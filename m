@@ -1,60 +1,27 @@
-Return-Path: <loberman@redhat.com>
-Return-Path: <loberman@redhat.com>
-Message-ID: <1541692483.24444.3.camel@redhat.com>
+Return-Path: <msnitzer@redhat.com>
+Date: Thu, 8 Nov 2018 10:49:01 -0500
+From: Mike Snitzer <snitzer@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
 Subject: Re: [PATCH 2/2] blk-mq: provide a helper to check if a queue is busy
-From: Laurence Oberman <loberman@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc: Mike Snitzer <snitzer@redhat.com>
-Date: Thu, 08 Nov 2018 10:54:43 -0500
-In-Reply-To: <20181108154216.23853-3-axboe@kernel.dk>
+Message-ID: <20181108154901.GB28795@redhat.com>
 References: <20181108154216.23853-1-axboe@kernel.dk>
-	 <20181108154216.23853-3-axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <20181108154216.23853-3-axboe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20181108154216.23853-3-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, 2018-11-08 at 08:42 -0700, Jens Axboe wrote:
-> +static bool blk_mq_check_busy(struct blk_mq_hw_ctx *hctx, struct
-> request *rq,
-> +                             void *priv, bool reserved)
-> +{
-> +       bool *busy = (bool *) priv;
-> +
-> +       /*
-> +        * If we find a request, we know the queue is busy. Return
-> false
-> +        * to stop the iteration.
-> +        */
-> +       *busy = true;
-> +       return false;
-> +}
-> +
+On Thu, Nov 08 2018 at 10:42am -0500,
+Jens Axboe <axboe@kernel.dk> wrote:
 
-Hi Jens,
+> Returns true if the queue currently has requests pending,
+> false if not.
+> 
+> DM can use this to replace the atomic_inc/dec they do per device
+> to see if a device is busy.
+> 
+> Cc: Mike Snitzer <snitzer@redhat.com>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-Trying to understand the logic, likely just my lack of knowledge
-You return false after setting true because you say we know the queue
-is busy.
-How do we know we found a request here
-I dont see you check the result of 
- bool *busy = (bool *) priv;
-Is the assumption here because this was called we already knew we had a
-request
-
-Apologies it its just my lack of understanding
-
-+static bool blk_mq_check_busy(struct blk_mq_hw_ctx *hctx, struct
-request *rq,
-+                             void *priv, bool reserved)
-+{
-+       bool *busy = (bool *) priv;
-+
-+       /*
-+        * If we find a request, we know the queue is busy. Return
-false
-+        * to stop the iteration.
-+        */
-+       *busy = true;
-+       return false;
-+}
-+
+Reviewed-by: Mike Snitzer <snitzer@redhat.com>
