@@ -1,91 +1,32 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
+Return-Path: <msnitzer@redhat.com>
+Date: Thu, 8 Nov 2018 10:48:33 -0500
+From: Mike Snitzer <snitzer@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 10/16] loop: Push loop_ctl_mutex down to loop_set_fd()
-Date: Thu,  8 Nov 2018 14:01:10 +0100
-Message-Id: <20181108130116.12140-11-jack@suse.cz>
-In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
-References: <20181108130116.12140-1-jack@suse.cz>
+Cc: linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] blk-mq-tag: change busy_iter_fn to return whether to
+ continue or not
+Message-ID: <20181108154832.GA28795@redhat.com>
+References: <20181108154216.23853-1-axboe@kernel.dk>
+ <20181108154216.23853-2-axboe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20181108154216.23853-2-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Push lo_ctl_mutex down to loop_set_fd(). We will need this to be able to
-call loop_reread_partitions() without lo_ctl_mutex.
+On Thu, Nov 08 2018 at 10:42am -0500,
+Jens Axboe <axboe@kernel.dk> wrote:
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/loop.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+> We have this functionality in sbitmap, but we don't export it in
+> blk-mq for users of the tags busy iteration. This can be useful
+> for stopping the iteration, if the caller doesn't need to find
+> more requests.
+> 
+> Cc: Mike Snitzer <snitzer@redhat.com>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index af79a59732b7..161e2a08f2e8 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -918,13 +918,17 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	if (!file)
- 		goto out;
- 
-+	error = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+	if (error)
-+		goto out_putf;
-+
- 	error = -EBUSY;
- 	if (lo->lo_state != Lo_unbound)
--		goto out_putf;
-+		goto out_unlock;
- 
- 	error = loop_validate_file(file, bdev);
- 	if (error)
--		goto out_putf;
-+		goto out_unlock;
- 
- 	mapping = file->f_mapping;
- 	inode = mapping->host;
-@@ -936,10 +940,10 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	error = -EFBIG;
- 	size = get_loop_size(lo, file);
- 	if ((loff_t)(sector_t)size != size)
--		goto out_putf;
-+		goto out_unlock;
- 	error = loop_prepare_queue(lo);
- 	if (error)
--		goto out_putf;
-+		goto out_unlock;
- 
- 	error = 0;
- 
-@@ -978,11 +982,14 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 	 * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
- 	 */
- 	bdgrab(bdev);
-+	mutex_unlock(&loop_ctl_mutex);
- 	return 0;
- 
-- out_putf:
-+out_unlock:
-+	mutex_unlock(&loop_ctl_mutex);
-+out_putf:
- 	fput(file);
-- out:
-+out:
- 	/* This is safe: open() is still holding a reference. */
- 	module_put(THIS_MODULE);
- 	return error;
-@@ -1460,12 +1467,7 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 
- 	switch (cmd) {
- 	case LOOP_SET_FD:
--		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
--		if (err)
--			return err;
--		err = loop_set_fd(lo, mode, bdev, arg);
--		mutex_unlock(&loop_ctl_mutex);
--		break;
-+		return loop_set_fd(lo, mode, bdev, arg);
- 	case LOOP_CHANGE_FD:
- 		err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
- 		if (err)
--- 
-2.16.4
+Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+
+(could add Tested-by too but probably overkill?)
+
+Thanks,
+Mike
