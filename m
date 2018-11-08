@@ -1,36 +1,28 @@
-Return-Path: <axboe@kernel.dk>
+Return-Path: <bart.vanassche@gmail.com>
+Return-Path: <bart.vanassche@gmail.com>
+Message-ID: <1541694626.196084.220.camel@acm.org>
 Subject: Re: [PATCH 2/2] blk-mq: provide a helper to check if a queue is busy
-To: Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
+From: Bart Van Assche <bvanassche@acm.org>
+To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Date: Thu, 08 Nov 2018 08:30:26 -0800
+In-Reply-To: <20181108160609.27568-4-axboe@kernel.dk>
 References: <20181108160609.27568-1-axboe@kernel.dk>
- <20181108160609.27568-4-axboe@kernel.dk>
- <1541694626.196084.220.camel@acm.org>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <7d4e0553-93d8-6b71-0359-2e463e32e0cc@kernel.dk>
-Date: Thu, 8 Nov 2018 09:32:21 -0700
-MIME-Version: 1.0
-In-Reply-To: <1541694626.196084.220.camel@acm.org>
-Content-Type: text/plain; charset=UTF-8
+	 <20181108160609.27568-4-axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-7"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/8/18 9:30 AM, Bart Van Assche wrote:
-> On Thu, 2018-11-08 at 09:06 -0700, Jens Axboe wrote:
->> +static bool blk_mq_check_busy(struct blk_mq_hw_ctx *hctx, struct request *rq,
->> +			      void *priv, bool reserved)
->> +{
->> +	/*
->> +	 * If we find a request, we know the queue is busy. Return false
->> +	 * to stop the iteration.
->> +	 */
->> +	if (rq->q == hctx->queue) {
->> +		bool *busy = (bool *) priv;
-> 
-> I think the "(bool *)" cast can be left out. Anyway:
+On Thu, 2018-11-08 at 09:06 -0700, Jens Axboe wrote:
++AD4 +-static bool blk+AF8-mq+AF8-check+AF8-busy(struct blk+AF8-mq+AF8-hw+AF8-ctx +ACo-hctx, struct request +ACo-rq,
++AD4 +-			      void +ACo-priv, bool reserved)
++AD4 +-+AHs
++AD4 +-	/+ACo
++AD4 +-	 +ACo If we find a request, we know the queue is busy. Return false
++AD4 +-	 +ACo to stop the iteration.
++AD4 +-	 +ACo-/
++AD4 +-	if (rq-+AD4-q +AD0APQ hctx-+AD4-queue) +AHs
++AD4 +-		bool +ACo-busy +AD0 (bool +ACo) priv+ADs
 
-It can, I'll drop it.
+I think the +ACI(bool +ACo)+ACI cast can be left out. Anyway:
 
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-
-Thanks
-
--- 
-Jens Axboe
+Reviewed-by: Bart Van Assche +ADw-bvanassche+AEA-acm.org+AD4
