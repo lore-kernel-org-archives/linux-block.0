@@ -1,63 +1,114 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx2.suse.de ([195.135.220.15]:34092 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727002AbeKHWgq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 8 Nov 2018 17:36:46 -0500
+From: Jan Kara <jack@suse.cz>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	David Sterba <dsterba@suse.com>,
-	linux-btrfs@vger.kernel.org
-Subject: [PATCH V8 08/18] btrfs: move bio_pages_all() to btrfs
-Date: Sat, 10 Nov 2018 00:26:00 +0800
-Message-Id: <20181109162610.18981-9-ming.lei@redhat.com>
-In-Reply-To: <20181109162610.18981-1-ming.lei@redhat.com>
-References: <20181109162610.18981-1-ming.lei@redhat.com>
-List-ID: <linux-block@vger.kernel.org>
+Cc: <linux-block@vger.kernel.org>,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH 13/16] loop: Move loop_reread_partitions() out of loop_ctl_mutex
+Date: Thu,  8 Nov 2018 14:01:13 +0100
+Message-Id: <20181108130116.12140-14-jack@suse.cz>
+In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
+References: <20181108130116.12140-1-jack@suse.cz>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-BTRFS is the only user of this helper, so move this helper into
-BTRFS, and implement it via bio_for_each_segment_all(), since
-bio->bi_vcnt may not equal to number of pages after multipage bvec
-is enabled.
+Calling loop_reread_partitions() under loop_ctl_mutex causes lockdep to
+complain about circular lock dependency between bdev->bd_mutex and
+lo->lo_ctl_mutex. The problem is that on loop device open or close
+lo_open() and lo_release() get called with bdev->bd_mutex held and they
+need to acquire loop_ctl_mutex. OTOH when loop_reread_partitions() is
+called with loop_ctl_mutex held, it will call blkdev_reread_part() which
+acquires bdev->bd_mutex. See syzbot report for details [1].
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: David Sterba <dsterba@suse.com>
-Cc: linux-btrfs@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Move all calls of loop_rescan_partitions() out of loop_ctl_mutex to
+avoid lockdep warning and fix deadlock possibility.
+
+[1] https://syzkaller.appspot.com/bug?id=bf154052f0eea4bc7712499e4569505907d1588
+
+Reported-by: syzbot <syzbot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- fs/btrfs/extent_io.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ drivers/block/loop.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index 5d5965297e7e..874bb9aeebdc 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2348,6 +2348,18 @@ struct bio *btrfs_create_repair_bio(struct inode *inode, struct bio *failed_bio,
- 	return bio;
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index f1d7a4fe30fc..cce5d4e8e863 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -679,6 +679,7 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ {
+ 	struct file	*file, *old_file;
+ 	int		error;
++	bool		partscan;
+ 
+ 	error = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+ 	if (error)
+@@ -720,9 +721,10 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	blk_mq_unfreeze_queue(lo->lo_queue);
+ 
+ 	fput(old_file);
+-	if (lo->lo_flags & LO_FLAGS_PARTSCAN)
+-		loop_reread_partitions(lo, bdev);
++	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+ 	mutex_unlock(&loop_ctl_mutex);
++	if (partscan)
++		loop_reread_partitions(lo, bdev);
+ 	return 0;
+ 
+ out_putf:
+@@ -903,6 +905,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	int		lo_flags = 0;
+ 	int		error;
+ 	loff_t		size;
++	bool		partscan;
+ 
+ 	/* This is safe, since we have a reference from open(). */
+ 	__module_get(THIS_MODULE);
+@@ -969,14 +972,15 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
+ 	lo->lo_state = Lo_bound;
+ 	if (part_shift)
+ 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
+-	if (lo->lo_flags & LO_FLAGS_PARTSCAN)
+-		loop_reread_partitions(lo, bdev);
++	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+ 
+ 	/* Grab the block_device to prevent its destruction after we
+ 	 * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
+ 	 */
+ 	bdgrab(bdev);
+ 	mutex_unlock(&loop_ctl_mutex);
++	if (partscan)
++		loop_reread_partitions(lo, bdev);
+ 	return 0;
+ 
+ out_unlock:
+@@ -1157,6 +1161,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	int err;
+ 	struct loop_func_table *xfer;
+ 	kuid_t uid = current_uid();
++	struct block_device *bdev;
++	bool partscan = false;
+ 
+ 	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
+ 	if (err)
+@@ -1245,10 +1251,13 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 	     !(lo->lo_flags & LO_FLAGS_PARTSCAN)) {
+ 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
+ 		lo->lo_disk->flags &= ~GENHD_FL_NO_PART_SCAN;
+-		loop_reread_partitions(lo, lo->lo_device);
++		bdev = lo->lo_device;
++		partscan = true;
+ 	}
+ out_unlock:
+ 	mutex_unlock(&loop_ctl_mutex);
++	if (partscan)
++		loop_reread_partitions(lo, bdev);
+ 
+ 	return err;
  }
- 
-+static unsigned btrfs_bio_pages_all(struct bio *bio)
-+{
-+	unsigned i;
-+	struct bio_vec *bv;
-+
-+	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
-+
-+	bio_for_each_segment_all(bv, bio, i)
-+		;
-+	return i;
-+}
-+
- /*
-  * this is a generic handler for readpage errors (default
-  * readpage_io_failed_hook). if other copies exist, read those and write back
-@@ -2368,7 +2380,7 @@ static int bio_readpage_error(struct bio *failed_bio, u64 phy_offset,
- 	int read_mode = 0;
- 	blk_status_t status;
- 	int ret;
--	unsigned failed_bio_pages = bio_pages_all(failed_bio);
-+	unsigned failed_bio_pages = btrfs_bio_pages_all(failed_bio);
- 
- 	BUG_ON(bio_op(failed_bio) == REQ_OP_WRITE);
- 
 -- 
-2.9.5
+2.16.4
