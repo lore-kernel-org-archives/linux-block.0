@@ -1,41 +1,75 @@
-Return-Path: <thomas@fjellstrom.ca>
-From: Thomas Fjellstrom <thomas@fjellstrom.ca>
+Return-Path: <BATV+1ef63fdb319281f35549+5556+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
-Subject: Re: recent issues with heavy delete's causing soft lockups
-Date: Fri, 02 Nov 2018 12:25:04 -0600
-Message-ID: <22668288.jsZX13hhXo@natasha>
-In-Reply-To: <BE7DD8B0-3D16-4AAC-9B49-E809EA30A0B6@kernel.dk>
-References: <2800911.LnhMzhikfW@natasha> <BE7DD8B0-3D16-4AAC-9B49-E809EA30A0B6@kernel.dk>
+Subject: [PATCH 1/9] mtip32xx: move the blk_rq_map_sg call to mtip_hw_submit_io
+Date: Fri,  9 Nov 2018 14:48:54 +0100
+Message-Id: <20181109134902.32057-2-hch@lst.de>
+In-Reply-To: <20181109134902.32057-1-hch@lst.de>
+References: <20181109134902.32057-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-block@vger.kernel.org>
 
-On Saturday, October 27, 2018 1:20:10 PM MDT Jens Axboe wrote:
-> On Oct 27, 2018, at 12:40 PM, Thomas Fjellstrom <thomas@fjellstrom.ca> 
-wrote:
-> > Hi
-[snip explanation of problem]
-> 
-> Can you try 4.19? A patch went in since 4.18 that fixes a starvation issue
-> around requeue conditions, which SATA is the one to most often hit.
+We have all arguments at hand in mtip_hw_submit_io, so keep the
+rq to sg mapping close to the dma_map_sg call.
 
-Gave it a shot. with the vanila kernel from git linux-stable/v4.9. It was a 
-bit of a pain as the amdgpu driver seems to be broken for my r9 390 on many 
-kernels, including 4.19. Had to reconfigure to the radeon driver, which I must 
-say seems to work a lot better than it used to.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/mtip32xx/mtip32xx.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
-At any rate, it doesn't seem to have helped a lot so far. I did end up adding 
-"scsi_mod.use_blk_mq=0 dm_mod.use_blk_mq=0" to the default kernel boot command 
-line in grub. It seems to have helped a little, but I haven't tested fully 
-with a full delete of the build directory. haven't had time to sit and wait 
-the 40+ minutes it takes to re build the entire thing. And I'm low enough on 
-disk space that I can't easily make a copy of the 109GB build folder. I've got 
-about 25GB free out of 780GB. I'll try and test some more soon.
-
-> Jens
-
-
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 947aa10107a6..1964af8a187b 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -2171,7 +2171,6 @@ static int mtip_hw_ioctl(struct driver_data *dd, unsigned int cmd,
+  * @dd       Pointer to the driver data structure.
+  * @start    First sector to read.
+  * @nsect    Number of sectors to read.
+- * @nents    Number of entries in scatter list for the read command.
+  * @tag      The tag of this read command.
+  * @callback Pointer to the function that should be called
+  *	     when the read completes.
+@@ -2183,7 +2182,7 @@ static int mtip_hw_ioctl(struct driver_data *dd, unsigned int cmd,
+  *	None
+  */
+ static void mtip_hw_submit_io(struct driver_data *dd, struct request *rq,
+-			      struct mtip_cmd *command, int nents,
++			      struct mtip_cmd *command,
+ 			      struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct host_to_dev_fis	*fis;
+@@ -2191,8 +2190,10 @@ static void mtip_hw_submit_io(struct driver_data *dd, struct request *rq,
+ 	int dma_dir = rq_data_dir(rq) == READ ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
+ 	u64 start = blk_rq_pos(rq);
+ 	unsigned int nsect = blk_rq_sectors(rq);
++	unsigned int nents;
+ 
+ 	/* Map the scatter list for DMA access */
++	nents = blk_rq_map_sg(hctx->queue, rq, command->sg);
+ 	nents = dma_map_sg(&dd->pdev->dev, command->sg, nents, dma_dir);
+ 
+ 	prefetch(&port->flags);
+@@ -3548,7 +3549,6 @@ static int mtip_submit_request(struct blk_mq_hw_ctx *hctx, struct request *rq)
+ {
+ 	struct driver_data *dd = hctx->queue->queuedata;
+ 	struct mtip_cmd *cmd = blk_mq_rq_to_pdu(rq);
+-	unsigned int nents;
+ 
+ 	if (is_se_active(dd))
+ 		return -ENODATA;
+@@ -3579,11 +3579,8 @@ static int mtip_submit_request(struct blk_mq_hw_ctx *hctx, struct request *rq)
+ 		return 0;
+ 	}
+ 
+-	/* Create the scatter list for this request. */
+-	nents = blk_rq_map_sg(hctx->queue, rq, cmd->sg);
+-
+ 	/* Issue the read/write. */
+-	mtip_hw_submit_io(dd, rq, cmd, nents, hctx);
++	mtip_hw_submit_io(dd, rq, cmd, hctx);
+ 	return 0;
+ }
+ 
 -- 
-Thomas Fjellstrom
-thomas@fjellstrom.ca
+2.19.1
