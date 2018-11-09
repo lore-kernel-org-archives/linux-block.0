@@ -1,93 +1,31 @@
-Return-Path: <BATV+1ef63fdb319281f35549+5556+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 3/9] mtip32xx: return a blk_status_t from mtip_send_trim
-Date: Fri,  9 Nov 2018 14:48:56 +0100
-Message-Id: <20181109134902.32057-4-hch@lst.de>
-In-Reply-To: <20181109134902.32057-1-hch@lst.de>
-References: <20181109134902.32057-1-hch@lst.de>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 09/30] scsi: kill off the legacy IO path
+To: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+ linux-scsi@vger.kernel.org
+References: <20181031175922.8849-1-axboe@kernel.dk>
+ <20181031175922.8849-10-axboe@kernel.dk> <yq17ehp3aiu.fsf@oracle.com>
+ <9343e6fc-89fb-24ff-cccd-da33913534c2@kernel.dk> <yq1y3a3vvau.fsf@oracle.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <c9836a6b-fc38-4ca2-7edb-949486ed671f@kernel.dk>
+Date: Fri, 9 Nov 2018 06:38:14 -0700
 MIME-Version: 1.0
+In-Reply-To: <yq1y3a3vvau.fsf@oracle.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This allows for better error propagation and simpler code.
+On 11/8/18 7:28 PM, Martin K. Petersen wrote:
+> 
+> Jens,
+> 
+>> Thanks for reviewing both of these. Since the series is hard to break
+>> apart, are you fine with me carrying this for 4.21 in the block tree?
+>> I can stage it very soon, which would make it trivial for you to base
+>> the 4.21 SCSI branch on it to avoid conflicting changes.
+> 
+> Sure, that's fine.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/mtip32xx/mtip32xx.c | 30 +++++++++++-------------------
- 1 file changed, 11 insertions(+), 19 deletions(-)
+Great, it's all sitting in my for-4.21/block branch now.
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 75a4ca0210f2..d5277bba0c02 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -1423,23 +1423,19 @@ static int mtip_get_smart_attr(struct mtip_port *port, unsigned int id,
-  * @dd		pointer to driver_data structure
-  * @lba		starting lba
-  * @len		# of 512b sectors to trim
-- *
-- * return value
-- *      -ENOMEM		Out of dma memory
-- *      -EINVAL		Invalid parameters passed in, trim not supported
-- *      -EIO		Error submitting trim request to hw
-  */
--static int mtip_send_trim(struct driver_data *dd, unsigned int lba,
--				unsigned int len)
-+static blk_status_t mtip_send_trim(struct driver_data *dd, unsigned int lba,
-+		unsigned int len)
- {
--	int i, rv = 0;
- 	u64 tlba, tlen, sect_left;
- 	struct mtip_trim_entry *buf;
- 	dma_addr_t dma_addr;
- 	struct host_to_dev_fis fis;
-+	blk_status_t ret = BLK_STS_OK;
-+	int i;
- 
- 	if (!len || dd->trim_supp == false)
--		return -EINVAL;
-+		return BLK_STS_IOERR;
- 
- 	/* Trim request too big */
- 	WARN_ON(len > (MTIP_MAX_TRIM_ENTRY_LEN * MTIP_MAX_TRIM_ENTRIES));
-@@ -1454,7 +1450,7 @@ static int mtip_send_trim(struct driver_data *dd, unsigned int lba,
- 	buf = dmam_alloc_coherent(&dd->pdev->dev, ATA_SECT_SIZE, &dma_addr,
- 								GFP_KERNEL);
- 	if (!buf)
--		return -ENOMEM;
-+		return BLK_STS_RESOURCE;
- 	memset(buf, 0, ATA_SECT_SIZE);
- 
- 	for (i = 0, sect_left = len, tlba = lba;
-@@ -1486,10 +1482,10 @@ static int mtip_send_trim(struct driver_data *dd, unsigned int lba,
- 					ATA_SECT_SIZE,
- 					0,
- 					MTIP_TRIM_TIMEOUT_MS) < 0)
--		rv = -EIO;
-+		ret = BLK_STS_IOERR;
- 
- 	dmam_free_coherent(&dd->pdev->dev, ATA_SECT_SIZE, buf, dma_addr);
--	return rv;
-+	return ret;
- }
- 
- /*
-@@ -3634,13 +3630,9 @@ static blk_status_t mtip_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- 	blk_mq_start_request(rq);
- 
--	if (req_op(rq) == REQ_OP_DISCARD) {
--		if (mtip_send_trim(dd, blk_rq_pos(rq), blk_rq_sectors(rq)) < 0)
--			return BLK_STS_IOERR;
--	} else {
--		mtip_hw_submit_io(dd, rq, cmd, hctx);
--	}
--
-+	if (req_op(rq) == REQ_OP_DISCARD)
-+		return mtip_send_trim(dd, blk_rq_pos(rq), blk_rq_sectors(rq));
-+	mtip_hw_submit_io(dd, rq, cmd, hctx);
- 	return BLK_STS_OK;
- }
- 
 -- 
-2.19.1
+Jens Axboe
