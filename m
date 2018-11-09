@@ -1,50 +1,79 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it1-f194.google.com ([209.85.166.194]:38430 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729004AbeKEVBb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Nov 2018 16:01:31 -0500
-Received: by mail-it1-f194.google.com with SMTP id k141-v6so10272577itk.3
-        for <linux-block@vger.kernel.org>; Mon, 05 Nov 2018 03:42:12 -0800 (PST)
-From: Hans Holmberg <hans@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: Javier Gonzales <javier@cnexlabs.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.ml.holmberg@owltronix.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH 6/7] lightnvm: pblk: fix pblk_lines_init error handling path
-Date: Mon,  5 Nov 2018 12:41:12 +0100
-Message-Id: <20181105114113.30932-7-hans.ml.holmberg@cnexlabs.com>
-In-Reply-To: <20181105114113.30932-1-hans.ml.holmberg@cnexlabs.com>
-References: <20181105114113.30932-1-hans.ml.holmberg@cnexlabs.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <BATV+1ef63fdb319281f35549+5556+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 8/9] mtip32xx: don't use req->special
+Date: Fri,  9 Nov 2018 14:49:01 +0100
+Message-Id: <20181109134902.32057-9-hch@lst.de>
+In-Reply-To: <20181109134902.32057-1-hch@lst.de>
+References: <20181109134902.32057-1-hch@lst.de>
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
+Instead create add to the icmd into struct mtip_cmd which can be unioned
+with the scatterlist used for the normal I/O path.
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
-
-The chunk metadata is allocated with vmalloc, so we need to use
-vfree to free it.
-
-Fixes: 090ee26fd512 ("lightnvm: use internal allocation for chunk log page")
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/lightnvm/pblk-init.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/mtip32xx/mtip32xx.c | 5 ++---
+ drivers/block/mtip32xx/mtip32xx.h | 7 ++++++-
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 33c1e83327c3..ae9686b5d521 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -1053,7 +1053,7 @@ static int pblk_lines_init(struct pblk *pblk)
- 		pblk_line_meta_free(l_mg, &pblk->lines[i]);
- 	kfree(pblk->lines);
- fail_free_chunk_meta:
--	kfree(chunk_meta);
-+	vfree(chunk_meta);
- fail_free_luns:
- 	kfree(pblk->luns);
- fail_free_meta:
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 5ae86224b2f5..e99db2c9118f 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -997,8 +997,6 @@ static int mtip_exec_internal_command(struct mtip_port *port,
+ 		return -EFAULT;
+ 	}
+ 
+-	rq->special = &icmd;
+-
+ 	set_bit(MTIP_PF_IC_ACTIVE_BIT, &port->flags);
+ 
+ 	if (fis->command == ATA_CMD_SEC_ERASE_PREP)
+@@ -1019,6 +1017,7 @@ static int mtip_exec_internal_command(struct mtip_port *port,
+ 
+ 	/* Copy the command to the command table */
+ 	int_cmd = blk_mq_rq_to_pdu(rq);
++	int_cmd->icmd = &icmd;
+ 	memcpy(int_cmd->command, fis, fis_len*4);
+ 
+ 	rq->timeout = timeout;
+@@ -3548,8 +3547,8 @@ static blk_status_t mtip_issue_reserved_cmd(struct blk_mq_hw_ctx *hctx,
+ 		struct request *rq)
+ {
+ 	struct driver_data *dd = hctx->queue->queuedata;
+-	struct mtip_int_cmd *icmd = rq->special;
+ 	struct mtip_cmd *cmd = blk_mq_rq_to_pdu(rq);
++	struct mtip_int_cmd *icmd = cmd->icmd;
+ 	struct mtip_cmd_hdr *hdr =
+ 		dd->port->command_list + sizeof(struct mtip_cmd_hdr) * rq->tag;
+ 	struct mtip_cmd_sg *command_sg;
+diff --git a/drivers/block/mtip32xx/mtip32xx.h b/drivers/block/mtip32xx/mtip32xx.h
+index 63414928f07c..c33f8c3d9fb4 100644
+--- a/drivers/block/mtip32xx/mtip32xx.h
++++ b/drivers/block/mtip32xx/mtip32xx.h
+@@ -321,6 +321,8 @@ struct mtip_cmd_sg {
+ };
+ struct mtip_port;
+ 
++struct mtip_int_cmd;
++
+ /* Structure used to describe a command. */
+ struct mtip_cmd {
+ 	void *command; /* ptr to command table entry */
+@@ -331,7 +333,10 @@ struct mtip_cmd {
+ 
+ 	int unaligned; /* command is unaligned on 4k boundary */
+ 
+-	struct scatterlist sg[MTIP_MAX_SG]; /* Scatter list entries */
++	union {
++		struct scatterlist sg[MTIP_MAX_SG]; /* Scatter list entries */
++		struct mtip_int_cmd *icmd;
++	};
+ 
+ 	int retries; /* The number of retries left for this command. */
+ 
 -- 
-2.17.1
+2.19.1
