@@ -1,23 +1,20 @@
-Return-Path: <greg@kroah.com>
-Date: Fri, 9 Nov 2018 03:17:00 -0800
-From: Greg KH <greg@kroah.com>
-To: Manjunath Patil <manjunath.b.patil@oracle.com>
-Cc: boris.ostrovsky@oracle.com, jgross@suse.com, konrad.wilk@oracle.com,
-	roger.pau@citrix.com, axboe@kernel.dk,
-	xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] xen-blkfront: fix kernel panic with blkfront_remove()
-Message-ID: <20181109111700.GC26335@kroah.com>
-References: <1541725108-1468-1-git-send-email-manjunath.b.patil@oracle.com>
+Return-Path: <jgross@suse.com>
+Subject: Re: [PATCH v2] xen-blkfront: fix kernel panic with blkfront_remove()
+To: Manjunath Patil <manjunath.b.patil@oracle.com>,
+ boris.ostrovsky@oracle.com, konrad.wilk@oracle.com, roger.pau@citrix.com
+Cc: axboe@kernel.dk, xen-devel@lists.xenproject.org,
+ linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+References: <1541725843-2019-1-git-send-email-manjunath.b.patil@oracle.com>
+From: Juergen Gross <jgross@suse.com>
+Message-ID: <9414b993-15f6-941a-fc2b-e96147e4fb26@suse.com>
+Date: Fri, 9 Nov 2018 07:16:22 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1541725108-1468-1-git-send-email-manjunath.b.patil@oracle.com>
+In-Reply-To: <1541725843-2019-1-git-send-email-manjunath.b.patil@oracle.com>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Thu, Nov 08, 2018 at 04:58:28PM -0800, Manjunath Patil wrote:
-> If a hot-attaching device fails inside domU[ex:negotiate_mq() returns
-> with ENOMEM] we clear the blkfront_info struct in talk_to_blkback()
-> 
+On 09/11/2018 02:10, Manjunath Patil wrote:
 > When we try to detach the device, blkfront_remove() tries to access
 > blkfront_info leading to kernel panic.
 > 
@@ -39,26 +36,8 @@ On Thu, Nov 08, 2018 at 04:58:28PM -0800, Manjunath Patil wrote:
 > 
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
-> ---
->  drivers/block/xen-blkfront.c |    3 +++
->  1 files changed, 3 insertions(+), 0 deletions(-)
-> 
-> diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-> index dc8fe25..144cda8 100644
-> --- a/drivers/block/xen-blkfront.c
-> +++ b/drivers/block/xen-blkfront.c
-> @@ -2496,6 +2496,9 @@ static int blkfront_remove(struct xenbus_device *xbdev)
->  
->  	dev_dbg(&xbdev->dev, "%s removed", xbdev->nodename);
->  
-> +	if(!info)
-> +		return 0;
-> +
 
-Always run scripts/checkpatch.pl on your patches so you do not get a
-grumpy maintainer telling you to run scripts/checkpatch.pl on your
-patches.
+Commit f92898e7f32e3 already added that.
 
-thanks,
 
-greg k-h
+Juergen
