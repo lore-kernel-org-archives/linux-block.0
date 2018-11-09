@@ -1,34 +1,52 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH 2/6] nullb: remove leftover legacy request code
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Return-Path: <BATV+1ef63fdb319281f35549+5556+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
+Subject: [PATCH 2/6] nullb: remove leftover legacy request code
+Date: Fri,  9 Nov 2018 19:32:04 +0100
+Message-Id: <20181109183208.19879-3-hch@lst.de>
+In-Reply-To: <20181109183208.19879-1-hch@lst.de>
 References: <20181109183208.19879-1-hch@lst.de>
- <20181109183208.19879-3-hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <0c3dfadb-eb4d-a99a-a521-abdafd7df2a2@suse.de>
-Date: Sat, 10 Nov 2018 13:56:46 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181109183208.19879-3-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/9/18 7:32 PM, Christoph Hellwig wrote:
-> null_softirq_done_fn is only used for the blk-mq path, so remove the
-> other branch.  Also rename the function to better match the method name.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/block/null_blk_main.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+null_softirq_done_fn is only used for the blk-mq path, so remove the
+other branch.  Also rename the function to better match the method name.
 
-Cheers,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/null_blk_main.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-Hannes
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 9c045bee0985..16ba3db2a015 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -642,14 +642,11 @@ static void null_cmd_end_timer(struct nullb_cmd *cmd)
+ 	hrtimer_start(&cmd->timer, kt, HRTIMER_MODE_REL);
+ }
+ 
+-static void null_softirq_done_fn(struct request *rq)
++static void null_complete_rq(struct request *rq)
+ {
+ 	struct nullb *nullb = rq->q->queuedata;
+ 
+-	if (nullb->dev->queue_mode == NULL_Q_MQ)
+-		end_cmd(blk_mq_rq_to_pdu(rq));
+-	else
+-		end_cmd(rq->special);
++	end_cmd(blk_mq_rq_to_pdu(rq));
+ }
+ 
+ static struct nullb_page *null_alloc_page(gfp_t gfp_flags)
+@@ -1357,7 +1354,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 
+ static const struct blk_mq_ops null_mq_ops = {
+ 	.queue_rq       = null_queue_rq,
+-	.complete	= null_softirq_done_fn,
++	.complete	= null_complete_rq,
+ 	.timeout	= null_timeout_rq,
+ };
+ 
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.19.1
