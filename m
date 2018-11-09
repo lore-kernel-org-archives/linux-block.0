@@ -1,75 +1,49 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH V4 1/5] blk-mq: make __blk_mq_issue_directly be able to accept NULL cookie pointer
-Date: Fri,  2 Nov 2018 15:08:52 +0800
-Message-Id: <1541142536-1431-2-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1541142536-1431-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1541142536-1431-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <manjunath.b.patil@oracle.com>
+Subject: Re: [Xen-devel] [PATCH v2] xen-blkfront: fix kernel panic with
+ blkfront_remove()
+To: Juergen Gross <jgross@suse.com>, boris.ostrovsky@oracle.com,
+        konrad.wilk@oracle.com, roger.pau@citrix.com
+Cc: axboe@kernel.dk, xen-devel@lists.xenproject.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+References: <1541725843-2019-1-git-send-email-manjunath.b.patil@oracle.com>
+ <9414b993-15f6-941a-fc2b-e96147e4fb26@suse.com>
+From: Manjunath Patil <manjunath.b.patil@oracle.com>
+Message-ID: <28e89b14-add7-348d-f054-975af74bdf52@oracle.com>
+Date: Fri, 9 Nov 2018 11:08:56 -0800
+MIME-Version: 1.0
+In-Reply-To: <9414b993-15f6-941a-fc2b-e96147e4fb26@suse.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-Make __blk_mq_issue_directly be able to accept a NULL cookie pointer
-and remove the dummy unused_cookie in blk_mq_request_issue_directly.
+oops! sorry for not noticing this.
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- block/blk-mq.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+-Manjunath
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index dcf10e3..af5b591 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1700,8 +1700,6 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	blk_qc_t new_cookie;
- 	blk_status_t ret;
- 
--	new_cookie = request_to_qc_t(hctx, rq);
--
- 	/*
- 	 * For OK queue, we are done. For error, caller may kill it.
- 	 * Any other error (busy), just add it to our list as we
-@@ -1711,19 +1709,23 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	switch (ret) {
- 	case BLK_STS_OK:
- 		blk_mq_update_dispatch_busy(hctx, false);
--		*cookie = new_cookie;
-+		new_cookie = request_to_qc_t(hctx, rq);
- 		break;
- 	case BLK_STS_RESOURCE:
- 	case BLK_STS_DEV_RESOURCE:
- 		blk_mq_update_dispatch_busy(hctx, true);
- 		__blk_mq_requeue_request(rq);
-+		new_cookie = BLK_QC_T_NONE;
- 		break;
- 	default:
- 		blk_mq_update_dispatch_busy(hctx, false);
--		*cookie = BLK_QC_T_NONE;
-+		new_cookie = BLK_QC_T_NONE;
- 		break;
- 	}
- 
-+	if (cookie)
-+		*cookie = new_cookie;
-+
- 	return ret;
- }
- 
-@@ -1791,12 +1793,11 @@ blk_status_t blk_mq_request_issue_directly(struct request *rq)
- {
- 	blk_status_t ret;
- 	int srcu_idx;
--	blk_qc_t unused_cookie;
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
- 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(rq->q, ctx->cpu);
- 
- 	hctx_lock(hctx, &srcu_idx);
--	ret = __blk_mq_try_issue_directly(hctx, rq, &unused_cookie, true);
-+	ret = __blk_mq_try_issue_directly(hctx, rq, NULL, true);
- 	hctx_unlock(hctx, srcu_idx);
- 
- 	return ret;
--- 
-2.7.4
+On 11/8/2018 10:16 PM, Juergen Gross wrote:
+> On 09/11/2018 02:10, Manjunath Patil wrote:
+>> When we try to detach the device, blkfront_remove() tries to access
+>> blkfront_info leading to kernel panic.
+>>
+>> Typical call stack involving panic -
+>>   #10 page_fault at ffffffff816f25df
+>>       [exception RIP: blkif_free+46]
+>>   #11 blkfront_remove at ffffffffa004de47 [xen_blkfront]
+>>   #12 xenbus_dev_remove at ffffffff813faa4c
+>>   #13 __device_release_driver at ffffffff814769aa
+>>   #14 device_release_driver at ffffffff81476a63
+>>   #15 bus_remove_device at ffffffff814762eb
+>>   #16 device_del at ffffffff81472684
+>>   #17 device_unregister at ffffffff814727e2
+>>   #18 xenbus_dev_changed at ffffffff813fa89f
+>>   #19 frontend_changed at ffffffff813fca19
+>>   #20 xenwatch_thread at ffffffff813f88f9
+>>   #21 kthread at ffffffff810a486b
+>>   #22 ret_from_fork at ffffffff816ed2a8
+>>
+>> Cc: stable@vger.kernel.org
+>> Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
+> Commit f92898e7f32e3 already added that.
+>
+>
+> Juergen
