@@ -1,56 +1,45 @@
-Return-Path: <manjunath.b.patil@oracle.com>
-From: Manjunath Patil <manjunath.b.patil@oracle.com>
-To: boris.ostrovsky@oracle.com, jgross@suse.com, konrad.wilk@oracle.com,
-        roger.pau@citrix.com
-Cc: axboe@kernel.dk, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: [PATCH] xen-blkfront: fix kernel panic with blkfront_remove()
-Date: Thu,  8 Nov 2018 16:58:28 -0800
-Message-Id: <1541725108-1468-1-git-send-email-manjunath.b.patil@oracle.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V8 14/18] block: always define BIO_MAX_PAGES as 256
+Date: Sat, 10 Nov 2018 00:26:06 +0800
+Message-Id: <20181109162610.18981-15-ming.lei@redhat.com>
+In-Reply-To: <20181109162610.18981-1-ming.lei@redhat.com>
+References: <20181109162610.18981-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-If a hot-attaching device fails inside domU[ex:negotiate_mq() returns
-with ENOMEM] we clear the blkfront_info struct in talk_to_blkback()
+Now multi-page bvec can cover CONFIG_THP_SWAP, so we don't need to
+increase BIO_MAX_PAGES for it.
 
-When we try to detach the device, blkfront_remove() tries to access
-blkfront_info leading to kernel panic.
-
-Typical call stack involving panic -
- #10 page_fault at ffffffff816f25df
-     [exception RIP: blkif_free+46]
- #11 blkfront_remove at ffffffffa004de47 [xen_blkfront]
- #12 xenbus_dev_remove at ffffffff813faa4c
- #13 __device_release_driver at ffffffff814769aa
- #14 device_release_driver at ffffffff81476a63
- #15 bus_remove_device at ffffffff814762eb
- #16 device_del at ffffffff81472684
- #17 device_unregister at ffffffff814727e2
- #18 xenbus_dev_changed at ffffffff813fa89f
- #19 frontend_changed at ffffffff813fca19
- #20 xenwatch_thread at ffffffff813f88f9
- #21 kthread at ffffffff810a486b
- #22 ret_from_fork at ffffffff816ed2a8
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/xen-blkfront.c |    3 +++
- 1 files changed, 3 insertions(+), 0 deletions(-)
+ include/linux/bio.h | 8 --------
+ 1 file changed, 8 deletions(-)
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index dc8fe25..144cda8 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -2496,6 +2496,9 @@ static int blkfront_remove(struct xenbus_device *xbdev)
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 1a2430a8b89d..5a86f0ecb57c 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -34,15 +34,7 @@
+ #define BIO_BUG_ON
+ #endif
  
- 	dev_dbg(&xbdev->dev, "%s removed", xbdev->nodename);
+-#ifdef CONFIG_THP_SWAP
+-#if HPAGE_PMD_NR > 256
+-#define BIO_MAX_PAGES		HPAGE_PMD_NR
+-#else
+ #define BIO_MAX_PAGES		256
+-#endif
+-#else
+-#define BIO_MAX_PAGES		256
+-#endif
  
-+	if(!info)
-+		return 0;
-+
- 	blkif_free(info, 0);
- 
- 	mutex_lock(&info->mutex);
+ #define bio_prio(bio)			(bio)->bi_ioprio
+ #define bio_set_prio(bio, prio)		((bio)->bi_ioprio = prio)
 -- 
-1.7.1
+2.9.5
