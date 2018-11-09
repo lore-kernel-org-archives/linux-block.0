@@ -1,96 +1,63 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH V5 3/6] blk-mq: fix issue directly case when q is stopped or quiesced
-Date: Mon, 12 Nov 2018 17:23:26 +0800
-Message-Id: <1542014609-1769-4-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1542014609-1769-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1542014609-1769-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	David Sterba <dsterba@suse.com>,
+	linux-btrfs@vger.kernel.org
+Subject: [PATCH V8 08/18] btrfs: move bio_pages_all() to btrfs
+Date: Sat, 10 Nov 2018 00:26:00 +0800
+Message-Id: <20181109162610.18981-9-ming.lei@redhat.com>
+In-Reply-To: <20181109162610.18981-1-ming.lei@redhat.com>
+References: <20181109162610.18981-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-When try to issue request directly, if the queue is stopped or
-quiesced, 'bypass' will be ignored and return BLK_STS_OK to caller
-to avoid it dispatch request again. Then the request will be
-inserted with blk_mq_sched_insert_request. This is not correct
-for dm-rq case where we should avoid to pass through the underlying
-path's io scheduler.
+BTRFS is the only user of this helper, so move this helper into
+BTRFS, and implement it via bio_for_each_segment_all(), since
+bio->bi_vcnt may not equal to number of pages after multipage bvec
+is enabled.
 
-To fix it, add new mq_issue_decision entry MQ_ISSUE_INSERT_DISPATCH
-for above case where the request need to be inserted forcibly.
-And use blk_mq_request_bypass_insert to insert the request into
-hctx->dispatch directly.
-
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: David Sterba <dsterba@suse.com>
+Cc: linux-btrfs@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ fs/btrfs/extent_io.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 48b7a7c..f54c092 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1768,12 +1768,13 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+index 5d5965297e7e..874bb9aeebdc 100644
+--- a/fs/btrfs/extent_io.c
++++ b/fs/btrfs/extent_io.c
+@@ -2348,6 +2348,18 @@ struct bio *btrfs_create_repair_bio(struct inode *inode, struct bio *failed_bio,
+ 	return bio;
+ }
  
- enum mq_issue_decision {
- 	MQ_ISSUE_INSERT_QUEUE,
-+	MQ_ISSUE_INSERT_DISPATCH,
- 	MQ_ISSUE_END_REQUEST,
- 	MQ_ISSUE_DO_NOTHING,
- };
++static unsigned btrfs_bio_pages_all(struct bio *bio)
++{
++	unsigned i;
++	struct bio_vec *bv;
++
++	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
++
++	bio_for_each_segment_all(bv, bio, i)
++		;
++	return i;
++}
++
+ /*
+  * this is a generic handler for readpage errors (default
+  * readpage_io_failed_hook). if other copies exist, read those and write back
+@@ -2368,7 +2380,7 @@ static int bio_readpage_error(struct bio *failed_bio, u64 phy_offset,
+ 	int read_mode = 0;
+ 	blk_status_t status;
+ 	int ret;
+-	unsigned failed_bio_pages = bio_pages_all(failed_bio);
++	unsigned failed_bio_pages = btrfs_bio_pages_all(failed_bio);
  
- static inline enum mq_issue_decision
--	blk_mq_make_dicision(blk_status_t ret, bool bypass)
-+	blk_mq_make_dicision(blk_status_t ret, bool bypass, bool force)
- {
- 	enum mq_issue_decision dec;
+ 	BUG_ON(bio_op(failed_bio) == REQ_OP_WRITE);
  
-@@ -1783,7 +1784,10 @@ static inline enum mq_issue_decision
- 		break;
- 	case BLK_STS_DEV_RESOURCE:
- 	case BLK_STS_RESOURCE:
--		dec = bypass ? MQ_ISSUE_DO_NOTHING : MQ_ISSUE_INSERT_QUEUE;
-+		if (force)
-+			dec = bypass ? MQ_ISSUE_INSERT_DISPATCH : MQ_ISSUE_INSERT_QUEUE;
-+		else
-+			dec = bypass ? MQ_ISSUE_DO_NOTHING : MQ_ISSUE_INSERT_QUEUE;
- 		break;
- 	default:
- 		dec = bypass ? MQ_ISSUE_DO_NOTHING : MQ_ISSUE_END_REQUEST;
-@@ -1799,7 +1803,7 @@ static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 						bool bypass)
- {
- 	struct request_queue *q = rq->q;
--	bool run_queue = true;
-+	bool run_queue = true, force = false;
- 	blk_status_t ret = BLK_STS_RESOURCE;
- 	enum mq_issue_decision dec;
- 	int srcu_idx;
-@@ -1814,7 +1818,7 @@ static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	 */
- 	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)) {
- 		run_queue = false;
--		bypass = false;
-+		force = true;
- 		goto out_unlock;
- 	}
- 
-@@ -1837,11 +1841,14 @@ static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- out_unlock:
- 	hctx_unlock(hctx, srcu_idx);
- 
--	dec = blk_mq_make_dicision(ret, bypass);
-+	dec = blk_mq_make_dicision(ret, bypass, force);
- 	switch(dec) {
- 	case MQ_ISSUE_INSERT_QUEUE:
- 		blk_mq_sched_insert_request(rq, false, run_queue, false);
- 		break;
-+	case MQ_ISSUE_INSERT_DISPATCH:
-+		blk_mq_request_bypass_insert(rq, run_queue);
-+		break;
- 	case MQ_ISSUE_END_REQUEST:
- 		blk_mq_end_request(rq, ret);
- 		break;
 -- 
-2.7.4
+2.9.5
