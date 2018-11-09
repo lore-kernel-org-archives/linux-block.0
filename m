@@ -1,34 +1,86 @@
-Return-Path: <torvalds@linuxfoundation.org>
-Return-Path: <torvalds@linuxfoundation.org>
+Return-Path: <axboe@kernel.dk>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4.20-rc2
+Message-ID: <08927d57-4155-b97e-0229-77b65b9eeb32@kernel.dk>
+Date: Fri, 9 Nov 2018 12:29:38 -0700
 MIME-Version: 1.0
-References: <08927d57-4155-b97e-0229-77b65b9eeb32@kernel.dk>
-In-Reply-To: <08927d57-4155-b97e-0229-77b65b9eeb32@kernel.dk>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 9 Nov 2018 16:35:45 -0600
-Message-ID: <CAHk-=wjxZyGmXC6m_YyDyy5BMKrMHZW4iE9GO__LZKD-t5S1Tw@mail.gmail.com>
-Subject: Re: [GIT PULL] Block fixes for 4.20-rc2
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On Fri, Nov 9, 2018 at 1:29 PM Jens Axboe <axboe@kernel.dk> wrote:
->
-> A select set of fixes that should go into this release. This pull
-> request contains:
+Hi Linus,
 
-This is part of a final few "ack" emails, pointing out that there is
-now automation in place if you cc lkml in your pull request.
+A select set of fixes that should go into this release. This pull
+request contains:
 
-That automation will parse the pull request and automatically send an
-ack when the end result gets merged into mainline, so I'll stop the
-manual process.
+- Two fixes for an ubd regression, one for missing locking, and one for
+  a missing initialization of a field. The latter was an old latent bug,
+  but it's now visible and triggers (Me, Anton Ivanov)
 
-But it currently only works on lkml (I think - maybe Konstantin
-enabled it for all lists that get tracked by lore.kernel.org), so this
-pull request probably won't get an automated response due to just
-going to linux-block.
+- Set of NVMe fixes via Christoph, but applied manually due to a git
+  tree mixup (Christoph, Sagi)
 
-Just a heads-up.
+- Fix for a discard split regression, in three patches (Ming)
 
-               Linus
+- Update libata git trees (Geert)
+
+- SPDX identifier for sata_rcar (Kuninori Morimoto)
+
+- Virtual boundary merge fix (Johannes)
+
+- Preemptively clear memory we are going to pass to userspace, in case
+  the driver does a short read (Keith)
+
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git tags/for-linus-20181109
+
+
+----------------------------------------------------------------
+Anton Ivanov (1):
+      ubd: fix missing initialization of io_req
+
+Christoph Hellwig (1):
+      Revert "nvmet-rdma: use a private workqueue for delete"
+
+Geert Uytterhoeven (1):
+      MAINTAINERS: Fix remaining pointers to obsolete libata.git
+
+Jens Axboe (1):
+      ubd: fix missing lock around request issue
+
+Johannes Thumshirn (1):
+      block: respect virtual boundary mask in bvecs
+
+Keith Busch (1):
+      block: Clear kernel memory before copying to user
+
+Kuninori Morimoto (1):
+      sata_rcar: convert to SPDX identifiers
+
+Ming Lei (3):
+      block: make sure discard bio is aligned with logical block size
+      block: cleanup __blkdev_issue_discard()
+      block: make sure writesame bio is aligned with logical block size
+
+Sagi Grimberg (2):
+      nvmet: don't try to add ns to p2p map unless it actually uses it
+      nvme: make sure ns head inherits underlying device limits
+
+ MAINTAINERS                   |  6 +++---
+ arch/um/drivers/ubd_kern.c    | 12 ++++++++----
+ block/bio.c                   |  1 +
+ block/blk-lib.c               | 26 +++++++-------------------
+ block/blk-merge.c             |  5 +++--
+ block/blk.h                   | 12 +++++++++++-
+ drivers/ata/sata_rcar.c       |  6 +-----
+ drivers/nvme/host/core.c      |  4 +++-
+ drivers/nvme/host/multipath.c |  1 +
+ drivers/nvme/target/core.c    |  2 +-
+ drivers/nvme/target/rdma.c    | 19 ++++---------------
+ 11 files changed, 43 insertions(+), 51 deletions(-)
+
+-- 
+Jens Axboe
