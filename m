@@ -1,119 +1,42 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:34094 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727024AbeKHWgr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Nov 2018 17:36:47 -0500
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 14/16] loop: Fix deadlock when calling blkdev_reread_part()
-Date: Thu,  8 Nov 2018 14:01:14 +0100
-Message-Id: <20181108130116.12140-15-jack@suse.cz>
-In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
-References: <20181108130116.12140-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [GIT PULL] nvme fixes for 4.20
+To: Sagi Grimberg <sagi@grimberg.me>, Christoph Hellwig <hch@infradead.org>
+Cc: Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+References: <20181109065654.GA12805@infradead.org>
+ <6b8d8562-a31d-bf11-557b-7f33a17d6e60@kernel.dk>
+ <20181109132011.GA2706@infradead.org>
+ <e1f4b4f5-6679-941f-638f-cdf3394ce773@kernel.dk>
+ <332dc27f-96a9-e171-1f07-54961d443400@grimberg.me>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <42652118-45e5-a251-0c4b-bc22798f41d4@kernel.dk>
+Date: Fri, 9 Nov 2018 10:12:31 -0700
+MIME-Version: 1.0
+In-Reply-To: <332dc27f-96a9-e171-1f07-54961d443400@grimberg.me>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-Calling blkdev_reread_part() under loop_ctl_mutex causes lockdep to
-complain about circular lock dependency between bdev->bd_mutex and
-lo->lo_ctl_mutex. The problem is that on loop device open or close
-lo_open() and lo_release() get called with bdev->bd_mutex held and they
-need to acquire loop_ctl_mutex. OTOH when loop_reread_partitions() is
-called with loop_ctl_mutex held, it will call blkdev_reread_part() which
-acquires bdev->bd_mutex. See syzbot report for details [1].
+On 11/9/18 10:10 AM, Sagi Grimberg wrote:
+> 
+>>> That is because your for-linus was still 4.20-rc based when
+>>> I created it.
+>>
+>> It's never been 4.20-rc based. After the initial merge, it got based
+>> on a random commit in the merge window:
+>>
+>> commit 3acbd2de6bc3af215c6ed7732dfc097d1e238503
+>> Merge: d49f8a52b15b de7d83da84bd
+>> Author: Linus Torvalds <torvalds@linux-foundation.org>
+>> Date:   Thu Oct 25 09:00:15 2018 -0700
+>>
+>>      Merge tag 'sound-4.20-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/tiwai/sound
+>>
+>> and has been ever since.
+> 
+> That was because I rebased it when your for-linus didn't include Ming's
+> buggy version of the brd commit. Sorry for the mixup..
 
-Move call to blkdev_reread_part() in __loop_clr_fd() from under
-loop_ctl_mutex to finish fixing of the lockdep warning and the possible
-deadlock.
+No problem, it's pretty trivial to just do manually for cases like this.
 
-[1] https://syzkaller.appspot.com/bug?id=bf154052f0eea4bc7712499e4569505907d1588
-
-Reported-by: syzbot <syzbot+4684a000d5abdade83fac55b1e7d1f935ef1936e@syzkaller.appspotmail.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/loop.c | 28 ++++++++++++++++------------
- 1 file changed, 16 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index cce5d4e8e863..b3f981ac8ef1 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1030,12 +1030,14 @@ loop_init_xfer(struct loop_device *lo, struct loop_func_table *xfer,
- 	return err;
- }
- 
--static int __loop_clr_fd(struct loop_device *lo)
-+static int __loop_clr_fd(struct loop_device *lo, bool release)
- {
- 	struct file *filp = NULL;
- 	gfp_t gfp = lo->old_gfp_mask;
- 	struct block_device *bdev = lo->lo_device;
- 	int err = 0;
-+	bool partscan = false;
-+	int lo_number;
- 
- 	mutex_lock(&loop_ctl_mutex);
- 	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown)) {
-@@ -1088,7 +1090,15 @@ static int __loop_clr_fd(struct loop_device *lo)
- 	module_put(THIS_MODULE);
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 
--	if (lo->lo_flags & LO_FLAGS_PARTSCAN && bdev) {
-+	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN && bdev;
-+	lo_number = lo->lo_number;
-+	lo->lo_flags = 0;
-+	if (!part_shift)
-+		lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
-+	loop_unprepare_queue(lo);
-+out_unlock:
-+	mutex_unlock(&loop_ctl_mutex);
-+	if (partscan) {
- 		/*
- 		 * bd_mutex has been held already in release path, so don't
- 		 * acquire it if this function is called in such case.
-@@ -1097,21 +1107,15 @@ static int __loop_clr_fd(struct loop_device *lo)
- 		 * must be at least one and it can only become zero when the
- 		 * current holder is released.
- 		 */
--		if (!atomic_read(&lo->lo_refcnt))
-+		if (release)
- 			err = __blkdev_reread_part(bdev);
- 		else
- 			err = blkdev_reread_part(bdev);
- 		pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
--			__func__, lo->lo_number, err);
-+			__func__, lo_number, err);
- 		/* Device is gone, no point in returning error */
- 		err = 0;
- 	}
--	lo->lo_flags = 0;
--	if (!part_shift)
--		lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
--	loop_unprepare_queue(lo);
--out_unlock:
--	mutex_unlock(&loop_ctl_mutex);
- 	/*
- 	 * Need not hold loop_ctl_mutex to fput backing file.
- 	 * Calling fput holding loop_ctl_mutex triggers a circular
-@@ -1152,7 +1156,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 	lo->lo_state = Lo_rundown;
- 	mutex_unlock(&loop_ctl_mutex);
- 
--	return __loop_clr_fd(lo);
-+	return __loop_clr_fd(lo, false);
- }
- 
- static int
-@@ -1713,7 +1717,7 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 		 * In autoclear mode, stop the loop thread
- 		 * and remove configuration after last close.
- 		 */
--		__loop_clr_fd(lo);
-+		__loop_clr_fd(lo, true);
- 		return;
- 	} else if (lo->lo_state == Lo_bound) {
- 		/*
 -- 
-2.16.4
+Jens Axboe
