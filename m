@@ -5,10 +5,13 @@ To: boris.ostrovsky@oracle.com, jgross@suse.com, konrad.wilk@oracle.com,
 Cc: axboe@kernel.dk, xen-devel@lists.xenproject.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         stable@vger.kernel.org
-Subject: [PATCH v2] xen-blkfront: fix kernel panic with blkfront_remove()
-Date: Thu,  8 Nov 2018 17:10:43 -0800
-Message-Id: <1541725843-2019-1-git-send-email-manjunath.b.patil@oracle.com>
+Subject: [PATCH] xen-blkfront: fix kernel panic with blkfront_remove()
+Date: Thu,  8 Nov 2018 16:58:28 -0800
+Message-Id: <1541725108-1468-1-git-send-email-manjunath.b.patil@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
+
+If a hot-attaching device fails inside domU[ex:negotiate_mq() returns
+with ENOMEM] we clear the blkfront_info struct in talk_to_blkback()
 
 When we try to detach the device, blkfront_remove() tries to access
 blkfront_info leading to kernel panic.
@@ -32,20 +35,18 @@ Typical call stack involving panic -
 Cc: stable@vger.kernel.org
 Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
 ---
-v2: style change. added the missing space b/w if and (
----
  drivers/block/xen-blkfront.c |    3 +++
  1 files changed, 3 insertions(+), 0 deletions(-)
 
 diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index dc8fe25..2d8b10d 100644
+index dc8fe25..144cda8 100644
 --- a/drivers/block/xen-blkfront.c
 +++ b/drivers/block/xen-blkfront.c
 @@ -2496,6 +2496,9 @@ static int blkfront_remove(struct xenbus_device *xbdev)
  
  	dev_dbg(&xbdev->dev, "%s removed", xbdev->nodename);
  
-+	if (!info)
++	if(!info)
 +		return 0;
 +
  	blkif_free(info, 0);
