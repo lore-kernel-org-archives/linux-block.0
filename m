@@ -1,155 +1,93 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
+Return-Path: <BATV+1ef63fdb319281f35549+5556+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V8 02/18] block: introduce bio_for_each_bvec()
-Date: Sat, 10 Nov 2018 00:25:54 +0800
-Message-Id: <20181109162610.18981-3-ming.lei@redhat.com>
-In-Reply-To: <20181109162610.18981-1-ming.lei@redhat.com>
-References: <20181109162610.18981-1-ming.lei@redhat.com>
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 3/9] mtip32xx: return a blk_status_t from mtip_send_trim
+Date: Fri,  9 Nov 2018 14:48:56 +0100
+Message-Id: <20181109134902.32057-4-hch@lst.de>
+In-Reply-To: <20181109134902.32057-1-hch@lst.de>
+References: <20181109134902.32057-1-hch@lst.de>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-This helper is used for iterating over multi-page bvec for bio
-split & merge code.
+This allows for better error propagation and simpler code.
 
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/bio.h  | 34 +++++++++++++++++++++++++++++++---
- include/linux/bvec.h | 36 ++++++++++++++++++++++++++++++++----
- 2 files changed, 63 insertions(+), 7 deletions(-)
+ drivers/block/mtip32xx/mtip32xx.c | 30 +++++++++++-------------------
+ 1 file changed, 11 insertions(+), 19 deletions(-)
 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 056fb627edb3..1f0dcf109841 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -76,6 +76,9 @@
- #define bio_data_dir(bio) \
- 	(op_is_write(bio_op(bio)) ? WRITE : READ)
- 
-+#define bio_iter_mp_iovec(bio, iter)				\
-+	mp_bvec_iter_bvec((bio)->bi_io_vec, (iter))
-+
- /*
-  * Check whether this bio carries any data or not. A NULL bio is allowed.
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index 75a4ca0210f2..d5277bba0c02 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -1423,23 +1423,19 @@ static int mtip_get_smart_attr(struct mtip_port *port, unsigned int id,
+  * @dd		pointer to driver_data structure
+  * @lba		starting lba
+  * @len		# of 512b sectors to trim
+- *
+- * return value
+- *      -ENOMEM		Out of dma memory
+- *      -EINVAL		Invalid parameters passed in, trim not supported
+- *      -EIO		Error submitting trim request to hw
   */
-@@ -135,18 +138,33 @@ static inline bool bio_full(struct bio *bio)
- #define bio_for_each_segment_all(bvl, bio, i)				\
- 	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
- 
--static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
--				    unsigned bytes)
-+static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
-+				      unsigned bytes, bool mp)
+-static int mtip_send_trim(struct driver_data *dd, unsigned int lba,
+-				unsigned int len)
++static blk_status_t mtip_send_trim(struct driver_data *dd, unsigned int lba,
++		unsigned int len)
  {
- 	iter->bi_sector += bytes >> 9;
+-	int i, rv = 0;
+ 	u64 tlba, tlen, sect_left;
+ 	struct mtip_trim_entry *buf;
+ 	dma_addr_t dma_addr;
+ 	struct host_to_dev_fis fis;
++	blk_status_t ret = BLK_STS_OK;
++	int i;
  
- 	if (bio_no_advance_iter(bio))
- 		iter->bi_size -= bytes;
- 	else
--		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
-+		if (!mp)
-+			bvec_iter_advance(bio->bi_io_vec, iter, bytes);
-+		else
-+			mp_bvec_iter_advance(bio->bi_io_vec, iter, bytes);
- 		/* TODO: It is reasonable to complete bio with error here. */
+ 	if (!len || dd->trim_supp == false)
+-		return -EINVAL;
++		return BLK_STS_IOERR;
+ 
+ 	/* Trim request too big */
+ 	WARN_ON(len > (MTIP_MAX_TRIM_ENTRY_LEN * MTIP_MAX_TRIM_ENTRIES));
+@@ -1454,7 +1450,7 @@ static int mtip_send_trim(struct driver_data *dd, unsigned int lba,
+ 	buf = dmam_alloc_coherent(&dd->pdev->dev, ATA_SECT_SIZE, &dma_addr,
+ 								GFP_KERNEL);
+ 	if (!buf)
+-		return -ENOMEM;
++		return BLK_STS_RESOURCE;
+ 	memset(buf, 0, ATA_SECT_SIZE);
+ 
+ 	for (i = 0, sect_left = len, tlba = lba;
+@@ -1486,10 +1482,10 @@ static int mtip_send_trim(struct driver_data *dd, unsigned int lba,
+ 					ATA_SECT_SIZE,
+ 					0,
+ 					MTIP_TRIM_TIMEOUT_MS) < 0)
+-		rv = -EIO;
++		ret = BLK_STS_IOERR;
+ 
+ 	dmam_free_coherent(&dd->pdev->dev, ATA_SECT_SIZE, buf, dma_addr);
+-	return rv;
++	return ret;
  }
  
-+static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
-+				    unsigned bytes)
-+{
-+	__bio_advance_iter(bio, iter, bytes, false);
-+}
-+
-+static inline void bio_advance_mp_iter(struct bio *bio, struct bvec_iter *iter,
-+				       unsigned bytes)
-+{
-+	__bio_advance_iter(bio, iter, bytes, true);
-+}
-+
- #define __bio_for_each_segment(bvl, bio, iter, start)			\
- 	for (iter = (start);						\
- 	     (iter).bi_size &&						\
-@@ -156,6 +174,16 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
- #define bio_for_each_segment(bvl, bio, iter)				\
- 	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
+ /*
+@@ -3634,13 +3630,9 @@ static blk_status_t mtip_queue_rq(struct blk_mq_hw_ctx *hctx,
  
-+#define __bio_for_each_bvec(bvl, bio, iter, start)		\
-+	for (iter = (start);						\
-+	     (iter).bi_size &&						\
-+		((bvl = bio_iter_mp_iovec((bio), (iter))), 1);	\
-+	     bio_advance_mp_iter((bio), &(iter), (bvl).bv_len))
-+
-+/* returns one real segment(multipage bvec) each time */
-+#define bio_for_each_bvec(bvl, bio, iter)			\
-+	__bio_for_each_bvec(bvl, bio, iter, (bio)->bi_iter)
-+
- #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
+ 	blk_mq_start_request(rq);
  
- static inline unsigned bio_segments(struct bio *bio)
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index 8ef904a50577..3d61352cd8cf 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -124,8 +124,16 @@ struct bvec_iter {
- 	.bv_offset	= bvec_iter_offset((bvec), (iter)),	\
- })
- 
--static inline bool bvec_iter_advance(const struct bio_vec *bv,
--		struct bvec_iter *iter, unsigned bytes)
-+#define mp_bvec_iter_bvec(bvec, iter)				\
-+((struct bio_vec) {							\
-+	.bv_page	= mp_bvec_iter_page((bvec), (iter)),	\
-+	.bv_len		= mp_bvec_iter_len((bvec), (iter)),	\
-+	.bv_offset	= mp_bvec_iter_offset((bvec), (iter)),	\
-+})
-+
-+static inline bool __bvec_iter_advance(const struct bio_vec *bv,
-+				       struct bvec_iter *iter,
-+				       unsigned bytes, bool mp)
- {
- 	if (WARN_ONCE(bytes > iter->bi_size,
- 		     "Attempted to advance past end of bvec iter\n")) {
-@@ -134,8 +142,14 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
- 	}
- 
- 	while (bytes) {
--		unsigned iter_len = bvec_iter_len(bv, *iter);
--		unsigned len = min(bytes, iter_len);
-+		unsigned len;
-+
-+		if (mp)
-+			len = mp_bvec_iter_len(bv, *iter);
-+		else
-+			len = bvec_iter_len(bv, *iter);
-+
-+		len = min(bytes, len);
- 
- 		bytes -= len;
- 		iter->bi_size -= len;
-@@ -173,6 +187,20 @@ static inline bool bvec_iter_rewind(const struct bio_vec *bv,
- 	return true;
+-	if (req_op(rq) == REQ_OP_DISCARD) {
+-		if (mtip_send_trim(dd, blk_rq_pos(rq), blk_rq_sectors(rq)) < 0)
+-			return BLK_STS_IOERR;
+-	} else {
+-		mtip_hw_submit_io(dd, rq, cmd, hctx);
+-	}
+-
++	if (req_op(rq) == REQ_OP_DISCARD)
++		return mtip_send_trim(dd, blk_rq_pos(rq), blk_rq_sectors(rq));
++	mtip_hw_submit_io(dd, rq, cmd, hctx);
+ 	return BLK_STS_OK;
  }
  
-+static inline bool bvec_iter_advance(const struct bio_vec *bv,
-+				     struct bvec_iter *iter,
-+				     unsigned bytes)
-+{
-+	return __bvec_iter_advance(bv, iter, bytes, false);
-+}
-+
-+static inline bool mp_bvec_iter_advance(const struct bio_vec *bv,
-+					struct bvec_iter *iter,
-+					unsigned bytes)
-+{
-+	return __bvec_iter_advance(bv, iter, bytes, true);
-+}
-+
- #define for_each_bvec(bvl, bio_vec, iter, start)			\
- 	for (iter = (start);						\
- 	     (iter).bi_size &&						\
 -- 
-2.9.5
+2.19.1
