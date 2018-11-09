@@ -1,79 +1,155 @@
-Return-Path: <mst@redhat.com>
-Date: Thu, 1 Nov 2018 17:25:17 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Daniel Verkamp <dverkamp@chromium.org>,
-	virtualization@lists.linux-foundation.org,
-	linux-block@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Changpeng Liu <changpeng.liu@intel.com>
-Subject: Re: [PATCH v8] virtio_blk: add discard and write zeroes support
-Message-ID: <20181101172153-mutt-send-email-mst@kernel.org>
-References: <1528258740-6581-1-git-send-email-changpeng.liu@intel.com>
- <20181012210628.226361-1-dverkamp@chromium.org>
- <20181026080838.GB4234@stefanha-x1.localdomain>
- <20181026104636-mutt-send-email-mst@kernel.org>
- <20181029050521.GB31012@stefanha-x1.localdomain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20181029050521.GB31012@stefanha-x1.localdomain>
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V8 02/18] block: introduce bio_for_each_bvec()
+Date: Sat, 10 Nov 2018 00:25:54 +0800
+Message-Id: <20181109162610.18981-3-ming.lei@redhat.com>
+In-Reply-To: <20181109162610.18981-1-ming.lei@redhat.com>
+References: <20181109162610.18981-1-ming.lei@redhat.com>
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Oct 29, 2018 at 05:05:21AM +0000, Stefan Hajnoczi wrote:
-> On Fri, Oct 26, 2018 at 10:47:16AM -0400, Michael S. Tsirkin wrote:
-> > On Fri, Oct 26, 2018 at 09:08:38AM +0100, Stefan Hajnoczi wrote:
-> > > On Fri, Oct 12, 2018 at 02:06:28PM -0700, Daniel Verkamp wrote:
-> > > > +		range[n].flags = cpu_to_le32(flags);
-> > > > +		range[n].num_sectors = cpu_to_le32(num_sectors);
-> > > > +		range[n].sector = cpu_to_le64(sector);
-> > > ...
-> > > > +/* Discard/write zeroes range for each request. */
-> > > > +struct virtio_blk_discard_write_zeroes {
-> > > > +	/* discard/write zeroes start sector */
-> > > > +	__virtio64 sector;
-> > > > +	/* number of discard/write zeroes sectors */
-> > > > +	__virtio32 num_sectors;
-> > > > +	/* flags for this range */
-> > > > +	__virtio32 flags;
-> > > 
-> > > cpu_to_le32() is being used on __virtio32 fields instead of cpu_to_virtio32().
-> > > 
-> > > From include/uapi/linux/virtio_types.h:
-> > > 
-> > >   /*
-> > >    * __virtio{16,32,64} have the following meaning:
-> > >    * - __u{16,32,64} for virtio devices in legacy mode, accessed in native endian
-> > >    * - __le{16,32,64} for standard-compliant virtio devices
-> > >    */
-> > > 
-> > > From the VIRTIO specification:
-> > > 
-> > >   struct virtio_blk_discard_write_zeroes {
-> > >          le64 sector;
-> > >          le32 num_sectors;
-> > >          struct {
-> > >                  le32 unmap:1;
-> > >                  le32 reserved:31;
-> > >          } flags;
-> > >   };
-> > > 
-> > > 
-> > > Since the VIRTIO spec says these fields are little-endian, I think these
-> > > fields should be declared just __u32 and __u64 instead of __virtio32 and
-> > > __virtio64.
-> > > 
-> > > Stefan
-> > 
-> > 
-> > __le32/__le64 rather?
-> 
-> Yes.
-> 
-> Stefan
+This helper is used for iterating over multi-page bvec for bio
+split & merge code.
 
-I agree. And further using bitfields for this is questionable -
-it is preferable to set bits in a full 32 bit field using "|".
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ include/linux/bio.h  | 34 +++++++++++++++++++++++++++++++---
+ include/linux/bvec.h | 36 ++++++++++++++++++++++++++++++++----
+ 2 files changed, 63 insertions(+), 7 deletions(-)
 
-
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 056fb627edb3..1f0dcf109841 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -76,6 +76,9 @@
+ #define bio_data_dir(bio) \
+ 	(op_is_write(bio_op(bio)) ? WRITE : READ)
+ 
++#define bio_iter_mp_iovec(bio, iter)				\
++	mp_bvec_iter_bvec((bio)->bi_io_vec, (iter))
++
+ /*
+  * Check whether this bio carries any data or not. A NULL bio is allowed.
+  */
+@@ -135,18 +138,33 @@ static inline bool bio_full(struct bio *bio)
+ #define bio_for_each_segment_all(bvl, bio, i)				\
+ 	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
+ 
+-static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+-				    unsigned bytes)
++static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
++				      unsigned bytes, bool mp)
+ {
+ 	iter->bi_sector += bytes >> 9;
+ 
+ 	if (bio_no_advance_iter(bio))
+ 		iter->bi_size -= bytes;
+ 	else
+-		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
++		if (!mp)
++			bvec_iter_advance(bio->bi_io_vec, iter, bytes);
++		else
++			mp_bvec_iter_advance(bio->bi_io_vec, iter, bytes);
+ 		/* TODO: It is reasonable to complete bio with error here. */
+ }
+ 
++static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
++				    unsigned bytes)
++{
++	__bio_advance_iter(bio, iter, bytes, false);
++}
++
++static inline void bio_advance_mp_iter(struct bio *bio, struct bvec_iter *iter,
++				       unsigned bytes)
++{
++	__bio_advance_iter(bio, iter, bytes, true);
++}
++
+ #define __bio_for_each_segment(bvl, bio, iter, start)			\
+ 	for (iter = (start);						\
+ 	     (iter).bi_size &&						\
+@@ -156,6 +174,16 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+ #define bio_for_each_segment(bvl, bio, iter)				\
+ 	__bio_for_each_segment(bvl, bio, iter, (bio)->bi_iter)
+ 
++#define __bio_for_each_bvec(bvl, bio, iter, start)		\
++	for (iter = (start);						\
++	     (iter).bi_size &&						\
++		((bvl = bio_iter_mp_iovec((bio), (iter))), 1);	\
++	     bio_advance_mp_iter((bio), &(iter), (bvl).bv_len))
++
++/* returns one real segment(multipage bvec) each time */
++#define bio_for_each_bvec(bvl, bio, iter)			\
++	__bio_for_each_bvec(bvl, bio, iter, (bio)->bi_iter)
++
+ #define bio_iter_last(bvec, iter) ((iter).bi_size == (bvec).bv_len)
+ 
+ static inline unsigned bio_segments(struct bio *bio)
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 8ef904a50577..3d61352cd8cf 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -124,8 +124,16 @@ struct bvec_iter {
+ 	.bv_offset	= bvec_iter_offset((bvec), (iter)),	\
+ })
+ 
+-static inline bool bvec_iter_advance(const struct bio_vec *bv,
+-		struct bvec_iter *iter, unsigned bytes)
++#define mp_bvec_iter_bvec(bvec, iter)				\
++((struct bio_vec) {							\
++	.bv_page	= mp_bvec_iter_page((bvec), (iter)),	\
++	.bv_len		= mp_bvec_iter_len((bvec), (iter)),	\
++	.bv_offset	= mp_bvec_iter_offset((bvec), (iter)),	\
++})
++
++static inline bool __bvec_iter_advance(const struct bio_vec *bv,
++				       struct bvec_iter *iter,
++				       unsigned bytes, bool mp)
+ {
+ 	if (WARN_ONCE(bytes > iter->bi_size,
+ 		     "Attempted to advance past end of bvec iter\n")) {
+@@ -134,8 +142,14 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
+ 	}
+ 
+ 	while (bytes) {
+-		unsigned iter_len = bvec_iter_len(bv, *iter);
+-		unsigned len = min(bytes, iter_len);
++		unsigned len;
++
++		if (mp)
++			len = mp_bvec_iter_len(bv, *iter);
++		else
++			len = bvec_iter_len(bv, *iter);
++
++		len = min(bytes, len);
+ 
+ 		bytes -= len;
+ 		iter->bi_size -= len;
+@@ -173,6 +187,20 @@ static inline bool bvec_iter_rewind(const struct bio_vec *bv,
+ 	return true;
+ }
+ 
++static inline bool bvec_iter_advance(const struct bio_vec *bv,
++				     struct bvec_iter *iter,
++				     unsigned bytes)
++{
++	return __bvec_iter_advance(bv, iter, bytes, false);
++}
++
++static inline bool mp_bvec_iter_advance(const struct bio_vec *bv,
++					struct bvec_iter *iter,
++					unsigned bytes)
++{
++	return __bvec_iter_advance(bv, iter, bytes, true);
++}
++
+ #define for_each_bvec(bvl, bio_vec, iter, start)			\
+ 	for (iter = (start);						\
+ 	     (iter).bi_size &&						\
 -- 
-MST
+2.9.5
