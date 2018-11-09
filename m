@@ -1,65 +1,43 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:36054 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727941AbeKJA4c (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 9 Nov 2018 19:56:32 -0500
-Received: by mail-pf1-f196.google.com with SMTP id d13-v6so1064349pfo.3
-        for <linux-block@vger.kernel.org>; Fri, 09 Nov 2018 07:15:32 -0800 (PST)
-From: Gwendal Grignou <gwendal@chromium.org>
-To: osandov@fb.com
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH blktests] makefile: Add install rule
-Date: Fri,  9 Nov 2018 07:15:24 -0800
-Message-Id: <20181109151524.50405-1-gwendal@chromium.org>
-MIME-Version: 1.0
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <ming.lei@redhat.com>
+From: Ming Lei <ming.lei@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ming Lei <ming.lei@redhat.com>,
+	Christoph Hellwig <hch@lst.de>,
+	linux-fsdevel@vger.kernel.org
+Subject: [PATCH V8 06/18] fs/buffer.c: use bvec iterator to truncate the bio
+Date: Sat, 10 Nov 2018 00:25:58 +0800
+Message-Id: <20181109162610.18981-7-ming.lei@redhat.com>
+In-Reply-To: <20181109162610.18981-1-ming.lei@redhat.com>
+References: <20181109162610.18981-1-ming.lei@redhat.com>
+List-ID: <linux-block@vger.kernel.org>
 
-Add rule to install to a target directory, /usr/local/blktests by
-default.
+Once multi-page bvec is enabled, the last bvec may include more than one
+page, this patch use bvec_last_segment() to truncate the bio.
 
-Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: linux-fsdevel@vger.kernel.org
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- Makefile     | 9 +++++++++
- src/Makefile | 3 +++
- 2 files changed, 12 insertions(+)
+ fs/buffer.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index 38b8ad1..d7c2b74 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1,9 +1,18 @@
-+prefix ?= /usr/local
-+dest = $(DESTDIR)$(prefix)/blktests
+diff --git a/fs/buffer.c b/fs/buffer.c
+index 1286c2b95498..fa37ad52e962 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -3032,7 +3032,10 @@ void guard_bio_eod(int op, struct bio *bio)
+ 
+ 	/* ..and clear the end of the buffer for reads */
+ 	if (op == REQ_OP_READ) {
+-		zero_user(bvec->bv_page, bvec->bv_offset + bvec->bv_len,
++		struct bio_vec bv;
 +
- all:
- 	$(MAKE) -C src all
- 
- clean:
- 	$(MAKE) -C src clean
- 
-+install:
-+	install -m755 -d $(dest)
-+	install check $(dest)
-+	cp -R tests common $(dest)
-+	$(MAKE) -C src dest=$(dest) install
-+
- # SC2119: "Use foo "$@" if function's $1 should mean script's $1". False
- # positives on helpers like _init_scsi_debug.
- SHELLCHECK_EXCLUDE := SC2119
-diff --git a/src/Makefile b/src/Makefile
-index 15c1022..f0ddbb5 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -20,6 +20,9 @@ all: $(TARGETS)
- clean:
- 	rm -f $(TARGETS)
- 
-+install: $(TARGETS)
-+	install $(TARGETS) $(dest)
-+
- $(C_TARGETS): %: %.c
- 	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $^
- 
++		bvec_last_segment(bvec, &bv);
++		zero_user(bv.bv_page, bv.bv_offset + bv.bv_len,
+ 				truncated_bytes);
+ 	}
+ }
 -- 
-2.16.4
+2.9.5
