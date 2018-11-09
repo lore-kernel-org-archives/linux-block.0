@@ -1,59 +1,48 @@
-Return-Path: <axboe@kernel.dk>
-From: Jens Axboe <axboe@kernel.dk>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Keith Busch <keith.busch@intel.com>,
-	linux-nvme@lists.infradead.org
-Subject: [PATCH 1/6] nvme: don't disable local ints for polled queue
-Date: Sat, 10 Nov 2018 08:13:12 -0700
-Message-Id: <20181110151317.3813-2-axboe@kernel.dk>
-In-Reply-To: <20181110151317.3813-1-axboe@kernel.dk>
-References: <20181110151317.3813-1-axboe@kernel.dk>
+Return-Path: <BATV+1ef63fdb319281f35549+5556+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 9/9] mtip32xxx: use for_each_sg
+Date: Fri,  9 Nov 2018 14:49:02 +0100
+Message-Id: <20181109134902.32057-10-hch@lst.de>
+In-Reply-To: <20181109134902.32057-1-hch@lst.de>
+References: <20181109134902.32057-1-hch@lst.de>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-A polled queued doesn't trigger interrupts, so it's always safe
-to grab the queue lock without disabling interrupts.
+Use the proper helper instead of manually iterating the scatterlist,
+which is broken in the presence of chained S/G lists.
 
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: linux-nvme@lists.infradead.org
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/pci.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ drivers/block/mtip32xx/mtip32xx.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 6aa86dfcb32c..a6e3fbddfadf 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1061,15 +1061,26 @@ static irqreturn_t nvme_irq_check(int irq, void *data)
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index e99db2c9118f..a4c44db097e0 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -1549,11 +1549,11 @@ static inline void fill_command_sg(struct driver_data *dd,
+ 	int n;
+ 	unsigned int dma_len;
+ 	struct mtip_cmd_sg *command_sg;
+-	struct scatterlist *sg = command->sg;
++	struct scatterlist *sg;
  
- static int __nvme_poll(struct nvme_queue *nvmeq, unsigned int tag)
- {
-+	unsigned long flags = 0; /* gcc 7.x fail */
- 	u16 start, end;
--	bool found;
-+	bool found, has_irq;
+ 	command_sg = command->command + AHCI_CMD_TBL_HDR_SZ;
  
- 	if (!nvme_cqe_pending(nvmeq))
- 		return 0;
+-	for (n = 0; n < nents; n++) {
++	for_each_sg(command->sg, sg, nents, n) {
+ 		dma_len = sg_dma_len(sg);
+ 		if (dma_len > 0x400000)
+ 			dev_err(&dd->pdev->dev,
+@@ -1563,7 +1563,6 @@ static inline void fill_command_sg(struct driver_data *dd,
+ 		command_sg->dba_upper =
+ 			cpu_to_le32((sg_dma_address(sg) >> 16) >> 16);
+ 		command_sg++;
+-		sg++;
+ 	}
+ }
  
--	spin_lock_irq(&nvmeq->cq_lock);
-+	/*
-+	 * Polled queue doesn't have an IRQ, no need to disable ints
-+	 */
-+	has_irq = !nvmeq->polled;
-+	if (has_irq)
-+		local_irq_save(flags);
-+
-+	spin_lock(&nvmeq->cq_lock);
- 	found = nvme_process_cq(nvmeq, &start, &end, tag);
--	spin_unlock_irq(&nvmeq->cq_lock);
-+	spin_unlock(&nvmeq->cq_lock);
-+
-+	if (has_irq)
-+		local_irq_restore(flags);
- 
- 	nvme_complete_cqes(nvmeq, start, end);
- 	return found;
 -- 
-2.17.1
+2.19.1
