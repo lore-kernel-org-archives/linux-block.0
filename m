@@ -1,66 +1,25 @@
-Return-Path: <osandov@osandov.com>
-Return-Path: <osandov@osandov.com>
-From: Omar Sandoval <osandov@osandov.com>
-To: linux-block@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	kernel-team@fb.com,
-	Jordan Glover <Golden_Miller83@protonmail.ch>,
-	Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH v2] kyber: fix wrong strlcpy() size in trace_kyber_latency()
-Date: Mon, 12 Nov 2018 00:08:46 -0800
-Message-Id: <7cd2a3c7ceed5dea16bc4ccf8edad77e90a49e7a.1542010053.git.osandov@fb.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 2/2] sx8: use a per-host tag_set
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+References: <20181109135110.32386-1-hch@lst.de>
+ <20181109135110.32386-3-hch@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <ee69bb73-8d95-b727-c8f2-c90188e37602@kernel.dk>
+Date: Fri, 9 Nov 2018 08:13:50 -0700
 MIME-Version: 1.0
+In-Reply-To: <20181109135110.32386-3-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-From: Omar Sandoval <osandov@fb.com>
+On 11/9/18 6:51 AM, Christoph Hellwig wrote:
+> The current sx8 code spends a lot of effort dealing with the fact that
+> tags are per-host, but there might be multiple queues.  Now that the
+> driver has been converted to blk-mq it can take care of the blk-mq
+> tag_set concept that has been designed just for that.
 
-When copying to the latency type, we should be passing LATENCY_TYPE_LEN,
-not DOMAIN_LEN (this isn't a problem in practice because we only pass
-"total" or "I/O"). Fix it by changing all of the strlcpy() calls to use
-sizeof().
+This is a thing of beauty, it should be on the poster for "why
+drivers should be as trivial as possible".
 
-Fixes: 6c3b7af1c975 ("kyber: add tracepoints")
-Reported-by: Jordan Glover <Golden_Miller83@protonmail.ch>
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
-Changes from v1:
-- Change to using sizeof() instead of constants
-
- include/trace/events/kyber.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/include/trace/events/kyber.h b/include/trace/events/kyber.h
-index a9834c37ac40..c0e7d24ca256 100644
---- a/include/trace/events/kyber.h
-+++ b/include/trace/events/kyber.h
-@@ -31,8 +31,8 @@ TRACE_EVENT(kyber_latency,
- 
- 	TP_fast_assign(
- 		__entry->dev		= disk_devt(dev_to_disk(kobj_to_dev(q->kobj.parent)));
--		strlcpy(__entry->domain, domain, DOMAIN_LEN);
--		strlcpy(__entry->type, type, DOMAIN_LEN);
-+		strlcpy(__entry->domain, domain, sizeof(__entry->domain));
-+		strlcpy(__entry->type, type, sizeof(__entry->type));
- 		__entry->percentile	= percentile;
- 		__entry->numerator	= numerator;
- 		__entry->denominator	= denominator;
-@@ -60,7 +60,7 @@ TRACE_EVENT(kyber_adjust,
- 
- 	TP_fast_assign(
- 		__entry->dev		= disk_devt(dev_to_disk(kobj_to_dev(q->kobj.parent)));
--		strlcpy(__entry->domain, domain, DOMAIN_LEN);
-+		strlcpy(__entry->domain, domain, sizeof(__entry->domain));
- 		__entry->depth		= depth;
- 	),
- 
-@@ -82,7 +82,7 @@ TRACE_EVENT(kyber_throttled,
- 
- 	TP_fast_assign(
- 		__entry->dev		= disk_devt(dev_to_disk(kobj_to_dev(q->kobj.parent)));
--		strlcpy(__entry->domain, domain, DOMAIN_LEN);
-+		strlcpy(__entry->domain, domain, sizeof(__entry->domain));
- 	),
- 
- 	TP_printk("%d,%d %s", MAJOR(__entry->dev), MINOR(__entry->dev),
 -- 
-2.19.1
+Jens Axboe
