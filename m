@@ -1,61 +1,23 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>,
-	Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V8 13/18] block: enable multipage bvecs
-Date: Sat, 10 Nov 2018 00:26:05 +0800
-Message-Id: <20181109162610.18981-14-ming.lei@redhat.com>
-In-Reply-To: <20181109162610.18981-1-ming.lei@redhat.com>
-References: <20181109162610.18981-1-ming.lei@redhat.com>
+Return-Path: <axboe@kernel.dk>
+Subject: Re: remove most req->special users
+To: Christoph Hellwig <hch@lst.de>
+Cc: linux-block@vger.kernel.org
+References: <20181109183208.19879-1-hch@lst.de>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <06b09b48-76d9-eae5-5cfa-e4df5ca285e6@kernel.dk>
+Date: Fri, 9 Nov 2018 15:47:05 -0700
+MIME-Version: 1.0
+In-Reply-To: <20181109183208.19879-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-This patch pulls the trigger for multi-page bvecs.
+On 11/9/18 11:32 AM, Christoph Hellwig wrote:
+> Try to get rid of the req->special users so that we can remove this
+> field.  With this series we basically only have the osd / scsi BIDI
+> code left, which should go away in another series.
 
-Now any request queue which supports queue cluster will see multi-page
-bvecs.
+Outside of the typo in skd_main that Bart pointed out, the rest
+of it looks fine to me. Can you send a v2 with that fixed?
 
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 6486722d4d4b..b2ce42e89076 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -767,12 +767,23 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
- 
- 	if (bio->bi_vcnt > 0) {
- 		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
--
--		if (page == bv->bv_page && off == bv->bv_offset + bv->bv_len) {
--			bv->bv_len += len;
--			bio->bi_iter.bi_size += len;
--			return true;
--		}
-+		struct request_queue *q = NULL;
-+
-+		if (page == bv->bv_page && off == bv->bv_offset + bv->bv_len)
-+			goto merge;
-+
-+		if (bio->bi_disk)
-+			q = bio->bi_disk->queue;
-+
-+		/* disable multi-page bvec too if cluster isn't enabled */
-+		if (!q || !blk_queue_cluster(q) ||
-+		    (page_to_phys(bv->bv_page) + bv->bv_offset + bv->bv_len !=
-+		     page_to_phys(page) + off))
-+			return false;
-+ merge:
-+		bv->bv_len += len;
-+		bio->bi_iter.bi_size += len;
-+		return true;
- 	}
- 	return false;
- }
 -- 
-2.9.5
+Jens Axboe
