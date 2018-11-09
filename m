@@ -2,145 +2,35 @@ Return-Path: <BATV+1ef63fdb319281f35549+5556+infradead.org+hch@bombadil.srs.infr
 From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
-Subject: [PATCH 6/9] mtip32xx: remove mtip_init_cmd_header
-Date: Fri,  9 Nov 2018 14:48:59 +0100
-Message-Id: <20181109134902.32057-7-hch@lst.de>
+Subject: [PATCH 5/9] mtip32xx: add missing endianess annotations on struct smart_attr
+Date: Fri,  9 Nov 2018 14:48:58 +0100
+Message-Id: <20181109134902.32057-6-hch@lst.de>
 In-Reply-To: <20181109134902.32057-1-hch@lst.de>
 References: <20181109134902.32057-1-hch@lst.de>
 MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-There isn't much need for this helper - we can just calculate the offset
-for the command header once late in the submission path and fill out
-the ctba and ctbau fields there.
-
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/mtip32xx/mtip32xx.c | 44 +++++++++++--------------------
- drivers/block/mtip32xx/mtip32xx.h |  5 ----
- 2 files changed, 15 insertions(+), 34 deletions(-)
+ drivers/block/mtip32xx/mtip32xx.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 9245c325fe3c..6006f7baa1eb 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -168,24 +168,6 @@ static bool mtip_check_surprise_removal(struct pci_dev *pdev)
- 	return false; /* device present */
- }
- 
--/* we have to use runtime tag to setup command header */
--static void mtip_init_cmd_header(struct request *rq)
--{
--	struct driver_data *dd = rq->q->queuedata;
--	struct mtip_cmd *cmd = blk_mq_rq_to_pdu(rq);
--
--	/* Point the command headers at the command tables. */
--	cmd->command_header = dd->port->command_list +
--				(sizeof(struct mtip_cmd_hdr) * rq->tag);
--	cmd->command_header_dma = dd->port->command_list_dma +
--				(sizeof(struct mtip_cmd_hdr) * rq->tag);
--
--	if (test_bit(MTIP_PF_HOST_CAP_64, &dd->port->flags))
--		cmd->command_header->ctbau = cpu_to_le32((cmd->command_dma >> 16) >> 16);
--
--	cmd->command_header->ctba = cpu_to_le32(cmd->command_dma & 0xFFFFFFFF);
--}
--
- static struct mtip_cmd *mtip_get_int_command(struct driver_data *dd)
- {
- 	struct request *rq;
-@@ -197,9 +179,6 @@ static struct mtip_cmd *mtip_get_int_command(struct driver_data *dd)
- 	if (IS_ERR(rq))
- 		return NULL;
- 
--	/* Internal cmd isn't submitted via .queue_rq */
--	mtip_init_cmd_header(rq);
--
- 	return blk_mq_rq_to_pdu(rq);
- }
- 
-@@ -2179,6 +2158,8 @@ static void mtip_hw_submit_io(struct driver_data *dd, struct request *rq,
- 			      struct mtip_cmd *command,
- 			      struct blk_mq_hw_ctx *hctx)
- {
-+	struct mtip_cmd_hdr *hdr =
-+		dd->port->command_list + sizeof(struct mtip_cmd_hdr) * rq->tag;
- 	struct host_to_dev_fis	*fis;
- 	struct mtip_port *port = dd->port;
- 	int dma_dir = rq_data_dir(rq) == READ ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
-@@ -2228,9 +2209,11 @@ static void mtip_hw_submit_io(struct driver_data *dd, struct request *rq,
- 		fis->device |= 1 << 7;
- 
- 	/* Populate the command header */
--	command->command_header->opts =
--			cpu_to_le32((nents << 16) | 5 | AHCI_CMD_PREFETCH);
--	command->command_header->byte_count = 0;
-+	hdr->ctba = cpu_to_le32(command->command_dma & 0xFFFFFFFF);
-+	if (test_bit(MTIP_PF_HOST_CAP_64, &dd->port->flags))
-+		hdr->ctbau = cpu_to_le32((command->command_dma >> 16) >> 16);
-+	hdr->opts = cpu_to_le32((nents << 16) | 5 | AHCI_CMD_PREFETCH);
-+	hdr->byte_count = 0;
- 
- 	command->direction = dma_dir;
- 
-@@ -3577,13 +3560,18 @@ static blk_status_t mtip_issue_reserved_cmd(struct blk_mq_hw_ctx *hctx,
- 	struct driver_data *dd = hctx->queue->queuedata;
- 	struct mtip_int_cmd *icmd = rq->special;
- 	struct mtip_cmd *cmd = blk_mq_rq_to_pdu(rq);
-+	struct mtip_cmd_hdr *hdr =
-+		dd->port->command_list + sizeof(struct mtip_cmd_hdr) * rq->tag;
- 	struct mtip_cmd_sg *command_sg;
- 
- 	if (mtip_commands_active(dd->port))
- 		return BLK_STS_RESOURCE;
- 
-+	hdr->ctba = cpu_to_le32(cmd->command_dma & 0xFFFFFFFF);
-+	if (test_bit(MTIP_PF_HOST_CAP_64, &dd->port->flags))
-+		hdr->ctbau = cpu_to_le32((cmd->command_dma >> 16) >> 16);
- 	/* Populate the SG list */
--	cmd->command_header->opts = cpu_to_le32(icmd->opts | icmd->fis_len);
-+	hdr->opts = cpu_to_le32(icmd->opts | icmd->fis_len);
- 	if (icmd->buf_len) {
- 		command_sg = cmd->command + AHCI_CMD_TBL_HDR_SZ;
- 
-@@ -3592,11 +3580,11 @@ static blk_status_t mtip_issue_reserved_cmd(struct blk_mq_hw_ctx *hctx,
- 		command_sg->dba_upper =
- 			cpu_to_le32((icmd->buffer >> 16) >> 16);
- 
--		cmd->command_header->opts |= cpu_to_le32((1 << 16));
-+		hdr->opts |= cpu_to_le32((1 << 16));
- 	}
- 
- 	/* Populate the command header */
--	cmd->command_header->byte_count = 0;
-+	hdr->byte_count = 0;
- 
- 	blk_mq_start_request(rq);
- 	mtip_issue_non_ncq_command(dd->port, rq->tag);
-@@ -3610,8 +3598,6 @@ static blk_status_t mtip_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	struct request *rq = bd->rq;
- 	struct mtip_cmd *cmd = blk_mq_rq_to_pdu(rq);
- 
--	mtip_init_cmd_header(rq);
--
- 	if (blk_rq_is_passthrough(rq))
- 		return mtip_issue_reserved_cmd(hctx, rq);
- 
 diff --git a/drivers/block/mtip32xx/mtip32xx.h b/drivers/block/mtip32xx/mtip32xx.h
-index e8b4b3d5365a..63414928f07c 100644
+index 0aa1ea210822..e8b4b3d5365a 100644
 --- a/drivers/block/mtip32xx/mtip32xx.h
 +++ b/drivers/block/mtip32xx/mtip32xx.h
-@@ -323,11 +323,6 @@ struct mtip_port;
+@@ -172,10 +172,10 @@ enum {
  
- /* Structure used to describe a command. */
- struct mtip_cmd {
--
--	struct mtip_cmd_hdr *command_header; /* ptr to command header entry */
--
--	dma_addr_t command_header_dma; /* corresponding physical address */
--
- 	void *command; /* ptr to command table entry */
+ struct smart_attr {
+ 	u8 attr_id;
+-	u16 flags;
++	__le16 flags;
+ 	u8 cur;
+ 	u8 worst;
+-	u32 data;
++	__le32 data;
+ 	u8 res[3];
+ } __packed;
  
- 	dma_addr_t command_dma; /* corresponding physical address */
 -- 
 2.19.1
