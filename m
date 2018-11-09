@@ -1,37 +1,146 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH 4/6] aoe: replace ->special use with private data in the
- request
-To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Return-Path: <BATV+1ef63fdb319281f35549+5556+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
+Subject: [PATCH 4/6] aoe: replace ->special use with private data in the request
+Date: Fri,  9 Nov 2018 19:32:06 +0100
+Message-Id: <20181109183208.19879-5-hch@lst.de>
+In-Reply-To: <20181109183208.19879-1-hch@lst.de>
 References: <20181109183208.19879-1-hch@lst.de>
- <20181109183208.19879-5-hch@lst.de>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <e1e14587-1a75-54ec-748b-36d8329f82bb@suse.de>
-Date: Sat, 10 Nov 2018 13:58:01 +0100
 MIME-Version: 1.0
-In-Reply-To: <20181109183208.19879-5-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/9/18 7:32 PM, Christoph Hellwig wrote:
-> Makes the code a whole lot better to read..
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  drivers/block/aoe/aoe.h    |  4 ++++
->  drivers/block/aoe/aoeblk.c |  1 +
->  drivers/block/aoe/aoecmd.c | 27 +++++++++------------------
->  drivers/block/aoe/aoedev.c | 11 ++++++-----
->  4 files changed, 20 insertions(+), 23 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Makes the code a whole lot better to read..
 
-Cheers,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/aoe/aoe.h    |  4 ++++
+ drivers/block/aoe/aoeblk.c |  1 +
+ drivers/block/aoe/aoecmd.c | 27 +++++++++------------------
+ drivers/block/aoe/aoedev.c | 11 ++++++-----
+ 4 files changed, 20 insertions(+), 23 deletions(-)
 
-Hannes
+diff --git a/drivers/block/aoe/aoe.h b/drivers/block/aoe/aoe.h
+index 7ca76ed2e71a..84d0fcebd6af 100644
+--- a/drivers/block/aoe/aoe.h
++++ b/drivers/block/aoe/aoe.h
+@@ -100,6 +100,10 @@ enum {
+ 	MAX_TAINT = 1000,	/* cap on aoetgt taint */
+ };
+ 
++struct aoe_req {
++	unsigned long nr_bios;
++};
++
+ struct buf {
+ 	ulong nframesout;
+ 	struct bio *bio;
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index ed26b7287256..e2c6aae2d636 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -387,6 +387,7 @@ aoeblk_gdalloc(void *vp)
+ 
+ 	set = &d->tag_set;
+ 	set->ops = &aoeblk_mq_ops;
++	set->cmd_size = sizeof(struct aoe_req);
+ 	set->nr_hw_queues = 1;
+ 	set->queue_depth = 128;
+ 	set->numa_node = NUMA_NO_NODE;
+diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
+index bb2fba651bd2..3cf9bc5d8d95 100644
+--- a/drivers/block/aoe/aoecmd.c
++++ b/drivers/block/aoe/aoecmd.c
+@@ -822,17 +822,6 @@ rexmit_timer(struct timer_list *timer)
+ 	spin_unlock_irqrestore(&d->lock, flags);
+ }
+ 
+-static unsigned long
+-rqbiocnt(struct request *r)
+-{
+-	struct bio *bio;
+-	unsigned long n = 0;
+-
+-	__rq_for_each_bio(bio, r)
+-		n++;
+-	return n;
+-}
+-
+ static void
+ bufinit(struct buf *buf, struct request *rq, struct bio *bio)
+ {
+@@ -847,6 +836,7 @@ nextbuf(struct aoedev *d)
+ {
+ 	struct request *rq;
+ 	struct request_queue *q;
++	struct aoe_req *req;
+ 	struct buf *buf;
+ 	struct bio *bio;
+ 
+@@ -865,7 +855,11 @@ nextbuf(struct aoedev *d)
+ 		blk_mq_start_request(rq);
+ 		d->ip.rq = rq;
+ 		d->ip.nxbio = rq->bio;
+-		rq->special = (void *) rqbiocnt(rq);
++
++		req = blk_mq_rq_to_pdu(rq);
++		req->nr_bios = 0;
++		__rq_for_each_bio(bio, rq)
++			req->nr_bios++;
+ 	}
+ 	buf = mempool_alloc(d->bufpool, GFP_ATOMIC);
+ 	if (buf == NULL) {
+@@ -1069,16 +1063,13 @@ aoe_end_request(struct aoedev *d, struct request *rq, int fastfail)
+ static void
+ aoe_end_buf(struct aoedev *d, struct buf *buf)
+ {
+-	struct request *rq;
+-	unsigned long n;
++	struct request *rq = buf->rq;
++	struct aoe_req *req = blk_mq_rq_to_pdu(rq);
+ 
+ 	if (buf == d->ip.buf)
+ 		d->ip.buf = NULL;
+-	rq = buf->rq;
+ 	mempool_free(buf, d->bufpool);
+-	n = (unsigned long) rq->special;
+-	rq->special = (void *) --n;
+-	if (n == 0)
++	if (--req->nr_bios == 0)
+ 		aoe_end_request(d, rq, 0);
+ }
+ 
+diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
+index 9063f8efbd3b..5b49f1b33ebe 100644
+--- a/drivers/block/aoe/aoedev.c
++++ b/drivers/block/aoe/aoedev.c
+@@ -160,21 +160,22 @@ static void
+ aoe_failip(struct aoedev *d)
+ {
+ 	struct request *rq;
++	struct aoe_req *req;
+ 	struct bio *bio;
+-	unsigned long n;
+ 
+ 	aoe_failbuf(d, d->ip.buf);
+-
+ 	rq = d->ip.rq;
+ 	if (rq == NULL)
+ 		return;
++
++	req = blk_mq_rq_to_pdu(rq);
+ 	while ((bio = d->ip.nxbio)) {
+ 		bio->bi_status = BLK_STS_IOERR;
+ 		d->ip.nxbio = bio->bi_next;
+-		n = (unsigned long) rq->special;
+-		rq->special = (void *) --n;
++		req->nr_bios--;
+ 	}
+-	if ((unsigned long) rq->special == 0)
++
++	if (!req->nr_bios)
+ 		aoe_end_request(d, rq, 0);
+ }
+ 
 -- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+2.19.1
