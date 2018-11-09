@@ -1,24 +1,14 @@
-Return-Path: <axboe@kernel.dk>
-Subject: Re: mtip32xx: fixes and cleanups
-To: Christoph Hellwig <hch@lst.de>
+Return-Path: <BATV+1ef63fdb319281f35549+5556+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
-References: <20181109134902.32057-1-hch@lst.de>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <22824d2c-86fc-6105-e056-72c982e40875@kernel.dk>
-Date: Fri, 9 Nov 2018 08:39:04 -0700
+Subject: mtip32xx: fixes and cleanups
+Date: Fri,  9 Nov 2018 14:48:53 +0100
+Message-Id: <20181109134902.32057-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20181109134902.32057-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-On 11/9/18 6:48 AM, Christoph Hellwig wrote:
-> Various low hanging fruit, kicked of by seeing one of the few remaining
-> req->special users.
-> 
-> Compile tested only.
+Various low hanging fruit, kicked of by seeing one of the few remaining
+req->special users.
 
-Looks good to me - as it so happens, I do have a few of these cards.
-Tested working fine after the patches.
-
--- 
-Jens Axboe
+Compile tested only.
