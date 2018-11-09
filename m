@@ -1,16 +1,168 @@
-Return-Path: <BATV+1ef63fdb319281f35549+5556+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:57506 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727955AbeKJCJ4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 9 Nov 2018 21:09:56 -0500
+From: Ming Lei <ming.lei@redhat.com>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: remove the legacy BLKPREP_* values
-Date: Fri,  9 Nov 2018 14:42:34 +0100
-Message-Id: <20181109134241.29346-1-hch@lst.de>
-MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Subject: [PATCH V8 18/18] block: kill BLK_MQ_F_SG_MERGE
+Date: Sat, 10 Nov 2018 00:26:10 +0800
+Message-Id: <20181109162610.18981-19-ming.lei@redhat.com>
+In-Reply-To: <20181109162610.18981-1-ming.lei@redhat.com>
+References: <20181109162610.18981-1-ming.lei@redhat.com>
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-Hi Jens,
+QUEUE_FLAG_NO_SG_MERGE has been killed, so kill BLK_MQ_F_SG_MERGE too.
 
-this series gets rid of the old BLKPREP_* values from the legacy block
-layer in favor of always using a blk_status_t (or a bool in one case).
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq-debugfs.c       | 1 -
+ drivers/block/loop.c         | 2 +-
+ drivers/block/nbd.c          | 2 +-
+ drivers/block/rbd.c          | 2 +-
+ drivers/block/skd_main.c     | 1 -
+ drivers/block/xen-blkfront.c | 2 +-
+ drivers/md/dm-rq.c           | 2 +-
+ drivers/mmc/core/queue.c     | 3 +--
+ drivers/scsi/scsi_lib.c      | 2 +-
+ include/linux/blk-mq.h       | 1 -
+ 10 files changed, 7 insertions(+), 11 deletions(-)
+
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index e188b1090759..e1c12358391a 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -250,7 +250,6 @@ static const char *const alloc_policy_name[] = {
+ static const char *const hctx_flag_name[] = {
+ 	HCTX_FLAG_NAME(SHOULD_MERGE),
+ 	HCTX_FLAG_NAME(TAG_SHARED),
+-	HCTX_FLAG_NAME(SG_MERGE),
+ 	HCTX_FLAG_NAME(BLOCKING),
+ 	HCTX_FLAG_NAME(NO_SCHED),
+ };
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index a3fd418ec637..d509902a8046 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1907,7 +1907,7 @@ static int loop_add(struct loop_device **l, int i)
+ 	lo->tag_set.queue_depth = 128;
+ 	lo->tag_set.numa_node = NUMA_NO_NODE;
+ 	lo->tag_set.cmd_size = sizeof(struct loop_cmd);
+-	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_SG_MERGE;
++	lo->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
+ 	lo->tag_set.driver_data = lo;
+ 
+ 	err = blk_mq_alloc_tag_set(&lo->tag_set);
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 08696f5f00bb..999c94de78e5 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1570,7 +1570,7 @@ static int nbd_dev_add(int index)
+ 	nbd->tag_set.numa_node = NUMA_NO_NODE;
+ 	nbd->tag_set.cmd_size = sizeof(struct nbd_cmd);
+ 	nbd->tag_set.flags = BLK_MQ_F_SHOULD_MERGE |
+-		BLK_MQ_F_SG_MERGE | BLK_MQ_F_BLOCKING;
++		BLK_MQ_F_BLOCKING;
+ 	nbd->tag_set.driver_data = nbd;
+ 
+ 	err = blk_mq_alloc_tag_set(&nbd->tag_set);
+diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+index 8e5140bbf241..3dfd300b5283 100644
+--- a/drivers/block/rbd.c
++++ b/drivers/block/rbd.c
+@@ -3988,7 +3988,7 @@ static int rbd_init_disk(struct rbd_device *rbd_dev)
+ 	rbd_dev->tag_set.ops = &rbd_mq_ops;
+ 	rbd_dev->tag_set.queue_depth = rbd_dev->opts->queue_depth;
+ 	rbd_dev->tag_set.numa_node = NUMA_NO_NODE;
+-	rbd_dev->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_SG_MERGE;
++	rbd_dev->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
+ 	rbd_dev->tag_set.nr_hw_queues = 1;
+ 	rbd_dev->tag_set.cmd_size = sizeof(struct work_struct);
+ 
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index a0196477165f..5675f321c659 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -2837,7 +2837,6 @@ static int skd_cons_disk(struct skd_device *skdev)
+ 		skdev->sgs_per_request * sizeof(struct scatterlist);
+ 	skdev->tag_set.numa_node = NUMA_NO_NODE;
+ 	skdev->tag_set.flags = BLK_MQ_F_SHOULD_MERGE |
+-		BLK_MQ_F_SG_MERGE |
+ 		BLK_ALLOC_POLICY_TO_MQ_FLAG(BLK_TAG_ALLOC_FIFO);
+ 	skdev->tag_set.driver_data = skdev;
+ 	rc = blk_mq_alloc_tag_set(&skdev->tag_set);
+diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
+index 56452cabce5b..297412bf23e1 100644
+--- a/drivers/block/xen-blkfront.c
++++ b/drivers/block/xen-blkfront.c
+@@ -977,7 +977,7 @@ static int xlvbd_init_blk_queue(struct gendisk *gd, u16 sector_size,
+ 	} else
+ 		info->tag_set.queue_depth = BLK_RING_SIZE(info);
+ 	info->tag_set.numa_node = NUMA_NO_NODE;
+-	info->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_SG_MERGE;
++	info->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
+ 	info->tag_set.cmd_size = sizeof(struct blkif_req);
+ 	info->tag_set.driver_data = info;
+ 
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 7cd36e4d1310..140ada0b99fc 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -536,7 +536,7 @@ int dm_mq_init_request_queue(struct mapped_device *md, struct dm_table *t)
+ 	md->tag_set->ops = &dm_mq_ops;
+ 	md->tag_set->queue_depth = dm_get_blk_mq_queue_depth();
+ 	md->tag_set->numa_node = md->numa_node_id;
+-	md->tag_set->flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_SG_MERGE;
++	md->tag_set->flags = BLK_MQ_F_SHOULD_MERGE;
+ 	md->tag_set->nr_hw_queues = dm_get_blk_mq_nr_hw_queues();
+ 	md->tag_set->driver_data = md;
+ 
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index 6edffeed9953..6a0e9f6b6412 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -387,8 +387,7 @@ static int mmc_mq_init_queue(struct mmc_queue *mq, int q_depth,
+ 	mq->tag_set.ops = mq_ops;
+ 	mq->tag_set.queue_depth = q_depth;
+ 	mq->tag_set.numa_node = NUMA_NO_NODE;
+-	mq->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_SG_MERGE |
+-			    BLK_MQ_F_BLOCKING;
++	mq->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_BLOCKING;
+ 	mq->tag_set.nr_hw_queues = 1;
+ 	mq->tag_set.cmd_size = sizeof(struct mmc_queue_req);
+ 	mq->tag_set.driver_data = mq;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index ed81b8e74cfe..aad9f2baaa02 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1898,7 +1898,7 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
+ 	shost->tag_set.queue_depth = shost->can_queue;
+ 	shost->tag_set.cmd_size = cmd_size;
+ 	shost->tag_set.numa_node = NUMA_NO_NODE;
+-	shost->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_SG_MERGE;
++	shost->tag_set.flags = BLK_MQ_F_SHOULD_MERGE;
+ 	shost->tag_set.flags |=
+ 		BLK_ALLOC_POLICY_TO_MQ_FLAG(shost->hostt->tag_alloc_policy);
+ 	shost->tag_set.driver_data = shost;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 929e8abc5535..ca7389d7e04f 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -211,7 +211,6 @@ struct blk_mq_ops {
+ enum {
+ 	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
+ 	BLK_MQ_F_TAG_SHARED	= 1 << 1,
+-	BLK_MQ_F_SG_MERGE	= 1 << 2,
+ 	BLK_MQ_F_BLOCKING	= 1 << 5,
+ 	BLK_MQ_F_NO_SCHED	= 1 << 6,
+ 	BLK_MQ_F_ALLOC_POLICY_START_BIT = 8,
+-- 
+2.9.5
