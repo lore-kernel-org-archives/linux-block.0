@@ -1,75 +1,44 @@
-Return-Path: <BATV+1ef63fdb319281f35549+5556+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
+Return-Path: <hare@suse.de>
+Subject: Re: [PATCH 6/6] ide: don't use req->special
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc: linux-block@vger.kernel.org
-Subject: [PATCH 1/9] mtip32xx: move the blk_rq_map_sg call to mtip_hw_submit_io
-Date: Fri,  9 Nov 2018 14:48:54 +0100
-Message-Id: <20181109134902.32057-2-hch@lst.de>
-In-Reply-To: <20181109134902.32057-1-hch@lst.de>
-References: <20181109134902.32057-1-hch@lst.de>
+References: <20181109183208.19879-1-hch@lst.de>
+ <20181109183208.19879-7-hch@lst.de>
+From: Hannes Reinecke <hare@suse.de>
+Message-ID: <0d4f66b0-93a7-8233-862d-3dd2cdbecee0@suse.de>
+Date: Sat, 10 Nov 2018 13:59:10 +0100
 MIME-Version: 1.0
+In-Reply-To: <20181109183208.19879-7-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
 List-ID: <linux-block@vger.kernel.org>
 
-We have all arguments at hand in mtip_hw_submit_io, so keep the
-rq to sg mapping close to the dma_map_sg call.
+On 11/9/18 7:32 PM, Christoph Hellwig wrote:
+> Just replace it with a field of the same name in struct ide_req.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/ide/ide-atapi.c    |  4 ++--
+>  drivers/ide/ide-cd.c       |  4 ++--
+>  drivers/ide/ide-devsets.c  |  4 ++--
+>  drivers/ide/ide-disk.c     |  6 +++---
+>  drivers/ide/ide-eh.c       |  2 +-
+>  drivers/ide/ide-floppy.c   |  2 +-
+>  drivers/ide/ide-io.c       | 14 +++++++++-----
+>  drivers/ide/ide-park.c     |  4 ++--
+>  drivers/ide/ide-pm.c       | 12 ++++++------
+>  drivers/ide/ide-tape.c     |  2 +-
+>  drivers/ide/ide-taskfile.c |  2 +-
+>  include/linux/ide.h        |  1 +
+>  12 files changed, 31 insertions(+), 26 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/mtip32xx/mtip32xx.c | 11 ++++-------
- 1 file changed, 4 insertions(+), 7 deletions(-)
+Cheers,
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 947aa10107a6..1964af8a187b 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -2171,7 +2171,6 @@ static int mtip_hw_ioctl(struct driver_data *dd, unsigned int cmd,
-  * @dd       Pointer to the driver data structure.
-  * @start    First sector to read.
-  * @nsect    Number of sectors to read.
-- * @nents    Number of entries in scatter list for the read command.
-  * @tag      The tag of this read command.
-  * @callback Pointer to the function that should be called
-  *	     when the read completes.
-@@ -2183,7 +2182,7 @@ static int mtip_hw_ioctl(struct driver_data *dd, unsigned int cmd,
-  *	None
-  */
- static void mtip_hw_submit_io(struct driver_data *dd, struct request *rq,
--			      struct mtip_cmd *command, int nents,
-+			      struct mtip_cmd *command,
- 			      struct blk_mq_hw_ctx *hctx)
- {
- 	struct host_to_dev_fis	*fis;
-@@ -2191,8 +2190,10 @@ static void mtip_hw_submit_io(struct driver_data *dd, struct request *rq,
- 	int dma_dir = rq_data_dir(rq) == READ ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
- 	u64 start = blk_rq_pos(rq);
- 	unsigned int nsect = blk_rq_sectors(rq);
-+	unsigned int nents;
- 
- 	/* Map the scatter list for DMA access */
-+	nents = blk_rq_map_sg(hctx->queue, rq, command->sg);
- 	nents = dma_map_sg(&dd->pdev->dev, command->sg, nents, dma_dir);
- 
- 	prefetch(&port->flags);
-@@ -3548,7 +3549,6 @@ static int mtip_submit_request(struct blk_mq_hw_ctx *hctx, struct request *rq)
- {
- 	struct driver_data *dd = hctx->queue->queuedata;
- 	struct mtip_cmd *cmd = blk_mq_rq_to_pdu(rq);
--	unsigned int nents;
- 
- 	if (is_se_active(dd))
- 		return -ENODATA;
-@@ -3579,11 +3579,8 @@ static int mtip_submit_request(struct blk_mq_hw_ctx *hctx, struct request *rq)
- 		return 0;
- 	}
- 
--	/* Create the scatter list for this request. */
--	nents = blk_rq_map_sg(hctx->queue, rq, cmd->sg);
--
- 	/* Issue the read/write. */
--	mtip_hw_submit_io(dd, rq, cmd, nents, hctx);
-+	mtip_hw_submit_io(dd, rq, cmd, hctx);
- 	return 0;
- }
- 
+Hannes
 -- 
-2.19.1
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
