@@ -1,575 +1,344 @@
-Return-Path: <BATV+1ef63fdb319281f35549+5556+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	linux-scsi@vger.kernel.org
-Subject: [PATCH 5/7] scsi: return blk_status_t from scsi_init_io and ->init_command
-Date: Fri,  9 Nov 2018 14:42:39 +0100
-Message-Id: <20181109134241.29346-6-hch@lst.de>
-In-Reply-To: <20181109134241.29346-1-hch@lst.de>
-References: <20181109134241.29346-1-hch@lst.de>
-MIME-Version: 1.0
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 2/6] block: add queue_is_mq() helper
+Date: Sat, 10 Nov 2018 08:13:13 -0700
+Message-Id: <20181110151317.3813-3-axboe@kernel.dk>
+In-Reply-To: <20181110151317.3813-1-axboe@kernel.dk>
+References: <20181110151317.3813-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Replace the old BLKRREP_* values with the BLK_STS_ ones that they are
-converted to later anyway.
+Various spots check for q->mq_ops being non-NULL, but provide
+a helper to do this instead.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Where the ->mq_ops != NULL check is redundant, remove it.
+
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/scsi/scsi_lib.c    | 45 ++++++++++----------
- drivers/scsi/sd.c          | 85 +++++++++++++++++---------------------
- drivers/scsi/sd.h          |  6 +--
- drivers/scsi/sd_zbc.c      | 10 ++---
- drivers/scsi/sr.c          | 12 +++---
- include/scsi/scsi_cmnd.h   |  2 +-
- include/scsi/scsi_driver.h |  3 +-
- 7 files changed, 78 insertions(+), 85 deletions(-)
+ block/blk-cgroup.c     |  8 ++++----
+ block/blk-core.c       | 10 +++++-----
+ block/blk-flush.c      |  3 +--
+ block/blk-mq.c         |  2 +-
+ block/blk-sysfs.c      | 14 +++++++-------
+ block/blk-wbt.c        |  2 +-
+ block/elevator.c       |  9 ++++-----
+ block/genhd.c          |  8 ++++----
+ drivers/md/dm-table.c  |  2 +-
+ include/linux/blkdev.h | 10 +++++++---
+ 10 files changed, 35 insertions(+), 33 deletions(-)
 
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index 1f84e2cec57b..3e3bdeee8f14 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -1005,7 +1005,8 @@ void scsi_io_completion(struct scsi_cmnd *cmd, unsigned int good_bytes)
- 		scsi_io_completion_action(cmd, result);
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 6c65791bc3fe..8da8d3773ecf 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1349,7 +1349,7 @@ int blkcg_activate_policy(struct request_queue *q,
+ 	if (blkcg_policy_enabled(q, pol))
+ 		return 0;
+ 
+-	if (q->mq_ops)
++	if (queue_is_mq(q))
+ 		blk_mq_freeze_queue(q);
+ pd_prealloc:
+ 	if (!pd_prealloc) {
+@@ -1388,7 +1388,7 @@ int blkcg_activate_policy(struct request_queue *q,
+ 
+ 	spin_unlock_irq(q->queue_lock);
+ out_bypass_end:
+-	if (q->mq_ops)
++	if (queue_is_mq(q))
+ 		blk_mq_unfreeze_queue(q);
+ 	if (pd_prealloc)
+ 		pol->pd_free_fn(pd_prealloc);
+@@ -1412,7 +1412,7 @@ void blkcg_deactivate_policy(struct request_queue *q,
+ 	if (!blkcg_policy_enabled(q, pol))
+ 		return;
+ 
+-	if (q->mq_ops)
++	if (queue_is_mq(q))
+ 		blk_mq_freeze_queue(q);
+ 
+ 	spin_lock_irq(q->queue_lock);
+@@ -1430,7 +1430,7 @@ void blkcg_deactivate_policy(struct request_queue *q,
+ 
+ 	spin_unlock_irq(q->queue_lock);
+ 
+-	if (q->mq_ops)
++	if (queue_is_mq(q))
+ 		blk_mq_unfreeze_queue(q);
  }
+ EXPORT_SYMBOL_GPL(blkcg_deactivate_policy);
+diff --git a/block/blk-core.c b/block/blk-core.c
+index fdc0ad2686c4..ab6675fd3568 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -268,7 +268,7 @@ void blk_sync_queue(struct request_queue *q)
+ 	del_timer_sync(&q->timeout);
+ 	cancel_work_sync(&q->timeout_work);
  
--static int scsi_init_sgtable(struct request *req, struct scsi_data_buffer *sdb)
-+static blk_status_t scsi_init_sgtable(struct request *req,
-+		struct scsi_data_buffer *sdb)
- {
- 	int count;
+-	if (q->mq_ops) {
++	if (queue_is_mq(q)) {
+ 		struct blk_mq_hw_ctx *hctx;
+ 		int i;
  
-@@ -1014,7 +1015,7 @@ static int scsi_init_sgtable(struct request *req, struct scsi_data_buffer *sdb)
+@@ -317,7 +317,7 @@ void blk_set_queue_dying(struct request_queue *q)
  	 */
- 	if (unlikely(sg_alloc_table_chained(&sdb->table,
- 			blk_rq_nr_phys_segments(req), sdb->table.sgl)))
--		return BLKPREP_DEFER;
-+		return BLK_STS_RESOURCE;
+ 	blk_freeze_queue_start(q);
  
- 	/* 
- 	 * Next, walk the list, and fill in the addresses and sizes of
-@@ -1024,7 +1025,7 @@ static int scsi_init_sgtable(struct request *req, struct scsi_data_buffer *sdb)
- 	BUG_ON(count > sdb->table.nents);
- 	sdb->table.nents = count;
- 	sdb->length = blk_rq_payload_bytes(req);
--	return BLKPREP_OK;
-+	return BLK_STS_OK;
- }
+-	if (q->mq_ops)
++	if (queue_is_mq(q))
+ 		blk_mq_wake_waiters(q);
  
- /*
-@@ -1034,25 +1035,25 @@ static int scsi_init_sgtable(struct request *req, struct scsi_data_buffer *sdb)
-  *
-  * Arguments:   cmd   - Command descriptor we wish to initialize
-  *
-- * Returns:     0 on success
-- *		BLKPREP_DEFER if the failure is retryable
-- *		BLKPREP_KILL if the failure is fatal
-+ * Returns:     BLK_STS_OK on success
-+ *		BLK_STS_RESOURCE if the failure is retryable
-+ *		BLK_STS_IOERR if the failure is fatal
+ 	/* Make blk_queue_enter() reexamine the DYING flag. */
+@@ -410,7 +410,7 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	 * blk_freeze_queue() should be enough for cases of passthrough
+ 	 * request.
+ 	 */
+-	if (q->mq_ops && blk_queue_init_done(q))
++	if (queue_is_mq(q) && blk_queue_init_done(q))
+ 		blk_mq_quiesce_queue(q);
+ 
+ 	/* for synchronous bio-based driver finish in-flight integrity i/o */
+@@ -428,7 +428,7 @@ void blk_cleanup_queue(struct request_queue *q)
+ 
+ 	blk_exit_queue(q);
+ 
+-	if (q->mq_ops)
++	if (queue_is_mq(q))
+ 		blk_mq_free_queue(q);
+ 
+ 	percpu_ref_exit(&q->q_usage_counter);
+@@ -1736,7 +1736,7 @@ EXPORT_SYMBOL_GPL(rq_flush_dcache_pages);
   */
--int scsi_init_io(struct scsi_cmnd *cmd)
-+blk_status_t scsi_init_io(struct scsi_cmnd *cmd)
+ int blk_lld_busy(struct request_queue *q)
  {
- 	struct request *rq = cmd->request;
--	int error = BLKPREP_KILL;
-+	blk_status_t ret;
+-	if (q->mq_ops && q->mq_ops->busy)
++	if (queue_is_mq(q) && q->mq_ops->busy)
+ 		return q->mq_ops->busy(q);
  
- 	if (WARN_ON_ONCE(!blk_rq_nr_phys_segments(rq)))
--		return BLKPREP_KILL;
-+		return BLK_STS_IOERR;
- 
--	error = scsi_init_sgtable(rq, &cmd->sdb);
--	if (error)
--		return error;
-+	ret = scsi_init_sgtable(rq, &cmd->sdb);
-+	if (ret)
-+		return ret;
- 
- 	if (blk_bidi_rq(rq)) {
--		error = scsi_init_sgtable(rq->next_rq, rq->next_rq->special);
--		if (error)
-+		ret = scsi_init_sgtable(rq->next_rq, rq->next_rq->special);
-+		if (ret)
- 			goto out_free_sgtables;
- 	}
- 
-@@ -1066,7 +1067,7 @@ int scsi_init_io(struct scsi_cmnd *cmd)
- 			 * queues a command to a device on an adapter
- 			 * that does not support DIX.
- 			 */
--			error = BLKPREP_KILL;
-+			ret = BLK_STS_IOERR;
- 			goto out_free_sgtables;
- 		}
- 
-@@ -1074,7 +1075,7 @@ int scsi_init_io(struct scsi_cmnd *cmd)
- 
- 		if (sg_alloc_table_chained(&prot_sdb->table, ivecs,
- 				prot_sdb->table.sgl)) {
--			error = BLKPREP_DEFER;
-+			ret = BLK_STS_RESOURCE;
- 			goto out_free_sgtables;
- 		}
- 
-@@ -1087,10 +1088,10 @@ int scsi_init_io(struct scsi_cmnd *cmd)
- 		cmd->prot_sdb->table.nents = count;
- 	}
- 
--	return BLKPREP_OK;
-+	return BLK_STS_OK;
- out_free_sgtables:
- 	scsi_mq_free_sgtables(cmd);
--	return error;
-+	return ret;
- }
- EXPORT_SYMBOL(scsi_init_io);
- 
-@@ -1200,9 +1201,9 @@ static blk_status_t scsi_setup_scsi_cmnd(struct scsi_device *sdev,
- 	 * submit a request without an attached bio.
+ 	return 0;
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index c53197dcdd70..3b79bea03462 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -273,8 +273,7 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
+ 	 * assigned to empty flushes, and we deadlock if we are expecting
+ 	 * other requests to make progress. Don't defer for that case.
  	 */
- 	if (req->bio) {
--		int ret = scsi_init_io(cmd);
--		if (unlikely(ret))
--			return prep_to_mq(ret);
-+		blk_status_t ret = scsi_init_io(cmd);
-+		if (unlikely(ret != BLK_STS_OK))
-+			return ret;
- 	} else {
- 		BUG_ON(blk_rq_bytes(req));
- 
-@@ -1233,7 +1234,7 @@ static blk_status_t scsi_setup_fs_cmnd(struct scsi_device *sdev,
- 
- 	cmd->cmnd = scsi_req(req)->cmd = scsi_req(req)->__cmd;
- 	memset(cmd->cmnd, 0, BLK_MAX_CDB);
--	return prep_to_mq(scsi_cmd_to_driver(cmd)->init_command(cmd));
-+	return scsi_cmd_to_driver(cmd)->init_command(cmd);
+-	if (!list_empty(&fq->flush_data_in_flight) &&
+-	    !(q->mq_ops && q->elevator) &&
++	if (!list_empty(&fq->flush_data_in_flight) && q->elevator &&
+ 	    time_before(jiffies,
+ 			fq->flush_pending_since + FLUSH_PENDING_TIMEOUT))
+ 		return;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 411be60d0cb6..eb9b9596d3de 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -150,7 +150,7 @@ void blk_freeze_queue_start(struct request_queue *q)
+ 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
+ 	if (freeze_depth == 1) {
+ 		percpu_ref_kill(&q->q_usage_counter);
+-		if (q->mq_ops)
++		if (queue_is_mq(q))
+ 			blk_mq_run_hw_queues(q, false);
+ 	}
  }
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index d4b1b84ba8ca..93635a693314 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -68,7 +68,7 @@ queue_requests_store(struct request_queue *q, const char *page, size_t count)
+ 	unsigned long nr;
+ 	int ret, err;
  
- static blk_status_t scsi_setup_cmnd(struct scsi_device *sdev,
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 3bb2b3351e35..4a6ed2fc8c71 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -114,7 +114,7 @@ static int sd_suspend_system(struct device *);
- static int sd_suspend_runtime(struct device *);
- static int sd_resume(struct device *);
- static void sd_rescan(struct device *);
--static int sd_init_command(struct scsi_cmnd *SCpnt);
-+static blk_status_t sd_init_command(struct scsi_cmnd *SCpnt);
- static void sd_uninit_command(struct scsi_cmnd *SCpnt);
- static int sd_done(struct scsi_cmnd *);
- static void sd_eh_reset(struct scsi_cmnd *);
-@@ -750,7 +750,7 @@ static void sd_config_discard(struct scsi_disk *sdkp, unsigned int mode)
- 	blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
- }
+-	if (!q->mq_ops)
++	if (!queue_is_mq(q))
+ 		return -EINVAL;
  
--static int sd_setup_unmap_cmnd(struct scsi_cmnd *cmd)
-+static blk_status_t sd_setup_unmap_cmnd(struct scsi_cmnd *cmd)
- {
- 	struct scsi_device *sdp = cmd->device;
- 	struct request *rq = cmd->request;
-@@ -761,7 +761,7 @@ static int sd_setup_unmap_cmnd(struct scsi_cmnd *cmd)
+ 	ret = queue_var_store(&nr, page, count);
+@@ -839,12 +839,12 @@ static void __blk_release_queue(struct work_struct *work)
  
- 	rq->special_vec.bv_page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
- 	if (!rq->special_vec.bv_page)
--		return BLKPREP_DEFER;
-+		return BLK_STS_RESOURCE;
- 	rq->special_vec.bv_offset = 0;
- 	rq->special_vec.bv_len = data_len;
- 	rq->rq_flags |= RQF_SPECIAL_PAYLOAD;
-@@ -784,7 +784,8 @@ static int sd_setup_unmap_cmnd(struct scsi_cmnd *cmd)
- 	return scsi_init_io(cmd);
- }
+ 	blk_queue_free_zone_bitmaps(q);
  
--static int sd_setup_write_same16_cmnd(struct scsi_cmnd *cmd, bool unmap)
-+static blk_status_t sd_setup_write_same16_cmnd(struct scsi_cmnd *cmd,
-+		bool unmap)
- {
- 	struct scsi_device *sdp = cmd->device;
- 	struct request *rq = cmd->request;
-@@ -794,7 +795,7 @@ static int sd_setup_write_same16_cmnd(struct scsi_cmnd *cmd, bool unmap)
+-	if (q->mq_ops)
++	if (queue_is_mq(q))
+ 		blk_mq_release(q);
  
- 	rq->special_vec.bv_page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
- 	if (!rq->special_vec.bv_page)
--		return BLKPREP_DEFER;
-+		return BLK_STS_RESOURCE;
- 	rq->special_vec.bv_offset = 0;
- 	rq->special_vec.bv_len = data_len;
- 	rq->rq_flags |= RQF_SPECIAL_PAYLOAD;
-@@ -814,7 +815,8 @@ static int sd_setup_write_same16_cmnd(struct scsi_cmnd *cmd, bool unmap)
- 	return scsi_init_io(cmd);
- }
+ 	blk_trace_shutdown(q);
  
--static int sd_setup_write_same10_cmnd(struct scsi_cmnd *cmd, bool unmap)
-+static blk_status_t sd_setup_write_same10_cmnd(struct scsi_cmnd *cmd,
-+		bool unmap)
- {
- 	struct scsi_device *sdp = cmd->device;
- 	struct request *rq = cmd->request;
-@@ -824,7 +826,7 @@ static int sd_setup_write_same10_cmnd(struct scsi_cmnd *cmd, bool unmap)
+-	if (q->mq_ops)
++	if (queue_is_mq(q))
+ 		blk_mq_debugfs_unregister(q);
  
- 	rq->special_vec.bv_page = alloc_page(GFP_ATOMIC | __GFP_ZERO);
- 	if (!rq->special_vec.bv_page)
--		return BLKPREP_DEFER;
-+		return BLK_STS_RESOURCE;
- 	rq->special_vec.bv_offset = 0;
- 	rq->special_vec.bv_len = data_len;
- 	rq->rq_flags |= RQF_SPECIAL_PAYLOAD;
-@@ -844,7 +846,7 @@ static int sd_setup_write_same10_cmnd(struct scsi_cmnd *cmd, bool unmap)
- 	return scsi_init_io(cmd);
- }
- 
--static int sd_setup_write_zeroes_cmnd(struct scsi_cmnd *cmd)
-+static blk_status_t sd_setup_write_zeroes_cmnd(struct scsi_cmnd *cmd)
- {
- 	struct request *rq = cmd->request;
- 	struct scsi_device *sdp = cmd->device;
-@@ -862,7 +864,7 @@ static int sd_setup_write_zeroes_cmnd(struct scsi_cmnd *cmd)
+ 	bioset_exit(&q->bio_split);
+@@ -918,7 +918,7 @@ int blk_register_queue(struct gendisk *disk)
+ 		goto unlock;
  	}
  
- 	if (sdp->no_write_same)
--		return BLKPREP_INVALID;
-+		return BLK_STS_TARGET;
- 
- 	if (sdkp->ws16 || sector > 0xffffffff || nr_sectors > 0xffff)
- 		return sd_setup_write_same16_cmnd(cmd, false);
-@@ -939,7 +941,7 @@ static void sd_config_write_same(struct scsi_disk *sdkp)
-  * Will set up either WRITE SAME(10) or WRITE SAME(16) depending on
-  * the preference indicated by the target device.
-  **/
--static int sd_setup_write_same_cmnd(struct scsi_cmnd *cmd)
-+static blk_status_t sd_setup_write_same_cmnd(struct scsi_cmnd *cmd)
- {
- 	struct request *rq = cmd->request;
- 	struct scsi_device *sdp = cmd->device;
-@@ -948,10 +950,10 @@ static int sd_setup_write_same_cmnd(struct scsi_cmnd *cmd)
- 	sector_t sector = blk_rq_pos(rq);
- 	unsigned int nr_sectors = blk_rq_sectors(rq);
- 	unsigned int nr_bytes = blk_rq_bytes(rq);
--	int ret;
-+	blk_status_t ret;
- 
- 	if (sdkp->device->no_write_same)
--		return BLKPREP_INVALID;
-+		return BLK_STS_TARGET;
- 
- 	BUG_ON(bio_offset(bio) || bio_iovec(bio).bv_len != sdp->sector_size);
- 
-@@ -992,7 +994,7 @@ static int sd_setup_write_same_cmnd(struct scsi_cmnd *cmd)
- 	return ret;
- }
- 
--static int sd_setup_flush_cmnd(struct scsi_cmnd *cmd)
-+static blk_status_t sd_setup_flush_cmnd(struct scsi_cmnd *cmd)
- {
- 	struct request *rq = cmd->request;
- 
-@@ -1005,10 +1007,10 @@ static int sd_setup_flush_cmnd(struct scsi_cmnd *cmd)
- 	cmd->allowed = SD_MAX_RETRIES;
- 
- 	rq->timeout = rq->q->rq_timeout * SD_FLUSH_TIMEOUT_MULTIPLIER;
--	return BLKPREP_OK;
-+	return BLK_STS_OK;
- }
- 
--static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
-+static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
- {
- 	struct request *rq = SCpnt->request;
- 	struct scsi_device *sdp = SCpnt->device;
-@@ -1018,18 +1020,14 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
- 	sector_t threshold;
- 	unsigned int this_count = blk_rq_sectors(rq);
- 	unsigned int dif, dix;
--	int ret;
- 	unsigned char protect;
-+	blk_status_t ret;
- 
- 	ret = scsi_init_io(SCpnt);
--	if (ret != BLKPREP_OK)
-+	if (ret != BLK_STS_OK)
- 		return ret;
- 	WARN_ON_ONCE(SCpnt != rq->special);
- 
--	/* from here on until we're complete, any goto out
--	 * is used for a killable error condition */
--	ret = BLKPREP_KILL;
--
- 	SCSI_LOG_HLQUEUE(1,
- 		scmd_printk(KERN_INFO, SCpnt,
- 			"%s: block=%llu, count=%d\n",
-@@ -1042,7 +1040,7 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
- 						blk_rq_sectors(rq)));
- 		SCSI_LOG_HLQUEUE(2, scmd_printk(KERN_INFO, SCpnt,
- 						"Retry with 0x%p\n", SCpnt));
--		goto out;
-+		return BLK_STS_IOERR;
+-	if (q->mq_ops) {
++	if (queue_is_mq(q)) {
+ 		__blk_mq_register_dev(dev, q);
+ 		blk_mq_debugfs_register(q);
  	}
+@@ -929,7 +929,7 @@ int blk_register_queue(struct gendisk *disk)
  
- 	if (sdp->changed) {
-@@ -1051,7 +1049,7 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
- 		 * the changed bit has been reset
- 		 */
- 		/* printk("SCSI disk has been changed or is not present. Prohibiting further I/O.\n"); */
--		goto out;
-+		return BLK_STS_IOERR;
- 	}
+ 	blk_throtl_register_queue(q);
  
+-	if ((q->mq_ops && q->elevator)) {
++	if (q->elevator) {
+ 		ret = elv_register_queue(q);
+ 		if (ret) {
+ 			mutex_unlock(&q->sysfs_lock);
+@@ -978,7 +978,7 @@ void blk_unregister_queue(struct gendisk *disk)
+ 	 * Remove the sysfs attributes before unregistering the queue data
+ 	 * structures that can be modified through sysfs.
+ 	 */
+-	if (q->mq_ops)
++	if (queue_is_mq(q))
+ 		blk_mq_unregister_dev(disk_to_dev(disk), q);
+ 	mutex_unlock(&q->sysfs_lock);
+ 
+@@ -987,7 +987,7 @@ void blk_unregister_queue(struct gendisk *disk)
+ 	blk_trace_remove_sysfs(disk_to_dev(disk));
+ 
+ 	mutex_lock(&q->sysfs_lock);
+-	if (q->mq_ops && q->elevator)
++	if (q->elevator)
+ 		elv_unregister_queue(q);
+ 	mutex_unlock(&q->sysfs_lock);
+ 
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 0fc222d4194b..b580763e8b1e 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -709,7 +709,7 @@ void wbt_enable_default(struct request_queue *q)
+ 	if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
+ 		return;
+ 
+-	if (q->mq_ops && IS_ENABLED(CONFIG_BLK_WBT_MQ))
++	if (queue_is_mq(q) && IS_ENABLED(CONFIG_BLK_WBT_MQ))
+ 		wbt_init(q);
+ }
+ EXPORT_SYMBOL_GPL(wbt_enable_default);
+diff --git a/block/elevator.c b/block/elevator.c
+index 19351ffa56b1..9df9ae6b038e 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -674,7 +674,7 @@ static int __elevator_change(struct request_queue *q, const char *name)
  	/*
-@@ -1089,31 +1087,28 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
- 		if ((block & 1) || (blk_rq_sectors(rq) & 1)) {
- 			scmd_printk(KERN_ERR, SCpnt,
- 				    "Bad block number requested\n");
--			goto out;
--		} else {
--			block = block >> 1;
--			this_count = this_count >> 1;
-+			return BLK_STS_IOERR;
- 		}
-+		block = block >> 1;
-+		this_count = this_count >> 1;
- 	}
- 	if (sdp->sector_size == 2048) {
- 		if ((block & 3) || (blk_rq_sectors(rq) & 3)) {
- 			scmd_printk(KERN_ERR, SCpnt,
- 				    "Bad block number requested\n");
--			goto out;
--		} else {
--			block = block >> 2;
--			this_count = this_count >> 2;
-+			return BLK_STS_IOERR;
- 		}
-+		block = block >> 2;
-+		this_count = this_count >> 2;
- 	}
- 	if (sdp->sector_size == 4096) {
- 		if ((block & 7) || (blk_rq_sectors(rq) & 7)) {
- 			scmd_printk(KERN_ERR, SCpnt,
- 				    "Bad block number requested\n");
--			goto out;
--		} else {
--			block = block >> 3;
--			this_count = this_count >> 3;
-+			return BLK_STS_IOERR;
- 		}
-+		block = block >> 3;
-+		this_count = this_count >> 3;
- 	}
- 	if (rq_data_dir(rq) == WRITE) {
- 		SCpnt->cmnd[0] = WRITE_6;
-@@ -1125,7 +1120,7 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
- 		SCpnt->cmnd[0] = READ_6;
- 	} else {
- 		scmd_printk(KERN_ERR, SCpnt, "Unknown command %d\n", req_op(rq));
--		goto out;
-+		return BLK_STS_IOERR;
- 	}
- 
- 	SCSI_LOG_HLQUEUE(2, scmd_printk(KERN_INFO, SCpnt,
-@@ -1145,10 +1140,8 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
- 	if (protect && sdkp->protection_type == T10_PI_TYPE2_PROTECTION) {
- 		SCpnt->cmnd = mempool_alloc(sd_cdb_pool, GFP_ATOMIC);
- 
--		if (unlikely(SCpnt->cmnd == NULL)) {
--			ret = BLKPREP_DEFER;
--			goto out;
--		}
-+		if (unlikely(!SCpnt->cmnd))
-+			return BLK_STS_RESOURCE;
- 
- 		SCpnt->cmd_len = SD_EXT_CDB_SIZE;
- 		memset(SCpnt->cmnd, 0, SCpnt->cmd_len);
-@@ -1216,7 +1209,7 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
- 			 */
- 			scmd_printk(KERN_ERR, SCpnt,
- 				    "FUA write on READ/WRITE(6) drive\n");
--			goto out;
-+			return BLK_STS_IOERR;
- 		}
- 
- 		SCpnt->cmnd[1] |= (unsigned char) ((block >> 16) & 0x1f);
-@@ -1240,12 +1233,10 @@ static int sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
- 	 * This indicates that the command is ready from our end to be
- 	 * queued.
+ 	 * Special case for mq, turn off scheduling
  	 */
--	ret = BLKPREP_OK;
-- out:
--	return ret;
-+	return BLK_STS_OK;
- }
+-	if (q->mq_ops && !strncmp(name, "none", 4))
++	if (!strncmp(name, "none", 4))
+ 		return elevator_switch(q, NULL);
  
--static int sd_init_command(struct scsi_cmnd *cmd)
-+static blk_status_t sd_init_command(struct scsi_cmnd *cmd)
+ 	strlcpy(elevator_name, name, sizeof(elevator_name));
+@@ -692,8 +692,7 @@ static int __elevator_change(struct request_queue *q, const char *name)
+ 
+ static inline bool elv_support_iosched(struct request_queue *q)
  {
- 	struct request *rq = cmd->request;
+-	if (q->mq_ops && q->tag_set && (q->tag_set->flags &
+-				BLK_MQ_F_NO_SCHED))
++	if (q->tag_set && (q->tag_set->flags & BLK_MQ_F_NO_SCHED))
+ 		return false;
+ 	return true;
+ }
+@@ -703,7 +702,7 @@ ssize_t elv_iosched_store(struct request_queue *q, const char *name,
+ {
+ 	int ret;
  
-@@ -1261,7 +1252,7 @@ static int sd_init_command(struct scsi_cmnd *cmd)
- 		case SD_LBP_ZERO:
- 			return sd_setup_write_same10_cmnd(cmd, false);
- 		default:
--			return BLKPREP_INVALID;
-+			return BLK_STS_TARGET;
- 		}
- 	case REQ_OP_WRITE_ZEROES:
- 		return sd_setup_write_zeroes_cmnd(cmd);
-@@ -1276,7 +1267,7 @@ static int sd_init_command(struct scsi_cmnd *cmd)
- 		return sd_zbc_setup_reset_cmnd(cmd);
- 	default:
- 		WARN_ON_ONCE(1);
--		return BLKPREP_KILL;
-+		return BLK_STS_NOTSUPP;
+-	if (!q->mq_ops || !elv_support_iosched(q))
++	if (!queue_is_mq(q) || !elv_support_iosched(q))
+ 		return count;
+ 
+ 	ret = __elevator_change(q, name);
+@@ -739,7 +738,7 @@ ssize_t elv_iosched_show(struct request_queue *q, char *name)
  	}
- }
+ 	spin_unlock(&elv_list_lock);
  
-diff --git a/drivers/scsi/sd.h b/drivers/scsi/sd.h
-index 1d63f3a23ffb..7f43e6839bce 100644
---- a/drivers/scsi/sd.h
-+++ b/drivers/scsi/sd.h
-@@ -271,7 +271,7 @@ static inline int sd_is_zoned(struct scsi_disk *sdkp)
+-	if (q->mq_ops && q->elevator)
++	if (q->elevator)
+ 		len += sprintf(name+len, "none");
  
- extern int sd_zbc_read_zones(struct scsi_disk *sdkp, unsigned char *buffer);
- extern void sd_zbc_print_zones(struct scsi_disk *sdkp);
--extern int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd);
-+extern blk_status_t sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd);
- extern void sd_zbc_complete(struct scsi_cmnd *cmd, unsigned int good_bytes,
- 			    struct scsi_sense_hdr *sshdr);
- extern int sd_zbc_report_zones(struct gendisk *disk, sector_t sector,
-@@ -288,9 +288,9 @@ static inline int sd_zbc_read_zones(struct scsi_disk *sdkp,
+ 	len += sprintf(len+name, "\n");
+diff --git a/block/genhd.c b/block/genhd.c
+index cff6bdf27226..0145bcb0cc76 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -47,7 +47,7 @@ static void disk_release_events(struct gendisk *disk);
  
- static inline void sd_zbc_print_zones(struct scsi_disk *sdkp) {}
- 
--static inline int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd)
-+static inline blk_status_t sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd)
+ void part_inc_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
  {
--	return BLKPREP_INVALID;
-+	return BLK_STS_TARGET;
- }
+-	if (q->mq_ops)
++	if (queue_is_mq(q))
+ 		return;
  
- static inline void sd_zbc_complete(struct scsi_cmnd *cmd,
-diff --git a/drivers/scsi/sd_zbc.c b/drivers/scsi/sd_zbc.c
-index e06c48c866e4..83365b29a4d8 100644
---- a/drivers/scsi/sd_zbc.c
-+++ b/drivers/scsi/sd_zbc.c
-@@ -185,7 +185,7 @@ static inline sector_t sd_zbc_zone_sectors(struct scsi_disk *sdkp)
-  *
-  * Called from sd_init_command() for a REQ_OP_ZONE_RESET request.
+ 	atomic_inc(&part->in_flight[rw]);
+@@ -57,7 +57,7 @@ void part_inc_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
+ 
+ void part_dec_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
+ {
+-	if (q->mq_ops)
++	if (queue_is_mq(q))
+ 		return;
+ 
+ 	atomic_dec(&part->in_flight[rw]);
+@@ -68,7 +68,7 @@ void part_dec_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
+ void part_in_flight(struct request_queue *q, struct hd_struct *part,
+ 		    unsigned int inflight[2])
+ {
+-	if (q->mq_ops) {
++	if (queue_is_mq(q)) {
+ 		blk_mq_in_flight(q, part, inflight);
+ 		return;
+ 	}
+@@ -85,7 +85,7 @@ void part_in_flight(struct request_queue *q, struct hd_struct *part,
+ void part_in_flight_rw(struct request_queue *q, struct hd_struct *part,
+ 		       unsigned int inflight[2])
+ {
+-	if (q->mq_ops) {
++	if (queue_is_mq(q)) {
+ 		blk_mq_in_flight_rw(q, part, inflight);
+ 		return;
+ 	}
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 9038c302d5c2..e42739177107 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -919,7 +919,7 @@ static int device_is_rq_based(struct dm_target *ti, struct dm_dev *dev,
+ 	struct request_queue *q = bdev_get_queue(dev->bdev);
+ 	struct verify_rq_based_data *v = data;
+ 
+-	if (q->mq_ops)
++	if (queue_is_mq(q))
+ 		v->mq_count++;
+ 	else
+ 		v->sq_count++;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index e67ad2dd025e..3712d1fe48d4 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -671,13 +671,17 @@ static inline bool blk_account_rq(struct request *rq)
+ 
+ #define rq_data_dir(rq)		(op_is_write(req_op(rq)) ? WRITE : READ)
+ 
++static inline bool queue_is_mq(struct request_queue *q)
++{
++	return q->mq_ops;
++}
++
+ /*
+- * Driver can handle struct request, if it either has an old style
+- * request_fn defined, or is blk-mq based.
++ * Only blk-mq based drivers are rq based
   */
--int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd)
-+blk_status_t sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd)
+ static inline bool queue_is_rq_based(struct request_queue *q)
  {
- 	struct request *rq = cmd->request;
- 	struct scsi_disk *sdkp = scsi_disk(rq->rq_disk);
-@@ -194,14 +194,14 @@ int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd)
- 
- 	if (!sd_is_zoned(sdkp))
- 		/* Not a zoned device */
--		return BLKPREP_KILL;
-+		return BLK_STS_IOERR;
- 
- 	if (sdkp->device->changed)
--		return BLKPREP_KILL;
-+		return BLK_STS_IOERR;
- 
- 	if (sector & (sd_zbc_zone_sectors(sdkp) - 1))
- 		/* Unaligned request */
--		return BLKPREP_KILL;
-+		return BLK_STS_IOERR;
- 
- 	cmd->cmd_len = 16;
- 	memset(cmd->cmnd, 0, cmd->cmd_len);
-@@ -214,7 +214,7 @@ int sd_zbc_setup_reset_cmnd(struct scsi_cmnd *cmd)
- 	cmd->transfersize = 0;
- 	cmd->allowed = 0;
- 
--	return BLKPREP_OK;
-+	return BLK_STS_OK;
+-	return q->mq_ops;
++	return queue_is_mq(q);
  }
  
- /**
-diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
-index 54dd70ae9731..38ddbbfe5f3c 100644
---- a/drivers/scsi/sr.c
-+++ b/drivers/scsi/sr.c
-@@ -80,7 +80,7 @@ MODULE_ALIAS_SCSI_DEVICE(TYPE_WORM);
- static DEFINE_MUTEX(sr_mutex);
- static int sr_probe(struct device *);
- static int sr_remove(struct device *);
--static int sr_init_command(struct scsi_cmnd *SCpnt);
-+static blk_status_t sr_init_command(struct scsi_cmnd *SCpnt);
- static int sr_done(struct scsi_cmnd *);
- static int sr_runtime_suspend(struct device *dev);
- 
-@@ -384,22 +384,22 @@ static int sr_done(struct scsi_cmnd *SCpnt)
- 	return good_bytes;
- }
- 
--static int sr_init_command(struct scsi_cmnd *SCpnt)
-+static blk_status_t sr_init_command(struct scsi_cmnd *SCpnt)
- {
- 	int block = 0, this_count, s_size;
- 	struct scsi_cd *cd;
- 	struct request *rq = SCpnt->request;
--	int ret;
-+	blk_status_t ret;
- 
- 	ret = scsi_init_io(SCpnt);
--	if (ret != BLKPREP_OK)
-+	if (ret != BLK_STS_OK)
- 		goto out;
- 	WARN_ON_ONCE(SCpnt != rq->special);
- 	cd = scsi_cd(rq->rq_disk);
- 
- 	/* from here on until we're complete, any goto out
- 	 * is used for a killable error condition */
--	ret = BLKPREP_KILL;
-+	ret = BLK_STS_IOERR;
- 
- 	SCSI_LOG_HLQUEUE(1, scmd_printk(KERN_INFO, SCpnt,
- 		"Doing sr request, block = %d\n", block));
-@@ -516,7 +516,7 @@ static int sr_init_command(struct scsi_cmnd *SCpnt)
- 	 * This indicates that the command is ready from our end to be
- 	 * queued.
- 	 */
--	ret = BLKPREP_OK;
-+	ret = BLK_STS_OK;
-  out:
- 	return ret;
- }
-diff --git a/include/scsi/scsi_cmnd.h b/include/scsi/scsi_cmnd.h
-index c891ada3c5c2..d6fd2aba0380 100644
---- a/include/scsi/scsi_cmnd.h
-+++ b/include/scsi/scsi_cmnd.h
-@@ -171,7 +171,7 @@ extern void *scsi_kmap_atomic_sg(struct scatterlist *sg, int sg_count,
- 				 size_t *offset, size_t *len);
- extern void scsi_kunmap_atomic_sg(void *virt);
- 
--extern int scsi_init_io(struct scsi_cmnd *cmd);
-+extern blk_status_t scsi_init_io(struct scsi_cmnd *cmd);
- 
- #ifdef CONFIG_SCSI_DMA
- extern int scsi_dma_map(struct scsi_cmnd *cmd);
-diff --git a/include/scsi/scsi_driver.h b/include/scsi/scsi_driver.h
-index fae8b465233e..6dffa8555a39 100644
---- a/include/scsi/scsi_driver.h
-+++ b/include/scsi/scsi_driver.h
-@@ -2,6 +2,7 @@
- #ifndef _SCSI_SCSI_DRIVER_H
- #define _SCSI_SCSI_DRIVER_H
- 
-+#include <linux/blk_types.h>
- #include <linux/device.h>
- 
- struct module;
-@@ -13,7 +14,7 @@ struct scsi_driver {
- 	struct device_driver	gendrv;
- 
- 	void (*rescan)(struct device *);
--	int (*init_command)(struct scsi_cmnd *);
-+	blk_status_t (*init_command)(struct scsi_cmnd *);
- 	void (*uninit_command)(struct scsi_cmnd *);
- 	int (*done)(struct scsi_cmnd *);
- 	int (*eh_action)(struct scsi_cmnd *, int);
+ static inline unsigned int blk_queue_cluster(struct request_queue *q)
 -- 
-2.19.1
+2.17.1
