@@ -1,32 +1,55 @@
-Return-Path: <hare@suse.de>
-Subject: Re: [PATCH 10/16] blk-mq: cleanup and improve list insertion
-To: Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
- linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20181030183252.17857-1-axboe@kernel.dk>
- <20181030183252.17857-11-axboe@kernel.dk>
-From: Hannes Reinecke <hare@suse.de>
-Message-ID: <579cc1b0-0147-d5b9-a507-85b56c2e0546@suse.de>
-Date: Thu, 1 Nov 2018 10:28:48 +0100
+Return-Path: <BATV+3de936c6eedb3fd3a39f+5557+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 3/6] skd_main: don't use req->special
+Date: Sat, 10 Nov 2018 09:30:46 +0100
+Message-Id: <20181110083049.17475-4-hch@lst.de>
+In-Reply-To: <20181110083049.17475-1-hch@lst.de>
+References: <20181110083049.17475-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20181030183252.17857-11-axboe@kernel.dk>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On 10/30/18 7:32 PM, Jens Axboe wrote:
-> It's somewhat strange to have a list insertion function that
-> relies on the fact that the caller has mapped things correctly.
-> Pass in the hardware queue directly for insertion, which makes
-> for a much cleaner interface and implementation.
-> 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> ---
->   block/blk-mq-sched.c |  8 +-------
->   block/blk-mq-sched.h |  2 +-
->   block/blk-mq.c       | 25 ++++++++++++++-----------
->   3 files changed, 16 insertions(+), 19 deletions(-)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Add a retries field to the internal request structure instead, which gets
+set to zero on the first submission.
 
-Cheers,
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/skd_main.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-Hannes
+diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
+index a0196477165f..a10d5736d8f7 100644
+--- a/drivers/block/skd_main.c
++++ b/drivers/block/skd_main.c
+@@ -181,6 +181,7 @@ struct skd_request_context {
+ 	struct fit_completion_entry_v1 completion;
+ 
+ 	struct fit_comp_error_info err_info;
++	int retries;
+ 
+ 	blk_status_t status;
+ };
+@@ -495,6 +496,11 @@ static blk_status_t skd_mq_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	if (unlikely(skdev->state != SKD_DRVR_STATE_ONLINE))
+ 		return skd_fail_all(q) ? BLK_STS_IOERR : BLK_STS_RESOURCE;
+ 
++	if (!(req->rq_flags & RQF_DONTPREP)) {
++		skreq->retries = 0;
++		req->rq_flags |= RQF_DONTPREP;
++	}
++
+ 	blk_mq_start_request(req);
+ 
+ 	WARN_ONCE(tag >= skd_max_queue_depth, "%#x > %#x (nr_requests = %lu)\n",
+@@ -1426,7 +1432,7 @@ static void skd_resolve_req_exception(struct skd_device *skdev,
+ 		break;
+ 
+ 	case SKD_CHECK_STATUS_REQUEUE_REQUEST:
+-		if ((unsigned long) ++req->special < SKD_MAX_RETRIES) {
++		if (++skreq->retries < SKD_MAX_RETRIES) {
+ 			skd_log_skreq(skdev, skreq, "retry");
+ 			blk_mq_requeue_request(req, true);
+ 			break;
+-- 
+2.19.1
