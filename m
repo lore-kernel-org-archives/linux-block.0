@@ -1,183 +1,42 @@
-Return-Path: <jianchao.w.wang@oracle.com>
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
-To: axboe@kernel.dk
-Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH V4 2/5] blk-mq: refactor the code of issue request directly
-Date: Fri,  2 Nov 2018 15:08:53 +0800
-Message-Id: <1541142536-1431-3-git-send-email-jianchao.w.wang@oracle.com>
-In-Reply-To: <1541142536-1431-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1541142536-1431-1-git-send-email-jianchao.w.wang@oracle.com>
+Return-Path: <axboe@kernel.dk>
+Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id d68-v6sm11178615pfa.80.2018.11.10.07.13.20
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 10 Nov 2018 07:13:20 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Subject: [PATCHSET 0/6] Various block optimizations
+Date: Sat, 10 Nov 2018 08:13:11 -0700
+Message-Id: <20181110151317.3813-1-axboe@kernel.dk>
 List-ID: <linux-block@vger.kernel.org>
 
-Merge blk_mq_try_issue_directly and __blk_mq_try_issue_directly
-into one interface which is able to handle the return value from
-.queue_rq callback. To make the code clearer, introduce new helpers
-enum mq_issue_decision and blk_mq_make_decision to decide how to
-handle the non-issued requests.
+A mixed bag of optimizations that are now possible, on top of my
+for-4.21/block branch.
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- block/blk-mq.c | 104 +++++++++++++++++++++++++++++++++------------------------
- 1 file changed, 61 insertions(+), 43 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index af5b591..962fdfc 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1729,78 +1729,96 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	return ret;
- }
- 
--static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+enum mq_issue_decision {
-+	MQ_ISSUE_INSERT_QUEUE,
-+	MQ_ISSUE_END_REQUEST,
-+	MQ_ISSUE_DO_NOTHING,
-+};
-+
-+static inline enum mq_issue_decision
-+	blk_mq_make_dicision(blk_status_t ret, bool bypass)
-+{
-+	enum mq_issue_decision dec;
-+
-+	switch(ret) {
-+	case BLK_STS_OK:
-+		dec = MQ_ISSUE_DO_NOTHING;
-+		break;
-+	case BLK_STS_DEV_RESOURCE:
-+	case BLK_STS_RESOURCE:
-+		dec = bypass ? MQ_ISSUE_DO_NOTHING : MQ_ISSUE_INSERT_QUEUE;
-+		break;
-+	default:
-+		dec = bypass ? MQ_ISSUE_DO_NOTHING : MQ_ISSUE_END_REQUEST;
-+		break;
-+	}
-+
-+	return dec;
-+}
-+
-+static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 						struct request *rq,
- 						blk_qc_t *cookie,
--						bool bypass_insert)
-+						bool bypass)
- {
- 	struct request_queue *q = rq->q;
- 	bool run_queue = true;
-+	blk_status_t ret = BLK_STS_RESOURCE;
-+	enum mq_issue_decision dec;
-+	int srcu_idx;
-+
-+	hctx_lock(hctx, &srcu_idx);
- 
- 	/*
--	 * RCU or SRCU read lock is needed before checking quiesced flag.
-+	 * hctx_lock is needed before checking quiesced flag.
- 	 *
--	 * When queue is stopped or quiesced, ignore 'bypass_insert' from
--	 * blk_mq_request_issue_directly(), and return BLK_STS_OK to caller,
--	 * and avoid driver to try to dispatch again.
-+	 * When queue is stopped or quiesced, ignore 'bypass', insert
-+	 * and return BLK_STS_OK to caller, and avoid driver to try to
-+	 * dispatch again.
- 	 */
- 	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)) {
- 		run_queue = false;
--		bypass_insert = false;
--		goto insert;
-+		bypass = false;
-+		goto out_unlock;
- 	}
- 
--	if (q->elevator && !bypass_insert)
--		goto insert;
-+	if (q->elevator && !bypass)
-+		goto out_unlock;
- 
- 	if (!blk_mq_get_dispatch_budget(hctx))
--		goto insert;
-+		goto out_unlock;
- 
- 	if (!blk_mq_get_driver_tag(rq)) {
- 		blk_mq_put_dispatch_budget(hctx);
--		goto insert;
-+		goto out_unlock;
- 	}
- 
--	return __blk_mq_issue_directly(hctx, rq, cookie);
--insert:
--	if (bypass_insert)
--		return BLK_STS_RESOURCE;
-+	ret = __blk_mq_issue_directly(hctx, rq, cookie);
- 
--	blk_mq_sched_insert_request(rq, false, run_queue, false);
--	return BLK_STS_OK;
--}
--
--static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
--		struct request *rq, blk_qc_t *cookie)
--{
--	blk_status_t ret;
--	int srcu_idx;
--
--	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
--
--	hctx_lock(hctx, &srcu_idx);
-+out_unlock:
-+	hctx_unlock(hctx, srcu_idx);
- 
--	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false);
--	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
--		blk_mq_sched_insert_request(rq, false, true, false);
--	else if (ret != BLK_STS_OK)
-+	dec = blk_mq_make_dicision(ret, bypass);
-+	switch(dec) {
-+	case MQ_ISSUE_INSERT_QUEUE:
-+		blk_mq_sched_insert_request(rq, false, run_queue, false);
-+		break;
-+	case MQ_ISSUE_END_REQUEST:
- 		blk_mq_end_request(rq, ret);
-+		break;
-+	default:
-+		return ret;
-+	}
- 
--	hctx_unlock(hctx, srcu_idx);
-+	return BLK_STS_OK;
- }
- 
- blk_status_t blk_mq_request_issue_directly(struct request *rq)
- {
--	blk_status_t ret;
--	int srcu_idx;
- 	struct blk_mq_ctx *ctx = rq->mq_ctx;
- 	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(rq->q, ctx->cpu);
- 
--	hctx_lock(hctx, &srcu_idx);
--	ret = __blk_mq_try_issue_directly(hctx, rq, NULL, true);
--	hctx_unlock(hctx, srcu_idx);
--
--	return ret;
-+	return blk_mq_try_issue_directly(hctx, rq, NULL, true);
- }
- 
- void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
-@@ -1922,13 +1940,13 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 			data.hctx = blk_mq_map_queue(q,
- 					same_queue_rq->mq_ctx->cpu);
- 			blk_mq_try_issue_directly(data.hctx, same_queue_rq,
--					&cookie);
-+					&cookie, false);
- 		}
- 	} else if ((q->nr_hw_queues > 1 && is_sync) || (!q->elevator &&
- 			!data.hctx->dispatch_busy)) {
- 		blk_mq_put_ctx(data.ctx);
- 		blk_mq_bio_to_request(rq, bio);
--		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
-+		blk_mq_try_issue_directly(data.hctx, rq, &cookie, false);
- 	} else {
- 		blk_mq_put_ctx(data.ctx);
- 		blk_mq_bio_to_request(rq, bio);
+ block/blk-cgroup.c         |   8 ++--
+ block/blk-core.c           |  16 ++++----
+ block/blk-flush.c          |   3 +-
+ block/blk-mq-debugfs.c     |   2 +-
+ block/blk-mq.c             |  24 +++++------
+ block/blk-mq.h             |  12 +++---
+ block/blk-rq-qos.c         |  90 +++++++++++-----------------------------
+ block/blk-rq-qos.h         |  35 ++++++++++++----
+ block/blk-softirq.c        |   4 +-
+ block/blk-sysfs.c          |  18 ++++----
+ block/blk-wbt.c            |   2 +-
+ block/elevator.c           |   9 ++--
+ block/genhd.c              |   8 ++--
+ drivers/md/dm-table.c      |   2 +-
+ drivers/nvme/host/pci.c    |  17 ++++++--
+ drivers/scsi/scsi_lib.c    |   2 +-
+ fs/block_dev.c             |  29 ++++++++++---
+ fs/iomap.c                 |   2 +-
+ include/linux/blk-mq-ops.h | 100 +++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h     |  94 +-----------------------------------------
+ include/linux/blkdev.h     |  27 ++++++++++--
+ 21 files changed, 268 insertions(+), 236 deletions(-)
+
 -- 
-2.7.4
+Jens Axboe
