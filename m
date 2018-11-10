@@ -1,158 +1,52 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:34060 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726986AbeKHWgq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 8 Nov 2018 17:36:46 -0500
-From: Jan Kara <jack@suse.cz>
+Return-Path: <BATV+3de936c6eedb3fd3a39f+5557+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
 To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH 09/16] loop: Push loop_ctl_mutex down to loop_set_status()
-Date: Thu,  8 Nov 2018 14:01:09 +0100
-Message-Id: <20181108130116.12140-10-jack@suse.cz>
-In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
-References: <20181108130116.12140-1-jack@suse.cz>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Subject: [PATCH 2/6] nullb: remove leftover legacy request code
+Date: Sat, 10 Nov 2018 09:30:45 +0100
+Message-Id: <20181110083049.17475-3-hch@lst.de>
+In-Reply-To: <20181110083049.17475-1-hch@lst.de>
+References: <20181110083049.17475-1-hch@lst.de>
+MIME-Version: 1.0
+List-ID: <linux-block@vger.kernel.org>
 
-Push loop_ctl_mutex down to loop_set_status(). We will need this to be
-able to call loop_reread_partitions() without loop_ctl_mutex.
+null_softirq_done_fn is only used for the blk-mq path, so remove the
+other branch.  Also rename the function to better match the method name.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/loop.c | 51 +++++++++++++++++++++++++--------------------------
- 1 file changed, 25 insertions(+), 26 deletions(-)
+ drivers/block/null_blk_main.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 2e814f8af4df..af79a59732b7 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1141,46 +1141,55 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	struct loop_func_table *xfer;
- 	kuid_t uid = current_uid();
- 
-+	err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
-+	if (err)
-+		return err;
- 	if (lo->lo_encrypt_key_size &&
- 	    !uid_eq(lo->lo_key_owner, uid) &&
--	    !capable(CAP_SYS_ADMIN))
--		return -EPERM;
--	if (lo->lo_state != Lo_bound)
--		return -ENXIO;
--	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE)
--		return -EINVAL;
-+	    !capable(CAP_SYS_ADMIN)) {
-+		err = -EPERM;
-+		goto out_unlock;
-+	}
-+	if (lo->lo_state != Lo_bound) {
-+		err = -ENXIO;
-+		goto out_unlock;
-+	}
-+	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE) {
-+		err = -EINVAL;
-+		goto out_unlock;
-+	}
- 
- 	/* I/O need to be drained during transfer transition */
- 	blk_mq_freeze_queue(lo->lo_queue);
- 
- 	err = loop_release_xfer(lo);
- 	if (err)
--		goto exit;
-+		goto out_unfreeze;
- 
- 	if (info->lo_encrypt_type) {
- 		unsigned int type = info->lo_encrypt_type;
- 
- 		if (type >= MAX_LO_CRYPT) {
- 			err = -EINVAL;
--			goto exit;
-+			goto out_unfreeze;
- 		}
- 		xfer = xfer_funcs[type];
- 		if (xfer == NULL) {
- 			err = -EINVAL;
--			goto exit;
-+			goto out_unfreeze;
- 		}
- 	} else
- 		xfer = NULL;
- 
- 	err = loop_init_xfer(lo, xfer, info);
- 	if (err)
--		goto exit;
-+		goto out_unfreeze;
- 
- 	if (lo->lo_offset != info->lo_offset ||
- 	    lo->lo_sizelimit != info->lo_sizelimit) {
- 		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
- 			err = -EFBIG;
--			goto exit;
-+			goto out_unfreeze;
- 		}
- 	}
- 
-@@ -1212,7 +1221,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 	/* update dio if lo_offset or transfer is changed */
- 	__loop_update_dio(lo, lo->use_dio);
- 
-- exit:
-+out_unfreeze:
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 
- 	if (!err && (info->lo_flags & LO_FLAGS_PARTSCAN) &&
-@@ -1221,6 +1230,8 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 		lo->lo_disk->flags &= ~GENHD_FL_NO_PART_SCAN;
- 		loop_reread_partitions(lo, lo->lo_device);
- 	}
-+out_unlock:
-+	mutex_unlock(&loop_ctl_mutex);
- 
- 	return err;
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 9c045bee0985..16ba3db2a015 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -642,14 +642,11 @@ static void null_cmd_end_timer(struct nullb_cmd *cmd)
+ 	hrtimer_start(&cmd->timer, kt, HRTIMER_MODE_REL);
  }
-@@ -1467,12 +1478,8 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 	case LOOP_SET_STATUS:
- 		err = -EPERM;
- 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
--			err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
--			if (err)
--				return err;
- 			err = loop_set_status_old(lo,
- 					(struct loop_info __user *)arg);
--			mutex_unlock(&loop_ctl_mutex);
- 		}
- 		break;
- 	case LOOP_GET_STATUS:
-@@ -1480,12 +1487,8 @@ static int lo_ioctl(struct block_device *bdev, fmode_t mode,
- 	case LOOP_SET_STATUS64:
- 		err = -EPERM;
- 		if ((mode & FMODE_WRITE) || capable(CAP_SYS_ADMIN)) {
--			err = mutex_lock_killable_nested(&loop_ctl_mutex, 1);
--			if (err)
--				return err;
- 			err = loop_set_status64(lo,
- 					(struct loop_info64 __user *) arg);
--			mutex_unlock(&loop_ctl_mutex);
- 		}
- 		break;
- 	case LOOP_GET_STATUS64:
-@@ -1630,12 +1633,8 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
  
- 	switch(cmd) {
- 	case LOOP_SET_STATUS:
--		err = mutex_lock_killable(&loop_ctl_mutex);
--		if (!err) {
--			err = loop_set_status_compat(lo,
--						     (const struct compat_loop_info __user *)arg);
--			mutex_unlock(&loop_ctl_mutex);
--		}
-+		err = loop_set_status_compat(lo,
-+			     (const struct compat_loop_info __user *)arg);
- 		break;
- 	case LOOP_GET_STATUS:
- 		err = loop_get_status_compat(lo,
+-static void null_softirq_done_fn(struct request *rq)
++static void null_complete_rq(struct request *rq)
+ {
+ 	struct nullb *nullb = rq->q->queuedata;
+ 
+-	if (nullb->dev->queue_mode == NULL_Q_MQ)
+-		end_cmd(blk_mq_rq_to_pdu(rq));
+-	else
+-		end_cmd(rq->special);
++	end_cmd(blk_mq_rq_to_pdu(rq));
+ }
+ 
+ static struct nullb_page *null_alloc_page(gfp_t gfp_flags)
+@@ -1357,7 +1354,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 
+ static const struct blk_mq_ops null_mq_ops = {
+ 	.queue_rq       = null_queue_rq,
+-	.complete	= null_softirq_done_fn,
++	.complete	= null_complete_rq,
+ 	.timeout	= null_timeout_rq,
+ };
+ 
 -- 
-2.16.4
+2.19.1
