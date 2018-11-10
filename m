@@ -1,55 +1,91 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:38763 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728970AbeKEVqP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Nov 2018 16:46:15 -0500
-Received: by mail-ed1-f66.google.com with SMTP id a2-v6so2729671edi.5
-        for <linux-block@vger.kernel.org>; Mon, 05 Nov 2018 04:26:44 -0800 (PST)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: Javier Gonzales <javier@cnexlabs.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH v2 1/7] lightnvm: pblk: fix resubmission of overwritten write err lbas
-Date: Mon,  5 Nov 2018 13:26:04 +0100
-Message-Id: <20181105122610.1555-2-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <20181105122610.1555-1-hans.ml.holmberg@owltronix.com>
-References: <20181105122610.1555-1-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <osandov@osandov.com>
+Return-Path: <osandov@osandov.com>
+Date: Fri, 9 Nov 2018 20:16:41 -0800
+From: Omar Sandoval <osandov@osandov.com>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] floppy: fix race condition in __floppy_read_block_0()
+Message-ID: <20181110041641.GC23447@vader>
+References: <21f7532d-8d90-56d0-3916-6329f6c2378f@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <21f7532d-8d90-56d0-3916-6329f6c2378f@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+On Fri, Nov 09, 2018 at 03:58:40PM -0700, Jens Axboe wrote:
+> LKP recently reported a hang at bootup in the floppy code:
+> 
+> [  245.678853] INFO: task mount:580 blocked for more than 120 seconds.
+> [  245.679906]       Tainted: G                T 4.19.0-rc6-00172-ga9f38e1 #1
+> [  245.680959] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> [  245.682181] mount           D 6372   580      1 0x00000004
+> [  245.683023] Call Trace:
+> [  245.683425]  __schedule+0x2df/0x570
+> [  245.683975]  schedule+0x2d/0x80
+> [  245.684476]  schedule_timeout+0x19d/0x330
+> [  245.685090]  ? wait_for_common+0xa5/0x170
+> [  245.685735]  wait_for_common+0xac/0x170
+> [  245.686339]  ? do_sched_yield+0x90/0x90
+> [  245.686935]  wait_for_completion+0x12/0x20
+> [  245.687571]  __floppy_read_block_0+0xfb/0x150
+> [  245.688244]  ? floppy_resume+0x40/0x40
+> [  245.688844]  floppy_revalidate+0x20f/0x240
+> [  245.689486]  check_disk_change+0x43/0x60
+> [  245.690087]  floppy_open+0x1ea/0x360
+> [  245.690653]  __blkdev_get+0xb4/0x4d0
+> [  245.691212]  ? blkdev_get+0x1db/0x370
+> [  245.691777]  blkdev_get+0x1f3/0x370
+> [  245.692351]  ? path_put+0x15/0x20
+> [  245.692871]  ? lookup_bdev+0x4b/0x90
+> [  245.693539]  blkdev_get_by_path+0x3d/0x80
+> [  245.694165]  mount_bdev+0x2a/0x190
+> [  245.694695]  squashfs_mount+0x10/0x20
+> [  245.695271]  ? squashfs_alloc_inode+0x30/0x30
+> [  245.695960]  mount_fs+0xf/0x90
+> [  245.696451]  vfs_kern_mount+0x43/0x130
+> [  245.697036]  do_mount+0x187/0xc40
+> [  245.697563]  ? memdup_user+0x28/0x50
+> [  245.698124]  ksys_mount+0x60/0xc0
+> [  245.698639]  sys_mount+0x19/0x20
+> [  245.699167]  do_int80_syscall_32+0x61/0x130
+> [  245.699813]  entry_INT80_32+0xc7/0xc7
+> 
+> showing that we never complete that read request. The reason is that
+> the completion setup is racy - it initializes the completion event
+> AFTER submitting the IO, which means that the IO could complete
+> before/during the init. If it does, we are passing garbage to
+> complete() and we may sleep forever waiting for the event to
+> occur.
+> 
+> Fixes: 7b7b68bba5ef ("floppy: bail out in open() if drive is not responding to block0 read")
 
-Make sure we only look up valid lba addresses on the resubmission path.
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 
-If an lba is invalidated in the write buffer, that sector will be
-submitted to disk(as it is already mapped to a ppa), and that write
-might fail, resulting in a crash when trying to look up the lba in the
-mapping table (as the lba is marked as invalid).
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
----
- drivers/lightnvm/pblk-write.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index fa8726493b39..3ddd16f47106 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -148,9 +148,11 @@ static void pblk_prepare_resubmit(struct pblk *pblk, unsigned int sentry,
- 		w_ctx = &entry->w_ctx;
- 
- 		/* Check if the lba has been overwritten */
--		ppa_l2p = pblk_trans_map_get(pblk, w_ctx->lba);
--		if (!pblk_ppa_comp(ppa_l2p, entry->cacheline))
--			w_ctx->lba = ADDR_EMPTY;
-+		if (w_ctx->lba != ADDR_EMPTY) {
-+			ppa_l2p = pblk_trans_map_get(pblk, w_ctx->lba);
-+			if (!pblk_ppa_comp(ppa_l2p, entry->cacheline))
-+				w_ctx->lba = ADDR_EMPTY;
-+		}
- 
- 		/* Mark up the entry as submittable again */
- 		flags = READ_ONCE(w_ctx->flags);
--- 
-2.17.1
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  drivers/block/floppy.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+> index a8cfa011c284..fb23578e9a41 100644
+> --- a/drivers/block/floppy.c
+> +++ b/drivers/block/floppy.c
+> @@ -4148,10 +4148,11 @@ static int __floppy_read_block_0(struct block_device *bdev, int drive)
+>  	bio.bi_end_io = floppy_rb0_cb;
+>  	bio_set_op_attrs(&bio, REQ_OP_READ, 0);
+>  
+> +	init_completion(&cbdata.complete);
+> +
+>  	submit_bio(&bio);
+>  	process_fd_request();
+>  
+> -	init_completion(&cbdata.complete);
+>  	wait_for_completion(&cbdata.complete);
+>  
+>  	__free_page(page);
+> -- 
+> 2.17.1
+> 
+> -- 
+> Jens Axboe
+> 
