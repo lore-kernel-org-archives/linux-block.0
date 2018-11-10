@@ -1,52 +1,70 @@
-Return-Path: <BATV+1ef63fdb319281f35549+5556+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 2/6] nullb: remove leftover legacy request code
-Date: Fri,  9 Nov 2018 19:32:04 +0100
-Message-Id: <20181109183208.19879-3-hch@lst.de>
-In-Reply-To: <20181109183208.19879-1-hch@lst.de>
-References: <20181109183208.19879-1-hch@lst.de>
+Return-Path: <Golden_Miller83@protonmail.ch>
+Date: Sat, 10 Nov 2018 14:15:34 +0000
+To: "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From: Jordan Glover <Golden_Miller83@protonmail.ch>
+Cc: Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>, Kees Cook <keescook@chromium.org>, Daniel Micay <danielmicay@gmail.com>
+Reply-To: Jordan Glover <Golden_Miller83@protonmail.ch>
+Subject: "kyber: add tracepoints" causes write beyond size of object
+Message-ID: <DLM1_HbVqIgDqe7g8efFag9FGTUn_GGAPNdzoZltene_ba7lQ7_WUPLeR55uE-ufyn0HcMtfeGGQX8PlekpAayPCf0UVont1YWqHWEU2Tms=@protonmail.ch>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-block@vger.kernel.org>
 
-null_softirq_done_fn is only used for the blk-mq path, so remove the
-other branch.  Also rename the function to better match the method name.
+Hello,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/null_blk_main.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+Commit 6c3b7af1c975b87b86dcb2af233d1ae21eb05107 ("kyber: add tracepoints")[=
+1] causes write beyond size of object. This was detected by "FORTIFY_SOURCE=
+ intra-object overflow checking"[2] feature which is part of linux-hardened=
+ out-of-tree patchset designed to catch such errors.
 
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 9c045bee0985..16ba3db2a015 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -642,14 +642,11 @@ static void null_cmd_end_timer(struct nullb_cmd *cmd)
- 	hrtimer_start(&cmd->timer, kt, HRTIMER_MODE_REL);
- }
- 
--static void null_softirq_done_fn(struct request *rq)
-+static void null_complete_rq(struct request *rq)
- {
- 	struct nullb *nullb = rq->q->queuedata;
- 
--	if (nullb->dev->queue_mode == NULL_Q_MQ)
--		end_cmd(blk_mq_rq_to_pdu(rq));
--	else
--		end_cmd(rq->special);
-+	end_cmd(blk_mq_rq_to_pdu(rq));
- }
- 
- static struct nullb_page *null_alloc_page(gfp_t gfp_flags)
-@@ -1357,7 +1354,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- static const struct blk_mq_ops null_mq_ops = {
- 	.queue_rq       = null_queue_rq,
--	.complete	= null_softirq_done_fn,
-+	.complete	= null_complete_rq,
- 	.timeout	= null_timeout_rq,
- };
- 
--- 
-2.19.1
+The specific error is:
+
+In file included from ./include/linux/bitmap.h:9,
+                 from ./include/linux/cpumask.h:12,
+                 from ./arch/x86/include/asm/cpumask.h:5,
+                 from ./arch/x86/include/asm/msr.h:11,
+                 from ./arch/x86/include/asm/processor.h:21,
+                 from ./arch/x86/include/asm/cpufeature.h:8,
+                 from ./arch/x86/include/asm/thread_info.h:53,
+                 from ./include/linux/thread_info.h:38,
+                 from ./arch/x86/include/asm/preempt.h:7,
+                 from ./include/linux/preempt.h:81,
+                 from ./include/linux/rcupdate.h:40,
+                 from ./include/linux/rculist.h:11,
+                 from ./include/linux/pid.h:5,
+                 from ./include/linux/sched.h:14,
+                 from ./include/linux/blkdev.h:5,
+                 from block/kyber-iosched.c:21:
+In function =E2=80=98strlcpy=E2=80=99,
+    inlined from =E2=80=98perf_trace_kyber_latency=E2=80=99 at ./include/tr=
+ace/events/kyber.h:14:1:
+./include/linux/string.h:310:4: error: call to =E2=80=98__write_overflow=
+=E2=80=99 declared with attribute error: detected write beyond size of obje=
+ct passed as 1st parameter
+    __write_overflow();
+    ^~~~~~~~~~~~~~~~~~
+In function =E2=80=98strlcpy=E2=80=99,
+    inlined from =E2=80=98trace_event_raw_event_kyber_latency=E2=80=99 at .=
+/include/trace/events/kyber.h:14:1:
+./include/linux/string.h:310:4: error: call to =E2=80=98__write_overflow=
+=E2=80=99 declared with attribute error: detected write beyond size of obje=
+ct passed as 1st parameter
+    __write_overflow();
+    ^~~~~~~~~~~~~~~~~~
+make[1]: *** [scripts/Makefile.build:293: block/kyber-iosched.o] Error 1
+make: *** [Makefile:1063: block] Error 2
+make: *** Waiting for unfinished jobs....
+
+Using 'strlcpy' function is generally not recommended[3][4].
+
+Jordan
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
+it/?h=3Dv4.20-rc1&id=3D6c3b7af1c975b87b86dcb2af233d1ae21eb05107
+
+[2] https://github.com/anthraxx/linux-hardened/commit/9460692de8eb53fd62d59=
+f564eba215e7c03a34b
+
+[3] https://lwn.net/Articles/763641/
+
+[4] https://outflux.net/slides/2018/lss/danger.pdf
