@@ -1,52 +1,47 @@
-Return-Path: <ming.lei@redhat.com>
-Date: Mon, 5 Nov 2018 11:41:44 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org, Rui Salvaterra <rsalvaterra@gmail.com>,
-	stable@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
-	Christoph Hellwig <hch@lst.de>, Xiao Ni <xni@redhat.com>,
-	Mariusz Dabrowski <mariusz.dabrowski@intel.com>
-Subject: Re: [PATCH V2 0/3] block: make sure discard/writesame bio is aligned
- with logical block size
-Message-ID: <20181105034143.GE13699@ming.t460p>
-References: <20181029125719.4998-1-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20181029125719.4998-1-ming.lei@redhat.com>
+Return-Path: <bart.vanassche@gmail.com>
+Return-Path: <bart.vanassche@gmail.com>
+Message-ID: <1541811591.10602.10.camel@acm.org>
+Subject: Re: [PATCH 7/7] block: remove the BLKPREP_* values.
+From: Bart Van Assche <bvanassche@acm.org>
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Date: Fri, 09 Nov 2018 16:59:51 -0800
+In-Reply-To: <20181109134241.29346-8-hch@lst.de>
+References: <20181109134241.29346-1-hch@lst.de>
+	 <20181109134241.29346-8-hch@lst.de>
+Content-Type: text/plain; charset="UTF-7"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On Mon, Oct 29, 2018 at 08:57:16PM +0800, Ming Lei wrote:
-> Hi,
-> 
-> The 1st & 3rd patch fixes bio size alignment issue.
-> 
-> The 2nd patch cleans up __blkdev_issue_discard() a bit.
-> 
-> V2:
-> 	- introduce helper of bio_allowed_max_sectors()
-> 	- add commit log for patch 2
-> 
-> 
-> Ming Lei (3):
->   block: make sure discard bio is aligned with logical block size
->   block: cleanup __blkdev_issue_discard()
->   block: make sure writesame bio is aligned with logical block size
-> 
->  block/blk-lib.c   | 26 +++++++-------------------
->  block/blk-merge.c |  3 ++-
->  block/blk.h       | 10 ++++++++++
->  3 files changed, 19 insertions(+), 20 deletions(-)
-> 
-> Cc: Rui Salvaterra <rsalvaterra@gmail.com>
-> Cc: stable@vger.kernel.org
-> Cc: Mike Snitzer <snitzer@redhat.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Xiao Ni <xni@redhat.com>
-> Cc: Mariusz Dabrowski <mariusz.dabrowski@intel.com>
+On Fri, 2018-11-09 at 14:42 +-0100, Christoph Hellwig wrote:
++AD4 Unused now.
++AD4 
++AD4 Signed-off-by: Christoph Hellwig +ADw-hch+AEA-lst.de+AD4
++AD4 ---
++AD4  include/linux/blkdev.h +AHw 10 ----------
++AD4  1 file changed, 10 deletions(-)
++AD4 
++AD4 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
++AD4 index 9b1f470cc784..55597948868b 100644
++AD4 --- a/include/linux/blkdev.h
++AD4 +-+-+- b/include/linux/blkdev.h
++AD4 +AEAAQA -778,16 +-778,6 +AEAAQA static inline unsigned int blk+AF8-queue+AF8-depth(struct request+AF8-queue +ACo-q)
++AD4  	return q-+AD4-nr+AF8-requests+ADs
++AD4  +AH0
++AD4  
++AD4 -/+ACo
++AD4 - +ACo q-+AD4-prep+AF8-rq+AF8-fn return values
++AD4 - +ACo-/
++AD4 -enum +AHs
++AD4 -	BLKPREP+AF8-OK,		/+ACo serve it +ACo-/
++AD4 -	BLKPREP+AF8-KILL,		/+ACo fatal error, kill, return -EIO +ACo-/
++AD4 -	BLKPREP+AF8-DEFER,		/+ACo leave on queue +ACo-/
++AD4 -	BLKPREP+AF8-INVALID,	/+ACo invalid command, kill, return -EREMOTEIO +ACo-/
++AD4 -+AH0AOw
++AD4 -
++AD4  extern unsigned long blk+AF8-max+AF8-low+AF8-pfn, blk+AF8-max+AF8-pfn+ADs
++AD4  
++AD4  /+ACo
 
-V2 addresses Christoph's comment by introducing bio_allowed_max_sectors().
-
-Ping...
-
-Thanks,
-Ming
+Reviewed-by: Bart Van Assche +ADw-bvanassche+AEA-acm.org+AD4
