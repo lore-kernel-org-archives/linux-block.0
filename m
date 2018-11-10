@@ -1,89 +1,178 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-it1-f193.google.com ([209.85.166.193]:36725 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388244AbeKFW66 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 6 Nov 2018 17:58:58 -0500
-Received: by mail-it1-f193.google.com with SMTP id w7-v6so17603627itd.1
-        for <linux-block@vger.kernel.org>; Tue, 06 Nov 2018 05:33:42 -0800 (PST)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: Javier Gonzales <javier@cnexlabs.com>,
-        Sebastien Boisvert <sboisvert@gydle.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH v3 2/7] lightnvm: pblk: account for write error sectors in emeta
-Date: Tue,  6 Nov 2018 14:33:25 +0100
-Message-Id: <20181106133330.26570-3-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <20181106133330.26570-1-hans.ml.holmberg@owltronix.com>
-References: <20181106133330.26570-1-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+From: Jens Axboe <axboe@kernel.dk>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Josef Bacik <josef@toxicpanda.com>
+Subject: [PATCH 5/6] blk-rq-qos: inline check for q->rq_qos functions
+Date: Sat, 10 Nov 2018 08:13:16 -0700
+Message-Id: <20181110151317.3813-6-axboe@kernel.dk>
+In-Reply-To: <20181110151317.3813-1-axboe@kernel.dk>
+References: <20181110151317.3813-1-axboe@kernel.dk>
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Put the short code in the fast path, where we don't have any
+functions attached to the queue. This minimizes the impact on
+the hot path in the core code.
 
-Lines inflicted with write errors lines might be recovered
-if they have not been recycled after write error garbage collection.
+Cleanup duplicated code by having a macro setup both the inline
+check and the actual functions.
 
-Ensure that the emeta accounting of valid lbas is correct
-for such lines to avoid recovery inconsistencies.
-
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Cc: Josef Bacik <josef@toxicpanda.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/lightnvm/pblk-write.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ block/blk-rq-qos.c | 90 +++++++++++++---------------------------------
+ block/blk-rq-qos.h | 35 ++++++++++++++----
+ 2 files changed, 52 insertions(+), 73 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 3ddd16f47106..750f04b8a227 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -105,14 +105,20 @@ static void pblk_complete_write(struct pblk *pblk, struct nvm_rq *rqd,
+diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
+index 0005dfd568dd..266c9e111475 100644
+--- a/block/blk-rq-qos.c
++++ b/block/blk-rq-qos.c
+@@ -27,76 +27,34 @@ bool rq_wait_inc_below(struct rq_wait *rq_wait, unsigned int limit)
+ 	return atomic_inc_below(&rq_wait->inflight, limit);
  }
  
- /* Map remaining sectors in chunk, starting from ppa */
--static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
-+static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa,
-+		int rqd_ppas)
- {
- 	struct pblk_line *line;
- 	struct ppa_addr map_ppa = *ppa;
-+	__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
-+	__le64 *lba_list;
- 	u64 paddr;
- 	int done = 0;
-+	int n = 0;
+-void rq_qos_cleanup(struct request_queue *q, struct bio *bio)
+-{
+-	struct rq_qos *rqos;
+-
+-	for (rqos = q->rq_qos; rqos; rqos = rqos->next) {
+-		if (rqos->ops->cleanup)
+-			rqos->ops->cleanup(rqos, bio);
+-	}
+-}
+-
+-void rq_qos_done(struct request_queue *q, struct request *rq)
+-{
+-	struct rq_qos *rqos;
+-
+-	for (rqos = q->rq_qos; rqos; rqos = rqos->next) {
+-		if (rqos->ops->done)
+-			rqos->ops->done(rqos, rq);
+-	}
+-}
+-
+-void rq_qos_issue(struct request_queue *q, struct request *rq)
+-{
+-	struct rq_qos *rqos;
+-
+-	for(rqos = q->rq_qos; rqos; rqos = rqos->next) {
+-		if (rqos->ops->issue)
+-			rqos->ops->issue(rqos, rq);
+-	}
+-}
+-
+-void rq_qos_requeue(struct request_queue *q, struct request *rq)
+-{
+-	struct rq_qos *rqos;
+-
+-	for(rqos = q->rq_qos; rqos; rqos = rqos->next) {
+-		if (rqos->ops->requeue)
+-			rqos->ops->requeue(rqos, rq);
+-	}
++#define __RQ_QOS_FUNC_ONE(__OP, type)					\
++void __rq_qos_##__OP(struct rq_qos *rqos, type arg)			\
++{									\
++	do {								\
++		if ((rqos)->ops->__OP)					\
++			(rqos)->ops->__OP((rqos), arg);			\
++		(rqos) = (rqos)->next;					\
++	} while (rqos);							\
+ }
  
- 	line = pblk_ppa_to_line(pblk, *ppa);
-+	lba_list = emeta_to_lbas(pblk, line->emeta->buf);
+-void rq_qos_throttle(struct request_queue *q, struct bio *bio,
+-		     spinlock_t *lock)
+-{
+-	struct rq_qos *rqos;
+-
+-	for(rqos = q->rq_qos; rqos; rqos = rqos->next) {
+-		if (rqos->ops->throttle)
+-			rqos->ops->throttle(rqos, bio, lock);
+-	}
++__RQ_QOS_FUNC_ONE(cleanup, struct bio *);
++__RQ_QOS_FUNC_ONE(done, struct request *);
++__RQ_QOS_FUNC_ONE(issue, struct request *);
++__RQ_QOS_FUNC_ONE(requeue, struct request *);
++__RQ_QOS_FUNC_ONE(done_bio, struct bio *);
 +
- 	spin_lock(&line->lock);
++#define __RQ_QOS_FUNC_TWO(__OP, type1, type2)				\
++void __rq_qos_##__OP(struct rq_qos *rqos, type1 arg1, type2 arg2)	\
++{									\
++	do {								\
++		if ((rqos)->ops->__OP)					\
++			(rqos)->ops->__OP((rqos), arg1, arg2);		\
++		(rqos) = (rqos)->next;					\
++	} while (rqos);							\
+ }
  
- 	while (!done)  {
-@@ -121,10 +127,17 @@ static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
- 		if (!test_and_set_bit(paddr, line->map_bitmap))
- 			line->left_msecs--;
+-void rq_qos_track(struct request_queue *q, struct request *rq, struct bio *bio)
+-{
+-	struct rq_qos *rqos;
+-
+-	for(rqos = q->rq_qos; rqos; rqos = rqos->next) {
+-		if (rqos->ops->track)
+-			rqos->ops->track(rqos, rq, bio);
+-	}
+-}
+-
+-void rq_qos_done_bio(struct request_queue *q, struct bio *bio)
+-{
+-	struct rq_qos *rqos;
+-
+-	for(rqos = q->rq_qos; rqos; rqos = rqos->next) {
+-		if (rqos->ops->done_bio)
+-			rqos->ops->done_bio(rqos, bio);
+-	}
+-}
++__RQ_QOS_FUNC_TWO(throttle, struct bio *, spinlock_t *);
++__RQ_QOS_FUNC_TWO(track, struct request *, struct bio *);
  
-+		if (n < rqd_ppas && lba_list[paddr] != addr_empty)
-+			line->nr_valid_lbas--;
+ /*
+  * Return true, if we can't increase the depth further by scaling
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index 32b02efbfa66..50558a6ea248 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -98,12 +98,33 @@ void rq_depth_scale_up(struct rq_depth *rqd);
+ void rq_depth_scale_down(struct rq_depth *rqd, bool hard_throttle);
+ bool rq_depth_calc_max_depth(struct rq_depth *rqd);
+ 
+-void rq_qos_cleanup(struct request_queue *, struct bio *);
+-void rq_qos_done(struct request_queue *, struct request *);
+-void rq_qos_issue(struct request_queue *, struct request *);
+-void rq_qos_requeue(struct request_queue *, struct request *);
+-void rq_qos_done_bio(struct request_queue *q, struct bio *bio);
+-void rq_qos_throttle(struct request_queue *, struct bio *, spinlock_t *);
+-void rq_qos_track(struct request_queue *q, struct request *, struct bio *);
++#define RQ_QOS_FUNC_ONE(__OP, type)					\
++void __rq_qos_##__OP(struct rq_qos *rqos, type arg);			\
++static inline void rq_qos_##__OP(struct request_queue *q, type arg)	\
++{									\
++	if ((q)->rq_qos)						\
++		__rq_qos_##__OP((q)->rq_qos, arg);			\
++}
 +
-+		lba_list[paddr] = addr_empty;
++#define RQ_QOS_FUNC_TWO(__OP, type1, type2)				\
++void __rq_qos_##__OP(struct rq_qos *rqos, type1 arg1, type2 arg2);	\
++static inline void rq_qos_##__OP(struct request_queue *q, type1 arg1,	\
++				 type2 arg2)				\
++{									\
++	if ((q)->rq_qos)						\
++		__rq_qos_##__OP((q)->rq_qos, arg1, arg2);		\
++}
 +
- 		if (!test_and_set_bit(paddr, line->invalid_bitmap))
- 			le32_add_cpu(line->vsc, -1);
- 
- 		done = nvm_next_ppa_in_chk(pblk->dev, &map_ppa);
++RQ_QOS_FUNC_ONE(cleanup, struct bio *);
++RQ_QOS_FUNC_ONE(done, struct request *);
++RQ_QOS_FUNC_ONE(issue, struct request *);
++RQ_QOS_FUNC_ONE(requeue, struct request *);
++RQ_QOS_FUNC_ONE(done_bio, struct bio *);
++RQ_QOS_FUNC_TWO(throttle, struct bio *, spinlock_t *);
++RQ_QOS_FUNC_TWO(track, struct request *, struct bio *);
++#undef RQ_QOS_FUNC_ONE
++#undef RQ_QOS_FUNC_TWO
 +
-+		n++;
- 	}
- 
- 	line->w_err_gc->has_write_err = 1;
-@@ -202,7 +215,7 @@ static void pblk_submit_rec(struct work_struct *work)
- 
- 	pblk_log_write_err(pblk, rqd);
- 
--	pblk_map_remaining(pblk, ppa_list);
-+	pblk_map_remaining(pblk, ppa_list, rqd->nr_ppas);
- 	pblk_queue_resubmit(pblk, c_ctx);
- 
- 	pblk_up_rq(pblk, c_ctx->lun_bitmap);
+ void rq_qos_exit(struct request_queue *);
++
+ #endif
 -- 
 2.17.1
