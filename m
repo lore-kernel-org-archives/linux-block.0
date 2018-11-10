@@ -1,43 +1,22 @@
-Return-Path: <jgross@suse.com>
-Subject: Re: [PATCH v2] xen-blkfront: fix kernel panic with negotiate_mq error
- path
-To: Manjunath Patil <manjunath.b.patil@oracle.com>,
- boris.ostrovsky@oracle.com, konrad.wilk@oracle.com, roger.pau@citrix.com
-Cc: axboe@kernel.dk, xen-devel@lists.xenproject.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
-References: <1540918161-31283-1-git-send-email-manjunath.b.patil@oracle.com>
-From: Juergen Gross <jgross@suse.com>
-Message-ID: <900be20c-459f-7adb-137c-f7451285f26a@suse.com>
-Date: Tue, 6 Nov 2018 10:37:00 +0100
-MIME-Version: 1.0
-In-Reply-To: <1540918161-31283-1-git-send-email-manjunath.b.patil@oracle.com>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <bart.vanassche@gmail.com>
+Return-Path: <bart.vanassche@gmail.com>
+Message-ID: <1541811569.10602.9.camel@acm.org>
+Subject: Re: [PATCH 6/7] scsi: return blk_status_t from device handler
+ ->prep_fn
+From: Bart Van Assche <bvanassche@acm.org>
+To: Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+	linux-scsi@vger.kernel.org
+Date: Fri, 09 Nov 2018 16:59:29 -0800
+In-Reply-To: <20181109134241.29346-7-hch@lst.de>
+References: <20181109134241.29346-1-hch@lst.de>
+	 <20181109134241.29346-7-hch@lst.de>
+Content-Type: text/plain; charset="UTF-7"
+Mime-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-On 30/10/2018 17:49, Manjunath Patil wrote:
-> info->nr_rings isn't adjusted in case of ENOMEM error from
-> negotiate_mq(). This leads to kernel panic in error path.
-> 
-> Typical call stack involving panic -
->  #8 page_fault at ffffffff8175936f
->     [exception RIP: blkif_free_ring+33]
->     RIP: ffffffffa0149491  RSP: ffff8804f7673c08  RFLAGS: 00010292
->  ...
->  #9 blkif_free at ffffffffa0149aaa [xen_blkfront]
->  #10 talk_to_blkback at ffffffffa014c8cd [xen_blkfront]
->  #11 blkback_changed at ffffffffa014ea8b [xen_blkfront]
->  #12 xenbus_otherend_changed at ffffffff81424670
->  #13 backend_changed at ffffffff81426dc3
->  #14 xenwatch_thread at ffffffff81422f29
->  #15 kthread at ffffffff810abe6a
->  #16 ret_from_fork at ffffffff81754078
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 7ed8ce1c5fc7 ("xen-blkfront: move negotiate_mq to cover all cases of new VBDs")
-> Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
+On Fri, 2018-11-09 at 14:42 +-0100, Christoph Hellwig wrote:
++AD4 Remove the last use of the old BLKPREP+AF8AKg values, which get converted
++AD4 to BLK+AF8-STS+AF8AKg later anyway.
 
-Pushed to xen.git for-linus-4.20a
-
-
-Juergen
+Reviewed-by: Bart Van Assche +ADw-bvanassche+AEA-acm.org+AD4
