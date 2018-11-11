@@ -1,276 +1,106 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-To: Jens Axboe <axboe@kernel.dk>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Tejun Heo <tj@kernel.org>,
-	Li Zefan <lizefan@huawei.com>,
-	Angelo Ruocco <angeloruocco90@gmail.com>,
-	Dennis Zhou <dennis@kernel.org>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Liu Bo <bo.liu@linux.alibaba.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Johannes Weiner <hannes@cmpxchg.org>
-Cc: linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ulf.hansson@linaro.org,
-	linus.walleij@linaro.org,
-	broonie@kernel.org,
-	bfq-iosched@googlegroups.com,
-	oleksandr@natalenko.name,
-	cgroups@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Jonathan Corbet <corbet@lwn.net>,
-	Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH 07/12] cgroup: make all functions of all cftypes be invoked
-Date: Mon, 12 Nov 2018 10:56:27 +0100
-Message-Id: <20181112095632.69114-8-paolo.valente@linaro.org>
-In-Reply-To: <20181112095632.69114-1-paolo.valente@linaro.org>
-References: <20181112095632.69114-1-paolo.valente@linaro.org>
+Return-Path: <BATV+c7c6d2b470208379b10c+5558+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	ooo@electrozaur.com
+Cc: Johannes Thumshirn <jthumshirn@suse.de>,
+	Benjamin Block <bblock@linux.vnet.ibm.com>,
+	linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 4/8] scsi: stop setting up request->special
+Date: Sun, 11 Nov 2018 14:32:07 +0100
+Message-Id: <20181111133211.13926-5-hch@lst.de>
+In-Reply-To: <20181111133211.13926-1-hch@lst.de>
+References: <20181111133211.13926-1-hch@lst.de>
+MIME-Version: 1.0
 List-ID: <linux-block@vger.kernel.org>
 
-From: Angelo Ruocco <angeloruocco90@gmail.com>
+No more need in a blk-mq world where the scsi command and request
+are allocated together.
 
-When two or more policies share a file their respective cftypes are
-linked together. The allowed operations on those files are: open,
-release, write and show, mapped to the functions defined in the
-cftypes.
-
-This commit makes the cgroup core invoke, whenever one of those
-operations is requested, the respective function of all the cftypes
-linked together.
-
-Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- kernel/cgroup/cgroup.c | 181 ++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 132 insertions(+), 49 deletions(-)
+ drivers/scsi/qedf/qedf_io.c | 6 ------
+ drivers/scsi/qedi/qedi_fw.c | 7 -------
+ drivers/scsi/scsi_lib.c     | 3 ---
+ drivers/scsi/sd.c           | 1 -
+ drivers/scsi/sr.c           | 1 -
+ 5 files changed, 18 deletions(-)
 
-diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
-index e3cc437669a8..6d4cfd6395ec 100644
---- a/kernel/cgroup/cgroup.c
-+++ b/kernel/cgroup/cgroup.c
-@@ -3481,66 +3481,107 @@ static int cgroup_cpu_pressure_show(struct seq_file *seq, void *v)
- static int cgroup_file_open(struct kernfs_open_file *of)
- {
- 	struct cftype *cft = of->kn->priv;
-+	struct cftype *n;
-+	int ret = 0;
- 
-+	list_for_each_cft(cft, n) {
-+		if (cft->open)
-+			ret = cft->open(of);
-+		/*
-+		 * If there has been an error with the open function of one of
-+		 * the cft associated with the file, we call the release
-+		 * function of all the cftype associated to cft whose open
-+		 * function succeded.
-+		 */
-+		if (ret) {
-+			struct cftype *c = of->kn->priv;
-+			struct cftype *n;
-+
-+			list_for_each_cft(c, n) {
-+				if (cft == c)
-+					break;
-+				if (c->release)
-+					c->release(of);
-+			}
-+			break;
-+		}
-+	}
- 
--	if (cft->open)
--		return cft->open(of);
--	return 0;
-+	return ret;
- }
- 
- static void cgroup_file_release(struct kernfs_open_file *of)
- {
- 	struct cftype *cft = of->kn->priv;
-+	struct cftype *n;
- 
--	if (cft->release)
--		cft->release(of);
-+	list_for_each_cft(cft, n)
-+		if (cft->release)
-+			cft->release(of);
- }
- 
-+/*
-+ * Call all the write functions of the cftypes associated with the file.
-+ *
-+ * When a write fails, don't keep trying to write into the file via the write
-+ * functions of the other cftypes associated with it.
-+ */
- static ssize_t cgroup_file_write(struct kernfs_open_file *of, char *buf,
- 				 size_t nbytes, loff_t off)
- {
- 	struct cgroup_namespace *ns = current->nsproxy->cgroup_ns;
- 	struct cgroup *cgrp = of->kn->parent->priv;
- 	struct cftype *cft = of->kn->priv;
-+	struct cftype *n;
- 	struct cgroup_subsys_state *css;
--	int ret;
-+	int ret = 0;
- 
--	/*
--	 * If namespaces are delegation boundaries, disallow writes to
--	 * files in an non-init namespace root from inside the namespace
--	 * except for the files explicitly marked delegatable -
--	 * cgroup.procs and cgroup.subtree_control.
--	 */
--	if ((cgrp->root->flags & CGRP_ROOT_NS_DELEGATE) &&
--	    !(cft->flags & CFTYPE_NS_DELEGATABLE) &&
--	    ns != &init_cgroup_ns && ns->root_cset->dfl_cgrp == cgrp)
--		return -EPERM;
-+	list_for_each_cft(cft, n) {
-+		/*
-+		 * If namespaces are delegation boundaries, disallow writes to
-+		 * files in an non-init namespace root from inside the
-+		 * namespace except for the files explicitly marked
-+		 * delegatable - cgroup.procs and cgroup.subtree_control.
-+		 */
-+		if ((cgrp->root->flags & CGRP_ROOT_NS_DELEGATE) &&
-+		    !(cft->flags & CFTYPE_NS_DELEGATABLE) &&
-+		    ns != &init_cgroup_ns && ns->root_cset->dfl_cgrp == cgrp)
-+			return -EPERM;
- 
--	if (cft->write)
--		return cft->write(of, buf, nbytes, off);
-+		if (cft->write) {
-+			ret = cft->write(of, buf, nbytes, off);
- 
--	/*
--	 * kernfs guarantees that a file isn't deleted with operations in
--	 * flight, which means that the matching css is and stays alive and
--	 * doesn't need to be pinned.  The RCU locking is not necessary
--	 * either.  It's just for the convenience of using cgroup_css().
--	 */
--	rcu_read_lock();
--	css = cgroup_css(cgrp, cft->ss);
--	rcu_read_unlock();
-+			if (ret)
-+				break;
-+			continue;
-+		}
- 
--	if (cft->write_u64) {
--		unsigned long long v;
--		ret = kstrtoull(buf, 0, &v);
--		if (!ret)
--			ret = cft->write_u64(css, cft, v);
--	} else if (cft->write_s64) {
--		long long v;
--		ret = kstrtoll(buf, 0, &v);
--		if (!ret)
--			ret = cft->write_s64(css, cft, v);
--	} else {
--		ret = -EINVAL;
-+		/*
-+		 * kernfs guarantees that a file isn't deleted with operations
-+		 * in flight, which means that the matching css is and stays
-+		 * alive and doesn't need to be pinned.  The RCU locking is not
-+		 * necessary either.  It's just for the convenience of using
-+		 * cgroup_css().
-+		 */
-+		rcu_read_lock();
-+		css = cgroup_css(cgrp, cft->ss);
-+		rcu_read_unlock();
-+
-+		if (cft->write_u64) {
-+			unsigned long long v;
-+
-+			ret = kstrtoull(buf, 0, &v);
-+			if (!ret)
-+				ret = cft->write_u64(css, cft, v);
-+		} else if (cft->write_s64) {
-+			long long v;
-+
-+			ret = kstrtoll(buf, 0, &v);
-+			if (!ret)
-+				ret = cft->write_s64(css, cft, v);
-+		} else {
-+			return -EINVAL;
-+		}
+diff --git a/drivers/scsi/qedf/qedf_io.c b/drivers/scsi/qedf/qedf_io.c
+index 6bbc38b1b465..6ca583bdde23 100644
+--- a/drivers/scsi/qedf/qedf_io.c
++++ b/drivers/scsi/qedf/qedf_io.c
+@@ -1128,12 +1128,6 @@ void qedf_scsi_completion(struct qedf_ctx *qedf, struct fcoe_cqe *cqe,
+ 		return;
  	}
  
- 	return ret ?: nbytes;
-@@ -3562,22 +3603,64 @@ static void cgroup_seqfile_stop(struct seq_file *seq, void *v)
- 		seq_cft(seq)->seq_stop(seq, v);
- }
+-	if (!sc_cmd->request->special) {
+-		QEDF_WARN(&(qedf->dbg_ctx), "request->special is NULL so "
+-		    "request not valid, sc_cmd=%p.\n", sc_cmd);
+-		return;
+-	}
+-
+ 	if (!sc_cmd->request->q) {
+ 		QEDF_WARN(&(qedf->dbg_ctx), "request->q is NULL so request "
+ 		   "is not valid, sc_cmd=%p.\n", sc_cmd);
+diff --git a/drivers/scsi/qedi/qedi_fw.c b/drivers/scsi/qedi/qedi_fw.c
+index 25d763ae5d5a..e2a995a6e8e7 100644
+--- a/drivers/scsi/qedi/qedi_fw.c
++++ b/drivers/scsi/qedi/qedi_fw.c
+@@ -616,13 +616,6 @@ static void qedi_scsi_completion(struct qedi_ctx *qedi,
+ 		goto error;
+ 	}
  
-+/*
-+ * A file shared by more cftypes may be showing different values. In that case
-+ * call all the show functions and print the name of the owner that defined
-+ * them.
-+ */
- static int cgroup_seqfile_show(struct seq_file *m, void *arg)
- {
- 	struct cftype *cft = seq_cft(m);
-+	struct cftype *n;
- 	struct cgroup_subsys_state *css = seq_css(m);
-+	char *first_seqshow_str = NULL;
-+	size_t first_str_size = 0;
-+	size_t current_str_size = 0;
- 	int ret = 0;
+-	if (!sc_cmd->request->special) {
+-		QEDI_WARN(&qedi->dbg_ctx,
+-			  "request->special is NULL so request not valid, sc_cmd=%p.\n",
+-			  sc_cmd);
+-		goto error;
+-	}
+-
+ 	if (!sc_cmd->request->q) {
+ 		QEDI_WARN(&qedi->dbg_ctx,
+ 			  "request->q is NULL so request is not valid, sc_cmd=%p.\n",
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 369c15a701f1..d65f838af6eb 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1561,10 +1561,7 @@ static blk_status_t scsi_mq_prep_fn(struct request *req)
  
--	if (cft->seq_show)
--		ret = cft->seq_show(m, arg);
--	else if (cft->seq_show_cft)
--		ret = cft->seq_show_cft(m, cft, arg);
--	else if (cft->read_u64)
--		seq_printf(m, "%llu\n", cft->read_u64(css, cft));
--	else if (cft->read_s64)
--		seq_printf(m, "%lld\n", cft->read_s64(css, cft));
--	else
--		ret = -EINVAL;
-+	list_for_each_cft(cft, n) {
-+		if (cft->seq_show) {
-+			ret = cft->seq_show(m, arg);
-+			if (ret)
-+				break;
-+		} else if (cft->seq_show_cft) {
-+			ret = cft->seq_show_cft(m, cft, arg);
-+			if (ret)
-+				break;
-+		} else if (cft->read_u64) {
-+			seq_printf(m, "%llu\n", cft->read_u64(css, cft));
-+		} else if (cft->read_s64) {
-+			seq_printf(m, "%lld\n", cft->read_s64(css, cft));
-+		} else {
-+			ret = -EINVAL;
-+			break;
-+		}
-+		current_str_size = m->count - current_str_size;
-+
-+		if (first_seqshow_str == NULL) {
-+			first_seqshow_str = kmalloc(m->size, GFP_KERNEL);
-+			first_str_size = m->count;
-+			strcpy(first_seqshow_str, m->buf);
-+			first_str_size = m->count;
-+		} else if (strcmp(first_seqshow_str,
-+				  m->buf + m->count - current_str_size)) {
-+			first_str_size = -1;
-+		}
-+
-+		if (current_str_size) {
-+			seq_printf(m, " - %s\n", cft->owner_name);
-+			current_str_size = m->count;
-+		}
-+	}
-+
-+	/*
-+	 * If all the cft->seqfile_show/read are equal, truncate the
-+	 * output of the seqfile to the length of the first string.
-+	 */
-+	if (first_str_size != -1)
-+		m->count = first_str_size;
-+
-+	kfree(first_seqshow_str);
- 	return ret;
- }
+ 	scsi_init_command(sdev, cmd);
  
+-	req->special = cmd;
+-
+ 	cmd->request = req;
+-
+ 	cmd->tag = req->tag;
+ 	cmd->prot_op = SCSI_PROT_NORMAL;
+ 
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 4a6ed2fc8c71..96e906e438d2 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -1026,7 +1026,6 @@ static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *SCpnt)
+ 	ret = scsi_init_io(SCpnt);
+ 	if (ret != BLK_STS_OK)
+ 		return ret;
+-	WARN_ON_ONCE(SCpnt != rq->special);
+ 
+ 	SCSI_LOG_HLQUEUE(1,
+ 		scmd_printk(KERN_INFO, SCpnt,
+diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
+index 38ddbbfe5f3c..039c27c2d7b3 100644
+--- a/drivers/scsi/sr.c
++++ b/drivers/scsi/sr.c
+@@ -394,7 +394,6 @@ static blk_status_t sr_init_command(struct scsi_cmnd *SCpnt)
+ 	ret = scsi_init_io(SCpnt);
+ 	if (ret != BLK_STS_OK)
+ 		goto out;
+-	WARN_ON_ONCE(SCpnt != rq->special);
+ 	cd = scsi_cd(rq->rq_disk);
+ 
+ 	/* from here on until we're complete, any goto out
 -- 
-2.16.1
+2.19.1
