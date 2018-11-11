@@ -1,48 +1,40 @@
-Return-Path: <dgilbert@interlog.com>
-Reply-To: dgilbert@interlog.com
-Subject: Re: remove exofs, the T10 OSD code and block/scsi bidi support V3
-To: Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
- martin.petersen@oracle.com, ooo@electrozaur.com
+Return-Path: <BATV+c7c6d2b470208379b10c+5558+infradead.org+hch@bombadil.srs.infradead.org>
+From: Christoph Hellwig <hch@lst.de>
+To: axboe@kernel.dk,
+	martin.petersen@oracle.com,
+	ooo@electrozaur.com
 Cc: Johannes Thumshirn <jthumshirn@suse.de>,
- Benjamin Block <bblock@linux.vnet.ibm.com>, linux-scsi@vger.kernel.org,
- linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20181111133211.13926-1-hch@lst.de>
-From: Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <5c1952ce-988e-45be-db01-0cf7277be0f5@interlog.com>
-Date: Sun, 11 Nov 2018 17:35:07 +0100
+	Benjamin Block <bblock@linux.vnet.ibm.com>,
+	linux-scsi@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: remove exofs, the T10 OSD code and block/scsi bidi support V3
+Date: Sun, 11 Nov 2018 14:32:03 +0100
+Message-Id: <20181111133211.13926-1-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <20181111133211.13926-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
 List-ID: <linux-block@vger.kernel.org>
 
-On 2018-11-11 2:32 p.m., Christoph Hellwig wrote:
-> The only real user of the T10 OSD protocol, the pNFS object layout
-> driver never went to the point of having shipping products, and we
-> removed it 1.5 years ago.  Exofs is just a simple example without
-> real life users.
-> 
-> The code has been mostly unmaintained for years and is getting in the
-> way of block / SCSI changes, so I think it's finally time to drop it.
-> 
-> Quote from Boaz:
-> 
-> "As I said then. It is used in Universities for studies and experiments.
-> Every once in a while. I get an email with questions and reports.
-> 
-> But yes feel free to remove the all thing!!
-> 
-> I guess I can put it up on github. In a public tree.
-> 
-> Just that I will need to forward port it myself, til now you guys
-> been doing this for me ;-)"
-> 
-> Now the last time this caused a bit of a stir, but still no actual users,
-> not even for SG_IO passthrough commands.
+The only real user of the T10 OSD protocol, the pNFS object layout
+driver never went to the point of having shipping products, and we
+removed it 1.5 years ago.  Exofs is just a simple example without
+real life users.
 
-What?? Do any Linux distros track what commands are sent to any (or all)
-of the SG_IO passthroughs? I would hope that the last part of that
-sentence remains unprovable.
+The code has been mostly unmaintained for years and is getting in the
+way of block / SCSI changes, so I think it's finally time to drop it.
 
-Doug Gilbert
+Quote from Boaz:
 
-"I've told you a million times, don't exaggerate!"
+"As I said then. It is used in Universities for studies and experiments.
+Every once in a while. I get an email with questions and reports.
+
+But yes feel free to remove the all thing!!
+
+I guess I can put it up on github. In a public tree.
+
+Just that I will need to forward port it myself, til now you guys
+been doing this for me ;-)"
+
+Now the last time this caused a bit of a stir, but still no actual users,
+not even for SG_IO passthrough commands.  So here we go again, this time
+including removing everything in the scsi and block layer supporting it,
+and thus shrinking struct request.
