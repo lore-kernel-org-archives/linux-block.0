@@ -1,40 +1,26 @@
-Return-Path: <BATV+c7c6d2b470208379b10c+5558+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: axboe@kernel.dk,
-	martin.petersen@oracle.com,
-	ooo@electrozaur.com
-Cc: Johannes Thumshirn <jthumshirn@suse.de>,
-	Benjamin Block <bblock@linux.vnet.ibm.com>,
-	linux-scsi@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: remove exofs, the T10 OSD code and block/scsi bidi support V3
-Date: Sun, 11 Nov 2018 14:32:03 +0100
-Message-Id: <20181111133211.13926-1-hch@lst.de>
+Return-Path: <linux-block-owner@vger.kernel.org>
+Received: from [206.189.131.98] ([206.189.131.98]:35140 "EHLO mail.hanqfast.cf"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1726019AbeKLF2S (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 12 Nov 2018 00:28:18 -0500
+To: linux-block@vger.kernel.org
+Subject: Price Inquiry
+From: Daniel Murray <sinara-group@bk.ru>
+Reply-To: sinara-group@list.ru
 MIME-Version: 1.0
-List-ID: <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Message-Id: <20181111162018.CC95762064E@mail.hanqfast.cf>
+Date: Sun, 11 Nov 2018 15:34:49 +0000 (UTC)
+Sender: linux-block-owner@vger.kernel.org
+List-Id: linux-block@vger.kernel.org
 
-The only real user of the T10 OSD protocol, the pNFS object layout
-driver never went to the point of having shipping products, and we
-removed it 1.5 years ago.  Exofs is just a simple example without
-real life users.
-
-The code has been mostly unmaintained for years and is getting in the
-way of block / SCSI changes, so I think it's finally time to drop it.
-
-Quote from Boaz:
-
-"As I said then. It is used in Universities for studies and experiments.
-Every once in a while. I get an email with questions and reports.
-
-But yes feel free to remove the all thing!!
-
-I guess I can put it up on github. In a public tree.
-
-Just that I will need to forward port it myself, til now you guys
-been doing this for me ;-)"
-
-Now the last time this caused a bit of a stir, but still no actual users,
-not even for SG_IO passthrough commands.  So here we go again, this time
-including removing everything in the scsi and block layer supporting it,
-and thus shrinking struct request.
+Hi,friend,
+ 
+This is Daniel Murray and i am from Sinara Group Co.Ltd Group Co.,LTD in Russia.
+We are glad to know about your company from the web and we are interested in your products.
+Could you kindly send us your Latest catalog and price list for our trial order.
+ 
+Best Regards,
+ 
+Daniel Murray
+Purchasing Manager
