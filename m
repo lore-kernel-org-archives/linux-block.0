@@ -1,88 +1,68 @@
-Return-Path: <linux-block-owner@vger.kernel.org>
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:42012 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729402AbeKEVqR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 5 Nov 2018 16:46:17 -0500
-Received: by mail-ed1-f65.google.com with SMTP id h21-v6so6862585edq.9
-        for <linux-block@vger.kernel.org>; Mon, 05 Nov 2018 04:26:45 -0800 (PST)
-From: Hans Holmberg <hans.ml.holmberg@owltronix.com>
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: Javier Gonzales <javier@cnexlabs.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH v2 2/7] lightnvm: pblk: account for write error sectors in emeta
-Date: Mon,  5 Nov 2018 13:26:05 +0100
-Message-Id: <20181105122610.1555-3-hans.ml.holmberg@owltronix.com>
-In-Reply-To: <20181105122610.1555-1-hans.ml.holmberg@owltronix.com>
-References: <20181105122610.1555-1-hans.ml.holmberg@owltronix.com>
-Sender: linux-block-owner@vger.kernel.org
-List-Id: linux-block@vger.kernel.org
+Return-Path: <axboe@kernel.dk>
+Subject: Re: [PATCH 4/6] block: avoid ordered task state change for polled IO
+To: "jianchao.wang" <jianchao.w.wang@oracle.com>, linux-block@vger.kernel.org
+References: <20181110151317.3813-1-axboe@kernel.dk>
+ <20181110151317.3813-5-axboe@kernel.dk>
+ <653c9f83-157c-dca9-aa3b-02903dc81f5b@oracle.com>
+From: Jens Axboe <axboe@kernel.dk>
+Message-ID: <e213ca38-19c0-70ca-e4d0-096c48d5b4b8@kernel.dk>
+Date: Mon, 12 Nov 2018 09:26:59 -0700
+MIME-Version: 1.0
+In-Reply-To: <653c9f83-157c-dca9-aa3b-02903dc81f5b@oracle.com>
+Content-Type: text/plain; charset=utf-8
+List-ID: <linux-block@vger.kernel.org>
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+On 11/12/18 2:35 AM, jianchao.wang wrote:
+> Hi Jens
+> 
+> On 11/10/18 11:13 PM, Jens Axboe wrote:
+>> We only really need the barrier if we're going to be sleeping,
+>> if we're just polling we're fine with the __set_current_state()
+>> variant.
+>>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> ---
+>>  fs/block_dev.c | 25 +++++++++++++++++++++----
+>>  1 file changed, 21 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/fs/block_dev.c b/fs/block_dev.c
+>> index c039abfb2052..e7550b1f9670 100644
+>> --- a/fs/block_dev.c
+>> +++ b/fs/block_dev.c
+>> @@ -237,12 +237,23 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+>>  
+>>  	qc = submit_bio(&bio);
+>>  	for (;;) {
+>> -		set_current_state(TASK_UNINTERRUPTIBLE);
+>> +		/*
+>> +		 * Using non-atomic task state for polling
+>> +		 */
+>> +		__set_current_state(TASK_UNINTERRUPTIBLE);
+>> +
+>>  		if (!READ_ONCE(bio.bi_private))
+>>  			break;
+> 
+> When we don't use polling, the blkdev_bio_end_io_simple may come on a different cpu before
+> submit_bio returns 
+> For example,
+> __blkdev_direct_IO_simple
+>   qc = submit_bio(&bio) 
+>                                           blkdev_bio_end_io_simple
+>                                             WRITE_ONCE(bio.bi_private, NULL)
+>                                             wake_up_process(waiter)
+>   __set_current_state(TASK_UNINTERRUPTIBLE)                              
+>   READ_ONCE(bio.bi_private)
 
-Lines inflicted with write errors lines might be recovered
-if they have not been recycled after write error garbage collection.
+While I agree that you are right, that's an existing issue. The store
+barrier implied by set_current_state() doesn't fix that.
 
-Ensure that the emeta accounting of valid lbas is correct
-for such lines to avoid recovery inconsistencies.
+How about this variant:
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
----
- drivers/lightnvm/pblk-write.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+http://git.kernel.dk/cgit/linux-block/commit/?h=mq-perf&id=036ba7a8d1334889c0fe55d4858d78f4e8022f12
 
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 3ddd16f47106..750f04b8a227 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -105,14 +105,20 @@ static void pblk_complete_write(struct pblk *pblk, struct nvm_rq *rqd,
- }
+which then changes the later wake up helper patch to be:
  
- /* Map remaining sectors in chunk, starting from ppa */
--static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
-+static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa,
-+		int rqd_ppas)
- {
- 	struct pblk_line *line;
- 	struct ppa_addr map_ppa = *ppa;
-+	__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
-+	__le64 *lba_list;
- 	u64 paddr;
- 	int done = 0;
-+	int n = 0;
- 
- 	line = pblk_ppa_to_line(pblk, *ppa);
-+	lba_list = emeta_to_lbas(pblk, line->emeta->buf);
-+
- 	spin_lock(&line->lock);
- 
- 	while (!done)  {
-@@ -121,10 +127,17 @@ static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
- 		if (!test_and_set_bit(paddr, line->map_bitmap))
- 			line->left_msecs--;
- 
-+		if (n < rqd_ppas && lba_list[paddr] != addr_empty)
-+			line->nr_valid_lbas--;
-+
-+		lba_list[paddr] = addr_empty;
-+
- 		if (!test_and_set_bit(paddr, line->invalid_bitmap))
- 			le32_add_cpu(line->vsc, -1);
- 
- 		done = nvm_next_ppa_in_chk(pblk->dev, &map_ppa);
-+
-+		n++;
- 	}
- 
- 	line->w_err_gc->has_write_err = 1;
-@@ -202,7 +215,7 @@ static void pblk_submit_rec(struct work_struct *work)
- 
- 	pblk_log_write_err(pblk, rqd);
- 
--	pblk_map_remaining(pblk, ppa_list);
-+	pblk_map_remaining(pblk, ppa_list, rqd->nr_ppas);
- 	pblk_queue_resubmit(pblk, c_ctx);
- 
- 	pblk_up_rq(pblk, c_ctx->lun_bitmap);
+http://git.kernel.dk/cgit/linux-block/commit/?h=mq-perf&id=f8c3f188425967adb040cfefb799b0a5a1df769d
+
 -- 
-2.17.1
+Jens Axboe
