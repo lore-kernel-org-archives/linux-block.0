@@ -2,89 +2,254 @@ Return-Path: <SRS0=fNpn=NX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D3CFC43441
-	for <linux-block@archiver.kernel.org>; Mon, 12 Nov 2018 17:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89DE8C43441
+	for <linux-block@archiver.kernel.org>; Mon, 12 Nov 2018 20:02:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 498B122419
-	for <linux-block@archiver.kernel.org>; Mon, 12 Nov 2018 17:36:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49A962245E
+	for <linux-block@archiver.kernel.org>; Mon, 12 Nov 2018 20:02:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="nenrvZxb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 498B122419
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="bX9ZC2jK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49A962245E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linuxfoundation.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728149AbeKMDa5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 12 Nov 2018 22:30:57 -0500
-Received: from mail-pg1-f172.google.com ([209.85.215.172]:44858 "EHLO
-        mail-pg1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727247AbeKMDa5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 12 Nov 2018 22:30:57 -0500
-Received: by mail-pg1-f172.google.com with SMTP id w3-v6so4355820pgs.11
-        for <linux-block@vger.kernel.org>; Mon, 12 Nov 2018 09:36:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Y096qYXCGV/OjoLwcLM7T3Y8gMBeQ6yFYq0XT8xD+yw=;
-        b=nenrvZxb0Q6pUIMvAIqJ5FXhax6Xa/fY4Sz2gwcMCCAGokIlTMFPZacO5rjpFgr2k6
-         cRIKGe3VEN0cSg2f+R83Oqkp6SP83HlB/N4kaf2EZ3riFLZDxypYVgGK3Ibn3oOgnAsj
-         2KmEZAvYZZwnhgrR75mA2g96j+/osv4VHGiOWKCSd1tMSXXYPeMTvyAoIj+M2JNuwDKv
-         9PhqIh69gPQXyN47ew5s6JfIsXfqe0gj5c7J9DEFCDuE1HQ1ltWzmeL2M1AnKTlC749u
-         V5NMK+A3IhMxCPgzOuBmgB6e21gQ5WXfMKAsaK1Bz5i+E+TmwweogM3a6gW8Uy95BJYk
-         MWEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Y096qYXCGV/OjoLwcLM7T3Y8gMBeQ6yFYq0XT8xD+yw=;
-        b=j62aZxzr8COtg21yk3KQOMGGjvCAB56T5R7AeV9Fd/6EYeSKOx8tyDHTX4NdmjiXMc
-         Xkf3HomqNa44jj/rlPkWcIZiGV2k7AzLT4l2sTxlDu4a5cdG0WhYB0X6qAeVDvUfTU1C
-         VMan8oFiVGRT2Q15KbzbnaaD7MyJOgjyOhG9iUkx8YzZb23EVNXUBflyI7J4LLMNCChK
-         yG4Sv5mgcIKvqyRHFjb/QHY7ZyNrIxaD/K7bNrnxJnX7haRk5ie41QSDIWw5TNuQoIZp
-         C/9b/bn4OvH3FwLSW7JzG1o03GsAr6duipzYP1xeF44Wwp2X0oIdZU/YQtrEir88LmNh
-         ZPeQ==
-X-Gm-Message-State: AGRZ1gJ7SDep396psXEVyNSB8GlbTZCGQ6bk5vzk7gjSnl4vTpyqpq0x
-        fKEa0/H4fnl5KzLi8JFzoLg+Aw==
-X-Google-Smtp-Source: AJdET5cQG9ihJ0R0sHZxSr3NcKe0oJN2cBje/XGN7u4Yf1caCLc3LYiZeG9IkI1ev5Yu8ZWRX2ftlg==
-X-Received: by 2002:a62:5285:: with SMTP id g127-v6mr1741441pfb.128.1542044203601;
-        Mon, 12 Nov 2018 09:36:43 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id m85-v6sm11626975pfj.171.2018.11.12.09.36.41
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 12 Nov 2018 09:36:42 -0800 (PST)
-Subject: Re: [PATCH v3] block: copy ioprio in __bio_clone_fast()
-To:     Jean Delvare <jdelvare@suse.de>, linux-block@vger.kernel.org
-Cc:     Hannes Reinecke <hare@suse.com>
-References: <20181112102959.6d2f4984@endymion>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <7121866c-f3d7-bcc7-be0f-2d12a62ebcd0@kernel.dk>
-Date:   Mon, 12 Nov 2018 10:36:40 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1725914AbeKMF5W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Nov 2018 00:57:22 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55242 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725832AbeKMF5W (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Nov 2018 00:57:22 -0500
+Received: from localhost (unknown [206.108.79.134])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F3893223AE;
+        Mon, 12 Nov 2018 20:02:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1542052957;
+        bh=n2IlSV9FdhvSwUnkqCIKgHmLyNx3gREn07Pp0pD+8VE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=bX9ZC2jKeak+gp+PqlE99nB7buOqVhVhzahA6JNMaRykei1cLfnXUolhwsmaEVpBz
+         tVPlz9tQFT/m985TLB31Sv1ey7Naoa3MgWYT1/B5e1/pyhLDrYul9Hybhq7ZBgXP9L
+         BZOPy2Qsw8f015W2ce5V7qjRrd0ePpOST0/GvwnI=
+Date:   Mon, 12 Nov 2018 12:02:36 -0800
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Guenter Roeck <linux@roeck-us.net>
+Cc:     Ming Lei <ming.lei@redhat.com>, Ming Lei <tom.leiming@gmail.com>,
+        Jens Axboe <axboe@fb.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+        linux-scsi@vger.kernel.org
+Subject: Re: kobject lifetime issues in blk-mq
+Message-ID: <20181112200236.GA4415@kroah.com>
+References: <20181109203518.GA7130@roeck-us.net>
+ <20181112092051.GA391@ming.t460p>
+ <20181112094406.GB391@ming.t460p>
+ <20181112164848.GA1790@roeck-us.net>
 MIME-Version: 1.0
-In-Reply-To: <20181112102959.6d2f4984@endymion>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181112164848.GA1790@roeck-us.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/12/18 2:29 AM, Jean Delvare wrote:
-> From: Hannes Reinecke <hare@suse.com>
+On Mon, Nov 12, 2018 at 08:48:48AM -0800, Guenter Roeck wrote:
+> On Mon, Nov 12, 2018 at 05:44:07PM +0800, Ming Lei wrote:
+> > On Mon, Nov 12, 2018 at 05:20:51PM +0800, Ming Lei wrote:
+> > > On Fri, Nov 09, 2018 at 12:35:18PM -0800, Guenter Roeck wrote:
+> > > > Hi,
+> > > > 
+> > > > Images with CONFIG_DEBUG_KOBJECT=y, CONFIG_DEBUG_KOBJECT_RELEASE=y
+> > > > enabled report kobject lifetime issues when booting an image in qemu
+> > > > using virtio-scsi-pci.
+> > > > 
+> > > > Bisect points to two different commits, depending on the kernel
+> > > > configuration.
+> > > > 
+> > > > 1st configuration: defconfig plus:
+> > > > 
+> > > > CONFIG_VIRTIO_BLK=y
+> > > > CONFIG_SCSI_LOWLEVEL=y
+> > > > CONFIG_SCSI_VIRTIO=y
+> > > > CONFIG_VIRTIO_PCI=y
+> > > > CONFIG_VIRTIO_MMIO=y
+> > > > CONFIG_DEBUG_OBJECTS=y
+> > > > CONFIG_DEBUG_OBJECTS_FREE=y
+> > > > CONFIG_DEBUG_OBJECTS_TIMERS=y
+> > > > CONFIG_DEBUG_KOBJECT=y
+> > > > CONFIG_DEBUG_KOBJECT_RELEASE=y
+> > > > 
+> > > > Bisecting this configuration points to commit b5b6e8c8d3b4 ("scsi:
+> > > > virtio_scsi: fix IO hang caused by automatic irq vector affinity")
+> > > > as the culprit. This commit enforces the use of blk-mq for virtio_scsi;
+> > > > the bisect log is therefore a bit misleading.
+> > > > 
+> > > > 2nd configuration: As above, plus:
+> > > > CONFIG_SCSI_MQ_DEFAULT=y
+> > > > 
+> > > > With this configuration, bisect points to commit 7ea5fe31c12d
+> > > > ("blk-mq: make lifetime consitent between q/ctx and its kobject").
+> > > > 
+> > > > The qemu command line used to reproduce the problem is as follows.
+> > > > The qemu version does not seem to matter (I tested with qemu versions
+> > > > 2.5, 2.11, and 3.0).
+> > > > 
+> > > > qemu-system-x86_64 \
+> > > > 	-kernel arch/x86/boot/bzImage \
+> > > > 	-device virtio-scsi-pci,id=scsi \
+> > > > 	-device scsi-hd,bus=scsi.0,drive=d0 \
+> > > > 	-drive file=./wheezy.img,format=raw,if=none,id=d0 \
+> > > > 	-snapshot \
+> > > > 	-m 2G -smp 4 -enable-kvm \
+> > > > 	-net user,host=10.0.2.10,hostfwd=tcp::10022-:22 -net nic \
+> > > > 	-nographic -monitor none \
+> > > > 	-no-reboot \
+> > > > 	-append "console=ttyS0 root=/dev/sda earlyprintk=serial panic_on_warn=1 panic=-1"
+> > > > 
+> > > > Root file system:
+> > > > 	https://storage.googleapis.com/syzkaller/wheezy.img
+> > > > or:
+> > > > 	https://github.com/groeck/linux-build-test/blob/master/rootfs/x86_64/rootfs.ext2.gz
+> > > > 
+> > > > It seems that any root file system can be used to reproduce the problem.
+> > > > Also, the problem is not limited to virtio-scsi-pci. I also tried
+> > > > am53c974, lsi53c810, and lsi53c895a (after enabling the respective
+> > > > drivers), with the same result.
+> > > > 
+> > > > Overall, this suggests that the problem is related to blk-mq and was
+> > > > indeed introduced with commit 7ea5fe31c12d.
+> > > > 
+> > > > For reference, I attached an actual crash log as well as a set of bisect
+> > > > logs below.
+> > > > 
+> > > > Unfortunately, my understanding of blk-mq is not good enough to find the
+> > > > underlying problem and suggest a fix. Please let me know if there is
+> > > > anything else I can do to help fixing the problem.
+> > > > 
+> > > > Note that the problem was originally reported by syzbot running a test
+> > > > on chromeos-4.14. It may well be that the problem has already been
+> > > > reported and is being worked on. If so, please apologize the noise.
+> > > > 
+> > > > Thanks,
+> > > > Guenter
+> > > > 
+> > > > ---
+> > > > [    8.700038] ------------[ cut here ]------------
+> > > > [    8.700376] ODEBUG: free active (active state 0) object type: timer_list hint: delayed_work_timer_fn+0x0/0x10
+> > > > [    8.701032] WARNING: CPU: 0 PID: 0 at lib/debugobjects.c:329 debug_print_object+0x6a/0x80
+> > > > [    8.701032] Kernel panic - not syncing: panic_on_warn set ...
+> > > > [    8.701032] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 4.20.0-rc1 #30
+> > > > [    8.701032] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Ubuntu-1.8.2-1ubuntu1 04/01/2014
+> > > > [    8.701032] Call Trace:
+> > > > [    8.701032]  <IRQ>
+> > > > [    8.701032]  dump_stack+0x46/0x5b
+> > > > [    8.701032]  panic+0xf3/0x246
+> > > > [    8.701032]  ? debug_print_object+0x6a/0x80
+> > > > [    8.701032]  __warn+0xeb/0xf0
+> > > > [    8.701032]  ? debug_print_object+0x6a/0x80
+> > > > [    8.701032]  ? debug_print_object+0x6a/0x80
+> > > > [    8.701032]  report_bug+0xb1/0x120
+> > > > [    8.701032]  fixup_bug.part.10+0x13/0x30
+> > > > [    8.701032]  do_error_trap+0x8f/0xb0
+> > > > [    8.701032]  do_invalid_op+0x31/0x40
+> > > > [    8.701032]  ? debug_print_object+0x6a/0x80
+> > > > [    8.701032]  invalid_op+0x14/0x20
+> > > > [    8.701032] RIP: 0010:debug_print_object+0x6a/0x80
+> > > > [    8.701032] Code: 8b 43 10 83 c2 01 8b 4b 14 89 15 c1 e2 78 01 4c 8b 45 00 4c
+> > > > 89 e6 48 c7 c7 f0 ca 41 a6 48 8b 14 c5 a0 f7 24 a6 e8 06 8e cc ff <0f> 0b 5b 83
+> > > > 05 70 47 1a 01 01 5d 41 5c c3 83 05 65 47 1a 01 01 c3
+> > > > [    8.701032] RSP: 0018:ffff89b9fda03e48 EFLAGS: 00010082
+> > > > [    8.701032] RAX: 0000000000000000 RBX: ffff89b9fd49d0c8 RCX: ffffffffa6646e18
+> > > > [    8.701032] RDX: 0000000000000001 RSI: 0000000000000082 RDI: ffffffffa6cc596c
+> > > > [    8.701032] RBP: ffffffffa664a5c0 R08: 79616c6564203a74 R09: 5f6b726f775f6465
+> > > > [    8.701032] R10: ffff89b9fda03f10 R11: 3178302f3078302b R12: ffffffffa6403e22
+> > > > [    8.701032] R13: 0000000000000001 R14: ffffffffa6d4d458 R15: ffff89b9fc4c8780
+> > > > [    8.701032]  ? debug_print_object+0x6a/0x80
+> > > > [    8.701032]  debug_check_no_obj_freed+0x1b8/0x1ea
+> > > > [    8.701032]  ? rcu_process_callbacks+0x2a7/0x750
+> > > > [    8.701032]  kmem_cache_free+0x6e/0x1a0
+> > > > [    8.701032]  ? __blk_release_queue+0x150/0x150
+> > > > [    8.701032]  rcu_process_callbacks+0x2a7/0x750
+> > > > [    8.701032]  __do_softirq+0xf2/0x2c7
+> > > > [    8.701032]  irq_exit+0xb7/0xc0
+> > > > [    8.701032]  smp_apic_timer_interrupt+0x67/0x130
+> > > > [    8.701032]  apic_timer_interrupt+0xf/0x20
+> > > > [    8.701032]  </IRQ>
+> > > > [    8.701032] RIP: 0010:default_idle+0x12/0x140
+> > > > [    8.701032] Code: fe ff ff c6 43 08 00 fb eb b0 31 c0 eb b4 e8 65 c8 60 ff 90
+> > > > 90 90 90 90 41 54 55 53 65 8b 2d 15 c4 3b 5a 66 66 66 66 90 fb f4 <65> 8b 2d 07
+> > > > c4 3b 5a 66 66 66 66 90 5b 5d 41 5c c3 65 8b 05 f6 c3
+> > > > [    8.701032] RSP: 0018:ffffffffa6603e98 EFLAGS: 00000246 ORIG_RAX: ffffffffffffff13
+> > > > [    8.701032] RAX: ffffffffa5c52d10 RBX: 0000000000000000 RCX: 0000000000000000
+> > > > [    8.701032] RDX: 0000000000000001 RSI: 0000000000000000 RDI: 000000020605092a
+> > > > [    8.701032] RBP: 0000000000000000 R08: ffffffffcff7766a R09: ffff89b9fda20b00
+> > > > [    8.701032] R10: 0000000000000000 R11: 0000000000002400 R12: ffffffffa6611740
+> > > > [    8.701032] R13: 0000000000000000 R14: 0000000000000000 R15: ffffffffa6611740
+> > > > [    8.701032]  ? __sched_text_end+0x5/0x5
+> > > > [    8.701032]  do_idle+0x19c/0x230
+> > > > [    8.701032]  cpu_startup_entry+0x14/0x20
+> > > > [    8.701032]  start_kernel+0x491/0x4b1
+> > > > [    8.701032]  secondary_startup_64+0xa4/0xb0
+> > > > [    8.701032] Kernel Offset: 0x24200000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> > > > 
+> > > 
+> > > That is simply caused by enabling DEBUG_KOBJECT_RELEASE itself, which
+> > > tries to do kboject_release() after delaying a while.
+> > > 
+> > > Wrt. this issue, q->mq_kobj is embedded in 'request_queue' whose
+> > > instance is freed in release handler of q->kobj. So when one instance
+> > > of 'request_queue' is freed, DEBUG_KOBJECT_RELEASE still expects that
+> > > the q->mq_kobj is active.
+> > > 
+> > > The release handler of q->mq_kobj is NOP actually, so in reality it won't
+> > > be one issue at all.
+> > 
+> > Given we have removed legacy IO path completely, it should be fine to
+> > remove q->mq_kobj and simply put everything under the kobj of queue,
+> > especially any attributes under mq aren't marked as stable ABI.
 > 
-> We need to copy the io priority, too; otherwise the clone will run
-> with a different priority than the original one.
+> That might be possible going forward, but that does not appear to be
+> a feasible solution for stable releases. I am not sure though if the
+> "stable ABI" argument is valid. Almost all sysfs attributes are not
+> marked stable. If there are applications using it, removing the atttributes
+> would still break userspace.
 
-Applied, thanks.
+Yeah, don't move attributes around for no good reason, you will make
+userspace grumpy :)
 
--- 
-Jens Axboe
+> Since the release function of mq_kobj is NOP (for reference, I assume
+> we are talking about blk_mq_sysfs_release), can it just be NULL ?
 
+Someone tried to work around the internal kernel warning that comes
+about when you set a release function to NULL.  As per the in-kernel
+documentation, I now get to make fun of that author by saying "do you
+think I added those checks and message just for no good reason?  Don't
+try to be smarter than the driver core by providing an empty release
+function to make the kernel be quiet.  That's NOT what the kernel is
+trying to tell you here at all."
+
+So fix this, that is the correct thing to do.  Memory is freed in a
+release function, to not do so is almost always a sign of a design bug.
+
+> That it is an empty function seems to be just as good or bad as having
+> no function at all. An empty function just avoids the "broken" debug
+> message. That message is still better than rendering DEBUG_KOBJECT_RELEASE
+> useless.
+> 
+> Copying GregKH for input.
+
+Thanks, this code is broken and needs to be fixed.
+
+greg k-h
