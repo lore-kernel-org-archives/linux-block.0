@@ -1,69 +1,96 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 03/16] loop: Fold __loop_release into loop_release
-Date: Thu,  8 Nov 2018 14:01:03 +0100
-Message-Id: <20181108130116.12140-4-jack@suse.cz>
-In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
-References: <20181108130116.12140-1-jack@suse.cz>
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk
+Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH V5 3/6] blk-mq: fix issue directly case when q is stopped or quiesced
+Date: Mon, 12 Nov 2018 17:23:26 +0800
+Message-Id: <1542014609-1769-4-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <1542014609-1769-1-git-send-email-jianchao.w.wang@oracle.com>
+References: <1542014609-1769-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-__loop_release() has a single call site. Fold it there. This is
-currently not a huge win but it will make following replacement of
-loop_index_mutex more obvious.
+When try to issue request directly, if the queue is stopped or
+quiesced, 'bypass' will be ignored and return BLK_STS_OK to caller
+to avoid it dispatch request again. Then the request will be
+inserted with blk_mq_sched_insert_request. This is not correct
+for dm-rq case where we should avoid to pass through the underlying
+path's io scheduler.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
+To fix it, add new mq_issue_decision entry MQ_ISSUE_INSERT_DISPATCH
+for above case where the request need to be inserted forcibly.
+And use blk_mq_request_bypass_insert to insert the request into
+hctx->dispatch directly.
+
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
 ---
- drivers/block/loop.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ block/blk-mq.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 63008e879771..3de2cd94225a 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1641,12 +1641,15 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
- 	return err;
- }
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 48b7a7c..f54c092 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1768,12 +1768,13 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
  
--static void __lo_release(struct loop_device *lo)
-+static void lo_release(struct gendisk *disk, fmode_t mode)
+ enum mq_issue_decision {
+ 	MQ_ISSUE_INSERT_QUEUE,
++	MQ_ISSUE_INSERT_DISPATCH,
+ 	MQ_ISSUE_END_REQUEST,
+ 	MQ_ISSUE_DO_NOTHING,
+ };
+ 
+ static inline enum mq_issue_decision
+-	blk_mq_make_dicision(blk_status_t ret, bool bypass)
++	blk_mq_make_dicision(blk_status_t ret, bool bypass, bool force)
  {
-+	struct loop_device *lo;
- 	int err;
+ 	enum mq_issue_decision dec;
  
-+	mutex_lock(&loop_index_mutex);
-+	lo = disk->private_data;
- 	if (atomic_dec_return(&lo->lo_refcnt))
--		return;
-+		goto unlock_index;
- 
- 	mutex_lock(&loop_ctl_mutex);
- 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
-@@ -1656,7 +1659,7 @@ static void __lo_release(struct loop_device *lo)
- 		 */
- 		err = loop_clr_fd(lo);
- 		if (!err)
--			return;
-+			goto unlock_index;
- 	} else if (lo->lo_state == Lo_bound) {
- 		/*
- 		 * Otherwise keep thread (if running) and config,
-@@ -1667,12 +1670,7 @@ static void __lo_release(struct loop_device *lo)
+@@ -1783,7 +1784,10 @@ static inline enum mq_issue_decision
+ 		break;
+ 	case BLK_STS_DEV_RESOURCE:
+ 	case BLK_STS_RESOURCE:
+-		dec = bypass ? MQ_ISSUE_DO_NOTHING : MQ_ISSUE_INSERT_QUEUE;
++		if (force)
++			dec = bypass ? MQ_ISSUE_INSERT_DISPATCH : MQ_ISSUE_INSERT_QUEUE;
++		else
++			dec = bypass ? MQ_ISSUE_DO_NOTHING : MQ_ISSUE_INSERT_QUEUE;
+ 		break;
+ 	default:
+ 		dec = bypass ? MQ_ISSUE_DO_NOTHING : MQ_ISSUE_END_REQUEST;
+@@ -1799,7 +1803,7 @@ static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 						bool bypass)
+ {
+ 	struct request_queue *q = rq->q;
+-	bool run_queue = true;
++	bool run_queue = true, force = false;
+ 	blk_status_t ret = BLK_STS_RESOURCE;
+ 	enum mq_issue_decision dec;
+ 	int srcu_idx;
+@@ -1814,7 +1818,7 @@ static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	 */
+ 	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)) {
+ 		run_queue = false;
+-		bypass = false;
++		force = true;
+ 		goto out_unlock;
  	}
  
- 	mutex_unlock(&loop_ctl_mutex);
--}
--
--static void lo_release(struct gendisk *disk, fmode_t mode)
--{
--	mutex_lock(&loop_index_mutex);
--	__lo_release(disk->private_data);
-+unlock_index:
- 	mutex_unlock(&loop_index_mutex);
- }
+@@ -1837,11 +1841,14 @@ static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ out_unlock:
+ 	hctx_unlock(hctx, srcu_idx);
  
+-	dec = blk_mq_make_dicision(ret, bypass);
++	dec = blk_mq_make_dicision(ret, bypass, force);
+ 	switch(dec) {
+ 	case MQ_ISSUE_INSERT_QUEUE:
+ 		blk_mq_sched_insert_request(rq, false, run_queue, false);
+ 		break;
++	case MQ_ISSUE_INSERT_DISPATCH:
++		blk_mq_request_bypass_insert(rq, run_queue);
++		break;
+ 	case MQ_ISSUE_END_REQUEST:
+ 		blk_mq_end_request(rq, ret);
+ 		break;
 -- 
-2.16.4
+2.7.4
