@@ -1,73 +1,52 @@
-Return-Path: <BATV+1ef63fdb319281f35549+5556+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 7/9] mtip32xx: remove mtip_get_int_command
-Date: Fri,  9 Nov 2018 14:49:00 +0100
-Message-Id: <20181109134902.32057-8-hch@lst.de>
-In-Reply-To: <20181109134902.32057-1-hch@lst.de>
-References: <20181109134902.32057-1-hch@lst.de>
+Return-Path: <jdelvare@suse.de>
+Date: Mon, 12 Nov 2018 10:29:59 +0100
+From: Jean Delvare <jdelvare@suse.de>
+To: linux-block@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.com>
+Subject: [PATCH v3] block: copy ioprio in __bio_clone_fast()
+Message-ID: <20181112102959.6d2f4984@endymion>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-block@vger.kernel.org>
 
-Merging this function into the only callers makes the code flow easier.
+From: Hannes Reinecke <hare@suse.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+We need to copy the io priority, too; otherwise the clone will run
+with a different priority than the original one.
+
+Fixes: 43b62ce3ff0a ("block: move bio io prio to a new field")
+Signed-off-by: Hannes Reinecke <hare@suse.com>
+Signed-off-by: Jean Delvare <jdelvare@suse.de>
 ---
- drivers/block/mtip32xx/mtip32xx.c | 24 +++++++-----------------
- 1 file changed, 7 insertions(+), 17 deletions(-)
+Changes since v2:
+ * Rebased on kernel v4.20-rc2.
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index 6006f7baa1eb..5ae86224b2f5 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -168,20 +168,6 @@ static bool mtip_check_surprise_removal(struct pci_dev *pdev)
- 	return false; /* device present */
+ block/bio.c    |    1 +
+ block/bounce.c |    1 +
+ 2 files changed, 2 insertions(+)
+
+--- linux-4.20-rc2.orig/block/bio.c	2018-11-12 10:00:34.875181186 +0100
++++ linux-4.20-rc2/block/bio.c	2018-11-12 10:00:42.804275169 +0100
+@@ -608,6 +608,7 @@ void __bio_clone_fast(struct bio *bio, s
+ 	bio->bi_write_hint = bio_src->bi_write_hint;
+ 	bio->bi_iter = bio_src->bi_iter;
+ 	bio->bi_io_vec = bio_src->bi_io_vec;
++	bio->bi_ioprio = bio_src->bi_ioprio;
+ 
+ 	bio_clone_blkcg_association(bio, bio_src);
  }
+--- linux-4.20-rc2.orig/block/bounce.c	2018-11-12 09:34:19.478031060 +0100
++++ linux-4.20-rc2/block/bounce.c	2018-11-12 10:04:25.742906302 +0100
+@@ -251,6 +251,7 @@ static struct bio *bounce_clone_bio(stru
+ 	bio->bi_write_hint	= bio_src->bi_write_hint;
+ 	bio->bi_iter.bi_sector	= bio_src->bi_iter.bi_sector;
+ 	bio->bi_iter.bi_size	= bio_src->bi_iter.bi_size;
++	bio->bi_ioprio		= bio_src->bi_ioprio;
  
--static struct mtip_cmd *mtip_get_int_command(struct driver_data *dd)
--{
--	struct request *rq;
--
--	if (mtip_check_surprise_removal(dd->pdev))
--		return NULL;
--
--	rq = blk_mq_alloc_request(dd->queue, REQ_OP_DRV_IN, BLK_MQ_REQ_RESERVED);
--	if (IS_ERR(rq))
--		return NULL;
--
--	return blk_mq_rq_to_pdu(rq);
--}
--
- static struct mtip_cmd *mtip_cmd_from_tag(struct driver_data *dd,
- 					  unsigned int tag)
- {
-@@ -1002,12 +988,15 @@ static int mtip_exec_internal_command(struct mtip_port *port,
- 		return -EFAULT;
- 	}
- 
--	int_cmd = mtip_get_int_command(dd);
--	if (!int_cmd) {
-+	if (mtip_check_surprise_removal(dd->pdev))
-+		return -EFAULT;
-+
-+	rq = blk_mq_alloc_request(dd->queue, REQ_OP_DRV_IN, BLK_MQ_REQ_RESERVED);
-+	if (IS_ERR(rq)) {
- 		dbg_printk(MTIP_DRV_NAME "Unable to allocate tag for PIO cmd\n");
- 		return -EFAULT;
- 	}
--	rq = blk_mq_rq_from_pdu(int_cmd);
-+
- 	rq->special = &icmd;
- 
- 	set_bit(MTIP_PF_IC_ACTIVE_BIT, &port->flags);
-@@ -1029,6 +1018,7 @@ static int mtip_exec_internal_command(struct mtip_port *port,
- 	}
- 
- 	/* Copy the command to the command table */
-+	int_cmd = blk_mq_rq_to_pdu(rq);
- 	memcpy(int_cmd->command, fis, fis_len*4);
- 
- 	rq->timeout = timeout;
+ 	switch (bio_op(bio)) {
+ 	case REQ_OP_DISCARD:
+
+
 -- 
-2.19.1
+Jean Delvare
+SUSE L3 Support
