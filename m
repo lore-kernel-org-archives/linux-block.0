@@ -1,52 +1,92 @@
-Return-Path: <BATV+3de936c6eedb3fd3a39f+5557+infradead.org+hch@bombadil.srs.infradead.org>
-From: Christoph Hellwig <hch@lst.de>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Subject: [PATCH 2/6] nullb: remove leftover legacy request code
-Date: Sat, 10 Nov 2018 09:30:45 +0100
-Message-Id: <20181110083049.17475-3-hch@lst.de>
-In-Reply-To: <20181110083049.17475-1-hch@lst.de>
-References: <20181110083049.17475-1-hch@lst.de>
-MIME-Version: 1.0
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Tejun Heo <tj@kernel.org>,
+	Li Zefan <lizefan@huawei.com>,
+	Angelo Ruocco <angeloruocco90@gmail.com>,
+	Dennis Zhou <dennis@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Liu Bo <bo.liu@linux.alibaba.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Johannes Weiner <hannes@cmpxchg.org>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	cgroups@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH 05/12] cgroup: add owner name to cftypes
+Date: Mon, 12 Nov 2018 10:56:25 +0100
+Message-Id: <20181112095632.69114-6-paolo.valente@linaro.org>
+In-Reply-To: <20181112095632.69114-1-paolo.valente@linaro.org>
+References: <20181112095632.69114-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-null_softirq_done_fn is only used for the blk-mq path, so remove the
-other branch.  Also rename the function to better match the method name.
+From: Angelo Ruocco <angeloruocco90@gmail.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+The piece of information "who created a certain cftype" is not stored
+anywhere, thus a cftype is not able to know who is its owner.
+
+This commit addresses this problem by adding a new field in the cftype
+structure that enables the name of its owner to be explicitly set.
+
+Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- drivers/block/null_blk_main.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ include/linux/cgroup-defs.h |  2 ++
+ include/linux/cgroup.h      | 13 +++++++++++++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 9c045bee0985..16ba3db2a015 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -642,14 +642,11 @@ static void null_cmd_end_timer(struct nullb_cmd *cmd)
- 	hrtimer_start(&cmd->timer, kt, HRTIMER_MODE_REL);
- }
+diff --git a/include/linux/cgroup-defs.h b/include/linux/cgroup-defs.h
+index d659763c7221..6e31f478c6e1 100644
+--- a/include/linux/cgroup-defs.h
++++ b/include/linux/cgroup-defs.h
+@@ -36,6 +36,7 @@ struct seq_file;
+ #define MAX_CGROUP_TYPE_NAMELEN 32
+ #define MAX_CGROUP_ROOT_NAMELEN 64
+ #define MAX_CFTYPE_NAME		64
++#define MAX_OWNER_NAME		64
  
--static void null_softirq_done_fn(struct request *rq)
-+static void null_complete_rq(struct request *rq)
- {
- 	struct nullb *nullb = rq->q->queuedata;
+ /* define the enumeration of all cgroup subsystems */
+ #define SUBSYS(_x) _x ## _cgrp_id,
+@@ -505,6 +506,7 @@ struct cftype {
+ 	 * end of cftype array.
+ 	 */
+ 	char name[MAX_CFTYPE_NAME];
++	char owner_name[MAX_OWNER_NAME];
+ 	unsigned long private;
  
--	if (nullb->dev->queue_mode == NULL_Q_MQ)
--		end_cmd(blk_mq_rq_to_pdu(rq));
--	else
--		end_cmd(rq->special);
-+	end_cmd(blk_mq_rq_to_pdu(rq));
- }
+ 	/*
+diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
+index 9968332cceed..bf17a9843f45 100644
+--- a/include/linux/cgroup.h
++++ b/include/linux/cgroup.h
+@@ -293,6 +293,19 @@ void css_task_iter_end(struct css_task_iter *it);
+ 			;						\
+ 		else
  
- static struct nullb_page *null_alloc_page(gfp_t gfp_flags)
-@@ -1357,7 +1354,7 @@ static blk_status_t null_queue_rq(struct blk_mq_hw_ctx *hctx,
- 
- static const struct blk_mq_ops null_mq_ops = {
- 	.queue_rq       = null_queue_rq,
--	.complete	= null_softirq_done_fn,
-+	.complete	= null_complete_rq,
- 	.timeout	= null_timeout_rq,
- };
- 
++/**
++ * list_for_each_cft - walk circular list of cftypes linked together
++ * @cft: cftype from where to start
++ * @n: cftype used as a temporary storage
++ *
++ * A cftype pointed by a file may be part of a circular list of cftypes, this
++ * macro walks the circular list starting from any given cftype. Unlike the
++ * "list_for_each_entry" macro, the first element is included in the iteration.
++ */
++#define list_for_each_cft(cft, n)					\
++	for (n = NULL; cft != n; n = (n == NULL) ? cft : n,		\
++	     cft = list_next_entry(cft, share_node))
++
+ /*
+  * Inline functions.
+  */
 -- 
-2.19.1
+2.16.1
