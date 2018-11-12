@@ -1,139 +1,250 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Tejun Heo <tj@kernel.org>,
+	Li Zefan <lizefan@huawei.com>,
+	Angelo Ruocco <angeloruocco90@gmail.com>,
+	Dennis Zhou <dennis@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Liu Bo <bo.liu@linux.alibaba.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Johannes Weiner <hannes@cmpxchg.org>
 Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 1/4] Revert "irq: add support for allocating (and affinitizing) sets of IRQs"
-Date: Fri,  2 Nov 2018 22:59:48 +0800
-Message-Id: <20181102145951.31979-2-ming.lei@redhat.com>
-In-Reply-To: <20181102145951.31979-1-ming.lei@redhat.com>
-References: <20181102145951.31979-1-ming.lei@redhat.com>
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	cgroups@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH 09/12] block, bfq: use standard file names for the proportional-share policy
+Date: Mon, 12 Nov 2018 10:56:29 +0100
+Message-Id: <20181112095632.69114-10-paolo.valente@linaro.org>
+In-Reply-To: <20181112095632.69114-1-paolo.valente@linaro.org>
+References: <20181112095632.69114-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-This reverts commit 1d44f6f43e229ca06bf680aa7eb5ad380eaa5d72.
----
- drivers/pci/msi.c         | 14 --------------
- include/linux/interrupt.h |  4 ----
- kernel/irq/affinity.c     | 40 +++++++++-------------------------------
- 3 files changed, 9 insertions(+), 49 deletions(-)
+Some of the files exposed in a cgroup by bfq, for the proportional
+share policy, have the same meaning as the files owned by cfq.
 
-diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
-index 265ed3e4c920..af24ed50a245 100644
---- a/drivers/pci/msi.c
-+++ b/drivers/pci/msi.c
-@@ -1036,13 +1036,6 @@ static int __pci_enable_msi_range(struct pci_dev *dev, int minvec, int maxvec,
- 	if (maxvec < minvec)
- 		return -ERANGE;
+The old implementation of the cgroup interface didn't allow different
+entities to create cgroup files with the same name (in the same
+subsystem). So, for bfq, we had to add the prefix "bfq" to the names
+of its cgroup files.
+
+This commit renames the cgroup files of the bfq scheduler as those
+exposed by cfq, and makes bfq share these files with any other policy.
+
+Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
+---
+ block/bfq-cgroup.c | 94 +++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 69 insertions(+), 25 deletions(-)
+
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 50b2d7ba6b9d..9148fc38c737 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -1055,50 +1055,67 @@ struct blkcg_policy blkcg_policy_bfq = {
  
--	/*
--	 * If the caller is passing in sets, we can't support a range of
--	 * vectors. The caller needs to handle that.
--	 */
--	if (affd && affd->nr_sets && minvec != maxvec)
--		return -EINVAL;
--
- 	if (WARN_ON_ONCE(dev->msi_enabled))
- 		return -EINVAL;
+ struct cftype bfq_blkcg_legacy_files[] = {
+ 	{
+-		.name = "bfq.weight",
+-		.flags = CFTYPE_NOT_ON_ROOT,
++		.name = "weight",
++		.owner_name = "bfq",
++		.flags = CFTYPE_NOT_ON_ROOT | CFTYPE_SHARES_FILE,
+ 		.seq_show = bfq_io_show_weight,
+ 		.write_u64 = bfq_io_set_weight_legacy,
+ 	},
  
-@@ -1094,13 +1087,6 @@ static int __pci_enable_msix_range(struct pci_dev *dev,
- 	if (maxvec < minvec)
- 		return -ERANGE;
+ 	/* statistics, covers only the tasks in the bfqg */
+ 	{
+-		.name = "bfq.io_service_bytes",
++		.name = "io_service_bytes",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = (unsigned long)&blkcg_policy_bfq,
+ 		.seq_show_cft = blkg_print_stat_bytes,
+ 	},
+ 	{
+-		.name = "bfq.io_serviced",
++		.name = "io_serviced",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = (unsigned long)&blkcg_policy_bfq,
+ 		.seq_show_cft = blkg_print_stat_ios,
+ 	},
+ #ifdef CONFIG_DEBUG_BLK_CGROUP
+ 	{
+-		.name = "bfq.time",
++		.name = "time",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = offsetof(struct bfq_group, stats.time),
+ 		.seq_show_cft = bfqg_print_stat,
+ 	},
+ 	{
+-		.name = "bfq.sectors",
++		.name = "sectors",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.seq_show = bfqg_print_stat_sectors,
+ 	},
+ 	{
+-		.name = "bfq.io_service_time",
++		.name = "io_service_time",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = offsetof(struct bfq_group, stats.service_time),
+ 		.seq_show_cft = bfqg_print_rwstat,
+ 	},
+ 	{
+-		.name = "bfq.io_wait_time",
++		.name = "io_wait_time",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = offsetof(struct bfq_group, stats.wait_time),
+ 		.seq_show_cft = bfqg_print_rwstat,
+ 	},
+ 	{
+-		.name = "bfq.io_merged",
++		.name = "io_merged",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = offsetof(struct bfq_group, stats.merged),
+ 		.seq_show_cft = bfqg_print_rwstat,
+ 	},
+ 	{
+-		.name = "bfq.io_queued",
++		.name = "io_queued",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = offsetof(struct bfq_group, stats.queued),
+ 		.seq_show_cft = bfqg_print_rwstat,
+ 	},
+@@ -1106,66 +1123,92 @@ struct cftype bfq_blkcg_legacy_files[] = {
  
--	/*
--	 * If the caller is passing in sets, we can't support a range of
--	 * supported vectors. The caller needs to handle that.
--	 */
--	if (affd && affd->nr_sets && minvec != maxvec)
--		return -EINVAL;
--
- 	if (WARN_ON_ONCE(dev->msix_enabled))
- 		return -EINVAL;
+ 	/* the same statictics which cover the bfqg and its descendants */
+ 	{
+-		.name = "bfq.io_service_bytes_recursive",
++		.name = "io_service_bytes_recursive",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = (unsigned long)&blkcg_policy_bfq,
+ 		.seq_show_cft = blkg_print_stat_bytes_recursive,
+ 	},
+ 	{
+-		.name = "bfq.io_serviced_recursive",
++		.name = "io_serviced_recursive",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = (unsigned long)&blkcg_policy_bfq,
+ 		.seq_show_cft = blkg_print_stat_ios_recursive,
+ 	},
+ #ifdef CONFIG_DEBUG_BLK_CGROUP
+ 	{
+-		.name = "bfq.time_recursive",
++		.name = "time_recursive",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = offsetof(struct bfq_group, stats.time),
+ 		.seq_show_cft = bfqg_print_stat_recursive,
+ 	},
+ 	{
+-		.name = "bfq.sectors_recursive",
++		.name = "sectors_recursive",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.seq_show = bfqg_print_stat_sectors_recursive,
+ 	},
+ 	{
+-		.name = "bfq.io_service_time_recursive",
++		.name = "io_service_time_recursive",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = offsetof(struct bfq_group, stats.service_time),
+ 		.seq_show_cft = bfqg_print_rwstat_recursive,
+ 	},
+ 	{
+-		.name = "bfq.io_wait_time_recursive",
++		.name = "io_wait_time_recursive",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = offsetof(struct bfq_group, stats.wait_time),
+ 		.seq_show_cft = bfqg_print_rwstat_recursive,
+ 	},
+ 	{
+-		.name = "bfq.io_merged_recursive",
++		.name = "io_merged_recursive",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = offsetof(struct bfq_group, stats.merged),
+ 		.seq_show_cft = bfqg_print_rwstat_recursive,
+ 	},
+ 	{
+-		.name = "bfq.io_queued_recursive",
++		.name = "io_queued_recursive",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = offsetof(struct bfq_group, stats.queued),
+ 		.seq_show_cft = bfqg_print_rwstat_recursive,
+ 	},
+ 	{
+-		.name = "bfq.avg_queue_size",
++		.name = "avg_queue_size",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.seq_show = bfqg_print_avg_queue_size,
+ 	},
+ 	{
+-		.name = "bfq.group_wait_time",
++		.name = "group_wait_time",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = offsetof(struct bfq_group, stats.group_wait_time),
+ 		.seq_show_cft = bfqg_print_stat,
+ 	},
+ 	{
+-		.name = "bfq.idle_time",
++		.name = "idle_time",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = offsetof(struct bfq_group, stats.idle_time),
+ 		.seq_show_cft = bfqg_print_stat,
+ 	},
+ 	{
+-		.name = "bfq.empty_time",
++		.name = "empty_time",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = offsetof(struct bfq_group, stats.empty_time),
+ 		.seq_show_cft = bfqg_print_stat,
+ 	},
+ 	{
+-		.name = "bfq.dequeue",
++		.name = "dequeue",
++		.owner_name = "bfq",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = offsetof(struct bfq_group, stats.dequeue),
+ 		.seq_show_cft = bfqg_print_stat,
+ 	},
+@@ -1175,8 +1218,9 @@ struct cftype bfq_blkcg_legacy_files[] = {
  
-diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
-index ca397ff40836..1d6711c28271 100644
---- a/include/linux/interrupt.h
-+++ b/include/linux/interrupt.h
-@@ -247,14 +247,10 @@ struct irq_affinity_notify {
-  *			the MSI(-X) vector space
-  * @post_vectors:	Don't apply affinity to @post_vectors at end of
-  *			the MSI(-X) vector space
-- * @nr_sets:		Length of passed in *sets array
-- * @sets:		Number of affinitized sets
-  */
- struct irq_affinity {
- 	int	pre_vectors;
- 	int	post_vectors;
--	int	nr_sets;
--	int	*sets;
- };
- 
- #if defined(CONFIG_SMP)
-diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
-index 2046a0f0f0f1..f4f29b9d90ee 100644
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -180,7 +180,6 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	int curvec, usedvecs;
- 	cpumask_var_t nmsk, npresmsk, *node_to_cpumask;
- 	struct cpumask *masks = NULL;
--	int i, nr_sets;
- 
- 	/*
- 	 * If there aren't any vectors left after applying the pre/post
-@@ -211,23 +210,10 @@ irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
- 	get_online_cpus();
- 	build_node_to_cpumask(node_to_cpumask);
- 
--	/*
--	 * Spread on present CPUs starting from affd->pre_vectors. If we
--	 * have multiple sets, build each sets affinity mask separately.
--	 */
--	nr_sets = affd->nr_sets;
--	if (!nr_sets)
--		nr_sets = 1;
--
--	for (i = 0, usedvecs = 0; i < nr_sets; i++) {
--		int this_vecs = affd->sets ? affd->sets[i] : affvecs;
--		int nr;
--
--		nr = irq_build_affinity_masks(affd, curvec, this_vecs,
--					      node_to_cpumask, cpu_present_mask,
--					      nmsk, masks + usedvecs);
--		usedvecs += nr;
--	}
-+	/* Spread on present CPUs starting from affd->pre_vectors */
-+	usedvecs = irq_build_affinity_masks(affd, curvec, affvecs,
-+					    node_to_cpumask, cpu_present_mask,
-+					    nmsk, masks);
- 
- 	/*
- 	 * Spread on non present CPUs starting from the next vector to be
-@@ -272,21 +258,13 @@ int irq_calc_affinity_vectors(int minvec, int maxvec, const struct irq_affinity
- {
- 	int resv = affd->pre_vectors + affd->post_vectors;
- 	int vecs = maxvec - resv;
--	int set_vecs;
-+	int ret;
- 
- 	if (resv > minvec)
- 		return 0;
- 
--	if (affd->nr_sets) {
--		int i;
--
--		for (i = 0, set_vecs = 0;  i < affd->nr_sets; i++)
--			set_vecs += affd->sets[i];
--	} else {
--		get_online_cpus();
--		set_vecs = cpumask_weight(cpu_possible_mask);
--		put_online_cpus();
--	}
--
--	return resv + min(set_vecs, vecs);
-+	get_online_cpus();
-+	ret = min_t(int, cpumask_weight(cpu_possible_mask), vecs) + resv;
-+	put_online_cpus();
-+	return ret;
- }
+ struct cftype bfq_blkg_files[] = {
+ 	{
+-		.name = "bfq.weight",
+-		.flags = CFTYPE_NOT_ON_ROOT,
++		.name = "weight",
++		.owner_name = "bfq",
++		.flags = CFTYPE_NOT_ON_ROOT | CFTYPE_SHARES_FILE,
+ 		.seq_show = bfq_io_show_weight,
+ 		.write = bfq_io_set_weight,
+ 	},
 -- 
-2.9.5
+2.16.1
