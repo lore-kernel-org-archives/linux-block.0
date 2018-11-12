@@ -1,126 +1,111 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 06/16] loop: Split setting of lo_state from loop_clr_fd
-Date: Thu,  8 Nov 2018 14:01:06 +0100
-Message-Id: <20181108130116.12140-7-jack@suse.cz>
-In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
-References: <20181108130116.12140-1-jack@suse.cz>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+Content-Type: text/plain;
+	charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
+Subject: inconsistent IOPS and throughput for /dev/mdX (?)
+Message-Id: <27E733A7-D003-4738-9AE9-728068416E56@linaro.org>
+Date: Mon, 12 Nov 2018 08:59:57 +0100
+Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
+ Federico Motta <federico@willer.it>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Mark Brown <broonie@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>,
+ linux-block <linux-block@vger.kernel.org>,
+ linux-kernel <linux-kernel@vger.kernel.org>,
+ linux-raid@vger.kernel.org,
+ Shaohua Li <shli@fb.com>,
+ Mike Snitzer <snitzer@redhat.com>,
+ Coly Li <colyli@suse.de>,
+ Michael Lyle <mlyle@lyle.org>,
+ Mikulas Patocka <mpatocka@redhat.com>,
+ Heinz Mauelshagen <heinzm@redhat.com>,
+ Tang Junhui <tang.junhui.linux@gmail.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Move setting of lo_state to Lo_rundown out into the callers. That will
-allow us to unlock loop_ctl_mutex while the loop device is protected
-from other changes by its special state.
+Hi,
+the following command line
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/loop.c | 52 +++++++++++++++++++++++++++++++---------------------
- 1 file changed, 31 insertions(+), 21 deletions(-)
+sudo fio --loops=3D20 --name=3Dseqreader -rw=3Dread --size=3D500M =
+--numjobs=3D1 --filename=3D/dev/md0 & iostat -tmd /dev/md0 2 & sleep 15 =
+; killall iostat
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 4c37578989c4..eb01a685da4e 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -975,7 +975,7 @@ static int loop_set_fd(struct loop_device *lo, fmode_t mode,
- 		loop_reread_partitions(lo, bdev);
- 
- 	/* Grab the block_device to prevent its destruction after we
--	 * put /dev/loopXX inode. Later in loop_clr_fd() we bdput(bdev).
-+	 * put /dev/loopXX inode. Later in __loop_clr_fd() we bdput(bdev).
- 	 */
- 	bdgrab(bdev);
- 	return 0;
-@@ -1025,31 +1025,15 @@ loop_init_xfer(struct loop_device *lo, struct loop_func_table *xfer,
- 	return err;
- }
- 
--static int loop_clr_fd(struct loop_device *lo)
-+static int __loop_clr_fd(struct loop_device *lo)
- {
- 	struct file *filp = lo->lo_backing_file;
- 	gfp_t gfp = lo->old_gfp_mask;
- 	struct block_device *bdev = lo->lo_device;
- 
--	if (lo->lo_state != Lo_bound)
-+	if (WARN_ON_ONCE(lo->lo_state != Lo_rundown))
- 		return -ENXIO;
- 
--	/*
--	 * If we've explicitly asked to tear down the loop device,
--	 * and it has an elevated reference count, set it for auto-teardown when
--	 * the last reference goes away. This stops $!~#$@ udev from
--	 * preventing teardown because it decided that it needs to run blkid on
--	 * the loopback device whenever they appear. xfstests is notorious for
--	 * failing tests because blkid via udev races with a losetup
--	 * <dev>/do something like mkfs/losetup -d <dev> causing the losetup -d
--	 * command to fail with EBUSY.
--	 */
--	if (atomic_read(&lo->lo_refcnt) > 1) {
--		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
--		mutex_unlock(&loop_ctl_mutex);
--		return 0;
--	}
--
- 	if (filp == NULL)
- 		return -EINVAL;
- 
-@@ -1057,7 +1041,6 @@ static int loop_clr_fd(struct loop_device *lo)
- 	blk_mq_freeze_queue(lo->lo_queue);
- 
- 	spin_lock_irq(&lo->lo_lock);
--	lo->lo_state = Lo_rundown;
- 	lo->lo_backing_file = NULL;
- 	spin_unlock_irq(&lo->lo_lock);
- 
-@@ -1110,6 +1093,30 @@ static int loop_clr_fd(struct loop_device *lo)
- 	return 0;
- }
- 
-+static int loop_clr_fd(struct loop_device *lo)
-+{
-+	if (lo->lo_state != Lo_bound)
-+		return -ENXIO;
-+	/*
-+	 * If we've explicitly asked to tear down the loop device,
-+	 * and it has an elevated reference count, set it for auto-teardown when
-+	 * the last reference goes away. This stops $!~#$@ udev from
-+	 * preventing teardown because it decided that it needs to run blkid on
-+	 * the loopback device whenever they appear. xfstests is notorious for
-+	 * failing tests because blkid via udev races with a losetup
-+	 * <dev>/do something like mkfs/losetup -d <dev> causing the losetup -d
-+	 * command to fail with EBUSY.
-+	 */
-+	if (atomic_read(&lo->lo_refcnt) > 1) {
-+		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
-+		mutex_unlock(&loop_ctl_mutex);
-+		return 0;
-+	}
-+	lo->lo_state = Lo_rundown;
-+
-+	return __loop_clr_fd(lo);
-+}
-+
- static int
- loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- {
-@@ -1691,11 +1698,14 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 		goto out_unlock;
- 
- 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
-+		if (lo->lo_state != Lo_bound)
-+			goto out_unlock;
-+		lo->lo_state = Lo_rundown;
- 		/*
- 		 * In autoclear mode, stop the loop thread
- 		 * and remove configuration after last close.
- 		 */
--		err = loop_clr_fd(lo);
-+		err = __loop_clr_fd(lo);
- 		if (!err)
- 			return;
- 	} else if (lo->lo_state == Lo_bound) {
--- 
-2.16.4
+generates a sequence of lines like this one:
+
+------------------
+
+8.11.2018 14:08:351)][15.4%][r=3D444MiB/s][r=3D114k IOPS][eta 00m:22s]
+
+Device             tps    MB_read/s    MB_wrtn/s    MB_read    MB_wrtn
+md0            1313,50       811,52         0,00       1623          0
+
+------------------
+
+So, iostat says that the throughput is about twice as high as that
+actually enjoyed by fio.
+
+The device layout is
+
+$ lsblk
+NAME                MAJ:MIN RM   SIZE RO TYPE   MOUNTPOINT
+sda                   8:0    0 119,2G  0 disk
+=E2=94=9C=E2=94=80sda1                8:1    0   128M  0 part   =
+/boot/EFI
+=E2=94=94=E2=94=80sda2                8:2    0 119,1G  0 part
+ =E2=94=94=E2=94=80md0               9:0    0 119,1G  0 raid10
+   =E2=94=94=E2=94=80luks          253:0    0 119,1G  0 crypt
+     =E2=94=9C=E2=94=80system-boot 253:1    0   512M  0 lvm    /boot
+     =E2=94=9C=E2=94=80system-root 253:2    0 116,6G  0 lvm    /
+     =E2=94=94=E2=94=80system-swap 253:3    0     2G  0 lvm    [SWAP]
+sdb                   8:16   0 119,2G  0 disk
+=E2=94=9C=E2=94=80sdb1                8:17   0   128M  0 part
+=E2=94=94=E2=94=80sdb2                8:18   0 119,1G  0 part
+ =E2=94=94=E2=94=80md0               9:0    0 119,1G  0 raid10
+   =E2=94=94=E2=94=80luks          253:0    0 119,1G  0 crypt
+     =E2=94=9C=E2=94=80system-boot 253:1    0   512M  0 lvm    /boot
+     =E2=94=9C=E2=94=80system-root 253:2    0 116,6G  0 lvm    /
+     =E2=94=94=E2=94=80system-swap 253:3    0     2G  0 lvm    [SWAP]
+
+The cause of the apparently inconsistent output of iostat are the =
+numbers in /proc/diskstats:
+
+  8      16 sdb 14175 991 2671357 19399 699083 167975 42916330 1241832 =
+0251020 694150 840537 0 42682016 157759
+  8      17 sdb1 57 0 4696 16 0 0 0 0 0 20 20 0 0 0 0
+  8      18 sdb2 14078 991 2663981 19351 684072 167975 42916330 1128887 =
+0240580 686070 840537 0 42682016 157759
+  8       0 sda 14156 1225 2653954 21037 699566 167483 42916331 1151504 =
+0202610 596520 840546 0 42682016 129468
+  8       1 sda1 214 168 7776 80 1 0 1 0 0 60 60 0 0 0 0
+  8       2 sda2 13902 1057 2643498 20935 684554 167483 42916330 1039618 =
+0198390 595160 840546 0 42682016 129468
+  9       0 md0 29891 0 8836730 0 740295 0 46361824 0 0 0 0 842371 0 =
+46963528 0
+  8      32 sdc 260 228 10536 1053 0 0 0 0 0 670 670 0 0 0 0
+  8      33 sdc1 210 228 7856 797 0 0 0 0 0 490 490 0 0 0 0
+  8      48 sdd 276 180 9624 1027 0 0 0 0 0 690 690 0 0 0 0
+  8      49 sdd1 226 180 6944 763 0 0 0 0 0 480 480 0 0 0 0
+  9     127 md127 654 0 9120 0 0 0 0 0 0 0 0 0 0 0 0
+253       0 dm-0 24390 0 5300378 58830 733400 0 42791400 37540750 0 =
+1196370 37938570 821551 0 42682016 338170
+253       1 dm-1 183 0 6714 120 13 0 72 70 0 170 190 0 0 0 0
+253       2 dm-2 24071 0 5287400 58960 725884 0 42791336 37486510 0 =
+1205100 37892450 821551 0 42682016 346660
+253       3 dm-3 94 0 4936 160 0 0 0 0 0 160 160 0 0 0 0
+
+(In addition, here is /sys/block/md0/stat:
+  29892        0  8836762        0   741031        0 46403088        0   =
+   0        0        0   843306        0 47004096        0)
+
+Comparing the above numbers, we have
+
+/dev/md0 : #read_io=3D29891 #sectors_read=3D8836730
+/dev/sda2: #read_io=3D13902 #sectors_read=3D2643498
+/dev/sdb2: #read_io=3D14078 #sectors_read=3D2663981
+
+Is this a bug, or are we missing something?
+
+Thanks,
+Paolo
