@@ -1,168 +1,46 @@
-Return-Path: <jack@suse.cz>
-From: Jan Kara <jack@suse.cz>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: <linux-block@vger.kernel.org>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Jan Kara <jack@suse.cz>
-Subject: [PATCH 04/16] loop: Get rid of loop_index_mutex
-Date: Thu,  8 Nov 2018 14:01:04 +0100
-Message-Id: <20181108130116.12140-5-jack@suse.cz>
-In-Reply-To: <20181108130116.12140-1-jack@suse.cz>
-References: <20181108130116.12140-1-jack@suse.cz>
+Return-Path: <SRS0=Tgdl=NX=linuxfoundation.org=gregkh@kernel.org>
+Date: Mon, 12 Nov 2018 04:28:40 -0800
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Paolo Valente <paolo.valente@linaro.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+	Li Zefan <lizefan@huawei.com>,
+	Angelo Ruocco <angeloruocco90@gmail.com>,
+	Dennis Zhou <dennis@kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+	Liu Bo <bo.liu@linux.alibaba.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Johannes Weiner <hannes@cmpxchg.org>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
+	linus.walleij@linaro.org, broonie@kernel.org,
+	bfq-iosched@googlegroups.com, oleksandr@natalenko.name,
+	cgroups@vger.kernel.org, linux-doc@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH 01/12] kernfs: add function to find kernfs_node without
+ increasing ref counter
+Message-ID: <20181112122840.GA1429@kroah.com>
+References: <20181112095632.69114-1-paolo.valente@linaro.org>
+ <20181112095632.69114-2-paolo.valente@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20181112095632.69114-2-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-Now that loop_ctl_mutex is global, just get rid of loop_index_mutex as
-there is no good reason to keep these two separate and it just
-complicates the locking.
+On Mon, Nov 12, 2018 at 10:56:21AM +0100, Paolo Valente wrote:
+> From: Angelo Ruocco <angeloruocco90@gmail.com>
+> 
+> The kernfs pseudo file system doesn't export any function to only find
+> a node by name, without also getting a reference on it.
+> But in some cases it is useful to just locate a kernfs node, while
+> using it or not depends on some other condition.
+> 
+> This commit adds a function to just look for a node, without getting
+> a reference on it.
 
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- drivers/block/loop.c | 41 ++++++++++++++++++++---------------------
- 1 file changed, 20 insertions(+), 21 deletions(-)
+Eeek, that sounds really bad.  So you save off a pointer to something,
+and have no idea if that pointer now really is valid or not?  It can
+instantly disappear right afterwards.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 3de2cd94225a..dcdc96f4d2d4 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -83,7 +83,6 @@
- #include <linux/uaccess.h>
- 
- static DEFINE_IDR(loop_index_idr);
--static DEFINE_MUTEX(loop_index_mutex);
- static DEFINE_MUTEX(loop_ctl_mutex);
- 
- static int max_part;
-@@ -1626,9 +1625,11 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
- static int lo_open(struct block_device *bdev, fmode_t mode)
- {
- 	struct loop_device *lo;
--	int err = 0;
-+	int err;
- 
--	mutex_lock(&loop_index_mutex);
-+	err = mutex_lock_killable(&loop_ctl_mutex);
-+	if (err)
-+		return err;
- 	lo = bdev->bd_disk->private_data;
- 	if (!lo) {
- 		err = -ENXIO;
-@@ -1637,7 +1638,7 @@ static int lo_open(struct block_device *bdev, fmode_t mode)
- 
- 	atomic_inc(&lo->lo_refcnt);
- out:
--	mutex_unlock(&loop_index_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 	return err;
- }
- 
-@@ -1646,12 +1647,11 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 	struct loop_device *lo;
- 	int err;
- 
--	mutex_lock(&loop_index_mutex);
-+	mutex_lock(&loop_ctl_mutex);
- 	lo = disk->private_data;
- 	if (atomic_dec_return(&lo->lo_refcnt))
--		goto unlock_index;
-+		goto out_unlock;
- 
--	mutex_lock(&loop_ctl_mutex);
- 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
- 		/*
- 		 * In autoclear mode, stop the loop thread
-@@ -1659,7 +1659,7 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 		 */
- 		err = loop_clr_fd(lo);
- 		if (!err)
--			goto unlock_index;
-+			return;
- 	} else if (lo->lo_state == Lo_bound) {
- 		/*
- 		 * Otherwise keep thread (if running) and config,
-@@ -1669,9 +1669,8 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 		blk_mq_unfreeze_queue(lo->lo_queue);
- 	}
- 
-+out_unlock:
- 	mutex_unlock(&loop_ctl_mutex);
--unlock_index:
--	mutex_unlock(&loop_index_mutex);
- }
- 
- static const struct block_device_operations lo_fops = {
-@@ -1972,7 +1971,7 @@ static struct kobject *loop_probe(dev_t dev, int *part, void *data)
- 	struct kobject *kobj;
- 	int err;
- 
--	mutex_lock(&loop_index_mutex);
-+	mutex_lock(&loop_ctl_mutex);
- 	err = loop_lookup(&lo, MINOR(dev) >> part_shift);
- 	if (err < 0)
- 		err = loop_add(&lo, MINOR(dev) >> part_shift);
-@@ -1980,7 +1979,7 @@ static struct kobject *loop_probe(dev_t dev, int *part, void *data)
- 		kobj = NULL;
- 	else
- 		kobj = get_disk_and_module(lo->lo_disk);
--	mutex_unlock(&loop_index_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 
- 	*part = 0;
- 	return kobj;
-@@ -1990,9 +1989,13 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
- 			       unsigned long parm)
- {
- 	struct loop_device *lo;
--	int ret = -ENOSYS;
-+	int ret;
- 
--	mutex_lock(&loop_index_mutex);
-+	ret = mutex_lock_killable(&loop_ctl_mutex);
-+	if (ret)
-+		return ret;
-+
-+	ret = -ENOSYS;
- 	switch (cmd) {
- 	case LOOP_CTL_ADD:
- 		ret = loop_lookup(&lo, parm);
-@@ -2006,9 +2009,6 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
- 		ret = loop_lookup(&lo, parm);
- 		if (ret < 0)
- 			break;
--		ret = mutex_lock_killable(&loop_ctl_mutex);
--		if (ret)
--			break;
- 		if (lo->lo_state != Lo_unbound) {
- 			ret = -EBUSY;
- 			mutex_unlock(&loop_ctl_mutex);
-@@ -2020,7 +2020,6 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
- 			break;
- 		}
- 		lo->lo_disk->private_data = NULL;
--		mutex_unlock(&loop_ctl_mutex);
- 		idr_remove(&loop_index_idr, lo->lo_number);
- 		loop_remove(lo);
- 		break;
-@@ -2030,7 +2029,7 @@ static long loop_control_ioctl(struct file *file, unsigned int cmd,
- 			break;
- 		ret = loop_add(&lo, -1);
- 	}
--	mutex_unlock(&loop_index_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 
- 	return ret;
- }
-@@ -2114,10 +2113,10 @@ static int __init loop_init(void)
- 				  THIS_MODULE, loop_probe, NULL, NULL);
- 
- 	/* pre-create number of devices given by config or max_loop */
--	mutex_lock(&loop_index_mutex);
-+	mutex_lock(&loop_ctl_mutex);
- 	for (i = 0; i < nr; i++)
- 		loop_add(&lo, i);
--	mutex_unlock(&loop_index_mutex);
-+	mutex_unlock(&loop_ctl_mutex);
- 
- 	printk(KERN_INFO "loop: module loaded\n");
- 	return 0;
--- 
-2.16.4
+This feels wrong, what is the problem of having a properly reference
+counted object passed back to you that you have to create a dangerous
+function like this?
+
+greg k-h
