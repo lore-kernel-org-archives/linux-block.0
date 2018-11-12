@@ -1,13 +1,13 @@
-Return-Path: <jack@suse.cz>
-Date: Mon, 12 Nov 2018 12:02:00 +0100
-From: Jan Kara <jack@suse.cz>
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Return-Path: <ming.lei@redhat.com>
+Date: Mon, 12 Nov 2018 10:56:48 +0800
+From: Ming Lei <ming.lei@redhat.com>
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 Cc: axboe@kernel.dk, Jan Kara <jack@suse.cz>,
 	syzbot <syzbot+c0138741c2290fc5e63f@syzkaller.appspotmail.com>,
 	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
 	syzkaller-bugs@googlegroups.com
 Subject: Re: WARNING: locking bug in loop_control_ioctl
-Message-ID: <20181112110200.GB7175@quack2.suse.cz>
+Message-ID: <20181112025647.GC21443@ming.t460p>
 References: <00000000000026aaac057a40a183@google.com>
  <913c3703-f6d3-a412-3b0c-ebc7422e8e69@I-love.SAKURA.ne.jp>
 MIME-Version: 1.0
@@ -15,7 +15,7 @@ Content-Type: text/plain; charset=us-ascii
 In-Reply-To: <913c3703-f6d3-a412-3b0c-ebc7422e8e69@I-love.SAKURA.ne.jp>
 List-ID: <linux-block@vger.kernel.org>
 
-On Sat 10-11-18 17:09:09, Tetsuo Handa wrote:
+On Sat, Nov 10, 2018 at 05:09:09PM +0900, Tetsuo Handa wrote:
 > From 4b9e5556fada37dff1eff13665a229b69e1f7dd8 Mon Sep 17 00:00:00 2001
 > From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 > Date: Sat, 10 Nov 2018 17:04:40 +0900
@@ -28,13 +28,6 @@ On Sat 10-11-18 17:09:09, Tetsuo Handa wrote:
 > Reported-by: syzbot <syzbot+c0138741c2290fc5e63f@syzkaller.appspotmail.com>
 > Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 > Cc: Jan Kara <jack@suse.cz>
-
-Yeah, my bad. Thanks for fixing this. You can add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
 > ---
 >  drivers/block/loop.c | 2 --
 >  1 file changed, 2 deletions(-)
@@ -59,6 +52,8 @@ Reviewed-by: Jan Kara <jack@suse.cz>
 > -- 
 > 1.8.3.1
 > 
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Ming
