@@ -1,109 +1,86 @@
-Return-Path: <ming.lei@redhat.com>
-From: Ming Lei <ming.lei@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>
+Return-Path: <paolo.valente@linaro.org>
+Return-Path: <paolo.valente@linaro.org>
+From: Paolo Valente <paolo.valente@linaro.org>
+To: Jens Axboe <axboe@kernel.dk>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Tejun Heo <tj@kernel.org>,
+	Li Zefan <lizefan@huawei.com>,
+	Angelo Ruocco <angeloruocco90@gmail.com>,
+	Dennis Zhou <dennis@kernel.org>,
+	Josef Bacik <josef@toxicpanda.com>,
+	Liu Bo <bo.liu@linux.alibaba.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Johannes Weiner <hannes@cmpxchg.org>
 Cc: linux-block@vger.kernel.org,
-	Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V2] block: brd: associate with queue until adding disk
-Date: Fri,  2 Nov 2018 08:50:51 +0800
-Message-Id: <20181102005051.23459-1-ming.lei@redhat.com>
+	linux-kernel@vger.kernel.org,
+	ulf.hansson@linaro.org,
+	linus.walleij@linaro.org,
+	broonie@kernel.org,
+	bfq-iosched@googlegroups.com,
+	oleksandr@natalenko.name,
+	cgroups@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Jonathan Corbet <corbet@lwn.net>,
+	Paolo Valente <paolo.valente@linaro.org>
+Subject: [PATCH 10/12] block, throttle: allow sharing cgroup statistic files
+Date: Mon, 12 Nov 2018 10:56:30 +0100
+Message-Id: <20181112095632.69114-11-paolo.valente@linaro.org>
+In-Reply-To: <20181112095632.69114-1-paolo.valente@linaro.org>
+References: <20181112095632.69114-1-paolo.valente@linaro.org>
 List-ID: <linux-block@vger.kernel.org>
 
-brd_free() may be called in failure path on one brd instance which
-disk isn't added yet, so release handler of gendisk may free the
-associated request_queue early and causes the following use-after-free[1].
+From: Angelo Ruocco <angeloruocco90@gmail.com>
 
-This patch fixes this issue by associating gendisk with request_queue
-just before adding disk.
+Some of the cgroup files defined in the throttle policy have the same
+meaning as those defined in the proportional share policy.
 
-[1] KASAN: use-after-free Read in del_timer_syncNon-volatile memory driver v1.3
-Linux agpgart interface v0.103
-[drm] Initialized vgem 1.0.0 20120112 for virtual device on minor 0
-usbcore: registered new interface driver udl
-==================================================================
-BUG: KASAN: use-after-free in __lock_acquire+0x36d9/0x4c20
-kernel/locking/lockdep.c:3218
-Read of size 8 at addr ffff8801d1b6b540 by task swapper/0/1
+This commit uses the new file sharing interface in cgroup to share
+these files.
 
-CPU: 0 PID: 1 Comm: swapper/0 Not tainted 4.19.0+ #88
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x244/0x39d lib/dump_stack.c:113
-  print_address_description.cold.7+0x9/0x1ff mm/kasan/report.c:256
-  kasan_report_error mm/kasan/report.c:354 [inline]
-  kasan_report.cold.8+0x242/0x309 mm/kasan/report.c:412
-  __asan_report_load8_noabort+0x14/0x20 mm/kasan/report.c:433
-  __lock_acquire+0x36d9/0x4c20 kernel/locking/lockdep.c:3218
-  lock_acquire+0x1ed/0x520 kernel/locking/lockdep.c:3844
-  del_timer_sync+0xb7/0x270 kernel/time/timer.c:1283
-  blk_cleanup_queue+0x413/0x710 block/blk-core.c:809
-  brd_free+0x5d/0x71 drivers/block/brd.c:422
-  brd_init+0x2eb/0x393 drivers/block/brd.c:518
-  do_one_initcall+0x145/0x957 init/main.c:890
-  do_initcall_level init/main.c:958 [inline]
-  do_initcalls init/main.c:966 [inline]
-  do_basic_setup init/main.c:984 [inline]
-  kernel_init_freeable+0x5c6/0x6b9 init/main.c:1148
-  kernel_init+0x11/0x1ae init/main.c:1068
-  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:350
-
-Reported-by: syzbot+3701447012fe951dabb2@syzkaller.appspotmail.com
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
+Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
-V2:
-	- don't reference queue via disk->queue in brd_alloc()
+ block/blk-throttle.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-
- drivers/block/brd.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index df8103dd40ac..c18586fccb6f 100644
---- a/drivers/block/brd.c
-+++ b/drivers/block/brd.c
-@@ -396,15 +396,14 @@ static struct brd_device *brd_alloc(int i)
- 	disk->first_minor	= i * max_part;
- 	disk->fops		= &brd_fops;
- 	disk->private_data	= brd;
--	disk->queue		= brd->brd_queue;
- 	disk->flags		= GENHD_FL_EXT_DEVT;
- 	sprintf(disk->disk_name, "ram%d", i);
- 	set_capacity(disk, rd_size * 2);
--	disk->queue->backing_dev_info->capabilities |= BDI_CAP_SYNCHRONOUS_IO;
-+	brd->brd_queue->backing_dev_info->capabilities |= BDI_CAP_SYNCHRONOUS_IO;
- 
- 	/* Tell the block layer that this is not a rotational device */
--	blk_queue_flag_set(QUEUE_FLAG_NONROT, disk->queue);
--	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, disk->queue);
-+	blk_queue_flag_set(QUEUE_FLAG_NONROT, brd->brd_queue);
-+	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, brd->brd_queue);
- 
- 	return brd;
- 
-@@ -436,6 +435,7 @@ static struct brd_device *brd_init_one(int i, bool *new)
- 
- 	brd = brd_alloc(i);
- 	if (brd) {
-+		brd->brd_disk->queue = brd->brd_queue;
- 		add_disk(brd->brd_disk);
- 		list_add_tail(&brd->brd_list, &brd_devices);
- 	}
-@@ -503,8 +503,14 @@ static int __init brd_init(void)
- 
- 	/* point of no return */
- 
--	list_for_each_entry(brd, &brd_devices, brd_list)
-+	list_for_each_entry(brd, &brd_devices, brd_list) {
-+		/*
-+		 * associate with queue just before adding disk for
-+		 * avoiding to mess up failure path
-+		 */
-+		brd->brd_disk->queue = brd->brd_queue;
- 		add_disk(brd->brd_disk);
-+	}
- 
- 	blk_register_region(MKDEV(RAMDISK_MAJOR, 0), 1UL << MINORBITS,
- 				  THIS_MODULE, brd_probe, NULL, NULL);
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 5c43821dc528..239957c12d34 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -1491,22 +1491,30 @@ static struct cftype throtl_legacy_files[] = {
+ 		.write = tg_set_conf_uint,
+ 	},
+ 	{
+-		.name = "throttle.io_service_bytes",
++		.name = "io_service_bytes",
++		.owner_name = "throttle",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = (unsigned long)&blkcg_policy_throtl,
+ 		.seq_show_cft = blkg_print_stat_bytes,
+ 	},
+ 	{
+-		.name = "throttle.io_service_bytes_recursive",
++		.name = "io_service_bytes_recursive",
++		.owner_name = "throttle",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = (unsigned long)&blkcg_policy_throtl,
+ 		.seq_show_cft = blkg_print_stat_bytes_recursive,
+ 	},
+ 	{
+-		.name = "throttle.io_serviced",
++		.name = "io_serviced",
++		.owner_name = "throttle",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = (unsigned long)&blkcg_policy_throtl,
+ 		.seq_show_cft = blkg_print_stat_ios,
+ 	},
+ 	{
+-		.name = "throttle.io_serviced_recursive",
++		.name = "io_serviced_recursive",
++		.owner_name = "throttle",
++		.flags = CFTYPE_SHARES_FILE,
+ 		.private = (unsigned long)&blkcg_policy_throtl,
+ 		.seq_show_cft = blkg_print_stat_ios_recursive,
+ 	},
 -- 
-2.9.5
+2.16.1
