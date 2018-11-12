@@ -1,111 +1,189 @@
-Return-Path: <paolo.valente@linaro.org>
-Return-Path: <paolo.valente@linaro.org>
-From: Paolo Valente <paolo.valente@linaro.org>
-Content-Type: text/plain;
-	charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
-Subject: inconsistent IOPS and throughput for /dev/mdX (?)
-Message-Id: <27E733A7-D003-4738-9AE9-728068416E56@linaro.org>
-Date: Mon, 12 Nov 2018 08:59:57 +0100
-Cc: Oleksandr Natalenko <oleksandr@natalenko.name>,
- Federico Motta <federico@willer.it>,
- Ulf Hansson <ulf.hansson@linaro.org>,
- Linus Walleij <linus.walleij@linaro.org>,
- Mark Brown <broonie@kernel.org>
-To: Jens Axboe <axboe@kernel.dk>,
- linux-block <linux-block@vger.kernel.org>,
- linux-kernel <linux-kernel@vger.kernel.org>,
- linux-raid@vger.kernel.org,
- Shaohua Li <shli@fb.com>,
- Mike Snitzer <snitzer@redhat.com>,
- Coly Li <colyli@suse.de>,
- Michael Lyle <mlyle@lyle.org>,
- Mikulas Patocka <mpatocka@redhat.com>,
- Heinz Mauelshagen <heinzm@redhat.com>,
- Tang Junhui <tang.junhui.linux@gmail.com>
+Return-Path: <jianchao.w.wang@oracle.com>
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
+To: axboe@kernel.dk
+Cc: ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH V5 2/6] blk-mq: refactor the code of issue request directly
+Date: Mon, 12 Nov 2018 17:23:25 +0800
+Message-Id: <1542014609-1769-3-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <1542014609-1769-1-git-send-email-jianchao.w.wang@oracle.com>
+References: <1542014609-1769-1-git-send-email-jianchao.w.wang@oracle.com>
 List-ID: <linux-block@vger.kernel.org>
 
-Hi,
-the following command line
+Merge blk_mq_try_issue_directly and __blk_mq_try_issue_directly
+into one interface to unify the interfaces to issue requests
+directly. The merged interface takes over the requests totally,
+it could insert, end or do nothing based on the return value of
+.queue_rq and 'bypass' parameter. Then caller needn't any other
+handling any more.
 
-sudo fio --loops=3D20 --name=3Dseqreader -rw=3Dread --size=3D500M =
---numjobs=3D1 --filename=3D/dev/md0 & iostat -tmd /dev/md0 2 & sleep 15 =
-; killall iostat
+To make code clearer, introduce new helpers enum mq_issue_decision
+and blk_mq_make_decision to decide how to handle the non-issued
+requests.
 
-generates a sequence of lines like this one:
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+---
+ block/blk-mq.c | 108 +++++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 63 insertions(+), 45 deletions(-)
 
-------------------
-
-8.11.2018 14:08:351)][15.4%][r=3D444MiB/s][r=3D114k IOPS][eta 00m:22s]
-
-Device             tps    MB_read/s    MB_wrtn/s    MB_read    MB_wrtn
-md0            1313,50       811,52         0,00       1623          0
-
-------------------
-
-So, iostat says that the throughput is about twice as high as that
-actually enjoyed by fio.
-
-The device layout is
-
-$ lsblk
-NAME                MAJ:MIN RM   SIZE RO TYPE   MOUNTPOINT
-sda                   8:0    0 119,2G  0 disk
-=E2=94=9C=E2=94=80sda1                8:1    0   128M  0 part   =
-/boot/EFI
-=E2=94=94=E2=94=80sda2                8:2    0 119,1G  0 part
- =E2=94=94=E2=94=80md0               9:0    0 119,1G  0 raid10
-   =E2=94=94=E2=94=80luks          253:0    0 119,1G  0 crypt
-     =E2=94=9C=E2=94=80system-boot 253:1    0   512M  0 lvm    /boot
-     =E2=94=9C=E2=94=80system-root 253:2    0 116,6G  0 lvm    /
-     =E2=94=94=E2=94=80system-swap 253:3    0     2G  0 lvm    [SWAP]
-sdb                   8:16   0 119,2G  0 disk
-=E2=94=9C=E2=94=80sdb1                8:17   0   128M  0 part
-=E2=94=94=E2=94=80sdb2                8:18   0 119,1G  0 part
- =E2=94=94=E2=94=80md0               9:0    0 119,1G  0 raid10
-   =E2=94=94=E2=94=80luks          253:0    0 119,1G  0 crypt
-     =E2=94=9C=E2=94=80system-boot 253:1    0   512M  0 lvm    /boot
-     =E2=94=9C=E2=94=80system-root 253:2    0 116,6G  0 lvm    /
-     =E2=94=94=E2=94=80system-swap 253:3    0     2G  0 lvm    [SWAP]
-
-The cause of the apparently inconsistent output of iostat are the =
-numbers in /proc/diskstats:
-
-  8      16 sdb 14175 991 2671357 19399 699083 167975 42916330 1241832 =
-0251020 694150 840537 0 42682016 157759
-  8      17 sdb1 57 0 4696 16 0 0 0 0 0 20 20 0 0 0 0
-  8      18 sdb2 14078 991 2663981 19351 684072 167975 42916330 1128887 =
-0240580 686070 840537 0 42682016 157759
-  8       0 sda 14156 1225 2653954 21037 699566 167483 42916331 1151504 =
-0202610 596520 840546 0 42682016 129468
-  8       1 sda1 214 168 7776 80 1 0 1 0 0 60 60 0 0 0 0
-  8       2 sda2 13902 1057 2643498 20935 684554 167483 42916330 1039618 =
-0198390 595160 840546 0 42682016 129468
-  9       0 md0 29891 0 8836730 0 740295 0 46361824 0 0 0 0 842371 0 =
-46963528 0
-  8      32 sdc 260 228 10536 1053 0 0 0 0 0 670 670 0 0 0 0
-  8      33 sdc1 210 228 7856 797 0 0 0 0 0 490 490 0 0 0 0
-  8      48 sdd 276 180 9624 1027 0 0 0 0 0 690 690 0 0 0 0
-  8      49 sdd1 226 180 6944 763 0 0 0 0 0 480 480 0 0 0 0
-  9     127 md127 654 0 9120 0 0 0 0 0 0 0 0 0 0 0 0
-253       0 dm-0 24390 0 5300378 58830 733400 0 42791400 37540750 0 =
-1196370 37938570 821551 0 42682016 338170
-253       1 dm-1 183 0 6714 120 13 0 72 70 0 170 190 0 0 0 0
-253       2 dm-2 24071 0 5287400 58960 725884 0 42791336 37486510 0 =
-1205100 37892450 821551 0 42682016 346660
-253       3 dm-3 94 0 4936 160 0 0 0 0 0 160 160 0 0 0 0
-
-(In addition, here is /sys/block/md0/stat:
-  29892        0  8836762        0   741031        0 46403088        0   =
-   0        0        0   843306        0 47004096        0)
-
-Comparing the above numbers, we have
-
-/dev/md0 : #read_io=3D29891 #sectors_read=3D8836730
-/dev/sda2: #read_io=3D13902 #sectors_read=3D2643498
-/dev/sdb2: #read_io=3D14078 #sectors_read=3D2663981
-
-Is this a bug, or are we missing something?
-
-Thanks,
-Paolo
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 364a53f..48b7a7c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1766,77 +1766,95 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	return ret;
+ }
+ 
+-static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
++enum mq_issue_decision {
++	MQ_ISSUE_INSERT_QUEUE,
++	MQ_ISSUE_END_REQUEST,
++	MQ_ISSUE_DO_NOTHING,
++};
++
++static inline enum mq_issue_decision
++	blk_mq_make_dicision(blk_status_t ret, bool bypass)
++{
++	enum mq_issue_decision dec;
++
++	switch(ret) {
++	case BLK_STS_OK:
++		dec = MQ_ISSUE_DO_NOTHING;
++		break;
++	case BLK_STS_DEV_RESOURCE:
++	case BLK_STS_RESOURCE:
++		dec = bypass ? MQ_ISSUE_DO_NOTHING : MQ_ISSUE_INSERT_QUEUE;
++		break;
++	default:
++		dec = bypass ? MQ_ISSUE_DO_NOTHING : MQ_ISSUE_END_REQUEST;
++		break;
++	}
++
++	return dec;
++}
++
++static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 						struct request *rq,
+ 						blk_qc_t *cookie,
+-						bool bypass_insert)
++						bool bypass)
+ {
+ 	struct request_queue *q = rq->q;
+ 	bool run_queue = true;
++	blk_status_t ret = BLK_STS_RESOURCE;
++	enum mq_issue_decision dec;
++	int srcu_idx;
+ 
++	hctx_lock(hctx, &srcu_idx);
+ 	/*
+-	 * RCU or SRCU read lock is needed before checking quiesced flag.
++	 * hctx_lock is needed before checking quiesced flag.
+ 	 *
+-	 * When queue is stopped or quiesced, ignore 'bypass_insert' from
+-	 * blk_mq_request_issue_directly(), and return BLK_STS_OK to caller,
+-	 * and avoid driver to try to dispatch again.
++	 * When queue is stopped or quiesced, ignore 'bypass', insert
++	 * and return BLK_STS_OK to caller, and avoid driver to try to
++	 * dispatch again.
+ 	 */
+ 	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)) {
+ 		run_queue = false;
+-		bypass_insert = false;
+-		goto insert;
++		bypass = false;
++		goto out_unlock;
+ 	}
+ 
+-	if (q->elevator && !bypass_insert)
+-		goto insert;
++	/*
++	 * Bypass the potential scheduler on the bottom device.
++	 */
++	if (q->elevator && !bypass)
++		goto out_unlock;
+ 
+ 	if (!blk_mq_get_dispatch_budget(hctx))
+-		goto insert;
++		goto out_unlock;
+ 
+ 	if (!blk_mq_get_driver_tag(rq)) {
+ 		blk_mq_put_dispatch_budget(hctx);
+-		goto insert;
++		goto out_unlock;
+ 	}
+ 
+-	return __blk_mq_issue_directly(hctx, rq, cookie);
+-insert:
+-	if (bypass_insert)
+-		return BLK_STS_RESOURCE;
+-
+-	blk_mq_sched_insert_request(rq, false, run_queue, false);
+-	return BLK_STS_OK;
+-}
+-
+-static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+-		struct request *rq, blk_qc_t *cookie)
+-{
+-	blk_status_t ret;
+-	int srcu_idx;
++	ret = __blk_mq_issue_directly(hctx, rq, cookie);
+ 
+-	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
+-
+-	hctx_lock(hctx, &srcu_idx);
++out_unlock:
++	hctx_unlock(hctx, srcu_idx);
+ 
+-	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false);
+-	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
+-		blk_mq_sched_insert_request(rq, false, true, false);
+-	else if (ret != BLK_STS_OK)
++	dec = blk_mq_make_dicision(ret, bypass);
++	switch(dec) {
++	case MQ_ISSUE_INSERT_QUEUE:
++		blk_mq_sched_insert_request(rq, false, run_queue, false);
++		break;
++	case MQ_ISSUE_END_REQUEST:
+ 		blk_mq_end_request(rq, ret);
++		break;
++	default:
++		return ret;
++	}
+ 
+-	hctx_unlock(hctx, srcu_idx);
++	return BLK_STS_OK;
+ }
+ 
+ blk_status_t blk_mq_request_issue_directly(struct request *rq)
+ {
+-	blk_status_t ret;
+-	int srcu_idx;
+-	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+-
+-	hctx_lock(hctx, &srcu_idx);
+-	ret = __blk_mq_try_issue_directly(hctx, rq, NULL, true);
+-	hctx_unlock(hctx, srcu_idx);
+-
+-	return ret;
++	return blk_mq_try_issue_directly(rq->mq_hctx, rq, NULL, true);
+ }
+ 
+ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+@@ -1957,13 +1975,13 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
+ 		if (same_queue_rq) {
+ 			data.hctx = same_queue_rq->mq_hctx;
+ 			blk_mq_try_issue_directly(data.hctx, same_queue_rq,
+-					&cookie);
++					&cookie, false);
+ 		}
+ 	} else if ((q->nr_hw_queues > 1 && is_sync) || (!q->elevator &&
+ 			!data.hctx->dispatch_busy)) {
+ 		blk_mq_put_ctx(data.ctx);
+ 		blk_mq_bio_to_request(rq, bio);
+-		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
++		blk_mq_try_issue_directly(data.hctx, rq, &cookie, false);
+ 	} else {
+ 		blk_mq_put_ctx(data.ctx);
+ 		blk_mq_bio_to_request(rq, bio);
+-- 
+2.7.4
