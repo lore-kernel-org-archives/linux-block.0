@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E066C43610
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47DFBC43441
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:42:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EF7CD2086B
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:42:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F5BC20896
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:42:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="f3tKsM+i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF7CD2086B
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="k3XxIfu0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F5BC20896
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732080AbeKNBlZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Nov 2018 20:41:25 -0500
-Received: from mail-io1-f65.google.com ([209.85.166.65]:39446 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731287AbeKNBlZ (ORCPT
+        id S1731287AbeKNBl1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Nov 2018 20:41:27 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:45767 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733221AbeKNBl1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Nov 2018 20:41:25 -0500
-Received: by mail-io1-f65.google.com with SMTP id b26-v6so8557486ioc.6
-        for <linux-block@vger.kernel.org>; Tue, 13 Nov 2018 07:42:46 -0800 (PST)
+        Tue, 13 Nov 2018 20:41:27 -0500
+Received: by mail-io1-f67.google.com with SMTP id w7so1538900iom.12
+        for <linux-block@vger.kernel.org>; Tue, 13 Nov 2018 07:42:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=gngy6ndCqerfPaGct02L9pdutncRCYm4yRPgtxDKoxs=;
-        b=f3tKsM+iibflxhK89pVkRzYkxMpSLCGG0qs0mfSa7G9QvohvynNE0gGBTNsNTRbjdw
-         qMjrtEZmEjAvNPSigIYio4yUCnYWKwacNulEIHrY9PdZVpbz6NluVrVj7bZIbhciJ3mZ
-         8qWucjbUaImCtSGZEOV1ZlFaEe40n+xwMKXdsHrg0QMQtrvkQVQuaKSuT7+tC6eNSwvw
-         MxZE79RuSPFiyMyCmepkvvZVFk/ZDI7VWF/69ua7bClqPZhoengt8qnxU7OBP/R/LaMr
-         AoVyH3TWzbq509A3DgpmszisRfIk/ztvXM6cuGkYJ1uN01iuCXAiOubzcSwc286gzOoZ
-         RyXA==
+        bh=22cgXaZEnMSuM0w9EE6vyRTYz+1ZdO+HfiYw/JrM9N8=;
+        b=k3XxIfu04Q+zqKPVcAmvvgwRoYGROqxXjOJ8krRRBtOuw+6RGCKJVsZQaI8VYHeaUl
+         oUJtRFb+0WygMcVOmqbr/Jp1f82MLM5914RaK7qU4vagKuCMWocoRC72jWhVjwW8XyM2
+         0M3mSQRDv0jL5aOc/md42WVyabmmXFJoinVyLxpa4Sq1VkfAHOXNppsowfjuQb+vlRV7
+         qccL7U8pRS5gz//jUvhEdBVziHAZi9nTfHPXFdzgFUkthdirMCAoDMog8THcgp7ZGcR4
+         TWbKsDt/Y9evL9a4GtgHKabpg1cNFOf6jc8Y4ju03Bn/IjuUvqZQfonXAmFAzyT572s4
+         tlaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=gngy6ndCqerfPaGct02L9pdutncRCYm4yRPgtxDKoxs=;
-        b=spgkUxnx5OK5uBtJt813iUcHqwItDIDjMcA5UTcTD4Tib+RQVKLXnzeYlV2NoJwL7B
-         pFLRv3Tjb1yeDc2AvqYmcS5joCpL4HzQ7EMDiV7D6cP7AM+YbxpDCu3zGYz8DZP9ERZL
-         r3xAXXVdrxHcCYmsEnN4iZNbJt50P0QopT9xlERH0bpoO6yj0JbRefMsSrPDU29Aqmjr
-         Tz/+kOyOChFRDR2gl7bxCqDhOFxO9V5d4Bz1MV3K2JWq4CmJkA4LFPvdbCrydDSxQBIp
-         cjdH0XpaKoIUNwk52HsEpCpwONWIpg31Ak3XGfPNkDx/DlnrZUw5VQOF3n2wZ4OSr3pK
-         /meg==
-X-Gm-Message-State: AGRZ1gIvBO5CAcwD2mkAEPyAnezLNeqjEE8zVhQWVrxAKPewavpHK6/v
-        7mIPwBy62YPrC4DngB6LPUqX8BFXUmA=
-X-Google-Smtp-Source: AJdET5ejq1/0Io6M3sV/1lum9J0qiUr8SQB2z5gjWxLx15qp7vMEFrlRYBCTvmaRO+FMk7s1SDBYLw==
-X-Received: by 2002:a6b:3809:: with SMTP id f9mr4634975ioa.305.1542123765871;
-        Tue, 13 Nov 2018 07:42:45 -0800 (PST)
+        bh=22cgXaZEnMSuM0w9EE6vyRTYz+1ZdO+HfiYw/JrM9N8=;
+        b=SZndbP7BtA8WfcEVyG3Rrk9b9CCXa5lcOnKyezorl9CL5WrLGMjzI3Z3Y4en5GC3o8
+         /mSwmwd+lfdW673huuNR3N5Op4pNdRohu5xP/2DL0ZOH7ABjOkZpsiXBU7Zo8hzLyx4u
+         AhER6vFSGOVSDhkn2MDvssGZLlkt78mDIPu1l4ff+6jiLIgCtpfszbR6WMvZMyAgxZm9
+         U6SYfbCZS6iffTIrjzFURwesYeaNp7eoijodIsmfRB/8kGPhxT0Eo1KBYOUWFyj+jjKb
+         Djb9OQeON1L4/H0a2B5MTRgLScig7bwj++jtC1NQfUYSHlsSZhkL/D0FkmV8qRa+W5/9
+         n6sw==
+X-Gm-Message-State: AGRZ1gKgehyjZr1uN8ph2HFLfWYXhO5/2oIFB7Ei8gaZqKY6/HB+c2vG
+        hgZeebYbCWo+zwCp7K4rydCy7kaBotw=
+X-Google-Smtp-Source: AFSGD/WvFT+meBwEJ6U+1CCiT2snW0PtoRfdfUt2L1Bf4NyROkPenaZvMBp9zudaZI5DWyrEbVGovQ==
+X-Received: by 2002:a6b:c815:: with SMTP id y21mr502082iof.98.1542123767670;
+        Tue, 13 Nov 2018 07:42:47 -0800 (PST)
 Received: from x1.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id o14-v6sm6721987ito.3.2018.11.13.07.42.43
+        by smtp.gmail.com with ESMTPSA id o14-v6sm6721987ito.3.2018.11.13.07.42.45
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 13 Nov 2018 07:42:44 -0800 (PST)
+        Tue, 13 Nov 2018 07:42:46 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>
-Subject: [PATCH 04/11] blk-rq-qos: inline check for q->rq_qos functions
-Date:   Tue, 13 Nov 2018 08:42:26 -0700
-Message-Id: <20181113154233.15256-5-axboe@kernel.dk>
+Cc:     Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 05/11] block: avoid ordered task state change for polled IO
+Date:   Tue, 13 Nov 2018 08:42:27 -0700
+Message-Id: <20181113154233.15256-6-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181113154233.15256-1-axboe@kernel.dk>
 References: <20181113154233.15256-1-axboe@kernel.dk>
@@ -71,170 +71,87 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Put the short code in the fast path, where we don't have any
-functions attached to the queue. This minimizes the impact on
-the hot path in the core code.
+Ensure that writes to the dio/bio waiter field are ordered
+correctly. With the smp_rmb() before the READ_ONCE() check,
+we should be able to use a more relaxed ordering for the
+task state setting.
 
-Cleanup duplicated code by having a macro setup both the inline
-check and the actual functions.
-
-Cc: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-rq-qos.c | 90 +++++++++++++---------------------------------
- block/blk-rq-qos.h | 35 ++++++++++++++----
- 2 files changed, 52 insertions(+), 73 deletions(-)
+ fs/block_dev.c | 11 +++++++++--
+ fs/iomap.c     |  6 +++++-
+ 2 files changed, 14 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index 0005dfd568dd..266c9e111475 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -27,76 +27,34 @@ bool rq_wait_inc_below(struct rq_wait *rq_wait, unsigned int limit)
- 	return atomic_inc_below(&rq_wait->inflight, limit);
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index c039abfb2052..2f920c03996e 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -181,6 +181,7 @@ static void blkdev_bio_end_io_simple(struct bio *bio)
+ 	struct task_struct *waiter = bio->bi_private;
+ 
+ 	WRITE_ONCE(bio->bi_private, NULL);
++	smp_wmb();
+ 	wake_up_process(waiter);
  }
  
--void rq_qos_cleanup(struct request_queue *q, struct bio *bio)
--{
--	struct rq_qos *rqos;
--
--	for (rqos = q->rq_qos; rqos; rqos = rqos->next) {
--		if (rqos->ops->cleanup)
--			rqos->ops->cleanup(rqos, bio);
--	}
--}
--
--void rq_qos_done(struct request_queue *q, struct request *rq)
--{
--	struct rq_qos *rqos;
--
--	for (rqos = q->rq_qos; rqos; rqos = rqos->next) {
--		if (rqos->ops->done)
--			rqos->ops->done(rqos, rq);
--	}
--}
--
--void rq_qos_issue(struct request_queue *q, struct request *rq)
--{
--	struct rq_qos *rqos;
--
--	for(rqos = q->rq_qos; rqos; rqos = rqos->next) {
--		if (rqos->ops->issue)
--			rqos->ops->issue(rqos, rq);
--	}
--}
--
--void rq_qos_requeue(struct request_queue *q, struct request *rq)
--{
--	struct rq_qos *rqos;
--
--	for(rqos = q->rq_qos; rqos; rqos = rqos->next) {
--		if (rqos->ops->requeue)
--			rqos->ops->requeue(rqos, rq);
--	}
-+#define __RQ_QOS_FUNC_ONE(__OP, type)					\
-+void __rq_qos_##__OP(struct rq_qos *rqos, type arg)			\
-+{									\
-+	do {								\
-+		if ((rqos)->ops->__OP)					\
-+			(rqos)->ops->__OP((rqos), arg);			\
-+		(rqos) = (rqos)->next;					\
-+	} while (rqos);							\
- }
+@@ -237,9 +238,12 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
  
--void rq_qos_throttle(struct request_queue *q, struct bio *bio,
--		     spinlock_t *lock)
--{
--	struct rq_qos *rqos;
--
--	for(rqos = q->rq_qos; rqos; rqos = rqos->next) {
--		if (rqos->ops->throttle)
--			rqos->ops->throttle(rqos, bio, lock);
--	}
-+__RQ_QOS_FUNC_ONE(cleanup, struct bio *);
-+__RQ_QOS_FUNC_ONE(done, struct request *);
-+__RQ_QOS_FUNC_ONE(issue, struct request *);
-+__RQ_QOS_FUNC_ONE(requeue, struct request *);
-+__RQ_QOS_FUNC_ONE(done_bio, struct bio *);
+ 	qc = submit_bio(&bio);
+ 	for (;;) {
+-		set_current_state(TASK_UNINTERRUPTIBLE);
++		__set_current_state(TASK_UNINTERRUPTIBLE);
 +
-+#define __RQ_QOS_FUNC_TWO(__OP, type1, type2)				\
-+void __rq_qos_##__OP(struct rq_qos *rqos, type1 arg1, type2 arg2)	\
-+{									\
-+	do {								\
-+		if ((rqos)->ops->__OP)					\
-+			(rqos)->ops->__OP((rqos), arg1, arg2);		\
-+		(rqos) = (rqos)->next;					\
-+	} while (rqos);							\
- }
++		smp_rmb();
+ 		if (!READ_ONCE(bio.bi_private))
+ 			break;
++
+ 		if (!(iocb->ki_flags & IOCB_HIPRI) ||
+ 		    !blk_poll(bdev_get_queue(bdev), qc))
+ 			io_schedule();
+@@ -305,6 +309,7 @@ static void blkdev_bio_end_io(struct bio *bio)
+ 			struct task_struct *waiter = dio->waiter;
  
--void rq_qos_track(struct request_queue *q, struct request *rq, struct bio *bio)
--{
--	struct rq_qos *rqos;
--
--	for(rqos = q->rq_qos; rqos; rqos = rqos->next) {
--		if (rqos->ops->track)
--			rqos->ops->track(rqos, rq, bio);
--	}
--}
--
--void rq_qos_done_bio(struct request_queue *q, struct bio *bio)
--{
--	struct rq_qos *rqos;
--
--	for(rqos = q->rq_qos; rqos; rqos = rqos->next) {
--		if (rqos->ops->done_bio)
--			rqos->ops->done_bio(rqos, bio);
--	}
--}
-+__RQ_QOS_FUNC_TWO(throttle, struct bio *, spinlock_t *);
-+__RQ_QOS_FUNC_TWO(track, struct request *, struct bio *);
+ 			WRITE_ONCE(dio->waiter, NULL);
++			smp_wmb();
+ 			wake_up_process(waiter);
+ 		}
+ 	}
+@@ -403,7 +408,9 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 		return -EIOCBQUEUED;
  
- /*
-  * Return true, if we can't increase the depth further by scaling
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index 32b02efbfa66..50558a6ea248 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -98,12 +98,33 @@ void rq_depth_scale_up(struct rq_depth *rqd);
- void rq_depth_scale_down(struct rq_depth *rqd, bool hard_throttle);
- bool rq_depth_calc_max_depth(struct rq_depth *rqd);
+ 	for (;;) {
+-		set_current_state(TASK_UNINTERRUPTIBLE);
++		__set_current_state(TASK_UNINTERRUPTIBLE);
++
++		smp_rmb();
+ 		if (!READ_ONCE(dio->waiter))
+ 			break;
  
--void rq_qos_cleanup(struct request_queue *, struct bio *);
--void rq_qos_done(struct request_queue *, struct request *);
--void rq_qos_issue(struct request_queue *, struct request *);
--void rq_qos_requeue(struct request_queue *, struct request *);
--void rq_qos_done_bio(struct request_queue *q, struct bio *bio);
--void rq_qos_throttle(struct request_queue *, struct bio *, spinlock_t *);
--void rq_qos_track(struct request_queue *q, struct request *, struct bio *);
-+#define RQ_QOS_FUNC_ONE(__OP, type)					\
-+void __rq_qos_##__OP(struct rq_qos *rqos, type arg);			\
-+static inline void rq_qos_##__OP(struct request_queue *q, type arg)	\
-+{									\
-+	if ((q)->rq_qos)						\
-+		__rq_qos_##__OP((q)->rq_qos, arg);			\
-+}
+diff --git a/fs/iomap.c b/fs/iomap.c
+index f61d13dfdf09..7898927e758e 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -1524,7 +1524,9 @@ static void iomap_dio_bio_end_io(struct bio *bio)
+ 	if (atomic_dec_and_test(&dio->ref)) {
+ 		if (dio->wait_for_completion) {
+ 			struct task_struct *waiter = dio->submit.waiter;
 +
-+#define RQ_QOS_FUNC_TWO(__OP, type1, type2)				\
-+void __rq_qos_##__OP(struct rq_qos *rqos, type1 arg1, type2 arg2);	\
-+static inline void rq_qos_##__OP(struct request_queue *q, type1 arg1,	\
-+				 type2 arg2)				\
-+{									\
-+	if ((q)->rq_qos)						\
-+		__rq_qos_##__OP((q)->rq_qos, arg1, arg2);		\
-+}
+ 			WRITE_ONCE(dio->submit.waiter, NULL);
++			smp_wmb();
+ 			wake_up_process(waiter);
+ 		} else if (dio->flags & IOMAP_DIO_WRITE) {
+ 			struct inode *inode = file_inode(dio->iocb->ki_filp);
+@@ -1888,7 +1890,9 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 			return -EIOCBQUEUED;
+ 
+ 		for (;;) {
+-			set_current_state(TASK_UNINTERRUPTIBLE);
++			__set_current_state(TASK_UNINTERRUPTIBLE);
 +
-+RQ_QOS_FUNC_ONE(cleanup, struct bio *);
-+RQ_QOS_FUNC_ONE(done, struct request *);
-+RQ_QOS_FUNC_ONE(issue, struct request *);
-+RQ_QOS_FUNC_ONE(requeue, struct request *);
-+RQ_QOS_FUNC_ONE(done_bio, struct bio *);
-+RQ_QOS_FUNC_TWO(throttle, struct bio *, spinlock_t *);
-+RQ_QOS_FUNC_TWO(track, struct request *, struct bio *);
-+#undef RQ_QOS_FUNC_ONE
-+#undef RQ_QOS_FUNC_TWO
-+
- void rq_qos_exit(struct request_queue *);
-+
- #endif
++			smp_rmb();
+ 			if (!READ_ONCE(dio->submit.waiter))
+ 				break;
+ 
 -- 
 2.17.1
 
