@@ -3,92 +3,87 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEBC2C43441
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:16:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F80FC43441
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:17:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F0A322510
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:16:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F0A322510
+	by mail.kernel.org (Postfix) with ESMTP id 2161622510
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:17:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2161622510
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732817AbeKNBPW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Nov 2018 20:15:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51662 "EHLO mx1.redhat.com"
+        id S2388285AbeKNBPi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Nov 2018 20:15:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34786 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388204AbeKNBPV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Nov 2018 20:15:21 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        id S2388268AbeKNBPh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Nov 2018 20:15:37 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 47BED30020C7;
-        Tue, 13 Nov 2018 15:16:47 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2C34F308625C;
+        Tue, 13 Nov 2018 15:17:03 +0000 (UTC)
 Received: from localhost (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 732D9605C6;
-        Tue, 13 Nov 2018 15:16:46 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 649C81019635;
+        Tue, 13 Nov 2018 15:16:49 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V9 16/19] block: document usage of bio iterator helpers
-Date:   Tue, 13 Nov 2018 23:15:02 +0800
-Message-Id: <20181113151505.15498-17-ming.lei@redhat.com>
+        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Subject: [PATCH V9 17/19] block: don't use bio->bi_vcnt to figure out segment number
+Date:   Tue, 13 Nov 2018 23:15:03 +0800
+Message-Id: <20181113151505.15498-18-ming.lei@redhat.com>
 In-Reply-To: <20181113151505.15498-1-ming.lei@redhat.com>
 References: <20181113151505.15498-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Tue, 13 Nov 2018 15:16:47 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Tue, 13 Nov 2018 15:17:03 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now multi-page bvec is supported, some helpers may return page by
-page, meantime some may return segment by segment, this patch
-documents the usage.
+It is wrong to use bio->bi_vcnt to figure out how many segments
+there are in the bio even though CLONED flag isn't set on this bio,
+because this bio may be splitted or advanced.
 
+So always use bio_segments() in blk_recount_segments(), and it shouldn't
+cause any performance loss now because the physical segment number is figured
+out in blk_queue_split() and BIO_SEG_VALID is set meantime since
+bdced438acd83ad83a6c ("block: setup bi_phys_segments after splitting").
+
+Fixes: 7f60dcaaf91 ("block: blk-merge: fix blk_recount_segments()")
 Cc: Christoph Hellwig <hch@lst.de>
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- Documentation/block/biovecs.txt | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ block/blk-merge.c | 8 +-------
+ 1 file changed, 1 insertion(+), 7 deletions(-)
 
-diff --git a/Documentation/block/biovecs.txt b/Documentation/block/biovecs.txt
-index 25689584e6e0..bfafb70d0d9e 100644
---- a/Documentation/block/biovecs.txt
-+++ b/Documentation/block/biovecs.txt
-@@ -117,3 +117,29 @@ Other implications:
-    size limitations and the limitations of the underlying devices. Thus
-    there's no need to define ->merge_bvec_fn() callbacks for individual block
-    drivers.
-+
-+Usage of helpers:
-+=================
-+
-+* The following helpers whose names have the suffix of "_all" can only be used
-+on non-BIO_CLONED bio, and usually they are used by filesystem code, and driver
-+shouldn't use them because bio may have been split before they got to the driver:
-+
-+	bio_for_each_segment_all()
-+	bio_first_bvec_all()
-+	bio_first_page_all()
-+	bio_last_bvec_all()
-+
-+* The following helpers iterate over single-page bvec, and the local
-+variable of 'struct bio_vec' or the reference records single-page IO
-+vector during the itearation:
-+
-+	bio_for_each_segment()
-+	bio_for_each_segment_all()
-+
-+* The following helper iterates over multi-page bvec, and each bvec may
-+include multiple physically contiguous pages, and the local variable of
-+'struct bio_vec' or the reference records multi-page IO vector during the
-+itearation:
-+
-+	bio_for_each_bvec()
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index cb9f49bcfd36..153a659fde74 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -429,13 +429,7 @@ void blk_recalc_rq_segments(struct request *rq)
+ 
+ void blk_recount_segments(struct request_queue *q, struct bio *bio)
+ {
+-	unsigned short seg_cnt;
+-
+-	/* estimate segment number by bi_vcnt for non-cloned bio */
+-	if (bio_flagged(bio, BIO_CLONED))
+-		seg_cnt = bio_segments(bio);
+-	else
+-		seg_cnt = bio->bi_vcnt;
++	unsigned short seg_cnt = bio_segments(bio);
+ 
+ 	if (test_bit(QUEUE_FLAG_NO_SG_MERGE, &q->queue_flags) &&
+ 			(seg_cnt < queue_max_segments(q)))
 -- 
 2.9.5
 
