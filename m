@@ -2,219 +2,116 @@ Return-Path: <SRS0=aXbO=NY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC32C43441
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:17:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D44B9C0044C
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:42:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 83C6F2251B
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:17:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83C6F2251B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 9D4B421582
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:42:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bjoqSfpK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D4B421582
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732928AbeKNBOW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Nov 2018 20:14:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55216 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387822AbeKNBOV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Nov 2018 20:14:21 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B2F2180F82;
-        Tue, 13 Nov 2018 15:15:46 +0000 (UTC)
-Received: from localhost (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 467B65FC02;
-        Tue, 13 Nov 2018 15:15:43 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V9 03/19] block: use bio_for_each_bvec() to compute multi-page bvec count
-Date:   Tue, 13 Nov 2018 23:14:49 +0800
-Message-Id: <20181113151505.15498-4-ming.lei@redhat.com>
-In-Reply-To: <20181113151505.15498-1-ming.lei@redhat.com>
-References: <20181113151505.15498-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Tue, 13 Nov 2018 15:15:46 +0000 (UTC)
+        id S1727188AbeKNBlS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Nov 2018 20:41:18 -0500
+Received: from mail-it1-f195.google.com ([209.85.166.195]:40305 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731287AbeKNBlS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Nov 2018 20:41:18 -0500
+Received: by mail-it1-f195.google.com with SMTP id e11so19043094itl.5
+        for <linux-block@vger.kernel.org>; Tue, 13 Nov 2018 07:42:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id;
+        bh=Yl+egARCa3TOZ7FZ3tb13xUWql2hR1sKdkfL/FxDfIc=;
+        b=bjoqSfpKqZo8eksvj9AFVS+fZkYQiARiEiISfzwiC3olwtROsravjdYiui3+heCq1H
+         3TSADEE+xszcyE7GTnrQ1XSzijlnY4Y7sQ35PQ6B+Yit8fEshjCksTTRojfrAXDPRS99
+         qzOXoLr3346H02ZvVPRjWBsxYvwyc81r29DtdK83KVDwZiEs1UijlLqNnWQTnWFE4K17
+         iGlmjypEGn8BLF5DyJTuZO5MK8JZJzf5xqtA3NjYH9Ah1n3bugLYDp+ro7Rh5V7VW+3s
+         OfDeu34Jb8qgfX6JNi7aUPMkSy69Y/spuXOGKp2qocxgPtLfBAfVQ6pESWQhxxLoLaQa
+         EZ1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id;
+        bh=Yl+egARCa3TOZ7FZ3tb13xUWql2hR1sKdkfL/FxDfIc=;
+        b=qyx6wESIfpWe1f0Hk9rCfT8a2biwLserpvB2kzwBKaZwC6mYGUnTomJ0vYaMDyIhnN
+         xQkOjuRbnnhLR25aSnwrCxLVI/M26O0Q8sMTPA0NWxc2FLkTbPacCnGcLD9RHWD9vMrW
+         G8tBtCd+13II8jS1a858FS7qh2ZcfOtlBzgmGGwbjMWj1NuOruiJC4pJ6YejaFBxih2W
+         +sjBFo3e9gFXFzuDWsZ1rR99srkzWE29NDrZqtzLS1glJiFBtKfquFQAUxhqBO73GjWd
+         CLZgyYwe9vSYV1nEd6tVjqCQz/raobDko/webjjeZ3FF3haLGrAj6NF89aMCqNlAFRzf
+         7G4w==
+X-Gm-Message-State: AGRZ1gIuSxklNRkBQUB3/EBlRicMrocK/OmXNQFiQ3Mc3P0lTsxC52cT
+        JcFy8aVOqv4oPLmSwxJT71aY0qv9ecs=
+X-Google-Smtp-Source: AJdET5dWM0afpP/pkckGwwV7IE7x/ZonPf40CgtWwp5j1Gd+G6NAeitIVwOS2eIiSvvFon5CwESgmQ==
+X-Received: by 2002:a24:3684:: with SMTP id l126-v6mr4184305itl.142.1542123758369;
+        Tue, 13 Nov 2018 07:42:38 -0800 (PST)
+Received: from x1.localdomain ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id o14-v6sm6721987ito.3.2018.11.13.07.42.37
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 13 Nov 2018 07:42:37 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org
+Subject: [PATCHSET v2 0/11] Various block optimizations
+Date:   Tue, 13 Nov 2018 08:42:22 -0700
+Message-Id: <20181113154233.15256-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-First it is more efficient to use bio_for_each_bvec() in both
-blk_bio_segment_split() and __blk_recalc_rq_segments() to compute how
-many multi-page bvecs there are in the bio.
+Some of these are optimizations, the latter part is prep work
+for supporting polling with aio.
 
-Secondly once bio_for_each_bvec() is used, the bvec may need to be
-splitted because its length can be very longer than max segment size,
-so we have to split the big bvec into several segments.
+Patches against my for-4.21/block branch. These patches can also
+be found in my mq-perf branch, though there are other patches
+sitting on top of this series (notably aio polling, as mentioned).
 
-Thirdly when splitting multi-page bvec into segments, the max segment
-limit may be reached, so the bio split need to be considered under
-this situation too.
+Changes since v1:
 
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-merge.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 76 insertions(+), 14 deletions(-)
+- Improve nvme irq disabling for polled IO
+- Fix barriers in the ordered wakeup for polled O_DIRECT
+- Add patch to allow polling to find any command that is done
+- Add patch to control whether polling spins or not
+- Have async O_DIRECT mark a bio as pollable
+- Don't plug for polling
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 91b2af332a84..6f7deb94a23f 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -160,6 +160,62 @@ static inline unsigned get_max_io_size(struct request_queue *q,
- 	return sectors;
- }
- 
-+/*
-+ * Split the bvec @bv into segments, and update all kinds of
-+ * variables.
-+ */
-+static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
-+		unsigned *nsegs, unsigned *last_seg_size,
-+		unsigned *front_seg_size, unsigned *sectors)
-+{
-+	bool need_split = false;
-+	unsigned len = bv->bv_len;
-+	unsigned total_len = 0;
-+	unsigned new_nsegs = 0, seg_size = 0;
-+
-+	if ((*nsegs >= queue_max_segments(q)) || !len)
-+		return need_split;
-+
-+	/*
-+	 * Multipage bvec may be too big to hold in one segment,
-+	 * so the current bvec has to be splitted as multiple
-+	 * segments.
-+	 */
-+	while (new_nsegs + *nsegs < queue_max_segments(q)) {
-+		seg_size = min(queue_max_segment_size(q), len);
-+
-+		new_nsegs++;
-+		total_len += seg_size;
-+		len -= seg_size;
-+
-+		if ((queue_virt_boundary(q) && ((bv->bv_offset +
-+		    total_len) & queue_virt_boundary(q))) || !len)
-+			break;
-+	}
-+
-+	/* split in the middle of the bvec */
-+	if (len)
-+		need_split = true;
-+
-+	/* update front segment size */
-+	if (!*nsegs) {
-+		unsigned first_seg_size = seg_size;
-+
-+		if (new_nsegs > 1)
-+			first_seg_size = queue_max_segment_size(q);
-+		if (*front_seg_size < first_seg_size)
-+			*front_seg_size = first_seg_size;
-+	}
-+
-+	/* update other varibles */
-+	*last_seg_size = seg_size;
-+	*nsegs += new_nsegs;
-+	if (sectors)
-+		*sectors += total_len >> 9;
-+
-+	return need_split;
-+}
-+
- static struct bio *blk_bio_segment_split(struct request_queue *q,
- 					 struct bio *bio,
- 					 struct bio_set *bs,
-@@ -173,7 +229,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	struct bio *new = NULL;
- 	const unsigned max_sectors = get_max_io_size(q, bio);
- 
--	bio_for_each_segment(bv, bio, iter) {
-+	bio_for_each_bvec(bv, bio, iter) {
- 		/*
- 		 * If the queue doesn't support SG gaps and adding this
- 		 * offset would create a gap, disallow it.
-@@ -188,8 +244,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 			 */
- 			if (nsegs < queue_max_segments(q) &&
- 			    sectors < max_sectors) {
--				nsegs++;
--				sectors = max_sectors;
-+				/* split in the middle of bvec */
-+				bv.bv_len = (max_sectors - sectors) << 9;
-+				bvec_split_segs(q, &bv, &nsegs,
-+						&seg_size,
-+						&front_seg_size,
-+						&sectors);
- 			}
- 			goto split;
- 		}
-@@ -214,11 +274,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 		if (nsegs == 1 && seg_size > front_seg_size)
- 			front_seg_size = seg_size;
- 
--		nsegs++;
- 		bvprv = bv;
- 		bvprvp = &bvprv;
--		seg_size = bv.bv_len;
--		sectors += bv.bv_len >> 9;
-+
-+		if (bvec_split_segs(q, &bv, &nsegs, &seg_size,
-+					&front_seg_size, &sectors))
-+			goto split;
- 
- 	}
- 
-@@ -296,6 +357,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 	struct bio_vec bv, bvprv = { NULL };
- 	int cluster, prev = 0;
- 	unsigned int seg_size, nr_phys_segs;
-+	unsigned front_seg_size = bio->bi_seg_front_size;
- 	struct bio *fbio, *bbio;
- 	struct bvec_iter iter;
- 
-@@ -316,7 +378,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 	seg_size = 0;
- 	nr_phys_segs = 0;
- 	for_each_bio(bio) {
--		bio_for_each_segment(bv, bio, iter) {
-+		bio_for_each_bvec(bv, bio, iter) {
- 			/*
- 			 * If SG merging is disabled, each bio vector is
- 			 * a segment
-@@ -336,20 +398,20 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 				continue;
- 			}
- new_segment:
--			if (nr_phys_segs == 1 && seg_size >
--			    fbio->bi_seg_front_size)
--				fbio->bi_seg_front_size = seg_size;
-+			if (nr_phys_segs == 1 && seg_size > front_seg_size)
-+				front_seg_size = seg_size;
- 
--			nr_phys_segs++;
- 			bvprv = bv;
- 			prev = 1;
--			seg_size = bv.bv_len;
-+			bvec_split_segs(q, &bv, &nr_phys_segs, &seg_size,
-+					&front_seg_size, NULL);
- 		}
- 		bbio = bio;
- 	}
- 
--	if (nr_phys_segs == 1 && seg_size > fbio->bi_seg_front_size)
--		fbio->bi_seg_front_size = seg_size;
-+	if (nr_phys_segs == 1 && seg_size > front_seg_size)
-+		front_seg_size = seg_size;
-+	fbio->bi_seg_front_size = front_seg_size;
- 	if (seg_size > bbio->bi_seg_back_size)
- 		bbio->bi_seg_back_size = seg_size;
- 
+
+ block/blk-cgroup.c                |   8 +--
+ block/blk-core.c                  |  20 ++++----
+ block/blk-flush.c                 |   3 +-
+ block/blk-mq-debugfs.c            |   2 +-
+ block/blk-mq.c                    | 105 +++++++++++++++++++++-----------------
+ block/blk-mq.h                    |  12 ++---
+ block/blk-rq-qos.c                |  90 +++++++++-----------------------
+ block/blk-rq-qos.h                |  35 ++++++++++---
+ block/blk-softirq.c               |   4 +-
+ block/blk-sysfs.c                 |  18 +++----
+ block/blk-wbt.c                   |   2 +-
+ block/elevator.c                  |   9 ++--
+ block/genhd.c                     |   8 +--
+ drivers/md/dm-table.c             |   2 +-
+ drivers/nvme/host/multipath.c     |   6 +--
+ drivers/nvme/host/pci.c           |  45 +++++++++-------
+ drivers/nvme/target/io-cmd-bdev.c |   2 +-
+ drivers/scsi/scsi_lib.c           |   2 +-
+ fs/block_dev.c                    |  32 +++++++++---
+ fs/direct-io.c                    |   2 +-
+ fs/iomap.c                        |   9 ++--
+ include/linux/blk-mq-ops.h        | 100 ++++++++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h            |  94 +---------------------------------
+ include/linux/blkdev.h            |  37 +++++++++++---
+ mm/page_io.c                      |   2 +-
+ 25 files changed, 347 insertions(+), 302 deletions(-)
+
 -- 
-2.9.5
+Jens Axboe
+
 
