@@ -6,91 +6,208 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA9EEC43610
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DD58C43441
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:17:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A9A022510
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:17:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A9A022510
+	by mail.kernel.org (Postfix) with ESMTP id 66C1A2251C
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:17:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66C1A2251C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387784AbeKNBOl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Nov 2018 20:14:41 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:48052 "EHLO mx1.redhat.com"
+        id S2388288AbeKNBP4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Nov 2018 20:15:56 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44586 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730939AbeKNBOl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Nov 2018 20:14:41 -0500
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        id S1731422AbeKNBPz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Nov 2018 20:15:55 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 61B1A2D7F6;
-        Tue, 13 Nov 2018 15:16:07 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4F92E58E44;
+        Tue, 13 Nov 2018 15:17:21 +0000 (UTC)
 Received: from localhost (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8FB111974C;
-        Tue, 13 Nov 2018 15:16:06 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 76EED605C5;
+        Tue, 13 Nov 2018 15:17:05 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org
-Subject: [PATCH V9 08/19] btrfs: move bio_pages_all() to btrfs
-Date:   Tue, 13 Nov 2018 23:14:54 +0800
-Message-Id: <20181113151505.15498-9-ming.lei@redhat.com>
+        Mike Snitzer <snitzer@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>
+Subject: [PATCH V9 18/19] block: kill QUEUE_FLAG_NO_SG_MERGE
+Date:   Tue, 13 Nov 2018 23:15:04 +0800
+Message-Id: <20181113151505.15498-19-ming.lei@redhat.com>
 In-Reply-To: <20181113151505.15498-1-ming.lei@redhat.com>
 References: <20181113151505.15498-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Tue, 13 Nov 2018 15:16:07 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Tue, 13 Nov 2018 15:17:21 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-BTRFS is the only user of this helper, so move this helper into
-BTRFS, and implement it via bio_for_each_segment_all(), since
-bio->bi_vcnt may not equal to number of pages after multipage bvec
-is enabled.
+Since bdced438acd83ad83a6c ("block: setup bi_phys_segments after splitting"),
+physical segment number is mainly figured out in blk_queue_split() for
+fast path, and the flag of BIO_SEG_VALID is set there too.
+
+Now only blk_recount_segments() and blk_recalc_rq_segments() use this
+flag.
+
+Basically blk_recount_segments() is bypassed in fast path given BIO_SEG_VALID
+is set in blk_queue_split().
+
+For another user of blk_recalc_rq_segments():
+
+- run in partial completion branch of blk_update_request, which is an unusual case
+
+- run in blk_cloned_rq_check_limits(), still not a big problem if the flag is killed
+since dm-rq is the only user.
+
+Multi-page bvec is enabled now, QUEUE_FLAG_NO_SG_MERGE doesn't make sense any more.
 
 Cc: Christoph Hellwig <hch@lst.de>
-Cc: David Sterba <dsterba@suse.com>
-Cc: linux-btrfs@vger.kernel.org
+Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- fs/btrfs/extent_io.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ block/blk-merge.c      | 31 ++++++-------------------------
+ block/blk-mq-debugfs.c |  1 -
+ block/blk-mq.c         |  3 ---
+ drivers/md/dm-table.c  | 13 -------------
+ include/linux/blkdev.h |  1 -
+ 5 files changed, 6 insertions(+), 43 deletions(-)
 
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index 5d5965297e7e..874bb9aeebdc 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -2348,6 +2348,18 @@ struct bio *btrfs_create_repair_bio(struct inode *inode, struct bio *failed_bio,
- 	return bio;
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 153a659fde74..06be298be332 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -351,8 +351,7 @@ void blk_queue_split(struct request_queue *q, struct bio **bio)
+ EXPORT_SYMBOL(blk_queue_split);
+ 
+ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+-					     struct bio *bio,
+-					     bool no_sg_merge)
++					     struct bio *bio)
+ {
+ 	struct bio_vec bv, bvprv = { NULL };
+ 	int cluster, prev = 0;
+@@ -379,13 +378,6 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+ 	nr_phys_segs = 0;
+ 	for_each_bio(bio) {
+ 		bio_for_each_bvec(bv, bio, iter) {
+-			/*
+-			 * If SG merging is disabled, each bio vector is
+-			 * a segment
+-			 */
+-			if (no_sg_merge)
+-				goto new_segment;
+-
+ 			if (prev && cluster) {
+ 				if (seg_size + bv.bv_len
+ 				    > queue_max_segment_size(q))
+@@ -420,27 +412,16 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+ 
+ void blk_recalc_rq_segments(struct request *rq)
+ {
+-	bool no_sg_merge = !!test_bit(QUEUE_FLAG_NO_SG_MERGE,
+-			&rq->q->queue_flags);
+-
+-	rq->nr_phys_segments = __blk_recalc_rq_segments(rq->q, rq->bio,
+-			no_sg_merge);
++	rq->nr_phys_segments = __blk_recalc_rq_segments(rq->q, rq->bio);
  }
  
-+static unsigned btrfs_bio_pages_all(struct bio *bio)
-+{
-+	unsigned i;
-+	struct bio_vec *bv;
-+
-+	WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED));
-+
-+	bio_for_each_segment_all(bv, bio, i)
-+		;
-+	return i;
-+}
-+
- /*
-  * this is a generic handler for readpage errors (default
-  * readpage_io_failed_hook). if other copies exist, read those and write back
-@@ -2368,7 +2380,7 @@ static int bio_readpage_error(struct bio *failed_bio, u64 phy_offset,
- 	int read_mode = 0;
- 	blk_status_t status;
- 	int ret;
--	unsigned failed_bio_pages = bio_pages_all(failed_bio);
-+	unsigned failed_bio_pages = btrfs_bio_pages_all(failed_bio);
+ void blk_recount_segments(struct request_queue *q, struct bio *bio)
+ {
+-	unsigned short seg_cnt = bio_segments(bio);
+-
+-	if (test_bit(QUEUE_FLAG_NO_SG_MERGE, &q->queue_flags) &&
+-			(seg_cnt < queue_max_segments(q)))
+-		bio->bi_phys_segments = seg_cnt;
+-	else {
+-		struct bio *nxt = bio->bi_next;
++	struct bio *nxt = bio->bi_next;
  
- 	BUG_ON(bio_op(failed_bio) == REQ_OP_WRITE);
+-		bio->bi_next = NULL;
+-		bio->bi_phys_segments = __blk_recalc_rq_segments(q, bio, false);
+-		bio->bi_next = nxt;
+-	}
++	bio->bi_next = NULL;
++	bio->bi_phys_segments = __blk_recalc_rq_segments(q, bio);
++	bio->bi_next = nxt;
  
+ 	bio_set_flag(bio, BIO_SEG_VALID);
+ }
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index f021f4817b80..e188b1090759 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -128,7 +128,6 @@ static const char *const blk_queue_flag_name[] = {
+ 	QUEUE_FLAG_NAME(SAME_FORCE),
+ 	QUEUE_FLAG_NAME(DEAD),
+ 	QUEUE_FLAG_NAME(INIT_DONE),
+-	QUEUE_FLAG_NAME(NO_SG_MERGE),
+ 	QUEUE_FLAG_NAME(POLL),
+ 	QUEUE_FLAG_NAME(WC),
+ 	QUEUE_FLAG_NAME(FUA),
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 411be60d0cb6..ed484af5744b 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2755,9 +2755,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 
+ 	q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
+ 
+-	if (!(set->flags & BLK_MQ_F_SG_MERGE))
+-		queue_flag_set_unlocked(QUEUE_FLAG_NO_SG_MERGE, q);
+-
+ 	q->sg_reserved_size = INT_MAX;
+ 
+ 	INIT_DELAYED_WORK(&q->requeue_work, blk_mq_requeue_work);
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index 9038c302d5c2..22fed6987aea 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -1698,14 +1698,6 @@ static int device_is_not_random(struct dm_target *ti, struct dm_dev *dev,
+ 	return q && !blk_queue_add_random(q);
+ }
+ 
+-static int queue_supports_sg_merge(struct dm_target *ti, struct dm_dev *dev,
+-				   sector_t start, sector_t len, void *data)
+-{
+-	struct request_queue *q = bdev_get_queue(dev->bdev);
+-
+-	return q && !test_bit(QUEUE_FLAG_NO_SG_MERGE, &q->queue_flags);
+-}
+-
+ static bool dm_table_all_devices_attribute(struct dm_table *t,
+ 					   iterate_devices_callout_fn func)
+ {
+@@ -1902,11 +1894,6 @@ void dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
+ 	if (!dm_table_supports_write_zeroes(t))
+ 		q->limits.max_write_zeroes_sectors = 0;
+ 
+-	if (dm_table_all_devices_attribute(t, queue_supports_sg_merge))
+-		blk_queue_flag_clear(QUEUE_FLAG_NO_SG_MERGE, q);
+-	else
+-		blk_queue_flag_set(QUEUE_FLAG_NO_SG_MERGE, q);
+-
+ 	dm_table_verify_integrity(t);
+ 
+ 	/*
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index e67ad2dd025e..c5c7799e88c2 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -604,7 +604,6 @@ struct request_queue {
+ #define QUEUE_FLAG_SAME_FORCE  15	/* force complete on same CPU */
+ #define QUEUE_FLAG_DEAD        16	/* queue tear-down finished */
+ #define QUEUE_FLAG_INIT_DONE   17	/* queue is initialized */
+-#define QUEUE_FLAG_NO_SG_MERGE 18	/* don't attempt to merge SG segments*/
+ #define QUEUE_FLAG_POLL	       19	/* IO polling enabled if set */
+ #define QUEUE_FLAG_WC	       20	/* Write back caching */
+ #define QUEUE_FLAG_FUA	       21	/* device supports FUA writes */
 -- 
 2.9.5
 
