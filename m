@@ -2,113 +2,150 @@ Return-Path: <SRS0=aXbO=NY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 242E6C43610
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:43:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17B6BC43441
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:56:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E254E2086B
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:42:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Sd6FN2Xi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E254E2086B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	by mail.kernel.org (Postfix) with ESMTP id D77B1214F1
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:56:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D77B1214F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387807AbeKNBlh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Nov 2018 20:41:37 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:38737 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733221AbeKNBlh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Nov 2018 20:41:37 -0500
-Received: by mail-it1-f195.google.com with SMTP id k141-v6so19064053itk.3
-        for <linux-block@vger.kernel.org>; Tue, 13 Nov 2018 07:42:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=Fz9g1ov0KEBk0jca5hC7QbGAUKLsaBIiDlim4iRDh3o=;
-        b=Sd6FN2XiMMy2fLFPu278s/m80rTFcVkyVi7Da6PEShW2mg8FprQOAGV+qvsYE2Lomg
-         5yzMadXXfeUijZaQYtQkQSiIXoO+3oKiwIt1RQ04ziANhlCXTOWAwoswlj7UeKk1ruIJ
-         Q1idg1g7jtt0PO5ChhvwlqwgaiHMd/DDmGiuYeNYdWG1+tJnfAMv5pP6VfGKr+X56tTX
-         cPo/18TVaZMv8/1/68ZWUUSJBoiR9t9DK+fbxcWd5qnDM02Zb9RAJya1WQ+t4krx309k
-         QxnVQovq45rlzGHFbs9uU37en7YBjTeGNGshpVjHGQbUN6ZeEQF+9i7ss+1TxtfUkVf7
-         +sRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=Fz9g1ov0KEBk0jca5hC7QbGAUKLsaBIiDlim4iRDh3o=;
-        b=hCp6qLiD0pWcGrp3pzHNZLb0o/08BLkvyxeOLA9Ul8Ajei18hiDgx2suq8oxNW/fUt
-         y0rpLLvzsuaA0v8AF+jGUHFPfWEsxZMytS4GJZOuRT1EwCmg68JjmUHtLiIw5JrPmyAl
-         v3RAXiA/FA/q5VJ6Czm64uKnZttgaoQ5YNdtUrrUrfpuCpKM3Co0fjSP/IIt3xSnSdUI
-         s8CWzs3aiUeg3BhhEoJnnfhSHxehQyO/TpxlLGy27wd1lC7fRcP/3WPqiR+/1Q06AOK5
-         ylSVMy2RFvKCAkaaW13tSFYyoDlp4+F3x/dL2H6G60AW793Gfc5B1GnBHAapHVlimU3l
-         Y9nw==
-X-Gm-Message-State: AGRZ1gL1Bb2niAPHrgwa+u/C0fXmetn7c0bN8QXoakVMeLdqbl5pW6gs
-        Ctfh8hINWn4ZEk7gjPYJ8G9GYmp0X+w=
-X-Google-Smtp-Source: AJdET5ecZTcjHWgJIM5f//nes9SHvCftsfFk/yhD+lANPd9/3VyUGnMaMV6VbG7balz9ubKbNaaveQ==
-X-Received: by 2002:a24:440f:: with SMTP id o15-v6mr3990915ita.15.1542123778003;
-        Tue, 13 Nov 2018 07:42:58 -0800 (PST)
-Received: from x1.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id o14-v6sm6721987ito.3.2018.11.13.07.42.56
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 13 Nov 2018 07:42:56 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 11/11] block: don't plug for aio/O_DIRECT HIPRI IO
-Date:   Tue, 13 Nov 2018 08:42:33 -0700
-Message-Id: <20181113154233.15256-12-axboe@kernel.dk>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20181113154233.15256-1-axboe@kernel.dk>
+        id S1731721AbeKNBzF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Nov 2018 20:55:05 -0500
+Received: from mga05.intel.com ([192.55.52.43]:56492 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731324AbeKNBzF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Nov 2018 20:55:05 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Nov 2018 07:56:24 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.54,499,1534834800"; 
+   d="scan'208";a="90791609"
+Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
+  by orsmga006.jf.intel.com with ESMTP; 13 Nov 2018 07:56:23 -0800
+Date:   Tue, 13 Nov 2018 08:52:55 -0700
+From:   Keith Busch <keith.busch@intel.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: [PATCH 06/11] block: add polled wakeup task helper
+Message-ID: <20181113155255.GB9827@localhost.localdomain>
 References: <20181113154233.15256-1-axboe@kernel.dk>
+ <20181113154233.15256-7-axboe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181113154233.15256-7-axboe@kernel.dk>
+User-Agent: Mutt/1.9.1 (2017-09-22)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Those will go straight to issue inside blk-mq, so don't bother
-setting up a block plug for them.
+On Tue, Nov 13, 2018 at 08:42:28AM -0700, Jens Axboe wrote:
+> If we're polling for IO on a device that doesn't use interrupts, then
+> IO completion loop (and wake of task) is done by submitting task itself.
+> If that is the case, then we don't need to enter the wake_up_process()
+> function, we can simply mark ourselves as TASK_RUNNING.
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  fs/block_dev.c         |  6 ++----
+>  fs/iomap.c             |  3 +--
+>  include/linux/blkdev.h | 19 +++++++++++++++++++
+>  3 files changed, 22 insertions(+), 6 deletions(-)
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+One more for swap read:
+
 ---
- fs/block_dev.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index c124982b810d..9dc695a3af4e 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -356,7 +356,13 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 	dio->multi_bio = false;
- 	dio->should_dirty = is_read && iter_is_iovec(iter);
+diff --git a/mm/page_io.c b/mm/page_io.c
+index d4d1c89bcddd..57572ff46016 100644
+--- a/mm/page_io.c
++++ b/mm/page_io.c
+@@ -140,7 +140,7 @@ static void end_swap_bio_read(struct bio *bio)
+ 	unlock_page(page);
+ 	WRITE_ONCE(bio->bi_private, NULL);
+ 	bio_put(bio);
+-	wake_up_process(waiter);
++	blk_wake_io_task(waiter);
+ 	put_task_struct(waiter);
+ }
  
--	blk_start_plug(&plug);
-+	/*
-+	 * Don't plug for HIPRI/polled IO, as those should go straight
-+	 * to issue
-+	 */
-+	if (!(iocb->ki_flags & IOCB_HIPRI))
-+		blk_start_plug(&plug);
-+
- 	for (;;) {
- 		bio_set_dev(bio, bdev);
- 		bio->bi_iter.bi_sector = pos >> 9;
-@@ -403,7 +409,9 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 		submit_bio(bio);
- 		bio = bio_alloc(GFP_KERNEL, nr_pages);
- 	}
--	blk_finish_plug(&plug);
-+
-+	if (!(iocb->ki_flags & IOCB_HIPRI))
-+		blk_finish_plug(&plug);
+--
  
- 	if (!is_sync)
- 		return -EIOCBQUEUED;
--- 
-2.17.1
-
+> diff --git a/fs/block_dev.c b/fs/block_dev.c
+> index 2f920c03996e..0ed9be8906a8 100644
+> --- a/fs/block_dev.c
+> +++ b/fs/block_dev.c
+> @@ -181,8 +181,7 @@ static void blkdev_bio_end_io_simple(struct bio *bio)
+>  	struct task_struct *waiter = bio->bi_private;
+>  
+>  	WRITE_ONCE(bio->bi_private, NULL);
+> -	smp_wmb();
+> -	wake_up_process(waiter);
+> +	blk_wake_io_task(waiter);
+>  }
+>  
+>  static ssize_t
+> @@ -309,8 +308,7 @@ static void blkdev_bio_end_io(struct bio *bio)
+>  			struct task_struct *waiter = dio->waiter;
+>  
+>  			WRITE_ONCE(dio->waiter, NULL);
+> -			smp_wmb();
+> -			wake_up_process(waiter);
+> +			blk_wake_io_task(waiter);
+>  		}
+>  	}
+>  
+> diff --git a/fs/iomap.c b/fs/iomap.c
+> index 7898927e758e..a182699e28db 100644
+> --- a/fs/iomap.c
+> +++ b/fs/iomap.c
+> @@ -1526,8 +1526,7 @@ static void iomap_dio_bio_end_io(struct bio *bio)
+>  			struct task_struct *waiter = dio->submit.waiter;
+>  
+>  			WRITE_ONCE(dio->submit.waiter, NULL);
+> -			smp_wmb();
+> -			wake_up_process(waiter);
+> +			blk_wake_io_task(waiter);
+>  		} else if (dio->flags & IOMAP_DIO_WRITE) {
+>  			struct inode *inode = file_inode(dio->iocb->ki_filp);
+>  
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index ad8474ec8c58..d1ef8cbbea04 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1798,4 +1798,23 @@ static inline int blkdev_issue_flush(struct block_device *bdev, gfp_t gfp_mask,
+>  
+>  #endif /* CONFIG_BLOCK */
+>  
+> +static inline void blk_wake_io_task(struct task_struct *waiter)
+> +{
+> +	/*
+> +	 * If we're polling, the task itself is doing the completions. For
+> +	 * that case, we don't need to signal a wakeup, it's enough to just
+> +	 * mark us as RUNNING.
+> +	 */
+> +	if (waiter == current)
+> +		__set_current_state(TASK_RUNNING);
+> +	else {
+> +		/*
+> +		 * Ensure the callers waiter store is ordered and seen
+> +		 * by the ->bi_end_io() function.
+> +		 */
+> +		smp_wmb();
+> +		wake_up_process(waiter);
+> +	}
+> +}
+> +
+>  #endif
+> -- 
+> 2.17.1
+> 
