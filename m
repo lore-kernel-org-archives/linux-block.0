@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7989C43441
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:42:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50EEBC43441
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:42:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9ABCE2086B
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:42:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 052E62086B
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 15:42:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="1v7jH0uw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9ABCE2086B
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="xMdT/5I2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 052E62086B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731840AbeKNBlW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Nov 2018 20:41:22 -0500
-Received: from mail-it1-f194.google.com ([209.85.166.194]:36147 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731287AbeKNBlV (ORCPT
+        id S1732028AbeKNBlY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Nov 2018 20:41:24 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:41751 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731287AbeKNBlY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Nov 2018 20:41:21 -0500
-Received: by mail-it1-f194.google.com with SMTP id w7-v6so19087199itd.1
-        for <linux-block@vger.kernel.org>; Tue, 13 Nov 2018 07:42:43 -0800 (PST)
+        Tue, 13 Nov 2018 20:41:24 -0500
+Received: by mail-io1-f67.google.com with SMTP id r6-v6so6453756ioj.8
+        for <linux-block@vger.kernel.org>; Tue, 13 Nov 2018 07:42:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=ywE5bv/wMPm3JaaKSxU4j+9woL2NqLCUQhLPCdEb4qQ=;
-        b=1v7jH0uw82TTZXEl0HdaqQ2hppXX+wE5nbkznhCkNd0d7cgxdccF3153evxA3MGbLy
-         akHelvZmGj46I5HBAMYYpulQ6ZDhtYsNszSgs+3rgiQziGryxe9CWE1b4otdyTMDuda5
-         c5tyyBNi6Oe5GsNVWbsZlFumL/sIx79zpMLEeiiw/SZGiwKlre7BEK8b4ej/oc5tWUjA
-         qtTVE1HyyOajBOktWX4E8rl3ufaSuK33Pf7EeooeC5GrsclCtlDe76P0rspLZnP19G2h
-         BkhDs9atwF0/knHodCSGsRfuGgfmRES4dY2zsBekbwX2UGd/5KiOTgy0oOOpeUx8pWhE
-         BcbQ==
+        bh=7HzI50GpmF6RrC6L0yZX4KGiRvscqtB4CaX6eBBB+f8=;
+        b=xMdT/5I2gbNyg1sXnxkMWlFXGis/ZNJYH3pvNr+NhEut9J9R8yqizYAERdd+5r8SxB
+         mo32xz8KdmrNw6iaAbz40F0qA/dvyx8sp0+h2aipAGZmYZfVGWq8mxeGdNdHseA6VDCk
+         A9hZ2z3WpCGcZos0dgkwtYfBNm47wUr2z3drHMqnWRD68Uruj9l7k5QfKM9yCRifzg+v
+         hIQc862xttpa+YZSyX33FX0TteIGT7FIVcC/ysRlwuQ5NlIYWZrpzPOHsytEHCcwzT4q
+         V9Wf8oRKYKYXCpsEZGMVmH0F6c1VBn/Ghxg8wIAnQd8CR9vSVQYqGnrLxu3vwEYNtMq3
+         gR0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=ywE5bv/wMPm3JaaKSxU4j+9woL2NqLCUQhLPCdEb4qQ=;
-        b=XGmH5LTIUbbJJ2pdKrWFTyCnxTu/WEt1YERtuDI+0YjIml2QykGkXXCNWuaVWmCmEt
-         B6LXBSXMrB0IfU/I/KVQ5XEX+LVnuAlDPHDVXcJxtlHsyZDkH2Xm320kvaxBXL+7thGT
-         phcfsibDXOHWhH99EyAmX1w3p4/mMzkfXNJrvYE1UK85v4niuw08PJur56VNAscOXn2c
-         0Ueeht3rZe1eGVVAl9PoBFzGBp37GnmqRS0z5XFU1JaghZpznRFe7hzpMMVW6LyB0aQX
-         gk1XCbtU8jPdHNET7pTzJqGiySNQTtx8fSWFQJVBal3w1lmBwU2aVmAH7YmTsojR7Vy9
-         ZsNw==
-X-Gm-Message-State: AGRZ1gJncFXKvRL809fukE/UilKBd/wNQ11hORTXwx2A2EbNxtkICV71
-        kflUfogksh3IDRcrxmVk4D9b/zzx/R0=
-X-Google-Smtp-Source: AJdET5eIyBtgk4rSQQqXJ22x9lSjXLl6cOo706ZjuB8JCnIghlGaoR7sJe8Ib6nCysNp9n5LaNhjLQ==
-X-Received: by 2002:a24:3046:: with SMTP id q67mr4218265itq.42.1542123762046;
-        Tue, 13 Nov 2018 07:42:42 -0800 (PST)
+        bh=7HzI50GpmF6RrC6L0yZX4KGiRvscqtB4CaX6eBBB+f8=;
+        b=jxVuENj+4sH2jTYFBk6v1Go9+EVaRBIWUiqhSiPXVd+Sk0vZeL3AFtDhDryOufHiRQ
+         2QbiCFm4lFm74eV1qz8NDUhaZs+rZq9OnuS0C4Q6cTW1C/o4o4Z2YjzGO8qHpmZphZFw
+         pVDpeWy5RUDN6fjI40cg20uZSd1/WExsr6FWyK9/BrVweaacK0IEMbZ+KorebAXnj4jr
+         VXVOmQx5YdFNNTJPfGv0yQYGHNm+wDJdutmHwprSUR7fimLw7HbmEBWb2G7wtXNe536B
+         L1dkUMPsMxMWHEr/6Yg07j0fd/HvZINENRa8Y1uFduAiMup18O9lvdYxIjFLMcCftl64
+         S3FQ==
+X-Gm-Message-State: AGRZ1gIB6zN7NDfaSSXskfvMHvMPQjp+IS7FSoaaniQjxThVaTJSNW5/
+        gKYkdSGZLoT169M4NlUAopPrpa+sUYM=
+X-Google-Smtp-Source: AJdET5fKQLfltYdsBZzN3QuHrnocBX6eT16KZe1x46EGJvmVE/4O6mG/iFM3QSvgT0ql+8WssLcVRg==
+X-Received: by 2002:a6b:900b:: with SMTP id s11mr4418248iod.159.1542123763912;
+        Tue, 13 Nov 2018 07:42:43 -0800 (PST)
 Received: from x1.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id o14-v6sm6721987ito.3.2018.11.13.07.42.40
+        by smtp.gmail.com with ESMTPSA id o14-v6sm6721987ito.3.2018.11.13.07.42.42
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 13 Nov 2018 07:42:40 -0800 (PST)
+        Tue, 13 Nov 2018 07:42:42 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 02/11] block: add queue_is_mq() helper
-Date:   Tue, 13 Nov 2018 08:42:24 -0700
-Message-Id: <20181113154233.15256-3-axboe@kernel.dk>
+Subject: [PATCH 03/11] blk-mq: embed blk_mq_ops directly in the request queue
+Date:   Tue, 13 Nov 2018 08:42:25 -0700
+Message-Id: <20181113154233.15256-4-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181113154233.15256-1-axboe@kernel.dk>
 References: <20181113154233.15256-1-axboe@kernel.dk>
@@ -71,337 +71,505 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Various spots check for q->mq_ops being non-NULL, but provide
-a helper to do this instead.
-
-Where the ->mq_ops != NULL check is redundant, remove it.
+This saves an indirect function call everytime we have to
+call one of the strategy functions. We keep it const, and just
+hack around that a bit in blk_mq_init_allocated_queue(), which
+is where we copy the ops in.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-cgroup.c     |  8 ++++----
- block/blk-core.c       | 10 +++++-----
- block/blk-flush.c      |  3 +--
- block/blk-mq.c         |  2 +-
- block/blk-sysfs.c      | 14 +++++++-------
- block/blk-wbt.c        |  2 +-
- block/elevator.c       |  9 ++++-----
- block/genhd.c          |  8 ++++----
- drivers/md/dm-table.c  |  2 +-
- include/linux/blkdev.h | 10 +++++++---
- 10 files changed, 35 insertions(+), 33 deletions(-)
+ block/blk-core.c           |   8 +--
+ block/blk-mq-debugfs.c     |   2 +-
+ block/blk-mq.c             |  22 ++++----
+ block/blk-mq.h             |  12 ++---
+ block/blk-softirq.c        |   4 +-
+ block/blk-sysfs.c          |   4 +-
+ drivers/scsi/scsi_lib.c    |   2 +-
+ include/linux/blk-mq-ops.h | 100 +++++++++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h     |  94 +---------------------------------
+ include/linux/blkdev.h     |   6 ++-
+ 10 files changed, 132 insertions(+), 122 deletions(-)
+ create mode 100644 include/linux/blk-mq-ops.h
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 6c65791bc3fe..8da8d3773ecf 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1349,7 +1349,7 @@ int blkcg_activate_policy(struct request_queue *q,
- 	if (blkcg_policy_enabled(q, pol))
- 		return 0;
- 
--	if (q->mq_ops)
-+	if (queue_is_mq(q))
- 		blk_mq_freeze_queue(q);
- pd_prealloc:
- 	if (!pd_prealloc) {
-@@ -1388,7 +1388,7 @@ int blkcg_activate_policy(struct request_queue *q,
- 
- 	spin_unlock_irq(q->queue_lock);
- out_bypass_end:
--	if (q->mq_ops)
-+	if (queue_is_mq(q))
- 		blk_mq_unfreeze_queue(q);
- 	if (pd_prealloc)
- 		pol->pd_free_fn(pd_prealloc);
-@@ -1412,7 +1412,7 @@ void blkcg_deactivate_policy(struct request_queue *q,
- 	if (!blkcg_policy_enabled(q, pol))
- 		return;
- 
--	if (q->mq_ops)
-+	if (queue_is_mq(q))
- 		blk_mq_freeze_queue(q);
- 
- 	spin_lock_irq(q->queue_lock);
-@@ -1430,7 +1430,7 @@ void blkcg_deactivate_policy(struct request_queue *q,
- 
- 	spin_unlock_irq(q->queue_lock);
- 
--	if (q->mq_ops)
-+	if (queue_is_mq(q))
- 		blk_mq_unfreeze_queue(q);
- }
- EXPORT_SYMBOL_GPL(blkcg_deactivate_policy);
 diff --git a/block/blk-core.c b/block/blk-core.c
-index fdc0ad2686c4..ab6675fd3568 100644
+index ab6675fd3568..88400ab166ac 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -268,7 +268,7 @@ void blk_sync_queue(struct request_queue *q)
- 	del_timer_sync(&q->timeout);
- 	cancel_work_sync(&q->timeout_work);
+@@ -656,8 +656,8 @@ struct request *blk_get_request(struct request_queue *q, unsigned int op,
+ 	WARN_ON_ONCE(flags & ~(BLK_MQ_REQ_NOWAIT | BLK_MQ_REQ_PREEMPT));
  
--	if (q->mq_ops) {
-+	if (queue_is_mq(q)) {
- 		struct blk_mq_hw_ctx *hctx;
- 		int i;
+ 	req = blk_mq_alloc_request(q, op, flags);
+-	if (!IS_ERR(req) && q->mq_ops->initialize_rq_fn)
+-		q->mq_ops->initialize_rq_fn(req);
++	if (!IS_ERR(req) && q->mq_ops.initialize_rq_fn)
++		q->mq_ops.initialize_rq_fn(req);
  
-@@ -317,7 +317,7 @@ void blk_set_queue_dying(struct request_queue *q)
- 	 */
- 	blk_freeze_queue_start(q);
- 
--	if (q->mq_ops)
-+	if (queue_is_mq(q))
- 		blk_mq_wake_waiters(q);
- 
- 	/* Make blk_queue_enter() reexamine the DYING flag. */
-@@ -410,7 +410,7 @@ void blk_cleanup_queue(struct request_queue *q)
- 	 * blk_freeze_queue() should be enough for cases of passthrough
- 	 * request.
- 	 */
--	if (q->mq_ops && blk_queue_init_done(q))
-+	if (queue_is_mq(q) && blk_queue_init_done(q))
- 		blk_mq_quiesce_queue(q);
- 
- 	/* for synchronous bio-based driver finish in-flight integrity i/o */
-@@ -428,7 +428,7 @@ void blk_cleanup_queue(struct request_queue *q)
- 
- 	blk_exit_queue(q);
- 
--	if (q->mq_ops)
-+	if (queue_is_mq(q))
- 		blk_mq_free_queue(q);
- 
- 	percpu_ref_exit(&q->q_usage_counter);
-@@ -1736,7 +1736,7 @@ EXPORT_SYMBOL_GPL(rq_flush_dcache_pages);
+ 	return req;
+ }
+@@ -1736,8 +1736,8 @@ EXPORT_SYMBOL_GPL(rq_flush_dcache_pages);
   */
  int blk_lld_busy(struct request_queue *q)
  {
--	if (q->mq_ops && q->mq_ops->busy)
-+	if (queue_is_mq(q) && q->mq_ops->busy)
- 		return q->mq_ops->busy(q);
+-	if (queue_is_mq(q) && q->mq_ops->busy)
+-		return q->mq_ops->busy(q);
++	if (q->mq_ops.busy)
++		return q->mq_ops.busy(q);
  
  	return 0;
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index c53197dcdd70..3b79bea03462 100644
---- a/block/blk-flush.c
-+++ b/block/blk-flush.c
-@@ -273,8 +273,7 @@ static void blk_kick_flush(struct request_queue *q, struct blk_flush_queue *fq,
- 	 * assigned to empty flushes, and we deadlock if we are expecting
- 	 * other requests to make progress. Don't defer for that case.
- 	 */
--	if (!list_empty(&fq->flush_data_in_flight) &&
--	    !(q->mq_ops && q->elevator) &&
-+	if (!list_empty(&fq->flush_data_in_flight) && q->elevator &&
- 	    time_before(jiffies,
- 			fq->flush_pending_since + FLUSH_PENDING_TIMEOUT))
- 		return;
+ }
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index f021f4817b80..efdfb6258e03 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -354,7 +354,7 @@ static const char *blk_mq_rq_state_name(enum mq_rq_state rq_state)
+ 
+ int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq)
+ {
+-	const struct blk_mq_ops *const mq_ops = rq->q->mq_ops;
++	const struct blk_mq_ops *const mq_ops = &rq->q->mq_ops;
+ 	const unsigned int op = rq->cmd_flags & REQ_OP_MASK;
+ 
+ 	seq_printf(m, "%p {.op=", rq);
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 411be60d0cb6..eb9b9596d3de 100644
+index eb9b9596d3de..6e0cb6adfc90 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -150,7 +150,7 @@ void blk_freeze_queue_start(struct request_queue *q)
- 	freeze_depth = atomic_inc_return(&q->mq_freeze_depth);
- 	if (freeze_depth == 1) {
- 		percpu_ref_kill(&q->q_usage_counter);
--		if (q->mq_ops)
-+		if (queue_is_mq(q))
- 			blk_mq_run_hw_queues(q, false);
- 	}
+@@ -558,7 +558,7 @@ static void __blk_mq_complete_request_remote(void *data)
+ 	struct request *rq = data;
+ 	struct request_queue *q = rq->q;
+ 
+-	q->mq_ops->complete(rq);
++	q->mq_ops.complete(rq);
  }
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index d4b1b84ba8ca..93635a693314 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -68,7 +68,7 @@ queue_requests_store(struct request_queue *q, const char *page, size_t count)
- 	unsigned long nr;
- 	int ret, err;
  
--	if (!q->mq_ops)
-+	if (!queue_is_mq(q))
- 		return -EINVAL;
- 
- 	ret = queue_var_store(&nr, page, count);
-@@ -839,12 +839,12 @@ static void __blk_release_queue(struct work_struct *work)
- 
- 	blk_queue_free_zone_bitmaps(q);
- 
--	if (q->mq_ops)
-+	if (queue_is_mq(q))
- 		blk_mq_release(q);
- 
- 	blk_trace_shutdown(q);
- 
--	if (q->mq_ops)
-+	if (queue_is_mq(q))
- 		blk_mq_debugfs_unregister(q);
- 
- 	bioset_exit(&q->bio_split);
-@@ -918,7 +918,7 @@ int blk_register_queue(struct gendisk *disk)
- 		goto unlock;
+ static void __blk_mq_complete_request(struct request *rq)
+@@ -586,7 +586,7 @@ static void __blk_mq_complete_request(struct request *rq)
  	}
  
--	if (q->mq_ops) {
-+	if (queue_is_mq(q)) {
- 		__blk_mq_register_dev(dev, q);
- 		blk_mq_debugfs_register(q);
- 	}
-@@ -929,7 +929,7 @@ int blk_register_queue(struct gendisk *disk)
- 
- 	blk_throtl_register_queue(q);
- 
--	if ((q->mq_ops && q->elevator)) {
-+	if (q->elevator) {
- 		ret = elv_register_queue(q);
- 		if (ret) {
- 			mutex_unlock(&q->sysfs_lock);
-@@ -978,7 +978,7 @@ void blk_unregister_queue(struct gendisk *disk)
- 	 * Remove the sysfs attributes before unregistering the queue data
- 	 * structures that can be modified through sysfs.
- 	 */
--	if (q->mq_ops)
-+	if (queue_is_mq(q))
- 		blk_mq_unregister_dev(disk_to_dev(disk), q);
- 	mutex_unlock(&q->sysfs_lock);
- 
-@@ -987,7 +987,7 @@ void blk_unregister_queue(struct gendisk *disk)
- 	blk_trace_remove_sysfs(disk_to_dev(disk));
- 
- 	mutex_lock(&q->sysfs_lock);
--	if (q->mq_ops && q->elevator)
-+	if (q->elevator)
- 		elv_unregister_queue(q);
- 	mutex_unlock(&q->sysfs_lock);
- 
-diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-index 0fc222d4194b..b580763e8b1e 100644
---- a/block/blk-wbt.c
-+++ b/block/blk-wbt.c
-@@ -709,7 +709,7 @@ void wbt_enable_default(struct request_queue *q)
- 	if (!test_bit(QUEUE_FLAG_REGISTERED, &q->queue_flags))
+ 	if (!test_bit(QUEUE_FLAG_SAME_COMP, &q->queue_flags)) {
+-		q->mq_ops->complete(rq);
++		q->mq_ops.complete(rq);
  		return;
+ 	}
  
--	if (q->mq_ops && IS_ENABLED(CONFIG_BLK_WBT_MQ))
-+	if (queue_is_mq(q) && IS_ENABLED(CONFIG_BLK_WBT_MQ))
- 		wbt_init(q);
+@@ -600,7 +600,7 @@ static void __blk_mq_complete_request(struct request *rq)
+ 		rq->csd.flags = 0;
+ 		smp_call_function_single_async(ctx->cpu, &rq->csd);
+ 	} else {
+-		q->mq_ops->complete(rq);
++		q->mq_ops.complete(rq);
+ 	}
+ 	put_cpu();
  }
- EXPORT_SYMBOL_GPL(wbt_enable_default);
-diff --git a/block/elevator.c b/block/elevator.c
-index 19351ffa56b1..9df9ae6b038e 100644
---- a/block/elevator.c
-+++ b/block/elevator.c
-@@ -674,7 +674,7 @@ static int __elevator_change(struct request_queue *q, const char *name)
- 	/*
- 	 * Special case for mq, turn off scheduling
- 	 */
--	if (q->mq_ops && !strncmp(name, "none", 4))
-+	if (!strncmp(name, "none", 4))
- 		return elevator_switch(q, NULL);
- 
- 	strlcpy(elevator_name, name, sizeof(elevator_name));
-@@ -692,8 +692,7 @@ static int __elevator_change(struct request_queue *q, const char *name)
- 
- static inline bool elv_support_iosched(struct request_queue *q)
+@@ -818,10 +818,10 @@ EXPORT_SYMBOL_GPL(blk_mq_queue_busy);
+ static void blk_mq_rq_timed_out(struct request *req, bool reserved)
  {
--	if (q->mq_ops && q->tag_set && (q->tag_set->flags &
--				BLK_MQ_F_NO_SCHED))
-+	if (q->tag_set && (q->tag_set->flags & BLK_MQ_F_NO_SCHED))
- 		return false;
+ 	req->rq_flags |= RQF_TIMED_OUT;
+-	if (req->q->mq_ops->timeout) {
++	if (req->q->mq_ops.timeout) {
+ 		enum blk_eh_timer_return ret;
+ 
+-		ret = req->q->mq_ops->timeout(req, reserved);
++		ret = req->q->mq_ops.timeout(req, reserved);
+ 		if (ret == BLK_EH_DONE)
+ 			return;
+ 		WARN_ON_ONCE(ret != BLK_EH_RESET_TIMER);
+@@ -1221,7 +1221,7 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 			bd.last = !blk_mq_get_driver_tag(nxt);
+ 		}
+ 
+-		ret = q->mq_ops->queue_rq(hctx, &bd);
++		ret = q->mq_ops.queue_rq(hctx, &bd);
+ 		if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE) {
+ 			/*
+ 			 * If an I/O scheduler has been configured and we got a
+@@ -1746,7 +1746,7 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	 * Any other error (busy), just add it to our list as we
+ 	 * previously would have done.
+ 	 */
+-	ret = q->mq_ops->queue_rq(hctx, &bd);
++	ret = q->mq_ops.queue_rq(hctx, &bd);
+ 	switch (ret) {
+ 	case BLK_STS_OK:
+ 		blk_mq_update_dispatch_busy(hctx, false);
+@@ -2723,7 +2723,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 						  struct request_queue *q)
+ {
+ 	/* mark the queue as mq asap */
+-	q->mq_ops = set->ops;
++	memcpy((void *) &q->mq_ops, set->ops, sizeof(q->mq_ops));
+ 
+ 	q->poll_cb = blk_stat_alloc_callback(blk_mq_poll_stats_fn,
+ 					     blk_mq_poll_stats_bkt,
+@@ -2765,7 +2765,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	spin_lock_init(&q->requeue_lock);
+ 
+ 	blk_queue_make_request(q, blk_mq_make_request);
+-	if (q->mq_ops->poll)
++	if (q->mq_ops.poll)
+ 		q->poll_fn = blk_mq_poll;
+ 
+ 	/*
+@@ -2797,7 +2797,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ err_percpu:
+ 	free_percpu(q->queue_ctx);
+ err_exit:
+-	q->mq_ops = NULL;
++	memset((void *) &q->mq_ops, 0, sizeof(q->mq_ops));
+ 	return ERR_PTR(-ENOMEM);
+ }
+ EXPORT_SYMBOL(blk_mq_init_allocated_queue);
+@@ -3328,7 +3328,7 @@ static bool __blk_mq_poll(struct blk_mq_hw_ctx *hctx, struct request *rq)
+ 
+ 		hctx->poll_invoked++;
+ 
+-		ret = q->mq_ops->poll(hctx, rq->tag);
++		ret = q->mq_ops.poll(hctx, rq->tag);
+ 		if (ret > 0) {
+ 			hctx->poll_success++;
+ 			set_current_state(TASK_RUNNING);
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index facb6e9ddce4..1eb6a3e8af58 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -99,8 +99,8 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
+ {
+ 	int hctx_type = 0;
+ 
+-	if (q->mq_ops->rq_flags_to_type)
+-		hctx_type = q->mq_ops->rq_flags_to_type(q, flags);
++	if (q->mq_ops.rq_flags_to_type)
++		hctx_type = q->mq_ops.rq_flags_to_type(q, flags);
+ 
+ 	return blk_mq_map_queue_type(q, hctx_type, cpu);
+ }
+@@ -187,16 +187,16 @@ static inline void blk_mq_put_dispatch_budget(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+ 
+-	if (q->mq_ops->put_budget)
+-		q->mq_ops->put_budget(hctx);
++	if (q->mq_ops.put_budget)
++		q->mq_ops.put_budget(hctx);
+ }
+ 
+ static inline bool blk_mq_get_dispatch_budget(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct request_queue *q = hctx->queue;
+ 
+-	if (q->mq_ops->get_budget)
+-		return q->mq_ops->get_budget(hctx);
++	if (q->mq_ops.get_budget)
++		return q->mq_ops.get_budget(hctx);
  	return true;
  }
-@@ -703,7 +702,7 @@ ssize_t elv_iosched_store(struct request_queue *q, const char *name,
- {
- 	int ret;
  
--	if (!q->mq_ops || !elv_support_iosched(q))
-+	if (!queue_is_mq(q) || !elv_support_iosched(q))
- 		return count;
+diff --git a/block/blk-softirq.c b/block/blk-softirq.c
+index 1534066e306e..2f4176668470 100644
+--- a/block/blk-softirq.c
++++ b/block/blk-softirq.c
+@@ -34,7 +34,7 @@ static __latent_entropy void blk_done_softirq(struct softirq_action *h)
  
- 	ret = __elevator_change(q, name);
-@@ -739,7 +738,7 @@ ssize_t elv_iosched_show(struct request_queue *q, char *name)
+ 		rq = list_entry(local_list.next, struct request, ipi_list);
+ 		list_del_init(&rq->ipi_list);
+-		rq->q->mq_ops->complete(rq);
++		rq->q->mq_ops.complete(rq);
  	}
- 	spin_unlock(&elv_list_lock);
- 
--	if (q->mq_ops && q->elevator)
-+	if (q->elevator)
- 		len += sprintf(name+len, "none");
- 
- 	len += sprintf(len+name, "\n");
-diff --git a/block/genhd.c b/block/genhd.c
-index cff6bdf27226..0145bcb0cc76 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -47,7 +47,7 @@ static void disk_release_events(struct gendisk *disk);
- 
- void part_inc_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
- {
--	if (q->mq_ops)
-+	if (queue_is_mq(q))
- 		return;
- 
- 	atomic_inc(&part->in_flight[rw]);
-@@ -57,7 +57,7 @@ void part_inc_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
- 
- void part_dec_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
- {
--	if (q->mq_ops)
-+	if (queue_is_mq(q))
- 		return;
- 
- 	atomic_dec(&part->in_flight[rw]);
-@@ -68,7 +68,7 @@ void part_dec_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
- void part_in_flight(struct request_queue *q, struct hd_struct *part,
- 		    unsigned int inflight[2])
- {
--	if (q->mq_ops) {
-+	if (queue_is_mq(q)) {
- 		blk_mq_in_flight(q, part, inflight);
- 		return;
- 	}
-@@ -85,7 +85,7 @@ void part_in_flight(struct request_queue *q, struct hd_struct *part,
- void part_in_flight_rw(struct request_queue *q, struct hd_struct *part,
- 		       unsigned int inflight[2])
- {
--	if (q->mq_ops) {
-+	if (queue_is_mq(q)) {
- 		blk_mq_in_flight_rw(q, part, inflight);
- 		return;
- 	}
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 9038c302d5c2..e42739177107 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -919,7 +919,7 @@ static int device_is_rq_based(struct dm_target *ti, struct dm_dev *dev,
- 	struct request_queue *q = bdev_get_queue(dev->bdev);
- 	struct verify_rq_based_data *v = data;
- 
--	if (q->mq_ops)
-+	if (queue_is_mq(q))
- 		v->mq_count++;
- 	else
- 		v->sq_count++;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index e67ad2dd025e..3712d1fe48d4 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -671,13 +671,17 @@ static inline bool blk_account_rq(struct request *rq)
- 
- #define rq_data_dir(rq)		(op_is_write(req_op(rq)) ? WRITE : READ)
- 
-+static inline bool queue_is_mq(struct request_queue *q)
-+{
-+	return q->mq_ops;
-+}
-+
- /*
-- * Driver can handle struct request, if it either has an old style
-- * request_fn defined, or is blk-mq based.
-+ * Only blk-mq based drivers are rq based
-  */
- static inline bool queue_is_rq_based(struct request_queue *q)
- {
--	return q->mq_ops;
-+	return queue_is_mq(q);
  }
  
- static inline unsigned int blk_queue_cluster(struct request_queue *q)
+@@ -102,7 +102,7 @@ void __blk_complete_request(struct request *req)
+ 	unsigned long flags;
+ 	bool shared = false;
+ 
+-	BUG_ON(!q->mq_ops->complete);
++	BUG_ON(!q->mq_ops.complete);
+ 
+ 	local_irq_save(flags);
+ 	cpu = smp_processor_id();
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 93635a693314..9661ef5b390f 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -380,7 +380,7 @@ static ssize_t queue_poll_delay_store(struct request_queue *q, const char *page,
+ {
+ 	int err, val;
+ 
+-	if (!q->mq_ops || !q->mq_ops->poll)
++	if (!q->mq_ops.poll)
+ 		return -EINVAL;
+ 
+ 	err = kstrtoint(page, 10, &val);
+@@ -406,7 +406,7 @@ static ssize_t queue_poll_store(struct request_queue *q, const char *page,
+ 	unsigned long poll_on;
+ 	ssize_t ret;
+ 
+-	if (!q->mq_ops || !q->mq_ops->poll)
++	if (!q->mq_ops.poll)
+ 		return -EINVAL;
+ 
+ 	ret = queue_var_store(&poll_on, page, count);
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 5d83a162d03b..61babcb269ab 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1907,7 +1907,7 @@ struct scsi_device *scsi_device_from_queue(struct request_queue *q)
+ {
+ 	struct scsi_device *sdev = NULL;
+ 
+-	if (q->mq_ops == &scsi_mq_ops)
++	if (q->mq_ops.queue_rq == scsi_mq_ops.queue_rq)
+ 		sdev = q->queuedata;
+ 	if (!sdev || !get_device(&sdev->sdev_gendev))
+ 		sdev = NULL;
+diff --git a/include/linux/blk-mq-ops.h b/include/linux/blk-mq-ops.h
+new file mode 100644
+index 000000000000..0940c26875ca
+--- /dev/null
++++ b/include/linux/blk-mq-ops.h
+@@ -0,0 +1,100 @@
++#ifndef BLK_MQ_OPS_H
++#define BLK_MQ_OPS_H
++
++struct blk_mq_queue_data;
++struct blk_mq_hw_ctx;
++struct blk_mq_tag_set;
++
++typedef blk_status_t (queue_rq_fn)(struct blk_mq_hw_ctx *,
++		const struct blk_mq_queue_data *);
++/* takes rq->cmd_flags as input, returns a hardware type index */
++typedef int (rq_flags_to_type_fn)(struct request_queue *, unsigned int);
++typedef bool (get_budget_fn)(struct blk_mq_hw_ctx *);
++typedef void (put_budget_fn)(struct blk_mq_hw_ctx *);
++typedef enum blk_eh_timer_return (timeout_fn)(struct request *, bool);
++typedef int (init_hctx_fn)(struct blk_mq_hw_ctx *, void *, unsigned int);
++typedef void (exit_hctx_fn)(struct blk_mq_hw_ctx *, unsigned int);
++typedef int (init_request_fn)(struct blk_mq_tag_set *set, struct request *,
++		unsigned int, unsigned int);
++typedef void (exit_request_fn)(struct blk_mq_tag_set *set, struct request *,
++		unsigned int);
++
++typedef bool (busy_iter_fn)(struct blk_mq_hw_ctx *, struct request *, void *,
++		bool);
++typedef bool (busy_tag_iter_fn)(struct request *, void *, bool);
++typedef int (poll_fn)(struct blk_mq_hw_ctx *, unsigned int);
++typedef int (map_queues_fn)(struct blk_mq_tag_set *set);
++typedef bool (busy_fn)(struct request_queue *);
++typedef void (complete_fn)(struct request *);
++
++struct blk_mq_ops {
++	/*
++	 * Queue request
++	 */
++	queue_rq_fn		*queue_rq;
++
++	/*
++	 * Return a queue map type for the given request/bio flags
++	 */
++	rq_flags_to_type_fn	*rq_flags_to_type;
++
++	/*
++	 * Reserve budget before queue request, once .queue_rq is
++	 * run, it is driver's responsibility to release the
++	 * reserved budget. Also we have to handle failure case
++	 * of .get_budget for avoiding I/O deadlock.
++	 */
++	get_budget_fn		*get_budget;
++	put_budget_fn		*put_budget;
++
++	/*
++	 * Called on request timeout
++	 */
++	timeout_fn		*timeout;
++
++	/*
++	 * Called to poll for completion of a specific tag.
++	 */
++	poll_fn			*poll;
++
++	complete_fn		*complete;
++
++	/*
++	 * Called when the block layer side of a hardware queue has been
++	 * set up, allowing the driver to allocate/init matching structures.
++	 * Ditto for exit/teardown.
++	 */
++	init_hctx_fn		*init_hctx;
++	exit_hctx_fn		*exit_hctx;
++
++	/*
++	 * Called for every command allocated by the block layer to allow
++	 * the driver to set up driver specific data.
++	 *
++	 * Tag greater than or equal to queue_depth is for setting up
++	 * flush request.
++	 *
++	 * Ditto for exit/teardown.
++	 */
++	init_request_fn		*init_request;
++	exit_request_fn		*exit_request;
++	/* Called from inside blk_get_request() */
++	void (*initialize_rq_fn)(struct request *rq);
++
++	/*
++	 * If set, returns whether or not this queue currently is busy
++	 */
++	busy_fn			*busy;
++
++	map_queues_fn		*map_queues;
++
++#ifdef CONFIG_BLK_DEBUG_FS
++	/*
++	 * Used by the debugfs implementation to show driver-specific
++	 * information about a request.
++	 */
++	void (*show_rq)(struct seq_file *m, struct request *rq);
++#endif
++};
++
++#endif
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 929e8abc5535..e32e9293e5a0 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -5,6 +5,7 @@
+ #include <linux/blkdev.h>
+ #include <linux/sbitmap.h>
+ #include <linux/srcu.h>
++#include <linux/blk-mq-ops.h>
+ 
+ struct blk_mq_tags;
+ struct blk_flush_queue;
+@@ -115,99 +116,6 @@ struct blk_mq_queue_data {
+ 	bool last;
+ };
+ 
+-typedef blk_status_t (queue_rq_fn)(struct blk_mq_hw_ctx *,
+-		const struct blk_mq_queue_data *);
+-/* takes rq->cmd_flags as input, returns a hardware type index */
+-typedef int (rq_flags_to_type_fn)(struct request_queue *, unsigned int);
+-typedef bool (get_budget_fn)(struct blk_mq_hw_ctx *);
+-typedef void (put_budget_fn)(struct blk_mq_hw_ctx *);
+-typedef enum blk_eh_timer_return (timeout_fn)(struct request *, bool);
+-typedef int (init_hctx_fn)(struct blk_mq_hw_ctx *, void *, unsigned int);
+-typedef void (exit_hctx_fn)(struct blk_mq_hw_ctx *, unsigned int);
+-typedef int (init_request_fn)(struct blk_mq_tag_set *set, struct request *,
+-		unsigned int, unsigned int);
+-typedef void (exit_request_fn)(struct blk_mq_tag_set *set, struct request *,
+-		unsigned int);
+-
+-typedef bool (busy_iter_fn)(struct blk_mq_hw_ctx *, struct request *, void *,
+-		bool);
+-typedef bool (busy_tag_iter_fn)(struct request *, void *, bool);
+-typedef int (poll_fn)(struct blk_mq_hw_ctx *, unsigned int);
+-typedef int (map_queues_fn)(struct blk_mq_tag_set *set);
+-typedef bool (busy_fn)(struct request_queue *);
+-typedef void (complete_fn)(struct request *);
+-
+-
+-struct blk_mq_ops {
+-	/*
+-	 * Queue request
+-	 */
+-	queue_rq_fn		*queue_rq;
+-
+-	/*
+-	 * Return a queue map type for the given request/bio flags
+-	 */
+-	rq_flags_to_type_fn	*rq_flags_to_type;
+-
+-	/*
+-	 * Reserve budget before queue request, once .queue_rq is
+-	 * run, it is driver's responsibility to release the
+-	 * reserved budget. Also we have to handle failure case
+-	 * of .get_budget for avoiding I/O deadlock.
+-	 */
+-	get_budget_fn		*get_budget;
+-	put_budget_fn		*put_budget;
+-
+-	/*
+-	 * Called on request timeout
+-	 */
+-	timeout_fn		*timeout;
+-
+-	/*
+-	 * Called to poll for completion of a specific tag.
+-	 */
+-	poll_fn			*poll;
+-
+-	complete_fn		*complete;
+-
+-	/*
+-	 * Called when the block layer side of a hardware queue has been
+-	 * set up, allowing the driver to allocate/init matching structures.
+-	 * Ditto for exit/teardown.
+-	 */
+-	init_hctx_fn		*init_hctx;
+-	exit_hctx_fn		*exit_hctx;
+-
+-	/*
+-	 * Called for every command allocated by the block layer to allow
+-	 * the driver to set up driver specific data.
+-	 *
+-	 * Tag greater than or equal to queue_depth is for setting up
+-	 * flush request.
+-	 *
+-	 * Ditto for exit/teardown.
+-	 */
+-	init_request_fn		*init_request;
+-	exit_request_fn		*exit_request;
+-	/* Called from inside blk_get_request() */
+-	void (*initialize_rq_fn)(struct request *rq);
+-
+-	/*
+-	 * If set, returns whether or not this queue currently is busy
+-	 */
+-	busy_fn			*busy;
+-
+-	map_queues_fn		*map_queues;
+-
+-#ifdef CONFIG_BLK_DEBUG_FS
+-	/*
+-	 * Used by the debugfs implementation to show driver-specific
+-	 * information about a request.
+-	 */
+-	void (*show_rq)(struct seq_file *m, struct request *rq);
+-#endif
+-};
+-
+ enum {
+ 	BLK_MQ_F_SHOULD_MERGE	= 1 << 0,
+ 	BLK_MQ_F_TAG_SHARED	= 1 << 1,
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 3712d1fe48d4..ad8474ec8c58 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -28,6 +28,8 @@
+ #include <linux/scatterlist.h>
+ #include <linux/blkzoned.h>
+ 
++#include <linux/blk-mq-ops.h>
++
+ struct module;
+ struct scsi_ioctl_command;
+ 
+@@ -406,7 +408,7 @@ struct request_queue {
+ 	poll_q_fn		*poll_fn;
+ 	dma_drain_needed_fn	*dma_drain_needed;
+ 
+-	const struct blk_mq_ops	*mq_ops;
++	const struct blk_mq_ops	mq_ops;
+ 
+ 	/* sw queues */
+ 	struct blk_mq_ctx __percpu	*queue_ctx;
+@@ -673,7 +675,7 @@ static inline bool blk_account_rq(struct request *rq)
+ 
+ static inline bool queue_is_mq(struct request_queue *q)
+ {
+-	return q->mq_ops;
++	return q->mq_ops.queue_rq != NULL;
+ }
+ 
+ /*
 -- 
 2.17.1
 
