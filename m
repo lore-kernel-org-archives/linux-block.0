@@ -2,121 +2,137 @@ Return-Path: <SRS0=aXbO=NY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1791BC43441
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 16:59:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9660C43441
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 17:54:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D16A922419
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 16:59:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BC04208A3
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 17:54:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="OAUyrok8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D16A922419
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="RwoGukJJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BC04208A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727475AbeKNC6B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Nov 2018 21:58:01 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:51648 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727042AbeKNC6B (ORCPT
+        id S1732124AbeKNDxP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Nov 2018 22:53:15 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:41727 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732121AbeKNDxP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Nov 2018 21:58:01 -0500
-Received: by mail-it1-f193.google.com with SMTP id m34-v6so19298696iti.1
-        for <linux-block@vger.kernel.org>; Tue, 13 Nov 2018 08:59:05 -0800 (PST)
+        Tue, 13 Nov 2018 22:53:15 -0500
+Received: by mail-wr1-f66.google.com with SMTP id v18-v6so14336384wrt.8
+        for <linux-block@vger.kernel.org>; Tue, 13 Nov 2018 09:54:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=HjHcq6+0x+tmwM8mNX0CTBpJ7rdlQDgiGUdpWB/Ln+E=;
-        b=OAUyrok82+mHYODjMqPZhLLcHS/m7jY/FS5kAbp2B4vg6KMJt8VX+b7tk8mKshW9QH
-         hPgiSF5omz1QSAhbgHE8HGeADhvilELTwL378IkKSys1HW1KgJ5AhesOViRNHDhZXN51
-         0pDwehEfV6o9iUxWLVj9K6Vtw3uyP3tn4Yl7544Oz5Ev+mGYAEoXP1dsNjigmLpJz4ob
-         NZKtiXtdkw4xqJrZaAhms4wVwqvqdH8uiMyGMftoLXKeKj0B0zwbu0Xuymlww4gMpa0D
-         nGMJDt6M7RyZ3R55zGblIHWalhsvTHozvneg4cuXkl3cTLSxpHA7fY80KlWpjF0xb107
-         smnA==
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=/UQjNl9KMYOO2L/Btjnus7YePUZ4dnRxDDZ4QOFJ+4Q=;
+        b=RwoGukJJ7K/gZSt1+7JVUvI3S4b7QqodpFcNlk4KWLoTAHsfD+7zFrfMXBRT2KUp59
+         gmmc8Mwn2I91WRjCnL5QxXqgapAXgG9n+I5bljScvf4yFYSXXn7GxZIf4pJWI4rj60Gu
+         CikS/N9nWD+xRVUir63QNA8LGtTC6vAjqY2M0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=HjHcq6+0x+tmwM8mNX0CTBpJ7rdlQDgiGUdpWB/Ln+E=;
-        b=WRJ+P47b1EG83/Xoa0d4HDGI3QoOS8iIb10zmWAKAeF0Yf9xGmvygtt0i1oWL9ZfSm
-         3mMyx7u+myAq7V+Z+Wll7ufi5+5ZRn4W/pmdkwsJFvSwcbW0YHiPdZLdF76s+2B/8vx9
-         qONpWmJzogtm7LuTUBTgPbKvwUAboIwaqGQUlhuX/p4tcyp66jax/JlD70FpF61nKuU5
-         QUa1q+vdUj5Rqc6rw0ibvlzPp46XMzuuQtPsSJsgJ1qbDmVZptrNX8hNbrGtGK4FS2LA
-         SQSiaDQZ2Kip9O6Xdb7Y6yH5rWOZjavmgRvk1dP7fSXaMsyUFTxhy+/ZgrclcLKlPmsG
-         DL7Q==
-X-Gm-Message-State: AGRZ1gKMZGWltIFNhTajxPAUxkOF8O2m7yh2xyRu6OCGeDHUjuszcr4Z
-        FXIQu+99sBKZZWJuvXiYvx1GnNnCQFU=
-X-Google-Smtp-Source: AJdET5dsDN6gh9DyipXScMuc/QL3FHhY5GwjZxREpShD8xAzX0KbudOT7PNPoypP/9ZuBGwEPTEvtw==
-X-Received: by 2002:a24:2190:: with SMTP id e138-v6mr4433684ita.71.1542128344160;
-        Tue, 13 Nov 2018 08:59:04 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id x25-v6sm6442104iob.84.2018.11.13.08.59.02
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=/UQjNl9KMYOO2L/Btjnus7YePUZ4dnRxDDZ4QOFJ+4Q=;
+        b=IPHDJOTvA9wKWiu61+IrC1joOUKezVvMPKw/G92PR+lgdiOzQ13vWCG1n4trrSw+De
+         xJLFNYRZlwPM5L41mNzQeI/NCXFg8leFZ3Mg2T//5e2PKYxmJwtV3e/nel1L1QCaX4rx
+         cXC/gFXaoP+X5Q82nkit8bX0+lDOdEMQDsvgaBpBh5DKn7ZzbdgxIjYNkHWQLfc77gIY
+         yJIjsVqdrvOBAB1ioWgHL3FH0JgC0agT5Uja6kfA4bp7SAxvS3JOH2Ahfx/Qj0vrOy3m
+         yK15yeDafYh7mRNylmJi4wisQ/F/0Fw4dPXCsEcPbMWt70KOyY0X3K3dMj4RVQB2IY0m
+         ZIFg==
+X-Gm-Message-State: AGRZ1gJ8qw9qz5d2IcRksQYjwOGVC8HHqBS2YcVml2i7p99s/7lh3uVJ
+        3I4ivOCclXlQV+IOf0Rer0FSv3M+nyMAvw==
+X-Google-Smtp-Source: AJdET5fGd69cAnQiv9zPmoRQwPq2c1CklzuciKUSYyExsZzkPQJ40RmSlVwE+qust4ExGWpLvpez/Q==
+X-Received: by 2002:a5d:410e:: with SMTP id l14mr4220381wrp.61.1542131644683;
+        Tue, 13 Nov 2018 09:54:04 -0800 (PST)
+Received: from [192.168.43.112] ([37.180.154.12])
+        by smtp.gmail.com with ESMTPSA id 125-v6sm15077606wmm.25.2018.11.13.09.54.01
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 13 Nov 2018 08:59:02 -0800 (PST)
-Subject: Re: [PATCH 06/11] block: add polled wakeup task helper
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Keith Busch <keith.busch@intel.com>
-Cc:     linux-block@vger.kernel.org
-References: <20181113154233.15256-1-axboe@kernel.dk>
- <20181113154233.15256-7-axboe@kernel.dk>
- <20181113155255.GB9827@localhost.localdomain>
- <a811ef9b-c72d-73ba-93aa-27c6a4b2f112@kernel.dk>
-Message-ID: <7fa09eed-d7ff-ee8c-6644-552d1f7f5607@kernel.dk>
-Date:   Tue, 13 Nov 2018 09:59:01 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <a811ef9b-c72d-73ba-93aa-27c6a4b2f112@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Tue, 13 Nov 2018 09:54:04 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
+Subject: Re: [PATCH 01/12] kernfs: add function to find kernfs_node without
+ increasing ref counter
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20181112122840.GA1429@kroah.com>
+Date:   Tue, 13 Nov 2018 18:53:59 +0100
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Li Zefan <lizefan@huawei.com>,
+        Angelo Ruocco <angeloruocco90@gmail.com>,
+        Dennis Zhou <dennis@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Liu Bo <bo.liu@linux.alibaba.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Mark Brown <broonie@kernel.org>, bfq-iosched@googlegroups.com,
+        oleksandr@natalenko.name, cgroups@vger.kernel.org,
+        linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <07A5F685-9D7D-42A7-9A10-73C658F47435@linaro.org>
+References: <20181112095632.69114-1-paolo.valente@linaro.org>
+ <20181112095632.69114-2-paolo.valente@linaro.org>
+ <20181112122840.GA1429@kroah.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+X-Mailer: Apple Mail (2.3445.100.39)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/13/18 8:58 AM, Jens Axboe wrote:
-> On 11/13/18 8:52 AM, Keith Busch wrote:
->> On Tue, Nov 13, 2018 at 08:42:28AM -0700, Jens Axboe wrote:
->>> If we're polling for IO on a device that doesn't use interrupts, then
->>> IO completion loop (and wake of task) is done by submitting task itself.
->>> If that is the case, then we don't need to enter the wake_up_process()
->>> function, we can simply mark ourselves as TASK_RUNNING.
->>>
->>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->>> ---
->>>  fs/block_dev.c         |  6 ++----
->>>  fs/iomap.c             |  3 +--
->>>  include/linux/blkdev.h | 19 +++++++++++++++++++
->>>  3 files changed, 22 insertions(+), 6 deletions(-)
->>
->> One more for swap read:
->>
->> ---
->> diff --git a/mm/page_io.c b/mm/page_io.c
->> index d4d1c89bcddd..57572ff46016 100644
->> --- a/mm/page_io.c
->> +++ b/mm/page_io.c
->> @@ -140,7 +140,7 @@ static void end_swap_bio_read(struct bio *bio)
->>  	unlock_page(page);
->>  	WRITE_ONCE(bio->bi_private, NULL);
->>  	bio_put(bio);
->> -	wake_up_process(waiter);
->> +	blk_wake_io_task(waiter);
->>  	put_task_struct(waiter);
->>  }
->>  
-> 
-> Indeed, thanks Keith! I'll fold it in.
 
-Ditto for the patch 5 changes, jfyi.
 
--- 
-Jens Axboe
+> Il giorno 12 nov 2018, alle ore 13:28, Greg Kroah-Hartman =
+<gregkh@linuxfoundation.org> ha scritto:
+>=20
+> On Mon, Nov 12, 2018 at 10:56:21AM +0100, Paolo Valente wrote:
+>> From: Angelo Ruocco <angeloruocco90@gmail.com>
+>>=20
+>> The kernfs pseudo file system doesn't export any function to only =
+find
+>> a node by name, without also getting a reference on it.
+>> But in some cases it is useful to just locate a kernfs node, while
+>> using it or not depends on some other condition.
+>>=20
+>> This commit adds a function to just look for a node, without getting
+>> a reference on it.
+>=20
+> Eeek, that sounds really bad.  So you save off a pointer to something,
+> and have no idea if that pointer now really is valid or not?  It can
+> instantly disappear right afterwards.
+>=20
+
+Hi Greg,
+that function is invoked only in functions executed with cgroup_mutex
+held.  This guarantees that nothing disappears or becomes
+inconsistent.  That's why we decided to go for this optimization,
+instead of doing useless gets&puts pairs.  Still, I'm not expert
+enough to state whether it is impossible that, once we have defined
+that function, it may then get used in some unsafe way.
+
+So, I seem to see two options:
+1) Add a comment on the function, saying that cgroup_mutex must be
+   held while invoking it (I guess you won't like this one).
+2) Do not define such a new function, and, in the other patches, use
+   the already-available find_and_get.
+
+Looking forward to your feedback (or of other knowledgeable people on
+this issue) before proceeding to a rebased V2,
+Paolo
+
+
+> This feels wrong, what is the problem of having a properly reference
+> counted object passed back to you that you have to create a dangerous
+> function like this?
+>=20
+> greg k-h
 
