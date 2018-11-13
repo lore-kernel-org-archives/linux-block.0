@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5A84C43441
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 06:02:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 292EBC43441
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 06:06:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7C78A223CB
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 06:02:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E47832245E
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 06:06:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="VUCr8DAP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C78A223CB
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="WCN8d7ys"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E47832245E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731898AbeKMPr0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Nov 2018 10:47:26 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33152 "EHLO mail.kernel.org"
+        id S1730886AbeKMPqW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Nov 2018 10:46:22 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59910 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731899AbeKMPrZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Nov 2018 10:47:25 -0500
+        id S1730805AbeKMPqV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Nov 2018 10:46:21 -0500
 Received: from sasha-vm.mshome.net (unknown [64.114.255.114])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9E5C62251E;
-        Tue, 13 Nov 2018 05:50:57 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id B105622507;
+        Tue, 13 Nov 2018 05:49:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1542088257;
-        bh=spIXaDN35EY+I/TFb7sgPVyMmQJTJiTnB5b2c5TPCpQ=;
+        s=default; t=1542088193;
+        bh=XT3u7JQ5fxdfizeCMv6duT7LCiHvaRUtEVjHvZbgKps=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VUCr8DAPBnj7cbfeOrQ4MfDKvmH+9Czsg1zMiWAy8JF+zA3SOD6ifcmEjv4jzC0of
-         V7HA+9S1NVyyXAkx6aGOmtDdxv/mr6O4+kQSN19AJ4TSvGfoXrJI2rhGoxlEyA+Q++
-         D0HyqIoQA0KeRhYKgKSv9RbaayLllx6AvCFwtd24=
+        b=WCN8d7ysqR1LsM6y+l4wS5VIQW0EziAacaaWKEqVKxPVU+HBpL8V8q+ElsH/MpMhX
+         qv/BrmWkA44zvjT+WYaDKfoIvUx8qVVlAENIPqiHm2TEkh8gKS+7BkAdxoYnHmJymm
+         7wuvWnv4s2ND5gY5uTyj2V8tCkvWQJB87RT49JJ0=
 From:   Sasha Levin <sashal@kernel.org>
 To:     stable@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.18 06/39] block: brd: associate with queue until adding disk
-Date:   Tue, 13 Nov 2018 00:50:20 -0500
-Message-Id: <20181113055053.78352-6-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 06/44] block: brd: associate with queue until adding disk
+Date:   Tue, 13 Nov 2018 00:49:12 -0500
+Message-Id: <20181113054950.77898-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20181113055053.78352-1-sashal@kernel.org>
-References: <20181113055053.78352-1-sashal@kernel.org>
+In-Reply-To: <20181113054950.77898-1-sashal@kernel.org>
+References: <20181113054950.77898-1-sashal@kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -104,7 +104,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/block/brd.c b/drivers/block/brd.c
-index bb976598ee43..739f8dfd6fd7 100644
+index df8103dd40ac..c18586fccb6f 100644
 --- a/drivers/block/brd.c
 +++ b/drivers/block/brd.c
 @@ -396,15 +396,14 @@ static struct brd_device *brd_alloc(int i)
