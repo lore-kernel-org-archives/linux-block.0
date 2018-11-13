@@ -2,137 +2,141 @@ Return-Path: <SRS0=aXbO=NY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9660C43441
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 17:54:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9B56C43441
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 18:00:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8BC04208A3
-	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 17:54:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="RwoGukJJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8BC04208A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id BA1ED208A3
+	for <linux-block@archiver.kernel.org>; Tue, 13 Nov 2018 18:00:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA1ED208A3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732124AbeKNDxP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 13 Nov 2018 22:53:15 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:41727 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732121AbeKNDxP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 13 Nov 2018 22:53:15 -0500
-Received: by mail-wr1-f66.google.com with SMTP id v18-v6so14336384wrt.8
-        for <linux-block@vger.kernel.org>; Tue, 13 Nov 2018 09:54:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=/UQjNl9KMYOO2L/Btjnus7YePUZ4dnRxDDZ4QOFJ+4Q=;
-        b=RwoGukJJ7K/gZSt1+7JVUvI3S4b7QqodpFcNlk4KWLoTAHsfD+7zFrfMXBRT2KUp59
-         gmmc8Mwn2I91WRjCnL5QxXqgapAXgG9n+I5bljScvf4yFYSXXn7GxZIf4pJWI4rj60Gu
-         CikS/N9nWD+xRVUir63QNA8LGtTC6vAjqY2M0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=/UQjNl9KMYOO2L/Btjnus7YePUZ4dnRxDDZ4QOFJ+4Q=;
-        b=IPHDJOTvA9wKWiu61+IrC1joOUKezVvMPKw/G92PR+lgdiOzQ13vWCG1n4trrSw+De
-         xJLFNYRZlwPM5L41mNzQeI/NCXFg8leFZ3Mg2T//5e2PKYxmJwtV3e/nel1L1QCaX4rx
-         cXC/gFXaoP+X5Q82nkit8bX0+lDOdEMQDsvgaBpBh5DKn7ZzbdgxIjYNkHWQLfc77gIY
-         yJIjsVqdrvOBAB1ioWgHL3FH0JgC0agT5Uja6kfA4bp7SAxvS3JOH2Ahfx/Qj0vrOy3m
-         yK15yeDafYh7mRNylmJi4wisQ/F/0Fw4dPXCsEcPbMWt70KOyY0X3K3dMj4RVQB2IY0m
-         ZIFg==
-X-Gm-Message-State: AGRZ1gJ8qw9qz5d2IcRksQYjwOGVC8HHqBS2YcVml2i7p99s/7lh3uVJ
-        3I4ivOCclXlQV+IOf0Rer0FSv3M+nyMAvw==
-X-Google-Smtp-Source: AJdET5fGd69cAnQiv9zPmoRQwPq2c1CklzuciKUSYyExsZzkPQJ40RmSlVwE+qust4ExGWpLvpez/Q==
-X-Received: by 2002:a5d:410e:: with SMTP id l14mr4220381wrp.61.1542131644683;
-        Tue, 13 Nov 2018 09:54:04 -0800 (PST)
-Received: from [192.168.43.112] ([37.180.154.12])
-        by smtp.gmail.com with ESMTPSA id 125-v6sm15077606wmm.25.2018.11.13.09.54.01
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 13 Nov 2018 09:54:04 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
-Subject: Re: [PATCH 01/12] kernfs: add function to find kernfs_node without
- increasing ref counter
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20181112122840.GA1429@kroah.com>
-Date:   Tue, 13 Nov 2018 18:53:59 +0100
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Li Zefan <lizefan@huawei.com>,
-        Angelo Ruocco <angeloruocco90@gmail.com>,
-        Dennis Zhou <dennis@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Liu Bo <bo.liu@linux.alibaba.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Mark Brown <broonie@kernel.org>, bfq-iosched@googlegroups.com,
-        oleksandr@natalenko.name, cgroups@vger.kernel.org,
-        linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <07A5F685-9D7D-42A7-9A10-73C658F47435@linaro.org>
-References: <20181112095632.69114-1-paolo.valente@linaro.org>
- <20181112095632.69114-2-paolo.valente@linaro.org>
- <20181112122840.GA1429@kroah.com>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-X-Mailer: Apple Mail (2.3445.100.39)
+        id S1731961AbeKND7q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 13 Nov 2018 22:59:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:47382 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730995AbeKND7p (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 13 Nov 2018 22:59:45 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A323D30001E0;
+        Tue, 13 Nov 2018 18:00:34 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.149])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A1E1960150;
+        Tue, 13 Nov 2018 18:00:10 +0000 (UTC)
+Date:   Tue, 13 Nov 2018 13:00:09 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>, hch@lst.de, axboe@kernel.dk
+Cc:     Martin Wilck <mwilck@suse.com>, lijie <lijie34@huawei.com>,
+        xose.vazquez@gmail.com, linux-nvme@lists.infradead.org,
+        chengjike.cheng@huawei.com, shenhong09@huawei.com,
+        dm-devel@redhat.com, wangzhoumengjian@huawei.com, hare@suse.de,
+        christophe.varoqui@opensvc.com, bmarzins@redhat.com,
+        sschremm@netapp.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: multipath-tools: add ANA support for NVMe device
+Message-ID: <20181113180008.GA12513@redhat.com>
+References: <1541657381-7452-1-git-send-email-lijie34@huawei.com>
+ <2691abf6733f791fb16b86d96446440e4aaff99f.camel@suse.com>
+ <20181112215323.GA7983@redhat.com>
+ <20181113161838.GC9827@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181113161838.GC9827@localhost.localdomain>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Tue, 13 Nov 2018 18:00:35 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Nov 13 2018 at 11:18am -0500,
+Keith Busch <keith.busch@intel.com> wrote:
 
+> On Mon, Nov 12, 2018 at 04:53:23PM -0500, Mike Snitzer wrote:
+> > On Mon, Nov 12 2018 at 11:23am -0500,
+> > Martin Wilck <mwilck@suse.com> wrote:
+> > 
+> > > Hello Lijie,
+> > > 
+> > > On Thu, 2018-11-08 at 14:09 +0800, lijie wrote:
+> > > > Add support for Asynchronous Namespace Access as specified in NVMe
+> > > > 1.3
+> > > > TP 4004. The states are updated through reading the ANA log page.
+> > > > 
+> > > > By default, the native nvme multipath takes over the nvme device.
+> > > > We can pass a false to the parameter 'multipath' of the nvme-core.ko
+> > > > module,when we want to use multipath-tools.
+> > > 
+> > > Thank you for the patch. It looks quite good to me. I've tested it with
+> > > a Linux target and found no problems so far.
+> > > 
+> > > I have a few questions and comments inline below.
+> > > 
+> > > I suggest you also have a look at detect_prio(); it seems to make sense
+> > > to use the ana prioritizer for NVMe paths automatically if ANA is
+> > > supported (with your patch, "detect_prio no" and "prio ana" have to be
+> > > configured explicitly). But that can be done in a later patch.
+> > 
+> > I (and others) think it makes sense to at least triple check with the
+> > NVMe developers (now cc'd) to see if we could get agreement on the nvme
+> > driver providing the ANA state via sysfs (when modparam
+> > nvme_core.multipath=N is set), like Hannes proposed here:
+> > http://lists.infradead.org/pipermail/linux-nvme/2018-November/020765.html
+> > 
+> > Then the userspace multipath-tools ANA support could just read sysfs
+> > rather than reinvent harvesting the ANA state via ioctl.
+> 
+> I'd prefer not duplicating the log page parsing. Maybe nvme's shouldn't
+> even be tied to CONFIG_NVME_MULTIPATH so that the 'multipath' param
+> isn't even an issue.
 
-> Il giorno 12 nov 2018, alle ore 13:28, Greg Kroah-Hartman =
-<gregkh@linuxfoundation.org> ha scritto:
->=20
-> On Mon, Nov 12, 2018 at 10:56:21AM +0100, Paolo Valente wrote:
->> From: Angelo Ruocco <angeloruocco90@gmail.com>
->>=20
->> The kernfs pseudo file system doesn't export any function to only =
-find
->> a node by name, without also getting a reference on it.
->> But in some cases it is useful to just locate a kernfs node, while
->> using it or not depends on some other condition.
->>=20
->> This commit adds a function to just look for a node, without getting
->> a reference on it.
->=20
-> Eeek, that sounds really bad.  So you save off a pointer to something,
-> and have no idea if that pointer now really is valid or not?  It can
-> instantly disappear right afterwards.
->=20
+I like your instincts, we just need to take them a bit further.
 
-Hi Greg,
-that function is invoked only in functions executed with cgroup_mutex
-held.  This guarantees that nothing disappears or becomes
-inconsistent.  That's why we decided to go for this optimization,
-instead of doing useless gets&puts pairs.  Still, I'm not expert
-enough to state whether it is impossible that, once we have defined
-that function, it may then get used in some unsafe way.
+Splitting out the kernel's ANA log page parsing won't buy us much given
+it is userspace (multipath-tools) that needs to consume it.  The less
+work userspace needs to do (because kernel has already done it) the
+better.
 
-So, I seem to see two options:
-1) Add a comment on the function, saying that cgroup_mutex must be
-   held while invoking it (I guess you won't like this one).
-2) Do not define such a new function, and, in the other patches, use
-   the already-available find_and_get.
+If the NVMe driver is made to always track and export the ANA state via
+sysfs [1] we'd avoid userspace parsing duplication "for free".  This
+should occur regardless of what layer is reacting to the ANA state
+changes (be it NVMe's native multipathing or multipath-tools).
 
-Looking forward to your feedback (or of other knowledgeable people on
-this issue) before proceeding to a rebased V2,
-Paolo
+ANA and NVMe multipathing really are disjoint, making them tightly
+coupled only serves to force NVMe driver provided multipathing _or_
+userspace ANA state tracking duplication that really isn't ideal [2].
 
+We need a reasoned answer to the primary question of whether the NVMe
+maintainers are willing to cooperate by providing this basic ANA sysfs
+export even if nvme_core.multipath=N [1].
 
-> This feels wrong, what is the problem of having a properly reference
-> counted object passed back to you that you have to create a dangerous
-> function like this?
->=20
-> greg k-h
+Christoph said "No" [3], but offered little _real_ justification for why
+this isn't the right thing for NVMe in general -- even when asked the
+question gets ignored [4].
 
+The inability to provide proper justification for rejecting a patch
+(that already had one co-maintainer's Reviewed-by [5]) _should_ render
+that rejection baseless, and the patch applied (especially if there is
+contributing subsystem developer interest in maintaining this support
+over time, which there is).  At least that is what would happen in a
+properly maintained kernel subsystem.
+
+It'd really go a long way if senior Linux NVMe maintainers took steps to
+accept reasonable changes.
+
+Mike
+
+[1]: http://lists.infradead.org/pipermail/linux-nvme/2018-November/020765.html
+[2]: https://www.redhat.com/archives/dm-devel/2018-November/msg00072.html
+[3]: http://lists.infradead.org/pipermail/linux-nvme/2018-November/020815.html
+[4]: http://lists.infradead.org/pipermail/linux-nvme/2018-November/020846.html
+[5]: http://lists.infradead.org/pipermail/linux-nvme/2018-November/020790.html
