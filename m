@@ -2,142 +2,169 @@ Return-Path: <SRS0=CiZa=NZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C74DC43441
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 04:35:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEB29C43441
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 05:38:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 42DC32145D
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 04:35:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="hMXekelz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42DC32145D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	by mail.kernel.org (Postfix) with ESMTP id A97FA21780
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 05:38:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A97FA21780
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726517AbeKNOhU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Nov 2018 09:37:20 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:46036 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726813AbeKNOhU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Nov 2018 09:37:20 -0500
-Received: by mail-pg1-f196.google.com with SMTP id y4so6748299pgc.12
-        for <linux-block@vger.kernel.org>; Tue, 13 Nov 2018 20:35:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=14aqRMXHUzmh8MaY6T0TYYXxIjG0HLvTmbYMOmqP/1A=;
-        b=hMXekelzsjdy/O0oUpY034KEQwUHbGV7/CscTxpDvNRVDid0cVvOCX8T2W4Y5gnCVq
-         ODAqevjbiaUFrR3lOK49LZmhqk9wxh/9P7mueLUFji55X0fSgWewVLI1CirzuNz4MIpA
-         tcpVa+7YdtAO2OAgE4AqYdSwW520MoKMOgmALHezSOx2yNf4X0kHed9pHa2NhYoe00Jr
-         gKsCEGgclsB96hM5ZY7ybJ+ueY/Zgz6262Y4ad4gfGQFKIwMG/X7f/nKZfmXkPJSNOZN
-         ehS7uaEBXyQwXRCFP3sFysEQ/AUoWxMjV7KVE1VLzM4cJM9wDAfkwKVImqLU3ij/+w1Q
-         4+/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=14aqRMXHUzmh8MaY6T0TYYXxIjG0HLvTmbYMOmqP/1A=;
-        b=KlneTiptLMfOgu6NAraQ9jrfyZXspBozivFVQSGDuJHAl2oiWhkkJVgtd7uM3Htk8T
-         5F0jB+FaWoUy6KbyAJEkG8YRmAQtiwb49ra3urwx6435m/kmJg9bn+IYPxta3CTs9HK8
-         YcuBVQ7Ma6hY4oyZVAKZ4bAEIF5za5FwB2PShPp+v20sduM2xX4xlCVrCGYEsSX3UYyx
-         KjHHoGW2wMHF1HaQpBlMyldZgWA5aRlWIfARQiOAxONwaYBUuvfxyLnhUPquHEEd0+GF
-         mNww9Iw+0isCF0dhhi5I6zfJ4ZciraAqW99Qn2g894mbZnhEsw1T7TYMapEnKjapMDbL
-         4qjw==
-X-Gm-Message-State: AGRZ1gLQw7T0PO+SsBZAm0DGpD4OzjUxaA67lPnrUwMwkFL0wfZeGdbC
-        LpB5Ja9cbgHYABP2z887wg29FmxqeyM=
-X-Google-Smtp-Source: AJdET5f8Kll/sTdxTpIyBQbdsxd09zFyuDdpn7emyYa61uZnifKqUAIycJkJ6cE6QL8uiXO02Ckf7w==
-X-Received: by 2002:a62:e704:: with SMTP id s4mr168293pfh.124.1542170149241;
-        Tue, 13 Nov 2018 20:35:49 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id e23sm17836523pfh.68.2018.11.13.20.35.47
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 13 Nov 2018 20:35:48 -0800 (PST)
-Subject: Re: [PATCH 1/2] scsi: Do not rely on blk-mq for double completions
-To:     Keith Busch <keith.busch@intel.com>
-Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-References: <20181113185712.10063-1-keith.busch@intel.com>
- <b2d9c646-3311-9f85-6e8b-de3ddf295899@kernel.dk>
- <20181113194517.GA10134@localhost.localdomain>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <03c3227d-7eed-2797-8589-3a57488a3171@kernel.dk>
-Date:   Tue, 13 Nov 2018 21:35:46 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726842AbeKNPkY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Nov 2018 10:40:24 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:44422 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726813AbeKNPkY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Nov 2018 10:40:24 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 22DEF307D856;
+        Wed, 14 Nov 2018 05:38:41 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.149])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 583B145DE;
+        Wed, 14 Nov 2018 05:38:38 +0000 (UTC)
+Date:   Wed, 14 Nov 2018 00:38:37 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>, hch@lst.de, axboe@kernel.dk
+Cc:     Martin Wilck <mwilck@suse.com>, lijie <lijie34@huawei.com>,
+        xose.vazquez@gmail.com, linux-nvme@lists.infradead.org,
+        chengjike.cheng@huawei.com, shenhong09@huawei.com,
+        dm-devel@redhat.com, wangzhoumengjian@huawei.com, hare@suse.de,
+        christophe.varoqui@opensvc.com, bmarzins@redhat.com,
+        sschremm@netapp.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: multipath-tools: add ANA support for NVMe device
+Message-ID: <20181114053837.GA15086@redhat.com>
+References: <1541657381-7452-1-git-send-email-lijie34@huawei.com>
+ <2691abf6733f791fb16b86d96446440e4aaff99f.camel@suse.com>
+ <20181112215323.GA7983@redhat.com>
+ <20181113161838.GC9827@localhost.localdomain>
+ <20181113180008.GA12513@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181113194517.GA10134@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181113180008.GA12513@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Wed, 14 Nov 2018 05:38:41 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/13/18 12:45 PM, Keith Busch wrote:
-> On Tue, Nov 13, 2018 at 12:20:46PM -0700, Jens Axboe wrote:
->> On 11/13/18 11:57 AM, Keith Busch wrote:
->>>  static void scsi_mq_done(struct scsi_cmnd *cmd)
->>>  {
->>> +	if (test_and_set_bit(__SCMD_COMPLETE, &cmd->flags))
->>> +		return;
->>>  	trace_scsi_dispatch_cmd_done(cmd);
->>>  	blk_mq_complete_request(cmd->request);
->>> +
->>> +#ifdef CONFIG_FAIL_IO_TIMEOUT
->>> +	/*
->>> +	 * Clearing complete here serves only to allow the desired recovery to
->>> +	 * escalate on blk_rq_should_fake_timeout()'s error injection.
->>> +	 */
->>> +	clear_bit(__SCMD_COMPLETE, &cmd->flags);
->>> +#endif
->>>  }
->>
->> We could have this be:
->>
->> static void scsi_mq_done(struct scsi_cmnd *cmd)
->> {
->> 	if (test_and_set_bit(__SCMD_COMPLETE, &cmd->flags))
->> 		return;
->>  	trace_scsi_dispatch_cmd_done(cmd);
->>
->>  	if (blk_mq_complete_request(cmd->request)) {
->> 		/*
->> 		 * Clearing complete here serves only to allow the
->> 		 * desired recovery to escalate on
->> 		 * blk_rq_should_fake_timeout()'s error injection.
->> 		 */
->> 		clear_bit(__SCMD_COMPLETE, &cmd->flags);
->> 	}
->> }
->>
->> with
->>
->> bool blk_mq_complete_request(struct request *rq)
->> {
->> 	if (unlikely(blk_should_fake_timeout(rq->q)))
->> 		return true;
->> 	__blk_mq_complete_request(rq);
->> 	return false;
->> }
->>
->> and not have this CONFIG_FAIL_IO_TIMEOUT dependency, but that'd be a bit
->> more expensive.
+On Tue, Nov 13 2018 at  1:00pm -0500,
+Mike Snitzer <snitzer@redhat.com> wrote:
+
+> On Tue, Nov 13 2018 at 11:18am -0500,
+> Keith Busch <keith.busch@intel.com> wrote:
 > 
-> I was trying to avoid every cost no matter how negligable (those are the
-> only types of costs left as far as I can see), but I think your proposal
-> might actually be necessary: if a timeout wasn't faked, clearing the
-> completion flag unconditionally might have a problem with a real timeout
-> racing with the real completion. :(
+> > On Mon, Nov 12, 2018 at 04:53:23PM -0500, Mike Snitzer wrote:
+> > > On Mon, Nov 12 2018 at 11:23am -0500,
+> > > Martin Wilck <mwilck@suse.com> wrote:
+> > > 
+> > > > Hello Lijie,
+> > > > 
+> > > > On Thu, 2018-11-08 at 14:09 +0800, lijie wrote:
+> > > > > Add support for Asynchronous Namespace Access as specified in NVMe
+> > > > > 1.3
+> > > > > TP 4004. The states are updated through reading the ANA log page.
+> > > > > 
+> > > > > By default, the native nvme multipath takes over the nvme device.
+> > > > > We can pass a false to the parameter 'multipath' of the nvme-core.ko
+> > > > > module,when we want to use multipath-tools.
+> > > > 
+> > > > Thank you for the patch. It looks quite good to me. I've tested it with
+> > > > a Linux target and found no problems so far.
+> > > > 
+> > > > I have a few questions and comments inline below.
+> > > > 
+> > > > I suggest you also have a look at detect_prio(); it seems to make sense
+> > > > to use the ana prioritizer for NVMe paths automatically if ANA is
+> > > > supported (with your patch, "detect_prio no" and "prio ana" have to be
+> > > > configured explicitly). But that can be done in a later patch.
+> > > 
+> > > I (and others) think it makes sense to at least triple check with the
+> > > NVMe developers (now cc'd) to see if we could get agreement on the nvme
+> > > driver providing the ANA state via sysfs (when modparam
+> > > nvme_core.multipath=N is set), like Hannes proposed here:
+> > > http://lists.infradead.org/pipermail/linux-nvme/2018-November/020765.html
+> > > 
+> > > Then the userspace multipath-tools ANA support could just read sysfs
+> > > rather than reinvent harvesting the ANA state via ioctl.
+> > 
+> > I'd prefer not duplicating the log page parsing. Maybe nvme's shouldn't
+> > even be tied to CONFIG_NVME_MULTIPATH so that the 'multipath' param
+> > isn't even an issue.
+> 
+> I like your instincts, we just need to take them a bit further.
+> 
+> Splitting out the kernel's ANA log page parsing won't buy us much given
+> it is userspace (multipath-tools) that needs to consume it.  The less
+> work userspace needs to do (because kernel has already done it) the
+> better.
+> 
+> If the NVMe driver is made to always track and export the ANA state via
+> sysfs [1] we'd avoid userspace parsing duplication "for free".  This
+> should occur regardless of what layer is reacting to the ANA state
+> changes (be it NVMe's native multipathing or multipath-tools).
+> 
+> ANA and NVMe multipathing really are disjoint, making them tightly
+> coupled only serves to force NVMe driver provided multipathing _or_
+> userspace ANA state tracking duplication that really isn't ideal [2].
+> 
+> We need a reasoned answer to the primary question of whether the NVMe
+> maintainers are willing to cooperate by providing this basic ANA sysfs
+> export even if nvme_core.multipath=N [1].
+> 
+> Christoph said "No" [3], but offered little _real_ justification for why
+> this isn't the right thing for NVMe in general.
+...
+> [1]: http://lists.infradead.org/pipermail/linux-nvme/2018-November/020765.html
+> [2]: https://www.redhat.com/archives/dm-devel/2018-November/msg00072.html
+...
 
-Yep, I think you are right... No way around it then. Are you going to
-resend it with the fix?
+I knew there had to be a pretty tight coupling between the NVMe driver's
+native multipathing and ANA support... and that the simplicity of
+Hannes' patch [1] was too good to be true.
 
--- 
-Jens Axboe
+The real justification for not making Hannes' change is it'd effectively
+be useless without first splitting out the ANA handling done during NVMe
+request completion (NVME_SC_ANA_* cases in nvme_failover_req) that
+triggers re-reading the ANA log page accordingly.
 
+So without the ability to drive the ANA workqueue to trigger
+nvme_read_ana_log() from the nvme driver's completion path -- even if
+nvme_core.multipath=N -- it really doesn't buy multipath-tools anything
+to have the NVMe driver export the ana state via sysfs, because that ANA
+state will never get updated.
+
+> The inability to provide proper justification for rejecting a patch
+> (that already had one co-maintainer's Reviewed-by [5]) _should_ render
+> that rejection baseless, and the patch applied (especially if there is
+> contributing subsystem developer interest in maintaining this support
+> over time, which there is).  At least that is what would happen in a
+> properly maintained kernel subsystem.
+> 
+> It'd really go a long way if senior Linux NVMe maintainers took steps to
+> accept reasonable changes.
+
+Even though I'm frustrated I was clearly too harsh and regret my tone.
+I promise to _try_ to suck less.
+
+This dynamic of terse responses or no responses at all whenever NVMe
+driver changes to ease multipath-tools NVMe support are floated is the
+depressing gift that keeps on giving.  But enough excuses...
+
+Not holding my breath BUT:
+if decoupling the reading of ANA state from native NVMe multipathing
+specific work during nvme request completion were an acceptable
+advancement I'd gladly do the work.
+
+Mike
