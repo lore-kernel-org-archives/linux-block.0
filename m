@@ -2,115 +2,98 @@ Return-Path: <SRS0=CiZa=NZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DECEC43441
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 16:47:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A9F9C43441
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 17:16:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5D62E22360
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 16:47:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D62E22360
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTP id D29C62089F
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 17:16:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="c/EV8r9z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D29C62089F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728045AbeKOCvl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Nov 2018 21:51:41 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34344 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728085AbeKOCvl (ORCPT
+        id S1728640AbeKODU7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Nov 2018 22:20:59 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:44423 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727969AbeKODU7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Nov 2018 21:51:41 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id wAEGjuAx129677
-        for <linux-block@vger.kernel.org>; Wed, 14 Nov 2018 11:47:43 -0500
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2nrmqvhrpg-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 14 Nov 2018 11:46:29 -0500
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <bblock@linux.ibm.com>;
-        Wed, 14 Nov 2018 16:44:35 -0000
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 14 Nov 2018 16:44:31 -0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id wAEGiUtl56164552
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 14 Nov 2018 16:44:30 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A13125204F;
-        Wed, 14 Nov 2018 16:44:30 +0000 (GMT)
-Received: from w530-pk1mzal (unknown [9.152.212.21])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 8D51F52059;
-        Wed, 14 Nov 2018 16:44:30 +0000 (GMT)
-Received: from bblock by w530-pk1mzal with local (Exim 4.91)
-        (envelope-from <bblock@linux.ibm.com>)
-        id 1gMyHG-0001sV-A2; Wed, 14 Nov 2018 17:44:30 +0100
-Date:   Wed, 14 Nov 2018 17:44:30 +0100
-From:   Benjamin Block <bblock@linux.ibm.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, martin.petersen@oracle.com, ooo@electrozaur.com,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6/8] bsg-lib: handle bidi requests without block layer
- help
-References: <20181111133211.13926-1-hch@lst.de>
- <20181111133211.13926-7-hch@lst.de>
- <20181113143520.GB7222@w530-pk1mzal>
- <20181114154857.GA28985@lst.de>
+        Wed, 14 Nov 2018 22:20:59 -0500
+Received: by mail-io1-f65.google.com with SMTP id r200so6755392iod.11
+        for <linux-block@vger.kernel.org>; Wed, 14 Nov 2018 09:16:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=TELA2/5WnTM5m/eMx9fHO6d5FlbNukZpVnv7IOnOzIs=;
+        b=c/EV8r9z5sT0hy+UqFNxfDBx/inOvXGSP0ty6rR5N0TO3Vw561WXwtnQaVf4t+hVkB
+         hqRGUyoOiK5OZZ8Ay98owuD3eRKLYbXit+xvczIcwX8hd5HvXBATi706i99NWjOvurU+
+         2vbhVTCIez1bo7qQznlmaYyn/RV/SQrJlwQnp/+wnYh82JyBj9IhRuCwwH4OW2Wn7w38
+         B5Va61bB74yCbaBP1O4amkOK+A3VKVSE+Cfw+d6yd9CZ4KXCyvFH3Ov90SkjjiLEBAMH
+         QH0UI3DXBLJhGiPlyjiXzCpoMILIOpjpX4gR06latHPeRB+vKygdASKwgAP71rQraiXp
+         xDWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=TELA2/5WnTM5m/eMx9fHO6d5FlbNukZpVnv7IOnOzIs=;
+        b=im2HcQqGNVqUJB1lOodvp8CJnfgdS3Th+rDmSe8eGxseyj9NYhF6z7mFskcCqimUjw
+         +q/YFT+WPoUfaqtPI2/SAiYdBAbM+Iz0CDyf6meN0YBP30sVIVUlEEZ2EmAFQjCuWZtS
+         vTS0V4T4ldbXH1ybBR8x8LsuQQbU1mDKkxQyI08UFuKadu0pjet0ztAKUnWtWkNg0Mvo
+         DgT/oW0JrjpC17YaFV4ob5AI/bxrkod/UsdM5CpZ/2t5S+KRcJFE8mZU3xb57HGnjW6p
+         T4fMX6vHTnE+s1dfY9KTCxg4uvZBVekkefLOucrPCJAchXraiTZ62sCRrZSpobXbkWMh
+         p1hw==
+X-Gm-Message-State: AGRZ1gJjsga84o+ZZrsPlBGxherMOK4DzgWD5fsojzTotgMqBDk7exTC
+        kFPwJFgiVtgZgMj6I/XrrM5dip1lzfQ=
+X-Google-Smtp-Source: AFSGD/V4kUWaqSL2Nvg9JoAGDga46RV7OlfxH63MfYzrzm4Y9eI9cbE88K3cvbMYDE3pjhmzH99RVQ==
+X-Received: by 2002:a6b:ee13:: with SMTP id i19-v6mr2183987ioh.69.1542215814835;
+        Wed, 14 Nov 2018 09:16:54 -0800 (PST)
+Received: from [192.168.1.56] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id s203-v6sm7798094iod.31.2018.11.14.09.16.52
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 14 Nov 2018 09:16:53 -0800 (PST)
+Subject: Re: [PATCH 5/6] blk-rq-qos: inline check for q->rq_qos functions
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>
+References: <20181110151317.3813-1-axboe@kernel.dk>
+ <20181110151317.3813-6-axboe@kernel.dk>
+ <20181114152132.GB22186@infradead.org>
+ <e81bc8be-cbb6-6f78-c358-32c7eae4e454@kernel.dk>
+ <20181114154043.GB22811@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a167e828-ac45-717a-7f77-52a9be670e5f@kernel.dk>
+Date:   Wed, 14 Nov 2018 10:16:52 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20181114154857.GA28985@lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-TM-AS-GCONF: 00
-x-cbid: 18111416-0012-0000-0000-000002CA7AC0
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 18111416-0013-0000-0000-000020FF8E03
-Message-Id: <20181114164430.GC7222@w530-pk1mzal>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2018-11-14_13:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 lowpriorityscore=0
- mlxlogscore=916 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1811140151
+In-Reply-To: <20181114154043.GB22811@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 14, 2018 at 04:48:57PM +0100, Christoph Hellwig wrote:
-> On Tue, Nov 13, 2018 at 03:35:20PM +0100, Benjamin Block wrote:
-> > This seems like a non-obvious user-breakage. So apart from removing the
-> > in-kernel stuff that uses bidirectional commands you also forbid
-> > userspace from every using them? That seems wrong to me.
-> > 
-> > There is other SCSI Command Sets than OSD that provide bidirectional
-> > commands, even SBC has some (i.e.  X*WRITE*, COMPARE AND WRITE).
+On 11/14/18 8:40 AM, Christoph Hellwig wrote:
+> On Wed, Nov 14, 2018 at 08:33:33AM -0700, Jens Axboe wrote:
+>>> The inlining sounds fine, but please do it without the obsfucating
+>>> macros.
+>>
+>> Why? It's a lot of code duplication.
 > 
-> Yes, there are a few.  But the only driver that even supports them
-> right now is iscsi_tcp to start with, and we have to drag a significant
-> amount of code around just to support this corner case.
-> 
+> Just source code, not binary code.  And remember that humans want
+> to understand this code by grepping it, finding it in source browsers,
+> etc.  And all that macro obsfucation makes it much harder.
 
-But we are not talking about kernel-support here, this interface is
-user-facing, and for an interfaces that was made so people could send
-arbitrary SCSI commands, that the kernel doesn't support.
-
-Its probably also more complicated to make sure that no one is using
-that, in contrast to the OSD stuff that - as state in the patch-letter -
-never made it out of academia. Its not like anyone has to release
-anything open if they use BSG/SG, its just syscalls after all.
+I've changed it to just spell them all out.
 
 -- 
-With Best Regards, Benjamin Block      /      Linux on IBM Z Kernel Development
-IBM Systems & Technology Group   /  IBM Deutschland Research & Development GmbH
-Vorsitz. AufsR.: Martina Koederitz       /      Geschäftsführung: Dirk Wittkopp
-Sitz der Gesellschaft: Böblingen / Registergericht: AmtsG Stuttgart, HRB 243294
+Jens Axboe
 
