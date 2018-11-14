@@ -2,148 +2,84 @@ Return-Path: <SRS0=CiZa=NZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 468DEC43441
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 19:39:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E2CC43441
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 19:46:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 113B1214F1
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 19:39:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 54C40214F1
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 19:46:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="V5wyySP+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 113B1214F1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="I1L9qvq3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54C40214F1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726226AbeKOFoS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Nov 2018 00:44:18 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:46589 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725756AbeKOFoR (ORCPT
+        id S1725766AbeKOFu6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Nov 2018 00:50:58 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:42800 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725756AbeKOFu5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Nov 2018 00:44:17 -0500
-Received: by mail-pl1-f196.google.com with SMTP id t13so5290971ply.13
-        for <linux-block@vger.kernel.org>; Wed, 14 Nov 2018 11:39:44 -0800 (PST)
+        Thu, 15 Nov 2018 00:50:57 -0500
+Received: by mail-io1-f66.google.com with SMTP id h19-v6so12613918iog.9
+        for <linux-block@vger.kernel.org>; Wed, 14 Nov 2018 11:46:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=G/Y5lp9QbfVD1h8Q3c10aUq3gCyj1b6nDnsXbcW1OzQ=;
-        b=V5wyySP+N+88Iomzwr0NVrgnj93+y1JgdF+M0oByzIxjQQxd7RSfPYpOGzkic8oneB
-         YMvEWP2lfBDdnjRsOLva3cj94VJwOEZ6+JDeoH8E7uZITQXgA7KaThfUpPMlGKQvm4Uy
-         GfMLV62yV1weKG1BK8CfC8uocA0ZYr925GzMynXcaOECu5A4FHDIY8Nd4TMp2kVJb5wg
-         SxRThr12WTk69dEXLNlXxGoVUTWMq5yCDyyflJVsQqDBChD3kFEyRaBPgTTgB6HEi0S+
-         S7l/Zg3dYMEoPeu97/QwmSfDy+EQrnPFHaEWQubueiMBP6+q4JrAX+2fUiMObS6JGJ6e
-         ZDAw==
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=5+5c2g22DLCy8TAMyGrUfMCZ8HQyFO+/QKFQq3+UV1g=;
+        b=I1L9qvq3UkzZd9O/HLmo6ZFBPAu85ijJ87W9EyToaVm7CwAaqzu+USwVXaW6bBDsXG
+         u16pEbzlfyfmAts9Ve6kZa3PDm53N3Z5GZZjzy2kzAspaFEJZZGl5cbWactWyBULZ8zB
+         sWo4lag2Fd3zW8K+NERWFFsgD0apF0l/JfqJbNNlERgD4+Gp2JbSuPz9CnX4MuYAKMHO
+         Qk8uU2XxLaQ9iUQh+wZ6+uop5QCp4INspQFAFZYgJ0IeLn2oITwLJjlyVe0MK1s2yDrS
+         z3DuonLphNVWqesevPlcKGqOmCZJ9Wq9Ok/FvrSASjwX+HxwXlIQTQHVPjtnHXDzsZ+7
+         01EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=G/Y5lp9QbfVD1h8Q3c10aUq3gCyj1b6nDnsXbcW1OzQ=;
-        b=HgNGVrKDv0D75eIE2RtLarti5/Y6VodGoM23w+n2qkx1BT0+8PkQjHdYw8gjia50KX
-         EMUyhDNiFZ9WwetAd43F2PunY9AmOjkmhhqfzmP11+n+eyifO8LNHkQG57TQYFuy6J7f
-         nyYOU9pdB+iAzhM/x7UxaOUnGTYj7oJfiylxp9xlag1FiyJKxCEEdiAiCo8ypBBSssA6
-         czlzTsxdpeB+/bJCVXXyDw5ZcHR0JOYbiqsfRliCBYLHdp13VXFIoVYxpLlLZY0LjZsJ
-         9dHXdWE2BYf3WYtTFsEVt8svHVGSwS+3v128NJ83LZdiUMtk//QKL1BJp+PJ5Z5sRD03
-         eHbA==
-X-Gm-Message-State: AGRZ1gIFrwnPAZU9lqy71WSIloL84EE6UFElmaLBZ8n9hnUpDJtAs8KK
-        fs6LtyVRliFfKP9Oh3Lg1uWy4Q==
-X-Google-Smtp-Source: AJdET5fY84KKGZSNyl7HYjJ/fw0wPxBPcwjQtzxM81+yFi+Wmrev/IkG70ra4jl0Gb1vGmyp5948XQ==
-X-Received: by 2002:a17:902:5a03:: with SMTP id q3-v6mr3269560pli.186.1542224383784;
-        Wed, 14 Nov 2018 11:39:43 -0800 (PST)
-Received: from gwendal.mtv.corp.google.com ([2620:15c:202:1:3c8f:512b:3522:dfaf])
-        by smtp.gmail.com with ESMTPSA id q11-v6sm22984060pgp.62.2018.11.14.11.39.42
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Wed, 14 Nov 2018 11:39:42 -0800 (PST)
-From:   Gwendal Grignou <gwendal@chromium.org>
-To:     osandov@osandov.com
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=5+5c2g22DLCy8TAMyGrUfMCZ8HQyFO+/QKFQq3+UV1g=;
+        b=DZ8NlauyTqC5UN84U0VC8IE78vqwx7Xay23nR9v1DCzQ71h3fJtLMP1lk3B2sulQnz
+         taW5oDn81vGOAYNyK1eenR/mnWtrhSw53DmXiHPCbRbDULwqH9lrhKBjiivYq2mu10ox
+         IuzpDL8E46sJCbhF1v6gtkDBWoaqRdrQp5T8jVkTIAxYgzBJd1I81POVbutCWsu7pNgj
+         UOXjWIuQ6uvEi6zw2oL9tkJpufK2rWvttnh30OtJUyNjQnyrCbiObCRSI9p6FT3/Y+gP
+         LZuqDAU1wY82ttRNJn3Zxl2x9Bw+w46nGE4yVrkzqYcrC5/mOb2OQn2CfQzdlZ8uM2fQ
+         cFCw==
+X-Gm-Message-State: AGRZ1gLkZXqYxXBIct2Bufz/cZG1igbNfUJLP9SorqanR73kLGFnIRAD
+        2lU7kDxbP6Lv+W8d9FKe8ZFToQ==
+X-Google-Smtp-Source: AJdET5ddCfpCezfTOOuBTXFZ3DSLgLpcIwjYOhFybqtr/qKQEZBZ1rq302yuxFHlVtb7Tfcx1FFtng==
+X-Received: by 2002:a6b:620d:: with SMTP id f13-v6mr2560623iog.11.1542224783321;
+        Wed, 14 Nov 2018 11:46:23 -0800 (PST)
+Received: from vader ([2620:10d:c090:180::1:2a61])
+        by smtp.gmail.com with ESMTPSA id y21sm2787280iof.51.2018.11.14.11.46.22
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 14 Nov 2018 11:46:22 -0800 (PST)
+Date:   Wed, 14 Nov 2018 11:46:20 -0800
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Gwendal Grignou <gwendal@chromium.org>
 Cc:     osandov@fb.com, linux-block@vger.kernel.org
-Subject: [PATCH v2] makefile: Add install rule
-Date:   Wed, 14 Nov 2018 11:39:31 -0800
-Message-Id: <20181114193931.90009-1-gwendal@chromium.org>
-X-Mailer: git-send-email 2.18.1
-In-Reply-To: <CAPUE2uuGz5qOZ0aFVsuATPqt3XCtmj_nSd0rE44wpihRPzkskA@mail.gmail.com>
+Subject: Re: [PATCH v2] makefile: Add install rule
+Message-ID: <20181114194620.GE4173@vader>
 References: <CAPUE2uuGz5qOZ0aFVsuATPqt3XCtmj_nSd0rE44wpihRPzkskA@mail.gmail.com>
+ <20181114193931.90009-1-gwendal@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181114193931.90009-1-gwendal@chromium.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add rule to install to a target directory, /usr/local/blktests by
-default.
+On Wed, Nov 14, 2018 at 11:39:31AM -0800, Gwendal Grignou wrote:
+> Add rule to install to a target directory, /usr/local/blktests by
+> default.
+> 
+> Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
 
-Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
----
- Makefile     | 11 ++++++++++-
- README.md    |  3 +++
- src/Makefile |  6 +++++-
- 3 files changed, 18 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 38b8ad1..9793a2d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1,9 +1,18 @@
-+prefix ?= /usr/local
-+dest = $(DESTDIR)$(prefix)/blktests
-+
- all:
- 	$(MAKE) -C src all
- 
- clean:
- 	$(MAKE) -C src clean
- 
-+install:
-+	install -m755 -d $(dest)
-+	install check $(dest)
-+	cp -R tests common $(dest)
-+	$(MAKE) -C src dest=$(dest)/src install
-+
- # SC2119: "Use foo "$@" if function's $1 should mean script's $1". False
- # positives on helpers like _init_scsi_debug.
- SHELLCHECK_EXCLUDE := SC2119
-@@ -13,4 +22,4 @@ check:
- 		tests/*/rc tests/*/[0-9]*[0-9]
- 	! grep TODO tests/*/rc tests/*/[0-9]*[0-9]
- 
--.PHONY: all check
-+.PHONY: all check install
-diff --git a/README.md b/README.md
-index be55aba..7967569 100644
---- a/README.md
-+++ b/README.md
-@@ -22,6 +22,9 @@ Some tests require the following:
- - multipath-tools (Debian, openSUSE) or device-mapper-multipath (Fedora)
- - dmsetup (Debian) or device-mapper (Fedora, openSUSE, Arch Linux)
- 
-+Build blktests with `make install`. Optionally, install it to a known location
-+with `make install`, `/usr/local/blktests` by default.
-+
- Add the list of block devices you want to test on in a file named `config`:
- 
- ```sh
-diff --git a/src/Makefile b/src/Makefile
-index 15c1022..b2bd321 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -20,10 +20,14 @@ all: $(TARGETS)
- clean:
- 	rm -f $(TARGETS)
- 
-+install: $(TARGETS)
-+	install -m755 -d $(dest)
-+	install $(TARGETS) $(dest)
-+
- $(C_TARGETS): %: %.c
- 	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $^
- 
- $(CXX_TARGETS): %: %.cpp
- 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -o $@ $^
- 
--.PHONY: all clean
-+.PHONY: all clean install
--- 
-2.18.1
-
+Pushed with a slightly expanded description in the README. Thanks!
