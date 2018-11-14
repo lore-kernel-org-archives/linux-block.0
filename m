@@ -2,70 +2,107 @@ Return-Path: <SRS0=CiZa=NZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23D64C43441
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 15:40:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0414C43441
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 15:48:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D9E0C20818
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 15:40:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF7E12089F
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 15:48:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nrsuV2xJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9E0C20818
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YWxoB08y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF7E12089F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732933AbeKOBo2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Nov 2018 20:44:28 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:60972 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728000AbeKOBo2 (ORCPT
+        id S1732933AbeKOBvs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Nov 2018 20:51:48 -0500
+Received: from mail-it1-f195.google.com ([209.85.166.195]:35620 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728358AbeKOBvr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Nov 2018 20:44:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=3DCsVju+2+mGI5DhN1EdZdO+y+4edCTM62e+YZcFmO4=; b=nrsuV2xJ7CxI2l6nWo+rWW0FR
-        CKalviEShtke5tELgVO/Qr8bVBRP+cESVtR64sWMNtkFeJ9qVmARxY5BeZvXXaQ0cImMUyI9YrOtM
-        PvVqAkQ3Lo6zn+G5qBg3xUluTCMsQiTRjX0RfyhV6p/jDYCwF2Z1Y8JNhqjfQHyjuE/xOxX+cy8Th
-        Id5RHREej/8ax8Ite0/29a69J5nRVmBN1ga3RhoYcE0oOdR/+8Qi3IGe/jz8TnCNGBFBocVi4pzV8
-        vtfqekWLhnGYZa/QZr/m3wsFSz27xY39joGKyyG/sls1RjnoBVRWa5WvtWu4FUmGU/0LN3JkDUQSa
-        z2HmlemzQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gMxHY-0007Du-0x; Wed, 14 Nov 2018 15:40:44 +0000
-Date:   Wed, 14 Nov 2018 07:40:43 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>, linux-block@vger.kernel.org,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: Re: [PATCH 5/6] blk-rq-qos: inline check for q->rq_qos functions
-Message-ID: <20181114154043.GB22811@infradead.org>
+        Wed, 14 Nov 2018 20:51:47 -0500
+Received: by mail-it1-f195.google.com with SMTP id v11so24547918itj.0
+        for <linux-block@vger.kernel.org>; Wed, 14 Nov 2018 07:48:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=6FnLQUKZxZTB70TbQl3lHk9AqJZYaS5Ypjb6E53I+Fo=;
+        b=YWxoB08yobwEILs1R528GlaYFPK1bqgknTUqc0IBkr4vixpf+CUMm2cineao4Bx8C+
+         bIaBREI69BaCMYy26tieXJQ02QtCNBragGVoS5jgQNQA3nnl/58SH+DiQH9Nrqph64Tl
+         K9oJt5baemSF0RnWkVeodnyRXksJvXkV6ZJZcIGHqBR7qFk9dckjWsPzSe6T9M11BVBY
+         boAGn5N+GLc8iUlx2E1/RRRnnnHE7TosaIWkI4kVrLquGhA46idyCHbx9neCQriSNwOs
+         34pGwAh9TNa8fLv/aDxaKMbFG0YuWo+3NjbsNU2FlLLdZDJOHYf4fJqPsl9gSW0eYboB
+         ZG/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=6FnLQUKZxZTB70TbQl3lHk9AqJZYaS5Ypjb6E53I+Fo=;
+        b=Voqc5A1rxLbe3ALgW4rY8DZvwcvv7/rorLIEmrvpIpswJMlWQfC7yGxfwryMMbyRR6
+         r4YcGriDgA1quJ/U34nDioFvEySPW2zHiohS3KByv+KSfbsVrbjd5ZRtFktHchDdfffa
+         9tQGarT5brkYtOo0+Dos2gcGzjN9nlMKiBV/F51/yoYzAfzK3TukFGZJQYg7x3SoAZr/
+         /ke8UCGn3Bh7rGgbD1a4xiaJY72XeBHVZC/khgqoYdhz/VnkKlywvhHsWlQpQSoz/Qn9
+         1an7mWDAN02lDRbziGMii5VDG+RVpzv4e4kj/dyhkmyTYLrxLdxXtkXnqaS6OX6rarFt
+         bzgA==
+X-Gm-Message-State: AGRZ1gLpMiI8XRufqXgssNfMZxa/dPnyg6l0eTEuFFpGDQe+hft6TzKR
+        FmocjfWpEP2B40RwaIn0h/KahRC3awo=
+X-Google-Smtp-Source: AJdET5e/qnM4QYgATjHXm6TpP7pXTbTYcz+Ail1lg1yr0DpHRwSOkxRLDPRFGtn0hhNWTcxO8+9wUg==
+X-Received: by 2002:a24:7b11:: with SMTP id q17-v6mr2417350itc.80.1542210480214;
+        Wed, 14 Nov 2018 07:48:00 -0800 (PST)
+Received: from [192.168.1.56] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id o10-v6sm7648693iob.43.2018.11.14.07.47.58
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 14 Nov 2018 07:47:59 -0800 (PST)
+Subject: Re: [PATCH 3/6] blk-mq: embed blk_mq_ops directly in the request
+ queue
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org
 References: <20181110151317.3813-1-axboe@kernel.dk>
- <20181110151317.3813-6-axboe@kernel.dk>
- <20181114152132.GB22186@infradead.org>
- <e81bc8be-cbb6-6f78-c358-32c7eae4e454@kernel.dk>
+ <20181110151317.3813-4-axboe@kernel.dk>
+ <20181114152053.GA22186@infradead.org>
+ <130070cd-e0d1-e75e-4341-7c1b26d1531e@kernel.dk>
+ <20181114153948.GA22811@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <1bec98d9-c0b1-c14a-8717-59af2e746895@kernel.dk>
+Date:   Wed, 14 Nov 2018 08:47:58 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e81bc8be-cbb6-6f78-c358-32c7eae4e454@kernel.dk>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20181114153948.GA22811@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 14, 2018 at 08:33:33AM -0700, Jens Axboe wrote:
-> > The inlining sounds fine, but please do it without the obsfucating
-> > macros.
+On 11/14/18 8:39 AM, Christoph Hellwig wrote:
+> On Wed, Nov 14, 2018 at 08:33:06AM -0700, Jens Axboe wrote:
+>> It's measurable. It doesn't defeat the const at all, the mq_ops
+>> is still const and is never modified outside of when the queue
+>> is allocated. The only difference is of course that it is no
+>> longer residing in a read only mapped section, which is a shame.
 > 
-> Why? It's a lot of code duplication.
+> And the separate section is very much the point of the const.
+> 
+> Without it attackers can easily overwrite the function pointer and
+> use it for exploits, as the C const attribute by itself doesn't
+> protect from that in any way.  But once it is in a read-only section
+> it can't easily be modified.
 
-Just source code, not binary code.  And remember that humans want
-to understand this code by grepping it, finding it in source browsers,
-etc.  And all that macro obsfucation makes it much harder.
+Are we really worried about this as an attack surface? I get it
+for other types of ops, but for mq_ops, I'd be more worried about
+callers changing it inadvertently, and they still can't do that.
+
+It's not a huge deal to me, I can drop this one for now and
+revisit at a later time.
+
+-- 
+Jens Axboe
+
