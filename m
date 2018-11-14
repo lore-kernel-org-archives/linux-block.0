@@ -2,262 +2,139 @@ Return-Path: <SRS0=CiZa=NZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8664FC43441
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 19:26:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15BF9C43441
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 19:37:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4586022360
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 19:26:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4586022360
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id CE53D214F1
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 19:37:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="WROg5CNQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE53D214F1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725757AbeKOFay (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Nov 2018 00:30:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:13191 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725756AbeKOFax (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Nov 2018 00:30:53 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C07E430C1D0D;
-        Wed, 14 Nov 2018 19:26:23 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.149])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F94B600D6;
-        Wed, 14 Nov 2018 19:26:21 +0000 (UTC)
-Date:   Wed, 14 Nov 2018 14:26:20 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>, hch@lst.de, axboe@kernel.dk,
-        Martin Wilck <mwilck@suse.com>, lijie <lijie34@huawei.com>,
-        xose.vazquez@gmail.com, linux-nvme@lists.infradead.org,
-        chengjike.cheng@huawei.com, shenhong09@huawei.com,
-        dm-devel@redhat.com, wangzhoumengjian@huawei.com,
-        christophe.varoqui@opensvc.com, bmarzins@redhat.com,
-        sschremm@netapp.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: multipath-tools: add ANA support for NVMe device
-Message-ID: <20181114192620.GA18908@redhat.com>
-References: <1541657381-7452-1-git-send-email-lijie34@huawei.com>
- <2691abf6733f791fb16b86d96446440e4aaff99f.camel@suse.com>
- <20181112215323.GA7983@redhat.com>
- <20181113161838.GC9827@localhost.localdomain>
- <20181113180008.GA12513@redhat.com>
- <20181114053837.GA15086@redhat.com>
- <30cf7af7-8826-55bd-e39a-4f81ed032f6d@suse.de>
- <20181114174746.GA18526@redhat.com>
- <87c931e5-4ac9-1795-8d40-cc5541d3ebcf@suse.de>
+        id S1725927AbeKOFmU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Nov 2018 00:42:20 -0500
+Received: from mail-it1-f195.google.com ([209.85.166.195]:32787 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725895AbeKOFmU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Nov 2018 00:42:20 -0500
+Received: by mail-it1-f195.google.com with SMTP id p11-v6so16995339itf.0
+        for <linux-block@vger.kernel.org>; Wed, 14 Nov 2018 11:37:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4zHw3q9Fm18/M2SA7bef7eEbM5kOwpfiMqTi4go80ac=;
+        b=WROg5CNQqk0k8vo50BDdeGBQRnfqVkgHUio96SkAFPc1PcuDwklkE3YDv8aVaHoqp4
+         cpNv1p3LsLPK/xDsKSESakDejv0GiP/y8k1DG5dZr5fiH/VzSZLLyCk24lQCXIvtG6+C
+         hnnIOC0zMbzilmH8KlNaJIiJLqLcG+pYu9irE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4zHw3q9Fm18/M2SA7bef7eEbM5kOwpfiMqTi4go80ac=;
+        b=nQ60Dh9eHBGJLxvwvN8PZFaTiZ2foHVzKh5eX0gpFjPF2svu5IolzD0Oprizc6VgVg
+         tA48BPVJDJkCJUfBcdZ7tKY/Zouowsxctb3kwxl3IjK6Ggu9DtpsqQziV7IZcosQzVcJ
+         WVMg7NfVJlEf3KytwQoHW+NujRjTmk4Otiq2SkqW8LjXJwDIfaZb9rH7cz4H5uGm81WD
+         IpLxEgHlmqhubMYeURaSUzEWC9oaLhTb6mW8q97wG1aGTGQuQnzBazkkxUq5M+h0E1qj
+         RXezt7D2+cGHX4ZVJj5TMyKEBG2b8r8GOBcn6pIsJtp+dIke3znFc9zi/3b9E+a4jE0a
+         ulqw==
+X-Gm-Message-State: AGRZ1gJDS1xhSrEk+lt+6n2tTlGi+hFMQFPAwj7+0mrJn75/bhfHqaUj
+        oJ7ey9ukgiI3LDHlGHu3IyzPcjV+vnMw14wLUSVyWWSdj5k=
+X-Google-Smtp-Source: AJdET5eMJDsR4Sl8BMTj2qZEO1QXbYbfkZFehEM2GarZGKhRXr6tsqX4dPraNRW5YjLWUA9sCzpoTK9iGGpxm4at/bU=
+X-Received: by 2002:a24:2c1:: with SMTP id 184-v6mr3090205itu.100.1542224266943;
+ Wed, 14 Nov 2018 11:37:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87c931e5-4ac9-1795-8d40-cc5541d3ebcf@suse.de>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Wed, 14 Nov 2018 19:26:24 +0000 (UTC)
+References: <20181109151524.50405-1-gwendal@chromium.org> <20181114182610.GB3253@vader>
+In-Reply-To: <20181114182610.GB3253@vader>
+From:   Gwendal Grignou <gwendal@chromium.org>
+Date:   Wed, 14 Nov 2018 11:37:35 -0800
+Message-ID: <CAPUE2uuGz5qOZ0aFVsuATPqt3XCtmj_nSd0rE44wpihRPzkskA@mail.gmail.com>
+Subject: Re: [PATCH blktests] makefile: Add install rule
+To:     osandov@osandov.com
+Cc:     osandov@fb.com, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 14 2018 at  1:51pm -0500,
-Hannes Reinecke <hare@suse.de> wrote:
+On Wed, Nov 14, 2018 at 10:26 AM Omar Sandoval <osandov@osandov.com> wrote:
+>
+> On Fri, Nov 09, 2018 at 07:15:24AM -0800, Gwendal Grignou wrote:
+> > Add rule to install to a target directory, /usr/local/blktests by
+> > default.
+>
+> This seems reasonale, but I'm curious, what's your use case?
+I will use blktest to check chromebooks kernel. ChromeOS is using
+Gentoo tool like emerge to [cros-]compile a package that is then
+integrated in a [test] image.
+You can see the ebuild I am currently using for building a blktest
+package at https://chromium-review.googlesource.com/c/chromiumos/overlays/chromiumos-overlay/+/1329948
+It needs an install rule to move the tests and common file from the
+source directory to the destination directory we will use to produce
+an image.
 
-> On 11/14/18 6:47 PM, Mike Snitzer wrote:
-> > On Wed, Nov 14 2018 at  2:49am -0500,
-> > Hannes Reinecke <hare@suse.de> wrote:
-> > 
-> >> On 11/14/18 6:38 AM, Mike Snitzer wrote:
-> >>> On Tue, Nov 13 2018 at  1:00pm -0500,
-> >>> Mike Snitzer <snitzer@redhat.com> wrote:
-> >>>
-> >>>> [1]: http://lists.infradead.org/pipermail/linux-nvme/2018-November/020765.html
-> >>>> [2]: https://www.redhat.com/archives/dm-devel/2018-November/msg00072.html
-> >>> ...
-> >>>
-> >>> I knew there had to be a pretty tight coupling between the NVMe driver's
-> >>> native multipathing and ANA support... and that the simplicity of
-> >>> Hannes' patch [1] was too good to be true.
-> >>>
-> >>> The real justification for not making Hannes' change is it'd effectively
-> >>> be useless without first splitting out the ANA handling done during NVMe
-> >>> request completion (NVME_SC_ANA_* cases in nvme_failover_req) that
-> >>> triggers re-reading the ANA log page accordingly.
-> >>>
-> >>> So without the ability to drive the ANA workqueue to trigger
-> >>> nvme_read_ana_log() from the nvme driver's completion path -- even if
-> >>> nvme_core.multipath=N -- it really doesn't buy multipath-tools anything
-> >>> to have the NVMe driver export the ana state via sysfs, because that ANA
-> >>> state will never get updated.
-> >>>
-> >> Hmm. Indeed, I was more focussed on having the sysfs attributes
-> >> displayed, so yes, indeed it needs some more work.
-> > ...
-> >>> Not holding my breath BUT:
-> >>> if decoupling the reading of ANA state from native NVMe multipathing
-> >>> specific work during nvme request completion were an acceptable
-> >>> advancement I'd gladly do the work.
-> >>>
-> >> I'd be happy to work on that, given that we'll have to have 'real'
-> >> ANA support for device-mapper anyway for SLE12 SP4 etc.
-> > 
-> > I had a close enough look yesterday that I figured I'd just implement
-> > what I reasoned through as one way forward, compile tested only (patch
-> > relative to Jens' for-4.21/block):
-> > 
-> >  drivers/nvme/host/core.c      | 14 +++++++---
-> >  drivers/nvme/host/multipath.c | 65 ++++++++++++++++++++++++++-----------------
-> >  drivers/nvme/host/nvme.h      |  4 +++
-> >  3 files changed, 54 insertions(+), 29 deletions(-)
-> > 
-> > diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> > index f172d63db2b5..05313ab5d91e 100644
-> > --- a/drivers/nvme/host/core.c
-> > +++ b/drivers/nvme/host/core.c
-> > @@ -252,10 +252,16 @@ void nvme_complete_rq(struct request *req)
-> >  	trace_nvme_complete_rq(req);
-> >  
-> >  	if (unlikely(status != BLK_STS_OK && nvme_req_needs_retry(req))) {
-> > -		if ((req->cmd_flags & REQ_NVME_MPATH) &&
-> > -		    blk_path_error(status)) {
-> > -			nvme_failover_req(req);
-> > -			return;
-> > +		if (blk_path_error(status)) {
-> > +			struct nvme_ns *ns = req->q->queuedata;
-> > +			u16 nvme_status = nvme_req(req)->status;
+Thans,
+
+Gwendal.
+>
+> > Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
+> > ---
+> >  Makefile     | 9 +++++++++
+> >  src/Makefile | 3 +++
+> >  2 files changed, 12 insertions(+)
+> >
+> > diff --git a/Makefile b/Makefile
+> > index 38b8ad1..d7c2b74 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -1,9 +1,18 @@
+> > +prefix ?= /usr/local
+> > +dest = $(DESTDIR)$(prefix)/blktests
 > > +
-> > +			if (req->cmd_flags & REQ_NVME_MPATH) {
-> > +				nvme_failover_req(req);
-> > +				nvme_update_ana(ns, nvme_status);
-> > +				return;
-> > +			}
-> > +			nvme_update_ana(ns, nvme_status);
-> >  		}
-> >  
-> >  		if (!blk_queue_dying(req->q)) {
-> > diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-> > index 5e3cc8c59a39..f7fbc161dc8c 100644
-> > --- a/drivers/nvme/host/multipath.c
-> > +++ b/drivers/nvme/host/multipath.c
-> > @@ -22,7 +22,7 @@ MODULE_PARM_DESC(multipath,
-> >  
-> >  inline bool nvme_ctrl_use_ana(struct nvme_ctrl *ctrl)
-> >  {
-> > -	return multipath && ctrl->subsys && (ctrl->subsys->cmic & (1 << 3));
-> > +	return ctrl->subsys && (ctrl->subsys->cmic & (1 << 3));
-> >  }
-> >  
-> >  /*
-> > @@ -47,6 +47,17 @@ void nvme_set_disk_name(char *disk_name, struct nvme_ns *ns,
-> >  	}
-> >  }
-> >  
-> > +static bool nvme_ana_error(u16 status)
-> > +{
-> > +	switch (status & 0x7ff) {
-> > +	case NVME_SC_ANA_TRANSITION:
-> > +	case NVME_SC_ANA_INACCESSIBLE:
-> > +	case NVME_SC_ANA_PERSISTENT_LOSS:
-> > +		return true;
-> > +	}
-> > +	return false;
-> > +}
+> >  all:
+> >       $(MAKE) -C src all
+> >
+> >  clean:
+> >       $(MAKE) -C src clean
+> >
+> > +install:
+>
+> install should be added to the .PHONY targets.
+done
+>
+> > +     install -m755 -d $(dest)
+> > +     install check $(dest)
+> > +     cp -R tests common $(dest)
+> > +     $(MAKE) -C src dest=$(dest) install
+>
+> The src programs need to be installed to $(dest)/src.
+done
+>
+> >  # SC2119: "Use foo "$@" if function's $1 should mean script's $1". False
+> >  # positives on helpers like _init_scsi_debug.
+> >  SHELLCHECK_EXCLUDE := SC2119
+> > diff --git a/src/Makefile b/src/Makefile
+> > index 15c1022..f0ddbb5 100644
+> > --- a/src/Makefile
+> > +++ b/src/Makefile
+> > @@ -20,6 +20,9 @@ all: $(TARGETS)
+> >  clean:
+> >       rm -f $(TARGETS)
+> >
+> > +install: $(TARGETS)
+> > +     install $(TARGETS) $(dest)
 > > +
-> >  void nvme_failover_req(struct request *req)
-> >  {
-> >  	struct nvme_ns *ns = req->q->queuedata;
-> > @@ -58,10 +69,7 @@ void nvme_failover_req(struct request *req)
-> >  	spin_unlock_irqrestore(&ns->head->requeue_lock, flags);
-> >  	blk_mq_end_request(req, 0);
-> >  
-> > -	switch (status & 0x7ff) {
-> > -	case NVME_SC_ANA_TRANSITION:
-> > -	case NVME_SC_ANA_INACCESSIBLE:
-> > -	case NVME_SC_ANA_PERSISTENT_LOSS:
-> > +	if (nvme_ana_error(status)) {
-> >  		/*
-> >  		 * If we got back an ANA error we know the controller is alive,
-> >  		 * but not ready to serve this namespaces.  The spec suggests
-> > @@ -69,31 +77,38 @@ void nvme_failover_req(struct request *req)
-> >  		 * that the admin and I/O queues are not serialized that is
-> >  		 * fundamentally racy.  So instead just clear the current path,
-> >  		 * mark the the path as pending and kick of a re-read of the ANA
-> > -		 * log page ASAP.
-> > +		 * log page ASAP (see nvme_update_ana() below).
-> >  		 */
-> >  		nvme_mpath_clear_current_path(ns);
-> > -		if (ns->ctrl->ana_log_buf) {
-> > -			set_bit(NVME_NS_ANA_PENDING, &ns->flags);
-> > -			queue_work(nvme_wq, &ns->ctrl->ana_work);
-> > +	} else {
-> > +		switch (status & 0x7ff) {
-> > +		case NVME_SC_HOST_PATH_ERROR:
-> > +			/*
-> > +			 * Temporary transport disruption in talking to the
-> > +			 * controller.  Try to send on a new path.
-> > +			 */
-> > +			nvme_mpath_clear_current_path(ns);
-> > +			break;
-> > +		default:
-> > +			/*
-> > +			 * Reset the controller for any non-ANA error as we
-> > +			 * don't know what caused the error.
-> > +			 */
-> > +			nvme_reset_ctrl(ns->ctrl);
-> > +			break;
-> >  		}
-> > -		break;
-> > -	case NVME_SC_HOST_PATH_ERROR:
-> > -		/*
-> > -		 * Temporary transport disruption in talking to the controller.
-> > -		 * Try to send on a new path.
-> > -		 */
-> > -		nvme_mpath_clear_current_path(ns);
-> > -		break;
-> > -	default:
-> > -		/*
-> > -		 * Reset the controller for any non-ANA error as we don't know
-> > -		 * what caused the error.
-> > -		 */
-> > -		nvme_reset_ctrl(ns->ctrl);
-> > -		break;
-> >  	}
-> Maybe move nvme_mpath_clear_current_path() out of the loop (it wouldn't
-> matter if we clear the path if we reset the controller afterwards); that
-> might even clean up the code even more.
-
-Not completely sure what you're suggesting.  But I was going for purely
-functional equivalent of the existing upstream code -- just with
-multipathing and ana split.
-
-Could be that in future it wouldn't make sense to always
-nvme_mpath_clear_current_path() for all cases?
-
-> 
-> > +}
-> >  
-> > -	kblockd_schedule_work(&ns->head->requeue_work);
-> > +void nvme_update_ana(struct nvme_ns *ns, u16 status)
-> > +{
-> > +	if (nvme_ana_error(status) && ns->ctrl->ana_log_buf) {
-> > +		set_bit(NVME_NS_ANA_PENDING, &ns->flags);
-> > +		queue_work(nvme_wq, &ns->ctrl->ana_work);
-> > +	}
-> > +
-> > +	if (multipath)
-> > +		kblockd_schedule_work(&ns->head->requeue_work);
-> >  }
-> 
-> maybe use 'ns->head->disk' here; we only need to call this if we have a
-> multipath disk.
-
-Sure.
-
-> Remaining bits are okay.
-
-Thanks,
-Mike
+> >  $(C_TARGETS): %: %.c
+> >       $(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $^
+>
+> This ability to install tests could also use a mention in the README.
+done
