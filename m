@@ -2,133 +2,116 @@ Return-Path: <SRS0=CiZa=NZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 201C2C43441
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 08:26:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AD31C43441
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 08:43:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E4E8421780
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 08:26:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4E8421780
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 5F80A223DD
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 08:43:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dHMvJcA8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F80A223DD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727558AbeKNS2N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Nov 2018 13:28:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:40254 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732227AbeKNS2N (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Nov 2018 13:28:13 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id AC756804F5;
-        Wed, 14 Nov 2018 08:26:00 +0000 (UTC)
-Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B5A295D738;
-        Wed, 14 Nov 2018 08:25:55 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
+        id S1727558AbeKNSpj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Nov 2018 13:45:39 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:52568 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727154AbeKNSpi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Nov 2018 13:45:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=KIpbN9opBYgxsa2QRZ3iWjgDy+QUvrhkoRzPxZ4J0z8=; b=dHMvJcA8p0PpcCIYrEGdp0xlK
+        RImYUjy4UcnbBVeRtAUEEGzryNP7OW9WNK7/HeKNl1DlM6eH/AOFxEW7nx3PJBSX+dA+yI6E5vewx
+        oTjWQoA6SqRVa0ERlvfdS/KwnpYk5FowHmu/Xm8z+fPa15AmecvtxuUS3OnV5rZoUMBvmXIzQz7Kn
+        Nq/WKgfH8tbrK3VWFtg0Uu+ZaEqiNmrRnIqDMVo5uwCOiPr5ZYnRocDkHUhe9I9rBQ5DpVznAczuy
+        5yZy/qiJJAoeCAHTTovxARdfQm5gBIOgLVUB0CyTbQZJi514w2+TjH80flUwy7K/D+EjmJsdaYSpm
+        RVDhOcvCw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gMqle-0003tJ-Q1; Wed, 14 Nov 2018 08:43:22 +0000
+Date:   Wed, 14 Nov 2018 00:43:22 -0800
+From:   Christoph Hellwig <hch@infradead.org>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        stable <stable@vger.kernel.org>,
-        "jianchao . wang" <jianchao.w.wang@oracle.com>
-Subject: [PATCH V2] SCSI: fix queue cleanup race before queue initialization is done
-Date:   Wed, 14 Nov 2018 16:25:51 +0800
-Message-Id: <20181114082551.12141-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Wed, 14 Nov 2018 08:26:00 +0000 (UTC)
+Cc:     linux-block@vger.kernel.org, Keith Busch <keith.busch@intel.com>,
+        linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 1/6] nvme: don't disable local ints for polled queue
+Message-ID: <20181114084322.GA14954@infradead.org>
+References: <20181110151317.3813-1-axboe@kernel.dk>
+ <20181110151317.3813-2-axboe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181110151317.3813-2-axboe@kernel.dk>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-c2856ae2f315d ("blk-mq: quiesce queue before freeing queue") has
-already fixed this race, however the implied synchronize_rcu()
-in blk_mq_quiesce_queue() can slow down LUN probe a lot, so caused
-performance regression.
+> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+> index 6aa86dfcb32c..a6e3fbddfadf 100644
+> --- a/drivers/nvme/host/pci.c
+> +++ b/drivers/nvme/host/pci.c
+> @@ -1061,15 +1061,26 @@ static irqreturn_t nvme_irq_check(int irq, void *data)
+>  
+>  static int __nvme_poll(struct nvme_queue *nvmeq, unsigned int tag)
+>  {
+> +	unsigned long flags = 0; /* gcc 7.x fail */
+>  	u16 start, end;
+> -	bool found;
+> +	bool found, has_irq;
+>  
+>  	if (!nvme_cqe_pending(nvmeq))
+>  		return 0;
+>  
+> -	spin_lock_irq(&nvmeq->cq_lock);
+> +	/*
+> +	 * Polled queue doesn't have an IRQ, no need to disable ints
+> +	 */
+> +	has_irq = !nvmeq->polled;
+> +	if (has_irq)
+> +		local_irq_save(flags);
+> +
+> +	spin_lock(&nvmeq->cq_lock);
+>  	found = nvme_process_cq(nvmeq, &start, &end, tag);
+> -	spin_unlock_irq(&nvmeq->cq_lock);
+> +	spin_unlock(&nvmeq->cq_lock);
+> +
+> +	if (has_irq)
+> +		local_irq_restore(flags);
 
-Then 1311326cf4755c7 ("blk-mq: avoid to synchronize rcu inside blk_cleanup_queue()")
-tried to quiesce queue for avoiding unnecessary synchronize_rcu()
-only when queue initialization is done, because it is usual to see
-lots of inexistent LUNs which need to be probed.
+Eww, this just looks ugly.  Given that we are micro-optimizing here
+I'd rather just use a different ->poll implementation and thus blk_mq_ops
+if we have a separate poll code.  Then we could leave the existing
+__nvme_poll as-is and have a new nvme_poll_noirq something like this:
 
-However, turns out it isn't safe to quiesce queue only when queue
-initialization is done. Because when one SCSI command is completed,
-the user of sending command can be waken up immediately, then the
-scsi device may be removed, meantime the run queue in scsi_end_request()
-is still in-progress, so kernel panic can be caused.
+static int nvme_poll_noirq(struct blk_mq_hw_ctx *hctx, unsigned int tag)
+{
+        struct nvme_queue *nvmeq = hctx->driver_data;
+>  	u16 start, end;
+	bool found;
+>  
+>  	if (!nvme_cqe_pending(nvmeq))
+>  		return 0;
+>  
+> +	spin_lock(&nvmeq->cq_lock);
+>  	found = nvme_process_cq(nvmeq, &start, &end, tag);
+> +	spin_unlock(&nvmeq->cq_lock);
+> +
+>  	nvme_complete_cqes(nvmeq, start, end);
+>  	return found;
 
-In Red Hat QE lab, there are several reports about this kind of kernel
-panic triggered during kernel booting.
-
-This patch tries to address the issue by grabing one queue usage
-counter during freeing one request and the following run queue.
-
-Fixes: 1311326cf4755c7 ("blk-mq: avoid to synchronize rcu inside blk_cleanup_queue()")
-Cc: Andrew Jones <drjones@redhat.com>
-Cc: Bart Van Assche <bart.vanassche@wdc.com>
-Cc: linux-scsi@vger.kernel.org
-Cc: Martin K. Petersen <martin.petersen@oracle.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: James E.J. Bottomley <jejb@linux.vnet.ibm.com>
-Cc: stable <stable@vger.kernel.org>
-Cc: jianchao.wang <jianchao.w.wang@oracle.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-core.c        | 5 ++---
- drivers/scsi/scsi_lib.c | 8 ++++++++
- 2 files changed, 10 insertions(+), 3 deletions(-)
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index ce12515f9b9b..deb56932f8c4 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -798,9 +798,8 @@ void blk_cleanup_queue(struct request_queue *q)
- 	 * dispatch may still be in-progress since we dispatch requests
- 	 * from more than one contexts.
- 	 *
--	 * No need to quiesce queue if it isn't initialized yet since
--	 * blk_freeze_queue() should be enough for cases of passthrough
--	 * request.
-+	 * We rely on driver to deal with the race in case that queue
-+	 * initialization isn't done.
- 	 */
- 	if (q->mq_ops && blk_queue_init_done(q))
- 		blk_mq_quiesce_queue(q);
-diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
-index c7fccbb8f554..fa6e0c3b3aa6 100644
---- a/drivers/scsi/scsi_lib.c
-+++ b/drivers/scsi/scsi_lib.c
-@@ -697,6 +697,12 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
- 		 */
- 		scsi_mq_uninit_cmd(cmd);
- 
-+		/*
-+		 * queue is still alive, so grab the ref for preventing it
-+		 * from being cleaned up during running queue.
-+		 */
-+		percpu_ref_get(&q->q_usage_counter);
-+
- 		__blk_mq_end_request(req, error);
- 
- 		if (scsi_target(sdev)->single_lun ||
-@@ -704,6 +710,8 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
- 			kblockd_schedule_work(&sdev->requeue_work);
- 		else
- 			blk_mq_run_hw_queues(q, true);
-+
-+		percpu_ref_put(&q->q_usage_counter);
- 	} else {
- 		unsigned long flags;
- 
--- 
-2.9.5
-
+And while we are at it:  I think for the irq-driven queuest in a
+separate queue for poll setup we might not even need to take the
+CQ lock.  Which might be an argument for only allowing polling
+if we have the separate queues just to keep everything simple.
