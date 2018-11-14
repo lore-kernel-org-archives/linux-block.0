@@ -2,96 +2,131 @@ Return-Path: <SRS0=CiZa=NZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E828FC43441
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 18:13:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19000C43441
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 18:26:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B7DC022360
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 18:13:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7DC022360
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id D8F36223DD
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 18:26:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="YBI5KDbG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8F36223DD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727761AbeKOERt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Nov 2018 23:17:49 -0500
-Received: from mga06.intel.com ([134.134.136.31]:1260 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727576AbeKOERt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Nov 2018 23:17:49 -0500
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Nov 2018 10:13:34 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,233,1539673200"; 
-   d="scan'208";a="106254506"
-Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
-  by fmsmga004.fm.intel.com with ESMTP; 14 Nov 2018 10:13:33 -0800
-Date:   Wed, 14 Nov 2018 11:10:07 -0700
-From:   Keith Busch <keith.busch@intel.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 2/3] scsi: Do not rely on blk-mq for double completions
-Message-ID: <20181114181007.GD11416@localhost.localdomain>
-References: <20181114162601.11477-1-keith.busch@intel.com>
- <20181114162601.11477-2-keith.busch@intel.com>
- <1542217896.100259.2.camel@acm.org>
- <20181114180018.GC11416@localhost.localdomain>
+        id S1727576AbeKOEab (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Nov 2018 23:30:31 -0500
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:34057 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727251AbeKOEab (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 14 Nov 2018 23:30:31 -0500
+Received: by mail-pf1-f196.google.com with SMTP id h3so1777236pfg.1
+        for <linux-block@vger.kernel.org>; Wed, 14 Nov 2018 10:26:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=cilLOqpPMwYrIofqEwwMadi2RhC85XkSEiGo4zu33W0=;
+        b=YBI5KDbGJmJv5OfI2ISZGFdjMR8KhQssKBumU0dCnrHj98EAX+ffwuVem4UA3nwLah
+         pKoP6jv9iFhT1cXWtBw8Xhalf+1/XFxXbNNFuGUQQT3o+J6pA/a4s6Zx/Yuzhd82A2IM
+         8ybLYpkTbhRFnDCvmkDiCoIZSTLbxilzOQ2KxbRcDaTB4h26WRrmMoyYjIXuFnZptyvI
+         OOq8k7YA+eSwIjdideIoGnjGkugdQhU3y7qT3HPbyZ3ysn44rr1DjHn2HB3D4SGDTr8v
+         hEEFqMCWZVsckdd8AYNlYKggENKtz393E8TWsxg9NebXzDbhVuaS8vDUUydoPe2YFbb1
+         Xo2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=cilLOqpPMwYrIofqEwwMadi2RhC85XkSEiGo4zu33W0=;
+        b=T9wPNxN0K2qO50kGkP8Q429DYVOAjymsqq3oMwKV6nKYONB4S2ixc69JNUl3jIh38U
+         I+Rb+9mTkB8x5vdDYS4Nn8YOqmpZHvvDnRXXWat+Grk59qlQ0E6KxrtnEH2YUiZydWAQ
+         opmdXNuBnw3KQ/rfk4u75/shYC5axcF1RHhOYeozTaxx1CEktg/slb9ZGQQ6Vj5+7/MF
+         /0ibl+CnjKF+9ntdUIfIuH8+i71H5oxTrHjzlD15oKTNjQr9G7xYYUMM+fV8vvPIRnX+
+         mQ9TOdTs7M0Q+nPcNNqo/wMo2T5deJ5VdpFWuvnWqDkz/XL2eubqfv+HgVYMtaJyIfNg
+         1UAA==
+X-Gm-Message-State: AGRZ1gJROeckca4M23l03NvFIAC0toDRGk0dFoC6sFqeBwxmTgXJjuZb
+        bCzQr6dU8w73uP5DJ4im0QuhLw==
+X-Google-Smtp-Source: AJdET5cyO9ln0OJO2tVxgluboWTbNsuy3sDhxByTwCj24jhPR4+7RHZ4vsMCb0oR5vcD/uBuQrURkw==
+X-Received: by 2002:a63:4342:: with SMTP id q63mr2746794pga.63.1542219972709;
+        Wed, 14 Nov 2018 10:26:12 -0800 (PST)
+Received: from vader ([2620:10d:c090:180::1:2a61])
+        by smtp.gmail.com with ESMTPSA id o86-v6sm30131326pfk.8.2018.11.14.10.26.11
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 14 Nov 2018 10:26:12 -0800 (PST)
+Date:   Wed, 14 Nov 2018 10:26:10 -0800
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Gwendal Grignou <gwendal@chromium.org>
+Cc:     osandov@fb.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH blktests] makefile: Add install rule
+Message-ID: <20181114182610.GB3253@vader>
+References: <20181109151524.50405-1-gwendal@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181114180018.GC11416@localhost.localdomain>
-User-Agent: Mutt/1.9.1 (2017-09-22)
+In-Reply-To: <20181109151524.50405-1-gwendal@chromium.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 14, 2018 at 11:00:18AM -0700, Keith Busch wrote:
-> On Wed, Nov 14, 2018 at 09:51:36AM -0800, Bart Van Assche wrote:
-> > Regarding this patch: I think this patch introduces a subtle but severe bug
-> > in the SCSI core, namely that if an abort is processed concurrently with
-> > request completion with "fake timeout" enabled that the abort is ignored.
-> 
-> That requires the following occur concurrently:
-> 
->   1. A real completion
->   2. A real timeout
->   3. A fake timeout
-> 
-> That can't happen on a production kernel, and highly improbable
-> on the fake one. We can still fix it by having scsi timeout return
-> BLK_EH_RESET_TIMER in this case. I didn't like adding code just to work
-> around error injection, but there isn't a good alternative at the moment.
+On Fri, Nov 09, 2018 at 07:15:24AM -0800, Gwendal Grignou wrote:
+> Add rule to install to a target directory, /usr/local/blktests by
+> default.
 
-So do this instead:
+This seems reasonale, but I'm curious, what's your use case?
 
---8<---
-diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-index ff372b335ced..d343024e732a 100644
---- a/drivers/scsi/scsi_error.c
-+++ b/drivers/scsi/scsi_error.c
-@@ -199,9 +199,6 @@ scsi_abort_command(struct scsi_cmnd *scmd)
- 		return FAILED;
- 	}
- 
--	if (test_and_set_bit(__SCMD_COMPLETE, &scmd->flags))
--		return SUCCESS;
--
- 	spin_lock_irqsave(shost->host_lock, flags);
- 	if (shost->eh_deadline != -1 && !shost->last_reset)
- 		shost->last_reset = jiffies;
-@@ -299,6 +296,8 @@ enum blk_eh_timer_return scsi_times_out(struct request *req)
- 		rtn = host->hostt->eh_timed_out(scmd);
- 
- 	if (rtn == BLK_EH_DONE) {
-+		if (test_and_set_bit(__SCMD_COMPLETE, &scmd->flags))
-+			return BLK_EH_RESET_TIMER;
- 		if (scsi_abort_command(scmd) != SUCCESS) {
- 			set_host_byte(scmd, DID_TIME_OUT);
- 			scsi_eh_scmd_add(scmd);
--->8---
+> Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
+> ---
+>  Makefile     | 9 +++++++++
+>  src/Makefile | 3 +++
+>  2 files changed, 12 insertions(+)
+> 
+> diff --git a/Makefile b/Makefile
+> index 38b8ad1..d7c2b74 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1,9 +1,18 @@
+> +prefix ?= /usr/local
+> +dest = $(DESTDIR)$(prefix)/blktests
+> +
+>  all:
+>  	$(MAKE) -C src all
+>  
+>  clean:
+>  	$(MAKE) -C src clean
+>  
+> +install:
+
+install should be added to the .PHONY targets.
+
+> +	install -m755 -d $(dest)
+> +	install check $(dest)
+> +	cp -R tests common $(dest)
+> +	$(MAKE) -C src dest=$(dest) install
+
+The src programs need to be installed to $(dest)/src.
+
+>  # SC2119: "Use foo "$@" if function's $1 should mean script's $1". False
+>  # positives on helpers like _init_scsi_debug.
+>  SHELLCHECK_EXCLUDE := SC2119
+> diff --git a/src/Makefile b/src/Makefile
+> index 15c1022..f0ddbb5 100644
+> --- a/src/Makefile
+> +++ b/src/Makefile
+> @@ -20,6 +20,9 @@ all: $(TARGETS)
+>  clean:
+>  	rm -f $(TARGETS)
+>  
+> +install: $(TARGETS)
+> +	install $(TARGETS) $(dest)
+> +
+>  $(C_TARGETS): %: %.c
+>  	$(CC) $(CPPFLAGS) $(CFLAGS) -o $@ $^
+
+This ability to install tests could also use a mention in the README.
