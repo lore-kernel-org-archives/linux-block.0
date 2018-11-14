@@ -2,105 +2,79 @@ Return-Path: <SRS0=CiZa=NZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFAFAC43610
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 15:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 629F9C43441
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 15:18:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7911722506
-	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 15:18:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C4BC208E7
+	for <linux-block@archiver.kernel.org>; Wed, 14 Nov 2018 15:18:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="K+Rxj7wP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7911722506
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OHkBdRbo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C4BC208E7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732367AbeKOBWH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 14 Nov 2018 20:22:07 -0500
-Received: from mail-it1-f172.google.com ([209.85.166.172]:39283 "EHLO
-        mail-it1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732485AbeKOBWH (ORCPT
+        id S1732914AbeKOBW1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 14 Nov 2018 20:22:27 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:42888 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732485AbeKOBW1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 14 Nov 2018 20:22:07 -0500
-Received: by mail-it1-f172.google.com with SMTP id m15so24350356itl.4
-        for <linux-block@vger.kernel.org>; Wed, 14 Nov 2018 07:18:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=HZ+inWvfHVDSEV1usxer1b2XqfBkS3568/ukX1pOf1M=;
-        b=K+Rxj7wPrdTCWQLhNRupB4mTyIqSqc10IWF6H72K2rlgYNHwaXoJ3RfU2g+k3rfWQc
-         mfhqUqLuQN+4haK7oPaFeYNHNfZPPQKSQrwmNTSeo8GJyK3J+HYbK/7CmaZ7yFCmeGDK
-         Kkb9+Krywz7K2fkhgiiolbQjuMOkMqMQmtooAEjO7rLhj9s5azYXa9+sV+tt9hpoUlEd
-         NgH3C9P311UP9DW5RIUq6uCCbNgjFeZKwmAKiuTnrci7kd1w969zVJETOfHs0YYbg3R+
-         6zO7398g+/bahknIK9nsPD40HAqkax2Yt3+/8Ad0fR0V7X4hxCWB2AvLTwZICvfv6NT7
-         mnvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=HZ+inWvfHVDSEV1usxer1b2XqfBkS3568/ukX1pOf1M=;
-        b=XsXmBC2Fr6fMn1+VedOCZkkqVoT3EXlLsi6jnGj4KNfphqsdfx29gukiYExpjyjLzb
-         udr2ay7aXu+JBj908SEJmoR5sOv/rIyJakrvIL/4uqCeQ0b9mFbaJBWT40ws88p8ILAK
-         SfEfy20vkZ+Krf2pwHSfE5FAWW/0IBZT5q/dExCSCqETFOIie1lleJ7wAIvh9kdbbj/l
-         khGmpz7W1S3gw6D7vnxz4dTptua1GnOt4qqvbKYDkeGvq25cNkVUxeZWYBH1agISMLj5
-         XB1gxmhzQ9Luy1vT1D+11KaiBqwIUjrGdySyBzfnDT3n+SF6yOIkTSUkssHYl5YPNc6C
-         53eg==
-X-Gm-Message-State: AGRZ1gJFUz354J71UjgwfjSb7vDr613wsObF0p6jyWuf3riGKyGMipma
-        dV+ZKpExTrl2F/4JeOJCx3hL2Q==
-X-Google-Smtp-Source: AJdET5dnEpQ25v6+ETv7+Ja7eR+2EZc0UfDq5s3KBL1Z2E46gqjmwVnlKivPy/ezagMmUUgchymkjw==
-X-Received: by 2002:a24:1706:: with SMTP id 6-v6mr2279539ith.169.1542208707074;
-        Wed, 14 Nov 2018 07:18:27 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id c102sm2653599itd.38.2018.11.14.07.18.25
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 14 Nov 2018 07:18:25 -0800 (PST)
-Subject: Re: [PATCH] block: fix 32 bit overflow in __blkdev_issue_discard()
-To:     Dave Chinner <david@fromorbit.com>, linux-xfs@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-References: <20181113214337.20581-1-david@fromorbit.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <10a8dd78-7c00-8593-9f4e-b20eb1161b92@kernel.dk>
-Date:   Wed, 14 Nov 2018 08:18:24 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Wed, 14 Nov 2018 20:22:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=PxQ3y8Fi+lTMVMPmyHgv4V+35r7gI90bPqY17fCU8ac=; b=OHkBdRbo1gRBBXsT//ovB3fXj
+        TdWThR3l+/u6gVHxzGvOdLlYHncbOrgwipqZDBfwEsKb7U1rT7lIUkEWzAaFFfgyZe9li8IJMyk7D
+        t99kqTDhBgYsD6mM9MSoQOtq19wNtYoetpwRQr1nn7VU12/p4GV8pl3tCFBEfExWlMiN57Pv7iI5K
+        iTd/BXSQnkp4Xz4HA5MTiTrhd9JX3vxc/Fw4NWye9DiIkxceqK4PC9x6RQ/JSO3r9aqM808ySz9A6
+        AMt5m+qASNWGkYMAuKG82cELqAGdB24DZVSfTsG82r4RJoY2xFz5I97d4K59syNcPVykD4cRNA54i
+        UT7wBtIzQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gMwwK-0005lH-7U; Wed, 14 Nov 2018 15:18:48 +0000
+Date:   Wed, 14 Nov 2018 07:18:48 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        "Alasdair G. Kergon" <agk@redhat.com>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, axboe@kernel.dk
+Subject: Re: [patch 5/5] block: use a driver-specific handler for the
+ "inflight" value
+Message-ID: <20181114151848.GA22138@infradead.org>
+References: <20181106213858.391264280@debian-a64.vm>
+ <20181108145240.GA20087@infradead.org>
+ <20181108170701.GA29107@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181113214337.20581-1-david@fromorbit.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181108170701.GA29107@redhat.com>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/13/18 2:43 PM, Dave Chinner wrote:
-> From: Dave Chinner <dchinner@redhat.com>
+On Thu, Nov 08, 2018 at 12:07:01PM -0500, Mike Snitzer wrote:
+> Discussed doing that with Jens and reported as much here:
 > 
-> A discard cleanup merged into 4.20-rc2 causes fstests xfs/259 to
-> fall into an endless loop in the discard code. The test is creating
-> a device that is exactly 2^32 sectors in size to test mkfs boundary
-> conditions around the 32 bit sector overflow region.
+> https://www.redhat.com/archives/dm-devel/2018-November/msg00068.html
 > 
-> mkfs issues a discard for the entire device size by default, and
-> hence this throws a sector count of 2^32 into
-> blkdev_issue_discard(). It takes the number of sectors to discard as
-> a sector_t - a 64 bit value.
+> And Jens gave additional context for why yet another attempt to switch
+> block core's in_flight to percpu counters is doomed (having already been
+> proposed and rejected twice):
 > 
-> The commit ba5d73851e71 ("block: cleanup __blkdev_issue_discard")
-> takes this sector count and casts it to a 32 bit value before
-> comapring it against the maximum allowed discard size the device
-> has. This truncates away the upper 32 bits, and so if the lower 32
-> bits of the sector count is zero, it starts issuing discards of
-> length 0. This causes the code to fall into an endless loop, issuing
-> a zero length discards over and over again on the same sector.
+> https://www.redhat.com/archives/dm-devel/2018-November/msg00071.html
+> 
+> And yes, definitely should've cc'd linux-block (now added).
 
-Applied, thanks. Ming, can you please add a blktests test for
-this case? This is the 2nd time it's been broken.
-
--- 
-Jens Axboe
-
+So how is dm different from the the other 3 handful of drivers using
+the make_request interface that the per-cpu counters work for dm and
+not the others?
