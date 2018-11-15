@@ -6,38 +6,39 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEECBC43441
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 06:57:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76906C43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 06:58:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 817E42086B
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 06:57:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 817E42086B
+	by mail.kernel.org (Postfix) with ESMTP id 47C522086B
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 06:58:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47C522086B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728564AbeKORDj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Nov 2018 12:03:39 -0500
-Received: from mx2.suse.de ([195.135.220.15]:57214 "EHLO mx1.suse.de"
+        id S1728204AbeKOREs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Nov 2018 12:04:48 -0500
+Received: from mx2.suse.de ([195.135.220.15]:57336 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726892AbeKORDj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Nov 2018 12:03:39 -0500
+        id S1727067AbeKOREs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Nov 2018 12:04:48 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay1.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 19CFBAF4C;
-        Thu, 15 Nov 2018 06:57:04 +0000 (UTC)
-Subject: Re: [PATCH 08/16] block: remove a few unused exports
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id A1A7BAF4C;
+        Thu, 15 Nov 2018 06:58:12 +0000 (UTC)
+Subject: Re: [PATCH 09/16] blk-cgroup: consolidate error handling in
+ blkcg_init_queue
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
         drbd-dev@lists.linbit.com
 References: <20181114160219.28328-1-hch@lst.de>
- <20181114160219.28328-9-hch@lst.de>
+ <20181114160219.28328-10-hch@lst.de>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <fc03d13c-1e60-6625-5c8f-9727ed8811be@suse.de>
-Date:   Thu, 15 Nov 2018 07:57:03 +0100
+Message-ID: <ab65d44e-a5f4-c040-19ab-d6dd3c4f5073@suse.de>
+Date:   Thu, 15 Nov 2018 07:58:12 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.3.0
 MIME-Version: 1.0
-In-Reply-To: <20181114160219.28328-9-hch@lst.de>
+In-Reply-To: <20181114160219.28328-10-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -47,15 +48,12 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 11/14/18 5:02 PM, Christoph Hellwig wrote:
+> Use a goto label to merge two identical pieces of error handling code.
+> 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->   block/blk-cgroup.c   | 6 ------
->   block/blk-ioc.c      | 3 ---
->   block/blk-mq-sysfs.c | 1 -
->   block/blk-softirq.c  | 1 -
->   block/blk-stat.c     | 4 ----
->   block/blk-wbt.c      | 2 --
->   6 files changed, 17 deletions(-)
+>   block/blk-cgroup.c | 22 ++++++++++------------
+>   1 file changed, 10 insertions(+), 12 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
