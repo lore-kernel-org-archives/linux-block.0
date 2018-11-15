@@ -6,68 +6,72 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C94DC43441
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 01:50:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E4FDC43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 01:51:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D63C9214F1
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 01:50:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39749214F1
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 01:51:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="kYWGozDo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D63C9214F1
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="VTNbTIz4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39749214F1
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726811AbeKOLzy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Nov 2018 06:55:54 -0500
-Received: from mail-pl1-f178.google.com ([209.85.214.178]:38261 "EHLO
-        mail-pl1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726574AbeKOLzy (ORCPT
+        id S1725895AbeKOL5h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Nov 2018 06:57:37 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:41430 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726379AbeKOL5h (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Nov 2018 06:55:54 -0500
-Received: by mail-pl1-f178.google.com with SMTP id p4-v6so8673748plo.5
-        for <linux-block@vger.kernel.org>; Wed, 14 Nov 2018 17:50:08 -0800 (PST)
+        Thu, 15 Nov 2018 06:57:37 -0500
+Received: by mail-pg1-f195.google.com with SMTP id 70so8228617pgh.8
+        for <linux-block@vger.kernel.org>; Wed, 14 Nov 2018 17:51:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=Ydy9PAOX0bvSjQe3p2AUQ6FPZYdf3i0kQ/PcqZeUZKM=;
-        b=kYWGozDoFDJvr8OTWNCXJh1PtEwpI5J0MhPzQ4YYHt1R/w/Mxd+WdE7lPd+ELWvji4
-         xRqc7qaqLS7Z5vxYEXmriKaIgrHgptUx9bk4AXUm2L+WqbkGM2hCMbY3+nQUAtiQnuKM
-         z6WXbt+AjkmjGSwrFoxHvttN5NNyWgkrGhdUedCVyEL5O/p8f+mA/IKq5n3eqMe95VCL
-         uLrlwBXaP5zlEsGaSkXvVqw99t9usjrV5EmCfugMiRWzszDtyTwypHy3UeQsrgtFY13s
-         /o7I6eeFYOQfois70UwSIHaNYzBQR0OoPExjtkmc+MtbCpdgQPpnUGgyucbJy7NtmiB3
-         Vnbw==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=NRS0WNPRswomrkeKUIMnHidk8L9CBK22oE+san0mMLw=;
+        b=VTNbTIz4evsD0cHuyKTcmIawQ7wg65Fc5Jy8Nycg6eQsTtpVYB+8vUlJ32xBmIKLUC
+         nZcMm4GvItzPcUbHiMF6dJ/z3pFTlAjPwNnOnVXNshhwIfOk0gWOSotqkICXA2kbUICt
+         sT6fpkvFrOCEfkXu77SQ8VtrVfRsb119asxeIOf4TkVK/wdMcqwbWvdp05eJp8D+LZij
+         am1aq2xTfbZpm5a9laN9ONat5zdN/lQXRtSC/wgVVcGZJqkK35laLl4hk9YIlcYtdKBo
+         UMIy3y7Y2E6PqDRpTd4WAXRIljMBIZqhp5uBLrySO6BZPkrW2su8W2rEEHAV+zwdk4Y9
+         zM6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Ydy9PAOX0bvSjQe3p2AUQ6FPZYdf3i0kQ/PcqZeUZKM=;
-        b=Ji0dAXaz8RjCvGuR4YrKPByNfLEayCaEkHjJmhu2tmm8FhWP0Tj4d1bp4unYRq6o/5
-         NN2Hh+4D5Ow5ABP0I3TH/T16X7Uity+g52uOuer9MtKcZZ/DfgYFIeDr4/XpLbLTG7i5
-         FxBEGntWh9ilFZxPSJBj8oRwwbi1tlPwm/iyNhPpf6zCT4CUMLhR9SMY3J38mKiKivXv
-         xzNt/wtl9h6OWRPvUgIFMgR0jZ0buVuiYwOI5PXznLfEKHqUtrLFKF2U2KFoTPvwdBlF
-         Mt3ZTJJ+509WIDV+Egz0HAPT/B9lWBGKDF1od8SEwIvYBJMi0kzisqLGKiMGEF3NkqhD
-         fQyg==
-X-Gm-Message-State: AGRZ1gLemimn/BdRfbnTzxpeSvNPN7jZU9nc5DVXSJWC5bqn/1C6aouO
-        4MMJiP/h147vXVasau6S3Cmqm8xu118=
-X-Google-Smtp-Source: AJdET5epIJjeIIqfmL0KfBhdFpMw+dzblYjEA4eWE04kvo38JWuCAhpTpJNH7kOT0ues2Z7jhSnShg==
-X-Received: by 2002:a17:902:112b:: with SMTP id d40-v6mr4346331pla.48.1542246607784;
-        Wed, 14 Nov 2018 17:50:07 -0800 (PST)
+        bh=NRS0WNPRswomrkeKUIMnHidk8L9CBK22oE+san0mMLw=;
+        b=ILYJAB/5yECNFUMfDGrkXREWROXrLc5K0WOOR0dy7gdR5Z8CkbFyO4wHZJ06dmkoiO
+         wSMHHE8G6kg9NjNLl7pMV1uEiYyGkUCIYmPXFasFHr4O2OcI83k1Af09WimRB4W9hltN
+         an7k3Tm2Y5ThNxFJllwg/u0Allpynty+SqqUrXpOM0GzSBV4ffM80wCd0A0rayGB2MjO
+         j6+pn0jzUinjX/uc5feXSfIToxG1Icx94LMgzcKn4zLpK9sAv9rCs9c+OLehGJGX4ekV
+         QoAByC0k2YdzGv/xIq8OqCmopueEKLFQ4cMGcfT2F2+p+FnMOpUiqIVKmj+0GEuKXMFU
+         UmRQ==
+X-Gm-Message-State: AGRZ1gK4F9C7DNXIJ1Uq91zOCetw9yU25P3g4Dvrl4kw/kJMeogIJNAJ
+        45RjymZ1cFCn4Snd77n0ezQrkNQbRDY=
+X-Google-Smtp-Source: AJdET5dvbAygKzTGpf+PD5EWVU+d8b7fMqj23zRkJi5DHndK1kNCF+EtWlSYD9RAwkt/rM/XhTRdNw==
+X-Received: by 2002:a63:2447:: with SMTP id k68-v6mr3918030pgk.156.1542246710117;
+        Wed, 14 Nov 2018 17:51:50 -0800 (PST)
 Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id 186sm23454294pga.36.2018.11.14.17.50.06
+        by smtp.gmail.com with ESMTPSA id f22-v6sm30657171pff.29.2018.11.14.17.51.48
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 14 Nov 2018 17:50:06 -0800 (PST)
-Subject: Re: [PATCH] block: make blk_try_req_merge() static
-To:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org
-References: <20181115011946.123485-1-ebiggers@kernel.org>
+        Wed, 14 Nov 2018 17:51:49 -0800 (PST)
+Subject: Re: [PATCH] block: fix 32 bit overflow in __blkdev_issue_discard()
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Dave Chinner <david@fromorbit.com>, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org
+References: <20181113214337.20581-1-david@fromorbit.com>
+ <10a8dd78-7c00-8593-9f4e-b20eb1161b92@kernel.dk>
+ <20181115010651.GD32603@ming.t460p>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <46236046-aa9f-05aa-679b-22295aa3341b@kernel.dk>
-Date:   Wed, 14 Nov 2018 18:50:05 -0700
+Message-ID: <80b9c4b7-1625-a1b6-0f1e-94de9d8b446b@kernel.dk>
+Date:   Wed, 14 Nov 2018 18:51:47 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20181115011946.123485-1-ebiggers@kernel.org>
+In-Reply-To: <20181115010651.GD32603@ming.t460p>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -76,15 +80,38 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/14/18 6:19 PM, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On 11/14/18 6:06 PM, Ming Lei wrote:
+> On Wed, Nov 14, 2018 at 08:18:24AM -0700, Jens Axboe wrote:
+>> On 11/13/18 2:43 PM, Dave Chinner wrote:
+>>> From: Dave Chinner <dchinner@redhat.com>
+>>>
+>>> A discard cleanup merged into 4.20-rc2 causes fstests xfs/259 to
+>>> fall into an endless loop in the discard code. The test is creating
+>>> a device that is exactly 2^32 sectors in size to test mkfs boundary
+>>> conditions around the 32 bit sector overflow region.
+>>>
+>>> mkfs issues a discard for the entire device size by default, and
+>>> hence this throws a sector count of 2^32 into
+>>> blkdev_issue_discard(). It takes the number of sectors to discard as
+>>> a sector_t - a 64 bit value.
+>>>
+>>> The commit ba5d73851e71 ("block: cleanup __blkdev_issue_discard")
+>>> takes this sector count and casts it to a 32 bit value before
+>>> comapring it against the maximum allowed discard size the device
+>>> has. This truncates away the upper 32 bits, and so if the lower 32
+>>> bits of the sector count is zero, it starts issuing discards of
+>>> length 0. This causes the code to fall into an endless loop, issuing
+>>> a zero length discards over and over again on the same sector.
+>>
+>> Applied, thanks. Ming, can you please add a blktests test for
+>> this case? This is the 2nd time it's been broken.
 > 
-> blk_try_req_merge() is only used in block/blk-merge.c, so make it
-> static.
-> 
-> This addresses a gcc warning when -Wmissing-prototypes is enabled.
+> OK, I will add zram discard test in blktests, which should cover the
+> 1st report. For the xfs/259, I need to investigate if it is easy to
+> do in blktests.
 
-Added for 4.21, thanks.
+null_blk has discard support, might be an easier target in terms
+of blktests.
 
 -- 
 Jens Axboe
