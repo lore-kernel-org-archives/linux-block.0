@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC9CC43441
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 22:34:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 328E2C43610
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 23:24:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 926602084C
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 22:34:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EEB1B2145D
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 23:24:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="kuiKUdcP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 926602084C
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="xNHPvfwn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEB1B2145D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727237AbeKPInp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Nov 2018 03:43:45 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:38649 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726812AbeKPInp (ORCPT
+        id S1726605AbeKPJd4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Nov 2018 04:33:56 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:40042 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726409AbeKPJdz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Nov 2018 03:43:45 -0500
-Received: by mail-pl1-f196.google.com with SMTP id e5so123068plb.5
-        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 14:34:02 -0800 (PST)
+        Fri, 16 Nov 2018 04:33:55 -0500
+Received: by mail-pf1-f193.google.com with SMTP id x2-v6so10422532pfm.7
+        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 15:24:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=osandov-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=a098WawebiQEI35+UC6o+h5gSwtB4cT8kXe3OZC4l0Y=;
-        b=kuiKUdcPwp6i0ipF7JnmuAigwlNOsM4+m6qSabIm42If8aj+totidZe5lZiL7oO3kz
-         BAhagr77MnqmgZ7eJWQg3VCHfO5DQAu5B/ELsVk1Ogyjyde/Jq4fE19hf3kEDo9ep/C3
-         calrtB9C3oEy/4eL96VN4o8NMKFKYA8fxw68HkD+pWc0fD9c9qT2nDmt2/bQQ6GcYiEv
-         aOXHIkQkKlwuRbZLR0ZwByLvFrDZQeTCmWv+ruWgn2KZ5YUt2NnmCOEigJr7YfMzztyX
-         gw6owHpEOl6KBog3pwkQmq66aF+B1cskdGh1Ug/PjRWSu/6ZuRFFodoysD09sNm4r7oP
-         s01g==
+        bh=jwnypmXRKe0aQmFwiDDHQvx5bHMn94jQ/OjQzX3YuJ0=;
+        b=xNHPvfwni0CT/Ud+WG0Z+eArtj5FLHdX5ny0CAJBgZw/w5k8sAxb3sDWxubpfB1ZS/
+         7WVq1n1Fp4vLIVMGHxTYOo5cgiGZQgwqJ7uYQNM33OACNJrd6jMSaYIYIelZKKlgosfK
+         nkEnkYrUnadWqJ43cAXSq2fMz5RDwApNaX7RGATH2cbmys5FkjmJdNzQ2hvgOQoVv/Gp
+         c5H+d8rWap2eHHnCaFtK4alcHdtD8uBvY3LcbPJXqocRZhw2iSpIq1ao3UU6L1cjlLAN
+         3qaL6ExIwzLXqtDfHjK/EfEagOR/RXXe0pXUMJLjb8iAEqGmsTTgFST/ahlPUZeRcNVf
+         m83Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=a098WawebiQEI35+UC6o+h5gSwtB4cT8kXe3OZC4l0Y=;
-        b=sdQ9izHoV3x2ofjCCW3r1Yr/kJNAW0TZYaiKtCLgqY5+fJVVxetFcQrhe29A+hY/7H
-         7LNFPIptZs95YraEwpO28vS2gN1m/KeCtzVSp9g9YV/kcT3Skdw6R8+3KNsPaoUf0sgb
-         OwyFZgHPmf/VLpQGEH0b0RPK070r/dZ0dVgqgPCNn9owvZg6/ds3UzU2rty4TM2/mX7B
-         /IZ+fLzQMSn9kZ9CDjfT4+X/NXZw2/ltUsdfkMahI8HdSUZBAnFeZfsAZ58sMtZ4Zc69
-         FCICwqMe7AGCSIF7RkENYNzIjOYLYfauyQ2U2pVOZsk3PSBMn9tzO0O8DVfbpfx5VviO
-         F6tA==
-X-Gm-Message-State: AGRZ1gKd4l0Twrqy2VXsbZEDs4Pdg1IH+oL0jrQIU6q9rlOWEg+En3Bt
-        z59rhZP+9U23vSdGzZPIP2LMgw==
-X-Google-Smtp-Source: AJdET5dmw/PuqSJI5XAo05F8Etf2qQJnLYladxMDCUzBzACO+pRIj9hKSJx7qc0yli6+d8UR+CjTyg==
-X-Received: by 2002:a17:902:128c:: with SMTP id g12-v6mr7885468pla.143.1542321241844;
-        Thu, 15 Nov 2018 14:34:01 -0800 (PST)
+        bh=jwnypmXRKe0aQmFwiDDHQvx5bHMn94jQ/OjQzX3YuJ0=;
+        b=GSUen/atVw0LpyHvrHJBC/R7dCSpIz40FYgkpE94pSiqaZ6vK6rWyhXMSAcSUFH3w3
+         8lG75j8/ahPWnWkWc8vIA9oyxo9dkV6SqkhKlkUMNgMOQIRFRTIgTTpF9k5M6E4/C1+H
+         VJuMmfxXvHXUxD12t0l/XdA8gwIFGgV/SrQdUyEdUEuwxSpTL5Hr2RnGeuu4n1TSZZgk
+         tHSZPeosy4eYtD1Zr5Y8OT4g5tccvLbqFFZA0ekSwYiZgnjhjbPzA56fvN1wX9tpmIHZ
+         vgxoWxTWNVQ10l21O7yYtmkKOAj15fAwZTYXkV6f+fcCBJd2zGp/Xg3Tpqo8NIKmuW73
+         mIzA==
+X-Gm-Message-State: AGRZ1gI58hM+DSRbqpiD2znc4mcSElTJV33M4d7X9WTxlLF/2tALm3Nr
+        E7PUPh17zmjAudHEkbaNNRXGlQ==
+X-Google-Smtp-Source: AJdET5f1hxetB9UqDibiUkx95kTB/X389pkp9WONJq7RyIqm5kAs3ITocaP1OtKLLpS24I28CEXFdQ==
+X-Received: by 2002:a63:344e:: with SMTP id b75mr7449203pga.184.1542324240224;
+        Thu, 15 Nov 2018 15:24:00 -0800 (PST)
 Received: from vader ([64.114.255.97])
-        by smtp.gmail.com with ESMTPSA id h128sm32821115pgc.15.2018.11.15.14.34.00
+        by smtp.gmail.com with ESMTPSA id x63-v6sm38337415pfk.14.2018.11.15.15.23.58
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 15 Nov 2018 14:34:01 -0800 (PST)
-Date:   Thu, 15 Nov 2018 14:33:58 -0800
+        Thu, 15 Nov 2018 15:23:59 -0800 (PST)
+Date:   Thu, 15 Nov 2018 15:23:56 -0800
 From:   Omar Sandoval <osandov@osandov.com>
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
@@ -76,23 +76,23 @@ Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
         linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
         Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: Re: [PATCH V10 04/19] block: use bio_for_each_bvec() to map sg
-Message-ID: <20181115223358.GE9348@vader>
+Subject: Re: [PATCH V10 05/19] block: introduce bvec_last_segment()
+Message-ID: <20181115232356.GA23238@vader>
 References: <20181115085306.9910-1-ming.lei@redhat.com>
- <20181115085306.9910-5-ming.lei@redhat.com>
+ <20181115085306.9910-6-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181115085306.9910-5-ming.lei@redhat.com>
+In-Reply-To: <20181115085306.9910-6-ming.lei@redhat.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 15, 2018 at 04:52:51PM +0800, Ming Lei wrote:
-> It is more efficient to use bio_for_each_bvec() to map sg, meantime
-> we have to consider splitting multipage bvec as done in blk_bio_segment_split().
+On Thu, Nov 15, 2018 at 04:52:52PM +0800, Ming Lei wrote:
+> BTRFS and guard_bio_eod() need to get the last singlepage segment
+> from one multipage bvec, so introduce this helper to make them happy.
 > 
 > Cc: Dave Chinner <dchinner@redhat.com>
 > Cc: Kent Overstreet <kent.overstreet@gmail.com>
@@ -119,108 +119,54 @@ On Thu, Nov 15, 2018 at 04:52:51PM +0800, Ming Lei wrote:
 
 Reviewed-by: Omar Sandoval <osandov@fb.com>
 
+Minor comments below.
+
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  block/blk-merge.c | 72 +++++++++++++++++++++++++++++++++++++++----------------
->  1 file changed, 52 insertions(+), 20 deletions(-)
+>  include/linux/bvec.h | 25 +++++++++++++++++++++++++
+>  1 file changed, 25 insertions(+)
 > 
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index 6f7deb94a23f..cb9f49bcfd36 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -473,6 +473,56 @@ static int blk_phys_contig_segment(struct request_queue *q, struct bio *bio,
->  	return biovec_phys_mergeable(q, &end_bv, &nxt_bv);
+> diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+> index 3d61352cd8cf..01616a0b6220 100644
+> --- a/include/linux/bvec.h
+> +++ b/include/linux/bvec.h
+> @@ -216,4 +216,29 @@ static inline bool mp_bvec_iter_advance(const struct bio_vec *bv,
+>  	.bi_bvec_done	= 0,						\
 >  }
 >  
-> +static struct scatterlist *blk_next_sg(struct scatterlist **sg,
-> +		struct scatterlist *sglist)
+> +/*
+> + * Get the last singlepage segment from the multipage bvec and store it
+> + * in @seg
+> + */
+> +static inline void bvec_last_segment(const struct bio_vec *bvec,
+> +		struct bio_vec *seg)
+
+Indentation is all messed up here.
+
 > +{
-> +	if (!*sg)
-> +		return sglist;
-> +	else {
-> +		/*
-> +		 * If the driver previously mapped a shorter
-> +		 * list, we could see a termination bit
-> +		 * prematurely unless it fully inits the sg
-> +		 * table on each mapping. We KNOW that there
-> +		 * must be more entries here or the driver
-> +		 * would be buggy, so force clear the
-> +		 * termination bit to avoid doing a full
-> +		 * sg_init_table() in drivers for each command.
-> +		 */
-> +		sg_unmark_end(*sg);
-> +		return sg_next(*sg);
+> +	unsigned total = bvec->bv_offset + bvec->bv_len;
+> +	unsigned last_page = total / PAGE_SIZE;
+> +
+> +	if (last_page * PAGE_SIZE == total)
+> +		last_page--;
+
+I think this could just be
+
+	unsigned int last_page = (total - 1) / PAGE_SIZE;
+
+> +	seg->bv_page = nth_page(bvec->bv_page, last_page);
+> +
+> +	/* the whole segment is inside the last page */
+> +	if (bvec->bv_offset >= last_page * PAGE_SIZE) {
+> +		seg->bv_offset = bvec->bv_offset % PAGE_SIZE;
+> +		seg->bv_len = bvec->bv_len;
+> +	} else {
+> +		seg->bv_offset = 0;
+> +		seg->bv_len = total - last_page * PAGE_SIZE;
 > +	}
 > +}
 > +
-> +static unsigned blk_bvec_map_sg(struct request_queue *q,
-> +		struct bio_vec *bvec, struct scatterlist *sglist,
-> +		struct scatterlist **sg)
-> +{
-> +	unsigned nbytes = bvec->bv_len;
-> +	unsigned nsegs = 0, total = 0;
-> +
-> +	while (nbytes > 0) {
-> +		unsigned seg_size;
-> +		struct page *pg;
-> +		unsigned offset, idx;
-> +
-> +		*sg = blk_next_sg(sg, sglist);
-> +
-> +		seg_size = min(nbytes, queue_max_segment_size(q));
-> +		offset = (total + bvec->bv_offset) % PAGE_SIZE;
-> +		idx = (total + bvec->bv_offset) / PAGE_SIZE;
-> +		pg = nth_page(bvec->bv_page, idx);
-> +
-> +		sg_set_page(*sg, pg, seg_size, offset);
-> +
-> +		total += seg_size;
-> +		nbytes -= seg_size;
-> +		nsegs++;
-> +	}
-> +
-> +	return nsegs;
-> +}
-> +
->  static inline void
->  __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
->  		     struct scatterlist *sglist, struct bio_vec *bvprv,
-> @@ -490,25 +540,7 @@ __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
->  		(*sg)->length += nbytes;
->  	} else {
->  new_segment:
-> -		if (!*sg)
-> -			*sg = sglist;
-> -		else {
-> -			/*
-> -			 * If the driver previously mapped a shorter
-> -			 * list, we could see a termination bit
-> -			 * prematurely unless it fully inits the sg
-> -			 * table on each mapping. We KNOW that there
-> -			 * must be more entries here or the driver
-> -			 * would be buggy, so force clear the
-> -			 * termination bit to avoid doing a full
-> -			 * sg_init_table() in drivers for each command.
-> -			 */
-> -			sg_unmark_end(*sg);
-> -			*sg = sg_next(*sg);
-> -		}
-> -
-> -		sg_set_page(*sg, bvec->bv_page, nbytes, bvec->bv_offset);
-> -		(*nsegs)++;
-> +		(*nsegs) += blk_bvec_map_sg(q, bvec, sglist, sg);
->  	}
->  	*bvprv = *bvec;
->  }
-> @@ -530,7 +562,7 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
->  	int cluster = blk_queue_cluster(q), nsegs = 0;
->  
->  	for_each_bio(bio)
-> -		bio_for_each_segment(bvec, bio, iter)
-> +		bio_for_each_bvec(bvec, bio, iter)
->  			__blk_segment_map_sg(q, &bvec, sglist, &bvprv, sg,
->  					     &nsegs, &cluster);
->  
+>  #endif /* __LINUX_BVEC_ITER_H */
 > -- 
 > 2.9.5
 > 
