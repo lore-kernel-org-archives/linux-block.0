@@ -2,234 +2,91 @@ Return-Path: <SRS0=/6aj=N2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F631C43441
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 17:46:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A29C6C43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 17:59:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DB29A21780
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 17:46:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB29A21780
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 72638223CB
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 17:59:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72638223CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388770AbeKPDy5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Nov 2018 22:54:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53736 "EHLO mx1.redhat.com"
+        id S2388226AbeKPEIl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Nov 2018 23:08:41 -0500
+Received: from mga11.intel.com ([192.55.52.93]:61131 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388452AbeKPDy5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Nov 2018 22:54:57 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CB848307EA87;
-        Thu, 15 Nov 2018 17:46:09 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.149])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 423CA600D6;
-        Thu, 15 Nov 2018 17:46:06 +0000 (UTC)
-Date:   Thu, 15 Nov 2018 12:46:05 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     linux-nvme@lists.infradead.org
-Cc:     Hannes Reinecke <hare@suse.de>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>, hch@lst.de, axboe@kernel.dk,
-        Martin Wilck <mwilck@suse.com>, lijie <lijie34@huawei.com>,
-        xose.vazquez@gmail.com, chengjike.cheng@huawei.com,
-        shenhong09@huawei.com, dm-devel@redhat.com,
-        wangzhoumengjian@huawei.com, christophe.varoqui@opensvc.com,
-        bmarzins@redhat.com, sschremm@netapp.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] nvme: allow ANA support to be independent of native
- multipathing
-Message-ID: <20181115174605.GA19782@redhat.com>
-References: <1541657381-7452-1-git-send-email-lijie34@huawei.com>
- <2691abf6733f791fb16b86d96446440e4aaff99f.camel@suse.com>
- <20181112215323.GA7983@redhat.com>
- <20181113161838.GC9827@localhost.localdomain>
- <20181113180008.GA12513@redhat.com>
- <20181114053837.GA15086@redhat.com>
- <30cf7af7-8826-55bd-e39a-4f81ed032f6d@suse.de>
- <20181114174746.GA18526@redhat.com>
- <87c931e5-4ac9-1795-8d40-cc5541d3ebcf@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87c931e5-4ac9-1795-8d40-cc5541d3ebcf@suse.de>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Thu, 15 Nov 2018 17:46:10 +0000 (UTC)
+        id S1726453AbeKPEIl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Nov 2018 23:08:41 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Nov 2018 09:59:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.56,237,1539673200"; 
+   d="scan'208";a="280206591"
+Received: from unknown (HELO localhost.lm.intel.com) ([10.232.112.69])
+  by fmsmga005.fm.intel.com with ESMTP; 15 Nov 2018 09:59:50 -0800
+From:   Keith Busch <keith.busch@intel.com>
+To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Martin Petersen <martin.petersen@oracle.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Keith Busch <keith.busch@intel.com>
+Subject: [PATCH 1/3] blk-mq: Return true if request was completed
+Date:   Thu, 15 Nov 2018 10:56:24 -0700
+Message-Id: <20181115175626.13293-1-keith.busch@intel.com>
+X-Mailer: git-send-email 2.13.6
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Whether or not ANA is present is a choice of the target implementation;
-the host (and whether it supports multipathing) has _zero_ influence on
-this.  If the target declares a path as 'inaccessible' the path _is_
-inaccessible to the host.  As such, ANA support should be functional
-even if native multipathing is not.
+A driver may have internal state to cleanup if we're pretending a request
+timeout occured. Return 'false' if the command wasn't actually completed
+due to the error injection, and true otherwise.
 
-Introduce ability to always re-read ANA log page as required due to ANA
-error and make current ANA state available via sysfs -- even if native
-multipathing is disabled on the host (e.g. nvme_core.multipath=N).
-
-This affords userspace access to the current ANA state independent of
-which layer might be doing multipathing.  It also allows multipath-tools
-to rely on the NVMe driver for ANA support while dm-multipath takes care
-of multipathing.
-
-While implementing these changes care was taken to preserve the exact
-ANA functionality and code sequence native multipathing has provided.
-This manifests as native multipathing's nvme_failover_req() being
-tweaked to call __nvme_update_ana() which was factored out to allow
-nvme_update_ana() to be called independent of nvme_failover_req().
-
-And as always, if embedded NVMe users do not want any performance
-overhead associated with ANA or native NVMe multipathing they can
-disable CONFIG_NVME_MULTIPATH.
-
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Keith Busch <keith.busch@intel.com>
 ---
- drivers/nvme/host/core.c      | 10 +++++----
- drivers/nvme/host/multipath.c | 49 +++++++++++++++++++++++++++++++++----------
- drivers/nvme/host/nvme.h      |  4 ++++
- 3 files changed, 48 insertions(+), 15 deletions(-)
+ block/blk-mq.c         | 5 +++--
+ include/linux/blk-mq.h | 2 +-
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index fe957166c4a9..3df607905628 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -255,10 +255,12 @@ void nvme_complete_rq(struct request *req)
- 		nvme_req(req)->ctrl->comp_seen = true;
- 
- 	if (unlikely(status != BLK_STS_OK && nvme_req_needs_retry(req))) {
--		if ((req->cmd_flags & REQ_NVME_MPATH) &&
--		    blk_path_error(status)) {
--			nvme_failover_req(req);
--			return;
-+		if (blk_path_error(status)) {
-+			if (req->cmd_flags & REQ_NVME_MPATH) {
-+				nvme_failover_req(req);
-+				return;
-+			}
-+			nvme_update_ana(req);
- 		}
- 
- 		if (!blk_queue_dying(req->q)) {
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index 8e03cda770c5..0adbcff5fba2 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -22,7 +22,7 @@ MODULE_PARM_DESC(multipath,
- 
- inline bool nvme_ctrl_use_ana(struct nvme_ctrl *ctrl)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3f91c6e5b17a..f91951800a64 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -630,11 +630,12 @@ static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
+  *	Ends all I/O on a request. It does not handle partial completions.
+  *	The actual completion happens out-of-order, through a IPI handler.
+  **/
+-void blk_mq_complete_request(struct request *rq)
++bool blk_mq_complete_request(struct request *rq)
  {
--	return multipath && ctrl->subsys && (ctrl->subsys->cmic & (1 << 3));
-+	return ctrl->subsys && (ctrl->subsys->cmic & (1 << 3));
+ 	if (unlikely(blk_should_fake_timeout(rq->q)))
+-		return;
++		return false;
+ 	__blk_mq_complete_request(rq);
++	return true;
  }
+ EXPORT_SYMBOL(blk_mq_complete_request);
  
- /*
-@@ -47,6 +47,35 @@ void nvme_set_disk_name(char *disk_name, struct nvme_ns *ns,
- 	}
- }
- 
-+static bool nvme_ana_error(u16 status)
-+{
-+	switch (status & 0x7ff) {
-+	case NVME_SC_ANA_TRANSITION:
-+	case NVME_SC_ANA_INACCESSIBLE:
-+	case NVME_SC_ANA_PERSISTENT_LOSS:
-+		return true;
-+	}
-+	return false;
-+}
-+
-+static void __nvme_update_ana(struct nvme_ns *ns)
-+{
-+	if (!ns->ctrl->ana_log_buf)
-+		return;
-+
-+	set_bit(NVME_NS_ANA_PENDING, &ns->flags);
-+	queue_work(nvme_wq, &ns->ctrl->ana_work);
-+}
-+
-+void nvme_update_ana(struct request *req)
-+{
-+	struct nvme_ns *ns = req->q->queuedata;
-+	u16 status = nvme_req(req)->status;
-+
-+	if (nvme_ana_error(status))
-+		__nvme_update_ana(ns);
-+}
-+
- void nvme_failover_req(struct request *req)
- {
- 	struct nvme_ns *ns = req->q->queuedata;
-@@ -58,25 +87,22 @@ void nvme_failover_req(struct request *req)
- 	spin_unlock_irqrestore(&ns->head->requeue_lock, flags);
- 	blk_mq_end_request(req, 0);
- 
--	switch (status & 0x7ff) {
--	case NVME_SC_ANA_TRANSITION:
--	case NVME_SC_ANA_INACCESSIBLE:
--	case NVME_SC_ANA_PERSISTENT_LOSS:
-+	if (nvme_ana_error(status)) {
- 		/*
- 		 * If we got back an ANA error we know the controller is alive,
- 		 * but not ready to serve this namespaces.  The spec suggests
- 		 * we should update our general state here, but due to the fact
- 		 * that the admin and I/O queues are not serialized that is
- 		 * fundamentally racy.  So instead just clear the current path,
--		 * mark the the path as pending and kick of a re-read of the ANA
-+		 * mark the path as pending and kick off a re-read of the ANA
- 		 * log page ASAP.
- 		 */
- 		nvme_mpath_clear_current_path(ns);
--		if (ns->ctrl->ana_log_buf) {
--			set_bit(NVME_NS_ANA_PENDING, &ns->flags);
--			queue_work(nvme_wq, &ns->ctrl->ana_work);
--		}
--		break;
-+		__nvme_update_ana(ns);
-+		goto kick_requeue;
-+	}
-+
-+	switch (status & 0x7ff) {
- 	case NVME_SC_HOST_PATH_ERROR:
- 		/*
- 		 * Temporary transport disruption in talking to the controller.
-@@ -93,6 +119,7 @@ void nvme_failover_req(struct request *req)
- 		break;
- 	}
- 
-+kick_requeue:
- 	kblockd_schedule_work(&ns->head->requeue_work);
- }
- 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 27663ce3044e..cbe4253f2d02 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -471,6 +471,7 @@ bool nvme_ctrl_use_ana(struct nvme_ctrl *ctrl);
- void nvme_set_disk_name(char *disk_name, struct nvme_ns *ns,
- 			struct nvme_ctrl *ctrl, int *flags);
- void nvme_failover_req(struct request *req);
-+void nvme_update_ana(struct request *req);
- void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl);
- int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl,struct nvme_ns_head *head);
- void nvme_mpath_add_disk(struct nvme_ns *ns, struct nvme_id_ns *id);
-@@ -510,6 +511,9 @@ static inline void nvme_set_disk_name(char *disk_name, struct nvme_ns *ns,
- static inline void nvme_failover_req(struct request *req)
- {
- }
-+static inline void nvme_update_ana(struct request *req)
-+{
-+}
- static inline void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl)
- {
- }
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 2286dc12c6bc..dec6ef385492 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -264,7 +264,7 @@ void blk_mq_add_to_requeue_list(struct request *rq, bool at_head,
+ 				bool kick_requeue_list);
+ void blk_mq_kick_requeue_list(struct request_queue *q);
+ void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs);
+-void blk_mq_complete_request(struct request *rq);
++bool blk_mq_complete_request(struct request *rq);
+ bool blk_mq_bio_list_merge(struct request_queue *q, struct list_head *list,
+ 			   struct bio *bio);
+ bool blk_mq_queue_stopped(struct request_queue *q);
 -- 
-2.15.0
+2.14.4
 
