@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6906CC04EBF
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 19:51:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39F3CC43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 19:51:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2566A2146D
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 19:51:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00AA62146D
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 19:51:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="CIEAgpUw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2566A2146D
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="zqcKF6d/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00AA62146D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726941AbeKPGBA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Nov 2018 01:01:00 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:32972 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725869AbeKPGA7 (ORCPT
+        id S1727651AbeKPGBC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Nov 2018 01:01:02 -0500
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:44904 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725869AbeKPGBB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Nov 2018 01:00:59 -0500
-Received: by mail-pf1-f195.google.com with SMTP id v68-v6so10203136pfk.0
-        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 11:51:47 -0800 (PST)
+        Fri, 16 Nov 2018 01:01:01 -0500
+Received: by mail-pl1-f196.google.com with SMTP id s5-v6so9953185plq.11
+        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 11:51:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=0CsOxzWNiXiFSdVT8Ap2AwFn+e3sW43Qpf/ppSkfHZc=;
-        b=CIEAgpUwfncK5yL71e0vdNcIrM3V78MAvcqc5PPBYeEwrA1wNemtYJtn46/sviuHB9
-         ji0od33E7vwTJ4s/t8BK+dWWh0pOtMvQ1jJGlMCKuXrFQ8h9PladOZq9cfaU9kS5X4Sg
-         XzvncLlMuCDcwpCzE2rDU4Vj2kzZZU2aRWjDhFmv92IpCgSA46RaojFxm9p+lsNK/OZY
-         GZiDW0IuLurz/MOuO8AXinFJGa+OU5AnYR0W8pfN/dLyIXZQ1WLwzpNK0ooEIMhD6zwO
-         1aQyF1oL1sbRHHUwonUzp37xl+52rO4qY34OWK9SOWZ/dk+C8yRqIpZCQcCH8HSWWIQx
-         ND0Q==
+        bh=MP5P1AyoI9WZaMp7Yr6iSxvqTi6dTbNRiicBr3AUvQI=;
+        b=zqcKF6d/G2RY0eSaetQhZ4NiwwGA+kOFBmETwTDrKAGeM9bRGMj6b8ZLV5vtE5yyuI
+         NxqUpXWPKB5PQZDvBUZxqWEQAi9Hwwtzl9HfcKTelEk/WrJ+qayfSLIvSW/L+FoIizID
+         nMc+tyC1bFsEviQ2BmMPTgBTuj9BsLacYezNYzpuGnX3Hw2rjvCeOaY8TMnyhqMxP5X5
+         uxEc2HISp6pEMAemRqFiiDrAwwXPKCZZ7xFWH4+lEYKJguWehoHm2BeToprEvHEt7PVO
+         M4WqkvNAon0vYZBUCm2pf3OuAExQ746SjBp9Zb2flv18w28SX+B3HR44z1404LJl92bB
+         WfRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=0CsOxzWNiXiFSdVT8Ap2AwFn+e3sW43Qpf/ppSkfHZc=;
-        b=q/mg8YpLI67f9pRYJkYn1kYudPHpo7szxgJKSvj0J78zJCZg8bJv/CijgTKcq/+rXc
-         5NmYnrUvOQ/MMbOq42JM8e0JmRmaVuuvkf1hU2g5FYC6HH3omeT/D0+p0G/VAXbuvrpU
-         0+m7Wt/JskEPuVM9VgsVhYj1awfVhbVpjG+jviwugdDF2vuAS1+WWzZuDeNRVjmqbfuY
-         C6CahmV368D86/r061hb9WYSqLhkF4L8BcMfyrQXDCAbFnoUT9GzOuzSj9XUHOQ76z4g
-         y9Uy4baD18DljaKqjtb0fkj5VNDxx6UN/UHk3oYAWiPa7Qgd5LgxAr77rpMkmLYLceyq
-         mZRg==
-X-Gm-Message-State: AGRZ1gI+JPF4j/tvexAx/rhptaTmUh0qTtjYXnF58OOt5876arN9veR3
-        gMFJTkqUPqW6q/guBzjqLxeLcDbE8S8=
-X-Google-Smtp-Source: AJdET5ew1XUfMbFTJpKUgMF13MdNwtlrs+RU3k+uiIDYq2/ETXQVW9SCesGN/4Gl/5oIHvT5uIrsCQ==
-X-Received: by 2002:a63:db02:: with SMTP id e2mr7112727pgg.419.1542311506944;
-        Thu, 15 Nov 2018 11:51:46 -0800 (PST)
+        bh=MP5P1AyoI9WZaMp7Yr6iSxvqTi6dTbNRiicBr3AUvQI=;
+        b=OM3Qfl5SZ33HJn6CTcSaUQQ0D4grrjdODfusq5HI4xsUxOmIi06pbL0/xrj7zPPH4k
+         GToZFBWj8u4YUdGVvPGj18ZjmK1CmSRXuXJR/ejMCGVb/H+zg3cTaprGvGy8fGDg8maM
+         yWhSH4jkjeTPI2p3CMOSQ8oJZV8YEhmSbrxhq6f6beJwRpbheYy7TsYA5bc/voLjF576
+         VeSXppVundgxTbWsWvBPhEoxqI/svL31r4TAF3D6GSdwIYDwcGph7WAoF8z/jn8cwDHz
+         NzeeWCBML+iYpuSQX/Z5PlHeoYo3MjKDBUHz1wyLBoiJNi0OQduo86Phvxc/iLF8NMOW
+         JCqQ==
+X-Gm-Message-State: AGRZ1gLDzsWrDNV6NLYxPDM6aXAF7+XzxCRIFPgD2y7gNnf8uMnZji85
+        8oJX5Bz+uLxJPzr13hpDpZ7b1rV8jv8=
+X-Google-Smtp-Source: AJdET5dme0s+6Zn5RRzTfdeWkoif/Qq0pM+yH+vSIIuv7YOBG6HBxjpDxVUBb/XkV3FpN69e7AemVw==
+X-Received: by 2002:a17:902:2ec5:: with SMTP id r63-v6mr7839372plb.330.1542311508808;
+        Thu, 15 Nov 2018 11:51:48 -0800 (PST)
 Received: from x1.localdomain ([2620:10d:c090:180::1:7813])
-        by smtp.gmail.com with ESMTPSA id d68-v6sm30670766pfa.80.2018.11.15.11.51.44
+        by smtp.gmail.com with ESMTPSA id d68-v6sm30670766pfa.80.2018.11.15.11.51.47
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Nov 2018 11:51:45 -0800 (PST)
+        Thu, 15 Nov 2018 11:51:47 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>
-Subject: [PATCH 03/11] blk-rq-qos: inline check for q->rq_qos functions
-Date:   Thu, 15 Nov 2018 12:51:27 -0700
-Message-Id: <20181115195135.22812-4-axboe@kernel.dk>
+Cc:     Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 04/11] block: avoid ordered task state change for polled IO
+Date:   Thu, 15 Nov 2018 12:51:28 -0700
+Message-Id: <20181115195135.22812-5-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181115195135.22812-1-axboe@kernel.dk>
 References: <20181115195135.22812-1-axboe@kernel.dk>
@@ -71,193 +71,104 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Put the short code in the fast path, where we don't have any
-functions attached to the queue. This minimizes the impact on
-the hot path in the core code.
+Ensure that writes to the dio/bio waiter field are ordered
+correctly. With the smp_rmb() before the READ_ONCE() check,
+we should be able to use a more relaxed ordering for the
+task state setting. We don't need a heavier barrier on
+the wakeup side after writing the waiter field, since we
+either going to be in the task we care about, or go through
+wake_up_process() which implies a strong enough barrier.
 
-Cc: Josef Bacik <josef@toxicpanda.com>
+For the core poll helper, the task state setting don't need
+to imply any atomics, as it's the current task itself that
+is being modified and we're not going to sleep.
+
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-rq-qos.c | 63 +++++++++++++++++++++-------------------------
- block/blk-rq-qos.h | 59 +++++++++++++++++++++++++++++++++++++------
- 2 files changed, 80 insertions(+), 42 deletions(-)
+ block/blk-mq.c | 4 ++--
+ fs/block_dev.c | 9 +++++++--
+ fs/iomap.c     | 4 +++-
+ mm/page_io.c   | 4 +++-
+ 4 files changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index f8a4d3fbb98c..80f603b76f61 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -27,74 +27,67 @@ bool rq_wait_inc_below(struct rq_wait *rq_wait, unsigned int limit)
- 	return atomic_inc_below(&rq_wait->inflight, limit);
- }
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 32b246ed44c0..7fc4abb4cc36 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3331,12 +3331,12 @@ static bool __blk_mq_poll(struct blk_mq_hw_ctx *hctx, struct request *rq)
+ 		ret = q->mq_ops->poll(hctx, rq->tag);
+ 		if (ret > 0) {
+ 			hctx->poll_success++;
+-			set_current_state(TASK_RUNNING);
++			__set_current_state(TASK_RUNNING);
+ 			return true;
+ 		}
  
--void rq_qos_cleanup(struct request_queue *q, struct bio *bio)
-+void __rq_qos_cleanup(struct rq_qos *rqos, struct bio *bio)
- {
--	struct rq_qos *rqos;
--
--	for (rqos = q->rq_qos; rqos; rqos = rqos->next) {
-+	do {
- 		if (rqos->ops->cleanup)
- 			rqos->ops->cleanup(rqos, bio);
--	}
-+		rqos = rqos->next;
-+	} while (rqos);
- }
+ 		if (signal_pending_state(state, current))
+-			set_current_state(TASK_RUNNING);
++			__set_current_state(TASK_RUNNING);
  
--void rq_qos_done(struct request_queue *q, struct request *rq)
-+void __rq_qos_done(struct rq_qos *rqos, struct request *rq)
- {
--	struct rq_qos *rqos;
--
--	for (rqos = q->rq_qos; rqos; rqos = rqos->next) {
-+	do {
- 		if (rqos->ops->done)
- 			rqos->ops->done(rqos, rq);
--	}
-+		rqos = rqos->next;
-+	} while (rqos);
- }
+ 		if (current->state == TASK_RUNNING)
+ 			return true;
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index c039abfb2052..5b754f84c814 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -237,9 +237,12 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
  
--void rq_qos_issue(struct request_queue *q, struct request *rq)
-+void __rq_qos_issue(struct rq_qos *rqos, struct request *rq)
- {
--	struct rq_qos *rqos;
--
--	for(rqos = q->rq_qos; rqos; rqos = rqos->next) {
-+	do {
- 		if (rqos->ops->issue)
- 			rqos->ops->issue(rqos, rq);
--	}
-+		rqos = rqos->next;
-+	} while (rqos);
- }
+ 	qc = submit_bio(&bio);
+ 	for (;;) {
+-		set_current_state(TASK_UNINTERRUPTIBLE);
++		__set_current_state(TASK_UNINTERRUPTIBLE);
++
++		smp_rmb();
+ 		if (!READ_ONCE(bio.bi_private))
+ 			break;
++
+ 		if (!(iocb->ki_flags & IOCB_HIPRI) ||
+ 		    !blk_poll(bdev_get_queue(bdev), qc))
+ 			io_schedule();
+@@ -403,7 +406,9 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 		return -EIOCBQUEUED;
  
--void rq_qos_requeue(struct request_queue *q, struct request *rq)
-+void __rq_qos_requeue(struct rq_qos *rqos, struct request *rq)
- {
--	struct rq_qos *rqos;
--
--	for(rqos = q->rq_qos; rqos; rqos = rqos->next) {
-+	do {
- 		if (rqos->ops->requeue)
- 			rqos->ops->requeue(rqos, rq);
--	}
-+		rqos = rqos->next;
-+	} while (rqos);
- }
+ 	for (;;) {
+-		set_current_state(TASK_UNINTERRUPTIBLE);
++		__set_current_state(TASK_UNINTERRUPTIBLE);
++
++		smp_rmb();
+ 		if (!READ_ONCE(dio->waiter))
+ 			break;
  
--void rq_qos_throttle(struct request_queue *q, struct bio *bio)
-+void __rq_qos_throttle(struct rq_qos *rqos, struct bio *bio)
- {
--	struct rq_qos *rqos;
--
--	for(rqos = q->rq_qos; rqos; rqos = rqos->next) {
-+	do {
- 		if (rqos->ops->throttle)
- 			rqos->ops->throttle(rqos, bio);
--	}
-+		rqos = rqos->next;
-+	} while (rqos);
- }
+diff --git a/fs/iomap.c b/fs/iomap.c
+index f61d13dfdf09..3373ea4984d9 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -1888,7 +1888,9 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 			return -EIOCBQUEUED;
  
--void rq_qos_track(struct request_queue *q, struct request *rq, struct bio *bio)
-+void __rq_qos_track(struct rq_qos *rqos, struct request *rq, struct bio *bio)
- {
--	struct rq_qos *rqos;
--
--	for(rqos = q->rq_qos; rqos; rqos = rqos->next) {
-+	do {
- 		if (rqos->ops->track)
- 			rqos->ops->track(rqos, rq, bio);
--	}
-+		rqos = rqos->next;
-+	} while (rqos);
- }
+ 		for (;;) {
+-			set_current_state(TASK_UNINTERRUPTIBLE);
++			__set_current_state(TASK_UNINTERRUPTIBLE);
++
++			smp_rmb();
+ 			if (!READ_ONCE(dio->submit.waiter))
+ 				break;
  
--void rq_qos_done_bio(struct request_queue *q, struct bio *bio)
-+void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio)
- {
--	struct rq_qos *rqos;
--
--	for(rqos = q->rq_qos; rqos; rqos = rqos->next) {
-+	do {
- 		if (rqos->ops->done_bio)
- 			rqos->ops->done_bio(rqos, bio);
--	}
-+		rqos = rqos->next;
-+	} while (rqos);
- }
+diff --git a/mm/page_io.c b/mm/page_io.c
+index d4d1c89bcddd..008f6d00c47c 100644
+--- a/mm/page_io.c
++++ b/mm/page_io.c
+@@ -405,7 +405,9 @@ int swap_readpage(struct page *page, bool synchronous)
+ 	bio_get(bio);
+ 	qc = submit_bio(bio);
+ 	while (synchronous) {
+-		set_current_state(TASK_UNINTERRUPTIBLE);
++		__set_current_state(TASK_UNINTERRUPTIBLE);
++
++		smp_rmb();
+ 		if (!READ_ONCE(bio->bi_private))
+ 			break;
  
- /*
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index b6b11d496007..6e09e98b93ea 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -98,12 +98,57 @@ void rq_depth_scale_up(struct rq_depth *rqd);
- void rq_depth_scale_down(struct rq_depth *rqd, bool hard_throttle);
- bool rq_depth_calc_max_depth(struct rq_depth *rqd);
- 
--void rq_qos_cleanup(struct request_queue *, struct bio *);
--void rq_qos_done(struct request_queue *, struct request *);
--void rq_qos_issue(struct request_queue *, struct request *);
--void rq_qos_requeue(struct request_queue *, struct request *);
--void rq_qos_done_bio(struct request_queue *q, struct bio *bio);
--void rq_qos_throttle(struct request_queue *, struct bio *);
--void rq_qos_track(struct request_queue *q, struct request *, struct bio *);
-+void __rq_qos_cleanup(struct rq_qos *rqos, struct bio *bio);
-+void __rq_qos_done(struct rq_qos *rqos, struct request *rq);
-+void __rq_qos_issue(struct rq_qos *rqos, struct request *rq);
-+void __rq_qos_requeue(struct rq_qos *rqos, struct request *rq);
-+void __rq_qos_throttle(struct rq_qos *rqos, struct bio *bio);
-+void __rq_qos_track(struct rq_qos *rqos, struct request *rq, struct bio *bio);
-+void __rq_qos_done_bio(struct rq_qos *rqos, struct bio *bio);
-+
-+static inline void rq_qos_cleanup(struct request_queue *q, struct bio *bio)
-+{
-+	if (q->rq_qos)
-+		__rq_qos_cleanup(q->rq_qos, bio);
-+}
-+
-+static inline void rq_qos_done(struct request_queue *q, struct request *rq)
-+{
-+	if (q->rq_qos)
-+		__rq_qos_done(q->rq_qos, rq);
-+}
-+
-+static inline void rq_qos_issue(struct request_queue *q, struct request *rq)
-+{
-+	if (q->rq_qos)
-+		__rq_qos_issue(q->rq_qos, rq);
-+}
-+
-+static inline void rq_qos_requeue(struct request_queue *q, struct request *rq)
-+{
-+	if (q->rq_qos)
-+		__rq_qos_requeue(q->rq_qos, rq);
-+}
-+
-+static inline void rq_qos_done_bio(struct request_queue *q, struct bio *bio)
-+{
-+	if (q->rq_qos)
-+		__rq_qos_done_bio(q->rq_qos, bio);
-+}
-+
-+static inline void rq_qos_throttle(struct request_queue *q, struct bio *bio)
-+{
-+	if (q->rq_qos)
-+		__rq_qos_throttle(q->rq_qos, bio);
-+}
-+
-+static inline void rq_qos_track(struct request_queue *q, struct request *rq,
-+				struct bio *bio)
-+{
-+	if (q->rq_qos)
-+		__rq_qos_track(q->rq_qos, rq, bio);
-+}
-+
- void rq_qos_exit(struct request_queue *);
-+
- #endif
 -- 
 2.17.1
 
