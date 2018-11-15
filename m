@@ -2,97 +2,124 @@ Return-Path: <SRS0=/6aj=N2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2887C43441
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 01:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57382C43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 01:35:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C955224E0
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 01:22:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C955224E0
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fromorbit.com
+	by mail.kernel.org (Postfix) with ESMTP id 1DB6022360
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 01:35:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="wbmVNsen"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DB6022360
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726379AbeKOL1q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Nov 2018 06:27:46 -0500
-Received: from ipmail07.adl2.internode.on.net ([150.101.137.131]:6139 "EHLO
-        ipmail07.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725895AbeKOL1q (ORCPT
+        id S1726554AbeKOLlP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Nov 2018 06:41:15 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:56256 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725895AbeKOLlO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Nov 2018 06:27:46 -0500
-Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
-  by ipmail07.adl2.internode.on.net with ESMTP; 15 Nov 2018 11:52:02 +1030
-Received: from dave by dastard with local (Exim 4.80)
-        (envelope-from <david@fromorbit.com>)
-        id 1gN6M5-00027m-Cr; Thu, 15 Nov 2018 12:22:01 +1100
-Date:   Thu, 15 Nov 2018 12:22:01 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-xfs@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: fix 32 bit overflow in __blkdev_issue_discard()
-Message-ID: <20181115012201.GX19305@dastard>
-References: <20181113214337.20581-1-david@fromorbit.com>
- <10a8dd78-7c00-8593-9f4e-b20eb1161b92@kernel.dk>
- <20181115010651.GD32603@ming.t460p>
+        Thu, 15 Nov 2018 06:41:14 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wAF1U0Le128824;
+        Thu, 15 Nov 2018 01:35:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=hKQkzgbLsQ66WXB6sPHOTALk0ojr6tOPyXzTnJyBbXE=;
+ b=wbmVNsenHVT3Yb6/vNz998leHf45BMQMLQPaDWFBgRtZ4ns0+hiArz4icjKOI0I8DZV0
+ ikpmBl3mieXAVZMFNK0FJNH5iUyMp3b+ynzaHd32wBVs2Ubu33aGb+HVsap+omYm7/cJ
+ eOk75h/GtZdT6nAtX6XO6ltX2Zqq3FV7P+XIn9G0kJE1qkhpU0xWG8ECclfadAN8DkQd
+ yU75WKEHvEvgi/Z7Slx2KuAIUGLe63iHMHs4/9gYwa/vQad4Kmj2IwB8cdyGr2YLzL9/
+ Hl6HfjOEhwzCAEx2dJcJGAEEK+9gWfyUBv1/m98ndyBQvbDwVCOkCEmc+n44IpAi/bxp 4g== 
+Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
+        by aserp2120.oracle.com with ESMTP id 2nr7cs6udx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 15 Nov 2018 01:35:27 +0000
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id wAF1ZQ3t028728
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 15 Nov 2018 01:35:26 GMT
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id wAF1ZQ6o028571;
+        Thu, 15 Nov 2018 01:35:26 GMT
+Received: from [10.182.69.118] (/10.182.69.118)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 14 Nov 2018 17:35:26 -0800
+Subject: Re: [PATCH V7 1/4] blk-mq: refactor the code of issue request
+ directly
+To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1542185131-15029-1-git-send-email-jianchao.w.wang@oracle.com>
+ <1542185131-15029-2-git-send-email-jianchao.w.wang@oracle.com>
+ <20181114091153.GB20550@ming.t460p>
+ <17b51550-d45b-9861-b172-74ee0e256d98@oracle.com>
+ <20181114094343.GA13193@ming.t460p>
+ <42861ece-5519-bb59-e3a7-8fea1c731f19@kernel.dk>
+From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <d7c48fb9-9294-49ff-bb18-67a5db3ea021@oracle.com>
+Date:   Thu, 15 Nov 2018 09:35:38 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181115010651.GD32603@ming.t460p>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <42861ece-5519-bb59-e3a7-8fea1c731f19@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9077 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1811150011
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 15, 2018 at 09:06:52AM +0800, Ming Lei wrote:
-> On Wed, Nov 14, 2018 at 08:18:24AM -0700, Jens Axboe wrote:
-> > On 11/13/18 2:43 PM, Dave Chinner wrote:
-> > > From: Dave Chinner <dchinner@redhat.com>
-> > > 
-> > > A discard cleanup merged into 4.20-rc2 causes fstests xfs/259 to
-> > > fall into an endless loop in the discard code. The test is creating
-> > > a device that is exactly 2^32 sectors in size to test mkfs boundary
-> > > conditions around the 32 bit sector overflow region.
-> > > 
-> > > mkfs issues a discard for the entire device size by default, and
-> > > hence this throws a sector count of 2^32 into
-> > > blkdev_issue_discard(). It takes the number of sectors to discard as
-> > > a sector_t - a 64 bit value.
-> > > 
-> > > The commit ba5d73851e71 ("block: cleanup __blkdev_issue_discard")
-> > > takes this sector count and casts it to a 32 bit value before
-> > > comapring it against the maximum allowed discard size the device
-> > > has. This truncates away the upper 32 bits, and so if the lower 32
-> > > bits of the sector count is zero, it starts issuing discards of
-> > > length 0. This causes the code to fall into an endless loop, issuing
-> > > a zero length discards over and over again on the same sector.
-> > 
-> > Applied, thanks. Ming, can you please add a blktests test for
-> > this case? This is the 2nd time it's been broken.
+
+
+On 11/14/18 11:22 PM, Jens Axboe wrote:
+> On 11/14/18 2:43 AM, Ming Lei wrote:
+>> On Wed, Nov 14, 2018 at 05:23:48PM +0800, jianchao.wang wrote:
+>>> Hi Ming
+>>>
+>>> On 11/14/18 5:11 PM, Ming Lei wrote:
+>>>>>  
+>>>>> -	if (!blk_mq_get_dispatch_budget(hctx))
+>>>>> -		goto insert;
+>>>>> +	if (unlikely(!blk_mq_get_dispatch_budget(hctx)))
+>>>>> +		goto out_unlock;
+>>>> The unlikely annotation is a bit misleading, since out-of-budget can
+>>>> happen frequently in case of low queue depth, and there are lots of
+>>>> such examples.
+>>>>
+>>>
+>>> This could be good for the case for no .get_budget and getting budget success.
+>>> In case of out-of-budget, we insert the request which is slow path.
+>>
+>> In case of low queue depth, it is hard to say that 'insert request' is
+>> done in slow path, cause it happens quite frequently.
+>>
+>> I suggest to remove these two unlikely() since modern CPU's branch prediction
+>> should work well enough.
+>>
+>> Especially the annotation of unlikely() often means that this branch is
+>> missed in most of times for all settings, and it is obviously not true
+>> in this case.
 > 
-> OK, I will add zram discard test in blktests, which should cover the
-> 1st report. For the xfs/259, I need to investigate if it is easy to
-> do in blktests.
+> Agree, unlikely() should only be used for the error handling case or
+> similar that does indeed almost never trigger. It should not be used
+> for cases that don't trigger a lot in "most" circumstances.
+> 
 
-Just write a test that creates block devices of 2^32 + (-1,0,1)
-sectors and runs a discard across the entire device. That's all that
-xfs/259 it doing - exercising mkfs on 2TB, 4TB and 16TB boundaries.
-i.e. the boundaries where sectors and page cache indexes (on 4k page
-size systems) overflow 32 bit int and unsigned int sizes. mkfs
-issues a discard for the entire device, so it's testing that as
-well...
+That's really appreciated for all of your kindly response.
+Fair enough with 'unlikely'.
+I will remove these two wrong 'unlikely' in next version.
 
-You need to write tests that exercise write_same, write_zeros and
-discard operations around these boundaries, because they all take
-a 64 bit sector count and stuff them into 32 bit size fields in
-the bio tha tis being submitted.
+Thanks
+Jianchao
 
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
