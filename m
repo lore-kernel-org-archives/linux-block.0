@@ -6,38 +6,39 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F99C43441
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 06:50:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 120CDC43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 06:51:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 37A3F223DD
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 06:50:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37A3F223DD
+	by mail.kernel.org (Postfix) with ESMTP id D9B2E223DD
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 06:51:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9B2E223DD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727099AbeKOQ5Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Nov 2018 11:57:16 -0500
-Received: from mx2.suse.de ([195.135.220.15]:56476 "EHLO mx1.suse.de"
+        id S1728527AbeKOQ5n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Nov 2018 11:57:43 -0500
+Received: from mx2.suse.de ([195.135.220.15]:56532 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727067AbeKOQ5Q (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Nov 2018 11:57:16 -0500
+        id S1726960AbeKOQ5n (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Nov 2018 11:57:43 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id A818EAFDE;
-        Thu, 15 Nov 2018 06:50:41 +0000 (UTC)
-Subject: Re: [PATCH 01/16] block: remove QUEUE_FLAG_BYPASS and ->bypass
+Received: from relay1.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 7DB1DAFE1;
+        Thu, 15 Nov 2018 06:51:08 +0000 (UTC)
+Subject: Re: [PATCH 02/16] block: remove deadline __deadline manipulation
+ helpers
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
         drbd-dev@lists.linbit.com
 References: <20181114160219.28328-1-hch@lst.de>
- <20181114160219.28328-2-hch@lst.de>
+ <20181114160219.28328-3-hch@lst.de>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <043dbdc8-01d9-8edc-b3ad-ddeab411c767@suse.de>
-Date:   Thu, 15 Nov 2018 07:50:40 +0100
+Message-ID: <d324f6ee-ea0d-3cb6-17dd-c7c1f250b6a2@suse.de>
+Date:   Thu, 15 Nov 2018 07:51:08 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.3.0
 MIME-Version: 1.0
-In-Reply-To: <20181114160219.28328-2-hch@lst.de>
+In-Reply-To: <20181114160219.28328-3-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -47,17 +48,20 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 11/14/18 5:02 PM, Christoph Hellwig wrote:
-> Unused since the removal of the legacy request code.
+> No users left since the removal of the legacy request interface, we can
+> remove all the magic bit stealing now and make it a normal field.
+> 
+> But use WRITE_ONCE/READ_ONCE on the new deadline field, given that we
+> don't seem to have any mechanism to guarantee a new value actually
+> gets seen by other threads.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->   block/blk-cgroup.c         | 15 ---------------
->   block/blk-core.c           | 21 ---------------------
->   block/blk-mq-debugfs.c     |  1 -
->   block/blk-throttle.c       |  3 ---
->   include/linux/blk-cgroup.h |  6 +-----
->   include/linux/blkdev.h     |  3 ---
->   6 files changed, 1 insertion(+), 48 deletions(-)
+>   block/blk-mq.c         |  4 ++--
+>   block/blk-timeout.c    |  8 +++++---
+>   block/blk.h            | 35 -----------------------------------
+>   include/linux/blkdev.h |  4 +---
+>   4 files changed, 8 insertions(+), 43 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
