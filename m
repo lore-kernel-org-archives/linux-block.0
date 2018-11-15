@@ -2,78 +2,97 @@ Return-Path: <SRS0=/6aj=N2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC96BC43441
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 01:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2887C43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 01:22:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85BB32147C
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 01:20:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="xUw7ikqZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85BB32147C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 9C955224E0
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 01:22:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C955224E0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fromorbit.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726379AbeKOL0g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Nov 2018 06:26:36 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37812 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725895AbeKOL0g (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Nov 2018 06:26:36 -0500
-Received: from ebiggers.mtv.corp.google.com (unknown [104.132.1.85])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3F0802147C;
-        Thu, 15 Nov 2018 01:20:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1542244855;
-        bh=n3H2KxvNnJ7UuRf6AxhvKhDyEp3ZMWNTbuaPuvRG5Ig=;
-        h=From:To:Subject:Date:From;
-        b=xUw7ikqZcu3pDu+HE4x5Bdkh21B0Cq/8TQL6PY28SM9VpaqEF9Pq4SyEATRoRzMjL
-         ccoDbIPGP54NwrotN8bNNcKc421RwGnnd0dw11djpB8uFSlvFY1K5zzED8aLE27pxI
-         9h7Ph/VVIYjIBROQduDGYxjTt0cTT/d9ib1iClYw=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: make blk_try_req_merge() static
-Date:   Wed, 14 Nov 2018 17:19:46 -0800
-Message-Id: <20181115011946.123485-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.19.1.930.g4563a0d9d0-goog
+        id S1726379AbeKOL1q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Nov 2018 06:27:46 -0500
+Received: from ipmail07.adl2.internode.on.net ([150.101.137.131]:6139 "EHLO
+        ipmail07.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725895AbeKOL1q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Nov 2018 06:27:46 -0500
+Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
+  by ipmail07.adl2.internode.on.net with ESMTP; 15 Nov 2018 11:52:02 +1030
+Received: from dave by dastard with local (Exim 4.80)
+        (envelope-from <david@fromorbit.com>)
+        id 1gN6M5-00027m-Cr; Thu, 15 Nov 2018 12:22:01 +1100
+Date:   Thu, 15 Nov 2018 12:22:01 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: fix 32 bit overflow in __blkdev_issue_discard()
+Message-ID: <20181115012201.GX19305@dastard>
+References: <20181113214337.20581-1-david@fromorbit.com>
+ <10a8dd78-7c00-8593-9f4e-b20eb1161b92@kernel.dk>
+ <20181115010651.GD32603@ming.t460p>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181115010651.GD32603@ming.t460p>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Thu, Nov 15, 2018 at 09:06:52AM +0800, Ming Lei wrote:
+> On Wed, Nov 14, 2018 at 08:18:24AM -0700, Jens Axboe wrote:
+> > On 11/13/18 2:43 PM, Dave Chinner wrote:
+> > > From: Dave Chinner <dchinner@redhat.com>
+> > > 
+> > > A discard cleanup merged into 4.20-rc2 causes fstests xfs/259 to
+> > > fall into an endless loop in the discard code. The test is creating
+> > > a device that is exactly 2^32 sectors in size to test mkfs boundary
+> > > conditions around the 32 bit sector overflow region.
+> > > 
+> > > mkfs issues a discard for the entire device size by default, and
+> > > hence this throws a sector count of 2^32 into
+> > > blkdev_issue_discard(). It takes the number of sectors to discard as
+> > > a sector_t - a 64 bit value.
+> > > 
+> > > The commit ba5d73851e71 ("block: cleanup __blkdev_issue_discard")
+> > > takes this sector count and casts it to a 32 bit value before
+> > > comapring it against the maximum allowed discard size the device
+> > > has. This truncates away the upper 32 bits, and so if the lower 32
+> > > bits of the sector count is zero, it starts issuing discards of
+> > > length 0. This causes the code to fall into an endless loop, issuing
+> > > a zero length discards over and over again on the same sector.
+> > 
+> > Applied, thanks. Ming, can you please add a blktests test for
+> > this case? This is the 2nd time it's been broken.
+> 
+> OK, I will add zram discard test in blktests, which should cover the
+> 1st report. For the xfs/259, I need to investigate if it is easy to
+> do in blktests.
 
-blk_try_req_merge() is only used in block/blk-merge.c, so make it
-static.
+Just write a test that creates block devices of 2^32 + (-1,0,1)
+sectors and runs a discard across the entire device. That's all that
+xfs/259 it doing - exercising mkfs on 2TB, 4TB and 16TB boundaries.
+i.e. the boundaries where sectors and page cache indexes (on 4k page
+size systems) overflow 32 bit int and unsigned int sizes. mkfs
+issues a discard for the entire device, so it's testing that as
+well...
 
-This addresses a gcc warning when -Wmissing-prototypes is enabled.
+You need to write tests that exercise write_same, write_zeros and
+discard operations around these boundaries, because they all take
+a 64 bit sector count and stuff them into 32 bit size fields in
+the bio tha tis being submitted.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- block/blk-merge.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Cheers,
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index e7696c47489ad..badccafc91303 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -731,7 +731,8 @@ static inline bool blk_discard_mergable(struct request *req)
- 	return false;
- }
- 
--enum elv_merge blk_try_req_merge(struct request *req, struct request *next)
-+static enum elv_merge blk_try_req_merge(struct request *req,
-+					struct request *next)
- {
- 	if (blk_discard_mergable(req))
- 		return ELEVATOR_DISCARD_MERGE;
+Dave.
 -- 
-2.19.1.930.g4563a0d9d0-goog
-
+Dave Chinner
+david@fromorbit.com
