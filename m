@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9182C43441
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 19:52:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6655CC43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 19:52:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6700421780
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 19:52:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D333208E7
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 19:52:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="T5sxAa0Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6700421780
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="2RATox6B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D333208E7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728772AbeKPGBM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Nov 2018 01:01:12 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:44728 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725781AbeKPGBM (ORCPT
+        id S1725868AbeKPGBO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Nov 2018 01:01:14 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:36192 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725781AbeKPGBO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Nov 2018 01:01:12 -0500
-Received: by mail-pf1-f196.google.com with SMTP id b81-v6so9694680pfe.11
-        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 11:52:00 -0800 (PST)
+        Fri, 16 Nov 2018 01:01:14 -0500
+Received: by mail-pg1-f196.google.com with SMTP id n2so2298137pgm.3
+        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 11:52:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=WYF2DQMSuLBvvC6oyWCzDINndqOwZo6FPKocRmVKp6k=;
-        b=T5sxAa0ZLNhXZpxss4WoFTAqUFa3kyESjrlyZu9kD3Y8OU5u3OKuAjcIw6l0YNXVkk
-         5P2pUgzHOp0w1oNae4/v9GQtSyo1vfxi9k6LZdfS34r6u3kG94lWUT3cBw1hPH14TPJw
-         VgppQZJFdHpMOXTA9Lu3rQwicPcQu7gidv4M8TPUVZr/CNLjQYvx989aKqgXqu4EwkW/
-         lv1jgByNxezdU1sH87DqduSW2/WdkEPVA/8pYm+lU1WQQUhc7tHTwTB6ONJUAeYodwxx
-         r2qNwBsipxL25Df4bU9KZYm8dAqfHt3YFp37HZVQXPC3H6KtPasmle0t1DqKp8AK+IpQ
-         PH/A==
+        bh=Fz9g1ov0KEBk0jca5hC7QbGAUKLsaBIiDlim4iRDh3o=;
+        b=2RATox6BMIW4EUoQcZ4YDFq8hclWiTuXeB0mphIjgCKp5th1/sVoIJ8ylG8PQoF2DZ
+         NreEVIM6RSDoPPZBYglwNOHYxM6eH2ECaACQ+vstVVz64rVelgNDJbGTfTkX+90SuEdg
+         Z0l50QcL7XI6neZX1tPhLZhdhaC4NcB/kMWonvxGLi4foG9GmsQyjSF68Hdal2lKxFZo
+         VJozM1hrlqQL8XZVvCWGOcZLBY6h48g5dqXW1TwxQKmZoT87gFr24KncOm4Vg1F/0y+E
+         BxYqKHt+kzOp/rjD0zkGtTUDs1+Jq4Uv4T+Uf0vr3ovf/z2p8un//jf5frh8aOju+3xr
+         zd9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=WYF2DQMSuLBvvC6oyWCzDINndqOwZo6FPKocRmVKp6k=;
-        b=YZxtPqq4eiZrr49L3gLo6vYTp/jO4m478j5q8/8PVQ2kqj90JLDeI/hcX/f6QnZ6IP
-         1EgvtCep+oy7hTlHIjqwWEjgfqVJIHblE7FxvwVb+htqw997V1H5aUZhYXGleYPR8PGm
-         Uwmfcnt5ogR80ciXV7/FEuXUywgvb8ZXeArEHO8Pl9hX5cN2ORAUQ4XGi1FAOrrY1nwA
-         sSLqI/B6MRRiDr0aDqXNQv07esPLU1VzUELVloDsu5I75YRIkVgf4NBmOA58uXjSGOl9
-         8/ott7Z1EHgErG+W3SwKR5GO9duqavuv4YaEvUogulJBoOMazKT8CC56kJwC9Z9NQfVg
-         NJSg==
-X-Gm-Message-State: AGRZ1gI+PHQX5BxZo3cChnWSqYFK6kRmtI6bg7EpYlU1ynZWg+VdSU0L
-        9Hn8lEaxEX31LREOcwbvWdpzqdMHNDo=
-X-Google-Smtp-Source: AJdET5ed0D/bh3cdJA0Xz8YbicN07WRf9ub7ivRjcjJjGR41EvQaranHOJU8Hi37wz1PICenjsaqKQ==
-X-Received: by 2002:a63:170c:: with SMTP id x12mr6869920pgl.364.1542311519713;
-        Thu, 15 Nov 2018 11:51:59 -0800 (PST)
+        bh=Fz9g1ov0KEBk0jca5hC7QbGAUKLsaBIiDlim4iRDh3o=;
+        b=q9UB3fo9n83DqakGbuz26In2EL1VdbV+j6zN3inPODbuVgRdseSuNchk7BUgZz4+EF
+         jjav8Ap5AuMadnJb4WtKagYaYD7ejnH7wPMH2VQ3/c7VRo4cCawu3Rwa3ltsyDzBRA+O
+         n6lavGGe7KsbkwXRoeo7foWsjWetQ08KKntIpK34D/QRAMdVss5xN1xS03EAiYB12d+a
+         cItHI59HsqgGT+AHA3uEtMvXj6IzzeFJ2wa5K7k+eZuVZvR0le6xaXmhtT8RX526d/M9
+         gj0w+gug1wc82p8ord+BrBgHRMA6WR7y4razYq5DYp0e4s+mrfjKutVcuX/djIFkUDLv
+         56Vg==
+X-Gm-Message-State: AGRZ1gIpTVE8gWBgMdu7Ed5V3w6IawJnNleDSh95mxlP6TYNgMYFjpN7
+        N7iz2CLSu9aNXVHtzaDZq5GErpU6Reo=
+X-Google-Smtp-Source: AJdET5c7FMGsxqg4HwcXgEXNRIEpm3boNBIOUyyK+dfkELu4a+gcwhVkpHgjOTnVApGReG9hSNw6Ow==
+X-Received: by 2002:a63:d747:: with SMTP id w7mr6918420pgi.360.1542311521459;
+        Thu, 15 Nov 2018 11:52:01 -0800 (PST)
 Received: from x1.localdomain ([2620:10d:c090:180::1:7813])
-        by smtp.gmail.com with ESMTPSA id d68-v6sm30670766pfa.80.2018.11.15.11.51.57
+        by smtp.gmail.com with ESMTPSA id d68-v6sm30670766pfa.80.2018.11.15.11.51.59
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Nov 2018 11:51:58 -0800 (PST)
+        Thu, 15 Nov 2018 11:52:00 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 10/11] block: for async O_DIRECT, mark us as polling if asked to
-Date:   Thu, 15 Nov 2018 12:51:34 -0700
-Message-Id: <20181115195135.22812-11-axboe@kernel.dk>
+Subject: [PATCH 11/11] block: don't plug for aio/O_DIRECT HIPRI IO
+Date:   Thu, 15 Nov 2018 12:51:35 -0700
+Message-Id: <20181115195135.22812-12-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181115195135.22812-1-axboe@kernel.dk>
 References: <20181115195135.22812-1-axboe@kernel.dk>
@@ -71,28 +71,44 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Inherit the iocb IOCB_HIPRI flag, and pass on REQ_HIPRI for
-those kinds of requests.
+Those will go straight to issue inside blk-mq, so don't bother
+setting up a block plug for them.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/block_dev.c | 3 +++
- 1 file changed, 3 insertions(+)
+ fs/block_dev.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 7810f5b588ea..c124982b810d 100644
+index c124982b810d..9dc695a3af4e 100644
 --- a/fs/block_dev.c
 +++ b/fs/block_dev.c
-@@ -386,6 +386,9 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+@@ -356,7 +356,13 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 	dio->multi_bio = false;
+ 	dio->should_dirty = is_read && iter_is_iovec(iter);
  
- 		nr_pages = iov_iter_npages(iter, BIO_MAX_PAGES);
- 		if (!nr_pages) {
-+			if (iocb->ki_flags & IOCB_HIPRI)
-+				bio->bi_opf |= REQ_HIPRI;
+-	blk_start_plug(&plug);
++	/*
++	 * Don't plug for HIPRI/polled IO, as those should go straight
++	 * to issue
++	 */
++	if (!(iocb->ki_flags & IOCB_HIPRI))
++		blk_start_plug(&plug);
 +
- 			qc = submit_bio(bio);
- 			break;
- 		}
+ 	for (;;) {
+ 		bio_set_dev(bio, bdev);
+ 		bio->bi_iter.bi_sector = pos >> 9;
+@@ -403,7 +409,9 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 		submit_bio(bio);
+ 		bio = bio_alloc(GFP_KERNEL, nr_pages);
+ 	}
+-	blk_finish_plug(&plug);
++
++	if (!(iocb->ki_flags & IOCB_HIPRI))
++		blk_finish_plug(&plug);
+ 
+ 	if (!is_sync)
+ 		return -EIOCBQUEUED;
 -- 
 2.17.1
 
