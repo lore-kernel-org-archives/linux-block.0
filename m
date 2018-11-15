@@ -2,143 +2,234 @@ Return-Path: <SRS0=/6aj=N2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E3B1C43441
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 17:17:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F631C43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 17:46:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 450B52087A
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 17:17:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GHRYsMwB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 450B52087A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lightbitslabs.com
+	by mail.kernel.org (Postfix) with ESMTP id DB29A21780
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 17:46:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB29A21780
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388265AbeKPDZJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Nov 2018 22:25:09 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:44496 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388395AbeKPDZJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Nov 2018 22:25:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Message-Id:Date:Subject:Cc:To:From:
-        Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
-        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=VjUIXK4TAYzPM4qbxbVQ5+ZFJqWsGe+897BiQ2rYimY=; b=GHRYsMwBpUdc12O4WGmPTGcKO
-        7iHyCxsrxDK7SOVKFJELvam9pjHULByvQjFpx4WSfwVZk4+V+niGOBXHQ2ikN5Hn5cFfv/kktVkBs
-        9v3CLT7EqnWNyVpo+m50iBQKOZdhddwyXgbXSlc+BK7obfBT79POWsF5B60NTT8bz3HhpuQ7cBilY
-        CG/Nh+0tEi0mk2TJ0tWqzKVy3kxRRZLZmOQb+H449snv/I7ajRs+ka6du0pMclO03OmhVRTB2s8Or
-        ZkLzQTgpzPP8SaQRdtWpMgQCKn1q2+1oagcgvpCYaF9/8sbxzIEgaaT4mulOeIDynWmPqPzbRPY5a
-        +OXiRJ3Gw==;
-Received: from [52.119.64.114] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gNLFk-0002LK-0z; Thu, 15 Nov 2018 17:16:28 +0000
-From:   Sagi Grimberg <sagi@lightbitslabs.com>
+        id S2388770AbeKPDy5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Nov 2018 22:54:57 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:53736 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388452AbeKPDy5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Nov 2018 22:54:57 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id CB848307EA87;
+        Thu, 15 Nov 2018 17:46:09 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.149])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 423CA600D6;
+        Thu, 15 Nov 2018 17:46:06 +0000 (UTC)
+Date:   Thu, 15 Nov 2018 12:46:05 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
 To:     linux-nvme@lists.infradead.org
-Cc:     linux-block@vger.kernel.org, netdev@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 00/11] TCP transport binding for NVMe over Fabrics
-Date:   Thu, 15 Nov 2018 09:16:12 -0800
-Message-Id: <20181115171626.9306-1-sagi@lightbitslabs.com>
-X-Mailer: git-send-email 2.17.1
+Cc:     Hannes Reinecke <hare@suse.de>,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>, hch@lst.de, axboe@kernel.dk,
+        Martin Wilck <mwilck@suse.com>, lijie <lijie34@huawei.com>,
+        xose.vazquez@gmail.com, chengjike.cheng@huawei.com,
+        shenhong09@huawei.com, dm-devel@redhat.com,
+        wangzhoumengjian@huawei.com, christophe.varoqui@opensvc.com,
+        bmarzins@redhat.com, sschremm@netapp.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] nvme: allow ANA support to be independent of native
+ multipathing
+Message-ID: <20181115174605.GA19782@redhat.com>
+References: <1541657381-7452-1-git-send-email-lijie34@huawei.com>
+ <2691abf6733f791fb16b86d96446440e4aaff99f.camel@suse.com>
+ <20181112215323.GA7983@redhat.com>
+ <20181113161838.GC9827@localhost.localdomain>
+ <20181113180008.GA12513@redhat.com>
+ <20181114053837.GA15086@redhat.com>
+ <30cf7af7-8826-55bd-e39a-4f81ed032f6d@suse.de>
+ <20181114174746.GA18526@redhat.com>
+ <87c931e5-4ac9-1795-8d40-cc5541d3ebcf@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87c931e5-4ac9-1795-8d40-cc5541d3ebcf@suse.de>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Thu, 15 Nov 2018 17:46:10 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch set implements the NVMe over Fabrics TCP host and the target
-drivers. Now NVMe over Fabrics can run on every Ethernet port in the world.
-The implementation conforms to NVMe over Fabrics 1.1 specification (which
-will include already publicly available NVMe/TCP transport binding, TP 8000).
+Whether or not ANA is present is a choice of the target implementation;
+the host (and whether it supports multipathing) has _zero_ influence on
+this.  If the target declares a path as 'inaccessible' the path _is_
+inaccessible to the host.  As such, ANA support should be functional
+even if native multipathing is not.
 
-The host driver hooks into the NVMe host stack and implements the TCP
-transport binding for NVMe over Fabrics. The NVMe over Fabrics TCP host
-driver is responsible for establishing a NVMe/TCP connection, TCP event
-and error handling and data-plane messaging and stream processing.
+Introduce ability to always re-read ANA log page as required due to ANA
+error and make current ANA state available via sysfs -- even if native
+multipathing is disabled on the host (e.g. nvme_core.multipath=N).
 
-The target driver hooks into the NVMe target core stack and implements
-the TCP transport binding. The NVMe over Fabrics target driver is
-responsible for accepting and establishing NVMe/TCP connections, TCP
-event and error handling, and data-plane messaging and stream processing.
+This affords userspace access to the current ANA state independent of
+which layer might be doing multipathing.  It also allows multipath-tools
+to rely on the NVMe driver for ANA support while dm-multipath takes care
+of multipathing.
 
-The implementation of both the host and target are fairly simple and
-straight-forward. Every NVMe queue is backed by a TCP socket that provides
-us reliable, in-order delivery of fabrics capsules and/or data.
+While implementing these changes care was taken to preserve the exact
+ANA functionality and code sequence native multipathing has provided.
+This manifests as native multipathing's nvme_failover_req() being
+tweaked to call __nvme_update_ana() which was factored out to allow
+nvme_update_ana() to be called independent of nvme_failover_req().
 
-All NVMe queues are sharded over a private bound workqueue such that we
-always have a single context handling the byte stream and we don't need
-to worry about any locking/serialization. In addition, close attention
-was paid to a completely non-blocking data plane to minimize context
-switching and/or unforced scheduling.
+And as always, if embedded NVMe users do not want any performance
+overhead associated with ANA or native NVMe multipathing they can
+disable CONFIG_NVME_MULTIPATH.
 
-I piggybacked nvme-cli patches to the set for completeness.
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+---
+ drivers/nvme/host/core.c      | 10 +++++----
+ drivers/nvme/host/multipath.c | 49 +++++++++++++++++++++++++++++++++----------
+ drivers/nvme/host/nvme.h      |  4 ++++
+ 3 files changed, 48 insertions(+), 15 deletions(-)
 
-Also, @netdev mailing list is cc'd as this patch set contains generic
-helpers for online digest calculation (patches 1-3).
-
-The patchset structure:
-- patches 1-3 adds a helper for digest calculation online with data placement
-- patches 4-8 are preparatory patches for NVMe/TCP
-- patches 9-11 implements NVMe/TCP
-- patches 12-14 are nvme-cli additions for NVMe/TCP
-
-Thanks to the members of the Fabrics Linux Driver team that helped development,
-testing and benchmarking this work.
-
-Gitweb code is available at:
-
-	git://git.infradead.org/nvme.git nvme-tcp
-
-Sagi Grimberg (11):
-  ath6kl: add ath6kl_ prefix to crypto_type
-  iov_iter: introduce hash_and_copy iter helpers
-  datagram: introduce skb_copy_and_hash_datagram_iter helper
-  nvme-core: add work elements to struct nvme_ctrl
-  nvmet: Add install_queue callout
-  nvmet: allow configfs tcp trtype configuration
-  nvme-fabrics: allow user passing header digest
-  nvme-fabrics: allow user passing data digest
-  nvme-tcp: Add protocol header
-  nvmet-tcp: add NVMe over TCP target driver
-  nvme-tcp: add NVMe over TCP host driver
-
- drivers/net/wireless/ath/ath6kl/cfg80211.c |    2 +-
- drivers/net/wireless/ath/ath6kl/common.h   |    2 +-
- drivers/net/wireless/ath/ath6kl/wmi.c      |    6 +-
- drivers/net/wireless/ath/ath6kl/wmi.h      |    6 +-
- drivers/nvme/host/Kconfig                  |   15 +
- drivers/nvme/host/Makefile                 |    3 +
- drivers/nvme/host/fabrics.c                |   10 +
- drivers/nvme/host/fabrics.h                |    4 +
- drivers/nvme/host/fc.c                     |   18 +-
- drivers/nvme/host/nvme.h                   |    2 +
- drivers/nvme/host/rdma.c                   |   19 +-
- drivers/nvme/host/tcp.c                    | 2305 ++++++++++++++++++++
- drivers/nvme/target/Kconfig                |   10 +
- drivers/nvme/target/Makefile               |    2 +
- drivers/nvme/target/configfs.c             |    1 +
- drivers/nvme/target/fabrics-cmd.c          |    9 +
- drivers/nvme/target/nvmet.h                |    1 +
- drivers/nvme/target/tcp.c                  | 1746 +++++++++++++++
- include/linux/nvme-tcp.h                   |  189 ++
- include/linux/nvme.h                       |    1 +
- include/linux/skbuff.h                     |    3 +
- include/linux/uio.h                        |    5 +
- lib/iov_iter.c                             |   31 +
- net/core/datagram.c                        |   90 +
- 24 files changed, 4451 insertions(+), 29 deletions(-)
- create mode 100644 drivers/nvme/host/tcp.c
- create mode 100644 drivers/nvme/target/tcp.c
- create mode 100644 include/linux/nvme-tcp.h
-
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index fe957166c4a9..3df607905628 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -255,10 +255,12 @@ void nvme_complete_rq(struct request *req)
+ 		nvme_req(req)->ctrl->comp_seen = true;
+ 
+ 	if (unlikely(status != BLK_STS_OK && nvme_req_needs_retry(req))) {
+-		if ((req->cmd_flags & REQ_NVME_MPATH) &&
+-		    blk_path_error(status)) {
+-			nvme_failover_req(req);
+-			return;
++		if (blk_path_error(status)) {
++			if (req->cmd_flags & REQ_NVME_MPATH) {
++				nvme_failover_req(req);
++				return;
++			}
++			nvme_update_ana(req);
+ 		}
+ 
+ 		if (!blk_queue_dying(req->q)) {
+diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+index 8e03cda770c5..0adbcff5fba2 100644
+--- a/drivers/nvme/host/multipath.c
++++ b/drivers/nvme/host/multipath.c
+@@ -22,7 +22,7 @@ MODULE_PARM_DESC(multipath,
+ 
+ inline bool nvme_ctrl_use_ana(struct nvme_ctrl *ctrl)
+ {
+-	return multipath && ctrl->subsys && (ctrl->subsys->cmic & (1 << 3));
++	return ctrl->subsys && (ctrl->subsys->cmic & (1 << 3));
+ }
+ 
+ /*
+@@ -47,6 +47,35 @@ void nvme_set_disk_name(char *disk_name, struct nvme_ns *ns,
+ 	}
+ }
+ 
++static bool nvme_ana_error(u16 status)
++{
++	switch (status & 0x7ff) {
++	case NVME_SC_ANA_TRANSITION:
++	case NVME_SC_ANA_INACCESSIBLE:
++	case NVME_SC_ANA_PERSISTENT_LOSS:
++		return true;
++	}
++	return false;
++}
++
++static void __nvme_update_ana(struct nvme_ns *ns)
++{
++	if (!ns->ctrl->ana_log_buf)
++		return;
++
++	set_bit(NVME_NS_ANA_PENDING, &ns->flags);
++	queue_work(nvme_wq, &ns->ctrl->ana_work);
++}
++
++void nvme_update_ana(struct request *req)
++{
++	struct nvme_ns *ns = req->q->queuedata;
++	u16 status = nvme_req(req)->status;
++
++	if (nvme_ana_error(status))
++		__nvme_update_ana(ns);
++}
++
+ void nvme_failover_req(struct request *req)
+ {
+ 	struct nvme_ns *ns = req->q->queuedata;
+@@ -58,25 +87,22 @@ void nvme_failover_req(struct request *req)
+ 	spin_unlock_irqrestore(&ns->head->requeue_lock, flags);
+ 	blk_mq_end_request(req, 0);
+ 
+-	switch (status & 0x7ff) {
+-	case NVME_SC_ANA_TRANSITION:
+-	case NVME_SC_ANA_INACCESSIBLE:
+-	case NVME_SC_ANA_PERSISTENT_LOSS:
++	if (nvme_ana_error(status)) {
+ 		/*
+ 		 * If we got back an ANA error we know the controller is alive,
+ 		 * but not ready to serve this namespaces.  The spec suggests
+ 		 * we should update our general state here, but due to the fact
+ 		 * that the admin and I/O queues are not serialized that is
+ 		 * fundamentally racy.  So instead just clear the current path,
+-		 * mark the the path as pending and kick of a re-read of the ANA
++		 * mark the path as pending and kick off a re-read of the ANA
+ 		 * log page ASAP.
+ 		 */
+ 		nvme_mpath_clear_current_path(ns);
+-		if (ns->ctrl->ana_log_buf) {
+-			set_bit(NVME_NS_ANA_PENDING, &ns->flags);
+-			queue_work(nvme_wq, &ns->ctrl->ana_work);
+-		}
+-		break;
++		__nvme_update_ana(ns);
++		goto kick_requeue;
++	}
++
++	switch (status & 0x7ff) {
+ 	case NVME_SC_HOST_PATH_ERROR:
+ 		/*
+ 		 * Temporary transport disruption in talking to the controller.
+@@ -93,6 +119,7 @@ void nvme_failover_req(struct request *req)
+ 		break;
+ 	}
+ 
++kick_requeue:
+ 	kblockd_schedule_work(&ns->head->requeue_work);
+ }
+ 
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 27663ce3044e..cbe4253f2d02 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -471,6 +471,7 @@ bool nvme_ctrl_use_ana(struct nvme_ctrl *ctrl);
+ void nvme_set_disk_name(char *disk_name, struct nvme_ns *ns,
+ 			struct nvme_ctrl *ctrl, int *flags);
+ void nvme_failover_req(struct request *req);
++void nvme_update_ana(struct request *req);
+ void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl);
+ int nvme_mpath_alloc_disk(struct nvme_ctrl *ctrl,struct nvme_ns_head *head);
+ void nvme_mpath_add_disk(struct nvme_ns *ns, struct nvme_id_ns *id);
+@@ -510,6 +511,9 @@ static inline void nvme_set_disk_name(char *disk_name, struct nvme_ns *ns,
+ static inline void nvme_failover_req(struct request *req)
+ {
+ }
++static inline void nvme_update_ana(struct request *req)
++{
++}
+ static inline void nvme_kick_requeue_lists(struct nvme_ctrl *ctrl)
+ {
+ }
 -- 
-2.17.1
+2.15.0
 
