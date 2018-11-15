@@ -2,132 +2,326 @@ Return-Path: <SRS0=/6aj=N2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F436C43441
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 20:15:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27877C43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 20:20:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5BE9C20858
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 20:15:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D272420858
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 20:20:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="0ePU7/Yc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BE9C20858
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="uI/+pM0r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D272420858
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725822AbeKPGYP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Nov 2018 01:24:15 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:34028 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725809AbeKPGYP (ORCPT
+        id S2388865AbeKPG3t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Nov 2018 01:29:49 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:38572 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388847AbeKPG3t (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Nov 2018 01:24:15 -0500
-Received: by mail-pf1-f194.google.com with SMTP id h3so3673554pfg.1
-        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 12:14:58 -0800 (PST)
+        Fri, 16 Nov 2018 01:29:49 -0500
+Received: by mail-pg1-f196.google.com with SMTP id f8-v6so9502206pgq.5
+        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 12:20:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=qzleyIG4fWbMBjys0bsxSkIUUXv49fRHq34UAUsgeyY=;
-        b=0ePU7/YcXm5OfMcIBxM8ySLfGW2Njxzc6UHJkjZOUaKbAm4I7wc1UmxwuStH5sSO1t
-         eKSNGaXQ+Otw+YEaO9J4K9/4vIqOu+yBUYzmc1FzZJz2nLOvMsnQN8XvGruvJZsogDHS
-         tinFjGSjICUI9O+FrNYa50wvUoWcBpg39nfzaKYLEAf9mtnus5Xceeuk1sWTqUKBfoiU
-         KdhIzNyNG8BQu5fmqePPFnx626dfp8nsADgf9tTjBpxCOMaeVekTu8iUxis8U0QHfzKn
-         8y/UjAWqurpHUYeu7D7yMYIbosl/AQ/3qwh9y0Xw7m94Dgn5haShvtpd/8U4EwIJVfk6
-         x1pg==
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=DjOESrPx+LNX18fh9qfhKZ+KPyRBzNVp6MIp26IMeXY=;
+        b=uI/+pM0rn1iRPxN5FCtrq1SbFlHuUR18/4dsIL4bsMQhabDgi4ZdSzX2Mfe3XjsNY6
+         4xQVm6vhr3p/PDRuutZ6VLpjOwi9mFZPDHQx0rB5UyG36UukDTCzePLW/v9wHyzWXmw6
+         3iZj2IDB2P6v7SdxGUDwwve4RBxhs4dBxxVg8jnpI2qlLc2xjMwvqL5kU/9e7PSAOizB
+         b5OL49aW0fD7MULdwpyDUNWc8iFy219aQu5r5fJmQWtARH8vxLVZa791D8sgq2RdhJhF
+         /8Dky+e1W5d6XNa5MVm3fJyyOYnjGqh/evPg8z/4hrklwK47hYtiOxVOjBDiEGeC5+e5
+         ifww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=qzleyIG4fWbMBjys0bsxSkIUUXv49fRHq34UAUsgeyY=;
-        b=Af/TuKSYqPkzdBG0ExNoV88br5XM6NVY9eRjHBWlRG2nwCM61l8VHsBd1aNC6WtW8D
-         VQi0xWTABlHrc2cIGcis4XlvlJnG3pnnZGq6R6V6Ehw4Bg8YNo+bXTW5DOHQRKBHUQIK
-         63oejb/eoLA11V5Qh0wj3k5VM7zZI55hzQdijx1br5HnmXUggNrvjkOIZl5TfPEPEdR1
-         qHZBrpRIKpI8MCTQ+sW073BCWiSSuggtzNbPAWQXdpjIELslozR6hBmqcnQfEeLomAJB
-         pDZek59rrb+Yhvam2qB/kW5RAwPdKcCs9cacNx5TeLeNgjhPM3lyHe8kj/88XzTKKWAW
-         9p5A==
-X-Gm-Message-State: AGRZ1gJYvkeRMXDXL7f0ldYlrgFlDDVXarsnrQ9+BU5eiYv+xHSYzYak
-        dqbmq6lzoHJoWUa6ZH7+9Qegx0au3pI=
-X-Google-Smtp-Source: AJdET5flu6gQy9+MdHpHrnlMeXOhRNhZ+oglSVcQqYV4rgpQSE2kdThWLkVjWCaipBXNZjRyM5CtzQ==
-X-Received: by 2002:a62:59cd:: with SMTP id k74-v6mr7934136pfj.243.1542312897516;
-        Thu, 15 Nov 2018 12:14:57 -0800 (PST)
-Received: from ?IPv6:2620:10d:c081:1130::11f6? ([2620:10d:c090:180::1:7813])
-        by smtp.gmail.com with ESMTPSA id h128sm32614674pgc.15.2018.11.15.12.14.48
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Nov 2018 12:14:48 -0800 (PST)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 4.20-rc3
-Message-ID: <35c71c32-94a0-3fa0-c6af-3f63258456ad@kernel.dk>
-Date:   Thu, 15 Nov 2018 13:14:47 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=DjOESrPx+LNX18fh9qfhKZ+KPyRBzNVp6MIp26IMeXY=;
+        b=MYJRNyQ/qUBgkn2pDn1w5Y2EQvr7a3NAo7KSipGUtTrHH2R9NIO41hWaGEQWeypfpv
+         iwW5D3s59I2y6bRyb3gGRaweVYWF+FrqcS+lQKxmvNPfargIkk9dF+FE/GOU7F3gCnO1
+         pVC0pi0tlWkcGACS3c0xIRSK7lBJgFGdVbSVTx6VbOFjKS7xiQpnTxXYV+/BsCpAJfQT
+         aHAOJOqwgtONDe34WJIqPwCpeJ/5io7ttQy8lDQylscWPy1yK2ffhDWh6uQFfj5UxJCf
+         yDK/OiJ783hl725TXX/5aogqf0A3O9ARIZCh6sxfSey4L8FoCDur4tKpvgnsbm/d27fZ
+         9r+Q==
+X-Gm-Message-State: AGRZ1gISBeY0DMEwR6SscZ4OMvGZvb0HAle9fWCeIrvmHfWOuZcWSqTW
+        i+mUIFrlF9Pnr79CFZDK7unR1Q==
+X-Google-Smtp-Source: AJdET5eqiyk2OGn04uLS3hlfRbTbPwj0U3PjWJBYhsPYxSUqp/qicx6znFMaWRavGC1+hem7C/qLAQ==
+X-Received: by 2002:a62:2741:: with SMTP id n62-v6mr8098091pfn.138.1542313230689;
+        Thu, 15 Nov 2018 12:20:30 -0800 (PST)
+Received: from vader ([64.114.255.97])
+        by smtp.gmail.com with ESMTPSA id u127-v6sm29173365pfb.47.2018.11.15.12.20.29
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 15 Nov 2018 12:20:30 -0800 (PST)
+Date:   Thu, 15 Nov 2018 12:20:28 -0800
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Dave Chinner <dchinner@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
+        Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
+        linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
+        linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
+        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
+Subject: Re: [PATCH V10 03/19] block: use bio_for_each_bvec() to compute
+ multi-page bvec count
+Message-ID: <20181115202028.GC9348@vader>
+References: <20181115085306.9910-1-ming.lei@redhat.com>
+ <20181115085306.9910-4-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181115085306.9910-4-ming.lei@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Thu, Nov 15, 2018 at 04:52:50PM +0800, Ming Lei wrote:
+> First it is more efficient to use bio_for_each_bvec() in both
+> blk_bio_segment_split() and __blk_recalc_rq_segments() to compute how
+> many multi-page bvecs there are in the bio.
+> 
+> Secondly once bio_for_each_bvec() is used, the bvec may need to be
+> splitted because its length can be very longer than max segment size,
+> so we have to split the big bvec into several segments.
+> 
+> Thirdly when splitting multi-page bvec into segments, the max segment
+> limit may be reached, so the bio split need to be considered under
+> this situation too.
+> 
+> Cc: Dave Chinner <dchinner@redhat.com>
+> Cc: Kent Overstreet <kent.overstreet@gmail.com>
+> Cc: Mike Snitzer <snitzer@redhat.com>
+> Cc: dm-devel@redhat.com
+> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+> Cc: linux-fsdevel@vger.kernel.org
+> Cc: Shaohua Li <shli@kernel.org>
+> Cc: linux-raid@vger.kernel.org
+> Cc: linux-erofs@lists.ozlabs.org
+> Cc: David Sterba <dsterba@suse.com>
+> Cc: linux-btrfs@vger.kernel.org
+> Cc: Darrick J. Wong <darrick.wong@oracle.com>
+> Cc: linux-xfs@vger.kernel.org
+> Cc: Gao Xiang <gaoxiang25@huawei.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Theodore Ts'o <tytso@mit.edu>
+> Cc: linux-ext4@vger.kernel.org
+> Cc: Coly Li <colyli@suse.de>
+> Cc: linux-bcache@vger.kernel.org
+> Cc: Boaz Harrosh <ooo@electrozaur.com>
+> Cc: Bob Peterson <rpeterso@redhat.com>
+> Cc: cluster-devel@redhat.com
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-merge.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++---------
+>  1 file changed, 76 insertions(+), 14 deletions(-)
+> 
+> diff --git a/block/blk-merge.c b/block/blk-merge.c
+> index 91b2af332a84..6f7deb94a23f 100644
+> --- a/block/blk-merge.c
+> +++ b/block/blk-merge.c
+> @@ -160,6 +160,62 @@ static inline unsigned get_max_io_size(struct request_queue *q,
+>  	return sectors;
+>  }
+>  
+> +/*
+> + * Split the bvec @bv into segments, and update all kinds of
+> + * variables.
+> + */
+> +static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
+> +		unsigned *nsegs, unsigned *last_seg_size,
+> +		unsigned *front_seg_size, unsigned *sectors)
+> +{
+> +	bool need_split = false;
+> +	unsigned len = bv->bv_len;
+> +	unsigned total_len = 0;
+> +	unsigned new_nsegs = 0, seg_size = 0;
 
-Small set of fixes that should go into the next -rc. This pull request
-contains:
+"unsigned int" here and everywhere else.
 
-- Discard loop fix, causing by integer overflow (Dave)
+> +	if ((*nsegs >= queue_max_segments(q)) || !len)
+> +		return need_split;
+> +
+> +	/*
+> +	 * Multipage bvec may be too big to hold in one segment,
+> +	 * so the current bvec has to be splitted as multiple
+> +	 * segments.
+> +	 */
+> +	while (new_nsegs + *nsegs < queue_max_segments(q)) {
+> +		seg_size = min(queue_max_segment_size(q), len);
+> +
+> +		new_nsegs++;
+> +		total_len += seg_size;
+> +		len -= seg_size;
+> +
+> +		if ((queue_virt_boundary(q) && ((bv->bv_offset +
+> +		    total_len) & queue_virt_boundary(q))) || !len)
+> +			break;
 
-- Blacklist of Samsung drive that hangs with power management (Diego)
+Checking queue_virt_boundary(q) != 0 is superfluous, and the len check
+could just control the loop, i.e.,
 
-- Copy bio priority when cloning it (Hannes)
+	while (len && new_nsegs + *nsegs < queue_max_segments(q)) {
+		seg_size = min(queue_max_segment_size(q), len);
 
-- Fix race condition exposed in floppy (me)
+		new_nsegs++;
+		total_len += seg_size;
+		len -= seg_size;
 
-- Fix SCSI queue cleanup regression. While elusive, it caused oopses in
-  queue running (Ming)
+		if ((bv->bv_offset + total_len) & queue_virt_boundary(q))
+			break;
+	}
 
-- Fix bad string copy in kyber tracing (Omar)
+And if you rewrite it this way, I _think_ you can get rid of this
+special case:
 
-Please pull!
+	if ((*nsegs >= queue_max_segments(q)) || !len)
+		return need_split;
 
+above.
 
-  git://git.kernel.dk/linux-block.git tags/for-linus-20181115
+> +	}
+> +
+> +	/* split in the middle of the bvec */
+> +	if (len)
+> +		need_split = true;
 
+need_split is unnecessary, just return len != 0.
 
-----------------------------------------------------------------
-Dave Chinner (1):
-      block: fix 32 bit overflow in __blkdev_issue_discard()
+> +
+> +	/* update front segment size */
+> +	if (!*nsegs) {
+> +		unsigned first_seg_size = seg_size;
+> +
+> +		if (new_nsegs > 1)
+> +			first_seg_size = queue_max_segment_size(q);
+> +		if (*front_seg_size < first_seg_size)
+> +			*front_seg_size = first_seg_size;
+> +	}
+> +
+> +	/* update other varibles */
+> +	*last_seg_size = seg_size;
+> +	*nsegs += new_nsegs;
+> +	if (sectors)
+> +		*sectors += total_len >> 9;
+> +
+> +	return need_split;
+> +}
+> +
+>  static struct bio *blk_bio_segment_split(struct request_queue *q,
+>  					 struct bio *bio,
+>  					 struct bio_set *bs,
+> @@ -173,7 +229,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+>  	struct bio *new = NULL;
+>  	const unsigned max_sectors = get_max_io_size(q, bio);
+>  
+> -	bio_for_each_segment(bv, bio, iter) {
+> +	bio_for_each_bvec(bv, bio, iter) {
+>  		/*
+>  		 * If the queue doesn't support SG gaps and adding this
+>  		 * offset would create a gap, disallow it.
+> @@ -188,8 +244,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+>  			 */
+>  			if (nsegs < queue_max_segments(q) &&
+>  			    sectors < max_sectors) {
+> -				nsegs++;
+> -				sectors = max_sectors;
+> +				/* split in the middle of bvec */
+> +				bv.bv_len = (max_sectors - sectors) << 9;
+> +				bvec_split_segs(q, &bv, &nsegs,
+> +						&seg_size,
+> +						&front_seg_size,
+> +						&sectors);
+>  			}
+>  			goto split;
+>  		}
+> @@ -214,11 +274,12 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+>  		if (nsegs == 1 && seg_size > front_seg_size)
+>  			front_seg_size = seg_size;
 
-Diego Viola (1):
-      libata: blacklist SAMSUNG MZ7TD256HAFV-000L9 SSD
+Hm, do we still need to check this here now that we're updating
+front_seg_size inside of bvec_split_segs()?
 
-Hannes Reinecke (1):
-      block: copy ioprio in __bio_clone_fast() and bounce
+>  
+> -		nsegs++;
+>  		bvprv = bv;
+>  		bvprvp = &bvprv;
+> -		seg_size = bv.bv_len;
+> -		sectors += bv.bv_len >> 9;
+> +
+> +		if (bvec_split_segs(q, &bv, &nsegs, &seg_size,
+> +					&front_seg_size, &sectors))
 
-Jens Axboe (1):
-      floppy: fix race condition in __floppy_read_block_0()
+What happened to the indent alignment here?
 
-Ming Lei (1):
-      SCSI: fix queue cleanup race before queue initialization is done
+> +			goto split;
+>  
+>  	}
+>  
+> @@ -296,6 +357,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+>  	struct bio_vec bv, bvprv = { NULL };
+>  	int cluster, prev = 0;
+>  	unsigned int seg_size, nr_phys_segs;
+> +	unsigned front_seg_size = bio->bi_seg_front_size;
+>  	struct bio *fbio, *bbio;
+>  	struct bvec_iter iter;
+>  
+> @@ -316,7 +378,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+>  	seg_size = 0;
+>  	nr_phys_segs = 0;
+>  	for_each_bio(bio) {
+> -		bio_for_each_segment(bv, bio, iter) {
+> +		bio_for_each_bvec(bv, bio, iter) {
+>  			/*
+>  			 * If SG merging is disabled, each bio vector is
+>  			 * a segment
+> @@ -336,20 +398,20 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+>  				continue;
+>  			}
+>  new_segment:
+> -			if (nr_phys_segs == 1 && seg_size >
+> -			    fbio->bi_seg_front_size)
+> -				fbio->bi_seg_front_size = seg_size;
+> +			if (nr_phys_segs == 1 && seg_size > front_seg_size)
+> +				front_seg_size = seg_size;
 
-Omar Sandoval (1):
-      kyber: fix wrong strlcpy() size in trace_kyber_latency()
+Same comment as in blk_bio_segment_split(), do we still need to check
+this if we're updating front_seg_size in bvec_split_segs()?
 
- block/bio.c                  | 1 +
- block/blk-core.c             | 5 ++---
- block/blk-lib.c              | 4 +++-
- block/bounce.c               | 1 +
- drivers/ata/libata-core.c    | 2 +-
- drivers/block/floppy.c       | 3 ++-
- drivers/scsi/scsi_lib.c      | 8 ++++++++
- include/trace/events/kyber.h | 8 ++++----
- 8 files changed, 22 insertions(+), 10 deletions(-)
-
--- 
-Jens Axboe
-
+>  
+> -			nr_phys_segs++;
+>  			bvprv = bv;
+>  			prev = 1;
+> -			seg_size = bv.bv_len;
+> +			bvec_split_segs(q, &bv, &nr_phys_segs, &seg_size,
+> +					&front_seg_size, NULL);
+>  		}
+>  		bbio = bio;
+>  	}
+>  
+> -	if (nr_phys_segs == 1 && seg_size > fbio->bi_seg_front_size)
+> -		fbio->bi_seg_front_size = seg_size;
+> +	if (nr_phys_segs == 1 && seg_size > front_seg_size)
+> +		front_seg_size = seg_size;
+> +	fbio->bi_seg_front_size = front_seg_size;
+>  	if (seg_size > bbio->bi_seg_back_size)
+>  		bbio->bi_seg_back_size = seg_size;
+>  
+> -- 
+> 2.9.5
+> 
