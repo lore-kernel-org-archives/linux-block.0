@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D91C43441
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 06:59:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B082DC43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 06:59:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 791C42086B
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 06:59:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 791C42086B
+	by mail.kernel.org (Postfix) with ESMTP id 62BB02086B
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 06:59:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62BB02086B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727067AbeKORFe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Nov 2018 12:05:34 -0500
-Received: from mx2.suse.de ([195.135.220.15]:57422 "EHLO mx1.suse.de"
+        id S1728597AbeKORF4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Nov 2018 12:05:56 -0500
+Received: from mx2.suse.de ([195.135.220.15]:57454 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726960AbeKORFe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Nov 2018 12:05:34 -0500
+        id S1727984AbeKORF4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Nov 2018 12:05:56 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 4E8DDB011;
-        Thu, 15 Nov 2018 06:58:58 +0000 (UTC)
-Subject: Re: [PATCH 11/16] drbd: don't override the queue_lock
+Received: from relay1.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 1EA97AF4C;
+        Thu, 15 Nov 2018 06:59:20 +0000 (UTC)
+Subject: Re: [PATCH 12/16] umem: don't override the queue_lock
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
         drbd-dev@lists.linbit.com
 References: <20181114160219.28328-1-hch@lst.de>
- <20181114160219.28328-12-hch@lst.de>
+ <20181114160219.28328-13-hch@lst.de>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <de7b9bee-a787-29f2-d58b-13d7a55d7752@suse.de>
-Date:   Thu, 15 Nov 2018 07:58:58 +0100
+Message-ID: <d02216e6-6bef-0fff-e8fb-23a555d83006@suse.de>
+Date:   Thu, 15 Nov 2018 07:59:19 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.3.0
 MIME-Version: 1.0
-In-Reply-To: <20181114160219.28328-12-hch@lst.de>
+In-Reply-To: <20181114160219.28328-13-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -47,28 +47,29 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 11/14/18 5:02 PM, Christoph Hellwig wrote:
-> The DRBD req_lock and block layer queue_lock are used for entirely
-> different resources.  Stop using the req_lock as the block layer
+> The umem card->lock and the block layer queue_lock are used for entirely
+> different resources.  Stop using card->lock as the block layer
 > queue_lock.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->   drivers/block/drbd/drbd_main.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+>   drivers/block/umem.c | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
 > 
-> diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-> index fa8204214ac0..b66c59ce6260 100644
-> --- a/drivers/block/drbd/drbd_main.c
-> +++ b/drivers/block/drbd/drbd_main.c
-> @@ -2792,7 +2792,7 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
+> diff --git a/drivers/block/umem.c b/drivers/block/umem.c
+> index be3e3ab79950..8a27b5adc2b3 100644
+> --- a/drivers/block/umem.c
+> +++ b/drivers/block/umem.c
+> @@ -888,8 +888,7 @@ static int mm_pci_probe(struct pci_dev *dev, const struct pci_device_id *id)
+>   	card->biotail = &card->bio;
+>   	spin_lock_init(&card->lock);
 >   
->   	drbd_init_set_defaults(device);
+> -	card->queue = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE,
+> -					   &card->lock);
+> +	card->queue = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE, NULL);
+>   	if (!card->queue)
+>   		goto failed_alloc;
 >   
-> -	q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE, &resource->req_lock);
-> +	q = blk_alloc_queue_node(GFP_KERNEL, NUMA_NO_NODE, NULL);
->   	if (!q)
->   		goto out_no_q;
->   	device->rq_queue = q;
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
