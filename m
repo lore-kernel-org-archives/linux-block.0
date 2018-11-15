@@ -2,93 +2,242 @@ Return-Path: <SRS0=/6aj=N2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47887C43610
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 18:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07589C43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 18:26:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 111D9208E7
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 18:02:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 111D9208E7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id BA04821780
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 18:26:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="hqxoBng/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA04821780
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388326AbeKPELB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Nov 2018 23:11:01 -0500
-Received: from mga05.intel.com ([192.55.52.43]:28722 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726746AbeKPELB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Nov 2018 23:11:01 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Nov 2018 10:02:10 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,237,1539673200"; 
-   d="scan'208";a="91428166"
-Received: from unknown (HELO localhost.lm.intel.com) ([10.232.112.69])
-  by orsmga006.jf.intel.com with ESMTP; 15 Nov 2018 10:02:10 -0800
-From:   Keith Busch <keith.busch@intel.com>
-To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Martin Petersen <martin.petersen@oracle.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Keith Busch <keith.busch@intel.com>
-Subject: [PATCHv3 1/3] blk-mq: Return true if request was completed
-Date:   Thu, 15 Nov 2018 10:58:18 -0700
-Message-Id: <20181115175820.13391-2-keith.busch@intel.com>
-X-Mailer: git-send-email 2.13.6
-In-Reply-To: <20181115175820.13391-1-keith.busch@intel.com>
-References: <20181115175820.13391-1-keith.busch@intel.com>
+        id S2388837AbeKPEe5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Nov 2018 23:34:57 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:41072 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388836AbeKPEe4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Nov 2018 23:34:56 -0500
+Received: by mail-pg1-f195.google.com with SMTP id 70so9374395pgh.8
+        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 10:26:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=LZBZD86Znd9LyHdczTLvGztQ2bKPH9Yi3lDzItF2KWw=;
+        b=hqxoBng/CavFPILF3XTaCP0hdlrGVTFYcEVuZcRu1M2nQ/9ofUYBnVA6xdnpWWuy3d
+         tLemHB+WZvRYGPE8HH+OLncnhKhFjbQc0l1MYLbbqxnLZoziaQZ6eQ7TOcl7OyVsBZWb
+         CuLQ6BoHuCVbf7yWa7Qmcb1Jt0K44fRqsJYsnhUmjPZav58fEHLN5MMo60kHxUHefXnl
+         K+t0Zu6g8DOdCvuNJHLcYJLRL/ktyo5YxUZMh2viTeAYDO4NRLCHsdZlcCWVUSnwJCLi
+         pddtldwMDnlESbYlmjcwB0C2C+5aGF8SEQD30lRkhsiTdONGwuUR1Y3TWKmoT2O/sZYu
+         cIhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=LZBZD86Znd9LyHdczTLvGztQ2bKPH9Yi3lDzItF2KWw=;
+        b=Ch4yMOLl/sISKjmyPIOHWKTjkMa9VpU4NjHI2/jPV1NoMcUgu8vjRChT4qA5dn9eVE
+         mkQZ+zJEegpiPUHLQzugelHr0QUQmM/Xu2sH2EnCJj/1pwpLuoMlrmdQMb0YDuLmRfk/
+         bggoOji8cu8UGILmqXVPBI8u4q+d9ZEl5/5qHLcNHczShJxhTGG5p0blUtdxjwEwrQCu
+         axn0yDeTWXvoZkWpkc/yYtay6b3gNJZ1qI2jo+7IwbYCGqkkicl7CQqnKmIIGhDiPAsn
+         eeMhV0WOhL70LS4hAGdBv7fEu/8t34DUb93wvMsnsZ8T3XTji707JerC+hHUjhItOpl1
+         u9SA==
+X-Gm-Message-State: AGRZ1gKQiS1NP0HjO9KmbjOCAUKd4SAxumLjSV9wQBP1DIoT9hAie+M6
+        SAfhhSY180b/PzLZrNA9iSHGLw==
+X-Google-Smtp-Source: AJdET5csVSw8rOnSLuu0/5ZHJYO4LwWh4n88DP3oYUT2NICBwFSDWdKjRu6fqlHwL2K1OaBXZhjWbg==
+X-Received: by 2002:a62:5343:: with SMTP id h64-v6mr7523295pfb.226.1542306362402;
+        Thu, 15 Nov 2018 10:26:02 -0800 (PST)
+Received: from vader ([64.114.255.97])
+        by smtp.gmail.com with ESMTPSA id x12sm26569212pgr.55.2018.11.15.10.26.00
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 15 Nov 2018 10:26:01 -0800 (PST)
+Date:   Thu, 15 Nov 2018 10:25:59 -0800
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Dave Chinner <dchinner@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
+        Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
+        linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
+        linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
+        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
+Subject: Re: [PATCH V10 01/19] block: introduce multi-page page bvec helpers
+Message-ID: <20181115182559.GA9348@vader>
+References: <20181115085306.9910-1-ming.lei@redhat.com>
+ <20181115085306.9910-2-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181115085306.9910-2-ming.lei@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A driver may have internal state to cleanup if we're pretending a request
-didn't complete. Return 'false' if the command wasn't actually completed
-due to the timeout error injection, and true otherwise.
+On Thu, Nov 15, 2018 at 04:52:48PM +0800, Ming Lei wrote:
+> This patch introduces helpers of 'mp_bvec_iter_*' for multipage
+> bvec support.
+> 
+> The introduced helpers treate one bvec as real multi-page segment,
+> which may include more than one pages.
+> 
+> The existed helpers of bvec_iter_* are interfaces for supporting current
+> bvec iterator which is thought as single-page by drivers, fs, dm and
+> etc. These introduced helpers will build single-page bvec in flight, so
+> this way won't break current bio/bvec users, which needn't any change.
+> 
+> Cc: Dave Chinner <dchinner@redhat.com>
+> Cc: Kent Overstreet <kent.overstreet@gmail.com>
+> Cc: Mike Snitzer <snitzer@redhat.com>
+> Cc: dm-devel@redhat.com
+> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+> Cc: linux-fsdevel@vger.kernel.org
+> Cc: Shaohua Li <shli@kernel.org>
+> Cc: linux-raid@vger.kernel.org
+> Cc: linux-erofs@lists.ozlabs.org
+> Cc: David Sterba <dsterba@suse.com>
+> Cc: linux-btrfs@vger.kernel.org
+> Cc: Darrick J. Wong <darrick.wong@oracle.com>
+> Cc: linux-xfs@vger.kernel.org
+> Cc: Gao Xiang <gaoxiang25@huawei.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Theodore Ts'o <tytso@mit.edu>
+> Cc: linux-ext4@vger.kernel.org
+> Cc: Coly Li <colyli@suse.de>
+> Cc: linux-bcache@vger.kernel.org
+> Cc: Boaz Harrosh <ooo@electrozaur.com>
+> Cc: Bob Peterson <rpeterso@redhat.com>
+> Cc: cluster-devel@redhat.com
 
-Signed-off-by: Keith Busch <keith.busch@intel.com>
----
- block/blk-mq.c         | 5 +++--
- include/linux/blk-mq.h | 2 +-
- 2 files changed, 4 insertions(+), 3 deletions(-)
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 352051ea30f7..1fb0f2050d31 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -633,11 +633,12 @@ static void hctx_lock(struct blk_mq_hw_ctx *hctx, int *srcu_idx)
-  *	Ends all I/O on a request. It does not handle partial completions.
-  *	The actual completion happens out-of-order, through a IPI handler.
-  **/
--void blk_mq_complete_request(struct request *rq)
-+bool blk_mq_complete_request(struct request *rq)
- {
- 	if (unlikely(blk_should_fake_timeout(rq->q)))
--		return;
-+		return false;
- 	__blk_mq_complete_request(rq);
-+	return true;
- }
- EXPORT_SYMBOL(blk_mq_complete_request);
- 
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 929e8abc5535..f0dc26fc86a9 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -298,7 +298,7 @@ void blk_mq_add_to_requeue_list(struct request *rq, bool at_head,
- 				bool kick_requeue_list);
- void blk_mq_kick_requeue_list(struct request_queue *q);
- void blk_mq_delay_kick_requeue_list(struct request_queue *q, unsigned long msecs);
--void blk_mq_complete_request(struct request *rq);
-+bool blk_mq_complete_request(struct request *rq);
- bool blk_mq_bio_list_merge(struct request_queue *q, struct list_head *list,
- 			   struct bio *bio);
- bool blk_mq_queue_stopped(struct request_queue *q);
--- 
-2.14.4
+But a couple of comments below.
 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  include/linux/bvec.h | 63 +++++++++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 60 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+> index 02c73c6aa805..8ef904a50577 100644
+> --- a/include/linux/bvec.h
+> +++ b/include/linux/bvec.h
+> @@ -23,6 +23,44 @@
+>  #include <linux/kernel.h>
+>  #include <linux/bug.h>
+>  #include <linux/errno.h>
+> +#include <linux/mm.h>
+> +
+> +/*
+> + * What is multi-page bvecs?
+> + *
+> + * - bvecs stored in bio->bi_io_vec is always multi-page(mp) style
+> + *
+> + * - bvec(struct bio_vec) represents one physically contiguous I/O
+> + *   buffer, now the buffer may include more than one pages after
+> + *   multi-page(mp) bvec is supported, and all these pages represented
+> + *   by one bvec is physically contiguous. Before mp support, at most
+> + *   one page is included in one bvec, we call it single-page(sp)
+> + *   bvec.
+> + *
+> + * - .bv_page of the bvec represents the 1st page in the mp bvec
+> + *
+> + * - .bv_offset of the bvec represents offset of the buffer in the bvec
+> + *
+> + * The effect on the current drivers/filesystem/dm/bcache/...:
+> + *
+> + * - almost everyone supposes that one bvec only includes one single
+> + *   page, so we keep the sp interface not changed, for example,
+> + *   bio_for_each_segment() still returns bvec with single page
+> + *
+> + * - bio_for_each_segment*() will be changed to return single-page
+> + *   bvec too
+> + *
+> + * - during iterating, iterator variable(struct bvec_iter) is always
+> + *   updated in multipage bvec style and that means bvec_iter_advance()
+> + *   is kept not changed
+> + *
+> + * - returned(copied) single-page bvec is built in flight by bvec
+> + *   helpers from the stored multipage bvec
+> + *
+> + * - In case that some components(such as iov_iter) need to support
+> + *   multi-page bvec, we introduce new helpers(mp_bvec_iter_*) for
+> + *   them.
+> + */
+
+This comment sounds more like a commit message (i.e., how were things
+before, and how are we changing them). In a couple of years when I read
+this code, I probably won't care how it was changed, just how it works.
+So I think a comment explaining the concepts of multi-page and
+single-page bvecs is very useful, but please move all of the "foo was
+changed" and "before mp support" type stuff to the commit message.
+
+>  /*
+>   * was unsigned short, but we might as well be ready for > 64kB I/O pages
+> @@ -50,16 +88,35 @@ struct bvec_iter {
+>   */
+>  #define __bvec_iter_bvec(bvec, iter)	(&(bvec)[(iter).bi_idx])
+>  
+> -#define bvec_iter_page(bvec, iter)				\
+> +#define mp_bvec_iter_page(bvec, iter)				\
+>  	(__bvec_iter_bvec((bvec), (iter))->bv_page)
+>  
+> -#define bvec_iter_len(bvec, iter)				\
+> +#define mp_bvec_iter_len(bvec, iter)				\
+>  	min((iter).bi_size,					\
+>  	    __bvec_iter_bvec((bvec), (iter))->bv_len - (iter).bi_bvec_done)
+>  
+> -#define bvec_iter_offset(bvec, iter)				\
+> +#define mp_bvec_iter_offset(bvec, iter)				\
+>  	(__bvec_iter_bvec((bvec), (iter))->bv_offset + (iter).bi_bvec_done)
+>  
+> +#define mp_bvec_iter_page_idx(bvec, iter)			\
+> +	(mp_bvec_iter_offset((bvec), (iter)) / PAGE_SIZE)
+> +
+> +/*
+> + * <page, offset,length> of single-page(sp) segment.
+> + *
+> + * This helpers are for building sp bvec in flight.
+> + */
+> +#define bvec_iter_offset(bvec, iter)					\
+> +	(mp_bvec_iter_offset((bvec), (iter)) % PAGE_SIZE)
+> +
+> +#define bvec_iter_len(bvec, iter)					\
+> +	min_t(unsigned, mp_bvec_iter_len((bvec), (iter)),		\
+> +	    (PAGE_SIZE - (bvec_iter_offset((bvec), (iter)))))
+
+The parentheses around (bvec_iter_offset((bvec), (iter))) and
+(PAGE_SIZE - (bvec_iter_offset((bvec), (iter)))) are unnecessary
+clutter. This looks easier to read to me:
+
+#define bvec_iter_len(bvec, iter)					\
+	min_t(unsigned, mp_bvec_iter_len((bvec), (iter)),		\
+	      PAGE_SIZE - bvec_iter_offset((bvec), (iter)))
+
+> +
+> +#define bvec_iter_page(bvec, iter)					\
+> +	nth_page(mp_bvec_iter_page((bvec), (iter)),		\
+> +		 mp_bvec_iter_page_idx((bvec), (iter)))
+> +
+>  #define bvec_iter_bvec(bvec, iter)				\
+>  ((struct bio_vec) {						\
+>  	.bv_page	= bvec_iter_page((bvec), (iter)),	\
+> -- 
+> 2.9.5
+> 
