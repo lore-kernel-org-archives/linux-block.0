@@ -6,38 +6,39 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3188DC43441
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 07:00:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D4D1C43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 07:01:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EF685223DD
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 07:00:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF685223DD
+	by mail.kernel.org (Postfix) with ESMTP id 3C1B62086B
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 07:01:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C1B62086B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727051AbeKORHL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Nov 2018 12:07:11 -0500
-Received: from mx2.suse.de ([195.135.220.15]:57588 "EHLO mx1.suse.de"
+        id S1726958AbeKORHf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Nov 2018 12:07:35 -0500
+Received: from mx2.suse.de ([195.135.220.15]:57648 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726892AbeKORHK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Nov 2018 12:07:10 -0500
+        id S1726892AbeKORHf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Nov 2018 12:07:35 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 8A84FAF4C;
-        Thu, 15 Nov 2018 07:00:34 +0000 (UTC)
-Subject: Re: [PATCH 14/16] mmc: stop abusing the request queue_lock pointer
+Received: from relay1.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id C30E7B029;
+        Thu, 15 Nov 2018 07:00:58 +0000 (UTC)
+Subject: Re: [PATCH 15/16] block: remove the lock argument to
+ blk_alloc_queue_node
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
         drbd-dev@lists.linbit.com
 References: <20181114160219.28328-1-hch@lst.de>
- <20181114160219.28328-15-hch@lst.de>
+ <20181114160219.28328-16-hch@lst.de>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <4a33c41f-e972-c8fd-2b34-f616e792bc40@suse.de>
-Date:   Thu, 15 Nov 2018 08:00:34 +0100
+Message-ID: <ceb13a4b-8434-1850-2067-163d64ec0335@suse.de>
+Date:   Thu, 15 Nov 2018 08:00:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.3.0
 MIME-Version: 1.0
-In-Reply-To: <20181114160219.28328-15-hch@lst.de>
+In-Reply-To: <20181114160219.28328-16-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -47,18 +48,22 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 11/14/18 5:02 PM, Christoph Hellwig wrote:
-> mmc uses the block layer struct request pointer to indirect their own
-> lock to the mmc_queue structure, given that the original lock isn't
-> reachable outside of block.c.  Add a lock pointer to struct mmc_queue
-> instead and stop overriding the block layer lock which protects fields
-> entirely separate from the mmc use.
+> With the legacy request path gone there is no real need to override the
+> queue_lock.
 > 
 > Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->   drivers/mmc/core/block.c | 22 ++++++++++------------
->   drivers/mmc/core/queue.c | 26 +++++++++++++-------------
->   drivers/mmc/core/queue.h |  1 +
->   3 files changed, 24 insertions(+), 25 deletions(-)
+>   block/blk-core.c               | 16 +++-------------
+>   block/blk-mq.c                 |  2 +-
+>   drivers/block/drbd/drbd_main.c |  2 +-
+>   drivers/block/null_blk_main.c  |  3 +--
+>   drivers/block/umem.c           |  2 +-
+>   drivers/lightnvm/core.c        |  2 +-
+>   drivers/md/dm.c                |  2 +-
+>   drivers/nvdimm/pmem.c          |  2 +-
+>   drivers/nvme/host/multipath.c  |  2 +-
+>   include/linux/blkdev.h         |  3 +--
+>   10 files changed, 12 insertions(+), 24 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
