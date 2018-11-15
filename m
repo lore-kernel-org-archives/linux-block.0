@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4FEBC43441
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 19:51:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84E6AC43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 19:51:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AB94D2146D
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 19:51:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48E1E2146D
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 19:51:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Juge2bx+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB94D2146D
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WAHT/Cdt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48E1E2146D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725869AbeKPGBD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Nov 2018 01:01:03 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:44107 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725781AbeKPGBD (ORCPT
+        id S1729077AbeKPGBF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Nov 2018 01:01:05 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:34254 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725781AbeKPGBF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Nov 2018 01:01:03 -0500
-Received: by mail-pg1-f194.google.com with SMTP id t13so816187pgr.11
-        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 11:51:51 -0800 (PST)
+        Fri, 16 Nov 2018 01:01:05 -0500
+Received: by mail-pl1-f193.google.com with SMTP id f12-v6so9984247plo.1
+        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 11:51:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=FMTs3C4r9EHC31s/sU7DDsf/1xn5v8SxFDlkXY61qcI=;
-        b=Juge2bx+u+W9xtKjSrjv7BrE6t9ix65K3/FhVQABXyl6ukFxi4L3ILMwwEJ1SrOoyL
-         Kk2vQmG4OpWCquoHikM2NoZl3NO26t03aXawqH2EI0/pGYacpZcONoQ9uEez+7oXBgh1
-         a9pBXgUXoBJfqAs/JxBGaJQmeQ+CrWev29wAT8KSXvaCyB8D071PrU7bmrYyiEz3Xfp8
-         2lcbJ90EQeyXczXzFaDlC87qVbF7H2ZwJl5YYZBs3XxT/irK+zwjTd1B+4KEhexR+gfR
-         McW3QtUqmsTSKXXScwCM/W9srJFUM+eiYQGDmAfZM2C6ohaXzROdEwWMvFSyVCeHhe84
-         /Edw==
+        bh=DEomzWGyNQSltl7n4uFzYYpxk2U93JIuvGhRDl2wTS4=;
+        b=WAHT/CdtxhpfrRLOwqLki37Sd1i9P8q4k9QyLqjTCGobXKSJLt7o7Ivh3eozwL/u5O
+         KmCX3gsMLO4Ut8ThlYX6Q4bx1oEeiZkR/DjJoeMetfL8aMnIZZ01jdMZu+2pD2byj8E9
+         +MxHbIRF8qCKSq0ecWbJEeAIRlj2VdFnwCOV81BsL7jZg5bNvq+/QY19Y+vyBEoMnyNL
+         TWtBq6uJBBaehw+EMiH8Rcq2foMpob+eKZTkMdLDrQsZBHYsmtT5zVQch2vJRVeFZjyR
+         DnciBAVOJ6Chw0oRvWOLBD3JE8YSFn8WRUVRoEcpkvFl2K/ZX/wv4su98siwgZaaFZFd
+         CQZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=FMTs3C4r9EHC31s/sU7DDsf/1xn5v8SxFDlkXY61qcI=;
-        b=Q9k4gQtyzFeLjIVnabLJDJIyw5n+cAN4Bq9W6EpCqeDxeNvPtQAMvjWZMwNV/O7qmD
-         /zqAwfT4fT48PMbL20O2wenhSluNhOWG8c7SEbli5xSQL4FPKjLD+IRhS5J7VO2DlqWf
-         hBiMWcvjhT8txp1u+IXrh6km7DS1KmWfuR6qA421+FtEhnY8Cd4XnS3gjP5SZ1TByM8x
-         g8UL2ITxJTGW1i432G7/p4XGyXBksYSCk3x1srtXNBODjyfnqImclP8WlmLztnBJ6fik
-         XJ2SZXbPApiaLUcFa06bO1We9/rSjwueMjwPKgVJqSC0d/4ibv2JXo5fHI4WiaH2Bj2d
-         7GMQ==
-X-Gm-Message-State: AGRZ1gIf6DHCdqLGLpAL5A7ErC6SUotpB+xOCC5wICygsd0a9C9wmSjx
-        1qa1/cCC8llg4G+deYd8FGsxvCJNcyY=
-X-Google-Smtp-Source: AJdET5cEKlTcH7fQETz1Ob4oMCJEpgdf7hlZqOt45OCd2/SraTspObtPXltJbROABrBAK0eJfOLFfg==
-X-Received: by 2002:a62:704a:: with SMTP id l71-v6mr7832104pfc.68.1542311510912;
-        Thu, 15 Nov 2018 11:51:50 -0800 (PST)
+        bh=DEomzWGyNQSltl7n4uFzYYpxk2U93JIuvGhRDl2wTS4=;
+        b=uOPWt7eL3fm8tWEEDkO6T4JJG1WbRPiKHXvwAydnhCmHId2XGHYHHOBJZ/fUqM9vOA
+         HzTJRaxpFNRTqmUoJyr7fdHH4uik3dk5qopqRl8MIB5E9Z0INYXWtAdATaWbJ/nO0oD0
+         PPKtQp5THIMfXOvJLmimBuYy9u+TpAQMnpFI5Mzw6xdeXVngjU1n0i3FUbmpD9Zym7lU
+         lgkv1ce9D0FbGFtssJU2f3aILh9GvqLa9CBSoEmZU67yPTSw5EQi+PXFjTwJAX+fYiIU
+         n/keaykxdu0PJigxo+Dama3mPbzG8TKbuAk1yfT8mzt6aylFDX0A/NHH2BSoCrxAVTgE
+         yT2w==
+X-Gm-Message-State: AGRZ1gJkhd92GXLxSm3Ga41EgEzsCZAq8kY/frwsDRndli4AVjwL5Pti
+        sm2iAwDoaTZ+3qFMLpat+B73Vr7oDN4=
+X-Google-Smtp-Source: AJdET5c76YU2UKow5wsiosXlK1NI9obmubFXNRBl49ArSazLKvc0T4YcVhIsC29pjlpRcxak46orvA==
+X-Received: by 2002:a17:902:70cb:: with SMTP id l11-v6mr7884739plt.30.1542311512716;
+        Thu, 15 Nov 2018 11:51:52 -0800 (PST)
 Received: from x1.localdomain ([2620:10d:c090:180::1:7813])
-        by smtp.gmail.com with ESMTPSA id d68-v6sm30670766pfa.80.2018.11.15.11.51.48
+        by smtp.gmail.com with ESMTPSA id d68-v6sm30670766pfa.80.2018.11.15.11.51.50
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Nov 2018 11:51:49 -0800 (PST)
+        Thu, 15 Nov 2018 11:51:51 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 05/11] block: add polled wakeup task helper
-Date:   Thu, 15 Nov 2018 12:51:29 -0700
-Message-Id: <20181115195135.22812-6-axboe@kernel.dk>
+Subject: [PATCH 06/11] block: have ->poll_fn() return number of entries polled
+Date:   Thu, 15 Nov 2018 12:51:30 -0700
+Message-Id: <20181115195135.22812-7-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181115195135.22812-1-axboe@kernel.dk>
 References: <20181115195135.22812-1-axboe@kernel.dk>
@@ -71,89 +71,130 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If we're polling for IO on a device that doesn't use interrupts, then
-IO completion loop (and wake of task) is done by submitting task itself.
-If that is the case, then we don't need to enter the wake_up_process()
-function, we can simply mark ourselves as TASK_RUNNING.
+We currently only really support sync poll, ie poll with 1
+IO in flight. This prepares us for supporting async poll.
+
+Note that the returned value isn't necessarily 100% accurate.
+If poll races with IRQ completion, we assume that the fact
+that the task is now runnable means we found at least one
+entry. In reality it could be more than 1, or not even 1.
+This is fine, the caller will just need to take this into
+account.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/block_dev.c         |  4 ++--
- fs/iomap.c             |  2 +-
- include/linux/blkdev.h | 13 +++++++++++++
- mm/page_io.c           |  2 +-
- 4 files changed, 17 insertions(+), 4 deletions(-)
+ block/blk-mq.c                | 18 +++++++++---------
+ drivers/nvme/host/multipath.c |  4 ++--
+ include/linux/blkdev.h        |  2 +-
+ 3 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 5b754f84c814..0ed9be8906a8 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -181,7 +181,7 @@ static void blkdev_bio_end_io_simple(struct bio *bio)
- 	struct task_struct *waiter = bio->bi_private;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 7fc4abb4cc36..52b1c97cd7c6 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -38,7 +38,7 @@
+ #include "blk-mq-sched.h"
+ #include "blk-rq-qos.h"
  
- 	WRITE_ONCE(bio->bi_private, NULL);
--	wake_up_process(waiter);
-+	blk_wake_io_task(waiter);
+-static bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie);
++static int blk_mq_poll(struct request_queue *q, blk_qc_t cookie);
+ static void blk_mq_poll_stats_start(struct request_queue *q);
+ static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
+ 
+@@ -3305,7 +3305,7 @@ static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
+ 	return true;
  }
  
- static ssize_t
-@@ -308,7 +308,7 @@ static void blkdev_bio_end_io(struct bio *bio)
- 			struct task_struct *waiter = dio->waiter;
+-static bool __blk_mq_poll(struct blk_mq_hw_ctx *hctx, struct request *rq)
++static int __blk_mq_poll(struct blk_mq_hw_ctx *hctx, struct request *rq)
+ {
+ 	struct request_queue *q = hctx->queue;
+ 	long state;
+@@ -3318,7 +3318,7 @@ static bool __blk_mq_poll(struct blk_mq_hw_ctx *hctx, struct request *rq)
+ 	 * straight to the busy poll loop.
+ 	 */
+ 	if (blk_mq_poll_hybrid_sleep(q, hctx, rq))
+-		return true;
++		return 1;
  
- 			WRITE_ONCE(dio->waiter, NULL);
--			wake_up_process(waiter);
-+			blk_wake_io_task(waiter);
+ 	hctx->poll_considered++;
+ 
+@@ -3332,30 +3332,30 @@ static bool __blk_mq_poll(struct blk_mq_hw_ctx *hctx, struct request *rq)
+ 		if (ret > 0) {
+ 			hctx->poll_success++;
+ 			__set_current_state(TASK_RUNNING);
+-			return true;
++			return ret;
  		}
+ 
+ 		if (signal_pending_state(state, current))
+ 			__set_current_state(TASK_RUNNING);
+ 
+ 		if (current->state == TASK_RUNNING)
+-			return true;
++			return 1;
+ 		if (ret < 0)
+ 			break;
+ 		cpu_relax();
  	}
  
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 3373ea4984d9..38c9bc63296a 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -1525,7 +1525,7 @@ static void iomap_dio_bio_end_io(struct bio *bio)
- 		if (dio->wait_for_completion) {
- 			struct task_struct *waiter = dio->submit.waiter;
- 			WRITE_ONCE(dio->submit.waiter, NULL);
--			wake_up_process(waiter);
-+			blk_wake_io_task(waiter);
- 		} else if (dio->flags & IOMAP_DIO_WRITE) {
- 			struct inode *inode = file_inode(dio->iocb->ki_filp);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 41aaa05e42c1..91c44f7a7f62 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1772,4 +1772,17 @@ static inline int blkdev_issue_flush(struct block_device *bdev, gfp_t gfp_mask,
- 
- #endif /* CONFIG_BLOCK */
- 
-+static inline void blk_wake_io_task(struct task_struct *waiter)
-+{
-+	/*
-+	 * If we're polling, the task itself is doing the completions. For
-+	 * that case, we don't need to signal a wakeup, it's enough to just
-+	 * mark us as RUNNING.
-+	 */
-+	if (waiter == current)
-+		__set_current_state(TASK_RUNNING);
-+	else
-+		wake_up_process(waiter);
-+}
-+
- #endif
-diff --git a/mm/page_io.c b/mm/page_io.c
-index 008f6d00c47c..f277459db805 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -140,7 +140,7 @@ static void end_swap_bio_read(struct bio *bio)
- 	unlock_page(page);
- 	WRITE_ONCE(bio->bi_private, NULL);
- 	bio_put(bio);
--	wake_up_process(waiter);
-+	blk_wake_io_task(waiter);
- 	put_task_struct(waiter);
+ 	__set_current_state(TASK_RUNNING);
+-	return false;
++	return 0;
  }
  
+-static bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie)
++static int blk_mq_poll(struct request_queue *q, blk_qc_t cookie)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	struct request *rq;
+ 
+ 	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
+-		return false;
++		return 0;
+ 
+ 	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
+ 	if (!blk_qc_t_is_internal(cookie))
+@@ -3369,7 +3369,7 @@ static bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie)
+ 		 * so we should be safe with just the NULL check.
+ 		 */
+ 		if (!rq)
+-			return false;
++			return 0;
+ 	}
+ 
+ 	return __blk_mq_poll(hctx, rq);
+diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
+index b82b0d3ca39a..65539c8df11d 100644
+--- a/drivers/nvme/host/multipath.c
++++ b/drivers/nvme/host/multipath.c
+@@ -220,11 +220,11 @@ static blk_qc_t nvme_ns_head_make_request(struct request_queue *q,
+ 	return ret;
+ }
+ 
+-static bool nvme_ns_head_poll(struct request_queue *q, blk_qc_t qc)
++static int nvme_ns_head_poll(struct request_queue *q, blk_qc_t qc)
+ {
+ 	struct nvme_ns_head *head = q->queuedata;
+ 	struct nvme_ns *ns;
+-	bool found = false;
++	int found = 0;
+ 	int srcu_idx;
+ 
+ 	srcu_idx = srcu_read_lock(&head->srcu);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 91c44f7a7f62..e96dc16ef8aa 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -283,7 +283,7 @@ static inline unsigned short req_get_ioprio(struct request *req)
+ struct blk_queue_ctx;
+ 
+ typedef blk_qc_t (make_request_fn) (struct request_queue *q, struct bio *bio);
+-typedef bool (poll_q_fn) (struct request_queue *q, blk_qc_t);
++typedef int (poll_q_fn) (struct request_queue *q, blk_qc_t);
+ 
+ struct bio_vec;
+ typedef int (dma_drain_needed_fn)(struct request *);
 -- 
 2.17.1
 
