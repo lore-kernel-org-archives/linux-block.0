@@ -2,124 +2,117 @@ Return-Path: <SRS0=/6aj=N2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 085B6C43441
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 00:57:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B728C43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 01:03:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C489C22360
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 00:57:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="DsJhtO6m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C489C22360
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linuxfoundation.org
+	by mail.kernel.org (Postfix) with ESMTP id C8CE0208E7
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 01:03:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8CE0208E7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727141AbeKOLCh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Nov 2018 06:02:37 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58158 "EHLO mail.kernel.org"
+        id S1726579AbeKOLIp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 15 Nov 2018 06:08:45 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51083 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726943AbeKOLCh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Nov 2018 06:02:37 -0500
-Received: from localhost (unknown [64.114.255.97])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1725895AbeKOLIp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 15 Nov 2018 06:08:45 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0FAFF208E7;
-        Thu, 15 Nov 2018 00:57:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1542243420;
-        bh=kycEJDTnQ3efzpmgmTLjKFGm9sBL8UnyW8pLuhE3gtI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=DsJhtO6mTXq5BRgWeUAr6WmikJToRnjoZYB2rztoQMxux7sk4a0JoGvBODxUfQgSZ
-         AR4ISx168MuKIT2M234fEvi1lKn6KqXEQ4fVEFVsuCNuuebjoxVg6vannCjwh8n5+Z
-         pNaKJ6npQwAWlva37cegeXQ4MVlW2j4Id13NYlYc=
-Date:   Wed, 14 Nov 2018 16:56:58 -0800
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Guenter Roeck <linux@roeck-us.net>,
-        Ming Lei <tom.leiming@gmail.com>, Jens Axboe <axboe@fb.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        by mx1.redhat.com (Postfix) with ESMTPS id 4140C3003D2A;
+        Thu, 15 Nov 2018 01:03:08 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 39F70600D6;
+        Thu, 15 Nov 2018 01:03:02 +0000 (UTC)
+Date:   Thu, 15 Nov 2018 09:02:58 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
         Christoph Hellwig <hch@lst.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org
-Subject: Re: kobject lifetime issues in blk-mq
-Message-ID: <20181115005658.GA24847@kroah.com>
-References: <20181109203518.GA7130@roeck-us.net>
- <20181112092051.GA391@ming.t460p>
- <20181112094406.GB391@ming.t460p>
- <20181112164848.GA1790@roeck-us.net>
- <20181112200236.GA4415@kroah.com>
- <20181113002226.GA4455@ming.t460p>
- <20181113004124.GC4455@ming.t460p>
- <20181114110827.GA31430@ming.t460p>
- <20181114151410.GB26378@kroah.com>
- <20181115003616.GA32603@ming.t460p>
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        stable <stable@vger.kernel.org>,
+        "jianchao . wang" <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH V2] SCSI: fix queue cleanup race before queue
+ initialization is done
+Message-ID: <20181115010257.GC32603@ming.t460p>
+References: <20181114082551.12141-1-ming.lei@redhat.com>
+ <63c063ad-7d74-4268-bfd4-2de89908949e@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181115003616.GA32603@ming.t460p>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <63c063ad-7d74-4268-bfd4-2de89908949e@kernel.dk>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Thu, 15 Nov 2018 01:03:08 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 15, 2018 at 08:36:17AM +0800, Ming Lei wrote:
-> > So even if you think the kernel is not going to do this, remember, you
-> > have no control over it.  Reference counted objects are done this way
-> > for a reason, you really do not know who has a reference and you really
-> > do not care.
+On Wed, Nov 14, 2018 at 08:20:09AM -0700, Jens Axboe wrote:
+> On 11/14/18 1:25 AM, Ming Lei wrote:
+> > c2856ae2f315d ("blk-mq: quiesce queue before freeing queue") has
+> > already fixed this race, however the implied synchronize_rcu()
+> > in blk_mq_quiesce_queue() can slow down LUN probe a lot, so caused
+> > performance regression.
 > > 
-> > You are just papering over the real issue here, see my previous email
-> > for how to start working on resolving it.
+> > Then 1311326cf4755c7 ("blk-mq: avoid to synchronize rcu inside blk_cleanup_queue()")
+> > tried to quiesce queue for avoiding unnecessary synchronize_rcu()
+> > only when queue initialization is done, because it is usual to see
+> > lots of inexistent LUNs which need to be probed.
+> > 
+> > However, turns out it isn't safe to quiesce queue only when queue
+> > initialization is done. Because when one SCSI command is completed,
+> > the user of sending command can be waken up immediately, then the
+> > scsi device may be removed, meantime the run queue in scsi_end_request()
+> > is still in-progress, so kernel panic can be caused.
+> > 
+> > In Red Hat QE lab, there are several reports about this kind of kernel
+> > panic triggered during kernel booting.
+> > 
+> > This patch tries to address the issue by grabing one queue usage
+> > counter during freeing one request and the following run queue.
 > 
-> IMO, there isn't real issue, and the issue is actually in 'delay release'.
+> Thanks applied, this bug was elusive but ever present in recent
+> testing that we did internally, it's been a huge pain in the butt.
+> The symptoms were usually a crash in blk_mq_get_driver_tag() with
+> hctx->tags == NULL, or a crash inside deadline request insert off
+> requeue.
 
-Nope, sorry, that is not true.
+Thanks for applying it.
 
-> Please look at the code in block/blk-mq-sysfs.c, both q->mq_kobj and all
-> ctx->kobj share same lifetime with q->kobj, we even don't call get/put
-> on q->mq_kobj & all ctx->kobj, and all are simply released in q->kobj's
-> release handler.
+In Red Hat internal test, kernel panic is triggered in blk_mq_hctx_has_pending(),
+either sbitmap_any_bit_set() or elevator's .has_work.
 
-How do you "know" you are keeping those lifetimes in sync?  The joy of a
-kobject is that _ANYTHING_ can grab a reference to your object without
-you knowing about it.  That includes userspace programs.  Yes, sysfs is
-now much better and it trys to release that reference "quickly" when it
-determines you are trying to delete a kobject, but it's not perfict,
-there are still races there.
+I think this patch can fix most of SCSI's corner case, but may not cover
+all, that is why I marked it as RFC in 1st post.
 
-And that is what the delay release code is showing you.  It is showing
-you that you "think" your reference counting is wrong, but it is not.
-It is showing you that if someone else grabs a reference, you are not
-correctly cleaning up for yourself.
+The root cause is in blk_mq_run_hw_queue(), which calls blk_mq_hctx_has_pending()
+with RCU read lock held, but we can't afford the synchronize_rcu() when
+blk_queue_init_done() is false.
 
-Never think that you really know the lifetime of a kobject, once you
-realize that your code gets simpler and you can then just "trust" that
-the kernel will do the right thing no matter what.
+For SCSI, blk_mq_run_hw_queue() can be run from other 3 code paths:
 
-Because really, you are using a kobject because you want that correct
-reference counting logic.  By ignoring that logic, you are ignoring the
-reason to be using that object at all.  If you don't need reference
-counting, then don't use it at all.
+1) scsi_ioctl_reset()
+- this one should be fine, given ioctl should be run after disk is added
 
-And if you need sysfs files, then you need to use the kobject and then
-you need to handle it properly, because again, you do NOT have full
-control over the lifetime of your object.  That's the basis for
-reference counting in the firstplace.
+2) scsi_error_handler()
+- this one is fine too, since EH implies that there is failed request
+  not completed yet
 
-So this code is broken without me evening having to look at it, please
-fix it to handle release properly.  Again, the kernel tried to tell you
-this, but you hacked around the kernel core to remove that warning
-incorrectly.  Please go read the kobject documentation again for even
-more details about this than what I said here.
+3) scsi_unblock_requests()
+- there might be risk in this code, I guess.
 
-thanks,
+Also not sure if there is such case for other devices.
 
-greg k-h
+
+Thanks,
+Ming
