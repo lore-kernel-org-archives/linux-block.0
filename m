@@ -2,168 +2,97 @@ Return-Path: <SRS0=/6aj=N2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EFCEC43610
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 18:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A083C43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 19:14:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5839B223CB
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 18:28:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F2DB2133D
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 19:14:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="aYeBtxCK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5839B223CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lLieOH5L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F2DB2133D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726453AbeKPEhv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 15 Nov 2018 23:37:51 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:36094 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388815AbeKPEhu (ORCPT
+        id S1725862AbeKPFXd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Nov 2018 00:23:33 -0500
+Received: from mail-io1-f47.google.com ([209.85.166.47]:39163 "EHLO
+        mail-io1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725845AbeKPFXd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 15 Nov 2018 23:37:50 -0500
-Received: by mail-pg1-f195.google.com with SMTP id n2so2205505pgm.3
-        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 10:28:56 -0800 (PST)
+        Fri, 16 Nov 2018 00:23:33 -0500
+Received: by mail-io1-f47.google.com with SMTP id j18-v6so3185625iog.6
+        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 11:14:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=cKqxCmj+g8wylWj4eAfctUKW1L6Qx1DV5mBadTwoHi0=;
-        b=aYeBtxCKN4fkLNjtgzi/IbgY/RCrYdQBDjus/pC7t2KKIOWW41bLlF0BI3wKNkM6MV
-         XipZqHXMqDKk1Z2fjnHTdMlF78IHpC05xrExzrwEnR044plj42lc60XwAYtybmSMLbXd
-         QU7qyfv8LoQ7Xl0Mdriw1X36qDSz0ir0+R3AfuTOhkQXGe43pSVGXn6LkHZ/SMTwbn8I
-         kkShBdyZ5HroecyXfNNxRrjiyWqSsew3pII+uQ9ToybQq6bzpyWQCNc3PGYVprSXPIxy
-         LPb8+ar3qE9hO8eQ18F8kWROsZ3+jbd1MxdOUkMib1xTGn4X3uFLEemxqbvSKec5wxfS
-         AK1Q==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Vq8/STd6YbRJmC6NfS56gff1pB+s7JMpOezVQaBLX3E=;
+        b=lLieOH5Lbwe2GRXy0RXDxMNRW8EQA1zKcCYkDQjghJiL7WoeqysGW1d1wo1Q0ROjhc
+         OFgzneLuBpMjrV9dnyhKPQGwC8hH+gsXwlMzW2kUuGUxqFyMZgq699/jLvquhsHa1IQT
+         Tlbfpb63wNhz4yLNSg3MQAW0OQrnbK5xh6c+ipd0jlUqF9YDASF5XZ/8ML9uIppH7NIU
+         svFlD4WzqbyV5BmrCTe+vsZHsGf+Eg27U0W4ManMpxZfoPCCSU2xnfq/jB56v5Jz4PVC
+         J6WTFjhnsUBw5YfPTpBlZzSBEPZMvx4v8xhfg7Shq5Mno4xCfuEX0OA8v1DlFsJ8Vkdn
+         dWWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=cKqxCmj+g8wylWj4eAfctUKW1L6Qx1DV5mBadTwoHi0=;
-        b=J6lLuOpN888bL0vphrLpPQLRJe7NU6dB8QO3YO96YeCdbTCsrT08Ucof8v8MWHLcZi
-         nJZDJzNZEtxECqCpgk9paqw8uDgKBfQh1iWC3I+X5eyQsZBqAJiFj0zmjJ/6ZAw6mfcp
-         QgsO2bKzw5iZI3YH32vRUy0Dk48FmvvVR47ox2UgLmE/DRYNEXhtazTML7YUI4nM8mnG
-         u+4m+vja9bL2zmU6zxGEoerFifwlvox2rQ+mIkhBJLlHALrlBGYMkUFQ0v8dG8F2nRBK
-         Fwl6IvUywio2AVsQpHLnX3+l3nK/bzn6q/B7f8OGt9mQLTHuhN3HH3qZhZMRzrch1d9m
-         CFMQ==
-X-Gm-Message-State: AGRZ1gLHRD0utE8qhFaQ1L3vcbcsPSdxaa5FmvHyCTfZyVPjI65g5EYA
-        uU+BAFFodFSSgf4bCTCRIvqwEA==
-X-Google-Smtp-Source: AJdET5cUkx5Cw0zfoRvC4mN0QBbB0FymNnWasc/6x4Bd2JTU0z9jg4Wqk9Tv9MwiHUzAQ/sFbYLksA==
-X-Received: by 2002:a63:790e:: with SMTP id u14mr6781823pgc.452.1542306535815;
-        Thu, 15 Nov 2018 10:28:55 -0800 (PST)
-Received: from vader ([64.114.255.97])
-        by smtp.gmail.com with ESMTPSA id f6-v6sm35792916pfg.128.2018.11.15.10.28.54
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 15 Nov 2018 10:28:55 -0800 (PST)
-Date:   Thu, 15 Nov 2018 10:28:54 -0800
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Dave Chinner <dchinner@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
-        Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
-        linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
-        linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
-        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: Re: [PATCH V10 02/19] block: introduce bio_for_each_bvec()
-Message-ID: <20181115182854.GB9348@vader>
-References: <20181115085306.9910-1-ming.lei@redhat.com>
- <20181115085306.9910-3-ming.lei@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Vq8/STd6YbRJmC6NfS56gff1pB+s7JMpOezVQaBLX3E=;
+        b=T4+47S9b+0po5ePANpARWEvnv3D67YX1ZGUtHF3LyAnInBnQluXAIzahQKYt6aOXnl
+         wxFrgBrpLblfWDXpjcIU2+bdydlsONCfX9ZyQRLnnxc5UBMGUEfjxa+3X5ti0NFnb8zf
+         uEDkIDkTZa19A4XG82hGFancczHA7Xu0f8F9YAZkM3+aWRT5HU5ytoOUGvwXeQPKMpFv
+         mCKXym3mPlWF17R0Q3aLleQKr+FfiC05WI1k/DTm2ent0/H3y4U+EGec960fdrmE99jt
+         73XVnSMA0ojkg2l4wd+3gn/Shod7H4j+ZvnAPLRjbDYCPbqtfxyXOwQvogkorfkzdZAI
+         u2Ew==
+X-Gm-Message-State: AA+aEWaafQt+QuOFvX8jqSkg2yYkZ4R7Yqg1l+D2AShakXdZvV5SkxFo
+        rJ6k+5NACXnjrIvir3lFnPD9wQ==
+X-Google-Smtp-Source: AJdET5dUm2qp8xUpwqWqZr+E4Y6n0VKXwpSQK53PPyiKDr7aCwbNGwExeM/+og2hr5F7Mms+Q3/EOw==
+X-Received: by 2002:a6b:928a:: with SMTP id u132-v6mr5453095iod.97.1542309270549;
+        Thu, 15 Nov 2018 11:14:30 -0800 (PST)
+Received: from ?IPv6:2620:10d:c081:1130::11f6? ([2620:10d:c090:180::1:7813])
+        by smtp.gmail.com with ESMTPSA id u129-v6sm9756043ita.13.2018.11.15.11.14.28
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 15 Nov 2018 11:14:29 -0800 (PST)
+Subject: Re: remove more legacy request leftover
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
+        drbd-dev@lists.linbit.com
+References: <20181114160219.28328-1-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <6927069f-46d4-2d37-058a-c9c9b9d5360d@kernel.dk>
+Date:   Thu, 15 Nov 2018 12:14:27 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181115085306.9910-3-ming.lei@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20181114160219.28328-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 15, 2018 at 04:52:49PM +0800, Ming Lei wrote:
-> This helper is used for iterating over multi-page bvec for bio
-> split & merge code.
+On 11/14/18 9:02 AM, Christoph Hellwig wrote:
+> Hi Jens,
 > 
-> Cc: Dave Chinner <dchinner@redhat.com>
-> Cc: Kent Overstreet <kent.overstreet@gmail.com>
-> Cc: Mike Snitzer <snitzer@redhat.com>
-> Cc: dm-devel@redhat.com
-> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-> Cc: linux-fsdevel@vger.kernel.org
-> Cc: Shaohua Li <shli@kernel.org>
-> Cc: linux-raid@vger.kernel.org
-> Cc: linux-erofs@lists.ozlabs.org
-> Cc: David Sterba <dsterba@suse.com>
-> Cc: linux-btrfs@vger.kernel.org
-> Cc: Darrick J. Wong <darrick.wong@oracle.com>
-> Cc: linux-xfs@vger.kernel.org
-> Cc: Gao Xiang <gaoxiang25@huawei.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Cc: linux-ext4@vger.kernel.org
-> Cc: Coly Li <colyli@suse.de>
-> Cc: linux-bcache@vger.kernel.org
-> Cc: Boaz Harrosh <ooo@electrozaur.com>
-> Cc: Bob Peterson <rpeterso@redhat.com>
-> Cc: cluster-devel@redhat.com
+> this series removes another bunch of legacy request leftovers,
+> including the pointer indirection for the queue_lock.
 
-Reviewed-by: Omar Sandoval <osandov@fb.com>
+Applied, with the subname part removed as mentioned in #13.
 
-One comment below.
+> Note that we have very few queue_lock users left, I wonder if
+> we should get rid of it entirely and have separate locks for
+> the cgroup and I/O scheduler code, which are the only heavy
+> users?
 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  include/linux/bio.h  | 34 +++++++++++++++++++++++++++++++---
->  include/linux/bvec.h | 36 ++++++++++++++++++++++++++++++++----
->  2 files changed, 63 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/linux/bio.h b/include/linux/bio.h
-> index 056fb627edb3..1f0dcf109841 100644
-> --- a/include/linux/bio.h
-> +++ b/include/linux/bio.h
-> @@ -76,6 +76,9 @@
->  #define bio_data_dir(bio) \
->  	(op_is_write(bio_op(bio)) ? WRITE : READ)
->  
-> +#define bio_iter_mp_iovec(bio, iter)				\
-> +	mp_bvec_iter_bvec((bio)->bi_io_vec, (iter))
-> +
->  /*
->   * Check whether this bio carries any data or not. A NULL bio is allowed.
->   */
-> @@ -135,18 +138,33 @@ static inline bool bio_full(struct bio *bio)
->  #define bio_for_each_segment_all(bvl, bio, i)				\
->  	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
->  
-> -static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
-> -				    unsigned bytes)
-> +static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
-> +				      unsigned bytes, bool mp)
->  {
->  	iter->bi_sector += bytes >> 9;
->  
->  	if (bio_no_advance_iter(bio))
->  		iter->bi_size -= bytes;
->  	else
-> -		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
-> +		if (!mp)
-> +			bvec_iter_advance(bio->bi_io_vec, iter, bytes);
-> +		else
-> +			mp_bvec_iter_advance(bio->bi_io_vec, iter, bytes);
+Probably not worth it...
 
-if (!foo) {} else {} hurts my brain, please do
+-- 
+Jens Axboe
 
-		if (mp)
-			mp_bvec_iter_advance(bio->bi_io_vec, iter, bytes);
-		else
-			bvec_iter_advance(bio->bi_io_vec, iter, bytes);
