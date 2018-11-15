@@ -2,136 +2,127 @@ Return-Path: <SRS0=/6aj=N2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA68C43441
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 21:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0266CC43441
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 22:13:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D06C8208A3
-	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 21:05:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D06C8208A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id C52CC21780
+	for <linux-block@archiver.kernel.org>; Thu, 15 Nov 2018 22:13:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C52CC21780
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fromorbit.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725856AbeKPHOs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Nov 2018 02:14:48 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:50744 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725809AbeKPHOs (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Nov 2018 02:14:48 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B331FC04B2C8;
-        Thu, 15 Nov 2018 21:05:20 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.149])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1949E5D739;
-        Thu, 15 Nov 2018 21:05:11 +0000 (UTC)
-Date:   Thu, 15 Nov 2018 16:05:10 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Omar Sandoval <osandov@osandov.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, Dave Chinner <dchinner@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        dm-devel@redhat.com, Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
-        Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
-        linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
-        linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
-        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: Re: [PATCH V10 03/19] block: use bio_for_each_bvec() to compute
- multi-page bvec count
-Message-ID: <20181115210510.GA24908@redhat.com>
-References: <20181115085306.9910-1-ming.lei@redhat.com>
- <20181115085306.9910-4-ming.lei@redhat.com>
- <20181115202028.GC9348@vader>
+        id S1725979AbeKPIXW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Nov 2018 03:23:22 -0500
+Received: from ipmail06.adl6.internode.on.net ([150.101.137.145]:58396 "EHLO
+        ipmail06.adl6.internode.on.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725888AbeKPIXW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Nov 2018 03:23:22 -0500
+Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
+  by ipmail06.adl6.internode.on.net with ESMTP; 16 Nov 2018 08:43:41 +1030
+Received: from dave by dastard with local (Exim 4.80)
+        (envelope-from <david@fromorbit.com>)
+        id 1gNPtJ-0003Oj-7L; Fri, 16 Nov 2018 09:13:37 +1100
+Date:   Fri, 16 Nov 2018 09:13:37 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-xfs@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: fix 32 bit overflow in __blkdev_issue_discard()
+Message-ID: <20181115221337.GY19305@dastard>
+References: <20181113214337.20581-1-david@fromorbit.com>
+ <10a8dd78-7c00-8593-9f4e-b20eb1161b92@kernel.dk>
+ <20181115010651.GD32603@ming.t460p>
+ <20181115012201.GX19305@dastard>
+ <20181115031035.GE32603@ming.t460p>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181115202028.GC9348@vader>
+In-Reply-To: <20181115031035.GE32603@ming.t460p>
 User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Thu, 15 Nov 2018 21:05:21 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 15 2018 at  3:20pm -0500,
-Omar Sandoval <osandov@osandov.com> wrote:
-
-> On Thu, Nov 15, 2018 at 04:52:50PM +0800, Ming Lei wrote:
-> > First it is more efficient to use bio_for_each_bvec() in both
-> > blk_bio_segment_split() and __blk_recalc_rq_segments() to compute how
-> > many multi-page bvecs there are in the bio.
+On Thu, Nov 15, 2018 at 11:10:36AM +0800, Ming Lei wrote:
+> On Thu, Nov 15, 2018 at 12:22:01PM +1100, Dave Chinner wrote:
+> > On Thu, Nov 15, 2018 at 09:06:52AM +0800, Ming Lei wrote:
+> > > On Wed, Nov 14, 2018 at 08:18:24AM -0700, Jens Axboe wrote:
+> > > > On 11/13/18 2:43 PM, Dave Chinner wrote:
+> > > > > From: Dave Chinner <dchinner@redhat.com>
+> > > > > 
+> > > > > A discard cleanup merged into 4.20-rc2 causes fstests xfs/259 to
+> > > > > fall into an endless loop in the discard code. The test is creating
+> > > > > a device that is exactly 2^32 sectors in size to test mkfs boundary
+> > > > > conditions around the 32 bit sector overflow region.
+> > > > > 
+> > > > > mkfs issues a discard for the entire device size by default, and
+> > > > > hence this throws a sector count of 2^32 into
+> > > > > blkdev_issue_discard(). It takes the number of sectors to discard as
+> > > > > a sector_t - a 64 bit value.
+> > > > > 
+> > > > > The commit ba5d73851e71 ("block: cleanup __blkdev_issue_discard")
+> > > > > takes this sector count and casts it to a 32 bit value before
+> > > > > comapring it against the maximum allowed discard size the device
+> > > > > has. This truncates away the upper 32 bits, and so if the lower 32
+> > > > > bits of the sector count is zero, it starts issuing discards of
+> > > > > length 0. This causes the code to fall into an endless loop, issuing
+> > > > > a zero length discards over and over again on the same sector.
+> > > > 
+> > > > Applied, thanks. Ming, can you please add a blktests test for
+> > > > this case? This is the 2nd time it's been broken.
+> > > 
+> > > OK, I will add zram discard test in blktests, which should cover the
+> > > 1st report. For the xfs/259, I need to investigate if it is easy to
+> > > do in blktests.
 > > 
-> > Secondly once bio_for_each_bvec() is used, the bvec may need to be
-> > splitted because its length can be very longer than max segment size,
-> > so we have to split the big bvec into several segments.
-> > 
-> > Thirdly when splitting multi-page bvec into segments, the max segment
-> > limit may be reached, so the bio split need to be considered under
-> > this situation too.
-> > 
-> > Cc: Dave Chinner <dchinner@redhat.com>
-> > Cc: Kent Overstreet <kent.overstreet@gmail.com>
-> > Cc: Mike Snitzer <snitzer@redhat.com>
-> > Cc: dm-devel@redhat.com
-> > Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-> > Cc: linux-fsdevel@vger.kernel.org
-> > Cc: Shaohua Li <shli@kernel.org>
-> > Cc: linux-raid@vger.kernel.org
-> > Cc: linux-erofs@lists.ozlabs.org
-> > Cc: David Sterba <dsterba@suse.com>
-> > Cc: linux-btrfs@vger.kernel.org
-> > Cc: Darrick J. Wong <darrick.wong@oracle.com>
-> > Cc: linux-xfs@vger.kernel.org
-> > Cc: Gao Xiang <gaoxiang25@huawei.com>
-> > Cc: Christoph Hellwig <hch@lst.de>
-> > Cc: Theodore Ts'o <tytso@mit.edu>
-> > Cc: linux-ext4@vger.kernel.org
-> > Cc: Coly Li <colyli@suse.de>
-> > Cc: linux-bcache@vger.kernel.org
-> > Cc: Boaz Harrosh <ooo@electrozaur.com>
-> > Cc: Bob Peterson <rpeterso@redhat.com>
-> > Cc: cluster-devel@redhat.com
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  block/blk-merge.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++---------
-> >  1 file changed, 76 insertions(+), 14 deletions(-)
-> > 
-> > diff --git a/block/blk-merge.c b/block/blk-merge.c
-> > index 91b2af332a84..6f7deb94a23f 100644
-> > --- a/block/blk-merge.c
-> > +++ b/block/blk-merge.c
-> > @@ -160,6 +160,62 @@ static inline unsigned get_max_io_size(struct request_queue *q,
-> >  	return sectors;
-> >  }
-> >  
-> > +/*
-> > + * Split the bvec @bv into segments, and update all kinds of
-> > + * variables.
-> > + */
-> > +static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
-> > +		unsigned *nsegs, unsigned *last_seg_size,
-> > +		unsigned *front_seg_size, unsigned *sectors)
-> > +{
-> > +	bool need_split = false;
-> > +	unsigned len = bv->bv_len;
-> > +	unsigned total_len = 0;
-> > +	unsigned new_nsegs = 0, seg_size = 0;
+> > Just write a test that creates block devices of 2^32 + (-1,0,1)
+> > sectors and runs a discard across the entire device. That's all that
+> > xfs/259 it doing - exercising mkfs on 2TB, 4TB and 16TB boundaries.
+> > i.e. the boundaries where sectors and page cache indexes (on 4k page
+> > size systems) overflow 32 bit int and unsigned int sizes. mkfs
+> > issues a discard for the entire device, so it's testing that as
+> > well...
 > 
-> "unsigned int" here and everywhere else.
+> Indeed, I can reproduce this issue via the following commands:
+> 
+> modprobe scsi_debug virtual_gb=2049 sector_size=512 lbpws10=1 dev_size_mb=512
+> blkdiscard /dev/sde
+> 
+> > 
+> > You need to write tests that exercise write_same, write_zeros and
+> > discard operations around these boundaries, because they all take
+> > a 64 bit sector count and stuff them into 32 bit size fields in
+> > the bio tha tis being submitted.
+> 
+> write_same/write_zeros are usually used by driver directly, so we
+> may need make the test case on some specific device.
 
-Curious why?  I've wondered what govens use of "unsigned" vs "unsigned
-int" recently and haven't found _the_ reason to pick one over the other.
+My local linux iscsi server and client advertise support for them.
+It definitely does not ships zeros across the wire(*) when I use
+things like FALLOC_FL_ZERO_RANGE, but fstests does not have block
+device fallocate() tests for zeroing or punching...
 
-Thanks,
-Mike
+Cheers,
+
+Dave.
+
+(*) but the back end storage is a sparse file on an XFS filesystem,
+and the iscsi server fails to translate write_zeroes or
+WRITE_SAME(0) to FALLOC_FL_ZERO_RANGE on the storage side and hence
+is really slow because it physically writes zeros to the XFS file.
+i.e. the client offloads the operation to the server to minimise
+wire traffic, but then the server doesn't offload the operation to
+the storage....
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
