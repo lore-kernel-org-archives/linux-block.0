@@ -2,179 +2,180 @@ Return-Path: <SRS0=uvQv=N3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C27F6C43610
-	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 00:26:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFAEC43441
+	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 00:36:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 88C1A2146D
-	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 00:26:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="Jcb61BmO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88C1A2146D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
+	by mail.kernel.org (Postfix) with ESMTP id 0F3542146D
+	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 00:36:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F3542146D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726718AbeKPKgv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Nov 2018 05:36:51 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:41920 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726407AbeKPKgf (ORCPT
+        id S1726271AbeKPKqg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Nov 2018 05:46:36 -0500
+Received: from 109-183-129-149.customers.tmcz.cz ([109.183.129.149]:46220 "EHLO
+        leontynka.twibright.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725985AbeKPKqg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Nov 2018 05:36:35 -0500
-Received: by mail-pg1-f193.google.com with SMTP id 70so9759105pgh.8
-        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 16:26:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=rc7fjUApD7flLlTVqa/RhgazHXBYzBAhEuXeNhvwmBU=;
-        b=Jcb61BmOL2Jy+hgyO2/CuDgpSAkWFinbUNWCgcSEX11fUG/4NFpcyuoqKnENa/1Ua5
-         PQrnGT5h+ai+Fxp9DOzzy2Ve6wq1+3E6wccymzQ8rvqQL8QGLxt0rHSw7RIo54m5hnVx
-         y6zabFjieEYHME8kJ3pIbuVSPB2uBmQ97htfzqKHtrlfytrO87IkKmWJLD11K8qeEblY
-         LVUbI4hmYiHPS0Fz4xAIDJJfVrpqbRyBVM+yYPGAWyWvD0Bj04dMWG2Cu8chIoQYZ+jI
-         lDlID/Orlb6eoayXMROJjxhsz7k6qTeyfXxPlRijju/mdxG6gNA7VSOUPUMMLlkqX/qO
-         07fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=rc7fjUApD7flLlTVqa/RhgazHXBYzBAhEuXeNhvwmBU=;
-        b=UiR50DtFFyqHPhQ1X2tYBz6akgDKUbtBqhwZeTyZQ//6saYAOVxFohvBOII94NVKHD
-         l+LAYHnHl7f5Me3jFYvm481thj+/3aIyrTqEl/VKcdrXRbTDu02NtKdTFpT0mPiZ22Pw
-         IIjiUTJhyi038vXKlkmZyONqGkP6brUwRkVMeTviX4l376FIL+nah1kELLuP3/ANw8w4
-         T8+tLybwCQhPPH1a/q2nz8YjnleST1cFQruxrC4NViRvwkpGKahWo9HLpSgALuXzxkHW
-         M7O+VgvBa/+ZGk0tFgVNFNIVI+DI2raeLlamjhp8w3nlFxoY6f0UMA2FHTwiPbu6VlYo
-         D8ew==
-X-Gm-Message-State: AGRZ1gJWOjIqpv+67rFZhlU9VIEyPhXETWrL8H53he/jA9/lDq1IO0jc
-        VoprOt/ds92Oy7n5J+I9Gxt0Yw==
-X-Google-Smtp-Source: AJdET5cOkeCunf0nsmycfXndFMzt5cULp9SAC4eTUiTiSYBG0YlOeorlCbZYURqg38qZwtCXn8+Jiw==
-X-Received: by 2002:a63:5518:: with SMTP id j24mr2179612pgb.208.1542327987036;
-        Thu, 15 Nov 2018 16:26:27 -0800 (PST)
-Received: from vader ([64.114.255.97])
-        by smtp.gmail.com with ESMTPSA id t64-v6sm32749985pfd.127.2018.11.15.16.26.26
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 15 Nov 2018 16:26:26 -0800 (PST)
-Date:   Thu, 15 Nov 2018 16:26:25 -0800
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Dave Chinner <dchinner@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
-        Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
-        linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
-        linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
-        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: Re: [PATCH V10 09/19] block: introduce bio_bvecs()
-Message-ID: <20181116002625.GD23828@vader>
-References: <20181115085306.9910-1-ming.lei@redhat.com>
- <20181115085306.9910-10-ming.lei@redhat.com>
+        Fri, 16 Nov 2018 05:46:36 -0500
+X-Greylist: delayed 1873 seconds by postgrey-1.27 at vger.kernel.org; Fri, 16 Nov 2018 05:46:35 EST
+Received: from debian.vm ([192.168.192.2])
+        by leontynka.twibright.com with smtp (Exim 4.89)
+        (envelope-from <mpatocka@redhat.com>)
+        id 1gNRdE-0001CW-DB; Fri, 16 Nov 2018 01:05:09 +0100
+Received: by debian.vm (sSMTP sendmail emulation); Fri, 16 Nov 2018 01:05:07 +0100
+Message-Id: <20181116000507.773533534@debian.vm>
+User-Agent: quilt/0.65
+Date:   Fri, 16 Nov 2018 01:04:18 +0100
+From:   Mikulas Patocka <mpatocka@redhat.com>
+To:     Mike Snitzer <msnitzer@redhat.com>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        "Alasdair G. Kergon" <agk@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Mikulas Patocka <mpatocka@redhat.com>
+Subject: [PATCH 2/3] dm: use percpu counters
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181115085306.9910-10-ming.lei@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline; filename=dm-percpu.patch
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 15, 2018 at 04:52:56PM +0800, Ming Lei wrote:
-> There are still cases in which we need to use bio_bvecs() for get the
-> number of multi-page segment, so introduce it.
-> 
-> Cc: Dave Chinner <dchinner@redhat.com>
-> Cc: Kent Overstreet <kent.overstreet@gmail.com>
-> Cc: Mike Snitzer <snitzer@redhat.com>
-> Cc: dm-devel@redhat.com
-> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-> Cc: linux-fsdevel@vger.kernel.org
-> Cc: Shaohua Li <shli@kernel.org>
-> Cc: linux-raid@vger.kernel.org
-> Cc: linux-erofs@lists.ozlabs.org
-> Cc: David Sterba <dsterba@suse.com>
-> Cc: linux-btrfs@vger.kernel.org
-> Cc: Darrick J. Wong <darrick.wong@oracle.com>
-> Cc: linux-xfs@vger.kernel.org
-> Cc: Gao Xiang <gaoxiang25@huawei.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Theodore Ts'o <tytso@mit.edu>
-> Cc: linux-ext4@vger.kernel.org
-> Cc: Coly Li <colyli@suse.de>
-> Cc: linux-bcache@vger.kernel.org
-> Cc: Boaz Harrosh <ooo@electrozaur.com>
-> Cc: Bob Peterson <rpeterso@redhat.com>
-> Cc: cluster-devel@redhat.com
+Use percpu inflight counters to avoid cache line bouncing and improve
+performance.
 
-Reviewed-by: Omar Sandoval <osandov@fb.com>
+Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  include/linux/bio.h | 30 +++++++++++++++++++++++++-----
->  1 file changed, 25 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/linux/bio.h b/include/linux/bio.h
-> index 1f0dcf109841..3496c816946e 100644
-> --- a/include/linux/bio.h
-> +++ b/include/linux/bio.h
-> @@ -196,7 +196,6 @@ static inline unsigned bio_segments(struct bio *bio)
->  	 * We special case discard/write same/write zeroes, because they
->  	 * interpret bi_size differently:
->  	 */
-> -
->  	switch (bio_op(bio)) {
->  	case REQ_OP_DISCARD:
->  	case REQ_OP_SECURE_ERASE:
-> @@ -205,13 +204,34 @@ static inline unsigned bio_segments(struct bio *bio)
->  	case REQ_OP_WRITE_SAME:
->  		return 1;
->  	default:
-> -		break;
-> +		bio_for_each_segment(bv, bio, iter)
-> +			segs++;
-> +		return segs;
->  	}
-> +}
->  
-> -	bio_for_each_segment(bv, bio, iter)
-> -		segs++;
-> +static inline unsigned bio_bvecs(struct bio *bio)
-> +{
-> +	unsigned bvecs = 0;
-> +	struct bio_vec bv;
-> +	struct bvec_iter iter;
->  
-> -	return segs;
-> +	/*
-> +	 * We special case discard/write same/write zeroes, because they
-> +	 * interpret bi_size differently:
-> +	 */
-> +	switch (bio_op(bio)) {
-> +	case REQ_OP_DISCARD:
-> +	case REQ_OP_SECURE_ERASE:
-> +	case REQ_OP_WRITE_ZEROES:
-> +		return 0;
-> +	case REQ_OP_WRITE_SAME:
-> +		return 1;
-> +	default:
-> +		bio_for_each_bvec(bv, bio, iter)
-> +			bvecs++;
-> +		return bvecs;
-> +	}
->  }
->  
->  /*
-> -- 
-> 2.9.5
-> 
+---
+ drivers/md/dm-core.h |    5 +++++
+ drivers/md/dm.c      |   50 ++++++++++++++++++++++++++++++++++----------------
+ 2 files changed, 39 insertions(+), 16 deletions(-)
+
+Index: linux-dm/drivers/md/dm-core.h
+===================================================================
+--- linux-dm.orig/drivers/md/dm-core.h	2018-11-15 22:06:37.000000000 +0100
++++ linux-dm/drivers/md/dm-core.h	2018-11-15 22:06:37.000000000 +0100
+@@ -24,6 +24,10 @@ struct dm_kobject_holder {
+ 	struct completion completion;
+ };
+ 
++struct dm_percpu {
++	unsigned inflight[2];
++};
++
+ /*
+  * DM core internal structure that used directly by dm.c and dm-rq.c
+  * DM targets must _not_ deference a mapped_device to directly access its members!
+@@ -63,6 +67,7 @@ struct mapped_device {
+ 	/*
+ 	 * A list of ios that arrived while we were suspended.
+ 	 */
++	struct dm_percpu __percpu *counters;
+ 	struct work_struct work;
+ 	wait_queue_head_t wait;
+ 	spinlock_t deferred_lock;
+Index: linux-dm/drivers/md/dm.c
+===================================================================
+--- linux-dm.orig/drivers/md/dm.c	2018-11-15 22:06:37.000000000 +0100
++++ linux-dm/drivers/md/dm.c	2018-11-15 22:09:31.000000000 +0100
+@@ -648,19 +648,32 @@ static void free_tio(struct dm_target_io
+ 
+ int md_in_flight(struct mapped_device *md)
+ {
+-	return atomic_read(&dm_disk(md)->part0.in_flight[READ]) +
+-	       atomic_read(&dm_disk(md)->part0.in_flight[WRITE]);
++	int cpu;
++	unsigned sum = 0;
++	for_each_possible_cpu(cpu) {
++		struct dm_percpu *p = per_cpu_ptr(md->counters, cpu);
++		sum += p->inflight[READ] + p->inflight[WRITE];
++	}
++	return (int)sum;
+ }
+ 
+ static void start_io_acct(struct dm_io *io)
+ {
+ 	struct mapped_device *md = io->md;
+ 	struct bio *bio = io->orig_bio;
++	struct hd_struct *part;
++	int sgrp, cpu;
+ 
+ 	io->start_time = jiffies;
+ 
+-	generic_start_io_acct(md->queue, bio_op(bio), bio_sectors(bio),
+-			      &dm_disk(md)->part0);
++	part = &dm_disk(md)->part0;
++	sgrp = op_stat_group(bio_op(bio));
++	cpu = part_stat_lock();
++	__part_stat_add(cpu, part, ios[sgrp], 1);
++	__part_stat_add(cpu, part, sectors[sgrp], bio_sectors(bio));
++	part_stat_unlock();
++
++	this_cpu_inc(md->counters->inflight[bio_data_dir(bio)]);
+ 
+ 	if (unlikely(dm_stats_used(&md->stats)))
+ 		dm_stats_account_io(&md->stats, bio_data_dir(bio),
+@@ -673,25 +686,24 @@ static void end_io_acct(struct dm_io *io
+ 	struct mapped_device *md = io->md;
+ 	struct bio *bio = io->orig_bio;
+ 	unsigned long duration = jiffies - io->start_time;
++	struct hd_struct *part;
++	int sgrp, cpu;
+ 
+ 	if (unlikely(dm_stats_used(&md->stats)))
+ 		dm_stats_account_io(&md->stats, bio_data_dir(bio),
+ 				    bio->bi_iter.bi_sector, bio_sectors(bio),
+ 				    true, duration, &io->stats_aux);
+ 
+-	/*
+-	 * make sure that atomic_dec in generic_end_io_acct is not reordered
+-	 * with previous writes
+-	 */
+-	smp_mb__before_atomic();
+-	generic_end_io_acct(md->queue, bio_op(bio), &dm_disk(md)->part0,
+-			    io->start_time);
+-	/*
+-	 * generic_end_io_acct does atomic_dec, this barrier makes sure that
+-	 * atomic_dec is not reordered with waitqueue_active
+-	 */
+-	smp_mb__after_atomic();
++	part = &dm_disk(md)->part0;
++	sgrp = op_stat_group(bio_op(bio));
++	cpu = part_stat_lock();
++	__part_stat_add(cpu, part, nsecs[sgrp], jiffies_to_nsecs(duration));
++	part_stat_unlock();
++
++	smp_wmb();
++	this_cpu_dec(md->counters->inflight[bio_data_dir(bio)]);
+ 
++	smp_mb();
+ 	/* nudge anyone waiting on suspend queue */
+ 	if (unlikely(waitqueue_active(&md->wait))) {
+ 		if (!md_in_flight(md))
+@@ -1822,6 +1834,8 @@ static void cleanup_mapped_device(struct
+ 	if (md->queue)
+ 		blk_cleanup_queue(md->queue);
+ 
++	free_percpu(md->counters);
++
+ 	cleanup_srcu_struct(&md->io_barrier);
+ 
+ 	if (md->bdev) {
+@@ -1892,6 +1906,10 @@ static struct mapped_device *alloc_dev(i
+ 	if (!md->disk)
+ 		goto bad;
+ 
++	md->counters = alloc_percpu(struct dm_percpu);
++	if (!md->counters)
++		goto bad;
++
+ 	init_waitqueue_head(&md->wait);
+ 	INIT_WORK(&md->work, dm_wq_work);
+ 	init_waitqueue_head(&md->eventq);
+
