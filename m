@@ -2,89 +2,76 @@ Return-Path: <SRS0=uvQv=N3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 970DCC43441
-	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 09:42:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E3FBC43441
+	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 09:49:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6C13C208A3
-	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 09:42:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C13C208A3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 4BC8B208E7
+	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 09:49:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BC8B208E7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389473AbeKPTxa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Nov 2018 14:53:30 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:42901 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727405AbeKPTxa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Nov 2018 14:53:30 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 6105A91790A54;
-        Fri, 16 Nov 2018 17:41:54 +0800 (CST)
-Received: from [10.151.23.176] (10.151.23.176) by smtp.huawei.com
- (10.3.19.213) with Microsoft SMTP Server (TLS) id 14.3.408.0; Fri, 16 Nov
- 2018 17:41:50 +0800
-Subject: Re: [PATCH V10 03/19] block: use bio_for_each_bvec() to compute
- multi-page bvec count
-To:     Christoph Hellwig <hch@lst.de>
-CC:     Omar Sandoval <osandov@osandov.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-mm@kvack.org>, Dave Chinner <dchinner@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        <dm-devel@redhat.com>, Alexander Viro <viro@zeniv.linux.org.uk>,
-        <linux-fsdevel@vger.kernel.org>, Shaohua Li <shli@kernel.org>,
-        <linux-raid@vger.kernel.org>, <linux-erofs@lists.ozlabs.org>,
-        David Sterba <dsterba@suse.com>, <linux-btrfs@vger.kernel.org>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        <linux-xfs@vger.kernel.org>, Theodore Ts'o <tytso@mit.edu>,
-        <linux-ext4@vger.kernel.org>, Coly Li <colyli@suse.de>,
-        <linux-bcache@vger.kernel.org>, Boaz Harrosh <ooo@electrozaur.com>,
-        "Bob Peterson" <rpeterso@redhat.com>, <cluster-devel@redhat.com>
-References: <20181115085306.9910-1-ming.lei@redhat.com>
- <20181115085306.9910-4-ming.lei@redhat.com> <20181115202028.GC9348@vader>
- <20181115210510.GA24908@redhat.com> <20181115221847.GD9348@vader>
- <20181116091956.GA17604@lst.de>
-From:   Gao Xiang <gaoxiang25@huawei.com>
-Message-ID: <a0105f7a-95b2-3a42-1543-3e8b999edb30@huawei.com>
-Date:   Fri, 16 Nov 2018 17:41:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+        id S1727454AbeKPUBY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Nov 2018 15:01:24 -0500
+Received: from verein.lst.de ([213.95.11.211]:48408 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727442AbeKPUBY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Nov 2018 15:01:24 -0500
+Received: by newverein.lst.de (Postfix, from userid 2407)
+        id E3C6B68D60; Fri, 16 Nov 2018 10:49:47 +0100 (CET)
+Date:   Fri, 16 Nov 2018 10:49:47 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>,
+        linux-nvme@lists.infradead.org,
+        Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>, axboe@kernel.dk,
+        Martin Wilck <mwilck@suse.com>, lijie <lijie34@huawei.com>,
+        xose.vazquez@gmail.com, chengjike.cheng@huawei.com,
+        shenhong09@huawei.com, dm-devel@redhat.com,
+        wangzhoumengjian@huawei.com, christophe.varoqui@opensvc.com,
+        bmarzins@redhat.com, sschremm@netapp.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] nvme: allow ANA support to be independent of native
+ multipathing
+Message-ID: <20181116094947.GA19296@lst.de>
+References: <20181112215323.GA7983@redhat.com> <20181113161838.GC9827@localhost.localdomain> <20181113180008.GA12513@redhat.com> <20181114053837.GA15086@redhat.com> <30cf7af7-8826-55bd-e39a-4f81ed032f6d@suse.de> <20181114174746.GA18526@redhat.com> <87c931e5-4ac9-1795-8d40-cc5541d3ebcf@suse.de> <20181115174605.GA19782@redhat.com> <20181116091458.GA17267@lst.de> <37098edd-4dea-b58f-bca6-3be9af8ec4ee@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20181116091956.GA17604@lst.de>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.151.23.176]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <37098edd-4dea-b58f-bca6-3be9af8ec4ee@suse.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On 2018/11/16 17:19, Christoph Hellwig wrote:
-> On Thu, Nov 15, 2018 at 02:18:47PM -0800, Omar Sandoval wrote:
->> My only reason to prefer unsigned int is consistency. unsigned int is
->> much more common in the kernel:
+On Fri, Nov 16, 2018 at 10:40:40AM +0100, Hannes Reinecke wrote:
+>>> Introduce ability to always re-read ANA log page as required due to ANA
+>>> error and make current ANA state available via sysfs -- even if native
+>>> multipathing is disabled on the host (e.g. nvme_core.multipath=N).
 >>
->> $ ag --cc -s 'unsigned\s+int' | wc -l
->> 129632
->> $ ag --cc -s 'unsigned\s+(?!char|short|int|long)' | wc -l
->> 22435
+>> The first part I could see, but I still want to make it conditional
+>> in some way as nvme is going into deeply embedded setups, and I don't
+>> want to carry the weight of the ANA code around for everyone.
 >>
->> checkpatch also warns on plain unsigned.
-> 
-> Talk about chicken and egg.  unsigned is perfectly valid C, and being
-> shorter often helps being more readable.  checkpath is as so often
-> wrongly opinionated..
-> 
+> Can you clarify this a bit?
+> We _do_ have the NVME multipath config option to deconfigure the whole 
+> thing during compile time; that isn't influenced with this patch.
+> So are you worried about the size of the ANA implementation itself?
+> Or are you worried about the size of the ANA structures?
 
-sigh...I personally tend to use "unsigned" instead of "unsigned int" as well,
-but checkpatch.pl also suggests erofs to use "unsigned int" :-(
+I just see the next step of wanting to move ANA code into the core
+which is implied above.
+>
+>> The second I fundamentally disagree with.  And even if you found agreement
+>> it would have to be in a separate patch as it is a separate feature.
+>>
+> Why? Where's the problem with re-reading the ANA log pages if we get an 
+> event indicating that we should?
 
-Thanks,
-Gao Xiang
+"second" here means the sysfs file.
