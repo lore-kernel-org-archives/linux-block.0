@@ -2,262 +2,198 @@ Return-Path: <SRS0=uvQv=N3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43FF4C43441
-	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 00:37:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89348C43610
+	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 00:40:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0819221019
-	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 00:37:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0819221019
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 501A821019
+	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 00:40:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="zSFi0Wg4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 501A821019
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726271AbeKPKrR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Nov 2018 05:47:17 -0500
-Received: from 109-183-129-149.customers.tmcz.cz ([109.183.129.149]:46232 "EHLO
-        leontynka.twibright.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725985AbeKPKrR (ORCPT
+        id S2389003AbeKPKup (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Nov 2018 05:50:45 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:43971 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726930AbeKPKug (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Nov 2018 05:47:17 -0500
-Received: from debian.vm ([192.168.192.2])
-        by leontynka.twibright.com with smtp (Exim 4.89)
-        (envelope-from <mpatocka@redhat.com>)
-        id 1gNRdF-0001CY-Jl; Fri, 16 Nov 2018 01:05:10 +0100
-Received: by debian.vm (sSMTP sendmail emulation); Fri, 16 Nov 2018 01:05:09 +0100
-Message-Id: <20181116000508.980108938@debian.vm>
-User-Agent: quilt/0.65
-Date:   Fri, 16 Nov 2018 01:04:19 +0100
-From:   Mikulas Patocka <mpatocka@redhat.com>
-To:     Mike Snitzer <msnitzer@redhat.com>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        "Alasdair G. Kergon" <agk@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Mikulas Patocka <mpatocka@redhat.com>
-Subject: [PATCH 3/3] block: use a driver-specific handler for the "inflight" value
+        Fri, 16 Nov 2018 05:50:36 -0500
+Received: by mail-pg1-f194.google.com with SMTP id n10-v6so9769937pgv.10
+        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 16:40:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=X1GEoJJK+UNhOkjdC245liGBUbvTxQSkakHM6BRG+ms=;
+        b=zSFi0Wg4E0kmg2hsWmVmNdlKdNmmvFXhUdB9J+8ub66TpY6GsbxYznDAGWV47L10zN
+         l0r+GbT81og7X+4tHTefy4jcCZC7J9QzhSLudEJcmV7nd/qVezLue4AZE5CLvp3dKFmc
+         0OTNBb7fC76mCt8W/LTX7BWbPCOI9ReagZVcMkrjHQlJdeVp0DOnOK2YeZ7QNsOcIv7x
+         yB/4vYgPiS+KUgk6sDn/F9DIPkyPcdeMDMTYF4Om8gU41KwW3EH8a29SBCPPhL0sKw+Z
+         a+oKwP/EsTLTJgfqqazY46cOIcvrEBEpClt4e/oyjn3fQD/2RoN0jr4iHE9CNiKxEGH8
+         wTCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=X1GEoJJK+UNhOkjdC245liGBUbvTxQSkakHM6BRG+ms=;
+        b=gSB5BSVziReZWl8CWGKqQUUnsOp2sYbCm2q7JZXE7U+bq7DrV3HJ+QvsCMRat2JLaw
+         qtVZASUzMDDNbopCEdhLsCTERV06wYsRTn0NcxM5BjfmDdcDrH2WL0YEw8rELMfARbOn
+         Mg00GvselX9XlowQfidtKm6NRetdTHn7yW4U5mZUtslRtvB5H1SJruWeFBVTxRTlKdlo
+         3lG9aggl47TZqzY6ZVBu3f79wz0Ga9yHQQxAx8gkNA1g/2LHkGI87LqJz8DofLlyvP+F
+         HUzidMBoy2QNBkpRdU1+BnZxfLNldnBPgIygKwANsx2PB/TMKPwSsb5CivgEHpNKx9Ez
+         XJ/A==
+X-Gm-Message-State: AGRZ1gLaA8bc5kb/gjCu5Txh/Zh0At0m8C7M/fzBQh4zAwK/ZxP+nghk
+        x/Xr7IkDeb0BvE6imePfdnbfOQ==
+X-Google-Smtp-Source: AJdET5cnzukDvAzvCEuOsZlVueOAE5LwQxO6M2EEVLTu0Ii6FYx/UJMF0RjEsO5hujQKgpl6f/PMcQ==
+X-Received: by 2002:a62:f54f:: with SMTP id n76mr8747535pfh.59.1542328824202;
+        Thu, 15 Nov 2018 16:40:24 -0800 (PST)
+Received: from vader ([64.114.255.97])
+        by smtp.gmail.com with ESMTPSA id a73sm13988092pfa.7.2018.11.15.16.40.23
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 15 Nov 2018 16:40:23 -0800 (PST)
+Date:   Thu, 15 Nov 2018 16:40:22 -0800
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Dave Chinner <dchinner@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
+        Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
+        linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
+        linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
+        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
+Subject: Re: [PATCH V10 10/19] block: loop: pass multi-page bvec to iov_iter
+Message-ID: <20181116004022.GE23828@vader>
+References: <20181115085306.9910-1-ming.lei@redhat.com>
+ <20181115085306.9910-11-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline; filename=dm-inflight.patch
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181115085306.9910-11-ming.lei@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Device mapper was converted to percpu inflight counters. In order to
-display the correct values in the "inflight" sysfs file and in
-/proc/diskstats, we need a custom callback that sums the percpu counters.
+On Thu, Nov 15, 2018 at 04:52:57PM +0800, Ming Lei wrote:
+> iov_iter is implemented with bvec itererator, so it is safe to pass
+> multipage bvec to it, and this way is much more efficient than
+> passing one page in each bvec.
+> 
+> Cc: Dave Chinner <dchinner@redhat.com>
+> Cc: Kent Overstreet <kent.overstreet@gmail.com>
+> Cc: Mike Snitzer <snitzer@redhat.com>
+> Cc: dm-devel@redhat.com
+> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+> Cc: linux-fsdevel@vger.kernel.org
+> Cc: Shaohua Li <shli@kernel.org>
+> Cc: linux-raid@vger.kernel.org
+> Cc: linux-erofs@lists.ozlabs.org
+> Cc: David Sterba <dsterba@suse.com>
+> Cc: linux-btrfs@vger.kernel.org
+> Cc: Darrick J. Wong <darrick.wong@oracle.com>
+> Cc: linux-xfs@vger.kernel.org
+> Cc: Gao Xiang <gaoxiang25@huawei.com>
+> Cc: Christoph Hellwig <hch@lst.de>
+> Cc: Theodore Ts'o <tytso@mit.edu>
+> Cc: linux-ext4@vger.kernel.org
+> Cc: Coly Li <colyli@suse.de>
+> Cc: linux-bcache@vger.kernel.org
+> Cc: Boaz Harrosh <ooo@electrozaur.com>
+> Cc: Bob Peterson <rpeterso@redhat.com>
+> Cc: cluster-devel@redhat.com
 
-The function part_round_stats calculates the number of in-flight I/Os
-every jiffy and uses this to calculate the counters time_in_queue and
-io_ticks. In order to avoid excessive memory traffic on systems with high
-number of CPUs, this functionality is disabled when percpu inflight values
-are used and the values time_in_queue and io_ticks are calculated
-differently - the result is less precise.
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 
-We add the duration of an I/O to time_in_queue when the I/O finishes (the
-value is almost the same as previously, except for the time of in-flight
-I/Os).
+Comments below.
 
-If an I/O starts or finishes and the "jiffies" value has changed, we add
-one to io_ticks. If the I/Os take less than a jiffy, the value is as exact
-as the previous value. If the I/Os take more than a jiffy, the value may
-lag behind the previous value.
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/block/loop.c | 23 ++++++++++++-----------
+>  1 file changed, 12 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index bf6bc35aaf88..a3fd418ec637 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -515,16 +515,16 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+>  	struct bio *bio = rq->bio;
+>  	struct file *file = lo->lo_backing_file;
+>  	unsigned int offset;
+> -	int segments = 0;
+> +	int nr_bvec = 0;
+>  	int ret;
+>  
+>  	if (rq->bio != rq->biotail) {
+> -		struct req_iterator iter;
+> +		struct bvec_iter iter;
+>  		struct bio_vec tmp;
+>  
+>  		__rq_for_each_bio(bio, rq)
+> -			segments += bio_segments(bio);
+> -		bvec = kmalloc_array(segments, sizeof(struct bio_vec),
+> +			nr_bvec += bio_bvecs(bio);
+> +		bvec = kmalloc_array(nr_bvec, sizeof(struct bio_vec),
+>  				     GFP_NOIO);
+>  		if (!bvec)
+>  			return -EIO;
+> @@ -533,13 +533,14 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+>  		/*
+>  		 * The bios of the request may be started from the middle of
+>  		 * the 'bvec' because of bio splitting, so we can't directly
+> -		 * copy bio->bi_iov_vec to new bvec. The rq_for_each_segment
+> +		 * copy bio->bi_iov_vec to new bvec. The bio_for_each_bvec
+>  		 * API will take care of all details for us.
+>  		 */
+> -		rq_for_each_segment(tmp, rq, iter) {
+> -			*bvec = tmp;
+> -			bvec++;
+> -		}
+> +		__rq_for_each_bio(bio, rq)
+> +			bio_for_each_bvec(tmp, bio, iter) {
+> +				*bvec = tmp;
+> +				bvec++;
+> +			}
 
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+Even if they're not strictly necessary, could you please include the
+curly braces for __rq_for_each_bio() here?
 
----
- block/blk-core.c       |    7 ++++++-
- block/blk-settings.c   |    6 ++++++
- block/genhd.c          |   12 ++++++++++++
- drivers/md/dm.c        |   37 +++++++++++++++++++++++++++++++++++--
- include/linux/blkdev.h |    3 +++
- 5 files changed, 62 insertions(+), 3 deletions(-)
+>  		bvec = cmd->bvec;
+>  		offset = 0;
+>  	} else {
+> @@ -550,11 +551,11 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+>  		 */
+>  		offset = bio->bi_iter.bi_bvec_done;
+>  		bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+> -		segments = bio_segments(bio);
+> +		nr_bvec = bio_bvecs(bio);
 
-Index: linux-dm/block/genhd.c
-===================================================================
---- linux-dm.orig/block/genhd.c	2018-11-15 22:11:51.000000000 +0100
-+++ linux-dm/block/genhd.c	2018-11-15 22:11:51.000000000 +0100
-@@ -68,6 +68,13 @@ void part_dec_in_flight(struct request_q
- void part_in_flight(struct request_queue *q, struct hd_struct *part,
- 		    unsigned int inflight[2])
- {
-+	if (q->get_inflight_fn) {
-+		q->get_inflight_fn(q, inflight);
-+		inflight[0] += inflight[1];
-+		inflight[1] = 0;
-+		return;
-+	}
-+
- 	if (q->mq_ops) {
- 		blk_mq_in_flight(q, part, inflight);
- 		return;
-@@ -85,6 +92,11 @@ void part_in_flight(struct request_queue
- void part_in_flight_rw(struct request_queue *q, struct hd_struct *part,
- 		       unsigned int inflight[2])
- {
-+	if (q->get_inflight_fn) {
-+		q->get_inflight_fn(q, inflight);
-+		return;
-+	}
-+
- 	if (q->mq_ops) {
- 		blk_mq_in_flight_rw(q, part, inflight);
- 		return;
-Index: linux-dm/include/linux/blkdev.h
-===================================================================
---- linux-dm.orig/include/linux/blkdev.h	2018-11-15 22:11:51.000000000 +0100
-+++ linux-dm/include/linux/blkdev.h	2018-11-15 22:11:51.000000000 +0100
-@@ -286,6 +286,7 @@ struct blk_queue_ctx;
- 
- typedef blk_qc_t (make_request_fn) (struct request_queue *q, struct bio *bio);
- typedef bool (poll_q_fn) (struct request_queue *q, blk_qc_t);
-+typedef void (get_inflight_fn)(struct request_queue *, unsigned int [2]);
- 
- struct bio_vec;
- typedef int (dma_drain_needed_fn)(struct request *);
-@@ -405,6 +406,7 @@ struct request_queue {
- 	make_request_fn		*make_request_fn;
- 	poll_q_fn		*poll_fn;
- 	dma_drain_needed_fn	*dma_drain_needed;
-+	get_inflight_fn		*get_inflight_fn;
- 
- 	const struct blk_mq_ops	*mq_ops;
- 
-@@ -1099,6 +1101,7 @@ extern void blk_queue_update_dma_alignme
- extern void blk_queue_rq_timeout(struct request_queue *, unsigned int);
- extern void blk_queue_flush_queueable(struct request_queue *q, bool queueable);
- extern void blk_queue_write_cache(struct request_queue *q, bool enabled, bool fua);
-+extern void blk_queue_get_inflight(struct request_queue *, get_inflight_fn *);
- 
- /*
-  * Number of physical segments as sent to the device.
-Index: linux-dm/block/blk-settings.c
-===================================================================
---- linux-dm.orig/block/blk-settings.c	2018-11-15 22:11:51.000000000 +0100
-+++ linux-dm/block/blk-settings.c	2018-11-15 22:11:51.000000000 +0100
-@@ -849,6 +849,12 @@ void blk_queue_write_cache(struct reques
- }
- EXPORT_SYMBOL_GPL(blk_queue_write_cache);
- 
-+void blk_queue_get_inflight(struct request_queue *q, get_inflight_fn *fn)
-+{
-+	q->get_inflight_fn = fn;
-+}
-+EXPORT_SYMBOL_GPL(blk_queue_get_inflight);
-+
- static int __init blk_settings_init(void)
- {
- 	blk_max_low_pfn = max_low_pfn - 1;
-Index: linux-dm/drivers/md/dm.c
-===================================================================
---- linux-dm.orig/drivers/md/dm.c	2018-11-15 22:11:51.000000000 +0100
-+++ linux-dm/drivers/md/dm.c	2018-11-15 22:18:44.000000000 +0100
-@@ -657,18 +657,30 @@ int md_in_flight(struct mapped_device *m
- 	return (int)sum;
- }
- 
-+static void test_io_ticks(int cpu, struct hd_struct *part, unsigned long now)
-+{
-+	unsigned long stamp = READ_ONCE(part->stamp);
-+	if (unlikely(stamp != now)) {
-+		if (likely(cmpxchg(&part->stamp, stamp, now) == stamp)) {
-+			__part_stat_add(cpu, part, io_ticks, 1);
-+		}
-+	}
-+}
-+
- static void start_io_acct(struct dm_io *io)
- {
- 	struct mapped_device *md = io->md;
- 	struct bio *bio = io->orig_bio;
-+	unsigned long now = jiffies;
- 	struct hd_struct *part;
- 	int sgrp, cpu;
- 
--	io->start_time = jiffies;
-+	io->start_time = now;
- 
- 	part = &dm_disk(md)->part0;
- 	sgrp = op_stat_group(bio_op(bio));
- 	cpu = part_stat_lock();
-+	test_io_ticks(cpu, part, now);
- 	__part_stat_add(cpu, part, ios[sgrp], 1);
- 	__part_stat_add(cpu, part, sectors[sgrp], bio_sectors(bio));
- 	part_stat_unlock();
-@@ -685,7 +697,8 @@ static void end_io_acct(struct dm_io *io
- {
- 	struct mapped_device *md = io->md;
- 	struct bio *bio = io->orig_bio;
--	unsigned long duration = jiffies - io->start_time;
-+	unsigned long now = jiffies;
-+	unsigned long duration = now - io->start_time;
- 	struct hd_struct *part;
- 	int sgrp, cpu;
- 
-@@ -697,7 +710,9 @@ static void end_io_acct(struct dm_io *io
- 	part = &dm_disk(md)->part0;
- 	sgrp = op_stat_group(bio_op(bio));
- 	cpu = part_stat_lock();
-+	test_io_ticks(cpu, part, now);
- 	__part_stat_add(cpu, part, nsecs[sgrp], jiffies_to_nsecs(duration));
-+	__part_stat_add(cpu, part, time_in_queue, duration);
- 	part_stat_unlock();
- 
- 	smp_wmb();
-@@ -711,6 +726,23 @@ static void end_io_acct(struct dm_io *io
- 	}
- }
- 
-+static void dm_get_inflight(struct request_queue *q, unsigned int inflight[2])
-+{
-+	struct mapped_device *md = q->queuedata;
-+	int cpu;
-+
-+	inflight[READ] = inflight[WRITE] = 0;
-+	for_each_possible_cpu(cpu) {
-+		struct dm_percpu *p = per_cpu_ptr(md->counters, cpu);
-+		inflight[READ] += p->inflight[READ];
-+		inflight[WRITE] += p->inflight[WRITE];
-+	}
-+	if ((int)inflight[READ] < 0)
-+		inflight[READ] = 0;
-+	if ((int)inflight[WRITE] < 0)
-+		inflight[WRITE] = 0;
-+}
-+
- /*
-  * Add the bio to the list of deferred io.
-  */
-@@ -2224,6 +2256,7 @@ int dm_setup_md_queue(struct mapped_devi
- 	case DM_TYPE_NVME_BIO_BASED:
- 		dm_init_normal_md_queue(md);
- 		blk_queue_make_request(md->queue, dm_make_request);
-+		blk_queue_get_inflight(md->queue, dm_get_inflight);
- 		break;
- 	case DM_TYPE_NONE:
- 		WARN_ON_ONCE(true);
-Index: linux-dm/block/blk-core.c
-===================================================================
---- linux-dm.orig/block/blk-core.c	2018-11-15 22:11:51.000000000 +0100
-+++ linux-dm/block/blk-core.c	2018-11-15 22:11:51.000000000 +0100
-@@ -695,10 +695,15 @@ static void part_round_stats_single(stru
- void part_round_stats(struct request_queue *q, int cpu, struct hd_struct *part)
- {
- 	struct hd_struct *part2 = NULL;
--	unsigned long now = jiffies;
-+	unsigned long now;
- 	unsigned int inflight[2];
- 	int stats = 0;
- 
-+	if (q->get_inflight_fn)
-+		return;
-+
-+	now = jiffies;
-+
- 	if (part->stamp != now)
- 		stats |= 1;
- 
+This scared me for a second, but it's fine to do here because we haven't
+actually enabled multipage bvecs yet, right?
 
+>  	}
+>  	atomic_set(&cmd->ref, 2);
+>  
+> -	iov_iter_bvec(&iter, rw, bvec, segments, blk_rq_bytes(rq));
+> +	iov_iter_bvec(&iter, rw, bvec, nr_bvec, blk_rq_bytes(rq));
+>  	iter.iov_offset = offset;
+>  
+>  	cmd->iocb.ki_pos = pos;
+> -- 
+> 2.9.5
+> 
