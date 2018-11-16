@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F048CC43610
-	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 00:20:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 608B2C43441
+	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 00:22:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B3BB3208A3
-	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 00:20:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 212FB2089D
+	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 00:22:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="wiTESMyL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3BB3208A3
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="t5kdpi0Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 212FB2089D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389094AbeKPKab (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Nov 2018 05:30:31 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:36453 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389056AbeKPKaa (ORCPT
+        id S2389131AbeKPKcJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Nov 2018 05:32:09 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:36972 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388957AbeKPKcI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Nov 2018 05:30:30 -0500
-Received: by mail-pl1-f193.google.com with SMTP id y6-v6so2684484plt.3
-        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 16:20:24 -0800 (PST)
+        Fri, 16 Nov 2018 05:32:08 -0500
+Received: by mail-pl1-f194.google.com with SMTP id b5so3837500plr.4
+        for <linux-block@vger.kernel.org>; Thu, 15 Nov 2018 16:22:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=osandov-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=k6RVFd+Vc0pfdcIaqX824O1heqiP0xSaSAehffCttMk=;
-        b=wiTESMyL5dqVRjbKaF3lqQafRzn4fD2CmMEEuGXYoy9BucJn1wjfdUQGcgIGszIxzw
-         aSGoiV4BuM2mWpRoVdyMsKio4h1LfrHxwpAwDjfWqTiiooDZy4SiypGgXNwNHTSNEtNT
-         AwhAoTqgxU+lWBiroMHUOFlupCBe6hrqs2rPDAIutpb+1jtSJG/4qNW1Vt2JMbj+34Hk
-         fa3W8d3iXCJU7mXvImDoeUiGQY17fIuEU/rNtweFVtkjIKPeJ/0+bxRVWvDzSmngffLs
-         MUQZm98vGL/G5DhQ1Xdg2XlfQRHxpEwftnHlu65FKAr0Ou5hT/0Hg4vfaJj9tG9USJR9
-         YmYA==
+        bh=T39mcugS1aLkzngTcT53twIshIQ6bootoTES/sa00Ow=;
+        b=t5kdpi0ZafvIr/HkP7X6avzLpb2P/ZGm1njaCYT/nrsABPy1EW3Ki4D7N5qtFFPmzK
+         uXlinCSIMzWIBAoAw0/FQURIb+XNMWDerNYBxwWUa4TYDaN41YRUfXxQzk3QB41saa0C
+         dBIZOpgg1pxz+f+9TM71ZrxLRpTRmXrPiarK7Z0yJn1GdDJT+YPpxp6MqCk6JndcPt0d
+         C0EdMprRidCaWMiliNq8GgIztRj92hvrpre4v2zzMp73tq366+43v1ms65UANAuQSmQ7
+         lELRH++GmUMwo5AgnhTxGDIpyz9HbdhQs5uVqYoDrwibVMI3ieVnkf5O+ESfFpO80mbG
+         R80w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=k6RVFd+Vc0pfdcIaqX824O1heqiP0xSaSAehffCttMk=;
-        b=SNH6rrPLC7kmUCMUf5KcHT2snjmpw84hvSZt4nsAZttR5zMarRYp4CTnWtw///7XN5
-         u8gVAxSb4PKkcpgctn70aHdEJtreC2aS21Mk3u5IPmC5lTjefu0DcGHp/1kLT47+4xkP
-         7H4aubeHdI0HWZ8o2bSPM7q0mxeCIBnuQreUefv247RNQSSLm/r3lAILBoDtPocFyPKo
-         5VS8gg/aFkdCgZ3eTWPpvmeU1PLoHWCvqH/0fws6IcflJ3fFSl/qe9xB4y35E7Mrfhd3
-         ogGrsY6hbZuzzzoUUiWtyUYKSZtEX+XeUXBevWIJXIw7maaycBV0CJiyrI/veUY+VVsi
-         6jew==
-X-Gm-Message-State: AGRZ1gJQCSi4TUpnMRdYB8ZLCD9dPw3ab/j5IaAySLOTAauEvRRIb4l+
-        9kT/UE5Tgigu7kvVuDpOn3sOEw==
-X-Google-Smtp-Source: AJdET5fKVPn+iIW61iLWhEosSg5589LR6m3lIxuiM05g3Y/tYl5Es6VZhvHdcmSItsJ1rZb8Jg+C6A==
-X-Received: by 2002:a17:902:e01:: with SMTP id 1-v6mr8205945plw.251.1542327623756;
-        Thu, 15 Nov 2018 16:20:23 -0800 (PST)
+        bh=T39mcugS1aLkzngTcT53twIshIQ6bootoTES/sa00Ow=;
+        b=H+TRkNpAT5d3AuJO7EZDbRSA5pSFZXqFmcGgthElqt7Wfn4E55U8twqi3xhMoPOuC3
+         DfHl5dCL7UqdN8EZTTDl0GDABMKZusHtt5ThpMUqLTSGttPr3du3mFqgONpObIZwildW
+         TrMFTUMcNxw3oV6ez1t4BPfqRomwr0+6IlKgXlKGaO5/V9lSH0k+JC9iBhVZlj60t+MS
+         fiZaT9x/PAG2W4hVYno+BTO9KYk2GOkufjrv53rj5A4XHzhjLVYKjo+Dn9VmPhjYK/pt
+         twSb1ZrS6mbocLTqrwwcb7gqMFhlzB91tKYU2R7Rs6Lmq4RzXoOiLB2rWOx6mhtrNVFc
+         ok1g==
+X-Gm-Message-State: AGRZ1gIQDrZJIM/W/852BsamgmvlDXle42XAZkNww1XPC2RZLipuc9ar
+        qsdMA1iDhZkc6FI8xaLYFjp+bg==
+X-Google-Smtp-Source: AJdET5c5gYec42aFbvjnF+656sHtt9JGXk44h33X2zFJRGjjNKUSF5rjgiWMHUKJJJzN1cjZ4Se8rA==
+X-Received: by 2002:a17:902:744a:: with SMTP id e10mr6788269plt.304.1542327720721;
+        Thu, 15 Nov 2018 16:22:00 -0800 (PST)
 Received: from vader ([64.114.255.97])
-        by smtp.gmail.com with ESMTPSA id m20sm4874872pgv.93.2018.11.15.16.20.22
+        by smtp.gmail.com with ESMTPSA id t3sm8676672pgv.31.2018.11.15.16.21.59
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 15 Nov 2018 16:20:23 -0800 (PST)
-Date:   Thu, 15 Nov 2018 16:20:20 -0800
+        Thu, 15 Nov 2018 16:22:00 -0800 (PST)
+Date:   Thu, 15 Nov 2018 16:21:57 -0800
 From:   Omar Sandoval <osandov@osandov.com>
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
@@ -76,24 +76,23 @@ Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
         linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
         Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: Re: [PATCH V10 06/19] fs/buffer.c: use bvec iterator to truncate the
- bio
-Message-ID: <20181116002020.GA23828@vader>
+Subject: Re: [PATCH V10 07/19] btrfs: use bvec_last_segment to get bio's last
+ page
+Message-ID: <20181116002157.GB23828@vader>
 References: <20181115085306.9910-1-ming.lei@redhat.com>
- <20181115085306.9910-7-ming.lei@redhat.com>
+ <20181115085306.9910-8-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181115085306.9910-7-ming.lei@redhat.com>
+In-Reply-To: <20181115085306.9910-8-ming.lei@redhat.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 15, 2018 at 04:52:53PM +0800, Ming Lei wrote:
-> Once multi-page bvec is enabled, the last bvec may include more than one
-> page, this patch use bvec_last_segment() to truncate the bio.
+On Thu, Nov 15, 2018 at 04:52:54PM +0800, Ming Lei wrote:
+> Preparing for supporting multi-page bvec.
 > 
 > Cc: Dave Chinner <dchinner@redhat.com>
 > Cc: Kent Overstreet <kent.overstreet@gmail.com>
@@ -122,25 +121,46 @@ Reviewed-by: Omar Sandoval <osandov@fb.com>
 
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  fs/buffer.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+>  fs/btrfs/compression.c | 5 ++++-
+>  fs/btrfs/extent_io.c   | 5 +++--
+>  2 files changed, 7 insertions(+), 3 deletions(-)
 > 
-> diff --git a/fs/buffer.c b/fs/buffer.c
-> index 1286c2b95498..fa37ad52e962 100644
-> --- a/fs/buffer.c
-> +++ b/fs/buffer.c
-> @@ -3032,7 +3032,10 @@ void guard_bio_eod(int op, struct bio *bio)
+> diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+> index 2955a4ea2fa8..161e14b8b180 100644
+> --- a/fs/btrfs/compression.c
+> +++ b/fs/btrfs/compression.c
+> @@ -400,8 +400,11 @@ blk_status_t btrfs_submit_compressed_write(struct inode *inode, u64 start,
+>  static u64 bio_end_offset(struct bio *bio)
+>  {
+>  	struct bio_vec *last = bio_last_bvec_all(bio);
+> +	struct bio_vec bv;
 >  
->  	/* ..and clear the end of the buffer for reads */
->  	if (op == REQ_OP_READ) {
-> -		zero_user(bvec->bv_page, bvec->bv_offset + bvec->bv_len,
-> +		struct bio_vec bv;
+> -	return page_offset(last->bv_page) + last->bv_len + last->bv_offset;
+> +	bvec_last_segment(last, &bv);
 > +
-> +		bvec_last_segment(bvec, &bv);
-> +		zero_user(bv.bv_page, bv.bv_offset + bv.bv_len,
->  				truncated_bytes);
->  	}
+> +	return page_offset(bv.bv_page) + bv.bv_len + bv.bv_offset;
 >  }
+>  
+>  static noinline int add_ra_bio_pages(struct inode *inode,
+> diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
+> index d228f706ff3e..5d5965297e7e 100644
+> --- a/fs/btrfs/extent_io.c
+> +++ b/fs/btrfs/extent_io.c
+> @@ -2720,11 +2720,12 @@ static int __must_check submit_one_bio(struct bio *bio, int mirror_num,
+>  {
+>  	blk_status_t ret = 0;
+>  	struct bio_vec *bvec = bio_last_bvec_all(bio);
+> -	struct page *page = bvec->bv_page;
+> +	struct bio_vec bv;
+>  	struct extent_io_tree *tree = bio->bi_private;
+>  	u64 start;
+>  
+> -	start = page_offset(page) + bvec->bv_offset;
+> +	bvec_last_segment(bvec, &bv);
+> +	start = page_offset(bv.bv_page) + bv.bv_offset;
+>  
+>  	bio->bi_private = NULL;
+>  
 > -- 
 > 2.9.5
 > 
