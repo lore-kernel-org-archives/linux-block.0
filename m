@@ -2,28 +2,28 @@ Return-Path: <SRS0=uvQv=N3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 233A9C070C3
-	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 13:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B5B6C43441
+	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 13:45:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ECB0B2087A
-	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 13:39:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECB0B2087A
+	by mail.kernel.org (Postfix) with ESMTP id CC3DE208E7
+	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 13:45:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC3DE208E7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727999AbeKPXvN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Nov 2018 18:51:13 -0500
-Received: from verein.lst.de ([213.95.11.211]:49888 "EHLO newverein.lst.de"
+        id S1728079AbeKPX6L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Nov 2018 18:58:11 -0500
+Received: from verein.lst.de ([213.95.11.211]:49948 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727711AbeKPXvN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Nov 2018 18:51:13 -0500
+        id S1727997AbeKPX6L (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Nov 2018 18:58:11 -0500
 Received: by newverein.lst.de (Postfix, from userid 2407)
-        id 2ECF668D60; Fri, 16 Nov 2018 14:38:45 +0100 (CET)
-Date:   Fri, 16 Nov 2018 14:38:45 +0100
+        id ACCE668D60; Fri, 16 Nov 2018 14:45:41 +0100 (CET)
+Date:   Fri, 16 Nov 2018 14:45:41 +0100
 From:   Christoph Hellwig <hch@lst.de>
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
@@ -41,25 +41,104 @@ Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
         linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
         Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: Re: [PATCH V10 08/19] btrfs: move bio_pages_all() to btrfs
-Message-ID: <20181116133845.GG3165@lst.de>
-References: <20181115085306.9910-1-ming.lei@redhat.com> <20181115085306.9910-9-ming.lei@redhat.com>
+Subject: Re: [PATCH V10 09/19] block: introduce bio_bvecs()
+Message-ID: <20181116134541.GH3165@lst.de>
+References: <20181115085306.9910-1-ming.lei@redhat.com> <20181115085306.9910-10-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181115085306.9910-9-ming.lei@redhat.com>
+In-Reply-To: <20181115085306.9910-10-ming.lei@redhat.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 15, 2018 at 04:52:55PM +0800, Ming Lei wrote:
-> BTRFS is the only user of this helper, so move this helper into
-> BTRFS, and implement it via bio_for_each_segment_all(), since
-> bio->bi_vcnt may not equal to number of pages after multipage bvec
-> is enabled.
+On Thu, Nov 15, 2018 at 04:52:56PM +0800, Ming Lei wrote:
+> There are still cases in which we need to use bio_bvecs() for get the
+> number of multi-page segment, so introduce it.
 
-btrfs only uses the value to check if it is larger than 1.  No amount
-of multipage bio merging should ever make bi_vcnt go from 0 to 1 or
-vice versa.
+The only user in your final tree seems to be the loop driver, and
+even that one only uses the helper for read/write bios.
+
+I think something like this would be much simpler in the end:
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index d509902a8046..712511815ac6 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -514,16 +514,18 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 	struct request *rq = blk_mq_rq_from_pdu(cmd);
+ 	struct bio *bio = rq->bio;
+ 	struct file *file = lo->lo_backing_file;
++	struct bvec_iter bvec_iter;
++	struct bio_vec tmp;
+ 	unsigned int offset;
+ 	int nr_bvec = 0;
+ 	int ret;
+ 
++	__rq_for_each_bio(bio, rq)
++		bio_for_each_bvec(tmp, bio, bvec_iter)
++			nr_bvec++;
++
+ 	if (rq->bio != rq->biotail) {
+-		struct bvec_iter iter;
+-		struct bio_vec tmp;
+ 
+-		__rq_for_each_bio(bio, rq)
+-			nr_bvec += bio_bvecs(bio);
+ 		bvec = kmalloc_array(nr_bvec, sizeof(struct bio_vec),
+ 				     GFP_NOIO);
+ 		if (!bvec)
+@@ -537,7 +539,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		 * API will take care of all details for us.
+ 		 */
+ 		__rq_for_each_bio(bio, rq)
+-			bio_for_each_bvec(tmp, bio, iter) {
++			bio_for_each_bvec(tmp, bio, bvec_iter) {
+ 				*bvec = tmp;
+ 				bvec++;
+ 			}
+@@ -551,7 +553,6 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+ 		 */
+ 		offset = bio->bi_iter.bi_bvec_done;
+ 		bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+-		nr_bvec = bio_bvecs(bio);
+ 	}
+ 	atomic_set(&cmd->ref, 2);
+ 
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index dcad0b69f57a..379440d1ced0 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -200,30 +200,6 @@ static inline unsigned bio_segments(struct bio *bio)
+ 	}
+ }
+ 
+-static inline unsigned bio_bvecs(struct bio *bio)
+-{
+-	unsigned bvecs = 0;
+-	struct bio_vec bv;
+-	struct bvec_iter iter;
+-
+-	/*
+-	 * We special case discard/write same/write zeroes, because they
+-	 * interpret bi_size differently:
+-	 */
+-	switch (bio_op(bio)) {
+-	case REQ_OP_DISCARD:
+-	case REQ_OP_SECURE_ERASE:
+-	case REQ_OP_WRITE_ZEROES:
+-		return 0;
+-	case REQ_OP_WRITE_SAME:
+-		return 1;
+-	default:
+-		bio_for_each_bvec(bv, bio, iter)
+-			bvecs++;
+-		return bvecs;
+-	}
+-}
+-
+ /*
+  * get a reference to a bio, so it won't disappear. the intended use is
+  * something like:
