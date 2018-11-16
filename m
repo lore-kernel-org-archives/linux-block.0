@@ -3,27 +3,27 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F439C43441
-	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 13:46:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AADC3C43441
+	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 13:49:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 449662087A
-	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 13:46:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 449662087A
+	by mail.kernel.org (Postfix) with ESMTP id 6F14E2087A
+	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 13:49:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F14E2087A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389824AbeKPX7Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Nov 2018 18:59:16 -0500
-Received: from verein.lst.de ([213.95.11.211]:49976 "EHLO newverein.lst.de"
+        id S1727997AbeKQACI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Nov 2018 19:02:08 -0500
+Received: from verein.lst.de ([213.95.11.211]:50005 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727999AbeKPX7P (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Nov 2018 18:59:15 -0500
+        id S1727727AbeKQACI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Nov 2018 19:02:08 -0500
 Received: by newverein.lst.de (Postfix, from userid 2407)
-        id 5663868D60; Fri, 16 Nov 2018 14:46:45 +0100 (CET)
-Date:   Fri, 16 Nov 2018 14:46:45 +0100
+        id C8C3968D60; Fri, 16 Nov 2018 14:49:36 +0100 (CET)
+Date:   Fri, 16 Nov 2018 14:49:36 +0100
 From:   Christoph Hellwig <hch@lst.de>
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
@@ -41,21 +41,19 @@ Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
         linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
         Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: Re: [PATCH V10 11/19] bcache: avoid to use
- bio_for_each_segment_all() in bch_bio_alloc_pages()
-Message-ID: <20181116134645.GI3165@lst.de>
-References: <20181115085306.9910-1-ming.lei@redhat.com> <20181115085306.9910-12-ming.lei@redhat.com>
+Subject: Re: [PATCH V10 13/19] iomap & xfs: only account for new added page
+Message-ID: <20181116134936.GJ3165@lst.de>
+References: <20181115085306.9910-1-ming.lei@redhat.com> <20181115085306.9910-14-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181115085306.9910-12-ming.lei@redhat.com>
+In-Reply-To: <20181115085306.9910-14-ming.lei@redhat.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> -	bio_for_each_segment_all(bv, bio, i) {
-> +	for (i = 0, bv = bio->bi_io_vec; i < bio->bi_vcnt; bv++) {
-
-This really needs a comment.  Otherwise it looks fine to me.
+I'd much rather have __bio_try_merge_page only do merges in
+the same page, and have a new __bio_try_merge_segment that does
+multi-page merges.  This will keep the accounting a lot simpler.
