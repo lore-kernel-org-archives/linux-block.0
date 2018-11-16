@@ -2,173 +2,131 @@ Return-Path: <SRS0=uvQv=N3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F684C43441
-	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 03:28:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E357C43441
+	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 04:05:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F8412075B
-	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 03:28:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F8412075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id F34C6223C8
+	for <linux-block@archiver.kernel.org>; Fri, 16 Nov 2018 04:05:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F34C6223C8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=fromorbit.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727200AbeKPNj2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 16 Nov 2018 08:39:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:38388 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726718AbeKPNj1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 16 Nov 2018 08:39:27 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9EDDE3082127;
-        Fri, 16 Nov 2018 03:28:49 +0000 (UTC)
-Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9D26F608C1;
-        Fri, 16 Nov 2018 03:28:45 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 2/2] blk-mq: alloc q->queue_ctx as normal array
-Date:   Fri, 16 Nov 2018 11:28:26 +0800
-Message-Id: <20181116032826.11901-3-ming.lei@redhat.com>
-In-Reply-To: <20181116032826.11901-1-ming.lei@redhat.com>
-References: <20181116032826.11901-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Fri, 16 Nov 2018 03:28:49 +0000 (UTC)
+        id S1727142AbeKPOPo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 16 Nov 2018 09:15:44 -0500
+Received: from ipmail06.adl2.internode.on.net ([150.101.137.129]:1846 "EHLO
+        ipmail06.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727124AbeKPOPo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 16 Nov 2018 09:15:44 -0500
+Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
+  by ipmail06.adl2.internode.on.net with ESMTP; 16 Nov 2018 14:34:58 +1030
+Received: from dave by dastard with local (Exim 4.80)
+        (envelope-from <david@fromorbit.com>)
+        id 1gNVNJ-0003jU-5E; Fri, 16 Nov 2018 15:04:57 +1100
+Date:   Fri, 16 Nov 2018 15:04:57 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-xfs@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: fix 32 bit overflow in __blkdev_issue_discard()
+Message-ID: <20181116040457.GA19305@dastard>
+References: <20181113214337.20581-1-david@fromorbit.com>
+ <10a8dd78-7c00-8593-9f4e-b20eb1161b92@kernel.dk>
+ <20181115010651.GD32603@ming.t460p>
+ <20181115012201.GX19305@dastard>
+ <20181115031035.GE32603@ming.t460p>
+ <20181115221337.GY19305@dastard>
+ <20181115222419.GV4235@magnolia>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181115222419.GV4235@magnolia>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now q->queue_ctx is just one read-mostly table for query the
-'blk_mq_ctx' instance from one cpu index, it isn't necessary
-to allocate it as percpu variable. One simple array may be
-more efficient.
+On Thu, Nov 15, 2018 at 02:24:19PM -0800, Darrick J. Wong wrote:
+> On Fri, Nov 16, 2018 at 09:13:37AM +1100, Dave Chinner wrote:
+> > On Thu, Nov 15, 2018 at 11:10:36AM +0800, Ming Lei wrote:
+> > > On Thu, Nov 15, 2018 at 12:22:01PM +1100, Dave Chinner wrote:
+> > > > On Thu, Nov 15, 2018 at 09:06:52AM +0800, Ming Lei wrote:
+> > > > > On Wed, Nov 14, 2018 at 08:18:24AM -0700, Jens Axboe wrote:
+> > > > > > On 11/13/18 2:43 PM, Dave Chinner wrote:
+> > > > > > > From: Dave Chinner <dchinner@redhat.com>
+> > > > > > > 
+> > > > > > > A discard cleanup merged into 4.20-rc2 causes fstests xfs/259 to
+> > > > > > > fall into an endless loop in the discard code. The test is creating
+> > > > > > > a device that is exactly 2^32 sectors in size to test mkfs boundary
+> > > > > > > conditions around the 32 bit sector overflow region.
+> > > > > > > 
+> > > > > > > mkfs issues a discard for the entire device size by default, and
+> > > > > > > hence this throws a sector count of 2^32 into
+> > > > > > > blkdev_issue_discard(). It takes the number of sectors to discard as
+> > > > > > > a sector_t - a 64 bit value.
+> > > > > > > 
+> > > > > > > The commit ba5d73851e71 ("block: cleanup __blkdev_issue_discard")
+> > > > > > > takes this sector count and casts it to a 32 bit value before
+> > > > > > > comapring it against the maximum allowed discard size the device
+> > > > > > > has. This truncates away the upper 32 bits, and so if the lower 32
+> > > > > > > bits of the sector count is zero, it starts issuing discards of
+> > > > > > > length 0. This causes the code to fall into an endless loop, issuing
+> > > > > > > a zero length discards over and over again on the same sector.
+> > > > > > 
+> > > > > > Applied, thanks. Ming, can you please add a blktests test for
+> > > > > > this case? This is the 2nd time it's been broken.
+> > > > > 
+> > > > > OK, I will add zram discard test in blktests, which should cover the
+> > > > > 1st report. For the xfs/259, I need to investigate if it is easy to
+> > > > > do in blktests.
+> > > > 
+> > > > Just write a test that creates block devices of 2^32 + (-1,0,1)
+> > > > sectors and runs a discard across the entire device. That's all that
+> > > > xfs/259 it doing - exercising mkfs on 2TB, 4TB and 16TB boundaries.
+> > > > i.e. the boundaries where sectors and page cache indexes (on 4k page
+> > > > size systems) overflow 32 bit int and unsigned int sizes. mkfs
+> > > > issues a discard for the entire device, so it's testing that as
+> > > > well...
+> > > 
+> > > Indeed, I can reproduce this issue via the following commands:
+> > > 
+> > > modprobe scsi_debug virtual_gb=2049 sector_size=512 lbpws10=1 dev_size_mb=512
+> > > blkdiscard /dev/sde
+> > > 
+> > > > 
+> > > > You need to write tests that exercise write_same, write_zeros and
+> > > > discard operations around these boundaries, because they all take
+> > > > a 64 bit sector count and stuff them into 32 bit size fields in
+> > > > the bio tha tis being submitted.
+> > > 
+> > > write_same/write_zeros are usually used by driver directly, so we
+> > > may need make the test case on some specific device.
+> > 
+> > My local linux iscsi server and client advertise support for them.
+> > It definitely does not ships zeros across the wire(*) when I use
+> > things like FALLOC_FL_ZERO_RANGE, but fstests does not have block
+> > device fallocate() tests for zeroing or punching...
+> 
+> fstests does (generic/{349,350,351}) but those basic functionality tests
+> don't include creating a 2^32 block device and seeing if overflows
+> happen... :/
 
-Cc: Guenter Roeck <linux@roeck-us.net>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq-sysfs.c   |  6 +++---
- block/blk-mq.c         | 12 +++++++-----
- block/blk-mq.h         |  2 +-
- include/linux/blkdev.h |  2 +-
- 4 files changed, 12 insertions(+), 10 deletions(-)
+They don't run on my test machines because they require a modular
+kernel and I run a monolithic kernel specified externally by the
+qemu command line on all my test VMs.
 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index bab236955f56..dc4ac733a125 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -300,7 +300,7 @@ void blk_mq_sysfs_deinit(struct request_queue *q)
- 	int cpu;
- 
- 	for_each_possible_cpu(cpu) {
--		ctx = *per_cpu_ptr(q->queue_ctx, cpu);
-+		ctx = q->queue_ctx[cpu];
- 		kobject_put(&ctx->kobj);
- 	}
- 	kobject_put(q->mq_kobj);
-@@ -322,7 +322,7 @@ int blk_mq_sysfs_init(struct request_queue *q)
- 		ctx = kzalloc_node(sizeof(*ctx), GFP_KERNEL, cpu_to_node(cpu));
- 		if (!ctx)
- 			goto fail;
--		*per_cpu_ptr(q->queue_ctx, cpu) = ctx;
-+		q->queue_ctx[cpu] = ctx;
- 		kobject_init(&ctx->kobj, &blk_mq_ctx_ktype);
- 	}
- 	q->mq_kobj = &mq_kobj->kobj;
-@@ -330,7 +330,7 @@ int blk_mq_sysfs_init(struct request_queue *q)
- 
-  fail:
- 	for_each_possible_cpu(cpu) {
--		ctx = *per_cpu_ptr(q->queue_ctx, cpu);
-+		ctx = q->queue_ctx[cpu];
- 		if (ctx)
- 			kobject_put(&ctx->kobj);
- 	}
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3589ee601f37..20c485e1817a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2299,7 +2299,7 @@ static void blk_mq_init_cpu_queues(struct request_queue *q,
- 	unsigned int i, j;
- 
- 	for_each_possible_cpu(i) {
--		struct blk_mq_ctx *__ctx = *per_cpu_ptr(q->queue_ctx, i);
-+		struct blk_mq_ctx *__ctx = q->queue_ctx[i];
- 		struct blk_mq_hw_ctx *hctx;
- 
- 		__ctx->cpu = i;
-@@ -2385,7 +2385,7 @@ static void blk_mq_map_swqueue(struct request_queue *q)
- 			set->map[0].mq_map[i] = 0;
- 		}
- 
--		ctx = *per_cpu_ptr(q->queue_ctx, i);
-+		ctx = q->queue_ctx[i];
- 		for (j = 0; j < set->nr_maps; j++) {
- 			hctx = blk_mq_map_queue_type(q, j, i);
- 
-@@ -2541,7 +2541,7 @@ void blk_mq_release(struct request_queue *q)
- 	 */
- 	blk_mq_sysfs_deinit(q);
- 
--	free_percpu(q->queue_ctx);
-+	kfree(q->queue_ctx);
- }
- 
- struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *set)
-@@ -2731,7 +2731,9 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	if (!q->poll_cb)
- 		goto err_exit;
- 
--	q->queue_ctx = alloc_percpu(struct blk_mq_ctx *);
-+	q->queue_ctx = kmalloc_array_node(nr_cpu_ids,
-+					  sizeof(struct blk_mq_ctx *),
-+					  GFP_KERNEL, set->numa_node);
- 	if (!q->queue_ctx)
- 		goto err_exit;
- 
-@@ -2798,7 +2800,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- err_sys_init:
- 	blk_mq_sysfs_deinit(q);
- err_percpu:
--	free_percpu(q->queue_ctx);
-+	kfree(q->queue_ctx);
- err_exit:
- 	q->mq_ops = NULL;
- 	return ERR_PTR(-ENOMEM);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 84898793c230..97829388e1db 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -129,7 +129,7 @@ static inline enum mq_rq_state blk_mq_rq_state(struct request *rq)
- static inline struct blk_mq_ctx *__blk_mq_get_ctx(struct request_queue *q,
- 					   unsigned int cpu)
- {
--	return *per_cpu_ptr(q->queue_ctx, cpu);
-+	return q->queue_ctx[cpu];
- }
- 
- /*
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 9e3892bd67fd..9b6ddc5c7a40 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -407,7 +407,7 @@ struct request_queue {
- 	const struct blk_mq_ops	*mq_ops;
- 
- 	/* sw queues */
--	struct blk_mq_ctx __percpu	**queue_ctx;
-+	struct blk_mq_ctx	**queue_ctx;
- 	unsigned int		nr_queues;
- 
- 	unsigned int		queue_depth;
+generic/349     [not run] scsi_debug module not found
+generic/350     [not run] scsi_debug module not found
+generic/351     [not run] scsi_debug module not found
+
+Cheers,
+
+Dave.
 -- 
-2.9.5
-
+Dave Chinner
+david@fromorbit.com
