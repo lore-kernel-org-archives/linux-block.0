@@ -2,70 +2,121 @@ Return-Path: <SRS0=MdGt=N4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB91C43441
-	for <linux-block@archiver.kernel.org>; Sat, 17 Nov 2018 20:15:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4740C43441
+	for <linux-block@archiver.kernel.org>; Sat, 17 Nov 2018 21:44:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C26B62080D
-	for <linux-block@archiver.kernel.org>; Sat, 17 Nov 2018 20:15:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C26B62080D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=davemloft.net
+	by mail.kernel.org (Postfix) with ESMTP id 1A6E32080D
+	for <linux-block@archiver.kernel.org>; Sat, 17 Nov 2018 21:44:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Kc95hzXn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A6E32080D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725857AbeKRGc7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Nov 2018 01:32:59 -0500
-Received: from shards.monkeyblade.net ([23.128.96.9]:34564 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725732AbeKRGc7 (ORCPT
+        id S1725894AbeKRICE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Nov 2018 03:02:04 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:37271 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725743AbeKRICD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Nov 2018 01:32:59 -0500
-Received: from localhost (unknown [IPv6:2601:601:9f80:35cd::bf5])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id 2DD2F146F2BE5;
-        Sat, 17 Nov 2018 12:15:11 -0800 (PST)
-Date:   Sat, 17 Nov 2018 12:15:10 -0800 (PST)
-Message-Id: <20181117.121510.1754018619653365187.davem@davemloft.net>
-To:     sagi@lightbitslabs.com
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        netdev@vger.kernel.org, hch@lst.de, keith.busch@intel.com
-Subject: Re: [PATCH 10/11] nvmet-tcp: add NVMe over TCP target driver
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <20181115171626.9306-11-sagi@lightbitslabs.com>
-References: <20181115171626.9306-1-sagi@lightbitslabs.com>
-        <20181115171626.9306-11-sagi@lightbitslabs.com>
-X-Mailer: Mew version 6.8 on Emacs 26.1
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Sat, 17 Nov 2018 12:15:11 -0800 (PST)
+        Sun, 18 Nov 2018 03:02:03 -0500
+Received: by mail-pl1-f194.google.com with SMTP id b5so6355907plr.4
+        for <linux-block@vger.kernel.org>; Sat, 17 Nov 2018 13:44:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=from:to:subject:date:message-id;
+        bh=S2cqtfL9iYXpoc5fRosGZliocoTsjIJJ7O3OeWY7CHw=;
+        b=Kc95hzXnvf6p8u+imt1RXIiTlcaDHfn/sJveZ2/gos00i7lGXpiTzFZK7BanOLO8mi
+         n1srjRr2CZJ/RUkQi3R3RVFuV99iIWoLkvmBl7fbAPXZ/q1sm/0/ozsPPTySq97o8YFs
+         usnnYknSNgFVtf0fMw2ylX4OVf4sTblxsoY8Z421BXO8nQ/Mj06Xf/k9oPutdGGSICoc
+         iUm+WLH7O07pd71Nd4cCts4Jumcg7ABsZtbxtA1Uko2Mt0uQNRon4+rlbi3axkUMCu1n
+         ZKfvKGp7G6tEuMmu6Iv5/VYdS3zHOeVRyDNQTXphzQJT9GL6xHyKQajZpGWbtiwPVV7N
+         tPew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id;
+        bh=S2cqtfL9iYXpoc5fRosGZliocoTsjIJJ7O3OeWY7CHw=;
+        b=lag13DVzGXOcjvBBBtF/7AsLZP7AzTCKyuDMkBThqGVcqJ1YvZ3vX6uYCcwdS9bpyD
+         VrGOY1cH+x2liw0nZHSSLo7FNHXSm4NEbR4LM01YOsTkTvmHUdEKfbzHJJVQXa/FP4ZF
+         lw05FkTZYmsc8OmIYogGs6VeZYk/7XToPTiSTfARw3DDQNcQ+fUZjRmCCX83PZWmKy6A
+         dGBQC2AXNAGBropWxjoLXpmD7+EaShLFOJZZbRBAfbs1kqnwzICOjJbzfB3X+OQBte/G
+         rouvDMoC1Rds4VBcO+oFJ4EdwQmS/s5X6nOdySOQWh5/uO8jIcRPTJio9uOFfRH1MWTv
+         w9Fg==
+X-Gm-Message-State: AGRZ1gJ4kcwvqw7Wqt+6UlRtQD9/3W8ScetQqJ5XTcen6wgiDMV2DNG0
+        SNIzi2ZIQutu+RY9LhTrtAbZ1y2mqaE=
+X-Google-Smtp-Source: AJdET5ftHF+vuZDkWz/x4vRK76TlJyzkNVXM0/eL++Mg7sE8eTBBSZM7q7317OsRlccP7JdgDaG4FA==
+X-Received: by 2002:a17:902:104:: with SMTP id 4-v6mr16801708plb.184.1542491039875;
+        Sat, 17 Nov 2018 13:43:59 -0800 (PST)
+Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id o84sm29006501pfi.172.2018.11.17.13.43.57
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 17 Nov 2018 13:43:58 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [PATCHSET v4] Various block optimizations
+Date:   Sat, 17 Nov 2018 14:43:47 -0700
+Message-Id: <20181117214354.822-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Sagi Grimberg <sagi@lightbitslabs.com>
-Date: Thu, 15 Nov 2018 09:16:22 -0800
+Some of these are optimizations, the latter part is prep work
+for supporting polling with aio.
 
-> +static unsigned nvmet_tcp_recv_budget = 8;
-> +module_param_named(recv_budget, nvmet_tcp_recv_budget, int, S_IRUGO | S_IWUSR);
-> +MODULE_PARM_DESC(recv_budget, "recvs budget");
-> +
-> +static unsigned nvmet_tcp_send_budget = 8;
-> +module_param_named(send_budget, nvmet_tcp_send_budget, int, S_IRUGO | S_IWUSR);
-> +MODULE_PARM_DESC(send_budget, "sends budget");
-> +
-> +static unsigned nvmet_tcp_io_work_budget = 64;
-> +module_param_named(io_work_budget, nvmet_tcp_io_work_budget, int, S_IRUGO | S_IWUSR);
-> +MODULE_PARM_DESC(io_work_budget, "io work budget");
+Patches against my for-4.21/block branch. These patches can also
+be found in my mq-perf branch. Some of them are prep patches for
+the aio poll work, which can be found in my aio-poll branch.
+These will get posted soon.
 
-I strongly suggest moving away from module parameters for this stuff.
+Changes since v3:
 
-Create a genetlink socket family and allow run time configuration of these knobs
-by the user.
+- Fix tiny race in iocb flag checking for plugging
+- Improve poll-many implementation, including nvme-rdma
+- Get rid of unneeded smp_rmb()
+- Drop merged patches
 
-Thanks.
+Changes since v2:
+
+- Include polled swap IO in the poll optimizations
+- Get rid of unnecessary write barrier for DIO wakeup
+- Fix a potential stall if need_resched() was set and preempt
+  wasn't enabled
+- Provide separate mq_ops for NVMe with poll queues
+- Drop q->mq_ops patch
+- Rebase on top of for-4.21/block
+
+Changes since v1:
+
+- Improve nvme irq disabling for polled IO
+- Fix barriers in the ordered wakeup for polled O_DIRECT
+- Add patch to allow polling to find any command that is done
+- Add patch to control whether polling spins or not
+- Have async O_DIRECT mark a bio as pollable
+- Don't plug for polling
+
+
+ block/blk-core.c                  |  4 +-
+ block/blk-mq.c                    | 91 +++++++++++++++++++++------------------
+ drivers/nvme/host/fc.c            | 33 --------------
+ drivers/nvme/host/multipath.c     |  6 +--
+ drivers/nvme/host/pci.c           | 22 +++++-----
+ drivers/nvme/host/rdma.c          | 38 ++++++++--------
+ drivers/nvme/target/io-cmd-bdev.c |  2 +-
+ fs/block_dev.c                    | 11 +++--
+ fs/direct-io.c                    |  2 +-
+ fs/iomap.c                        |  5 ++-
+ include/linux/blk-mq.h            |  2 +-
+ include/linux/blkdev.h            |  4 +-
+ mm/page_io.c                      |  5 ++-
+ 13 files changed, 101 insertions(+), 124 deletions(-)
+
+-- 
+Jens Axboe
+
+
