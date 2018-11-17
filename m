@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBEE8C04EBF
-	for <linux-block@archiver.kernel.org>; Sat, 17 Nov 2018 21:44:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0857C43441
+	for <linux-block@archiver.kernel.org>; Sat, 17 Nov 2018 21:44:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A409F2080D
-	for <linux-block@archiver.kernel.org>; Sat, 17 Nov 2018 21:44:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4AD320817
+	for <linux-block@archiver.kernel.org>; Sat, 17 Nov 2018 21:44:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="DKgcnSht"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A409F2080D
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="IEBDpUs3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4AD320817
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726034AbeKRICH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 18 Nov 2018 03:02:07 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:44414 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725743AbeKRICH (ORCPT
+        id S1726142AbeKRICK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 18 Nov 2018 03:02:10 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:34268 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725743AbeKRICJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 18 Nov 2018 03:02:07 -0500
-Received: by mail-pl1-f196.google.com with SMTP id s5-v6so12758639plq.11
-        for <linux-block@vger.kernel.org>; Sat, 17 Nov 2018 13:44:04 -0800 (PST)
+        Sun, 18 Nov 2018 03:02:09 -0500
+Received: by mail-pg1-f196.google.com with SMTP id 17so11857862pgg.1
+        for <linux-block@vger.kernel.org>; Sat, 17 Nov 2018 13:44:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=m/skZUFQZ3fxw1cd1nVnD2mYBZ9RX6Jjcd9knLDBuZs=;
-        b=DKgcnShtDt480++uiQ24V0eL/a+xa6pemKjcWqULvSS6Y45MFTI5tPLkV0Vd4opgsu
-         L+0d6F9JCRLk0fCh3vS+KMTly7zb8WtwFe0jhipFyjGI42AMKTafqtlk602EutxNkA1n
-         zU8N+N/a+mDix+/lvHc06Us0nMJrCpjK1ISmxJmu3iE3Fghp2APLDdobJfkY9p4Y6OQ3
-         svWgrLwKz25mFUiVdJTAVtD7+Shes56gqRnWP7mhSn0BKMSvwKUVT/U0Tgcjb7sxqQV5
-         HGjXrQumj9/5AMdnwvJjB+GHauJwPV1slPyXLt/HAwr/w+ueJCQzPXRAqYijnAgGevag
-         O1Og==
+        bh=H55bb8wp7wkS/nESuGn9Ie3eERQNTXp7uDD13Q7fiM4=;
+        b=IEBDpUs3ZNrlI+QMxbKKjqF5obyBGhC6FICFH0YxTzbCDY2blqDM8QzbN9ClXwknAf
+         xTB3H+wHHfLBi3yvs0Dla8zNDTOwTQF2HebNcN8RYnnGZiIqM03rTv8cvl4EIyHkuBZC
+         Ad48j9lTCfIrZzOVXrLueB2yhbAL4ES/zgGeoleywE/oboBgoLCyx3hYLuQACTp89aZp
+         zAP8vOthvXk/oKiMShcxLMY4RxcxFjFfRFRiz7yfM/m4IqZCz3EF07Kg22nd1ZEEU66U
+         3aYvUINUJ0RUkXstFfhCFFF5TTDqBCUi4e2v6tupiWMvPIUCA9TSHqYW1KRs069ZrwS7
+         jn3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=m/skZUFQZ3fxw1cd1nVnD2mYBZ9RX6Jjcd9knLDBuZs=;
-        b=WwdrE/mODHlMOqvqp//OpafRzidsU7OyeWq8tbrwovGvrXVU8D+u5ZeSBn0CjoYknu
-         vzOGmnbJxpjqGbIIa75m7fPrARFbJP8/RKQcGRM0y6e0FWCEVa3mwih9nUuW1ApEisU/
-         qgRtYmJFhsWsIgRFEQ57D1ahxpg8T1QG6qeNJ01j6xS+Ut/vWjqi5K6R0niqNZhyQxbi
-         tll4SWiyWN7v5EEcn2tM8OeUUc7zRXF+Izxkdb1Ui/OaIY0RXpqJl22rP9vf+3Cnzh5z
-         09ZZBxhnmJNTmJ7g3rt9w+So9x8kslgds85YP09Y68WDP6KCxuSzH78W6pWcPaEMTf1k
-         H35g==
-X-Gm-Message-State: AGRZ1gIRPiyvf8JQtqovN6blvyl+aprMeq8zQBr2x5q5GwnjFpVguXa/
-        3uNYDfRxAE/SGhkvn/q4ugQluw1mm+c=
-X-Google-Smtp-Source: AJdET5eCx7AhSy9bbTbdkDeGKAuEzJuv/xP6P2W5QuBew1cKVeIXK12Ey+roVyjzrNnB6aZe6W2Nbw==
-X-Received: by 2002:a17:902:6a4:: with SMTP id 33-v6mr16756275plh.268.1542491043885;
-        Sat, 17 Nov 2018 13:44:03 -0800 (PST)
+        bh=H55bb8wp7wkS/nESuGn9Ie3eERQNTXp7uDD13Q7fiM4=;
+        b=ViHyWbZdvtL6D+wFZQJRurn00n76Qp2QwXdwiyjkszBYK7FTaVQfbLkPTcWVGJX2u1
+         hkeGnHHBdWAnJ42IwFaHyGdhCCEH7vZ0F4HZKcCJ/bnRoRGDPSBWBvlaMAoEwn7Qrv3e
+         jKrZykbVPZs0gvhXqr+/crIPbA0Ad3aYbSkpxm+7EyjrhqKypSdE03fbVBWogRs1oOkf
+         ctsaQNAX1Ms2AG3j7DccrV6KZKFJh6X+6GmI+SG5pAfcNW1W63KVoqZsqQNE4QNJjmWJ
+         zTDtvZp7hNr8Wi9ySWR4HsAm0yH5l1XlGHB4wPXhEtIlFTOJJJVvOTahkUmciQEls3wW
+         lUYw==
+X-Gm-Message-State: AA+aEWa16+amlVDiUJK+LxcBc2iEPae9YKCciJw9RPruiFFaM82ewW0/
+        P8oOlOJwVwTvtt/7vAZqz+TeM1schOc=
+X-Google-Smtp-Source: AJdET5cRg8RS/2biv1j/tjlkYMhCvUHjAFZbZfddtB3ivj8B+ABFPwQmIMFN43yZl1LlhP0mNldEXw==
+X-Received: by 2002:a62:9657:: with SMTP id c84mr3040385pfe.77.1542491045738;
+        Sat, 17 Nov 2018 13:44:05 -0800 (PST)
 Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id o84sm29006501pfi.172.2018.11.17.13.44.02
+        by smtp.gmail.com with ESMTPSA id o84sm29006501pfi.172.2018.11.17.13.44.03
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 17 Nov 2018 13:44:03 -0800 (PST)
+        Sat, 17 Nov 2018 13:44:04 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/7] block: have ->poll_fn() return number of entries polled
-Date:   Sat, 17 Nov 2018 14:43:49 -0700
-Message-Id: <20181117214354.822-3-axboe@kernel.dk>
+Subject: [PATCH 3/7] nvme-fc: remove unused poll implementation
+Date:   Sat, 17 Nov 2018 14:43:50 -0700
+Message-Id: <20181117214354.822-4-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181117214354.822-1-axboe@kernel.dk>
 References: <20181117214354.822-1-axboe@kernel.dk>
@@ -71,130 +71,66 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We currently only really support sync poll, ie poll with 1
-IO in flight. This prepares us for supporting async poll.
-
-Note that the returned value isn't necessarily 100% accurate.
-If poll races with IRQ completion, we assume that the fact
-that the task is now runnable means we found at least one
-entry. In reality it could be more than 1, or not even 1.
-This is fine, the caller will just need to take this into
-account.
+This relies on the fc taget ops setting ->poll_queue, which
+nobody does. Otherwise it just checks if something has
+completed, which isn't very useful.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-mq.c                | 18 +++++++++---------
- drivers/nvme/host/multipath.c |  4 ++--
- include/linux/blkdev.h        |  2 +-
- 3 files changed, 12 insertions(+), 12 deletions(-)
+ drivers/nvme/host/fc.c | 33 ---------------------------------
+ 1 file changed, 33 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 7fc4abb4cc36..52b1c97cd7c6 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -38,7 +38,7 @@
- #include "blk-mq-sched.h"
- #include "blk-rq-qos.h"
- 
--static bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie);
-+static int blk_mq_poll(struct request_queue *q, blk_qc_t cookie);
- static void blk_mq_poll_stats_start(struct request_queue *q);
- static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
- 
-@@ -3305,7 +3305,7 @@ static bool blk_mq_poll_hybrid_sleep(struct request_queue *q,
- 	return true;
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index 98c3c77f48f6..de797c641265 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -2302,38 +2302,6 @@ nvme_fc_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	return nvme_fc_start_fcp_op(ctrl, queue, op, data_len, io_dir);
  }
  
--static bool __blk_mq_poll(struct blk_mq_hw_ctx *hctx, struct request *rq)
-+static int __blk_mq_poll(struct blk_mq_hw_ctx *hctx, struct request *rq)
+-static struct blk_mq_tags *
+-nvme_fc_tagset(struct nvme_fc_queue *queue)
+-{
+-	if (queue->qnum == 0)
+-		return queue->ctrl->admin_tag_set.tags[queue->qnum];
+-
+-	return queue->ctrl->tag_set.tags[queue->qnum - 1];
+-}
+-
+-static int
+-nvme_fc_poll(struct blk_mq_hw_ctx *hctx, unsigned int tag)
+-
+-{
+-	struct nvme_fc_queue *queue = hctx->driver_data;
+-	struct nvme_fc_ctrl *ctrl = queue->ctrl;
+-	struct request *req;
+-	struct nvme_fc_fcp_op *op;
+-
+-	req = blk_mq_tag_to_rq(nvme_fc_tagset(queue), tag);
+-	if (!req)
+-		return 0;
+-
+-	op = blk_mq_rq_to_pdu(req);
+-
+-	if ((atomic_read(&op->state) == FCPOP_STATE_ACTIVE) &&
+-		 (ctrl->lport->ops->poll_queue))
+-		ctrl->lport->ops->poll_queue(&ctrl->lport->localport,
+-						 queue->lldd_handle);
+-
+-	return ((atomic_read(&op->state) != FCPOP_STATE_ACTIVE));
+-}
+-
+ static void
+ nvme_fc_submit_async_event(struct nvme_ctrl *arg)
  {
- 	struct request_queue *q = hctx->queue;
- 	long state;
-@@ -3318,7 +3318,7 @@ static bool __blk_mq_poll(struct blk_mq_hw_ctx *hctx, struct request *rq)
- 	 * straight to the busy poll loop.
- 	 */
- 	if (blk_mq_poll_hybrid_sleep(q, hctx, rq))
--		return true;
-+		return 1;
+@@ -2404,7 +2372,6 @@ static const struct blk_mq_ops nvme_fc_mq_ops = {
+ 	.init_request	= nvme_fc_init_request,
+ 	.exit_request	= nvme_fc_exit_request,
+ 	.init_hctx	= nvme_fc_init_hctx,
+-	.poll		= nvme_fc_poll,
+ 	.timeout	= nvme_fc_timeout,
+ };
  
- 	hctx->poll_considered++;
- 
-@@ -3332,30 +3332,30 @@ static bool __blk_mq_poll(struct blk_mq_hw_ctx *hctx, struct request *rq)
- 		if (ret > 0) {
- 			hctx->poll_success++;
- 			__set_current_state(TASK_RUNNING);
--			return true;
-+			return ret;
- 		}
- 
- 		if (signal_pending_state(state, current))
- 			__set_current_state(TASK_RUNNING);
- 
- 		if (current->state == TASK_RUNNING)
--			return true;
-+			return 1;
- 		if (ret < 0)
- 			break;
- 		cpu_relax();
- 	}
- 
- 	__set_current_state(TASK_RUNNING);
--	return false;
-+	return 0;
- }
- 
--static bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie)
-+static int blk_mq_poll(struct request_queue *q, blk_qc_t cookie)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	struct request *rq;
- 
- 	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
--		return false;
-+		return 0;
- 
- 	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
- 	if (!blk_qc_t_is_internal(cookie))
-@@ -3369,7 +3369,7 @@ static bool blk_mq_poll(struct request_queue *q, blk_qc_t cookie)
- 		 * so we should be safe with just the NULL check.
- 		 */
- 		if (!rq)
--			return false;
-+			return 0;
- 	}
- 
- 	return __blk_mq_poll(hctx, rq);
-diff --git a/drivers/nvme/host/multipath.c b/drivers/nvme/host/multipath.c
-index b82b0d3ca39a..65539c8df11d 100644
---- a/drivers/nvme/host/multipath.c
-+++ b/drivers/nvme/host/multipath.c
-@@ -220,11 +220,11 @@ static blk_qc_t nvme_ns_head_make_request(struct request_queue *q,
- 	return ret;
- }
- 
--static bool nvme_ns_head_poll(struct request_queue *q, blk_qc_t qc)
-+static int nvme_ns_head_poll(struct request_queue *q, blk_qc_t qc)
- {
- 	struct nvme_ns_head *head = q->queuedata;
- 	struct nvme_ns *ns;
--	bool found = false;
-+	int found = 0;
- 	int srcu_idx;
- 
- 	srcu_idx = srcu_read_lock(&head->srcu);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1ad6eafc43f2..e97c0a3b2262 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -283,7 +283,7 @@ static inline unsigned short req_get_ioprio(struct request *req)
- struct blk_queue_ctx;
- 
- typedef blk_qc_t (make_request_fn) (struct request_queue *q, struct bio *bio);
--typedef bool (poll_q_fn) (struct request_queue *q, blk_qc_t);
-+typedef int (poll_q_fn) (struct request_queue *q, blk_qc_t);
- 
- struct bio_vec;
- typedef int (dma_drain_needed_fn)(struct request *);
 -- 
 2.17.1
 
