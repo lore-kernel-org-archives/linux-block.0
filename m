@@ -2,77 +2,84 @@ Return-Path: <SRS0=iXKq=N6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA6EC43441
-	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:19:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E35C43441
+	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:19:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 938C120823
-	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:19:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="iblNDjrL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 938C120823
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	by mail.kernel.org (Postfix) with ESMTP id 7197A2087C
+	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:19:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7197A2087C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726921AbeKSSmM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Nov 2018 13:42:12 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:39606 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726784AbeKSSmL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Nov 2018 13:42:11 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=tBAAeYfqmh5bvL/8d0zy96DMnMxqV3XFDdJGPyTvklk=; b=iblNDjrLtybEn5qD2LUX4VjZm
-        ZLvrd9a6lQMLQmez1xD0yyTOQDQolMgFrEzel8vfQf9v7vO4TmqK/3YGYZrOvBx6B2YxEChGIBRaM
-        Cn3dQ9P1BN6ko48VYB9LsMo0iGpRzGyOK4iwr4UEukrFHGgcWNETkvPnXbcSDp2a2JZZsLorCwrZW
-        zR8FzLk/EDXBcrR4buehfBBISY/zfBnZ0QID3cjEdvsFj2GZ/JnTs1OSAOEDw135uMsiJxILMXEN7
-        xJGfTdDU00Vs00fNcVrVCGxTAW+Xq41OviKaW6888BISLD++gWLLPn/yQPKPB+5PG3Cw4URGJIPCG
-        gPgD+T/vQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gOem6-00026c-Gf; Mon, 19 Nov 2018 08:19:18 +0000
-Date:   Mon, 19 Nov 2018 00:19:18 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Damien Le Moal <damien.lemoal@wdc.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Adam Manzanares <adam.manzanares@wdc.com>,
+        id S1726958AbeKSSmo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Nov 2018 13:42:44 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57698 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726784AbeKSSmo (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Nov 2018 13:42:44 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 46775307D91A;
+        Mon, 19 Nov 2018 08:19:50 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-26.pek2.redhat.com [10.72.8.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E334B5D70A;
+        Mon, 19 Nov 2018 08:19:28 +0000 (UTC)
+Date:   Mon, 19 Nov 2018 16:19:24 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Dave Chinner <dchinner@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
         Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 6/7] block: prevent merging of requests with different
- priorities
-Message-ID: <20181119081918.GQ9622@infradead.org>
-References: <20181119035131.11255-1-damien.lemoal@wdc.com>
- <20181119035131.11255-7-damien.lemoal@wdc.com>
+        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
+        Theodore Ts'o <tytso@mit.edu>, linux-ext4@vger.kernel.org,
+        Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
+        Boaz Harrosh <ooo@electrozaur.com>,
+        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
+Subject: Re: [PATCH V10 08/19] btrfs: move bio_pages_all() to btrfs
+Message-ID: <20181119081922.GB16736@ming.t460p>
+References: <20181115085306.9910-1-ming.lei@redhat.com>
+ <20181115085306.9910-9-ming.lei@redhat.com>
+ <20181116133845.GG3165@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181119035131.11255-7-damien.lemoal@wdc.com>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20181116133845.GG3165@lst.de>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Mon, 19 Nov 2018 08:19:50 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +	/*
-> +	 * Don't allow merge of different I/O priorities.
-> +	 */
-> +	if (req->ioprio != next->ioprio)
-> +		return NULL;
+On Fri, Nov 16, 2018 at 02:38:45PM +0100, Christoph Hellwig wrote:
+> On Thu, Nov 15, 2018 at 04:52:55PM +0800, Ming Lei wrote:
+> > BTRFS is the only user of this helper, so move this helper into
+> > BTRFS, and implement it via bio_for_each_segment_all(), since
+> > bio->bi_vcnt may not equal to number of pages after multipage bvec
+> > is enabled.
+> 
+> btrfs only uses the value to check if it is larger than 1.  No amount
+> of multipage bio merging should ever make bi_vcnt go from 0 to 1 or
+> vice versa.
 
-> +	/*
-> +	 * Don't allow merge of different I/O priorities.
-> +	 */
-> +	if (rq->ioprio != bio_prio(bio))
-> +		return false;
-> +
+Could you explain a bit why?
 
-These comments just restate what is obvious in the code.  I would
-recommend to drop them.
+Suppose 2 physically continuous pages are added to this bio, .bi_vcnt
+can be 1 in case of multi-page bvec, but it is 2 in case of single-page
+bvec.
+
+Thanks,
+Ming
