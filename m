@@ -2,413 +2,129 @@ Return-Path: <SRS0=iXKq=N6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC2BC43441
-	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 10:35:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E5B6C43441
+	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 10:51:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F8C620831
-	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 10:35:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="SU4gX9Ur"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F8C620831
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id EA98020851
+	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 10:51:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA98020851
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728130AbeKSU54 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Nov 2018 15:57:56 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:54301 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728102AbeKSU5z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Nov 2018 15:57:55 -0500
-Received: by mail-wm1-f66.google.com with SMTP id r63-v6so4759168wma.4
-        for <linux-block@vger.kernel.org>; Mon, 19 Nov 2018 02:34:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=xE31UGISHMijh6BWsEpclRZoNNImo7FAKtEIn5NIV0A=;
-        b=SU4gX9UrHxz7m4v1tXtIXnFVKBC85SmHhU3WWiQYYH5YJWdQrx77/09MmnpPILr2Gv
-         PCbKmtQgB2koGowWyZFjNRJlKJFv9udeNRVF/Tx2HHxFCDZQhXGe45I/uov9rCuAnB50
-         t7iYiiNqnQaObo/r0EtTj0WBdzrK0QxzCGtFc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=xE31UGISHMijh6BWsEpclRZoNNImo7FAKtEIn5NIV0A=;
-        b=LnATcvH5vl/RMePygnhBj6j+MWELpFWKVGWI8weikTG/QvOreGgnrflUqqXvjqcW8G
-         JD1lO+llt4uuetLiEvOMW3J/LXJLkrOu7IbDLVUi6HWc9LFINy1evf706HUEQZQXN5JJ
-         qBNfrhwgwq2VFEBJw8pdEpwpR+GXto8kjzn0ebxXtG0KXhWGcGrLVg0m8uB/Fgszt6x2
-         cWSU97o6v68wz8/J6GyLoOQmjvUv5oEd2p86Ul4zP5RmdHXwtvuay3aBfDjpBgkYDOj0
-         zXAD1Dt4jIm0IbtUS0gUIb67cMo1n3Q/5Z+wqKWIE+idvka+uA6rhI5WAIkjiZzft5SX
-         3Pjw==
-X-Gm-Message-State: AA+aEWbVHYvJVU9AAinmYG35c8cVEijQ+VzFWpEUvIhj6GKzucHcUd8O
-        AwBhmNUvP6bFVZu6CETlFa7zBQ==
-X-Google-Smtp-Source: AJdET5ePbdKRB70yuXm+nYTaN5hJuUM29xs9xF7/e6SHKoDCwG1a+m1b34Np/Qb+SAwhNgZdAROnFg==
-X-Received: by 2002:a1c:ce0e:: with SMTP id e14mr4785626wmg.53.1542623680540;
-        Mon, 19 Nov 2018 02:34:40 -0800 (PST)
-Received: from localhost.localdomain ([37.162.18.180])
-        by smtp.gmail.com with ESMTPSA id e9sm14973298wro.16.2018.11.19.02.34.38
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 19 Nov 2018 02:34:40 -0800 (PST)
-From:   Paolo Valente <paolo.valente@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
-        Angelo Ruocco <angeloruocco90@gmail.com>,
-        Dennis Zhou <dennis@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Liu Bo <bo.liu@linux.alibaba.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Johannes Weiner <hannes@cmpxchg.org>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ulf.hansson@linaro.org, linus.walleij@linaro.org,
-        broonie@kernel.org, bfq-iosched@googlegroups.com,
-        oleksandr@natalenko.name, cgroups@vger.kernel.org,
-        linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V2 02/10] block, cgroup: pass cftype to functions that need to use it
-Date:   Mon, 19 Nov 2018 11:34:16 +0100
-Message-Id: <20181119103424.3853-3-paolo.valente@linaro.org>
-X-Mailer: git-send-email 2.16.1
-In-Reply-To: <20181119103424.3853-1-paolo.valente@linaro.org>
-References: <20181119103424.3853-1-paolo.valente@linaro.org>
+        id S1727959AbeKSVOn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Nov 2018 16:14:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:5004 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727956AbeKSVOn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Nov 2018 16:14:43 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9C14E307D91A;
+        Mon, 19 Nov 2018 10:51:28 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-26.pek2.redhat.com [10.72.8.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 91D445D9CB;
+        Mon, 19 Nov 2018 10:51:22 +0000 (UTC)
+Date:   Mon, 19 Nov 2018 18:51:18 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "jianchao.wang" <jianchao.w.wang@oracle.com>,
+        Guenter Roeck <linux@roeck-us.net>
+Subject: Re: [PATCH V2 for-4.21 2/2] blk-mq: alloc q->queue_ctx as normal
+ array
+Message-ID: <20181119105117.GB18231@ming.t460p>
+References: <20181116112311.4117-1-ming.lei@redhat.com>
+ <20181116112311.4117-3-ming.lei@redhat.com>
+ <20181116140623.GC4595@kroah.com>
+ <20181117023417.GC8872@ming.t460p>
+ <20181117100342.GB1482@kroah.com>
+ <20181119020426.GB10838@ming.t460p>
+ <20181119101749.GB20178@kroah.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181119101749.GB20178@kroah.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Mon, 19 Nov 2018 10:51:28 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Some seq_show functions need to access the cftype they belong to, for
-retrieving the data to show. These functions get their cftype by using
-the seq_cft accessor for the seq_file. This solution is no longer
-viable in case a seq_file is shared among more than one cftype,
-because the accessor always returns (only) the first of the cftypes
-sharing the seq_file.
+On Mon, Nov 19, 2018 at 11:17:49AM +0100, Greg Kroah-Hartman wrote:
+> On Mon, Nov 19, 2018 at 10:04:27AM +0800, Ming Lei wrote:
+> > On Sat, Nov 17, 2018 at 11:03:42AM +0100, Greg Kroah-Hartman wrote:
+> > > On Sat, Nov 17, 2018 at 10:34:18AM +0800, Ming Lei wrote:
+> > > > On Fri, Nov 16, 2018 at 06:06:23AM -0800, Greg Kroah-Hartman wrote:
+> > > > > On Fri, Nov 16, 2018 at 07:23:11PM +0800, Ming Lei wrote:
+> > > > > > Now q->queue_ctx is just one read-mostly table for query the
+> > > > > > 'blk_mq_ctx' instance from one cpu index, it isn't necessary
+> > > > > > to allocate it as percpu variable. One simple array may be
+> > > > > > more efficient.
+> > > > > 
+> > > > > "may be", have you run benchmarks to be sure?  If so, can you add the
+> > > > > results of them to this changelog?  If there is no measurable
+> > > > > difference, then why make this change at all?
+> > > > 
+> > > > __blk_mq_get_ctx() is used in fast path, what do you think about which
+> > > > one is more efficient?
+> > > > 
+> > > > - *per_cpu_ptr(q->queue_ctx, cpu);
+> > > > 
+> > > > - q->queue_ctx[cpu]
+> > > 
+> > > You need to actually test to see which one is faster, you might be
+> > > surprised :)
+> > > 
+> > > In other words, do not just guess.
+> > 
+> > No performance difference is observed wrt. this patchset when I
+> > run the following fio test on null_blk(modprobe null_blk) in my VM:
+> > 
+> > fio --direct=1 --size=128G --bsrange=4k-4k --runtime=40 --numjobs=32 \
+> >   --ioengine=libaio --iodepth=64 --group_reporting=1 --filename=/dev/nullb0 \
+> >   --name=null_blk-ttest-randread --rw=randread
+> > 
+> > Running test is important, but IMO it is more important to understand
+> > the idea behind is correct, or the approach can be proved as correct.
+> > 
+> > Given the count of test cases can be increased exponentially when the related
+> > factors or settings are covered, obviously we can't run all the test cases.
+> 
+> And what happens when you start to scale the number of queues and cpus
+> in the system?
 
-This commit enables these seq_show functions to be passed their
-cftype, by replacing their prototype with that of the newly defined
-seq_show_cft hook, and by invoking these functions through this new
-hook.
+It is related with cpus.
 
-Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-cgroup.c         | 54 ++++++++++++++++++++++++----------------------
- block/blk-cgroup.c         | 22 ++++++++++++-------
- block/blk-throttle.c       |  8 +++----
- include/linux/blk-cgroup.h | 10 +++++----
- 4 files changed, 52 insertions(+), 42 deletions(-)
+> Does both options work the same?
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index a7a1712632b0..038e418fa64f 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -918,17 +918,17 @@ static ssize_t bfq_io_set_weight(struct kernfs_open_file *of,
- }
- 
- #ifdef CONFIG_DEBUG_BLK_CGROUP
--static int bfqg_print_stat(struct seq_file *sf, void *v)
-+static int bfqg_print_stat(struct seq_file *sf, struct cftype *cft, void *v)
- {
- 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), blkg_prfill_stat,
--			  &blkcg_policy_bfq, seq_cft(sf)->private, false);
-+			  &blkcg_policy_bfq, cft->private, false);
- 	return 0;
- }
- 
--static int bfqg_print_rwstat(struct seq_file *sf, void *v)
-+static int bfqg_print_rwstat(struct seq_file *sf, struct cftype *cft, void *v)
- {
- 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)), blkg_prfill_rwstat,
--			  &blkcg_policy_bfq, seq_cft(sf)->private, true);
-+			  &blkcg_policy_bfq, cft->private, true);
- 	return 0;
- }
- 
-@@ -949,19 +949,21 @@ static u64 bfqg_prfill_rwstat_recursive(struct seq_file *sf,
- 	return __blkg_prfill_rwstat(sf, pd, &sum);
- }
- 
--static int bfqg_print_stat_recursive(struct seq_file *sf, void *v)
-+static int bfqg_print_stat_recursive(struct seq_file *sf, struct cftype *cft,
-+				     void *v)
- {
- 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
- 			  bfqg_prfill_stat_recursive, &blkcg_policy_bfq,
--			  seq_cft(sf)->private, false);
-+			  cft->private, false);
- 	return 0;
- }
- 
--static int bfqg_print_rwstat_recursive(struct seq_file *sf, void *v)
-+static int bfqg_print_rwstat_recursive(struct seq_file *sf, struct cftype *cft,
-+				       void *v)
- {
- 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
- 			  bfqg_prfill_rwstat_recursive, &blkcg_policy_bfq,
--			  seq_cft(sf)->private, true);
-+			  cft->private, true);
- 	return 0;
- }
- 
-@@ -1063,18 +1065,18 @@ struct cftype bfq_blkcg_legacy_files[] = {
- 	{
- 		.name = "bfq.io_service_bytes",
- 		.private = (unsigned long)&blkcg_policy_bfq,
--		.seq_show = blkg_print_stat_bytes,
-+		.seq_show_cft = blkg_print_stat_bytes,
- 	},
- 	{
- 		.name = "bfq.io_serviced",
- 		.private = (unsigned long)&blkcg_policy_bfq,
--		.seq_show = blkg_print_stat_ios,
-+		.seq_show_cft = blkg_print_stat_ios,
- 	},
- #ifdef CONFIG_DEBUG_BLK_CGROUP
- 	{
- 		.name = "bfq.time",
- 		.private = offsetof(struct bfq_group, stats.time),
--		.seq_show = bfqg_print_stat,
-+		.seq_show_cft = bfqg_print_stat,
- 	},
- 	{
- 		.name = "bfq.sectors",
-@@ -1083,22 +1085,22 @@ struct cftype bfq_blkcg_legacy_files[] = {
- 	{
- 		.name = "bfq.io_service_time",
- 		.private = offsetof(struct bfq_group, stats.service_time),
--		.seq_show = bfqg_print_rwstat,
-+		.seq_show_cft = bfqg_print_rwstat,
- 	},
- 	{
- 		.name = "bfq.io_wait_time",
- 		.private = offsetof(struct bfq_group, stats.wait_time),
--		.seq_show = bfqg_print_rwstat,
-+		.seq_show_cft = bfqg_print_rwstat,
- 	},
- 	{
- 		.name = "bfq.io_merged",
- 		.private = offsetof(struct bfq_group, stats.merged),
--		.seq_show = bfqg_print_rwstat,
-+		.seq_show_cft = bfqg_print_rwstat,
- 	},
- 	{
- 		.name = "bfq.io_queued",
- 		.private = offsetof(struct bfq_group, stats.queued),
--		.seq_show = bfqg_print_rwstat,
-+		.seq_show_cft = bfqg_print_rwstat,
- 	},
- #endif /* CONFIG_DEBUG_BLK_CGROUP */
- 
-@@ -1106,18 +1108,18 @@ struct cftype bfq_blkcg_legacy_files[] = {
- 	{
- 		.name = "bfq.io_service_bytes_recursive",
- 		.private = (unsigned long)&blkcg_policy_bfq,
--		.seq_show = blkg_print_stat_bytes_recursive,
-+		.seq_show_cft = blkg_print_stat_bytes_recursive,
- 	},
- 	{
- 		.name = "bfq.io_serviced_recursive",
- 		.private = (unsigned long)&blkcg_policy_bfq,
--		.seq_show = blkg_print_stat_ios_recursive,
-+		.seq_show_cft = blkg_print_stat_ios_recursive,
- 	},
- #ifdef CONFIG_DEBUG_BLK_CGROUP
- 	{
- 		.name = "bfq.time_recursive",
- 		.private = offsetof(struct bfq_group, stats.time),
--		.seq_show = bfqg_print_stat_recursive,
-+		.seq_show_cft = bfqg_print_stat_recursive,
- 	},
- 	{
- 		.name = "bfq.sectors_recursive",
-@@ -1126,22 +1128,22 @@ struct cftype bfq_blkcg_legacy_files[] = {
- 	{
- 		.name = "bfq.io_service_time_recursive",
- 		.private = offsetof(struct bfq_group, stats.service_time),
--		.seq_show = bfqg_print_rwstat_recursive,
-+		.seq_show_cft = bfqg_print_rwstat_recursive,
- 	},
- 	{
- 		.name = "bfq.io_wait_time_recursive",
- 		.private = offsetof(struct bfq_group, stats.wait_time),
--		.seq_show = bfqg_print_rwstat_recursive,
-+		.seq_show_cft = bfqg_print_rwstat_recursive,
- 	},
- 	{
- 		.name = "bfq.io_merged_recursive",
- 		.private = offsetof(struct bfq_group, stats.merged),
--		.seq_show = bfqg_print_rwstat_recursive,
-+		.seq_show_cft = bfqg_print_rwstat_recursive,
- 	},
- 	{
- 		.name = "bfq.io_queued_recursive",
- 		.private = offsetof(struct bfq_group, stats.queued),
--		.seq_show = bfqg_print_rwstat_recursive,
-+		.seq_show_cft = bfqg_print_rwstat_recursive,
- 	},
- 	{
- 		.name = "bfq.avg_queue_size",
-@@ -1150,22 +1152,22 @@ struct cftype bfq_blkcg_legacy_files[] = {
- 	{
- 		.name = "bfq.group_wait_time",
- 		.private = offsetof(struct bfq_group, stats.group_wait_time),
--		.seq_show = bfqg_print_stat,
-+		.seq_show_cft = bfqg_print_stat,
- 	},
- 	{
- 		.name = "bfq.idle_time",
- 		.private = offsetof(struct bfq_group, stats.idle_time),
--		.seq_show = bfqg_print_stat,
-+		.seq_show_cft = bfqg_print_stat,
- 	},
- 	{
- 		.name = "bfq.empty_time",
- 		.private = offsetof(struct bfq_group, stats.empty_time),
--		.seq_show = bfqg_print_stat,
-+		.seq_show_cft = bfqg_print_stat,
- 	},
- 	{
- 		.name = "bfq.dequeue",
- 		.private = offsetof(struct bfq_group, stats.dequeue),
--		.seq_show = bfqg_print_stat,
-+		.seq_show_cft = bfqg_print_stat,
- 	},
- #endif	/* CONFIG_DEBUG_BLK_CGROUP */
- 	{ }	/* terminate */
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 63d226a084cd..772d32bbecae 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -565,15 +565,16 @@ static u64 blkg_prfill_rwstat_field(struct seq_file *sf,
- /**
-  * blkg_print_stat_bytes - seq_show callback for blkg->stat_bytes
-  * @sf: seq_file to print to
-+ * @cft: cftype holding the data
-  * @v: unused
-  *
-  * To be used as cftype->seq_show to print blkg->stat_bytes.
-  * cftype->private must be set to the blkcg_policy.
-  */
--int blkg_print_stat_bytes(struct seq_file *sf, void *v)
-+int blkg_print_stat_bytes(struct seq_file *sf, struct cftype *cft, void *v)
- {
- 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
--			  blkg_prfill_rwstat_field, (void *)seq_cft(sf)->private,
-+			  blkg_prfill_rwstat_field, (void *)cft->private,
- 			  offsetof(struct blkcg_gq, stat_bytes), true);
- 	return 0;
- }
-@@ -582,15 +583,16 @@ EXPORT_SYMBOL_GPL(blkg_print_stat_bytes);
- /**
-  * blkg_print_stat_bytes - seq_show callback for blkg->stat_ios
-  * @sf: seq_file to print to
-+ * @cft: cftype holding the data
-  * @v: unused
-  *
-  * To be used as cftype->seq_show to print blkg->stat_ios.  cftype->private
-  * must be set to the blkcg_policy.
-  */
--int blkg_print_stat_ios(struct seq_file *sf, void *v)
-+int blkg_print_stat_ios(struct seq_file *sf, struct cftype *cft, void *v)
- {
- 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
--			  blkg_prfill_rwstat_field, (void *)seq_cft(sf)->private,
-+			  blkg_prfill_rwstat_field, (void *)cft->private,
- 			  offsetof(struct blkcg_gq, stat_ios), true);
- 	return 0;
- }
-@@ -608,13 +610,15 @@ static u64 blkg_prfill_rwstat_field_recursive(struct seq_file *sf,
- /**
-  * blkg_print_stat_bytes_recursive - recursive version of blkg_print_stat_bytes
-  * @sf: seq_file to print to
-+ * @cft: cftype holding the data
-  * @v: unused
-  */
--int blkg_print_stat_bytes_recursive(struct seq_file *sf, void *v)
-+int blkg_print_stat_bytes_recursive(struct seq_file *sf, struct cftype *cft,
-+				    void *v)
- {
- 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
- 			  blkg_prfill_rwstat_field_recursive,
--			  (void *)seq_cft(sf)->private,
-+			  (void *)cft->private,
- 			  offsetof(struct blkcg_gq, stat_bytes), true);
- 	return 0;
- }
-@@ -623,13 +627,15 @@ EXPORT_SYMBOL_GPL(blkg_print_stat_bytes_recursive);
- /**
-  * blkg_print_stat_ios_recursive - recursive version of blkg_print_stat_ios
-  * @sf: seq_file to print to
-+ * @cft: cftype holding the data
-  * @v: unused
-  */
--int blkg_print_stat_ios_recursive(struct seq_file *sf, void *v)
-+int blkg_print_stat_ios_recursive(struct seq_file *sf, struct cftype *cft,
-+				  void *v)
- {
- 	blkcg_print_blkgs(sf, css_to_blkcg(seq_css(sf)),
- 			  blkg_prfill_rwstat_field_recursive,
--			  (void *)seq_cft(sf)->private,
-+			  (void *)cft->private,
- 			  offsetof(struct blkcg_gq, stat_ios), true);
- 	return 0;
- }
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 8f0a104770ee..6bfdaac53b6f 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1493,22 +1493,22 @@ static struct cftype throtl_legacy_files[] = {
- 	{
- 		.name = "throttle.io_service_bytes",
- 		.private = (unsigned long)&blkcg_policy_throtl,
--		.seq_show = blkg_print_stat_bytes,
-+		.seq_show_cft = blkg_print_stat_bytes,
- 	},
- 	{
- 		.name = "throttle.io_service_bytes_recursive",
- 		.private = (unsigned long)&blkcg_policy_throtl,
--		.seq_show = blkg_print_stat_bytes_recursive,
-+		.seq_show_cft = blkg_print_stat_bytes_recursive,
- 	},
- 	{
- 		.name = "throttle.io_serviced",
- 		.private = (unsigned long)&blkcg_policy_throtl,
--		.seq_show = blkg_print_stat_ios,
-+		.seq_show_cft = blkg_print_stat_ios,
- 	},
- 	{
- 		.name = "throttle.io_serviced_recursive",
- 		.private = (unsigned long)&blkcg_policy_throtl,
--		.seq_show = blkg_print_stat_ios_recursive,
-+		.seq_show_cft = blkg_print_stat_ios_recursive,
- 	},
- 	{ }	/* terminate */
- };
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index a9e2e2037129..770b59e0d35f 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -207,10 +207,12 @@ u64 __blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
- u64 blkg_prfill_stat(struct seq_file *sf, struct blkg_policy_data *pd, int off);
- u64 blkg_prfill_rwstat(struct seq_file *sf, struct blkg_policy_data *pd,
- 		       int off);
--int blkg_print_stat_bytes(struct seq_file *sf, void *v);
--int blkg_print_stat_ios(struct seq_file *sf, void *v);
--int blkg_print_stat_bytes_recursive(struct seq_file *sf, void *v);
--int blkg_print_stat_ios_recursive(struct seq_file *sf, void *v);
-+int blkg_print_stat_bytes(struct seq_file *sf, struct cftype *cft, void *v);
-+int blkg_print_stat_ios(struct seq_file *sf, struct cftype *cft, void *v);
-+int blkg_print_stat_bytes_recursive(struct seq_file *sf, struct cftype *cft,
-+				    void *v);
-+int blkg_print_stat_ios_recursive(struct seq_file *sf, struct cftype *cft,
-+				  void *v);
- 
- u64 blkg_stat_recursive_sum(struct blkcg_gq *blkg,
- 			    struct blkcg_policy *pol, int off);
--- 
-2.16.1
+This patch may introduce one extra memory read for getting one
+'blk_mq_ctx' instance.
 
+> Why did the original code have per-cpu variables?
+
+Each instance of 'struct blk_mq_ctx' is actually percpu, so it is natural
+to allocate it as one percpu variable.
+
+However, there is the kobject lifetime issue if we allocate all 'blk_mq_ctx'
+instances as one single percpu variable, because we can't release just one
+part(for one cpu) of the single percpu variable.
+
+So this patch converts the percpu variable into one loop-up table(read
+only) and one 'blk_mq_ctx' instance for each CPU, and all the instances
+are allocated from the local NUMA node of its CPU.
+
+Another approach is to keep the percpu allocation, and introduces one
+reference counter for counting how many active 'ctx' there are, and only
+free the percpu variable when the ref drops zero, then we may save one
+extra memory read for __blk_mq_get_ctx().
+
+
+Thanks,
+Ming
