@@ -2,55 +2,55 @@ Return-Path: <SRS0=iXKq=N6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D78C43441
-	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:06:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6091C43441
+	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:06:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12260206BB
-	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:06:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E4A8206BB
+	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:06:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jdc00V9k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12260206BB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Xnz+k7J3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E4A8206BB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726505AbeKSS2u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Nov 2018 13:28:50 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:36414 "EHLO
+        id S1726510AbeKSS3R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Nov 2018 13:29:17 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:37504 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726348AbeKSS2u (ORCPT
+        with ESMTP id S1726348AbeKSS3R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Nov 2018 13:28:50 -0500
+        Mon, 19 Nov 2018 13:29:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=9U3CXaW0pKRBVegYbg6lCjicwvVu6inFmsFdnqx90g8=; b=jdc00V9k3HSCa/PafcLVBlzdU
-        XqHZcqKd7XyKfnsHq05zAR3M+JaX4A1UfcIyeEhdWz0L+TWuHIOce6oiUS7xv9sd6bqm6NP5Mf5Qo
-        pj536m3yuVNaD0Q0O/+y3jFz45dJ/7amfNwn/h0/khXMEBU8TO94CdPej8MxxWR/rvk8ZaDg2J6iB
-        yO15pJs1cHUVj08VRzmMh5hpTAVHPg3CDmtYjo/vaA+ikxzBjSYSJvzJt3Fb0uK4o5MgQ6GNQe/Nu
-        7aLmhF8n2IX7iSsIg/IPTyvRTdMM+m6sutS76ru82cEx3jgm/SCZeZbzvMhyuIw4VN67CP9KJi4/w
-        JlZIj1i5A==;
+         bh=D8ed4hvrcHWKJ7k2vuo9B7G4GVJdOBMDaLG/J/gGlrw=; b=Xnz+k7J3DTfikYRLvOmerecH9
+        2mpxrswSuZAM4/LxwaHkPL5vM0V0lM8aeez8V5516jJcXLz/JabD1bRbojTYVTTDeI4aVlBItKt3K
+        2w/uAMdL7gx+uDNN2SO4M2kQSvN8TJdKc/LDyumcGvCJiBR8PWm+L6Qp3G6fO/AiLM0R7XmghkbP+
+        CbHY1xkqkFFDIyueglEn9DQcJq+8hX2uE3vXoZzTVkot9bRg+yg9h/XlRIdx9Mqhwt7pHUK75FhIV
+        +XCUN6U2JRZKMu43MqHR82Oe96V4DtViApOs1oyCmwnEEXTxJyPV4/+oOlxTTWPFLf/9qtNs/YApN
+        rKjyJNQIQ==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gOeZD-0006sE-4U; Mon, 19 Nov 2018 08:05:59 +0000
-Date:   Mon, 19 Nov 2018 00:05:59 -0800
+        id 1gOeZd-00074I-FF; Mon, 19 Nov 2018 08:06:25 +0000
+Date:   Mon, 19 Nov 2018 00:06:25 -0800
 From:   Christoph Hellwig <hch@infradead.org>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 7/7] blk-mq: ensure mq_ops ->poll() is entered at least
- once
-Message-ID: <20181119080558.GG9622@infradead.org>
-References: <20181117214354.822-1-axboe@kernel.dk>
- <20181117214354.822-8-axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 1/5] aio: use assigned completion handler
+Message-ID: <20181119080625.GH9622@infradead.org>
+References: <20181117235317.7366-1-axboe@kernel.dk>
+ <20181117235317.7366-2-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181117214354.822-8-axboe@kernel.dk>
+In-Reply-To: <20181117235317.7366-2-axboe@kernel.dk>
 User-Agent: Mutt/1.9.2 (2017-12-15)
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
@@ -58,11 +58,12 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Nov 17, 2018 at 02:43:54PM -0700, Jens Axboe wrote:
-> Right now we immediately bail if need_resched() is true, but
-> we need to do at least one loop in case we have entries waiting.
-> So just invert the need_resched() check, putting it at the
-> bottom of the loop.
+On Sat, Nov 17, 2018 at 04:53:13PM -0700, Jens Axboe wrote:
+> We know this is a read/write request, but in preparation for
+> having different kinds of those, ensure that we call the assigned
+> handler instead of assuming it's aio_complete_rq().
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
 Looks good,
 
