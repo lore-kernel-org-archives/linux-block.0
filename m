@@ -2,156 +2,107 @@ Return-Path: <SRS0=iXKq=N6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E31CC43610
-	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:46:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E943C43441
+	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:58:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1265F206BA
-	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:46:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1265F206BA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 4695320823
+	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:58:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JLTbinaN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4695320823
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726944AbeKSTI4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Nov 2018 14:08:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:35034 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726859AbeKSTI4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Nov 2018 14:08:56 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 9A87C308FC4E;
-        Mon, 19 Nov 2018 08:45:58 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-26.pek2.redhat.com [10.72.8.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8F9CA6090A;
-        Mon, 19 Nov 2018 08:45:27 +0000 (UTC)
-Date:   Mon, 19 Nov 2018 16:45:23 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Omar Sandoval <osandov@osandov.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Dave Chinner <dchinner@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
-        Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
-        linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
-        linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
-        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: Re: [PATCH V10 14/19] block: enable multipage bvecs
-Message-ID: <20181119084522.GK16736@ming.t460p>
-References: <20181115085306.9910-1-ming.lei@redhat.com>
- <20181115085306.9910-15-ming.lei@redhat.com>
- <20181116015627.GI23828@vader>
+        id S1727122AbeKSTVP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Nov 2018 14:21:15 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:37666 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726289AbeKSTVP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Nov 2018 14:21:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=C9EBn/npVuPiYxeMHCBFKi7NQeM9Vn4qO/S4Q+Wg4IY=; b=JLTbinaNQWYJWkdew8/qUHATH
+        f2h5Rq6EB1N1NBv6rzUWGM7KCZMN4alVcbYXmBPG3xsFToV47MlqDjV8SiTABD0sIiZYCFOu0lQtk
+        HklZlyROnjUqzf6892sT6ZDJnLUk9aVhRrY7moSWnq5wNQFFXHypHSRSEiBNS83v17Zfa8srnHtcf
+        mxHPtC9EGuhMkZWl9JDnXMFv6QVHJVJS3XN3J1LOwaR/ifQCxxwgM6MvuTtsat16o1SdujbIzkDzy
+        q8rumJ4mZcxYaBkD6g5Bqe8kK2C3yCFUkCtbNPW2JEz8rA6ONr0WG/a2nji93dk7YRhe2pF8e0Pns
+        o6/NTKVDQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gOfNn-0000G8-N6; Mon, 19 Nov 2018 08:58:15 +0000
+Date:   Mon, 19 Nov 2018 00:58:15 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Keith Busch <keith.busch@intel.com>
+Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Martin Petersen <martin.petersen@oracle.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [PATCHv3 2/3] scsi: Do not rely on blk-mq for double completions
+Message-ID: <20181119085815.GB29626@infradead.org>
+References: <20181115175820.13391-1-keith.busch@intel.com>
+ <20181115175820.13391-3-keith.busch@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181116015627.GI23828@vader>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Mon, 19 Nov 2018 08:45:59 +0000 (UTC)
+In-Reply-To: <20181115175820.13391-3-keith.busch@intel.com>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 15, 2018 at 05:56:27PM -0800, Omar Sandoval wrote:
-> On Thu, Nov 15, 2018 at 04:53:01PM +0800, Ming Lei wrote:
-> > This patch pulls the trigger for multi-page bvecs.
-> > 
-> > Now any request queue which supports queue cluster will see multi-page
-> > bvecs.
-> > 
-> > Cc: Dave Chinner <dchinner@redhat.com>
-> > Cc: Kent Overstreet <kent.overstreet@gmail.com>
-> > Cc: Mike Snitzer <snitzer@redhat.com>
-> > Cc: dm-devel@redhat.com
-> > Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-> > Cc: linux-fsdevel@vger.kernel.org
-> > Cc: Shaohua Li <shli@kernel.org>
-> > Cc: linux-raid@vger.kernel.org
-> > Cc: linux-erofs@lists.ozlabs.org
-> > Cc: David Sterba <dsterba@suse.com>
-> > Cc: linux-btrfs@vger.kernel.org
-> > Cc: Darrick J. Wong <darrick.wong@oracle.com>
-> > Cc: linux-xfs@vger.kernel.org
-> > Cc: Gao Xiang <gaoxiang25@huawei.com>
-> > Cc: Christoph Hellwig <hch@lst.de>
-> > Cc: Theodore Ts'o <tytso@mit.edu>
-> > Cc: linux-ext4@vger.kernel.org
-> > Cc: Coly Li <colyli@suse.de>
-> > Cc: linux-bcache@vger.kernel.org
-> > Cc: Boaz Harrosh <ooo@electrozaur.com>
-> > Cc: Bob Peterson <rpeterso@redhat.com>
-> > Cc: cluster-devel@redhat.com
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  block/bio.c | 24 ++++++++++++++++++------
-> >  1 file changed, 18 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/block/bio.c b/block/bio.c
-> > index 6486722d4d4b..ed6df6f8e63d 100644
-> > --- a/block/bio.c
-> > +++ b/block/bio.c
-> 
-> This comment above __bio_try_merge_page() doesn't make sense after this
-> change:
-> 
->  This is a
->  a useful optimisation for file systems with a block size smaller than the
->  page size.
-> 
-> Can you please get rid of it in this patch?
+> index 5d83a162d03b..c1d5e4e36125 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -1635,8 +1635,11 @@ static blk_status_t scsi_mq_prep_fn(struct request *req)
+>  
+>  static void scsi_mq_done(struct scsi_cmnd *cmd)
+>  {
+> +	if (unlikely(test_and_set_bit(__SCMD_COMPLETE, &cmd->flags)))
+> +		return;
+>  	trace_scsi_dispatch_cmd_done(cmd);
+> -	blk_mq_complete_request(cmd->request);
+> +	if (unlikely(!blk_mq_complete_request(cmd->request)))
+> +		clear_bit(__SCMD_COMPLETE, &cmd->flags);
+>  }
 
-I understand __bio_try_merge_page() still works for original cases, so
-looks the optimization for sub-pagesize is still there too, isn't it?
+This looks a little odd to me.  If we didn't complete the command
+someone else did.  Why would we clear the bit in this case?
 
-> 
-> > @@ -767,12 +767,24 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
-> >  
-> >  	if (bio->bi_vcnt > 0) {
-> >  		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
-> > -
-> > -		if (page == bv->bv_page && off == bv->bv_offset + bv->bv_len) {
-> > -			bv->bv_len += len;
-> > -			bio->bi_iter.bi_size += len;
-> > -			return true;
-> > -		}
-> > +		struct request_queue *q = NULL;
-> > +
-> > +		if (page == bv->bv_page && off == (bv->bv_offset + bv->bv_len)
-> > +				&& (off + len) <= PAGE_SIZE)
-> > +			goto merge;
-> 
-> The parentheses around (bv->bv_offset + bv->bv_len) and (off + len) are
-> unnecessary noise.
-> 
-> What's the point of the new (off + len) <= PAGE_SIZE check?
+>  static void scsi_mq_put_budget(struct blk_mq_hw_ctx *hctx)
+> @@ -1701,6 +1704,7 @@ static blk_status_t scsi_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  			goto out_dec_host_busy;
+>  		req->rq_flags |= RQF_DONTPREP;
+>  	} else {
+> +		cmd->flags &= ~SCMD_COMPLETE;
+>  		blk_mq_start_request(req);
+>  	}
+>  
+> diff --git a/include/scsi/scsi_cmnd.h b/include/scsi/scsi_cmnd.h
+> index d6fd2aba0380..ded7c7194a28 100644
+> --- a/include/scsi/scsi_cmnd.h
+> +++ b/include/scsi/scsi_cmnd.h
+> @@ -58,6 +58,9 @@ struct scsi_pointer {
+>  #define SCMD_TAGGED		(1 << 0)
+>  #define SCMD_UNCHECKED_ISA_DMA	(1 << 1)
+>  #define SCMD_INITIALIZED	(1 << 2)
+> +
+> +#define __SCMD_COMPLETE		3
+> +#define SCMD_COMPLETE		(1 << __SCMD_COMPLETE)
 
-Yeah, I don't know why I did it, :-(, the check is absolutely always true.
+This mixing of atomic and non-atomic bitops looks rather dangerous
+to me.  Can you add a new atomic_flags just for the completed flag,
+and always use the bitops on it for now? I think we can eventually
+kill most of the existing flags except for SCMD_TAGGED over the
+next merge window or two and then move that over as well.
 
-> 
-> > +
-> > +		if (bio->bi_disk)
-> > +			q = bio->bi_disk->queue;
-> > +
-> > +		/* disable multi-page bvec too if cluster isn't enabled */
-> > +		if (!q || !blk_queue_cluster(q) ||
-> > +		    ((page_to_phys(bv->bv_page) + bv->bv_offset + bv->bv_len) !=
-> > +		     (page_to_phys(page) + off)))
-> 
-> More unnecessary parentheses here.
-
-OK.
-
-Thanks,
-Ming
+Otherwise the concept looks fine to me.
