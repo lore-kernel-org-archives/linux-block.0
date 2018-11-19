@@ -2,116 +2,225 @@ Return-Path: <SRS0=iXKq=N6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47777C43441
-	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D860FC43441
+	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:33:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1C78520871
-	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:31:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C78520871
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTP id 9F40A20817
+	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:33:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F40A20817
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726659AbeKSSya (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Nov 2018 13:54:30 -0500
-Received: from mx2.suse.de ([195.135.220.15]:50806 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726088AbeKSSya (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Nov 2018 13:54:30 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay1.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 508C0AED4;
-        Mon, 19 Nov 2018 08:31:33 +0000 (UTC)
-Subject: Re: [PATCH 6/7] block: prevent merging of requests with different
- priorities
-To:     Damien Le Moal <damien.lemoal@wdc.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Adam Manzanares <adam.manzanares@wdc.com>,
+        id S1727085AbeKSSzg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Nov 2018 13:55:36 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:33826 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726910AbeKSSzg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Nov 2018 13:55:36 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1B57B3DE0A;
+        Mon, 19 Nov 2018 08:32:40 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-26.pek2.redhat.com [10.72.8.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 76F345D75D;
+        Mon, 19 Nov 2018 08:32:23 +0000 (UTC)
+Date:   Mon, 19 Nov 2018 16:32:19 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Omar Sandoval <osandov@osandov.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Dave Chinner <dchinner@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        linux-fsdevel@vger.kernel.org,
         Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org
-References: <20181119035131.11255-1-damien.lemoal@wdc.com>
- <20181119035131.11255-7-damien.lemoal@wdc.com>
-From:   Johannes Thumshirn <jthumshirn@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <9ab9df2c-286a-7ae4-f58e-bf6c64cfd356@suse.de>
-Date:   Mon, 19 Nov 2018 09:31:31 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Shaohua Li <shli@kernel.org>, linux-raid@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-btrfs@vger.kernel.org,
+        David Sterba <dsterba@suse.com>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Gao Xiang <gaoxiang25@huawei.com>,
+        Christoph Hellwig <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
+        linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
+        linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
+        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
+Subject: Re: [PATCH V10 12/19] block: allow bio_for_each_segment_all() to
+ iterate over multi-page bvec
+Message-ID: <20181119083218.GH16736@ming.t460p>
+References: <20181115085306.9910-1-ming.lei@redhat.com>
+ <20181115085306.9910-13-ming.lei@redhat.com>
+ <20181116012245.GG23828@vader>
 MIME-Version: 1.0
-In-Reply-To: <20181119035131.11255-7-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181116012245.GG23828@vader>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Mon, 19 Nov 2018 08:32:40 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+On Thu, Nov 15, 2018 at 05:22:45PM -0800, Omar Sandoval wrote:
+> On Thu, Nov 15, 2018 at 04:52:59PM +0800, Ming Lei wrote:
+> > This patch introduces one extra iterator variable to bio_for_each_segment_all(),
+> > then we can allow bio_for_each_segment_all() to iterate over multi-page bvec.
+> > 
+> > Given it is just one mechannical & simple change on all bio_for_each_segment_all()
+> > users, this patch does tree-wide change in one single patch, so that we can
+> > avoid to use a temporary helper for this conversion.
+> > 
+> > Cc: Dave Chinner <dchinner@redhat.com>
+> > Cc: Kent Overstreet <kent.overstreet@gmail.com>
+> > Cc: linux-fsdevel@vger.kernel.org
+> > Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+> > Cc: Shaohua Li <shli@kernel.org>
+> > Cc: linux-raid@vger.kernel.org
+> > Cc: linux-erofs@lists.ozlabs.org
+> > Cc: linux-btrfs@vger.kernel.org
+> > Cc: David Sterba <dsterba@suse.com>
+> > Cc: Darrick J. Wong <darrick.wong@oracle.com>
+> > Cc: Gao Xiang <gaoxiang25@huawei.com>
+> > Cc: Christoph Hellwig <hch@lst.de>
+> > Cc: Theodore Ts'o <tytso@mit.edu>
+> > Cc: linux-ext4@vger.kernel.org
+> > Cc: Coly Li <colyli@suse.de>
+> > Cc: linux-bcache@vger.kernel.org
+> > Cc: Boaz Harrosh <ooo@electrozaur.com>
+> > Cc: Bob Peterson <rpeterso@redhat.com>
+> > Cc: cluster-devel@redhat.com
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  block/bio.c                       | 27 ++++++++++++++++++---------
+> >  block/blk-zoned.c                 |  1 +
+> >  block/bounce.c                    |  6 ++++--
+> >  drivers/md/bcache/btree.c         |  3 ++-
+> >  drivers/md/dm-crypt.c             |  3 ++-
+> >  drivers/md/raid1.c                |  3 ++-
+> >  drivers/staging/erofs/data.c      |  3 ++-
+> >  drivers/staging/erofs/unzip_vle.c |  3 ++-
+> >  fs/block_dev.c                    |  6 ++++--
+> >  fs/btrfs/compression.c            |  3 ++-
+> >  fs/btrfs/disk-io.c                |  3 ++-
+> >  fs/btrfs/extent_io.c              | 12 ++++++++----
+> >  fs/btrfs/inode.c                  |  6 ++++--
+> >  fs/btrfs/raid56.c                 |  3 ++-
+> >  fs/crypto/bio.c                   |  3 ++-
+> >  fs/direct-io.c                    |  4 +++-
+> >  fs/exofs/ore.c                    |  3 ++-
+> >  fs/exofs/ore_raid.c               |  3 ++-
+> >  fs/ext4/page-io.c                 |  3 ++-
+> >  fs/ext4/readpage.c                |  3 ++-
+> >  fs/f2fs/data.c                    |  9 ++++++---
+> >  fs/gfs2/lops.c                    |  6 ++++--
+> >  fs/gfs2/meta_io.c                 |  3 ++-
+> >  fs/iomap.c                        |  6 ++++--
+> >  fs/mpage.c                        |  3 ++-
+> >  fs/xfs/xfs_aops.c                 |  5 +++--
+> >  include/linux/bio.h               | 11 +++++++++--
+> >  include/linux/bvec.h              | 31 +++++++++++++++++++++++++++++++
+> >  28 files changed, 129 insertions(+), 46 deletions(-)
+> > 
+> 
+> [snip]
+> 
+> > diff --git a/include/linux/bio.h b/include/linux/bio.h
+> > index 3496c816946e..1a2430a8b89d 100644
+> > --- a/include/linux/bio.h
+> > +++ b/include/linux/bio.h
+> > @@ -131,12 +131,19 @@ static inline bool bio_full(struct bio *bio)
+> >  	return bio->bi_vcnt >= bio->bi_max_vecs;
+> >  }
+> >  
+> > +#define bvec_for_each_segment(bv, bvl, i, iter_all)			\
+> > +	for (bv = bvec_init_iter_all(&iter_all);			\
+> > +		(iter_all.done < (bvl)->bv_len) &&			\
+> > +		((bvec_next_segment((bvl), &iter_all)), 1);		\
+> 
+> The parentheses around (bvec_next_segment((bvl), &iter_all)) are
+> unnecessary.
+
+OK.
+
+> 
+> > +		iter_all.done += bv->bv_len, i += 1)
+> > +
+> >  /*
+> >   * drivers should _never_ use the all version - the bio may have been split
+> >   * before it got to the driver and the driver won't own all of it
+> >   */
+> > -#define bio_for_each_segment_all(bvl, bio, i)				\
+> > -	for (i = 0, bvl = (bio)->bi_io_vec; i < (bio)->bi_vcnt; i++, bvl++)
+> > +#define bio_for_each_segment_all(bvl, bio, i, iter_all)		\
+> > +	for (i = 0, iter_all.idx = 0; iter_all.idx < (bio)->bi_vcnt; iter_all.idx++)	\
+> > +		bvec_for_each_segment(bvl, &((bio)->bi_io_vec[iter_all.idx]), i, iter_all)
+> 
+> Would it be possible to move i into iter_all to streamline this a bit?
+
+That may may cause unnecessary conversion work for us, because the local
+variable 'i' is defined in external function.
+
+> 
+> >  static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+> >  				      unsigned bytes, bool mp)
+> > diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+> > index 01616a0b6220..02f26d2b59ad 100644
+> > --- a/include/linux/bvec.h
+> > +++ b/include/linux/bvec.h
+> > @@ -82,6 +82,12 @@ struct bvec_iter {
+> >  						   current bvec */
+> >  };
+> >  
+> > +struct bvec_iter_all {
+> > +	struct bio_vec	bv;
+> > +	int		idx;
+> > +	unsigned	done;
+> > +};
+> > +
+> >  /*
+> >   * various member access, note that bio_data should of course not be used
+> >   * on highmem page vectors
+> > @@ -216,6 +222,31 @@ static inline bool mp_bvec_iter_advance(const struct bio_vec *bv,
+> >  	.bi_bvec_done	= 0,						\
+> >  }
+> >  
+> > +static inline struct bio_vec *bvec_init_iter_all(struct bvec_iter_all *iter_all)
+> > +{
+> > +	iter_all->bv.bv_page = NULL;
+> > +	iter_all->done = 0;
+> > +
+> > +	return &iter_all->bv;
+> > +}
+> > +
+> > +/* used for chunk_for_each_segment */
+> > +static inline void bvec_next_segment(const struct bio_vec *bvec,
+> > +		struct bvec_iter_all *iter_all)
+> 
+> Indentation.
+
+OK.
+
+> 
+> > +{
+> > +	struct bio_vec *bv = &iter_all->bv;
+> > +
+> > +	if (bv->bv_page) {
+> > +		bv->bv_page += 1;
+> > +		bv->bv_offset = 0;
+> > +	} else {
+> > +		bv->bv_page = bvec->bv_page;
+> > +		bv->bv_offset = bvec->bv_offset;
+> > +	}
+> > +	bv->bv_len = min_t(unsigned int, PAGE_SIZE - bv->bv_offset,
+> > +			bvec->bv_len - iter_all->done);
+> 
+> Indentation.
+
+OK.
 
 -- 
-Johannes Thumshirn                                        SUSE Labs
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Ming
