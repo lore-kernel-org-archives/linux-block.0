@@ -3,36 +3,35 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6D53C43441
-	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:26:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16EDBC43441
+	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:27:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 78F8320871
-	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:26:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78F8320871
+	by mail.kernel.org (Postfix) with ESMTP id DC02920684
+	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 08:27:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC02920684
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727046AbeKSStU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Nov 2018 13:49:20 -0500
-Received: from mx2.suse.de ([195.135.220.15]:50082 "EHLO mx1.suse.de"
+        id S1727133AbeKSSuV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Nov 2018 13:50:21 -0500
+Received: from mx2.suse.de ([195.135.220.15]:50310 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726175AbeKSStT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Nov 2018 13:49:19 -0500
+        id S1726175AbeKSSuV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 19 Nov 2018 13:50:21 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay1.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id E93F5AECF;
-        Mon, 19 Nov 2018 08:26:22 +0000 (UTC)
-Subject: Re: [PATCH 4/7] block: Introduce get_current_ioprio()
+        by mx1.suse.de (Postfix) with ESMTP id A2E36AECF;
+        Mon, 19 Nov 2018 08:27:24 +0000 (UTC)
+Subject: Re: [PATCH 5/7] aio: Fix fallback I/O priority value
 To:     Damien Le Moal <damien.lemoal@wdc.com>,
         linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 Cc:     Adam Manzanares <adam.manzanares@wdc.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-fsdevel@vger.kernel.org
 References: <20181119035131.11255-1-damien.lemoal@wdc.com>
- <20181119035131.11255-5-damien.lemoal@wdc.com>
+ <20181119035131.11255-6-damien.lemoal@wdc.com>
 From:   Johannes Thumshirn <jthumshirn@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
@@ -90,12 +89,12 @@ Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
  l2t2TyTuHm7wVUY2J3gJYgG723/PUGW4LaoqNrYQUr/rqo6NXw6c+EglRpm1BdpkwPwAng63
  W5VOQMdnozD2RsDM5GfA4aEFi5m00tE+8XPICCtkduyWw+Z+zIqYk2v+zraPLs9Gs0X2C7X0
  yvqY9voUoJjG6skkOToGZbqtMX9K4GOv9JAxVs075QRXL3brHtHONDt6udYobzz+
-Message-ID: <58b7dac5-4ebc-ef70-d4ed-3856bfab7dd1@suse.de>
-Date:   Mon, 19 Nov 2018 09:26:22 +0100
+Message-ID: <6e98eb7f-9829-867d-c1e3-89497d440714@suse.de>
+Date:   Mon, 19 Nov 2018 09:27:24 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20181119035131.11255-5-damien.lemoal@wdc.com>
+In-Reply-To: <20181119035131.11255-6-damien.lemoal@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -105,7 +104,7 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 Looks good,
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Reiewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 
 -- 
 Johannes Thumshirn                                        SUSE Labs
