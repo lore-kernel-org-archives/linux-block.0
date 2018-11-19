@@ -4,56 +4,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE84C43441
-	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 10:35:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4136AC43441
+	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 10:35:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4B4C92086A
-	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 10:35:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F20A020823
+	for <linux-block@archiver.kernel.org>; Mon, 19 Nov 2018 10:35:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="YfU6dTeT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B4C92086A
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="hcuU6/Vq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F20A020823
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728285AbeKSU6K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 19 Nov 2018 15:58:10 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:39984 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728342AbeKSU6K (ORCPT
+        id S1728431AbeKSU6U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 19 Nov 2018 15:58:20 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:53363 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728426AbeKSU6T (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 19 Nov 2018 15:58:10 -0500
-Received: by mail-wr1-f68.google.com with SMTP id p4so22274523wrt.7
-        for <linux-block@vger.kernel.org>; Mon, 19 Nov 2018 02:34:56 -0800 (PST)
+        Mon, 19 Nov 2018 15:58:19 -0500
+Received: by mail-wm1-f65.google.com with SMTP id g131so4347008wmg.3
+        for <linux-block@vger.kernel.org>; Mon, 19 Nov 2018 02:35:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=hWUit/vYiH26YHlA9buP+oQITDwnzmUPMPxq3d9LPkE=;
-        b=YfU6dTeTHM5A73Tg5BMA4Dw8e7o9lmuB/XXB5c23ILL9CwfpTx7baLDS9fcxsc4otQ
-         h+tJUzNJjWWpTo+fcsVP95Nv2im3yghKNLInHuZODRvbKsDeb2XPU70gXHTWu30bsKH+
-         nOdzVt5hy9oioZwEv6JpXsY9wqtsNzerY764E=
+        bh=2PZH8WwXkvnGeOOTNTp/CB09k6USJvSSB6C0CaaMGjI=;
+        b=hcuU6/VqTQwptGHjtIMvqO0p51x14o0CH8VynZz+6pAYFV8wdEQyx+ljlgfV6rV2w7
+         ITCCyWJsgcX5EmmWYweoyDAMoKM4kZS/0KIuLLINuDr3CFzBBAYSz+58G1YiRCRMTQrt
+         ivc6Bbj1bt5nmThOu57faArw/3BCDnwjUELl8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=hWUit/vYiH26YHlA9buP+oQITDwnzmUPMPxq3d9LPkE=;
-        b=G39A/XOZapKRKjAkWYq3CfTo8FbrFnZF4JwzPiy433iCb9fp6XKyUz2b+fzqeB+zKL
-         Nv5SnwIOzYx3Qazx4HNyrRUSnEZ3JfF3P5bR2B3X/LRMP4nwwWS6pyD2178QWHKRxE1E
-         Tp8PHbst5/pU1zXt4QcMbdS2uOrd4IE3RZuNOXmtdfLg88qomvLZwqL7vu1aBEUYFKw/
-         IIvXjXuAY3VLLzUECIJezKFezwLwK6AHRVGw68VVn+zsorF4OIwMQhOG4P82b7gQCjSp
-         RoqmYdWqr4YZdZLh2bNGDJVpCcZI7QNQgwa3GPh9+Q/y31d0LUH8xcq+5wHLl/Yf0SLC
-         F/3g==
-X-Gm-Message-State: AGRZ1gLbRNRtUydKiAx9mil4XiJiORND/slJcxDNlyc6BF+ErzPBy/BT
-        nwegEgoweF/JsCIV8EjrZOCOEw==
-X-Google-Smtp-Source: AJdET5fCheLXk7HslibEJh72wzIBDKuwOox1n0FqTi3WVYdm8eRpBK2TFHFO6xuNfT2KcB6yhBtsJg==
-X-Received: by 2002:adf:9387:: with SMTP id 7-v6mr17123195wrp.269.1542623695517;
-        Mon, 19 Nov 2018 02:34:55 -0800 (PST)
+        bh=2PZH8WwXkvnGeOOTNTp/CB09k6USJvSSB6C0CaaMGjI=;
+        b=tKWGN2H2EQXK5UX2xb+/ac9ThMLbrJaBnfTf8AF406rL4H6yjmd1KdyBFLSC6XTRhC
+         7f/1nfs7WNDxXq+naPX+JBG9Q3KvHBXfS0s4mpIyj+lCyOkb2QKFJ9XFwkbRgb1f+OKT
+         /Lf4I1LRh8MKHGJRswfxBUY8+9UXwQX4YN12o+GwMmhU3IBuagpFGEeXV98grJDwfn+d
+         xeAran4E7kZ5c3Qac0ErYQVTJs4d2zUYqCuMOskvJXaJgxpHNWvmDzy4cI1MDTeXpLbw
+         A5sHuu0valS0++tDstmh6UpjFFLShUJysGT/EDoYcZJgj74PmIysUdIET/MxdqUFy2fk
+         k/ZA==
+X-Gm-Message-State: AGRZ1gJClcXd31Y4C6/BPfBEIc4BpRl2rrOzhraIDvSQbnjGVd74Lyce
+        vsBpDuhzT7EKLBfAtfuEQirIOw==
+X-Google-Smtp-Source: AFSGD/V/PzPvdMmgio2MMuksaWEdLCDo8SfjRuu380b7ZwE1q0ngjmXv93lavCq2gXUdRW2aWbo06w==
+X-Received: by 2002:a1c:ddc3:: with SMTP id u186mr6436592wmg.110.1542623705169;
+        Mon, 19 Nov 2018 02:35:05 -0800 (PST)
 Received: from localhost.localdomain ([37.162.18.180])
-        by smtp.gmail.com with ESMTPSA id e9sm14973298wro.16.2018.11.19.02.34.52
+        by smtp.gmail.com with ESMTPSA id e9sm14973298wro.16.2018.11.19.02.35.02
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 19 Nov 2018 02:34:55 -0800 (PST)
+        Mon, 19 Nov 2018 02:35:04 -0800 (PST)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -70,9 +70,9 @@ Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         oleksandr@natalenko.name, cgroups@vger.kernel.org,
         linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
         Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH V2 07/10] block, bfq: use standard file names for the proportional-share policy
-Date:   Mon, 19 Nov 2018 11:34:21 +0100
-Message-Id: <20181119103424.3853-8-paolo.valente@linaro.org>
+Subject: [PATCH V2 10/10] doc, bfq-iosched: make it consistent with the new cgroup interface
+Date:   Mon, 19 Nov 2018 11:34:24 +0100
+Message-Id: <20181119103424.3853-11-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.16.1
 In-Reply-To: <20181119103424.3853-1-paolo.valente@linaro.org>
 References: <20181119103424.3853-1-paolo.valente@linaro.org>
@@ -81,225 +81,69 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Some of the files exposed in a cgroup by bfq, for the proportional
-share policy, have the same meaning as the files owned by cfq (before
-legacy blk was removed).
+BFQ now shares interface files with CFQ, for the proportional-share
+policy. Make documentation consistent with that.
 
-The old implementation of the cgroup interface didn't allow different
-entities to create cgroup files with the same name (in the same
-subsystem). So, for bfq, we had to add the prefix "bfq" to the names
-of its cgroup files.
-
-This commit renames the cgroup files of the bfq scheduler as those
-exposed by cfq, and makes bfq willing to share these files with any
-other future policy.
-
-Signed-off-by: Angelo Ruocco <angeloruocco90@gmail.com>
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/bfq-cgroup.c | 94 +++++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 69 insertions(+), 25 deletions(-)
+ Documentation/block/bfq-iosched.txt | 28 +++++++++++++++-------------
+ 1 file changed, 15 insertions(+), 13 deletions(-)
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 038e418fa64f..0643147b2cbc 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -1055,50 +1055,67 @@ struct blkcg_policy blkcg_policy_bfq = {
+diff --git a/Documentation/block/bfq-iosched.txt b/Documentation/block/bfq-iosched.txt
+index 6d7dd5ab8554..3d7ef138ce6a 100644
+--- a/Documentation/block/bfq-iosched.txt
++++ b/Documentation/block/bfq-iosched.txt
+@@ -508,12 +508,14 @@ process.
+ To get proportional sharing of bandwidth with BFQ for a given device,
+ BFQ must of course be the active scheduler for that device.
  
- struct cftype bfq_blkcg_legacy_files[] = {
- 	{
--		.name = "bfq.weight",
--		.flags = CFTYPE_NOT_ON_ROOT,
-+		.name = "weight",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_NOT_ON_ROOT | CFTYPE_SHARES_FILE,
- 		.seq_show = bfq_io_show_weight,
- 		.write_u64 = bfq_io_set_weight_legacy,
- 	},
+-Within each group directory, the names of the files associated with
+-BFQ-specific cgroup parameters and stats begin with the "bfq."
+-prefix. So, with cgroups-v1 or cgroups-v2, the full prefix for
+-BFQ-specific files is "blkio.bfq." or "io.bfq." For example, the group
+-parameter to set the weight of a group with BFQ is blkio.bfq.weight
+-or io.bfq.weight.
++BFQ uses the standard interface files of the proportional-share
++policy, previously used by CFQ. If one such file is read/written, then
++the operation associated with the file is performed by BFQ for each
++device where BFQ is the active scheduler. In addition, BFQ is
++configured so as to share interface files with other entities (if some
++of these files does happen to be shared, then its associated operation
++is performed also by any of the other entities that is using the
++file).
  
- 	/* statistics, covers only the tasks in the bfqg */
- 	{
--		.name = "bfq.io_service_bytes",
-+		.name = "io_service_bytes",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = (unsigned long)&blkcg_policy_bfq,
- 		.seq_show_cft = blkg_print_stat_bytes,
- 	},
- 	{
--		.name = "bfq.io_serviced",
-+		.name = "io_serviced",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = (unsigned long)&blkcg_policy_bfq,
- 		.seq_show_cft = blkg_print_stat_ios,
- 	},
- #ifdef CONFIG_DEBUG_BLK_CGROUP
- 	{
--		.name = "bfq.time",
-+		.name = "time",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.time),
- 		.seq_show_cft = bfqg_print_stat,
- 	},
- 	{
--		.name = "bfq.sectors",
-+		.name = "sectors",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.seq_show = bfqg_print_stat_sectors,
- 	},
- 	{
--		.name = "bfq.io_service_time",
-+		.name = "io_service_time",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.service_time),
- 		.seq_show_cft = bfqg_print_rwstat,
- 	},
- 	{
--		.name = "bfq.io_wait_time",
-+		.name = "io_wait_time",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.wait_time),
- 		.seq_show_cft = bfqg_print_rwstat,
- 	},
- 	{
--		.name = "bfq.io_merged",
-+		.name = "io_merged",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.merged),
- 		.seq_show_cft = bfqg_print_rwstat,
- 	},
- 	{
--		.name = "bfq.io_queued",
-+		.name = "io_queued",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.queued),
- 		.seq_show_cft = bfqg_print_rwstat,
- 	},
-@@ -1106,66 +1123,92 @@ struct cftype bfq_blkcg_legacy_files[] = {
+ As for cgroups-v1 (blkio controller), the exact set of stat files
+ created, and kept up-to-date by bfq, depends on whether
+@@ -521,13 +523,13 @@ CONFIG_DEBUG_BLK_CGROUP is set. If it is set, then bfq creates all
+ the stat files documented in
+ Documentation/cgroup-v1/blkio-controller.txt. If, instead,
+ CONFIG_DEBUG_BLK_CGROUP is not set, then bfq creates only the files
+-blkio.bfq.io_service_bytes
+-blkio.bfq.io_service_bytes_recursive
+-blkio.bfq.io_serviced
+-blkio.bfq.io_serviced_recursive
++blkio.io_service_bytes
++blkio.io_service_bytes_recursive
++blkio.io_serviced
++blkio.io_serviced_recursive
  
- 	/* the same statictics which cover the bfqg and its descendants */
- 	{
--		.name = "bfq.io_service_bytes_recursive",
-+		.name = "io_service_bytes_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = (unsigned long)&blkcg_policy_bfq,
- 		.seq_show_cft = blkg_print_stat_bytes_recursive,
- 	},
- 	{
--		.name = "bfq.io_serviced_recursive",
-+		.name = "io_serviced_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = (unsigned long)&blkcg_policy_bfq,
- 		.seq_show_cft = blkg_print_stat_ios_recursive,
- 	},
- #ifdef CONFIG_DEBUG_BLK_CGROUP
- 	{
--		.name = "bfq.time_recursive",
-+		.name = "time_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.time),
- 		.seq_show_cft = bfqg_print_stat_recursive,
- 	},
- 	{
--		.name = "bfq.sectors_recursive",
-+		.name = "sectors_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.seq_show = bfqg_print_stat_sectors_recursive,
- 	},
- 	{
--		.name = "bfq.io_service_time_recursive",
-+		.name = "io_service_time_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.service_time),
- 		.seq_show_cft = bfqg_print_rwstat_recursive,
- 	},
- 	{
--		.name = "bfq.io_wait_time_recursive",
-+		.name = "io_wait_time_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.wait_time),
- 		.seq_show_cft = bfqg_print_rwstat_recursive,
- 	},
- 	{
--		.name = "bfq.io_merged_recursive",
-+		.name = "io_merged_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.merged),
- 		.seq_show_cft = bfqg_print_rwstat_recursive,
- 	},
- 	{
--		.name = "bfq.io_queued_recursive",
-+		.name = "io_queued_recursive",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.queued),
- 		.seq_show_cft = bfqg_print_rwstat_recursive,
- 	},
- 	{
--		.name = "bfq.avg_queue_size",
-+		.name = "avg_queue_size",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.seq_show = bfqg_print_avg_queue_size,
- 	},
- 	{
--		.name = "bfq.group_wait_time",
-+		.name = "group_wait_time",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.group_wait_time),
- 		.seq_show_cft = bfqg_print_stat,
- 	},
- 	{
--		.name = "bfq.idle_time",
-+		.name = "idle_time",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.idle_time),
- 		.seq_show_cft = bfqg_print_stat,
- 	},
- 	{
--		.name = "bfq.empty_time",
-+		.name = "empty_time",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.empty_time),
- 		.seq_show_cft = bfqg_print_stat,
- 	},
- 	{
--		.name = "bfq.dequeue",
-+		.name = "dequeue",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_SHARES_FILE,
- 		.private = offsetof(struct bfq_group, stats.dequeue),
- 		.seq_show_cft = bfqg_print_stat,
- 	},
-@@ -1175,8 +1218,9 @@ struct cftype bfq_blkcg_legacy_files[] = {
+ The value of CONFIG_DEBUG_BLK_CGROUP greatly influences the maximum
+-throughput sustainable with bfq, because updating the blkio.bfq.*
++throughput sustainable with BFQ, because updating the blkio.*
+ stats is rather costly, especially for some of the stats enabled by
+ CONFIG_DEBUG_BLK_CGROUP.
  
- struct cftype bfq_blkg_files[] = {
- 	{
--		.name = "bfq.weight",
--		.flags = CFTYPE_NOT_ON_ROOT,
-+		.name = "weight",
-+		.owner_name = "bfq",
-+		.flags = CFTYPE_NOT_ON_ROOT | CFTYPE_SHARES_FILE,
- 		.seq_show = bfq_io_show_weight,
- 		.write = bfq_io_set_weight,
- 	},
+@@ -536,8 +538,8 @@ Parameters to set
+ 
+ For each group, there is only the following parameter to set.
+ 
+-weight (namely blkio.bfq.weight or io.bfq-weight): the weight of the
+-group inside its parent. Available values: 1..10000 (default 100). The
++weight (namely blkio.weight or io.weight): the weight of the group
++inside its parent. Available values: 1..10000 (default 100). The
+ linear mapping between ioprio and weights, described at the beginning
+ of the tunable section, is still valid, but all weights higher than
+ IOPRIO_BE_NR*10 are mapped to ioprio 0.
 -- 
 2.16.1
 
