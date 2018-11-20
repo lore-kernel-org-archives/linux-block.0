@@ -2,93 +2,76 @@ Return-Path: <SRS0=hv45=N7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60DDFC43610
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 07:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CF87C43610
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 09:12:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4291720C01
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 07:51:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="a+zu7xfp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4291720C01
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linuxfoundation.org
+	by mail.kernel.org (Postfix) with ESMTP id 3EF8A20851
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 09:12:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EF8A20851
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725846AbeKTSTi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Nov 2018 13:19:38 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59224 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725843AbeKTSTi (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Nov 2018 13:19:38 -0500
-Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5283D208E3;
-        Tue, 20 Nov 2018 07:51:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1542700312;
-        bh=6GCS43V8awYkBugZseUHHbkEXc1GQV8mg6BZ2jqoBhY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=a+zu7xfpgEnbfealCnLtt0/54tD5PMXLJq4U7gW2Jldi1ZygtxZ3lQ9o0R/U1jpyR
-         bnb0ZgQylu7C8RqYpYDkwNgsTUYKXXZIvwaZaMBFGFk3/GOIPsC4AhCtOe8qDbuxJc
-         GkHMjSoXBC0kqBuviem9SWsjuOifa0+S/4zeWukI=
-Date:   Tue, 20 Nov 2018 08:51:50 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "jianchao.wang" <jianchao.w.wang@oracle.com>,
-        Guenter Roeck <linux@roeck-us.net>, stable@vger.kernel.org
-Subject: Re: [PATCH 4.21 V3] blk-mq: not embed .mq_kobj and ctx->kobj into
- queue instance
-Message-ID: <20181120075150.GF15276@kroah.com>
-References: <20181120014435.3339-1-ming.lei@redhat.com>
+        id S1726947AbeKTTkE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Nov 2018 14:40:04 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:46644 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726477AbeKTTkD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Nov 2018 14:40:03 -0500
+Received: by mail-pg1-f195.google.com with SMTP id w7so608903pgp.13
+        for <linux-block@vger.kernel.org>; Tue, 20 Nov 2018 01:11:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+q5C+uYVKKPqSoB1P44kuuer33ia3HXfMmyHtl6CaQg=;
+        b=at70GId0mP7cPvsCweL7AtZT1J20EhtlpzVJWjIDl7MTm/OEzROatSuneSiaqXkwgv
+         Dp0oBRnSZwgdr5TVWA21DPWlUpluxZDm5U5+seSAxmaPO94taAyGOyFHRjdZCpUI3q2k
+         0BWHihnTJHJXdFJaVdu60rvyUlpvVx7YupgyihT3jxRGWWWznT/FboeUHxz7wNyO/l0Y
+         xuNLUhGkdw6imG2BFAE60nuHqny6bVQwOeE2dV2YgmXCksYE8EYkhTFg1Rf7aOBupmt7
+         2ufsVb37gDKgdFD831/t4Vw2SP58J95bto9Jev7Zp5nV7rSDYSXIhgMXwsSL3mzeaxNv
+         HeZw==
+X-Gm-Message-State: AA+aEWZnEKZ0ptmPeH71Dc9Kq18IP3aNvwqq8ZLnlt/IIZtXyma7GCIH
+        3kZ0InTtSGEtoXc2gFE8+1kxT9yP
+X-Google-Smtp-Source: AFSGD/XGxIpeb5dyexE3wp6S8i3Ns4lcA7eyEQw3nMBBb6hNJYrcJh1/Ds2uoD1v4SvqPtViD8fBBg==
+X-Received: by 2002:a63:e001:: with SMTP id e1mr1179803pgh.39.1542705118852;
+        Tue, 20 Nov 2018 01:11:58 -0800 (PST)
+Received: from ?IPv6:2601:647:4800:973f:8a0:7611:3223:f4db? ([2601:647:4800:973f:8a0:7611:3223:f4db])
+        by smtp.gmail.com with ESMTPSA id z62sm25646716pfl.33.2018.11.20.01.11.57
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 20 Nov 2018 01:11:57 -0800 (PST)
+Subject: Re: [PATCH 6/7] block: make blk_poll() take a parameter on whether to
+ spin or not
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+References: <20181117214354.822-1-axboe@kernel.dk>
+ <20181117214354.822-7-axboe@kernel.dk> <20181119080544.GF9622@infradead.org>
+ <04b6015e-2949-750d-01a0-640373b406ea@kernel.dk>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <5caad4a6-d9af-df12-1eed-6d2c9906457f@grimberg.me>
+Date:   Tue, 20 Nov 2018 01:11:56 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181120014435.3339-1-ming.lei@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <04b6015e-2949-750d-01a0-640373b406ea@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 20, 2018 at 09:44:35AM +0800, Ming Lei wrote:
-> Even though .mq_kobj, ctx->kobj and q->kobj share same lifetime
-> from block layer's view, actually they don't because userspace may
-> grab one kobject anytime via sysfs.
-> 
-> This patch fixes the issue by the following approach:
-> 
-> 1) introduce 'struct blk_mq_ctxs' for holding .mq_kobj and managing
-> all ctxs
-> 
-> 2) free all allocated ctxs and the 'blk_mq_ctxs' instance in release
-> handler of .mq_kobj
-> 
-> 3) grab one ref of .mq_kobj before initializing each ctx->kobj, so that
-> .mq_kobj is always released after all ctxs are freed.
-> 
-> This patch fixes kernel panic issue during booting when DEBUG_KOBJECT_RELEASE
-> is enabled.
-> 
-> Reported-by: Guenter Roeck <linux@roeck-us.net>
-> Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>
-> Cc: Guenter Roeck <linux@roeck-us.net>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
-> V3:
-> 	- keep to allocate q->queue_ctx via percpu allocator, so one extra
-> 	  pointer reference can be saved for getting ctx
-> V2:
-> 	- allocate 'blk_mq_ctx' inside blk_mq_init_allocated_queue()
-> 	- allocate q->mq_kobj directly 
 
-Not tested, but seems sane from a kobject point-of-view:
+>> This opportunistic poll is pretty bogus now as we never set the HIPRI
+>> flag and it should probably be removed in a prep patch.  We should then
+>> later try to use a scheme similar to your aio polling for the nvme
+>> target as well.
+> 
+> I'll kill it in a pre-patch.
 
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Agreed..
