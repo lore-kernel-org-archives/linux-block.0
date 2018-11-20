@@ -4,55 +4,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 405EDC43441
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 01:52:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEFF5C43441
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 01:52:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 064C52080C
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 01:52:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9378E2080C
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 01:52:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="owcZLdMV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 064C52080C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="SroPo51z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9378E2080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732676AbeKTMTY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Nov 2018 07:19:24 -0500
+        id S1732688AbeKTMT0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Nov 2018 07:19:26 -0500
 Received: from esa5.hgst.iphmx.com ([216.71.153.144]:40409 "EHLO
         esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730379AbeKTMTY (ORCPT
+        with ESMTP id S1730379AbeKTMT0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Nov 2018 07:19:24 -0500
+        Tue, 20 Nov 2018 07:19:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1542678767; x=1574214767;
+  t=1542678769; x=1574214769;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=8u6/urnTFpqshHyKlRjyPTXdhxYafyiTOsIsLu1oEtY=;
-  b=owcZLdMVzZmYQ5+JPp16JeQszS+FB9BcgtcWN5C8uKZI/BevQFAmSO5q
-   dHdyNIhQszVaQ0iqv/vCiJltrCeDHKjRa7maRu6QqBCUnRcc+/lAululd
-   dV4D4lMLjO3f/Mt4/x4H4c5wMSSetjwEgiPOgk1GUDtZtyp/i5H6oWHVj
-   /6AAJI4m2PldWg6qf/tGI9DshHg5KXSgpD/hADauWOABZovYDDgy6aftR
-   AkDfSJ1/4hZfuJz2GuGggLqXoOFE3bE+3Xp+tSkT2J94W6yLksPNbhhSD
-   IjkhGWuMREQWHyC2zRylcHtxl79H/mpLO6UaCvoS8FFauz1/nFEiha/tB
-   w==;
+  bh=vuBdbepM0Yy0VdI3VUb8R1S5fsJ4V8LQf3FXWW4S2LI=;
+  b=SroPo51zcw3cZ9BXtDcy8QL3asY6Z7E6C6bWFwBV1Gs3uFItKUjKo4CG
+   y2VlBYyw665iqB0g9CQBQPbbtLZKSTXNP+NKnP1zvYIOSFEwVfnN4Rw7w
+   VSbu+Qe/GmZxUHLz++TZmSWfUpmCpC2/tqV66QjLQX5ErfJKQHCIRt5oD
+   Va4mnGZqaXcG/EmxqG2AzkPwNcfuRYAu+DIANV8pz0y4YLOZEPJxcE/mi
+   srqjI9XGdFGCh2bMPryu78YQd5wU1wGBKQNNHxqg1qmBlUWpl2vSKPTLA
+   HUJktxlr5P4rFxQ84yrVoxfv0gluBO+68I+NvxLiGMaE8SR2Tq91TWwfH
+   Q==;
 X-IronPort-AV: E=Sophos;i="5.56,255,1539619200"; 
-   d="scan'208";a="95813259"
+   d="scan'208";a="95813269"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 20 Nov 2018 09:52:47 +0800
+  by ob1.hgst.iphmx.com with ESMTP; 20 Nov 2018 09:52:49 +0800
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP; 19 Nov 2018 17:36:02 -0800
+  by uls-op-cesaep02.wdc.com with ESMTP; 19 Nov 2018 17:36:04 -0800
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 19 Nov 2018 17:52:45 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 19 Nov 2018 17:52:47 -0800
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 Cc:     Adam Manzanares <adam.manzanares@wdc.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-fsdevel@vger.kernel.org
-Subject: [PATCH v2 2/6] block: Remove bio->bi_ioc
-Date:   Tue, 20 Nov 2018 10:52:34 +0900
-Message-Id: <20181120015238.26467-3-damien.lemoal@wdc.com>
+Subject: [PATCH v2 3/6] block: Introduce get_current_ioprio()
+Date:   Tue, 20 Nov 2018 10:52:35 +0900
+Message-Id: <20181120015238.26467-4-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181120015238.26467-1-damien.lemoal@wdc.com>
 References: <20181120015238.26467-1-damien.lemoal@wdc.com>
@@ -63,144 +64,66 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bio->bi_ioc is never set so always NULL. Remove references to it in
-bio_disassociate_task() and in rq_ioc() and delete this field from
-struct bio. With this change, rq_ioc() always returns
-current->io_context without the need for a bio argument. Further
-simplify the code and make it more readable by also removing this
-helper, which also allows to simplify blk_mq_sched_assign_ioc() by
-removing its bio argument.
+Define get_current_ioprio() as an inline helper to obtain the caller
+I/O priority from its task I/O context. Use this helper in
+blk_init_request_from_bio() to set a request ioprio.
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Reviewed-by: Adam Manzanares <adam.manzanares@wdc.com>
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- block/bio.c               |  4 ----
- block/blk-core.c          |  2 +-
- block/blk-mq-sched.c      |  4 ++--
- block/blk-mq-sched.h      |  2 +-
- block/blk-mq.c            |  4 ++--
- block/blk.h               | 16 ----------------
- include/linux/blk_types.h |  3 +--
- 7 files changed, 7 insertions(+), 28 deletions(-)
+ block/blk-core.c       |  6 +-----
+ include/linux/ioprio.h | 13 +++++++++++++
+ 2 files changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 4f4d9884443b..03895cc0d74a 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -2027,10 +2027,6 @@ int bio_associate_blkg(struct bio *bio, struct blkcg_gq *blkg)
-  */
- void bio_disassociate_task(struct bio *bio)
- {
--	if (bio->bi_ioc) {
--		put_io_context(bio->bi_ioc);
--		bio->bi_ioc = NULL;
--	}
- 	if (bio->bi_css) {
- 		css_put(bio->bi_css);
- 		bio->bi_css = NULL;
 diff --git a/block/blk-core.c b/block/blk-core.c
-index d6e8ab9ca99d..492648c96992 100644
+index 492648c96992..4450d3c08f25 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -813,7 +813,7 @@ unsigned int blk_plug_queued_count(struct request_queue *q)
+@@ -813,18 +813,14 @@ unsigned int blk_plug_queued_count(struct request_queue *q)
  
  void blk_init_request_from_bio(struct request *req, struct bio *bio)
  {
--	struct io_context *ioc = rq_ioc(bio);
-+	struct io_context *ioc = current->io_context;
- 
+-	struct io_context *ioc = current->io_context;
+-
  	if (bio->bi_opf & REQ_RAHEAD)
  		req->cmd_flags |= REQ_FAILFAST_MASK;
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index d084f731d104..13b8dc332541 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -31,10 +31,10 @@ void blk_mq_sched_free_hctx_data(struct request_queue *q,
+ 
+ 	req->__sector = bio->bi_iter.bi_sector;
+ 	if (ioprio_valid(bio_prio(bio)))
+ 		req->ioprio = bio_prio(bio);
+-	else if (ioc)
+-		req->ioprio = ioc->ioprio;
+ 	else
+-		req->ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
++		req->ioprio = get_current_ioprio();
+ 	req->write_hint = bio->bi_write_hint;
+ 	blk_rq_bio_prep(req->q, req, bio);
  }
- EXPORT_SYMBOL_GPL(blk_mq_sched_free_hctx_data);
+diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
+index 9e30ed6443db..e9bfe6972aed 100644
+--- a/include/linux/ioprio.h
++++ b/include/linux/ioprio.h
+@@ -70,6 +70,19 @@ static inline int task_nice_ioclass(struct task_struct *task)
+ 		return IOPRIO_CLASS_BE;
+ }
  
--void blk_mq_sched_assign_ioc(struct request *rq, struct bio *bio)
-+void blk_mq_sched_assign_ioc(struct request *rq)
- {
- 	struct request_queue *q = rq->q;
--	struct io_context *ioc = rq_ioc(bio);
++/*
++ * If the calling process has set an I/O priority, use that. Otherwise, return
++ * the default I/O priority.
++ */
++static inline int get_current_ioprio(void)
++{
 +	struct io_context *ioc = current->io_context;
- 	struct io_cq *icq;
- 
- 	spin_lock_irq(&q->queue_lock);
-diff --git a/block/blk-mq-sched.h b/block/blk-mq-sched.h
-index 7ff5671bf128..0f719c8532ae 100644
---- a/block/blk-mq-sched.h
-+++ b/block/blk-mq-sched.h
-@@ -8,7 +8,7 @@
- void blk_mq_sched_free_hctx_data(struct request_queue *q,
- 				 void (*exit)(struct blk_mq_hw_ctx *));
- 
--void blk_mq_sched_assign_ioc(struct request *rq, struct bio *bio);
-+void blk_mq_sched_assign_ioc(struct request *rq);
- 
- void blk_mq_sched_request_inserted(struct request *rq);
- bool blk_mq_sched_try_merge(struct request_queue *q, struct bio *bio,
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 32b246ed44c0..636f80b96fa6 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -389,8 +389,8 @@ static struct request *blk_mq_get_request(struct request_queue *q,
- 	if (!op_is_flush(data->cmd_flags)) {
- 		rq->elv.icq = NULL;
- 		if (e && e->type->ops.prepare_request) {
--			if (e->type->icq_cache && rq_ioc(bio))
--				blk_mq_sched_assign_ioc(rq, bio);
-+			if (e->type->icq_cache)
-+				blk_mq_sched_assign_ioc(rq);
- 
- 			e->type->ops.prepare_request(rq, bio);
- 			rq->rq_flags |= RQF_ELVPRIV;
-diff --git a/block/blk.h b/block/blk.h
-index 816a9abb87cd..610948157a5b 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -254,22 +254,6 @@ void ioc_clear_queue(struct request_queue *q);
- 
- int create_task_io_context(struct task_struct *task, gfp_t gfp_mask, int node);
- 
--/**
-- * rq_ioc - determine io_context for request allocation
-- * @bio: request being allocated is for this bio (can be %NULL)
-- *
-- * Determine io_context to use for request allocation for @bio.  May return
-- * %NULL if %current->io_context doesn't exist.
-- */
--static inline struct io_context *rq_ioc(struct bio *bio)
--{
--#ifdef CONFIG_BLK_CGROUP
--	if (bio && bio->bi_ioc)
--		return bio->bi_ioc;
--#endif
--	return current->io_context;
--}
--
- /**
-  * create_io_context - try to create task->io_context
-  * @gfp_mask: allocation mask
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index dbdbfbd6a987..c0ba1a038ff3 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -174,10 +174,9 @@ struct bio {
- 	void			*bi_private;
- #ifdef CONFIG_BLK_CGROUP
- 	/*
--	 * Optional ioc and css associated with this bio.  Put on bio
-+	 * Optional css associated with this bio.  Put on bio
- 	 * release.  Read comment on top of bio_associate_current().
- 	 */
--	struct io_context	*bi_ioc;
- 	struct cgroup_subsys_state *bi_css;
- 	struct blkcg_gq		*bi_blkg;
- 	struct bio_issue	bi_issue;
++
++	if (ioc)
++		return ioc->ioprio;
++	return IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0);
++}
++
+ /*
+  * For inheritance, return the highest of the two given priorities
+  */
 -- 
 2.19.1
 
