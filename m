@@ -2,87 +2,151 @@ Return-Path: <SRS0=hv45=N7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30438C43441
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 02:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10CF2C43441
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 03:00:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F20812080C
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 02:45:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F20812080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id CA4FA2089F
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 03:00:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="eNcQ94sM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA4FA2089F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727680AbeKTNL6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Nov 2018 08:11:58 -0500
-Received: from mga04.intel.com ([192.55.52.120]:13768 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725992AbeKTNL6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Nov 2018 08:11:58 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Nov 2018 18:45:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,255,1539673200"; 
-   d="scan'208";a="109949215"
-Received: from yhuang-dev.sh.intel.com (HELO yhuang-dev) ([10.239.13.27])
-  by orsmga002.jf.intel.com with ESMTP; 19 Nov 2018 18:45:04 -0800
-From:   "Huang\, Ying" <ying.huang@intel.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@kernel.dk>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-mm@kvack.org>, Dave Chinner <dchinner@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        "Mike Snitzer" <snitzer@redhat.com>, <dm-devel@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        <linux-fsdevel@vger.kernel.org>, Shaohua Li <shli@kernel.org>,
-        <linux-raid@vger.kernel.org>, <linux-erofs@lists.ozlabs.org>,
-        David Sterba <dsterba@suse.com>, <linux-btrfs@vger.kernel.org>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        <linux-xfs@vger.kernel.org>, Gao Xiang <gaoxiang25@huawei.com>,
-        "Christoph Hellwig" <hch@lst.de>, Theodore Ts'o <tytso@mit.edu>,
-        <linux-ext4@vger.kernel.org>, Coly Li <colyli@suse.de>,
-        <linux-bcache@vger.kernel.org>, Boaz Harrosh <ooo@electrozaur.com>,
-        "Bob Peterson" <rpeterso@redhat.com>, <cluster-devel@redhat.com>
-Subject: Re: [PATCH V10 15/19] block: always define BIO_MAX_PAGES as 256
-References: <20181115085306.9910-1-ming.lei@redhat.com>
-        <20181115085306.9910-16-ming.lei@redhat.com>
-        <20181116015936.GJ23828@vader> <20181119090415.GM16736@ming.t460p>
-Date:   Tue, 20 Nov 2018 10:45:03 +0800
-In-Reply-To: <20181119090415.GM16736@ming.t460p> (Ming Lei's message of "Mon,
-        19 Nov 2018 17:04:16 +0800")
-Message-ID: <87o9ak8o28.fsf@yhuang-dev.intel.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.2 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ascii
+        id S1731643AbeKTN1S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Nov 2018 08:27:18 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:58260 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731370AbeKTN1R (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Nov 2018 08:27:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=References:In-Reply-To:Message-Id:
+        Date:Subject:Cc:To:From:Sender:Reply-To:MIME-Version:Content-Type:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=3rSmEbWASuu7gOOPl+jW7pAMMn1ZzI7tK94ts+5UhSc=; b=eNcQ94sMrSByJycb9HHNBTtIa
+        yxkZ9ScEeJRvQjn/lYrvb50ENBjvDINHklQ7HNSNn75GFo3nyEGs9qy00neI/wUD6Hkctvdok1yAJ
+        InUg5xpQ9o44rNAdwJQen2aTj1Pc+vfY73PlcxiYRthkWhiHwORe9Vlbic98+BF7Z8RUQ9euxYCAO
+        JfQ2TpJTQgcV9khb8fGgiX1cpo5LVWpavT41VrTWTu2UcoAT1jq1DaydUquTlgaNv56fiYKXNlZL3
+        F75vv1Wkzj6uJVTFZYb+8OqTnt1fSpF3WArY+mPyvU7kiFsTXgJQfdTQBVDYdogn1P1UjgqueLo+R
+        LYRxzOTxg==;
+Received: from [2600:1700:65a0:78e0:514:7862:1503:8e4d] (helo=sagi-Latitude-E7470.lbits)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gOwH3-0000FW-Px; Tue, 20 Nov 2018 03:00:25 +0000
+From:   Sagi Grimberg <sagi@grimberg.me>
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Keith Busch <keith.busch@intel.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v2 01/14] ath6kl: add ath6kl_ prefix to crypto_type
+Date:   Mon, 19 Nov 2018 19:00:02 -0800
+Message-Id: <20181120030019.31738-2-sagi@grimberg.me>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20181120030019.31738-1-sagi@grimberg.me>
+References: <20181120030019.31738-1-sagi@grimberg.me>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ming Lei <ming.lei@redhat.com> writes:
+From: Sagi Grimberg <sagi@lightbitslabs.com>
 
-> On Thu, Nov 15, 2018 at 05:59:36PM -0800, Omar Sandoval wrote:
->> On Thu, Nov 15, 2018 at 04:53:02PM +0800, Ming Lei wrote:
->> > Now multi-page bvec can cover CONFIG_THP_SWAP, so we don't need to
->> > increase BIO_MAX_PAGES for it.
->> 
->> You mentioned to it in the cover letter, but this needs more explanation
->> in the commit message. Why did CONFIG_THP_SWAP require > 256? Why does
->> multipage bvecs remove that requirement?
->
-> CONFIG_THP_SWAP needs to split one TH page into normal pages and adds
-> them all to one bio. With multipage-bvec, it just takes one bvec to
-> hold them all.
+Prevent a namespace conflict as in following patches as skbuff.h will
+include the crypto API.
 
-Yes.  CONFIG_THP_SWAP needs to put 512 normal sub-pages into one bio to
-write the 512 sub-pages together.  With the help of multipage-bvec, it
-needs just bvect to hold 512 normal sub-pages.
+Cc: Kalle Valo <kvalo@codeaurora.org>
+Signed-off-by: Sagi Grimberg <sagi@lightbitslabs.com>
+---
+ drivers/net/wireless/ath/ath6kl/cfg80211.c | 2 +-
+ drivers/net/wireless/ath/ath6kl/common.h   | 2 +-
+ drivers/net/wireless/ath/ath6kl/wmi.c      | 6 +++---
+ drivers/net/wireless/ath/ath6kl/wmi.h      | 6 +++---
+ 4 files changed, 8 insertions(+), 8 deletions(-)
 
-Best Regards,
-Huang, Ying
+diff --git a/drivers/net/wireless/ath/ath6kl/cfg80211.c b/drivers/net/wireless/ath/ath6kl/cfg80211.c
+index e121187f371f..fa049c4ae315 100644
+--- a/drivers/net/wireless/ath/ath6kl/cfg80211.c
++++ b/drivers/net/wireless/ath/ath6kl/cfg80211.c
+@@ -1322,7 +1322,7 @@ static int ath6kl_cfg80211_set_default_key(struct wiphy *wiphy,
+ 	struct ath6kl_vif *vif = netdev_priv(ndev);
+ 	struct ath6kl_key *key = NULL;
+ 	u8 key_usage;
+-	enum crypto_type key_type = NONE_CRYPT;
++	enum ath6kl_crypto_type key_type = NONE_CRYPT;
+ 
+ 	ath6kl_dbg(ATH6KL_DBG_WLAN_CFG, "%s: index %d\n", __func__, key_index);
+ 
+diff --git a/drivers/net/wireless/ath/ath6kl/common.h b/drivers/net/wireless/ath/ath6kl/common.h
+index 4f82e8632d37..d6e5234f67a1 100644
+--- a/drivers/net/wireless/ath/ath6kl/common.h
++++ b/drivers/net/wireless/ath/ath6kl/common.h
+@@ -67,7 +67,7 @@ struct ath6kl_llc_snap_hdr {
+ 	__be16 eth_type;
+ } __packed;
+ 
+-enum crypto_type {
++enum ath6kl_crypto_type {
+ 	NONE_CRYPT          = 0x01,
+ 	WEP_CRYPT           = 0x02,
+ 	TKIP_CRYPT          = 0x04,
+diff --git a/drivers/net/wireless/ath/ath6kl/wmi.c b/drivers/net/wireless/ath/ath6kl/wmi.c
+index 777acc564ac9..9d7ac1ab2d02 100644
+--- a/drivers/net/wireless/ath/ath6kl/wmi.c
++++ b/drivers/net/wireless/ath/ath6kl/wmi.c
+@@ -1849,9 +1849,9 @@ int ath6kl_wmi_connect_cmd(struct wmi *wmi, u8 if_idx,
+ 			   enum network_type nw_type,
+ 			   enum dot11_auth_mode dot11_auth_mode,
+ 			   enum auth_mode auth_mode,
+-			   enum crypto_type pairwise_crypto,
++			   enum ath6kl_crypto_type pairwise_crypto,
+ 			   u8 pairwise_crypto_len,
+-			   enum crypto_type group_crypto,
++			   enum ath6kl_crypto_type group_crypto,
+ 			   u8 group_crypto_len, int ssid_len, u8 *ssid,
+ 			   u8 *bssid, u16 channel, u32 ctrl_flags,
+ 			   u8 nw_subtype)
+@@ -2301,7 +2301,7 @@ int ath6kl_wmi_disctimeout_cmd(struct wmi *wmi, u8 if_idx, u8 timeout)
+ }
+ 
+ int ath6kl_wmi_addkey_cmd(struct wmi *wmi, u8 if_idx, u8 key_index,
+-			  enum crypto_type key_type,
++			  enum ath6kl_crypto_type key_type,
+ 			  u8 key_usage, u8 key_len,
+ 			  u8 *key_rsc, unsigned int key_rsc_len,
+ 			  u8 *key_material,
+diff --git a/drivers/net/wireless/ath/ath6kl/wmi.h b/drivers/net/wireless/ath/ath6kl/wmi.h
+index a60bb49fe920..784940ba4c90 100644
+--- a/drivers/net/wireless/ath/ath6kl/wmi.h
++++ b/drivers/net/wireless/ath/ath6kl/wmi.h
+@@ -2556,9 +2556,9 @@ int ath6kl_wmi_connect_cmd(struct wmi *wmi, u8 if_idx,
+ 			   enum network_type nw_type,
+ 			   enum dot11_auth_mode dot11_auth_mode,
+ 			   enum auth_mode auth_mode,
+-			   enum crypto_type pairwise_crypto,
++			   enum ath6kl_crypto_type pairwise_crypto,
+ 			   u8 pairwise_crypto_len,
+-			   enum crypto_type group_crypto,
++			   enum ath6kl_crypto_type group_crypto,
+ 			   u8 group_crypto_len, int ssid_len, u8 *ssid,
+ 			   u8 *bssid, u16 channel, u32 ctrl_flags,
+ 			   u8 nw_subtype);
+@@ -2610,7 +2610,7 @@ int ath6kl_wmi_config_debug_module_cmd(struct wmi *wmi, u32 valid, u32 config);
+ 
+ int ath6kl_wmi_get_stats_cmd(struct wmi *wmi, u8 if_idx);
+ int ath6kl_wmi_addkey_cmd(struct wmi *wmi, u8 if_idx, u8 key_index,
+-			  enum crypto_type key_type,
++			  enum ath6kl_crypto_type key_type,
+ 			  u8 key_usage, u8 key_len,
+ 			  u8 *key_rsc, unsigned int key_rsc_len,
+ 			  u8 *key_material,
+-- 
+2.17.1
 
-> thanks,
-> Ming
