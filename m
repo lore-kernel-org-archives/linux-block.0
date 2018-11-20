@@ -2,133 +2,144 @@ Return-Path: <SRS0=hv45=N7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCECFC4161D
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 16:45:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7B89C32789
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 16:51:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A1B1208E3
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 16:45:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1170D20831
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 16:50:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ID497ezd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A1B1208E3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="bR53PuEk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1170D20831
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727647AbeKUDPQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Nov 2018 22:15:16 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:40373 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726499AbeKUDPP (ORCPT
+        id S1725925AbeKUDUZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Nov 2018 22:20:25 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:38913 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727155AbeKUDUZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Nov 2018 22:15:15 -0500
-Received: by mail-pg1-f193.google.com with SMTP id z10so1139018pgp.7;
-        Tue, 20 Nov 2018 08:45:12 -0800 (PST)
+        Tue, 20 Nov 2018 22:20:25 -0500
+Received: by mail-wm1-f67.google.com with SMTP id u13-v6so2980164wmc.4
+        for <linux-block@vger.kernel.org>; Tue, 20 Nov 2018 08:50:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=LAims/OHofY0nDv6m/rc/pUUPTbq9lMd1V61SuIstx8=;
-        b=ID497ezdIfehKu+6Q7RZCARgVYJE1cHBS1Au5FEEyeLs3aE4E8samEKRzK48egoPkE
-         myPZRaJrgeJjPZv0IbHgNd/qb8LK/tr/OoykyAw/w05J8hdqa2YVshVbmCYsBCF6+saR
-         BVlaBBuYkQOxMQWF0nNW4zEJLqUlHo3eeAVLuMmLPeFa5P6MX6hjBlKmKZLGd/kfdbAX
-         f7GZ/TgzV1ubb4rcuWa/YLQoRY2QmUNBzUFzjZhm6Ervoyvh7kY9IBuTKFoEZWzysnoa
-         z2Oeip16FHAfQr4cfPfpXNItOrlF2qj6ONIQXMey2B3Qg4yCf3Dfyw/Y/Kb4P5qquGqP
-         6TYg==
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=+Wf6CDJUPs+eWjtmr8Hr9KG3FFVm+nlkqZS2f8RgM/w=;
+        b=bR53PuEkjfKVO5TfuQ57wxNpCGss5PElS42NlnIjUGGw8biMobE8VfD8A7yOhyg7TC
+         evXEdHcDLEQS1PR8hyjN3k1q1TpLWTTPVIMHma0fR4A9eq/FXWqA9rrXZQ6+52BApAWS
+         dXn5fVB13ahQLsouU+4AlZzMipjOTQmhOgXT0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=LAims/OHofY0nDv6m/rc/pUUPTbq9lMd1V61SuIstx8=;
-        b=Uf0jL2J5hyhJdTWMNHaX1UncSOVdC+VkGXvhjOqahaGTIFjMDCFpxmMJoS4CZt08mT
-         MTBUn1UCPrmoZ7+D0jaNXxLbdNSTQmc5dWXZPKF5cn415qc4kHTXw8o2Wr1g8PoX6cn1
-         B0kQUItye8Z1g5vJrqMHHd5KmWkNiD6/t4WqYufDcwZuU5CJSG9hbSLMZWBvKozIV3Wf
-         GaIkxcTcjzvaqFG6BOvC632bI/BNS48WbhRi47s7roZs419i7EWqdcVsJj3HzmleVu3J
-         0l4FcbNZhhs+mEWsOFjx8nIOp7cqtjetbsSHhT0r7D6kfsRAi0WFE1X6ynsDBuk7HO6I
-         iHvw==
-X-Gm-Message-State: AA+aEWaE1F+SADPDt8t6Y3XSM76FvtPVDyeAsOxHKTPQV5l6Ea1jIw4h
-        mBMzCBGxpIN+6yssMpNn81U=
-X-Google-Smtp-Source: AFSGD/Vf32SSjzekAyeHMgDZx0tkNzOm5OX0y4J+2NZDyA+/a94Zc+9COJW6c7n1XVswRYqeRVIPPw==
-X-Received: by 2002:a63:c00b:: with SMTP id h11mr2586960pgg.429.1542732312054;
-        Tue, 20 Nov 2018 08:45:12 -0800 (PST)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id 186-v6sm50309279pfe.39.2018.11.20.08.45.10
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=+Wf6CDJUPs+eWjtmr8Hr9KG3FFVm+nlkqZS2f8RgM/w=;
+        b=ctH0ditsMBb8y24nkegwrRyMRMCrY+FqSXWwRgn0V4iIcm+ggw8mQkTsp7JZXBvGJE
+         +qkJ0M+4VVDPUgrtX/8UBRNFB7jR6m/lJOrgGaKKy4cNFVX+cp4JtwgMzOjvpopsgPli
+         EzlyqB73cM/bf0LMlWilR6WgFCc7B/sdbfQqf8SDQoqF0aGi1R71MAyka2xij9UEElgy
+         xpbCXb8TkLd6wmKF9w3+MbK1MJHUHWDEPHIFBUZ5QC4JJaNSHtz+dQdYlYE84PyjcpOG
+         2SJ1hX6op+xXe2S8fVZ2MwuTlhZiWntRqxrM1U93l9q3HQLj5qlhx6ZEg2yHZ9AVo8pP
+         5tXA==
+X-Gm-Message-State: AGRZ1gIqLyDXGADUO8BGVlgcfk7ATnHRo853dwQ5Hfb/14X9b2pG8jMD
+        +pPO0gF6jBnBFUp9C+3JR/HY2g==
+X-Google-Smtp-Source: AJdET5dkziSdP8kN9ecWfAoJJIrNuDvoLya7OiySpONwRyyCGhF1GloXfIzKPQNpK90RAvs1zJhLRA==
+X-Received: by 2002:a1c:bc82:: with SMTP id m124-v6mr2719620wmf.47.1542732619004;
+        Tue, 20 Nov 2018 08:50:19 -0800 (PST)
+Received: from [192.168.43.112] ([37.162.66.240])
+        by smtp.gmail.com with ESMTPSA id x6-v6sm13626648wrs.50.2018.11.20.08.50.16
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 20 Nov 2018 08:45:11 -0800 (PST)
-Date:   Tue, 20 Nov 2018 08:45:09 -0800
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        "jianchao.wang" <jianchao.w.wang@oracle.com>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 4.21 V3] blk-mq: not embed .mq_kobj and ctx->kobj into
- queue instance
-Message-ID: <20181120164509.GA32433@roeck-us.net>
-References: <20181120014435.3339-1-ming.lei@redhat.com>
- <20181120075150.GF15276@kroah.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181120075150.GF15276@kroah.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+        Tue, 20 Nov 2018 08:50:18 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.0 \(3445.100.39\))
+Subject: Re: [PATCH V2 00/10] unify the interface of the proportional-share
+ policy in blkio/io
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20181120162816.GV2509588@devbig004.ftw2.facebook.com>
+Date:   Tue, 20 Nov 2018 17:50:14 +0100
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Li Zefan <lizefan@huawei.com>,
+        Angelo Ruocco <angeloruocco90@gmail.com>,
+        Dennis Zhou <dennis@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Liu Bo <bo.liu@linux.alibaba.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ulf.hansson@linaro.org, linus.walleij@linaro.org,
+        broonie@kernel.org, bfq-iosched@googlegroups.com,
+        oleksandr@natalenko.name, cgroups@vger.kernel.org,
+        linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <25296DAE-73EC-46CC-9A98-A8B7E9017BB7@linaro.org>
+References: <20181119103424.3853-1-paolo.valente@linaro.org>
+ <20181120162816.GV2509588@devbig004.ftw2.facebook.com>
+To:     Tejun Heo <tj@kernel.org>
+X-Mailer: Apple Mail (2.3445.100.39)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 20, 2018 at 08:51:50AM +0100, Greg Kroah-Hartman wrote:
-> On Tue, Nov 20, 2018 at 09:44:35AM +0800, Ming Lei wrote:
-> > Even though .mq_kobj, ctx->kobj and q->kobj share same lifetime
-> > from block layer's view, actually they don't because userspace may
-> > grab one kobject anytime via sysfs.
-> > 
-> > This patch fixes the issue by the following approach:
-> > 
-> > 1) introduce 'struct blk_mq_ctxs' for holding .mq_kobj and managing
-> > all ctxs
-> > 
-> > 2) free all allocated ctxs and the 'blk_mq_ctxs' instance in release
-> > handler of .mq_kobj
-> > 
-> > 3) grab one ref of .mq_kobj before initializing each ctx->kobj, so that
-> > .mq_kobj is always released after all ctxs are freed.
-> > 
-> > This patch fixes kernel panic issue during booting when DEBUG_KOBJECT_RELEASE
-> > is enabled.
-> > 
-> > Reported-by: Guenter Roeck <linux@roeck-us.net>
-> > Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>
-> > Cc: Guenter Roeck <linux@roeck-us.net>
-> > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> > V3:
-> > 	- keep to allocate q->queue_ctx via percpu allocator, so one extra
-> > 	  pointer reference can be saved for getting ctx
-> > V2:
-> > 	- allocate 'blk_mq_ctx' inside blk_mq_init_allocated_queue()
-> > 	- allocate q->mq_kobj directly 
-> 
-> Not tested, but seems sane from a kobject point-of-view:
-> 
-> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-Tested-by: Guenter Roeck <linux@roeck-us.net>
 
-with v4.14.y and v4.19.y.
+> Il giorno 20 nov 2018, alle ore 17:28, Tejun Heo <tj@kernel.org> ha =
+scritto:
+>=20
+> Hello, Paolo.
+>=20
+> On Mon, Nov 19, 2018 at 11:34:14AM +0100, Paolo Valente wrote:
+>> - if all entities produce the same output, the this common output is
+>> shown only once;
+>> - if the outputs differ, then every per-entity output is shown,
+>> followed by the name of the entity that produced that output.
+>=20
+> So, this doesn't make sense to me.  One set of numbers is meaningful,
+> the other not and the user doesn't have a way to tell which one is.
+> It makes no sense to present both numbers.
+>=20
 
-The patch is marked for v4.21. I would kindly suggest to not wait for v4.21
-but apply it to v4.20. This would let us enable DEBUG_KOBJECT_RELEASE
-with syzbot on upstream and stable kernels.
+I do agree that these numbers may confuse.  Before discussing how to
+do this better, let me tell you why we are showing them.
 
-Greg, applying the patch to v4.14.y will require a backport due to a minor
-context conflict. I'll send that to you after the patch is available in
-mainline.
+In the first place, the need for a diversified output showed up in the
+following case.  Given a group using the blkio/io controller, and two
+drives
+- one with legacy block and cfq
+- one with blk-mq and bfq
+there will be different statistics for each scheduler, for the same
+interface files.
+
+Then we understood that exactly the same happens with throttling, in
+case the latter is activated on different devices w.r.t. bfq.
+
+In addition, the same may happen, in the near future, with the
+bandwidth controller Josef is working on.  If the controller can be
+configured per device, as with throttling, then statistics may differ,
+for the same interface files, between bfq, throttling and that
+controller.
+
+More general examples could be made considering that this extension is
+for the generic cgroup interface.
+
+Of course, suggestions for a clearer way to show these numbers are
+more than welcome!  Maybe involved device identifiers can be somehow
+gathered by the entities providing these numbers, and then shown?  In
+this respect, consider that, even without this extension, one still
+has the fundamental problem of not knowing to which devices numbers
+apply (unless I'm missing something else).
 
 Thanks,
-Guenter
+Paolo
+
+> Thanks.
+>=20
+> --=20
+> tejun
+
