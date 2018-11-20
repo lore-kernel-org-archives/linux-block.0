@@ -2,80 +2,78 @@ Return-Path: <SRS0=hv45=N7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.7 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D6B8C41536
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 17:35:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 226E9C46462
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 20:11:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E186206BA
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 17:35:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WCJ4NVOJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E186206BA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	by mail.kernel.org (Postfix) with ESMTP id E81452252C
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 20:11:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E81452252C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727551AbeKUEFq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Nov 2018 23:05:46 -0500
-Received: from mail-it1-f196.google.com ([209.85.166.196]:36338 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727166AbeKUEFq (ORCPT
+        id S1727484AbeKUGmf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Nov 2018 01:42:35 -0500
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:43936 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725887AbeKUGme (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Nov 2018 23:05:46 -0500
-Received: by mail-it1-f196.google.com with SMTP id c9so4808538itj.1
-        for <linux-block@vger.kernel.org>; Tue, 20 Nov 2018 09:35:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=/sK6Fncbe+irKkeRXtqblRPzKPhkvavXtyL18HcWvXk=;
-        b=WCJ4NVOJM+aQ73j04Fo4PbWgMBr2v6bVknSI2WFdwJZ8e9Ozvgtco5/jpX4OvUGpDV
-         /u0Bk/bgLq4zhHQ2KVx5oi3ufxoJaXOd3YvJEyamlKo9V3dEmkcTMMml6rAbio3+9Yif
-         eE30duXlhctzkW6Un82XBlL2QzJFbKPkq/PsbneYFi9oFABmBBAyYZsHx4vLsnLdbI8Y
-         aEg6tI8DTM/TkwYRlpv5mCTa7kwJoP2jQUgsvvFT5r+Ym/KtlOMyLKjKeoo4lwD1YLX3
-         QxpFfBwYURyErffhou8rGlUMv2L6bZ8KHxz70onMuN00/nv9pGniJx1x7qrrxdujLqtx
-         5Zcw==
+        Wed, 21 Nov 2018 01:42:34 -0500
+Received: by mail-oi1-f196.google.com with SMTP id u18so2575541oie.10;
+        Tue, 20 Nov 2018 12:11:40 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=/sK6Fncbe+irKkeRXtqblRPzKPhkvavXtyL18HcWvXk=;
-        b=ZLQ+vMkv0+1xrO0zmgg5uQfDqjrTAI5C9znHo1tAPUgHpErXJ7AXJ70orSu96dfJ/V
-         W18Kz2VnwWxQkbypGBTXEcRcUms0irBF6cXKnfeRt8IftKayJXQ/sMt5B1RDOHWR7BgD
-         60+GdCDwqD+Ww03ndP33PwNyqQQbKaRrJJTReIB5iHWkfuznVW2LISfgsjtlO2OKMJIL
-         S42FSWcDyWXyF4+paqHutTj7q5U7yy5HEV7shhV8d48NmcgherucTvQQM3sizMvIQLPc
-         lIhk67lIS+nJqHNZ/IcUghYyqh3oobymVtGT2jTGZGa5Anihp5tnZ82ItSg1ldwGKI68
-         t7NA==
-X-Gm-Message-State: AGRZ1gKdm4CIGFKaaYB3NZMAQtwd6Tf7amXHX9m1PvFPGUdiGw8rx0Cr
-        H54MmmTnD0QBIfsuxEF+CMb07QOKQ2Q=
-X-Google-Smtp-Source: AFSGD/Vh3eadKpElW/xiCJiQ8BN/eYMKTkGX+EQYBhVShLEcdl84wMnqtm5ijRyIQITTCiMaGhQTQg==
-X-Received: by 2002:a05:660c:850:: with SMTP id f16mr3186105itl.111.1542735328348;
-        Tue, 20 Nov 2018 09:35:28 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id i77-v6sm20963049itb.22.2018.11.20.09.35.26
+        bh=+nDOz9mjqo4L3rzgAR7CUb2HdO4CSp5KgwQNxh2bwe8=;
+        b=Xh3kdG12xmlmj21e7ZO8IEInjYVYIEQIrMm3zbzHJwrHOd2xnpumbiaCdLhfXCkzJC
+         BtXnhe9VqNaZgv1izOhaI4nU+9fS2pkNUHkJJEPb47s9Dg8ttKZud0taRZJFk0gjo9Vj
+         H8HQIfg/rSNHvyyrr66lNqMmRggNN8mmM1UWduw0VsXATL6UHPoxKjN5Fpl1P+9SLjqk
+         1oZHrvoBrV+4z9ibjWeS+H8R+uGuQS/Kktw/7gycGVj46w7W14PI1BBSnIdkpr6RqY2L
+         wp4AqUhsZfF0vzaxK+4aEiJVZPmglVHYfS5NIgvJtayY2jGRxiAoxIB8tagAmeBAbKZn
+         7OkQ==
+X-Gm-Message-State: AGRZ1gK5hztfaZOmTBrEGaWzaYP5pEobcP1sPjDpWNcLnJAGnc2H6cJn
+        z/1MRWvdzn3kXXhX+bxhIQo=
+X-Google-Smtp-Source: AJdET5f5ehNN96vcKRz2NXaqMQda85YBO55TqjtSMuwNpXqePnneNcb7NjbLve3qt0sZ+FBHzugBOA==
+X-Received: by 2002:a05:6808:13:: with SMTP id u19mr2037670oic.57.1542744699917;
+        Tue, 20 Nov 2018 12:11:39 -0800 (PST)
+Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
+        by smtp.gmail.com with ESMTPSA id i35sm13742439ote.69.2018.11.20.12.11.36
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 20 Nov 2018 09:35:27 -0800 (PST)
-Subject: Re: [PATCH 4.21 V3] blk-mq: not embed .mq_kobj and ctx->kobj into
- queue instance
-To:     Guenter Roeck <linux@roeck-us.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        "jianchao.wang" <jianchao.w.wang@oracle.com>,
-        stable@vger.kernel.org
-References: <20181120014435.3339-1-ming.lei@redhat.com>
- <20181120075150.GF15276@kroah.com> <20181120164509.GA32433@roeck-us.net>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0e6ce1db-3d24-6d01-22a9-4f37719bdccc@kernel.dk>
-Date:   Tue, 20 Nov 2018 10:35:25 -0700
+        Tue, 20 Nov 2018 12:11:39 -0800 (PST)
+Subject: Re: [PATCH V10 09/19] block: introduce bio_bvecs()
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, Dave Chinner <dchinner@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
+        Theodore Ts'o <tytso@mit.edu>, linux-ext4@vger.kernel.org,
+        Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
+        Boaz Harrosh <ooo@electrozaur.com>,
+        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
+References: <20181115085306.9910-1-ming.lei@redhat.com>
+ <20181115085306.9910-10-ming.lei@redhat.com> <20181116134541.GH3165@lst.de>
+ <002fe56b-25e4-573e-c09b-bb12c3e8d25a@grimberg.me>
+ <20181120161651.GB2629@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <53526aae-fb9b-ee38-0a01-e5899e2d4e4d@grimberg.me>
+Date:   Tue, 20 Nov 2018 12:11:35 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20181120164509.GA32433@roeck-us.net>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20181120161651.GB2629@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -83,57 +81,38 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/20/18 9:45 AM, Guenter Roeck wrote:
-> On Tue, Nov 20, 2018 at 08:51:50AM +0100, Greg Kroah-Hartman wrote:
->> On Tue, Nov 20, 2018 at 09:44:35AM +0800, Ming Lei wrote:
->>> Even though .mq_kobj, ctx->kobj and q->kobj share same lifetime
->>> from block layer's view, actually they don't because userspace may
->>> grab one kobject anytime via sysfs.
+
+>>> The only user in your final tree seems to be the loop driver, and
+>>> even that one only uses the helper for read/write bios.
 >>>
->>> This patch fixes the issue by the following approach:
->>>
->>> 1) introduce 'struct blk_mq_ctxs' for holding .mq_kobj and managing
->>> all ctxs
->>>
->>> 2) free all allocated ctxs and the 'blk_mq_ctxs' instance in release
->>> handler of .mq_kobj
->>>
->>> 3) grab one ref of .mq_kobj before initializing each ctx->kobj, so that
->>> .mq_kobj is always released after all ctxs are freed.
->>>
->>> This patch fixes kernel panic issue during booting when DEBUG_KOBJECT_RELEASE
->>> is enabled.
->>>
->>> Reported-by: Guenter Roeck <linux@roeck-us.net>
->>> Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>
->>> Cc: Guenter Roeck <linux@roeck-us.net>
->>> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
->>> Cc: stable@vger.kernel.org
->>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>> ---
->>> V3:
->>> 	- keep to allocate q->queue_ctx via percpu allocator, so one extra
->>> 	  pointer reference can be saved for getting ctx
->>> V2:
->>> 	- allocate 'blk_mq_ctx' inside blk_mq_init_allocated_queue()
->>> 	- allocate q->mq_kobj directly 
+>>> I think something like this would be much simpler in the end:
 >>
->> Not tested, but seems sane from a kobject point-of-view:
->>
->> Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+>> The recently submitted nvme-tcp host driver should also be a user
+>> of this. Does it make sense to keep it as a helper then?
 > 
-> Tested-by: Guenter Roeck <linux@roeck-us.net>
-> 
-> with v4.14.y and v4.19.y.
-> 
-> The patch is marked for v4.21. I would kindly suggest to not wait for v4.21
-> but apply it to v4.20. This would let us enable DEBUG_KOBJECT_RELEASE
-> with syzbot on upstream and stable kernels.
+> I did take a brief look at the code, and I really don't understand
+> why the heck it even deals with bios to start with.  Like all the
+> other nvme transports it is a blk-mq driver and should iterate
+> over segments in a request and more or less ignore bios.  Something
+> is horribly wrong in the design.
 
-I'd very much like to put this into 4.21, and not 4.20, as that's much
-less risky. This isn't a new regression anyway, so there's no rush to
-put it into 4.20 as far as I'm concerned.
+Can you explain a little more? I'm more than happy to change that but
+I'm not completely clear how...
 
--- 
-Jens Axboe
+Before we begin a data transfer, we need to set our own iterator that
+will advance with the progression of the data transfer. We also need to
+keep in mind that all the data transfer (both send and recv) are
+completely non blocking (and zero-copy when we send).
 
+That means that every data movement needs to be able to suspend
+and resume asynchronously. i.e. we cannot use the following pattern:
+rq_for_each_segment(bvec, rq, rq_iter) {
+	iov_iter_bvec(&iov_iter, WRITE, &bvec, 1, bvec.bv_len);
+	send(sock, iov_iter);
+}
+
+Given that a request can hold more than a single bio, I'm not clear on
+how we can achieve that without iterating over the bios in the request
+ourselves.
+
+Any useful insight?
