@@ -2,97 +2,103 @@ Return-Path: <SRS0=hv45=N7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2904C43610
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 07:17:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32E8CC43610
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 07:19:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7AC3C208E4
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 07:17:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 750F5206BA
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 07:18:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YNbg3K/0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AC3C208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="iJ1kujzE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 750F5206BA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lightnvm.io
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730564AbeKTRpD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Nov 2018 12:45:03 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:37566 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730532AbeKTRpD (ORCPT
+        id S1730605AbeKTRqS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Nov 2018 12:46:18 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:40338 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726840AbeKTRqS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Nov 2018 12:45:03 -0500
-Received: by mail-pf1-f194.google.com with SMTP id u3-v6so558648pfm.4;
-        Mon, 19 Nov 2018 23:17:26 -0800 (PST)
+        Tue, 20 Nov 2018 12:46:18 -0500
+Received: by mail-lj1-f196.google.com with SMTP id n18-v6so719811lji.7
+        for <linux-block@vger.kernel.org>; Mon, 19 Nov 2018 23:18:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=HDxjroR+Qk57aPMTHSMkdRSmO3X58GNV4ZL5R8TjMQs=;
-        b=YNbg3K/0oIjm1U10Z6BHywTNH+VmwXv3KbORhBPQumgfPdE0CSbkXr3tGWsLjHKKv1
-         TP3gbAXpcvr6heQzCSKmOdz2VB++WCIDcZ6IlMmqrsXpu0WANZxPucZ2tCC2RcNzIeWa
-         2VbVlxV1dv3CQj8fPLaBu9SGG22nVLwb/lJNyiNsRarxupw1hB0y+lwh5Nr951wNVFY6
-         4A7O5CrdmQsJDm6+lH6UyqqPPDLSve6+LAuuYXgZL8m4vF+IvXVJ2tBcwSTa11emSmBg
-         kyuCMM66Vifsizpvsw9kEMHKADr3Vzz5hvCGQfIK5XOHxKnC6V32n48TQ5pIzVy0X9PG
-         wkog==
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=0rNKxF3OO85+ullvbdajsC+Ve2o21RfM+PJVBskyocI=;
+        b=iJ1kujzEmU4B2N5dnAG094SAmoMT3pDNqUEb3nmidRVEyDaorGh7cYE9A17Xyb/ZIo
+         giWySZlyx83nkLT/6asZE4QhIX+FKwX2iXwnS8fkQpC+CsUtHvgVy3FA8C/CNCQ1ES5z
+         gW8Lld+5cI/8knZ9UGEAb7XKi0k8AvScg8Ryh2OCUeQnKaZv+ck6qgqyaYtOCpNwVY3P
+         oa4KuTxKNY14VUF2Q1qG2OEckHULiZmiQ9YqCCbdJL3t3vLoCsgg7j4/NaxY6sQ2WoNT
+         Bd7ysEVUoYPk1gLQ3xL472/EExGcXv64CVKcUCGIoDrkVEb4sM+RopaJE5kV6tTt+By6
+         LL0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=HDxjroR+Qk57aPMTHSMkdRSmO3X58GNV4ZL5R8TjMQs=;
-        b=pl5ddVVrsgwWApGPLWOXh1lUqKp1aw6aJXyH5q3NtQpE7AaEKYeOLWezPR4/3KAwDg
-         iy4JNOzhhqBN906xF4gS+Cpm1rBvoTbUpcBNHHWVtLCPBEoMd/1BmdXWnQ472hSweNmY
-         ZWJv7PGpkI70g9pIRSsHA9gE0RqXB+g6arO3+i35KUt57TJ5j/Yi0OzYtyaPRwzRJ0EV
-         0shctd0NsaHQYt84t3q9gA58jJQ9HT5yIuZ9O+q+PtmZb1a14Oj4jfMeIUfGuhusSUUd
-         CF/hlxetGIR3xzP4drybl5s5uOaRNFE2+s51pkBpahcUauBVtrcJRvkXWDuiqivvYJuf
-         8nNg==
-X-Gm-Message-State: AA+aEWbJLKV8t1bsi8X8UnkCn7jiLwct5K8EtddXQ0QLtDVHWhP1VIGk
-        sJmnjIumNi29ztC4M4msWYg=
-X-Google-Smtp-Source: AFSGD/WOj0ipHLzkgfYZO+vBaWsW7mJHTpJgYrrzp4axpA5Fq9NVEC+ZRFScT4mVWwjfM5HT3NKOyA==
-X-Received: by 2002:a65:48c4:: with SMTP id o4mr845219pgs.371.1542698245792;
-        Mon, 19 Nov 2018 23:17:25 -0800 (PST)
-Received: from localhost.localdomain ([119.40.32.42])
-        by smtp.gmail.com with ESMTPSA id b5sm30638974pfc.150.2018.11.19.23.17.23
+        bh=0rNKxF3OO85+ullvbdajsC+Ve2o21RfM+PJVBskyocI=;
+        b=QP3yMlRZ77U8cVwdCrD4ISzkqeE+FTHbQsN1/yq2/OREu1QQ9DI/K1HKeNeNPtx6lz
+         BeSMtwza8O8IG88WJZGolTH5QO5iN5twUWfbjDU279Vr2rh6NLwMkUv1MG5vNr3zG7cL
+         +d/7Mzq1fugG52oBdfAyKXbuK+hanoesqFwFyIP7thDJ7l1KSzZCd0NjtXJNaqFZaDVs
+         48fn5e3xr+G05cUZ+ecb70I3hZ331/+tpHzHcH8cE3QXmybTlMld/0I0pUGmjAjICu+U
+         H0WLwWicoszG150cgLrL2yxY4NznajXEHD/mna0LXEFdNCUwEqL/fws/1xclTmy/oD6W
+         1x/Q==
+X-Gm-Message-State: AA+aEWbgTtKmxFOkRf5FTFSg62+bxAJoh6NN+dUN4DhA+SpHuaLmW6+7
+        GpCsEB3X8Oo7ywjLjvvt2WFtzw==
+X-Google-Smtp-Source: AFSGD/UvkpxdgBEx+Lb5OmETSFdzHU6AHZId3a9Wro6QDYNQkkb6MThS2dGsltyLNKB7iMbHt91E6w==
+X-Received: by 2002:a2e:612:: with SMTP id 18-v6mr485561ljg.125.1542698319355;
+        Mon, 19 Nov 2018 23:18:39 -0800 (PST)
+Received: from [192.168.0.36] (95-166-82-66-cable.dk.customer.tdc.net. [95.166.82.66])
+        by smtp.googlemail.com with ESMTPSA id b128sm5997182lfe.91.2018.11.19.23.18.38
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 19 Nov 2018 23:17:25 -0800 (PST)
-From:   Hua Su <suhua.tanke@gmail.com>
-To:     mb@lightnvm.io
+        Mon, 19 Nov 2018 23:18:38 -0800 (PST)
+Subject: Re: [PATCH] lightnvm: pblk: modify a comment
+To:     suhua.tanke@gmail.com
 Cc:     javier@cnexlabs.com, axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, suhua.tanke@gmail.com
-Subject: [PATCH] lightnvm: pblk: modify a comment
-Date:   Tue, 20 Nov 2018 15:16:50 +0800
-Message-Id: <20181120071650.5379-1-suhua.tanke@gmail.com>
-X-Mailer: git-send-email 2.19.1
+        linux-kernel@vger.kernel.org
+References: <20181120071650.5379-1-suhua.tanke@gmail.com>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <59ee9fcb-4b81-400b-116e-8a9fe7346a41@lightnvm.io>
+Date:   Tue, 20 Nov 2018 08:18:37 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181120071650.5379-1-suhua.tanke@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Does the code want to express that it should be like this?
+On 11/20/2018 08:16 AM, Hua Su wrote:
+> Does the code want to express that it should be like this?
+> 
+> Signed-off-by: Hua Su <suhua.tanke@gmail.com>
+> ---
+>   drivers/lightnvm/pblk-rb.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+> index b1f4b51783f4..9f7fa0fe9c77 100644
+> --- a/drivers/lightnvm/pblk-rb.c
+> +++ b/drivers/lightnvm/pblk-rb.c
+> @@ -147,7 +147,7 @@ int pblk_rb_init(struct pblk_rb *rb, unsigned int size, unsigned int threshold,
+>   
+>   	/*
+>   	 * Initialize rate-limiter, which controls access to the write buffer
+> -	 * but user and GC I/O
+> +	 * by user and GC I/O
+>   	 */
+>   	pblk_rl_init(&pblk->rl, rb->nr_entries);
+>   
+> 
 
-Signed-off-by: Hua Su <suhua.tanke@gmail.com>
----
- drivers/lightnvm/pblk-rb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
-index b1f4b51783f4..9f7fa0fe9c77 100644
---- a/drivers/lightnvm/pblk-rb.c
-+++ b/drivers/lightnvm/pblk-rb.c
-@@ -147,7 +147,7 @@ int pblk_rb_init(struct pblk_rb *rb, unsigned int size, unsigned int threshold,
- 
- 	/*
- 	 * Initialize rate-limiter, which controls access to the write buffer
--	 * but user and GC I/O
-+	 * by user and GC I/O
- 	 */
- 	pblk_rl_init(&pblk->rl, rb->nr_entries);
- 
--- 
-2.19.1
-
+Thanks Hue. Applied for 4.21.
