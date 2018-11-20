@@ -2,304 +2,124 @@ Return-Path: <SRS0=hv45=N7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A5EAC43441
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 01:44:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C517FC43441
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 01:47:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F41E52089F
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 01:44:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F41E52089F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 7D26E2089F
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 01:47:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="lOCIHEAe";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="KY0n4uQs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D26E2089F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730646AbeKTMLW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Nov 2018 07:11:22 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55026 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726119AbeKTMLW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Nov 2018 07:11:22 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 81EF6307D85B;
-        Tue, 20 Nov 2018 01:44:46 +0000 (UTC)
-Received: from localhost (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E16695D75E;
-        Tue, 20 Nov 2018 01:44:42 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        "jianchao.wang" <jianchao.w.wang@oracle.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org
-Subject: [PATCH 4.21 V3] blk-mq: not embed .mq_kobj and ctx->kobj into queue instance
-Date:   Tue, 20 Nov 2018 09:44:35 +0800
-Message-Id: <20181120014435.3339-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Tue, 20 Nov 2018 01:44:46 +0000 (UTC)
+        id S1727679AbeKTMNr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Nov 2018 07:13:47 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:55252 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726119AbeKTMNr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 20 Nov 2018 07:13:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1542678432; x=1574214432;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=6PdIDPaBvQOzxrbQ+FJ1pHjEIg59SKlj6rWz3Re/8fM=;
+  b=lOCIHEAe7/r42Pjb69gPWQ5j7qOehWSowss9s1hVILi9hf4TvlFA2nEO
+   34er0hLpkbPA0VoziJQmd+EB5fC3yiExSpXfOyZRl4cs+ZBhRqI09s60q
+   KOPJNFh+E4RMRdUfs3Q43tX2dJFAIr31idtoupulCdBc/WYgJPs+H6S0S
+   AW0wTEylaXmLfA53qf5kc86agqvdy6Jc6xMGGADDDb/RQ2bUKav+o2RrP
+   W26dSkNoiQlVfYne2+OqSa+uUEY85BkCYNM45p25bIq+R2h1CXbCcpVDO
+   Y0TWg/rkOAE2GV5+lA22TgYAH/cirgYCHJ3KyGlQo9QiAhBsrA4fs4s4b
+   g==;
+X-IronPort-AV: E=Sophos;i="5.56,255,1539619200"; 
+   d="scan'208";a="99455677"
+Received: from mail-bn3nam04lp0113.outbound.protection.outlook.com (HELO NAM04-BN3-obe.outbound.protection.outlook.com) ([216.32.180.113])
+  by ob1.hgst.iphmx.com with ESMTP; 20 Nov 2018 09:47:11 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6PdIDPaBvQOzxrbQ+FJ1pHjEIg59SKlj6rWz3Re/8fM=;
+ b=KY0n4uQsbPmiwnmhczwXrdTonJks1aDH8MonStQLfcyzsm2qqLR0g7gmO19nozTmeXJYgj6vuNYGuUZI9NL4oVQNIqMG5m/673kkrGB0+1j/vRvb1nvZHAEzF07Vi/RYGB6Hq9dNNWDL1mg6oSSwPYv4fPK6v1lbIBp8x5r8FfU=
+Received: from BN3PR0401MB1640.namprd04.prod.outlook.com (10.163.41.30) by
+ BN3PR0401MB1622.namprd04.prod.outlook.com (10.163.36.26) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1339.23; Tue, 20 Nov 2018 01:47:07 +0000
+Received: from BN3PR0401MB1640.namprd04.prod.outlook.com
+ ([fe80::e1b0:e927:5d5d:4164]) by BN3PR0401MB1640.namprd04.prod.outlook.com
+ ([fe80::e1b0:e927:5d5d:4164%5]) with mapi id 15.20.1339.027; Tue, 20 Nov 2018
+ 01:47:07 +0000
+From:   Damien Le Moal <Damien.LeMoal@wdc.com>
+To:     "hch@infradead.org" <hch@infradead.org>
+CC:     Adam Manzanares <Adam.Manzanares@wdc.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH 3/7] block: Fix get_task_ioprio() default return value
+Thread-Topic: [PATCH 3/7] block: Fix get_task_ioprio() default return value
+Thread-Index: AQHUf7tErV0mes1nT06Hj2/6l+MnSKVWwOiAgAElgQA=
+Date:   Tue, 20 Nov 2018 01:47:07 +0000
+Message-ID: <26656d88acec98d1e08c034ec87315cf917ce279.camel@wdc.com>
+References: <20181119035131.11255-1-damien.lemoal@wdc.com>
+         <20181119035131.11255-4-damien.lemoal@wdc.com>
+         <20181119081635.GN9622@infradead.org>
+In-Reply-To: <20181119081635.GN9622@infradead.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.30.2 (3.30.2-2.fc29) 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Damien.LeMoal@wdc.com; 
+x-originating-ip: [199.255.47.11]
+x-ms-publictraffictype: Email
+x-microsoft-exchange-diagnostics: 1;BN3PR0401MB1622;6:Ng+LykHtZN3TYv1NYDbwaaIRo/s4M+HwuDt030VWlT04C10WDlBtqpx07lqrpCoEvA9noGUM7Axl7hAMidWJmt0Dfitf3dZXg88ip0dU5NzwJJJV/WM8baBY4xRuvBrVPXzP4tSKC6k/Zof7djJ1pF+pZ/GBaEe9G/96iSAXtbg9KQhUy3p1/RsszZl9StXsYgWJdIf7uCqPpp0OkPrAHBQy8Zl3vGvOlT0es/0H8GxapHkhn2la/0wkav1CDEnN9eg+XqHb6xWJ/+D7qgMfnW9llFZsOl0fFUuAeZJ6swjK6f/VpbGt71N8ysNPm2rEBHuSQhymD8UX7D06G19mplyQvUm4sM5/esLjlm03kXyg2ugRNDq3RVA0zvLghl4q+Rf5fVZbaSmnsa7Ghdi+IO0Bj+39QJXVnCgh/INefauLJiHLyjtVn8g+sf+8H79zOPs63ToahQnUm9d4mv34kg==;5:UaTvI+UYU3+5tXIWq2gqc1piynwrjiuUCDDc3YuVy04MAAELMPlqKXq2HSXaQsZ5Ypf2qege4rJa91rn83xRqSWgIgzVF63E4j7RUcz1Hpoi+QezzklD/ckdpVhKlW4s5OblVczdz0gOYkAt2wtK3KpP875RXu+icTCM3SGsISE=;7:iFPPRHYuriwaBiR1YIEXuvNUifWbhul45lTsNWuIGN61pMQgyQoBavf82/i/0/Br1onoh1SA8qES+LX9W8PuZDsIoGNXuk2x+/kmSvatibJEnb2H8GbxLqU2neleS82ClyYME8earVKo84N65daQvg==
+x-ms-exchange-antispam-srfa-diagnostics: SOS;SOR;
+x-ms-office365-filtering-correlation-id: b6aeb1fe-6316-4556-8ae2-08d64e8a144f
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390098)(7020095)(4652040)(8989299)(5600074)(711020)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7153060)(7193020);SRVR:BN3PR0401MB1622;
+x-ms-traffictypediagnostic: BN3PR0401MB1622:
+wdcipoutbound: EOP-TRUE
+x-microsoft-antispam-prvs: <BN3PR0401MB1622866F64F140AEBCDA4272E7D90@BN3PR0401MB1622.namprd04.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-exchange-antispam-report-cfa-test: BCL:0;PCL:0;RULEID:(8211001083)(6040522)(2401047)(5005006)(8121501046)(93006095)(93001095)(3002001)(10201501046)(3231442)(944501410)(52105112)(6055026)(148016)(149066)(150057)(6041310)(201703131423095)(201702281528075)(20161123555045)(201703061421075)(201703061406153)(20161123560045)(20161123564045)(20161123558120)(20161123562045)(201708071742011)(7699051)(76991095);SRVR:BN3PR0401MB1622;BCL:0;PCL:0;RULEID:;SRVR:BN3PR0401MB1622;
+x-forefront-prvs: 08626BE3A5
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(136003)(376002)(346002)(39860400002)(366004)(199004)(189003)(11346002)(3846002)(36756003)(446003)(6116002)(6506007)(6916009)(5660300001)(106356001)(5640700003)(6512007)(118296001)(2351001)(26005)(186003)(486006)(2616005)(99286004)(2900100001)(76176011)(14454004)(6246003)(6436002)(2906002)(476003)(102836004)(2501003)(8936002)(478600001)(105586002)(1730700003)(81166006)(7736002)(256004)(8676002)(81156014)(305945005)(97736004)(229853002)(53936002)(316002)(25786009)(71200400001)(71190400001)(58126008)(6486002)(72206003)(68736007)(54906003)(4001150100001)(4326008)(66066001)(86362001);DIR:OUT;SFP:1102;SCL:1;SRVR:BN3PR0401MB1622;H:BN3PR0401MB1640.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-microsoft-antispam-message-info: 7eq51xuvBeQ8es0kD0SjRo4Aw1+ZPergSV5TuRRqBMl74Ka3lAMnW9YGQzfzd55vY9uzOzJxnL6TdMwo8q0yCKRcOyYcTtJhFlD+GP5dEBZMZ99w/45T1e/YcajiRp0MnhiF6TUpN10RhD+zg13A9WbYDvadXUJIdPvqE/h2Ex4129Gs3StlBmWIuQxWvIsbNYC1dAd9Mw5IVI3Gt3NtoMDHanFGlKDaGWbXgwhaA/orxVe3FoMmUzXf9Bzvs6vDfPUXLmMKMhT50QCc71bfJ6RQ6ezq+phDCfOkjgJvu8s+8Be5p26sIBfrfloPQmRcwBtPN5k8ofuPkdfC1jLwKAwJYJEBcBdbbZM+QiSaOWw=
+spamdiagnosticoutput: 1:99
+spamdiagnosticmetadata: NSPM
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A7935F8CCCF182429D30C8E34C21930D@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b6aeb1fe-6316-4556-8ae2-08d64e8a144f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Nov 2018 01:47:07.0662
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN3PR0401MB1622
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Even though .mq_kobj, ctx->kobj and q->kobj share same lifetime
-from block layer's view, actually they don't because userspace may
-grab one kobject anytime via sysfs.
-
-This patch fixes the issue by the following approach:
-
-1) introduce 'struct blk_mq_ctxs' for holding .mq_kobj and managing
-all ctxs
-
-2) free all allocated ctxs and the 'blk_mq_ctxs' instance in release
-handler of .mq_kobj
-
-3) grab one ref of .mq_kobj before initializing each ctx->kobj, so that
-.mq_kobj is always released after all ctxs are freed.
-
-This patch fixes kernel panic issue during booting when DEBUG_KOBJECT_RELEASE
-is enabled.
-
-Reported-by: Guenter Roeck <linux@roeck-us.net>
-Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>
-Cc: Guenter Roeck <linux@roeck-us.net>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: stable@vger.kernel.org
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V3:
-	- keep to allocate q->queue_ctx via percpu allocator, so one extra
-	  pointer reference can be saved for getting ctx
-V2:
-	- allocate 'blk_mq_ctx' inside blk_mq_init_allocated_queue()
-	- allocate q->mq_kobj directly 
-
- block/blk-mq-sysfs.c   | 34 ++++++++++++++++++++++++----------
- block/blk-mq.c         | 39 ++++++++++++++++++++++++++++++++-------
- block/blk-mq.h         |  6 ++++++
- include/linux/blkdev.h |  2 +-
- 4 files changed, 63 insertions(+), 18 deletions(-)
-
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 3d25b9c419e9..6efef1f679f0 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -15,6 +15,18 @@
- 
- static void blk_mq_sysfs_release(struct kobject *kobj)
- {
-+	struct blk_mq_ctxs *ctxs = container_of(kobj, struct blk_mq_ctxs, kobj);
-+
-+	free_percpu(ctxs->queue_ctx);
-+	kfree(ctxs);
-+}
-+
-+static void blk_mq_ctx_sysfs_release(struct kobject *kobj)
-+{
-+	struct blk_mq_ctx *ctx = container_of(kobj, struct blk_mq_ctx, kobj);
-+
-+	/* ctx->ctxs won't be released until all ctx are freed */
-+	kobject_put(&ctx->ctxs->kobj);
- }
- 
- static void blk_mq_hw_sysfs_release(struct kobject *kobj)
-@@ -213,7 +225,7 @@ static struct kobj_type blk_mq_ktype = {
- static struct kobj_type blk_mq_ctx_ktype = {
- 	.sysfs_ops	= &blk_mq_sysfs_ops,
- 	.default_attrs	= default_ctx_attrs,
--	.release	= blk_mq_sysfs_release,
-+	.release	= blk_mq_ctx_sysfs_release,
- };
- 
- static struct kobj_type blk_mq_hw_ktype = {
-@@ -245,7 +257,7 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
- 	if (!hctx->nr_ctx)
- 		return 0;
- 
--	ret = kobject_add(&hctx->kobj, &q->mq_kobj, "%u", hctx->queue_num);
-+	ret = kobject_add(&hctx->kobj, q->mq_kobj, "%u", hctx->queue_num);
- 	if (ret)
- 		return ret;
- 
-@@ -268,8 +280,8 @@ void blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
- 	queue_for_each_hw_ctx(q, hctx, i)
- 		blk_mq_unregister_hctx(hctx);
- 
--	kobject_uevent(&q->mq_kobj, KOBJ_REMOVE);
--	kobject_del(&q->mq_kobj);
-+	kobject_uevent(q->mq_kobj, KOBJ_REMOVE);
-+	kobject_del(q->mq_kobj);
- 	kobject_put(&dev->kobj);
- 
- 	q->mq_sysfs_init_done = false;
-@@ -289,7 +301,7 @@ void blk_mq_sysfs_deinit(struct request_queue *q)
- 		ctx = per_cpu_ptr(q->queue_ctx, cpu);
- 		kobject_put(&ctx->kobj);
- 	}
--	kobject_put(&q->mq_kobj);
-+	kobject_put(q->mq_kobj);
- }
- 
- void blk_mq_sysfs_init(struct request_queue *q)
-@@ -297,10 +309,12 @@ void blk_mq_sysfs_init(struct request_queue *q)
- 	struct blk_mq_ctx *ctx;
- 	int cpu;
- 
--	kobject_init(&q->mq_kobj, &blk_mq_ktype);
-+	kobject_init(q->mq_kobj, &blk_mq_ktype);
- 
- 	for_each_possible_cpu(cpu) {
- 		ctx = per_cpu_ptr(q->queue_ctx, cpu);
-+
-+		kobject_get(q->mq_kobj);
- 		kobject_init(&ctx->kobj, &blk_mq_ctx_ktype);
- 	}
- }
-@@ -313,11 +327,11 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
- 	WARN_ON_ONCE(!q->kobj.parent);
- 	lockdep_assert_held(&q->sysfs_lock);
- 
--	ret = kobject_add(&q->mq_kobj, kobject_get(&dev->kobj), "%s", "mq");
-+	ret = kobject_add(q->mq_kobj, kobject_get(&dev->kobj), "%s", "mq");
- 	if (ret < 0)
- 		goto out;
- 
--	kobject_uevent(&q->mq_kobj, KOBJ_ADD);
-+	kobject_uevent(q->mq_kobj, KOBJ_ADD);
- 
- 	queue_for_each_hw_ctx(q, hctx, i) {
- 		ret = blk_mq_register_hctx(hctx);
-@@ -334,8 +348,8 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
- 	while (--i >= 0)
- 		blk_mq_unregister_hctx(q->queue_hw_ctx[i]);
- 
--	kobject_uevent(&q->mq_kobj, KOBJ_REMOVE);
--	kobject_del(&q->mq_kobj);
-+	kobject_uevent(q->mq_kobj, KOBJ_REMOVE);
-+	kobject_del(q->mq_kobj);
- 	kobject_put(&dev->kobj);
- 	return ret;
- }
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 32b246ed44c0..9228f2e9bd40 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2515,6 +2515,34 @@ static void blk_mq_add_queue_tag_set(struct blk_mq_tag_set *set,
- 	mutex_unlock(&set->tag_list_lock);
- }
- 
-+/* All allocations will be freed in release handler of q->mq_kobj */
-+static int blk_mq_alloc_ctxs(struct request_queue *q)
-+{
-+	struct blk_mq_ctxs *ctxs;
-+	int cpu;
-+
-+	ctxs = kzalloc(sizeof(*ctxs), GFP_KERNEL);
-+	if (!ctxs)
-+		return -ENOMEM;
-+
-+	ctxs->queue_ctx = alloc_percpu(struct blk_mq_ctx);
-+	if (!ctxs->queue_ctx)
-+		goto fail;
-+
-+	for_each_possible_cpu(cpu) {
-+		struct blk_mq_ctx *ctx = per_cpu_ptr(ctxs->queue_ctx, cpu);
-+		ctx->ctxs = ctxs;
-+	}
-+
-+	q->mq_kobj = &ctxs->kobj;
-+	q->queue_ctx = ctxs->queue_ctx;
-+
-+	return 0;
-+ fail:
-+	kfree(ctxs);
-+	return -ENOMEM;
-+}
-+
- /*
-  * It is the actual release handler for mq, but we do it from
-  * request queue's release handler for avoiding use-after-free
-@@ -2540,8 +2568,6 @@ void blk_mq_release(struct request_queue *q)
- 	 * both share lifetime with request queue.
- 	 */
- 	blk_mq_sysfs_deinit(q);
--
--	free_percpu(q->queue_ctx);
- }
- 
- struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *set)
-@@ -2731,8 +2757,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	if (!q->poll_cb)
- 		goto err_exit;
- 
--	q->queue_ctx = alloc_percpu(struct blk_mq_ctx);
--	if (!q->queue_ctx)
-+	if (blk_mq_alloc_ctxs(q))
- 		goto err_exit;
- 
- 	/* init q->mq_kobj and sw queues' kobjects */
-@@ -2742,7 +2767,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	q->queue_hw_ctx = kcalloc_node(q->nr_queues, sizeof(*(q->queue_hw_ctx)),
- 						GFP_KERNEL, set->numa_node);
- 	if (!q->queue_hw_ctx)
--		goto err_percpu;
-+		goto err_sys_init;
- 
- 	blk_mq_realloc_hw_ctxs(set, q);
- 	if (!q->nr_hw_queues)
-@@ -2794,8 +2819,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 
- err_hctxs:
- 	kfree(q->queue_hw_ctx);
--err_percpu:
--	free_percpu(q->queue_ctx);
-+err_sys_init:
-+	blk_mq_sysfs_deinit(q);
- err_exit:
- 	q->mq_ops = NULL;
- 	return ERR_PTR(-ENOMEM);
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index facb6e9ddce4..9ae8e9f8f8b1 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -7,6 +7,11 @@
- 
- struct blk_mq_tag_set;
- 
-+struct blk_mq_ctxs {
-+	struct kobject kobj;
-+	struct blk_mq_ctx __percpu	*queue_ctx;
-+};
-+
- /**
-  * struct blk_mq_ctx - State for a software queue facing the submitting CPUs
-  */
-@@ -27,6 +32,7 @@ struct blk_mq_ctx {
- 	unsigned long		____cacheline_aligned_in_smp rq_completed[2];
- 
- 	struct request_queue	*queue;
-+	struct blk_mq_ctxs      *ctxs;
- 	struct kobject		kobj;
- } ____cacheline_aligned_in_smp;
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1ad6eafc43f2..efd9a31bd226 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -456,7 +456,7 @@ struct request_queue {
- 	/*
- 	 * mq queue kobject
- 	 */
--	struct kobject mq_kobj;
-+	struct kobject *mq_kobj;
- 
- #ifdef  CONFIG_BLK_DEV_INTEGRITY
- 	struct blk_integrity integrity;
--- 
-2.9.5
-
+T24gTW9uLCAyMDE4LTExLTE5IGF0IDAwOjE2IC0wODAwLCBDaHJpc3RvcGggSGVsbHdpZyB3cm90
+ZToNCj4gT24gTW9uLCBOb3YgMTksIDIwMTggYXQgMTI6NTE6MjdQTSArMDkwMCwgRGFtaWVuIExl
+IE1vYWwgd3JvdGU6DQo+ID4gQXMgZXhwbGFpbmVkIGluIGlvcHJpb19nZXQoKSBhbmQgaW9uaWNl
+IG1hbiBwYWdlcywgdGhlIGRlZmF1bHQgSS9PDQo+ID4gcHJpb3JpdHkgY2xhc3MgZm9yIHByb2Nl
+c3NlcyB3aGljaCBoYXZlIG5vdCBzZXQgYW4gSS9PIHByaW9yaXR5DQo+ID4gdXNpbmcNCj4gPiBp
+b3ByaW9fc2V0KCkgaXMgSU9QUklPX0NMQVNTX0JFIGFuZCBub3QgSU9QUklPX0NMQVNTX05PTkUu
+DQo+IA0KPiBXaGlsZSB0aGlzIG1hdGNoZXMgdGhlIGRvY3VtZW50YXRpb24sIHdlJ3ZlIHJldHVy
+bmVkIHRoZSBjdXJyZW50DQo+IHZhbHVlcyBmb3IgMTAgeWVhcnMsIGFuZCBiZWZvcmUgdGhhdCBw
+bGFpbiAwIHdpdGhvdXQgYW55IGlvcHJpbw0KPiBtYWdpYy4gIEl0IG1pZ2h0IGJlIHNhZmVyIHRv
+IGp1c3QgZml4IHRoZSBkb2N1bWVudGF0aW9uLg0KDQpPSy4gV2lsbCBzZW5kIGEgcGF0Y2ggdG8g
+Zml4IHRoZSBtYW4gcGFnZXMuDQo=
