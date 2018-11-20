@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CB3C43441
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 01:52:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EC91C43441
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 01:52:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1F5A02080C
-	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 01:52:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F1CC2080C
+	for <linux-block@archiver.kernel.org>; Tue, 20 Nov 2018 01:52:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="aFcAAINq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F5A02080C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="YPr++mYl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F1CC2080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732697AbeKTMTb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 20 Nov 2018 07:19:31 -0500
+        id S1732700AbeKTMTd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 20 Nov 2018 07:19:33 -0500
 Received: from esa5.hgst.iphmx.com ([216.71.153.144]:40409 "EHLO
         esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730379AbeKTMTb (ORCPT
+        with ESMTP id S1730379AbeKTMTd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 20 Nov 2018 07:19:31 -0500
+        Tue, 20 Nov 2018 07:19:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1542678774; x=1574214774;
+  t=1542678777; x=1574214777;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=vWI5hiLR1Vd86YclP29pJ4JZOvyQnFq+3CxVZMtcm9I=;
-  b=aFcAAINqumMST8C/o3iE6ZYwRbvIDzpHJbbbTYnaMUC1Z+D5h/YVd7Jd
-   TZyTz9F0ehhI0Bs516CU/DoMYNCUPH4+NGfMB2s7RivxMtw5WXMDsFakQ
-   QFTHDPNgE9lLHnqN1voCzen5q1Kut3TkgM/7SVp2qgdYTPWdVLbeSzmaj
-   wMb236/xMNT1uzqC9VkpM+Xl9iPs6Vndv+Pf67zpNBpyKeMG0t+yHKSEC
-   76qidQVvrwN2xR7pZenjfIM8pTN14uKGEqA61Oai1nrBX96kFIz7gL2+Y
-   Xhtf6lCw5RLX6D4XHc2EUrSPMFHKuhpBRsWIP4lwzhzQxWlM3zXGjh2JU
-   g==;
+  bh=5eQNOqIzW2mPuqeCDTvKL8q4KeDRbXvNiXn6QDbW7w4=;
+  b=YPr++mYl5L3r9pTKArNvdVG3684K9C0xTIAjjEZjeXyD852FqpKxbP1u
+   1jgVswlH7RrjaiRcFb4+3mN+EvXFCr6xSjMnnUj1lfQEdQTcAtJzZb5sA
+   44qyru1CTM1O/PCI9ulZvY7WyVvGrgp3jVsTO959PLiQGvPyM5IxlA6E0
+   3WIdxfUcvg9O8zJAzI7rB5Vwt2/wDNsNZ6ZFDlgqLxQbO+r+UwEb2i8jP
+   09wNpiCSbt0L1MgGKaGmpfngbniMhb1mo+Jd7BhIVStSEmhhL78xwPWqV
+   Zrlut2tFIorwiNHqp/xq/bvCGLKceuh5KjGGFF3juVVFWVJAcbE1zw2Fq
+   Q==;
 X-IronPort-AV: E=Sophos;i="5.56,255,1539619200"; 
-   d="scan'208";a="95813294"
+   d="scan'208";a="95813298"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 20 Nov 2018 09:52:54 +0800
+  by ob1.hgst.iphmx.com with ESMTP; 20 Nov 2018 09:52:56 +0800
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP; 19 Nov 2018 17:36:09 -0800
+  by uls-op-cesaep02.wdc.com with ESMTP; 19 Nov 2018 17:36:11 -0800
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 19 Nov 2018 17:52:52 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 19 Nov 2018 17:52:54 -0800
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
 Cc:     Adam Manzanares <adam.manzanares@wdc.com>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
         linux-fsdevel@vger.kernel.org
-Subject: [PATCH v2 5/6] block: prevent merging of requests with different priorities
-Date:   Tue, 20 Nov 2018 10:52:37 +0900
-Message-Id: <20181120015238.26467-6-damien.lemoal@wdc.com>
+Subject: [PATCH v2 6/6] block: Initialize BIO I/O priority early
+Date:   Tue, 20 Nov 2018 10:52:38 +0900
+Message-Id: <20181120015238.26467-7-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181120015238.26467-1-damien.lemoal@wdc.com>
 References: <20181120015238.26467-1-damien.lemoal@wdc.com>
@@ -64,77 +64,58 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Growing in size a high priority request by merging it with a lower
-priority BIO or request will increase the request execution time. This
-is the opposite result of the desired effect of high I/O priorities,
-namely getting low I/O latencies. Prevent merging of requests and BIOs
-that have different I/O priorities to fix this.
+For the synchronous I/O path case (read(), write() etc system calls), a
+BIO I/O priority is not initialized until the execution of
+blk_init_request_from_bio() when the BIO is submitted and a request
+initialized for the BIO execution. This is due to the ki_ioprio field of
+the struct kiocb defined on stack being always initialized to
+IOPRIO_CLASS_NONE, regardless of the calling process I/O context ioprio
+value set with ioprio_set(). This late initialization can result in the
+BIO being merged to pending requests even when the I/O priorities
+differ.
 
+Fix this by initializing the ki_iopriority field of on stack struct
+kiocb using the get_current_ioprio() helper, ensuring that all BIOs
+allocated and submitted for the system call execution see the correct
+intended I/O priority early. With this, since a BIO I/O priority is
+always set to the intended effective value for both the sync and async
+path, blk_init_request_from_bio() can be simplified.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Adam Manzanares <adam.manzanares@wdc.com>
 Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 ---
- block/blk-core.c  | 3 ---
- block/blk-merge.c | 8 ++++++--
- 2 files changed, 6 insertions(+), 5 deletions(-)
+ block/blk-core.c   | 5 +----
+ include/linux/fs.h | 2 +-
+ 2 files changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 4450d3c08f25..dde30b08aa14 100644
+index dde30b08aa14..04f5be473638 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -662,7 +662,6 @@ bool bio_attempt_back_merge(struct request_queue *q, struct request *req,
- 	req->biotail->bi_next = bio;
- 	req->biotail = bio;
- 	req->__data_len += bio->bi_iter.bi_size;
--	req->ioprio = ioprio_best(req->ioprio, bio_prio(bio));
- 
- 	blk_account_io_start(req, false);
- 	return true;
-@@ -686,7 +685,6 @@ bool bio_attempt_front_merge(struct request_queue *q, struct request *req,
+@@ -814,10 +814,7 @@ void blk_init_request_from_bio(struct request *req, struct bio *bio)
+ 		req->cmd_flags |= REQ_FAILFAST_MASK;
  
  	req->__sector = bio->bi_iter.bi_sector;
- 	req->__data_len += bio->bi_iter.bi_size;
--	req->ioprio = ioprio_best(req->ioprio, bio_prio(bio));
- 
- 	blk_account_io_start(req, false);
- 	return true;
-@@ -706,7 +704,6 @@ bool bio_attempt_discard_merge(struct request_queue *q, struct request *req,
- 	req->biotail->bi_next = bio;
- 	req->biotail = bio;
- 	req->__data_len += bio->bi_iter.bi_size;
--	req->ioprio = ioprio_best(req->ioprio, bio_prio(bio));
- 	req->nr_phys_segments = segments + 1;
- 
- 	blk_account_io_start(req, false);
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index b1df622cbd85..6be04ef8da5b 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -752,6 +752,9 @@ static struct request *attempt_merge(struct request_queue *q,
- 	if (req->write_hint != next->write_hint)
- 		return NULL;
- 
-+	if (req->ioprio != next->ioprio)
-+		return NULL;
-+
- 	/*
- 	 * If we are allowed to merge, then append bio list
- 	 * from next to rq and release next. merge_requests_fn
-@@ -807,8 +810,6 @@ static struct request *attempt_merge(struct request_queue *q,
- 	 */
- 	blk_account_io_merge(next);
- 
--	req->ioprio = ioprio_best(req->ioprio, next->ioprio);
--
- 	/*
- 	 * ownership of bio passed from next to req, return 'next' for
- 	 * the caller to free
-@@ -883,6 +884,9 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
- 	if (rq->write_hint != bio->bi_write_hint)
- 		return false;
- 
-+	if (rq->ioprio != bio_prio(bio))
-+		return false;
-+
- 	return true;
+-	if (ioprio_valid(bio_prio(bio)))
+-		req->ioprio = bio_prio(bio);
+-	else
+-		req->ioprio = get_current_ioprio();
++	req->ioprio = bio_prio(bio);
+ 	req->write_hint = bio->bi_write_hint;
+ 	blk_rq_bio_prep(req->q, req, bio);
+ }
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index c95c0807471f..a1ab233e6469 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2021,7 +2021,7 @@ static inline void init_sync_kiocb(struct kiocb *kiocb, struct file *filp)
+ 		.ki_filp = filp,
+ 		.ki_flags = iocb_flags(filp),
+ 		.ki_hint = ki_hint_validate(file_write_hint(filp)),
+-		.ki_ioprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0),
++		.ki_ioprio = get_current_ioprio(),
+ 	};
  }
  
 -- 
