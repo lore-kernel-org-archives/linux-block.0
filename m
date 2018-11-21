@@ -2,122 +2,104 @@ Return-Path: <SRS0=SuLc=OA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 702A3C43441
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 22:02:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1E93C43441
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 22:27:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 34E522075B
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 22:02:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=thunk.org header.i=@thunk.org header.b="KZiEdcxm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34E522075B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mit.edu
+	by mail.kernel.org (Postfix) with ESMTP id A6651206BB
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 22:27:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6651206BB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732057AbeKVIic (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Nov 2018 03:38:32 -0500
-Received: from imap.thunk.org ([74.207.234.97]:38444 "EHLO imap.thunk.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730599AbeKVIic (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Nov 2018 03:38:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=thunk.org;
-         s=ef5046eb; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-        List-Post:List-Owner:List-Archive;
-        bh=AKJRjyS10+2JRsVl0V00LPyvPFCfrf/0JSXZPMDrewM=; b=KZiEdcxmEPa9SlCcqrNV/jatxM
-        HvJ24o7Lk/7HUtn2VsbyExalIaSwEd/oEVCVoi1Ashjmmw0vxPJGu+mLKmqZ7h9nD7tVqLMPhydmc
-        Ztgpu4GQyO/ZRwkAlxRwZuiAY+Nv9CUnP2/zWo+nyFOMLi2toqUnWXrUq0UUiJJHkLmA=;
-Received: from root (helo=callcc.thunk.org)
-        by imap.thunk.org with local-esmtp (Exim 4.89)
-        (envelope-from <tytso@thunk.org>)
-        id 1gPaZZ-0001eA-TA; Wed, 21 Nov 2018 22:02:13 +0000
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id 2E7D17A3680; Wed, 21 Nov 2018 17:02:13 -0500 (EST)
-Date:   Wed, 21 Nov 2018 17:02:13 -0500
-From:   "Theodore Y. Ts'o" <tytso@mit.edu>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        Andrew Jones <drjones@redhat.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        stable <stable@vger.kernel.org>,
-        "jianchao . wang" <jianchao.w.wang@oracle.com>
-Subject: Re: [PATCH V2] SCSI: fix queue cleanup race before queue
- initialization is done
-Message-ID: <20181121220213.GK26006@thunk.org>
-Mail-Followup-To: "Theodore Y. Ts'o" <tytso@mit.edu>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        linux-block@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        stable <stable@vger.kernel.org>,
-        "jianchao . wang" <jianchao.w.wang@oracle.com>
-References: <20181114082551.12141-1-ming.lei@redhat.com>
- <63c063ad-7d74-4268-bfd4-2de89908949e@kernel.dk>
- <4e24ace9-c83f-5311-5419-18f4a0fb5148@kernel.dk>
+        id S2390061AbeKVJDi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Nov 2018 04:03:38 -0500
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:38959 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731518AbeKVJDh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Nov 2018 04:03:37 -0500
+Received: by mail-oi1-f195.google.com with SMTP id 192-v6so5903106oii.6;
+        Wed, 21 Nov 2018 14:27:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=bLeg8UuXDEeZoXaUXYG2KSrINF8EWk9lwb8xlY9VDwc=;
+        b=T5k72Ixyx8vDgbjf5Vh47J8atmGHhmd5WPekn9/8WjApN/OUdULAxiUHv4DNkKloP1
+         eJNNDgBDEk5TImDTzLgEf4okufUGcGdyS7Q6EDObOV7gfjZ70u7j5MZ36yComWBhITbJ
+         lL83ROH1WW/BpDpZ061hyIaUvsE3s3d/0dAdQe833CFaLGmWnuydaBDKQoiUCQT3aMU2
+         rWbnbBKTXTMT3iV/CvS2VmGZ5CYCUADIb3N5WCzvYJmqOfwQIQJhsscXAap4LCyc2uMW
+         HZ0oQi5dpKSLxokiz34w8HsyiIqm0o/eH8NSPdW+7jYtIY4U6GSH4w3RN9hPWAENJn5x
+         vSkg==
+X-Gm-Message-State: AGRZ1gIICJQrLqkxu0CiVKQWMxujscKolZaY5mTAZVHFj1aV/lEf863s
+        zb1zxxf5L8uyBwgvgmKMI7g=
+X-Google-Smtp-Source: AJdET5deta+ff1DM/SEUaflOjzBi1x0d2SexXBOLu/HJL57SPsBDVM3u7rt+WsZTYpY/bMBRF6WDhw==
+X-Received: by 2002:aca:e78a:: with SMTP id e132-v6mr4881131oih.9.1542839239577;
+        Wed, 21 Nov 2018 14:27:19 -0800 (PST)
+Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
+        by smtp.gmail.com with ESMTPSA id r25sm3995983otb.27.2018.11.21.14.27.17
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 21 Nov 2018 14:27:18 -0800 (PST)
+Subject: Re: [PATCH v2 14/14] nvme-tcp: add NVMe over TCP host driver
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+        Keith Busch <keith.busch@intel.com>
+References: <20181120030019.31738-1-sagi@grimberg.me>
+ <20181120030019.31738-16-sagi@grimberg.me> <20181121085645.GA29747@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <09c340a0-0b7f-ff9b-f196-7ba48a0ee234@grimberg.me>
+Date:   Wed, 21 Nov 2018 14:27:16 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4e24ace9-c83f-5311-5419-18f4a0fb5148@kernel.dk>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Mail-From: tytso@thunk.org
-X-SA-Exim-Scanned: No (on imap.thunk.org); SAEximRunCond expanded to false
+In-Reply-To: <20181121085645.GA29747@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 21, 2018 at 02:47:35PM -0700, Jens Axboe wrote:
-> > Thanks applied, this bug was elusive but ever present in recent
-> > testing that we did internally, it's been a huge pain in the butt.
-> > The symptoms were usually a crash in blk_mq_get_driver_tag() with
-> > hctx->tags == NULL, or a crash inside deadline request insert off
-> > requeue.
+
+>> +struct nvme_tcp_send_ctx {
+>> +	struct bio		*curr_bio;
+>> +	struct iov_iter		iter;
+>> +	size_t			offset;
+>> +	size_t			data_sent;
+>> +	enum nvme_tcp_send_state state;
+>> +};
+>> +
+>> +struct nvme_tcp_recv_ctx {
+>> +	struct iov_iter		iter;
+>> +	struct bio		*curr_bio;
+>> +};
 > 
-> I'm still hitting some weird crashes even with this applied, like
-> this one:
+> I don't understand these structures.  There should only be
+> a bio to be send or receive, not both.  Why do we need two
+> curr_bio pointers?
 
-FYI, there are a number of Ubuntu users running 4.19, 4.19.1, and
-4.19.2 which have been reporting file system corruption problems.
-They have a fix of configurations, but one of the things which is seem
-to be a common factor is they all have CONFIG_SCSI_MQ_DEFAULT
-disabled.  (Which also happens to be how I happen to be running my
-laptop, and I've noticed no problems.)
+We don't really need both...
 
-	https://bugzilla.kernel.org/show_bug.cgi?id=201685
+> To me it seems like both structures should just go away and
+> move into nvme_tcp_request ala:
+> 
+> 
+> 	struct bio		*curr_bio;
+> 
+> 	/* send state */
+> 	struct iov_iter		send_iter;
+> 	size_t			send_offset;
+> 	enum nvme_tcp_send_state send_state;
+> 	size_t			data_sent;
+> 
+> 	/* receive state */
+> 	struct iov_iter		recv_iter;
+> 
 
-One user in particular reported that 4.19 worked fine, and 4.19.1 had
-fs corruptions (and there are no storage-related changes between 4.19
-and 4.19.1) --- but the one thing those two kernels had in common was
-his 4.19 build had SCSI_MQ_DEFAULT disabled, and his 4.19.1 build did
-*not* have SCSI_MQ_DEFAULT enabled.  This same user tried 4.19.3, and
-after two hours of heavy I/O, he's not seen a repeat, and
-interestingly, 4.19.3 has the backport mentioned on this thread.
-
-The weird thing is that it looked like the problem that was fixed by
-this commit would only show up at queue setup and teardown time.  Is
-that correct?  Is it possible that the bug fixed here would manifest
-as data corruptions on disk?  Or would only manifest as kernel
-BUG_ON's and/or crashes?
-
-One more thing.  I tried building a 4.20-rc2 based kernel with
-CONFIG_SCSI_MQ_DEFAULT=y, and I tried running gce-xfstests (which uses
-virtio-scsi) and I saw no failures.  So I don't have a clean repro of
-Kernel Bugzilla #201685, and at the moment I'm too chicken to enable
-CONFIG_SCSI_MQ_DEFAULT on my primary development laptop...
-
-Any thoughts/suggestions appreciated.
-
-						- Ted
+Sure, will move this.
