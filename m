@@ -6,71 +6,71 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38BAFC43441
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 13:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7147C43441
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 13:27:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F1A78214DA
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 13:26:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EAE8214DA
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 13:27:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="t5nN4+VU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1A78214DA
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WM5jRn7l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EAE8214DA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729229AbeKVAA4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Nov 2018 19:00:56 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:39003 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726729AbeKVAA4 (ORCPT
+        id S1729991AbeKVABv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Nov 2018 19:01:51 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:46890 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729787AbeKVABv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Nov 2018 19:00:56 -0500
-Received: by mail-pl1-f196.google.com with SMTP id b5-v6so5555506pla.6
-        for <linux-block@vger.kernel.org>; Wed, 21 Nov 2018 05:26:33 -0800 (PST)
+        Wed, 21 Nov 2018 19:01:51 -0500
+Received: by mail-pl1-f193.google.com with SMTP id t13so5547889ply.13
+        for <linux-block@vger.kernel.org>; Wed, 21 Nov 2018 05:27:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:references:from:message-id:date:user-agent:mime-version
          :in-reply-to:content-language:content-transfer-encoding;
-        bh=Nt+R4/AXRMSguIBnrZpDPuB1omlB0egUfPI+wT7/Dhk=;
-        b=t5nN4+VUW0CGgVa9tJE1OqVWkeGbm59eUtoyms0g+TeYNKDSM71XFrD5xvi9SnTbXD
-         3Lp20u3wQEhSwumWQ7+fXV5k9M+qxJAZqv3OXR0Wt+2Ej9JD8DF7PLKlK2zIJjrWI8dO
-         zSfI38EAYAxMUnSXclWT0rBDA0fkQJ9CTEiVjNLkhby2dMue1UB8IrT2TlxAs/OOSX+M
-         xCmhhwNJp0Lc0pt9UIu36NZAmgXBpiCjESuB09XeTygYkOh21xBQh9i0jia+dEvqCgij
-         1UyQPLuh6zsjaecXbRl3ZjnQhF8t+u/OR087qML+truscYAWmei8jSqeLU+aAZbSup/M
-         ZRzg==
+        bh=cjtw29MPQXxO+3fR75ETwq7fRG/F9EGyMI0CKiUPsiI=;
+        b=WM5jRn7lnAUUFoFwDXum46v6o90IxYIydEY0Wkps333DOiQvnqnVA6iMmbsoyzZnWK
+         N0dmlHLrI6g5NyBmnHPhGjAHFOboXh2vNVD+Qs4Q0OTdR3B6FNqaPsLCgca/0WTlYn0y
+         AhXu/Sa7AMf3ZUwyYxlaxlnDX8yuoJMAJh00x08s1RgwSz4z3r+wPPp8HHWtttm8nLGk
+         L60jdSXRzFxMlL5wvZTc8GdTMgEfEDO2VFgpGFF7nd/0oi6B++B8t7F96VaUYG4yvIfC
+         dlJVSs6iQTyiCDyfX/nVoV0yacKWE3ovEiRD+rAy9Votc2BxARg/MVlAUA8V4vxQoksb
+         moww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Nt+R4/AXRMSguIBnrZpDPuB1omlB0egUfPI+wT7/Dhk=;
-        b=AOhsRfWZm49xNHK04Vx7dcUaru+S0578leOmUJXcxiRHDljraC7hQjdmf3UWZHXFG1
-         Cbt3IThIJXt4ow7WLzSiqxqxRDYhame5uv4qU3n6qJt1qYoNB7dKKs1zu/2wsyCVQvvk
-         RnP8F9l6af1i/VUW1wh1Gt9HWWT1RtKOonfiCPuIWU7GkQ9JuPSy2Z+M++JWr9ulZ4zL
-         2yZytNT+5warFQI9uMGQmrlRZ2pELtomSQWfLkWAfADpBgTlrF0NSXge2i5jqYrqiV20
-         7Xf69GajBj+xe2+d+zx6ukYQhAHkMihtXkzyBCRewFq9jnBAPi7FTfkoMRojCDXhEmKZ
-         /OfQ==
-X-Gm-Message-State: AA+aEWYRJGCCDCIqkMczq4mKK1mfAK4efIkddwPkoTIMwlhufRG7YrSg
-        wBltVP87o6/x225QML1kRGjnsA==
-X-Google-Smtp-Source: AFSGD/X8X2KbUDQcQ/IpmzzjGtAVE5UaoZW1d7DY5q1iUxWTdfEg4xkO8ezQCO2Y/NilDFDT8Lh1lg==
-X-Received: by 2002:a63:d157:: with SMTP id c23mr5937341pgj.170.1542806793357;
-        Wed, 21 Nov 2018 05:26:33 -0800 (PST)
+        bh=cjtw29MPQXxO+3fR75ETwq7fRG/F9EGyMI0CKiUPsiI=;
+        b=lISGLKRMJsQYlqyU5lNvpJSsmLfeWZz1rPvbr7zLXMuH2Emo6zD3glzCg6bkxZJJBu
+         /vF7eMf/gDNLRbw3kPoGRSdQE1GVj7DrYadTG1x6p3sfkY8S7Ph43DHeMGbEd2jx+HL2
+         5tCmDVfzpajlfql8CQ3k5WIZeQ2nc7D3K8+3xa6pC1HS1lmSwCzQV/aB468P4rbt0fy2
+         awboaM6bJqx9KexYQY9TNaUlVmp8kEYyL1gPbPJGYum4MnV+Vofro+5CAi5CkesXylfD
+         +Y8pm8jvbGFEzb9A/h9S0SRB8HdcH/ATB2fJOy+qn9tkpYtOK5i0XfRFTuWsPYXwbrV4
+         ZNGQ==
+X-Gm-Message-State: AGRZ1gLvPwHREkeJfIBWWYlkBhLtZ4QdDDHmNdcI1x81CjAZrgDpLPYX
+        ys7/g+8QqdrxoKsaOKng9+ZXvQ==
+X-Google-Smtp-Source: AJdET5dTwhTQTzBotVnb8OV1yTowV3vP2QSlBH3ieQbjF/9CveXCnBJaAYJhfeAgxvSJYGUtfo5+DQ==
+X-Received: by 2002:a62:2292:: with SMTP id p18mr6980230pfj.9.1542806848053;
+        Wed, 21 Nov 2018 05:27:28 -0800 (PST)
 Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id z14sm34543389pgv.47.2018.11.21.05.26.31
+        by smtp.gmail.com with ESMTPSA id y6sm20495331pfl.187.2018.11.21.05.27.25
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 21 Nov 2018 05:26:32 -0800 (PST)
-Subject: Re: [PATCH 8/8] aio: support for IO polling
+        Wed, 21 Nov 2018 05:27:26 -0800 (PST)
+Subject: Re: [PATCH 3/8] iomap/xfs: wire up file_operations ->iopoll()
 To:     Benny Halevy <bhalevy@scylladb.com>, linux-block@vger.kernel.org,
         linux-aio@kvack.org, linux-fsdevel@vger.kernel.org
 References: <20181120171953.1258-1-axboe@kernel.dk>
- <20181120171953.1258-9-axboe@kernel.dk>
- <c3066246445a9f303d3d46f6a3274944093e78e8.camel@scylladb.com>
+ <20181120171953.1258-4-axboe@kernel.dk>
+ <feffd542a50966c7cd552c280290f406ea5629ef.camel@scylladb.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <eb9d0381-eeaa-a67b-ea30-43525ee1fc3e@kernel.dk>
-Date:   Wed, 21 Nov 2018 06:26:30 -0700
+Message-ID: <62aca28d-fd54-ae4e-d4d4-44c7232f23da@kernel.dk>
+Date:   Wed, 21 Nov 2018 06:27:25 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <c3066246445a9f303d3d46f6a3274944093e78e8.camel@scylladb.com>
+In-Reply-To: <feffd542a50966c7cd552c280290f406ea5629ef.camel@scylladb.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,158 +79,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/21/18 4:12 AM, Benny Halevy wrote:
->> +#define AIO_POLL_STACK	8
->> +
->> +/*
->> + * Process completed iocb iopoll entries, copying the result to userspace.
->> + */
->> +static long aio_iopoll_reap(struct kioctx *ctx, struct io_event __user *evs,
->> +			    unsigned int *nr_events, long max)
+On 11/21/18 2:15 AM, Benny Halevy wrote:
+>> +int iomap_dio_iopoll(struct kiocb *kiocb, bool spin)
 >> +{
->> +	void *iocbs[AIO_POLL_STACK];
->> +	struct aio_kiocb *iocb, *n;
->> +	int to_free = 0, ret = 0;
-> 
-> To be on the safe side, how about checking that if (evs)
-> *nr_events < max, otherwise, return -EINVAL?
-
-Good point, I think we should re-arrange the loop a bit to move the
-check up at the top to guard for entries == max at entry. I've done
-that.
-
->> +	/*
->> +	 * Take in a new working set from the submitted list if possible.
->> +	 */
->> +	if (!list_empty_careful(&ctx->poll_submitted)) {
->> +		spin_lock(&ctx->poll_lock);
->> +		list_splice_init(&ctx->poll_submitted, &ctx->poll_completing);
->> +		spin_unlock(&ctx->poll_lock);
->> +	}
+>> +	struct iomap_dio *dio = kiocb->private;
+>> +	struct request_queue *q = READ_ONCE(dio->last_queue);
 >> +
->> +	if (list_empty(&ctx->poll_completing))
+>> +	if (!q || dio->cookie == BLK_QC_T_NONE)
 >> +		return 0;
+>> +	return blk_poll(q, READ_ONCE(dio->cookie), spin);
 > 
-> Could be somewhat optimized like this:
+> How about:
+> 	blk_qc_t cookie = READ_ONCE(dio->cookie);
 > 
-> 	if (list_empty_careful(&ctx->poll_submitted))
+> 	if (!q || cookie == BLK_QC_T_NONE)
 > 		return 0;
+> 	return blk_poll(q, cookie, spin);
 > 
-> 	spin_lock(&ctx->poll_lock);
-> 	list_splice_init(&ctx->poll_submitted, &ctx->poll_completing);
-> 	spin_unlock(&ctx->poll_lock);
-> 	if (list_empty(&ctx->poll_completing))
-> 		return 0;
-> 
-> Or, possibly...
-> 	if (list_empty_careful(&ctx->poll_submitted) ||
-> 	    ({
-> 		spin_lock(&ctx->poll_lock);
-> 		list_splice_init(&ctx->poll_submitted, &ctx->poll_completing);
-> 		spin_unlock(&ctx->poll_lock);
-> 		list_empty(&ctx->poll_completing);
-> 	    }))
-> 		return 0;
+> Is there a chance the dio->cookie in the if () condition
+> will be stale?
 
-I think the readability of the existing version is better.
-
->> +	/*
->> +	 * Check again now that we have a new batch.
->> +	 */
->> +	ret = aio_iopoll_reap(ctx, event, nr_events, max);
->> +	if (ret < 0)
->> +		return ret;
->> +	if (*nr_events >= min)
->> +		return 0;
->> +
->> +	/*
->> +	 * Find up to 'max_nr' worth of events to poll for, including the
-> 
-> What's max_nr? You mean 'max'?
-
-It should, corrected.
-
->> +	 * events we already successfully polled
->> +	 */
->> +	polled = to_poll = 0;
->> +	poll_completed = atomic_read(&ctx->poll_completed);
->> +	list_for_each_entry(iocb, &ctx->poll_completing, ki_list) {
->> +		/*
->> +		 * Poll for needed events with wait == true, anything after
->> +		 * that we just check if we have more, up to max.
->> +		 */
->> +		bool wait = polled + *nr_events >= min;
->> +		struct kiocb *kiocb = &iocb->rw;
->> +
->> +		if (test_bit(IOCB_POLL_COMPLETED, &iocb->ki_flags))
->> +			break;
->> +		if (++to_poll + *nr_events >= max)
->> +			break;
->> +
->> +		polled += kiocb->ki_filp->f_op->iopoll(kiocb, wait);
-> 
-> Could iopoll return a negative value? (Currently not in this patchset,
-> but would it be possible in the future?)
-
-That's a good point, I've added a separate check for this. Given that
-it's a regular fops handler, it should be perfectly valid to return
--ERROR.
-
->> +		if (polled + *nr_events >= max)
->> +			break;
->> +		if (poll_completed != atomic_read(&ctx->poll_completed))
->> +			break;
->> +	}
->> +
->> +	ret = aio_iopoll_reap(ctx, event, nr_events, max);
->> +	if (ret < 0)
->> +		return ret;
->> +	if (*nr_events >= min)
->> +		return 0;
->> +	return to_poll;
-> 
-> What does the returned value mean?
-> If the intention is only to return a value greater than zero,
-> how about just returning to_poll > 0?
-
-It just means that you could call us again, if > 0, and < 0 is an error
-specifically.
-
->> +/*
->> + * We can't just wait for polled events to come to us, we have to actively
->> + * find and complete them.
->> + */
->> +static void aio_iopoll_reap_events(struct kioctx *ctx)
->> +{
->> +	if (!(ctx->flags & IOCTX_FLAG_IOPOLL))
->> +		return;
->> +
->> +	while (!list_empty_careful(&ctx->poll_submitted) ||
->> +	       !list_empty(&ctx->poll_completing)) {
->> +		unsigned int nr_events = 0;
->> +
->> +		__aio_iopoll_check(ctx, NULL, &nr_events, 1, UINT_MAX);
-> 
-> BUG_ON(__aoi_iopoll_check() < 0) ?
-
-Ho hum...
-
->> +	}
->> +}
->> +
->> +static int aio_iopoll_check(struct kioctx *ctx, long min_nr, long nr,
->> +			    struct io_event __user *event)
->> +{
->> +	unsigned int nr_events = 0;
->> +	int ret = 0;
->> +
->> +	/* * Only allow one thread polling at a time */
-> 
-> nit: extra '* '
-
-Removed.
-
-Thanks for your review!
+I've rewritten this one, more importantly it needs to guard against
+submission by ensuring that 'dio' is valid.
 
 -- 
 Jens Axboe
