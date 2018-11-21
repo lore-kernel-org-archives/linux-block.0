@@ -2,106 +2,129 @@ Return-Path: <SRS0=SuLc=OA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7147C43441
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 13:27:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54832C43441
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 13:32:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9EAE8214DA
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 13:27:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WM5jRn7l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EAE8214DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	by mail.kernel.org (Postfix) with ESMTP id 289E5214DB
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 13:32:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 289E5214DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729991AbeKVABv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Nov 2018 19:01:51 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:46890 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729787AbeKVABv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Nov 2018 19:01:51 -0500
-Received: by mail-pl1-f193.google.com with SMTP id t13so5547889ply.13
-        for <linux-block@vger.kernel.org>; Wed, 21 Nov 2018 05:27:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=cjtw29MPQXxO+3fR75ETwq7fRG/F9EGyMI0CKiUPsiI=;
-        b=WM5jRn7lnAUUFoFwDXum46v6o90IxYIydEY0Wkps333DOiQvnqnVA6iMmbsoyzZnWK
-         N0dmlHLrI6g5NyBmnHPhGjAHFOboXh2vNVD+Qs4Q0OTdR3B6FNqaPsLCgca/0WTlYn0y
-         AhXu/Sa7AMf3ZUwyYxlaxlnDX8yuoJMAJh00x08s1RgwSz4z3r+wPPp8HHWtttm8nLGk
-         L60jdSXRzFxMlL5wvZTc8GdTMgEfEDO2VFgpGFF7nd/0oi6B++B8t7F96VaUYG4yvIfC
-         dlJVSs6iQTyiCDyfX/nVoV0yacKWE3ovEiRD+rAy9Votc2BxARg/MVlAUA8V4vxQoksb
-         moww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cjtw29MPQXxO+3fR75ETwq7fRG/F9EGyMI0CKiUPsiI=;
-        b=lISGLKRMJsQYlqyU5lNvpJSsmLfeWZz1rPvbr7zLXMuH2Emo6zD3glzCg6bkxZJJBu
-         /vF7eMf/gDNLRbw3kPoGRSdQE1GVj7DrYadTG1x6p3sfkY8S7Ph43DHeMGbEd2jx+HL2
-         5tCmDVfzpajlfql8CQ3k5WIZeQ2nc7D3K8+3xa6pC1HS1lmSwCzQV/aB468P4rbt0fy2
-         awboaM6bJqx9KexYQY9TNaUlVmp8kEYyL1gPbPJGYum4MnV+Vofro+5CAi5CkesXylfD
-         +Y8pm8jvbGFEzb9A/h9S0SRB8HdcH/ATB2fJOy+qn9tkpYtOK5i0XfRFTuWsPYXwbrV4
-         ZNGQ==
-X-Gm-Message-State: AGRZ1gLvPwHREkeJfIBWWYlkBhLtZ4QdDDHmNdcI1x81CjAZrgDpLPYX
-        ys7/g+8QqdrxoKsaOKng9+ZXvQ==
-X-Google-Smtp-Source: AJdET5dTwhTQTzBotVnb8OV1yTowV3vP2QSlBH3ieQbjF/9CveXCnBJaAYJhfeAgxvSJYGUtfo5+DQ==
-X-Received: by 2002:a62:2292:: with SMTP id p18mr6980230pfj.9.1542806848053;
-        Wed, 21 Nov 2018 05:27:28 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id y6sm20495331pfl.187.2018.11.21.05.27.25
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 21 Nov 2018 05:27:26 -0800 (PST)
-Subject: Re: [PATCH 3/8] iomap/xfs: wire up file_operations ->iopoll()
-To:     Benny Halevy <bhalevy@scylladb.com>, linux-block@vger.kernel.org,
-        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org
-References: <20181120171953.1258-1-axboe@kernel.dk>
- <20181120171953.1258-4-axboe@kernel.dk>
- <feffd542a50966c7cd552c280290f406ea5629ef.camel@scylladb.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <62aca28d-fd54-ae4e-d4d4-44c7232f23da@kernel.dk>
-Date:   Wed, 21 Nov 2018 06:27:25 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1729500AbeKVAHL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Nov 2018 19:07:11 -0500
+Received: from verein.lst.de ([213.95.11.211]:51393 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727486AbeKVAHL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Nov 2018 19:07:11 -0500
+Received: by newverein.lst.de (Postfix, from userid 2407)
+        id B141D68C19; Wed, 21 Nov 2018 14:32:44 +0100 (CET)
+Date:   Wed, 21 Nov 2018 14:32:44 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>, Omar Sandoval <osandov@fb.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Dave Chinner <dchinner@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org, David Sterba <dsterba@suse.com>,
+        linux-btrfs@vger.kernel.org,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
+        Christoph Hellwig <hch@lst.de>, linux-ext4@vger.kernel.org,
+        Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
+        Boaz Harrosh <ooo@electrozaur.com>,
+        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
+Subject: Re: [PATCH V11 03/19] block: introduce bio_for_each_bvec()
+Message-ID: <20181121133244.GB1640@lst.de>
+References: <20181121032327.8434-1-ming.lei@redhat.com> <20181121032327.8434-4-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <feffd542a50966c7cd552c280290f406ea5629ef.camel@scylladb.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181121032327.8434-4-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/21/18 2:15 AM, Benny Halevy wrote:
->> +int iomap_dio_iopoll(struct kiocb *kiocb, bool spin)
->> +{
->> +	struct iomap_dio *dio = kiocb->private;
->> +	struct request_queue *q = READ_ONCE(dio->last_queue);
->> +
->> +	if (!q || dio->cookie == BLK_QC_T_NONE)
->> +		return 0;
->> +	return blk_poll(q, READ_ONCE(dio->cookie), spin);
-> 
-> How about:
-> 	blk_qc_t cookie = READ_ONCE(dio->cookie);
-> 
-> 	if (!q || cookie == BLK_QC_T_NONE)
-> 		return 0;
-> 	return blk_poll(q, cookie, spin);
-> 
-> Is there a chance the dio->cookie in the if () condition
-> will be stale?
+> +#define bio_iter_mp_iovec(bio, iter)				\
+> +	segment_iter_bvec((bio)->bi_io_vec, (iter))
 
-I've rewritten this one, more importantly it needs to guard against
-submission by ensuring that 'dio' is valid.
+Besides the mp naming we'd like to get rid off there also is just
+a single user of this macro, please just expand it there.
 
--- 
-Jens Axboe
+> +#define segment_iter_bvec(bvec, iter)				\
+> +((struct bio_vec) {							\
+> +	.bv_page	= segment_iter_page((bvec), (iter)),	\
+> +	.bv_len		= segment_iter_len((bvec), (iter)),	\
+> +	.bv_offset	= segment_iter_offset((bvec), (iter)),	\
+> +})
 
+And for this one please keep the segment vs bvec versions of these
+macros close together in the file please, right now it follow the
+bvec_iter_bvec variant closely.
+
+> +static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+> +				      unsigned bytes, unsigned max_seg_len)
+>  {
+>  	iter->bi_sector += bytes >> 9;
+>  
+>  	if (bio_no_advance_iter(bio))
+>  		iter->bi_size -= bytes;
+>  	else
+> -		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
+> +		__bvec_iter_advance(bio->bi_io_vec, iter, bytes, max_seg_len);
+>  		/* TODO: It is reasonable to complete bio with error here. */
+>  }
+>  
+> +static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+> +				    unsigned bytes)
+> +{
+> +	__bio_advance_iter(bio, iter, bytes, PAGE_SIZE);
+> +}
+
+Btw, I think the remaining users of bio_advance_iter() in bio.h
+should probably switch to using __bio_advance_iter to make them a little
+more clear to read.
+
+> +/* returns one real segment(multi-page bvec) each time */
+
+space before the brace, please.
+
+> +#define BVEC_MAX_LEN  ((unsigned int)-1)
+
+>  	while (bytes) {
+> +		unsigned segment_len = segment_iter_len(bv, *iter);
+>  
+> -		iter->bi_bvec_done += len;
+> +		if (max_seg_len < BVEC_MAX_LEN)
+> +			segment_len = min_t(unsigned, segment_len,
+> +					    max_seg_len -
+> +					    bvec_iter_offset(bv, *iter));
+> +
+> +		segment_len = min(bytes, segment_len);
+
+Please stick to passing the magic zero here as can often generate more
+efficient code.
+
+Talking about efficent code - I wonder how much code size we'd save
+by moving this function out of line..
+
+But while looking over this I wonder why we even need the max_seg_len
+here.  The only thing __bvec_iter_advance does it to move bi_bvec_done
+and bi_idx forward, with corresponding decrements of bi_size.  As far
+as I can tell the only thing that max_seg_len does is that we need
+to more iterations of the while loop to archive the same thing.
+
+And actual bvec used by the caller will be obtained using
+bvec_iter_bvec or segment_iter_bvec depending on if they want multi-page
+or single-page variants.
