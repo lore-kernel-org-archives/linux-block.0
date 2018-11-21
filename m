@@ -3,33 +3,33 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 993E8C43610
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 15:08:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2488AC43441
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 15:32:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6206721479
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 15:08:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6206721479
+	by mail.kernel.org (Postfix) with ESMTP id A9606214DA
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 15:32:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9606214DA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731165AbeKVBmL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Nov 2018 20:42:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34052 "EHLO mx1.redhat.com"
+        id S1731419AbeKVCHH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Nov 2018 21:07:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:8638 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729828AbeKVBmJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Nov 2018 20:42:09 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        id S1731011AbeKVCHG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Nov 2018 21:07:06 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 65ADB3002F82;
-        Wed, 21 Nov 2018 15:07:21 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id AC949308214B;
+        Wed, 21 Nov 2018 15:32:08 +0000 (UTC)
 Received: from ming.t460p (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0B9468271A;
-        Wed, 21 Nov 2018 15:06:15 +0000 (UTC)
-Date:   Wed, 21 Nov 2018 23:06:11 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E1D35F7D9;
+        Wed, 21 Nov 2018 15:31:40 +0000 (UTC)
+Date:   Wed, 21 Nov 2018 23:31:36 +0800
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
@@ -48,45 +48,135 @@ Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
         linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
         Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: Re: [PATCH V11 02/19] block: introduce multi-page bvec helpers
-Message-ID: <20181121150610.GA19111@ming.t460p>
+Subject: Re: [PATCH V11 03/19] block: introduce bio_for_each_bvec()
+Message-ID: <20181121153135.GB19111@ming.t460p>
 References: <20181121032327.8434-1-ming.lei@redhat.com>
- <20181121032327.8434-3-ming.lei@redhat.com>
- <20181121131928.GA1640@lst.de>
+ <20181121032327.8434-4-ming.lei@redhat.com>
+ <20181121133244.GB1640@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181121131928.GA1640@lst.de>
+In-Reply-To: <20181121133244.GB1640@lst.de>
 User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Wed, 21 Nov 2018 15:07:21 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Wed, 21 Nov 2018 15:32:09 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 21, 2018 at 02:19:28PM +0100, Christoph Hellwig wrote:
-> On Wed, Nov 21, 2018 at 11:23:10AM +0800, Ming Lei wrote:
-> > This patch introduces helpers of 'segment_iter_*' for multipage
-> > bvec support.
-> > 
-> > The introduced helpers treate one bvec as real multi-page segment,
-> > which may include more than one pages.
+On Wed, Nov 21, 2018 at 02:32:44PM +0100, Christoph Hellwig wrote:
+> > +#define bio_iter_mp_iovec(bio, iter)				\
+> > +	segment_iter_bvec((bio)->bi_io_vec, (iter))
 > 
-> Unless I'm missing something these bvec vs segment names are exactly
-> inverted vs how we use it elsewhere.
+> Besides the mp naming we'd like to get rid off there also is just
+> a single user of this macro, please just expand it there.
+
+OK.
+
 > 
-> In the iterators we use segment for single-page bvec, and bvec for multi
-> page ones, and here it is inverse.  Please switch it around.
+> > +#define segment_iter_bvec(bvec, iter)				\
+> > +((struct bio_vec) {							\
+> > +	.bv_page	= segment_iter_page((bvec), (iter)),	\
+> > +	.bv_len		= segment_iter_len((bvec), (iter)),	\
+> > +	.bv_offset	= segment_iter_offset((bvec), (iter)),	\
+> > +})
+> 
+> And for this one please keep the segment vs bvec versions of these
+> macros close together in the file please, right now it follow the
+> bvec_iter_bvec variant closely.
 
-bvec_iter_* is used for single-page bvec in current linus tree, and there are
-lots of users now:
+OK.
 
-[linux]$ git grep -n "bvec_iter_*" ./ | wc
-    191     995   13242
+> 
+> > +static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+> > +				      unsigned bytes, unsigned max_seg_len)
+> >  {
+> >  	iter->bi_sector += bytes >> 9;
+> >  
+> >  	if (bio_no_advance_iter(bio))
+> >  		iter->bi_size -= bytes;
+> >  	else
+> > -		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
+> > +		__bvec_iter_advance(bio->bi_io_vec, iter, bytes, max_seg_len);
+> >  		/* TODO: It is reasonable to complete bio with error here. */
+> >  }
+> >  
+> > +static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+> > +				    unsigned bytes)
+> > +{
+> > +	__bio_advance_iter(bio, iter, bytes, PAGE_SIZE);
+> > +}
+> 
+> Btw, I think the remaining users of bio_advance_iter() in bio.h
+> should probably switch to using __bio_advance_iter to make them a little
+> more clear to read.
 
-If we have to switch it first, it can be a big change, just wondering if Jens
-is happy with that?
+Good point.
+
+> 
+> > +/* returns one real segment(multi-page bvec) each time */
+> 
+> space before the brace, please.
+
+OK.
+
+> 
+> > +#define BVEC_MAX_LEN  ((unsigned int)-1)
+> 
+> >  	while (bytes) {
+> > +		unsigned segment_len = segment_iter_len(bv, *iter);
+> >  
+> > -		iter->bi_bvec_done += len;
+> > +		if (max_seg_len < BVEC_MAX_LEN)
+> > +			segment_len = min_t(unsigned, segment_len,
+> > +					    max_seg_len -
+> > +					    bvec_iter_offset(bv, *iter));
+> > +
+> > +		segment_len = min(bytes, segment_len);
+> 
+> Please stick to passing the magic zero here as can often generate more
+> efficient code.
+
+But zero may decrease the code readability. Actually the passed
+'max_seg_len' is just a constant, and complier should have generated
+same efficient code for any constant, either 0 or other.
+
+> 
+> Talking about efficent code - I wonder how much code size we'd save
+> by moving this function out of line..
+
+That is good point, see the following diff:
+
+[mingl@hp kernel]$ diff -u inline.size non_inline.size
+--- inline.size	2018-11-21 23:24:52.305312076 +0800
++++ non_inline.size	2018-11-21 23:24:59.908393010 +0800
+@@ -1,2 +1,2 @@
+    text	   data	    bss	    dec	    hex	filename
+-13429213	6893922	4292692	24615827	1779b93	vmlinux.inline
++13429153	6893346	4292692	24615191	1779917	vmlinux.non_inline
+
+vmlinux(non_inline) is built by just moving/exporting __bvec_iter_advance()
+into block/bio.c.
+
+The difference is about 276bytes.
+
+> 
+> But while looking over this I wonder why we even need the max_seg_len
+> here.  The only thing __bvec_iter_advance does it to move bi_bvec_done
+> and bi_idx forward, with corresponding decrements of bi_size.  As far
+> as I can tell the only thing that max_seg_len does is that we need
+> to more iterations of the while loop to archive the same thing.
+> 
+> And actual bvec used by the caller will be obtained using
+> bvec_iter_bvec or segment_iter_bvec depending on if they want multi-page
+> or single-page variants.
+
+Right, we let __bvec_iter_advance() serve for both multi-page and single-page
+case, then we have to tell it via one way or another, now we use the constant
+of 'max_seg_len'.
+
+Or you suggest to implement two versions of __bvec_iter_advance()?
 
 Thanks,
 Ming
