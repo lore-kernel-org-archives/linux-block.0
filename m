@@ -2,83 +2,173 @@ Return-Path: <SRS0=SuLc=OA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89320C43610
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 16:24:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 139A0C43441
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 17:12:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 479B321479
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 16:24:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ekVcuHan"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 479B321479
+	by mail.kernel.org (Postfix) with ESMTP id D11BA214E0
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 17:12:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D11BA214E0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731737AbeKVC7m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Nov 2018 21:59:42 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:39544 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730375AbeKVC7m (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Nov 2018 21:59:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
-        :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=0Sc/7JZrLZH3MB9AKrNIk+mOyLv5fjOlTXwM2E67fJg=; b=ekVcuHanRtS/lVNHopuYSDWeTT
-        CKTXSbPTG8kfXd4M523sGUZdEqvNpICgI2qjDmir9EJhTQ7YCBV+crAxt9pH14j7DfJIAtjs9RyPq
-        X5rlDR7VqzutwMWKM1kHgFnhxytGNxn4DTsh+OnSVk6HLDhELE5O8JoY8CEUhMcAPv9jw8vICenll
-        0HGE237UO+YK17x0lXFsREDDEwOO3ggYAV53BRve+gt/Uqvdsr2IJhrxFo8Ju8AJXhwF3jt04RMMb
-        BGEgIK3PA6k9rMD7/2UPvq+I8sfpuX0vN3kEVD0alpnK79LxRaIdqm07ntTysgq6/8FqXFN5rSy5/
-        0AR36TdA==;
-Received: from 089144201193.atnat0010.highway.a1.net ([89.144.201.193] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gPVIh-0003ZL-1X; Wed, 21 Nov 2018 16:24:27 +0000
+        id S1727486AbeKVDre (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Nov 2018 22:47:34 -0500
+Received: from verein.lst.de ([213.95.11.211]:52660 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725995AbeKVDre (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Nov 2018 22:47:34 -0500
+Received: by newverein.lst.de (Postfix, from userid 2407)
+        id 248B268C19; Wed, 21 Nov 2018 18:12:17 +0100 (CET)
+Date:   Wed, 21 Nov 2018 18:12:17 +0100
 From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@fb.com>, Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>
-Cc:     Max Gurtovoy <maxg@mellanox.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 13/13] block: enable polling by default if a poll map is initalized
-Date:   Wed, 21 Nov 2018 17:23:47 +0100
-Message-Id: <20181121162347.17430-14-hch@lst.de>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20181121162347.17430-1-hch@lst.de>
-References: <20181121162347.17430-1-hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        Omar Sandoval <osandov@fb.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Dave Chinner <dchinner@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org, David Sterba <dsterba@suse.com>,
+        linux-btrfs@vger.kernel.org,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
+        linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
+        linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
+        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
+Subject: Re: [PATCH V11 03/19] block: introduce bio_for_each_bvec()
+Message-ID: <20181121171217.GA6259@lst.de>
+References: <20181121032327.8434-1-ming.lei@redhat.com> <20181121032327.8434-4-ming.lei@redhat.com> <20181121133244.GB1640@lst.de> <20181121153135.GB19111@ming.t460p> <20181121161025.GB4977@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181121161025.GB4977@lst.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If the user did setup polling in the driver we should not require
-another know in the block layer to enable it.
+On Wed, Nov 21, 2018 at 05:10:25PM +0100, Christoph Hellwig wrote:
+> No - I think we can always use the code without any segment in
+> bvec_iter_advance.  Because bvec_iter_advance only operates on the
+> iteractor, the generation of an actual single-page or multi-page
+> bvec is left to the caller using the bvec_iter_bvec or segment_iter_bvec
+> helpers.  The only difference is how many bytes you can move the
+> iterator forward in a single loop iteration - so if you pass in
+> PAGE_SIZE as the max_seg_len you just will have to loop more often
+> for a large enough bytes, but not actually do anything different.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c | 2 ++
- 1 file changed, 2 insertions(+)
+FYI, this patch reverts the max_seg_len related changes back to where
+we are in mainline, and as expected everything works fine for me:
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 32e43bea36e3..9847e9d2fa7b 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2782,6 +2782,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	q->tag_set = set;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index e5b975fa0558..926550ce2d21 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -137,24 +137,18 @@ static inline bool bio_full(struct bio *bio)
+ 	for (i = 0, iter_all.idx = 0; iter_all.idx < (bio)->bi_vcnt; iter_all.idx++)	\
+ 		bvec_for_each_segment(bvl, &((bio)->bi_io_vec[iter_all.idx]), i, iter_all)
  
- 	q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
-+	if (set->nr_maps > HCTX_TYPE_POLL)
-+		blk_queue_flag_set(QUEUE_FLAG_POLL, q);
+-static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+-				      unsigned bytes, unsigned max_seg_len)
++static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
++				    unsigned bytes)
+ {
+ 	iter->bi_sector += bytes >> 9;
  
- 	if (!(set->flags & BLK_MQ_F_SG_MERGE))
- 		blk_queue_flag_set(QUEUE_FLAG_NO_SG_MERGE, q);
--- 
-2.19.1
-
+ 	if (bio_no_advance_iter(bio))
+ 		iter->bi_size -= bytes;
+ 	else
+-		__bvec_iter_advance(bio->bi_io_vec, iter, bytes, max_seg_len);
++		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
+ 		/* TODO: It is reasonable to complete bio with error here. */
+ }
+ 
+-static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+-				    unsigned bytes)
+-{
+-	__bio_advance_iter(bio, iter, bytes, PAGE_SIZE);
+-}
+-
+ #define __bio_for_each_segment(bvl, bio, iter, start)			\
+ 	for (iter = (start);						\
+ 	     (iter).bi_size &&						\
+@@ -168,7 +162,7 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+ 	for (iter = (start);						\
+ 	     (iter).bi_size &&						\
+ 		((bvl = bio_iter_mp_iovec((bio), (iter))), 1);	\
+-	     __bio_advance_iter((bio), &(iter), (bvl).bv_len, BVEC_MAX_LEN))
++	     bio_advance_iter((bio), &(iter), (bvl).bv_len))
+ 
+ /* returns one real segment(multi-page bvec) each time */
+ #define bio_for_each_bvec(bvl, bio, iter)			\
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index cab36d838ed0..138b4007b8f2 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -25,8 +25,6 @@
+ #include <linux/errno.h>
+ #include <linux/mm.h>
+ 
+-#define BVEC_MAX_LEN  ((unsigned int)-1)
+-
+ /*
+  * was unsigned short, but we might as well be ready for > 64kB I/O pages
+  */
+@@ -102,8 +100,8 @@ struct bvec_iter_all {
+ 	.bv_offset	= segment_iter_offset((bvec), (iter)),	\
+ })
+ 
+-static inline bool __bvec_iter_advance(const struct bio_vec *bv,
+-		struct bvec_iter *iter, unsigned bytes, unsigned max_seg_len)
++static inline bool bvec_iter_advance(const struct bio_vec *bv,
++		struct bvec_iter *iter, unsigned bytes)
+ {
+ 	if (WARN_ONCE(bytes > iter->bi_size,
+ 		     "Attempted to advance past end of bvec iter\n")) {
+@@ -112,18 +110,12 @@ static inline bool __bvec_iter_advance(const struct bio_vec *bv,
+ 	}
+ 
+ 	while (bytes) {
+-		unsigned segment_len = segment_iter_len(bv, *iter);
+-
+-		if (max_seg_len < BVEC_MAX_LEN)
+-			segment_len = min_t(unsigned, segment_len,
+-					    max_seg_len -
+-					    bvec_iter_offset(bv, *iter));
++		unsigned iter_len = bvec_iter_len(bv, *iter);
++		unsigned len = min(bytes, iter_len);
+ 
+-		segment_len = min(bytes, segment_len);
+-
+-		bytes -= segment_len;
+-		iter->bi_size -= segment_len;
+-		iter->bi_bvec_done += segment_len;
++		bytes -= len;
++		iter->bi_size -= len;
++		iter->bi_bvec_done += len;
+ 
+ 		if (iter->bi_bvec_done == __bvec_iter_bvec(bv, *iter)->bv_len) {
+ 			iter->bi_bvec_done = 0;
+@@ -157,13 +149,6 @@ static inline bool bvec_iter_rewind(const struct bio_vec *bv,
+ 	return true;
+ }
+ 
+-static inline bool bvec_iter_advance(const struct bio_vec *bv,
+-				     struct bvec_iter *iter,
+-				     unsigned bytes)
+-{
+-	return __bvec_iter_advance(bv, iter, bytes, PAGE_SIZE);
+-}
+-
+ #define for_each_bvec(bvl, bio_vec, iter, start)			\
+ 	for (iter = (start);						\
+ 	     (iter).bi_size &&						\
