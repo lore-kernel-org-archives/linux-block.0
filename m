@@ -2,73 +2,179 @@ Return-Path: <SRS0=SuLc=OA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BC04C43610
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 08:46:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A694C43441
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 08:56:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D6E2214C1
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 08:46:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D6E2214C1
+	by mail.kernel.org (Postfix) with ESMTP id 5A7302146F
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 08:56:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A7302146F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728268AbeKUTTs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Nov 2018 14:19:48 -0500
-Received: from verein.lst.de ([213.95.11.211]:50061 "EHLO newverein.lst.de"
+        id S1729014AbeKUTaZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Nov 2018 14:30:25 -0500
+Received: from verein.lst.de ([213.95.11.211]:50120 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728210AbeKUTTr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Nov 2018 14:19:47 -0500
+        id S1726550AbeKUTaZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Nov 2018 14:30:25 -0500
 Received: by newverein.lst.de (Postfix, from userid 2407)
-        id 4F0CA68C19; Wed, 21 Nov 2018 09:46:08 +0100 (CET)
-Date:   Wed, 21 Nov 2018 09:46:08 +0100
+        id 82C7168C19; Wed, 21 Nov 2018 09:56:45 +0100 (CET)
+Date:   Wed, 21 Nov 2018 09:56:45 +0100
 From:   Christoph Hellwig <hch@lst.de>
 To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Dave Chinner <dchinner@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
-        Theodore Ts'o <tytso@mit.edu>, linux-ext4@vger.kernel.org,
-        Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
-        Boaz Harrosh <ooo@electrozaur.com>,
-        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: Re: [PATCH V10 09/19] block: introduce bio_bvecs()
-Message-ID: <20181121084608.GA29622@lst.de>
-References: <002fe56b-25e4-573e-c09b-bb12c3e8d25a@grimberg.me> <20181120161651.GB2629@lst.de> <53526aae-fb9b-ee38-0a01-e5899e2d4e4d@grimberg.me> <20181121005902.GA31748@ming.t460p> <2d9bee7a-f010-dcf4-1184-094101058584@grimberg.me> <20181121034415.GA8408@ming.t460p> <2a47d336-c19b-6bf4-c247-d7382871eeea@grimberg.me> <7378bf49-5a7e-5622-d4d1-808ba37ce656@grimberg.me> <20181121050359.GA31915@ming.t460p> <fc268b0e-61b5-aacc-67be-cb7b266c6d8f@grimberg.me>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+        Keith Busch <keith.busch@intel.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v2 14/14] nvme-tcp: add NVMe over TCP host driver
+Message-ID: <20181121085645.GA29747@lst.de>
+References: <20181120030019.31738-1-sagi@grimberg.me> <20181120030019.31738-16-sagi@grimberg.me>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fc268b0e-61b5-aacc-67be-cb7b266c6d8f@grimberg.me>
+In-Reply-To: <20181120030019.31738-16-sagi@grimberg.me>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 20, 2018 at 09:35:07PM -0800, Sagi Grimberg wrote:
->> Given it is over TCP, I guess it should be doable for you to preallocate one
->> 256-bvec table in one page for each request, then sets the max segment size as
->> (unsigned int)-1, and max segment number as 256, the preallocated table
->> should work anytime.
->
-> 256 bvec table is really a lot to preallocate, especially when its not
-> needed, I can easily initialize the bvec_iter on the bio bvec. If this
-> involves preallocation of the worst-case than I don't consider this to
-> be an improvement.
+On Mon, Nov 19, 2018 at 07:00:16PM -0800, Sagi Grimberg wrote:
+> From: Sagi Grimberg <sagi@lightbitslabs.com>
+> 
+> This patch implements the NVMe over TCP host driver. It can be used to
+> connect to remote NVMe over Fabrics subsystems over good old TCP/IP.
+> 
+> The driver implements the TP 8000 of how nvme over fabrics capsules and
+> data are encapsulated in nvme-tcp pdus and exchaged on top of a TCP byte
+> stream. nvme-tcp header and data digest are supported as well.
+> 
+> To connect to all NVMe over Fabrics controllers reachable on a given taget
+> port over TCP use the following command:
+> 
+> 	nvme connect-all -t tcp -a $IPADDR
+> 
+> This requires the latest version of nvme-cli with TCP support.
+> 
+> Signed-off-by: Sagi Grimberg <sagi@lightbitslabs.com>
+> Signed-off-by: Roy Shterman <roys@lightbitslabs.com>
+> Signed-off-by: Solganik Alexander <sashas@lightbitslabs.com>
+> ---
+>  drivers/nvme/host/Kconfig  |   15 +
+>  drivers/nvme/host/Makefile |    3 +
+>  drivers/nvme/host/tcp.c    | 2306 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 2324 insertions(+)
+>  create mode 100644 drivers/nvme/host/tcp.c
+> 
+> diff --git a/drivers/nvme/host/Kconfig b/drivers/nvme/host/Kconfig
+> index 88a8b5916624..0f345e207675 100644
+> --- a/drivers/nvme/host/Kconfig
+> +++ b/drivers/nvme/host/Kconfig
+> @@ -57,3 +57,18 @@ config NVME_FC
+>  	  from https://github.com/linux-nvme/nvme-cli.
+>  
+>  	  If unsure, say N.
+> +
+> +config NVME_TCP
+> +	tristate "NVM Express over Fabrics TCP host driver"
+> +	depends on INET
+> +	depends on BLK_DEV_NVME
+> +	select NVME_FABRICS
+> +	help
+> +	  This provides support for the NVMe over Fabrics protocol using
+> +	  the TCP transport.  This allows you to use remote block devices
+> +	  exported using the NVMe protocol set.
+> +
+> +	  To configure a NVMe over Fabrics controller use the nvme-cli tool
+> +	  from https://github.com/linux-nvme/nvme-cli.
+> +
+> +	  If unsure, say N.
+> diff --git a/drivers/nvme/host/Makefile b/drivers/nvme/host/Makefile
+> index aea459c65ae1..8a4b671c5f0c 100644
+> --- a/drivers/nvme/host/Makefile
+> +++ b/drivers/nvme/host/Makefile
+> @@ -7,6 +7,7 @@ obj-$(CONFIG_BLK_DEV_NVME)		+= nvme.o
+>  obj-$(CONFIG_NVME_FABRICS)		+= nvme-fabrics.o
+>  obj-$(CONFIG_NVME_RDMA)			+= nvme-rdma.o
+>  obj-$(CONFIG_NVME_FC)			+= nvme-fc.o
+> +obj-$(CONFIG_NVME_TCP)			+= nvme-tcp.o
+>  
+>  nvme-core-y				:= core.o
+>  nvme-core-$(CONFIG_TRACING)		+= trace.o
+> @@ -21,3 +22,5 @@ nvme-fabrics-y				+= fabrics.o
+>  nvme-rdma-y				+= rdma.o
+>  
+>  nvme-fc-y				+= fc.o
+> +
+> +nvme-tcp-y				+= tcp.o
+> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+> new file mode 100644
+> index 000000000000..4c583859f0ad
+> --- /dev/null
+> +++ b/drivers/nvme/host/tcp.c
+> @@ -0,0 +1,2306 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * NVMe over Fabrics TCP host.
+> + * Copyright (c) 2018 LightBits Labs. All rights reserved.
+> + */
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +#include <linux/module.h>
+> +#include <linux/init.h>
+> +#include <linux/slab.h>
+> +#include <linux/err.h>
+> +#include <linux/nvme-tcp.h>
+> +#include <net/sock.h>
+> +#include <net/tcp.h>
+> +#include <linux/blk-mq.h>
+> +#include <crypto/hash.h>
+> +
+> +#include "nvme.h"
+> +#include "fabrics.h"
+> +
+> +struct nvme_tcp_queue;
+> +
+> +enum nvme_tcp_send_state {
+> +	NVME_TCP_SEND_CMD_PDU = 0,
+> +	NVME_TCP_SEND_H2C_PDU,
+> +	NVME_TCP_SEND_DATA,
+> +	NVME_TCP_SEND_DDGST,
+> +};
+> +
+> +struct nvme_tcp_send_ctx {
+> +	struct bio		*curr_bio;
+> +	struct iov_iter		iter;
+> +	size_t			offset;
+> +	size_t			data_sent;
+> +	enum nvme_tcp_send_state state;
+> +};
+> +
+> +struct nvme_tcp_recv_ctx {
+> +	struct iov_iter		iter;
+> +	struct bio		*curr_bio;
+> +};
 
-Ok, I took a look at the nvme-tcp code and it seems you care about
-bios because you want a contiguos bio chunk for sending it down
-the networking code.  Yes, in that case we sort of need to iterate
-over bios.  But you already have a special case for discard, so you
-don't really need any of the magic in the bio_bvecs() helper either
-can can just count bi_vcnt in the bio.
+I don't understand these structures.  There should only be
+a bio to be send or receive, not both.  Why do we need two
+curr_bio pointers?
+
+To me it seems like both structures should just go away and
+move into nvme_tcp_request ala:
+
+
+	struct bio		*curr_bio;
+
+	/* send state */
+	struct iov_iter		send_iter;
+	size_t			send_offset;
+	enum nvme_tcp_send_state send_state;
+	size_t			data_sent;
+
+	/* receive state */
+	struct iov_iter		recv_iter;
+
