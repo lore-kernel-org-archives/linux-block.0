@@ -4,49 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D4C3C43441
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 16:24:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 283D8C43441
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 16:24:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 05F5521479
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 16:24:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E49D921479
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 16:24:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fNNv+xmR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05F5521479
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tdyEAz8N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E49D921479
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730396AbeKVC7I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Nov 2018 21:59:08 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:35312 "EHLO
+        id S1731713AbeKVC7N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Nov 2018 21:59:13 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:35872 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730369AbeKVC7I (ORCPT
+        with ESMTP id S1730398AbeKVC7M (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Nov 2018 21:59:08 -0500
+        Wed, 21 Nov 2018 21:59:12 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=rHia6aUKP3l1i9fKElG3LXlwD4SVyFKecln4cQ6XUlM=; b=fNNv+xmRKGBSsykQlMsnfj3Ti0
-        +gSccRSK2iEw85Z93HDDjcE2E0D8IbFATGyARLnsg6aguvcTwrWSHtWLMIRXI29xSlkQqoHqOh7lT
-        23vLGYCL2e5hFwnkvXI1lQzb4qONd63lvJ1aEhng9JXm5mZhcDmllC901V2XsDpibll218Tk5hEMi
-        mAt1jF2nr3Txf6DLJO6+uOdMwDR42DQy4GkPhl3Zn4gp5hPZYXl+P6zD+CB1EVQz1BDqp+tecnnL2
-        vpclvudTkJSxjuVpbeKz7XA19WM2mY9IUVQv7DiOe/yAjcAEMVDExOFGQY4y3JlPoxp0mJ7dfS4/F
-        ibgfo1SQ==;
+        bh=na/qPFNvVf85bI7/DMx+STga2n3Bqp2LvxK7201IkJY=; b=tdyEAz8NetF6+SWpJ9uOeS0Wsh
+        dNB8cu5LrF5VBoV+oJ03BHnqutcl7fBUOBxOV2kOwrkMIoMs7NFh6aXErnbfK0zgRc4E2CPbvECdL
+        uYku2mNg6qz+zXWEhh85rq0E8C31hdv8kfCPppY8/qQ0Ct0kosPwU2zYELL9fWI4/MyqjbDYcKpGc
+        953cvSaZMgDJrnTq9OLszAtX5YyKfGKJQMVS+FN1WeGveX2P5mYVzy87nHUQmY9DKJoNewesBoTlm
+        uzmb4t9KtQMZa5MjXgqdfPXRT7SlNGFBVe4b4k8kG8h1JXAs0tS5fdB1Oo8+gtfe/1YaN8h1kgLFF
+        G5euf0sA==;
 Received: from 089144201193.atnat0010.highway.a1.net ([89.144.201.193] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gPVIB-0002mH-6R; Wed, 21 Nov 2018 16:23:55 +0000
+        id 1gPVIG-0002uW-Tf; Wed, 21 Nov 2018 16:24:01 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@fb.com>, Keith Busch <keith.busch@intel.com>,
         Sagi Grimberg <sagi@grimberg.me>
 Cc:     Max Gurtovoy <maxg@mellanox.com>, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org
-Subject: [PATCH 02/13] nvme-pci: use atomic bitops to mark a queue enabled
-Date:   Wed, 21 Nov 2018 17:23:36 +0100
-Message-Id: <20181121162347.17430-3-hch@lst.de>
+Subject: [PATCH 04/13] nvme-pci: only allow polling with separate poll queues
+Date:   Wed, 21 Nov 2018 17:23:38 +0100
+Message-Id: <20181121162347.17430-5-hch@lst.de>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181121162347.17430-1-hch@lst.de>
 References: <20181121162347.17430-1-hch@lst.de>
@@ -58,128 +59,62 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This gets rid of all the messing with cq_vector and the ->polled field
-by using an atomic bitop to mark the queue enabled or not.
+This will allow us to simplify both the regular NVMe interrupt handler
+and the upcoming aio poll code.  In addition to that the separate
+queues are generally a good idea for performance reasons.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/pci.c | 43 ++++++++++++++---------------------------
- 1 file changed, 15 insertions(+), 28 deletions(-)
+ drivers/nvme/host/pci.c | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 308216201abe..d8e9998b5d0f 100644
+index 608c52045b1b..a68d71ffd0b9 100644
 --- a/drivers/nvme/host/pci.c
 +++ b/drivers/nvme/host/pci.c
-@@ -200,7 +200,8 @@ struct nvme_queue {
- 	u16 last_cq_head;
- 	u16 qid;
- 	u8 cq_phase;
--	u8 polled;
-+	unsigned long flags;
-+#define NVMEQ_ENABLED		0
- 	u32 *dbbuf_sq_db;
- 	u32 *dbbuf_cq_db;
- 	u32 *dbbuf_sq_ei;
-@@ -898,7 +899,7 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	 * We should not need to do this, but we're still using this to
- 	 * ensure we can drain requests on a dying queue.
- 	 */
--	if (unlikely(nvmeq->cq_vector < 0 && !nvmeq->polled))
-+	if (unlikely(!test_bit(NVMEQ_ENABLED, &nvmeq->flags)))
- 		return BLK_STS_IOERR;
+@@ -1060,13 +1060,6 @@ static int __nvme_poll(struct nvme_queue *nvmeq, unsigned int tag)
+ }
  
- 	ret = nvme_setup_cmd(ns, req, &cmnd);
-@@ -1366,31 +1367,19 @@ static void nvme_free_queues(struct nvme_dev *dev, int lowest)
-  */
- static int nvme_suspend_queue(struct nvme_queue *nvmeq)
+ static int nvme_poll(struct blk_mq_hw_ctx *hctx)
+-{
+-	struct nvme_queue *nvmeq = hctx->driver_data;
+-
+-	return __nvme_poll(nvmeq, -1);
+-}
+-
+-static int nvme_poll_noirq(struct blk_mq_hw_ctx *hctx)
  {
--	int vector;
--
--	spin_lock_irq(&nvmeq->cq_lock);
--	if (nvmeq->cq_vector == -1 && !nvmeq->polled) {
--		spin_unlock_irq(&nvmeq->cq_lock);
-+	if (!test_and_clear_bit(NVMEQ_ENABLED, &nvmeq->flags))
- 		return 1;
--	}
--	vector = nvmeq->cq_vector;
--	nvmeq->dev->online_queues--;
--	nvmeq->cq_vector = -1;
--	nvmeq->polled = false;
--	spin_unlock_irq(&nvmeq->cq_lock);
+ 	struct nvme_queue *nvmeq = hctx->driver_data;
+ 	u16 start, end;
+@@ -1574,12 +1567,11 @@ static const struct blk_mq_ops nvme_mq_admin_ops = {
  
--	/*
--	 * Ensure that nvme_queue_rq() sees it ->cq_vector == -1 without
--	 * having to grab the lock.
--	 */
-+	/* ensure that nvme_queue_rq() sees NVMEQ_ENABLED cleared */
- 	mb();
+ static const struct blk_mq_ops nvme_mq_ops = {
+ 	NVME_SHARED_MQ_OPS,
+-	.poll			= nvme_poll,
+ };
  
-+	nvmeq->dev->online_queues--;
- 	if (!nvmeq->qid && nvmeq->dev->ctrl.admin_q)
- 		blk_mq_quiesce_queue(nvmeq->dev->ctrl.admin_q);
--
--	if (vector != -1)
--		pci_free_irq(to_pci_dev(nvmeq->dev->dev), vector, nvmeq);
--
-+	if (nvmeq->cq_vector == -1)
-+		return 0;
-+	pci_free_irq(to_pci_dev(nvmeq->dev->dev), nvmeq->cq_vector, nvmeq);
-+	nvmeq->cq_vector = -1;
- 	return 0;
- }
+-static const struct blk_mq_ops nvme_mq_poll_noirq_ops = {
++static const struct blk_mq_ops nvme_mq_poll_ops = {
+ 	NVME_SHARED_MQ_OPS,
+-	.poll			= nvme_poll_noirq,
++	.poll			= nvme_poll,
+ };
  
-@@ -1548,13 +1537,7 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid, bool polled)
- 	else if (result)
- 		goto release_cq;
+ static void nvme_dev_remove_admin(struct nvme_dev *dev)
+@@ -2267,10 +2259,10 @@ static int nvme_dev_add(struct nvme_dev *dev)
+ 	int ret;
  
--	/*
--	 * Set cq_vector after alloc cq/sq, otherwise nvme_suspend_queue will
--	 * invoke free_irq for it and cause a 'Trying to free already-free IRQ
--	 * xxx' warning if the create CQ/SQ command times out.
--	 */
- 	nvmeq->cq_vector = vector;
--	nvmeq->polled = polled;
- 	nvme_init_queue(nvmeq, qid);
+ 	if (!dev->ctrl.tagset) {
+-		if (!dev->io_queues[HCTX_TYPE_POLL])
+-			dev->tagset.ops = &nvme_mq_ops;
++		if (dev->io_queues[HCTX_TYPE_POLL])
++			dev->tagset.ops = &nvme_mq_poll_ops;
+ 		else
+-			dev->tagset.ops = &nvme_mq_poll_noirq_ops;
++			dev->tagset.ops = &nvme_mq_ops;
  
- 	if (vector != -1) {
-@@ -1563,11 +1546,11 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid, bool polled)
- 			goto release_sq;
- 	}
- 
-+	set_bit(NVMEQ_ENABLED, &nvmeq->flags);
- 	return result;
- 
- release_sq:
- 	nvmeq->cq_vector = -1;
--	nvmeq->polled = false;
- 	dev->online_queues--;
- 	adapter_delete_sq(dev, qid);
- release_cq:
-@@ -1720,6 +1703,7 @@ static int nvme_pci_configure_admin_queue(struct nvme_dev *dev)
- 		return result;
- 	}
- 
-+	set_bit(NVMEQ_ENABLED, &nvmeq->flags);
- 	return result;
- }
- 
-@@ -2142,6 +2126,8 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
- 
- 	if (nr_io_queues == 0)
- 		return 0;
-+	
-+	clear_bit(NVMEQ_ENABLED, &adminq->flags);
- 
- 	if (dev->cmb_use_sqes) {
- 		result = nvme_cmb_qdepth(dev, nr_io_queues,
-@@ -2196,6 +2182,7 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
- 		adminq->cq_vector = -1;
- 		return result;
- 	}
-+	set_bit(NVMEQ_ENABLED, &adminq->flags);
- 	return nvme_create_io_queues(dev);
- }
- 
+ 		dev->tagset.nr_hw_queues = dev->online_queues - 1;
+ 		dev->tagset.nr_maps = HCTX_MAX_TYPES;
 -- 
 2.19.1
 
