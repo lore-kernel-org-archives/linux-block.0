@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4A81C43441
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 16:24:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCC22C43441
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 16:24:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A50E21479
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 16:24:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9669B21479
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 16:24:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ae2OH0mf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A50E21479
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="G/j1RHTv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9669B21479
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731716AbeKVC7U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Nov 2018 21:59:20 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:36796 "EHLO
+        id S1731720AbeKVC7Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Nov 2018 21:59:25 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:37484 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730375AbeKVC7T (ORCPT
+        with ESMTP id S1730375AbeKVC7Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Nov 2018 21:59:19 -0500
+        Wed, 21 Nov 2018 21:59:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=gcpcUN0krZCHJ2SUEqt3nNSAu1yTmINktXWfQh7vZMc=; b=Ae2OH0mfQ3SuAzRaDCx7hMk4+5
-        17Q4BG5X8fIWmB/TgbEhd2w/AzF1JQZ4eLMU+v9tBdQpTzZ8jOZZDO0TPvv8ibT0Z/NkqACHxBDir
-        ttaVlA6pGp51wgsRdUsBXnK1IATaUFdbkJamKIRQ9Y/zf4hA6r9U7paTvXRpQuSb6BVTvY+U2OR9K
-        dznpLZRnQ3Pu9JK2RsQzgpZAEIN6+snjfUA3DeIaQAVBKunVgNVY4Ge75UXtg1ChmNyQkHaiIrBgA
-        Jcmu8Fkio2tX69gPQ47UvToZXzkyhZa695EbMFsW9dAUP+I+21hMqcEyAsZ0+a/m8i1Bz09I/Bb7T
-        5M4ZRAkw==;
+        bh=wrU72pwaZrETvvaZrm+CvBu2+OHTFfSWCHBU0BmvwSQ=; b=G/j1RHTvSDz5Va11FCXN4ph3Ib
+        +RKo9Ni/3+SI0Y8RIYal0SyghXOoADOX/LR274Ko72bVlaQ4P8IcPZZqCmxnzZWfuxgStD3maB/Vb
+        DyIZKf46jeHPr9DMmCUZj5CMOCidMu9QyR4wFMhv9/H54OxPjOoKVX4Arz1H0QpsR86QY9J74EoZQ
+        vqgjeayhIccwsRNr2L66IklMccrWIvScvs3D1pQdrtcUIerFZHULZIdWNJSjbtuD38nXTkUz9E0sU
+        LuEt7ndk3hzCygdOMDjict+Q/JgMZFBSg/lWEnp+xGnI3fc//MZAmALkNRaOq/FoX//t9novDkjpn
+        HEi0c+mA==;
 Received: from 089144201193.atnat0010.highway.a1.net ([89.144.201.193] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gPVIM-00033n-Ou; Wed, 21 Nov 2018 16:24:07 +0000
+        id 1gPVIP-00038o-Kb; Wed, 21 Nov 2018 16:24:10 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@fb.com>, Keith Busch <keith.busch@intel.com>,
         Sagi Grimberg <sagi@grimberg.me>
 Cc:     Max Gurtovoy <maxg@mellanox.com>, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org
-Subject: [PATCH 06/13] nvme-pci: refactor nvme_disable_io_queues
-Date:   Wed, 21 Nov 2018 17:23:40 +0100
-Message-Id: <20181121162347.17430-7-hch@lst.de>
+Subject: [PATCH 07/13] nvme-pci: don't poll from irq context when deleting queues
+Date:   Wed, 21 Nov 2018 17:23:41 +0100
+Message-Id: <20181121162347.17430-8-hch@lst.de>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181121162347.17430-1-hch@lst.de>
 References: <20181121162347.17430-1-hch@lst.de>
@@ -59,78 +59,59 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Pass the opcode for the delete SQ/CQ command as an argument instead of
-the somewhat confusing pass loop.
+This is the last place outside of nvme_irq that handles CQEs from
+interrupt context, and thus is in the way of removing the cq_lock for
+normal queues, and avoiding lockdep warnings on the poll queues, for
+which we already take it without IRQ disabling.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/pci.c | 41 ++++++++++++++++++++---------------------
- 1 file changed, 20 insertions(+), 21 deletions(-)
+ drivers/nvme/host/pci.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 2965e4bb4e41..29072ad0a268 100644
+index 29072ad0a268..ef10279f4e58 100644
 --- a/drivers/nvme/host/pci.c
 +++ b/drivers/nvme/host/pci.c
-@@ -2213,31 +2213,29 @@ static int nvme_delete_queue(struct nvme_queue *nvmeq, u8 opcode)
- 	return 0;
+@@ -202,6 +202,7 @@ struct nvme_queue {
+ 	unsigned long flags;
+ #define NVMEQ_ENABLED		0
+ #define NVMEQ_SQ_CMB		1
++#define NVMEQ_DELETE_ERROR	2
+ 	u32 *dbbuf_sq_db;
+ 	u32 *dbbuf_cq_db;
+ 	u32 *dbbuf_sq_ei;
+@@ -2185,7 +2186,7 @@ static void nvme_del_cq_end(struct request *req, blk_status_t error)
+ 	struct nvme_queue *nvmeq = req->end_io_data;
+ 
+ 	if (!error)
+-		nvme_poll_irqdisable(nvmeq, -1);
++		set_bit(NVMEQ_DELETE_ERROR, &nvmeq->flags);
+ 
+ 	nvme_del_queue_end(req, error);
  }
- 
--static void nvme_disable_io_queues(struct nvme_dev *dev)
-+static bool nvme_disable_io_queues(struct nvme_dev *dev, u8 opcode)
- {
--	int pass, queues = dev->online_queues - 1;
-+	int nr_queues = dev->online_queues - 1, sent = 0;
- 	unsigned long timeout;
--	u8 opcode = nvme_admin_delete_sq;
- 
--	for (pass = 0; pass < 2; pass++) {
--		int sent = 0, i = queues;
--
--		reinit_completion(&dev->ioq_wait);
-+	reinit_completion(&dev->ioq_wait);
-  retry:
--		timeout = ADMIN_TIMEOUT;
--		for (; i > 0; i--, sent++)
--			if (nvme_delete_queue(&dev->queues[i], opcode))
--				break;
--
--		while (sent--) {
--			timeout = wait_for_completion_io_timeout(&dev->ioq_wait, timeout);
--			if (timeout == 0)
--				return;
--			if (i)
--				goto retry;
--		}
--		opcode = nvme_admin_delete_cq;
-+	timeout = ADMIN_TIMEOUT;
-+	while (nr_queues > 0) {
-+		if (nvme_delete_queue(&dev->queues[nr_queues], opcode))
-+			break;
-+		nr_queues--;
-+		sent++;
+@@ -2227,11 +2228,20 @@ static bool nvme_disable_io_queues(struct nvme_dev *dev, u8 opcode)
+ 		nr_queues--;
+ 		sent++;
  	}
-+	while (sent--) {
-+		timeout = wait_for_completion_io_timeout(&dev->ioq_wait,
-+				timeout);
-+		if (timeout == 0)
-+			return false;
-+		if (nr_queues)
-+			goto retry;
-+	}
-+	return true;
- }
- 
- /*
-@@ -2397,7 +2395,8 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
- 	nvme_stop_queues(&dev->ctrl);
- 
- 	if (!dead && dev->ctrl.queue_count > 0) {
--		nvme_disable_io_queues(dev);
-+		if (nvme_disable_io_queues(dev, nvme_admin_delete_sq))
-+			nvme_disable_io_queues(dev, nvme_admin_delete_cq);
- 		nvme_disable_admin_queue(dev, shutdown);
+-	while (sent--) {
++	while (sent) {
++		struct nvme_queue *nvmeq = &dev->queues[nr_queues + sent];
++
+ 		timeout = wait_for_completion_io_timeout(&dev->ioq_wait,
+ 				timeout);
+ 		if (timeout == 0)
+ 			return false;
++
++		/* handle any remaining CQEs */
++		if (opcode == nvme_admin_delete_cq &&
++		    !test_bit(NVMEQ_DELETE_ERROR, &nvmeq->flags))
++			nvme_poll_irqdisable(nvmeq, -1);
++
++		sent--;
+ 		if (nr_queues)
+ 			goto retry;
  	}
- 	for (i = dev->ctrl.queue_count - 1; i >= 0; i--)
 -- 
 2.19.1
 
