@@ -6,29 +6,29 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 654BFC43441
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 03:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90C48C43610
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 03:28:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3074621104
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 03:28:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3074621104
+	by mail.kernel.org (Postfix) with ESMTP id 62F6C21104
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 03:28:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62F6C21104
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728202AbeKUOA2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Nov 2018 09:00:28 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:44128 "EHLO mx1.redhat.com"
+        id S1728267AbeKUOAs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Nov 2018 09:00:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37826 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726967AbeKUOA1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Nov 2018 09:00:27 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        id S1726705AbeKUOAs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Nov 2018 09:00:48 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 81F973083390;
-        Wed, 21 Nov 2018 03:27:55 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id CD8E4309706B;
+        Wed, 21 Nov 2018 03:28:15 +0000 (UTC)
 Received: from localhost (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 091845D75D;
-        Wed, 21 Nov 2018 03:27:47 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B383B17188;
+        Wed, 21 Nov 2018 03:27:57 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -49,212 +49,159 @@ Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Boaz Harrosh <ooo@electrozaur.com>,
         Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com,
         Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V11 13/19] block: move bounce_clone_bio into bio.c
-Date:   Wed, 21 Nov 2018 11:23:21 +0800
-Message-Id: <20181121032327.8434-14-ming.lei@redhat.com>
+Subject: [PATCH V11 14/19] block: handle non-cluster bio out of blk_bio_segment_split
+Date:   Wed, 21 Nov 2018 11:23:22 +0800
+Message-Id: <20181121032327.8434-15-ming.lei@redhat.com>
 In-Reply-To: <20181121032327.8434-1-ming.lei@redhat.com>
 References: <20181121032327.8434-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Wed, 21 Nov 2018 03:27:55 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Wed, 21 Nov 2018 03:28:16 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We will reuse bounce_clone_bio() for cloning bio in case of
-!blk_queue_cluster(q), so move this helper into bio.c and
-rename it as bio_clone_bioset().
-
-No function change.
+We will enable multi-page bvec soon, but non-cluster queue can't
+handle the multi-page bvec at all. This patch borrows bounce's
+idea to clone new single-page bio for non-cluster queue, and moves
+its handling out of blk_bio_segment_split().
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bio.c    | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- block/blk.h    |  2 ++
- block/bounce.c | 70 +---------------------------------------------------------
- 3 files changed, 72 insertions(+), 69 deletions(-)
+ block/Makefile      |  3 ++-
+ block/blk-merge.c   |  6 ++++-
+ block/blk.h         |  2 ++
+ block/non-cluster.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 79 insertions(+), 2 deletions(-)
+ create mode 100644 block/non-cluster.c
 
-diff --git a/block/bio.c b/block/bio.c
-index 2680aa42a625..0f1635b9ec50 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -647,6 +647,75 @@ struct bio *bio_clone_fast(struct bio *bio, gfp_t gfp_mask, struct bio_set *bs)
- }
- EXPORT_SYMBOL(bio_clone_fast);
+diff --git a/block/Makefile b/block/Makefile
+index eee1b4ceecf9..e07d59438c4b 100644
+--- a/block/Makefile
++++ b/block/Makefile
+@@ -9,7 +9,8 @@ obj-$(CONFIG_BLOCK) := bio.o elevator.o blk-core.o blk-sysfs.o \
+ 			blk-lib.o blk-mq.o blk-mq-tag.o blk-stat.o \
+ 			blk-mq-sysfs.o blk-mq-cpumap.o blk-mq-sched.o ioctl.o \
+ 			genhd.o partition-generic.o ioprio.o \
+-			badblocks.o partitions/ blk-rq-qos.o
++			badblocks.o partitions/ blk-rq-qos.o \
++			non-cluster.o
  
-+/* block core only helper */
-+struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask,
-+			     struct bio_set *bs)
-+{
-+	struct bvec_iter iter;
-+	struct bio_vec bv;
-+	struct bio *bio;
-+
-+	/*
-+	 * Pre immutable biovecs, __bio_clone() used to just do a memcpy from
-+	 * bio_src->bi_io_vec to bio->bi_io_vec.
-+	 *
-+	 * We can't do that anymore, because:
-+	 *
-+	 *  - The point of cloning the biovec is to produce a bio with a biovec
-+	 *    the caller can modify: bi_idx and bi_bvec_done should be 0.
-+	 *
-+	 *  - The original bio could've had more than BIO_MAX_PAGES biovecs; if
-+	 *    we tried to clone the whole thing bio_alloc_bioset() would fail.
-+	 *    But the clone should succeed as long as the number of biovecs we
-+	 *    actually need to allocate is fewer than BIO_MAX_PAGES.
-+	 *
-+	 *  - Lastly, bi_vcnt should not be looked at or relied upon by code
-+	 *    that does not own the bio - reason being drivers don't use it for
-+	 *    iterating over the biovec anymore, so expecting it to be kept up
-+	 *    to date (i.e. for clones that share the parent biovec) is just
-+	 *    asking for trouble and would force extra work on
-+	 *    __bio_clone_fast() anyways.
-+	 */
-+
-+	bio = bio_alloc_bioset(gfp_mask, bio_segments(bio_src), bs);
-+	if (!bio)
-+		return NULL;
-+	bio->bi_disk		= bio_src->bi_disk;
-+	bio->bi_opf		= bio_src->bi_opf;
-+	bio->bi_ioprio		= bio_src->bi_ioprio;
-+	bio->bi_write_hint	= bio_src->bi_write_hint;
-+	bio->bi_iter.bi_sector	= bio_src->bi_iter.bi_sector;
-+	bio->bi_iter.bi_size	= bio_src->bi_iter.bi_size;
-+
-+	switch (bio_op(bio)) {
-+	case REQ_OP_DISCARD:
-+	case REQ_OP_SECURE_ERASE:
-+	case REQ_OP_WRITE_ZEROES:
-+		break;
-+	case REQ_OP_WRITE_SAME:
-+		bio->bi_io_vec[bio->bi_vcnt++] = bio_src->bi_io_vec[0];
-+		break;
-+	default:
-+		bio_for_each_segment(bv, bio_src, iter)
-+			bio->bi_io_vec[bio->bi_vcnt++] = bv;
-+		break;
-+	}
-+
-+	if (bio_integrity(bio_src)) {
-+		int ret;
-+
-+		ret = bio_integrity_clone(bio, bio_src, gfp_mask);
-+		if (ret < 0) {
-+			bio_put(bio);
-+			return NULL;
+ obj-$(CONFIG_BOUNCE)		+= bounce.o
+ obj-$(CONFIG_BLK_SCSI_REQUEST)	+= scsi_ioctl.o
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 8829c51b4e75..7c44216c1b58 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -247,7 +247,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
+ 			goto split;
+ 		}
+ 
+-		if (bvprvp && blk_queue_cluster(q)) {
++		if (bvprvp) {
+ 			if (seg_size + bv.bv_len > queue_max_segment_size(q))
+ 				goto new_segment;
+ 			if (!biovec_phys_mergeable(q, bvprvp, &bv))
+@@ -307,6 +307,10 @@ void blk_queue_split(struct request_queue *q, struct bio **bio)
+ 		split = blk_bio_write_same_split(q, *bio, &q->bio_split, &nsegs);
+ 		break;
+ 	default:
++		if (!blk_queue_cluster(q)) {
++			blk_queue_non_cluster_bio(q, bio);
++			return;
 +		}
-+	}
-+
-+	bio_clone_blkcg_association(bio, bio_src);
-+
-+	return bio;
-+}
-+
- /**
-  *	bio_add_pc_page	-	attempt to add page to bio
-  *	@q: the target queue
+ 		split = blk_bio_segment_split(q, *bio, &q->bio_split, &nsegs);
+ 		break;
+ 	}
 diff --git a/block/blk.h b/block/blk.h
-index 816a9abb87cd..31c0e45aba3a 100644
+index 31c0e45aba3a..6fc5821ced55 100644
 --- a/block/blk.h
 +++ b/block/blk.h
-@@ -336,6 +336,8 @@ static inline int blk_iolatency_init(struct request_queue *q) { return 0; }
+@@ -338,6 +338,8 @@ struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp);
  
- struct bio *blk_next_bio(struct bio *bio, unsigned int nr_pages, gfp_t gfp);
+ struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask, struct bio_set *bs);
  
-+struct bio *bio_clone_bioset(struct bio *bio_src, gfp_t gfp_mask, struct bio_set *bs);
++void blk_queue_non_cluster_bio(struct request_queue *q, struct bio **bio_orig);
 +
  #ifdef CONFIG_BLK_DEV_ZONED
  void blk_queue_free_zone_bitmaps(struct request_queue *q);
  #else
-diff --git a/block/bounce.c b/block/bounce.c
-index 7338041e3042..4947c36173b2 100644
---- a/block/bounce.c
-+++ b/block/bounce.c
-@@ -215,74 +215,6 @@ static void bounce_end_io_read_isa(struct bio *bio)
- 	__bounce_end_io_read(bio, &isa_page_pool);
- }
- 
--static struct bio *bounce_clone_bio(struct bio *bio_src, gfp_t gfp_mask,
--		struct bio_set *bs)
--{
--	struct bvec_iter iter;
--	struct bio_vec bv;
--	struct bio *bio;
--
--	/*
--	 * Pre immutable biovecs, __bio_clone() used to just do a memcpy from
--	 * bio_src->bi_io_vec to bio->bi_io_vec.
--	 *
--	 * We can't do that anymore, because:
--	 *
--	 *  - The point of cloning the biovec is to produce a bio with a biovec
--	 *    the caller can modify: bi_idx and bi_bvec_done should be 0.
--	 *
--	 *  - The original bio could've had more than BIO_MAX_PAGES biovecs; if
--	 *    we tried to clone the whole thing bio_alloc_bioset() would fail.
--	 *    But the clone should succeed as long as the number of biovecs we
--	 *    actually need to allocate is fewer than BIO_MAX_PAGES.
--	 *
--	 *  - Lastly, bi_vcnt should not be looked at or relied upon by code
--	 *    that does not own the bio - reason being drivers don't use it for
--	 *    iterating over the biovec anymore, so expecting it to be kept up
--	 *    to date (i.e. for clones that share the parent biovec) is just
--	 *    asking for trouble and would force extra work on
--	 *    __bio_clone_fast() anyways.
--	 */
--
--	bio = bio_alloc_bioset(gfp_mask, bio_segments(bio_src), bs);
--	if (!bio)
--		return NULL;
--	bio->bi_disk		= bio_src->bi_disk;
--	bio->bi_opf		= bio_src->bi_opf;
--	bio->bi_ioprio		= bio_src->bi_ioprio;
--	bio->bi_write_hint	= bio_src->bi_write_hint;
--	bio->bi_iter.bi_sector	= bio_src->bi_iter.bi_sector;
--	bio->bi_iter.bi_size	= bio_src->bi_iter.bi_size;
--
--	switch (bio_op(bio)) {
--	case REQ_OP_DISCARD:
--	case REQ_OP_SECURE_ERASE:
--	case REQ_OP_WRITE_ZEROES:
--		break;
--	case REQ_OP_WRITE_SAME:
--		bio->bi_io_vec[bio->bi_vcnt++] = bio_src->bi_io_vec[0];
--		break;
--	default:
--		bio_for_each_segment(bv, bio_src, iter)
--			bio->bi_io_vec[bio->bi_vcnt++] = bv;
--		break;
--	}
--
--	if (bio_integrity(bio_src)) {
--		int ret;
--
--		ret = bio_integrity_clone(bio, bio_src, gfp_mask);
--		if (ret < 0) {
--			bio_put(bio);
--			return NULL;
--		}
--	}
--
--	bio_clone_blkcg_association(bio, bio_src);
--
--	return bio;
--}
--
- static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 			       mempool_t *pool)
- {
-@@ -311,7 +243,7 @@ static void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig,
- 		generic_make_request(*bio_orig);
- 		*bio_orig = bio;
- 	}
--	bio = bounce_clone_bio(*bio_orig, GFP_NOIO, passthrough ? NULL :
-+	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, passthrough ? NULL :
- 			&bounce_bio_set);
- 
- 	bio_for_each_segment_all(to, bio, i, iter_all) {
+diff --git a/block/non-cluster.c b/block/non-cluster.c
+new file mode 100644
+index 000000000000..9c2910be9404
+--- /dev/null
++++ b/block/non-cluster.c
+@@ -0,0 +1,70 @@
++// SPDX-License-Identifier: GPL-2.0
++/* non-cluster handling for block devices */
++
++#include <linux/kernel.h>
++#include <linux/export.h>
++#include <linux/swap.h>
++#include <linux/gfp.h>
++#include <linux/bio.h>
++#include <linux/blkdev.h>
++#include <linux/backing-dev.h>
++#include <linux/init.h>
++#include <linux/printk.h>
++
++#include "blk.h"
++
++static struct bio_set non_cluster_bio_set, non_cluster_bio_split;
++
++static __init int init_non_cluster_bioset(void)
++{
++	WARN_ON(bioset_init(&non_cluster_bio_set, BIO_POOL_SIZE, 0,
++			   BIOSET_NEED_BVECS));
++	WARN_ON(bioset_integrity_create(&non_cluster_bio_set, BIO_POOL_SIZE));
++	WARN_ON(bioset_init(&non_cluster_bio_split, BIO_POOL_SIZE, 0, 0));
++
++	return 0;
++}
++__initcall(init_non_cluster_bioset);
++
++static void non_cluster_end_io(struct bio *bio)
++{
++	struct bio *bio_orig = bio->bi_private;
++
++	bio_orig->bi_status = bio->bi_status;
++	bio_endio(bio_orig);
++	bio_put(bio);
++}
++
++void blk_queue_non_cluster_bio(struct request_queue *q, struct bio **bio_orig)
++{
++	struct bio *bio;
++	struct bvec_iter iter;
++	struct bio_vec from;
++	unsigned i = 0;
++	unsigned sectors = 0;
++	unsigned short max_segs = min_t(unsigned short, BIO_MAX_PAGES,
++					queue_max_segments(q));
++
++	bio_for_each_segment(from, *bio_orig, iter) {
++		if (i++ < max_segs)
++			sectors += from.bv_len >> 9;
++		else
++			break;
++	}
++
++	if (sectors < bio_sectors(*bio_orig)) {
++		bio = bio_split(*bio_orig, sectors, GFP_NOIO,
++				&non_cluster_bio_split);
++		bio_chain(bio, *bio_orig);
++		generic_make_request(*bio_orig);
++		*bio_orig = bio;
++	}
++	bio = bio_clone_bioset(*bio_orig, GFP_NOIO, &non_cluster_bio_set);
++
++	bio->bi_phys_segments = bio_segments(bio);
++        bio_set_flag(bio, BIO_SEG_VALID);
++	bio->bi_end_io = non_cluster_end_io;
++
++	bio->bi_private = *bio_orig;
++	*bio_orig = bio;
++}
 -- 
 2.9.5
 
