@@ -2,51 +2,36 @@ Return-Path: <SRS0=SuLc=OA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7AFDC43441
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 04:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49B4EC43441
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 05:04:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 78B2C2145D
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 04:42:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78B2C2145D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+	by mail.kernel.org (Postfix) with ESMTP id 129E421104
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 05:04:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 129E421104
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726004AbeKUPOz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Nov 2018 10:14:55 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:46812 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725939AbeKUPOz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Nov 2018 10:14:55 -0500
-Received: by mail-pl1-f194.google.com with SMTP id t13so3573825ply.13;
-        Tue, 20 Nov 2018 20:42:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=beNzxtekC3eXWHufu9KYAAFX95VFF++NlzuARk/OlmM=;
-        b=OtGo04Uq2QpF0OwfLkHXvcJkd6Qgo4FtDHwcw1PLV7ZutmqvcCH9n05BcvPbN9epud
-         AvrARewg1IxOuuZTbEv9Ff+I4p2oKJrQFirTu4nNJjN62JARofS2egUQjF6gf4NtlgZg
-         hOgNGZjV/GNFEjVlNOb0eNQAIBmETBl0UtZPT96Pg/HiUNFaflL6X228M/ljpjBrH++R
-         EYnvlnf/oYyEUDr1mSdmlq86GoCwqRJB/whBF2jdYjpPkC4I3OQwOD/QDlzZ7x1YKVmW
-         ViWCVfp/oq+uz8+m4hxO8G+QSWOQ4QjBZtqcFQsJxckJZTaAhZFumjnq8/y6nx/dZtFV
-         K0zQ==
-X-Gm-Message-State: AA+aEWY/NG424koZUjf0EADULCbDS5H/+YCOrrB9fSb+KASvNWPdknGE
-        nv/U3XdrSFC+YYo+38hmtB0=
-X-Google-Smtp-Source: AFSGD/VfQU9yeCQvEyKVSqmkBBv3/CBEFUNv2FLAgZo9cuQAsWuO+IksYjy7sC2dMkjEksRN1uHK8Q==
-X-Received: by 2002:a63:f006:: with SMTP id k6mr4563792pgh.259.1542775327338;
-        Tue, 20 Nov 2018 20:42:07 -0800 (PST)
-Received: from ?IPv6:2601:647:4800:973f:8a0:7611:3223:f4db? ([2601:647:4800:973f:8a0:7611:3223:f4db])
-        by smtp.gmail.com with ESMTPSA id v20-v6sm49421268pfm.114.2018.11.20.20.42.05
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 20 Nov 2018 20:42:06 -0800 (PST)
-Subject: Re: [PATCH V10 09/19] block: introduce bio_bvecs()
-From:   Sagi Grimberg <sagi@grimberg.me>
-To:     Ming Lei <ming.lei@redhat.com>
+        id S1726149AbeKUPhQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Nov 2018 10:37:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49052 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725939AbeKUPhQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 21 Nov 2018 10:37:16 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 53B1E4E936;
+        Wed, 21 Nov 2018 05:04:24 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A3AA7600C3;
+        Wed, 21 Nov 2018 05:04:04 +0000 (UTC)
+Date:   Wed, 21 Nov 2018 13:04:00 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
 Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, Dave Chinner <dchinner@redhat.com>,
@@ -62,8 +47,10 @@ Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
         Boaz Harrosh <ooo@electrozaur.com>,
         Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-References: <20181115085306.9910-1-ming.lei@redhat.com>
- <20181115085306.9910-10-ming.lei@redhat.com> <20181116134541.GH3165@lst.de>
+Subject: Re: [PATCH V10 09/19] block: introduce bio_bvecs()
+Message-ID: <20181121050359.GA31915@ming.t460p>
+References: <20181115085306.9910-10-ming.lei@redhat.com>
+ <20181116134541.GH3165@lst.de>
  <002fe56b-25e4-573e-c09b-bb12c3e8d25a@grimberg.me>
  <20181120161651.GB2629@lst.de>
  <53526aae-fb9b-ee38-0a01-e5899e2d4e4d@grimberg.me>
@@ -71,32 +58,44 @@ References: <20181115085306.9910-1-ming.lei@redhat.com>
  <2d9bee7a-f010-dcf4-1184-094101058584@grimberg.me>
  <20181121034415.GA8408@ming.t460p>
  <2a47d336-c19b-6bf4-c247-d7382871eeea@grimberg.me>
-Message-ID: <7378bf49-5a7e-5622-d4d1-808ba37ce656@grimberg.me>
-Date:   Tue, 20 Nov 2018 20:42:04 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+ <7378bf49-5a7e-5622-d4d1-808ba37ce656@grimberg.me>
 MIME-Version: 1.0
-In-Reply-To: <2a47d336-c19b-6bf4-c247-d7382871eeea@grimberg.me>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7378bf49-5a7e-5622-d4d1-808ba37ce656@grimberg.me>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Wed, 21 Nov 2018 05:04:24 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
->> Yeah, that is the most common example, given merge is enabled
->> in most of cases. If the driver or device doesn't care merge,
->> you can disable it and always get single bio request, then the
->> bio's bvec table can be reused for send().
+On Tue, Nov 20, 2018 at 08:42:04PM -0800, Sagi Grimberg wrote:
 > 
-> Does bvec_iter span bvecs with your patches? I didn't see that change?
+> > > Yeah, that is the most common example, given merge is enabled
+> > > in most of cases. If the driver or device doesn't care merge,
+> > > you can disable it and always get single bio request, then the
+> > > bio's bvec table can be reused for send().
+> > 
+> > Does bvec_iter span bvecs with your patches? I didn't see that change?
+> 
+> Wait, I see that the bvec is still a single array per bio. When you said
+> a table I thought you meant a 2-dimentional array...
 
-Wait, I see that the bvec is still a single array per bio. When you said
-a table I thought you meant a 2-dimentional array...
+I mean a new 1-d table A has to be created for multiple bios in one rq,
+and build it in the following way
 
-Unless I'm not mistaken, I think that the change is pretty simple then.
-However, nvme-tcp still needs to be bio aware unless we have some
-abstraction in place.. Which will mean that nvme-tcp will need to
-open-code bio_bvecs.
+           rq_for_each_bvec(tmp, rq, rq_iter)
+                    *A = tmp;
+
+Then you can pass A to iov_iter_bvec() & send().
+
+Given it is over TCP, I guess it should be doable for you to preallocate one
+256-bvec table in one page for each request, then sets the max segment size as
+(unsigned int)-1, and max segment number as 256, the preallocated table
+should work anytime.
+
+
+Thanks,
+Ming
