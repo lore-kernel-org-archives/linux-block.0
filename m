@@ -4,50 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C076C43441
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 16:24:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0D5C04EBA
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 16:24:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3467621479
-	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 16:24:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D17521479
+	for <linux-block@archiver.kernel.org>; Wed, 21 Nov 2018 16:24:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="sC/8PI6e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3467621479
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="uCWtfIoB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D17521479
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730528AbeKVC73 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 21 Nov 2018 21:59:29 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:37902 "EHLO
+        id S1731721AbeKVC7b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 21 Nov 2018 21:59:31 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:38176 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730375AbeKVC73 (ORCPT
+        with ESMTP id S1730375AbeKVC7b (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 21 Nov 2018 21:59:29 -0500
+        Wed, 21 Nov 2018 21:59:31 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=PdRzTTdP26YjsSRQzuQPPbTaMhlUoEgr8vQEzuqVbPQ=; b=sC/8PI6eLWiKgaBzOUkV2qqbhs
-        zhFSaNc7swYn4L8RMGiFn7zo/s+JcoxP/zhlhcDN2OYZe8lqIJoKFLQvBi1MrqPuTwpeDG4bZJHhE
-        8DN4pTyXaPwET2t7jPVLZrzQDLBbGylKN72sMs4ycYNaR/QXyaRiKTjMTlzV7OB7yfF1ODo9bz+C3
-        50WqEWR/mJjT76Jh12U5V8Qv6BAyaKHa5HNyqPi7bckhPGDv5Ub8KpiySW6SLVTyBzez8fyVLCAAC
-        BWI3WVZ3I83ALIK5MlknY8K7c2nqUAB7PsZPOGzEMUfJWXndS3lKcJwy4rAW0JrKEjqxuWwcT9ZCx
-        CCZgTWGA==;
+        bh=dNADhd9xviHVkkwk7j5mLOQq+L79o9RgisN5N2dYn0k=; b=uCWtfIoBXVFuCyPj1ypBu1iNG8
+        eS6cJb/m3Ok42qjcR7s69AQHDzStTJCt08Y05t1jqzKsn0k7oLxoK1gqodgOHi74oGp7RhbpdOHNt
+        y0YM257hQy+71bsNdUpXSFuqYqyXxjG/DjwpFpGn2kBwgOFS4bphX2raq9yvD/sin4GUBismlizsK
+        w0sO/9w5jEa+1iuOpOlRyeJwGQi6QraRrtqw22iQahrfUtYyv9HvXz+ypIr0uMk0KdlJzaQ4lAglg
+        f4n3QOvkU8rBFfykjp5K7JhL9XcCcftEYWPnzqqZO5j4z5rHO4cogtqRRVGNJCzFXLBGY7GdS5vHD
+        CF+TmWlA==;
 Received: from 089144201193.atnat0010.highway.a1.net ([89.144.201.193] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gPVIS-0003DH-F1; Wed, 21 Nov 2018 16:24:12 +0000
+        id 1gPVIV-0003Hr-9a; Wed, 21 Nov 2018 16:24:15 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@fb.com>, Keith Busch <keith.busch@intel.com>,
         Sagi Grimberg <sagi@grimberg.me>
 Cc:     Max Gurtovoy <maxg@mellanox.com>, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org
-Subject: [PATCH 08/13] nvme-pci: remove the CQ lock for interrupt driven queues
-Date:   Wed, 21 Nov 2018 17:23:42 +0100
-Message-Id: <20181121162347.17430-9-hch@lst.de>
+Subject: [PATCH 09/13] nvme-rdma: remove I/O polling support
+Date:   Wed, 21 Nov 2018 17:23:43 +0100
+Message-Id: <20181121162347.17430-10-hch@lst.de>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181121162347.17430-1-hch@lst.de>
 References: <20181121162347.17430-1-hch@lst.de>
@@ -59,118 +58,57 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that we can't poll regular, interrupt driven I/O queues there
-is almost nothing that can race with an interrupt.  The only
-possible other contexts polling a CQ are the error handler and
-queue shutdown, and both are so far off in the slow path that
-we can simply use the big hammer of disabling interrupts.
-
-With that we can stop taking the cq_lock for normal queues.
+The code was always a bit of a hack that digs far too much into
+RDMA core internals.  Lets kick it out and reimplement proper
+dedicated poll queues as needed.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/pci.c | 37 ++++++++++++++++++++++++++-----------
- 1 file changed, 26 insertions(+), 11 deletions(-)
+ drivers/nvme/host/rdma.c | 24 ------------------------
+ 1 file changed, 24 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index ef10279f4e58..330510176a97 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -186,7 +186,8 @@ struct nvme_queue {
- 	struct nvme_dev *dev;
- 	spinlock_t sq_lock;
- 	struct nvme_command *sq_cmds;
--	spinlock_t cq_lock ____cacheline_aligned_in_smp;
-+	 /* only used for poll queues: */
-+	spinlock_t cq_poll_lock ____cacheline_aligned_in_smp;
- 	volatile struct nvme_completion *cqes;
- 	struct blk_mq_tags **tags;
- 	dma_addr_t sq_dma_addr;
-@@ -1021,12 +1022,16 @@ static irqreturn_t nvme_irq(int irq, void *data)
- 	irqreturn_t ret = IRQ_NONE;
- 	u16 start, end;
- 
--	spin_lock(&nvmeq->cq_lock);
-+	/*
-+	 * The rmb/wmb pair ensures we see all updates from a previous run of
-+	 * the irq handler, even if that was on another CPU.
-+	 */
-+	rmb();
- 	if (nvmeq->cq_head != nvmeq->last_cq_head)
- 		ret = IRQ_HANDLED;
- 	nvme_process_cq(nvmeq, &start, &end, -1);
- 	nvmeq->last_cq_head = nvmeq->cq_head;
--	spin_unlock(&nvmeq->cq_lock);
-+	wmb();
- 
- 	if (start != end) {
- 		nvme_complete_cqes(nvmeq, start, end);
-@@ -1050,13 +1055,24 @@ static irqreturn_t nvme_irq_check(int irq, void *data)
-  */
- static int nvme_poll_irqdisable(struct nvme_queue *nvmeq, unsigned int tag)
- {
--	unsigned long flags;
-+	struct pci_dev *pdev = to_pci_dev(nvmeq->dev->dev);
- 	u16 start, end;
- 	int found;
- 
--	spin_lock_irqsave(&nvmeq->cq_lock, flags);
-+	/*
-+	 * For a poll queue we need to protect against the polling thread
-+	 * using the CQ lock.  For normal interrupt driven threads we have
-+	 * to disable the interrupt to avoid racing with it.
-+	 */
-+	if (nvmeq->cq_vector == -1)
-+		spin_lock(&nvmeq->cq_poll_lock);
-+	else
-+		disable_irq(pci_irq_vector(pdev, nvmeq->cq_vector));
- 	found = nvme_process_cq(nvmeq, &start, &end, tag);
--	spin_unlock_irqrestore(&nvmeq->cq_lock, flags);
-+	if (nvmeq->cq_vector == -1)
-+		spin_unlock(&nvmeq->cq_poll_lock);
-+	else
-+		enable_irq(pci_irq_vector(pdev, nvmeq->cq_vector));
- 
- 	nvme_complete_cqes(nvmeq, start, end);
- 	return found;
-@@ -1071,9 +1087,9 @@ static int nvme_poll(struct blk_mq_hw_ctx *hctx)
- 	if (!nvme_cqe_pending(nvmeq))
- 		return 0;
- 
--	spin_lock(&nvmeq->cq_lock);
-+	spin_lock(&nvmeq->cq_poll_lock);
- 	found = nvme_process_cq(nvmeq, &start, &end, -1);
--	spin_unlock(&nvmeq->cq_lock);
-+	spin_unlock(&nvmeq->cq_poll_lock);
- 
- 	nvme_complete_cqes(nvmeq, start, end);
- 	return found;
-@@ -1453,7 +1469,7 @@ static int nvme_alloc_queue(struct nvme_dev *dev, int qid, int depth)
- 	nvmeq->q_dmadev = dev->dev;
- 	nvmeq->dev = dev;
- 	spin_lock_init(&nvmeq->sq_lock);
--	spin_lock_init(&nvmeq->cq_lock);
-+	spin_lock_init(&nvmeq->cq_poll_lock);
- 	nvmeq->cq_head = 0;
- 	nvmeq->cq_phase = 1;
- 	nvmeq->q_db = &dev->dbs[qid * 2 * dev->db_stride];
-@@ -1489,7 +1505,6 @@ static void nvme_init_queue(struct nvme_queue *nvmeq, u16 qid)
- {
- 	struct nvme_dev *dev = nvmeq->dev;
- 
--	spin_lock_irq(&nvmeq->cq_lock);
- 	nvmeq->sq_tail = 0;
- 	nvmeq->cq_head = 0;
- 	nvmeq->cq_phase = 1;
-@@ -1497,7 +1512,7 @@ static void nvme_init_queue(struct nvme_queue *nvmeq, u16 qid)
- 	memset((void *)nvmeq->cqes, 0, CQ_SIZE(nvmeq->q_depth));
- 	nvme_dbbuf_init(dev, nvmeq, qid);
- 	dev->online_queues++;
--	spin_unlock_irq(&nvmeq->cq_lock);
-+	wmb(); /* ensure the first interrupt sees the initialization */
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index ccfde6c7c0a5..a62e9f177c06 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -1736,29 +1736,6 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	return BLK_STS_IOERR;
  }
  
- static int nvme_create_queue(struct nvme_queue *nvmeq, int qid, bool polled)
+-static int nvme_rdma_poll(struct blk_mq_hw_ctx *hctx)
+-{
+-	struct nvme_rdma_queue *queue = hctx->driver_data;
+-	struct ib_cq *cq = queue->ib_cq;
+-	struct ib_wc wc;
+-	int found = 0;
+-
+-	while (ib_poll_cq(cq, 1, &wc) > 0) {
+-		struct ib_cqe *cqe = wc.wr_cqe;
+-
+-		if (cqe) {
+-			if (cqe->done == nvme_rdma_recv_done) {
+-				nvme_rdma_recv_done(cq, &wc);
+-				found++;
+-			} else {
+-				cqe->done(cq, &wc);
+-			}
+-		}
+-	}
+-
+-	return found;
+-}
+-
+ static void nvme_rdma_complete_rq(struct request *rq)
+ {
+ 	struct nvme_rdma_request *req = blk_mq_rq_to_pdu(rq);
+@@ -1780,7 +1757,6 @@ static const struct blk_mq_ops nvme_rdma_mq_ops = {
+ 	.init_request	= nvme_rdma_init_request,
+ 	.exit_request	= nvme_rdma_exit_request,
+ 	.init_hctx	= nvme_rdma_init_hctx,
+-	.poll		= nvme_rdma_poll,
+ 	.timeout	= nvme_rdma_timeout,
+ 	.map_queues	= nvme_rdma_map_queues,
+ };
 -- 
 2.19.1
 
