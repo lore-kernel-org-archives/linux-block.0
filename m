@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D1EBC43441
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 19:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE0BC43441
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 20:01:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 058E020892
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 19:59:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A790620892
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 20:01:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="zr7xiGDl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 058E020892
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="famrQBfR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A790620892
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407044AbeKWGgH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Nov 2018 01:36:07 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35052 "EHLO mail.kernel.org"
+        id S2438457AbeKWGeR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Nov 2018 01:34:17 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33270 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733189AbeKWGgH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Nov 2018 01:36:07 -0500
+        id S2438433AbeKWGeQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Nov 2018 01:34:16 -0500
 Received: from sasha-vm.mshome.net (unknown [37.142.5.207])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3BBED20864;
-        Thu, 22 Nov 2018 19:55:13 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8061C20864;
+        Thu, 22 Nov 2018 19:53:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1542916514;
-        bh=au5fx61beQbA5Hm8RawIWe8NEBGCph35MQbJKO//hFw=;
+        s=default; t=1542916404;
+        bh=wLz6yvVFxEVk4YxIW+igMezA197CdeT32OOm2P6k31k=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=zr7xiGDljYIbiaJcMmIvw8nI5cEs0UQC9sbn1HsETaelteyEJ4JK6xMuygW5CcXp4
-         HyexuD69yLw3nnHhIU/Ts4mh7+zEQ3pQEOH0b7q3Sby2uT0bi+JjS4plpUcRZgvOdp
-         SAiJK14ENiXxbGPOc03WlAI6W+z3+Ppp0Aw5Ucvk=
+        b=famrQBfRM3nTX3JQsKphr7NsrqYtiFlOzXXpFlKxV7KzSFA21NntZ/PUHqq4wc6LB
+         y2RjPM4TqhTBdo9iKB8AV7qqt2VX6bgbFk7TKMoJGVXHv/zwZyq6WyjIIlCUSxuTB2
+         1fkAuJ5X0omlu9YYxErCCkmwpP6ndyZbPQoQTSGs=
 From:   Sasha Levin <sashal@kernel.org>
 To:     stable@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 07/21] floppy: fix race condition in __floppy_read_block_0()
-Date:   Thu, 22 Nov 2018 14:54:38 -0500
-Message-Id: <20181122195452.13520-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 15/36] floppy: fix race condition in __floppy_read_block_0()
+Date:   Thu, 22 Nov 2018 14:52:19 -0500
+Message-Id: <20181122195240.13123-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20181122195452.13520-1-sashal@kernel.org>
-References: <20181122195452.13520-1-sashal@kernel.org>
+In-Reply-To: <20181122195240.13123-1-sashal@kernel.org>
+References: <20181122195240.13123-1-sashal@kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -108,10 +108,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index 3d0287e212fe..a7f212ea17bf 100644
+index f2b6f4da1034..fdabd0b74492 100644
 --- a/drivers/block/floppy.c
 +++ b/drivers/block/floppy.c
-@@ -4146,10 +4146,11 @@ static int __floppy_read_block_0(struct block_device *bdev, int drive)
+@@ -4151,10 +4151,11 @@ static int __floppy_read_block_0(struct block_device *bdev, int drive)
  	bio.bi_end_io = floppy_rb0_cb;
  	bio_set_op_attrs(&bio, REQ_OP_READ, 0);
  
