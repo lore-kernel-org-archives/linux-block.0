@@ -6,22 +6,22 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 212CEC43441
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 01:56:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57EE3C43610
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 01:56:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CF5DA2080F
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 01:56:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1582120821
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 01:56:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="G6BVGGB4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF5DA2080F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="a+BOaJMj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1582120821
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404047AbeKVMd1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Nov 2018 07:33:27 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:41246 "EHLO
+        id S2404021AbeKVMd0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Nov 2018 07:33:26 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:41264 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404015AbeKVMd0 (ORCPT
+        with ESMTP id S2404037AbeKVMd0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 22 Nov 2018 07:33:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -30,24 +30,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=C/Vv7dY3jag/qT3NsL4IY2O8e7ebC1FbRmTR0jRGd9s=; b=G6BVGGB4jvl7WO19wxtgRnr9M
-        CtktzR97tJRGOL2dyxM9XLrS03Ptgo9+sIRaaR2GTimvl2Ln1KEQwvkkH3Mt6C+ESOChdmvhpJhiP
-        9n4aptpduYf2s8saCvnXlfGpPeU1o65bSbjEB58D3CsB+pGkGv6+o2EkTBMCTTHwAfVNtpGiXUa18
-        lxO3ADZOPbhQPI0nasA+9CaudKOrFU7SyV7bxXjH912xNq5W3SOhaUN7bTnvcEtk/8q6nAVdSFboV
-        ZNzyeilUpFdtpRVrj+u+CrrxX0m28UGXTWj4Qs5iT73mFG/QSdQD8iJluZTAOlNUt8eIhcWENHE8W
-        N7pouIPmQ==;
+         bh=bz6sLONTcyPgDmr4XJ8yBuUx/MYIx+rF6T9SSJ6KLhs=; b=a+BOaJMjBKov3gJTg47ECLPNd
+        0inOO2nr2eO/J1DiGdaPSE6EZLFEYpvB91EgpbjtL5/o+UjIutZ4gIVVDjSDX1Bn4AT4zgq5W6Luw
+        PKo9mnQkuAkrb876rWImA7WBZDcoYud5XYpROFNyKrxLWkQrXE69yoqhDygZHI0O3UcQy+Lqcpmy1
+        +CfkaVQU018grshmLXIn7FQQzZUGRR75F+PymPTko5AGWRu0hwSKQ9VOQscfhRzsqQtYKxYq1DJK7
+        av81Q/p1DLpXAlfdJPxfM7t2xudz+CYJMiUWcCMGnAcXMV0gZ8g3HTrCxu5vXubNM2pIMC6hPwSE1
+        z1BtvSoTA==;
 Received: from [2600:1700:65a0:78e0:514:7862:1503:8e4d] (helo=sagi-Latitude-E7470.lbits)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gPeE8-0006v0-0J; Thu, 22 Nov 2018 01:56:20 +0000
+        id 1gPeE8-0006v0-Jm; Thu, 22 Nov 2018 01:56:20 +0000
 From:   Sagi Grimberg <sagi@grimberg.me>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, netdev@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Keith Busch <keith.busch@intel.com>,
         "David S. Miller" <davem@davemloft.net>
-Subject: [PATCH v3 10/13] nvme-tcp: Add protocol header
-Date:   Wed, 21 Nov 2018 17:56:08 -0800
-Message-Id: <20181122015615.15763-11-sagi@grimberg.me>
+Subject: [PATCH v3 12/13] nvmet: allow configfs tcp trtype configuration
+Date:   Wed, 21 Nov 2018 17:56:10 -0800
+Message-Id: <20181122015615.15763-13-sagi@grimberg.me>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181122015615.15763-1-sagi@grimberg.me>
 References: <20181122015615.15763-1-sagi@grimberg.me>
@@ -58,220 +58,25 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Sagi Grimberg <sagi@lightbitslabs.com>
 
+Reviewed-by: Max Gurtovoy <maxg@mellanox.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Sagi Grimberg <sagi@lightbitslabs.com>
 ---
- include/linux/nvme-tcp.h | 189 +++++++++++++++++++++++++++++++++++++++
- include/linux/nvme.h     |   1 +
- 2 files changed, 190 insertions(+)
- create mode 100644 include/linux/nvme-tcp.h
+ drivers/nvme/target/configfs.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/linux/nvme-tcp.h b/include/linux/nvme-tcp.h
-new file mode 100644
-index 000000000000..03d87c0550a9
---- /dev/null
-+++ b/include/linux/nvme-tcp.h
-@@ -0,0 +1,189 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * NVMe over Fabrics TCP protocol header.
-+ * Copyright (c) 2018 Lightbits Labs. All rights reserved.
-+ */
-+
-+#ifndef _LINUX_NVME_TCP_H
-+#define _LINUX_NVME_TCP_H
-+
-+#include <linux/nvme.h>
-+
-+#define NVME_TCP_DISC_PORT	8009
-+#define NVME_TCP_ADMIN_CCSZ	SZ_8K
-+#define NVME_TCP_DIGEST_LENGTH	4
-+
-+enum nvme_tcp_pfv {
-+	NVME_TCP_PFV_1_0 = 0x0,
-+};
-+
-+enum nvme_tcp_fatal_error_status {
-+	NVME_TCP_FES_INVALID_PDU_HDR		= 0x01,
-+	NVME_TCP_FES_PDU_SEQ_ERR		= 0x02,
-+	NVME_TCP_FES_HDR_DIGEST_ERR		= 0x03,
-+	NVME_TCP_FES_DATA_OUT_OF_RANGE		= 0x04,
-+	NVME_TCP_FES_R2T_LIMIT_EXCEEDED		= 0x05,
-+	NVME_TCP_FES_DATA_LIMIT_EXCEEDED	= 0x05,
-+	NVME_TCP_FES_UNSUPPORTED_PARAM		= 0x06,
-+};
-+
-+enum nvme_tcp_digest_option {
-+	NVME_TCP_HDR_DIGEST_ENABLE	= (1 << 0),
-+	NVME_TCP_DATA_DIGEST_ENABLE	= (1 << 1),
-+};
-+
-+enum nvme_tcp_pdu_type {
-+	nvme_tcp_icreq		= 0x0,
-+	nvme_tcp_icresp		= 0x1,
-+	nvme_tcp_h2c_term	= 0x2,
-+	nvme_tcp_c2h_term	= 0x3,
-+	nvme_tcp_cmd		= 0x4,
-+	nvme_tcp_rsp		= 0x5,
-+	nvme_tcp_h2c_data	= 0x6,
-+	nvme_tcp_c2h_data	= 0x7,
-+	nvme_tcp_r2t		= 0x9,
-+};
-+
-+enum nvme_tcp_pdu_flags {
-+	NVME_TCP_F_HDGST		= (1 << 0),
-+	NVME_TCP_F_DDGST		= (1 << 1),
-+	NVME_TCP_F_DATA_LAST		= (1 << 2),
-+	NVME_TCP_F_DATA_SUCCESS		= (1 << 3),
-+};
-+
-+/**
-+ * struct nvme_tcp_hdr - nvme tcp pdu common header
-+ *
-+ * @type:          pdu type
-+ * @flags:         pdu specific flags
-+ * @hlen:          pdu header length
-+ * @pdo:           pdu data offset
-+ * @plen:          pdu wire byte length
-+ */
-+struct nvme_tcp_hdr {
-+	__u8	type;
-+	__u8	flags;
-+	__u8	hlen;
-+	__u8	pdo;
-+	__le32	plen;
-+};
-+
-+/**
-+ * struct nvme_tcp_icreq_pdu - nvme tcp initialize connection request pdu
-+ *
-+ * @hdr:           pdu generic header
-+ * @pfv:           pdu version format
-+ * @hpda:          host pdu data alignment (dwords, 0's based)
-+ * @digest:        digest types enabled
-+ * @maxr2t:        maximum r2ts per request supported
-+ */
-+struct nvme_tcp_icreq_pdu {
-+	struct nvme_tcp_hdr	hdr;
-+	__le16			pfv;
-+	__u8			hpda;
-+	__u8			digest;
-+	__le32			maxr2t;
-+	__u8			rsvd2[112];
-+};
-+
-+/**
-+ * struct nvme_tcp_icresp_pdu - nvme tcp initialize connection response pdu
-+ *
-+ * @hdr:           pdu common header
-+ * @pfv:           pdu version format
-+ * @cpda:          controller pdu data alignment (dowrds, 0's based)
-+ * @digest:        digest types enabled
-+ * @maxdata:       maximum data capsules per r2t supported
-+ */
-+struct nvme_tcp_icresp_pdu {
-+	struct nvme_tcp_hdr	hdr;
-+	__le16			pfv;
-+	__u8			cpda;
-+	__u8			digest;
-+	__le32			maxdata;
-+	__u8			rsvd[112];
-+};
-+
-+/**
-+ * struct nvme_tcp_term_pdu - nvme tcp terminate connection pdu
-+ *
-+ * @hdr:           pdu common header
-+ * @fes:           fatal error status
-+ * @fei:           fatal error information
-+ */
-+struct nvme_tcp_term_pdu {
-+	struct nvme_tcp_hdr	hdr;
-+	__le16			fes;
-+	__le32			fei;
-+	__u8			rsvd[8];
-+};
-+
-+/**
-+ * struct nvme_tcp_cmd_pdu - nvme tcp command capsule pdu
-+ *
-+ * @hdr:           pdu common header
-+ * @cmd:           nvme command
-+ */
-+struct nvme_tcp_cmd_pdu {
-+	struct nvme_tcp_hdr	hdr;
-+	struct nvme_command	cmd;
-+};
-+
-+/**
-+ * struct nvme_tcp_rsp_pdu - nvme tcp response capsule pdu
-+ *
-+ * @hdr:           pdu common header
-+ * @hdr:           nvme-tcp generic header
-+ * @cqe:           nvme completion queue entry
-+ */
-+struct nvme_tcp_rsp_pdu {
-+	struct nvme_tcp_hdr	hdr;
-+	struct nvme_completion	cqe;
-+};
-+
-+/**
-+ * struct nvme_tcp_r2t_pdu - nvme tcp ready-to-transfer pdu
-+ *
-+ * @hdr:           pdu common header
-+ * @command_id:    nvme command identifier which this relates to
-+ * @ttag:          transfer tag (controller generated)
-+ * @r2t_offset:    offset from the start of the command data
-+ * @r2t_length:    length the host is allowed to send
-+ */
-+struct nvme_tcp_r2t_pdu {
-+	struct nvme_tcp_hdr	hdr;
-+	__u16			command_id;
-+	__u16			ttag;
-+	__le32			r2t_offset;
-+	__le32			r2t_length;
-+	__u8			rsvd[4];
-+};
-+
-+/**
-+ * struct nvme_tcp_data_pdu - nvme tcp data pdu
-+ *
-+ * @hdr:           pdu common header
-+ * @command_id:    nvme command identifier which this relates to
-+ * @ttag:          transfer tag (controller generated)
-+ * @data_offset:   offset from the start of the command data
-+ * @data_length:   length of the data stream
-+ */
-+struct nvme_tcp_data_pdu {
-+	struct nvme_tcp_hdr	hdr;
-+	__u16			command_id;
-+	__u16			ttag;
-+	__le32			data_offset;
-+	__le32			data_length;
-+	__u8			rsvd[4];
-+};
-+
-+union nvme_tcp_pdu {
-+	struct nvme_tcp_icreq_pdu	icreq;
-+	struct nvme_tcp_icresp_pdu	icresp;
-+	struct nvme_tcp_cmd_pdu		cmd;
-+	struct nvme_tcp_rsp_pdu		rsp;
-+	struct nvme_tcp_r2t_pdu		r2t;
-+	struct nvme_tcp_data_pdu	data;
-+};
-+
-+#endif /* _LINUX_NVME_TCP_H */
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index c03973c215ad..4793dc06cda1 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -52,6 +52,7 @@ enum {
- enum {
- 	NVMF_TRTYPE_RDMA	= 1,	/* RDMA */
- 	NVMF_TRTYPE_FC		= 2,	/* Fibre Channel */
-+	NVMF_TRTYPE_TCP		= 3,	/* TCP/IP */
- 	NVMF_TRTYPE_LOOP	= 254,	/* Reserved for host usage */
- 	NVMF_TRTYPE_MAX,
+diff --git a/drivers/nvme/target/configfs.c b/drivers/nvme/target/configfs.c
+index db2cb64be7ba..618bbd006544 100644
+--- a/drivers/nvme/target/configfs.c
++++ b/drivers/nvme/target/configfs.c
+@@ -34,6 +34,7 @@ static const struct nvmet_transport_name {
+ } nvmet_transport_names[] = {
+ 	{ NVMF_TRTYPE_RDMA,	"rdma" },
+ 	{ NVMF_TRTYPE_FC,	"fc" },
++	{ NVMF_TRTYPE_TCP,	"tcp" },
+ 	{ NVMF_TRTYPE_LOOP,	"loop" },
  };
+ 
 -- 
 2.17.1
 
