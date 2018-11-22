@@ -7,22 +7,22 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B492C43441
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 01:56:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 965F8C04EBA
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 01:56:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2C88720821
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 01:56:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E6552080F
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 01:56:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hvdQ8Kk9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C88720821
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GBKfoyb4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E6552080F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404066AbeKVMd2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Nov 2018 07:33:28 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:41506 "EHLO
+        id S2388980AbeKVMdk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Nov 2018 07:33:40 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:41548 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404059AbeKVMd2 (ORCPT
+        with ESMTP id S2404060AbeKVMd2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 22 Nov 2018 07:33:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -31,24 +31,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=4VCgSIAngRhs9S219+f1FTloJbv2iSmhHPj8lxFcQBc=; b=hvdQ8Kk9ZOzu42RJusBqqzaKn
-        X2HvjdOYNnNj33vnj9i0nU/Lkdr3pjQ7inX2DRYS2WQwc/It6LjjjF5EAF/j7drfGQdA5NkbkUS3B
-        BphpasvGj0qb8xa/Ab7ZHEw4SSHvdqrfvT8iIbFcOfW9x5ohnHqU0a83XxDyvuymGTOctNJccO97z
-        PZLXdsD7a1NGC24WDzE2iqbkhcjuWmi1vQxd4hcwuXudEQsF51g5Pn4MHf0dYdpPQhw9DMoHmefBs
-        U7khIZOhbtuzK+RV50oXgn/xerL0fg0n6wlJfBcSGI5erGIamkQCoR62dvNdfloY3k1I22go6xzEZ
-        7GXVtC0Jw==;
+         bh=rXWYBlCCjPXyzbQZOTDFMAObyJoxlnFcn6sfPQ5ARx0=; b=GBKfoyb4BLREzBSzokYnu1Phm
+        8LpyzipgDUnYO6pwWFv/C+9NI0tjO6gxS29dJKLJXX5pYJZZplpmAhMLLaCcEkAXULMP3r4lVnHzZ
+        ZSEUnA0EA4gXkx34Lbi7qOzll7i+yGyY7Dr49rmp1qCyvMRCTI+MqRjGLS/ANTdxmgxe7Rgfze59c
+        sBfePhw+611gDLul1H4W/K1TlB7yzfY6PZ+4wooZfm0qZRRbkr+H/RwsmM9AwN555u1mr0TbH7GVt
+        gjKNuIBpmt2hMMzaa2lyUe8bT+XGbY+EgAULOAq0g2V3gRu1CgB5SjZnGziiKF4usdYF6iF8+IZ73
+        yqgm1NWRg==;
 Received: from [2600:1700:65a0:78e0:514:7862:1503:8e4d] (helo=sagi-Latitude-E7470.lbits)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gPeE9-0006v0-71; Thu, 22 Nov 2018 01:56:21 +0000
+        id 1gPeE9-0006v0-MX; Thu, 22 Nov 2018 01:56:21 +0000
 From:   Sagi Grimberg <sagi@grimberg.me>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, netdev@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Keith Busch <keith.busch@intel.com>,
         "David S. Miller" <davem@davemloft.net>
-Subject: [PATCH nvme-cli v3 14/13] fabrics: use trtype_str when parsing a discovery log entry
-Date:   Wed, 21 Nov 2018 17:56:12 -0800
-Message-Id: <20181122015615.15763-15-sagi@grimberg.me>
+Subject: [PATCH nvme-cli v3 16/13] fabrics: add tcp port tsas decoding
+Date:   Wed, 21 Nov 2018 17:56:14 -0800
+Message-Id: <20181122015615.15763-17-sagi@grimberg.me>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181122015615.15763-1-sagi@grimberg.me>
 References: <20181122015615.15763-1-sagi@grimberg.me>
@@ -57,89 +57,76 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reduce some code duplication.
+From: Sagi Grimberg <sagi@lightbitslabs.com>
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+tcp tsas include sectype indication for unsecured/tls ports.
+
+Signed-off-by: Sagi Grimberg <sagi@lightbitslabs.com>
 ---
- fabrics.c | 35 ++++++++++++++---------------------
- 1 file changed, 14 insertions(+), 21 deletions(-)
+ fabrics.c    | 14 ++++++++++++++
+ linux/nvme.h | 10 ++++++++++
+ 2 files changed, 24 insertions(+)
 
 diff --git a/fabrics.c b/fabrics.c
-index 99793f8beef8..e7c2021b0c70 100644
+index 86f6f992b14f..f8e03de46632 100644
 --- a/fabrics.c
 +++ b/fabrics.c
-@@ -609,6 +609,7 @@ static int build_options(char *argstr, int max_len)
- static int connect_ctrl(struct nvmf_disc_rsp_page_entry *e)
- {
- 	char argstr[BUF_SIZE], *p;
-+	const char *transport;
- 	bool discover, disable_sqflow = true;
- 	int len, ret;
+@@ -140,6 +140,16 @@ static inline const char *treq_str(__u8 treq)
+ 	return arg_str(treqs, ARRAY_SIZE(treqs), treq);
+ }
  
-@@ -681,24 +682,24 @@ retry:
- 		p += len;
- 	}
- 
-+	transport = trtype_str(e->trtype);
-+	if (!strcmp(transport, "unrecognized")) {
-+		fprintf(stderr, "skipping unsupported transport %d\n",
-+				 e->trtype);
-+		return -EINVAL;
-+	}
++static const char * const sectypes[] = {
++	[NVMF_TCP_SECTYPE_NONE]		= "none",
++	[NVMF_TCP_SECTYPE_TLS]		= "tls",
++};
 +
-+	len = sprintf(p, ",transport=%s", transport);
-+	if (len < 0)
-+		return -EINVAL;
-+	p += len;
++static inline const char *sectype_str(__u8 sectype)
++{
++	return arg_str(sectypes, ARRAY_SIZE(sectypes), sectype);
++}
 +
- 	switch (e->trtype) {
--	case NVMF_TRTYPE_LOOP: /* loop */
--		len = sprintf(p, ",transport=loop");
--		if (len < 0)
--			return -EINVAL;
--		p += len;
--		/* we can safely ignore the rest of the entries */
--		break;
- 	case NVMF_TRTYPE_RDMA:
- 		switch (e->adrfam) {
- 		case NVMF_ADDR_FAMILY_IP4:
- 		case NVMF_ADDR_FAMILY_IP6:
- 			/* FALLTHRU */
--			len = sprintf(p, ",transport=rdma");
--			if (len < 0)
--				return -EINVAL;
--			p += len;
--
- 			len = sprintf(p, ",traddr=%.*s",
- 				      space_strip_len(NVMF_TRADDR_SIZE, e->traddr),
- 				      e->traddr);
-@@ -718,14 +719,10 @@ retry:
- 			return -EINVAL;
+ static const char * const prtypes[] = {
+ 	[NVMF_RDMA_PRTYPE_NOT_SPECIFIED]	= "not specified",
+ 	[NVMF_RDMA_PRTYPE_IB]			= "infiniband",
+@@ -436,6 +446,10 @@ static void print_discovery_log(struct nvmf_disc_rsp_page_hdr *log, int numrec)
+ 			printf("rdma_pkey: 0x%04x\n",
+ 				e->tsas.rdma.pkey);
+ 			break;
++		case NVMF_TRTYPE_TCP:
++			printf("sectype: %s\n",
++				sectype_str(e->tsas.tcp.sectype));
++			break;
  		}
- 		break;
-+	default:
- 	case NVMF_TRTYPE_FC:
- 		switch (e->adrfam) {
- 		case NVMF_ADDR_FAMILY_FC:
--			len = sprintf(p, ",transport=fc");
--			if (len < 0)
--				return -EINVAL;
--			p += len;
--
- 			len = sprintf(p, ",traddr=%.*s",
- 				      space_strip_len(NVMF_TRADDR_SIZE, e->traddr),
- 				      e->traddr);
-@@ -738,10 +735,6 @@ retry:
- 			return -EINVAL;
- 		}
- 		break;
--	default:
--		fprintf(stderr, "skipping unsupported transport %d\n",
--				 e->trtype);
--		return -EINVAL;
  	}
+ }
+diff --git a/linux/nvme.h b/linux/nvme.h
+index 7a600c791877..68000eb8c1dc 100644
+--- a/linux/nvme.h
++++ b/linux/nvme.h
+@@ -91,6 +91,13 @@ enum {
+ 	NVMF_RDMA_CMS_RDMA_CM	= 1, /* Sockets based endpoint addressing */
+ };
  
- 	if (e->treq & NVMF_TREQ_DISABLE_SQFLOW && disable_sqflow) {
++/* TCP port security type for  Discovery Log Page entry TSAS
++ */
++enum {
++	NVMF_TCP_SECTYPE_NONE	= 0, /* No Security */
++	NVMF_TCP_SECTYPE_TLS	= 1, /* Transport Layer Security */
++};
++
+ #define NVME_AQ_DEPTH		32
+ #define NVME_NR_AEN_COMMANDS	1
+ #define NVME_AQ_BLK_MQ_DEPTH	(NVME_AQ_DEPTH - NVME_NR_AEN_COMMANDS)
+@@ -1184,6 +1191,9 @@ struct nvmf_disc_rsp_page_entry {
+ 			__u16	pkey;
+ 			__u8	resv10[246];
+ 		} rdma;
++		struct tcp {
++			__u8	sectype;
++		} tcp;
+ 	} tsas;
+ };
+ 
 -- 
 2.17.1
 
