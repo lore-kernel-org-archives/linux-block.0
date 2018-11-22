@@ -2,128 +2,178 @@ Return-Path: <SRS0=CtFQ=OB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83238C43441
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 13:47:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15804C43441
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 14:58:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 42F1020672
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 13:47:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="W271uKsA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42F1020672
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=javigon.com
+	by mail.kernel.org (Postfix) with ESMTP id CA772206B2
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 14:58:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA772206B2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437049AbeKWA0k (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Nov 2018 19:26:40 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:36934 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391365AbeKWA0i (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Nov 2018 19:26:38 -0500
-Received: by mail-ed1-f66.google.com with SMTP id h15so7776533edb.4
-        for <linux-block@vger.kernel.org>; Thu, 22 Nov 2018 05:47:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=rWHtLTMGvL6s4MAnpD1kuO8lAzOkIuYD/LB+c3dyEeU=;
-        b=W271uKsAdCGxoKSawAdcUCr4T6amic75JAKC6+EbnIyBAfUeq1Y0yAtJvb3g8Nlx8X
-         vKOF8o6VTay+T8gSgC3KK0CNhHrVQJ5fBolZ1XjDtw1GwN06Ve6GqBOmR1vNEu5eUkjA
-         4YntVcwySShSm5C7RQhLj/QGbrtRC+/22wFNeHfAdpNLSWVna3HXrdJLvVg2i3YheCsO
-         X6cYVyYcne6fywmEoB2JBlqKR6s3rhAkvxW1vswFG7zVC/TuPYKpgXIXlAWpdrgy/jwQ
-         Oh9GxkZlh2DJC7mlffzznRZ0oUOx5Xo0WSDFnbCx+dNreFVHqsQoUCI3HOP+N70qAXzB
-         nW2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=rWHtLTMGvL6s4MAnpD1kuO8lAzOkIuYD/LB+c3dyEeU=;
-        b=nqsKbWKoJubrPw51oGet26BAqs9xKDODZNTDnZBgrEbkX1qtYKukBwUOl9U38BuS7Y
-         57boJYpqmtkY0XvNyqEUdWjUZS6dGtTntlqpSH78jcx000HLf2Qi+jwx4OGOM3MmQVN/
-         i+fGYDJv8uMioqM+Beh8I0XSxvXsjgm7VqdI/Fn7h04BrnPxly4T9KxpMAylKWOnYhl3
-         TwLPtEWZWcw6UOf75AQ0JbmPe1Zi7MSdJYAUL7u66Gij6VDJEhcIUWgeS2PpSppQFi+N
-         oPfACIe3y/Djt57Zy2w5+sPHbGOObwUo36JGVPjjeUKDFrZiCPf7FpDNA6XDzblkK2Mc
-         NM5A==
-X-Gm-Message-State: AA+aEWYOSRUiwIe6/5KUkM1wa2G8E04UFKekmMghBmxROs9GdqL748EF
-        Kfl55i/liHOollS0MFgr7to08Q==
-X-Google-Smtp-Source: AFSGD/W1MsrKTwBJ/DtpAzHbRHE88osLRK+CDTYvQHiVz2ENwt1fm3+Y+0EeTCTGwUJfkwK71cf3jA==
-X-Received: by 2002:a50:b4b3:: with SMTP id w48mr9483874edd.233.1542894431731;
-        Thu, 22 Nov 2018 05:47:11 -0800 (PST)
-Received: from ch-wrk-javier.cnexlabs.com (6164211-cl69.boa.fiberby.dk. [193.106.164.211])
-        by smtp.gmail.com with ESMTPSA id s6-v6sm14246263edh.89.2018.11.22.05.47.10
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Thu, 22 Nov 2018 05:47:10 -0800 (PST)
-From:   "=?UTF-8?q?Javier=20Gonz=C3=A1lez?=" <javier@javigon.com>
-X-Google-Original-From: =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-To:     mb@lightnvm.io
-Cc:     hans.holmberg@cnexlabs.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>
-Subject: [PATCH] lightnvm: pblk: avoid ref warning on cache creation
-Date:   Thu, 22 Nov 2018 14:46:50 +0100
-Message-Id: <1542894410-14047-2-git-send-email-javier@cnexlabs.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1542894410-14047-1-git-send-email-javier@cnexlabs.com>
-References: <1542894410-14047-1-git-send-email-javier@cnexlabs.com>
+        id S2403947AbeKWBiB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Nov 2018 20:38:01 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34462 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388992AbeKWBiB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Nov 2018 20:38:01 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5279630024F0;
+        Thu, 22 Nov 2018 14:58:17 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E482282714;
+        Thu, 22 Nov 2018 14:57:54 +0000 (UTC)
+Date:   Thu, 22 Nov 2018 22:57:50 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>, Omar Sandoval <osandov@fb.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Dave Chinner <dchinner@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org, David Sterba <dsterba@suse.com>,
+        linux-btrfs@vger.kernel.org,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
+        linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
+        linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
+        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
+Subject: Re: [PATCH V11 03/19] block: introduce bio_for_each_bvec()
+Message-ID: <20181122145749.GA22146@ming.t460p>
+References: <20181121032327.8434-1-ming.lei@redhat.com>
+ <20181121032327.8434-4-ming.lei@redhat.com>
+ <20181121133244.GB1640@lst.de>
+ <20181121153135.GB19111@ming.t460p>
+ <20181121161025.GB4977@lst.de>
+ <20181121171217.GA6259@lst.de>
+ <20181122101527.GB27273@ming.t460p>
+ <20181122102309.GA29295@lst.de>
+ <20181122103033.GA29418@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181122103033.GA29418@lst.de>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Thu, 22 Nov 2018 14:58:18 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The current kref implementation around pblk global caches triggers a
-false positive on refcount_inc_checked() (when called) as the kref is
-initialized to 0. Instead of usint kref_inc() on a 0 reference, which is
-in principle correct, use kref_init() to avoid the check. This is also
-more explicit about what actually happens on cache creation.
+On Thu, Nov 22, 2018 at 11:30:33AM +0100, Christoph Hellwig wrote:
+> Btw, this patch instead of the plain rever might make it a little
+> more clear what is going on by skipping the confusing helper altogher
+> and operating on the raw bvec array:
+> 
+> 
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index e5b975fa0558..926550ce2d21 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -137,24 +137,18 @@ static inline bool bio_full(struct bio *bio)
+>  	for (i = 0, iter_all.idx = 0; iter_all.idx < (bio)->bi_vcnt; iter_all.idx++)	\
+>  		bvec_for_each_segment(bvl, &((bio)->bi_io_vec[iter_all.idx]), i, iter_all)
+>  
+> -static inline void __bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+> -				      unsigned bytes, unsigned max_seg_len)
+> +static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+> +				    unsigned bytes)
+>  {
+>  	iter->bi_sector += bytes >> 9;
+>  
+>  	if (bio_no_advance_iter(bio))
+>  		iter->bi_size -= bytes;
+>  	else
+> -		__bvec_iter_advance(bio->bi_io_vec, iter, bytes, max_seg_len);
+> +		bvec_iter_advance(bio->bi_io_vec, iter, bytes);
+>  		/* TODO: It is reasonable to complete bio with error here. */
+>  }
+>  
+> -static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+> -				    unsigned bytes)
+> -{
+> -	__bio_advance_iter(bio, iter, bytes, PAGE_SIZE);
+> -}
+> -
+>  #define __bio_for_each_segment(bvl, bio, iter, start)			\
+>  	for (iter = (start);						\
+>  	     (iter).bi_size &&						\
+> @@ -168,7 +162,7 @@ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+>  	for (iter = (start);						\
+>  	     (iter).bi_size &&						\
+>  		((bvl = bio_iter_mp_iovec((bio), (iter))), 1);	\
+> -	     __bio_advance_iter((bio), &(iter), (bvl).bv_len, BVEC_MAX_LEN))
+> +	     bio_advance_iter((bio), &(iter), (bvl).bv_len))
+>  
+>  /* returns one real segment(multi-page bvec) each time */
+>  #define bio_for_each_bvec(bvl, bio, iter)			\
+> diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+> index cab36d838ed0..7d0f9bdb6f05 100644
+> --- a/include/linux/bvec.h
+> +++ b/include/linux/bvec.h
+> @@ -25,8 +25,6 @@
+>  #include <linux/errno.h>
+>  #include <linux/mm.h>
+>  
+> -#define BVEC_MAX_LEN  ((unsigned int)-1)
+> -
+>  /*
+>   * was unsigned short, but we might as well be ready for > 64kB I/O pages
+>   */
+> @@ -102,8 +100,8 @@ struct bvec_iter_all {
+>  	.bv_offset	= segment_iter_offset((bvec), (iter)),	\
+>  })
+>  
+> -static inline bool __bvec_iter_advance(const struct bio_vec *bv,
+> -		struct bvec_iter *iter, unsigned bytes, unsigned max_seg_len)
+> +static inline bool bvec_iter_advance(const struct bio_vec *bv,
+> +		struct bvec_iter *iter, unsigned bytes)
+>  {
+>  	if (WARN_ONCE(bytes > iter->bi_size,
+>  		     "Attempted to advance past end of bvec iter\n")) {
+> @@ -112,20 +110,15 @@ static inline bool __bvec_iter_advance(const struct bio_vec *bv,
+>  	}
+>  
+>  	while (bytes) {
+> -		unsigned segment_len = segment_iter_len(bv, *iter);
+> -
+> -		if (max_seg_len < BVEC_MAX_LEN)
+> -			segment_len = min_t(unsigned, segment_len,
+> -					    max_seg_len -
+> -					    bvec_iter_offset(bv, *iter));
+> +		const struct bio_vec *cur = bv + iter->bi_idx;
+> +		unsigned len = min3(bytes, iter->bi_size,
+> +				    cur->bv_len - iter->bi_bvec_done);
+>  
+> -		segment_len = min(bytes, segment_len);
+> -
+> -		bytes -= segment_len;
+> -		iter->bi_size -= segment_len;
+> -		iter->bi_bvec_done += segment_len;
+> +		bytes -= len;
+> +		iter->bi_size -= len;
+> +		iter->bi_bvec_done += len;
+>  
+> -		if (iter->bi_bvec_done == __bvec_iter_bvec(bv, *iter)->bv_len) {
+> +		if (iter->bi_bvec_done == cur->bv_len) {
+>  			iter->bi_bvec_done = 0;
+>  			iter->bi_idx++;
+>  		}
 
-In the process, do a small refactoring to use kref helpers.
+I'd rather not do the optimization part in this patchset, given it doesn't
+belong to this patchset, and it may decrease readability. So I plan to revert
+the delta part in V12 first.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
----
- drivers/lightnvm/pblk-init.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 13822594647c..e225bd60cbb4 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -350,23 +350,19 @@ static int pblk_create_global_caches(void)
- 
- static int pblk_get_global_caches(void)
- {
--	int ret;
-+	int ret = 0;
- 
- 	mutex_lock(&pblk_caches.mutex);
- 
--	if (kref_read(&pblk_caches.kref) > 0) {
--		kref_get(&pblk_caches.kref);
--		mutex_unlock(&pblk_caches.mutex);
--		return 0;
--	}
-+	if (kref_get_unless_zero(&pblk_caches.kref))
-+		goto out;
- 
- 	ret = pblk_create_global_caches();
--
- 	if (!ret)
--		kref_get(&pblk_caches.kref);
-+		kref_init(&pblk_caches.kref);
- 
-+out:
- 	mutex_unlock(&pblk_caches.mutex);
--
- 	return ret;
- }
- 
--- 
-2.7.4
-
+Thanks,
+Ming
