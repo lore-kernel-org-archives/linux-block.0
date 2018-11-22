@@ -2,128 +2,140 @@ Return-Path: <SRS0=CtFQ=OB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECE0BC43441
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 20:01:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15E94C43441
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 21:01:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A790620892
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 20:01:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A899B20878
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 21:01:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="famrQBfR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A790620892
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="kEonLD+1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A899B20878
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438457AbeKWGeR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Nov 2018 01:34:17 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33270 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2438433AbeKWGeQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Nov 2018 01:34:16 -0500
-Received: from sasha-vm.mshome.net (unknown [37.142.5.207])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8061C20864;
-        Thu, 22 Nov 2018 19:53:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1542916404;
-        bh=wLz6yvVFxEVk4YxIW+igMezA197CdeT32OOm2P6k31k=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=famrQBfRM3nTX3JQsKphr7NsrqYtiFlOzXXpFlKxV7KzSFA21NntZ/PUHqq4wc6LB
-         y2RjPM4TqhTBdo9iKB8AV7qqt2VX6bgbFk7TKMoJGVXHv/zwZyq6WyjIIlCUSxuTB2
-         1fkAuJ5X0omlu9YYxErCCkmwpP6ndyZbPQoQTSGs=
-From:   Sasha Levin <sashal@kernel.org>
-To:     stable@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 15/36] floppy: fix race condition in __floppy_read_block_0()
-Date:   Thu, 22 Nov 2018 14:52:19 -0500
-Message-Id: <20181122195240.13123-15-sashal@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20181122195240.13123-1-sashal@kernel.org>
-References: <20181122195240.13123-1-sashal@kernel.org>
+        id S2407273AbeKWHm5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Nov 2018 02:42:57 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:44474 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2407250AbeKWHm4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Nov 2018 02:42:56 -0500
+Received: by mail-pf1-f195.google.com with SMTP id u6so2374217pfh.11
+        for <linux-block@vger.kernel.org>; Thu, 22 Nov 2018 13:01:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=9bi8KEbI1mjb9xGjLoSU9H6rIUkZEpEWb50XSR1CMhI=;
+        b=kEonLD+1/9OKL650Q4Qi4Z/qluy0ck5tt7mA2UHinN7E8MwZmleteuaj5IPKvzVyt7
+         SOCDbgeKXXprONpX7Poj7tNiReJMH/x7hKe2zuzMhX2ta9/3NCq9E8jhnDDwHrmMf8QM
+         O0RjL/7k9yqyDvfhi/RoH6pJOqPSckLt4rypZJ1J83S9Nnb+4hwVlczZhRMQuji86U/X
+         3f9fFc1ZDN0bPEgW1/e7kOLxFBjmycNkipWdvQBdSk3Fq9KPH+x8yWltb8AthM1htqD2
+         WOTKRajEHNUVSDNQ0zF5TGJT3coOF/JtmpSVzkW7oySJMzro8ZGBDjrF9+tlP2pxsBrV
+         UKew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=9bi8KEbI1mjb9xGjLoSU9H6rIUkZEpEWb50XSR1CMhI=;
+        b=SAhfms5CnWIKs/qCgfQpZPz2xiNWFHjivEckkLeOJOBZdSezdXxjx76P5AMRRwkogI
+         JYV1/epn4n+HlPBo0O4uihGEPSPeTjyDG6ny2zzcJoOziNgJ6XBScwrhTKPz+1fIfkgf
+         ayK8+eNQvMi1dNZrMgM8hwRCGrMZI7+2G7k0Ae7hXWYKmdt8w7ZmGww2TL/yIo71s8hb
+         p56kL5yR5XHId+qnquPQw+AAW+rROL8qVE5ax36lU1ASAa9Wo0IAPBg8KiJjXPGbsfGl
+         xYlOleyP4bvlHyxBl+nN+4iheoBcHweL8fqICzM1Cmj8VFF1s6swqtyNfYWsy+5kKLR8
+         MIwQ==
+X-Gm-Message-State: AA+aEWY3i51TnheEiGPAi4ppUUr17hU5rdw35Z3mWZd3sJx0ugBuGicC
+        TwLbCqAwTKQemfbnZC3LoyGxDinnsHo=
+X-Google-Smtp-Source: AFSGD/U0m7R9ZyQum7vKJu0i5tX1LAIFHoHHEYdkpiZxutlftU4WvNunX3ix++HCRt4Oby+TU5a4Rg==
+X-Received: by 2002:a63:cb4a:: with SMTP id m10mr10963898pgi.105.1542920509456;
+        Thu, 22 Nov 2018 13:01:49 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id q195sm54650525pgq.7.2018.11.22.13.01.47
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 22 Nov 2018 13:01:47 -0800 (PST)
+Subject: Re: [PATCH 8/8] aio: support for IO polling
+To:     Jan Kara <jack@suse.cz>
+Cc:     linux-block@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org
+References: <20181120171953.1258-1-axboe@kernel.dk>
+ <20181120171953.1258-9-axboe@kernel.dk>
+ <20181122111351.GD9840@quack2.suse.cz>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <42b38b07-3120-095e-44ac-bcda88b6412c@kernel.dk>
+Date:   Thu, 22 Nov 2018 14:01:45 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+MIME-Version: 1.0
+In-Reply-To: <20181122111351.GD9840@quack2.suse.cz>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jens Axboe <axboe@kernel.dk>
+On 11/22/18 4:13 AM, Jan Kara wrote:
+> 
+> On Tue 20-11-18 10:19:53, Jens Axboe wrote:
+>> +/*
+>> + * We can't just wait for polled events to come to us, we have to actively
+>> + * find and complete them.
+>> + */
+>> +static void aio_iopoll_reap_events(struct kioctx *ctx)
+>> +{
+>> +	if (!(ctx->flags & IOCTX_FLAG_IOPOLL))
+>> +		return;
+>> +
+>> +	while (!list_empty_careful(&ctx->poll_submitted) ||
+>> +	       !list_empty(&ctx->poll_completing)) {
+>> +		unsigned int nr_events = 0;
+>> +
+>> +		__aio_iopoll_check(ctx, NULL, &nr_events, 1, UINT_MAX);
+>> +	}
+>> +}
+>> +
+>> +static int aio_iopoll_check(struct kioctx *ctx, long min_nr, long nr,
+>> +			    struct io_event __user *event)
+>> +{
+>> +	unsigned int nr_events = 0;
+>> +	int ret = 0;
+>> +
+>> +	/* * Only allow one thread polling at a time */
+>> +	if (test_and_set_bit(0, &ctx->getevents_busy))
+>> +		return -EBUSY;
+>> +
+>> +	while (!nr_events || !need_resched()) {
+>> +		int tmin = 0;
+>> +
+>> +		if (nr_events < min_nr)
+>> +			tmin = min_nr - nr_events;
+>> +
+>> +		ret = __aio_iopoll_check(ctx, event, &nr_events, tmin, nr);
+>> +		if (ret <= 0)
+>> +			break;
+>> +		ret = 0;
+>> +	}
+>> +
+>> +	clear_bit(0, &ctx->getevents_busy);
+>> +	return nr_events ? nr_events : ret;
+>> +}
+> 
+> Hum, what if userspace calls io_destroy() while another process is polling
+> for events on the same kioctx? It seems we'd be reaping events from two
+> processes in parallel in that case which will result in various
+> "interesting" effects like ctx->poll_completing list corruption...
 
-[ Upstream commit de7b75d82f70c5469675b99ad632983c50b6f7e7 ]
+I've replaced the ->getevents_busy with a mutex, and we also protect
+the ->dead check inside that mutex. That ensures that destroy can't
+proceed before a potential caller is inside getevents(), and that
+getevents() sees if the ctx is being destroyed.
 
-LKP recently reported a hang at bootup in the floppy code:
-
-[  245.678853] INFO: task mount:580 blocked for more than 120 seconds.
-[  245.679906]       Tainted: G                T 4.19.0-rc6-00172-ga9f38e1 #1
-[  245.680959] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[  245.682181] mount           D 6372   580      1 0x00000004
-[  245.683023] Call Trace:
-[  245.683425]  __schedule+0x2df/0x570
-[  245.683975]  schedule+0x2d/0x80
-[  245.684476]  schedule_timeout+0x19d/0x330
-[  245.685090]  ? wait_for_common+0xa5/0x170
-[  245.685735]  wait_for_common+0xac/0x170
-[  245.686339]  ? do_sched_yield+0x90/0x90
-[  245.686935]  wait_for_completion+0x12/0x20
-[  245.687571]  __floppy_read_block_0+0xfb/0x150
-[  245.688244]  ? floppy_resume+0x40/0x40
-[  245.688844]  floppy_revalidate+0x20f/0x240
-[  245.689486]  check_disk_change+0x43/0x60
-[  245.690087]  floppy_open+0x1ea/0x360
-[  245.690653]  __blkdev_get+0xb4/0x4d0
-[  245.691212]  ? blkdev_get+0x1db/0x370
-[  245.691777]  blkdev_get+0x1f3/0x370
-[  245.692351]  ? path_put+0x15/0x20
-[  245.692871]  ? lookup_bdev+0x4b/0x90
-[  245.693539]  blkdev_get_by_path+0x3d/0x80
-[  245.694165]  mount_bdev+0x2a/0x190
-[  245.694695]  squashfs_mount+0x10/0x20
-[  245.695271]  ? squashfs_alloc_inode+0x30/0x30
-[  245.695960]  mount_fs+0xf/0x90
-[  245.696451]  vfs_kern_mount+0x43/0x130
-[  245.697036]  do_mount+0x187/0xc40
-[  245.697563]  ? memdup_user+0x28/0x50
-[  245.698124]  ksys_mount+0x60/0xc0
-[  245.698639]  sys_mount+0x19/0x20
-[  245.699167]  do_int80_syscall_32+0x61/0x130
-[  245.699813]  entry_INT80_32+0xc7/0xc7
-
-showing that we never complete that read request. The reason is that
-the completion setup is racy - it initializes the completion event
-AFTER submitting the IO, which means that the IO could complete
-before/during the init. If it does, we are passing garbage to
-complete() and we may sleep forever waiting for the event to
-occur.
-
-Fixes: 7b7b68bba5ef ("floppy: bail out in open() if drive is not responding to block0 read")
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/floppy.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-index f2b6f4da1034..fdabd0b74492 100644
---- a/drivers/block/floppy.c
-+++ b/drivers/block/floppy.c
-@@ -4151,10 +4151,11 @@ static int __floppy_read_block_0(struct block_device *bdev, int drive)
- 	bio.bi_end_io = floppy_rb0_cb;
- 	bio_set_op_attrs(&bio, REQ_OP_READ, 0);
- 
-+	init_completion(&cbdata.complete);
-+
- 	submit_bio(&bio);
- 	process_fd_request();
- 
--	init_completion(&cbdata.complete);
- 	wait_for_completion(&cbdata.complete);
- 
- 	__free_page(page);
 -- 
-2.17.1
+Jens Axboe
 
