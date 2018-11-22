@@ -7,22 +7,22 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6805CC43441
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 01:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B492C43441
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 01:56:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1EF6520645
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 01:56:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C88720821
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 01:56:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gmA/Cbft"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EF6520645
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hvdQ8Kk9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C88720821
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404059AbeKVMd3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Nov 2018 07:33:29 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:41522 "EHLO
+        id S2404066AbeKVMd2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Nov 2018 07:33:28 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:41506 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404043AbeKVMd2 (ORCPT
+        with ESMTP id S2404059AbeKVMd2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 22 Nov 2018 07:33:28 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -31,24 +31,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=3OFad/l3eHeQ1KGKIJaiF5PyGPpcPkFRKEQGBw2nd9E=; b=gmA/Cbftd3u4MZdZlwtErB6K0
-        Q2CTQnpoaxUoKy3DIN36bZn6sm8Zts/SDbjhKZddpc2Bo7B33GvkV5rqdWSfts30VkEEvlyLDxeJH
-        L/DixnfvOGVoTxESD+g8DvYeHpz2g/c707x/fPqRv+G55ykddcOErPKQDbi7pwLA951rKFFRt5tCt
-        3gAAFVw8Z5CsuCzHGiAU5sziixwbTAozZgdxzFjzTm+8Y2C7OHUF+D4FqVwZ7pEUPSqogyyfHuwuA
-        Z2+co/+7Wpze6fo0ux8bNxnhj0ljw1OoLAdAHTtgmd7tdLWdH/0K3P0vG1QgLB2J9RPCHX9nHrm1T
-        iPzl0xjyw==;
+         bh=4VCgSIAngRhs9S219+f1FTloJbv2iSmhHPj8lxFcQBc=; b=hvdQ8Kk9ZOzu42RJusBqqzaKn
+        X2HvjdOYNnNj33vnj9i0nU/Lkdr3pjQ7inX2DRYS2WQwc/It6LjjjF5EAF/j7drfGQdA5NkbkUS3B
+        BphpasvGj0qb8xa/Ab7ZHEw4SSHvdqrfvT8iIbFcOfW9x5ohnHqU0a83XxDyvuymGTOctNJccO97z
+        PZLXdsD7a1NGC24WDzE2iqbkhcjuWmi1vQxd4hcwuXudEQsF51g5Pn4MHf0dYdpPQhw9DMoHmefBs
+        U7khIZOhbtuzK+RV50oXgn/xerL0fg0n6wlJfBcSGI5erGIamkQCoR62dvNdfloY3k1I22go6xzEZ
+        7GXVtC0Jw==;
 Received: from [2600:1700:65a0:78e0:514:7862:1503:8e4d] (helo=sagi-Latitude-E7470.lbits)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gPeE9-0006v0-Eo; Thu, 22 Nov 2018 01:56:21 +0000
+        id 1gPeE9-0006v0-71; Thu, 22 Nov 2018 01:56:21 +0000
 From:   Sagi Grimberg <sagi@grimberg.me>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, netdev@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Keith Busch <keith.busch@intel.com>,
         "David S. Miller" <davem@davemloft.net>
-Subject: [PATCH nvme-cli v3 15/13] nvme: Add TCP transport
-Date:   Wed, 21 Nov 2018 17:56:13 -0800
-Message-Id: <20181122015615.15763-16-sagi@grimberg.me>
+Subject: [PATCH nvme-cli v3 14/13] fabrics: use trtype_str when parsing a discovery log entry
+Date:   Wed, 21 Nov 2018 17:56:12 -0800
+Message-Id: <20181122015615.15763-15-sagi@grimberg.me>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181122015615.15763-1-sagi@grimberg.me>
 References: <20181122015615.15763-1-sagi@grimberg.me>
@@ -57,46 +57,89 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Sagi Grimberg <sagi@lightbitslabs.com>
+Reduce some code duplication.
 
-Signed-off-by: Sagi Grimberg <sagi@lightbitslabs.com>
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- fabrics.c    | 2 ++
- linux/nvme.h | 1 +
- 2 files changed, 3 insertions(+)
+ fabrics.c | 35 ++++++++++++++---------------------
+ 1 file changed, 14 insertions(+), 21 deletions(-)
 
 diff --git a/fabrics.c b/fabrics.c
-index e7c2021b0c70..86f6f992b14f 100644
+index 99793f8beef8..e7c2021b0c70 100644
 --- a/fabrics.c
 +++ b/fabrics.c
-@@ -95,6 +95,7 @@ static const char *arg_str(const char * const *strings,
- static const char * const trtypes[] = {
- 	[NVMF_TRTYPE_RDMA]	= "rdma",
- 	[NVMF_TRTYPE_FC]	= "fibre-channel",
-+	[NVMF_TRTYPE_TCP]	= "tcp",
- 	[NVMF_TRTYPE_LOOP]	= "loop",
- };
+@@ -609,6 +609,7 @@ static int build_options(char *argstr, int max_len)
+ static int connect_ctrl(struct nvmf_disc_rsp_page_entry *e)
+ {
+ 	char argstr[BUF_SIZE], *p;
++	const char *transport;
+ 	bool discover, disable_sqflow = true;
+ 	int len, ret;
  
-@@ -696,6 +697,7 @@ retry:
+@@ -681,24 +682,24 @@ retry:
+ 		p += len;
+ 	}
  
++	transport = trtype_str(e->trtype);
++	if (!strcmp(transport, "unrecognized")) {
++		fprintf(stderr, "skipping unsupported transport %d\n",
++				 e->trtype);
++		return -EINVAL;
++	}
++
++	len = sprintf(p, ",transport=%s", transport);
++	if (len < 0)
++		return -EINVAL;
++	p += len;
++
  	switch (e->trtype) {
+-	case NVMF_TRTYPE_LOOP: /* loop */
+-		len = sprintf(p, ",transport=loop");
+-		if (len < 0)
+-			return -EINVAL;
+-		p += len;
+-		/* we can safely ignore the rest of the entries */
+-		break;
  	case NVMF_TRTYPE_RDMA:
-+	case NVMF_TRTYPE_TCP:
  		switch (e->adrfam) {
  		case NVMF_ADDR_FAMILY_IP4:
  		case NVMF_ADDR_FAMILY_IP6:
-diff --git a/linux/nvme.h b/linux/nvme.h
-index a6a44b066267..7a600c791877 100644
---- a/linux/nvme.h
-+++ b/linux/nvme.h
-@@ -52,6 +52,7 @@ enum {
- enum {
- 	NVMF_TRTYPE_RDMA	= 1,	/* RDMA */
- 	NVMF_TRTYPE_FC		= 2,	/* Fibre Channel */
-+	NVMF_TRTYPE_TCP		= 3,	/* TCP */
- 	NVMF_TRTYPE_LOOP	= 254,	/* Reserved for host usage */
- 	NVMF_TRTYPE_MAX,
- };
+ 			/* FALLTHRU */
+-			len = sprintf(p, ",transport=rdma");
+-			if (len < 0)
+-				return -EINVAL;
+-			p += len;
+-
+ 			len = sprintf(p, ",traddr=%.*s",
+ 				      space_strip_len(NVMF_TRADDR_SIZE, e->traddr),
+ 				      e->traddr);
+@@ -718,14 +719,10 @@ retry:
+ 			return -EINVAL;
+ 		}
+ 		break;
++	default:
+ 	case NVMF_TRTYPE_FC:
+ 		switch (e->adrfam) {
+ 		case NVMF_ADDR_FAMILY_FC:
+-			len = sprintf(p, ",transport=fc");
+-			if (len < 0)
+-				return -EINVAL;
+-			p += len;
+-
+ 			len = sprintf(p, ",traddr=%.*s",
+ 				      space_strip_len(NVMF_TRADDR_SIZE, e->traddr),
+ 				      e->traddr);
+@@ -738,10 +735,6 @@ retry:
+ 			return -EINVAL;
+ 		}
+ 		break;
+-	default:
+-		fprintf(stderr, "skipping unsupported transport %d\n",
+-				 e->trtype);
+-		return -EINVAL;
+ 	}
+ 
+ 	if (e->treq & NVMF_TREQ_DISABLE_SQFLOW && disable_sqflow) {
 -- 
 2.17.1
 
