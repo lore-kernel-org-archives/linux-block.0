@@ -3,220 +3,107 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7895CC43441
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 09:06:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 745ADC43441
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 09:33:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 455F120663
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 09:06:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 455F120663
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+	by mail.kernel.org (Postfix) with ESMTP id 4434F20684
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 09:33:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4434F20684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387543AbeKVTpb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Nov 2018 14:45:31 -0500
-Received: from verein.lst.de ([213.95.11.211]:56991 "EHLO newverein.lst.de"
+        id S2393484AbeKVUMR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Nov 2018 15:12:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49112 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731655AbeKVTpb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Nov 2018 14:45:31 -0500
-Received: by newverein.lst.de (Postfix, from userid 2407)
-        id AA91B68C22; Thu, 22 Nov 2018 10:06:55 +0100 (CET)
-Date:   Thu, 22 Nov 2018 10:06:55 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        netdev@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v3 11/13] nvmet-tcp: add NVMe over TCP target driver
-Message-ID: <20181122090655.GA27707@lst.de>
-References: <20181122015615.15763-1-sagi@grimberg.me> <20181122015615.15763-12-sagi@grimberg.me>
+        id S2387669AbeKVUMQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Nov 2018 15:12:16 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1E7402D7F3;
+        Thu, 22 Nov 2018 09:33:36 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 951B3171F6;
+        Thu, 22 Nov 2018 09:33:04 +0000 (UTC)
+Date:   Thu, 22 Nov 2018 17:33:00 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>, Omar Sandoval <osandov@fb.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Dave Chinner <dchinner@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org, David Sterba <dsterba@suse.com>,
+        linux-btrfs@vger.kernel.org,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
+        linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
+        linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
+        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
+Subject: Re: [PATCH V11 14/19] block: handle non-cluster bio out of
+ blk_bio_segment_split
+Message-ID: <20181122093259.GA27007@ming.t460p>
+References: <20181121032327.8434-1-ming.lei@redhat.com>
+ <20181121032327.8434-15-ming.lei@redhat.com>
+ <20181121143355.GB2594@lst.de>
+ <20181121153726.GC19111@ming.t460p>
+ <20181121174621.GA6961@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181122015615.15763-12-sagi@grimberg.me>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20181121174621.GA6961@lst.de>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Thu, 22 Nov 2018 09:33:36 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +enum nvmet_tcp_send_state {
-> +	NVMET_TCP_SEND_DATA_PDU = 0,
-> +	NVMET_TCP_SEND_DATA,
-> +	NVMET_TCP_SEND_R2T,
-> +	NVMET_TCP_SEND_DDGST,
-> +	NVMET_TCP_SEND_RESPONSE
-> +};
-> +
-> +enum nvmet_tcp_recv_state {
-> +	NVMET_TCP_RECV_PDU,
-> +	NVMET_TCP_RECV_DATA,
-> +	NVMET_TCP_RECV_DDGST,
-> +	NVMET_TCP_RECV_ERR,
-> +};
+On Wed, Nov 21, 2018 at 06:46:21PM +0100, Christoph Hellwig wrote:
+> Actually..
+> 
+> I think we can kill this code entirely.  If we look at what the
+> clustering setting is really about it is to avoid ever merging a
+> segement that spans a page boundary.  And we should be able to do
+> that with something like this before your series:
+> 
+> ---
+> From 0d46fa76c376493a74ea0dbe77305bd5fa2cf011 Mon Sep 17 00:00:00 2001
+> From: Christoph Hellwig <hch@lst.de>
+> Date: Wed, 21 Nov 2018 18:39:47 +0100
+> Subject: block: remove the "cluster" flag
+> 
+> The cluster flag implements some very old SCSI behavior.  As far as I
+> can tell the original intent was to enable or disable any kind of
+> segment merging.  But the actually visible effect to the LLDD is that
+> it limits each segments to be inside a single page, which we can
+> also affect by setting the maximum segment size and the virt
+> boundary.
 
-I think you can drop the explicit initialization for
-NVMET_TCP_SEND_DATA_PDU.
+This approach is pretty good given we can do post-split during mapping
+sg.
 
-> +struct nvmet_tcp_recv_ctx {
-> +};
+However, using virt boundary limit on non-cluster seems over-kill,
+because the bio will be over-split(each small bvec may be split as one bio)
+if it includes lots of small segment.
 
-There are no users of this empty struct, so it can probably be
-dropped..
+What we want to do is just to avoid to merge bvecs to segment, which
+should have been done by NO_SG_MERGE simply. However, after multi-page
+is enabled, two adjacent bvecs won't be merged any more, I just forget
+to remove the bvec merge code in V11.
 
-> +	void (*dr)(struct sock *);
-> +	void (*sc)(struct sock *);
-> +	void (*ws)(struct sock *);
+So seems we can simply avoid to use virt boundary limit for non-cluster
+after multipage bvec is enabled?
 
-These looks very cryptic.  Can you please at least spell out the
-full names as used in the networking code (data_ready, etc).
 
-> +struct nvmet_tcp_port {
-> +	struct socket		*sock;
-> +	struct work_struct	accept_work;
-> +	struct nvmet_port	*nport;
-> +	struct sockaddr_storage addr;
-> +	int			last_cpu;
-> +	void (*dr)(struct sock *);
-> +};
-
-Same here.
-
-> +	pdu->hdr.plen =
-> +		cpu_to_le32(pdu->hdr.hlen + hdgst + cmd->req.transfer_len + ddgst);
-
-Overly long line.
-
-> +static struct nvmet_tcp_cmd *nvmet_tcp_reverse_list(struct nvmet_tcp_queue *queue, struct llist_node *node)
-
-Way too long line.
-
-Also this function does not reverse a list, it removes from a llist,
-adds to a regular list in reverse order and increments a counter.  Maybe
-there is a better name?  It would also seem more readable if the
-llist_del_all from the caller moved in here.
-
-> +{
-> +	struct nvmet_tcp_cmd *cmd;
-> +
-> +	while (node) {
-> +		struct nvmet_tcp_cmd *cmd = container_of(node, struct nvmet_tcp_cmd, lentry);
-> +
-
-Also shouldn't this use llist_entry instead of container_of to document
-the intent?
-
-> +		list_add(&cmd->entry, &queue->resp_send_list);
-> +		node = node->next;
-> +		queue->send_list_len++;
-> +	}
-> +
-> +	cmd = list_first_entry(&queue->resp_send_list, struct nvmet_tcp_cmd, entry);
-> +	return cmd;
-
-Besides the way too long line this can be a direct return.  Then
-again moving the assignment of this in would probably make sense
-as well.
-
-> +}
-> +
-> +static struct nvmet_tcp_cmd *nvmet_tcp_fetch_send_command(struct nvmet_tcp_queue *queue)
-
-Another way too long line.  Please just fix this up everwhere.
-
-> +	if (!cmd || queue->state == NVMET_TCP_Q_DISCONNECTING) {
-> +		cmd = nvmet_tcp_fetch_send_command(queue);
-> +		if (unlikely(!cmd))
-> +			return 0;
-> +	}
-> +
-> +	if (cmd->state == NVMET_TCP_SEND_DATA_PDU) {
-> +		ret = nvmet_try_send_data_pdu(cmd);
-> +		if (ret <= 0)
-> +			goto done_send;
-> +	}
-> +
-> +	if (cmd->state == NVMET_TCP_SEND_DATA) {
-> +		ret = nvmet_try_send_data(cmd);
-> +		if (ret <= 0)
-> +			goto done_send;
-> +	}
-> +
-> +	if (cmd->state == NVMET_TCP_SEND_DDGST) {
-> +		ret = nvmet_try_send_ddgst(cmd);
-> +		if (ret <= 0)
-> +			goto done_send;
-> +	}
-> +
-> +	if (cmd->state == NVMET_TCP_SEND_R2T) {
-> +		ret = nvmet_try_send_r2t(cmd, last_in_batch);
-> +		if (ret <= 0)
-> +			goto done_send;
-> +	}
-> +
-> +	if (cmd->state == NVMET_TCP_SEND_RESPONSE)
-> +		ret = nvmet_try_send_response(cmd, last_in_batch);
-
-Use a switch statement?
-
-> +	if (queue->left) {
-> +		return -EAGAIN;
-> +	} else if (queue->offset == sizeof(struct nvme_tcp_hdr)) {
-
-No need for an else after a return.
-
-> +
-> +	if (unlikely(queue->rcv_state == NVMET_TCP_RECV_ERR))
-> +		return 0;
-> +
-> +	if (queue->rcv_state == NVMET_TCP_RECV_PDU) {
-> +		result = nvmet_tcp_try_recv_pdu(queue);
-> +		if (result != 0)
-> +			goto done_recv;
-> +	}
-> +
-> +	if (queue->rcv_state == NVMET_TCP_RECV_DATA) {
-> +		result = nvmet_tcp_try_recv_data(queue);
-> +		if (result != 0)
-> +			goto done_recv;
-> +	}
-> +
-> +	if (queue->rcv_state == NVMET_TCP_RECV_DDGST) {
-> +		result = nvmet_tcp_try_recv_ddgst(queue);
-> +		if (result != 0)
-> +			goto done_recv;
-> +	}
-
-switch statement?
-
-> +	spin_lock(&queue->state_lock);
-> +	if (queue->state == NVMET_TCP_Q_DISCONNECTING)
-> +		goto out;
-> +
-> +	queue->state = NVMET_TCP_Q_DISCONNECTING;
-> +	schedule_work(&queue->release_work);
-> +out:
-> +	spin_unlock(&queue->state_lock);
-
-No real need for the goto here.
-
-> +static void nvmet_tcp_data_ready(struct sock *sk)
-> +{
-> +	struct nvmet_tcp_queue *queue;
-> +
-> +	read_lock_bh(&sk->sk_callback_lock);
-> +	queue = sk->sk_user_data;
-> +	if (!queue)
-> +		goto out;
-> +
-> +	queue_work_on(queue->cpu, nvmet_tcp_wq, &queue->io_work);
-> +out:
-> +	read_unlock_bh(&sk->sk_callback_lock);
-> +}
-
-This should only need rcu_read_proctection, right?
-
-Also no need for the goto.
+thanks,
+Ming
