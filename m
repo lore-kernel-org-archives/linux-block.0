@@ -3,72 +3,100 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78594C43441
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 11:03:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A574C43610
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 11:13:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 39F5E20820
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 11:03:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 39F5E20820
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+	by mail.kernel.org (Postfix) with ESMTP id 41E082087E
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 11:13:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41E082087E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394453AbeKVVmL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 22 Nov 2018 16:42:11 -0500
-Received: from verein.lst.de ([213.95.11.211]:57741 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387923AbeKVVmL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 22 Nov 2018 16:42:11 -0500
-Received: by newverein.lst.de (Postfix, from userid 2407)
-        id 4147F68BC7; Thu, 22 Nov 2018 12:03:15 +0100 (CET)
-Date:   Thu, 22 Nov 2018 12:03:15 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>, Omar Sandoval <osandov@fb.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Dave Chinner <dchinner@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org, David Sterba <dsterba@suse.com>,
-        linux-btrfs@vger.kernel.org,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
-        Christoph Hellwig <hch@lst.de>, linux-ext4@vger.kernel.org,
-        Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
-        Boaz Harrosh <ooo@electrozaur.com>,
-        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: Re: [PATCH V11 12/19] block: allow bio_for_each_segment_all() to
- iterate over multi-page bvec
-Message-ID: <20181122110315.GA30369@lst.de>
-References: <20181121032327.8434-1-ming.lei@redhat.com> <20181121032327.8434-13-ming.lei@redhat.com>
+        id S2390805AbeKVVwt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 22 Nov 2018 16:52:49 -0500
+Received: from mx2.suse.de ([195.135.220.15]:60012 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1732060AbeKVVws (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 22 Nov 2018 16:52:48 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay1.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id AC6FFABE6;
+        Thu, 22 Nov 2018 11:13:52 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 031CE1E0A16; Thu, 22 Nov 2018 12:13:52 +0100 (CET)
+Date:   Thu, 22 Nov 2018 12:13:51 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 8/8] aio: support for IO polling
+Message-ID: <20181122111351.GD9840@quack2.suse.cz>
+References: <20181120171953.1258-1-axboe@kernel.dk>
+ <20181120171953.1258-9-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181121032327.8434-13-ming.lei@redhat.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20181120171953.1258-9-axboe@kernel.dk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +/* used for chunk_for_each_segment */
-> +static inline void bvec_next_segment(const struct bio_vec *bvec,
-> +				     struct bvec_iter_all *iter_all)
 
-FYI, chunk_for_each_segment doesn't exist anymore, this is
-bvec_for_each_segment now.  Not sure the comment helps much, though.
-
+On Tue 20-11-18 10:19:53, Jens Axboe wrote:
+> +/*
+> + * We can't just wait for polled events to come to us, we have to actively
+> + * find and complete them.
+> + */
+> +static void aio_iopoll_reap_events(struct kioctx *ctx)
 > +{
-> +	struct bio_vec *bv = &iter_all->bv;
+> +	if (!(ctx->flags & IOCTX_FLAG_IOPOLL))
+> +		return;
 > +
-> +	if (bv->bv_page) {
-> +		bv->bv_page += 1;
+> +	while (!list_empty_careful(&ctx->poll_submitted) ||
+> +	       !list_empty(&ctx->poll_completing)) {
+> +		unsigned int nr_events = 0;
+> +
+> +		__aio_iopoll_check(ctx, NULL, &nr_events, 1, UINT_MAX);
+> +	}
+> +}
+> +
+> +static int aio_iopoll_check(struct kioctx *ctx, long min_nr, long nr,
+> +			    struct io_event __user *event)
+> +{
+> +	unsigned int nr_events = 0;
+> +	int ret = 0;
+> +
+> +	/* * Only allow one thread polling at a time */
+> +	if (test_and_set_bit(0, &ctx->getevents_busy))
+> +		return -EBUSY;
+> +
+> +	while (!nr_events || !need_resched()) {
+> +		int tmin = 0;
+> +
+> +		if (nr_events < min_nr)
+> +			tmin = min_nr - nr_events;
+> +
+> +		ret = __aio_iopoll_check(ctx, event, &nr_events, tmin, nr);
+> +		if (ret <= 0)
+> +			break;
+> +		ret = 0;
+> +	}
+> +
+> +	clear_bit(0, &ctx->getevents_busy);
+> +	return nr_events ? nr_events : ret;
+> +}
 
-I think this needs to use nth_page() given that with discontigmem
-page structures might not be allocated contigously.
+Hum, what if userspace calls io_destroy() while another process is polling
+for events on the same kioctx? It seems we'd be reaping events from two
+processes in parallel in that case which will result in various
+"interesting" effects like ctx->poll_completing list corruption...
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
