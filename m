@@ -7,22 +7,22 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90C1FC04EBA
-	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 01:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B95FC43610
+	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 01:56:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5851620645
+	by mail.kernel.org (Postfix) with ESMTP id DD0F32080F
 	for <linux-block@archiver.kernel.org>; Thu, 22 Nov 2018 01:56:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Xi7ISxnm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5851620645
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CaLFCTJq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD0F32080F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404026AbeKVMdZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S2404024AbeKVMdZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 22 Nov 2018 07:33:25 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:40936 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:40944 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404015AbeKVMdY (ORCPT
+        with ESMTP id S2404021AbeKVMdY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 22 Nov 2018 07:33:24 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -31,24 +31,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=bR7RP+lntTBKCIkonfUSbr8y60GQQq5+R78uSVwWIUQ=; b=Xi7ISxnmH/agv9hCBFupos5Xq
-        rtrkH7OoZpBKU+2c5Fu5Rf/H8n43ZQNPOfUusnEkkbFUncGgkry8rAwOTMCp0HRveqOkx0c0VW2St
-        D7yuQXm8PQ2yP21JHTNHqU8KRhy2CsjAm2mK2TIYdyCgRwFfUoKJdAn6oyZ8EF1CHpi2C/7l8a/Nz
-        HDcrGv9byCZiQAkAj4BMx9eoJeWsaOvfoE6qaSuGx2k9o2sEdPJblOEdMvOahWwX+sRDJWdfLMUWN
-        CQGdN7IJufeKiZOn71/s6o2uHUlWnAfsyjux6ybsiu9CTBUTrU5In1Ul4sZd50lRizJ26NmL/6K6a
-        MHrKy3j7Q==;
+         bh=tiEHjGZk27ZQZk11RKGqIkWf55qCwP7iQbHyCkJhRjE=; b=CaLFCTJqbfAGompEveB846K3V
+        A7hr2BeOvflTH2rOJISsnuh1l0vkJ/q82qyyyGhorvNDn2cOBnsE3O9QvIwXWsOorD9UQjdWa4BB0
+        zKTvk22DkS5HNUO4s2/liTLGmpUcL/VqaFF/Rrq6qBNCTxNyUc956vU/0n7+O+UPutltOzcNtX3//
+        KvuJM9fQlcErndh8ae7r0NABFbSto5i+Ef1ZDdU7f6u4IrHq+3GyqOUQcj4QgnKdjXNUoXbUwMrOW
+        zUI7RvfpAt3bfp90FGfO5b62ZMsXk9amsR8NpEqQ4oOmV3x+eyd3zu6f5w7kLbvDRKgqNAi3OI/yX
+        KSv9BoTng==;
 Received: from [2600:1700:65a0:78e0:514:7862:1503:8e4d] (helo=sagi-Latitude-E7470.lbits)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gPeE7-0006v0-0z; Thu, 22 Nov 2018 01:56:19 +0000
+        id 1gPeE7-0006v0-98; Thu, 22 Nov 2018 01:56:19 +0000
 From:   Sagi Grimberg <sagi@grimberg.me>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, netdev@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Keith Busch <keith.busch@intel.com>,
         "David S. Miller" <davem@davemloft.net>
-Subject: [PATCH v3 06/13] datagram: introduce skb_copy_and_hash_datagram_iter helper
-Date:   Wed, 21 Nov 2018 17:56:04 -0800
-Message-Id: <20181122015615.15763-7-sagi@grimberg.me>
+Subject: [PATCH v3 07/13] nvmet: Add install_queue callout
+Date:   Wed, 21 Nov 2018 17:56:05 -0800
+Message-Id: <20181122015615.15763-8-sagi@grimberg.me>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181122015615.15763-1-sagi@grimberg.me>
 References: <20181122015615.15763-1-sagi@grimberg.me>
@@ -59,70 +59,49 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Sagi Grimberg <sagi@lightbitslabs.com>
 
-Introduce a helper to copy datagram into an iovec iterator
-but also update a predefined hash. This is useful for
-consumers of skb_copy_datagram_iter to also support inflight
-data digest without having to finish to copy and only then
-traverse the iovec and calculate the digest hash.
+nvmet-tcp will implement it to allocate queue commands which
+are only known at nvmf connect time (sq size).
 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Sagi Grimberg <sagi@lightbitslabs.com>
 ---
- include/linux/skbuff.h |  3 +++
- net/core/datagram.c    | 20 +++++++++++++++++++-
- 2 files changed, 22 insertions(+), 1 deletion(-)
+ drivers/nvme/target/fabrics-cmd.c | 10 ++++++++++
+ drivers/nvme/target/nvmet.h       |  1 +
+ 2 files changed, 11 insertions(+)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 0ba687454267..b0b8d5653f0d 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -3309,6 +3309,9 @@ static inline int skb_copy_datagram_msg(const struct sk_buff *from, int offset,
- }
- int skb_copy_and_csum_datagram_msg(struct sk_buff *skb, int hlen,
- 				   struct msghdr *msg);
-+int skb_copy_and_hash_datagram_iter(const struct sk_buff *skb, int offset,
-+			   struct iov_iter *to, int len,
-+			   struct ahash_request *hash);
- int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
- 				 struct iov_iter *from, int len);
- int zerocopy_sg_from_iter(struct sk_buff *skb, struct iov_iter *frm);
-diff --git a/net/core/datagram.c b/net/core/datagram.c
-index 382543302ae5..ef262282c8be 100644
---- a/net/core/datagram.c
-+++ b/net/core/datagram.c
-@@ -465,7 +465,7 @@ int __skb_datagram_iter(const struct sk_buff *skb, int offset,
- 			if (copy > len)
- 				copy = len;
- 			if (__skb_datagram_iter(frag_iter, offset - start,
--						to, copy, short_copy, cb, data))
-+						to, copy, fault_short, cb, data))
- 				goto fault;
- 			if ((len -= copy) == 0)
- 				return 0;
-@@ -492,6 +492,24 @@ int __skb_datagram_iter(const struct sk_buff *skb, int offset,
+diff --git a/drivers/nvme/target/fabrics-cmd.c b/drivers/nvme/target/fabrics-cmd.c
+index 328ae46d8344..ee7d84621d65 100644
+--- a/drivers/nvme/target/fabrics-cmd.c
++++ b/drivers/nvme/target/fabrics-cmd.c
+@@ -121,6 +121,16 @@ static u16 nvmet_install_queue(struct nvmet_ctrl *ctrl, struct nvmet_req *req)
+ 		req->rsp->sq_head = cpu_to_le16(0xffff);
+ 	}
+ 
++	if (ctrl->ops->install_queue) {
++		u16 ret = ctrl->ops->install_queue(req->sq);
++
++		if (ret) {
++			pr_err("failed to install queue %d cntlid %d ret %x\n",
++				qid, ret, ctrl->cntlid);
++			return ret;
++		}
++	}
++
  	return 0;
  }
  
-+/**
-+ *	skb_copy_and_hash_datagram_iter - Copy datagram to an iovec iterator
-+ *          and update a hash.
-+ *	@skb: buffer to copy
-+ *	@offset: offset in the buffer to start copying from
-+ *	@to: iovec iterator to copy to
-+ *	@len: amount of data to copy from buffer to iovec
-+ *      @hash: hash request to update
-+ */
-+int skb_copy_and_hash_datagram_iter(const struct sk_buff *skb, int offset,
-+			   struct iov_iter *to, int len,
-+			   struct ahash_request *hash)
-+{
-+	return __skb_datagram_iter(skb, offset, to, len, true,
-+			hash_and_copy_to_iter, hash);
-+}
-+EXPORT_SYMBOL(skb_copy_and_hash_datagram_iter);
-+
- static size_t simple_copy_to_iter(const void *addr, size_t bytes,
- 		void *data __always_unused, struct iov_iter *i)
- {
+diff --git a/drivers/nvme/target/nvmet.h b/drivers/nvme/target/nvmet.h
+index 7d8b7a7d572a..89df51ee5bdf 100644
+--- a/drivers/nvme/target/nvmet.h
++++ b/drivers/nvme/target/nvmet.h
+@@ -279,6 +279,7 @@ struct nvmet_fabrics_ops {
+ 	void (*delete_ctrl)(struct nvmet_ctrl *ctrl);
+ 	void (*disc_traddr)(struct nvmet_req *req,
+ 			struct nvmet_port *port, char *traddr);
++	u16 (*install_queue)(struct nvmet_sq *nvme_sq);
+ };
+ 
+ #define NVMET_MAX_INLINE_BIOVEC	8
 -- 
 2.17.1
 
