@@ -2,130 +2,148 @@ Return-Path: <SRS0=Lvn3=OC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFB9C43441
-	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 10:05:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAF8CC43441
+	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 10:36:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 816FD205C9
-	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 10:05:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="EebVeko2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 816FD205C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=owltronix.com
+	by mail.kernel.org (Postfix) with ESMTP id 7FC6A20685
+	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 10:36:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FC6A20685
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387834AbeKWUsr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Nov 2018 15:48:47 -0500
-Received: from mail-vk1-f193.google.com ([209.85.221.193]:40185 "EHLO
-        mail-vk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393967AbeKWUsr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Nov 2018 15:48:47 -0500
-Received: by mail-vk1-f193.google.com with SMTP id v70so2550660vkv.7
-        for <linux-block@vger.kernel.org>; Fri, 23 Nov 2018 02:05:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=YUd68lT+Nbs1CuYWfgadotcTcrWCer+xWXfaNUArWhM=;
-        b=EebVeko2mmI5SWtPIR/svf3tE1WPbBR+a6wqVVBgi2l2k4J6oIBkZnhiDXBs7L5ToE
-         c9mz7ptIEZ+nF8T3Y0lVBLAMT1Sz41raMant5AZveh9rKMsd6W6aUmq2umPcoHLhswbk
-         aV0LzE/8jM4p3hosvcL5qg10piQW5PT/KP2/0Fr/P3XaYgDQwqljvEgH+3WuYx/PCpGJ
-         gb/Hy1sB3jyE3r+xcsJMihNxA4Kwmvu9Ea+aygpE1ydzqV6u311LLnWsgPJ5PnbFk0Xa
-         EKHY1vSP59SOrHfBMsXaZoqlsgWFzA7ud92yzcisAxgHzc3pLOSSv/xumsk1+JBXulyZ
-         GboQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=YUd68lT+Nbs1CuYWfgadotcTcrWCer+xWXfaNUArWhM=;
-        b=o/3814B85ytGqzjDDgmMU5QoNVJWj4UvJH+u8o3Co1XKyB2CsIm+3FMoJRK04zWfIH
-         kZtrKlR2unbd+Rp1sSbdkRRDKkNECS72zWxGMoqlqircdEu4ZJKlgVdyHyAWI2pholFd
-         GALj8Uh8Cz33Z6vWF3AjqBNXpJiqUO8OqaSsFHBmS40LQzQYQNI8NSlTkBsWJ1VDGzT8
-         e8UqL6RitecuH+SNaxCukJZbIct8veHv9zVJ8LBa25ez2FNmY+QFVftgKNFMafFyBF86
-         eXqH7i9zi1jZU4kVd0uu4JTamWYbZhzjwEWdv63ys6ddWg2N/xAOqLqNFA837FAEl8Xc
-         3eOw==
-X-Gm-Message-State: AA+aEWYmTzWFHPh/Bb3wRlqniOeRNzVjo+z+fssXVBGGuAMKx0D7/6YG
-        XoRihg1VVJB8nyQz/R5y8V94sNVk8fGLx4YILVISTw==
-X-Google-Smtp-Source: AFSGD/X33K6U3n0oOIT1K2p9wXWxpWqmndNvaTQGhe3/o+R6jjwYuaaxCVxk6T0+TwtwwjkW1KT4pBkgtvv6ImnwLA8=
-X-Received: by 2002:a1f:8b48:: with SMTP id n69mr5988322vkd.12.1542967509671;
- Fri, 23 Nov 2018 02:05:09 -0800 (PST)
+        id S2503313AbeKWVUR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Nov 2018 16:20:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50866 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2394087AbeKWVUR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Nov 2018 16:20:17 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E1FFA30832D4;
+        Fri, 23 Nov 2018 10:36:32 +0000 (UTC)
+Received: from [10.36.118.36] (unknown [10.36.118.36])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1C4921851B;
+        Fri, 23 Nov 2018 10:36:28 +0000 (UTC)
+Subject: Re: [PATCH] mm: Replace all open encodings for NUMA_NO_NODE
+To:     Anshuman Khandual <anshuman.khandual@arm.com>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Cc:     ocfs2-devel@oss.oracle.com, linux-fbdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, netdev@vger.kernel.org,
+        intel-wired-lan@lists.osuosl.org, linux-media@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-rdma@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux-block@vger.kernel.org,
+        sparclinux@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-ia64@vger.kernel.org, linux-alpha@vger.kernel.org,
+        akpm@linux-foundation.org, jiangqi903@gmail.com, hverkuil@xs4all.nl
+References: <1542966856-12619-1-git-send-email-anshuman.khandual@arm.com>
+From:   David Hildenbrand <david@redhat.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=david@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ SE+xAvmumFBY
+Organization: Red Hat GmbH
+Message-ID: <d7cb905f-76f7-3053-2a46-e1a514bd309b@redhat.com>
+Date:   Fri, 23 Nov 2018 11:36:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.0
 MIME-Version: 1.0
-References: <1542894410-14047-1-git-send-email-javier@cnexlabs.com> <1542894410-14047-2-git-send-email-javier@cnexlabs.com>
-In-Reply-To: <1542894410-14047-2-git-send-email-javier@cnexlabs.com>
-From:   Hans Holmberg <hans.ml.holmberg@owltronix.com>
-Date:   Fri, 23 Nov 2018 11:04:58 +0100
-Message-ID: <CANr-nt2XMzZnd309pY7QJxYXWMSuXXrcWMt8F=pa49BzARb5dg@mail.gmail.com>
-Subject: Re: [PATCH] lightnvm: pblk: avoid ref warning on cache creation
-To:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Cc:     Matias Bjorling <mb@lightnvm.io>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Javier Gonzalez <javier@cnexlabs.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <1542966856-12619-1-git-send-email-anshuman.khandual@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Fri, 23 Nov 2018 10:36:33 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Great catch Javier! Nice refactoring work too.
-
-Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-On Thu, Nov 22, 2018 at 2:47 PM Javier Gonz=C3=A1lez <javier@javigon.com> w=
-rote:
->
-> The current kref implementation around pblk global caches triggers a
-> false positive on refcount_inc_checked() (when called) as the kref is
-> initialized to 0. Instead of usint kref_inc() on a 0 reference, which is
-> in principle correct, use kref_init() to avoid the check. This is also
-> more explicit about what actually happens on cache creation.
->
-> In the process, do a small refactoring to use kref helpers.
->
-> Signed-off-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
+On 23.11.18 10:54, Anshuman Khandual wrote:
+> At present there are multiple places where invalid node number is encoded
+> as -1. Even though implicitly understood it is always better to have macros
+> in there. Replace these open encodings for an invalid node number with the
+> global macro NUMA_NO_NODE. This helps remove NUMA related assumptions like
+> 'invalid node' from various places redirecting them to a common definition.
+> 
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
 > ---
->  drivers/lightnvm/pblk-init.c | 14 +++++---------
->  1 file changed, 5 insertions(+), 9 deletions(-)
->
-> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-> index 13822594647c..e225bd60cbb4 100644
-> --- a/drivers/lightnvm/pblk-init.c
-> +++ b/drivers/lightnvm/pblk-init.c
-> @@ -350,23 +350,19 @@ static int pblk_create_global_caches(void)
->
->  static int pblk_get_global_caches(void)
->  {
-> -       int ret;
-> +       int ret =3D 0;
->
->         mutex_lock(&pblk_caches.mutex);
->
-> -       if (kref_read(&pblk_caches.kref) > 0) {
-> -               kref_get(&pblk_caches.kref);
-> -               mutex_unlock(&pblk_caches.mutex);
-> -               return 0;
-> -       }
-> +       if (kref_get_unless_zero(&pblk_caches.kref))
-> +               goto out;
->
->         ret =3D pblk_create_global_caches();
-> -
->         if (!ret)
-> -               kref_get(&pblk_caches.kref);
-> +               kref_init(&pblk_caches.kref);
->
-> +out:
->         mutex_unlock(&pblk_caches.mutex);
-> -
->         return ret;
->  }
->
-> --
-> 2.7.4
->
+> 
+> Changes in V1:
+> 
+> - Dropped OCFS2 changes per Joseph
+> - Dropped media/video drivers changes per Hans
+> 
+> RFC - https://patchwork.kernel.org/patch/10678035/
+> 
+> Build tested this with multiple cross compiler options like alpha, sparc,
+> arm64, x86, powerpc, powerpc64le etc with their default config which might
+> not have compiled tested all driver related changes. I will appreciate
+> folks giving this a test in their respective build environment.
+> 
+> All these places for replacement were found by running the following grep
+> patterns on the entire kernel code. Please let me know if this might have
+> missed some instances. This might also have replaced some false positives.
+> I will appreciate suggestions, inputs and review.
+> 
+> 1. git grep "nid == -1"
+> 2. git grep "node == -1"
+> 3. git grep "nid = -1"
+> 4. git grep "node = -1"
+
+Hopefully you found most users :)
+
+Did you check if some are encoded into function calls? f(-1, ...)
+
+Reviewed-by: David Hildenbrand <david@redhat.com>
+
+
+-- 
+
+Thanks,
+
+David / dhildenb
