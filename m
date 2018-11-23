@@ -3,107 +3,118 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03368C43441
-	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 08:16:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0F1FC43441
+	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 08:24:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 98349206B2
-	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 08:16:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9198220645
+	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 08:24:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=cnexlabs.onmicrosoft.com header.i=@cnexlabs.onmicrosoft.com header.b="l8zxY4Lh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98349206B2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cnexlabs.com
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="OO/CxISE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9198220645
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lightnvm.io
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387840AbeKWS7j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Nov 2018 13:59:39 -0500
-Received: from mail-eopbgr810083.outbound.protection.outlook.com ([40.107.81.83]:20224
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731828AbeKWS7j (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Nov 2018 13:59:39 -0500
+        id S2408516AbeKWTHM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Nov 2018 14:07:12 -0500
+Received: from mail-lj1-f177.google.com ([209.85.208.177]:44801 "EHLO
+        mail-lj1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731828AbeKWTHL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Nov 2018 14:07:11 -0500
+Received: by mail-lj1-f177.google.com with SMTP id k19-v6so9921602lji.11
+        for <linux-block@vger.kernel.org>; Fri, 23 Nov 2018 00:23:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=cnexlabs.onmicrosoft.com; s=selector1-cnexlabs-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JRjdeP6WLmMUh6ll66EeDMk02L77fIseKmq0GGyfsHc=;
- b=l8zxY4LhzEhk5y1MYg2n1e7oOvSTbQ/rCdWhkxgFZIWYzcK22UrQgbm4KQZ9vz/Lw7qEbg58mp4ZGX/toRi++fPqMaVatC+lmTZxd2XcQvNTEWHmddc8spTJkJaRyubqV+drNczetao6Z91N4jQ2JrQ6uNrZPj5gs/I8srASiK0=
-Received: from DM6PR06MB5178.namprd06.prod.outlook.com (20.178.25.19) by
- DM6PR06MB4122.namprd06.prod.outlook.com (20.176.73.19) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1361.14; Fri, 23 Nov 2018 08:16:27 +0000
-Received: from DM6PR06MB5178.namprd06.prod.outlook.com
- ([fe80::c450:96ae:b322:78c7]) by DM6PR06MB5178.namprd06.prod.outlook.com
- ([fe80::c450:96ae:b322:78c7%4]) with mapi id 15.20.1361.017; Fri, 23 Nov 2018
- 08:16:26 +0000
-From:   Javier Gonzalez <javier@cnexlabs.com>
-To:     =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
-CC:     "javier@javigon.com" <javier@javigon.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=HIfelMlnLBH4z2Mnp8iWztGi0Pyq+RYmCWqVegN7yz8=;
+        b=OO/CxISEAHwYLusZ2lqc/VFIueoLBZbA2HaFbm4YzdF3wuB33DYzS408OoiKVCwv4v
+         cBwilKqIyIEV8u8O6mUatX6I5ssUy39WBx1whNpoZJB0LyXOpCikuNCINEFuAoz8xG90
+         3k8rRIFC2aS21rYYA3c1fk5KGlZcggkfDl3+B4/8bY9CMAXAzkqzeu6MuU1MenJ6D5XG
+         H37CT16aGTUA/Uo4Brj6ZH3nFMNIdvIwOHut/xZ+3Xdvv5uNnR9GcyEj9siLgWhOG2Qe
+         AwxnT1iHa0Y2RHd4g+0hFdkLZ82MND3VYa/WFxwtdmYgjLBGtDuTdKr5fd4k9tEDNKAM
+         /Uog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=HIfelMlnLBH4z2Mnp8iWztGi0Pyq+RYmCWqVegN7yz8=;
+        b=djM8GQSIxU8l1oISzBoyI7RAEyMCWXgdOdZv9++evGAEidmQfowknCeVDUNvulvHi+
+         B2pNjdvyHivm1+KRaoN69oTmCZikD9UcSXysQpokh2Zw7fNkVMZ2DjL6N9F8YFMyjhyc
+         cs10WsfnarMviyiYNddfJiCJzjc0Nl3fjhW+bny1SKIy+Lbi6FQWqddoW9/1XFoepB14
+         1bpi3h16JP3pMj9H2llI+7OnoSx0aHataofTaj2MboQsV9t6CadDi8ATdS2ifiZDHGFs
+         APXqgM1L9fHQUxIQYCbCxILU6JYJ3N0lF4Qghjk/o40Qqf/stYPmWLiGuGOSmJtRuAjB
+         J0Sw==
+X-Gm-Message-State: AA+aEWb/azAf/2c5hfLbRmVR3HXvC8rjc5wkYBXDDI8nBsnhagSA7pUq
+        Hm8yO/kL7MRGU8V1j40Voektpw==
+X-Google-Smtp-Source: AFSGD/WqEVkH1SQf76yKO5VFAGOE8gTG0gdPdMmgUDqPzmYxzqGhCHxDnhaZkTCRdbaYNb+VhGUmzw==
+X-Received: by 2002:a2e:8007:: with SMTP id j7-v6mr5605266ljg.22.1542961437653;
+        Fri, 23 Nov 2018 00:23:57 -0800 (PST)
+Received: from [192.168.0.36] (95-166-82-66-cable.dk.customer.tdc.net. [95.166.82.66])
+        by smtp.googlemail.com with ESMTPSA id k63sm6706233lfe.13.2018.11.23.00.23.56
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 23 Nov 2018 00:23:57 -0800 (PST)
 Subject: Re: lightnvm: pblk: avoid ref warning on cache creation
-Thread-Topic: lightnvm: pblk: avoid ref warning on cache creation
-Thread-Index: AQHUgmngYlYqD1slx0yfDxHproHlAaVdBDIAgAAAoWE=
-Date:   Fri, 23 Nov 2018 08:16:25 +0000
-Message-ID: <2D1F9096-EFF8-43C2-8403-9897B3D36409@cnexlabs.com>
-References: <1542894410-14047-1-git-send-email-javier@cnexlabs.com>,<2ef4bc58-98cf-fdfc-195d-d6f88e85f4a6@lightnvm.io>
-In-Reply-To: <2ef4bc58-98cf-fdfc-195d-d6f88e85f4a6@lightnvm.io>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=javier@cnexlabs.com; 
-x-originating-ip: [2a02:aa7:400b:6c85:246c:4a27:fbbe:89b1]
-x-ms-publictraffictype: Email
-x-microsoft-exchange-diagnostics: 1;DM6PR06MB4122;6:MDe5RzlOlJKN8hgndQHOASi6nJJ3FJHKrVQkPJl8m2qw0LUYcp+Rx2S1G6QaExqLuRhGxRqt0UmBqe8P337LRD2iyUo3KIKPSUr/6W4EBYdYxqycncrNyUOaTmp+ep3rOpfaKskPWSV6r+5bNJ4sOtJ4LHrTqmmV1BU3glahXVBBsXw4/cM2miAZe9hAvxG8iHlZ1obY4ADQsfW3BZyXY9QKw9/Oqoo3PFLAvKeFazQkHv5Xc3I3OATGhQAZ5EekxOdUD4PbRo36CY6+zZ7WWxDHpGMcACh/FnDrMajWlBV+mvwdOGJS1O7xGOn7F9m6QGPdXN4ilWYdqm5/AyGsk18yy/bGYSRrZtS44dZrqQeHNyVxB5r5UGYmFcM70asZmlEyzx4EWH2V/M9AhZhrUk16RnBXYlRYEdivPurPh5W9Sc7ZQfIKMhRiDm+pj4QOKUIAIqPIy1iBjf0vZeGbdg==;5:/o8MPRDpc45Fcz/tQE9QxFqnsTt1S5ciRxWpw0B1if7jkV79LNphT2DcUvfPeWQ5oQHw2Bw/jKaPOr3r87aPEuTUddFRrZFfmTj3jiGWNO3QVfKNc9AhCaR5iYEkKS4G30v7irsqGAjog7kaHunK1j0CDz8vh51tTfbsfclhMCE=;7:p1xg7dNXww/dypJuuR+vYbKH8bPr50qhHmQ5avgiXYugCTjQnb/zHPILGU0b5SqwRLGNsuSRtvxSi4XAg/6lMnFVmbAzuVfzJTNsf2rDW5BHOZ8aL5LvFnV4RoMxc8bGhIWhVKKCXDGnSJCB2/X+2A==
-x-ms-exchange-antispam-srfa-diagnostics: SOS;SOR;
-x-forefront-antispam-report: SFV:SKI;SCL:-1;SFV:NSPM;SFS:(10009020)(39830400003)(366004)(376002)(346002)(396003)(136003)(189003)(199004)(106356001)(33656002)(5660300001)(53546011)(6916009)(25786009)(6506007)(6486002)(14454004)(229853002)(76176011)(66574009)(8936002)(6246003)(102836004)(105586002)(81156014)(81166006)(71190400001)(71200400001)(8676002)(46003)(2906002)(53936002)(14444005)(99286004)(476003)(6436002)(305945005)(36756003)(7736002)(82746002)(478600001)(6116002)(68736007)(54906003)(256004)(2900100001)(2616005)(486006)(4326008)(83716004)(97736004)(6512007)(446003)(316002)(186003)(86362001)(11346002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR06MB4122;H:DM6PR06MB5178.namprd06.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-office365-filtering-correlation-id: 6f764054-f9c9-4896-2d73-08d6511bf691
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390098)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600074)(711020)(2017052603328)(7153060)(7193020);SRVR:DM6PR06MB4122;
-x-ms-traffictypediagnostic: DM6PR06MB4122:
-x-microsoft-antispam-prvs: <DM6PR06MB4122B2A6DA2DD4FC38FDE377BAD40@DM6PR06MB4122.namprd06.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-exchange-antispam-report-cfa-test: BCL:0;PCL:0;RULEID:(8211001083)(6040522)(2401047)(5005006)(8121501046)(93006095)(93001095)(3231442)(944501410)(52105112)(3002001)(10201501046)(148016)(149066)(150057)(6041310)(201703131423095)(201702281528075)(20161123555045)(201703061421075)(201703061406153)(20161123562045)(20161123560045)(20161123558120)(20161123564045)(201708071742011)(7699051)(76991095);SRVR:DM6PR06MB4122;BCL:0;PCL:0;RULEID:;SRVR:DM6PR06MB4122;
-x-forefront-prvs: 086597191B
-received-spf: None (protection.outlook.com: cnexlabs.com does not designate
- permitted sender hosts)
-x-microsoft-antispam-message-info: LlbEiTiNoSj5a+umxKNZu3mXD6TbyTSt0RZbaNW6tPfPRQ6ijrZdK6H7VKMXlDhgejfUDvqAXP5SBUMF2qdeHW6TOtzt1aRQDKjgltIyCYe/L+LXj2Di0iyAOTsntW+zydrioXTmJjd1fcUk3R95asOgrmcAME2ZdFvN801OCXHLxE3d3Qe7aW9i0A/bjZJz+m9g1zvbITn/csAapL/4+VwpSSbxKYpCi+w7KOdcbK5L81BCzNq9XOM7COSYoKVVX4pQPkpEYRmAIXQExSkGKEqC1grWJ3bYMtx4VFD12DufxKr63p0ZOvSIVLZl79iLea9PDegMv01O97pEXCaXSFhB86QiTYha9Xhifwdzdd4=
-spamdiagnosticoutput: 1:99
-spamdiagnosticmetadata: NSPM
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+To:     javier@cnexlabs.com
+Cc:     javier@javigon.com, hans.holmberg@cnexlabs.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1542894410-14047-1-git-send-email-javier@cnexlabs.com>
+ <2ef4bc58-98cf-fdfc-195d-d6f88e85f4a6@lightnvm.io>
+ <2D1F9096-EFF8-43C2-8403-9897B3D36409@cnexlabs.com>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <cfcc4dee-c07f-156f-4523-1bda9c878b02@lightnvm.io>
+Date:   Fri, 23 Nov 2018 09:23:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-X-OriginatorOrg: cnexlabs.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6f764054-f9c9-4896-2d73-08d6511bf691
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Nov 2018 08:16:25.9258
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: e40dfc2e-c6c1-463a-a598-38602b2c3cff
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR06MB4122
+In-Reply-To: <2D1F9096-EFF8-43C2-8403-9897B3D36409@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-DQoNCj4gT24gMjMgTm92IDIwMTgsIGF0IDA5LjE0LCBNYXRpYXMgQmrDuHJsaW5nIDxtYkBsaWdo
-dG52bS5pbz4gd3JvdGU6DQo+IA0KPj4gT24gMTEvMjIvMjAxOCAwMjo0NiBQTSwgSmF2aWVyIEdv
-bnrDoWxleiB3cm90ZToNCj4+IE1hdGlhcywNCj4+IENhbiB5b3UgcGljayB0aGlzIHVwIGZvciA0
-LjIwPyBFdmVuIHRob3VnaCBpdCBpcyBub3QgYW4gZXJyb3IgcGVyIHNlLCBpdA0KPj4gZG9lcyB0
-cmlnZ2VyIGFuIHVnbHkgZmFsc2UgcG9zaXRpdmUgd2FybmluZyB3aGVuIENPTkZJR19SRUZDT1VO
-VF9GVUxMIGlzDQo+PiBzZXQuDQo+PiBUaGFua3MsDQo+PiBKYXZpZXINCj4+IEphdmllciBHb256
-w6FsZXogKDEpOg0KPj4gICBsaWdodG52bTogcGJsazogYXZvaWQgcmVmIHdhcm5pbmcgb24gY2Fj
-aGUgY3JlYXRpb24NCj4+ICBkcml2ZXJzL2xpZ2h0bnZtL3BibGstaW5pdC5jIHwgMTQgKysrKyst
-LS0tLS0tLS0NCj4+ICAxIGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCA5IGRlbGV0aW9u
-cygtKQ0KPiANCj4gSXQgaXMgdG9vIGxhdGUgdG8gZ2V0IGl0IGZvciA0LjIwLiBJJ2xsIHB1bGwg
-aXQgaW4gZm9yIDQuMjEuDQoNCldlbGwsIGlmIGl0IGlzIGEgZml4IGl04oCZcyBub3QgdG9vIGxh
-dGUgQUZBSUsuIEl0IGFsc28gYXBwbGllcyB0byBhIHBhdGNoIHBpY2tlZCB1cCBpbiB0aGlzIHNl
-cmllcy4gV2Ugc2hvdWxkIGhhdmUgY2F0Y2hlcyB0aGlzIGJlZm9yZS4gDQoNCkJ1dCBJIGd1ZXNz
-IGl04oCZcyB5b3VyIGNhbGwuIA0KDQo+IA0KPiBXZSBjYW4gcHV0IG9uIGEgRml4ZXM6IDE4NjRk
-ZTk0ZWM5ZDYgImxpZ2h0bnZtOiBwYmxrOiBzdG9wIHJlY3JlYXRpbmcgZ2xvYmFsIGNhY2hlcyIg
-aWYgeW91IHdhbnQgR3JlZyBhbmQgZnJpZW5kcyB0byBwaWNrIHBpY2tlZCBpdCB1cCBmb3Igc3Rh
-YmxlIGtlcm5lbHM/DQoNCkkgZGlkbuKAmXQgYWRkIGl0IGFzIGl0IGlzIG5vdCBhIGJ1ZyBpbiBp
-dHNlbGYuIEJ1dCBpdCBpcyBnb29kIHRvIGFkZCBpdC4gQ2FuIHlvdSBkbyBpdC4gDQoNCkphdmll
-ci4gDQoNCg==
+On 11/23/2018 09:16 AM, Javier Gonzalez wrote:
+> 
+> 
+>> On 23 Nov 2018, at 09.14, Matias Bjørling <mb@lightnvm.io> wrote:
+>>
+>>> On 11/22/2018 02:46 PM, Javier González wrote:
+>>> Matias,
+>>> Can you pick this up for 4.20? Even though it is not an error per se, it
+>>> does trigger an ugly false positive warning when CONFIG_REFCOUNT_FULL is
+>>> set.
+>>> Thanks,
+>>> Javier
+>>> Javier González (1):
+>>>    lightnvm: pblk: avoid ref warning on cache creation
+>>>   drivers/lightnvm/pblk-init.c | 14 +++++---------
+>>>   1 file changed, 5 insertions(+), 9 deletions(-)
+>>
+>> It is too late to get it for 4.20. I'll pull it in for 4.21.
+> 
+> Well, if it is a fix it’s not too late AFAIK. It also applies to a patch picked up in this series. We should have catches this before.
+> 
+> But I guess it’s your call.
+
+There is a likelihood that Linus would catch it, with the result of fire 
+& fury. I don't feel like using one of my cat life's for this one.
+
+> 
+>>
+>> We can put on a Fixes: 1864de94ec9d6 "lightnvm: pblk: stop recreating global caches" if you want Greg and friends to pick picked it up for stable kernels?
+> 
+> I didn’t add it as it is not a bug in itself. But it is good to add it. Can you do it.
+> 
+
+I'll do it.
+
+> Javier.
+> 
+
