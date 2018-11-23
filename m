@@ -6,115 +6,114 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0F1FC43441
-	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 08:24:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 880D2C43441
+	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 08:31:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9198220645
-	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 08:24:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4668920663
+	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 08:31:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="OO/CxISE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9198220645
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lightnvm.io
+	dkim=pass (1024-bit key) header.d=cnexlabs.onmicrosoft.com header.i=@cnexlabs.onmicrosoft.com header.b="KGcCFCAL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4668920663
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cnexlabs.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2408516AbeKWTHM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Nov 2018 14:07:12 -0500
-Received: from mail-lj1-f177.google.com ([209.85.208.177]:44801 "EHLO
-        mail-lj1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731828AbeKWTHL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Nov 2018 14:07:11 -0500
-Received: by mail-lj1-f177.google.com with SMTP id k19-v6so9921602lji.11
-        for <linux-block@vger.kernel.org>; Fri, 23 Nov 2018 00:23:58 -0800 (PST)
+        id S2408588AbeKWTOX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Nov 2018 14:14:23 -0500
+Received: from mail-eopbgr730045.outbound.protection.outlook.com ([40.107.73.45]:47512
+        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2408556AbeKWTOX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Nov 2018 14:14:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=HIfelMlnLBH4z2Mnp8iWztGi0Pyq+RYmCWqVegN7yz8=;
-        b=OO/CxISEAHwYLusZ2lqc/VFIueoLBZbA2HaFbm4YzdF3wuB33DYzS408OoiKVCwv4v
-         cBwilKqIyIEV8u8O6mUatX6I5ssUy39WBx1whNpoZJB0LyXOpCikuNCINEFuAoz8xG90
-         3k8rRIFC2aS21rYYA3c1fk5KGlZcggkfDl3+B4/8bY9CMAXAzkqzeu6MuU1MenJ6D5XG
-         H37CT16aGTUA/Uo4Brj6ZH3nFMNIdvIwOHut/xZ+3Xdvv5uNnR9GcyEj9siLgWhOG2Qe
-         AwxnT1iHa0Y2RHd4g+0hFdkLZ82MND3VYa/WFxwtdmYgjLBGtDuTdKr5fd4k9tEDNKAM
-         /Uog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=HIfelMlnLBH4z2Mnp8iWztGi0Pyq+RYmCWqVegN7yz8=;
-        b=djM8GQSIxU8l1oISzBoyI7RAEyMCWXgdOdZv9++evGAEidmQfowknCeVDUNvulvHi+
-         B2pNjdvyHivm1+KRaoN69oTmCZikD9UcSXysQpokh2Zw7fNkVMZ2DjL6N9F8YFMyjhyc
-         cs10WsfnarMviyiYNddfJiCJzjc0Nl3fjhW+bny1SKIy+Lbi6FQWqddoW9/1XFoepB14
-         1bpi3h16JP3pMj9H2llI+7OnoSx0aHataofTaj2MboQsV9t6CadDi8ATdS2ifiZDHGFs
-         APXqgM1L9fHQUxIQYCbCxILU6JYJ3N0lF4Qghjk/o40Qqf/stYPmWLiGuGOSmJtRuAjB
-         J0Sw==
-X-Gm-Message-State: AA+aEWb/azAf/2c5hfLbRmVR3HXvC8rjc5wkYBXDDI8nBsnhagSA7pUq
-        Hm8yO/kL7MRGU8V1j40Voektpw==
-X-Google-Smtp-Source: AFSGD/WqEVkH1SQf76yKO5VFAGOE8gTG0gdPdMmgUDqPzmYxzqGhCHxDnhaZkTCRdbaYNb+VhGUmzw==
-X-Received: by 2002:a2e:8007:: with SMTP id j7-v6mr5605266ljg.22.1542961437653;
-        Fri, 23 Nov 2018 00:23:57 -0800 (PST)
-Received: from [192.168.0.36] (95-166-82-66-cable.dk.customer.tdc.net. [95.166.82.66])
-        by smtp.googlemail.com with ESMTPSA id k63sm6706233lfe.13.2018.11.23.00.23.56
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 23 Nov 2018 00:23:57 -0800 (PST)
+ d=cnexlabs.onmicrosoft.com; s=selector1-cnexlabs-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RmJH/Pigs4Nq+U1+uGOEJmJ5OI8L9oC7+2NmG/D59Ck=;
+ b=KGcCFCALtyg4gXzZn8pJMIbs1T4gTmgrKJryjziHkb+1pwXUxqEcXBSRWRbO9cp4EyAPkU6Q1QJ1oMRboLqDqJo6saR9pN8GgdmyA7gERdbrBILQvRL7OYsFsRv+IKLZlBtORJuGId3flve2cZjQEJGgBXdrd8EKK39R8ig24W8=
+Received: from DM6PR06MB5178.namprd06.prod.outlook.com (20.178.25.19) by
+ DM6PR06MB5291.namprd06.prod.outlook.com (20.178.26.148) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1361.14; Fri, 23 Nov 2018 08:31:06 +0000
+Received: from DM6PR06MB5178.namprd06.prod.outlook.com
+ ([fe80::c450:96ae:b322:78c7]) by DM6PR06MB5178.namprd06.prod.outlook.com
+ ([fe80::c450:96ae:b322:78c7%4]) with mapi id 15.20.1361.017; Fri, 23 Nov 2018
+ 08:31:05 +0000
+From:   Javier Gonzalez <javier@cnexlabs.com>
+To:     =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
+CC:     "javier@javigon.com" <javier@javigon.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Subject: Re: lightnvm: pblk: avoid ref warning on cache creation
-To:     javier@cnexlabs.com
-Cc:     javier@javigon.com, hans.holmberg@cnexlabs.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Thread-Topic: lightnvm: pblk: avoid ref warning on cache creation
+Thread-Index: AQHUgmngYlYqD1slx0yfDxHproHlAaVdBDIAgAAAoWGAAAIZAIAAAgDb
+Date:   Fri, 23 Nov 2018 08:31:05 +0000
+Message-ID: <2A862095-B029-4CBF-A67D-74D8704F5137@cnexlabs.com>
 References: <1542894410-14047-1-git-send-email-javier@cnexlabs.com>
  <2ef4bc58-98cf-fdfc-195d-d6f88e85f4a6@lightnvm.io>
- <2D1F9096-EFF8-43C2-8403-9897B3D36409@cnexlabs.com>
-From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <cfcc4dee-c07f-156f-4523-1bda9c878b02@lightnvm.io>
-Date:   Fri, 23 Nov 2018 09:23:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+ <2D1F9096-EFF8-43C2-8403-9897B3D36409@cnexlabs.com>,<cfcc4dee-c07f-156f-4523-1bda9c878b02@lightnvm.io>
+In-Reply-To: <cfcc4dee-c07f-156f-4523-1bda9c878b02@lightnvm.io>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=javier@cnexlabs.com; 
+x-originating-ip: [2a02:aa7:400b:6c85:246c:4a27:fbbe:89b1]
+x-ms-publictraffictype: Email
+x-microsoft-exchange-diagnostics: 1;DM6PR06MB5291;6:jTmU7ekewUb24YAxl2mKMaw5dAE5UppLHdWq6jx/5Z/N83oD/fw9H90FaiBIWFpD9rfTdYxDO/J7yWqfnYwo2r7HSEbEWsUVbFr7JDdDuDbdMsMOfksmBEhyXp9wPCBjbB7vNI6B7sHbTWjOBL7goRXmlOlzS5PMt4UPsPMQ3I6B48BAadC9tf1k4g10WGK7X5e088w70IsowF7qiBq8xBrlbrZbQfpqfI+pK0SIA2pQIqYL8EwmOGoWTQNFTYfmGGaeeGl12iiPH1dowtbv98TkOyRsJ7Or9TiVHcSLoyUxIb5gD4yiZMMgLkEZhJZRRrDKv8U3i3N4nB9OxQGEfL7V1DJi2mbjLcgjPjz59lX6qYQMHt7R4kcLBBmr/HZsM7wYpG6wCzHAHO8/D286GIMlTIzZNmeJJ3jPEyEoFSKCO5oBscZNu/WF2WgFDxGcLhNRoHIEvVHaZPfxtWjkiQ==;5:TjAqUaP6yn/6n58avoXUoPsSXezlhHMTtUZZmAh7pRXDM10njv3UnQb8u4kmZD5UCowCJLVeK8TwzzHBJ4FlWClxbGpNqyovJfVQDnJNzPdYPXFtC8uSOASPCZ/S9fw7FVUQW53LvTyMMJUE1H/LuRbZgeXoFe0N/OrAe5qItBc=;7:XhLL9BzDulBdeZJ9XizWGhDouYoe+dcUu4sJBPh4UAwyGNByi1A+t2Nf/yNlqcbFuYuhLcktyZVkh0RuHTHR9Z4e80x7vX7ZxUnoNizrFVTkpji52cXp7T2WAosi3TZzjYLdgD4d7pePpdIpZnDSvQ==
+x-ms-exchange-antispam-srfa-diagnostics: SOS;SOR;
+x-forefront-antispam-report: SFV:SKI;SCL:-1;SFV:NSPM;SFS:(10009020)(136003)(39830400003)(396003)(366004)(346002)(376002)(189003)(199004)(93886005)(14444005)(256004)(6916009)(46003)(6506007)(99286004)(4326008)(186003)(486006)(68736007)(229853002)(446003)(6116002)(53546011)(476003)(71200400001)(7736002)(305945005)(71190400001)(478600001)(11346002)(316002)(66574009)(2906002)(76176011)(102836004)(54906003)(33656002)(2616005)(2900100001)(83716004)(8936002)(53936002)(86362001)(36756003)(6436002)(6486002)(5660300001)(8676002)(6512007)(6246003)(105586002)(25786009)(106356001)(81166006)(97736004)(82746002)(81156014)(14454004);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR06MB5291;H:DM6PR06MB5178.namprd06.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-office365-filtering-correlation-id: d9b0a16d-3559-41da-ebef-08d6511e02f0
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390098)(7020095)(4652040)(8989299)(5600074)(711020)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7153060)(7193020);SRVR:DM6PR06MB5291;
+x-ms-traffictypediagnostic: DM6PR06MB5291:
+x-microsoft-antispam-prvs: <DM6PR06MB5291A2D5FAD018EF03CE003ABAD40@DM6PR06MB5291.namprd06.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-exchange-antispam-report-cfa-test: BCL:0;PCL:0;RULEID:(8211001083)(6040522)(2401047)(5005006)(8121501046)(93006095)(93001095)(3231442)(944501410)(52105112)(10201501046)(3002001)(148016)(149066)(150057)(6041310)(201703131423095)(201702281528075)(20161123555045)(201703061421075)(201703061406153)(20161123562045)(20161123560045)(20161123558120)(20161123564045)(201708071742011)(7699051)(76991095);SRVR:DM6PR06MB5291;BCL:0;PCL:0;RULEID:;SRVR:DM6PR06MB5291;
+x-forefront-prvs: 086597191B
+received-spf: None (protection.outlook.com: cnexlabs.com does not designate
+ permitted sender hosts)
+x-microsoft-antispam-message-info: GTY8n3bFkoVISoEDRkHkJJ7qWLUjHBTjKS+v+rUnz3sEtktjPMyJRl4cvVrWHL94yYPYa+lceOcFlwdOoB5mRW19kxRT7QBfn/3+JWs3n4LSm71C6ZzlKAXgUDywXWZNwzeT26fP0zaMlyo7PAFmHb/RwqiF5XgsiIZSFTfhsg+N1IkFOvtlvbvOy5eQ2LjvNMMpFdLyOYp11jTytXN4gaGRg2rbNUzGUzzZ8YJFWoB5DmlM7bQh+2wGCWNyZx7urA4uqKjtA95UH5JZJa9TecZkVvrZIAcRXgwZm1Gi7Fs0E6Us1U7kQE0bolOXK4dsOziIQcyTbSsWGFunE/IaBpK1JQJkZkVFIYVs77XSIec=
+spamdiagnosticoutput: 1:99
+spamdiagnosticmetadata: NSPM
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <2D1F9096-EFF8-43C2-8403-9897B3D36409@cnexlabs.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: cnexlabs.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d9b0a16d-3559-41da-ebef-08d6511e02f0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Nov 2018 08:31:05.8074
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: e40dfc2e-c6c1-463a-a598-38602b2c3cff
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR06MB5291
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/23/2018 09:16 AM, Javier Gonzalez wrote:
-> 
-> 
->> On 23 Nov 2018, at 09.14, Matias Bjørling <mb@lightnvm.io> wrote:
->>
->>> On 11/22/2018 02:46 PM, Javier González wrote:
->>> Matias,
->>> Can you pick this up for 4.20? Even though it is not an error per se, it
->>> does trigger an ugly false positive warning when CONFIG_REFCOUNT_FULL is
->>> set.
->>> Thanks,
->>> Javier
->>> Javier González (1):
->>>    lightnvm: pblk: avoid ref warning on cache creation
->>>   drivers/lightnvm/pblk-init.c | 14 +++++---------
->>>   1 file changed, 5 insertions(+), 9 deletions(-)
->>
->> It is too late to get it for 4.20. I'll pull it in for 4.21.
-> 
-> Well, if it is a fix it’s not too late AFAIK. It also applies to a patch picked up in this series. We should have catches this before.
-> 
-> But I guess it’s your call.
-
-There is a likelihood that Linus would catch it, with the result of fire 
-& fury. I don't feel like using one of my cat life's for this one.
-
-> 
->>
->> We can put on a Fixes: 1864de94ec9d6 "lightnvm: pblk: stop recreating global caches" if you want Greg and friends to pick picked it up for stable kernels?
-> 
-> I didn’t add it as it is not a bug in itself. But it is good to add it. Can you do it.
-> 
-
-I'll do it.
-
-> Javier.
-> 
-
+DQoNCj4gT24gMjMgTm92IDIwMTgsIGF0IDA5LjI0LCBNYXRpYXMgQmrDuHJsaW5nIDxtYkBsaWdo
+dG52bS5pbz4gd3JvdGU6DQo+IA0KPiBPbiAxMS8yMy8yMDE4IDA5OjE2IEFNLCBKYXZpZXIgR29u
+emFsZXogd3JvdGU6DQo+Pj4gT24gMjMgTm92IDIwMTgsIGF0IDA5LjE0LCBNYXRpYXMgQmrDuHJs
+aW5nIDxtYkBsaWdodG52bS5pbz4gd3JvdGU6DQo+Pj4gDQo+Pj4+IE9uIDExLzIyLzIwMTggMDI6
+NDYgUE0sIEphdmllciBHb256w6FsZXogd3JvdGU6DQo+Pj4+IE1hdGlhcywNCj4+Pj4gQ2FuIHlv
+dSBwaWNrIHRoaXMgdXAgZm9yIDQuMjA/IEV2ZW4gdGhvdWdoIGl0IGlzIG5vdCBhbiBlcnJvciBw
+ZXIgc2UsIGl0DQo+Pj4+IGRvZXMgdHJpZ2dlciBhbiB1Z2x5IGZhbHNlIHBvc2l0aXZlIHdhcm5p
+bmcgd2hlbiBDT05GSUdfUkVGQ09VTlRfRlVMTCBpcw0KPj4+PiBzZXQuDQo+Pj4+IFRoYW5rcywN
+Cj4+Pj4gSmF2aWVyDQo+Pj4+IEphdmllciBHb256w6FsZXogKDEpOg0KPj4+PiAgIGxpZ2h0bnZt
+OiBwYmxrOiBhdm9pZCByZWYgd2FybmluZyBvbiBjYWNoZSBjcmVhdGlvbg0KPj4+PiAgZHJpdmVy
+cy9saWdodG52bS9wYmxrLWluaXQuYyB8IDE0ICsrKysrLS0tLS0tLS0tDQo+Pj4+ICAxIGZpbGUg
+Y2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCA5IGRlbGV0aW9ucygtKQ0KPj4+IA0KPj4+IEl0IGlz
+IHRvbyBsYXRlIHRvIGdldCBpdCBmb3IgNC4yMC4gSSdsbCBwdWxsIGl0IGluIGZvciA0LjIxLg0K
+Pj4gV2VsbCwgaWYgaXQgaXMgYSBmaXggaXTigJlzIG5vdCB0b28gbGF0ZSBBRkFJSy4gSXQgYWxz
+byBhcHBsaWVzIHRvIGEgcGF0Y2ggcGlja2VkIHVwIGluIHRoaXMgc2VyaWVzLiBXZSBzaG91bGQg
+aGF2ZSBjYXRjaGVzIHRoaXMgYmVmb3JlLg0KPj4gQnV0IEkgZ3Vlc3MgaXTigJlzIHlvdXIgY2Fs
+bC4NCj4gDQo+IFRoZXJlIGlzIGEgbGlrZWxpaG9vZCB0aGF0IExpbnVzIHdvdWxkIGNhdGNoIGl0
+LCB3aXRoIHRoZSByZXN1bHQgb2YgZmlyZSAmIGZ1cnkuIEkgZG9uJ3QgZmVlbCBsaWtlIHVzaW5n
+IG9uZSBvZiBteSBjYXQgbGlmZSdzIGZvciB0aGlzIG9uZS4NCg0KSSBkb27igJl0IGdldCBob3cg
+YSBmaXggaW4gcmMzIHdpbGwgcmVzdWx0IGluIEplbnMgb3IgTGludXMgY29tcGxhaW5pbmcuIEJ1
+dCBPaywgbGV04oCZcyByZWxlYXNlIDQuMjAgd2l0aCBhIGZhbHNlIHBvc2l0aXZlIHdhcm5pbmcg
+Zm9yIHVzZS1hZnRlci1mcmVlIG9uIHBibGsgY3JlYXRpb24uIA0KDQoNCj4+PiBXZSBjYW4gcHV0
+IG9uIGEgRml4ZXM6IDE4NjRkZTk0ZWM5ZDYgImxpZ2h0bnZtOiBwYmxrOiBzdG9wIHJlY3JlYXRp
+bmcgZ2xvYmFsIGNhY2hlcyIgaWYgeW91IHdhbnQgR3JlZyBhbmQgZnJpZW5kcyB0byBwaWNrIHBp
+Y2tlZCBpdCB1cCBmb3Igc3RhYmxlIGtlcm5lbHM/DQo+PiBJIGRpZG7igJl0IGFkZCBpdCBhcyBp
+dCBpcyBub3QgYSBidWcgaW4gaXRzZWxmLiBCdXQgaXQgaXMgZ29vZCB0byBhZGQgaXQuIENhbiB5
+b3UgZG8gaXQuDQo+IA0KPiBJJ2xsIGRvIGl0Lg0KDQpUaGFua3MuIA0KDQpKYXZpZXIuIA==
