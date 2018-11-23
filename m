@@ -2,91 +2,102 @@ Return-Path: <SRS0=Lvn3=OC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE777C43441
-	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 02:20:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9C3DC43441
+	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 08:14:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7D3AF20672
-	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 02:20:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D3AF20672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 71F68206B2
+	for <linux-block@archiver.kernel.org>; Fri, 23 Nov 2018 08:14:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="NrcyMYFB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71F68206B2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lightnvm.io
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392910AbeKWNCO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 23 Nov 2018 08:02:14 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46834 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727343AbeKWNCN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 23 Nov 2018 08:02:13 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1ABC19B308;
-        Fri, 23 Nov 2018 02:20:00 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-31.pek2.redhat.com [10.72.8.31])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D723560923;
-        Fri, 23 Nov 2018 02:19:38 +0000 (UTC)
-Date:   Fri, 23 Nov 2018 10:19:34 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>, Omar Sandoval <osandov@fb.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Dave Chinner <dchinner@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
-        linux-raid@vger.kernel.org, David Sterba <dsterba@suse.com>,
-        linux-btrfs@vger.kernel.org,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
-        linux-ext4@vger.kernel.org, Coly Li <colyli@suse.de>,
-        linux-bcache@vger.kernel.org, Boaz Harrosh <ooo@electrozaur.com>,
-        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: Re: [PATCH V11 12/19] block: allow bio_for_each_segment_all() to
- iterate over multi-page bvec
-Message-ID: <20181123021933.GB20110@ming.t460p>
-References: <20181121032327.8434-1-ming.lei@redhat.com>
- <20181121032327.8434-13-ming.lei@redhat.com>
- <20181122110315.GA30369@lst.de>
+        id S2393510AbeKWS5Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 23 Nov 2018 13:57:24 -0500
+Received: from mail-lf1-f48.google.com ([209.85.167.48]:41105 "EHLO
+        mail-lf1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387607AbeKWS5X (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 23 Nov 2018 13:57:23 -0500
+Received: by mail-lf1-f48.google.com with SMTP id c16so8109104lfj.8
+        for <linux-block@vger.kernel.org>; Fri, 23 Nov 2018 00:14:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=2QezV+2WlvZA7bJuTqObIT46PU7b7NzSVeV2Eg8lo+s=;
+        b=NrcyMYFBx/oxHytMcSAPnxKPlubcU27mB9ibSFQ2sPtB9bq0efO3fuTLpbp+C2a7Pg
+         FpxVsuZ6DjHn/WJ5DyWV+Wi/GEPVZOeAXtkdr9LnZ0EtHbKPz6NC3vKRm+eZZpuom8DL
+         ZAJl0cfV+O95hVjW0gJC3no979WH+YtRrwTiQG5m3MaesrxAcTfLy1q4VWUGiGoH839j
+         /Ocb43AeBnP4jEitSoihV2FSO7yf3vWlDHysL7oMrjvYz0yHQz8pP0h+1kxlMk6ZpNmh
+         IJNyJh1RpzleVTSFHfojT42hVzS+mnTMt8sLEWJmN2mcoQjLNKeYA6sfZnC8LIpdvsnU
+         vMHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2QezV+2WlvZA7bJuTqObIT46PU7b7NzSVeV2Eg8lo+s=;
+        b=bx5LBfOOxhFi2UAA5pN1Rf7gRtV42CDjz2RiG6+f+JjG0nFKh1OBhAQWPT14INgLGC
+         q0ib2qYGUazhOeVItdTOfzTzLtKTumRi9r9EzR/yl4vJQgRu/Z54DorZ87+I8cb7x177
+         ROvQYINtvZm5PtO6jypXqoHm7gQ/k6N/usocXErElxdEetthRlJFO3/5BbnpYWAaMiGI
+         vbB3TOHpxlLLT4iX3h2f5C5zr3JMzbsYf26lo0rGCdevhqeNOU6asCTiCPl4ZBURe/9k
+         aIvjs8pMgf4QnpjxLExzIhMQ+Lmrx+5aOEMT8r4N/WLQhocXpc8djOe8JgqWssngWkQK
+         Hz5w==
+X-Gm-Message-State: AGRZ1gL0aR4h8kwylhli7rMvGZX2qPVuC6KY3qHf9w77Cy+w0j5SL3/7
+        jzj9b22gRtv5u2+AT71xrtZBcQ==
+X-Google-Smtp-Source: AJdET5f3dbo4KhmC8FJpstU0/9QaVeCg4aI9vh0NpxB/LBMgT43BcFWZqkDQduljtamQ6vMcQ1C5Wg==
+X-Received: by 2002:a19:c18d:: with SMTP id r135mr8041315lff.59.1542960852107;
+        Fri, 23 Nov 2018 00:14:12 -0800 (PST)
+Received: from [192.168.0.36] (95-166-82-66-cable.dk.customer.tdc.net. [95.166.82.66])
+        by smtp.googlemail.com with ESMTPSA id x16sm7544156lff.26.2018.11.23.00.14.10
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 23 Nov 2018 00:14:11 -0800 (PST)
+Subject: Re: lightnvm: pblk: avoid ref warning on cache creation
+To:     javier@javigon.com
+Cc:     hans.holmberg@cnexlabs.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, javier@cnexlabs.com
+References: <1542894410-14047-1-git-send-email-javier@cnexlabs.com>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <2ef4bc58-98cf-fdfc-195d-d6f88e85f4a6@lightnvm.io>
+Date:   Fri, 23 Nov 2018 09:14:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181122110315.GA30369@lst.de>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Fri, 23 Nov 2018 02:20:00 +0000 (UTC)
+In-Reply-To: <1542894410-14047-1-git-send-email-javier@cnexlabs.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 22, 2018 at 12:03:15PM +0100, Christoph Hellwig wrote:
-> > +/* used for chunk_for_each_segment */
-> > +static inline void bvec_next_segment(const struct bio_vec *bvec,
-> > +				     struct bvec_iter_all *iter_all)
+On 11/22/2018 02:46 PM, Javier González wrote:
+> Matias,
 > 
-> FYI, chunk_for_each_segment doesn't exist anymore, this is
-> bvec_for_each_segment now.  Not sure the comment helps much, though.
-
-OK, will remove the comment.
-
+> Can you pick this up for 4.20? Even though it is not an error per se, it
+> does trigger an ugly false positive warning when CONFIG_REFCOUNT_FULL is
+> set.
 > 
-> > +{
-> > +	struct bio_vec *bv = &iter_all->bv;
-> > +
-> > +	if (bv->bv_page) {
-> > +		bv->bv_page += 1;
+> Thanks,
+> Javier
 > 
-> I think this needs to use nth_page() given that with discontigmem
-> page structures might not be allocated contigously.
+> Javier González (1):
+>    lightnvm: pblk: avoid ref warning on cache creation
+> 
+>   drivers/lightnvm/pblk-init.c | 14 +++++---------
+>   1 file changed, 5 insertions(+), 9 deletions(-)
+> 
 
-Good catch!
+It is too late to get it for 4.20. I'll pull it in for 4.21.
 
-Thanks,
-Ming
+We can put on a Fixes: 1864de94ec9d6 "lightnvm: pblk: stop recreating 
+global caches" if you want Greg and friends to pick picked it up for 
+stable kernels?
+
