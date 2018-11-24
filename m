@@ -2,33 +2,42 @@ Return-Path: <SRS0=vA4A=OD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A00DCC43441
-	for <linux-block@archiver.kernel.org>; Sat, 24 Nov 2018 11:13:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 936BEC43441
+	for <linux-block@archiver.kernel.org>; Sat, 24 Nov 2018 14:06:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 67EBB2086B
-	for <linux-block@archiver.kernel.org>; Sat, 24 Nov 2018 11:13:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67EBB2086B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 507FE20874
+	for <linux-block@archiver.kernel.org>; Sat, 24 Nov 2018 14:06:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wyzd3EjB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 507FE20874
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726092AbeKXWBm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 24 Nov 2018 17:01:42 -0500
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:33308 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725844AbeKXWBm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 24 Nov 2018 17:01:42 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 94F6A3898;
-        Sat, 24 Nov 2018 03:13:30 -0800 (PST)
-Received: from [10.163.1.117] (unknown [10.163.1.117])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 55D4F3F5AF;
-        Sat, 24 Nov 2018 03:13:19 -0800 (PST)
-Subject: Re: [PATCH] mm: Replace all open encodings for NUMA_NO_NODE
-To:     Andrew Morton <akpm@linux-foundation.org>
+        id S1726467AbeKYAye (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 24 Nov 2018 19:54:34 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56812 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726419AbeKYAye (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 24 Nov 2018 19:54:34 -0500
+Received: from localhost (unknown [122.178.235.61])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 929B22086B;
+        Sat, 24 Nov 2018 14:06:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1543068363;
+        bh=cAUODXnN0bd/5FPeBUzD/o00hGIH9sKkV2f7Rv3WRos=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Wyzd3EjBEfn6aZDGOhEdN87u0XAMgZHXb+J2lkIQecoEVbW2MUztHQfLrlvr70MwZ
+         JsPOjylVoj2PxsH+B6OHNYeCVKfj4xRTNYBSQvVKLhMSmUa/bsxbMVUgtAuq34DxmR
+         /nA9baU4VcG3Hpkn/1eu6Q+QrvbBMxh0RYlp8Vkk=
+Date:   Sat, 24 Nov 2018 19:35:54 +0530
+From:   Vinod Koul <vkoul@kernel.org>
+To:     Anshuman Khandual <anshuman.khandual@arm.com>
 Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
         ocfs2-devel@oss.oracle.com, linux-fbdev@vger.kernel.org,
         dri-devel@lists.freedesktop.org, netdev@vger.kernel.org,
@@ -37,63 +46,35 @@ Cc:     linux-mm@kvack.org, linux-kernel@vger.kernel.org,
         dmaengine@vger.kernel.org, linux-block@vger.kernel.org,
         sparclinux@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         linux-ia64@vger.kernel.org, linux-alpha@vger.kernel.org,
-        jiangqi903@gmail.com, hverkuil@xs4all.nl
+        akpm@linux-foundation.org, jiangqi903@gmail.com, hverkuil@xs4all.nl
+Subject: Re: [PATCH] mm: Replace all open encodings for NUMA_NO_NODE
+Message-ID: <20181124140554.GG3175@vkoul-mobl.Dlink>
 References: <1542966856-12619-1-git-send-email-anshuman.khandual@arm.com>
- <20181123154415.42898a42e28a31488749738a@linux-foundation.org>
-From:   Anshuman Khandual <anshuman.khandual@arm.com>
-Message-ID: <8e16e9d1-8f64-d2ca-7d06-985ce601f75b@arm.com>
-Date:   Sat, 24 Nov 2018 16:43:15 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <20181123154415.42898a42e28a31488749738a@linux-foundation.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1542966856-12619-1-git-send-email-anshuman.khandual@arm.com>
+User-Agent: Mutt/1.9.2 (2017-12-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 23-11-18, 15:24, Anshuman Khandual wrote:
 
+> --- a/drivers/dma/dmaengine.c
+> +++ b/drivers/dma/dmaengine.c
+> @@ -386,7 +386,8 @@ EXPORT_SYMBOL(dma_issue_pending_all);
+>  static bool dma_chan_is_local(struct dma_chan *chan, int cpu)
+>  {
+>  	int node = dev_to_node(chan->device->dev);
+> -	return node == -1 || cpumask_test_cpu(cpu, cpumask_of_node(node));
+> +	return node == NUMA_NO_NODE ||
+> +		cpumask_test_cpu(cpu, cpumask_of_node(node));
+>  }
 
-On 11/24/2018 05:14 AM, Andrew Morton wrote:
-> On Fri, 23 Nov 2018 15:24:16 +0530 Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> 
->> At present there are multiple places where invalid node number is encoded
->> as -1. Even though implicitly understood it is always better to have macros
->> in there. Replace these open encodings for an invalid node number with the
->> global macro NUMA_NO_NODE. This helps remove NUMA related assumptions like
->> 'invalid node' from various places redirecting them to a common definition.
->>
->> ...
->>
->> Build tested this with multiple cross compiler options like alpha, sparc,
->> arm64, x86, powerpc, powerpc64le etc with their default config which might
->> not have compiled tested all driver related changes. I will appreciate
->> folks giving this a test in their respective build environment.
->>
->> All these places for replacement were found by running the following grep
->> patterns on the entire kernel code. Please let me know if this might have
->> missed some instances. This might also have replaced some false positives.
->> I will appreciate suggestions, inputs and review.
->>
->> 1. git grep "nid == -1"
->> 2. git grep "node == -1"
->> 3. git grep "nid = -1"
->> 4. git grep "node = -1"
-> 
-> The build testing is good, but I worry that some of the affected files
-> don't clearly have numa.h in their include paths, for the NUMA_NO_NODE
-> definition.
-> 
-> The first thing I looked it is arch/powerpc/include/asm/pci-bridge.h. 
-> Maybe it somehow manages to include numa.h via some nested include, but
-> if so, is that reliable across all config combinations and as code
-> evolves?
-> 
-> So I think that the patch should have added an explicit include of
-> numa.h, especially in cases where the affected file previously had no
-> references to any of the things which numa.h defines.
+I do not see dev_to_node being updated first, that returns -1 so I would
+prefer to check for -1 unless it return NUMA_NO_NODE
 
-Fair enough. Will include numa.h in those particular files.
+-- 
+~Vinod
