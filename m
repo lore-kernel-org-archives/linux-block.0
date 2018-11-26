@@ -2,306 +2,152 @@ Return-Path: <SRS0=/l1b=OF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F28BEC43441
-	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 21:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93CCBC43441
+	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 22:13:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B344A20873
-	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 21:21:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B344A20873
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 590A520C01
+	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 22:13:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="f/7XFRkx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 590A520C01
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727284AbeK0IPV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Nov 2018 03:15:21 -0500
-Received: from mail-yw1-f65.google.com ([209.85.161.65]:40447 "EHLO
-        mail-yw1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727277AbeK0IPU (ORCPT
+        id S1726448AbeK0JIe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Nov 2018 04:08:34 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:39169 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726367AbeK0JIe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Nov 2018 03:15:20 -0500
-Received: by mail-yw1-f65.google.com with SMTP id r130so5034775ywg.7;
-        Mon, 26 Nov 2018 13:19:53 -0800 (PST)
+        Tue, 27 Nov 2018 04:08:34 -0500
+Received: by mail-pg1-f196.google.com with SMTP id w6so6819109pgl.6
+        for <linux-block@vger.kernel.org>; Mon, 26 Nov 2018 14:12:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=Z828Q1hGWN4xE0ZgmUT37ch1Jh+fPsJT+V+amprtHxs=;
+        b=f/7XFRkxWkgNbPNPf+s6683DpOao683kKiPGfp+GDY1wWulUsqMdaALo9ICdTUmCxJ
+         N9V3AYcRNie0T3XNvPm5DKhfUhniEaEw3zGp9Hse6oePD1pVUsqmvE2uC/mcg5+XIxnU
+         LMKdFvP/+gdqw+WJ+0zz33dXh471ApwV+CszQ6S8iVabJDAyB8RgAw6VXGF1THvbn6Kj
+         o9Flhc42RZGBCVbTQs5wtxHFWH2GcnA1vBPkvQefc+fi2XIgy8Vx9Q8wXXGWNEv5FBGD
+         r3wuGSM48Ustfn1hUNS3X++TFN30nIeaTExPEOtWt+kYFe39c/YU7xDg2ixcbDV4lgxx
+         K8zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=zbElfZ7fEzEPUKY5ASS32YybzzEidUShAIHW3J0gUbU=;
-        b=W1/h2imyxABfIT+t9EkXGs340RyXwogTVFcF5PNOcVKeqC5tMegCywxY9c9favOJzp
-         thFkORC/wQladmQMpj4UV0BHn4zPwgHAMa+s4LjjMrd1au0J4F45pclemV6HTaY4UeDy
-         Y4XaVyPlEECiNFXxg7h0UTOEmCpddiPWQXHhR5T7Ec1SJMJc5IGH0rk5QdDa46yiXwS+
-         J0/EyJ4PZDXAwxp8OAVYlkAPa1Y1x2ElKsdxJDD/jW8EkWkw9CmhrlPWtNQfZQO8XMpi
-         kEBHniJqaVgwswALfuxiEchf9hDW1dElt869sc2OBR5H3SMx3rbOdi+JJ+GGDTtqau2t
-         6Yeg==
-X-Gm-Message-State: AA+aEWZtWGddLFyZrgLPYwygogZ5BMKYUDC7KA9j/pGJ+xwuP9pab0r/
-        4NcgQUrGGoyfHM0tVU/gyJ0=
-X-Google-Smtp-Source: AFSGD/Vbr62YnX9k8yJpB+6b3TGeeIXlpIXL0OY9C7xEdH5K1TkuyHTqdLcLpkA0AjoKcqQjXL11sQ==
-X-Received: by 2002:a0d:f4c5:: with SMTP id d188mr3300037ywf.480.1543267193357;
-        Mon, 26 Nov 2018 13:19:53 -0800 (PST)
-Received: from dennisz-mbp.thefacebook.com ([199.201.65.135])
-        by smtp.gmail.com with ESMTPSA id d135-v6sm495462ywh.43.2018.11.26.13.19.51
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 26 Nov 2018 13:19:52 -0800 (PST)
-From:   Dennis Zhou <dennis@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Josef Bacik <josef@toxicpanda.com>
-Cc:     kernel-team@fb.com, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dennis Zhou <dennis@kernel.org>
-Subject: [PATCH 01/13] blkcg: fix ref count issue with bio_blkcg() using task_css
-Date:   Mon, 26 Nov 2018 16:19:34 -0500
-Message-Id: <20181126211946.77067-2-dennis@kernel.org>
-X-Mailer: git-send-email 2.13.5
-In-Reply-To: <20181126211946.77067-1-dennis@kernel.org>
-References: <20181126211946.77067-1-dennis@kernel.org>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=Z828Q1hGWN4xE0ZgmUT37ch1Jh+fPsJT+V+amprtHxs=;
+        b=hwi+Oh3vRSUu5IqPiLMf0sRCKSPW/qUrVTB9Qzt3Qv6/qB3IfOHyg1uClpk81vYo+B
+         V2FJkkmv/QUcFrbGw2KfiG6RqhrWEetsVL6BHPIt79f/ZTgcWHVt0NKLCu3XWNJBSuFj
+         90VIO5TPgHPgzQEP1Sp79ypz1gpKgZz4Rz37NCwWVSiNJCOU36hUwqIMtn9oRlGM7dsP
+         4Hd89ErERQXKvcJtGcYvOQcso+9dOtpHCw/2QU1CR3CFzgOHaTmhgwjSP0zPx84yQ2A+
+         jXoNu+Fy43kf+Sk6zd9pGxzdLFhsdvAPA/9mwiMHGSXARJB+SCCvDs7TyeN/qTdSPiTx
+         DHKw==
+X-Gm-Message-State: AGRZ1gLhb0121UOV7SRq8TqeiDJFLTaxzgKIUbnHrBchQJ8gA5VLKXXX
+        Vl1wOkEcafXgIEmOtHVYbKZQJg==
+X-Google-Smtp-Source: AJdET5cTQuaqAg55SqlEDPYiv4+R2g4Vn4siqfxm4fzsHzoMq4v8KxsClX1F2y/iS6mNA81LmxEZAQ==
+X-Received: by 2002:a62:6d07:: with SMTP id i7-v6mr31099102pfc.146.1543270378421;
+        Mon, 26 Nov 2018 14:12:58 -0800 (PST)
+Received: from vader ([2601:602:8b00:55d3:e6a7:a0ff:fe0b:c9a8])
+        by smtp.gmail.com with ESMTPSA id v184sm1780153pfb.182.2018.11.26.14.12.57
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 26 Nov 2018 14:12:57 -0800 (PST)
+Date:   Mon, 26 Nov 2018 14:12:56 -0800
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>, Omar Sandoval <osandov@fb.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Dave Chinner <dchinner@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, Shaohua Li <shli@kernel.org>,
+        linux-raid@vger.kernel.org, David Sterba <dsterba@suse.com>,
+        linux-btrfs@vger.kernel.org,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
+        Christoph Hellwig <hch@lst.de>, linux-ext4@vger.kernel.org,
+        Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
+        Boaz Harrosh <ooo@electrozaur.com>,
+        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
+Subject: Re: [PATCH V12 03/20] block: remove the "cluster" flag
+Message-ID: <20181126221256.GD30411@vader>
+References: <20181126021720.19471-1-ming.lei@redhat.com>
+ <20181126021720.19471-4-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181126021720.19471-4-ming.lei@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The bio_blkcg() function turns out to be inconsistent and consequently
-dangerous to use. The first part returns a blkcg where a reference is
-owned by the bio meaning it does not need to be rcu protected. However,
-the third case, the last line, is problematic:
+On Mon, Nov 26, 2018 at 10:17:03AM +0800, Ming Lei wrote:
+> From: Christoph Hellwig <hch@lst.de>
+> 
+> The cluster flag implements some very old SCSI behavior.  As far as I
+> can tell the original intent was to enable or disable any kind of
+> segment merging.  But the actually visible effect to the LLDD is that
+> it limits each segments to be inside a single page, which we can
+> also affect by setting the maximum segment size and the segment
+> boundary.
 
-	return css_to_blkcg(task_css(current, io_cgrp_id));
+Reviewed-by: Omar Sandoval <osandov@fb.com>
 
-This can race against task migration and the cgroup dying. It is also
-semantically different as it must be called rcu protected and is
-susceptible to failure when trying to get a reference to it.
+One comment typo below.
 
-This patch adds association ahead of calling bio_blkcg() rather than
-after. This makes association a required and explicit step along the
-code paths for calling bio_blkcg(). In blk-iolatency, association is
-moved above the bio_blkcg() call to ensure it will not return %NULL.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> 
+> Replace virt boundary with segment boundary limit.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-merge.c       | 20 ++++++++------------
+>  block/blk-settings.c    |  3 ---
+>  block/blk-sysfs.c       |  5 +----
+>  drivers/scsi/scsi_lib.c | 20 ++++++++++++++++----
+>  include/linux/blkdev.h  |  6 ------
+>  5 files changed, 25 insertions(+), 29 deletions(-)
+> 
 
-BFQ uses the old bio_blkcg() function, but I do not want to address it
-in this series due to the complexity. I have created a private version
-documenting the inconsistency and noting not to use it.
+[snip]
 
-Signed-off-by: Dennis Zhou <dennis@kernel.org>
-Acked-by: Tejun Heo <tj@kernel.org>
----
- block/bfq-cgroup.c         |  4 +-
- block/bfq-iosched.c        |  2 +-
- block/bio.c                | 10 +++-
- block/blk-iolatency.c      |  2 +-
- include/linux/blk-cgroup.h | 98 ++++++++++++++++++++++++++++++++++----
- 5 files changed, 102 insertions(+), 14 deletions(-)
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 0df15cb738d2..78d6d05992b0 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -1810,6 +1810,8 @@ static int scsi_map_queues(struct blk_mq_tag_set *set)
+>  void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
+>  {
+>  	struct device *dev = shost->dma_dev;
+> +	unsigned max_segment_size = dma_get_max_seg_size(dev);
+> +	unsigned long segment_boundary = shost->dma_boundary;
+>  
+>  	/*
+>  	 * this limit is imposed by hardware restrictions
+> @@ -1828,13 +1830,23 @@ void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
+>  	blk_queue_max_hw_sectors(q, shost->max_sectors);
+>  	if (shost->unchecked_isa_dma)
+>  		blk_queue_bounce_limit(q, BLK_BOUNCE_ISA);
+> -	blk_queue_segment_boundary(q, shost->dma_boundary);
+>  	dma_set_seg_boundary(dev, shost->dma_boundary);
+>  
+> -	blk_queue_max_segment_size(q, dma_get_max_seg_size(dev));
+> +	/*
+> +	 * Clustering is a really old concept from the stone age of Linux
+> +	 * SCSI support.  But the basic idea is that we never give the
+> +	 * driver a segment that spans multiple pages.  For that we need
+> +	 * to limit the segment size, and set the segment boundary so that
+> +	 * we never merge a second segment which is no page aligned.
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index a7a1712632b0..c6113af31960 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -642,7 +642,7 @@ void bfq_bic_update_cgroup(struct bfq_io_cq *bic, struct bio *bio)
- 	uint64_t serial_nr;
- 
- 	rcu_read_lock();
--	serial_nr = bio_blkcg(bio)->css.serial_nr;
-+	serial_nr = __bio_blkcg(bio)->css.serial_nr;
- 
- 	/*
- 	 * Check whether blkcg has changed.  The condition may trigger
-@@ -651,7 +651,7 @@ void bfq_bic_update_cgroup(struct bfq_io_cq *bic, struct bio *bio)
- 	if (unlikely(!bfqd) || likely(bic->blkcg_serial_nr == serial_nr))
- 		goto out;
- 
--	bfqg = __bfq_bic_change_cgroup(bfqd, bic, bio_blkcg(bio));
-+	bfqg = __bfq_bic_change_cgroup(bfqd, bic, __bio_blkcg(bio));
- 	/*
- 	 * Update blkg_path for bfq_log_* functions. We cache this
- 	 * path, and update it here, for the following
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 67b22c924aee..3d1f319fe977 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4384,7 +4384,7 @@ static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
- 
- 	rcu_read_lock();
- 
--	bfqg = bfq_find_set_group(bfqd, bio_blkcg(bio));
-+	bfqg = bfq_find_set_group(bfqd, __bio_blkcg(bio));
- 	if (!bfqg) {
- 		bfqq = &bfqd->oom_bfqq;
- 		goto out;
-diff --git a/block/bio.c b/block/bio.c
-index 03895cc0d74a..7528c2324319 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1990,13 +1990,19 @@ int bio_associate_blkcg_from_page(struct bio *bio, struct page *page)
-  *
-  * This function takes an extra reference of @blkcg_css which will be put
-  * when @bio is released.  The caller must own @bio and is responsible for
-- * synchronizing calls to this function.
-+ * synchronizing calls to this function.  If @blkcg_css is NULL, a call to
-+ * blkcg_get_css() finds the current css from the kthread or task.
-  */
- int bio_associate_blkcg(struct bio *bio, struct cgroup_subsys_state *blkcg_css)
- {
- 	if (unlikely(bio->bi_css))
- 		return -EBUSY;
--	css_get(blkcg_css);
-+
-+	if (blkcg_css)
-+		css_get(blkcg_css);
-+	else
-+		blkcg_css = blkcg_get_css();
-+
- 	bio->bi_css = blkcg_css;
- 	return 0;
- }
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 5f7f1773be61..fe0c4ca312ff 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -481,8 +481,8 @@ static void blkcg_iolatency_throttle(struct rq_qos *rqos, struct bio *bio)
- 		return;
- 
- 	rcu_read_lock();
-+	bio_associate_blkcg(bio, NULL);
- 	blkcg = bio_blkcg(bio);
--	bio_associate_blkcg(bio, &blkcg->css);
- 	blkg = blkg_lookup(blkcg, q);
- 	if (unlikely(!blkg)) {
- 		spin_lock_irq(&q->queue_lock);
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index a9e2e2037129..db8214047486 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -227,22 +227,103 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
- 		   char *input, struct blkg_conf_ctx *ctx);
- void blkg_conf_finish(struct blkg_conf_ctx *ctx);
- 
-+/**
-+ * blkcg_css - find the current css
-+ *
-+ * Find the css associated with either the kthread or the current task.
-+ * This may return a dying css, so it is up to the caller to use tryget logic
-+ * to confirm it is alive and well.
-+ */
-+static inline struct cgroup_subsys_state *blkcg_css(void)
-+{
-+	struct cgroup_subsys_state *css;
-+
-+	css = kthread_blkcg();
-+	if (css)
-+		return css;
-+	return task_css(current, io_cgrp_id);
-+}
-+
-+/**
-+ * blkcg_get_css - find and get a reference to the css
-+ *
-+ * Find the css associated with either the kthread or the current task.
-+ * This takes a reference on the blkcg which will need to be managed by the
-+ * caller.
-+ */
-+static inline struct cgroup_subsys_state *blkcg_get_css(void)
-+{
-+	struct cgroup_subsys_state *css;
-+
-+	rcu_read_lock();
-+
-+	css = kthread_blkcg();
-+	if (css) {
-+		css_get(css);
-+	} else {
-+		/*
-+		 * This is a bit complicated.  It is possible task_css is seeing
-+		 * an old css pointer here.  This is caused by the current
-+		 * thread migrating away from this cgroup and this cgroup dying.
-+		 * css_tryget() will fail when trying to take a ref on a cgroup
-+		 * that's ref count has hit 0.
-+		 *
-+		 * Therefore, if it does fail, this means current must have
-+		 * been swapped away already and this is waiting for it to
-+		 * propagate on the polling cpu.  Hence the use of cpu_relax().
-+		 */
-+		while (true) {
-+			css = task_css(current, io_cgrp_id);
-+			if (likely(css_tryget(css)))
-+				break;
-+			cpu_relax();
-+		}
-+	}
-+
-+	rcu_read_unlock();
-+
-+	return css;
-+}
- 
- static inline struct blkcg *css_to_blkcg(struct cgroup_subsys_state *css)
- {
- 	return css ? container_of(css, struct blkcg, css) : NULL;
- }
- 
--static inline struct blkcg *bio_blkcg(struct bio *bio)
-+/**
-+ * __bio_blkcg - internal, inconsistent version to get blkcg
-+ *
-+ * DO NOT USE.
-+ * This function is inconsistent and consequently is dangerous to use.  The
-+ * first part of the function returns a blkcg where a reference is owned by the
-+ * bio.  This means it does not need to be rcu protected as it cannot go away
-+ * with the bio owning a reference to it.  However, the latter potentially gets
-+ * it from task_css().  This can race against task migration and the cgroup
-+ * dying.  It is also semantically different as it must be called rcu protected
-+ * and is susceptible to failure when trying to get a reference to it.
-+ * Therefore, it is not ok to assume that *_get() will always succeed on the
-+ * blkcg returned here.
-+ */
-+static inline struct blkcg *__bio_blkcg(struct bio *bio)
- {
--	struct cgroup_subsys_state *css;
-+	if (bio && bio->bi_css)
-+		return css_to_blkcg(bio->bi_css);
-+	return css_to_blkcg(blkcg_css());
-+}
- 
-+/**
-+ * bio_blkcg - grab the blkcg associated with a bio
-+ * @bio: target bio
-+ *
-+ * This returns the blkcg associated with a bio, %NULL if not associated.
-+ * Callers are expected to either handle %NULL or know association has been
-+ * done prior to calling this.
-+ */
-+static inline struct blkcg *bio_blkcg(struct bio *bio)
-+{
- 	if (bio && bio->bi_css)
- 		return css_to_blkcg(bio->bi_css);
--	css = kthread_blkcg();
--	if (css)
--		return css_to_blkcg(css);
--	return css_to_blkcg(task_css(current, io_cgrp_id));
-+	return NULL;
- }
- 
- static inline bool blk_cgroup_congested(void)
-@@ -710,10 +791,10 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
- 	bool throtl = false;
- 
- 	rcu_read_lock();
--	blkcg = bio_blkcg(bio);
- 
- 	/* associate blkcg if bio hasn't attached one */
--	bio_associate_blkcg(bio, &blkcg->css);
-+	bio_associate_blkcg(bio, NULL);
-+	blkcg = bio_blkcg(bio);
- 
- 	blkg = blkg_lookup(blkcg, q);
- 	if (unlikely(!blkg)) {
-@@ -835,6 +916,7 @@ static inline int blkcg_activate_policy(struct request_queue *q,
- static inline void blkcg_deactivate_policy(struct request_queue *q,
- 					   const struct blkcg_policy *pol) { }
- 
-+static inline struct blkcg *__bio_blkcg(struct bio *bio) { return NULL; }
- static inline struct blkcg *bio_blkcg(struct bio *bio) { return NULL; }
- 
- static inline struct blkg_policy_data *blkg_to_pd(struct blkcg_gq *blkg,
--- 
-2.17.1
-
+Typo, "which is not page aligned".
