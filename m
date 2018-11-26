@@ -4,61 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A7AAC43610
-	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 22:40:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77DF1C43441
+	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 22:40:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D5F2420873
-	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 22:40:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3510421104
+	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 22:40:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="i3qnjehB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5F2420873
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="kWu3M/Pg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3510421104
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727568AbeK0Jfp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Nov 2018 04:35:45 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:43650 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727632AbeK0Jfp (ORCPT
+        id S1727416AbeK0JfX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Nov 2018 04:35:23 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:44504 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727314AbeK0JfU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Nov 2018 04:35:45 -0500
-Received: by mail-pl1-f196.google.com with SMTP id gn14so14570689plb.10
-        for <linux-block@vger.kernel.org>; Mon, 26 Nov 2018 14:40:05 -0800 (PST)
+        Tue, 27 Nov 2018 04:35:20 -0500
+Received: by mail-pg1-f194.google.com with SMTP id t13so6834253pgr.11
+        for <linux-block@vger.kernel.org>; Mon, 26 Nov 2018 14:39:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=osandov-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=7SO7oOEdYQMovzlJck3mc2068mng5do2HhlfyldvWPU=;
-        b=i3qnjehBiyOqrFRjAHBr9Jb6QUj670RxC/4MexyY1O/JiJiZzrjd8nTLEhgSW7RAfc
-         +FVQbE8UyT+he+H1Q/aEJn7aHCBC5DFtZgeBL+uBBaKIAdDIfovyVnEu86oD25w4aMJ3
-         bDQLit7fjyShtnmlwlIKSnMKWauICluAa5y02isaD/gK3jBbk0SVRWiSOASYM62FQd1D
-         E0TxievofnMe9YDLX8FKtJ0j3ToCj7fKJfNyPMY1owCLnWL/ioXt1vjKxzo45yRN8OMG
-         qi64+ePkHIswSk+nzc6tG7YZyrgg/qop0MKatM26GS0yrqjjnl2yv8qFAO7A1OlHW3pX
-         JO3g==
+        bh=RUaiQARROohQiAOdny5us6dTb3HLIuGpGt6crRAlRs8=;
+        b=kWu3M/Pg7YRitikkahpKiBl5cCUnoiBMDo/k7D4nxQKGNeUrhzsp3IHHN3doNwb/kD
+         e+9EBrzpQwB1ZBTyEn44PpIKLid6y29HqBgkdjvAB+Bg1igpAKj3RVm/PKOxRyqGPY2T
+         X1rggbUOJC5rYhwhHSW/Hh59KSJuPHtxnoOYRn7BqHzxEdVNZLywgqCv6o62Cd/XzV6n
+         PeAdxxPpGLw9a7YBjD1adzo7n6tgd5+FvwuuKMouy46sgY8NzvhWen76DwmWnzzNYePH
+         acjs1KTVl6/uL/knjosfu1aMoXstmrlISal/OL9bYMv4RMuinjL5cWOJWhT0eMGeDgNx
+         vt+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=7SO7oOEdYQMovzlJck3mc2068mng5do2HhlfyldvWPU=;
-        b=kjnxdhFC0/bDNlOMwDUea3N7lxmn23kRWKQrqnU8U6/cPLQkLxGnEV++kUQ4eTDXwv
-         qm8AdXWHLJ+3wAbuh49rwhOTrhkzBwQ51bFEV+8MTaUqit1Au6C0fkUaMn0bWJBkZowG
-         T9sEKdKtYH/311LXiVl1geONYYPMsc+CZNm6iEE0tGGnNGZqRYIWuaYSXlf9BHeXMtPg
-         5ZqVr6ZBBhT0FN9Y8f3RTIcdhLhEEtM3f37gzBmuqTLp6DEX+gwUt/AcC7e2p+U3Ki8S
-         Fmcq1AwmDpHwmzwwAN+S2949DXaOINufZ4MiOkX4ZRmluQAPVhPJClbVQU1KpU2n6jol
-         fItg==
-X-Gm-Message-State: AA+aEWaHRHac4MU5wnGgI2JesLSfhUlYNsSrNrA1ulWOW5lApqMvfSwT
-        wmjO4vmjJechluDcfFdKtAl+Cw==
-X-Google-Smtp-Source: AFSGD/XiSRQHKl6i4Ud9hpVkTqDz9dHlgDZMIs2FFvUUJM4ork3eboFR7OiJBXZO5SjLcJMPsHmCow==
-X-Received: by 2002:a17:902:aa8c:: with SMTP id d12mr7815591plr.25.1543272005111;
-        Mon, 26 Nov 2018 14:40:05 -0800 (PST)
+        bh=RUaiQARROohQiAOdny5us6dTb3HLIuGpGt6crRAlRs8=;
+        b=fXFcyrbFZsWkxIzouHhjfQWXuQcs1AX+iQs/ZTEyCnH7yKO00umObeFFblQegyxv4K
+         L+Cfem7zZ+/P789ar/qUQ1FWgZb26pP/8C+nLQLqqOvNB6XQ2RPxnvhOTwTq7BzTkXKo
+         JEEhDwXTCXzyiBnigGjw5FMnxnIe+oyqEJUl3MRK37nu5H+JtHhLaC1pyXm54mMuDW/K
+         hp1OJkxMY/ocNZeM9+dTgIGdjnzSaR3QsDkPdqhshgdAMeRELIeZhU1LJeqB2BH0xAo1
+         E4YD82c5JOasF7ZSwim3NvvXQYJI1Mw2QC3SpfC+DWMSwPcFWVEh5ban29xG8ZSHFS0g
+         vsVg==
+X-Gm-Message-State: AA+aEWaqD+SyUR4btIUki2QoLNYnU6qDhkmcRTNC1U9YLsxTrLOpyxLh
+        6E63UFLhq+xcZ4i2i595UG5XyQ==
+X-Google-Smtp-Source: AFSGD/WKF2YX6sjXdtrywlIZWIhARgrTQBAsfQcHBfGoFipMevteRNDHtxwiJzMkTPu20TTEPw3acw==
+X-Received: by 2002:a62:4b4d:: with SMTP id y74mr28649197pfa.186.1543271980701;
+        Mon, 26 Nov 2018 14:39:40 -0800 (PST)
 Received: from vader ([2601:602:8b00:55d3:e6a7:a0ff:fe0b:c9a8])
-        by smtp.gmail.com with ESMTPSA id t13sm3253245pgr.42.2018.11.26.14.40.03
+        by smtp.gmail.com with ESMTPSA id y12sm2059602pfk.70.2018.11.26.14.39.39
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 26 Nov 2018 14:40:04 -0800 (PST)
-Date:   Mon, 26 Nov 2018 14:40:03 -0800
+        Mon, 26 Nov 2018 14:39:40 -0800 (PST)
+Date:   Mon, 26 Nov 2018 14:39:38 -0800
 From:   Omar Sandoval <osandov@osandov.com>
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
@@ -78,54 +78,93 @@ Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
         Boaz Harrosh <ooo@electrozaur.com>,
         Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-Subject: Re: [PATCH V12 14/20] bcache: avoid to use
- bio_for_each_segment_all() in bch_bio_alloc_pages()
-Message-ID: <20181126224003.GK30411@vader>
+Subject: Re: [PATCH V12 13/20] block: loop: pass multi-page bvec to iov_iter
+Message-ID: <20181126223938.GJ30411@vader>
 References: <20181126021720.19471-1-ming.lei@redhat.com>
- <20181126021720.19471-15-ming.lei@redhat.com>
+ <20181126021720.19471-14-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181126021720.19471-15-ming.lei@redhat.com>
+In-Reply-To: <20181126021720.19471-14-ming.lei@redhat.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 26, 2018 at 10:17:14AM +0800, Ming Lei wrote:
-> bch_bio_alloc_pages() is always called on one new bio, so it is safe
-> to access the bvec table directly. Given it is the only kind of this
-> case, open code the bvec table access since bio_for_each_segment_all()
-> will be changed to support for iterating over multipage bvec.
+On Mon, Nov 26, 2018 at 10:17:13AM +0800, Ming Lei wrote:
+> iov_iter is implemented on bvec itererator helpers, so it is safe to pass
+> multi-page bvec to it, and this way is much more efficient than passing one
+> page in each bvec.
 > 
-> Acked-by: Coly Li <colyli@suse.de>
 > Reviewed-by: Christoph Hellwig <hch@lst.de>
 
 Reviewed-by: Omar Sandoval <osandov@fb.com>
 
 > Signed-off-by: Ming Lei <ming.lei@redhat.com>
 > ---
->  drivers/md/bcache/util.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>  drivers/block/loop.c | 20 ++++++++++----------
+>  1 file changed, 10 insertions(+), 10 deletions(-)
 > 
-> diff --git a/drivers/md/bcache/util.c b/drivers/md/bcache/util.c
-> index 20eddeac1531..62fb917f7a4f 100644
-> --- a/drivers/md/bcache/util.c
-> +++ b/drivers/md/bcache/util.c
-> @@ -270,7 +270,11 @@ int bch_bio_alloc_pages(struct bio *bio, gfp_t gfp_mask)
->  	int i;
->  	struct bio_vec *bv;
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index 176ab1f28eca..e3683211f12d 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -510,21 +510,22 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+>  		     loff_t pos, bool rw)
+>  {
+>  	struct iov_iter iter;
+> +	struct req_iterator rq_iter;
+>  	struct bio_vec *bvec;
+>  	struct request *rq = blk_mq_rq_from_pdu(cmd);
+>  	struct bio *bio = rq->bio;
+>  	struct file *file = lo->lo_backing_file;
+> +	struct bio_vec tmp;
+>  	unsigned int offset;
+> -	int segments = 0;
+> +	int nr_bvec = 0;
+>  	int ret;
 >  
-> -	bio_for_each_segment_all(bv, bio, i) {
-> +	/*
-> +	 * This is called on freshly new bio, so it is safe to access the
-> +	 * bvec table directly.
-> +	 */
-> +	for (i = 0, bv = bio->bi_io_vec; i < bio->bi_vcnt; bv++, i++) {
->  		bv->bv_page = alloc_page(gfp_mask);
->  		if (!bv->bv_page) {
->  			while (--bv >= bio->bi_io_vec)
+> +	rq_for_each_bvec(tmp, rq, rq_iter)
+> +		nr_bvec++;
+> +
+>  	if (rq->bio != rq->biotail) {
+> -		struct req_iterator iter;
+> -		struct bio_vec tmp;
+>  
+> -		__rq_for_each_bio(bio, rq)
+> -			segments += bio_segments(bio);
+> -		bvec = kmalloc_array(segments, sizeof(struct bio_vec),
+> +		bvec = kmalloc_array(nr_bvec, sizeof(struct bio_vec),
+>  				     GFP_NOIO);
+>  		if (!bvec)
+>  			return -EIO;
+> @@ -533,10 +534,10 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+>  		/*
+>  		 * The bios of the request may be started from the middle of
+>  		 * the 'bvec' because of bio splitting, so we can't directly
+> -		 * copy bio->bi_iov_vec to new bvec. The rq_for_each_segment
+> +		 * copy bio->bi_iov_vec to new bvec. The rq_for_each_bvec
+>  		 * API will take care of all details for us.
+>  		 */
+> -		rq_for_each_segment(tmp, rq, iter) {
+> +		rq_for_each_bvec(tmp, rq, rq_iter) {
+>  			*bvec = tmp;
+>  			bvec++;
+>  		}
+> @@ -550,11 +551,10 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
+>  		 */
+>  		offset = bio->bi_iter.bi_bvec_done;
+>  		bvec = __bvec_iter_bvec(bio->bi_io_vec, bio->bi_iter);
+> -		segments = bio_segments(bio);
+>  	}
+>  	atomic_set(&cmd->ref, 2);
+>  
+> -	iov_iter_bvec(&iter, rw, bvec, segments, blk_rq_bytes(rq));
+> +	iov_iter_bvec(&iter, rw, bvec, nr_bvec, blk_rq_bytes(rq));
+>  	iter.iov_offset = offset;
+>  
+>  	cmd->iocb.ki_pos = pos;
 > -- 
 > 2.9.5
 > 
