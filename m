@@ -2,106 +2,124 @@ Return-Path: <SRS0=/l1b=OF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 261B4C43441
-	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 16:01:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9406C43441
+	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 16:27:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BF69320645
-	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 16:01:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF69320645
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id 9E08B20664
+	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 16:27:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YS22Ja36"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E08B20664
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726563AbeK0Czv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Nov 2018 21:55:51 -0500
-Received: from mga06.intel.com ([134.134.136.31]:40545 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726260AbeK0Czv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Nov 2018 21:55:51 -0500
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Nov 2018 08:01:19 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,282,1539673200"; 
-   d="scan'208";a="111538070"
-Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
-  by orsmga001.jf.intel.com with ESMTP; 26 Nov 2018 08:01:18 -0800
-Date:   Mon, 26 Nov 2018 08:58:17 -0700
-From:   Keith Busch <keith.busch@intel.com>
-To:     Igor Konopko <igor.j.konopko@intel.com>
-Cc:     "axboe@fb.com" <axboe@fb.com>, "hch@lst.de" <hch@lst.de>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [PATCH] nvme: Fix PCIe surprise removal scenario
-Message-ID: <20181126155816.GQ26707@localhost.localdomain>
-References: <20181123155810.60246-1-igor.j.konopko@intel.com>
+        id S1726340AbeK0DVy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Nov 2018 22:21:54 -0500
+Received: from mail-it1-f181.google.com ([209.85.166.181]:39223 "EHLO
+        mail-it1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726253AbeK0DVy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 26 Nov 2018 22:21:54 -0500
+Received: by mail-it1-f181.google.com with SMTP id m15so28629606itl.4
+        for <linux-block@vger.kernel.org>; Mon, 26 Nov 2018 08:27:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=7Q3SsSEiydM+sGOhyNMTLDXCfrqcR1dO9d1ZpQFh/hw=;
+        b=YS22Ja36MfFlmckhLnBoqnqXPMwnnToO/j5IAECh19p6bHxV3KznFcuZWEt5QBpn7l
+         rIj18si2xLtfk3QGNah8zykplHqKbQMP2Iyh7ZOGyoRRlU9RFhiNMq2dzSO20F4mLSHm
+         iy+MGDBtOutjnn6R+/lACvNRwf+1QwPvwGNns+4jCI8ZPwTOrZzS6OhciNYJpcgHDqK7
+         r5NLdFt4sbsU7tNSyyvb8TWvb5f+o7g8Zoof09nvlfobCa4jlI1uCSa+GB6MQowvLScL
+         FJ8Ye07o2Q6McTdUb1/X77yESP474avqXnSzWCtVm+opqZB+1RBn8JS7GM3HmJeNSREU
+         oZYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=7Q3SsSEiydM+sGOhyNMTLDXCfrqcR1dO9d1ZpQFh/hw=;
+        b=Cp+de56vpvBxnuJaOMndyyx2FP48tJxTqGoem9sGHkEXwEkBJetQgFrU8F5xNdCWsJ
+         v3kZy7+kg17iPMPLhUf4adlIa6GpkyhcI17TasmQE4vG9FqYOaEBoMZaWUkOVYLGU0qV
+         kRZnwXilme/j+1Z1ThaUovqEUN09HhCHo+XhnL90OaA8CdfUIQC6xtYQa2I7TItx9+gq
+         UkyhB/J5jPc0+badZ+pN7SRprFuUkxlNZeN4meKG+5PObPAs0TmNFVvXtNBEf/aRovbN
+         vZESV6DecvgRDnSAZvBL4sBPpiQzywujbu3XkcBl40b4b067nceqh1ns2wW7LVVUpORs
+         Fo4g==
+X-Gm-Message-State: AGRZ1gJBCsLA4KRx9bdJVCFiUet3KW0n+IXCJGULEYTggFiMN2TB3ujl
+        g5ny7IPVciF6aYxZ2PFKhmjtVdShvkA=
+X-Google-Smtp-Source: AJdET5ccKRK3doE8xiuuMVHoDrWSTsPj8lJdVoTVWi7qScb5uJd2S+agrMQZvh91kKb2ZrGZzLI7lg==
+X-Received: by 2002:a24:2fc1:: with SMTP id j184-v6mr25038979itj.28.1543249638313;
+        Mon, 26 Nov 2018 08:27:18 -0800 (PST)
+Received: from [192.168.1.56] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id d3sm505059itc.40.2018.11.26.08.27.17
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 26 Nov 2018 08:27:17 -0800 (PST)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     Omar Sandoval <osandov@osandov.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: sbitmap: don't use READ_ONCE() if we don't have to
+Message-ID: <9c657cca-97e6-68e4-6dbb-ac85a6e6511d@kernel.dk>
+Date:   Mon, 26 Nov 2018 09:27:16 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181123155810.60246-1-igor.j.konopko@intel.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 23, 2018 at 07:58:10AM -0800, Igor Konopko wrote:
-> This patch fixes kernel OOPS for surprise removal
-> scenario for PCIe connected NVMe drives.
-> 
-> After latest changes, when PCIe device is not present,
-> nvme_dev_remove_admin() calls blk_cleanup_queue() on
-> admin queue, which frees hctx for that queue.
-> Moment later, on the same path nvme_kill_queues()
-> calls blk_mq_unquiesce_queue() on admin queue and
-> tries to access hctx of it, which leads to
-> following OOPS scenario:
-> 
-> Oops: 0000 [#1] SMP PTI
-> RIP: 0010:sbitmap_any_bit_set+0xb/0x40
-> Call Trace:
->  blk_mq_run_hw_queue+0xd5/0x150
->  blk_mq_run_hw_queues+0x3a/0x50
->  nvme_kill_queues+0x26/0x50
->  nvme_remove_namespaces+0xb2/0xc0
->  nvme_remove+0x60/0x140
->  pci_device_remove+0x3b/0xb0
-> 
-> Fixes: cb4bfda62afa2 ("nvme-pci: fix hot removal during error handling")
-> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+We don't need to use READ_ONCE() to read the map depth and word
+fields. This reduces overhead of __sbitmap_queue_get() dramatically
+on high IOPS devices, taking it from ~3% to a tenth of that.
 
-Thanks Igor, my previous proposal was a bit flawed, and this patch looks
-good. For the future, you should adjust your commit log formatting to
-use the more standard 72 character width.
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ lib/sbitmap.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-The fix should go in for the next rc for sure. Maybe longer term, if
-a request_queue has an active reference, it might make sense to have
-blk-mq's APIs consistently handle these sorts of things.
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index fdd1b8aa8ac6..77442e04aeac 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -243,8 +243,8 @@ void sbitmap_bitmap_show(struct sbitmap *sb, struct seq_file *m)
+ 	int i;
+ 
+ 	for (i = 0; i < sb->map_nr; i++) {
+-		unsigned long word = READ_ONCE(sb->map[i].word);
+-		unsigned int word_bits = READ_ONCE(sb->map[i].depth);
++		unsigned long word = sb->map[i].word;
++		unsigned int word_bits = sb->map[i].depth;
+ 
+ 		while (word_bits > 0) {
+ 			unsigned int bits = min(8 - byte_bits, word_bits);
+@@ -375,7 +375,7 @@ int __sbitmap_queue_get(struct sbitmap_queue *sbq)
+ 	int nr;
+ 
+ 	hint = this_cpu_read(*sbq->alloc_hint);
+-	depth = READ_ONCE(sbq->sb.depth);
++	depth = sbq->sb.depth;
+ 	if (unlikely(hint >= depth)) {
+ 		hint = depth ? prandom_u32() % depth : 0;
+ 		this_cpu_write(*sbq->alloc_hint, hint);
+@@ -406,7 +406,7 @@ int __sbitmap_queue_get_shallow(struct sbitmap_queue *sbq,
+ 	WARN_ON_ONCE(shallow_depth < sbq->min_shallow_depth);
+ 
+ 	hint = this_cpu_read(*sbq->alloc_hint);
+-	depth = READ_ONCE(sbq->sb.depth);
++	depth = sbq->sb.depth;
+ 	if (unlikely(hint >= depth)) {
+ 		hint = depth ? prandom_u32() % depth : 0;
+ 		this_cpu_write(*sbq->alloc_hint, hint);
+-- 
+2.17.1
 
-Reviewed-by: Keith Busch <keith.busch@intel.com>
+-- 
+Jens Axboe
 
-
-> ---
->  drivers/nvme/host/core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index 65c42448e904..5aff95389694 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -3601,7 +3601,7 @@ void nvme_kill_queues(struct nvme_ctrl *ctrl)
->  	down_read(&ctrl->namespaces_rwsem);
->  
->  	/* Forcibly unquiesce queues to avoid blocking dispatch */
-> -	if (ctrl->admin_q)
-> +	if (ctrl->admin_q && !blk_queue_dying(ctrl->admin_q))
->  		blk_mq_unquiesce_queue(ctrl->admin_q);
->  
->  	list_for_each_entry(ns, &ctrl->namespaces, list)
-> -- 
-> 2.14.5
