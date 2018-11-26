@@ -2,109 +2,157 @@ Return-Path: <SRS0=/l1b=OF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E84CC43441
-	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 19:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CF68C43441
+	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 21:19:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0273E20855
-	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 19:37:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="UEhExwlv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0273E20855
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
+	by mail.kernel.org (Postfix) with ESMTP id D750520C01
+	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 21:19:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D750520C01
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726251AbeK0GcR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Nov 2018 01:32:17 -0500
-Received: from mail-io1-f65.google.com ([209.85.166.65]:35283 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726140AbeK0GcR (ORCPT
+        id S1726315AbeK0IPS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Nov 2018 03:15:18 -0500
+Received: from mail-yb1-f196.google.com ([209.85.219.196]:46040 "EHLO
+        mail-yb1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726296AbeK0IPS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Nov 2018 01:32:17 -0500
-Received: by mail-io1-f65.google.com with SMTP id u19so14950380ioc.2
-        for <linux-block@vger.kernel.org>; Mon, 26 Nov 2018 11:37:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=0Z7/J3/XsHVbNKck4ATblMNLdXF25k68A8MLeEe5iJE=;
-        b=UEhExwlvmQGEj8mStrA+2Jja3bFGdGkDozUimCD938z1eSMCmwP2E85H00vzoax5QG
-         zsoS4ncy6M8MYm0tFBAGnbDFOGwlIE/DLdHoZYVLVPB8+Jl3PyXpai2SWUkRFHmP0Mq2
-         GXvNjC0geBZrcfIePRzG+axeFNvq7N2mh0cUKGg6/Uk15TlFYRWyc/1XeN41nPN6zULA
-         Lplub+4s+qF60vJUWAWBiEXvC/RzuUGC3aNsRwAZ1HL0RKxpiwG+joWzos78MgjoQGPP
-         maUxKmQcOY93OSC77Av/z+Xis5w0knGXYCGKrq/xgNwl3zImDQOehjH07ARPZP8CBr/C
-         mmdQ==
+        Tue, 27 Nov 2018 03:15:18 -0500
+Received: by mail-yb1-f196.google.com with SMTP id f6-v6so6701385ybg.12;
+        Mon, 26 Nov 2018 13:19:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=0Z7/J3/XsHVbNKck4ATblMNLdXF25k68A8MLeEe5iJE=;
-        b=BSZWWJLt5Ceu7OdmS1NW2khveHaTEhXlODjahcj8cEHID91HquaxTIpuaI9FpXZH8t
-         VYt5LZ7s3u+RkOvWN5DMUCWtp57oT3XTNC7s29ny+jYl3Bx2YdLAUBiZsX9lyMi9X2Es
-         AwgCQwz12vKGSlw+OMmplYVH1iLXFH/bZXpISTBFezik6OWnjSd0X77YnKcs1pNc1xaB
-         nEVuQ7qmQleZEsYa/EnBWi3/TxE6d5pbCwZHF5N9Jn17TjaOq6kix82sVdrgh9aexoG9
-         m5gjWZzigqrOwEPbuuYxE/qQN9g6P+PcqlT39TjXwUNI3bUxsh3ZSRqSu4IZ5oUWRBEw
-         fGjA==
-X-Gm-Message-State: AA+aEWbuRvu5Np9eNlKcOTDNTZ9WmAqnt9u8OG7XCdNs4W4zLOkS8OQF
-        871a1/yp7ywXcCETKWNBStMmKIDi2xU=
-X-Google-Smtp-Source: AFSGD/Uga4KUckvTU83rmsDAcnB0E9dD3IWf1IzKmKEddUpWfKgN+J7G+4PDdNSEFzmi0AvddqK0mA==
-X-Received: by 2002:a5e:c914:: with SMTP id z20mr21588143iol.72.1543261028066;
-        Mon, 26 Nov 2018 11:37:08 -0800 (PST)
-Received: from vader ([2620:10d:c090:180::1:fd28])
-        by smtp.gmail.com with ESMTPSA id w16sm1000581ita.38.2018.11.26.11.37.06
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 26 Nov 2018 11:37:07 -0800 (PST)
-Date:   Mon, 26 Nov 2018 11:37:04 -0800
-From:   Omar Sandoval <osandov@osandov.com>
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: [PATCH blktests] Add use of logger so that syslog files show
- when each test starts
-Message-ID: <20181126193704.GC30411@vader>
-References: <20181029161557.7652-1-tytso@mit.edu>
- <20181123010221.GA6311@thunk.org>
- <20181126175057.GA30411@vader>
- <20181126183211.GA31885@thunk.org>
- <20181126183723.GB30411@vader>
- <20181126193129.GB31885@thunk.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181126193129.GB31885@thunk.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=8rMoiDmdRPmR3hN5zZipHlN1I4Sy3AxFGp9yVlEAyEw=;
+        b=mBuOM7+I7/852olIYpBQ8q6QOzjphpUDUJZhKsStU2a7jgPTxRVay6EsP0fhDTYguc
+         g/fCt3IWVobU4Uf8wyLL5+2ug8KICmDgwzbJ6X5mscPDtXzNMJf4EaQ9e0zID/ZZVtOY
+         4NbnZ99ODvh4BYa0oj+PVjP0Brf6z3E4Pi6H7cFN0UuUd9FfbqR2jntPmRR4660JQnwQ
+         R4x6/W/UbTQzgTa2n/OV4UH+7TR/AQ8eKl64kUVvSMdSOkxYaEZ9lHMTpMWjD5GIlpKA
+         5OkH0/S9snoD4uFzjTcqyn906BqAzfWSWNtdPievKlN33hqhBXUOj8nUALNlnu6uaPpY
+         GZHg==
+X-Gm-Message-State: AA+aEWZHEyfhHzK2JsgJOqrButF2j/gkTDqHWTOgtG6da/g9j1SlfOh+
+        BcP7kybTpuN7H0GMOuGcIDE=
+X-Google-Smtp-Source: AFSGD/VD8wzsw3a6HHAWKXZGkNEhl+bUQMV1BTZx/LUmSRZywffk9IU2Vw6N0sROIynASzFQ8K/ktA==
+X-Received: by 2002:a25:e80d:: with SMTP id k13-v6mr29537108ybd.420.1543267191928;
+        Mon, 26 Nov 2018 13:19:51 -0800 (PST)
+Received: from dennisz-mbp.thefacebook.com ([199.201.65.135])
+        by smtp.gmail.com with ESMTPSA id d135-v6sm495462ywh.43.2018.11.26.13.19.50
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Mon, 26 Nov 2018 13:19:51 -0800 (PST)
+From:   Dennis Zhou <dennis@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Josef Bacik <josef@toxicpanda.com>
+Cc:     kernel-team@fb.com, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dennis Zhou <dennis@kernel.org>
+Subject: [PATCH 00/13 v4] block: always associate blkg and refcount cleanup
+Date:   Mon, 26 Nov 2018 16:19:33 -0500
+Message-Id: <20181126211946.77067-1-dennis@kernel.org>
+X-Mailer: git-send-email 2.13.5
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 26, 2018 at 02:31:29PM -0500, Theodore Y. Ts'o wrote:
-> On Mon, Nov 26, 2018 at 10:37:23AM -0800, Omar Sandoval wrote:
-> > 
-> > Hm, what if we output it as KERN_INFO?
-> > 
-> > diff --git a/check b/check
-> > index f6c3537..9b4765f 100755
-> > --- a/check
-> > +++ b/check
-> > @@ -314,7 +314,7 @@ _call_test() {
-> >  
-> >  	if [[ -w /dev/kmsg ]]; then
-> >  		local dmesg_marker="run blktests $TEST_NAME at ${TEST_RUN["date"]}"
-> > -		echo "$dmesg_marker" >> /dev/kmsg
-> > +		echo "<6>$dmesg_marker" >> /dev/kmsg
-> >  	else
-> >  		local dmesg_marker=""
-> >  		CHECK_DMESG=0
-> 
-> Still not working, alas.   I tested it via:
-> 
-> root@xfstests-ltm:~# echo "<6>testing 123" >> /dev/kmsg 
-> 
-> It still didn't appear in /var/log/kern.log
-> 
-> 				- Ted
+Hi everyone,
 
-Ok, well that's my due diligence, so applied. Thanks!
+This is respin of v3 [1] with fixes for the errors reported in [2] and
+[3]. v3 was reverted in [4].
+
+The issue in [3] was that bio->bi_disk->queue and blkg->q were out
+of sync. So when I changed blk_get_rl() to use blkg->q, the wrong queue
+was returned and elevator from q->elevator->type threw a NPE. Note, with
+v4.21, the old block stack was removed and so this patch was dropped. I
+did backport this to v4.20 and verified this series does not encounter
+the error.
+
+The biggest changes in v4 are when association occurs and clearly
+defining the cases where association should happen.
+  1. Association is now done when the device is set to keep blkg->q and
+     bio->bi_disk->queue in sync.
+  2. When a bio is submitted directly to the device, it will not be
+     associated with a blkg. This is because a blkg represents the
+     relationship between a blkcg and a request_queue. Going directly to
+     the device means the request_queue may not exist meaning no blkg
+     will exist.
+
+The patch updating blk_get_rl() was dropped (v3 10/12). The patch to
+always associate a blkg from v3 (v3 04/12) was fixed and split into
+patches 0004 and 0005. 0011 is new removing bio_disassociate_task().
+
+Summarizing the ideas of this series:
+  1. Gracefully handle blkg failure to create by walking up the blkg
+     tree rather than fall through to root.
+  2. Associate a bio with a blkg in core logic rather than per
+     controller logic.
+  3. Rather than have a css and blkg reference, hold just a blkg ref
+     as it also holds a css ref.
+  4. Switch to percpu ref counting for blkg.
+
+[1] https://lore.kernel.org/lkml/20180911184137.35897-1-dennisszhou@gmail.com/ 
+[2] https://lore.kernel.org/lkml/13987.1539646128@turing-police.cc.vt.edu/
+[3] https://marc.info/?l=linux-cgroups&m=154110436103723
+[4] https://lore.kernel.org/lkml/20181101212410.47569-1-dennis@kernel.org/
+
+This patchset contains the following 13 patches:
+  0001-blkcg-fix-ref-count-issue-with-bio_blkcg-using-task_.patch
+  0002-blkcg-update-blkg_lookup_create-to-do-locking.patch
+  0003-blkcg-convert-blkg_lookup_create-to-find-closest-blk.patch
+  0004-blkcg-introduce-common-blkg-association-logic.patch
+  0005-blkcg-associate-blkg-when-associating-a-device.patch
+  0006-blkcg-consolidate-bio_issue_init-to-be-a-part-of-cor.patch
+  0007-blkcg-associate-a-blkg-for-pages-being-evicted-by-sw.patch
+  0008-blkcg-associate-writeback-bios-with-a-blkg.patch
+  0009-blkcg-remove-bio-bi_css-and-instead-use-bio-bi_blkg.patch
+  0010-blkcg-remove-additional-reference-to-the-css.patch
+  0011-blkcg-remove-bio_disassociate_task.patch
+  0012-blkcg-change-blkg-reference-counting-to-use-percpu_r.patch
+  0013-blkcg-rename-blkg_try_get-to-blkg_tryget.patch
+
+This patchset is on top of linux-block#for-4.21/block 5f0ed774ed29.
+
+diffstats below:
+
+Dennis Zhou (13):
+  blkcg: fix ref count issue with bio_blkcg() using task_css
+  blkcg: update blkg_lookup_create() to do locking
+  blkcg: convert blkg_lookup_create() to find closest blkg
+  blkcg: introduce common blkg association logic
+  blkcg: associate blkg when associating a device
+  blkcg: consolidate bio_issue_init() to be a part of core
+  blkcg: associate a blkg for pages being evicted by swap
+  blkcg: associate writeback bios with a blkg
+  blkcg: remove bio->bi_css and instead use bio->bi_blkg
+  blkcg: remove additional reference to the css
+  blkcg: remove bio_disassociate_task()
+  blkcg: change blkg reference counting to use percpu_ref
+  blkcg: rename blkg_try_get() to blkg_tryget()
+
+ Documentation/admin-guide/cgroup-v2.rst |   8 +-
+ block/bfq-cgroup.c                      |   4 +-
+ block/bfq-iosched.c                     |   2 +-
+ block/bio.c                             | 189 ++++++++++++++++--------
+ block/blk-cgroup.c                      |  97 ++++++++++--
+ block/blk-iolatency.c                   |  24 +--
+ block/blk-throttle.c                    |  11 --
+ block/bounce.c                          |   4 +-
+ drivers/block/loop.c                    |   5 +-
+ drivers/md/raid0.c                      |   2 +-
+ fs/buffer.c                             |  12 +-
+ fs/ext4/page-io.c                       |   4 +-
+ include/linux/bio.h                     |  34 +++--
+ include/linux/blk-cgroup.h              | 119 ++++++++++-----
+ include/linux/blk_types.h               |   7 +-
+ include/linux/cgroup.h                  |   2 +
+ include/linux/writeback.h               |   5 +-
+ kernel/cgroup/cgroup.c                  |  48 ++++--
+ kernel/trace/blktrace.c                 |   4 +-
+ mm/page_io.c                            |   4 +-
+ 20 files changed, 396 insertions(+), 189 deletions(-)
+
+Thanks,
+Dennis
