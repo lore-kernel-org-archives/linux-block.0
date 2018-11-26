@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DB29C43441
-	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 16:36:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB93BC43441
+	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 16:36:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 150CF20855
-	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 16:36:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 986B320659
+	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 16:36:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="DwKeFjZA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 150CF20855
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="EhJkWjQI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 986B320659
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726167AbeK0Dar (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Nov 2018 22:30:47 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:39034 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726253AbeK0Dar (ORCPT
+        id S1726634AbeK0Dat (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Nov 2018 22:30:49 -0500
+Received: from mail-it1-f196.google.com ([209.85.166.196]:51809 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726253AbeK0Dat (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Nov 2018 22:30:47 -0500
-Received: by mail-io1-f67.google.com with SMTP id k7so4574637iob.6
-        for <linux-block@vger.kernel.org>; Mon, 26 Nov 2018 08:36:09 -0800 (PST)
+        Mon, 26 Nov 2018 22:30:49 -0500
+Received: by mail-it1-f196.google.com with SMTP id x19so29251760itl.1
+        for <linux-block@vger.kernel.org>; Mon, 26 Nov 2018 08:36:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=dQNpMrnHiA8Sq6l5G1VGOnfunRBbHhhFUOFsxMZRY6o=;
-        b=DwKeFjZAG8fw1993XjAg0QLcyl+9+CVEyCM0k5OSMU9z4luAQ175CJFmH4+3Kd/wE/
-         LgDQQMfHZQdT2dzue0Zzi0Itxp9cAXi8Wnc09x/vo+9sNEDmJVCm2wdkiuk9R8xy6Zzd
-         uCBK7lW2oZ37knZc3P/3ouzTMalIa8f2hcuPGQXsAxPjdb5Me6DK3DapTUNFBLeUxQp4
-         fOprsVcmWP0moBpHGcHd/sMMem/8/epTFK0rkWnhbnJFvL2q/93qPbU9SXMkuE1Ka55w
-         lBmQyTvSjEXy7ZZ4h12kwUr2ziwVOCY+R91Vl244auZrTH1gwnLrfDu/ONC2FBUj+6zP
-         /GdA==
+        bh=Dg+etYC2drYnfrLWClPG4P6hpiYhQ/56nszkzahxJB8=;
+        b=EhJkWjQI2JP92wWMckYenWDZben7TEVnaTCmcoMvxAnGgskAEZFkeP84PdAuilkSce
+         oIofQpUBmVmpJV5Y1Y3/CwCpK++S5GiRTy/UbHSbZsDAYI48Om1nxk+hnRlTwyldAl7l
+         nJQZ3pbUYGPLR6clzQ2FrTndxIPXKzuNNNlkoZqDAaZ8WmB3TIx2AdDqUGYfo+4qGwch
+         aCIWP/QoNQHMnnnhnpr5SPN86y+XdF6fJ3r0T807+le+lUywKIX84JpZouBXRjd1xunw
+         tlkWcIyboX1sM1eZICFLv3Ds3fhaAYuBmpBfO6my+nuFFzizsL25uKSf6tBXYR4NSKlp
+         90JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=dQNpMrnHiA8Sq6l5G1VGOnfunRBbHhhFUOFsxMZRY6o=;
-        b=nfhpj5N2OUCLpQ/K7BzbRetq7y+LNPkD9ZKudbsm9Rbi2bCoJNia+Xo9ZM4s2zG886
-         J2U8+6X+4rcrBxDdj+pEn0jKRr2i+HSdh26GjZ5FGD+hSe9j3Hu9qtngo2Ig7ImPdcIK
-         h/jUu54KTK4vL2uGDKUgRokKcmFPWbyK3Z6NC5gE7O8QRm7HHLZW1khKUL1ofFGRm0EV
-         ceInDTKPDTx4fjyqwMpk/MjJTpvnCL1qR2YV1dAoXBc1Wb09KMs5SXJ6enoT7M9qqrXI
-         yZd7s6b0RSs1N/jpZkyHvyryKFqqbTKfjLSC5zJh72v3Huzqd4Hq+48YJPZS5Eq8cBRY
-         eW9Q==
-X-Gm-Message-State: AA+aEWamGT5K3o7AJilN2sAkEF858mFQnbaVq8fXcCjxLQnzhT8yH2HA
-        2yuu/1a4kyjYnap1elmrr6bOaTtoHug=
-X-Google-Smtp-Source: AFSGD/WyesAa5saWos3qvLjDmOhwwkDw32e2g6Szojfa1CsYC9l0r6J34H9EP73aA0obu7dRYIBk3w==
-X-Received: by 2002:a6b:14c6:: with SMTP id 189mr21191603iou.179.1543250168835;
-        Mon, 26 Nov 2018 08:36:08 -0800 (PST)
+        bh=Dg+etYC2drYnfrLWClPG4P6hpiYhQ/56nszkzahxJB8=;
+        b=h67J7u9l5IFa8QB203diAcII8XRq4Wv7m0tqjczTjD0j5r7MFTSUquZ5RX/gUUE58o
+         vN6H5iEIN6mu6h3qTymyEcGdMB/wUtDI/xPBAzI4XWBwPyUpu/ywhgelmjsm4LYSQRtj
+         bkk+bS29quGdfwUekRh+dcR4k+2qZ38hpjBuF1zsQrO1qcOHP94oV1avYwwOKSuw8aoO
+         RhiTiVROnTSV3ZSaJyZxDw1xDmokL9fN+HyFrk3bKGAIyJJcGB68VJzhhTVVnFqF+Q5w
+         x0CtWrtbp4PdBeye6ij8TR0FfPrixeWHVdDpLqIcsO+pxJPYH4mE7h1ItdVqKz6TXdP9
+         6F0Q==
+X-Gm-Message-State: AA+aEWZ3qcHTZn8mQpU0S4qVn5/a5rQ5Yo4m/rE8jHBj1uNvCcAafqUU
+        aAKhA+CWPIZ4VaK6jagq3PMhtSdxBmc=
+X-Google-Smtp-Source: AJdET5fKZfS1T0DGCM+D8/+UpX+tglfd9Li+rspSnSa1OaYX1Kk9ez99fq8dXt9fh5oxLOD7pFRgxA==
+X-Received: by 2002:a24:5989:: with SMTP id p131-v6mr22798269itb.0.1543250171582;
+        Mon, 26 Nov 2018 08:36:11 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id r11sm263717iog.46.2018.11.26.08.36.07
+        by smtp.gmail.com with ESMTPSA id r11sm263717iog.46.2018.11.26.08.36.08
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Nov 2018 08:36:07 -0800 (PST)
+        Mon, 26 Nov 2018 08:36:10 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 4/8] nvme: implement mq_ops->commit_rqs() hook
-Date:   Mon, 26 Nov 2018 09:35:52 -0700
-Message-Id: <20181126163556.5181-5-axboe@kernel.dk>
+Subject: [PATCH 5/8] virtio_blk: implement mq_ops->commit_rqs() hook
+Date:   Mon, 26 Nov 2018 09:35:53 -0700
+Message-Id: <20181126163556.5181-6-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181126163556.5181-1-axboe@kernel.dk>
 References: <20181126163556.5181-1-axboe@kernel.dk>
@@ -71,137 +71,47 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Split the command submission and the SQ doorbell ring, and add the
-doorbell ring as our ->commit_rqs() hook. This allows a list of
-requests to be issued, with nvme only writing the SQ update when
-it's necessary. This is more efficient if we have lists of requests
-to issue, particularly on virtualized hardware, where writing the
-SQ doorbell is more expensive than on real hardware. For those cases,
-performance increases of 2-3x have been observed.
-
-The use case for this is plugged IO, where blk-mq flushes a batch of
-requests at the time.
+We need this for blk-mq to kick things into gear, if we told it that
+we had more IO coming, but then failed to deliver on that promise.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- drivers/nvme/host/pci.c | 52 +++++++++++++++++++++++++++++++++--------
- 1 file changed, 42 insertions(+), 10 deletions(-)
+ drivers/block/virtio_blk.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 73effe586e5f..d503bf6cd8ba 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -203,6 +203,7 @@ struct nvme_queue {
- 	u16 q_depth;
- 	s16 cq_vector;
- 	u16 sq_tail;
-+	u16 last_sq_tail;
- 	u16 cq_head;
- 	u16 last_cq_head;
- 	u16 qid;
-@@ -522,22 +523,52 @@ static int nvme_pci_map_queues(struct blk_mq_tag_set *set)
- 	return 0;
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index 6e869d05f91e..b49c57e77780 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -214,6 +214,20 @@ static void virtblk_done(struct virtqueue *vq)
+ 	spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
  }
  
-+static inline void nvme_write_sq_db(struct nvme_queue *nvmeq)
++static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
 +{
-+	if (nvme_dbbuf_update_and_check_event(nvmeq->sq_tail,
-+			nvmeq->dbbuf_sq_db, nvmeq->dbbuf_sq_ei))
-+		writel(nvmeq->sq_tail, nvmeq->q_db);
-+	nvmeq->last_sq_tail = nvmeq->sq_tail;
++	struct virtio_blk *vblk = hctx->queue->queuedata;
++	int qid = hctx->queue_num;
++	bool kick;
++
++	spin_lock_irq(&vblk->vqs[qid].lock);
++	kick = virtqueue_kick_prepare(vblk->vqs[qid].vq);
++	spin_unlock_irq(&vblk->vqs[qid].lock);
++
++	if (kick)
++		virtqueue_notify(vblk->vqs[qid].vq);
 +}
 +
-+static inline int nvme_next_ring_index(struct nvme_queue *nvmeq, u16 index)
-+{
-+	if (++index == nvmeq->q_depth)
-+		return 0;
-+
-+	return index;
-+}
-+
- /**
-  * nvme_submit_cmd() - Copy a command into a queue and ring the doorbell
-  * @nvmeq: The queue to use
-  * @cmd: The command to send
-+ * @write_sq: whether to write to the SQ doorbell
-  */
--static void nvme_submit_cmd(struct nvme_queue *nvmeq, struct nvme_command *cmd)
-+static void nvme_submit_cmd(struct nvme_queue *nvmeq, struct nvme_command *cmd,
-+			    bool write_sq)
+ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 			   const struct blk_mq_queue_data *bd)
  {
- 	spin_lock(&nvmeq->sq_lock);
+@@ -638,6 +652,7 @@ static void virtblk_initialize_rq(struct request *req)
  
- 	memcpy(&nvmeq->sq_cmds[nvmeq->sq_tail], cmd, sizeof(*cmd));
- 
--	if (++nvmeq->sq_tail == nvmeq->q_depth)
--		nvmeq->sq_tail = 0;
--	if (nvme_dbbuf_update_and_check_event(nvmeq->sq_tail,
--			nvmeq->dbbuf_sq_db, nvmeq->dbbuf_sq_ei))
--		writel(nvmeq->sq_tail, nvmeq->q_db);
-+	/*
-+	 * Write sq tail if we have to, OR if the next command would wrap
-+	 */
-+	nvmeq->sq_tail = nvme_next_ring_index(nvmeq, nvmeq->sq_tail);
-+	if (write_sq ||
-+	    nvme_next_ring_index(nvmeq, nvmeq->sq_tail) == nvmeq->last_sq_tail)
-+		nvme_write_sq_db(nvmeq);
-+	spin_unlock(&nvmeq->sq_lock);
-+}
-+
-+static void nvme_commit_rqs(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct nvme_queue *nvmeq = hctx->driver_data;
-+
-+	spin_lock(&nvmeq->sq_lock);
-+	if (nvmeq->sq_tail != nvmeq->last_sq_tail)
-+		nvme_write_sq_db(nvmeq);
- 	spin_unlock(&nvmeq->sq_lock);
- }
- 
-@@ -923,7 +954,7 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	}
- 
- 	blk_mq_start_request(req);
--	nvme_submit_cmd(nvmeq, &cmnd);
-+	nvme_submit_cmd(nvmeq, &cmnd, bd->last);
- 	return BLK_STS_OK;
- out_cleanup_iod:
- 	nvme_free_iod(dev, req);
-@@ -999,8 +1030,7 @@ static void nvme_complete_cqes(struct nvme_queue *nvmeq, u16 start, u16 end)
- {
- 	while (start != end) {
- 		nvme_handle_cqe(nvmeq, start);
--		if (++start == nvmeq->q_depth)
--			start = 0;
-+		start = nvme_next_ring_index(nvmeq, start);
- 	}
- }
- 
-@@ -1108,7 +1138,7 @@ static void nvme_pci_submit_async_event(struct nvme_ctrl *ctrl)
- 	memset(&c, 0, sizeof(c));
- 	c.common.opcode = nvme_admin_async_event;
- 	c.common.command_id = NVME_AQ_BLK_MQ_DEPTH;
--	nvme_submit_cmd(nvmeq, &c);
-+	nvme_submit_cmd(nvmeq, &c, true);
- }
- 
- static int adapter_delete_queue(struct nvme_dev *dev, u8 opcode, u16 id)
-@@ -1531,6 +1561,7 @@ static void nvme_init_queue(struct nvme_queue *nvmeq, u16 qid)
- 
- 	spin_lock_irq(&nvmeq->cq_lock);
- 	nvmeq->sq_tail = 0;
-+	nvmeq->last_sq_tail = 0;
- 	nvmeq->cq_head = 0;
- 	nvmeq->cq_phase = 1;
- 	nvmeq->q_db = &dev->dbs[qid * 2 * dev->db_stride];
-@@ -1603,6 +1634,7 @@ static const struct blk_mq_ops nvme_mq_admin_ops = {
- 
- #define NVME_SHARED_MQ_OPS					\
- 	.queue_rq		= nvme_queue_rq,		\
-+	.commit_rqs		= nvme_commit_rqs,		\
- 	.rq_flags_to_type	= nvme_rq_flags_to_type,	\
- 	.complete		= nvme_pci_complete_rq,		\
- 	.init_hctx		= nvme_init_hctx,		\
+ static const struct blk_mq_ops virtio_mq_ops = {
+ 	.queue_rq	= virtio_queue_rq,
++	.commit_rqs	= virtio_commit_rqs,
+ 	.complete	= virtblk_request_done,
+ 	.init_request	= virtblk_init_request,
+ #ifdef CONFIG_VIRTIO_BLK_SCSI
 -- 
 2.17.1
 
