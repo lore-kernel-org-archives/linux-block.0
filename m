@@ -2,118 +2,69 @@ Return-Path: <SRS0=/l1b=OF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4B1C43441
-	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 08:17:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23294C43441
+	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 08:17:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1BBD62082F
-	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 08:17:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4BB320855
+	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 08:17:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPgJf0II"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BBD62082F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="XXpf5wLD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4BB320855
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726224AbeKZTKv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Nov 2018 14:10:51 -0500
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:42964 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726191AbeKZTKu (ORCPT
+        id S1726199AbeKZTLH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Nov 2018 14:11:07 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:59494 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726162AbeKZTLG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Nov 2018 14:10:50 -0500
-Received: by mail-lj1-f194.google.com with SMTP id l15-v6so15677134lja.9;
-        Mon, 26 Nov 2018 00:17:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DL1JU2Jl6dHmu7oOgaXiyAFBJJhQbFK6TWDQpuzmsr4=;
-        b=OPgJf0IIpylcteRNfDc3IqVd95zj+0p2O6hBuUB8D3uwtsDz/KrvNzhOvR4cw8fSmf
-         1HHWDwFzsaAENxmFNKK+e1RhvMAuhAgf1/p0uCXIqEx6JdoL2JWxl8tnHgisByCyB7DX
-         hBzdAxtbDHUlcUwnJONnm2ifPBzoVGfPDq/78lxTtTfRbtfiAM/Vd/sfmtPhIdgY8I+o
-         2tWwwVA9NJ/gP2AndTm/NReUOhg510NEzWNKvTJSNCjMkbd7euf2L8TdUZTurfktp5xq
-         qP+/pxlBBYTWaixtzzGVUHeg0TAIOOo8PrD2tJiyB7hq3gyeiBdYxn4uhZczS179gF19
-         vf1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DL1JU2Jl6dHmu7oOgaXiyAFBJJhQbFK6TWDQpuzmsr4=;
-        b=F/uThOZyatIp0yHmlZb0JjM1HBZ0JxhuYJ3j60HsqhetcMLXmOLlhiGUNOMF8EJYFU
-         X/AdyN5KWGt9NESLY6tTKIhK0ko+5SCgwU1tRPXBJOKpTuHeMzoTu/h20KO7sbE0kMBP
-         RPvDwnNC+qF8BE1h32TUPFt1niBflNsyS7RWU55J5i4T7FL5242rAi8LpKAYv6Gq9ry5
-         6p7plxFRl0Mt5NAqHBfs2QadPVweE+0uaVxnmx+gT21/xr/2TrqT+4QbhQLDugBAaxJh
-         I5/MwcTz6QaInR8IkxGjoymnvJ7ZWOgiB2SR2rFphoQOVz3ExaLzrfx4+Un5CoeRDmDJ
-         c1cg==
-X-Gm-Message-State: AA+aEWauZe+U1RlUyz8pFmXz08Z6Ybl6khQvyMEy2SgYBqQ5lSkzBFH7
-        BqTVynFMafxotetlqOjucnCDv39ug4fB7fPtcz4=
-X-Google-Smtp-Source: AFSGD/VTOt2bq0cxRq6Vx5uu/66ncyC731ADEI57OU28qOq5jRn5s9MSl77HgATKVmyT1/PlGeH5BLIRNlUyr8UuEas=
-X-Received: by 2002:a2e:5054:: with SMTP id v20-v6mr15822680ljd.45.1543220247340;
- Mon, 26 Nov 2018 00:17:27 -0800 (PST)
+        Mon, 26 Nov 2018 14:11:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=kFYmEUxJDA2mOlJcm/r7bIh8MQRtJegN3RnCIprEHMM=; b=XXpf5wLDWXuf1ytPTM5MR/8GJ
+        BMeEdd3FVvfyxO0B8C38jR/C8gVTg6+AobC7eMoaN/aq616gXpTGwaghW6DVMEqB1JtqIShkvpyl6
+        0z2td1HAeedsEKm6a4bpcugRxtlRwBePibYT2RvY/h9agX76y2jxq+Z3u7/GIkFqKDEJLqI/sFjxv
+        9q8rXBDHRLi7NokGPfB6xQ85DDC/bD0Surybr66Nv1ay4/HzQvc9c0jun2ffb6qR6C255O9IRvaZ5
+        trmmlQDxUODTdgoNC9ZjO2siw0Sm+bdR25HRFhEjsVOYtPt6mnK1hZOAGOTvJ8LuDmC2zTCyoXJD5
+        3j9NXkG6w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gRC5S-0001zA-Mn; Mon, 26 Nov 2018 08:17:46 +0000
+Date:   Mon, 26 Nov 2018 00:17:46 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/6] nvme: remove opportunistic polling from bdev target
+Message-ID: <20181126081746.GB362@infradead.org>
+References: <20181123183411.8708-1-axboe@kernel.dk>
+ <20181123183411.8708-4-axboe@kernel.dk>
 MIME-Version: 1.0
-References: <20181126021720.19471-1-ming.lei@redhat.com> <20181126021720.19471-7-ming.lei@redhat.com>
-In-Reply-To: <20181126021720.19471-7-ming.lei@redhat.com>
-From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date:   Mon, 26 Nov 2018 09:17:16 +0100
-Message-ID: <CANiq72nSa-=n2WUvmQOieDRtf+gC1wg2YuRvKDniSAtDn8=U8g@mail.gmail.com>
-Subject: Re: [PATCH V12 06/20] block: rename bvec helpers
-To:     ming.lei@redhat.com
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Linux-MM <linux-mm@kvack.org>, "Ted Ts'o" <tytso@mit.edu>,
-        osandov@fb.com, sagi@grimberg.me, dchinner@redhat.com,
-        kent.overstreet@gmail.com, snitzer@redhat.com, dm-devel@redhat.com,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, shli@kernel.org,
-        linux-raid@vger.kernel.org, David Sterba <dsterba@suse.com>,
-        Linux Btrfs <linux-btrfs@vger.kernel.org>,
-        darrick.wong@oracle.com, linux-xfs@vger.kernel.org,
-        gaoxiang25@huawei.com, hch@lst.de,
-        Ext4 Developers List <linux-ext4@vger.kernel.org>,
-        colyli@suse.de, linux-bcache@vger.kernel.org, ooo@electrozaur.com,
-        rpeterso@redhat.com, cluster-devel@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181123183411.8708-4-axboe@kernel.dk>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 26, 2018 at 3:20 AM Ming Lei <ming.lei@redhat.com> wrote:
->
-> We will support multi-page bvec soon, and have to deal with
-> single-page vs multi-page bvec. This patch follows Christoph's
-> suggestion to rename all the following helpers:
->
->         for_each_bvec
->         bvec_iter_bvec
->         bvec_iter_len
->         bvec_iter_page
->         bvec_iter_offset
->
-> into:
->         for_each_segment
->         segment_iter_bvec
->         segment_iter_len
->         segment_iter_page
->         segment_iter_offset
->
-> so that these helpers named with 'segment' only deal with single-page
-> bvec, or called segment. We will introduce helpers named with 'bvec'
-> for multi-page bvec.
->
-> bvec_iter_advance() isn't renamed becasue this helper is always operated
-> on real bvec even though multi-page bvec is supported.
->
-> Suggested-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  .clang-format                  |  2 +-
+On Fri, Nov 23, 2018 at 11:34:08AM -0700, Jens Axboe wrote:
+> It doesn't set HIPRI on the bio, so polling for it is pretty silly.
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-Acked-by: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Well, I know who forgot to mark it hipri :)
 
-Cheers,
-Miguel
+But for now this looks good, we need to revisit fabrics polling entirely
+once everything has settled.
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
