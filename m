@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47FD7C04EB8
-	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 16:46:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EADEC43441
+	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 16:46:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1156B20659
-	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 16:46:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB15920865
+	for <linux-block@archiver.kernel.org>; Mon, 26 Nov 2018 16:46:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ZI/Nj0KW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1156B20659
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="SpG2ITlT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB15920865
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727104AbeK0Dkr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 26 Nov 2018 22:40:47 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:54576 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727100AbeK0Dkq (ORCPT
+        id S1727105AbeK0Dkt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 26 Nov 2018 22:40:49 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:41208 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726484AbeK0Dkt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 26 Nov 2018 22:40:46 -0500
-Received: by mail-it1-f195.google.com with SMTP id m123-v6so5069964ita.4
-        for <linux-block@vger.kernel.org>; Mon, 26 Nov 2018 08:46:08 -0800 (PST)
+        Mon, 26 Nov 2018 22:40:49 -0500
+Received: by mail-io1-f68.google.com with SMTP id s22so14461692ioc.8
+        for <linux-block@vger.kernel.org>; Mon, 26 Nov 2018 08:46:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=mh+baagw6TRyG7ZRVJ1uWljPK7oJpHidng0AtT9sC8g=;
-        b=ZI/Nj0KWRWNNOzDBr+AA6s1u+beQA0V+xoTW/OIX0kXbANq3qRThh3xyTyZakAX35n
-         VBjMeULPcxYgS6Gp5wq3P1DvPmyFJ8vt3WeJtsZCPAGyFkrDzJR7LA5gtl7iN+a4y7Q8
-         SwONi7qLWdYZmF7uPfIrrVBb4tSUQqCCcRFzVCVsxJWcPHCzHtEKL8LU059ci/Glur7G
-         XL4Kk384BfccHtj61hgZtmPiAP2hMYaYCk2uvMCOxZEEp+IPp+dpjSerXpddY8RukvqI
-         M9/bnez19KCGlyR7Ip2bnPhO+hpv4tUKRJfYKNCUWbpSMgrsRMfjf6a9axR6zp8bE0C/
-         fPBA==
+        bh=8/1Nol3a3uaTr8sM9gFlQE0kinP2KU2cED85d/G/25k=;
+        b=SpG2ITlTENkBMGZK/kJkn/8cxIwNnkar1M8O94LTHwrAlqMcDehZ+x4SX0yv8fyWBk
+         CGnm8gTrSEI6GZJ7+iahYvmKqdqKnwb1byicIDFkgxY+J1i8rpGmQUL7PoEjaEShAJd9
+         V+8+qCFxWFRrZJCMIm+rD2YLu1cu58mNG0GiWbpU/THKsvzkp3/I0Zvyh7rFLoGqOHag
+         abklHSYlwiWYuV272zC/4aHE8kzp0cdnnZgy7+Cchl+W5Nl5RRTpgGqJHzBlvv2ZX5BM
+         HezJzM365+6tacTIdKEXYJCXN2iEO5aoFZ0p3lsb0KqfXBYu5h9Mo5JOst0NQJBDS/pZ
+         gbyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=mh+baagw6TRyG7ZRVJ1uWljPK7oJpHidng0AtT9sC8g=;
-        b=ZfY34FIPm3wdtffQfiiP3BCLbx+m8WI8j6CJxclHPLWAvMhtweycEgpFXr10zC3k/y
-         22a5TUG+0TJlMsKYDNPW+8iR6HfrKEI/WoFa9YZalnFabhBmpVcWORTD8cFB/viuElqJ
-         n/8vdXr77j9bGNQiQe5cRlfey8G0H0K50wNdba+rXAge9vrKNKuFJy/C7375d/xtWlVN
-         6mn48S1jhLLb4jgc65/PJ8Gfee0wGTFJKhp1DXxLpW/G9azPax7OYitNDExL7BU/mN61
-         PMER48XRbzbfy2EJIuBP7ogr19TFcznTHin02vZq/p5XshVSV4Tx60D3+DnmuLcTV8Ai
-         BkSA==
-X-Gm-Message-State: AGRZ1gJCZ1Dwd62aLyhNarXUA+YdxMnLzkXPptXBBmWobkeUU/SCLOed
-        91gJUuS3631dnn6xDlGWyFcPsPDI8WM=
-X-Google-Smtp-Source: AJdET5eqjJTja24x3SvUDZJy4+CPO+TjcaJpqgrtOzRfwrmRMc+NKBxBHBXGEV19gsrKeQn6F4vFXw==
-X-Received: by 2002:a24:458c:: with SMTP id c12mr23420072itd.27.1543250767096;
-        Mon, 26 Nov 2018 08:46:07 -0800 (PST)
+        bh=8/1Nol3a3uaTr8sM9gFlQE0kinP2KU2cED85d/G/25k=;
+        b=dyM9Py2Tc0JM/3YK5Fa1JzROPgGjOVV9/cVkSyWXZZoCEHuM642ZVPkkLQW8SKuUlc
+         skOnkoxkdzww06WwFYQvAfGPJqcxvPeaJwrjLE32GpIcaNiLSjPIEUvwuJuMjMmThT11
+         5dQeDx5dJhKZsnBySDiHy2+1g9ixPVPBkLe+JUf9N+O4O/Y7S9SES3SdyXFR0JIBpesv
+         TkwWETdYQ3TdfqlxIldPf124fjlq6Zp6sMC9y6Jg9DiqzFCRyvhekBoTvsG8oKk2Z47G
+         NqFC2MO4E49KVVX7VUxFaqTjsm3KpK/S+r1dsYv+ABsWdRVsK66496fj6fSGKHvDQ7vL
+         Q6sA==
+X-Gm-Message-State: AA+aEWYAvScWSPAgVt3ziZ367vGgPlS8mkmLb6FuN5lfbqtPO7p6rVnU
+        LPMPEFa9ZKB1depr3t4DLGLiDQynqJc=
+X-Google-Smtp-Source: AFSGD/XMTYi6/A14h4AbBuZrWT5os/7E/avzDu65ty7TuN1Eo8U7jb6gqgbAg39BcxVTBUjmlcnM5A==
+X-Received: by 2002:a5d:87cd:: with SMTP id q13mr5186661ios.92.1543250769114;
+        Mon, 26 Nov 2018 08:46:09 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id t65-v6sm486801ita.9.2018.11.26.08.46.05
+        by smtp.gmail.com with ESMTPSA id t65-v6sm486801ita.9.2018.11.26.08.46.07
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Nov 2018 08:46:05 -0800 (PST)
+        Mon, 26 Nov 2018 08:46:08 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org, linux-aio@kvack.org,
         linux-fsdevel@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 10/20] aio: don't zero entire aio_kiocb aio_get_req()
-Date:   Mon, 26 Nov 2018 09:45:34 -0700
-Message-Id: <20181126164544.5699-11-axboe@kernel.dk>
+Subject: [PATCH 11/20] aio: only use blk plugs for > 2 depth submissions
+Date:   Mon, 26 Nov 2018 09:45:35 -0700
+Message-Id: <20181126164544.5699-12-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181126164544.5699-1-axboe@kernel.dk>
 References: <20181126164544.5699-1-axboe@kernel.dk>
@@ -72,53 +72,71 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It's 192 bytes, fairly substantial. Most items don't need to be cleared,
-especially not upfront. Clear the ones we do need to clear, and leave
-the other ones for setup when the iocb is prepared and submitted.
+Plugging is meant to optimize submission of a string of IOs, if we don't
+have more than 2 being submitted, don't bother setting up a plug.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/aio.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+ fs/aio.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
 diff --git a/fs/aio.c b/fs/aio.c
-index eaceb40e6cf5..681f2072f81b 100644
+index 681f2072f81b..533cb7b1112f 100644
 --- a/fs/aio.c
 +++ b/fs/aio.c
-@@ -1009,14 +1009,15 @@ static inline struct aio_kiocb *aio_get_req(struct kioctx *ctx)
- {
- 	struct aio_kiocb *req;
- 
--	req = kmem_cache_alloc(kiocb_cachep, GFP_KERNEL|__GFP_ZERO);
--	if (unlikely(!req))
--		return NULL;
-+	req = kmem_cache_alloc(kiocb_cachep, GFP_KERNEL);
-+	if (req) {
-+		percpu_ref_get(&ctx->reqs);
-+		req->ki_ctx = ctx;
-+		INIT_LIST_HEAD(&req->ki_list);
-+		refcount_set(&req->ki_refcnt, 0);
-+		req->ki_eventfd = NULL;
-+	}
- 
--	percpu_ref_get(&ctx->reqs);
--	INIT_LIST_HEAD(&req->ki_list);
--	refcount_set(&req->ki_refcnt, 0);
--	req->ki_ctx = ctx;
- 	return req;
+@@ -1887,6 +1887,12 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+ 	return ret;
  }
  
-@@ -1730,6 +1731,10 @@ static ssize_t aio_poll(struct aio_kiocb *aiocb, struct iocb *iocb)
- 	if (unlikely(!req->file))
- 		return -EBADF;
- 
-+	req->head = NULL;
-+	req->woken = false;
-+	req->cancelled = false;
++/*
++ * Plugging is meant to work with larger batches of IOs. If we don't
++ * have more than the below, then don't bother setting up a plug.
++ */
++#define AIO_PLUG_THRESHOLD	2
 +
- 	apt.pt._qproc = aio_poll_queue_proc;
- 	apt.pt._key = req->events;
- 	apt.iocb = aiocb;
+ /* sys_io_submit:
+  *	Queue the nr iocbs pointed to by iocbpp for processing.  Returns
+  *	the number of iocbs queued.  May return -EINVAL if the aio_context
+@@ -1919,7 +1925,8 @@ SYSCALL_DEFINE3(io_submit, aio_context_t, ctx_id, long, nr,
+ 	if (nr > ctx->nr_events)
+ 		nr = ctx->nr_events;
+ 
+-	blk_start_plug(&plug);
++	if (nr > AIO_PLUG_THRESHOLD)
++		blk_start_plug(&plug);
+ 	for (i = 0; i < nr; i++) {
+ 		struct iocb __user *user_iocb;
+ 
+@@ -1932,7 +1939,8 @@ SYSCALL_DEFINE3(io_submit, aio_context_t, ctx_id, long, nr,
+ 		if (ret)
+ 			break;
+ 	}
+-	blk_finish_plug(&plug);
++	if (nr > AIO_PLUG_THRESHOLD)
++		blk_finish_plug(&plug);
+ 
+ 	percpu_ref_put(&ctx->users);
+ 	return i ? i : ret;
+@@ -1959,7 +1967,8 @@ COMPAT_SYSCALL_DEFINE3(io_submit, compat_aio_context_t, ctx_id,
+ 	if (nr > ctx->nr_events)
+ 		nr = ctx->nr_events;
+ 
+-	blk_start_plug(&plug);
++	if (nr > AIO_PLUG_THRESHOLD)
++		blk_start_plug(&plug);
+ 	for (i = 0; i < nr; i++) {
+ 		compat_uptr_t user_iocb;
+ 
+@@ -1972,7 +1981,8 @@ COMPAT_SYSCALL_DEFINE3(io_submit, compat_aio_context_t, ctx_id,
+ 		if (ret)
+ 			break;
+ 	}
+-	blk_finish_plug(&plug);
++	if (nr > AIO_PLUG_THRESHOLD)
++		blk_finish_plug(&plug);
+ 
+ 	percpu_ref_put(&ctx->users);
+ 	return i ? i : ret;
 -- 
 2.17.1
 
