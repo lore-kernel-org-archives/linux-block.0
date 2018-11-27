@@ -7,22 +7,22 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1141C43441
-	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 23:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3373C43441
+	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 23:16:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 65EFE20851
-	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 23:16:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC26F20851
+	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 23:16:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AVev7g9o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65EFE20851
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="n4Bl0ywo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC26F20851
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726670AbeK1KPz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Nov 2018 05:15:55 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:37894 "EHLO
+        id S1726628AbeK1KQV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Nov 2018 05:16:21 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:37942 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726638AbeK1KPz (ORCPT
+        with ESMTP id S1726641AbeK1KPz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 28 Nov 2018 05:15:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -31,24 +31,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=3rSmEbWASuu7gOOPl+jW7pAMMn1ZzI7tK94ts+5UhSc=; b=AVev7g9oQWRO4mRccmwKbGFhJ
-        4IKvZb5pzZKHfHt6RouxBG4+DxLB3O0PCMjGXfEwNYmJJ2gC79ZvQbSOCdAjA4CWsNGtV11g7lnf0
-        tcOyJGNl02MR4TUm/USqLKZP62xjdPNow1jY1qGCHbLbjTPX9CKiPBRz7nA224QHjCodf7mookAgD
-        yEbgn7/BjP3C9JjuREpTcrM5R6znZ4FcGjTYunH1V8MhEFzW84EYEyl5QWoLDRcsqAF0NmwR+2aNI
-        PkuVglqvloxJyvI6F7ElBbs2rkUrEfvOyUn0NydxoOKLqpNkOiElPC8Rk/ddLJ4e4QOe2CQV/3Z1F
-        FACqXu6Rw==;
+         bh=sUe3caG67P7jm+s/FywSA7J7IV+HYAo3Rozd8gCXxZw=; b=n4Bl0ywo2+oiv5v5CYv3eMSaq
+        jXOTv3X0hgLCDAYvmmfETXT9gE6jZmQM5XCd8UESfvq84SaDBHsBbLIDEQtXiPzMRHJnLbdBAS4Oj
+        BlvyTuElSc8BVB9+wki1F1m+8KfLubvMnW9QI8E3i2Me1nMr5CGdOzwpxGx2Var7mhsYCDDuU67RS
+        mlcL7kToZcoOX1BkWTdWW1wzFLe01Rg8G04DwqXUgnmhMuSlVkBX5enX4TSz/MLnl6wkZYcLd0zpU
+        LoZQLqS+0UNv5k7LBy+cSdeOg5yBHE4iaerAM3o6z53t/qKX1Y+Z4HBvtE3AzwjpyGD/sFveWvcK/
+        9xb7LwgXQ==;
 Received: from [2600:1700:65a0:78e0:514:7862:1503:8e4d] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gRmaa-0007cp-RT; Tue, 27 Nov 2018 23:16:20 +0000
+        id 1gRmac-0007cp-8X; Tue, 27 Nov 2018 23:16:22 +0000
 From:   Sagi Grimberg <sagi@grimberg.me>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, netdev@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Keith Busch <keith.busch@intel.com>,
         "David S. Miller" <davem@davemloft.net>
-Subject: [PATCH v4 01/13] ath6kl: add ath6kl_ prefix to crypto_type
-Date:   Tue, 27 Nov 2018 15:16:03 -0800
-Message-Id: <20181127231615.9446-2-sagi@grimberg.me>
+Subject: [PATCH v4 05/13] iov_iter: introduce hash_and_copy_to_iter helper
+Date:   Tue, 27 Nov 2018 15:16:07 -0800
+Message-Id: <20181127231615.9446-6-sagi@grimberg.me>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181127231615.9446-1-sagi@grimberg.me>
 References: <20181127231615.9446-1-sagi@grimberg.me>
@@ -59,94 +59,74 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Sagi Grimberg <sagi@lightbitslabs.com>
 
-Prevent a namespace conflict as in following patches as skbuff.h will
-include the crypto API.
+Allow consumers that want to use iov iterator helpers and also update
+a predefined hash calculation online when copying data. This is useful
+when copying incoming network buffers to a local iterator and calculate
+a digest on the incoming stream. nvme-tcp host driver that will be
+introduced in following patches is the first consumer via
+skb_copy_and_hash_datagram_iter.
 
-Cc: Kalle Valo <kvalo@codeaurora.org>
 Signed-off-by: Sagi Grimberg <sagi@lightbitslabs.com>
 ---
- drivers/net/wireless/ath/ath6kl/cfg80211.c | 2 +-
- drivers/net/wireless/ath/ath6kl/common.h   | 2 +-
- drivers/net/wireless/ath/ath6kl/wmi.c      | 6 +++---
- drivers/net/wireless/ath/ath6kl/wmi.h      | 6 +++---
- 4 files changed, 8 insertions(+), 8 deletions(-)
+ include/linux/uio.h |  3 +++
+ lib/iov_iter.c      | 16 ++++++++++++++++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/drivers/net/wireless/ath/ath6kl/cfg80211.c b/drivers/net/wireless/ath/ath6kl/cfg80211.c
-index e121187f371f..fa049c4ae315 100644
---- a/drivers/net/wireless/ath/ath6kl/cfg80211.c
-+++ b/drivers/net/wireless/ath/ath6kl/cfg80211.c
-@@ -1322,7 +1322,7 @@ static int ath6kl_cfg80211_set_default_key(struct wiphy *wiphy,
- 	struct ath6kl_vif *vif = netdev_priv(ndev);
- 	struct ath6kl_key *key = NULL;
- 	u8 key_usage;
--	enum crypto_type key_type = NONE_CRYPT;
-+	enum ath6kl_crypto_type key_type = NONE_CRYPT;
+diff --git a/include/linux/uio.h b/include/linux/uio.h
+index 41d1f8d3313d..ecf584f6b82d 100644
+--- a/include/linux/uio.h
++++ b/include/linux/uio.h
+@@ -11,6 +11,7 @@
  
- 	ath6kl_dbg(ATH6KL_DBG_WLAN_CFG, "%s: index %d\n", __func__, key_index);
+ #include <linux/kernel.h>
+ #include <linux/thread_info.h>
++#include <crypto/hash.h>
+ #include <uapi/linux/uio.h>
  
-diff --git a/drivers/net/wireless/ath/ath6kl/common.h b/drivers/net/wireless/ath/ath6kl/common.h
-index 4f82e8632d37..d6e5234f67a1 100644
---- a/drivers/net/wireless/ath/ath6kl/common.h
-+++ b/drivers/net/wireless/ath/ath6kl/common.h
-@@ -67,7 +67,7 @@ struct ath6kl_llc_snap_hdr {
- 	__be16 eth_type;
- } __packed;
+ struct page;
+@@ -269,6 +270,8 @@ static inline void iov_iter_reexpand(struct iov_iter *i, size_t count)
+ size_t csum_and_copy_to_iter(const void *addr, size_t bytes, void *csump, struct iov_iter *i);
+ size_t csum_and_copy_from_iter(void *addr, size_t bytes, __wsum *csum, struct iov_iter *i);
+ bool csum_and_copy_from_iter_full(void *addr, size_t bytes, __wsum *csum, struct iov_iter *i);
++size_t hash_and_copy_to_iter(const void *addr, size_t bytes, void *hashp,
++		struct iov_iter *i);
  
--enum crypto_type {
-+enum ath6kl_crypto_type {
- 	NONE_CRYPT          = 0x01,
- 	WEP_CRYPT           = 0x02,
- 	TKIP_CRYPT          = 0x04,
-diff --git a/drivers/net/wireless/ath/ath6kl/wmi.c b/drivers/net/wireless/ath/ath6kl/wmi.c
-index 777acc564ac9..9d7ac1ab2d02 100644
---- a/drivers/net/wireless/ath/ath6kl/wmi.c
-+++ b/drivers/net/wireless/ath/ath6kl/wmi.c
-@@ -1849,9 +1849,9 @@ int ath6kl_wmi_connect_cmd(struct wmi *wmi, u8 if_idx,
- 			   enum network_type nw_type,
- 			   enum dot11_auth_mode dot11_auth_mode,
- 			   enum auth_mode auth_mode,
--			   enum crypto_type pairwise_crypto,
-+			   enum ath6kl_crypto_type pairwise_crypto,
- 			   u8 pairwise_crypto_len,
--			   enum crypto_type group_crypto,
-+			   enum ath6kl_crypto_type group_crypto,
- 			   u8 group_crypto_len, int ssid_len, u8 *ssid,
- 			   u8 *bssid, u16 channel, u32 ctrl_flags,
- 			   u8 nw_subtype)
-@@ -2301,7 +2301,7 @@ int ath6kl_wmi_disctimeout_cmd(struct wmi *wmi, u8 if_idx, u8 timeout)
+ int import_iovec(int type, const struct iovec __user * uvector,
+ 		 unsigned nr_segs, unsigned fast_segs,
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index db93531ca3e3..8a5f7b2ae346 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -6,6 +6,7 @@
+ #include <linux/vmalloc.h>
+ #include <linux/splice.h>
+ #include <net/checksum.h>
++#include <linux/scatterlist.h>
+ 
+ #define PIPE_PARANOIA /* for now */
+ 
+@@ -1475,6 +1476,21 @@ size_t csum_and_copy_to_iter(const void *addr, size_t bytes, void *csump,
  }
+ EXPORT_SYMBOL(csum_and_copy_to_iter);
  
- int ath6kl_wmi_addkey_cmd(struct wmi *wmi, u8 if_idx, u8 key_index,
--			  enum crypto_type key_type,
-+			  enum ath6kl_crypto_type key_type,
- 			  u8 key_usage, u8 key_len,
- 			  u8 *key_rsc, unsigned int key_rsc_len,
- 			  u8 *key_material,
-diff --git a/drivers/net/wireless/ath/ath6kl/wmi.h b/drivers/net/wireless/ath/ath6kl/wmi.h
-index a60bb49fe920..784940ba4c90 100644
---- a/drivers/net/wireless/ath/ath6kl/wmi.h
-+++ b/drivers/net/wireless/ath/ath6kl/wmi.h
-@@ -2556,9 +2556,9 @@ int ath6kl_wmi_connect_cmd(struct wmi *wmi, u8 if_idx,
- 			   enum network_type nw_type,
- 			   enum dot11_auth_mode dot11_auth_mode,
- 			   enum auth_mode auth_mode,
--			   enum crypto_type pairwise_crypto,
-+			   enum ath6kl_crypto_type pairwise_crypto,
- 			   u8 pairwise_crypto_len,
--			   enum crypto_type group_crypto,
-+			   enum ath6kl_crypto_type group_crypto,
- 			   u8 group_crypto_len, int ssid_len, u8 *ssid,
- 			   u8 *bssid, u16 channel, u32 ctrl_flags,
- 			   u8 nw_subtype);
-@@ -2610,7 +2610,7 @@ int ath6kl_wmi_config_debug_module_cmd(struct wmi *wmi, u32 valid, u32 config);
- 
- int ath6kl_wmi_get_stats_cmd(struct wmi *wmi, u8 if_idx);
- int ath6kl_wmi_addkey_cmd(struct wmi *wmi, u8 if_idx, u8 key_index,
--			  enum crypto_type key_type,
-+			  enum ath6kl_crypto_type key_type,
- 			  u8 key_usage, u8 key_len,
- 			  u8 *key_rsc, unsigned int key_rsc_len,
- 			  u8 *key_material,
++size_t hash_and_copy_to_iter(const void *addr, size_t bytes, void *hashp,
++		struct iov_iter *i)
++{
++	struct ahash_request *hash = hashp;
++	struct scatterlist sg;
++	size_t copied;
++
++	copied = copy_to_iter(addr, bytes, i);
++	sg_init_one(&sg, addr, copied);
++	ahash_request_set_crypt(hash, &sg, NULL, copied);
++	crypto_ahash_update(hash);
++	return copied;
++}
++EXPORT_SYMBOL(hash_and_copy_to_iter);
++
+ int iov_iter_npages(const struct iov_iter *i, int maxpages)
+ {
+ 	size_t size = i->count;
 -- 
 2.17.1
 
