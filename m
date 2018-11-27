@@ -2,150 +2,124 @@ Return-Path: <SRS0=Byed=OG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9A8EC43441
-	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 14:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EB6FC43441
+	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 15:20:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A893D208E4
-	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 14:26:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C9FF208E4
+	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 15:20:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="Bg2SaTrs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A893D208E4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lightnvm.io
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="EjuBGJ5e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C9FF208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726489AbeK1BYX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Nov 2018 20:24:23 -0500
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:46395 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726651AbeK1BYX (ORCPT
+        id S1729541AbeK1CSY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Nov 2018 21:18:24 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:42596 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728834AbeK1CSX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Nov 2018 20:24:23 -0500
-Received: by mail-lf1-f66.google.com with SMTP id f23so16538971lfc.13
-        for <linux-block@vger.kernel.org>; Tue, 27 Nov 2018 06:26:17 -0800 (PST)
+        Tue, 27 Nov 2018 21:18:23 -0500
+Received: by mail-io1-f67.google.com with SMTP id x6so17247735ioa.9
+        for <linux-block@vger.kernel.org>; Tue, 27 Nov 2018 07:20:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=IVCP6KjXw4SdUwbraedFu0XHwLpTkR+LBKdggOrcVKs=;
-        b=Bg2SaTrsDEw+KHgOQyc850or4mspu7N2ECj7kE4F0P4XJgX67Cf/kkHts9jFtQckIO
-         duh0lFE+pJ4ng2o53589zA+aPfGz8lIZR7Fj9mA3bfAO8Ibj6Puu4U775RVBAFsgFU7E
-         0ObOtfqyAjyg2Nqaf5u40n1FpJtodm6ar8c756peSV0bUSXQN3GlNewel9TCKn3AA8oN
-         yjbN0Wu2IrR7X3k5BdUrQH8FFOSN8knRqk/dAiT3xBancd6z2kcXUBvV5OjbntxWKMtj
-         rFII2mUuL5JRFzJ+wnBVSZHyzW03HKznjsFDoz3JuPiI1w1MHHVGrZqrTfArK4lZb769
-         Z8ng==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=POh+IpSj5aInNunC/JT3A2D5g2jxhXy8a/L5Lu2wvPA=;
+        b=EjuBGJ5elEsjloaOoUsYFPqAOUh89QUdYv29vITjWKAluMKvmRHzowHHEnHCrmLmvI
+         1JhKGGAi7oRNgfUCy48bi1WKfktnGIGirVbO5D8Co6MSSqAgaPBDB4bLUOOV8ypCax1R
+         8zwUMs4I3Pf3m8oQei96KfrphkHUP+Y3i4IzTT5OJHdtTWeF6WimujXedJjzYggY0M8m
+         3VIafA2Xulu6eA4swsaviWjquhWqZ22auoYw1g1lPuydKwRbjryjIzlXcwdUFvgGqPL9
+         aYcv4qxkRQqMvj1Sf0ojUF/rCnype5S0LtTC+gF0QabDDm+kN3WF/Vdu5wqX0QBjPkr+
+         sekg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=IVCP6KjXw4SdUwbraedFu0XHwLpTkR+LBKdggOrcVKs=;
-        b=izvqrR8ugfWFm4VdCf52F0HFkJzWnHShQpvs3RWJh8rsCYOCq+CwmLFLNKMhZ9lJ7H
-         Lu4jK8/8cgO71K6FmY9qNsZbl4Eto/9z0LggLpdbSC0m5/WppaeEFpUjNukiIwoVxwPq
-         sQz+p5MdNp4FlOdBqXUA8IDq+YwlJ80xurJ4AckoTdfYd8p3GQl9eZwv+pAreDaf/t0g
-         dly/Hl4/BPcSIx9WTUEm4gLQYji27/jHDUQ6OyBoExkBPOW/4o0FFUlEfzQe1IBkyeft
-         XZ9EZMrfbsbTr43uPXRCtQ3ZMcOqcYK5hifhUcxyCwRXE52gYho3ulTsf89n1SDScbSD
-         NTOw==
-X-Gm-Message-State: AGRZ1gIjmQFHA1K2Uq2YHcDwT7x+sEO7IbvdRycQnuelCsJxcmYqNXBB
-        MmiGAYTDJbkHgt8DfNPNl78/xA==
-X-Google-Smtp-Source: AJdET5fbmdnN3V+HnExkc3D9LiQ1DcNKht6W7TAdapfNWXsWBbtQlSJYS2kNc+zj10uKEWg3pPSp/Q==
-X-Received: by 2002:a19:a86:: with SMTP id 128mr18014259lfk.139.1543328776402;
-        Tue, 27 Nov 2018 06:26:16 -0800 (PST)
-Received: from [192.168.0.36] (95-166-82-66-cable.dk.customer.tdc.net. [95.166.82.66])
-        by smtp.googlemail.com with ESMTPSA id f29sm614699lfa.46.2018.11.27.06.26.15
+        bh=POh+IpSj5aInNunC/JT3A2D5g2jxhXy8a/L5Lu2wvPA=;
+        b=o7rgZB6yi5YT8KwSMDDnv0KHFe9emeLvLvBTYZfwPdzsgRF8kbO4P8xH9R5XbJC/Y5
+         piKramLMWQSyED5Yy+9UizKat2T5Z9mT+C+bjBT6DR/Bb97L7SgCZXO87w8qRE9EEEgC
+         vyxxuYxc5H2dv4BbBkA1JRUwjqelxK66urYIcotKdUeW19NmwaUoiVeHM0/GholXbHTI
+         oWH96JGt1atW9UDTeXW82VIc/oTzOcZufie3/CjBOQQmzRqjktv33G+H2Lf3c2D2/7Lx
+         RsvFYEDcfqbQHBc1AU2ij3T+/V5yuCJfnYscbt0XF/i+CIQ+AupPac/dH/c6PiI9zBK/
+         qAew==
+X-Gm-Message-State: AA+aEWYjrPxGDJ73PKfd4Vu+C6yC9y1Ubh7Fk22qOXCGW14l5s/WF1FA
+        Yryt61x9gz9VrSwRK7zyYyKIzYWyoT4=
+X-Google-Smtp-Source: AFSGD/XWycQ4APTAzc5vXAjwCYBFxU6BS27U+1kGXYfGaWEHWfKbf5dteRce/LdQaQ7/83M5SJxVWg==
+X-Received: by 2002:a6b:c9ce:: with SMTP id z197mr24914112iof.287.1543332008854;
+        Tue, 27 Nov 2018 07:20:08 -0800 (PST)
+Received: from [192.168.1.56] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id j8sm1871104itb.30.2018.11.27.07.20.06
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 27 Nov 2018 06:26:15 -0800 (PST)
-Subject: Re: [PATCH] lightnvm: pblk: adjust the position of the lock
-To:     javier@cnexlabs.com
-Cc:     suhua.tanke@gmail.com, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20181127015309.2374-1-suhua.tanke@gmail.com>
- <F75BC3C7-FACE-4C04-A9BE-5A3AA25D3466@cnexlabs.com>
- <a53eb78d-90d3-f84e-a0bf-9acbc32671f4@lightnvm.io>
- <ACAA275B-AC2C-4147-AF88-E250771CA1DD@cnexlabs.com>
-From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <55a08621-53cd-66b0-5b31-ca2bd6b26861@lightnvm.io>
-Date:   Tue, 27 Nov 2018 15:26:15 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+        Tue, 27 Nov 2018 07:20:07 -0800 (PST)
+Subject: Re: [PATCH 2/7] block: have ->poll_fn() return number of entries
+ polled
+To:     Sagi Grimberg <sagi@grimberg.me>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org
+References: <20181117214354.822-1-axboe@kernel.dk>
+ <20181117214354.822-3-axboe@kernel.dk>
+ <fb1200ad-35ef-1c2e-25cf-d8a71bc505b5@grimberg.me>
+ <ba2d191c-cf9d-07f1-5875-6a07ef043949@kernel.dk>
+ <eee2f768-5ca2-aaa1-7d04-4fd7c9623312@grimberg.me>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <470ea9e2-9546-8001-bed9-ed4753f061cb@kernel.dk>
+Date:   Tue, 27 Nov 2018 08:20:05 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <ACAA275B-AC2C-4147-AF88-E250771CA1DD@cnexlabs.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <eee2f768-5ca2-aaa1-7d04-4fd7c9623312@grimberg.me>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/27/2018 03:24 PM, Javier Gonzalez wrote:
+On 11/27/18 3:10 AM, Sagi Grimberg wrote:
+>> No, it'll be exactly the same, and believe me, I've done plenty of
+>> performance testing to ensure that it works well.  In fact, with the
+>> changes queued up and this on top, polling is both faster and more
+>> efficient than it ever has been before, for both the classic
+>> preadv2/pwritev2 and the async polled IO.
 > 
->> On 27 Nov 2018, at 15.22, Matias Bjørling <mb@lightnvm.io> wrote:
->>
->> On 11/27/2018 01:57 PM, Javier Gonzalez wrote:
->>>> On 27 Nov 2018, at 02.53, Hua Su <suhua.tanke@gmail.com> wrote:
->>>>
->>>> Add lock protection for list operations.
->>>> Signed-off-by: Hua Su <suhua.tanke@gmail.com>
->>>> ---
->>>> drivers/lightnvm/pblk-core.c | 17 ++++++++++-------
->>>> 1 file changed, 10 insertions(+), 7 deletions(-)
->>>>
->>>> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
->>>> index 6944aac43b01..e490df217dac 100644
->>>> --- a/drivers/lightnvm/pblk-core.c
->>>> +++ b/drivers/lightnvm/pblk-core.c
->>>> @@ -1286,24 +1286,27 @@ int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
->>>>     list_del(&line->list);
->>>>
->>>>     ret = pblk_line_prepare(pblk, line);
->>>> -    if (ret) {
->>>> -        list_add(&line->list, &l_mg->free_list);
->>>> -        spin_unlock(&l_mg->free_lock);
->>>> -        return ret;
->>>> -    }
->>>> -    spin_unlock(&l_mg->free_lock);
->>>> +    if (ret)
->>>> +        goto out;
->>>>
->>>>     ret = pblk_line_alloc_bitmaps(pblk, line);
->>>>     if (ret)
->>>> -        return ret;
->>>> +        goto out;
->>>>
->>>>     if (!pblk_line_init_bb(pblk, line, 0)) {
->>>>         list_add(&line->list, &l_mg->free_list);
->>>> +        spin_unlock(&l_mg->free_lock);
->>>>         return -EINTR;
->>>>     }
->>>> +    spin_unlock(&l_mg->free_lock);
->>>>
->>>>     pblk_rl_free_lines_dec(&pblk->rl, line, true);
->>>>     return 0;
->>>> +
->>>> +out:
->>>> +    list_add(&line->list, &l_mg->free_list);
->>>> +    spin_unlock(&l_mg->free_lock);
->>>> +    return ret;
->>>> }
->>>>
->>>> void pblk_line_recov_close(struct pblk *pblk, struct pblk_line *line)
->>>> --
->>>> 2.19.1
->>> This path is only touched by the recovery path, which is single
->>> threaded, so there is no race condition as is. Also, if recovery fails,
->>> pblk will not create the instance at all. This said, it would be
->>> good to protect the list_add on the pblk_line_init_bb() error path in
->>> case this code is used for some other purpose in the future.
->>
->> I like your explanation here. Another option is that we could add a comment to notify the developer that it safe in this context?
+> I don't argue that this has not been tested, I was referring to the
+> following use-case: app queues say 16 I/Os with io_submit and then
+> issues preadv2 for an "important" 512B sector.
 > 
-> Sure. Do you want to add it? Or should I send it?
-> 
-> Javier
-> 
+> With this proposed change, is poll_fn more likely to return with the
+> first completion it sees rather than continue poll until it sees that
+> specific I/O it polled for?
 
-Please send it. Thanks!
+Any IO completion will make it return, that was the case before and that
+is still the case. If it isn't your specific IO, then you get to go
+around the loop again.
+
+>> I think that would be useless. For SYNC type polling with one thread, it
+>> doesn't matter if we're looking for a particular IO, or just any IO.
+>> Once your into two threads, you're already wasting huge amounts of CPU,
+>> just to get to QD=2. The poll loop handles finding each others IOs just
+>> fine, so there's no worry on that side.
+>>
+>> Polling was originally designed for the strictly SYNC interfaces, and
+>> since we had the cookie anyway, it was tempting to look for a specific
+>> IO. I think that was a mistake, as it assumed that we'd never do async
+>> polling.
+> 
+> Not arguing. Just now that we already have the selective interface in
+> place I'm asking is it OK to change that (IFF the above question is
+> indeed real) esoteric as this use-case may be...
+
+It won't cause any real change for the sync use case. There's no
+difference between multiple sync users of polling and a mixed async/sync
+polled use case in that regard.
+
+-- 
+Jens Axboe
+
