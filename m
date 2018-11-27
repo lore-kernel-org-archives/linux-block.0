@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3F2AC43441
-	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 23:16:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56B1FC43441
+	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 23:16:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C0CA20851
-	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 23:16:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C70520851
+	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 23:16:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gdUXsNvV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C0CA20851
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="cRFiVZQm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C70520851
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726780AbeK1KP6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Nov 2018 05:15:58 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:38134 "EHLO
+        id S1726701AbeK1KP4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Nov 2018 05:15:56 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:37892 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726770AbeK1KP5 (ORCPT
+        with ESMTP id S1726636AbeK1KPz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Nov 2018 05:15:57 -0500
+        Wed, 28 Nov 2018 05:15:55 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=References:In-Reply-To:Message-Id:
         Date:Subject:Cc:To:From:Sender:Reply-To:MIME-Version:Content-Type:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=bR7RP+lntTBKCIkonfUSbr8y60GQQq5+R78uSVwWIUQ=; b=gdUXsNvVT7Eo3ud0j6TNkOAe2
-        ZE5ElnBQAKqtGT0SPzceR0/M9L2Dm3cdSq2MbiMn1lj3bhdtEmkLfiB1eSd9krmunTCoXZbYCOkha
-        aHhil1luAwS6yKEZn537fS/VEyKa6/BbCNlPUEh3vZERXZRkMZ2OHPtw0qgM/nYl25/jRAwuENU7D
-        OeB8lu1LMBNY2tLfYe8lgHn6KW7kUXsZE1HlZ5p2h4hfnDIEa+gMMhL4le8jJfwvhmrHOwb9SJWRi
-        9b0tPBZSMLxYsw+dn0RJAmQ+VvUEgNlFgHNyHPJl8fuFE6bqCIh8NYX+sYQGp3YVKQUdHmSvFv+y3
-        WQj4iT9Vw==;
+         bh=efGn1soh43TdZZoOO70FVPJNadeYGJ0RRfisArm2dRw=; b=cRFiVZQmNpBorQpWyiqYT3eUK
+        lrqkMR9OybS5mVCU1rOs8W4ywNUjy6wzdA6YV8uaIzqZhNjl0yj/8tfZstObG2mkCi9yltyGOAICy
+        m4bg1cZtRVfsLxnPyOl2d1Ms8g8bemXyreaRrAdXTBz6MNUsEioqWwWAclz4ItTWHL85IO6k0Jh1o
+        v2uAft6Gzh4UjBRRI7hr0pKE9GsKYVNntJlq9kEQ+ZBYnRezuefA9e3Ce3NoNo+c1fKAxid5QYfQk
+        eIjlYnUrCyXN6koG5NaOUUeyxjBlnLYEPxpiXCup17f8y5+EN3hH/5fv5fViACh3lV9u6A5DgT/fZ
+        eefsR4MKQ==;
 Received: from [2600:1700:65a0:78e0:514:7862:1503:8e4d] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gRmac-0007cp-Gq; Tue, 27 Nov 2018 23:16:22 +0000
+        id 1gRmac-0007cp-0S; Tue, 27 Nov 2018 23:16:22 +0000
 From:   Sagi Grimberg <sagi@grimberg.me>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, netdev@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Keith Busch <keith.busch@intel.com>,
         "David S. Miller" <davem@davemloft.net>
-Subject: [PATCH v4 06/13] datagram: introduce skb_copy_and_hash_datagram_iter helper
-Date:   Tue, 27 Nov 2018 15:16:08 -0800
-Message-Id: <20181127231615.9446-7-sagi@grimberg.me>
+Subject: [PATCH v4 04/13] datagram: consolidate datagram copy to iter helpers
+Date:   Tue, 27 Nov 2018 15:16:06 -0800
+Message-Id: <20181127231615.9446-5-sagi@grimberg.me>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181127231615.9446-1-sagi@grimberg.me>
 References: <20181127231615.9446-1-sagi@grimberg.me>
@@ -59,70 +59,216 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Sagi Grimberg <sagi@lightbitslabs.com>
 
-Introduce a helper to copy datagram into an iovec iterator
-but also update a predefined hash. This is useful for
-consumers of skb_copy_datagram_iter to also support inflight
-data digest without having to finish to copy and only then
-traverse the iovec and calculate the digest hash.
+skb_copy_datagram_iter and skb_copy_and_csum_datagram are essentialy
+the same but with a couple of differences: The first is the copy
+operation used which either a simple copy or a csum_and_copy, and the
+second are the behavior on the "short copy" path where simply copy
+needs to return the number of bytes successfully copied while csum_and_copy
+needs to fault immediately as the checksum is partial.
 
+Introduce __skb_datagram_iter that additionally accepts:
+1. copy operation function pointer
+2. private data that goes with the copy operation
+3. fault_short flag to indicate the action on short copy
+
+Suggested-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sagi Grimberg <sagi@lightbitslabs.com>
 ---
- include/linux/skbuff.h |  3 +++
- net/core/datagram.c    | 20 +++++++++++++++++++-
- 2 files changed, 22 insertions(+), 1 deletion(-)
+ net/core/datagram.c | 136 ++++++++++++++------------------------------
+ 1 file changed, 42 insertions(+), 94 deletions(-)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 0ba687454267..b0b8d5653f0d 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -3309,6 +3309,9 @@ static inline int skb_copy_datagram_msg(const struct sk_buff *from, int offset,
- }
- int skb_copy_and_csum_datagram_msg(struct sk_buff *skb, int hlen,
- 				   struct msghdr *msg);
-+int skb_copy_and_hash_datagram_iter(const struct sk_buff *skb, int offset,
-+			   struct iov_iter *to, int len,
-+			   struct ahash_request *hash);
- int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
- 				 struct iov_iter *from, int len);
- int zerocopy_sg_from_iter(struct sk_buff *skb, struct iov_iter *frm);
 diff --git a/net/core/datagram.c b/net/core/datagram.c
-index 382543302ae5..ef262282c8be 100644
+index abe642181b64..382543302ae5 100644
 --- a/net/core/datagram.c
 +++ b/net/core/datagram.c
-@@ -465,7 +465,7 @@ int __skb_datagram_iter(const struct sk_buff *skb, int offset,
+@@ -408,27 +408,20 @@ int skb_kill_datagram(struct sock *sk, struct sk_buff *skb, unsigned int flags)
+ }
+ EXPORT_SYMBOL(skb_kill_datagram);
+ 
+-/**
+- *	skb_copy_datagram_iter - Copy a datagram to an iovec iterator.
+- *	@skb: buffer to copy
+- *	@offset: offset in the buffer to start copying from
+- *	@to: iovec iterator to copy to
+- *	@len: amount of data to copy from buffer to iovec
+- */
+-int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
+-			   struct iov_iter *to, int len)
++int __skb_datagram_iter(const struct sk_buff *skb, int offset,
++			struct iov_iter *to, int len, bool fault_short,
++			size_t (*cb)(const void *, size_t, void *, struct iov_iter *),
++			void *data)
+ {
+ 	int start = skb_headlen(skb);
+ 	int i, copy = start - offset, start_off = offset, n;
+ 	struct sk_buff *frag_iter;
+ 
+-	trace_skb_copy_datagram_iovec(skb, len);
+-
+ 	/* Copy header. */
+ 	if (copy > 0) {
+ 		if (copy > len)
+ 			copy = len;
+-		n = copy_to_iter(skb->data + offset, copy, to);
++		n = cb(skb->data + offset, copy, data, to);
+ 		offset += n;
+ 		if (n != copy)
+ 			goto short_copy;
+@@ -450,8 +443,8 @@ int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
+ 
  			if (copy > len)
  				copy = len;
- 			if (__skb_datagram_iter(frag_iter, offset - start,
--						to, copy, short_copy, cb, data))
-+						to, copy, fault_short, cb, data))
+-			n = copy_to_iter(vaddr + frag->page_offset +
+-					 offset - start, copy, to);
++			n = cb(vaddr + frag->page_offset +
++				offset - start, copy, data, to);
+ 			kunmap(page);
+ 			offset += n;
+ 			if (n != copy)
+@@ -471,8 +464,8 @@ int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
+ 		if ((copy = end - offset) > 0) {
+ 			if (copy > len)
+ 				copy = len;
+-			if (skb_copy_datagram_iter(frag_iter, offset - start,
+-						   to, copy))
++			if (__skb_datagram_iter(frag_iter, offset - start,
++						to, copy, short_copy, cb, data))
  				goto fault;
  			if ((len -= copy) == 0)
  				return 0;
-@@ -492,6 +492,24 @@ int __skb_datagram_iter(const struct sk_buff *skb, int offset,
+@@ -493,11 +486,32 @@ int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
+ 	return -EFAULT;
+ 
+ short_copy:
+-	if (iov_iter_count(to))
++	if (fault_short || iov_iter_count(to))
+ 		goto fault;
+ 
  	return 0;
  }
- 
++
++static size_t simple_copy_to_iter(const void *addr, size_t bytes,
++		void *data __always_unused, struct iov_iter *i)
++{
++	return copy_to_iter(addr, bytes, i);
++}
++
 +/**
-+ *	skb_copy_and_hash_datagram_iter - Copy datagram to an iovec iterator
-+ *          and update a hash.
++ *	skb_copy_datagram_iter - Copy a datagram to an iovec iterator.
 + *	@skb: buffer to copy
 + *	@offset: offset in the buffer to start copying from
 + *	@to: iovec iterator to copy to
 + *	@len: amount of data to copy from buffer to iovec
-+ *      @hash: hash request to update
 + */
-+int skb_copy_and_hash_datagram_iter(const struct sk_buff *skb, int offset,
-+			   struct iov_iter *to, int len,
-+			   struct ahash_request *hash)
++int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
++			   struct iov_iter *to, int len)
 +{
-+	return __skb_datagram_iter(skb, offset, to, len, true,
-+			hash_and_copy_to_iter, hash);
++	trace_skb_copy_datagram_iovec(skb, len);
++	return __skb_datagram_iter(skb, offset, to, len, false,
++			simple_copy_to_iter, NULL);
 +}
-+EXPORT_SYMBOL(skb_copy_and_hash_datagram_iter);
-+
- static size_t simple_copy_to_iter(const void *addr, size_t bytes,
- 		void *data __always_unused, struct iov_iter *i)
+ EXPORT_SYMBOL(skb_copy_datagram_iter);
+ 
+ /**
+@@ -648,87 +662,21 @@ int zerocopy_sg_from_iter(struct sk_buff *skb, struct iov_iter *from)
+ }
+ EXPORT_SYMBOL(zerocopy_sg_from_iter);
+ 
++/**
++ *	skb_copy_and_csum_datagram_iter - Copy datagram to an iovec iterator
++ *          and update a checksum.
++ *	@skb: buffer to copy
++ *	@offset: offset in the buffer to start copying from
++ *	@to: iovec iterator to copy to
++ *	@len: amount of data to copy from buffer to iovec
++ *      @csump: checksum pointer
++ */
+ static int skb_copy_and_csum_datagram(const struct sk_buff *skb, int offset,
+ 				      struct iov_iter *to, int len,
+ 				      __wsum *csump)
  {
+-	int start = skb_headlen(skb);
+-	int i, copy = start - offset, start_off = offset;
+-	struct sk_buff *frag_iter;
+-	int pos = 0;
+-	int n;
+-
+-	/* Copy header. */
+-	if (copy > 0) {
+-		if (copy > len)
+-			copy = len;
+-		n = csum_and_copy_to_iter(skb->data + offset, copy, csump, to);
+-		offset += n;
+-		if (n != copy)
+-			goto fault;
+-		if ((len -= copy) == 0)
+-			return 0;
+-		pos = copy;
+-	}
+-
+-	for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
+-		int end;
+-		const skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
+-
+-		WARN_ON(start > offset + len);
+-
+-		end = start + skb_frag_size(frag);
+-		if ((copy = end - offset) > 0) {
+-			__wsum csum2 = 0;
+-			struct page *page = skb_frag_page(frag);
+-			u8  *vaddr = kmap(page);
+-
+-			if (copy > len)
+-				copy = len;
+-			n = csum_and_copy_to_iter(vaddr + frag->page_offset +
+-						  offset - start, copy,
+-						  &csum2, to);
+-			kunmap(page);
+-			offset += n;
+-			if (n != copy)
+-				goto fault;
+-			*csump = csum_block_add(*csump, csum2, pos);
+-			if (!(len -= copy))
+-				return 0;
+-			pos += copy;
+-		}
+-		start = end;
+-	}
+-
+-	skb_walk_frags(skb, frag_iter) {
+-		int end;
+-
+-		WARN_ON(start > offset + len);
+-
+-		end = start + frag_iter->len;
+-		if ((copy = end - offset) > 0) {
+-			__wsum csum2 = 0;
+-			if (copy > len)
+-				copy = len;
+-			if (skb_copy_and_csum_datagram(frag_iter,
+-						       offset - start,
+-						       to, copy,
+-						       &csum2))
+-				goto fault;
+-			*csump = csum_block_add(*csump, csum2, pos);
+-			if ((len -= copy) == 0)
+-				return 0;
+-			offset += copy;
+-			pos += copy;
+-		}
+-		start = end;
+-	}
+-	if (!len)
+-		return 0;
+-
+-fault:
+-	iov_iter_revert(to, offset - start_off);
+-	return -EFAULT;
++	return __skb_datagram_iter(skb, offset, to, len, true,
++			csum_and_copy_to_iter, csump);
+ }
+ 
+ __sum16 __skb_checksum_complete_head(struct sk_buff *skb, int len)
 -- 
 2.17.1
 
