@@ -3,34 +3,33 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B10AC43441
-	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 08:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA8F6C43441
+	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 08:24:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1AC62208E4
-	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 08:18:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AC62208E4
+	by mail.kernel.org (Postfix) with ESMTP id 9C00D20873
+	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 08:24:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C00D20873
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729259AbeK0TPS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Nov 2018 14:15:18 -0500
-Received: from mx2.suse.de ([195.135.220.15]:35634 "EHLO mx1.suse.de"
+        id S1728880AbeK0TVr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Nov 2018 14:21:47 -0500
+Received: from mx2.suse.de ([195.135.220.15]:36542 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728976AbeK0TPS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Nov 2018 14:15:18 -0500
+        id S1728797AbeK0TVr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Nov 2018 14:21:47 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 0B8D4ADF2;
-        Tue, 27 Nov 2018 08:18:12 +0000 (UTC)
-Subject: Re: [PATCH 02/20] aio: clear IOCB_HIPRI
+Received: from relay1.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 58F8CADF2;
+        Tue, 27 Nov 2018 08:24:39 +0000 (UTC)
+Subject: Re: [PATCH 03/20] fs: add an iopoll method to struct file_operations
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-aio@kvack.org, linux-fsdevel@vger.kernel.org
 Cc:     Christoph Hellwig <hch@lst.de>
 References: <20181126164544.5699-1-axboe@kernel.dk>
- <20181126164544.5699-3-axboe@kernel.dk>
+ <20181126164544.5699-4-axboe@kernel.dk>
 From:   Johannes Thumshirn <jthumshirn@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
@@ -88,12 +87,12 @@ Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
  l2t2TyTuHm7wVUY2J3gJYgG723/PUGW4LaoqNrYQUr/rqo6NXw6c+EglRpm1BdpkwPwAng63
  W5VOQMdnozD2RsDM5GfA4aEFi5m00tE+8XPICCtkduyWw+Z+zIqYk2v+zraPLs9Gs0X2C7X0
  yvqY9voUoJjG6skkOToGZbqtMX9K4GOv9JAxVs075QRXL3brHtHONDt6udYobzz+
-Message-ID: <d38f2595-6919-34c1-9b08-d1cccd8f5365@suse.de>
-Date:   Tue, 27 Nov 2018 09:18:11 +0100
+Message-ID: <7f9224de-d01f-9ace-8cf9-fbfabac1f566@suse.de>
+Date:   Tue, 27 Nov 2018 09:24:39 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20181126164544.5699-3-axboe@kernel.dk>
+In-Reply-To: <20181126164544.5699-4-axboe@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
