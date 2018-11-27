@@ -2,100 +2,104 @@ Return-Path: <SRS0=Byed=OG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0FB6C43441
-	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 02:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 747CCC43441
+	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 05:28:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8C1A3208E4
-	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 02:55:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u89ca9Ms"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C1A3208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id 3420B208E4
+	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 05:28:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3420B208E4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727633AbeK0Nvy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Nov 2018 08:51:54 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:50697 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727542AbeK0Nvy (ORCPT
+        id S1728218AbeK0QYr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Nov 2018 11:24:47 -0500
+Received: from smtpproxy19.qq.com ([184.105.206.84]:38742 "EHLO
+        smtpproxy19.qq.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728129AbeK0QYr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Nov 2018 08:51:54 -0500
-Received: by mail-wm1-f65.google.com with SMTP id 125so20315394wmh.0;
-        Mon, 26 Nov 2018 18:55:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fCmD6Tz7iCxWyreyZhP9ACxtmOf5xsbNROFEMLo+/ao=;
-        b=u89ca9MsOdRjjCC04lcQ2BpRhU97tkZh1o7lMQFpBUj1jLk05XN/aLHRIdvvbnNx/L
-         NqXKRiXYoEhc6c73D2/QJJwgwbzygSWeuQ+hPxCdUnOGHmD1wJxQzEOdUSbJZd06o0U6
-         1Z5maSC0b78DAOdtfuo9psamMhHxHK1J+dH93bQ042YMub8wggVqk/w2ykKev7WuF3u7
-         VgddTkGhOfUDkT6S5hh09ISqnUwGqFPnFtdYUVkRS1MBPeBlimAlrDVV/itk7j2gRl/Y
-         FO4m65Vtgg2dGUI1TJHecXEdXGgdlihKKHTIHGArbuRC+LLuo/xKO5LWmESPLAjNI0FU
-         6jQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fCmD6Tz7iCxWyreyZhP9ACxtmOf5xsbNROFEMLo+/ao=;
-        b=VnxffwyDS3Peiv3US7aIJrcnRUbeJ24Z3a1T4tzoJjR2GomJZri/2uHEJnR7zf7doy
-         qzri+Gc2axIJ8wOzo5Om2Ih6DlZbBXvErESyQev/XoFqkjZySlqwvV3QeZ3qzATqutkO
-         nbvHOYrjRXZla5+ySWNMBOE+04+1N7QnXl2qfCYXmAZe1iexQh+w/UJD/gyQeahKuags
-         cuRuwLhviHPTCEXMkKleQaZTO4CUVk4GLrMaAt0ha1O3SWHvO2PLRITli6E0RxJPteAF
-         y2P+amWKjXA4QwrFyjbD7NKP1sr4q6uR4p/NjhbAgPNbCggKRj09hGWIbzkuxog74paQ
-         zPAA==
-X-Gm-Message-State: AA+aEWYj7XqJVEs5HmGUxtKQo5fbijZ61OGp+8+p7w+Ngh+BHGBFE/PY
-        ECfBesGt0knKz9kt9A4FCovUspg7gedl6cmARhk=
-X-Google-Smtp-Source: AFSGD/W9TnnxT6RIwMKxAhpncHJ6xVO6zb/Bh5A6DLzfiUpUAjnOlA3TT0bgynUdh/250lad0q4sjFRSu1IVzKnR9Hc=
-X-Received: by 2002:a1c:9d10:: with SMTP id g16mr24971739wme.43.1543287332780;
- Mon, 26 Nov 2018 18:55:32 -0800 (PST)
+        Tue, 27 Nov 2018 11:24:47 -0500
+X-QQ-mid: bizesmtp10t1543296478t8y753l2
+Received: from localhost.localdomain (unknown [210.22.22.130])
+        by esmtp10.qq.com (ESMTP) with 
+        id ; Tue, 27 Nov 2018 13:27:58 +0800 (CST)
+X-QQ-SSF: 01400000002000F0FK51B00A0000000
+X-QQ-FEAT: GeavupMxF+G2EryvIcu58sKdO+f6vj5ruvStboIeCPaFsOeSdv7QB1B+Y9Gn3
+        VRm5c6++7oJBGx/IyWDeg4fxCIjogKWolKbG3Twfy+wXNm2W1/JXg/vjtEOLDvw8zoL0Pqp
+        RhUD7APd9yXJmfJWD3l5P2hLuva37CcAT+1JyPuf59cLkPzir1ZJq1gJJQVm/6YSrzrHwo4
+        SOJn4y1vsHpSsA+Dicxe12KGtzzibxXoyrDGVKaom13nIecacdPf6RmeNIdIjGhDN1mRpKh
+        1/KJcrjqE66xO9VBLFhzEnBPQQc+IIKDrRG9bJxq73k8MY
+X-QQ-GoodBg: 2
+From:   Jackie Liu <liuyun01@kylinos.cn>
+To:     ard.biesheuvel@linaro.org
+Cc:     linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+        Jackie Liu <liuyun01@kylinos.cn>
+Subject: [PATCH v2 1/2] arm64: add workaround for ambiguous C99 stdint.h types
+Date:   Tue, 27 Nov 2018 13:27:00 +0800
+Message-Id: <20181127052701.4144-1-liuyun01@kylinos.cn>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-References: <20181030230624.61834-1-evgreen@chromium.org> <20181030230624.61834-3-evgreen@chromium.org>
- <CAE=gft5XZD-GQYwcv4YWHrDSWRqT7SDpWXzv7c6MKAAH7uGr2Q@mail.gmail.com>
-In-Reply-To: <CAE=gft5XZD-GQYwcv4YWHrDSWRqT7SDpWXzv7c6MKAAH7uGr2Q@mail.gmail.com>
-From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Tue, 27 Nov 2018 10:55:20 +0800
-Message-ID: <CACVXFVN63UDefvBnYTQ==tWwYqGJbCS_HK==-1jVa5sVc=-Upw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] loop: Better discard support for block devices
-To:     evgreen@chromium.org
-Cc:     Jens Axboe <axboe@kernel.dk>, gwendal@chromium.org,
-        asavery@chromium.org, linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign2
+X-QQ-Bgrelay: 1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 27, 2018 at 2:55 AM Evan Green <evgreen@chromium.org> wrote:
->
-> On Tue, Oct 30, 2018 at 4:06 PM Evan Green <evgreen@chromium.org> wrote:
-> >
-> > If the backing device for a loop device is a block device,
+In a way similar to ARM commit 09096f6a0ee2 ("ARM: 7822/1: add workaround
+for ambiguous C99 stdint.h types"), this patch redefines the macros that
+are used in stdint.h so its definitions of uint64_t and int64_t are
+compatible with those of the kernel.
 
-This shouldn't be a very common use case wrt. loop.
+This patch comes from: https://patchwork.kernel.org/patch/3540001/
+Wrote by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-> > then mirror the discard properties of the underlying block
-> > device into the loop device. While in there, differentiate
-> > between REQ_OP_DISCARD and REQ_OP_WRITE_ZEROES, which are
-> > different for block devices, but which the loop device had
-> > just been lumping together.
-> >
-> > Signed-off-by: Evan Green <evgreen@chromium.org>
->
-> Any thoughts on this patch? This fixes issues for us when using a loop
-> device backed by a block device, where we see many logs like:
->
-> [  372.767286] print_req_error: I/O error, dev loop5, sector 88125696
+Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
+---
+ arch/arm64/include/uapi/asm/types.h | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
+ create mode 100644 arch/arm64/include/uapi/asm/types.h
 
-Seems not see any explanation about this IO error and the fix in your patch.
-Could you describe it a bit more?
+diff --git a/arch/arm64/include/uapi/asm/types.h b/arch/arm64/include/uapi/asm/types.h
+new file mode 100644
+index 0000000..0016780
+--- /dev/null
++++ b/arch/arm64/include/uapi/asm/types.h
+@@ -0,0 +1,26 @@
++#ifndef _UAPI_ASM_TYPES_H
++#define _UAPI_ASM_TYPES_H
++
++#include <asm-generic/int-ll64.h>
++
++/*
++ * For Aarch64, there is some ambiguity in the definition of the types below
++ * between the kernel and GCC itself. This is usually not a big deal, but it
++ * causes trouble when including GCC's version of 'stdint.h' (this is the file
++ * that gets included when you #include <stdint.h> on a -ffreestanding build).
++ * As this file also gets included implicitly when including 'arm_neon.h' (the
++ * NEON intrinsics support header), we need the following to work around the
++ * issue if we want to use NEON intrinsics in the kernel.
++ */
++
++#ifdef __INT64_TYPE__
++#undef __INT64_TYPE__
++#define __INT64_TYPE__		__signed__ long long
++#endif
++
++#ifdef __UINT64_TYPE__
++#undef __UINT64_TYPE__
++#define __UINT64_TYPE__		unsigned long long
++#endif
++
++#endif /* _UAPI_ASM_TYPES_H */
+-- 
+2.7.4
 
 
-thanks,
-Ming Lei
+
+
