@@ -2,86 +2,104 @@ Return-Path: <SRS0=Byed=OG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 901FBC43441
-	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 07:48:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E78DC43441
+	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 07:57:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 623C620873
-	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 07:48:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 623C620873
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+	by mail.kernel.org (Postfix) with ESMTP id 5F4E42086B
+	for <linux-block@archiver.kernel.org>; Tue, 27 Nov 2018 07:57:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F4E42086B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729163AbeK0SpI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 27 Nov 2018 13:45:08 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:35206 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729085AbeK0SpI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 27 Nov 2018 13:45:08 -0500
-Received: by mail-wr1-f68.google.com with SMTP id 96so21589811wrb.2;
-        Mon, 26 Nov 2018 23:48:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=BNgpRiIMm6UVnBOQ2U0iDLW87cddWDRCfOZfZY2+aMc=;
-        b=aPQZ0jA4cWbbrks5zH4rAdoAvh6lbFtHnrVzKeepAcH9gbrjniA82Hknsl0V7J+1ZM
-         2SfNBWmUMIw7DcMNz07HHu4GIAFKoQv6Ob4e3dyMWW3JNJUCNpThBJUPbCiiS5CqDYc7
-         gqjd5o/xOPV2ob+ygHqRuW9KHLAZRFCXwT4GDhpt+kEbntOJKpQb2+UfCOTFAr/OcGuQ
-         6ZeUNElx1M5C0UM/ML6NmJiHLYtvk7iKN726I1Bk2QvIblmCZOjWDktj02YO6zMbP3LR
-         /Y1uKx2YbSKYwGlI2r1b09gMo1B5sMtGHFANKAwXW/TXRTVzu58UFrP/uL3xxxBqXr5m
-         VOog==
-X-Gm-Message-State: AA+aEWbLtklP4Iz9RF29ZqgoFqlngE6JCRn2K1aUYOf1F4tZlBheo+sQ
-        MEukl1mdZCbBX3lK6qeN6+8=
-X-Google-Smtp-Source: AFSGD/XyP1wHHR/grFWw2J0NZdB7XZlpuT9N8tc1R2b06EOcOLT2RW9YuAxKqfI4DmItZOrJaXMo0w==
-X-Received: by 2002:adf:f504:: with SMTP id q4mr27797638wro.321.1543304886590;
-        Mon, 26 Nov 2018 23:48:06 -0800 (PST)
-Received: from ?IPv6:2601:647:4800:973f:7888:b13c:bff:87b0? ([2601:647:4800:973f:7888:b13c:bff:87b0])
-        by smtp.gmail.com with ESMTPSA id m4sm455937wrw.67.2018.11.26.23.48.04
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 26 Nov 2018 23:48:06 -0800 (PST)
-Subject: Re: [PATCH v3 13/13] nvme-tcp: add NVMe over TCP host driver
-To:     Max Gurtovoy <maxg@mellanox.com>, Christoph Hellwig <hch@lst.de>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        netdev@vger.kernel.org, Keith Busch <keith.busch@intel.com>,
-        "David S. Miller" <davem@davemloft.net>
-References: <20181122015615.15763-1-sagi@grimberg.me>
- <20181122015615.15763-14-sagi@grimberg.me> <20181122080224.GA26504@lst.de>
- <af432c70-1b3a-6c62-bb13-67bf7df1a43f@grimberg.me>
- <e4407485-843a-7968-c367-29d60baf8373@mellanox.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <43ad34a0-799d-5f78-a07f-e2c51f64a854@grimberg.me>
-Date:   Mon, 26 Nov 2018 23:48:01 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1729223AbeK0SyU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 27 Nov 2018 13:54:20 -0500
+Received: from ozlabs.org ([203.11.71.1]:60387 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728838AbeK0SyU (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 27 Nov 2018 13:54:20 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ozlabs.org (Postfix) with ESMTPSA id 433x2f3tQHz9s3C;
+        Tue, 27 Nov 2018 18:57:14 +1100 (AEDT)
+Authentication-Results: ozlabs.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Anshuman Khandual <anshuman.khandual@arm.com>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Cc:     ocfs2-devel@oss.oracle.com, linux-fbdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, netdev@vger.kernel.org,
+        intel-wired-lan@lists.osuosl.org, linux-media@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-rdma@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux-block@vger.kernel.org,
+        sparclinux@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-ia64@vger.kernel.org, linux-alpha@vger.kernel.org,
+        akpm@linux-foundation.org, jiangqi903@gmail.com,
+        hverkuil@xs4all.nl, vkoul@kernel.org
+Subject: Re: [PATCH V2] mm: Replace all open encodings for NUMA_NO_NODE
+In-Reply-To: <1543235202-9075-1-git-send-email-anshuman.khandual@arm.com>
+References: <1543235202-9075-1-git-send-email-anshuman.khandual@arm.com>
+Date:   Tue, 27 Nov 2018 18:57:11 +1100
+Message-ID: <87mupvgdgo.fsf@concordia.ellerman.id.au>
 MIME-Version: 1.0
-In-Reply-To: <e4407485-843a-7968-c367-29d60baf8373@mellanox.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Anshuman Khandual <anshuman.khandual@arm.com> writes:
+> At present there are multiple places where invalid node number is encoded
+> as -1. Even though implicitly understood it is always better to have macros
+> in there. Replace these open encodings for an invalid node number with the
+> global macro NUMA_NO_NODE. This helps remove NUMA related assumptions like
+> 'invalid node' from various places redirecting them to a common definition.
+>
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ---
+> Changes in V2:
+>
+> - Added inclusion of 'numa.h' header at various places per Andrew
+> - Updated 'dev_to_node' to use NUMA_NO_NODE instead per Vinod
+>
+> Changes in V1: (https://lkml.org/lkml/2018/11/23/485)
+>
+> - Dropped OCFS2 changes per Joseph
+> - Dropped media/video drivers changes per Hans
+>
+> RFC - https://patchwork.kernel.org/patch/10678035/
+>
+> Build tested this with multiple cross compiler options like alpha, sparc,
+> arm64, x86, powerpc, powerpc64le etc with their default config which might
+> not have compiled tested all driver related changes. I will appreciate
+> folks giving this a test in their respective build environment.
+>
+> All these places for replacement were found by running the following grep
+> patterns on the entire kernel code. Please let me know if this might have
+> missed some instances. This might also have replaced some false positives.
+> I will appreciate suggestions, inputs and review.
+>
+> 1. git grep "nid == -1"
+> 2. git grep "node == -1"
+> 3. git grep "nid = -1"
+> 4. git grep "node = -1"
+>
+>  arch/alpha/include/asm/topology.h             |  3 ++-
+>  arch/ia64/kernel/numa.c                       |  2 +-
+>  arch/ia64/mm/discontig.c                      |  6 +++---
+>  arch/ia64/sn/kernel/io_common.c               |  3 ++-
+>  arch/powerpc/include/asm/pci-bridge.h         |  3 ++-
+>  arch/powerpc/kernel/paca.c                    |  3 ++-
+>  arch/powerpc/kernel/pci-common.c              |  3 ++-
+>  arch/powerpc/mm/numa.c                        | 14 +++++++-------
+>  arch/powerpc/platforms/powernv/memtrace.c     |  5 +++--
 
->>> This looks odd.  It's not really the timeout handlers job to
->>> call nvme_end_request here.
->>
->> Well.. if we are not yet LIVE, we will not trigger error
->> recovery, which means nothing will complete this command so
->> something needs to do it...
->>
->> I think that we need it for rdma too..
-> 
-> 
-> yes we do. and we've patches in our pipe.
-> 
-> I'm thinking on a wider change in the error/recovery flows but might 
-> send it "as is" meanwhile.
+These powerpc changes all look fine.
 
-I have it too in the pipe. Do you want to send it out or should I?
+Acked-by: Michael Ellerman <mpe@ellerman.id.au>
+
+
+cheers
