@@ -5,64 +5,64 @@ X-Spam-Level:
 X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AAA5C43441
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 03:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92124C43441
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 03:52:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E2B932082F
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 03:52:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5AC0D2082F
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 03:52:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="wkK785TJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2B932082F
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NS/jKRyb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AC0D2082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726989AbeK1Owk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Nov 2018 09:52:40 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:50934 "EHLO
+        id S1727351AbeK1Owr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Nov 2018 09:52:47 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:51018 "EHLO
         userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726847AbeK1Owk (ORCPT
+        with ESMTP id S1727303AbeK1Owq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Nov 2018 09:52:40 -0500
+        Wed, 28 Nov 2018 09:52:46 -0500
 Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wAS3mp2q033441;
-        Wed, 28 Nov 2018 03:52:31 GMT
+        by userp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wAS3nT5F033592;
+        Wed, 28 Nov 2018 03:52:38 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=BJnmFYQQlGRu/5A4+zMVKg4kh2H7+FpVmnF4JYWo4q4=;
- b=wkK785TJDZl3d3oYaFCYpE0DxZz8WoqFzGoHUH2P2KEUVnsPz9EREcaPfrtpW40WP5lE
- QlTjVLAHueQfS9uTXIzE0sYc3G/ahSdKC0AF49h3qgTfbDJ8KxtZ3P0tfy9HevGPsI3H
- 51/tKC5/TBmWO4R+7nPRn2KthnJWthLoMbgRK6iD0hGCpsZnZz2KMFaJOxzKF4XMm5S+
- iiS7cJgt+cc+y7d0pc5YPqxTgpzZkK+YBfgsc3q98yArG2SmBk1Ir6aZ3f5+NjEBXrqL
- 13nJVEnWO2rhl88DB5fnq8QNKU5BBCF3WltBa7WDdwR1hV43ImN5CwsgGejtENWyyKNg 6A== 
-Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
-        by userp2130.oracle.com with ESMTP id 2nxx2u7tkm-1
+ bh=BDUE6wDq/IbemDKwp/UVciMiYE8vE607IFhP3GTLrWc=;
+ b=NS/jKRybQ+dpqYqVhrQoFpv/cqqqSIQybQAmwhgQAkas9G1XwQ+E1jIdZGFDPo8wxC3r
+ RBfiG1ksStLtt0d/f/g8OsGfBBkRYwpqzITuDiDKitgrZn6JMRrOwfatlCg4S+Ctrp2Q
+ RkYsQ3jFnhui7xuGGoixTyEyBkvI2WL50iZlxAtkyhiY78dhh291icl2vmOupPvUhkSq
+ FwBlTpj8PlaG40yfPCqKauTxnpY5c2xPpm6phtWza7V9twmEysr18u1n8zh8dgx7xGbv
+ 2gZPzp9qBDojByYb5YrXpjzXwScCiwD/FraZoiZjTR4x5ZqHPNYptuDW1S1FRKqUdcnX 3w== 
+Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
+        by userp2130.oracle.com with ESMTP id 2nxx2u7tkw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Nov 2018 03:52:31 +0000
+        Wed, 28 Nov 2018 03:52:38 +0000
 Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id wAS3qU2Q018655
+        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id wAS3qbVO012583
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Nov 2018 03:52:30 GMT
+        Wed, 28 Nov 2018 03:52:37 GMT
 Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id wAS3qUt4005857;
-        Wed, 28 Nov 2018 03:52:30 GMT
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id wAS3qbr1006058;
+        Wed, 28 Nov 2018 03:52:37 GMT
 Received: from localhost.localdomain (/70.176.225.12)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 27 Nov 2018 19:52:30 -0800
+        with ESMTP ; Tue, 27 Nov 2018 19:52:36 -0800
 From:   Allison Henderson <allison.henderson@oracle.com>
 To:     linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org
 Cc:     martin.petersen@oracle.com, shirley.ma@oracle.com,
         bob.liu@oracle.com, allison.henderson@oracle.com
-Subject: [PATCH v1 1/7] block: add nr_mirrors to request_queue
-Date:   Tue, 27 Nov 2018 20:49:45 -0700
-Message-Id: <1543376991-5764-2-git-send-email-allison.henderson@oracle.com>
+Subject: [PATCH v1 7/7] xfs: Add tracepoints and logging to alternate device retry
+Date:   Tue, 27 Nov 2018 20:49:51 -0700
+Message-Id: <1543376991-5764-8-git-send-email-allison.henderson@oracle.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1543376991-5764-1-git-send-email-allison.henderson@oracle.com>
 References: <1543376991-5764-1-git-send-email-allison.henderson@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9090 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.0.1-1810050000 definitions=main-1811280033
@@ -71,98 +71,109 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Bob Liu <bob.liu@oracle.com>
+This patch adds new log entries and trace points to the
+alternate device retry error path
 
-When fs data/metadata checksum mismatch, lower block devices may have other
-correct copies. e.g if we did raid1 for protecting fs metadata.
-Then fs could try other copies of metadata instead of panic, but fs need be
-awared how many mirrors the block devices have and specify which mirror/copy to
-retry.
-
-This patch add @nr_mirrors to struct request_queue which is similar as
-blk_queue_nonrot(), filesystem can grab device request queue and check the
-number of mirrors of this block device.
-
-@nr_mirrors is 0 by default which means no mirrors, drivers e.g raid1 are
-responsible for setting the right value.
-
-Also added helper functions for get/set the number of mirrors for a specific
-device request queue.
-
-Todo:
-* Export nr_mirrors through /sysfs.
-
-Signed-off-by: Bob Liu <bob.liu@oracle.com>
+Signed-off-by: Allison Henderson <allison.henderson@oracle.com>
 ---
- block/blk-core.c       |  3 +++
- block/blk-settings.c   | 18 ++++++++++++++++++
- include/linux/blkdev.h |  3 +++
- 3 files changed, 24 insertions(+)
+ fs/xfs/xfs_buf.c   | 14 +++++++++++++-
+ fs/xfs/xfs_buf.h   |  1 +
+ fs/xfs/xfs_trace.h |  6 +++++-
+ 3 files changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index ce12515f..50779c8 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1082,6 +1082,9 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id,
- 	if (blkcg_init_queue(q))
- 		goto fail_ref;
- 
-+	/* Set queue default mirrors to 0 explicitly. */
-+	blk_queue_set_mirrors(q, 0);
+diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
+index 81f6491..f203ddebe 100644
+--- a/fs/xfs/xfs_buf.c
++++ b/fs/xfs/xfs_buf.c
+@@ -833,6 +833,10 @@ xfs_buf_read_map(
+ 		for (i = 0; i <= blk_queue_get_mirrors(q); i++) {
+ 			bp->b_error = 0;
+ 			bp->b_rw_hint = i;
 +
- 	return q;
++			if (i > 0)
++				xfs_alert(bp->b_target->bt_mount,
++					  "Retrying read from disk %hu",i);
+ 			_xfs_buf_read(bp, flags);
  
- fail_ref:
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 696c04c..6f4f9c7 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -904,6 +904,24 @@ void blk_queue_write_cache(struct request_queue *q, bool wc, bool fua)
- }
- EXPORT_SYMBOL_GPL(blk_queue_write_cache);
- 
-+/*
-+ * Get the number of read redundant mirrors.
-+ */
-+unsigned short blk_queue_get_mirrors(struct request_queue *q)
-+{
-+	return q->nr_mirrors;
-+}
-+EXPORT_SYMBOL(blk_queue_get_mirrors);
+ 			switch (bp->b_error) {
+@@ -840,6 +844,11 @@ xfs_buf_read_map(
+ 			case -EFSCORRUPTED:
+ 			case -EFSBADCRC:
+ 				/* loop again */
++				trace_xfs_buf_ioretry(bp, _RET_IP_);
++				xfs_alert(bp->b_target->bt_mount,
++					  "Read error:%d from disk number %hu",
++					   bp->b_error, bp->b_rw_hint);
 +
-+/*
-+ * Set the number of read redundant mirrors.
-+ */
-+void blk_queue_set_mirrors(struct request_queue *q, unsigned short mirrors)
-+{
-+	q->nr_mirrors = mirrors;
-+}
-+EXPORT_SYMBOL(blk_queue_set_mirrors);
-+
- static int __init blk_settings_init(void)
- {
- 	blk_max_low_pfn = max_low_pfn - 1;
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4293dc1..fac35da 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -680,6 +680,7 @@ struct request_queue {
+ 				continue;
+ 			default:
+ 				goto retry_done;
+@@ -852,8 +861,11 @@ xfs_buf_read_map(
+ 		 * if we had to try more than one mirror to sucessfully read
+ 		 * the buffer, write the buffer back
+ 		 */
+-		if (!bp->b_error && i > 0)
++		if (!bp->b_error && i > 0) {
++			xfs_alert(bp->b_target->bt_mount,
++				"Re-writeing verified data");
+ 			xfs_bwrite(bp);
++		}
  
- #define BLK_MAX_WRITE_HINTS	5
- 	u64			write_hints[BLK_MAX_WRITE_HINTS];
-+	unsigned short		nr_mirrors; /* Default value is zero */
- };
+ 		return bp;
+ 	}
+diff --git a/fs/xfs/xfs_buf.h b/fs/xfs/xfs_buf.h
+index db138e5..23c9c3e 100644
+--- a/fs/xfs/xfs_buf.h
++++ b/fs/xfs/xfs_buf.h
+@@ -300,6 +300,7 @@ extern void __xfs_buf_ioerror(struct xfs_buf *bp, int error,
+ 		xfs_failaddr_t failaddr);
+ #define xfs_buf_ioerror(bp, err) __xfs_buf_ioerror((bp), (err), __this_address)
+ extern void xfs_buf_ioerror_alert(struct xfs_buf *, const char *func);
++extern void xfs_buf_ioretry_alert(struct xfs_buf *, const char *func);
  
- #define QUEUE_FLAG_QUEUED	0	/* uses generic tag queueing */
-@@ -1267,6 +1268,8 @@ extern void blk_queue_rq_timed_out(struct request_queue *, rq_timed_out_fn *);
- extern void blk_queue_rq_timeout(struct request_queue *, unsigned int);
- extern void blk_queue_flush_queueable(struct request_queue *q, bool queueable);
- extern void blk_queue_write_cache(struct request_queue *q, bool enabled, bool fua);
-+extern unsigned short blk_queue_get_mirrors(struct request_queue *q);
-+extern void blk_queue_set_mirrors(struct request_queue *q, unsigned short mirrors);
+ extern int __xfs_buf_submit(struct xfs_buf *bp, bool);
+ static inline int xfs_buf_submit(struct xfs_buf *bp)
+diff --git a/fs/xfs/xfs_trace.h b/fs/xfs/xfs_trace.h
+index 3043e5e..1d98a3e 100644
+--- a/fs/xfs/xfs_trace.h
++++ b/fs/xfs/xfs_trace.h
+@@ -276,6 +276,7 @@ DECLARE_EVENT_CLASS(xfs_buf_class,
+ 		__field(int, pincount)
+ 		__field(unsigned, lockval)
+ 		__field(unsigned, flags)
++		__field(unsigned short, rw_hint)
+ 		__field(unsigned long, caller_ip)
+ 	),
+ 	TP_fast_assign(
+@@ -286,10 +287,11 @@ DECLARE_EVENT_CLASS(xfs_buf_class,
+ 		__entry->pincount = atomic_read(&bp->b_pin_count);
+ 		__entry->lockval = bp->b_sema.count;
+ 		__entry->flags = bp->b_flags;
++		__entry->rw_hint = bp->b_rw_hint;
+ 		__entry->caller_ip = caller_ip;
+ 	),
+ 	TP_printk("dev %d:%d bno 0x%llx nblks 0x%x hold %d pincount %d "
+-		  "lock %d flags %s caller %pS",
++		  "lock %d flags %s rw_hint %hu caller %pS",
+ 		  MAJOR(__entry->dev), MINOR(__entry->dev),
+ 		  (unsigned long long)__entry->bno,
+ 		  __entry->nblks,
+@@ -297,6 +299,7 @@ DECLARE_EVENT_CLASS(xfs_buf_class,
+ 		  __entry->pincount,
+ 		  __entry->lockval,
+ 		  __print_flags(__entry->flags, "|", XFS_BUF_FLAGS),
++		  __entry->rw_hint,
+ 		  (void *)__entry->caller_ip)
+ )
  
- /*
-  * Number of physical segments as sent to the device.
+@@ -309,6 +312,7 @@ DEFINE_BUF_EVENT(xfs_buf_free);
+ DEFINE_BUF_EVENT(xfs_buf_hold);
+ DEFINE_BUF_EVENT(xfs_buf_rele);
+ DEFINE_BUF_EVENT(xfs_buf_iodone);
++DEFINE_BUF_EVENT(xfs_buf_ioretry);
+ DEFINE_BUF_EVENT(xfs_buf_submit);
+ DEFINE_BUF_EVENT(xfs_buf_lock);
+ DEFINE_BUF_EVENT(xfs_buf_lock_done);
 -- 
 2.7.4
 
