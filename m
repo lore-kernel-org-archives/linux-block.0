@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5052C43441
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 13:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD2DDC43441
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 13:35:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6CB33208E7
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 13:35:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8FCD32081B
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 13:35:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ewC376kS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CB33208E7
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="zgbDTlS3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FCD32081B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727982AbeK2Ah1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Nov 2018 19:37:27 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:35454 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727802AbeK2Ah1 (ORCPT
+        id S1728044AbeK2Ah3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Nov 2018 19:37:29 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:39404 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727802AbeK2Ah3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Nov 2018 19:37:27 -0500
-Received: by mail-pg1-f196.google.com with SMTP id s198so9521867pgs.2
-        for <linux-block@vger.kernel.org>; Wed, 28 Nov 2018 05:35:46 -0800 (PST)
+        Wed, 28 Nov 2018 19:37:29 -0500
+Received: by mail-pf1-f193.google.com with SMTP id c72so10181668pfc.6
+        for <linux-block@vger.kernel.org>; Wed, 28 Nov 2018 05:35:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=JrqoU3peOrnIVekH1BfOdSNpERgLs0QRqKGQNsNb1lw=;
-        b=ewC376kSdzyekNXjoOxpQAtkikUsQ5g4IeT2gT694CTqitVfzbx/goRr/CX/RxDyEP
-         TlPSwswJZuv9q7aybbBP0PA3p7BrrhPw9C6vmRfdpA2WWHDxll+C76Ga2ECxWbkZXNhD
-         Ny2E1TjmWawpJPRl1hpGHIeXUKkM0gNGMEzYL311C8dad3iOE66cDcs0RLNnekvDoGis
-         N7aCindjFc1MjtDbSHoBV/Ut2uNSDJWh3ucmH5Hd7XbuvX9gRxhEdzBYOdAt9grpOxSA
-         7r8NZmLMRSeI7g39jVVGQlMcjVuSbxinNNafOY7nqTjvSz9MqjAyWN/oj8gKOgDCJV0r
-         ajaQ==
+        bh=Auo7bxuoU3B9Y/we6rFKweZ9RhWC7hH2EBXNAlZK3k0=;
+        b=zgbDTlS33qmTDl4Dl8ZqCtiJTiN8jxWi2+94yTRTE3AruSdleYAai5ikO0UCrtoC3i
+         jHl6nPriZpKacXSlmg3SCusEMNDK0YG2RAJUojtUjSkgTSF1KXGmswRCsUsthMj/zbI0
+         BUk0e7zKG39VuxkHBP5fE/6JPV4BhaC+iP3Rwvs4gKK5xNyPZlgOaAUdkexySVmrg9qO
+         0cq6jbAqNWs4B3foh40HoTVLUcADsvsl6qd/4LD9h5tuu5RBoZ7TL7lRZ8eCnX5Mp0PJ
+         qubYMTSXJFdBdmhaF7z0oVBecp859BFV4fBfGRsQfw4kUmjqrm/2Byd2wWlFROKpamwd
+         e1HA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=JrqoU3peOrnIVekH1BfOdSNpERgLs0QRqKGQNsNb1lw=;
-        b=b9Q/SySgzHkPu72KZKZG7UGPcrWVhWAG2EHn1v6ean6VQl7oupEjdfyNzs/1DPY9mO
-         OI5ka2mBfLPvCM82giG+OWwLXWAQYkBnu2Ie1sjYnW+T6RFVlPWEW24zWOiramRVMe2w
-         gGxAL2tRonVCqK6GkzGzFvZTN48H4VxSulJlzTqkZHjB1zC4VADV7utsWKKySF0FpwqU
-         jvruZ5iiluQ9oTE85QF7mNbmm6KxzGZtBrM+XBpETtT+NWQvWn921pNQvxvKa0ueI5ls
-         fv3+BTfft+thakgA1gP8HHvSN//kxJPwme5fAioLBZAHskApwuL0AsRB6Kknj8gfNdMM
-         GlTg==
-X-Gm-Message-State: AGRZ1gLpNNbiwjM4DPibAqKg7MngRza3sDJ5kSoIxcK+NBAxrpW2/5VS
-        4OBwBk57JbaMfmoNARSNk9+GnFXEM9E=
-X-Google-Smtp-Source: AJdET5fBNFDpn4fGf5LI8ekCIWUi82JACPlkjzjJNHiqOEMtqa6lTHyysxgC2eTyP64ZQ0dzoR2pXg==
-X-Received: by 2002:a63:e247:: with SMTP id y7mr31776887pgj.84.1543412145167;
-        Wed, 28 Nov 2018 05:35:45 -0800 (PST)
+        bh=Auo7bxuoU3B9Y/we6rFKweZ9RhWC7hH2EBXNAlZK3k0=;
+        b=JekPe/69MUfDBu43v6E7LXeBpYaCQxmL3Dgh8kIHonlT3SiTN3XV4FORO2cmCke06X
+         a1ZUBzlV+3LwkLSybBdRAPfdvHhm4373nICH+nMDKu30FvB6kBR3iXxPDdTBaBiJhtta
+         uubjXFh6brAXwRsjbCYI/uYP8eFaC1dDrj1DDn4nJuvz9q4vQ196sChrIGrF1y8vwN/V
+         XptQwuJVgziPOJJOOnT1vDDNyusul1ADcEkGhG6ZvHEmTBt7Zq6kRIgDKea7Sh5bmecN
+         UhAXLZl1bJjvv69Yr5zm32Ha3Sal7hsfkocWa8aPxPJMANFNiuEC2em0PKcRdCnv9WAa
+         fa8Q==
+X-Gm-Message-State: AA+aEWZKUk98zi+KmYuYOUmqMvi4Hw+APYKCxpxgANQDlcjgE+ZZrGwF
+        WZYBvk2xhF0aajr2Y9ipydUmv/zkXVE=
+X-Google-Smtp-Source: AFSGD/XG4X1QsesWRt+W+LnsMIrN2PFRsCYz9SeOOx1R3Kc1rximifViKo2F8Uwi+XVnBVX4C27Wsw==
+X-Received: by 2002:a63:d34a:: with SMTP id u10mr33733439pgi.301.1543412147201;
+        Wed, 28 Nov 2018 05:35:47 -0800 (PST)
 Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id q75sm4744925pfa.38.2018.11.28.05.35.43
+        by smtp.gmail.com with ESMTPSA id q75sm4744925pfa.38.2018.11.28.05.35.45
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 28 Nov 2018 05:35:43 -0800 (PST)
+        Wed, 28 Nov 2018 05:35:46 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/7] block: improve logic around when to sort a plug list
-Date:   Wed, 28 Nov 2018 06:35:32 -0700
-Message-Id: <20181128133538.20329-2-axboe@kernel.dk>
+Subject: [PATCH 2/7] blk-mq: add mq_ops->commit_rqs()
+Date:   Wed, 28 Nov 2018 06:35:33 -0700
+Message-Id: <20181128133538.20329-3-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181128133538.20329-1-axboe@kernel.dk>
 References: <20181128133538.20329-1-axboe@kernel.dk>
@@ -71,95 +71,88 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Only do it if we have requests for multiple queues in the same
-plug.
+blk-mq passes information to the hardware about any given request being
+the last that we will issue in this sequence. The point is that hardware
+can defer costly doorbell type writes to the last request. But if we run
+into errors issuing a sequence of requests, we may never send the request
+with bd->last == true set. For that case, we need a hook that tells the
+hardware that nothing else is coming right now.
 
+For failures returned by the drivers ->queue_rq() hook, the driver is
+responsible for flushing pending requests, if it uses bd->last to
+optimize that part. This works like before, no changes there.
+
+Reviewed-by: Omar Sandoval <osandov@fb.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/blk-core.c       |  1 +
- block/blk-mq.c         | 23 ++++++++++++++++++-----
- include/linux/blkdev.h |  1 +
- 3 files changed, 20 insertions(+), 5 deletions(-)
+ block/blk-mq.c         | 16 ++++++++++++++++
+ include/linux/blk-mq.h | 10 ++++++++++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index be9233400314..d107d016b92b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1780,6 +1780,7 @@ void blk_start_plug(struct blk_plug *plug)
- 	INIT_LIST_HEAD(&plug->mq_list);
- 	INIT_LIST_HEAD(&plug->cb_list);
- 	plug->rq_count = 0;
-+	plug->multiple_queues = false;
- 
- 	/*
- 	 * Store ordering should not be needed here, since a potential
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index a82830f39933..0e2663048d95 100644
+index 0e2663048d95..18ff47a85ad3 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -1677,7 +1677,8 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
- 	list_splice_init(&plug->mq_list, &list);
- 	plug->rq_count = 0;
+@@ -1259,6 +1259,14 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
+ 	if (!list_empty(list)) {
+ 		bool needs_restart;
  
--	list_sort(NULL, &list, plug_rq_cmp);
-+	if (plug->rq_count > 2 && plug->multiple_queues)
-+		list_sort(NULL, &list, plug_rq_cmp);
- 
- 	this_q = NULL;
- 	this_hctx = NULL;
-@@ -1866,6 +1867,20 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
++		/*
++		 * If we didn't flush the entire list, we could have told
++		 * the driver there was more coming, but that turned out to
++		 * be a lie.
++		 */
++		if (q->mq_ops->commit_rqs)
++			q->mq_ops->commit_rqs(hctx);
++
+ 		spin_lock(&hctx->lock);
+ 		list_splice_init(list, &hctx->dispatch);
+ 		spin_unlock(&hctx->lock);
+@@ -1865,6 +1873,14 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+ 			blk_mq_end_request(rq, ret);
+ 		}
  	}
++
++	/*
++	 * If we didn't flush the entire list, we could have told
++	 * the driver there was more coming, but that turned out to
++	 * be a lie.
++	 */
++	if (!list_empty(list) && hctx->queue->mq_ops->commit_rqs)
++		hctx->queue->mq_ops->commit_rqs(hctx);
  }
  
-+static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
-+{
-+	list_add_tail(&rq->queuelist, &plug->mq_list);
-+	plug->rq_count++;
-+	if (!plug->multiple_queues && !list_is_singular(&plug->mq_list)) {
-+		struct request *tmp;
+ static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index b8de11e0603b..467f1dd21ccf 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -117,6 +117,7 @@ struct blk_mq_queue_data {
+ 
+ typedef blk_status_t (queue_rq_fn)(struct blk_mq_hw_ctx *,
+ 		const struct blk_mq_queue_data *);
++typedef void (commit_rqs_fn)(struct blk_mq_hw_ctx *);
+ /* takes rq->cmd_flags as input, returns a hardware type index */
+ typedef int (rq_flags_to_type_fn)(struct request_queue *, unsigned int);
+ typedef bool (get_budget_fn)(struct blk_mq_hw_ctx *);
+@@ -144,6 +145,15 @@ struct blk_mq_ops {
+ 	 */
+ 	queue_rq_fn		*queue_rq;
+ 
++	/*
++	 * If a driver uses bd->last to judge when to submit requests to
++	 * hardware, it must define this function. In case of errors that
++	 * make us stop issuing further requests, this hook serves the
++	 * purpose of kicking the hardware (which the last request otherwise
++	 * would have done).
++	 */
++	commit_rqs_fn		*commit_rqs;
 +
-+		tmp = list_first_entry(&plug->mq_list, struct request,
-+						queuelist);
-+		if (tmp->q != rq->q)
-+			plug->multiple_queues = true;
-+	}
-+}
-+
- static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- {
- 	const int is_sync = op_is_sync(bio->bi_opf);
-@@ -1932,8 +1947,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 			trace_block_plug(q);
- 		}
- 
--		list_add_tail(&rq->queuelist, &plug->mq_list);
--		plug->rq_count++;
-+		blk_add_rq_to_plug(plug, rq);
- 	} else if (plug && !blk_queue_nomerges(q)) {
- 		blk_mq_bio_to_request(rq, bio);
- 
-@@ -1950,8 +1964,7 @@ static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
- 			list_del_init(&same_queue_rq->queuelist);
- 			plug->rq_count--;
- 		}
--		list_add_tail(&rq->queuelist, &plug->mq_list);
--		plug->rq_count++;
-+		blk_add_rq_to_plug(plug, rq);
- 
- 		blk_mq_put_ctx(data.ctx);
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 02732cae6080..08d940f85fa0 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1131,6 +1131,7 @@ struct blk_plug {
- 	struct list_head mq_list; /* blk-mq requests */
- 	struct list_head cb_list; /* md requires an unplug callback */
- 	unsigned short rq_count;
-+	bool multiple_queues;
- };
- #define BLK_MAX_REQUEST_COUNT 16
- #define BLK_PLUG_FLUSH_SIZE (128 * 1024)
+ 	/*
+ 	 * Return a queue map type for the given request/bio flags
+ 	 */
 -- 
 2.17.1
 
