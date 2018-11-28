@@ -2,147 +2,107 @@ Return-Path: <SRS0=FxMo=OH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C251C43441
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 02:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF3AC43441
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 03:05:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1229120851
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 02:37:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="PjPL++tI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1229120851
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	by mail.kernel.org (Postfix) with ESMTP id 7D4552086B
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 03:05:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D4552086B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727159AbeK1Nhk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Nov 2018 08:37:40 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:44297 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726548AbeK1Nhk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Nov 2018 08:37:40 -0500
-Received: by mail-pf1-f195.google.com with SMTP id u6so9389086pfh.11
-        for <linux-block@vger.kernel.org>; Tue, 27 Nov 2018 18:37:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=+1RO7oRqZMo2SkUAfVRZqf0y+/uSm7/o66knF6yM1Sg=;
-        b=PjPL++tITXdVqv1bJDIaHKRd3UG9Dmm5XN/bapN0urgx/IB5JeS681s91AX+ogxKDA
-         oQchAda1etIiJhxfNM1XqPNjW8nQ/bJdtG28sHg9D+f1d1/Ou4Bsje5DUSdeNtF4LfMH
-         Qrxlfx+Y8/cD/FFYOBF7pSkjev8GxXJsoOvOzB1CCJdsCiRwe7bNI887VrP2UC/w4oNn
-         cHSpGbUoc2VHx9GQQzRF6YjjS4mpP2rvlxhb2n4MIMVdj+bLZvznoj05O4VOml1hJUPw
-         M+PhfeaU6neaK1hdANdxlS2D2SuIH5ijdrvxkPCluZhZtsNJEdzPM6Qo/kMLTQA7Vz0p
-         z+sQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+1RO7oRqZMo2SkUAfVRZqf0y+/uSm7/o66knF6yM1Sg=;
-        b=JLZ1ZcrsOyQwISh9smPC5SU/KbTh/dBsvGNHm/eHJ40NPJnf90H53W6xEk1l4rxgb5
-         F4PEeDNsOlFuuq0PKEuwPCsFmzr1hx9yRxr7J6Ovfx1scQsjcyjmZrcXP+RBEmY0ycY5
-         OdLAhIAQHcQmESvPk4n6W0RXVW4HhuuhYdF7Dl2dyw8VvUgUH3jRY+hmCvE78PC8S+IQ
-         Gy8kZ+UP20I4cgOEQJZ9KVcTcWyIAwNol2jMYj0E78RoDLYDCYLRLCrhd+eZTt95AIoc
-         QTzePaOzlZlwsRNQvsIrdfisaX2VQJcpNxxGVcpi7cZ7UF5oaPEu9qJXJzjZyThEgJ/J
-         IYmw==
-X-Gm-Message-State: AA+aEWaCoJGX6X2HgXUGLBp8yeA5wjCGC8+a8Gie1QWilwLYe/6SjfX1
-        BrknndP4cGNzFK2W8MlRX4hrFVeHvFk=
-X-Google-Smtp-Source: AFSGD/XYfmdG6FUh0KHBkKFCdgR0VAMsWzUM24gVLtEg3qIVjMOZYUZnLJad0roBMmy17ikHmjBvNg==
-X-Received: by 2002:a63:1c61:: with SMTP id c33mr30764748pgm.354.1543372663579;
-        Tue, 27 Nov 2018 18:37:43 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id 196sm16205837pfc.77.2018.11.27.18.37.42
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 27 Nov 2018 18:37:42 -0800 (PST)
-Subject: Re: [PATCH 7/8] blk-mq: use bd->last == true for list inserts
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+        id S1727008AbeK1OFV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Nov 2018 09:05:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40554 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726953AbeK1OFV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Nov 2018 09:05:21 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A17BC30B4A3E;
+        Wed, 28 Nov 2018 03:05:20 +0000 (UTC)
+Received: from redhat.com (ovpn-121-88.rdu2.redhat.com [10.10.121.88])
+        by smtp.corp.redhat.com (Postfix) with SMTP id AAC215C1B2;
+        Wed, 28 Nov 2018 03:05:19 +0000 (UTC)
+Date:   Tue, 27 Nov 2018 22:05:18 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Omar Sandoval <osandov@osandov.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH 5/8] virtio_blk: implement mq_ops->commit_rqs() hook
+Message-ID: <20181127220128-mutt-send-email-mst@kernel.org>
 References: <20181126163556.5181-1-axboe@kernel.dk>
- <20181126163556.5181-8-axboe@kernel.dk> <20181128014922.GE11128@ming.t460p>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c148e021-6c93-38c8-662e-0c123bf26e87@kernel.dk>
-Date:   Tue, 27 Nov 2018 19:37:41 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+ <20181126163556.5181-6-axboe@kernel.dk>
+ <20181127234538.GD846@vader>
 MIME-Version: 1.0
-In-Reply-To: <20181128014922.GE11128@ming.t460p>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181127234538.GD846@vader>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Wed, 28 Nov 2018 03:05:20 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/27/18 6:49 PM, Ming Lei wrote:
-> On Mon, Nov 26, 2018 at 09:35:55AM -0700, Jens Axboe wrote:
->> If we are issuing a list of requests, we know if we're at the last one.
->> If we fail issuing, ensure that we call ->commits_rqs() to flush any
->> potential previous requests.
->>
->> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->> ---
->>  block/blk-core.c |  2 +-
->>  block/blk-mq.c   | 32 ++++++++++++++++++++++++--------
->>  block/blk-mq.h   |  2 +-
->>  3 files changed, 26 insertions(+), 10 deletions(-)
->>
->> diff --git a/block/blk-core.c b/block/blk-core.c
->> index c9758d185357..808a65d23f1a 100644
->> --- a/block/blk-core.c
->> +++ b/block/blk-core.c
->> @@ -1334,7 +1334,7 @@ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *
->>  	 * bypass a potential scheduler on the bottom device for
->>  	 * insert.
->>  	 */
->> -	return blk_mq_request_issue_directly(rq);
->> +	return blk_mq_request_issue_directly(rq, true);
->>  }
->>  EXPORT_SYMBOL_GPL(blk_insert_cloned_request);
->>  
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 6a249bf6ed00..0a12cec0b426 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -1260,6 +1260,14 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
->>  	if (!list_empty(list)) {
->>  		bool needs_restart;
->>  
->> +		/*
->> +		 * If we didn't flush the entire list, we could have told
->> +		 * the driver there was more coming, but that turned out to
->> +		 * be a lie.
->> +		 */
->> +		if (q->mq_ops->commit_rqs)
->> +			q->mq_ops->commit_rqs(hctx);
->> +
+On Tue, Nov 27, 2018 at 03:45:38PM -0800, Omar Sandoval wrote:
+> On Mon, Nov 26, 2018 at 09:35:53AM -0700, Jens Axboe wrote:
+> > We need this for blk-mq to kick things into gear, if we told it that
+> > we had more IO coming, but then failed to deliver on that promise.
 > 
-> Looks you miss to do it for blk_mq_do_dispatch_sched() and
-> blk_mq_do_dispatch_ctx(), in which only one request is added to
-> the rq_list.
+> Reviewed-by: Omar Sandoval <osandov@fb.com>
+> 
+> But also cc'd the virtio-blk maintainers.
 
-blk_mq_do_dispatch() is handled through blk_mq_dispatch_rq_list(),
-it doesn't need to do this on its own, it's only working on
-single requests.
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Ditto for blk_mq_do_dispatch()
 
-> Maybe we can call the .commit_rqs(hctx) just at the end of
-> blk_mq_sched_dispatch_requests() for cover all non-direct-issue
-> cases.
+Feel free to queue with other changes.
 
-I think you miss the point of ->commits_rqs() - it's only meant to
-catch the case where we set bd->last == false, and never got to
-the end. Like not getting a driver tag, for instance. It's not
-meant to always be a kick things into gear, it's more efficient
-to use bd->last for the general case, as most drivers require some
-sort of locking for the submission.
 
--- 
-Jens Axboe
-
+> > Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> > ---
+> >  drivers/block/virtio_blk.c | 15 +++++++++++++++
+> >  1 file changed, 15 insertions(+)
+> > 
+> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > index 6e869d05f91e..b49c57e77780 100644
+> > --- a/drivers/block/virtio_blk.c
+> > +++ b/drivers/block/virtio_blk.c
+> > @@ -214,6 +214,20 @@ static void virtblk_done(struct virtqueue *vq)
+> >  	spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
+> >  }
+> >  
+> > +static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
+> > +{
+> > +	struct virtio_blk *vblk = hctx->queue->queuedata;
+> > +	int qid = hctx->queue_num;
+> > +	bool kick;
+> > +
+> > +	spin_lock_irq(&vblk->vqs[qid].lock);
+> > +	kick = virtqueue_kick_prepare(vblk->vqs[qid].vq);
+> > +	spin_unlock_irq(&vblk->vqs[qid].lock);
+> > +
+> > +	if (kick)
+> > +		virtqueue_notify(vblk->vqs[qid].vq);
+> > +}
+> > +
+> >  static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+> >  			   const struct blk_mq_queue_data *bd)
+> >  {
+> > @@ -638,6 +652,7 @@ static void virtblk_initialize_rq(struct request *req)
+> >  
+> >  static const struct blk_mq_ops virtio_mq_ops = {
+> >  	.queue_rq	= virtio_queue_rq,
+> > +	.commit_rqs	= virtio_commit_rqs,
+> >  	.complete	= virtblk_request_done,
+> >  	.init_request	= virtblk_init_request,
+> >  #ifdef CONFIG_VIRTIO_BLK_SCSI
+> > -- 
+> > 2.17.1
+> > 
