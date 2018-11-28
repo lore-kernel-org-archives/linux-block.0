@@ -2,151 +2,94 @@ Return-Path: <SRS0=FxMo=OH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2EE3C43441
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 14:52:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FB61C43441
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 15:20:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B6DEA2086B
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 14:52:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1254C2081B
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 15:20:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cLXKLfec"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6DEA2086B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="y1TR7aZ4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1254C2081B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728262AbeK2Byt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Nov 2018 20:54:49 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:35965 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728217AbeK2Byt (ORCPT
+        id S1727789AbeK2CWS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Nov 2018 21:22:18 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:45140 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727726AbeK2CWS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Nov 2018 20:54:49 -0500
-Received: by mail-wm1-f67.google.com with SMTP id a18so2226348wmj.1
-        for <linux-block@vger.kernel.org>; Wed, 28 Nov 2018 06:52:52 -0800 (PST)
+        Wed, 28 Nov 2018 21:22:18 -0500
+Received: by mail-io1-f67.google.com with SMTP id w7so20233616iom.12
+        for <linux-block@vger.kernel.org>; Wed, 28 Nov 2018 07:20:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=K0WipYoAONmvaBZMopY9nAgruH8DNCGNWaqPJZ1rL8I=;
-        b=cLXKLfecqeePM4nK/EVCFlgDEyf3tBroO0uCL8hhrWAj/psLCCVkrI4mT/CyxIZCE9
-         te3COweFjakugBlJURzAcTTdx/MNfrRIOQvfpQFACzE1jjT2+M0s0VDy/NRcZ0OASD1R
-         leZuHoUeW8ahwpo/e9go/YI2uqq4El7amkEcLm36QsORfT38nU1GG4zlB9GOupTTHAWy
-         +pGmoSD9YxY465mMLTyVk4/P/gQ4zxd856RaLzHmU5pkydY4dMfOCBWI1g7Dugor8s/b
-         q2Y8jQTiTfDC62fpaE3L0WZ/1DjbEvqL85CWRIOneYfUO/YRsDmh2qW6wXrHdYZwghey
-         rJrQ==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=9IzR2ZPEDUqsYaGzu0x0pAPCd33jktjjRbWgRXhob6E=;
+        b=y1TR7aZ4ys2rX34XYpNIj3fLEdnNSU8hHklJxqTZmWUSjRmKch50VgjcRZ8Gk6OPrU
+         PzufldLI4Ibf9/QXmqfYMIu/lyXWs5xL6kFhqShbprY2sqkRSGtYv4OSeSdZuo+fhWRZ
+         Iegljg+jBD4cT4k1GX/pb0e3feC3skSuM0SB5PS7bWDY3Vt4zNX+ies0+R5Rp5KToqfQ
+         tHUkYIOOZxLWman91U/QkRxqAqRg+CSV+e/pnBxGfwn0rfVLlXqjZ6Q0jN3Ot3Wcb3j8
+         SuM3Zxgpi2wSvoPv9ZhVSI71opMN/bfvQ/8U/l9sALspKqMupkEcdIIWQQ2LJIE1pQ9I
+         AuIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:content-transfer-encoding;
-        bh=K0WipYoAONmvaBZMopY9nAgruH8DNCGNWaqPJZ1rL8I=;
-        b=CDGKTJzNF9PZYPVvWKg9IoWJ8CptoMJiPpk57xVIIuqDrNiKzyFaQ37cazEF2ip6if
-         0/kXy8RMuiOOIpVELNCrZaxhTfv79pE8GgMkOBmmnHAKs3Z57Xi48fH7Pum8RIo2YItD
-         xBEKSl4YTi8WYqBaKhKbIlz0tVzx3x8DMPyYDMSCtl2ZoRSKjOXSIbNcFCvzqBXg9isx
-         Vyr1X6MRyzCdyNNobCrrTFZi9iCWDidfFXz9Eqjrz0E0bb2FpSKP5v9UbKrglSGssois
-         I4dZZwv//b7aVTKgoRMg0rN8C63Wse3OSM6ogN4s9H2It9Q6NmJhAsttVsz9Nip3poeC
-         onKQ==
-X-Gm-Message-State: AA+aEWbSP3tE/WJ3htlzzNVrWCC7XbLYrH+nh/lmvPZZ4x8DjFKu73mK
-        eI1rLBKxWKTnxy33GiBh362ztXob0CDpCApMOLC8Dg==
-X-Google-Smtp-Source: AFSGD/WFVrQEEt2nC12VLalvoKORVbzoQfYdKcsacY/t9rCZgoQtMAIqFo4HDygDV4Z6+zcpWHMosB0BHJBp999wJUA=
-X-Received: by 2002:a1c:87cc:: with SMTP id j195mr3024002wmd.2.1543416771650;
- Wed, 28 Nov 2018 06:52:51 -0800 (PST)
-MIME-Version: 1.0
-References: <20181119141145.GA25638@192.168.3.9>
-In-Reply-To: <20181119141145.GA25638@192.168.3.9>
-From:   Weiping Zhang <zwp10758@gmail.com>
-Date:   Wed, 28 Nov 2018 22:52:38 +0800
-Message-ID: <CAA70yB6DedBE=yrbQD5qUdPL2HBtRHg9TejcywGMqeuAcqGM6Q@mail.gmail.com>
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=9IzR2ZPEDUqsYaGzu0x0pAPCd33jktjjRbWgRXhob6E=;
+        b=kTROoO9qHVUSSPuXdfBXLM8EyA5RukswRW+zcc9AYMz6//Kecvi7Wt0+6dINkT7ndu
+         X8x0HKI7nxGAMFY/77D7NZn2PQhBlqcFWwpq/kCVSq7EsW9+PaSUfZsSPChhzpfIY3Ih
+         f0sBEDzP1N1xnWFYWUNELH8soXgziEvGinvZspjWGUvd4zWXaVoG0yiLGm8m0S+DwL2p
+         Yo+Uk9xiZHevfr0B+kpkDJxnUcul68GYIDFL6QYQz311+kiV0RBg0kdVgWtP/6HPuNoE
+         PyAXkLH+N5ue6P5QoMw5j2Qvriy62no82WlALr+AbHoQ4R/odhw9EgcVBnpu5ii5lxGI
+         fZKg==
+X-Gm-Message-State: AA+aEWbOev5DpzJ/7sRtBwxEyIfKOdLEbxTR5Hi632ksOzVENaHVhfmG
+        PXx1UsedyQhWto7BFkc+YxUJugb1on8=
+X-Google-Smtp-Source: AFSGD/VQYLOj/Ru8ah2/lDN5fqD6PcMkLWTtgjQuGetao9a3tqTRbmLFUQ2Do8qD0VfyKpC5VFMA/g==
+X-Received: by 2002:a6b:6e07:: with SMTP id d7mr27148745ioh.8.1543418416977;
+        Wed, 28 Nov 2018 07:20:16 -0800 (PST)
+Received: from [192.168.1.56] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id u127-v6sm1321546ita.10.2018.11.28.07.20.15
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 28 Nov 2018 07:20:15 -0800 (PST)
 Subject: Re: [RFC PATCH v2] block: add io timeout to sysfs
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     Weiping Zhang <zwp10758@gmail.com>, linux-block@vger.kernel.org
+References: <20181119141145.GA25638@192.168.3.9>
+ <CAA70yB6DedBE=yrbQD5qUdPL2HBtRHg9TejcywGMqeuAcqGM6Q@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ae7c1cc8-cd0b-1aff-6388-4ada80418350@kernel.dk>
+Date:   Wed, 28 Nov 2018 08:20:14 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+MIME-Version: 1.0
+In-Reply-To: <CAA70yB6DedBE=yrbQD5qUdPL2HBtRHg9TejcywGMqeuAcqGM6Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On 11/28/18 7:52 AM, Weiping Zhang wrote:
+> Hi Jens,
+> 
+> It's useful if user want a short timeout when a disk doesn't work normally.
+> Would you give some comments for this patch,
 
-It's useful if user want a short timeout when a disk doesn't work normally.
-Would you give some comments for this patch,
+I'm fine with the patch, in fact I've posted a similar/identical one in
+the past but just never got around to merging it. I think we should
+expose the value in seconds or msecs, however, not in jiffies. That
+makes it hard to use for people.
 
-Thanks a lot
-Weiping Zhang <zhangweiping@didiglobal.com> =E4=BA=8E2018=E5=B9=B411=E6=9C=
-=8819=E6=97=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=8810:30=E5=86=99=E9=81=93=
-=EF=BC=9A
->
-> Give a interface to adjust io timeout by device.
->
-> Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
-> ---
->
-> Changes since v1:
-> * make sure timeout > 0
->
->  block/blk-sysfs.c | 27 +++++++++++++++++++++++++++
->  1 file changed, 27 insertions(+)
->
-> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-> index 80eef48fddc8..90a927514d30 100644
-> --- a/block/blk-sysfs.c
-> +++ b/block/blk-sysfs.c
-> @@ -417,6 +417,26 @@ static ssize_t queue_poll_store(struct request_queue=
- *q, const char *page,
->         return ret;
->  }
->
-> +static ssize_t queue_io_timeout_show(struct request_queue *q, char *page=
-)
-> +{
-> +       return sprintf(page, "%u\n", q->rq_timeout);
-> +}
-> +
-> +static ssize_t queue_io_timeout_store(struct request_queue *q, const cha=
-r *page,
-> +                                 size_t count)
-> +{
-> +       unsigned int val;
-> +       int err;
-> +
-> +       err =3D kstrtou32(page, 10, &val);
-> +       if (err || val =3D=3D 0)
-> +               return -EINVAL;
-> +
-> +       blk_queue_rq_timeout(q, val);
-> +
-> +       return count;
-> +}
-> +
->  static ssize_t queue_wb_lat_show(struct request_queue *q, char *page)
->  {
->         if (!wbt_rq_qos(q))
-> @@ -685,6 +705,12 @@ static struct queue_sysfs_entry queue_dax_entry =3D =
-{
->         .show =3D queue_dax_show,
->  };
->
-> +static struct queue_sysfs_entry queue_io_timeout_entry =3D {
-> +       .attr =3D {.name =3D "io_timeout", .mode =3D 0644 },
-> +       .show =3D queue_io_timeout_show,
-> +       .store =3D queue_io_timeout_store,
-> +};
-> +
->  static struct queue_sysfs_entry queue_wb_lat_entry =3D {
->         .attr =3D {.name =3D "wbt_lat_usec", .mode =3D 0644 },
->         .show =3D queue_wb_lat_show,
-> @@ -734,6 +760,7 @@ static struct attribute *default_attrs[] =3D {
->         &queue_dax_entry.attr,
->         &queue_wb_lat_entry.attr,
->         &queue_poll_delay_entry.attr,
-> +       &queue_io_timeout_entry.attr,
->  #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
->         &throtl_sample_time_entry.attr,
->  #endif
-> --
-> 2.14.1
->
+So modify it to do a msecs_to_jiffies() on the value passed in.
+
+-- 
+Jens Axboe
+
