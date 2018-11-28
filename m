@@ -2,133 +2,146 @@ Return-Path: <SRS0=FxMo=OH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	URIBL_SBL,URIBL_SBL_A,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C059AC43441
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 16:05:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8453C43441
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 16:06:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 890F22086B
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 16:05:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 890F22086B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=didiglobal.com
+	by mail.kernel.org (Postfix) with ESMTP id 8D443208E7
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 16:06:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lG4+wbJQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D443208E7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728619AbeK2DHU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Nov 2018 22:07:20 -0500
-Received: from mx2.didiglobal.com ([111.202.154.82]:25167 "HELO
-        bsf01.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with SMTP id S1728181AbeK2DHU (ORCPT
+        id S1728747AbeK2DIZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Nov 2018 22:08:25 -0500
+Received: from mail-it1-f196.google.com ([209.85.166.196]:37880 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728833AbeK2DIZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Nov 2018 22:07:20 -0500
-X-ASG-Debug-ID: 1543421085-0e40881e31c2f40001-Cu09wu
-Received: from BJEXCAS006.didichuxing.com (bjexcas006.didichuxing.com [172.20.2.189]) by bsf01.didichuxing.com with ESMTP id P9wMAcZYHAPAh69C; Thu, 29 Nov 2018 00:04:45 +0800 (CST)
-X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
-Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
- (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1263.5; Thu, 29 Nov
- 2018 00:04:45 +0800
-Date:   Thu, 29 Nov 2018 00:04:39 +0800
-From:   Weiping Zhang <zhangweiping@didiglobal.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>
-Subject: [PATCH v3] block: add io timeout to sysfs
-Message-ID: <20181128160433.GA35371@192.168.3.9>
-X-ASG-Orig-Subj: [PATCH v3] block: add io timeout to sysfs
-Mail-Followup-To: axboe@kernel.dk, linux-block@vger.kernel.org
+        Wed, 28 Nov 2018 22:08:25 -0500
+Received: by mail-it1-f196.google.com with SMTP id b5so4992865iti.2
+        for <linux-block@vger.kernel.org>; Wed, 28 Nov 2018 08:06:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=LLBsbC2SSp6TA8yJpUt438nG8UOzJ+ePqa0cn4WEb9M=;
+        b=lG4+wbJQH7bteRIqLMRJqBdlD4Mk0h52VyHhjP+KI/tWzmp0iDWnVrYNNOF9syv470
+         6jnvT11/A+v2eJhBJASJ8GqBJLlrhRo4Qdz8mo0fnNeOBQOUInL2oWktTUq2BhYrV3BO
+         l8fbVjpIGwIq86QxuTYzUFLDHmKzULQjNjGvtAIkCsxYg5euTdvZhGEDjIYoBm4nla/e
+         vbjFgihrlBaVZKcdsLqsN1burEH92N4Dz0XSdHp/HKXPaQcsH+hiL36FrOFQcc5Lh619
+         Xy31JhhvqLYkaXI+fwmugK2FPxlX6kAXazN/O4LHi7SSpIGcBAeB2HG6YlGjLzLjItKZ
+         dQYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=LLBsbC2SSp6TA8yJpUt438nG8UOzJ+ePqa0cn4WEb9M=;
+        b=kF2CpXg1/NpJwR60iFCh4gLe2L3qM2KX7/xuQNxoM67XYsBM69cwZcE/Vhd+uokk6j
+         HTlXu3b5K148r98uIriX4l/bT+QwHlFt8FqPdH4zjvdBA+CpW/2aO5oNA45o1VvkwEiU
+         QRgYwPZXEYW1pxbuX8947WF7NcriHma+VAD0ULWT+b9a9kgEd9/Okum7AGsDwnUjuqu8
+         WehAzxWl6AzOCtu2DCDwXoO7XggTMGc5DTpdb8kXHb++Q9AAaE+ajyOlWhr9YULQMu+u
+         K93x+d0/SowAMO199NP88Vj93RX5N3DFGxgZ1c0WNIresGbnRwK9twZrFq/LKv4ctWla
+         AXUA==
+X-Gm-Message-State: AA+aEWYClNkJ+Nr9rgFPd6pHdJFjWyvK0UXy69QmPegdjzCoixGZPTXL
+        jb321/jZnEZqDa4nVfsf686Poiq6wuY=
+X-Google-Smtp-Source: AFSGD/VPN4DMq7l38b99hohftgwM3fEkml1iLaS+Iu4tA+rE2X5YxLg6oZMU6RdtZ+mqcaFN+FJhVw==
+X-Received: by 2002:a02:9c34:: with SMTP id q49mr7003708jak.101.1543421175355;
+        Wed, 28 Nov 2018 08:06:15 -0800 (PST)
+Received: from [192.168.1.56] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id z10sm2739275ioh.20.2018.11.28.08.06.13
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 28 Nov 2018 08:06:14 -0800 (PST)
+Subject: Re: [PATCH] block: use rcu_work instead of call_rcu to avoid sleep in
+ softirq
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     linux-block@vger.kernel.org, tj@kernel.org,
+        paulmck@linux.vnet.ibm.com, ming.lei@redhat.com
+References: <20181128084201.69211-1-yuyufen@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <e49ffe44-c341-dd9f-cb08-511186c83b03@kernel.dk>
+Date:   Wed, 28 Nov 2018 09:06:13 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Originating-IP: [172.22.50.20]
-X-ClientProxiedBy: BJEXCAS002.didichuxing.com (172.20.1.42) To
- BJSGEXMBX03.didichuxing.com (172.20.15.133)
-X-Barracuda-Connect: bjexcas006.didichuxing.com[172.20.2.189]
-X-Barracuda-Start-Time: 1543421085
-X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at didichuxing.com
-X-Barracuda-Scan-Msg-Size: 1867
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0147 1.0000 -1.9251
-X-Barracuda-Spam-Score: -1.43
-X-Barracuda-Spam-Status: No, SCORE=-1.43 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=BSF_RULE7568M
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.62616
-        Rule breakdown below
-         pts rule name              description
-        ---- ---------------------- --------------------------------------------------
-        0.50 BSF_RULE7568M          Custom Rule 7568M
+In-Reply-To: <20181128084201.69211-1-yuyufen@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Give a interface to adjust io timeout(ms) by device.
+On 11/28/18 1:42 AM, Yufen Yu wrote:
+> We recently got a stack by syzkaller like this:
+> 
+> BUG: sleeping function called from invalid context at mm/slab.h:361
+> in_atomic(): 1, irqs_disabled(): 0, pid: 6644, name: blkid
+> INFO: lockdep is turned off.
+> CPU: 1 PID: 6644 Comm: blkid Not tainted 4.4.163-514.55.6.9.x86_64+ #76
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
+>  0000000000000000 5ba6a6b879e50c00 ffff8801f6b07b10 ffffffff81cb2194
+>  0000000041b58ab3 ffffffff833c7745 ffffffff81cb2080 5ba6a6b879e50c00
+>  0000000000000000 0000000000000001 0000000000000004 0000000000000000
+> Call Trace:
+>  <IRQ>  [<ffffffff81cb2194>] __dump_stack lib/dump_stack.c:15 [inline]
+>  <IRQ>  [<ffffffff81cb2194>] dump_stack+0x114/0x1a0 lib/dump_stack.c:51
+>  [<ffffffff8129a981>] ___might_sleep+0x291/0x490 kernel/sched/core.c:7675
+>  [<ffffffff8129ac33>] __might_sleep+0xb3/0x270 kernel/sched/core.c:7637
+>  [<ffffffff81794c13>] slab_pre_alloc_hook mm/slab.h:361 [inline]
+>  [<ffffffff81794c13>] slab_alloc_node mm/slub.c:2610 [inline]
+>  [<ffffffff81794c13>] slab_alloc mm/slub.c:2692 [inline]
+>  [<ffffffff81794c13>] kmem_cache_alloc_trace+0x2c3/0x5c0 mm/slub.c:2709
+>  [<ffffffff81cbe9a7>] kmalloc include/linux/slab.h:479 [inline]
+>  [<ffffffff81cbe9a7>] kzalloc include/linux/slab.h:623 [inline]
+>  [<ffffffff81cbe9a7>] kobject_uevent_env+0x2c7/0x1150 lib/kobject_uevent.c:227
+>  [<ffffffff81cbf84f>] kobject_uevent+0x1f/0x30 lib/kobject_uevent.c:374
+>  [<ffffffff81cbb5b9>] kobject_cleanup lib/kobject.c:633 [inline]
+>  [<ffffffff81cbb5b9>] kobject_release+0x229/0x440 lib/kobject.c:675
+>  [<ffffffff81cbb0a2>] kref_sub include/linux/kref.h:73 [inline]
+>  [<ffffffff81cbb0a2>] kref_put include/linux/kref.h:98 [inline]
+>  [<ffffffff81cbb0a2>] kobject_put+0x72/0xd0 lib/kobject.c:692
+>  [<ffffffff8216f095>] put_device+0x25/0x30 drivers/base/core.c:1237
+>  [<ffffffff81c4cc34>] delete_partition_rcu_cb+0x1d4/0x2f0 block/partition-generic.c:232
+>  [<ffffffff813c08bc>] __rcu_reclaim kernel/rcu/rcu.h:118 [inline]
+>  [<ffffffff813c08bc>] rcu_do_batch kernel/rcu/tree.c:2705 [inline]
+>  [<ffffffff813c08bc>] invoke_rcu_callbacks kernel/rcu/tree.c:2973 [inline]
+>  [<ffffffff813c08bc>] __rcu_process_callbacks kernel/rcu/tree.c:2940 [inline]
+>  [<ffffffff813c08bc>] rcu_process_callbacks+0x59c/0x1c70 kernel/rcu/tree.c:2957
+>  [<ffffffff8120f509>] __do_softirq+0x299/0xe20 kernel/softirq.c:273
+>  [<ffffffff81210496>] invoke_softirq kernel/softirq.c:350 [inline]
+>  [<ffffffff81210496>] irq_exit+0x216/0x2c0 kernel/softirq.c:391
+>  [<ffffffff82c2cd7b>] exiting_irq arch/x86/include/asm/apic.h:652 [inline]
+>  [<ffffffff82c2cd7b>] smp_apic_timer_interrupt+0x8b/0xc0 arch/x86/kernel/apic/apic.c:926
+>  [<ffffffff82c2bc25>] apic_timer_interrupt+0xa5/0xb0 arch/x86/entry/entry_64.S:746
+>  <EOI>  [<ffffffff814cbf40>] ? audit_kill_trees+0x180/0x180
+>  [<ffffffff8187d2f7>] fd_install+0x57/0x80 fs/file.c:626
+>  [<ffffffff8180989e>] do_sys_open+0x45e/0x550 fs/open.c:1043
+>  [<ffffffff818099c2>] SYSC_open fs/open.c:1055 [inline]
+>  [<ffffffff818099c2>] SyS_open+0x32/0x40 fs/open.c:1050
+>  [<ffffffff82c299e1>] entry_SYSCALL_64_fastpath+0x1e/0x9a
+> 
+> In softirq context, we call rcu callback function delete_partition_rcu_cb(),
+> which may allocate memory by kzalloc with GFP_KERNEL flag. If the
+> allocation cannot be satisfied, it may sleep. However, That is not allowed
+> in softirq contex.
+> 
+> Although we found this problem on linux 4.4, the latest kernel version
+> seems to have this problem as well. And it is very similar to the
+> previous one:
+> 	https://lkml.org/lkml/2018/7/9/391
+> 
+> Fix it by using RCU workqueue, which allows sleep.
 
-Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
----
+Applied, thanks.
 
-Changes since v2:
-* use msecs_to_jiffies and jiffies_to_msecs
-
-Changes since v1:
-* make sure timeout > 0
-
- block/blk-sysfs.c | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 80eef48fddc8..9f0cb370b39b 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -417,6 +417,26 @@ static ssize_t queue_poll_store(struct request_queue *q, const char *page,
- 	return ret;
- }
- 
-+static ssize_t queue_io_timeout_show(struct request_queue *q, char *page)
-+{
-+	return sprintf(page, "%u\n", jiffies_to_msecs(q->rq_timeout));
-+}
-+
-+static ssize_t queue_io_timeout_store(struct request_queue *q, const char *page,
-+				  size_t count)
-+{
-+	unsigned int val;
-+	int err;
-+
-+	err = kstrtou32(page, 10, &val);
-+	if (err || val == 0)
-+		return -EINVAL;
-+
-+	blk_queue_rq_timeout(q, msecs_to_jiffies(val));
-+
-+	return count;
-+}
-+
- static ssize_t queue_wb_lat_show(struct request_queue *q, char *page)
- {
- 	if (!wbt_rq_qos(q))
-@@ -685,6 +705,12 @@ static struct queue_sysfs_entry queue_dax_entry = {
- 	.show = queue_dax_show,
- };
- 
-+static struct queue_sysfs_entry queue_io_timeout_entry = {
-+	.attr = {.name = "io_timeout", .mode = 0644 },
-+	.show = queue_io_timeout_show,
-+	.store = queue_io_timeout_store,
-+};
-+
- static struct queue_sysfs_entry queue_wb_lat_entry = {
- 	.attr = {.name = "wbt_lat_usec", .mode = 0644 },
- 	.show = queue_wb_lat_show,
-@@ -734,6 +760,7 @@ static struct attribute *default_attrs[] = {
- 	&queue_dax_entry.attr,
- 	&queue_wb_lat_entry.attr,
- 	&queue_poll_delay_entry.attr,
-+	&queue_io_timeout_entry.attr,
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- 	&throtl_sample_time_entry.attr,
- #endif
 -- 
-2.14.1
+Jens Axboe
 
