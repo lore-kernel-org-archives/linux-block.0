@@ -2,174 +2,169 @@ Return-Path: <SRS0=FxMo=OH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C9D6C43441
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 09:16:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48E0CC43441
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 09:33:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F00D820989
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 09:16:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E0C1208E7
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 09:33:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=cnexlabs.onmicrosoft.com header.i=@cnexlabs.onmicrosoft.com header.b="lo07Gml+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F00D820989
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cnexlabs.com
+	dkim=pass (2048-bit key) header.d=scylladb-com.20150623.gappssmtp.com header.i=@scylladb-com.20150623.gappssmtp.com header.b="b2J0hhr7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E0C1208E7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=scylladb.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727382AbeK1UR0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Nov 2018 15:17:26 -0500
-Received: from mail-eopbgr750074.outbound.protection.outlook.com ([40.107.75.74]:2647
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727341AbeK1UR0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Nov 2018 15:17:26 -0500
+        id S1727662AbeK1UeK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Nov 2018 15:34:10 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:36149 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727676AbeK1UeJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Nov 2018 15:34:09 -0500
+Received: by mail-wm1-f65.google.com with SMTP id a18so1162259wmj.1
+        for <linux-block@vger.kernel.org>; Wed, 28 Nov 2018 01:33:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=cnexlabs.onmicrosoft.com; s=selector1-cnexlabs-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eCxm36Ca7sjx/uuLLqcVneP59ivZX1ieJx1Omhis6+s=;
- b=lo07Gml+inHnQWTqZnIlncu80kAFWBZXQXf3oBvHyCHxqzhwOazt6ZCLrOvn/qbOjwaLIdXZtzw4m8jmTUnNzCd+IwaUYoqc7IIOnNF9wfQWW/P7RNeGe9r76UQOrMqBVM6L/ipiEWmGykfmN8Q/DsbytndChSkaOjUZoV7A32A=
-Received: from DM6PR06MB5178.namprd06.prod.outlook.com (20.178.25.19) by
- DM6PR06MB4617.namprd06.prod.outlook.com (20.176.110.94) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1361.14; Wed, 28 Nov 2018 09:16:13 +0000
-Received: from DM6PR06MB5178.namprd06.prod.outlook.com
- ([fe80::c450:96ae:b322:78c7]) by DM6PR06MB5178.namprd06.prod.outlook.com
- ([fe80::c450:96ae:b322:78c7%4]) with mapi id 15.20.1361.019; Wed, 28 Nov 2018
- 09:16:13 +0000
-From:   Javier Gonzalez <javier@cnexlabs.com>
-To:     Hua Su <suhua.tanke@gmail.com>
-CC:     =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>,
-        Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] lightnvm: pblk: add lock protection to list operations
-Thread-Topic: [PATCH] lightnvm: pblk: add lock protection to list operations
-Thread-Index: AQHUhvq1/HfKQQNiM0itSqrt33gBL6Vk6A0A
-Date:   Wed, 28 Nov 2018 09:16:13 +0000
-Message-ID: <930717BD-D32A-4BE2-AEE6-579594E70842@cnexlabs.com>
-References: <20181128091352.5088-1-suhua.tanke@gmail.com>
-In-Reply-To: <20181128091352.5088-1-suhua.tanke@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-x-originating-ip: [193.106.164.211]
-x-ms-publictraffictype: Email
-x-microsoft-exchange-diagnostics: 1;DM6PR06MB4617;6:sd+VzGnv4u9+gz80jnUwijZ340oRGemMtEvhXwOgechtOC6FfeiTSMpqUw11bxgfZcvVN9VmC21irMksjr8bzwA1ylpmdyDiq7nvLhj738hRWAOU14SLuAxePQc9IL7ksMO+6sj/o9IA1pCGHA65ph+w39KoAMMTrtf7zHmjEkHEPyhUhwBswUTq5Dl7Rs9MKE3Np+PmdqREp62ADUT0KRCJUNCHTGE1t1HSPGqEErrO2mL59tfGVAdraECPMEm+McN7ojeQFBnjgLBYmwr2FYuFLzfossG5BaSAkP7kfzEXQJXhEyRYjK3kKgcZDkEXnvZXE6wG1sgd659LOhPlIkylqgg0J038ejzYra/hLp7I/4uX9LG5ERHd6Mm9cacmsIWto9abddHIWMCkgw8Q6FxB94qFhx2UkVq4Cy7bylTP7FkoUxUGcqxtJWB3wRrGh3ru439A4d91drpKpeyOZQ==;5:WxsDuxEHN1bMf5SIOv3Kt74kuI/Snm1Kd5vTZt3drp1INa0u+o+ETX6+7WY62zsm6H7oLZnusMRaV5dD8Fs1/nB57v2d+IaeX0CHK3fOAKmN5l+62kU9mE3yRCR3hyphjwgKqL9kRCuuVLHOSe5JabsUqxzXu/2Ih/UIAPrCDCY=;7:XdlpIi1wh7IHtQYPnUPU4WY3ZzSfaBDZ8yNURJTiwi6qpx/n4NRCti1G9uVKZDvpf9kZbnWg42kfUj9iOT3ij6fZpaYhPqTWiXWps/wXRf+JFM3hLEQzX/58XI928XsUKgsg3c7d3JSxDANKxjR1UA==
-x-ms-exchange-antispam-srfa-diagnostics: SOS;
-x-ms-office365-filtering-correlation-id: 3dd5f9fe-2d33-4ddf-77eb-08d6551224f3
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390098)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600074)(711020)(2017052603328)(7153060)(49563074)(7193020);SRVR:DM6PR06MB4617;
-x-ms-traffictypediagnostic: DM6PR06MB4617:
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=javier@cnexlabs.com; 
-x-microsoft-antispam-prvs: <DM6PR06MB46176E806ED4CD201CB5440FBAD10@DM6PR06MB4617.namprd06.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-exchange-antispam-report-cfa-test: BCL:0;PCL:0;RULEID:(8211001083)(102415395)(6040522)(2401047)(8121501046)(5005006)(3002001)(93006095)(93001095)(10201501046)(3231443)(999002)(944501436)(4983020)(52105112)(148016)(149066)(150057)(6041310)(20161123560045)(20161123562045)(20161123564045)(20161123558120)(201703131423095)(201702281528075)(20161123555045)(201703061421075)(201703061406153)(201708071742011)(7699051)(76991095);SRVR:DM6PR06MB4617;BCL:0;PCL:0;RULEID:;SRVR:DM6PR06MB4617;
-x-forefront-prvs: 0870212862
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(39840400004)(376002)(136003)(396003)(346002)(189003)(199004)(8936002)(11346002)(476003)(446003)(6916009)(5660300001)(6246003)(6506007)(316002)(2616005)(186003)(54906003)(86362001)(102836004)(26005)(81166006)(229853002)(8676002)(6116002)(3846002)(39060400002)(6436002)(66066001)(81156014)(486006)(305945005)(4326008)(2906002)(14454004)(6512007)(53936002)(6486002)(71190400001)(71200400001)(36756003)(68736007)(83716004)(99936001)(97736004)(82746002)(99286004)(66574009)(7736002)(105586002)(106356001)(25786009)(76176011)(478600001)(33656002)(14444005)(256004);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR06MB4617;H:DM6PR06MB5178.namprd06.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: cnexlabs.com does not designate
- permitted sender hosts)
-x-microsoft-antispam-message-info: 3gUTjm4lIwWLnx0w7y6qjj805hNSv8vmAjibkvfUwr05sqfystPNoholaEM39MgXrJbRkulSXJmeWKd4k7ilgtmBZjlT2Jg6ei6o0vwpauwbrl9H2SjNtWf65j2D/7qPhUg5AEDoXuNnyJNM5VQ08FVPMttKnuCHHYB2dOBN1tJcAKTGUiXb21W3KaI64CARvVCFl73K+1kMlkCZoExLrt0mBzHCQer1nNS9Glmpt7feP5KGaaW+xCbTJpqKU8yo5C3XlAuUtBXXjZ5NuexvtCrIYXEZvu5KQrJZ0Vcx6xDnRNKrleo2ZWcV2TZGbqc5Ee0Q0PPBCa9V2LlyHND1hk/LXgsZqeklR16DdxIrKEc=
-spamdiagnosticoutput: 1:99
-spamdiagnosticmetadata: NSPM
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_48022DDD-1627-4BA2-B8C8-416BFE625003";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha512
-MIME-Version: 1.0
-X-OriginatorOrg: cnexlabs.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3dd5f9fe-2d33-4ddf-77eb-08d6551224f3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Nov 2018 09:16:13.5810
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: e40dfc2e-c6c1-463a-a598-38602b2c3cff
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR06MB4617
+        d=scylladb-com.20150623.gappssmtp.com; s=20150623;
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=GDfUH+jAbWymQlV+srSqrYDaxKXexQ2PPMThtQxZGog=;
+        b=b2J0hhr7yz1K1DPFJ59olW4x9IekN1WJsKzNFKzRGgl27lC/QRIZDTuYCY6fipO6BO
+         5tqVcRH4vjq8XtpkWwGUHKh0HUmXOmMEiWfpN+G62R3oE8HV8Ae7fPUUBgSMg91Clrmw
+         FPL3ZSyaEMTLDXgghdwKxdFgT77fbqYEDp6vfTYwazZhg5KPn9Dvytcyn4NXwgh69UO+
+         iOh6r+i5SCK03w54lAKUQNaDyNWKkC5fnGriz1Kw9onOHEEMWbEDC/jDjnJXZpKFBYws
+         mh23bffyh4uSke9P5jyAccZaD7U7qdgmrqUugzcXcH6aBmnl2sjt3mrXNNHZJeqjvQz+
+         yZPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=GDfUH+jAbWymQlV+srSqrYDaxKXexQ2PPMThtQxZGog=;
+        b=D0G0bROdftgdBGUsk+DLOk8WDWSquCpyZfCz3WURSJhG7ex3LbciRjvzi1yxSz2uns
+         Otq8YEhRKGJ95z8d6SrWPUtEO3srCVO6h2oJbvSUWnSus/Qy3XvF0L0wLCZZn4hrdDEQ
+         yv/8ypFFgNWyDdJdzr/FTql3mxnCyNTw4QfaGC2/H37+oeM18kULQxRfEzpTAujd01wp
+         0T8aB07rAp30g8wzKQZTBj2UOGY/6RlEVqSlxEQiDEKPrpbYZsZRfbIvENhDvLDLmlv7
+         uQ2/NVFeN9j+ZOtr8wYzrYGQcwwwPRCQ0Jm7s6lT1UtB/uXxCviSJBrgY99FNox3zjBz
+         ja0g==
+X-Gm-Message-State: AA+aEWZPnXmCa/spvE4IoPczMOh6G6SZFLSO6/5E1i6snduQv9bbN/eL
+        2GSVZ5PcymJY8YCHGmMvc6n3Xw==
+X-Google-Smtp-Source: AFSGD/XTHGrYSwzhkn7OO+8iOousuTvHD9qyN6wo+YCOZMm0TF5GApDR7DLM+hBDdtO2I7Ox/arHJA==
+X-Received: by 2002:a1c:4046:: with SMTP id n67mr1903029wma.123.1543397587766;
+        Wed, 28 Nov 2018 01:33:07 -0800 (PST)
+Received: from bhalevy-lt (system.cloudius-systems.com. [199.203.229.89])
+        by smtp.gmail.com with ESMTPSA id y145sm1285195wmd.30.2018.11.28.01.33.06
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 28 Nov 2018 01:33:06 -0800 (PST)
+Message-ID: <1b282e42a1573bbcba31bd628860b31ce9b60e5c.camel@scylladb.com>
+Subject: Re: [PATCH 17/20] aio: support for IO polling
+From:   Benny Halevy <bhalevy@scylladb.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org
+Date:   Wed, 28 Nov 2018 11:33:04 +0200
+In-Reply-To: <a58a7fd3-7994-0e30-40f7-f990a162205f@kernel.dk>
+References: <20181126164544.5699-1-axboe@kernel.dk>
+         <20181126164544.5699-18-axboe@kernel.dk>
+         <69acea804eaf71f2d05b6ab649ecbf9bfd026447.camel@scylladb.com>
+         <a58a7fd3-7994-0e30-40f7-f990a162205f@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-2.fc28) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---Apple-Mail=_48022DDD-1627-4BA2-B8C8-416BFE625003
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+On Tue, 2018-11-27 at 08:24 -0700, Jens Axboe wrote:
+> On 11/27/18 2:53 AM, Benny Halevy wrote:
+> > > @@ -818,11 +853,15 @@ static int kill_ioctx(struct mm_struct *mm, struct kioctx *ctx,
+> > >  {
+> > >  	struct kioctx_table *table;
+> > >  
+> > > +	mutex_lock(&ctx->getevents_lock);
+> > >  	spin_lock(&mm->ioctx_lock);
+> > >  	if (atomic_xchg(&ctx->dead, 1)) {
+> > >  		spin_unlock(&mm->ioctx_lock);
+> > > +		mutex_unlock(&ctx->getevents_lock);
+> > >  		return -EINVAL;
+> > >  	}
+> > > +	aio_iopoll_reap_events(ctx);
+> > > +	mutex_unlock(&ctx->getevents_lock);
+> > 
+> > Is it worth handling the mutex lock and calling aio_iopoll_reap_events
+> > only if (ctx->flags & IOCTX_FLAG_IOPOLL)?  If so, testing it can be
+> > removed from aio_iopoll_reap_events() (and maybe it could even
+> > be open coded
+> > here since this is its only call site apparently)
+> 
+> I don't think it really matters, this only happens when you tear down an
+> io_context. FWIW, I think it's cleaner to retain the test in the
+> function, not outside it.
+> 
+> > > @@ -1072,6 +1112,15 @@ static inline void iocb_put(struct aio_kiocb *iocb)
+> > >  	}
+> > >  }
+> > >  
+> > > +static void iocb_put_many(struct kioctx *ctx, void **iocbs, int *nr)
+> > > +{
+> > > +	if (nr) {
+> > 
+> > How can nr by NULL?
+> > And what's the point of supporting this case?
+> > Did you mean: if (*nr)?
+> > (In this case, if safe to call the functions below with *nr==0,
+> > I'm not sure it's worth optimizing... especially since this is a static
+> > function and its callers make sure to call it only when *nr > 0)
+> 
+> Indeed, that should be if (*nr), thanks! The slub implementation of the
+> bulk free complains if you pass in nr == 0. Outside of that, a single
+> check should be better than checking in multiple spots.
+> 
 
-> On 28 Nov 2018, at 10.13, Hua Su <suhua.tanke@gmail.com> wrote:
->=20
-> Protect the list_add on the pblk_line_init_bb() error
-> path in case this code is used for some other purpose
-> in the future.
->=20
-> Signed-off-by: Hua Su <suhua.tanke@gmail.com>
-> ---
-> drivers/lightnvm/pblk-core.c | 13 ++++++++++---
-> 1 file changed, 10 insertions(+), 3 deletions(-)
->=20
-> diff --git a/drivers/lightnvm/pblk-core.c =
-b/drivers/lightnvm/pblk-core.c
-> index 6944aac43b01..247112e1db94 100644
-> --- a/drivers/lightnvm/pblk-core.c
-> +++ b/drivers/lightnvm/pblk-core.c
-> @@ -1295,15 +1295,22 @@ int pblk_line_recov_alloc(struct pblk *pblk, =
-struct pblk_line *line)
->=20
-> 	ret =3D pblk_line_alloc_bitmaps(pblk, line);
-> 	if (ret)
-> -		return ret;
-> +		goto fail;
->=20
-> 	if (!pblk_line_init_bb(pblk, line, 0)) {
-> -		list_add(&line->list, &l_mg->free_list);
-> -		return -EINTR;
-> +		ret =3D -EINTR;
-> +		goto fail;
-> 	}
->=20
-> 	pblk_rl_free_lines_dec(&pblk->rl, line, true);
-> 	return 0;
-> +
-> +fail:
-> +	spin_lock(&l_mg->free_lock);
-> +	list_add(&line->list, &l_mg->free_list);
-> +	spin_unlock(&l_mg->free_lock);
-> +
-> +	return ret;
-> }
->=20
-> void pblk_line_recov_close(struct pblk *pblk, struct pblk_line *line)
-> --
-> 2.19.1
+Cool. The compiler might also optimize it away when inlining this function
+if the caller tests *nr for being non-zero too.
 
-Looks good to me.
+> > > @@ -1261,6 +1310,166 @@ static bool aio_read_events(struct kioctx *ctx, long min_nr, long nr,
+> > >  	return ret < 0 || *i >= min_nr;
+> > >  }
+> > >  
+> > > +#define AIO_IOPOLL_BATCH	8
+> > > +
+> > > +/*
+> > > + * Process completed iocb iopoll entries, copying the result to userspace.
+> > > + */
+> > > +static long aio_iopoll_reap(struct kioctx *ctx, struct io_event __user *evs,
+> > > +			    unsigned int *nr_events, long max)
+> > > +{
+> > > +	void *iocbs[AIO_IOPOLL_BATCH];
+> > > +	struct aio_kiocb *iocb, *n;
+> > > +	int to_free = 0, ret = 0;
+> > > +
+> > > +	list_for_each_entry_safe(iocb, n, &ctx->poll_completing, ki_list) {
+> > > +		if (*nr_events == max)
+> > 
+> > *nr_events >= max would be safer.
+> 
+> I don't see how we can get there with it being larger than already, that
+> would be a big bug if we fill more events than userspace asked for.
+> 
 
-Reviewed-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
+Currently we indeed can't, but if the code changes in the future
+and we do, this will reduce the damage - hence being safer (and it costs nothing
+in terms of performance).
 
+> > > @@ -1570,17 +1829,43 @@ static inline void aio_rw_done(struct kiocb *req, ssize_t ret)
+> > >  	default:
+> > >  		req->ki_complete(req, ret, 0);
+> > >  	}
+> > > +
+> > 
+> > nit: this hunk is probably unintentional
+> 
+> Looks like it, I'll kill it.
+> 
+> 
 
---Apple-Mail=_48022DDD-1627-4BA2-B8C8-416BFE625003
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlv+XNwACgkQIX4xUKFR
-nnTftA/+KnAY8ehl8/JvxaKmMVfNjuVSVjcwjV+aDnQ1WrFYBLSmif+sRx304dnL
-bAzaA2f0fLW4crIl2bSiWHMFcwjRS5ptRetN2nJfO9z96BENqTOTGR3zsbtWgRgZ
-DJqlPM7jxfwfAiEkSXAodfaXw8MJ5gJA3yb0CDAgoN6rkyoWWGVwjE0mTDyZGO3R
-wFEeLwYlOjotdLzwHwe9ogMHbOhwyar36qfIInv420sw+GfwekykskMECQ3T/ecA
-g8pviK79DYIoR+L5AdEOR68r1QPJ2pV2mBK50PlhSoi2BUWp354HJzkDPu3Mu6cZ
-JLCVIHvcU+e7Qh8n7vN2+PrwVczre3L+1zMlITCb/mTLE6rZPCq0uUsf2UDx0sqK
-JrTN0fyKtXrqnM7aFvtj+MrwP5gsjzb1V7pVIIorvdDKqWWjG2FpDUZu8rqim/JE
-qEQY1TCCMAGuQXZntdylTbMw6FibVGFH3XFvNAOod6HIbCpmpy7pArQAimHGYnu3
-NBCpRa1bf+drt03Ghk3Yk9qOUY8w2Ih64Pp2yZpPiDLjjo1wcfmfa32ygdBQgP1+
-2JZCvDBNTOq5eBkbUllWlR9Mm72lKZ6vN13L0oJUHcgjiYG+uqCNNWmCvqRTSdsv
-NYcP530SudZgrBKD5rc1SZfZ2sqjeGEBuXmIh5r9xsbS9B8bWSM=
-=yiVx
------END PGP SIGNATURE-----
-
---Apple-Mail=_48022DDD-1627-4BA2-B8C8-416BFE625003--
