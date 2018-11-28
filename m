@@ -6,60 +6,59 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 300D4C43441
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 01:59:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0468DC43441
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 02:00:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EDBEF20851
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 01:59:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDBEF20851
+	by mail.kernel.org (Postfix) with ESMTP id C18852081B
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 02:00:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C18852081B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726731AbeK1M7n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Nov 2018 07:59:43 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:40272 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726671AbeK1M7n (ORCPT
+        id S1726671AbeK1M7v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Nov 2018 07:59:51 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:42255 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726548AbeK1M7v (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Nov 2018 07:59:43 -0500
-Received: by mail-ot1-f66.google.com with SMTP id s5so22106849oth.7
-        for <linux-block@vger.kernel.org>; Tue, 27 Nov 2018 17:59:51 -0800 (PST)
+        Wed, 28 Nov 2018 07:59:51 -0500
+Received: by mail-ot1-f68.google.com with SMTP id v23so16695087otk.9
+        for <linux-block@vger.kernel.org>; Tue, 27 Nov 2018 17:59:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
         bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
-        b=ltUXX8PdK6KHB4L8vgCCAVw0Tmt5Q7KdbRqezmVfoIRgocABTAWNsc5H2lv/Yfo4pG
-         i+TxTPdKjrFLiAmlYuLXDA6CC8Y1we8XlTsTF8QmLwTkRbLt4e9xmFWylcoG4UziEeuE
-         A7ga689MuF7O4tic/EAVN1N6YWLf1dgGNdVqMzBSrYNUiOzzDWTF/Lvvns2EYvY95Wjo
-         iB5xkueC0lN+9CqEEoPxJAd9tULSmI/fmheH47/Gil4U5+bdEfdNgd6Ldyrf0moV+1G+
-         jbAR08Ga1FyhoBESq5BrQK+lRdmGoRO0lSEkWP9xBu6hpk7EEaDB7z+0WAABWgqMuZ9z
-         3V2g==
-X-Gm-Message-State: AA+aEWbZuAUW3T9G8mE34ddBa/uwChgoZ0VQxKQIeOMJ7kbjToOtQJZ0
-        NqleZBo+KYOO24C+t8n9CWc=
-X-Google-Smtp-Source: AFSGD/XlBsCp2VOUE2bLeEgBhjeUn35A4oBIKOG4mI4k+TiqR/S18QVq8wfHMW9o/9Vt4CH017bk/w==
-X-Received: by 2002:a9d:7d10:: with SMTP id v16mr18735177otn.114.1543370391298;
-        Tue, 27 Nov 2018 17:59:51 -0800 (PST)
+        b=j9fslvl3+H5T/UnPXDq/sPpKrWtKgVHFZY83OFQ5AQgqZxae3a9aNMcnewQ2Lps7FE
+         I84jls6dDPnbm/Cc8a4xQceoUKPd3Kgj15N4U8boRE3puS/EOKBYEyT4aTf6PvdIyU8g
+         v9dI9EuIGZRJaScsJD5tf8X2uNwNWYzeXeJ+/udBTJGJdxrE9DJwPjyNJueKNyd4BNp9
+         8hpk1s3EndA5I0hhqYStMn/rAarQc83MnhrGY5kAUxLpNqnjXwc7JyNcDzy7CH1kG3ei
+         2WNK2qPw0ldfB0Z5QmpUXNTAjkmBt2eb/Fs9nubOnNurh6vGhwNWuGoL0fGINenVdwia
+         Rm2g==
+X-Gm-Message-State: AA+aEWYQT7IyYtlylmA2WA51x7mnsf9SvBmHYS2NQApFH+9AVav/tku8
+        fffu5gsJQ1TjhSZfXQdoqPl9Rdl2
+X-Google-Smtp-Source: AFSGD/WH+U87ReMiVeJnDFX3de0jTMdPHHQCADmPywRWZU+b8/XprBlJHRsuIyA6uFbLY37M3spl9w==
+X-Received: by 2002:a9d:724d:: with SMTP id a13mr20802153otk.193.1543370399221;
+        Tue, 27 Nov 2018 17:59:59 -0800 (PST)
 Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
-        by smtp.gmail.com with ESMTPSA id s13sm2275368otc.40.2018.11.27.17.59.50
+        by smtp.gmail.com with ESMTPSA id t8sm5492957otp.69.2018.11.27.17.59.58
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 27 Nov 2018 17:59:50 -0800 (PST)
-Subject: Re: [PATCH 1/2] block: move holder tracking from struct block_device
- to hd_struct
+        Tue, 27 Nov 2018 17:59:58 -0800 (PST)
+Subject: Re: [PATCH 2/2] nvme: create slaves/holder entries for multipath
+ devices
 To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Cc:     linux-block@vger.kernel.org,
-        Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
-        linux-nvme@lists.infradead.org
+Cc:     Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
 References: <20181116130805.16225-1-hch@lst.de>
- <20181116130805.16225-2-hch@lst.de>
+ <20181116130805.16225-3-hch@lst.de>
 From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <ff2b6b5d-0e99-1cfb-ec85-7039ec690e43@grimberg.me>
-Date:   Tue, 27 Nov 2018 17:59:49 -0800
+Message-ID: <2a2e2b22-5575-8bc4-7f8f-802baf41f059@grimberg.me>
+Date:   Tue, 27 Nov 2018 17:59:57 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20181116130805.16225-2-hch@lst.de>
+In-Reply-To: <20181116130805.16225-3-hch@lst.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
