@@ -2,102 +2,70 @@ Return-Path: <SRS0=FxMo=OH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D627C43441
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 01:49:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 300D4C43441
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 01:59:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2FCB2206B6
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 01:49:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FCB2206B6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id EDBEF20851
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 01:59:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDBEF20851
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727107AbeK1MtZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Nov 2018 07:49:25 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:12728 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726548AbeK1MtZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Nov 2018 07:49:25 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id EEC71300170C;
-        Wed, 28 Nov 2018 01:49:34 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-25.pek2.redhat.com [10.72.8.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 73B9C60BE0;
-        Wed, 28 Nov 2018 01:49:29 +0000 (UTC)
-Date:   Wed, 28 Nov 2018 09:49:24 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 7/8] blk-mq: use bd->last == true for list inserts
-Message-ID: <20181128014922.GE11128@ming.t460p>
-References: <20181126163556.5181-1-axboe@kernel.dk>
- <20181126163556.5181-8-axboe@kernel.dk>
+        id S1726731AbeK1M7n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Nov 2018 07:59:43 -0500
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:40272 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726671AbeK1M7n (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Nov 2018 07:59:43 -0500
+Received: by mail-ot1-f66.google.com with SMTP id s5so22106849oth.7
+        for <linux-block@vger.kernel.org>; Tue, 27 Nov 2018 17:59:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+        b=ltUXX8PdK6KHB4L8vgCCAVw0Tmt5Q7KdbRqezmVfoIRgocABTAWNsc5H2lv/Yfo4pG
+         i+TxTPdKjrFLiAmlYuLXDA6CC8Y1we8XlTsTF8QmLwTkRbLt4e9xmFWylcoG4UziEeuE
+         A7ga689MuF7O4tic/EAVN1N6YWLf1dgGNdVqMzBSrYNUiOzzDWTF/Lvvns2EYvY95Wjo
+         iB5xkueC0lN+9CqEEoPxJAd9tULSmI/fmheH47/Gil4U5+bdEfdNgd6Ldyrf0moV+1G+
+         jbAR08Ga1FyhoBESq5BrQK+lRdmGoRO0lSEkWP9xBu6hpk7EEaDB7z+0WAABWgqMuZ9z
+         3V2g==
+X-Gm-Message-State: AA+aEWbZuAUW3T9G8mE34ddBa/uwChgoZ0VQxKQIeOMJ7kbjToOtQJZ0
+        NqleZBo+KYOO24C+t8n9CWc=
+X-Google-Smtp-Source: AFSGD/XlBsCp2VOUE2bLeEgBhjeUn35A4oBIKOG4mI4k+TiqR/S18QVq8wfHMW9o/9Vt4CH017bk/w==
+X-Received: by 2002:a9d:7d10:: with SMTP id v16mr18735177otn.114.1543370391298;
+        Tue, 27 Nov 2018 17:59:51 -0800 (PST)
+Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
+        by smtp.gmail.com with ESMTPSA id s13sm2275368otc.40.2018.11.27.17.59.50
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 27 Nov 2018 17:59:50 -0800 (PST)
+Subject: Re: [PATCH 1/2] block: move holder tracking from struct block_device
+ to hd_struct
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
+Cc:     linux-block@vger.kernel.org,
+        Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
+        linux-nvme@lists.infradead.org
+References: <20181116130805.16225-1-hch@lst.de>
+ <20181116130805.16225-2-hch@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <ff2b6b5d-0e99-1cfb-ec85-7039ec690e43@grimberg.me>
+Date:   Tue, 27 Nov 2018 17:59:49 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181126163556.5181-8-axboe@kernel.dk>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Wed, 28 Nov 2018 01:49:35 +0000 (UTC)
+In-Reply-To: <20181116130805.16225-2-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 26, 2018 at 09:35:55AM -0700, Jens Axboe wrote:
-> If we are issuing a list of requests, we know if we're at the last one.
-> If we fail issuing, ensure that we call ->commits_rqs() to flush any
-> potential previous requests.
-> 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> ---
->  block/blk-core.c |  2 +-
->  block/blk-mq.c   | 32 ++++++++++++++++++++++++--------
->  block/blk-mq.h   |  2 +-
->  3 files changed, 26 insertions(+), 10 deletions(-)
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index c9758d185357..808a65d23f1a 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -1334,7 +1334,7 @@ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *
->  	 * bypass a potential scheduler on the bottom device for
->  	 * insert.
->  	 */
-> -	return blk_mq_request_issue_directly(rq);
-> +	return blk_mq_request_issue_directly(rq, true);
->  }
->  EXPORT_SYMBOL_GPL(blk_insert_cloned_request);
->  
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 6a249bf6ed00..0a12cec0b426 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1260,6 +1260,14 @@ bool blk_mq_dispatch_rq_list(struct request_queue *q, struct list_head *list,
->  	if (!list_empty(list)) {
->  		bool needs_restart;
->  
-> +		/*
-> +		 * If we didn't flush the entire list, we could have told
-> +		 * the driver there was more coming, but that turned out to
-> +		 * be a lie.
-> +		 */
-> +		if (q->mq_ops->commit_rqs)
-> +			q->mq_ops->commit_rqs(hctx);
-> +
-
-Looks you miss to do it for blk_mq_do_dispatch_sched() and
-blk_mq_do_dispatch_ctx(), in which only one request is added to
-the rq_list.
-
-Maybe we can call the .commit_rqs(hctx) just at the end of
-blk_mq_sched_dispatch_requests() for cover all non-direct-issue
-cases.
-
-Thanks,
-Ming
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
