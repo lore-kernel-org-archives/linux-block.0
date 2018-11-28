@@ -2,69 +2,101 @@ Return-Path: <SRS0=FxMo=OH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0468DC43441
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 02:00:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC051C43441
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 02:10:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C18852081B
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 02:00:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C18852081B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+	by mail.kernel.org (Postfix) with ESMTP id BE9B920851
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 02:10:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE9B920851
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726671AbeK1M7v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Nov 2018 07:59:51 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:42255 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726548AbeK1M7v (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Nov 2018 07:59:51 -0500
-Received: by mail-ot1-f68.google.com with SMTP id v23so16695087otk.9
-        for <linux-block@vger.kernel.org>; Tue, 27 Nov 2018 17:59:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
-        b=j9fslvl3+H5T/UnPXDq/sPpKrWtKgVHFZY83OFQ5AQgqZxae3a9aNMcnewQ2Lps7FE
-         I84jls6dDPnbm/Cc8a4xQceoUKPd3Kgj15N4U8boRE3puS/EOKBYEyT4aTf6PvdIyU8g
-         v9dI9EuIGZRJaScsJD5tf8X2uNwNWYzeXeJ+/udBTJGJdxrE9DJwPjyNJueKNyd4BNp9
-         8hpk1s3EndA5I0hhqYStMn/rAarQc83MnhrGY5kAUxLpNqnjXwc7JyNcDzy7CH1kG3ei
-         2WNK2qPw0ldfB0Z5QmpUXNTAjkmBt2eb/Fs9nubOnNurh6vGhwNWuGoL0fGINenVdwia
-         Rm2g==
-X-Gm-Message-State: AA+aEWYQT7IyYtlylmA2WA51x7mnsf9SvBmHYS2NQApFH+9AVav/tku8
-        fffu5gsJQ1TjhSZfXQdoqPl9Rdl2
-X-Google-Smtp-Source: AFSGD/WH+U87ReMiVeJnDFX3de0jTMdPHHQCADmPywRWZU+b8/XprBlJHRsuIyA6uFbLY37M3spl9w==
-X-Received: by 2002:a9d:724d:: with SMTP id a13mr20802153otk.193.1543370399221;
-        Tue, 27 Nov 2018 17:59:59 -0800 (PST)
-Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
-        by smtp.gmail.com with ESMTPSA id t8sm5492957otp.69.2018.11.27.17.59.58
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 27 Nov 2018 17:59:58 -0800 (PST)
-Subject: Re: [PATCH 2/2] nvme: create slaves/holder entries for multipath
- devices
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
-Cc:     Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-References: <20181116130805.16225-1-hch@lst.de>
- <20181116130805.16225-3-hch@lst.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <2a2e2b22-5575-8bc4-7f8f-802baf41f059@grimberg.me>
-Date:   Tue, 27 Nov 2018 17:59:57 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726731AbeK1NKf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Nov 2018 08:10:35 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43244 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726567AbeK1NKf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 28 Nov 2018 08:10:35 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A0B3780F99;
+        Wed, 28 Nov 2018 02:10:41 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6333960BF0;
+        Wed, 28 Nov 2018 02:10:35 +0000 (UTC)
+Date:   Wed, 28 Nov 2018 10:10:30 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 5/8] virtio_blk: implement mq_ops->commit_rqs() hook
+Message-ID: <20181128021029.GF11128@ming.t460p>
+References: <20181126163556.5181-1-axboe@kernel.dk>
+ <20181126163556.5181-6-axboe@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <20181116130805.16225-3-hch@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181126163556.5181-6-axboe@kernel.dk>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Wed, 28 Nov 2018 02:10:41 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
+On Mon, Nov 26, 2018 at 09:35:53AM -0700, Jens Axboe wrote:
+> We need this for blk-mq to kick things into gear, if we told it that
+> we had more IO coming, but then failed to deliver on that promise.
+> 
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  drivers/block/virtio_blk.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 6e869d05f91e..b49c57e77780 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -214,6 +214,20 @@ static void virtblk_done(struct virtqueue *vq)
+>  	spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
+>  }
+>  
+> +static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
+> +{
+> +	struct virtio_blk *vblk = hctx->queue->queuedata;
+> +	int qid = hctx->queue_num;
+> +	bool kick;
+> +
+> +	spin_lock_irq(&vblk->vqs[qid].lock);
+> +	kick = virtqueue_kick_prepare(vblk->vqs[qid].vq);
+> +	spin_unlock_irq(&vblk->vqs[qid].lock);
+> +
+> +	if (kick)
+> +		virtqueue_notify(vblk->vqs[qid].vq);
+> +}
+> +
+>  static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+>  			   const struct blk_mq_queue_data *bd)
+>  {
+> @@ -638,6 +652,7 @@ static void virtblk_initialize_rq(struct request *req)
+>  
+>  static const struct blk_mq_ops virtio_mq_ops = {
+>  	.queue_rq	= virtio_queue_rq,
+> +	.commit_rqs	= virtio_commit_rqs,
+>  	.complete	= virtblk_request_done,
+>  	.init_request	= virtblk_init_request,
+>  #ifdef CONFIG_VIRTIO_BLK_SCSI
+> -- 
+> 2.17.1
+> 
+
+If .commit_rqs() is implemented, virtqueue_notify() in virtio_queue_rq()
+should have been removed for saving the world switch per .queue_rq()
+
+thanks,
+Ming
