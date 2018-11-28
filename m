@@ -2,118 +2,109 @@ Return-Path: <SRS0=FxMo=OH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	URIBL_SBL,URIBL_SBL_A,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 615F6C43441
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 16:47:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CCF2C43441
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 16:54:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 29BBE2081B
-	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 16:47:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="S9OvwBNR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29BBE2081B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTP id 3D1422086B
+	for <linux-block@archiver.kernel.org>; Wed, 28 Nov 2018 16:54:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D1422086B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=didiglobal.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729107AbeK2Dtw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 28 Nov 2018 22:49:52 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:60716 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728798AbeK2Dtw (ORCPT
+        id S1728807AbeK2D4r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 28 Nov 2018 22:56:47 -0500
+Received: from mx2.didichuxing.com ([36.110.17.22]:12330 "HELO
+        bsf01.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S1728141AbeK2D4r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 28 Nov 2018 22:49:52 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wASGhulB028735;
-        Wed, 28 Nov 2018 16:47:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=uYoS2uHWsmwFcYNxZUpnWboocvYxHxu4Drtmg5taZeM=;
- b=S9OvwBNRUK+x0aXemBm8aUKJkUDDeUEY8g1w2/d0sEXy3FwuTcqwKbVsTsU06qO6DoAH
- hmf3lw5Y0YpLxt0YEkZPjBW2/kV0+yl8pnTSiWhqHrbGBEnxhV1X6ozPxYUkR2bPOqYQ
- j/Ws+n+siRr2h8bphD+Q+F3aizVPTFA9r7yBui+RzURlJ1GlkWQpcnM3nqXhz/KrnVKT
- 6UdntPLa+fSxcBuPIBJXiFG+UPMqoLBwFXVGT0y4LmTeZwK9/sCZPWeo5l40xBgdJj5m
- YvaqYSZ/hFcge4q/BCItfAiVpuonx/QMM9UsvZ2jaGniJ9a2sUJQFHD9/FpUUkR6HUBZ QA== 
-Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
-        by userp2120.oracle.com with ESMTP id 2nxy9rbcb7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Nov 2018 16:47:16 +0000
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id wASGlFFH020708
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Nov 2018 16:47:15 GMT
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id wASGlEbi003497;
-        Wed, 28 Nov 2018 16:47:14 GMT
-Received: from [192.168.1.226] (/70.176.225.12)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 28 Nov 2018 08:47:14 -0800
-Subject: Re: [PATCH v1 5/7] xfs: Add device retry
-To:     Bob Liu <bob.liu@oracle.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <david@fromorbit.com>
-Cc:     linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        martin.petersen@oracle.com, shirley.ma@oracle.com
-References: <1543376991-5764-1-git-send-email-allison.henderson@oracle.com>
- <1543376991-5764-6-git-send-email-allison.henderson@oracle.com>
- <20181128050850.GJ6311@dastard> <20181128073520.GA7084@infradead.org>
- <f30fd190-28e5-938a-1cb9-3690559a60f0@oracle.com>
-From:   Allison Henderson <allison.henderson@oracle.com>
-Message-ID: <b24bdf13-e5b3-3793-54fe-5eca5b10915a@oracle.com>
-Date:   Wed, 28 Nov 2018 09:47:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Wed, 28 Nov 2018 22:56:47 -0500
+X-ASG-Debug-ID: 1543424063-0e40881e33c74d0001-Cu09wu
+Received: from BJEXCAS007.didichuxing.com (bjexcas007.didichuxing.com [172.20.2.248]) by bsf01.didichuxing.com with ESMTP id QEZIZqDNQwH1fZ5Q; Thu, 29 Nov 2018 00:54:23 +0800 (CST)
+X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
+Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
+ (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1263.5; Thu, 29 Nov
+ 2018 00:54:23 +0800
+Date:   Thu, 29 Nov 2018 00:54:18 +0800
+From:   Weiping Zhang <zhangweiping@didiglobal.com>
+To:     <axboe@kernel.dk>
+CC:     <bvanassche@acm.org>, <linux-block@vger.kernel.org>
+Subject: [PATCH] block: add documentation for io_timeout
+Message-ID: <20181128165415.GA38237@192.168.3.9>
+X-ASG-Orig-Subj: [PATCH] block: add documentation for io_timeout
+Mail-Followup-To: axboe@kernel.dk, bvanassche@acm.org,
+        linux-block@vger.kernel.org
 MIME-Version: 1.0
-In-Reply-To: <f30fd190-28e5-938a-1cb9-3690559a60f0@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9091 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1811280146
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Originating-IP: [172.22.50.20]
+X-ClientProxiedBy: BJEXCAS002.didichuxing.com (172.20.1.42) To
+ BJSGEXMBX03.didichuxing.com (172.20.15.133)
+X-Barracuda-Connect: bjexcas007.didichuxing.com[172.20.2.248]
+X-Barracuda-Start-Time: 1543424063
+X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at didichuxing.com
+X-Barracuda-Scan-Msg-Size: 1758
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0054 1.0000 -1.9860
+X-Barracuda-Spam-Score: -1.99
+X-Barracuda-Spam-Status: No, SCORE=-1.99 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.62617
+        Rule breakdown below
+         pts rule name              description
+        ---- ---------------------- --------------------------------------------------
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+add documentation for /sys/block/<disk>/queue/io_timeout
 
+Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
+---
+ Documentation/ABI/testing/sysfs-block | 9 +++++++++
+ Documentation/block/queue-sysfs.txt   | 6 ++++++
+ 2 files changed, 15 insertions(+)
 
-On 11/28/18 5:41 AM, Bob Liu wrote:
-> On 11/28/18 3:35 PM, Christoph Hellwig wrote:
->> On Wed, Nov 28, 2018 at 04:08:50PM +1100, Dave Chinner wrote:
->>> So the first time through this loop the block layer devices what
->>> device to read from, then we iterate devices 1..n on error.
->>>
->>> Whihc means if device 0 is the only one with good information in it,
->>> we may not ever actually read from it.
->>>
->>> I'd suggest that a hint of "-1" (or equivalent max value) should be
->>> used for "device selects mirror leg" rather than 0, so we can
->>> actually read from the first device on command.
->>
->> Yes.  For one thing I think we really need to split this retry counter
->> of sorts from the write hints.  I.e. make both u8 types and keep them
->> separate.  Then start out with (u8)-1 as initialized by the block layer
->> for the first attempt.  The device then fills out which leg it used
->> (in the completion path, so that another underlying driver doesn't
->> override it!), and then the file system just preserves this value on
->> a resumit, leaving the driver to chose a new value when it gets a
->> non -1 value.
->>
-> 
-> Will update as suggested, thank you for all your feedback :)
-> 
-> -Bob
-> 
+diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
+index dea212db9df3..f37c0000ca16 100644
+--- a/Documentation/ABI/testing/sysfs-block
++++ b/Documentation/ABI/testing/sysfs-block
+@@ -271,3 +271,12 @@ Description:
+ 		size of 512B sectors of the zones of the device, with
+ 		the eventual exception of the last zone of the device
+ 		which may be smaller.
++
++What:		/sys/block/<disk>/queue/io_timeout
++Date:		November 2018
++Contact:	Weiping Zhang <zhangweiping@didiglobal.com>
++Description:
++		io_timeout is the timeout in millisecods of a request in
++		block layer. The block layer will start a timer when low
++		level device driver start the request, and cancle timer
++		when request completes.
+diff --git a/Documentation/block/queue-sysfs.txt b/Documentation/block/queue-sysfs.txt
+index 2c1e67058fd3..cbd44fe056fa 100644
+--- a/Documentation/block/queue-sysfs.txt
++++ b/Documentation/block/queue-sysfs.txt
+@@ -67,6 +67,12 @@ If set to a value larger than 0, the kernel will put the process issuing
+ IO to sleep for this amont of microseconds before entering classic
+ polling.
+ 
++io_timeout (RW)
++---------------
++This is the timeout in millisecods of a request in block layer.
++The block layer will start a timer when low level device driver start
++the request, and cancle timer when request completes.
++
+ iostats (RW)
+ -------------
+ This file is used to control (on/off) the iostats accounting of the
+-- 
+2.14.1
 
-Yes, thanks everyone for your feed back.  Maybe Bob and I can come up 
-with some test cases that recreate the problem scenarios described here 
-and see if we can work out a solution to the multi bio complexities. 
-Thanks!
-
-Allison
