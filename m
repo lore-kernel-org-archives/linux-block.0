@@ -2,92 +2,110 @@ Return-Path: <SRS0=Gm8i=OI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	URIBL_SBL,URIBL_SBL_A,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 291A1C43441
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 08:12:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73B55C43441
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 10:22:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB0EC20834
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 08:12:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB0EC20834
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 2A86C2081C
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 10:22:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A86C2081C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=didiglobal.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726956AbeK2TRI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Nov 2018 14:17:08 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:57326 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726651AbeK2TRH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Nov 2018 14:17:07 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E708630001E8;
-        Thu, 29 Nov 2018 08:12:35 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-31.pek2.redhat.com [10.72.8.31])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B052661520;
-        Thu, 29 Nov 2018 08:12:26 +0000 (UTC)
-Date:   Thu, 29 Nov 2018 16:12:21 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCHv4 0/3] scsi timeout handling updates
-Message-ID: <20181129081214.GD23249@ming.t460p>
-References: <20181126165430.4519-1-keith.busch@intel.com>
- <b9813c10-776f-46fc-15d4-bbd675edc402@kernel.dk>
- <20181128021959.GG11128@ming.t460p>
- <20181128070010.GA20369@lst.de>
- <20181128100659.GA16495@ming.t460p>
- <20181128100848.GA23567@lst.de>
- <20181129021521.GB23390@ming.t460p>
- <yq1woowzjwv.fsf@oracle.com>
+        id S1727480AbeK2V1q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Nov 2018 16:27:46 -0500
+Received: from mx2.didichuxing.com ([36.110.17.22]:23718 "HELO
+        bsf01.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S1726740AbeK2V1q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Nov 2018 16:27:46 -0500
+X-ASG-Debug-ID: 1543486967-0e408836ca1cf30001-Cu09wu
+Received: from BJEXMBX012.didichuxing.com (bjexmbx012.didichuxing.com [172.20.2.191]) by bsf01.didichuxing.com with ESMTP id 1q9NhABXiz8x7Dvf; Thu, 29 Nov 2018 18:22:47 +0800 (CST)
+X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
+Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
+ (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1263.5; Thu, 29 Nov
+ 2018 18:22:46 +0800
+Date:   Thu, 29 Nov 2018 18:22:41 +0800
+From:   Weiping Zhang <zhangweiping@didiglobal.com>
+To:     <axboe@kernel.dk>
+CC:     <bvanassche@acm.org>, <linux-block@vger.kernel.org>
+Subject: [PATCH v2] block: add documentation for io_timeout
+Message-ID: <20181129102237.GA29592@192.168.3.9>
+X-ASG-Orig-Subj: [PATCH v2] block: add documentation for io_timeout
+Mail-Followup-To: axboe@kernel.dk, bvanassche@acm.org,
+        linux-block@vger.kernel.org
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <yq1woowzjwv.fsf@oracle.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Thu, 29 Nov 2018 08:12:36 +0000 (UTC)
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Originating-IP: [172.22.50.20]
+X-ClientProxiedBy: BJEXCAS002.didichuxing.com (172.20.1.42) To
+ BJSGEXMBX03.didichuxing.com (172.20.15.133)
+X-Barracuda-Connect: bjexmbx012.didichuxing.com[172.20.2.191]
+X-Barracuda-Start-Time: 1543486967
+X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at didichuxing.com
+X-Barracuda-Scan-Msg-Size: 1760
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0001 1.0000 -2.0201
+X-Barracuda-Spam-Score: -1.52
+X-Barracuda-Spam-Status: No, SCORE=-1.52 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=BSF_RULE7568M
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.62675
+        Rule breakdown below
+         pts rule name              description
+        ---- ---------------------- --------------------------------------------------
+        0.50 BSF_RULE7568M          Custom Rule 7568M
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 28, 2018 at 09:39:44PM -0500, Martin K. Petersen wrote:
-> 
-> Ming,
-> 
-> > On Wed, Nov 28, 2018 at 11:08:48AM +0100, Christoph Hellwig wrote:
-> >> On Wed, Nov 28, 2018 at 06:07:01PM +0800, Ming Lei wrote:
-> >> > > Is this the nvme target on top of null_blk?
-> >> > 
-> >> > Yes.
-> >> 
-> >> And it goes away if you revert just the last patch?
-> >
-> > Today I run this test again and can't reproduce it any more.
-> >
-> > So maybe not a new issue, and it is just triggered in yesterday's
-> > for-4.21/block, :-)
-> 
-> Can you reproduce with yesterday's tree then?
-> 
-> I'm obviously a bit concerned about merging something without knowing
-> the cause of the problems you were seeing.
+add documentation for /sys/block/<disk>/queue/io_timeout
 
-Hi Martin,
+Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
+---
+ Documentation/ABI/testing/sysfs-block | 9 +++++++++
+ Documentation/block/queue-sysfs.txt   | 6 ++++++
+ 2 files changed, 15 insertions(+)
 
-The panic is triggered on my auto daily test on yesterday's
-for-4.21/block.
+diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
+index dea212db9df3..6befa2ce667d 100644
+--- a/Documentation/ABI/testing/sysfs-block
++++ b/Documentation/ABI/testing/sysfs-block
+@@ -271,3 +271,12 @@ Description:
+ 		size of 512B sectors of the zones of the device, with
+ 		the eventual exception of the last zone of the device
+ 		which may be smaller.
++
++What:		/sys/block/<disk>/queue/io_timeout
++Date:		November 2018
++Contact:	Weiping Zhang <zhangweiping@didiglobal.com>
++Description:
++		io_timeout is the timeout in milliseconds of a request in
++		block layer. The block layer will start a timer when low
++		level device driver start the request, and cancel timer
++		when request completes.
+diff --git a/Documentation/block/queue-sysfs.txt b/Documentation/block/queue-sysfs.txt
+index 2c1e67058fd3..c0f2a9c92cce 100644
+--- a/Documentation/block/queue-sysfs.txt
++++ b/Documentation/block/queue-sysfs.txt
+@@ -67,6 +67,12 @@ If set to a value larger than 0, the kernel will put the process issuing
+ IO to sleep for this amont of microseconds before entering classic
+ polling.
+ 
++io_timeout (RW)
++---------------
++This is the timeout in milliseconds of a request in block layer.
++The block layer will start a timer when low level device driver start
++the request, and cancel timer when request completes.
++
+ iostats (RW)
+ -------------
+ This file is used to control (on/off) the iostats accounting of the
+-- 
+2.14.1
 
-It isn't triggered in today's for-4.21/block. Also not triggered any more
-when I run same test again on yesterday's for-4.21/block(5f0ed774ed29).
-
-
-Thanks,
-Ming
