@@ -7,63 +7,65 @@ X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,
 	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78CCBC43441
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 10:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0956C43441
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 10:57:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 177D120863
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 10:55:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64CEE20863
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 10:57:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="rnFnjfw3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 177D120863
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mNLhuraA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64CEE20863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726879AbeK2WAf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Nov 2018 17:00:35 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:43006 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726780AbeK2WAf (ORCPT
+        id S1727114AbeK2WCN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Nov 2018 17:02:13 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:52416 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726780AbeK2WCM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Nov 2018 17:00:35 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wATArmct056573;
-        Thu, 29 Nov 2018 10:55:34 GMT
+        Thu, 29 Nov 2018 17:02:12 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wATAs33H060689;
+        Thu, 29 Nov 2018 10:57:11 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2018-07-02;
- bh=5ZWr2cjWOap3myAYbiHBsW3+3XxI4l9n/cE/MqwXlEc=;
- b=rnFnjfw3zTbGfbyYmB/4TGlbI2bmyLFuWvAFM+S4GTjc1maELWiwW+OEfqATwmT8RNLL
- 4VksCfIR4IaEXrWZOnfrcxAxjbBHIIulLM1BuXCDT/+86JBXYF1bgx8NKbPpQ/q6vY/k
- 8lm9iGeAb6lsySoCjWnDAk7FYW0vWWDDh/UDjGyg3F6mNhxBzxCCLnYsqA5IiRW+0jys
- 5j5xR9/obQcGfSFGpEaLQfZoAsIyUGAl9HdGcOXwgi2nYoxt/VPIdJLjM1MlokpOeNqQ
- Dj+RCVO5SzHuX8JoRqO57owu5opCRYqU6HcoMlwMnNPpOaYXfCqJzbdgO7QIXPeH6bWR sw== 
+ : subject : message-id : mime-version : content-type : in-reply-to;
+ s=corp-2018-07-02; bh=W72AQif6uBskFsVeUn3FYDTFEVI8VlHSXPQJp0+XXCY=;
+ b=mNLhuraAPnIAuI7ornjBADamnde3vCHUHHjPb/Pn8nxST4c7YjQ3sGWqJttnJnjNTMKr
+ DtzdKYJXJwWbu9rBdFGmqGGPPdP3dmMIx27OPEK80aeZJxcYblE3osfDYnzoU9LPdiYK
+ EV6fCATw4lkk6eFIF/sOwFm2s3ukceYvKPclZyvkOw9Cds1SbC7HOAzWKtAJFAroLCRQ
+ uhhHLxGihCr0TOWDai586/LAkXL9IXlO+rG4rPST3w+26E5OrB6LNXCIU0UZK00DQ7Hc
+ gHbudPRFjTEMHNnzzZPn8QJgm+edyNe34Br6WcK5pU0Cqj5cChNK3mUhOkO8mx55EBQ3 MA== 
 Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
-        by userp2120.oracle.com with ESMTP id 2nxy9rffg9-1
+        by aserp2120.oracle.com with ESMTP id 2nxxkqqg3y-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 29 Nov 2018 10:55:34 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id wATAtSf4009578
+        Thu, 29 Nov 2018 10:57:11 +0000
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id wATAv5o0013742
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 29 Nov 2018 10:55:28 GMT
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id wATAtS4E013869;
-        Thu, 29 Nov 2018 10:55:28 GMT
+        Thu, 29 Nov 2018 10:57:05 GMT
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id wATAv5i6024211;
+        Thu, 29 Nov 2018 10:57:05 GMT
 Received: from kili.mountain (/197.157.34.169)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 29 Nov 2018 02:55:27 -0800
-Date:   Thu, 29 Nov 2018 13:55:19 +0300
+        with ESMTP ; Thu, 29 Nov 2018 02:57:04 -0800
+Date:   Thu, 29 Nov 2018 13:56:54 +0300
 From:   Dan Carpenter <dan.carpenter@oracle.com>
 To:     Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>
 Cc:     linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH 1/2] ataflop: fix error handling in atari_floppy_init()
-Message-ID: <20181129105519.mklhnmx34yjucb22@kili.mountain>
+Subject: [PATCH 2/2] blk-mq: Add a NULL check in
+ blk_mq_free_map_and_requests()
+Message-ID: <20181129105654.5icpvxx7p2kq257c@kili.mountain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20181129105519.mklhnmx34yjucb22@kili.mountain>
 X-Mailer: git-send-email haha only kidding
 User-Agent: NeoMutt/20170113 (1.7.2)
 X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9091 signatures=668686
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=800
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.0.1-1810050000 definitions=main-1811290095
 Sender: linux-block-owner@vger.kernel.org
@@ -71,68 +73,33 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Smatch complains that there is an off by one if the allocation fails in:
+I recently found some code which called blk_mq_free_map_and_requests()
+with a NULL set->tags pointer.  I fixed the caller, but it seems like a
+good idea to add a NULL check here as well.  Now we can call:
 
-	DMABuffer = atari_stram_alloc(BUFFER_SIZE+512, "ataflop");
+	blk_mq_free_tag_set(set);
+	blk_mq_free_tag_set(set);
 
-In that situation, "i" would be point to one element beyond the end of
-the unit[] array.
-
-There is a second bug because the error handling calls
-blk_mq_free_tag_set(&unit[i].tag_set); regardless of whether
-"disk->queue" is NULL or non-NULL.  So if blk_mq_init_sq_queue() fails,
-then that means unit[i].tag_set->tags is NULL and it leads to an Oops.
-
-It's easiest to call put_disk() before the goto to clean up the partial
-iteration.  Then the earlier unit[] elements are fully allocated so we
-can remove the checks whether "disk->queue" is NULL and the code is
-simpler.
+twice in a row and it's harmless.
 
 Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 ---
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I hope the Atari floppy disk users are appropriately grateful for all
-the love and effort we put into their software...
-
- drivers/block/ataflop.c | 16 ++++++----------
- 1 file changed, 6 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
-index f88b4c26d422..313064b1005c 100644
---- a/drivers/block/ataflop.c
-+++ b/drivers/block/ataflop.c
-@@ -1982,6 +1982,7 @@ static int __init atari_floppy_init (void)
- 							   &ataflop_mq_ops, 2,
- 							   BLK_MQ_F_SHOULD_MERGE);
- 		if (IS_ERR(unit[i].disk->queue)) {
-+			put_disk(unit[i].disk);
- 			ret = PTR_ERR(unit[i].disk->queue);
- 			unit[i].disk->queue = NULL;
- 			goto err;
-@@ -2033,18 +2034,13 @@ static int __init atari_floppy_init (void)
- 	return 0;
- 
- err:
--	do {
-+	while (--i >= 0) {
- 		struct gendisk *disk = unit[i].disk;
- 
--		if (disk) {
--			if (disk->queue) {
--				blk_cleanup_queue(disk->queue);
--				disk->queue = NULL;
--			}
--			blk_mq_free_tag_set(&unit[i].tag_set);
--			put_disk(unit[i].disk);
--		}
--	} while (i--);
-+		blk_cleanup_queue(disk->queue);
-+		blk_mq_free_tag_set(&unit[i].tag_set);
-+		put_disk(unit[i].disk);
-+	}
- 
- 	unregister_blkdev(FLOPPY_MAJOR, "fd");
- 	return ret;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a82830f39933..5f4b93f424b4 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2341,7 +2341,7 @@ static bool __blk_mq_alloc_rq_map(struct blk_mq_tag_set *set, int hctx_idx)
+ static void blk_mq_free_map_and_requests(struct blk_mq_tag_set *set,
+ 					 unsigned int hctx_idx)
+ {
+-	if (set->tags[hctx_idx]) {
++	if (set->tags && set->tags[hctx_idx]) {
+ 		blk_mq_free_rqs(set, set->tags[hctx_idx], hctx_idx);
+ 		blk_mq_free_rq_map(set->tags[hctx_idx]);
+ 		set->tags[hctx_idx] = NULL;
 -- 
 2.11.0
 
