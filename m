@@ -3,152 +3,95 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22A1BC43441
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 18:17:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC6FEC43441
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 18:20:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DB1D2213A2
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 18:17:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB1D2213A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 8056121104
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 18:20:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8056121104
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727167AbeK3FXp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Nov 2018 00:23:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43626 "EHLO mx1.redhat.com"
+        id S1726619AbeK3F1A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Nov 2018 00:27:00 -0500
+Received: from foss.arm.com ([217.140.101.70]:42766 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726676AbeK3FXp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 00:23:45 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 50560307D85E;
-        Thu, 29 Nov 2018 18:17:29 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E76010841F8;
-        Thu, 29 Nov 2018 18:17:24 +0000 (UTC)
-Date:   Fri, 30 Nov 2018 02:17:20 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "chenxiang (M)" <chenxiang66@hisilicon.com>
-Cc:     "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        John Garry <john.garry@huawei.com>,
-        Linuxarm <linuxarm@huawei.com>
-Subject: Re: DIF/DIX issue related to config CONFIG_SCSI_MQ_DEFAULT
-Message-ID: <20181129181719.GA3581@ming.t460p>
-References: <5d9bf51d-1ef9-b948-2168-9e7526d77225@hisilicon.com>
- <20181127130811.GA2780@ming.t460p>
- <27fa5907-9e50-23ca-c6a7-18ad0151ee19@hisilicon.com>
+        id S1725928AbeK3F1A (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Nov 2018 00:27:00 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8307980D;
+        Thu, 29 Nov 2018 10:20:44 -0800 (PST)
+Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 95BEB3F575;
+        Thu, 29 Nov 2018 10:20:43 -0800 (PST)
+Date:   Thu, 29 Nov 2018 18:20:41 +0000
+From:   Dave Martin <Dave.Martin@arm.com>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-block@vger.kernel.org, liuyun01 <liuyun01@kylinos.cn>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v3 2/2] arm64: crypto: add NEON accelerated XOR
+ implementation
+Message-ID: <20181129182040.GR3505@e103592.cambridge.arm.com>
+References: <20181127100858.6995-1-liuyun01@kylinos.cn>
+ <20181127100858.6995-2-liuyun01@kylinos.cn>
+ <20181129170048.GQ3505@e103592.cambridge.arm.com>
+ <CAKv+Gu-rm6uygi7+_=ssJ7UK-RgYgGNVyiTQ4O9zkN3JoYEB7g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <27fa5907-9e50-23ca-c6a7-18ad0151ee19@hisilicon.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Thu, 29 Nov 2018 18:17:29 +0000 (UTC)
+In-Reply-To: <CAKv+Gu-rm6uygi7+_=ssJ7UK-RgYgGNVyiTQ4O9zkN3JoYEB7g@mail.gmail.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 28, 2018 at 11:37:23AM +0800, chenxiang (M) wrote:
-> Hi Lei Ming,
+On Thu, Nov 29, 2018 at 07:09:10PM +0100, Ard Biesheuvel wrote:
+> On Thu, 29 Nov 2018 at 18:00, Dave Martin <Dave.Martin@arm.com> wrote:
+> >
+> > On Tue, Nov 27, 2018 at 06:08:58PM +0800, Jackie Liu wrote:
+
+[...]
+
+> > > +static struct xor_block_template xor_block_arm64 = {
+> > > +     .name   = "arm64_neon",
+> > > +     .do_2   = xor_neon_2,
+> > > +     .do_3   = xor_neon_3,
+> > > +     .do_4   = xor_neon_4,
+> > > +     .do_5   = xor_neon_5
+> > > +};
+> > > +#undef XOR_TRY_TEMPLATES
+> > > +#define XOR_TRY_TEMPLATES           \
+> > > +     do {        \
+> > > +             xor_speed(&xor_block_8regs);    \
+> > > +             xor_speed(&xor_block_32regs);    \
+> > > +             if (cpu_has_neon()) { \
+> > > +                     xor_speed(&xor_block_arm64);\
+> > > +             } \
+> > > +     } while (0)
+> >
+> > Should there be a may_use_simd() check somewhere?
+> >
+> > If we invoke this in a softirq I don't see what prevents us from
+> > corrupting the task's NEON state.
+> >
+> > (The check might be in some surrounding glue code that I missed...)
+> >
 > 
-> 在 2018/11/27 21:08, Ming Lei 写道:
-> > On Tue, Nov 27, 2018 at 05:55:45PM +0800, chenxiang (M) wrote:
-> > > Hi all,
-> > > 
-> > > There is a issue which may be related to CONFIG_SCSI_MQ_DEFAULT: before we
-> > > developed DIF/DIX feature on kernel 4.18 (disable CONFIG_SCSI_MQ_DEFAULT
-> > > default), and
-> > > it works well.
-> > I guess you are testing hisi_sas_v3_hw, does 4.18 work with
-> > 'scsi_mod.use_blk_mq=Y'? If yes, you may run 'git bisect' to figure out
-> > which commit is the 1st bad one.
-> > 
-> > > But when we switch to kernel 4.19-rc1 and 4.20-rc1, Call
-> > > trace as follow occurs when running fio and if disable config
-> > > CONFIG_SCSI_MQ_DEFAULT,
-> > > then it works well. Also if switch ioengine=libaio to ioengine=psync, it
-> > > seems also work well. Do you have any idea or encounter similar issue?
-> > I tested scsi-debug via 'dix=1 dif=1', looks everything is fine, are you
-> > using direct io or not?
-> > 
-> > > job1: (g=0): rw=rw, bs=4K-4K/4K-4K, ioengine=libaio, iodepth=128
-> > > job1: (g=0): rw=rw, bs=4K-4K/4K-4K, ioengine=libaio, iodepth=128
-> > > job1: (g=0): rw=rw, bs=4K-4K/4K-4K, ioengine=libaio, iodepth=128
-> > > job1: (g=0): rw=rw, bs=4K-4K/4K-4K, ioengine=libaio, iodepth=128
-> > > job1: (g=0): rw=rw, bs=4K-4K/4K-4K, ioengine=libaio, iodepth=128
-> > > job1: (g=0): rw=rw, bs=4K-4K/4K-4K, ioengine=libaio, iodepth=128
-> > > job1: (g=0): rw=rw, bs=4K-4K/4K-4K, ioengine=libaio, iodepth=128
-> > > job1: (g=0): rw=rw, bs=4K-4K/4K-4K, ioengine=libaio, iodepth=128
-> > > job1: (g=0): rw=rw, bs=4K-4K/4K-4K, ioengine=libaio, iodepth=128
-> > > job1: (g=0): rw=rw, bs=4K-4K/4K-4K, ioengine=libaio, iodepth=128
-> > > job1: (g=0): rw=rw, bs=4K-4K/4K-4K, ioengine=libaio, iodepth=128
-> > > job1: (g=0): rw=rw, bs=4K-4K/4K-4K, ioengine=libaio, iodepth=128
-> > > fio 2.0.5
-> > > Starting 12 processes
-> > > [  629.210506] Unable to handle kernel paging request at virtual address
-> > > 0000ffff8027e048
-> > > [  629.210506] Unable to handle kernel paging request at virtual address
-> > > 0000ffff8027e048
-> > > [  629.226373] Mem abort info:
-> > > [  629.226373] Mem abort info:
-> > > [  629.231952]   ESR = 0x96000006
-> > > [  629.231952]   ESR = 0x96000006
-> > > [  629.238052]   Exception class = DABT (current EL), IL = 32 bits
-> > > [  629.238052]   Exception class = DABT (current EL), IL = 32 bits
-> > > [  629.249898]   SET = 0, FnV = 0
-> > > [  629.249898]   SET = 0, FnV = 0
-> > > [  629.255998]   EA = 0, S1PTW = 0
-> > > [  629.255998]   EA = 0, S1PTW = 0
-> > > [  629.262272] Data abort info:
-> > > [  629.262272] Data abort info:
-> > > [  629.268023]   ISV = 0, ISS = 0x00000006
-> > > [  629.268023]   ISV = 0, ISS = 0x00000006
-> > > [  629.275690]   CM = 0, WnR = 0
-> > > [  629.275690]   CM = 0, WnR = 0
-> > > [  629.281617] user pgtable: 4k pages, 48-bit VAs, pgdp = 0000000085c91728
-> > > [  629.281617] user pgtable: 4k pages, 48-bit VAs, pgdp = 0000000085c91728
-> > > [  629.294857] [0000ffff8027e048] pgd=00000027a8644003,
-> > > pud=00000027a85ea003, pmd=0000000000000000
-> > > [  629.294857] [0000ffff8027e048] pgd=00000027a8644003,
-> > > pud=00000027a85ea003, pmd=0000000000000000
-> > > [  629.312278] Internal error: Oops: 96000006 [#1] PREEMPT SMP
-> > > [  629.312278] Internal error: Oops: 96000006 [#1] PREEMPT SMP
-> > > [  629.323427] Modules linked in: hisi_sas_v3_hw [last unloaded:
-> > > hisi_sas_v3_hw]
-> > > [  629.323427] Modules linked in: hisi_sas_v3_hw [last unloaded:
-> > > hisi_sas_v3_hw]
-> > > [  629.337713] CPU: 13 PID: 4465 Comm: fio Not tainted
-> > > 4.20.0-rc1-15093-ge876dec #1067
-> > > [  629.337713] CPU: 13 PID: 4465 Comm: fio Not tainted
-> > > 4.20.0-rc1-15093-ge876dec #1067
-> > > [  629.353040] Hardware name: Huawei D06/D06, BIOS Hisilicon D06 UEFI RC0 -
-> > > B601 (V6.01) 11/08/2018
-> > > [  629.353040] Hardware name: Huawei D06/D06, BIOS Hisilicon D06 UEFI RC0 -
-> > > B601 (V6.01) 11/08/2018
-> > > [  629.370633] pstate: 80400009 (Nzcv daif +PAN -UAO)
-> > > [  629.370633] pstate: 80400009 (Nzcv daif +PAN -UAO)
-> > > [  629.380218] pc : deadline_remove_request+0x2c/0xd0
-> > > [  629.380218] pc : deadline_remove_request+0x2c/0xd0
-> > Could you use gdb to find where 'deadline_remove_request+0x2c' points
-> > to?
+> There is no check. This code should simply not be called from
+> non-process context, same as the RAID56 code.
 > 
-> From objdump, 'deadline_remove_request+0x2c' is on the function __list_del
-> -> INIT_LIST_HEAD.
+> This is not terribly robust, obviously, but appears to be common
+> practice in this realm of the kernel.
 
-You may enable 'Kernel hacking/Debug linked list manipulation' config
-option and see what the dumped log is.
+Fair enough -- I was just curious.
 
-Also it might be related with the following recent report too:
+If this goes wrong, we should get a clear splat in kernel_neon_begin()
+anyway.  I'd be more concerned if we could just end up scribbling over
+the NEON state silently.
 
-https://marc.info/?l=linux-scsi&m=154283686812846&w=2
-
-Thanks,
-Ming
+Cheers
+---Dave
