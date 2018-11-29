@@ -2,173 +2,101 @@ Return-Path: <SRS0=Gm8i=OI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E741C43441
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 17:00:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78FE5C43441
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 17:02:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 38CD52145D
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 17:00:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38CD52145D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTP id 409EA2146D
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 17:02:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="XeVgyEcS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 409EA2146D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729992AbeK3EGy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Nov 2018 23:06:54 -0500
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:39512 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729519AbeK3EGx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Nov 2018 23:06:53 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 90387A78;
-        Thu, 29 Nov 2018 09:00:51 -0800 (PST)
-Received: from e103592.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A3E803F59C;
-        Thu, 29 Nov 2018 09:00:50 -0800 (PST)
-Date:   Thu, 29 Nov 2018 17:00:48 +0000
-From:   Dave Martin <Dave.Martin@arm.com>
-To:     Jackie Liu <liuyun01@kylinos.cn>
-Cc:     ard.biesheuvel@linaro.org, linux-block@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v3 2/2] arm64: crypto: add NEON accelerated XOR
- implementation
-Message-ID: <20181129170048.GQ3505@e103592.cambridge.arm.com>
-References: <20181127100858.6995-1-liuyun01@kylinos.cn>
- <20181127100858.6995-2-liuyun01@kylinos.cn>
+        id S1730341AbeK3EIb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Nov 2018 23:08:31 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:40942 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729818AbeK3EIa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Nov 2018 23:08:30 -0500
+Received: by mail-io1-f66.google.com with SMTP id n9so2144707ioh.7
+        for <linux-block@vger.kernel.org>; Thu, 29 Nov 2018 09:02:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=WViLNR3GVSvzR0xL1UYGQkvTcnDaKw+4VZurOf7WlB4=;
+        b=XeVgyEcSUkyQsHsJk3I2eAihwxYqCrBp3XVIgvcaX/f9pC22uG+yFsO7TpiadFHZaI
+         Xs86nl4KidjHmKUrlgyidi+F3Y6r2GEM7beri/999MHb/uopfqZaZ++onMwRG5wEvnHE
+         x0Va37LwHuQeaUH5JYeAzQMXFQiEe9t8HcDSQnho1LR3uf4IJzKHlOAiNBVMZ/GwTLz8
+         3f35Oc5syQ7bLP3L5Ex10NVGiDhbf+uLKlb+BcFjtNzn3kNrem6popqvTTgVbd5xVdjK
+         MsA/K3x/0xnPivDA4aS859i74epLhrzSq8AHkATJaofLVAlU+k+0byxUAaY/CYQaiLqB
+         pCmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=WViLNR3GVSvzR0xL1UYGQkvTcnDaKw+4VZurOf7WlB4=;
+        b=UZdsy87+rZLXKRhnYKibRP+4m6yrEGR+HWf6WS3iohC9rPDyaM8++LJyMcFK7YSyVF
+         BKwADDtjckeb5OrY4cuwSxVxhlzP36v7SeUghVnq8ViBGti79XAx5aCauomBu0WvwXO9
+         PlHYK+wUR2EMYY6TaO1F15NRjeBrLRPnyX7I/wuiZa0Uc1b4R5hMqvaxFnxsYTdUtbeh
+         HVUQ8xDFfE0LCd8Mnr9TJ2JkRqtse6pnjjBdSPvmtw5wNR/dybibuz+ux/txUmMJrCx/
+         CMp5gx2bsRazxxRJlfO7HWIaWQcKOVKl90HhGXt4RZf+hMW8SOMRgEO2iXgEKclR0orv
+         7iEg==
+X-Gm-Message-State: AA+aEWYfbxozFr/d18b/nuT2IjaFDLgx09NTLbNWy5Ax+MNVMVC7i0gd
+        uCIUWJeD3jpRbUx/nvlQvzQNnw==
+X-Google-Smtp-Source: AFSGD/UmBmwBiSjDEl/Ljg3ortPuN+QESc4oqcYg05YRgdCFyYM2GPyDtEMESyFz3/oPyt9uZrX0FQ==
+X-Received: by 2002:a5d:97d9:: with SMTP id k25mr1860824ios.146.1543510947975;
+        Thu, 29 Nov 2018 09:02:27 -0800 (PST)
+Received: from [192.168.1.56] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id t7sm902282iom.27.2018.11.29.09.02.25
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 29 Nov 2018 09:02:26 -0800 (PST)
+Subject: Re: [PATCH 3/7] nvme: implement mq_ops->commit_rqs() hook
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+References: <20181128133538.20329-1-axboe@kernel.dk>
+ <20181128133538.20329-4-axboe@kernel.dk>
+ <20181129154713.GC7234@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <2188627d-6d45-fe8a-8d31-fa46fdb82618@kernel.dk>
+Date:   Thu, 29 Nov 2018 10:02:25 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181127100858.6995-2-liuyun01@kylinos.cn>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+In-Reply-To: <20181129154713.GC7234@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Nov 27, 2018 at 06:08:58PM +0800, Jackie Liu wrote:
-> This is a NEON acceleration method that can improve
-> performance by approximately 20%. I got the following
-> data from the centos 7.5 on Huawei's HISI1616 chip:
+On 11/29/18 8:47 AM, Christoph Hellwig wrote:
+>> +static inline int nvme_next_ring_index(struct nvme_queue *nvmeq, u16 index)
+>> +{
+>> +	if (++index == nvmeq->q_depth)
+>> +		return 0;
+>> +
+>> +	return index;
+>> +}
 > 
-> [ 93.837726] xor: measuring software checksum speed
-> [ 93.874039]   8regs  : 7123.200 MB/sec
-> [ 93.914038]   32regs : 7180.300 MB/sec
-> [ 93.954043]   arm64_neon: 9856.000 MB/sec
-> [ 93.954047] xor: using function: arm64_neon (9856.000 MB/sec)
-> 
-> I believe this code can bring some optimization for
-> all arm64 platform.
-> 
-> That is patch version 3. Thanks for Ard Biesheuvel's
-> suggestions.
-> 
-> Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
-> ---
->  arch/arm64/include/asm/Kbuild |   1 -
->  arch/arm64/include/asm/xor.h  |  73 +++++++++++++++++
->  arch/arm64/lib/Makefile       |   6 ++
->  arch/arm64/lib/xor-neon.c     | 184 ++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 263 insertions(+), 1 deletion(-)
->  create mode 100644 arch/arm64/include/asm/xor.h
->  create mode 100644 arch/arm64/lib/xor-neon.c
-> 
-> diff --git a/arch/arm64/include/asm/Kbuild b/arch/arm64/include/asm/Kbuild
-> index 6cd5d77..1877f29 100644
-> --- a/arch/arm64/include/asm/Kbuild
-> +++ b/arch/arm64/include/asm/Kbuild
-> @@ -27,4 +27,3 @@ generic-y += trace_clock.h
->  generic-y += unaligned.h
->  generic-y += user.h
->  generic-y += vga.h
-> -generic-y += xor.h
-> diff --git a/arch/arm64/include/asm/xor.h b/arch/arm64/include/asm/xor.h
-> new file mode 100644
-> index 0000000..856386a
-> --- /dev/null
-> +++ b/arch/arm64/include/asm/xor.h
-> @@ -0,0 +1,73 @@
-> +/*
-> + * arch/arm64/include/asm/xor.h
-> + *
-> + * Authors: Jackie Liu <liuyun01@kylinos.cn>
-> + * Copyright (C) 2018,Tianjin KYLIN Information Technology Co., Ltd.
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License version 2 as
-> + * published by the Free Software Foundation.
-> + */
-> +
-> +#include <linux/hardirq.h>
-> +#include <asm-generic/xor.h>
-> +#include <asm/hwcap.h>
-> +#include <asm/neon.h>
-> +
-> +#ifdef CONFIG_KERNEL_MODE_NEON
-> +
-> +extern struct xor_block_template const xor_block_inner_neon;
-> +
-> +static void
-> +xor_neon_2(unsigned long bytes, unsigned long *p1, unsigned long *p2)
-> +{
-> +	kernel_neon_begin();
-> +	xor_block_inner_neon.do_2(bytes, p1, p2);
-> +	kernel_neon_end();
-> +}
-> +
-> +static void
-> +xor_neon_3(unsigned long bytes, unsigned long *p1, unsigned long *p2,
-> +		unsigned long *p3)
-> +{
-> +	kernel_neon_begin();
-> +	xor_block_inner_neon.do_3(bytes, p1, p2, p3);
-> +	kernel_neon_end();
-> +}
-> +
-> +static void
-> +xor_neon_4(unsigned long bytes, unsigned long *p1, unsigned long *p2,
-> +		unsigned long *p3, unsigned long *p4)
-> +{
-> +	kernel_neon_begin();
-> +	xor_block_inner_neon.do_4(bytes, p1, p2, p3, p4);
-> +	kernel_neon_end();
-> +}
-> +
-> +static void
-> +xor_neon_5(unsigned long bytes, unsigned long *p1, unsigned long *p2,
-> +		unsigned long *p3, unsigned long *p4, unsigned long *p5)
-> +{
-> +	kernel_neon_begin();
-> +	xor_block_inner_neon.do_5(bytes, p1, p2, p3, p4, p5);
-> +	kernel_neon_end();
-> +}
-> +
-> +static struct xor_block_template xor_block_arm64 = {
-> +	.name   = "arm64_neon",
-> +	.do_2   = xor_neon_2,
-> +	.do_3   = xor_neon_3,
-> +	.do_4   = xor_neon_4,
-> +	.do_5	= xor_neon_5
-> +};
-> +#undef XOR_TRY_TEMPLATES
-> +#define XOR_TRY_TEMPLATES           \
-> +	do {        \
-> +		xor_speed(&xor_block_8regs);    \
-> +		xor_speed(&xor_block_32regs);    \
-> +		if (cpu_has_neon()) { \
-> +			xor_speed(&xor_block_arm64);\
-> +		} \
-> +	} while (0)
+> This is unused now.
 
-Should there be a may_use_simd() check somewhere?
+Huh, wonder how I missed that. GCC must not have complained.
 
-If we invoke this in a softirq I don't see what prevents us from
-corrupting the task's NEON state.
+> Also what about this little cleanup on top?
 
-(The check might be in some surrounding glue code that I missed...)
+That looks good, I like it. With that, can I add your reviewed-by? I'll
+run a sanity check on it first.
 
-[...]
+-- 
+Jens Axboe
 
-Cheers
----Dave
