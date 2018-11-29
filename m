@@ -2,71 +2,73 @@ Return-Path: <SRS0=Gm8i=OI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C1ECC04EB9
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 22:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A1AC04EB9
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 22:58:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 390F32146F
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 22:55:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C3A220989
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 22:58:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="et+KHCIp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 390F32146F
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="g5KpVPL3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C3A220989
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726393AbeK3KCt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Nov 2018 05:02:49 -0500
-Received: from mail-it1-f194.google.com ([209.85.166.194]:55987 "EHLO
+        id S1726425AbeK3KFg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Nov 2018 05:05:36 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:38680 "EHLO
         mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726389AbeK3KCs (ORCPT
+        with ESMTP id S1726403AbeK3KFf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 05:02:48 -0500
-Received: by mail-it1-f194.google.com with SMTP id o19so6358932itg.5
-        for <linux-block@vger.kernel.org>; Thu, 29 Nov 2018 14:55:42 -0800 (PST)
+        Fri, 30 Nov 2018 05:05:35 -0500
+Received: by mail-it1-f194.google.com with SMTP id h65so6440066ith.3
+        for <linux-block@vger.kernel.org>; Thu, 29 Nov 2018 14:58:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=gxo4TyNc7iO+Dp6T0YhlBuNWFZ65rKoZke/uE/QmWz8=;
-        b=et+KHCIpO3SJ8lS3wL6UFNZNS9bjepBKdfyS08cyZHnppbFgxJUPPLGij6bZiKsLoA
-         BH2aNw98ittsmc4Nch+dtS9cjnvr7YoGSJ4LG0U47fZRZWhD3KpwYqjwkdZ2Hxa9gqgy
-         JPT3CRxQHG/QGQSBHk/AIDDenJWXAxGQjeLesXLUNZ6sQXCJ2+ZjAsBoC3ynHMUFjatZ
-         PxjikrG+X4S7w/w2TV8C1BGCxo2L8kim132amZpLoRgOjA7E7dNtM0dOHJpKo/YL8PCc
-         LAqFetiFMZGtWmS4lThwp83c4z+qUtX4NMDHBBF6NTwkYNcP1CxC70+aPscTewP62OR4
-         tfIg==
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Bo1Spzz7ZnFVfgQSdpOjRkLR9kvErLiby+2BXZ7ab5w=;
+        b=g5KpVPL3PVyx0rANZky/Iz+lBL7VArVr8ueey6+cT2/yg1HbLAKBb+N2uKLY9QEEvh
+         3iOX0YacKhY+5kyNFZsJ9WXHWamreSwSM5R9SoysjJwTeKZ1sTj97EiOMZQrraWWFypx
+         v7xpZY0fxyle20T0Zlgwy9gARVat78evWS7teLK/IohYrtWi1RKX3Q1aC/yoBWZ5BgGd
+         8Ns6xrSdLtpM4Nw2bm38CKE25TkynR3bX4jJCAH8w22IYGBSHZR265dIc+HccJ4NKOHW
+         wR2R2Csj0UHKoo2RlWlhiPYzU+Ejvp93DQC4i/QEd6+Q/ZqwDKzoXq/a5u/7tvKfY904
+         PaWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=gxo4TyNc7iO+Dp6T0YhlBuNWFZ65rKoZke/uE/QmWz8=;
-        b=kTLcH0HUBbYlBCceVnnxPBZnJeH7aXAfoqkBJgF8tsiqJlPazloq79Uze/1OPX3Dvc
-         a3IggPSYaeJ5IwvkXF4bUibEKoIcezh8UtPYv43cI5Z+pflMxbjw61WSB6EeGp2eNLg9
-         htQ1LNdv/rWQIRBEP26sEibrsvvIN0tupigJ89y0yua7Vt2hLFIAEhj87wMl8M1TDzAF
-         9GcEYo82oqVeIpTMe+CK45mkR5NxaGuduWC0IX6XeiJa3UFBALfAa78iZjRM6p+9zAhd
-         HlkpaUt8KXKqUM4jtArYumWuJahDNeIn6JBqR/ndTE+yG7DSPIRGjDx/rlrcoqazcRgF
-         z8ag==
-X-Gm-Message-State: AA+aEWYD5v5AAC7C5J0LtasiCWReb1hTSNBXOrL1xvyHVSbCbCWzrc4O
-        TTKAu+cKJY4kva6NQZEUzkDJFClpVsI=
-X-Google-Smtp-Source: AFSGD/VJDIHGUmYUrbLTs7usKXhB/oaFPGEjUJcVcpKUFig9FCP5CR1UoEm0VLZP73c3n9Jwudu/CQ==
-X-Received: by 2002:a05:660c:648:: with SMTP id y8mr3250527itk.48.1543532142051;
-        Thu, 29 Nov 2018 14:55:42 -0800 (PST)
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Bo1Spzz7ZnFVfgQSdpOjRkLR9kvErLiby+2BXZ7ab5w=;
+        b=tNFytIbHSmIsJP8p+h2BsxV9p8AJAAPDcOgEoEBQLFNJVxYnlzRqoBAVS27md3XYE1
+         /N75Ou6PS1jhZ9sFTR5AKQVZxthVK0VRbW+WcwUpo5tl+YSLMzSkchar06O+L3rCO+A9
+         gl491cvAwsPhYkLpNFIvKsYYxjEhWrY2zZlOdKIV9ZqsKyf9hDWVPEuTpdFC+GiEPIcN
+         VWzuVVBRtlUZ/Fl/IGXngvoPZ+7lHg5VVnVDmIdwrgjj0X6FoFBUTTduX2VzoQC83STP
+         lms67yiifF6EttBu8b0SEbjQRG/u9f3CwL89ncLmi6F+J5Fc/MeEsaZvvCXsJXriCcZh
+         BXxg==
+X-Gm-Message-State: AA+aEWYbqXTxRxn+H6OUgMDtjVlqrKuKNbCiSWCPvDLbggbnpP7ieB/K
+        mw88u92DQsACh7F9ApNOc0JOMJf6PwQ=
+X-Google-Smtp-Source: AFSGD/WVj8kEC0K7fo3KNJQbtFvAmpKr4QhxDC+oroLfkJAywQHye+fAbm5HzSnGxonxeUhfxFpQPg==
+X-Received: by 2002:a24:f982:: with SMTP id l124mr3214894ith.59.1543532308802;
+        Thu, 29 Nov 2018 14:58:28 -0800 (PST)
 Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id r21sm1463721ita.27.2018.11.29.14.55.40
+        by smtp.gmail.com with ESMTPSA id 70sm1749283ity.9.2018.11.29.14.58.27
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 29 Nov 2018 14:55:41 -0800 (PST)
+        Thu, 29 Nov 2018 14:58:27 -0800 (PST)
+Subject: Re: [PATCH] block: avoid extra bio reference for async O_DIRECT
+From:   Jens Axboe <axboe@kernel.dk>
 To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Cc:     Christoph Hellwig <hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] block: avoid extra bio reference for async O_DIRECT
-Message-ID: <b890e540-fc63-13c1-bef0-1e6a39d1850e@kernel.dk>
-Date:   Thu, 29 Nov 2018 15:55:40 -0700
+References: <b890e540-fc63-13c1-bef0-1e6a39d1850e@kernel.dk>
+Message-ID: <e834208c-bb4b-820a-28c9-918e92afa295@kernel.dk>
+Date:   Thu, 29 Nov 2018 15:58:26 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
+In-Reply-To: <b890e540-fc63-13c1-bef0-1e6a39d1850e@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,28 +77,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The bio referencing has a trick that doesn't do any actual atomic
-inc/dec on the reference count until we have to elevator to > 1. For the
-async IO O_DIRECT case, we can't use the simple DIO variants, so we use
-__blkdev_direct_IO(). It always grabs an extra reference to the bio
-after allocation, which means we then enter the slower path of actually
-having to do atomic_inc/dec on the count.
+On 11/29/18 3:55 PM, Jens Axboe wrote:
+> The bio referencing has a trick that doesn't do any actual atomic
+> inc/dec on the reference count until we have to elevator to > 1. For the
+> async IO O_DIRECT case, we can't use the simple DIO variants, so we use
+> __blkdev_direct_IO(). It always grabs an extra reference to the bio
+> after allocation, which means we then enter the slower path of actually
+> having to do atomic_inc/dec on the count.
+> 
+> We don't need to do that for the async case, unless we end up going
+> multi-bio, in which case we're already doing huge amounts of IO. For the
+> smaller IO case (< BIO_MAX_PAGES), we can do without the extra ref.
 
-We don't need to do that for the async case, unless we end up going
-multi-bio, in which case we're already doing huge amounts of IO. For the
-smaller IO case (< BIO_MAX_PAGES), we can do without the extra ref.
+I accidentally generated this against the aio-poll branch, here's a
+version that is not.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
----
 
 diff --git a/fs/block_dev.c b/fs/block_dev.c
-index f3bd41f80421..44fc9da13f68 100644
+index d233a59ea364..5c0a224bf9cb 100644
 --- a/fs/block_dev.c
 +++ b/fs/block_dev.c
-@@ -292,10 +292,26 @@ static int blkdev_iopoll(struct kiocb *kiocb, bool wait)
- 	return blk_poll(q, READ_ONCE(kiocb->ki_cookie), wait);
- }
+@@ -281,10 +281,25 @@ struct blkdev_dio {
+ 
+ static struct bio_set blkdev_dio_pool;
  
 +static void blkdev_bio_dirty_release(struct bio *bio, bool should_dirty)
 +{
@@ -106,9 +109,8 @@ index f3bd41f80421..44fc9da13f68 100644
 +		struct bio_vec *bvec;
 +		int i;
 +
-+		if (!bio_flagged(bio, BIO_HOLD_PAGES))
-+			bio_for_each_segment_all(bvec, bio, i)
-+				put_page(bvec->bv_page);
++		bio_for_each_segment_all(bvec, bio, i)
++			put_page(bvec->bv_page);
 +		bio_put(bio);
 +	}
 +}
@@ -121,7 +123,7 @@ index f3bd41f80421..44fc9da13f68 100644
  
  	if (dio->multi_bio && !atomic_dec_and_test(&dio->ref)) {
  		if (bio->bi_status && !dio->bio.bi_status)
-@@ -313,26 +329,20 @@ static void blkdev_bio_end_io(struct bio *bio)
+@@ -302,25 +317,20 @@ static void blkdev_bio_end_io(struct bio *bio)
  			}
  
  			dio->iocb->ki_complete(iocb, ret, 0);
@@ -142,9 +144,8 @@ index f3bd41f80421..44fc9da13f68 100644
 -		struct bio_vec *bvec;
 -		int i;
 -
--		if (!bio_flagged(bio, BIO_HOLD_PAGES))
--			bio_for_each_segment_all(bvec, bio, i)
--				put_page(bvec->bv_page);
+-		bio_for_each_segment_all(bvec, bio, i)
+-			put_page(bvec->bv_page);
 -		bio_put(bio);
 -	}
 +	if (!dio->is_sync)
@@ -154,7 +155,7 @@ index f3bd41f80421..44fc9da13f68 100644
  }
  
  static ssize_t
-@@ -355,14 +365,15 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+@@ -343,14 +353,15 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
  		return -EINVAL;
  
  	bio = bio_alloc_bioset(GFP_KERNEL, nr_pages, &blkdev_dio_pool);
@@ -173,7 +174,7 @@ index f3bd41f80421..44fc9da13f68 100644
  
  	dio->size = 0;
  	dio->multi_bio = false;
-@@ -425,6 +436,13 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+@@ -400,6 +411,13 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
  		}
  
  		if (!dio->multi_bio) {
@@ -187,7 +188,7 @@ index f3bd41f80421..44fc9da13f68 100644
  			dio->multi_bio = true;
  			atomic_set(&dio->ref, 2);
  		} else {
-@@ -458,6 +476,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+@@ -433,6 +451,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
  	if (likely(!ret))
  		ret = dio->size;
  
