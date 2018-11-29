@@ -2,92 +2,59 @@ Return-Path: <SRS0=Gm8i=OI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3815AC43441
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 15:55:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37ECAC43441
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 16:01:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F021E213A2
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 15:55:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3AA5213A2
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 16:01:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CJY2VxSK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F021E213A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZqRynE9k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3AA5213A2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728778AbeK3DAt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Nov 2018 22:00:49 -0500
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:41276 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728583AbeK3DAt (ORCPT
+        id S1728779AbeK3DHK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Nov 2018 22:07:10 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:43160 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728272AbeK3DHK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Nov 2018 22:00:49 -0500
-Received: by mail-qt1-f193.google.com with SMTP id d18so2465929qto.8;
-        Thu, 29 Nov 2018 07:55:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=04/qz8pdLsU4owCgN/+S4NzXW745Zs/GT+VihcKn1BQ=;
-        b=CJY2VxSK69Lg9Fxe33/Pl6m98z94gClHNtHo3zML+d7D+WHR3JBPoca+2RE1SniLgc
-         GFXFXftY39J0B2i5o7xanPFKCGwwHmyGnwtLBVr1iUDPP9aKOqX6trn+dHjVIJk8Lwf7
-         M9l/DBz/LFKcvMrtjq/c4KMBgdUzfwd/K3MCG8PRWV5cCZZgRIEVOXFx/DAqxelqpiMv
-         uQ1heHDh/155GWT8oN8ZK8pdWBQ957IdVyxn8+fZODsOGAoJBxjPv20If7s95a60PN8p
-         KJVcFSicEDJK4NkGAwBpBwaUBrZ09gU/Qzi23EgUuiUUdIzADQcJK15dRNNp16Ope25A
-         9aCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=04/qz8pdLsU4owCgN/+S4NzXW745Zs/GT+VihcKn1BQ=;
-        b=EVbqcXPOwrJ8S9O7Qsi+kFGdBgBlH5f3WgzTMOjGGjzblj3XMB75YbX5NBMmOlQDVg
-         fNagy967CP6rYGYJ+gSe93tjm7DM2LDWtNeHKFii2H/gqKW52Fa9FAiRTX7s5HHDhQCr
-         In9dzHOPwfwgnFtggQYMtwf4J+Co3E247iCWnqTmTzf0QM1V5/J7+e0H/q7Nxu2FA0N2
-         cNQy1+bPBaxz4HKYH4H/O4nd/SpOMdEKsZoCWy0JTuVYCZcPAjoppNtAqmjbwKo6MRFm
-         OYadjFqSG3Q7JiOPJybfRodWntrQ+R3IPyx2KVcz2i1CgYKyEHPS5f8xUxc5Mh1zKw2d
-         wKdw==
-X-Gm-Message-State: AA+aEWYog04mP4JmpiTRLTKOz947M6oswO5/fLp43yBZuyK2kv915XkQ
-        uquEbCn7YRVAQ2YJevnazgc=
-X-Google-Smtp-Source: AFSGD/W4BRgfGQKgu7dKivTw+AmrediSAO8cSafg0/HO1LUZxagar+D5t9Zaso+pwHQkqf6B8iURWQ==
-X-Received: by 2002:ac8:1add:: with SMTP id h29mr1884607qtk.258.1543506899825;
-        Thu, 29 Nov 2018 07:54:59 -0800 (PST)
-Received: from localhost ([2620:10d:c091:200::7:c5f4])
-        by smtp.gmail.com with ESMTPSA id k6sm1805946qkk.60.2018.11.29.07.54.58
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 29 Nov 2018 07:54:59 -0800 (PST)
-Date:   Thu, 29 Nov 2018 07:54:56 -0800
-From:   Tejun Heo <tj@kernel.org>
-To:     Dennis Zhou <dennis@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-        Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 11/13] blkcg: remove bio_disassociate_task()
-Message-ID: <20181129155456.GF2509588@devbig004.ftw2.facebook.com>
-References: <20181126211946.77067-1-dennis@kernel.org>
- <20181126211946.77067-12-dennis@kernel.org>
+        Thu, 29 Nov 2018 22:07:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:To:From:Date:Sender:Reply-To:Cc:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=Zq76zl+WXkKrKXTJhP6mDa95qyjqZvbdF5Jqxo9+5ew=; b=ZqRynE9k4OV8LfcNkzW4GDs76
+        3kBhbWLvMJIyyDj4GkowhMYEO1B5DVe+t14EVXXfYaYRWaC1D6RwSKwprOlB7MhqMdkxM1VK48gIZ
+        wWgT6ThfG/eTXNPs26bhObLbnCv5i6Z3x62SFgtgYlOQZ3AuKKKsLF7I5/UMzxcrCH4MnD9JIKHb0
+        CWnjNld3ST2WjzzKyTOgN+u86SkQnRgOUIPtnzxLqKoTUl6wAK5qC/0ch03BOCs7TJCGRj8Uq0DD6
+        6qlI289O5/Ktm0Wtmf+qGsBYdf0vH+ojIrpHOAPb8Fa1sYOWB7WfpKrNocIxFUvaYo1tFiWPsZ4lF
+        Kf8kQ2T3w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gSOkh-0001wG-QN; Thu, 29 Nov 2018 16:01:19 +0000
+Date:   Thu, 29 Nov 2018 08:01:19 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: Re: [PATCH v3] block: add io timeout to sysfs
+Message-ID: <20181129160119.GA7364@infradead.org>
+References: <20181128160433.GA35371@192.168.3.9>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181126211946.77067-12-dennis@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20181128160433.GA35371@192.168.3.9>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Nov 26, 2018 at 04:19:44PM -0500, Dennis Zhou wrote:
-> Now that a bio only holds a blkg reference, so clean up is simply
-> putting back that reference. Remove bio_disassociate_task() as it just
-> calls bio_disassociate_blkg() and call the latter directly.
-> 
-> Signed-off-by: Dennis Zhou <dennis@kernel.org>
-
-Acked-by: Tejun Heo <tj@kernel.org>
-
-Thanks.
-
--- 
-tejun
+I think we need a check for the presence of a timeout method and
+only show this attribute if the driver actually supports block level
+timeouts.
