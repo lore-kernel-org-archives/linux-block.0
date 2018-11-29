@@ -2,79 +2,71 @@ Return-Path: <SRS0=Gm8i=OI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24468C04EB9
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 22:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C1ECC04EB9
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 22:55:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CEE1A21473
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 22:22:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 390F32146F
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 22:55:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="iUfhHRug"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEE1A21473
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="et+KHCIp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 390F32146F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726362AbeK3J3G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Nov 2018 04:29:06 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:37608 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726264AbeK3J3F (ORCPT
+        id S1726393AbeK3KCt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Nov 2018 05:02:49 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:55987 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726389AbeK3KCs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 04:29:05 -0500
-Received: by mail-it1-f193.google.com with SMTP id b5so6326169iti.2
-        for <linux-block@vger.kernel.org>; Thu, 29 Nov 2018 14:22:05 -0800 (PST)
+        Fri, 30 Nov 2018 05:02:48 -0500
+Received: by mail-it1-f194.google.com with SMTP id o19so6358932itg.5
+        for <linux-block@vger.kernel.org>; Thu, 29 Nov 2018 14:55:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=lOQ81fIfCBJZfAiNrSQUjANHqWXoicujO0d0updRgDI=;
-        b=iUfhHRugSYRlnM3/+5JHVRB5SNBoz277p9xtxqU8bkq4ED4FYplVJzq2mxWA6/Jeff
-         oTaGwnVV1qdMrAZKWl9BhewtHxicev2ZXDf6JE9l+9sCpI4JAqlDR5P7xzM+7j+OlYSP
-         EcJ+iCwRe4AcH0WS4aGYrjaqWeGDoyA/bgU0wa/QmjPVKJEP0HbS87c2fY7YDbTzUac1
-         uQ0pZ7QXcPTOuBMnXG/sFmDZeVMLRSDxyGlEXJjE5qe4FedkIAvFxjDh2h1swuB9AtuV
-         BXx2lx5bpFH6JsPQyl7PvTXupePID961swLZt7bwpbq1UdV2DUsHB+kyL5IiTQmf/R/+
-         mlMA==
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=gxo4TyNc7iO+Dp6T0YhlBuNWFZ65rKoZke/uE/QmWz8=;
+        b=et+KHCIpO3SJ8lS3wL6UFNZNS9bjepBKdfyS08cyZHnppbFgxJUPPLGij6bZiKsLoA
+         BH2aNw98ittsmc4Nch+dtS9cjnvr7YoGSJ4LG0U47fZRZWhD3KpwYqjwkdZ2Hxa9gqgy
+         JPT3CRxQHG/QGQSBHk/AIDDenJWXAxGQjeLesXLUNZ6sQXCJ2+ZjAsBoC3ynHMUFjatZ
+         PxjikrG+X4S7w/w2TV8C1BGCxo2L8kim132amZpLoRgOjA7E7dNtM0dOHJpKo/YL8PCc
+         LAqFetiFMZGtWmS4lThwp83c4z+qUtX4NMDHBBF6NTwkYNcP1CxC70+aPscTewP62OR4
+         tfIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=lOQ81fIfCBJZfAiNrSQUjANHqWXoicujO0d0updRgDI=;
-        b=JuprOOUdVsjlrr4L8vEWR22EvzlO5rlx6m+YewYjojV2dfaOqGmmjFgQtRhiTOW0x6
-         Nl1m+swHR/zUAclt2MUV8fYHLHPoOaYFDOlI0HLNKFYpdradReXaBWOCKa94EIvhQITr
-         9EBBHo5eKvytntNlHiM1nEajKGDJw9JYcU73EhaFtH5gTWv25IxaHR2y/f0uJm08uAqN
-         qfRCQQN3MOCQCUMtxL8XKbgdlTRvbjSQwyGUn5bf7JUkKpvHyxPlUgjg7uxPAMXmGaQY
-         tJcdvMDH0PMav7Fmw3IfvYDgx/yv617DiV0mbfGQA4JwjItxt8znoC4u8Hk2j/4aUJwI
-         G0wg==
-X-Gm-Message-State: AA+aEWaXgX3CmOTgVEPZKTXgfwPWesisl3RTEvyeCjjrjrEPCgcnu4MI
-        Br2HwV4HhOEDhBzUBtyWJ2qAtA==
-X-Google-Smtp-Source: AFSGD/UtoF2vCuYKHUK+8bC/x0CYrHwOIHrW9AyDJx/Id4GVfM3EulJo1ZafMQM5PrJeNVzinpY4oA==
-X-Received: by 2002:a24:b951:: with SMTP id k17mr2939152iti.147.1543530124956;
-        Thu, 29 Nov 2018 14:22:04 -0800 (PST)
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=gxo4TyNc7iO+Dp6T0YhlBuNWFZ65rKoZke/uE/QmWz8=;
+        b=kTLcH0HUBbYlBCceVnnxPBZnJeH7aXAfoqkBJgF8tsiqJlPazloq79Uze/1OPX3Dvc
+         a3IggPSYaeJ5IwvkXF4bUibEKoIcezh8UtPYv43cI5Z+pflMxbjw61WSB6EeGp2eNLg9
+         htQ1LNdv/rWQIRBEP26sEibrsvvIN0tupigJ89y0yua7Vt2hLFIAEhj87wMl8M1TDzAF
+         9GcEYo82oqVeIpTMe+CK45mkR5NxaGuduWC0IX6XeiJa3UFBALfAa78iZjRM6p+9zAhd
+         HlkpaUt8KXKqUM4jtArYumWuJahDNeIn6JBqR/ndTE+yG7DSPIRGjDx/rlrcoqazcRgF
+         z8ag==
+X-Gm-Message-State: AA+aEWYD5v5AAC7C5J0LtasiCWReb1hTSNBXOrL1xvyHVSbCbCWzrc4O
+        TTKAu+cKJY4kva6NQZEUzkDJFClpVsI=
+X-Google-Smtp-Source: AFSGD/VJDIHGUmYUrbLTs7usKXhB/oaFPGEjUJcVcpKUFig9FCP5CR1UoEm0VLZP73c3n9Jwudu/CQ==
+X-Received: by 2002:a05:660c:648:: with SMTP id y8mr3250527itk.48.1543532142051;
+        Thu, 29 Nov 2018 14:55:42 -0800 (PST)
 Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id 134sm2158389itl.25.2018.11.29.14.22.03
+        by smtp.gmail.com with ESMTPSA id r21sm1463721ita.27.2018.11.29.14.55.40
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 29 Nov 2018 14:22:04 -0800 (PST)
-Subject: Re: [PATCH 2/3] block: switch to per-cpu in-flight counters
-To:     Mikulas Patocka <mpatocka@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        "Alasdair G. Kergon" <agk@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>
-References: <20181128004250.325095242@debian.vm>
- <20181129215746.GA9226@redhat.com>
- <alpine.LRH.2.02.1811291701430.9428@file01.intranet.prod.int.rdu2.redhat.com>
+        Thu, 29 Nov 2018 14:55:41 -0800 (PST)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <1ef58c51-eb76-d542-e752-d4cbc8903a8c@kernel.dk>
-Date:   Thu, 29 Nov 2018 15:22:02 -0700
+Subject: [PATCH] block: avoid extra bio reference for async O_DIRECT
+Message-ID: <b890e540-fc63-13c1-bef0-1e6a39d1850e@kernel.dk>
+Date:   Thu, 29 Nov 2018 15:55:40 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <alpine.LRH.2.02.1811291701430.9428@file01.intranet.prod.int.rdu2.redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -83,83 +75,126 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/29/18 3:05 PM, Mikulas Patocka wrote:
-> 
-> 
-> On Thu, 29 Nov 2018, Mike Snitzer wrote:
-> 
->> On Tue, Nov 27 2018 at  7:42pm -0500,
->> Mikulas Patocka <mpatocka@redhat.com> wrote:
->>
->>> Now when part_round_stats is gone, we can switch to per-cpu in-flight
->>> counters.
->>>
->>> We use the local-atomic type local_t, so that if part_inc_in_flight or
->>> part_dec_in_flight is reentrantly called from an interrupt, the value will
->>> be correct.
->>>
->>> The other counters could be corrupted due to reentrant interrupt, but the
->>> corruption only results in slight counter skew - the in_flight counter
->>> must be exact, so it needs local_t.
->>>
->>> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
->>>
->>> ---
->>>  block/bio.c           |    4 ++--
->>>  block/blk-core.c      |    4 ++--
->>>  block/blk-merge.c     |    2 +-
->>>  block/genhd.c         |   47 +++++++++++++++++++++++++++++++++++------------
->>>  drivers/md/dm.c       |    4 +---
->>>  include/linux/genhd.h |    7 ++++---
->>>  6 files changed, 45 insertions(+), 23 deletions(-)
->>>
->> ...
->>> Index: linux-block/drivers/md/dm.c
->>> ===================================================================
->>> --- linux-block.orig/drivers/md/dm.c	2018-11-28 00:09:59.000000000 +0100
->>> +++ linux-block/drivers/md/dm.c	2018-11-28 00:09:59.000000000 +0100
->>> @@ -663,8 +663,7 @@ static void start_io_acct(struct dm_io *
->>>  	generic_start_io_acct(md->queue, bio_op(bio), bio_sectors(bio),
->>>  			      &dm_disk(md)->part0);
->>>  
->>> -	atomic_set(&dm_disk(md)->part0.in_flight[rw],
->>> -		   atomic_inc_return(&md->pending[rw]));
->>> +	atomic_inc(&md->pending[rw]);
->>>  
->>>  	if (unlikely(dm_stats_used(&md->stats)))
->>>  		dm_stats_account_io(&md->stats, bio_data_dir(bio),
->>> @@ -693,7 +692,6 @@ static void end_io_acct(struct dm_io *io
->>>  	 * a flush.
->>>  	 */
->>>  	pending = atomic_dec_return(&md->pending[rw]);
->>> -	atomic_set(&dm_disk(md)->part0.in_flight[rw], pending);
->>>  	pending += atomic_read(&md->pending[rw^0x1]);
->>>  
->>>  	/* nudge anyone waiting on suspend queue */
->>>
->>
->>
->> These dm.c hunks conflict with changes from you that I already staged in
->> dm-4.21, see:
->>
->> https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-4.21&id=b5616f7a11592cc74860f4ec3e3c4fba6688eefa
->> https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-4.21&id=78f95b53c203c969bbe6b86e405f7a891a43b6be
->>
->> I'd really like to get away from DM maintaining its own ->pending
->> counters.
->>
->> Mike
-> 
-> I know.
-> 
-> It depends on whether Jens takes these patches or not. If he doesn't take 
-> them, dm will use percpu counters on its own and it will return zero in 
-> the "/sys/block/dm-*/inflight" file.
+The bio referencing has a trick that doesn't do any actual atomic
+inc/dec on the reference count until we have to elevator to > 1. For the
+async IO O_DIRECT case, we can't use the simple DIO variants, so we use
+__blkdev_direct_IO(). It always grabs an extra reference to the bio
+after allocation, which means we then enter the slower path of actually
+having to do atomic_inc/dec on the count.
 
-This reply is the first I've seen of them?!
+We don't need to do that for the async case, unless we end up going
+multi-bio, in which case we're already doing huge amounts of IO. For the
+smaller IO case (< BIO_MAX_PAGES), we can do without the extra ref.
 
-Oh, they are in gmail spam. This happened with your last patches as well,
-you might want to look into that. I'll take a look at them later today.
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+---
+
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index f3bd41f80421..44fc9da13f68 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -292,10 +292,26 @@ static int blkdev_iopoll(struct kiocb *kiocb, bool wait)
+ 	return blk_poll(q, READ_ONCE(kiocb->ki_cookie), wait);
+ }
+ 
++static void blkdev_bio_dirty_release(struct bio *bio, bool should_dirty)
++{
++	if (should_dirty) {
++		bio_check_pages_dirty(bio);
++	} else {
++		struct bio_vec *bvec;
++		int i;
++
++		if (!bio_flagged(bio, BIO_HOLD_PAGES))
++			bio_for_each_segment_all(bvec, bio, i)
++				put_page(bvec->bv_page);
++		bio_put(bio);
++	}
++}
++
+ static void blkdev_bio_end_io(struct bio *bio)
+ {
+ 	struct blkdev_dio *dio = bio->bi_private;
+ 	bool should_dirty = dio->should_dirty;
++	bool should_free = false;
+ 
+ 	if (dio->multi_bio && !atomic_dec_and_test(&dio->ref)) {
+ 		if (bio->bi_status && !dio->bio.bi_status)
+@@ -313,26 +329,20 @@ static void blkdev_bio_end_io(struct bio *bio)
+ 			}
+ 
+ 			dio->iocb->ki_complete(iocb, ret, 0);
+-			bio_put(&dio->bio);
+ 		} else {
+ 			struct task_struct *waiter = dio->waiter;
+ 
+ 			WRITE_ONCE(dio->waiter, NULL);
+ 			blk_wake_io_task(waiter);
+ 		}
++		/* last bio is done, now we can free the parent holding dio */
++		should_free = dio->multi_bio;
+ 	}
+ 
+-	if (should_dirty) {
+-		bio_check_pages_dirty(bio);
+-	} else {
+-		struct bio_vec *bvec;
+-		int i;
+-
+-		if (!bio_flagged(bio, BIO_HOLD_PAGES))
+-			bio_for_each_segment_all(bvec, bio, i)
+-				put_page(bvec->bv_page);
+-		bio_put(bio);
+-	}
++	if (!dio->is_sync)
++		blkdev_bio_dirty_release(bio, should_dirty);
++	if (should_free)
++		bio_put(&dio->bio);
+ }
+ 
+ static ssize_t
+@@ -355,14 +365,15 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 		return -EINVAL;
+ 
+ 	bio = bio_alloc_bioset(GFP_KERNEL, nr_pages, &blkdev_dio_pool);
+-	bio_get(bio); /* extra ref for the completion handler */
+ 
+ 	dio = container_of(bio, struct blkdev_dio, bio);
+ 	dio->is_sync = is_sync = is_sync_kiocb(iocb);
+-	if (dio->is_sync)
++	if (dio->is_sync) {
+ 		dio->waiter = current;
+-	else
++		bio_get(bio);
++	} else {
+ 		dio->iocb = iocb;
++	}
+ 
+ 	dio->size = 0;
+ 	dio->multi_bio = false;
+@@ -425,6 +436,13 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 		}
+ 
+ 		if (!dio->multi_bio) {
++			/*
++			 * async needs an extra reference if we are goign
++			 * multi-bio only, so we can ensure that 'dio'
++			 * sticks around.
++			 */
++			if (!is_sync)
++				bio_get(bio);
+ 			dio->multi_bio = true;
+ 			atomic_set(&dio->ref, 2);
+ 		} else {
+@@ -458,6 +476,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 	if (likely(!ret))
+ 		ret = dio->size;
+ 
++	blkdev_bio_dirty_release(bio, dio->should_dirty);
+ 	bio_put(&dio->bio);
+ 	return ret;
+ }
 
 -- 
 Jens Axboe
