@@ -2,59 +2,83 @@ Return-Path: <SRS0=Gm8i=OI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37ECAC43441
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 16:01:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AC5BC43610
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 16:41:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F3AA5213A2
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 16:01:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ZqRynE9k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3AA5213A2
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	by mail.kernel.org (Postfix) with ESMTP id 1A878213A2
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 16:41:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A878213A2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728779AbeK3DHK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Nov 2018 22:07:10 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:43160 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728272AbeK3DHK (ORCPT
+        id S1729641AbeK3Dry (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Nov 2018 22:47:54 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:36815 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729402AbeK3Dry (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Nov 2018 22:07:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:To:From:Date:Sender:Reply-To:Cc:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=Zq76zl+WXkKrKXTJhP6mDa95qyjqZvbdF5Jqxo9+5ew=; b=ZqRynE9k4OV8LfcNkzW4GDs76
-        3kBhbWLvMJIyyDj4GkowhMYEO1B5DVe+t14EVXXfYaYRWaC1D6RwSKwprOlB7MhqMdkxM1VK48gIZ
-        wWgT6ThfG/eTXNPs26bhObLbnCv5i6Z3x62SFgtgYlOQZ3AuKKKsLF7I5/UMzxcrCH4MnD9JIKHb0
-        CWnjNld3ST2WjzzKyTOgN+u86SkQnRgOUIPtnzxLqKoTUl6wAK5qC/0ch03BOCs7TJCGRj8Uq0DD6
-        6qlI289O5/Ktm0Wtmf+qGsBYdf0vH+ojIrpHOAPb8Fa1sYOWB7WfpKrNocIxFUvaYo1tFiWPsZ4lF
-        Kf8kQ2T3w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gSOkh-0001wG-QN; Thu, 29 Nov 2018 16:01:19 +0000
-Date:   Thu, 29 Nov 2018 08:01:19 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org
-Subject: Re: [PATCH v3] block: add io timeout to sysfs
-Message-ID: <20181129160119.GA7364@infradead.org>
-References: <20181128160433.GA35371@192.168.3.9>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181128160433.GA35371@192.168.3.9>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+        Thu, 29 Nov 2018 22:47:54 -0500
+Received: by mail-pg1-f196.google.com with SMTP id n2so1178823pgm.3
+        for <linux-block@vger.kernel.org>; Thu, 29 Nov 2018 08:41:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=U0qc9AXnLTCcTnsPKpukVQfvsf4ob/TOJgOlkC+QS9k=;
+        b=tI9VdtYTRvtJ0emEdUS1rerfve9xN/dztIWOwxfxoFDBWWAMVjMZxdXsYg+hCew7Cx
+         D3bHkaNZ9TFV6jspC5QQ2mENRh36CrerAA5qrP4FZbN/VWENDRvbEb0iRk0WfKVshDCM
+         1yS4e/AXeRdrpZEuuzsN9yyRmWfKX1NL92871ln3K05jWKI82U37RIS+Av4jYZCQ9p8l
+         G5qAZzPgb3hCu7YpcLUQXEZ0N8LEnemnPnwDZMW/NaVfN98AvNrgYnvmrC3mxIYO+/sB
+         hCYK6WZ0ACIU4ZoLZgfPFvKO8BnxaFfOnHWU6PJvxzMCBuQoXlyIeofRBOABwJwR/Ot9
+         zepA==
+X-Gm-Message-State: AA+aEWZpeXxj6BJ9Q/wMr2fGbdN86Un5zMuKrvxjywnsUtwR7fNYLnuK
+        +670EmihUyX499fxH/R1+Dc=
+X-Google-Smtp-Source: AFSGD/UmeP0sukd4zsoH1WlzBZgWUqi1TTYTCDmv/PtPwavOV11xlkr+wUFoZdQHIk192mGzIFMDCw==
+X-Received: by 2002:a63:1258:: with SMTP id 24mr1814035pgs.114.1543509716195;
+        Thu, 29 Nov 2018 08:41:56 -0800 (PST)
+Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id z8sm6170246pgz.53.2018.11.29.08.41.54
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 29 Nov 2018 08:41:55 -0800 (PST)
+Message-ID: <1543509714.185366.134.camel@acm.org>
+Subject: Re: [PATCH v2] block: add documentation for io_timeout
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Weiping Zhang <zhangweiping@didiglobal.com>, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Date:   Thu, 29 Nov 2018 08:41:54 -0800
+In-Reply-To: <20181129102237.GA29592@192.168.3.9>
+References: <20181129102237.GA29592@192.168.3.9>
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I think we need a check for the presence of a timeout method and
-only show this attribute if the driver actually supports block level
-timeouts.
+On Thu, 2018-11-29 at 18:22 +-0800, Weiping Zhang wrote:
++AD4 add documentation for /sys/block/+ADw-disk+AD4-/queue/io+AF8-timeout
+
+Patch descriptions should consist of full sentences. That means that these
+should start with a capital letter and end with a period.
+
++AD4 +-
++AD4 +-What:		/sys/block/+ADw-disk+AD4-/queue/io+AF8-timeout
++AD4 +-Date:		November 2018
++AD4 +-Contact:	Weiping Zhang +ADw-zhangweiping+AEA-didiglobal.com+AD4
++AD4 +-Description:
++AD4 +-		io+AF8-timeout is the timeout in milliseconds of a request in
++AD4 +-		block layer. The block layer will start a timer when low
++AD4 +-		level device driver start the request, and cancel timer
++AD4 +-		when request completes.
+
+The grammar of that explanation needs to be improved ... I can spot three
+grammatical issues.
+
+Thanks,
+
+Bart.
