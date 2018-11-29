@@ -2,175 +2,170 @@ Return-Path: <SRS0=Gm8i=OI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D98AC43441
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 05:16:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6950BC43441
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 07:01:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2674420834
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 05:16:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="InIRR8k6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2674420834
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTP id 37B2D21019
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 07:01:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37B2D21019
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727615AbeK2QUz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Nov 2018 11:20:55 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:38986 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727402AbeK2QUz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Nov 2018 11:20:55 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wAT58lsk186679;
-        Thu, 29 Nov 2018 05:16:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2018-07-02;
- bh=6c9vUm9CIYiMwq05XmbGbH9J1Io9Ug8I7KAol5/Fx+s=;
- b=InIRR8k6CIQoLIBk6IsRQl7elTICkBIkuXitOcvCmyx9aViTuKZMPnci9fV+p2NinUtU
- NadaFMwsj3sIv6nYNHK6T6hQce9u9XnQb6ckUPcndHINk3UUgeeIEKupDjVbZNI+ZqjG
- hXJfXV8xYl4+TtjIlQ0PkQzU2yX1bkyIV0Bvli1GfgJRxhkA4mRbQG5dwRiktXmY94MV
- SIFZ5POcbBUF+f5GYUHHO6Fvp8phiyH17LGdasFkhtU+2+NfwBX25o3+UYinkVVGs/40
- DBa0Eha/msOYG3JbjaeqZxh92eMIuKJMjcm5tSkTfK3obtDt6ULwkNyDCrBby2lsz2iP 6A== 
-Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
-        by aserp2120.oracle.com with ESMTP id 2nxxkqp2gs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 29 Nov 2018 05:16:39 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id wAT5GbHb016585
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 29 Nov 2018 05:16:37 GMT
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id wAT5GbrV004944;
-        Thu, 29 Nov 2018 05:16:37 GMT
-Received: from manjunathpatil.us.oracle.com (/10.211.44.52)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 28 Nov 2018 21:16:36 -0800
-From:   Manjunath Patil <manjunath.b.patil@oracle.com>
-To:     boris.ostrovsky@oracle.com, jgross@suse.com,
-        konrad.wilk@oracle.com, roger.pau@citrix.com, axboe@kernel.dk
-Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        manjuanth.b.patil@oracle.com
-Subject: [PATCH] xen-blkfront: use old rinfo after enomem during migration
-Date:   Wed, 28 Nov 2018 21:17:45 -0800
-Message-Id: <1543468665-22795-1-git-send-email-manjunath.b.patil@oracle.com>
-X-Mailer: git-send-email 1.7.1
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9091 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1811290043
+        id S1727643AbeK2SFt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Nov 2018 13:05:49 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57664 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727521AbeK2SFt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Nov 2018 13:05:49 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 322B19B316;
+        Thu, 29 Nov 2018 07:01:28 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-31.pek2.redhat.com [10.72.8.31])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AA08965F4E;
+        Thu, 29 Nov 2018 07:01:22 +0000 (UTC)
+Date:   Thu, 29 Nov 2018 15:01:17 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 6/7] blk-mq: use bd->last == true for list inserts
+Message-ID: <20181129070116.GA27186@ming.t460p>
+References: <20181128133538.20329-1-axboe@kernel.dk>
+ <20181128133538.20329-7-axboe@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181128133538.20329-7-axboe@kernel.dk>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Thu, 29 Nov 2018 07:01:28 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-Feel free to suggest/comment on this.
+On Wed, Nov 28, 2018 at 06:35:37AM -0700, Jens Axboe wrote:
+> If we are issuing a list of requests, we know if we're at the last one.
+> If we fail issuing, ensure that we call ->commits_rqs() to flush any
+> potential previous requests.
+> 
+> Reviewed-by: Omar Sandoval <osandov@fb.com>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  block/blk-core.c |  2 +-
+>  block/blk-mq.c   | 16 ++++++++--------
+>  block/blk-mq.h   |  2 +-
+>  3 files changed, 10 insertions(+), 10 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index d107d016b92b..3f6f5e6c2fe4 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1334,7 +1334,7 @@ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *
+>  	 * bypass a potential scheduler on the bottom device for
+>  	 * insert.
+>  	 */
+> -	return blk_mq_request_issue_directly(rq);
+> +	return blk_mq_request_issue_directly(rq, true);
+>  }
+>  EXPORT_SYMBOL_GPL(blk_insert_cloned_request);
+>  
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 18ff47a85ad3..9e1045152e45 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1743,12 +1743,12 @@ static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
+>  
+>  static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  					    struct request *rq,
+> -					    blk_qc_t *cookie)
+> +					    blk_qc_t *cookie, bool last)
+>  {
+>  	struct request_queue *q = rq->q;
+>  	struct blk_mq_queue_data bd = {
+>  		.rq = rq,
+> -		.last = true,
+> +		.last = last,
+>  	};
+>  	blk_qc_t new_cookie;
+>  	blk_status_t ret;
+> @@ -1783,7 +1783,7 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  						struct request *rq,
+>  						blk_qc_t *cookie,
+> -						bool bypass_insert)
+> +						bool bypass_insert, bool last)
+>  {
+>  	struct request_queue *q = rq->q;
+>  	bool run_queue = true;
+> @@ -1812,7 +1812,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  		goto insert;
+>  	}
+>  
+> -	return __blk_mq_issue_directly(hctx, rq, cookie);
+> +	return __blk_mq_issue_directly(hctx, rq, cookie, last);
+>  insert:
+>  	if (bypass_insert)
+>  		return BLK_STS_RESOURCE;
+> @@ -1831,7 +1831,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  
+>  	hctx_lock(hctx, &srcu_idx);
+>  
+> -	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false);
+> +	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false, true);
+>  	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
+>  		blk_mq_sched_insert_request(rq, false, true, false);
+>  	else if (ret != BLK_STS_OK)
+> @@ -1840,7 +1840,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  	hctx_unlock(hctx, srcu_idx);
+>  }
+>  
+> -blk_status_t blk_mq_request_issue_directly(struct request *rq)
+> +blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last)
+>  {
+>  	blk_status_t ret;
+>  	int srcu_idx;
+> @@ -1848,7 +1848,7 @@ blk_status_t blk_mq_request_issue_directly(struct request *rq)
+>  	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+>  
+>  	hctx_lock(hctx, &srcu_idx);
+> -	ret = __blk_mq_try_issue_directly(hctx, rq, &unused_cookie, true);
+> +	ret = __blk_mq_try_issue_directly(hctx, rq, &unused_cookie, true, last);
+>  	hctx_unlock(hctx, srcu_idx);
+>  
+>  	return ret;
+> @@ -1863,7 +1863,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+>  				queuelist);
+>  
+>  		list_del_init(&rq->queuelist);
+> -		ret = blk_mq_request_issue_directly(rq);
+> +		ret = blk_mq_request_issue_directly(rq, list_empty(list));
+>  		if (ret != BLK_STS_OK) {
+>  			if (ret == BLK_STS_RESOURCE ||
+>  					ret == BLK_STS_DEV_RESOURCE) {
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index 9ae8e9f8f8b1..7291e5379358 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -69,7 +69,7 @@ void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
+>  				struct list_head *list);
+>  
+>  /* Used by blk_insert_cloned_request() to issue request directly */
+> -blk_status_t blk_mq_request_issue_directly(struct request *rq);
+> +blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last);
+>  void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+>  				    struct list_head *list);
+>  
+> -- 
+> 2.17.1
+> 
 
-I am trying to do the following at dst during the migration now.
-1. Dont clear the old rinfo in blkif_free(). Instead just clean it.
-2. Store the old rinfo and nr_rings into temp variables in negotiate_mq()
-3. let nr_rings get re-calculated based on backend data
-4. try allocating new memory based on new nr_rings
-5. 
-  a. If memory allocation is a success
-     - free the old rinfo and proceed to use the new rinfo
-  b. If memory allocation is a failure
-     - use the old the rinfo
-     - adjust the nr_rings to the lowest of new nr_rings and old nr_rings
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
--Thanks,
-Manjunath
---
-During migration, the dst side device resume can fail to allocate rinfo
-struct. Each rinfo is about 80K in size and allocating 4[typical] such
-rings would need an order 7 allocation[512KB chuck] there by incresing
-the chance of memory allocation failure. Device resume failure during
-migration will lead the processes accessing the device into hung state.
-
-This patch aims to reuse old rinfo in case of memory allocation failure.
-
-Signed-off-by: Manjunath Patil <manjunath.b.patil@oracle.com>
----
- drivers/block/xen-blkfront.c |   46 +++++++++++++++++++++++++++++++++++------
- 1 files changed, 39 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 0ed4b20..041ba67 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -1353,9 +1353,17 @@ static void blkif_free(struct blkfront_info *info, int suspend)
- 	for (i = 0; i < info->nr_rings; i++)
- 		blkif_free_ring(&info->rinfo[i]);
- 
--	kfree(info->rinfo);
--	info->rinfo = NULL;
--	info->nr_rings = 0;
-+	if (unlikely(info->connected == BLKIF_STATE_SUSPENDED)) {
-+		/* We are migrating. You may reuse it. Just clean. */
-+		for (i = 0; i < info->nr_rings; i++) {
-+			memset(&info->rinfo[i], 0,
-+				sizeof(struct blkfront_ring_info));
-+		}
-+	} else {
-+		kfree(info->rinfo);
-+		info->rinfo = NULL;
-+		info->nr_rings = 0;
-+	}
- }
- 
- struct copy_from_grant {
-@@ -1903,6 +1911,16 @@ static int negotiate_mq(struct blkfront_info *info)
- {
- 	unsigned int backend_max_queues;
- 	unsigned int i;
-+	struct blkfront_ring_info *rinfo_old = NULL;
-+	unsigned int nr_rings_old = 0;
-+
-+	/* Migrating. We did not free old rinfo. Reuse it if possible */
-+	if (unlikely(info->connected == BLKIF_STATE_SUSPENDED)) {
-+		nr_rings_old = info->nr_rings;
-+		rinfo_old = info->rinfo;
-+		info->rinfo = NULL;
-+		info->nr_rings = 0;
-+	}
- 
- 	BUG_ON(info->nr_rings);
- 
-@@ -1918,10 +1936,24 @@ static int negotiate_mq(struct blkfront_info *info)
- 			      sizeof(struct blkfront_ring_info),
- 			      GFP_KERNEL);
- 	if (!info->rinfo) {
--		xenbus_dev_fatal(info->xbdev, -ENOMEM, "allocating ring_info structure");
--		info->nr_rings = 0;
--		return -ENOMEM;
--	}
-+		if (unlikely(nr_rings_old)) {
-+			/* We might waste some memory if
-+			 * info->nr_rings < nr_rings_old
-+			 */
-+			info->rinfo = rinfo_old;
-+			if (info->nr_rings > nr_rings_old)
-+				info->nr_rings = nr_rings_old;
-+			xenbus_dev_fatal(info->xbdev, -ENOMEM,
-+			"reusing old ring_info structure(new ring size=%d)",
-+				info->nr_rings);
-+		} else {
-+			xenbus_dev_fatal(info->xbdev, -ENOMEM,
-+				"allocating ring_info structure");
-+			info->nr_rings = 0;
-+			return -ENOMEM;
-+		}
-+	} else if (unlikely(nr_rings_old))
-+		kfree(rinfo_old);
- 
- 	for (i = 0; i < info->nr_rings; i++) {
- 		struct blkfront_ring_info *rinfo;
--- 
-1.7.1
-
+Thanks,
+Ming
