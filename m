@@ -2,107 +2,120 @@ Return-Path: <SRS0=Gm8i=OI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9238C43441
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 01:18:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BD5BC43441
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 01:23:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 93A46206B6
-	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 01:18:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93A46206B6
+	by mail.kernel.org (Postfix) with ESMTP id 68EF220863
+	for <linux-block@archiver.kernel.org>; Thu, 29 Nov 2018 01:23:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68EF220863
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726926AbeK2MV4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 29 Nov 2018 07:21:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:47592 "EHLO mx1.redhat.com"
+        id S1726872AbeK2M10 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 29 Nov 2018 07:27:26 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49100 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726617AbeK2MV4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 29 Nov 2018 07:21:56 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        id S1726565AbeK2M10 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 29 Nov 2018 07:27:26 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4EA35C057867;
-        Thu, 29 Nov 2018 01:18:22 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 556D0369CF;
+        Thu, 29 Nov 2018 01:23:52 +0000 (UTC)
 Received: from ming.t460p (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5FE5C7A5F5;
-        Thu, 29 Nov 2018 01:18:14 +0000 (UTC)
-Date:   Thu, 29 Nov 2018 09:18:11 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5061460C61;
+        Thu, 29 Nov 2018 01:23:46 +0000 (UTC)
+Date:   Thu, 29 Nov 2018 09:23:43 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Keith Busch <keith.busch@intel.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Martin Petersen <martin.petersen@oracle.com>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCHv4 0/3] scsi timeout handling updates
-Message-ID: <20181129011810.GA23390@ming.t460p>
-References: <20181126165430.4519-1-keith.busch@intel.com>
- <b9813c10-776f-46fc-15d4-bbd675edc402@kernel.dk>
- <20181128021959.GG11128@ming.t460p>
- <20181128070010.GA20369@lst.de>
- <20181128100659.GA16495@ming.t460p>
- <20181128100848.GA23567@lst.de>
- <20181128154927.GE6401@localhost.localdomain>
- <ddc31c4c-5d5f-c5ca-67bf-33acdd03ed54@kernel.dk>
- <20181128162655.GF6401@localhost.localdomain>
- <20181128175625.GG6401@localhost.localdomain>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 5/8] virtio_blk: implement mq_ops->commit_rqs() hook
+Message-ID: <20181129012342.GB23249@ming.t460p>
+References: <20181126163556.5181-1-axboe@kernel.dk>
+ <20181126163556.5181-6-axboe@kernel.dk>
+ <20181128021029.GF11128@ming.t460p>
+ <35b33a34-9e24-5acb-7a4e-57433328bf3d@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181128175625.GG6401@localhost.localdomain>
+In-Reply-To: <35b33a34-9e24-5acb-7a4e-57433328bf3d@kernel.dk>
 User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Thu, 29 Nov 2018 01:18:22 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Thu, 29 Nov 2018 01:23:52 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Nov 28, 2018 at 10:56:25AM -0700, Keith Busch wrote:
-> On Wed, Nov 28, 2018 at 09:26:55AM -0700, Keith Busch wrote:
-> > ---
-> > diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
-> > index 9908082b32c4..116398b240e5 100644
-> > --- a/drivers/nvme/target/loop.c
-> > +++ b/drivers/nvme/target/loop.c
-> > @@ -428,10 +428,14 @@ static int nvme_loop_configure_admin_queue(struct nvme_loop_ctrl *ctrl)
-> >  static void nvme_loop_shutdown_ctrl(struct nvme_loop_ctrl *ctrl)
-> >  {
-> >  	if (ctrl->ctrl.queue_count > 1) {
-> > -		nvme_stop_queues(&ctrl->ctrl);
-> > -		blk_mq_tagset_busy_iter(&ctrl->tag_set,
-> > -					nvme_cancel_request, &ctrl->ctrl);
-> > +		/*
-> > +		 * The back end device driver is responsible for completing all
-> > +		 * entered requests
-> > +		 */
-> > +		nvme_start_freeze(&ctrl->ctrl);
-> > +		nvme_wait_freeze(&ctrl->ctrl);
-> >  		nvme_loop_destroy_io_queues(ctrl);
-> > +		nvme_unfreeze(&ctrl->ctrl);
-> >  	}
-> >  
-> >  	if (ctrl->ctrl.state == NVME_CTRL_LIVE)
-> > ---
+On Tue, Nov 27, 2018 at 07:34:51PM -0700, Jens Axboe wrote:
+> On 11/27/18 7:10 PM, Ming Lei wrote:
+> > On Mon, Nov 26, 2018 at 09:35:53AM -0700, Jens Axboe wrote:
+> >> We need this for blk-mq to kick things into gear, if we told it that
+> >> we had more IO coming, but then failed to deliver on that promise.
+> >>
+> >> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> >> ---
+> >>  drivers/block/virtio_blk.c | 15 +++++++++++++++
+> >>  1 file changed, 15 insertions(+)
+> >>
+> >> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> >> index 6e869d05f91e..b49c57e77780 100644
+> >> --- a/drivers/block/virtio_blk.c
+> >> +++ b/drivers/block/virtio_blk.c
+> >> @@ -214,6 +214,20 @@ static void virtblk_done(struct virtqueue *vq)
+> >>  	spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
+> >>  }
+> >>  
+> >> +static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
+> >> +{
+> >> +	struct virtio_blk *vblk = hctx->queue->queuedata;
+> >> +	int qid = hctx->queue_num;
+> >> +	bool kick;
+> >> +
+> >> +	spin_lock_irq(&vblk->vqs[qid].lock);
+> >> +	kick = virtqueue_kick_prepare(vblk->vqs[qid].vq);
+> >> +	spin_unlock_irq(&vblk->vqs[qid].lock);
+> >> +
+> >> +	if (kick)
+> >> +		virtqueue_notify(vblk->vqs[qid].vq);
+> >> +}
+> >> +
+> >>  static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+> >>  			   const struct blk_mq_queue_data *bd)
+> >>  {
+> >> @@ -638,6 +652,7 @@ static void virtblk_initialize_rq(struct request *req)
+> >>  
+> >>  static const struct blk_mq_ops virtio_mq_ops = {
+> >>  	.queue_rq	= virtio_queue_rq,
+> >> +	.commit_rqs	= virtio_commit_rqs,
+> >>  	.complete	= virtblk_request_done,
+> >>  	.init_request	= virtblk_init_request,
+> >>  #ifdef CONFIG_VIRTIO_BLK_SCSI
+> >> -- 
+> >> 2.17.1
+> >>
+> > 
+> > If .commit_rqs() is implemented, virtqueue_notify() in virtio_queue_rq()
+> > should have been removed for saving the world switch per .queue_rq()
 > 
-> The above tests fine with io and nvme resets on a target nvme loop
-> backed by null_blk, but I also couldn't recreate the original report
-> without the patch.
-> 
-> Ming,
-> 
-> Could you tell me a little more how you set it up? I'm just configuring
-> null_blk with queue_mode=2 irqmode=2. Anything else to recreate?
+> ->commits_rqs() is only for the case where bd->last is set to false,
+> and we never make it to the end and flag bd->last == true. If bd->last
+> is true, the driver should kick things into gear.
 
-No any parameters for null_blk.
+OK, looks I misunderstood it. However, virtio-blk doesn't need this
+change since virtio_queue_rq() can handle it well. This patch may introduce
+one unnecessary VM world switch in case of queue busy.
 
-You may find all the scripts and .json here:
+IMO bd->last won't work well in case of io scheduler given the rq_list
+only includes one single request.
 
-http://people.redhat.com/minlei/tests/tools/nvme/
+I wrote this kind of patch(never posted) before to use sort of ->commits_rqs()
+to replace the current bd->last mechanism which need one extra driver tag,
+which may improve the above case, also code gets cleaned up.
 
-And the test entry is nvme_sanity.
-
-thanks,
+Thanks,
 Ming
