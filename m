@@ -2,159 +2,321 @@ Return-Path: <SRS0=+5f8=OJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7608C04EB8
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 05:36:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 578DFC64EB4
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 07:18:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 45D8220868
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 05:36:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 064C021473
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 07:18:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="pmUu4daF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45D8220868
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=pass (1024-bit key) header.d=cnexlabs.onmicrosoft.com header.i=@cnexlabs.onmicrosoft.com header.b="hpKXwA+n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 064C021473
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cnexlabs.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726386AbeK3Qod (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Nov 2018 11:44:33 -0500
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:4801 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726355AbeK3Qod (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 11:44:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1543556188; x=1575092188;
-  h=from:to:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=OAzUSBv86tyuxPjxcEqksvLGS03F8SjUFAMa4LsvQpE=;
-  b=pmUu4daFZeUBD3obipel/TZzsIgUtdtHdXNCMGMfyyp2a8qAGBzZ0WIw
-   3j+GVintnhlPp6g94b+jDh3nKZD2dBPx/LY4/FmG1IcayOYpOzSXeiBeF
-   K/tW+FsqyN7XqahTiuFmhpJHoq+o9OcxaNtrB/p7/DFJeFgFySNq+quAI
-   R1pB9qDVGDX/7YOKpzvMSudfvwlx7ToANcYMuWBXfk8QaRh6CkLmXwVB7
-   xgUVafmrM6B5vfGI4aPfOzih5tLHx3Wz3D0SI/KrWzunfXhhIZADE2f9L
-   v1DTZh0Jk9lt0YaelopLotGfNH57Pcv50QnaLNMLObpsvKNM8uFOnYqiT
-   A==;
-X-IronPort-AV: E=Sophos;i="5.56,297,1539619200"; 
-   d="scan'208";a="97208997"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 30 Nov 2018 13:36:27 +0800
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP; 29 Nov 2018 21:19:23 -0800
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 29 Nov 2018 21:36:25 -0800
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2] block: update documentation
-Date:   Fri, 30 Nov 2018 14:36:24 +0900
-Message-Id: <20181130053624.1910-1-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.19.2
+        id S1726600AbeK3S0T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Nov 2018 13:26:19 -0500
+Received: from mail-eopbgr750048.outbound.protection.outlook.com ([40.107.75.48]:47840
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726386AbeK3S0T (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Nov 2018 13:26:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=cnexlabs.onmicrosoft.com; s=selector1-cnexlabs-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Cc6cW5WfQG/9Q0SOksKz57uPCRR8gWpILsvKVNZXLUA=;
+ b=hpKXwA+nRCjzIeIqLfIOsNUh+ZvUN+7oKxiGowFg5c4+Bv8hkvZYKUIkgvLZfZ07hPNJ5X/v4wb/R/k2n/uzlOgcVRhQTp36sB1IRyvrMjKBoqYeumEF7IipOahmUj4geLNITucYGAOcVRUrGGvXfvw3Nm7f1/IDDBH5prIEYJM=
+Received: from DM6PR06MB5178.namprd06.prod.outlook.com (20.178.25.19) by
+ DM6PR06MB5210.namprd06.prod.outlook.com (20.178.25.139) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1382.18; Fri, 30 Nov 2018 07:17:54 +0000
+Received: from DM6PR06MB5178.namprd06.prod.outlook.com
+ ([fe80::c450:96ae:b322:78c7]) by DM6PR06MB5178.namprd06.prod.outlook.com
+ ([fe80::c450:96ae:b322:78c7%4]) with mapi id 15.20.1361.019; Fri, 30 Nov 2018
+ 07:17:54 +0000
+From:   Javier Gonzalez <javier@cnexlabs.com>
+To:     =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
+CC:     "Konopko, Igor J" <igor.j.konopko@intel.com>,
+        "marcin.dziegielewski@intel.com" <marcin.dziegielewski@intel.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Keith Busch <keith.busch@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [PATCH] lightnvm: simplify geometry enumeration
+Thread-Topic: [PATCH] lightnvm: simplify geometry enumeration
+Thread-Index: AQHUh+/AxF+u6YXd40KvE3EuBX7KZaVn6b6A
+Date:   Fri, 30 Nov 2018 07:17:54 +0000
+Message-ID: <6FEED0D7-5064-464A-B522-412CEE2A1C7A@cnexlabs.com>
+References: <20181129142738.9567-1-mb@lightnvm.io>
+In-Reply-To: <20181129142738.9567-1-mb@lightnvm.io>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: yes
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=javier@cnexlabs.com; 
+x-originating-ip: [193.106.164.211]
+x-ms-publictraffictype: Email
+x-microsoft-exchange-diagnostics: 1;DM6PR06MB5210;6:PujDCk83PKYj0CtQkrBKBxH/aZu/EFGygGmgM21aSr2pUsH6KLwezGbyNgXLzN2RIU2U+eBDzBujs4NPZJdoQJaBZPJOvOZdWEeShNsoJ4LPuI0JeZhw7x44MKQCxV7fIliX9VJ78CjiaDTWwGY1wvAjB7N8TQI2RNrP/kaIv/MuwoNILn0JvmVz+sZ5jtsBQ8aj83Y0MBLD+8fD1rf+AXOIXZdFggk7f6vMecoBeX9giZkUEL+lwh9mrLDhndgOm5LTmHg4182bm1inmI3FL0J7wXStOUQA+mHLYuOlIwjNuYxMG3lQn/jMB5Q6+r6466HmTFulwYml/XHNZ++rf/OnOW6EFzOL2X3BmCLrtFgXMqfzvzdHXhzF/G1eydbLwwRmZziGTs6wIU6mFNFB1zijgnI+PG7sJrOxpAnwQDVn35BycnK8fGzYY6aEtZEUeZC5EGfZ5U6t+yAySqIFUA==;5:f2a9lcQSH91Hi6u2DkXCK3vMSrhMlDPSWTIk+WvpWRFW14zlPsDsQDDzaeInvWSl3OPUsAkE0cr1Fhazcp5V0QYfNeqDmESHVmetL2xT8/eFLY6ZDcGsoiTKFjsQBOwIPzPdj7fSiBZVjm8fydNi5qQNmZ7bbSFi5adMtR8YeVU=;7:Dr1eca7phe6V7opYYFeGwcEmiFQrYSPCyGhSwejGwwjD9tm999z4KG43/TIeHbOHOmxvCH/gmryFIgfttnOX5D44SLADpJevacvYpGYtxjWkX7ItyyIY1FfuKFXTPZ3QBUbWD35PP0i2l5pZC/l4JA==
+x-ms-exchange-antispam-srfa-diagnostics: SOS;
+x-ms-office365-filtering-correlation-id: 15d8eb01-b169-4f60-2c63-08d65693f285
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390098)(7020095)(4652040)(8989299)(5600074)(711020)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7153060)(49563074)(7193020);SRVR:DM6PR06MB5210;
+x-ms-traffictypediagnostic: DM6PR06MB5210:
+x-microsoft-antispam-prvs: <DM6PR06MB5210813A3AC4E46789F305B6BAD30@DM6PR06MB5210.namprd06.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-exchange-antispam-report-cfa-test: BCL:0;PCL:0;RULEID:(8211001083)(102415395)(6040522)(2401047)(8121501046)(5005006)(3231453)(999002)(944501410)(4983020)(4982022)(52105112)(93006095)(93001095)(10201501046)(3002001)(148016)(149066)(150057)(6041310)(20161123560045)(201703131423095)(201702281528075)(20161123555045)(201703061421075)(201703061406153)(20161123564045)(20161123562045)(20161123558120)(201708071742011)(7699051)(76991095);SRVR:DM6PR06MB5210;BCL:0;PCL:0;RULEID:;SRVR:DM6PR06MB5210;
+x-forefront-prvs: 087223B4DA
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(376002)(396003)(346002)(39840400004)(136003)(199004)(189003)(99286004)(4326008)(305945005)(106356001)(486006)(7736002)(97736004)(25786009)(82746002)(105586002)(14444005)(6506007)(3846002)(6116002)(76176011)(256004)(6512007)(102836004)(6306002)(478600001)(229853002)(53936002)(186003)(81166006)(68736007)(81156014)(5660300001)(36756003)(6486002)(99936001)(6436002)(966005)(86362001)(66066001)(2906002)(54906003)(14454004)(8676002)(11346002)(446003)(66574009)(71200400001)(26005)(8936002)(6246003)(2616005)(476003)(33656002)(71190400001)(83716004)(316002)(6916009);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR06MB5210;H:DM6PR06MB5178.namprd06.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: cnexlabs.com does not designate
+ permitted sender hosts)
+x-microsoft-antispam-message-info: WHbcnPzMLczDMMpo6Qu9hoP7UIYzDjuK8xfSR7YliBJWipd0DqbJe4qLjjcq9XQZvEn6sTRFX9Bj3DW0CfOJDQnIRNN7I0Gi9ff5m7CLJCRLHDrjSwqYA7GOCJiX+ow4AgEL83CPp/1R+PSiX7c5WGopixpJ61hjfDlwxh83+TgHyCysPPZF/LufH0m05odTgZWA6vbNCuL8UVMDvHAs0JVe+gkqd9xHVfMQpMsmBIVZNFCnAg091WtyUbT4v4SEZYwhtDZInd5lJ9unAWxlmBtZ77/JO9yXQ8qHyDEhP/P6IO7vYitvpQmEW+WZTaO58BIHh5WcSxtTzhwp8Hu9rqBRZJbHJAhmZKSOiSYJg+Y=
+spamdiagnosticoutput: 1:99
+spamdiagnosticmetadata: NSPM
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_8CC13221-B825-4BDC-BFC5-4075621773DC";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha512
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: cnexlabs.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15d8eb01-b169-4f60-2c63-08d65693f285
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2018 07:17:54.7558
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: e40dfc2e-c6c1-463a-a598-38602b2c3cff
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR06MB5210
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add the description of the zoned, nr_zones and chunk_sectors sysfs queue
-attributes to Documentation/block/queue-sysfs.txt. The description of
-the zoned and chunk_sector attributes are mostly copied from
-ABI/testing/sysfs-block (added a typo fix). While at it, also fix a
-typo in the description of the io_poll_delay attribute.
+--Apple-Mail=_8CC13221-B825-4BDC-BFC5-4075621773DC
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-nr_zones description is also added to ABI/testing/sysfs-block and
-contact email address updated for the zoned attribute.
+> On 29 Nov 2018, at 15.27, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
+>=20
+> Currently the geometry of an OCSSD is enumerated using a two step
+> approach:
+>=20
+> First, nvm_register is called, the OCSSD identify command is issued,
+> and second the geometry sos and csecs values are read either from the
+> OCSSD identify if it is a 1.2 drive, or from the NVMe namespace data
+> structure if it is a 2.0 device.
+>=20
+> This patch recombines it into a single step, such that nvm_register =
+can
+> use the csecs and sos fields independent of which version is used. =
+This
+> enables one to dynamically size the lightnvm subsystem dma pool.
+>=20
+> Signed-off-by: Matias Bj=C3=B8rling <mb@lightnvm.io>
+> ---
+> drivers/lightnvm/core.c      | 12 +++++-------
+> drivers/nvme/host/core.c     | 18 +++++++++---------
+> drivers/nvme/host/lightnvm.c | 18 ++++++------------
+> drivers/nvme/host/nvme.h     |  2 --
+> 4 files changed, 20 insertions(+), 30 deletions(-)
+>=20
+> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+> index 73ab3cf26868..a1d52e934ce4 100644
+> --- a/drivers/lightnvm/core.c
+> +++ b/drivers/lightnvm/core.c
+> @@ -1145,25 +1145,23 @@ int nvm_register(struct nvm_dev *dev)
+> 	if (!dev->q || !dev->ops)
+> 		return -EINVAL;
+>=20
+> +	ret =3D nvm_init(dev);
+> +	if (ret)
+> +		return ret;
+> +
+> 	dev->dma_pool =3D dev->ops->create_dma_pool(dev, "ppalist");
+> 	if (!dev->dma_pool) {
+> 		pr_err("nvm: could not create dma pool\n");
+> +		nvm_free(dev);
+> 		return -ENOMEM;
+> 	}
+>=20
+> -	ret =3D nvm_init(dev);
+> -	if (ret)
+> -		goto err_init;
+> -
+> 	/* register device with a supported media manager */
+> 	down_write(&nvm_lock);
+> 	list_add(&dev->devices, &nvm_devices);
+> 	up_write(&nvm_lock);
+>=20
+> 	return 0;
+> -err_init:
+> -	dev->ops->destroy_dma_pool(dev->dma_pool);
+> -	return ret;
+> }
+> EXPORT_SYMBOL(nvm_register);
+>=20
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index 65c42448e904..387833b37e38 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -1516,8 +1516,6 @@ static void __nvme_revalidate_disk(struct =
+gendisk *disk, struct nvme_id_ns *id)
+> 	if (ns->noiob)
+> 		nvme_set_chunk_size(ns);
+> 	nvme_update_disk_info(disk, ns, id);
+> -	if (ns->ndev)
+> -		nvme_nvm_update_nvm_info(ns);
+> #ifdef CONFIG_NVME_MULTIPATH
+> 	if (ns->head->disk)
+> 		nvme_update_disk_info(ns->head->disk, ns, id);
+> @@ -3086,13 +3084,6 @@ static void nvme_alloc_ns(struct nvme_ctrl =
+*ctrl, unsigned nsid)
+> 	nvme_setup_streams_ns(ctrl, ns);
+> 	nvme_set_disk_name(disk_name, ns, ctrl, &flags);
+>=20
+> -	if ((ctrl->quirks & NVME_QUIRK_LIGHTNVM) && id->vs[0] =3D=3D =
+0x1) {
+> -		if (nvme_nvm_register(ns, disk_name, node)) {
+> -			dev_warn(ctrl->device, "LightNVM init =
+failure\n");
+> -			goto out_unlink_ns;
+> -		}
+> -	}
+> -
+> 	disk =3D alloc_disk_node(0, node);
+> 	if (!disk)
+> 		goto out_unlink_ns;
+> @@ -3106,6 +3097,13 @@ static void nvme_alloc_ns(struct nvme_ctrl =
+*ctrl, unsigned nsid)
+>=20
+> 	__nvme_revalidate_disk(disk, id);
+>=20
+> +	if ((ctrl->quirks & NVME_QUIRK_LIGHTNVM) && id->vs[0] =3D=3D =
+0x1) {
+> +		if (nvme_nvm_register(ns, disk_name, node)) {
+> +			dev_warn(ctrl->device, "LightNVM init =
+failure\n");
+> +			goto out_put_disk;
+> +		}
+> +	}
+> +
+> 	down_write(&ctrl->namespaces_rwsem);
+> 	list_add_tail(&ns->list, &ctrl->namespaces);
+> 	up_write(&ctrl->namespaces_rwsem);
+> @@ -3119,6 +3117,8 @@ static void nvme_alloc_ns(struct nvme_ctrl =
+*ctrl, unsigned nsid)
+> 	kfree(id);
+>=20
+> 	return;
+> + out_put_disk:
+> +	put_disk(ns->disk);
+>  out_unlink_ns:
+> 	mutex_lock(&ctrl->subsys->lock);
+> 	list_del_rcu(&ns->siblings);
+> diff --git a/drivers/nvme/host/lightnvm.c =
+b/drivers/nvme/host/lightnvm.c
+> index d64805dc8efb..51d957ccf328 100644
+> --- a/drivers/nvme/host/lightnvm.c
+> +++ b/drivers/nvme/host/lightnvm.c
+> @@ -973,22 +973,11 @@ int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned =
+int cmd, unsigned long arg)
+> 	}
+> }
+>=20
+> -void nvme_nvm_update_nvm_info(struct nvme_ns *ns)
+> -{
+> -	struct nvm_dev *ndev =3D ns->ndev;
+> -	struct nvm_geo *geo =3D &ndev->geo;
+> -
+> -	if (geo->version =3D=3D NVM_OCSSD_SPEC_12)
+> -		return;
+> -
+> -	geo->csecs =3D 1 << ns->lba_shift;
+> -	geo->sos =3D ns->ms;
+> -}
+> -
+> int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
+> {
+> 	struct request_queue *q =3D ns->queue;
+> 	struct nvm_dev *dev;
+> +	struct nvm_geo *geo;
+>=20
+> 	_nvme_nvm_check_size();
+>=20
+> @@ -996,6 +985,11 @@ int nvme_nvm_register(struct nvme_ns *ns, char =
+*disk_name, int node)
+> 	if (!dev)
+> 		return -ENOMEM;
+>=20
+> +	/* Note that csecs and sos will be overridden if it is a 1.2 =
+drive. */
+> +	geo =3D &dev->geo;
+> +	geo->csecs =3D 1 << ns->lba_shift;
+> +	geo->sos =3D ns->ms;
+> +
+> 	dev->q =3D q;
+> 	memcpy(dev->name, disk_name, DISK_NAME_LEN);
+> 	dev->ops =3D &nvme_nvm_dev_ops;
+> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+> index 9fefba039d1e..4f5399c8808b 100644
+> --- a/drivers/nvme/host/nvme.h
+> +++ b/drivers/nvme/host/nvme.h
+> @@ -541,13 +541,11 @@ static inline void nvme_mpath_stop(struct =
+nvme_ctrl *ctrl)
+> #endif /* CONFIG_NVME_MULTIPATH */
+>=20
+> #ifdef CONFIG_NVM
+> -void nvme_nvm_update_nvm_info(struct nvme_ns *ns);
+> int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node);
+> void nvme_nvm_unregister(struct nvme_ns *ns);
+> extern const struct attribute_group nvme_nvm_attr_group;
+> int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long =
+arg);
+> #else
+> -static inline void nvme_nvm_update_nvm_info(struct nvme_ns *ns) {};
+> static inline int nvme_nvm_register(struct nvme_ns *ns, char =
+*disk_name,
+> 				    int node)
+> {
+> --
+> 2.17.1
+>=20
+>=20
+> _______________________________________________
+> Linux-nvme mailing list
+> Linux-nvme@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-nvme
 
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
- Documentation/ABI/testing/sysfs-block | 12 +++++++++--
- Documentation/block/queue-sysfs.txt   | 29 ++++++++++++++++++++++++++-
- 2 files changed, 38 insertions(+), 3 deletions(-)
+Good refactor; much better to do initialization on a single step.
 
-diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/ABI/testing/sysfs-block
-index dea212db9df3..7710d4022b19 100644
---- a/Documentation/ABI/testing/sysfs-block
-+++ b/Documentation/ABI/testing/sysfs-block
-@@ -244,7 +244,7 @@ Description:
- 
- What:		/sys/block/<disk>/queue/zoned
- Date:		September 2016
--Contact:	Damien Le Moal <damien.lemoal@hgst.com>
-+Contact:	Damien Le Moal <damien.lemoal@wdc.com>
- Description:
- 		zoned indicates if the device is a zoned block device
- 		and the zone model of the device if it is indeed zoned.
-@@ -259,6 +259,14 @@ Description:
- 		zone commands, they will be treated as regular block
- 		devices and zoned will report "none".
- 
-+What:		/sys/block/<disk>/queue/nr_zones
-+Date:		November 2018
-+Contact:	Damien Le Moal <damien.lemoal@wdc.com>
-+Description:
-+		nr_zones indicates the total number of zones of a zoned block
-+		device ("host-aware" or "host-managed" zone model). For regular
-+		block devices, the value is always 0.
-+
- What:		/sys/block/<disk>/queue/chunk_sectors
- Date:		September 2016
- Contact:	Hannes Reinecke <hare@suse.com>
-@@ -268,6 +276,6 @@ Description:
- 		indicates the size in 512B sectors of the RAID volume
- 		stripe segment. For a zoned block device, either
- 		host-aware or host-managed, chunk_sectors indicates the
--		size of 512B sectors of the zones of the device, with
-+		size in 512B sectors of the zones of the device, with
- 		the eventual exception of the last zone of the device
- 		which may be smaller.
-diff --git a/Documentation/block/queue-sysfs.txt b/Documentation/block/queue-sysfs.txt
-index 2c1e67058fd3..39e286d7afc9 100644
---- a/Documentation/block/queue-sysfs.txt
-+++ b/Documentation/block/queue-sysfs.txt
-@@ -64,7 +64,7 @@ guess, the kernel will put the process issuing IO to sleep for an amount
- of time, before entering a classic poll loop. This mode might be a
- little slower than pure classic polling, but it will be more efficient.
- If set to a value larger than 0, the kernel will put the process issuing
--IO to sleep for this amont of microseconds before entering classic
-+IO to sleep for this amount of microseconds before entering classic
- polling.
- 
- iostats (RW)
-@@ -194,4 +194,31 @@ blk-throttle makes decision based on the samplings. Lower time means cgroups
- have more smooth throughput, but higher CPU overhead. This exists only when
- CONFIG_BLK_DEV_THROTTLING_LOW is enabled.
- 
-+zoned (RO)
-+----------
-+This indicates if the device is a zoned block device and the zone model of the
-+device if it is indeed zoned. The possible values indicated by zoned are
-+"none" for regular block devices and "host-aware" or "host-managed" for zoned
-+block devices. The characteristics of host-aware and host-managed zoned block
-+devices are described in the ZBC (Zoned Block Commands) and ZAC
-+(Zoned Device ATA Command Set) standards. These standards also define the
-+"drive-managed" zone model. However, since drive-managed zoned block devices
-+do not support zone commands, they will be treated as regular block devices
-+and zoned will report "none".
-+
-+nr_zones (RO)
-+-------------
-+For zoned block devices (zoned attribute indicating "host-managed" or
-+"host-aware"), this indicates the total number of zones of the device.
-+This is always 0 for regular block devices.
-+
-+chunk_sectors (RO)
-+------------------
-+This has different meaning depending on the type of the block device.
-+For a RAID device (dm-raid), chunk_sectors indicates the size in 512B sectors
-+of the RAID volume stripe segment. For a zoned block device, either host-aware
-+or host-managed, chunk_sectors indicates the size in 512B sectors of the zones
-+of the device, with the eventual exception of the last zone of the device which
-+may be smaller.
-+
- Jens Axboe <jens.axboe@oracle.com>, February 2009
--- 
-2.19.2
+Reviewed-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
 
+
+--Apple-Mail=_8CC13221-B825-4BDC-BFC5-4075621773DC
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlwA5CEACgkQIX4xUKFR
+nnTNAg/+If42ZquryLgdIeq5uXcr6icmtLkPKGLYbimbcKyue+D6kEVC88gGwk4i
+kd60Q6afKyYFNYHay83QlryFjepTJqh/LrVxhnuVHODLYfe89Ei1zm0HtsBXyEym
+IYqS26+KiYyv9LE+eJbWoicPPKKgYR2IWF3i0fAm2IzebftHp4G+wLiWOVrswq6r
+aMNugBp2YI+lCyh9qNtnFT2u81pgkjIzcXe08v705+rDNJBvPNp0sYT8un+3/rqP
+o8ztY9v9DUOVbff1reFO/Xg0FV0PjtPqUSbrfDIo39sZXWGbXkDs4YnafkM902d1
+IXWeHGGRzCZzh7vfRb4glksTNh0aa22eyVU1n9Am8gWXpC5/d9d/xrUje45E1sDA
+jH4MnmQ41c/467pbIbLMnwPqJ6+IgIsL9/mcupmORyeFaH+qyWG8drmwTaz7ZATU
+TDsbcuErlIHt/oK5ffJ82doUAS1BPX+/8V9P5EHdkruxZx+zakmJEUC26Mnn63Ba
+9uqRc+kE9Lc6dqTTYhRzAJkGfedrJxdzsBK/gepeQjxUSmv+IMnm1R+B3d/9NDAu
+pwDJyZzN7LssALqfXmvaICeUYG5hXKKKdoXRhR/pFEnRx9qNvTEBpczXJ60X5YHZ
+Hk8c17N1Jrwqz6fg5/4tb/gF0ELbuadAXrb5r2EgXGkMUP3NFmQ=
+=tbRG
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_8CC13221-B825-4BDC-BFC5-4075621773DC--
