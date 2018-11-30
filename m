@@ -6,53 +6,50 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB0D8C04EB8
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 19:17:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80491C64EB4
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 19:21:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5554C2082F
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 19:17:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5554C2082F
+	by mail.kernel.org (Postfix) with ESMTP id 540ED20868
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 19:21:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 540ED20868
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=zeniv.linux.org.uk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725861AbeLAG2G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 1 Dec 2018 01:28:06 -0500
-Received: from zeniv.linux.org.uk ([195.92.253.2]:51030 "EHLO
+        id S1726616AbeLAGbV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 1 Dec 2018 01:31:21 -0500
+Received: from zeniv.linux.org.uk ([195.92.253.2]:51066 "EHLO
         ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725842AbeLAG2G (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 1 Dec 2018 01:28:06 -0500
+        with ESMTP id S1725790AbeLAGbV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 1 Dec 2018 01:31:21 -0500
 Received: from viro by ZenIV.linux.org.uk with local (Exim 4.91 #2 (Red Hat Linux))
-        id 1gSoIN-00089p-CW; Fri, 30 Nov 2018 19:17:47 +0000
-Date:   Fri, 30 Nov 2018 19:17:47 +0000
+        id 1gSoLW-0008Du-Bk; Fri, 30 Nov 2018 19:21:02 +0000
+Date:   Fri, 30 Nov 2018 19:21:02 +0000
 From:   Al Viro <viro@zeniv.linux.org.uk>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-aio@kvack.org, hch@lst.de
-Subject: Re: [PATCH 26/27] iov_iter: add import_kvec()
-Message-ID: <20181130191747.GO2217@ZenIV.linux.org.uk>
+Subject: Re: [PATCH 24/27] block: implement bio helper to add iter kvec pages
+ to bio
+Message-ID: <20181130192102.GP2217@ZenIV.linux.org.uk>
 References: <20181130165646.27341-1-axboe@kernel.dk>
- <20181130165646.27341-27-axboe@kernel.dk>
+ <20181130165646.27341-25-axboe@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181130165646.27341-27-axboe@kernel.dk>
+In-Reply-To: <20181130165646.27341-25-axboe@kernel.dk>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 30, 2018 at 09:56:45AM -0700, Jens Axboe wrote:
-> This explicitly sets up an ITER_KVEC from an iovec with kernel ranges
-> mapped.
+On Fri, Nov 30, 2018 at 09:56:43AM -0700, Jens Axboe wrote:
+> For an ITER_KVEC, we can just iterate the iov and add the pages
+> to the bio directly.
 
-> +int import_kvec(int type, const struct kvec *kvecs, unsigned nr_segs,
-> +		size_t bytes, struct iov_iter *iter)
-> +{
-> +	const struct iovec *p = (const struct iovec *) kvecs;
-> +
-> +	iov_iter_init_type(iter, ITER_KVEC, type, p, nr_segs, bytes);
-> +	return 0;
-> +}
+> +		page = virt_to_page(kv->iov_base);
+> +		size = bio_add_page(bio, page, kv->iov_len,
+> +					offset_in_page(kv->iov_base));
 
-What the hell is wrong with existing iov_iter_kvec()?
+Who said that you *can* do virt_to_page() on those?  E.g. vmalloc()'ed
+addresses are fine for ITER_KVEC, etc.
