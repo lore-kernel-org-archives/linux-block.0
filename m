@@ -2,131 +2,103 @@ Return-Path: <SRS0=+5f8=OJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33E61C04EB8
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 11:26:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10E87C04EB8
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 11:49:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 06E57206B7
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 11:26:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06E57206B7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id D27792146D
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 11:49:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D27792146D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726473AbeK3WfZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Nov 2018 17:35:25 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:44291 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726459AbeK3WfY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 17:35:24 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id E619E8E6979A4;
-        Fri, 30 Nov 2018 19:26:21 +0800 (CST)
-Received: from [127.0.0.1] (10.202.226.41) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.408.0; Fri, 30 Nov 2018
- 19:26:12 +0800
-Subject: Re: DIF/DIX issue related to config CONFIG_SCSI_MQ_DEFAULT
-To:     Ming Lei <ming.lei@redhat.com>,
-        "chenxiang (M)" <chenxiang66@hisilicon.com>
-References: <5d9bf51d-1ef9-b948-2168-9e7526d77225@hisilicon.com>
- <20181127130811.GA2780@ming.t460p>
- <6c573f36-60d8-0631-e9ac-dacd72f6c8ad@hisilicon.com>
- <20181130011935.GA7573@ming.t460p>
-CC:     "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linuxarm <linuxarm@huawei.com>,
-        Steffen Maier <maier@linux.ibm.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <e0e07583-98ca-4fc5-e60d-055e5474c084@huawei.com>
-Date:   Fri, 30 Nov 2018 11:26:07 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        id S1726521AbeK3W6T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Nov 2018 17:58:19 -0500
+Received: from mga03.intel.com ([134.134.136.65]:41003 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726512AbeK3W6T (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Nov 2018 17:58:19 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Nov 2018 03:49:18 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.56,298,1539673200"; 
+   d="scan'208";a="108549569"
+Received: from gklab-106-154.igk.intel.com ([10.102.106.154])
+  by FMSMGA003.fm.intel.com with ESMTP; 30 Nov 2018 03:49:16 -0800
+From:   Igor Konopko <igor.j.konopko@intel.com>
+To:     mb@lightnvm.io
+Cc:     linux-block@vger.kernel.org, javier@cnexlabs.com,
+        hans.holmberg@cnexlabs.com, igor.j.konopko@intel.com
+Subject: [PATCH v5 0/5] lightnvm: Flexible metadata
+Date:   Fri, 30 Nov 2018 12:43:57 +0100
+Message-Id: <20181130114402.43793-1-igor.j.konopko@intel.com>
+X-Mailer: git-send-email 2.14.5
 MIME-Version: 1.0
-In-Reply-To: <20181130011935.GA7573@ming.t460p>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.202.226.41]
-X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-+
+This series of patches extends the way how pblk can
+store L2P sector metadata. After this set of changes
+any size of NVMe metadata is supported in pblk.
+Also there is an support for case without NVMe metadata.
 
-On 30/11/2018 01:19, Ming Lei wrote:
-> On Wed, Nov 28, 2018 at 10:50:11AM +0800, chenxiang (M) wrote:
->> Hi  Lei Ming,
->>
->> 在 2018/11/27 21:08, Ming Lei 写道:
->>> On Tue, Nov 27, 2018 at 05:55:45PM +0800, chenxiang (M) wrote:
->>>> Hi all,
->>>>
->>>> There is a issue which may be related to CONFIG_SCSI_MQ_DEFAULT: before we
->>>> developed DIF/DIX feature on kernel 4.18 (disable CONFIG_SCSI_MQ_DEFAULT
->>>> default), and
->>>> it works well.
->>> I guess you are testing hisi_sas_v3_hw, does 4.18 work with
->>> 'scsi_mod.use_blk_mq=Y'? If yes, you may run 'git bisect' to figure out
->>> which commit is the 1st bad one.
->>
->> Yes, i am testing hisi_sas_v3_hw, if 4.18 with 'scsi_mod.use_blk_mq=Y' ,
->> there is still a issue, and
->> the log is as attached ;
->>
->>>
->>>> But when we switch to kernel 4.19-rc1 and 4.20-rc1, Call
->>>> trace as follow occurs when running fio and if disable config
->>>> CONFIG_SCSI_MQ_DEFAULT,
->>>> then it works well. Also if switch ioengine=libaio to ioengine=psync, it
->>>> seems also work well. Do you have any idea or encounter similar issue?
->>> I tested scsi-debug via 'dix=1 dif=1', looks everything is fine, are you
->>> using direct io or not?
->> Yes, i use direct io.
->> I also test scsi-debug on kernel 4.19, and there seems be some other issue,
->> and i am not sure
->> whethere there is something wrong my operation:
->>
->> root@(none)$ insmod scsi_debug.ko dif=1 dix=1 virtual_gb=120
->
-> Hi chenxiang,
->
-> For DIX/DIF test, I think you need to pass 'dev_size_mb=XXX' instead of
-> 'virtual_gb'.
->
-> I just run FIO over 'scsi_debug dev_size_mb=896 max_luns=1 dif=1 dix=1'
-> on one apm-mustang-ev3 board, and looks everything is fine. You may run
-> the same test on your D06 and see if it is fine.
->
-> Please check if you may reproduce the list corruption issue on v4.18 with
-> hisi_sas_v3_hw.
->
+Changes v4 --> v5:
+-rebase on top of ocssd/for-4.21/core
 
-Hi Ming,
+Changes v3 --> v4:
+-rename nvm_alloc_dma_pool() to nvm_create_dma_pool()
+-split pblk_get_meta() calls and lba setting into
+two operations for better core readability
+-fixing compilation with CONFIG_NVM disabled
+-getting rid of unnecessary memcpy for packed metadata
+on write path
+-support for drives with oob size >0 and <16B in packed
+metadata mode
+-minor commit message updates
 
-Thanks for your support.
+Changes v2 --> v3:
+-Rebase on top of ocssd/for-4.21/core
+-get/set_meta_lba helpers were removed
+-dma reallocation was replaced with single allocation
+-oob metadata size was added to pblk structure
+-proper checks on pblk creation were added
+ 
+Changes v1 --> v2:
+-Revert sector meta size back to 16b for pblk
+-Dma pool for larger oob meta are handled in core instead of pblk
+-Pblk oob meta helpers uses __le64 as input outpu instead of u64
+-Other minor fixes based on v1 patch review
 
-We have also noticed that if we just enable DIF in hisi_sas (with MQ), 
-and not DIX, then no issue.
+Igor Konopko (5):
+  lightnvm: pblk: Move lba list to partial read context
+  lightnvm: pblk: Helpers for OOB metadata
+  lightnvm: Flexible DMA pool entry size
+  lightnvm: Disable interleaved metadata
+  lightnvm: pblk: Support for packed metadata
 
-I did also noticed mail "[PATCH v2 01/23] zfcp: make DIX experimental, 
-disabled, and independent of DIF", where DIX is made experimental.
+ drivers/lightnvm/core.c          |  9 ++++--
+ drivers/lightnvm/pblk-core.c     | 61 +++++++++++++++++++++++++++++++------
+ drivers/lightnvm/pblk-init.c     | 44 +++++++++++++++++++++++++--
+ drivers/lightnvm/pblk-map.c      | 20 +++++++-----
+ drivers/lightnvm/pblk-rb.c       |  3 ++
+ drivers/lightnvm/pblk-read.c     | 66 +++++++++++++++++++++++-----------------
+ drivers/lightnvm/pblk-recovery.c | 25 +++++++++------
+ drivers/lightnvm/pblk-sysfs.c    |  7 +++++
+ drivers/lightnvm/pblk-write.c    |  9 +++---
+ drivers/lightnvm/pblk.h          | 24 +++++++++++++--
+ drivers/nvme/host/lightnvm.c     |  6 ++--
+ include/linux/lightnvm.h         |  3 +-
+ 12 files changed, 209 insertions(+), 68 deletions(-)
 
-For now we may not support DIX. It seems to have issues. We wanted to 
-try 3008 card on our system, but it does not seem to support DIX 0-3.
-
-BTW, chen xiang said your commnand works ok on our HW. He can confirm.
-
-Thanks again,
-John
-
-> Thanks,
-> Ming
->
-> .
->
-
+-- 
+2.14.5
 
