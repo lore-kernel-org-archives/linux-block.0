@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 550AAC04EB8
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC13C65BAE
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 079972145D
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B47C20867
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cywvOdps"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 079972145D
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="EfcQOIoU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B47C20867
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727510AbeLAEHY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Nov 2018 23:07:24 -0500
-Received: from mail-io1-f65.google.com ([209.85.166.65]:42605 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726736AbeLAEHY (ORCPT
+        id S1726779AbeLAEH0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Nov 2018 23:07:26 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:35513 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727653AbeLAEH0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 23:07:24 -0500
-Received: by mail-io1-f65.google.com with SMTP id x6so5060611ioa.9
-        for <linux-block@vger.kernel.org>; Fri, 30 Nov 2018 08:57:29 -0800 (PST)
+        Fri, 30 Nov 2018 23:07:26 -0500
+Received: by mail-it1-f194.google.com with SMTP id p197so10253627itp.0
+        for <linux-block@vger.kernel.org>; Fri, 30 Nov 2018 08:57:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=KTzMVdjW5NFmc+ni1z0AYs6SzISV9Szv/UKJuYhDmgM=;
-        b=cywvOdps9izJS4wyu2a/6Vi+ryIpdgR6h2qtZGAAW5B0OBsEerT6be7yKT7QQhh8uQ
-         9jGKVa4iVqKwcm7kdLrIo1wgmsSmD9FK9rgIdfGQ1RwN9fleMhIiXPo8DX/WdJZghy0l
-         zzBdwjgalTExk714jbBtbg0VsU0fleKxJVQI+LpskhRLdTUS0mcE5p5Xe6YRc5fsO45L
-         ahkaKeWSVMY5h/kKK5GH0m5zMyhBOXmQlCXKm/jOVXOCPdYPD3tZIKRobQKqCnYi/fj3
-         DCqzKneZOW28xyeKxghUc3u0R4b0sLspyUe2fhXl4UPGCn2Yo/VsdCrygfcvMZkeTVb2
-         85Qg==
+        bh=g46PYTbAjyIcxDqCKCRd2T5v8MCWa71J81SsLDN3oOo=;
+        b=EfcQOIoULyEeMdNtFqUGblTKvD4RYYzQLQUU34/06yRNt+Xahpv12wPlX0X2xgkFXh
+         OTbzHOE5HiWZgeJiAuAQD+6e8bB1UwKSe4mHSmIVHFWkm5VkjLf4KBuiqdkt9DQTE1Hn
+         e36Y/xgvavR8b2FeAjgUADEWnD7Q1lZ0ziPnX5goup4285SAkeb3U6CRfLZPN2UGRrQC
+         U27gi+HNd23Usf/6GvXoe8nAALoDLXtGx46lElqUB8i/ahApkhrWd7Q9dzRw7rahUeQ0
+         W2Ix9Rw3bCXYWc1ZheeR70ZG1c+j4bidU7hBbqLlPfZDGLbNGx2Mw1SXksORTuFHDlH/
+         IGlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=KTzMVdjW5NFmc+ni1z0AYs6SzISV9Szv/UKJuYhDmgM=;
-        b=cvLcneDK1fcnQpDnan6bk/BtXqhOGxubZh6iP+G/VgBx2VjrTn+GmQNBAp5eFXN5+5
-         3cjk/VJenS6BTbRuj0+fhaGu5/Ca98YiRLP2pgvO4e9Wj0CcKbMmZH5dTXAyYDA8OZKD
-         atesiYAR8O4ADwhhJMBS40U3Or2CR+jvm3A4u+FdQeLoJtx/dQ+n2IcYcSYg7EhseZCK
-         0KUfT7QuKUe2JITDaeX5oJeHvvpTmwvqUmNUSK0wLgenLcgPjwNk+MCfhVRAN4rFFUUD
-         uQ0pYosI9Qgr8jzUyyvo4+9GpkN8T8uotHUHMheEwP6ByqTL8NeGIcqDebA0eItvJ0IT
-         MTRQ==
-X-Gm-Message-State: AA+aEWaJtJskTUZ0yiJmapBBtfDLa4O8CCukWRoXKkfeN9iCwNcrU0Bg
-        lZVOsFNG2wm8cD6wXMJ5jJjWTYiZiVM=
-X-Google-Smtp-Source: AFSGD/Xln4DhlHKpJ13gaxoheMc6RZwjWAd+PVZ6X1VhdC3IrOxkzslwk+z094NVyYcV1gcWAxy5bQ==
-X-Received: by 2002:a6b:f70a:: with SMTP id k10mr4834429iog.270.1543597048182;
-        Fri, 30 Nov 2018 08:57:28 -0800 (PST)
+        bh=g46PYTbAjyIcxDqCKCRd2T5v8MCWa71J81SsLDN3oOo=;
+        b=fgKLHN4Uu44l++j+VuaYWPBjuXw8Gbvrg4n52gQl0p+Q9Z1UoxoDuFthHblUmow0wz
+         H+zQrHTOcGmeQh21pyO2EzFIGkGXidercvHx7R0aH45vJKCY7cCMBktOEoY0l9MjeuwO
+         O3ReCcSMVpY7Sw4PMuGFuxsQJDABJqzAgaKJShrV1elzvD2i57NPMXyzJSwEc7gHSQj2
+         ki1IwJWvgSCXpXrnL1Z7NUvWyRYPlaJbShMuW7bOQnWSdGklOWvs4df96GMxSfHeC3r7
+         eMyCS5cCE8JSqL2yodrV59WAoc/hXMgSwZ8+QiWKa1QzK46HVTBReliPREdUcoqFkTgs
+         JhAg==
+X-Gm-Message-State: AA+aEWbULbEHChXcqHmTUHDwRDyBr8Tny3mpwVBHxt+4Xm6rcOD5t9ko
+        VBX27kTdduZeu2MCZQqx5DptlGeHovs=
+X-Google-Smtp-Source: AFSGD/VustQw5HVZWLmhppIjvJibhAVyzP6F1VYZU8kliZqR1wrNqFEz2nrCQ6WiVVRTUoKpcbvLGA==
+X-Received: by 2002:a24:a08a:: with SMTP id o132mr6004259ite.1.1543597049680;
+        Fri, 30 Nov 2018 08:57:29 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id j133sm2979447itj.16.2018.11.30.08.57.26
+        by smtp.gmail.com with ESMTPSA id j133sm2979447itj.16.2018.11.30.08.57.28
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 30 Nov 2018 08:57:27 -0800 (PST)
+        Fri, 30 Nov 2018 08:57:28 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-aio@kvack.org
 Cc:     hch@lst.de, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 24/27] block: implement bio helper to add iter kvec pages to bio
-Date:   Fri, 30 Nov 2018 09:56:43 -0700
-Message-Id: <20181130165646.27341-25-axboe@kernel.dk>
+Subject: [PATCH 25/27] fs: add support for mapping an ITER_KVEC for O_DIRECT
+Date:   Fri, 30 Nov 2018 09:56:44 -0700
+Message-Id: <20181130165646.27341-26-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181130165646.27341-1-axboe@kernel.dk>
 References: <20181130165646.27341-1-axboe@kernel.dk>
@@ -72,68 +72,72 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For an ITER_KVEC, we can just iterate the iov and add the pages
-to the bio directly.
+This adds support for sync/async O_DIRECT to make a kvec type iter
+for bdev access, as well as iomap.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/bio.c         | 30 ++++++++++++++++++++++++++++++
- include/linux/bio.h |  1 +
- 2 files changed, 31 insertions(+)
+ fs/block_dev.c | 16 ++++++++++++----
+ fs/iomap.c     |  5 ++++-
+ 2 files changed, 16 insertions(+), 5 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index ab174bce5436..7e59ef547ed4 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -903,6 +903,36 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- }
- EXPORT_SYMBOL_GPL(bio_iov_iter_get_pages);
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index ebc3d5a0f424..b926f03de55e 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -219,7 +219,10 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
+ 	bio.bi_end_io = blkdev_bio_end_io_simple;
+ 	bio.bi_ioprio = iocb->ki_ioprio;
  
-+/**
-+ * bio_iov_kvec_add_pages - add pages from an ITER_KVEC to a bio
-+ * @bio: bio to add pages to
-+ * @iter: iov iterator describing the region to be added
-+ *
-+ * Iterate pages in the @iter and add them to the bio. We flag the
-+ * @bio with BIO_HOLD_PAGES, telling IO completion not to free them.
-+ */
-+int bio_iov_kvec_add_pages(struct bio *bio, struct iov_iter *iter)
-+{
-+	unsigned short orig_vcnt = bio->bi_vcnt;
-+	const struct kvec *kv;
+-	ret = bio_iov_iter_get_pages(&bio, iter);
++	if (iov_iter_is_kvec(iter))
++		ret = bio_iov_kvec_add_pages(&bio, iter);
++	else
++		ret = bio_iov_iter_get_pages(&bio, iter);
+ 	if (unlikely(ret))
+ 		goto out;
+ 	ret = bio.bi_iter.bi_size;
+@@ -326,8 +329,9 @@ static void blkdev_bio_end_io(struct bio *bio)
+ 		struct bio_vec *bvec;
+ 		int i;
+ 
+-		bio_for_each_segment_all(bvec, bio, i)
+-			put_page(bvec->bv_page);
++		if (!bio_flagged(bio, BIO_HOLD_PAGES))
++			bio_for_each_segment_all(bvec, bio, i)
++				put_page(bvec->bv_page);
+ 		bio_put(bio);
+ 	}
+ }
+@@ -381,7 +385,11 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 		bio->bi_end_io = blkdev_bio_end_io;
+ 		bio->bi_ioprio = iocb->ki_ioprio;
+ 
+-		ret = bio_iov_iter_get_pages(bio, iter);
++		if (iov_iter_is_kvec(iter))
++			ret = bio_iov_kvec_add_pages(bio, iter);
++		else
++			ret = bio_iov_iter_get_pages(bio, iter);
 +
-+	do {
-+		struct page *page;
-+		size_t size;
-+
-+		kv = iter->kvec + iter->iov_offset;
-+		page = virt_to_page(kv->iov_base);
-+		size = bio_add_page(bio, page, kv->iov_len,
-+					offset_in_page(kv->iov_base));
-+		if (size != kv->iov_len)
-+			break;
-+		iov_iter_advance(iter, size);
-+	} while (iov_iter_count(iter) && !bio_full(bio));
-+
-+	bio_set_flag(bio, BIO_HOLD_PAGES);
-+	return bio->bi_vcnt > orig_vcnt ? 0 : -EINVAL;
-+}
-+
- static void submit_bio_wait_endio(struct bio *bio)
- {
- 	complete(bio->bi_private);
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 056fb627edb3..23ae8fb66b1e 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -434,6 +434,7 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
- void __bio_add_page(struct bio *bio, struct page *page,
- 		unsigned int len, unsigned int off);
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter);
-+int bio_iov_kvec_add_pages(struct bio *bio, struct iov_iter *iter);
- struct rq_map_data;
- extern struct bio *bio_map_user_iov(struct request_queue *,
- 				    struct iov_iter *, gfp_t);
+ 		if (unlikely(ret)) {
+ 			bio->bi_status = BLK_STS_IOERR;
+ 			bio_endio(bio);
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 96d60b9b2bea..72f58d604fab 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -1671,7 +1671,10 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+ 		bio->bi_private = dio;
+ 		bio->bi_end_io = iomap_dio_bio_end_io;
+ 
+-		ret = bio_iov_iter_get_pages(bio, &iter);
++		if (iov_iter_is_kvec(&iter))
++			ret = bio_iov_kvec_add_pages(bio, &iter);
++		else
++			ret = bio_iov_iter_get_pages(bio, &iter);
+ 		if (unlikely(ret)) {
+ 			bio_put(bio);
+ 			return copied ? copied : ret;
 -- 
 2.17.1
 
