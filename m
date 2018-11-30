@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 109CCC04EB9
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 01:12:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B914FC64EB4
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 01:12:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C13112145D
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 01:12:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 742702082F
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 01:12:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="P4jNQATX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C13112145D
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="L4lKV+HD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 742702082F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726609AbeK3MUL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Nov 2018 07:20:11 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:41423 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726525AbeK3MUK (ORCPT
+        id S1726652AbeK3MUM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Nov 2018 07:20:12 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:43846 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726525AbeK3MUM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 07:20:10 -0500
-Received: by mail-pf1-f196.google.com with SMTP id b7so1914545pfi.8
-        for <linux-block@vger.kernel.org>; Thu, 29 Nov 2018 17:12:41 -0800 (PST)
+        Fri, 30 Nov 2018 07:20:12 -0500
+Received: by mail-pl1-f195.google.com with SMTP id gn14so1913673plb.10
+        for <linux-block@vger.kernel.org>; Thu, 29 Nov 2018 17:12:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=/BkC37cR1BMAuLA3V/wheSuC8+j44tyzekubWlTVNpI=;
-        b=P4jNQATXG1Prp032p2SjvXDRmy2lrykiWSTY28cOMfr9lPMydgIkrARobvl6/5WTIW
-         77cU8XXOHox+utu2Xcr7nh5EhX1ecLEp84aNn9LhCNxVTvlrzfzg8NowSv91IfYYYjgR
-         7Tg8QvtncJFm2hXwaqTLsJc1rvQcxHpb+3O9K9vSwebHG6+zeYKA17yu7a5GrMohg1GL
-         pCewvG4QJnJOnm1+FnZ/XmhsKbS0Q2GpjfwOrcwowZRm0cDrA2RI8bSQwwo0pMXX6ZqU
-         yBiiQtmaYXPfl0kBiEJWShZShLYFSAMp0dTbGahC7bCMiPXu4ukg5UR/hVqv+wdYF4gv
-         dtwQ==
+        bh=FL64amkHfziKUXg291XJEzD6bPujZYHM+eAGmoCvs38=;
+        b=L4lKV+HDaFtMwQ7sBWg1gSpfTnQwtqhHeJITHqMJ4OJrjalYqS8fLYy2n+fu7OoRNj
+         Im6AO9J7dCiYjlRmHXwVM+qdTMa+06+109SrKoqRuYYNiNiQEOX7y5tPxS4or8mStuw0
+         QjwCB9Okx1FnFUcRRR62YjNW+MUmFp8Ri4HSnvZmCT9kHIUzbygUceAA2azxDR8ZGfC1
+         aXzaMrh1ro0blqXlMxuGEi6nG3NwQc8RFFPUaLIV/erdduqfQctYCmTrcXWk/JpqBV6m
+         UxxhGd0d8KtJ15zDn61awAVaWKjb5XaXFQqU4jpkwaxsbFjh7r26ToRAEt/9iF7C/oW5
+         emSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=/BkC37cR1BMAuLA3V/wheSuC8+j44tyzekubWlTVNpI=;
-        b=S2mJyc+nALeQZkts9dVbullK0cCfvCU4zN3NFvxz+M4r/y//s3G1+mG154GfUCUbNp
-         qsm6PBm7U/AQoZIVUvFhUyWnkTC5NXz5CleGy9JgGS7ZkuysbKnfHWqjj2e0m40qY+io
-         Ho8vavU8B7q52UBpuuFuqLEQsv4AK4w/nSSgPzhNqS8zrvWWw1JIt6J3Z+I7w/a7FpFn
-         I5xEybW+9rhMyxMWXhgdKyjIv/xSzvPFikSSwvEyn+lTfjBaxutgjtjjgtMB2CXGvZLr
-         PE9h2zmGacdS+y75P8HU40etDt7Q8LO4tz9Vp7638Rar5HnWZmD+tAfuCJyi2O6C5np3
-         xh/w==
-X-Gm-Message-State: AA+aEWa4xGiF2bXDrlEF9N0hMyDkNlfsGWN+e/IKSL1kLc9f6Fse0NuX
-        OgXS9sDpROPWzKkkCyHg764y04Spt0U=
-X-Google-Smtp-Source: AFSGD/VfjGXOZ0vx0q2vBnTBXcY2gCBn56c9acSYPDadX54A7CWxPCPYeZWocRz9ydB+36fiZ3hXlw==
-X-Received: by 2002:a62:56c7:: with SMTP id h68mr3830421pfj.134.1543540360738;
-        Thu, 29 Nov 2018 17:12:40 -0800 (PST)
+        bh=FL64amkHfziKUXg291XJEzD6bPujZYHM+eAGmoCvs38=;
+        b=s7mnUyfCrkMgQ8DTIWpo4YEHcAAcaW82gMIRfJXwLZ1wiuj4HPfCGStMsqmz/PZbMA
+         +HoKZQ05x/1ULiiASDH6ltjyDO5UcgP5sinXP3dy7+UtugFclDkF8OZbqX9OMmMVSrgO
+         jo+KrX1jranpmPKnXhixNGSqtmlyFuH/W4n84wIR4elRUUllOw5TODzmR2dTB91LlHz9
+         VhwK83MUUiGKUKLty0K38XTyqu5OKzUAUzF6gEcqlVi2UZnb5PDcR7rQzJTglGspkvXg
+         WcoGdGrgghHMf/NNPAcbHc01SzruD9gqjt/bXwQR1a8zkM8L0GgvwjbTM3OllIhfOi4p
+         SLww==
+X-Gm-Message-State: AA+aEWYLlhSfZbdPbBJZSyqiO7bSOZfdE9QiM+mwumx+5LHrRqYZk96v
+        YVAZXX+d+mkaGnpeVQFh/jCkulzws5g=
+X-Google-Smtp-Source: AFSGD/UoalAz4uVrZgM3REBPPeMOZUtAYXW/QAAmc9y/URUcn0TfBHaZAUdDwGt7QJfnoYEnfO95+Q==
+X-Received: by 2002:a17:902:2a66:: with SMTP id i93mr3615008plb.113.1543540362737;
+        Thu, 29 Nov 2018 17:12:42 -0800 (PST)
 Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id v15sm4841749pfn.94.2018.11.29.17.12.39
+        by smtp.gmail.com with ESMTPSA id v15sm4841749pfn.94.2018.11.29.17.12.40
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 29 Nov 2018 17:12:39 -0800 (PST)
+        Thu, 29 Nov 2018 17:12:41 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org, osandov@osandov.com
 Cc:     Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/3] sbitmap: ensure that sbitmap maps are properly aligned
-Date:   Thu, 29 Nov 2018 18:12:32 -0700
-Message-Id: <20181130011234.32674-2-axboe@kernel.dk>
+Subject: [PATCH 2/3] sbitmap: ammortize cost of clearing bits
+Date:   Thu, 29 Nov 2018 18:12:33 -0700
+Message-Id: <20181130011234.32674-3-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181130011234.32674-1-axboe@kernel.dk>
 References: <20181130011234.32674-1-axboe@kernel.dk>
@@ -71,72 +71,160 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We try to be careful with alignment for cache purposes, but all of
-that is worthless if we don't actually align the maps themselves.
+sbitmap maintains a set of words that we use to set and clear bits, with
+each bit representing a tag for blk-mq. Even though we spread the bits
+out and maintain a hint cache, one particular bit allocated will end up
+being cleared in the exact same spot.
+
+This introduces batched clearing of bits. Instead of clearing a given
+bit, the same bit is set in a cleared/free mask instead. If we fail
+allocating a bit from a given word, then we check the free mask, and
+batch move those cleared bits at that time. This trades 64 atomic bitops
+for 2 cmpxchg().
+
+In a threaded poll test case, half the overhead of getting and clearing
+tags is removed with this change. On another poll test case with a
+single thread, performance is unchanged.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- include/linux/sbitmap.h | 11 ++++++++---
- lib/sbitmap.c           |  7 +++++--
- 2 files changed, 13 insertions(+), 5 deletions(-)
+ include/linux/sbitmap.h | 26 +++++++++++++++---
+ lib/sbitmap.c           | 60 ++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 78 insertions(+), 8 deletions(-)
 
 diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index 804a50983ec5..5cb1755d32da 100644
+index 5cb1755d32da..13eb8973bd10 100644
 --- a/include/linux/sbitmap.h
 +++ b/include/linux/sbitmap.h
-@@ -63,9 +63,14 @@ struct sbitmap {
- 	unsigned int map_nr;
+@@ -30,14 +30,19 @@ struct seq_file;
+  */
+ struct sbitmap_word {
+ 	/**
+-	 * @word: The bitmap word itself.
++	 * @depth: Number of bits being used in @word/@cleared
+ 	 */
+-	unsigned long word;
++	unsigned long depth;
  
  	/**
--	 * @map: Allocated bitmap.
-+	 * @map: Aligned allocated bitmap.
+-	 * @depth: Number of bits being used in @word.
++	 * @word: word holding free bits
  	 */
- 	struct sbitmap_word *map;
+-	unsigned long depth;
++	unsigned long word ____cacheline_aligned_in_smp;
 +
 +	/**
-+	 * @map_ptr: Originally allocated map pointer
++	 * @cleared: word holding cleared bits
 +	 */
-+	void *map_ptr;
- };
- 
- #define SBQ_WAIT_QUEUES 8
-@@ -157,8 +162,8 @@ int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
-  */
- static inline void sbitmap_free(struct sbitmap *sb)
- {
--	kfree(sb->map);
--	sb->map = NULL;
-+	kfree(sb->map_ptr);
-+	sb->map_ptr = sb->map = NULL;
- }
++	unsigned long cleared ____cacheline_aligned_in_smp;
+ } ____cacheline_aligned_in_smp;
  
  /**
+@@ -315,6 +320,19 @@ static inline void sbitmap_clear_bit(struct sbitmap *sb, unsigned int bitnr)
+ 	clear_bit(SB_NR_TO_BIT(sb, bitnr), __sbitmap_word(sb, bitnr));
+ }
+ 
++/*
++ * This one is special, since it doesn't actually clear the bit, rather it
++ * sets the corresponding bit in the ->cleared mask instead. Paired with
++ * the caller doing sbitmap_batch_clear() if a given index is full, which
++ * will clear the previously freed entries in the corresponding ->word.
++ */
++static inline void sbitmap_deferred_clear_bit(struct sbitmap *sb, unsigned int bitnr)
++{
++	unsigned long *addr = &sb->map[SB_NR_TO_INDEX(sb, bitnr)].cleared;
++
++	set_bit(SB_NR_TO_BIT(sb, bitnr), addr);
++}
++
+ static inline void sbitmap_clear_bit_unlock(struct sbitmap *sb,
+ 					    unsigned int bitnr)
+ {
 diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 45cab6bbc1c7..21e776e3128d 100644
+index 21e776e3128d..04db31f4dfda 100644
 --- a/lib/sbitmap.c
 +++ b/lib/sbitmap.c
-@@ -25,6 +25,7 @@ int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
+@@ -114,6 +114,58 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
+ 	return nr;
+ }
+ 
++/*
++ * See if we have deferred clears that we can batch move
++ */
++static inline bool sbitmap_deferred_clear(struct sbitmap *sb, int index)
++{
++	unsigned long mask, val;
++
++	if (!sb->map[index].cleared)
++		return false;
++
++	/*
++	 * First get a stable cleared mask, setting the old mask to 0.
++	 */
++	do {
++		mask = sb->map[index].cleared;
++	} while (cmpxchg(&sb->map[index].cleared, mask, 0) != mask);
++
++	/*
++	 * Now clear the masked bits in our free word
++	 */
++	do {
++		val = sb->map[index].word;
++	} while (cmpxchg(&sb->map[index].word, val, val & ~mask) != val);
++
++	/*
++	 * If someone found ->cleared == 0 before we wrote ->word, then
++	 * they could have failed when they should not have. Check for
++	 * waiters.
++	 */
++	smp_mb__after_atomic();
++	sbitmap_queue_wake_up(container_of(sb, struct sbitmap_queue, sb));
++	return true;
++}
++
++static int sbitmap_find_bit_in_index(struct sbitmap *sb, int index,
++				     unsigned int alloc_hint, bool round_robin)
++{
++	int nr;
++
++	do {
++		nr = __sbitmap_get_word(&sb->map[index].word,
++					sb->map[index].depth, alloc_hint,
++					!round_robin);
++		if (nr != -1)
++			break;
++		if (!sbitmap_deferred_clear(sb, index))
++			break;
++	} while (1);
++
++	return nr;
++}
++
+ int sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint, bool round_robin)
  {
- 	unsigned int bits_per_word;
- 	unsigned int i;
-+	size_t size;
- 
- 	if (shift < 0) {
- 		shift = ilog2(BITS_PER_LONG);
-@@ -52,9 +53,11 @@ int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
- 		return 0;
- 	}
- 
--	sb->map = kcalloc_node(sb->map_nr, sizeof(*sb->map), flags, node);
--	if (!sb->map)
-+	size = sb->map_nr * sizeof(*sb->map) + L1_CACHE_BYTES - 1;
-+	sb->map_ptr = kzalloc_node(size, flags, node);
-+	if (!sb->map_ptr)
- 		return -ENOMEM;
-+	sb->map = PTR_ALIGN(sb->map_ptr, L1_CACHE_BYTES);
+ 	unsigned int i, index;
+@@ -132,9 +184,8 @@ int sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint, bool round_robin)
+ 		alloc_hint = 0;
  
  	for (i = 0; i < sb->map_nr; i++) {
- 		sb->map[i].depth = min(depth, bits_per_word);
+-		nr = __sbitmap_get_word(&sb->map[index].word,
+-					sb->map[index].depth, alloc_hint,
+-					!round_robin);
++		nr = sbitmap_find_bit_in_index(sb, index, alloc_hint,
++						round_robin);
+ 		if (nr != -1) {
+ 			nr += index << sb->shift;
+ 			break;
+@@ -517,7 +568,8 @@ EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
+ void sbitmap_queue_clear(struct sbitmap_queue *sbq, unsigned int nr,
+ 			 unsigned int cpu)
+ {
+-	sbitmap_clear_bit_unlock(&sbq->sb, nr);
++	sbitmap_deferred_clear_bit(&sbq->sb, nr);
++
+ 	/*
+ 	 * Pairs with the memory barrier in set_current_state() to ensure the
+ 	 * proper ordering of clear_bit_unlock()/waitqueue_active() in the waker
 -- 
 2.17.1
 
