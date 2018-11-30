@@ -2,113 +2,137 @@ Return-Path: <SRS0=+5f8=OJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D35DBC04EB8
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E9F9C04EB8
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:38:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9825720867
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:26:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="kJCAa/7p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9825720867
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	by mail.kernel.org (Postfix) with ESMTP id 6848320868
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:38:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6848320868
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726659AbeLADgZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Nov 2018 22:36:25 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:51630 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726644AbeLADgZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 22:36:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=965IEQwCeaP7tM4UAHQvRgfeimmruA3ABQaNbuXy5UE=; b=kJCAa/7pEIB308S0v6COoBQOF
-        G/ZL/c72WMlTfrbtMdd9A/Q9bOoB5rhQEcZ7U0C7iaF9ei+X14NGNgjbqb9uGuOHQa//CMPz7g59s
-        LFRhJ+XwSbe06L6ge1r8+RuPdfwm4AI9LxlVwzVCpoqid12tdXF8VY65bbJFquzPjhBu7+9Kxcl+n
-        te+fh85E9+feo+rE/uSloSri/o+V0JEePVeDxzmwC6q8UXmMPutQ6IttBQr6B6trG3WTMf5EL6sqn
-        cQ1lfNVcO9Lh/4EajxTCbyCbPCMara/huxqKHPsDelbvoHdspWS7zurcVyxZSLk6xh+mUe1bTRb93
-        zc8j5X9mw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gSlcf-0004S4-FF; Fri, 30 Nov 2018 16:26:33 +0000
-Date:   Fri, 30 Nov 2018 08:26:33 -0800
-From:   Christoph Hellwig <hch@infradead.org>
+        id S1726659AbeLADsX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Nov 2018 22:48:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45966 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726647AbeLADsW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Nov 2018 22:48:22 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id B6D6283F3D;
+        Fri, 30 Nov 2018 16:38:29 +0000 (UTC)
+Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2886B1949B;
+        Fri, 30 Nov 2018 16:38:25 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-block@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-Subject: Re: [GIT PULL] nvme fixes for 4.20
-Message-ID: <20181130162633.GA16933@infradead.org>
-References: <20181130152430.GA3107@infradead.org>
- <01b6314c-903e-6787-ccf6-e93aa789199a@kernel.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <01b6314c-903e-6787-ccf6-e93aa789199a@kernel.dk>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Guangwu Zhang <guazhang@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Jianchao Wang <jianchao.w.wang@oracle.com>
+Subject: [PATCH] block: fix single range discard merge
+Date:   Sat,  1 Dec 2018 00:38:18 +0800
+Message-Id: <20181130163818.6540-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Fri, 30 Nov 2018 16:38:29 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 30, 2018 at 08:26:24AM -0700, Jens Axboe wrote:
-> On 11/30/18 8:24 AM, Christoph Hellwig wrote:
-> > Various fixlets all over, including throwing in a 'default y' for the
-> > multipath code, given that we want people to actually enable it for full
-> > functionality.
-> 
-> Why enable it by default? 99.9% of users aren't going to care. That
-> seems like an odd choice.
+There are actually two kinds of discard merge:
 
-Because its small, and if you don't have it you are going to run into
-problems pretty soon.
+- one is the normal discard merge, just like normal read/write request,
+and call it single-range discard
 
-Anyway, to get the fixes out ASAP here is the updated request without
-it:
+- another is the multi-range discard, queue_max_discard_segments(rq->q) > 1
 
-The following changes since commit 14b04063cc994effc86f976625bf8f806d8d44cb:
+For the former case, queue_max_discard_segments(rq->q) is 1, and we
+should handle this kind of discard merge like the normal read/write
+request.
 
-  Merge branch 'nvme-4.20' of git://git.infradead.org/nvme into for-linus (2018-11-21 05:56:28 -0700)
+This patch fixes the following kernel panic issue[1], which is caused by
+not removing the single-range discard request from elevator queue.
 
-are available in the Git repository at:
+Guangwu has one raid discard test case, in which this issue is a bit
+easier to trigger, and I verified that this patch can fix the kernel
+panic issue in Guangwu's test case.
 
-  git://git.infradead.org/nvme.git nvme-4.20
+[1] kernel panic log from Jens's report
 
-for you to fetch changes up to 6344d02dc8f886b6bbcd922ae1a17e4a41500f2d:
+ BUG: unable to handle kernel NULL pointer dereference at 0000000000000148
+ PGD 0 P4D 0.
+ Oops: 0000 [#1] SMP PTI
+ CPU: 37 PID: 763 Comm: kworker/37:1H Not tainted \
+4.20.0-rc3-00649-ge64d9a554a91-dirty #14  Hardware name: Wiwynn \
+Leopard-Orv2/Leopard-DDR BW, BIOS LBM08   03/03/2017       Workqueue: kblockd \
+blk_mq_run_work_fn                                            RIP: \
+0010:blk_mq_get_driver_tag+0x81/0x120                                       Code: 24 \
+10 48 89 7c 24 20 74 21 83 fa ff 0f 95 c0 48 8b 4c 24 28 65 48 33 0c 25 28 00 00 00 \
+0f 85 96 00 00 00 48 83 c4 30 5b 5d c3 <48> 8b 87 48 01 00 00 8b 40 04 39 43 20 72 37 \
+f6 87 b0 00 00 00 02  RSP: 0018:ffffc90004aabd30 EFLAGS: 00010246                     \
+  RAX: 0000000000000003 RBX: ffff888465ea1300 RCX: ffffc90004aabde8
+ RDX: 00000000ffffffff RSI: ffffc90004aabde8 RDI: 0000000000000000
+ RBP: 0000000000000000 R08: ffff888465ea1348 R09: 0000000000000000
+ R10: 0000000000001000 R11: 00000000ffffffff R12: ffff888465ea1300
+ R13: 0000000000000000 R14: ffff888465ea1348 R15: ffff888465d10000
+ FS:  0000000000000000(0000) GS:ffff88846f9c0000(0000) knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: 0000000000000148 CR3: 000000000220a003 CR4: 00000000003606e0
+ DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+ DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+ Call Trace:
+  blk_mq_dispatch_rq_list+0xec/0x480
+  ? elv_rb_del+0x11/0x30
+  blk_mq_do_dispatch_sched+0x6e/0xf0
+  blk_mq_sched_dispatch_requests+0xfa/0x170
+  __blk_mq_run_hw_queue+0x5f/0xe0
+  process_one_work+0x154/0x350
+  worker_thread+0x46/0x3c0
+  kthread+0xf5/0x130
+  ? process_one_work+0x350/0x350
+  ? kthread_destroy_worker+0x50/0x50
+  ret_from_fork+0x1f/0x30
+ Modules linked in: sb_edac x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel \
+kvm switchtec irqbypass iTCO_wdt iTCO_vendor_support efivars cdc_ether usbnet mii \
+cdc_acm i2c_i801 lpc_ich mfd_core ipmi_si ipmi_devintf ipmi_msghandler acpi_cpufreq \
+button sch_fq_codel nfsd nfs_acl lockd grace auth_rpcgss oid_registry sunrpc nvme \
+nvme_core fuse sg loop efivarfs autofs4  CR2: 0000000000000148                        \
 
-  nvme-rdma: fix double freeing of async event data (2018-11-30 17:23:23 +0100)
+ ---[ end trace 340a1fb996df1b9b ]---
+ RIP: 0010:blk_mq_get_driver_tag+0x81/0x120
+ Code: 24 10 48 89 7c 24 20 74 21 83 fa ff 0f 95 c0 48 8b 4c 24 28 65 48 33 0c 25 28 \
+00 00 00 0f 85 96 00 00 00 48 83 c4 30 5b 5d c3 <48> 8b 87 48 01 00 00 8b 40 04 39 43 \
+20 72 37 f6 87 b0 00 00 00 02
 
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      nvme: warn when finding multi-port subsystems without multipathing enabled
+Fixes: 445251d0f4d329a ("blk-mq: fix discard merge with scheduler attached")
+Reported-by: Jens Axboe <axboe@kernel.dk>
+Cc: Guangwu Zhang <guazhang@redhat.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-merge.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Ewan D. Milne (1):
-      nvme-fc: initialize nvme_req(rq)->ctrl after calling __nvme_fc_init_request()
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index e7696c47489a..7695034f4b87 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -820,7 +820,7 @@ static struct request *attempt_merge(struct request_queue *q,
+ 
+ 	req->__data_len += blk_rq_bytes(next);
+ 
+-	if (req_op(req) != REQ_OP_DISCARD)
++	if (!blk_discard_mergable(req))
+ 		elv_merge_requests(q, req, next);
+ 
+ 	/*
+-- 
+2.9.5
 
-Igor Konopko (1):
-      nvme-pci: fix surprise removal
-
-Keith Busch (1):
-      nvme: Free ctrl device name on init failure
-
-Prabhath Sajeepa (1):
-      nvme-rdma: fix double freeing of async event data
-
-Sagi Grimberg (1):
-      nvme: flush namespace scanning work just before removing namespaces
-
- drivers/nvme/host/core.c | 8 +++++---
- drivers/nvme/host/fc.c   | 2 +-
- drivers/nvme/host/nvme.h | 3 +++
- drivers/nvme/host/rdma.c | 2 ++
- 4 files changed, 11 insertions(+), 4 deletions(-)
