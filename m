@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0765AC64EB4
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2B9C64EB4
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BFD8A2145D
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CF122145D
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="sq6DFq35"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFD8A2145D
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Sz6VUAyv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CF122145D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727203AbeLAEHE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Nov 2018 23:07:04 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:56290 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727350AbeLAEHD (ORCPT
+        id S1727324AbeLAEHF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Nov 2018 23:07:05 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:39314 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727350AbeLAEHF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 23:07:03 -0500
-Received: by mail-it1-f195.google.com with SMTP id o19so10088451itg.5
-        for <linux-block@vger.kernel.org>; Fri, 30 Nov 2018 08:57:08 -0800 (PST)
+        Fri, 30 Nov 2018 23:07:05 -0500
+Received: by mail-it1-f194.google.com with SMTP id a6so10218242itl.4
+        for <linux-block@vger.kernel.org>; Fri, 30 Nov 2018 08:57:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=8/1Nol3a3uaTr8sM9gFlQE0kinP2KU2cED85d/G/25k=;
-        b=sq6DFq35bVoDp8yMVd4wxPxeB8WZxYMT8MrxJpIMsjZTcUC+cuzrHaib4c2h+cUWHG
-         SPFt6/IM5SlxytyM7VaRwZJGxCVuWiTt+KVUDZ/adXoMwgVp5OERMgsbUDg2T084vID7
-         Y3koQryj0o11LyctjsTQhcjhUtC+udH6LMa+T47rVrF7ylZvpS+BgDB0MTNyxUf8hRwE
-         UjS5PIpt1+bkk6fWt1vfk2t3CoMcj5+SIQua01wzJW1RvlU6ZGDbAKiF3dtC43BHoEGE
-         BVXbxpc7KHuKh0MSsaoLwKPac57p3ojDSW3Kcxyd2OsyDoFB+CYlQfP+WdJ7GT9FyXAV
-         paPQ==
+        bh=6hPqsRSp/t/J4Haujgv9+B43f7+1jV9cXsozT1ugKjo=;
+        b=Sz6VUAyvjCgyg/BgD9Rh8Dp3owrIvg6sysqFF7ip2j3Ssexon4xfM/7+iY6MUDmzh7
+         Ml7shDAlm4wGOUjRXhtwzF7Tpu0Z2QlwMSazKgfbPoag08AClX2aRokriLYyHZWaH3jl
+         rOJtIKJOlQhYmJYYzQ7VZx4fgm0rwSQyBtvrwqfBm7DtbbfIi9jCxc4CZqcgDxDSciTi
+         OPVZyF2GJs1TlTQRbAtlSR4Lw13sORgIdnhtZtYNW6rWJzbP8GPtpBQayu6Q6T0ulu29
+         zecSXkGIS328ENcoWi1VF1LXZCbzcMs9TWBPOA3RgZeRlNoXmHbDn0kOrT6wUZnwm8jj
+         6y9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=8/1Nol3a3uaTr8sM9gFlQE0kinP2KU2cED85d/G/25k=;
-        b=cahWSoVOQoCwnI5cQgoe/ni4ec77mfogRbckG/+VE30Aly9eb34gVawZV9Yp0NFcKe
-         JhmspdmmkNkjyW7E6P471b6S/UtXMq5TCp45Wk9rFt10sqF9yDVWc4Nx2n173ZfgWhsn
-         0qVDFrdnzZHkV8gtOw8CHGJMoBlVsgPOK7DcZMepbVQjJVqMDE/zopZRSKy1u1uVAKNq
-         OWua6HvSgXjd6BLYtAiJTN4pBjlVSlt9ZaxhGpL1JABnjeijZQVW1c1bsuZyNr0zgo4Z
-         Tf19slAWyEGGt/YmTC7Pa5OQhvb0fHrgxY4oK+fNwvsdJbYqVYZ5M0PrqKjCACeZpsOi
-         rQ7A==
-X-Gm-Message-State: AA+aEWZDabzd1tnQkBKjkg1dnu/nJY++QZu99Z3w6Ot3UB5crkQqmohO
-        N/50ks10LNM8GDni0fi17Pvmh5dMETI=
-X-Google-Smtp-Source: AFSGD/UgQEX8ECP7m2g6PGBOyb8hL2FU1DTaFUDFfNacktD29Gyaf8QZxq/WPkzeZurYJbhxzTNmdQ==
-X-Received: by 2002:a02:242b:: with SMTP id f43mr5640161jaa.144.1543597027331;
-        Fri, 30 Nov 2018 08:57:07 -0800 (PST)
+        bh=6hPqsRSp/t/J4Haujgv9+B43f7+1jV9cXsozT1ugKjo=;
+        b=PYcsqZ+7RaqSMrx9zM3jL6J3f7h/TCXPic2VjxUqgEwNFKzErymyUjKvbMABgoJfx1
+         k89xoXq7HQmpzhQNaEbZb1eOpzHOVWyX5BCz2W2H+Km9mllJmkgnqzCk3yhSqnmGAWg4
+         d5Ys0ENlZqNnUN9t5+3TF+/rGjoPmw+C0Msxn7BA5Ig66wvMADXAD0pLewG7rbWszT6m
+         U9A7nkRBUe9H4NIQY8UHqXQvcLBl/fWBkj4kCgIa8h269Gu5/fSwRQssXThCsUBWyVS+
+         Z55Bnal7laiAGLNLfJNmOBKRcfr/ZxXfusQ0ufo7OD6KUUs2p0dTTJ/J8koQuIGcFnE9
+         2LMQ==
+X-Gm-Message-State: AA+aEWY8UEiz1MLemQsgGNfYd8c1+SVAvIGPYQOoTJlUWwmOpzEs2Wch
+        g2twFJw2EOJ+nKNYY01QEf10A45p/Lc=
+X-Google-Smtp-Source: AFSGD/X4FBxX9pIBYP27LYasJrY9Clxt4rqZX5Wzptp2+bfMExF5sW53WDLQGfvkFQe+MErJXm+7Dw==
+X-Received: by 2002:a02:b719:: with SMTP id g25mr5496992jam.46.1543597028934;
+        Fri, 30 Nov 2018 08:57:08 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id j133sm2979447itj.16.2018.11.30.08.57.05
+        by smtp.gmail.com with ESMTPSA id j133sm2979447itj.16.2018.11.30.08.57.07
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 30 Nov 2018 08:57:06 -0800 (PST)
+        Fri, 30 Nov 2018 08:57:08 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-aio@kvack.org
 Cc:     hch@lst.de, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 11/27] aio: only use blk plugs for > 2 depth submissions
-Date:   Fri, 30 Nov 2018 09:56:30 -0700
-Message-Id: <20181130165646.27341-12-axboe@kernel.dk>
+Subject: [PATCH 12/27] aio: use iocb_put() instead of open coding it
+Date:   Fri, 30 Nov 2018 09:56:31 -0700
+Message-Id: <20181130165646.27341-13-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181130165646.27341-1-axboe@kernel.dk>
 References: <20181130165646.27341-1-axboe@kernel.dk>
@@ -72,71 +72,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Plugging is meant to optimize submission of a string of IOs, if we don't
-have more than 2 being submitted, don't bother setting up a plug.
+Replace the percpu_ref_put() + kmem_cache_free() with a call to
+iocb_put() instead.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/aio.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ fs/aio.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/fs/aio.c b/fs/aio.c
-index 681f2072f81b..533cb7b1112f 100644
+index 533cb7b1112f..e8457f9486e3 100644
 --- a/fs/aio.c
 +++ b/fs/aio.c
-@@ -1887,6 +1887,12 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+@@ -1878,10 +1878,9 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+ 		goto out_put_req;
+ 	return 0;
+ out_put_req:
+-	percpu_ref_put(&ctx->reqs);
+ 	if (req->ki_eventfd)
+ 		eventfd_ctx_put(req->ki_eventfd);
+-	kmem_cache_free(kiocb_cachep, req);
++	iocb_put(req);
+ out_put_reqs_available:
+ 	put_reqs_available(ctx, 1);
  	return ret;
- }
- 
-+/*
-+ * Plugging is meant to work with larger batches of IOs. If we don't
-+ * have more than the below, then don't bother setting up a plug.
-+ */
-+#define AIO_PLUG_THRESHOLD	2
-+
- /* sys_io_submit:
-  *	Queue the nr iocbs pointed to by iocbpp for processing.  Returns
-  *	the number of iocbs queued.  May return -EINVAL if the aio_context
-@@ -1919,7 +1925,8 @@ SYSCALL_DEFINE3(io_submit, aio_context_t, ctx_id, long, nr,
- 	if (nr > ctx->nr_events)
- 		nr = ctx->nr_events;
- 
--	blk_start_plug(&plug);
-+	if (nr > AIO_PLUG_THRESHOLD)
-+		blk_start_plug(&plug);
- 	for (i = 0; i < nr; i++) {
- 		struct iocb __user *user_iocb;
- 
-@@ -1932,7 +1939,8 @@ SYSCALL_DEFINE3(io_submit, aio_context_t, ctx_id, long, nr,
- 		if (ret)
- 			break;
- 	}
--	blk_finish_plug(&plug);
-+	if (nr > AIO_PLUG_THRESHOLD)
-+		blk_finish_plug(&plug);
- 
- 	percpu_ref_put(&ctx->users);
- 	return i ? i : ret;
-@@ -1959,7 +1967,8 @@ COMPAT_SYSCALL_DEFINE3(io_submit, compat_aio_context_t, ctx_id,
- 	if (nr > ctx->nr_events)
- 		nr = ctx->nr_events;
- 
--	blk_start_plug(&plug);
-+	if (nr > AIO_PLUG_THRESHOLD)
-+		blk_start_plug(&plug);
- 	for (i = 0; i < nr; i++) {
- 		compat_uptr_t user_iocb;
- 
-@@ -1972,7 +1981,8 @@ COMPAT_SYSCALL_DEFINE3(io_submit, compat_aio_context_t, ctx_id,
- 		if (ret)
- 			break;
- 	}
--	blk_finish_plug(&plug);
-+	if (nr > AIO_PLUG_THRESHOLD)
-+		blk_finish_plug(&plug);
- 
- 	percpu_ref_put(&ctx->users);
- 	return i ? i : ret;
 -- 
 2.17.1
 
