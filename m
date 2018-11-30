@@ -2,155 +2,141 @@ Return-Path: <SRS0=+5f8=OJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 906E1C04EB8
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 21:41:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4213C04EB8
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 21:44:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3C633206B7
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 21:41:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="Vel2ad85"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C633206B7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
+	by mail.kernel.org (Postfix) with ESMTP id 6678220863
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 21:44:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6678220863
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725867AbeLAIwS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 1 Dec 2018 03:52:18 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:40755 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725749AbeLAIwS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 1 Dec 2018 03:52:18 -0500
-Received: by mail-pf1-f195.google.com with SMTP id i12so3417599pfo.7
-        for <linux-block@vger.kernel.org>; Fri, 30 Nov 2018 13:41:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=tJNDrBeqUg2p3c/lfV0spJxoSqBGrK1JunTBHMNbutA=;
-        b=Vel2ad85pPUAJHwKUS4SScvrI8yknV5XU6jL9JnoqpWWwyFTlPDtxQJ6YvrLLs8e5Q
-         xj3P5zgUJisjSDEapZu6culyccDL0dmyN5IC3PtfDJ+HhD53em4h47h8li7fcq8eaXw4
-         ag2l/7lHAZ0NEQRW23Lo1txrgo4cYWAbKO6iOYydrqbztU6qbOdoweKli7UfZ3ESizHS
-         8zWGgeOC5HL62Xc2Y2X4o9oyLmPHnqxFxCKgzhiwQfc03eCmJPFH5pSiqaPCJ6+fVjp2
-         40/7Z0DPxffKRex5nYZQMHKlvkgfcooIi+whXFbVyvPbCpCdP0Q+zhI+cSmogrYk26M1
-         x7hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=tJNDrBeqUg2p3c/lfV0spJxoSqBGrK1JunTBHMNbutA=;
-        b=gtDzLjKZmRJSyNAmWaDj2+3mJOJ7RgveO2vmlIRN/VAFjJaIdLN/bv0h2ilkBAilmv
-         xxnrIC+T2WOPBWqkJkqtbb9qe/7p+yJu60Zu7fXz+PYTEYxOY/5VKqnwvBj56NwAu8fb
-         JT0ABK+1ks1gDTWxPnce+PVlzO/jfkeJWjrVvu/T/T5ua2eUYv/xbopDH7WGtNKo5TPC
-         T71mwRBNABfqCJfqp/Qn8kH/MRtVREDi/xDcjkSA12tcQ8cwwA3Jx5YoEkU1zPqTimL8
-         C8sFHQVSlpZQxQQe1VqVvJUXl3oJf2nvarwwVSivbGH4AdOOPju5XwXfYdOndkec9yJ8
-         ZePw==
-X-Gm-Message-State: AA+aEWbUUHHSiN27iEcyxeFwUmlkkz9X7pr9sLfU2iYHiQ4Rh2tm035t
-        tOVyzZqnhmAFcDPw8si2sr6poaZ5dP8=
-X-Google-Smtp-Source: AFSGD/U6zXNlWg9FyfQyWUbTTgHYiEmUyfHJvOGPtSDSoSOd2sOuiMpdWUZPpCRvE7vMr6cMtpUaSA==
-X-Received: by 2002:a63:1e17:: with SMTP id e23mr6152696pge.130.1543614097931;
-        Fri, 30 Nov 2018 13:41:37 -0800 (PST)
-Received: from vader ([2620:10d:c090:200::4:705d])
-        by smtp.gmail.com with ESMTPSA id p83sm14902302pfi.85.2018.11.30.13.41.37
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 30 Nov 2018 13:41:37 -0800 (PST)
-Date:   Fri, 30 Nov 2018 13:41:36 -0800
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: [PATCH 1/2] sbitmap: ammortize cost of clearing bits
-Message-ID: <20181130214136.GB11220@vader>
-References: <20181130160118.24683-1-axboe@kernel.dk>
- <20181130160118.24683-2-axboe@kernel.dk>
- <20181130200308.GB27411@vader>
- <f830e923-2307-5e0d-102d-be681a3b1601@kernel.dk>
+        id S1726142AbeLAIzX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 1 Dec 2018 03:55:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:49298 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725749AbeLAIzX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 1 Dec 2018 03:55:23 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8D42CE86E;
+        Fri, 30 Nov 2018 21:44:43 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.149])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 51FA17A5FE;
+        Fri, 30 Nov 2018 21:44:34 +0000 (UTC)
+Date:   Fri, 30 Nov 2018 16:44:33 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Mikulas Patocka <mpatocka@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, "Alasdair G. Kergon" <agk@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH 2/3] block: switch to per-cpu in-flight counters
+Message-ID: <20181130214433.GA15049@redhat.com>
+References: <20181128004250.325095242@debian.vm>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f830e923-2307-5e0d-102d-be681a3b1601@kernel.dk>
-User-Agent: Mutt/1.11.0 (2018-11-25)
+In-Reply-To: <20181128004250.325095242@debian.vm>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Fri, 30 Nov 2018 21:44:43 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 30, 2018 at 01:10:47PM -0700, Jens Axboe wrote:
-> On 11/30/18 1:03 PM, Omar Sandoval wrote:
-> > On Fri, Nov 30, 2018 at 09:01:17AM -0700, Jens Axboe wrote:
-> >> sbitmap maintains a set of words that we use to set and clear bits, with
-> >> each bit representing a tag for blk-mq. Even though we spread the bits
-> >> out and maintain a hint cache, one particular bit allocated will end up
-> >> being cleared in the exact same spot.
-> >>
-> >> This introduces batched clearing of bits. Instead of clearing a given
-> >> bit, the same bit is set in a cleared/free mask instead. If we fail
-> >> allocating a bit from a given word, then we check the free mask, and
-> >> batch move those cleared bits at that time. This trades 64 atomic bitops
-> >> for 2 cmpxchg().
-> >>
-> >> In a threaded poll test case, half the overhead of getting and clearing
-> >> tags is removed with this change. On another poll test case with a
-> >> single thread, performance is unchanged.
-> >>
-> >> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> >> ---
-> >>  include/linux/sbitmap.h | 31 +++++++++++++---
-> >>  lib/sbitmap.c           | 80 +++++++++++++++++++++++++++++++++++++----
-> >>  2 files changed, 100 insertions(+), 11 deletions(-)
-> >>
-> >> diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-> >> index 804a50983ec5..07f117ee19dc 100644
-> >> --- a/include/linux/sbitmap.h
-> >> +++ b/include/linux/sbitmap.h
-> >> @@ -30,14 +30,24 @@ struct seq_file;
-> >>   */
-> >>  struct sbitmap_word {
-> >>  	/**
-> >> -	 * @word: The bitmap word itself.
-> >> +	 * @depth: Number of bits being used in @word/@cleared
-> >>  	 */
-> >> -	unsigned long word;
-> >> +	unsigned long depth;
-> >>  
-> >>  	/**
-> >> -	 * @depth: Number of bits being used in @word.
-> >> +	 * @word: word holding free bits
-> >>  	 */
-> >> -	unsigned long depth;
-> >> +	unsigned long word ____cacheline_aligned_in_smp;
-> > 
-> > Still splitting up word and depth in separate cachelines?
-> 
-> Yeah, I mentioned that in one of the other postings, there's still a
-> definite win to doing that.
-> 
-> > Okay, I couldn't find any holes in this one :)
-> 
-> Good to hear that :-)
-> 
-> >> -unsigned int sbitmap_weight(const struct sbitmap *sb)
-> >> +static unsigned int __sbitmap_weight(const struct sbitmap *sb, bool set)
-> >>  {
-> >>  	unsigned int i, weight = 0;
-> >>  
-> >>  	for (i = 0; i < sb->map_nr; i++) {
-> >>  		const struct sbitmap_word *word = &sb->map[i];
-> >>  
-> >> -		weight += bitmap_weight(&word->word, word->depth);
-> >> +		if (set)
-> >> +			weight += bitmap_weight(&word->word, word->depth);
-> > 
-> > Should probably do
-> > 			weight -= bitmap_weight(&word->cleared, word->depth);
-> > 
-> > too, right?
-> 
-> We only use these for the debugfs stuff, how about I just make it static
-> instead?
+On Tue, Nov 27 2018 at  7:42pm -0500,
+Mikulas Patocka <mpatocka@redhat.com> wrote:
 
-Yeah, with that,
+> Now when part_round_stats is gone, we can switch to per-cpu in-flight
+> counters.
+> 
+> We use the local-atomic type local_t, so that if part_inc_in_flight or
+> part_dec_in_flight is reentrantly called from an interrupt, the value will
+> be correct.
+> 
+> The other counters could be corrupted due to reentrant interrupt, but the
+> corruption only results in slight counter skew - the in_flight counter
+> must be exact, so it needs local_t.
+> 
+> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+> 
+> ---
+>  block/bio.c           |    4 ++--
+>  block/blk-core.c      |    4 ++--
+>  block/blk-merge.c     |    2 +-
+>  block/genhd.c         |   47 +++++++++++++++++++++++++++++++++++------------
+>  drivers/md/dm.c       |    4 +---
+>  include/linux/genhd.h |    7 ++++---
+>  6 files changed, 45 insertions(+), 23 deletions(-)
+> 
+> Index: linux-block/block/genhd.c
+> ===================================================================
+> --- linux-block.orig/block/genhd.c	2018-11-28 00:09:59.000000000 +0100
+> +++ linux-block/block/genhd.c	2018-11-28 00:09:59.000000000 +0100
+> @@ -45,53 +45,76 @@ static void disk_add_events(struct gendi
+>  static void disk_del_events(struct gendisk *disk);
+>  static void disk_release_events(struct gendisk *disk);
+>  
+> -void part_inc_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
+> +void part_inc_in_flight(struct request_queue *q, int cpu, struct hd_struct *part, int rw)
+>  {
+>  	if (queue_is_mq(q))
+>  		return;
+>  
+> -	atomic_inc(&part->in_flight[rw]);
+> +	local_inc(per_cpu_ptr(part->dkstats, cpu)->in_flight);
+>  	if (part->partno)
+> -		atomic_inc(&part_to_disk(part)->part0.in_flight[rw]);
+> +		local_inc(per_cpu_ptr(part_to_disk(part)->part0.dkstats, cpu)->in_flight);
+>  }
+>  
+> -void part_dec_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
+> +void part_dec_in_flight(struct request_queue *q, int cpu, struct hd_struct *part, int rw)
+>  {
+>  	if (queue_is_mq(q))
+>  		return;
+>  
+> -	atomic_dec(&part->in_flight[rw]);
+> +	local_dec(per_cpu_ptr(part->dkstats, cpu)->in_flight);
+>  	if (part->partno)
+> -		atomic_dec(&part_to_disk(part)->part0.in_flight[rw]);
+> +		local_dec(per_cpu_ptr(part_to_disk(part)->part0.dkstats, cpu)->in_flight);
+>  }
 
-Reviewed-by: Omar Sandoval <osandov@fb.com>
+
+The above is wrong, needs this incremental fix:
+
+diff --git a/block/genhd.c b/block/genhd.c
+index 2ed431098953..3397288a2926 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -50,9 +50,9 @@ void part_inc_in_flight(struct request_queue *q, int cpu, struct hd_struct *part
+ 	if (queue_is_mq(q))
+ 		return;
+ 
+-	local_inc(per_cpu_ptr(part->dkstats, cpu)->in_flight);
++	local_inc(&per_cpu_ptr(part->dkstats, cpu)->in_flight[rw]);
+ 	if (part->partno)
+-		local_inc(per_cpu_ptr(part_to_disk(part)->part0.dkstats, cpu)->in_flight);
++		local_inc(&per_cpu_ptr(part_to_disk(part)->part0.dkstats, cpu)->in_flight[rw]);
+ }
+ 
+ void part_dec_in_flight(struct request_queue *q, int cpu, struct hd_struct *part, int rw)
+@@ -60,9 +60,9 @@ void part_dec_in_flight(struct request_queue *q, int cpu, struct hd_struct *part
+ 	if (queue_is_mq(q))
+ 		return;
+ 
+-	local_dec(per_cpu_ptr(part->dkstats, cpu)->in_flight);
++	local_dec(&per_cpu_ptr(part->dkstats, cpu)->in_flight[rw]);
+ 	if (part->partno)
+-		local_dec(per_cpu_ptr(part_to_disk(part)->part0.dkstats, cpu)->in_flight);
++		local_dec(&per_cpu_ptr(part_to_disk(part)->part0.dkstats, cpu)->in_flight[rw]);
+ }
+ 
+ unsigned int part_in_flight(struct request_queue *q, struct hd_struct *part)
