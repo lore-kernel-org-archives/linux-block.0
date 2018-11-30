@@ -6,37 +6,37 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 274C5C04EB8
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 11:49:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34FA9C04EB8
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 11:49:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E72592082F
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 11:49:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E72592082F
+	by mail.kernel.org (Postfix) with ESMTP id F16B82146D
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 11:49:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F16B82146D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726557AbeK3W60 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Nov 2018 17:58:26 -0500
+        id S1726618AbeK3W63 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Nov 2018 17:58:29 -0500
 Received: from mga03.intel.com ([134.134.136.65]:41003 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726512AbeK3W60 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 17:58:26 -0500
+        id S1726512AbeK3W62 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Nov 2018 17:58:28 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Nov 2018 03:49:25 -0800
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Nov 2018 03:49:28 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,298,1539673200"; 
-   d="scan'208";a="108549591"
+   d="scan'208";a="108549597"
 Received: from gklab-106-154.igk.intel.com ([10.102.106.154])
-  by FMSMGA003.fm.intel.com with ESMTP; 30 Nov 2018 03:49:24 -0800
+  by FMSMGA003.fm.intel.com with ESMTP; 30 Nov 2018 03:49:26 -0800
 From:   Igor Konopko <igor.j.konopko@intel.com>
 To:     mb@lightnvm.io
 Cc:     linux-block@vger.kernel.org, javier@cnexlabs.com,
         hans.holmberg@cnexlabs.com, igor.j.konopko@intel.com
-Subject: [PATCH v5 3/5] lightnvm: Flexible DMA pool entry size
-Date:   Fri, 30 Nov 2018 12:44:00 +0100
-Message-Id: <20181130114402.43793-4-igor.j.konopko@intel.com>
+Subject: [PATCH v5 4/5] lightnvm: Disable interleaved metadata
+Date:   Fri, 30 Nov 2018 12:44:01 +0100
+Message-Id: <20181130114402.43793-5-igor.j.konopko@intel.com>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20181130114402.43793-1-igor.j.konopko@intel.com>
 References: <20181130114402.43793-1-igor.j.konopko@intel.com>
@@ -48,164 +48,67 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently whole lightnvm and pblk uses single DMA pool,
-for which entry size is always equal to PAGE_SIZE.
-PPA list always needs 8B*64, so there is only 56B*64
-space for OOB meta. Since NVMe OOB meta can be bigger,
-such as 128B, this solution is not robustness.
+Currently pblk and lightnvm does only check for size
+of OOB metadata and does not care wheather this meta
+is located in separate buffer or is interleaved with
+data in single buffer.
 
-This patch add the possiblity to support OOB meta above
-56b by changing DMA pool size based on OOB meta size.
+In reality only the first scenario is supported, where
+second mode will break pblk functionality during any
+IO operation.
 
-It also allows pblk to use OOB metadata >=16B.
+The goal of this patch is to block creation of pblk
+devices in case of interleaved metadata
 
 Reviewed-by: Javier González <javier@cnexlabs.com>
 Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
 ---
- drivers/lightnvm/core.c          | 9 +++++++--
- drivers/lightnvm/pblk-core.c     | 8 ++++----
- drivers/lightnvm/pblk-init.c     | 2 +-
- drivers/lightnvm/pblk-recovery.c | 4 ++--
- drivers/lightnvm/pblk.h          | 6 +++++-
- drivers/nvme/host/lightnvm.c     | 5 +++--
- include/linux/lightnvm.h         | 2 +-
- 7 files changed, 23 insertions(+), 13 deletions(-)
+ drivers/lightnvm/pblk-init.c | 6 ++++++
+ drivers/nvme/host/lightnvm.c | 1 +
+ include/linux/lightnvm.h     | 1 +
+ 3 files changed, 8 insertions(+)
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 69b841d682c7..5f82036fe322 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -1140,7 +1140,7 @@ EXPORT_SYMBOL(nvm_alloc_dev);
- 
- int nvm_register(struct nvm_dev *dev)
- {
--	int ret;
-+	int ret, exp_pool_size;
- 
- 	if (!dev->q || !dev->ops)
- 		return -EINVAL;
-@@ -1149,7 +1149,12 @@ int nvm_register(struct nvm_dev *dev)
- 	if (ret)
- 		return ret;
- 
--	dev->dma_pool = dev->ops->create_dma_pool(dev, "ppalist");
-+	exp_pool_size = max_t(int, PAGE_SIZE,
-+			      (NVM_MAX_VLBA * (sizeof(u64) + dev->geo.sos)));
-+	exp_pool_size = round_up(exp_pool_size, PAGE_SIZE);
-+
-+	dev->dma_pool = dev->ops->create_dma_pool(dev, "ppalist",
-+						  exp_pool_size);
- 	if (!dev->dma_pool) {
- 		pr_err("nvm: could not create dma pool\n");
- 		nvm_free(dev);
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index e732b2d12a23..7e3397f8ead1 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -250,8 +250,8 @@ int pblk_alloc_rqd_meta(struct pblk *pblk, struct nvm_rq *rqd)
- 	if (rqd->nr_ppas == 1)
- 		return 0;
- 
--	rqd->ppa_list = rqd->meta_list + pblk_dma_meta_size;
--	rqd->dma_ppa_list = rqd->dma_meta_list + pblk_dma_meta_size;
-+	rqd->ppa_list = rqd->meta_list + pblk_dma_meta_size(pblk);
-+	rqd->dma_ppa_list = rqd->dma_meta_list + pblk_dma_meta_size(pblk);
- 
- 	return 0;
- }
-@@ -846,8 +846,8 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
- 	if (!meta_list)
- 		return -ENOMEM;
- 
--	ppa_list = meta_list + pblk_dma_meta_size;
--	dma_ppa_list = dma_meta_list + pblk_dma_meta_size;
-+	ppa_list = meta_list + pblk_dma_meta_size(pblk);
-+	dma_ppa_list = dma_meta_list + pblk_dma_meta_size(pblk);
- 
- next_rq:
- 	memset(&rqd, 0, sizeof(struct nvm_rq));
 diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 33361bfb85c3..ff6a6df369c3 100644
+index ff6a6df369c3..e8055b796381 100644
 --- a/drivers/lightnvm/pblk-init.c
 +++ b/drivers/lightnvm/pblk-init.c
-@@ -406,7 +406,7 @@ static int pblk_core_init(struct pblk *pblk)
- 	pblk_set_sec_per_write(pblk, pblk->min_write_pgs);
- 
- 	pblk->oob_meta_size = geo->sos;
--	if (pblk->oob_meta_size != sizeof(struct pblk_sec_meta)) {
-+	if (pblk->oob_meta_size < sizeof(struct pblk_sec_meta)) {
- 		pblk_err(pblk, "Unsupported metadata size\n");
- 		return -EINVAL;
+@@ -1175,6 +1175,12 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+ 		return ERR_PTR(-EINVAL);
  	}
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index e4dd634ba05f..3a775d10f616 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -481,8 +481,8 @@ static int pblk_recov_l2p_from_oob(struct pblk *pblk, struct pblk_line *line)
- 	if (!meta_list)
- 		return -ENOMEM;
  
--	ppa_list = (void *)(meta_list) + pblk_dma_meta_size;
--	dma_ppa_list = dma_meta_list + pblk_dma_meta_size;
-+	ppa_list = (void *)(meta_list) + pblk_dma_meta_size(pblk);
-+	dma_ppa_list = dma_meta_list + pblk_dma_meta_size(pblk);
- 
- 	data = kcalloc(pblk->max_write_pgs, geo->csecs, GFP_KERNEL);
- 	if (!data) {
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 80f356688803..9087d53d5c25 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -104,7 +104,6 @@ enum {
- 	PBLK_RL_LOW = 4
- };
- 
--#define pblk_dma_meta_size (sizeof(struct pblk_sec_meta) * NVM_MAX_VLBA)
- #define pblk_dma_ppa_size (sizeof(u64) * NVM_MAX_VLBA)
- 
- /* write buffer completion context */
-@@ -1388,4 +1387,9 @@ static inline struct pblk_sec_meta *pblk_get_meta(struct pblk *pblk,
- {
- 	return meta + pblk->oob_meta_size * index;
- }
++	if (geo->ext) {
++		pblk_err(pblk, "extended metadata not supported\n");
++		kfree(pblk);
++		return ERR_PTR(-EINVAL);
++	}
 +
-+static inline int pblk_dma_meta_size(struct pblk *pblk)
-+{
-+	return pblk->oob_meta_size * NVM_MAX_VLBA;
-+}
- #endif /* PBLK_H_ */
+ 	spin_lock_init(&pblk->resubmit_lock);
+ 	spin_lock_init(&pblk->trans_lock);
+ 	spin_lock_init(&pblk->lock);
 diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index 51d957ccf328..ba268d7cf141 100644
+index ba268d7cf141..f145fc0220d6 100644
 --- a/drivers/nvme/host/lightnvm.c
 +++ b/drivers/nvme/host/lightnvm.c
-@@ -732,11 +732,12 @@ static int nvme_nvm_submit_io_sync(struct nvm_dev *dev, struct nvm_rq *rqd)
- 	return ret;
- }
+@@ -990,6 +990,7 @@ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
+ 	geo = &dev->geo;
+ 	geo->csecs = 1 << ns->lba_shift;
+ 	geo->sos = ns->ms;
++	geo->ext = ns->ext;
  
--static void *nvme_nvm_create_dma_pool(struct nvm_dev *nvmdev, char *name)
-+static void *nvme_nvm_create_dma_pool(struct nvm_dev *nvmdev, char *name,
-+					int size)
- {
- 	struct nvme_ns *ns = nvmdev->q->queuedata;
- 
--	return dma_pool_create(name, ns->ctrl->dev, PAGE_SIZE, PAGE_SIZE, 0);
-+	return dma_pool_create(name, ns->ctrl->dev, size, PAGE_SIZE, 0);
- }
- 
- static void nvme_nvm_destroy_dma_pool(void *pool)
+ 	dev->q = q;
+ 	memcpy(dev->name, disk_name, DISK_NAME_LEN);
 diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 2fdeac1a420d..7afedaddbd15 100644
+index 7afedaddbd15..5d865a5d5cdc 100644
 --- a/include/linux/lightnvm.h
 +++ b/include/linux/lightnvm.h
-@@ -90,7 +90,7 @@ typedef int (nvm_get_chk_meta_fn)(struct nvm_dev *, sector_t, int,
- 							struct nvm_chk_meta *);
- typedef int (nvm_submit_io_fn)(struct nvm_dev *, struct nvm_rq *);
- typedef int (nvm_submit_io_sync_fn)(struct nvm_dev *, struct nvm_rq *);
--typedef void *(nvm_create_dma_pool_fn)(struct nvm_dev *, char *);
-+typedef void *(nvm_create_dma_pool_fn)(struct nvm_dev *, char *, int);
- typedef void (nvm_destroy_dma_pool_fn)(void *);
- typedef void *(nvm_dev_dma_alloc_fn)(struct nvm_dev *, void *, gfp_t,
- 								dma_addr_t *);
+@@ -357,6 +357,7 @@ struct nvm_geo {
+ 	u32	clba;		/* sectors per chunk */
+ 	u16	csecs;		/* sector size */
+ 	u16	sos;		/* out-of-band area size */
++	bool	ext;		/* metadata in extended data buffer */
+ 
+ 	/* device write constrains */
+ 	u32	ws_min;		/* minimum write size */
 -- 
 2.14.5
 
