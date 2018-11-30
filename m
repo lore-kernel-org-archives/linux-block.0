@@ -2,321 +2,62 @@ Return-Path: <SRS0=+5f8=OJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 578DFC64EB4
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 07:18:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC8B9C64EB4
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 07:56:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 064C021473
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 07:18:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=cnexlabs.onmicrosoft.com header.i=@cnexlabs.onmicrosoft.com header.b="hpKXwA+n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 064C021473
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cnexlabs.com
+	by mail.kernel.org (Postfix) with ESMTP id 73D562082F
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 07:56:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73D562082F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726600AbeK3S0T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Nov 2018 13:26:19 -0500
-Received: from mail-eopbgr750048.outbound.protection.outlook.com ([40.107.75.48]:47840
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726386AbeK3S0T (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 13:26:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=cnexlabs.onmicrosoft.com; s=selector1-cnexlabs-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Cc6cW5WfQG/9Q0SOksKz57uPCRR8gWpILsvKVNZXLUA=;
- b=hpKXwA+nRCjzIeIqLfIOsNUh+ZvUN+7oKxiGowFg5c4+Bv8hkvZYKUIkgvLZfZ07hPNJ5X/v4wb/R/k2n/uzlOgcVRhQTp36sB1IRyvrMjKBoqYeumEF7IipOahmUj4geLNITucYGAOcVRUrGGvXfvw3Nm7f1/IDDBH5prIEYJM=
-Received: from DM6PR06MB5178.namprd06.prod.outlook.com (20.178.25.19) by
- DM6PR06MB5210.namprd06.prod.outlook.com (20.178.25.139) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1382.18; Fri, 30 Nov 2018 07:17:54 +0000
-Received: from DM6PR06MB5178.namprd06.prod.outlook.com
- ([fe80::c450:96ae:b322:78c7]) by DM6PR06MB5178.namprd06.prod.outlook.com
- ([fe80::c450:96ae:b322:78c7%4]) with mapi id 15.20.1361.019; Fri, 30 Nov 2018
- 07:17:54 +0000
-From:   Javier Gonzalez <javier@cnexlabs.com>
-To:     =?utf-8?B?TWF0aWFzIEJqw7hybGluZw==?= <mb@lightnvm.io>
-CC:     "Konopko, Igor J" <igor.j.konopko@intel.com>,
-        "marcin.dziegielewski@intel.com" <marcin.dziegielewski@intel.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        id S1726629AbeK3TEb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Nov 2018 14:04:31 -0500
+Received: from verein.lst.de ([213.95.11.211]:48651 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726589AbeK3TEb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 30 Nov 2018 14:04:31 -0500
+Received: by newverein.lst.de (Postfix, from userid 2407)
+        id C9E1768BDF; Fri, 30 Nov 2018 08:56:03 +0100 (CET)
+Date:   Fri, 30 Nov 2018 08:56:03 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@fb.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
         Keith Busch <keith.busch@intel.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [PATCH] lightnvm: simplify geometry enumeration
-Thread-Topic: [PATCH] lightnvm: simplify geometry enumeration
-Thread-Index: AQHUh+/AxF+u6YXd40KvE3EuBX7KZaVn6b6A
-Date:   Fri, 30 Nov 2018 07:17:54 +0000
-Message-ID: <6FEED0D7-5064-464A-B522-412CEE2A1C7A@cnexlabs.com>
-References: <20181129142738.9567-1-mb@lightnvm.io>
-In-Reply-To: <20181129142738.9567-1-mb@lightnvm.io>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: yes
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=javier@cnexlabs.com; 
-x-originating-ip: [193.106.164.211]
-x-ms-publictraffictype: Email
-x-microsoft-exchange-diagnostics: 1;DM6PR06MB5210;6:PujDCk83PKYj0CtQkrBKBxH/aZu/EFGygGmgM21aSr2pUsH6KLwezGbyNgXLzN2RIU2U+eBDzBujs4NPZJdoQJaBZPJOvOZdWEeShNsoJ4LPuI0JeZhw7x44MKQCxV7fIliX9VJ78CjiaDTWwGY1wvAjB7N8TQI2RNrP/kaIv/MuwoNILn0JvmVz+sZ5jtsBQ8aj83Y0MBLD+8fD1rf+AXOIXZdFggk7f6vMecoBeX9giZkUEL+lwh9mrLDhndgOm5LTmHg4182bm1inmI3FL0J7wXStOUQA+mHLYuOlIwjNuYxMG3lQn/jMB5Q6+r6466HmTFulwYml/XHNZ++rf/OnOW6EFzOL2X3BmCLrtFgXMqfzvzdHXhzF/G1eydbLwwRmZziGTs6wIU6mFNFB1zijgnI+PG7sJrOxpAnwQDVn35BycnK8fGzYY6aEtZEUeZC5EGfZ5U6t+yAySqIFUA==;5:f2a9lcQSH91Hi6u2DkXCK3vMSrhMlDPSWTIk+WvpWRFW14zlPsDsQDDzaeInvWSl3OPUsAkE0cr1Fhazcp5V0QYfNeqDmESHVmetL2xT8/eFLY6ZDcGsoiTKFjsQBOwIPzPdj7fSiBZVjm8fydNi5qQNmZ7bbSFi5adMtR8YeVU=;7:Dr1eca7phe6V7opYYFeGwcEmiFQrYSPCyGhSwejGwwjD9tm999z4KG43/TIeHbOHOmxvCH/gmryFIgfttnOX5D44SLADpJevacvYpGYtxjWkX7ItyyIY1FfuKFXTPZ3QBUbWD35PP0i2l5pZC/l4JA==
-x-ms-exchange-antispam-srfa-diagnostics: SOS;
-x-ms-office365-filtering-correlation-id: 15d8eb01-b169-4f60-2c63-08d65693f285
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390098)(7020095)(4652040)(8989299)(5600074)(711020)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7153060)(49563074)(7193020);SRVR:DM6PR06MB5210;
-x-ms-traffictypediagnostic: DM6PR06MB5210:
-x-microsoft-antispam-prvs: <DM6PR06MB5210813A3AC4E46789F305B6BAD30@DM6PR06MB5210.namprd06.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-exchange-antispam-report-cfa-test: BCL:0;PCL:0;RULEID:(8211001083)(102415395)(6040522)(2401047)(8121501046)(5005006)(3231453)(999002)(944501410)(4983020)(4982022)(52105112)(93006095)(93001095)(10201501046)(3002001)(148016)(149066)(150057)(6041310)(20161123560045)(201703131423095)(201702281528075)(20161123555045)(201703061421075)(201703061406153)(20161123564045)(20161123562045)(20161123558120)(201708071742011)(7699051)(76991095);SRVR:DM6PR06MB5210;BCL:0;PCL:0;RULEID:;SRVR:DM6PR06MB5210;
-x-forefront-prvs: 087223B4DA
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(376002)(396003)(346002)(39840400004)(136003)(199004)(189003)(99286004)(4326008)(305945005)(106356001)(486006)(7736002)(97736004)(25786009)(82746002)(105586002)(14444005)(6506007)(3846002)(6116002)(76176011)(256004)(6512007)(102836004)(6306002)(478600001)(229853002)(53936002)(186003)(81166006)(68736007)(81156014)(5660300001)(36756003)(6486002)(99936001)(6436002)(966005)(86362001)(66066001)(2906002)(54906003)(14454004)(8676002)(11346002)(446003)(66574009)(71200400001)(26005)(8936002)(6246003)(2616005)(476003)(33656002)(71190400001)(83716004)(316002)(6916009);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR06MB5210;H:DM6PR06MB5178.namprd06.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: cnexlabs.com does not designate
- permitted sender hosts)
-x-microsoft-antispam-message-info: WHbcnPzMLczDMMpo6Qu9hoP7UIYzDjuK8xfSR7YliBJWipd0DqbJe4qLjjcq9XQZvEn6sTRFX9Bj3DW0CfOJDQnIRNN7I0Gi9ff5m7CLJCRLHDrjSwqYA7GOCJiX+ow4AgEL83CPp/1R+PSiX7c5WGopixpJ61hjfDlwxh83+TgHyCysPPZF/LufH0m05odTgZWA6vbNCuL8UVMDvHAs0JVe+gkqd9xHVfMQpMsmBIVZNFCnAg091WtyUbT4v4SEZYwhtDZInd5lJ9unAWxlmBtZ77/JO9yXQ8qHyDEhP/P6IO7vYitvpQmEW+WZTaO58BIHh5WcSxtTzhwp8Hu9rqBRZJbHJAhmZKSOiSYJg+Y=
-spamdiagnosticoutput: 1:99
-spamdiagnosticmetadata: NSPM
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_8CC13221-B825-4BDC-BFC5-4075621773DC";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha512
+        Sagi Grimberg <sagi@grimberg.me>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 01/13] block: move queues types to the block layer
+Message-ID: <20181130075603.GA18936@lst.de>
+References: <20181129191310.9795-1-hch@lst.de> <20181129191310.9795-2-hch@lst.de> <c20e4d66-0fc5-ab65-2805-c4b22012c1c5@fb.com>
 MIME-Version: 1.0
-X-OriginatorOrg: cnexlabs.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 15d8eb01-b169-4f60-2c63-08d65693f285
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Nov 2018 07:17:54.7558
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: e40dfc2e-c6c1-463a-a598-38602b2c3cff
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR06MB5210
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c20e4d66-0fc5-ab65-2805-c4b22012c1c5@fb.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---Apple-Mail=_8CC13221-B825-4BDC-BFC5-4075621773DC
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+On Thu, Nov 29, 2018 at 07:50:09PM +0000, Jens Axboe wrote:
+> > in our post-spectre world.  Also having too many queue type is just
+> > going to create confusion, so I'd rather manage them centrally.
+> > 
+> > Note that the queue type naming and ordering changes a bit - the
+> > first index now is the defauly queue for everything not explicitly
+>                          ^^^^^^^
+> 
+> default
 
-> On 29 Nov 2018, at 15.27, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
->=20
-> Currently the geometry of an OCSSD is enumerated using a two step
-> approach:
->=20
-> First, nvm_register is called, the OCSSD identify command is issued,
-> and second the geometry sos and csecs values are read either from the
-> OCSSD identify if it is a 1.2 drive, or from the NVMe namespace data
-> structure if it is a 2.0 device.
->=20
-> This patch recombines it into a single step, such that nvm_register =
-can
-> use the csecs and sos fields independent of which version is used. =
-This
-> enables one to dynamically size the lightnvm subsystem dma pool.
->=20
-> Signed-off-by: Matias Bj=C3=B8rling <mb@lightnvm.io>
-> ---
-> drivers/lightnvm/core.c      | 12 +++++-------
-> drivers/nvme/host/core.c     | 18 +++++++++---------
-> drivers/nvme/host/lightnvm.c | 18 ++++++------------
-> drivers/nvme/host/nvme.h     |  2 --
-> 4 files changed, 20 insertions(+), 30 deletions(-)
->=20
-> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-> index 73ab3cf26868..a1d52e934ce4 100644
-> --- a/drivers/lightnvm/core.c
-> +++ b/drivers/lightnvm/core.c
-> @@ -1145,25 +1145,23 @@ int nvm_register(struct nvm_dev *dev)
-> 	if (!dev->q || !dev->ops)
-> 		return -EINVAL;
->=20
-> +	ret =3D nvm_init(dev);
-> +	if (ret)
-> +		return ret;
-> +
-> 	dev->dma_pool =3D dev->ops->create_dma_pool(dev, "ppalist");
-> 	if (!dev->dma_pool) {
-> 		pr_err("nvm: could not create dma pool\n");
-> +		nvm_free(dev);
-> 		return -ENOMEM;
-> 	}
->=20
-> -	ret =3D nvm_init(dev);
-> -	if (ret)
-> -		goto err_init;
-> -
-> 	/* register device with a supported media manager */
-> 	down_write(&nvm_lock);
-> 	list_add(&dev->devices, &nvm_devices);
-> 	up_write(&nvm_lock);
->=20
-> 	return 0;
-> -err_init:
-> -	dev->ops->destroy_dma_pool(dev->dma_pool);
-> -	return ret;
-> }
-> EXPORT_SYMBOL(nvm_register);
->=20
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index 65c42448e904..387833b37e38 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -1516,8 +1516,6 @@ static void __nvme_revalidate_disk(struct =
-gendisk *disk, struct nvme_id_ns *id)
-> 	if (ns->noiob)
-> 		nvme_set_chunk_size(ns);
-> 	nvme_update_disk_info(disk, ns, id);
-> -	if (ns->ndev)
-> -		nvme_nvm_update_nvm_info(ns);
-> #ifdef CONFIG_NVME_MULTIPATH
-> 	if (ns->head->disk)
-> 		nvme_update_disk_info(ns->head->disk, ns, id);
-> @@ -3086,13 +3084,6 @@ static void nvme_alloc_ns(struct nvme_ctrl =
-*ctrl, unsigned nsid)
-> 	nvme_setup_streams_ns(ctrl, ns);
-> 	nvme_set_disk_name(disk_name, ns, ctrl, &flags);
->=20
-> -	if ((ctrl->quirks & NVME_QUIRK_LIGHTNVM) && id->vs[0] =3D=3D =
-0x1) {
-> -		if (nvme_nvm_register(ns, disk_name, node)) {
-> -			dev_warn(ctrl->device, "LightNVM init =
-failure\n");
-> -			goto out_unlink_ns;
-> -		}
-> -	}
-> -
-> 	disk =3D alloc_disk_node(0, node);
-> 	if (!disk)
-> 		goto out_unlink_ns;
-> @@ -3106,6 +3097,13 @@ static void nvme_alloc_ns(struct nvme_ctrl =
-*ctrl, unsigned nsid)
->=20
-> 	__nvme_revalidate_disk(disk, id);
->=20
-> +	if ((ctrl->quirks & NVME_QUIRK_LIGHTNVM) && id->vs[0] =3D=3D =
-0x1) {
-> +		if (nvme_nvm_register(ns, disk_name, node)) {
-> +			dev_warn(ctrl->device, "LightNVM init =
-failure\n");
-> +			goto out_put_disk;
-> +		}
-> +	}
-> +
-> 	down_write(&ctrl->namespaces_rwsem);
-> 	list_add_tail(&ns->list, &ctrl->namespaces);
-> 	up_write(&ctrl->namespaces_rwsem);
-> @@ -3119,6 +3117,8 @@ static void nvme_alloc_ns(struct nvme_ctrl =
-*ctrl, unsigned nsid)
-> 	kfree(id);
->=20
-> 	return;
-> + out_put_disk:
-> +	put_disk(ns->disk);
->  out_unlink_ns:
-> 	mutex_lock(&ctrl->subsys->lock);
-> 	list_del_rcu(&ns->siblings);
-> diff --git a/drivers/nvme/host/lightnvm.c =
-b/drivers/nvme/host/lightnvm.c
-> index d64805dc8efb..51d957ccf328 100644
-> --- a/drivers/nvme/host/lightnvm.c
-> +++ b/drivers/nvme/host/lightnvm.c
-> @@ -973,22 +973,11 @@ int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned =
-int cmd, unsigned long arg)
-> 	}
-> }
->=20
-> -void nvme_nvm_update_nvm_info(struct nvme_ns *ns)
-> -{
-> -	struct nvm_dev *ndev =3D ns->ndev;
-> -	struct nvm_geo *geo =3D &ndev->geo;
-> -
-> -	if (geo->version =3D=3D NVM_OCSSD_SPEC_12)
-> -		return;
-> -
-> -	geo->csecs =3D 1 << ns->lba_shift;
-> -	geo->sos =3D ns->ms;
-> -}
-> -
-> int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
-> {
-> 	struct request_queue *q =3D ns->queue;
-> 	struct nvm_dev *dev;
-> +	struct nvm_geo *geo;
->=20
-> 	_nvme_nvm_check_size();
->=20
-> @@ -996,6 +985,11 @@ int nvme_nvm_register(struct nvme_ns *ns, char =
-*disk_name, int node)
-> 	if (!dev)
-> 		return -ENOMEM;
->=20
-> +	/* Note that csecs and sos will be overridden if it is a 1.2 =
-drive. */
-> +	geo =3D &dev->geo;
-> +	geo->csecs =3D 1 << ns->lba_shift;
-> +	geo->sos =3D ns->ms;
-> +
-> 	dev->q =3D q;
-> 	memcpy(dev->name, disk_name, DISK_NAME_LEN);
-> 	dev->ops =3D &nvme_nvm_dev_ops;
-> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-> index 9fefba039d1e..4f5399c8808b 100644
-> --- a/drivers/nvme/host/nvme.h
-> +++ b/drivers/nvme/host/nvme.h
-> @@ -541,13 +541,11 @@ static inline void nvme_mpath_stop(struct =
-nvme_ctrl *ctrl)
-> #endif /* CONFIG_NVME_MULTIPATH */
->=20
-> #ifdef CONFIG_NVM
-> -void nvme_nvm_update_nvm_info(struct nvme_ns *ns);
-> int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node);
-> void nvme_nvm_unregister(struct nvme_ns *ns);
-> extern const struct attribute_group nvme_nvm_attr_group;
-> int nvme_nvm_ioctl(struct nvme_ns *ns, unsigned int cmd, unsigned long =
-arg);
-> #else
-> -static inline void nvme_nvm_update_nvm_info(struct nvme_ns *ns) {};
-> static inline int nvme_nvm_register(struct nvme_ns *ns, char =
-*disk_name,
-> 				    int node)
-> {
-> --
-> 2.17.1
->=20
->=20
-> _______________________________________________
-> Linux-nvme mailing list
-> Linux-nvme@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-nvme
+Fixed.
 
-Good refactor; much better to do initialization on a single step.
+> Side not, should probably make the sysfs 'type' attribute a string
+> at this point.
 
-Reviewed-by: Javier Gonz=C3=A1lez <javier@cnexlabs.com>
-
-
---Apple-Mail=_8CC13221-B825-4BDC-BFC5-4075621773DC
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEE+ws7Qq+qZPG1bJoyIX4xUKFRnnQFAlwA5CEACgkQIX4xUKFR
-nnTNAg/+If42ZquryLgdIeq5uXcr6icmtLkPKGLYbimbcKyue+D6kEVC88gGwk4i
-kd60Q6afKyYFNYHay83QlryFjepTJqh/LrVxhnuVHODLYfe89Ei1zm0HtsBXyEym
-IYqS26+KiYyv9LE+eJbWoicPPKKgYR2IWF3i0fAm2IzebftHp4G+wLiWOVrswq6r
-aMNugBp2YI+lCyh9qNtnFT2u81pgkjIzcXe08v705+rDNJBvPNp0sYT8un+3/rqP
-o8ztY9v9DUOVbff1reFO/Xg0FV0PjtPqUSbrfDIo39sZXWGbXkDs4YnafkM902d1
-IXWeHGGRzCZzh7vfRb4glksTNh0aa22eyVU1n9Am8gWXpC5/d9d/xrUje45E1sDA
-jH4MnmQ41c/467pbIbLMnwPqJ6+IgIsL9/mcupmORyeFaH+qyWG8drmwTaz7ZATU
-TDsbcuErlIHt/oK5ffJ82doUAS1BPX+/8V9P5EHdkruxZx+zakmJEUC26Mnn63Ba
-9uqRc+kE9Lc6dqTTYhRzAJkGfedrJxdzsBK/gepeQjxUSmv+IMnm1R+B3d/9NDAu
-pwDJyZzN7LssALqfXmvaICeUYG5hXKKKdoXRhR/pFEnRx9qNvTEBpczXJ60X5YHZ
-Hk8c17N1Jrwqz6fg5/4tb/gF0ELbuadAXrb5r2EgXGkMUP3NFmQ=
-=tbRG
------END PGP SIGNATURE-----
-
---Apple-Mail=_8CC13221-B825-4BDC-BFC5-4075621773DC--
+Fixed as well.
