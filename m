@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4069BC64EB4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92A24C65BAE
 	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D5DDE2145D
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58E142145D
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="iRhG9Bxi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5DDE2145D
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="TiqPrLnO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58E142145D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727618AbeLAEHQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727619AbeLAEHQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 30 Nov 2018 23:07:16 -0500
-Received: from mail-it1-f194.google.com ([209.85.166.194]:38872 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727606AbeLAEHP (ORCPT
+Received: from mail-it1-f195.google.com ([209.85.166.195]:38881 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727510AbeLAEHQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 23:07:15 -0500
-Received: by mail-it1-f194.google.com with SMTP id h65so10227275ith.3
-        for <linux-block@vger.kernel.org>; Fri, 30 Nov 2018 08:57:19 -0800 (PST)
+        Fri, 30 Nov 2018 23:07:16 -0500
+Received: by mail-it1-f195.google.com with SMTP id h65so10227413ith.3
+        for <linux-block@vger.kernel.org>; Fri, 30 Nov 2018 08:57:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=0+NngYCEwZmyaHCfliqIZzKXf8tREdBkDh7BHlIPjoY=;
-        b=iRhG9Bxi7d/+z3JHkw2TCh8ZTUuFNTxCilzedQ0/Vaq83CVsYJeAnHvZoBNXgyzI0h
-         wHCttmqLsVKFfpGYWwBwr6MAkPdninwktf+B7SzuPaDPOlOC9vn/XJmK5mo1+V8p0gF3
-         kY8UDLJH7cFyAEId8SFuo4TtAw6LIe4ueARgbHmTRJomZv9u4aOl9PIo3VcPx7pDb2oi
-         w/R4FhNcCqOYhrECk9rbKwCyD/oXvP1zO1UGNEdVqtfvtjRLaJK2To7w8xJtOAW9XGKg
-         fUGjo3vAUvXy5cLDR1yJ34+OCiW51BlTI0azLOBy2gFw1VHx3LUT9aQGjgSPQu2t6R/Y
-         C/Tw==
+        bh=14kCfLiACV93AenWhL1xKvUDPabDTnEKBX7DXRr/kpI=;
+        b=TiqPrLnOkfC+Zz5Ju3GWBXlcq1tYFO2h82OmJ4SGdl3VfZ9GzV0OTQ/TQt1uf8la1x
+         CpVciynTtXqo+HhAMdm1imVoG6es+G2xqmy0nsjkONh8SkD2nbDDGkCgbSKSU8d66F3y
+         19sK++Ypfi7CpKiq69jkBQVzypv0+K6Tosuzw2EKqAyUyrO3E+nQvBRNGPX5lcwh6zXS
+         LdfBYCKBOt1nBESVtMdXlcP+bmedgXCigUIoLeYkv8GWh/GyBruY7xkxwkoXpD9Akcg1
+         hIxFsxGqV0JqLgQRfHLohN1wl+T36KSsyjpUYW6m8ispf6W0Qp2JHpgd8q1HZ1dm9Y8v
+         A8yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=0+NngYCEwZmyaHCfliqIZzKXf8tREdBkDh7BHlIPjoY=;
-        b=KhbId4cuJX0BENbH99hrquOSb+SxSPqP34WLlHrIwJqratbvLNFey9lgDtP3D1aHcI
-         dnZGcqaFDw0K3lcoEpV43NFHYhl3maUd08pWG2l1hXyTelCLuW+uimr51YJbWvHF7XCj
-         NKI2DGnZRHsQPuskZ+4MxyY8rMxpgbEQR4GhOuFDup+tUbRy1NeuyfyUS+eVlqqDfjZ1
-         Xwf6G9sYHt1JYTtQGUhmYHgy6I33dkrsoqyCrR+Y2tNjzRWgAlccS+dqO3EPH+V/BLAR
-         nxIeo0vc5ht7NP9PbVprJp8kq/g4DPRTuCGE0SUCOppREAbna1hb+APavj4n0AxuclFu
-         sqpA==
-X-Gm-Message-State: AA+aEWb8gOcNffiVCK6330jh+su/t5xVLuu6Kz37QLtxjkqtDB4tkZIA
-        V0FDREvCgUvnNmGdfc+ktcCPmu4LZ0c=
-X-Google-Smtp-Source: AFSGD/Ua1hyabcOerfXkHkPm/gFjbPS8SrzDWZlZ9S2gEdEmDKfvEyAf2K5HRUmf/oz0K/9YOJB41g==
-X-Received: by 2002:a02:1a0a:: with SMTP id 10mr5649788jai.50.1543597038740;
-        Fri, 30 Nov 2018 08:57:18 -0800 (PST)
+        bh=14kCfLiACV93AenWhL1xKvUDPabDTnEKBX7DXRr/kpI=;
+        b=lkOBqQwVQt8sUMZJ4H7u2VY6jHiO+HskOpBoj1GXlqOXz3JmU26n81f8ouRtq5O7bv
+         505XV7L0ca+36PA6AdqPV1h3X2pbmVhmG2CyBdrcINJ+hHlicDqn5A9J69F2PxfRN+ZJ
+         VqU2F0hQ69xMne1jsD9OzEoE/peCb57UAnwgwizE2DhrBZZ3/fOCMxnCA4RcfZpVKj5o
+         edSLTnn/jMQ7bLmgfSj/Ee7WnTtscrB9eQ8ORwKWIS0FTu2EWive80UqCZfOzorNzwqY
+         9kld//y2s4dWx95L0YfZIF8evIy1M5GrLiLomYWRfquXBbViGY9RV9B1XPkdtXJR6QAW
+         1MNQ==
+X-Gm-Message-State: AA+aEWZahcQqgRtw6BFiOa8Bp1IhN3dMo2mUkHtRbMruXSm6m3z8OT/H
+        A6noIq5vX2J+0/DFgtdBEopqX8yQ3vA=
+X-Google-Smtp-Source: AFSGD/UCWQhcPAOi9IxYkGGlOZkwbmyrVMJWWnfjL/JMdacEe+udH3jNy64/LUMyfmy7JJuLVa7p6Q==
+X-Received: by 2002:a02:a990:: with SMTP id q16mr5882865jam.132.1543597040111;
+        Fri, 30 Nov 2018 08:57:20 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id j133sm2979447itj.16.2018.11.30.08.57.17
+        by smtp.gmail.com with ESMTPSA id j133sm2979447itj.16.2018.11.30.08.57.18
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 30 Nov 2018 08:57:17 -0800 (PST)
+        Fri, 30 Nov 2018 08:57:19 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-aio@kvack.org
 Cc:     hch@lst.de, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 18/27] aio: add submission side request cache
-Date:   Fri, 30 Nov 2018 09:56:37 -0700
-Message-Id: <20181130165646.27341-19-axboe@kernel.dk>
+Subject: [PATCH 19/27] fs: add fget_many() and fput_many()
+Date:   Fri, 30 Nov 2018 09:56:38 -0700
+Message-Id: <20181130165646.27341-20-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181130165646.27341-1-axboe@kernel.dk>
 References: <20181130165646.27341-1-axboe@kernel.dk>
@@ -72,273 +72,140 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We have to add each submitted polled request to the io_context
-poll_submitted list, which means we have to grab the poll_lock. We
-already use the block plug to batch submissions if we're doing a batch
-of IO submissions, extend that to cover the poll requests internally as
-well.
+Some uses cases repeatedly get and put references to the same file, but
+the only exposed interface is doing these one at the time. As each of
+these entail an atomic inc or dec on a shared structure, that cost can
+add up.
+
+Add fget_many(), which works just like fget(), except it takes an
+argument for how many references to get on the file. Ditto fput_many(),
+which can drop an arbitrary number of references to a file.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/aio.c | 136 +++++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 113 insertions(+), 23 deletions(-)
+ fs/file.c            | 15 ++++++++++-----
+ fs/file_table.c      | 10 ++++++++--
+ include/linux/file.h |  2 ++
+ include/linux/fs.h   |  3 ++-
+ 4 files changed, 22 insertions(+), 8 deletions(-)
 
-diff --git a/fs/aio.c b/fs/aio.c
-index f7a49abc7694..182e2fc6ec82 100644
---- a/fs/aio.c
-+++ b/fs/aio.c
-@@ -230,6 +230,21 @@ struct aio_kiocb {
- 	};
- };
+diff --git a/fs/file.c b/fs/file.c
+index 7ffd6e9d103d..ad9870edfd51 100644
+--- a/fs/file.c
++++ b/fs/file.c
+@@ -676,7 +676,7 @@ void do_close_on_exec(struct files_struct *files)
+ 	spin_unlock(&files->file_lock);
+ }
  
-+struct aio_submit_state {
-+	struct kioctx *ctx;
-+
-+	struct blk_plug plug;
-+#ifdef CONFIG_BLOCK
-+	struct blk_plug_cb plug_cb;
-+#endif
-+
-+	/*
-+	 * Polled iocbs that have been submitted, but not added to the ctx yet
-+	 */
-+	struct list_head req_list;
-+	unsigned int req_count;
-+};
-+
- /*------ sysctl variables----*/
- static DEFINE_SPINLOCK(aio_nr_lock);
- unsigned long aio_nr;		/* current system wide number of aio requests */
-@@ -247,6 +262,15 @@ static const struct address_space_operations aio_ctx_aops;
- static const unsigned int iocb_page_shift =
- 				ilog2(PAGE_SIZE / sizeof(struct iocb));
+-static struct file *__fget(unsigned int fd, fmode_t mask)
++static struct file *__fget(unsigned int fd, fmode_t mask, unsigned int refs)
+ {
+ 	struct files_struct *files = current->files;
+ 	struct file *file;
+@@ -691,7 +691,7 @@ static struct file *__fget(unsigned int fd, fmode_t mask)
+ 		 */
+ 		if (file->f_mode & mask)
+ 			file = NULL;
+-		else if (!get_file_rcu(file))
++		else if (!get_file_rcu_many(file, refs))
+ 			goto loop;
+ 	}
+ 	rcu_read_unlock();
+@@ -699,15 +699,20 @@ static struct file *__fget(unsigned int fd, fmode_t mask)
+ 	return file;
+ }
  
-+/*
-+ * We rely on block level unplugs to flush pending requests, if we schedule
-+ */
-+#ifdef CONFIG_BLOCK
-+static const bool aio_use_state_req_list = true;
-+#else
-+static const bool aio_use_state_req_list = false;
-+#endif
++struct file *fget_many(unsigned int fd, unsigned int refs)
++{
++	return __fget(fd, FMODE_PATH, refs);
++}
 +
- static void aio_useriocb_free(struct kioctx *);
- static void aio_iopoll_reap_events(struct kioctx *);
+ struct file *fget(unsigned int fd)
+ {
+-	return __fget(fd, FMODE_PATH);
++	return fget_many(fd, 1);
+ }
+ EXPORT_SYMBOL(fget);
  
-@@ -1851,13 +1875,28 @@ static inline void aio_rw_done(struct kiocb *req, ssize_t ret)
+ struct file *fget_raw(unsigned int fd)
+ {
+-	return __fget(fd, 0);
++	return __fget(fd, 0, 1);
+ }
+ EXPORT_SYMBOL(fget_raw);
+ 
+@@ -738,7 +743,7 @@ static unsigned long __fget_light(unsigned int fd, fmode_t mask)
+ 			return 0;
+ 		return (unsigned long)file;
+ 	} else {
+-		file = __fget(fd, mask);
++		file = __fget(fd, mask, 1);
+ 		if (!file)
+ 			return 0;
+ 		return FDPUT_FPUT | (unsigned long)file;
+diff --git a/fs/file_table.c b/fs/file_table.c
+index e49af4caf15d..6a3964df33e4 100644
+--- a/fs/file_table.c
++++ b/fs/file_table.c
+@@ -326,9 +326,9 @@ void flush_delayed_fput(void)
+ 
+ static DECLARE_DELAYED_WORK(delayed_fput_work, delayed_fput);
+ 
+-void fput(struct file *file)
++void fput_many(struct file *file, unsigned int refs)
+ {
+-	if (atomic_long_dec_and_test(&file->f_count)) {
++	if (atomic_long_sub_and_test(refs, &file->f_count)) {
+ 		struct task_struct *task = current;
+ 
+ 		if (likely(!in_interrupt() && !(task->flags & PF_KTHREAD))) {
+@@ -347,6 +347,12 @@ void fput(struct file *file)
  	}
  }
  
-+/*
-+ * Called either at the end of IO submission, or through a plug callback
-+ * because we're going to schedule. Moves out local batch of requests to
-+ * the ctx poll list, so they can be found for polling + reaping.
-+ */
-+static void aio_flush_state_reqs(struct kioctx *ctx,
-+				 struct aio_submit_state *state)
++void fput(struct file *file)
 +{
-+	spin_lock(&ctx->poll_lock);
-+	list_splice_tail_init(&state->req_list, &ctx->poll_submitted);
-+	spin_unlock(&ctx->poll_lock);
-+	state->req_count = 0;
++	fput_many(file, 1);
 +}
++
 +
  /*
-  * After the iocb has been issued, it's safe to be found on the poll list.
-  * Adding the kiocb to the list AFTER submission ensures that we don't
-  * find it from a io_getevents() thread before the issuer is done accessing
-  * the kiocb cookie.
-  */
--static void aio_iopoll_iocb_issued(struct aio_kiocb *kiocb)
-+static void aio_iopoll_iocb_issued(struct aio_submit_state *state,
-+				   struct aio_kiocb *kiocb)
- {
- 	/*
- 	 * For fast devices, IO may have already completed. If it has, add
-@@ -1867,12 +1906,21 @@ static void aio_iopoll_iocb_issued(struct aio_kiocb *kiocb)
- 	const int front_add = test_bit(IOCB_POLL_COMPLETED, &kiocb->ki_flags);
- 	struct kioctx *ctx = kiocb->ki_ctx;
+  * synchronous analog of fput(); for kernel threads that might be needed
+  * in some umount() (and thus can't use flush_delayed_fput() without
+diff --git a/include/linux/file.h b/include/linux/file.h
+index 6b2fb032416c..3fcddff56bc4 100644
+--- a/include/linux/file.h
++++ b/include/linux/file.h
+@@ -13,6 +13,7 @@
+ struct file;
  
--	spin_lock(&ctx->poll_lock);
--	if (front_add)
--		list_add(&kiocb->ki_list, &ctx->poll_submitted);
--	else
--		list_add_tail(&kiocb->ki_list, &ctx->poll_submitted);
--	spin_unlock(&ctx->poll_lock);
-+	if (!state || !aio_use_state_req_list) {
-+		spin_lock(&ctx->poll_lock);
-+		if (front_add)
-+			list_add(&kiocb->ki_list, &ctx->poll_submitted);
-+		else
-+			list_add_tail(&kiocb->ki_list, &ctx->poll_submitted);
-+		spin_unlock(&ctx->poll_lock);
-+	} else {
-+		if (front_add)
-+			list_add(&kiocb->ki_list, &state->req_list);
-+		else
-+			list_add_tail(&kiocb->ki_list, &state->req_list);
-+		if (++state->req_count >= AIO_IOPOLL_BATCH)
-+			aio_flush_state_reqs(ctx, state);
-+	}
+ extern void fput(struct file *);
++extern void fput_many(struct file *, unsigned int);
+ 
+ struct file_operations;
+ struct vfsmount;
+@@ -44,6 +45,7 @@ static inline void fdput(struct fd fd)
  }
  
- static ssize_t aio_read(struct aio_kiocb *kiocb, const struct iocb *iocb,
-@@ -2168,7 +2216,8 @@ static ssize_t aio_poll(struct aio_kiocb *aiocb, const struct iocb *iocb)
+ extern struct file *fget(unsigned int fd);
++extern struct file *fget_many(unsigned int fd, unsigned int refs);
+ extern struct file *fget_raw(unsigned int fd);
+ extern unsigned long __fdget(unsigned int fd);
+ extern unsigned long __fdget_raw(unsigned int fd);
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 6a5f71f8ae06..dc54a65c401a 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -952,7 +952,8 @@ static inline struct file *get_file(struct file *f)
+ 	atomic_long_inc(&f->f_count);
+ 	return f;
  }
+-#define get_file_rcu(x) atomic_long_inc_not_zero(&(x)->f_count)
++#define get_file_rcu_many(x, cnt) atomic_long_add_unless(&(x)->f_count, (cnt), 0)
++#define get_file_rcu(x) get_file_rcu_many((x), 1)
+ #define fput_atomic(x)	atomic_long_add_unless(&(x)->f_count, -1, 1)
+ #define file_count(x)	atomic_long_read(&(x)->f_count)
  
- static int __io_submit_one(struct kioctx *ctx, const struct iocb *iocb,
--			   struct iocb __user *user_iocb, bool compat)
-+			   struct iocb __user *user_iocb,
-+			   struct aio_submit_state *state, bool compat)
- {
- 	struct aio_kiocb *req;
- 	ssize_t ret;
-@@ -2272,7 +2321,7 @@ static int __io_submit_one(struct kioctx *ctx, const struct iocb *iocb,
- 			ret = -EAGAIN;
- 			goto out_put_req;
- 		}
--		aio_iopoll_iocb_issued(req);
-+		aio_iopoll_iocb_issued(state, req);
- 	}
- 	return 0;
- out_put_req:
-@@ -2286,7 +2335,7 @@ static int __io_submit_one(struct kioctx *ctx, const struct iocb *iocb,
- }
- 
- static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
--			 bool compat)
-+			 struct aio_submit_state *state, bool compat)
- {
- 	struct iocb iocb, *iocbp;
- 
-@@ -2303,7 +2352,44 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- 		iocbp = &iocb;
- 	}
- 
--	return __io_submit_one(ctx, iocbp, user_iocb, compat);
-+	return __io_submit_one(ctx, iocbp, user_iocb, state, compat);
-+}
-+
-+#ifdef CONFIG_BLOCK
-+static void aio_state_unplug(struct blk_plug_cb *cb, bool from_schedule)
-+{
-+	struct aio_submit_state *state;
-+
-+	state = container_of(cb, struct aio_submit_state, plug_cb);
-+	if (!list_empty(&state->req_list))
-+		aio_flush_state_reqs(state->ctx, state);
-+}
-+#endif
-+
-+/*
-+ * Batched submission is done, ensure local IO is flushed out.
-+ */
-+static void aio_submit_state_end(struct aio_submit_state *state)
-+{
-+	blk_finish_plug(&state->plug);
-+	if (!list_empty(&state->req_list))
-+		aio_flush_state_reqs(state->ctx, state);
-+}
-+
-+/*
-+ * Start submission side cache.
-+ */
-+static void aio_submit_state_start(struct aio_submit_state *state,
-+				   struct kioctx *ctx)
-+{
-+	state->ctx = ctx;
-+	INIT_LIST_HEAD(&state->req_list);
-+	state->req_count = 0;
-+#ifdef CONFIG_BLOCK
-+	state->plug_cb.callback = aio_state_unplug;
-+	blk_start_plug(&state->plug);
-+	list_add(&state->plug_cb.list, &state->plug.cb_list);
-+#endif
- }
- 
- /*
-@@ -2327,10 +2413,10 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- SYSCALL_DEFINE3(io_submit, aio_context_t, ctx_id, long, nr,
- 		struct iocb __user * __user *, iocbpp)
- {
-+	struct aio_submit_state state, *statep = NULL;
- 	struct kioctx *ctx;
- 	long ret = 0;
- 	int i = 0;
--	struct blk_plug plug;
- 
- 	if (unlikely(nr < 0))
- 		return -EINVAL;
-@@ -2344,8 +2430,10 @@ SYSCALL_DEFINE3(io_submit, aio_context_t, ctx_id, long, nr,
- 	if (nr > ctx->nr_events)
- 		nr = ctx->nr_events;
- 
--	if (nr > AIO_PLUG_THRESHOLD)
--		blk_start_plug(&plug);
-+	if (nr > AIO_PLUG_THRESHOLD) {
-+		aio_submit_state_start(&state, ctx);
-+		statep = &state;
-+	}
- 	for (i = 0; i < nr; i++) {
- 		struct iocb __user *user_iocb;
- 
-@@ -2354,12 +2442,12 @@ SYSCALL_DEFINE3(io_submit, aio_context_t, ctx_id, long, nr,
- 			break;
- 		}
- 
--		ret = io_submit_one(ctx, user_iocb, false);
-+		ret = io_submit_one(ctx, user_iocb, statep, false);
- 		if (ret)
- 			break;
- 	}
--	if (nr > AIO_PLUG_THRESHOLD)
--		blk_finish_plug(&plug);
-+	if (statep)
-+		aio_submit_state_end(statep);
- 
- 	percpu_ref_put(&ctx->users);
- 	return i ? i : ret;
-@@ -2369,10 +2457,10 @@ SYSCALL_DEFINE3(io_submit, aio_context_t, ctx_id, long, nr,
- COMPAT_SYSCALL_DEFINE3(io_submit, compat_aio_context_t, ctx_id,
- 		       int, nr, compat_uptr_t __user *, iocbpp)
- {
-+	struct aio_submit_state state, *statep = NULL;
- 	struct kioctx *ctx;
- 	long ret = 0;
- 	int i = 0;
--	struct blk_plug plug;
- 
- 	if (unlikely(nr < 0))
- 		return -EINVAL;
-@@ -2386,8 +2474,10 @@ COMPAT_SYSCALL_DEFINE3(io_submit, compat_aio_context_t, ctx_id,
- 	if (nr > ctx->nr_events)
- 		nr = ctx->nr_events;
- 
--	if (nr > AIO_PLUG_THRESHOLD)
--		blk_start_plug(&plug);
-+	if (nr > AIO_PLUG_THRESHOLD) {
-+		aio_submit_state_start(&state, ctx);
-+		statep = &state;
-+	}
- 	for (i = 0; i < nr; i++) {
- 		compat_uptr_t user_iocb;
- 
-@@ -2396,12 +2486,12 @@ COMPAT_SYSCALL_DEFINE3(io_submit, compat_aio_context_t, ctx_id,
- 			break;
- 		}
- 
--		ret = io_submit_one(ctx, compat_ptr(user_iocb), true);
-+		ret = io_submit_one(ctx, compat_ptr(user_iocb), statep, true);
- 		if (ret)
- 			break;
- 	}
--	if (nr > AIO_PLUG_THRESHOLD)
--		blk_finish_plug(&plug);
-+	if (statep)
-+		aio_submit_state_end(statep);
- 
- 	percpu_ref_put(&ctx->users);
- 	return i ? i : ret;
 -- 
 2.17.1
 
