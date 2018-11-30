@@ -6,182 +6,184 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D59B6C64EB4
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 20:29:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F548C64EB4
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 20:29:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9CED42145D
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 20:29:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CED42145D
+	by mail.kernel.org (Postfix) with ESMTP id 3AF152146D
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 20:29:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AF152146D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726564AbeLAHj5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 1 Dec 2018 02:39:57 -0500
+        id S1726057AbeLAHkC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 1 Dec 2018 02:40:02 -0500
 Received: from mga12.intel.com ([192.55.52.136]:53034 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725941AbeLAHj5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 1 Dec 2018 02:39:57 -0500
+        id S1725941AbeLAHkC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 1 Dec 2018 02:40:02 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Nov 2018 12:29:29 -0800
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 Nov 2018 12:29:34 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.56,299,1539673200"; 
-   d="scan'208";a="121024749"
+   d="scan'208";a="121024769"
 Received: from unknown (HELO localhost.lm.intel.com) ([10.232.112.69])
-  by fmsmga001.fm.intel.com with ESMTP; 30 Nov 2018 12:29:29 -0800
+  by fmsmga001.fm.intel.com with ESMTP; 30 Nov 2018 12:29:33 -0800
 From:   Keith Busch <keith.busch@intel.com>
 To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Sagi Grimberg <sagi@grimberg.me>,
         linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
 Cc:     Keith Busch <keith.busch@intel.com>
-Subject: [PATCH 1/2] blk-mq: Export iterating all tagged requests
-Date:   Fri, 30 Nov 2018 13:26:34 -0700
-Message-Id: <20181130202635.11145-1-keith.busch@intel.com>
+Subject: [PATCH 2/2] nvme: Remove queue flushing hack
+Date:   Fri, 30 Nov 2018 13:26:35 -0700
+Message-Id: <20181130202635.11145-2-keith.busch@intel.com>
 X-Mailer: git-send-email 2.13.6
+In-Reply-To: <20181130202635.11145-1-keith.busch@intel.com>
+References: <20181130202635.11145-1-keith.busch@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A driver may wish to iterate every tagged request, not just ones that
-satisfy blk_mq_request_started(). The intended use is so a driver may
-terminate entered requests on quiesced queues.
+The nvme driver checked the queue state on every IO so the path could
+drain requests. The code however declares "We shold not need to do this",
+so let's not do it. Instead, use blk-mq's tag iterator to terminate
+entered requests on dying queues so the IO path doesn't have to deal
+with these conditions.
 
 Signed-off-by: Keith Busch <keith.busch@intel.com>
 ---
- block/blk-mq-tag.c     | 41 +++++++++++++++++++++++++++++++++++------
- block/blk-mq-tag.h     |  2 --
- include/linux/blk-mq.h |  4 ++++
- 3 files changed, 39 insertions(+), 8 deletions(-)
+ drivers/nvme/host/core.c | 10 ++++++++--
+ drivers/nvme/host/pci.c  | 43 +++++++++++++++++++++++++++----------------
+ 2 files changed, 35 insertions(+), 18 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 87bc5df72d48..c5fd2e0a4074 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -272,6 +272,7 @@ struct bt_tags_iter_data {
- 	busy_tag_iter_fn *fn;
- 	void *data;
- 	bool reserved;
-+	bool all;
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 91474b3c566c..af84c4d3c20e 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -103,6 +103,13 @@ static void nvme_put_subsystem(struct nvme_subsystem *subsys);
+ static void nvme_remove_invalid_namespaces(struct nvme_ctrl *ctrl,
+ 					   unsigned nsid);
+ 
++static bool nvme_fail_request(struct blk_mq_hw_ctx *hctx, struct request *req,
++			      void *data, bool reserved)
++{
++	blk_mq_end_request(req, BLK_STS_IOERR);
++	return true;
++}
++
+ static void nvme_set_queue_dying(struct nvme_ns *ns)
+ {
+ 	/*
+@@ -113,8 +120,7 @@ static void nvme_set_queue_dying(struct nvme_ns *ns)
+ 		return;
+ 	revalidate_disk(ns->disk);
+ 	blk_set_queue_dying(ns->queue);
+-	/* Forcibly unquiesce queues to avoid blocking dispatch */
+-	blk_mq_unquiesce_queue(ns->queue);
++	blk_mq_queue_tag_busy_iter(ns->queue, nvme_fail_request, NULL);
+ }
+ 
+ static void nvme_queue_scan(struct nvme_ctrl *ctrl)
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 3ecc0bf75a62..ec830aa52842 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -926,13 +926,6 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	struct nvme_command cmnd;
+ 	blk_status_t ret;
+ 
+-	/*
+-	 * We should not need to do this, but we're still using this to
+-	 * ensure we can drain requests on a dying queue.
+-	 */
+-	if (unlikely(!test_bit(NVMEQ_ENABLED, &nvmeq->flags)))
+-		return BLK_STS_IOERR;
+-
+ 	ret = nvme_setup_cmd(ns, req, &cmnd);
+ 	if (ret)
+ 		return ret;
+@@ -1408,10 +1401,6 @@ static int nvme_suspend_queue(struct nvme_queue *nvmeq)
+ {
+ 	if (!test_and_clear_bit(NVMEQ_ENABLED, &nvmeq->flags))
+ 		return 1;
+-
+-	/* ensure that nvme_queue_rq() sees NVMEQ_ENABLED cleared */
+-	mb();
+-
+ 	nvmeq->dev->online_queues--;
+ 	if (!nvmeq->qid && nvmeq->dev->ctrl.admin_q)
+ 		blk_mq_quiesce_queue(nvmeq->dev->ctrl.admin_q);
+@@ -1611,15 +1600,30 @@ static const struct blk_mq_ops nvme_mq_ops = {
+ 	.poll		= nvme_poll,
  };
  
- static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
-@@ -289,7 +290,7 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
- 	 * test and set the bit before assining ->rqs[].
- 	 */
- 	rq = tags->rqs[bitnr];
--	if (rq && blk_mq_request_started(rq))
-+	if (rq && (iter_data->all || blk_mq_request_started(rq)))
- 		return iter_data->fn(rq, iter_data->data, reserved);
- 
- 	return true;
-@@ -309,13 +310,15 @@ static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
-  *		bitmap_tags member of struct blk_mq_tags.
-  */
- static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
--			     busy_tag_iter_fn *fn, void *data, bool reserved)
-+			     busy_tag_iter_fn *fn, void *data, bool reserved,
-+			     bool all)
- {
- 	struct bt_tags_iter_data iter_data = {
- 		.tags = tags,
- 		.fn = fn,
- 		.data = data,
- 		.reserved = reserved,
-+		.all = all,
- 	};
- 
- 	if (tags->rqs)
-@@ -333,11 +336,12 @@ static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
-  * @priv:	Will be passed as second argument to @fn.
-  */
- static void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
--		busy_tag_iter_fn *fn, void *priv)
-+		busy_tag_iter_fn *fn, void *priv, bool all)
- {
- 	if (tags->nr_reserved_tags)
--		bt_tags_for_each(tags, &tags->breserved_tags, fn, priv, true);
--	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, false);
-+		bt_tags_for_each(tags, &tags->breserved_tags, fn, priv, true,
-+				 all);
-+	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, false, all);
- }
- 
- /**
-@@ -357,11 +361,35 @@ void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- 
- 	for (i = 0; i < tagset->nr_hw_queues; i++) {
- 		if (tagset->tags && tagset->tags[i])
--			blk_mq_all_tag_busy_iter(tagset->tags[i], fn, priv);
-+			blk_mq_all_tag_busy_iter(tagset->tags[i], fn, priv,
-+						 false);
- 	}
- }
- EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
- 
-+/**
-+ * blk_mq_tagset_all_iter - iterate over all requests in a tag set
-+ * @tagset:	Tag set to iterate over.
-+ * @fn:		Pointer to the function that will be called for each started
-+ *		request. @fn will be called as follows: @fn(rq, @priv,
-+ *		reserved) where rq is a pointer to a request. 'reserved'
-+ *		indicates whether or not @rq is a reserved request. Return
-+ *		true to continue iterating tags, false to stop.
-+ * @priv:	Will be passed as second argument to @fn.
-+ */
-+void blk_mq_tagset_all_iter(struct blk_mq_tag_set *tagset,
-+		busy_tag_iter_fn *fn, void *priv)
++static bool nvme_fail_queue_request(struct request *req, void *data, bool reserved)
 +{
-+	int i;
++	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
++	struct nvme_queue *nvmeq = iod->nvmeq;
 +
-+	for (i = 0; i < tagset->nr_hw_queues; i++) {
-+		if (tagset->tags && tagset->tags[i])
-+			blk_mq_all_tag_busy_iter(tagset->tags[i], fn, priv,
-+						 true);
-+	}
++	if (test_bit(NVMEQ_ENABLED, &nvmeq->flags))
++		return true;
++	blk_mq_end_request(req, BLK_STS_IOERR);
++	return true;
 +}
-+EXPORT_SYMBOL(blk_mq_tagset_all_iter);
 +
- /**
-  * blk_mq_queue_tag_busy_iter - iterate over all requests with a driver tag
-  * @q:		Request queue to examine.
-@@ -408,6 +436,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+ static void nvme_dev_remove_admin(struct nvme_dev *dev)
+ {
+ 	if (dev->ctrl.admin_q && !blk_queue_dying(dev->ctrl.admin_q)) {
+ 		/*
+ 		 * If the controller was reset during removal, it's possible
+-		 * user requests may be waiting on a stopped queue. Start the
+-		 * queue to flush these to completion.
++		 * user requests may be waiting on a stopped queue. End all
++		 * entered requests after preventing new requests from
++		 * entering.
+ 		 */
+-		blk_mq_unquiesce_queue(dev->ctrl.admin_q);
++		blk_set_queue_dying(dev->ctrl.admin_q);
++		blk_mq_tagset_all_iter(&dev->admin_tagset,
++				       nvme_fail_queue_request,
++				       NULL);
+ 		blk_cleanup_queue(dev->ctrl.admin_q);
+ 		blk_mq_free_tag_set(&dev->admin_tagset);
  	}
- 	blk_queue_exit(q);
+@@ -2411,6 +2415,11 @@ static void nvme_pci_disable(struct nvme_dev *dev)
+ 	}
  }
-+EXPORT_SYMBOL(blk_mq_queue_tag_busy_iter);
  
- static int bt_alloc(struct sbitmap_queue *bt, unsigned int depth,
- 		    bool round_robin, int node)
-diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
-index 61deab0b5a5a..5af7ff94b400 100644
---- a/block/blk-mq-tag.h
-+++ b/block/blk-mq-tag.h
-@@ -33,8 +33,6 @@ extern int blk_mq_tag_update_depth(struct blk_mq_hw_ctx *hctx,
- 					struct blk_mq_tags **tags,
- 					unsigned int depth, bool can_grow);
- extern void blk_mq_tag_wakeup_all(struct blk_mq_tags *tags, bool);
--void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
--		void *priv);
++static void nvme_fail_requests(struct nvme_dev *dev)
++{
++	blk_mq_tagset_all_iter(&dev->tagset, nvme_fail_queue_request, NULL);
++}
++
+ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
+ {
+ 	int i;
+@@ -2454,11 +2463,11 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
  
- static inline struct sbq_wait_state *bt_wait_ptr(struct sbitmap_queue *bt,
- 						 struct blk_mq_hw_ctx *hctx)
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 57eda7b20243..246aa128fd1f 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -322,6 +322,10 @@ bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_run_hw_queues(struct request_queue *q, bool async);
- void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
- 		busy_tag_iter_fn *fn, void *priv);
-+void blk_mq_tagset_all_iter(struct blk_mq_tag_set *tagset,
-+		busy_tag_iter_fn *fn, void *priv);
-+void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
-+		void *priv);
- void blk_mq_freeze_queue(struct request_queue *q);
- void blk_mq_unfreeze_queue(struct request_queue *q);
- void blk_freeze_queue_start(struct request_queue *q);
+ 	/*
+ 	 * The driver will not be starting up queues again if shutting down so
+-	 * must flush all entered requests to their failed completion to avoid
++	 * must end all entered requests to their failed completion to avoid
+ 	 * deadlocking blk-mq hot-cpu notifier.
+ 	 */
+ 	if (shutdown)
+-		nvme_start_queues(&dev->ctrl);
++		nvme_fail_requests(dev);
+ 	mutex_unlock(&dev->shutdown_lock);
+ }
+ 
+@@ -2601,6 +2610,8 @@ static void nvme_reset_work(struct work_struct *work)
+ 		nvme_remove_namespaces(&dev->ctrl);
+ 		new_state = NVME_CTRL_ADMIN_ONLY;
+ 	} else {
++		/* Fail requests that entered an hctx that no longer exists */
++		nvme_fail_requests(dev);
+ 		nvme_start_queues(&dev->ctrl);
+ 		nvme_wait_freeze(&dev->ctrl);
+ 		/* hit this only when allocate tagset fails */
 -- 
 2.14.4
 
