@@ -2,96 +2,106 @@ Return-Path: <SRS0=+5f8=OJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BFA7C04EB8
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 17:20:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24ACDC04EB8
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 17:24:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C86EC206B7
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 17:20:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="wuCE3JJc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C86EC206B7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	by mail.kernel.org (Postfix) with ESMTP id E13562146D
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 17:24:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E13562146D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726736AbeLAEaP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Nov 2018 23:30:15 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:50290 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726712AbeLAEaP (ORCPT
+        id S1726650AbeLAEeX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Nov 2018 23:34:23 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:33689 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726292AbeLAEeX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 23:30:15 -0500
-Received: by mail-it1-f195.google.com with SMTP id z7so10237817iti.0
-        for <linux-block@vger.kernel.org>; Fri, 30 Nov 2018 09:20:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=QO2CiVXn54qdK6JpT9Xi21d4JFxOhnoogfe0Bp8gs1s=;
-        b=wuCE3JJcSCXBj8xfLmRmMOdzesKWPYHpoHmzDRdyIeLS0HQCQBGMdbOTYs/RaNoE5o
-         02TKfGv1qbT7Ggb06wlkY6GVCJoKFyJ7sG1P3fJmO2vawTL1u/18X0FYUqEu9vgv/T4C
-         DQc/GnJaLmmN8HIn7PbpUGtQH23V4R9g+5ZTVcavxC+K7wgYylQesU2HT/RTJkB1FaGG
-         LUoWKMxkgaBPZLpmAnoLMKYyzVq9lrwk31IzjcyHhUkGuU8NifiWeHP7w6a8eejnZC17
-         MfYRL2FDozSSKq5Y49Q1BG90ODHKo6gSUXkmsuEamMEhZExzeWQaSEtbC6sRy5UPDF+J
-         iCiA==
+        Fri, 30 Nov 2018 23:34:23 -0500
+Received: by mail-pf1-f194.google.com with SMTP id c123so3141363pfb.0;
+        Fri, 30 Nov 2018 09:24:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=QO2CiVXn54qdK6JpT9Xi21d4JFxOhnoogfe0Bp8gs1s=;
-        b=FizjvLzaXHdI4asnfFV0swEV7sZjJ2aY4q1SCsvVXOJNfOuLo5Hkr9ONgpqrrDZhrV
-         YuW8l5x3VBf66zakmwe3PyEJdwyVxDqCheBQeaQkleCdBZcdNIDbfUPrSSQfIBjvTVRi
-         Vb6/Cwy39NG+k6O2b3aYfFaT9LqXTa+W2hAs8jxuBUzqfFdxaBfU2b6m6e+ZnmEfWrx6
-         DxB4IXAooY5loF5hkpTRjUBrZ/7P6QVXU3P0vlKsrs6Yv0qDZWS6/xm08V7f90sgHoLZ
-         dpdzvi3Ajc9/KZ8c6hn79Jzb+6Fm6pzAPQ6PP2tUTzv7+DiokoXb0R6c2jsqx1YgN/db
-         V5BA==
-X-Gm-Message-State: AA+aEWZTQ9oQRHpH6mJLRsEMkbVG2Pu9cUU8CTpBWOdDPhOLDImGROT8
-        WRfdCLoc1KajrxazDv4Gy8MSig==
-X-Google-Smtp-Source: AFSGD/Xh+MQqtMn+xjCexaKJEeju01hhwqeTomJu+MjxO6sCWUYq8+6at4SOap5sLxUky13s1BzCLQ==
-X-Received: by 2002:a24:c456:: with SMTP id v83mr5547007itf.44.1543598416107;
-        Fri, 30 Nov 2018 09:20:16 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id r139sm2390555ior.53.2018.11.30.09.20.14
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 30 Nov 2018 09:20:15 -0800 (PST)
-Subject: Re: [PATCH] block: fix single range discard merge
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Guangwu Zhang <guazhang@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jianchao Wang <jianchao.w.wang@oracle.com>
-References: <20181130163818.6540-1-ming.lei@redhat.com>
- <1543598309.4347.5.camel@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <9ebec24a-103c-2ea8-49e1-2f927eb8a4f8@kernel.dk>
-Date:   Fri, 30 Nov 2018 10:20:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <1543598309.4347.5.camel@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Language: en-US
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=mhknZVvHAWi4NnKosLSr9TAIriD3mac9Wb+I53iUqtM=;
+        b=f8U6Zuc8XSPjHQ5atwm+z2ZL20fW9wpzw/Wgaea4xh28E9eaZw1IG2zgY37VhWTNmW
+         USH5SN6rGSioqVNM35CNiQEKab1nHeU1ksEGe6mzfa5zHk5/bDa3bcNNIvfaK5QKykWT
+         am8lcBbzPFGxq3YvIYCblDq/pb1IBTrjZ3eF2qUjuuL9yXEYkB2cDm+IM13gsHfgqYO4
+         dQiZwKo/qM9OYEXuTd8JnncaPkzYj6CsVx+k2KNycHgzLwNBz/lFwMOSmSBLae5Y2vT4
+         gflJl8qjDajqg+EClzYimiTQlNiLL20JhvJZrfbm8Df2ISBaBqWX4KQe1N6elS3eXcRL
+         TgGQ==
+X-Gm-Message-State: AA+aEWa5J4P1WJblFlzajjhxAzzZYY8YmQECIJ5BokBo9iQ+eUDVdPtW
+        De29irApmSkc7Wj+fSkKCgw=
+X-Google-Smtp-Source: AFSGD/X+Ff2Mbd/wVGSSlgO2wboT0bAJrgeEhkEW3ABPeM+yaGMYHdM6Z6e+gd1zl+4kkyG6G9upxA==
+X-Received: by 2002:a63:134f:: with SMTP id 15mr5494196pgt.19.1543598662961;
+        Fri, 30 Nov 2018 09:24:22 -0800 (PST)
+Received: from ?IPv6:2620:15c:2c0:5:2d74:bb8d:dd9b:a53e? ([2620:15c:2c0:5:2d74:bb8d:dd9b:a53e])
+        by smtp.gmail.com with ESMTPSA id 128sm10819518pfu.129.2018.11.30.09.24.22
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 30 Nov 2018 09:24:22 -0800 (PST)
+Message-ID: <1543598661.4347.8.camel@acm.org>
+Subject: Re: [PATCH 01/27] aio: fix failure to put the file pointer
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-aio@kvack.org
+Cc:     hch@lst.de
+Date:   Fri, 30 Nov 2018 09:24:21 -0800
+In-Reply-To: <52910028-205c-adc5-acc0-3f03e35ece66@kernel.dk>
+References: <20181130165646.27341-1-axboe@kernel.dk>
+         <20181130165646.27341-2-axboe@kernel.dk> <1543597666.4347.1.camel@acm.org>
+         <52910028-205c-adc5-acc0-3f03e35ece66@kernel.dk>
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/30/18 10:18 AM, Bart Van Assche wrote:
-> On Sat, 2018-12-01 at 00:38 +0800, Ming Lei wrote:
->> Fixes: 445251d0f4d329a ("blk-mq: fix discard merge with scheduler attached")
-> 
-> Since this patch fixes a bug introduced in kernel v4.16, does it need
-> a "Cc: stable" tag?
+On Fri, 2018-11-30 at 10:08 -0700, Jens Axboe wrote:
++AD4 On 11/30/18 10:07 AM, Bart Van Assche wrote:
++AD4 +AD4 On Fri, 2018-11-30 at 09:56 -0700, Jens Axboe wrote:
++AD4 +AD4 +AD4 If the ioprio capability check fails, we return without putting
++AD4 +AD4 +AD4 the file pointer.
++AD4 +AD4 +AD4 
++AD4 +AD4 +AD4 Fixes: d9a08a9e616b (+ACI-fs: Add aio iopriority support+ACI)
++AD4 +AD4 +AD4 Reviewed-by: Johannes Thumshirn +ADw-jthumshirn+AEA-suse.de+AD4
++AD4 +AD4 +AD4 Reviewed-by: Christoph Hellwig +ADw-hch+AEA-lst.de+AD4
++AD4 +AD4 +AD4 Signed-off-by: Jens Axboe +ADw-axboe+AEA-kernel.dk+AD4
++AD4 +AD4 +AD4 ---
++AD4 +AD4 +AD4  fs/aio.c +AHw 1 +-
++AD4 +AD4 +AD4  1 file changed, 1 insertion(+-)
++AD4 +AD4 +AD4 
++AD4 +AD4 +AD4 diff --git a/fs/aio.c b/fs/aio.c
++AD4 +AD4 +AD4 index b984918be4b7..205390c0c1bb 100644
++AD4 +AD4 +AD4 --- a/fs/aio.c
++AD4 +AD4 +AD4 +-+-+- b/fs/aio.c
++AD4 +AD4 +AD4 +AEAAQA -1436,6 +-1436,7 +AEAAQA static int aio+AF8-prep+AF8-rw(struct kiocb +ACo-req, struct iocb +ACo-iocb)
++AD4 +AD4 +AD4  		ret +AD0 ioprio+AF8-check+AF8-cap(iocb-+AD4-aio+AF8-reqprio)+ADs
++AD4 +AD4 +AD4  		if (ret) +AHs
++AD4 +AD4 +AD4  			pr+AF8-debug(+ACI-aio ioprio check cap error: +ACU-d+AFw-n+ACI, ret)+ADs
++AD4 +AD4 +AD4 +-			fput(req-+AD4-ki+AF8-filp)+ADs
++AD4 +AD4 +AD4  			return ret+ADs
++AD4 +AD4 +AD4  		+AH0
++AD4 +AD4 
++AD4 +AD4 Since this patch fixes a bug that was introduced in kernel v4.18, does this
++AD4 +AD4 patch need a +ACI-Cc: stable+ACI tag?
++AD4 
++AD4 The fixes should take care of that by itself, I hope.
 
-Like the other one, isn't stable implied with Fixes in there? You'd want
-a stable backport for any kernel that has that patchset. I think that's
-a stronger hint than stable cc.
+Hi Jens,
 
--- 
-Jens Axboe
+My understanding is that patches that have a +ACI-Cc: stable+ACI tag are guaranteed to
+be integrated in a stable kernel sooner or later. Without that tag it depends on
+the stable kernel maintainer whether or not these patches get picked up. I think
+the +ACI-AUTOSEL+ACI tag Sasha Levin uses indicates that a patch was picked up for one
+of his stable kernels and that it did not have a +ACI-Cc: stable+ACI tag. I'm not sure
+Greg KH picks up patches that only have a +ACI-Fixes:+ACI tag but no +ACI-Cc: stable+ACI tag.
 
+Bart.
