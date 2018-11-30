@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF9D9C64EB4
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:56:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD22BC64EB4
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7E5D20867
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:56:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73E5F2145D
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="nX/PmpLd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7E5D20867
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="PnnqyejQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73E5F2145D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726881AbeLAEGw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Nov 2018 23:06:52 -0500
-Received: from mail-it1-f194.google.com ([209.85.166.194]:36844 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726830AbeLAEGw (ORCPT
+        id S1726830AbeLAEGy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Nov 2018 23:06:54 -0500
+Received: from mail-it1-f195.google.com ([209.85.166.195]:39266 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727013AbeLAEGy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 23:06:52 -0500
-Received: by mail-it1-f194.google.com with SMTP id c9so10242664itj.1
-        for <linux-block@vger.kernel.org>; Fri, 30 Nov 2018 08:56:57 -0800 (PST)
+        Fri, 30 Nov 2018 23:06:54 -0500
+Received: by mail-it1-f195.google.com with SMTP id a6so10217209itl.4
+        for <linux-block@vger.kernel.org>; Fri, 30 Nov 2018 08:56:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=eJ3aWzBT4gm4FwYHYUV1JBWUWsiFyJVaotzVIFD6bng=;
-        b=nX/PmpLduSA9mqR4VBb8drcGkVO1AAo0v/hZLs4NUHO/7xChEotTLFjbVTUCVzTmIK
-         twcSpUMQ3hmX/PJI3Xq4m4wnFazExi/erEvpBFviQ59XUFCa9xC8oV3TWJBPPUUPn578
-         pqOuNF7nkRF/hz6eLoQiAYwOeLcvVjqfDEhzlf55LuwxRIW/FMspJPIAAjmNdYByYVEx
-         mfNokArAJaK6hAMgYKmwjXoj2nMayHi9f3zSUXOfJ6OnLjq7dOchyevxx5ZK5SXuihm+
-         OMuZBL70rOIPxP04JPyd/7BLCssgmitbA4qq8LlbH2Pimv/azJ4TjiwQ1Ov0lB67nDYI
-         kZeA==
+        bh=0Qn86S9IysAhUjs5lPwgSM110FSlNFVglHplsagyxFA=;
+        b=PnnqyejQfl3Y1Sx27UmSfYpY6XtRSsUkDvCBqF32TA7W8fVFAuIoTBWfJd6XPDavIR
+         D7CEkQR8B35dmNB9vmJtSno1X0r/F9MkeHCazLVp9DGTES8W7VyqCSe5fGV+XcFGZqrH
+         HZ4ieXxta9CZL/MgpkenNLTjzqJdAlxS2ologaO9S+/8shR+Gw6giCFN471CuoxhOIC/
+         2Pkuf0a8cmF5Yy0sbrBvugVOKvBY0/anggkKLjU0C/Uehq+q15KWZMdc4QNpqDOwA82W
+         PxLQhQ+hioHgoWbm3Si8URsnLMQnDyhVuME7SvIqv8a8oZD6LuPsjaQdOEKVhT6m4iMb
+         1tAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=eJ3aWzBT4gm4FwYHYUV1JBWUWsiFyJVaotzVIFD6bng=;
-        b=qWp7EqX+nVNPBgzZCU2pVSd01z9Zs9IfVdH4iCPjmibb9wWmLFM0kGorqfUEGrXXtO
-         /1DvzrydrE6ck3Pdg0xSJ4J1CgVtpYrHIbvGScJy810wmR5rqEdTg8oa0lwWkKlXqzP8
-         YakBgx2KwGR3+oJyZG1SQIHpl6EKAhSrDQhCEVIrRfxddF9dXcnC2ZVsGolv8b+icX03
-         rpVDADBdELO+SFM0KVx4pW8SNWR9IDSMaM7+foW2HMVXY+udyeubjhRx0qyJulMx8QWT
-         1aEeyZYgMXXxIzry6KxCkzwV1lxgH1qE6T+uKO0QDC6DVIhZP0lrehTB2sgzVpHNfgJi
-         Rb8A==
-X-Gm-Message-State: AA+aEWZ7oNk0PFuUOCD4+YKV2KdaOvfLe4yYGkTfaklcatBdDz9MPqB0
-        GHwGoe8f50iVtQou/2YZ6YydZxc2zY0=
-X-Google-Smtp-Source: AFSGD/UsLoqORr4GKEZsDyGUoXn5f2YvD82zm7qVTDqunQCW+JkUlxngTEpw9ivPa2HUUdQ7LhwZ/A==
-X-Received: by 2002:a02:1e88:: with SMTP id 8mr5670956jat.108.1543597016459;
-        Fri, 30 Nov 2018 08:56:56 -0800 (PST)
+        bh=0Qn86S9IysAhUjs5lPwgSM110FSlNFVglHplsagyxFA=;
+        b=PWm7vN43CeuNJRPzX64vzS6eouP52YuV1pYrjA/8X/balBVEv9L0Y3Bo/w/i+DnfL+
+         beG3sA6RY0WZ/zLYaaDxP8d9ygkKAEEZ/RSEoCeA+vtB4nQ8VyZQbX9I8iS1HuROyDfw
+         CVIlnyrieB+/YRaleyGG2SNTiZOexMCkZdqVkKAbAPELJu4VfihQXspjNPqsOsY9rWpc
+         gUKJo2K7rJe9BaG12Qj0r/cJXUXb+ZJhI4lOum8PYIPk9ou3abua5no1HnuNO2/hz3Tj
+         ROrko1X1e3jQ0MMWrPsIQyNuxHhaAQ5QIEZeQLwK9DACyao4aTnRs4vG947DkEXKXdE0
+         u2fA==
+X-Gm-Message-State: AA+aEWYEQ73SqstcPSE418sKkM3AHLk7T/p4SPy1R+hN2hlH/B2KU/2W
+        kdx/MEX4fv0nfLc/8ZWBydDFDJ606M4=
+X-Google-Smtp-Source: AFSGD/VUg1tqk5zm1omAZOdspM+84VPskzax56AznGHgAnyPgdIrhavsyYAjV6LJaxwuP1fTkpaueg==
+X-Received: by 2002:a02:9281:: with SMTP id b1mr5893855jah.86.1543597018129;
+        Fri, 30 Nov 2018 08:56:58 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id j133sm2979447itj.16.2018.11.30.08.56.55
+        by smtp.gmail.com with ESMTPSA id j133sm2979447itj.16.2018.11.30.08.56.56
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 30 Nov 2018 08:56:55 -0800 (PST)
+        Fri, 30 Nov 2018 08:56:57 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-aio@kvack.org
 Cc:     hch@lst.de, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 04/27] block: wire up block device iopoll method
-Date:   Fri, 30 Nov 2018 09:56:23 -0700
-Message-Id: <20181130165646.27341-5-axboe@kernel.dk>
+Subject: [PATCH 05/27] block: ensure that async polled IO is marked REQ_NOWAIT
+Date:   Fri, 30 Nov 2018 09:56:24 -0700
+Message-Id: <20181130165646.27341-6-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181130165646.27341-1-axboe@kernel.dk>
 References: <20181130165646.27341-1-axboe@kernel.dk>
@@ -72,53 +72,38 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+We can't wait for polled events to complete, as they may require active
+polling from whoever submitted it. If that is the same task that is
+submitting new IO, we could deadlock waiting for IO to complete that
+this task is supposed to be completing itself.
 
-Just call blk_poll on the iocb cookie, we can derive the block device
-from the inode trivially.
-
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/block_dev.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ fs/block_dev.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/fs/block_dev.c b/fs/block_dev.c
-index e1886cc7048f..6de8d35f6e41 100644
+index 6de8d35f6e41..ebc3d5a0f424 100644
 --- a/fs/block_dev.c
 +++ b/fs/block_dev.c
-@@ -281,6 +281,14 @@ struct blkdev_dio {
+@@ -402,8 +402,16 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
  
- static struct bio_set blkdev_dio_pool;
- 
-+static int blkdev_iopoll(struct kiocb *kiocb, bool wait)
-+{
-+	struct block_device *bdev = I_BDEV(kiocb->ki_filp->f_mapping->host);
-+	struct request_queue *q = bdev_get_queue(bdev);
-+
-+	return blk_poll(q, READ_ONCE(kiocb->ki_cookie), wait);
-+}
-+
- static void blkdev_bio_end_io(struct bio *bio)
- {
- 	struct blkdev_dio *dio = bio->bi_private;
-@@ -398,6 +406,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 		nr_pages = iov_iter_npages(iter, BIO_MAX_PAGES);
+ 		if (!nr_pages) {
+-			if (iocb->ki_flags & IOCB_HIPRI)
++			if (iocb->ki_flags & IOCB_HIPRI) {
  				bio->bi_opf |= REQ_HIPRI;
++				/*
++				 * For async polled IO, we can't wait for
++				 * requests to complete, as they may also be
++				 * polled and require active reaping.
++				 */
++				if (!is_sync)
++					bio->bi_opf |= REQ_NOWAIT;
++			}
  
  			qc = submit_bio(bio);
-+			WRITE_ONCE(iocb->ki_cookie, qc);
- 			break;
- 		}
- 
-@@ -2070,6 +2079,7 @@ const struct file_operations def_blk_fops = {
- 	.llseek		= block_llseek,
- 	.read_iter	= blkdev_read_iter,
- 	.write_iter	= blkdev_write_iter,
-+	.iopoll		= blkdev_iopoll,
- 	.mmap		= generic_file_mmap,
- 	.fsync		= blkdev_fsync,
- 	.unlocked_ioctl	= block_ioctl,
+ 			WRITE_ONCE(iocb->ki_cookie, qc);
 -- 
 2.17.1
 
