@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED8D0C64EB4
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ACC5C04EB8
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A881B2145D
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8D412145D
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 16:57:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="d0tJD0Wy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A881B2145D
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="w4eaNS/C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8D412145D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727588AbeLAEHM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Nov 2018 23:07:12 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:56310 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727565AbeLAEHL (ORCPT
+        id S1727612AbeLAEHO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Nov 2018 23:07:14 -0500
+Received: from mail-it1-f196.google.com ([209.85.166.196]:40646 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727592AbeLAEHO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 23:07:11 -0500
-Received: by mail-it1-f193.google.com with SMTP id o19so10088973itg.5
-        for <linux-block@vger.kernel.org>; Fri, 30 Nov 2018 08:57:16 -0800 (PST)
+        Fri, 30 Nov 2018 23:07:14 -0500
+Received: by mail-it1-f196.google.com with SMTP id h193so10216773ita.5
+        for <linux-block@vger.kernel.org>; Fri, 30 Nov 2018 08:57:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=oKKQgmcCq/9Ah7syrea645E2X6XDYJJKTHIbZiVUtQA=;
-        b=d0tJD0Wy9ZqANIAHGeCLauIvT1VK7FS8IK8QoCAOQXsuEJ7/RYSep1DMCbjukV2xit
-         8IN81K9MwjMNC0trD1xv50CEJzyhORoc0CDg4G0MV1WgDMJvxbL3H03rNtcpEq65NqVA
-         lKELC/VGnU7DasbLyGho8vxDQ48aXQbL/LkZ8nmQQBrIfA7dp+PgD5/bXph7HVLP12E3
-         exI4DhxNeeIZQigdrz7YQGEpI22R2M3jwOT9UfUv833rWUfDudVVDr45BIK94UzDpKtd
-         cp7dFFYc+ty1caW3bf01/jmmL7fjKcRK1Ji5WFehV0obKLWPk5KIQjq/3X/5l0XENa3m
-         6TOQ==
+        bh=sQLMf2lCjXlFfggxx2kifv1G3GLA0iPim2lyNjDBjHI=;
+        b=w4eaNS/CIgCC+HE0z4k10W1lLwAry1H1WqPFbXS0WS6aNggXrLqmK4OjU+adAX/Brk
+         /YccX3wiifAdeaRmH388EXo16M8KIWl8Psv6IrGc0RHJd6dsw88CDls+RFIS9V/AgAIB
+         HVe3PYq/AzgRd3Y5Hp0D5uobcxIjeYnoqdxjAZeyhjueaUFzDfmHqJzh4MJlGoY9Ob0h
+         Ah2nbUK5KJK/t9W4WdI7uKEm3iQWZFKSHohfb7XplzuI3vixgMKQgm96XbAuwS6iMC+l
+         aE0bYY/ACYtW2mf4zKh23F6bxappW4NfVPh+Oq1VD2mShffrNGs1cxgzswXe+MHi0Fca
+         xYVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=oKKQgmcCq/9Ah7syrea645E2X6XDYJJKTHIbZiVUtQA=;
-        b=nvsKhz606QMcL7J1bGYBhKVzUB+2vfMbLEWjTbXiYu85x0KTIha1uMLGoAiGQYjIBL
-         912aMZNXxtQ8301Q9NZp1d55+ZLGzEJiSN+lgmxiRyGZCrIFsh+sG4o6G4aa9r3pwaWG
-         7uFxEBCAwsKXDZ6oY8lAIs052OE2quUk5s9XEL658DP4wsiOc1jydmnsUXmHPNGMbGOG
-         3hy4RFPp7W/AYfDrUqVm3hERQ6fjqy822zq61ba/zHYg0cYA+DgsWOiOQI/YGx7KPx85
-         cqVSukhBJIdJJh3MfQukhOoN+K3UG/HN5R1oFulaTnxiFQYMXUVv89t8j6xY3GNyiX/R
-         e2pQ==
-X-Gm-Message-State: AA+aEWa3SQayR2U7o6k6RZnT2QF8cU1d+qajrrQN9IlAXSb7cFQURS+y
-        2i4i2QGe0wstr7f4sAgTIonc8f2FMUw=
-X-Google-Smtp-Source: AFSGD/VKuFulIgf3VgS6jKp58AG2QjXP9zPiQs34oa5nM39AyaEQN/SUENA7iC1X/xIfVgA60BlOIA==
-X-Received: by 2002:a24:750f:: with SMTP id y15mr5507249itc.177.1543597035467;
-        Fri, 30 Nov 2018 08:57:15 -0800 (PST)
+        bh=sQLMf2lCjXlFfggxx2kifv1G3GLA0iPim2lyNjDBjHI=;
+        b=CNUiMDOblld9EUo74GpovDVWK4UBe9faRDvlJY8r4ShlyIjjJwK7dn/rgHubXAVohF
+         sVhz9SZNqwcM+zTn6A+xXsttsj2kbtUyOlDEAKAap/LfytgfjdUaGgZFIFSlSM0w8MwL
+         FB0lH2bk1xoDmKdF8M9zPCLPw9NkcAaVjSyjnzUMQgTg+lxNQ4bfvKjqetEiEGFFCQzI
+         w6ZQxWUYuFYmwcgLD2KmUZ9ZF0Mc8x9gQjQHhNNsKV8FGQBvy+QR7HlEvae6VIbCGs5Z
+         z7sNZ987JFm//BATO++/pi+GaWXYbCgm4swdWsN9cyEyvF9PBvCHI3QuR3dPCfDKYxKg
+         nr+g==
+X-Gm-Message-State: AA+aEWZ+odSE6gJW1YCF3KkGAgZH4o8D8AvJ3YFYFE+YttD3oJ1BUJq0
+        OYLWriF5BUHTSr0ZmVT9BsbcQBEVUts=
+X-Google-Smtp-Source: AFSGD/VvKwEwa+TBFAQzvIZ4gqvBNtjpve/2djpwLo+PxUqXG9REa4I6GPkFzxEnofm5cxHUoG4FCA==
+X-Received: by 2002:a02:9549:: with SMTP id y67mr5840339jah.4.1543597037056;
+        Fri, 30 Nov 2018 08:57:17 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id j133sm2979447itj.16.2018.11.30.08.57.13
+        by smtp.gmail.com with ESMTPSA id j133sm2979447itj.16.2018.11.30.08.57.15
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 30 Nov 2018 08:57:14 -0800 (PST)
+        Fri, 30 Nov 2018 08:57:16 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-aio@kvack.org
 Cc:     hch@lst.de, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 16/27] aio: add support for having user mapped iocbs
-Date:   Fri, 30 Nov 2018 09:56:35 -0700
-Message-Id: <20181130165646.27341-17-axboe@kernel.dk>
+Subject: [PATCH 17/27] aio: support for IO polling
+Date:   Fri, 30 Nov 2018 09:56:36 -0700
+Message-Id: <20181130165646.27341-18-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181130165646.27341-1-axboe@kernel.dk>
 References: <20181130165646.27341-1-axboe@kernel.dk>
@@ -72,234 +72,640 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For io_submit(), we have to first copy each pointer to an iocb, then
-copy the iocb. The latter is 64 bytes in size, and that's a lot of
-copying for a single IO.
+Add polled variants of PREAD/PREADV and PWRITE/PWRITEV. These act
+like their non-polled counterparts, except we expect to poll for
+completion of them. The polling happens at io_getevent() time, and
+works just like non-polled IO.
 
-Add support for setting IOCTX_FLAG_USERIOCB through the new io_setup2()
-system call, which allows the iocbs to reside in userspace. If this flag
-is used, then io_submit() doesn't take pointers to iocbs anymore, it
-takes an index value into the array of iocbs instead. Similary, for
-io_getevents(), the iocb ->obj will be the index, not the pointer to the
-iocb.
+To setup an io_context for polled IO, the application must call
+io_setup2() with IOCTX_FLAG_IOPOLL as one of the flags. It is illegal
+to mix and match polled and non-polled IO on an io_context.
 
-See the change made to fio to support this feature, it's pretty
-trivialy to adapt to. For applications, like fio, that previously
-embedded the iocb inside a application private structure, some sort
-of lookup table/structure is needed to find the private IO structure
-from the index at io_getevents() time.
-
-http://git.kernel.dk/cgit/fio/commit/?id=3c3168e91329c83880c91e5abc28b9d6b940fd95
+Polled IO doesn't support the user mapped completion ring. Events
+must be reaped through the io_getevents() system call. For non-irq
+driven poll devices, there's no way to support completion reaping
+from userspace by just looking at the ring. The application itself
+is the one that pulls completion entries.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/aio.c                     | 111 +++++++++++++++++++++++++++++++----
- include/uapi/linux/aio_abi.h |   2 +
- 2 files changed, 101 insertions(+), 12 deletions(-)
+ fs/aio.c                     | 381 +++++++++++++++++++++++++++++++----
+ include/uapi/linux/aio_abi.h |   3 +
+ 2 files changed, 348 insertions(+), 36 deletions(-)
 
 diff --git a/fs/aio.c b/fs/aio.c
-index 74831ce2185e..380e6fe8c429 100644
+index 380e6fe8c429..f7a49abc7694 100644
 --- a/fs/aio.c
 +++ b/fs/aio.c
-@@ -121,6 +121,9 @@ struct kioctx {
- 	struct page		**ring_pages;
- 	long			nr_pages;
+@@ -143,6 +143,18 @@ struct kioctx {
+ 		atomic_t	reqs_available;
+ 	} ____cacheline_aligned_in_smp;
  
-+	struct page		**iocb_pages;
-+	long			iocb_nr_pages;
++	/* iopoll submission state */
++	struct {
++		spinlock_t poll_lock;
++		struct list_head poll_submitted;
++	} ____cacheline_aligned_in_smp;
 +
- 	struct rcu_work		free_rwork;	/* see free_ioctx() */
++	/* iopoll completion state */
++	struct {
++		struct list_head poll_completing;
++		struct mutex getevents_lock;
++	} ____cacheline_aligned_in_smp;
++
+ 	struct {
+ 		spinlock_t	ctx_lock;
+ 		struct list_head active_reqs;	/* used for cancellation */
+@@ -195,14 +207,27 @@ struct aio_kiocb {
+ 	__u64			ki_user_data;	/* user's data for completion */
  
- 	/*
-@@ -216,6 +219,11 @@ static struct vfsmount *aio_mnt;
- static const struct file_operations aio_ring_fops;
- static const struct address_space_operations aio_ctx_aops;
+ 	struct list_head	ki_list;	/* the aio core uses this
+-						 * for cancellation */
++						 * for cancellation, or for
++						 * polled IO */
++
++	unsigned long		ki_flags;
++#define IOCB_POLL_COMPLETED	0
++#define IOCB_POLL_BUSY		1
++
+ 	refcount_t		ki_refcnt;
  
-+static const unsigned int iocb_page_shift =
-+				ilog2(PAGE_SIZE / sizeof(struct iocb));
+-	/*
+-	 * If the aio_resfd field of the userspace iocb is not zero,
+-	 * this is the underlying eventfd context to deliver events to.
+-	 */
+-	struct eventfd_ctx	*ki_eventfd;
++	union {
++		/*
++		 * If the aio_resfd field of the userspace iocb is not zero,
++		 * this is the underlying eventfd context to deliver events to.
++		 */
++		struct eventfd_ctx	*ki_eventfd;
 +
-+static void aio_useriocb_free(struct kioctx *);
-+
++		/*
++		 * For polled IO, stash completion info here
++		 */
++		struct io_event		ki_ev;
++	};
+ };
+ 
+ /*------ sysctl variables----*/
+@@ -223,6 +248,7 @@ static const unsigned int iocb_page_shift =
+ 				ilog2(PAGE_SIZE / sizeof(struct iocb));
+ 
+ static void aio_useriocb_free(struct kioctx *);
++static void aio_iopoll_reap_events(struct kioctx *);
+ 
  static struct file *aio_private_file(struct kioctx *ctx, loff_t nr_pages)
  {
+@@ -461,11 +487,15 @@ static int aio_setup_ring(struct kioctx *ctx, unsigned int nr_events)
+ 	int i;
  	struct file *file;
-@@ -572,6 +580,7 @@ static void free_ioctx(struct work_struct *work)
- 					  free_rwork);
- 	pr_debug("freeing %p\n", ctx);
  
-+	aio_useriocb_free(ctx);
- 	aio_free_ring(ctx);
- 	free_percpu(ctx->cpu);
- 	percpu_ref_exit(&ctx->reqs);
-@@ -1281,6 +1290,61 @@ static long read_events(struct kioctx *ctx, long min_nr, long nr,
- 	return ret;
+-	/* Compensate for the ring buffer's head/tail overlap entry */
+-	nr_events += 2;	/* 1 is required, 2 for good luck */
+-
++	/*
++	 * Compensate for the ring buffer's head/tail overlap entry.
++	 * IO polling doesn't require any io event entries
++	 */
+ 	size = sizeof(struct aio_ring);
+-	size += sizeof(struct io_event) * nr_events;
++	if (!(ctx->flags & IOCTX_FLAG_IOPOLL)) {
++		nr_events += 2;	/* 1 is required, 2 for good luck */
++		size += sizeof(struct io_event) * nr_events;
++	}
+ 
+ 	nr_pages = PFN_UP(size);
+ 	if (nr_pages < 0)
+@@ -747,6 +777,11 @@ static struct kioctx *io_setup_flags(unsigned long ctxid,
+ 
+ 	INIT_LIST_HEAD(&ctx->active_reqs);
+ 
++	spin_lock_init(&ctx->poll_lock);
++	INIT_LIST_HEAD(&ctx->poll_submitted);
++	INIT_LIST_HEAD(&ctx->poll_completing);
++	mutex_init(&ctx->getevents_lock);
++
+ 	if (percpu_ref_init(&ctx->users, free_ioctx_users, 0, GFP_KERNEL))
+ 		goto err;
+ 
+@@ -818,11 +853,15 @@ static int kill_ioctx(struct mm_struct *mm, struct kioctx *ctx,
+ {
+ 	struct kioctx_table *table;
+ 
++	mutex_lock(&ctx->getevents_lock);
+ 	spin_lock(&mm->ioctx_lock);
+ 	if (atomic_xchg(&ctx->dead, 1)) {
+ 		spin_unlock(&mm->ioctx_lock);
++		mutex_unlock(&ctx->getevents_lock);
+ 		return -EINVAL;
+ 	}
++	aio_iopoll_reap_events(ctx);
++	mutex_unlock(&ctx->getevents_lock);
+ 
+ 	table = rcu_dereference_raw(mm->ioctx_table);
+ 	WARN_ON(ctx != rcu_access_pointer(table->table[ctx->id]));
+@@ -1029,6 +1068,7 @@ static inline struct aio_kiocb *aio_get_req(struct kioctx *ctx)
+ 		percpu_ref_get(&ctx->reqs);
+ 		req->ki_ctx = ctx;
+ 		INIT_LIST_HEAD(&req->ki_list);
++		req->ki_flags = 0;
+ 		refcount_set(&req->ki_refcnt, 0);
+ 		req->ki_eventfd = NULL;
+ 	}
+@@ -1072,6 +1112,15 @@ static inline void iocb_put(struct aio_kiocb *iocb)
+ 	}
  }
  
-+static struct iocb *aio_iocb_from_index(struct kioctx *ctx, int index)
++static void iocb_put_many(struct kioctx *ctx, void **iocbs, int *nr)
 +{
-+	unsigned int page_index;
-+	struct iocb *iocb;
-+
-+	page_index = index >> iocb_page_shift;
-+	index &= ((1 << iocb_page_shift) - 1);
-+	iocb = page_address(ctx->iocb_pages[page_index]);
-+
-+	return iocb + index;
++	if (*nr) {
++		percpu_ref_put_many(&ctx->reqs, *nr);
++		kmem_cache_free_bulk(kiocb_cachep, *nr, iocbs);
++		*nr = 0;
++	}
 +}
 +
-+static void aio_useriocb_free(struct kioctx *ctx)
+ static void aio_fill_event(struct io_event *ev, struct aio_kiocb *iocb,
+ 			   long res, long res2)
+ {
+@@ -1261,6 +1310,170 @@ static bool aio_read_events(struct kioctx *ctx, long min_nr, long nr,
+ 	return ret < 0 || *i >= min_nr;
+ }
+ 
++#define AIO_IOPOLL_BATCH	8
++
++/*
++ * Process completed iocb iopoll entries, copying the result to userspace.
++ */
++static long aio_iopoll_reap(struct kioctx *ctx, struct io_event __user *evs,
++			    unsigned int *nr_events, long max)
 +{
-+	int i;
++	void *iocbs[AIO_IOPOLL_BATCH];
++	struct aio_kiocb *iocb, *n;
++	int to_free = 0, ret = 0;
 +
-+	if (!ctx->iocb_nr_pages)
-+		return;
++	/* Shouldn't happen... */
++	if (*nr_events >= max)
++		return 0;
 +
-+	for (i = 0; i < ctx->iocb_nr_pages; i++)
-+		put_page(ctx->iocb_pages[i]);
++	list_for_each_entry_safe(iocb, n, &ctx->poll_completing, ki_list) {
++		if (*nr_events == max)
++			break;
++		if (!test_bit(IOCB_POLL_COMPLETED, &iocb->ki_flags))
++			continue;
++		if (to_free == AIO_IOPOLL_BATCH)
++			iocb_put_many(ctx, iocbs, &to_free);
 +
-+	kfree(ctx->iocb_pages);
-+	ctx->iocb_pages = NULL;
-+	ctx->iocb_nr_pages = 0;
-+}
++		list_del(&iocb->ki_list);
++		iocbs[to_free++] = iocb;
 +
-+static int aio_useriocb_map(struct kioctx *ctx, struct iocb __user *iocbs)
-+{
-+	int nr_pages, ret;
++		fput(iocb->rw.ki_filp);
 +
-+	if ((unsigned long) iocbs & ~PAGE_MASK)
-+		return -EINVAL;
-+
-+	nr_pages = sizeof(struct iocb) * ctx->max_reqs;
-+	nr_pages = (nr_pages + PAGE_SIZE - 1) >> PAGE_SHIFT;
-+
-+	ctx->iocb_pages = kzalloc(nr_pages * sizeof(struct page *), GFP_KERNEL);
-+	if (!ctx->iocb_pages)
-+		return -ENOMEM;
-+
-+	down_write(&current->mm->mmap_sem);
-+	ret = get_user_pages((unsigned long) iocbs, nr_pages, 0,
-+				ctx->iocb_pages, NULL);
-+	up_write(&current->mm->mmap_sem);
-+
-+	if (ret < nr_pages) {
-+		kfree(ctx->iocb_pages);
-+		return -ENOMEM;
++		if (evs && copy_to_user(evs + *nr_events, &iocb->ki_ev,
++		    sizeof(iocb->ki_ev))) {
++			ret = -EFAULT;
++			break;
++		}
++		(*nr_events)++;
 +	}
 +
-+	ctx->iocb_nr_pages = nr_pages;
-+	return 0;
++	if (to_free)
++		iocb_put_many(ctx, iocbs, &to_free);
++
++	return ret;
 +}
 +
- SYSCALL_DEFINE4(io_setup2, u32, nr_events, u32, flags, struct iocb * __user,
- 		iocbs, aio_context_t __user *, ctxp)
- {
-@@ -1288,7 +1352,7 @@ SYSCALL_DEFINE4(io_setup2, u32, nr_events, u32, flags, struct iocb * __user,
++static int __aio_iopoll_check(struct kioctx *ctx, struct io_event __user *event,
++			      unsigned int *nr_events, long min, long max)
++{
++	struct aio_kiocb *iocb;
++	int to_poll, polled, ret;
++
++	/*
++	 * Check if we already have done events that satisfy what we need
++	 */
++	if (!list_empty(&ctx->poll_completing)) {
++		ret = aio_iopoll_reap(ctx, event, nr_events, max);
++		if (ret < 0)
++			return ret;
++		if (*nr_events >= min)
++			return 0;
++	}
++
++	/*
++	 * Take in a new working set from the submitted list, if possible.
++	 */
++	if (!list_empty_careful(&ctx->poll_submitted)) {
++		spin_lock(&ctx->poll_lock);
++		list_splice_init(&ctx->poll_submitted, &ctx->poll_completing);
++		spin_unlock(&ctx->poll_lock);
++	}
++
++	if (list_empty(&ctx->poll_completing))
++		return 0;
++
++	/*
++	 * Check again now that we have a new batch.
++	 */
++	ret = aio_iopoll_reap(ctx, event, nr_events, max);
++	if (ret < 0)
++		return ret;
++	if (*nr_events >= min)
++		return 0;
++
++	/*
++	 * Find up to 'max' worth of events to poll for, including the
++	 * events we already successfully polled
++	 */
++	polled = to_poll = 0;
++	list_for_each_entry(iocb, &ctx->poll_completing, ki_list) {
++		/*
++		 * Poll for needed events with spin == true, anything after
++		 * that we just check if we have more, up to max.
++		 */
++		bool spin = polled + *nr_events >= min;
++		struct kiocb *kiocb = &iocb->rw;
++
++		if (test_bit(IOCB_POLL_COMPLETED, &iocb->ki_flags))
++			break;
++		if (++to_poll + *nr_events > max)
++			break;
++
++		ret = kiocb->ki_filp->f_op->iopoll(kiocb, spin);
++		if (ret < 0)
++			return ret;
++
++		polled += ret;
++		if (polled + *nr_events >= max)
++			break;
++	}
++
++	ret = aio_iopoll_reap(ctx, event, nr_events, max);
++	if (ret < 0)
++		return ret;
++	if (*nr_events >= min)
++		return 0;
++	return to_poll;
++}
++
++/*
++ * We can't just wait for polled events to come to us, we have to actively
++ * find and complete them.
++ */
++static void aio_iopoll_reap_events(struct kioctx *ctx)
++{
++	if (!(ctx->flags & IOCTX_FLAG_IOPOLL))
++		return;
++
++	while (!list_empty_careful(&ctx->poll_submitted) ||
++	       !list_empty(&ctx->poll_completing)) {
++		unsigned int nr_events = 0;
++
++		__aio_iopoll_check(ctx, NULL, &nr_events, 1, UINT_MAX);
++	}
++}
++
++static int aio_iopoll_check(struct kioctx *ctx, long min_nr, long nr,
++			    struct io_event __user *event)
++{
++	unsigned int nr_events = 0;
++	int ret = 0;
++
++	/* Only allow one thread polling at a time */
++	if (!mutex_trylock(&ctx->getevents_lock))
++		return -EBUSY;
++	if (unlikely(atomic_read(&ctx->dead))) {
++		ret = -EINVAL;
++		goto err;
++	}
++
++	while (!nr_events || !need_resched()) {
++		int tmin = 0;
++
++		if (nr_events < min_nr)
++			tmin = min_nr - nr_events;
++
++		ret = __aio_iopoll_check(ctx, event, &nr_events, tmin, nr);
++		if (ret <= 0)
++			break;
++		ret = 0;
++	}
++
++err:
++	mutex_unlock(&ctx->getevents_lock);
++	return nr_events ? nr_events : ret;
++}
++
+ static long read_events(struct kioctx *ctx, long min_nr, long nr,
+ 			struct io_event __user *event,
+ 			ktime_t until)
+@@ -1352,7 +1565,7 @@ SYSCALL_DEFINE4(io_setup2, u32, nr_events, u32, flags, struct iocb * __user,
  	unsigned long ctx;
  	long ret;
  
--	if (flags)
-+	if (flags & ~IOCTX_FLAG_USERIOCB)
+-	if (flags & ~IOCTX_FLAG_USERIOCB)
++	if (flags & ~(IOCTX_FLAG_USERIOCB | IOCTX_FLAG_IOPOLL))
  		return -EINVAL;
  
  	ret = get_user(ctx, ctxp);
-@@ -1300,9 +1364,17 @@ SYSCALL_DEFINE4(io_setup2, u32, nr_events, u32, flags, struct iocb * __user,
- 	if (IS_ERR(ioctx))
- 		goto out;
+@@ -1485,13 +1698,8 @@ static void aio_remove_iocb(struct aio_kiocb *iocb)
+ 	spin_unlock_irqrestore(&ctx->ctx_lock, flags);
+ }
  
-+	if (flags & IOCTX_FLAG_USERIOCB) {
-+		ret = aio_useriocb_map(ioctx, iocbs);
-+		if (ret)
-+			goto err;
-+	}
+-static void aio_complete_rw(struct kiocb *kiocb, long res, long res2)
++static void kiocb_end_write(struct kiocb *kiocb)
+ {
+-	struct aio_kiocb *iocb = container_of(kiocb, struct aio_kiocb, rw);
+-
+-	if (!list_empty_careful(&iocb->ki_list))
+-		aio_remove_iocb(iocb);
+-
+ 	if (kiocb->ki_flags & IOCB_WRITE) {
+ 		struct inode *inode = file_inode(kiocb->ki_filp);
+ 
+@@ -1503,19 +1711,48 @@ static void aio_complete_rw(struct kiocb *kiocb, long res, long res2)
+ 			__sb_writers_acquired(inode->i_sb, SB_FREEZE_WRITE);
+ 		file_end_write(kiocb->ki_filp);
+ 	}
++}
 +
- 	ret = put_user(ioctx->user_id, ctxp);
--	if (ret)
-+	if (ret) {
-+err:
- 		kill_ioctx(current->mm, ioctx, NULL);
++static void aio_complete_rw(struct kiocb *kiocb, long res, long res2)
++{
++	struct aio_kiocb *iocb = container_of(kiocb, struct aio_kiocb, rw);
++
++	if (!list_empty_careful(&iocb->ki_list))
++		aio_remove_iocb(iocb);
++
++	kiocb_end_write(kiocb);
+ 
+ 	fput(kiocb->ki_filp);
+ 	aio_complete(iocb, res, res2);
+ }
+ 
+-static int aio_prep_rw(struct kiocb *req, const struct iocb *iocb)
++static void aio_complete_rw_poll(struct kiocb *kiocb, long res, long res2)
+ {
++	struct aio_kiocb *iocb = container_of(kiocb, struct aio_kiocb, rw);
++
++	kiocb_end_write(kiocb);
++
++	/*
++	 * Handle EAGAIN from resource limits with polled IO inline, don't
++	 * pass the event back to userspace.
++	 */
++	if (unlikely(res == -EAGAIN))
++		set_bit(IOCB_POLL_BUSY, &iocb->ki_flags);
++	else {
++		aio_fill_event(&iocb->ki_ev, iocb, res, res2);
++		set_bit(IOCB_POLL_COMPLETED, &iocb->ki_flags);
 +	}
- 	percpu_ref_put(&ioctx->users);
- out:
++}
++
++static int aio_prep_rw(struct aio_kiocb *kiocb, const struct iocb *iocb)
++{
++	struct kioctx *ctx = kiocb->ki_ctx;
++	struct kiocb *req = &kiocb->rw;
+ 	int ret;
+ 
+ 	req->ki_filp = fget(iocb->aio_fildes);
+ 	if (unlikely(!req->ki_filp))
+ 		return -EBADF;
+-	req->ki_complete = aio_complete_rw;
+ 	req->ki_pos = iocb->aio_offset;
+ 	req->ki_flags = iocb_flags(req->ki_filp);
+ 	if (iocb->aio_flags & IOCB_FLAG_RESFD)
+@@ -1541,9 +1778,35 @@ static int aio_prep_rw(struct kiocb *req, const struct iocb *iocb)
+ 	if (unlikely(ret))
+ 		goto out_fput;
+ 
+-	req->ki_flags &= ~IOCB_HIPRI; /* no one is going to poll for this I/O */
+-	return 0;
++	if (iocb->aio_flags & IOCB_FLAG_HIPRI) {
++		/* shares space in the union, and is rather pointless.. */
++		ret = -EINVAL;
++		if (iocb->aio_flags & IOCB_FLAG_RESFD)
++			goto out_fput;
++
++		/* can't submit polled IO to a non-polled ctx */
++		if (!(ctx->flags & IOCTX_FLAG_IOPOLL))
++			goto out_fput;
++
++		ret = -EOPNOTSUPP;
++		if (!(req->ki_flags & IOCB_DIRECT) ||
++		    !req->ki_filp->f_op->iopoll)
++			goto out_fput;
++
++		req->ki_flags |= IOCB_HIPRI;
++		req->ki_complete = aio_complete_rw_poll;
++	} else {
++		/* can't submit non-polled IO to a polled ctx */
++		ret = -EINVAL;
++		if (ctx->flags & IOCTX_FLAG_IOPOLL)
++			goto out_fput;
++
++		/* no one is going to poll for this I/O */
++		req->ki_flags &= ~IOCB_HIPRI;
++		req->ki_complete = aio_complete_rw;
++	}
+ 
++	return 0;
+ out_fput:
+ 	fput(req->ki_filp);
  	return ret;
-@@ -1851,10 +1923,13 @@ static int __io_submit_one(struct kioctx *ctx, const struct iocb *iocb,
+@@ -1588,15 +1851,40 @@ static inline void aio_rw_done(struct kiocb *req, ssize_t ret)
+ 	}
+ }
+ 
+-static ssize_t aio_read(struct kiocb *req, const struct iocb *iocb,
++/*
++ * After the iocb has been issued, it's safe to be found on the poll list.
++ * Adding the kiocb to the list AFTER submission ensures that we don't
++ * find it from a io_getevents() thread before the issuer is done accessing
++ * the kiocb cookie.
++ */
++static void aio_iopoll_iocb_issued(struct aio_kiocb *kiocb)
++{
++	/*
++	 * For fast devices, IO may have already completed. If it has, add
++	 * it to the front so we find it first. We can't add to the poll_done
++	 * list as that's unlocked from the completion side.
++	 */
++	const int front_add = test_bit(IOCB_POLL_COMPLETED, &kiocb->ki_flags);
++	struct kioctx *ctx = kiocb->ki_ctx;
++
++	spin_lock(&ctx->poll_lock);
++	if (front_add)
++		list_add(&kiocb->ki_list, &ctx->poll_submitted);
++	else
++		list_add_tail(&kiocb->ki_list, &ctx->poll_submitted);
++	spin_unlock(&ctx->poll_lock);
++}
++
++static ssize_t aio_read(struct aio_kiocb *kiocb, const struct iocb *iocb,
+ 			bool vectored, bool compat)
+ {
+ 	struct iovec inline_vecs[UIO_FASTIOV], *iovec = inline_vecs;
++	struct kiocb *req = &kiocb->rw;
+ 	struct iov_iter iter;
+ 	struct file *file;
+ 	ssize_t ret;
+ 
+-	ret = aio_prep_rw(req, iocb);
++	ret = aio_prep_rw(kiocb, iocb);
+ 	if (ret)
+ 		return ret;
+ 	file = req->ki_filp;
+@@ -1621,15 +1909,16 @@ static ssize_t aio_read(struct kiocb *req, const struct iocb *iocb,
+ 	return ret;
+ }
+ 
+-static ssize_t aio_write(struct kiocb *req, const struct iocb *iocb,
++static ssize_t aio_write(struct aio_kiocb *kiocb, const struct iocb *iocb,
+ 			 bool vectored, bool compat)
+ {
+ 	struct iovec inline_vecs[UIO_FASTIOV], *iovec = inline_vecs;
++	struct kiocb *req = &kiocb->rw;
+ 	struct iov_iter iter;
+ 	struct file *file;
+ 	ssize_t ret;
+ 
+-	ret = aio_prep_rw(req, iocb);
++	ret = aio_prep_rw(kiocb, iocb);
+ 	if (ret)
+ 		return ret;
+ 	file = req->ki_filp;
+@@ -1900,7 +2189,8 @@ static int __io_submit_one(struct kioctx *ctx, const struct iocb *iocb,
+ 		return -EINVAL;
+ 	}
+ 
+-	if (!get_reqs_available(ctx))
++	/* Poll IO doesn't need ring reservations */
++	if (!(ctx->flags & IOCTX_FLAG_IOPOLL) && !get_reqs_available(ctx))
+ 		return -EAGAIN;
+ 
+ 	ret = -EAGAIN;
+@@ -1923,8 +2213,8 @@ static int __io_submit_one(struct kioctx *ctx, const struct iocb *iocb,
  		}
  	}
  
--	ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
--	if (unlikely(ret)) {
--		pr_debug("EFAULT: aio_key\n");
--		goto out_put_req;
-+	/* Don't support cancel on user mapped iocbs */
-+	if (!(ctx->flags & IOCTX_FLAG_USERIOCB)) {
-+		ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
-+		if (unlikely(ret)) {
-+			pr_debug("EFAULT: aio_key\n");
+-	/* Don't support cancel on user mapped iocbs */
+-	if (!(ctx->flags & IOCTX_FLAG_USERIOCB)) {
++	/* Don't support cancel on user mapped iocbs or polled context */
++	if (!(ctx->flags & (IOCTX_FLAG_USERIOCB | IOCTX_FLAG_IOPOLL))) {
+ 		ret = put_user(KIOCB_KEY, &user_iocb->aio_key);
+ 		if (unlikely(ret)) {
+ 			pr_debug("EFAULT: aio_key\n");
+@@ -1935,26 +2225,33 @@ static int __io_submit_one(struct kioctx *ctx, const struct iocb *iocb,
+ 	req->ki_user_iocb = user_iocb;
+ 	req->ki_user_data = iocb->aio_data;
+ 
++	ret = -EINVAL;
+ 	switch (iocb->aio_lio_opcode) {
+ 	case IOCB_CMD_PREAD:
+-		ret = aio_read(&req->rw, iocb, false, compat);
++		ret = aio_read(req, iocb, false, compat);
+ 		break;
+ 	case IOCB_CMD_PWRITE:
+-		ret = aio_write(&req->rw, iocb, false, compat);
++		ret = aio_write(req, iocb, false, compat);
+ 		break;
+ 	case IOCB_CMD_PREADV:
+-		ret = aio_read(&req->rw, iocb, true, compat);
++		ret = aio_read(req, iocb, true, compat);
+ 		break;
+ 	case IOCB_CMD_PWRITEV:
+-		ret = aio_write(&req->rw, iocb, true, compat);
++		ret = aio_write(req, iocb, true, compat);
+ 		break;
+ 	case IOCB_CMD_FSYNC:
++		if (ctx->flags & IOCTX_FLAG_IOPOLL)
++			break;
+ 		ret = aio_fsync(&req->fsync, iocb, false);
+ 		break;
+ 	case IOCB_CMD_FDSYNC:
++		if (ctx->flags & IOCTX_FLAG_IOPOLL)
++			break;
+ 		ret = aio_fsync(&req->fsync, iocb, true);
+ 		break;
+ 	case IOCB_CMD_POLL:
++		if (ctx->flags & IOCTX_FLAG_IOPOLL)
++			break;
+ 		ret = aio_poll(req, iocb);
+ 		break;
+ 	default:
+@@ -1970,13 +2267,21 @@ static int __io_submit_one(struct kioctx *ctx, const struct iocb *iocb,
+ 	 */
+ 	if (ret)
+ 		goto out_put_req;
++	if (ctx->flags & IOCTX_FLAG_IOPOLL) {
++		if (test_bit(IOCB_POLL_BUSY, &req->ki_flags)) {
++			ret = -EAGAIN;
 +			goto out_put_req;
 +		}
- 	}
- 
- 	req->ki_user_iocb = user_iocb;
-@@ -1908,12 +1983,22 @@ static int __io_submit_one(struct kioctx *ctx, const struct iocb *iocb,
- static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- 			 bool compat)
- {
--	struct iocb iocb;
-+	struct iocb iocb, *iocbp;
- 
--	if (unlikely(copy_from_user(&iocb, user_iocb, sizeof(iocb))))
--		return -EFAULT;
-+	if (ctx->flags & IOCTX_FLAG_USERIOCB) {
-+		unsigned long iocb_index = (unsigned long) user_iocb;
-+
-+		if (iocb_index >= ctx->max_reqs)
-+			return -EINVAL;
-+
-+		iocbp = aio_iocb_from_index(ctx, iocb_index);
-+	} else {
-+		if (unlikely(copy_from_user(&iocb, user_iocb, sizeof(iocb))))
-+			return -EFAULT;
-+		iocbp = &iocb;
++		aio_iopoll_iocb_issued(req);
 +	}
- 
--	return __io_submit_one(ctx, &iocb, user_iocb, compat);
-+	return __io_submit_one(ctx, iocbp, user_iocb, compat);
- }
- 
- /*
-@@ -2063,6 +2148,9 @@ SYSCALL_DEFINE3(io_cancel, aio_context_t, ctx_id, struct iocb __user *, iocb,
- 	if (unlikely(!ctx))
- 		return -EINVAL;
- 
-+	if (ctx->flags & IOCTX_FLAG_USERIOCB)
-+		goto err;
-+
- 	spin_lock_irq(&ctx->ctx_lock);
- 	kiocb = lookup_kiocb(ctx, iocb);
- 	if (kiocb) {
-@@ -2079,9 +2167,8 @@ SYSCALL_DEFINE3(io_cancel, aio_context_t, ctx_id, struct iocb __user *, iocb,
- 		 */
- 		ret = -EINPROGRESS;
- 	}
--
-+err:
- 	percpu_ref_put(&ctx->users);
--
+ 	return 0;
+ out_put_req:
+ 	if (req->ki_eventfd)
+ 		eventfd_ctx_put(req->ki_eventfd);
+ 	iocb_put(req);
+ out_put_reqs_available:
+-	put_reqs_available(ctx, 1);
++	if (!(ctx->flags & IOCTX_FLAG_IOPOLL))
++		put_reqs_available(ctx, 1);
  	return ret;
  }
  
+@@ -2148,7 +2453,7 @@ SYSCALL_DEFINE3(io_cancel, aio_context_t, ctx_id, struct iocb __user *, iocb,
+ 	if (unlikely(!ctx))
+ 		return -EINVAL;
+ 
+-	if (ctx->flags & IOCTX_FLAG_USERIOCB)
++	if (ctx->flags & (IOCTX_FLAG_USERIOCB | IOCTX_FLAG_IOPOLL))
+ 		goto err;
+ 
+ 	spin_lock_irq(&ctx->ctx_lock);
+@@ -2183,8 +2488,12 @@ static long do_io_getevents(aio_context_t ctx_id,
+ 	long ret = -EINVAL;
+ 
+ 	if (likely(ioctx)) {
+-		if (likely(min_nr <= nr && min_nr >= 0))
+-			ret = read_events(ioctx, min_nr, nr, events, until);
++		if (likely(min_nr <= nr && min_nr >= 0)) {
++			if (ioctx->flags & IOCTX_FLAG_IOPOLL)
++				ret = aio_iopoll_check(ioctx, min_nr, nr, events);
++			else
++				ret = read_events(ioctx, min_nr, nr, events, until);
++		}
+ 		percpu_ref_put(&ioctx->users);
+ 	}
+ 
 diff --git a/include/uapi/linux/aio_abi.h b/include/uapi/linux/aio_abi.h
-index 8387e0af0f76..814e6606c413 100644
+index 814e6606c413..ea0b9a19f4df 100644
 --- a/include/uapi/linux/aio_abi.h
 +++ b/include/uapi/linux/aio_abi.h
-@@ -106,6 +106,8 @@ struct iocb {
- 	__u32	aio_resfd;
+@@ -52,9 +52,11 @@ enum {
+  *                   is valid.
+  * IOCB_FLAG_IOPRIO - Set if the "aio_reqprio" member of the "struct iocb"
+  *                    is valid.
++ * IOCB_FLAG_HIPRI - Use IO completion polling
+  */
+ #define IOCB_FLAG_RESFD		(1 << 0)
+ #define IOCB_FLAG_IOPRIO	(1 << 1)
++#define IOCB_FLAG_HIPRI		(1 << 2)
+ 
+ /* read() from /dev/aio returns these structures. */
+ struct io_event {
+@@ -107,6 +109,7 @@ struct iocb {
  }; /* 64 bytes */
  
-+#define IOCTX_FLAG_USERIOCB	(1 << 0)	/* iocbs are user mapped */
-+
+ #define IOCTX_FLAG_USERIOCB	(1 << 0)	/* iocbs are user mapped */
++#define IOCTX_FLAG_IOPOLL	(1 << 1)	/* io_context is polled */
+ 
  #undef IFBIG
  #undef IFLITTLE
- 
 -- 
 2.17.1
 
