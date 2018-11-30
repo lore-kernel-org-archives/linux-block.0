@@ -4,76 +4,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10C82C65BAE
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 08:36:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F2E6C64EB4
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 08:36:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CBF562146D
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 08:36:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBE5320863
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 08:36:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="TOITIWu2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBF562146D
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="RsAPHWwK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBE5320863
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lightnvm.io
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727088AbeK3Tor (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 30 Nov 2018 14:44:47 -0500
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:46819 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726572AbeK3Tor (ORCPT
+        id S1727148AbeK3To7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 30 Nov 2018 14:44:59 -0500
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:46935 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727151AbeK3To6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 30 Nov 2018 14:44:47 -0500
-Received: by mail-lf1-f66.google.com with SMTP id f23so3467049lfc.13
-        for <linux-block@vger.kernel.org>; Fri, 30 Nov 2018 00:36:13 -0800 (PST)
+        Fri, 30 Nov 2018 14:44:58 -0500
+Received: by mail-lj1-f193.google.com with SMTP id v15-v6so4217287ljh.13
+        for <linux-block@vger.kernel.org>; Fri, 30 Nov 2018 00:36:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=mrwc12kGFUvTe4G8O2yVusGKb78ANicaV+8Tfof25bQ=;
-        b=TOITIWu20w+TZzp9jiY2fK2vjMZvd83jQatrBCtKkujphNDnnVWVNTAGQ0VU/zKcAV
-         G+6wA3zFS9Pu1NKX6suxFFvxrNxBkWUzY3SZOzmoBqClkdTrdNASnO3QWodWM+IUHAi/
-         jVh4MxqNsJOVsLhh/bF7r/Ml6VIoV1JlwfWr/LqajnllsBMt4+wKH4Lx+VccUg9AhLEe
-         36dP/9ECY2fxwKBUNdz5ExGr8G1Zy7Tp8bFpvqEedT+qbgMdyM7Ipd3L46XcGsqbNKU0
-         p/w7uRwVEXVOZdz4+BIThD0a/M5uWCzDsxr00+CLHZWYjxplpC0I+9Z1pmyuweBXh6t8
-         8V3w==
+        bh=ioXF4bCL8BuwqWo5CCjgjpGdZH7diIK4hexxj1Nvf8o=;
+        b=RsAPHWwKdpngwQoodtjN35xFxp6L4Ne2axZleCQscGRB1vuT9Aw65WogQB0cJZ/bn5
+         KrZ4Gu5Yw0xz3E0mPzCyv4jwMo70yGzqVA3k9Xr4pSwWC0ueteybKeZ88m1wuke+oD/3
+         12hgrzzCwGQV1dmTLxjEvm+oM22RJ9pWrhNoe+vKdPYCiH6qaVfXNQr+pimM4qy+HzqW
+         wtzRDeg9ODyDCntGvTtPjWWP6LBJa0MtREyek8ULqdIgtlpZLnHw8Ly+1DGisEiAjEpX
+         H5YdyMr1mbf9zP0BoAbUBjA/2lr5RHH54B+140YNVMK610nM7OJQdEqdXL6QQaATCxiZ
+         z7LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=mrwc12kGFUvTe4G8O2yVusGKb78ANicaV+8Tfof25bQ=;
-        b=t3oUf4OwdtWHZFpqV66UYCjG5JO9V6KUuEQ82sOW0Ok0PFTvTEvVrGT1h6krNJcbyO
-         tvGGpeQcDvliM22IBI6tj2apgzsPiKM+ZGac1BegtJqJBKALrNWvu36kTGzN0At1AxVW
-         6aCH3Om9DBOlQra/BaeH6Ydghe7R8LRa7+KaXoeFDoyRUQHNUW9c9tGmEE0WQaH0XiR5
-         JceCWU8sRqR+ZapIjrJLYo+QOC3V/425do+MGIhHueYV0krZuOcibWsSUHGRW64n1R7Z
-         CUZomA40Xe8OUl5VWvZLu7wUhcNE/h4sk+qeolr1eRv17ksxP/9hHvdgaVudItBLjOBn
-         98lQ==
-X-Gm-Message-State: AA+aEWZKyPV8VygwUoXYK3MDxT6a6cDjMDaQMBj4DlvnPFjQ9JDzPn10
-        vh3iTwF+Ggt6PPlwM1BbGgZUDvYSfGU=
-X-Google-Smtp-Source: AFSGD/WogDBerdNDJVhwo/56h03oEPgBsq3YVBIT0qvkfFxexAGMgJktNrhYK1X1RDMqPbR8JX6HtQ==
-X-Received: by 2002:a19:2106:: with SMTP id h6mr2943704lfh.29.1543566972748;
-        Fri, 30 Nov 2018 00:36:12 -0800 (PST)
+        bh=ioXF4bCL8BuwqWo5CCjgjpGdZH7diIK4hexxj1Nvf8o=;
+        b=NX5P3gz7Zxr3oWRxWX+amKlDAM0scH5jbrrKQbKOwRlgbHmIBR4+rjeESMbaeMD4Cp
+         j4VS1mhCasynJ8GNX6IEqwEpUUO8h52FSv1lLcDERgXSkBJlyqIZc+6ZkbG8NbEQk6Rz
+         RQ6Ru+wS1ty9I33MrtdB1OjoOGSDc+rySNhXP8QEdhnAZmPPRzNkJVyjekfk7hCz/jwy
+         5I+r6cEXVqEiMVqsq+Lrn233HTXfmwxhw7PCQMuZdNmfSO8rUYd7RhNTYbT/MX8UZfed
+         fEnGXJW+O9QWkU9NUfU6bsT2x+ieXATiIkNBiKnDKZbd9TFIesLHTw5EJnHhoNpg8UuV
+         z8OQ==
+X-Gm-Message-State: AA+aEWYch4nOsIZIqecnSlzFscfe5kJJS2pm2T2Wd50zmf3qBGiK1xqg
+        SGhSkbGN/XirAb+PqmR4aLRHuQ==
+X-Google-Smtp-Source: AFSGD/XgpXETfsbcHjHD99lFbDWo72gPOJYrLxfDJzqpY9aEGui4EEUN+IWI3h744LW7Z4YzHwbvVg==
+X-Received: by 2002:a2e:994:: with SMTP id 142-v6mr2903040ljj.120.1543566983755;
+        Fri, 30 Nov 2018 00:36:23 -0800 (PST)
 Received: from [192.168.0.36] (95-166-82-66-cable.dk.customer.tdc.net. [95.166.82.66])
-        by smtp.googlemail.com with ESMTPSA id b81-v6sm680627ljb.7.2018.11.30.00.36.11
+        by smtp.googlemail.com with ESMTPSA id j138sm692946lfg.64.2018.11.30.00.36.22
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 30 Nov 2018 00:36:12 -0800 (PST)
-Subject: Re: [PATCH] lightnvm: pblk: add lock protection to list operations
-To:     Javier Gonzalez <javier@cnexlabs.com>,
-        Hua Su <suhua.tanke@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20181128091352.5088-1-suhua.tanke@gmail.com>
- <930717BD-D32A-4BE2-AEE6-579594E70842@cnexlabs.com>
+        Fri, 30 Nov 2018 00:36:23 -0800 (PST)
+Subject: Re: [PATCH] lightnvm: pblk: avoid ref warning on cache creation
+To:     Hans Holmberg <hans.ml.holmberg@owltronix.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>
+Cc:     Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Javier Gonzalez <javier@cnexlabs.com>
+References: <1542894410-14047-1-git-send-email-javier@cnexlabs.com>
+ <1542894410-14047-2-git-send-email-javier@cnexlabs.com>
+ <CANr-nt2XMzZnd309pY7QJxYXWMSuXXrcWMt8F=pa49BzARb5dg@mail.gmail.com>
 From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <ad41a638-4c59-e079-e272-9ebd98ab929b@lightnvm.io>
-Date:   Fri, 30 Nov 2018 09:36:11 +0100
+Message-ID: <a0bacf2c-1405-b70b-828a-f2bbe0ecb271@lightnvm.io>
+Date:   Fri, 30 Nov 2018 09:36:22 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
  Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <930717BD-D32A-4BE2-AEE6-579594E70842@cnexlabs.com>
+In-Reply-To: <CANr-nt2XMzZnd309pY7QJxYXWMSuXXrcWMt8F=pa49BzARb5dg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
@@ -82,54 +84,60 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/28/2018 10:16 AM, Javier Gonzalez wrote:
->> On 28 Nov 2018, at 10.13, Hua Su <suhua.tanke@gmail.com> wrote:
+On 11/23/2018 11:04 AM, Hans Holmberg wrote:
+> Great catch Javier! Nice refactoring work too.
+> 
+> Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+> On Thu, Nov 22, 2018 at 2:47 PM Javier González <javier@javigon.com> wrote:
 >>
->> Protect the list_add on the pblk_line_init_bb() error
->> path in case this code is used for some other purpose
->> in the future.
+>> The current kref implementation around pblk global caches triggers a
+>> false positive on refcount_inc_checked() (when called) as the kref is
+>> initialized to 0. Instead of usint kref_inc() on a 0 reference, which is
+>> in principle correct, use kref_init() to avoid the check. This is also
+>> more explicit about what actually happens on cache creation.
 >>
->> Signed-off-by: Hua Su <suhua.tanke@gmail.com>
+>> In the process, do a small refactoring to use kref helpers.
+>>
+>> Signed-off-by: Javier González <javier@cnexlabs.com>
 >> ---
->> drivers/lightnvm/pblk-core.c | 13 ++++++++++---
->> 1 file changed, 10 insertions(+), 3 deletions(-)
+>>   drivers/lightnvm/pblk-init.c | 14 +++++---------
+>>   1 file changed, 5 insertions(+), 9 deletions(-)
 >>
->> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
->> index 6944aac43b01..247112e1db94 100644
->> --- a/drivers/lightnvm/pblk-core.c
->> +++ b/drivers/lightnvm/pblk-core.c
->> @@ -1295,15 +1295,22 @@ int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
+>> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+>> index 13822594647c..e225bd60cbb4 100644
+>> --- a/drivers/lightnvm/pblk-init.c
+>> +++ b/drivers/lightnvm/pblk-init.c
+>> @@ -350,23 +350,19 @@ static int pblk_create_global_caches(void)
 >>
->> 	ret = pblk_line_alloc_bitmaps(pblk, line);
->> 	if (ret)
->> -		return ret;
->> +		goto fail;
+>>   static int pblk_get_global_caches(void)
+>>   {
+>> -       int ret;
+>> +       int ret = 0;
 >>
->> 	if (!pblk_line_init_bb(pblk, line, 0)) {
->> -		list_add(&line->list, &l_mg->free_list);
->> -		return -EINTR;
->> +		ret = -EINTR;
->> +		goto fail;
->> 	}
+>>          mutex_lock(&pblk_caches.mutex);
 >>
->> 	pblk_rl_free_lines_dec(&pblk->rl, line, true);
->> 	return 0;
->> +
->> +fail:
->> +	spin_lock(&l_mg->free_lock);
->> +	list_add(&line->list, &l_mg->free_list);
->> +	spin_unlock(&l_mg->free_lock);
->> +
->> +	return ret;
->> }
+>> -       if (kref_read(&pblk_caches.kref) > 0) {
+>> -               kref_get(&pblk_caches.kref);
+>> -               mutex_unlock(&pblk_caches.mutex);
+>> -               return 0;
+>> -       }
+>> +       if (kref_get_unless_zero(&pblk_caches.kref))
+>> +               goto out;
 >>
->> void pblk_line_recov_close(struct pblk *pblk, struct pblk_line *line)
+>>          ret = pblk_create_global_caches();
+>> -
+>>          if (!ret)
+>> -               kref_get(&pblk_caches.kref);
+>> +               kref_init(&pblk_caches.kref);
+>>
+>> +out:
+>>          mutex_unlock(&pblk_caches.mutex);
+>> -
+>>          return ret;
+>>   }
+>>
 >> --
->> 2.19.1
-> 
-> Looks good to me.
-> 
-> Reviewed-by: Javier González <javier@cnexlabs.com>
-> 
+>> 2.7.4
+>>
 
 Picked up for 4.21.
