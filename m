@@ -2,135 +2,122 @@ Return-Path: <SRS0=+5f8=OJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A5CBC04EB8
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 21:58:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D83EFC64EB4
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 22:04:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5FF8D20660
-	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 21:58:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="mGbaFVZm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FF8D20660
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	by mail.kernel.org (Postfix) with ESMTP id A3D5E20660
+	for <linux-block@archiver.kernel.org>; Fri, 30 Nov 2018 22:04:28 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3D5E20660
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725867AbeLAJIp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 1 Dec 2018 04:08:45 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:36329 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726788AbeLAJIo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 1 Dec 2018 04:08:44 -0500
-Received: by mail-io1-f68.google.com with SMTP id m19so5777574ioh.3
-        for <linux-block@vger.kernel.org>; Fri, 30 Nov 2018 13:58:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=DTCiJHEIPhwqKmFmtBvCXYEnbAfU2WekbVfHr/8KqJk=;
-        b=mGbaFVZmG4vH4xh7ywtItGaz+LpDCqWKJJT6Tb6NNGa/DyK05Lsco0nw0Yi+0s7vNG
-         +Ddb/uvIImesxYtrFIkaU8FDls6Smsb01qhlrkt13hwFUJww6oL0OHnDcWH4wAz4JeYy
-         rEVn1MsGK9s7YEjSGjRPFCY/3qCZcH6yQ3J+2p5jBjjb3DtGa2ssJLJxtqH72i1ozxEy
-         7+KTfNdSaV5eMci8hhuv6wA0OlIQWzm91unPsa+UoaJHHACkYSuqLTLamsYbY3ofrd2n
-         u6PZKxvbIQhVbxsvEg5Me11PXOgc9GJhpPDa4ZRMXDcdt2NkFjBlJWLKB1024opu1ggN
-         vQ2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=DTCiJHEIPhwqKmFmtBvCXYEnbAfU2WekbVfHr/8KqJk=;
-        b=m8xTmyxeJsBSPHkw3GZ2N3tGmbiDedqgsExiuozywLolmduAHFYOBw/gASv4LMavXs
-         +TLXqhg3gkCDS+xfiTDLwoe58Qrk0ZV12kx7z/5Q8C3NcRM4H+XjSY/vwxFz/chGRdQI
-         sdXKXfpQTl/Y0fq1mUPRLPfrWwdnjQyHHzox7iwx6zgXsfYv8esOOyH92yTIjIjBJ2Pr
-         pAj0fYZAJWZr1zkNl83uTxaJL372UsMuvDFoQvxGg+0JmlcxdrSFhUDyDKA/nU//+qh/
-         rhcimuie/K7FSFljMi8QvY0wIu+f7nCt6eYVBOWmCv6ce8xnMRYZxdAF4tX03GuhwgFr
-         ndlw==
-X-Gm-Message-State: AA+aEWYJBmuXTG8HHNm746p+rSaTH7TlAMfv+K/Ykk4xwZlQpM3815C5
-        MQXMTF+WCEGbQx1cFwgSNlv9zg==
-X-Google-Smtp-Source: AFSGD/UhDroKxs2FHfUCa3j/nD7f+RvP/2uOk0pUhPls4zbyWIVwjv5nAqGVcZhRx7NIF1ao9z0Oig==
-X-Received: by 2002:a5e:d607:: with SMTP id w7mr6156844iom.75.1543615080760;
-        Fri, 30 Nov 2018 13:58:00 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id f21sm207454itc.14.2018.11.30.13.57.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 30 Nov 2018 13:57:59 -0800 (PST)
-Subject: Re: [PATCH 27/27] aio: add support for pre-mapped user IO buffers
-To:     Jeff Moyer <jmoyer@redhat.com>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-aio@kvack.org, hch@lst.de
-References: <20181130165646.27341-1-axboe@kernel.dk>
- <20181130165646.27341-28-axboe@kernel.dk>
- <x49pnum5jfv.fsf@segfault.boston.devel.redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8dc2ea1d-b6a4-728b-7550-87d32240989c@kernel.dk>
-Date:   Fri, 30 Nov 2018 14:57:58 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726454AbeLAJPL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 1 Dec 2018 04:15:11 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57136 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725749AbeLAJPL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 1 Dec 2018 04:15:11 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id BD305753E2;
+        Fri, 30 Nov 2018 22:04:27 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.149])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4990F6012E;
+        Fri, 30 Nov 2018 22:04:24 +0000 (UTC)
+Date:   Fri, 30 Nov 2018 17:04:23 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Mikulas Patocka <mpatocka@redhat.com>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, "Alasdair G. Kergon" <agk@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH 2/3] block: switch to per-cpu in-flight counters
+Message-ID: <20181130220423.GC15049@redhat.com>
+References: <20181128004250.325095242@debian.vm>
+ <20181130214433.GA15049@redhat.com>
+ <2a7c33ef-0bd0-d901-6a11-cffca1751b9e@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <x49pnum5jfv.fsf@segfault.boston.devel.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2a7c33ef-0bd0-d901-6a11-cffca1751b9e@kernel.dk>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Fri, 30 Nov 2018 22:04:27 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/30/18 2:44 PM, Jeff Moyer wrote:
-> Hi, Jens,
+On Fri, Nov 30 2018 at  4:52pm -0500,
+Jens Axboe <axboe@kernel.dk> wrote:
+
+> On 11/30/18 2:44 PM, Mike Snitzer wrote:
+> > On Tue, Nov 27 2018 at  7:42pm -0500,
+> > Mikulas Patocka <mpatocka@redhat.com> wrote:
+> > 
+> >> Now when part_round_stats is gone, we can switch to per-cpu in-flight
+> >> counters.
+> >>
+> >> We use the local-atomic type local_t, so that if part_inc_in_flight or
+> >> part_dec_in_flight is reentrantly called from an interrupt, the value will
+> >> be correct.
+> >>
+> >> The other counters could be corrupted due to reentrant interrupt, but the
+> >> corruption only results in slight counter skew - the in_flight counter
+> >> must be exact, so it needs local_t.
+> >>
+> >> Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+> >>
+> >> ---
+> >>  block/bio.c           |    4 ++--
+> >>  block/blk-core.c      |    4 ++--
+> >>  block/blk-merge.c     |    2 +-
+> >>  block/genhd.c         |   47 +++++++++++++++++++++++++++++++++++------------
+> >>  drivers/md/dm.c       |    4 +---
+> >>  include/linux/genhd.h |    7 ++++---
+> >>  6 files changed, 45 insertions(+), 23 deletions(-)
+> >>
+> >> Index: linux-block/block/genhd.c
+> >> ===================================================================
+> >> --- linux-block.orig/block/genhd.c	2018-11-28 00:09:59.000000000 +0100
+> >> +++ linux-block/block/genhd.c	2018-11-28 00:09:59.000000000 +0100
+> >> @@ -45,53 +45,76 @@ static void disk_add_events(struct gendi
+> >>  static void disk_del_events(struct gendisk *disk);
+> >>  static void disk_release_events(struct gendisk *disk);
+> >>  
+> >> -void part_inc_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
+> >> +void part_inc_in_flight(struct request_queue *q, int cpu, struct hd_struct *part, int rw)
+> >>  {
+> >>  	if (queue_is_mq(q))
+> >>  		return;
+> >>  
+> >> -	atomic_inc(&part->in_flight[rw]);
+> >> +	local_inc(per_cpu_ptr(part->dkstats, cpu)->in_flight);
+> >>  	if (part->partno)
+> >> -		atomic_inc(&part_to_disk(part)->part0.in_flight[rw]);
+> >> +		local_inc(per_cpu_ptr(part_to_disk(part)->part0.dkstats, cpu)->in_flight);
+> >>  }
+> >>  
+> >> -void part_dec_in_flight(struct request_queue *q, struct hd_struct *part, int rw)
+> >> +void part_dec_in_flight(struct request_queue *q, int cpu, struct hd_struct *part, int rw)
+> >>  {
+> >>  	if (queue_is_mq(q))
+> >>  		return;
+> >>  
+> >> -	atomic_dec(&part->in_flight[rw]);
+> >> +	local_dec(per_cpu_ptr(part->dkstats, cpu)->in_flight);
+> >>  	if (part->partno)
+> >> -		atomic_dec(&part_to_disk(part)->part0.in_flight[rw]);
+> >> +		local_dec(per_cpu_ptr(part_to_disk(part)->part0.dkstats, cpu)->in_flight);
+> >>  }
+> > 
+> > 
+> > The above is wrong, needs this incremental fix:
 > 
-> Jens Axboe <axboe@kernel.dk> writes:
-> 
->> If we have fixed user buffers, we can map them into the kernel when we
->> setup the io_context. That avoids the need to do get_user_pages() for
->> each and every IO.
->>
->> To utilize this feature, the application must set both
->> IOCTX_FLAG_USERIOCB, to provide iocb's in userspace, and then
->> IOCTX_FLAG_FIXEDBUFS. The latter tells aio that the iocbs that are
->> mapped already contain valid destination and sizes. These buffers can
->> then be mapped into the kernel for the life time of the io_context, as
->> opposed to just the duration of the each single IO.
->>
->> Only works with non-vectored read/write commands for now, not with
->> PREADV/PWRITEV.
->>
->> A limit of 4M is imposed as the largest buffer we currently support.
->> There's nothing preventing us from going larger, but we need some cap,
->> and 4M seemed like it would definitely be big enough.
-> 
-> Doesn't this mean that a user can pin a bunch of memory?  Something like
-> 4MB * aio_max_nr?
-> 
-> $ sysctl fs.aio-max-nr
-> fs.aio-max-nr = 1048576
-> 
-> If so, it may be a good idea to account the memory under RLIMIT_MEMLOCK.
+> Should also be using this_cpu_inc/dec instead.
 
-Yes, it'll need some kind of limiting, right now the limit would indeed
-be aio-max-nr * 4MB. 4G isn't terrible, but...
-
-RLIMIT_MEMLOCK isn't a bad idea.
-
-> I'm not sure how close you are to proposing this patch set for realz.
-> If it's soon (now?), then CC-ing linux-api and writing man pages would
-> be a good idea.  I can help out with the libaio bits if you'd like.  I
-> haven't yet had time to take this stuff for a spin, sorry.  I'll try to
-> get to that soonish.
-
-I am proposing it for real, not sure how long it'll take to get it
-reviewed and moved forward. Unless I get lucky. 4.22 seems like a more
-viable version than 4.21.
-
-I'll take any help I can get on the API/man page parts. And/or testing!
-
-> The speedups are pretty impressive!
-
-That's why I put them in there, maybe that'd get peoples attention :-)
-
--- 
-Jens Axboe
-
+How so?  Mikulas is using local_t (original header speaks to why)
