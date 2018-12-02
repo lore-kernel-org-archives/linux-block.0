@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DB2AC64EB4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA001C04EB8
 	for <linux-block@archiver.kernel.org>; Sun,  2 Dec 2018 16:47:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D751120851
-	for <linux-block@archiver.kernel.org>; Sun,  2 Dec 2018 16:47:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1B6C20851
+	for <linux-block@archiver.kernel.org>; Sun,  2 Dec 2018 16:47:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="l24E/SpO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D751120851
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="jzKgonlN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1B6C20851
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725562AbeLBQr7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1725601AbeLBQr7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Sun, 2 Dec 2018 11:47:59 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:54662 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:54664 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725468AbeLBQr6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Dec 2018 11:47:58 -0500
+        with ESMTP id S1725468AbeLBQr7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Dec 2018 11:47:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=7wWcjVk4t3l/WAQnz6Ow/YsvmwGsVmR+BwuEX52Cjyw=; b=l24E/SpONeqIdN4r48uryYnKir
-        SYG8sxCe6f9D66t6XDFqslitY80OaNq3SCtWpUE/R1qnKJvbAWoUBKTMmFUIuePkeHJSKeOIDDIXd
-        yGA8XVARU3nEtxnaeVNFwrTXsWwVLYgizVmZX5ekBNbs5YTwH3MEo9TyHPNZyLL8D7ipIXVu5iEwQ
-        c4q/cbd0UzzIhmy3rdNi9bqDhpXelfxUcCnTTmOeCG8zlA9vtZThw6AfcGb9Cho0D5t/sfDIXeuLA
-        CiGe7W9pN8auGdVwA6fv+pyjVwDbMinVZfY3+2L+798zYkTHkjazr5ecLodt/PZZb6ephaETRkRxj
-        mQCGghVQ==;
+        bh=PEIzcJpy3wmcq5f+eYMjlUOuE0CnlWkpzgmtT8oDRiY=; b=jzKgonlNm4P7S6tqoRuJcDZSD/
+        yIWlUwWhkznyIeNYzikFTH2LfN6/GVUgi8la1X/h2Sb2l1yTnXW97opI9zlZ8PNYu700+ljUo2rrf
+        0nNQnjjfr8+kakpVDxHJ5OhMC1V2wfeC+G3xW80j7fEfhm4TbdZdRgqfXH+VdplZa25rNCIjZ++5Q
+        lQ1yKG3UqXQJWEgoPpj+iBhw9f+2Uz6SMKzNqNTILyKlVCyJzLzoDqJUyWsp54h5VL9xZn7GFNA7V
+        URa9y3zh4veRPzeG0qztBUJlo1xN2QDOxBSy05LnjxZQ8esc+AwwJcItTUG7nMxwCxVb+rqnJkjX/
+        BN3h4jXg==;
 Received: from 089144206221.atnat0015.highway.bob.at ([89.144.206.221] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gTUuP-0002Rv-T1; Sun, 02 Dec 2018 16:47:54 +0000
+        id 1gTUuN-0002Rg-BO; Sun, 02 Dec 2018 16:47:51 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@fb.com>, Keith Busch <keith.busch@intel.com>,
         Sagi Grimberg <sagi@grimberg.me>
 Cc:     Max Gurtovoy <maxg@mellanox.com>, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org
-Subject: [PATCH 05/13] nvme-pci: consolidate code for polling non-dedicated queues
-Date:   Sun,  2 Dec 2018 17:46:20 +0100
-Message-Id: <20181202164628.1116-6-hch@lst.de>
+Subject: [PATCH 04/13] nvme-pci: only allow polling with separate poll queues
+Date:   Sun,  2 Dec 2018 17:46:19 +0100
+Message-Id: <20181202164628.1116-5-hch@lst.de>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181202164628.1116-1-hch@lst.de>
 References: <20181202164628.1116-1-hch@lst.de>
@@ -57,95 +57,62 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We have three places that can poll for I/O completions on a normal
-interrupt-enabled queue.  All of them are in slow path code, so
-consolidate them to a single helper that uses spin_lock_irqsave and
-removes the fast path cqe_pending check.
+This will allow us to simplify both the regular NVMe interrupt handler
+and the upcoming aio poll code.  In addition to that the separate
+queues are generally a good idea for performance reasons.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/pci.c | 35 ++++++++++++-----------------------
- 1 file changed, 12 insertions(+), 23 deletions(-)
+ drivers/nvme/host/pci.c | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index d42bb76e5e78..10c26a2e355a 100644
+index b820dd0351cb..d42bb76e5e78 100644
 --- a/drivers/nvme/host/pci.c
 +++ b/drivers/nvme/host/pci.c
-@@ -1072,17 +1072,19 @@ static irqreturn_t nvme_irq_check(int irq, void *data)
- 	return IRQ_NONE;
+@@ -1089,13 +1089,6 @@ static int __nvme_poll(struct nvme_queue *nvmeq, unsigned int tag)
  }
  
--static int __nvme_poll(struct nvme_queue *nvmeq, unsigned int tag)
-+/*
-+ * Poll for completions any queue, including those not dedicated to polling.
-+ * Can be called from any context.
-+ */
-+static int nvme_poll_irqdisable(struct nvme_queue *nvmeq, unsigned int tag)
+ static int nvme_poll(struct blk_mq_hw_ctx *hctx)
+-{
+-	struct nvme_queue *nvmeq = hctx->driver_data;
+-
+-	return __nvme_poll(nvmeq, -1);
+-}
+-
+-static int nvme_poll_noirq(struct blk_mq_hw_ctx *hctx)
  {
-+	unsigned long flags;
+ 	struct nvme_queue *nvmeq = hctx->driver_data;
  	u16 start, end;
- 	int found;
+@@ -1605,12 +1598,11 @@ static const struct blk_mq_ops nvme_mq_admin_ops = {
  
--	if (!nvme_cqe_pending(nvmeq))
--		return 0;
--
--	spin_lock_irq(&nvmeq->cq_lock);
-+	spin_lock_irqsave(&nvmeq->cq_lock, flags);
- 	found = nvme_process_cq(nvmeq, &start, &end, tag);
--	spin_unlock_irq(&nvmeq->cq_lock);
-+	spin_unlock_irqrestore(&nvmeq->cq_lock, flags);
+ static const struct blk_mq_ops nvme_mq_ops = {
+ 	NVME_SHARED_MQ_OPS,
+-	.poll			= nvme_poll,
+ };
  
- 	nvme_complete_cqes(nvmeq, start, end);
- 	return found;
-@@ -1279,7 +1281,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
- 	/*
- 	 * Did we miss an interrupt?
- 	 */
--	if (__nvme_poll(nvmeq, req->tag)) {
-+	if (nvme_poll_irqdisable(nvmeq, req->tag)) {
- 		dev_warn(dev->ctrl.device,
- 			 "I/O %d QID %d timeout, completion polled\n",
- 			 req->tag, nvmeq->qid);
-@@ -1406,18 +1408,13 @@ static int nvme_suspend_queue(struct nvme_queue *nvmeq)
- static void nvme_disable_admin_queue(struct nvme_dev *dev, bool shutdown)
- {
- 	struct nvme_queue *nvmeq = &dev->queues[0];
--	u16 start, end;
+-static const struct blk_mq_ops nvme_mq_poll_noirq_ops = {
++static const struct blk_mq_ops nvme_mq_poll_ops = {
+ 	NVME_SHARED_MQ_OPS,
+-	.poll			= nvme_poll_noirq,
++	.poll			= nvme_poll,
+ };
  
- 	if (shutdown)
- 		nvme_shutdown_ctrl(&dev->ctrl);
- 	else
- 		nvme_disable_ctrl(&dev->ctrl, dev->ctrl.cap);
+ static void nvme_dev_remove_admin(struct nvme_dev *dev)
+@@ -2298,10 +2290,10 @@ static int nvme_dev_add(struct nvme_dev *dev)
+ 	int ret;
  
--	spin_lock_irq(&nvmeq->cq_lock);
--	nvme_process_cq(nvmeq, &start, &end, -1);
--	spin_unlock_irq(&nvmeq->cq_lock);
--
--	nvme_complete_cqes(nvmeq, start, end);
-+	nvme_poll_irqdisable(nvmeq, -1);
- }
+ 	if (!dev->ctrl.tagset) {
+-		if (!dev->io_queues[HCTX_TYPE_POLL])
+-			dev->tagset.ops = &nvme_mq_ops;
++		if (dev->io_queues[HCTX_TYPE_POLL])
++			dev->tagset.ops = &nvme_mq_poll_ops;
+ 		else
+-			dev->tagset.ops = &nvme_mq_poll_noirq_ops;
++			dev->tagset.ops = &nvme_mq_ops;
  
- static int nvme_cmb_qdepth(struct nvme_dev *dev, int nr_io_queues,
-@@ -2217,17 +2214,9 @@ static void nvme_del_queue_end(struct request *req, blk_status_t error)
- static void nvme_del_cq_end(struct request *req, blk_status_t error)
- {
- 	struct nvme_queue *nvmeq = req->end_io_data;
--	u16 start, end;
- 
--	if (!error) {
--		unsigned long flags;
--
--		spin_lock_irqsave(&nvmeq->cq_lock, flags);
--		nvme_process_cq(nvmeq, &start, &end, -1);
--		spin_unlock_irqrestore(&nvmeq->cq_lock, flags);
--
--		nvme_complete_cqes(nvmeq, start, end);
--	}
-+	if (!error)
-+		nvme_poll_irqdisable(nvmeq, -1);
- 
- 	nvme_del_queue_end(req, error);
- }
+ 		dev->tagset.nr_hw_queues = dev->online_queues - 1;
+ 		dev->tagset.nr_maps = HCTX_MAX_TYPES;
 -- 
 2.19.1
 
