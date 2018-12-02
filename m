@@ -4,49 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93566C64EB4
-	for <linux-block@archiver.kernel.org>; Sun,  2 Dec 2018 16:48:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDFE9C64EB4
+	for <linux-block@archiver.kernel.org>; Sun,  2 Dec 2018 16:48:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B03D20851
-	for <linux-block@archiver.kernel.org>; Sun,  2 Dec 2018 16:48:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7AA6420851
+	for <linux-block@archiver.kernel.org>; Sun,  2 Dec 2018 16:48:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qo9TdPcL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B03D20851
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JePxls+V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AA6420851
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725764AbeLBQs0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 2 Dec 2018 11:48:26 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:57238 "EHLO
+        id S1725765AbeLBQs3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 2 Dec 2018 11:48:29 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:57576 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725747AbeLBQs0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Dec 2018 11:48:26 -0500
+        with ESMTP id S1725468AbeLBQs3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Dec 2018 11:48:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=yonbpNgrgmhegygaJoKmapITrVQwpqVv+gSyiLQ9B6w=; b=qo9TdPcLElnKSjPL0nt4B/8Zr5
-        0ScgM+1OG5zDqXoIm3IUJUVaXQ1mxRBQVWf7LTSLVkv3QLCN/8hgJElflnJq0GSJccMG0F+6Ba0Gk
-        7RJJf5MmWiNRJXmjYBpU+bRDjyKIG6FY2ABI2Soqa2vP87VH741B5tLLLK2UzPYgFydHlPmDic1KD
-        E8zOHVwCWj+vi0TiwHXRkuwMeMZ+ueXgQCawEm6Ei6fIZK/nbTLUlKYu5VEoxwB1tcD1jmyMGMTOe
-        T6Cml6quaXv/u6iKCjKeW6sievDnaDAXyTyA79ciGOWEXAIyNe5m1t1Y8z4q9Ql/oIpHyJ8JJSLdx
-        wivSxcgw==;
+        bh=ykAaLZV2iF6SPE0j2qoE/d4tLRBOGBVmZGLykGCOQU4=; b=JePxls+VZH2J6AQcwUSuDdlnjJ
+        kqLShlGt2Ux10xmSnRLH0RBYyLbtZW/jW4hvHSCqh1DkPNJXuMST/gJskCctA7JwOzbOC0pAxuXOn
+        5o+uPF3Hcq7XJsoNexg6SYJMJUH6szG+LhWlO2tQ4APvyvtkDDAM6VROI39eC0wogDpFYT1vVA6UM
+        z/CU1NF7LnuJ8avqz3XJFAhE4Vbh+8Vj/+sJ8TpxsMYEoH5ExwcQNk72X9f3a8p0SoUCaUyAoM9T1
+        C/poACWYI8aA7vYldI/FvyebyIHI79oqKovNnx/YgG6LAWwEFAtFT+Qf954nLmvn21Nu2V2E/CDxQ
+        DTZd7ubw==;
 Received: from 089144206221.atnat0015.highway.bob.at ([89.144.206.221] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gTUug-0002er-3p; Sun, 02 Dec 2018 16:48:10 +0000
+        id 1gTUul-0002ln-Fg; Sun, 02 Dec 2018 16:48:15 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@fb.com>, Keith Busch <keith.busch@intel.com>,
         Sagi Grimberg <sagi@grimberg.me>
 Cc:     Max Gurtovoy <maxg@mellanox.com>, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org
-Subject: [PATCH 11/13] block: remove ->poll_fn
-Date:   Sun,  2 Dec 2018 17:46:26 +0100
-Message-Id: <20181202164628.1116-12-hch@lst.de>
+Subject: [PATCH 13/13] block: enable polling by default if a poll map is initalized
+Date:   Sun,  2 Dec 2018 17:46:28 +0100
+Message-Id: <20181202164628.1116-14-hch@lst.de>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20181202164628.1116-1-hch@lst.de>
 References: <20181202164628.1116-1-hch@lst.de>
@@ -58,132 +57,27 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This was intended to support users like nvme multipath, but is just
-getting in the way and adding another indirect call.
+If the user did setup polling in the driver we should not require
+another know in the block layer to enable it.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-core.c       | 23 -----------------------
- block/blk-mq.c         | 24 +++++++++++++++++++-----
- include/linux/blkdev.h |  2 --
- 3 files changed, 19 insertions(+), 30 deletions(-)
+ block/blk-mq.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 3f6f5e6c2fe4..942276399085 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1249,29 +1249,6 @@ blk_qc_t submit_bio(struct bio *bio)
- }
- EXPORT_SYMBOL(submit_bio);
- 
--/**
-- * blk_poll - poll for IO completions
-- * @q:  the queue
-- * @cookie: cookie passed back at IO submission time
-- * @spin: whether to spin for completions
-- *
-- * Description:
-- *    Poll for completions on the passed in queue. Returns number of
-- *    completed entries found. If @spin is true, then blk_poll will continue
-- *    looping until at least one completion is found, unless the task is
-- *    otherwise marked running (or we need to reschedule).
-- */
--int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
--{
--	if (!q->poll_fn || !blk_qc_t_valid(cookie))
--		return 0;
--
--	if (current->plug)
--		blk_flush_plug_list(current->plug, false);
--	return q->poll_fn(q, cookie, spin);
--}
--EXPORT_SYMBOL_GPL(blk_poll);
--
- /**
-  * blk_cloned_rq_check_limits - Helper function to check a cloned request
-  *                              for new the queue limits
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 7dcef565dc0f..9c90c5038d07 100644
+index 9c90c5038d07..a550a00ac00c 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -38,7 +38,6 @@
- #include "blk-mq-sched.h"
- #include "blk-rq-qos.h"
+@@ -2811,6 +2811,8 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	q->tag_set = set;
  
--static int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, bool spin);
- static void blk_mq_poll_stats_start(struct request_queue *q);
- static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
+ 	q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
++	if (set->nr_maps > HCTX_TYPE_POLL)
++		blk_queue_flag_set(QUEUE_FLAG_POLL, q);
  
-@@ -2823,8 +2822,6 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	spin_lock_init(&q->requeue_lock);
- 
- 	blk_queue_make_request(q, blk_mq_make_request);
--	if (q->mq_ops->poll)
--		q->poll_fn = blk_mq_poll;
- 
- 	/*
- 	 * Do this after blk_queue_make_request() overrides it...
-@@ -3385,14 +3382,30 @@ static bool blk_mq_poll_hybrid(struct request_queue *q,
- 	return blk_mq_poll_hybrid_sleep(q, hctx, rq);
- }
- 
--static int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
-+/**
-+ * blk_poll - poll for IO completions
-+ * @q:  the queue
-+ * @cookie: cookie passed back at IO submission time
-+ * @spin: whether to spin for completions
-+ *
-+ * Description:
-+ *    Poll for completions on the passed in queue. Returns number of
-+ *    completed entries found. If @spin is true, then blk_poll will continue
-+ *    looping until at least one completion is found, unless the task is
-+ *    otherwise marked running (or we need to reschedule).
-+ */
-+int blk_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	long state;
- 
--	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
-+	if (!blk_qc_t_valid(cookie) ||
-+	    !test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
- 		return 0;
- 
-+	if (current->plug)
-+		blk_flush_plug_list(current->plug, false);
-+
- 	hctx = q->queue_hw_ctx[blk_qc_t_to_queue_num(cookie)];
- 
- 	/*
-@@ -3433,6 +3446,7 @@ static int blk_mq_poll(struct request_queue *q, blk_qc_t cookie, bool spin)
- 	__set_current_state(TASK_RUNNING);
- 	return 0;
- }
-+EXPORT_SYMBOL_GPL(blk_poll);
- 
- unsigned int blk_mq_rq_cpu(struct request *rq)
- {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 08d940f85fa0..0b3874bdbc6a 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -283,7 +283,6 @@ static inline unsigned short req_get_ioprio(struct request *req)
- struct blk_queue_ctx;
- 
- typedef blk_qc_t (make_request_fn) (struct request_queue *q, struct bio *bio);
--typedef int (poll_q_fn) (struct request_queue *q, blk_qc_t, bool spin);
- 
- struct bio_vec;
- typedef int (dma_drain_needed_fn)(struct request *);
-@@ -401,7 +400,6 @@ struct request_queue {
- 	struct rq_qos		*rq_qos;
- 
- 	make_request_fn		*make_request_fn;
--	poll_q_fn		*poll_fn;
- 	dma_drain_needed_fn	*dma_drain_needed;
- 
- 	const struct blk_mq_ops	*mq_ops;
+ 	if (!(set->flags & BLK_MQ_F_SG_MERGE))
+ 		blk_queue_flag_set(QUEUE_FLAG_NO_SG_MERGE, q);
 -- 
 2.19.1
 
