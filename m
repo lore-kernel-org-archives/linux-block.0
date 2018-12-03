@@ -2,115 +2,142 @@ Return-Path: <SRS0=uopx=OM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC65C04EBF
-	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 18:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0515FC04EBF
+	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 18:59:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DDA26208A3
-	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 18:57:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bTZJ00g8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDA26208A3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=broadcom.com
+	by mail.kernel.org (Postfix) with ESMTP id C84D820848
+	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 18:59:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C84D820848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726030AbeLCS5o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Dec 2018 13:57:44 -0500
-Received: from mail-pl1-f181.google.com ([209.85.214.181]:45401 "EHLO
-        mail-pl1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726015AbeLCS5o (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 13:57:44 -0500
-Received: by mail-pl1-f181.google.com with SMTP id a14so6911335plm.12
-        for <linux-block@vger.kernel.org>; Mon, 03 Dec 2018 10:57:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=2d/gJnVLoLtlTisUqT8Dy71CWwPnyVGjWkZfAyew+JI=;
-        b=bTZJ00g8haQGdUUeuxe3hYH1ztsjAI4FnqrZ+a6MmBk7/OHMdR6Fdkz1d8aX9w4D0N
-         ZuGnvN3z5R4lBYwzOhoqblBBWsbwrXPf/DZsk8i2AjSu/I6PTkh5CMrvn5bMpvYSiLz5
-         zqZQY4W78BMcvOatmMzQrsrX3360+ihR4Z6XI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=2d/gJnVLoLtlTisUqT8Dy71CWwPnyVGjWkZfAyew+JI=;
-        b=jZ1j7N1NB4NmNtSgo70JvyCqGx3qmHoVSHWJw5wpgKiNtp0nBwAbZ5PVBCmL2ieR51
-         sn5344LEJe7qaTIcMeHdz3mao80SXZJ7Grb5C+JQdUhok8WvcN3SsN3XROBhr5QUIoOx
-         h6JsosYBZ9Qvb6jl4xw0a+ftjVnvKGaM7mV88+lyGhcr+pPeE3SNRPi7Pit83GeJmerO
-         /wEwS31fGzILIqqRKlVw3AgMon9mZCdzN8JkqZGd4xmMI7sdY6PrOzL7ZNk5OPRnQMYZ
-         Cw/c+B8iz5u7LGC+qtsGanorqQ2REIZqefEwjDZrkNHrFD0aSoZ33nmQdCGFt2beIeTd
-         S7+w==
-X-Gm-Message-State: AA+aEWbzx6YemEtFm1R9picPLu2pRLgEkTWki9SfJeo4hWWRqJgMjQiZ
-        awEdpUV/VXkU4BA/JRoCNigiIQ==
-X-Google-Smtp-Source: AFSGD/XjbfiL0vyElfGTg5JyXgnmulzG8PrWMbgt581EuX5b3RVuh+3Z/jLIQHXTNTnJZyLw1rKfuA==
-X-Received: by 2002:a17:902:7481:: with SMTP id h1mr17264940pll.341.1543863461416;
-        Mon, 03 Dec 2018 10:57:41 -0800 (PST)
-Received: from [10.69.52.190] (igp-prod-emp-gw.vpn.broadcom.com. [192.19.223.250])
-        by smtp.gmail.com with ESMTPSA id p7sm18306016pfa.22.2018.12.03.10.57.37
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 03 Dec 2018 10:57:40 -0800 (PST)
-Subject: Re: [PATCH 1/2] blk-mq: Export iterating all tagged requests
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <20181130202635.11145-1-keith.busch@intel.com>
- <823fc3bf-78a4-c8fb-c80c-e3944f320af0@kernel.dk>
- <20181201164804.GB19557@lst.de>
- <9346f289-f265-e2ee-2d2c-c97973b45e23@suse.de>
- <0dbbafd4-8b40-5a95-1ea5-30e2cd61826b@acm.org>
-From:   James Smart <james.smart@broadcom.com>
-Message-ID: <2945fa16-3326-7ee8-bb0f-b953ac75b22b@broadcom.com>
-Date:   Mon, 3 Dec 2018 10:57:35 -0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.2
-MIME-Version: 1.0
-In-Reply-To: <0dbbafd4-8b40-5a95-1ea5-30e2cd61826b@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+        id S1726041AbeLCS7Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Dec 2018 13:59:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:62429 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725964AbeLCS7Q (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 3 Dec 2018 13:59:16 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D3E7F309178C;
+        Mon,  3 Dec 2018 18:59:12 +0000 (UTC)
+Received: from haswell-e.nc.xsintricity.com (ovpn-112-74.rdu2.redhat.com [10.10.112.74])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 655B360BE0;
+        Mon,  3 Dec 2018 18:59:09 +0000 (UTC)
+Message-ID: <e295bca26fce6408c7265292e81107b04a1a144d.camel@redhat.com>
+Subject: Re: [PATCH V2] mm: Replace all open encodings for NUMA_NO_NODE
+From:   Doug Ledford <dledford@redhat.com>
+To:     Anshuman Khandual <anshuman.khandual@arm.com>, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Cc:     ocfs2-devel@oss.oracle.com, linux-fbdev@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, netdev@vger.kernel.org,
+        intel-wired-lan@lists.osuosl.org, linux-media@vger.kernel.org,
+        iommu@lists.linux-foundation.org, linux-rdma@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux-block@vger.kernel.org,
+        sparclinux@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-ia64@vger.kernel.org, linux-alpha@vger.kernel.org,
+        akpm@linux-foundation.org, jiangqi903@gmail.com,
+        hverkuil@xs4all.nl, vkoul@kernel.org
+Date:   Mon, 03 Dec 2018 13:59:08 -0500
+In-Reply-To: <1543235202-9075-1-git-send-email-anshuman.khandual@arm.com>
+References: <1543235202-9075-1-git-send-email-anshuman.khandual@arm.com>
+Organization: Red Hat, Inc.
+Content-Type: multipart/signed; micalg="pgp-sha256";
+        protocol="application/pgp-signature"; boundary="=-Jgd362xHNNmppwzCQCK+"
+User-Agent: Evolution 3.30.2 (3.30.2-2.fc29) 
+Mime-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Mon, 03 Dec 2018 18:59:13 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
+--=-Jgd362xHNNmppwzCQCK+
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/1/2018 10:32 AM, Bart Van Assche wrote:
-> On 12/1/18 9:11 AM, Hannes Reinecke wrote:
->>
->> Yes, I'm very much in favour of this, too.
->> We always have this IMO slightly weird notion of stopping the queue, 
->> set some error flags in the driver, then _restarting_ the queue, just 
->> so that the driver then sees the error flag and terminates the requests.
->> Which I always found quite counter-intuitive.
->> So having a common helper for terminating requests for queue errors 
->> would be very welcomed here.
->>
->> But when we have that we really should audit all drivers to ensure 
->> they do the right thin (tm).
->
-> Would calling blk_abort_request() for all outstanding requests be 
-> sufficient to avoid that the queue has to be stopped and restarted in 
-> the nvme-fc driver?
+On Mon, 2018-11-26 at 17:56 +0530, Anshuman Khandual wrote:
+> At present there are multiple places where invalid node number is encoded
+> as -1. Even though implicitly understood it is always better to have macr=
+os
+> in there. Replace these open encodings for an invalid node number with th=
+e
+> global macro NUMA_NO_NODE. This helps remove NUMA related assumptions lik=
+e
+> 'invalid node' from various places redirecting them to a common definitio=
+n.
+>=20
+> Signed-off-by: Anshuman Khandual <anshuman.khandual@arm.com>
+> ---
+> Changes in V2:
+>=20
+> - Added inclusion of 'numa.h' header at various places per Andrew
+> - Updated 'dev_to_node' to use NUMA_NO_NODE instead per Vinod
+>=20
+> Changes in V1: (https://lkml.org/lkml/2018/11/23/485)
+>=20
+> - Dropped OCFS2 changes per Joseph
+> - Dropped media/video drivers changes per Hans
+>=20
+> RFC - https://patchwork.kernel.org/patch/10678035/
+>=20
+> Build tested this with multiple cross compiler options like alpha, sparc,
+> arm64, x86, powerpc, powerpc64le etc with their default config which migh=
+t
+> not have compiled tested all driver related changes. I will appreciate
+> folks giving this a test in their respective build environment.
+>=20
+> All these places for replacement were found by running the following grep
+> patterns on the entire kernel code. Please let me know if this might have
+> missed some instances. This might also have replaced some false positives=
+.
+> I will appreciate suggestions, inputs and review.
+>=20
+> 1. git grep "nid =3D=3D -1"
+> 2. git grep "node =3D=3D -1"
+> 3. git grep "nid =3D -1"
+> 4. git grep "node =3D -1"
+>=20
+>  drivers/infiniband/hw/hfi1/affinity.c         |  3 ++-
+>  drivers/infiniband/hw/hfi1/init.c             |  3 ++-
 
-what nvme-fc does is the same as what is done in all the other 
-transports - for the same reasons.  If we're eliminating those 
-synchronization reasons, and now that we've plugged the request_queue 
-path into the transports to check state appropriately, I don' t think 
-there are reasons to block the queue.  In some respects, it is nice to 
-stop new io while the work to terminate everything else happens, but I 
-don't know that it's required.  I would hope that the bounced work due 
-to the controller state (returned BLK_STAT_RESOURCE) is actually pausing 
-for a short while. I've seen some circumstances where it didn't and was 
-infinitely polling. Which would be a change in behavior vs the queue stops.
+For the drivers/infiniband changes,
 
--- james
+Acked-by: Doug Ledford <dledford@redhat.com>
+
+--=20
+Doug Ledford <dledford@redhat.com>
+    GPG KeyID: B826A3330E572FDD
+    Key fingerprint =3D AE6B 1BDA 122B 23B4 265B  1274 B826 A333 0E57 2FDD
+
+--=-Jgd362xHNNmppwzCQCK+
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEErmsb2hIrI7QmWxJ0uCajMw5XL90FAlwFfPwACgkQuCajMw5X
+L911nA/+Pq4noh4r/S3RhvajccFUfwzT5+IhZ7V69GHF9EaiPK8E1lka1m7BdNtX
+MlRVfjw6oW1Gs5uQFJfJC2qucbFLzZOm1I25GgzLq/iEq0ItnvUBVC13P2W5bmIa
+OB1zY9MRcBQs3T9W3/rcwFwxzYBIh9YsFNbq+op5uu5iUnKsLYenyPPTnWSVj5qO
+PWFKzPVxp68NmPpc/vPph6SrazSdSChuZFH06PElH0ifHC+Gde6gCuBSiX4dNCm5
+NzODtQz2AqmWPLS7XrgwtN2VGdjN8sPpQBcaYMV9aYOXzXdn5BexsgtoSd5VHdUN
+UZOUZQi/1UwA/i+Ngg86mv7nKWh/sxflS7a+F3u3xR9BoP09Gtt41Yu+zLZ28omr
+NTKrHWhoiv+WFY+iXoCCtPbI8TYjTuqyVhqHOZiMzX9rTxYBZ3wtHMOqmdQl5K69
+nnpJpIJr0uFEehieZvo7Tcvj28D7kDUwYN66HkEJcie71Uu45+lW2HoaIQwURsnY
+ot6h/yf8X2Pu1PY4A9FjXeFbECh4qXjZXevOz6vDaubqVwWtQdpoGl78KPd8WaJ+
+8tCtiT+L99uUE6sZoLaTdYd/EYsABxfbduwcTOdpNWVgxx2bxDXSgWkAd1bk0A0k
+zFoViov/qfs5E2JiGmVcxPeya+X/5gFMM8vJRwIvhMyokGfWRLg=
+=LheN
+-----END PGP SIGNATURE-----
+
+--=-Jgd362xHNNmppwzCQCK+--
 
