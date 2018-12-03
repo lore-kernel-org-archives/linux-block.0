@@ -1,194 +1,109 @@
-Return-Path: <SRS0=EAuX=OL=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=uopx=OM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9C00C04EB8
-	for <linux-block@archiver.kernel.org>; Sun,  2 Dec 2018 20:31:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC0A6C04EB9
+	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 07:45:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 91DDD20851
-	for <linux-block@archiver.kernel.org>; Sun,  2 Dec 2018 20:31:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5AFD120848
+	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 07:45:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nchF5epz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91DDD20851
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oxl4luaY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AFD120848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725730AbeLBUbZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 2 Dec 2018 15:31:25 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:41986 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725710AbeLBUbY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 2 Dec 2018 15:31:24 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wB2KTnOC010185;
-        Sun, 2 Dec 2018 20:31:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=uqJktl1DCrq8LhdqmMK8qNvpoIRJLFQt6X+JAWkq0YU=;
- b=nchF5epzwEuydipHlGTsFyds1679mfmA4X17gDPk0jZpz19dBomzMptlFV6WWZLBni3n
- BEI0/itmkZldZe+YZrqYy0ZmCzaMChcJeahOLEsov11F+cw25Geo9fOwA0n0Q6QAxfYk
- aleme0hNWHOAlaPCSuJc1CrqehBafEV1KpD8PDgy4PC+2ywgh7uYMjq6LxlP0+iPkjVr
- Mhd+CEurVMABqyPkdCQDbsm7MsyeOIebUUdUJL+SyRNM+bJvO+ZNS+YK67KYtZVoplfg
- WFkpVvQRgV8ZwbHd9F40Womp72JOzj9CAXaKBWbLtlqG9ErAswe5NmYxGDd+1v5ReKUW Gg== 
-Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
-        by userp2120.oracle.com with ESMTP id 2p3jxr36fj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 02 Dec 2018 20:31:15 +0000
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id wB2KV99j002576
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 2 Dec 2018 20:31:09 GMT
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id wB2KV8Oq007171;
-        Sun, 2 Dec 2018 20:31:08 GMT
-Received: from [10.159.153.92] (/10.159.153.92)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 02 Dec 2018 20:31:08 +0000
-Subject: Re: [Xen-devel] [PATCH] xen-blkfront: use old rinfo after enomem
- during migration
-To:     Boris Ostrovsky <boris.ostrovsky@oracle.com>, jgross@suse.com,
-        konrad.wilk@oracle.com, roger.pau@citrix.com, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, xen-devel@lists.xenproject.org
-References: <1543468665-22795-1-git-send-email-manjunath.b.patil@oracle.com>
- <fab88d94-79de-8ff4-be69-ff768b3f9697@oracle.com>
- <1dafcf3d-c3b6-e6c5-f5d4-fbdb549aaa9c@oracle.com>
- <3da66993-a044-c65c-88a6-c0672ab8814f@oracle.com>
-From:   Manjunath Patil <manjunath.b.patil@oracle.com>
-Organization: Oracle Corporation
-Message-ID: <f187b34d-8b05-a1ce-cc96-731729a7da55@oracle.com>
-Date:   Sun, 2 Dec 2018 12:31:06 -0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+        id S1725837AbeLCHpF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Dec 2018 02:45:05 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:53512 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725829AbeLCHpF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 02:45:05 -0500
+Received: by mail-wm1-f66.google.com with SMTP id y1so4588740wmi.3
+        for <linux-block@vger.kernel.org>; Sun, 02 Dec 2018 23:45:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=FNVkd13TImWK9c1N5Yyde6Y6ASFU3LTV6AkmuzU/OfY=;
+        b=Oxl4luaYiISBhBLZOSpF1R6D9VE4SVwtiE/fvgeuTg3F5IFYUlE/u5nf3fXoLNLuVp
+         LTW/MqW4EAA2YAJ9PC0QoAuMEpZhzlx5gdqffY1e3TuN3s4ZmItxAd8BT9F93MjZw7QX
+         FiqOpKxgvcZFBUA1JjbgNatZyhwN6YV5vASbsixVpePYwSuE4lTTgJcxWIdBSXY+bTHT
+         2BztP/OVK36LwTdP0fPI9sGvZr65SqeIHBb2WDjjZIwZlsltW6rREF+25Lbg1fzpwjVG
+         0G+SRNolh1PaeF5ibyiorjZ1eyBgNN13sQBvHseWx1tf92sGKvZ7UzSwB12LUF1806YK
+         Q2mA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=FNVkd13TImWK9c1N5Yyde6Y6ASFU3LTV6AkmuzU/OfY=;
+        b=nB6p2v5dxZWmXjGEFchX972Ykch3++IE1WESNbxKFW86dNAEJ5XCheDmMHyTa8G/FP
+         IY2CKftXKeFApctkrDVTD4iFBBl/FxoLbkI4U8kmiQj7aY3T1NQeLwyW/ZfKnfv8PQld
+         JKjvQ2hJ3R8wvflHtHDNRXi1ex4JHZngKRYzcyEihBQhlxN/mIdvYVaSFVWV5Qou0N8h
+         pwhMIEYzWF0dSaMZRTJ83RXiqxNwG7Ra5TNmGeywiB2WuYhezf79FyThfT2jT5Q4+UFG
+         IYe0FYeDYAtm4Q74WHOUbAH57StRY63YVGYliDObwbGEHl69nXozOTRhUdOCfQwdgsCY
+         Z7Lw==
+X-Gm-Message-State: AA+aEWamCQmTc9B6y6pTY6MA5SChsdIweZtZBFH+Hfxjzo6NX4Ie5DSv
+        7YtCdbtHuLSSvIgq1IPs1CKLRJk4h9UL/Au6p20=
+X-Google-Smtp-Source: AFSGD/XQXL0qHzId8iLDzFAz078i2lSaw7I9KjA3rnI1CCvGPUllyBVAmJCa71ezB8cEiYqp6YhOkxUXYX6d84jrIPI=
+X-Received: by 2002:a7b:c853:: with SMTP id c19mr6801233wml.61.1543823100906;
+ Sun, 02 Dec 2018 23:45:00 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <3da66993-a044-c65c-88a6-c0672ab8814f@oracle.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9095 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1812020197
+References: <20181130202635.11145-1-keith.busch@intel.com> <823fc3bf-78a4-c8fb-c80c-e3944f320af0@kernel.dk>
+ <20181201164804.GB19557@lst.de>
+In-Reply-To: <20181201164804.GB19557@lst.de>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Mon, 3 Dec 2018 15:44:48 +0800
+Message-ID: <CACVXFVMv1yT44=rGwyXxY+GKGLCzVH8-+A11wBTQMcaZOq5K9Q@mail.gmail.com>
+Subject: Re: [PATCH 1/2] blk-mq: Export iterating all tagged requests
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-nvme <linux-nvme@lists.infradead.org>,
+        Sagi Grimberg <sagi@grimberg.me>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/30/2018 2:33 PM, Boris Ostrovsky wrote:
+On Sun, Dec 2, 2018 at 12:48 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Fri, Nov 30, 2018 at 01:36:09PM -0700, Jens Axboe wrote:
+> > On 11/30/18 1:26 PM, Keith Busch wrote:
+> > > A driver may wish to iterate every tagged request, not just ones that
+> > > satisfy blk_mq_request_started(). The intended use is so a driver may
+> > > terminate entered requests on quiesced queues.
+> >
+> > How about we just move the started check into the handler passed in for
+> > those that care about it? Much saner to make the interface iterate
+> > everything, and leave whatever state check to the callback.
+>
+> So we used to do that, and I changed it back in May to test for
+> MQ_RQ_IN_FLIGHT, and then Ming changed it to check
+> blk_mq_request_started.  So this is clearly a minefield of sorts..
 
-> On 11/30/18 4:49 PM, Manjunath Patil wrote:
->> Thank you Boris for your comments. I removed faulty email of mine.
->>
->> replies inline.
->> On 11/30/2018 12:42 PM, Boris Ostrovsky wrote:
->>> On 11/29/18 12:17 AM, Manjunath Patil wrote:
->>>> Hi,
->>>> Feel free to suggest/comment on this.
->>>>
->>>> I am trying to do the following at dst during the migration now.
->>>> 1. Dont clear the old rinfo in blkif_free(). Instead just clean it.
->>>> 2. Store the old rinfo and nr_rings into temp variables in
->>>> negotiate_mq()
->>>> 3. let nr_rings get re-calculated based on backend data
->>>> 4. try allocating new memory based on new nr_rings
->>> Since I suspect number of rings will likely be the same why not reuse
->>> the rings in the common case?
->> I thought attaching devices will be more often than migration. Hence
->> did not want add to an extra check for
->>    - if I am inside migration code path and
->>    - if new nr_rings is equal to old nr_rings or not
->>
->> Sure addition of such a thing would avoid the memory allocation
->> altogether in migration path,
->> but it would add a little overhead for normal device addition.
->>
->> Do you think its worth adding that change?
->
-> IMO a couple of extra checks are not going to make much difference.
-I will add this change
->
-> I wonder though --- have you actually seen the case where you did fail
-> allocation and changes provided in this patch made things work? I am
-> asking because right after negotiate_mq() we will call setup_blkring()
-> and it will want to allocate bunch of memory. A failure there is fatal
-> (to ring setup). So it seems to me that you will survive negotiate_mq()
-> but then will likely fail soon after.
-I have noticed the ENOMEM insise negotiate_mq() on ct machine. When I 
-included my patch, I manually triggered the ENOMEM using a debug flag.
-The patch works for ENOMEM inside negotiate_mq().
+The change to blk_mq_request_started() is for just fixing SCSI's boot
+hang issue.
 
-As you mentioned, if we really hit the ENOMEM in negotiate_mq(), we 
-might hit it in setup_blkring() as well.
-We should add the similar change to blkif_sring struct as well.
+>
+> Note that at least mtip32xx, nbd, skd and the various nvme transports
+> want to use the function to terminate all requests in the error
+> path, and it would be great to have one single understood, documented
+> and debugged helper for that in the core, so this is a vote for moving
+> more of the logic in your second helper into the core code.  skd
+> will need actually use ->complete to release resources for that, though
+> and mtip plays some odd abort bits.  If it weren't for the interesting
+> abort behavior in nvme-fc that means we could even unexport the
+> low-level interface.
 
-I will make this change as well and send the new patch-set for review.
->
->>>
->>>> 5.
->>>>     a. If memory allocation is a success
->>>>        - free the old rinfo and proceed to use the new rinfo
->>>>     b. If memory allocation is a failure
->>>>        - use the old the rinfo
->>>>        - adjust the nr_rings to the lowest of new nr_rings and old
->>>> nr_rings
->>>> @@ -1918,10 +1936,24 @@ static int negotiate_mq(struct blkfront_info
->>>> *info)
->>>>                      sizeof(struct blkfront_ring_info),
->>>>                      GFP_KERNEL);
->>>>        if (!info->rinfo) {
->>>> -        xenbus_dev_fatal(info->xbdev, -ENOMEM, "allocating
->>>> ring_info structure");
->>>> -        info->nr_rings = 0;
->>>> -        return -ENOMEM;
->>>> -    }
->>>> +        if (unlikely(nr_rings_old)) {
->>>> +            /* We might waste some memory if
->>>> +             * info->nr_rings < nr_rings_old
->>>> +             */
->>>> +            info->rinfo = rinfo_old;
->>>> +            if (info->nr_rings > nr_rings_old)
->>>> +                info->nr_rings = nr_rings_old;
->>>> +            xenbus_dev_fatal(info->xbdev, -ENOMEM,
->>> Why xenbus_dev_fatal()?
->> I wanted to make sure that this msg is seen on console by default. So
->> that we know there was a enomem event happened and we recovered from it.
->> What do you suggest instead? xenbus_dev_error?
-> Neither. xenbus_dev_fatal() is going to change connection state so it is
-> certainly not what we want. And even xenbus_dev_error() doesn't look
-> like the right thing to do since as far as block device setup is
-> concerned there are no errors.
->
-> Maybe pr_warn().
-I will include this.
+Agree, and especially SCSI's use should be understood given
+SCSI is so widely deployed in product system.
 
-Thank you for your comments.
->
-> -boris
->
->
->>> -boris
->>>
->>>
->>>> +            "reusing old ring_info structure(new ring size=%d)",
->>>> +                info->nr_rings);
->>>> +        } else {
->>>> +            xenbus_dev_fatal(info->xbdev, -ENOMEM,
->>>> +                "allocating ring_info structure");
->>>> +            info->nr_rings = 0;
->>>> +            return -ENOMEM;
->>>> +        }
->>>> +    } else if (unlikely(nr_rings_old))
->>>> +        kfree(rinfo_old);
->>>>          for (i = 0; i < info->nr_rings; i++) {
->>>>            struct blkfront_ring_info *rinfo;
->
-> _______________________________________________
-> Xen-devel mailing list
-> Xen-devel@lists.xenproject.org
-> https://lists.xenproject.org/mailman/listinfo/xen-devel
-
+thanks,
+Ming Lei
