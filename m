@@ -2,117 +2,96 @@ Return-Path: <SRS0=uopx=OM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76DD2C04EB9
-	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 22:45:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF55EC04EB9
+	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 22:52:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3B1FC2145D
-	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 22:45:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="vOS4FP/C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B1FC2145D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
+	by mail.kernel.org (Postfix) with ESMTP id B2D9F2145D
+	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 22:52:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2D9F2145D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725858AbeLCWpv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Dec 2018 17:45:51 -0500
-Received: from mail-it1-f196.google.com ([209.85.166.196]:51774 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725943AbeLCWpv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 17:45:51 -0500
-Received: by mail-it1-f196.google.com with SMTP id x19so12173044itl.1
-        for <linux-block@vger.kernel.org>; Mon, 03 Dec 2018 14:45:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=OIqISCEH8tVp/fKknhIcymwhSUTaEsnQQ2+seQiv4VI=;
-        b=vOS4FP/CLRYsZm7jO69+hqjsaiyiI4rOq2fyyMok5tdZKm2ey1u5Q3n/K63fTo8md9
-         bcXnbZZyErXuBhMEV94VLsLw0Y2pSkDE3f3rmnNFo+pz7M0IOqbt4i5+ZzERKGl63hhr
-         Gr5726BTQNiNSOkpq6glIGHd45dGH+2EEqvUXeA7R7bVS89iIAkfvsodecF4xLXiAJ8J
-         kokRJESburWn9ZIGRJI+upE0ZJAI95aCKbArX7OVEOk2CBfznWREuEWfN8f7y0H5RAE1
-         R+wlXZmFBMFa+9lGMDwnhZytfVukTaYyVthPnDM04/KU/EDug11r7K8NfhGE+8fsEvc3
-         Pk1w==
+        id S1725931AbeLCWw0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Dec 2018 17:52:26 -0500
+Received: from mail-yw1-f68.google.com ([209.85.161.68]:37306 "EHLO
+        mail-yw1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725909AbeLCWw0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 17:52:26 -0500
+Received: by mail-yw1-f68.google.com with SMTP id h193so6141919ywc.4;
+        Mon, 03 Dec 2018 14:52:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=OIqISCEH8tVp/fKknhIcymwhSUTaEsnQQ2+seQiv4VI=;
-        b=UPNQ7t7Mdfz4GjoIeK6cvX/4qrNsssajVaOpSV+w5zHUOU9YZkYdoi0FgdbbzzDynD
-         ZjLxau75GGGCx5Tg7lZ85VOCNzE7wj2EKq7W0651SnZyovuGPjHnwOWrJUEMdy2SO9dV
-         uQqq2HjF/8k6J0S84Y24rkDGSIyrkSPuiyijQMymrWNNQDvnGgdVkhYIN5X2ajKczKRs
-         s8LzDowZQfl9UQxI/2ryJlzU4+FcF4bSLD3YRPdTDZgCj4RbfWf508fA5UjC1fVHbY4v
-         tSegypizStsjM5gxD2GnvKuzRBV7KRpcXIBANeI4QEKREAjSn+40gBitIgRpvX4dkAfL
-         cnDg==
-X-Gm-Message-State: AA+aEWa5V3tVLhFweWSH8u36fcGBid7s2yVh/sfJzTo+RRa1F1rAVcro
-        McWaPSU78lL3qwRyh1Nb2ShK363aoUA=
-X-Google-Smtp-Source: AFSGD/UvaQGaZTQszHQsYMjX1PqvdBMQLiDyzwXNUbS+AWYi/bNHlYD5y5pIwY6AXjN2V9ZTBDHMKg==
-X-Received: by 2002:a24:e4ce:: with SMTP id o197mr2866557ith.116.1543877150089;
-        Mon, 03 Dec 2018 14:45:50 -0800 (PST)
-Received: from vader.thefacebook.com ([2620:10d:c090:200::5:8421])
-        by smtp.gmail.com with ESMTPSA id z23sm6395708iob.19.2018.12.03.14.45.49
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=qlsB2qxyDXoJ5/gKi66gGtq+F1sMq5v1Kd3Slw2sXdQ=;
+        b=DrSgxjU+UXNHPRpWBMltuCpFSuTxFP9D1G13cMWIXmGzhMyDiw8LsuBbDCs5yUln3d
+         d1xFves/r6aXIB/9M1aztxwjGF4CTmEaJ3UxzSlPymFspejMYkoJ58FfUgvQ/pQtVHiy
+         WnoXYzPHYd5n9hbvgIjfxvvJqFq+ajG0zk7TsR+PX0aV2BT+Yl81J90tcD1+fe5ceyh/
+         MzZ8CiORT/PQsjQmE7OKAVOHSXUMGFvvI0bCt+9CaCsaOpNVpL1xt1ty189VKY2RhUJx
+         yrUurcefp2PmNultMEZGBruKwOXROrB7w5STxBa1/2YPwzwNab6Xr0nHvUML0NB0ewY+
+         bvWQ==
+X-Gm-Message-State: AA+aEWYYp/n8/6tnB2hj1KWRE7WuNrbLfzy11OPsMgP7M5k0tusHjJDu
+        LVXJewLK1vEDDggGm9V9hQ8=
+X-Google-Smtp-Source: AFSGD/V6kXmUFNr7zrmHRtYx7Wb/p1MnSkGVNctNAK3f2pLhKbCX/kVIaCJKqNZqiHG9j2VHkIS+0w==
+X-Received: by 2002:a81:3184:: with SMTP id x126mr17920910ywx.448.1543877545496;
+        Mon, 03 Dec 2018 14:52:25 -0800 (PST)
+Received: from dennisz-mbp.dhcp.thefacebook.com ([2620:10d:c091:200::7:e729])
+        by smtp.gmail.com with ESMTPSA id p3sm4763471ywc.14.2018.12.03.14.52.24
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 03 Dec 2018 14:45:49 -0800 (PST)
-From:   Omar Sandoval <osandov@osandov.com>
-To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, kernel-team@fb.com
-Subject: [PATCH] sbitmap: fix sbitmap_for_each_set()
-Date:   Mon,  3 Dec 2018 14:45:43 -0800
-Message-Id: <d83eb1df09213aafdd190fde18f406d1b988af3f.1543877128.git.osandov@fb.com>
-X-Mailer: git-send-email 2.19.2
+        Mon, 03 Dec 2018 14:52:24 -0800 (PST)
+Date:   Mon, 3 Dec 2018 17:52:22 -0500
+From:   Dennis Zhou <dennis@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Dennis Zhou <dennis@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Tejun Heo <tj@kernel.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 05/13] blkcg: associate blkg when associating a device
+Message-ID: <20181203225222.GA3801@dennisz-mbp.dhcp.thefacebook.com>
+References: <20181126211946.77067-1-dennis@kernel.org>
+ <20181126211946.77067-6-dennis@kernel.org>
+ <20181130095426.GB17103@infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181130095426.GB17103@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Omar Sandoval <osandov@fb.com>
+On Fri, Nov 30, 2018 at 01:54:26AM -0800, Christoph Hellwig wrote:
+> > diff --git a/include/linux/bio.h b/include/linux/bio.h
+> > index 62715a5a4f32..8bc9d9b29fd3 100644
+> > --- a/include/linux/bio.h
+> > +++ b/include/linux/bio.h
+> > @@ -486,6 +486,12 @@ extern unsigned int bvec_nr_vecs(unsigned short idx);
+> >  extern const char *bio_devname(struct bio *bio, char *buffer);
+> >  
+> >  #define bio_set_dev(bio, bdev) 			\
+> > +do {						\
+> > +	bio_set_dev_only(bio, bdev);		\
+> > +	bio_associate_blkg(bio);		\
+> > +} while (0)
+> > +
+> > +#define bio_set_dev_only(bio, bdev)		\
+> 
+> This lacks any explanation on when you would use bio_set_dev_only or
+> bio_set_dev.  Please document why we need both and why you'd choose or
+> the other.
 
-We need to ignore bits in the cleared mask when iterating over all set
-bits.
+I realized after thinking about this more and checking more use cases
+that it isn't as simple as swapping macro uses because many of the
+callers share common bio allocation paths. I think the simplest way
+forward is to have writeback and swap do reassociation and split out bio
+init code in a future series. So in v5, there is only bio_set_dev().
 
-Fixes: ea86ea2cdced ("sbitmap: ammortize cost of clearing bits")
-Signed-off-by: Omar Sandoval <osandov@fb.com>
----
- include/linux/sbitmap.h | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index 92806a2dbab7..03f50fcedc79 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -265,12 +265,14 @@ static inline void __sbitmap_for_each_set(struct sbitmap *sb,
- 	nr = SB_NR_TO_BIT(sb, start);
- 
- 	while (scanned < sb->depth) {
--		struct sbitmap_word *word = &sb->map[index];
--		unsigned int depth = min_t(unsigned int, word->depth - nr,
-+		unsigned long word;
-+		unsigned int depth = min_t(unsigned int,
-+					   sb->map[index].depth - nr,
- 					   sb->depth - scanned);
- 
- 		scanned += depth;
--		if (!word->word)
-+		word = sb->map[index].word & ~sb->map[index].cleared;
-+		if (!word)
- 			goto next;
- 
- 		/*
-@@ -280,7 +282,7 @@ static inline void __sbitmap_for_each_set(struct sbitmap *sb,
- 		 */
- 		depth += nr;
- 		while (1) {
--			nr = find_next_bit(&word->word, depth, nr);
-+			nr = find_next_bit(&word, depth, nr);
- 			if (nr >= depth)
- 				break;
- 			if (!fn(sb, (index << sb->shift) + nr, data))
--- 
-2.19.2
-
+Thanks,
+Dennis
