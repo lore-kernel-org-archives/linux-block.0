@@ -2,137 +2,150 @@ Return-Path: <SRS0=uopx=OM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-8.5 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02D07C04EB9
-	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 20:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E102C04EB9
+	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 20:58:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B425620661
-	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 20:23:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="cWi59BvH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B425620661
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
+	by mail.kernel.org (Postfix) with ESMTP id 2B6D120850
+	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 20:58:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B6D120850
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725961AbeLCUXB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Dec 2018 15:23:01 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:41537 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725946AbeLCUXB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 15:23:01 -0500
-Received: by mail-pf1-f194.google.com with SMTP id b7so6945420pfi.8
-        for <linux-block@vger.kernel.org>; Mon, 03 Dec 2018 12:23:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=C+Jb64N4UR0Stvftf0nkwi+ApQWzzf4fn/lCKUjbUiU=;
-        b=cWi59BvH43BcW2fxt0AQUKznDAcWzqMVuqqUoB7AqhViIB6bLDonLekl3FKsVYFcN4
-         IUJ1xeqib2NYUv6Mel2q+eFgZ0Jv06LRIsEt3QGV8TJZx0Y9mgIigUcbSK1uTtnkwRyp
-         wAul3xS4kCgKoxhFNHaoQshYrCDwlqHOYKS6rY31bO8hCfv6jXnLw5EO8jTrGyhwH6E2
-         MKvpDnDvOdCi/UikUlxOD+oY02e4ZuWEI+gt9I1ptDfzrV45PR1M7F+C3zcJk7FqB/YZ
-         UTi0ftmah7SywfG21FFwcIHlt2hbLhMtvFEDyuv5qo2/J8FH8Hidpm5rthkGnju9Z3ZO
-         DnfA==
+        id S1725958AbeLCU6s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Dec 2018 15:58:48 -0500
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:35081 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725952AbeLCU6r (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 15:58:47 -0500
+Received: by mail-qk1-f195.google.com with SMTP id w204so8276089qka.2;
+        Mon, 03 Dec 2018 12:58:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=C+Jb64N4UR0Stvftf0nkwi+ApQWzzf4fn/lCKUjbUiU=;
-        b=EHokh0lLs2U8FTqe5Ve4jLKO0zP0TgwMWZ0rslW9CbhrHn2XtOSm7Fxt3r8eEqHzJN
-         h/fb/44HyMTpRCChTVXIuvMrY6zacfB8cNVddSQ5MqwJzMQUYaOng8d4V2oqQ/t5qghu
-         nTvey0fw767MvwyP5Q2FZVLfbXCJerQxBieuD4YQt6h5k2YpHNwLKGk99BwuBl4MCkv9
-         D9AK5rGo/RtUJ/2NhqBjq/H+caerhw5J+ya0f11dis8PP6W9wb9wWynTjBu5XOoKyk4S
-         KKAiDZytqOZlKkQstwuFlvdFG3U9AmWnWr778bIz8MHu8kjwa1O79bpvkLlQoyKAMu1E
-         xZvw==
-X-Gm-Message-State: AA+aEWZlHWlbHNwRpkia+xtyJ9XZfpUuteAhNATOglZZ9rVb0wtBkmBC
-        6OUEnIVifNwJEVCHGYskC+MDBQ==
-X-Google-Smtp-Source: AFSGD/VJFFFcT1bwOI0FkfCngV+0mgFM59Qdhd6kTwHUsqAhTpMhsASkfTIO0cKLPzDPMBp9/iVh4g==
-X-Received: by 2002:a63:8d44:: with SMTP id z65mr14605391pgd.57.1543868579497;
-        Mon, 03 Dec 2018 12:22:59 -0800 (PST)
-Received: from vader ([2620:10d:c090:200::5:8421])
-        by smtp.gmail.com with ESMTPSA id f64sm50980902pfh.0.2018.12.03.12.22.58
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 03 Dec 2018 12:22:58 -0800 (PST)
-Date:   Mon, 3 Dec 2018 12:22:57 -0800
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2] blk-mq: don't call ktime_get_ns() if we don't need it
-Message-ID: <20181203202257.GC11220@vader>
-References: <73f58a60-cfa8-5736-d42a-9297601a1f71@kernel.dk>
+        bh=g9C1/r4c63to+g32lsRVecYhxr1QWtG5M1qbNkaLgcA=;
+        b=J2Uq+VCxmsOZTsF+k+gwya/bQR4hPdNOg2v4S7Z8R5Giv3HEdIwx9k03XznESMVicg
+         /OjH7mZNcBi31waf8XttkyK2eogeRdNzfaL5l8zomTHxBisd3q1oJoB5CAwL5sYHi4B/
+         Lq0Q83KrLGKTwD0RNllabJswrvAkKzplllFpV6b3T7AJsF5XEv+TSP2ELCKpGD0C+uBS
+         63dQnytbjv7nRLou5w9Wi7RNbx9/y48FgP5/OWdQ9fA+TrdWmRYAvKiCTsB8LeWSxzHA
+         Z9i227pB+Gp0Mxn2wN2XZcghum0fA6snc+/e0SD7mnnG/brImO7q2NyqnNu+uxZPJhG1
+         5VsQ==
+X-Gm-Message-State: AA+aEWYTDN5zZ12BvfpywWNb5uVHfebZzVVzKxQuSqo9qtRZcQsgFQe0
+        0hFJqb9QFCPirh2xi6h1qNo=
+X-Google-Smtp-Source: AFSGD/VqDQscYuJ8ALNwzh27HqgKOVYYtpdEPy2pZrvviMmp2qu3DbroicydTvMWekEl/qLtJTN6Xg==
+X-Received: by 2002:a37:6a42:: with SMTP id f63mr16354369qkc.224.1543870726289;
+        Mon, 03 Dec 2018 12:58:46 -0800 (PST)
+Received: from dennisz-mbp.dhcp.thefacebook.com ([2620:10d:c091:200::7:e729])
+        by smtp.gmail.com with ESMTPSA id z8sm9848396qth.34.2018.12.03.12.58.44
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 03 Dec 2018 12:58:45 -0800 (PST)
+Date:   Mon, 3 Dec 2018 15:58:42 -0500
+From:   Dennis Zhou <dennis@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Dennis Zhou <dennis@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Tejun Heo <tj@kernel.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 04/13] blkcg: introduce common blkg association logic
+Message-ID: <20181203205842.GA90035@dennisz-mbp.dhcp.thefacebook.com>
+References: <20181126211946.77067-1-dennis@kernel.org>
+ <20181126211946.77067-5-dennis@kernel.org>
+ <20181130095209.GA17103@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <73f58a60-cfa8-5736-d42a-9297601a1f71@kernel.dk>
-User-Agent: Mutt/1.11.0 (2018-11-25)
+In-Reply-To: <20181130095209.GA17103@infradead.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Nov 30, 2018 at 02:13:54PM -0700, Jens Axboe wrote:
-> We only need the request fields and the end_io time if we have
-> stats enabled, or if we have a scheduler attached as those may
-> use it for completion time stats.
+Hi Christoph,
 
-Reviewed-by: Omar Sandoval <osandov@fb.com>
+On Fri, Nov 30, 2018 at 01:52:09AM -0800, Christoph Hellwig wrote:
+> >  EXPORT_SYMBOL_GPL(bio_associate_blkcg);
+> >  
+> >  /**
+> > - * bio_associate_blkg - associate a bio with the a blkg
+> > + * bio_has_queue - required check for blkg association
+> > + * @bio: target bio
+> > + *
+> > + * A blkg represents the relationship between a blkcg and a request_queue.
+> > + * If there is no request_queue, there is no blkg and therefore nothing to
+> > + * associate with.
+> > + */
+> > +static inline bool bio_has_queue(struct bio *bio)
+> > +{
+> > +	return bio->bi_disk && bio->bi_disk->queue;
+> > +}
+> 
+> How do you ever see a bio without a queue?  We can't even do I/O in
+> that case.
 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> ---
-> 
-> v2: add helper, use it in both spots. also clear ->start_time_ns
->     so merging doesn't read garbage.
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 7dcef565dc0f..e09d7f500077 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -281,6 +281,15 @@ bool blk_mq_can_queue(struct blk_mq_hw_ctx *hctx)
->  }
->  EXPORT_SYMBOL(blk_mq_can_queue);
->  
-> +/*
-> + * Only need start/end time stamping if we have stats enabled, or using
-> + * an IO scheduler.
-> + */
-> +static inline bool blk_mq_need_time_stamp(struct request *rq)
-> +{
-> +	return (rq->rq_flags & RQF_IO_STAT) || rq->q->elevator;
-> +}
-> +
->  static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
->  		unsigned int tag, unsigned int op)
->  {
-> @@ -316,7 +325,10 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
->  	RB_CLEAR_NODE(&rq->rb_node);
->  	rq->rq_disk = NULL;
->  	rq->part = NULL;
-> -	rq->start_time_ns = ktime_get_ns();
-> +	if (blk_mq_need_time_stamp(rq))
-> +		rq->start_time_ns = ktime_get_ns();
-> +	else
-> +		rq->start_time_ns = 0;
->  	rq->io_start_time_ns = 0;
->  	rq->nr_phys_segments = 0;
->  #if defined(CONFIG_BLK_DEV_INTEGRITY)
-> @@ -522,7 +534,10 @@ EXPORT_SYMBOL_GPL(blk_mq_free_request);
->  
->  inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
->  {
-> -	u64 now = ktime_get_ns();
-> +	u64 now = 0;
-> +
-> +	if (blk_mq_need_time_stamp(rq))
-> +		now = ktime_get_ns();
->  
->  	if (rq->rq_flags & RQF_STATS) {
->  		blk_mq_poll_stats_start(rq->q);
-> -- 
-> Jens Axboe
-> 
+The case I found was with the flush bio in dm which is statically
+allocated in dm_alloc(). The issue issue is that bio_set_dev() is called
+on a bdev that isn't opened. So, the bdev wasn't pointing to a genhd.
+I've fixed the issue with the patch below, which will be added in v5.
+
+I think I was being overly cautious with the change and have taken this
+out in v5. It seems that this should be a one-off case which should work
+with the patch below.
+
+Thanks,
+Dennis
+
+---
+From 3ee13402af369ee8618549b63593d68ffca574ca Mon Sep 17 00:00:00 2001
+From: Dennis Zhou <dennis@kernel.org>
+Date: Mon, 3 Dec 2018 10:56:34 -0800
+Subject: [PATCH 05/14] dm: set flush bio device on demand
+
+The next patch changes the macro bio_set_dev() to associate a bio with a
+blkg based on the device set. However, dm creates a static bio to be
+used as the basis for cloning empty flush bios on creation. This
+association is with a not-opened bdev so bd_disk is %NULL. To easily get
+around this, we will set the device on the static bio every time and use
+that to copy to the other bios.
+
+Signed-off-by: Dennis Zhou <dennis@kernel.org>
+---
+ drivers/md/dm.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index a733e4c920af..b5e996c5c709 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1417,10 +1417,14 @@ static int __send_empty_flush(struct clone_info *ci)
+ 	unsigned target_nr = 0;
+ 	struct dm_target *ti;
+ 
++	bio_set_dev(ci->bio, ci->io->md->bdev);
++
+ 	BUG_ON(bio_has_data(ci->bio));
+ 	while ((ti = dm_table_get_target(ci->map, target_nr++)))
+ 		__send_duplicate_bios(ci, ti, ti->num_flush_bios, NULL);
+ 
++	bio_disassociate_blkg(ci->bio);
++
+ 	return 0;
+ }
+ 
+@@ -1939,7 +1943,6 @@ static struct mapped_device *alloc_dev(int minor)
+ 		goto bad;
+ 
+ 	bio_init(&md->flush_bio, NULL, 0);
+-	bio_set_dev(&md->flush_bio, md->bdev);
+ 	md->flush_bio.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH | REQ_SYNC;
+ 
+ 	dm_stats_init(&md->stats);
+-- 
+2.17.1
+
