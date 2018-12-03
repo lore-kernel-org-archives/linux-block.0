@@ -2,150 +2,100 @@ Return-Path: <SRS0=uopx=OM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E102C04EB9
-	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 20:58:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F99C04EB9
+	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 21:56:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2B6D120850
-	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 20:58:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B6D120850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 978CB20850
+	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 21:56:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lxVhJ7/X"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 978CB20850
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725958AbeLCU6s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Dec 2018 15:58:48 -0500
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:35081 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725952AbeLCU6r (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 15:58:47 -0500
-Received: by mail-qk1-f195.google.com with SMTP id w204so8276089qka.2;
-        Mon, 03 Dec 2018 12:58:46 -0800 (PST)
+        id S1725848AbeLCV4V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Dec 2018 16:56:21 -0500
+Received: from mail-io1-f41.google.com ([209.85.166.41]:34651 "EHLO
+        mail-io1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725808AbeLCV4V (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 16:56:21 -0500
+Received: by mail-io1-f41.google.com with SMTP id r9so4440906ioa.1
+        for <linux-block@vger.kernel.org>; Mon, 03 Dec 2018 13:56:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=b80Vd8FkCwLKcUnA02GWgUE14LNoCb7bPqkj5fjAUCI=;
+        b=lxVhJ7/XZSPzdS000kvFHvj5sK29qgAKMZKJ6U8clVPqZXGHw7BJPnjbyfhJNMM484
+         FEW9UudkRItrzO8T/kGdSSWF4A4Wt4PGiFntR3a/roDPy0zgsyadv+/9c8qYoRLQryY3
+         xs0i5icJJMTkNuVfyV3Nqd2s+i2pm80ukt7STYz7Xx5+TU7kkWQfGnLPUOwEAHfthISj
+         BY6Syd+jz8SyyH02JeZs0sn4TrDjlDtZctqtyZl+DPEMuC4aN+KM1X4JjVtAzcsVAbaS
+         GsjahmmUfB+4K58NeVtbAYJHqEA0uoumuNdOT6zm3HJen/vzdd/UnDxfz9qOciPtcFom
+         3yoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=g9C1/r4c63to+g32lsRVecYhxr1QWtG5M1qbNkaLgcA=;
-        b=J2Uq+VCxmsOZTsF+k+gwya/bQR4hPdNOg2v4S7Z8R5Giv3HEdIwx9k03XznESMVicg
-         /OjH7mZNcBi31waf8XttkyK2eogeRdNzfaL5l8zomTHxBisd3q1oJoB5CAwL5sYHi4B/
-         Lq0Q83KrLGKTwD0RNllabJswrvAkKzplllFpV6b3T7AJsF5XEv+TSP2ELCKpGD0C+uBS
-         63dQnytbjv7nRLou5w9Wi7RNbx9/y48FgP5/OWdQ9fA+TrdWmRYAvKiCTsB8LeWSxzHA
-         Z9i227pB+Gp0Mxn2wN2XZcghum0fA6snc+/e0SD7mnnG/brImO7q2NyqnNu+uxZPJhG1
-         5VsQ==
-X-Gm-Message-State: AA+aEWYTDN5zZ12BvfpywWNb5uVHfebZzVVzKxQuSqo9qtRZcQsgFQe0
-        0hFJqb9QFCPirh2xi6h1qNo=
-X-Google-Smtp-Source: AFSGD/VqDQscYuJ8ALNwzh27HqgKOVYYtpdEPy2pZrvviMmp2qu3DbroicydTvMWekEl/qLtJTN6Xg==
-X-Received: by 2002:a37:6a42:: with SMTP id f63mr16354369qkc.224.1543870726289;
-        Mon, 03 Dec 2018 12:58:46 -0800 (PST)
-Received: from dennisz-mbp.dhcp.thefacebook.com ([2620:10d:c091:200::7:e729])
-        by smtp.gmail.com with ESMTPSA id z8sm9848396qth.34.2018.12.03.12.58.44
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=b80Vd8FkCwLKcUnA02GWgUE14LNoCb7bPqkj5fjAUCI=;
+        b=lnTiGdyB4/dFZPxvXx3IBIqHFECxXlVzc9fWQwjm8XtZviIAaidnM6zssBeGkshWgW
+         Gfb4vc9PHHJvyMG4mxis5sNxTpEr3ADWOnLZ7rbzJsUzowBd8N8T7db6cY1iGqWBWsG0
+         wV+SJAb/gFxUob9Ge41ntUD1GsaHvdWm/wPHxAvg+bIFlcv/ivBi3wZG+sODFk0Kkz2H
+         kCjbUD7GiY7zr8xozh6A/ZguYEENqpcPdW1eCxUa+mtQj3I7YI+IXFcmoVbQwlAyo2mX
+         rBNQh/eHwFWzg1HIdFB2n33j4/OHieMyKpoT+D2J1pzcRVzVKU809YwDR/A5zsejHcfq
+         zogw==
+X-Gm-Message-State: AA+aEWajYcoWOn4YUFIOJ6hFPNuWQzVBAX3KiI5o6IHEwaDlafoCs9fY
+        rAWsWsAfMinALEdjgIayYdkGZvWk2tw=
+X-Google-Smtp-Source: AFSGD/WlFskyTKnoXX3hlWJcA8ddAwt0yxsNHnFxchsARhJrkRSB7XSwkLG8UFEZOeoY55FB5zjyPA==
+X-Received: by 2002:a6b:6604:: with SMTP id a4mr15226257ioc.10.1543874180776;
+        Mon, 03 Dec 2018 13:56:20 -0800 (PST)
+Received: from ?IPv6:2620:10d:c081:1131::106f? ([2620:10d:c090:180::1:94b1])
+        by smtp.gmail.com with ESMTPSA id z23sm6350902iob.19.2018.12.03.13.56.18
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 03 Dec 2018 12:58:45 -0800 (PST)
-Date:   Mon, 3 Dec 2018 15:58:42 -0500
-From:   Dennis Zhou <dennis@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Dennis Zhou <dennis@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Tejun Heo <tj@kernel.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 04/13] blkcg: introduce common blkg association logic
-Message-ID: <20181203205842.GA90035@dennisz-mbp.dhcp.thefacebook.com>
-References: <20181126211946.77067-1-dennis@kernel.org>
- <20181126211946.77067-5-dennis@kernel.org>
- <20181130095209.GA17103@infradead.org>
+        Mon, 03 Dec 2018 13:56:19 -0800 (PST)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     Omar Sandoval <osandov@osandov.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: sbitmap: check cleared bits when iterating busy bits
+Message-ID: <8bde3953-56d8-32cb-2c34-582d632f4a3f@kernel.dk>
+Date:   Mon, 3 Dec 2018 14:56:17 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181130095209.GA17103@infradead.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
+When we are iterating the set bits in a word, we also need to factor in
+the cleared bits. Don't call fn() unless the bit is also not set in
+the cleared word.
 
-On Fri, Nov 30, 2018 at 01:52:09AM -0800, Christoph Hellwig wrote:
-> >  EXPORT_SYMBOL_GPL(bio_associate_blkcg);
-> >  
-> >  /**
-> > - * bio_associate_blkg - associate a bio with the a blkg
-> > + * bio_has_queue - required check for blkg association
-> > + * @bio: target bio
-> > + *
-> > + * A blkg represents the relationship between a blkcg and a request_queue.
-> > + * If there is no request_queue, there is no blkg and therefore nothing to
-> > + * associate with.
-> > + */
-> > +static inline bool bio_has_queue(struct bio *bio)
-> > +{
-> > +	return bio->bi_disk && bio->bi_disk->queue;
-> > +}
-> 
-> How do you ever see a bio without a queue?  We can't even do I/O in
-> that case.
+Fixes: ea86ea2cdced ("sbitmap: ammortize cost of clearing bits")
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-The case I found was with the flush bio in dm which is statically
-allocated in dm_alloc(). The issue issue is that bio_set_dev() is called
-on a bdev that isn't opened. So, the bdev wasn't pointing to a genhd.
-I've fixed the issue with the patch below, which will be added in v5.
-
-I think I was being overly cautious with the change and have taken this
-out in v5. It seems that this should be a one-off case which should work
-with the patch below.
-
-Thanks,
-Dennis
-
----
-From 3ee13402af369ee8618549b63593d68ffca574ca Mon Sep 17 00:00:00 2001
-From: Dennis Zhou <dennis@kernel.org>
-Date: Mon, 3 Dec 2018 10:56:34 -0800
-Subject: [PATCH 05/14] dm: set flush bio device on demand
-
-The next patch changes the macro bio_set_dev() to associate a bio with a
-blkg based on the device set. However, dm creates a static bio to be
-used as the basis for cloning empty flush bios on creation. This
-association is with a not-opened bdev so bd_disk is %NULL. To easily get
-around this, we will set the device on the static bio every time and use
-that to copy to the other bios.
-
-Signed-off-by: Dennis Zhou <dennis@kernel.org>
----
- drivers/md/dm.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index a733e4c920af..b5e996c5c709 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1417,10 +1417,14 @@ static int __send_empty_flush(struct clone_info *ci)
- 	unsigned target_nr = 0;
- 	struct dm_target *ti;
+diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+index 92806a2dbab7..9f374fbcdba6 100644
+--- a/include/linux/sbitmap.h
++++ b/include/linux/sbitmap.h
+@@ -283,6 +283,11 @@ static inline void __sbitmap_for_each_set(struct sbitmap *sb,
+ 			nr = find_next_bit(&word->word, depth, nr);
+ 			if (nr >= depth)
+ 				break;
++			/* if set in cleared, it's actually free */
++			if (test_bit(nr, &word->cleared)) {
++				nr++;
++				continue;
++			}
+ 			if (!fn(sb, (index << sb->shift) + nr, data))
+ 				return;
  
-+	bio_set_dev(ci->bio, ci->io->md->bdev);
-+
- 	BUG_ON(bio_has_data(ci->bio));
- 	while ((ti = dm_table_get_target(ci->map, target_nr++)))
- 		__send_duplicate_bios(ci, ti, ti->num_flush_bios, NULL);
- 
-+	bio_disassociate_blkg(ci->bio);
-+
- 	return 0;
- }
- 
-@@ -1939,7 +1943,6 @@ static struct mapped_device *alloc_dev(int minor)
- 		goto bad;
- 
- 	bio_init(&md->flush_bio, NULL, 0);
--	bio_set_dev(&md->flush_bio, md->bdev);
- 	md->flush_bio.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH | REQ_SYNC;
- 
- 	dm_stats_init(&md->stats);
 -- 
-2.17.1
+Jens Axboe
 
