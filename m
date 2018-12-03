@@ -2,108 +2,143 @@ Return-Path: <SRS0=uopx=OM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC0A6C04EB9
-	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 07:45:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 817FBC04EB9
+	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 08:52:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5AFD120848
-	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 07:45:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 470492145D
+	for <linux-block@archiver.kernel.org>; Mon,  3 Dec 2018 08:52:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oxl4luaY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AFD120848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="uLdJVyCt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 470492145D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=owltronix.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725837AbeLCHpF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Dec 2018 02:45:05 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:53512 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725829AbeLCHpF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 02:45:05 -0500
-Received: by mail-wm1-f66.google.com with SMTP id y1so4588740wmi.3
-        for <linux-block@vger.kernel.org>; Sun, 02 Dec 2018 23:45:01 -0800 (PST)
+        id S1725849AbeLCIwQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Dec 2018 03:52:16 -0500
+Received: from mail-vs1-f67.google.com ([209.85.217.67]:45130 "EHLO
+        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725845AbeLCIwQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 03:52:16 -0500
+Received: by mail-vs1-f67.google.com with SMTP id v10so6995192vsv.12
+        for <linux-block@vger.kernel.org>; Mon, 03 Dec 2018 00:52:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=FNVkd13TImWK9c1N5Yyde6Y6ASFU3LTV6AkmuzU/OfY=;
-        b=Oxl4luaYiISBhBLZOSpF1R6D9VE4SVwtiE/fvgeuTg3F5IFYUlE/u5nf3fXoLNLuVp
-         LTW/MqW4EAA2YAJ9PC0QoAuMEpZhzlx5gdqffY1e3TuN3s4ZmItxAd8BT9F93MjZw7QX
-         FiqOpKxgvcZFBUA1JjbgNatZyhwN6YV5vASbsixVpePYwSuE4lTTgJcxWIdBSXY+bTHT
-         2BztP/OVK36LwTdP0fPI9sGvZr65SqeIHBb2WDjjZIwZlsltW6rREF+25Lbg1fzpwjVG
-         0G+SRNolh1PaeF5ibyiorjZ1eyBgNN13sQBvHseWx1tf92sGKvZ7UzSwB12LUF1806YK
-         Q2mA==
+        bh=ZYfdKfrfBvP7/WIcwpKCuI4vF//h63LhWY4XV20mz88=;
+        b=uLdJVyCtcOEBVpk9C7RxDrwU8XhduCp6djUXigJoSfyAayWBZoRsaTQwTNzk236vOT
+         P6UYtWZvGtUnuiZ89WpaY3myXCKp+EaoUeX4zLDRgFRBUvxRu9JVfnUEFt/VLdoi8EXj
+         jr9xbhEFJi+MBDTGRPpsqj9FdWsfoOckubTWdKL/XtVmf2jXeN9US7OJ/ttdhc4IpQlY
+         2I3KUficKkZD+NX9P3fKJzkn/GJ8AW7iDuzlqu3Pqj4THiTHYsb6V/D6r9QzFKXmd/cI
+         xtwV4Lluh4AdBjjbTeoNJ9RdHyULkpuip81FuTqiHtTHY4iFKTQrMe0CfzW21+zTOQky
+         G3dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=FNVkd13TImWK9c1N5Yyde6Y6ASFU3LTV6AkmuzU/OfY=;
-        b=nB6p2v5dxZWmXjGEFchX972Ykch3++IE1WESNbxKFW86dNAEJ5XCheDmMHyTa8G/FP
-         IY2CKftXKeFApctkrDVTD4iFBBl/FxoLbkI4U8kmiQj7aY3T1NQeLwyW/ZfKnfv8PQld
-         JKjvQ2hJ3R8wvflHtHDNRXi1ex4JHZngKRYzcyEihBQhlxN/mIdvYVaSFVWV5Qou0N8h
-         pwhMIEYzWF0dSaMZRTJ83RXiqxNwG7Ra5TNmGeywiB2WuYhezf79FyThfT2jT5Q4+UFG
-         IYe0FYeDYAtm4Q74WHOUbAH57StRY63YVGYliDObwbGEHl69nXozOTRhUdOCfQwdgsCY
-         Z7Lw==
-X-Gm-Message-State: AA+aEWamCQmTc9B6y6pTY6MA5SChsdIweZtZBFH+Hfxjzo6NX4Ie5DSv
-        7YtCdbtHuLSSvIgq1IPs1CKLRJk4h9UL/Au6p20=
-X-Google-Smtp-Source: AFSGD/XQXL0qHzId8iLDzFAz078i2lSaw7I9KjA3rnI1CCvGPUllyBVAmJCa71ezB8cEiYqp6YhOkxUXYX6d84jrIPI=
-X-Received: by 2002:a7b:c853:: with SMTP id c19mr6801233wml.61.1543823100906;
- Sun, 02 Dec 2018 23:45:00 -0800 (PST)
+        bh=ZYfdKfrfBvP7/WIcwpKCuI4vF//h63LhWY4XV20mz88=;
+        b=INMwnAs/O0TvdfAK1SJlU4Q3ErtC2Y73gnNC2UJyhLT5cG4cmjUEyvYNcTCp86q2R5
+         ZxhKtoSdMwUzrpuZA+r0safuxyefkjjH+xII1n28v9HTJdltNWEaJV6Sni1Dv5K2K6SZ
+         9hVCXolclzLUfjgUZ/AnUVLmsYFh+ojrRwdqXYkVbw32iRXXrjLXcaHjkRpzcqEKvPNP
+         QMOyd4VcVDRM1/8Q1lFXI8OmTeEWTBSNWzR6rrtpXqFOodNMKw1i5SoWO//ooZ8zG1yt
+         K5CyFN6/z8UwRxaD4+0FW6NTpj1Smb/mmad8CeldwICNGKhWg8Cy0fMFE2gtQJfahYBi
+         H0tg==
+X-Gm-Message-State: AA+aEWZiSlslDmFQedh6SPXLmGJwkR48zLasC/v4T3JQZ3rPIR3dy4m9
+        mgz3o0J4TPN5zdtErBpI02EQiP8bTmXXzyl/hahKcklMQsM=
+X-Google-Smtp-Source: AFSGD/U7aisI56uvRjD8YPqIiSxma9oi+Cuj+HGd424XIhH7YCgyrrVPj5ezrs3aja5OP9uDyA6Xl93aHZWywt7Etwc=
+X-Received: by 2002:a67:24c6:: with SMTP id k189mr6456401vsk.16.1543827129853;
+ Mon, 03 Dec 2018 00:52:09 -0800 (PST)
 MIME-Version: 1.0
-References: <20181130202635.11145-1-keith.busch@intel.com> <823fc3bf-78a4-c8fb-c80c-e3944f320af0@kernel.dk>
- <20181201164804.GB19557@lst.de>
-In-Reply-To: <20181201164804.GB19557@lst.de>
-From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Mon, 3 Dec 2018 15:44:48 +0800
-Message-ID: <CACVXFVMv1yT44=rGwyXxY+GKGLCzVH8-+A11wBTQMcaZOq5K9Q@mail.gmail.com>
-Subject: Re: [PATCH 1/2] blk-mq: Export iterating all tagged requests
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-nvme <linux-nvme@lists.infradead.org>,
-        Sagi Grimberg <sagi@grimberg.me>
+References: <20181130114402.43793-1-igor.j.konopko@intel.com> <CANr-nt33vO=egptfmCxDEdom5CKEEQ=NA1R5_z0Pe951-cPmSw@mail.gmail.com>
+In-Reply-To: <CANr-nt33vO=egptfmCxDEdom5CKEEQ=NA1R5_z0Pe951-cPmSw@mail.gmail.com>
+From:   Hans Holmberg <hans.ml.holmberg@owltronix.com>
+Date:   Mon, 3 Dec 2018 09:51:59 +0100
+Message-ID: <CANr-nt0NV61Rq9B19qeOHDN6gRGc76hdcxqQcgAVpysTBBEB8w@mail.gmail.com>
+Subject: Re: [PATCH v5 0/5] lightnvm: Flexible metadata
+To:     igor.j.konopko@intel.com
+Cc:     Matias Bjorling <mb@lightnvm.io>, linux-block@vger.kernel.org,
+        Javier Gonzalez <javier@cnexlabs.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Dec 2, 2018 at 12:48 AM Christoph Hellwig <hch@lst.de> wrote:
+Great! The tests(rocksdb, pblk recovery and the generic xfs suite)
+completed successfully on one of our disks, so feel free to add:
+
+Tested-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+
+Thanks,
+Hans
+On Fri, Nov 30, 2018 at 2:03 PM Hans Holmberg
+<hans.ml.holmberg@owltronix.com> wrote:
 >
-> On Fri, Nov 30, 2018 at 01:36:09PM -0700, Jens Axboe wrote:
-> > On 11/30/18 1:26 PM, Keith Busch wrote:
-> > > A driver may wish to iterate every tagged request, not just ones that
-> > > satisfy blk_mq_request_started(). The intended use is so a driver may
-> > > terminate entered requests on quiesced queues.
+> I just started a regression test on this patch set that'll run over
+> the weekend. I'll add a tested-by if everything checks out.
+>
+> All the best,
+> Hans
+> On Fri, Nov 30, 2018 at 12:49 PM Igor Konopko <igor.j.konopko@intel.com> wrote:
 > >
-> > How about we just move the started check into the handler passed in for
-> > those that care about it? Much saner to make the interface iterate
-> > everything, and leave whatever state check to the callback.
->
-> So we used to do that, and I changed it back in May to test for
-> MQ_RQ_IN_FLIGHT, and then Ming changed it to check
-> blk_mq_request_started.  So this is clearly a minefield of sorts..
-
-The change to blk_mq_request_started() is for just fixing SCSI's boot
-hang issue.
-
->
-> Note that at least mtip32xx, nbd, skd and the various nvme transports
-> want to use the function to terminate all requests in the error
-> path, and it would be great to have one single understood, documented
-> and debugged helper for that in the core, so this is a vote for moving
-> more of the logic in your second helper into the core code.  skd
-> will need actually use ->complete to release resources for that, though
-> and mtip plays some odd abort bits.  If it weren't for the interesting
-> abort behavior in nvme-fc that means we could even unexport the
-> low-level interface.
-
-Agree, and especially SCSI's use should be understood given
-SCSI is so widely deployed in product system.
-
-thanks,
-Ming Lei
+> > This series of patches extends the way how pblk can
+> > store L2P sector metadata. After this set of changes
+> > any size of NVMe metadata is supported in pblk.
+> > Also there is an support for case without NVMe metadata.
+> >
+> > Changes v4 --> v5:
+> > -rebase on top of ocssd/for-4.21/core
+> >
+> > Changes v3 --> v4:
+> > -rename nvm_alloc_dma_pool() to nvm_create_dma_pool()
+> > -split pblk_get_meta() calls and lba setting into
+> > two operations for better core readability
+> > -fixing compilation with CONFIG_NVM disabled
+> > -getting rid of unnecessary memcpy for packed metadata
+> > on write path
+> > -support for drives with oob size >0 and <16B in packed
+> > metadata mode
+> > -minor commit message updates
+> >
+> > Changes v2 --> v3:
+> > -Rebase on top of ocssd/for-4.21/core
+> > -get/set_meta_lba helpers were removed
+> > -dma reallocation was replaced with single allocation
+> > -oob metadata size was added to pblk structure
+> > -proper checks on pblk creation were added
+> >
+> > Changes v1 --> v2:
+> > -Revert sector meta size back to 16b for pblk
+> > -Dma pool for larger oob meta are handled in core instead of pblk
+> > -Pblk oob meta helpers uses __le64 as input outpu instead of u64
+> > -Other minor fixes based on v1 patch review
+> >
+> > Igor Konopko (5):
+> >   lightnvm: pblk: Move lba list to partial read context
+> >   lightnvm: pblk: Helpers for OOB metadata
+> >   lightnvm: Flexible DMA pool entry size
+> >   lightnvm: Disable interleaved metadata
+> >   lightnvm: pblk: Support for packed metadata
+> >
+> >  drivers/lightnvm/core.c          |  9 ++++--
+> >  drivers/lightnvm/pblk-core.c     | 61 +++++++++++++++++++++++++++++++------
+> >  drivers/lightnvm/pblk-init.c     | 44 +++++++++++++++++++++++++--
+> >  drivers/lightnvm/pblk-map.c      | 20 +++++++-----
+> >  drivers/lightnvm/pblk-rb.c       |  3 ++
+> >  drivers/lightnvm/pblk-read.c     | 66 +++++++++++++++++++++++-----------------
+> >  drivers/lightnvm/pblk-recovery.c | 25 +++++++++------
+> >  drivers/lightnvm/pblk-sysfs.c    |  7 +++++
+> >  drivers/lightnvm/pblk-write.c    |  9 +++---
+> >  drivers/lightnvm/pblk.h          | 24 +++++++++++++--
+> >  drivers/nvme/host/lightnvm.c     |  6 ++--
+> >  include/linux/lightnvm.h         |  3 +-
+> >  12 files changed, 209 insertions(+), 68 deletions(-)
+> >
+> > --
+> > 2.14.5
+> >
