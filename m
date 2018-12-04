@@ -2,182 +2,273 @@ Return-Path: <SRS0=ovnK=ON=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1955C04EB9
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 01:54:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AD6EC04EBF
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 01:54:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6838A2081C
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 01:54:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB70720850
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 01:54:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="o1UvByhm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6838A2081C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="C1ee96fP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB70720850
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726034AbeLDBwV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Dec 2018 20:52:21 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:39010 "EHLO
+        id S1726041AbeLDByL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Dec 2018 20:54:11 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:39028 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725937AbeLDBwU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 20:52:20 -0500
+        with ESMTP id S1726004AbeLDBwV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 20:52:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Message-Id:Date:Subject:Cc:To:From:
-        Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
-        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        d=infradead.org; s=bombadil.20170209; h=References:In-Reply-To:Message-Id:
+        Date:Subject:Cc:To:From:Sender:Reply-To:MIME-Version:Content-Type:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=hJd6EBluiw4U3ZnUhV8q7Tb+wHuvITbItn/5jn0A6YA=; b=o1UvByhmBRDGGfdisIAvRFdvq
-        G6d6Hz2kG/Q1QrmQihJvqIxEe3NW5YZiMchFAQ/Fmr2mfWYEF6iw4rbmvl4vD8VJTSSeiz3zM2mjV
-        b+giR5guXI99F+vj4nz3fkY5/3wXxuHHZENElfc4JGObHF+3CYrVn2bby9P83xv0TXI6aNNOzlgNU
-        ZskqDIF4S9440YXzLUbyRiXKkeGJWrvlPiiN4vfIAtiEkX07pL54+y7C2BK5wxzVbStc4sBPpjYiR
-        H1UpXQwvh7THmhl2q8e9yHqfaTCkgOkSnGJXiHjryyaXuwE4O5tODyXszccMbpHyfsUAmcjinCZ20
-        mQqNuA58g==;
+         bh=GqFaytTeevFHVbjUyezWxg8MRufMvsdod4y9qsi4NNU=; b=C1ee96fP89gGyh0R/Nz6X0s7O
+        cmK1AWjPfImTTdTZAw5DZJOCyoQy+lJfUWQaBCXrMHxyHWUGHu3Xj69xIObPGF5knN3Vf7cRlV4NI
+        vI3+7WgcdNE2KU1NG67KqkVien56bqgYwuTqz5KWvxr41d7S3EymZo0g8S+96+L3iW6qRRb1TC0YJ
+        um/h4Z7tZSE07h2WrofpngGrw2pttZE/THPg10uTh9BIdYBMyzyROToYU8OUcHHd+HnVAwrYBgIdp
+        C29GADq3q/2xOnNhyj7b/NhYtkO0Ncvxj2RrVkVMl8IjPY7biM5fQohwGSwKFd7J2kzfmkXgxZAmh
+        /m+DaAo4Q==;
 Received: from [2600:1700:65a0:78e0:514:7862:1503:8e4d] (helo=sagi-Latitude-E7470.lbits)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gTzsp-0003Zq-Fq; Tue, 04 Dec 2018 01:52:19 +0000
+        id 1gTzsq-0003Zq-Hh; Tue, 04 Dec 2018 01:52:20 +0000
 From:   Sagi Grimberg <sagi@grimberg.me>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Keith Busch <keith.busch@intel.com>,
         "David S. Miller" <davem@davemloft.net>
-Subject: [PATCH v5 00/13] TCP transport binding for NVMe over Fabrics
-Date:   Mon,  3 Dec 2018 17:52:04 -0800
-Message-Id: <20181204015217.16613-1-sagi@grimberg.me>
+Subject: [PATCH v5 04/13] datagram: consolidate datagram copy to iter helpers
+Date:   Mon,  3 Dec 2018 17:52:08 -0800
+Message-Id: <20181204015217.16613-5-sagi@grimberg.me>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20181204015217.16613-1-sagi@grimberg.me>
+References: <20181204015217.16613-1-sagi@grimberg.me>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch set implements the NVMe over Fabrics TCP host and the target
-drivers. Now NVMe over Fabrics can run on every Ethernet port in the world.
-The implementation conforms to NVMe over Fabrics 1.1 specification (which
-will include already publicly available NVMe/TCP transport binding, TP 8000).
+From: Sagi Grimberg <sagi@lightbitslabs.com>
 
-The host driver hooks into the NVMe host stack and implements the TCP
-transport binding for NVMe over Fabrics. The NVMe over Fabrics TCP host
-driver is responsible for establishing a NVMe/TCP connection, TCP event
-and error handling and data-plane messaging and stream processing.
+skb_copy_datagram_iter and skb_copy_and_csum_datagram are essentialy
+the same but with a couple of differences: The first is the copy
+operation used which either a simple copy or a csum_and_copy, and the
+second are the behavior on the "short copy" path where simply copy
+needs to return the number of bytes successfully copied while csum_and_copy
+needs to fault immediately as the checksum is partial.
 
-The target driver hooks into the NVMe target core stack and implements
-the TCP transport binding. The NVMe over Fabrics target driver is
-responsible for accepting and establishing NVMe/TCP connections, TCP
-event and error handling, and data-plane messaging and stream processing.
+Introduce __skb_datagram_iter that additionally accepts:
+1. copy operation function pointer
+2. private data that goes with the copy operation
+3. fault_short flag to indicate the action on short copy
 
-The implementation of both the host and target are fairly simple and
-straight-forward. Every NVMe queue is backed by a TCP socket that provides
-us reliable, in-order delivery of fabrics capsules and/or data.
+Suggested-by: David S. Miller <davem@davemloft.net>
+Acked-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sagi Grimberg <sagi@lightbitslabs.com>
+---
+ net/core/datagram.c | 136 ++++++++++++++------------------------------
+ 1 file changed, 42 insertions(+), 94 deletions(-)
 
-All NVMe queues are sharded over a private bound workqueue such that we
-always have a single context handling the byte stream and we don't need
-to worry about any locking/serialization. In addition, close attention
-was paid to a completely non-blocking data plane to minimize context
-switching and/or unforced scheduling.
-
-Also, @netdev mailing list is cc'd as this patch set contains generic
-helpers for online digest calculation (patches 1-3).
-
-The patchset structure:
-- patches 1-6 are prep to add a helper for digest calculation online
-  with data placement
-- patches 7-9 are preparatory patches for NVMe/TCP
-- patches 10-13 implements NVMe/TCP
-
-Thanks to the members of the Fabrics Linux Driver team that helped
-development, testing and benchmarking this work.
-
-Gitweb code is available at:
-
-	git://git.infradead.org/nvme.git nvme-tcp
-
-Changes from v4:
-- Added acks from Dave Miller for relevant patches
-- Fixed possible memory leak in nvmet-tcp error flow
-
-Changes from v3:
-- various changes based on comments from christoph
-  - removed unused variables
-  - united send/recv iter initialization
-  - removed unneeded void * casting
-  - fixed long lines
-  - removed unneeded wrappers (nvme_tcp_free_tagset and friends)
-  - remove null sgl setting
-  - fixed socket callbacks naming
-  - reworked nvmet-tcp send_list processing
-- omitted nvme-cli patches as no changes were made to them and no negative
-  feedback was accepted since v3
-
-Changes from v2:
-- fixed stupid missing symbol export for skb_copy_and_hash_datagram_iter 
-- dropped patch that moved err_work and connect_work to nvme_ctrl
-- fixed maxr2t icreq validation
-- got rid of host and target send/recv context structures by moving
-  the members directly to their parent structure along with some struct
-  documentation
-- removed bh disable when locking the queue lock
-- moved definition in nvme-tcp.h to appropriate patch
-- added patch to rework nvme-cli trtype handling for discovery log entries
-  a bit
-- rebased on top of nvme-4.21 branch
-- cleaned up some checkpatch warnings
-- collected review tags
-
-Changes from v1:
-- unified skb_copy_datagram_iter and skb_copy_and_csum_datagram (and the
-  new skb_hash_and_copy_datagram_iter) to a single code path
-- removed nvmet modparam budgets (made them a define set to their default
-  values)
-- fixed nvme-tcp host chained r2t transfers reported off-list
-- made .install_queue callout return nvme status code
-- Added some review tags
-- rebased on top of nvme-4.21 branch (nvme tree) + sqflow disable patches
-
-Sagi Grimberg (13):
-  ath6kl: add ath6kl_ prefix to crypto_type
-  datagram: open-code copy_page_to_iter
-  iov_iter: pass void csum pointer to csum_and_copy_to_iter
-  datagram: consolidate datagram copy to iter helpers
-  iov_iter: introduce hash_and_copy_to_iter helper
-  datagram: introduce skb_copy_and_hash_datagram_iter helper
-  nvmet: Add install_queue callout
-  nvme-fabrics: allow user passing header digest
-  nvme-fabrics: allow user passing data digest
-  nvme-tcp: Add protocol header
-  nvmet-tcp: add NVMe over TCP target driver
-  nvmet: allow configfs tcp trtype configuration
-  nvme-tcp: add NVMe over TCP host driver
-
- drivers/net/wireless/ath/ath6kl/cfg80211.c |    2 +-
- drivers/net/wireless/ath/ath6kl/common.h   |    2 +-
- drivers/net/wireless/ath/ath6kl/wmi.c      |    6 +-
- drivers/net/wireless/ath/ath6kl/wmi.h      |    6 +-
- drivers/nvme/host/Kconfig                  |   15 +
- drivers/nvme/host/Makefile                 |    3 +
- drivers/nvme/host/fabrics.c                |   10 +
- drivers/nvme/host/fabrics.h                |    4 +
- drivers/nvme/host/tcp.c                    | 2242 ++++++++++++++++++++
- drivers/nvme/target/Kconfig                |   10 +
- drivers/nvme/target/Makefile               |    2 +
- drivers/nvme/target/configfs.c             |    1 +
- drivers/nvme/target/fabrics-cmd.c          |   10 +
- drivers/nvme/target/nvmet.h                |    1 +
- drivers/nvme/target/tcp.c                  | 1737 +++++++++++++++
- include/linux/nvme-tcp.h                   |  189 ++
- include/linux/nvme.h                       |    1 +
- include/linux/skbuff.h                     |    3 +
- include/linux/uio.h                        |    5 +-
- lib/iov_iter.c                             |   19 +-
- net/core/datagram.c                        |  159 +-
- 21 files changed, 4322 insertions(+), 105 deletions(-)
- create mode 100644 drivers/nvme/host/tcp.c
- create mode 100644 drivers/nvme/target/tcp.c
- create mode 100644 include/linux/nvme-tcp.h
-
+diff --git a/net/core/datagram.c b/net/core/datagram.c
+index abe642181b64..382543302ae5 100644
+--- a/net/core/datagram.c
++++ b/net/core/datagram.c
+@@ -408,27 +408,20 @@ int skb_kill_datagram(struct sock *sk, struct sk_buff *skb, unsigned int flags)
+ }
+ EXPORT_SYMBOL(skb_kill_datagram);
+ 
+-/**
+- *	skb_copy_datagram_iter - Copy a datagram to an iovec iterator.
+- *	@skb: buffer to copy
+- *	@offset: offset in the buffer to start copying from
+- *	@to: iovec iterator to copy to
+- *	@len: amount of data to copy from buffer to iovec
+- */
+-int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
+-			   struct iov_iter *to, int len)
++int __skb_datagram_iter(const struct sk_buff *skb, int offset,
++			struct iov_iter *to, int len, bool fault_short,
++			size_t (*cb)(const void *, size_t, void *, struct iov_iter *),
++			void *data)
+ {
+ 	int start = skb_headlen(skb);
+ 	int i, copy = start - offset, start_off = offset, n;
+ 	struct sk_buff *frag_iter;
+ 
+-	trace_skb_copy_datagram_iovec(skb, len);
+-
+ 	/* Copy header. */
+ 	if (copy > 0) {
+ 		if (copy > len)
+ 			copy = len;
+-		n = copy_to_iter(skb->data + offset, copy, to);
++		n = cb(skb->data + offset, copy, data, to);
+ 		offset += n;
+ 		if (n != copy)
+ 			goto short_copy;
+@@ -450,8 +443,8 @@ int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
+ 
+ 			if (copy > len)
+ 				copy = len;
+-			n = copy_to_iter(vaddr + frag->page_offset +
+-					 offset - start, copy, to);
++			n = cb(vaddr + frag->page_offset +
++				offset - start, copy, data, to);
+ 			kunmap(page);
+ 			offset += n;
+ 			if (n != copy)
+@@ -471,8 +464,8 @@ int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
+ 		if ((copy = end - offset) > 0) {
+ 			if (copy > len)
+ 				copy = len;
+-			if (skb_copy_datagram_iter(frag_iter, offset - start,
+-						   to, copy))
++			if (__skb_datagram_iter(frag_iter, offset - start,
++						to, copy, short_copy, cb, data))
+ 				goto fault;
+ 			if ((len -= copy) == 0)
+ 				return 0;
+@@ -493,11 +486,32 @@ int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
+ 	return -EFAULT;
+ 
+ short_copy:
+-	if (iov_iter_count(to))
++	if (fault_short || iov_iter_count(to))
+ 		goto fault;
+ 
+ 	return 0;
+ }
++
++static size_t simple_copy_to_iter(const void *addr, size_t bytes,
++		void *data __always_unused, struct iov_iter *i)
++{
++	return copy_to_iter(addr, bytes, i);
++}
++
++/**
++ *	skb_copy_datagram_iter - Copy a datagram to an iovec iterator.
++ *	@skb: buffer to copy
++ *	@offset: offset in the buffer to start copying from
++ *	@to: iovec iterator to copy to
++ *	@len: amount of data to copy from buffer to iovec
++ */
++int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
++			   struct iov_iter *to, int len)
++{
++	trace_skb_copy_datagram_iovec(skb, len);
++	return __skb_datagram_iter(skb, offset, to, len, false,
++			simple_copy_to_iter, NULL);
++}
+ EXPORT_SYMBOL(skb_copy_datagram_iter);
+ 
+ /**
+@@ -648,87 +662,21 @@ int zerocopy_sg_from_iter(struct sk_buff *skb, struct iov_iter *from)
+ }
+ EXPORT_SYMBOL(zerocopy_sg_from_iter);
+ 
++/**
++ *	skb_copy_and_csum_datagram_iter - Copy datagram to an iovec iterator
++ *          and update a checksum.
++ *	@skb: buffer to copy
++ *	@offset: offset in the buffer to start copying from
++ *	@to: iovec iterator to copy to
++ *	@len: amount of data to copy from buffer to iovec
++ *      @csump: checksum pointer
++ */
+ static int skb_copy_and_csum_datagram(const struct sk_buff *skb, int offset,
+ 				      struct iov_iter *to, int len,
+ 				      __wsum *csump)
+ {
+-	int start = skb_headlen(skb);
+-	int i, copy = start - offset, start_off = offset;
+-	struct sk_buff *frag_iter;
+-	int pos = 0;
+-	int n;
+-
+-	/* Copy header. */
+-	if (copy > 0) {
+-		if (copy > len)
+-			copy = len;
+-		n = csum_and_copy_to_iter(skb->data + offset, copy, csump, to);
+-		offset += n;
+-		if (n != copy)
+-			goto fault;
+-		if ((len -= copy) == 0)
+-			return 0;
+-		pos = copy;
+-	}
+-
+-	for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
+-		int end;
+-		const skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
+-
+-		WARN_ON(start > offset + len);
+-
+-		end = start + skb_frag_size(frag);
+-		if ((copy = end - offset) > 0) {
+-			__wsum csum2 = 0;
+-			struct page *page = skb_frag_page(frag);
+-			u8  *vaddr = kmap(page);
+-
+-			if (copy > len)
+-				copy = len;
+-			n = csum_and_copy_to_iter(vaddr + frag->page_offset +
+-						  offset - start, copy,
+-						  &csum2, to);
+-			kunmap(page);
+-			offset += n;
+-			if (n != copy)
+-				goto fault;
+-			*csump = csum_block_add(*csump, csum2, pos);
+-			if (!(len -= copy))
+-				return 0;
+-			pos += copy;
+-		}
+-		start = end;
+-	}
+-
+-	skb_walk_frags(skb, frag_iter) {
+-		int end;
+-
+-		WARN_ON(start > offset + len);
+-
+-		end = start + frag_iter->len;
+-		if ((copy = end - offset) > 0) {
+-			__wsum csum2 = 0;
+-			if (copy > len)
+-				copy = len;
+-			if (skb_copy_and_csum_datagram(frag_iter,
+-						       offset - start,
+-						       to, copy,
+-						       &csum2))
+-				goto fault;
+-			*csump = csum_block_add(*csump, csum2, pos);
+-			if ((len -= copy) == 0)
+-				return 0;
+-			offset += copy;
+-			pos += copy;
+-		}
+-		start = end;
+-	}
+-	if (!len)
+-		return 0;
+-
+-fault:
+-	iov_iter_revert(to, offset - start_off);
+-	return -EFAULT;
++	return __skb_datagram_iter(skb, offset, to, len, true,
++			csum_and_copy_to_iter, csump);
+ }
+ 
+ __sum16 __skb_checksum_complete_head(struct sk_buff *skb, int len)
 -- 
 2.17.1
 
