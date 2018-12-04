@@ -2,101 +2,156 @@ Return-Path: <SRS0=ovnK=ON=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC46CC04EB8
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 18:13:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C926AC04EB8
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 18:18:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 895CE2081C
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 18:13:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F9D12081C
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 18:18:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="DogNkerg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 895CE2081C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="StzBLaSr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F9D12081C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725867AbeLDSNh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Dec 2018 13:13:37 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:55894 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725797AbeLDSNh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 13:13:37 -0500
-Received: by mail-it1-f193.google.com with SMTP id o19so16929263itg.5
-        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 10:13:37 -0800 (PST)
+        id S1725797AbeLDSSv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 13:18:51 -0500
+Received: from mail-io1-f54.google.com ([209.85.166.54]:33331 "EHLO
+        mail-io1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725831AbeLDSSv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 13:18:51 -0500
+Received: by mail-io1-f54.google.com with SMTP id t24so14451778ioi.0
+        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 10:18:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Bob2PeY6enAJ2qt87TENCghO5L/ZUGUN4V2wHith8f8=;
-        b=DogNkerg0sEph4VcEkTZxtMiP8i3qCVqlDvh5ByeTpi2heuCZqASf3gCt/pBwHOJgK
-         FDeHxQM4kYNT0OqTIGO/K17wPTaFiPl9mp6MQVGXuodvjfGimCDBddzPESa62tJbIC6J
-         EEvU+5PGahr4T8OIXaLtkN7d8M7pucYmXEbPyNYdF2m+wjKGuoNax7c6b7FTMy5cvtJA
-         FvaxwfE5SonkjVkuwNk618XwB2LmCGSrPw9W+cM5JKmAjlE08TriYaiD+S3yKfP3V4Qa
-         AS2zaphTdhbePd/8tGbKN1UqIBdzxblYt2Gi5NMgfLju5Kr795afVMz06VdN40MxhBKg
-         zDGQ==
+        d=broadcom.com; s=google;
+        h=from:references:in-reply-to:mime-version:thread-index:date
+         :message-id:subject:to:cc;
+        bh=w3utUibT/wQw1dcCIBVOyHjVMd2llJ58gnXim0FVhvU=;
+        b=StzBLaSr9dHCE93JehUdUd6g0CM4HTvtPgXO85Sj8CtMfPpAks5g28B0VxLU7RdSYQ
+         OBrcKk6kUALCAG9rfKABscSokpBK69+xGoQJL0stCYeUFvNwr16+40H6muoQwNBVOmW9
+         nrIyvfKaMhas4Df8qXSOixFytBwEhDtujukvA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Bob2PeY6enAJ2qt87TENCghO5L/ZUGUN4V2wHith8f8=;
-        b=pnVpwQrfCjOBLEqzxZIZ7MfIrkFqeaRU/o6U8sJRllOEz87wSkotjgtpyOwwADlr6W
-         yPjszBlV/G0+o0vyX06x/pGL8lgDM1R2w1ZjulqcVZQZoWw+xesQaNjWfC3K3QyDShcA
-         IhEHCPsHf4TXaTmPZYcq81ehW1PaooqGyFrPDzejBSF5cjrinY4sVVrZ4/Peq2fdWZub
-         en//FAUUJN7y/GhnZA5dipjudZfCTFH5VFSIQbGsmsYUSCpS97b5Za9e224lEtSeu4Iz
-         kpF4zhzTEDKWi1lhjnc2GIDO/0NbVIERFFcOiTzxjvGnTKfE601A4BtGs62iLJLEh7Pj
-         EKBQ==
-X-Gm-Message-State: AA+aEWY7/940bU75ErQpnHwys8xxkrlfccXYxPSGEb6VESiEfZW+XNve
-        VmMAVcXDnHvO5uGHHprYQyq/zw==
-X-Google-Smtp-Source: AFSGD/VI7/htrDpCZbe8aZRckdhLM0vlHjr/h9xPnmnk1553Okc98cNv8a7pnJlaJk9YeMtChoAh3A==
-X-Received: by 2002:a24:7ac8:: with SMTP id a191mr12485281itc.176.1543947216812;
-        Tue, 04 Dec 2018 10:13:36 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id o18sm2704735ioh.31.2018.12.04.10.13.32
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Dec 2018 10:13:32 -0800 (PST)
-Subject: Re: [PATCH 05/27] block: ensure that async polled IO is marked
- REQ_NOWAIT
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-aio@kvack.org
-References: <20181130165646.27341-1-axboe@kernel.dk>
- <20181130165646.27341-6-axboe@kernel.dk> <1543597960.4347.3.camel@acm.org>
- <6044f9e1-0175-823b-b923-998094bdca72@kernel.dk>
- <20181204144820.GC3180@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2e06ca6d-61c2-3a29-992e-70818819b9b4@kernel.dk>
-Date:   Tue, 4 Dec 2018 11:13:31 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        h=x-gm-message-state:from:references:in-reply-to:mime-version
+         :thread-index:date:message-id:subject:to:cc;
+        bh=w3utUibT/wQw1dcCIBVOyHjVMd2llJ58gnXim0FVhvU=;
+        b=kpv9hUR2V6bsLHahV+Jyax9RZegxXDvIern9+whtyZDKy4lhVjLPlIfGAVyKDbGhfE
+         H4ObKB5M1zo/OL4yOygvvOPC88qZOoGUtkdMEUulej6REd99Dup9TBxdkePOkd/XQOtT
+         Ty0DvV6iH2IwTe/I0344tEJai1qlshVca4kcWB3aKEHHj+5lHrAc3WrYVAtZnyiG5+IJ
+         Wcecvu9XlpRgWhJNy+R7mA6uElHIjpsj7thif43P7/nkrz0TwPmTS5xi+MDtrHOmgMp5
+         vuCGnfM8Aq8pEuTr5hJATAejcsg1cY8rjGaPPUDtDIXg3CHJCa83O8rpv5GAoDvXxK1e
+         n5NQ==
+X-Gm-Message-State: AA+aEWYrjukOVKKWUDyisfi5v5beVse685wRB47+wKJsch+P+ZVL7FVc
+        B1B9gZT6nqiPQ9SdF96DNR98LcuBqte3KXRMRG37qA==
+X-Google-Smtp-Source: AFSGD/U3hjiTYpPChuaSJEkv4KYxuUCnp3kbh/ynbNaHXf+7YQHIOLJKIF3Gv12Qs6UAjIAbFtiMqqHhkGZZqWX6oO0=
+X-Received: by 2002:a6b:b90a:: with SMTP id j10mr17698182iof.172.1543947530225;
+ Tue, 04 Dec 2018 10:18:50 -0800 (PST)
+From:   Kashyap Desai <kashyap.desai@broadcom.com>
+References: +ADw-CAHsXFKFOBSmZeT9j7U2S6J4Af2k2ODe+AF8-pkFVGJg73v0Wp7O38A+AEA-mail.gmail.com+AD4-
+         +ADw-7e8e1fe2-9f91-a370-a98c-43cdad1f6e8e+AEA-acm.org+AD4-
+         +ADw-d56ddf2b485c13445fff5f9c36dd3c87+AEA-mail.gmail.com+AD4- +ADw-1543943674.185366.194.camel+AEA-acm.org+AD4-
+In-Reply-To: <1543943674.185366.194.camel@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20181204144820.GC3180@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 14.0
+Thread-Index: AQEyvrdX27HdOCj1DHPKEZclYJ8CJQEQPyI2ApGcuBQCAxrAOaaFU6ww
+Date:   Tue, 4 Dec 2018 23:48:48 +0530
+Message-ID: <ce2cdcee7e8d8e21cc8398a882b9d6e3@mail.gmail.com>
+Subject: RE: +AFs-PATCH+AF0- blk-mq: Set request mapping to NULL in blk+AF8-mq+AF8-put+AF8-driver+AF8-tag
+To:     Bart Van Assche <bvanassche@acm.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        linux-scsi <linux-scsi@vger.kernel.org>
+Cc:     Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/4/18 7:48 AM, Christoph Hellwig wrote:
-> On Fri, Nov 30, 2018 at 10:17:49AM -0700, Jens Axboe wrote:
->>> Setting REQ_NOWAIT from inside the block layer will make the code that
->>> submits requests harder to review. Have you considered to make this code
->>> fail I/O if REQ_NOWAIT has not been set and to require that the context
->>> that submits I/O sets REQ_NOWAIT?
->>
->> It's technically still feasible to do for sync polled IO, it's only
->> the async case that makes it a potential deadlock.
-> 
-> I wonder if we want a REQ_ASYNC_POLL compound flag #define that sets
-> REQ_POLL and REQ_NOWAIT to make this blindly obvious.
+> -----Original Message-----
+> From: Bart Van Assche [mailto:bvanassche@acm.org]
+> Sent: Tuesday, December 4, 2018 10:45 PM
+> To: Kashyap Desai; linux-block; Jens Axboe; Ming Lei; linux-scsi
+> Cc: Suganath Prabu Subramani; Sreekanth Reddy; Sathya Prakash Veerichetty
+> Subject: Re: [PATCH] blk-mq: Set request mapping to NULL in
+> blk_mq_put_driver_tag
+>
+> On Tue, 2018-12-04 at 22:17 +0530, Kashyap Desai wrote:
+> > + Linux-scsi
+> >
+> > > > diff --git a/block/blk-mq.h b/block/blk-mq.h
+> > > > index 9497b47..57432be 100644
+> > > > --- a/block/blk-mq.h
+> > > > +++ b/block/blk-mq.h
+> > > > @@ -175,6 +175,7 @@ static inline bool
+> > > > blk_mq_get_dispatch_budget(struct blk_mq_hw_ctx *hctx)
+> > > >   static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx
+> *hctx,
+> > > >                          struct request *rq)
+> > > >   {
+> > > > +    hctx->tags->rqs[rq->tag] = NULL;
+> > > >       blk_mq_put_tag(hctx, hctx->tags, rq->mq_ctx, rq->tag);
+> > > >       rq->tag = -1;
+> > >
+> > > No SCSI driver should call scsi_host_find_tag() after a request has
+> > > finished. The above patch introduces yet another race and hence can't
+> > > be
+> > > a proper fix.
+> >
+> > Bart, many scsi drivers use scsi_host_find_tag() to traverse max tag_id
+> > to
+> > find out pending IO in firmware.
+> > One of the use case is -  HBA firmware recovery.  In case of firmware
+> > recovery, driver may require to traverse the list and return back
+> > pending
+> > scsi command to SML for retry.
+> > I quickly grep the scsi code and found that snic_scsi, qla4xxx, fnic,
+> > mpt3sas are using API scsi_host_find_tag for the same purpose.
+> >
+> > Without this patch, we hit very basic kernel panic due to page fault.
+> > This
+> > is not an issue in non-mq code path. Non-mq path use
+> > blk_map_queue_find_tag() and that particular API does not provide stale
+> > requests.
+>
+> As I wrote before, your patch doesn't fix the race you described but only
+> makes the race window smaller.
+Hi Bart,
 
-Yeah that might make sense, all the async cases should certainly use it,
-and sync can keep using REQ_POLL. I'll add that and fold where I can.
+Let me explain the issue. It is not a race, but very straight issue.  Let's
+say we have one scsi_device /dev/sda and total IO submitted + completed are
+some number 100.
+All the 100 IO is *completed*.   Now, As part of Firmware recovery, driver
+tries to find our outstanding IOs using scsi_host_find_tag().
+Block layer will return all the 100 commands to the driver but really those
+100 commands are not outstanding. This patch will return *actual*
+outstanding commands.
+If scsi_device /dev/sda is not removed in OS, driver accessing scmd of those
+100 commands are safe memory access.
 
--- 
-Jens Axboe
+Now consider a case where scsi_device /dev/sda is removed and driver
+performs firmware recovery. This time driver will crash while accessing scmd
+(randomly based on memory reused.).
 
+Along with this patch, low level driver should make sure that all request
+queue at block layer is quiesce.
+
+If you want an example of how to use
+> scsi_host_find_tag() properly, have a look at the SRP initiator driver
+> (drivers/infiniband/ulp/srp). That driver uses scsi_host_find_tag()
+> without
+> triggering any NULL pointer dereferences.
+
+I am not able to find right context from srp, but I check the srp code and
+looks like that driver is getting scmd using scsi_host_find_tag() for live
+command.
+
+> The approach used in that driver
+> also works when having to support HBA firmware recovery.
+>
+> Bart.
