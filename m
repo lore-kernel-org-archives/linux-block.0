@@ -2,108 +2,68 @@ Return-Path: <SRS0=ovnK=ON=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFF56C04EBF
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 15:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E09FC04EB8
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 15:48:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 834EA2081C
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 15:27:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Lc9e5sMr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 834EA2081C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	by mail.kernel.org (Postfix) with ESMTP id 2C6BC206B7
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 15:48:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C6BC206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726684AbeLDP1l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Dec 2018 10:27:41 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:45659 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725910AbeLDP1k (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 10:27:40 -0500
-Received: by mail-io1-f68.google.com with SMTP id o5so7941240iop.12
-        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 07:27:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=A9tg/TZfoRi46T/5QLmu+csxC6cl1yW14hEbSfRv7bw=;
-        b=Lc9e5sMrZPOlz6Bf2vV73CaQ0xZPFmV8oPN7bKB8FPeLsYgfBRqyF/P1ILlGt+OHE3
-         4lU6IdvYQakxuf8/qiHZ3pxYs+yDlLaByWFfSEbIbKhSZDIGoOYAIe+5+uGQ5rVpq5Cd
-         5KH6I4f16EtivIzleYHJtmOdJpeRn6DTUlzPE1x4yJdjPThtUPH3ey+rt6wfjgsXpTXu
-         z8lJtTxDt/RK2vMwowIt/raU96m89nNtZvpOwQJgFjxLrT8uDJBc4/lHMfU7M+WUiteJ
-         74Od1Edry11QKlwAU0/gRtPwNQ9uRlcpp3ftzx70yW1k8bdZs70R91MSR/XXe1+14q1U
-         /BNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=A9tg/TZfoRi46T/5QLmu+csxC6cl1yW14hEbSfRv7bw=;
-        b=Gliqzo5z8kKDGt3ydufoKOgGMFhR1Q4w4IDDLlFH8ZmrrztFf6v3VPiCOdZwMnmCtJ
-         GS6KbsYzuviSRFqS73tzUC11uJtmAne3Le1Exyukft3KO9psmj6fRAhfy0aaF67+lpnd
-         dQ2xVSoZJdoOb6I8g//Sv1PWYBO9qPEO8VGrqZ8uFiKJjovExYepUTx1/jJoMKIpZjv+
-         AF1Ogemw3TMj/muniEvz/IfYoRJh6CvfwH3cxh4s6hzGNTA2PcjtPKo0n32y0oGfeH6m
-         xUv2oJGxnwRWNJyh1hGvX+DorRxontKe5ZbXhC4oIq27arM2aiQWc99h0NqNRdVebszk
-         OySg==
-X-Gm-Message-State: AA+aEWbX+cT/4R7P6pGEJoFJpV8o4WpgqtH7zcZ3WhnxJKZxpa+dLzTJ
-        1Q1VlPSJkaBh0bFL4kiGZ9bzHQ==
-X-Google-Smtp-Source: AFSGD/VCXg6+AEXSnTguhXqYCXKoStAbZiuRdvVXGWlPB3HVXTbxPrDNqEQD8ucIPPdlYk9UmLHaCg==
-X-Received: by 2002:a6b:5c14:: with SMTP id z20mr17218387ioh.39.1543937260025;
-        Tue, 04 Dec 2018 07:27:40 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id y13sm6361782ioa.56.2018.12.04.07.27.38
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Dec 2018 07:27:39 -0800 (PST)
-Subject: Re: [PATCH 10/27] aio: don't zero entire aio_kiocb aio_get_req()
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-aio@kvack.org
-References: <20181130165646.27341-1-axboe@kernel.dk>
- <20181130165646.27341-11-axboe@kernel.dk> <20181204144921.GE3180@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <466fed7f-3e89-c659-f150-3fd1a59d0271@kernel.dk>
-Date:   Tue, 4 Dec 2018 08:27:38 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726420AbeLDPsq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 10:48:46 -0500
+Received: from mga07.intel.com ([134.134.136.100]:59968 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726226AbeLDPsq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Dec 2018 10:48:46 -0500
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Dec 2018 07:48:44 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.56,314,1539673200"; 
+   d="scan'208";a="280857668"
+Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
+  by orsmga005.jf.intel.com with ESMTP; 04 Dec 2018 07:48:45 -0800
+Date:   Tue, 4 Dec 2018 08:46:00 -0700
+From:   Keith Busch <keith.busch@intel.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH 1/2] blk-mq: Export iterating all tagged requests
+Message-ID: <20181204154559.GJ14775@localhost.localdomain>
+References: <20181130202635.11145-1-keith.busch@intel.com>
+ <823fc3bf-78a4-c8fb-c80c-e3944f320af0@kernel.dk>
+ <20181201164804.GB19557@lst.de>
+ <9346f289-f265-e2ee-2d2c-c97973b45e23@suse.de>
+ <8cd9a950-6605-6387-e4d4-4346a46da781@grimberg.me>
 MIME-Version: 1.0
-In-Reply-To: <20181204144921.GE3180@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8cd9a950-6605-6387-e4d4-4346a46da781@grimberg.me>
+User-Agent: Mutt/1.9.1 (2017-09-22)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/4/18 7:49 AM, Christoph Hellwig wrote:
->> -	req = kmem_cache_alloc(kiocb_cachep, GFP_KERNEL|__GFP_ZERO);
->> -	if (unlikely(!req))
->> -		return NULL;
->> +	req = kmem_cache_alloc(kiocb_cachep, GFP_KERNEL);
->> +	if (req) {
->> +		percpu_ref_get(&ctx->reqs);
->> +		req->ki_ctx = ctx;
->> +		INIT_LIST_HEAD(&req->ki_list);
->> +		refcount_set(&req->ki_refcnt, 0);
->> +		req->ki_eventfd = NULL;
->> +	}
->>  
->> -	percpu_ref_get(&ctx->reqs);
->> -	INIT_LIST_HEAD(&req->ki_list);
->> -	refcount_set(&req->ki_refcnt, 0);
->> -	req->ki_ctx = ctx;
->>  	return req;
+On Mon, Dec 03, 2018 at 05:33:06PM -0800, Sagi Grimberg wrote:
+> >>
+> > Yes, I'm very much in favour of this, too.
+> > We always have this IMO slightly weird notion of stopping the queue, set 
+> > some error flags in the driver, then _restarting_ the queue, just so 
+> > that the driver then sees the error flag and terminates the requests.
+> > Which I always found quite counter-intuitive.
 > 
-> Why the reformatting?  Otherwise this looks fine to me:
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> What about requests that come in after the iteration runs? how are those
+> terminated?
 
-Probably just the (over) abuse of likely/unlikely in aio.c. I can get
-rid of it.
-
--- 
-Jens Axboe
-
+If we've reached a dead state, I think you'd want to start a queue freeze
+before running the terminating iterator.
