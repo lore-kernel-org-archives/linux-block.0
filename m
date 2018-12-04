@@ -2,84 +2,155 @@ Return-Path: <SRS0=ovnK=ON=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0384C04EB9
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 00:31:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F6C1C04EB9
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 00:50:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6E8C820850
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 00:31:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E8C820850
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+	by mail.kernel.org (Postfix) with ESMTP id 0FFB42087F
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 00:50:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FFB42087F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726130AbeLDAbb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Dec 2018 19:31:31 -0500
-Received: from mail-pl1-f178.google.com ([209.85.214.178]:36875 "EHLO
-        mail-pl1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726074AbeLDAbb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 19:31:31 -0500
-Received: by mail-pl1-f178.google.com with SMTP id b5so7344938plr.4
-        for <linux-block@vger.kernel.org>; Mon, 03 Dec 2018 16:31:31 -0800 (PST)
+        id S1725971AbeLDAuA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Dec 2018 19:50:00 -0500
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:39763 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725968AbeLDAuA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 19:50:00 -0500
+Received: by mail-oi1-f196.google.com with SMTP id i6so12760116oia.6
+        for <linux-block@vger.kernel.org>; Mon, 03 Dec 2018 16:49:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=l4XsbgFKwRKDLzseCO6+ycUkiHYFJ43dzKGvhHwYap4=;
-        b=sqIlWu7WFmvR6UhRbZT6sTNRLh6wYyk9oGim750jzfPcjI8CA8EA0QCgD+p9QLVIFx
-         fTJgJySVrsLa+gundQ/zm0/qVi1IA33bQCofY+dffSEwn8J42Bv0IDUafXOOYu+ryQeS
-         foYnfg4+72JvSYAi87oqNZfc9IzxugZ9DrDmmrP3L+PUYYajYQcefvI00eW0FTYUDMhF
-         xuurvzbt3lqOQbwlpX1pVDyVhRuzPBqSgeq9QznbDHt7zRCsCVQ/v8ZX+zBGHWpkcNhJ
-         FUt+c1SZvUMLaGVNN/DeGUz4F86Nj8n0dKtEPGBPbaLSuMTzhPzD1x2OlGFxfeU2H0h9
-         ggHQ==
-X-Gm-Message-State: AA+aEWYxI8qRlpfEKQtgi1Z+zFsXuh/BlwBwN72eO/HKaXXWonLrZUus
-        SsJJmbCisAKU7MO5enzCYss=
-X-Google-Smtp-Source: AFSGD/Uk3ePFQcwGRwPe5GF6tcFjzFhjd2cjYazLH1ROQmljbQtBakkvkD/+VXD/Y8gLaFzkBK6yeg==
-X-Received: by 2002:a17:902:9a41:: with SMTP id x1mr17806749plv.126.1543883490542;
-        Mon, 03 Dec 2018 16:31:30 -0800 (PST)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id h129sm37970447pfb.110.2018.12.03.16.31.29
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 03 Dec 2018 16:31:29 -0800 (PST)
-Message-ID: <1543883488.185366.176.camel@acm.org>
-Subject: Re: block: sbitmap related lockdep warning
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <tom.leiming@gmail.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Omar Sandoval <osandov@fb.com>
-Date:   Mon, 03 Dec 2018 16:31:28 -0800
-In-Reply-To: <879e4f73-caa0-93e0-a6c3-3d53d1962cee@kernel.dk>
-References: <CACVXFVObAF+keMw3aDSMBg0vfL-wSVFMw46ubkxEP-09QX4bsw@mail.gmail.com>
-         <879e4f73-caa0-93e0-a6c3-3d53d1962cee@kernel.dk>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=f0YAT2SXVxQ1iJ7lUUu5S5sONIuNDd1ovz0YxUcP+xs=;
+        b=Dtf8c4v7Pyj5KL5o5rJ08GxHXBSTKKJRN/sQpy8HoIysUqRW5zTgAgPCZ0dbfbVVlM
+         udkir01H6XYcqubcIS7c4fffT7MS8FyRHpVfAaAkSkeq7ZagRcAhBMDvXjK3rz8HWqaT
+         aWbU4CoWpcfuXo2OwvsNWD9/wWBO90BOfpTb91g5PFGqeuN4vlG59w6/6TOhZSUzoPmo
+         pj+J4TRBaAXpT2WRDPe9JnZGXeyNRR6q4oL26irrYY81udHrjsu+p3F23PsOicqHL6aG
+         PeBn/GrV3kWjrSmQCdoZFQfmHvDS2GgwqQnv6S1pI4dO32ORJ67gKn3BSe4qRzso3VNk
+         wIXw==
+X-Gm-Message-State: AA+aEWYMLRIczRLHi/7AFUlEbbkAC50/UBfS3ASghxz2XgUPup7X835e
+        51TxTr15dlUj13yeBpI2WtemXqfU
+X-Google-Smtp-Source: AFSGD/XdmOnShS0owBO+B4yvXCeSyA1WX6LR6cyNmABCu6pd40lZhevo+lyZPG1XlOP/tvsC5lyhJQ==
+X-Received: by 2002:aca:2807:: with SMTP id 7mr11522681oix.7.1543884599170;
+        Mon, 03 Dec 2018 16:49:59 -0800 (PST)
+Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
+        by smtp.gmail.com with ESMTPSA id p129sm5932758oif.17.2018.12.03.16.49.57
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 03 Dec 2018 16:49:58 -0800 (PST)
+Subject: Re: [PATCH 01/13] block: move queues types to the block layer
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>,
+        Keith Busch <keith.busch@intel.com>
+Cc:     Max Gurtovoy <maxg@mellanox.com>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+References: <20181202164628.1116-1-hch@lst.de>
+ <20181202164628.1116-2-hch@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <5a1cd7aa-8937-ae23-c9ae-c8ddaf525080@grimberg.me>
+Date:   Mon, 3 Dec 2018 16:49:56 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+MIME-Version: 1.0
+In-Reply-To: <20181202164628.1116-2-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2018-12-03 at 15:24 -0700, Jens Axboe wrote:
-+AD4 On 12/3/18 3:02 AM, Ming Lei wrote:
-+AD4 +AD4 Hi,
-+AD4 +AD4 
-+AD4 +AD4 Just found there is sbmitmap related lockdep warning, not take a close
-+AD4 +AD4 look yet, maybe
-+AD4 +AD4 it is caused by recent sbitmap change.
-+AD4 +AD4 
-+AD4 +AD4 +AFs-1+AF0 test
-+AD4 +AD4 - modprobe null+AF8-blk queue+AF8-mode+AD0-2 nr+AF8-devices+AD0-4 shared+AF8-tags+AD0-1
-+AD4 +AD4 submit+AF8-queues+AD0-1 hw+AF8-queue+AF8-depth+AD0-1
-+AD4 +AD4 - then run fio on the 4 null+AF8-blk devices
-+AD4 
-+AD4 This is a false positive - lockdep thinks that -+AD4-swap+AF8-lock needs to be
-+AD4 IRQ safe since it's called with IRQs disabled from the
-+AD4 blk+AF8-mq+AF8-mark+AF8-tag+AF8-wait() path. But we never grab the lock from IRQ
-+AD4 context. I wonder how to teach lockdep about that...
 
-There is probably a better solution, but one possible solution is to disable
-lockdep checking for swap+AF8-lock by using lockdep+AF8-set+AF8-novalidate+AF8-class().
 
-Bart.
+On 12/2/18 8:46 AM, Christoph Hellwig wrote:
+> Having another indirect all in the fast path doesn't really help
+> in our post-spectre world.  Also having too many queue type is just
+> going to create confusion, so I'd rather manage them centrally.
+> 
+> Note that the queue type naming and ordering changes a bit - the
+> first index now is the default queue for everything not explicitly
+> marked, the optional ones are read and poll queues.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   block/blk-mq-sysfs.c    |  9 +++++-
+>   block/blk-mq.h          | 21 +++++++------
+>   drivers/nvme/host/pci.c | 68 +++++++++++++++--------------------------
+>   include/linux/blk-mq.h  | 15 ++++-----
+>   4 files changed, 51 insertions(+), 62 deletions(-)
+> 
+> diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+> index 6efef1f679f0..9c2df137256a 100644
+> --- a/block/blk-mq-sysfs.c
+> +++ b/block/blk-mq-sysfs.c
+> @@ -173,9 +173,16 @@ static ssize_t blk_mq_hw_sysfs_cpus_show(struct blk_mq_hw_ctx *hctx, char *page)
+>   	return ret;
+>   }
+>   
+> +static const char *const hctx_types[] = {
+> +	[HCTX_TYPE_DEFAULT]	= "default",
+> +	[HCTX_TYPE_READ]	= "read",
+> +	[HCTX_TYPE_POLL]	= "poll",
+> +};
+> +
+>   static ssize_t blk_mq_hw_sysfs_type_show(struct blk_mq_hw_ctx *hctx, char *page)
+>   {
+> -	return sprintf(page, "%u\n", hctx->type);
+> +	BUILD_BUG_ON(ARRAY_SIZE(hctx_types) != HCTX_MAX_TYPES);
+> +	return sprintf(page, "%s\n", hctx_types[hctx->type]);
+>   }
+>   
+>   static struct attribute *default_ctx_attrs[] = {
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index 7291e5379358..a664ea44ffd4 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -81,16 +81,14 @@ extern int blk_mq_hw_queue_to_node(struct blk_mq_queue_map *qmap, unsigned int);
+>   /*
+>    * blk_mq_map_queue_type() - map (hctx_type,cpu) to hardware queue
+>    * @q: request queue
+> - * @hctx_type: the hctx type index
+> + * @type: the hctx type index
+>    * @cpu: CPU
+>    */
+>   static inline struct blk_mq_hw_ctx *blk_mq_map_queue_type(struct request_queue *q,
+> -							  unsigned int hctx_type,
+> +							  enum hctx_type type,
+>   							  unsigned int cpu)
+>   {
+> -	struct blk_mq_tag_set *set = q->tag_set;
+> -
+> -	return q->queue_hw_ctx[set->map[hctx_type].mq_map[cpu]];
+> +	return q->queue_hw_ctx[q->tag_set->map[type].mq_map[cpu]];
+>   }
+>   
+>   /*
+> @@ -103,12 +101,17 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
+>   						     unsigned int flags,
+>   						     unsigned int cpu)
+>   {
+> -	int hctx_type = 0;
+> +	enum hctx_type type = HCTX_TYPE_DEFAULT;
+> +
+> +	if (q->tag_set->nr_maps > HCTX_TYPE_POLL &&
+> +	    ((flags & REQ_HIPRI) && test_bit(QUEUE_FLAG_POLL, &q->queue_flags)))
+> +		type = HCTX_TYPE_POLL;
+>   
+> -	if (q->mq_ops->rq_flags_to_type)
+> -		hctx_type = q->mq_ops->rq_flags_to_type(q, flags);
+> +	else if (q->tag_set->nr_maps > HCTX_TYPE_READ &&
+> +		 ((flags & REQ_OP_MASK) == REQ_OP_READ))
+> +		type = HCTX_TYPE_READ;
+
+Nit, there seems to be an extra newline that can be omitted here before
+the else if statement (if I'm reading this correctly)...
+
+Otherwise looks good,
+
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
