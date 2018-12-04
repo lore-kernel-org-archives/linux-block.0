@@ -2,138 +2,154 @@ Return-Path: <SRS0=ovnK=ON=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB76CC04EB8
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 03:55:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DEE5C04EB8
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 05:57:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AD19420850
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 03:55:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="aC5ljE8d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD19420850
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTP id E9E4420834
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 05:57:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9E4420834
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725977AbeLDDzl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Dec 2018 22:55:41 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:53280 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725969AbeLDDzk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 22:55:40 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wB43sTe6022240;
-        Tue, 4 Dec 2018 03:55:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=xw+ycnsmmRpehYiAeaNdSgpBW/9N3QNg55eCLzW19DY=;
- b=aC5ljE8dAi+ODqvGY4VXkfP/B7iE/l4tW9udpXMjYD2lQ+4KUB8eqAGQUlzhfiidhW10
- Sa2avpVwiG2lqKldrqpgu7RvmYmNXFRnQv7z8LiLH+rp9F5tUoHIBnqFKOH4dmNzl89D
- g8qHGWgb4aHGSXGN++dW9ib9CF0qZGa0VXLhNENlIXSAOeZQ+iEDPDx8mPVf1METpWvf
- NGMjAKToSyASo1B18x95+zzNYLaGN+Jgw9QfeZ+d8/WGbLnnDrx2A2tCYOBp/XvosF14
- 2jqHkksh1/hIg91Gg1WbHT/0VzNtsdD0/Lk1W1Oqvh79bbBs4zEBb8YosquyF8AzBX2v Sw== 
-Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
-        by userp2120.oracle.com with ESMTP id 2p3jxr9x0f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 04 Dec 2018 03:55:29 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id wB43tSE1011266
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 4 Dec 2018 03:55:29 GMT
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id wB43tSFT032690;
-        Tue, 4 Dec 2018 03:55:28 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 03 Dec 2018 19:55:27 -0800
-To:     John Garry <john.garry@huawei.com>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        "chenxiang \(M\)" <chenxiang66@hisilicon.com>,
-        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "linux-scsi\@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linuxarm <linuxarm@huawei.com>,
-        Steffen Maier <maier@linux.ibm.com>
-Subject: Re: DIF/DIX issue related to config CONFIG_SCSI_MQ_DEFAULT
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <5d9bf51d-1ef9-b948-2168-9e7526d77225@hisilicon.com>
-        <20181127130811.GA2780@ming.t460p>
-        <6c573f36-60d8-0631-e9ac-dacd72f6c8ad@hisilicon.com>
-        <20181130011935.GA7573@ming.t460p>
-        <e0e07583-98ca-4fc5-e60d-055e5474c084@huawei.com>
-Date:   Mon, 03 Dec 2018 22:55:25 -0500
-In-Reply-To: <e0e07583-98ca-4fc5-e60d-055e5474c084@huawei.com> (John Garry's
-        message of "Fri, 30 Nov 2018 11:26:07 +0000")
-Message-ID: <yq1k1kqt07m.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        id S1726020AbeLDF5D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 00:57:03 -0500
+Received: from mx2.suse.de ([195.135.220.15]:33176 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725988AbeLDF5D (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Dec 2018 00:57:03 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay1.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 4EDC4AC2C;
+        Tue,  4 Dec 2018 05:57:01 +0000 (UTC)
+Subject: Re: [Xen-devel] [PATCH] xen-blkfront: use old rinfo after enomem
+ during migration
+To:     Dongli Zhang <dongli.zhang@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Manjunath Patil <manjunath.b.patil@oracle.com>,
+        konrad.wilk@oracle.com, roger.pau@citrix.com, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, xen-devel@lists.xenproject.org
+References: <1543468665-22795-1-git-send-email-manjunath.b.patil@oracle.com>
+ <fab88d94-79de-8ff4-be69-ff768b3f9697@oracle.com>
+ <1dafcf3d-c3b6-e6c5-f5d4-fbdb549aaa9c@oracle.com>
+ <3da66993-a044-c65c-88a6-c0672ab8814f@oracle.com>
+ <f187b34d-8b05-a1ce-cc96-731729a7da55@oracle.com>
+ <ee73815a-3b0c-bb3e-bd52-239c9b3d8cc0@oracle.com>
+ <5cdcbb60-d862-b3c7-2869-4961c5565dfa@oracle.com>
+From:   Juergen Gross <jgross@suse.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jgross@suse.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <cc70048a-5ad0-9696-0bec-d6c976fb6bb5@suse.com>
+Date:   Tue, 4 Dec 2018 06:57:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9096 signatures=668686
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1812040032
+In-Reply-To: <5cdcbb60-d862-b3c7-2869-4961c5565dfa@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: de-DE
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 04/12/2018 02:14, Dongli Zhang wrote:
+> Hi Boris,
+> 
+> On 12/04/2018 12:07 AM, Boris Ostrovsky wrote:
+>> On 12/2/18 3:31 PM, Manjunath Patil wrote:
+>>> On 11/30/2018 2:33 PM, Boris Ostrovsky wrote:
+>>>
+>>>> On 11/30/18 4:49 PM, Manjunath Patil wrote:
+>>>>> Thank you Boris for your comments. I removed faulty email of mine.
+>>>>>
+>>>>> replies inline.
+>>>>> On 11/30/2018 12:42 PM, Boris Ostrovsky wrote:
+>>>>>> On 11/29/18 12:17 AM, Manjunath Patil wrote:
+>>>>>>> Hi,
+>>>>>>> Feel free to suggest/comment on this.
+>>>>>>>
+>>>>>>> I am trying to do the following at dst during the migration now.
+>>>>>>> 1. Dont clear the old rinfo in blkif_free(). Instead just clean it.
+>>>>>>> 2. Store the old rinfo and nr_rings into temp variables in
+>>>>>>> negotiate_mq()
+>>>>>>> 3. let nr_rings get re-calculated based on backend data
+>>>>>>> 4. try allocating new memory based on new nr_rings
+>>>>>> Since I suspect number of rings will likely be the same why not reuse
+>>>>>> the rings in the common case?
+>>>>> I thought attaching devices will be more often than migration. Hence
+>>>>> did not want add to an extra check for
+>>>>>    - if I am inside migration code path and
+>>>>>    - if new nr_rings is equal to old nr_rings or not
+>>>>>
+>>>>> Sure addition of such a thing would avoid the memory allocation
+>>>>> altogether in migration path,
+>>>>> but it would add a little overhead for normal device addition.
+>>>>>
+>>>>> Do you think its worth adding that change?
+>>>>
+>>>> IMO a couple of extra checks are not going to make much difference.
+>>> I will add this change
+>>>>
+>>>> I wonder though --- have you actually seen the case where you did fail
+>>>> allocation and changes provided in this patch made things work? I am
+>>>> asking because right after negotiate_mq() we will call setup_blkring()
+>>>> and it will want to allocate bunch of memory. A failure there is fatal
+>>>> (to ring setup). So it seems to me that you will survive negotiate_mq()
+>>>> but then will likely fail soon after.
+>>> I have noticed the ENOMEM insise negotiate_mq() on ct machine. When I
+>>> included my patch, I manually triggered the ENOMEM using a debug flag.
+>>> The patch works for ENOMEM inside negotiate_mq().
+>>>
+>>> As you mentioned, if we really hit the ENOMEM in negotiate_mq(), we
+>>> might hit it in setup_blkring() as well.
+>>> We should add the similar change to blkif_sring struct as well.
+>>
+>>
+>> Won't you have a similar issue with other frontends, say, netfront?
+> 
+> I think the kmalloc is failed not because of OOM.
+> 
+> In fact, the size of "blkfront_ring_info" is large. When domU have 4
+> queues/rings, the size of 4 blkfront_ring_info can be about 300+ KB.
+> 
+> There is chance that kmalloc() 300+ KB would fail.
 
-Hi John,
+So kmalloc() might not be the best choice. Any reason why you don't
+change it to vmalloc()? This should address the problem in a much
+simpler way.
 
-> We have also noticed that if we just enable DIF in hisi_sas (with MQ),
-> and not DIX, then no issue.
 
-Enabling DIF doesn't really do anything on the kernel side other than
-setting PROTECT=1 in the READ/WRITE CDB and telling the driver which DIX
-protection operation the HBA should use. Since protection information is
-invisible to the kernel and only sent on the wire between initiator and
-target, enabling DIF doesn't really have the ability to interfere with
-anything on the kernel side. We're basically just setting flags asking
-HBA and storage to enable protected transfers.
-
-> I did also noticed mail "[PATCH v2 01/23] zfcp: make DIX experimental,
-> disabled, and independent of DIF", where DIX is made experimental.
-
-...for the zfcp driver on zSeries.
-
-Just nitpicking on terminology here:
-
-T10 Protection Information (formerly known as DIF) describes how to
-generate and verify 8 bytes of extra information that's sent trailing
-each logical block on the wire between an initiator and target. The T10
-PI spec is focused on the target device implementation of this and
-largely ignores the initiator side.
-
-DIX tries to remedy this deficiency. It is a spec that describes a set
-of logical operations an initiator must implement to facilitate sending
-and receiving the T10 protection information to/from host memory instead
-of terminating it at the HBA. The DIX spec isn't experimental, it's
-about a decade old and hasn't changed in years.
-
-The Linux kernel support for data integrity passthrough in the block
-layer and SCSI isn't experimental either. It's also a decade old and
-used extensively in production.
-
-So I object to the notion of "DIX being made experimental". An
-ASIC/firmware/driver implementation of DIX may be experimental. And of
-course I can't rule out regressions in the kernel block integrity
-implementation as a result of some of the recent MQ changes (will be
-happy to work with you guys to figure those out).
-
-But DIX isn't experimental, nor is the kernel support for passing
-protection information to an HBA.
-
-> For now we may not support DIX. It seems to have issues. We wanted to
-> try 3008 card on our system, but it does not seem to support DIX 0-3.
-
-For some reason Broadcom have not upstreamed their DIX support. It's
-supposedly available in their outbox driver.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Juergen
