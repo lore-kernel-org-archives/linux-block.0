@@ -2,150 +2,164 @@ Return-Path: <SRS0=ovnK=ON=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCC8FC04EB8
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 22:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 791FAC04EB8
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 22:15:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 643F52082B
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 22:09:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GaL8a7zH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 643F52082B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=broadcom.com
+	by mail.kernel.org (Postfix) with ESMTP id 465562082B
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 22:15:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 465562082B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725880AbeLDWJr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Dec 2018 17:09:47 -0500
-Received: from mail-yb1-f182.google.com ([209.85.219.182]:43040 "EHLO
-        mail-yb1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725875AbeLDWJq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 17:09:46 -0500
-Received: by mail-yb1-f182.google.com with SMTP id x144so3386536ybg.10
-        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 14:09:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=vpbJ3hhIEl9WIDdcymDJ5sWJ3DT9zjevC40rzXSSSwA=;
-        b=GaL8a7zHmNUp2CmXuXEKFZGjXSlj/+IIhuktl8iNaZFNEgPzVuoHtnlQG+voQdW0+m
-         H8W7v92zyNaZbbiI80Gali8m/mnTkrKh+itC+SEu8QKQLLby7jiDzw/wZkO0Pfb+vGnO
-         n7Tq6ib2zf9KiL+IO8ehKCE9p8rxGotY5fdIo=
+        id S1725925AbeLDWP2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 17:15:28 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:44567 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725875AbeLDWP2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 17:15:28 -0500
+Received: by mail-qt1-f194.google.com with SMTP id n32so20030084qte.11;
+        Tue, 04 Dec 2018 14:15:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=vpbJ3hhIEl9WIDdcymDJ5sWJ3DT9zjevC40rzXSSSwA=;
-        b=am9CmlDfaD6i2ynZ5eAngtmi/UNekc+TkKCc+JGgxJsmKcg5eBZ6g7WusXaK2tIRhs
-         iNRtIYt+Msa8yt0Q63koHG3gdrDJiEZ0p9TvfpXFeR82KegqMiBwhy/H45eREMV95Q8W
-         swKTGwLhWhrz7XkqDg4to82Cr+suAOi73gzYv0bHnGpSd62VTAtn/tvQEZj5h2oKFcl4
-         ENpdrI4dtXo01vk9dybKPPd6pFDLwli01J7kTMMJIITL7WVKKnEdneVvSFgsMa5IJg+F
-         Zv+8mxDQnaeWllbinRye6lnlmI4PqmO3TrAVoPjJ4tAzSVy2CG//JPRrSguV7TpJmB9J
-         yjFg==
-X-Gm-Message-State: AA+aEWax0XL6PeLnY+l+uaE4kIAIuyYEftSGeSpySSN6Bz2PQsYYOL7T
-        u200/T67zvzek6mQIlBWHtyM1Q==
-X-Google-Smtp-Source: AFSGD/VPicUWAjwpPKiLPnblfWPtfXJAg6Z36bpD9vtOs+ypFZ82ZYm7CY62cpjcEttJh1AUcYrzEA==
-X-Received: by 2002:a25:1383:: with SMTP id 125-v6mr22364106ybt.394.1543961385537;
-        Tue, 04 Dec 2018 14:09:45 -0800 (PST)
-Received: from [192.168.1.237] (ip68-5-145-143.oc.oc.cox.net. [68.5.145.143])
-        by smtp.gmail.com with ESMTPSA id n16sm7372244ywn.31.2018.12.04.14.09.43
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=ixSjDezikF8McOAtpR6nufWD3806ERSgOMy1Cw5PMmQ=;
+        b=iDG+//DRYyGyctFiwvcHEeJ4En/xtIbsN9sMVBlPqlHJPtJqQiVGHinOuFbrzjpaqm
+         fBSEp4P6NkBNct8ul15WYKagXiOSnFIDFRyDtPGLsuhhQxx7U+OFIckh7sZRNbsx4ov8
+         YHK6KjA5fLbp9QVQglP3xOXHOkWKA+PuYXOpylIwsSmGe20PmGh1ap5awSX0Q5iFgca4
+         iq/asuZ2WXRNTtE+oEZw/VS0V7q5a6Q5HnSp1BqF4yWILSZadLW4d5Ge9fu+MsZN9E/7
+         iiLPh1mxPHHPQTQW9G+YmQHPxZujudd4UU+XPvC33mIYIzuqNUjc6y0kXikJK1V2C+U8
+         I41Q==
+X-Gm-Message-State: AA+aEWZjc4qvl60dwj18hg6xZfhX+CtKcVvEWn8pI8MSUh1lE+DhEqKZ
+        Py6P10KH23tnF6O13jW+3Mk=
+X-Google-Smtp-Source: AFSGD/VlImFaszJYPM38EqGhPrCcDwXBgdMZ6FtpUIZRH0B0pa9AwNlKkMgQCTJIa3JsaomtTvXRqA==
+X-Received: by 2002:a0c:f313:: with SMTP id j19mr21634021qvl.200.1543961727132;
+        Tue, 04 Dec 2018 14:15:27 -0800 (PST)
+Received: from dennisz-mbp.dhcp.thefacebook.com ([2620:10d:c091:200::7:d0b1])
+        by smtp.gmail.com with ESMTPSA id 86sm14568635qky.92.2018.12.04.14.15.25
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Dec 2018 14:09:44 -0800 (PST)
-Subject: Re: [PATCH 1/2] blk-mq: Export iterating all tagged requests
-To:     Keith Busch <keith.busch@intel.com>
-Cc:     Sagi Grimberg <sagi@grimberg.me>, Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Hannes Reinecke <hare@suse.de>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        Christoph Hellwig <hch@lst.de>
-References: <20181130202635.11145-1-keith.busch@intel.com>
- <823fc3bf-78a4-c8fb-c80c-e3944f320af0@kernel.dk>
- <20181201164804.GB19557@lst.de>
- <9346f289-f265-e2ee-2d2c-c97973b45e23@suse.de>
- <8cd9a950-6605-6387-e4d4-4346a46da781@grimberg.me>
- <20181204154559.GJ14775@localhost.localdomain>
- <11e02aa5-b0cb-b4cf-0af4-da3db8db9e36@grimberg.me>
- <20181204174806.GA16751@localhost.localdomain>
- <b5b306cd-7341-7ce3-f2dc-fe98a01327fe@broadcom.com>
- <20181204212117.GC16751@localhost.localdomain>
-From:   James Smart <james.smart@broadcom.com>
-Message-ID: <975230d1-01b4-64a7-f906-ca1a6893f846@broadcom.com>
-Date:   Tue, 4 Dec 2018 14:09:42 -0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.2
+        Tue, 04 Dec 2018 14:15:26 -0800 (PST)
+Date:   Tue, 4 Dec 2018 17:15:23 -0500
+From:   Dennis Zhou <dennis@kernel.org>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Dennis Zhou <dennis@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Tejun Heo <tj@kernel.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Alasdair Kergon <agk@redhat.com>
+Subject: Re: [PATCH 05/14] dm: set the static flush bio device on demand
+Message-ID: <20181204221523.GA14183@dennisz-mbp.dhcp.thefacebook.com>
+References: <20181204183600.99746-1-dennis@kernel.org>
+ <20181204183600.99746-6-dennis@kernel.org>
+ <20181204202807.GA4689@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20181204212117.GC16751@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181204202807.GA4689@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Dec 04, 2018 at 03:28:07PM -0500, Mike Snitzer wrote:
+> On Tue, Dec 04 2018 at  1:35pm -0500,
+> Dennis Zhou <dennis@kernel.org> wrote:
+> 
+> > The next patch changes the macro bio_set_dev() to associate a bio with a
+> > blkg based on the device set. However, dm creates a static bio to be
+> > used as the basis for cloning empty flush bios on creation. The
+> > bio_set_dev() call in alloc_dev() will cause problems with the next
+> > patch adding association to bio_set_dev() because the call is before the
+> > bdev is associated with a gendisk (bd_disk is %NULL). To get around
+> > this, set the device on the static bio every time and use that to clone
+> > to the other bios.
+> > 
+> > Signed-off-by: Dennis Zhou <dennis@kernel.org>
+> > Cc: Alasdair Kergon <agk@redhat.com>
+> > Cc: Mike Snitzer <snitzer@redhat.com>
+> > ---
+> >  block/bio.c     |  1 +
+> >  drivers/md/dm.c | 12 +++++++++++-
+> >  2 files changed, 12 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/block/bio.c b/block/bio.c
+> > index 452b8e79b998..41ebb3f8e2fc 100644
+> > --- a/block/bio.c
+> > +++ b/block/bio.c
+> > @@ -2021,6 +2021,7 @@ void bio_disassociate_blkg(struct bio *bio)
+> >  		bio->bi_blkg = NULL;
+> >  	}
+> >  }
+> > +EXPORT_SYMBOL_GPL(bio_disassociate_blkg);
+> >  
+> >  /**
+> >   * __bio_associate_blkg - associate a bio with the a blkg
+> > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> > index a733e4c920af..a2d6f8b33d23 100644
+> > --- a/drivers/md/dm.c
+> > +++ b/drivers/md/dm.c
+> > @@ -1417,10 +1417,21 @@ static int __send_empty_flush(struct clone_info *ci)
+> >  	unsigned target_nr = 0;
+> >  	struct dm_target *ti;
+> >  
+> > +	/*
+> > +	 * Empty flush uses a statically initialized bio as the base for
+> > +	 * cloning, &md->flush_bio.  However, blkg association requires that
+> 
+> Would prefer:
+> "Empty flush uses a statically initialized bio, &md->flush_bio, as the
+> base for cloning.  ..."
+> 
 
+Cool, that reads better.
 
-On 12/4/2018 1:21 PM, Keith Busch wrote:
-> On Tue, Dec 04, 2018 at 11:33:33AM -0800, James Smart wrote:
->> I disagree.  The cases I've run into are on the admin queue - where we are
->> sending io to initialize the controller when another error/reset occurs, and
->> the checks are required to identify/reject the "old" initialization
->> commands, with another state check allowing them to proceed on the "new"
->> initialization commands.  And there are also cases for ioctls and other
->> things that occur during the middle of those initialization steps that need
->> to be weeded out.   The Admin queue has to be kept live to allow the
->> initialization commands on the new controller.
->>
->> state checks are also needed for those namespace validation cases....
->>
->>> Once quiesced, the proposed iterator can handle the final termination
->>> of the request, perform failover, or some other lld specific action
->>> depending on your situation.
->> I don't believe they can remain frozen, definitely not for the admin queue.
->> -- james
-> Quiesced and frozen carry different semantics.
->
-> My understanding of the nvme-fc implementation is that it returns
-> BLK_STS_RESOURCE in the scenario you've described where the admin
-> command can't be executed at the moment. That just has the block layer
-> requeue it for later resubmission 3 milliseconds later, which will
-> continue to return the same status code until you're really ready for
-> it.
+> > +	 * a bdev is associated with a gendisk, which doesn't happen until the
+> > +	 * bdev is opened.  So, blkg association is done at issue time of the
+> > +	 * flush rather than when the device is created in dm_alloc().
+> 
+> Another nit but I think you mean "alloc_dev()" here .......^
+> 
 
-BLK_STS_RESOURCE is correct - but for "normal" io, which comes from the 
-filesystem, etc and are mostly on the io queues.
+Yeah, I did mean alloc_dev(). Fixed.
 
-But if the io originated from other sources, like the core layer via 
-nvme_alloc_request() - used by lots of service routines for the 
-transport to initialize the controller, core routines to talk to the 
-controller, and ioctls from user space - then they are failed with a 
-PATHING ERROR status.  The status doesn't mean much to these other 
-places which mainly care if they succeed or not, and if not, they fail 
-and unwind.  It's pretty critical for these paths to get that error 
-status as many of those threads do synchronous io.  And this is not just 
-for nvme-fc. Any transport initializing the controller and getting half 
-way through it when an error occurs that kills the association will 
-depend on this behavior.  PCI is a large exception as interaction with a 
-pci function is very different from sending packets over a network and 
-detecting network errors.
+> > +	 */
+> > +	bio_set_dev(ci->bio, ci->io->md->bdev);
+> > +
+> >  	BUG_ON(bio_has_data(ci->bio));
+> >  	while ((ti = dm_table_get_target(ci->map, target_nr++)))
+> >  		__send_duplicate_bios(ci, ti, ti->num_flush_bios, NULL);
+> >  
+> > +	bio_disassociate_blkg(ci->bio);
+> > +
+> >  	return 0;
+> >  }
+> >  
+> > @@ -1939,7 +1950,6 @@ static struct mapped_device *alloc_dev(int minor)
+> >  		goto bad;
+> >  
+> >  	bio_init(&md->flush_bio, NULL, 0);
+> > -	bio_set_dev(&md->flush_bio, md->bdev);
+> >  	md->flush_bio.bi_opf = REQ_OP_WRITE | REQ_PREFLUSH | REQ_SYNC;
+> >  
+> >  	dm_stats_init(&md->stats);
+> 
+> The top-level DM device's bdev->bd_disk is only assigned after the first
+> blkdev_get(), so I can see why this is needed.
+> 
+> Think this type of life-cycle quirk was the kind of thing that caused
+> blk cgroup issues with DM.
+> 
+> Left wondering whether there would be a better way of handling N flush
+> bios for DM devices.  But for the now this will have to do.
+> 
+> Acked-by: Mike Snitzer <snitzer@redhat.com>
+> 
 
-Io requests, on the io queues, that are flagged as multipath, also are 
-failed this way rather than requeued.  We would need some iterator here 
-to classify the type of io (one valid to go down another path) and move 
-it to another path (but the transport doesn't want to know about other 
-paths).
-
-
->
-> What I'm proposing is that instead of using that return code, you may
-> have nvme-fc control when to dispatch those queued requests by utilizing
-> the blk-mq quiesce on/off states. Is there a reason that wouldn't work?
-
-and quiesce on/off isn't sufficient to do this.
-
--- james
-
-
+Thanks,
+Dennis
