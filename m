@@ -4,65 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF85DC04EBF
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 23:37:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E619CC04EBF
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 23:37:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A6923206B6
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 23:37:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A727820878
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 23:37:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="qlMYd37o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6923206B6
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="wPBjiib/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A727820878
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726578AbeLDXhn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Dec 2018 18:37:43 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:46473 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726092AbeLDXhm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 18:37:42 -0500
-Received: by mail-pg1-f196.google.com with SMTP id w7so8084253pgp.13
-        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 15:37:41 -0800 (PST)
+        id S1726092AbeLDXho (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 18:37:44 -0500
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:41240 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726581AbeLDXho (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 18:37:44 -0500
+Received: by mail-pl1-f196.google.com with SMTP id u6so9064943plm.8
+        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 15:37:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=FSmFyxdzuP5ug/6YEtOiiyUa72y6iXE8GKTBze9pRyY=;
-        b=qlMYd37o2DkQ1ult2b2Q7Vs9z4B4VNJMb2oQLB4pmOOOM+ETqKmU+ek2WqcteOS/hf
-         3fk+oxqXy/Ap2ZAVmGRSHOomawgkwGibsgtT2J/vGTH4hNsE5dvMwIA56ufTa5yycteo
-         zy0ALXXboieiifhKsgq4NT97odnaFaZStYGHkEOrYM3YKULleA93Bj8aiKraVQc558AI
-         dCEIfx3LBgPxl6B4RNhZuk49v1r7tjbTOLYk7NX23HIhhZDe6yvWz0TLDZu9P2gkk7VC
-         ZToJmvbqYF6EhWv+YiyJTWD0o8pXj8mDW3KHun/1ywcvZnYVv+03ZknyR5xgRFbpe2TH
-         Dopg==
+        bh=eJ3aWzBT4gm4FwYHYUV1JBWUWsiFyJVaotzVIFD6bng=;
+        b=wPBjiib/AjwVUwGJ8Lj5+r5OfUcoMGHUL3c3C2u3/Vn3Vducqv3jAJEiEW8fIUU6R+
+         2iTHG1CSQSlEMtijEzm9YarsbbSdzsn/KtPXXzOBMrRXHAzw03cMwxcGaNMmUbKmQCMr
+         TgS+An6DJrpU2gTFLW2AZS3aw3tWZJAWAEnVCAoEiIEZc/s5qlQZF4Q2FMjTDjTJnyWd
+         hzABWFT78uNa+cwEzAE/5EsSU1Tz3jBZr/GYFYFCdZoU6cH9pegXWYdND9wp+0A9s0rD
+         A6nDu0B07HWgQdLFsOO/+UKAFsQ9GKQBx5ExC2gcdQPKgm5+GWrLBzioapfM5tJCT0H/
+         Jx4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=FSmFyxdzuP5ug/6YEtOiiyUa72y6iXE8GKTBze9pRyY=;
-        b=sWokffGJekUyHmb7QsgNQXCTSfrQfW/zeymhXugef4+W0JS3KbrCIEvyyd/OMY5V14
-         ZuhGOXghh6CKqXnvCq8y3fHupWdrIk5VJjvr+Ftui1lmKLOnly1EUmoandG1bvEo3rL1
-         7UCRgy2oB5eOJqkqM9lzBKtfQGiZjrhGT85+2l0xArsLyKCwhMIERrE4HMF+tbOizFqp
-         QbDj2Ov4vDbP8OFnz8SK1uouwgoW6YeDxr5gjewuvhAbXKNzGVho0ajssQRvsO3uESA4
-         0lH7HyWm6lRuRKX59QvJGje7gZLwmtWFtpDFLekYMZEgZVlaTxQRqWiqAMIHcLrnq6Nc
-         Fd5g==
-X-Gm-Message-State: AA+aEWZmAgspgJ9KSTufKCJRvXnYl+tlKFEk3orE0X+lzFXZ4pJDV/kR
-        0Qr+e71HVNgDjbf/PouZBFehSCK5G9o=
-X-Google-Smtp-Source: AFSGD/UVk0jn174qmJfatEBZtlMDsDTIbnBGv5Qzzs3/ZmsrkcOjoekCOck9thzDRUl5Dal/0aLw5A==
-X-Received: by 2002:a65:564b:: with SMTP id m11mr17957051pgs.216.1543966661174;
-        Tue, 04 Dec 2018 15:37:41 -0800 (PST)
+        bh=eJ3aWzBT4gm4FwYHYUV1JBWUWsiFyJVaotzVIFD6bng=;
+        b=XHTf+GL9iIHJzZ2Gxxi/Sj9HucW1uCBnnwqmF0uQ2QkdjWP2uL44QlqTp1u+MF2oty
+         pMwPLIg9Hh7idZWbMeYdeSPtkygYW3e7cD4wzARVnxwH1EqnOXJyQBN3ctJmyUIJXgex
+         GK5rot7Z0i7yblnw5M23WZPd/X7GL1sdmOo6GvZMDYedmBn8Us0SYEcYqY/0uMU8A5BH
+         EdNyATr1GpOu3BXjkF8J4I82Ry+iAXrUzC/TdV5vwACh2GcrQfj5RgP61qyQO7p+bcBT
+         hmyNDIAZfPY/qjxlqYvBLM1Qys8plGB1Pz4hOVLAWILlqPWl8SXYl1qv8kf4evilQ0ZK
+         F89g==
+X-Gm-Message-State: AA+aEWbSCHJE/YBvSjTmieGPGmqjpj6buJdv+UK3w5k6701Na9vR/Mpn
+        7S82p17qeGmp9iiEobYvZA5Lp9bvhYU=
+X-Google-Smtp-Source: AFSGD/V86QrCPgAdBchJQQz7hOU1x9SJhRs1OCI9da1EDCeCoh6DTnTxrl+TeHAZGced5LMzX9kt7g==
+X-Received: by 2002:a17:902:1008:: with SMTP id b8mr21275265pla.252.1543966663256;
+        Tue, 04 Dec 2018 15:37:43 -0800 (PST)
 Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id t13sm22527635pgr.42.2018.12.04.15.37.39
+        by smtp.gmail.com with ESMTPSA id t13sm22527635pgr.42.2018.12.04.15.37.41
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Dec 2018 15:37:40 -0800 (PST)
+        Tue, 04 Dec 2018 15:37:42 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-aio@kvack.org
 Cc:     hch@lst.de, jmoyer@redhat.com, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 02/26] block: add REQ_HIPRI_ASYNC
-Date:   Tue,  4 Dec 2018 16:37:05 -0700
-Message-Id: <20181204233729.26776-3-axboe@kernel.dk>
+Subject: [PATCH 03/26] block: wire up block device iopoll method
+Date:   Tue,  4 Dec 2018 16:37:06 -0700
+Message-Id: <20181204233729.26776-4-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181204233729.26776-1-axboe@kernel.dk>
 References: <20181204233729.26776-1-axboe@kernel.dk>
@@ -71,28 +71,53 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For the upcoming async polled IO, we can't sleep allocating requests.
-If we do, then we introduce a deadlock where the submitter already
-has async polled IO in-flight, but can't wait for them to complete
-since polled requests must be active found and reaped.
+From: Christoph Hellwig <hch@lst.de>
 
+Just call blk_poll on the iocb cookie, we can derive the block device
+from the inode trivially.
+
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- include/linux/blk_types.h | 1 +
- 1 file changed, 1 insertion(+)
+ fs/block_dev.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index c0ba1a038ff3..1d9c3da0f2a1 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -346,6 +346,7 @@ enum req_flag_bits {
- #define REQ_NOWAIT		(1ULL << __REQ_NOWAIT)
- #define REQ_NOUNMAP		(1ULL << __REQ_NOUNMAP)
- #define REQ_HIPRI		(1ULL << __REQ_HIPRI)
-+#define REQ_HIPRI_ASYNC		(REQ_HIPRI | REQ_NOWAIT)
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index e1886cc7048f..6de8d35f6e41 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -281,6 +281,14 @@ struct blkdev_dio {
  
- #define REQ_DRV			(1ULL << __REQ_DRV)
- #define REQ_SWAP		(1ULL << __REQ_SWAP)
+ static struct bio_set blkdev_dio_pool;
+ 
++static int blkdev_iopoll(struct kiocb *kiocb, bool wait)
++{
++	struct block_device *bdev = I_BDEV(kiocb->ki_filp->f_mapping->host);
++	struct request_queue *q = bdev_get_queue(bdev);
++
++	return blk_poll(q, READ_ONCE(kiocb->ki_cookie), wait);
++}
++
+ static void blkdev_bio_end_io(struct bio *bio)
+ {
+ 	struct blkdev_dio *dio = bio->bi_private;
+@@ -398,6 +406,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
+ 				bio->bi_opf |= REQ_HIPRI;
+ 
+ 			qc = submit_bio(bio);
++			WRITE_ONCE(iocb->ki_cookie, qc);
+ 			break;
+ 		}
+ 
+@@ -2070,6 +2079,7 @@ const struct file_operations def_blk_fops = {
+ 	.llseek		= block_llseek,
+ 	.read_iter	= blkdev_read_iter,
+ 	.write_iter	= blkdev_write_iter,
++	.iopoll		= blkdev_iopoll,
+ 	.mmap		= generic_file_mmap,
+ 	.fsync		= blkdev_fsync,
+ 	.unlocked_ioctl	= block_ioctl,
 -- 
 2.17.1
 
