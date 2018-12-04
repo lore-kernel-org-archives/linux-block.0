@@ -2,147 +2,109 @@ Return-Path: <SRS0=ovnK=ON=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AC8FC04EB8
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 19:33:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CA03C04EB8
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 19:35:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 52CBB206B7
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 19:33:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="UJjYRHrS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52CBB206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=broadcom.com
+	by mail.kernel.org (Postfix) with ESMTP id 3B8C320834
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 19:35:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B8C320834
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725874AbeLDTdh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Dec 2018 14:33:37 -0500
-Received: from mail-yb1-f175.google.com ([209.85.219.175]:46458 "EHLO
-        mail-yb1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725831AbeLDTdh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 14:33:37 -0500
-Received: by mail-yb1-f175.google.com with SMTP id l126so3393412ybf.13
-        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 11:33:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=Iwdipn8mV+PFGWbTHjKp+Lk2ierRZsqbwHZkbqpQrZU=;
-        b=UJjYRHrSiFLZMppxKuYqObv7PpOYSx+duImyntoh1TRPuN1ijJ4rbVUjAkJPcNnB7H
-         lYg4wWX9wIoZ389gVvl+qra0iiYfmcDAvRbHvUOOvPZGSDXOItS42kwz8+kaXqT3SKln
-         jSk4ChXvF7lWtjaB0GiC5J6TK9Ae+hULxOlaw=
+        id S1725866AbeLDTfI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 14:35:08 -0500
+Received: from mail-pg1-f174.google.com ([209.85.215.174]:37263 "EHLO
+        mail-pg1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725855AbeLDTfI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 14:35:08 -0500
+Received: by mail-pg1-f174.google.com with SMTP id 80so7825728pge.4;
+        Tue, 04 Dec 2018 11:35:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=Iwdipn8mV+PFGWbTHjKp+Lk2ierRZsqbwHZkbqpQrZU=;
-        b=ewz8NU11JguPal1U3zXdX6OJrr8kBERGr9c9NjK+DGX67STjp1rXL2tKybyAdM3Ndg
-         /u1bAjQc+b2u7W2GDGQRZXq+Pkd+rUeeJjG1Dg2vtlGR4AbadGPBRx7qvFvw5O+4f5kj
-         vWEhKT8I7t+IBFJICd/2d8Ec0G8rRqCb5AAMQkGgD6aTIeLq4CrT0uBtnXwG40ilnnQz
-         creCFwNbAqbml8v/ySLInkju2l7oMOzbyIf2dYsnrJ6MC2RW95PfsRUI0mUf7auZ+Rvx
-         55TFkcZS8nC2FZcMm+YgzAxnd8cf2eod7d5HbV33mgQhjfSZLsYLTvOLXyk3dCfjKJwT
-         UiLA==
-X-Gm-Message-State: AA+aEWb0exhrqVy4nidPtRnNwmTCt5el695JubcxrBSxBKk+usxN+wDo
-        echVL4HlN2EC0lxPIpvKUAh7mQ==
-X-Google-Smtp-Source: AFSGD/XZxHIajk7/5k1ZaHPMoULEQURPmgRgpuPAz/Cz+xZ66uvOXFJin8p5RcIcq1p+/KHj2E9ucw==
-X-Received: by 2002:a25:1585:: with SMTP id 127-v6mr20864204ybv.208.1543952016147;
-        Tue, 04 Dec 2018 11:33:36 -0800 (PST)
-Received: from [192.168.1.237] (ip68-5-145-143.oc.oc.cox.net. [68.5.145.143])
-        by smtp.gmail.com with ESMTPSA id j6sm6012304ywi.110.2018.12.04.11.33.34
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Dec 2018 11:33:35 -0800 (PST)
-Subject: Re: [PATCH 1/2] blk-mq: Export iterating all tagged requests
-To:     Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Hannes Reinecke <hare@suse.de>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        Christoph Hellwig <hch@lst.de>
-References: <20181130202635.11145-1-keith.busch@intel.com>
- <823fc3bf-78a4-c8fb-c80c-e3944f320af0@kernel.dk>
- <20181201164804.GB19557@lst.de>
- <9346f289-f265-e2ee-2d2c-c97973b45e23@suse.de>
- <8cd9a950-6605-6387-e4d4-4346a46da781@grimberg.me>
- <20181204154559.GJ14775@localhost.localdomain>
- <11e02aa5-b0cb-b4cf-0af4-da3db8db9e36@grimberg.me>
- <20181204174806.GA16751@localhost.localdomain>
-From:   James Smart <james.smart@broadcom.com>
-Message-ID: <b5b306cd-7341-7ce3-f2dc-fe98a01327fe@broadcom.com>
-Date:   Tue, 4 Dec 2018 11:33:33 -0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.2
-MIME-Version: 1.0
-In-Reply-To: <20181204174806.GA16751@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=chND8r3WS/hguEE67ft5PJqXhGXMvedt4gxFiwZIX/M=;
+        b=azCa0VFrY33QwJmHt7jv7Yqx+C/7ULEGjnrEUFpMJNYocwPMPsJL3uJnHUdDzcUstV
+         xqOqP+cy4hkGr3DZmht9Fwyy1n+to1GWT8F53BYUZ0Npr2AwbWwo55Ft1df+JxhCVptR
+         PtMik8g0KCM3ZzZ2XiQ+P6KwGrw4m5yu6YupiDr0OOQaTcBFALcgw4V72fHOm8e5OjAZ
+         uYSOAUWnAHzZ+ViTGAsXenB7MhguotQcFrqkf2opkpfeqQQr5eoKvaXeLzUhMKCN6zdU
+         CoKXXLctJLY/3x0jgK33lkzfVlo/HJIu2AOf3yK84Y7I3u+8TFtubQ3RwWnQ1670HYWU
+         Ps5w==
+X-Gm-Message-State: AA+aEWbq2iiDAywemlRmpLOcdtESFYlzMlBS0wgbScXA5weNvd1146kx
+        +6rSMFSredtpxehnAOBe+0Q=
+X-Google-Smtp-Source: AFSGD/UKi45mhB+LlnVN2R+UEwoLJFrhWw5lxPdfdSEEVLxXOyH0QX3se29BCEEYRrldROtr50SFpg==
+X-Received: by 2002:a62:442:: with SMTP id 63mr20921230pfe.156.1543952107397;
+        Tue, 04 Dec 2018 11:35:07 -0800 (PST)
+Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id y1-v6sm23291532pfb.81.2018.12.04.11.35.06
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 04 Dec 2018 11:35:06 -0800 (PST)
+Message-ID: <1543952105.185366.210.camel@acm.org>
+Subject: Re: +AFs-PATCH+AF0- blk-mq: Set request mapping to NULL in
+ blk+AF8-mq+AF8-put+AF8-driver+AF8-tag
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Kashyap Desai <kashyap.desai@broadcom.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        linux-scsi <linux-scsi@vger.kernel.org>
+Cc:     Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
+Date:   Tue, 04 Dec 2018 11:35:05 -0800
+In-Reply-To: <ce2cdcee7e8d8e21cc8398a882b9d6e3@mail.gmail.com>
+References: +ADw-CAHsXFKFOBSmZeT9j7U2S6J4Af2k2ODe+AF8-pkFVGJg73v0Wp7O38A+AEA-mail.gmail.com+AD4- +ADw-7e8e1fe2-9f91-a370-a98c-43cdad1f6e8e+AEA-acm.org+AD4- +ADw-d56ddf2b485c13445fff5f9c36dd3c87+AEA-mail.gmail.com+AD4- +ADw-1543943674.185366.194.camel+AEA-acm.org+AD4- <ce2cdcee7e8d8e21cc8398a882b9d6e3@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, 2018-12-04 at 23:48 +-0530, Kashyap Desai wrote:
++AD4 Let me explain the issue. It is not a race, but very straight issue.
 
+Please clarify what makes you think that iterating over all requests does not
+race with request completion. Is request submission perhaps blocked during the
+firmware recovery process? Does the firmware recovery process wait for
+completion interrupts that are in progress to finish?
 
-On 12/4/2018 9:48 AM, Keith Busch wrote:
-> On Tue, Dec 04, 2018 at 09:38:29AM -0800, Sagi Grimberg wrote:
->>>>> Yes, I'm very much in favour of this, too.
->>>>> We always have this IMO slightly weird notion of stopping the queue, set
->>>>> some error flags in the driver, then _restarting_ the queue, just so
->>>>> that the driver then sees the error flag and terminates the requests.
->>>>> Which I always found quite counter-intuitive.
->>>> What about requests that come in after the iteration runs? how are those
->>>> terminated?
->>> If we've reached a dead state, I think you'd want to start a queue freeze
->>> before running the terminating iterator.
->> Its not necessarily dead, in fabrics we need to handle disconnections
->> that last for a while before we are able to reconnect (for a variety of
->> reasons) and we need a way to fail I/O for failover (or requeue, or
->> block its up to the upper layer). Its less of a "last resort" action
->> like in the pci case.
->>
->> Does this guarantee that after freeze+iter we won't get queued with any
->> other request? If not then we still need to unfreeze and fail at
->> queue_rq.
-> It sounds like there are different scenarios to consider.
->
-> For the dead controller, we call blk_cleanup_queue() at the end which
-> ends callers who blocked on entering.
->
-> If you're doing a failover, you'd replace the freeze with a current path
-> update in order to prevent new requests from entering.
-and if you're not multipath ?    I assume you want the io queues to be 
-frozen so they queue there - which can block threads such as ns 
-verification. It's good to have them live, as todays checks bounce the 
-io, letting the thread terminate as its in a reset/reconnect state, 
-which allows those threads to exit out or finish before a new reconnect 
-kicks them off again. We've already been fighting deadlocks with the 
-reset/delete/rescan paths and these io paths. suspending the queues 
-completely over the reconnect will likely create more issues in this area.
++AD4 Let's
++AD4 say we have one scsi+AF8-device /dev/sda and total IO submitted +- completed are
++AD4 some number 100.
++AD4 All the 100 IO is +ACo-completed+ACo.   Now, As part of Firmware recovery, driver
++AD4 tries to find our outstanding IOs using scsi+AF8-host+AF8-find+AF8-tag().
++AD4 Block layer will return all the 100 commands to the driver but really those
++AD4 100 commands are not outstanding. This patch will return +ACo-actual+ACo
++AD4 outstanding commands.
 
+Would iterating over started requests be a good alternative to the patch
+that you had posted? The header above blk+AF8-mq+AF8-tagset+AF8-busy+AF8-iter() is as follows
+(this function is used by e.g. the skd driver for firmware recovery):
 
-> In either case, you don't need checks in queue_rq. The queue_rq check
-> is redundant with the quiesce state that blk-mq already provides.
+/+ACoAKg
+ +ACo blk+AF8-mq+AF8-tagset+AF8-busy+AF8-iter - iterate over all started requests in a tag set
+ +ACo +AEA-tagset:	Tag set to iterate over.
+ +ACo +AEA-fn:		Pointer to the function that will be called for each started
+ +ACo		request. +AEA-fn will be called as follows: +AEA-fn(rq, +AEA-priv,
+ +ACo		reserved) where rq is a pointer to a request. 'reserved'
+ +ACo		indicates whether or not +AEA-rq is a reserved request.
+ +ACo +AEA-priv:	Will be passed as second argument to +AEA-fn.
+ +ACo-/
 
-I disagree.  The cases I've run into are on the admin queue - where we 
-are sending io to initialize the controller when another error/reset 
-occurs, and the checks are required to identify/reject the "old" 
-initialization commands, with another state check allowing them to 
-proceed on the "new" initialization commands.  And there are also cases 
-for ioctls and other things that occur during the middle of those 
-initialization steps that need to be weeded out.   The Admin queue has 
-to be kept live to allow the initialization commands on the new controller.
++AD4 I am not able to find right context from srp, but I check the srp code and
++AD4 looks like that driver is getting scmd using scsi+AF8-host+AF8-find+AF8-tag() for live
++AD4 command.
 
-state checks are also needed for those namespace validation cases....
+Sorry, my e-mail was a bit too short to be comprehensible. When running
+sg+AF8-reset -d /dev/sd... in a loop it is possible that the SCSI reset handler
+terminates a request while the SRP driver is handling a request completion
+for one of the terminated requests. That is why both srp+AF8-process+AF8-srp() and
+the reset handler call srp+AF8-claim+AF8-req() to make sure that only one of these
+two contexts completes a request.
 
->
-> Once quiesced, the proposed iterator can handle the final termination
-> of the request, perform failover, or some other lld specific action
-> depending on your situation.
-
-I don't believe they can remain frozen, definitely not for the admin queue.
--- james
-
+Bart.
