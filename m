@@ -2,129 +2,82 @@ Return-Path: <SRS0=ovnK=ON=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A1C6C04EBF
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 10:00:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C343C04EB8
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 11:36:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1C4542082B
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 10:00:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Lha4EGU3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C4542082B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=broadcom.com
+	by mail.kernel.org (Postfix) with ESMTP id 6BA922146D
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 11:36:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BA922146D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726042AbeLDKAY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Dec 2018 05:00:24 -0500
-Received: from mail-it1-f196.google.com ([209.85.166.196]:55536 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725613AbeLDKAY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 05:00:24 -0500
-Received: by mail-it1-f196.google.com with SMTP id o19so14398498itg.5
-        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 02:00:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=mime-version:from:date:message-id:subject:to:cc
-         :content-transfer-encoding;
-        bh=gmbo766LGwjzdNTXE4pQ4XjK+N0K1PO3YhpgsMnbwSU=;
-        b=Lha4EGU3ZEbxIyY0yOrJAO7S9GRgq1b1xvKBuktkjc78ZDKZLCguruf1cSFEcQeihi
-         As0dFSDM+WTMGgZqZb5bZw4LtXBIxNkSA0AF5RNTvGEBDuK1w3imjgjjQbkpmnN0FbKz
-         6NMoZ/R3Q184oGvijlzx+mYiYZynSwR941q0g=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
-         :content-transfer-encoding;
-        bh=gmbo766LGwjzdNTXE4pQ4XjK+N0K1PO3YhpgsMnbwSU=;
-        b=Sv5aZH34gMJcVUxATINdbIBoAaBcWRGfWrpcehwWY18r3HXS9CkoPXtLtKJ74HZn6A
-         PaHzxdCZquLnmMFnTSZ7zunS3SuW0QoS2Dh+jwwuOAqWyLVGLQYeTS9k+Sat2LPevewK
-         yHJV67Ko6ZSLNszWoejEwO1nw4i6voes9zbW07I/qRFs9l2snNJ3Tl48kcXg+E/OqwKQ
-         OiEbf1iOmJwlB7HrzTh24nXd/bjCz4ywevCRoY5zJRKneFtkalPGPOtyMIAeg1x8Ey45
-         eLLFfI2rHQKF4x4UG3DdVkDBQtm984PpC64NzNBG69iO1WI8+z5JEOH6sqEp35i/iMD+
-         N1hg==
-X-Gm-Message-State: AA+aEWbMIeaudXIXxhFzYf6Hk4kBthNLlgpm/yQq0MC8pFwCq2/8IUQZ
-        S6gI/izrcG/TozFfk5Ud7iAH4r9kOYMnyvfu1sAWdfXJtTU=
-X-Google-Smtp-Source: AFSGD/UDf+InyLrr8LTHAx7G9ed2WD4rmnhT9Qnz1wW8uuj3ReXddGh3nQ4UsLC0X4cbVjh5SShclR+OBpiGvPPs/xk=
-X-Received: by 2002:a02:2303:: with SMTP id u3mr17912788jau.42.1543917623017;
- Tue, 04 Dec 2018 02:00:23 -0800 (PST)
-MIME-Version: 1.0
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-Date:   Tue, 4 Dec 2018 15:30:11 +0530
-Message-ID: <CAHsXFKFOBSmZeT9j7U2S6J4Af2k2ODe_pkFVGJg73v0Wp7O38A@mail.gmail.com>
-Subject: [PATCH] blk-mq: Set request mapping to NULL in blk_mq_put_driver_tag
-To:     linux-block <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
-Cc:     Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+        id S1725956AbeLDLgJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 06:36:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:40650 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725767AbeLDLgJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Dec 2018 06:36:09 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2BCD7308339D;
+        Tue,  4 Dec 2018 11:36:09 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 25B585DE01;
+        Tue,  4 Dec 2018 11:35:56 +0000 (UTC)
+Date:   Tue, 4 Dec 2018 19:35:52 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Kashyap Desai <kashyap.desai@broadcom.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
         Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Sathya Prakash <sathya.prakash@broadcom.com>
+Subject: Re: [PATCH] blk-mq: Set request mapping to NULL in
+ blk_mq_put_driver_tag
+Message-ID: <20181204113550.GA11121@ming.t460p>
+References: <CAHsXFKFOBSmZeT9j7U2S6J4Af2k2ODe_pkFVGJg73v0Wp7O38A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHsXFKFOBSmZeT9j7U2S6J4Af2k2ODe_pkFVGJg73v0Wp7O38A@mail.gmail.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Tue, 04 Dec 2018 11:36:09 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Problem statement :
-Whenever try to get outstanding request via scsi_host_find_tag,
-block layer will return stale entries instead of actual outstanding
-request. Kernel panic if stale entry is inaccessible or memory is reused.
-Fix :
-Undo request mapping in blk_mq_put_driver_tag  nce request is return.
+On Tue, Dec 04, 2018 at 03:30:11PM +0530, Kashyap Desai wrote:
+> Problem statement :
+> Whenever try to get outstanding request via scsi_host_find_tag,
+> block layer will return stale entries instead of actual outstanding
+> request. Kernel panic if stale entry is inaccessible or memory is reused.
+> Fix :
+> Undo request mapping in blk_mq_put_driver_tag  nce request is return.
+> 
+> More detail :
+> Whenever each SDEV entry is created, block layer allocate separate tags
+> and static requestis.Those requests are not valid after SDEV is deleted
+> from the system. On the fly, block layer maps static rqs to rqs as below
+> from blk_mq_get_driver_tag()
+> 
+> data.hctx->tags->rqs[rq->tag] = rq;
+> 
+> Above mapping is active in-used requests and it is the same mapping which
+> is referred in function scsi_host_find_tag().
+> After running some IOs, “data.hctx->tags->rqs[rq->tag]” will have some
+> entries which will never be reset in block layer.
 
-More detail :
-Whenever each SDEV entry is created, block layer allocate separate tags
-and static requestis.Those requests are not valid after SDEV is deleted
-from the system. On the fly, block layer maps static rqs to rqs as below
-from blk_mq_get_driver_tag()
+However, if rq & rq->tag is valid, data.hctx->tags->rqs[rq->tag] should
+have pointed to one active request instead of the stale one, right?
 
-data.hctx->tags->rqs[rq->tag] =3D rq;
-
-Above mapping is active in-used requests and it is the same mapping which
-is referred in function scsi_host_find_tag().
-After running some IOs, =E2=80=9Cdata.hctx->tags->rqs[rq->tag]=E2=80=9D wil=
-l have some
-entries which will never be reset in block layer.
-
-There would be a kernel panic, If request pointing to
-=E2=80=9Cdata.hctx->tags->rqs[rq->tag]=E2=80=9D is part of =E2=80=9Csdev=E2=
-=80=9D which is removed
-and as part of that all the memory allocation of request associated with
-that sdev might be reused or inaccessible to the driver.
-Kernel panic snippet -
-
-BUG: unable to handle kernel paging request at ffffff8000000010
-IP: [<ffffffffc048306c>] mpt3sas_scsih_scsi_lookup_get+0x6c/0xc0 [mpt3sas]
-PGD aa4414067 PUD 0
-Oops: 0000 [#1] SMP
-Call Trace:
- [<ffffffffc046f72f>] mpt3sas_get_st_from_smid+0x1f/0x60 [mpt3sas]
- [<ffffffffc047e125>] scsih_shutdown+0x55/0x100 [mpt3sas]
-
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Kashyap Desai <kashyap.desai@broadcom.com>
-Signed-off-by: Sreekanth Reddy <sreekanth.reddy@broadcom.com>
-
-
----
- block/blk-mq.h | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 9497b47..57432be 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -175,6 +175,7 @@ static inline bool
-blk_mq_get_dispatch_budget(struct blk_mq_hw_ctx *hctx)
- static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
-                        struct request *rq)
- {
-+    hctx->tags->rqs[rq->tag] =3D NULL;
-     blk_mq_put_tag(hctx, hctx->tags, rq->mq_ctx, rq->tag);
-     rq->tag =3D -1;
-
---=20
-1.8.3.1
+Thanks,
+Ming
