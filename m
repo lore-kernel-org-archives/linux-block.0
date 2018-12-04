@@ -2,118 +2,115 @@ Return-Path: <SRS0=ovnK=ON=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0612CC04EB8
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 18:40:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71621C04EB8
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 19:13:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B975B20834
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 18:40:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 34BE52082B
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 19:13:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="1nhPZnzj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B975B20834
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aK60bJN+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34BE52082B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725887AbeLDSkV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Dec 2018 13:40:21 -0500
-Received: from mail-it1-f176.google.com ([209.85.166.176]:54800 "EHLO
-        mail-it1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725797AbeLDSkU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 13:40:20 -0500
-Received: by mail-it1-f176.google.com with SMTP id i145so17078877ita.4
-        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 10:40:20 -0800 (PST)
+        id S1725875AbeLDTNy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 14:13:54 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:37003 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725864AbeLDTNy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 14:13:54 -0500
+Received: by mail-pf1-f193.google.com with SMTP id y126so8697520pfb.4
+        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 11:13:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        d=broadcom.com; s=google;
         h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=1+JDQ/NnX6tG1n8cbWDk+0wKzjEzGeT4Hsf8t0KdPw4=;
-        b=1nhPZnzj34EtoKokIFRYgJmp60PvtGTIH9dIL59nlbRG+tt43Wcv4aJWQBBUq0I+cp
-         Oeve1pVqVI/Q4ao6gZE+8wo3DU869TZDQz+M5wqEFLDRy6z3KXj4sekYpbfjRXjMdz28
-         1QH4J4nQFDD5kTKZk0mJFkOALouN+CkkMonX7NSQryNXFSSjWUa1YszTEyT7mUjo2akX
-         XkdSQi+hz+QIUBRR93PV3bPSQabMf1Vc08TbKnL4N/sB6qOsiTFQS6FHBXlyi2k8OswO
-         AQ9AsgkvuNFZg6oQdgPfteMEJXA5znEmeEzi+9kO7jh2HUm84d1qIpKAJWfdKWFcHAzh
-         6ieQ==
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=eBDQPbGS5Dj4tWunN8ujeBqj/BcNwt7XOyP7uon1nYk=;
+        b=aK60bJN+PjcpI/SqQWRJjVJU3+IDkW10YnvhldKqGFCyHhOowWbEhJEuxCqf0TXiun
+         /7ECo+f1zvoxjqzgvryDwXJV59oHrWu46S4APuPk5PGfFl18++HnMw2aHWdM84qc5dGf
+         d0POVPkLKXiL1ziVY3HQicqmCEmKgz5gdeb84=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1+JDQ/NnX6tG1n8cbWDk+0wKzjEzGeT4Hsf8t0KdPw4=;
-        b=JLfdg+UZgGurQo0DEp0rMR1DZEiqe2HwytFFbBL5kJW556Vu00WXpvXsz0zTN31Ecg
-         4RZ9fknTzP+oz1oA/pQHM6L6j31TdNxQNB46KE1Qwu6FrtvFkHiPNFxxM/G+lPxnOr9z
-         7EI1fNmy0W/xFgGMQN2H0mwhVcISsJFOhnCwcFZqiVVYDnlqj4mIP21eIw90m0d+Rp/C
-         RlHWFAsUsvJZFZ13f5lxsnk+bLAwE+Fp+B4+Rv3TrXSD7K3qELYy9T1+YeUZuQu5ksQh
-         gQ9V2P1rO4UIfLK0R3Kfbis/IGCPSSp0AsdQkY2g0s9KsuTEQRiDNEjw7FMkdChZlQwB
-         W8HA==
-X-Gm-Message-State: AA+aEWa2nb083ukFkwkSbNSXS8hYcFkL4UyW2DyofPOfJxQV8NSMMjVp
-        8KkLX4Hiu4zrd7fFYdC/DCNiI4CP++w=
-X-Google-Smtp-Source: AFSGD/WMTtYuMero7yAjWcZ1PwF6g6DJDUNRTyMzfYtwDam5PnXSm3u6C3TRt7uVs7bDUd8xQ6LZIg==
-X-Received: by 2002:a02:6:: with SMTP id 6mr18744943jaa.19.1543948818783;
-        Tue, 04 Dec 2018 10:40:18 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id d192sm7458319iog.81.2018.12.04.10.40.17
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=eBDQPbGS5Dj4tWunN8ujeBqj/BcNwt7XOyP7uon1nYk=;
+        b=nA4J3pxk7pb83BlSNnE/lkCxb1fWcj6GMOJDF11brely1tvVOQKjyjze3Ph7k4QLso
+         r8k0RQ8A/SUl6JDc4ZPhHX/I2Qd8wlcAfzPU5OooJgUfttidPQ13Yd1Fa1V9wZwQlQF0
+         TOnG61Wi7eoDwhSXtdYhrPtJBwPeRCH/HYX04BCSqv/bjOuDUzD5LYNCVbXspcAaujLO
+         1IUs95NgQtSfS660kkSz1pIqk8bGjIgUny71eGxwO77sNQgDvXuyL3cYO8cjOKESLlTY
+         gXXPCxoO07FcMaSDd11OhMN6HQlWxANny3VKzuag/u/sy0yxE2rjsUy5Lw0tytwdKA3a
+         w/7w==
+X-Gm-Message-State: AA+aEWb3Vw7+XzENiVTDBFiivf47jG/PAklFUgjbn60rPsxNROeZA0Us
+        HXUp0xI896vG9obEO/L/dTJmFw==
+X-Google-Smtp-Source: AFSGD/XrnDXnP2WoL8Fa1yaYrvhzAkjWjg2bNHlJ5MCgNmbon/B9vQG15HI6xHRlaNah481Lx+sruA==
+X-Received: by 2002:a65:62da:: with SMTP id m26mr17842593pgv.278.1543950832403;
+        Tue, 04 Dec 2018 11:13:52 -0800 (PST)
+Received: from [10.75.249.89] ([192.19.228.250])
+        by smtp.gmail.com with ESMTPSA id q1sm19070343pgs.14.2018.12.04.11.13.50
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Dec 2018 10:40:17 -0800 (PST)
-Subject: Re: block and nvme polling improvements V3
-To:     Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>
-Cc:     Max Gurtovoy <maxg@mellanox.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org
-References: <20181202164628.1116-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <11a7106d-17e2-ceb4-bc16-22b447d0bc0f@kernel.dk>
-Date:   Tue, 4 Dec 2018 11:40:16 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Tue, 04 Dec 2018 11:13:51 -0800 (PST)
+Subject: Re: [PATCH 1/2] blk-mq: Export iterating all tagged requests
+To:     Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <keith.busch@intel.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Hannes Reinecke <hare@suse.de>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Christoph Hellwig <hch@lst.de>
+References: <20181130202635.11145-1-keith.busch@intel.com>
+ <823fc3bf-78a4-c8fb-c80c-e3944f320af0@kernel.dk>
+ <20181201164804.GB19557@lst.de>
+ <9346f289-f265-e2ee-2d2c-c97973b45e23@suse.de>
+ <8cd9a950-6605-6387-e4d4-4346a46da781@grimberg.me>
+ <20181204154559.GJ14775@localhost.localdomain>
+ <5af6dfb3-c471-1377-2d1d-b2a4b15eef43@broadcom.com>
+ <19b3821e-02fa-bd09-1b90-0dd8904e8a57@grimberg.me>
+From:   James Smart <james.smart@broadcom.com>
+Message-ID: <2ba6570b-1684-6082-7b70-f51a4136b38a@broadcom.com>
+Date:   Tue, 4 Dec 2018 11:13:49 -0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.2
 MIME-Version: 1.0
-In-Reply-To: <20181202164628.1116-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <19b3821e-02fa-bd09-1b90-0dd8904e8a57@grimberg.me>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/2/18 9:46 AM, Christoph Hellwig wrote:
-> Hi all,
-> 
-> this series optimizes a few bits in the block layer and nvme code
-> related to polling.
-> 
-> It starts by moving the queue types recently introduce entirely into
-> the block layer instead of requiring an indirect call for them.
-> 
-> It then switches nvme and the block layer to only allow polling
-> with separate poll queues, which allows us to realize the following
-> benefits:
-> 
->  - poll queues can safely avoid disabling irqs on any locks
->    (we already do that in NVMe, but it isn't 100% kosher as-is)
->  - regular interrupt driven queues can drop the CQ lock entirely,
->    as we won't race for completing CQs
-> 
-> Then we drop the NVMe RDMA code, as it doesn't follow the new mode,
-> and remove the nvme multipath polling code including the block hooks
-> for it, which didn't make much sense to start with given that we
-> started bypassing the multipath code for single controller subsystems
-> early on.  Last but not least we enable polling in the block layer
-> by default if the underlying driver has poll queues, as that already
-> requires explicit user action.
-> 
-> Note that it would be really nice to have polling back for RDMA with
-> dedicated poll queues, but that might take a while.  Also based on
-> Jens' polling aio patches we could now implement a model in nvmet
-> where we have a thread polling both the backend nvme device and
-> the RDMA CQs, which might give us some pretty nice performace
-> (I know Sagi looked into something similar a while ago).
 
-Applied, thanks.
 
--- 
-Jens Axboe
+On 12/4/2018 9:23 AM, Sagi Grimberg wrote:
+>
+>>>>> Yes, I'm very much in favour of this, too.
+>>>>> We always have this IMO slightly weird notion of stopping the 
+>>>>> queue, set
+>>>>> some error flags in the driver, then _restarting_ the queue, just so
+>>>>> that the driver then sees the error flag and terminates the requests.
+>>>>> Which I always found quite counter-intuitive.
+>>>> What about requests that come in after the iteration runs? how are 
+>>>> those
+>>>> terminated?
+>>> If we've reached a dead state, I think you'd want to start a queue 
+>>> freeze
+>>> before running the terminating iterator.
+>>
+>> For the requests that come in after the iterator, the 
+>> nvmf_check_ready() routine, which validates controller state, will 
+>> catch and bounce them.
+>
+> The point of this patch was to omit the check in queue_rq like Keith
+> did in patch #2.
+
+well - I'm not sure that's possible. The fabrics will have different 
+time constraints vs pci.
+
+-- james
 
