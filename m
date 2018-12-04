@@ -2,378 +2,93 @@ Return-Path: <SRS0=ovnK=ON=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A666CC04EB9
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 01:43:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A585FC04EB9
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 01:52:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 69B26208A3
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 01:43:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69B26208A3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+	by mail.kernel.org (Postfix) with ESMTP id 6333720850
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 01:52:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="PIfw1Yd3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6333720850
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726013AbeLDBnz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Dec 2018 20:43:55 -0500
-Received: from smtpbgbr2.qq.com ([54.207.22.56]:47893 "EHLO smtpbgbr2.qq.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725915AbeLDBny (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 3 Dec 2018 20:43:54 -0500
-X-QQ-mid: bizesmtp20t1543887825tsiu9oqv
-Received: from Macbook.pro (unknown [210.22.22.130])
-        by esmtp6.qq.com (ESMTP) with 
-        id ; Tue, 04 Dec 2018 09:43:44 +0800 (CST)
-X-QQ-SSF: 01400000002000F0FL51B00A0000000
-X-QQ-FEAT: l2be6KKOhXNUUTqoO7yT9bVKOQNTQSQGRoET4TqfIElbpwtVMhiG14lgaha6i
-        KSe3yhMvuTTw/+U9xQVmX8qnT1wazmw68y6kMzvHJX/Yfnj0TZ3yCeQTY73U+3HUSXOJfCS
-        9oeqpYbqCWHF20YorK7yqwfjymAhRhrmP3LDkMJEBV+VgAS/qKopEGo1vsNvfemENvEFx/6
-        qw/8JCjb8r+TiHmGJytcC6wtp9dKEE1NXMPZwpxtsgiCwkQ1rlYu2mMFluUjHvex/5Yp84m
-        z1mklR4JToZYgTfJnoQ5YidmqcIbuNfQBSn94E4ZV8AHmV
-X-QQ-GoodBg: 2
-From:   Jackie Liu <liuyun01@kylinos.cn>
-To:     will.deacon@arm.com
-Cc:     ard.biesheuvel@linaro.org, catalin.marinas@arm.com,
-        linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-        Jackie Liu <liuyun01@kylinos.cn>
-Subject: [PATCH v6 2/2] arm64: crypto: add NEON accelerated XOR implementation
-Date:   Tue,  4 Dec 2018 09:43:23 +0800
-Message-Id: <20181204014323.1438-3-liuyun01@kylinos.cn>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20181204014323.1438-1-liuyun01@kylinos.cn>
-References: <20181204014323.1438-1-liuyun01@kylinos.cn>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:kylinos.cn:qybgforeign:qybgforeign2
-X-QQ-Bgrelay: 1
+        id S1725996AbeLDBwU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Dec 2018 20:52:20 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:39014 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725988AbeLDBwU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 20:52:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=References:In-Reply-To:Message-Id:
+        Date:Subject:Cc:To:From:Sender:Reply-To:MIME-Version:Content-Type:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=bYaZ4qlIQDKGcnjv76hOkv1dLfD9fJnppYA9pfY+0qE=; b=PIfw1Yd3X082vcelUypqH2guP
+        KW0XRCxacAWM4x3VNb4O88mK2i90/uc7xr/MhZaxrioUYj5jJ5RFXSAmTlernvL3cAgYrQJWlsTix
+        2VMOiaApx00EnVRYabve5OnRldxF6dHd+xv95qNPJsm+Ku+VDEgMLkiYP7Pts99Ubo3oyzGYh8WLg
+        Gdnh1sMSjjATS5vMuFHC8+SvyUNhX53RyQCPnTm0BXrbElBmJaFusGIffbpnQAxxn5WrD5FKRrcQS
+        nwYHXA4HVmrqzN/unK76lHSRLqqg0Eloh94PUT0HUOGETZC7qfLd8qIqP4ABjVGsS4DtXywbLEdN+
+        0QIAfxKqw==;
+Received: from [2600:1700:65a0:78e0:514:7862:1503:8e4d] (helo=sagi-Latitude-E7470.lbits)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gTzsq-0003Zq-0l; Tue, 04 Dec 2018 01:52:20 +0000
+From:   Sagi Grimberg <sagi@grimberg.me>
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-block@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: [PATCH v5 02/13] datagram: open-code copy_page_to_iter
+Date:   Mon,  3 Dec 2018 17:52:06 -0800
+Message-Id: <20181204015217.16613-3-sagi@grimberg.me>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20181204015217.16613-1-sagi@grimberg.me>
+References: <20181204015217.16613-1-sagi@grimberg.me>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a NEON acceleration method that can improve
-performance by approximately 20%. I got the following
-data from the centos 7.5 on Huawei's HISI1616 chip:
+From: Sagi Grimberg <sagi@lightbitslabs.com>
 
-[ 93.837726] xor: measuring software checksum speed
-[ 93.874039]   8regs  : 7123.200 MB/sec
-[ 93.914038]   32regs : 7180.300 MB/sec
-[ 93.954043]   arm64_neon: 9856.000 MB/sec
-[ 93.954047] xor: using function: arm64_neon (9856.000 MB/sec)
+This will be useful to consolidate skb_copy_and_hash_datagram_iter and
+skb_copy_and_csum_datagram to a single code path.
 
-I believe this code can bring some optimization for
-all arm64 platform. thanks for Ard Biesheuvel's suggestions.
-
-Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Acked-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sagi Grimberg <sagi@lightbitslabs.com>
 ---
- arch/arm64/include/asm/Kbuild |   1 -
- arch/arm64/include/asm/xor.h  |  73 +++++++++++++++++
- arch/arm64/lib/Makefile       |   6 ++
- arch/arm64/lib/xor-neon.c     | 184 ++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 263 insertions(+), 1 deletion(-)
- create mode 100644 arch/arm64/include/asm/xor.h
- create mode 100644 arch/arm64/lib/xor-neon.c
+ net/core/datagram.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/include/asm/Kbuild b/arch/arm64/include/asm/Kbuild
-index 6cd5d77..1877f29 100644
---- a/arch/arm64/include/asm/Kbuild
-+++ b/arch/arm64/include/asm/Kbuild
-@@ -27,4 +27,3 @@ generic-y += trace_clock.h
- generic-y += unaligned.h
- generic-y += user.h
- generic-y += vga.h
--generic-y += xor.h
-diff --git a/arch/arm64/include/asm/xor.h b/arch/arm64/include/asm/xor.h
-new file mode 100644
-index 0000000..856386a
---- /dev/null
-+++ b/arch/arm64/include/asm/xor.h
-@@ -0,0 +1,73 @@
-+/*
-+ * arch/arm64/include/asm/xor.h
-+ *
-+ * Authors: Jackie Liu <liuyun01@kylinos.cn>
-+ * Copyright (C) 2018,Tianjin KYLIN Information Technology Co., Ltd.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#include <linux/hardirq.h>
-+#include <asm-generic/xor.h>
-+#include <asm/hwcap.h>
-+#include <asm/neon.h>
-+
-+#ifdef CONFIG_KERNEL_MODE_NEON
-+
-+extern struct xor_block_template const xor_block_inner_neon;
-+
-+static void
-+xor_neon_2(unsigned long bytes, unsigned long *p1, unsigned long *p2)
-+{
-+	kernel_neon_begin();
-+	xor_block_inner_neon.do_2(bytes, p1, p2);
-+	kernel_neon_end();
-+}
-+
-+static void
-+xor_neon_3(unsigned long bytes, unsigned long *p1, unsigned long *p2,
-+		unsigned long *p3)
-+{
-+	kernel_neon_begin();
-+	xor_block_inner_neon.do_3(bytes, p1, p2, p3);
-+	kernel_neon_end();
-+}
-+
-+static void
-+xor_neon_4(unsigned long bytes, unsigned long *p1, unsigned long *p2,
-+		unsigned long *p3, unsigned long *p4)
-+{
-+	kernel_neon_begin();
-+	xor_block_inner_neon.do_4(bytes, p1, p2, p3, p4);
-+	kernel_neon_end();
-+}
-+
-+static void
-+xor_neon_5(unsigned long bytes, unsigned long *p1, unsigned long *p2,
-+		unsigned long *p3, unsigned long *p4, unsigned long *p5)
-+{
-+	kernel_neon_begin();
-+	xor_block_inner_neon.do_5(bytes, p1, p2, p3, p4, p5);
-+	kernel_neon_end();
-+}
-+
-+static struct xor_block_template xor_block_arm64 = {
-+	.name   = "arm64_neon",
-+	.do_2   = xor_neon_2,
-+	.do_3   = xor_neon_3,
-+	.do_4   = xor_neon_4,
-+	.do_5	= xor_neon_5
-+};
-+#undef XOR_TRY_TEMPLATES
-+#define XOR_TRY_TEMPLATES           \
-+	do {        \
-+		xor_speed(&xor_block_8regs);    \
-+		xor_speed(&xor_block_32regs);    \
-+		if (cpu_has_neon()) { \
-+			xor_speed(&xor_block_arm64);\
-+		} \
-+	} while (0)
-+
-+#endif /* ! CONFIG_KERNEL_MODE_NEON */
-diff --git a/arch/arm64/lib/Makefile b/arch/arm64/lib/Makefile
-index 69ff988..5540a16 100644
---- a/arch/arm64/lib/Makefile
-+++ b/arch/arm64/lib/Makefile
-@@ -5,6 +5,12 @@ lib-y		:= clear_user.o delay.o copy_from_user.o		\
- 		   memcmp.o strcmp.o strncmp.o strlen.o strnlen.o	\
- 		   strchr.o strrchr.o tishift.o
+diff --git a/net/core/datagram.c b/net/core/datagram.c
+index 57f3a6fcfc1e..abe642181b64 100644
+--- a/net/core/datagram.c
++++ b/net/core/datagram.c
+@@ -445,11 +445,14 @@ int skb_copy_datagram_iter(const struct sk_buff *skb, int offset,
  
-+ifeq ($(CONFIG_KERNEL_MODE_NEON), y)
-+obj-$(CONFIG_XOR_BLOCKS)	+= xor-neon.o
-+CFLAGS_REMOVE_xor-neon.o	+= -mgeneral-regs-only
-+CFLAGS_xor-neon.o		+= -ffreestanding
-+endif
+ 		end = start + skb_frag_size(frag);
+ 		if ((copy = end - offset) > 0) {
++			struct page *page = skb_frag_page(frag);
++			u8 *vaddr = kmap(page);
 +
- # Tell the compiler to treat all general purpose registers (with the
- # exception of the IP registers, which are already handled by the caller
- # in case of a PLT) as callee-saved, which allows for efficient runtime
-diff --git a/arch/arm64/lib/xor-neon.c b/arch/arm64/lib/xor-neon.c
-new file mode 100644
-index 0000000..131c60c2
---- /dev/null
-+++ b/arch/arm64/lib/xor-neon.c
-@@ -0,0 +1,184 @@
-+/*
-+ * arch/arm64/lib/xor-neon.c
-+ *
-+ * Authors: Jackie Liu <liuyun01@kylinos.cn>
-+ * Copyright (C) 2018,Tianjin KYLIN Information Technology Co., Ltd.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#include <linux/raid/xor.h>
-+#include <linux/module.h>
-+#include <asm/neon-intrinsics.h>
-+
-+void xor_arm64_neon_2(unsigned long bytes, unsigned long *p1,
-+	unsigned long *p2)
-+{
-+	uint64_t *dp1 = (uint64_t *)p1;
-+	uint64_t *dp2 = (uint64_t *)p2;
-+
-+	register uint64x2_t v0, v1, v2, v3;
-+	long lines = bytes / (sizeof(uint64x2_t) * 4);
-+
-+	do {
-+		/* p1 ^= p2 */
-+		v0 = veorq_u64(vld1q_u64(dp1 +  0), vld1q_u64(dp2 +  0));
-+		v1 = veorq_u64(vld1q_u64(dp1 +  2), vld1q_u64(dp2 +  2));
-+		v2 = veorq_u64(vld1q_u64(dp1 +  4), vld1q_u64(dp2 +  4));
-+		v3 = veorq_u64(vld1q_u64(dp1 +  6), vld1q_u64(dp2 +  6));
-+
-+		/* store */
-+		vst1q_u64(dp1 +  0, v0);
-+		vst1q_u64(dp1 +  2, v1);
-+		vst1q_u64(dp1 +  4, v2);
-+		vst1q_u64(dp1 +  6, v3);
-+
-+		dp1 += 8;
-+		dp2 += 8;
-+	} while (--lines > 0);
-+}
-+
-+void xor_arm64_neon_3(unsigned long bytes, unsigned long *p1,
-+	unsigned long *p2, unsigned long *p3)
-+{
-+	uint64_t *dp1 = (uint64_t *)p1;
-+	uint64_t *dp2 = (uint64_t *)p2;
-+	uint64_t *dp3 = (uint64_t *)p3;
-+
-+	register uint64x2_t v0, v1, v2, v3;
-+	long lines = bytes / (sizeof(uint64x2_t) * 4);
-+
-+	do {
-+		/* p1 ^= p2 */
-+		v0 = veorq_u64(vld1q_u64(dp1 +  0), vld1q_u64(dp2 +  0));
-+		v1 = veorq_u64(vld1q_u64(dp1 +  2), vld1q_u64(dp2 +  2));
-+		v2 = veorq_u64(vld1q_u64(dp1 +  4), vld1q_u64(dp2 +  4));
-+		v3 = veorq_u64(vld1q_u64(dp1 +  6), vld1q_u64(dp2 +  6));
-+
-+		/* p1 ^= p3 */
-+		v0 = veorq_u64(v0, vld1q_u64(dp3 +  0));
-+		v1 = veorq_u64(v1, vld1q_u64(dp3 +  2));
-+		v2 = veorq_u64(v2, vld1q_u64(dp3 +  4));
-+		v3 = veorq_u64(v3, vld1q_u64(dp3 +  6));
-+
-+		/* store */
-+		vst1q_u64(dp1 +  0, v0);
-+		vst1q_u64(dp1 +  2, v1);
-+		vst1q_u64(dp1 +  4, v2);
-+		vst1q_u64(dp1 +  6, v3);
-+
-+		dp1 += 8;
-+		dp2 += 8;
-+		dp3 += 8;
-+	} while (--lines > 0);
-+}
-+
-+void xor_arm64_neon_4(unsigned long bytes, unsigned long *p1,
-+	unsigned long *p2, unsigned long *p3, unsigned long *p4)
-+{
-+	uint64_t *dp1 = (uint64_t *)p1;
-+	uint64_t *dp2 = (uint64_t *)p2;
-+	uint64_t *dp3 = (uint64_t *)p3;
-+	uint64_t *dp4 = (uint64_t *)p4;
-+
-+	register uint64x2_t v0, v1, v2, v3;
-+	long lines = bytes / (sizeof(uint64x2_t) * 4);
-+
-+	do {
-+		/* p1 ^= p2 */
-+		v0 = veorq_u64(vld1q_u64(dp1 +  0), vld1q_u64(dp2 +  0));
-+		v1 = veorq_u64(vld1q_u64(dp1 +  2), vld1q_u64(dp2 +  2));
-+		v2 = veorq_u64(vld1q_u64(dp1 +  4), vld1q_u64(dp2 +  4));
-+		v3 = veorq_u64(vld1q_u64(dp1 +  6), vld1q_u64(dp2 +  6));
-+
-+		/* p1 ^= p3 */
-+		v0 = veorq_u64(v0, vld1q_u64(dp3 +  0));
-+		v1 = veorq_u64(v1, vld1q_u64(dp3 +  2));
-+		v2 = veorq_u64(v2, vld1q_u64(dp3 +  4));
-+		v3 = veorq_u64(v3, vld1q_u64(dp3 +  6));
-+
-+		/* p1 ^= p4 */
-+		v0 = veorq_u64(v0, vld1q_u64(dp4 +  0));
-+		v1 = veorq_u64(v1, vld1q_u64(dp4 +  2));
-+		v2 = veorq_u64(v2, vld1q_u64(dp4 +  4));
-+		v3 = veorq_u64(v3, vld1q_u64(dp4 +  6));
-+
-+		/* store */
-+		vst1q_u64(dp1 +  0, v0);
-+		vst1q_u64(dp1 +  2, v1);
-+		vst1q_u64(dp1 +  4, v2);
-+		vst1q_u64(dp1 +  6, v3);
-+
-+		dp1 += 8;
-+		dp2 += 8;
-+		dp3 += 8;
-+		dp4 += 8;
-+	} while (--lines > 0);
-+}
-+
-+void xor_arm64_neon_5(unsigned long bytes, unsigned long *p1,
-+	unsigned long *p2, unsigned long *p3,
-+	unsigned long *p4, unsigned long *p5)
-+{
-+	uint64_t *dp1 = (uint64_t *)p1;
-+	uint64_t *dp2 = (uint64_t *)p2;
-+	uint64_t *dp3 = (uint64_t *)p3;
-+	uint64_t *dp4 = (uint64_t *)p4;
-+	uint64_t *dp5 = (uint64_t *)p5;
-+
-+	register uint64x2_t v0, v1, v2, v3;
-+	long lines = bytes / (sizeof(uint64x2_t) * 4);
-+
-+	do {
-+		/* p1 ^= p2 */
-+		v0 = veorq_u64(vld1q_u64(dp1 +  0), vld1q_u64(dp2 +  0));
-+		v1 = veorq_u64(vld1q_u64(dp1 +  2), vld1q_u64(dp2 +  2));
-+		v2 = veorq_u64(vld1q_u64(dp1 +  4), vld1q_u64(dp2 +  4));
-+		v3 = veorq_u64(vld1q_u64(dp1 +  6), vld1q_u64(dp2 +  6));
-+
-+		/* p1 ^= p3 */
-+		v0 = veorq_u64(v0, vld1q_u64(dp3 +  0));
-+		v1 = veorq_u64(v1, vld1q_u64(dp3 +  2));
-+		v2 = veorq_u64(v2, vld1q_u64(dp3 +  4));
-+		v3 = veorq_u64(v3, vld1q_u64(dp3 +  6));
-+
-+		/* p1 ^= p4 */
-+		v0 = veorq_u64(v0, vld1q_u64(dp4 +  0));
-+		v1 = veorq_u64(v1, vld1q_u64(dp4 +  2));
-+		v2 = veorq_u64(v2, vld1q_u64(dp4 +  4));
-+		v3 = veorq_u64(v3, vld1q_u64(dp4 +  6));
-+
-+		/* p1 ^= p5 */
-+		v0 = veorq_u64(v0, vld1q_u64(dp5 +  0));
-+		v1 = veorq_u64(v1, vld1q_u64(dp5 +  2));
-+		v2 = veorq_u64(v2, vld1q_u64(dp5 +  4));
-+		v3 = veorq_u64(v3, vld1q_u64(dp5 +  6));
-+
-+		/* store */
-+		vst1q_u64(dp1 +  0, v0);
-+		vst1q_u64(dp1 +  2, v1);
-+		vst1q_u64(dp1 +  4, v2);
-+		vst1q_u64(dp1 +  6, v3);
-+
-+		dp1 += 8;
-+		dp2 += 8;
-+		dp3 += 8;
-+		dp4 += 8;
-+		dp5 += 8;
-+	} while (--lines > 0);
-+}
-+
-+struct xor_block_template const xor_block_inner_neon = {
-+	.name	= "__inner_neon__",
-+	.do_2	= xor_arm64_neon_2,
-+	.do_3	= xor_arm64_neon_3,
-+	.do_4	= xor_arm64_neon_4,
-+	.do_5	= xor_arm64_neon_5,
-+};
-+EXPORT_SYMBOL(xor_block_inner_neon);
-+
-+MODULE_AUTHOR("Jackie Liu <liuyun01@kylinos.cn>");
-+MODULE_DESCRIPTION("ARMv8 XOR Extensions");
-+MODULE_LICENSE("GPL");
+ 			if (copy > len)
+ 				copy = len;
+-			n = copy_page_to_iter(skb_frag_page(frag),
+-					      frag->page_offset + offset -
+-					      start, copy, to);
++			n = copy_to_iter(vaddr + frag->page_offset +
++					 offset - start, copy, to);
++			kunmap(page);
+ 			offset += n;
+ 			if (n != copy)
+ 				goto short_copy;
 -- 
-2.7.4
-
-
+2.17.1
 
