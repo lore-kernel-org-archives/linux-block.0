@@ -4,63 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8524FC04EB8
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 17:47:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F7FAC04EB8
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 17:47:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4D5DA2081B
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 17:47:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E723B2081B
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 17:47:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="wDVI6jyc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D5DA2081B
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="XOFZAOXb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E723B2081B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726073AbeLDRrj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Dec 2018 12:47:39 -0500
-Received: from mail-yb1-f196.google.com ([209.85.219.196]:36368 "EHLO
-        mail-yb1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726038AbeLDRrj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 12:47:39 -0500
-Received: by mail-yb1-f196.google.com with SMTP id w203so3372489ybg.3
-        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 09:47:39 -0800 (PST)
+        id S1726078AbeLDRrl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 12:47:41 -0500
+Received: from mail-yw1-f46.google.com ([209.85.161.46]:37116 "EHLO
+        mail-yw1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726038AbeLDRrl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 12:47:41 -0500
+Received: by mail-yw1-f46.google.com with SMTP id h193so7325575ywc.4
+        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 09:47:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=PNem2NL5fu2OhKSUpx777wY1UDGuyATbaD4VZNtn5yg=;
-        b=wDVI6jycnOCyV2AAMdeVw432AAxBfktihv1TFNNpqOdkZq+xUYNkEMpjlx2CWmdy4P
-         KA83CyS3ozd/cAaOGI9pMJjVZvmCWr7w/tdxxeHj7xod2XRWccb5BvRHd8WcZL9JnEVx
-         XH7+aa9VP+jP3CNI21oBLiYhD+J5a3ah/nIyZf6Bw5n4vihqKj1vuH0q4ZLILzQm2NT9
-         Sr0JpcRbI01DaSt8Ueq6eHItf3pyrKtFz6Dg5VzYsQX7goLnds2xnuw2aIElz93VaplB
-         VdpibcKGkQtu+u8B8u+P6P7dLXWWnj4zxY1CfG3vUdB6YwV45ljz5lJJb5HaWj7hlyuk
-         dUVw==
+        bh=cpp233uzRBKsfChjZCjS2W9+E8WvGYpADU5EZ/6mWnM=;
+        b=XOFZAOXbXNnB24Q+VnpCwHdQbgo7YSQQ1kzaisYwmy7yBW384jZdStbtQRFsuvNki4
+         lmCDAq6YdzHZ75eXG9y0AuGZFml2aSES2od/ielYM+ku1HDBttHKP/VpWyv0Xgry6XSe
+         y9c6DDTTNxVe77ftqUIVYFafipJBOI5ieIbyNRxtGYHw67aNQSyvw0xl/yYrd/TrsKtI
+         UiwZ5A+eGq6aRwEIropU0aEE6+6qSpYZXZLMK3t5bQ85rVkxwG/fbB1ufREts9X9vaxj
+         rszpRbnWzL0ttvtVI1uh3mkEYb09BzXQrlQ6Bh/uYNe8hetV1N4UDIV/pf/dC/BUOm8V
+         +7Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references;
-        bh=PNem2NL5fu2OhKSUpx777wY1UDGuyATbaD4VZNtn5yg=;
-        b=oNEk3hMNaReiJxzzBnByRoUAZrCLn8HnxOHvthTOlh6zonU4JZujO7HVKwxZwgRO5N
-         pxpLlareJSK7f3qjqNsDfJFkD7NguwzrtCA3JSeh+6wb6ltS6ljMV/XuEMoVceOKZ1yf
-         4Sb2l/n8sJlnLnsGcF/HTlDiDMHlhrvLqSOO42HZMDlSw8fXR2PaNFTxOxZVVoAF10OH
-         U54l1P0nY8+yIfCfgOcLTRBEOczw111LOJCW86+HdkD+g+CCDcxZ7wvkGJ7DAewGViyC
-         Bi3d9h9ZTBVmmN7t48cK3mBnqVTMMRtWkRNQPEFKeZ/odxJAxXO28YCWHAvfWvTwwVl7
-         D6Lg==
-X-Gm-Message-State: AA+aEWZyNxwFEz3meh3WFkAk0qK86Shzw9ZZbzpFblGN1T8YY2A5QgXt
-        IT071JG2+uoVcRbvCMg52naoCSDVprE=
-X-Google-Smtp-Source: AFSGD/XZS2EL3Ihant6wuXWp9MCYzp8og9pJemLHJF0SMJTtX6OsS27GCpxdKrqfyYzHCwYRTpxumw==
-X-Received: by 2002:a25:7a43:: with SMTP id v64-v6mr20806442ybc.187.1543945658197;
-        Tue, 04 Dec 2018 09:47:38 -0800 (PST)
+        bh=cpp233uzRBKsfChjZCjS2W9+E8WvGYpADU5EZ/6mWnM=;
+        b=nFbUH424xmx1KJs4q5fQFBk/nSj4QRp8kGZuTug50X3Ak/5lFBPFWW8nbfTvG6JR1F
+         W9GiF8VEEjGKnF+dXn51kkM2QOO50MMO+/n/nhx+UNAoTv3U+1pcNjr1rjs9HnmEc2se
+         AZqNzzljXmPhCPcZ/OLFiLpnnW9pK0H9lfrgHpn8l6+heELFmE2mwwKD3gfIN8ZltFMe
+         lAcKU5OZmpmkSupq7Ui85DGFHK+xaGJI4JaSYUSib5Wgfs4kowFJdxbqIuL8EGQimqDy
+         JJb8ZPGtI9/L4fbM+5nilMDQd6IiGDhGvE/T9OWFySNM8OwiSDTVFoYHRiPdx8wJ3+lX
+         vHQQ==
+X-Gm-Message-State: AA+aEWbTEOpjm9o67rA8cswGR8/fW5cvAcgyyah1U4pB5zK0qr0Jzzlh
+        PklUtARFA08V7VgEJUmG06ZyAR0NJUs=
+X-Google-Smtp-Source: AFSGD/V+zWLF67PUUZz7prKD5rnNXU3P2G4snpofixYia1F1R1WlfD74mh0IElz3IntOV3CgFu841Q==
+X-Received: by 2002:a81:3e05:: with SMTP id l5mr21292101ywa.508.1543945659843;
+        Tue, 04 Dec 2018 09:47:39 -0800 (PST)
 Received: from localhost ([107.15.81.208])
-        by smtp.gmail.com with ESMTPSA id u81sm5453682ywf.6.2018.12.04.09.47.37
+        by smtp.gmail.com with ESMTPSA id m67sm5385553ywb.54.2018.12.04.09.47.39
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 04 Dec 2018 09:47:37 -0800 (PST)
+        Tue, 04 Dec 2018 09:47:39 -0800 (PST)
 From:   Josef Bacik <josef@toxicpanda.com>
 To:     linux-block@vger.kernel.org, kernel-team@fb.com, osandov@fb.com
-Subject: [PATCH 1/3] blktests: add cgroup2 infrastructure
-Date:   Tue,  4 Dec 2018 12:47:31 -0500
-Message-Id: <20181204174733.7423-2-josef@toxicpanda.com>
+Subject: [PATCH 2/3] blktests: add python scripts for parsing fio json output
+Date:   Tue,  4 Dec 2018 12:47:32 -0500
+Message-Id: <20181204174733.7423-3-josef@toxicpanda.com>
 X-Mailer: git-send-email 2.14.3
 In-Reply-To: <20181204174733.7423-1-josef@toxicpanda.com>
 References: <20181204174733.7423-1-josef@toxicpanda.com>
@@ -69,87 +69,124 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In order to test io.latency and other cgroup related things we need some
-supporting helpers to setup and tear down cgroup2.  This adds support
-for checking that we can even configure cgroup2 things, set them up if
-need be, and then add the cleanup stuff to the main cleanup function so
-everything is always in a clean state.
+I wrote these scripts for xfstests, just copying them over to blktests
+as well.  The terse output fio support that blktests doesn't get all of
+the various fio performance things that we may want to look at, this
+gives us a lot of flexibility around getting specific values out of the
+fio results data.
 
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 ---
- check     |  2 ++
- common/rc | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 50 insertions(+)
+ src/FioResultDecoder.py | 64 +++++++++++++++++++++++++++++++++++++++++++++++++
+ src/fio-key-value.py    | 28 ++++++++++++++++++++++
+ 2 files changed, 92 insertions(+)
+ create mode 100644 src/FioResultDecoder.py
+ create mode 100644 src/fio-key-value.py
 
-diff --git a/check b/check
-index ebd87c097e25..1c9dbc518fa1 100755
---- a/check
-+++ b/check
-@@ -294,6 +294,8 @@ _cleanup() {
- 		done
- 		unset RESTORE_CPUS_ONLINE
- 	fi
+diff --git a/src/FioResultDecoder.py b/src/FioResultDecoder.py
+new file mode 100644
+index 000000000000..d004140c0fdf
+--- /dev/null
++++ b/src/FioResultDecoder.py
+@@ -0,0 +1,64 @@
++# SPDX-License-Identifier: GPL-2.0
 +
-+	_cleanup_cgroup2
- }
- 
- _call_test() {
-diff --git a/common/rc b/common/rc
-index 8a892bcd5fde..a785f2329687 100644
---- a/common/rc
-+++ b/common/rc
-@@ -202,3 +202,51 @@ _test_dev_in_hotplug_slot() {
- _filter_xfs_io_error() {
- 	sed -e 's/^\(.*\)64\(: .*$\)/\1\2/'
- }
++import json
 +
-+_cgroup2_base_dir()
-+{
-+	grep cgroup2 /proc/mounts | awk '{ print $2 }'
-+}
++class FioResultDecoder(json.JSONDecoder):
++    """Decoder for decoding fio result json to an object for our database
 +
-+_cleanup_cgroup2()
-+{
-+	_dir=$(_cgroup2_base_dir)/blktests
-+	[ -d "${_dir}" ] || return
++    This decodes the json output from fio into an object that can be directly
++    inserted into our database.  This just strips out the fields we don't care
++    about and collapses the read/write/trim classes into a flat value structure
++    inside of the jobs object.
 +
-+	for i in $(find ${_dir} -type d | tac)
-+	do
-+		rmdir $i
-+	done
-+}
++    For example
++        "write" : {
++            "io_bytes" : 313360384,
++            "bw" : 1016,
++        }
 +
-+_have_cgroup2()
-+{
-+	if ! grep -q 'cgroup2' /proc/mounts; then
-+		SKIP_REASON="This test requires cgroup2"
-+		return 1
-+	fi
-+	return 0
-+}
++    Get's collapsed to
 +
-+_have_cgroup2_controller_file()
-+{
-+	_have_cgroup2 || return 1
++        "write_io_bytes" : 313360384,
++        "write_bw": 1016,
 +
-+	_controller=$1
-+	_file=$2
-+	_dir=$(_cgroup2_base_dir)
++    Currently any dict under 'jobs' get's dropped, with the exception of 'read',
++    'write', and 'trim'.  For those sub sections we drop any dict's under those.
 +
-+	if ! grep -q ${_controller} ${_dir}/cgroup.controllers; then
-+		SKIP_REASON="No support for ${_controller} cgroup controller"
-+		return 1
-+	fi
++    Attempt to keep this as generic as possible, we don't want to break every
++    time fio changes it's json output format.
++    """
++    _ignore_types = ['dict', 'list']
++    _override_keys = ['lat_ns', 'lat']
++    _io_ops = ['read', 'write', 'trim']
 +
-+	mkdir ${_dir}/blktests
-+	echo "+${_controller}" > ${_dir}/cgroup.subtree_control
-+	if [ ! -f ${_dir}/blktests/${_file} ]; then
-+		_cleanup_cgroup2
-+		SKIP_REASON="Cgroup file ${_file} doesn't exist"
-+		return 1
-+	fi
-+	return 0
-+}
++    _transform_keys = { 'lat': 'lat_ns' }
++
++    def decode(self, json_string):
++        """This does the dirty work of converting everything"""
++        default_obj = super(FioResultDecoder, self).decode(json_string)
++        obj = {}
++        obj['global'] = {}
++        obj['global']['time'] = default_obj['time']
++        obj['jobs'] = []
++        for job in default_obj['jobs']:
++            new_job = {}
++            for key,value in job.iteritems():
++                if key not in self._io_ops:
++                    if value.__class__.__name__ in self._ignore_types:
++                        continue
++                    new_job[key] = value
++                    continue
++                for k,v in value.iteritems():
++                    if k in self._override_keys:
++                        if k in self._transform_keys:
++                            k = self._transform_keys[k]
++                        for subk,subv in v.iteritems():
++                            collapsed_key = "{}_{}_{}".format(key, k, subk)
++                            new_job[collapsed_key] = subv
++                        continue
++                    if v.__class__.__name__ in self._ignore_types:
++                        continue
++                    collapsed_key = "{}_{}".format(key, k)
++                    new_job[collapsed_key] = v
++            obj['jobs'].append(new_job)
++        return obj
+diff --git a/src/fio-key-value.py b/src/fio-key-value.py
+new file mode 100644
+index 000000000000..208e9a453a19
+--- /dev/null
++++ b/src/fio-key-value.py
+@@ -0,0 +1,28 @@
++# SPDX-License-Identifier: GPL-2.0
++
++import FioResultDecoder
++import json
++import argparse
++import sys
++import platform
++
++parser = argparse.ArgumentParser()
++parser.add_argument('-j', '--jobname', type=str,
++                    help="The jobname we want our key from.",
++                    required=True)
++parser.add_argument('-k', '--key', type=str,
++                    help="The key we want the value of", required=True)
++parser.add_argument('result', type=str,
++                    help="The result file read")
++args = parser.parse_args()
++
++json_data = open(args.result)
++data = json.load(json_data, cls=FioResultDecoder.FioResultDecoder)
++
++for job in data['jobs']:
++    if job['jobname'] == args.jobname:
++        if args.key not in job:
++            print('')
++        else:
++            print("{}".format(job[args.key]))
++        break
 -- 
 2.14.3
 
