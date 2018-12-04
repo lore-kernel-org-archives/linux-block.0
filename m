@@ -6,56 +6,56 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBD30C04EB9
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 01:35:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 618FBC04EBF
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 01:35:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 809B12146D
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 01:35:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 809B12146D
+	by mail.kernel.org (Postfix) with ESMTP id 283D520851
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 01:35:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 283D520851
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726007AbeLDBfm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 3 Dec 2018 20:35:42 -0500
-Received: from mail-oi1-f172.google.com ([209.85.167.172]:41800 "EHLO
-        mail-oi1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725943AbeLDBfm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 20:35:42 -0500
-Received: by mail-oi1-f172.google.com with SMTP id j21so12838387oii.8
-        for <linux-block@vger.kernel.org>; Mon, 03 Dec 2018 17:35:41 -0800 (PST)
+        id S1726017AbeLDBfv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 3 Dec 2018 20:35:51 -0500
+Received: from mail-oi1-f193.google.com ([209.85.167.193]:36591 "EHLO
+        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725943AbeLDBfv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 3 Dec 2018 20:35:51 -0500
+Received: by mail-oi1-f193.google.com with SMTP id x23so12851153oix.3
+        for <linux-block@vger.kernel.org>; Mon, 03 Dec 2018 17:35:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
         bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
-        b=qk7ar9+ypyWOImIwodKqoF2FFvOkbz8omFbEOZTHIBoWYBQKxO/S/w5pt/SX+IbPzN
-         j3V9dTR1rB953PBidj+nRPsWg+peNLo/6ohQAamxPXRjdwD6VHsot38MaZaROJpvfnDR
-         RVPDy5tKdxudHJzzxKOp4mz5ltLYWnNim7gaGukMx/XI8Q5WTTkGHX51kWT4A1YM/9m8
-         qufs6jTcM2BtdJPA1Oynvk+m/YYEdpHvNuP4wing4nawkuT/V4nz2jeC8MPyrCPSe5aE
-         4A5GKEBhlzDgwIlcSYaxg7PsaQEquXbIRM8RvUp5sdMBkNnwa8eWaFUlMw9c9dtMVpgV
-         iwxg==
-X-Gm-Message-State: AA+aEWZe3ctfzivhIogcjnl1CrOCKXUz+Xog2wGb1Cc/uYCsecqvKHSD
-        qpo18tcUFaugQ2c3cxbQN0g=
-X-Google-Smtp-Source: AFSGD/XWZhKPDNR9ca5KdsQ6eMVHYd6QetlRMGGz1LLbyIhGp3+L3L0l20gdk2Lc91j3lVoe4nNBnA==
-X-Received: by 2002:aca:1e08:: with SMTP id m8mr10830703oic.347.1543887340940;
-        Mon, 03 Dec 2018 17:35:40 -0800 (PST)
+        b=IuoTsUO3he/P9JWG5HFiqcJ1LNYC5cm2TeUr5RRa53AkhQr+7Grr9Jx0RwNeTkWZlt
+         DAZGawr3bIEifA9+1kptnISrCn/KDJz2JUTkWWAN7584x+QJHig4IQ0zKHU6Apbm0Emn
+         9Fjjc4hr3g8P+avRIU0KYeoixbbfz8oVlHxlJ73Qa1r0nkjbYI5OlWH8qzNAo22HEtPN
+         +szJsjOCkECOQazE+Iy17am4Cprwrat0jAVWiOe4oo1EAZZ2Q4jtHpURkcvySh3GVEV6
+         MUIdIlVYr+srXJTV7SfT1JmU4wmjwtozOPtkqAqnZmKaQsskwvkDjbz5zvHwX5bvHGaN
+         IRFA==
+X-Gm-Message-State: AA+aEWbMHC8IEucGRziGrQr+qGDCFicm18kR2K/GR3G0OC4RVBCsBZoY
+        XGeVqmqk4HsB68FErolhKGo=
+X-Google-Smtp-Source: AFSGD/XabgZT++kqpnVk+sOoBxX44r3cIZc1NgmlESJATKlz28hTi9KifTy2yqucowIQ86KwqQ7qwA==
+X-Received: by 2002:aca:5681:: with SMTP id k123mr11758490oib.106.1543887351010;
+        Mon, 03 Dec 2018 17:35:51 -0800 (PST)
 Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
-        by smtp.gmail.com with ESMTPSA id 52sm28284416oti.30.2018.12.03.17.35.39
+        by smtp.gmail.com with ESMTPSA id b23sm5601580otq.5.2018.12.03.17.35.49
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 03 Dec 2018 17:35:40 -0800 (PST)
-Subject: Re: [PATCH 1/7] block: improve logic around when to sort a plug list
+        Mon, 03 Dec 2018 17:35:50 -0800 (PST)
+Subject: Re: [PATCH 2/7] blk-mq: add mq_ops->commit_rqs()
 To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org
 References: <20181128133538.20329-1-axboe@kernel.dk>
- <20181128133538.20329-2-axboe@kernel.dk>
+ <20181128133538.20329-3-axboe@kernel.dk>
 From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <47f01bcf-a6c3-a366-da7d-b2cbc04b7ebb@grimberg.me>
-Date:   Mon, 3 Dec 2018 17:35:39 -0800
+Message-ID: <36208bf2-723c-aa1d-0005-51df24204883@grimberg.me>
+Date:   Mon, 3 Dec 2018 17:35:49 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20181128133538.20329-2-axboe@kernel.dk>
+In-Reply-To: <20181128133538.20329-3-axboe@kernel.dk>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
