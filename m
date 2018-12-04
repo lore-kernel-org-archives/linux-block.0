@@ -2,109 +2,188 @@ Return-Path: <SRS0=ovnK=ON=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CA03C04EB8
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 19:35:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F4A3C04EBF
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 19:48:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3B8C320834
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 19:35:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B8C320834
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+	by mail.kernel.org (Postfix) with ESMTP id 5D57C2081C
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 19:48:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="TXuxE6OX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D57C2081C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725866AbeLDTfI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Dec 2018 14:35:08 -0500
-Received: from mail-pg1-f174.google.com ([209.85.215.174]:37263 "EHLO
-        mail-pg1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725855AbeLDTfI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 14:35:08 -0500
-Received: by mail-pg1-f174.google.com with SMTP id 80so7825728pge.4;
-        Tue, 04 Dec 2018 11:35:08 -0800 (PST)
+        id S1725880AbeLDTsn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 14:48:43 -0500
+Received: from mail-yw1-f67.google.com ([209.85.161.67]:34874 "EHLO
+        mail-yw1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725886AbeLDTsn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 14:48:43 -0500
+Received: by mail-yw1-f67.google.com with SMTP id h32so7495753ywk.2
+        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 11:48:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=s+VP0A474Tn5W27kbi2McsJ3o8jRy8Pe/xLsJObravE=;
+        b=TXuxE6OXamLMpftTaSywcaxH6buXuteXDw6YAvhwyWP5Ilhszc8nNplZozwycnERdt
+         K9wa6Z5NLf/T6bTOYzzx6TcBWmsZIiOw1anKCR4zK+38Kp2HZfHb8fSiBqrRlpqbk7Wh
+         NvvLyWWYzflnENQXLFCC/Zhz/NQ9LdvjDxdaf+P+sXS3wTDCGZYp5LVgys7slXZWF9Rt
+         AOAvS074N3tCvoR9yJNHjkgz8DeL6t29p1dj3hKDslsHQy8qn01MJxlDY/cmHOkUqdyE
+         XLY0MkGS+wKuajdXZ2G0IYPpmuTliseWMKwHRd8+V+YJfcoixFepVBEHMsT8w2wXt1qB
+         Oulw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=chND8r3WS/hguEE67ft5PJqXhGXMvedt4gxFiwZIX/M=;
-        b=azCa0VFrY33QwJmHt7jv7Yqx+C/7ULEGjnrEUFpMJNYocwPMPsJL3uJnHUdDzcUstV
-         xqOqP+cy4hkGr3DZmht9Fwyy1n+to1GWT8F53BYUZ0Npr2AwbWwo55Ft1df+JxhCVptR
-         PtMik8g0KCM3ZzZ2XiQ+P6KwGrw4m5yu6YupiDr0OOQaTcBFALcgw4V72fHOm8e5OjAZ
-         uYSOAUWnAHzZ+ViTGAsXenB7MhguotQcFrqkf2opkpfeqQQr5eoKvaXeLzUhMKCN6zdU
-         CoKXXLctJLY/3x0jgK33lkzfVlo/HJIu2AOf3yK84Y7I3u+8TFtubQ3RwWnQ1670HYWU
-         Ps5w==
-X-Gm-Message-State: AA+aEWbq2iiDAywemlRmpLOcdtESFYlzMlBS0wgbScXA5weNvd1146kx
-        +6rSMFSredtpxehnAOBe+0Q=
-X-Google-Smtp-Source: AFSGD/UKi45mhB+LlnVN2R+UEwoLJFrhWw5lxPdfdSEEVLxXOyH0QX3se29BCEEYRrldROtr50SFpg==
-X-Received: by 2002:a62:442:: with SMTP id 63mr20921230pfe.156.1543952107397;
-        Tue, 04 Dec 2018 11:35:07 -0800 (PST)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id y1-v6sm23291532pfb.81.2018.12.04.11.35.06
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 04 Dec 2018 11:35:06 -0800 (PST)
-Message-ID: <1543952105.185366.210.camel@acm.org>
-Subject: Re: +AFs-PATCH+AF0- blk-mq: Set request mapping to NULL in
- blk+AF8-mq+AF8-put+AF8-driver+AF8-tag
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        linux-scsi <linux-scsi@vger.kernel.org>
-Cc:     Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
-        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
-Date:   Tue, 04 Dec 2018 11:35:05 -0800
-In-Reply-To: <ce2cdcee7e8d8e21cc8398a882b9d6e3@mail.gmail.com>
-References: +ADw-CAHsXFKFOBSmZeT9j7U2S6J4Af2k2ODe+AF8-pkFVGJg73v0Wp7O38A+AEA-mail.gmail.com+AD4- +ADw-7e8e1fe2-9f91-a370-a98c-43cdad1f6e8e+AEA-acm.org+AD4- +ADw-d56ddf2b485c13445fff5f9c36dd3c87+AEA-mail.gmail.com+AD4- +ADw-1543943674.185366.194.camel+AEA-acm.org+AD4- <ce2cdcee7e8d8e21cc8398a882b9d6e3@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=s+VP0A474Tn5W27kbi2McsJ3o8jRy8Pe/xLsJObravE=;
+        b=I05gIctnh1reIeOlgo5vTCZ9QWy5Iza2JJuqBmaFxoVtOXShu6QyEqkzPiPR8PpOhu
+         emou7WaxUPXilLr30+F9QME1QtAhVuDATIa7PS4agZEFvYd3XZ94HsZxsxeMycOvoJsj
+         McRMT8DzotcJiPSNTXrF69c3Q/2+QL9YA8jlBhXBs0bRN6LOe5aaX3BVtCc/s9uq6dkR
+         zN+BqjqiepdsK73BMmz/Sx1P0n202a94GhhWWWEIMMnV69fDTbhi+F5AiDnz6I3cTgem
+         AGSulxOpPeS/VbOJVg3/j9sgW8MYjwueMWm+Y18ZYIVXQ5pthz8JrPWI94rBwEjf113f
+         Mv5A==
+X-Gm-Message-State: AA+aEWauZuSZeYqUZ1L+EV44I3kP8mrZmS8EW9PKw/wljvM65x/ZVr4m
+        3hmfPRjV3ALRjhKGHrRXfIedBQ==
+X-Google-Smtp-Source: AFSGD/V1pyirlPgNfZ6QTMnWBFYFfLd/Hi7fHd7X1n4rwLyPwK2klSsRbUMBfIQeKDv9HiO4t9aEug==
+X-Received: by 2002:a81:a4d1:: with SMTP id b200mr20349089ywh.316.1543952921817;
+        Tue, 04 Dec 2018 11:48:41 -0800 (PST)
+Received: from localhost ([107.15.81.208])
+        by smtp.gmail.com with ESMTPSA id g70sm5827232ywe.105.2018.12.04.11.48.40
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 04 Dec 2018 11:48:40 -0800 (PST)
+Date:   Tue, 4 Dec 2018 14:48:39 -0500
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Dennis Zhou <dennis@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 06/14] blkcg: associate blkg when associating a device
+Message-ID: <20181204194838.ylk546legwikfrik@MacBook-Pro-91.local>
+References: <20181204183600.99746-1-dennis@kernel.org>
+ <20181204183600.99746-7-dennis@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181204183600.99746-7-dennis@kernel.org>
+User-Agent: NeoMutt/20180716
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2018-12-04 at 23:48 +-0530, Kashyap Desai wrote:
-+AD4 Let me explain the issue. It is not a race, but very straight issue.
+On Tue, Dec 04, 2018 at 01:35:52PM -0500, Dennis Zhou wrote:
+> Previously, blkg association was handled by controller specific code in
+> blk-throttle and blk-iolatency. However, because a blkg represents a
+> relationship between a blkcg and a request_queue, it makes sense to keep
+> the blkg->q and bio->bi_disk->queue consistent.
+> 
+> This patch moves association into the bio_set_dev macro(). This should
+> cover the majority of cases where the device is set/changed keeping the
+> two pointers consistent. Fallback code is added to
+> blkcg_bio_issue_check() to catch any missing paths.
+> 
+> Signed-off-by: Dennis Zhou <dennis@kernel.org>
+> ---
+>  block/bio.c                |  1 +
+>  block/blk-iolatency.c      |  4 +---
+>  block/blk-throttle.c       |  1 -
+>  include/linux/bio.h        |  2 ++
+>  include/linux/blk-cgroup.h | 11 +++--------
+>  5 files changed, 7 insertions(+), 12 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 41ebb3f8e2fc..1e852ab904aa 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -2074,6 +2074,7 @@ void bio_associate_blkg(struct bio *bio)
+>  
+>  	rcu_read_unlock();
+>  }
+> +EXPORT_SYMBOL_GPL(bio_associate_blkg);
+>  
+>  /**
+>   * bio_disassociate_task - undo bio_associate_current()
+> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+> index cdbd10564e66..e6b47c255521 100644
+> --- a/block/blk-iolatency.c
+> +++ b/block/blk-iolatency.c
+> @@ -472,14 +472,12 @@ static void check_scale_change(struct iolatency_grp *iolat)
+>  static void blkcg_iolatency_throttle(struct rq_qos *rqos, struct bio *bio)
+>  {
+>  	struct blk_iolatency *blkiolat = BLKIOLATENCY(rqos);
+> -	struct blkcg_gq *blkg;
+> +	struct blkcg_gq *blkg = bio->bi_blkg;
+>  	bool issue_as_root = bio_issue_as_root_blkg(bio);
+>  
+>  	if (!blk_iolatency_enabled(blkiolat))
+>  		return;
+>  
+> -	bio_associate_blkg(bio);
+> -	blkg = bio->bi_blkg;
+>  	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
+>  
+>  	while (blkg && blkg->parent) {
+> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> index 228c3a007ebc..1c6529df2002 100644
+> --- a/block/blk-throttle.c
+> +++ b/block/blk-throttle.c
+> @@ -2118,7 +2118,6 @@ static inline void throtl_update_latency_buckets(struct throtl_data *td)
+>  static void blk_throtl_assoc_bio(struct bio *bio)
+>  {
+>  #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+> -	bio_associate_blkg(bio);
+>  	bio_issue_init(&bio->bi_issue, bio_sectors(bio));
+>  #endif
+>  }
+> diff --git a/include/linux/bio.h b/include/linux/bio.h
+> index 62715a5a4f32..6ee2ea8b378a 100644
+> --- a/include/linux/bio.h
+> +++ b/include/linux/bio.h
+> @@ -491,12 +491,14 @@ do {						\
+>  		bio_clear_flag(bio, BIO_THROTTLED);\
+>  	(bio)->bi_disk = (bdev)->bd_disk;	\
+>  	(bio)->bi_partno = (bdev)->bd_partno;	\
+> +	bio_associate_blkg(bio);		\
+>  } while (0)
+>  
+>  #define bio_copy_dev(dst, src)			\
+>  do {						\
+>  	(dst)->bi_disk = (src)->bi_disk;	\
+>  	(dst)->bi_partno = (src)->bi_partno;	\
+> +	bio_clone_blkcg_association(dst, src);	\
+>  } while (0)
+>  
+>  #define bio_dev(bio) \
+> diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+> index c08e96e521ed..3c87ae71156f 100644
+> --- a/include/linux/blk-cgroup.h
+> +++ b/include/linux/blk-cgroup.h
+> @@ -802,21 +802,17 @@ static inline bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg
+>  static inline bool blkcg_bio_issue_check(struct request_queue *q,
+>  					 struct bio *bio)
+>  {
+> -	struct blkcg *blkcg;
+>  	struct blkcg_gq *blkg;
+>  	bool throtl = false;
+>  
+> -	rcu_read_lock();
+> +	if (!bio->bi_blkg)
+> +		bio_associate_blkg(bio);
+>  
 
-Please clarify what makes you think that iterating over all requests does not
-race with request completion. Is request submission perhaps blocked during the
-firmware recovery process? Does the firmware recovery process wait for
-completion interrupts that are in progress to finish?
+Should we maybe WARN_ON_ONCE() here since this really shouldn't happen?
+Otherwise you can add
 
-+AD4 Let's
-+AD4 say we have one scsi+AF8-device /dev/sda and total IO submitted +- completed are
-+AD4 some number 100.
-+AD4 All the 100 IO is +ACo-completed+ACo.   Now, As part of Firmware recovery, driver
-+AD4 tries to find our outstanding IOs using scsi+AF8-host+AF8-find+AF8-tag().
-+AD4 Block layer will return all the 100 commands to the driver but really those
-+AD4 100 commands are not outstanding. This patch will return +ACo-actual+ACo
-+AD4 outstanding commands.
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
-Would iterating over started requests be a good alternative to the patch
-that you had posted? The header above blk+AF8-mq+AF8-tagset+AF8-busy+AF8-iter() is as follows
-(this function is used by e.g. the skd driver for firmware recovery):
+Thanks,
 
-/+ACoAKg
- +ACo blk+AF8-mq+AF8-tagset+AF8-busy+AF8-iter - iterate over all started requests in a tag set
- +ACo +AEA-tagset:	Tag set to iterate over.
- +ACo +AEA-fn:		Pointer to the function that will be called for each started
- +ACo		request. +AEA-fn will be called as follows: +AEA-fn(rq, +AEA-priv,
- +ACo		reserved) where rq is a pointer to a request. 'reserved'
- +ACo		indicates whether or not +AEA-rq is a reserved request.
- +ACo +AEA-priv:	Will be passed as second argument to +AEA-fn.
- +ACo-/
-
-+AD4 I am not able to find right context from srp, but I check the srp code and
-+AD4 looks like that driver is getting scmd using scsi+AF8-host+AF8-find+AF8-tag() for live
-+AD4 command.
-
-Sorry, my e-mail was a bit too short to be comprehensible. When running
-sg+AF8-reset -d /dev/sd... in a loop it is possible that the SCSI reset handler
-terminates a request while the SRP driver is handling a request completion
-for one of the terminated requests. That is why both srp+AF8-process+AF8-srp() and
-the reset handler call srp+AF8-claim+AF8-req() to make sure that only one of these
-two contexts completes a request.
-
-Bart.
+Josef
