@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A3F4C04EB8
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 23:37:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C7A5C04EBF
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 23:37:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D941206B6
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 23:37:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 505FC206B6
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 23:37:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="dE8WS+kU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D941206B6
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Set3dj9n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 505FC206B6
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726001AbeLDXhy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Dec 2018 18:37:54 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:37862 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726624AbeLDXhy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 18:37:54 -0500
-Received: by mail-pg1-f193.google.com with SMTP id 80so8092784pge.4
-        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 15:37:53 -0800 (PST)
+        id S1725925AbeLDXh4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 18:37:56 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:33798 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726624AbeLDXhz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 18:37:55 -0500
+Received: by mail-pg1-f195.google.com with SMTP id 17so8110784pgg.1
+        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 15:37:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=X5thebUgmjkZJznWx9PghrfmA/cZ8t8Zs5+DcD2OHEI=;
-        b=dE8WS+kUC7yZA4W/psiXS2ohAuqeprvpmbU6SBBH2j//376jO5T895dTIRaKHvHs4i
-         4LXsmnPEopGbxesEKPAAIpWzOguX+nEM1KE1AK9UzjaITvaiFXrJ4Rl+R8a3rDJXvhxO
-         ipcpJh/omuzdnmyroasy9amsPxS4Y3+7AlMqGAMiPc2SHBnp7D72Ych4lcIcJ3FDnwCd
-         wUglliba9O8OjMMh9jsjoV2iCckthmeKav0NjAXJh83GTSQkekOwmSYKFXSlkyxAMuOl
-         7FPOL7nSsRy+NFEC115kEWA1EfeJkQZAvw4WNaZn31cLedsLxDyW7kg5vGFl+wCCFAfo
-         UgMA==
+        bh=j8zbGImEaiI6fzdEzobInCNQIlTJ46kLaRSNEoXmu1s=;
+        b=Set3dj9nxVQrkupYh/+vPbi3t2uxo7+EjNlGSkIkQl0JTq/vhMHP5SQ1GKLG4UJsYT
+         goH8r45Ukjn6fzROvOFzgYeEPTIiPAEdjbGoePumQiVPTenDrVMpLERic2Ya4PaX98Vj
+         cDEcGXe4RzCUcqW/NqCXzh6ms2KpAyqwa/KLSPt0h80HBZMNJPgcLW0L4Xwli6Ck4mkw
+         JICDXjN3tL19OSIrQZWglTy/qsTHmiObvAg/i6w+uGIC/Y2FhQ2cz1ICi3dyKx9QI/AJ
+         aSCwW5ZibvSpME6fTPqLStYRoIT3mAWAX6ECgkwdc/QC1UXgab6+cJAutkIPXJ/vjbHo
+         Z24g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=X5thebUgmjkZJznWx9PghrfmA/cZ8t8Zs5+DcD2OHEI=;
-        b=K/nc5pA6bHIDu8D2qc5+xFfZ3bozqePKrwnbVvCoqxoeF5dEZ5MTWXqNrVtLdqkXdz
-         bY+vkjLAqGoOBN8VFggadDVqGXfz9GABVN3hC5xGennEZZIj6YL9WwJxbJFHCvyhW5Zt
-         YJEVnHaQdTtXsSuvAu8xVEd+JdD1mpK7BaEm9m3uLV81e5xZYTmgu+kN2DqMewvximeO
-         JscxMw3Du2XRCfTMQqabQK8MIdNGzIdJ6heOcDRH8Ss/AY/I2+2LO+mMBCVmqwxJNSiv
-         8WMhFZj6gCIeHE/9VdKPKGZ7IJ24U2T4RZwtdaDh/fLOkHMWU/eGP7Ou1fH6MgFUe3D2
-         eQvA==
-X-Gm-Message-State: AA+aEWbv7bz4QsIyZ7gCbQ5qYfWqq20V62iQOREJZNmtBZtLe7ulk526
-        L2LMIKena3p/rHAjcKw67NXFfqqcKU4=
-X-Google-Smtp-Source: AFSGD/UVaMY5FzeFtJ9H4penb1h/+C7kMxs1mWyVILtRTdEOYh5ylEJTTUtloBU3PRxVG3ELb2mc7w==
-X-Received: by 2002:a63:63c3:: with SMTP id x186mr18526940pgb.330.1543966672509;
-        Tue, 04 Dec 2018 15:37:52 -0800 (PST)
+        bh=j8zbGImEaiI6fzdEzobInCNQIlTJ46kLaRSNEoXmu1s=;
+        b=sV4QUi5PdMxTf4sCZF3Fzt8zvinkQR58+QhUpMKsnWepilQLN7ptwFm4+HLWPAA3dV
+         +Bk3EydFo/X6s92kdmtXI/cq79rMtQ05Zq5mk6HoXo9B98LVbyssktBl+hQ06825t5WQ
+         NIjpD9LtVhy5Z9JdyvzE6/QiRm93uEYqC22JztXEjuW1VmpOGqfh/mWKKZUhwFj5AtJ3
+         dxggnX5S4i/aSiF8wZ5aho1pgXAYp3xQhbidMgmlSmwL3Knz46YcZY4cpaHd0OllGPGN
+         pScS3jeaYREpGTo6wcFF1E1KO9Z48E1Oiq7eCRkF9CdmSTI8Ko7Rwlt8jE+gSfreFKsg
+         nu/A==
+X-Gm-Message-State: AA+aEWagfqjacJ8Z1FDc/1XDPjbvRaYCWF5fweaDCaXqK3DKgD08yrFW
+        P11/CJdGW3GA5ts8G02yeYegTJ6o9/E=
+X-Google-Smtp-Source: AFSGD/VBmQMykE9KxJcCOsVQ6mWUMkR59I46LJ+UNutZ8v/nWJqEjOW8gCHKkFpPqJwdy7OZl8zLpQ==
+X-Received: by 2002:a62:7dcb:: with SMTP id y194mr22258894pfc.113.1543966674877;
+        Tue, 04 Dec 2018 15:37:54 -0800 (PST)
 Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id t13sm22527635pgr.42.2018.12.04.15.37.49
+        by smtp.gmail.com with ESMTPSA id t13sm22527635pgr.42.2018.12.04.15.37.52
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Dec 2018 15:37:50 -0800 (PST)
+        Tue, 04 Dec 2018 15:37:53 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-aio@kvack.org
 Cc:     hch@lst.de, jmoyer@redhat.com, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 07/26] aio: separate out ring reservation from req allocation
-Date:   Tue,  4 Dec 2018 16:37:10 -0700
-Message-Id: <20181204233729.26776-8-axboe@kernel.dk>
+Subject: [PATCH 08/26] aio: don't zero entire aio_kiocb aio_get_req()
+Date:   Tue,  4 Dec 2018 16:37:11 -0700
+Message-Id: <20181204233729.26776-9-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181204233729.26776-1-axboe@kernel.dk>
 References: <20181204233729.26776-1-axboe@kernel.dk>
@@ -71,100 +71,49 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Christoph Hellwig <hch@lst.de>
+It's 192 bytes, fairly substantial. Most items don't need to be cleared,
+especially not upfront. Clear the ones we do need to clear, and leave
+the other ones for setup when the iocb is prepared and submitted.
 
-This is in preparation for certain types of IO not needing a ring
-reserveration.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/aio.c | 30 +++++++++++++++++-------------
- 1 file changed, 17 insertions(+), 13 deletions(-)
+ fs/aio.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/fs/aio.c b/fs/aio.c
-index cf0de61743e8..eaceb40e6cf5 100644
+index eaceb40e6cf5..522c04864d82 100644
 --- a/fs/aio.c
 +++ b/fs/aio.c
-@@ -901,7 +901,7 @@ static void put_reqs_available(struct kioctx *ctx, unsigned nr)
- 	local_irq_restore(flags);
- }
- 
--static bool get_reqs_available(struct kioctx *ctx)
-+static bool __get_reqs_available(struct kioctx *ctx)
- {
- 	struct kioctx_cpu *kcpu;
- 	bool ret = false;
-@@ -993,6 +993,14 @@ static void user_refill_reqs_available(struct kioctx *ctx)
- 	spin_unlock_irq(&ctx->completion_lock);
- }
- 
-+static bool get_reqs_available(struct kioctx *ctx)
-+{
-+	if (__get_reqs_available(ctx))
-+		return true;
-+	user_refill_reqs_available(ctx);
-+	return __get_reqs_available(ctx);
-+}
-+
- /* aio_get_req
-  *	Allocate a slot for an aio request.
-  * Returns NULL if no requests are free.
-@@ -1001,24 +1009,15 @@ static inline struct aio_kiocb *aio_get_req(struct kioctx *ctx)
+@@ -1009,14 +1009,15 @@ static inline struct aio_kiocb *aio_get_req(struct kioctx *ctx)
  {
  	struct aio_kiocb *req;
  
--	if (!get_reqs_available(ctx)) {
--		user_refill_reqs_available(ctx);
--		if (!get_reqs_available(ctx))
--			return NULL;
--	}
--
- 	req = kmem_cache_alloc(kiocb_cachep, GFP_KERNEL|__GFP_ZERO);
+-	req = kmem_cache_alloc(kiocb_cachep, GFP_KERNEL|__GFP_ZERO);
++	req = kmem_cache_alloc(kiocb_cachep, GFP_KERNEL);
  	if (unlikely(!req))
--		goto out_put;
-+		return NULL;
+ 		return NULL;
  
  	percpu_ref_get(&ctx->reqs);
++	req->ki_ctx = ctx;
  	INIT_LIST_HEAD(&req->ki_list);
  	refcount_set(&req->ki_refcnt, 0);
- 	req->ki_ctx = ctx;
+-	req->ki_ctx = ctx;
++	req->ki_eventfd = NULL;
  	return req;
--out_put:
--	put_reqs_available(ctx, 1);
--	return NULL;
  }
  
- static struct kioctx *lookup_ioctx(unsigned long ctx_id)
-@@ -1805,9 +1804,13 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- 		return -EINVAL;
- 	}
+@@ -1730,6 +1731,10 @@ static ssize_t aio_poll(struct aio_kiocb *aiocb, struct iocb *iocb)
+ 	if (unlikely(!req->file))
+ 		return -EBADF;
  
-+	if (!get_reqs_available(ctx))
-+		return -EAGAIN;
++	req->head = NULL;
++	req->woken = false;
++	req->cancelled = false;
 +
-+	ret = -EAGAIN;
- 	req = aio_get_req(ctx);
- 	if (unlikely(!req))
--		return -EAGAIN;
-+		goto out_put_reqs_available;
- 
- 	if (iocb.aio_flags & IOCB_FLAG_RESFD) {
- 		/*
-@@ -1870,11 +1873,12 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
- 		goto out_put_req;
- 	return 0;
- out_put_req:
--	put_reqs_available(ctx, 1);
- 	percpu_ref_put(&ctx->reqs);
- 	if (req->ki_eventfd)
- 		eventfd_ctx_put(req->ki_eventfd);
- 	kmem_cache_free(kiocb_cachep, req);
-+out_put_reqs_available:
-+	put_reqs_available(ctx, 1);
- 	return ret;
- }
- 
+ 	apt.pt._qproc = aio_poll_queue_proc;
+ 	apt.pt._key = req->events;
+ 	apt.iocb = aiocb;
 -- 
 2.17.1
 
