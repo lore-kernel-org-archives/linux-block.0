@@ -2,110 +2,85 @@ Return-Path: <SRS0=ovnK=ON=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE75AC04EB8
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 17:14:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38418C04EB8
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 17:18:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AE59320672
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 17:14:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE59320672
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+	by mail.kernel.org (Postfix) with ESMTP id F03F42082B
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 17:18:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F03F42082B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726381AbeLDROj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Dec 2018 12:14:39 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:33650 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726353AbeLDROj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 12:14:39 -0500
-Received: by mail-pg1-f194.google.com with SMTP id z11so7675599pgu.0;
-        Tue, 04 Dec 2018 09:14:37 -0800 (PST)
+        id S1726367AbeLDRS1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 12:18:27 -0500
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:42558 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726226AbeLDRS1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 12:18:27 -0500
+Received: by mail-pf1-f196.google.com with SMTP id 64so8527918pfr.9
+        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 09:18:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=ZGVBwA3Eu7LHZi3kMu+nrKdJZvJMSb1KomRQOiB/jck=;
-        b=KB+tFJDTmZl7ETCp1pOlotCRTZ+iMNgqG1tzUzrDhGTZlvmuJD4k4CzOJ5+7OnzzX1
-         EVBRSuu9peTRdqIyWq3F+8dvUCeTWktsTUYKnxoj8Rj/6rpZTtIBGZiAVj/iSpNUFzyq
-         Y3sMohkDuGNOPy8c9Nw7taYnyQJAqAN7Xfwx5Q2im93eS669el9VGg/7HBmNyFyRIG79
-         pLnjxkng5U9SzUf6T2LWAUp6cdow/hRwoVJ84ZHgBQhne0ANUhkuePx214LkYIw2hd/2
-         5BbdnIQOlzHG6lcZxHAAIpcFLS6vrZmo5eOu44DAjEgRitQmjfzcZcF3fOib0qrZrZic
-         Pgxw==
-X-Gm-Message-State: AA+aEWb6j5GEjNW/JUIkClETRiLFkzE1VxJsjm/bScfYNXF3eSIorThm
-        iEqIuKrX0Bo3QfgYVKmP4YI=
-X-Google-Smtp-Source: AFSGD/Ujq62AKkh3aZnaJHj0tMxbClVBWwL5IYy1bVEVIoz1wPgbP117BiEtTE16sZmjWIXZzYBYpg==
-X-Received: by 2002:a62:3006:: with SMTP id w6mr21086366pfw.258.1543943676887;
-        Tue, 04 Dec 2018 09:14:36 -0800 (PST)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id 202sm33905168pfy.87.2018.12.04.09.14.35
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 04 Dec 2018 09:14:35 -0800 (PST)
-Message-ID: <1543943674.185366.194.camel@acm.org>
-Subject: Re: [PATCH] blk-mq: Set request mapping to NULL in
- blk_mq_put_driver_tag
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Kashyap Desai <kashyap.desai@broadcom.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        linux-scsi <linux-scsi@vger.kernel.org>
-Cc:     Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
-        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
-Date:   Tue, 04 Dec 2018 09:14:34 -0800
-In-Reply-To: <d56ddf2b485c13445fff5f9c36dd3c87@mail.gmail.com>
-References: <CAHsXFKFOBSmZeT9j7U2S6J4Af2k2ODe_pkFVGJg73v0Wp7O38A@mail.gmail.com>
-         <7e8e1fe2-9f91-a370-a98c-43cdad1f6e8e@acm.org>
-         <d56ddf2b485c13445fff5f9c36dd3c87@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+mgy4unuJ1juyyL51JBLvu9CSAb4d1ApDRGi/24h5D0=;
+        b=dBbY/LTgJL3oPmoliuH9OsCO8gHtwftyll1nGo5y3XLusId7ZNg0vvNja/o3cQLKm0
+         VGVG5vf4ye11guo2l8Qa6fUgYj1jo6IfKTbc8c8TjxFUJbDvyWnWFckFAr/ip1BsGixR
+         i760xoCKdHyP7/ntMFtirmtgF2+aNTK/jcEA9RLe4V5/r7fEIEi0quLgkUO4NjglImvZ
+         NzTUeXtqMWl8pGQ0kvz8vBSUNcmSYCd5SC3cOTGqv1uy/7BT3JEVJY8wp9Groeb3jVn7
+         Ytfu11bKZ1w0mtgo47icRxqsC5fp+k9llcEKQP3guAmbSmeTa9A703s6wLnJ0rVHYFbG
+         KBrg==
+X-Gm-Message-State: AA+aEWaCJ+FuRXhWNc+Wz1KXaSkqruLJBzSImyqZh5fbx0e1uIM8/J2/
+        iSDIFBvLYLGfxQWsWfg07QQgMAKi
+X-Google-Smtp-Source: AFSGD/XW17bw7WbyG+RbrFRWCLFgvKEHLS1xCngOVIPHvxKsdtMWq17f9rxJiQUpGLVUqZkbsXImgA==
+X-Received: by 2002:a62:b80a:: with SMTP id p10mr20808671pfe.32.1543943905193;
+        Tue, 04 Dec 2018 09:18:25 -0800 (PST)
+Received: from ?IPv6:2601:647:4800:973f:7888:b13c:bff:87b0? ([2601:647:4800:973f:7888:b13c:bff:87b0])
+        by smtp.gmail.com with ESMTPSA id c13sm24695817pfo.121.2018.12.04.09.18.23
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 04 Dec 2018 09:18:24 -0800 (PST)
+Subject: Re: [PATCH 10/13] nvme-mpath: remove I/O polling support
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@fb.com>, Keith Busch <keith.busch@intel.com>,
+        Max Gurtovoy <maxg@mellanox.com>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+References: <20181202164628.1116-1-hch@lst.de>
+ <20181202164628.1116-11-hch@lst.de>
+ <f62ed781-28cd-dae0-f3aa-544d75cdc4fc@grimberg.me>
+ <20181204150729.GD3630@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <76b2d640-aba6-3869-4420-8c09b8e2ea77@grimberg.me>
+Date:   Tue, 4 Dec 2018 09:18:22 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+MIME-Version: 1.0
+In-Reply-To: <20181204150729.GD3630@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2018-12-04 at 22:17 +-0530, Kashyap Desai wrote:
-+AD4 +- Linux-scsi
-+AD4 
-+AD4 +AD4 +AD4 diff --git a/block/blk-mq.h b/block/blk-mq.h
-+AD4 +AD4 +AD4 index 9497b47..57432be 100644
-+AD4 +AD4 +AD4 --- a/block/blk-mq.h
-+AD4 +AD4 +AD4 +-+-+- b/block/blk-mq.h
-+AD4 +AD4 +AD4 +AEAAQA -175,6 +-175,7 +AEAAQA static inline bool
-+AD4 +AD4 +AD4 blk+AF8-mq+AF8-get+AF8-dispatch+AF8-budget(struct blk+AF8-mq+AF8-hw+AF8-ctx +ACo-hctx)
-+AD4 +AD4 +AD4   static inline void +AF8AXw-blk+AF8-mq+AF8-put+AF8-driver+AF8-tag(struct blk+AF8-mq+AF8-hw+AF8-ctx +ACo-hctx,
-+AD4 +AD4 +AD4                          struct request +ACo-rq)
-+AD4 +AD4 +AD4   +AHs
-+AD4 +AD4 +AD4 +-    hctx-+AD4-tags-+AD4-rqs+AFs-rq-+AD4-tag+AF0 +AD0 NULL+ADs
-+AD4 +AD4 +AD4       blk+AF8-mq+AF8-put+AF8-tag(hctx, hctx-+AD4-tags, rq-+AD4-mq+AF8-ctx, rq-+AD4-tag)+ADs
-+AD4 +AD4 +AD4       rq-+AD4-tag +AD0 -1+ADs
-+AD4 +AD4 
-+AD4 +AD4 No SCSI driver should call scsi+AF8-host+AF8-find+AF8-tag() after a request has
-+AD4 +AD4 finished. The above patch introduces yet another race and hence can't be
-+AD4 +AD4 a proper fix.
-+AD4 
-+AD4 Bart, many scsi drivers use scsi+AF8-host+AF8-find+AF8-tag() to traverse max tag+AF8-id to
-+AD4 find out pending IO in firmware.
-+AD4 One of the use case is -  HBA firmware recovery.  In case of firmware
-+AD4 recovery, driver may require to traverse the list and return back pending
-+AD4 scsi command to SML for retry.
-+AD4 I quickly grep the scsi code and found that snic+AF8-scsi, qla4xxx, fnic,
-+AD4 mpt3sas are using API scsi+AF8-host+AF8-find+AF8-tag for the same purpose.
-+AD4 
-+AD4 Without this patch, we hit very basic kernel panic due to page fault.  This
-+AD4 is not an issue in non-mq code path. Non-mq path use
-+AD4 blk+AF8-map+AF8-queue+AF8-find+AF8-tag() and that particular API does not provide stale
-+AD4 requests.
 
-As I wrote before, your patch doesn't fix the race you described but only
-makes the race window smaller. If you want an example of how to use
-scsi+AF8-host+AF8-find+AF8-tag() properly, have a look at the SRP initiator driver
-(drivers/infiniband/ulp/srp). That driver uses scsi+AF8-host+AF8-find+AF8-tag() without
-triggering any NULL pointer dereferences. The approach used in that driver
-also works when having to support HBA firmware recovery.
+>>> If it really becomes an issue we
+>>> should rework the nvme code to also skip the multipath code for any
+>>> private namespace, even if that could mean some trouble when rescanning.
+>>>
+>>
+>> This requires some explanation? skip the multipath code how?
+> 
+> We currently always go through the multipath node as long the the
+> controller is multipath capable.  If we care about e.g. polling
+> on a private namespace on a dual ported U.2 drive we'd have to make
+> sure we don't go through the multipath device node for private namespaces
+> that can only have one path, but only for shared namespaces.
 
-Bart.
+But we'd still use the multipath node for shared namespaces (and also
+polling if needed). I agree that private namespaces can skip the
+multipath node.
