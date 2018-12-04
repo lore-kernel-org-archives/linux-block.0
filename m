@@ -2,98 +2,109 @@ Return-Path: <SRS0=ovnK=ON=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53518C04EB8
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 16:40:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BD4C04EB8
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 16:47:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0F51C2082F
-	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 16:40:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DF7920834
+	for <linux-block@archiver.kernel.org>; Tue,  4 Dec 2018 16:47:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="QPJ2Aqxh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F51C2082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DKYNPZPF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DF7920834
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726459AbeLDQkw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Dec 2018 11:40:52 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:35653 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726461AbeLDQkv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 11:40:51 -0500
-Received: by mail-io1-f66.google.com with SMTP id n9so6098804ioo.2
-        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 08:40:51 -0800 (PST)
+        id S1726420AbeLDQry (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 11:47:54 -0500
+Received: from mail-it1-f193.google.com ([209.85.166.193]:40925 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726367AbeLDQry (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 11:47:54 -0500
+Received: by mail-it1-f193.google.com with SMTP id h193so15444589ita.5
+        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 08:47:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=lro4YL6U5GayqRt30XRLIyyC2kuVyY9MWpPuyG3grVI=;
-        b=QPJ2AqxhOC0eimZeCeYpcZc9jc5CKMfVp+M4tYvGodts7oc9xaxfqGMn/4du63cApB
-         0LdkEH8242HNIpVdjNV79lbpSb8h6OZANben2TiMZchOJ+MM5bgE612set0iSxhEvJ8C
-         1tcd0+oG7janYMfJvqNj0Hs0m/ZYft8oTGn4cGDuPscVm9AQzOtA1V91XEmgAKhyOW1t
-         0dxo91ZFeXwbUvLLBb8meo2uPeaaoO7vnosm+I2fE4yv1qPoJ0hH2klA34oGc/sjp1FK
-         nS8NsB70eP94nH/MrSERtxCH9WGQR6cvmIE1H1aw7s4pc7zXUcoYbDp+QJnVYnblAV2W
-         yQCA==
+        d=broadcom.com; s=google;
+        h=from:references:in-reply-to:mime-version:thread-index:date
+         :message-id:subject:to:cc;
+        bh=6MtSRmCm6aVdDzQRFtm/H2PxQChCgFBt62rSyJRDfY4=;
+        b=DKYNPZPFhTQN7x/R7ek88o7NDH9e7soL4Tc2g0LFGsIesKfOzkWbE7MFWzxX9/+ZsY
+         ktjccDySznGxoDQuFyL3tM4uGz9IkKM1nHVQwlhhs3+kbDssi7/CN/96mmtaqSZCH2xK
+         n1A/yK4NaOYtyMzxo9B1sFk0L8Hl3vp0oPEXw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=lro4YL6U5GayqRt30XRLIyyC2kuVyY9MWpPuyG3grVI=;
-        b=iL2V7YTL4ptjpt8+c2e2KHif89t9MB3gPPT6D82DMwVhZ6uxrPSHZrHEpFk0abPOtI
-         S0OBl6JCncd5sAtS3Udhrdvzk5ImsD3AcLT/nVrOqD64UN5eUVsoHdTSM67KiSsIhKNZ
-         cq347vXo72IthrJeFcbIZU/JIgoIGeJ+Wp2kQZVuox3tOcxxmsvyBs7cc3r2P+I/m2bo
-         DsYKqpfPVceh+kB/4MFxgI+edzj7Qfr2UK7+3UrKLn1U9BU8YQ85toJb+84wpKSNAWPx
-         yHcvLwwVU+6htEcpmtBvJJBmvsQjFlbWNkKgqjRvRRTD3tNwIg4tjgWyI+sdvzlWIF/r
-         HXJA==
-X-Gm-Message-State: AA+aEWa7FL/2k0zTbt+lvh8nlmVzBmO01wVU7pi92HFKTAAQnZnvCF07
-        +SA4jGFgtGLdf34utjFSbHo9heF8IYw=
-X-Google-Smtp-Source: AFSGD/UcikYW4zX/zhw/cQbaI9DJDxL1I/8HyARv/tZLU4zNTm7iE1Wbsptxudrxus0zcIk16Mn1tg==
-X-Received: by 2002:a6b:d908:: with SMTP id r8mr18846968ioc.160.1543941650932;
-        Tue, 04 Dec 2018 08:40:50 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id u127-v6sm5555300ita.10.2018.12.04.08.40.49
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Dec 2018 08:40:49 -0800 (PST)
-Subject: Re: [PATCH 02/27] aio: clear IOCB_HIPRI
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-aio@kvack.org
-References: <20181130165646.27341-1-axboe@kernel.dk>
- <20181130165646.27341-3-axboe@kernel.dk> <20181130171336.GA17030@lst.de>
- <75612cc8-aa98-92b9-4a0d-02564add9c3f@kernel.dk>
- <20181204144644.GB3180@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <89a9e94e-6d35-ea2a-fa1c-f14ca16e6e74@kernel.dk>
-Date:   Tue, 4 Dec 2018 09:40:48 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        h=x-gm-message-state:from:references:in-reply-to:mime-version
+         :thread-index:date:message-id:subject:to:cc;
+        bh=6MtSRmCm6aVdDzQRFtm/H2PxQChCgFBt62rSyJRDfY4=;
+        b=Q5tpb3wHS8j0MKolarPKiC5g/jp2vjHYWWOPHKobTVR23mRQDeEOSV5Mp7ViQJqnKy
+         ffujphsb34FSnqsdgS5WsbBAtew+iMCn2JwB+E5vk/1fcUmzvtvNIHu3mEX8N00Tu7FI
+         GpmbgMf0TB09/V0z14+fwjyLv5zzqd5dJj8TuMirjKfBOOJKT4j/CjuARHpdOSNMgr8W
+         ovte48IIt+5Ur6Ib5G0BYpkZxnMablxZHcl9DZeB3yOmSXpdpWyAAM7rBu4TRq+qo7Vu
+         kbvqCSnjwgk3e8hZkNxLkUTx52RicpKZ+ufsdra0I6p/UlCrMI5Q//IuN0zW9dVvP6zo
+         PM2A==
+X-Gm-Message-State: AA+aEWZKkyWEG/des+pduniqNG1V7B5JzeuTJWY95Bw+JBBv6BBZLa6o
+        k0ScepBxbqZlGdP8cZsMZKVF9XAEo0CBhhlk8f4gRw==
+X-Google-Smtp-Source: AFSGD/UZTVaRplDEr6WiA5Mq/xqho6/OXRNRvHRDKis3E0ogU98riKidymMdmrhWYkijBDhapdOXoYcf9hF1FnGmqhE=
+X-Received: by 2002:a05:660c:3c7:: with SMTP id c7mr5300247itl.131.1543942073307;
+ Tue, 04 Dec 2018 08:47:53 -0800 (PST)
+From:   Kashyap Desai <kashyap.desai@broadcom.com>
+References: <CAHsXFKFOBSmZeT9j7U2S6J4Af2k2ODe_pkFVGJg73v0Wp7O38A@mail.gmail.com>
+ <7e8e1fe2-9f91-a370-a98c-43cdad1f6e8e@acm.org>
+In-Reply-To: <7e8e1fe2-9f91-a370-a98c-43cdad1f6e8e@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20181204144644.GB3180@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 14.0
+Thread-Index: AQEyvrdX27HdOCj1DHPKEZclYJ8CJQEQPyI2pqnfvSA=
+Date:   Tue, 4 Dec 2018 22:17:51 +0530
+Message-ID: <d56ddf2b485c13445fff5f9c36dd3c87@mail.gmail.com>
+Subject: RE: [PATCH] blk-mq: Set request mapping to NULL in blk_mq_put_driver_tag
+To:     Bart Van Assche <bvanassche@acm.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        linux-scsi <linux-scsi@vger.kernel.org>
+Cc:     Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/4/18 7:46 AM, Christoph Hellwig wrote:
-> On Fri, Nov 30, 2018 at 10:14:31AM -0700, Jens Axboe wrote:
->> On 11/30/18 10:13 AM, Christoph Hellwig wrote:
->>> I think we'll need to queue this up for 4.21 ASAP independent of the
->>> rest, given that with separate poll queues userspace could otherwise
->>> submit I/O that will never get polled for anywhere.
->>
->> Probably a good idea, I can just move it to my 4.21 branch, it's not
->> strictly dependent on the series.
-> 
-> So, can you add it to the 4.21 branch?
++ Linux-scsi
 
-Done
+> > diff --git a/block/blk-mq.h b/block/blk-mq.h
+> > index 9497b47..57432be 100644
+> > --- a/block/blk-mq.h
+> > +++ b/block/blk-mq.h
+> > @@ -175,6 +175,7 @@ static inline bool
+> > blk_mq_get_dispatch_budget(struct blk_mq_hw_ctx *hctx)
+> >   static inline void __blk_mq_put_driver_tag(struct blk_mq_hw_ctx *hctx,
+> >                          struct request *rq)
+> >   {
+> > +    hctx->tags->rqs[rq->tag] = NULL;
+> >       blk_mq_put_tag(hctx, hctx->tags, rq->mq_ctx, rq->tag);
+> >       rq->tag = -1;
+>
+> No SCSI driver should call scsi_host_find_tag() after a request has
+> finished. The above patch introduces yet another race and hence can't be
+> a proper fix.
 
--- 
-Jens Axboe
+Bart, many scsi drivers use scsi_host_find_tag() to traverse max tag_id to
+find out pending IO in firmware.
+One of the use case is -  HBA firmware recovery.  In case of firmware
+recovery, driver may require to traverse the list and return back pending
+scsi command to SML for retry.
+I quickly grep the scsi code and found that snic_scsi, qla4xxx, fnic,
+mpt3sas are using API scsi_host_find_tag for the same purpose.
 
+Without this patch, we hit very basic kernel panic due to page fault.  This
+is not an issue in non-mq code path. Non-mq path use
+blk_map_queue_find_tag() and that particular API does not provide stale
+requests.
+
+Kashyap
+
+>
+> Bart.
