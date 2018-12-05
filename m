@@ -2,79 +2,44 @@ Return-Path: <SRS0=VELz=OO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87658C04EB9
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 13:48:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C850C04EB9
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 14:05:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4D90220878
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 13:48:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="V7tjByPd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D90220878
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	by mail.kernel.org (Postfix) with ESMTP id 450D72082B
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 14:05:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 450D72082B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727339AbeLENs0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Dec 2018 08:48:26 -0500
-Received: from mail-pf1-f173.google.com ([209.85.210.173]:45871 "EHLO
-        mail-pf1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727177AbeLENs0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Dec 2018 08:48:26 -0500
-Received: by mail-pf1-f173.google.com with SMTP id g62so10028751pfd.12
-        for <linux-block@vger.kernel.org>; Wed, 05 Dec 2018 05:48:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=5bQP5GF38p6tNBGkNNSdM9jrCUfjWB3hksiQ0JVFb5o=;
-        b=V7tjByPdfvuxTTVaM7N53ibJ1UApYyiZiwC/F+J5Fn+BZuqIhtsJBIBCuAkdbIUnRN
-         FlXtwB3Su9V1I2zwRvwRXu7h8hzwibGlaxjaf4GLDK5iLEnN9QnuYJMZYbrG45gjNOR1
-         3gqPRNAfKJcOHjHEpXSmI7Whk2TzyK90mgG9CZOtW0ri2NflSGuJ7iZYGXnCEqhOtOr8
-         VQz+p6T+vFQRClu7JVX6uZqO+KPSak7ZZEZ0apWZCU003CtuqKIYz9WXj7U1+vHZ/BL3
-         8q+EPMio719XrLaYNfLNvWwR5ltveE/td8aIP3dFmolDLGnE07bD+Ztc/rmNkbMqgeHv
-         OJXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5bQP5GF38p6tNBGkNNSdM9jrCUfjWB3hksiQ0JVFb5o=;
-        b=Ss3B41hiogP5oqGaIvN701LLnbj75JIMsR6+cj7v/3Ai/tEd11L5RGQFjSR/TXNBLr
-         nXt9rhmIn7BuRa8khZSRDFjNYa7ZwlBuJ/hI3WHzYvVU+RiJcK2EW668rBOYS00CXA2y
-         Lm3L7gplKyNg0MKAAoxZUjOkBCekPGm1ulMfnidmi1BYxzTfjy7gr7goJ1y6vqGtejdd
-         Z58bG1I2ryem4vZi4v+krYJqkD+pG3Phshmov6pRHfekoFZbdXm5jcjbOotK62lhsg73
-         gsJ/W6m8gYdEt39lf80edxEd6+rZKXRFs7R1/6zDvrUuEfh5Zv7aQqkY9ucJc0QM4Btf
-         w5og==
-X-Gm-Message-State: AA+aEWYvEw60Q67Pb5p+7JChtLpi/oN8kfjgkENYmMPHOLKlj3gu5KkZ
-        bJscJ+ckho5udXSzPofga7Tvkw==
-X-Google-Smtp-Source: AFSGD/Uoli/9J+EWCBGBnqwrlMSiQOjpuFETYcordDaQJ4OkTokm3sYZVMFTUlQLqAs+XC46G7/WvQ==
-X-Received: by 2002:a62:99dd:: with SMTP id t90mr19609855pfk.179.1544017705582;
-        Wed, 05 Dec 2018 05:48:25 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id j14sm26594399pfn.175.2018.12.05.05.48.23
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 05 Dec 2018 05:48:24 -0800 (PST)
+        id S1727240AbeLEOFX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Dec 2018 09:05:23 -0500
+Received: from relay.sw.ru ([185.231.240.75]:46426 "EHLO relay.sw.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726918AbeLEOFX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Dec 2018 09:05:23 -0500
+Received: from [172.16.25.169]
+        by relay.sw.ru with esmtp (Exim 4.91)
+        (envelope-from <ktkhai@virtuozzo.com>)
+        id 1gUXnj-00077J-Bi; Wed, 05 Dec 2018 17:05:19 +0300
 Subject: Re: Kernel crashes after 529262d56dbe "block: remove ->poll_fn"
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Kirill Tkhai <ktkhai@virtuozzo.com>, sagi@grimberg.me,
+To:     Jens Axboe <axboe@kernel.dk>, hch@lst.de, sagi@grimberg.me,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <0bd2d36e-bef0-b836-7039-124ae4d346a6@virtuozzo.com>
  <c374e085-a86b-6df3-2142-74968f067bc7@kernel.dk>
  <5e8d3302-a7d0-3483-6540-f0b87c237f7d@virtuozzo.com>
  <0e6c1e68-38b0-6618-40cd-a2b72dc4e240@kernel.dk>
- <a6efd5b2-3190-54e7-ad4c-06f9ac441641@kernel.dk>
- <20181205134727.GA26794@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0bf49b6e-19ea-5bf8-164d-4d0dbf8446fe@kernel.dk>
-Date:   Wed, 5 Dec 2018 06:48:22 -0700
+From:   Kirill Tkhai <ktkhai@virtuozzo.com>
+Message-ID: <d2f563b5-a832-ce72-d8d8-6add788548b7@virtuozzo.com>
+Date:   Wed, 5 Dec 2018 17:05:18 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+ Thunderbird/60.3.1
 MIME-Version: 1.0
-In-Reply-To: <20181205134727.GA26794@lst.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <0e6c1e68-38b0-6618-40cd-a2b72dc4e240@kernel.dk>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -82,18 +47,87 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/5/18 6:47 AM, Christoph Hellwig wrote:
-> On Wed, Dec 05, 2018 at 06:39:26AM -0700, Jens Axboe wrote:
->>> What device is this?
+On 05.12.2018 16:20, Jens Axboe wrote:
+> On 12/5/18 6:05 AM, Kirill Tkhai wrote:
+>> On 05.12.2018 15:45, Jens Axboe wrote:
+>>> On 12/5/18 5:19 AM, Kirill Tkhai wrote:
+>>>> Hi,
+>>>>
+>>>> commit 529262d56dbe from today linux-next makes my kernel crash:
+>>>>
+>>>> Author: Christoph Hellwig <hch@lst.de>
+>>>> Date:   Sun Dec 2 17:46:26 2018 +0100
+>>>>
+>>>>     block: remove ->poll_fn
+>>>>
+>>>> Traceback is below, config and reproducer (not minimal, just a random one populating swap) are attached.
+>>>>
+>>>> [   29.097612] BUG: unable to handle kernel NULL pointer dereference at 0000000000000000
+>>>> [   29.098730] #PF error: [INSTR]
+>>>> [   29.099104] PGD 0 P4D 0 
+>>>> [   29.099425] Oops: 0010 [#1] PREEMPT SMP
+>>>> [   29.099879] CPU: 3 PID: 925 Comm: bash Not tainted 4.20.0-rc5-next-20181205+ #244
+>>>> [   29.100658] RIP: 0010:          (null)
+>>>> [   29.101100] Code: Bad RIP value.
+>>>> [   29.101480] RSP: 0000:ffffc9000023fb80 EFLAGS: 00010202
+>>>> [   29.102061] RAX: ffffffff8182d0e0 RBX: ffff88807ceee000 RCX: 0000000000000000
+>>>> [   29.102818] RDX: ffff88807d560f40 RSI: 0000000000000000 RDI: ffff88807ceee000
+>>>> [   29.103661] RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000002000
+>>>> [   29.104560] R10: 00000000ffffffff R11: ffff88807c854150 R12: 0000000000000000
+>>>> [   29.105458] R13: 0000000000000002 R14: ffff88807d7236c0 R15: ffffc9000023fe20
+>>>> [   29.106438] FS:  00007faba91d7740(0000) GS:ffff88807db80000(0000) knlGS:0000000000000000
+>>>> [   29.107304] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>> [   29.107917] CR2: ffffffffffffffd6 CR3: 000000007a172000 CR4: 00000000000006a0
+>>>> [   29.109401] Call Trace:
+>>>> [   29.110017]  ? blk_poll+0x27c/0x340
+>>>> [   29.110691]  ? submit_bio+0x40/0x120
+>>>> [   29.111278]  ? swap_readpage+0x148/0x190
+>>>> [   29.111924]  ? read_swap_cache_async+0x53/0x60
+>>>> [   29.112670]  ? swap_cluster_readahead+0x231/0x2b0
+>>>> [   29.113310]  ? swapin_readahead+0x2ce/0x400
+>>>> [   29.113878]  ? pagecache_get_page+0x2b/0x210
+>>>> [   29.114416]  ? do_swap_page+0x42c/0x800
+>>>> [   29.114919]  ? __handle_mm_fault+0x544/0xdd0
+>>>> [   29.115455]  ? handle_mm_fault+0x112/0x230
+>>>> [   29.115978]  ? __do_page_fault+0x196/0x410
+>>>> [   29.116501]  ? __put_user_4+0x19/0x20
+>>>> [   29.116990]  ? page_fault+0x5/0x20
+>>>> [   29.117451]  ? page_fault+0x1b/0x20
+>>>> [   29.117925] CR2: 0000000000000000
+>>>> [   29.118472] ---[ end trace 0faa4ddc190b41fa ]---
+>>>
+>>> Can you try this? The swap read-in poll attempts looks totally
+>>> incorrect.
+>>>
+>>>
+>>> diff --git a/mm/page_io.c b/mm/page_io.c
+>>> index 5bdfd21c1bd9..f3455f9f8dc7 100644
+>>> --- a/mm/page_io.c
+>>> +++ b/mm/page_io.c
+>>> @@ -401,6 +401,8 @@ int swap_readpage(struct page *page, bool synchronous)
+>>>  	get_task_struct(current);
+>>>  	bio->bi_private = current;
+>>>  	bio_set_op_attrs(bio, REQ_OP_READ, 0);
+>>> +	if (synchronous)
+>>> +		bio->bi_opf |= REQ_HIPRI;
+>>>  	count_vm_event(PSWPIN);
+>>>  	bio_get(bio);
+>>>  	qc = submit_bio(bio);
+>>> @@ -411,7 +413,7 @@ int swap_readpage(struct page *page, bool synchronous)
+>>>  			break;
+>>>  
+>>>  		if (!blk_poll(disk->queue, qc, true))
+>>> -			break;
+>>> +			io_schedule();
+>>>  	}
+>>>  	__set_current_state(TASK_RUNNING);
+>>>  	bio_put(bio);
 >>
->> This might also help...
+>> Still crashes:
 > 
-> Yes, it should.  I had missed that we turned on QUEUE_FLAG_POLL
-> by default, which is rather odd.  The even weirder things is that
-> git-blame claims it was me who enabled it :)
+> What device is this?
 
-No presents for you this year!
+00:01.1 IDE interface: Intel Corporation 82371SB PIIX3 IDE [Natoma/Triton II] (prog-if 80 [Master])
+	Subsystem: Red Hat, Inc Qemu virtual machine
 
--- 
-Jens Axboe
-
+JFI: The same result for gcc-7.3 (initially was gcc-8.2).
