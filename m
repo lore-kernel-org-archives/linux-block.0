@@ -2,96 +2,97 @@ Return-Path: <SRS0=VELz=OO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB9AC04EB9
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 15:27:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D3EC04EB9
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 15:32:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 07FFB2084C
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 15:27:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07FFB2084C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTP id 686CB2084C
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 15:32:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 686CB2084C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727242AbeLEP10 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Dec 2018 10:27:26 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:16082 "EHLO huawei.com"
+        id S1727690AbeLEPc5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Dec 2018 10:32:57 -0500
+Received: from mx2.suse.de ([195.135.220.15]:59434 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727195AbeLEP10 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 5 Dec 2018 10:27:26 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 4BDBADA7FDF17;
-        Wed,  5 Dec 2018 23:27:21 +0800 (CST)
-Received: from [127.0.0.1] (10.202.226.41) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.408.0; Wed, 5 Dec 2018
- 23:27:14 +0800
-Subject: Re: DIF/DIX issue related to config CONFIG_SCSI_MQ_DEFAULT
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-References: <5d9bf51d-1ef9-b948-2168-9e7526d77225@hisilicon.com>
- <20181127130811.GA2780@ming.t460p>
- <6c573f36-60d8-0631-e9ac-dacd72f6c8ad@hisilicon.com>
- <20181130011935.GA7573@ming.t460p>
- <e0e07583-98ca-4fc5-e60d-055e5474c084@huawei.com>
- <yq1k1kqt07m.fsf@oracle.com>
- <45193ec6-6398-3953-4833-88ca2057971a@huawei.com>
- <yq1ftvcsoes.fsf@oracle.com>
-CC:     Ming Lei <ming.lei@redhat.com>,
-        "chenxiang (M)" <chenxiang66@hisilicon.com>,
-        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linuxarm <linuxarm@huawei.com>,
-        Steffen Maier <maier@linux.ibm.com>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <fe72aef6-d313-5f02-7c0e-0eea28e86582@huawei.com>
-Date:   Wed, 5 Dec 2018 15:27:09 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        id S1727103AbeLEPc5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Dec 2018 10:32:57 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 34658B005;
+        Wed,  5 Dec 2018 15:32:55 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 724871E0DBB; Wed,  5 Dec 2018 16:32:54 +0100 (CET)
+Date:   Wed, 5 Dec 2018 16:32:54 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Alexander Lochmann <alexander.lochmann@tu-dortmund.de>
+Cc:     viro@zeniv.linux.org.uk, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Horst Schirmeier <horst.schirmeier@tu-dortmund.de>,
+        Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH] Fix sync. in inode_has_no_xattr()
+Message-ID: <20181205153254.GD30615@quack2.suse.cz>
+References: <13eaa1c6-def5-afad-89eb-6f149db90684@tu-dortmund.de>
 MIME-Version: 1.0
-In-Reply-To: <yq1ftvcsoes.fsf@oracle.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.226.41]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <13eaa1c6-def5-afad-89eb-6f149db90684@tu-dortmund.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 05/12/2018 02:22, Martin K. Petersen wrote:
->
+On Wed 05-12-18 12:45:06, Alexander Lochmann wrote:
+> 
+> inode.i_flags might be altered without proper
+> synchronisation when the inode belongs to devtmpfs.
+> The following stacktrace shows how to get there:
+> 13: entry_SYSENTER_32:460
+> 12: do_fast_syscall_32:410
+> 11: _static_cpu_has:146
+> 10: do_syscall_32_irqs_on:322
+> 09: SyS_pwrite64:636
+> 08: SYSC_pwrite64:650
+> 07: fdput:38
+> 06: vfs_write:560
+> 05: __vfs_write:512
+> 04: new_sync_write:500
+> 03: blkdev_write_iter:1977
+> 02: __generic_file_write_iter:2897
+> 01: file_remove_privs:1818
+> 00: inode_has_no_xattr:3163
+> 
+> Found by LockDoc (Alexander Lochmann, Horst Schirmeier and Olaf
+> Spinczyk)
+> 
+> Signed-off-by: Alexander Lochmann <alexander.lochmann@tu-dortmund.de>
+> Signed-off-by: Horst Schirmeier <horst.schirmeier@tu-dortmund.de>
+...
+> +/*
+> + * blkdev_write_iter() can call this without i_rwsem, need to be
+> + * careful with i_flags update.
+> + */
+>  static inline void inode_has_no_xattr(struct inode *inode)
+>  {
+>  	if (!is_sxid(inode->i_mode) && (inode->i_sb->s_flags & SB_NOSEC))
+> -		inode->i_flags |= S_NOSEC;
+> +		inode_set_flags(inode, S_NOSEC, S_NOSEC);
+>  }
 
-Hi Martin,
+Thinking more about this I'm not sure if this is actually the right
+solution. Because for example the write(2) can set S_NOSEC flag wrongly
+when it would race with chmod adding SUID bit. So probably we rather need
+to acquire i_rwsem in blkdev_write_iter() if file does not have S_NOSEC set
+(we don't want to acquire it unconditionally as that would heavily impact
+scalability of block device writes).
 
-> John,
->
->> OK, great. Happy to help. So far we have hisi_sas fio issue to go on
->> plus knowledge that this issue seems to be exposed/triggered by
->> enabling SCSI MQ.
->
-> I'll have to go revisit the archives for your exact fio bits.
->
-> But I successfully ran our DIX/T10 PI qualification tooling without any
-> errors on the latest SCSI tree. On both scsi_debug and FC hardware.
-
-I'm not fimilar with this tooling. Is it internal to your company?
-
-Unfortunately it seems that no other SAS HBA kernel driver supports DIX, 
-so we have nothing to test against for this transport.
-
->
->> My colleague chenxiang also tried DIF on 3008 with our same platform,
->> and we are seeing an issue there also; here's a snippet:
->
-> Reproduced this. Turns out to be a recently introduced bug that
-> exclusively affects DIF-only setups (so primarily mpt3sas due to lack of
-> DIX support). It's a regression caused by a commit that went in through
-> block a few months ago. I'll send a patch...
->
-
-ok, great.
-
-thanks,
-John
-
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
