@@ -2,168 +2,105 @@ Return-Path: <SRS0=VELz=OO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC33FC04EB9
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 14:59:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72F50C04EB9
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 15:15:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9D32A206B7
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 14:59:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3AE372082D
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 15:15:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fRs1AqsN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D32A206B7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="MJ4a3//j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AE372082D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727182AbeLEO7r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Dec 2018 09:59:47 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:50373 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727142AbeLEO7r (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Dec 2018 09:59:47 -0500
-Received: by mail-wm1-f68.google.com with SMTP id n190so11158598wmd.0
-        for <linux-block@vger.kernel.org>; Wed, 05 Dec 2018 06:59:45 -0800 (PST)
+        id S1727954AbeLEPPR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Dec 2018 10:15:17 -0500
+Received: from mail-it1-f173.google.com ([209.85.166.173]:50491 "EHLO
+        mail-it1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727606AbeLEPPR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Dec 2018 10:15:17 -0500
+Received: by mail-it1-f173.google.com with SMTP id z7so21832456iti.0
+        for <linux-block@vger.kernel.org>; Wed, 05 Dec 2018 07:15:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=ppoYVHrvXIn5sQwam+kKuQckR/dRRpKbtLMrTcFlzL4=;
-        b=fRs1AqsNSb0jEtDZNSkSQCOg7Sfr/3CbIsITtY0rOIt64yk7zTECnDMZwszchR6NYO
-         J1ARpJPV3eE8apcKgD+HtpA/7SVs7UflkaKmbZ3I0zzs0RuU660j6Cv6lEMy//AXuqgV
-         Zw3To4njs8C1O8ORiwtIwOHJN2ibrRhynoRj3CUaqjlXm6r/9T+yXY4dFc2IJdlXgJO3
-         Vilth7w9Y8ENuKlp6iQxViw7/TiAxIpuKIHQZ2f3/vKCg0EIrwVFGLuGVyjlzdjD937S
-         fjbgZcOP7lZQntMea/b6p+YIeZ/4V6GOVP/12Mn8xc+nhfWC89P7lNbRBRSxjCP05jzw
-         c7kA==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=/mP7/ZLn/q209y+k6fP706G2b9UmRHCddcqP7dP39Io=;
+        b=MJ4a3//j4JhdnWCkOcXYnRBv0vp54FPsiMZEaJw1mImO1VkwwIQAZFMhnOspdTWaRb
+         DRVuzls+qUgYN73J9I8jpBg/4TcIKPgde3cm7yqiQbH6JwkpNgiFdGWND92o13l0TbqC
+         3i8JzHL7H6v96ylv4XdKO/WJIsjE+Lvy2DFHVYMkVJdGySXATPlg4fQiXw2AhUysGufV
+         v2MtSFKMrx/MAy4HA2DKuReN1vrROdJnDuSBPtP2tCltQY9ILEnOt4mDkqJohRgGXNtd
+         yh42H04RG64VzIZMacXrBzxKuHVcdU1OhDKRYSbZvs4A8ufMKWVfyBCP1RAKeTKvLcJr
+         6EbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=ppoYVHrvXIn5sQwam+kKuQckR/dRRpKbtLMrTcFlzL4=;
-        b=UcvdlixhRbBZwKrh4+8pSLspAlGzIqBWzY5D9ViRFqf9FSRgbgn/6j66iZxkrEZ4Ut
-         PBl/yfbyMDNk4ZnApzop2rhiHlDn2bPsiRsTjlgC8D4cnAS2pyoTqrY/kBwB5Rsp3Eo6
-         /ENFopprR6/SjPWX9Nai3uu5vGqRjCmpMknnh6QZR8EZmkaeT5XzpC6ULSVRLZqj3b9s
-         huq8NMKXqntTtP9sbPblquYOX84CD83ca31iF1JpZSQhaBuel1SHceopspUdMuvK3pIo
-         0wny2yWU7tv89khWUNqvyXipH9wdCL7OuHmXY9JrTuDELs00ct9YoKdcRyKDwZk70iUT
-         RIYg==
-X-Gm-Message-State: AA+aEWbD19LQwFs9JXIKSoVuUTGuA6YvOsKH6RcX27gipy07jVBVf/Px
-        22qdET/QWb/TV5xdvWVodXxNp9gF43YgnEkUT4M=
-X-Google-Smtp-Source: AFSGD/WhZUgH60gBRfC6Rq+Tjtdw2UQqloMwnEYjVjhdHAK5G0Efsq+vNA5ygQqxOsoUpJAXix6uot/P+6rbpZBN7a0=
-X-Received: by 2002:a1c:48c1:: with SMTP id v184-v6mr16635705wma.26.1544021984527;
- Wed, 05 Dec 2018 06:59:44 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/mP7/ZLn/q209y+k6fP706G2b9UmRHCddcqP7dP39Io=;
+        b=ZDe8waLdwvFipV7QOKx/qO933t3AiTiuuvr1h1ioIn1g5Zob1p2NU7KNFEgo+vzji1
+         zSUA0HkFb3IkVK0gXusb6Wscs2qKKaFjLmboobjfsxbIYc9KQaGOPzQI7a7VymECq7sE
+         AjIn6e4O91tWKxb6efz/18TJEmUkz7XVzK4IPEon5thP92M8ynSZEGcOZbUgIJDkRSoI
+         PNH3M7Qju8jCTxZGTRzJUKTah2FyfV+jD0gKKX0fe6IV/3UZTme2PGnp9YA1lQQgmbP2
+         kT4CFPRLUH9S/zog4yDcX/ZUWIfVtbmyBdCJYqgC7478k0/yMReDpxSS25ZTfo9FnjTq
+         SWKg==
+X-Gm-Message-State: AA+aEWYXpu55iwMa4WA106xrWn1zLJ76XdPOSV/33SHuElLqyve1zBP+
+        BeMf1IO1TgkD0WHs3Hd1rQfCfA==
+X-Google-Smtp-Source: AFSGD/UfBr/Ap09egI2ARO0QkAsC1wh4LuxEwVTRQVV4gEPxqlIsBpRRToP7JgjvSXJi6e8R30nr0Q==
+X-Received: by 2002:a24:4648:: with SMTP id j69mr15802369itb.56.1544022916284;
+        Wed, 05 Dec 2018 07:15:16 -0800 (PST)
+Received: from [192.168.1.56] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id o74sm6457989itc.44.2018.12.05.07.15.14
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 05 Dec 2018 07:15:15 -0800 (PST)
+Subject: Re: [PATCH] blk-mq: fix corruption with direct issue
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Ming Lei <ming.lei@redhat.com>
+References: <1d359819-5410-7af2-d02b-f0ecca39d2c9@kernel.dk>
+ <20181205144117.GB18123@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <1251a863-5269-a766-4cef-2bb403b167b8@kernel.dk>
+Date:   Wed, 5 Dec 2018 08:15:13 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-References: <20181205141701.GA33910@192.168.3.9> <20181205144006.GA18123@infradead.org>
- <CAA70yB5WQPYzptck=miwiBrV7=uixvLKpJrzGEOP9zBU5Y2CwQ@mail.gmail.com>
-In-Reply-To: <CAA70yB5WQPYzptck=miwiBrV7=uixvLKpJrzGEOP9zBU5Y2CwQ@mail.gmail.com>
-From:   Weiping Zhang <zwp10758@gmail.com>
-Date:   Wed, 5 Dec 2018 22:59:31 +0800
-Message-ID: <CAA70yB7rD_vqMXUvHrQ8SwH-jAyDZeL58TkqABqJ0Y=-p_pjyg@mail.gmail.com>
-Subject: Re: [PATCH v3] block: add documentation for io_timeout
-To:     hch@infradead.org
-Cc:     Jens Axboe <axboe@kernel.dk>, bvanassche@acm.org,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20181205144117.GB18123@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Weiping Zhang <zwp10758@gmail.com> =E4=BA=8E2018=E5=B9=B412=E6=9C=885=E6=97=
-=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8810:49=E5=86=99=E9=81=93=EF=BC=9A
->
-> Christoph Hellwig <hch@infradead.org> =E4=BA=8E2018=E5=B9=B412=E6=9C=885=
-=E6=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8810:40=E5=86=99=E9=81=93=EF=BC=
-=9A
-> >
-> > Can you please also send a patch to not show this attribute for
-> > drivers without a timeout handler?  Thanks!
-> >
-Is there a simple way do that ?
+On 12/5/18 7:41 AM, Christoph Hellwig wrote:
+> On Tue, Dec 04, 2018 at 03:47:46PM -0700, Jens Axboe wrote:
+>> If we attempt a direct issue to a SCSI device, and it returns BUSY, then
+>> we queue the request up normally. However, the SCSI layer may have
+>> already setup SG tables etc for this particular command. If we later
+>> merge with this request, then the old tables are no longer valid. Once
+>> we issue the IO, we only read/write the original part of the request,
+>> not the new state of it.
+>>
+>> This causes data corruption, and is most often noticed with the file
+>> system complaining about the just read data being invalid:
+> 
+> Looks good as the first quick fix:
+> 
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> 
+> But as we discussed I think we need to be even more careful. including
+> the only read and write check below in the thread or some higher level
+> approach.
 
-Shall we return -ENOTSUPP when user read/write this attribute when
-driver has no timeout handler ?
-> Do you means checking q->mq_ops->timeout is NULL or not ?
->
-> static void blk_mq_rq_timed_out(struct request *req, bool reserved)
-> {
->         req->rq_flags |=3D RQF_TIMED_OUT;
-> If it's NULL, only re-start a timer for this request in blk_add_timer.
-> Is there some defect ? if show this attribute and the driver doesn't
-> support timeout handler =EF=BC=9F
->
->         if (req->q->mq_ops->timeout) {
->                 enum blk_eh_timer_return ret;
->
->                 ret =3D req->q->mq_ops->timeout(req, reserved);
->                 if (ret =3D=3D BLK_EH_DONE)
->                         return;
->                 WARN_ON_ONCE(ret !=3D BLK_EH_RESET_TIMER);
->         }
->
->         blk_add_timer(req);
-> }
->
->
-> > On Wed, Dec 05, 2018 at 10:17:06PM +0800, Weiping Zhang wrote:
-> > > Add documentation for /sys/block/<disk>/queue/io_timeout.
-> > >
-> > > Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
-> > > ---
-> > >  Documentation/ABI/testing/sysfs-block | 10 ++++++++++
-> > >  Documentation/block/queue-sysfs.txt   |  7 +++++++
-> > >  2 files changed, 17 insertions(+)
-> > >
-> > > diff --git a/Documentation/ABI/testing/sysfs-block b/Documentation/AB=
-I/testing/sysfs-block
-> > > index dea212db9df3..f254a374710a 100644
-> > > --- a/Documentation/ABI/testing/sysfs-block
-> > > +++ b/Documentation/ABI/testing/sysfs-block
-> > > @@ -271,3 +271,13 @@ Description:
-> > >               size of 512B sectors of the zones of the device, with
-> > >               the eventual exception of the last zone of the device
-> > >               which may be smaller.
-> > > +
-> > > +What:                /sys/block/<disk>/queue/io_timeout
-> > > +Date:                November 2018
-> > > +Contact:     Weiping Zhang <zhangweiping@didiglobal.com>
-> > > +Description:
-> > > +             io_timeout is a request=E2=80=99s timeouts at block lay=
-er in
-> > > +             milliseconds. When the underlying driver starts process=
-ing
-> > > +             a request, the generic block layer will start a timer, =
-if
-> > > +             this request cannot be completed in io_timeout millisec=
-onds,
-> > > +             a timeout event will occur.
-> > > diff --git a/Documentation/block/queue-sysfs.txt b/Documentation/bloc=
-k/queue-sysfs.txt
-> > > index 2c1e67058fd3..f0c9bbce73fd 100644
-> > > --- a/Documentation/block/queue-sysfs.txt
-> > > +++ b/Documentation/block/queue-sysfs.txt
-> > > @@ -67,6 +67,13 @@ If set to a value larger than 0, the kernel will p=
-ut the process issuing
-> > >  IO to sleep for this amont of microseconds before entering classic
-> > >  polling.
-> > >
-> > > +io_timeout (RW)
-> > > +---------------
-> > > +This is a request=E2=80=99s timeouts at block layer in milliseconds.=
- When the
-> > > +underlying driver starts processing a request, the generic block lay=
-er
-> > > +will start a timer, if this request cannot be completed in io_timeou=
-t
-> > > +milliseconds, a timeout event will occur.
-> > > +
-> > >  iostats (RW)
-> > >  -------------
-> > >  This file is used to control (on/off) the iostats accounting of the
-> > > --
-> > > 2.14.1
-> > >
-> > ---end quoted text---
+I agree, I'm reviewing the patches from Jianchao now and will do
+something cleaner on top of that.
+
+-- 
+Jens Axboe
+
