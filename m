@@ -2,76 +2,75 @@ Return-Path: <SRS0=VELz=OO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80622C07E85
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 13:10:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AB41C04EBF
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 13:20:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 463E82084C
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 13:10:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 069502082B
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 13:20:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="pa5zZgws"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 463E82084C
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cBHSAlvx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 069502082B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726909AbeLENK1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Dec 2018 08:10:27 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:34967 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726918AbeLENK0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Dec 2018 08:10:26 -0500
-Received: by mail-pg1-f194.google.com with SMTP id s198so9024293pgs.2
-        for <linux-block@vger.kernel.org>; Wed, 05 Dec 2018 05:10:26 -0800 (PST)
+        id S1727454AbeLENUV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Dec 2018 08:20:21 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:40494 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726918AbeLENUU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Dec 2018 08:20:20 -0500
+Received: by mail-pf1-f195.google.com with SMTP id i12so9997459pfo.7
+        for <linux-block@vger.kernel.org>; Wed, 05 Dec 2018 05:20:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=bwlBPVRzMS0EuEdU2s/Ly9iDEaOpfIj8Bxy6xGC7DWU=;
-        b=pa5zZgws9sMpWPTusT5Q8E+3mzIdt8UaggItLYYQg2v/O/I5Bvkm8U5cHX63kZMI7W
-         V6koh4M1Wv3q8EdpDpsYQKnw02Tlm/ZXAhjwijyBP9yTy69K49TUQU/k6+cm9lO7oP5l
-         cBRlygz/ZyM6uyWuoYMlVSJ9HjLgjckvbK7FBIvGSdOsZIQ6nZCO1HkP8jtFm0/yloYl
-         ba1DiBniGe0wT0+sinIYhMN8pGzC99HHmunmXifUYqfsPDROpOr8dmdx4KBvcjHmdOF4
-         mRk0LF+ohMVJEKwd9zT08Pz5Rs2crtdr780oyspdGttPEDBJmutIy0RuWscyVva2siMB
-         fMsw==
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=zwQg1+mimVAWF/0uZryFn7z428Qa9OXmR2pULNKrwhk=;
+        b=cBHSAlvx9h8NCRirp5NsYEp9WJyKvyiC9KYjdSzLdK1GvR2aiouECozFZLK8QCYSN6
+         SCrOen6qxWPfYJaGXi1T0rV/Jq4kyRUqyHnZUVSofr1IX/5ZB7qli/Ia0MlC9HKsMFpY
+         hPIMDqrLVJzyRlxb3MBCB++cNGAOPJhaCwHtQ+Avw7BnYIBKfmi7P7e3In6AUKaKkAck
+         BIawbUkugGeQp5aq6QCdANSS5SvNwBbCCL2NbcQA61OA8YacOJ546rQ4l0kyDa3zRbGs
+         G7j6lpKYX0iC+evdlypDIDNSgQEvcTZwfOojZPHERpRwVS+p8Hykf/Ud9t6XcTDg9T+t
+         Uc2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+        h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=bwlBPVRzMS0EuEdU2s/Ly9iDEaOpfIj8Bxy6xGC7DWU=;
-        b=ILOnh18WO9TyXfDbq4hp4/+EYb/CU0lJAKgK7jOUH2pQhIxebG1vA05QFj4pCxzNVb
-         uw6J7SNsoTVAxVz5V1NNSfldcWiH9lRDAQICfq7bOAxslIzU8UfAmpf3dBhd6C/m4WOM
-         vcTrO9H8kw+o8yTisHifu/kusc7UaCxqVFsFu5LPCeQXwxP0C3oBHnslTwQrQSy/URQc
-         TCv44lGj5VTQ7S6Ux1ZRsQ9Ijvdn6VhWSOz3H9OQK1uHFLJJeS+AwC8islS3Pg7ahOGb
-         PEeph9hl98uZd33wfy6kPRrcpQyKgeTmeEz8ssY3X0xUc7e7tIu75eb8ETUVTxt0Sn2V
-         GnEg==
-X-Gm-Message-State: AA+aEWZUX2qV1xUEWjSDK//QwgVwU1E1Y3v4l+D0H/sApKx4BFcycxxa
-        ab8CiOjyCdWIPXQXQbIIswi7/bJP9jo=
-X-Google-Smtp-Source: AFSGD/VOKawi/Zi2j6Y6ifnMSrhJq9Z1E3UHv4JnnFvyD3xPI7QWPm9s4pngJiVAgwUBFE+245z2pA==
-X-Received: by 2002:a63:6ecf:: with SMTP id j198mr20786234pgc.3.1544015425791;
-        Wed, 05 Dec 2018 05:10:25 -0800 (PST)
+        bh=zwQg1+mimVAWF/0uZryFn7z428Qa9OXmR2pULNKrwhk=;
+        b=qbbBFjZbP38tBozFzfCooXa0lPvAqjyJelbirnneUVGNACY7wyiZHh6+CGuMB4PsrX
+         tfq+jJwit24lbKE01yGTFnWe6GfOinjL0LC88f8U4xMj3qRSkbI1ks3y0Wop8x0BVHob
+         r4a1HsEPbhIk/3L4VAS4KUS4hfPZFCXVScmJpQdRwExyHY7+GDI42cv+5SOYAkAjZJlG
+         lzLWSMItd0/Gk2X4hauTmBjqsLiH5T8uX+Eu6iWSzub54iOx5UQSl8KANcER9VafZcjI
+         nM53jo3tN2UFiDCCqoDL5PDuPINuGaIMGRgj3QGu60indUQ1gMI9xhxE0SZ6GhWzHIyk
+         uDWw==
+X-Gm-Message-State: AA+aEWYLXtmIkpfUWGaj46I665nc3Knw/ZoSjV+G1RO1Haojs40qQ5xE
+        2n7UWMt1Npt+MH21znlPDIBDAeIsUZk=
+X-Google-Smtp-Source: AFSGD/WZ93eWq25ksmDY2zdOMgZ7pei+MNFtgh0CVHKwGbi8AbtmNESslZhbOCt6RzpkrP5ZekfWvA==
+X-Received: by 2002:a63:194f:: with SMTP id 15mr20712575pgz.192.1544016019821;
+        Wed, 05 Dec 2018 05:20:19 -0800 (PST)
 Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id r12sm19988926pgv.83.2018.12.05.05.10.23
+        by smtp.gmail.com with ESMTPSA id q187sm91096156pfq.128.2018.12.05.05.20.17
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 05 Dec 2018 05:10:24 -0800 (PST)
-Subject: Re: [PATCH 15/26] aio: support for IO polling
-To:     Benny Halevy <bhalevy@scylladb.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-aio@kvack.org
-Cc:     hch@lst.de, jmoyer@redhat.com
-References: <20181204233729.26776-1-axboe@kernel.dk>
- <20181204233729.26776-16-axboe@kernel.dk>
- <51ae659719c64d869cae06cdc94748f64132ba3a.camel@scylladb.com>
+        Wed, 05 Dec 2018 05:20:18 -0800 (PST)
+Subject: Re: Kernel crashes after 529262d56dbe "block: remove ->poll_fn"
+To:     Kirill Tkhai <ktkhai@virtuozzo.com>, hch@lst.de, sagi@grimberg.me,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <0bd2d36e-bef0-b836-7039-124ae4d346a6@virtuozzo.com>
+ <c374e085-a86b-6df3-2142-74968f067bc7@kernel.dk>
+ <5e8d3302-a7d0-3483-6540-f0b87c237f7d@virtuozzo.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a8df7d41-3a3c-370f-33be-1e2954b45362@kernel.dk>
-Date:   Wed, 5 Dec 2018 06:10:22 -0700
+Message-ID: <0e6c1e68-38b0-6618-40cd-a2b72dc4e240@kernel.dk>
+Date:   Wed, 5 Dec 2018 06:20:16 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <51ae659719c64d869cae06cdc94748f64132ba3a.camel@scylladb.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <5e8d3302-a7d0-3483-6540-f0b87c237f7d@virtuozzo.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -79,87 +78,84 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/5/18 2:56 AM, Benny Halevy wrote:
->> +static int aio_iopoll_getevents(struct kioctx *ctx,
->> +				struct io_event __user *event,
->> +				unsigned int *nr_events, long min, long max)
->> +{
->> +	struct aio_kiocb *iocb;
->> +	int to_poll, polled, ret;
->> +
->> +	/*
->> +	 * Check if we already have done events that satisfy what we need
->> +	 */
->> +	if (!list_empty(&ctx->poll_completing)) {
->> +		ret = aio_iopoll_reap(ctx, event, nr_events, max);
->> +		if (ret < 0)
->> +			return ret;
->> +		/* if min is zero, still go through a poll check */
-> 
-> A function-level comment about that would be more visible.
-
-Yes, that might be a better idea.
-
->> +		if (min && *nr_events >= min)
+On 12/5/18 6:05 AM, Kirill Tkhai wrote:
+> On 05.12.2018 15:45, Jens Axboe wrote:
+>> On 12/5/18 5:19 AM, Kirill Tkhai wrote:
+>>> Hi,
+>>>
+>>> commit 529262d56dbe from today linux-next makes my kernel crash:
+>>>
+>>> Author: Christoph Hellwig <hch@lst.de>
+>>> Date:   Sun Dec 2 17:46:26 2018 +0100
+>>>
+>>>     block: remove ->poll_fn
+>>>
+>>> Traceback is below, config and reproducer (not minimal, just a random one populating swap) are attached.
+>>>
+>>> [   29.097612] BUG: unable to handle kernel NULL pointer dereference at 0000000000000000
+>>> [   29.098730] #PF error: [INSTR]
+>>> [   29.099104] PGD 0 P4D 0 
+>>> [   29.099425] Oops: 0010 [#1] PREEMPT SMP
+>>> [   29.099879] CPU: 3 PID: 925 Comm: bash Not tainted 4.20.0-rc5-next-20181205+ #244
+>>> [   29.100658] RIP: 0010:          (null)
+>>> [   29.101100] Code: Bad RIP value.
+>>> [   29.101480] RSP: 0000:ffffc9000023fb80 EFLAGS: 00010202
+>>> [   29.102061] RAX: ffffffff8182d0e0 RBX: ffff88807ceee000 RCX: 0000000000000000
+>>> [   29.102818] RDX: ffff88807d560f40 RSI: 0000000000000000 RDI: ffff88807ceee000
+>>> [   29.103661] RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000002000
+>>> [   29.104560] R10: 00000000ffffffff R11: ffff88807c854150 R12: 0000000000000000
+>>> [   29.105458] R13: 0000000000000002 R14: ffff88807d7236c0 R15: ffffc9000023fe20
+>>> [   29.106438] FS:  00007faba91d7740(0000) GS:ffff88807db80000(0000) knlGS:0000000000000000
+>>> [   29.107304] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>> [   29.107917] CR2: ffffffffffffffd6 CR3: 000000007a172000 CR4: 00000000000006a0
+>>> [   29.109401] Call Trace:
+>>> [   29.110017]  ? blk_poll+0x27c/0x340
+>>> [   29.110691]  ? submit_bio+0x40/0x120
+>>> [   29.111278]  ? swap_readpage+0x148/0x190
+>>> [   29.111924]  ? read_swap_cache_async+0x53/0x60
+>>> [   29.112670]  ? swap_cluster_readahead+0x231/0x2b0
+>>> [   29.113310]  ? swapin_readahead+0x2ce/0x400
+>>> [   29.113878]  ? pagecache_get_page+0x2b/0x210
+>>> [   29.114416]  ? do_swap_page+0x42c/0x800
+>>> [   29.114919]  ? __handle_mm_fault+0x544/0xdd0
+>>> [   29.115455]  ? handle_mm_fault+0x112/0x230
+>>> [   29.115978]  ? __do_page_fault+0x196/0x410
+>>> [   29.116501]  ? __put_user_4+0x19/0x20
+>>> [   29.116990]  ? page_fault+0x5/0x20
+>>> [   29.117451]  ? page_fault+0x1b/0x20
+>>> [   29.117925] CR2: 0000000000000000
+>>> [   29.118472] ---[ end trace 0faa4ddc190b41fa ]---
 >>
->> +			return 0;
+>> Can you try this? The swap read-in poll attempts looks totally
+>> incorrect.
+>>
+>>
+>> diff --git a/mm/page_io.c b/mm/page_io.c
+>> index 5bdfd21c1bd9..f3455f9f8dc7 100644
+>> --- a/mm/page_io.c
+>> +++ b/mm/page_io.c
+>> @@ -401,6 +401,8 @@ int swap_readpage(struct page *page, bool synchronous)
+>>  	get_task_struct(current);
+>>  	bio->bi_private = current;
+>>  	bio_set_op_attrs(bio, REQ_OP_READ, 0);
+>> +	if (synchronous)
+>> +		bio->bi_opf |= REQ_HIPRI;
+>>  	count_vm_event(PSWPIN);
+>>  	bio_get(bio);
+>>  	qc = submit_bio(bio);
+>> @@ -411,7 +413,7 @@ int swap_readpage(struct page *page, bool synchronous)
+>>  			break;
+>>  
+>>  		if (!blk_poll(disk->queue, qc, true))
+>> -			break;
+>> +			io_schedule();
+>>  	}
+>>  	__set_current_state(TASK_RUNNING);
+>>  	bio_put(bio);
 > 
-> if ((min && *nr_events >= min) || *nr_events >= max) ?
-> 
-> Otherwise, if poll_completing or poll_submitted are not empty,
-> besides getting to the "Shouldn't happen" case in aio_iopoll_reap,
-> it looks like we're gonna waste some cycles and never call f_op->iopoll
+> Still crashes:
 
-Agree, that would be a better place to catch it. I'll make those two
-changes, thanks!
-
->> +
->> +	/*
->> +	 * Find up to 'max' worth of events to poll for, including the
->> +	 * events we already successfully polled
->> +	 */
->> +	polled = to_poll = 0;
->> +	list_for_each_entry(iocb, &ctx->poll_completing, ki_list) {
->> +		/*
->> +		 * Poll for needed events with spin == true, anything after
->> +		 * that we just check if we have more, up to max.
->> +		 */
->> +		bool spin = polled + *nr_events >= min;
-> 
-> I'm confused. Shouldn't spin == true if polled + *nr_events < min?
-
-Heh, that does look off, and it is. I think the correct condition is:
-
-bool spin = !polled || *nr_events < min;
-
-and I'm not sure why that got broken. I just tested it, slight
-performance win as expected correcting this. It ties in with the above
-nr_events check - it's perfectly valid to pass min_nr == 0 and just do a
-poll check. Conversely, if we already spun, just do non-spin checks on
-followup poll checks.
-
->> +static int __aio_iopoll_check(struct kioctx *ctx, struct io_event __user *event,
->> +			      unsigned int *nr_events, long min_nr, long max_nr)
->> +{
->> +	int ret = 0;
->> +
->> +	while (!*nr_events || !need_resched()) {
->> +		int tmin = 0;
->> +
->> +		if (*nr_events < min_nr)
->> +			tmin = min_nr - *nr_events;
-> 
-> Otherwise, shouldn't the function just return 0?
-> 
-> Or perhaps you explicitly want to go through the tmin==0 case
-> in aio_iopoll_getevents if *nr_events == min_nr (or min_nr==0)?
-
-No, we need to go through poll, if min_nr == 0, but only if min_nr == 0
-and !nr_events. But we only get here for nr_events != 0, so should be
-fine as-is.
-
-Thanks for your review, very useful! I'll make the above changes right
-now.
+What device is this?
 
 -- 
 Jens Axboe
