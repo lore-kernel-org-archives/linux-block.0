@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 294BEC04EBF
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 15:34:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 587E6C04EBF
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 15:34:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E39B02084C
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 15:34:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DD8920878
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 15:34:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="zyHXHLpt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E39B02084C
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="r3FGAdka"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DD8920878
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727842AbeLEPeK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Dec 2018 10:34:10 -0500
-Received: from mail-yw1-f66.google.com ([209.85.161.66]:46550 "EHLO
-        mail-yw1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727177AbeLEPeK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Dec 2018 10:34:10 -0500
-Received: by mail-yw1-f66.google.com with SMTP id t13so8676604ywe.13
-        for <linux-block@vger.kernel.org>; Wed, 05 Dec 2018 07:34:09 -0800 (PST)
+        id S1727309AbeLEPeM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Dec 2018 10:34:12 -0500
+Received: from mail-yb1-f195.google.com ([209.85.219.195]:45944 "EHLO
+        mail-yb1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727177AbeLEPeM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Dec 2018 10:34:12 -0500
+Received: by mail-yb1-f195.google.com with SMTP id f6-v6so8551372ybg.12
+        for <linux-block@vger.kernel.org>; Wed, 05 Dec 2018 07:34:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=PNem2NL5fu2OhKSUpx777wY1UDGuyATbaD4VZNtn5yg=;
-        b=zyHXHLpt5UmQYp9dfvz/yrgPzsC4TeWMh6ctsF4gtatudS2y5h9DjezFZpB3IOaIaS
-         eRRXwCECRfInNoEdYyz8DH17F31QR6pmtmvUinftiROWIifSAzOS5cTtRTjbvXFg3EMB
-         FoGd+4AhWpiIiPzx9G2v8626AMWxrwQAhFqQ92IDqnfcLfAKKt7WJ77JB6c6mOBrra3d
-         i76iha3V5LrPZRDt6sKO2xXDXHoi7R8ScN5D1X9azD2q6htwHsExskWXWNwoLkklBkpy
-         tN9g7fLCwVQvATKl/TbPR9zalgd8t7O9/Dq1PQ1wAsZvTI4nXKUWumxJmopes/xdwail
-         IR2g==
+        bh=52WJ2Cz4Mo5QsIj5798m+wuQX4YBxhTQAraOz340Igc=;
+        b=r3FGAdkatH6CtVP/BP31wsSyroNtVPSZW6HW6PkmJrNJ5th7oCadAWdYVHCr5nJTKw
+         pKflLPmkonNwYZu5HYxcjXquyfktkH3MqzBQp1fKHNqwM5CZoXdPiMQWDjK8kez0t1qF
+         TLH3eOYLgaj4ilat3nY8F0IgCoZnrA9oB8/qp6GlNmJA099a/5roWRB2/REk6uZ+boEX
+         4qfZsxMTJKjEem1bh3cTgKLGgnNcFS9RnISA7bSKNbLlIH2tQpvoIQDUxjRd/WDAVn4i
+         ThCd4HPOeYUwh4IiAmMcgoEqyN4c8FKL+H7FC8Iy0m/01IFHz5GVVSBE5TfGi8qt5bF/
+         IQsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references;
-        bh=PNem2NL5fu2OhKSUpx777wY1UDGuyATbaD4VZNtn5yg=;
-        b=CUL3TPr5RInRF+60b/+hTQASEQ1VzmFjKTYMlSIGyzMJWhvX/MeGAXaYNiKs7Y66JB
-         4bUfa6ypIAf+P4nIgnyEKWWjOxwZD7vgb1UaMw5m8Ew0wW7sDWhnXVPdtiuSpY+lQio2
-         G2moqxEfn/F1wmkmnp7Pt/B8Y2bBPpcSUMgORAYLs1kMTamjVZctr7w17WGRv4A4w8LE
-         /UDnENRLsr7eiujme82I5E5pExcClRLxvZMvc+8fh87KqJAXrRkTzoOLuPHJ0cxRXSQ5
-         bodxMrdDKgsAeeWQVEhrKRIV+r1CebGeklHeidJfXS071YQE5TxZMgMQuEYyycwN19t2
-         76OQ==
-X-Gm-Message-State: AA+aEWZNwH3MC/MXGpk4LDdODynWO2Q4rtvaMZ5BBjIdXlUY9vANq0PE
-        mlsQbFiFJn8VHEZRIkWvo9klT4FqH+Q=
-X-Google-Smtp-Source: AFSGD/WwTiz27dSoaNR9koCohXVi5oCAm7eS+fYOlRycMfsQGQOy0mg5adjc5+VC9EWmGA8kuGh82w==
-X-Received: by 2002:a81:4ac6:: with SMTP id x189mr24629654ywa.249.1544024048772;
-        Wed, 05 Dec 2018 07:34:08 -0800 (PST)
+        bh=52WJ2Cz4Mo5QsIj5798m+wuQX4YBxhTQAraOz340Igc=;
+        b=FYHRf4I4KVPS6Yqh8QmliCeOkWAvXBsMK9ZW3k3CJjBPQNkikQwv9iUzR0bfgVKZv5
+         /RO8MM4ePogqCcn+mAdeH/8tuymA4HevB255kwqBIUS54v2m1aZP0BpsOi3CXBB99XCR
+         00pJmTS6OqmH/MHvj7n2F6UbPZ4VUYNMDB5uQSlqs+v4MCiI8ux0PAwDME/uLy3pFNAi
+         cdHyEdKDsIQmry0vFpXjdK3ea2ECneKk9eT3sp1YnSOGtTdQdqj6m9h+lnMlaF7P4lXq
+         vI7E7LcwsuiWNDpDASsUVhbEPwrsi5LHMg7OzY13+tF3pwOIyEMy0a9993d4+8qnKyY6
+         hMfA==
+X-Gm-Message-State: AA+aEWZRLutiKNeOToG4RfiJ5KFJRfV30VrOXAFi8wZCTyV+HuKffqJh
+        BhiwQbaUjov3YiOFoMxuq8dyrPIqYWo=
+X-Google-Smtp-Source: AFSGD/Wq4N+BywS9mz//gyIJksbXWPX8BIxZyeAa5x9BMfM2Dry43fNPr4IZe/yDyZYJ2J3XQVLtRg==
+X-Received: by 2002:a25:ef10:: with SMTP id g16-v6mr23220098ybd.164.1544024050618;
+        Wed, 05 Dec 2018 07:34:10 -0800 (PST)
 Received: from localhost ([107.15.81.208])
-        by smtp.gmail.com with ESMTPSA id e189sm6275589ywc.101.2018.12.05.07.34.07
+        by smtp.gmail.com with ESMTPSA id m3sm6103398ywe.90.2018.12.05.07.34.09
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 05 Dec 2018 07:34:07 -0800 (PST)
+        Wed, 05 Dec 2018 07:34:09 -0800 (PST)
 From:   Josef Bacik <josef@toxicpanda.com>
 To:     linux-block@vger.kernel.org, kernel-team@fb.com, osandov@fb.com
-Subject: [PATCH 1/2] blktests: add cgroup2 infrastructure
-Date:   Wed,  5 Dec 2018 10:34:03 -0500
-Message-Id: <20181205153404.26634-2-josef@toxicpanda.com>
+Subject: [PATCH 2/2] blktests: block/025: an io.latency test
+Date:   Wed,  5 Dec 2018 10:34:04 -0500
+Message-Id: <20181205153404.26634-3-josef@toxicpanda.com>
 X-Mailer: git-send-email 2.14.3
 In-Reply-To: <20181205153404.26634-1-josef@toxicpanda.com>
 References: <20181205153404.26634-1-josef@toxicpanda.com>
@@ -69,87 +69,167 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In order to test io.latency and other cgroup related things we need some
-supporting helpers to setup and tear down cgroup2.  This adds support
-for checking that we can even configure cgroup2 things, set them up if
-need be, and then add the cleanup stuff to the main cleanup function so
-everything is always in a clean state.
+This is a test to verify io.latency is working properly.  It does this
+by first running a fio job by itself to figure out how fast it runs.
+Then we calculate some thresholds, set up 2 cgroups, a fast and a slow
+cgroup, and then run the same job in both groups simultaneously.  We
+should see the slow group get throttled until the first cgroup is able
+to finish, and then the slow cgroup will be allowed to finish.
 
 Signed-off-by: Josef Bacik <josef@toxicpanda.com>
 ---
- check     |  2 ++
- common/rc | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 50 insertions(+)
+ tests/block/025     | 133 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tests/block/025.out |   1 +
+ 2 files changed, 134 insertions(+)
+ create mode 100644 tests/block/025
+ create mode 100644 tests/block/025.out
 
-diff --git a/check b/check
-index ebd87c097e25..1c9dbc518fa1 100755
---- a/check
-+++ b/check
-@@ -294,6 +294,8 @@ _cleanup() {
- 		done
- 		unset RESTORE_CPUS_ONLINE
- 	fi
+diff --git a/tests/block/025 b/tests/block/025
+new file mode 100644
+index 000000000000..cdaa35c5e335
+--- /dev/null
++++ b/tests/block/025
+@@ -0,0 +1,133 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++#
++# Test io.latency to make sure it's protecting the higher priority group
++# properly.
 +
-+	_cleanup_cgroup2
- }
- 
- _call_test() {
-diff --git a/common/rc b/common/rc
-index 8a892bcd5fde..a785f2329687 100644
---- a/common/rc
-+++ b/common/rc
-@@ -202,3 +202,51 @@ _test_dev_in_hotplug_slot() {
- _filter_xfs_io_error() {
- 	sed -e 's/^\(.*\)64\(: .*$\)/\1\2/'
- }
++. tests/block/rc
 +
-+_cgroup2_base_dir()
-+{
-+	grep cgroup2 /proc/mounts | awk '{ print $2 }'
++DESCRIPTION="test the io.latency interface to make sure it's working right"
++
++requires() {
++	_have_cgroup2_controller_file io io.latency && _have_fio && \
++		_have_program jq
 +}
 +
-+_cleanup_cgroup2()
-+{
++_fio_results_key() {
++	_job=$1
++	_key=$2
++	_resultfile=$3
++
++	jq '.jobs[] | select(.jobname == "'${_job}'") | .'${_key} ${_resultfile}
++}
++
++test_device() {
++	local fio_config_single fio_config_double fio_results fio_args qd
++
++	fio_config_single=${TMPDIR}/single.fio
++	fio_config_double=${TMPDIR}/double.fio
++	fio_results=${TMPDIR}/025.json
++	fio_args="--output-format=json --output=${fio_results}"
++	qd=$(cat ${TEST_DEV_SYSFS}/queue/nr_requests)
++
++	cat << EOF > "${fio_config_single}"
++	[fast]
++	filename=${TEST_DEV}
++	direct=1
++	allrandrepeat=1
++	readwrite=randrw
++	size=4G
++	ioengine=libaio
++	iodepth=${qd}
++	fallocate=none
++	randseed=12345
++EOF
++
++	cat << EOF > "${fio_config_double}"
++	[global]
++	filename=${TEST_DEV}
++	direct=1
++	allrandrepeat=1
++	readwrite=randrw
++	size=4G
++	ioengine=libaio
++	iodepth=${qd}
++	fallocate=none
++	randseed=12345
++
++	[fast]
++	cgroup=blktests/fast
++
++	[slow]
++	cgroup=blktests/slow
++EOF
++	# We run the test once so we have an idea of how fast this workload will
++	# go with nobody else doing IO on the device.
++	if ! fio ${fio_args} ${fio_config_single}; then
++		echo "fio exited with status $?"
++		return 1
++	fi
++
++	_time_taken=$(_fio_results_key fast job_runtime ${fio_results})
++	if [ "${_time_taken}" = "" ]; then
++		echo "fio doesn't report job_runtime"
++		return 1
++	fi
++
++	echo "normal time taken ${_time_taken}" >> $FULL
++
++	# There's no way to predict how the two workloads are going to affect
++	# each other, so we weant to set thresholds to something reasonable so
++	# we can verify io.latency is doing something.  This means we set 15%
++	# for the fast cgroup, just to give us enough wiggle room as throttling
++	# doesn't happen immediately.  But if we have a super fast disk we could
++	# run both groups really fast and make it under our fast threshold, so
++	# we need to set a threshold for the slow group at 50%.  We assume that
++	# if it was faster than 50% of the fast threshold then we probably
++	# didn't throttle and we can assume io.latency is broken.
++	_fast_thresh=$((${_time_taken} + ${_time_taken} * 15 / 100))
++	_slow_thresh=$((${_time_taken} + ${_time_taken} * 50 / 100))
++	echo "fast threshold time is ${_fast_thresh}" >> $FULL
++	echo "slow threshold time is ${_slow_thresh}" >> $FULL
++
++	# Create the cgroup files
 +	_dir=$(_cgroup2_base_dir)/blktests
-+	[ -d "${_dir}" ] || return
++	echo "+io" > ${_dir}/cgroup.subtree_control
++	mkdir ${_dir}/fast
++	mkdir ${_dir}/slow
 +
-+	for i in $(find ${_dir} -type d | tac)
-+	do
-+		rmdir $i
-+	done
-+}
-+
-+_have_cgroup2()
-+{
-+	if ! grep -q 'cgroup2' /proc/mounts; then
-+		SKIP_REASON="This test requires cgroup2"
++	# We set the target to 1usec because we could have a fast device that is
++	# capable of remarkable IO latencies that would skew the test.  It needs
++	# to be low enough that we do actually throttle the slow group,
++	# otherwise the test will fail when there's nothing wrong.
++	_major=$((0x$(stat -c "%t" ${TEST_DEV})))
++	_minor=$((0x$(stat -c "%T" ${TEST_DEV})))
++	echo "${_major}:${_minor} is our device" >> $FULL
++	if ! echo "${_major}:${_minor} target=1" > ${_dir}/fast/io.latency; then
++		echo "Failed to set our latency target"
 +		return 1
 +	fi
++
++	if ! fio ${fio_args} ${fio_config_double}; then
++		echo "fio exited with status $?"
++		return 1
++	fi
++
++	_fast_time=$(_fio_results_key fast job_runtime ${fio_results})
++	echo "Fast time ${_fast_time}" >> $FULL
++	_slow_time=$(_fio_results_key slow job_runtime ${fio_results})
++	echo "Slow time ${_slow_time}" >> $FULL
++
++	if [ ${_fast_thresh} -lt ${_fast_time} ]; then
++		echo "Too much of a performance drop for the protected workload"
++		return 1
++	fi
++
++	if [ ${_slow_thresh} -gt ${_slow_time} ]; then
++		echo "The slow group does not appear to have been throttled"
++		return 1
++	fi
++
++	echo "Silence is golden"
 +	return 0
 +}
-+
-+_have_cgroup2_controller_file()
-+{
-+	_have_cgroup2 || return 1
-+
-+	_controller=$1
-+	_file=$2
-+	_dir=$(_cgroup2_base_dir)
-+
-+	if ! grep -q ${_controller} ${_dir}/cgroup.controllers; then
-+		SKIP_REASON="No support for ${_controller} cgroup controller"
-+		return 1
-+	fi
-+
-+	mkdir ${_dir}/blktests
-+	echo "+${_controller}" > ${_dir}/cgroup.subtree_control
-+	if [ ! -f ${_dir}/blktests/${_file} ]; then
-+		_cleanup_cgroup2
-+		SKIP_REASON="Cgroup file ${_file} doesn't exist"
-+		return 1
-+	fi
-+	return 0
-+}
+diff --git a/tests/block/025.out b/tests/block/025.out
+new file mode 100644
+index 000000000000..c19ff631b9b5
+--- /dev/null
++++ b/tests/block/025.out
+@@ -0,0 +1 @@
++Silence is golden
 -- 
 2.14.3
 
