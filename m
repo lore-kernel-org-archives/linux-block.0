@@ -2,151 +2,108 @@ Return-Path: <SRS0=VELz=OO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B2FFC04EB8
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 02:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2674C04EBF
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 02:22:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DD02D20878
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 02:16:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B50092082B
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 02:22:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="m7CXyl55"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD02D20878
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ndab/PzJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B50092082B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725841AbeLECQQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Dec 2018 21:16:16 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:33852 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725834AbeLECQQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 21:16:16 -0500
-Received: by mail-pg1-f194.google.com with SMTP id 17so8279396pgg.1
-        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 18:16:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=8ti/UP3dyW5Kt2gbMtMb/78hmoQbtRC2H1BUagoAPtg=;
-        b=m7CXyl55/B0hI/bFRBnOxOQsEO5fH9lilIduIXZAkoXAAnEfoVO4i0vbAYAbzN7tfc
-         pao8WvCuNBJFMwOc85aE1w1KG8jzo4wDX8dTDYizE+jAKr6Y7e6DrxIyjrRf1DwAyj7h
-         m1x32qD31IxwNRW1tHumL0A++/X2lJUaOsRZo1tMFK+4it40A5XKxI+bXlKmLzfZgvGw
-         fnqLxerswCvXnQO0Y1IWSfsMYbBa6uDEji+zGAeQsIJ7Tk+4J7QB621+Uet5Ql+ttPXJ
-         91ZORGOeFK5q1wOvUPTo5PNudPZSGBWDjabGT4Hi+g+OuG8FDCaEoVzBJf8wPeJIxsHk
-         j8fQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8ti/UP3dyW5Kt2gbMtMb/78hmoQbtRC2H1BUagoAPtg=;
-        b=CAJysDcXUwobFPuvBpAVSOGQvLzmjI9UYkggzLatcKTlHayGM9lMCALyR2gtRt02Jq
-         3EUoR0UmyFtoB3IgKowlKAl8EhFPWt8DcxrodSzm0Hxhw055WFqmaSYHpif/AUjMNGE/
-         XhFdXe47QD6JbZEAcfIQqb58vGy8bgJqns3ggRiuq76SMRi8Pg7qLmzLX9jhDDeREGSE
-         OzLXk7p8MBdFGOk8EEGhZGcgGNjniens92U+KAxi7Avhy0sQloV8o2Zw6dYLyPw+djkr
-         lqIr9zXwy+v4+GQp/WfHgH3ZEb9NtFe6ijCEzVkbgTWwe+FTmAXn8S05wQ4RyH8RBk/u
-         EQnA==
-X-Gm-Message-State: AA+aEWaAsycDjOmEVNN82Gw6sioWHm7E7JnTeV4Dveo3sKuZcVxe9Dqx
-        tQPm5+oYqZXBhEd3uFity/9AK/XK1u4=
-X-Google-Smtp-Source: AFSGD/V4zVlBw/awSkUISZP/NUq5CpDT5xahJcclYeMSqP/O34FvrViohNmdPAcuqnJNsjzhrfM5hw==
-X-Received: by 2002:a63:ec13:: with SMTP id j19mr18635708pgh.6.1543976174372;
-        Tue, 04 Dec 2018 18:16:14 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id y71sm30321767pfi.123.2018.12.04.18.16.12
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Dec 2018 18:16:13 -0800 (PST)
-Subject: Re: [PATCH] blk-mq: fix corruption with direct issue
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <1d359819-5410-7af2-d02b-f0ecca39d2c9@kernel.dk>
- <20181205013736.GD17845@ming.t460p>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <37bf8821-c205-717a-df0d-96ecfb0f75aa@kernel.dk>
-Date:   Tue, 4 Dec 2018 19:16:11 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726537AbeLECWv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 21:22:51 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:40000 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725834AbeLECWu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 21:22:50 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wB52J16K138504;
+        Wed, 5 Dec 2018 02:22:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=wlMM0S8WIstEElTRJorHK3KNzOCsapAWWW51RB70w4I=;
+ b=ndab/PzJ2tOEdK07SQY7hpAHZyNkzMynoCOaUO7nvsoPMHR9oQU3iLa6s9lzkFhRXMjZ
+ 3+Thas4wQwh/M1ribk+mgwLWIPbCyTIvJs6z3ttIm7HwEDP3NtY9AoGsA5wVWRxE/IA3
+ 2536XDZ2QV8eOOnD5RrI4ZVJy2SSG7DkMC42XyvW/BJ4gnM9xVE3l1qauLjyeavV+ntc
+ 1faGEIZFvL6Kh3JBPIdzTdYZCkFsfdl/YGYyzh7/Tch4nvifXGnBHRXpIn+mAI0cL2iq
+ SRE77DN9GrKjCAlV0wwocH47aF8tstZyPMg167HO567Kk0hTOCR+CZzAMUUTTEH/E7Rh Kg== 
+Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
+        by userp2130.oracle.com with ESMTP id 2p3hqtyv8a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 05 Dec 2018 02:22:39 +0000
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id wB52MduS029887
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 5 Dec 2018 02:22:39 GMT
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id wB52McI9021350;
+        Wed, 5 Dec 2018 02:22:38 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 04 Dec 2018 18:22:38 -0800
+To:     John Garry <john.garry@huawei.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        "chenxiang \(M\)" <chenxiang66@hisilicon.com>,
+        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
+        "linux-scsi\@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Linuxarm <linuxarm@huawei.com>,
+        Steffen Maier <maier@linux.ibm.com>
+Subject: Re: DIF/DIX issue related to config CONFIG_SCSI_MQ_DEFAULT
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <5d9bf51d-1ef9-b948-2168-9e7526d77225@hisilicon.com>
+        <20181127130811.GA2780@ming.t460p>
+        <6c573f36-60d8-0631-e9ac-dacd72f6c8ad@hisilicon.com>
+        <20181130011935.GA7573@ming.t460p>
+        <e0e07583-98ca-4fc5-e60d-055e5474c084@huawei.com>
+        <yq1k1kqt07m.fsf@oracle.com>
+        <45193ec6-6398-3953-4833-88ca2057971a@huawei.com>
+Date:   Tue, 04 Dec 2018 21:22:35 -0500
+In-Reply-To: <45193ec6-6398-3953-4833-88ca2057971a@huawei.com> (John Garry's
+        message of "Tue, 4 Dec 2018 12:33:37 +0000")
+Message-ID: <yq1ftvcsoes.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20181205013736.GD17845@ming.t460p>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9097 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=821
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1812050020
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/4/18 6:37 PM, Ming Lei wrote:
-> On Tue, Dec 04, 2018 at 03:47:46PM -0700, Jens Axboe wrote:
->> If we attempt a direct issue to a SCSI device, and it returns BUSY, then
->> we queue the request up normally. However, the SCSI layer may have
->> already setup SG tables etc for this particular command. If we later
->> merge with this request, then the old tables are no longer valid. Once
->> we issue the IO, we only read/write the original part of the request,
->> not the new state of it.
->>
->> This causes data corruption, and is most often noticed with the file
->> system complaining about the just read data being invalid:
->>
->> [  235.934465] EXT4-fs error (device sda1): ext4_iget:4831: inode #7142: comm dpkg-query: bad extra_isize 24937 (inode size 256)
->>
->> because most of it is garbage...
->>
->> This doesn't happen from the normal issue path, as we will simply defer
->> the request to the hardware queue dispatch list if we fail. Once it's on
->> the dispatch list, we never merge with it.
->>
->> Fix this from the direct issue path by flagging the request as
->> REQ_NOMERGE so we don't change the size of it before issue.
->>
->> See also:
->>   https://bugzilla.kernel.org/show_bug.cgi?id=201685
->>
->> Fixes: 6ce3dd6eec1 ("blk-mq: issue directly if hw queue isn't busy in case of 'none'")
->> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->>
->> ---
->>
->> diff --git a/block/blk-mq.c b/block/blk-mq.c
->> index 3f91c6e5b17a..d8f518c6ea38 100644
->> --- a/block/blk-mq.c
->> +++ b/block/blk-mq.c
->> @@ -1715,6 +1715,15 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
->>  		break;
->>  	case BLK_STS_RESOURCE:
->>  	case BLK_STS_DEV_RESOURCE:
->> +		/*
->> +		 * If direct dispatch fails, we cannot allow any merging on
->> +		 * this IO. Drivers (like SCSI) may have set up permanent state
->> +		 * for this request, like SG tables and mappings, and if we
->> +		 * merge to it later on then we'll still only do IO to the
->> +		 * original part.
->> +		 */
->> +		rq->cmd_flags |= REQ_NOMERGE;
->> +
->>  		blk_mq_update_dispatch_busy(hctx, true);
->>  		__blk_mq_requeue_request(rq);
->>  		break;
->>
-> 
-> Not sure it is enough to just mark it as NOMERGE, for example, driver
-> may have setup the .special_vec for discard, and NOMERGE may not prevent
-> request from entering elevator queue completely. Cause 'rq.rb_node' and
-> 'rq.special_vec' share same space.
 
-We should rather limit the scope of the direct dispatch instead. It
-doesn't make sense to do for anything but read/write anyway.
+John,
 
-> So how about inserting this request via blk_mq_request_bypass_insert()
-> in case that direct issue returns BUSY? Then it is invariant that
-> any request queued via .queue_rq() won't enter scheduler queue.
+> OK, great. Happy to help. So far we have hisi_sas fio issue to go on
+> plus knowledge that this issue seems to be exposed/triggered by
+> enabling SCSI MQ.
 
-I did consider this, but I didn't want to experiment with exercising
-a new path for an important bug fix. You do realize that your original
-patch has been corrupting data for months? I think a little caution
-is in order here.
+I'll have to go revisit the archives for your exact fio bits.
+
+But I successfully ran our DIX/T10 PI qualification tooling without any
+errors on the latest SCSI tree. On both scsi_debug and FC hardware.
+
+> My colleague chenxiang also tried DIF on 3008 with our same platform,
+> and we are seeing an issue there also; here's a snippet:
+
+Reproduced this. Turns out to be a recently introduced bug that
+exclusively affects DIF-only setups (so primarily mpt3sas due to lack of
+DIX support). It's a regression caused by a commit that went in through
+block a few months ago. I'll send a patch...
 
 -- 
-Jens Axboe
-
+Martin K. Petersen	Oracle Linux Engineering
