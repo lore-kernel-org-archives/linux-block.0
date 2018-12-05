@@ -6,218 +6,134 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1957AC04EB8
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 01:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51775C04EB8
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 01:37:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CE4FD20878
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 01:11:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE4FD20878
+	by mail.kernel.org (Postfix) with ESMTP id 1FBF42082B
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 01:37:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FBF42082B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726092AbeLEBLM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Dec 2018 20:11:12 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34144 "EHLO mx1.redhat.com"
+        id S1725841AbeLEBhq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 20:37:46 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52582 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726048AbeLEBLM (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 4 Dec 2018 20:11:12 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        id S1725834AbeLEBhq (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 4 Dec 2018 20:37:46 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 58C7F8831E;
-        Wed,  5 Dec 2018 01:11:11 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id F19CD31256AC;
+        Wed,  5 Dec 2018 01:37:45 +0000 (UTC)
 Received: from ming.t460p (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8FB935D78C;
-        Wed,  5 Dec 2018 01:11:04 +0000 (UTC)
-Date:   Wed, 5 Dec 2018 09:10:59 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 310172A308;
+        Wed,  5 Dec 2018 01:37:41 +0000 (UTC)
+Date:   Wed, 5 Dec 2018 09:37:37 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Evan Green <evgreen@chromium.org>
-Cc:     axboe@kernel.dk, Gwendal Grignou <gwendal@chromium.org>,
-        asavery@chromium.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] loop: Better discard support for block devices
-Message-ID: <20181205011059.GA17845@ming.t460p>
-References: <20181030230624.61834-1-evgreen@chromium.org>
- <20181030230624.61834-3-evgreen@chromium.org>
- <20181128012624.GB11128@ming.t460p>
- <CAE=gft7Fyq+Jb3ZG3PSTR=C0Wjt3uu57+H2bshM6Gu=_0W0YQw@mail.gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] blk-mq: fix corruption with direct issue
+Message-ID: <20181205013736.GD17845@ming.t460p>
+References: <1d359819-5410-7af2-d02b-f0ecca39d2c9@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAE=gft7Fyq+Jb3ZG3PSTR=C0Wjt3uu57+H2bshM6Gu=_0W0YQw@mail.gmail.com>
+In-Reply-To: <1d359819-5410-7af2-d02b-f0ecca39d2c9@kernel.dk>
 User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Wed, 05 Dec 2018 01:11:11 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Wed, 05 Dec 2018 01:37:46 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 04, 2018 at 02:19:46PM -0800, Evan Green wrote:
-> Hi Ming,
+On Tue, Dec 04, 2018 at 03:47:46PM -0700, Jens Axboe wrote:
+> If we attempt a direct issue to a SCSI device, and it returns BUSY, then
+> we queue the request up normally. However, the SCSI layer may have
+> already setup SG tables etc for this particular command. If we later
+> merge with this request, then the old tables are no longer valid. Once
+> we issue the IO, we only read/write the original part of the request,
+> not the new state of it.
 > 
-> On Tue, Nov 27, 2018 at 5:26 PM Ming Lei <ming.lei@redhat.com> wrote:
-> >
-> > On Tue, Oct 30, 2018 at 04:06:24PM -0700, Evan Green wrote:
-> > > If the backing device for a loop device is a block device,
-> > > then mirror the discard properties of the underlying block
-> > > device into the loop device. While in there, differentiate
-> > > between REQ_OP_DISCARD and REQ_OP_WRITE_ZEROES, which are
-> > > different for block devices, but which the loop device had
-> > > just been lumping together.
-> > >
-> > > Signed-off-by: Evan Green <evgreen@chromium.org>
-> > > ---
-> > >
-> > >  drivers/block/loop.c | 61 +++++++++++++++++++++++++++++++++++-----------------
-> > >  1 file changed, 41 insertions(+), 20 deletions(-)
-> > >
-> > > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> > > index 28990fc94841a..176e65101c4ef 100644
-> > > --- a/drivers/block/loop.c
-> > > +++ b/drivers/block/loop.c
-> > > @@ -417,19 +417,14 @@ static int lo_read_transfer(struct loop_device *lo, struct request *rq,
-> > >       return ret;
-> > >  }
-> > >
-> > > -static int lo_discard(struct loop_device *lo, struct request *rq, loff_t pos)
-> > > +static int lo_discard(struct loop_device *lo, struct request *rq,
-> > > +             int mode, loff_t pos)
-> > >  {
-> > > -     /*
-> > > -      * We use punch hole to reclaim the free space used by the
-> > > -      * image a.k.a. discard. However we do not support discard if
-> > > -      * encryption is enabled, because it may give an attacker
-> > > -      * useful information.
-> > > -      */
-> > >       struct file *file = lo->lo_backing_file;
-> > > -     int mode = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE;
-> > > +     struct request_queue *q = lo->lo_queue;
-> > >       int ret;
-> > >
-> > > -     if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
-> > > +     if (!blk_queue_discard(q)) {
-> > >               ret = -EOPNOTSUPP;
-> > >               goto out;
-> > >       }
-> > > @@ -603,8 +598,13 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
-> > >       case REQ_OP_FLUSH:
-> > >               return lo_req_flush(lo, rq);
-> > >       case REQ_OP_DISCARD:
-> > > +             return lo_discard(lo, rq,
-> > > +                     FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, pos);
-> > > +
-> > >       case REQ_OP_WRITE_ZEROES:
-> > > -             return lo_discard(lo, rq, pos);
-> > > +             return lo_discard(lo, rq,
-> > > +                     FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE, pos);
-> > > +
-> > >       case REQ_OP_WRITE:
-> > >               if (lo->transfer)
-> > >                       return lo_write_transfer(lo, rq, pos);
-> > > @@ -859,6 +859,25 @@ static void loop_config_discard(struct loop_device *lo)
-> > >       struct file *file = lo->lo_backing_file;
-> > >       struct inode *inode = file->f_mapping->host;
-> > >       struct request_queue *q = lo->lo_queue;
-> > > +     struct request_queue *backingq;
-> > > +
-> > > +     /*
-> > > +      * If the backing device is a block device, mirror its discard
-> > > +      * capabilities.
-> > > +      */
-> > > +     if (S_ISBLK(inode->i_mode)) {
-> > > +             backingq = bdev_get_queue(inode->i_bdev);
-> > > +             blk_queue_max_discard_sectors(q,
-> > > +                     backingq->limits.max_discard_sectors);
-> > > +
-> > > +             blk_queue_max_write_zeroes_sectors(q,
-> > > +                     backingq->limits.max_write_zeroes_sectors);
-> > > +
-> > > +             q->limits.discard_granularity =
-> > > +                     backingq->limits.discard_granularity;
-> > > +
-> > > +             q->limits.discard_alignment =
-> > > +                     backingq->limits.discard_alignment;
-> >
-> > I think it isn't necessary to mirror backing queue's discard/write_zeros
-> > capabilities, given either fs of the underlying queue can deal with well.
-> >
-> > >
-> > >       /*
-> > >        * We use punch hole to reclaim the free space used by the
-> > > @@ -866,22 +885,24 @@ static void loop_config_discard(struct loop_device *lo)
-> > >        * encryption is enabled, because it may give an attacker
-> > >        * useful information.
-> > >        */
-> > > -     if ((!file->f_op->fallocate) ||
-> > > -         lo->lo_encrypt_key_size) {
-> > > +     } else if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
-> > >               q->limits.discard_granularity = 0;
-> > >               q->limits.discard_alignment = 0;
-> > >               blk_queue_max_discard_sectors(q, 0);
-> > >               blk_queue_max_write_zeroes_sectors(q, 0);
-> > > -             blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
-> > > -             return;
-> > > -     }
-> > >
-> > > -     q->limits.discard_granularity = inode->i_sb->s_blocksize;
-> > > -     q->limits.discard_alignment = 0;
-> > > +     } else {
-> > > +             q->limits.discard_granularity = inode->i_sb->s_blocksize;
-> > > +             q->limits.discard_alignment = 0;
-> > > +
-> > > +             blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
-> > > +             blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
-> > > +     }
-> > >
-> > > -     blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
-> > > -     blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
-> > > -     blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
-> > > +     if (q->limits.max_discard_sectors || q->limits.max_write_zeroes_sectors)
-> > > +             blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
-> > > +     else
-> > > +             blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
-> > >  }
-> >
-> > Looks it should work just by mirroring backing queue's discard
-> > capability to loop queue in case that the loop is backed by
-> > block device, doesn't it? Meantime the unified discard limits &
-> > write_zeros limits can be kept.
+> This causes data corruption, and is most often noticed with the file
+> system complaining about the just read data being invalid:
 > 
-> I tested this out, and you're right that I could just flip the
-> QUEUE_FLAG_DISCARD based on whether its a block device, and leave
-
-What I meant actually is to do the following discard config:
-
-	bool discard;
-	if (S_ISBLK(inode->i_mode)) {
-		struct request_queue *backingq = bdev_get_queue(inode->i_bdev);
-		discard = blk_queue_discard(backingq);
-	} else if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size)
-		discard = false;
-	else
-		discard = true;
-
-	if (discard) {
-		blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
-		blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
-		blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
-	} else {
-		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
-	}
-
-> everything else alone, to completely disable discard support for loop
-> devices backed by block devices. This seems to work for programs like
-> mkfs.ext4, but still leaves problems for coreutils cp.
+> [  235.934465] EXT4-fs error (device sda1): ext4_iget:4831: inode #7142: comm dpkg-query: bad extra_isize 24937 (inode size 256)
 > 
-> But is that really the right call? With this change, we're not only
-> able to use loop devices in this way, but we're able to use the
-> discard and zero functionality of the underlying block device by
-> simply passing it through. To me that seemed better than disabling all
-> discard support for block devices, which would severely slow us down
-> on some devices.
+> because most of it is garbage...
+> 
+> This doesn't happen from the normal issue path, as we will simply defer
+> the request to the hardware queue dispatch list if we fail. Once it's on
+> the dispatch list, we never merge with it.
+> 
+> Fix this from the direct issue path by flagging the request as
+> REQ_NOMERGE so we don't change the size of it before issue.
+> 
+> See also:
+>   https://bugzilla.kernel.org/show_bug.cgi?id=201685
+> 
+> Fixes: 6ce3dd6eec1 ("blk-mq: issue directly if hw queue isn't busy in case of 'none'")
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+> ---
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 3f91c6e5b17a..d8f518c6ea38 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1715,6 +1715,15 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  		break;
+>  	case BLK_STS_RESOURCE:
+>  	case BLK_STS_DEV_RESOURCE:
+> +		/*
+> +		 * If direct dispatch fails, we cannot allow any merging on
+> +		 * this IO. Drivers (like SCSI) may have set up permanent state
+> +		 * for this request, like SG tables and mappings, and if we
+> +		 * merge to it later on then we'll still only do IO to the
+> +		 * original part.
+> +		 */
+> +		rq->cmd_flags |= REQ_NOMERGE;
+> +
+>  		blk_mq_update_dispatch_busy(hctx, true);
+>  		__blk_mq_requeue_request(rq);
+>  		break;
+> 
 
-I guess the above approach can do the same job with yours, but simpler.
+Not sure it is enough to just mark it as NOMERGE, for example, driver
+may have setup the .special_vec for discard, and NOMERGE may not prevent
+request from entering elevator queue completely. Cause 'rq.rb_node' and
+'rq.special_vec' share same space.
 
-thanks,
+So how about inserting this request via blk_mq_request_bypass_insert()
+in case that direct issue returns BUSY? Then it is invariant that
+any request queued via .queue_rq() won't enter scheduler queue.
+
+--
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3f91c6e5b17a..4b2db0b2909e 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1764,7 +1764,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 	if (bypass_insert)
+ 		return BLK_STS_RESOURCE;
+ 
+-	blk_mq_sched_insert_request(rq, false, run_queue, false);
++	blk_mq_request_bypass_insert(rq, run_queue);
+ 	return BLK_STS_OK;
+ }
+ 
+@@ -1780,7 +1780,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 
+ 	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false);
+ 	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
+-		blk_mq_sched_insert_request(rq, false, true, false);
++		blk_mq_request_bypass_insert(rq, true);
+ 	else if (ret != BLK_STS_OK)
+ 		blk_mq_end_request(rq, ret);
+ 
+
+
+Thanks,
 Ming
