@@ -2,187 +2,107 @@ Return-Path: <SRS0=VELz=OO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D47CC04EB9
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 20:24:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18AEDC04EB9
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 20:25:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 138E720989
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 20:24:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D03E020989
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 20:25:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oZMLDyEi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 138E720989
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="trKiRHFU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D03E020989
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728411AbeLEUYt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Dec 2018 15:24:49 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:38375 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727388AbeLEUYt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Dec 2018 15:24:49 -0500
-Received: by mail-qk1-f196.google.com with SMTP id d19so12696542qkg.5
-        for <linux-block@vger.kernel.org>; Wed, 05 Dec 2018 12:24:48 -0800 (PST)
+        id S1727388AbeLEUZv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Dec 2018 15:25:51 -0500
+Received: from mail-it1-f193.google.com ([209.85.166.193]:50586 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727257AbeLEUZv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Dec 2018 15:25:51 -0500
+Received: by mail-it1-f193.google.com with SMTP id z7so23525645iti.0
+        for <linux-block@vger.kernel.org>; Wed, 05 Dec 2018 12:25:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=/MmpQWfVqjIcIBzc1IhAmuNIPGv+IYi6voBAs2gkkkI=;
-        b=oZMLDyEixH85J4sIUD1wmhel7oo/NXb5Ir16aUhweca/LwChRGYdLzEGPapBcHRtn5
-         /XOWqU+SY/qvRPa3BjhjnF3+XwPMW0thuYiuEe+u+KQy/57e/cna61l6HMs0Xx5ZB2pX
-         Ju9B/ScvVwZq3ekMo6ASTFwrysQrAS93pp5LTET60sLJqTf3Pl/qzlxDlbYGGnoQPs76
-         W0iiGiSAfRcZtO3bRdBGCbfmXQFqIh7CCJU3RAVuHbI44XZ9FxIFZRZK0Mr332VVJbHy
-         kItlSOk0SY7syd1hBjoXJzXMvfHnxGy6ikulGUvHrlkvSPzlF0sHlVJVYID6jTGi2mNN
-         Rh5Q==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=3xGilgYtM9FXfWKPwTR6omtunFRVZV25qn1pfInbAX0=;
+        b=trKiRHFU4u6QhHNDMYkmO8Y60cGsJd3b8jQmpKKirRIp4I2rntOewyXJirRAF7Rvxf
+         M6Qot2pZFd2T67h2AGV5ILWohWK37jgqBorFmngeLgaSfDsQivHvGocUq7BHtt+dD9Q7
+         c8l9z+6f856kG+c8Lk3gSHLEHE9Xrgjw4eCDJ6xV7eA6n3QURF6+YBgbQs5J7ijwycrg
+         Ztif/W67XgGB+E8VuszMCybGozGNwQmxSLdE336dA73nrtUvTV+L77masCY1OkQP0E1q
+         at1ODbATjzv+gHO9r3e65JcAgBXfDjAii8SJWJnoNmmZf6ZF8TWWn4mIcauZskj6ysVp
+         Fs5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :in-reply-to:references;
-        bh=/MmpQWfVqjIcIBzc1IhAmuNIPGv+IYi6voBAs2gkkkI=;
-        b=BhYMOkwV0F9fXtYPnuqke29QxZj8zL6ltKW2wakq09dxCimpsj0/TdhWThJhSOUmUT
-         ZlYosCjYgupvnkCvyk/S4JgMwFw6KhmwST+vH1PpFlDIhxdxSQ9lgzhf4frRR9NFHXVv
-         bskIm4MrOGiMLSXkXQ6mibPJ/7s5KmjnAFzZ/c4XBC409SRz1aLF+Ehgq9Ey3xwoPqWM
-         I86nSrAfgBs5EFxRarui8Ke/+6sg6ExlXYLmJEINFJS0OztUtLE0Igia02WzE/G+SetN
-         mai5lJcdjwB3EhzDVpt19V0saVvIoUUmjy/XTQngY7FrP2nQOybNPdWfptFU1FRC9Syh
-         xCDw==
-X-Gm-Message-State: AA+aEWaRRQadKLXQVx1pwfblc9qc3Qe8AJ94KxJTC/2cfTSxfXyUgSyw
-        XZIM6+UsB2nB/KcXMhwkUck=
-X-Google-Smtp-Source: AFSGD/XDRY6zz++uNJeWsIYIZGuAPXV86dEHzvxrI+U7lqyKaGr0GePKcLIMFRNxdhluTlRyUTbhfA==
-X-Received: by 2002:a37:9cd4:: with SMTP id f203mr24203387qke.155.1544041488238;
-        Wed, 05 Dec 2018 12:24:48 -0800 (PST)
-Received: from localhost (pool-68-160-144-192.bstnma.fios.verizon.net. [68.160.144.192])
-        by smtp.gmail.com with ESMTPSA id n68sm7914741qte.66.2018.12.05.12.24.47
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=3xGilgYtM9FXfWKPwTR6omtunFRVZV25qn1pfInbAX0=;
+        b=HYgH/+CxHeVVqiuWBF6Dy07CtTrX8CMTTSIdrYAOEXLcF20yDkGzvllCTp5B1FuRJ4
+         8EdS/uLRTzexwJBU+lu92UIeOhsxcpz60Iy65FR3VRLImMZjyQq66RQFafL0y+0xLSoJ
+         +GMAak4FWeULQ0KpDboTd31TtOGckWNpF/OQnB7hy/fIARE8R/Xg+YwjTVRXox2R7ZVq
+         b1SHy5u+Q6rl+k1SbRjr2XIUvyjCHIx3mytCf9lxgJlR3LklNIyJXBIeqLEmDxT3HC7i
+         tGfeFWXWY+Hx9MTZgWaX/m7iyaWlJxyyCWKVkkrSB8PSkBHY3ce6lIbtIad5jtP8D4ts
+         jbwg==
+X-Gm-Message-State: AA+aEWYC8p7E6oKLWJj62kz/yQJoRVNMmeekEGuzfZ8mw/AHwgQdt/hV
+        PvCvzBt3egSbo3DL4Zl1mtsAY5kvdno=
+X-Google-Smtp-Source: AFSGD/U167xcddo3YJZ45z4B9J+fBgISz87R9ieUTgQ+9370IWr2fCWYR2icTt4KGzL9H82Yiws1hA==
+X-Received: by 2002:a05:660c:b12:: with SMTP id f18mr9145207itk.118.1544041549913;
+        Wed, 05 Dec 2018 12:25:49 -0800 (PST)
+Received: from [192.168.1.56] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id w26sm8319960iol.60.2018.12.05.12.25.48
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 05 Dec 2018 12:24:47 -0800 (PST)
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Mikulas Patocka <mpatocka@redhat.com>
-Subject: [PATCH v3 7/7] dm: remove the pending IO accounting
-Date:   Wed,  5 Dec 2018 15:24:33 -0500
-Message-Id: <20181205202433.95823-8-snitzer@redhat.com>
-X-Mailer: git-send-email 2.15.0
-In-Reply-To: <20181205202433.95823-1-snitzer@redhat.com>
-References: <20181205202433.95823-1-snitzer@redhat.com>
+        Wed, 05 Dec 2018 12:25:49 -0800 (PST)
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 4.20-rc6
+Message-ID: <4c60c846-1423-83e2-1795-b94c7f569920@kernel.dk>
+Date:   Wed, 5 Dec 2018 13:25:47 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Mikulas Patocka <mpatocka@redhat.com>
+Hi Linus,
 
-Remove the "pending" atomic counters, that duplicate block-core's
-in_flight counters, and update md_in_flight() to look at percpu
-in_flight counters.
+A bit earlier in the week as usual, but there's a fix here that should
+go in sooner rather than later. Under a combination of circumstance, the
+direct issue path in blk-mq could corrupt data. This wasn't easy to hit,
+but the ones that are affected by it, seem to hit it pretty easily. Full
+explanation in the patch. None of the regular filesystem and storage
+testing has triggered it, even though it's been around since 4.19-rc1.
 
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
-Signed-off-by: Mike Snitzer <snitzer@redhat.com>
----
- drivers/md/dm-core.h |  2 --
- drivers/md/dm.c      | 34 +++++++++++++++-------------------
- 2 files changed, 15 insertions(+), 21 deletions(-)
+Outside of that, whitelist trim tweak for certain Samsung devices for
+libata.
 
-diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
-index 224d44503a06..6fe883fac471 100644
---- a/drivers/md/dm-core.h
-+++ b/drivers/md/dm-core.h
-@@ -65,7 +65,6 @@ struct mapped_device {
- 	 */
- 	struct work_struct work;
- 	wait_queue_head_t wait;
--	atomic_t pending[2];
- 	spinlock_t deferred_lock;
- 	struct bio_list deferred;
- 
-@@ -119,7 +118,6 @@ struct mapped_device {
- 	struct srcu_struct io_barrier;
- };
- 
--int md_in_flight(struct mapped_device *md);
- void disable_write_same(struct mapped_device *md);
- void disable_write_zeroes(struct mapped_device *md);
- 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index a8ae7931bce7..ff6e5a5902f2 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -646,25 +646,30 @@ static void free_tio(struct dm_target_io *tio)
- 	bio_put(&tio->clone);
- }
- 
--int md_in_flight(struct mapped_device *md)
-+static bool md_in_flight(struct mapped_device *md)
- {
--	return atomic_read(&md->pending[READ]) +
--	       atomic_read(&md->pending[WRITE]);
-+	int cpu;
-+	struct hd_struct *part = &dm_disk(md)->part0;
-+
-+	for_each_possible_cpu(cpu) {
-+		if (local_read(&per_cpu_ptr(part->dkstats, cpu)->in_flight[0]) ||
-+		    local_read(&per_cpu_ptr(part->dkstats, cpu)->in_flight[1]))
-+			return true;
-+	}
-+
-+	return false;
- }
- 
- static void start_io_acct(struct dm_io *io)
- {
- 	struct mapped_device *md = io->md;
- 	struct bio *bio = io->orig_bio;
--	int rw = bio_data_dir(bio);
- 
- 	io->start_time = jiffies;
- 
- 	generic_start_io_acct(md->queue, bio_op(bio), bio_sectors(bio),
- 			      &dm_disk(md)->part0);
- 
--	atomic_inc(&md->pending[rw]);
--
- 	if (unlikely(dm_stats_used(&md->stats)))
- 		dm_stats_account_io(&md->stats, bio_data_dir(bio),
- 				    bio->bi_iter.bi_sector, bio_sectors(bio),
-@@ -676,8 +681,6 @@ static void end_io_acct(struct dm_io *io)
- 	struct mapped_device *md = io->md;
- 	struct bio *bio = io->orig_bio;
- 	unsigned long duration = jiffies - io->start_time;
--	int pending;
--	int rw = bio_data_dir(bio);
- 
- 	generic_end_io_acct(md->queue, bio_op(bio), &dm_disk(md)->part0,
- 			    io->start_time);
-@@ -687,16 +690,11 @@ static void end_io_acct(struct dm_io *io)
- 				    bio->bi_iter.bi_sector, bio_sectors(bio),
- 				    true, duration, &io->stats_aux);
- 
--	/*
--	 * After this is decremented the bio must not be touched if it is
--	 * a flush.
--	 */
--	pending = atomic_dec_return(&md->pending[rw]);
--	pending += atomic_read(&md->pending[rw^0x1]);
--
- 	/* nudge anyone waiting on suspend queue */
--	if (!pending)
--		wake_up(&md->wait);
-+	if (unlikely(waitqueue_active(&md->wait))) {
-+		if (!md_in_flight(md))
-+			wake_up(&md->wait);
-+	}
- }
- 
- /*
-@@ -1904,8 +1902,6 @@ static struct mapped_device *alloc_dev(int minor)
- 	if (!md->disk)
- 		goto bad;
- 
--	atomic_set(&md->pending[0], 0);
--	atomic_set(&md->pending[1], 0);
- 	init_waitqueue_head(&md->wait);
- 	INIT_WORK(&md->work, dm_wq_work);
- 	init_waitqueue_head(&md->eventq);
+Please pull!
+
+
+  git://git.kernel.dk/linux-block.git tags/for-linus-20181205
+
+
+----------------------------------------------------------------
+Jens Axboe (1):
+      blk-mq: fix corruption with direct issue
+
+Juha-Matti Tilli (1):
+      libata: whitelist all SAMSUNG MZ7KM* solid-state disks
+
+ block/blk-mq.c            | 26 +++++++++++++++++++++++++-
+ drivers/ata/libata-core.c |  1 +
+ 2 files changed, 26 insertions(+), 1 deletion(-)
+
 -- 
-2.18.0
+Jens Axboe
 
