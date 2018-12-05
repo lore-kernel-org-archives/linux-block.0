@@ -2,47 +2,74 @@ Return-Path: <SRS0=VELz=OO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51775C04EB8
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 01:37:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05AA1C04EB8
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 01:38:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1FBF42082B
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 01:37:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FBF42082B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id B0FED2082B
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 01:38:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JkppqI7B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0FED2082B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725841AbeLEBhq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 4 Dec 2018 20:37:46 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52582 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725834AbeLEBhq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 4 Dec 2018 20:37:46 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id F19CD31256AC;
-        Wed,  5 Dec 2018 01:37:45 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 310172A308;
-        Wed,  5 Dec 2018 01:37:41 +0000 (UTC)
-Date:   Wed, 5 Dec 2018 09:37:37 +0800
-From:   Ming Lei <ming.lei@redhat.com>
+        id S1725841AbeLEBiZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 4 Dec 2018 20:38:25 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:38629 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725834AbeLEBiZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 4 Dec 2018 20:38:25 -0500
+Received: by mail-pg1-f195.google.com with SMTP id g189so8222786pgc.5
+        for <linux-block@vger.kernel.org>; Tue, 04 Dec 2018 17:38:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=10fDMYp5jZQOjF0oWsEw6Oyeo2UyAiboRP37lTjMvEM=;
+        b=JkppqI7BShQBfjzkTq3IRki2Cc8TVBL0B8DYBhVXjtoKhEedYrOONVUl8clTVW+sAt
+         3lo3q3TzDyx5/6EVp1JT9wSi0UqAql5u9E9p1EkPa0tF8e1u6pYpsah0CYjsZIwcA4xd
+         aAh8zRaKLhWqZPLF+JFxrqQf0YQ2J/lgJ0YMx9iX8d4GCT1el78QNoUj7UGBClbi70x0
+         eUd3UbaF6UlurHf9otEWUDL7sWkv9VgBndkjQXbCDiCj0xZbLPk0UZ0IzSj2M//4dVrc
+         6CVyrH3uuchvSPn+f1YI6WXhGdtNOcrzpJr2Zbdo8eymYmwUYZkGV4AymHjJhMbfslzz
+         Azlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=10fDMYp5jZQOjF0oWsEw6Oyeo2UyAiboRP37lTjMvEM=;
+        b=koh7k8I2rcqnM+iAIe2kqfR3JZpYdk/mvO7A9kdvXY5TKdiacaRWQlOz3tEVlPzjux
+         J5b+DAHnVFTOe9LaMRM09yMaL6NMEuZaVzJrAOJSwrFK4/rA5numvis/kicaBNA53cIf
+         Ps32sN7Lv1fs620oaWE5TdZek5FzvEAY/xz5NJ0GzlTKBEfvJUBqBWrZotZ82VL9BYJs
+         PCLhpnVF+MaHs+EBoEhrPchsC/om50WnPkRHJT7TORzfojVkYEgcUpmeArxuUq8fLma9
+         LvxbPHzlz70nKitNGJselxD6EjnkDx8Rg/77x50uQXIxFN3/AvG6vqkyyZTKcwTwCvFA
+         Kb6g==
+X-Gm-Message-State: AA+aEWaX4bvEBiPbIABLI2bfRkxJOd7oeFVEmUhB5fXTLREI2x2kp7hU
+        /RBSA205gXUsQ91n+2xWhts=
+X-Google-Smtp-Source: AFSGD/WVQT1tTBDnx/Uci4ZWpq4j8v3nWFavA9/dTLmPk7VPcHJZccYNLf+slkAg1LrM6S92P5X5Eg==
+X-Received: by 2002:a63:588:: with SMTP id 130mr18518516pgf.273.1543973904156;
+        Tue, 04 Dec 2018 17:38:24 -0800 (PST)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id i123sm35673474pfg.164.2018.12.04.17.38.21
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 04 Dec 2018 17:38:22 -0800 (PST)
+Date:   Tue, 4 Dec 2018 17:38:21 -0800
+From:   Guenter Roeck <linux@roeck-us.net>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Ming Lei <ming.lei@redhat.com>
 Subject: Re: [PATCH] blk-mq: fix corruption with direct issue
-Message-ID: <20181205013736.GD17845@ming.t460p>
+Message-ID: <20181205013821.GA19605@roeck-us.net>
 References: <1d359819-5410-7af2-d02b-f0ecca39d2c9@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <1d359819-5410-7af2-d02b-f0ecca39d2c9@kernel.dk>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Wed, 05 Dec 2018 01:37:46 +0000 (UTC)
+User-Agent: Mutt/1.5.24 (2015-08-30)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -75,8 +102,11 @@ On Tue, Dec 04, 2018 at 03:47:46PM -0700, Jens Axboe wrote:
 > 
 > Fixes: 6ce3dd6eec1 ("blk-mq: issue directly if hw queue isn't busy in case of 'none'")
 > Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> ---
+
+Tested-by: Guenter Roeck <linux@roeck-us.net>
+
+... on two systems affected by the problem.
+
 > 
 > diff --git a/block/blk-mq.c b/block/blk-mq.c
 > index 3f91c6e5b17a..d8f518c6ea38 100644
@@ -98,42 +128,3 @@ On Tue, Dec 04, 2018 at 03:47:46PM -0700, Jens Axboe wrote:
 >  		blk_mq_update_dispatch_busy(hctx, true);
 >  		__blk_mq_requeue_request(rq);
 >  		break;
-> 
-
-Not sure it is enough to just mark it as NOMERGE, for example, driver
-may have setup the .special_vec for discard, and NOMERGE may not prevent
-request from entering elevator queue completely. Cause 'rq.rb_node' and
-'rq.special_vec' share same space.
-
-So how about inserting this request via blk_mq_request_bypass_insert()
-in case that direct issue returns BUSY? Then it is invariant that
-any request queued via .queue_rq() won't enter scheduler queue.
-
---
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3f91c6e5b17a..4b2db0b2909e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1764,7 +1764,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	if (bypass_insert)
- 		return BLK_STS_RESOURCE;
- 
--	blk_mq_sched_insert_request(rq, false, run_queue, false);
-+	blk_mq_request_bypass_insert(rq, run_queue);
- 	return BLK_STS_OK;
- }
- 
-@@ -1780,7 +1780,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 
- 	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false);
- 	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
--		blk_mq_sched_insert_request(rq, false, true, false);
-+		blk_mq_request_bypass_insert(rq, true);
- 	else if (ret != BLK_STS_OK)
- 		blk_mq_end_request(rq, ret);
- 
-
-
-Thanks,
-Ming
