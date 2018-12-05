@@ -2,66 +2,64 @@ Return-Path: <SRS0=VELz=OO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5802C04EB9
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 07:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB4EC04EBF
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 07:45:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9BD5D2082B
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 07:45:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9459820850
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 07:45:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="c1iBGReX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BD5D2082B
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="4OqbIt/Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9459820850
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727170AbeLEHou (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727025AbeLEHou (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 5 Dec 2018 02:44:50 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:43048 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726102AbeLEHou (ORCPT
+Received: from userp2130.oracle.com ([156.151.31.86]:39736 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726909AbeLEHou (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Wed, 5 Dec 2018 02:44:50 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wB57iR0b129950;
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wB57i6kb166791;
         Wed, 5 Dec 2018 07:44:46 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=9g3aOswRkBa0Sy+nHjpOtR1GfeY+RHsrrC/jHEcEm3A=;
- b=c1iBGReXJZzrgmkwg8B78NItEOsf4TIfrvSyC3MU1tWzYf/IwWcHKY0QNXu5aMCoJAB1
- WiJ+wp92MyxDrTzqIdGYlvRCdfHtMDWmgIVM8nWrLHYOqQgeP7xIaDNWHJ1uy2XZJaFl
- wq2CmnJQECEz0sWOmYfSdJz7sv/FyNzinT+ASB859PXRfHZEzhkJ7ixxJulfTkCPuUlG
- VN/GYRaynKdqUCGqRdFVWZI36AE/1spQFhValHp+7ywhsBh+tKVkQt4Xzl7R1JN3NfqX
- W/tAEIOhJdLRjDNtTwmHqXBD4NjFgvIc1dO6qsyR3ksUNvLPSS/WKZX8k7lFOukl01Yf Sw== 
+ subject : date : message-id; s=corp-2018-07-02;
+ bh=aWc4ssTqK3+0Va0XF3SwYiR03i3PrRf+R9WvbryzeBM=;
+ b=4OqbIt/Z0vJHEqoC7GD6DJJHAz8RmA354cNul3aVFLmjZ4j0pHkZyTM017XVL8cQtPFQ
+ KI/HzhRU4GTCah4hpX8yAc2cndwQ850CcskC/zVVinz11FuGym9/hB2ZJCiyT8lZyHeR
+ OKG41IsBgScnJjFGc7PCC7mU3ablGVqXayI9bGShwfsWa0H351aVfaBgVMRCYCViMguM
+ vO+/k6dzR4QP7+ewMfRH7tP4dc8txgAsv48mcnqLhFdompmtFntPv5BYjd/tz5gLYalO
+ gjqtmqrBp2+5iqGajEO3HiGjnDDpwxw5j0Qpn1G/h3i4hEKX0+I4xgs8j5q6rWDT/bq2 UA== 
 Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
-        by userp2120.oracle.com with ESMTP id 2p3jxrgpvy-1
+        by userp2130.oracle.com with ESMTP id 2p3hqu0t71-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Wed, 05 Dec 2018 07:44:46 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id wB57ijp7020882
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id wB57ifCQ020725
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 5 Dec 2018 07:44:45 GMT
+        Wed, 5 Dec 2018 07:44:41 GMT
 Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id wB57ijeX032102;
-        Wed, 5 Dec 2018 07:44:45 GMT
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id wB57id4V021853;
+        Wed, 5 Dec 2018 07:44:41 GMT
 Received: from will-ThinkCentre-M93p.cn.oracle.com (/10.182.70.234)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 04 Dec 2018 23:44:44 -0800
+        with ESMTP ; Tue, 04 Dec 2018 23:44:39 -0800
 From:   Jianchao Wang <jianchao.w.wang@oracle.com>
 To:     axboe@kernel.dk
 Cc:     ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH V9 3/4] blk-mq: issue directly with bypass 'false' in blk_mq_sched_insert_requests
-Date:   Wed,  5 Dec 2018 15:44:01 +0800
-Message-Id: <1543995842-20704-4-git-send-email-jianchao.w.wang@oracle.com>
+Subject: [PATCH V9 0/4] blk-mq: refactor code of issue directly
+Date:   Wed,  5 Dec 2018 15:43:58 +0800
+Message-Id: <1543995842-20704-1-git-send-email-jianchao.w.wang@oracle.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1543995842-20704-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1543995842-20704-1-git-send-email-jianchao.w.wang@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9097 signatures=668686
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=984
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.0.1-1810050000 definitions=main-1812050072
 Sender: linux-block-owner@vger.kernel.org
@@ -69,100 +67,86 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It is not necessary to issue request directly with bypass 'true'
-in blk_mq_sched_insert_requests and handle the non-issued requests
-itself. Just set bypass to 'false' and let blk_mq_try_issue_directly
-handle them totally. Remove the blk_rq_can_direct_dispatch check,
-because blk_mq_try_issue_directly can handle it well.
+Hi Jens
 
-With respect to commit_rqs hook, we only need to care about the last
-request's result. If it is inserted, invoke commit_rqs. We identify
-the actual result of blk_mq_try_issue_directly with outputed cookie.
+Please consider this patchset for 4.21.
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- block/blk-mq-sched.c      |  8 +++-----
- block/blk-mq.c            | 25 ++++++++-----------------
- include/linux/blk_types.h |  1 +
- 3 files changed, 12 insertions(+), 22 deletions(-)
+It refactors the code of issue request directly to unify the interface
+and make the code clearer and more readable.
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index f096d898..5b4d52d 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -417,12 +417,10 @@ void blk_mq_sched_insert_requests(struct blk_mq_hw_ctx *hctx,
- 		 * busy in case of 'none' scheduler, and this way may save
- 		 * us one extra enqueue & dequeue to sw queue.
- 		 */
--		if (!hctx->dispatch_busy && !e && !run_queue_async) {
-+		if (!hctx->dispatch_busy && !e && !run_queue_async)
- 			blk_mq_try_issue_list_directly(hctx, list);
--			if (list_empty(list))
--				return;
--		}
--		blk_mq_insert_requests(hctx, ctx, list);
-+		else
-+			blk_mq_insert_requests(hctx, ctx, list);
- 	}
- 
- 	blk_mq_run_hw_queue(hctx, run_queue_async);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index fe92e52..0dfa269 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1899,32 +1899,23 @@ blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last)
- void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 		struct list_head *list)
- {
-+	blk_qc_t cookie = BLK_QC_T_INVALID;
-+
- 	while (!list_empty(list)) {
--		blk_status_t ret;
- 		struct request *rq = list_first_entry(list, struct request,
- 				queuelist);
- 
--		if (!blk_rq_can_direct_dispatch(rq))
--			break;
--
- 		list_del_init(&rq->queuelist);
--		ret = blk_mq_request_issue_directly(rq, list_empty(list));
--		if (ret != BLK_STS_OK) {
--			if (ret == BLK_STS_RESOURCE ||
--					ret == BLK_STS_DEV_RESOURCE) {
--				list_add(&rq->queuelist, list);
--				break;
--			}
--			blk_mq_end_request(rq, ret);
--		}
-+		blk_mq_try_issue_directly(hctx, rq, &cookie, false,
-+				list_empty(list));
- 	}
- 
- 	/*
--	 * If we didn't flush the entire list, we could have told
--	 * the driver there was more coming, but that turned out to
--	 * be a lie.
-+	 * cookie is set to a valid value only when reqeust is issued successfully.
-+	 * We only need to care about the last request's result, if it is inserted,
-+	 * kick the hardware with commit_rqs hook.
- 	 */
--	if (!list_empty(list) && hctx->queue->mq_ops->commit_rqs)
-+	if ((cookie == BLK_QC_T_INVALID) && hctx->queue->mq_ops->commit_rqs)
- 		hctx->queue->mq_ops->commit_rqs(hctx);
- }
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index c0ba1a0..a0a467a41 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -414,6 +414,7 @@ static inline int op_stat_group(unsigned int op)
- }
- 
- typedef unsigned int blk_qc_t;
-+#define BLK_QC_T_INVALID 	-2U
- #define BLK_QC_T_NONE		-1U
- #define BLK_QC_T_SHIFT		16
- #define BLK_QC_T_INTERNAL	(1U << 31)
--- 
-2.7.4
+This patch set is rebased on the recent for-4.21/block and add the 1st
+patch which inserts the non-read-write request to hctx dispatch
+list to avoid to involve merge and io scheduler when bypass_insert
+is true, otherwise, inserting is ignored, BLK_STS_RESOURCE is returned
+and the caller will fail forever.
 
+The 2nd patch refactors the code of issue request directly to unify the
+helper interface which could handle all the cases.
+
+The 3rd patch make blk_mq_sched_insert_requests issue requests directly
+with 'bypass' false, then it needn't to handle the non-issued requests
+any more.
+
+The 4th patch replace and kill the blk_mq_request_issue_directly.
+
+V9:
+ - rebase on recent for-4.21/block
+ - add 1st patch
+
+V8:
+ - drop the original 2nd patch which try to insert requests into hctx->dispatch
+   if quiesced or stopped.
+ - remove two wrong 'unlikely'
+
+V7:
+ - drop the original 3rd patch which try to ensure hctx to be ran on
+   its mapped cpu in issueing directly path.
+
+V6:
+ - drop original 1st patch to address Jen's comment
+ - discard the enum mq_issue_decision and blk_mq_make_decision and use
+   BLK_STS_* return values directly to address Jen's comment. (1/5)
+ - add 'unlikely' in blk_mq_try_issue_directly (1/5)
+ - refactor the 2nd and 3rd patch based on the new 1st patch.
+ - reserve the unused_cookie in 4th and 5th patch
+
+V5:
+ - rebase against Jens' for-4.21/block branch
+ - adjust the order of patch04 and patch05
+ - add patch06 to replace and kill the one line blk_mq_request_bypass_insert
+ - comment changes
+
+V4:
+ - split the original patch 1 into two patches, 1st and 2nd patch currently
+ - rename the mq_decision to mq_issue_decision
+ - comment changes
+
+V3:
+ - Correct the code about the case bypass_insert is true and io scheduler
+   attached. The request still need to be issued in case above. (1/4)
+ - Refactor the code to make code clearer. blk_mq_make_request is introduced
+   to decide insert, end or just return based on the return value of .queue_rq
+   and bypass_insert (1/4) 
+ - Add the 2nd patch. It introduce a new decision result which indicates to
+   insert request with blk_mq_request_bypass_insert.
+ - Modify the code to adapt the new patch 1.
+
+V2:
+ - Add 1st and 2nd patch to refactor the code.
+
+
+Jianchao Wang (4)
+blk-mq: insert to hctx dispatch list when
+blk-mq: refactor the code of issue request directly
+blk-mq: issue directly with bypass 'false' in
+blk-mq: replace and kill blk_mq_request_issue_directly
+
+block/blk-core.c          |   4 +-
+block/blk-mq-sched.c      |   8 ++-
+block/blk-mq.c            | 129 +++++++++++++++++++++-------------------------
+block/blk-mq.h            |   6 ++-
+include/linux/blk_types.h |   1 +
+5 files changed, 71 insertions(+), 77 deletions(-)
+
+Thanks
+Jianchao
