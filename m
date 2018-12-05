@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 707E8C04EBF
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 20:24:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F130C04EB9
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 20:24:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 349AF20989
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 20:24:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C4D020989
+	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 20:24:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iy4GUKPD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 349AF20989
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MKxW1lAM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C4D020989
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727436AbeLEUYi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Dec 2018 15:24:38 -0500
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:42286 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727388AbeLEUYi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Dec 2018 15:24:38 -0500
-Received: by mail-qk1-f195.google.com with SMTP id w12so1908098qkb.9
-        for <linux-block@vger.kernel.org>; Wed, 05 Dec 2018 12:24:37 -0800 (PST)
+        id S1728331AbeLEUYk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Dec 2018 15:24:40 -0500
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:40118 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727388AbeLEUYk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Dec 2018 15:24:40 -0500
+Received: by mail-qt1-f196.google.com with SMTP id k12so23824745qtf.7
+        for <linux-block@vger.kernel.org>; Wed, 05 Dec 2018 12:24:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=IPsDdKQlx38t2S9AR2ga4G4Dr1vJK59J1pvT/EwZZ1I=;
-        b=iy4GUKPDxuT1gV7T2f4F2eL93pW0UkFoVY3DrQQE0WXJV2GBk6VAQ52lHMCtyLMk4C
-         Xcw2mqDdVEbnHsF2ZjBpvRTq3ESbWET6kN7jG3RAnk308kwWIdzKN+mtnIkGx3XoV4RB
-         swhGvozoUoipnoJqFY5/nlc1hUg/Oqt2jnkWobE7NIHH0qq1Bkd45UUsBZhAezUgoD8x
-         Jrm8jyWabmAn65iJHTUxROVpNGAV1trTKotcFlHhfJAGjWynIw9/DYvsEPeJnAQ4dNHl
-         e9sZWGnfRfuG5x8liyrpXDRJLpLCSTPmySLxXD6ihbN5PFxUUB2BybuPfbloN/lTlHWJ
-         fEVw==
+        bh=icB+G85GZTRRdeXIVpg1MXe93D03U8a/VLdB+3cEmQw=;
+        b=MKxW1lAM9NIpVnC9mpzbiT/XgEhB10AJ8M22AalW6ejgsSQPy645Q88JaO23kECVvs
+         odXaeFxWLaTj92MuCOnUiqbQzHT123EmzWl6vd7DqgYpDE7R4UzVygNRWp/lqIOZsLUz
+         bJPxFdYLPHu7qYkIr81N2ZS9td+otsSQfAtMrRtE6yEtYkWUPEnpmisNubV7kPH38TrH
+         s+I1G5EVAMCaQtqpMgbBjDtLWhvGYu+0gnYL8KZSyn7xjtuLaPL8SryWsdOc4XRVuDqV
+         QTNeNllowSdEt8jw2qbOSxDJ8vdxEJCAvBN7+M1tGzdJ4me5WmdbgSrVZn8ZKdrc1qDB
+         G+mA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=IPsDdKQlx38t2S9AR2ga4G4Dr1vJK59J1pvT/EwZZ1I=;
-        b=J8C7HsALyhAJnWZeNDjh8EqSBYVWqOP8B0muAVu6wWZHabpcA7huQbniyuSlC3u5ll
-         cNfJ1hkjhsArBBiyHgjgYPyRw6vIlfYiBIG47ZqrOhkP5aZy9Bwiw5NuqbThkYOpE+ha
-         ItgUQkJ1oDiELFzrPWteUN6GBatk8oKvTPxDHuazKOBKu1+XU9JTxau6Y0YPkfN5c5MZ
-         PwQ3DKfeZpR96J7FQ6hI6Y06Qo6OsxyrOQ3a1H2D2EyzxH1+AED73E9Bj7UMeP63JgOp
-         siaRz7fYJfiwUETuLvPZDl53SZ0DOF5npPUCesUmglWtONbUqMKzD9ESo0g3FINhRbTS
-         KLkg==
-X-Gm-Message-State: AA+aEWa6NJILv5CDJ6NcL5gtBPgOj6SLXDupnoiAV6GhpTUqs7KaV+HK
-        Ftf8GJQLyFwMKOKFzJCC738=
-X-Google-Smtp-Source: AFSGD/V5F0whJ55efXgBHr1ccvJU7JBgy0XfZh/SUfic2blW8KYM5VFVP1mLlbKa0hLLdv/uQnSP8Q==
-X-Received: by 2002:a37:3008:: with SMTP id w8mr23660228qkw.75.1544041477424;
-        Wed, 05 Dec 2018 12:24:37 -0800 (PST)
+        bh=icB+G85GZTRRdeXIVpg1MXe93D03U8a/VLdB+3cEmQw=;
+        b=tTmkWYQxEH2mHxFMzKb78QiKFn/mtP1TxRsFuFB5mdPKAX9eYkKjaIP4kCbGscOCYX
+         Z9Ua09PnRnyc5tQCHXfEFB8/3tWDpfyOd+myicz81SRl/BsGYiz7xk9wMoSAD/rKIv7P
+         H1QHpHrTWQmazcQ54TRlkp4/f0uTNwSsm1UCbLma38eo6mq0dUEeNZiTN0ojR5KCuuGG
+         DgqDZj4TOSEIvGezcSStlGaHR6DIilrY2gh5KFdCNCHtfFMP/aBpKUQHERYUReJ1+Kh1
+         F1nxj//UjUWol7tdOpFyEKk4zkjwXszlsrLkXQCYPPh1Qs0BNirODPGv3yHD7+r+j7rf
+         S4xA==
+X-Gm-Message-State: AA+aEWaIS2zx1yRkHm0kn5I9WqabtucdjFwNKNtFXlQHV4iaI4nciYGg
+        T57ZhJJSyCqVJDZcPsAKW70=
+X-Google-Smtp-Source: AFSGD/XSqS3NBGMeF90Gj8HHohgV61AoBK6P5YGtrjoR7bTr6Yd5NwoJRCc8rI3xie6T5TptgB2hBg==
+X-Received: by 2002:a0c:c16b:: with SMTP id i40mr25240037qvh.28.1544041479128;
+        Wed, 05 Dec 2018 12:24:39 -0800 (PST)
 Received: from localhost (pool-68-160-144-192.bstnma.fios.verizon.net. [68.160.144.192])
-        by smtp.gmail.com with ESMTPSA id z23sm18445488qkg.50.2018.12.05.12.24.36
+        by smtp.gmail.com with ESMTPSA id c12sm15512621qka.42.2018.12.05.12.24.38
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 05 Dec 2018 12:24:36 -0800 (PST)
+        Wed, 05 Dec 2018 12:24:38 -0800 (PST)
 From:   Mike Snitzer <snitzer@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
         Mikulas Patocka <mpatocka@redhat.com>
-Subject: [PATCH v3 1/7] dm: dont rewrite dm_disk(md)->part0.in_flight
-Date:   Wed,  5 Dec 2018 15:24:27 -0500
-Message-Id: <20181205202433.95823-2-snitzer@redhat.com>
+Subject: [PATCH v3 2/7] dm rq: leverage blk_mq_queue_busy() to check for outstanding IO
+Date:   Wed,  5 Dec 2018 15:24:28 -0500
+Message-Id: <20181205202433.95823-3-snitzer@redhat.com>
 X-Mailer: git-send-email 2.15.0
 In-Reply-To: <20181205202433.95823-1-snitzer@redhat.com>
 References: <20181205202433.95823-1-snitzer@redhat.com>
@@ -70,40 +70,43 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Mikulas Patocka <mpatocka@redhat.com>
+Now that request-based dm-multipath only supports blk-mq, make use of
+the newly introduced blk_mq_queue_busy() to check for outstanding IO --
+rather than (ab)using the block core's in_flight counters.
 
-generic_start_io_acct and generic_end_io_acct already update the variable
-in_flight using atomic operations, so we don't have to overwrite them
-again.
-
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
 Signed-off-by: Mike Snitzer <snitzer@redhat.com>
 ---
- drivers/md/dm.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ drivers/md/dm-rq.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index a733e4c920af..a8ae7931bce7 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -663,8 +663,7 @@ static void start_io_acct(struct dm_io *io)
- 	generic_start_io_acct(md->queue, bio_op(bio), bio_sectors(bio),
- 			      &dm_disk(md)->part0);
- 
--	atomic_set(&dm_disk(md)->part0.in_flight[rw],
--		   atomic_inc_return(&md->pending[rw]));
-+	atomic_inc(&md->pending[rw]);
- 
- 	if (unlikely(dm_stats_used(&md->stats)))
- 		dm_stats_account_io(&md->stats, bio_data_dir(bio),
-@@ -693,7 +692,6 @@ static void end_io_acct(struct dm_io *io)
- 	 * a flush.
- 	 */
- 	pending = atomic_dec_return(&md->pending[rw]);
--	atomic_set(&dm_disk(md)->part0.in_flight[rw], pending);
- 	pending += atomic_read(&md->pending[rw^0x1]);
- 
+diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
+index 1f1fe9a618ea..d2397d8fcbd1 100644
+--- a/drivers/md/dm-rq.c
++++ b/drivers/md/dm-rq.c
+@@ -130,11 +130,11 @@ static void rq_end_stats(struct mapped_device *md, struct request *orig)
+  */
+ static void rq_completed(struct mapped_device *md, int rw, bool run_queue)
+ {
+-	atomic_dec(&md->pending[rw]);
+-
  	/* nudge anyone waiting on suspend queue */
+-	if (!md_in_flight(md))
+-		wake_up(&md->wait);
++	if (unlikely(waitqueue_active(&md->wait))) {
++		if (!blk_mq_queue_busy(md->queue))
++			wake_up(&md->wait);
++	}
+ 
+ 	/*
+ 	 * dm_put() must be at the end of this function. See the comment above
+@@ -436,7 +436,6 @@ ssize_t dm_attr_rq_based_seq_io_merge_deadline_store(struct mapped_device *md,
+ static void dm_start_request(struct mapped_device *md, struct request *orig)
+ {
+ 	blk_mq_start_request(orig);
+-	atomic_inc(&md->pending[rq_data_dir(orig)]);
+ 
+ 	if (unlikely(dm_stats_used(&md->stats))) {
+ 		struct dm_rq_target_io *tio = tio_from_request(orig);
 -- 
 2.18.0
 
