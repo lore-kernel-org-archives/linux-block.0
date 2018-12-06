@@ -2,112 +2,128 @@ Return-Path: <SRS0=YK6u=OP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F62EC04EB8
-	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 04:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4EA0C04EB8
+	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 05:45:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA7E620878
-	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 04:22:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7EFE12146D
+	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 05:45:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="RVh6iITC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA7E620878
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="I5nlhea+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EFE12146D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728909AbeLFEWz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Dec 2018 23:22:55 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:45532 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727695AbeLFEWz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Dec 2018 23:22:55 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wB64JNoP155513;
-        Thu, 6 Dec 2018 04:22:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=TQdksy3wE2iK0qdFBKMNS57sw+PrZEuhzxGqX+R0/J0=;
- b=RVh6iITCvH/4n0agI2slwyB4vRMokmwx5byPIQWh1r2xT1CLI3inNpQ2VVpq8op70sdF
- n61x3yCGYThE88iRtb7SDabFmmo3aaXWT+xjgmg5cnghNTNbzqek8jvqSS4sFMZDzrIO
- RgDljOmhfZs497U3fhjaRIW3BfoA/dQZTJDJBDmJyg7jSjHvEmwMfGDJwzfw8YtrKCl8
- mPSbNZm6vpskemilfDoMv3hK3ab/veXJTLNtQobnjsUVNdwvRfEc5VbkUYi0vl6g+eDo
- MTGsnho1yt6aJezsS6pk6tDU291GS4Bcn0MBDbZowSPcG9SwPPgvG7vodZraEuVyjdQn cQ== 
-Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by userp2130.oracle.com with ESMTP id 2p3hqu63ts-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 06 Dec 2018 04:22:44 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id wB64McUK016189
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 6 Dec 2018 04:22:38 GMT
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id wB64Mbo7018035;
-        Thu, 6 Dec 2018 04:22:38 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 06 Dec 2018 04:22:37 +0000
-To:     John Garry <john.garry@huawei.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        "chenxiang \(M\)" <chenxiang66@hisilicon.com>,
-        "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>,
-        "linux-scsi\@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Linuxarm <linuxarm@huawei.com>,
-        Steffen Maier <maier@linux.ibm.com>
-Subject: Re: DIF/DIX issue related to config CONFIG_SCSI_MQ_DEFAULT
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <5d9bf51d-1ef9-b948-2168-9e7526d77225@hisilicon.com>
-        <20181127130811.GA2780@ming.t460p>
-        <6c573f36-60d8-0631-e9ac-dacd72f6c8ad@hisilicon.com>
-        <20181130011935.GA7573@ming.t460p>
-        <e0e07583-98ca-4fc5-e60d-055e5474c084@huawei.com>
-        <yq1k1kqt07m.fsf@oracle.com>
-        <45193ec6-6398-3953-4833-88ca2057971a@huawei.com>
-        <yq1ftvcsoes.fsf@oracle.com>
-        <fe72aef6-d313-5f02-7c0e-0eea28e86582@huawei.com>
-Date:   Wed, 05 Dec 2018 23:22:34 -0500
-In-Reply-To: <fe72aef6-d313-5f02-7c0e-0eea28e86582@huawei.com> (John Garry's
-        message of "Wed, 5 Dec 2018 15:27:09 +0000")
-Message-ID: <yq1efavp9md.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        id S1728294AbeLFFpR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Dec 2018 00:45:17 -0500
+Received: from mail-io1-f54.google.com ([209.85.166.54]:41651 "EHLO
+        mail-io1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728648AbeLFFpR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Dec 2018 00:45:17 -0500
+Received: by mail-io1-f54.google.com with SMTP id s22so18729101ioc.8
+        for <linux-block@vger.kernel.org>; Wed, 05 Dec 2018 21:45:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=from:references:in-reply-to:mime-version:thread-index:date
+         :message-id:subject:to:cc;
+        bh=ESxszga/9lbWfhjwnK/zLk3T36da5oTJNBT2CcojXG0=;
+        b=I5nlhea+CU16g8NuDUy5b9s0JOEqgTSd9ou+ZqZaUIpQx0bh29b58Sz5nZ8XDP4v6d
+         7391UB/fl/pf760M25lT8o3BROZlOSmUb39mhd/MD/0QrTw+3PgQwebrDFi2uQZiGFt+
+         Y6R+PISRJy7ag7i/LcQtSSeXgZDSUTcvMtR28=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:references:in-reply-to:mime-version
+         :thread-index:date:message-id:subject:to:cc;
+        bh=ESxszga/9lbWfhjwnK/zLk3T36da5oTJNBT2CcojXG0=;
+        b=qK6ZZ3Q9+5XC3Zm7pKJJKscmjDpQP3+HWPwOrpBQ+gGR3Y4mPpyW9CLi1HyIH+w+R5
+         gzsgbjV7R9N4pqmdnBDKfS/QXW03biDyxAXKFYCWhXMgEExmp/DguH9ZB/ql2I9r+CJo
+         S636ES/L4xGllmVd6twPccYEAfi7KGic5nVBR8uFgOK1fknk/QIuqPKcoT4S4tKN0eK7
+         ztWXSF3HzZy+kzCLo3UDZBFj2rJICQHS6gf6iYRs13vI7OpiPJitaUusE2MM2td6SSeg
+         cfWlMD2K5/t6lw/SihaZNIH8Yro86BnTx1Rh1v3mKTdbIvU9XfHRm7pYOwivbwbSS1c5
+         7zXw==
+X-Gm-Message-State: AA+aEWZ/84R0aEgTwg0BktnkdFWKFkJ5l+lUs3iyYebSOH4a91puzpmb
+        urS2tzAcddRc3SuXS5lHikliP0Km0puZxMGdnhiGVw==
+X-Google-Smtp-Source: AFSGD/X3FBGjt+ofNeXVbL34zDJiYC3kjFF2v2X7HgB7mKO6hmJdIX5EDb2uIV0FwVQJf0s8/MLWv99dDmHPlfXZskE=
+X-Received: by 2002:a6b:b90a:: with SMTP id j10mr22555829iof.172.1544075115996;
+ Wed, 05 Dec 2018 21:45:15 -0800 (PST)
+From:   Kashyap Desai <kashyap.desai@broadcom.com>
+References: <1543943674.185366.194.camel@acm.org> <ce2cdcee7e8d8e21cc8398a882b9d6e3@mail.gmail.com>
+ <20181206003323.GB3015@ming.t460p>
+In-Reply-To: <20181206003323.GB3015@ming.t460p>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9098 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=342
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1812060038
+X-Mailer: Microsoft Outlook 14.0
+Thread-Index: AQIDGsA5xuRcZ0ZzYKBZCDlABhVdmwHqGsmwAaocH2ak93HZkA==
+Date:   Thu, 6 Dec 2018 11:15:13 +0530
+Message-ID: <9e57309d7f40c35c1096b6f932c02f68@mail.gmail.com>
+Subject: RE: +AFs-PATCH+AF0- blk-mq: Set request mapping to NULL in blk+AF8-mq+AF8-put+AF8-driver+AF8-tag
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-John,
-
->> I'll have to go revisit the archives for your exact fio bits.
-
-Your fio test case ran to completion on all my test systems.
-
->> But I successfully ran our DIX/T10 PI qualification tooling without any
->> errors on the latest SCSI tree. On both scsi_debug and FC hardware.
 >
-> I'm not fimilar with this tooling. Is it internal to your company?
+> If the 'tag' passed to scsi_host_find_tag() is valid, I think there
+> shouldn't have such issue.
+>
+> If you want to find outstanding IOs, maybe you can try
+> blk_mq_queue_tag_busy_iter()
+> or blk_mq_tagset_busy_iter(), because you may not know if the passed
+'tag'
+> to
+> scsi_host_find_tag() is valid or not.
 
-Sadly, yes :( We have not had much luck upstreaming the necessary aio
-integrity passthrough enhancements.
+We tried quick change in mpt3sas driver using blk_mq_tagset_busy_iter and
+it returns/callback for valid requests (no stale entries are returned).
+Expected.
+Above two APIs are only for blk-mq.  What about non-mq case ? Driver
+should use scsi_host_find_tag for non-mq and blk_mq_tagset_busy_iter for
+blk-mq case ?
+I don't see that will be good interface. Also, blk_mq_tagset_busy_iter API
+does not provide control if driver wants to quit in-between or do some
+retry logic etc.
 
-> Unfortunately it seems that no other SAS HBA kernel driver supports
-> DIX, so we have nothing to test against for this transport.
+Why can't we add single API which provides the correct output.
 
-We did a preliminary qual of LSISAS3008 many moons ago. But we had no
-immediate use for it in our offerings so it never went beyond that. I
-know other companies are using it, though.
+scsi_host_find_tag () API works well in non-mq case because,
+blk_queue_end_tag() set bqt->tag_index[tag] = NULL;.
+We are missing similar reset upon request completion in blk-mq case. This
+patch has similar approach as non-mq and there is no race condition I can
+foresee.
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+BTW - My original patch is half fix. We also need below changes -
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3f91c6e..d8f53ac 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -477,8 +477,10 @@ static void __blk_mq_free_request(struct request *rq)
+        const int sched_tag = rq->internal_tag;
+
+        blk_pm_mark_last_busy(rq);
+-       if (rq->tag != -1)
++       if (rq->tag != -1) {
++               hctx->tags->rqs[rq->tag] = NULL;
+                blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
++       }
+        if (sched_tag != -1)
+                blk_mq_put_tag(hctx, hctx->sched_tags, ctx, sched_tag);
+        blk_mq_sched_restart(hctx);
+
+
+>
+>
+> Thanks,
+> Ming
