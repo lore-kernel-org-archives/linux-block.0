@@ -2,169 +2,117 @@ Return-Path: <SRS0=YK6u=OP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E7BC04EB8
-	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 09:05:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EAE3C04EB8
+	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 14:18:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4F10D20989
-	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 09:05:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0698F208E7
+	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 14:18:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=scylladb-com.20150623.gappssmtp.com header.i=@scylladb-com.20150623.gappssmtp.com header.b="UhKE/euD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F10D20989
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=scylladb.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rnqqO5Br"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0698F208E7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729152AbeLFJE7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Dec 2018 04:04:59 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:41758 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727804AbeLFJE7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Dec 2018 04:04:59 -0500
-Received: by mail-wr1-f68.google.com with SMTP id x10so22425901wrs.8
-        for <linux-block@vger.kernel.org>; Thu, 06 Dec 2018 01:04:58 -0800 (PST)
+        id S1728695AbeLFOSp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Dec 2018 09:18:45 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:45794 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727704AbeLFOSp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Dec 2018 09:18:45 -0500
+Received: by mail-wr1-f66.google.com with SMTP id b14so618071wru.12
+        for <linux-block@vger.kernel.org>; Thu, 06 Dec 2018 06:18:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=scylladb-com.20150623.gappssmtp.com; s=20150623;
-        h=message-id:subject:from:to:cc:date:in-reply-to:references
-         :user-agent:mime-version:content-transfer-encoding;
-        bh=ZQk0pbtBP7wG/ITlIFUupSL/k6xVaiom3/h9orjCy/o=;
-        b=UhKE/euD5dgBnsdblspucRYvgEo6Vb4rpoqrGjem4xE+TW2+znWz3DG1VlXhx2e9G2
-         XV3nlF/Y9/BfoiUC8OWRKbKLnc9ahLQ8cb1h7ayWp9SnQPC+vOvRWG/hmT4hxAjpAmJV
-         KltR0OOT/dEH0peRRJ7tu2fGuJrnguxwMNcoI4UuoCwqzah3V77I4o5tU3EEJzHodYal
-         qa8UmqVmeVxpvObkad9wspCTFDv7ltdBKumw5daziC4e2e9a4UVb2NVkbpZXDRtkwr9y
-         31Li1P9jw2SLy4bDPxRssROTh2xw4DI2P9NF6AUznoHViU4UVOl3HfEOZFAH6FSe2lzW
-         NELw==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=SzGFxhxdHn2cxLIS1Z3pWi2U7R22N3MY+J4WQG7Tzkk=;
+        b=rnqqO5BrQbguwFzuGg9D4evS4kL+j5Toem3/8XSQHNrvRWoKMHf2fD1vpTbY+j1e96
+         7orypQxfiSnCLOCRXb3ielfxyp+wwzV5SDQ86gFWOnkfxmIu1FXLaQaJsosoitLBcGmC
+         q1PHyffIId2zHbbpqvqWOGXnBoI2ZCzDXi885LoxGb1US/wR0Tg6YUiRNnVRWMGp1nc6
+         s0sVuL7qaKeWkZkJa1xO7x0Z4LvqZLvcwRbirLBxnyIzUV9lbb18Z/N1HzGVt1CKJGqb
+         7QokrPnQqQctn7zY4BexBa7gygOA9PQxTknfUlmimu6z4Twf6ODe1x76eO+KzHHXZCo6
+         xAcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=ZQk0pbtBP7wG/ITlIFUupSL/k6xVaiom3/h9orjCy/o=;
-        b=DiLmw539jaBCFrOMD2CC4L83o6boGVm49FL1KJHn3IKnEDg+qu+egehxNs63rxz9ZW
-         iqI1sczxabcdg0bDCJal/f4noCb5rc3jWW6QJRF38zHBxlIm0aAmqdXlRi5bFVSbPTsr
-         0l3f1cKM6MElDXYEYFchR/4X9opdzHoom+Amx2PUxU5mMJ4OV/K5RR5ECbNuENQFwN5x
-         tDeWnA940cGIv1hv+RxwF2+owNvnHxpRELImwSKlU5tKWfKlv6zfA705tibMCFboJZ3k
-         9cxguXltekWvSFU8/EqNU5FGpXXhsEQRgVV1YKo/QPd5Jt2AVIRip7fIPfF3PsJVd5hX
-         xIVA==
-X-Gm-Message-State: AA+aEWbPP+b736Ce14uIqvQ6/ugUuRpsCzZo+EajS4EdbCEXYlqPCWb+
-        gxHv2/4ZWtapo7cCuCXvKM8Yjg==
-X-Google-Smtp-Source: AFSGD/XRdMC8knrezKnfLvVRG2/PZl9Fqj3wluP988KgqaX4WUh76CGMgna6jKW5FpZwvjIOMwsiKw==
-X-Received: by 2002:a5d:4ec4:: with SMTP id s4mr25515665wrv.187.1544087098040;
-        Thu, 06 Dec 2018 01:04:58 -0800 (PST)
-Received: from bhalevy-lt (system.cloudius-systems.com. [199.203.229.89])
-        by smtp.gmail.com with ESMTPSA id q3sm17471301wrn.84.2018.12.06.01.04.56
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 06 Dec 2018 01:04:57 -0800 (PST)
-Message-ID: <ef2ffc05f262ec222db7fb11a4bf827ef757c723.camel@scylladb.com>
-Subject: Re: [PATCH 15/26] aio: support for IO polling
-From:   Benny Halevy <bhalevy@scylladb.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-aio@kvack.org
-Cc:     hch@lst.de, jmoyer@redhat.com
-Date:   Thu, 06 Dec 2018 11:04:55 +0200
-In-Reply-To: <a8df7d41-3a3c-370f-33be-1e2954b45362@kernel.dk>
-References: <20181204233729.26776-1-axboe@kernel.dk>
-         <20181204233729.26776-16-axboe@kernel.dk>
-         <51ae659719c64d869cae06cdc94748f64132ba3a.camel@scylladb.com>
-         <a8df7d41-3a3c-370f-33be-1e2954b45362@kernel.dk>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=SzGFxhxdHn2cxLIS1Z3pWi2U7R22N3MY+J4WQG7Tzkk=;
+        b=YxtEkCjKDejUSKS293y+qOm/nMHjOOCoTyK96SVN18EKAC5hp+eR480X8pbIUwn0UV
+         9IqNWZ1EwGng0Rusy9BazGP2NUAnwMpocIG5CtJnnJ7HBXK7EO6LgpTWZdBpN3gNwm9T
+         fY9s4oxp7DByewUw04+1EIoAgNi/6XbyDm8KuuD+rB7XuuRG421209rtVeD0+/L+55vJ
+         k7BUbbsq9nVsSW8PZKsVST9hJ2iU2PiFyXfk1te0yjeGeih3SSJpEu1Ns8qgm/tT5XGX
+         V+aaqAQdNLy8L1LMMswsTdnyvFUINbxYeK1BIlmQEiREdL3d3ZYJXDw40i1BpU1Zcwxy
+         psUw==
+X-Gm-Message-State: AA+aEWbR/GHGwBh74C32Z89DDawcpJNiyU5adbKvWft95nxSuwk9TRCi
+        mrawkS53s64eLYJZdjzK4/OdaDZSPdyLXObLefPGJnm7lns=
+X-Google-Smtp-Source: AFSGD/XizrXlK8NB2osNmWEMBnjJZPyyw+4HbSdrEulL0Kph1pc5EqR51cGSw2gIFM+B469dpmsHqk0HMoMWc4vV25U=
+X-Received: by 2002:a5d:4acb:: with SMTP id y11mr24998317wrs.281.1544105923138;
+ Thu, 06 Dec 2018 06:18:43 -0800 (PST)
+MIME-Version: 1.0
+References: <cover.1544023832.git.zhangweiping@didiglobal.com>
+ <997df532a176a435c3581ce180f318a298084393.1544023832.git.zhangweiping@didiglobal.com>
+ <1544025539.185366.224.camel@acm.org>
+In-Reply-To: <1544025539.185366.224.camel@acm.org>
+From:   Weiping Zhang <zwp10758@gmail.com>
+Date:   Thu, 6 Dec 2018 22:18:31 +0800
+Message-ID: <CAA70yB5HbEqSRO9KzqCkV=ZPgsRqVLmGZh0XrBAYwPaPbmDaYg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] block: get rid of BLK_MAX_TIMEOUT
+To:     bvanassche@acm.org
+Cc:     zhangweiping@didiglobal.com, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.2 (3.30.2-2.fc29) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2018-12-05 at 06:10 -0700, Jens Axboe wrote:
-> On 12/5/18 2:56 AM, Benny Halevy wrote:
-> > > +static int aio_iopoll_getevents(struct kioctx *ctx,
-> > > +				struct io_event __user *event,
-> > > +				unsigned int *nr_events, long min, long max)
-> > > +{
-> > > +	struct aio_kiocb *iocb;
-> > > +	int to_poll, polled, ret;
-> > > +
-> > > +	/*
-> > > +	 * Check if we already have done events that satisfy what we need
-> > > +	 */
-> > > +	if (!list_empty(&ctx->poll_completing)) {
-> > > +		ret = aio_iopoll_reap(ctx, event, nr_events, max);
-> > > +		if (ret < 0)
-> > > +			return ret;
-> > > +		/* if min is zero, still go through a poll check */
-> > 
-> > A function-level comment about that would be more visible.
-> 
-> Yes, that might be a better idea.
-> 
-> > > +		if (min && *nr_events >= min)
-> > > 
-> > > +			return 0;
-> > 
-> > if ((min && *nr_events >= min) || *nr_events >= max) ?
-> > 
-> > Otherwise, if poll_completing or poll_submitted are not empty,
-> > besides getting to the "Shouldn't happen" case in aio_iopoll_reap,
-> > it looks like we're gonna waste some cycles and never call f_op->iopoll
-> 
-> Agree, that would be a better place to catch it. I'll make those two
-> changes, thanks!
-> 
-> > > +
-> > > +	/*
-> > > +	 * Find up to 'max' worth of events to poll for, including the
-> > > +	 * events we already successfully polled
-> > > +	 */
-> > > +	polled = to_poll = 0;
-> > > +	list_for_each_entry(iocb, &ctx->poll_completing, ki_list) {
-> > > +		/*
-> > > +		 * Poll for needed events with spin == true, anything after
-> > > +		 * that we just check if we have more, up to max.
-> > > +		 */
-> > > +		bool spin = polled + *nr_events >= min;
-> > 
-> > I'm confused. Shouldn't spin == true if polled + *nr_events < min?
-> 
-> Heh, that does look off, and it is. I think the correct condition is:
-> 
-> bool spin = !polled || *nr_events < min;
-> 
-> and I'm not sure why that got broken. I just tested it, slight
-> performance win as expected correcting this. It ties in with the above
-> nr_events check - it's perfectly valid to pass min_nr == 0 and just do a
-> poll check. Conversely, if we already spun, just do non-spin checks on
-> followup poll checks.
-> 
+Bart Van Assche <bvanassche@acm.org> =E4=BA=8E2018=E5=B9=B412=E6=9C=885=E6=
+=97=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8811:59=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On Wed, 2018-12-05 at 23:37 +0800, Weiping Zhang wrote:
+> > @@ -130,7 +119,7 @@ void blk_add_timer(struct request *req)
+> >        * than an existing one, modify the timer. Round up to next neare=
+st
+> >        * second.
+> >        */
+> > -     expiry =3D blk_rq_timeout(round_jiffies_up(expiry));
+> > +     expiry =3D round_jiffies_up(expiry);
+>
+> If you would have read the comment above this code, you would have known
+> that this patch does not do what you think it does and additionally that
+> it introduces a regression.
+>
+Let's paste full comments here:
+        /*
+         * If the timer isn't already pending or this timeout is earlier
+         * than an existing one, modify the timer. Round up to next nearest
+         * second.
+         */
+Before this patch, even we set io_timeout to 30*HZ(default), but
+blk_rq_timeout always return jiffies +5*HZ,
+  [1]. if there no pending request in timeout list, the timer callback
+blk_rq_timed_out_timer will be called after 5*HZ, and then
+blk_mq_check_expired will check is there exist some request
+was delayed by compare jiffies and request->deadline, obvious
+request is not timeout because we set request's timeouts is 30*HZ.
+So for this case timer callback should be called at jiffies + 30 instead
+of jiffies + 5*HZ.
 
-Yep, that makes sense.
+  [2]. if there are pending request in timeout list, we compare request's
+expiry and queue's expiry. If time_after(request->expire, queue->expire) mo=
+dify
+queue->timeout.expire to request->expire, otherwise do nothing.
 
-> > > +static int __aio_iopoll_check(struct kioctx *ctx, struct io_event __user *event,
-> > > +			      unsigned int *nr_events, long min_nr, long max_nr)
-> > > +{
-> > > +	int ret = 0;
-> > > +
-> > > +	while (!*nr_events || !need_resched()) {
-> > > +		int tmin = 0;
-> > > +
-> > > +		if (*nr_events < min_nr)
-> > > +			tmin = min_nr - *nr_events;
-> > 
-> > Otherwise, shouldn't the function just return 0?
-> > 
-> > Or perhaps you explicitly want to go through the tmin==0 case
-> > in aio_iopoll_getevents if *nr_events == min_nr (or min_nr==0)?
-> 
-> No, we need to go through poll, if min_nr == 0, but only if min_nr == 0
-> and !nr_events. But we only get here for nr_events != 0, so should be
-> fine as-is.
-> 
-> Thanks for your review, very useful! I'll make the above changes right
-> now.
-> 
+So I think this patch just solve problem in [1], no other regression, or wh=
+at's
+I missing here ?
 
-Thanks!
-
-
-
+Thanks
+Weiping
+> Bart.
