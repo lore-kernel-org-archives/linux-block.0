@@ -1,94 +1,235 @@
-Return-Path: <SRS0=VELz=OO=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=YK6u=OP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB3C5C04EB9
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 23:39:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A8B2C04EBF
+	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 00:22:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A323A20989
-	for <linux-block@archiver.kernel.org>; Wed,  5 Dec 2018 23:39:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="R7tfg4F+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A323A20989
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
+	by mail.kernel.org (Postfix) with ESMTP id 54D742133F
+	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 00:22:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54D742133F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727592AbeLEXjm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 5 Dec 2018 18:39:42 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:40190 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727337AbeLEXjl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 5 Dec 2018 18:39:41 -0500
-Received: by mail-pf1-f193.google.com with SMTP id i12so10780368pfo.7
-        for <linux-block@vger.kernel.org>; Wed, 05 Dec 2018 15:39:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=QyMv6k47mxC4QXsLZAWLAwhvbbAwz6JqUNys0Z+UDg8=;
-        b=R7tfg4F+GB2UzaNa0k9i4ts6iQLowNobti5AOKKKr1IbytvWfw7ApBqHDu86ChNIsF
-         BMN3WKGQcDBH1wj8toI0ibxFPr6vXw48h/+dK53CIz2nL96KbA+8ESHyJBALo9EjhEHJ
-         E53Juqreq5IUEk6gjo/cbOf6BV+gAfMKyzbmxm3oWrh3tdnMwJMzwI85VcFQ2yHE3uug
-         RowfHSXHoGEtZA0zUupz1FDLk7Z0JU3/I85Ek7mbkKmXRTV7Vy/H0Eg8X1mmNMasN1PH
-         V9c7bqNbHs9+mHw14VmUO23LrdbE/4Uhjr2Ha/Ye/f+7BKSofy4193WMB3iCw8EOmSxm
-         Gz2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=QyMv6k47mxC4QXsLZAWLAwhvbbAwz6JqUNys0Z+UDg8=;
-        b=hfSNk+1nKojargLBkK5pux3hqwaLCPK+/9c+VLmxdzhhjh4ljKBktd2bXSBLA0RCDk
-         vEAFHvyrzZSMx+Vlwhb5giphikCu1NGLyahlBD4dKeV2NvWS3lojpZrzwBqHa7Odewv4
-         7w1tVFjWh1Ig5FQt7nCc7oNjjXYYvY2hmkfaQgKBHyPZY0kcRxrwWam1srH4gpMwfIzM
-         o15y7hkOg+43E3i0PLet8O1hOTYyjrRmC2FFY01JE4i0AU2pjhwCTpYPBuuNAeVQuTva
-         kJcjDfhClehZCwckHgJpMtu4GiKAkLuSZs46sb5w/4fnXM3NVgbyiGdAo41sErd6N/Dl
-         5tWg==
-X-Gm-Message-State: AA+aEWadGsjZTlqyajMAJzf5rComSPc3oqUdh4qDEN+WWu/oSsPo0Txk
-        +GOiBOA5nt7iQW7u3VTcjUKo4HXFpHo=
-X-Google-Smtp-Source: AFSGD/WGIGieVfZE5xNORZSvLF8dToGJc/NMP0E5umLzjMf1ul0YiqcWu9+lTb/GqkcNBTs6O10RpQ==
-X-Received: by 2002:a63:5b48:: with SMTP id l8mr22369832pgm.80.1544053180626;
-        Wed, 05 Dec 2018 15:39:40 -0800 (PST)
-Received: from vader ([2601:602:8b00:55d3:e6a7:a0ff:fe0b:c9a8])
-        by smtp.gmail.com with ESMTPSA id c13sm29502033pfo.121.2018.12.05.15.39.39
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 05 Dec 2018 15:39:40 -0800 (PST)
-Date:   Wed, 5 Dec 2018 15:39:38 -0800
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Omar Sandoval <osandov@fb.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] block/025: test discard sector alignement and sector
- size overflow
-Message-ID: <20181205233938.GE11220@vader>
-References: <20181115040017.4920-1-ming.lei@redhat.com>
+        id S1727794AbeLFAWX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 5 Dec 2018 19:22:23 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:48839 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727575AbeLFAWX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 5 Dec 2018 19:22:23 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id EF3F489AC6;
+        Thu,  6 Dec 2018 00:22:21 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 403EF60F89;
+        Thu,  6 Dec 2018 00:22:15 +0000 (UTC)
+Date:   Thu, 6 Dec 2018 08:22:11 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Evan Green <evgreen@chromium.org>
+Cc:     axboe@kernel.dk, Gwendal Grignou <gwendal@chromium.org>,
+        asavery@chromium.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] loop: Better discard support for block devices
+Message-ID: <20181206002210.GA3015@ming.t460p>
+References: <20181030230624.61834-1-evgreen@chromium.org>
+ <20181030230624.61834-3-evgreen@chromium.org>
+ <20181128012624.GB11128@ming.t460p>
+ <CAE=gft7Fyq+Jb3ZG3PSTR=C0Wjt3uu57+H2bshM6Gu=_0W0YQw@mail.gmail.com>
+ <20181205011059.GA17845@ming.t460p>
+ <CAE=gft7K2OrN93c8TQ5ozOpXzXf5ZD-PNnVHWP9SbZXZqp2dHw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181115040017.4920-1-ming.lei@redhat.com>
-User-Agent: Mutt/1.11.0 (2018-11-25)
+In-Reply-To: <CAE=gft7K2OrN93c8TQ5ozOpXzXf5ZD-PNnVHWP9SbZXZqp2dHw@mail.gmail.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Thu, 06 Dec 2018 00:22:22 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Nov 15, 2018 at 12:00:17PM +0800, Ming Lei wrote:
-> This test covers the following two issues:
+On Wed, Dec 05, 2018 at 11:35:57AM -0800, Evan Green wrote:
+> Hi Ming,
 > 
-> 1) discard sector need to be aligned with logical block size
+> On Tue, Dec 4, 2018 at 5:11 PM Ming Lei <ming.lei@redhat.com> wrote:
+> >
+> > On Tue, Dec 04, 2018 at 02:19:46PM -0800, Evan Green wrote:
+> > > Hi Ming,
+> > >
+> > > On Tue, Nov 27, 2018 at 5:26 PM Ming Lei <ming.lei@redhat.com> wrote:
+> > > >
+> > > > On Tue, Oct 30, 2018 at 04:06:24PM -0700, Evan Green wrote:
+> > > > > If the backing device for a loop device is a block device,
+> > > > > then mirror the discard properties of the underlying block
+> > > > > device into the loop device. While in there, differentiate
+> > > > > between REQ_OP_DISCARD and REQ_OP_WRITE_ZEROES, which are
+> > > > > different for block devices, but which the loop device had
+> > > > > just been lumping together.
+> > > > >
+> > > > > Signed-off-by: Evan Green <evgreen@chromium.org>
+> > > > > ---
+> > > > >
+> > > > >  drivers/block/loop.c | 61 +++++++++++++++++++++++++++++++++++-----------------
+> > > > >  1 file changed, 41 insertions(+), 20 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> > > > > index 28990fc94841a..176e65101c4ef 100644
+> > > > > --- a/drivers/block/loop.c
+> > > > > +++ b/drivers/block/loop.c
+> > > > > @@ -417,19 +417,14 @@ static int lo_read_transfer(struct loop_device *lo, struct request *rq,
+> > > > >       return ret;
+> > > > >  }
+> > > > >
+> > > > > -static int lo_discard(struct loop_device *lo, struct request *rq, loff_t pos)
+> > > > > +static int lo_discard(struct loop_device *lo, struct request *rq,
+> > > > > +             int mode, loff_t pos)
+> > > > >  {
+> > > > > -     /*
+> > > > > -      * We use punch hole to reclaim the free space used by the
+> > > > > -      * image a.k.a. discard. However we do not support discard if
+> > > > > -      * encryption is enabled, because it may give an attacker
+> > > > > -      * useful information.
+> > > > > -      */
+> > > > >       struct file *file = lo->lo_backing_file;
+> > > > > -     int mode = FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE;
+> > > > > +     struct request_queue *q = lo->lo_queue;
+> > > > >       int ret;
+> > > > >
+> > > > > -     if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
+> > > > > +     if (!blk_queue_discard(q)) {
+> > > > >               ret = -EOPNOTSUPP;
+> > > > >               goto out;
+> > > > >       }
+> > > > > @@ -603,8 +598,13 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
+> > > > >       case REQ_OP_FLUSH:
+> > > > >               return lo_req_flush(lo, rq);
+> > > > >       case REQ_OP_DISCARD:
+> > > > > +             return lo_discard(lo, rq,
+> > > > > +                     FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE, pos);
+> > > > > +
+> > > > >       case REQ_OP_WRITE_ZEROES:
+> > > > > -             return lo_discard(lo, rq, pos);
+> > > > > +             return lo_discard(lo, rq,
+> > > > > +                     FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE, pos);
+> > > > > +
+> > > > >       case REQ_OP_WRITE:
+> > > > >               if (lo->transfer)
+> > > > >                       return lo_write_transfer(lo, rq, pos);
+> > > > > @@ -859,6 +859,25 @@ static void loop_config_discard(struct loop_device *lo)
+> > > > >       struct file *file = lo->lo_backing_file;
+> > > > >       struct inode *inode = file->f_mapping->host;
+> > > > >       struct request_queue *q = lo->lo_queue;
+> > > > > +     struct request_queue *backingq;
+> > > > > +
+> > > > > +     /*
+> > > > > +      * If the backing device is a block device, mirror its discard
+> > > > > +      * capabilities.
+> > > > > +      */
+> > > > > +     if (S_ISBLK(inode->i_mode)) {
+> > > > > +             backingq = bdev_get_queue(inode->i_bdev);
+> > > > > +             blk_queue_max_discard_sectors(q,
+> > > > > +                     backingq->limits.max_discard_sectors);
+> > > > > +
+> > > > > +             blk_queue_max_write_zeroes_sectors(q,
+> > > > > +                     backingq->limits.max_write_zeroes_sectors);
+> > > > > +
+> > > > > +             q->limits.discard_granularity =
+> > > > > +                     backingq->limits.discard_granularity;
+> > > > > +
+> > > > > +             q->limits.discard_alignment =
+> > > > > +                     backingq->limits.discard_alignment;
+> > > >
+> > > > I think it isn't necessary to mirror backing queue's discard/write_zeros
+> > > > capabilities, given either fs of the underlying queue can deal with well.
+> > > >
+> > > > >
+> > > > >       /*
+> > > > >        * We use punch hole to reclaim the free space used by the
+> > > > > @@ -866,22 +885,24 @@ static void loop_config_discard(struct loop_device *lo)
+> > > > >        * encryption is enabled, because it may give an attacker
+> > > > >        * useful information.
+> > > > >        */
+> > > > > -     if ((!file->f_op->fallocate) ||
+> > > > > -         lo->lo_encrypt_key_size) {
+> > > > > +     } else if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
+> > > > >               q->limits.discard_granularity = 0;
+> > > > >               q->limits.discard_alignment = 0;
+> > > > >               blk_queue_max_discard_sectors(q, 0);
+> > > > >               blk_queue_max_write_zeroes_sectors(q, 0);
+> > > > > -             blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
+> > > > > -             return;
+> > > > > -     }
+> > > > >
+> > > > > -     q->limits.discard_granularity = inode->i_sb->s_blocksize;
+> > > > > -     q->limits.discard_alignment = 0;
+> > > > > +     } else {
+> > > > > +             q->limits.discard_granularity = inode->i_sb->s_blocksize;
+> > > > > +             q->limits.discard_alignment = 0;
+> > > > > +
+> > > > > +             blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
+> > > > > +             blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
+> > > > > +     }
+> > > > >
+> > > > > -     blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
+> > > > > -     blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
+> > > > > -     blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
+> > > > > +     if (q->limits.max_discard_sectors || q->limits.max_write_zeroes_sectors)
+> > > > > +             blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
+> > > > > +     else
+> > > > > +             blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
+> > > > >  }
+> > > >
+> > > > Looks it should work just by mirroring backing queue's discard
+> > > > capability to loop queue in case that the loop is backed by
+> > > > block device, doesn't it? Meantime the unified discard limits &
+> > > > write_zeros limits can be kept.
+> > >
+> > > I tested this out, and you're right that I could just flip the
+> > > QUEUE_FLAG_DISCARD based on whether its a block device, and leave
+> >
+> > What I meant actually is to do the following discard config:
+> >
+> >         bool discard;
+> >         if (S_ISBLK(inode->i_mode)) {
+> >                 struct request_queue *backingq = bdev_get_queue(inode->i_bdev);
+> >                 discard = blk_queue_discard(backingq);
+> >         } else if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size)
+> >                 discard = false;
+> >         else
+> >                 discard = true;
+> >
+> >         if (discard) {
+> >                 blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
+> >                 blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
+> >                 blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
+> >         } else {
+> >                 blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
+> >         }
 > 
-> 2) make sure 'sector_t' instead of 'unsigned int' is used when comparing
-> with discard sector size
-> 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  tests/block/025     | 37 +++++++++++++++++++++++++++++++++++++
->  tests/block/025.out |  2 ++
->  2 files changed, 39 insertions(+)
->  create mode 100755 tests/block/025
->  create mode 100644 tests/block/025.out
+> Ah, I see. But I think it's useful to reflect max_discard_sectors,
+> max_write_zeroes_sectors, discard_granularity, and discard_alignment
+> from the block device to the loop device. With the exception of
+> discard_alignment, these parameters are visible via sysfs, so usermode
+> can actually use these to make more intelligent use of fallocate.
 
-Applied, thanks Ming.
+Could you share us what the intelligent use of fallocate is?
+
+The block layer code of blk_bio_discard_split() can deal with all the
+magic limits.
+
+The unified discard limits is simpler from implement view of loop, or
+from userspace view.
+
+> Without this part of it, I still see issues with GNU cp.
+
+Could you investigate the cause of the GNU cp issue?
+
+Thanks,
+Ming
