@@ -5,54 +5,55 @@ X-Spam-Level:
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20EFBC04EB8
-	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 16:06:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E25E4C04EB8
+	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 16:14:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E040920838
-	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 16:06:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E040920838
+	by mail.kernel.org (Postfix) with ESMTP id B3ADC20878
+	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 16:14:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3ADC20878
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725889AbeLFQGU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Dec 2018 11:06:20 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:38650 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725862AbeLFQGU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Dec 2018 11:06:20 -0500
-Received: by mail-pf1-f195.google.com with SMTP id q1so389897pfi.5
-        for <linux-block@vger.kernel.org>; Thu, 06 Dec 2018 08:06:19 -0800 (PST)
+        id S1726036AbeLFQOk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Dec 2018 11:14:40 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:34958 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725972AbeLFQOj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Dec 2018 11:14:39 -0500
+Received: by mail-pg1-f195.google.com with SMTP id s198so359449pgs.2
+        for <linux-block@vger.kernel.org>; Thu, 06 Dec 2018 08:14:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=svpvzU/dbLSFtbp42nmU8G9XdKDKMDMv/6tlX9uxHLA=;
-        b=Binx6m2Qr+VJnzCEmQnyYlnbiedbrYoDxoHU5Tszyagd8TBQal1mvnH9gdvFR+85Ko
-         6/T4cFwp+7coMnbW9AzK05vOTjCyFBdfxVLhkz4/l1auFrEJ8EMf+U7btJtpA4m2B4Bt
-         HfRXQ8lSdvvNxOGCthbcochj1b74aYKRTIhw6QloEKrutH8cFUcsFcBhLDnut1CU3xMm
-         lymSVNbCOc7fj7qf23bqME+OkzT0p5j++oqa8LcKY+Zltk1z1GK99nBZvhOU3w585Ql3
-         UAlcuJZqRfbeafyAqkKrRqgtno34copq7+j7T6OkP3IqXKBg+J9Bit5BvxKq3slpTIo1
-         LU5Q==
-X-Gm-Message-State: AA+aEWbEK+coRkxkm7B7T0eY6tXg/tN/YaM769CEFW89Wefma/wwst8K
-        upyZxegFMSRCoUUQprHYf50=
-X-Google-Smtp-Source: AFSGD/Xa6IAO3iEIFE2HGZAgoW8+hHyZLMKykhk1sdGhDXWQ8Li5RGq9VYXUoRj3UY8b6r7Kz3KDYQ==
-X-Received: by 2002:a62:399b:: with SMTP id u27mr30128548pfj.181.1544112379142;
-        Thu, 06 Dec 2018 08:06:19 -0800 (PST)
+        bh=i3uaP80JemUs5iHtC02rJ9z8WA12EVwF9Q5l7KRmZTA=;
+        b=tgUSKwhFE/yCO24M280j4epEhwyfqq++WpApOf5qRwWlCiHvpWs6O13XD6bhHbu+yR
+         qagTsCiVvTPdxEfZzykXdKsaqj1A2E4xF9WThQDNEkCZgzNCQrzs9KQNBsNArINBizMb
+         mAg36T45nfp1LQusBpnMpYPft7mkcvdr3ENycRwAmkr9p5FBe9eGd7chgvgd9t7IotYc
+         M1lxuYJqA4oo0TKKP9iBUDAP/OsK2xxgZqojlSnKgwnL6ObpLzVgkgV1x/UnUGe4NncS
+         3MyJkdafmFyewl8+OQizcld3Rqj4TCKWE0oGpNeDr/kZAgV7e/Jr5b+Ry9TUVyURNaQP
+         nOwg==
+X-Gm-Message-State: AA+aEWbvBwvDHVBHKi2qR/VSxmCzuPQeql91o2RBUJ26rSHKS3dHvTYI
+        sy4fGuDk/aNzqglZc5rGwJ8=
+X-Google-Smtp-Source: AFSGD/UN/c1YlcZpGOOphNhMZIheaHKsrE51BD12N8d5OqaSsBJ0iT80Un4gES7lhFIGJ9E9V6Wi0A==
+X-Received: by 2002:a63:f1f:: with SMTP id e31mr24307715pgl.274.1544112879011;
+        Thu, 06 Dec 2018 08:14:39 -0800 (PST)
 Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id g190sm1076614pgc.28.2018.12.06.08.06.17
+        by smtp.gmail.com with ESMTPSA id j14sm1047144pfn.175.2018.12.06.08.14.37
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 06 Dec 2018 08:06:17 -0800 (PST)
-Message-ID: <1544112376.185366.230.camel@acm.org>
-Subject: Re: [PATCH v3] block: add documentation for io_timeout
+        Thu, 06 Dec 2018 08:14:37 -0800 (PST)
+Message-ID: <1544112876.185366.235.camel@acm.org>
+Subject: Re: [PATCH 1/2] block: get rid of BLK_MAX_TIMEOUT
 From:   Bart Van Assche <bvanassche@acm.org>
-To:     Weiping Zhang <zwp10758@gmail.com>, hch@infradead.org
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Date:   Thu, 06 Dec 2018 08:06:16 -0800
-In-Reply-To: <CAA70yB7rD_vqMXUvHrQ8SwH-jAyDZeL58TkqABqJ0Y=-p_pjyg@mail.gmail.com>
-References: <20181205141701.GA33910@192.168.3.9>
-         <20181205144006.GA18123@infradead.org>
-         <CAA70yB5WQPYzptck=miwiBrV7=uixvLKpJrzGEOP9zBU5Y2CwQ@mail.gmail.com>
-         <CAA70yB7rD_vqMXUvHrQ8SwH-jAyDZeL58TkqABqJ0Y=-p_pjyg@mail.gmail.com>
+To:     Weiping Zhang <zwp10758@gmail.com>
+Cc:     zhangweiping@didiglobal.com, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Date:   Thu, 06 Dec 2018 08:14:36 -0800
+In-Reply-To: <CAA70yB5HbEqSRO9KzqCkV=ZPgsRqVLmGZh0XrBAYwPaPbmDaYg@mail.gmail.com>
+References: <cover.1544023832.git.zhangweiping@didiglobal.com>
+         <997df532a176a435c3581ce180f318a298084393.1544023832.git.zhangweiping@didiglobal.com>
+         <1544025539.185366.224.camel@acm.org>
+         <CAA70yB5HbEqSRO9KzqCkV=ZPgsRqVLmGZh0XrBAYwPaPbmDaYg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-7"
 X-Mailer: Evolution 3.26.2-1 
 Mime-Version: 1.0
@@ -62,23 +63,32 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2018-12-05 at 22:59 +-0800, Weiping Zhang wrote:
-+AD4 Weiping Zhang +ADw-zwp10758+AEA-gmail.com+AD4 +To4-2018+XnQ-12+Zwg-5+ZeVUaE4J +TgtTSA-10:49+UZmQU/8a
-+AD4 +AD4 Christoph Hellwig +ADw-hch+AEA-infradead.org+AD4 +To4-2018+XnQ-12+Zwg-5+ZeVUaE4J +TgtTSA-10:40+UZmQU/8a
-+AD4 +AD4 +AD4 Can you please also send a patch to not show this attribute for
-+AD4 +AD4 +AD4 drivers without a timeout handler?  Thanks+ACE
+On Thu, 2018-12-06 at 22:18 +-0800, Weiping Zhang wrote:
++AD4 Before this patch, even we set io+AF8-timeout to 30+ACo-HZ(default), but
++AD4 blk+AF8-rq+AF8-timeout always return jiffies +-5+ACo-HZ,
++AD4   +AFs-1+AF0. if there no pending request in timeout list, the timer callback
++AD4 blk+AF8-rq+AF8-timed+AF8-out+AF8-timer will be called after 5+ACo-HZ, and then
++AD4 blk+AF8-mq+AF8-check+AF8-expired will check is there exist some request
++AD4 was delayed by compare jiffies and request-+AD4-deadline, obvious
++AD4 request is not timeout because we set request's timeouts is 30+ACo-HZ.
++AD4 So for this case timer callback should be called at jiffies +- 30 instead
++AD4 of jiffies +- 5+ACo-HZ.
 +AD4 
-+AD4 Is there a simple way do that ?
++AD4   +AFs-2+AF0. if there are pending request in timeout list, we compare request's
++AD4 expiry and queue's expiry. If time+AF8-after(request-+AD4-expire, queue-+AD4-expire) modify
++AD4 queue-+AD4-timeout.expire to request-+AD4-expire, otherwise do nothing.
++AD4 
++AD4 So I think this patch just solve problem in +AFs-1+AF0, no other regression, or what's
++AD4 I missing here ?
 
-How about checking the timeout member of struct blk+AF8-mq+AF8-ops for blk-mq and
-checking the rq+AF8-timed+AF8-out+AF8-fn member in struct request+AF8-queue for the legacy
-block layer?
-
-+AD4 Shall we return -ENOTSUPP when user read/write this attribute when
-+AD4 driver has no timeout handler ?
-
-A much more elegant solution is to introduce a sysfs attribute group for the
-io+AF8-timeout attribute and to make that group visible only if a timeout handler
-has been defined. See e.g. disk+AF8-attr+AF8-group in block/genhd.c for an example.
+The blk+AF8-rq+AF8-timeout() function was introduced by commit 0d2602ca30e4 (+ACI-blk-mq:
+improve support for shared tags maps+ACI). I think the purpose of that function
+is to make sure that the nr+AF8-active counter in struct blk+AF8-mq+AF8-hw+AF8-ctx gets updated
+at least once every five seconds. So there are two problems with this patch:
+- It reduces the frequency of 'nr+AF8-active' updates. I think that is wrong and
+  also that it will negatively affect drivers that rely on this functionality,
+  e.g. the SCSI core.
+- The patch description does not match the code changes in this patch.
 
 Bart.
+
