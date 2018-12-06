@@ -6,62 +6,62 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A46EC65BAF
-	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 16:41:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC9ECC04EB8
+	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 16:41:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3510E20850
-	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 16:41:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D6AD20850
+	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 16:41:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jhm0lkFP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3510E20850
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dy8ba+YE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D6AD20850
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726030AbeLFQlf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Dec 2018 11:41:35 -0500
-Received: from mail-qk1-f178.google.com ([209.85.222.178]:38723 "EHLO
-        mail-qk1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726020AbeLFQlf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Dec 2018 11:41:35 -0500
-Received: by mail-qk1-f178.google.com with SMTP id d19so688738qkg.5
-        for <linux-block@vger.kernel.org>; Thu, 06 Dec 2018 08:41:34 -0800 (PST)
+        id S1725970AbeLFQle (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Dec 2018 11:41:34 -0500
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:44536 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726020AbeLFQld (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Dec 2018 11:41:33 -0500
+Received: by mail-qk1-f195.google.com with SMTP id n12so667979qkh.11
+        for <linux-block@vger.kernel.org>; Thu, 06 Dec 2018 08:41:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=Iw1pxVal0P9iW2FYwEShmYf7++g/Hc6pwU/St/Unn+E=;
-        b=Jhm0lkFPku52yv/ydwT9kt6hMkiCNiL4QCNcGxo+kbHwgAw1Q6zp0yrlzNAwnVFoCc
-         7PGncfiJ8u2TQB5ggkGbdr/8IH43vu6P3awwhuG2sCeYLc13diqcml2c6sGDEGDctkvo
-         h158omwn9wpGQLkgk+ot6rC6mEFA/Cgaqag1POgXu7JuiZsXgSshZajr1uhGYHh6JG90
-         8Ur5+VVdUlOJlJMYbVWqAI64iN/EgsRE6H3nlj/OH1iTcIffSnrETaeCgTrr6JtwJl3I
-         /gWj//q5aQMO3TMoBKD0eTGwcRhqE1pPpUyXyxP9ftc6JUaKsDXyJPY8amIVj0bI37jk
-         pP4Q==
+        bh=85coUe5jj/aEgGb9sq6PLEn2E7N+OcXpkyJUZd5up8g=;
+        b=dy8ba+YEMlUWrdDOY7IG2NTCbIgkWE87YxoMwjJ2pG8VYKGv7Afz1StZgMNek+tAy2
+         IenTxIqIBBXsL6lchbVk166bGQ2IYvj2Td9N+tVRxeMsJYjE3AuNyIsMbTGR6ibZTu2M
+         aE1WIkky2XB8SuQYekNNfvY0D/pCuEGY43kf3DA7nVVlaeG3VP2s2AQaIIoU1LLEXRcT
+         N8Xgl8v8svhi/fx5KtiyJ/g+atUTJ27nBA20NGx9iiZVlL8Kn0iaC9dMammSfErOWNME
+         qBWf8wIb5MZqHXAhU64ZpOzZI1Ubup7D1d8UjAji37TQlNnTAfICGnnUs5izFP9p1jhH
+         uUTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=Iw1pxVal0P9iW2FYwEShmYf7++g/Hc6pwU/St/Unn+E=;
-        b=e0eUpIcxnIpJn0hfT20VzGEzvwGWuLYwi4XK38NtypNHQPtMg7r3c3brjIUj6UpH0G
-         nFjS6TGOLJpXCSoH70bGPa+hqjRnlCd9V2GCFIoahNKnJQ3GacfpQTF+zkSpYlM+Ch9y
-         BjZEEyT/OqQ7mgkhn4wnCqVui01MubD9cXJ3sQMWlJzuKMPAb/uWHGuQriQlsXChzaQe
-         doRBblajpLCmR6HDRfCVlZ+UGZfp/dBMzNwEmmRLm3phyB12tU72yQuL5Th81DO5V06p
-         qHmvb7RqWWaZqbVrhz9sfKlfJ7ke8U8NZd6R1oRp4QQaoj8WaqKsOrK5agTUrx4cNIr2
-         OD5w==
-X-Gm-Message-State: AA+aEWZvtKyjHL7k/9I2xgnyHPg1vkVrMyoPpxw1bK6borZ9dwz1knmT
-        tBTHGnmsc6AhS9Y3kfmMuWA=
-X-Google-Smtp-Source: AFSGD/WJ6tocTP1JdRSp7eRm9dZcgVxLYECUibvsnMTtzJl4J9OIL6VOOE0kgk2DDk+zBZTe+wyyEA==
-X-Received: by 2002:a37:a9cf:: with SMTP id s198mr25268156qke.274.1544114494277;
-        Thu, 06 Dec 2018 08:41:34 -0800 (PST)
+        bh=85coUe5jj/aEgGb9sq6PLEn2E7N+OcXpkyJUZd5up8g=;
+        b=cAMXGi07MKNqjG2iCK0b0nW+DFJkxTpy8JmcaJkUaVnSg5+GyoacZtSrLmYb5Oc5vv
+         HzEHXY/3V1j6m52Bvs6e8O9U0fJy9aQbTqKiMffZXMQmvGwR/B4YBshETXlhsBw0vGmM
+         7he0jA7wHDhmoOVoI1u/Ck9k9kM72jPwSkV2KQUZBvrsB/3UQudwdQyXrXiBQ4f6DhAN
+         u8qD+SkXexyjRjq5vO2z8hd+LtctXnkZXBvu5HeXH/dtFdC6z0Bt7H4yMVdS9c9yJD5e
+         VioBtFbiWI+WgUJR6LaHy+OxUEV+k3m77xbz8AlwkLRPFZ0hiLHUQj3XkDSajbB8doWy
+         pvAw==
+X-Gm-Message-State: AA+aEWZqscm1yJAVwGTGhJu9RccbcNzwG9II6xAQNwi3Ir/gnzBRH7NT
+        CNi1aim4KSMGEXT2kypcbfI=
+X-Google-Smtp-Source: AFSGD/WYWt0tHxQtDo6ZUGwLGPj/R9kz9OgisWdphiMW4Eryy+WA2+OOqP8kVQPvI6xxsTvRsR325g==
+X-Received: by 2002:a37:3b47:: with SMTP id i68mr26961444qka.277.1544114492204;
+        Thu, 06 Dec 2018 08:41:32 -0800 (PST)
 Received: from localhost (nat-pool-bos-t.redhat.com. [66.187.233.206])
-        by smtp.gmail.com with ESMTPSA id p42sm509546qte.8.2018.12.06.08.41.33
+        by smtp.gmail.com with ESMTPSA id p31sm763892qkh.86.2018.12.06.08.41.31
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 06 Dec 2018 08:41:33 -0800 (PST)
+        Thu, 06 Dec 2018 08:41:31 -0800 (PST)
 From:   Mike Snitzer <snitzer@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
         Mikulas Patocka <mpatocka@redhat.com>
-Subject: [PATCH v4 4/7] block: delete part_round_stats and switch to less precise counting
-Date:   Thu,  6 Dec 2018 11:41:19 -0500
-Message-Id: <20181206164122.2166-5-snitzer@redhat.com>
+Subject: [PATCH v4 3/7] block: stop passing 'cpu' to all percpu stats methods
+Date:   Thu,  6 Dec 2018 11:41:18 -0500
+Message-Id: <20181206164122.2166-4-snitzer@redhat.com>
 X-Mailer: git-send-email 2.15.0
 In-Reply-To: <20181206164122.2166-1-snitzer@redhat.com>
 References: <20181206164122.2166-1-snitzer@redhat.com>
@@ -70,235 +70,313 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Mikulas Patocka <mpatocka@redhat.com>
+All of part_stat_* and related methods are used with preempt disabled,
+so there is no need to pass cpu around to allow of them.  Just call
+smp_processor_id() as needed.
 
-We want to convert to per-cpu in_flight counters.
-
-The function part_round_stats needs the in_flight counter every jiffy, it
-would be too costly to sum all the percpu variables every jiffy, so it
-must be deleted. part_round_stats is used to calculate two counters -
-time_in_queue and io_ticks.
-
-time_in_queue can be calculated without part_round_stats, by adding the
-duration of the I/O when the I/O ends (the value is almost as exact as the
-previously calculated value, except that time for in-progress I/Os is not
-counted).
-
-io_ticks can be approximated by increasing the value when I/O is started
-or ended and the jiffies value has changed. If the I/Os take less than a
-jiffy, the value is as exact as the previously calculated value. If the
-I/Os take more than a jiffy, io_ticks can drift behind the previously
-calculated value.
-
-Signed-off-by: Mikulas Patocka <mpatocka@redhat.com>
+Suggested-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Mike Snitzer <snitzer@redhat.com>
 ---
- block/bio.c               | 24 +++++++++++++++---
- block/blk-core.c          | 62 +++--------------------------------------------
- block/blk-merge.c         |  1 -
- block/genhd.c             |  3 ---
- block/partition-generic.c |  3 ---
- include/linux/genhd.h     |  3 +--
- 6 files changed, 26 insertions(+), 70 deletions(-)
+ block/bio.c               | 16 +++++++++-------
+ block/blk-core.c          | 34 +++++++++++++++-------------------
+ block/blk-merge.c         |  5 ++---
+ block/genhd.c             |  5 ++---
+ block/partition-generic.c |  5 ++---
+ drivers/md/md.c           |  7 +++----
+ include/linux/genhd.h     | 26 +++++++++++++-------------
+ 7 files changed, 46 insertions(+), 52 deletions(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index 91e398ba57f1..0c2208a5446d 100644
+index 03895cc0d74a..91e398ba57f1 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -1663,6 +1663,22 @@ void bio_check_pages_dirty(struct bio *bio)
- }
- EXPORT_SYMBOL_GPL(bio_check_pages_dirty);
- 
-+void update_io_ticks(struct hd_struct *part, unsigned long now)
-+{
-+	unsigned long stamp;
-+again:
-+	stamp = READ_ONCE(part->stamp);
-+	if (unlikely(stamp != now)) {
-+		if (likely(cmpxchg(&part->stamp, stamp, now) == stamp)) {
-+			__part_stat_add(part, io_ticks, 1);
-+		}
-+	}
-+	if (part->partno) {
-+		part = &part_to_disk(part)->part0;
-+		goto again;
-+	}
-+}
-+
- void generic_start_io_acct(struct request_queue *q, int op,
+@@ -1667,11 +1667,12 @@ void generic_start_io_acct(struct request_queue *q, int op,
  			   unsigned long sectors, struct hd_struct *part)
  {
-@@ -1670,7 +1686,7 @@ void generic_start_io_acct(struct request_queue *q, int op,
+ 	const int sgrp = op_stat_group(op);
+-	int cpu = part_stat_lock();
  
- 	part_stat_lock();
- 
--	part_round_stats(q, part);
-+	update_io_ticks(part, jiffies);
- 	part_stat_inc(part, ios[sgrp]);
- 	part_stat_add(part, sectors[sgrp], sectors);
+-	part_round_stats(q, cpu, part);
+-	part_stat_inc(cpu, part, ios[sgrp]);
+-	part_stat_add(cpu, part, sectors[sgrp], sectors);
++	part_stat_lock();
++
++	part_round_stats(q, part);
++	part_stat_inc(part, ios[sgrp]);
++	part_stat_add(part, sectors[sgrp], sectors);
  	part_inc_in_flight(q, part, op_is_write(op));
-@@ -1682,13 +1698,15 @@ EXPORT_SYMBOL(generic_start_io_acct);
- void generic_end_io_acct(struct request_queue *q, int req_op,
- 			 struct hd_struct *part, unsigned long start_time)
+ 
+ 	part_stat_unlock();
+@@ -1683,10 +1684,11 @@ void generic_end_io_acct(struct request_queue *q, int req_op,
  {
--	unsigned long duration = jiffies - start_time;
-+	unsigned long now = jiffies;
-+	unsigned long duration = now - start_time;
+ 	unsigned long duration = jiffies - start_time;
  	const int sgrp = op_stat_group(req_op);
+-	int cpu = part_stat_lock();
  
- 	part_stat_lock();
- 
-+	update_io_ticks(part, now);
- 	part_stat_add(part, nsecs[sgrp], jiffies_to_nsecs(duration));
--	part_round_stats(q, part);
-+	part_stat_add(part, time_in_queue, duration);
+-	part_stat_add(cpu, part, nsecs[sgrp], jiffies_to_nsecs(duration));
+-	part_round_stats(q, cpu, part);
++	part_stat_lock();
++
++	part_stat_add(part, nsecs[sgrp], jiffies_to_nsecs(duration));
++	part_round_stats(q, part);
  	part_dec_in_flight(q, part, op_is_write(req_op));
  
  	part_stat_unlock();
 diff --git a/block/blk-core.c b/block/blk-core.c
-index 734b768c9d9d..268d2b8e9843 100644
+index ad59102ee30a..734b768c9d9d 100644
 --- a/block/blk-core.c
 +++ b/block/blk-core.c
-@@ -584,62 +584,6 @@ struct request *blk_get_request(struct request_queue *q, unsigned int op,
+@@ -584,14 +584,14 @@ struct request *blk_get_request(struct request_queue *q, unsigned int op,
  }
  EXPORT_SYMBOL(blk_get_request);
  
--static void part_round_stats_single(struct request_queue *q,
--				    struct hd_struct *part, unsigned long now,
--				    unsigned int inflight)
--{
--	if (inflight) {
--		__part_stat_add(part, time_in_queue,
--				inflight * (now - part->stamp));
--		__part_stat_add(part, io_ticks, (now - part->stamp));
--	}
--	part->stamp = now;
--}
--
--/**
-- * part_round_stats() - Round off the performance stats on a struct disk_stats.
-- * @q: target block queue
-- * @part: target partition
-- *
-- * The average IO queue length and utilisation statistics are maintained
-- * by observing the current state of the queue length and the amount of
-- * time it has been in this state for.
-- *
-- * Normally, that accounting is done on IO completion, but that can result
-- * in more than a second's worth of IO being accounted for within any one
-- * second, leading to >100% utilisation.  To deal with that, we call this
-- * function to do a round-off before returning the results when reading
-- * /proc/diskstats.  This accounts immediately for all queue usage up to
-- * the current jiffies and restarts the counters again.
-- */
--void part_round_stats(struct request_queue *q, struct hd_struct *part)
--{
--	struct hd_struct *part2 = NULL;
--	unsigned long now = jiffies;
--	unsigned int inflight[2];
--	int stats = 0;
--
--	if (part->stamp != now)
--		stats |= 1;
--
--	if (part->partno) {
--		part2 = &part_to_disk(part)->part0;
--		if (part2->stamp != now)
--			stats |= 2;
--	}
--
--	if (!stats)
--		return;
--
--	part_in_flight(q, part, inflight);
--
--	if (stats & 2)
--		part_round_stats_single(q, part2, now, inflight[1]);
--	if (stats & 1)
--		part_round_stats_single(q, part, now, inflight[0]);
--}
--EXPORT_SYMBOL_GPL(part_round_stats);
--
- void blk_put_request(struct request *req)
+-static void part_round_stats_single(struct request_queue *q, int cpu,
++static void part_round_stats_single(struct request_queue *q,
+ 				    struct hd_struct *part, unsigned long now,
+ 				    unsigned int inflight)
  {
- 	blk_mq_free_request(req);
-@@ -1383,9 +1327,10 @@ void blk_account_io_done(struct request *req, u64 now)
- 		part_stat_lock();
+ 	if (inflight) {
+-		__part_stat_add(cpu, part, time_in_queue,
++		__part_stat_add(part, time_in_queue,
+ 				inflight * (now - part->stamp));
+-		__part_stat_add(cpu, part, io_ticks, (now - part->stamp));
++		__part_stat_add(part, io_ticks, (now - part->stamp));
+ 	}
+ 	part->stamp = now;
+ }
+@@ -599,7 +599,6 @@ static void part_round_stats_single(struct request_queue *q, int cpu,
+ /**
+  * part_round_stats() - Round off the performance stats on a struct disk_stats.
+  * @q: target block queue
+- * @cpu: cpu number for stats access
+  * @part: target partition
+  *
+  * The average IO queue length and utilisation statistics are maintained
+@@ -613,7 +612,7 @@ static void part_round_stats_single(struct request_queue *q, int cpu,
+  * /proc/diskstats.  This accounts immediately for all queue usage up to
+  * the current jiffies and restarts the counters again.
+  */
+-void part_round_stats(struct request_queue *q, int cpu, struct hd_struct *part)
++void part_round_stats(struct request_queue *q, struct hd_struct *part)
+ {
+ 	struct hd_struct *part2 = NULL;
+ 	unsigned long now = jiffies;
+@@ -635,9 +634,9 @@ void part_round_stats(struct request_queue *q, int cpu, struct hd_struct *part)
+ 	part_in_flight(q, part, inflight);
+ 
+ 	if (stats & 2)
+-		part_round_stats_single(q, cpu, part2, now, inflight[1]);
++		part_round_stats_single(q, part2, now, inflight[1]);
+ 	if (stats & 1)
+-		part_round_stats_single(q, cpu, part, now, inflight[0]);
++		part_round_stats_single(q, part, now, inflight[0]);
+ }
+ EXPORT_SYMBOL_GPL(part_round_stats);
+ 
+@@ -1362,11 +1361,10 @@ void blk_account_io_completion(struct request *req, unsigned int bytes)
+ 	if (blk_do_io_stat(req)) {
+ 		const int sgrp = op_stat_group(req_op(req));
+ 		struct hd_struct *part;
+-		int cpu;
+ 
+-		cpu = part_stat_lock();
++		part_stat_lock();
+ 		part = req->part;
+-		part_stat_add(cpu, part, sectors[sgrp], bytes >> 9);
++		part_stat_add(part, sectors[sgrp], bytes >> 9);
+ 		part_stat_unlock();
+ 	}
+ }
+@@ -1381,14 +1379,13 @@ void blk_account_io_done(struct request *req, u64 now)
+ 	if (blk_do_io_stat(req) && !(req->rq_flags & RQF_FLUSH_SEQ)) {
+ 		const int sgrp = op_stat_group(req_op(req));
+ 		struct hd_struct *part;
+-		int cpu;
+ 
+-		cpu = part_stat_lock();
++		part_stat_lock();
  		part = req->part;
  
-+		update_io_ticks(part, jiffies);
- 		part_stat_inc(part, ios[sgrp]);
- 		part_stat_add(part, nsecs[sgrp], now - req->start_time_ns);
--		part_round_stats(req->q, part);
-+		part_stat_add(part, time_in_queue, nsecs_to_jiffies64(now - req->start_time_ns));
+-		part_stat_inc(cpu, part, ios[sgrp]);
+-		part_stat_add(cpu, part, nsecs[sgrp], now - req->start_time_ns);
+-		part_round_stats(req->q, cpu, part);
++		part_stat_inc(part, ios[sgrp]);
++		part_stat_add(part, nsecs[sgrp], now - req->start_time_ns);
++		part_round_stats(req->q, part);
  		part_dec_in_flight(req->q, part, rq_data_dir(req));
  
  		hd_struct_put(part);
-@@ -1420,11 +1365,12 @@ void blk_account_io_start(struct request *rq, bool new_io)
+@@ -1400,16 +1397,15 @@ void blk_account_io_start(struct request *rq, bool new_io)
+ {
+ 	struct hd_struct *part;
+ 	int rw = rq_data_dir(rq);
+-	int cpu;
+ 
+ 	if (!blk_do_io_stat(rq))
+ 		return;
+ 
+-	cpu = part_stat_lock();
++	part_stat_lock();
+ 
+ 	if (!new_io) {
+ 		part = rq->part;
+-		part_stat_inc(cpu, part, merges[rw]);
++		part_stat_inc(part, merges[rw]);
+ 	} else {
+ 		part = disk_map_sector_rcu(rq->rq_disk, blk_rq_pos(rq));
+ 		if (!hd_struct_try_get(part)) {
+@@ -1424,7 +1420,7 @@ void blk_account_io_start(struct request *rq, bool new_io)
  			part = &rq->rq_disk->part0;
  			hd_struct_get(part);
  		}
--		part_round_stats(rq->q, part);
+-		part_round_stats(rq->q, cpu, part);
++		part_round_stats(rq->q, part);
  		part_inc_in_flight(rq->q, part, rw);
  		rq->part = part;
  	}
- 
-+	update_io_ticks(part, jiffies);
-+
- 	part_stat_unlock();
- }
- 
 diff --git a/block/blk-merge.c b/block/blk-merge.c
-index a120d59b9705..9da5629d0887 100644
+index 4431da69a5cf..a120d59b9705 100644
 --- a/block/blk-merge.c
 +++ b/block/blk-merge.c
-@@ -689,7 +689,6 @@ static void blk_account_io_merge(struct request *req)
- 		part_stat_lock();
+@@ -685,12 +685,11 @@ static void blk_account_io_merge(struct request *req)
+ {
+ 	if (blk_do_io_stat(req)) {
+ 		struct hd_struct *part;
+-		int cpu;
+ 
+-		cpu = part_stat_lock();
++		part_stat_lock();
  		part = req->part;
  
--		part_round_stats(req->q, part);
+-		part_round_stats(req->q, cpu, part);
++		part_round_stats(req->q, part);
  		part_dec_in_flight(req->q, part, rq_data_dir(req));
  
  		hd_struct_put(part);
 diff --git a/block/genhd.c b/block/genhd.c
-index 2fe00cf32b93..cdf174d7d329 100644
+index 0145bcb0cc76..2fe00cf32b93 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -1337,9 +1337,6 @@ static int diskstats_show(struct seq_file *seqf, void *v)
+@@ -1326,7 +1326,6 @@ static int diskstats_show(struct seq_file *seqf, void *v)
+ 	struct hd_struct *hd;
+ 	char buf[BDEVNAME_SIZE];
+ 	unsigned int inflight[2];
+-	int cpu;
+ 
+ 	/*
+ 	if (&disk_to_dev(gp)->kobj.entry == block_class.devices.next)
+@@ -1338,8 +1337,8 @@ static int diskstats_show(struct seq_file *seqf, void *v)
  
  	disk_part_iter_init(&piter, gp, DISK_PITER_INCL_EMPTY_PART0);
  	while ((hd = disk_part_iter_next(&piter))) {
--		part_stat_lock();
--		part_round_stats(gp->queue, hd);
--		part_stat_unlock();
+-		cpu = part_stat_lock();
+-		part_round_stats(gp->queue, cpu, hd);
++		part_stat_lock();
++		part_round_stats(gp->queue, hd);
+ 		part_stat_unlock();
  		part_in_flight(gp->queue, hd, inflight);
  		seq_printf(seqf, "%4d %7d %s "
- 			   "%lu %lu %lu %u "
 diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 7e663cfb1487..42d6138ac876 100644
+index 5f8db5c5140f..7e663cfb1487 100644
 --- a/block/partition-generic.c
 +++ b/block/partition-generic.c
-@@ -122,9 +122,6 @@ ssize_t part_stat_show(struct device *dev,
+@@ -121,10 +121,9 @@ ssize_t part_stat_show(struct device *dev,
+ 	struct hd_struct *p = dev_to_part(dev);
  	struct request_queue *q = part_to_disk(p)->queue;
  	unsigned int inflight[2];
+-	int cpu;
  
--	part_stat_lock();
--	part_round_stats(q, p);
--	part_stat_unlock();
+-	cpu = part_stat_lock();
+-	part_round_stats(q, cpu, p);
++	part_stat_lock();
++	part_round_stats(q, p);
+ 	part_stat_unlock();
  	part_in_flight(q, p, inflight);
  	return sprintf(buf,
- 		"%8lu %8lu %8llu %8u "
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index fc488cb30a94..9a0a1e0934d5 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -334,7 +334,6 @@ static blk_qc_t md_make_request(struct request_queue *q, struct bio *bio)
+ 	const int sgrp = op_stat_group(bio_op(bio));
+ 	struct mddev *mddev = q->queuedata;
+ 	unsigned int sectors;
+-	int cpu;
+ 
+ 	blk_queue_split(q, &bio);
+ 
+@@ -359,9 +358,9 @@ static blk_qc_t md_make_request(struct request_queue *q, struct bio *bio)
+ 
+ 	md_handle_request(mddev, bio);
+ 
+-	cpu = part_stat_lock();
+-	part_stat_inc(cpu, &mddev->gendisk->part0, ios[sgrp]);
+-	part_stat_add(cpu, &mddev->gendisk->part0, sectors[sgrp], sectors);
++	part_stat_lock();
++	part_stat_inc(&mddev->gendisk->part0, ios[sgrp]);
++	part_stat_add(&mddev->gendisk->part0, sectors[sgrp], sectors);
+ 	part_stat_unlock();
+ 
+ 	return BLK_QC_T_NONE;
 diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 1677cd2a4c4e..838c2a7a40c5 100644
+index 0c5ee17b4d88..1677cd2a4c4e 100644
 --- a/include/linux/genhd.h
 +++ b/include/linux/genhd.h
-@@ -398,8 +398,7 @@ static inline void free_part_info(struct hd_struct *part)
- 	kfree(part->info);
+@@ -295,8 +295,8 @@ extern struct hd_struct *disk_map_sector_rcu(struct gendisk *disk,
+ #define part_stat_lock()	({ rcu_read_lock(); get_cpu(); })
+ #define part_stat_unlock()	do { put_cpu(); rcu_read_unlock(); } while (0)
+ 
+-#define __part_stat_add(cpu, part, field, addnd)			\
+-	(per_cpu_ptr((part)->dkstats, (cpu))->field += (addnd))
++#define __part_stat_add(part, field, addnd)				\
++	(per_cpu_ptr((part)->dkstats, smp_processor_id())->field += (addnd))
+ 
+ #define part_stat_read(part, field)					\
+ ({									\
+@@ -333,7 +333,7 @@ static inline void free_part_stats(struct hd_struct *part)
+ #define part_stat_lock()	({ rcu_read_lock(); 0; })
+ #define part_stat_unlock()	rcu_read_unlock()
+ 
+-#define __part_stat_add(cpu, part, field, addnd)				\
++#define __part_stat_add(part, field, addnd)				\
+ 	((part)->dkstats.field += addnd)
+ 
+ #define part_stat_read(part, field)	((part)->dkstats.field)
+@@ -362,19 +362,19 @@ static inline void free_part_stats(struct hd_struct *part)
+ 	 part_stat_read(part, field[STAT_WRITE]) +			\
+ 	 part_stat_read(part, field[STAT_DISCARD]))
+ 
+-#define part_stat_add(cpu, part, field, addnd)	do {			\
+-	__part_stat_add((cpu), (part), field, addnd);			\
++#define part_stat_add(part, field, addnd)	do {			\
++	__part_stat_add((part), field, addnd);				\
+ 	if ((part)->partno)						\
+-		__part_stat_add((cpu), &part_to_disk((part))->part0,	\
++		__part_stat_add(&part_to_disk((part))->part0,		\
+ 				field, addnd);				\
+ } while (0)
+ 
+-#define part_stat_dec(cpu, gendiskp, field)				\
+-	part_stat_add(cpu, gendiskp, field, -1)
+-#define part_stat_inc(cpu, gendiskp, field)				\
+-	part_stat_add(cpu, gendiskp, field, 1)
+-#define part_stat_sub(cpu, gendiskp, field, subnd)			\
+-	part_stat_add(cpu, gendiskp, field, -subnd)
++#define part_stat_dec(gendiskp, field)					\
++	part_stat_add(gendiskp, field, -1)
++#define part_stat_inc(gendiskp, field)					\
++	part_stat_add(gendiskp, field, 1)
++#define part_stat_sub(gendiskp, field, subnd)				\
++	part_stat_add(gendiskp, field, -subnd)
+ 
+ void part_in_flight(struct request_queue *q, struct hd_struct *part,
+ 		    unsigned int inflight[2]);
+@@ -399,7 +399,7 @@ static inline void free_part_info(struct hd_struct *part)
  }
  
--/* block/blk-core.c */
--extern void part_round_stats(struct request_queue *q, struct hd_struct *part);
-+void update_io_ticks(struct hd_struct *part, unsigned long now);
+ /* block/blk-core.c */
+-extern void part_round_stats(struct request_queue *q, int cpu, struct hd_struct *part);
++extern void part_round_stats(struct request_queue *q, struct hd_struct *part);
  
  /* block/genhd.c */
  extern void device_add_disk(struct device *parent, struct gendisk *disk,
