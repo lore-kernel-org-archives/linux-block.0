@@ -2,154 +2,169 @@ Return-Path: <SRS0=YK6u=OP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D30CCC04EB9
-	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 09:04:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E7BC04EB8
+	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 09:05:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8FCBE21479
-	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 09:04:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F10D20989
+	for <linux-block@archiver.kernel.org>; Thu,  6 Dec 2018 09:05:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="A87TJKc/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FCBE21479
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=osandov.com
+	dkim=pass (2048-bit key) header.d=scylladb-com.20150623.gappssmtp.com header.i=@scylladb-com.20150623.gappssmtp.com header.b="UhKE/euD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F10D20989
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=scylladb.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727783AbeLFJEk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Dec 2018 04:04:40 -0500
-Received: from mail-pg1-f176.google.com ([209.85.215.176]:34077 "EHLO
-        mail-pg1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728482AbeLFJEk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Dec 2018 04:04:40 -0500
-Received: by mail-pg1-f176.google.com with SMTP id 17so10370543pgg.1
-        for <linux-block@vger.kernel.org>; Thu, 06 Dec 2018 01:04:39 -0800 (PST)
+        id S1729152AbeLFJE7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Dec 2018 04:04:59 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:41758 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727804AbeLFJE7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Dec 2018 04:04:59 -0500
+Received: by mail-wr1-f68.google.com with SMTP id x10so22425901wrs.8
+        for <linux-block@vger.kernel.org>; Thu, 06 Dec 2018 01:04:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=oXJkJdNxAo+zPPTm9819wlxAf70NcUz4vHcSM97XBRI=;
-        b=A87TJKc/lhn61QkyxpX6Ejb82DdV7VVucFXrIfsqVifomhgas96RTmClw5l3oCtd6D
-         d3EN75a+ZDCVWLPzZIuYfjk5dN2BqiRNviMc0QTe7/fe8alvWRz77y35lQfplXydzsSS
-         bIX2x09Ify3JlSeLGDnNr5D6iDutqxFvboH711+cBBCL7aRXYklkmicVn2RugtaZlbcr
-         UjchbxC9neihEPv/cViUyIX0iNkes0pW7thMbFe1uu94eM7LLS8scTOjEGKP4s0kUMI8
-         f9hWhoWgHHhpJX/2J0aApiJv6qr0aDsJ/Z3JDKaeZSUE2mdH+v5HZ6qrZSUmQg6r78+P
-         e20g==
+        d=scylladb-com.20150623.gappssmtp.com; s=20150623;
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :user-agent:mime-version:content-transfer-encoding;
+        bh=ZQk0pbtBP7wG/ITlIFUupSL/k6xVaiom3/h9orjCy/o=;
+        b=UhKE/euD5dgBnsdblspucRYvgEo6Vb4rpoqrGjem4xE+TW2+znWz3DG1VlXhx2e9G2
+         XV3nlF/Y9/BfoiUC8OWRKbKLnc9ahLQ8cb1h7ayWp9SnQPC+vOvRWG/hmT4hxAjpAmJV
+         KltR0OOT/dEH0peRRJ7tu2fGuJrnguxwMNcoI4UuoCwqzah3V77I4o5tU3EEJzHodYal
+         qa8UmqVmeVxpvObkad9wspCTFDv7ltdBKumw5daziC4e2e9a4UVb2NVkbpZXDRtkwr9y
+         31Li1P9jw2SLy4bDPxRssROTh2xw4DI2P9NF6AUznoHViU4UVOl3HfEOZFAH6FSe2lzW
+         NELw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=oXJkJdNxAo+zPPTm9819wlxAf70NcUz4vHcSM97XBRI=;
-        b=XD9U47nSvHt03HVEKE7OBbF5tX6K6kGH1SqGlLdfdUllKTXnb/6jOb8G+SHW4t7O05
-         UAvSuGJroXPnd+rfgUetjFmbSm+eVhHzaFUUQEg/HOAqTSiwsRAvBgr25/u6+E9cifRE
-         qAX1ryN/74vpUjLHP+Id0ypSW2D66z03hxKbwkWPUaHzVOXPT+5DpNOgvCOSP6PS+OJ0
-         PD2joF4L/CVpTGPl5v3X2QnWaYfCZ820I0If4r7v3wluifYiYgGkxsX4bP9ntp0N8ztD
-         SgxCvUYkXRjlF2bfLNiYl00R1LW2u1bUmAkelRW4iNrRZPfqlFUv46IPUKh9UwsaR1MY
-         aL/Q==
-X-Gm-Message-State: AA+aEWYABXKRoFm6Rr2CRRpIKYcbU+fGVN8uf2XEfUM5pJkgU+KHiYxw
-        AgGMFpj4WrZwo+5vDYn93047cQ==
-X-Google-Smtp-Source: AFSGD/Un89UnJT46s+McIlrucqLCP87t82n1jjtdMMeHK02MUv4a7VM+ixxHI+eYGfrCiSpRCcFsYQ==
-X-Received: by 2002:a63:f74f:: with SMTP id f15mr23601595pgk.190.1544087078972;
-        Thu, 06 Dec 2018 01:04:38 -0800 (PST)
-Received: from vader ([2601:602:8b00:55d3:e6a7:a0ff:fe0b:c9a8])
-        by smtp.gmail.com with ESMTPSA id h15sm29876907pgl.43.2018.12.06.01.04.38
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=ZQk0pbtBP7wG/ITlIFUupSL/k6xVaiom3/h9orjCy/o=;
+        b=DiLmw539jaBCFrOMD2CC4L83o6boGVm49FL1KJHn3IKnEDg+qu+egehxNs63rxz9ZW
+         iqI1sczxabcdg0bDCJal/f4noCb5rc3jWW6QJRF38zHBxlIm0aAmqdXlRi5bFVSbPTsr
+         0l3f1cKM6MElDXYEYFchR/4X9opdzHoom+Amx2PUxU5mMJ4OV/K5RR5ECbNuENQFwN5x
+         tDeWnA940cGIv1hv+RxwF2+owNvnHxpRELImwSKlU5tKWfKlv6zfA705tibMCFboJZ3k
+         9cxguXltekWvSFU8/EqNU5FGpXXhsEQRgVV1YKo/QPd5Jt2AVIRip7fIPfF3PsJVd5hX
+         xIVA==
+X-Gm-Message-State: AA+aEWbPP+b736Ce14uIqvQ6/ugUuRpsCzZo+EajS4EdbCEXYlqPCWb+
+        gxHv2/4ZWtapo7cCuCXvKM8Yjg==
+X-Google-Smtp-Source: AFSGD/XRdMC8knrezKnfLvVRG2/PZl9Fqj3wluP988KgqaX4WUh76CGMgna6jKW5FpZwvjIOMwsiKw==
+X-Received: by 2002:a5d:4ec4:: with SMTP id s4mr25515665wrv.187.1544087098040;
+        Thu, 06 Dec 2018 01:04:58 -0800 (PST)
+Received: from bhalevy-lt (system.cloudius-systems.com. [199.203.229.89])
+        by smtp.gmail.com with ESMTPSA id q3sm17471301wrn.84.2018.12.06.01.04.56
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 06 Dec 2018 01:04:38 -0800 (PST)
-Date:   Thu, 6 Dec 2018 01:04:36 -0800
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Josef Bacik <josef@toxicpanda.com>
-Cc:     linux-block@vger.kernel.org, kernel-team@fb.com, osandov@fb.com
-Subject: Re: [PATCH 0/2][V2] io.latency test for blktests
-Message-ID: <20181206090436.GF11220@vader>
-References: <20181205153404.26634-1-josef@toxicpanda.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181205153404.26634-1-josef@toxicpanda.com>
-User-Agent: Mutt/1.11.0 (2018-11-25)
+        Thu, 06 Dec 2018 01:04:57 -0800 (PST)
+Message-ID: <ef2ffc05f262ec222db7fb11a4bf827ef757c723.camel@scylladb.com>
+Subject: Re: [PATCH 15/26] aio: support for IO polling
+From:   Benny Halevy <bhalevy@scylladb.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-aio@kvack.org
+Cc:     hch@lst.de, jmoyer@redhat.com
+Date:   Thu, 06 Dec 2018 11:04:55 +0200
+In-Reply-To: <a8df7d41-3a3c-370f-33be-1e2954b45362@kernel.dk>
+References: <20181204233729.26776-1-axboe@kernel.dk>
+         <20181204233729.26776-16-axboe@kernel.dk>
+         <51ae659719c64d869cae06cdc94748f64132ba3a.camel@scylladb.com>
+         <a8df7d41-3a3c-370f-33be-1e2954b45362@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.2 (3.30.2-2.fc29) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 05, 2018 at 10:34:02AM -0500, Josef Bacik wrote:
-> v1->v2:
-> - dropped my python library, TIL about jq.
-> - fixed the spelling mistakes in the test.
+On Wed, 2018-12-05 at 06:10 -0700, Jens Axboe wrote:
+> On 12/5/18 2:56 AM, Benny Halevy wrote:
+> > > +static int aio_iopoll_getevents(struct kioctx *ctx,
+> > > +				struct io_event __user *event,
+> > > +				unsigned int *nr_events, long min, long max)
+> > > +{
+> > > +	struct aio_kiocb *iocb;
+> > > +	int to_poll, polled, ret;
+> > > +
+> > > +	/*
+> > > +	 * Check if we already have done events that satisfy what we need
+> > > +	 */
+> > > +	if (!list_empty(&ctx->poll_completing)) {
+> > > +		ret = aio_iopoll_reap(ctx, event, nr_events, max);
+> > > +		if (ret < 0)
+> > > +			return ret;
+> > > +		/* if min is zero, still go through a poll check */
+> > 
+> > A function-level comment about that would be more visible.
 > 
-> -- Original message --
+> Yes, that might be a better idea.
 > 
-> This patchset is to add a test to verify io.latency is working properly, and to
-> add all the supporting code to run that test.
+> > > +		if (min && *nr_events >= min)
+> > > 
+> > > +			return 0;
+> > 
+> > if ((min && *nr_events >= min) || *nr_events >= max) ?
+> > 
+> > Otherwise, if poll_completing or poll_submitted are not empty,
+> > besides getting to the "Shouldn't happen" case in aio_iopoll_reap,
+> > it looks like we're gonna waste some cycles and never call f_op->iopoll
 > 
-> First is the cgroup2 infrastructure which is fairly straightforward.  Just
-> verifies we have cgroup2, and gives us the helpers to check and make sure we
-> have the right controllers in place for the test.
+> Agree, that would be a better place to catch it. I'll make those two
+> changes, thanks!
 > 
-> The second patch brings over some python scripts I put in xfstests for parsing
-> the fio json output.  I looked at the existing fio performance stuff in
-> blktests, but we only capture bw stuff, which is wonky with this particular test
-> because once the fast group is finished the slow group is allowed to go as fast
-> as it wants.  So I needed this to pull out actual jobtime spent.  This will give
-> us flexibility to pull out other fio performance data in the future.
+> > > +
+> > > +	/*
+> > > +	 * Find up to 'max' worth of events to poll for, including the
+> > > +	 * events we already successfully polled
+> > > +	 */
+> > > +	polled = to_poll = 0;
+> > > +	list_for_each_entry(iocb, &ctx->poll_completing, ki_list) {
+> > > +		/*
+> > > +		 * Poll for needed events with spin == true, anything after
+> > > +		 * that we just check if we have more, up to max.
+> > > +		 */
+> > > +		bool spin = polled + *nr_events >= min;
+> > 
+> > I'm confused. Shouldn't spin == true if polled + *nr_events < min?
 > 
-> The final patch is the test itself.  It simply runs a job by itself to get a
-> baseline view of the disk performance.  Then it creates 2 cgroups, one fast and
-> one slow, and runs the same job simultaneously in both groups.  The result
-> should be that the fast group takes just slightly longer time than the baseline
-> (I use a 15% threshold to be safe), and that the slow one takes considerably
-> longer.  Thanks,
+> Heh, that does look off, and it is. I think the correct condition is:
+> 
+> bool spin = !polled || *nr_events < min;
+> 
+> and I'm not sure why that got broken. I just tested it, slight
+> performance win as expected correcting this. It ties in with the above
+> nr_events check - it's perfectly valid to pass min_nr == 0 and just do a
+> poll check. Conversely, if we already spun, just do non-spin checks on
+> followup poll checks.
+> 
 
-I cleaned up a ton of shellcheck warnings (from `make check`) and pushed
-to https://github.com/osandov/blktests/tree/josef. On I tested with QEMU
-on Jens' for-next branch. With an emulated NVMe device, it failed with
-"Too much of a performance drop for the protected workload". On
-virtio-blk, I hit this:
+Yep, that makes sense.
 
-[ 1843.056452] INFO: task fio:20750 blocked for more than 120 seconds.
-[ 1843.057495]       Not tainted 4.20.0-rc5-00251-g90efb26fa9a4 #19
-[ 1843.058487] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[ 1843.059769] fio             D    0 20750  20747 0x00000080
-[ 1843.060688] Call Trace:
-[ 1843.061123]  ? __schedule+0x286/0x870
-[ 1843.061735]  ? blkcg_iolatency_done_bio+0x680/0x680
-[ 1843.062574]  ? blkcg_iolatency_cleanup+0x60/0x60
-[ 1843.063347]  schedule+0x32/0x80
-[ 1843.063874]  io_schedule+0x12/0x40
-[ 1843.064449]  rq_qos_wait+0x9a/0x120
-[ 1843.065007]  ? karma_partition+0x210/0x210
-[ 1843.065661]  ? blkcg_iolatency_done_bio+0x680/0x680
-[ 1843.066435]  blkcg_iolatency_throttle+0x185/0x360
-[ 1843.067196]  __rq_qos_throttle+0x23/0x30
-[ 1843.067958]  blk_mq_make_request+0x101/0x5c0
-[ 1843.068637]  generic_make_request+0x1b3/0x3c0
-[ 1843.069329]  submit_bio+0x45/0x140
-[ 1843.069876]  blkdev_direct_IO+0x3db/0x440
-[ 1843.070527]  ? aio_complete+0x2f0/0x2f0
-[ 1843.071146]  generic_file_direct_write+0x96/0x160
-[ 1843.071880]  __generic_file_write_iter+0xb3/0x1c0
-[ 1843.072599]  ? blk_mq_dispatch_rq_list+0x3aa/0x550
-[ 1843.073340]  blkdev_write_iter+0xa0/0x120
-[ 1843.073960]  ? __fget+0x6e/0xa0
-[ 1843.074452]  aio_write+0x11f/0x1d0
-[ 1843.074979]  ? __blk_mq_run_hw_queue+0x6f/0xe0
-[ 1843.075658]  ? __check_object_size+0xa0/0x189
-[ 1843.076345]  ? preempt_count_add+0x5a/0xb0
-[ 1843.077086]  ? aio_read_events+0x259/0x380
-[ 1843.077819]  ? kmem_cache_alloc+0x16e/0x1c0
-[ 1843.078427]  io_submit_one+0x4a8/0x790
-[ 1843.078975]  ? read_events+0x76/0x150
-[ 1843.079510]  __se_sys_io_submit+0x98/0x1a0
-[ 1843.080116]  ? syscall_trace_enter+0x1d3/0x2d0
-[ 1843.080785]  do_syscall_64+0x55/0x160
-[ 1843.081404]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-[ 1843.082210] RIP: 0033:0x7f6e571fc4ed
-[ 1843.082763] Code: Bad RIP value.
-[ 1843.083268] RSP: 002b:00007ffc212b76f8 EFLAGS: 00000246 ORIG_RAX: 00000000000000d1
-[ 1843.084445] RAX: ffffffffffffffda RBX: 00007f6e4c876870 RCX: 00007f6e571fc4ed
-[ 1843.085545] RDX: 0000557c4bc11208 RSI: 0000000000000001 RDI: 00007f6e4c85e000
-[ 1843.086251] RBP: 00007f6e4c85e000 R08: 0000557c4bc2b130 R09: 00000000000002f8
-[ 1843.087308] R10: 0000557c4bbf4470 R11: 0000000000000246 R12: 0000000000000001
-[ 1843.088310] R13: 0000000000000000 R14: 0000557c4bc11208 R15: 00007f6e2b17f070
+> > > +static int __aio_iopoll_check(struct kioctx *ctx, struct io_event __user *event,
+> > > +			      unsigned int *nr_events, long min_nr, long max_nr)
+> > > +{
+> > > +	int ret = 0;
+> > > +
+> > > +	while (!*nr_events || !need_resched()) {
+> > > +		int tmin = 0;
+> > > +
+> > > +		if (*nr_events < min_nr)
+> > > +			tmin = min_nr - *nr_events;
+> > 
+> > Otherwise, shouldn't the function just return 0?
+> > 
+> > Or perhaps you explicitly want to go through the tmin==0 case
+> > in aio_iopoll_getevents if *nr_events == min_nr (or min_nr==0)?
+> 
+> No, we need to go through poll, if min_nr == 0, but only if min_nr == 0
+> and !nr_events. But we only get here for nr_events != 0, so should be
+> fine as-is.
+> 
+> Thanks for your review, very useful! I'll make the above changes right
+> now.
+> 
+
+Thanks!
+
+
+
