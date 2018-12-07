@@ -2,85 +2,112 @@ Return-Path: <SRS0=IV7O=OQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3597C04EB8
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 00:20:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 631E7C04EB8
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 00:26:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7C1EB20868
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 00:20:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C1EB20868
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+	by mail.kernel.org (Postfix) with ESMTP id 218A02083D
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 00:26:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="mAzlCfs6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 218A02083D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725958AbeLGAUi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Dec 2018 19:20:38 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:39286 "EHLO
+        id S1725952AbeLGA0x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Dec 2018 19:26:53 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:36325 "EHLO
         mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725944AbeLGAUi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Dec 2018 19:20:38 -0500
-Received: by mail-pf1-f194.google.com with SMTP id c72so992471pfc.6
-        for <linux-block@vger.kernel.org>; Thu, 06 Dec 2018 16:20:37 -0800 (PST)
+        with ESMTP id S1725945AbeLGA0x (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Dec 2018 19:26:53 -0500
+Received: by mail-pf1-f194.google.com with SMTP id b85so1007886pfc.3
+        for <linux-block@vger.kernel.org>; Thu, 06 Dec 2018 16:26:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=N2x/TesVPPmzQq1gtuw3hQ0iX66gQkj63OxfIjnWQn4=;
+        b=mAzlCfs6xnzHFH+CGeMPvMsxYHi1Yw2g9xi9ij/RUangfBSxoRXGwCHLww1MeiW08Z
+         jze/RlH99UMrv410oNnCezKU4bU1qj1q2y8yqi2SWTedlViiuN+jUkVfbdjZl3ei8Fh9
+         eS9r6d4UJOeNAwwf9uqM5AAVBqAEys7JdCDTVchHSSTsTuXHppPfp+O87hWyqTe6BSc1
+         tbpWCs5eAojumWiwsscvvVzDU1O3VVikLwpKyKG2vVrmDl60KpzCMAg56ZRHvqZgV7RP
+         nSOxs6olasvYnwUhjfqofgqXg2KFiUbMvszMw9m2Ip8rpowrA5ERRi3JuPVSJcq2k2+A
+         QcRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=FCpL2NlNlNJTgYxdgqNvRH1t7pSkO5r8/2i0e1GPM34=;
-        b=d+41P+BoQGlGUAIGon48UKcEHGcoJ/XDYGjRW/2wmkiG2Z5FtREK7bo56F4PyouYb3
-         jdqrJ9qrla1N8KRxhN/6zqQqd4nB7fL6img5g1hapOAKzclBPxUlOvTJiZL+cPjzaUUz
-         JiSz0TelNRaBTueYrSAkKnpSpNDmHdv+j2tbOe4pam2iVuNHbXgHsTU8Cz+A4uFzqY88
-         UNAUzgYemmzrV1iJO2laOKImou/vn0n7p52K6/eMY1SkpL6KBvTfKb/WcFSrClQf+CTI
-         wc3PcRItTuYQG/u0R566kPxiyJ5Wk9r+IKMPRhSAJN7uw90i0ILFeJPIYe099qvLM9Qb
-         /7zg==
-X-Gm-Message-State: AA+aEWbsf9P1oDpNkLVhDmZLTolKzvzT+HJzcU7JhSKCw+C5dGmIqnXS
-        rlqxDgLO7YJryRVMN3gSL1xV7lHB9MA=
-X-Google-Smtp-Source: AFSGD/WxuG28GC/xziaAwzGf+Pd3bTiq/MUbkP1Tyl130xgucWEsjQhoUmDOQIlGtv6YkqsY41hdlw==
-X-Received: by 2002:a62:5e41:: with SMTP id s62mr73939pfb.232.1544142036561;
-        Thu, 06 Dec 2018 16:20:36 -0800 (PST)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id s21sm3814518pfk.133.2018.12.06.16.20.35
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 06 Dec 2018 16:20:35 -0800 (PST)
-Message-ID: <1544142034.185366.293.camel@acm.org>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=N2x/TesVPPmzQq1gtuw3hQ0iX66gQkj63OxfIjnWQn4=;
+        b=T8Hx6Mnq4rUi7m5C+lhaYc33PeGzuh8G4pWhRp3v7eeQ6RzkKhvWisO+eIH0fEOJOR
+         g/uvDUeU9xdc3ZVjtcJ70marGlVDidfEfQOgnumLaluCmQGYJeU4uTG37zTS0wxSurjs
+         ACjgYYfDG7q4NANlPrqduadYP741taj/6doUIqgHGTu7fTgfQuXx6Zd0q/7RQVdk/fNs
+         ZpQz7tA37uJXwk7lZounAasJkkZ7jGbK8lhaV4y/8OvOqHhOXkDubsh1vOxF0jyngP0J
+         FWdCYllnqIaGtiy9Eqr3N8H09ni4dl34zmKH7xszKkJewGvz/rxCDP9kf+BKzCjb4xVC
+         hsVg==
+X-Gm-Message-State: AA+aEWb90bakGneS+ch9gmCewj22TrvW782EwRRWxZU9ElMdpQ+uP5Bl
+        mMVgnVZk7cwgBpQy/0QWxFUQZp2KcYY=
+X-Google-Smtp-Source: AFSGD/WSFED5eEKmmFqoyB2IU7FsBu7rlRmLMbJCn0AtAGo4+O4ZLSPP0aflHCP2AV1UPE6uqnQw+A==
+X-Received: by 2002:a63:1d1d:: with SMTP id d29mr70348pgd.49.1544142412004;
+        Thu, 06 Dec 2018 16:26:52 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id 5sm1865085pfz.149.2018.12.06.16.26.49
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 06 Dec 2018 16:26:50 -0800 (PST)
 Subject: Re: [GIT PULL] Follow up block fix
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>,
+To:     Bart Van Assche <bvanassche@acm.org>,
         Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Date:   Thu, 06 Dec 2018 16:20:34 -0800
-In-Reply-To: <fd37a010-d44e-dab7-4e39-059a339091eb@kernel.dk>
 References: <fd37a010-d44e-dab7-4e39-059a339091eb@kernel.dk>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
+ <1544142034.185366.293.camel@acm.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ee93d591-3476-dff1-590a-6ea74efd8f8b@kernel.dk>
+Date:   Thu, 6 Dec 2018 17:26:48 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+MIME-Version: 1.0
+In-Reply-To: <1544142034.185366.293.camel@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2018-12-06 at 16:59 -0700, Jens Axboe wrote:
-+AD4 Just a single followup fix to the corruption fix from yesterday. We have
-+AD4 an exported interface that does direct dispatch, with DM being the sole
-+AD4 user of it. Change that to do bypass insert always instead of attempting
-+AD4 direct dispatch. This fixes a deadlock that can happen on DM.
-+AD4 Additionally, it gets rid of any exported user of direct dispatch, and
-+AD4 enables DM to drop any BUSY handling from using the interface.
-+AD4 
-+AD4 Please pull+ACE
-+AD4 
-+AD4 
-+AD4   git://git.kernel.dk/linux-block.git tags/for-linus-20181206
+On 12/6/18 5:20 PM, Bart Van Assche wrote:
+> On Thu, 2018-12-06 at 16:59 -0700, Jens Axboe wrote:
+>> Just a single followup fix to the corruption fix from yesterday. We have
+>> an exported interface that does direct dispatch, with DM being the sole
+>> user of it. Change that to do bypass insert always instead of attempting
+>> direct dispatch. This fixes a deadlock that can happen on DM.
+>> Additionally, it gets rid of any exported user of direct dispatch, and
+>> enables DM to drop any BUSY handling from using the interface.
+>>
+>> Please pull!
+>>
+>>
+>>   git://git.kernel.dk/linux-block.git tags/for-linus-20181206
+> 
+> Hi Jens,
+> 
+> Which branch does that tag correspond to? Even after having run git fetch
+> --tags I can't find that tag in your repository.
 
-Hi Jens,
+I pushed it before I sent the email, where are you looking?
 
-Which branch does that tag correspond to? Even after having run git fetch
---tags I can't find that tag in your repository. Additionally, the patch on
-your for-linus branch is missing the +ACI-Cc: stable+ACI and +ACI-Reported-by:+ACI tags
-that you had promised to add. Did I look at the wrong branch?
+http://git.kernel.dk/cgit/linux-block/tag/?h=for-linus-20181206
 
-Thanks,
+> Additionally, the patch on your for-linus branch is missing the "Cc:
+> stable" and "Reported-by:" tags that you had promised to add. Did I
+> look at the wrong branch?
 
-Bart.
+Doh I did - Linus, I'm going to amend the commit with that info and push
+it out again, jfyi. Now done.
+
+-- 
+Jens Axboe
+
