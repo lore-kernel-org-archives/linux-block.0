@@ -2,71 +2,73 @@ Return-Path: <SRS0=IV7O=OQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,T_DKIMWL_WL_MED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,T_DKIMWL_WL_MED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2437DC07E85
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 05:17:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AF29C07E85
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 05:52:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BFA6C20882
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 05:17:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CD6720838
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 05:52:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ayGVd4vx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFA6C20882
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ADKP5zYF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CD6720838
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725948AbeLGFRu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Dec 2018 00:17:50 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:34377 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725939AbeLGFRu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Dec 2018 00:17:50 -0500
-Received: by mail-pg1-f194.google.com with SMTP id 17so1198898pgg.1
-        for <linux-block@vger.kernel.org>; Thu, 06 Dec 2018 21:17:49 -0800 (PST)
+        id S1725950AbeLGFwR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Dec 2018 00:52:17 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:36486 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725948AbeLGFwR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Dec 2018 00:52:17 -0500
+Received: by mail-pg1-f195.google.com with SMTP id n2so1229414pgm.3
+        for <linux-block@vger.kernel.org>; Thu, 06 Dec 2018 21:52:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:from:subject:cc:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=O01kHKuF7uC/rp1h0z2S7QStYwcQIS/S6iFB5OoW2qo=;
-        b=ayGVd4vxv39NFIbBSNiuZ3c59YdfmNvU5OZd+M0wOd/GXdZJde9fOMDFJbfqQ3PHLM
-         DE4ddhU4zxPADE4V3qQwT/JleFHm95sODs3k+VzYp6fZpr99S4RnIS+kB2/yKo6LdUxq
-         AvEaodOxNwQxntu8RuTsJRCGew4X8dIsqVU6WT4eNUa0z6NYu648R5YDK7oaPljH/M5r
-         fUf7H1MDers/i1eJQlRVegqyMtcn5FE9yAk0cdPE3EmvXXuPaV31PfgwN/gY/6PBDq1m
-         nvzN78hi5ylqFM3ha7iJKOXOeTwEgBR2hfezwxDnXB7SYlt4/vQkDGX6jRWyOh3Dvw3+
-         YaRw==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=n5nzNF/2QyZMAs2rXh7Oidf6VFJjE+8AAe3L1zoY1UI=;
+        b=ADKP5zYFUJerYw4Hdtf6HZSVH0Qb6Myxr7+gY29RpKKl7pzsoFQYYZ4er8TCcpcAMF
+         IJO2Lhp0YnZwA+Iq4Re7z1Y5QyyGk7hb9JOZKwEjXIwZvHxguVy5AjyoN6Ha+tip0lcb
+         K1WIpnVp6XJdnZVjnk6s1sl+oKndZubtwUXP/s4QatvaHpUzqByrkutXBaeA2IPfpPSy
+         tnie4bd7YhxR/+wTC/B9r+PmUluL2Qk/lEmzk7zcOhNus4/gaN+VXfJRszQnco03mIiN
+         a3q2Mea9GNnx/adqX3XJXazaB7e4MLbSNq6fmXuDHQ1czRJ2ct3qI2ii0eodr95nHcla
+         CQoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:from:subject:cc:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=O01kHKuF7uC/rp1h0z2S7QStYwcQIS/S6iFB5OoW2qo=;
-        b=eQkAcgDooitPBcKPkUlSME3CBiqogIWTu4n8tkVK2k6Q6DJlfuhK71Yv/pYo4H3rUN
-         f+xgEnNIP7rik7DqGsbbhGcQ0ShhsH+ht+9DdfALimsadvQ8xhfJyb1Tz67YerQTViTL
-         0szQpS/T/c/PBUZhxV5fbMwIHIKQGGsSBh6C84IesLzNU5cNkJ/55u96MnH1yuWBK/Aw
-         meyJEhhxnvdEOvbVCy7Tm6TqPYedcGkF4TJiLpkcpD3JwzqsVm7hHCJKiFjH4b7Ft2fy
-         tLkcfOYtwj2k3R4UUCKXZmJXMV6hLa/8ERNPH+dwNSj+t/mGyCvnYHJcgCMtriKcVknX
-         rmKw==
-X-Gm-Message-State: AA+aEWa5bdRiz7Kxo/eoppg+didLG6KPXyWA5ZpcNqBwopFHFnoP7K6J
-        fqdfSp5sFIM3h/uDJNE6eD1vryxYB98=
-X-Google-Smtp-Source: AFSGD/VyOsrald8vUf9cry7pc7b3XDhiiENSgzUVAPLLRrvJWdZTeU8oJYMG7vqD1+pHahnUcmYbsg==
-X-Received: by 2002:a63:bd1a:: with SMTP id a26mr743565pgf.121.1544159869352;
-        Thu, 06 Dec 2018 21:17:49 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=n5nzNF/2QyZMAs2rXh7Oidf6VFJjE+8AAe3L1zoY1UI=;
+        b=dpU7TBX5dLktEnB1o34FJ8PZZTtzxYy9PzKdBFClROiRN0vZXgSc2mJKxAfeVp8ACg
+         3AVE4lR9j0AGkbJaCR7UYbu4qWUtGuIWtTMfjJGwo2KN8oTqx7h8gjCPEQRhC8CJU6Gm
+         fF/Tiiuyx7g8I+MUHJ/7+DfFtCt86oEq0eiIU1jnQAh2+gUL07WOCPLYW/zXgikKn6lF
+         rS5/AVet5+ZszhRW60WrZjx/gNTPUlPrxVj4F/MA6cHc1C5caro6x5W3urCV36mrEqwB
+         DvWNNLmsRMMKV6jG305MAhx6OJcaxe9auHwURU9KkGqQspLf79YNTR4rGTpAoD+y8uNW
+         kpyQ==
+X-Gm-Message-State: AA+aEWa6fJv2u8YRHbV9HOuehCMCBf3ElERZ0VzTNEBBfcyZQuii1E6A
+        9t2M24AUt02cWA1OqAWQsmKWUg==
+X-Google-Smtp-Source: AFSGD/W85B48QGTC83GsVhJYUIjov+7jRns2zqJnZsfgZJtL+a2L4d+KG19a6Lw3CJDwrEzoHReGyQ==
+X-Received: by 2002:a63:b218:: with SMTP id x24mr777651pge.223.1544161935921;
+        Thu, 06 Dec 2018 21:52:15 -0800 (PST)
 Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id a90sm4105137pfj.109.2018.12.06.21.17.46
+        by smtp.gmail.com with ESMTPSA id t67sm3518995pfd.90.2018.12.06.21.52.14
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 06 Dec 2018 21:17:47 -0800 (PST)
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Thu, 06 Dec 2018 21:52:14 -0800 (PST)
+Subject: Re: [PATCH V2] blk-mq: re-build queue map in case of kdump kernel
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        linux-nvme@lists.infradead.org, David Milburn <dmilburn@redhat.com>
+References: <20181207030353.27575-1-ming.lei@redhat.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v3] blk-mq: punt failed direct issue to dispatch list
-Cc:     Mike Snitzer <snitzer@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>
-Message-ID: <aa6abfa7-30c3-57d7-7369-754d514584f5@kernel.dk>
-Date:   Thu, 6 Dec 2018 22:17:44 -0700
+Message-ID: <cd0c4c59-fd9a-aebe-5f25-aa02878f66ad@kernel.dk>
+Date:   Thu, 6 Dec 2018 22:52:12 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
+In-Reply-To: <20181207030353.27575-1-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,127 +77,69 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-After the direct dispatch corruption fix, we permanently disallow direct
-dispatch of non read/write requests. This works fine off the normal IO
-path, as they will be retried like any other failed direct dispatch
-request. But for the blk_insert_cloned_request() that only DM uses to
-bypass the bottom level scheduler, we always first attempt direct
-dispatch. For some types of requests, that's now a permanent failure,
-and no amount of retrying will make that succeed. This results in a
-livelock.
+On 12/6/18 8:03 PM, Ming Lei wrote:
+> Now almost all .map_queues() implementation based on managed irq
+> affinity doesn't update queue mapping and it just retrieves the
+> old built mapping, so if nr_hw_queues is changed, the mapping talbe
+> includes stale mapping. And only blk_mq_map_queues() may rebuild
+> the mapping talbe.
+> 
+> One case is that we limit .nr_hw_queues as 1 in case of kdump kernel.
+> However, drivers often builds queue mapping before allocating tagset
+> via pci_alloc_irq_vectors_affinity(), but set->nr_hw_queues can be set
+> as 1 in case of kdump kernel, so wrong queue mapping is used, and
+> kernel panic[1] is observed during booting.
+> 
+> This patch fixes the kernel panic triggerd on nvme by rebulding the
+> mapping table via blk_mq_map_queues().
+> 
+> [1] kernel panic log
+> [    4.438371] nvme nvme0: 16/0/0 default/read/poll queues
+> [    4.443277] BUG: unable to handle kernel NULL pointer dereference at 0000000000000098
+> [    4.444681] PGD 0 P4D 0
+> [    4.445367] Oops: 0000 [#1] SMP NOPTI
+> [    4.446342] CPU: 3 PID: 201 Comm: kworker/u33:10 Not tainted 4.20.0-rc5-00664-g5eb02f7ee1eb-dirty #459
+> [    4.447630] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.10.2-2.fc27 04/01/2014
+> [    4.448689] Workqueue: nvme-wq nvme_scan_work [nvme_core]
+> [    4.449368] RIP: 0010:blk_mq_map_swqueue+0xfb/0x222
+> [    4.450596] Code: 04 f5 20 28 ef 81 48 89 c6 39 55 30 76 93 89 d0 48 c1 e0 04 48 03 83 f8 05 00 00 48 8b 00 42 8b 3c 28 48 8b 43 58 48 8b 04 f8 <48> 8b b8 98 00 00 00 4c 0f a3 37 72 42 f0 4c 0f ab 37 66 8b b8 f6
+> [    4.453132] RSP: 0018:ffffc900023b3cd8 EFLAGS: 00010286
+> [    4.454061] RAX: 0000000000000000 RBX: ffff888174448000 RCX: 0000000000000001
+> [    4.456480] RDX: 0000000000000001 RSI: ffffe8feffc506c0 RDI: 0000000000000001
+> [    4.458750] RBP: ffff88810722d008 R08: ffff88817647a880 R09: 0000000000000002
+> [    4.464580] R10: ffffc900023b3c10 R11: 0000000000000004 R12: ffff888174448538
+> [    4.467803] R13: 0000000000000004 R14: 0000000000000001 R15: 0000000000000001
+> [    4.469220] FS:  0000000000000000(0000) GS:ffff88817bac0000(0000) knlGS:0000000000000000
+> [    4.471554] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [    4.472464] CR2: 0000000000000098 CR3: 0000000174e4e001 CR4: 0000000000760ee0
+> [    4.474264] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> [    4.476007] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> [    4.477061] PKRU: 55555554
+> [    4.477464] Call Trace:
+> [    4.478731]  blk_mq_init_allocated_queue+0x36a/0x3ad
+> [    4.479595]  blk_mq_init_queue+0x32/0x4e
+> [    4.480178]  nvme_validate_ns+0x98/0x623 [nvme_core]
+> [    4.480963]  ? nvme_submit_sync_cmd+0x1b/0x20 [nvme_core]
+> [    4.481685]  ? nvme_identify_ctrl.isra.8+0x70/0xa0 [nvme_core]
+> [    4.482601]  nvme_scan_work+0x23a/0x29b [nvme_core]
+> [    4.483269]  ? _raw_spin_unlock_irqrestore+0x25/0x38
+> [    4.483930]  ? try_to_wake_up+0x38d/0x3b3
+> [    4.484478]  ? process_one_work+0x179/0x2fc
+> [    4.485118]  process_one_work+0x1d3/0x2fc
+> [    4.485655]  ? rescuer_thread+0x2ae/0x2ae
+> [    4.486196]  worker_thread+0x1e9/0x2be
+> [    4.486841]  kthread+0x115/0x11d
+> [    4.487294]  ? kthread_park+0x76/0x76
+> [    4.487784]  ret_from_fork+0x3a/0x50
+> [    4.488322] Modules linked in: nvme nvme_core qemu_fw_cfg virtio_scsi ip_tables
+> [    4.489428] Dumping ftrace buffer:
+> [    4.489939]    (ftrace buffer empty)
+> [    4.490492] CR2: 0000000000000098
+> [    4.491052] ---[ end trace 03cd268ad5a86ff7 ]---
 
-Instead of making special cases for what we can direct issue, and now
-having to deal with DM solving the livelock while still retaining a BUSY
-condition feedback loop, always just add a request that has been through
-->queue_rq() to the hardware queue dispatch list. These are safe to use
-as no merging can take place there. Additionally, if requests do have
-prepped data from drivers, we aren't dependent on them not sharing space
-in the request structure to safely add them to the IO scheduler lists.
-
-This basically reverts ffe81d45322c and is based on a patch from Ming,
-but with the list insert case covered as well.
-
-Fixes: ffe81d45322c ("blk-mq: fix corruption with direct issue")
-Cc: stable@vger.kernel.org
-Suggested-by: Ming Lei <ming.lei@redhat.com>
-Reported-by: Bart Van Assche <bvanassche@acm.org>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
----
-
-I've thrown the initial hang test reported by Bart at it, works fine.
-My reproducer for the corruption case is also happy, as expected.
-
-I'm running blktests and xfstests on it overnight. If that passes as
-expected, this qualms my initial worries on using ->dispatch as a
-holding place for these types of requests.
-
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3262d83b9e07..6a7566244de3 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1715,15 +1715,6 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		break;
- 	case BLK_STS_RESOURCE:
- 	case BLK_STS_DEV_RESOURCE:
--		/*
--		 * If direct dispatch fails, we cannot allow any merging on
--		 * this IO. Drivers (like SCSI) may have set up permanent state
--		 * for this request, like SG tables and mappings, and if we
--		 * merge to it later on then we'll still only do IO to the
--		 * original part.
--		 */
--		rq->cmd_flags |= REQ_NOMERGE;
--
- 		blk_mq_update_dispatch_busy(hctx, true);
- 		__blk_mq_requeue_request(rq);
- 		break;
-@@ -1736,18 +1727,6 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	return ret;
- }
- 
--/*
-- * Don't allow direct dispatch of anything but regular reads/writes,
-- * as some of the other commands can potentially share request space
-- * with data we need for the IO scheduler. If we attempt a direct dispatch
-- * on those and fail, we can't safely add it to the scheduler afterwards
-- * without potentially overwriting data that the driver has already written.
-- */
--static bool blk_rq_can_direct_dispatch(struct request *rq)
--{
--	return req_op(rq) == REQ_OP_READ || req_op(rq) == REQ_OP_WRITE;
--}
--
- static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 						struct request *rq,
- 						blk_qc_t *cookie,
-@@ -1769,7 +1748,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 		goto insert;
- 	}
- 
--	if (!blk_rq_can_direct_dispatch(rq) || (q->elevator && !bypass_insert))
-+	if (q->elevator && !bypass_insert)
- 		goto insert;
- 
- 	if (!blk_mq_get_dispatch_budget(hctx))
-@@ -1785,7 +1764,7 @@ static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	if (bypass_insert)
- 		return BLK_STS_RESOURCE;
- 
--	blk_mq_sched_insert_request(rq, false, run_queue, false);
-+	blk_mq_request_bypass_insert(rq, run_queue);
- 	return BLK_STS_OK;
- }
- 
-@@ -1801,7 +1780,7 @@ static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 
- 	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false);
- 	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
--		blk_mq_sched_insert_request(rq, false, true, false);
-+		blk_mq_request_bypass_insert(rq, true);
- 	else if (ret != BLK_STS_OK)
- 		blk_mq_end_request(rq, ret);
- 
-@@ -1831,15 +1810,13 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 		struct request *rq = list_first_entry(list, struct request,
- 				queuelist);
- 
--		if (!blk_rq_can_direct_dispatch(rq))
--			break;
--
- 		list_del_init(&rq->queuelist);
- 		ret = blk_mq_request_issue_directly(rq);
- 		if (ret != BLK_STS_OK) {
- 			if (ret == BLK_STS_RESOURCE ||
- 					ret == BLK_STS_DEV_RESOURCE) {
--				list_add(&rq->queuelist, list);
-+				blk_mq_request_bypass_insert(rq,
-+							list_empty(list));
- 				break;
- 			}
- 			blk_mq_end_request(rq, ret);
-
+Works for me, tested various configs and stubbed out the kdump check.
+Thanks for fixing this, applied to 4.21.
 
 -- 
 Jens Axboe
+
