@@ -2,174 +2,160 @@ Return-Path: <SRS0=IV7O=OQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B00CC04EB8
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 02:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EFCFC04EB8
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 02:55:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF3402064D
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 02:49:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="GxTDvCoZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF3402064D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	by mail.kernel.org (Postfix) with ESMTP id EBEC02083D
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 02:55:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBEC02083D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725948AbeLGCtS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Dec 2018 21:49:18 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:40946 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725939AbeLGCtS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Dec 2018 21:49:18 -0500
-Received: by mail-pf1-f195.google.com with SMTP id i12so1166689pfo.7
-        for <linux-block@vger.kernel.org>; Thu, 06 Dec 2018 18:49:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=5Uvgn4H5n0U/MFNF2f3JHsp2q+/zeP8MnrxaKTKWNrk=;
-        b=GxTDvCoZzelywLDB26TK9OCniVpt1Boqv4ILIatSt2nqU980zyrFXNXht2+KcMIJSR
-         Vo1DH2GXkiA73rn6NRBtgldhKKEAZr4iPrFB12Wh6nIh93mvYpRNU3GXZuBvkl+U03Aj
-         ttWsaDQUP/Hm7HZxfqobEUsrONho4jnayBXCjyz4jVuA2454tK7UCMs/M0c8Hd+oLPgu
-         j6tj9dG54eFUO0FkgKe7KmnP2Ssdp96GckhUhAgxiZ7sGcm1Sg8j57iKU2DU139TKPWQ
-         0SVpMkfXoQf6AIglK0H0+WIQeb6TmJltnjvBi+EvMPsQ+QdCxTVe9uohMt+NHEZP2Jyd
-         TI0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=5Uvgn4H5n0U/MFNF2f3JHsp2q+/zeP8MnrxaKTKWNrk=;
-        b=SPXpZVR4ZwU3pacO3tEK2L2QiAZkdL5ZTEmX2yOi6s/AswLv+4klJTI9dEfQwaDa96
-         4lXPZo4fx3qQA3+ymFcjj+Fsyf8zc/XwKMgpQLyWvTzj26c03iBfVMCo/62fyjLdVkEQ
-         VHBGIhZuPJ93eDnPwvrgwuqbYARESEn5x+9QeKMqAukpkn8ysapk/y5LwEG6iv2s2osv
-         bkYNIGzhqzKAl6E2goW90SU4TJh0Td8GmXHrLzR+dhUzKQhsjHT5z/09JEuiWj0TsmKE
-         bxf+H+JwsPFC6t5DwYML5b84idSrwji/Zz5oJt/p9zANK5hfsgCPXtRseGxsjzVBEX3Q
-         Pxjw==
-X-Gm-Message-State: AA+aEWZg0H6xFopZuA5mfDgxhPKBFRYj8KkQwC32BXvpEg0C6Dt9xWkp
-        FeHk8+9QPvDRts46292gFKQ78AlDINo=
-X-Google-Smtp-Source: AFSGD/W7yDty2i3j3aE9W+dFYtu0z+ZeeeV/4f48jnJBivk0dep8xoBesWtnSacVKv7kI0TAuhS59Q==
-X-Received: by 2002:a62:442:: with SMTP id 63mr525424pfe.156.1544150957143;
-        Thu, 06 Dec 2018 18:49:17 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id w10sm2130725pgi.81.2018.12.06.18.49.15
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 06 Dec 2018 18:49:15 -0800 (PST)
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     Mike Snitzer <snitzer@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2] block/dm: fix handling of busy off direct dispatch path
-Message-ID: <e6024b99-579a-ce20-ca3a-a9983582ea36@kernel.dk>
-Date:   Thu, 6 Dec 2018 19:49:14 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1725948AbeLGCze (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Dec 2018 21:55:34 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50326 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725939AbeLGCze (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 6 Dec 2018 21:55:34 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 67A64307DA35;
+        Fri,  7 Dec 2018 02:55:33 +0000 (UTC)
+Received: from localhost (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F1C515C1A1;
+        Fri,  7 Dec 2018 02:55:29 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
+        David Milburn <dmilburn@redhat.com>
+Subject: [PATCH] blk-mq: re-build queue map in case of kdump kernel
+Date:   Fri,  7 Dec 2018 10:55:23 +0800
+Message-Id: <20181207025523.22703-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Fri, 07 Dec 2018 02:55:33 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-After the direct dispatch corruption fix, we permanently disallow direct
-dispatch of non read/write requests. This works fine off the normal IO
-path, as they will be retried like any other failed direct dispatch
-request. But for the blk_insert_cloned_request() that only DM uses to
-bypass the bottom level scheduler, we always first attempt direct
-dispatch. For some types of requests, that's now a permanent failure,
-and no amount of retrying will make that succeed.
+Now almost all .map_queues() implementation based on managed irq
+affinity doesn't update queue mapping and it just retrieves the
+old built mapping, so if nr_hw_queues is changed, the mapping talbe
+includes stale mapping. And only blk_mq_map_queues() may rebuild
+the mapping talbe.
 
-Use the driver private RQF_DONTPREP to track this condition in DM. If
-we encounter a BUSY condition from blk_insert_cloned_request(), then
-flag the request with RQF_DONTPREP. When we next time see this request,
-ask blk_insert_cloned_request() to bypass insert the request directly.
-This avoids the livelock of repeatedly trying to direct dispatch a
-request, while still retaining the BUSY feedback loop for blk-mq so
-that we don't over-dispatch to the lower level queue and mess up
-opportunities for merging on the DM queue.
+One case is that we limit .nr_hw_queues as 1 in case of kdump kernel.
+However, drivers often builds queue mapping before allocating tagset
+via pci_alloc_irq_vectors_affinity(), but set->nr_hw_queues can be set
+as 1 in case of kdump kernel, so wrong queue mapping is used, and
+kernel panic[1] is observed during booting.
 
-Fixes: ffe81d45322c ("blk-mq: fix corruption with direct issue")
-Reported-by: Bart Van Assche <bvanassche@acm.org>
-Cc: stable@vger.kernel.org
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+This patch fixes the kernel panic triggerd on nvme by rebulding the
+mapping table via blk_mq_map_queues().
 
+[1] kernel panic log
+[    4.438371] nvme nvme0: 16/0/0 default/read/poll queues
+[    4.443277] BUG: unable to handle kernel NULL pointer dereference at 0000000000000098
+[    4.444681] PGD 0 P4D 0
+[    4.445367] Oops: 0000 [#1] SMP NOPTI
+[    4.446342] CPU: 3 PID: 201 Comm: kworker/u33:10 Not tainted 4.20.0-rc5-00664-g5eb02f7ee1eb-dirty #459
+[    4.447630] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.10.2-2.fc27 04/01/2014
+[    4.448689] Workqueue: nvme-wq nvme_scan_work [nvme_core]
+[    4.449368] RIP: 0010:blk_mq_map_swqueue+0xfb/0x222
+[    4.450596] Code: 04 f5 20 28 ef 81 48 89 c6 39 55 30 76 93 89 d0 48 c1 e0 04 48 03 83 f8 05 00 00 48 8b 00 42 8b 3c 28 48 8b 43 58 48 8b 04 f8 <48> 8b b8 98 00 00 00 4c 0f a3 37 72 42 f0 4c 0f ab 37 66 8b b8 f6
+[    4.453132] RSP: 0018:ffffc900023b3cd8 EFLAGS: 00010286
+[    4.454061] RAX: 0000000000000000 RBX: ffff888174448000 RCX: 0000000000000001
+[    4.456480] RDX: 0000000000000001 RSI: ffffe8feffc506c0 RDI: 0000000000000001
+[    4.458750] RBP: ffff88810722d008 R08: ffff88817647a880 R09: 0000000000000002
+[    4.464580] R10: ffffc900023b3c10 R11: 0000000000000004 R12: ffff888174448538
+[    4.467803] R13: 0000000000000004 R14: 0000000000000001 R15: 0000000000000001
+[    4.469220] FS:  0000000000000000(0000) GS:ffff88817bac0000(0000) knlGS:0000000000000000
+[    4.471554] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    4.472464] CR2: 0000000000000098 CR3: 0000000174e4e001 CR4: 0000000000760ee0
+[    4.474264] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[    4.476007] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[    4.477061] PKRU: 55555554
+[    4.477464] Call Trace:
+[    4.478731]  blk_mq_init_allocated_queue+0x36a/0x3ad
+[    4.479595]  blk_mq_init_queue+0x32/0x4e
+[    4.480178]  nvme_validate_ns+0x98/0x623 [nvme_core]
+[    4.480963]  ? nvme_submit_sync_cmd+0x1b/0x20 [nvme_core]
+[    4.481685]  ? nvme_identify_ctrl.isra.8+0x70/0xa0 [nvme_core]
+[    4.482601]  nvme_scan_work+0x23a/0x29b [nvme_core]
+[    4.483269]  ? _raw_spin_unlock_irqrestore+0x25/0x38
+[    4.483930]  ? try_to_wake_up+0x38d/0x3b3
+[    4.484478]  ? process_one_work+0x179/0x2fc
+[    4.485118]  process_one_work+0x1d3/0x2fc
+[    4.485655]  ? rescuer_thread+0x2ae/0x2ae
+[    4.486196]  worker_thread+0x1e9/0x2be
+[    4.486841]  kthread+0x115/0x11d
+[    4.487294]  ? kthread_park+0x76/0x76
+[    4.487784]  ret_from_fork+0x3a/0x50
+[    4.488322] Modules linked in: nvme nvme_core qemu_fw_cfg virtio_scsi ip_tables
+[    4.489428] Dumping ftrace buffer:
+[    4.489939]    (ftrace buffer empty)
+[    4.490492] CR2: 0000000000000098
+[    4.491052] ---[ end trace 03cd268ad5a86ff7 ]---
+
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: linux-nvme@lists.infradead.org
+Cc: David Milburn <dmilburn@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
+ block/blk-mq.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-This passes my testing as well, like the previous patch. But unlike the
-previous patch, we retain the BUSY feedback loop information for better
-merging.
-
-diff --git a/block/blk-core.c b/block/blk-core.c
-index deb56932f8c4..cccda51e165f 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -2617,7 +2617,8 @@ static int blk_cloned_rq_check_limits(struct request_queue *q,
-  * @q:  the queue to submit the request
-  * @rq: the request being queued
-  */
--blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *rq)
-+blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *rq,
-+				       bool force_insert)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 900550594651..a3e463a726a6 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -38,6 +38,11 @@
+ #include "blk-mq-sched.h"
+ #include "blk-rq-qos.h"
+ 
++static inline bool blk_mq_kdump_kernel(void)
++{
++	return !!is_kdump_kernel();
++}
++
+ static void blk_mq_poll_stats_start(struct request_queue *q);
+ static void blk_mq_poll_stats_fn(struct blk_stat_callback *cb);
+ 
+@@ -2960,7 +2965,7 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
+ 
+ static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
  {
- 	unsigned long flags;
- 	int where = ELEVATOR_INSERT_BACK;
-@@ -2637,7 +2638,11 @@ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *
- 		 * bypass a potential scheduler on the bottom device for
- 		 * insert.
- 		 */
--		return blk_mq_request_issue_directly(rq);
-+		if (force_insert) {
-+			blk_mq_request_bypass_insert(rq, true);
-+			return BLK_STS_OK;
-+		} else
-+			return blk_mq_request_issue_directly(rq);
+-	if (set->ops->map_queues) {
++	if (set->ops->map_queues && !blk_mq_kdump_kernel()) {
+ 		int i;
+ 
+ 		/*
+@@ -3028,8 +3033,9 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ 	 * memory constrained environment. Limit us to 1 queue and
+ 	 * 64 tags to prevent using too much memory.
+ 	 */
+-	if (is_kdump_kernel()) {
++	if (blk_mq_kdump_kernel()) {
+ 		set->nr_hw_queues = 1;
++		set->nr_maps = 1;
+ 		set->queue_depth = min(64U, set->queue_depth);
+ 	}
+ 	/*
+@@ -3051,7 +3057,7 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
+ 						  GFP_KERNEL, set->numa_node);
+ 		if (!set->map[i].mq_map)
+ 			goto out_free_mq_map;
+-		set->map[i].nr_queues = set->nr_hw_queues;
++		set->map[i].nr_queues = blk_mq_kdump_kernel() ? 1 : set->nr_hw_queues;
  	}
  
- 	spin_lock_irqsave(q->queue_lock, flags);
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 7cd36e4d1310..e497a2ab6766 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -299,16 +299,20 @@ static void end_clone_request(struct request *clone, blk_status_t error)
- 
- static blk_status_t dm_dispatch_clone_request(struct request *clone, struct request *rq)
- {
-+	bool was_busy = (rq->rq_flags & RQF_DONTPREP) != 0;
- 	blk_status_t r;
- 
- 	if (blk_queue_io_stat(clone->q))
- 		clone->rq_flags |= RQF_IO_STAT;
- 
- 	clone->start_time_ns = ktime_get_ns();
--	r = blk_insert_cloned_request(clone->q, clone);
--	if (r != BLK_STS_OK && r != BLK_STS_RESOURCE && r != BLK_STS_DEV_RESOURCE)
-+	r = blk_insert_cloned_request(clone->q, clone, was_busy);
-+	if (r == BLK_STS_RESOURCE || r == BLK_STS_DEV_RESOURCE)
-+		rq->rq_flags |= RQF_DONTPREP;
-+	else if (r != BLK_STS_OK)
- 		/* must complete clone in terms of original request */
- 		dm_complete_request(rq, r);
-+
- 	return r;
- }
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4293dc1cd160..7cb84ee4c9f4 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -994,7 +994,7 @@ extern int blk_rq_prep_clone(struct request *rq, struct request *rq_src,
- 			     void *data);
- extern void blk_rq_unprep_clone(struct request *rq);
- extern blk_status_t blk_insert_cloned_request(struct request_queue *q,
--				     struct request *rq);
-+				     struct request *rq, bool force_insert);
- extern int blk_rq_append_bio(struct request *rq, struct bio **bio);
- extern void blk_delay_queue(struct request_queue *, unsigned long);
- extern void blk_queue_split(struct request_queue *, struct bio **);
-
+ 	ret = blk_mq_update_queue_map(set);
 -- 
-Jens Axboe
+2.9.5
 
