@@ -2,97 +2,74 @@ Return-Path: <SRS0=IV7O=OQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,T_DKIMWL_WL_MED,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3800C07E85
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 19:35:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E71DC07E85
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 19:43:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A3CE320673
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 19:35:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2AFEE20672
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 19:43:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="dyt3a3Eh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3CE320673
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="TWAClJXv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AFEE20672
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726041AbeLGTf3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Dec 2018 14:35:29 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:36216 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726045AbeLGTf2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Dec 2018 14:35:28 -0500
-Received: by mail-io1-f68.google.com with SMTP id m19so4188021ioh.3
-        for <linux-block@vger.kernel.org>; Fri, 07 Dec 2018 11:35:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=K4l7L3ZNooP4lgmIIi4OTHswBDQz9mJFgir2ZJPB+iI=;
-        b=dyt3a3EhJiTu31+BNukr/NdVc1Gr3C9TBQ85XpnxQ/vte31UnCpHoPXOHixiwWQ/5+
-         bbTupeXPW1Jb9A2EY8Shn5lLTXNkjW+C+9f6SwtG+ndu+bZHMIC+rKKnsKP5/rGtSC0Q
-         r2tjxsn3BGiw+kk3bQXvBlsk51QXroHgwZYuz2ps4EUVNor06r3G9XCd4fmrGCUlq1iM
-         EOJ2vME64jogyvIaN7y4EFrQRk5iDlu8uZMT2+VDrRHYC5S8Xdh0VrMsRtg4kNUrTpN3
-         fEE8WUcAbOWQ6ALAdoq5T9QukwyR7/g9RpILxy1w+Tp1dvxZCyzXmynviGfyjyFYbKxR
-         f+hA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=K4l7L3ZNooP4lgmIIi4OTHswBDQz9mJFgir2ZJPB+iI=;
-        b=LudSmHVDadkxdVqiUG+3+uHZsYuSL71IuoA+/dvCbhVCOeAA6+u3oY5Vt+WkfYkwt3
-         Ua73e76+1/wVOsMjWbhliTJg4QayopG7wiFsJ+RfIA33opl2sacDFE7YRU56Jkp3cH4c
-         ccgzcmwS9qLR1xOAciq/TsFxePlUs831L2iDxWS6wdWd1ubR7sciDz0T6r2J/Ipp0iXY
-         6AsSpchTMm30sXTq2WUTiIPAfDmvnp46Wj2Ve+cuxUECCsXl5tW8v9EuXwLbwJC8+NZq
-         sXg7WuXe2oT9sIK3G31cdqr/PhxZz4lcesPtBAgduEPGSYoULkesFgeJ5fWRvRMTyD99
-         w4ng==
-X-Gm-Message-State: AA+aEWZ3SsOkD8T6VkT4S6YEf98CSJwRWEXLCHhAnwIRQ08PqTiPqDhV
-        b/M5eazG5b2+1GZ5FF6RMmDVEA==
-X-Google-Smtp-Source: AFSGD/VxCWlFG2EbVYmmj/5rTYqbCkqh4TkZq/1pwD4zdSPWhUXc+fU9J1F8u75Apzg5/74NNFWq1w==
-X-Received: by 2002:a6b:38c3:: with SMTP id f186mr2703082ioa.186.1544211327407;
-        Fri, 07 Dec 2018 11:35:27 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id r15sm1674067ioh.12.2018.12.07.11.35.25
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 07 Dec 2018 11:35:26 -0800 (PST)
-Subject: Re: [PATCHSET v5] Support for polled aio
-To:     Jeff Moyer <jmoyer@redhat.com>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-aio@kvack.org, hch@lst.de
-References: <20181204233729.26776-1-axboe@kernel.dk>
- <x49muphrx4u.fsf@segfault.boston.devel.redhat.com>
- <4bf3dfe4-b157-88b6-f9a3-60ad1f76328a@kernel.dk>
- <9747f14b-8361-08c0-5a1f-d4f26509083e@kernel.dk>
- <x49a7lhrv0x.fsf@segfault.boston.devel.redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <650ef685-0727-aaf4-aff5-adf11c06f3fa@kernel.dk>
-Date:   Fri, 7 Dec 2018 12:35:25 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726061AbeLGTnW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Dec 2018 14:43:22 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:43804 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726053AbeLGTnW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Dec 2018 14:43:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=xrlUeBG9RxpToZxxkwQB1g05pKAVkCJc/pXEr8EWaqE=; b=TWAClJXv1OT0Rn3BDfECrsbum
+        5CXQEgV8UwFGGgL6XaZmvlHm1xuyTuhrpPBYS2YvIgI51gFAQXkE55Lg3SXgHeI1OYc+QLfEFgiZW
+        ShHSN9cYolqhNoxNbOvx5KpLShQpKPIgpdE8IDSV0yS8DITlFYTds5zf9i8cI9p5yA9x2W9NAN8EG
+        9s9AE1GPqW44F5VGPs6WKpFxa+qwJOMmjPZz4IhqUlNkgp7Oetv5fHooM5wgmVpkfuIEczKDgm7xH
+        FStq3ABSPDK7baCPu8J56NtC9d1CQJZxSY9dyhlGQ6KbLbwS2lS3xeD6xKrV/MfEMRgMb9w9G+nu1
+        9YC0kUz1w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gVM1w-0003n7-5Z; Fri, 07 Dec 2018 19:43:20 +0000
+Date:   Fri, 7 Dec 2018 11:43:20 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Eric Wheeler <dm-devel@lists.ewheeler.net>, dm-devel@redhat.com
+Subject: Re: [dm-devel] [PATCH] dm crypt: fix lost ioprio when queuing crypto
+ bios from task with ioprio
+Message-ID: <20181207194319.GA1690@infradead.org>
+References: <20181206221507.5423-1-snitzer@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <x49a7lhrv0x.fsf@segfault.boston.devel.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181206221507.5423-1-snitzer@redhat.com>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/7/18 12:34 PM, Jeff Moyer wrote:
-> Jens Axboe <axboe@kernel.dk> writes:
+On Thu, Dec 06, 2018 at 05:15:07PM -0500, Mike Snitzer wrote:
+> From: Eric Wheeler <dm-devel@lists.ewheeler.net>
 > 
->> BTW, quick guess is that it doesn't work so well with fixed buffers, as that
->> hasn't been tested. You could try and remove IOCTX_FLAG_FIXEDBUFS from the
->> test program and see if that works.
+> Since dm-crypt queues writes (and sometimes reads) to a different kernel
+> thread (workqueue), the bios will dispatch from tasks with different
+> io_context->ioprio settings than the submitting task, thus giving
+> incorrect ioprio hints to the io scheduler.
 > 
-> That results in a NULL pointer dereference.  I'll stick to block device
-> testing for now.  :)
+> By assigning the ioprio to the bio before queuing to a workqueue, the
+> original submitting task's io_context->ioprio setting can be retained
+> through the life of the bio.  We only set the bio's ioprio in dm-crypt
+> if not already set (by somewhere else, higher in the stack).
 
-Good plan :-)
-
--- 
-Jens Axboe
-
+The scheme looks a little odd to me.  Instead of requring a driver
+call why don't we just make sure bios always have the submitting
+tasks priority set and then make sure the lower layers can rely on it?
