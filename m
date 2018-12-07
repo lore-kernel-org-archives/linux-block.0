@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,T_DKIMWL_WL_MED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01E86C64EB1
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 22:21:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A15F5C64EB1
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 22:21:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B859920892
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 22:21:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4EADE2083D
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 22:21:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Gt+cLwFN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B859920892
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="pzw7xpgV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EADE2083D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726186AbeLGWVH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Dec 2018 17:21:07 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:36545 "EHLO
+        id S1726079AbeLGWVK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Dec 2018 17:21:10 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:32848 "EHLO
         mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726079AbeLGWVH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Dec 2018 17:21:07 -0500
-Received: by mail-pg1-f195.google.com with SMTP id n2so2304856pgm.3
-        for <linux-block@vger.kernel.org>; Fri, 07 Dec 2018 14:21:07 -0800 (PST)
+        with ESMTP id S1726084AbeLGWVK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Dec 2018 17:21:10 -0500
+Received: by mail-pg1-f195.google.com with SMTP id z11so2311708pgu.0
+        for <linux-block@vger.kernel.org>; Fri, 07 Dec 2018 14:21:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=zZOhdIxDv845Z5UGbqrPoX9bgWw6pO6TACmobM92btU=;
-        b=Gt+cLwFNRr/dysEZCzTM6TPJiwZNvTwtB4Xh018YTEXkxA+2F37y7wHOwmDUtZX5gP
-         gwiRDSwHdBtePJzEw1g+k8yQvh3RyCCe2NeM84P8EsuAz3ZIyYNXN3sB8HGGJ8fI8cAT
-         R0/8J6ZPIVOJG5O49OA7mhFHnhr98Csic4Z0oVg6vtQftvflCZfxBysP0yot44n918tW
-         aZyUVKqI2gVygxqNK+7AHh+AZ5eQj3Vbpcd8p/ohcCbB81fml2oq0eEBN5CU9Wx5ldOa
-         3Shdcf9iTgvhd269kQH004joXIGhejhRWESViADsX06dpGvg6bij2O4QUdN96ZVRXbi7
-         7xMQ==
+        bh=WVJDSRBfflF2eLtTWuUce/zNx6uF2Wx4FI1yEsGrNKo=;
+        b=pzw7xpgVkFcKpoXZq4sDn/6BsTPt28YQGtAs1Y+fI6et8opj9meVNoc0Rj8Z8sET7q
+         wjKm7krfysOJEnlWGHO0lL3SvzdnDrMsqPNCrz64NJBNNtVo6/jNjx651IDVnu51Kqpz
+         nvSLEkYZ9zHieGulY9Qm3EMUmbdu6pNCX/QjmFlXW33UD0uvA1a6VvIP+G9ipPcy2zdm
+         Lpx9cki/Nwc+FA53zKRUcMSSWxKa0ENBJnSAXj9ilbkfWn142Y155WSdpUvErkYKOdD0
+         INtogt0IwkH1ushM2x8B19/Y5yYqUfyI98dz43YUwHMbuIXJGwq2n1e+G/CxIsugRSw6
+         RqNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=zZOhdIxDv845Z5UGbqrPoX9bgWw6pO6TACmobM92btU=;
-        b=HTJqFVVPcCozojPkVF+nxwcEsjZidENu8G0mvQIa2tApUoa7xcNzZNczUTKpQS7dfY
-         paP/TBwJooLuxpNPEGnosCmwkZRNOxwW2YKzVuD+BnYyX12jsKyAAQhFXL3DvTTm13NP
-         Zk32rS8oX/QOIfyqgixi3DoX0BbTzhGiX7CV/jFAXETnRB3Kf9kkbMGF7V7IEda4DvX8
-         zbRSEHH3I3UDwl6iCHgUdoG89xJkqgH+Yx7tLMjSNKhWitDmqJ/qZ+QcELjQN2s3K0Uu
-         a0VKqiCzmC2mQinIxBS8i5opr0/H1egfrqLIpxTJ7Nnk+cANvkvNScFbKEHGdGq9eOuO
-         COSA==
-X-Gm-Message-State: AA+aEWYT2VPUXQcT4A8OsF7wSxB1AQWxqcRb1pzTZoCL6dyJPihQkW3X
-        gIM7HUQsb4WVZhIl0cvLXoC+8mREgOk=
-X-Google-Smtp-Source: AFSGD/XQyaNZ+KKTfKQw11gP0/tK020TnPXRjvGY3CuEn3DK8mPYCRZTusMLG6nOHrj372wK6sU0yA==
-X-Received: by 2002:a62:1a44:: with SMTP id a65mr4074933pfa.30.1544221266362;
-        Fri, 07 Dec 2018 14:21:06 -0800 (PST)
+        bh=WVJDSRBfflF2eLtTWuUce/zNx6uF2Wx4FI1yEsGrNKo=;
+        b=M4RmqWsYEGS1CiqDyQsEADAkmQChdkxAZXFsw/drZVW3qs9QfN4K6qXb7TgPm1Wtin
+         mP0wZ180HDOcnYUwDxIr4AFagTuaW6N13qnrNtn9Eu8rB+Cm3TL5E9Kfn5UHaN8EJMis
+         C9Np61u/w2Si2zfQW4JyONQifIMZXBRWpWlExAjK5KrnHDY8OuuAfiAlIzKF15t3n8CX
+         EaA2OWqOsTEOSRGYQHc46j6E0A0lS0Q4QyhjQB5DOYKrRszGd1d5Ssm0Z1dHp8xQm3gG
+         tvxn14077pq/IDgC6ThvV45Y1i4/ja8dQqe1tWZNSy+2/UEfMSx+vESeWff9k2IOCBHp
+         4EoA==
+X-Gm-Message-State: AA+aEWbUbMjP8dtcklLAOD1Z2iACYvcJX//RAeIltPRb4RP678hSSQs8
+        yyheOYLMX+wt+LKIMmClH/9h/ZnouVQ=
+X-Google-Smtp-Source: AFSGD/Xy30V8rBKIgJLmYkQZUXeTQ0z3hPO08zaAgo03/KPKrOd7ATsDICBBkegWixfvscgkp0oPPw==
+X-Received: by 2002:a62:1112:: with SMTP id z18mr3911928pfi.173.1544221268097;
+        Fri, 07 Dec 2018 14:21:08 -0800 (PST)
 Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id e9sm5282511pff.5.2018.12.07.14.21.04
+        by smtp.gmail.com with ESMTPSA id e9sm5282511pff.5.2018.12.07.14.21.06
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 07 Dec 2018 14:21:05 -0800 (PST)
+        Fri, 07 Dec 2018 14:21:07 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-aio@kvack.org
 Cc:     hch@lst.de, jmoyer@redhat.com, clm@fb.com,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 23/26] fs: add support for mapping an ITER_BVEC for O_DIRECT
-Date:   Fri,  7 Dec 2018 15:20:13 -0700
-Message-Id: <20181207222016.29387-24-axboe@kernel.dk>
+Subject: [PATCH 24/26] aio: add support for pre-mapped user IO buffers
+Date:   Fri,  7 Dec 2018 15:20:14 -0700
+Message-Id: <20181207222016.29387-25-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181207222016.29387-1-axboe@kernel.dk>
 References: <20181207222016.29387-1-axboe@kernel.dk>
@@ -72,84 +72,389 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This adds support for sync/async O_DIRECT to make a bvec type iter
-for bdev access, as well as iomap.
+If we have fixed user buffers, we can map them into the kernel when we
+setup the io_context. That avoids the need to do get_user_pages() for
+each and every IO.
+
+To utilize this feature, the application must set both
+IOCTX_FLAG_USERIOCB, to provide iocb's in userspace, and then
+IOCTX_FLAG_FIXEDBUFS. The latter tells aio that the iocbs that are
+mapped already contain valid destination and sizes. These buffers can
+then be mapped into the kernel for the life time of the io_context, as
+opposed to just the duration of the each single IO.
+
+Only works with non-vectored read/write commands for now, not with
+PREADV/PWRITEV.
+
+A limit of 4M is imposed as the largest buffer we currently support.
+There's nothing preventing us from going larger, but we need some cap,
+and 4M seemed like it would definitely be big enough. RLIMIT_MEMLOCK
+is used to cap the total amount of memory pinned.
+
+See the fio change for how to utilize this feature:
+
+http://git.kernel.dk/cgit/fio/commit/?id=2041bd343da1c1e955253f62374588718c64f0f3
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/block_dev.c | 16 ++++++++++++----
- fs/iomap.c     | 10 +++++++---
- 2 files changed, 19 insertions(+), 7 deletions(-)
+ fs/aio.c                     | 193 ++++++++++++++++++++++++++++++++---
+ include/uapi/linux/aio_abi.h |   1 +
+ 2 files changed, 177 insertions(+), 17 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index b8f574615792..236c6abe649d 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -219,7 +219,10 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 	bio.bi_end_io = blkdev_bio_end_io_simple;
- 	bio.bi_ioprio = iocb->ki_ioprio;
+diff --git a/fs/aio.c b/fs/aio.c
+index 52a0b2291f71..fd323b3ba499 100644
+--- a/fs/aio.c
++++ b/fs/aio.c
+@@ -42,6 +42,7 @@
+ #include <linux/ramfs.h>
+ #include <linux/percpu-refcount.h>
+ #include <linux/mount.h>
++#include <linux/sizes.h>
  
--	ret = bio_iov_iter_get_pages(&bio, iter);
-+	if (iov_iter_is_bvec(iter))
-+		ret = bio_iov_bvec_add_pages(&bio, iter);
-+	else
-+		ret = bio_iov_iter_get_pages(&bio, iter);
- 	if (unlikely(ret))
- 		goto out;
- 	ret = bio.bi_iter.bi_size;
-@@ -326,8 +329,9 @@ static void blkdev_bio_end_io(struct bio *bio)
- 		struct bio_vec *bvec;
- 		int i;
+ #include <asm/kmap_types.h>
+ #include <linux/uaccess.h>
+@@ -97,6 +98,11 @@ struct aio_mapped_range {
+ 	long nr_pages;
+ };
  
--		bio_for_each_segment_all(bvec, bio, i)
--			put_page(bvec->bv_page);
-+		if (!bio_flagged(bio, BIO_HOLD_PAGES))
-+			bio_for_each_segment_all(bvec, bio, i)
-+				put_page(bvec->bv_page);
- 		bio_put(bio);
- 	}
- }
-@@ -381,7 +385,11 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 		bio->bi_end_io = blkdev_bio_end_io;
- 		bio->bi_ioprio = iocb->ki_ioprio;
- 
--		ret = bio_iov_iter_get_pages(bio, iter);
-+		if (iov_iter_is_bvec(iter))
-+			ret = bio_iov_bvec_add_pages(bio, iter);
-+		else
-+			ret = bio_iov_iter_get_pages(bio, iter);
++struct aio_mapped_ubuf {
++	struct bio_vec *bvec;
++	unsigned int nr_bvecs;
++};
 +
- 		if (unlikely(ret)) {
- 			bio->bi_status = BLK_STS_IOERR;
- 			bio_endio(bio);
-diff --git a/fs/iomap.c b/fs/iomap.c
-index bd483fcb7b5a..e36ad0be03f5 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -1573,8 +1573,9 @@ static void iomap_dio_bio_end_io(struct bio *bio)
- 		struct bio_vec *bvec;
- 		int i;
+ struct kioctx {
+ 	struct percpu_ref	users;
+ 	atomic_t		dead;
+@@ -132,6 +138,8 @@ struct kioctx {
+ 	struct page		**ring_pages;
+ 	long			nr_pages;
  
--		bio_for_each_segment_all(bvec, bio, i)
--			put_page(bvec->bv_page);
-+		if (!bio_flagged(bio, BIO_HOLD_PAGES))
-+			bio_for_each_segment_all(bvec, bio, i)
-+				put_page(bvec->bv_page);
- 		bio_put(bio);
- 	}
++	struct aio_mapped_ubuf	*user_bufs;
++
+ 	struct aio_mapped_range	iocb_range;
+ 
+ 	struct rcu_work		free_rwork;	/* see free_ioctx() */
+@@ -301,6 +309,7 @@ static const bool aio_use_state_req_list = false;
+ 
+ static void aio_useriocb_unmap(struct kioctx *);
+ static void aio_iopoll_reap_events(struct kioctx *);
++static void aio_iocb_buffer_unmap(struct kioctx *);
+ 
+ static struct file *aio_private_file(struct kioctx *ctx, loff_t nr_pages)
+ {
+@@ -662,6 +671,7 @@ static void free_ioctx(struct work_struct *work)
+ 					  free_rwork);
+ 	pr_debug("freeing %p\n", ctx);
+ 
++	aio_iocb_buffer_unmap(ctx);
+ 	aio_useriocb_unmap(ctx);
+ 	aio_free_ring(ctx);
+ 	free_percpu(ctx->cpu);
+@@ -1675,6 +1685,122 @@ static int aio_useriocb_map(struct kioctx *ctx, struct iocb __user *iocbs)
+ 	return aio_map_range(&ctx->iocb_range, iocbs, size, 0);
  }
-@@ -1673,7 +1674,10 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
- 		bio->bi_private = dio;
- 		bio->bi_end_io = iomap_dio_bio_end_io;
  
--		ret = bio_iov_iter_get_pages(bio, &iter);
-+		if (iov_iter_is_bvec(&iter))
-+			ret = bio_iov_bvec_add_pages(bio, &iter);
-+		else
-+			ret = bio_iov_iter_get_pages(bio, &iter);
- 		if (unlikely(ret)) {
- 			/*
- 			 * We have to stop part way through an IO. We must fall
++static void aio_iocb_buffer_unmap(struct kioctx *ctx)
++{
++	int i, j;
++
++	if (!ctx->user_bufs)
++		return;
++
++	for (i = 0; i < ctx->max_reqs; i++) {
++		struct aio_mapped_ubuf *amu = &ctx->user_bufs[i];
++
++		for (j = 0; j < amu->nr_bvecs; j++)
++			put_page(amu->bvec[j].bv_page);
++
++		kfree(amu->bvec);
++		amu->nr_bvecs = 0;
++	}
++
++	kfree(ctx->user_bufs);
++	ctx->user_bufs = NULL;
++}
++
++static int aio_iocb_buffer_map(struct kioctx *ctx)
++{
++	unsigned long total_pages, page_limit;
++	struct page **pages = NULL;
++	int i, j, got_pages = 0;
++	struct iocb *iocb;
++	int ret = -EINVAL;
++
++	ctx->user_bufs = kzalloc(ctx->max_reqs * sizeof(struct aio_mapped_ubuf),
++					GFP_KERNEL);
++	if (!ctx->user_bufs)
++		return -ENOMEM;
++
++	/* Don't allow more pages than we can safely lock */
++	total_pages = 0;
++	page_limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
++
++	for (i = 0; i < ctx->max_reqs; i++) {
++		struct aio_mapped_ubuf *amu = &ctx->user_bufs[i];
++		unsigned long off, start, end, ubuf;
++		int pret, nr_pages;
++		size_t size;
++
++		iocb = aio_iocb_from_index(ctx, i);
++
++		/*
++		 * Don't impose further limits on the size and buffer
++		 * constraints here, we'll -EINVAL later when IO is
++		 * submitted if they are wrong.
++		 */
++		ret = -EFAULT;
++		if (!iocb->aio_buf)
++			goto err;
++
++		/* arbitrary limit, but we need something */
++		if (iocb->aio_nbytes > SZ_4M)
++			goto err;
++
++		ubuf = iocb->aio_buf;
++		end = (ubuf + iocb->aio_nbytes + PAGE_SIZE - 1) >> PAGE_SHIFT;
++		start = ubuf >> PAGE_SHIFT;
++		nr_pages = end - start;
++
++		ret = -ENOMEM;
++		if (total_pages + nr_pages > page_limit)
++			goto err;
++
++		if (!pages || nr_pages > got_pages) {
++			kfree(pages);
++			pages = kmalloc(nr_pages * sizeof(struct page *),
++					GFP_KERNEL);
++			if (!pages)
++				goto err;
++			got_pages = nr_pages;
++		}
++
++		amu->bvec = kmalloc(nr_pages * sizeof(struct bio_vec),
++					GFP_KERNEL);
++		if (!amu->bvec)
++			goto err;
++
++		down_write(&current->mm->mmap_sem);
++		pret = get_user_pages((unsigned long) iocb->aio_buf, nr_pages,
++					1, pages, NULL);
++		up_write(&current->mm->mmap_sem);
++
++		if (pret < nr_pages) {
++			if (pret < 0)
++				ret = pret;
++			goto err;
++		}
++
++		off = ubuf & ~PAGE_MASK;
++		size = iocb->aio_nbytes;
++		for (j = 0; j < nr_pages; j++) {
++			size_t vec_len;
++
++			vec_len = min_t(size_t, size, PAGE_SIZE - off);
++			amu->bvec[j].bv_page = pages[j];
++			amu->bvec[j].bv_len = vec_len;
++			amu->bvec[j].bv_offset = off;
++			off = 0;
++			size -= vec_len;
++		}
++		amu->nr_bvecs = nr_pages;
++		total_pages += nr_pages;
++	}
++	kfree(pages);
++	return 0;
++err:
++	kfree(pages);
++	aio_iocb_buffer_unmap(ctx);
++	return ret;
++}
++
+ SYSCALL_DEFINE6(io_setup2, u32, nr_events, u32, flags, struct iocb __user *,
+ 		iocbs, void __user *, user1, void __user *, user2,
+ 		aio_context_t __user *, ctxp)
+@@ -1685,7 +1811,8 @@ SYSCALL_DEFINE6(io_setup2, u32, nr_events, u32, flags, struct iocb __user *,
+ 
+ 	if (user1 || user2)
+ 		return -EINVAL;
+-	if (flags & ~(IOCTX_FLAG_USERIOCB | IOCTX_FLAG_IOPOLL))
++	if (flags & ~(IOCTX_FLAG_USERIOCB | IOCTX_FLAG_IOPOLL |
++		      IOCTX_FLAG_FIXEDBUFS))
+ 		return -EINVAL;
+ 
+ 	ret = get_user(ctx, ctxp);
+@@ -1701,6 +1828,15 @@ SYSCALL_DEFINE6(io_setup2, u32, nr_events, u32, flags, struct iocb __user *,
+ 		ret = aio_useriocb_map(ioctx, iocbs);
+ 		if (ret)
+ 			goto err;
++		if (flags & IOCTX_FLAG_FIXEDBUFS) {
++			ret = aio_iocb_buffer_map(ioctx);
++			if (ret)
++				goto err;
++		}
++	} else if (flags & IOCTX_FLAG_FIXEDBUFS) {
++		/* can only support fixed bufs with user mapped iocbs */
++		ret = -EINVAL;
++		goto err;
+ 	}
+ 
+ 	ret = put_user(ioctx->user_id, ctxp);
+@@ -1978,23 +2114,39 @@ static int aio_prep_rw(struct aio_kiocb *kiocb, const struct iocb *iocb,
+ 	return ret;
+ }
+ 
+-static int aio_setup_rw(int rw, const struct iocb *iocb, struct iovec **iovec,
+-		bool vectored, bool compat, struct iov_iter *iter)
++static int aio_setup_rw(int rw, struct aio_kiocb *kiocb,
++		const struct iocb *iocb, struct iovec **iovec, bool vectored,
++		bool compat, bool kaddr, struct iov_iter *iter)
+ {
+-	void __user *buf = (void __user *)(uintptr_t)iocb->aio_buf;
++	void __user *ubuf = (void __user *)(uintptr_t)iocb->aio_buf;
+ 	size_t len = iocb->aio_nbytes;
+ 
+ 	if (!vectored) {
+-		ssize_t ret = import_single_range(rw, buf, len, *iovec, iter);
++		ssize_t ret;
++
++		if (!kaddr) {
++			ret = import_single_range(rw, ubuf, len, *iovec, iter);
++		} else {
++			long index = (long) kiocb->ki_user_iocb;
++			struct aio_mapped_ubuf *amu;
++
++			/* __io_submit_one() already validated the index */
++			amu = &kiocb->ki_ctx->user_bufs[index];
++			iov_iter_bvec(iter, rw, amu->bvec, amu->nr_bvecs, len);
++			ret = 0;
++
++		}
+ 		*iovec = NULL;
+ 		return ret;
+ 	}
++	if (kaddr)
++		return -EINVAL;
+ #ifdef CONFIG_COMPAT
+ 	if (compat)
+-		return compat_import_iovec(rw, buf, len, UIO_FASTIOV, iovec,
++		return compat_import_iovec(rw, ubuf, len, UIO_FASTIOV, iovec,
+ 				iter);
+ #endif
+-	return import_iovec(rw, buf, len, UIO_FASTIOV, iovec, iter);
++	return import_iovec(rw, ubuf, len, UIO_FASTIOV, iovec, iter);
+ }
+ 
+ static inline void aio_rw_done(struct kiocb *req, ssize_t ret)
+@@ -2067,7 +2219,7 @@ static void aio_iopoll_iocb_issued(struct aio_submit_state *state,
+ 
+ static ssize_t aio_read(struct aio_kiocb *kiocb, const struct iocb *iocb,
+ 			struct aio_submit_state *state, bool vectored,
+-			bool compat)
++			bool compat, bool kaddr)
+ {
+ 	struct iovec inline_vecs[UIO_FASTIOV], *iovec = inline_vecs;
+ 	struct kiocb *req = &kiocb->rw;
+@@ -2087,9 +2239,11 @@ static ssize_t aio_read(struct aio_kiocb *kiocb, const struct iocb *iocb,
+ 	if (unlikely(!file->f_op->read_iter))
+ 		goto out_fput;
+ 
+-	ret = aio_setup_rw(READ, iocb, &iovec, vectored, compat, &iter);
++	ret = aio_setup_rw(READ, kiocb, iocb, &iovec, vectored, compat, kaddr,
++				&iter);
+ 	if (ret)
+ 		goto out_fput;
++
+ 	ret = rw_verify_area(READ, file, &req->ki_pos, iov_iter_count(&iter));
+ 	if (!ret)
+ 		aio_rw_done(req, call_read_iter(file, req, &iter));
+@@ -2102,7 +2256,7 @@ static ssize_t aio_read(struct aio_kiocb *kiocb, const struct iocb *iocb,
+ 
+ static ssize_t aio_write(struct aio_kiocb *kiocb, const struct iocb *iocb,
+ 			 struct aio_submit_state *state, bool vectored,
+-			 bool compat)
++			 bool compat, bool kaddr)
+ {
+ 	struct iovec inline_vecs[UIO_FASTIOV], *iovec = inline_vecs;
+ 	struct kiocb *req = &kiocb->rw;
+@@ -2122,7 +2276,8 @@ static ssize_t aio_write(struct aio_kiocb *kiocb, const struct iocb *iocb,
+ 	if (unlikely(!file->f_op->write_iter))
+ 		goto out_fput;
+ 
+-	ret = aio_setup_rw(WRITE, iocb, &iovec, vectored, compat, &iter);
++	ret = aio_setup_rw(WRITE, kiocb, iocb, &iovec, vectored, compat, kaddr,
++				&iter);
+ 	if (ret)
+ 		goto out_fput;
+ 	ret = rw_verify_area(WRITE, file, &req->ki_pos, iov_iter_count(&iter));
+@@ -2361,7 +2516,8 @@ static ssize_t aio_poll(struct aio_kiocb *aiocb, const struct iocb *iocb)
+ 
+ static int __io_submit_one(struct kioctx *ctx, const struct iocb *iocb,
+ 			   struct iocb __user *user_iocb,
+-			   struct aio_submit_state *state, bool compat)
++			   struct aio_submit_state *state, bool compat,
++			   bool kaddr)
+ {
+ 	struct aio_kiocb *req;
+ 	ssize_t ret;
+@@ -2421,16 +2577,16 @@ static int __io_submit_one(struct kioctx *ctx, const struct iocb *iocb,
+ 	ret = -EINVAL;
+ 	switch (iocb->aio_lio_opcode) {
+ 	case IOCB_CMD_PREAD:
+-		ret = aio_read(req, iocb, state, false, compat);
++		ret = aio_read(req, iocb, state, false, compat, kaddr);
+ 		break;
+ 	case IOCB_CMD_PWRITE:
+-		ret = aio_write(req, iocb, state, false, compat);
++		ret = aio_write(req, iocb, state, false, compat, kaddr);
+ 		break;
+ 	case IOCB_CMD_PREADV:
+-		ret = aio_read(req, iocb, state, true, compat);
++		ret = aio_read(req, iocb, state, true, compat, kaddr);
+ 		break;
+ 	case IOCB_CMD_PWRITEV:
+-		ret = aio_write(req, iocb, state, true, compat);
++		ret = aio_write(req, iocb, state, true, compat, kaddr);
+ 		break;
+ 	case IOCB_CMD_FSYNC:
+ 		if (ctx->flags & IOCTX_FLAG_IOPOLL)
+@@ -2482,6 +2638,7 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+ 			 struct aio_submit_state *state, bool compat)
+ {
+ 	struct iocb iocb, *iocbp;
++	bool kaddr;
+ 
+ 	if (ctx->flags & IOCTX_FLAG_USERIOCB) {
+ 		unsigned long iocb_index = (unsigned long) user_iocb;
+@@ -2489,14 +2646,16 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+ 		if (iocb_index >= ctx->max_reqs)
+ 			return -EINVAL;
+ 
++		kaddr = (ctx->flags & IOCTX_FLAG_FIXEDBUFS) != 0;
+ 		iocbp = aio_iocb_from_index(ctx, iocb_index);
+ 	} else {
+ 		if (unlikely(copy_from_user(&iocb, user_iocb, sizeof(iocb))))
+ 			return -EFAULT;
++		kaddr = false;
+ 		iocbp = &iocb;
+ 	}
+ 
+-	return __io_submit_one(ctx, iocbp, user_iocb, state, compat);
++	return __io_submit_one(ctx, iocbp, user_iocb, state, compat, kaddr);
+ }
+ 
+ #ifdef CONFIG_BLOCK
+diff --git a/include/uapi/linux/aio_abi.h b/include/uapi/linux/aio_abi.h
+index ea0b9a19f4df..05d72cf86bd3 100644
+--- a/include/uapi/linux/aio_abi.h
++++ b/include/uapi/linux/aio_abi.h
+@@ -110,6 +110,7 @@ struct iocb {
+ 
+ #define IOCTX_FLAG_USERIOCB	(1 << 0)	/* iocbs are user mapped */
+ #define IOCTX_FLAG_IOPOLL	(1 << 1)	/* io_context is polled */
++#define IOCTX_FLAG_FIXEDBUFS	(1 << 2)	/* IO buffers are fixed */
+ 
+ #undef IFBIG
+ #undef IFLITTLE
 -- 
 2.17.1
 
