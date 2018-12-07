@@ -2,158 +2,114 @@ Return-Path: <SRS0=IV7O=OQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E6BFC07E85
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 09:39:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8F49C07E85
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 10:01:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0C9EB20989
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 09:39:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C9EB20989
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=citrix.com
+	by mail.kernel.org (Postfix) with ESMTP id 809DE20645
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 10:01:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="aNrvuw4W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 809DE20645
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725992AbeLGJjT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 7 Dec 2018 04:39:19 -0500
-Received: from smtp.eu.citrix.com ([185.25.65.24]:51591 "EHLO
-        SMTP.EU.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725987AbeLGJjT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Dec 2018 04:39:19 -0500
-X-IronPort-AV: E=Sophos;i="5.56,324,1539648000"; 
-   d="scan'208";a="82942895"
-From:   Paul Durrant <Paul.Durrant@citrix.com>
-To:     'Dongli Zhang' <dongli.zhang@oracle.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        Roger Pau Monne <roger.pau@citrix.com>,
-        "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>
-Subject: RE: [Xen-devel] [PATCH 1/1] xen/blkback: rework connect_ring() to
- avoid inconsistent xenstore 'ring-page-order' set by malicious blkfront
-Thread-Topic: [Xen-devel] [PATCH 1/1] xen/blkback: rework connect_ring() to
- avoid inconsistent xenstore 'ring-page-order' set by malicious blkfront
-Thread-Index: AQHUjePlVFCFD2KmD0G9djADL/FCxaVzAuIQ
-Date:   Fri, 7 Dec 2018 09:39:15 +0000
-Message-ID: <742d0e02a1aa4031ad68a9f81fe2bdc4@AMSPEX02CL03.citrite.net>
-References: <1544156284-7756-1-git-send-email-dongli.zhang@oracle.com>
-In-Reply-To: <1544156284-7756-1-git-send-email-dongli.zhang@oracle.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+        id S1726014AbeLGKBG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 7 Dec 2018 05:01:06 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:39114 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725976AbeLGKBG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 7 Dec 2018 05:01:06 -0500
+Received: by mail-wr1-f68.google.com with SMTP id t27so3202696wra.6
+        for <linux-block@vger.kernel.org>; Fri, 07 Dec 2018 02:01:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=KTrgKZ7XMVslfV/vKvMZa8+Nk1ppKsTfGuP7Gy2lJcI=;
+        b=aNrvuw4WXIdoyOIbrHtlCDuOgx/RrN+wC4ZYBMsw8Yh1Gdv955aRjn/EyS10cbJ3Oc
+         Wx15an9FxVzbVNF3Wsc1IvD4ZqMyKFk4whtq0t5ihwgnWouWqj1DBkVCPF+yTgDx7uI7
+         xg5WaiTbUXP+OuoqdPjHXOFuVi8MR248OoZso=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=KTrgKZ7XMVslfV/vKvMZa8+Nk1ppKsTfGuP7Gy2lJcI=;
+        b=sRtPYPkpchcMWnLLf5yt41DNiXq9Ls5hZ7U99dbHXeyCGmKRwjRKfMgXZvYuUbzEon
+         a76CHnKHTBTZaEbH+8Ppbnjeh6hoh2CvvjFzpP7bgvR2d1dg1Ho0tLm0uTORsPWn2b5H
+         /U3QzxPdtXq9u0fRBgqRBij8IaZBCzU2TFSSe+wdcvhWGAYim31MNV65Q9Lu7dgbCfM7
+         l73Uq3hVOAesjwSACjPxJOg70ctRBgEsCOtqFX/9gtCD2M2Mj99ikPxBS4If8VD9lAC9
+         qmNS/bk9mKuAdlxKNGjEQkIMEjMlkXnusXBtinPSEj/4knIQkxEoYwnYajkMnv+p2cIF
+         7h5A==
+X-Gm-Message-State: AA+aEWatSROmODmdtWN997mqYzsW5FJXIGY/AJef5ksfM4OOVSbgfLpB
+        oUXBwpuFGPdd75AiHZJOGsI5rg==
+X-Google-Smtp-Source: AFSGD/VmtcbLbgxKe/u/THwA15xoaZTnvFR38tMr1g67KP78N1AZhmHQALcHAURKB6oNW6vZnpamhg==
+X-Received: by 2002:adf:92a4:: with SMTP id 33mr1209953wrn.11.1544176864670;
+        Fri, 07 Dec 2018 02:01:04 -0800 (PST)
+Received: from wifi-122_dhcprange-139.wifi.unimo.it (wifi-122_dhcprange-139.wifi.unimo.it. [155.185.122.139])
+        by smtp.gmail.com with ESMTPSA id h12sm7927220wma.48.2018.12.07.02.01.03
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 07 Dec 2018 02:01:03 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.1 \(3445.101.1\))
+Subject: Re: [PATCH BUGFIX 0/2] bfq: fix unbalanced decrements causing loss of
+ throughput
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <09393ef1-9559-2042-6c83-75ed3fd529d3@kernel.dk>
+Date:   Fri, 7 Dec 2018 11:01:03 +0100
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Mark Brown <broonie@kernel.org>, bfq-iosched@googlegroups.com,
+        oleksandr@natalenko.name, federico@willer.it
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <8753C347-2BFD-40D4-A97E-DA955BC0207C@linaro.org>
+References: <20181206181819.11148-1-paolo.valente@linaro.org>
+ <09393ef1-9559-2042-6c83-75ed3fd529d3@kernel.dk>
+To:     Jens Axboe <axboe@kernel.dk>
+X-Mailer: Apple Mail (2.3445.101.1)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBYZW4tZGV2ZWwgW21haWx0bzp4
-ZW4tZGV2ZWwtYm91bmNlc0BsaXN0cy54ZW5wcm9qZWN0Lm9yZ10gT24gQmVoYWxmDQo+IE9mIERv
-bmdsaSBaaGFuZw0KPiBTZW50OiAwNyBEZWNlbWJlciAyMDE4IDA0OjE4DQo+IFRvOiBsaW51eC1r
-ZXJuZWxAdmdlci5rZXJuZWwub3JnOyB4ZW4tZGV2ZWxAbGlzdHMueGVucHJvamVjdC5vcmc7IGxp
-bnV4LQ0KPiBibG9ja0B2Z2VyLmtlcm5lbC5vcmcNCj4gQ2M6IGF4Ym9lQGtlcm5lbC5kazsgUm9n
-ZXIgUGF1IE1vbm5lIDxyb2dlci5wYXVAY2l0cml4LmNvbT47DQo+IGtvbnJhZC53aWxrQG9yYWNs
-ZS5jb20NCj4gU3ViamVjdDogW1hlbi1kZXZlbF0gW1BBVENIIDEvMV0geGVuL2Jsa2JhY2s6IHJl
-d29yayBjb25uZWN0X3JpbmcoKSB0bw0KPiBhdm9pZCBpbmNvbnNpc3RlbnQgeGVuc3RvcmUgJ3Jp
-bmctcGFnZS1vcmRlcicgc2V0IGJ5IG1hbGljaW91cyBibGtmcm9udA0KPiANCj4gVGhlIHhlbnN0
-b3JlICdyaW5nLXBhZ2Utb3JkZXInIGlzIHVzZWQgZ2xvYmFsbHkgZm9yIGVhY2ggYmxrYmFjayBx
-dWV1ZSBhbmQNCj4gdGhlcmVmb3JlIHNob3VsZCBiZSByZWFkIGZyb20geGVuc3RvcmUgb25seSBv
-bmNlLiBIb3dldmVyLCBpdCBpcyBvYnRhaW5lZA0KPiBpbiByZWFkX3Blcl9yaW5nX3JlZnMoKSB3
-aGljaCBtaWdodCBiZSBjYWxsZWQgbXVsdGlwbGUgdGltZXMgZHVyaW5nIHRoZQ0KPiBpbml0aWFs
-aXphdGlvbiBvZiBlYWNoIGJsa2JhY2sgcXVldWUuDQoNClRoYXQgaXMgY2VydGFpbmx5IHN1Yi1v
-cHRpbWFsLg0KDQo+IA0KPiBJZiB0aGUgYmxrZnJvbnQgaXMgbWFsaWNpb3VzIGFuZCB0aGUgJ3Jp
-bmctcGFnZS1vcmRlcicgaXMgc2V0IGluIGRpZmZlcmVudA0KPiB2YWx1ZSBieSBibGtmcm9udCBl
-dmVyeSB0aW1lIGJlZm9yZSBibGtiYWNrIHJlYWRzIGl0LCB0aGlzIG1heSBlbmQgdXAgYXQNCj4g
-dGhlICJXQVJOX09OKGkgIT0gKFhFTl9CTEtJRl9SRVFTX1BFUl9QQUdFICogYmxraWYtPm5yX3Jp
-bmdfcGFnZXMpKTsiIGluDQo+IHhlbl9ibGtpZl9kaXNjb25uZWN0KCkgd2hlbiBmcm9udGVuZCBp
-cyBkZXN0cm95ZWQuDQoNCkkgY2FuJ3QgYWN0dWFsbHkgc2VlIHdoYXQgdXNlZnVsIGZ1bmN0aW9u
-IGJsa2lmLT5ucl9yaW5nX3BhZ2VzIGFjdHVhbGx5IHBlcmZvcm1zIGFueSBtb3JlLiBQZXJoYXBz
-IHlvdSBjb3VsZCBhY3R1YWxseSBnZXQgcmlkIG9mIGl0Pw0KDQo+IA0KPiBUaGlzIHBhdGNoIHJl
-d29ya3MgY29ubmVjdF9yaW5nKCkgdG8gcmVhZCB4ZW5zdG9yZSAncmluZy1wYWdlLW9yZGVyJyBv
-bmx5DQo+IG9uY2UuDQoNClRoYXQgaXMgY2VydGFpbmx5IGEgZ29vZCB0aGluZyA6LSkNCg0KICBQ
-YXVsDQoNCj4gDQo+IFNpZ25lZC1vZmYtYnk6IERvbmdsaSBaaGFuZyA8ZG9uZ2xpLnpoYW5nQG9y
-YWNsZS5jb20+DQo+IC0tLQ0KPiAgZHJpdmVycy9ibG9jay94ZW4tYmxrYmFjay94ZW5idXMuYyB8
-IDQ5ICsrKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLQ0KPiAtLS0tLQ0KPiAgMSBmaWxl
-IGNoYW5nZWQsIDMxIGluc2VydGlvbnMoKyksIDE4IGRlbGV0aW9ucygtKQ0KPiANCj4gZGlmZiAt
-LWdpdCBhL2RyaXZlcnMvYmxvY2sveGVuLWJsa2JhY2sveGVuYnVzLmMgYi9kcml2ZXJzL2Jsb2Nr
-L3hlbi0NCj4gYmxrYmFjay94ZW5idXMuYw0KPiBpbmRleCBhNGJjNzRlLi40YThjZTIwIDEwMDY0
-NA0KPiAtLS0gYS9kcml2ZXJzL2Jsb2NrL3hlbi1ibGtiYWNrL3hlbmJ1cy5jDQo+ICsrKyBiL2Ry
-aXZlcnMvYmxvY2sveGVuLWJsa2JhY2sveGVuYnVzLmMNCj4gQEAgLTkxOSwxNCArOTE5LDE1IEBA
-IHN0YXRpYyB2b2lkIGNvbm5lY3Qoc3RydWN0IGJhY2tlbmRfaW5mbyAqYmUpDQo+ICAvKg0KPiAg
-ICogRWFjaCByaW5nIG1heSBoYXZlIG11bHRpIHBhZ2VzLCBkZXBlbmRzIG9uICJyaW5nLXBhZ2Ut
-b3JkZXIiLg0KPiAgICovDQo+IC1zdGF0aWMgaW50IHJlYWRfcGVyX3JpbmdfcmVmcyhzdHJ1Y3Qg
-eGVuX2Jsa2lmX3JpbmcgKnJpbmcsIGNvbnN0IGNoYXINCj4gKmRpcikNCj4gK3N0YXRpYyBpbnQg
-cmVhZF9wZXJfcmluZ19yZWZzKHN0cnVjdCB4ZW5fYmxraWZfcmluZyAqcmluZywgY29uc3QgY2hh
-cg0KPiAqZGlyLA0KPiArCQkJICAgICAgYm9vbCB1c2VfcmluZ19wYWdlX29yZGVyKQ0KPiAgew0K
-PiAgCXVuc2lnbmVkIGludCByaW5nX3JlZltYRU5CVVNfTUFYX1JJTkdfR1JBTlRTXTsNCj4gIAlz
-dHJ1Y3QgcGVuZGluZ19yZXEgKnJlcSwgKm47DQo+ICAJaW50IGVyciwgaSwgajsNCj4gIAlzdHJ1
-Y3QgeGVuX2Jsa2lmICpibGtpZiA9IHJpbmctPmJsa2lmOw0KPiAgCXN0cnVjdCB4ZW5idXNfZGV2
-aWNlICpkZXYgPSBibGtpZi0+YmUtPmRldjsNCj4gLQl1bnNpZ25lZCBpbnQgcmluZ19wYWdlX29y
-ZGVyLCBucl9ncmVmcywgZXZ0Y2huOw0KPiArCXVuc2lnbmVkIGludCBucl9ncmVmcywgZXZ0Y2hu
-Ow0KPiANCj4gIAllcnIgPSB4ZW5idXNfc2NhbmYoWEJUX05JTCwgZGlyLCAiZXZlbnQtY2hhbm5l
-bCIsICIldSIsDQo+ICAJCQkgICZldnRjaG4pOw0KPiBAQCAtOTM2LDI4ICs5MzcsMTggQEAgc3Rh
-dGljIGludCByZWFkX3Blcl9yaW5nX3JlZnMoc3RydWN0IHhlbl9ibGtpZl9yaW5nDQo+ICpyaW5n
-LCBjb25zdCBjaGFyICpkaXIpDQo+ICAJCXJldHVybiBlcnI7DQo+ICAJfQ0KPiANCj4gLQllcnIg
-PSB4ZW5idXNfc2NhbmYoWEJUX05JTCwgZGV2LT5vdGhlcmVuZCwgInJpbmctcGFnZS1vcmRlciIs
-ICIldSIsDQo+IC0JCQkgICZyaW5nX3BhZ2Vfb3JkZXIpOw0KPiAtCWlmIChlcnIgIT0gMSkgew0K
-PiArCW5yX2dyZWZzID0gYmxraWYtPm5yX3JpbmdfcGFnZXM7DQo+ICsNCj4gKwlpZiAoIXVzZV9y
-aW5nX3BhZ2Vfb3JkZXIpIHsNCj4gIAkJZXJyID0geGVuYnVzX3NjYW5mKFhCVF9OSUwsIGRpciwg
-InJpbmctcmVmIiwgIiV1IiwNCj4gJnJpbmdfcmVmWzBdKTsNCj4gIAkJaWYgKGVyciAhPSAxKSB7
-DQo+ICAJCQllcnIgPSAtRUlOVkFMOw0KPiAgCQkJeGVuYnVzX2Rldl9mYXRhbChkZXYsIGVyciwg
-InJlYWRpbmcgJXMvcmluZy1yZWYiLCBkaXIpOw0KPiAgCQkJcmV0dXJuIGVycjsNCj4gIAkJfQ0K
-PiAtCQlucl9ncmVmcyA9IDE7DQo+ICAJfSBlbHNlIHsNCj4gIAkJdW5zaWduZWQgaW50IGk7DQo+
-IA0KPiAtCQlpZiAocmluZ19wYWdlX29yZGVyID4geGVuX2Jsa2lmX21heF9yaW5nX29yZGVyKSB7
-DQo+IC0JCQllcnIgPSAtRUlOVkFMOw0KPiAtCQkJeGVuYnVzX2Rldl9mYXRhbChkZXYsIGVyciwg
-IiVzL3JlcXVlc3QgJWQgcmluZyBwYWdlDQo+IG9yZGVyIGV4Y2VlZCBtYXg6JWQiLA0KPiAtCQkJ
-CQkgZGlyLCByaW5nX3BhZ2Vfb3JkZXIsDQo+IC0JCQkJCSB4ZW5fYmxraWZfbWF4X3Jpbmdfb3Jk
-ZXIpOw0KPiAtCQkJcmV0dXJuIGVycjsNCj4gLQkJfQ0KPiAtDQo+IC0JCW5yX2dyZWZzID0gMSA8
-PCByaW5nX3BhZ2Vfb3JkZXI7DQo+ICAJCWZvciAoaSA9IDA7IGkgPCBucl9ncmVmczsgaSsrKSB7
-DQo+ICAJCQljaGFyIHJpbmdfcmVmX25hbWVbUklOR1JFRl9OQU1FX0xFTl07DQo+IA0KPiBAQCAt
-OTcyLDcgKzk2Myw2IEBAIHN0YXRpYyBpbnQgcmVhZF9wZXJfcmluZ19yZWZzKHN0cnVjdCB4ZW5f
-YmxraWZfcmluZw0KPiAqcmluZywgY29uc3QgY2hhciAqZGlyKQ0KPiAgCQkJfQ0KPiAgCQl9DQo+
-ICAJfQ0KPiAtCWJsa2lmLT5ucl9yaW5nX3BhZ2VzID0gbnJfZ3JlZnM7DQo+IA0KPiAgCWZvciAo
-aSA9IDA7IGkgPCBucl9ncmVmcyAqIFhFTl9CTEtJRl9SRVFTX1BFUl9QQUdFOyBpKyspIHsNCj4g
-IAkJcmVxID0ga3phbGxvYyhzaXplb2YoKnJlcSksIEdGUF9LRVJORUwpOw0KPiBAQCAtMTAzMCw2
-ICsxMDIwLDggQEAgc3RhdGljIGludCBjb25uZWN0X3Jpbmcoc3RydWN0IGJhY2tlbmRfaW5mbyAq
-YmUpDQo+ICAJc2l6ZV90IHhzcGF0aHNpemU7DQo+ICAJY29uc3Qgc2l6ZV90IHhlbnN0b3JlX3Bh
-dGhfZXh0X3NpemUgPSAxMTsgLyogc3VmZmljaWVudCBmb3IgIi9xdWV1ZS0NCj4gTk5OIiAqLw0K
-PiAgCXVuc2lnbmVkIGludCByZXF1ZXN0ZWRfbnVtX3F1ZXVlcyA9IDA7DQo+ICsJYm9vbCB1c2Vf
-cmluZ19wYWdlX29yZGVyID0gZmFsc2U7DQo+ICsJdW5zaWduZWQgaW50IHJpbmdfcGFnZV9vcmRl
-cjsNCj4gDQo+ICAJcHJfZGVidWcoIiVzICVzXG4iLCBfX2Z1bmNfXywgZGV2LT5vdGhlcmVuZCk7
-DQo+IA0KPiBAQCAtMTA3NSw4ICsxMDY3LDI4IEBAIHN0YXRpYyBpbnQgY29ubmVjdF9yaW5nKHN0
-cnVjdCBiYWNrZW5kX2luZm8gKmJlKQ0KPiAgCQkgYmUtPmJsa2lmLT5ucl9yaW5ncywgYmUtPmJs
-a2lmLT5ibGtfcHJvdG9jb2wsIHByb3RvY29sLA0KPiAgCQkgcGVyc19ncmFudHMgPyAicGVyc2lz
-dGVudCBncmFudHMiIDogIiIpOw0KPiANCj4gKwllcnIgPSB4ZW5idXNfc2NhbmYoWEJUX05JTCwg
-ZGV2LT5vdGhlcmVuZCwgInJpbmctcGFnZS1vcmRlciIsICIldSIsDQo+ICsJCQkgICAmcmluZ19w
-YWdlX29yZGVyKTsNCj4gKw0KPiArCWlmIChlcnIgIT0gMSkgew0KPiArCQliZS0+YmxraWYtPm5y
-X3JpbmdfcGFnZXMgPSAxOw0KPiArCX0gZWxzZSB7DQo+ICsJCWlmIChyaW5nX3BhZ2Vfb3JkZXIg
-PiB4ZW5fYmxraWZfbWF4X3Jpbmdfb3JkZXIpIHsNCj4gKwkJCWVyciA9IC1FSU5WQUw7DQo+ICsJ
-CQl4ZW5idXNfZGV2X2ZhdGFsKGRldiwgZXJyLA0KPiArCQkJCQkgInJlcXVlc3RlZCByaW5nIHBh
-Z2Ugb3JkZXIgJWQgZXhjZWVkDQo+IG1heDolZCIsDQo+ICsJCQkJCSByaW5nX3BhZ2Vfb3JkZXIs
-DQo+ICsJCQkJCSB4ZW5fYmxraWZfbWF4X3Jpbmdfb3JkZXIpOw0KPiArCQkJcmV0dXJuIGVycjsN
-Cj4gKwkJfQ0KPiArDQo+ICsJCXVzZV9yaW5nX3BhZ2Vfb3JkZXIgPSB0cnVlOw0KPiArCQliZS0+
-YmxraWYtPm5yX3JpbmdfcGFnZXMgPSAxIDw8IHJpbmdfcGFnZV9vcmRlcjsNCj4gKwl9DQo+ICsN
-Cj4gIAlpZiAoYmUtPmJsa2lmLT5ucl9yaW5ncyA9PSAxKQ0KPiAtCQlyZXR1cm4gcmVhZF9wZXJf
-cmluZ19yZWZzKCZiZS0+YmxraWYtPnJpbmdzWzBdLCBkZXYtDQo+ID5vdGhlcmVuZCk7DQo+ICsJ
-CXJldHVybiByZWFkX3Blcl9yaW5nX3JlZnMoJmJlLT5ibGtpZi0+cmluZ3NbMF0sIGRldi0+b3Ro
-ZXJlbmQsDQo+ICsJCQkJCSAgdXNlX3JpbmdfcGFnZV9vcmRlcik7DQo+ICAJZWxzZSB7DQo+ICAJ
-CXhzcGF0aHNpemUgPSBzdHJsZW4oZGV2LT5vdGhlcmVuZCkgKyB4ZW5zdG9yZV9wYXRoX2V4dF9z
-aXplOw0KPiAgCQl4c3BhdGggPSBrbWFsbG9jKHhzcGF0aHNpemUsIEdGUF9LRVJORUwpOw0KPiBA
-QCAtMTA4OCw3ICsxMTAwLDggQEAgc3RhdGljIGludCBjb25uZWN0X3Jpbmcoc3RydWN0IGJhY2tl
-bmRfaW5mbyAqYmUpDQo+ICAJCWZvciAoaSA9IDA7IGkgPCBiZS0+YmxraWYtPm5yX3JpbmdzOyBp
-KyspIHsNCj4gIAkJCW1lbXNldCh4c3BhdGgsIDAsIHhzcGF0aHNpemUpOw0KPiAgCQkJc25wcmlu
-dGYoeHNwYXRoLCB4c3BhdGhzaXplLCAiJXMvcXVldWUtJXUiLCBkZXYtDQo+ID5vdGhlcmVuZCwg
-aSk7DQo+IC0JCQllcnIgPSByZWFkX3Blcl9yaW5nX3JlZnMoJmJlLT5ibGtpZi0+cmluZ3NbaV0s
-IHhzcGF0aCk7DQo+ICsJCQllcnIgPSByZWFkX3Blcl9yaW5nX3JlZnMoJmJlLT5ibGtpZi0+cmlu
-Z3NbaV0sIHhzcGF0aCwNCj4gKwkJCQkJCSB1c2VfcmluZ19wYWdlX29yZGVyKTsNCj4gIAkJCWlm
-IChlcnIpIHsNCj4gIAkJCQlrZnJlZSh4c3BhdGgpOw0KPiAgCQkJCXJldHVybiBlcnI7DQo+IC0t
-DQo+IDIuNy40DQo+IA0KPiANCj4gX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX18NCj4gWGVuLWRldmVsIG1haWxpbmcgbGlzdA0KPiBYZW4tZGV2ZWxAbGlzdHMu
-eGVucHJvamVjdC5vcmcNCj4gaHR0cHM6Ly9saXN0cy54ZW5wcm9qZWN0Lm9yZy9tYWlsbWFuL2xp
-c3RpbmZvL3hlbi1kZXZlbA0K
+
+
+> Il giorno 7 dic 2018, alle ore 03:23, Jens Axboe <axboe@kernel.dk> ha =
+scritto:
+>=20
+> On 12/6/18 11:18 AM, Paolo Valente wrote:
+>> Hi Jens,
+>> the first patch in this series fixes an error in the decrementing of
+>> the counter of the number of groups with pending I/O. This wrong
+>> decrement caused loss of throughput or, less likely, of control on
+>> I/O. The second patch is a fix of some wrong comments, which somehow
+>> contributed to making the above bug more difficult to find.
+>=20
+> Are you fine with this going into 4.21? I can't quite tell what your
+> intent is. The first patch has a Fixes for something
+
+yep, that fixes a serious error.
+
+> that went into
+> this series, but then patch 2 is a comment update that would not
+> normally be something to be applied at this stage.
+>=20
+
+and yes, only comments changed by the second one
+
+May it make sense to apply them in two steps, one in the 4.20 and the =
+other one in the 4.21?
+
+Thanks,
+Paolo
+
+> --=20
+> Jens Axboe
+>=20
+
