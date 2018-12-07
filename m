@@ -2,113 +2,100 @@ Return-Path: <SRS0=IV7O=OQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD45C04EB8
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 01:18:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 651C8C04EB8
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 01:20:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9CCF320989
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 01:18:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="2J+rL/tk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CCF320989
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	by mail.kernel.org (Postfix) with ESMTP id 3359F20989
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 01:20:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3359F20989
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725978AbeLGBS5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Dec 2018 20:18:57 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:46103 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725955AbeLGBS5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Dec 2018 20:18:57 -0500
-Received: by mail-pf1-f196.google.com with SMTP id c73so1045080pfe.13
-        for <linux-block@vger.kernel.org>; Thu, 06 Dec 2018 17:18:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=9YXCB5urI/dW9wENhRy9IS0IgUsBt68fh08QEVt3RKw=;
-        b=2J+rL/tkld49d+T3xPLh/31UxdRG4FGzey3pVTu0Yv0EM1d6/naRsKub5uHFpjRHE0
-         g5uNgYciUDxnBI20dEnneS1elsFlaseoxIDLv+BVvyKu0XwGKad0Y7rgkr+Gt9zI9mam
-         IMcjujnLpMhQIMsETEi6zHI4NTAEB3QAYLVDfKtaYA+1ESk5mVBn8F4o/s3iMTVV92uf
-         nw7WIdkq40hk3MyBKDGsS/N+KDPDWFilRlbXbQzE5+CcY56O96qAaWLRm13fAjZfwLBW
-         3caOTJZu1pcZRtiVop9YlqhOAmtcPaLH82CtMu2kc+f7LBQALvnzydZ6VH5fsDNuf2xt
-         Lb7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=9YXCB5urI/dW9wENhRy9IS0IgUsBt68fh08QEVt3RKw=;
-        b=CjYCLfU4eKipGsvF6hMe/+N+oCag1D0Zk2rUWE8YN9Uy4F5jq7AH09ztsaovs54p6y
-         5MoC+2CkYQZDzJtsaAMIppC6MzMoXMntrym5RQORrPKDCgsm242UNbGugaoNmjZgNRjl
-         /8CONU+HmE/UhZjHZZRoMq8uVsJoPuCXpx+3YX1LLZs/Bd6bd1M18grvzvysGQ4lqih+
-         mwRC1Yapp2LO8yhGrWPgARGdNndYzYLgMRKg7ikqj2FI9xGcWAO60i4cBHmVYbnJEJcL
-         jUK42j0OS5J5dKnjV+A8ZayxE4r6VVEscPixtZPAhhM8qZZksgns3pH4LZbTo7CBVnMf
-         VAEw==
-X-Gm-Message-State: AA+aEWZeovICsbxpzMciXzmmBj811mJfXxcXKHgm5Gh/+EILaTq15PkZ
-        5sU1I+J3tVlMv1xDc3LQl4zWchAdmjA=
-X-Google-Smtp-Source: AFSGD/WGCcyPQVaDX/zQNStYuFoZYGaCKdaQl0QtU7VnJKiOd2TPkuAbS4n8NOmcbjTV9Cy7by4/MQ==
-X-Received: by 2002:a63:ff16:: with SMTP id k22mr218803pgi.244.1544145536712;
-        Thu, 06 Dec 2018 17:18:56 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id 84sm3456173pfk.134.2018.12.06.17.18.54
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 06 Dec 2018 17:18:55 -0800 (PST)
-Subject: Re: [PATCH V10 3/4] blk-mq: issue directly with bypass 'false' in
- blk_mq_sched_insert_requests
+        id S1725988AbeLGBUk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Dec 2018 20:20:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:34174 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725993AbeLGBUk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 6 Dec 2018 20:20:40 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C12C43004406;
+        Fri,  7 Dec 2018 01:20:39 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.149])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DDD419C7B;
+        Fri,  7 Dec 2018 01:20:39 +0000 (UTC)
+Date:   Thu, 6 Dec 2018 20:20:38 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
 To:     "jianchao.wang" <jianchao.w.wang@oracle.com>
-Cc:     ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <1544067160-20564-1-git-send-email-jianchao.w.wang@oracle.com>
- <1544067160-20564-4-git-send-email-jianchao.w.wang@oracle.com>
- <840accff-5050-744d-9c95-febce5433ab2@kernel.dk>
- <eedc417a-3ad2-e586-2ef2-a051a403228e@oracle.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4c4d6425-6ffe-f306-a7d3-6da2fe791838@kernel.dk>
-Date:   Thu, 6 Dec 2018 18:18:53 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: Re: block: fix direct dispatch issue failure for clones
+Message-ID: <20181207012038.GA17427@redhat.com>
+References: <adab29e7-6f9e-0804-5630-73e92be6a990@kernel.dk>
+ <0d754fbb-9034-e375-a71d-9262ce8300ea@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <eedc417a-3ad2-e586-2ef2-a051a403228e@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0d754fbb-9034-e375-a71d-9262ce8300ea@oracle.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Fri, 07 Dec 2018 01:20:39 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/6/18 6:16 PM, jianchao.wang wrote:
+On Thu, Dec 06 2018 at  8:04pm -0500,
+jianchao.wang <jianchao.w.wang@oracle.com> wrote:
+
 > 
 > 
-> On 12/6/18 11:19 PM, Jens Axboe wrote:
->> On 12/5/18 8:32 PM, Jianchao Wang wrote:
->>> It is not necessary to issue request directly with bypass 'true'
->>> in blk_mq_sched_insert_requests and handle the non-issued requests
->>> itself. Just set bypass to 'false' and let blk_mq_try_issue_directly
->>> handle them totally. Remove the blk_rq_can_direct_dispatch check,
->>> because blk_mq_try_issue_directly can handle it well.
->>>
->>> With respect to commit_rqs hook, we only need to care about the last
->>> request's result. If it is inserted, invoke commit_rqs.
->>
->> I don't think there's anything wrong, functionally, with this patch,
->> but I question the logic of continuing to attempt direct dispatch
->> if we fail one. If we get busy on one, for instance, we should just
->> insert that one to the dispatch list, and insert the rest of the list
->> normally.
->>
->>
-> It is OK for me to stop to attempt direct dispatch and insert all of the
-> rest when meet the non-ok case.
+> On 12/7/18 6:20 AM, Jens Axboe wrote:
+> > After the direct dispatch corruption fix, we permanently disallow direct
+> > dispatch of non read/write requests. This works fine off the normal IO
+> > path, as they will be retried like any other failed direct dispatch
+> > request. But for the blk_insert_cloned_request() that only DM uses to
+> > bypass the bottom level scheduler, we always first attempt direct
+> > dispatch. For some types of requests, that's now a permanent failure,
+> > and no amount of retrying will make that succeed.
+> > 
+> > Don't use direct dispatch off the cloned insert path, always just use
+> > bypass inserts. This still bypasses the bottom level scheduler, which is
+> > what DM wants.
+> > 
+> > Fixes: ffe81d45322c ("blk-mq: fix corruption with direct issue")
+> > Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> > 
+> > ---
+> > 
+> > diff --git a/block/blk-core.c b/block/blk-core.c
+> > index deb56932f8c4..4c44e6fa0d08 100644
+> > --- a/block/blk-core.c
+> > +++ b/block/blk-core.c
+> > @@ -2637,7 +2637,8 @@ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *
+> >  		 * bypass a potential scheduler on the bottom device for
+> >  		 * insert.
+> >  		 */
+> > -		return blk_mq_request_issue_directly(rq);
+> > +		blk_mq_request_bypass_insert(rq, true);
+> > +		return BLK_STS_OK;
+> >  	}
+> >  
+> >  	spin_lock_irqsave(q->queue_lock, flags);
+> > 
+> Not sure about this because it will break the merging promotion for request based DM
+> from Ming.
+> 396eaf21ee17c476e8f66249fb1f4a39003d0ab4
+> (blk-mq: improve DM's blk-mq IO merging via blk_insert_cloned_request feedback)
 
-Great, let's do that then, I think that makes more sense. The usual case
-of not being able to dispatch is resource limited, and for that case
-we'd just be wasting our time continuing to attempt direct dispatch.
+Ngh.. yeah, forgot about that convoluted feedback loop.
 
--- 
-Jens Axboe
+> We could use some other way to fix this.
 
+Yeah, afraid we have to.
