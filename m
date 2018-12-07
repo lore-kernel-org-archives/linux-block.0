@@ -2,145 +2,121 @@ Return-Path: <SRS0=IV7O=OQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90C3AC04EB8
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 03:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 667B7C04EB8
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 03:04:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4DEF52083D
-	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 03:04:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DEF52083D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id 2CC972083D
+	for <linux-block@archiver.kernel.org>; Fri,  7 Dec 2018 03:04:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="FzjKD22B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CC972083D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725939AbeLGDEE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 6 Dec 2018 22:04:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:55546 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725948AbeLGDEE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 6 Dec 2018 22:04:04 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D4C559F754;
-        Fri,  7 Dec 2018 03:04:03 +0000 (UTC)
-Received: from localhost (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 006A260C5C;
-        Fri,  7 Dec 2018 03:03:58 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
-        David Milburn <dmilburn@redhat.com>
-Subject: [PATCH V2] blk-mq: re-build queue map in case of kdump kernel
-Date:   Fri,  7 Dec 2018 11:03:53 +0800
-Message-Id: <20181207030353.27575-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Fri, 07 Dec 2018 03:04:03 +0000 (UTC)
+        id S1725948AbeLGDEn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 6 Dec 2018 22:04:43 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:44691 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725939AbeLGDEn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 6 Dec 2018 22:04:43 -0500
+Received: by mail-pg1-f194.google.com with SMTP id t13so1040383pgr.11
+        for <linux-block@vger.kernel.org>; Thu, 06 Dec 2018 19:04:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=nIBtSXDwVk1xLX/RFhr2CIyjYzNmIvpmGnmjQAvFlC8=;
+        b=FzjKD22Bu6XZ2fIXGJCMxghCTc9qCo5OYlAfLzYeJi9H0CN9e2npUpiwrYhelIc2IJ
+         jj53PBMSo+dr03Mxwa59wv/lZUkIy1Ng0bZUmlSklC3O1VwsDSWcjWn4m0+xgR6P/JnS
+         GHw9bOMzMdK6gpq41Qrm/GCG0fpwuInPcWAyLtIX8aAVwADIQEj1sfEb8FR8/6HqTdSn
+         1iBaTDSmzpuveCP35CMtMduN5RWQRw52Qqlvu1//PbcE6kEwYYRWPtYx8aha0qcwwC/g
+         HfeqEUN5lbfc60ap4zOwXQZ/vK2zD9hgcNLqlHXHv4EjCc2zbY3h8GFJypGzyXQyALYx
+         yczA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nIBtSXDwVk1xLX/RFhr2CIyjYzNmIvpmGnmjQAvFlC8=;
+        b=g5Nod5nfofobP5ifXg3Eg/XCQ7zB4EALeIunTSO58TaK3v/g8Evn6/qrZkTzDG9yE3
+         rE6v6v1++fpEV7vaOLf4WOExQpHA+nEp3RxefgsmT025Nv9E6GGjkYFfzc2c9vgFOGtv
+         UV7t+Su4OCLGfE1yXLVJN0IE0PSV7YWshZi7+eW4seevUjggMYZiuj3stK2nCpQuPNrC
+         XhjM/bFuTUas9s+TXcMmAqFasoNHBV4DFGmuZpXiVWmDNBtE/wZWiJTV2adv30PXoU40
+         4TADoJkhQeNx3yOuhWGXPHjT2qI+e4NxbXJbPY/pB++tB9xCgBLen8j2DmcIfbxPeL/o
+         eMMQ==
+X-Gm-Message-State: AA+aEWbFEEUX/JUNKUMDzrUKKBgieqt7Oy7VrznVjlwbQfumCIlH3yaV
+        6WNUxHn/j5IxBqi1lIqY87mPT3tYW/0=
+X-Google-Smtp-Source: AFSGD/U7l/XhAMRswj6gKdLLduLTu8NTBiMs9zXTDFsky3AX5XA6ULmJeRhVZuIXZEjz6czLt0p5aA==
+X-Received: by 2002:a63:1e56:: with SMTP id p22mr496621pgm.126.1544151881980;
+        Thu, 06 Dec 2018 19:04:41 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id h128sm1864070pgc.15.2018.12.06.19.04.40
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 06 Dec 2018 19:04:40 -0800 (PST)
+Subject: Re: [PATCH] blk-mq: fix corruption with direct issue
+To:     "Theodore Y. Ts'o" <tytso@mit.edu>, Ming Lei <ming.lei@redhat.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <1d359819-5410-7af2-d02b-f0ecca39d2c9@kernel.dk>
+ <20181205013736.GD17845@ming.t460p>
+ <37bf8821-c205-717a-df0d-96ecfb0f75aa@kernel.dk>
+ <20181205022716.GE17845@ming.t460p>
+ <227a40a3-6599-9fc0-ab58-674f063e9c3a@kernel.dk>
+ <20181205025801.GF17845@ming.t460p> <20181205030300.GG17845@ming.t460p>
+ <20181207024642.GA13460@thunk.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <53b0a7dd-58dc-2be8-c085-754d02ec1414@kernel.dk>
+Date:   Thu, 6 Dec 2018 20:04:38 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+MIME-Version: 1.0
+In-Reply-To: <20181207024642.GA13460@thunk.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now almost all .map_queues() implementation based on managed irq
-affinity doesn't update queue mapping and it just retrieves the
-old built mapping, so if nr_hw_queues is changed, the mapping talbe
-includes stale mapping. And only blk_mq_map_queues() may rebuild
-the mapping talbe.
+On 12/6/18 7:46 PM, Theodore Y. Ts'o wrote:
+> On Wed, Dec 05, 2018 at 11:03:01AM +0800, Ming Lei wrote:
+>>
+>> But at that time, there isn't io scheduler for MQ, so in theory the
+>> issue should be there since v4.11, especially 945ffb60c11d ("mq-deadline:
+>> add blk-mq adaptation of the deadline IO scheduler").
+> 
+> Hi Ming,
+> 
+> How were serious you about this issue being there (theoretically) an
+> issue since 4.11?  Can you talk about how it might get triggered, and
+> how we can test for it?  The reason why I ask is because we're trying
+> to track down a mysterious file system corruption problem on a 4.14.x
+> stable kernel.  The symptoms are *very* eerily similar to kernel
+> bugzilla #201685.
+> 
+> The problem is that the problem is super-rare --- roughly once a week
+> out of a popuation of about 2500 systems.  The workload is NFS
+> serving.  Unfortunately, the problem is since 4.14.63, we can no
+> longer disable blk-mq for the virtio-scsi driver, thanks to the commit
+> b5b6e8c8d3b4 ("scsi: virtio_scsi: fix IO hang caused by automatic irq
+> vector affinity") getting backported into 4.14.63 as commit
+> 70b522f163bbb32.
+> 
+> We're considering reverting this patch in our 4.14 LTS kernel, and
+> seeing whether it makes the problem go away.  Is there any thing else
+> you might suggest?
 
-One case is that we limit .nr_hw_queues as 1 in case of kdump kernel.
-However, drivers often builds queue mapping before allocating tagset
-via pci_alloc_irq_vectors_affinity(), but set->nr_hw_queues can be set
-as 1 in case of kdump kernel, so wrong queue mapping is used, and
-kernel panic[1] is observed during booting.
+We should just make SCSI do the right thing, which is to unprep if
+it sees BUSY and prep next time again. Otherwise I fear the direct
+dispatch isn't going to be super useful, if a failed direct dispatch
+prevents future merging.
 
-This patch fixes the kernel panic triggerd on nvme by rebulding the
-mapping table via blk_mq_map_queues().
+This would be a lot less error prone as well for other cases.
 
-[1] kernel panic log
-[    4.438371] nvme nvme0: 16/0/0 default/read/poll queues
-[    4.443277] BUG: unable to handle kernel NULL pointer dereference at 0000000000000098
-[    4.444681] PGD 0 P4D 0
-[    4.445367] Oops: 0000 [#1] SMP NOPTI
-[    4.446342] CPU: 3 PID: 201 Comm: kworker/u33:10 Not tainted 4.20.0-rc5-00664-g5eb02f7ee1eb-dirty #459
-[    4.447630] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.10.2-2.fc27 04/01/2014
-[    4.448689] Workqueue: nvme-wq nvme_scan_work [nvme_core]
-[    4.449368] RIP: 0010:blk_mq_map_swqueue+0xfb/0x222
-[    4.450596] Code: 04 f5 20 28 ef 81 48 89 c6 39 55 30 76 93 89 d0 48 c1 e0 04 48 03 83 f8 05 00 00 48 8b 00 42 8b 3c 28 48 8b 43 58 48 8b 04 f8 <48> 8b b8 98 00 00 00 4c 0f a3 37 72 42 f0 4c 0f ab 37 66 8b b8 f6
-[    4.453132] RSP: 0018:ffffc900023b3cd8 EFLAGS: 00010286
-[    4.454061] RAX: 0000000000000000 RBX: ffff888174448000 RCX: 0000000000000001
-[    4.456480] RDX: 0000000000000001 RSI: ffffe8feffc506c0 RDI: 0000000000000001
-[    4.458750] RBP: ffff88810722d008 R08: ffff88817647a880 R09: 0000000000000002
-[    4.464580] R10: ffffc900023b3c10 R11: 0000000000000004 R12: ffff888174448538
-[    4.467803] R13: 0000000000000004 R14: 0000000000000001 R15: 0000000000000001
-[    4.469220] FS:  0000000000000000(0000) GS:ffff88817bac0000(0000) knlGS:0000000000000000
-[    4.471554] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    4.472464] CR2: 0000000000000098 CR3: 0000000174e4e001 CR4: 0000000000760ee0
-[    4.474264] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[    4.476007] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[    4.477061] PKRU: 55555554
-[    4.477464] Call Trace:
-[    4.478731]  blk_mq_init_allocated_queue+0x36a/0x3ad
-[    4.479595]  blk_mq_init_queue+0x32/0x4e
-[    4.480178]  nvme_validate_ns+0x98/0x623 [nvme_core]
-[    4.480963]  ? nvme_submit_sync_cmd+0x1b/0x20 [nvme_core]
-[    4.481685]  ? nvme_identify_ctrl.isra.8+0x70/0xa0 [nvme_core]
-[    4.482601]  nvme_scan_work+0x23a/0x29b [nvme_core]
-[    4.483269]  ? _raw_spin_unlock_irqrestore+0x25/0x38
-[    4.483930]  ? try_to_wake_up+0x38d/0x3b3
-[    4.484478]  ? process_one_work+0x179/0x2fc
-[    4.485118]  process_one_work+0x1d3/0x2fc
-[    4.485655]  ? rescuer_thread+0x2ae/0x2ae
-[    4.486196]  worker_thread+0x1e9/0x2be
-[    4.486841]  kthread+0x115/0x11d
-[    4.487294]  ? kthread_park+0x76/0x76
-[    4.487784]  ret_from_fork+0x3a/0x50
-[    4.488322] Modules linked in: nvme nvme_core qemu_fw_cfg virtio_scsi ip_tables
-[    4.489428] Dumping ftrace buffer:
-[    4.489939]    (ftrace buffer empty)
-[    4.490492] CR2: 0000000000000098
-[    4.491052] ---[ end trace 03cd268ad5a86ff7 ]---
-
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: linux-nvme@lists.infradead.org
-Cc: David Milburn <dmilburn@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 900550594651..65770da99159 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2960,7 +2960,7 @@ static int blk_mq_alloc_rq_maps(struct blk_mq_tag_set *set)
- 
- static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
- {
--	if (set->ops->map_queues) {
-+	if (set->ops->map_queues && !is_kdump_kernel()) {
- 		int i;
- 
- 		/*
-@@ -3030,6 +3030,7 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 	 */
- 	if (is_kdump_kernel()) {
- 		set->nr_hw_queues = 1;
-+		set->nr_maps = 1;
- 		set->queue_depth = min(64U, set->queue_depth);
- 	}
- 	/*
-@@ -3051,7 +3052,7 @@ int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set)
- 						  GFP_KERNEL, set->numa_node);
- 		if (!set->map[i].mq_map)
- 			goto out_free_mq_map;
--		set->map[i].nr_queues = set->nr_hw_queues;
-+		set->map[i].nr_queues = is_kdump_kernel() ? 1 : set->nr_hw_queues;
- 	}
- 
- 	ret = blk_mq_update_queue_map(set);
 -- 
-2.9.5
+Jens Axboe
 
