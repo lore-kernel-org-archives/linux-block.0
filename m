@@ -2,439 +2,112 @@ Return-Path: <SRS0=93Gy=OS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FAKE_REPLY_C,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,T_MIXED_ES,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7078DC07E85
-	for <linux-block@archiver.kernel.org>; Sun,  9 Dec 2018 16:58:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8A41C07E85
+	for <linux-block@archiver.kernel.org>; Sun,  9 Dec 2018 17:50:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 149DF20672
-	for <linux-block@archiver.kernel.org>; Sun,  9 Dec 2018 16:58:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C05920855
+	for <linux-block@archiver.kernel.org>; Sun,  9 Dec 2018 17:50:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AL+Ilp2l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 149DF20672
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="mvcb8X4/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C05920855
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726086AbeLIQ6u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Dec 2018 11:58:50 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:32812 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726078AbeLIQ6u (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Dec 2018 11:58:50 -0500
-Received: by mail-pl1-f195.google.com with SMTP id z23so4090126plo.0
-        for <linux-block@vger.kernel.org>; Sun, 09 Dec 2018 08:58:49 -0800 (PST)
+        id S1726097AbeLIRuy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Dec 2018 12:50:54 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:44430 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726096AbeLIRuy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Dec 2018 12:50:54 -0500
+Received: by mail-pl1-f194.google.com with SMTP id k8so4102908pls.11
+        for <linux-block@vger.kernel.org>; Sun, 09 Dec 2018 09:50:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=KscH+JH3OGZXCkdRT3/wbB9QALH8hfS88TW+t/xzRBg=;
-        b=AL+Ilp2lDrNMN7CeRRe/4UrILD5jIFbodUfo+R19FzfUdO+T93W3yu/DU5AqEA6nmp
-         2YGXyCC5vR+h9kgEfZqAjCYQ6dQ+oHiCSBl0iVt1aPq01bOoWsG2G7YCEbMegY9joW1w
-         67O9lCxy2MIyBMh19xvlvyoiozNEE4XXSUulQHhFhADY+aPTePI2uCQRHMIwX4TuSOVx
-         QiGDFIiMXYXlKxcxv39fqZlBuO9qEnfgJCwiJt29PygugDhxvSJDFDRHmTOdZfBYGqGz
-         m+IBg8lFgLmXBKs60oLNJbbKayO6ZuzZtngW+hU5vUs2byVAcgjWsGxP2JR5Ctgo9+6R
-         SJow==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=n3fDLjtN9HluwYxr5S1AV21djoICktjCloPV+d7S070=;
+        b=mvcb8X4/+L3IORywIk9ZY+Fb7gPPhG0b7OoCbbv1/LqlqGkmvYiRYbH2+igNNWHylC
+         kh2Zwg2/SyOkfyBs4e18cicnd/GRY5WEzRhT6S5IuqDSNfJ1dLcp5rvURKTzR6tUkHn6
+         iqnrM5jO+WM+36C5X2m5huCg24+wpxgaSN+oLBqNg6cFoIZ5nh7ICiFs/3DWCrQXI78r
+         cUPysTRAbgKYUfdd3OEn9JdnxQAJBQvEnr6sdwI06SQmceGdKYqC+yPuCXKMTKYg5Vlt
+         eN0jaUVid99ZAiZZuKeIuQmnan9mRKP6TywUy20x1fLlTmV7GLTGE8yfk415QCq+qE0R
+         G7eA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition:user-agent;
-        bh=KscH+JH3OGZXCkdRT3/wbB9QALH8hfS88TW+t/xzRBg=;
-        b=oi4MP6h07SeS94cZE2viJFI/J0YQZV+BjL6k0Tgw12vM5E/pwtDcVxcKUfHBU/iD4L
-         dT7yHcNZsFryB0FxBo6/o5X1KdZmTBwtwprOa7j1XIIepXtvf/zi2edO0x6APJ8evKua
-         oXl364eXPRd1uJYEeR5bafjpE5ToZIkxKnXcg2Uvsz5uCLEyQs08Fwr3Vb/3ULzQbFa+
-         qVy0AloQ0JCbITNEIsZ+/Ko6xU0qr4KWNvaDwsHaCIJgEQw6OsUX9VWdDolvOOkOK+D+
-         +FeCzQouEJ4KeV97CR9FPlClT30rjEf3p21MgFn3ySut1FEjj5fPHIBwNXlILoECZAoX
-         WEFQ==
-X-Gm-Message-State: AA+aEWalSYvSGTj/nNTUsX/u/fLRe4eIcbuwIoe5Mz8odW3bz+kSIou0
-        ig8+AFsq1NsxDc2JUI9+U/s=
-X-Google-Smtp-Source: AFSGD/W5tENg8eQ0OkjwFkj36r7xQh8kljO1IJBlKZrt/v9nlhkE93fw+6ekO60YBvukw5uZ9d+TCA==
-X-Received: by 2002:a17:902:9692:: with SMTP id n18mr9349586plp.333.1544374728676;
-        Sun, 09 Dec 2018 08:58:48 -0800 (PST)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id e128sm12359325pfe.67.2018.12.09.08.58.47
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=n3fDLjtN9HluwYxr5S1AV21djoICktjCloPV+d7S070=;
+        b=oPthjPiZtrGUbDNeCRYV5BycMDrv8bH57wwbwvpuH1Ok/rT1kui4OAl6d2EnV2DVOw
+         ctu7zMB7jWF5u8pTdD63GPC2ejYxJRIFpGowhK1B85fcSoO2xUBaz5ysX8vmLS5D4oyn
+         T4S9m14GvKJ+4QMYlq2eE3KpVzPn3PJ7wJ2SgGC9vGtMVcKnmUzAKepEUgdIPm047PXG
+         5biwyj7Tnans8+MPTePVr7uM7EC78VW80wP7WLJzs3HvYA9UcAa8SoDFFZrdTei07854
+         MsSKFtwXnVNr6caIOivZygEHSS4m2vvJqKqHAeb5BeZjGfWoOqgH3gCOmTcdZdXy0h0j
+         /xMA==
+X-Gm-Message-State: AA+aEWZ5ta5+N42EcbkB0eBrc3UvYVxWYmYa6hGj0aBmYssjff2n+0Yr
+        oWX9aMg/iJfoCsX7uzqX0W1XfQ==
+X-Google-Smtp-Source: AFSGD/XYG3Ndq/+RD7n4Al0kf7cXHBQ0//rQYulQmGugSysBUP8j9XzeivYA5EF82ZvFTUecb1DCfw==
+X-Received: by 2002:a17:902:96a:: with SMTP id 97mr9038956plm.45.1544377853315;
+        Sun, 09 Dec 2018 09:50:53 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id u137sm13725376pfc.140.2018.12.09.09.50.51
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 09 Dec 2018 08:58:48 -0800 (PST)
-Date:   Sun, 9 Dec 2018 08:58:47 -0800
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     Jens Axboe <axboe@kernel.dk>
+        Sun, 09 Dec 2018 09:50:52 -0800 (PST)
+Subject: Re: [PATCH] sbitmap: silence bogus lockdep IRQ warning
+To:     Guenter Roeck <linux@roeck-us.net>
 Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Omar Sandoval <osandov@osandov.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH] sbitmap: silence bogus lockdep IRQ warning
-Message-ID: <20181209165847.GA31213@roeck-us.net>
+References: <20181209165847.GA31213@roeck-us.net>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <f57e00fe-9f59-e1c2-2af3-8c41ebe1fe51@kernel.dk>
+Date:   Sun, 9 Dec 2018 10:50:50 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20181209165847.GA31213@roeck-us.net>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Dec 09, 2018 at 07:26:47AM -0700, Jens Axboe wrote:
+On 12/9/18 9:58 AM, Guenter Roeck wrote:
+> On Sun, Dec 09, 2018 at 07:26:47AM -0700, Jens Axboe wrote:
+>>
+>> Ming that lockdep spews the following trace. What this essentially says
+>> is that the sbitmap swap_lock was used inconsistently in IRQ enabled
+>> and disabled context, and that is usually indicative of a bug that will
+>> cause a deadlock.
+>>
+>> For this case, it's a false positive. The swap_lock is used from process
+>> context only, when we swap the bits in the word and cleared mask. We
+>> also end up doing that when we are getting a driver tag, from the
+>> blk_mq_mark_tag_wait(), and from there we hold the waitqueue lock with
+>> IRQs disabled. However, this isn't from an actual IRQ, it's still
+>> process context.
+>>
+>> Mark the swap_lock as not needing validation to silence this warning.
+>>
 > 
-> Ming that lockdep spews the following trace. What this essentially says
-> is that the sbitmap swap_lock was used inconsistently in IRQ enabled
-> and disabled context, and that is usually indicative of a bug that will
-> cause a deadlock.
+> checkpatch says:
 > 
-> For this case, it's a false positive. The swap_lock is used from process
-> context only, when we swap the bits in the word and cleared mask. We
-> also end up doing that when we are getting a driver tag, from the
-> blk_mq_mark_tag_wait(), and from there we hold the waitqueue lock with
-> IRQs disabled. However, this isn't from an actual IRQ, it's still
-> process context.
-> 
-> Mark the swap_lock as not needing validation to silence this warning.
-> 
-
-checkpatch says:
-
-$ scripts/checkpatch.pl jens2
-ERROR: lockdep_no_validate class is reserved for device->mutex.
-#357: FILE: lib/sbitmap.c:68:
-+		lockdep_set_novalidate_class(&sb->map[i].swap_lock);
-
-... which I think explains the warning I am seeing with this patch applied. 
-
-Guenter
-
-> [  100.967642] ================start test sanity/001================
-> [  101.238280] null: module loaded
-> [  106.093735]
-> [  106.094012] =====================================================
-> [  106.094854] WARNING: SOFTIRQ-safe -> SOFTIRQ-unsafe lock order detected
-> [  106.095759] 4.20.0-rc3_5d2ee7122c73_for-next+ #1 Not tainted
-> [  106.096551] -----------------------------------------------------
-> [  106.097386] fio/1043 [HC0[0]:SC0[0]:HE0:SE1] is trying to acquire:
-> [  106.098231] 000000004c43fa71
-> (&(&sb->map[i].swap_lock)->rlock){+.+.}, at: sbitmap_get+0xd5/0x22c
-> [  106.099431]
-> [  106.099431] and this task is already holding:
-> [  106.100229] 000000007eec8b2f
-> (&(&hctx->dispatch_wait_lock)->rlock){....}, at:
-> blk_mq_dispatch_rq_list+0x4c1/0xd7c
-> [  106.101630] which would create a new lock dependency:
-> [  106.102326]  (&(&hctx->dispatch_wait_lock)->rlock){....} ->
-> (&(&sb->map[i].swap_lock)->rlock){+.+.}
-> [  106.103553]
-> [  106.103553] but this new dependency connects a SOFTIRQ-irq-safe lock:
-> [  106.104580]  (&sbq->ws[i].wait){..-.}
-> [  106.104582]
-> [  106.104582] ... which became SOFTIRQ-irq-safe at:
-> [  106.105751]   _raw_spin_lock_irqsave+0x4b/0x82
-> [  106.106284]   __wake_up_common_lock+0x119/0x1b9
-> [  106.106825]   sbitmap_queue_wake_up+0x33f/0x383
-> [  106.107456]   sbitmap_queue_clear+0x4c/0x9a
-> [  106.108046]   __blk_mq_free_request+0x188/0x1d3
-> [  106.108581]   blk_mq_free_request+0x23b/0x26b
-> [  106.109102]   scsi_end_request+0x345/0x5d7
-> [  106.109587]   scsi_io_completion+0x4b5/0x8f0
-> [  106.110099]   scsi_finish_command+0x412/0x456
-> [  106.110615]   scsi_softirq_done+0x23f/0x29b
-> [  106.111115]   blk_done_softirq+0x2a7/0x2e6
-> [  106.111608]   __do_softirq+0x360/0x6ad
-> [  106.112062]   run_ksoftirqd+0x2f/0x5b
-> [  106.112499]   smpboot_thread_fn+0x3a5/0x3db
-> [  106.113000]   kthread+0x1d4/0x1e4
-> [  106.113457]   ret_from_fork+0x3a/0x50
-> [  106.113969]
-> [  106.113969] to a SOFTIRQ-irq-unsafe lock:
-> [  106.114672]  (&(&sb->map[i].swap_lock)->rlock){+.+.}
-> [  106.114674]
-> [  106.114674] ... which became SOFTIRQ-irq-unsafe at:
-> [  106.116000] ...
-> [  106.116003]   _raw_spin_lock+0x33/0x64
-> [  106.116676]   sbitmap_get+0xd5/0x22c
-> [  106.117134]   __sbitmap_queue_get+0xe8/0x177
-> [  106.117731]   __blk_mq_get_tag+0x1e6/0x22d
-> [  106.118286]   blk_mq_get_tag+0x1db/0x6e4
-> [  106.118756]   blk_mq_get_driver_tag+0x161/0x258
-> [  106.119383]   blk_mq_dispatch_rq_list+0x28e/0xd7c
-> [  106.120043]   blk_mq_do_dispatch_sched+0x23a/0x287
-> [  106.120607]   blk_mq_sched_dispatch_requests+0x379/0x3fc
-> [  106.121234]   __blk_mq_run_hw_queue+0x137/0x17e
-> [  106.121781]   __blk_mq_delay_run_hw_queue+0x80/0x25f
-> [  106.122366]   blk_mq_run_hw_queue+0x151/0x187
-> [  106.122887]   blk_mq_sched_insert_requests+0x13f/0x175
-> [  106.123492]   blk_mq_flush_plug_list+0x7d6/0x81b
-> [  106.124042]   blk_flush_plug_list+0x392/0x3d7
-> [  106.124557]   blk_finish_plug+0x37/0x4f
-> [  106.125019]   read_pages+0x3ef/0x430
-> [  106.125446]   __do_page_cache_readahead+0x18e/0x2fc
-> [  106.126027]   force_page_cache_readahead+0x121/0x133
-> [  106.126621]   page_cache_sync_readahead+0x35f/0x3bb
-> [  106.127229]   generic_file_buffered_read+0x410/0x1860
-> [  106.127932]   __vfs_read+0x319/0x38f
-> [  106.128415]   vfs_read+0xd2/0x19a
-> [  106.128817]   ksys_read+0xb9/0x135
-> [  106.129225]   do_syscall_64+0x140/0x385
-> [  106.129684]   entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> [  106.130292]
-> [  106.130292] other info that might help us debug this:
-> [  106.130292]
-> [  106.131226] Chain exists of:
-> [  106.131226]   &sbq->ws[i].wait -->
-> &(&hctx->dispatch_wait_lock)->rlock -->
-> &(&sb->map[i].swap_lock)->rlock
-> [  106.131226]
-> [  106.132865]  Possible interrupt unsafe locking scenario:
-> [  106.132865]
-> [  106.133659]        CPU0                    CPU1
-> [  106.134194]        ----                    ----
-> [  106.134733]   lock(&(&sb->map[i].swap_lock)->rlock);
-> [  106.135318]                                local_irq_disable();
-> [  106.136014]                                lock(&sbq->ws[i].wait);
-> [  106.136747]
-> lock(&(&hctx->dispatch_wait_lock)->rlock);
-> [  106.137742]   <Interrupt>
-> [  106.138110]     lock(&sbq->ws[i].wait);
-> [  106.138625]
-> [  106.138625]  *** DEADLOCK ***
-> [  106.138625]
-> [  106.139430] 3 locks held by fio/1043:
-> [  106.139947]  #0: 0000000076ff0fd9 (rcu_read_lock){....}, at:
-> hctx_lock+0x29/0xe8
-> [  106.140813]  #1: 000000002feb1016 (&sbq->ws[i].wait){..-.}, at:
-> blk_mq_dispatch_rq_list+0x4ad/0xd7c
-> [  106.141877]  #2: 000000007eec8b2f
-> (&(&hctx->dispatch_wait_lock)->rlock){....}, at:
-> blk_mq_dispatch_rq_list+0x4c1/0xd7c
-> [  106.143267]
-> [  106.143267] the dependencies between SOFTIRQ-irq-safe lock and the
-> holding lock:
-> [  106.144351]  -> (&sbq->ws[i].wait){..-.} ops: 82 {
-> [  106.144926]     IN-SOFTIRQ-W at:
-> [  106.145314]                       _raw_spin_lock_irqsave+0x4b/0x82
-> [  106.146042]                       __wake_up_common_lock+0x119/0x1b9
-> [  106.146785]                       sbitmap_queue_wake_up+0x33f/0x383
-> [  106.147567]                       sbitmap_queue_clear+0x4c/0x9a
-> [  106.148379]                       __blk_mq_free_request+0x188/0x1d3
-> [  106.149148]                       blk_mq_free_request+0x23b/0x26b
-> [  106.149864]                       scsi_end_request+0x345/0x5d7
-> [  106.150546]                       scsi_io_completion+0x4b5/0x8f0
-> [  106.151367]                       scsi_finish_command+0x412/0x456
-> [  106.152157]                       scsi_softirq_done+0x23f/0x29b
-> [  106.152855]                       blk_done_softirq+0x2a7/0x2e6
-> [  106.153537]                       __do_softirq+0x360/0x6ad
-> [  106.154280]                       run_ksoftirqd+0x2f/0x5b
-> [  106.155020]                       smpboot_thread_fn+0x3a5/0x3db
-> [  106.155828]                       kthread+0x1d4/0x1e4
-> [  106.156526]                       ret_from_fork+0x3a/0x50
-> [  106.157267]     INITIAL USE at:
-> [  106.157713]                      _raw_spin_lock_irqsave+0x4b/0x82
-> [  106.158542]                      prepare_to_wait_exclusive+0xa8/0x215
-> [  106.159421]                      blk_mq_get_tag+0x34f/0x6e4
-> [  106.160186]                      blk_mq_get_request+0x48e/0xaef
-> [  106.160997]                      blk_mq_make_request+0x27e/0xbd2
-> [  106.161828]                      generic_make_request+0x4d1/0x873
-> [  106.162661]                      submit_bio+0x20c/0x253
-> [  106.163379]                      mpage_bio_submit+0x44/0x4b
-> [  106.164142]                      mpage_readpages+0x3c2/0x407
-> [  106.164919]                      read_pages+0x13a/0x430
-> [  106.165633]                      __do_page_cache_readahead+0x18e/0x2fc
-> [  106.166530]                      force_page_cache_readahead+0x121/0x133
-> [  106.167439]                      page_cache_sync_readahead+0x35f/0x3bb
-> [  106.168337]                      generic_file_buffered_read+0x410/0x1860
-> [  106.169255]                      __vfs_read+0x319/0x38f
-> [  106.169977]                      vfs_read+0xd2/0x19a
-> [  106.170662]                      ksys_read+0xb9/0x135
-> [  106.171356]                      do_syscall_64+0x140/0x385
-> [  106.172120]                      entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> [  106.173051]   }
-> [  106.173308]   ... key      at: [<ffffffff85094600>] __key.26481+0x0/0x40
-> [  106.174219]   ... acquired at:
-> [  106.174646]    _raw_spin_lock+0x33/0x64
-> [  106.175183]    blk_mq_dispatch_rq_list+0x4c1/0xd7c
-> [  106.175843]    blk_mq_do_dispatch_sched+0x23a/0x287
-> [  106.176518]    blk_mq_sched_dispatch_requests+0x379/0x3fc
-> [  106.177262]    __blk_mq_run_hw_queue+0x137/0x17e
-> [  106.177900]    __blk_mq_delay_run_hw_queue+0x80/0x25f
-> [  106.178591]    blk_mq_run_hw_queue+0x151/0x187
-> [  106.179207]    blk_mq_sched_insert_requests+0x13f/0x175
-> [  106.179926]    blk_mq_flush_plug_list+0x7d6/0x81b
-> [  106.180571]    blk_flush_plug_list+0x392/0x3d7
-> [  106.181187]    blk_finish_plug+0x37/0x4f
-> [  106.181737]    __se_sys_io_submit+0x171/0x304
-> [  106.182346]    do_syscall_64+0x140/0x385
-> [  106.182895]    entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> [  106.183607]
-> [  106.183830] -> (&(&hctx->dispatch_wait_lock)->rlock){....} ops: 1 {
-> [  106.184691]    INITIAL USE at:
-> [  106.185119]                    _raw_spin_lock+0x33/0x64
-> [  106.185838]                    blk_mq_dispatch_rq_list+0x4c1/0xd7c
-> [  106.186697]                    blk_mq_do_dispatch_sched+0x23a/0x287
-> [  106.187551]                    blk_mq_sched_dispatch_requests+0x379/0x3fc
-> [  106.188481]                    __blk_mq_run_hw_queue+0x137/0x17e
-> [  106.189307]                    __blk_mq_delay_run_hw_queue+0x80/0x25f
-> [  106.190189]                    blk_mq_run_hw_queue+0x151/0x187
-> [  106.190989]                    blk_mq_sched_insert_requests+0x13f/0x175
-> [  106.191902]                    blk_mq_flush_plug_list+0x7d6/0x81b
-> [  106.192739]                    blk_flush_plug_list+0x392/0x3d7
-> [  106.193535]                    blk_finish_plug+0x37/0x4f
-> [  106.194269]                    __se_sys_io_submit+0x171/0x304
-> [  106.195059]                    do_syscall_64+0x140/0x385
-> [  106.195794]                    entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> [  106.196705]  }
-> [  106.196950]  ... key      at: [<ffffffff84880620>] __key.51231+0x0/0x40
-> [  106.197853]  ... acquired at:
-> [  106.198270]    lock_acquire+0x280/0x2f3
-> [  106.198806]    _raw_spin_lock+0x33/0x64
-> [  106.199337]    sbitmap_get+0xd5/0x22c
-> [  106.199850]    __sbitmap_queue_get+0xe8/0x177
-> [  106.200450]    __blk_mq_get_tag+0x1e6/0x22d
-> [  106.201035]    blk_mq_get_tag+0x1db/0x6e4
-> [  106.201589]    blk_mq_get_driver_tag+0x161/0x258
-> [  106.202237]    blk_mq_dispatch_rq_list+0x5b9/0xd7c
-> [  106.202902]    blk_mq_do_dispatch_sched+0x23a/0x287
-> [  106.203572]    blk_mq_sched_dispatch_requests+0x379/0x3fc
-> [  106.204316]    __blk_mq_run_hw_queue+0x137/0x17e
-> [  106.204956]    __blk_mq_delay_run_hw_queue+0x80/0x25f
-> [  106.205649]    blk_mq_run_hw_queue+0x151/0x187
-> [  106.206269]    blk_mq_sched_insert_requests+0x13f/0x175
-> [  106.206997]    blk_mq_flush_plug_list+0x7d6/0x81b
-> [  106.207644]    blk_flush_plug_list+0x392/0x3d7
-> [  106.208264]    blk_finish_plug+0x37/0x4f
-> [  106.208814]    __se_sys_io_submit+0x171/0x304
-> [  106.209415]    do_syscall_64+0x140/0x385
-> [  106.209965]    entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> [  106.210684]
-> [  106.210904]
-> [  106.210904] the dependencies between the lock to be acquired
-> [  106.210905]  and SOFTIRQ-irq-unsafe lock:
-> [  106.212541] -> (&(&sb->map[i].swap_lock)->rlock){+.+.} ops: 1969 {
-> [  106.213393]    HARDIRQ-ON-W at:
-> [  106.213840]                     _raw_spin_lock+0x33/0x64
-> [  106.214570]                     sbitmap_get+0xd5/0x22c
-> [  106.215282]                     __sbitmap_queue_get+0xe8/0x177
-> [  106.216086]                     __blk_mq_get_tag+0x1e6/0x22d
-> [  106.216876]                     blk_mq_get_tag+0x1db/0x6e4
-> [  106.217627]                     blk_mq_get_driver_tag+0x161/0x258
-> [  106.218465]                     blk_mq_dispatch_rq_list+0x28e/0xd7c
-> [  106.219326]                     blk_mq_do_dispatch_sched+0x23a/0x287
-> [  106.220198]                     blk_mq_sched_dispatch_requests+0x379/0x3fc
-> [  106.221138]                     __blk_mq_run_hw_queue+0x137/0x17e
-> [  106.221975]                     __blk_mq_delay_run_hw_queue+0x80/0x25f
-> [  106.222874]                     blk_mq_run_hw_queue+0x151/0x187
-> [  106.223686]                     blk_mq_sched_insert_requests+0x13f/0x175
-> [  106.224597]                     blk_mq_flush_plug_list+0x7d6/0x81b
-> [  106.225444]                     blk_flush_plug_list+0x392/0x3d7
-> [  106.226255]                     blk_finish_plug+0x37/0x4f
-> [  106.227006]                     read_pages+0x3ef/0x430
-> [  106.227717]                     __do_page_cache_readahead+0x18e/0x2fc
-> [  106.228595]                     force_page_cache_readahead+0x121/0x133
-> [  106.229491]                     page_cache_sync_readahead+0x35f/0x3bb
-> [  106.230373]                     generic_file_buffered_read+0x410/0x1860
-> [  106.231277]                     __vfs_read+0x319/0x38f
-> [  106.231986]                     vfs_read+0xd2/0x19a
-> [  106.232666]                     ksys_read+0xb9/0x135
-> [  106.233350]                     do_syscall_64+0x140/0x385
-> [  106.234097]                     entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> [  106.235012]    SOFTIRQ-ON-W at:
-> [  106.235460]                     _raw_spin_lock+0x33/0x64
-> [  106.236195]                     sbitmap_get+0xd5/0x22c
-> [  106.236913]                     __sbitmap_queue_get+0xe8/0x177
-> [  106.237715]                     __blk_mq_get_tag+0x1e6/0x22d
-> [  106.238488]                     blk_mq_get_tag+0x1db/0x6e4
-> [  106.239244]                     blk_mq_get_driver_tag+0x161/0x258
-> [  106.240079]                     blk_mq_dispatch_rq_list+0x28e/0xd7c
-> [  106.240937]                     blk_mq_do_dispatch_sched+0x23a/0x287
-> [  106.241806]                     blk_mq_sched_dispatch_requests+0x379/0x3fc
-> [  106.242751]                     __blk_mq_run_hw_queue+0x137/0x17e
-> [  106.243579]                     __blk_mq_delay_run_hw_queue+0x80/0x25f
-> [  106.244469]                     blk_mq_run_hw_queue+0x151/0x187
-> [  106.245277]                     blk_mq_sched_insert_requests+0x13f/0x175
-> [  106.246191]                     blk_mq_flush_plug_list+0x7d6/0x81b
-> [  106.247044]                     blk_flush_plug_list+0x392/0x3d7
-> [  106.247859]                     blk_finish_plug+0x37/0x4f
-> [  106.248749]                     read_pages+0x3ef/0x430
-> [  106.249463]                     __do_page_cache_readahead+0x18e/0x2fc
-> [  106.250357]                     force_page_cache_readahead+0x121/0x133
-> [  106.251263]                     page_cache_sync_readahead+0x35f/0x3bb
-> [  106.252157]                     generic_file_buffered_read+0x410/0x1860
-> [  106.253084]                     __vfs_read+0x319/0x38f
-> [  106.253808]                     vfs_read+0xd2/0x19a
-> [  106.254488]                     ksys_read+0xb9/0x135
-> [  106.255186]                     do_syscall_64+0x140/0x385
-> [  106.255943]                     entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> [  106.256867]    INITIAL USE at:
-> [  106.257300]                    _raw_spin_lock+0x33/0x64
-> [  106.258033]                    sbitmap_get+0xd5/0x22c
-> [  106.258747]                    __sbitmap_queue_get+0xe8/0x177
-> [  106.259542]                    __blk_mq_get_tag+0x1e6/0x22d
-> [  106.260320]                    blk_mq_get_tag+0x1db/0x6e4
-> [  106.261072]                    blk_mq_get_driver_tag+0x161/0x258
-> [  106.261902]                    blk_mq_dispatch_rq_list+0x28e/0xd7c
-> [  106.262762]                    blk_mq_do_dispatch_sched+0x23a/0x287
-> [  106.263626]                    blk_mq_sched_dispatch_requests+0x379/0x3fc
-> [  106.264571]                    __blk_mq_run_hw_queue+0x137/0x17e
-> [  106.265409]                    __blk_mq_delay_run_hw_queue+0x80/0x25f
-> [  106.266302]                    blk_mq_run_hw_queue+0x151/0x187
-> [  106.267111]                    blk_mq_sched_insert_requests+0x13f/0x175
-> [  106.268028]                    blk_mq_flush_plug_list+0x7d6/0x81b
-> [  106.268878]                    blk_flush_plug_list+0x392/0x3d7
-> [  106.269694]                    blk_finish_plug+0x37/0x4f
-> [  106.270432]                    read_pages+0x3ef/0x430
-> [  106.271139]                    __do_page_cache_readahead+0x18e/0x2fc
-> [  106.272040]                    force_page_cache_readahead+0x121/0x133
-> [  106.272932]                    page_cache_sync_readahead+0x35f/0x3bb
-> [  106.273811]                    generic_file_buffered_read+0x410/0x1860
-> [  106.274709]                    __vfs_read+0x319/0x38f
-> [  106.275407]                    vfs_read+0xd2/0x19a
-> [  106.276074]                    ksys_read+0xb9/0x135
-> [  106.276764]                    do_syscall_64+0x140/0x385
-> [  106.277500]                    entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> [  106.278417]  }
-> [  106.278676]  ... key      at: [<ffffffff85094640>] __key.26212+0x0/0x40
-> [  106.279586]  ... acquired at:
-> [  106.280026]    lock_acquire+0x280/0x2f3
-> [  106.280559]    _raw_spin_lock+0x33/0x64
-> [  106.281101]    sbitmap_get+0xd5/0x22c
-> [  106.281610]    __sbitmap_queue_get+0xe8/0x177
-> [  106.282221]    __blk_mq_get_tag+0x1e6/0x22d
-> [  106.282809]    blk_mq_get_tag+0x1db/0x6e4
-> [  106.283368]    blk_mq_get_driver_tag+0x161/0x258
-> [  106.284018]    blk_mq_dispatch_rq_list+0x5b9/0xd7c
-> [  106.284685]    blk_mq_do_dispatch_sched+0x23a/0x287
-> [  106.285371]    blk_mq_sched_dispatch_requests+0x379/0x3fc
-> [  106.286135]    __blk_mq_run_hw_queue+0x137/0x17e
-> [  106.286806]    __blk_mq_delay_run_hw_queue+0x80/0x25f
-> [  106.287515]    blk_mq_run_hw_queue+0x151/0x187
-> [  106.288149]    blk_mq_sched_insert_requests+0x13f/0x175
-> [  106.289041]    blk_mq_flush_plug_list+0x7d6/0x81b
-> [  106.289912]    blk_flush_plug_list+0x392/0x3d7
-> [  106.290590]    blk_finish_plug+0x37/0x4f
-> [  106.291238]    __se_sys_io_submit+0x171/0x304
-> [  106.291864]    do_syscall_64+0x140/0x385
-> [  106.292534]    entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> 
-> Reported-by: Ming Lei <ming.lei@redhat.com>
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> ---
-> 
-> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-> index a89fbe7cf6ca..053334a8e101 100644
-> --- a/lib/sbitmap.c
-> +++ b/lib/sbitmap.c
-> @@ -60,6 +60,12 @@ int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
->  		sb->map[i].depth = min(depth, bits_per_word);
->  		depth -= sb->map[i].depth;
->  		spin_lock_init(&sb->map[i].swap_lock);
-> +		/*
-> +		 * Avoid false positives while being grabbed under
-> +		 * the blk-mq waitqueue lock with ints disabled, any
-> +		 * use of it is from process context.
-> +		 */
+> $ scripts/checkpatch.pl jens2
+> ERROR: lockdep_no_validate class is reserved for device->mutex.
+> #357: FILE: lib/sbitmap.c:68:
 > +		lockdep_set_novalidate_class(&sb->map[i].swap_lock);
->  	}
->  	return 0;
->  }
 > 
-> -- 
-> Jens Axboe
-> 
+> ... which I think explains the warning I am seeing with this patch applied. 
+
+Try the other patch I sent out earlier, that should work.
+
+-- 
+Jens Axboe
+
