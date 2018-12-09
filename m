@@ -2,77 +2,73 @@ Return-Path: <SRS0=93Gy=OS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7469C07E85
-	for <linux-block@archiver.kernel.org>; Sun,  9 Dec 2018 18:14:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A130CC07E85
+	for <linux-block@archiver.kernel.org>; Sun,  9 Dec 2018 18:21:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9BB652081C
-	for <linux-block@archiver.kernel.org>; Sun,  9 Dec 2018 18:14:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CCDC20837
+	for <linux-block@archiver.kernel.org>; Sun,  9 Dec 2018 18:21:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cs/jyDaP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BB652081C
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="aIU4M1qb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CCDC20837
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726097AbeLISOp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Dec 2018 13:14:45 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:46032 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726096AbeLISOo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Dec 2018 13:14:44 -0500
-Received: by mail-pg1-f194.google.com with SMTP id y4so3880323pgc.12
-        for <linux-block@vger.kernel.org>; Sun, 09 Dec 2018 10:14:44 -0800 (PST)
+        id S1726179AbeLISVt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Dec 2018 13:21:49 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:46413 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726097AbeLISVt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Dec 2018 13:21:49 -0500
+Received: by mail-pg1-f195.google.com with SMTP id w7so3883593pgp.13
+        for <linux-block@vger.kernel.org>; Sun, 09 Dec 2018 10:21:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=+MqSEAO42VNdDFp983LulFBy7Amse3Osiu/3HOyIge4=;
-        b=cs/jyDaPY/Wcv4XiPwzNHRyN4RMIndIepQZUkboIN3XftsGvr5NPY1MnhQz3jU9cFp
-         Hlk+sUmSNSN9pgF8z1cUbDKqQo0NYIap7Q1jOBgqmWzyLJGy4MZeGIpvgJ7ALYnEgFMU
-         4n3+iHqlDoeGEV3smrf47Y03h/0fO/hoFOCmmOzT6Bk/40NQpu2hXP2LS1hPgPFjrf5U
-         KJ/uzl1gLNzPBwI0Yfrye+khFEN2Cvx2j8T+3H1tuu45ujGbZVax/XvApCtC+i1mq0hp
-         v0onBFzbQqAAajUUnsYlGzCF0DLB9xfGgKcBXQctbdY1J9znWLwLdiT/pTH+ir6PvU4L
-         dPrA==
+        h=to:cc:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=AZTQ+gKaLlV5gBP48gUGcZybNYVas6fKgxDHplrXZ3U=;
+        b=aIU4M1qbae3AcXy50ZXKjQbi07SOBngKBX/GQxaTvBM8fgpndSKWZyhyAYiv4Tiicb
+         FglH9b01Wqb9pWDgLmz5D1gNg+frjxPr8zMXv0X2Kgq1PQ8Mct8fDzJRLGtQrfy5Rwj/
+         gFABDLqsKxmuLHsCDkZRdlxfU2XR3gi5SkmH2uJu0UNp8U0F2U0LWst2Wr4eBygOrHAJ
+         6cNufVrlPkMN4wgeR1J3cjbpuBA8QLJIU87N0A7rT9AYa4kzH4jnPkucva3ZXxR8+bkq
+         wIKXRgisqVEnbkvuNkfZsdyvQPS0X2ige5oEOz7vVi8x6iYl520Mwwh3w/PGzaaHQqBF
+         DItg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+MqSEAO42VNdDFp983LulFBy7Amse3Osiu/3HOyIge4=;
-        b=n0AmwM2eY1mwra6oZAV4aJb8OZyPT7SZp90kKhLkkQznDvJq5Vi2jBdvGXhvOfWj4W
-         fPK2au6sIDQjVJGa2HCn8SElPrwrhT6ZcCa/VGnx7EzJokifeVpFNtoVvpYvMOm/dMZL
-         A6rQf7eGcyfif0VQ/qAU8uT0Ap856imdDjlMKyDAlWGcM+6/mfBYFW1PpjCZ2AXsfO6r
-         3GbJLIc3VhaqBHNpLrkcjTju94bXe5MIMmfYBNvg+lSwYOlTIH2nnFhhscRYiRW57n4k
-         4ohHmTxHnRijoLWM46SN3sPVJ+fbdPOXUrWCFbGfE59Em3zCC2t30xrio8UzmLlh4Z2d
-         pzqQ==
-X-Gm-Message-State: AA+aEWZp79D63/l1Hv1QRVYiPatZTLVTksQjaXVno4enOFaQHO5tTxMT
-        qQIlzJGKNqwjkuRf1gDKfIgRViLKvgg=
-X-Google-Smtp-Source: AFSGD/WHMT7iGPNr0M4qq6CGyGO/wYKHF8eqrPpOi+HAGcYS3qAZyTz6WgC8ivpuxl0MKsvzfgYOsg==
-X-Received: by 2002:a62:4181:: with SMTP id g1mr9511913pfd.45.1544379283570;
-        Sun, 09 Dec 2018 10:14:43 -0800 (PST)
+        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=AZTQ+gKaLlV5gBP48gUGcZybNYVas6fKgxDHplrXZ3U=;
+        b=bhfoC2aadIT8hcCJk2AFblcYvt/5DfJsPUxWXM6aFrHH9qHM1Ql/CAzrNc4ZXsydlz
+         z18TLaTH1wmh1Vn0iaGwyC4yHNrvQkAgNcZbkKIXcmjux2Xj0Oe802dvbGepYaKGwxXb
+         AKJQC/2vZ0mEs+v6UneBLVOTOx0zfJ09lqFRvjq1AU90zBKX1uAmUA7eXQpRt2eLu7SS
+         lz859Sytlj48mkC7qwN8di/33dxGE1+9elYMgk0B6hqwNU/lJvbT+0OM256hMIvpq//a
+         Eq51DX5Ao1dHsCEktoWZB4f/bMjhhWA7FSKSEXFz99xOQ4eHlhprsdnzl9WE3XSdv8JK
+         sDeA==
+X-Gm-Message-State: AA+aEWbQEI7uTCv8t5QcLjHmyvk19FQbc8YDVMDhVoBwlyCZ4haZQc5c
+        QGFLRxNwZaZM5PIs4uYkR7C0OQ==
+X-Google-Smtp-Source: AFSGD/XIQAY7cID8xFbYrV21PsEG8IQrlfO3L+JF7GcmpqbDRO77fixOLEAEROTxO02CF2XPdILswg==
+X-Received: by 2002:a62:6cc8:: with SMTP id h191mr9995511pfc.89.1544379708166;
+        Sun, 09 Dec 2018 10:21:48 -0800 (PST)
 Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id i72sm12845356pfe.181.2018.12.09.10.14.41
+        by smtp.gmail.com with ESMTPSA id v14sm17217950pgf.3.2018.12.09.10.21.46
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 09 Dec 2018 10:14:42 -0800 (PST)
-Subject: Re: [PATCH] sbitmap: silence bogus lockdep IRQ warning
-To:     Guenter Roeck <linux@roeck-us.net>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Omar Sandoval <osandov@osandov.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>
-References: <20181209165847.GA31213@roeck-us.net>
- <f57e00fe-9f59-e1c2-2af3-8c41ebe1fe51@kernel.dk>
- <5b742063-76c4-ba63-e50c-5e4dfe1dbe42@roeck-us.net>
+        Sun, 09 Dec 2018 10:21:47 -0800 (PST)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>,
+        Guenter Roeck <linux@roeck-us.net>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <20315f53-4954-6b32-335a-bb7c3b097aa9@kernel.dk>
-Date:   Sun, 9 Dec 2018 11:14:40 -0700
+Subject: [PATCH] nvme: fix irq vs io_queue calculations
+Message-ID: <0d463400-f954-7588-1ae9-2c68e52e9082@kernel.dk>
+Date:   Sun, 9 Dec 2018 11:21:45 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <5b742063-76c4-ba63-e50c-5e4dfe1dbe42@roeck-us.net>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -81,72 +77,157 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/9/18 11:01 AM, Guenter Roeck wrote:
-> On 12/9/18 9:50 AM, Jens Axboe wrote:
->> On 12/9/18 9:58 AM, Guenter Roeck wrote:
->>> On Sun, Dec 09, 2018 at 07:26:47AM -0700, Jens Axboe wrote:
->>>>
->>>> Ming that lockdep spews the following trace. What this essentially says
->>>> is that the sbitmap swap_lock was used inconsistently in IRQ enabled
->>>> and disabled context, and that is usually indicative of a bug that will
->>>> cause a deadlock.
->>>>
->>>> For this case, it's a false positive. The swap_lock is used from process
->>>> context only, when we swap the bits in the word and cleared mask. We
->>>> also end up doing that when we are getting a driver tag, from the
->>>> blk_mq_mark_tag_wait(), and from there we hold the waitqueue lock with
->>>> IRQs disabled. However, this isn't from an actual IRQ, it's still
->>>> process context.
->>>>
->>>> Mark the swap_lock as not needing validation to silence this warning.
->>>>
->>>
->>> checkpatch says:
->>>
->>> $ scripts/checkpatch.pl jens2
->>> ERROR: lockdep_no_validate class is reserved for device->mutex.
->>> #357: FILE: lib/sbitmap.c:68:
->>> +		lockdep_set_novalidate_class(&sb->map[i].swap_lock);
->>>
->>> ... which I think explains the warning I am seeing with this patch applied.
->>
->> Try the other patch I sent out earlier, that should work.
->>
-> 
-> Ok, I am lost. No idea which patch you refer to. I'll just wait for the problem
-> to disappear from -next, or report it again if it shows up in mainline.
+Guenter reported an boot hang issue on HPPA after we default to 0 poll
+queues. We have two issues in the queue count calculations:
 
-This one, sent out this morning in this thread:
+1) We don't separate the poll queues from the read/write queues. This is
+   important, since the former doesn't need interrupts.
+2) The adjust logic is broken.
 
+Adjust the poll queue count before doing nvme_calc_io_queues(). The poll
+queue count is only limited by the IO queue count we were able to get
+from the controller, not failures in the IRQ allocation loop. This
+leaves nvme_calc_io_queues() just adjusting the read/write queue map.
 
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index a89fbe7cf6ca..23da156f7a17 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -118,8 +118,13 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
- static inline bool sbitmap_deferred_clear(struct sbitmap *sb, int index)
- {
- 	unsigned long mask, val;
-+	unsigned long flags;
- 	bool ret = false;
- 
-+	/* Silence bogus lockdep warning */
-+#if defined(CONFIG_LOCKDEP)
-+	local_irq_save(flags);
-+#endif
- 	spin_lock(&sb->map[index].swap_lock);
- 
- 	if (!sb->map[index].cleared)
-@@ -142,6 +147,9 @@ static inline bool sbitmap_deferred_clear(struct sbitmap *sb, int index)
- 	ret = true;
- out_unlock:
- 	spin_unlock(&sb->map[index].swap_lock);
-+#if defined(CONFIG_LOCKDEP)
-+	local_irq_restore(flags);
-+#endif
+Reported-by: Reported-by: Guenter Roeck <linux@roeck-us.net>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+---
+
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 7732c4979a4e..0fe48b128aff 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -2030,60 +2030,40 @@ static int nvme_setup_host_mem(struct nvme_dev *dev)
  	return ret;
  }
  
+-static void nvme_calc_io_queues(struct nvme_dev *dev, unsigned int nr_io_queues)
++static void nvme_calc_io_queues(struct nvme_dev *dev, unsigned int irq_queues)
+ {
+ 	unsigned int this_w_queues = write_queues;
+-	unsigned int this_p_queues = poll_queues;
+ 
+ 	/*
+ 	 * Setup read/write queue split
+ 	 */
+-	if (nr_io_queues == 1) {
++	if (irq_queues == 1) {
+ 		dev->io_queues[HCTX_TYPE_DEFAULT] = 1;
+ 		dev->io_queues[HCTX_TYPE_READ] = 0;
+-		dev->io_queues[HCTX_TYPE_POLL] = 0;
+ 		return;
+ 	}
+ 
+-	/*
+-	 * Configure number of poll queues, if set
+-	 */
+-	if (this_p_queues) {
+-		/*
+-		 * We need at least one queue left. With just one queue, we'll
+-		 * have a single shared read/write set.
+-		 */
+-		if (this_p_queues >= nr_io_queues) {
+-			this_w_queues = 0;
+-			this_p_queues = nr_io_queues - 1;
+-		}
+-
+-		dev->io_queues[HCTX_TYPE_POLL] = this_p_queues;
+-		nr_io_queues -= this_p_queues;
+-	} else
+-		dev->io_queues[HCTX_TYPE_POLL] = 0;
+-
+ 	/*
+ 	 * If 'write_queues' is set, ensure it leaves room for at least
+ 	 * one read queue
+ 	 */
+-	if (this_w_queues >= nr_io_queues)
+-		this_w_queues = nr_io_queues - 1;
++	if (this_w_queues >= irq_queues)
++		this_w_queues = irq_queues - 1;
+ 
+ 	/*
+ 	 * If 'write_queues' is set to zero, reads and writes will share
+ 	 * a queue set.
+ 	 */
+ 	if (!this_w_queues) {
+-		dev->io_queues[HCTX_TYPE_DEFAULT] = nr_io_queues;
++		dev->io_queues[HCTX_TYPE_DEFAULT] = irq_queues;
+ 		dev->io_queues[HCTX_TYPE_READ] = 0;
+ 	} else {
+ 		dev->io_queues[HCTX_TYPE_DEFAULT] = this_w_queues;
+-		dev->io_queues[HCTX_TYPE_READ] = nr_io_queues - this_w_queues;
++		dev->io_queues[HCTX_TYPE_READ] = irq_queues - this_w_queues;
+ 	}
+ }
+ 
+-static int nvme_setup_irqs(struct nvme_dev *dev, int nr_io_queues)
++static int nvme_setup_irqs(struct nvme_dev *dev, unsigned int nr_io_queues)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(dev->dev);
+ 	int irq_sets[2];
+@@ -2093,6 +2073,20 @@ static int nvme_setup_irqs(struct nvme_dev *dev, int nr_io_queues)
+ 		.sets = irq_sets,
+ 	};
+ 	int result = 0;
++	unsigned int irq_queues, this_p_queues;
++
++	/*
++	 * Poll queues don't need interrupts, but we need at least one IO
++	 * queue left over for non-polled IO.
++	 */
++	this_p_queues = poll_queues;
++	if (this_p_queues >= nr_io_queues) {
++		this_p_queues = nr_io_queues - 1;
++		irq_queues = 1;
++	} else {
++		irq_queues = nr_io_queues - this_p_queues;
++	}
++	dev->io_queues[HCTX_TYPE_POLL] = this_p_queues;
+ 
+ 	/*
+ 	 * For irq sets, we have to ask for minvec == maxvec. This passes
+@@ -2100,7 +2094,7 @@ static int nvme_setup_irqs(struct nvme_dev *dev, int nr_io_queues)
+ 	 * IRQ vector needs.
+ 	 */
+ 	do {
+-		nvme_calc_io_queues(dev, nr_io_queues);
++		nvme_calc_io_queues(dev, irq_queues);
+ 		irq_sets[0] = dev->io_queues[HCTX_TYPE_DEFAULT];
+ 		irq_sets[1] = dev->io_queues[HCTX_TYPE_READ];
+ 		if (!irq_sets[1])
+@@ -2111,11 +2105,11 @@ static int nvme_setup_irqs(struct nvme_dev *dev, int nr_io_queues)
+ 		 * 1 + 1 queues, just ask for a single vector. We'll share
+ 		 * that between the single IO queue and the admin queue.
+ 		 */
+-		if (!(result < 0 && nr_io_queues == 1))
+-			nr_io_queues = irq_sets[0] + irq_sets[1] + 1;
++		if (!(result < 0 || irq_queues == 1))
++			irq_queues = irq_sets[0] + irq_sets[1] + 1;
+ 
+-		result = pci_alloc_irq_vectors_affinity(pdev, nr_io_queues,
+-				nr_io_queues,
++		result = pci_alloc_irq_vectors_affinity(pdev, irq_queues,
++				irq_queues,
+ 				PCI_IRQ_ALL_TYPES | PCI_IRQ_AFFINITY, &affd);
+ 
+ 		/*
+@@ -2125,12 +2119,12 @@ static int nvme_setup_irqs(struct nvme_dev *dev, int nr_io_queues)
+ 		 * likely does not. Back down to ask for just one vector.
+ 		 */
+ 		if (result == -ENOSPC) {
+-			nr_io_queues--;
+-			if (!nr_io_queues)
++			irq_queues--;
++			if (!irq_queues)
+ 				return result;
+ 			continue;
+ 		} else if (result == -EINVAL) {
+-			nr_io_queues = 1;
++			irq_queues = 1;
+ 			continue;
+ 		} else if (result <= 0)
+ 			return -EIO;
 
 -- 
 Jens Axboe
