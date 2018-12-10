@@ -2,149 +2,118 @@ Return-Path: <SRS0=VRLd=OT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 470C9C67838
-	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 03:02:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40DE6C04EB8
+	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 03:24:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0AFEB2081C
-	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 03:02:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9A5020831
+	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 03:24:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Bfk9MGMh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AFEB2081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=mailprotect.be header.i=@mailprotect.be header.b="d01qCBbX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9A5020831
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726476AbeLJDCP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 9 Dec 2018 22:02:15 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:54464 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726314AbeLJDCO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Dec 2018 22:02:14 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wBA305Lm132421;
-        Mon, 10 Dec 2018 03:02:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=OlPuZiTvgvzKOgajjxIeH7Sy+1fzl1vb3OLC9rKmAdw=;
- b=Bfk9MGMhrAmjivC6lgbVJj7PhUWiYbp/m93VgmJyRh4/V8I6hqBQJsuDAIJWFxNmuUEG
- 4hHUIILSGXHpWa9G5bhz9NuwcVXOoVow5s+ldytIMPxZ2WUK3UmJJaMXXixVT890ksrW
- s2zrByEWHnJw3qLYsFJRNUn/xfg9et5OXFZBGhibSQNYUvHLGkL/W5AiGAjWf0HStaaj
- xYt1TuD9FY6xfodG4RWpfCNBjUgLwTDkUIiBULEe3BXeAg8tQOF5KleMfnyJNuaNM7wQ
- GzWzNPifK7ZXd+wfg7/ZnqOjnI9mFgQnT8D5HImTrimbnpx67jQBl9B3fgo5Qkj54UAf 8w== 
-Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
-        by userp2120.oracle.com with ESMTP id 2p86kqkdjb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Dec 2018 03:02:10 +0000
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id wBA32Adr003065
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 10 Dec 2018 03:02:10 GMT
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id wBA32AjK012679;
-        Mon, 10 Dec 2018 03:02:10 GMT
-Received: from will-ThinkCentre-M93p.cn.oracle.com (/10.182.70.234)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 09 Dec 2018 19:02:09 -0800
-From:   Jianchao Wang <jianchao.w.wang@oracle.com>
-To:     axboe@kernel.dk
-Cc:     ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH V13 3/3] blk-mq: replace and kill blk_mq_request_issue_directly
-Date:   Mon, 10 Dec 2018 11:01:32 +0800
-Message-Id: <1544410892-2905-4-git-send-email-jianchao.w.wang@oracle.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1544410892-2905-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1544410892-2905-1-git-send-email-jianchao.w.wang@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9102 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1812100026
+        id S1726375AbeLJDYM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 9 Dec 2018 22:24:12 -0500
+Received: from com-out001.mailprotect.be ([83.217.72.83]:58711 "EHLO
+        com-out001.mailprotect.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726371AbeLJDYM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 9 Dec 2018 22:24:12 -0500
+X-Greylist: delayed 918 seconds by postgrey-1.27 at vger.kernel.org; Sun, 09 Dec 2018 22:24:10 EST
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=mailprotect.be; s=mail; h=Content-Transfer-Encoding:MIME-Version:Message-Id
+        :Date:Subject:Cc:To:From:reply-to:sender:bcc:in-reply-to:references:
+        content-type; bh=zlV1B26Pu94XGlR9wFWUgID6JyhsXKq1x0vAk7+3z8k=; b=d01qCBbX9WFA
+        /Yma26b44gpTEfrrWV+TxEK4vqwlbtF4Jh17CYHWds1AQsGhsihU08hb0lhG+jmQXtR8j3nzPg04a
+        qpLzOMTYcB7VPtE+63k28c/zjZQeLjy3Y6rozYxYSVyq9FF93mQmbw1CjvFNaCjgYWjPrM9B+eGoV
+        uwIIPbva5t0tQSWid/HOn4IaiYnbNwyI2F1tyi+pmB8JWPTSyc8Wv3DmUKkUA0NfklfMxsBWIhpOq
+        1DYskCnyrImIo825yvIFOHE32PzHLfPqNhnXRI2qMgMV5JyUr/cUr5bb1uss+F5BPOojZsPLPCAyv
+        SFEsqPpweFXdtsmXKcmeyw==;
+Received: from smtp-auth.mailprotect.be ([178.208.39.159])
+        by com-mpt-out001.mailprotect.be with esmtp (Exim 4.89)
+        (envelope-from <bvanassche@acm.org>)
+        id 1gWBw0-0006Sd-Jl; Mon, 10 Dec 2018 04:08:41 +0100
+Received: from asus.hsd1.ca.comcast.net (c-24-7-51-64.hsd1.ca.comcast.net [24.7.51.64])
+        (using TLSv1 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by smtp-auth.mailprotect.be (Postfix) with ESMTPSA id 7E3FAC05C6;
+        Mon, 10 Dec 2018 04:08:20 +0100 (CET)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Todd Aiken <taiken@mvtech.ca>,
+        Keith Busch <keith.busch@intel.com>,
+        Laurence Oberman <loberman@redhat.com>, stable@vger.kernel.org
+Subject: [PATCH] block: Restore tape support
+Date:   Sun,  9 Dec 2018 19:08:14 -0800
+Message-Id: <20181210030814.13235-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.19.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: 178.208.39.159
+X-SpamExperts-Domain: mailprotect.be
+X-SpamExperts-Username: 178.208.39.128/27
+Authentication-Results: mailprotect.be; auth=pass smtp.auth=178.208.39.128/27@mailprotect.be
+X-SpamExperts-Outgoing-Class: ham
+X-SpamExperts-Outgoing-Evidence: Combined (0.02)
+X-Recommended-Action: accept
+X-Filter-ID: EX5BVjFpneJeBchSMxfU5sX5xZERB5ZYfSk4dSbXkIN602E9L7XzfQH6nu9C/Fh9KJzpNe6xgvOx
+ q3u0UDjvO1tLifGj39bI0bcPyaJsYTa0hZW3miwWUwYQUoxPMYN0/vElarfOomUcabrov8z0PeyO
+ hb5GDj0rq8D+3HFJ06Dxr7qaG4fgWdY0QrMiiTmewrfgTMUWMtvWgegpvfTaAXNUcb+K173lNmeK
+ aXSVkZ0DTnWiPmsvrDOE9sQjLDo1rBQRDMCPoVIktGfXqz+K7yyw5/aUKPFnDw4Bf7lOa4oclUw0
+ /8UoTm9tFaQ+tM6v2Gh/Qfgu9chLVc2vRhNMldxqFl97Y4E3SNMknNYplPEk4Ndu06h2Q8QP5GQe
+ NUYfzfh+1hTlNmKlqsmcMQ3aemJb4oRxP5STU+xUtRhnzoXNsFlW4xzv3KSabGJbxYTPkxkQ0H6O
+ L7P/NDQJvXLBFogkcrMa30IAuQwcvqfu8p8T9oXmckUtTiqujG9MEAys0Pj+CuspuqIywLM1+yFE
+ 28W6VmkUOCR75FEzGh68OC8qjedQ/jV+CiBePeEy87fciSrlgXUe2FRrt3Q/saIuu1pdVjRHzTdn
+ z3Xm0z5QCuv0rPJtdXKhkIUdbjJccbATbEI0+1qiZCID5pC0mn1iDfxcb3XRuJkRyiZZ6HPi7yzM
+ ODodi5MLJiAvrVIiQFNhysatj2pSf8Y/sjw2Tx7jGlOIjEOAq7+zlZIMXkjo8jedyeqIoZhC5dHo
+ yWeT+unFGJ9FFggCAznkY0NIg+2syH6jN/zrHSgTBXY75aL7Lf03C+PU1KMusNosSbRFhiuotUnQ
+ FPKmSccSJtKR11Ka7CmEMUMorS5RhJIX8IV1I9NfaQM3FyOrMjT6Cfa6u2EHZ2ITRsTxrfq0Mm6B
+ rCqJogELL9VzWOhnEfGvIkwyA7rBRBZgCikvOAMF/4pY8933AXWdvuMLZV3bWhmuaxt6pwQCpD0P
+ 7cLlLBv1Ynl6wdtAYEdHjLsc3JXQKB4EYM/Uw+714f+1zhJBVGCf6GMd8tnbrn0+3UKhngm7Vtb0
+ +GDDqcigOvSxdRnthmhn8Zn6Bu3R8b/TlH3rj3agBo/83GDgWGooLLZtQVUvlagFdKneNHk15Vol
+ AGHS5rCXQKDyKm6UHkvMKTco5nAg4mA05LI0q854skGDr1SFWz9TrEaeJv7ulMm8/tzYx+4R1cCq
+ iTlhJVWE1Tu7G2kCq+1xQG9E3lUgISRJWe2MG18u+0Y=
+X-Report-Abuse-To: spam@com-mpt-mgt001.mailprotect.be
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Replace blk_mq_request_issue_directly with blk_mq_try_issue_directly
-in blk_insert_cloned_request and kill it as nobody uses it any more.
+According to what I found in
+https://bugzilla.kernel.org/show_bug.cgi?id=201935 patch "block: Clear
+kernel memory before copying to user" broke tape access. Hence revert
+that patch.
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Reported-by: Todd Aiken <taiken@mvtech.ca>
+Fixes: f3587d76da05 ("block: Clear kernel memory before copying to user") # v4.20-rc2
+Cc: Todd Aiken <taiken@mvtech.ca>
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: Laurence Oberman <loberman@redhat.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-core.c | 4 +++-
- block/blk-mq.c   | 9 +--------
- block/blk-mq.h   | 6 ++++--
- 3 files changed, 8 insertions(+), 11 deletions(-)
+ block/bio.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index ad59102..c92d866 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1297,6 +1297,8 @@ static int blk_cloned_rq_check_limits(struct request_queue *q,
-  */
- blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *rq)
- {
-+	blk_qc_t unused;
-+
- 	if (blk_cloned_rq_check_limits(q, rq))
- 		return BLK_STS_IOERR;
- 
-@@ -1312,7 +1314,7 @@ blk_status_t blk_insert_cloned_request(struct request_queue *q, struct request *
- 	 * bypass a potential scheduler on the bottom device for
- 	 * insert.
- 	 */
--	return blk_mq_request_issue_directly(rq, true);
-+	return blk_mq_try_issue_directly(rq->mq_hctx, rq, &unused, true, true);
- }
- EXPORT_SYMBOL_GPL(blk_insert_cloned_request);
- 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8f554d1..890d074 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1794,7 +1794,7 @@ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	return ret;
- }
- 
--static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 						struct request *rq,
- 						blk_qc_t *cookie,
- 						bool bypass, bool last)
-@@ -1866,13 +1866,6 @@ static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
- 	return ret;
- }
- 
--blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last)
--{
--	blk_qc_t unused;
--
--	return blk_mq_try_issue_directly(rq->mq_hctx, rq, &unused, true, last);
--}
--
- void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 		struct list_head *list)
- {
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index a664ea4..b81e619 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -68,8 +68,10 @@ void blk_mq_request_bypass_insert(struct request *rq, bool run_queue);
- void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct blk_mq_ctx *ctx,
- 				struct list_head *list);
- 
--/* Used by blk_insert_cloned_request() to issue request directly */
--blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last);
-+blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+						struct request *rq,
-+						blk_qc_t *cookie,
-+						bool bypass, bool last);
- void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 				    struct list_head *list);
+diff --git a/block/bio.c b/block/bio.c
+index 06760543ec81..90c32cd3e0c7 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1262,7 +1262,6 @@ struct bio *bio_copy_user_iov(struct request_queue *q,
+ 		if (ret)
+ 			goto cleanup;
+ 	} else {
+-		zero_fill_bio(bio);
+ 		iov_iter_advance(iter, bio->bi_iter.bi_size);
+ 	}
  
 -- 
-2.7.4
+2.19.2
 
