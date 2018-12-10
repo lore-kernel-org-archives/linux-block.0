@@ -2,94 +2,78 @@ Return-Path: <SRS0=VRLd=OT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0217EC04EB8
-	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 21:44:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9437C04EB8
+	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 21:53:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BB8772084E
-	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 21:44:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADDE52084E
+	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 21:53:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="iXyAFh3E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB8772084E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AW/aZxf5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADDE52084E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727757AbeLJVon (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Dec 2018 16:44:43 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:39696 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727716AbeLJVom (ORCPT
+        id S1726959AbeLJVx6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Dec 2018 16:53:58 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:38740 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726392AbeLJVx5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Dec 2018 16:44:42 -0500
-Received: by mail-pg1-f193.google.com with SMTP id w6so5582546pgl.6
-        for <linux-block@vger.kernel.org>; Mon, 10 Dec 2018 13:44:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Q/LNkITI6Mo00J9iVRX70fKCzr1sV4kHJirNir7Hw5E=;
-        b=iXyAFh3E3oigxUa5uYeSGAQCGcrf13cPQEJBqIBuI9upstTBdM5bP2igSIoanHfjv2
-         XZhpulwOxUuNq+Z5B2ZOQ6peURFOeItO3fOgBcjrN/4KwlHVHfgKG9YmAI0J6MabzxVg
-         LKoags1R4zDMIxOkBWiBM18Vya7OdqSXHu1gJ2qtxTHxmMkxkWIyS7GxNA8HV4liqXPL
-         SVKOtcr3EUlmJjYiZkNQnyAOmvSCpKZJ38o4Ee/X8OTDY+o9+BQ3svPe0cHYP1sYK/H8
-         yYIKit/AoJ26+6d6teoCtl0I+mQowr3x0infaTdR7KAVXuRWGbWEpOslqdMZB25rGfq9
-         bxuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Q/LNkITI6Mo00J9iVRX70fKCzr1sV4kHJirNir7Hw5E=;
-        b=Jfy3banC2HiJsrDNJ0odDL+aFXk2AN2hHwuiRnJYgdOC/j8AQG1PmlLPmPi+p1hZny
-         HPnI7TfF36R8OsElyVGVKuWzGdYJAPp2mX9tzUQ2YQ8xNMOAwlbTcsjjmldVSP8YkVEv
-         8M2xATZm11iIb++cUYMmzX3L3cwaHhGmUOEyFWH4F7mrP3/pHuvhLwITYw20ijtGEuoN
-         jKo0bxn9wIzjEQSgK63JsjiBwoWJqAHTqpL8nOQnaiqrkjcX4kh2YCtKhTQ15tu1Ol5F
-         YtUpFxBNMDe3pv7EEN/fzBP3L5ki3cERsj8/EJ/uw6wEAoJUr49XllCAIUhIc4yEzFsS
-         uJ4w==
-X-Gm-Message-State: AA+aEWblbKQqhe3jVZM6CLMnOnxrq9+2mZ+beG8K293K6k4tVRmPisFk
-        cssMgjvCaCsO45T9LSPRkvyaLA==
-X-Google-Smtp-Source: AFSGD/VxET1oVt24BqIeyvVIB9B9KDrV/eZ1ANkti5jRWK7TaQob+R5u44BJACGZzOlho23GjXhRNg==
-X-Received: by 2002:a63:bd1a:: with SMTP id a26mr12159678pgf.121.1544478282281;
-        Mon, 10 Dec 2018 13:44:42 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id 64sm16187094pff.101.2018.12.10.13.44.40
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 10 Dec 2018 13:44:41 -0800 (PST)
-Subject: Re: [PATCH] mtip32xx: avoid using semaphores
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Johannes Thumshirn <jthumshirn@suse.de>,
-        Hannes Reinecke <hare@suse.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20181210213459.1147671-1-arnd@arndb.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <6caf6fa4-15e5-a7ec-cec4-69e5ad70c090@kernel.dk>
-Date:   Mon, 10 Dec 2018 14:44:39 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Mon, 10 Dec 2018 16:53:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=k9BOrQy+T3fm4BTSDW4eDiw2aCCIgnyRvnT5+2h2cc8=; b=AW/aZxf5VGR2wlEsXbwVWV0Zp
+        UDTh4c5KKOcvdx9Blf+jjLAXC/y3By3WUIXiXA/vrGFRgKKXlfFcQKv8fcYNQEB/Oj4aGJBK/qk9A
+        PQPhqKm7MCnrCriEb56jK3GsD5u5OX/DBlZmxUNxSh7zzn86z54iRieJYsyLeuccx5sw3CHxK89L+
+        VApVUhi31HYzG0F5OBkjp6Yrl231g2NxJikDDLAlTcsqsTBMQRV/xNMDUag9ShQlhC/5R+CKG/O0L
+        n7Jm8H9EOhhWZB2FykARlGfa9zLZqJsWnzyGzayHZPS+86bt3WRekFuDiSABdE8TNANTHrQ3KVMUy
+        O/rz50jmA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gWTUz-0005FW-2k; Mon, 10 Dec 2018 21:53:57 +0000
+Date:   Mon, 10 Dec 2018 13:53:56 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>, snitzer@redhat.com,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: Re: xfstests generic/347 seems unhappy on todays block for-next tree
+Message-ID: <20181210215356.GA20174@infradead.org>
+References: <20181210213724.GA27905@infradead.org>
+ <f7854d23-cba0-d5ce-e136-6cacd052a6da@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <20181210213459.1147671-1-arnd@arndb.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f7854d23-cba0-d5ce-e136-6cacd052a6da@kernel.dk>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/10/18 2:34 PM, Arnd Bergmann wrote:
-> The "cmd_slot_unal" semaphore is never used in a blocking way
-> but only as an atomic counter. Change the code to using
-> atomic_dec_if_positive() as a better API.
+On Mon, Dec 10, 2018 at 02:39:39PM -0700, Jens Axboe wrote:
+> On 12/10/18 2:37 PM, Christoph Hellwig wrote:
+> > This test is described as:
+> > 
+> > # Test very basic thin device usage, exhaustion, and growth
+> 
+> Does that tree have:
+> 
+> commit c616cbee97aed4bc6178f148a7240206dcdb85a6
+> Author: Jens Axboe <axboe@kernel.dk>
+> Date:   Thu Dec 6 22:17:44 2018 -0700
+> 
+>     blk-mq: punt failed direct issue to dispatch list
+> 
+> ?
 
-Looks good to me. We should also convert the return to blk-mq
-when we hit failure here to BLK_STS_DEV_RESOURCE, but that's
-a separate patch.
+yes.
 
--- 
-Jens Axboe
-
+The latest commit is 6f75723190d88e1319bea623bfe0292bf3917965
