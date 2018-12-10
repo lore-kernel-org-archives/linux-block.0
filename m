@@ -2,118 +2,193 @@ Return-Path: <SRS0=VRLd=OT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9811FC04EB8
-	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 17:32:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9457C04EB8
+	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 18:25:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 51EDA2064D
-	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 17:32:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99F242084C
+	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 18:25:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="VinfOFxh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51EDA2064D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=chromium.org
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="AgzPf1Wv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99F242084C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727356AbeLJRcH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Dec 2018 12:32:07 -0500
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:42595 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726562AbeLJRcH (ORCPT
+        id S1728163AbeLJSZN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Dec 2018 13:25:13 -0500
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:39803 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727662AbeLJSZM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Dec 2018 12:32:07 -0500
-Received: by mail-lj1-f195.google.com with SMTP id l15-v6so10378138lja.9
-        for <linux-block@vger.kernel.org>; Mon, 10 Dec 2018 09:32:06 -0800 (PST)
+        Mon, 10 Dec 2018 13:25:12 -0500
+Received: by mail-qt1-f193.google.com with SMTP id n21so13422499qtl.6
+        for <linux-block@vger.kernel.org>; Mon, 10 Dec 2018 10:25:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=x/JBBDo5sPjXAxcwlSBWcL/J/58a10jVgtkZ0FWng78=;
-        b=VinfOFxhF1tMpPR5v/jGPjR8NsOhAeK+tLGXwnOX3cLm9YQd0jOIyEzrkbwRAVhhj2
-         yGe67viBeDwIJEX7MQyX5T8B93Lp2eJyVHV4Zlm/j7ep2xHDMWg962BW3f1+SvBw6Db5
-         JH6Y4M95FnnrzhMqOigrSZy07l5z35GOhVRCw=
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=6sOnz/4vgAk2eH1xfravzxXZdhKh8tythlohwKwR+IE=;
+        b=AgzPf1Wv/ITlr1cVgvVofeRippKx7t4YdEh5qR+OYpPI6TM6j5PimSAZz3yW4FNZF1
+         5GrAdWygE8mDZe4r1S4IU9dbVJ53CnVKwWVDbIoqPWwLn1MUWp6b1GkuRuijq03LlLyi
+         YbVVJaIlNFvX3+qYn8cL5aQ88Pyp0ZFWFqqm1S8le8bheqbc/X9PBSURrSMioYa7R082
+         QgGFC2eeG32/lKEm0wAud51Q2K8ElR/gmnXhhfV0JARswyJTZUhYsUMWz0825PYDBc39
+         CIQEjDSLcFB72qdFpOOyhK8kCvuG7nZTb0OXJpYb+arGPT31crZZWQC//0R17YHDV60Z
+         Mi5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=x/JBBDo5sPjXAxcwlSBWcL/J/58a10jVgtkZ0FWng78=;
-        b=mISWoG2s9mUvNpSCQUK3KHQFhYINTwoW25uHaWxEC54EvyVXRQeX8v044wBNFEpijb
-         whc1usQUp5LUfgOtIIP4ABtbau3mZwn/j+cpH6WUloDqVY8avchETKI3NAmeE+s4KKeU
-         udMjbZnEgF/RWKK/ep2WoZsyAikvHbAr3eblXvFFpMM9jDHAktA48v5EkOXOd4WTPCNy
-         1FhjCMeT9c6fMHpvjsLHzOgTR2/IO6W6yFnouvvMBtZP2nrS05G1m+FBZlRZkyFvJu+G
-         WSqsSXMtMkV0powtT0rwMGgbnNBk1bCieReFPbOAuIN4luXauPGPjZ58TcL5GF07riSs
-         0piQ==
-X-Gm-Message-State: AA+aEWaBJ6eN1ebttMBeeh1+TSqWt+VHUpw2SBeMJivwoRMZW3zo9SSU
-        7b7Q7u0JaAfGFFXKsEguqiG8QRWEU9k=
-X-Google-Smtp-Source: AFSGD/UVdQCsGnG43B8qa9v2UD68FKoRVqnNoQ63rHML7t/RtC8YfBy7sCv1+Lh8wONMeHjZjv2MKA==
-X-Received: by 2002:a2e:1241:: with SMTP id t62-v6mr6842239lje.171.1544463125273;
-        Mon, 10 Dec 2018 09:32:05 -0800 (PST)
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com. [209.85.167.51])
-        by smtp.gmail.com with ESMTPSA id b25sm2160990lfa.96.2018.12.10.09.32.03
-        for <linux-block@vger.kernel.org>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=6sOnz/4vgAk2eH1xfravzxXZdhKh8tythlohwKwR+IE=;
+        b=ZRrqrCiznxHt5zQQ05tzxX/ySL1LXV9r87l4n/JLsOxQf/xaqw/cjT4lQ/ZzSLVrKj
+         RlfsEQ1OCIJvJl84QF9voQt9I6nd7DVAGgJPf66bczYW5VXX3G8p8wU2NozXdJxlzCMP
+         bzcbRHGbRLZINszH6QiRZ7Y4haXh2B1diqbZWbNttk49tRjs13vLYWo9L/gH/gkfc2PA
+         zuevPjocyCWhwhOio9mdemhyoCDQIOxxXmV5hyQpotFyuEnibLuSTxVcyrNKE1X8MvK5
+         xUaLeFUIOofAtYoZhA8ECLCYkxRpNHZpRhPlDvMKYyVqulpQs/k6q9e5Cu1JazxXayGQ
+         nmkg==
+X-Gm-Message-State: AA+aEWZbEhm5ftIQzCOS7XXVw09Z7moWzaLs6cX7oAKSlA9h5Y3hNCgi
+        YzlrkiBR9+938eHuWSd1cZgcDw==
+X-Google-Smtp-Source: AFSGD/UNB7AW9C3+prtytXJ2ODYiAlNlzeXAfgVqseeGOUdHmAMYzx+Z+K80j3VFKK7RZGWowxJgxg==
+X-Received: by 2002:a0c:fb4c:: with SMTP id b12mr12508581qvq.177.1544466311230;
+        Mon, 10 Dec 2018 10:25:11 -0800 (PST)
+Received: from localhost ([2620:10d:c091:180::1:9260])
+        by smtp.gmail.com with ESMTPSA id c49sm8746456qtc.94.2018.12.10.10.25.09
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 10 Dec 2018 09:32:04 -0800 (PST)
-Received: by mail-lf1-f51.google.com with SMTP id b20so8579133lfa.12
-        for <linux-block@vger.kernel.org>; Mon, 10 Dec 2018 09:32:03 -0800 (PST)
-X-Received: by 2002:a19:4287:: with SMTP id p129mr7697075lfa.135.1544463123575;
- Mon, 10 Dec 2018 09:32:03 -0800 (PST)
+        Mon, 10 Dec 2018 10:25:09 -0800 (PST)
+Date:   Mon, 10 Dec 2018 13:25:08 -0500
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Dennis Zhou <dennis@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] block: fix iolat timestamp and restore accounting
+ semantics
+Message-ID: <20181210182507.qtoj5egbflr5s366@macbook-pro-91.dhcp.thefacebook.com>
+References: <20181210163510.58985-1-dennis@kernel.org>
 MIME-Version: 1.0
-References: <20181030230624.61834-1-evgreen@chromium.org> <20181030230624.61834-3-evgreen@chromium.org>
- <20181128012624.GB11128@ming.t460p> <CAE=gft7Fyq+Jb3ZG3PSTR=C0Wjt3uu57+H2bshM6Gu=_0W0YQw@mail.gmail.com>
- <20181205011059.GA17845@ming.t460p> <CAE=gft7K2OrN93c8TQ5ozOpXzXf5ZD-PNnVHWP9SbZXZqp2dHw@mail.gmail.com>
- <yq1va47pcqp.fsf@oracle.com>
-In-Reply-To: <yq1va47pcqp.fsf@oracle.com>
-From:   Evan Green <evgreen@chromium.org>
-Date:   Mon, 10 Dec 2018 09:31:27 -0800
-X-Gmail-Original-Message-ID: <CAE=gft7ymeVu0chvCYWn8tw9ss_pZgyUHt=5sSdxfRenDD46Xw@mail.gmail.com>
-Message-ID: <CAE=gft7ymeVu0chvCYWn8tw9ss_pZgyUHt=5sSdxfRenDD46Xw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] loop: Better discard support for block devices
-To:     martin.petersen@oracle.com
-Cc:     ming.lei@redhat.com, axboe@kernel.dk,
-        Gwendal Grignou <gwendal@chromium.org>, asavery@chromium.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181210163510.58985-1-dennis@kernel.org>
+User-Agent: NeoMutt/20180716
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 5, 2018 at 7:15 PM Martin K. Petersen
-<martin.petersen@oracle.com> wrote:
->
->
-> Evan,
->
-> > Ah, I see. But I think it's useful to reflect max_discard_sectors,
-> > max_write_zeroes_sectors, discard_granularity, and discard_alignment
-> > from the block device to the loop device. With the exception of
-> > discard_alignment, these parameters are visible via sysfs,
->
-> discard_alignment is visible in sysfs, just not in the queue directory
-> since alignment can be different on a per-partition basis. So there is
-> one discard_alignment at the root of each /sys/block/foo directory and
-> one for each partition subdirectory. This mirrors the alignment_offset
-> variable which indicates a partitions alignment wrt. the underlying
-> physical block size.
->
-> That said, there are not many devices that actually report a non-zero
-> discard alignment so it's not as useful as the device manufacturers
-> (that were looking for an implementation shortcut) envisioned.
+On Mon, Dec 10, 2018 at 11:35:10AM -0500, Dennis Zhou wrote:
+> The blk-iolatency controller measures the time from rq_qos_throttle() to
+> rq_qos_done_bio() and attributes this time to the first bio that needs
+> to create the request. This means if a bio is plug-mergeable or
+> bio-mergeable, it gets to bypass the blk-iolatency controller.
+> 
+> The recent series, to tag all bios w/ blkgs in [1] changed the timing
+> incorrectly as well. First, the iolatency controller was tagging bios
+> and using that information if it should process it in rq_qos_done_bio().
+> However, now that all bios are tagged, this caused the atomic_t for the
+> struct rq_wait inflight count to underflow resulting in a stall. Second,
+> now the timing was using the duration a bio from generic_make_request()
+> rather than the timing mentioned above.
+> 
+> This patch fixes the errors by accounting time separately in a bio
+> adding the field bi_start. If this field is set, the bio should be
+> processed by blk-iolatency in rq_qos_done_bio().
+> 
+> [1] https://lore.kernel.org/lkml/20181205171039.73066-1-dennis@kernel.org/
+> 
+> Signed-off-by: Dennis Zhou <dennis@kernel.org>
+> Cc: Josef Bacik <josef@toxicpanda.com>
+> ---
+>  block/blk-iolatency.c     | 17 ++++++-----------
+>  include/linux/blk_types.h | 12 ++++++++++++
+>  2 files changed, 18 insertions(+), 11 deletions(-)
+> 
+> diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+> index bee092727cad..52d5d7cc387c 100644
+> --- a/block/blk-iolatency.c
+> +++ b/block/blk-iolatency.c
+> @@ -463,6 +463,8 @@ static void blkcg_iolatency_throttle(struct rq_qos *rqos, struct bio *bio)
+>  	if (!blk_iolatency_enabled(blkiolat))
+>  		return;
+>  
+> +	bio->bi_start = ktime_get_ns();
+> +
+>  	while (blkg && blkg->parent) {
+>  		struct iolatency_grp *iolat = blkg_to_lat(blkg);
+>  		if (!iolat) {
+> @@ -480,18 +482,12 @@ static void blkcg_iolatency_throttle(struct rq_qos *rqos, struct bio *bio)
+>  }
+>  
+>  static void iolatency_record_time(struct iolatency_grp *iolat,
+> -				  struct bio_issue *issue, u64 now,
+> +				  struct bio *bio, u64 now,
+>  				  bool issue_as_root)
+>  {
+> -	u64 start = bio_issue_time(issue);
+> +	u64 start = bio->bi_start;
+>  	u64 req_time;
+>  
+> -	/*
+> -	 * Have to do this so we are truncated to the correct time that our
+> -	 * issue is truncated to.
+> -	 */
+> -	now = __bio_issue_time(now);
+> -
+>  	if (now <= start)
+>  		return;
+>  
+> @@ -593,7 +589,7 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
+>  	bool enabled = false;
+>  
+>  	blkg = bio->bi_blkg;
+> -	if (!blkg)
+> +	if (!blkg || !bio->bi_start)
+>  		return;
+>  
+>  	iolat = blkg_to_lat(bio->bi_blkg);
+> @@ -612,8 +608,7 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
+>  		atomic_dec(&rqw->inflight);
+>  		if (!enabled || iolat->min_lat_nsec == 0)
+>  			goto next;
+> -		iolatency_record_time(iolat, &bio->bi_issue, now,
+> -				      issue_as_root);
+> +		iolatency_record_time(iolat, bio, now, issue_as_root);
+>  		window_start = atomic64_read(&iolat->window_start);
+>  		if (now > window_start &&
+>  		    (now - window_start) >= iolat->cur_win_nsec) {
+> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+> index 46c005d601ac..c2c02ec08d7c 100644
+> --- a/include/linux/blk_types.h
+> +++ b/include/linux/blk_types.h
+> @@ -181,6 +181,18 @@ struct bio {
+>  	 */
+>  	struct blkcg_gq		*bi_blkg;
+>  	struct bio_issue	bi_issue;
+> +#ifdef CONFIG_BLK_CGROUP_IOLATENCY
+> +	/*
+> +	 * blk-iolatency measure the time a bio takes between rq_qos_throttle()
+> +	 * and rq_qos_done_bio().  It attributes the time to the bio that gets
+> +	 * the request allowing any bios that can tag along via plug merging or
+> +	 * bio merging to be free (from blk-iolatency's perspective). This is
+> +	 * different from the time a bio takes from generic_make_request() to
+> +	 * the end of its life.  So, this also serves as a marker for which bios
+> +	 * should be processed by blk-iolatency.
+> +	 */
+> +	u64			bi_start;
+> +#endif /* CONFIG_BLK_CGROUP_IOLATENCY */
 
-Ah ok, thanks.
+So now we have bi_issue and bi_start, both count basically the same thing.  Does
+using bi_issue actually matter?  I assume that it's going to be basically the
+same as bi_start for the most part, you are just getting us to only care about
+the bio's that we care about.
 
->
-> > I'm not totally sure about discard_alignment, that seems to be useful
-> > in cases of merging blk requests. So I can stop mirroring that one if
-> > it's harmful or not helpful. But unless it's a nak, I'd really love to
-> > keep most of the mirroring. In which case the bool doesn't do a whole
-> > lot of simplifying.
->
-> I think it's fine to export these. The block device topology was
-> explicitly designed to be stackable like this.
+What if we just add a bio flag to indicate that we've gone through io-latency?
+Once that's in place do these problems go away?  Or is the extra time counted
+from make_request_time to rq_qos_throttle() actually matter?  I feel like it
+shouldn't since it's mostly just checks, but I could be mistaken.  Thanks,
 
-Yeah, it seemed to fall in pretty naturally, which is why I was hoping
-it might not be so controversial. Thanks Martin.
--Evan
+Josef
