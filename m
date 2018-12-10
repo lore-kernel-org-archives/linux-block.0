@@ -2,114 +2,96 @@ Return-Path: <SRS0=VRLd=OT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D29EC04EB8
-	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 21:37:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C06BC04EB8
+	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 21:39:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 014BE2082F
-	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 21:37:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2738F2084E
+	for <linux-block@archiver.kernel.org>; Mon, 10 Dec 2018 21:39:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ckjSxlZA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 014BE2082F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="afEbStCm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2738F2084E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727721AbeLJVhZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Dec 2018 16:37:25 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:33724 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727225AbeLJVhZ (ORCPT
+        id S1728775AbeLJVjm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Dec 2018 16:39:42 -0500
+Received: from mail-pg1-f170.google.com ([209.85.215.170]:43403 "EHLO
+        mail-pg1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727225AbeLJVjm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Dec 2018 16:37:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=FeOy7Q3Nykk4X0Gk1cDeO9q6mpGHhBNyrWfhXubOUzk=; b=ckjSxlZAkHDhZ+En3PIKZugmHp
-        YSsXNSHCMrSOou3xsT9Hi+cxxFAMvjCzfA+aiVlVQIScm5W0lGjngrYjz627dY1j3kvZqqclKP7aU
-        bIfduyQjTHpWIl4X6/AZu9ubQqHH2WpXbVMyJSVSBQbEIcCevIR3yZ7Cbpbao3VZMtsLiJb5gUebK
-        JZvFpfyNFH17mM41JhR6kKgFlQq1I66roLa+f9/byAEqx/hUesraJJvu3yX8pd6QEOXSKqJ6vqz2w
-        i4jOiCHx4ihnggBF8+ZShbcLebdiod+bd0f2nVj8u6uQhUpVoGSWhc+fqof9kJF5ww0QQc16uJSMZ
-        Rv+JA7og==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gWTEy-0008Ja-7M; Mon, 10 Dec 2018 21:37:24 +0000
-Date:   Mon, 10 Dec 2018 13:37:24 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     axboe@kernel.dk, snitzer@redhat.com
+        Mon, 10 Dec 2018 16:39:42 -0500
+Received: by mail-pg1-f170.google.com with SMTP id v28so5576450pgk.10
+        for <linux-block@vger.kernel.org>; Mon, 10 Dec 2018 13:39:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=FgkGwlE8GXgsgQMrlUpryBGy8HysYWOMQCQIgwuIjf8=;
+        b=afEbStCm+Urz60nMJWWkjV95tf99/GsLSZwPRgQKMzZhOQcZab+6pxGWR2qGzc0Svv
+         S2U002kpgbpmad8GXgOdqCMF2N+znR1TOULuq3FoqFFq3yNysd7C/ngnltEZB/2XWWKZ
+         LZALZXYOm1+BS4+nYThfJxQa5dHqHqgsUYj8359mk9HflsQbcHKamrGi2KfbRoW19pz1
+         S3Qq5b3CjSe7HfFHqRPU+j/KwjGXCXXvmDYToGdj5aQIuDokQvvrf290IvR8HbsA7cqK
+         q17gYnYLjtnQ+JF2lLRqrzQV17FNvmp315m1uKr6Ciwy7hTUbIn/Cd6o8haO/WCr7Uk5
+         SIHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=FgkGwlE8GXgsgQMrlUpryBGy8HysYWOMQCQIgwuIjf8=;
+        b=euaLtGt5nTBEDeiUSZ7Hh4EsAQqWLVVa+btOuzzkjD9Jv1B5FAJ9pJ0REWWFB2aHJl
+         G/WVGa15qGT7KkcuszgJvNMcXUuTW3FM3Qa2HVPLKTdKg1zjQDwfBkLsXJIJwUELsM6c
+         nQi1s3WKMS3zfAvOfi7TnfY49DcrOixXu/BnszIcGgyVqhqiSqQVbo81v+dYf0DYVC7c
+         nACxsYDpu1KjH+Jpg0fIEU2cuZNfyV/86qYxubrs7ZxcsUnfbb5x/xuPllbjE9Tm+9QV
+         jcY4Ok4kdRJQ9rL+p8hJiFH7c7YDD2B1vEQ5P11RPhyRwNZHL6lLCUg4CbMk7F0Jckb4
+         CVMg==
+X-Gm-Message-State: AA+aEWbuXwiY8/AskLaEayd3tYbJellC7lWEldYvcBRd5bCiJU1LfqUf
+        sb36WQfwJtqq9RuFB4uMNE1KDA==
+X-Google-Smtp-Source: AFSGD/Wd/pAExgUiAFwxGbfC08dS2h2B64qCFSh0DIp1l0fRTFvetvPCbsf+lRkvPsEa25yz3fzFBg==
+X-Received: by 2002:a63:504d:: with SMTP id q13mr12499439pgl.319.1544477981637;
+        Mon, 10 Dec 2018 13:39:41 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id x7sm14391033pga.68.2018.12.10.13.39.40
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 10 Dec 2018 13:39:40 -0800 (PST)
+Subject: Re: xfstests generic/347 seems unhappy on todays block for-next tree
+To:     Christoph Hellwig <hch@infradead.org>, snitzer@redhat.com
 Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: xfstests generic/347 seems unhappy on todays block for-next tree
-Message-ID: <20181210213724.GA27905@infradead.org>
+References: <20181210213724.GA27905@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <f7854d23-cba0-d5ce-e136-6cacd052a6da@kernel.dk>
+Date:   Mon, 10 Dec 2018 14:39:39 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20181210213724.GA27905@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This test is described as:
+On 12/10/18 2:37 PM, Christoph Hellwig wrote:
+> This test is described as:
+> 
+> # Test very basic thin device usage, exhaustion, and growth
 
-# Test very basic thin device usage, exhaustion, and growth
+Does that tree have:
 
+commit c616cbee97aed4bc6178f148a7240206dcdb85a6
+Author: Jens Axboe <axboe@kernel.dk>
+Date:   Thu Dec 6 22:17:44 2018 -0700
 
-And seems to hang like this:
+    blk-mq: punt failed direct issue to dispatch list
 
-generic/347 74s ... [  701.658856] run fstests generic/347 at 2018-12-10 21:05:23
-[  701.845672] XFS (nvme0n1): Mounting V5 Filesystem
-[  702.048278] XFS (nvme0n1): Ending clean mount
-[  702.184992] XFS (nvme1n1): Unmounting Filesystem
-[  702.453064] device-mapper: thin: Data device (dm-1) discard unsupported: Disabling discard passdown.
-[  847.533607] INFO: task dmsetup:28965 blocked for more than 120 seconds.
-[  847.536715]       Not tainted 4.20.0-rc6+ #4
-[  847.538857] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[  847.542613] dmsetup         D    0 28965  28695 0x00000000
-[  847.545405] Call Trace:
-[  847.548500]  ? __schedule+0x2e6/0xb00
-[  847.550331]  schedule+0x27/0x70
-[  847.551977]  io_schedule+0x11/0x40
-[  847.553991]  dm_wait_for_completion+0xbe/0xd0
-[  847.556151]  ? wait_woken+0x80/0x80
-[  847.558165]  __dm_suspend+0x90/0x1e0
-[  847.559888]  dm_internal_suspend_noflush+0x90/0xe0
-[  847.562380]  pool_presuspend+0x41/0x60
-[  847.564626]  suspend_targets+0x45/0xa0
-[  847.566783]  __dm_suspend+0xe0/0x1e0
-[  847.568454]  ? table_clear+0xb0/0xb0
-[  847.570289]  dm_suspend+0xd3/0x110
-[  847.572218]  ? up_read+0x17/0x90
-[  847.573960]  dev_suspend+0x148/0x250
-[  847.575671]  ctl_ioctl+0x1a7/0x3a0
-[  847.577413]  ? _raw_spin_lock_irqsave_nested+0x10/0x40
-[  847.579895]  dm_ctl_ioctl+0x5/0x10
-[  847.581580]  do_vfs_ioctl+0xa0/0x6a0
-[  847.583299]  ksys_ioctl+0x5b/0x90
-[  847.584739]  __x64_sys_ioctl+0x11/0x20
-[  847.586701]  do_syscall_64+0x4b/0x180
-[  847.588679]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-[  847.590450] RIP: 0033:0x7f3b400a2f07
-[  847.591709] Code: Bad RIP value.
-[  847.592688] RSP: 002b:00007ffc29d632f8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-[  847.595091] RAX: ffffffffffffffda RBX: 000055fbf64e0b00 RCX: 00007f3b400a2f07
-[  847.597344] RDX: 000055fbf64e0b00 RSI: 00000000c138fd06 RDI: 0000000000000003
-[  847.599027] RBP: 000000000000000c R08: 00007f3b405bc648 R09: 00007ffc29d63160
-[  847.600660] R10: 00007f3b405bbb53 R11: 0000000000000246 R12: 000055fbf64e0b30
-[  847.602441] R13: 00007f3b405bbb53 R14: 000055fbf64e0940 R15: 0000000000000000
-[  847.604404] 
-[  847.604404] Showing all locks held in the system:
-[  847.605655] 1 lock held by khungtaskd/620:
-[  847.606542]  #0: 00000000253d4c96 (rcu_read_lock){....}, at: debug_show_all_locks+0x15/0x175
-[  847.608204] 1 lock held by in:imklog/3712:
-[  847.608979]  #0: 00000000af869ccd (&f->f_pos_lock){+.+.}, at: __fdget_pos+0x3f/0x50
-[  847.610629] 2 locks held by dmsetup/28965:
-[  847.611410]  #0: 00000000e234e2ee (&md->suspend_lock/1){+.+.}, at: dm_suspend+0x22/0x110
-[  847.613066]  #1: 00000000756de3cd (&md->suspend_lock#2){+.+.}, at: dm_internal_suspend_noflush+0xc/0xe0
-[  847.614989] 
-[  847.615323] =============================================
-[  847.615323] 
+?
+
+-- 
+Jens Axboe
+
