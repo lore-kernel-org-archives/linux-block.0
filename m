@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E6AAC67839
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 19:17:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18D18C67839
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 19:17:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E2840208E7
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 19:17:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5A8520880
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 19:17:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="l8XbY/U9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2840208E7
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="h1OPYfc4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5A8520880
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lightnvm.io
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727119AbeLKTRW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Dec 2018 14:17:22 -0500
-Received: from mail-lj1-f182.google.com ([209.85.208.182]:42133 "EHLO
-        mail-lj1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727157AbeLKTRW (ORCPT
+        id S1727158AbeLKTR0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Dec 2018 14:17:26 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:46481 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727176AbeLKTR0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Dec 2018 14:17:22 -0500
-Received: by mail-lj1-f182.google.com with SMTP id l15-v6so14026320lja.9
-        for <linux-block@vger.kernel.org>; Tue, 11 Dec 2018 11:17:20 -0800 (PST)
+        Tue, 11 Dec 2018 14:17:26 -0500
+Received: by mail-lj1-f195.google.com with SMTP id v15-v6so13993602ljh.13
+        for <linux-block@vger.kernel.org>; Tue, 11 Dec 2018 11:17:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=wU5IGf/IyJdy8E6pFE20BoISwxjYZEejL799cEuLgMo=;
-        b=l8XbY/U90YceqUUbbdJ8jZ3AimHblgIxtbTOSxh71p+RjIKxtiWaEgLpyvQmL1j6B1
-         bxhkcbxGTHjWGGYkebIZfTZZakEqD4bCtHNm62qfsm/gjXjkb/dVouYYWv4ZXrN0AYUg
-         A8lKzr/Kpd50Q6fEa8U7UifuDmdZKKS1kyoSs/Bopz08pzB2hERpjLUZrHdjbqOg3b6Q
-         D0oHqk3Psc2KgfE8QLT2FCi7g0wIW8idFQbvima6gT9sLQ7Tum5K5L0ctezVTaGZk0Yn
-         SiZg8SCE4DQ1kPebeqpRrMxw9MKVGVpydxwSgPkVyGNxjBhVHRVZvezxEHOWYBYpRgAd
-         PgLw==
+        bh=H9nWBPfYW84tctbJc+ROv6OY4/CteCEQpmHH16Eu8b8=;
+        b=h1OPYfc4N0gmIDfmwABehgiudKb18sHygTDILZWOYjI++3IODxZvZwvdt+vpRBcRo+
+         KOjqr70lbHTwuPrY3jWc3pXkZE2AuPDnNpDRVw3NhlfBCy/oFkkQLDcSVz1fUmSi+jNG
+         /QvCQcIWjOnS8LBxRJgJV7KwKNk6w4sFmilzMDQvDMUxmT25pa0Yj2VGXKBxgoX2ptkc
+         tEMAgV3AJ56Ecx3LIM6+0dYh030yyvJhE8H5NU/l0YPcyf8Bw4tkVf1HYK9yis6mPY00
+         Xw6336c3Lk1VzXlGyHAElOyiBVB1dVwlEcae5N4JNicVVNE7yf+JwZwoSOuwr5P82WkG
+         00xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=wU5IGf/IyJdy8E6pFE20BoISwxjYZEejL799cEuLgMo=;
-        b=gwLV6VXek+WLn0HOuEk3tAcEanrxJh36Vay5lUFNCXC2fMQwmGEQ1W7WY+ODtYPNUe
-         Sd5YphUCKMbgeaf1XvKJR3ynTZDbyt3QSPkUfuzehu9OeCvqzWw/fQ8dq2cT4sCt00lt
-         x4IfxIUfvnx9aQb0MOzDUNXjLyU+4TxNldJgkgelk8VBfp8fJrr1IOVK2/G20EAi8ih2
-         n+1RjREMWcZzkmB8oPIjlpJpkxmaPORPSpx9NGBMHsNdcRXsYsFp8XjlpzS4TvqMUBbm
-         Z5/u7pweZrscV9e7aIbNwaLeujPmjMhVXpMXFvD8JtmAKtJ54EJfPMWTSosX0rP8uoan
-         +RrA==
-X-Gm-Message-State: AA+aEWYkPVBs59c/f0joRwBhexwSyM0GBHVxlkv1Mtp1Ogocv2tXr3PM
-        56xlFaBEb5WXvu/qPyKwX7eqEw==
-X-Google-Smtp-Source: AFSGD/XgcqFzcTWqOriOaX7BJKHTfC1QNrMBG4R3B2qaiu2/ykO1/UlrGbHKke70Yn9/BMZkzSqehg==
-X-Received: by 2002:a2e:86ca:: with SMTP id n10-v6mr10465788ljj.49.1544555839929;
-        Tue, 11 Dec 2018 11:17:19 -0800 (PST)
+        bh=H9nWBPfYW84tctbJc+ROv6OY4/CteCEQpmHH16Eu8b8=;
+        b=hA2Fj7ymdbo9ZnX1Pe/rjsBpBDtKeLYR4+IhXweX6CDRl3sigeqPHhHhsqtAVNZnqP
+         +KuhLaXC2aGV9p8YWtcys7A+KEKiVFSP9KJo+L1qGpXPLHicBGmJILwMnxLVYgiRBxdP
+         PP8vJDRfzQ97g0l4WrzgV7y9MJgNa9Yy3l+28VzP8/8Wp0DYt/ImXP74xTWGr/zQUv0T
+         rsuvonsywQyF/xkSWHx9B18ic83QSg0ltbTHPsGQejUKxJKFPwCRee9LSwjj3g7lYX0k
+         nJpnCuO6wur3umoLPZWngyUnixd9YL+Sy2U+1IOXM0VprmRfDaIMmPd1dri4rurX541N
+         LnPw==
+X-Gm-Message-State: AA+aEWZhQgKD4112t+irVev7jWy75HkPZcewQE2yNvIo5ActkVIFmmU4
+        m7FBUZcM1nM1MFiNfRbyLygV9g==
+X-Google-Smtp-Source: AFSGD/XRfo4Dw4GdF522BKuhlK/hB8VjCAfBQvlXl5Qb3jUM5D8/vcEc0d9Xg+MaVlPs4lb8jM/bHQ==
+X-Received: by 2002:a2e:9957:: with SMTP id r23-v6mr10159814ljj.98.1544555843804;
+        Tue, 11 Dec 2018 11:17:23 -0800 (PST)
 Received: from skyninja.webspeed.dk (95-166-82-66-cable.dk.customer.tdc.net. [95.166.82.66])
-        by smtp.gmail.com with ESMTPSA id v64sm2764583lfa.48.2018.12.11.11.17.18
+        by smtp.gmail.com with ESMTPSA id v64sm2764583lfa.48.2018.12.11.11.17.22
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 11 Dec 2018 11:17:19 -0800 (PST)
+        Tue, 11 Dec 2018 11:17:23 -0800 (PST)
 From:   =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
 To:     axboe@fb.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Igor Konopko <igor.j.konopko@intel.com>,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 16/21] lightnvm: pblk: move lba list to partial read context
-Date:   Tue, 11 Dec 2018 20:16:22 +0100
-Message-Id: <20181211191627.15542-17-mb@lightnvm.io>
+Subject: [GIT PULL 19/21] lightnvm: disable interleaved metadata
+Date:   Tue, 11 Dec 2018 20:16:25 +0100
+Message-Id: <20181211191627.15542-20-mb@lightnvm.io>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181211191627.15542-1-mb@lightnvm.io>
 References: <20181211191627.15542-1-mb@lightnvm.io>
@@ -79,106 +79,66 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Igor Konopko <igor.j.konopko@intel.com>
 
-Currently DMA allocated memory is reused on partial read
-for lba_list_mem and lba_list_media arrays. In preparation
-for dynamic DMA pool sizes we need to move this arrays
-into pblk_pr_ctx structures.
+Currently pblk only check the size of I/O metadata and does not take
+into account if this metadata is in a separate buffer or interleaved
+in a single metadata buffer.
+
+In reality only the first scenario is supported, where second mode will
+break pblk functionality during any IO operation.
+
+This patch prevents pblk to be instantiated in case device only
+supports interleaved metadata.
 
 Reviewed-by: Javier González <javier@cnexlabs.com>
 Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
 Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/lightnvm/pblk-read.c | 20 +++++---------------
- drivers/lightnvm/pblk.h      |  2 ++
- 2 files changed, 7 insertions(+), 15 deletions(-)
+ drivers/lightnvm/pblk-init.c | 6 ++++++
+ drivers/nvme/host/lightnvm.c | 1 +
+ include/linux/lightnvm.h     | 1 +
+ 3 files changed, 8 insertions(+)
 
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index 9fba614adeeb..19917d3c19b3 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -224,7 +224,6 @@ static void pblk_end_partial_read(struct nvm_rq *rqd)
- 	unsigned long *read_bitmap = pr_ctx->bitmap;
- 	int nr_secs = pr_ctx->orig_nr_secs;
- 	int nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
--	__le64 *lba_list_mem, *lba_list_media;
- 	void *src_p, *dst_p;
- 	int hole, i;
- 
-@@ -237,13 +236,9 @@ static void pblk_end_partial_read(struct nvm_rq *rqd)
- 		rqd->ppa_list[0] = ppa;
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index ff6a6df369c3..e8055b796381 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -1175,6 +1175,12 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+ 		return ERR_PTR(-EINVAL);
  	}
  
--	/* Re-use allocated memory for intermediate lbas */
--	lba_list_mem = (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
--	lba_list_media = (((void *)rqd->ppa_list) + 2 * pblk_dma_ppa_size);
--
- 	for (i = 0; i < nr_secs; i++) {
--		lba_list_media[i] = meta_list[i].lba;
--		meta_list[i].lba = lba_list_mem[i];
-+		pr_ctx->lba_list_media[i] = meta_list[i].lba;
-+		meta_list[i].lba = pr_ctx->lba_list_mem[i];
- 	}
++	if (geo->ext) {
++		pblk_err(pblk, "extended metadata not supported\n");
++		kfree(pblk);
++		return ERR_PTR(-EINVAL);
++	}
++
+ 	spin_lock_init(&pblk->resubmit_lock);
+ 	spin_lock_init(&pblk->trans_lock);
+ 	spin_lock_init(&pblk->lock);
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index ba268d7cf141..f145fc0220d6 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -990,6 +990,7 @@ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
+ 	geo = &dev->geo;
+ 	geo->csecs = 1 << ns->lba_shift;
+ 	geo->sos = ns->ms;
++	geo->ext = ns->ext;
  
- 	/* Fill the holes in the original bio */
-@@ -255,7 +250,7 @@ static void pblk_end_partial_read(struct nvm_rq *rqd)
- 		line = pblk_ppa_to_line(pblk, rqd->ppa_list[i]);
- 		kref_put(&line->ref, pblk_line_put);
+ 	dev->q = q;
+ 	memcpy(dev->name, disk_name, DISK_NAME_LEN);
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index 7afedaddbd15..5d865a5d5cdc 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -357,6 +357,7 @@ struct nvm_geo {
+ 	u32	clba;		/* sectors per chunk */
+ 	u16	csecs;		/* sector size */
+ 	u16	sos;		/* out-of-band area size */
++	bool	ext;		/* metadata in extended data buffer */
  
--		meta_list[hole].lba = lba_list_media[i];
-+		meta_list[hole].lba = pr_ctx->lba_list_media[i];
- 
- 		src_bv = new_bio->bi_io_vec[i++];
- 		dst_bv = bio->bi_io_vec[bio_init_idx + hole];
-@@ -295,13 +290,9 @@ static int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
- 	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
- 	struct pblk_pr_ctx *pr_ctx;
- 	struct bio *new_bio, *bio = r_ctx->private;
--	__le64 *lba_list_mem;
- 	int nr_secs = rqd->nr_ppas;
- 	int i;
- 
--	/* Re-use allocated memory for intermediate lbas */
--	lba_list_mem = (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
--
- 	new_bio = bio_alloc(GFP_KERNEL, nr_holes);
- 
- 	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
-@@ -312,12 +303,12 @@ static int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
- 		goto fail_free_pages;
- 	}
- 
--	pr_ctx = kmalloc(sizeof(struct pblk_pr_ctx), GFP_KERNEL);
-+	pr_ctx = kzalloc(sizeof(struct pblk_pr_ctx), GFP_KERNEL);
- 	if (!pr_ctx)
- 		goto fail_free_pages;
- 
- 	for (i = 0; i < nr_secs; i++)
--		lba_list_mem[i] = meta_list[i].lba;
-+		pr_ctx->lba_list_mem[i] = meta_list[i].lba;
- 
- 	new_bio->bi_iter.bi_sector = 0; /* internal bio */
- 	bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
-@@ -325,7 +316,6 @@ static int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
- 	rqd->bio = new_bio;
- 	rqd->nr_ppas = nr_holes;
- 
--	pr_ctx->ppa_ptr = NULL;
- 	pr_ctx->orig_bio = bio;
- 	bitmap_copy(pr_ctx->bitmap, read_bitmap, NVM_MAX_VLBA);
- 	pr_ctx->bio_init_idx = bio_init_idx;
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index e5b88a25d4d6..0e9d3960ac4c 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -132,6 +132,8 @@ struct pblk_pr_ctx {
- 	unsigned int bio_init_idx;
- 	void *ppa_ptr;
- 	dma_addr_t dma_ppa_list;
-+	__le64 lba_list_mem[NVM_MAX_VLBA];
-+	__le64 lba_list_media[NVM_MAX_VLBA];
- };
- 
- /* Pad context */
+ 	/* device write constrains */
+ 	u32	ws_min;		/* minimum write size */
 -- 
 2.17.1
 
