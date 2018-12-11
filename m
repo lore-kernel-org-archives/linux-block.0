@@ -2,85 +2,78 @@ Return-Path: <SRS0=ptgV=OU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEE8AC6783B
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 23:34:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0244C6783B
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 23:35:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F6132086D
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 23:34:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F6132086D
+	by mail.kernel.org (Postfix) with ESMTP id 95C7920851
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 23:35:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="FA5N60oC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95C7920851
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726357AbeLKXed (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Dec 2018 18:34:33 -0500
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:33946 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726240AbeLKXec (ORCPT
+        id S1726230AbeLKXf3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Dec 2018 18:35:29 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:56602 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726227AbeLKXf3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Dec 2018 18:34:32 -0500
-Received: by mail-oi1-f195.google.com with SMTP id h25so13583202oig.1
-        for <linux-block@vger.kernel.org>; Tue, 11 Dec 2018 15:34:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=yafPJnl+PdOgvyoRVag2vuSqK645F4OR2nW/M0tDJ4k=;
-        b=qOoMmW4TscsjTu9ldvgJgnZDQfXemfhAcOCZrr3ZbjzjR3gZs4zOhf5WhFgykm1soM
-         egI7h+CJPtVxJ4QSmdGNbp1tq+/TH1cCCd5DAYomofbcKHrVraO/eBOwPIl7aLQywHWn
-         s9V7uS5xirK8qJyt9G/FVmWaEPY8f1jIvFlSIht6r+VXBd5nO1FUFpT4389HKRf0gooF
-         df3KfWUuY57ydvtUTrnM+6XvYbk+5bvJWXQfWyp5CMrAUnmTOkMDWuqidP3w29EDwAny
-         pOwW+nAuRm0SPFOCatNSMaBytBigLA1GRK+5ip+zr1xFBj4mjNne/4eMerMvVLUnOUOy
-         UB7Q==
-X-Gm-Message-State: AA+aEWYC5WWOEo+e32svjssBlba/O4ELSUWT6pgGEaGX7FlIyhLq9D0M
-        XdU2tXddsWqRpS99Aw2z9+siAI5L
-X-Google-Smtp-Source: AFSGD/U9I68/ZBDT/53+4HU4tx9kJc0ymuGEa46uxcC5dAGM9lw56HkmX5+oeqGbxG6LmpsHYHCJKw==
-X-Received: by 2002:aca:2803:: with SMTP id 3mr2558548oix.85.1544571271886;
-        Tue, 11 Dec 2018 15:34:31 -0800 (PST)
-Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
-        by smtp.gmail.com with ESMTPSA id s186sm7399141oif.0.2018.12.11.15.34.30
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 11 Dec 2018 15:34:31 -0800 (PST)
-Subject: Re: [PATCH nvme-cli 6/5] fabrics: pass in nr_write_queues
-To:     Keith Busch <keith.busch@intel.com>
-Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-References: <20181211104936.25333-1-sagi@grimberg.me>
- <20181211104936.25333-7-sagi@grimberg.me>
- <20181211193015.GC8101@localhost.localdomain>
+        Tue, 11 Dec 2018 18:35:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=References:In-Reply-To:Message-Id:
+        Date:Subject:Cc:To:From:Sender:Reply-To:MIME-Version:Content-Type:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=kspA0YSoLOcngjQAnQgM+xxzcscHJNp2K0o69qKJtb4=; b=FA5N60oC0ZM+S39D1w1D/I7xb
+        5wRm6ZqxKsr0Gf3pWxE5FsDRqXJlJPegRa6bD26xZ3kk5c+QhxC3KqpS5smpw6QVb3866aehIzUKu
+        HC46355swJaQ8EGrhrzIIFB0FWjcn5CxN8l1OsURZDNovJndVct65CxXOzSb3moxqG6Jw8277ajN2
+        5KwciwUxw4TEsFznoBFa/NjxS2fGfx/t2GYJo5pZ3US5RYWuiQpnAyCFi6WkZYsUplEKvJg5+XLpW
+        XKc1bmKtNyiIJtXzsmbijKy6YrNOfPNOTjsuX6JdEXmkW/sLWXF7nqtLzlFPvN+UlMjQHG/xjV0t8
+        q8GGr6/ow==;
+Received: from [2600:1700:65a0:78e0:514:7862:1503:8e4d] (helo=sagi-Latitude-E7470.lbits)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gWrYh-0002L4-AW; Tue, 11 Dec 2018 23:35:23 +0000
 From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <45d197ee-9f2e-ab65-4927-f8f7308395d3@grimberg.me>
-Date:   Tue, 11 Dec 2018 15:34:29 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <20181211193015.GC8101@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>
+Subject: [PATCH v2 2/5] nvme-fabrics: add missing nvmf_ctrl_options documentation
+Date:   Tue, 11 Dec 2018 15:35:15 -0800
+Message-Id: <20181211233519.9350-3-sagi@grimberg.me>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20181211233519.9350-1-sagi@grimberg.me>
+References: <20181211233519.9350-1-sagi@grimberg.me>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+---
+ drivers/nvme/host/fabrics.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> On Tue, Dec 11, 2018 at 02:49:36AM -0800, Sagi Grimberg wrote:
->>   	if (cfg.host_traddr) {
->>   		len = sprintf(p, ",host_traddr=%s", cfg.host_traddr);
->>   		if (len < 0)
->> @@ -1009,6 +1019,7 @@ int connect(const char *desc, int argc, char **argv)
->>   		{"hostnqn",         'q', "LIST", CFG_STRING, &cfg.hostnqn,         required_argument, "user-defined hostnqn" },
->>   		{"hostid",          'I', "LIST", CFG_STRING, &cfg.hostid,      required_argument, "user-defined hostid (if default not used)"},
->>   		{"nr-io-queues",    'i', "LIST", CFG_INT, &cfg.nr_io_queues,    required_argument, "number of io queues to use (default is core count)" },
->> +		{"nr_write_queues",  'W', "LIST", CFG_INT, &cfg.nr_write_queues,    required_argument, "number of write queues to use (default 0)" },
-> 
-> I realize the kernel's nvme-admin uses "_", but everything else in the
-> shell utility here uses "-", so just want to use that for consistency.
-> And the documentation needs to include this as well.
+diff --git a/drivers/nvme/host/fabrics.h b/drivers/nvme/host/fabrics.h
+index 524a02a67817..28dc916ef26b 100644
+--- a/drivers/nvme/host/fabrics.h
++++ b/drivers/nvme/host/fabrics.h
+@@ -88,6 +88,9 @@ enum {
+  * @max_reconnects: maximum number of allowed reconnect attempts before removing
+  *              the controller, (-1) means reconnect forever, zero means remove
+  *              immediately;
++ * @disable_sqflow: disable controller sq flow control
++ * @hdr_digest: generate/verify header digest (TCP)
++ * @data_digest: generate/verify data digest (TCP)
+  */
+ struct nvmf_ctrl_options {
+ 	unsigned		mask;
+-- 
+2.17.1
 
-Will do.
