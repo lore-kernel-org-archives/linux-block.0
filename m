@@ -2,200 +2,180 @@ Return-Path: <SRS0=ptgV=OU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,T_MIXED_ES
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BE35C04EB8
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 03:22:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EBDAC04EB8
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 03:22:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CE8A920645
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 03:22:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1544498525;
-	bh=FO9I1OCXE44/F8PRjLU1uMnj5r987K3vv0glqJU8rkE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=AjshcaEbC+xJh1FWi5WT9quuSz4sxr1x+JuRMl4Gs92WA5gXA3a/YgJJXsJqvAZbP
-	 kmPiPpVUO/OTJvqtGjjXtpsbbP9OloDusutQ2hceOByV51RDhrzjsl6R1r3zDzK2p/
-	 62tYS1HpN8+nCWsDS4L7uzltinyNF19o9VkowQGc=
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE8A920645
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTP id 49CF020849
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 03:22:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U5+wRAgi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49CF020849
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728627AbeLKDWE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Dec 2018 22:22:04 -0500
-Received: from mail-yb1-f193.google.com ([209.85.219.193]:33366 "EHLO
-        mail-yb1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728584AbeLKDWE (ORCPT
+        id S1729868AbeLKDWd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Dec 2018 22:22:33 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:39881 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728584AbeLKDWd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Dec 2018 22:22:04 -0500
-Received: by mail-yb1-f193.google.com with SMTP id f125so6159495ybc.0;
-        Mon, 10 Dec 2018 19:22:03 -0800 (PST)
+        Mon, 10 Dec 2018 22:22:33 -0500
+Received: by mail-wr1-f68.google.com with SMTP id t27so12537813wra.6
+        for <linux-block@vger.kernel.org>; Mon, 10 Dec 2018 19:22:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7fG6caQSczk9x+OEMiw/JcpxXj1GxSBGVAA/3QV7Kkc=;
+        b=U5+wRAgiMpGw6w2BbgZfFlkmSUYavIBamqCAVzuZtfidjKILxRbHJ/CpL3ihlSGpug
+         +FrXzw1k2s3vNngOlKXJ6AHXoLF2iu85F45rpXM6I7J6s3+X1ZjlW/7srUkWk3X2LQG9
+         FKKAORdaEOUM7+f07DH3ogFAmVK/PhA+mZAsOkM3q1fbHeXQyrnlYyPN6c3FfR59nbKn
+         PCh8y2papuVX4AxNDfOCRkK5x7OGUR3Io9ihZoBQK1WhbmZMJ8WbItoc0ZF2DacP5GQW
+         qyVvzDWK4BjaEgyUcmaLhrZp384NJyi8MNu+13JB8vzj7+Ga3dZ51lJ8a6sAd+P1ptM4
+         ptZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=WZNmerNVp1OzoQvVK2tSTUhw2j6CZgTEH86VJHmZyEY=;
-        b=GKb2SP422Og9aXteBCggxYkcj/IhViZy8dTo6WfDrdcJZuENf2BAutcLxILDRJ2CKC
-         HdEq7OJiD1oiw+VyncHxes2CNycZAjg8F5mfCUQoOoUmthawil3J5YVGY1LdIPsOy0L0
-         eJ7lVraTiugN1I0m/EFH01ITmGLA486FiYt1L3ocvBjmqzj8LdZxzoaD9AcbB1KOyr+p
-         DDWl2oY3c4PTrv//vAYRutu02BgCIRkE6HSl66UrX6TJa6XZrW64Enn/SA9cytT7JU0w
-         vZV8hRrVRvLHYLLwJJEByl9s2TRCPmj2y7h1YuIUKrCTG3lBwg/pJxZjNmR4h0hTcES6
-         G5Hw==
-X-Gm-Message-State: AA+aEWY14qHpjQkZP+zHkyjJtRyI2G11GGNlg9NfCQqT8tUJmeiDEqq0
-        eg+UoqEgqKxNY+VZve4M/Kk=
-X-Google-Smtp-Source: AFSGD/Wcc9LMd74JAttNgCgQsp5UIy2Bi7zB07z4H9czoXyP1DinwFtIs89fAfs1i5xdldpX0AHRoQ==
-X-Received: by 2002:a25:1585:: with SMTP id 127-v6mr14699787ybv.208.1544498522650;
-        Mon, 10 Dec 2018 19:22:02 -0800 (PST)
-Received: from dennisz-mbp.dhcp.thefacebook.com ([2620:10d:c091:180::1:c7f8])
-        by smtp.gmail.com with ESMTPSA id j6sm4403463ywi.110.2018.12.10.19.22.00
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 10 Dec 2018 19:22:01 -0800 (PST)
-Date:   Mon, 10 Dec 2018 22:21:59 -0500
-From:   Dennis Zhou <dennis@kernel.org>
-To:     Josef Bacik <josef@toxicpanda.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Johannes Weiner <hannes@cmpxchg.org>, kernel-team@fb.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: fix iolat timestamp and restore accounting
- semantics
-Message-ID: <20181211032159.GB40583@dennisz-mbp.dhcp.thefacebook.com>
-References: <20181210163510.58985-1-dennis@kernel.org>
- <20181210182507.qtoj5egbflr5s366@macbook-pro-91.dhcp.thefacebook.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7fG6caQSczk9x+OEMiw/JcpxXj1GxSBGVAA/3QV7Kkc=;
+        b=GHZrHtPHH7u3fWjNNTEYdp/3m5bU8CdO+ZJ4nqzLcsoW4yokWBjsALDqLHY//LkP4c
+         EBdq75YDE6McQ3leeuz644IEU06qGOnPvh3zIzvnWW5x8axorRJbJ2ql6sjKpKePQfPn
+         JIPhCQc2pKOpAq/o9ErxkHZgTRc4I7v/QMSpbdPofMKXwewKKrbPxJBgwoPGsSn1e6qn
+         NzCsacTyV1xkMb6WcSOcjyEZUs2IfMfEHtt0eS+seXLd+D1g4sE4Sr8wLnwbCxuGbYhW
+         y9RYJDPg0lMMfzjRVRv4JxYVd8tumHaXQ14FChLaK5sN/gF/5h56Qf7sxS5l28PZsynW
+         7mFw==
+X-Gm-Message-State: AA+aEWY2lDIsj2DRds9TfgMTzWK86yBwZxk0ddsIbAD2nKH0DJjz8mDX
+        PrRGVT46eC+3kqGlbPgD8pKFTRocFTOTX8FE4EM=
+X-Google-Smtp-Source: AFSGD/WaKAe5y+yqxW3rrYxP49er3a5EYNIlFqcOmMXv8oW6PMQI/+26o/nEV/RTQYEvBjLsi7IZqDQU66bAeYyczCY=
+X-Received: by 2002:adf:ce02:: with SMTP id p2mr13017997wrn.185.1544498550684;
+ Mon, 10 Dec 2018 19:22:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181210182507.qtoj5egbflr5s366@macbook-pro-91.dhcp.thefacebook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <CACVXFVO_QXipD3cmPvpLyBYSiEcWPN_ThQ=0pO9AwLqN-Lv93w@mail.gmail.com>
+ <20181211030929.GA40583@dennisz-mbp.dhcp.thefacebook.com>
+In-Reply-To: <20181211030929.GA40583@dennisz-mbp.dhcp.thefacebook.com>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Tue, 11 Dec 2018 11:22:18 +0800
+Message-ID: <CACVXFVNnmR1+KDLXjJK_qCkAQB3hJBS3GqPAXCnbd8cG7jaK8A@mail.gmail.com>
+Subject: Re: block: kernel panic in __bio_associate_blkg+0x1e
+To:     Dennis Zhou <dennis@kernel.org>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Josef,
+On Tue, Dec 11, 2018 at 11:09 AM Dennis Zhou <dennis@kernel.org> wrote:
+>
+> Hi Ming,
+>
+> On Tue, Dec 11, 2018 at 10:36:07AM +0800, Ming Lei wrote:
+> > Hi Jens and Dennis,
+> >
+> > Just found the following issue when testing for-4.21/block when
+> > running stress io & device
+> > remove on scsi_debug, and it should be caused by recent blkcg changes.
+> >
+> > [   37.144330] sd 8:0:0:15: [sds] Synchronizing SCSI cache
+> > [   37.665644] BUG: unable to handle kernel NULL pointer dereference
+> > at 0000000000000048
+> > [   37.674748] PGD 8000000269c3b067 P4D 8000000269c3b067 PUD 269c3c067 PMD 0
+> > [   37.675703] Oops: 0000 [#1] PREEMPT SMP PTI
+> > [   37.676294] CPU: 2 PID: 1270 Comm: fio Not tainted
+> > 4.20.0-rc6_f0ea84586b7c_for-next+ #1
+> > [   37.677392] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009),
+> > BIOS 1.10.2-2.fc27 04/01/2014
+> > [   37.678563] RIP: 0010:__bio_associate_blkg+0x1e/0x81
+> > [   37.679255] Code: 00 00 5b 5d c3 0f 1f 44 00 00 eb 94 0f 1f 44 00
+> > 00 41 54 55 48 89 fd 53 48 89 f3 e8 80 ff ff ff bf 01 00 00 00 e8 94
+> > 37 d7 ff <48> 8b 43 48 a8 03 74 06 48 8b 53 40 eb 1b 65 48 ff 00 41 b4
+> > 01 eb
+> > [   37.681801] RSP: 0018:ffffc9000169bb80 EFLAGS: 00010246
+> > [   37.682525] RAX: ffff888269c40000 RBX: 0000000000000000 RCX: 0000000000000000
+> > [   37.683506] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff8132c44f
+> > [   37.684486] RBP: ffff888270fecb18 R08: 000000000000001e R09: ffffffffffffffff
+> > [   37.685473] R10: 00000000ffffffca R11: 0000000000000000 R12: ffff88826630b758
+> > [   37.686450] R13: ffff888270fecb18 R14: ffff888107811118 R15: ffff888270fecb18
+> > [   37.687435] FS:  00007f7d486c6ec0(0000) GS:ffff888277b00000(0000)
+> > knlGS:0000000000000000
+> > [   37.688548] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > [   37.689345] CR2: 0000000000000048 CR3: 0000000269c4a001 CR4: 0000000000760ee0
+> > [   37.690333] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > [   37.691330] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > [   37.692320] PKRU: 55555554
+> > [   37.692704] Call Trace:
+> > [   37.693070]  bio_associate_blkg_from_css+0x4e/0x57
+> > [   37.693734]  bio_associate_blkg+0x4d/0x53
+> > [   37.694300]  blkdev_direct_IO+0x1d4/0x3c9
+> > [   37.694861]  ? __switch_to_asm+0x34/0x70
+> > [   37.695417]  ? aio_complete+0x2cc/0x2cc
+> > [   37.695962]  ? __switch_to_asm+0x34/0x70
+> > [   37.696511]  ? __switch_to_asm+0x40/0x70
+> > [   37.697066]  ? __switch_to_asm+0x34/0x70
+> > [   37.697614]  ? __switch_to_asm+0x40/0x70
+> > [   37.698166]  ? __switch_to_asm+0x34/0x70
+> > [   37.698717]  ? generic_file_read_iter+0x96/0x110
+> > [   37.699366]  generic_file_read_iter+0x96/0x110
+> > [   37.699991]  aio_read+0xe9/0x178
+> > [   37.700448]  ? __switch_to_asm+0x34/0x70
+> > [   37.701004]  ? __switch_to_asm+0x34/0x70
+> > [   37.701552]  ? __switch_to_asm+0x40/0x70
+> > [   37.702109]  ? __switch_to_asm+0x34/0x70
+> > [   37.702659]  ? __switch_to_asm+0x40/0x70
+> > [   37.703214]  ? __switch_to_asm+0x34/0x70
+> > [   37.703762]  ? __switch_to_asm+0x40/0x70
+> > [   37.704317]  ? __switch_to_asm+0x34/0x70
+> > [   37.704867]  ? __switch_to_asm+0x40/0x70
+> > [   37.705423]  ? __switch_to_asm+0x34/0x70
+> > [   37.705973]  ? __switch_to_asm+0x40/0x70
+> > [   37.706523]  ? __switch_to_asm+0x34/0x70
+> > [   37.707088]  ? io_submit_one+0x2e1/0x67b
+> > [   37.707638]  io_submit_one+0x2e1/0x67b
+> > [   37.708171]  ? __se_sys_io_submit+0xc5/0x15e
+> > [   37.708770]  __se_sys_io_submit+0xc5/0x15e
+> > [   37.709348]  ? 0xffffffff81000000
+> > [   37.709819]  ? do_syscall_64+0x84/0x13f
+> > [   37.710362]  ? __se_sys_io_submit+0x15e/0x15e
+> > [   37.710987]  do_syscall_64+0x84/0x13f
+> > [   37.711505]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+> > [   37.712216] RIP: 0033:0x7f7d471c6687
+> > [   37.712720] Code: 00 00 00 49 83 38 00 75 ed 49 83 78 08 00 75 e6
+> > 8b 47 0c 39 47 08 75 de 31 c0 c3 0f 1f 84 00 00 00 00 00 b8 d1 00 00
+> > 00 0f 05 <c3> 0f 1f 84 00 00 00 00 00 b8 d2 00 00 00 0f 05 c3 0f 1f 84
+> > 00 00
+> > [   37.715280] RSP: 002b:00007ffcb7d448c8 EFLAGS: 00000202 ORIG_RAX:
+> > 00000000000000d1
+> > [   37.716314] RAX: ffffffffffffffda RBX: 00007f7d22e90298 RCX: 00007f7d471c6687
+> > [   37.717297] RDX: 00000000009f4b20 RSI: 0000000000000001 RDI: 00007f7d484ea000
+> > [   37.718280] RBP: 0000000000003e70 R08: 0000000000000001 R09: 00000000008799e0
+> > [   37.719264] R10: 0000000000000000 R11: 0000000000000202 R12: 00007f7d22e90298
+> > [   37.720249] R13: 0000000000000000 R14: 00000000009f4cc0 R15: 00000000009e0c60
+> > [   37.721232] Modules linked in: scsi_debug isofs iTCO_wdt i2c_i801
+> > i2c_core iTCO_vendor_support lpc_ich mfd_core ip_tables sr_mod cdrom
+> > usb_storage sd_mod ahci libahci libata crc32c_intel qemu_fw_cfg
+> > virtio_scsi dm_mirror dm_region_hash dm_log dm_mod
+> > [   37.724240] Dumping ftrace buffer:
+> > [   37.724717]    (ftrace buffer empty)
+> > [   37.725223] CR2: 0000000000000048
+> > [   37.725692] ---[ end trace 4758725073447b42 ]---
+> >
+>
+> Thanks for reporting this to me. I'm not familiar with scsi_debug would
+> you please explain to me how to reproduce this?
 
-On Mon, Dec 10, 2018 at 01:25:08PM -0500, Josef Bacik wrote:
-> On Mon, Dec 10, 2018 at 11:35:10AM -0500, Dennis Zhou wrote:
-> > The blk-iolatency controller measures the time from rq_qos_throttle() to
-> > rq_qos_done_bio() and attributes this time to the first bio that needs
-> > to create the request. This means if a bio is plug-mergeable or
-> > bio-mergeable, it gets to bypass the blk-iolatency controller.
-> > 
-> > The recent series, to tag all bios w/ blkgs in [1] changed the timing
-> > incorrectly as well. First, the iolatency controller was tagging bios
-> > and using that information if it should process it in rq_qos_done_bio().
-> > However, now that all bios are tagged, this caused the atomic_t for the
-> > struct rq_wait inflight count to underflow resulting in a stall. Second,
-> > now the timing was using the duration a bio from generic_make_request()
-> > rather than the timing mentioned above.
-> > 
-> > This patch fixes the errors by accounting time separately in a bio
-> > adding the field bi_start. If this field is set, the bio should be
-> > processed by blk-iolatency in rq_qos_done_bio().
-> > 
-> > [1] https://lore.kernel.org/lkml/20181205171039.73066-1-dennis@kernel.org/
-> > 
-> > Signed-off-by: Dennis Zhou <dennis@kernel.org>
-> > Cc: Josef Bacik <josef@toxicpanda.com>
-> > ---
-> >  block/blk-iolatency.c     | 17 ++++++-----------
-> >  include/linux/blk_types.h | 12 ++++++++++++
-> >  2 files changed, 18 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-> > index bee092727cad..52d5d7cc387c 100644
-> > --- a/block/blk-iolatency.c
-> > +++ b/block/blk-iolatency.c
-> > @@ -463,6 +463,8 @@ static void blkcg_iolatency_throttle(struct rq_qos *rqos, struct bio *bio)
-> >  	if (!blk_iolatency_enabled(blkiolat))
-> >  		return;
-> >  
-> > +	bio->bi_start = ktime_get_ns();
-> > +
-> >  	while (blkg && blkg->parent) {
-> >  		struct iolatency_grp *iolat = blkg_to_lat(blkg);
-> >  		if (!iolat) {
-> > @@ -480,18 +482,12 @@ static void blkcg_iolatency_throttle(struct rq_qos *rqos, struct bio *bio)
-> >  }
-> >  
-> >  static void iolatency_record_time(struct iolatency_grp *iolat,
-> > -				  struct bio_issue *issue, u64 now,
-> > +				  struct bio *bio, u64 now,
-> >  				  bool issue_as_root)
-> >  {
-> > -	u64 start = bio_issue_time(issue);
-> > +	u64 start = bio->bi_start;
-> >  	u64 req_time;
-> >  
-> > -	/*
-> > -	 * Have to do this so we are truncated to the correct time that our
-> > -	 * issue is truncated to.
-> > -	 */
-> > -	now = __bio_issue_time(now);
-> > -
-> >  	if (now <= start)
-> >  		return;
-> >  
-> > @@ -593,7 +589,7 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
-> >  	bool enabled = false;
-> >  
-> >  	blkg = bio->bi_blkg;
-> > -	if (!blkg)
-> > +	if (!blkg || !bio->bi_start)
-> >  		return;
-> >  
-> >  	iolat = blkg_to_lat(bio->bi_blkg);
-> > @@ -612,8 +608,7 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
-> >  		atomic_dec(&rqw->inflight);
-> >  		if (!enabled || iolat->min_lat_nsec == 0)
-> >  			goto next;
-> > -		iolatency_record_time(iolat, &bio->bi_issue, now,
-> > -				      issue_as_root);
-> > +		iolatency_record_time(iolat, bio, now, issue_as_root);
-> >  		window_start = atomic64_read(&iolat->window_start);
-> >  		if (now > window_start &&
-> >  		    (now - window_start) >= iolat->cur_win_nsec) {
-> > diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> > index 46c005d601ac..c2c02ec08d7c 100644
-> > --- a/include/linux/blk_types.h
-> > +++ b/include/linux/blk_types.h
-> > @@ -181,6 +181,18 @@ struct bio {
-> >  	 */
-> >  	struct blkcg_gq		*bi_blkg;
-> >  	struct bio_issue	bi_issue;
-> > +#ifdef CONFIG_BLK_CGROUP_IOLATENCY
-> > +	/*
-> > +	 * blk-iolatency measure the time a bio takes between rq_qos_throttle()
-> > +	 * and rq_qos_done_bio().  It attributes the time to the bio that gets
-> > +	 * the request allowing any bios that can tag along via plug merging or
-> > +	 * bio merging to be free (from blk-iolatency's perspective). This is
-> > +	 * different from the time a bio takes from generic_make_request() to
-> > +	 * the end of its life.  So, this also serves as a marker for which bios
-> > +	 * should be processed by blk-iolatency.
-> > +	 */
-> > +	u64			bi_start;
-> > +#endif /* CONFIG_BLK_CGROUP_IOLATENCY */
-> 
-> So now we have bi_issue and bi_start, both count basically the same thing.  Does
-> using bi_issue actually matter?  I assume that it's going to be basically the
-> same as bi_start for the most part, you are just getting us to only care about
-> the bio's that we care about.
-> 
-> What if we just add a bio flag to indicate that we've gone through io-latency?
-> Once that's in place do these problems go away?  Or is the extra time counted
-> from make_request_time to rq_qos_throttle() actually matter?  I feel like it
-> shouldn't since it's mostly just checks, but I could be mistaken.  Thanks,
+Hi,
 
-Yeah after talking with Jens about this, it sounds like a good way
-forward would be to reuse BIO_QUEUE_ENTERED. My initial concern with
-the flag only approach was the time of stacked drivers. But as they
-should not be calling into blk_mq_make_request(), tagging in that
-function should allow us to properly ignore them.
+The issue can be reproduced reliably by passing '21' to the following
+script, and
+run it for a couple of times.
 
-It sounds like in the general case where a bio does make it to
-blk_mq_make_request(), the overhead of the checks prior should be
-minimal. I'll have a v2 out soon doing tagging with BIO_QUEUE_ENTERED.
+http://people.redhat.com/minlei/tests/tools/scsi-stress-remove
 
 Thanks,
-Dennis
+Ming Lei
