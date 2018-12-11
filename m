@@ -7,66 +7,65 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D767C67839
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 19:17:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E6AAC67839
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 19:17:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 693692087F
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 19:17:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E2840208E7
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 19:17:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="FGRziMQZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 693692087F
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="l8XbY/U9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2840208E7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lightnvm.io
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727139AbeLKTRS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Dec 2018 14:17:18 -0500
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:35492 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727105AbeLKTRS (ORCPT
+        id S1727119AbeLKTRW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Dec 2018 14:17:22 -0500
+Received: from mail-lj1-f182.google.com ([209.85.208.182]:42133 "EHLO
+        mail-lj1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727157AbeLKTRW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Dec 2018 14:17:18 -0500
-Received: by mail-lf1-f67.google.com with SMTP id e26so11632951lfc.2
-        for <linux-block@vger.kernel.org>; Tue, 11 Dec 2018 11:17:16 -0800 (PST)
+        Tue, 11 Dec 2018 14:17:22 -0500
+Received: by mail-lj1-f182.google.com with SMTP id l15-v6so14026320lja.9
+        for <linux-block@vger.kernel.org>; Tue, 11 Dec 2018 11:17:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=XIJBkKtDTdtODSkE6+A4O5w3fglTXZAwQfmBdOXd13U=;
-        b=FGRziMQZuMRiSDmvLY8uInW360xLgeVem6Fk+pLfCkeHx9nPJXL2rb4BKTCdFRq59w
-         nV3Gt65Szwc5ks8B955gSkoMRfhFXge1a768V9bGZWqvghzQyw7//oLkOEfBhfCpaZqT
-         +efUFCNo4XsftnHCFkQhu5y1XzWUt5QvCeuPBbDLnRXzbXw0ShH13CNmXElx57wTxFlL
-         0PIDSM1yiW0SR+0OnE9Vt41CGk9LnBsY2nOEV34GyPNxIudGr4i8hQ8FpO+RGGhk7fMY
-         d5P0c1jJ2GWjWlk2ffEZPLoyU/q7LW39JW78cRjyqZhgNN5HReYi9qjpvJ8FZL5yJlz1
-         TCDQ==
+        bh=wU5IGf/IyJdy8E6pFE20BoISwxjYZEejL799cEuLgMo=;
+        b=l8XbY/U90YceqUUbbdJ8jZ3AimHblgIxtbTOSxh71p+RjIKxtiWaEgLpyvQmL1j6B1
+         bxhkcbxGTHjWGGYkebIZfTZZakEqD4bCtHNm62qfsm/gjXjkb/dVouYYWv4ZXrN0AYUg
+         A8lKzr/Kpd50Q6fEa8U7UifuDmdZKKS1kyoSs/Bopz08pzB2hERpjLUZrHdjbqOg3b6Q
+         D0oHqk3Psc2KgfE8QLT2FCi7g0wIW8idFQbvima6gT9sLQ7Tum5K5L0ctezVTaGZk0Yn
+         SiZg8SCE4DQ1kPebeqpRrMxw9MKVGVpydxwSgPkVyGNxjBhVHRVZvezxEHOWYBYpRgAd
+         PgLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=XIJBkKtDTdtODSkE6+A4O5w3fglTXZAwQfmBdOXd13U=;
-        b=dgoPN0f6ohzFH+V+ZEWKmFsqmLbyLCogASJmfuRuOiIARaGpKY7nRnY2RoEnPUYLtX
-         u4GWOM7LXl36a3lu+r2i2gc2fru5jZHZGeHCKLm84k4Ser+5XnLerpEZ2lW5j3ZU44di
-         PJNkimCec6s+7VYIHwzoHnSZdfWb0isJljjjR+Nijl+GiDCxkic6qGS6/LuStBNqHiMw
-         wioGme5ypadAJ6gh9byNn+iqcGHOQdCK55A0rm/Hl1+7SxtN19UoB2Z9y9KgKErd7f/E
-         DQtOEQUoNc93bU2t2EbxFxUHWaZYDHoCaV2Rbr41Y9naD6jIO/4fIvLkw66xuLFWSdJa
-         0lww==
-X-Gm-Message-State: AA+aEWZsmGM/82SWo19SYkVo1MXIeAGdIrKurQg91PxR+1KUOz6ZKfUC
-        sZPZbqWAv8f1Ms34O0ZO9WMRfw==
-X-Google-Smtp-Source: AFSGD/VaQqEmcGg+pu7tqg2kky7TZuBvPyh4u6va9sPk3QJwWFEZQrAUY3PcglXieU+7X0LBjYSs4Q==
-X-Received: by 2002:a19:be16:: with SMTP id o22mr9713728lff.22.1544555836221;
-        Tue, 11 Dec 2018 11:17:16 -0800 (PST)
+        bh=wU5IGf/IyJdy8E6pFE20BoISwxjYZEejL799cEuLgMo=;
+        b=gwLV6VXek+WLn0HOuEk3tAcEanrxJh36Vay5lUFNCXC2fMQwmGEQ1W7WY+ODtYPNUe
+         Sd5YphUCKMbgeaf1XvKJR3ynTZDbyt3QSPkUfuzehu9OeCvqzWw/fQ8dq2cT4sCt00lt
+         x4IfxIUfvnx9aQb0MOzDUNXjLyU+4TxNldJgkgelk8VBfp8fJrr1IOVK2/G20EAi8ih2
+         n+1RjREMWcZzkmB8oPIjlpJpkxmaPORPSpx9NGBMHsNdcRXsYsFp8XjlpzS4TvqMUBbm
+         Z5/u7pweZrscV9e7aIbNwaLeujPmjMhVXpMXFvD8JtmAKtJ54EJfPMWTSosX0rP8uoan
+         +RrA==
+X-Gm-Message-State: AA+aEWYkPVBs59c/f0joRwBhexwSyM0GBHVxlkv1Mtp1Ogocv2tXr3PM
+        56xlFaBEb5WXvu/qPyKwX7eqEw==
+X-Google-Smtp-Source: AFSGD/XgcqFzcTWqOriOaX7BJKHTfC1QNrMBG4R3B2qaiu2/ykO1/UlrGbHKke70Yn9/BMZkzSqehg==
+X-Received: by 2002:a2e:86ca:: with SMTP id n10-v6mr10465788ljj.49.1544555839929;
+        Tue, 11 Dec 2018 11:17:19 -0800 (PST)
 Received: from skyninja.webspeed.dk (95-166-82-66-cable.dk.customer.tdc.net. [95.166.82.66])
-        by smtp.gmail.com with ESMTPSA id v64sm2764583lfa.48.2018.12.11.11.17.14
+        by smtp.gmail.com with ESMTPSA id v64sm2764583lfa.48.2018.12.11.11.17.18
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 11 Dec 2018 11:17:15 -0800 (PST)
+        Tue, 11 Dec 2018 11:17:19 -0800 (PST)
 From:   =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
 To:     axboe@fb.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@cnexlabs.com>,
+        Igor Konopko <igor.j.konopko@intel.com>,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 13/21] lightnvm: pblk: add comments wrt locking in recovery path
-Date:   Tue, 11 Dec 2018 20:16:19 +0100
-Message-Id: <20181211191627.15542-14-mb@lightnvm.io>
+Subject: [GIT PULL 16/21] lightnvm: pblk: move lba list to partial read context
+Date:   Tue, 11 Dec 2018 20:16:22 +0100
+Message-Id: <20181211191627.15542-17-mb@lightnvm.io>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181211191627.15542-1-mb@lightnvm.io>
 References: <20181211191627.15542-1-mb@lightnvm.io>
@@ -78,45 +77,108 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Javier González <javier@javigon.com>
+From: Igor Konopko <igor.j.konopko@intel.com>
 
-pblk's recovery path is single threaded and therefore a number of
-assumptions regarding concurrency can be made. To avoid confusion, make
-this explicit with a couple of comments in the code.
+Currently DMA allocated memory is reused on partial read
+for lba_list_mem and lba_list_media arrays. In preparation
+for dynamic DMA pool sizes we need to move this arrays
+into pblk_pr_ctx structures.
 
-Signed-off-by: Javier González <javier@cnexlabs.com>
+Reviewed-by: Javier González <javier@cnexlabs.com>
+Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
 Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/lightnvm/pblk-core.c     | 1 +
- drivers/lightnvm/pblk-recovery.c | 3 +++
- 2 files changed, 4 insertions(+)
+ drivers/lightnvm/pblk-read.c | 20 +++++---------------
+ drivers/lightnvm/pblk.h      |  2 ++
+ 2 files changed, 7 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 44c5dc046912..f1b411e7c7c9 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -1276,6 +1276,7 @@ static int pblk_line_prepare(struct pblk *pblk, struct pblk_line *line)
- 	return 0;
- }
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 9fba614adeeb..19917d3c19b3 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -224,7 +224,6 @@ static void pblk_end_partial_read(struct nvm_rq *rqd)
+ 	unsigned long *read_bitmap = pr_ctx->bitmap;
+ 	int nr_secs = pr_ctx->orig_nr_secs;
+ 	int nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
+-	__le64 *lba_list_mem, *lba_list_media;
+ 	void *src_p, *dst_p;
+ 	int hole, i;
  
-+/* Line allocations in the recovery path are always single threaded */
- int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line)
- {
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 416d9840544b..4c726506a831 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -13,6 +13,9 @@
-  * General Public License for more details.
-  *
-  * pblk-recovery.c - pblk's recovery path
-+ *
-+ * The L2P recovery path is single threaded as the L2P table is updated in order
-+ * following the line sequence ID.
-  */
+@@ -237,13 +236,9 @@ static void pblk_end_partial_read(struct nvm_rq *rqd)
+ 		rqd->ppa_list[0] = ppa;
+ 	}
  
- #include "pblk.h"
+-	/* Re-use allocated memory for intermediate lbas */
+-	lba_list_mem = (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
+-	lba_list_media = (((void *)rqd->ppa_list) + 2 * pblk_dma_ppa_size);
+-
+ 	for (i = 0; i < nr_secs; i++) {
+-		lba_list_media[i] = meta_list[i].lba;
+-		meta_list[i].lba = lba_list_mem[i];
++		pr_ctx->lba_list_media[i] = meta_list[i].lba;
++		meta_list[i].lba = pr_ctx->lba_list_mem[i];
+ 	}
+ 
+ 	/* Fill the holes in the original bio */
+@@ -255,7 +250,7 @@ static void pblk_end_partial_read(struct nvm_rq *rqd)
+ 		line = pblk_ppa_to_line(pblk, rqd->ppa_list[i]);
+ 		kref_put(&line->ref, pblk_line_put);
+ 
+-		meta_list[hole].lba = lba_list_media[i];
++		meta_list[hole].lba = pr_ctx->lba_list_media[i];
+ 
+ 		src_bv = new_bio->bi_io_vec[i++];
+ 		dst_bv = bio->bi_io_vec[bio_init_idx + hole];
+@@ -295,13 +290,9 @@ static int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
+ 	struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+ 	struct pblk_pr_ctx *pr_ctx;
+ 	struct bio *new_bio, *bio = r_ctx->private;
+-	__le64 *lba_list_mem;
+ 	int nr_secs = rqd->nr_ppas;
+ 	int i;
+ 
+-	/* Re-use allocated memory for intermediate lbas */
+-	lba_list_mem = (((void *)rqd->ppa_list) + pblk_dma_ppa_size);
+-
+ 	new_bio = bio_alloc(GFP_KERNEL, nr_holes);
+ 
+ 	if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
+@@ -312,12 +303,12 @@ static int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
+ 		goto fail_free_pages;
+ 	}
+ 
+-	pr_ctx = kmalloc(sizeof(struct pblk_pr_ctx), GFP_KERNEL);
++	pr_ctx = kzalloc(sizeof(struct pblk_pr_ctx), GFP_KERNEL);
+ 	if (!pr_ctx)
+ 		goto fail_free_pages;
+ 
+ 	for (i = 0; i < nr_secs; i++)
+-		lba_list_mem[i] = meta_list[i].lba;
++		pr_ctx->lba_list_mem[i] = meta_list[i].lba;
+ 
+ 	new_bio->bi_iter.bi_sector = 0; /* internal bio */
+ 	bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
+@@ -325,7 +316,6 @@ static int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
+ 	rqd->bio = new_bio;
+ 	rqd->nr_ppas = nr_holes;
+ 
+-	pr_ctx->ppa_ptr = NULL;
+ 	pr_ctx->orig_bio = bio;
+ 	bitmap_copy(pr_ctx->bitmap, read_bitmap, NVM_MAX_VLBA);
+ 	pr_ctx->bio_init_idx = bio_init_idx;
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index e5b88a25d4d6..0e9d3960ac4c 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -132,6 +132,8 @@ struct pblk_pr_ctx {
+ 	unsigned int bio_init_idx;
+ 	void *ppa_ptr;
+ 	dma_addr_t dma_ppa_list;
++	__le64 lba_list_mem[NVM_MAX_VLBA];
++	__le64 lba_list_media[NVM_MAX_VLBA];
+ };
+ 
+ /* Pad context */
 -- 
 2.17.1
 
