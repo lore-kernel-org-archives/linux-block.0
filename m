@@ -4,68 +4,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 820D6C67839
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 19:18:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22DEDC5CFFE
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 19:18:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4BF412087F
+	by mail.kernel.org (Postfix) with ESMTP id D829320880
 	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 19:18:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="FxvvClA9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BF412087F
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="2J1zH/EZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D829320880
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lightnvm.io
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726965AbeLKTRM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726987AbeLKTRM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 11 Dec 2018 14:17:12 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:42245 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726932AbeLKTRI (ORCPT
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:38873 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726965AbeLKTRK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Dec 2018 14:17:08 -0500
-Received: by mail-lf1-f68.google.com with SMTP id l10so11620184lfh.9
-        for <linux-block@vger.kernel.org>; Tue, 11 Dec 2018 11:17:06 -0800 (PST)
+        Tue, 11 Dec 2018 14:17:10 -0500
+Received: by mail-lj1-f196.google.com with SMTP id c19-v6so14050285lja.5
+        for <linux-block@vger.kernel.org>; Tue, 11 Dec 2018 11:17:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=TZQ05pd/DYjcwuL9XXbPWfkpS7Sp4JOpwfteFuJIygo=;
-        b=FxvvClA9cQfAubxbDAgtvRwIAmlxsmj1UmtpQFJtjzwQFaXN+XByf3lRndQBu3nT4S
-         tcb+YqigqYFQDKvaBGwE3cEYFTuWDhcjhQF13HioIE+bUHpbvJayyOhlqFY4l1MLqR3m
-         wZUrY0wAAMGvfdMKDCejzpLAWUKcvzBB3tBtKv4PluuKSxuPfiyxgpuVP3bCy7lVBR9B
-         kW8nXkW2FNV8xPUopBNRdD14+6mTSB3ad9kutWB7JEKfYQWb7mPzWCgw/2lL+omrs6e5
-         RZnNrjyyBv0gnnb7FvU9o2AxUN2SrTf2qONwLu8Cmpv/+rvLeKx/PG2QN0hM33wZQupy
-         Hz2g==
+        bh=2KZ49ckM214MQ/LPN+J2+wUW0e01VDa2eJXW8vGowJA=;
+        b=2J1zH/EZzg28A49kP+BGxufDnEB0w11BsChE6yG+xknpGQPAMg3LH3XK2WK9EXOhAl
+         zDBTHtRhpABoyY+7GkCu3DteXFk/Dy4XhO3Y7mugYavA8MGch1JKfvHRrHd5GCiTV3Qp
+         1k+JJTJGoO12Iuh0apRtu78iF4v4oHqSlPfSLUL18ckHhnbuHsBz8nnNoNRiNm5CroVr
+         go4qFSsn2lHRxZivjOHcsV2iQXs8kUJvmv8uoeqMmGqvKwpnusnr3Gnl7dAFygobrdKL
+         xSORoS4rkcXIzKsgB4dF8Uz/FvhYQnlOGSrMkF6sf0WkkbGjMzzL6sotfa5DCdSdKTOl
+         7taw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=TZQ05pd/DYjcwuL9XXbPWfkpS7Sp4JOpwfteFuJIygo=;
-        b=TAj8PsAjSB5ihQ2IXpKUFVVyPIliaibvxI+SyYR+WyWaP6U2Pzp3fVBABccvv5Fl5C
-         PrzKIwMql7mkzKWtJSfl9yiChjSZZZZ2OwINO96QVBN+BnXNoMX0tFxsZlclaVQxNFXo
-         1FBmJt9F38P4+X70FrMxdjJOg5cC4jlGjAT3OdxZOFL2hgVnR2AX9euohXCHN2W4wZ2P
-         fWtTotZrH7oGHvV9R7LJeuNCbiQITpVTJpjfN3hs5FSEBqFF9oapcd4wFsK0QBI9QZ4s
-         jPpPvPDsMZwF6VrwGlL7dBzQGUmFPrxqLBo4QWvDFHuy+BfSD0WqFPiGrYmuJj+bs1a6
-         f4fA==
-X-Gm-Message-State: AA+aEWZyawew9+guu2UMw3tedRdS+aBdxzUhuxvXw+mBeOZPHKGcfb1j
-        Lp6NAaTxGG7nWqR4BxKerI0wKg==
-X-Google-Smtp-Source: AFSGD/XoRz+ExZr+V1Ej1p2fCOyGx6jG0U8Z6KflkM+pER4l+MNtqZeCaQlt0DhDvtq8WUtc6q+spw==
-X-Received: by 2002:a19:e01e:: with SMTP id x30mr9657551lfg.89.1544555825446;
-        Tue, 11 Dec 2018 11:17:05 -0800 (PST)
+        bh=2KZ49ckM214MQ/LPN+J2+wUW0e01VDa2eJXW8vGowJA=;
+        b=fTYQ/sSerppmGXkJXgD9dkQ7wbpdeVa7UH3tU4ey0+NKcMS2hF+E9Qb6QZKq7UJ7r3
+         l+4scedU9NJStkGbFOGFjSps6KSFL0uoXS1uw8H0YiAOUgqUK2Gn7VW2k/yr4xK3TRV0
+         UvaCn70dOR42fA65xkFjVf887oN/chSONj0DTvBViwtlU7Vu7D1AVpfmjCuIBAI/R1U3
+         ahqsgKCWKGKwZWIh9k1n21MpAtfDJrHmGS7B6AFXc7IRymx7bdpmxeRSRKvSdNu+uSxs
+         zGBeHxyKx93VCtxrW2rCI6W6Q/9oj4OT4ULEQNAQmOSizqmAWdpVARNffbG+HSo5ybR7
+         5oWg==
+X-Gm-Message-State: AA+aEWa+A9JWo9xRkbmt0dN7/8ErYX5zfXpDwtRpT3VGwxShT/ObkC4a
+        Bi0attYJRfcCjoM2VQVeM+o+0A==
+X-Google-Smtp-Source: AFSGD/U5+0LKHhND1VEBeiFsfmql7wM0VxQCQ0S9sM+XaES/YVO+EcHNoOV1eS+74BWOZ7LrIFr2ig==
+X-Received: by 2002:a2e:8ec8:: with SMTP id e8-v6mr10664468ljl.162.1544555827855;
+        Tue, 11 Dec 2018 11:17:07 -0800 (PST)
 Received: from skyninja.webspeed.dk (95-166-82-66-cable.dk.customer.tdc.net. [95.166.82.66])
-        by smtp.gmail.com with ESMTPSA id v64sm2764583lfa.48.2018.12.11.11.17.04
+        by smtp.gmail.com with ESMTPSA id v64sm2764583lfa.48.2018.12.11.11.17.06
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 11 Dec 2018 11:17:04 -0800 (PST)
+        Tue, 11 Dec 2018 11:17:07 -0800 (PST)
 From:   =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
 To:     axboe@fb.com
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
         =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>
-Subject: [GIT PULL 05/21] lightnvm: pblk: account for write error sectors in emeta
-Date:   Tue, 11 Dec 2018 20:16:11 +0100
-Message-Id: <20181211191627.15542-6-mb@lightnvm.io>
+Subject: [GIT PULL 07/21] lightnvm: pblk: set conservative threshold for user writes
+Date:   Tue, 11 Dec 2018 20:16:13 +0100
+Message-Id: <20181211191627.15542-8-mb@lightnvm.io>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181211191627.15542-1-mb@lightnvm.io>
 References: <20181211191627.15542-1-mb@lightnvm.io>
@@ -79,72 +79,177 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-Lines inflicted with write errors lines might be recovered
-if they have not been recycled after write error garbage collection.
+In a worst-case scenario (random writes), OP% of sectors
+in each line will be invalid, and we will then need
+to move data out of 100/OP% lines to free a single line.
 
-Ensure that the emeta accounting of valid lbas is correct
-for such lines to avoid recovery inconsistencies.
+So, to prevent the possibility of running out of lines,
+temporarily block user writes when there is less than
+100/OP% free lines.
+
+Also ensure that pblk creation does not produce instances
+with insufficient over provisioning.
+
+Insufficient over-provising is not a problem on real hardware,
+but often an issue when running QEMU simulations (with few lines).
+100 lines is enough to create a sane instance with the standard
+(11%) over provisioning.
 
 Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 Reviewed-by: Javier González <javier@javigon.com>
 Signed-off-by: Matias Bjørling <mb@lightnvm.io>
 ---
- drivers/lightnvm/pblk-write.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ drivers/lightnvm/pblk-init.c | 40 ++++++++++++++++++++++++++++--------
+ drivers/lightnvm/pblk-rl.c   |  5 ++---
+ drivers/lightnvm/pblk.h      | 12 ++++++++++-
+ 3 files changed, 44 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
-index 3ddd16f47106..750f04b8a227 100644
---- a/drivers/lightnvm/pblk-write.c
-+++ b/drivers/lightnvm/pblk-write.c
-@@ -105,14 +105,20 @@ static void pblk_complete_write(struct pblk *pblk, struct nvm_rq *rqd,
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 13822594647c..f083130d9920 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -635,7 +635,7 @@ static unsigned int calc_emeta_len(struct pblk *pblk)
+ 	return (lm->emeta_len[1] + lm->emeta_len[2] + lm->emeta_len[3]);
  }
  
- /* Map remaining sectors in chunk, starting from ppa */
--static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
-+static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa,
-+		int rqd_ppas)
+-static void pblk_set_provision(struct pblk *pblk, long nr_free_blks)
++static int pblk_set_provision(struct pblk *pblk, int nr_free_chks)
  {
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+@@ -643,23 +643,41 @@ static void pblk_set_provision(struct pblk *pblk, long nr_free_blks)
+ 	struct nvm_geo *geo = &dev->geo;
+ 	sector_t provisioned;
+ 	int sec_meta, blk_meta;
++	int minimum;
+ 
+ 	if (geo->op == NVM_TARGET_DEFAULT_OP)
+ 		pblk->op = PBLK_DEFAULT_OP;
+ 	else
+ 		pblk->op = geo->op;
+ 
+-	provisioned = nr_free_blks;
++	minimum = pblk_get_min_chks(pblk);
++	provisioned = nr_free_chks;
+ 	provisioned *= (100 - pblk->op);
+ 	sector_div(provisioned, 100);
+ 
+-	pblk->op_blks = nr_free_blks - provisioned;
++	if ((nr_free_chks - provisioned) < minimum) {
++		if (geo->op != NVM_TARGET_DEFAULT_OP) {
++			pblk_err(pblk, "OP too small to create a sane instance\n");
++			return -EINTR;
++		}
++
++		/* If the user did not specify an OP value, and PBLK_DEFAULT_OP
++		 * is not enough, calculate and set sane value
++		 */
++
++		provisioned = nr_free_chks - minimum;
++		pblk->op =  (100 * minimum) / nr_free_chks;
++		pblk_info(pblk, "Default OP insufficient, adjusting OP to %d\n",
++				pblk->op);
++	}
++
++	pblk->op_blks = nr_free_chks - provisioned;
+ 
+ 	/* Internally pblk manages all free blocks, but all calculations based
+ 	 * on user capacity consider only provisioned blocks
+ 	 */
+-	pblk->rl.total_blocks = nr_free_blks;
+-	pblk->rl.nr_secs = nr_free_blks * geo->clba;
++	pblk->rl.total_blocks = nr_free_chks;
++	pblk->rl.nr_secs = nr_free_chks * geo->clba;
+ 
+ 	/* Consider sectors used for metadata */
+ 	sec_meta = (lm->smeta_sec + lm->emeta_sec[0]) * l_mg->nr_free_lines;
+@@ -667,8 +685,10 @@ static void pblk_set_provision(struct pblk *pblk, long nr_free_blks)
+ 
+ 	pblk->capacity = (provisioned - blk_meta) * geo->clba;
+ 
+-	atomic_set(&pblk->rl.free_blocks, nr_free_blks);
+-	atomic_set(&pblk->rl.free_user_blocks, nr_free_blks);
++	atomic_set(&pblk->rl.free_blocks, nr_free_chks);
++	atomic_set(&pblk->rl.free_user_blocks, nr_free_chks);
++
++	return 0;
+ }
+ 
+ static int pblk_setup_line_meta_chk(struct pblk *pblk, struct pblk_line *line,
+@@ -984,7 +1004,7 @@ static int pblk_lines_init(struct pblk *pblk)
+ 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
  	struct pblk_line *line;
- 	struct ppa_addr map_ppa = *ppa;
-+	__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
-+	__le64 *lba_list;
- 	u64 paddr;
- 	int done = 0;
-+	int n = 0;
+ 	void *chunk_meta;
+-	long nr_free_chks = 0;
++	int nr_free_chks = 0;
+ 	int i, ret;
  
- 	line = pblk_ppa_to_line(pblk, *ppa);
-+	lba_list = emeta_to_lbas(pblk, line->emeta->buf);
-+
- 	spin_lock(&line->lock);
- 
- 	while (!done)  {
-@@ -121,10 +127,17 @@ static void pblk_map_remaining(struct pblk *pblk, struct ppa_addr *ppa)
- 		if (!test_and_set_bit(paddr, line->map_bitmap))
- 			line->left_msecs--;
- 
-+		if (n < rqd_ppas && lba_list[paddr] != addr_empty)
-+			line->nr_valid_lbas--;
-+
-+		lba_list[paddr] = addr_empty;
-+
- 		if (!test_and_set_bit(paddr, line->invalid_bitmap))
- 			le32_add_cpu(line->vsc, -1);
- 
- 		done = nvm_next_ppa_in_chk(pblk->dev, &map_ppa);
-+
-+		n++;
+ 	ret = pblk_line_meta_init(pblk);
+@@ -1031,7 +1051,9 @@ static int pblk_lines_init(struct pblk *pblk)
+ 		goto fail_free_lines;
  	}
  
- 	line->w_err_gc->has_write_err = 1;
-@@ -202,7 +215,7 @@ static void pblk_submit_rec(struct work_struct *work)
+-	pblk_set_provision(pblk, nr_free_chks);
++	ret = pblk_set_provision(pblk, nr_free_chks);
++	if (ret)
++		goto fail_free_lines;
  
- 	pblk_log_write_err(pblk, rqd);
+ 	vfree(chunk_meta);
+ 	return 0;
+diff --git a/drivers/lightnvm/pblk-rl.c b/drivers/lightnvm/pblk-rl.c
+index db55a1c89997..76116d5f78e4 100644
+--- a/drivers/lightnvm/pblk-rl.c
++++ b/drivers/lightnvm/pblk-rl.c
+@@ -214,11 +214,10 @@ void pblk_rl_init(struct pblk_rl *rl, int budget)
+ 	struct nvm_geo *geo = &dev->geo;
+ 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+ 	struct pblk_line_meta *lm = &pblk->lm;
+-	int min_blocks = lm->blk_per_line * PBLK_GC_RSV_LINE;
+ 	int sec_meta, blk_meta;
+-
+ 	unsigned int rb_windows;
  
--	pblk_map_remaining(pblk, ppa_list);
-+	pblk_map_remaining(pblk, ppa_list, rqd->nr_ppas);
- 	pblk_queue_resubmit(pblk, c_ctx);
++
+ 	/* Consider sectors used for metadata */
+ 	sec_meta = (lm->smeta_sec + lm->emeta_sec[0]) * l_mg->nr_free_lines;
+ 	blk_meta = DIV_ROUND_UP(sec_meta, geo->clba);
+@@ -226,7 +225,7 @@ void pblk_rl_init(struct pblk_rl *rl, int budget)
+ 	rl->high = pblk->op_blks - blk_meta - lm->blk_per_line;
+ 	rl->high_pw = get_count_order(rl->high);
  
- 	pblk_up_rq(pblk, c_ctx->lun_bitmap);
+-	rl->rsv_blocks = min_blocks;
++	rl->rsv_blocks = pblk_get_min_chks(pblk);
+ 
+ 	/* This will always be a power-of-2 */
+ 	rb_windows = budget / NVM_MAX_VLBA;
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index f415aae600c8..e5b88a25d4d6 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -905,7 +905,6 @@ int pblk_recov_check_emeta(struct pblk *pblk, struct line_emeta *emeta);
+ #define PBLK_GC_MAX_READERS 8	/* Max number of outstanding GC reader jobs */
+ #define PBLK_GC_RQ_QD 128	/* Queue depth for inflight GC requests */
+ #define PBLK_GC_L_QD 4		/* Queue depth for inflight GC lines */
+-#define PBLK_GC_RSV_LINE 1	/* Reserved lines for GC */
+ 
+ int pblk_gc_init(struct pblk *pblk);
+ void pblk_gc_exit(struct pblk *pblk, bool graceful);
+@@ -1370,4 +1369,15 @@ static inline char *pblk_disk_name(struct pblk *pblk)
+ 
+ 	return disk->disk_name;
+ }
++
++static inline unsigned int pblk_get_min_chks(struct pblk *pblk)
++{
++	struct pblk_line_meta *lm = &pblk->lm;
++	/* In a worst-case scenario every line will have OP invalid sectors.
++	 * We will then need a minimum of 1/OP lines to free up a single line
++	 */
++
++	return DIV_ROUND_UP(100, pblk->op) * lm->blk_per_line;
++
++}
+ #endif /* PBLK_H_ */
 -- 
 2.17.1
 
