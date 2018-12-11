@@ -2,180 +2,191 @@ Return-Path: <SRS0=ptgV=OU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BA31C04EB8
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 01:41:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DC95C04EB8
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 02:02:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 567F920672
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 01:41:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="03E470CH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 567F920672
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTP id EF3EC20645
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 02:02:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF3EC20645
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729109AbeLKBld (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Dec 2018 20:41:33 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:54348 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728586AbeLKBld (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Dec 2018 20:41:33 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wBB1YPt2010319;
-        Tue, 11 Dec 2018 01:41:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=+BqcrYpxy5FhbcXFuoeBDdEk/8cWqUDOO4+BAyActtY=;
- b=03E470CHJ6TnfEhVEOx9se16Vc3fTDz9HchegaM/Vx3xAirRQ1qLybBY9UGetW5/Or10
- wOC5SXc2Z2SjT48qKlHt9pv9eUaRUbY5usSKyLj7jC6plBb0de7rvJDuqwB1+GqVI1vQ
- ZmvEwV4PLnOcHf6cz7Ao3R2lCae7zS9VhimErgnhUkcP0hktRjBVPyH8/sxaxFqqCT/X
- vTYWJjqmEwo9kqnFv/C1MGAOecU5VOEhNMc6GsAsvf3UxW6PKFjqexvJcMOVQY2TqatK
- nkEqmOTY1Z2YF1vJlBOfny793OYEA9q4Oi8yjYth7ClLKQ6InblxS5NE5sJW/EHK/qNx Nw== 
-Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
-        by aserp2130.oracle.com with ESMTP id 2p83fe1d56-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Dec 2018 01:41:28 +0000
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id wBB1fQC1026840
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Dec 2018 01:41:27 GMT
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id wBB1fQQX000878;
-        Tue, 11 Dec 2018 01:41:26 GMT
-Received: from [10.182.69.118] (/10.182.69.118)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 10 Dec 2018 17:41:26 -0800
-Subject: Re: [PATCH V13 0/3] blk-mq: refactor code of issue directly
-To:     axboe@kernel.dk
-Cc:     ming.lei@redhat.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <1544410892-2905-1-git-send-email-jianchao.w.wang@oracle.com>
-From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <e0048af3-6ba5-f397-9837-41fede63ce07@oracle.com>
-Date:   Tue, 11 Dec 2018 09:42:17 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1727790AbeLKCCw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 10 Dec 2018 21:02:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45280 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727485AbeLKCCw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 10 Dec 2018 21:02:52 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id B33CD5AFE9;
+        Tue, 11 Dec 2018 02:02:51 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 78FC55D73F;
+        Tue, 11 Dec 2018 02:02:44 +0000 (UTC)
+Date:   Tue, 11 Dec 2018 10:02:38 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, Hannes Reinecke <hare@suse.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Juergen Gross <jgross@suse.com>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 2/9] scsi: introduce a max_segment_size host_template
+ parameters
+Message-ID: <20181211020237.GB27651@ming.t460p>
+References: <20181206155258.11465-1-hch@lst.de>
+ <20181206155258.11465-3-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <1544410892-2905-1-git-send-email-jianchao.w.wang@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9103 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1812110014
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181206155258.11465-3-hch@lst.de>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Tue, 11 Dec 2018 02:02:51 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ping ?
+On Thu, Dec 06, 2018 at 07:52:51AM -0800, Christoph Hellwig wrote:
+> This allows the host driver to indicate the maximum supported
+> segment size in a nice an easy way, so that the driver doesn't
+> have to worry about DMA-layer imposed limitations.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/scsi/be2iscsi/be_main.c | 8 +-------
+>  drivers/scsi/hosts.c            | 5 +++++
+>  drivers/scsi/scsi_debug.c       | 2 +-
+>  drivers/scsi/scsi_lib.c         | 3 ++-
+>  include/scsi/scsi_host.h        | 6 ++++++
+>  5 files changed, 15 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/scsi/be2iscsi/be_main.c b/drivers/scsi/be2iscsi/be_main.c
+> index c4108b17d5ab..39f3820572b4 100644
+> --- a/drivers/scsi/be2iscsi/be_main.c
+> +++ b/drivers/scsi/be2iscsi/be_main.c
+> @@ -214,12 +214,6 @@ static char const *cqe_desc[] = {
+>  	"CXN_KILLED_IMM_DATA_RCVD"
+>  };
+>  
+> -static int beiscsi_slave_configure(struct scsi_device *sdev)
+> -{
+> -	blk_queue_max_segment_size(sdev->request_queue, 65536);
+> -	return 0;
+> -}
+> -
+>  static int beiscsi_eh_abort(struct scsi_cmnd *sc)
+>  {
+>  	struct iscsi_task *abrt_task = (struct iscsi_task *)sc->SCp.ptr;
+> @@ -393,7 +387,6 @@ static struct scsi_host_template beiscsi_sht = {
+>  	.proc_name = DRV_NAME,
+>  	.queuecommand = iscsi_queuecommand,
+>  	.change_queue_depth = scsi_change_queue_depth,
+> -	.slave_configure = beiscsi_slave_configure,
+>  	.target_alloc = iscsi_target_alloc,
+>  	.eh_timed_out = iscsi_eh_cmd_timed_out,
+>  	.eh_abort_handler = beiscsi_eh_abort,
+> @@ -404,6 +397,7 @@ static struct scsi_host_template beiscsi_sht = {
+>  	.can_queue = BE2_IO_DEPTH,
+>  	.this_id = -1,
+>  	.max_sectors = BEISCSI_MAX_SECTORS,
+> +	.max_segment_size = 65536,
+>  	.cmd_per_lun = BEISCSI_CMD_PER_LUN,
+>  	.vendor_id = SCSI_NL_VID_TYPE_PCI | BE_VENDOR_ID,
+>  	.track_queue_depth = 1,
+> diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
+> index ea4b0bb0c1cd..e8148ba414a3 100644
+> --- a/drivers/scsi/hosts.c
+> +++ b/drivers/scsi/hosts.c
+> @@ -464,6 +464,11 @@ struct Scsi_Host *scsi_host_alloc(struct scsi_host_template *sht, int privsize)
+>  	else
+>  		shost->max_sectors = SCSI_DEFAULT_MAX_SECTORS;
+>  
+> +	if (sht->max_segment_size)
+> +		shost->max_segment_size = sht->max_segment_size;
+> +	else
+> +		shost->max_segment_size = BLK_MAX_SEGMENT_SIZE;
+> +
+>  	/*
+>  	 * assume a 4GB boundary, if not set
+>  	 */
+> diff --git a/drivers/scsi/scsi_debug.c b/drivers/scsi/scsi_debug.c
+> index 53ba417bef8a..57d418d7d74e 100644
+> --- a/drivers/scsi/scsi_debug.c
+> +++ b/drivers/scsi/scsi_debug.c
+> @@ -3973,7 +3973,6 @@ static int scsi_debug_slave_configure(struct scsi_device *sdp)
+>  			return 1;  /* no resources, will be marked offline */
+>  	}
+>  	sdp->hostdata = devip;
+> -	blk_queue_max_segment_size(sdp->request_queue, -1U);
+>  	if (sdebug_no_uld)
+>  		sdp->no_uld_attach = 1;
+>  	config_cdb_len(sdp);
+> @@ -5851,6 +5850,7 @@ static struct scsi_host_template sdebug_driver_template = {
+>  	.sg_tablesize =		SG_MAX_SEGMENTS,
+>  	.cmd_per_lun =		DEF_CMD_PER_LUN,
+>  	.max_sectors =		-1U,
+> +	.max_segment_size =	-1U,
+>  	.module =		THIS_MODULE,
+>  	.track_queue_depth =	1,
+>  };
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index f6900e0b3024..2d4fd6b4bd92 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -2227,7 +2227,8 @@ void __scsi_init_queue(struct Scsi_Host *shost, struct request_queue *q)
+>  	blk_queue_segment_boundary(q, shost->dma_boundary);
+>  	dma_set_seg_boundary(dev, shost->dma_boundary);
+>  
+> -	blk_queue_max_segment_size(q, dma_get_max_seg_size(dev));
+> +	blk_queue_max_segment_size(q,
+> +		min(shost->max_segment_size, dma_get_max_seg_size(dev)));
+>  
+>  	if (shost->use_clustering == DISABLE_CLUSTERING)
+>  		q->limits.cluster = 0;
+> diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+> index 7dc534c794dc..834204681ca3 100644
+> --- a/include/scsi/scsi_host.h
+> +++ b/include/scsi/scsi_host.h
+> @@ -364,6 +364,11 @@ struct scsi_host_template {
+>  	 */
+>  	unsigned int max_sectors;
+>  
+> +	/*
+> +	 * Maximum size in bytes of a single segment.
+> +	 */
+> +	unsigned int max_segment_size;
+> +
+>  	/*
+>  	 * DMA scatter gather segment boundary limit. A segment crossing this
+>  	 * boundary will be split in two.
+> @@ -603,6 +608,7 @@ struct Scsi_Host {
+>  	short unsigned int sg_tablesize;
+>  	short unsigned int sg_prot_tablesize;
+>  	unsigned int max_sectors;
+> +	unsigned int max_segment_size;
+>  	unsigned long dma_boundary;
+>  	/*
+>  	 * In scsi-mq mode, the number of hardware queues supported by the LLD.
+> -- 
+> 2.19.1
+> 
 
-Thanks
-Jianchao
+Just one concern, max segment size is often related with one specific
+controller's DMA capability.
 
-On 12/10/18 11:01 AM, Jianchao Wang wrote:
-> Hi Jens
-> 
-> Please consider this patchset for 4.21.
-> 
-> It refactors the code of issue request directly to unify the interface
-> and make the code clearer and more readable.
-> 
-> The 1st patch refactors the code of issue request directly to unify the
-> helper interface which could handle all the cases.
-> 
-> The 2nd patch make blk_mq_sched_insert_requests issue requests directly
-> with 'bypass' false, then it needn't to handle the non-issued requests
-> any more.
-> 
-> The 3rd patch replace and kill the blk_mq_request_issue_directly.
-> 
-> V13:
->  - remove the unused tag 'out' (1/3)
-> 
-> V12:
->  - remove the original 1st patch/
->  - rebase other 3 patches on newest for-4.21/block
->  - add some comment
-> 
-> V11:
->  - insert request to dispatch list when .queue_rq return
->    BLK_STS_RESOURCE/BLK_STS_DEV_RESOURCE. (2/4)
->  - stop to attempt direct-issue and insert the reset when meet
->    non-ok case (3/4).
-> 
-> V10:
->  - address Jen's comment.
->  - let blk_mq_try_issue_directly return actual result for case
->    'bypass == false'. (2/4)
->  - use return value of blk_mq_try_issue_directly to identify
->    whether the request is direct-issued successfully. (3/4)
-> 
-> V9:
->  - rebase on recent for-4.21/block
->  - add 1st patch
-> 
-> V8:
->  - drop the original 2nd patch which try to insert requests into hctx->dispatch
->    if quiesced or stopped.
->  - remove two wrong 'unlikely'
-> 
-> V7:
->  - drop the original 3rd patch which try to ensure hctx to be ran on
->    its mapped cpu in issueing directly path.
-> 
-> V6:
->  - drop original 1st patch to address Jen's comment
->  - discard the enum mq_issue_decision and blk_mq_make_decision and use
->    BLK_STS_* return values directly to address Jen's comment. (1/5)
->  - add 'unlikely' in blk_mq_try_issue_directly (1/5)
->  - refactor the 2nd and 3rd patch based on the new 1st patch.
->  - reserve the unused_cookie in 4th and 5th patch
-> 
-> V5:
->  - rebase against Jens' for-4.21/block branch
->  - adjust the order of patch04 and patch05
->  - add patch06 to replace and kill the one line blk_mq_request_bypass_insert
->  - comment changes
-> 
-> V4:
->  - split the original patch 1 into two patches, 1st and 2nd patch currently
->  - rename the mq_decision to mq_issue_decision
->  - comment changes
-> 
-> V3:
->  - Correct the code about the case bypass_insert is true and io scheduler
->    attached. The request still need to be issued in case above. (1/4)
->  - Refactor the code to make code clearer. blk_mq_make_request is introduced
->    to decide insert, end or just return based on the return value of .queue_rq
->    and bypass_insert (1/4) 
->  - Add the 2nd patch. It introduce a new decision result which indicates to
->    insert request with blk_mq_request_bypass_insert.
->  - Modify the code to adapt the new patch 1.
-> 
-> V2:
->  - Add 1st and 2nd patch to refactor the code.
-> 
-> 
-> Jianchao Wang (3)
-> blk-mq: refactor the code of issue request directly
-> blk-mq: issue directly with bypass 'false' in
-> blk-mq: replace and kill blk_mq_request_issue_directly
-> 
-> block/blk-core.c     |   4 +-
-> block/blk-mq-sched.c |   8 ++--
-> block/blk-mq.c       | 123 +++++++++++++++++++++++++--------------------------
-> block/blk-mq.h       |   6 ++-
-> 4 files changed, 70 insertions(+), 71 deletions(-)
-> 
-> Thanks
-> Jianchao
-> 
-> 
+Is it possible that HBAs have different segment size, but all are driven
+by same driver(shared scsi_host_template)?
+
+If yes, this way may not be a correct abstract, at least defining 
+'max_segment_size' from 'scsi_host_template'.
+
+Thanks,
+Ming
