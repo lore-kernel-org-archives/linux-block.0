@@ -2,180 +2,122 @@ Return-Path: <SRS0=ptgV=OU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,T_MIXED_ES
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EBDAC04EB8
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 03:22:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F70C07E85
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 06:17:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 49CF020849
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 03:22:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C15472082F
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 06:17:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U5+wRAgi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49CF020849
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u55Is/qA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C15472082F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729868AbeLKDWd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 10 Dec 2018 22:22:33 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:39881 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728584AbeLKDWd (ORCPT
+        id S1727494AbeLKGRK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Dec 2018 01:17:10 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:46884 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727352AbeLKGRJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 10 Dec 2018 22:22:33 -0500
-Received: by mail-wr1-f68.google.com with SMTP id t27so12537813wra.6
-        for <linux-block@vger.kernel.org>; Mon, 10 Dec 2018 19:22:31 -0800 (PST)
+        Tue, 11 Dec 2018 01:17:09 -0500
+Received: by mail-pl1-f194.google.com with SMTP id t13so6423609ply.13;
+        Mon, 10 Dec 2018 22:17:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7fG6caQSczk9x+OEMiw/JcpxXj1GxSBGVAA/3QV7Kkc=;
-        b=U5+wRAgiMpGw6w2BbgZfFlkmSUYavIBamqCAVzuZtfidjKILxRbHJ/CpL3ihlSGpug
-         +FrXzw1k2s3vNngOlKXJ6AHXoLF2iu85F45rpXM6I7J6s3+X1ZjlW/7srUkWk3X2LQG9
-         FKKAORdaEOUM7+f07DH3ogFAmVK/PhA+mZAsOkM3q1fbHeXQyrnlYyPN6c3FfR59nbKn
-         PCh8y2papuVX4AxNDfOCRkK5x7OGUR3Io9ihZoBQK1WhbmZMJ8WbItoc0ZF2DacP5GQW
-         qyVvzDWK4BjaEgyUcmaLhrZp384NJyi8MNu+13JB8vzj7+Ga3dZ51lJ8a6sAd+P1ptM4
-         ptZQ==
+        h=from:to:cc:subject:date:message-id;
+        bh=TlYVShGWQfqCikX7zIfo6dSj8lcXrBBDWQwIm/PzWAQ=;
+        b=u55Is/qA0pSseLvGvzYgxvg44ykhaYLA1P4+SfTntUm/1jRq5p7qJiQ82p0EdWsWni
+         cdvBxrnGCavkp5pqneI/M2ZusPoIRlDM5rLfqYNyRTCAXLOadKxh/huIBzcXV+RJRkqu
+         WaRrwWxdL53tDisAlhgvyZC3eJvj4tR1M0xxQaJAlJ8N0mxjKisR6jiVAkywiRAAAXyh
+         x63D8vDM1Ydvsgb86/tzzVtyLBnFYitf18eB7h2HHynwSTbA/65xpbvo0IyF1fQ63nv8
+         dpMDV3QxZTn0idAZcy07VA0/DG2cTvC3ZrQpNIGSavewgqms8TirjIKom8g+K/0xwIZs
+         p/rA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7fG6caQSczk9x+OEMiw/JcpxXj1GxSBGVAA/3QV7Kkc=;
-        b=GHZrHtPHH7u3fWjNNTEYdp/3m5bU8CdO+ZJ4nqzLcsoW4yokWBjsALDqLHY//LkP4c
-         EBdq75YDE6McQ3leeuz644IEU06qGOnPvh3zIzvnWW5x8axorRJbJ2ql6sjKpKePQfPn
-         JIPhCQc2pKOpAq/o9ErxkHZgTRc4I7v/QMSpbdPofMKXwewKKrbPxJBgwoPGsSn1e6qn
-         NzCsacTyV1xkMb6WcSOcjyEZUs2IfMfEHtt0eS+seXLd+D1g4sE4Sr8wLnwbCxuGbYhW
-         y9RYJDPg0lMMfzjRVRv4JxYVd8tumHaXQ14FChLaK5sN/gF/5h56Qf7sxS5l28PZsynW
-         7mFw==
-X-Gm-Message-State: AA+aEWY2lDIsj2DRds9TfgMTzWK86yBwZxk0ddsIbAD2nKH0DJjz8mDX
-        PrRGVT46eC+3kqGlbPgD8pKFTRocFTOTX8FE4EM=
-X-Google-Smtp-Source: AFSGD/WaKAe5y+yqxW3rrYxP49er3a5EYNIlFqcOmMXv8oW6PMQI/+26o/nEV/RTQYEvBjLsi7IZqDQU66bAeYyczCY=
-X-Received: by 2002:adf:ce02:: with SMTP id p2mr13017997wrn.185.1544498550684;
- Mon, 10 Dec 2018 19:22:30 -0800 (PST)
-MIME-Version: 1.0
-References: <CACVXFVO_QXipD3cmPvpLyBYSiEcWPN_ThQ=0pO9AwLqN-Lv93w@mail.gmail.com>
- <20181211030929.GA40583@dennisz-mbp.dhcp.thefacebook.com>
-In-Reply-To: <20181211030929.GA40583@dennisz-mbp.dhcp.thefacebook.com>
-From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Tue, 11 Dec 2018 11:22:18 +0800
-Message-ID: <CACVXFVNnmR1+KDLXjJK_qCkAQB3hJBS3GqPAXCnbd8cG7jaK8A@mail.gmail.com>
-Subject: Re: block: kernel panic in __bio_associate_blkg+0x1e
-To:     Dennis Zhou <dennis@kernel.org>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=TlYVShGWQfqCikX7zIfo6dSj8lcXrBBDWQwIm/PzWAQ=;
+        b=m/f2KiVNnDXd3jv0IZRlpdIuWYqChCpuImIXmRHyqmt3+yru9W4IJOzncGVFTlTYI8
+         xC9hi5x5R6T4eNSlJyCF9Wh9TQ48Fi3J1VS7MfnpQEU586kicsPjFFcwbdqF8RA4W9Q1
+         os6cJtcoPWX4MNVOPPcXBkn2XfmFBklBmkN55s7NOSGel8IjzDvBoROxuJHX4JPnHERt
+         GW4v0JnMC6i9dYxtMvLUX3uqDFgfp+LLDezjXuNYE4IDoxtX6iOhKBSiBVWMnxI+yY3L
+         8yDlVLi6pCHw1XFs2Vxvq/5Oe3tywst+0bKoVCmob/yHKwz89xTh+W6g0UFqAkq+rtbZ
+         xtwQ==
+X-Gm-Message-State: AA+aEWYLuLVIzzBwKxQ9UsZJxKMmlA3heL0bq5nnU6XcpShk11zChhEm
+        ZCdjZxp2V2DkjvkDxdiTfMI=
+X-Google-Smtp-Source: AFSGD/WtGwEGzXbzvfgEkVr2zxQ5RWgAx4+tVSYC1KALczRjt5jgzWAy5EcN525T7eCRDfgAiwvC+w==
+X-Received: by 2002:a17:902:722:: with SMTP id 31mr14992831pli.271.1544509029167;
+        Mon, 10 Dec 2018 22:17:09 -0800 (PST)
+Received: from localhost.localdomain (27-52-137-213.adsl.fetnet.net. [27.52.137.213])
+        by smtp.gmail.com with ESMTPSA id e16sm16246045pfn.46.2018.12.10.22.17.07
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Mon, 10 Dec 2018 22:17:08 -0800 (PST)
+From:   medadyoung@gmail.com
+To:     jbacik@fb.com, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, openbmc@lists.ozlabs.org,
+        Medad <medadyoung@gmail.com>
+Subject: [PATCH] nbd:clear NBD_BOUND flag when NBD connection is closed
+Date:   Tue, 11 Dec 2018 14:17:03 +0800
+Message-Id: <1544509023-18923-1-git-send-email-medadyoung@gmail.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 11, 2018 at 11:09 AM Dennis Zhou <dennis@kernel.org> wrote:
->
-> Hi Ming,
->
-> On Tue, Dec 11, 2018 at 10:36:07AM +0800, Ming Lei wrote:
-> > Hi Jens and Dennis,
-> >
-> > Just found the following issue when testing for-4.21/block when
-> > running stress io & device
-> > remove on scsi_debug, and it should be caused by recent blkcg changes.
-> >
-> > [   37.144330] sd 8:0:0:15: [sds] Synchronizing SCSI cache
-> > [   37.665644] BUG: unable to handle kernel NULL pointer dereference
-> > at 0000000000000048
-> > [   37.674748] PGD 8000000269c3b067 P4D 8000000269c3b067 PUD 269c3c067 PMD 0
-> > [   37.675703] Oops: 0000 [#1] PREEMPT SMP PTI
-> > [   37.676294] CPU: 2 PID: 1270 Comm: fio Not tainted
-> > 4.20.0-rc6_f0ea84586b7c_for-next+ #1
-> > [   37.677392] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009),
-> > BIOS 1.10.2-2.fc27 04/01/2014
-> > [   37.678563] RIP: 0010:__bio_associate_blkg+0x1e/0x81
-> > [   37.679255] Code: 00 00 5b 5d c3 0f 1f 44 00 00 eb 94 0f 1f 44 00
-> > 00 41 54 55 48 89 fd 53 48 89 f3 e8 80 ff ff ff bf 01 00 00 00 e8 94
-> > 37 d7 ff <48> 8b 43 48 a8 03 74 06 48 8b 53 40 eb 1b 65 48 ff 00 41 b4
-> > 01 eb
-> > [   37.681801] RSP: 0018:ffffc9000169bb80 EFLAGS: 00010246
-> > [   37.682525] RAX: ffff888269c40000 RBX: 0000000000000000 RCX: 0000000000000000
-> > [   37.683506] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff8132c44f
-> > [   37.684486] RBP: ffff888270fecb18 R08: 000000000000001e R09: ffffffffffffffff
-> > [   37.685473] R10: 00000000ffffffca R11: 0000000000000000 R12: ffff88826630b758
-> > [   37.686450] R13: ffff888270fecb18 R14: ffff888107811118 R15: ffff888270fecb18
-> > [   37.687435] FS:  00007f7d486c6ec0(0000) GS:ffff888277b00000(0000)
-> > knlGS:0000000000000000
-> > [   37.688548] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [   37.689345] CR2: 0000000000000048 CR3: 0000000269c4a001 CR4: 0000000000760ee0
-> > [   37.690333] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > [   37.691330] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > [   37.692320] PKRU: 55555554
-> > [   37.692704] Call Trace:
-> > [   37.693070]  bio_associate_blkg_from_css+0x4e/0x57
-> > [   37.693734]  bio_associate_blkg+0x4d/0x53
-> > [   37.694300]  blkdev_direct_IO+0x1d4/0x3c9
-> > [   37.694861]  ? __switch_to_asm+0x34/0x70
-> > [   37.695417]  ? aio_complete+0x2cc/0x2cc
-> > [   37.695962]  ? __switch_to_asm+0x34/0x70
-> > [   37.696511]  ? __switch_to_asm+0x40/0x70
-> > [   37.697066]  ? __switch_to_asm+0x34/0x70
-> > [   37.697614]  ? __switch_to_asm+0x40/0x70
-> > [   37.698166]  ? __switch_to_asm+0x34/0x70
-> > [   37.698717]  ? generic_file_read_iter+0x96/0x110
-> > [   37.699366]  generic_file_read_iter+0x96/0x110
-> > [   37.699991]  aio_read+0xe9/0x178
-> > [   37.700448]  ? __switch_to_asm+0x34/0x70
-> > [   37.701004]  ? __switch_to_asm+0x34/0x70
-> > [   37.701552]  ? __switch_to_asm+0x40/0x70
-> > [   37.702109]  ? __switch_to_asm+0x34/0x70
-> > [   37.702659]  ? __switch_to_asm+0x40/0x70
-> > [   37.703214]  ? __switch_to_asm+0x34/0x70
-> > [   37.703762]  ? __switch_to_asm+0x40/0x70
-> > [   37.704317]  ? __switch_to_asm+0x34/0x70
-> > [   37.704867]  ? __switch_to_asm+0x40/0x70
-> > [   37.705423]  ? __switch_to_asm+0x34/0x70
-> > [   37.705973]  ? __switch_to_asm+0x40/0x70
-> > [   37.706523]  ? __switch_to_asm+0x34/0x70
-> > [   37.707088]  ? io_submit_one+0x2e1/0x67b
-> > [   37.707638]  io_submit_one+0x2e1/0x67b
-> > [   37.708171]  ? __se_sys_io_submit+0xc5/0x15e
-> > [   37.708770]  __se_sys_io_submit+0xc5/0x15e
-> > [   37.709348]  ? 0xffffffff81000000
-> > [   37.709819]  ? do_syscall_64+0x84/0x13f
-> > [   37.710362]  ? __se_sys_io_submit+0x15e/0x15e
-> > [   37.710987]  do_syscall_64+0x84/0x13f
-> > [   37.711505]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > [   37.712216] RIP: 0033:0x7f7d471c6687
-> > [   37.712720] Code: 00 00 00 49 83 38 00 75 ed 49 83 78 08 00 75 e6
-> > 8b 47 0c 39 47 08 75 de 31 c0 c3 0f 1f 84 00 00 00 00 00 b8 d1 00 00
-> > 00 0f 05 <c3> 0f 1f 84 00 00 00 00 00 b8 d2 00 00 00 0f 05 c3 0f 1f 84
-> > 00 00
-> > [   37.715280] RSP: 002b:00007ffcb7d448c8 EFLAGS: 00000202 ORIG_RAX:
-> > 00000000000000d1
-> > [   37.716314] RAX: ffffffffffffffda RBX: 00007f7d22e90298 RCX: 00007f7d471c6687
-> > [   37.717297] RDX: 00000000009f4b20 RSI: 0000000000000001 RDI: 00007f7d484ea000
-> > [   37.718280] RBP: 0000000000003e70 R08: 0000000000000001 R09: 00000000008799e0
-> > [   37.719264] R10: 0000000000000000 R11: 0000000000000202 R12: 00007f7d22e90298
-> > [   37.720249] R13: 0000000000000000 R14: 00000000009f4cc0 R15: 00000000009e0c60
-> > [   37.721232] Modules linked in: scsi_debug isofs iTCO_wdt i2c_i801
-> > i2c_core iTCO_vendor_support lpc_ich mfd_core ip_tables sr_mod cdrom
-> > usb_storage sd_mod ahci libahci libata crc32c_intel qemu_fw_cfg
-> > virtio_scsi dm_mirror dm_region_hash dm_log dm_mod
-> > [   37.724240] Dumping ftrace buffer:
-> > [   37.724717]    (ftrace buffer empty)
-> > [   37.725223] CR2: 0000000000000048
-> > [   37.725692] ---[ end trace 4758725073447b42 ]---
-> >
->
-> Thanks for reporting this to me. I'm not familiar with scsi_debug would
-> you please explain to me how to reproduce this?
+From: Medad <medadyoung@gmail.com>
 
-Hi,
+    If we do NOT clear NBD_BOUND flag when NBD connection is closed,
+    then the original NBD device could not be used again.
 
-The issue can be reproduced reliably by passing '21' to the following
-script, and
-run it for a couple of times.
+Signed-off-by: Medad <medadyoung@gmail.com>
+---
+ drivers/block/nbd.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-http://people.redhat.com/minlei/tests/tools/scsi-stress-remove
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 64278f4..5c88490 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -277,10 +277,14 @@ static void sock_shutdown(struct nbd_device *nbd)
+ 	struct nbd_config *config = nbd->config;
+ 	int i;
+ 
+-	if (config->num_connections == 0)
++	if (config->num_connections == 0) {
++		clear_bit(NBD_BOUND, &config->runtime_flags);
+ 		return;
+-	if (test_and_set_bit(NBD_DISCONNECTED, &config->runtime_flags))
++	}
++	if (test_and_set_bit(NBD_DISCONNECTED, &config->runtime_flags)) {
++		clear_bit(NBD_BOUND, &config->runtime_flags);
+ 		return;
++	}
+ 
+ 	for (i = 0; i < config->num_connections; i++) {
+ 		struct nbd_sock *nsock = config->socks[i];
+@@ -944,7 +948,7 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
+ 		sockfd_put(old);
+ 
+ 		clear_bit(NBD_DISCONNECTED, &config->runtime_flags);
+-
++		clear_bit(NBD_BOUND, &config->runtime_flags);
+ 		/* We take the tx_mutex in an error path in the recv_work, so we
+ 		 * need to queue_work outside of the tx_mutex.
+ 		 */
+@@ -1020,6 +1024,7 @@ static int nbd_disconnect(struct nbd_device *nbd)
+ 	dev_info(disk_to_dev(nbd->disk), "NBD_DISCONNECT\n");
+ 	set_bit(NBD_DISCONNECT_REQUESTED, &config->runtime_flags);
+ 	send_disconnects(nbd);
++	clear_bit(NBD_BOUND, &config->runtime_flags);
+ 	return 0;
+ }
+ 
+-- 
+2.7.4
 
-Thanks,
-Ming Lei
