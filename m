@@ -2,206 +2,173 @@ Return-Path: <SRS0=ptgV=OU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC8F3C5CFFE
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 09:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6118FC07E85
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 10:16:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7B6B120849
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 09:51:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D0B920849
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 10:16:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cadence.com header.i=@cadence.com header.b="AF3LDcwL";
-	dkim=pass (1024-bit key) header.d=cadence.com header.i=@cadence.com header.b="UmiSah8J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B6B120849
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=cadence.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BOtUU/Hr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D0B920849
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726137AbeLKJuC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Dec 2018 04:50:02 -0500
-Received: from mx0b-0014ca01.pphosted.com ([208.86.201.193]:53576 "EHLO
-        mx0a-0014ca01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726267AbeLKJuA (ORCPT
+        id S1726242AbeLKKQd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Dec 2018 05:16:33 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:34842 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726114AbeLKKQd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Dec 2018 04:50:00 -0500
-Received: from pps.filterd (m0042333.ppops.net [127.0.0.1])
-        by mx0b-0014ca01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id wBB9mIWd007751;
-        Tue, 11 Dec 2018 01:49:35 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cadence.com; h=date : from : to :
- cc : subject : message-id : mime-version : content-type; s=proofpoint;
- bh=h3wJXpCN83RZBii7FQ6EjII02XdY32lVPDlTSgOyINM=;
- b=AF3LDcwLEi1qDYRbcto14qMoVt819UyUvE5EymdEtYCgjQRai4gNWwtc2FgyhXYsbJEN
- OKH+I4fuUUzAYiU4PpIxdcqvBbl5O16VZUEwHR2jI6nl/ShRysMPb1gTX2+UFD59vWtf
- A5f80HpA0apLt3Soil2aqjxmMKbfo4Y/DQdruOnyiYFmzB7n4MIa7XX1eJASlb9K2y6V
- GlXcnwW3nTUEhhCSPROy//Q0qrOg/ow3TplXJnT+HqQfXtDSuwSBy/kC5/hLnX5PGJgk
- LjXzR2bf0bB09/ChU3IEWW2OfNlpR2Sgd5cW7KNd1zJtZSmKgTsuisINrJtZpTiOlKsG mw== 
-Authentication-Results: cadence.com;
-        spf=pass smtp.mailfrom=pthombar@cadence.com
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1nam02lp2051.outbound.protection.outlook.com [104.47.36.51])
-        by mx0b-0014ca01.pphosted.com with ESMTP id 2p9wg8bka6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Dec 2018 01:49:34 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cadence.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h3wJXpCN83RZBii7FQ6EjII02XdY32lVPDlTSgOyINM=;
- b=UmiSah8J/i5cxPqVeepM5s8ekJH/up57eAR/7G0gfsc+Of/ts0X52DYkTeSaX0mxWPAKorWsgZjPx+Eh1Y6b5kABcvlBDVaHHyk0p5RxkzSt5YILybDSIm9yAQLosfSC5CyPqjP68qH1ABOf4XOhfxWnOxP/56ttT+ktucsqPoo=
-Received: from DM5PR07CA0048.namprd07.prod.outlook.com (2603:10b6:3:16::34) by
- SN6PR07MB4416.namprd07.prod.outlook.com (2603:10b6:805:59::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1404.17; Tue, 11 Dec 2018 09:49:29 +0000
-Received: from BY2NAM05FT041.eop-nam05.prod.protection.outlook.com
- (2a01:111:f400:7e52::202) by DM5PR07CA0048.outlook.office365.com
- (2603:10b6:3:16::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1425.19 via Frontend
- Transport; Tue, 11 Dec 2018 09:49:28 +0000
-Received-SPF: SoftFail (protection.outlook.com: domain of transitioning
- cadence.com discourages use of 199.43.4.28 as permitted sender)
-Received: from rmmaillnx1.cadence.com (199.43.4.28) by
- BY2NAM05FT041.mail.protection.outlook.com (10.152.100.178) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.1446.5 via Frontend Transport; Tue, 11 Dec 2018 09:49:28 +0000
-Received: from maileu3.global.cadence.com (maileu3.cadence.com [10.160.88.99])
-        by rmmaillnx1.cadence.com (8.14.4/8.14.4) with ESMTP id wBB9nImT022533
-        (version=TLSv1/SSLv3 cipher=AES256-SHA bits=256 verify=OK);
-        Tue, 11 Dec 2018 04:49:20 -0500
-X-CrossPremisesHeadersFilteredBySendConnector: maileu3.global.cadence.com
-Received: from maileu3.global.cadence.com (10.160.88.99) by
- maileu3.global.cadence.com (10.160.88.99) with Microsoft SMTP Server (TLS) id
- 15.0.1367.3; Tue, 11 Dec 2018 10:49:20 +0100
-Received: from lvlogina.cadence.com (10.165.176.102) by
- maileu3.global.cadence.com (10.160.88.99) with Microsoft SMTP Server (TLS) id
- 15.0.1367.3 via Frontend Transport; Tue, 11 Dec 2018 10:49:20 +0100
-Received: from lvlogina.cadence.com (localhost.localdomain [127.0.0.1])
-        by lvlogina.cadence.com (8.14.4/8.14.4) with ESMTP id wBB9nHh6031533;
-        Tue, 11 Dec 2018 09:49:17 GMT
-Received: (from pthombar@localhost)
-        by lvlogina.cadence.com (8.14.4/8.14.4/Submit) id wBB9nAgm031127;
-        Tue, 11 Dec 2018 09:49:10 GMT
-Date:   Tue, 11 Dec 2018 09:49:10 +0000
-From:   Parshuram Thombare <pthombar@cadence.com>
-To:     <axboe@kernel.dk>, <vinholikatti@gmail.com>,
-        <jejb@linux.vnet.ibm.com>, <martin.petersen@oracle.com>,
-        <mchehab+samsung@kernel.org>, <gregkh@linuxfoundation.org>,
-        <davem@davemloft.net>, <akpm@linux-foundation.org>,
-        <nicolas.ferre@microchip.com>, <arnd@arndb.de>,
-        <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>, <tj@kernel.org>, <jbacik@fb.com>,
-        <michaelcallahan@fb.com>, <snitzer@redhat.com>, <osandov@fb.com>,
-        <keith.busch@intel.com>, <ming.lei@redhat.com>, <shli@fb.com>,
-        <dennisszhou@gmail.com>
-CC:     <adouglas@cadence.com>, <jank@cadence.com>, <rafalc@cadence.com>,
-        <pthombar@cadence.com>
-Subject: [PATCH 0/2] scsi: ufs: add real time/inline crypto support to UFS HCD
-Message-ID: <20181211094910.GA28288@lvlogina.cadence.com>
+        Tue, 11 Dec 2018 05:16:33 -0500
+Received: by mail-it1-f194.google.com with SMTP id p197so2909774itp.0
+        for <linux-block@vger.kernel.org>; Tue, 11 Dec 2018 02:16:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=iQQbudlyyqw9QYq7OpcsZgG7rfcHPWsyg5HZGpcEpbs=;
+        b=BOtUU/Hr/acuLDPKBCKOLuS6NcmQjAuorPMHXadIlCWy43QnoB8zK30s54Pc/552O7
+         0N/W7Fy+0eXh0VZgSEfSm6RU9sviBltEIg9fp64/q0EqEzQpexFj46BQDBAj5opkSoxw
+         52xCxxVZpO3HW8s0PQm8/6vdriKo/JGLN9M+ljd2/XrrQy+AkGFoTApXZt3PnzMjRb5+
+         jVlTGXedbK5B1VhdsHRqcTsRYtQqGXCbdDcGY21FK+5/d8qadUUG8Pb8LcPOdfOhAFae
+         4RLmfMZyfkqyZ2DxxV68LsRIPuapyCaWKEZcH51Eu1rNjVE9vVV435Wu7kA12rDXBLVG
+         0+NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=iQQbudlyyqw9QYq7OpcsZgG7rfcHPWsyg5HZGpcEpbs=;
+        b=h8vI0FgDc1heIE4Lqy7QUpTomHIP2E5K7YCe5oHud0cIZktRZWT1MYNAW5VVMcD/S/
+         YqaPp6WRBQCctXOADIVqcxgInRmUxKXPkDCsC3MbW+2bcznaW19za0lkzM8+fXWQ8ze7
+         HXB0ROHfInCu/Xlj3gUh6PiTbwgDbKyT08B9bsZ9pkYuoRvwJckodRPSbOO1SV9P4oZE
+         icYIv18uGmU++2yCyQsKcnpNzT2WrmzK9I5CbzvBDSrM3HYlBTUFTrnegnjqYgtExRUK
+         3hQ6RQuOAupITbyGi7nMcr4fUAa8CZ9v4QnJTARircMEYTAaaSNWffrQL0GV/6kG6mGw
+         QkVQ==
+X-Gm-Message-State: AA+aEWaMakUwyj4b6xLmBJ+ARWffXfWNbF9xg+GFIQSUUfsmUDH17fdQ
+        cX6QcD1ERaS3v+orSMaP0T5MWsZt9lBH0f+0qCyICQ==
+X-Google-Smtp-Source: AFSGD/VwoKxxhm3cSAV/rJ0M/u6rPFpBKmU+VaoppwUI7SQk1Ilb8+DUU9YoGLgkxRtzxMLmT9UUczlOhgZkDNodR90=
+X-Received: by 2002:a05:660c:f94:: with SMTP id x20mr1464115itl.144.1544523391894;
+ Tue, 11 Dec 2018 02:16:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-User-Agent: Mutt/1.5.20 (2009-12-10)
-X-OrganizationHeadersPreserved: maileu3.global.cadence.com
-X-EOPAttributedMessage: 0
-X-Forefront-Antispam-Report: CIP:199.43.4.28;IPV:CAL;SCL:-1;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(10009020)(396003)(39860400002)(376002)(346002)(136003)(2980300002)(189003)(199004)(36092001)(106466001)(356004)(26005)(7416002)(50466002)(105596002)(186003)(69596002)(5660300001)(33656002)(486006)(476003)(97756001)(478600001)(42186006)(26826003)(87636003)(53936002)(97736004)(316002)(16586007)(126002)(58126008)(426003)(54906003)(2906002)(4326008)(8676002)(305945005)(81166006)(81156014)(336012)(1076002)(47776003)(107886003)(23726003)(110136005)(68736007)(39060400002)(86362001)(8936002)(2201001)(46406003)(18370500001)(921003)(1121003)(2101003)(83996005);DIR:OUT;SFP:1101;SCL:1;SRVR:SN6PR07MB4416;H:rmmaillnx1.cadence.com;FPR:;SPF:SoftFail;LANG:en;PTR:InfoDomainNonexistent;MX:1;A:1;
-X-Microsoft-Exchange-Diagnostics: 1;BY2NAM05FT041;1:HUsprDXgJM8dsjhn0W4y7rr0sbcYX2y5vZUyGABY50Z8BXRl2ZEf6Ks0EdxN25JUkez9LiZhtBl13Ujbb6zS2SkRn+o/t+yNQuZd8NXQPzXLoX2A9mAPqrt+xNm29ShT
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1ec0f5e0-8015-4c75-e838-08d65f4df16d
-X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390098)(7020095)(4652040)(8989299)(5600074)(711020)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7153060);SRVR:SN6PR07MB4416;
-X-Microsoft-Exchange-Diagnostics: 1;SN6PR07MB4416;3:XMYS96ybMbepIm1LpwD+iulBkGVbbOeVci/glLeoOUEKB3C/st6WnQFal+U0KGcdMGtnTpToY3ypmIQQ+usqwxlNO+IN9xY6AvpD6gdOOEPZ5B6SJasuAS5I6DU2aMNK03wGanIrfw5org5+r9CZVqS9jiCjS9CUMr8sU39ixbyuF3PvKpLKJcEMXgD6PFsxRaSKa3e+DxEBXu41abSY77h79N/tsu69r/nvMDN2PzSJYDe4qN9qvQvc9VFlNBWBI98XDvmpLXF3PIbgq7+gMSoM6omjOTibrdA1wjWN5che3OX5tN8E6hFhA00GyTsiZz/kwZ/k9y4BVdRtufT5cA==;25:R0bIbCkso1bjXAaqgGmp8afVGtYHwggwCE9LOXve/sJXBNs4RVrP0t/KojHbT36WqqkQEpEe+GCMUsRHill36CMYQYpC9+5QMOUMZ8fI4ofcceZ5Kt5i5VEyD4FmFnYvLbqN4tlsmmkV27jEPPyZjpbGhsCkpKYMxe9hNhgPGsr3uZE1raJCph+QUJXpEUiWRDaBa2OXQEO6Dd3TnPktFBrM1Tr97U7ziH3uJ6UHd7uMp1EduloKZpClDa3eYmUqLOvvPYWb8ZELzRDX928KpPILTHKxjQmzRgTHUUj5ehTRIQnO/RuQGAUYPIFB3D6dr0b/8KxO3DW9RCn0jxT+iQ==;31:vo/tPrYpb/OqwyNASCGyVgVUE5XsVT682NCAlDjKzvnCaJEw2TcBJOlVeK7IDzE0a9injr4xjSC8uXCwE9Mou1pw3g4dj3a6mUZl/dg+ypcFkjGsku4SDuqp+Dtp5iSnwl6ISszaOcx7YOyE2nhmfR2h87/G5zpDrBDYetxDlgTpRr+lzXomCD9+VsZBH/UCy0R/OHisKpicqCFeCFqjrdBTi/EiM+TE5NK/lm9pEV4=
-X-MS-TrafficTypeDiagnostic: SN6PR07MB4416:
-X-Microsoft-Exchange-Diagnostics: 1;SN6PR07MB4416;20:zk26VXAaOUKoFyGtRuHuCaidmEyxxrGMtLb/caPDa5ghQ2BRC/M+z+qaTxpldLjzRyyD91Dxi0dRY06izjMjvoRkDSwnBHaL4cbhpLv92AzrNu89FvjthaLQmJVKek9gOhtiopx+krnd1BYu+h4VxvjgT4b/UQbSJg8OLrOVR9LtgkaROOdU9UDQ4Daq/R5GHpg3MNXcJrebTmFo7JCtXXZvuFb7aKbrFniTVrZKe0mnOZJ9xiG4BngI0HzdqLG8rWpzC3FcOMPflf7dHJnO+UhI5mZt1f98n5U3+2cjGM+W+U27yYX+GfLY0E07zlzuPXy8Wv1WqVWa9bT3dZiJY33iPyb2liJLGzGkU3wcGTWN/PydO/FT6sOFbH7a2J/gXj6xJE3Eu9kGi+QJW2HVYJEUQtqSqj9XfFkpa2wPE1QwjKkRC/g+ztPqOMlO9L/EhagL9praGnEF6u+PDZymtGk1maPalobk5s2rGFbOHXih6cttoRRefKHo6Zs3GVl8;4:c2NlTwB9DnQCh8NxypubD/Xa8m+QScCc3s5yPIN1o423EDR3nLvj526jJzrW/psCLkA2tJxBPycunu6oSkwla8BwlCQ9h5rxsIKZtB1dnmlv3Q7Me7AcTs4OUeDTacm1uKkqNowdCa7CIhVuX3UP3ZGdjr4ikv/UztLDn4sQqv28P+8U7YA+sLSh4NJ3y05Lzi4PTTDikcg8uTUJrxPa1H9RTXwbOJ9IW6f1MtNb0wGKaHf5FcN36JcBCQMLXSLIyErk0vaGW2GiPAOkgtX/0Q==
-X-Microsoft-Antispam-PRVS: <SN6PR07MB4416B23E323C721ED9B62FF2C1A60@SN6PR07MB4416.namprd07.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-Exchange-Antispam-Report-CFA-Test: BCL:0;PCL:0;RULEID:(8211001083)(3230017)(999002)(6040522)(2401047)(8121501046)(5005006)(3231472)(944501520)(52105112)(3002001)(10201501046)(93006095)(93003095)(148016)(149066)(150057)(6041310)(20161123562045)(20161123558120)(201703131423095)(201702281528075)(20161123555045)(201703061421075)(201703061406153)(20161123560045)(20161123564045)(201708071742011)(7699051)(76991095);SRVR:SN6PR07MB4416;BCL:0;PCL:0;RULEID:;SRVR:SN6PR07MB4416;
-X-Forefront-PRVS: 08831F51DC
-X-Microsoft-Exchange-Diagnostics: =?us-ascii?Q?1;SN6PR07MB4416;23:dCdrVZdHa5UeS0ADpQZGBtaUxz40wQ3vdG8mM6zEe?=
- =?us-ascii?Q?jyY2rh+C/Z0ybdYcG1YsdGgbP2kaovu0QX7apsh36jj3i5hz3e01myWRNNqD?=
- =?us-ascii?Q?CS0c72cT5wcUgOCqlL3ZxyUSfk1slTXQAwq6ec1dxwKkU1NHq+dRdP5j1p4+?=
- =?us-ascii?Q?YaEjxU7PXHEd7BnSErX2Eo7L3SQH1XaOK/qy2w5ccDEHvd9j2nr2zWa0Y+05?=
- =?us-ascii?Q?Ca6nK69cSCL6Z0Jot8joq0fSZnxtvQUKBt75Tfb4DMo/bqla3lDO4qJQBGuH?=
- =?us-ascii?Q?Ng164IhPLVZoNx5N+uaPGLGdKieLpA9EVjdS2eyrdJZMdBWgl/WAdZcSIRAM?=
- =?us-ascii?Q?Vpry2KpHCmdPD/YBPQ4StEggvM+EGsn/EfITxXXuUtKbj64p3KmY+Y1HbSNB?=
- =?us-ascii?Q?47pH9bWbwRMRCizksNWWAfVeFA/NBxT2R8Sl7NbiM+lDONbPH0CwtNgkt28f?=
- =?us-ascii?Q?z/bxzxJxA2LShTjP67Ep3nVMLy88hIJ5rjR1+4F3mD7uzxGuqhDgFVeCpMLl?=
- =?us-ascii?Q?mgSw0uYvUbBcN3alRNWwQ/J62Vw3eNJkJQ/VkMakxTUxJF7wpNatRtGJmicw?=
- =?us-ascii?Q?yoq/b2BuGMvhky7KXESFmsd5gYj4wE2JC/Raw2hK/8/yL1Znz8Zd7lztS5iL?=
- =?us-ascii?Q?dAe0d3aj6PkzP91OdQeNj45nQlPbjL44qBqkeAK9drAzkbG+NGIaUfEuFDSB?=
- =?us-ascii?Q?gwATwFqeQoswNLHB57ieun+PqzWn9btGXg1fS0PW1hn/70TdpyIZELN2E/4J?=
- =?us-ascii?Q?q9pEMtHBJckpJmzOzOI6Jf0EvO2cqQ7PO0t73sPTRIaSCGBm4u54CmnCLqOa?=
- =?us-ascii?Q?tNnMnSBqWBptcVunujwO9L9C49ohIbpjqGtZ1IlVZsYsKkXU1lUtL9hEucne?=
- =?us-ascii?Q?mlLhjWKBtNC5hQ1z/kw7L/PSA9gf4kO220dlQEu0Xb4GZ4k6A4+nXBLcv1VP?=
- =?us-ascii?Q?I6t6wfjlDmC71538VfSi19O/z9Ob6dR85wNyRS4czfvh/YwViWj68t8mAwTu?=
- =?us-ascii?Q?eVdjynqln9/NJcnWIuBL6mRv6agEmRkjQuv1hmc+EoL/GzgrhDVBwaRAlIIi?=
- =?us-ascii?Q?S6pus43DUbNkW8afysDYzw8rI/6NdTRSwaCcJDGLzvhbU8FiKvfQNRBNDI7D?=
- =?us-ascii?Q?LBxhLhyniar9RHLXh5Ca/mG9CCdvimZG3zS9zAtD0siI6JLc3Nob177GFAgx?=
- =?us-ascii?Q?OaJJTMriLivDK+QNUaJAYk+3D3ISopzG293S2v4VGRBx8ieICHIeFpTOznme?=
- =?us-ascii?Q?PqgbqMhCVDtfKyesb1T0nPlQ1oHSO9kcg+iLiJO?=
-X-Microsoft-Antispam-Message-Info: 4nxPygdZVaxCm9yliTa60WaWt2eZlq9OOAyTebHduIGpe+6rcGJ3K6yWXdfVg7nZCJ7LN374Q3oDz8ZeaIlCHoKgfIdhHgI+7x6AhfdqN+CnfPeMRi2twtpjKQmZCoEfSxr1YvYa7l4mMzNiic0JoEP6ZbzXpq2Ih/o93VaTQf9mpqcuLIe8JpPxApwZWoG0Cxl0LgD9sLVj73ELwZBHGMUqSw7tOHIZhnCIZabUE4h1TWVHBV2+QZ7Y7jyvCEpfA9uAH3GozOfznTS8MjNsi0PJQh3vsL3HVko0BbprHuRoJClZzRLK7m9NSzaUWnaJ
-X-Microsoft-Exchange-Diagnostics: 1;SN6PR07MB4416;6:3ifqjKP53DX7Oef8plVoXvSxJpDzWIICrYgj+g3L+dlQHbGUZuCtw01fLlQOASP6M2NHiR7fdobp62wCcpeIhL/8CPfZo0v4lqGWhZaT74eQ/joO37j2nJYVl+fVyAEt9cxg74T406S3qolKJBtwY/8C6QTqDqtr31V0LfRJsoxUtECY7T1KMOxVq1DGXJSKmXWDk1IPSR8V4Rr384OnyaQ19M8GyH5/8A3nd71UyCZeHKa2Ax61no8aSMcHC/6f2gN3OTFaMdlGJeXujOOe/+3n6pw1eZGzBPdhf4E7Tlf0BG8k63xYAp6OAxf/w4G5CS8IA04DQl9bRrWWeeC0lA109aWHRDwBaUR06k6+2z10vGsO7p42hpDdMn/77e1+oxcwUGSYd94DqrWfxRFNNoPqyX/bUtmVFuoPvWRL47tDy0lcJrQFgAeSia2RQ9QFApb/H8zcDYo8Jko6Sai+YA==;5:zAzkJUf4rezVmdYcnQGeB7SIT8+ZebURkKUr8Bhfrj8mdVo/Gim/kfuOlj4ncAfJB9Twmup9I30YvJvP3nwCk1nohdIi8PVUqG+oWykB/P3U5XCtLZs53Ru2aGaf8wQiT9g/6i6v6FLuUeaowVsXw/HCrGB39TsrtMIOjri9iIo=;7:qYAYUIwAFXPPkwOyVOuJEPLRwD+GgHLKfP9ENcuAQdUm3J0H+lqJ2L+q3whw5jMlengiATPEIRxPnAK1FtF3YHMOiWykN7Ht3mwaE/7z/eC8FbNHHFLMJVU+fHZm10ZOK5Tbx6SPCsG9iYumLTF5xQ==
-SpamDiagnosticOutput: 1:99
-SpamDiagnosticMetadata: NSPM
-X-Microsoft-Exchange-Diagnostics: 1;SN6PR07MB4416;20:SGu1AZ2b48RPlokfw2tE7/uWdfpQKbqIY228ow3Qdpj2Amid/a6PNn1SaufMwwGeO+f8QqP3Z/H79D/MYMbJKUP6PZ6JcJX4dUXCZ/EUWxCevXU7ain9wBsseAkP3pQkXBu5ysnuqrWeFPGZT2MKAgV59uWScY4mR5ZRftNQFokZMoaSQwsuP7H05eCcCbeVsmEGBUovmstKaIKefhVNQiomlpoNIUvyLCeb7NJA4rUBuJz7igL9P18rdK0PDeTH
-X-OriginatorOrg: cadence.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Dec 2018 09:49:28.4636
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1ec0f5e0-8015-4c75-e838-08d65f4df16d
-X-MS-Exchange-CrossTenant-Id: d36035c5-6ce6-4662-a3dc-e762e61ae4c9
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=d36035c5-6ce6-4662-a3dc-e762e61ae4c9;Ip=[199.43.4.28];Helo=[rmmaillnx1.cadence.com]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR07MB4416
-X-Proofpoint-SPF-Result: pass
-X-Proofpoint-SPF-Record: v=spf1 include:_spf.salesforce.com include:mktomail.com
- include:spf-0014ca01.pphosted.com include:spf.protection.outlook.com
- include:auth.msgapp.com include:spf.mandrillapp.com ~all
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2018-12-11_03:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_check_notspam policy=outbound_check score=0
- priorityscore=1501 malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0
- spamscore=0 clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1812110093
+References: <bug-201949-27@https.bugzilla.kernel.org/> <20181210154550.03bf3fe93944a7c786ba924d@linux-foundation.org>
+In-Reply-To: <20181210154550.03bf3fe93944a7c786ba924d@linux-foundation.org>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Tue, 11 Dec 2018 11:16:20 +0100
+Message-ID: <CACT4Y+a_J1sjL352sY=+6paZDg2-4V9UPa8t3XBNeZfYw_ZHWA@mail.gmail.com>
+Subject: Re: [Bug 201949] New: KASAN: use-after-free Read in __handle_mm_fault
+To:     Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     Andrey Ryabinin <aryabinin@virtuozzo.com>,
+        Alexander Potapenko <glider@google.com>,
+        bugzilla-daemon@bugzilla.kernel.org,
+        kasan-dev <kasan-dev@googlegroups.com>, jaguo2014@outlook.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Tue, Dec 11, 2018 at 12:45 AM Andrew Morton
+<akpm@linux-foundation.org> wrote:
+>
+> (switched to email.  Please respond via emailed reply-to-all, not via the
+> bugzilla web interface).
 
-This patch series add inline / real time encryption support to UFS
-host controller driver. It include following patches
-0001-block-add-bi_crypto_ctx-variable-in-struct-bio.patch
-Add 'void *bi_crypto_ctx' variable in 'struct bio' to embded crypto
-configuration information, which is used by low level driver when
-bio is processed. This field can also be useful to support inline
-encryption in other protocols also.
-0002-scsi-ufs-add-inline-crypto-support-to-UFS-HCD.patch
-This patch depends on patch [0/1] in this series.
-Patch include changes regarding UFS controller
-crypto support. Inline crypto support is provided by using new
-device mapper called 'crypt-ufs'. Inline encryption can be enabled on
-UFS device by creating mapping using tool like dmsetup and mapper
-'crypt-ufs'. Patch is tested on Cadence UFS controller which currently
-support AES-ECB inline encryption.
-As part of [PATCH 2/2], MAINTAINERS file is modified to add name as
-supporter of ufshcd crypto files.
+Looking at the reproducer this looks like a bug in sg ioctl.
++block/scsi_ioctl.c maintainers
 
-Regards,
-Parshuram Thombare
-
-Parshuram Thombare (2):
-  block: add bi_crypto_ctx variable in struct bio
-  scsi: ufs: add inline crypto support to UFS HCD
-
- MAINTAINERS                      |    7 +
- block/Kconfig                    |    5 +
- drivers/scsi/ufs/Kconfig         |   12 +
- drivers/scsi/ufs/Makefile        |    1 +
- drivers/scsi/ufs/ufshcd-crypto.c |  453 ++++++++++++++++++++++++++++++++++++++
- drivers/scsi/ufs/ufshcd-crypto.h |  102 +++++++++
- drivers/scsi/ufs/ufshcd.c        |   27 +++-
- drivers/scsi/ufs/ufshcd.h        |    6 +
- drivers/scsi/ufs/ufshci.h        |    1 +
- include/linux/blk_types.h        |    4 +
- 10 files changed, 617 insertions(+), 1 deletions(-)
- create mode 100644 drivers/scsi/ufs/ufshcd-crypto.c
- create mode 100644 drivers/scsi/ufs/ufshcd-crypto.h
-
+> On Mon, 10 Dec 2018 10:56:31 +0000 bugzilla-daemon@bugzilla.kernel.org wrote:
+>
+> > https://bugzilla.kernel.org/show_bug.cgi?id=201949
+> >
+> >             Bug ID: 201949
+> >            Summary: KASAN: use-after-free Read in __handle_mm_fault
+> >            Product: Memory Management
+> >            Version: 2.5
+> >     Kernel Version: 4.19-rc2,4.20-rc5,4.20-rc6
+> >           Hardware: All
+> >                 OS: Linux
+> >               Tree: Mainline
+> >             Status: NEW
+> >           Severity: normal
+> >           Priority: P1
+> >          Component: Other
+> >           Assignee: akpm@linux-foundation.org
+> >           Reporter: jaguo2014@outlook.com
+> >         Regression: No
+> >
+> > Created attachment 279915
+> >   --> https://bugzilla.kernel.org/attachment.cgi?id=279915&action=edit
+> > poc.c
+> >
+> > Syzkaller hit 'KASAN: use-after-free Read in __handle_mm_fault' bug.
+> >
+> > ==================================================================
+> > BUG: KASAN: use-after-free in handle_pte_fault mm/memory.c:3744 [inline]
+> > BUG: KASAN: use-after-free in __handle_mm_fault+0x1b5d/0x1d20 mm/memory.c:3889
+> > Read of size 8 at addr ffff888000048008 by task syz-executor666/2067
+> >
+> > CPU: 0 PID: 2067 Comm: syz-executor666 Not tainted 4.20.0-rc5+ #1
+> > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 0.5.1 01/01/2011
+> > Call Trace:
+> >  __dump_stack lib/dump_stack.c:77 [inline]
+> >  dump_stack+0x75/0xae lib/dump_stack.c:113
+> >  print_address_description+0x65/0x270 mm/kasan/report.c:256
+> >  kasan_report_error mm/kasan/report.c:354 [inline]
+> >  kasan_report+0x25b/0x380 mm/kasan/report.c:412
+> >  handle_pte_fault mm/memory.c:3744 [inline]
+> >  __handle_mm_fault+0x1b5d/0x1d20 mm/memory.c:3889
+> >  handle_mm_fault+0xfc/0x350 mm/memory.c:3926
+> >  do_user_addr_fault arch/x86/mm/fault.c:1423 [inline]
+> >  __do_page_fault+0x4f4/0xaa0 arch/x86/mm/fault.c:1489
+> >  async_page_fault+0x1e/0x30 arch/x86/entry/entry_64.S:1142
+> > RIP: 0033:0x4014fd
+> > Code: Bad RIP value.
+> > RSP: 002b:00007ffdaac075f0 EFLAGS: 00010246
+> > RAX: 0000000000000000 RBX: 00007ffdaac07790 RCX: 00007f6df4bee2f0
+> > RDX: 0000000000000001 RSI: 00007f6df4bea270 RDI: 00007f6df4e08ae0
+> > RBP: 0000000000000000 R08: 00007f6df4e08800 R09: 00007f6df4bea270
+> > R10: 00007f6df4e08800 R11: 0000000000000202 R12: 0000000000000000
+> > R13: 00007ffdaac07920 R14: 0000000000000000 R15: 0000000000000000
+> >
+> > The buggy address belongs to the page:
+> > page:ffffea0000001200 count:0 mapcount:0 mapping:0000000000000000 index:0x0
+> > flags: 0x0()
+> > raw: 0000000000000000 ffffea0000001208 ffffea0000001208 0000000000000000
+> > raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+> > page dumped because: kasan: bad access detected
+> >
+> > Memory state around the buggy address:
+> >  ffff888000047f00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+> >  ffff888000047f80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+> > >ffff888000048000: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+> >                       ^
+> >  ffff888000048080: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+> >  ffff888000048100: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+> > ==================================================================
+> >
+> >
+> > Syzkaller reproducer:
+> > # {Threaded:false Collide:false Repeat:true RepeatTimes:0 Procs:8 Sandbox:
+> > Fault:false FaultCall:-1 FaultNth:0 EnableTun:false UseTmpDir:true
+> > EnableCgroups:false EnableNetdev:false ResetNet:false HandleSegv:true
+> > Repro:false Trace:false}
+> > r0 = syz_open_dev$sg(&(0x7f0000000180)='/dev/sg#\x00', 0x0, 0x0)
+> > ioctl$SCSI_IOCTL_SEND_COMMAND(r0, 0x1, &(0x7f0000000080)={0x1, 0x0, 0x8, "ae"})
+> >
+> > --
+> > You are receiving this mail because:
+> > You are the assignee for the bug.
+>
+> --
+> You received this message because you are subscribed to the Google Groups "kasan-dev" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to kasan-dev+unsubscribe@googlegroups.com.
+> To post to this group, send email to kasan-dev@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/kasan-dev/20181210154550.03bf3fe93944a7c786ba924d%40linux-foundation.org.
+> For more options, visit https://groups.google.com/d/optout.
