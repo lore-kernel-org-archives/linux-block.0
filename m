@@ -3,44 +3,46 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B961C07E85
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 13:34:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E489EC07E85
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 13:35:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B45F2082F
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 13:34:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B45F2082F
+	by mail.kernel.org (Postfix) with ESMTP id B603420849
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 13:35:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B603420849
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726350AbeLKNei (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Dec 2018 08:34:38 -0500
-Received: from verein.lst.de ([213.95.11.211]:55366 "EHLO newverein.lst.de"
+        id S1726401AbeLKNfD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Dec 2018 08:35:03 -0500
+Received: from verein.lst.de ([213.95.11.211]:55370 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726203AbeLKNei (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Dec 2018 08:34:38 -0500
+        id S1726203AbeLKNfD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Dec 2018 08:35:03 -0500
 Received: by newverein.lst.de (Postfix, from userid 2407)
-        id 6D4C268DD2; Tue, 11 Dec 2018 14:34:37 +0100 (CET)
-Date:   Tue, 11 Dec 2018 14:34:37 +0100
+        id 22BB668DD2; Tue, 11 Dec 2018 14:35:02 +0100 (CET)
+Date:   Tue, 11 Dec 2018 14:35:02 +0100
 From:   Christoph Hellwig <hch@lst.de>
 To:     Sagi Grimberg <sagi@grimberg.me>
 Cc:     linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>,
         Keith Busch <keith.busch@intel.com>,
         linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 1/5] blk-mq-rdma: pass in queue map to
- blk_mq_rdma_map_queues
-Message-ID: <20181211133437.GA20614@lst.de>
-References: <20181211104936.25333-1-sagi@grimberg.me> <20181211104936.25333-2-sagi@grimberg.me>
+Subject: Re: [PATCH 2/5] nvme-fabrics: add missing nvmf_ctrl_options
+ documentation
+Message-ID: <20181211133502.GB20614@lst.de>
+References: <20181211104936.25333-1-sagi@grimberg.me> <20181211104936.25333-3-sagi@grimberg.me>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181211104936.25333-2-sagi@grimberg.me>
+In-Reply-To: <20181211104936.25333-3-sagi@grimberg.me>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good.
+Looks good,
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
