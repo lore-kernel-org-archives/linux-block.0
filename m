@@ -2,144 +2,235 @@ Return-Path: <SRS0=ptgV=OU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E611C5CFFE
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 10:50:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75D45C5CFFE
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 12:03:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D80672081B
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 10:50:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qW/EbUwW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D80672081B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
+	by mail.kernel.org (Postfix) with ESMTP id 2F04F2084A
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 12:03:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1544529828;
+	bh=+pZmcssiwvH5/LDB7RHzVGPPLG/zrDKdISRzO4N+gcI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=vdQRxD//j/4shPk2wUo/Vfg2w/cY9iET6jKWyscalGprl1+BPyr/jYp1qyspMabPV
+	 91E764VViu/uPRGnNQqkbeQP9eKYNZLDqXXWGbT6ojgugmf0LRiTZtFW1B7YUCjmnB
+	 QFag8zp6WIQtjw0lphPJqnrhXYEXjZcii+dcrVZ4=
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F04F2084A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=linuxfoundation.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726242AbeLKKu3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Dec 2018 05:50:29 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:58432 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726467AbeLKKu3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Dec 2018 05:50:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=References:In-Reply-To:Message-Id:
-        Date:Subject:Cc:To:From:Sender:Reply-To:MIME-Version:Content-Type:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=LFkZyPvbqSYLLS6vBNRWZ3gVK017bJYsIXx6LHwoeTc=; b=qW/EbUwW6Ror9R6WTv6DffZ9f
-        3ZaXvX8R8BxLBI8dp4p9CPB+XgPfcSKRfbvENuhYzzo7rmPxDobz3pXLa7J68YW+OphGJV7Ur2zxu
-        xJ3HAn6qC4d80AIhn+VdNcBESgRP3ViJ6QvSCj2mCgmw5k1p0O8lZQdZqaSF3jK2Eeg9NUx5LH2Ah
-        eF5m8oZ+4vPq0AhS2xKeu5wvuYSBGMiF2WW3ACPHudY57gl6+IpTCIfF8EsRK80l5ZJpi++cDAyCf
-        TW25GYG9EwFzGSptIV18sg5355rXUL+8CbzcoRlzBjkqzJj2tojAd4mZFLPfUIWdisTrb0Pcw5suS
-        WwqDJZsvg==;
-Received: from [2601:647:4800:973f:7888:b13c:bff:87b0] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gWfbe-0004p6-Au; Tue, 11 Dec 2018 10:49:38 +0000
-From:   Sagi Grimberg <sagi@grimberg.me>
-To:     linux-nvme@lists.infradead.org
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 5/5] nvme-rdma: support read/write queue separation
-Date:   Tue, 11 Dec 2018 02:49:35 -0800
-Message-Id: <20181211104936.25333-6-sagi@grimberg.me>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20181211104936.25333-1-sagi@grimberg.me>
-References: <20181211104936.25333-1-sagi@grimberg.me>
+        id S1726342AbeLKMDl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Dec 2018 07:03:41 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60460 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726114AbeLKMDl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 11 Dec 2018 07:03:41 -0500
+Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5986120811;
+        Tue, 11 Dec 2018 12:03:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1544529820;
+        bh=+pZmcssiwvH5/LDB7RHzVGPPLG/zrDKdISRzO4N+gcI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=BC9CfASbnYKb32Ps8bRQRjBJMB2FejF9WgJmWoeQePTY/lt+py3sWn446833zYSBp
+         zs8Xsa+/GQfGTOdrZ4rIfNe71l+QYc+ZGANTqemEzmiSzgImPWSQQdGvWkhzuOwv80
+         YV8byCNy6Y0MpZj8IiGbt2xiwkPf18IloehYtE3A=
+Date:   Tue, 11 Dec 2018 13:03:37 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Parshuram Thombare <pthombar@cadence.com>
+Cc:     axboe@kernel.dk, vinholikatti@gmail.com, jejb@linux.vnet.ibm.com,
+        martin.petersen@oracle.com, mchehab+samsung@kernel.org,
+        davem@davemloft.net, akpm@linux-foundation.org,
+        nicolas.ferre@microchip.com, arnd@arndb.de,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, adouglas@cadence.com, jank@cadence.com,
+        rafalc@cadence.com
+Subject: Re: [PATCH 2/2] scsi: ufs: add inline crypto support to UFS HCD
+Message-ID: <20181211120337.GA3023@kroah.com>
+References: <20181211095027.GA3316@lvlogina.cadence.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181211095027.GA3316@lvlogina.cadence.com>
+User-Agent: Mutt/1.11.1 (2018-12-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
----
- drivers/nvme/host/rdma.c | 39 ++++++++++++++++++++++++++++++++++++---
- 1 file changed, 36 insertions(+), 3 deletions(-)
+On Tue, Dec 11, 2018 at 09:50:27AM +0000, Parshuram Thombare wrote:
+> Add real time crypto support to UFS HCD using new device
+> mapper 'crypto-ufs'. dmsetup tool can be used to enable
+> real time / inline crypto support using device mapper
+> 'crypt-ufs'.
+> 
+> Signed-off-by: Parshuram Thombare <pthombar@cadence.com>
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 5057d5ab5aaa..cfe823a491f2 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -645,6 +645,8 @@ static int nvme_rdma_alloc_io_queues(struct nvme_rdma_ctrl *ctrl)
- 	nr_io_queues = min_t(unsigned int, nr_io_queues,
- 				ibdev->num_comp_vectors);
- 
-+	nr_io_queues += min(opts->nr_write_queues, num_online_cpus());
-+
- 	ret = nvme_set_queue_count(&ctrl->ctrl, &nr_io_queues);
- 	if (ret)
- 		return ret;
-@@ -714,6 +716,7 @@ static struct blk_mq_tag_set *nvme_rdma_alloc_tagset(struct nvme_ctrl *nctrl,
- 		set->driver_data = ctrl;
- 		set->nr_hw_queues = nctrl->queue_count - 1;
- 		set->timeout = NVME_IO_TIMEOUT;
-+		set->nr_maps = 2 /* default + read */;
- 	}
- 
- 	ret = blk_mq_alloc_tag_set(set);
-@@ -1750,8 +1753,37 @@ static void nvme_rdma_complete_rq(struct request *rq)
- static int nvme_rdma_map_queues(struct blk_mq_tag_set *set)
- {
- 	struct nvme_rdma_ctrl *ctrl = set->driver_data;
-+	struct blk_mq_queue_map *map;
-+	int offset = 0;
-+
-+	if (ctrl->ctrl.opts->nr_write_queues) {
-+		/* separate read/write queues */
-+		map = &set->map[HCTX_TYPE_DEFAULT];
-+		map->queue_offset = offset;
-+		map->nr_queues = ctrl->ctrl.opts->nr_write_queues;
-+		blk_mq_rdma_map_queues(map, ctrl->device->dev, 0);
-+		offset += map->nr_queues;
-+
-+		map = &set->map[HCTX_TYPE_READ];
-+		map->nr_queues = ctrl->ctrl.opts->nr_io_queues;
-+		map->queue_offset = offset;
-+		blk_mq_rdma_map_queues(map, ctrl->device->dev, offset);
-+		offset += map->nr_queues;
- 
--	return blk_mq_rdma_map_queues(&set->map[0], ctrl->device->dev, 0);
-+	} else {
-+		/* mixed read/write queues */
-+		map = &set->map[HCTX_TYPE_DEFAULT];
-+		map->queue_offset = 0;
-+		map->nr_queues = ctrl->ctrl.opts->nr_io_queues;
-+		blk_mq_rdma_map_queues(map, ctrl->device->dev, 0);
-+
-+		map = &set->map[HCTX_TYPE_READ];
-+		map->queue_offset = 0;
-+		map->nr_queues = ctrl->ctrl.opts->nr_io_queues;
-+		blk_mq_rdma_map_queues(map, ctrl->device->dev, 0);
-+	}
-+
-+	return 0;
- }
- 
- static const struct blk_mq_ops nvme_rdma_mq_ops = {
-@@ -1906,7 +1938,7 @@ static struct nvme_ctrl *nvme_rdma_create_ctrl(struct device *dev,
- 	INIT_WORK(&ctrl->err_work, nvme_rdma_error_recovery_work);
- 	INIT_WORK(&ctrl->ctrl.reset_work, nvme_rdma_reset_ctrl_work);
- 
--	ctrl->ctrl.queue_count = opts->nr_io_queues + 1; /* +1 for admin queue */
-+	ctrl->ctrl.queue_count = opts->nr_io_queues + opts->nr_write_queues + 1;
- 	ctrl->ctrl.sqsize = opts->queue_size - 1;
- 	ctrl->ctrl.kato = opts->kato;
- 
-@@ -1957,7 +1989,8 @@ static struct nvmf_transport_ops nvme_rdma_transport = {
- 	.module		= THIS_MODULE,
- 	.required_opts	= NVMF_OPT_TRADDR,
- 	.allowed_opts	= NVMF_OPT_TRSVCID | NVMF_OPT_RECONNECT_DELAY |
--			  NVMF_OPT_HOST_TRADDR | NVMF_OPT_CTRL_LOSS_TMO,
-+			  NVMF_OPT_HOST_TRADDR | NVMF_OPT_CTRL_LOSS_TMO |
-+			  NVMF_OPT_NR_IO_QUEUES,
- 	.create_ctrl	= nvme_rdma_create_ctrl,
- };
- 
--- 
-2.17.1
+As you cc:ed me, I'll provide some minor review comments:
 
+> +config BLK_DEV_HW_RT_ENCRYPTION
+> +	bool
+> +	depends on SCSI_UFSHCD_RT_ENCRYPTION
+> +	default n
+
+n is always the default, you never need to list that.
+
+> +
+>  source block/Kconfig.iosched
+> diff --git a/drivers/scsi/ufs/Kconfig b/drivers/scsi/ufs/Kconfig
+> index 2ddbb26..09a3ec0 100644
+> --- a/drivers/scsi/ufs/Kconfig
+> +++ b/drivers/scsi/ufs/Kconfig
+> @@ -136,3 +136,15 @@ config SCSI_UFS_BSG
+>  
+>  	  Select this if you need a bsg device node for your UFS controller.
+>  	  If unsure, say N.
+> +
+> +config SCSI_UFSHCD_RT_ENCRYPTION
+> +	bool "Universal Flash Storage Controller RT encryption support"
+> +	depends on SCSI_UFSHCD
+> +	default n
+
+Same here.
+
+> +	select BLK_DEV_HW_RT_ENCRYPTION if SCSI_UFSHCD_RT_ENCRYPTION
+> +	select BLK_DEV_DM if SCSI_UFSHCD_RT_ENCRYPTION
+> +	help
+> +	Universal Flash Storage Controller RT encryption support
+> +
+> +	Select this if you want to enable real time encryption on UFS controller
+> +	If unsure, say N.
+
+Don't you need to indent the help lines?
+
+> +int ufshcd_crypto_init(struct ufs_hba *hba);
+> +void ufshcd_crypto_remove(struct ufs_hba *hba);
+> +void ufshcd_prepare_for_crypto(struct ufs_hba *hba, struct ufshcd_lrb *lrbp);
+> +#endif
+
+You need to provide inline functions for when your config option is not
+enabled here.
+
+That way you don't have to do this mess:
+
+> diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
+> index 86fe114..a96b038 100644
+> --- a/drivers/scsi/ufs/ufshcd.c
+> +++ b/drivers/scsi/ufs/ufshcd.c
+> @@ -47,6 +47,9 @@
+>  #include "unipro.h"
+>  #include "ufs-sysfs.h"
+>  #include "ufs_bsg.h"
+> +#ifdef CONFIG_SCSI_UFSHCD_RT_ENCRYPTION
+> +#include "ufshcd-crypto.h"
+> +#endif
+
+No need for #ifdefs in .c files at all.  Always include the .h file, and
+then since your functions are all inline void functions, the code just
+compiles away into nothing.
+
+
+>  
+>  #define CREATE_TRACE_POINTS
+>  #include <trace/events/ufs.h>
+> @@ -2198,6 +2201,14 @@ static void ufshcd_prepare_req_desc_hdr(struct ufshcd_lrb *lrbp,
+>  
+>  	dword_0 = data_direction | (lrbp->command_type
+>  				<< UPIU_COMMAND_TYPE_OFFSET);
+> +#ifdef CONFIG_SCSI_UFSHCD_RT_ENCRYPTION
+> +	if (lrbp->cci >= 0) {
+> +		dword_0 |= (1 << CRYPTO_UTP_REQ_DESC_DWORD0_CE_SHIFT);
+> +		dword_0 |= ((lrbp->cci << CRYPTO_UTP_REQ_DESC_DWORD0_CCI_SHIFT)
+> +				& CRYPTO_UTP_REQ_DESC_DWORD0_CCI_MASK);
+> +	} else
+> +		dword_0 &= ~CRYPTO_UTP_REQ_DESC_DWORD0_CE_MASK;
+> +#endif
+
+Some comments on what this is trying to do here?
+
+
+>  	if (lrbp->intr_cmd)
+>  		dword_0 |= UTP_REQ_DESC_INT_CMD;
+>  
+> @@ -2462,6 +2473,12 @@ static int ufshcd_queuecommand(struct Scsi_Host *host, struct scsi_cmnd *cmd)
+>  	lrbp->intr_cmd = !ufshcd_is_intr_aggr_allowed(hba) ? true : false;
+>  	lrbp->req_abort_skip = false;
+>  
+> +#ifdef CONFIG_SCSI_UFSHCD_RT_ENCRYPTION
+> +	lrbp->cci = -1;
+
+What does -1 mean?  You should have a type for it if it is something
+"special".
+
+> +	/* prepare block for crypto */
+> +	if (hba->capabilities & MASK_CRYPTO_SUPPORT)
+> +		ufshcd_prepare_for_crypto(hba, lrbp);
+> +#endif
+
+Again, no #ifdefs needed please.
+
+
+>  	ufshcd_comp_scsi_upiu(hba, lrbp);
+>  
+>  	err = ufshcd_map_sg(hba, lrbp);
+> @@ -8119,6 +8136,11 @@ void ufshcd_remove(struct ufs_hba *hba)
+>  	ufs_bsg_remove(hba);
+>  	ufs_sysfs_remove_nodes(hba->dev);
+>  	scsi_remove_host(hba->host);
+> +#ifdef CONFIG_SCSI_UFSHCD_RT_ENCRYPTION
+> +	if (hba->capabilities & MASK_CRYPTO_SUPPORT)
+> +		ufshcd_crypto_remove(hba);
+> +#endif
+
+Same ifdef here, and everywhere else in this file.
+
+> --- a/drivers/scsi/ufs/ufshcd.h
+> +++ b/drivers/scsi/ufs/ufshcd.h
+> @@ -193,6 +193,9 @@ struct ufshcd_lrb {
+>  	ktime_t compl_time_stamp;
+>  
+>  	bool req_abort_skip;
+> +#ifdef CONFIG_SCSI_UFSHCD_RT_ENCRYPTION
+> +	int cci;
+> +#endif
+
+No need for a #ifdef here.  But comment on exactly what "cci" means,
+that seems to not make any sense to me.
+
+>  };
+>  
+>  /**
+> @@ -706,6 +709,9 @@ struct ufs_hba {
+>  
+>  	struct device		bsg_dev;
+>  	struct request_queue	*bsg_queue;
+> +#ifdef CONFIG_SCSI_UFSHCD_RT_ENCRYPTION
+> +	struct ufshcd_crypto_ctx *cctx;
+> +#endif
+
+or here.
+
+>  };
+>  
+>  /* Returns true if clocks can be gated. Otherwise false */
+> diff --git a/drivers/scsi/ufs/ufshci.h b/drivers/scsi/ufs/ufshci.h
+> index 6fa889d..fe5a92d 100644
+> --- a/drivers/scsi/ufs/ufshci.h
+> +++ b/drivers/scsi/ufs/ufshci.h
+> @@ -90,6 +90,7 @@ enum {
+>  	MASK_64_ADDRESSING_SUPPORT		= 0x01000000,
+>  	MASK_OUT_OF_ORDER_DATA_DELIVERY_SUPPORT	= 0x02000000,
+>  	MASK_UIC_DME_TEST_MODE_SUPPORT		= 0x04000000,
+> +	MASK_CRYPTO_SUPPORT                     = 0x10000000,
+
+Why are you all not using the BIT(N) macro for these?
+
+thanks,
+
+greg k-h
