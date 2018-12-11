@@ -2,90 +2,104 @@ Return-Path: <SRS0=ptgV=OU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF5DC67839
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 23:16:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 566EEC6783B
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 23:19:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9522D20870
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 23:16:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9522D20870
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+	by mail.kernel.org (Postfix) with ESMTP id C3AB42084C
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 23:19:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lpV5JZ75"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3AB42084C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726183AbeLKXQR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 11 Dec 2018 18:16:17 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:45743 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726158AbeLKXQR (ORCPT
+        id S1726201AbeLKXTc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 11 Dec 2018 18:19:32 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:46259 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726158AbeLKXTc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 11 Dec 2018 18:16:17 -0500
-Received: by mail-pl1-f196.google.com with SMTP id a14so7630657plm.12;
-        Tue, 11 Dec 2018 15:16:17 -0800 (PST)
+        Tue, 11 Dec 2018 18:19:32 -0500
+Received: by mail-pl1-f193.google.com with SMTP id t13so7620627ply.13
+        for <linux-block@vger.kernel.org>; Tue, 11 Dec 2018 15:19:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=GP7ZqagonEWPWHRcHBE/il5Ha+dVE6uvxO7MQumM4Z8=;
+        b=lpV5JZ750K36SBb1sDh5+U3sXcUtyKL3uUTdPzmmHJ144J6aC81fShziaOJvGCRpGp
+         PUDWhDd2P0+avxazGGmjB/kL0IrM1ffAhoILTXUJcV62gjuPAGu3IrxaS7ze/P6Qgsmh
+         JGUY06RIDP8Yb2IpS6xhCTwduXfBQjd3tP3kOD1SgJ/I8s0HT3QPbg3TkLLH6TDBqsOj
+         EHieV4aj+TntEPHGcRgT3i3ARvg0OPYeIHk63AsOA8/huGvzbFti/sRd6Cz9lwiHWh1h
+         iMw6yuAM4dx0enHJZh0GTYgBfNUhW+24aVr4YdHqT69T9jE8eQunFykgwrqe5uARch6X
+         8AMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=3qx8ck+bCS8xNMB6L1Jbv2bXMQ9MinmQyXaEbJcK2iw=;
-        b=jOtov/HBtnSEyUhn6Gqt5wpcCtcYX9dYJI+/p12rY9ZQ+bP4Jek2tBM+4pBEld7Jx7
-         n31qRpbDwc4bLgFBCCxPXsEcr68g/jbBoXPnwehQqjphR3xmnmQs6/NS2ggKRt8xC+51
-         xZeU4xVBCOt1PSoCkeOl0QmLOldMhIsOmQndBLG55IBxZKcOVyKdQ6W653yKv4/0G0b5
-         S4DGP+pDd15E4oeW1ABkvkN0mO5G10E9EpGEqR4bbvB/mBW87KUTV1lhN3O2XojuX3cj
-         JGgG/kaeWL8RHOFicybcUWtzo/gyqrT+NuBsBjZSnZf/9dp1Azba/9y7kRfp7JktrVki
-         kPYg==
-X-Gm-Message-State: AA+aEWZjw9OhprptpPM8nyHYtjUK9JpPo5w6w5u6J+lceOuw0zH0qQ9Z
-        qjUXcVpnZOk6tAbtxMXA3GM=
-X-Google-Smtp-Source: AFSGD/UwbskVYXrCOf5iQqkHK7NmRsG2Lr1bLYta0QAuFoc/SxyT1lEuUNZXR28XzlbS0zuORl8BBw==
-X-Received: by 2002:a17:902:3124:: with SMTP id w33mr17897851plb.241.1544570175563;
-        Tue, 11 Dec 2018 15:16:15 -0800 (PST)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id 12sm15469587pgd.35.2018.12.11.15.16.14
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 11 Dec 2018 15:16:14 -0800 (PST)
-Message-ID: <1544570173.185366.397.camel@acm.org>
-Subject: Re: [PATCH] blkcg: handle dying request_queue when associating a
- blkg
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Dennis Zhou <dennis@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Tejun Heo <tj@kernel.org>, Josef Bacik <josef@toxicpanda.com>
-Cc:     kernel-team@fb.com, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-Date:   Tue, 11 Dec 2018 15:16:13 -0800
-In-Reply-To: <20181211230308.66276-1-dennis@kernel.org>
-References: <20181211230308.66276-1-dennis@kernel.org>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=GP7ZqagonEWPWHRcHBE/il5Ha+dVE6uvxO7MQumM4Z8=;
+        b=C6PnKDQAdwIP8/DqGrhTb+z+Pfi36uMZnNcbbHXPFdApcBx3gyUJwtAiI0JmPVOQGY
+         Cu54E5gUpAZeQWMR7dnqd7yodo41opBiviOIQHjzBtgQ/0ORbyECjFlu65jwLe5jidfa
+         HiIIqXd1Cn6uTIKlQ6NZjM3A6Z7oSJvsUPZ2iksRRWS3GfAyCOOhxx0CV+8j369IazYi
+         5N79PT847Z9SlMaqCOoSvVfhVaweIpMW+zQmVwMRuU6YegYOGLaVIH4ciNxyPNCY+9BB
+         8+LaLnXeeDuStcbpxFGFCsPui+t4/1izy8yQ0EjuC09QwhHPjDeEBik1gtLGdxcPRVz2
+         AKmw==
+X-Gm-Message-State: AA+aEWYdUnrfyvWv8vtw64/k1K2naV+tG/hu0XuT1u2mOsFciBfP2IVp
+        3uv2c+wi7G0/N926ZU64DIgp1vZKGP2Hww==
+X-Google-Smtp-Source: AFSGD/V0daLfC9mefaJaEFytfz8wCwwENcBwv+Ze3x/snsRvFyRC1QhnSaNljaySQ2HbW9BoSQFtCQ==
+X-Received: by 2002:a17:902:b60a:: with SMTP id b10mr16604064pls.303.1544570371268;
+        Tue, 11 Dec 2018 15:19:31 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id a18sm20532446pgj.30.2018.12.11.15.19.29
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 11 Dec 2018 15:19:30 -0800 (PST)
+Subject: Re: [PATCH] block: Fix null_blk_zoned creation failure with small
+ number of zones
+To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     Matias Bjorling <Matias.Bjorling@wdc.com>
+References: <20181211120826.28852-1-shinichiro.kawasaki@wdc.com>
+ <35b326a9-e428-7195-06ea-fc6c5d201ef1@kernel.dk>
+ <BYAPR04MB58169F997AEC920DE8E3D022E7A60@BYAPR04MB5816.namprd04.prod.outlook.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <511098e4-47fb-cd00-51f7-9892077a5485@kernel.dk>
+Date:   Tue, 11 Dec 2018 16:19:27 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+MIME-Version: 1.0
+In-Reply-To: <BYAPR04MB58169F997AEC920DE8E3D022E7A60@BYAPR04MB5816.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2018-12-11 at 18:03 -0500, Dennis Zhou wrote:
-+AD4 diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-+AD4 index 6bd0619a7d6e..c30661ddc873 100644
-+AD4 --- a/block/blk-cgroup.c
-+AD4 +-+-+- b/block/blk-cgroup.c
-+AD4 +AEAAQA -202,6 +-202,12 +AEAAQA static struct blkcg+AF8-gq +ACo-blkg+AF8-create(struct blkcg +ACo-blkcg,
-+AD4  	WARN+AF8-ON+AF8-ONCE(+ACE-rcu+AF8-read+AF8-lock+AF8-held())+ADs
-+AD4  	lockdep+AF8-assert+AF8-held(+ACY-q-+AD4-queue+AF8-lock)+ADs
-+AD4  
-+AD4 +-	/+ACo request+AF8-queue is dying, do not create/recreate a blkg +ACo-/
-+AD4 +-	if (blk+AF8-queue+AF8-dying(q)) +AHs
-+AD4 +-		ret +AD0 -ENODEV+ADs
-+AD4 +-		goto err+AF8-free+AF8-blkg+ADs
-+AD4 +-	+AH0
-+AD4 +-
-+AD4  	/+ACo blkg holds a reference to blkcg +ACo-/
-+AD4  	if (+ACE-css+AF8-tryget+AF8-online(+ACY-blkcg-+AD4-css)) +AHs
-+AD4  		ret +AD0 -ENODEV+ADs
+On 12/11/18 3:55 PM, Damien Le Moal wrote:
+> On 2018/12/11 22:44, Jens Axboe wrote:
+>> On 12/11/18 5:08 AM, Shin'ichiro Kawasaki wrote:
+>>> null_blk_zoned creation fails if the number of zones specified is equal to or is
+>>> smaller than 64 due to a memory allocation failure in blk_alloc_zones(). With
+>>> such a small number of zones, the required memory size for all zones descriptors
+>>> fits in a single page, and the page order for alloc_pages_node() is zero. Allow
+>>> this value in blk_alloc_zones() for the allocation to succeed.
+>>
+>> Looks good to me, this looks like 4.20 material.
+> 
+> Yes, this is a fix for commit bf5054569653 "block: Introduce
+> blk_revalidate_disk_zones()" that was included in 4.20 merge window.
 
-What prevents that the queue state changes after blk+AF8-queue+AF8-dying() has returned
-and before blkg+AF8-create() returns? Are you sure you don't need to protect this
-code with a blk+AF8-queue+AF8-enter() / blk+AF8-queue+AF8-exit() pair?
+If only the patch already had a Fixes tag!
 
-Bart.
+Queued up for 4.20.
+
+-- 
+Jens Axboe
+
