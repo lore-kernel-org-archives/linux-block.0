@@ -6,22 +6,22 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FC69C6783B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4698EC6783C
 	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 23:35:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BDEE52086D
-	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 23:35:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0AB0620851
+	for <linux-block@archiver.kernel.org>; Tue, 11 Dec 2018 23:35:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Bw/Nt92N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDEE52086D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nw0lPOSY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AB0620851
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726225AbeLKXfa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726229AbeLKXfa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 11 Dec 2018 18:35:30 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:56584 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:56578 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726209AbeLKXf3 (ORCPT
+        with ESMTP id S1726219AbeLKXf3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 11 Dec 2018 18:35:29 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -30,22 +30,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=zdZRGxe6+K9R1S+q8YhU7Mhn7jmgSU5GwE3WESFPoWc=; b=Bw/Nt92NrWIZS9bBVc8HYirhL
-        VzyelQWf9yr43K0e3sa7wtzsLgTOjWs87cn8NxclMpEJacKX/7ZeKZOJlVTY6KXiY9onLajwgt3yV
-        W9mikNFyZisPoZAtTbmPzjTdlz4UlUtLz6DgtDhFyrtsUM6E5dT1ptxxg0o3EzW3Pqu0PEifFTJoM
-        0JMhnMiEPvf05pigi1N2M01jZi0SBjKDQVycLmf9d+uwV+bY4sGNP7Slk5kpR9IPD2HSbi5j7th01
-        Gwq7fstkmeUsC3cb9nB/Nb5Qg4CBkIxhn1uLKvZJ2aYJbQt+O+L/c/HBOayxjOibkJ4JdzdVtS1fH
-        GiYaHWRWA==;
+         bh=qOJo1FY0ts4w5VWtvpXt1ZEWHNVVYuKP5ntb1O2VaYM=; b=nw0lPOSYc58rq7Chfn/GjpMBn
+        S8+il1f/QSJ6KQQAFLknqu3R9eXNLutv8k+lnePSMRSKsfnwl5ywuUE8eSVmOj4ahOqd8zaoxy+F6
+        t8SvJdLZaDHghsvhdbpnytWIuF8Q4G8WqlSls9oYbFVVxK2/JK3KXz7fo9UF+pZ8GZpqFptOu822G
+        9Gkt95H6P28Z0px8QYINA/fovj70a3YdNpyozpFj3Gjyjtr49TXzlFmf3xmUDEW8nXkUMOoxGv/BO
+        ATS7Wn+Zi7/sOjtgrgRjU2DM86Z5/eX9bBBbBbU1h80tpOaPheK7ZXp2LRjp/0hba7FOuACR57BM4
+        lUtF9E7/w==;
 Received: from [2600:1700:65a0:78e0:514:7862:1503:8e4d] (helo=sagi-Latitude-E7470.lbits)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gWrYh-0002L4-VA; Tue, 11 Dec 2018 23:35:24 +0000
+        id 1gWrYh-0002L4-3U; Tue, 11 Dec 2018 23:35:23 +0000
 From:   Sagi Grimberg <sagi@grimberg.me>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Keith Busch <keith.busch@intel.com>
-Subject: [PATCH v2 5/5] nvme-rdma: support separate queue maps for read and write
-Date:   Tue, 11 Dec 2018 15:35:18 -0800
-Message-Id: <20181211233519.9350-6-sagi@grimberg.me>
+Subject: [PATCH v2 1/5] blk-mq-rdma: pass in queue map to blk_mq_rdma_map_queues
+Date:   Tue, 11 Dec 2018 15:35:14 -0800
+Message-Id: <20181211233519.9350-2-sagi@grimberg.me>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181211233519.9350-1-sagi@grimberg.me>
 References: <20181211233519.9350-1-sagi@grimberg.me>
@@ -54,85 +54,75 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Allow NVMF_OPT_NR_WRITE_QUEUES and allocate nvme queues for
-write additionally. In addition, implement .map_queues that
-will apply 2 queue maps for read and write queue sets.
+will be used by nvme-rdma for queue map separation support.
 
-Note that with the separate queue map, HCTX_TYPE_READ will always
-use nr_io_queues and HCTX_TYPE_DEFAULT will use nr_write_queues.
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/nvme/host/rdma.c | 28 +++++++++++++++++++++++++---
- 1 file changed, 25 insertions(+), 3 deletions(-)
+ block/blk-mq-rdma.c         | 8 ++++----
+ drivers/nvme/host/rdma.c    | 2 +-
+ include/linux/blk-mq-rdma.h | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index 5057d5ab5aaa..6a7c546b4e74 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -645,6 +645,8 @@ static int nvme_rdma_alloc_io_queues(struct nvme_rdma_ctrl *ctrl)
- 	nr_io_queues = min_t(unsigned int, nr_io_queues,
- 				ibdev->num_comp_vectors);
+diff --git a/block/blk-mq-rdma.c b/block/blk-mq-rdma.c
+index a71576aff3a5..45030a81a1ed 100644
+--- a/block/blk-mq-rdma.c
++++ b/block/blk-mq-rdma.c
+@@ -29,24 +29,24 @@
+  * @set->nr_hw_queues, or @dev does not provide an affinity mask for a
+  * vector, we fallback to the naive mapping.
+  */
+-int blk_mq_rdma_map_queues(struct blk_mq_tag_set *set,
++int blk_mq_rdma_map_queues(struct blk_mq_queue_map *map,
+ 		struct ib_device *dev, int first_vec)
+ {
+ 	const struct cpumask *mask;
+ 	unsigned int queue, cpu;
  
-+	nr_io_queues += min(opts->nr_write_queues, num_online_cpus());
-+
- 	ret = nvme_set_queue_count(&ctrl->ctrl, &nr_io_queues);
- 	if (ret)
- 		return ret;
-@@ -714,6 +716,7 @@ static struct blk_mq_tag_set *nvme_rdma_alloc_tagset(struct nvme_ctrl *nctrl,
- 		set->driver_data = ctrl;
- 		set->nr_hw_queues = nctrl->queue_count - 1;
- 		set->timeout = NVME_IO_TIMEOUT;
-+		set->nr_maps = 2 /* default + read */;
+-	for (queue = 0; queue < set->nr_hw_queues; queue++) {
++	for (queue = 0; queue < map->nr_queues; queue++) {
+ 		mask = ib_get_vector_affinity(dev, first_vec + queue);
+ 		if (!mask)
+ 			goto fallback;
+ 
+ 		for_each_cpu(cpu, mask)
+-			set->map[0].mq_map[cpu] = queue;
++			map->mq_map[cpu] = map->queue_offset + queue;
  	}
  
- 	ret = blk_mq_alloc_tag_set(set);
-@@ -1751,7 +1754,25 @@ static int nvme_rdma_map_queues(struct blk_mq_tag_set *set)
+ 	return 0;
+ 
+ fallback:
+-	return blk_mq_map_queues(&set->map[0]);
++	return blk_mq_map_queues(map);
+ }
+ EXPORT_SYMBOL_GPL(blk_mq_rdma_map_queues);
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index f2db848f6985..5057d5ab5aaa 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -1751,7 +1751,7 @@ static int nvme_rdma_map_queues(struct blk_mq_tag_set *set)
  {
  	struct nvme_rdma_ctrl *ctrl = set->driver_data;
  
--	return blk_mq_rdma_map_queues(&set->map[0], ctrl->device->dev, 0);
-+	set->map[HCTX_TYPE_DEFAULT].queue_offset = 0;
-+	set->map[HCTX_TYPE_READ].nr_queues = ctrl->ctrl.opts->nr_io_queues;
-+	if (ctrl->ctrl.opts->nr_write_queues) {
-+		/* separate read/write queues */
-+		set->map[HCTX_TYPE_DEFAULT].nr_queues =
-+				ctrl->ctrl.opts->nr_write_queues;
-+		set->map[HCTX_TYPE_READ].queue_offset =
-+				ctrl->ctrl.opts->nr_write_queues;
-+	} else {
-+		/* mixed read/write queues */
-+		set->map[HCTX_TYPE_DEFAULT].nr_queues =
-+				ctrl->ctrl.opts->nr_io_queues;
-+		set->map[HCTX_TYPE_READ].queue_offset = 0;
-+	}
-+	blk_mq_rdma_map_queues(&set->map[HCTX_TYPE_DEFAULT],
-+			ctrl->device->dev, 0);
-+	blk_mq_rdma_map_queues(&set->map[HCTX_TYPE_READ],
-+			ctrl->device->dev, 0);
-+	return 0;
+-	return blk_mq_rdma_map_queues(set, ctrl->device->dev, 0);
++	return blk_mq_rdma_map_queues(&set->map[0], ctrl->device->dev, 0);
  }
  
  static const struct blk_mq_ops nvme_rdma_mq_ops = {
-@@ -1906,7 +1927,7 @@ static struct nvme_ctrl *nvme_rdma_create_ctrl(struct device *dev,
- 	INIT_WORK(&ctrl->err_work, nvme_rdma_error_recovery_work);
- 	INIT_WORK(&ctrl->ctrl.reset_work, nvme_rdma_reset_ctrl_work);
+diff --git a/include/linux/blk-mq-rdma.h b/include/linux/blk-mq-rdma.h
+index b4ade198007d..7b6ecf9ac4c3 100644
+--- a/include/linux/blk-mq-rdma.h
++++ b/include/linux/blk-mq-rdma.h
+@@ -4,7 +4,7 @@
+ struct blk_mq_tag_set;
+ struct ib_device;
  
--	ctrl->ctrl.queue_count = opts->nr_io_queues + 1; /* +1 for admin queue */
-+	ctrl->ctrl.queue_count = opts->nr_io_queues + opts->nr_write_queues + 1;
- 	ctrl->ctrl.sqsize = opts->queue_size - 1;
- 	ctrl->ctrl.kato = opts->kato;
+-int blk_mq_rdma_map_queues(struct blk_mq_tag_set *set,
++int blk_mq_rdma_map_queues(struct blk_mq_queue_map *map,
+ 		struct ib_device *dev, int first_vec);
  
-@@ -1957,7 +1978,8 @@ static struct nvmf_transport_ops nvme_rdma_transport = {
- 	.module		= THIS_MODULE,
- 	.required_opts	= NVMF_OPT_TRADDR,
- 	.allowed_opts	= NVMF_OPT_TRSVCID | NVMF_OPT_RECONNECT_DELAY |
--			  NVMF_OPT_HOST_TRADDR | NVMF_OPT_CTRL_LOSS_TMO,
-+			  NVMF_OPT_HOST_TRADDR | NVMF_OPT_CTRL_LOSS_TMO |
-+			  NVMF_OPT_NR_IO_QUEUES,
- 	.create_ctrl	= nvme_rdma_create_ctrl,
- };
- 
+ #endif /* _LINUX_BLK_MQ_RDMA_H */
 -- 
 2.17.1
 
