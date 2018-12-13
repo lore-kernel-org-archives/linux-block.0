@@ -3,35 +3,34 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A89C8C65BAE
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52366C67839
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:55:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6ACF52086D
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:55:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ACF52086D
+	by mail.kernel.org (Postfix) with ESMTP id 231B02086D
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:55:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 231B02086D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728709AbeLMOze (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Dec 2018 09:55:34 -0500
-Received: from mx2.suse.de ([195.135.220.15]:51510 "EHLO mx1.suse.de"
+        id S1728885AbeLMOzl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Dec 2018 09:55:41 -0500
+Received: from mx2.suse.de ([195.135.220.15]:51572 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728612AbeLMOze (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Dec 2018 09:55:34 -0500
+        id S1728612AbeLMOzl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Dec 2018 09:55:41 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id ED825AD5C;
-        Thu, 13 Dec 2018 14:55:32 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 9EB6DAD5C;
+        Thu, 13 Dec 2018 14:55:39 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, Shenghui Wang <shhuiw@foxmail.com>,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH 06/12] bcache: cannot set writeback_running via sysfs if no writeback kthread created
-Date:   Thu, 13 Dec 2018 22:53:51 +0800
-Message-Id: <20181213145357.38528-7-colyli@suse.de>
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
+Subject: [PATCH 07/12] bcache: introduce force_wake_up_gc()
+Date:   Thu, 13 Dec 2018 22:53:52 +0800
+Message-Id: <20181213145357.38528-8-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20181213145357.38528-1-colyli@suse.de>
 References: <20181213145357.38528-1-colyli@suse.de>
@@ -40,57 +39,80 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Shenghui Wang <shhuiw@foxmail.com>
+Garbage collection thread starts to work when c->sectors_to_gc is
+negative value, otherwise nothing will happen even the gc thread
+is woken up by wake_up_gc().
 
-"echo 1 > writeback_running" marks writeback_running even if no writeback
-kthread created as "d_strtoul(writeback_running)" will simply set dc->
-writeback_running without checking the existence of dc->writeback_thread.
+force_wake_up_gc() sets c->sectors_to_gc to -1 before calling
+wake_up_gc(), then gc thread may have chance to run if no one else
+sets c->sectors_to_gc to a positive value before gc_should_run().
 
-Add check for setting writeback_running via sysfs: if no writeback kthread
-available, reject setting to 1.
+This routine can be called where the gc thread is woken up and
+required to run in force.
 
-v2 -> v3:
-  * Make message on wrong assignment more clear.
-  * Print name of bcache device instead of name of backing device.
-
-Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/sysfs.c | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
+ drivers/md/bcache/btree.h | 18 ++++++++++++++++++
+ drivers/md/bcache/sysfs.c | 17 ++---------------
+ 2 files changed, 20 insertions(+), 15 deletions(-)
 
+diff --git a/drivers/md/bcache/btree.h b/drivers/md/bcache/btree.h
+index a68d6c55783b..d1c72ef64edf 100644
+--- a/drivers/md/bcache/btree.h
++++ b/drivers/md/bcache/btree.h
+@@ -266,6 +266,24 @@ static inline void wake_up_gc(struct cache_set *c)
+ 	wake_up(&c->gc_wait);
+ }
+ 
++static inline void force_wake_up_gc(struct cache_set *c)
++{
++	/*
++	 * Garbage collection thread only works when sectors_to_gc < 0,
++	 * calling wake_up_gc() won't start gc thread if sectors_to_gc is
++	 * not a nagetive value.
++	 * Therefore sectors_to_gc is set to -1 here, before waking up
++	 * gc thread by calling wake_up_gc(). Then gc_should_run() will
++	 * give a chance to permit gc thread to run. "Give a chance" means
++	 * before going into gc_should_run(), there is still possibility
++	 * that c->sectors_to_gc being set to other positive value. So
++	 * this routine won't 100% make sure gc thread will be woken up
++	 * to run.
++	 */
++	atomic_set(&c->sectors_to_gc, -1);
++	wake_up_gc(c);
++}
++
+ #define MAP_DONE	0
+ #define MAP_CONTINUE	1
+ 
 diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index d2e5c9892d4d..9d5fe12f0c9c 100644
+index 9d5fe12f0c9c..c09748497cdc 100644
 --- a/drivers/md/bcache/sysfs.c
 +++ b/drivers/md/bcache/sysfs.c
-@@ -384,8 +384,25 @@ STORE(bch_cached_dev)
- 	mutex_lock(&bch_register_lock);
- 	size = __cached_dev_store(kobj, attr, buf, size);
+@@ -742,21 +742,8 @@ STORE(__bch_cache_set)
+ 		bch_cache_accounting_clear(&c->accounting);
+ 	}
  
--	if (attr == &sysfs_writeback_running)
--		bch_writeback_queue(dc);
-+	if (attr == &sysfs_writeback_running) {
-+		/* dc->writeback_running changed in __cached_dev_store() */
-+		if (IS_ERR_OR_NULL(dc->writeback_thread)) {
-+			/*
-+			 * reject setting it to 1 via sysfs if writeback
-+			 * kthread is not created yet.
-+			 */
-+			if (dc->writeback_running) {
-+				dc->writeback_running = false;
-+				pr_err("%s: failed to run non-existent writeback thread",
-+						dc->disk.disk->disk_name);
-+			}
-+		} else
-+			/*
-+			 * writeback kthread will check if dc->writeback_running
-+			 * is true or false.
-+			 */
-+			bch_writeback_queue(dc);
-+	}
+-	if (attr == &sysfs_trigger_gc) {
+-		/*
+-		 * Garbage collection thread only works when sectors_to_gc < 0,
+-		 * when users write to sysfs entry trigger_gc, most of time
+-		 * they want to forcibly triger gargage collection. Here -1 is
+-		 * set to c->sectors_to_gc, to make gc_should_run() give a
+-		 * chance to permit gc thread to run. "give a chance" means
+-		 * before going into gc_should_run(), there is still chance
+-		 * that c->sectors_to_gc being set to other positive value. So
+-		 * writing sysfs entry trigger_gc won't always make sure gc
+-		 * thread takes effect.
+-		 */
+-		atomic_set(&c->sectors_to_gc, -1);
+-		wake_up_gc(c);
+-	}
++	if (attr == &sysfs_trigger_gc)
++		force_wake_up_gc(c);
  
- 	if (attr == &sysfs_writeback_percent)
- 		if (!test_and_set_bit(BCACHE_DEV_WB_RUNNING, &dc->disk.flags))
+ 	if (attr == &sysfs_prune_cache) {
+ 		struct shrink_control sc;
 -- 
 2.16.4
 
