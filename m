@@ -2,217 +2,180 @@ Return-Path: <SRS0=8pZC=OW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,T_MIXED_ES,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF1AC67872
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 15:17:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E001FC65BAE
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 15:19:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 55D8920851
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 15:17:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="rN6xSN4P"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55D8920851
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+	by mail.kernel.org (Postfix) with ESMTP id 9F57820851
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 15:19:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F57820851
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=opengridcomputing.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728928AbeLMPRp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Dec 2018 10:17:45 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:60890 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728696AbeLMPRp (ORCPT
+        id S1728812AbeLMPTm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Dec 2018 10:19:42 -0500
+Received: from opengridcomputing.com ([72.48.214.68]:47178 "EHLO
+        smtp.opengridcomputing.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728288AbeLMPTm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Dec 2018 10:17:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
-        :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=R7+fawFSU4v+aCLiExMlpkvFQ+mrsTNYgpc3aADv0xQ=; b=rN6xSN4PcvvP2hYYEiM2gmWJME
-        DQwwarTOV39rUK/5PzbBJXQjNEEO5tOB4ZOo44NrHCKg5A9MUh0oaCqFqPAWkhNeFqyyuRHtQM8Gv
-        8lD5WLD0ymzD7iivXjN9sTKxdopo/GUDqbpZcs6uNHzulPsRUT1dZz9Y5QCWRnrE6rC3wNvDqer53
-        COwV87L5LK9N52RTL4x+zIE7YxA0g0Kg2qkWEZE4ich+3n+l6weXXAAczIH2e5t258bNJ2NWb2rol
-        fIpGBRgMlXlumuAmRJEzybXfNArQ6nOfQ7OYbiMxcWQFWVf6G6bXSR0G5aHXGasI/xb7BveCA0LeR
-        f8iR63rA==;
-Received: from 089144198147.atnat0007.highway.a1.net ([89.144.198.147] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gXSk9-0001Wr-8H; Thu, 13 Dec 2018 15:17:41 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Juergen Gross <jgross@suse.com>, linux-scsi@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH 10/10] block: remove the cluster flag
-Date:   Thu, 13 Dec 2018 16:17:10 +0100
-Message-Id: <20181213151710.30036-11-hch@lst.de>
-X-Mailer: git-send-email 2.19.2
-In-Reply-To: <20181213151710.30036-1-hch@lst.de>
-References: <20181213151710.30036-1-hch@lst.de>
+        Thu, 13 Dec 2018 10:19:42 -0500
+Received: from [10.10.0.239] (cody.ogc.int [10.10.0.239])
+        by smtp.opengridcomputing.com (Postfix) with ESMTPSA id 8731A2267C;
+        Thu, 13 Dec 2018 09:19:41 -0600 (CST)
+Subject: Re: [PATCH v2 2/6] nvme-core: allow __nvme_submit_sync_cmd to poll
+To:     Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
+Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>,
+        Jens Axboe <axboe@kernel.dk>
+References: <20181213063819.13614-1-sagi@grimberg.me>
+ <20181213063819.13614-3-sagi@grimberg.me>
+From:   Steve Wise <swise@opengridcomputing.com>
+Message-ID: <cfb3f950-b0ce-62f7-7888-a511592fa693@opengridcomputing.com>
+Date:   Thu, 13 Dec 2018 09:19:46 -0600
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.3
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20181213063819.13614-3-sagi@grimberg.me>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that the the SCSI layer replaced the use of the cluster flag with
-segment size limits and the DMA boundary we can remove the cluster
-flag from the block layer.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-merge.c      | 18 +++++++-----------
- block/blk-settings.c   |  3 ---
- block/blk-sysfs.c      |  5 +----
- include/linux/blkdev.h |  6 ------
- 4 files changed, 8 insertions(+), 24 deletions(-)
+On 12/13/2018 12:38 AM, Sagi Grimberg wrote:
+> Pass poll bool to indicate that we need it to poll. This prepares us for
+> polling support in nvmf since connect is an I/O that will be queued
+> and has to be polled in order to complete.
+>
+> Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
+> ---
+>  drivers/nvme/host/core.c    | 13 ++++++++-----
+>  drivers/nvme/host/fabrics.c | 10 +++++-----
+>  drivers/nvme/host/nvme.h    |  2 +-
+>  3 files changed, 14 insertions(+), 11 deletions(-)
+>
+> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+> index f90576862736..eb1c10b0eaf0 100644
+> --- a/drivers/nvme/host/core.c
+> +++ b/drivers/nvme/host/core.c
+> @@ -713,7 +713,7 @@ EXPORT_SYMBOL_GPL(nvme_setup_cmd);
+>  int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+>  		union nvme_result *result, void *buffer, unsigned bufflen,
+>  		unsigned timeout, int qid, int at_head,
+> -		blk_mq_req_flags_t flags)
+> +		blk_mq_req_flags_t flags, bool poll)
+>  {
+>  	struct request *req;
+>  	int ret;
+> @@ -730,7 +730,10 @@ int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+>  			goto out;
+>  	}
+>  
+> -	blk_execute_rq(req->q, NULL, req, at_head);
+> +	if (poll)
+> +		blk_execute_rq_polled(req->q, NULL, req, at_head);
+> +	else
+> +		blk_execute_rq(req->q, NULL, req, at_head);
+>  	if (result)
+>  		*result = nvme_req(req)->result;
+>  	if (nvme_req(req)->flags & NVME_REQ_CANCELLED)
+> @@ -747,7 +750,7 @@ int nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+>  		void *buffer, unsigned bufflen)
+>  {
+>  	return __nvme_submit_sync_cmd(q, cmd, NULL, buffer, bufflen, 0,
+> -			NVME_QID_ANY, 0, 0);
+> +			NVME_QID_ANY, 0, 0, false);
+>  }
+>  EXPORT_SYMBOL_GPL(nvme_submit_sync_cmd);
+>  
+> @@ -1058,7 +1061,7 @@ static int nvme_set_features(struct nvme_ctrl *dev, unsigned fid, unsigned dword
+>  	c.features.dword11 = cpu_to_le32(dword11);
+>  
+>  	ret = __nvme_submit_sync_cmd(dev->admin_q, &c, &res,
+> -			buffer, buflen, 0, NVME_QID_ANY, 0, 0);
+> +			buffer, buflen, 0, NVME_QID_ANY, 0, 0, false);
+>  	if (ret >= 0 && result)
+>  		*result = le32_to_cpu(res.u32);
+>  	return ret;
+> @@ -1703,7 +1706,7 @@ int nvme_sec_submit(void *data, u16 spsp, u8 secp, void *buffer, size_t len,
+>  	cmd.common.cdw10[1] = cpu_to_le32(len);
+>  
+>  	return __nvme_submit_sync_cmd(ctrl->admin_q, &cmd, NULL, buffer, len,
+> -				      ADMIN_TIMEOUT, NVME_QID_ANY, 1, 0);
+> +				      ADMIN_TIMEOUT, NVME_QID_ANY, 1, 0, false);
+>  }
+>  EXPORT_SYMBOL_GPL(nvme_sec_submit);
+>  #endif /* CONFIG_BLK_SED_OPAL */
+> diff --git a/drivers/nvme/host/fabrics.c b/drivers/nvme/host/fabrics.c
+> index 19ff0eae4582..d93a169f6403 100644
+> --- a/drivers/nvme/host/fabrics.c
+> +++ b/drivers/nvme/host/fabrics.c
+> @@ -159,7 +159,7 @@ int nvmf_reg_read32(struct nvme_ctrl *ctrl, u32 off, u32 *val)
+>  	cmd.prop_get.offset = cpu_to_le32(off);
+>  
+>  	ret = __nvme_submit_sync_cmd(ctrl->admin_q, &cmd, &res, NULL, 0, 0,
+> -			NVME_QID_ANY, 0, 0);
+> +			NVME_QID_ANY, 0, 0, false);
+>  
+>  	if (ret >= 0)
+>  		*val = le64_to_cpu(res.u64);
+> @@ -206,7 +206,7 @@ int nvmf_reg_read64(struct nvme_ctrl *ctrl, u32 off, u64 *val)
+>  	cmd.prop_get.offset = cpu_to_le32(off);
+>  
+>  	ret = __nvme_submit_sync_cmd(ctrl->admin_q, &cmd, &res, NULL, 0, 0,
+> -			NVME_QID_ANY, 0, 0);
+> +			NVME_QID_ANY, 0, 0, false);
+>  
+>  	if (ret >= 0)
+>  		*val = le64_to_cpu(res.u64);
+> @@ -252,7 +252,7 @@ int nvmf_reg_write32(struct nvme_ctrl *ctrl, u32 off, u32 val)
+>  	cmd.prop_set.value = cpu_to_le64(val);
+>  
+>  	ret = __nvme_submit_sync_cmd(ctrl->admin_q, &cmd, NULL, NULL, 0, 0,
+> -			NVME_QID_ANY, 0, 0);
+> +			NVME_QID_ANY, 0, 0, false);
+>  	if (unlikely(ret))
+>  		dev_err(ctrl->device,
+>  			"Property Set error: %d, offset %#x\n",
+> @@ -406,7 +406,7 @@ int nvmf_connect_admin_queue(struct nvme_ctrl *ctrl)
+>  
+>  	ret = __nvme_submit_sync_cmd(ctrl->admin_q, &cmd, &res,
+>  			data, sizeof(*data), 0, NVME_QID_ANY, 1,
+> -			BLK_MQ_REQ_RESERVED | BLK_MQ_REQ_NOWAIT);
+> +			BLK_MQ_REQ_RESERVED | BLK_MQ_REQ_NOWAIT, false);
+>  	if (ret) {
+>  		nvmf_log_connect_error(ctrl, ret, le32_to_cpu(res.u32),
+>  				       &cmd, data);
+> @@ -468,7 +468,7 @@ int nvmf_connect_io_queue(struct nvme_ctrl *ctrl, u16 qid)
+>  
+>  	ret = __nvme_submit_sync_cmd(ctrl->connect_q, &cmd, &res,
+>  			data, sizeof(*data), 0, qid, 1,
+> -			BLK_MQ_REQ_RESERVED | BLK_MQ_REQ_NOWAIT);
+> +			BLK_MQ_REQ_RESERVED | BLK_MQ_REQ_NOWAIT, false);
+>  	if (ret) {
+>  		nvmf_log_connect_error(ctrl, ret, le32_to_cpu(res.u32),
+>  				       &cmd, data);
+> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+> index 8e0ec365ce8d..75ed640a5ef0 100644
+> --- a/drivers/nvme/host/nvme.h
+> +++ b/drivers/nvme/host/nvme.h
+> @@ -444,7 +444,7 @@ int nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+>  int __nvme_submit_sync_cmd(struct request_queue *q, struct nvme_command *cmd,
+>  		union nvme_result *result, void *buffer, unsigned bufflen,
+>  		unsigned timeout, int qid, int at_head,
+> -		blk_mq_req_flags_t flags);
+> +		blk_mq_req_flags_t flags, bool flag);
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 6b5ad275ed56..4478d53cc6ee 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -194,7 +194,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 			goto split;
- 		}
- 
--		if (bvprvp && blk_queue_cluster(q)) {
-+		if (bvprvp) {
- 			if (seg_size + bv.bv_len > queue_max_segment_size(q))
- 				goto new_segment;
- 			if (!biovec_phys_mergeable(q, bvprvp, &bv))
-@@ -294,7 +294,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 					     bool no_sg_merge)
- {
- 	struct bio_vec bv, bvprv = { NULL };
--	int cluster, prev = 0;
-+	int prev = 0;
- 	unsigned int seg_size, nr_phys_segs;
- 	struct bio *fbio, *bbio;
- 	struct bvec_iter iter;
-@@ -312,7 +312,6 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 	}
- 
- 	fbio = bio;
--	cluster = blk_queue_cluster(q);
- 	seg_size = 0;
- 	nr_phys_segs = 0;
- 	for_each_bio(bio) {
-@@ -324,7 +323,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 			if (no_sg_merge)
- 				goto new_segment;
- 
--			if (prev && cluster) {
-+			if (prev) {
- 				if (seg_size + bv.bv_len
- 				    > queue_max_segment_size(q))
- 					goto new_segment;
-@@ -395,9 +394,6 @@ static int blk_phys_contig_segment(struct request_queue *q, struct bio *bio,
- {
- 	struct bio_vec end_bv = { NULL }, nxt_bv;
- 
--	if (!blk_queue_cluster(q))
--		return 0;
--
- 	if (bio->bi_seg_back_size + nxt->bi_seg_front_size >
- 	    queue_max_segment_size(q))
- 		return 0;
-@@ -414,12 +410,12 @@ static int blk_phys_contig_segment(struct request_queue *q, struct bio *bio,
- static inline void
- __blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
- 		     struct scatterlist *sglist, struct bio_vec *bvprv,
--		     struct scatterlist **sg, int *nsegs, int *cluster)
-+		     struct scatterlist **sg, int *nsegs)
- {
- 
- 	int nbytes = bvec->bv_len;
- 
--	if (*sg && *cluster) {
-+	if (*sg) {
- 		if ((*sg)->length + nbytes > queue_max_segment_size(q))
- 			goto new_segment;
- 		if (!biovec_phys_mergeable(q, bvprv, bvec))
-@@ -465,12 +461,12 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
- {
- 	struct bio_vec bvec, bvprv = { NULL };
- 	struct bvec_iter iter;
--	int cluster = blk_queue_cluster(q), nsegs = 0;
-+	int nsegs = 0;
- 
- 	for_each_bio(bio)
- 		bio_for_each_segment(bvec, bio, iter)
- 			__blk_segment_map_sg(q, &bvec, sglist, &bvprv, sg,
--					     &nsegs, &cluster);
-+					     &nsegs);
- 
- 	return nsegs;
- }
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 696c04c1ab6c..9c8b62f8c180 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -109,7 +109,6 @@ void blk_set_default_limits(struct queue_limits *lim)
- 	lim->alignment_offset = 0;
- 	lim->io_opt = 0;
- 	lim->misaligned = 0;
--	lim->cluster = 1;
- 	lim->zoned = BLK_ZONED_NONE;
- }
- EXPORT_SYMBOL(blk_set_default_limits);
-@@ -602,8 +601,6 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 	t->io_min = max(t->io_min, b->io_min);
- 	t->io_opt = lcm_not_zero(t->io_opt, b->io_opt);
- 
--	t->cluster &= b->cluster;
--
- 	/* Physical block size a multiple of the logical block size? */
- 	if (t->physical_block_size & (t->logical_block_size - 1)) {
- 		t->physical_block_size = t->logical_block_size;
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 844a454a7b3a..5144707f25ea 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -136,10 +136,7 @@ static ssize_t queue_max_integrity_segments_show(struct request_queue *q, char *
- 
- static ssize_t queue_max_segment_size_show(struct request_queue *q, char *page)
- {
--	if (blk_queue_cluster(q))
--		return queue_var_show(queue_max_segment_size(q), (page));
--
--	return queue_var_show(PAGE_SIZE, (page));
-+	return queue_var_show(queue_max_segment_size(q), (page));
- }
- 
- static ssize_t queue_logical_block_size_show(struct request_queue *q, char *page)
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 4293dc1cd160..653ae90eec0b 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -389,7 +389,6 @@ struct queue_limits {
- 
- 	unsigned char		misaligned;
- 	unsigned char		discard_misaligned;
--	unsigned char		cluster;
- 	unsigned char		raid_partial_stripes_expensive;
- 	enum blk_zoned_model	zoned;
- };
-@@ -785,11 +784,6 @@ static inline bool queue_is_rq_based(struct request_queue *q)
- 	return q->request_fn || q->mq_ops;
- }
- 
--static inline unsigned int blk_queue_cluster(struct request_queue *q)
--{
--	return q->limits.cluster;
--}
--
- static inline enum blk_zoned_model
- blk_queue_zoned_model(struct request_queue *q)
- {
--- 
-2.19.2
+
+Shouldn't the above be 'bool poll'?
+
+
+Reviewed-by: Steve Wise <swise@opengridcomputing.com>
 
