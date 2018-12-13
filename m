@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45B29C65BAE
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 20:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDB66C67839
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 20:32:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0557C2086D
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 20:32:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9961E20851
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 20:32:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="JD6icGd/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0557C2086D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Wf4jpeeh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9961E20851
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727118AbeLMUcY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Dec 2018 15:32:24 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:54946 "EHLO
+        id S1727540AbeLMUc1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Dec 2018 15:32:27 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:54954 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726764AbeLMUcY (ORCPT
+        with ESMTP id S1726764AbeLMUc1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Dec 2018 15:32:24 -0500
+        Thu, 13 Dec 2018 15:32:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=x7N9wkWVrhL7eD+tlMZmcYB5T4RvJ7h8O5ZuEHDcnBU=; b=JD6icGd/DMmmfERw9+L6OgCVF0
-        Ljuu6dIDXCwuCdxNypLt4JCmHDIr3o9mvJsJHQ+GAKe9MhdBSrlakhC+2NpTpANm9OV4Ox9HKrdIQ
-        wrANo/kZc7GviSSbSMtMCOGv3jmBYleAplnipAAFNcgm8upteFbiSecRyl5pu92q7A4E/0y+nvGDW
-        NNgl71KpFpGV+KRrSdARHxEtMnWyJKeywdfi3fO2bzGCWcdYkIsJgRT5ypykdN0HPhdYsmOOxK3It
-        oNsa7KjdlWUPcE6YgAYERIZpLqOpTgbLv1zyU5ofVB3YcM77Ov0RxU+YJvTB3NTWNW/v+Do8oIWfM
-        PBDklRfA==;
+        bh=wyaf3Zj5OBqynIfmGub4TZanr3vNhw7drJWhfZDo9h4=; b=Wf4jpeeh5Tj/EyriYZdNmd+Um9
+        bnj3XQh7Kb8/YZixdVFa7OFlZmbtsWg5nPJ+poGij3qlqgvRQ/w4MGWbbFZVPrW9LtqJ6cnL1NPpg
+        rngsOaUQ+Hs01mIUKXXNkPHBBouevbHdpT/AMFQ5kFAtHZVVTfpEHumvXq6IlQ5OGzAyblTj5ULhg
+        WCf4iaNL6DD/GNlBTwBMv0zz585b4SuqGAVFi5bsXEd/R+OZOVH9mJTfp7MXDcnCOWWMw8KUXCGtb
+        Gi79Yr0L0NaZAmSAVTMw9HOjX2NrYaTWxcEXhIyjIDcTIXmBxT/aff76EAeslijjEcZcz7/sNIf7N
+        HJafaVew==;
 Received: from 089144198147.atnat0007.highway.a1.net ([89.144.198.147] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gXXeh-0005sT-OF; Thu, 13 Dec 2018 20:32:24 +0000
+        id 1gXXek-0005ss-9v; Thu, 13 Dec 2018 20:32:26 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 2/7] block: remove the bio_phys_segments export
-Date:   Thu, 13 Dec 2018 21:32:09 +0100
-Message-Id: <20181213203214.10650-3-hch@lst.de>
+Subject: [PATCH 3/7] block: remove the blk_recount_segments export
+Date:   Thu, 13 Dec 2018 21:32:10 +0100
+Message-Id: <20181213203214.10650-4-hch@lst.de>
 X-Mailer: git-send-email 2.19.2
 In-Reply-To: <20181213203214.10650-1-hch@lst.de>
 References: <20181213203214.10650-1-hch@lst.de>
@@ -59,47 +59,21 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio.c       | 3 +--
- block/blk-merge.c | 6 +++++-
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ block/blk-merge.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 036e3f0cc736..fa1ea2ac66a8 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -571,14 +571,13 @@ void bio_put(struct bio *bio)
- }
- EXPORT_SYMBOL(bio_put);
- 
--inline int bio_phys_segments(struct request_queue *q, struct bio *bio)
-+int bio_phys_segments(struct request_queue *q, struct bio *bio)
- {
- 	if (unlikely(!bio_flagged(bio, BIO_SEG_VALID)))
- 		blk_recount_segments(q, bio);
- 
- 	return bio->bi_phys_segments;
- }
--EXPORT_SYMBOL(bio_phys_segments);
- 
- /**
-  * 	__bio_clone_fast - clone a bio that shares the original bio's biovec
 diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 09591daf4993..62e97ec92034 100644
+index 62e97ec92034..ae220312f0e8 100644
 --- a/block/blk-merge.c
 +++ b/block/blk-merge.c
-@@ -264,7 +264,11 @@ void blk_queue_split(struct request_queue *q, struct bio **bio)
- 	}
+@@ -393,7 +393,6 @@ void blk_recount_segments(struct request_queue *q, struct bio *bio)
  
- 	/* physical segments can be figured out during splitting */
--	res = split ? split : *bio;
-+	if (split) {
-+		res = split;
-+	} else {
-+		res = *bio;
-+	}
- 	res->bi_phys_segments = nsegs;
- 	bio_set_flag(res, BIO_SEG_VALID);
+ 	bio_set_flag(bio, BIO_SEG_VALID);
+ }
+-EXPORT_SYMBOL(blk_recount_segments);
  
+ static int blk_phys_contig_segment(struct request_queue *q, struct bio *bio,
+ 				   struct bio *nxt)
 -- 
 2.19.2
 
