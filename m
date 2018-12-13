@@ -6,32 +6,32 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B858C65BAE
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:55:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB07CC67839
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:55:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 19F7B2086D
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:55:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19F7B2086D
+	by mail.kernel.org (Postfix) with ESMTP id 7CCBA20870
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:55:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CCBA20870
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729148AbeLMOzG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Dec 2018 09:55:06 -0500
-Received: from mx2.suse.de ([195.135.220.15]:51434 "EHLO mx1.suse.de"
+        id S1729177AbeLMOzO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Dec 2018 09:55:14 -0500
+Received: from mx2.suse.de ([195.135.220.15]:51452 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729063AbeLMOzG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Dec 2018 09:55:06 -0500
+        id S1729063AbeLMOzN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Dec 2018 09:55:13 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id CAAA8AD5C;
-        Thu, 13 Dec 2018 14:55:04 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 2977AADDD;
+        Thu, 13 Dec 2018 14:55:12 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, Shenghui Wang <shhuiw@foxmail.com>,
         Coly Li <colyli@suse.de>
-Subject: [PATCH 03/12] bcache: update comment for bch_data_insert
-Date:   Thu, 13 Dec 2018 22:53:48 +0800
-Message-Id: <20181213145357.38528-4-colyli@suse.de>
+Subject: [PATCH 04/12] bcache: update comment in sysfs.c
+Date:   Thu, 13 Dec 2018 22:53:49 +0800
+Message-Id: <20181213145357.38528-5-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20181213145357.38528-1-colyli@suse.de>
 References: <20181213145357.38528-1-colyli@suse.de>
@@ -42,35 +42,41 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Shenghui Wang <shhuiw@foxmail.com>
 
-commit 220bb38c21b8 ("bcache: Break up struct search") introduced changes
-to struct search and s->iop.
-bypass/bio are fields of struct data_insert_op now. Update the comment.
+We have struct cached_dev allocated by kzalloc in register_bcache(), which
+initializes all the fields of cached_dev with 0s. And commit ce4c3e19e520
+("bcache: Replace bch_read_string_list() by __sysfs_match_string()") has
+remove the string "default".
+
+Update the comment.
 
 Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/request.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/md/bcache/sysfs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 3bf35914bb57..15070412a32e 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -311,11 +311,11 @@ static void bch_data_insert_start(struct closure *cl)
-  * data is written it calls bch_journal, and after the keys have been added to
-  * the next journal write they're inserted into the btree.
-  *
-- * It inserts the data in s->cache_bio; bi_sector is used for the key offset,
-+ * It inserts the data in op->bio; bi_sector is used for the key offset,
-  * and op->inode is used for the key inode.
-  *
-- * If s->bypass is true, instead of inserting the data it invalidates the
-- * region of the cache represented by s->cache_bio and op->inode.
-+ * If op->bypass is true, instead of inserting the data it invalidates the
-+ * region of the cache represented by op->bio and op->inode.
-  */
- void bch_data_insert(struct closure *cl)
- {
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index 26f035a0c5b9..d2e5c9892d4d 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -16,7 +16,7 @@
+ #include <linux/sort.h>
+ #include <linux/sched/clock.h>
+ 
+-/* Default is -1; we skip past it for struct cached_dev's cache mode */
++/* Default is 0 ("writethrough") */
+ static const char * const bch_cache_modes[] = {
+ 	"writethrough",
+ 	"writeback",
+@@ -25,7 +25,7 @@ static const char * const bch_cache_modes[] = {
+ 	NULL
+ };
+ 
+-/* Default is -1; we skip past it for stop_when_cache_set_failed */
++/* Default is 0 ("auto") */
+ static const char * const bch_stop_on_failure_modes[] = {
+ 	"auto",
+ 	"always",
 -- 
 2.16.4
 
