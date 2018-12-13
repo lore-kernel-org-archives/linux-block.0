@@ -2,103 +2,133 @@ Return-Path: <SRS0=8pZC=OW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52370C67839
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 11:36:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3B16C65BAE
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 11:41:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0BA5420870
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 11:36:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BA5420870
+	by mail.kernel.org (Postfix) with ESMTP id B26E920811
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 11:41:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B26E920811
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727696AbeLMLgB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Dec 2018 06:36:01 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:33411 "EHLO
+        id S1727835AbeLMLle (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Dec 2018 06:41:34 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:33471 "EHLO
         youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727590AbeLMLgB (ORCPT
+        with ESMTP id S1727826AbeLMLle (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Dec 2018 06:36:01 -0500
+        Thu, 13 Dec 2018 06:41:34 -0500
 Received: from 201-68-129-100.dsl.telesp.net.br ([201.68.129.100] helo=calabresa)
         by youngberry.canonical.com with esmtpsa (TLS1.0:RSA_AES_256_CBC_SHA1:32)
         (Exim 4.76)
         (envelope-from <cascardo@canonical.com>)
-        id 1gXPHY-0002UX-9r; Thu, 13 Dec 2018 11:35:56 +0000
-Date:   Thu, 13 Dec 2018 09:35:50 -0200
+        id 1gXPMw-0002kb-4g; Thu, 13 Dec 2018 11:41:30 +0000
+Date:   Thu, 13 Dec 2018 09:41:25 -0200
 From:   Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-To:     Johannes Thumshirn <jthumshirn@suse.de>
+To:     Hannes Reinecke <hare@suse.de>
 Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 0/4] nvme multipath: expose slaves/holders
-Message-ID: <20181213113549.GA7543@calabresa>
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>
+Subject: Re: [PATCH 4/4] block: expose devt for GENHD_FL_HIDDEN disks
+Message-ID: <20181213114124.GB7543@calabresa>
 References: <20181206164812.30925-1-cascardo@canonical.com>
- <bd4405c7-560c-f138-78f0-023807f96367@suse.de>
+ <20181206164812.30925-5-cascardo@canonical.com>
+ <b3ef062d-3bc3-fdf8-f395-31d1822a3192@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <bd4405c7-560c-f138-78f0-023807f96367@suse.de>
+In-Reply-To: <b3ef062d-3bc3-fdf8-f395-31d1822a3192@suse.de>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Dec 13, 2018 at 10:33:13AM +0100, Johannes Thumshirn wrote:
-> On 06/12/2018 17:48, Thadeu Lima de Souza Cascardo wrote:
-> > Exposing slaves/holders is necessary in order to find out the real PCI device
-> > and its driver for the root filesystem when generating an initramfs with
-> > initramfs-tools. That fails right now for nvme multipath devices, which this
-> > patchset fixes.
+On Thu, Dec 13, 2018 at 10:18:40AM +0100, Hannes Reinecke wrote:
+> On 12/6/18 5:48 PM, Thadeu Lima de Souza Cascardo wrote:
+> > Without this exposure, lsblk will fail as it tries to find out the
+> > device's dev_t numbers. This causes a real problem for nvme multipath
+> > devices, as their slaves are hidden.
 > > 
-> > However, because the slave devices are hidden, lsblk fails without some extra
-> > patches, as it can't find the device numbers for the slave devices, and exits.
+> > Exposing them fixes the problem, even though trying to open the devices
+> > returns an error in the case of nvme multipath. So, right now, it's the
+> > driver's responsibility to return a failure to open hidden devices.
+> > 
+> > Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+> > ---
+> >   block/genhd.c | 9 ++++-----
+> >   1 file changed, 4 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/block/genhd.c b/block/genhd.c
+> > index 7674fce32fca..65a7fa664188 100644
+> > --- a/block/genhd.c
+> > +++ b/block/genhd.c
+> > @@ -687,6 +687,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+> >   	disk_alloc_events(disk);
+> > +	disk_to_dev(disk)->devt = devt;
+> >   	if (disk->flags & GENHD_FL_HIDDEN) {
+> >   		/*
+> >   		 * Don't let hidden disks show up in /proc/partitions,
+> > @@ -698,13 +699,12 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+> >   		int ret;
+> >   		/* Register BDI before referencing it from bdev */
+> > -		disk_to_dev(disk)->devt = devt;
+> >   		ret = bdi_register_owner(disk->queue->backing_dev_info,
+> >   						disk_to_dev(disk));
+> >   		WARN_ON(ret);
+> > -		blk_register_region(disk_devt(disk), disk->minors, NULL,
+> > -				    exact_match, exact_lock, disk);
+> >   	}
+> > +	blk_register_region(disk_devt(disk), disk->minors, NULL,
+> > +			    exact_match, exact_lock, disk);
+> >   	register_disk(parent, disk, groups);
+> >   	if (register_queue)
+> >   		blk_register_queue(disk);
+> > @@ -776,8 +776,7 @@ void del_gendisk(struct gendisk *disk)
+> >   		WARN_ON(1);
+> >   	}
+> > -	if (!(disk->flags & GENHD_FL_HIDDEN))
+> > -		blk_unregister_region(disk_devt(disk), disk->minors);
+> > +	blk_unregister_region(disk_devt(disk), disk->minors);
+> >   	kobject_put(disk->part0.holder_dir);
+> >   	kobject_put(disk->slave_dir);
+> > 
+> Welll ... this is not just 'lsblk', but more importantly this will force
+> udev to create _block_ device nodes for the hidden devices, essentially
+> 'unhide' them.
 > 
-> Sorry for chiming in so late, can someone give me an explanation what
-> actually is broken?
+> Is this what we want?
+> Christoph?
+> I thought the entire _point_ of having hidden devices is that the are ...
+> well ... hidden ...
 > 
-> I know this is technically a user visible regression, but isn't lsblk
-> (and others) already fixed? I believe it's [1] in util-linux.
-> 
-> And to find out the PCI device, why do you need slaves/holders here?
-> Have a look at blktest's _get_pci_dev_from_blkdev() function [2].
-> 
-> [1] d51f05bfecb2 ("lsblk: try device/dev to read devno")
-> [2] https://github.com/osandov/blktests/blob/master/common/rc#L185
 
-Those two work fine for the block device associated to a controller. Now, when
-multipath is used, there is now a virtual block device that balances IO to the
-real paths.
+I knew this would be the most controversial patch. And I had other solutions as
+well, but preferred this one. So, the other alternative would be just not use
+GENHD_FL_HIDDEN for the nvme devices, which would leave that flag without a
+single user in the kernel. That would still fix the two problems
+(initramfs-tools and lsblk), and not create any other problem I know of. That
+patch would still fail to open the underlying devices when there is a
+head/multipath associated with it.
 
-# readlink -f /sys/block/nvme0n1/device
-/sys/devices/virtual/nvme-subsystem/nvme-subsys0
-#
-
-And we can't just give it a parent because it may have multiple parents as it
-might have multiple slaves, which is something we can represent, and has been
-in use for a long time.
-
-Now, the issue with lsblk is that the hidden block devices won't have a dev.
-And now that I think of it, when you are reading device/dev instead of dev for
-the nvme block device, you are, in fact, looking at the dev for the character
-device, which seems wrong.
-
-You are looking at nvme0, which is the character device that works as a
-controlling interface. So, there is no reason lsblk should use that as the dev
-number for the block device.
+So, the only thing GENHD_FL_HIDDEN gives us is saving some resources, like bdi,
+for example. And we could also use it to fail open when blkdev_get* is called.
+Of couse, that would still imply that its name should be changed, but as we
+already have an attribute named after that, I find it hard to suggest such a
+change.
 
 Cascardo.
 
+> Cheers,
 > 
-> Byte,
-> 	Johannes
+> Hannes
 > -- 
-> Johannes Thumshirn                            SUSE Labs Filesystems
-> jthumshirn@suse.de                                +49 911 74053 689
+> Dr. Hannes Reinecke		   Teamlead Storage & Networking
+> hare@suse.de			               +49 911 74053 688
 > SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-> GF: Felix Imendörffer, Jane Smithard, Graham Norton
+> GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
 > HRB 21284 (AG Nürnberg)
-> Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
