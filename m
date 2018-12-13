@@ -2,142 +2,68 @@ Return-Path: <SRS0=8pZC=OW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2095BC67839
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 01:24:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18F4FC67839
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 03:00:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DC78720851
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 01:24:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC78720851
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTP id C5DB820879
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 03:00:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5DB820879
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726475AbeLMBYV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Dec 2018 20:24:21 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46714 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726337AbeLMBYV (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Dec 2018 20:24:21 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7417981F12;
-        Thu, 13 Dec 2018 01:24:20 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-24.pek2.redhat.com [10.72.8.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EF34A60921;
-        Thu, 13 Dec 2018 01:24:13 +0000 (UTC)
-Date:   Thu, 13 Dec 2018 09:24:09 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Dennis Zhou <dennis@kernel.org>
-Cc:     Omar Sandoval <osandov@fb.com>, kernel-team@fb.com,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH blktests 2/2] blktests: add Ming Lei's scsi-stress-remove
-Message-ID: <20181213012407.GA7881@ming.t460p>
-References: <20181212230959.69975-1-dennis@kernel.org>
- <20181212230959.69975-3-dennis@kernel.org>
+        id S1726389AbeLMDAY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Dec 2018 22:00:24 -0500
+Received: from mail-ot1-f43.google.com ([209.85.210.43]:45661 "EHLO
+        mail-ot1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726344AbeLMDAX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Dec 2018 22:00:23 -0500
+Received: by mail-ot1-f43.google.com with SMTP id 32so516260ota.12
+        for <linux-block@vger.kernel.org>; Wed, 12 Dec 2018 19:00:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+        b=n8KHzv+PZReuBfTQl/LNRP32+gdaZOZcGrPGwm4+96SnsqHncuU6/4qXVxr1P4WV8F
+         yKN2ajuVXkrBZDsyenmKP/qB3ROV2PuXsYnqpSjna5RHHO6vagw1ZrExAA17j+27Y98M
+         1A38nfcAzmDQFihPHGHIf7Hi89JEh5YFfkkCsjYExZCabayo0HUc+rUYfAHNFro0OdPi
+         0TPdCVkEteQubyTtQ8DeyveAewOJXpcZy5PyHXnAA3GKlkfMXLCZwM6vVTR4mtAA8GzT
+         gFyrBe/PlRwq1ObgXvD8WD9R6BPh63tSnPizobvMxV1EFkb3eZ2pUjcle4yW97v+EBX4
+         njMA==
+X-Gm-Message-State: AA+aEWYm294YdvnVkdnz5GWGhvlbLPYrFgK9k95rhOyVeU6jNCbXX9nf
+        3H+wkNUF98GmrTGwSXFgPZc=
+X-Google-Smtp-Source: AFSGD/UScCsWzSpZsrfmDfs/UcB4wV0Lq7I8CxjookHqQRU2KStq52dRcIQihW5IFRQfTz8yqE0eMQ==
+X-Received: by 2002:a9d:754f:: with SMTP id b15mr15162719otl.231.1544670023043;
+        Wed, 12 Dec 2018 19:00:23 -0800 (PST)
+Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
+        by smtp.gmail.com with ESMTPSA id l1sm485326oib.10.2018.12.12.19.00.21
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 12 Dec 2018 19:00:22 -0800 (PST)
+Subject: Re: [PATCH v2] nvme: provide fallback for discard alloc failure
+To:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Cc:     Christoph Hellwig <hch@lst.de>
+References: <87d6d992-6d9f-c863-c14c-e4f3555cb3d6@kernel.dk>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <9c9ab7dc-48c5-f365-6bca-abb4aff0ef42@grimberg.me>
+Date:   Wed, 12 Dec 2018 19:00:20 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181212230959.69975-3-dennis@kernel.org>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Thu, 13 Dec 2018 01:24:20 +0000 (UTC)
+In-Reply-To: <87d6d992-6d9f-c863-c14c-e4f3555cb3d6@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 12, 2018 at 06:09:59PM -0500, Dennis Zhou wrote:
-> This test exposed a race condition with shutting down a request_queue
-> and the new blkg association. The issue ended up being that while the
-> request_queue will just start failing requests, blkg destruction sets
-> the q->root_blkg to %NULL. This caused a NPE when trying to reference
-> it. So to help prevent this from happening again, integrate Ming's test
-> into blktests so that it can more easily be ran.
-> 
-> Signed-off-by: Dennis Zhou <dennis@kernel.org>
-> Cc: Ming Lei <ming.lei@redhat.com>
-> ---
->  tests/block/022     | 96 +++++++++++++++++++++++++++++++++++++++++++++
->  tests/block/022.out |  2 +
->  2 files changed, 98 insertions(+)
->  create mode 100755 tests/block/022
->  create mode 100644 tests/block/022.out
-> 
-> diff --git a/tests/block/022 b/tests/block/022
-> new file mode 100755
-> index 0000000..45bfff7
-> --- /dev/null
-> +++ b/tests/block/022
-> @@ -0,0 +1,96 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-3.0+
-> +# Copyright (C) 2018 Ming Lei
-> +#
-> +# Regression test for patch "blkcg: handle dying request_queue when associating
-> +# a blkg"
-> +#
-> +# This tries to expose the race condition between blkg association and
-> +# request_queue shutdown. When a request_queue is shutdown, the corresponding
-> +# blkgs are destroyed. Any further associations should fail gracefully and not
-> +# cause a kernel panic.
-> +
-> +. tests/block/rc
-> +. common/scsi_debug
-> +. common/cgroup
-> +
-> +DESCRIPTION="test graceful shutdown of scsi_debug devices with running fio jobs"
-> +QUICK=1
-> +
-> +requires() {
-> +	_have_cgroup2_controller io && _have_scsi_debug && _have_fio
-> +}
-> +
-> +scsi_debug_stress_remove() {
-> +	scsi_debug_path="/sys/bus/pseudo/drivers/scsi_debug"
-> +	count=21
-> +
-> +	runtime=12
-> +	nr_fio_jobs=8
-> +	scsi_dbg_ndelay=10000
-> +
-> +	# set higher aio limit
-> +	echo 524288 > /proc/sys/fs/aio-max-nr
-> +
-> +	#figure out the CAN_QUEUE
-> +	can_queue=$(((count + 1) * (count / 2) / 2))
-> +
-> +	rmmod scsi_debug > /dev/null 2>&1
-> +	modprobe scsi_debug virtual_gb=128 max_luns=$count \
-> +		ndelay=$scsi_dbg_ndelay max_queue=$can_queue
-> +
-> +	# figure out scsi_debug disks
-> +	hosts=$(ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter0/host*)
-> +	hostname=$(basename "$hosts")
-> +	host=$(echo "$hostname" | grep -o -E '[0-9]+')
-> +
-> +	sdisks=$(ls -d $scsi_debug_path/adapter*/"$hostname"/target*/*/block/*)
-> +	disks=""
-> +	for sd in $sdisks; do
-> +		disks+="/dev/"$(basename "$sd")
-> +		disks+=" "
-> +	done
-> +
-> +	use_mq=$(cat /sys/module/scsi_mod/parameters/use_blk_mq)
-> +	if [[ $use_mq = "Y" ]]; then
-> +		scheds=("none" "mq-deadline" "kyber")
-> +	else
-> +		scheds=("noop" "deadline" "cfq")
-> +	fi
-
-You may use the following to figure out all supported io schedulers,
-especially we have removed all legacy io schedulers.
-
-IOSCHEDS=`sed 's/[][]//g' $Q_PATH/scheduler`
-
-
-Thanks,
-Ming
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
