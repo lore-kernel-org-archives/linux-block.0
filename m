@@ -3,45 +3,45 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 904E5C65BAE
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 15:23:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 693E6C65BAE
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 15:24:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 558CC20870
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 15:23:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 558CC20870
+	by mail.kernel.org (Postfix) with ESMTP id 0817D20849
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 15:24:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0817D20849
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=opengridcomputing.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729228AbeLMPXs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Dec 2018 10:23:48 -0500
-Received: from opengridcomputing.com ([72.48.214.68]:47256 "EHLO
+        id S1729623AbeLMPY4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Dec 2018 10:24:56 -0500
+Received: from opengridcomputing.com ([72.48.214.68]:47284 "EHLO
         smtp.opengridcomputing.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728612AbeLMPXs (ORCPT
+        by vger.kernel.org with ESMTP id S1729620AbeLMPY4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Dec 2018 10:23:48 -0500
+        Thu, 13 Dec 2018 10:24:56 -0500
 Received: from [10.10.0.239] (cody.ogc.int [10.10.0.239])
-        by smtp.opengridcomputing.com (Postfix) with ESMTPSA id EC6C622667;
-        Thu, 13 Dec 2018 09:23:47 -0600 (CST)
-Subject: Re: [PATCH v2 1/6] block: introduce blk_execute_rq_polled
+        by smtp.opengridcomputing.com (Postfix) with ESMTPSA id DE16822667;
+        Thu, 13 Dec 2018 09:24:55 -0600 (CST)
+Subject: Re: [PATCH v2 3/6] nvme-fabrics: allow nvmf_connect_io_queue to poll
 To:     Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Keith Busch <keith.busch@intel.com>,
         Jens Axboe <axboe@kernel.dk>
 References: <20181213063819.13614-1-sagi@grimberg.me>
- <20181213063819.13614-2-sagi@grimberg.me>
+ <20181213063819.13614-4-sagi@grimberg.me>
 From:   Steve Wise <swise@opengridcomputing.com>
-Message-ID: <998d400e-f81a-469e-5105-47f063d15466@opengridcomputing.com>
-Date:   Thu, 13 Dec 2018 09:23:52 -0600
+Message-ID: <89faa415-cbbb-d3d1-10f5-5eca509f1479@opengridcomputing.com>
+Date:   Thu, 13 Dec 2018 09:25:00 -0600
 User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.3.3
 MIME-Version: 1.0
-In-Reply-To: <20181213063819.13614-2-sagi@grimberg.me>
+In-Reply-To: <20181213063819.13614-4-sagi@grimberg.me>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -50,17 +50,14 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 On 12/13/2018 12:38 AM, Sagi Grimberg wrote:
-> Used forsynchronous requests that needs polling. If we are knowingly
-
-nit:  "Used for synchronous requests that need polling."
-
-
-> sending a request down to a poll queue, we need a synchronous interface
-> to poll for its completion.
+> Preparation for polling support for fabrics. Polling support
+> means that our completion queues are not generating any interrupts
+> which means we need to poll for the nvmf io queue connect as well.
 >
 > Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 
+Looks good.
 
-Reviewed-by: Steve Wise <swise@opengricomputing.com>
+Reviewed by Steve Wise <swise@opengridcomputing.com>
 
 
