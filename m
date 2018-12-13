@@ -4,25 +4,24 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,T_MIXED_ES,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FEBCC67875
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 06:38:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD7EC67872
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 06:38:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 22E8620879
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 06:38:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 936F520849
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 06:38:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="iYLnRhQM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22E8620879
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pPa44Joh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 936F520849
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=grimberg.me
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727033AbeLMGiY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Dec 2018 01:38:24 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:35092 "EHLO
+        id S1726654AbeLMGiX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Dec 2018 01:38:23 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:35078 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726819AbeLMGiX (ORCPT
+        with ESMTP id S1726836AbeLMGiX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 13 Dec 2018 01:38:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -31,24 +30,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=38sEy+G4G9ArGYJ3B4IT6rYIhWAn9rGtIETJZfIEphI=; b=iYLnRhQMOyfci4IwXRr6clpkW
-        b+VX+XTgGBVu6jnYrIZcFsqlwil5LN/bnw2V8UTUkG+GD9+cx+K6RR/mWk8iCMKH+HtatzFwKEF4f
-        9x5J+GvjC+Vz2mC8Tio6F2LI0R0nlWlc5kNQpAOqRxtnen8LFMQcJ296zzK3vnXamcBE4zf80ZWzN
-        D0sc70jd+1pa47v27UbGxt78S5l1hMSq/zSjuiKPYMvG3B55VjKUaVB6zNaVkWlpUGNf7GKHpt93c
-        kkm468kx1e/kYXFbohbiBd+VobNoR2Wo7ECrKkhBDyeagucjNLLsCOHtrLDbJ0rBcoW4jEn2HQzH6
-        BTevxmkvQ==;
+         bh=QK17lslDLMRhPNR8yTzH9mTyZUh7dXGT1Z0ul7MONnI=; b=pPa44JohVbHBVsLZAO9k1bhSK
+        eFWUHCU9LSRmGMXZKz9mLRUZOHKnJu0x5BsMWuF+VM00VJXXAnkacWh0cyJV9AbyUAmuS1V0T9HtP
+        eKI9+Z8zk8//8y46nSZAYC88YgREE44GIM+grPNFFE51N4w6EKudEOiIjFciThwpkEAJnuYv9MwkS
+        vW7cgQpgads1yidZHmfRNb1Tdn/9/2oMA9/mu6xa4Zi0MU4+fEkvwWd9VoFNu1t+UeMgXzKC8Vbvc
+        CtRKIfv7vtk28A5uJ9N6+5Qa31yLCGzlTlcKHkuDERBLcvNGUoTlUQOlHNiL+uBMF44mHZ1xv0HL8
+        /VDO6x8gA==;
 Received: from [2601:647:4800:973f:7888:b13c:bff:87b0] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gXKdZ-0006LR-OM; Thu, 13 Dec 2018 06:38:21 +0000
+        id 1gXKdZ-0006LR-42; Thu, 13 Dec 2018 06:38:21 +0000
 From:   Sagi Grimberg <sagi@grimberg.me>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         Keith Busch <keith.busch@intel.com>,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2 5/6] nvme-rdma: implement polling queue map
-Date:   Wed, 12 Dec 2018 22:38:17 -0800
-Message-Id: <20181213063819.13614-6-sagi@grimberg.me>
+Subject: [PATCH v2 1/6] block: introduce blk_execute_rq_polled
+Date:   Wed, 12 Dec 2018 22:38:13 -0800
+Message-Id: <20181213063819.13614-2-sagi@grimberg.me>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181213063819.13614-1-sagi@grimberg.me>
 References: <20181213063819.13614-1-sagi@grimberg.me>
@@ -57,175 +56,104 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When passed with nr_poll_queues setup additional queues with cq polling
-context IB_POLL_DIRECT (no interrupts) and make sure to set
-QUEUE_FLAG_POLL on the connect_q. In addition add the third queue
-mapping for polling queues.
-
-nvmf connect on this queue is polled for like all other requests so make
-nvmf_connect_io_queue poll for polling queues.
+Used forsynchronous requests that needs polling. If we are knowingly
+sending a request down to a poll queue, we need a synchronous interface
+to poll for its completion.
 
 Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/nvme/host/rdma.c | 58 +++++++++++++++++++++++++++++++++++-----
- 1 file changed, 52 insertions(+), 6 deletions(-)
+ block/blk-exec.c       | 29 +++++++++++++++++++++++++++++
+ block/blk-mq.c         |  8 --------
+ include/linux/blk-mq.h |  8 ++++++++
+ include/linux/blkdev.h |  2 ++
+ 4 files changed, 39 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-index b907ed43814f..80b3113b45fb 100644
---- a/drivers/nvme/host/rdma.c
-+++ b/drivers/nvme/host/rdma.c
-@@ -162,6 +162,13 @@ static inline int nvme_rdma_queue_idx(struct nvme_rdma_queue *queue)
- 	return queue - queue->ctrl->queues;
+diff --git a/block/blk-exec.c b/block/blk-exec.c
+index a34b7d918742..572032d60001 100644
+--- a/block/blk-exec.c
++++ b/block/blk-exec.c
+@@ -90,3 +90,32 @@ void blk_execute_rq(struct request_queue *q, struct gendisk *bd_disk,
+ 		wait_for_completion_io(&wait);
  }
- 
-+static bool nvme_rdma_poller_queue(struct nvme_rdma_queue *queue)
+ EXPORT_SYMBOL(blk_execute_rq);
++
++/**
++ * blk_execute_rq_polled - execute a request and poll for its completion
++ * @q:		queue to insert the request in
++ * @bd_disk:	matching gendisk
++ * @rq:		request to insert
++ * @at_head:    insert request at head or tail of queue
++ *
++ * Description:
++ *    Insert a fully prepared request at the back of the I/O scheduler queue
++ *    for execution and wait for completion.
++ */
++void blk_execute_rq_polled(struct request_queue *q, struct gendisk *bd_disk,
++		   struct request *rq, int at_head)
 +{
-+	return nvme_rdma_queue_idx(queue) >
-+		queue->ctrl->ctrl.opts->nr_io_queues +
-+		queue->ctrl->ctrl.opts->nr_write_queues;
-+}
++	DECLARE_COMPLETION_ONSTACK(wait);
 +
- static inline size_t nvme_rdma_inline_data_size(struct nvme_rdma_queue *queue)
- {
- 	return queue->cmnd_capsule_len - sizeof(struct nvme_command);
-@@ -440,6 +447,7 @@ static int nvme_rdma_create_queue_ib(struct nvme_rdma_queue *queue)
- 	const int send_wr_factor = 3;			/* MR, SEND, INV */
- 	const int cq_factor = send_wr_factor + 1;	/* + RECV */
- 	int comp_vector, idx = nvme_rdma_queue_idx(queue);
-+	enum ib_poll_context poll_ctx;
- 	int ret;
- 
- 	queue->device = nvme_rdma_find_get_device(queue->cm_id);
-@@ -456,10 +464,16 @@ static int nvme_rdma_create_queue_ib(struct nvme_rdma_queue *queue)
- 	 */
- 	comp_vector = idx == 0 ? idx : idx - 1;
- 
-+	/* Polling queues need direct cq polling context */
-+	if (nvme_rdma_poller_queue(queue))
-+		poll_ctx = IB_POLL_DIRECT;
-+	else
-+		poll_ctx = IB_POLL_SOFTIRQ;
++	WARN_ON_ONCE(!test_bit(QUEUE_FLAG_POLL, &q->queue_flags));
 +
- 	/* +1 for ib_stop_cq */
- 	queue->ib_cq = ib_alloc_cq(ibdev, queue,
- 				cq_factor * queue->queue_size + 1,
--				comp_vector, IB_POLL_SOFTIRQ);
-+				comp_vector, poll_ctx);
- 	if (IS_ERR(queue->ib_cq)) {
- 		ret = PTR_ERR(queue->ib_cq);
- 		goto out_put_dev;
-@@ -595,15 +609,17 @@ static void nvme_rdma_stop_io_queues(struct nvme_rdma_ctrl *ctrl)
- 
- static int nvme_rdma_start_queue(struct nvme_rdma_ctrl *ctrl, int idx)
- {
-+	struct nvme_rdma_queue *queue = &ctrl->queues[idx];
-+	bool poll = nvme_rdma_poller_queue(queue);
- 	int ret;
- 
- 	if (idx)
--		ret = nvmf_connect_io_queue(&ctrl->ctrl, idx, false);
-+		ret = nvmf_connect_io_queue(&ctrl->ctrl, idx, poll);
- 	else
- 		ret = nvmf_connect_admin_queue(&ctrl->ctrl);
- 
- 	if (!ret)
--		set_bit(NVME_RDMA_Q_LIVE, &ctrl->queues[idx].flags);
-+		set_bit(NVME_RDMA_Q_LIVE, &queue->flags);
- 	else
- 		dev_info(ctrl->ctrl.device,
- 			"failed to connect queue: %d ret=%d\n", idx, ret);
-@@ -646,6 +662,7 @@ static int nvme_rdma_alloc_io_queues(struct nvme_rdma_ctrl *ctrl)
- 				ibdev->num_comp_vectors);
- 
- 	nr_io_queues += min(opts->nr_write_queues, num_online_cpus());
-+	nr_io_queues += min(opts->nr_poll_queues, num_online_cpus());
- 
- 	ret = nvme_set_queue_count(&ctrl->ctrl, &nr_io_queues);
- 	if (ret)
-@@ -716,7 +733,7 @@ static struct blk_mq_tag_set *nvme_rdma_alloc_tagset(struct nvme_ctrl *nctrl,
- 		set->driver_data = ctrl;
- 		set->nr_hw_queues = nctrl->queue_count - 1;
- 		set->timeout = NVME_IO_TIMEOUT;
--		set->nr_maps = 2 /* default + read */;
-+		set->nr_maps = HCTX_MAX_TYPES;
- 	}
- 
- 	ret = blk_mq_alloc_tag_set(set);
-@@ -864,6 +881,10 @@ static int nvme_rdma_configure_io_queues(struct nvme_rdma_ctrl *ctrl, bool new)
- 			ret = PTR_ERR(ctrl->ctrl.connect_q);
- 			goto out_free_tag_set;
- 		}
++	rq->cmd_flags |= REQ_HIPRI;
++	rq->end_io_data = &wait;
++	blk_execute_rq_nowait(q, bd_disk, rq, at_head, blk_end_sync_rq);
 +
-+		if (ctrl->ctrl.opts->nr_poll_queues)
-+			blk_queue_flag_set(QUEUE_FLAG_POLL,
-+				ctrl->ctrl.connect_q);
- 	} else {
- 		blk_mq_update_nr_hw_queues(&ctrl->tag_set,
- 			ctrl->ctrl.queue_count - 1);
-@@ -1742,6 +1763,14 @@ static blk_status_t nvme_rdma_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	return BLK_STS_IOERR;
- }
- 
-+static int nvme_rdma_poll(struct blk_mq_hw_ctx *hctx)
-+{
-+	struct nvme_rdma_queue *queue = hctx->driver_data;
-+	struct ib_cq *cq = queue->ib_cq;
-+
-+	return ib_process_cq_direct(cq, -1);
-+}
-+
- static void nvme_rdma_complete_rq(struct request *rq)
- {
- 	struct nvme_rdma_request *req = blk_mq_rq_to_pdu(rq);
-@@ -1772,6 +1801,21 @@ static int nvme_rdma_map_queues(struct blk_mq_tag_set *set)
- 			ctrl->device->dev, 0);
- 	blk_mq_rdma_map_queues(&set->map[HCTX_TYPE_READ],
- 			ctrl->device->dev, 0);
-+
-+	if (ctrl->ctrl.opts->nr_poll_queues) {
-+		set->map[HCTX_TYPE_POLL].nr_queues =
-+				ctrl->ctrl.opts->nr_poll_queues;
-+		set->map[HCTX_TYPE_POLL].queue_offset =
-+				ctrl->ctrl.opts->nr_io_queues;
-+		if (ctrl->ctrl.opts->nr_write_queues)
-+			set->map[HCTX_TYPE_POLL].queue_offset +=
-+				ctrl->ctrl.opts->nr_write_queues;
-+	} else {
-+		set->map[HCTX_TYPE_POLL].nr_queues =
-+				ctrl->ctrl.opts->nr_io_queues;
-+		set->map[HCTX_TYPE_POLL].queue_offset = 0;
++	while (!completion_done(&wait)) {
++		blk_poll(q, request_to_qc_t(rq->mq_hctx, rq), true);
++		cond_resched();
 +	}
-+	blk_mq_map_queues(&set->map[HCTX_TYPE_POLL]);
- 	return 0;
++}
++EXPORT_SYMBOL(blk_execute_rq_polled);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 65770da99159..65d3f3a69c0d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1747,14 +1747,6 @@ static void blk_mq_bio_to_request(struct request *rq, struct bio *bio)
+ 	blk_account_io_start(rq, true);
  }
  
-@@ -1783,6 +1827,7 @@ static const struct blk_mq_ops nvme_rdma_mq_ops = {
- 	.init_hctx	= nvme_rdma_init_hctx,
- 	.timeout	= nvme_rdma_timeout,
- 	.map_queues	= nvme_rdma_map_queues,
-+	.poll		= nvme_rdma_poll,
- };
+-static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
+-{
+-	if (rq->tag != -1)
+-		return blk_tag_to_qc_t(rq->tag, hctx->queue_num, false);
+-
+-	return blk_tag_to_qc_t(rq->internal_tag, hctx->queue_num, true);
+-}
+-
+ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+ 					    struct request *rq,
+ 					    blk_qc_t *cookie, bool last)
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index 57eda7b20243..c77cba1ec0f5 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -357,4 +357,12 @@ static inline void *blk_mq_rq_to_pdu(struct request *rq)
+ 	for ((i) = 0; (i) < (hctx)->nr_ctx &&				\
+ 	     ({ ctx = (hctx)->ctxs[(i)]; 1; }); (i)++)
  
- static const struct blk_mq_ops nvme_rdma_admin_mq_ops = {
-@@ -1927,7 +1972,8 @@ static struct nvme_ctrl *nvme_rdma_create_ctrl(struct device *dev,
- 	INIT_WORK(&ctrl->err_work, nvme_rdma_error_recovery_work);
- 	INIT_WORK(&ctrl->ctrl.reset_work, nvme_rdma_reset_ctrl_work);
++static inline blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
++{
++	if (rq->tag != -1)
++		return blk_tag_to_qc_t(rq->tag, hctx->queue_num, false);
++
++	return blk_tag_to_qc_t(rq->internal_tag, hctx->queue_num, true);
++}
++
+ #endif
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 81f1b105946b..9f48d8855916 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -860,6 +860,8 @@ extern void blk_execute_rq(struct request_queue *, struct gendisk *,
+ 			  struct request *, int);
+ extern void blk_execute_rq_nowait(struct request_queue *, struct gendisk *,
+ 				  struct request *, int, rq_end_io_fn *);
++void blk_execute_rq_polled(struct request_queue *q, struct gendisk *bd_disk,
++		   struct request *rq, int at_head);
  
--	ctrl->ctrl.queue_count = opts->nr_io_queues + opts->nr_write_queues + 1;
-+	ctrl->ctrl.queue_count = opts->nr_io_queues + opts->nr_write_queues +
-+				opts->nr_poll_queues + 1;
- 	ctrl->ctrl.sqsize = opts->queue_size - 1;
- 	ctrl->ctrl.kato = opts->kato;
- 
-@@ -1979,7 +2025,7 @@ static struct nvmf_transport_ops nvme_rdma_transport = {
- 	.required_opts	= NVMF_OPT_TRADDR,
- 	.allowed_opts	= NVMF_OPT_TRSVCID | NVMF_OPT_RECONNECT_DELAY |
- 			  NVMF_OPT_HOST_TRADDR | NVMF_OPT_CTRL_LOSS_TMO |
--			  NVMF_OPT_NR_WRITE_QUEUES,
-+			  NVMF_OPT_NR_WRITE_QUEUES | NVMF_OPT_NR_POLL_QUEUES,
- 	.create_ctrl	= nvme_rdma_create_ctrl,
- };
- 
+ int blk_status_to_errno(blk_status_t status);
+ blk_status_t errno_to_blk_status(int errno);
 -- 
 2.17.1
 
