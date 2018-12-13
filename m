@@ -1,125 +1,100 @@
-Return-Path: <SRS0=4xS2=OV=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=8pZC=OW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C7CBC67839
-	for <linux-block@archiver.kernel.org>; Wed, 12 Dec 2018 23:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 997EAC67839
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 00:44:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 09AB420835
-	for <linux-block@archiver.kernel.org>; Wed, 12 Dec 2018 23:54:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09AB420835
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=acm.org
+	by mail.kernel.org (Postfix) with ESMTP id 5BEAF20851
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 00:44:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bT3XD8DT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BEAF20851
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726869AbeLLXy4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Dec 2018 18:54:56 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:39946 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726337AbeLLXyz (ORCPT
+        id S1726381AbeLMAoC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Dec 2018 19:44:02 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:35016 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726344AbeLMAoC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Dec 2018 18:54:55 -0500
-Received: by mail-pf1-f194.google.com with SMTP id i12so107569pfo.7;
-        Wed, 12 Dec 2018 15:54:55 -0800 (PST)
+        Wed, 12 Dec 2018 19:44:02 -0500
+Received: by mail-pg1-f194.google.com with SMTP id s198so171563pgs.2
+        for <linux-block@vger.kernel.org>; Wed, 12 Dec 2018 16:44:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=eGCL8CXk2DxsRI6RmIenE/gWHSpzzo3ICYl1Dkuy9FQ=;
+        b=bT3XD8DTdeHNd1n7r1baIPUQ89GQKbMby4TiPYbrsR8kiaghg/YQFkWEgaHm+c2j9P
+         1UlBC6u5KTkRSzIMxaI4/bTCiPyybRCDtR4h4F1NPUNNL21q6axIUJA8bVsJv7/hLPtL
+         6IGHyRtjtkypXbam8yBKBp1wudltVrnCLUYqx2pWAFNP51kFRbgaFZm5dR5Ud64wBr4H
+         F8vZlbH8atdbIjbB5oYO93hNDcMJtU96lpGvdkOpgzk6z062VLLiR9h2fbeZVgvt4fdd
+         v25M1E6LcBI3mDeM6Sq5iG++4pXKEbNJfdUu0KAwhYxKQsp/d60f1PPPRUb6/IiUACCq
+         ppig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=+61rvmzfSdAZe1Oh34hSvbDO8st4DilaDi6ymfCQzS0=;
-        b=T6zoVOGfL/hozmuYjhYzlthO2AbD8tkaQUUyDrKYRVXIgP2xSsOTlzhFPAo2HOHCdM
-         zSDYRZ87kBhtAxUodJooi13gBKpJm+qb8thFlOIjdbsKbvld3CWkm+gDC4o7atcaEL77
-         mf1yIT9k1ddPEtimQqFHDZAExijXnGOqq/QfKFGZkDE/h28KgNWX0w2QCr/5liIDjax/
-         H1/pRmzplWUZcUpVclBqi7CRS1NKNxPAg6Th+t6Mpu7kWnmu04WYp779MWzFhZoIwkOR
-         evUY+U2mHLH62Mn/dVtaMDoG+F8pj22LTBBtBoX9Yy7jVLPU0uODqBz9v1m2RcvsBnt7
-         Z/xQ==
-X-Gm-Message-State: AA+aEWa9e1DRpv5bjVdGdfd1zaiHEatUbNaTX8Cp86LDZue07n3intyx
-        PbKyzt/ALYFWmfikODfP/YM=
-X-Google-Smtp-Source: AFSGD/VHEyDrhJOi3V8vqOyVGsUwEV/p+cqiYhQnmuuCyAUBFLEs47Bd4jJgTFbvliP1IodZIVXYBA==
-X-Received: by 2002:a62:6303:: with SMTP id x3mr22789351pfb.110.1544658894730;
-        Wed, 12 Dec 2018 15:54:54 -0800 (PST)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id r12sm118677pgv.83.2018.12.12.15.54.53
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 12 Dec 2018 15:54:54 -0800 (PST)
-Message-ID: <1544658892.185366.412.camel@acm.org>
-Subject: Re: [PATCH] blkcg: handle dying request_queue when associating a
- blkg
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Dennis Zhou <dennis@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Date:   Wed, 12 Dec 2018 15:54:52 -0800
-In-Reply-To: <20181212040643.GA73727@dennisz-mbp.dhcp.thefacebook.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=eGCL8CXk2DxsRI6RmIenE/gWHSpzzo3ICYl1Dkuy9FQ=;
+        b=Q2vpP8hE7ZWTwBwPW8FfetJpSrpVfHaTWs2pBMEMvvsAijUPkLcjJAydLHTSQyD5z/
+         EhEGdSpZWic4bgANR+EFXkAmeU5Hpprh7uFPIIUktYzcZeurQxE/hlBXor5TO8vxCpzn
+         0/XUIbxGs6EORrfrAT00rZ2WwJJZfZoQKUkR40jXKdKS0HbeNO5NFSg5XqUbLbXFBZbh
+         K88w9YfnZX7refK+hp40jhslR1mpKL11vkVX/ltBZgaqrXVpJS16dglbrHeWVZ5isNt9
+         OuvQOVZi9X8FrKb3JfmbP8sArDTwKO68G9exRnBo6Ne0MWnM29NX4zA0En60Sfj14o5Y
+         ieiw==
+X-Gm-Message-State: AA+aEWbzpEjH4w6eGKMyX0uEK9Cvymt6sJQR/v5Z3940GnCI2DAxOhor
+        C0rFbDjwBWy8IXC2sis+bZYkTA==
+X-Google-Smtp-Source: AFSGD/WKp5J5LeNaoqGKcG5fzCqad43ccyyu0EEVy1qkK/rSC3+B2UvfamPnuXjatcvsz4hgIrN1lQ==
+X-Received: by 2002:a62:62c5:: with SMTP id w188mr22423342pfb.160.1544661841546;
+        Wed, 12 Dec 2018 16:44:01 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id p2sm236938pfb.28.2018.12.12.16.43.59
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 12 Dec 2018 16:44:00 -0800 (PST)
+Subject: Re: [PATCH] blkcg: handle dying request_queue when associating a blkg
+To:     Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>
+Cc:     kernel-team@fb.com, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
 References: <20181211230308.66276-1-dennis@kernel.org>
-         <1544570173.185366.397.camel@acm.org>
-         <20181212040643.GA73727@dennisz-mbp.dhcp.thefacebook.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <217c7b15-d54a-b51d-8b1a-c2ad0d404721@kernel.dk>
+Date:   Wed, 12 Dec 2018 17:43:58 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+MIME-Version: 1.0
+In-Reply-To: <20181211230308.66276-1-dennis@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2018-12-11 at 23:06 -0500, Dennis Zhou wrote:
-+AD4 Hi Bart,
-+AD4 
-+AD4 On Tue, Dec 11, 2018 at 03:16:13PM -0800, Bart Van Assche wrote:
-+AD4 +AD4 On Tue, 2018-12-11 at 18:03 -0500, Dennis Zhou wrote:
-+AD4 +AD4 +AD4 diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-+AD4 +AD4 +AD4 index 6bd0619a7d6e..c30661ddc873 100644
-+AD4 +AD4 +AD4 --- a/block/blk-cgroup.c
-+AD4 +AD4 +AD4 +-+-+- b/block/blk-cgroup.c
-+AD4 +AD4 +AD4 +AEAAQA -202,6 +-202,12 +AEAAQA static struct blkcg+AF8-gq +ACo-blkg+AF8-create(struct blkcg +ACo-blkcg,
-+AD4 +AD4 +AD4  	WARN+AF8-ON+AF8-ONCE(+ACE-rcu+AF8-read+AF8-lock+AF8-held())+ADs
-+AD4 +AD4 +AD4  	lockdep+AF8-assert+AF8-held(+ACY-q-+AD4-queue+AF8-lock)+ADs
-+AD4 +AD4 +AD4  
-+AD4 +AD4 +AD4 +-	/+ACo request+AF8-queue is dying, do not create/recreate a blkg +ACo-/
-+AD4 +AD4 +AD4 +-	if (blk+AF8-queue+AF8-dying(q)) +AHs
-+AD4 +AD4 +AD4 +-		ret +AD0 -ENODEV+ADs
-+AD4 +AD4 +AD4 +-		goto err+AF8-free+AF8-blkg+ADs
-+AD4 +AD4 +AD4 +-	+AH0
-+AD4 +AD4 +AD4 +-
-+AD4 +AD4 +AD4  	/+ACo blkg holds a reference to blkcg +ACo-/
-+AD4 +AD4 +AD4  	if (+ACE-css+AF8-tryget+AF8-online(+ACY-blkcg-+AD4-css)) +AHs
-+AD4 +AD4 +AD4  		ret +AD0 -ENODEV+ADs
-+AD4 +AD4 
-+AD4 +AD4 What prevents that the queue state changes after blk+AF8-queue+AF8-dying() has returned
-+AD4 +AD4 and before blkg+AF8-create() returns? Are you sure you don't need to protect this
-+AD4 +AD4 code with a blk+AF8-queue+AF8-enter() / blk+AF8-queue+AF8-exit() pair?
-+AD4 +AD4 
-+AD4 
-+AD4 Hmmm. So I think the idea is that we rely on normal shutdown as I don't
-+AD4 think there is anything wrong with creating a blkg on a dying
-+AD4 request+AF8-queue. When we are doing association, the request+AF8-queue should
-+AD4 be pinned by the open call. What we are racing against is when the
-+AD4 request+AF8-queue is shutting down, it goes around and destroys the blkgs.
-+AD4 For clarity, QUEUE+AF8-FLAG+AF8-DYING is set in blk+AF8-cleanup+AF8-queue() before
-+AD4 calling blk+AF8-exit+AF8-queue() which eventually calls blkcg+AF8-exit+AF8-queue().
-+AD4 
-+AD4 The use of blk+AF8-queue+AF8-dying() is to determine whether blkg shutdown has
-+AD4 already started as if we create one after it has started, we may
-+AD4 incorrectly orphan a blkg and leak it. Both blkg creation and
-+AD4 destruction require holding the queue+AF8-lock, so if the QUEUE+AF8-FLAG+AF8-DYING
-+AD4 flag is set after we've checked it, it means blkg destruction hasn't
-+AD4 started because it has to wait on the queue+AF8-lock. If QUEUE+AF8-FLAG+AF8-DYING is
-+AD4 set, then we have no guarantee of knowing what phase blkg destruction is
-+AD4 in leading to a potential leak.
+On 12/11/18 4:03 PM, Dennis Zhou wrote:
+> Between v3 [1] and v4 [2] of the blkg association series, the
+> association point moved from generic_make_request_checks(), which is
+> called after the request enters the queue, to bio_set_dev(), which is when
+> the bio is formed before submit_bio(). When the request_queue goes away,
+> the blkgs supporting the request_queue are destroyed and then the
+> q->root_blkg is set to %NULL.
+> 
+> This patch adds a %NULL check to blkg_tryget_closest() to prevent the
+> NPE caused by the above. It also adds a guard to see if the
+> request_queue is dying when creating a blkg to prevent creating a blkg
+> for a dead request_queue.
 
-Hi Dennis,
+Applied, thanks Dennis.
 
-To answer my own question: since all queue flag manipulations are protected
-by the queue lock and since blkg+AF8-create() is called with the queue lock held
-the above code does not need any further protection. Hence feel free to add
-the following:
-
-Reviewed-by: Bart Van Assche +ADw-bvanassche+AEA-acm.org+AD4
-
-
+-- 
+Jens Axboe
 
