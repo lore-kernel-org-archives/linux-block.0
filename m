@@ -6,32 +6,32 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 463BCC65BAE
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:54:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C2E2C67839
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:55:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 146E12086D
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:54:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 146E12086D
+	by mail.kernel.org (Postfix) with ESMTP id CCA7C2086D
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:55:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCA7C2086D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728759AbeLMOyv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Dec 2018 09:54:51 -0500
-Received: from mx2.suse.de ([195.135.220.15]:51320 "EHLO mx1.suse.de"
+        id S1728799AbeLMOzA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Dec 2018 09:55:00 -0500
+Received: from mx2.suse.de ([195.135.220.15]:51378 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727822AbeLMOyv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Dec 2018 09:54:51 -0500
+        id S1729063AbeLMOy7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Dec 2018 09:54:59 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 74C5CAD5C;
-        Thu, 13 Dec 2018 14:54:49 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 2E18FAD5C;
+        Thu, 13 Dec 2018 14:54:58 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, Shenghui Wang <shhuiw@foxmail.com>,
         Coly Li <colyli@suse.de>
-Subject: [PATCH 01/12] bcache: add comment for cache_set->fill_iter
-Date:   Thu, 13 Dec 2018 22:53:46 +0800
-Message-Id: <20181213145357.38528-2-colyli@suse.de>
+Subject: [PATCH 02/12] bcache: do not check if debug dentry is ERR or NULL explicitly on remove
+Date:   Thu, 13 Dec 2018 22:53:47 +0800
+Message-Id: <20181213145357.38528-3-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20181213145357.38528-1-colyli@suse.de>
 References: <20181213145357.38528-1-colyli@suse.de>
@@ -42,74 +42,46 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Shenghui Wang <shhuiw@foxmail.com>
 
-We have the following define for btree iterator:
-	struct btree_iter {
-		size_t size, used;
-	#ifdef CONFIG_BCACHE_DEBUG
-		struct btree_keys *b;
-	#endif
-		struct btree_iter_set {
-			struct bkey *k, *end;
-		} data[MAX_BSETS];
-	};
+debugfs_remove and debugfs_remove_recursive will check if the dentry
+pointer is NULL or ERR, and will do nothing in that case.
 
-We can see that the length of data[] field is static MAX_BSETS, which is
-defined as 4 currently.
-
-But a btree node on disk could have too many bsets for an iterator to fit
-on the stack - maybe far more that MAX_BSETS. Have to dynamically allocate
-space to host more btree_iter_sets.
-
-bch_cache_set_alloc() will make sure the pool cache_set->fill_iter can
-allocate an iterator equipped with enough room that can host
-	(sb.bucket_size / sb.block_size)
-btree_iter_sets, which is more than static MAX_BSETS.
-
-bch_btree_node_read_done() will use that pool to allocate one iterator, to
-host many bsets in one btree node.
-
-Add more comment around cache_set->fill_iter to make code less confusing.
+Remove the check in cache_set_free and bch_debug_init.
 
 Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/bcache.h | 6 +++++-
- drivers/md/bcache/btree.c  | 5 +++++
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ drivers/md/bcache/debug.c | 3 +--
+ drivers/md/bcache/super.c | 3 +--
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/md/bcache/bcache.h b/drivers/md/bcache/bcache.h
-index b61b83bbcfff..96d2213f279e 100644
---- a/drivers/md/bcache/bcache.h
-+++ b/drivers/md/bcache/bcache.h
-@@ -658,7 +658,11 @@ struct cache_set {
+diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
+index 8f448b9c96a1..8b123be05254 100644
+--- a/drivers/md/bcache/debug.c
++++ b/drivers/md/bcache/debug.c
+@@ -249,8 +249,7 @@ void bch_debug_init_cache_set(struct cache_set *c)
  
- 	/*
- 	 * A btree node on disk could have too many bsets for an iterator to fit
--	 * on the stack - have to dynamically allocate them
-+	 * on the stack - have to dynamically allocate them.
-+	 * bch_cache_set_alloc() will make sure the pool can allocate iterators
-+	 * equipped with enough room that can host
-+	 *     (sb.bucket_size / sb.block_size)
-+	 * btree_iter_sets, which is more than static MAX_BSETS.
- 	 */
- 	mempool_t		fill_iter;
+ void bch_debug_exit(void)
+ {
+-	if (!IS_ERR_OR_NULL(bcache_debug))
+-		debugfs_remove_recursive(bcache_debug);
++	debugfs_remove_recursive(bcache_debug);
+ }
  
-diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
-index 3f4211b5cd33..23cb1dc7296b 100644
---- a/drivers/md/bcache/btree.c
-+++ b/drivers/md/bcache/btree.c
-@@ -207,6 +207,11 @@ void bch_btree_node_read_done(struct btree *b)
- 	struct bset *i = btree_bset_first(b);
- 	struct btree_iter *iter;
+ void __init bch_debug_init(void)
+diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+index 7bbd670a5a84..5b59d44656c0 100644
+--- a/drivers/md/bcache/super.c
++++ b/drivers/md/bcache/super.c
+@@ -1510,8 +1510,7 @@ static void cache_set_free(struct closure *cl)
+ 	struct cache *ca;
+ 	unsigned int i;
  
-+	/*
-+	 * c->fill_iter can allocate an iterator with more memory space
-+	 * than static MAX_BSETS.
-+	 * See the comment arount cache_set->fill_iter.
-+	 */
- 	iter = mempool_alloc(&b->c->fill_iter, GFP_NOIO);
- 	iter->size = b->c->sb.bucket_size / b->c->sb.block_size;
- 	iter->used = 0;
+-	if (!IS_ERR_OR_NULL(c->debug))
+-		debugfs_remove(c->debug);
++	debugfs_remove(c->debug);
+ 
+ 	bch_open_buckets_free(c);
+ 	bch_btree_cache_free(c);
 -- 
 2.16.4
 
