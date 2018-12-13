@@ -6,39 +6,39 @@ X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90C22C65BAE
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 09:16:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBAABC67872
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 09:18:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5D82220672
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 09:16:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D82220672
+	by mail.kernel.org (Postfix) with ESMTP id BBF6320811
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 09:18:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBF6320811
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727054AbeLMJQ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Dec 2018 04:16:56 -0500
-Received: from mx2.suse.de ([195.135.220.15]:53024 "EHLO mx1.suse.de"
+        id S1727693AbeLMJSm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Dec 2018 04:18:42 -0500
+Received: from mx2.suse.de ([195.135.220.15]:53300 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726578AbeLMJQ4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Dec 2018 04:16:56 -0500
+        id S1727980AbeLMJSm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Dec 2018 04:18:42 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay1.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 00949AE38;
-        Thu, 13 Dec 2018 09:16:55 +0000 (UTC)
-Subject: Re: [PATCH 3/4] nvme: Should not warn when a disk path is opened
+        by mx1.suse.de (Postfix) with ESMTP id 44086AE38;
+        Thu, 13 Dec 2018 09:18:40 +0000 (UTC)
+Subject: Re: [PATCH 4/4] block: expose devt for GENHD_FL_HIDDEN disks
 To:     Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
         linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Jens Axboe <axboe@fb.com>
 References: <20181206164812.30925-1-cascardo@canonical.com>
- <20181206164812.30925-4-cascardo@canonical.com>
+ <20181206164812.30925-5-cascardo@canonical.com>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <c8d9ca76-10bc-4827-f1bd-3164a15fcd33@suse.de>
-Date:   Thu, 13 Dec 2018 10:16:54 +0100
+Message-ID: <b3ef062d-3bc3-fdf8-f395-31d1822a3192@suse.de>
+Date:   Thu, 13 Dec 2018 10:18:40 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.3.0
 MIME-Version: 1.0
-In-Reply-To: <20181206164812.30925-4-cascardo@canonical.com>
+In-Reply-To: <20181206164812.30925-5-cascardo@canonical.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -48,39 +48,66 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 12/6/18 5:48 PM, Thadeu Lima de Souza Cascardo wrote:
-> As we hide the disks used for nvme multipath, their open functions
-> should be allowed to be called, as their devices are not exposed.
+> Without this exposure, lsblk will fail as it tries to find out the
+> device's dev_t numbers. This causes a real problem for nvme multipath
+> devices, as their slaves are hidden.
 > 
-> However, not exposing the devices cause problems with lsblk, which won't
-> find the devices and show them, which is even more of a problem when
-> holders/slaves relationships are exposed.
-> 
-> Not warning here allow us to expose the disks without creating spurious
-> warnings. A failure should still be returned, which is the case here,
-> and still allows lsblk to work.
+> Exposing them fixes the problem, even though trying to open the devices
+> returns an error in the case of nvme multipath. So, right now, it's the
+> driver's responsibility to return a failure to open hidden devices.
 > 
 > Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
 > ---
->   drivers/nvme/host/core.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+>   block/genhd.c | 9 ++++-----
+>   1 file changed, 4 insertions(+), 5 deletions(-)
 > 
-> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> index 1dc29795f1ee..22424b2adfad 100644
-> --- a/drivers/nvme/host/core.c
-> +++ b/drivers/nvme/host/core.c
-> @@ -1327,8 +1327,8 @@ static int nvme_open(struct block_device *bdev, fmode_t mode)
->   	struct nvme_ns *ns = bdev->bd_disk->private_data;
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 7674fce32fca..65a7fa664188 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -687,6 +687,7 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
 >   
->   #ifdef CONFIG_NVME_MULTIPATH
-> -	/* should never be called due to GENHD_FL_HIDDEN */
-> -	if (WARN_ON_ONCE(ns->head->disk))
-> +	/* Should fail as it's hidden */
-> +	if (ns->head->disk)
->   		goto fail;
->   #endif
->   	if (!kref_get_unless_zero(&ns->kref))
+>   	disk_alloc_events(disk);
+>   
+> +	disk_to_dev(disk)->devt = devt;
+>   	if (disk->flags & GENHD_FL_HIDDEN) {
+>   		/*
+>   		 * Don't let hidden disks show up in /proc/partitions,
+> @@ -698,13 +699,12 @@ static void __device_add_disk(struct device *parent, struct gendisk *disk,
+>   		int ret;
+>   
+>   		/* Register BDI before referencing it from bdev */
+> -		disk_to_dev(disk)->devt = devt;
+>   		ret = bdi_register_owner(disk->queue->backing_dev_info,
+>   						disk_to_dev(disk));
+>   		WARN_ON(ret);
+> -		blk_register_region(disk_devt(disk), disk->minors, NULL,
+> -				    exact_match, exact_lock, disk);
+>   	}
+> +	blk_register_region(disk_devt(disk), disk->minors, NULL,
+> +			    exact_match, exact_lock, disk);
+>   	register_disk(parent, disk, groups);
+>   	if (register_queue)
+>   		blk_register_queue(disk);
+> @@ -776,8 +776,7 @@ void del_gendisk(struct gendisk *disk)
+>   		WARN_ON(1);
+>   	}
+>   
+> -	if (!(disk->flags & GENHD_FL_HIDDEN))
+> -		blk_unregister_region(disk_devt(disk), disk->minors);
+> +	blk_unregister_region(disk_devt(disk), disk->minors);
+>   
+>   	kobject_put(disk->part0.holder_dir);
+>   	kobject_put(disk->slave_dir);
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.com>
+Welll ... this is not just 'lsblk', but more importantly this will force 
+udev to create _block_ device nodes for the hidden devices, essentially 
+'unhide' them.
+
+Is this what we want?
+Christoph?
+I thought the entire _point_ of having hidden devices is that the are 
+... well ... hidden ...
 
 Cheers,
 
