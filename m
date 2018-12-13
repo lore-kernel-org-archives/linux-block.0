@@ -6,32 +6,32 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C2E2C67839
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:55:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B858C65BAE
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:55:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CCA7C2086D
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:55:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCA7C2086D
+	by mail.kernel.org (Postfix) with ESMTP id 19F7B2086D
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 14:55:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19F7B2086D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728799AbeLMOzA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Dec 2018 09:55:00 -0500
-Received: from mx2.suse.de ([195.135.220.15]:51378 "EHLO mx1.suse.de"
+        id S1729148AbeLMOzG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Dec 2018 09:55:06 -0500
+Received: from mx2.suse.de ([195.135.220.15]:51434 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729063AbeLMOy7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Dec 2018 09:54:59 -0500
+        id S1729063AbeLMOzG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 13 Dec 2018 09:55:06 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 2E18FAD5C;
-        Thu, 13 Dec 2018 14:54:58 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id CAAA8AD5C;
+        Thu, 13 Dec 2018 14:55:04 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, Shenghui Wang <shhuiw@foxmail.com>,
         Coly Li <colyli@suse.de>
-Subject: [PATCH 02/12] bcache: do not check if debug dentry is ERR or NULL explicitly on remove
-Date:   Thu, 13 Dec 2018 22:53:47 +0800
-Message-Id: <20181213145357.38528-3-colyli@suse.de>
+Subject: [PATCH 03/12] bcache: update comment for bch_data_insert
+Date:   Thu, 13 Dec 2018 22:53:48 +0800
+Message-Id: <20181213145357.38528-4-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20181213145357.38528-1-colyli@suse.de>
 References: <20181213145357.38528-1-colyli@suse.de>
@@ -42,46 +42,35 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Shenghui Wang <shhuiw@foxmail.com>
 
-debugfs_remove and debugfs_remove_recursive will check if the dentry
-pointer is NULL or ERR, and will do nothing in that case.
-
-Remove the check in cache_set_free and bch_debug_init.
+commit 220bb38c21b8 ("bcache: Break up struct search") introduced changes
+to struct search and s->iop.
+bypass/bio are fields of struct data_insert_op now. Update the comment.
 
 Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/debug.c | 3 +--
- drivers/md/bcache/super.c | 3 +--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+ drivers/md/bcache/request.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/md/bcache/debug.c b/drivers/md/bcache/debug.c
-index 8f448b9c96a1..8b123be05254 100644
---- a/drivers/md/bcache/debug.c
-+++ b/drivers/md/bcache/debug.c
-@@ -249,8 +249,7 @@ void bch_debug_init_cache_set(struct cache_set *c)
- 
- void bch_debug_exit(void)
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 3bf35914bb57..15070412a32e 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -311,11 +311,11 @@ static void bch_data_insert_start(struct closure *cl)
+  * data is written it calls bch_journal, and after the keys have been added to
+  * the next journal write they're inserted into the btree.
+  *
+- * It inserts the data in s->cache_bio; bi_sector is used for the key offset,
++ * It inserts the data in op->bio; bi_sector is used for the key offset,
+  * and op->inode is used for the key inode.
+  *
+- * If s->bypass is true, instead of inserting the data it invalidates the
+- * region of the cache represented by s->cache_bio and op->inode.
++ * If op->bypass is true, instead of inserting the data it invalidates the
++ * region of the cache represented by op->bio and op->inode.
+  */
+ void bch_data_insert(struct closure *cl)
  {
--	if (!IS_ERR_OR_NULL(bcache_debug))
--		debugfs_remove_recursive(bcache_debug);
-+	debugfs_remove_recursive(bcache_debug);
- }
- 
- void __init bch_debug_init(void)
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index 7bbd670a5a84..5b59d44656c0 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -1510,8 +1510,7 @@ static void cache_set_free(struct closure *cl)
- 	struct cache *ca;
- 	unsigned int i;
- 
--	if (!IS_ERR_OR_NULL(c->debug))
--		debugfs_remove(c->debug);
-+	debugfs_remove(c->debug);
- 
- 	bch_open_buckets_free(c);
- 	bch_btree_cache_free(c);
 -- 
 2.16.4
 
