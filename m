@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDB53C65BAE
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 17:57:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 419B0C67872
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 17:57:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9E51620879
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 17:57:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1002E20870
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 17:57:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="wyVRCenG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E51620879
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="goOGTZ3S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1002E20870
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729589AbeLMR5H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Dec 2018 12:57:07 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:39763 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729095AbeLMR5H (ORCPT
+        id S1729585AbeLMR5I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Dec 2018 12:57:08 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:33506 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729483AbeLMR5F (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Dec 2018 12:57:07 -0500
-Received: by mail-io1-f68.google.com with SMTP id k7so2302872iob.6
-        for <linux-block@vger.kernel.org>; Thu, 13 Dec 2018 09:57:06 -0800 (PST)
+        Thu, 13 Dec 2018 12:57:05 -0500
+Received: by mail-it1-f194.google.com with SMTP id m8so16925407itk.0
+        for <linux-block@vger.kernel.org>; Thu, 13 Dec 2018 09:57:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=j8zbGImEaiI6fzdEzobInCNQIlTJ46kLaRSNEoXmu1s=;
-        b=wyVRCenGpJ7Utd3thODL9gLn/0Um/RLk+cC32Z8bg8uPkqdCKKPF+y/OmgbxHALv+D
-         HgJm7LsD5066SLdHBMEB5LtRu83wx7DzAO2m91Ktxfuj1iFUJLu7pmq6f0oCYHNOGg5S
-         zesTlVyin4C34Q0K/B9T6uLcYo725WW1Zt5cTzcgUQ63f6D2I7ji3gSV3oPP+kJdaduo
-         M06OuF8QENdFkfDV5oWtp1SVBgMenPN1LRAotaqKQ4npOQydl704/bmvkOqYCe8KSfBy
-         V030HuGHFvZ1miYapW0ZbEn/2STeGa/bmdJgeuv640sg8FiDBwe9gE99schsbaJ9c5cS
-         YFYA==
+        bh=X5thebUgmjkZJznWx9PghrfmA/cZ8t8Zs5+DcD2OHEI=;
+        b=goOGTZ3S2bIPtcVEyAIvwmS+N+HRhYtZ6GRBJ6m6CXJgf/OcgDVA7dTJtEpJhfHWwl
+         L/fwf2ReSe1w71CFwyW4r7fk40YPbQzFEg/3YZ0dW6CNDP1UnJH/MIqhXbNJuBF6MZKE
+         wyod2DPH5oiRSRLdTXpNQbQ2BwSV8k89seWYuPo/ntyQX9VbdWT0rh6UNGmPKS18VyH8
+         +csvJWMDK/q61P47Ctj3F7//178AaK1LUeNw8UWPUwDTUEJEOYSEMBEFb/9+wqUTbo4g
+         3JNe+VOoBLHdt/9veQPnQvH0gJG9NXe1O3ubC7UOt4HgZsgc8cYHGfi23DNpHd1xaJAX
+         uaMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=j8zbGImEaiI6fzdEzobInCNQIlTJ46kLaRSNEoXmu1s=;
-        b=Dqu8WDUcp/3hI+7wC5JcYVRelSkBomncBb4noHXkaGx8IBvYfJleLfzPMagEbU1Gw3
-         bfYatJOwI7GejOke0luE5Df5Rx69JWHNtzEIGYLadFG6iloOY4A48TjDDIKKoBNOviq5
-         FYvlxLbWJbMzJsueSd4y+7EClG0qXM8/3OT+GXLDhEn5hUhkOBAg4iytEUmTDCLDUTt2
-         DgvegeCrlrL1IuJfRve10JJzxdTAC18GZGzHo+l/lvTWVuA2BfSEzbYJmI5d9pAfMODD
-         Tzfhr2euvtrFUzVvOeSsOYl7Goj2ubgR0HO00hUTM3AnX6wddYNvge3DovhmFtUzeNas
-         a6VQ==
-X-Gm-Message-State: AA+aEWY8df0lk3qMsBW947wLe1BpXAOlZF+wGjbTD0u9ceMaX2fYIdKp
-        e1kOeeOmQ+kjPG2E6iGX70wnROmoLTlHpw==
-X-Google-Smtp-Source: AFSGD/UZuMcpdXV9ceBYr4vyy/sE99WT1EGbVIyhWSUEsc7jJlo6Agstzty9h2WNv6XBn/eCGnEGtA==
-X-Received: by 2002:a6b:919:: with SMTP id t25mr20293537ioi.207.1544723825932;
-        Thu, 13 Dec 2018 09:57:05 -0800 (PST)
+        bh=X5thebUgmjkZJznWx9PghrfmA/cZ8t8Zs5+DcD2OHEI=;
+        b=XQ+/S7G4suSLBWc13gE2+dSFDFFpnx+vQ67wIYF2E9cd/mYZi+q2KaoMuZjhPY27Km
+         UO7fJ9XFRyvsLGG168kzOZ/De4gmG17YakjanM4eN0IpC69jet9LhtVc/hoI67tkSLLZ
+         Bmp5Shp1VjVXAYsH7C1/ArzTVDI4rFJ9oA3/t5W4sRlBcveZkQ67amVkH+z5+N020gqF
+         O1Vzn/3YJktY6Fc+zuFc5ILVkkQISXTw+t5Cx1HuhIHMfZ/QObsV2P9HkPB+8vXHbvYG
+         6Gwn5/VnK7mmbeAzNSzrb3+yE9Es4XDXxsbtlE28wMJlfTrKYCiQ8sKM45Of5EHWr666
+         VrIQ==
+X-Gm-Message-State: AA+aEWZpPpTbYqgUNvqsPPEMQuC8nTrLd+YbcJd7qqUQNQ6YYFqIqEhg
+        Nl1171lLPwMEQk0wsSWGEiKV/mxn5umvZg==
+X-Google-Smtp-Source: AFSGD/UGUt/ieaGY/xOrXeJHi8t1gAYSSDyTPADAahpvxgzXyMsjM4uyEfmBYSZNz72jt9HDkbSmug==
+X-Received: by 2002:a05:660c:648:: with SMTP id y8mr316990itk.48.1544723823981;
+        Thu, 13 Dec 2018 09:57:03 -0800 (PST)
 Received: from x1.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id k6sm1022261ios.69.2018.12.13.09.57.04
+        by smtp.gmail.com with ESMTPSA id k6sm1022261ios.69.2018.12.13.09.57.02
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 13 Dec 2018 09:57:04 -0800 (PST)
+        Thu, 13 Dec 2018 09:57:03 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-aio@kvack.org
 Cc:     hch@lst.de, jmoyer@redhat.com, clm@fb.com,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 08/26] aio: don't zero entire aio_kiocb aio_get_req()
-Date:   Thu, 13 Dec 2018 10:56:27 -0700
-Message-Id: <20181213175645.22181-9-axboe@kernel.dk>
+Subject: [PATCH 07/26] aio: separate out ring reservation from req allocation
+Date:   Thu, 13 Dec 2018 10:56:26 -0700
+Message-Id: <20181213175645.22181-8-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181213175645.22181-1-axboe@kernel.dk>
 References: <20181213175645.22181-1-axboe@kernel.dk>
@@ -73,49 +73,100 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It's 192 bytes, fairly substantial. Most items don't need to be cleared,
-especially not upfront. Clear the ones we do need to clear, and leave
-the other ones for setup when the iocb is prepared and submitted.
+From: Christoph Hellwig <hch@lst.de>
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+This is in preparation for certain types of IO not needing a ring
+reserveration.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/aio.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ fs/aio.c | 30 +++++++++++++++++-------------
+ 1 file changed, 17 insertions(+), 13 deletions(-)
 
 diff --git a/fs/aio.c b/fs/aio.c
-index eaceb40e6cf5..522c04864d82 100644
+index cf0de61743e8..eaceb40e6cf5 100644
 --- a/fs/aio.c
 +++ b/fs/aio.c
-@@ -1009,14 +1009,15 @@ static inline struct aio_kiocb *aio_get_req(struct kioctx *ctx)
+@@ -901,7 +901,7 @@ static void put_reqs_available(struct kioctx *ctx, unsigned nr)
+ 	local_irq_restore(flags);
+ }
+ 
+-static bool get_reqs_available(struct kioctx *ctx)
++static bool __get_reqs_available(struct kioctx *ctx)
+ {
+ 	struct kioctx_cpu *kcpu;
+ 	bool ret = false;
+@@ -993,6 +993,14 @@ static void user_refill_reqs_available(struct kioctx *ctx)
+ 	spin_unlock_irq(&ctx->completion_lock);
+ }
+ 
++static bool get_reqs_available(struct kioctx *ctx)
++{
++	if (__get_reqs_available(ctx))
++		return true;
++	user_refill_reqs_available(ctx);
++	return __get_reqs_available(ctx);
++}
++
+ /* aio_get_req
+  *	Allocate a slot for an aio request.
+  * Returns NULL if no requests are free.
+@@ -1001,24 +1009,15 @@ static inline struct aio_kiocb *aio_get_req(struct kioctx *ctx)
  {
  	struct aio_kiocb *req;
  
--	req = kmem_cache_alloc(kiocb_cachep, GFP_KERNEL|__GFP_ZERO);
-+	req = kmem_cache_alloc(kiocb_cachep, GFP_KERNEL);
+-	if (!get_reqs_available(ctx)) {
+-		user_refill_reqs_available(ctx);
+-		if (!get_reqs_available(ctx))
+-			return NULL;
+-	}
+-
+ 	req = kmem_cache_alloc(kiocb_cachep, GFP_KERNEL|__GFP_ZERO);
  	if (unlikely(!req))
- 		return NULL;
+-		goto out_put;
++		return NULL;
  
  	percpu_ref_get(&ctx->reqs);
-+	req->ki_ctx = ctx;
  	INIT_LIST_HEAD(&req->ki_list);
  	refcount_set(&req->ki_refcnt, 0);
--	req->ki_ctx = ctx;
-+	req->ki_eventfd = NULL;
+ 	req->ki_ctx = ctx;
  	return req;
+-out_put:
+-	put_reqs_available(ctx, 1);
+-	return NULL;
  }
  
-@@ -1730,6 +1731,10 @@ static ssize_t aio_poll(struct aio_kiocb *aiocb, struct iocb *iocb)
- 	if (unlikely(!req->file))
- 		return -EBADF;
+ static struct kioctx *lookup_ioctx(unsigned long ctx_id)
+@@ -1805,9 +1804,13 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+ 		return -EINVAL;
+ 	}
  
-+	req->head = NULL;
-+	req->woken = false;
-+	req->cancelled = false;
++	if (!get_reqs_available(ctx))
++		return -EAGAIN;
 +
- 	apt.pt._qproc = aio_poll_queue_proc;
- 	apt.pt._key = req->events;
- 	apt.iocb = aiocb;
++	ret = -EAGAIN;
+ 	req = aio_get_req(ctx);
+ 	if (unlikely(!req))
+-		return -EAGAIN;
++		goto out_put_reqs_available;
+ 
+ 	if (iocb.aio_flags & IOCB_FLAG_RESFD) {
+ 		/*
+@@ -1870,11 +1873,12 @@ static int io_submit_one(struct kioctx *ctx, struct iocb __user *user_iocb,
+ 		goto out_put_req;
+ 	return 0;
+ out_put_req:
+-	put_reqs_available(ctx, 1);
+ 	percpu_ref_put(&ctx->reqs);
+ 	if (req->ki_eventfd)
+ 		eventfd_ctx_put(req->ki_eventfd);
+ 	kmem_cache_free(kiocb_cachep, req);
++out_put_reqs_available:
++	put_reqs_available(ctx, 1);
+ 	return ret;
+ }
+ 
 -- 
 2.17.1
 
