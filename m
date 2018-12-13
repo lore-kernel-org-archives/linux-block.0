@@ -2,99 +2,142 @@ Return-Path: <SRS0=8pZC=OW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 997EAC67839
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 00:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2095BC67839
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 01:24:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5BEAF20851
-	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 00:44:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bT3XD8DT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BEAF20851
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+	by mail.kernel.org (Postfix) with ESMTP id DC78720851
+	for <linux-block@archiver.kernel.org>; Thu, 13 Dec 2018 01:24:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC78720851
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726381AbeLMAoC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 12 Dec 2018 19:44:02 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:35016 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726344AbeLMAoC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 12 Dec 2018 19:44:02 -0500
-Received: by mail-pg1-f194.google.com with SMTP id s198so171563pgs.2
-        for <linux-block@vger.kernel.org>; Wed, 12 Dec 2018 16:44:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=eGCL8CXk2DxsRI6RmIenE/gWHSpzzo3ICYl1Dkuy9FQ=;
-        b=bT3XD8DTdeHNd1n7r1baIPUQ89GQKbMby4TiPYbrsR8kiaghg/YQFkWEgaHm+c2j9P
-         1UlBC6u5KTkRSzIMxaI4/bTCiPyybRCDtR4h4F1NPUNNL21q6axIUJA8bVsJv7/hLPtL
-         6IGHyRtjtkypXbam8yBKBp1wudltVrnCLUYqx2pWAFNP51kFRbgaFZm5dR5Ud64wBr4H
-         F8vZlbH8atdbIjbB5oYO93hNDcMJtU96lpGvdkOpgzk6z062VLLiR9h2fbeZVgvt4fdd
-         v25M1E6LcBI3mDeM6Sq5iG++4pXKEbNJfdUu0KAwhYxKQsp/d60f1PPPRUb6/IiUACCq
-         ppig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=eGCL8CXk2DxsRI6RmIenE/gWHSpzzo3ICYl1Dkuy9FQ=;
-        b=Q2vpP8hE7ZWTwBwPW8FfetJpSrpVfHaTWs2pBMEMvvsAijUPkLcjJAydLHTSQyD5z/
-         EhEGdSpZWic4bgANR+EFXkAmeU5Hpprh7uFPIIUktYzcZeurQxE/hlBXor5TO8vxCpzn
-         0/XUIbxGs6EORrfrAT00rZ2WwJJZfZoQKUkR40jXKdKS0HbeNO5NFSg5XqUbLbXFBZbh
-         K88w9YfnZX7refK+hp40jhslR1mpKL11vkVX/ltBZgaqrXVpJS16dglbrHeWVZ5isNt9
-         OuvQOVZi9X8FrKb3JfmbP8sArDTwKO68G9exRnBo6Ne0MWnM29NX4zA0En60Sfj14o5Y
-         ieiw==
-X-Gm-Message-State: AA+aEWbzpEjH4w6eGKMyX0uEK9Cvymt6sJQR/v5Z3940GnCI2DAxOhor
-        C0rFbDjwBWy8IXC2sis+bZYkTA==
-X-Google-Smtp-Source: AFSGD/WKp5J5LeNaoqGKcG5fzCqad43ccyyu0EEVy1qkK/rSC3+B2UvfamPnuXjatcvsz4hgIrN1lQ==
-X-Received: by 2002:a62:62c5:: with SMTP id w188mr22423342pfb.160.1544661841546;
-        Wed, 12 Dec 2018 16:44:01 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id p2sm236938pfb.28.2018.12.12.16.43.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 12 Dec 2018 16:44:00 -0800 (PST)
-Subject: Re: [PATCH] blkcg: handle dying request_queue when associating a blkg
-To:     Dennis Zhou <dennis@kernel.org>, Tejun Heo <tj@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>
-Cc:     kernel-team@fb.com, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-References: <20181211230308.66276-1-dennis@kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <217c7b15-d54a-b51d-8b1a-c2ad0d404721@kernel.dk>
-Date:   Wed, 12 Dec 2018 17:43:58 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726475AbeLMBYV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 12 Dec 2018 20:24:21 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46714 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726337AbeLMBYV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 12 Dec 2018 20:24:21 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 7417981F12;
+        Thu, 13 Dec 2018 01:24:20 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id EF34A60921;
+        Thu, 13 Dec 2018 01:24:13 +0000 (UTC)
+Date:   Thu, 13 Dec 2018 09:24:09 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Dennis Zhou <dennis@kernel.org>
+Cc:     Omar Sandoval <osandov@fb.com>, kernel-team@fb.com,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH blktests 2/2] blktests: add Ming Lei's scsi-stress-remove
+Message-ID: <20181213012407.GA7881@ming.t460p>
+References: <20181212230959.69975-1-dennis@kernel.org>
+ <20181212230959.69975-3-dennis@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20181211230308.66276-1-dennis@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181212230959.69975-3-dennis@kernel.org>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Thu, 13 Dec 2018 01:24:20 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/11/18 4:03 PM, Dennis Zhou wrote:
-> Between v3 [1] and v4 [2] of the blkg association series, the
-> association point moved from generic_make_request_checks(), which is
-> called after the request enters the queue, to bio_set_dev(), which is when
-> the bio is formed before submit_bio(). When the request_queue goes away,
-> the blkgs supporting the request_queue are destroyed and then the
-> q->root_blkg is set to %NULL.
+On Wed, Dec 12, 2018 at 06:09:59PM -0500, Dennis Zhou wrote:
+> This test exposed a race condition with shutting down a request_queue
+> and the new blkg association. The issue ended up being that while the
+> request_queue will just start failing requests, blkg destruction sets
+> the q->root_blkg to %NULL. This caused a NPE when trying to reference
+> it. So to help prevent this from happening again, integrate Ming's test
+> into blktests so that it can more easily be ran.
 > 
-> This patch adds a %NULL check to blkg_tryget_closest() to prevent the
-> NPE caused by the above. It also adds a guard to see if the
-> request_queue is dying when creating a blkg to prevent creating a blkg
-> for a dead request_queue.
+> Signed-off-by: Dennis Zhou <dennis@kernel.org>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> ---
+>  tests/block/022     | 96 +++++++++++++++++++++++++++++++++++++++++++++
+>  tests/block/022.out |  2 +
+>  2 files changed, 98 insertions(+)
+>  create mode 100755 tests/block/022
+>  create mode 100644 tests/block/022.out
+> 
+> diff --git a/tests/block/022 b/tests/block/022
+> new file mode 100755
+> index 0000000..45bfff7
+> --- /dev/null
+> +++ b/tests/block/022
+> @@ -0,0 +1,96 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-3.0+
+> +# Copyright (C) 2018 Ming Lei
+> +#
+> +# Regression test for patch "blkcg: handle dying request_queue when associating
+> +# a blkg"
+> +#
+> +# This tries to expose the race condition between blkg association and
+> +# request_queue shutdown. When a request_queue is shutdown, the corresponding
+> +# blkgs are destroyed. Any further associations should fail gracefully and not
+> +# cause a kernel panic.
+> +
+> +. tests/block/rc
+> +. common/scsi_debug
+> +. common/cgroup
+> +
+> +DESCRIPTION="test graceful shutdown of scsi_debug devices with running fio jobs"
+> +QUICK=1
+> +
+> +requires() {
+> +	_have_cgroup2_controller io && _have_scsi_debug && _have_fio
+> +}
+> +
+> +scsi_debug_stress_remove() {
+> +	scsi_debug_path="/sys/bus/pseudo/drivers/scsi_debug"
+> +	count=21
+> +
+> +	runtime=12
+> +	nr_fio_jobs=8
+> +	scsi_dbg_ndelay=10000
+> +
+> +	# set higher aio limit
+> +	echo 524288 > /proc/sys/fs/aio-max-nr
+> +
+> +	#figure out the CAN_QUEUE
+> +	can_queue=$(((count + 1) * (count / 2) / 2))
+> +
+> +	rmmod scsi_debug > /dev/null 2>&1
+> +	modprobe scsi_debug virtual_gb=128 max_luns=$count \
+> +		ndelay=$scsi_dbg_ndelay max_queue=$can_queue
+> +
+> +	# figure out scsi_debug disks
+> +	hosts=$(ls -d /sys/bus/pseudo/drivers/scsi_debug/adapter0/host*)
+> +	hostname=$(basename "$hosts")
+> +	host=$(echo "$hostname" | grep -o -E '[0-9]+')
+> +
+> +	sdisks=$(ls -d $scsi_debug_path/adapter*/"$hostname"/target*/*/block/*)
+> +	disks=""
+> +	for sd in $sdisks; do
+> +		disks+="/dev/"$(basename "$sd")
+> +		disks+=" "
+> +	done
+> +
+> +	use_mq=$(cat /sys/module/scsi_mod/parameters/use_blk_mq)
+> +	if [[ $use_mq = "Y" ]]; then
+> +		scheds=("none" "mq-deadline" "kyber")
+> +	else
+> +		scheds=("noop" "deadline" "cfq")
+> +	fi
 
-Applied, thanks Dennis.
+You may use the following to figure out all supported io schedulers,
+especially we have removed all legacy io schedulers.
 
--- 
-Jens Axboe
+IOSCHEDS=`sed 's/[][]//g' $Q_PATH/scheduler`
 
+
+Thanks,
+Ming
