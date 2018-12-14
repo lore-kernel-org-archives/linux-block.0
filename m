@@ -2,114 +2,88 @@ Return-Path: <SRS0=oQb0=OX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D53EDC67839
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 07:04:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03773C67839
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 07:47:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9B9BE20811
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 07:04:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lc5z4jOR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B9BE20811
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTP id BB1F220811
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 07:47:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB1F220811
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726494AbeLNHEO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Dec 2018 02:04:14 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:32844 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726437AbeLNHEO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Dec 2018 02:04:14 -0500
-Received: by mail-pl1-f195.google.com with SMTP id z23so2307425plo.0;
-        Thu, 13 Dec 2018 23:04:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=W94W/BgjeqGKPkfSUeTBUijXYogWQIiSWFVM4GqFHtE=;
-        b=Lc5z4jORTWT8eBOLSsR6XO+aoHAREhvZULccbyk0hMRdsOtuUsqST+xrwCEH2n6CwF
-         T6lJNqGeFYq6rauioLr/sG56leo6xxRvLhut7g0OqIWrUdp8x2P/IOb8OIwlJVt9fOhK
-         oKAbKfwQ53ZFea1VctMnVUEzOhXifausjzwFlsH3R0380DU660qL/jCDRfJ1qYHN/B9R
-         LnTTkqQbrS+VoetU+IOkZCpsA0Ym8PgvxvHzqKWdS+dgzQSmDRNB6i4msiw3kuBXpmxp
-         jLfVhLeVDMP713FrrEO9HrYZJq0x6KpeMae7m4gD6IDShRsYu+aviM3vheNvXCmd7DE6
-         XjDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=W94W/BgjeqGKPkfSUeTBUijXYogWQIiSWFVM4GqFHtE=;
-        b=okpKGmZsROd1HToVJspEvfFgKhmPVdZbq4i7LnmPV+ysb//xiSt7CHd2rqCpn60TxG
-         ecAchRh1EAWcCUWdHTg8Q8hL+GAT80oqtiTh2dn+MYc5gudT9S/Uvq9UqVqnn8t39RhA
-         EMjQ4zDr5W/boO+s3Lb+NBBuBGrDWY6NhTEbgsfJvNLjXvhNbFbxJsLU855L/FyNeXuu
-         w2kyYPXwF3YH9SMDOSpQG5uHsocAfl6IzPa/tCUs6droExFEswS+RkfIaMM1+osTMoVJ
-         jCaY5nt78O9Xne8NzJQmBC1yCLmwhK5DGXEf7MLlvFJlBUbidUyQURs4Flu9ioF97p5d
-         kp6w==
-X-Gm-Message-State: AA+aEWbWXo8WGM7dZCTpDM6KL371ePZV6ZU1d4stHq14YYs23WCiajf7
-        ZQNwZREVYHHLGZO3qsR8mco=
-X-Google-Smtp-Source: AFSGD/UPlBGPfMuqf/vmcBKgP4yFKlwAsDHITPAKvUIuWjX6QxH/CU9YmFF+L6D/o2d2i5k17isH2w==
-X-Received: by 2002:a17:902:b83:: with SMTP id 3mr1782716plr.42.1544771053891;
-        Thu, 13 Dec 2018 23:04:13 -0800 (PST)
-Received: from localhost.localdomain ([119.196.123.230])
-        by smtp.gmail.com with ESMTPSA id p7sm5956330pfa.22.2018.12.13.23.04.12
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Thu, 13 Dec 2018 23:04:13 -0800 (PST)
-From:   jotun9935@gmail.com
-To:     axboe@kernel.dk, jotun9935@gmail.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] partitions: fix coding style
-Date:   Fri, 14 Dec 2018 16:04:02 +0900
-Message-Id: <20181214070402.92541-1-jotun9935@gmail.com>
-X-Mailer: git-send-email 2.18.0
+        id S1726500AbeLNHrY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Dec 2018 02:47:24 -0500
+Received: from mx2.suse.de ([195.135.220.15]:33136 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726494AbeLNHrX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Dec 2018 02:47:23 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay1.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 3E004AEEC;
+        Fri, 14 Dec 2018 07:47:22 +0000 (UTC)
+Subject: Re: [PATCH 4/4] block: expose devt for GENHD_FL_HIDDEN disks
+To:     Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@fb.com>
+References: <20181206164812.30925-1-cascardo@canonical.com>
+ <20181206164812.30925-5-cascardo@canonical.com>
+ <b3ef062d-3bc3-fdf8-f395-31d1822a3192@suse.de> <20181213143218.GA8723@lst.de>
+ <20181213152532.GA5321@calabresa>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <35acb1b3-77f5-29cf-b92d-5171f4ad6450@suse.de>
+Date:   Fri, 14 Dec 2018 08:47:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.0
+MIME-Version: 1.0
+In-Reply-To: <20181213152532.GA5321@calabresa>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Sungkyung Kim <jotun9935@gmail.com>
+On 12/13/18 4:25 PM, Thadeu Lima de Souza Cascardo wrote:
+> On Thu, Dec 13, 2018 at 03:32:18PM +0100, Christoph Hellwig wrote:
+>> On Thu, Dec 13, 2018 at 10:18:40AM +0100, Hannes Reinecke wrote:
+>>> Welll ... this is not just 'lsblk', but more importantly this will force
+>>> udev to create _block_ device nodes for the hidden devices, essentially
+>>> 'unhide' them.
+>>>
+>>> Is this what we want?
+>>> Christoph?
+>>> I thought the entire _point_ of having hidden devices is that the are ...
+>>> well ... hidden ...
+>>
+>> Yes, that is why I really don't like the last two patches.
+>>
+>> And I've checked back - lsblk actually works just fine at the moment.
+>> But it turns out once we create the slave links it stops working,
+>> which is a really good argument against the first two patches, which
+>> would otherwise seem nice..
+> 
+> Which is why I have sent the "paths/" patchset in the first place. Because I
+> did some homework and read the previous discussion about this, and how lsblk
+> failure to behave with slave links led to the revert of the slaves/holders
+> patch by Dr. Hannes.
+> 
+But you haven't answered my question:
 
-Fix coding style of osf.c
+Why can't we patch 'lsblk' to provide the required information even with 
+the current sysfs layout?
 
-Signed-off-by: Sungkyung Kim <jotun9935@gmail.com>
----
- block/partitions/osf.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Cheers,
 
-diff --git a/block/partitions/osf.c b/block/partitions/osf.c
-index 4b873973d6c0..96921a1e31ce 100644
---- a/block/partitions/osf.c
-+++ b/block/partitions/osf.c
-@@ -22,7 +22,7 @@ int osf_partition(struct parsed_partitions *state)
- 	unsigned char *data;
- 	struct disklabel {
- 		__le32 d_magic;
--		__le16 d_type,d_subtype;
-+		__le16 d_type, d_subtype;
- 		u8 d_typename[16];
- 		u8 d_packname[16];
- 		__le32 d_secsize;
-@@ -50,8 +50,8 @@ int osf_partition(struct parsed_partitions *state)
- 			u8  p_frag;
- 			__le16 p_cpg;
- 		} d_partitions[MAX_OSF_PARTITIONS];
--	} * label;
--	struct d_partition * partition;
-+	} *label;
-+	struct d_partition *partition;
- 
- 	data = read_part_sector(state, 0, &sect);
- 	if (!data)
-@@ -74,7 +74,7 @@ int osf_partition(struct parsed_partitions *state)
- 	}
- 	for (i = 0 ; i < npartitions; i++, partition++) {
- 		if (slot == state->limit)
--		        break;
-+			break;
- 		if (le32_to_cpu(partition->p_size))
- 			put_partition(state, slot,
- 				le32_to_cpu(partition->p_offset),
+Hannes
 -- 
-2.18.0
-
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
