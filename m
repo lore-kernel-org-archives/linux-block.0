@@ -7,19 +7,19 @@ X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5839C43613
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 19:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 363A5C43614
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 19:06:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D0ED2080F
+	by mail.kernel.org (Postfix) with ESMTP id 870242080F
 	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 19:06:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CH0Nk8Jl"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WyndJnv4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730566AbeLNTGO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1730491AbeLNTGO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 14 Dec 2018 14:06:14 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:39938 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:39948 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730491AbeLNTGN (ORCPT
+        with ESMTP id S1730658AbeLNTGN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 14 Dec 2018 14:06:13 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -28,23 +28,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=q8wDJqAk7FPk+TWSFol8MMpUZMPkLaTgn4liGaBL954=; b=CH0Nk8JlxTBkZ4T6RbkH7toBO
-        ePN0Xetq9p6X1Bxu0MCsosovz0JfK+zS14IVbobNbw4uaGWeWy13WO+ZUqKVCMMdVEAuQIkqo+D8o
-        iEkYzWhzledhSDsATt/RG0nZfu5+v7rYYjQVTsSASQd5hBaOOG6gMb1yBHxGnRRtmQIKLk/EWKEAs
-        2f9804xUiOd5CQ2o5Jq3pSD68cOXfRCrY9jb8OeSkr0BS4lfFG4Cpy3SFz+kd+FekB7AwtbmWNeCp
-        QQt3H9Bi5egS4CYMUAfIvrLBhIA1jzAC4/6zxkvX+RV1/qEAhZdvJSEEURqFZSpcYe7ajO4Y/cAcm
-        xWmbOg3kg==;
+         bh=QPQTcFQSwsdDx3QAqFAaR3iAumv+5FC0WJ95UC3nJCY=; b=WyndJnv4Alw5UZImS0Vqj1JqY
+        NxJ5iD5WHK1BcaFAop5kPh47JfuZjagCHDPoUxknE6WNNxhYP5WQxOk7hSEn2OiUmc/EOfNLafiQm
+        H2V8F12kpaQ4Lv6Ox+7fbHzN6FhZ5QEOlqYRWCBd2OG7lE4BSFb4QXWENAryAPY+MiGfPWr7oah/+
+        BhBmOX3pfrvGi7gvCBNUQCblb+SA4BeC0YhwqwAr/dGBjZ/M6at1WWdk3SKz2fbRjlwIISOttikhj
+        LYPhTf9ZO6eT2Mc/6U81C1cyuyaB4q3yADXMrDONcn3a11VYvCGofKGFvwu+gtGbLvXJI4GpC59fS
+        Mwe9XR/CQ==;
 Received: from [2600:1700:65a0:78e0:514:7862:1503:8e4d] (helo=sagi-Latitude-E7470.lbits)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gXsmq-0002PK-Mz; Fri, 14 Dec 2018 19:06:12 +0000
+        id 1gXsmr-0002PK-5A; Fri, 14 Dec 2018 19:06:13 +0000
 From:   Sagi Grimberg <sagi@grimberg.me>
 To:     linux-nvme@lists.infradead.org
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Keith Busch <keith.busch@intel.com>,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v4 2/6] block: make request_to_qc_t public
-Date:   Fri, 14 Dec 2018 11:06:06 -0800
-Message-Id: <20181214190610.20086-3-sagi@grimberg.me>
+Subject: [PATCH v4 4/6] nvme-fabrics: allow nvmf_connect_io_queue to poll
+Date:   Fri, 14 Dec 2018 11:06:08 -0800
+Message-Id: <20181214190610.20086-5-sagi@grimberg.me>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181214190610.20086-1-sagi@grimberg.me>
 References: <20181214190610.20086-1-sagi@grimberg.me>
@@ -53,79 +53,109 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-block consumers will need it for polling requests that
-are sent with blk_execute_rq_nowait. Also, get rid of
-blk_tag_to_qc_t and open-code it instead.
+Preparation for polling support for fabrics. Polling support
+means that our completion queues are not generating any interrupts
+which means we need to poll for the nvmf io queue connect as well.
 
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
+Reviewed by Steve Wise <swise@opengridcomputing.com>
 Signed-off-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- block/blk-mq.c            |  8 --------
- include/linux/blk-mq.h    | 10 ++++++++++
- include/linux/blk_types.h | 11 -----------
- 3 files changed, 10 insertions(+), 19 deletions(-)
+ drivers/nvme/host/fabrics.c | 4 ++--
+ drivers/nvme/host/fabrics.h | 2 +-
+ drivers/nvme/host/fc.c      | 2 +-
+ drivers/nvme/host/rdma.c    | 2 +-
+ drivers/nvme/host/tcp.c     | 2 +-
+ drivers/nvme/target/loop.c  | 2 +-
+ 6 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index eff52c33e434..fb4a09b096d5 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1745,14 +1745,6 @@ static void blk_mq_bio_to_request(struct request *rq, struct bio *bio)
- 	blk_account_io_start(rq, true);
- }
- 
--static blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx, struct request *rq)
--{
--	if (rq->tag != -1)
--		return blk_tag_to_qc_t(rq->tag, hctx->queue_num, false);
--
--	return blk_tag_to_qc_t(rq->internal_tag, hctx->queue_num, true);
--}
--
- static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
- 					    struct request *rq,
- 					    blk_qc_t *cookie, bool last)
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 57eda7b20243..2dd84feaf1ef 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -357,4 +357,14 @@ static inline void *blk_mq_rq_to_pdu(struct request *rq)
- 	for ((i) = 0; (i) < (hctx)->nr_ctx &&				\
- 	     ({ ctx = (hctx)->ctxs[(i)]; 1; }); (i)++)
- 
-+static inline blk_qc_t request_to_qc_t(struct blk_mq_hw_ctx *hctx,
-+		struct request *rq)
-+{
-+	if (rq->tag != -1)
-+		return rq->tag | (hctx->queue_num << BLK_QC_T_SHIFT);
-+
-+	return rq->internal_tag | (hctx->queue_num << BLK_QC_T_SHIFT) |
-+			BLK_QC_T_INTERNAL;
-+}
-+
- #endif
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 46c005d601ac..ee1ce9058302 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -424,17 +424,6 @@ static inline bool blk_qc_t_valid(blk_qc_t cookie)
- 	return cookie != BLK_QC_T_NONE;
- }
- 
--static inline blk_qc_t blk_tag_to_qc_t(unsigned int tag, unsigned int queue_num,
--				       bool internal)
--{
--	blk_qc_t ret = tag | (queue_num << BLK_QC_T_SHIFT);
--
--	if (internal)
--		ret |= BLK_QC_T_INTERNAL;
--
--	return ret;
--}
--
- static inline unsigned int blk_qc_t_to_queue_num(blk_qc_t cookie)
+diff --git a/drivers/nvme/host/fabrics.c b/drivers/nvme/host/fabrics.c
+index d93a169f6403..5ff14f46a8d9 100644
+--- a/drivers/nvme/host/fabrics.c
++++ b/drivers/nvme/host/fabrics.c
+@@ -441,7 +441,7 @@ EXPORT_SYMBOL_GPL(nvmf_connect_admin_queue);
+  *	> 0: NVMe error status code
+  *	< 0: Linux errno error code
+  */
+-int nvmf_connect_io_queue(struct nvme_ctrl *ctrl, u16 qid)
++int nvmf_connect_io_queue(struct nvme_ctrl *ctrl, u16 qid, bool poll)
  {
- 	return (cookie & ~BLK_QC_T_INTERNAL) >> BLK_QC_T_SHIFT;
+ 	struct nvme_command cmd;
+ 	struct nvmf_connect_data *data;
+@@ -468,7 +468,7 @@ int nvmf_connect_io_queue(struct nvme_ctrl *ctrl, u16 qid)
+ 
+ 	ret = __nvme_submit_sync_cmd(ctrl->connect_q, &cmd, &res,
+ 			data, sizeof(*data), 0, qid, 1,
+-			BLK_MQ_REQ_RESERVED | BLK_MQ_REQ_NOWAIT, false);
++			BLK_MQ_REQ_RESERVED | BLK_MQ_REQ_NOWAIT, poll);
+ 	if (ret) {
+ 		nvmf_log_connect_error(ctrl, ret, le32_to_cpu(res.u32),
+ 				       &cmd, data);
+diff --git a/drivers/nvme/host/fabrics.h b/drivers/nvme/host/fabrics.h
+index 81b8fd1c0c5d..cad70a9f976a 100644
+--- a/drivers/nvme/host/fabrics.h
++++ b/drivers/nvme/host/fabrics.h
+@@ -168,7 +168,7 @@ int nvmf_reg_read32(struct nvme_ctrl *ctrl, u32 off, u32 *val);
+ int nvmf_reg_read64(struct nvme_ctrl *ctrl, u32 off, u64 *val);
+ int nvmf_reg_write32(struct nvme_ctrl *ctrl, u32 off, u32 val);
+ int nvmf_connect_admin_queue(struct nvme_ctrl *ctrl);
+-int nvmf_connect_io_queue(struct nvme_ctrl *ctrl, u16 qid);
++int nvmf_connect_io_queue(struct nvme_ctrl *ctrl, u16 qid, bool poll);
+ int nvmf_register_transport(struct nvmf_transport_ops *ops);
+ void nvmf_unregister_transport(struct nvmf_transport_ops *ops);
+ void nvmf_free_options(struct nvmf_ctrl_options *opts);
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index b79e41938513..89accc76d71c 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -1975,7 +1975,7 @@ nvme_fc_connect_io_queues(struct nvme_fc_ctrl *ctrl, u16 qsize)
+ 					(qsize / 5));
+ 		if (ret)
+ 			break;
+-		ret = nvmf_connect_io_queue(&ctrl->ctrl, i);
++		ret = nvmf_connect_io_queue(&ctrl->ctrl, i, false);
+ 		if (ret)
+ 			break;
+ 
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index ed726da77b5b..b907ed43814f 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -598,7 +598,7 @@ static int nvme_rdma_start_queue(struct nvme_rdma_ctrl *ctrl, int idx)
+ 	int ret;
+ 
+ 	if (idx)
+-		ret = nvmf_connect_io_queue(&ctrl->ctrl, idx);
++		ret = nvmf_connect_io_queue(&ctrl->ctrl, idx, false);
+ 	else
+ 		ret = nvmf_connect_admin_queue(&ctrl->ctrl);
+ 
+diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+index 51826479a41e..762a676403ef 100644
+--- a/drivers/nvme/host/tcp.c
++++ b/drivers/nvme/host/tcp.c
+@@ -1393,7 +1393,7 @@ static int nvme_tcp_start_queue(struct nvme_ctrl *nctrl, int idx)
+ 	int ret;
+ 
+ 	if (idx)
+-		ret = nvmf_connect_io_queue(nctrl, idx);
++		ret = nvmf_connect_io_queue(nctrl, idx, false);
+ 	else
+ 		ret = nvmf_connect_admin_queue(nctrl);
+ 
+diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
+index 9908082b32c4..4aac1b4a8112 100644
+--- a/drivers/nvme/target/loop.c
++++ b/drivers/nvme/target/loop.c
+@@ -345,7 +345,7 @@ static int nvme_loop_connect_io_queues(struct nvme_loop_ctrl *ctrl)
+ 	int i, ret;
+ 
+ 	for (i = 1; i < ctrl->ctrl.queue_count; i++) {
+-		ret = nvmf_connect_io_queue(&ctrl->ctrl, i);
++		ret = nvmf_connect_io_queue(&ctrl->ctrl, i, false);
+ 		if (ret)
+ 			return ret;
+ 		set_bit(NVME_LOOP_Q_LIVE, &ctrl->queues[i].flags);
 -- 
 2.17.1
 
