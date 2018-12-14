@@ -2,92 +2,67 @@ Return-Path: <SRS0=oQb0=OX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49EF6C43387
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 20:32:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0A05C43444
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 20:40:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 89D6A2080F
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 20:32:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14C252080F
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 20:40:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1544819550;
-	bh=pRgCTIOsiEvEuttqrH8YrexzH/2Tl0/O+NJvbjuss00=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=MXZb0r1Yi6Pb8oyVcjSiJpGAfyWFrcT+6/sH2kifUHzc+fgo+1gukanplnEdVDDvf
-	 4O+xshrks2HpcqtmOYYEzEld/xTFPgRV2QNlw9NKy18zw9SJxfkK/1DUcO3TGk6w57
-	 5GLuht9t52EoVB5iZJ44VZAT/WyHq8Dox2AVkMcc=
+	s=default; t=1544820010;
+	bh=1g5niojlu+s2g4wlEceutGDJVLIWvTbLU9VBzWJv0xg=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=l89S6y36YlBBpppdokiW/o1gJQWMjvALId+F52Pqbf58AyEoNm5X3gisrvHTfrQw4
+	 HQSMu3GhZ6nPwYF/pvxBy3AsmKsYGaCIas1/YfHRPTV/BRHUAoGqXwexQszehsCRVo
+	 ES/tBWxZifuk/JCv6XC/7HBM67zUvuiPnz3hazp0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730731AbeLNUc3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Dec 2018 15:32:29 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36942 "EHLO mail.kernel.org"
+        id S1730714AbeLNUkI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Dec 2018 15:40:08 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40526 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730714AbeLNUc3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Dec 2018 15:32:29 -0500
-Received: from localhost (unknown [104.132.0.93])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 113EB2080F;
-        Fri, 14 Dec 2018 20:32:29 +0000 (UTC)
+        id S1730987AbeLNUkC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 14 Dec 2018 15:40:02 -0500
+Subject: Re: [GIT PULL] Storage fixes for 4.20-rc6
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1544819549;
-        bh=pRgCTIOsiEvEuttqrH8YrexzH/2Tl0/O+NJvbjuss00=;
-        h=From:To:Cc:Subject:Date:From;
-        b=zYZchJJ/wTQAq2nqnpMKRyi/o/mWnQnaIy/hj606dBPVi+0mUiZTPrlyr+O5j4KO2
-         INVfXqkD+A84fA+ooyfeVIOF6GYlZRX1X1nwn9PMqTYHEIa7vALfLPLFidfmwnJPEn
-         PVLFZAgVuwdxmzynryAXyN8JKLtTjr1L/KwfM94g=
-From:   Jaegeuk Kim <jaegeuk@kernel.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Jaegeuk Kim <jaegeuk@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org
-Subject: [PATCH] loop: drop caches if offset is changed
-Date:   Fri, 14 Dec 2018 12:32:23 -0800
-Message-Id: <20181214203223.7063-1-jaegeuk@kernel.org>
-X-Mailer: git-send-email 2.19.0.605.g01d371f741-goog
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        s=default; t=1544820002;
+        bh=1g5niojlu+s2g4wlEceutGDJVLIWvTbLU9VBzWJv0xg=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=b7Og8HaNtjScYiClCp8DacDVKoj/baBnhFivM6/+HFoe76U/LIaNpxBento+CR9JH
+         QfHlmCEbLbydHpXg6rKoceSeSzFs6bVPCdZFJttSM6NIWfvY09bt/6YVBj3fw5nsLS
+         E00enKQyuBd38HU50GfsImaJBZmoiWcSJDJ8cLws=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <2dd937be-804a-7524-d088-83da7e405ed0@kernel.dk>
+References: <2dd937be-804a-7524-d088-83da7e405ed0@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <2dd937be-804a-7524-d088-83da7e405ed0@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
+ tags/for-linus-20181214
+X-PR-Tracked-Commit-Id: 927b6b2d69b4cc900fa50d7e46d8f1fa91c91b3a
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 380ef2c9ad4fdd5fdd81055857be21ae5f581877
+Message-Id: <20181214204002.7612.57084.pr-tracker-bot@pdx-korg-gitolite-1.ci.codeaurora.org>
+Date:   Fri, 14 Dec 2018 20:40:02 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If we don't drop caches used in old offset, we can get old data from new
-offset, which gives unexpected data to user.
+The pull request you sent on Fri, 14 Dec 2018 12:54:09 -0700:
 
-Martijn found a loopback bug in the below scenario.
-1) LOOP_SET_FD loads first two pages on loop file
-2) LOOP_SET_STATUS64 changes the offset on the loop file
-3) mount is failed due to the cached pages having wrong superblock
+> git://git.kernel.dk/linux-block.git tags/for-linus-20181214
 
-This patch drops caches when we change lo->offset.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/380ef2c9ad4fdd5fdd81055857be21ae5f581877
 
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: linux-block@vger.kernel.org
-Reported-by: Martijn Coenen <maco@google.com>
-Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
----
- drivers/block/loop.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Thank you!
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index cb0cc8685076..f073a3f1a7cd 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1154,6 +1154,12 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 
- 	if (lo->lo_offset != info->lo_offset ||
- 	    lo->lo_sizelimit != info->lo_sizelimit) {
-+		struct block_device *bdev = lo->lo_device;
-+
-+		/* drop stale caches used in old offset */
-+		sync_blockdev(bdev);
-+		kill_bdev(bdev);
-+
- 		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
- 			err = -EFBIG;
- 			goto exit;
 -- 
-2.19.0.605.g01d371f741-goog
-
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
