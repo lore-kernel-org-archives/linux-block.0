@@ -2,134 +2,103 @@ Return-Path: <SRS0=oQb0=OX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F246C6786C
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 08:47:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23642C67839
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 08:56:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D862C2080F
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 08:47:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="YBDfLKtF";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="YBDfLKtF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D862C2080F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+	by mail.kernel.org (Postfix) with ESMTP id E584620879
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 08:56:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E584620879
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=canonical.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728093AbeLNIrw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Dec 2018 03:47:52 -0500
-Received: from smtp.codeaurora.org ([198.145.29.96]:44384 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726494AbeLNIrt (ORCPT
+        id S1727229AbeLNI4S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Dec 2018 03:56:18 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:57498 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726520AbeLNI4S (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Dec 2018 03:47:49 -0500
-Received: by smtp.codeaurora.org (Postfix, from userid 1000)
-        id C3D7A6071B; Fri, 14 Dec 2018 08:47:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1544777268;
-        bh=7VcXAJEE8mpYdb3QXeBNFkdik2X6FkSGjb/XkzckzMw=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=YBDfLKtFYGyAHlgmea0AEdnfHQVSWggOM3/nwer2L3T1uDQhOLyr8PyKIr20bsbMG
-         yfvmlh9466OAzkyAV1Ur2dwE+X10rpoQvlfBv94CkE2NGvXXRaDMOGNit8QYTvXJqu
-         Sa48sRbSZlYFoj94PCQC/9LtZarg1wh1nNE9e4aU=
-Received: from [10.204.79.22] (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: mojha@smtp.codeaurora.org)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id DFAF260208;
-        Fri, 14 Dec 2018 08:47:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
-        s=default; t=1544777268;
-        bh=7VcXAJEE8mpYdb3QXeBNFkdik2X6FkSGjb/XkzckzMw=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=YBDfLKtFYGyAHlgmea0AEdnfHQVSWggOM3/nwer2L3T1uDQhOLyr8PyKIr20bsbMG
-         yfvmlh9466OAzkyAV1Ur2dwE+X10rpoQvlfBv94CkE2NGvXXRaDMOGNit8QYTvXJqu
-         Sa48sRbSZlYFoj94PCQC/9LtZarg1wh1nNE9e4aU=
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org DFAF260208
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=mojha@codeaurora.org
-Subject: Re: [PATCH] partitions: fix coding style
-To:     jotun9935@gmail.com, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20181214070402.92541-1-jotun9935@gmail.com>
-From:   Mukesh Ojha <mojha@codeaurora.org>
-Message-ID: <e1fd45ed-a482-f387-687c-cb4375367a67@codeaurora.org>
-Date:   Fri, 14 Dec 2018 14:17:37 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+        Fri, 14 Dec 2018 03:56:18 -0500
+Received: from 201-68-129-100.dsl.telesp.net.br ([201.68.129.100] helo=calabresa)
+        by youngberry.canonical.com with esmtpsa (TLS1.0:RSA_AES_256_CBC_SHA1:32)
+        (Exim 4.76)
+        (envelope-from <cascardo@canonical.com>)
+        id 1gXjGX-0006MU-4m; Fri, 14 Dec 2018 08:56:13 +0000
+Date:   Fri, 14 Dec 2018 06:56:07 -0200
+From:   Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@fb.com>
+Subject: Re: [PATCH 4/4] block: expose devt for GENHD_FL_HIDDEN disks
+Message-ID: <20181214085606.GD5321@calabresa>
+References: <20181206164812.30925-1-cascardo@canonical.com>
+ <20181206164812.30925-5-cascardo@canonical.com>
+ <b3ef062d-3bc3-fdf8-f395-31d1822a3192@suse.de>
+ <20181213143218.GA8723@lst.de>
+ <20181213152532.GA5321@calabresa>
+ <35acb1b3-77f5-29cf-b92d-5171f4ad6450@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <20181214070402.92541-1-jotun9935@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+In-Reply-To: <35acb1b3-77f5-29cf-b92d-5171f4ad6450@suse.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, Dec 14, 2018 at 08:47:20AM +0100, Hannes Reinecke wrote:
+> On 12/13/18 4:25 PM, Thadeu Lima de Souza Cascardo wrote:
+> > On Thu, Dec 13, 2018 at 03:32:18PM +0100, Christoph Hellwig wrote:
+> > > On Thu, Dec 13, 2018 at 10:18:40AM +0100, Hannes Reinecke wrote:
+> > > > Welll ... this is not just 'lsblk', but more importantly this will force
+> > > > udev to create _block_ device nodes for the hidden devices, essentially
+> > > > 'unhide' them.
+> > > > 
+> > > > Is this what we want?
+> > > > Christoph?
+> > > > I thought the entire _point_ of having hidden devices is that the are ...
+> > > > well ... hidden ...
+> > > 
+> > > Yes, that is why I really don't like the last two patches.
+> > > 
+> > > And I've checked back - lsblk actually works just fine at the moment.
+> > > But it turns out once we create the slave links it stops working,
+> > > which is a really good argument against the first two patches, which
+> > > would otherwise seem nice..
+> > 
+> > Which is why I have sent the "paths/" patchset in the first place. Because I
+> > did some homework and read the previous discussion about this, and how lsblk
+> > failure to behave with slave links led to the revert of the slaves/holders
+> > patch by Dr. Hannes.
+> > 
+> But you haven't answered my question:
+> 
+> Why can't we patch 'lsblk' to provide the required information even with the
+> current sysfs layout?
+> 
 
+I think we could, but with my Ubuntu hat on, after the kernel fix for
+initramfs-tools, that is, slaves/holders links, the user will get an updated
+kernel that breaks the current lsblk on Bionic (Ubuntu 18.04). That will
+require that we backport the lsblk fix, which is not only more work, but there
+may be users who only update from -security, which is where kernel updates end
+regularly, but not this lsblk fix.
 
-On 12/14/2018 12:34 PM, jotun9935@gmail.com wrote:
-> From: Sungkyung Kim <jotun9935@gmail.com>
->
-> Fix coding style of osf.c
->
-> Signed-off-by: Sungkyung Kim <jotun9935@gmail.com>
-> ---
->   block/partitions/osf.c | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/block/partitions/osf.c b/block/partitions/osf.c
-> index 4b873973d6c0..96921a1e31ce 100644
-> --- a/block/partitions/osf.c
-> +++ b/block/partitions/osf.c
-> @@ -22,7 +22,7 @@ int osf_partition(struct parsed_partitions *state)
->   	unsigned char *data;
->   	struct disklabel {
->   		__le32 d_magic;
-> -		__le16 d_type,d_subtype;
-> +		__le16 d_type, d_subtype;
->   		u8 d_typename[16];
->   		u8 d_packname[16];
->   		__le32 d_secsize;
-> @@ -50,8 +50,8 @@ int osf_partition(struct parsed_partitions *state)
->   			u8  p_frag;
->   			__le16 p_cpg;
->   		} d_partitions[MAX_OSF_PARTITIONS];
+And that kernel update is a regression against that old lsblk version.
 
-Also include this change as well
+Cascardo.
 
---- a/block/partitions/osf.c
-+++ b/block/partitions/osf.c
-@@ -57,7 +57,7 @@ int osf_partition(struct parsed_partitions *state)
-         if (!data)
-                 return -1;
-
--       label = (struct disklabel *) (data+64);
-+       label = (struct disklabel *) (data + 64);
-         partition = label->d_partitions;
-
-
-would be better a bit more you add in your changelog.
-
-Cheers,
-Mukesh
-> -	} * label;
-> -	struct d_partition * partition;
-> +	} *label;
-> +	struct d_partition *partition;
->   
->   	data = read_part_sector(state, 0, &sect);
->   	if (!data)
-> @@ -74,7 +74,7 @@ int osf_partition(struct parsed_partitions *state)
->   	}
->   	for (i = 0 ; i < npartitions; i++, partition++) {
->   		if (slot == state->limit)
-> -		        break;
-> +			break;
->   		if (le32_to_cpu(partition->p_size))
->   			put_partition(state, slot,
->   				le32_to_cpu(partition->p_offset),
-
+> Cheers,
+> 
+> Hannes
+> -- 
+> Dr. Hannes Reinecke		   Teamlead Storage & Networking
+> hare@suse.de			               +49 911 74053 688
+> SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N�rnberg
+> GF: F. Imend�rffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+> HRB 21284 (AG N�rnberg)
