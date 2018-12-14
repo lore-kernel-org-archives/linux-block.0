@@ -2,151 +2,101 @@ Return-Path: <SRS0=oQb0=OX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FF5AC67839
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 01:29:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE70BC67839
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 04:27:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E71A42075B
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 01:29:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56A8220645
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 04:27:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ILgE9p+R"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E71A42075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ETV+eKf3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56A8220645
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727638AbeLNB3l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 13 Dec 2018 20:29:41 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:42978 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728130AbeLNB3X (ORCPT
+        id S1726465AbeLNE1C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 13 Dec 2018 23:27:02 -0500
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:44700 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726437AbeLNE1C (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 13 Dec 2018 20:29:23 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wBE1OPWC158563;
-        Fri, 14 Dec 2018 01:29:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=9TBTfJALae16hdD8OBiuBFcGlbqT897B63K0LtZfH2w=;
- b=ILgE9p+RvdUGtweBOVpqN0z7tOjJy9sqeYhS79NcPjw+NKX2iiaVh4TTChbjaqPeiEbC
- PcOVrRDb8cLBDul4iTlbXK+oGFsSYsuJmAmC014jUFPzzSKck+zs7RKh0Z+Tc28Yltil
- XHRhkfbAeZpROGaLrLg6jReHsTcQKFOz+ruyt+WqnSjMXb8MDDNzCw1oXvVcSmYy7VS9
- DxrMYFHtU1IBW4u7c1KiYWeIl2H5QahDMJqdmlM5LyLoUaiaL3+laKmFc6wcyskCFRpy
- hjZfz145GBfGtWzofbXNgHB1O6CtdtAkhhfpR9nalzydPy7lqk96CbEI+DRyobC5usAl /w== 
-Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
-        by userp2120.oracle.com with ESMTP id 2pb7tf77ke-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 Dec 2018 01:29:19 +0000
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id wBE1TItL015296
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 14 Dec 2018 01:29:19 GMT
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id wBE1TIBW012393;
-        Fri, 14 Dec 2018 01:29:18 GMT
-Received: from will-ThinkCentre-M93p.cn.oracle.com (/10.182.70.234)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 13 Dec 2018 17:29:18 -0800
-From:   Jianchao Wang <jianchao.w.wang@oracle.com>
-To:     axboe@kernel.dk
+        Thu, 13 Dec 2018 23:27:02 -0500
+Received: by mail-pl1-f196.google.com with SMTP id e11so1460712plt.11
+        for <linux-block@vger.kernel.org>; Thu, 13 Dec 2018 20:27:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=KPHbDV34yzR9ERzXsDpefC/OdXUniSJP9yj/1sPWB28=;
+        b=ETV+eKf3iJQ0jGIcJ9JqJfN+yZWK/rsZN+XRWhVe6xp/XNMfjTtQcpTidP3Jeqc3JU
+         TU3BJa+WZLmTUUkgIJczqsIw8QoNi5t0gWpTwhYcZ2z8iKiL5KSN53c/M0vqPduFlZhf
+         kSnG6DNxj0M1dR4sDrFwUNpZ6jpY/3GbrTeLl/fUpVzSiBOa+6FjvvS33veBpgWSxesf
+         hoyr3wgJ4GYkww4K1gN6WShwx4v4+LbaAp+04AZffYfoXe02QFx5XE6bIsVE4b6TkJHX
+         o0KmsQ9+EHbzCXXXXxQsknoW96tZzuLzxIVbVwjLiZfwIPHchr/VsbvYYAyZ0nl0Tuno
+         aKJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=KPHbDV34yzR9ERzXsDpefC/OdXUniSJP9yj/1sPWB28=;
+        b=anih8bCJ0L05CgqgnZ+cle8xWtM+qcxMryU1EfMroAfJ3P/S2y50/MR6KwnNlxHdzy
+         +eoobsS5wEWVJ6uXwN2X2ChByRLD3GTUfMVphJOvd1WKkoFI4DqNExcZMnZgCW7xw49a
+         CzghMTJ9ibjrR9OHwFYzNJWjtwA0hD6Hb7erslg2L4aD/G8eaeqWmQt6dSSXowd7ajHq
+         1rslLYfpMk5IAPXbVJzd8AziRrLPVtF6H7xCHJMf4Ym0uCiyI3YMRnzA+5wtjdo6Kqrn
+         sUd3uyTAclmpw0WsW2FI+vUPWealDccgDskiCg/2ggIrR9jEcCPEdNsnuNNndb+o1kDJ
+         BKaA==
+X-Gm-Message-State: AA+aEWbZYHyk4AAM7MeIJGVkGpSYLDGfXP6Xlg7Ql9nuOmfYtgnJpwTl
+        LHvEXwNZHsYWXywAlpminCjuPw==
+X-Google-Smtp-Source: AFSGD/VLuEMLa6QbDOUxUm4EFELnZ/jTKROs/FZQme5RyHCNUtK7dAmEGH3geC0YYj+tsMljKGmVpQ==
+X-Received: by 2002:a17:902:22f:: with SMTP id 44mr1477889plc.137.1544761621557;
+        Thu, 13 Dec 2018 20:27:01 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id w185sm4625343pfb.135.2018.12.13.20.26.59
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 13 Dec 2018 20:27:00 -0800 (PST)
+Subject: Re: [PATCH V14 0/3] blk-mq: refactor and fix the code of issue
+ directly
+To:     Jianchao Wang <jianchao.w.wang@oracle.com>
 Cc:     ming.lei@redhat.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH V14 2/3] blk-mq: issue directly with bypass 'false' in blk_mq_sched_insert_requests
-Date:   Fri, 14 Dec 2018 09:28:19 +0800
-Message-Id: <1544750900-1549-3-git-send-email-jianchao.w.wang@oracle.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1544750900-1549-1-git-send-email-jianchao.w.wang@oracle.com>
 References: <1544750900-1549-1-git-send-email-jianchao.w.wang@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9106 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1812140011
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8035ac66-63a1-b03a-95f8-c11a5482e8d7@kernel.dk>
+Date:   Thu, 13 Dec 2018 21:26:58 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+MIME-Version: 1.0
+In-Reply-To: <1544750900-1549-1-git-send-email-jianchao.w.wang@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It is not necessary to issue request directly with bypass 'true'
-in blk_mq_sched_insert_requests and handle the non-issued requests
-itself. Just set bypass to 'false' and let blk_mq_try_issue_directly
-handle them totally. Remove the blk_rq_can_direct_dispatch check,
-because blk_mq_try_issue_directly can handle it well.If request is
-direct-issued unsuccessfully, insert the reset.
+On 12/13/18 6:28 PM, Jianchao Wang wrote:
+> Hi Jens
+> 
+> After commit c616cbee ( blk-mq: punt failed direct issue to dispatch
+> list ), we always insert request to hctx dispatch list whenever get a
+> BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE, this is overkill and will
+> harm the merging. We just need to do that for the requests that has
+> been through .queue_rq.
+> 
+> This patch set fixes the issue above and refactors the code of issue
+> request directly to unify the interface and make the code clearer and
+> more readable.
+> 
+> Please consider this patchset for 4.21.
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
----
- block/blk-mq-sched.c |  8 +++-----
- block/blk-mq.c       | 20 +++++++++-----------
- 2 files changed, 12 insertions(+), 16 deletions(-)
+I'll throw this through all the testing tomorrow, looks good to me.
+If it passes, I'll add it for 4.21.
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index f096d898..5b4d52d 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -417,12 +417,10 @@ void blk_mq_sched_insert_requests(struct blk_mq_hw_ctx *hctx,
- 		 * busy in case of 'none' scheduler, and this way may save
- 		 * us one extra enqueue & dequeue to sw queue.
- 		 */
--		if (!hctx->dispatch_busy && !e && !run_queue_async) {
-+		if (!hctx->dispatch_busy && !e && !run_queue_async)
- 			blk_mq_try_issue_list_directly(hctx, list);
--			if (list_empty(list))
--				return;
--		}
--		blk_mq_insert_requests(hctx, ctx, list);
-+		else
-+			blk_mq_insert_requests(hctx, ctx, list);
- 	}
- 
- 	blk_mq_run_hw_queue(hctx, run_queue_async);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index af4dc82..90361fe 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1874,22 +1874,20 @@ blk_status_t blk_mq_request_issue_directly(struct request *rq, bool last)
- void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 		struct list_head *list)
- {
-+	blk_qc_t unused;
-+	blk_status_t ret = BLK_STS_OK;
-+
- 	while (!list_empty(list)) {
--		blk_status_t ret;
- 		struct request *rq = list_first_entry(list, struct request,
- 				queuelist);
- 
- 		list_del_init(&rq->queuelist);
--		ret = blk_mq_request_issue_directly(rq, list_empty(list));
--		if (ret != BLK_STS_OK) {
--			if (ret == BLK_STS_RESOURCE ||
--					ret == BLK_STS_DEV_RESOURCE) {
--				blk_mq_request_bypass_insert(rq,
-+		if (ret == BLK_STS_OK)
-+			ret = blk_mq_try_issue_directly(hctx, rq, &unused,
-+							false,
- 							list_empty(list));
--				break;
--			}
--			blk_mq_end_request(rq, ret);
--		}
-+		else
-+			blk_mq_sched_insert_request(rq, false, true, false);
- 	}
- 
- 	/*
-@@ -1897,7 +1895,7 @@ void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
- 	 * the driver there was more coming, but that turned out to
- 	 * be a lie.
- 	 */
--	if (!list_empty(list) && hctx->queue->mq_ops->commit_rqs)
-+	if (ret != BLK_STS_OK && hctx->queue->mq_ops->commit_rqs)
- 		hctx->queue->mq_ops->commit_rqs(hctx);
- }
- 
 -- 
-2.7.4
+Jens Axboe
 
