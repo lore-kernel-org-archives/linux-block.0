@@ -2,119 +2,101 @@ Return-Path: <SRS0=oQb0=OX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 553CAC43387
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 19:00:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64DBEC43612
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 19:06:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5DCD206C0
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 19:00:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BFF0920879
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 19:06:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="g2vDrd9X"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730414AbeLNS77 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Dec 2018 13:59:59 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:40364 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730123AbeLNS77 (ORCPT
+        id S1730657AbeLNTGO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Dec 2018 14:06:14 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:39952 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730659AbeLNTGN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Dec 2018 13:59:59 -0500
-Received: by mail-ot1-f67.google.com with SMTP id s5so6382976oth.7;
-        Fri, 14 Dec 2018 10:59:58 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=XVtfZxMKULLz0z4vLPwF+0VmgbRmglG9tctFZMoTuuo=;
-        b=CJXZuNcb9w8Q6z1+QVaHn6kiovSatrnDcBYbu4yEZNxDcNH5JEVUbBqv2UmXk1a8JJ
-         o4J6evSqzb+j+BD+pwq7U3rIWv2cL8rquXA4nvnDGvykFCKgTzWucvwZN8+FzFJD7awS
-         H/egt34MHFkcDWA9zQkDrZU3ojfwqPVX/vQ1tOcCA6wqH9MaAup1UG96+Nxe//+hMspN
-         DvVF1k/dQ3TDvcgPt/frUFCQi/Mq4XsKBFXX66QmZTK6+nbkldkKoY4TEKFOsN5Wdq/T
-         hQdNyFSF2vx8IlimvfCWEM1kaRwzH+OUQBk+6eWsttRxqML4UtDBN/GYYiZBIqbb9bok
-         M4iQ==
-X-Gm-Message-State: AA+aEWYE80xt7oB55d9aHaABC4BQJ5/MxUvrgqnIeRxr1p4NjtngcGWD
-        J5S6ZeOZ67LIHsHddTPZ0f+aRF2A
-X-Google-Smtp-Source: AFSGD/VDv5BXY0gwGV1yYuI85IASjeqUvTa9LR9kDSOUQ6zCoWSUP9Oca7k/tWRW6Wy4BNAjQ8zB1w==
-X-Received: by 2002:a9d:63cd:: with SMTP id e13mr3049643otl.319.1544813997573;
-        Fri, 14 Dec 2018 10:59:57 -0800 (PST)
-Received: from ?IPv6:2600:1700:65a0:78e0:514:7862:1503:8e4d? ([2600:1700:65a0:78e0:514:7862:1503:8e4d])
-        by smtp.gmail.com with ESMTPSA id x4sm2408021otk.37.2018.12.14.10.59.52
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Dec 2018 10:59:56 -0800 (PST)
-Subject: Re: [PATCH v3 6/6] nvme-rdma: implement polling queue map
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-rdma@vger.kernel.org, Keith Busch <keith.busch@intel.com>,
-        Jens Axboe <axboe@kernel.dk>
-References: <20181213213410.9841-1-sagi@grimberg.me>
- <20181213213410.9841-7-sagi@grimberg.me> <20181214154632.GC24417@lst.de>
+        Fri, 14 Dec 2018 14:06:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Message-Id:Date:Subject:Cc:To:From:
+        Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=YBh005hj5l95m+IEbr6EKNTzV45g6K47MQ49zTTNG74=; b=g2vDrd9XUtym725KpHVHTC7gP
+        XufA54glS02kfhjOvirO1FlWIVR7LrXc92pIpFjf3/qRAE6OjAZgKjad7kfz6939XdPatgAigGf0Q
+        QiHlwVx9/0DrkRg7m1NmCoXwe0fj5ycgk91W1RR8SgsUjjkQ50wH9WY0S7fWattQrj2D05Jg7QSRh
+        HkoLALkSemjl5NhWjOqXSO5BjzeLbhB2yVejOQ6mUSKhwKWU+vMrMUnhpr7v1HcXsIjZFM0/5VLrq
+        19nNhdeANndHnwLXDJLOvfso0kB0n/rbLSEo4ukpY/cof2sYu7PptfMdB2gB9x7uPl481jN8L7d98
+        7WzEtM6qA==;
+Received: from [2600:1700:65a0:78e0:514:7862:1503:8e4d] (helo=sagi-Latitude-E7470.lbits)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gXsmq-0002PK-8s; Fri, 14 Dec 2018 19:06:12 +0000
 From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <1ae85cf5-4b54-c1f2-7337-16184f7ba5d4@grimberg.me>
-Date:   Fri, 14 Dec 2018 10:59:51 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <20181214154632.GC24417@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     linux-nvme@lists.infradead.org
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <keith.busch@intel.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v4 0/6] restore nvme-rdma polling
+Date:   Fri, 14 Dec 2018 11:06:04 -0800
+Message-Id: <20181214190610.20086-1-sagi@grimberg.me>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Add an additional queue mapping for polling queues that will
+host polling for latency critical I/O.
 
->> +static bool nvme_rdma_poller_queue(struct nvme_rdma_queue *queue)
-> 
-> Can we please make this poll_queue?  or at least polled_queue?
-> poller sounds odd..
+Allocate the poll queues with IB_POLL_DIRECT context. For nvmf connect
+we introduce a new blk_execute_rq_polled to poll for the completion and
+have nvmf_connect_io_queue use it for conneting polling queues.
 
-Changed to nvme_rdma_poll_queue..
+Changes from v3:
+- renamed nvme_rdma_poller_queue to nvme_rdma_poll_queue
+- dropped explicit setting of QUEUE_FLAG_POLL in the connect_q
+- report nr_maps=3 only if we got opts->nr_poll_queues
+- dropped local cq variable from nvme_rdma_poll
 
-> 
->> -		set->nr_maps = 2 /* default + read */;
->> +		set->nr_maps = HCTX_MAX_TYPES;
->>   	}
->>   
->>   	ret = blk_mq_alloc_tag_set(set);
->> @@ -864,6 +881,10 @@ static int nvme_rdma_configure_io_queues(struct nvme_rdma_ctrl *ctrl, bool new)
->>   			ret = PTR_ERR(ctrl->ctrl.connect_q);
->>   			goto out_free_tag_set;
->>   		}
->> +
->> +		if (ctrl->ctrl.opts->nr_poll_queues)
->> +			blk_queue_flag_set(QUEUE_FLAG_POLL,
->> +				ctrl->ctrl.connect_q);
-> 
-> The block core is supposed to detect we can poll based on nr_maps > 2,
-> and then set QUEUE_FLAG_POLL automatically.  Although I got the details
-> wrong for PCI as well, but I just sent a fix..
+Changes from v2:
+- move blk_execute_rq_polled to nvme-core
+- turn off REQ_HIPRI if polling is not supported (e.g. for stacking devices)
+- omit nvme-cli patch - can be taken from v2
+- removed blk_tag_to_qc_t and open-coded it in request_to_tag instead
 
-I'll lose that, but I didn't understand what you got wrong for pci?
-(didn't understand the fix either)
+Changes from v1:
+- get rid of ib_change_cq_ctx
+- poll for nvmf connect over poll queues
 
->> +static int nvme_rdma_poll(struct blk_mq_hw_ctx *hctx)
->> +{
->> +	struct nvme_rdma_queue *queue = hctx->driver_data;
->> +	struct ib_cq *cq = queue->ib_cq;
->> +
->> +	return ib_process_cq_direct(cq, -1);
-> 
-> I think we can skip the cq local variable here.
+Christoph Hellwig (1):
+  block: clear REQ_HIPRI if polling is not supported
 
-Lost..
+Sagi Grimberg (5):
+  block: make request_to_qc_t public
+  nvme-core: optionally poll sync commands
+  nvme-fabrics: allow nvmf_connect_io_queue to poll
+  nvme-fabrics: allow user to pass in nr_poll_queues
+  nvme-rdma: implement polling queue map
 
-> Otherwise this looks really nice and simple, thanks for looking into it!
-> 
-> Do you have any performance number, especially with Jens' ringbuffer
-> code?
+ block/blk-core.c            |  3 +++
+ block/blk-mq.c              |  8 ------
+ drivers/nvme/host/core.c    | 38 ++++++++++++++++++++++++----
+ drivers/nvme/host/fabrics.c | 25 ++++++++++++++-----
+ drivers/nvme/host/fabrics.h |  5 +++-
+ drivers/nvme/host/fc.c      |  2 +-
+ drivers/nvme/host/nvme.h    |  2 +-
+ drivers/nvme/host/rdma.c    | 49 ++++++++++++++++++++++++++++++++-----
+ drivers/nvme/host/tcp.c     |  2 +-
+ drivers/nvme/target/loop.c  |  2 +-
+ include/linux/blk-mq.h      | 10 ++++++++
+ include/linux/blk_types.h   | 11 ---------
+ 12 files changed, 116 insertions(+), 41 deletions(-)
 
-Well, I can get from my local vm on my laptop on top of soft-roce 7K
-iops :) (compared tp 5.5K without polling, but not something to
-conclude from)
+-- 
+2.17.1
 
-I don't have any numbers to show for right now...
-
-As I said in the cover letter, we want a way to tell ib_poll_cq_direct
-to not count send completions (where we end our sqe), right now we are
-probably screwing up poll_success stat...
