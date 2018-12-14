@@ -2,78 +2,85 @@ Return-Path: <SRS0=oQb0=OX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5091BC43387
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 16:21:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34A02C43387
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 16:47:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C8839206E0
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 16:21:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D3CEF206DD
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 16:47:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QpGqc665"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="s/ifdbMa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729748AbeLNQVZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Dec 2018 11:21:25 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:54560 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727698AbeLNQVZ (ORCPT
+        id S1729672AbeLNQrx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Dec 2018 11:47:53 -0500
+Received: from mail-io1-f50.google.com ([209.85.166.50]:38780 "EHLO
+        mail-io1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729409AbeLNQrx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Dec 2018 11:21:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=bggtyBEbG34io588W2NZDb84f8RWVx7porrtxyQOIqI=; b=QpGqc665kXyTlJZjz0LpBtMeB
-        SjuLjn3StMd0Y2wHy9rHl9mNnT38lUOq6IDuwLu6yqtajEM2TomFDQswmcbV61yjHINj9TlhFdQ9j
-        uBTd1Lu+wpSMKgy4ZJ2Lm2WOsLe4u2SfHRci1FudDXM77Fzor1kE3Ms/WTj065oLU8p5UlDiAeM9J
-        6IJla6jTAWQaB/Mu3RVhPsmKPFKdv6NBzqcWm9FkI3ELFQUanXEMkY+3RZAlkpSsj8WCgz/u5ymmt
-        SyiJ3kgVqqRnJC7kEQqaZ3r3mCmc8v9JBDsPByiW8irB6ZwHDk4KFkF69Dys7Tp5Sd+zF0V8DXRa1
-        HGFhYDo4Q==;
-Received: from 089144198147.atnat0007.highway.a1.net ([89.144.198.147] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gXqDM-0006Yi-Do; Fri, 14 Dec 2018 16:21:25 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
+        Fri, 14 Dec 2018 11:47:53 -0500
+Received: by mail-io1-f50.google.com with SMTP id l14so4927528ioj.5
+        for <linux-block@vger.kernel.org>; Fri, 14 Dec 2018 08:47:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=PwXONsIWQY8zwbUGfM+SvGcQ1/KT/1FMCdgAJdTVKLM=;
+        b=s/ifdbMagByaIgO5XTav9W+Y1OmpykF1+dGNVqoGiaD2jSxlggjiU33vMolPBQAc3d
+         PXYZVQCi6gG/rSSiAOXwauTfcuPiegXQbybrsmI03ZFSrYQCoBcOx1v1eXGPTo92NBrn
+         y9fGc1O6dgAO18p7wqlJ97oqFbpAb8W/EDMR34zl3hoT2IRB6ZeOmNlZR4uEbKaUoB6d
+         QEAcyCQwv/xKOIbYllX7jyNkVqyS51Y9YHSfoV7BDL2v0extHGS0vzx6C421bpsUk0a0
+         PvvabeYF4F3zWoFsDC8i2ADj98v93ocpRKuUPAmdLvSZwOcUSR4SvcaoLqqxt79/3tyU
+         CqIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=PwXONsIWQY8zwbUGfM+SvGcQ1/KT/1FMCdgAJdTVKLM=;
+        b=VD1ph7xDySLAfVMl707ykv4peT7RQecvB2XRs7Lpdu8yjdObk+jxabWAHEzba2uq/p
+         YNdZvfXiJydfqHaeY5PUGtiqMeZPCkyKnvc2q5J8NTub2QJszBz3vVzRMDAmvYdEpqff
+         52gXKgRy56l8eOTsrzIUWPAvU6s2ep+zJQGtSRHmWUjkFOmwTJPGPPmTQgjSatGnAefX
+         b+7MyPeTxeOL1rfMmAJ861KB+B7kjkAaOXJTB6KvabXuzsSQUyeJJjziqP0SW9CQlvT2
+         yRfurBeJdgR4isrKXGhB41sAlidx5RFAMq8M8p4QHRoxDW8UVK4NS3UyNnnDRLV24IyS
+         EDiA==
+X-Gm-Message-State: AA+aEWas/hEtQHJmdfMAB7hWIqa0RcUe5ztghlyGAnV+Z8Js6DBAe7ya
+        4Ph1F3J0dIyxPV3Qax6V2WougUyLHoAR+g==
+X-Google-Smtp-Source: AFSGD/X0WlTE7kcf0hCBtDtI5TTCOCmBRoPSWfuPNiwlq0sXrpUJWdeS/g2TW9udAx/J+FG6xVS9dA==
+X-Received: by 2002:a6b:1741:: with SMTP id 62mr3164769iox.251.1544806071629;
+        Fri, 14 Dec 2018 08:47:51 -0800 (PST)
+Received: from [192.168.1.56] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id b91sm2791608itd.26.2018.12.14.08.47.50
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 14 Dec 2018 08:47:50 -0800 (PST)
+Subject: Re: [PATCH] block: clear REQ_HIPRI if polling is not supported
+To:     Christoph Hellwig <hch@lst.de>
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH] block: clear REQ_HIPRI if polling is not supported
-Date:   Fri, 14 Dec 2018 17:21:22 +0100
-Message-Id: <20181214162122.14937-1-hch@lst.de>
-X-Mailer: git-send-email 2.19.2
+References: <20181214162122.14937-1-hch@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <1afcdd57-1193-0d85-49e4-2808d1123865@kernel.dk>
+Date:   Fri, 14 Dec 2018 09:47:49 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20181214162122.14937-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This prevents a HIPRI bio from being submitted through a stacking
-driver that does not support polling and thus won't poll for I/O
-completion.
+On 12/14/18 9:21 AM, Christoph Hellwig wrote:
+> This prevents a HIPRI bio from being submitted through a stacking
+> driver that does not support polling and thus won't poll for I/O
+> completion.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-core.c | 3 +++
- 1 file changed, 3 insertions(+)
+Applied, thanks.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 268d2b8e9843..efa10789ddc0 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -921,6 +921,9 @@ generic_make_request_checks(struct bio *bio)
- 		}
- 	}
- 
-+	if (!test_bit(QUEUE_FLAG_POLL, &q->queue_flags))
-+		bio->bi_opf &= ~REQ_HIPRI;
-+
- 	switch (bio_op(bio)) {
- 	case REQ_OP_DISCARD:
- 		if (!blk_queue_discard(q))
 -- 
-2.19.2
+Jens Axboe
 
