@@ -2,119 +2,97 @@ Return-Path: <SRS0=oQb0=OX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD4B9C43387
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 19:15:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1217C43387
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 19:33:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 349DC204FD
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 19:15:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07F9A2080F
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 19:33:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="nrEokc98"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730405AbeLNTPG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Dec 2018 14:15:06 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:45668 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730123AbeLNTPF (ORCPT
+        id S1730551AbeLNTdE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Dec 2018 14:33:04 -0500
+Received: from mail-it1-f196.google.com ([209.85.166.196]:50776 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730521AbeLNTdE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Dec 2018 14:15:05 -0500
-Received: by mail-pl1-f196.google.com with SMTP id a14so3139442plm.12
-        for <linux-block@vger.kernel.org>; Fri, 14 Dec 2018 11:15:05 -0800 (PST)
+        Fri, 14 Dec 2018 14:33:04 -0500
+Received: by mail-it1-f196.google.com with SMTP id z7so10556214iti.0
+        for <linux-block@vger.kernel.org>; Fri, 14 Dec 2018 11:33:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=BVMq4uJdj9GiwZS67Gsjx6en9Dve9CoCPZnQ6kVkVLQ=;
+        b=nrEokc98pvt18UbB3FYJTOC698g7Yr67c4/3MpnDsO2cFDYYS9ky3Mkp3FS5sJsJtr
+         CVAWC9RTvW9KtJdg/ba/f2515astTw2h8Ni/yXe0wPplEUezZRZtM3kdDUDo0fcfN9Vb
+         s13fvuD1uKZppb6qSkOjvvLs0EJDAobCgAvuS96YzNswDTKe4qrtVtVEapQc3nFLHJvY
+         OEBNgDKg6Yx+F8d+KJBTm47m4SBGW29C9uaTgB7AVX/ePcS4z6GcLYnY43ne+yBfqZrm
+         y1gnIg3ww5amw2Hz6squUpV6pgBu3fB294QsgJKXp4HdnOm50qCIh0YsVkD7HWicjJ+x
+         kF+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=uUr0rorcAsBwP1JVWctylssazl+dnHmWq/IaLZNc+3g=;
-        b=sce9gQKqSYs3zsZkAkNbxC83hul/eerBp4wLoob9eg/LJ+7UPXq9JL4NWqSwMYhdho
-         ZvnlWm1yySgFpT0RTP4uH8GPG9bM4UdgYUo3HgIXiButpc6SmswOV+rb72todbYpejX6
-         euhf17jyAuc3/Tg1xM/31bh6ikgOIq9GrRmjEmEieuwKzDryEtbo2CQs4Qkvy8rXtaLi
-         yXVRzvfg+cEN22IY1bCyqUf08MRoR2yztAsxnn4MvOEso9MH+f6rz35LqYcXlN7A1IyX
-         jjMks+9Ha2qOV5HXw5Wy0Kn98I6+nZG25/zy6PUbTwZzTUDQjFduaEvi8pwb8RQH6wWH
-         ge0Q==
-X-Gm-Message-State: AA+aEWacZfNey4k5W5L3+N8Iz3JJ0XlRE4mgenAvYJ4D0gaXZnjZBVRr
-        YoIzKc/m/drprjj0nmzcfdk=
-X-Google-Smtp-Source: AFSGD/Vz1+kzA2b+9TUjGAiuuIFzoGdGaVv3OxU8iY2S5V7I9WuPofX1FwLs+9U9tKfSG62xIULAXA==
-X-Received: by 2002:a17:902:2c03:: with SMTP id m3mr4111875plb.125.1544814905021;
-        Fri, 14 Dec 2018 11:15:05 -0800 (PST)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id 128sm8607938pfu.129.2018.12.14.11.15.04
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 14 Dec 2018 11:15:04 -0800 (PST)
-Message-ID: <1544814903.185366.427.camel@acm.org>
-Subject: Re: [PATCH 2/2] blk-wbt: export internal state via debugfs
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Omar Sandoval <osandov@fb.com>, Christoph Hellwig <hch@lst.de>,
-        Josef Bacik <josef@toxicpanda.com>
-Date:   Fri, 14 Dec 2018 11:15:03 -0800
-In-Reply-To: <20181214113926.7451-3-ming.lei@redhat.com>
-References: <20181214113926.7451-1-ming.lei@redhat.com>
-         <20181214113926.7451-3-ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=BVMq4uJdj9GiwZS67Gsjx6en9Dve9CoCPZnQ6kVkVLQ=;
+        b=Ka48+bMop9WFc6UQnd2gkw4vTNebe3gfHWK7ps7gXSQCKTNH7DTWezAxf2FBoJMFJb
+         ngT1l5YAzvA8ktdYuiDT7Jk2qM4F+SxrVEwqE0oKIY/qBwFQYpFStij4c4f5rIdquFlE
+         YOnsUUk3Ot6+S8VpPF1oVp3gygz75uPXFy2bxeLnilv/z8B72GorEtllBbz6nt3oQoNF
+         0re4eigfinZUgyUCfn0V+8o48buHjk7V60cxu+eQXlym5vxTO+VxO85m6Exean7LWjz9
+         7HdRpX3g7SMJjxwmH8Pg9GFY+BeGFgMwqSx6veEMCf9aT9HVetkMm0wkML3Ej8paPrWi
+         cT8w==
+X-Gm-Message-State: AA+aEWbthu1GyDT7KlGK4afDGBvV0ed/pPmlSugOCrZxCT1mpvq9KuL1
+        KS87GqvWeXibH+xF0dJ3qcaCMA==
+X-Google-Smtp-Source: AFSGD/XNDIPRnYmA/sSN2eCqrJirV4argD6D85cwmd20Y9sog8CA/YJzXtWej9Vin0kGJIIQJe5vAg==
+X-Received: by 2002:a24:ef44:: with SMTP id i65mr4156646ith.165.1544815983535;
+        Fri, 14 Dec 2018 11:33:03 -0800 (PST)
+Received: from [192.168.1.56] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id k64sm4131244itb.7.2018.12.14.11.33.02
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 14 Dec 2018 11:33:02 -0800 (PST)
+Subject: Re: [PATCH V14 0/3] blk-mq: refactor and fix the code of issue
+ directly
+To:     Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc:     ming.lei@redhat.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <1544750900-1549-1-git-send-email-jianchao.w.wang@oracle.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <f13c2983-8e59-374f-7fd7-7158f3b71b8b@kernel.dk>
+Date:   Fri, 14 Dec 2018 12:33:01 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+MIME-Version: 1.0
+In-Reply-To: <1544750900-1549-1-git-send-email-jianchao.w.wang@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 2018-12-14 at 19:39 +-0800, Ming Lei wrote:
-+AD4 This information is helpful to either investigate issues, or understand
-+AD4 wbt's internal behaviour.
-+AD4 
-+AD4 Cc: Bart Van Assche +ADw-bart.vanassche+AEA-wdc.com+AD4
-+AD4 Cc: Omar Sandoval +ADw-osandov+AEA-fb.com+AD4
-+AD4 Cc: Christoph Hellwig +ADw-hch+AEA-lst.de+AD4
-+AD4 Cc: Josef Bacik +ADw-josef+AEA-toxicpanda.com+AD4
-+AD4 Signed-off-by: Ming Lei +ADw-ming.lei+AEA-redhat.com+AD4
-+AD4 ---
-+AD4  block/blk-wbt.c +AHw 91 +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-+AD4  1 file changed, 91 insertions(+-)
-+AD4 
-+AD4 diff --git a/block/blk-wbt.c b/block/blk-wbt.c
-+AD4 index 463e4eb80287..2684bf2d112f 100644
-+AD4 --- a/block/blk-wbt.c
-+AD4 +-+-+- b/block/blk-wbt.c
-+AD4 +AEAAQA -715,6 +-715,94 +AEAAQA void wbt+AF8-disable+AF8-default(struct request+AF8-queue +ACo-q)
-+AD4  +AH0
-+AD4  EXPORT+AF8-SYMBOL+AF8-GPL(wbt+AF8-disable+AF8-default)+ADs
-+AD4  
-+AD4 +-+ACM-ifdef CONFIG+AF8-BLK+AF8-DEBUG+AF8-FS
-+AD4 +-static int wbt+AF8-curr+AF8-window+AF8-show(void +ACo-data, struct seq+AF8-file +ACo-m)
-+AD4 +-+AHs
-+AD4 +-	struct rq+AF8-qos +ACo-rqos +AD0 data+ADs
-+AD4 +-	struct rq+AF8-wb +ACo-rwb +AD0 RQWB(rqos)+ADs
-+AD4 +-
-+AD4 +-	seq+AF8-printf(m, +ACIAJQ-llu ns+AFw-n+ACI, rwb-+AD4-cur+AF8-win+AF8-nsec)+ADs
-+AD4 +-	return 0+ADs
-+AD4 +-+AH0
+On 12/13/18 6:28 PM, Jianchao Wang wrote:
+> Hi Jens
+> 
+> After commit c616cbee ( blk-mq: punt failed direct issue to dispatch
+> list ), we always insert request to hctx dispatch list whenever get a
+> BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE, this is overkill and will
+> harm the merging. We just need to do that for the requests that has
+> been through .queue_rq.
+> 
+> This patch set fixes the issue above and refactors the code of issue
+> request directly to unify the interface and make the code clearer and
+> more readable.
+> 
+> Please consider this patchset for 4.21.
 
-Please consider to embed the unit (+ACI-ns+ACI) in the attribute name instead of
-in the attribute value. That will make it easier to process this attribute
-in developer debug scripts.
+Applied, thanks Jianchao.
 
-+AD4 +-static int wbt+AF8-min+AF8-latency+AF8-show(void +ACo-data, struct seq+AF8-file +ACo-m)
-+AD4 +-+AHs
-+AD4 +-	struct rq+AF8-qos +ACo-rqos +AD0 data+ADs
-+AD4 +-	struct rq+AF8-wb +ACo-rwb +AD0 RQWB(rqos)+ADs
-+AD4 +-
-+AD4 +-	seq+AF8-printf(m, +ACIAJQ-luns+AFw-n+ACI, rwb-+AD4-min+AF8-lat+AF8-nsec)+ADs
-+AD4 +-	return 0+ADs
-+AD4 +-+AH0
-
-Same comment here about the unit.
-
-+AD4 +-static const struct blk+AF8-mq+AF8-debugfs+AF8-attr wbt+AF8-debugfs+AF8-attrs+AFsAXQ +AD0 +AHs
-+AD4 +-	+AHsAIg-curr+AF8-window+ACI, 0400, wbt+AF8-curr+AF8-window+AF8-show+AH0,
-+AD4 +-	+AHsAIg-enable+AF8-state+ACI, 0400, wbt+AF8-enable+AF8-state+AF8-show+AH0,
-
-How about using +ACI-enabled+ACI instead of +ACI-enable+AF8-state+ACI?
-
-Thanks,
-
-Bart.
+-- 
+Jens Axboe
 
