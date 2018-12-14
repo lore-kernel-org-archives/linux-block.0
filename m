@@ -2,860 +2,150 @@ Return-Path: <SRS0=oQb0=OX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A37AC67839
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 05:44:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45B7AC67839
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 06:22:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CCA4720879
-	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 05:44:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07F1720811
+	for <linux-block@archiver.kernel.org>; Fri, 14 Dec 2018 06:22:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cadence.com header.i=@cadence.com header.b="CBV61ejM";
-	dkim=pass (1024-bit key) header.d=cadence.com header.i=@cadence.com header.b="Xupp9LwB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCA4720879
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=cadence.com
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="HA+hEmI1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07F1720811
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-block-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726465AbeLNFoN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Dec 2018 00:44:13 -0500
-Received: from mx0a-0014ca01.pphosted.com ([208.84.65.235]:55360 "EHLO
-        mx0a-0014ca01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726437AbeLNFoM (ORCPT
+        id S1726437AbeLNGWf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 14 Dec 2018 01:22:35 -0500
+Received: from mail-it1-f180.google.com ([209.85.166.180]:38901 "EHLO
+        mail-it1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726510AbeLNGWe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Dec 2018 00:44:12 -0500
-Received: from pps.filterd (m0042385.ppops.net [127.0.0.1])
-        by mx0a-0014ca01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id wBE5gTLE031735;
-        Thu, 13 Dec 2018 21:43:52 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cadence.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=proofpoint;
- bh=loCV1Hf0pFL086hi91wq2VAu4CD95yiSxLnOLGE4Ih8=;
- b=CBV61ejMYoH7NtwMykWU1Cu7Z9vhL9G1EvVN84zt8/NCaL6KoVrS9Zl3jbnF6/k8tEpK
- MuH6Ea+vH0gbqey6ElhR/nMeojCGm2OEIqPgAsyWe6un6vqm7iJseFyL1W6aPKCYUYu6
- dImpTIX6G8BmNIR8uPcf07axXH66fa0IC2G8JfI5ufV8AHT0/MnFPJSge+Aopf+l7nOg
- FZMlZq3vIrDisQscYxGb6k0TeDOmRVmvr5vMevM3Q66houVOABdap79nWHmJN1S3UPRg
- OWxJ+A30Zqy7f6y8cOZ9Z0NbZGUMtvJ2k3sGXI2LDY19m0iz8qB5pZV1EIoGa/T2DIlu wQ== 
-Authentication-Results: cadence.com;
-        spf=pass smtp.mailfrom=pthombar@cadence.com
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1nam02lp2055.outbound.protection.outlook.com [104.47.36.55])
-        by mx0a-0014ca01.pphosted.com with ESMTP id 2pbf1upt83-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Thu, 13 Dec 2018 21:43:51 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cadence.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=loCV1Hf0pFL086hi91wq2VAu4CD95yiSxLnOLGE4Ih8=;
- b=Xupp9LwBGOeRP6m/VATqtFTbQET8f3CWIPxFrhIbYfVwhEQcv/QrOK6LJPfaIxuJ2yb4kTcAMrfQkyNcn7Q37UCbb+T1BEqmsnMtxAilVV9KZlgA+XhhD6cEV0L0kqdEOODIXGjqujhz1NWzJIrVthqj3gB5wkiTxSZ+L/ltzAg=
-Received: from SN2PR07MB2480.namprd07.prod.outlook.com (10.167.14.144) by
- SN2PR07MB2687.namprd07.prod.outlook.com (10.167.15.151) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1425.19; Fri, 14 Dec 2018 05:43:46 +0000
-Received: from SN2PR07MB2480.namprd07.prod.outlook.com
- ([fe80::18cf:ee7a:c8ee:1bba]) by SN2PR07MB2480.namprd07.prod.outlook.com
- ([fe80::18cf:ee7a:c8ee:1bba%10]) with mapi id 15.20.1404.026; Fri, 14 Dec
- 2018 05:43:46 +0000
-From:   Parshuram Raju Thombare <pthombar@cadence.com>
-To:     Ladvine D Almeida <ladvine.dalmeida@synopsys.com>,
-        Eric Biggers <ebiggers@kernel.org>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "vinholikatti@gmail.com" <vinholikatti@gmail.com>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "mchehab+samsung@kernel.org" <mchehab+samsung@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "nicolas.ferre@microchip.com" <nicolas.ferre@microchip.com>,
-        "arnd@arndb.de" <arnd@arndb.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        Alan Douglas <adouglas@cadence.com>,
-        Janek Kotas <jank@cadence.com>,
-        Rafal Ciepiela <rafalc@cadence.com>,
-        "AnilKumar Chimata" <anilc@codeaurora.org>,
-        Satya Tangirala <satyat@google.com>,
-        "Paul Crowley" <paulcrowley@google.com>,
-        Manjunath M Bettegowda <manjunath.mb@synopsys.com>,
-        Tejas Joglekar <tejas.joglekar@synopsys.com>,
-        Joao Pinto <Joao.Pinto@synopsys.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: RE: [PATCH 2/2] scsi: ufs: add inline crypto support to UFS HCD
-Thread-Topic: [PATCH 2/2] scsi: ufs: add inline crypto support to UFS HCD
-Thread-Index: AQHUkTcFn2oUaDSRF0KQyi683pox5qV9uxUw
-Date:   Fri, 14 Dec 2018 05:43:46 +0000
-Message-ID: <SN2PR07MB24803F60A3290CD95A0FFDFAC1A10@SN2PR07MB2480.namprd07.prod.outlook.com>
-References: <20181211095027.GA3316@lvlogina.cadence.com>
- <20181211181647.GC221175@gmail.com>
- <CO2PR07MB2469AD9C0A121EBF94129A11C1A70@CO2PR07MB2469.namprd07.prod.outlook.com>
- <BD7FB879CC136E419544C8E2AE7B9C30227EE5@IN01WEMBXA.internal.synopsys.com>
-In-Reply-To: <BD7FB879CC136E419544C8E2AE7B9C30227EE5@IN01WEMBXA.internal.synopsys.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-dg-ref: PG1ldGE+PGF0IG5tPSJib2R5LnR4dCIgcD0iYzpcdXNlcnNccHRob21iYXJcYXBwZGF0YVxyb2FtaW5nXDA5ZDg0OWI2LTMyZDMtNGE0MC04NWVlLTZiODRiYTI5ZTM1Ylxtc2dzXG1zZy0zNTkzYzM4My1mZjYzLTExZTgtODRlMC0xMDY1MzBlNmVmM2VcYW1lLXRlc3RcMzU5M2MzODUtZmY2My0xMWU4LTg0ZTAtMTA2NTMwZTZlZjNlYm9keS50eHQiIHN6PSIxNjc5MyIgdD0iMTMxODkyMzk4MjEwODgyNTYzIiBoPSJtbWtxNmR2dlVIcm9KbWxCbzdnZjRoNWVER1E9IiBpZD0iIiBibD0iMCIgYm89IjEiLz48L21ldGE+
-x-dg-rorf: 
-x-originating-ip: [14.143.9.161]
-x-ms-publictraffictype: Email
-x-microsoft-exchange-diagnostics: 1;SN2PR07MB2687;20:ro7eKXJsypNOvs2dYqEVeGKuCJhUppBO/DatS+mN8TKCesgDK/WlKbN7MSo9AzVtXW0wHdC+77re3P58Z7uqEUAcPgWVHBuaHCNKmsfcR4VKLmYlqoVzNJhbC/5eaYCQSxo39Mwbur7qLbAH3kfKBf460ut3AjrDXvM3rdGpQr1gn8dR4CrDIWC1tMPJ8+cCFzN6MhICx/sLnwBDsifX1AJQYpCnOcPyKMX8xErX66Q+Ugg100yhbhQF/Y6zkZUs
-x-ms-office365-filtering-correlation-id: e7690adc-0b35-4c3f-2f98-08d661871d9a
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600074)(711020)(2017052603328)(7153060)(7193020);SRVR:SN2PR07MB2687;
-x-ms-traffictypediagnostic: SN2PR07MB2687:
-x-microsoft-antispam-prvs: <SN2PR07MB2687711394FAC8A237F45AFCC1A10@SN2PR07MB2687.namprd07.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-exchange-antispam-report-cfa-test: BCL:0;PCL:0;RULEID:(8211001083)(3230021)(999002)(6040522)(2401047)(8121501046)(5005006)(93006095)(93001095)(10201501046)(3002001)(3231475)(944501520)(4982022)(52105112)(148016)(149066)(150057)(6041310)(20161123564045)(20161123558120)(20161123562045)(20161123560045)(201703131423095)(201702281528075)(20161123555045)(201703061421075)(201703061406153)(201708071742011)(7699051)(76991095);SRVR:SN2PR07MB2687;BCL:0;PCL:0;RULEID:;SRVR:SN2PR07MB2687;
-x-forefront-prvs: 08864C38AC
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(396003)(376002)(136003)(39860400002)(366004)(346002)(36092001)(189003)(199004)(13464003)(6246003)(478600001)(53946003)(14444005)(7696005)(8936002)(6506007)(53546011)(81166006)(99286004)(55236004)(256004)(81156014)(105586002)(102836004)(305945005)(76176011)(2906002)(71200400001)(14454004)(9686003)(19627235002)(6306002)(78486014)(966005)(55016002)(71190400001)(4744004)(53936002)(476003)(345774005)(5660300001)(33656002)(93886005)(446003)(26005)(11346002)(25786009)(106356001)(8676002)(68736007)(6116002)(316002)(54906003)(486006)(6436002)(7416002)(39060400002)(3846002)(74316002)(110136005)(186003)(7736002)(575784001)(66066001)(4326008)(86362001)(97736004)(229853002);DIR:OUT;SFP:1101;SCL:1;SRVR:SN2PR07MB2687;H:SN2PR07MB2480.namprd07.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: cadence.com does not designate
- permitted sender hosts)
-x-microsoft-antispam-message-info: bk9fiagUU7e7yfp19VEkUA12bZbKyN78kPpEli6tWTC9+YHZf18eXViB+2NJYlVlle1r6mvKyMxG1AnAVz+0QFYnG2M6dB6huAoAmAWUUpjr5OSX2RqQGNi5Ei1guR+Dd637DuoCmooTEFjHjMVUqUM1atcG+uuFYxQJdgn721yTTYSAVVkXnZMVkFB7zXTn1gDPtjqhpzsY9fXFDzDlp6N66T6VFzZ7V1ZyzF/hFWbcfclQV2U/kSZx/t8/RDg385Ixo7yeE4P26yPjJl+7gKT26bp8O1wIlaOkM4LC2Z0vchhpfT3Df5v/xdtxZ/8p
-spamdiagnosticoutput: 1:99
-spamdiagnosticmetadata: NSPM
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 14 Dec 2018 01:22:34 -0500
+Received: by mail-it1-f180.google.com with SMTP id h65so7778435ith.3
+        for <linux-block@vger.kernel.org>; Thu, 13 Dec 2018 22:22:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=from:references:in-reply-to:mime-version:thread-index:date
+         :message-id:subject:to:cc;
+        bh=I12FPaqyGXSoogFjkNTkufV4uRDY/Cff2IBDxDI4KpI=;
+        b=HA+hEmI1fKphcid3Wqu1l6r9epJ/ZrC2vCCrP9SKrX++r4BnMe45jrPKru5wNmoK1O
+         pjY0mKOtL6UiEakepZpBrPXzVImU7tMs16KcKHx0EIjVyNrGRVwjVw3ryz44A01LWg3U
+         6TWlbnM88ltDF/phoyFNk6I2WTsxw3t7X4/Qw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:references:in-reply-to:mime-version
+         :thread-index:date:message-id:subject:to:cc;
+        bh=I12FPaqyGXSoogFjkNTkufV4uRDY/Cff2IBDxDI4KpI=;
+        b=li2huCp2BNPllYb9sGy1DTYHNxdX1HS643zFz/BEfrRzqyrVibhC9RTD8/BpNY3H4F
+         Ec/VvSDDgrLqMeiyaEKO+1fqxl8N0+HlIu1fBKdiAsQ5sF8XRrLvqv4vO2az8FdNSGIn
+         Whz8ElTnjoOYriiqPYmSoKMRGolK4Wpy9Paz8NbQzUeTry4DHfQrtQd1KjoIXCb4MpFj
+         zmQv4h5KgmaRMql/CvCYTybIPxnCwWGgvOGkd5Upr08k3fHRnQgzN1hxMjayl/OLBqSQ
+         96N2qvnvdStB3+qgYQ/G2IU2AdC0Yxvs+fBPsshm2FK48MLdpBBR2DdEWC336gpgtsyT
+         rWDw==
+X-Gm-Message-State: AA+aEWYUvndLLQGMBbL4RY7g+yrx0etuzSdgzCQy3y6Za1lijs2y6bJf
+        O+y5YMLXGfVExr4FIBAlQ33wjYrSF0qAe8QiPNZhTA==
+X-Google-Smtp-Source: AFSGD/X8Ub0uTcCConCF8ENpcIqIHjxFQbcdhTWudIeGDLDxp8Ds0t9IdjBcfL6EUmPR3MTazgoXkBLCgerOQaxaIsM=
+X-Received: by 2002:a02:2303:: with SMTP id u3mr1611571jau.42.1544768553574;
+ Thu, 13 Dec 2018 22:22:33 -0800 (PST)
+From:   Kashyap Desai <kashyap.desai@broadcom.com>
+References: <1543943674.185366.194.camel@acm.org> <ce2cdcee7e8d8e21cc8398a882b9d6e3@mail.gmail.com>
+ <20181206003323.GB3015@ming.t460p> <9e57309d7f40c35c1096b6f932c02f68@mail.gmail.com>
+ <20181207101959.GF29027@ming.t460p> 88ed84836a807d5102f9164fceb157ac@mail.gmail.com
+ 1c6b4131aea4d2efa19d5ce0584bf6e3@mail.gmail.com
+In-Reply-To: 1c6b4131aea4d2efa19d5ce0584bf6e3@mail.gmail.com
 MIME-Version: 1.0
-X-OriginatorOrg: cadence.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e7690adc-0b35-4c3f-2f98-08d661871d9a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Dec 2018 05:43:46.1404
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: d36035c5-6ce6-4662-a3dc-e762e61ae4c9
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN2PR07MB2687
-X-Proofpoint-SPF-Result: pass
-X-Proofpoint-SPF-Record: v=spf1 include:_spf.salesforce.com include:mktomail.com
- include:spf-0014ca01.pphosted.com include:spf.protection.outlook.com
- include:auth.msgapp.com include:spf.mandrillapp.com ~all
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2018-12-14_03:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_check_notspam policy=outbound_check score=0
- priorityscore=1501 malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0
- spamscore=0 clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1812140052
+X-Mailer: Microsoft Outlook 14.0
+Thread-Index: AQIDGsA5xuRcZ0ZzYKBZCDlABhVdmwHqGsmwAaocH2YATD8ANgEEvmLDpO7Q/qCABpVU4IAEJO3A
+Date:   Fri, 14 Dec 2018 11:52:31 +0530
+Message-ID: <c8843ac18d076085e6740db7e083ab21@mail.gmail.com>
+Subject: RE: +AFs-PATCH+AF0- blk-mq: Set request mapping to NULL in blk+AF8-mq+AF8-put+AF8-driver+AF8-tag
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ladvine,
+> > > On Thu, Dec 06, 2018 at 11:15:13AM +0530, Kashyap Desai wrote:
+> > > > >
+> > > > > If the 'tag' passed to scsi_host_find_tag() is valid, I think
+there
+> > > > > shouldn't have such issue.
+> > > > >
+> > > > > If you want to find outstanding IOs, maybe you can try
+> > > > > blk_mq_queue_tag_busy_iter()
+> > > > > or blk_mq_tagset_busy_iter(), because you may not know if the
+passed
+> > > > 'tag'
+> > > > > to
+> > > > > scsi_host_find_tag() is valid or not.
+> > > >
+> > > > We tried quick change in mpt3sas driver using
+blk_mq_tagset_busy_iter
+> > and
+> > > > it returns/callback for valid requests (no stale entries are
+returned).
+> > > > Expected.
+> > > > Above two APIs are only for blk-mq.  What about non-mq case ?
+Driver
+> > > > should use scsi_host_find_tag for non-mq and
+blk_mq_tagset_busy_iter
+> > for
+> > > > blk-mq case ?
+> > >
+> > > But your patch is only for blk-mq, is there same issue on non-mq
+case?
+> >
+> > Problematic part from below function is code path which goes from "
+> > shost_use_blk_mq(shost))".
+> > Non-mq path works fine because every IO completion set bqt-
+> >tag_index[tag]
+> > = NULL from blk_queue_end_tag().
+> >
+> > I did similar things for mq path in this patch.
+> >
+> > static inline struct scsi_cmnd *scsi_host_find_tag(struct Scsi_Host
+*shost,
+> >                 int tag)
+> > {
+> >         struct request *req = NULL;
+> >
+> >         if (tag == SCSI_NO_TAG)
+> >                 return NULL;
+> >
+> >         if (shost_use_blk_mq(shost)) {
+> >                 u16 hwq = blk_mq_unique_tag_to_hwq(tag);
+> >
+> >                 if (hwq < shost->tag_set.nr_hw_queues) {
+> >                         req =
+blk_mq_tag_to_rq(shost->tag_set.tags[hwq],
+> >                                 blk_mq_unique_tag_to_tag(tag));
+> >                 }
+> >         } else {
+> >                 req = blk_map_queue_find_tag(shost->bqt, tag);
+> >         }
+>
+>
+> Hi Jens,
+>
+> Any conclusion/feedback on this topic/patch ?  As discussed, This is a
+safe
+> change and  good to have if no design issue.
 
->From: Ladvine D Almeida <ladvine.dalmeida@synopsys.com>
->Sent: Friday, December 14, 2018 1:10 AM
->Subject: Re: [PATCH 2/2] scsi: ufs: add inline crypto support to UFS HCD
->Where is Crypto target 'crypto-ufs' implementation available? Did you subm=
-itted
->any other patch for the same?
->Also, it is better to provide a generic name as the target is valid for al=
-l other block
->devices.
+Hi, Since we have not concluded on fix, we can resume discussion on next
+revision of the patch. I will be posting V2 patch with complete fix.
 
-[PATCH 2/2] have crypto-ufs implementation. [PATCH 1/2] add variable to str=
-uct bio.
-Device mapper name is not generic because there are ufs specific things but=
- we should
-be able to make it generic.
+Kashyap
 
-Regards,
-Parshuram Thombare
-
->-----Original Message-----
->From: Ladvine D Almeida <ladvine.dalmeida@synopsys.com>
->Sent: Friday, December 14, 2018 1:10 AM
->To: Parshuram Raju Thombare <pthombar@cadence.com>; Eric Biggers
-><ebiggers@kernel.org>
->Cc: axboe@kernel.dk; vinholikatti@gmail.com; jejb@linux.vnet.ibm.com;
->martin.petersen@oracle.com; mchehab+samsung@kernel.org;
->gregkh@linuxfoundation.org; davem@davemloft.net; akpm@linux-
->foundation.org; nicolas.ferre@microchip.com; arnd@arndb.de; linux-
->kernel@vger.kernel.org; linux-block@vger.kernel.org; linux-
->scsi@vger.kernel.org; Alan Douglas <adouglas@cadence.com>; Janek Kotas
-><jank@cadence.com>; Rafal Ciepiela <rafalc@cadence.com>; AnilKumar
->Chimata <anilc@codeaurora.org>; Ladvine D Almeida
-><ladvine.dalmeida@synopsys.com>; Satya Tangirala <satyat@google.com>; Paul
->Crowley <paulcrowley@google.com>; Manjunath M Bettegowda
-><manjunath.mb@synopsys.com>; Tejas Joglekar
-><tejas.joglekar@synopsys.com>; Joao Pinto <Joao.Pinto@synopsys.com>; linux=
--
->crypto@vger.kernel.org
->Subject: Re: [PATCH 2/2] scsi: ufs: add inline crypto support to UFS HCD
 >
->EXTERNAL MAIL
->
->
->On 12/12/18 5:52 AM, Parshuram Raju Thombare wrote:
->> Hello Eric,
->>
->> Thank you for a comment.
->>
->>> -----Original Message-----
->>> From: Eric Biggers <ebiggers@kernel.org>
->>> Sent: Tuesday, December 11, 2018 11:47 PM
->>> To: Parshuram Raju Thombare <pthombar@cadence.com>
->>> Cc: axboe@kernel.dk; vinholikatti@gmail.com; jejb@linux.vnet.ibm.com;
->>> martin.petersen@oracle.com; mchehab+samsung@kernel.org;
->>> gregkh@linuxfoundation.org; davem@davemloft.net; akpm@linux-
->>> foundation.org; nicolas.ferre@microchip.com; arnd@arndb.de; linux-
->>> kernel@vger.kernel.org; linux-block@vger.kernel.org; linux-
->>> scsi@vger.kernel.org; Alan Douglas <adouglas@cadence.com>; Janek
->>> Kotas <jank@cadence.com>; Rafal Ciepiela <rafalc@cadence.com>;
->>> AnilKumar Chimata <anilc@codeaurora.org>; Ladvine D Almeida
->>> <ladvine@synopsys.com>; Satya Tangirala <satyat@google.com>; Paul
->>> Crowley <paulcrowley@google.com>
->>> Subject: Re: [PATCH 2/2] scsi: ufs: add inline crypto support to UFS
->>> HCD
->>>
->>> EXTERNAL MAIL
->>>
->>>
->>> [+Cc other people who have been working on this]
->Eric, Thanks for cc-ing me to the mail chain.
->
->Parshuram,
->Glad to know that you are working on the Inline Encryption support.
->My concerns are mentioned inline below.
->
->>>
->>>
->>>
->>> Hi Parshuram,
->>>
->>>
->>>
->>> On Tue, Dec 11, 2018 at 09:50:27AM +0000, Parshuram Thombare wrote:
->>>
->>>> Add real time crypto support to UFS HCD using new device
->>>
->>>> mapper 'crypto-ufs'. dmsetup tool can be used to enable
->>>
->>>> real time / inline crypto support using device mapper
->>>
->>>> 'crypt-ufs'.
->
->Where is Crypto target 'crypto-ufs' implementation available? Did you subm=
-itted
->any other patch for the same?
->Also, it is better to provide a generic name as the target is valid for al=
-l other block
->devices.
->
->>>
->>>>
->>>
->>>> Signed-off-by: Parshuram Thombare <pthombar@cadence.com>
->>>
->>>> ---
->>>
->>>>  MAINTAINERS                      |    7 +
->>>
->>>>  block/Kconfig                    |    5 +
->>>
->>>>  drivers/scsi/ufs/Kconfig         |   12 +
->>>
->>>>  drivers/scsi/ufs/Makefile        |    1 +
->>>
->>>>  drivers/scsi/ufs/ufshcd-crypto.c |  453
->>> ++++++++++++++++++++++++++++++++++++++
->>>
->>>>  drivers/scsi/ufs/ufshcd-crypto.h |  102 +++++++++
->>>
->>>>  drivers/scsi/ufs/ufshcd.c        |   27 +++-
->>>
->>>>  drivers/scsi/ufs/ufshcd.h        |    6 +
->>>
->>>>  drivers/scsi/ufs/ufshci.h        |    1 +
->>>
->>>>  9 files changed, 613 insertions(+), 1 deletions(-)
->>>
->>>>  create mode 100644 drivers/scsi/ufs/ufshcd-crypto.c
->>>
->>>>  create mode 100644 drivers/scsi/ufs/ufshcd-crypto.h
->>>
->>>>
->>>
->>>> diff --git a/MAINTAINERS b/MAINTAINERS
->>>
->>>> index f485597..3a68126 100644
->>>
->>>> --- a/MAINTAINERS
->>>
->>>> +++ b/MAINTAINERS
->>>
->>>> @@ -15340,6 +15340,13 @@ S:	Supported
->>>
->>>>  F:	Documentation/scsi/ufs.txt
->>>
->>>>  F:	drivers/scsi/ufs/
->>>
->>>>
->>>
->>>> +UNIVERSAL FLASH STORAGE HOST CONTROLLER CRYPTO DRIVER
->>>
->>>> +M:	Parshuram Thombare <pthombar@cadence.com>
->>>
->>>> +L:	linux-scsi@vger.kernel.org
->>>
->>>> +S:	Supported
->>>
->>>> +F:	drivers/scsi/ufs/ufshcd-crypto.c
->>>
->>>> +F:	drivers/scsi/ufs/ufshcd-crypto.h
->>>
->>>> +
->>>
->>>>  UNIVERSAL FLASH STORAGE HOST CONTROLLER DRIVER DWC HOOKS
->>>
->>>>  M:	Joao Pinto <jpinto@synopsys.com>
->>>
->>>>  L:	linux-scsi@vger.kernel.org
->>>
->>>> diff --git a/block/Kconfig b/block/Kconfig
->>>
->>>> index f7045aa..6afe131 100644
->>>
->>>> --- a/block/Kconfig
->>>
->>>> +++ b/block/Kconfig
->>>
->>>> @@ -224,4 +224,9 @@ config BLK_MQ_RDMA
->>>
->>>>  config BLK_PM
->>>
->>>>  	def_bool BLOCK && PM
->>>
->>>>
->>>
->>>> +config BLK_DEV_HW_RT_ENCRYPTION
->>>
->>>> +	bool
->>>
->>>> +	depends on SCSI_UFSHCD_RT_ENCRYPTION
->>>
->>>> +	default n
->>>
->>>> +
->>>
->>>>  source block/Kconfig.iosched
->>>
->>>> diff --git a/drivers/scsi/ufs/Kconfig b/drivers/scsi/ufs/Kconfig
->>>
->>>> index 2ddbb26..09a3ec0 100644
->>>
->>>> --- a/drivers/scsi/ufs/Kconfig
->>>
->>>> +++ b/drivers/scsi/ufs/Kconfig
->>>
->>>> @@ -136,3 +136,15 @@ config SCSI_UFS_BSG
->>>
->>>>
->>>
->>>>  	  Select this if you need a bsg device node for your UFS controller.
->>>
->>>>  	  If unsure, say N.
->>>
->>>> +
->>>
->>>> +config SCSI_UFSHCD_RT_ENCRYPTION
->>>
->>>> +	bool "Universal Flash Storage Controller RT encryption support"
->>>
->>>> +	depends on SCSI_UFSHCD
->>>
->>>> +	default n
->>>
->>>> +	select BLK_DEV_HW_RT_ENCRYPTION if SCSI_UFSHCD_RT_ENCRYPTION
->>>
->>>> +	select BLK_DEV_DM if SCSI_UFSHCD_RT_ENCRYPTION
->>>
->>>> +	help
->>>
->>>> +	Universal Flash Storage Controller RT encryption support
->>>
->>>> +
->>>
->>>> +	Select this if you want to enable real time encryption on UFS
->>>> +controller
->>>
->>>> +	If unsure, say N.
->>>
->>>> diff --git a/drivers/scsi/ufs/Makefile b/drivers/scsi/ufs/Makefile
->>>
->>>> index a3bd70c..6169096 100644
->>>
->>>> --- a/drivers/scsi/ufs/Makefile
->>>
->>>> +++ b/drivers/scsi/ufs/Makefile
->>>
->>>> @@ -7,6 +7,7 @@ obj-$(CONFIG_SCSI_UFS_QCOM) +=3D ufs-qcom.o
->>>
->>>>  obj-$(CONFIG_SCSI_UFSHCD) +=3D ufshcd-core.o
->>>
->>>>  ufshcd-core-y				+=3D ufshcd.o ufs-sysfs.o
->>>
->>>>  ufshcd-core-$(CONFIG_SCSI_UFS_BSG)	+=3D ufs_bsg.o
->>>
->>>> +ufshcd-core-$(CONFIG_SCSI_UFSHCD_RT_ENCRYPTION) +=3D ufshcd-crypto.o
->>>
->>>>  obj-$(CONFIG_SCSI_UFSHCD_PCI) +=3D ufshcd-pci.o
->>>
->>>>  obj-$(CONFIG_SCSI_UFSHCD_PLATFORM) +=3D ufshcd-pltfrm.o
->>>
->>>>  obj-$(CONFIG_SCSI_UFS_HISI) +=3D ufs-hisi.o
->>>
->>>> diff --git a/drivers/scsi/ufs/ufshcd-crypto.c
->>>> b/drivers/scsi/ufs/ufshcd-crypto.c
->>>
->>>> new file mode 100644
->>>
->>>> index 0000000..9c95ff3
->>>
->>>> --- /dev/null
->>>
->>>> +++ b/drivers/scsi/ufs/ufshcd-crypto.c
->>>
->>>> @@ -0,0 +1,453 @@
->>>
->>>> +// SPDX-License-Identifier: GPL-2.0
->>>
->>>> +/*
->>>
->>>> + * UFS Host controller crypto driver
->>>
->>>> + *
->>>
->>>> + * Copyright (C) 2018 Cadence Design Systems, Inc.
->>>
->>>> + *
->>>
->>>> + * Authors:
->>>
->>>> + *	Parshuram Thombare <pthombar@cadence.com>
->>>
->>>> + *
->>>
->>>> + */
->>>
->>>> +
->>>
->>>> +#include <linux/module.h>
->>>
->>>> +#include <linux/kernel.h>
->>>
->>>> +#include <crypto/aes.h>
->>>
->>>> +#include <linux/device-mapper.h>
->>>
->>>> +#include "ufshcd.h"
->>>
->>>> +#include "ufshcd-crypto.h"
->>>
->>>> +#include "scsi/scsi_device.h"
->>>
->>>> +#include "scsi/scsi_host.h"
->>>
->>>> +
->>>
->>>> +struct ufshcd_dm_ctx {
->>>
->>>> +	struct dm_dev *dev;
->>>
->>>> +	sector_t start;
->>>
->>>> +	unsigned short int sector_size;
->>>
->>>> +	unsigned char sector_shift;
->>>
->>>> +	int cci;
->>>
->>>> +	int cap_idx;
->>>
->>>> +	char key[AES_MAX_KEY_SIZE];
->>>
->>>> +	struct ufs_hba *hba;
->>>
->>>> +};
->>>
->>>> +
->>>
->>>> +static int dm_registered;
->>>
->>>> +
->>>
->>>> +static inline int
->>>
->>>> +ufshcd_key_id_to_len(int key_id)
->>>
->>>> +{
->>>
->>>> +	int key_len =3D -1;
->>>
->>>> +
->>>
->>>> +	switch (key_id) {
->>>
->>>> +	case UFS_CRYPTO_KEY_ID_128BITS:
->>>
->>>> +		key_len =3D AES_KEYSIZE_128;
->>>
->>>> +		break;
->>>
->>>> +	case UFS_CRYPTO_KEY_ID_192BITS:
->>>
->>>> +		key_len =3D AES_KEYSIZE_192;
->>>
->>>> +		break;
->>>
->>>> +	case UFS_CRYPTO_KEY_ID_256BITS:
->>>
->>>> +		key_len =3D AES_KEYSIZE_256;
->>>
->>>> +		break;
->>>
->>>> +	default:
->>>
->>>> +		break;
->>>
->>>> +	}
->>>
->>>> +	return key_len;
->>>
->>>> +}
->
->Why not -EINVAL for invalid key length?
->
->>>
->>>> +
->>>
->>>> +static inline int
->>>
->>>> +ufshcd_key_len_to_id(int key_len)
->>>
->>>> +{
->>>
->>>> +	int key_id =3D -1;
->>>
->>>> +
->>>
->>>> +	switch (key_len) {
->>>
->>>> +	case AES_KEYSIZE_128:
->>>
->>>> +		key_id =3D UFS_CRYPTO_KEY_ID_128BITS;
->>>
->>>> +		break;
->>>
->>>> +	case AES_KEYSIZE_192:
->>>
->>>> +		key_id =3D UFS_CRYPTO_KEY_ID_192BITS;
->>>
->>>> +		break;
->>>
->>>> +	case AES_KEYSIZE_256:
->>>
->>>> +		key_id =3D UFS_CRYPTO_KEY_ID_256BITS;
->>>
->>>> +		break;
->>>
->>>> +	default:
->>>
->>>> +		break;
->>>
->>>> +	}
->>>
->>>> +	return key_id;
->>>
->>>> +}
->>>
->>>> +
->>>
->>>> +static void
->>>
->>>> +ufshcd_read_crypto_capabilities(struct ufs_hba *hba)
->>>
->>>> +{
->>>
->>>> +	u32 tmp, i;
->>>
->>>> +	struct ufshcd_crypto_ctx *cctx =3D hba->cctx;
->>>
->>>> +
->>>
->>>> +	for (i =3D 0; i < cctx->cap_cnt; i++) {
->>>
->>>> +		tmp =3D ufshcd_readl(hba, REG_UFS_CRYPTOCAP + i);
->>>
->>>> +		cctx->ccaps[i].key_id =3D (tmp & CRYPTO_CAPS_KS_MASK) >>
->>>
->>>> +						CRYPTO_CAPS_KS_SHIFT;
->>>
->>>> +		cctx->ccaps[i].sdusb =3D (tmp & CRYPTO_CAPS_SDUSB_MASK) >>
->>>
->>>> +						CRYPTO_CAPS_SDUSB_SHIFT;
->>>
->>>> +		cctx->ccaps[i].alg_id =3D (tmp & CRYPTO_CAPS_ALG_ID_MASK) >>
->>>
->>>> +						CRYPTO_CAPS_ALG_ID_SHIFT;
->>>
->>>> +	}
->>>
->>>> +}
->>>
->>>> +
->>>
->>>> +static inline int
->>>
->>>> +ufshcd_get_cap_idx(struct ufshcd_crypto_ctx *cctx, int alg_id,
->>>
->>>> +	int key_id)
->>>
->>>> +{
->>>
->>>> +	int cap_idx;
->>>
->>>> +
->>>
->>>> +	for (cap_idx =3D 0; cap_idx < cctx->cap_cnt; cap_idx++) {
->>>
->>>> +		if (((cctx->ccaps[cap_idx].alg_id =3D=3D alg_id) &&
->>>
->>>> +			cctx->ccaps[cap_idx].key_id =3D=3D key_id))
->>>
->>>> +			break;
->>>
->>>> +	}
->>>
->>>> +	return ((cap_idx < cctx->cap_cnt) ? cap_idx : -1);
->>>
->>>> +}
->>>
->>>> +
->>>
->>>> +static inline int
->>>
->>>> +ufshcd_get_cci_slot(struct ufshcd_crypto_ctx *cctx)
->>>
->>>> +{
->>>
->>>> +	int  cci;
->>>
->>>> +
->>>
->>>> +	for (cci =3D 0; cci < cctx->config_cnt; cci++) {
->>>
->>>> +		if (!cctx->cconfigs[cci].cfge) {
->>>
->>>> +			cctx->cconfigs[cci].cfge =3D 1;
->>>
->>>> +			break;
->>>
->>>> +		}
->>>
->>>> +	}
->>>
->>>> +	return ((cci < cctx->config_cnt) ? cci : -1);
->>>
->>>> +}
->>>
->>>> +
->>>
->>>> +static void
->>>
->>>> +ufshcd_aes_ecb_set_key(struct ufshcd_dm_ctx *ctx)
->>>
->>>> +{
->>>
->>>> +	int i, key_size;
->>>
->>>> +	u32 val, cconfig16, crypto_config_addr;
->>>
->>>> +	struct ufshcd_crypto_ctx *cctx;
->>>
->>>> +	struct ufshcd_crypto_config *cconfig;
->>>
->>>> +	struct ufshcd_crypto_cap ccap;
->>>
->>>> +
->>>
->>>> +	cctx =3D ctx->hba->cctx;
->>>
->>>> +	if (ctx->cci <=3D 0)
->>>
->>>> +		ctx->cci =3D ufshcd_get_cci_slot(cctx);
->>>
->>>> +	/* If no slot is available, slot 0 is shared */
->>>
->>>> +	ctx->cci =3D ctx->cci < 0 ? 0 : ctx->cci;
->>>
->>>> +	cconfig =3D &(cctx->cconfigs[ctx->cci]);
->>>
->>>> +	ccap =3D cctx->ccaps[ctx->cap_idx];
->>>
->>>> +	key_size =3D ufshcd_key_id_to_len(ccap.key_id);
->>>
->>>> +
->>>
->>>> +	if ((cconfig->cap_idx !=3D ctx->cap_idx) ||
->>>
->>>> +		((key_size > 0) &&
->>>
->>>> +		memcmp(cconfig->key, ctx->key, key_size))) {
->>>
->>>> +		cconfig->cap_idx =3D ctx->cap_idx;
->>>
->>>> +		memcpy(cconfig->key, ctx->key, key_size);
->>>
->>>> +		crypto_config_addr =3D cctx->crypto_config_base_addr +
->>>
->>>> +				ctx->cci * CRYPTO_CONFIG_SIZE;
->>>
->>>> +		cconfig16 =3D ccap.sdusb | (1 <<
->>> CRYPTO_CCONFIG16_CFGE_SHIFT);
->>>
->>>> +		cconfig16 |=3D ((ctx->cap_idx <<
->>> CRYPTO_CCONFIG16_CAP_IDX_SHIFT) &
->>>
->>>> +				CRYPTO_CCONFIG16_CAP_IDX_MASK);
->>>
->>>> +		spin_lock(&cctx->crypto_lock);
->>>
->>>> +		for (i =3D 0; i < key_size; i +=3D 4) {
->>>
->>>> +			val =3D (ctx->key[i] | (ctx->key[i + 1] << 8) |
->>>
->>>> +				(ctx->key[i + 2] << 16) |
->>>
->>>> +				(ctx->key[i + 3] << 24));
->>>
->>>> +			ufshcd_writel(ctx->hba, val, crypto_config_addr + i);
->>>
->>>> +		}
->>>
->>>> +		ufshcd_writel(ctx->hba, cpu_to_le32(cconfig16),
->>>
->>>> +				crypto_config_addr + (4 * 16));
->>>
->>>> +		spin_unlock(&cctx->crypto_lock);
->>>
->>>> +		/* Make sure keys are programmed */
->>>
->>>> +		mb();
->>>
->>>> +	}
->>>
->>>> +}
->>>
->>>
->>>
->>> First of all, thanks for working on this.  A lot of Android device
->>> vendors would
->>>
->>> like to have upstream support for inline encryption.  However, are
->>> you aware of
->>>
->>> previous (unsuccessful) patchsets by other people working on this?
->>> Have you
->>>
->>> addressed the concerns and improved on their work, or is this just
->>> yet another
->>>
->>> new effort starting from scratch?
->>>
->>>
->>>
->>> AnilKumar Chimata <anilc@codeaurora.org> (Qualcomm) in October 2018:
->>>
->>>
->>>
->>> 	https://urldefense.proofpoint.com/v2/url?u=3Dhttps-
->>>
->3A__patchwork.kernel.org_cover_10645739_&d=3DDwIBAg&c=3DaUq983L2pue2FqKF
->>> oP6PGHMJQyoJ7kl3s3GZ-_haXqY&r=3DGTefrem3hiBCnsjCOqAuapQHRN8-
->>> rKC1FRbk0it-
->>>
->LDs&m=3DL9VLjsZ31dZ4TP4LdveuvcjPFzdZWGlZaZnzqGZH3zc&s=3DZzYaAaVic5TB4RUS
->>> cR5kzcM_8gvLYdlNAzuY80_ASzI&e=3D
->>>
->>>
->>>
->>> Ladvine D Almeida <ladvine@synopsys.com> in May 2018:
->>>
->>>
->>>
->>> 	https://urldefense.proofpoint.com/v2/url?u=3Dhttp-3A__lists-
->>> 2Darchives.com_linux-2Dkernel_29135393-2Dscsi-2Dufs-2Dufs-2Dhost-
->>> 2Dcontroller-2Dcrypto-
->>> 2Dchanges.html&d=3DDwIBAg&c=3DaUq983L2pue2FqKFoP6PGHMJQyoJ7kl3s3GZ-
->>> _haXqY&r=3DGTefrem3hiBCnsjCOqAuapQHRN8-rKC1FRbk0it-
->>>
->LDs&m=3DL9VLjsZ31dZ4TP4LdveuvcjPFzdZWGlZaZnzqGZH3zc&s=3D3pxSBZrt_DpDSz-
->>> ZXrM7_bj0QXmRzcbasPl_wB259Us&e=3D
->>>
->>>
->>>
->>> Satya Tangirala <satyat@google.com> is also working on it but I don't
->>> believe
->>>
->>> he's sent out a patchset yet.
->>>
->>>
->>>
->>> It would be nice to coordinate to get a proper solution upstream that
->>> works for
->>>
->>> everyone, rather than having everyone try independently and fail
->>> repeatedly :-)
->> I had look at Ladvine's submission and think the approach of using
->> Linux crypto API and adding algorithm which is supposed to work inline
->> (and with UFS devices only) in global pool of algorithms (which is
->> supposed to be generic) makes it risky, if selected/used for other
->> type of device not supporting inline encryption. Also apparently it is n=
-ot possible
->to support multiple UFS controllers in the system with that approach.
->> There was suggestion from Milan to use separate device mapper which
->> seems cleaner way of enabling inline encryption. Hence new device mapper=
- is
->used.
->> I think this is better idea to coordinate and come up with a generic sol=
-ution.
->
->Suggest to take a look into the article
->https://urldefense.proofpoint.com/v2/url?u=3Dhttps-
->3A__lwn.net_Articles_717754&d=3DDwIFAg&c=3DaUq983L2pue2FqKFoP6PGHMJQyoJ
->7kl3s3GZ-_haXqY&r=3DGTefrem3hiBCnsjCOqAuapQHRN8-rKC1FRbk0it-
->LDs&m=3DrOQpiy7-
->jae72qATLWxXtCnoEXCjZLklWrHo5NtcUqo&s=3DxVHqE7JfiKf0rCQozZrYr6eeFn5D6U
->OCvXJMP-mjYX8&e=3D
->My real concern is how to achieve it without any modifications to the
->bio.(because key slot information has to finally reach the target block
->device)
->
->>>
->>>
->>>
->>> Also, note that ECB mode is not appropriate for disk encryption.  So
->>> this patch
->>>
->>> (and the hardware you tested it on, if that's all it supports) is
->>> effectively
->>>
->>> useless as-is.  You need to support XTS mode.
->> For now only AES-ECB is supported, we are working on adding other modes.
->>>
->>>
->>>
->>> Thanks!
->>>
->>>
->>>
->>> - Eric
->>
->> Regards,
->> Parshuram Thombare
->>
->
->Thanks,
->Ladvine
-
+> Kashyap
