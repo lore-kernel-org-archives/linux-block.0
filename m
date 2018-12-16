@@ -7,72 +7,75 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D695C43387
-	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 06:08:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B24BC43387
+	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 09:35:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 252EF2086C
-	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 06:08:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15BFD217FB
+	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 09:35:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729811AbeLPGIj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 Dec 2018 01:08:39 -0500
-Received: from mout.gmx.net ([212.227.15.19]:50083 "EHLO mout.gmx.net"
+        id S1729784AbeLPJfe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 16 Dec 2018 04:35:34 -0500
+Received: from mout.gmx.net ([212.227.17.21]:45021 "EHLO mout.gmx.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729758AbeLPGIj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Dec 2018 01:08:39 -0500
+        id S1729354AbeLPJfe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 16 Dec 2018 04:35:34 -0500
 Received: from localhost.localdomain ([113.87.89.150]) by mail.gmx.com
- (mrgmx001 [212.227.17.184]) with ESMTPSA (Nemesis) id
- 0Lcj9b-1hFPeQ346x-00kBeq; Sun, 16 Dec 2018 07:08:34 +0100
+ (mrgmx101 [212.227.17.174]) with ESMTPSA (Nemesis) id
+ 0MTwYX-1gzF0l2kyn-00Qh2z; Sun, 16 Dec 2018 10:35:31 +0100
 From:   Chengguang Xu <cgxu519@gmx.com>
-To:     ed.cashin@acm.org, axboe@kernel.dk
+To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, Chengguang Xu <cgxu519@gmx.com>
-Subject: [PATCH] aoe: add __exit annotation
-Date:   Sun, 16 Dec 2018 14:08:18 +0800
-Message-Id: <20181216060818.26986-1-cgxu519@gmx.com>
+Subject: [PATCH] block: loop: check error using IS_ERR instead of IS_ERR_OR_NULL in loop_add()
+Date:   Sun, 16 Dec 2018 17:35:00 +0800
+Message-Id: <20181216093500.25023-1-cgxu519@gmx.com>
 X-Mailer: git-send-email 2.17.2
-X-Provags-ID: V03:K1:aTljckzLamhgD9eIyfJaMoGijhnbpdhKrgd+Us0lAoMpg5HIC8p
- GaIgbkp0/mvKaC54j0ckZniYw/SwCEIe0nz0Q/FembLo/mBk1/ArvUEgpbR5xGZLXml5Oi8
- KQ66o70i3BMRzF3/GjAQZZ5sxYdZPlO1aHJnMmsvmZbEFncyPuhWqSSdZerbM03y5tRrpR9
- eHvdQ4yuD3b1IkA7W8SUg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:8qEL9PhZTHQ=:jL+k3iHU7m/L0d8lqnBzqg
- zYepbi8k38trR+C34zwIWwv8rEEWf/QnXqSgOStZwW4P2cgySuTYAu1Xs0k0fwPmINvOlcdNT
- W59MbxwspaG05v+q3NotdpiXXdth5m2HWV3tUgLzlDnwuhctKKno2trxRQrqEZlafPDglUdqE
- p2pWGgERIaV+W/Xbm2bbvI5w/7rrhNdhLVJB4CNnb5AA4RZHOMTxyPvfjb9MZLnusFJLun86Z
- 2KZJ67iIUtYdOMHLHBJfecm7zIpkSNAO1gaBCqEXsFTeVd/IZHYDYwH/uLxIjx3h++E044/JK
- GX4EGdVxcIZx6vEI+WTkyPOQsCE15md8Mnd2DjZXvKbMQOx907xrlsVmiha5NbVRLfj7glhdq
- zHK8ZxxB+OFdk4jlVmmKZvy8PHvC46ciMVcINY/E11+KztorsqNvkB/F+kAOOeNFe7bpoIoGW
- n5M0f1Vsqtin0l6Kz0479RYW94LvL5Ril340qvJyzCTI+GlLMSTDXR4ax6lY8cGDddZX3sczX
- U9dGkZMryNiqDGXOwr5ZeXP6WqSPSLyEN9mFi9rcNCGzrVcPBe0AVkHGMI7olFx2PTRpXdBh0
- wTdfD4mS1DvgeNtl9eT79biDeFbzPtgIgAzc09OkeBKPjtmJLx/f4UhmrXcUEFH+WXHWBi40F
- jF3nfbit6T0cF/3ZIxo2VTi3h4iXWAs7sgJONxd2MtSJbAbW1TXISx1ZGRS9oXhGFEmBZMZ6T
- S7cUNDdCQC5JH8+N6qJYx5SCQXi7QBMFkrIXE1Q1ED0Sw4oU8epUcRhMI81+Uj9EH2xBGjBLF
- 9z8L8R60uYoy0fsqx+0lZQQ/UMUAXx5jV08f9ulrqz9Up852lxCP0Q8iN2hcGizeHzQM0mTWj
- QLeZi2bS0JnARzK66iMP6xuOdJt8tTdN0TzyliKao=
+X-Provags-ID: V03:K1:hzJx1Kv9nzQ/oDGnskYeLLrdijeHG6DTk3x/rvKqfJu0nogiehO
+ G5HeS/xZ184Txi5UZTb+bYFIFyQZepSkejeSh4wI8zC4hwIeKzjFY9TJSapkftvkXTNj08I
+ 6wj/epcMLgrDEX3xEl1wPE7oxZl7paJ79me94VYIsNowzzGEm+OeedIl9/I5UN+FJaMVjCS
+ lmrUejPWcZMGlk2eVZHwg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:HWZQH5K48hU=:nLkSNvuygCmqqZktOTnZm5
+ XRM6BsBeyicSqktEIQHHlaJVGlRFk7Tuc2Kp+ORpTLCHck1dso/foawqaZJVaVLSjdtI31oWe
+ yTnZ4431Qi0miTvr+malUQ/ICnDrIT6Yq4+WEKhHiJZqGm9FasdkZddWVe+Az/gvem1QPivTs
+ eo12i5jv9rJI/OvzTUsM4SoPpgh61B0arm1aodzNDUaV/hOLehOPkJHCX1kNwESrt3DB6sNqk
+ mAP9uiSl8JtBT5FackapdksLZiekiv6fx8Ka3+gOVFuwYrKdrAnGsU1iaVo8Izi3Y7cRCy8Wz
+ Sf5joJRlX25RzfS3eNZBVSXOzYg4XnNusL3v/FY0x1SZdWHoK3onxYFcYItUq5HhbXXrjJFvL
+ zz+F4Z0vD9G867ggCVXJn/fF7YHHfqUX0+rY7xrDgQJjSG9k940noQF2VkR33s6MDhLLzlHbK
+ Dw+1DjAibZdr76RcH6V+kpFOQ5WDeiJfsUj5U26rglsYj0P9P2HGduNMbkJKrLhCY71Dkg1ml
+ oh9q4VaTPXx5U2ccUVvnB/dr/JkCYvtVYhna4ipyS8bqbQDlSJ75KRafkYb5atHz692Tp6314
+ gpiaY77Yz0kkfyirQYK9KWDInLOUEkUyTWI79wGojuDSGh3LjdE7tlR+rh9JqTG2Xe9ruVnVC
+ 2bJHlAN8VbonLNDmHugGunAs/FxY4Qfm3wYvqMH8sO/4Nto9sPJlmehbzS/LpDWrR47d8Yzez
+ FZ96HkBxiXGEoNVZyzVyaHw8yqicWQwhYZ0odT9DD+QgeQ8xRDTKJAmeAjK6MiEUcazim18ZK
+ UdpCrEaTpiLmr3gGBzrNneY+L3N8ilVqFQ2TPZlhgKqT3NWr0addOYDuqqNlo0lpaDx2queN+
+ oamghU4BoCnikQ50CsO+LJHVhFD1SWkTeRN4BjbtQ=
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add __exit annotation to cleanup helper which
-is only called once in the module.
+blk_mq_init_queue() will not return NULL pointer to its caller,
+so it's better to replace IS_ERR_OR_NULL using IS_ERR in loop_add().
+
+If in the future things change to check NULL pointer inside loop_add(),
+we should return -ENOMEM as return code instead of PTR_ERR(NULL).
 
 Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
 ---
- drivers/block/aoe/aoemain.c | 2 +-
+ drivers/block/loop.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/aoe/aoemain.c b/drivers/block/aoe/aoemain.c
-index 251482066977..1e4e2971171c 100644
---- a/drivers/block/aoe/aoemain.c
-+++ b/drivers/block/aoe/aoemain.c
-@@ -24,7 +24,7 @@ static void discover_timer(struct timer_list *t)
- 	aoecmd_cfg(0xffff, 0xff);
- }
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index cb0cc8685076..849a48120cca 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1853,7 +1853,7 @@ static int loop_add(struct loop_device **l, int i)
+ 		goto out_free_idr;
  
--static void
-+static void __exit
- aoe_exit(void)
- {
- 	del_timer_sync(&timer);
+ 	lo->lo_queue = blk_mq_init_queue(&lo->tag_set);
+-	if (IS_ERR_OR_NULL(lo->lo_queue)) {
++	if (IS_ERR(lo->lo_queue)) {
+ 		err = PTR_ERR(lo->lo_queue);
+ 		goto out_cleanup_tags;
+ 	}
 -- 
 2.17.2
 
