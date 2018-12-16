@@ -1,121 +1,334 @@
-Return-Path: <SRS0=QLrH=OY=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=nu7S=OZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 302A5C43387
-	for <linux-block@archiver.kernel.org>; Sat, 15 Dec 2018 04:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EDEDC43387
+	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 01:48:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B0B62086D
-	for <linux-block@archiver.kernel.org>; Sat, 15 Dec 2018 04:38:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B968206C2
+	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 01:48:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPydhI3A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729245AbeLOEiM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 14 Dec 2018 23:38:12 -0500
-Received: from mx2.suse.de ([195.135.220.15]:43716 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728962AbeLOEiL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 14 Dec 2018 23:38:11 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id B882DACAB;
-        Sat, 15 Dec 2018 04:38:09 +0000 (UTC)
-Subject: Re: [PATCH v2] bcache: set max writeback rate when I/O request is
- idle
-To:     Michael Lyle <mlyle@lyle.org>
-Cc:     linux-bcache <linux-bcache@vger.kernel.org>,
-        linux-block@vger.kernel.org, stable <stable@vger.kernel.org>,
-        Stefan Priebe - Profihost AG <s.priebe@profihost.ag>
-References: <20180724040310.1590-1-colyli@suse.de>
- <CAJ+L6qcyR2nqdTJAPwi_hKx+BtDjzX+K0guJJK7xLtBU0w64eg@mail.gmail.com>
- <8046b547-d59d-2764-90f9-27698b1011f7@suse.de>
- <CAJ+L6qfVM+uSE5UbN8jtBM3F4JwYYsnZ1_R5YFkaa0Q_-J3LFQ@mail.gmail.com>
-From:   Coly Li <colyli@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=colyli@suse.de; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <8f646cbf-38b8-f3fe-5c62-8e269357e99b@suse.de>
-Date:   Sat, 15 Dec 2018 12:37:31 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:52.0)
- Gecko/20100101 Thunderbird/52.9.1
-MIME-Version: 1.0
-In-Reply-To: <CAJ+L6qfVM+uSE5UbN8jtBM3F4JwYYsnZ1_R5YFkaa0Q_-J3LFQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S1727306AbeLPBsw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 15 Dec 2018 20:48:52 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:38929 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727227AbeLPBsw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 15 Dec 2018 20:48:52 -0500
+Received: by mail-pg1-f196.google.com with SMTP id w6so4438946pgl.6;
+        Sat, 15 Dec 2018 17:48:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id;
+        bh=HZQs3PQx2/bdtEO8VHnejHgNGOzdb07KmzpGf5Nbh/g=;
+        b=OPydhI3AmN+VnP0cPlqTOI+cdbKFeCMv26SyGHE2rMW4Z1TVETZ4YEPajA6vF9HmhV
+         jeJQxm9A3avkSNelIySZlAg7PuNMAbrD0MXnGr7lTBriT97cG1BvPdbrazIbd1w4foV4
+         EJAy94BTHDnbvbbnqzsaJxrD6zaHwJ5jdTpcRmOekG7/xZ+HSBKWBs6yWkko70zMN6i6
+         AEUzkS6qNE3AkYaG+518Kt566jVBv0uDT0pi95n1QAi5CipdMdz3undfyu6lWTalvF+h
+         l2dTEkWStFQWuX+KS3/ENCzN2IwKV0/j87hy2S02RsgMyfhRCbnxxNmsdWsBVcM4bbAX
+         Nu+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id;
+        bh=HZQs3PQx2/bdtEO8VHnejHgNGOzdb07KmzpGf5Nbh/g=;
+        b=I5+iE4Ss3m2ROzM0R2s9kKR3sq12XVYto+3NQUqGjGsJyNvDzANLAi8hKY7+EIilOO
+         qKmb99ABFT3MAfRIWUZPmN+rEAZfUH4JliFsu8udbFWZ1gtJMZ6DWlRkUJ3GEJj7LRqv
+         7NbcgYlXe8B38T6vV7wNpgLbwCQ1Dn0DOAvmdRpBiUxFi1iWoDHDmYMPjrUto5R3wb/f
+         gtQv+5uiL5lloOG8J6ADhEi+sut6K3DPF46vTqWAyK+SGUC9RawtfSrOli1gTtOQFu4h
+         5EpLWMe5H7an4I5l+/pg1/lL5y3hr10UM8LPyvPQJI3VgMyY9THlohLDtySQ1MwvV+XS
+         MBFA==
+X-Gm-Message-State: AA+aEWb20xmngUcyl2Y15GaFmSJgERAz5CU+Y2I22uZna6xeVlQvZ/ZG
+        xceA8oQbKNb0UXTwg7nND/EkMaxdZ2Q=
+X-Google-Smtp-Source: AFSGD/VDI05SfkhKQPFPCzk5RR7S4rBXO+Iai1MJ0+m2OiAtam7nrFkyiLKhULHjJwVxuaK/gFShvQ==
+X-Received: by 2002:a62:db41:: with SMTP id f62mr8378361pfg.123.1544924930789;
+        Sat, 15 Dec 2018 17:48:50 -0800 (PST)
+Received: from localhost.localdomain ([2601:602:9602:6598:9540:1d4c:35c2:b8e8])
+        by smtp.gmail.com with ESMTPSA id z127sm14394990pfb.80.2018.12.15.17.48.49
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 15 Dec 2018 17:48:50 -0800 (PST)
+From:   yupeng <yupeng0921@gmail.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, keith.busch@intel.com,
+        axboe@fb.com, hch@lst.de, sagi@grimberg.me
+Subject: [PATCH v2 1/2] share nvme trace event helper functions with multiple nvme modules
+Date:   Sat, 15 Dec 2018 17:48:48 -0800
+Message-Id: <20181216014849.8584-1-yupeng0921@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/15/18 12:22 PM, Michael Lyle wrote:
-> On Fri, Dec 14, 2018 at 8:08 PM Coly Li <colyli@suse.de> wrote:
->> Commit b1092c9af9ed ("bcache: allow quick writeback when backing idle")
->> just looks at single bcache device. If there are I/Os for other bcache
->> device on the cache set, and a single bcache device is idle, a faster
->> writeback rate for this single idle bcache device will happen, I/O to
->> read dirty data on cache for writeback will have negative impact to I/O
->> requests of other bcache devices.
-> 
-> Yes, but this will potentially fill the queue on the idle device.  If
-> you have an application that is intermittently doing I/O every few
-> seconds, the latency of the individual I/Os will be high.  I was told
-> during review that this was unacceptable, and revised my patch.  But
-> now we have merged a change that is more like my first patch that was
-> rejected...
+The trace.c could only be used by core.c, move it to a header file and
+then other nvme modules could also use it. This commit creates a new
+header file trace_common.h, which has all the functions of trace.c. It
+changes all functions to static functions, so any other modules could
+include it without conflict. This commit also moves some common
+functions from trace.h to trace_common.h. Because the trace events in
+trace.h are used by nvme-core only, this commit renames the trace.h to
+trace_core.h.
 
-The original patch only looks at a single bcache, this fix looks at all
-bcache devices.
+Signed-off-by: yupeng <yupeng0921@gmail.com>
+---
+ drivers/nvme/host/Makefile                    |  1 -
+ drivers/nvme/host/core.c                      |  2 +-
+ drivers/nvme/host/{trace.c => trace_common.h} | 82 +++++++++++++++++--
+ drivers/nvme/host/{trace.h => trace_core.h}   | 76 +----------------
+ 4 files changed, 80 insertions(+), 81 deletions(-)
+ rename drivers/nvme/host/{trace.c => trace_common.h} (55%)
+ rename drivers/nvme/host/{trace.h => trace_core.h} (56%)
 
-If only a single bcache attached on cache set, by default it will be
-idle for 30 seconds before the writeback rate to be set to a high rate.
-And if more bcache devices attached, longer threshold required. For 4
-bcache devices attached the default idle threshold will be about 120
-seconds. If I/O comes between more than 30 seconds (even minutes), I
-will not take it as an online system, most cases the latency should not
-be sensitive, or bcache is not proper for such workload.
+diff --git a/drivers/nvme/host/Makefile b/drivers/nvme/host/Makefile
+index aea459c65ae1..165c265f57f1 100644
+--- a/drivers/nvme/host/Makefile
++++ b/drivers/nvme/host/Makefile
+@@ -9,7 +9,6 @@ obj-$(CONFIG_NVME_RDMA)			+= nvme-rdma.o
+ obj-$(CONFIG_NVME_FC)			+= nvme-fc.o
+ 
+ nvme-core-y				:= core.o
+-nvme-core-$(CONFIG_TRACING)		+= trace.o
+ nvme-core-$(CONFIG_NVME_MULTIPATH)	+= multipath.o
+ nvme-core-$(CONFIG_NVM)			+= lightnvm.o
+ nvme-core-$(CONFIG_FAULT_INJECTION_DEBUG_FS)	+= fault_inject.o
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 962012135b62..a1cf8df4c507 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -30,7 +30,7 @@
+ #include <asm/unaligned.h>
+ 
+ #define CREATE_TRACE_POINTS
+-#include "trace.h"
++#include "trace_core.h"
+ 
+ #include "nvme.h"
+ #include "fabrics.h"
+diff --git a/drivers/nvme/host/trace.c b/drivers/nvme/host/trace_common.h
+similarity index 55%
+rename from drivers/nvme/host/trace.c
+rename to drivers/nvme/host/trace_common.h
+index 25b0e310f4a8..b9b88da74f58 100644
+--- a/drivers/nvme/host/trace.c
++++ b/drivers/nvme/host/trace_common.h
+@@ -12,9 +12,16 @@
+  * more details.
+  */
+ 
+-#include <asm/unaligned.h>
+-#include "trace.h"
++#ifndef TRACE_HEADER_MULTI_READ
++
++#include <linux/nvme.h>
++#include <linux/tracepoint.h>
++#include <linux/trace_seq.h>
++
++#include "nvme.h"
+ 
++#ifdef CONFIG_TRACING
++#include <asm/unaligned.h>
+ static const char *nvme_trace_create_sq(struct trace_seq *p, u8 *cdw10)
+ {
+ 	const char *ret = trace_seq_buffer_ptr(p);
+@@ -99,7 +106,7 @@ static const char *nvme_trace_common(struct trace_seq *p, u8 *cdw10)
+ 	return ret;
+ }
+ 
+-const char *nvme_trace_parse_admin_cmd(struct trace_seq *p,
++static const char *nvme_trace_parse_admin_cmd(struct trace_seq *p,
+ 				       u8 opcode, u8 *cdw10)
+ {
+ 	switch (opcode) {
+@@ -114,7 +121,7 @@ const char *nvme_trace_parse_admin_cmd(struct trace_seq *p,
+ 	}
+ }
+ 
+-const char *nvme_trace_parse_nvm_cmd(struct trace_seq *p,
++static const char *nvme_trace_parse_nvm_cmd(struct trace_seq *p,
+ 				     u8 opcode, u8 *cdw10)
+ {
+ 	switch (opcode) {
+@@ -129,7 +136,7 @@ const char *nvme_trace_parse_nvm_cmd(struct trace_seq *p,
+ 	}
+ }
+ 
+-const char *nvme_trace_disk_name(struct trace_seq *p, char *name)
++static const char *nvme_trace_disk_name(struct trace_seq *p, char *name)
+ {
+ 	const char *ret = trace_seq_buffer_ptr(p);
+ 
+@@ -139,3 +146,68 @@ const char *nvme_trace_disk_name(struct trace_seq *p, char *name)
+ 
+ 	return ret;
+ }
++
++#endif	/* CONFIG_TRACING */
++
++static inline void __assign_disk_name(char *name, struct gendisk *disk)
++{
++	if (disk)
++		memcpy(name, disk->disk_name, DISK_NAME_LEN);
++	else
++		memset(name, 0, DISK_NAME_LEN);
++}
++
++#define nvme_admin_opcode_name(opcode)	{ opcode, #opcode }
++#define show_admin_opcode_name(val)					\
++	__print_symbolic(val,						\
++		nvme_admin_opcode_name(nvme_admin_delete_sq),		\
++		nvme_admin_opcode_name(nvme_admin_create_sq),		\
++		nvme_admin_opcode_name(nvme_admin_get_log_page),	\
++		nvme_admin_opcode_name(nvme_admin_delete_cq),		\
++		nvme_admin_opcode_name(nvme_admin_create_cq),		\
++		nvme_admin_opcode_name(nvme_admin_identify),		\
++		nvme_admin_opcode_name(nvme_admin_abort_cmd),		\
++		nvme_admin_opcode_name(nvme_admin_set_features),	\
++		nvme_admin_opcode_name(nvme_admin_get_features),	\
++		nvme_admin_opcode_name(nvme_admin_async_event),		\
++		nvme_admin_opcode_name(nvme_admin_ns_mgmt),		\
++		nvme_admin_opcode_name(nvme_admin_activate_fw),		\
++		nvme_admin_opcode_name(nvme_admin_download_fw),		\
++		nvme_admin_opcode_name(nvme_admin_ns_attach),		\
++		nvme_admin_opcode_name(nvme_admin_keep_alive),		\
++		nvme_admin_opcode_name(nvme_admin_directive_send),	\
++		nvme_admin_opcode_name(nvme_admin_directive_recv),	\
++		nvme_admin_opcode_name(nvme_admin_dbbuf),		\
++		nvme_admin_opcode_name(nvme_admin_format_nvm),		\
++		nvme_admin_opcode_name(nvme_admin_security_send),	\
++		nvme_admin_opcode_name(nvme_admin_security_recv),	\
++		nvme_admin_opcode_name(nvme_admin_sanitize_nvm))
++
++#define nvme_opcode_name(opcode)	{ opcode, #opcode }
++#define show_nvm_opcode_name(val)				\
++	__print_symbolic(val,					\
++		nvme_opcode_name(nvme_cmd_flush),		\
++		nvme_opcode_name(nvme_cmd_write),		\
++		nvme_opcode_name(nvme_cmd_read),		\
++		nvme_opcode_name(nvme_cmd_write_uncor),		\
++		nvme_opcode_name(nvme_cmd_compare),		\
++		nvme_opcode_name(nvme_cmd_write_zeroes),	\
++		nvme_opcode_name(nvme_cmd_dsm),			\
++		nvme_opcode_name(nvme_cmd_resv_register),	\
++		nvme_opcode_name(nvme_cmd_resv_report),		\
++		nvme_opcode_name(nvme_cmd_resv_acquire),	\
++		nvme_opcode_name(nvme_cmd_resv_release))
++
++#define show_opcode_name(qid, opcode)					\
++	(qid ? show_nvm_opcode_name(opcode) : show_admin_opcode_name(opcode))
++
++#define parse_nvme_cmd(qid, opcode, cdw10) 			\
++	(qid ?							\
++	 nvme_trace_parse_nvm_cmd(p, opcode, cdw10) : 		\
++	 nvme_trace_parse_admin_cmd(p, opcode, cdw10))
++
++#define __print_disk_name(name)				\
++	nvme_trace_disk_name(p, name)
++
++
++#endif	/* TRACE_HEADER_MULTI_READ */
+diff --git a/drivers/nvme/host/trace.h b/drivers/nvme/host/trace_core.h
+similarity index 56%
+rename from drivers/nvme/host/trace.h
+rename to drivers/nvme/host/trace_core.h
+index 196d5bd56718..ed60ad6cf634 100644
+--- a/drivers/nvme/host/trace.h
++++ b/drivers/nvme/host/trace_core.h
+@@ -18,79 +18,7 @@
+ #if !defined(_TRACE_NVME_H) || defined(TRACE_HEADER_MULTI_READ)
+ #define _TRACE_NVME_H
+ 
+-#include <linux/nvme.h>
+-#include <linux/tracepoint.h>
+-#include <linux/trace_seq.h>
+-
+-#include "nvme.h"
+-
+-#define nvme_admin_opcode_name(opcode)	{ opcode, #opcode }
+-#define show_admin_opcode_name(val)					\
+-	__print_symbolic(val,						\
+-		nvme_admin_opcode_name(nvme_admin_delete_sq),		\
+-		nvme_admin_opcode_name(nvme_admin_create_sq),		\
+-		nvme_admin_opcode_name(nvme_admin_get_log_page),	\
+-		nvme_admin_opcode_name(nvme_admin_delete_cq),		\
+-		nvme_admin_opcode_name(nvme_admin_create_cq),		\
+-		nvme_admin_opcode_name(nvme_admin_identify),		\
+-		nvme_admin_opcode_name(nvme_admin_abort_cmd),		\
+-		nvme_admin_opcode_name(nvme_admin_set_features),	\
+-		nvme_admin_opcode_name(nvme_admin_get_features),	\
+-		nvme_admin_opcode_name(nvme_admin_async_event),		\
+-		nvme_admin_opcode_name(nvme_admin_ns_mgmt),		\
+-		nvme_admin_opcode_name(nvme_admin_activate_fw),		\
+-		nvme_admin_opcode_name(nvme_admin_download_fw),		\
+-		nvme_admin_opcode_name(nvme_admin_ns_attach),		\
+-		nvme_admin_opcode_name(nvme_admin_keep_alive),		\
+-		nvme_admin_opcode_name(nvme_admin_directive_send),	\
+-		nvme_admin_opcode_name(nvme_admin_directive_recv),	\
+-		nvme_admin_opcode_name(nvme_admin_dbbuf),		\
+-		nvme_admin_opcode_name(nvme_admin_format_nvm),		\
+-		nvme_admin_opcode_name(nvme_admin_security_send),	\
+-		nvme_admin_opcode_name(nvme_admin_security_recv),	\
+-		nvme_admin_opcode_name(nvme_admin_sanitize_nvm))
+-
+-#define nvme_opcode_name(opcode)	{ opcode, #opcode }
+-#define show_nvm_opcode_name(val)				\
+-	__print_symbolic(val,					\
+-		nvme_opcode_name(nvme_cmd_flush),		\
+-		nvme_opcode_name(nvme_cmd_write),		\
+-		nvme_opcode_name(nvme_cmd_read),		\
+-		nvme_opcode_name(nvme_cmd_write_uncor),		\
+-		nvme_opcode_name(nvme_cmd_compare),		\
+-		nvme_opcode_name(nvme_cmd_write_zeroes),	\
+-		nvme_opcode_name(nvme_cmd_dsm),			\
+-		nvme_opcode_name(nvme_cmd_resv_register),	\
+-		nvme_opcode_name(nvme_cmd_resv_report),		\
+-		nvme_opcode_name(nvme_cmd_resv_acquire),	\
+-		nvme_opcode_name(nvme_cmd_resv_release))
+-
+-#define show_opcode_name(qid, opcode)					\
+-	(qid ? show_nvm_opcode_name(opcode) : show_admin_opcode_name(opcode))
+-
+-const char *nvme_trace_parse_admin_cmd(struct trace_seq *p, u8 opcode,
+-		u8 *cdw10);
+-const char *nvme_trace_parse_nvm_cmd(struct trace_seq *p, u8 opcode,
+-		u8 *cdw10);
+-
+-#define parse_nvme_cmd(qid, opcode, cdw10) 			\
+-	(qid ?							\
+-	 nvme_trace_parse_nvm_cmd(p, opcode, cdw10) : 		\
+-	 nvme_trace_parse_admin_cmd(p, opcode, cdw10))
+-
+-const char *nvme_trace_disk_name(struct trace_seq *p, char *name);
+-#define __print_disk_name(name)				\
+-	nvme_trace_disk_name(p, name)
+-
+-#ifndef TRACE_HEADER_MULTI_READ
+-static inline void __assign_disk_name(char *name, struct gendisk *disk)
+-{
+-	if (disk)
+-		memcpy(name, disk->disk_name, DISK_NAME_LEN);
+-	else
+-		memset(name, 0, DISK_NAME_LEN);
+-}
+-#endif
++#include "trace_common.h"
+ 
+ TRACE_EVENT(nvme_setup_cmd,
+ 	    TP_PROTO(struct request *req, struct nvme_command *cmd),
+@@ -189,7 +117,7 @@ TRACE_EVENT(nvme_async_event,
+ #undef TRACE_INCLUDE_PATH
+ #define TRACE_INCLUDE_PATH .
+ #undef TRACE_INCLUDE_FILE
+-#define TRACE_INCLUDE_FILE trace
++#define TRACE_INCLUDE_FILE trace_core
+ 
+ /* This part must be outside protection */
+ #include <trace/define_trace.h>
+-- 
+2.17.1
 
-
-Coly Li
