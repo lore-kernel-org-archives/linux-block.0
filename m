@@ -6,69 +6,70 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF55C43387
-	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 16:43:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9010AC43387
+	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 16:44:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BCF152082F
-	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 16:43:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5AEDE217F9
+	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 16:44:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="irez5tiW"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Y1bX361P"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730449AbeLPQnO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 Dec 2018 11:43:14 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:35805 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729910AbeLPQnO (ORCPT
+        id S1730500AbeLPQn7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 16 Dec 2018 11:43:59 -0500
+Received: from mail-pg1-f172.google.com ([209.85.215.172]:44047 "EHLO
+        mail-pg1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730382AbeLPQn7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Dec 2018 11:43:14 -0500
-Received: by mail-pf1-f194.google.com with SMTP id z9so5166046pfi.2
-        for <linux-block@vger.kernel.org>; Sun, 16 Dec 2018 08:43:14 -0800 (PST)
+        Sun, 16 Dec 2018 11:43:59 -0500
+Received: by mail-pg1-f172.google.com with SMTP id t13so4930622pgr.11
+        for <linux-block@vger.kernel.org>; Sun, 16 Dec 2018 08:43:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=hEpn1KWPhpHa/0cbsSQGfvzga3r92vtv+cTmIofl6X4=;
-        b=irez5tiWT7JUD395b+SmjDpM81AzIQBauRUMVJowZQyICchAHrfHfn6ELfkMH0e5X/
-         pbZOw1NaGLs2nHSe83zi4n2u9P1yINnk92fH7/jXU7a1PjQOPV4nLymo3qbolPEfNMyD
-         mzwty90q5k026iDe/n6CjhiIc7699vWdjroizsHSrm/RzC1wID/8DVeUSnNTX5OE9FUl
-         lxRf7M30WT7NSW8v4Yabq3shze9YVcG/4vNNxQ+GRDsQMaZCyjVfKFnYcz7lgwY2BN75
-         wRSdTjJs68ZbCRWSFsgVpTCistob+h0y0mVsl0tqPDLAR+61Pw8imgWsKAVRprhs3xBS
-         xuQA==
+        bh=LIkIyeEcXQhiW0PaQuL81VwDRPUMx+it4Yi8SiyNafY=;
+        b=Y1bX361PgiR3NnQh135MKgHOV0rW5bKvaaDt7qNfKVUMvSmaPKhcedzYu9SVXqYNmT
+         rYpVlXef27HsbAI2oA8WRaRkGzpZRDijZ2g4N+iYmqC5eKbpzroLGl7cHPQPgrSqgheD
+         8VLuxOkZUPjWPNtnuiEXM0jLX0sPT4G2o9qfeswhS6QgZCTX68x7jQqBNXsAZg8wFoGO
+         B3J+faXoLaOewLNc1BQi5m3wpDGlWcIqxZVX3KhynCQGHFz7jB/mpBx1WX+ep6AvnuwO
+         0Bh1s+KyeT055rlN2+HT1dxh3Oeree9U2vj4zYmflbibP+S3vCgKL/9m3D+lCqcUHFRy
+         Jmdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=hEpn1KWPhpHa/0cbsSQGfvzga3r92vtv+cTmIofl6X4=;
-        b=O6Kur3MiSFUSggwm7K0rQXh8WQgxP0VEzLEz7OMtCAisXYwhkpAzbxe9TlqkX6ejuP
-         xgSZ3/B26yw3/2Wgmk5zyi9AOIJ2N45d95Pp/1tlzryW7KVORTJf0noSMAivIXH7AUnK
-         7LVV2CQd0kmOPIF6gN3yChbiM/ynyV03n400wDPcH1gbZLIqj/yuiUrtJ77CnxHAGZmb
-         Lg+i6gd85PgGs1Ay7bYTtiXtTxhlTogZV21CaZtFvmIsVPeb9TNt4KIDYVqY79uJOAvn
-         5JuXTnMomE0F89Rt4XCt1/FWdTnrueu/R+vjpChsv+wuqrZvx9nJz0twzmAsHfknZjCO
-         tdPw==
-X-Gm-Message-State: AA+aEWbDjgFn5Cl67inFfNAO1cAHMPzvNJGBqoZCGvimHGIS25ODUjk7
-        t5vS386ofdlL9khr2OqiGQHfiA==
-X-Google-Smtp-Source: AFSGD/V5u7wloeJFpwZFBwLevE1NdDFSxERg0qFcr7dr1B+Vn/xklYEK8Sx4Urx984F6Xz/P9DO9Yg==
-X-Received: by 2002:a62:ae12:: with SMTP id q18mr9955658pff.126.1544978593723;
-        Sun, 16 Dec 2018 08:43:13 -0800 (PST)
+        bh=LIkIyeEcXQhiW0PaQuL81VwDRPUMx+it4Yi8SiyNafY=;
+        b=c8tZZp3SVm2aFn5j5y4qYZrw9OreCwa0ZDFvHzJKaiLRSEkdttet/Ngd2udYgfeMPq
+         cS/tW71tFKYz5xFJuZQ/pujJi6o7igUrEO96HNMPWtepILNmVpObyttwlxyubbv2iA2u
+         pmKnSJrvErEdJiYlUzZJUkJIwkCUMiMJaZ/3XtjKpA/UxUHwE8B+rTl1n99fNTgr5K28
+         H3AW+OVpmmkTEKif1rf+lY3+Yw2mQlVIDCjxMETFAaePu18QJ4wFJ5TMaTps2lLpiTNN
+         067j74Kemn7Io0rdNgelVk14/VPo3wA4YYeKSNdBgfSodLQAcFlVrj/Cr4gbRFdAIpWc
+         l5lQ==
+X-Gm-Message-State: AA+aEWb884p5lWUn+kpgh9a7jUrqspsDlUrBPWNCIMNYm5mV10djWZrs
+        IDb1jNRHzBLbwJHVU446jUyjtQ==
+X-Google-Smtp-Source: AFSGD/Vk2dnzCLZ2LunDjZU9uNy7uJ4mmYaWAXe9Qupfrmdszum5Uo7UJEQDcbqFn1UZQ6cuFCYdjQ==
+X-Received: by 2002:a63:5d14:: with SMTP id r20mr9410712pgb.329.1544978638189;
+        Sun, 16 Dec 2018 08:43:58 -0800 (PST)
 Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id k129sm12752206pgk.29.2018.12.16.08.43.12
+        by smtp.gmail.com with ESMTPSA id n22sm19827479pfh.166.2018.12.16.08.43.56
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 16 Dec 2018 08:43:12 -0800 (PST)
-Subject: Re: [PATCH 23/26] block: implement bio helper to add iter bvec pages
- to bio
+        Sun, 16 Dec 2018 08:43:57 -0800 (PST)
+Subject: Re: [PATCHSET v8] Support for polled and buffered aio (and more)
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-aio@kvack.org, jmoyer@redhat.com, clm@fb.com
 References: <20181213175645.22181-1-axboe@kernel.dk>
- <20181213175645.22181-24-axboe@kernel.dk> <20181216164015.GC13234@lst.de>
+ <20181216163405.GA13234@lst.de>
+ <2c38c940-414f-519a-c938-8d94c249e477@kernel.dk>
+ <20181216164221.GA13930@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c4a8618a-2603-541d-6fca-43c78e0a9ca4@kernel.dk>
-Date:   Sun, 16 Dec 2018 09:43:11 -0700
+Message-ID: <df8e29e3-cee5-de6a-0d6d-f880d9503ca5@kernel.dk>
+Date:   Sun, 16 Dec 2018 09:43:55 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20181216164015.GC13234@lst.de>
+In-Reply-To: <20181216164221.GA13930@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,26 +78,27 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/16/18 9:40 AM, Christoph Hellwig wrote:
->> +	do {
->> +		size_t size;
->> +
->> +		bv = iter->bvec + iter->iov_offset;
->> +		size = bio_add_page(bio, bv->bv_page, bv->bv_len, bv->bv_offset);
+On 12/16/18 9:42 AM, Christoph Hellwig wrote:
+> On Sun, Dec 16, 2018 at 09:37:25AM -0700, Jens Axboe wrote:
+>> On 12/16/18 9:34 AM, Christoph Hellwig wrote:
+>>> Any chance you could send the series that just optimize the existing
+>>> aio code and don't need new interface as an initial prep series?
+>>>
+>>> Batching things up should make it a little easier to review, and with
+>>> a little luck those "simple" patches might still make 4.21.  Make
+>>> sure to include Al on the series, please.
+>>
+>> Sure, I can do that. So basically all of the optimizations, but none of
+>> the features (like polling)? Would require serious refactoring though,
+>> but not impossible.
+>>
+>> Or do you mean everything up to polled IO for old style aio, just
+>> excluding the new ring interfaces?
 > 
-> Overly long line here.
+> No, just the various little optimizations and cleanups towards the
+> beginning of the series.  Shouldn't really require any refactoring.
 
-Will fix.
-
->> +		if (size != bv->bv_len)
->> +			break;
->> +		iov_iter_advance(iter, size);
->> +	} while (iov_iter_count(iter) && !bio_full(bio));
-> 
-> bio_add_page already does the bio_full check for you.
-
-get_pages does the same thing, but I guess it makes more sense there since
-we'd have to undo if we could not add.
+OK, that'd be trivial enough. I'll do that and send it out separately.
 
 -- 
 Jens Axboe
