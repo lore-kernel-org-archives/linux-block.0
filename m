@@ -6,42 +6,59 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B58DBC43387
-	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 16:41:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22386C43387
+	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 16:42:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D7F9206BA
-	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 16:41:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB50A2082F
+	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 16:42:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730449AbeLPQlb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 Dec 2018 11:41:31 -0500
-Received: from verein.lst.de ([213.95.11.211]:57931 "EHLO newverein.lst.de"
+        id S1730449AbeLPQmX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 16 Dec 2018 11:42:23 -0500
+Received: from verein.lst.de ([213.95.11.211]:57936 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729910AbeLPQlb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Dec 2018 11:41:31 -0500
+        id S1729910AbeLPQmX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 16 Dec 2018 11:42:23 -0500
 Received: by newverein.lst.de (Postfix, from userid 2407)
-        id AA0E168DD3; Sun, 16 Dec 2018 17:41:30 +0100 (CET)
-Date:   Sun, 16 Dec 2018 17:41:30 +0100
+        id BFD6F68DD3; Sun, 16 Dec 2018 17:42:21 +0100 (CET)
+Date:   Sun, 16 Dec 2018 17:42:21 +0100
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-aio@kvack.org, hch@lst.de, jmoyer@redhat.com, clm@fb.com
-Subject: Re: [PATCH 24/26] fs: add support for mapping an ITER_BVEC for
- O_DIRECT
-Message-ID: <20181216164130.GD13234@lst.de>
-References: <20181213175645.22181-1-axboe@kernel.dk> <20181213175645.22181-25-axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
+        jmoyer@redhat.com, clm@fb.com
+Subject: Re: [PATCHSET v8] Support for polled and buffered aio (and more)
+Message-ID: <20181216164221.GA13930@lst.de>
+References: <20181213175645.22181-1-axboe@kernel.dk> <20181216163405.GA13234@lst.de> <2c38c940-414f-519a-c938-8d94c249e477@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181213175645.22181-25-axboe@kernel.dk>
+In-Reply-To: <2c38c940-414f-519a-c938-8d94c249e477@kernel.dk>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> +	if (iov_iter_is_bvec(iter))
-> +		ret = bio_iov_bvec_add_pages(&bio, iter);
-> +	else
-> +		ret = bio_iov_iter_get_pages(&bio, iter);
+On Sun, Dec 16, 2018 at 09:37:25AM -0700, Jens Axboe wrote:
+> On 12/16/18 9:34 AM, Christoph Hellwig wrote:
+> > Any chance you could send the series that just optimize the existing
+> > aio code and don't need new interface as an initial prep series?
+> > 
+> > Batching things up should make it a little easier to review, and with
+> > a little luck those "simple" patches might still make 4.21.  Make
+> > sure to include Al on the series, please.
+> 
+> Sure, I can do that. So basically all of the optimizations, but none of
+> the features (like polling)? Would require serious refactoring though,
+> but not impossible.
+> 
+> Or do you mean everything up to polled IO for old style aio, just
+> excluding the new ring interfaces?
 
-Shouldn't this actually be done inside bio_iov_iter_get_pages?
+No, just the various little optimizations and cleanups towards the
+beginning of the series.  Shouldn't really require any refactoring.
+
+> 
+> -- 
+> Jens Axboe
+---end quoted text---
