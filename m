@@ -2,91 +2,77 @@ Return-Path: <SRS0=nu7S=OZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64415C43387
-	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 02:26:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D695C43387
+	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 06:08:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 33ADD2084D
-	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 02:26:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 252EF2086C
+	for <linux-block@archiver.kernel.org>; Sun, 16 Dec 2018 06:08:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728972AbeLPC0N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 15 Dec 2018 21:26:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43490 "EHLO mx1.redhat.com"
+        id S1729811AbeLPGIj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 16 Dec 2018 01:08:39 -0500
+Received: from mout.gmx.net ([212.227.15.19]:50083 "EHLO mout.gmx.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727403AbeLPC0N (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 15 Dec 2018 21:26:13 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 778A93697E;
-        Sun, 16 Dec 2018 02:26:13 +0000 (UTC)
-Received: from localhost (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A3150105705C;
-        Sun, 16 Dec 2018 02:26:07 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Jeff Moyer <jmoyer@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 4/4] blk-mq-debugfs: export hctx->type
-Date:   Sun, 16 Dec 2018 10:25:17 +0800
-Message-Id: <20181216022517.26650-5-ming.lei@redhat.com>
-In-Reply-To: <20181216022517.26650-1-ming.lei@redhat.com>
-References: <20181216022517.26650-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Sun, 16 Dec 2018 02:26:13 +0000 (UTC)
+        id S1729758AbeLPGIj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 16 Dec 2018 01:08:39 -0500
+Received: from localhost.localdomain ([113.87.89.150]) by mail.gmx.com
+ (mrgmx001 [212.227.17.184]) with ESMTPSA (Nemesis) id
+ 0Lcj9b-1hFPeQ346x-00kBeq; Sun, 16 Dec 2018 07:08:34 +0100
+From:   Chengguang Xu <cgxu519@gmx.com>
+To:     ed.cashin@acm.org, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, Chengguang Xu <cgxu519@gmx.com>
+Subject: [PATCH] aoe: add __exit annotation
+Date:   Sun, 16 Dec 2018 14:08:18 +0800
+Message-Id: <20181216060818.26986-1-cgxu519@gmx.com>
+X-Mailer: git-send-email 2.17.2
+X-Provags-ID: V03:K1:aTljckzLamhgD9eIyfJaMoGijhnbpdhKrgd+Us0lAoMpg5HIC8p
+ GaIgbkp0/mvKaC54j0ckZniYw/SwCEIe0nz0Q/FembLo/mBk1/ArvUEgpbR5xGZLXml5Oi8
+ KQ66o70i3BMRzF3/GjAQZZ5sxYdZPlO1aHJnMmsvmZbEFncyPuhWqSSdZerbM03y5tRrpR9
+ eHvdQ4yuD3b1IkA7W8SUg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:8qEL9PhZTHQ=:jL+k3iHU7m/L0d8lqnBzqg
+ zYepbi8k38trR+C34zwIWwv8rEEWf/QnXqSgOStZwW4P2cgySuTYAu1Xs0k0fwPmINvOlcdNT
+ W59MbxwspaG05v+q3NotdpiXXdth5m2HWV3tUgLzlDnwuhctKKno2trxRQrqEZlafPDglUdqE
+ p2pWGgERIaV+W/Xbm2bbvI5w/7rrhNdhLVJB4CNnb5AA4RZHOMTxyPvfjb9MZLnusFJLun86Z
+ 2KZJ67iIUtYdOMHLHBJfecm7zIpkSNAO1gaBCqEXsFTeVd/IZHYDYwH/uLxIjx3h++E044/JK
+ GX4EGdVxcIZx6vEI+WTkyPOQsCE15md8Mnd2DjZXvKbMQOx907xrlsVmiha5NbVRLfj7glhdq
+ zHK8ZxxB+OFdk4jlVmmKZvy8PHvC46ciMVcINY/E11+KztorsqNvkB/F+kAOOeNFe7bpoIoGW
+ n5M0f1Vsqtin0l6Kz0479RYW94LvL5Ril340qvJyzCTI+GlLMSTDXR4ax6lY8cGDddZX3sczX
+ U9dGkZMryNiqDGXOwr5ZeXP6WqSPSLyEN9mFi9rcNCGzrVcPBe0AVkHGMI7olFx2PTRpXdBh0
+ wTdfD4mS1DvgeNtl9eT79biDeFbzPtgIgAzc09OkeBKPjtmJLx/f4UhmrXcUEFH+WXHWBi40F
+ jF3nfbit6T0cF/3ZIxo2VTi3h4iXWAs7sgJONxd2MtSJbAbW1TXISx1ZGRS9oXhGFEmBZMZ6T
+ S7cUNDdCQC5JH8+N6qJYx5SCQXi7QBMFkrIXE1Q1ED0Sw4oU8epUcRhMI81+Uj9EH2xBGjBLF
+ 9z8L8R60uYoy0fsqx+0lZQQ/UMUAXx5jV08f9ulrqz9Up852lxCP0Q8iN2hcGizeHzQM0mTWj
+ QLeZi2bS0JnARzK66iMP6xuOdJt8tTdN0TzyliKao=
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now we only export hctx->type via sysfs, and there isn't such info
-in hctx entry under debugfs. We often use debugfs only to diagnose
-queue mapping issue, so add the support in debugfs.
+Add __exit annotation to cleanup helper which
+is only called once in the module.
 
-Queue mapping becomes a bit more complicated after multiple queue
-mapping is supported, we may write blktest to verify if queue mapping
-is valid based on blk-mq-debug.
-
-Cc: Jeff Moyer <jmoyer@redhat.com>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
 ---
- block/blk-mq-debugfs.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ drivers/block/aoe/aoemain.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index a32bb79d6c95..219e29d49a49 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -636,6 +636,14 @@ static int hctx_dispatch_busy_show(void *data, struct seq_file *m)
- 	return 0;
+diff --git a/drivers/block/aoe/aoemain.c b/drivers/block/aoe/aoemain.c
+index 251482066977..1e4e2971171c 100644
+--- a/drivers/block/aoe/aoemain.c
++++ b/drivers/block/aoe/aoemain.c
+@@ -24,7 +24,7 @@ static void discover_timer(struct timer_list *t)
+ 	aoecmd_cfg(0xffff, 0xff);
  }
  
-+static int hctx_type_show(void *data, struct seq_file *m)
-+{
-+	struct blk_mq_hw_ctx *hctx = data;
-+
-+	seq_printf(m, "%u\n", hctx->type);
-+	return 0;
-+}
-+
- static void *ctx_rq_list_start(struct seq_file *m, loff_t *pos)
- 	__acquires(&ctx->lock)
+-static void
++static void __exit
+ aoe_exit(void)
  {
-@@ -798,6 +806,7 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_hctx_attrs[] = {
- 	{"run", 0600, hctx_run_show, hctx_run_write},
- 	{"active", 0400, hctx_active_show},
- 	{"dispatch_busy", 0400, hctx_dispatch_busy_show},
-+	{"type", 0400, hctx_type_show},
- 	{},
- };
- 
+ 	del_timer_sync(&timer);
 -- 
-2.9.5
+2.17.2
 
