@@ -3,53 +3,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2857BC43387
-	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 01:46:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43FFBC43387
+	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 01:46:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ECFA220883
-	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 01:46:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B10A206BA
+	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 01:46:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731256AbeLQBqN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 Dec 2018 20:46:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34232 "EHLO mx1.redhat.com"
+        id S1731258AbeLQBqS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 16 Dec 2018 20:46:18 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54552 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726252AbeLQBqN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Dec 2018 20:46:13 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        id S1726252AbeLQBqS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 16 Dec 2018 20:46:18 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B70AF13AA0;
-        Mon, 17 Dec 2018 01:46:12 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3BF3758E43;
+        Mon, 17 Dec 2018 01:46:18 +0000 (UTC)
 Received: from localhost (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D11915D717;
-        Mon, 17 Dec 2018 01:46:11 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 29857600D7;
+        Mon, 17 Dec 2018 01:46:14 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Bart Van Assche <bart.vanassche@wdc.com>,
         Omar Sandoval <osandov@fb.com>, Christoph Hellwig <hch@lst.de>,
         Josef Bacik <josef@toxicpanda.com>
-Subject: [PATCH V2 1/2] blk-mq-debugfs: support rq_qos
-Date:   Mon, 17 Dec 2018 09:46:00 +0800
-Message-Id: <20181217014601.11823-2-ming.lei@redhat.com>
+Subject: [PATCH V2 2/2] blk-wbt: export internal state via debugfs
+Date:   Mon, 17 Dec 2018 09:46:01 +0800
+Message-Id: <20181217014601.11823-3-ming.lei@redhat.com>
 In-Reply-To: <20181217014601.11823-1-ming.lei@redhat.com>
 References: <20181217014601.11823-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Mon, 17 Dec 2018 01:46:12 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Mon, 17 Dec 2018 01:46:18 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk-mq-debugfs has been proved as very helpful for debug some
-tough issues, such as IO hang.
-
-We have seen blk-wbt related IO hang several times, even inside
-Red Hat BZ, there is such report not sovled yet, so this patch
-adds support debugfs on rq_qos.
+This information is helpful to either investigate issues, or understand
+wbt's internal behaviour.
 
 Cc: Bart Van Assche <bart.vanassche@wdc.com>
 Cc: Omar Sandoval <osandov@fb.com>
@@ -57,222 +53,118 @@ Cc: Christoph Hellwig <hch@lst.de>
 Cc: Josef Bacik <josef@toxicpanda.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq-debugfs.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++
- block/blk-mq-debugfs.h | 17 ++++++++++++++++
- block/blk-rq-qos.c     |  2 ++
- block/blk-rq-qos.h     | 24 ++++++++++++++++++++++
- include/linux/blkdev.h |  1 +
- 5 files changed, 98 insertions(+)
+ block/blk-wbt.c | 91 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 91 insertions(+)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index a32bb79d6c95..2793e91bc7a4 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -23,6 +23,7 @@
- #include "blk-mq.h"
- #include "blk-mq-debugfs.h"
- #include "blk-mq-tag.h"
-+#include "blk-rq-qos.h"
- 
- static void print_stat(struct seq_file *m, struct blk_rq_stat *stat)
- {
-@@ -856,6 +857,15 @@ int blk_mq_debugfs_register(struct request_queue *q)
- 			goto err;
- 	}
- 
-+	if (q->rq_qos) {
-+		struct rq_qos *rqos = q->rq_qos;
-+
-+		while (rqos) {
-+			blk_mq_debugfs_register_rqos(rqos);
-+			rqos = rqos->next;
-+		}
-+	}
-+
- 	return 0;
- 
- err:
-@@ -978,6 +988,50 @@ void blk_mq_debugfs_unregister_sched(struct request_queue *q)
- 	q->sched_debugfs_dir = NULL;
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 463e4eb80287..f0c56649775f 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -715,6 +715,94 @@ void wbt_disable_default(struct request_queue *q)
  }
+ EXPORT_SYMBOL_GPL(wbt_disable_default);
  
-+void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos)
-+{
-+	debugfs_remove_recursive(rqos->debugfs_dir);
-+	rqos->debugfs_dir = NULL;
-+}
-+
-+int blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
-+{
-+	struct request_queue *q = rqos->q;
-+	const char *dir_name = rq_qos_id_to_name(rqos->id);
-+
-+	if (!q->debugfs_dir)
-+		return -ENOENT;
-+
-+	if (rqos->debugfs_dir || !rqos->ops->debugfs_attrs)
-+		return 0;
-+
-+	if (!q->rqos_debugfs_dir) {
-+		q->rqos_debugfs_dir = debugfs_create_dir("rqos",
-+							 q->debugfs_dir);
-+		if (!q->rqos_debugfs_dir)
-+			return -ENOMEM;
-+	}
-+
-+	rqos->debugfs_dir = debugfs_create_dir(dir_name,
-+					       rqos->q->rqos_debugfs_dir);
-+	if (!rqos->debugfs_dir)
-+		return -ENOMEM;
-+
-+	if (!debugfs_create_files(rqos->debugfs_dir, rqos,
-+				  rqos->ops->debugfs_attrs))
-+		goto err;
-+	return 0;
-+ err:
-+	blk_mq_debugfs_unregister_rqos(rqos);
-+	return -ENOMEM;
-+}
-+
-+void blk_mq_debugfs_unregister_queue_rqos(struct request_queue *q)
-+{
-+	debugfs_remove_recursive(q->rqos_debugfs_dir);
-+	q->rqos_debugfs_dir = NULL;
-+}
-+
- int blk_mq_debugfs_register_sched_hctx(struct request_queue *q,
- 				       struct blk_mq_hw_ctx *hctx)
- {
-diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
-index a9160be12be0..8c9012a578c1 100644
---- a/block/blk-mq-debugfs.h
-+++ b/block/blk-mq-debugfs.h
-@@ -31,6 +31,10 @@ void blk_mq_debugfs_unregister_sched(struct request_queue *q);
- int blk_mq_debugfs_register_sched_hctx(struct request_queue *q,
- 				       struct blk_mq_hw_ctx *hctx);
- void blk_mq_debugfs_unregister_sched_hctx(struct blk_mq_hw_ctx *hctx);
-+
-+int blk_mq_debugfs_register_rqos(struct rq_qos *rqos);
-+void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos);
-+void blk_mq_debugfs_unregister_queue_rqos(struct request_queue *q);
- #else
- static inline int blk_mq_debugfs_register(struct request_queue *q)
- {
-@@ -78,6 +82,19 @@ static inline int blk_mq_debugfs_register_sched_hctx(struct request_queue *q,
- static inline void blk_mq_debugfs_unregister_sched_hctx(struct blk_mq_hw_ctx *hctx)
- {
- }
-+
-+static inline int blk_mq_debugfs_register_rqos(struct rq_qos *rqos)
-+{
-+	return 0;
-+}
-+
-+static inline void blk_mq_debugfs_unregister_rqos(struct rq_qos *rqos)
-+{
-+}
-+
-+static inline void blk_mq_debugfs_unregister_queue_rqos(struct request_queue *q)
-+{
-+}
- #endif
- 
- #ifdef CONFIG_BLK_DEBUG_FS_ZONED
-diff --git a/block/blk-rq-qos.c b/block/blk-rq-qos.c
-index e932ef9d2718..d169d7188fa6 100644
---- a/block/blk-rq-qos.c
-+++ b/block/blk-rq-qos.c
-@@ -264,6 +264,8 @@ void rq_qos_wait(struct rq_wait *rqw, void *private_data,
- 
- void rq_qos_exit(struct request_queue *q)
- {
-+	blk_mq_debugfs_unregister_queue_rqos(q);
-+
- 	while (q->rq_qos) {
- 		struct rq_qos *rqos = q->rq_qos;
- 		q->rq_qos = rqos->next;
-diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
-index 8678875de420..3c85f26d3846 100644
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -7,6 +7,10 @@
- #include <linux/atomic.h>
- #include <linux/wait.h>
- 
-+#include "blk-mq-debugfs.h"
-+
-+struct blk_mq_debugfs_attr;
-+
- enum rq_qos_id {
- 	RQ_QOS_WBT,
- 	RQ_QOS_CGROUP,
-@@ -22,6 +26,9 @@ struct rq_qos {
- 	struct request_queue *q;
- 	enum rq_qos_id id;
- 	struct rq_qos *next;
 +#ifdef CONFIG_BLK_DEBUG_FS
-+	struct dentry *debugfs_dir;
++static int wbt_curr_win_nsec_show(void *data, struct seq_file *m)
++{
++	struct rq_qos *rqos = data;
++	struct rq_wb *rwb = RQWB(rqos);
++
++	seq_printf(m, "%llu\n", rwb->cur_win_nsec);
++	return 0;
++}
++
++static int wbt_enabled_show(void *data, struct seq_file *m)
++{
++	struct rq_qos *rqos = data;
++	struct rq_wb *rwb = RQWB(rqos);
++
++	seq_printf(m, "%d\n", rwb->enable_state);
++	return 0;
++}
++
++static int wbt_id_show(void *data, struct seq_file *m)
++{
++	struct rq_qos *rqos = data;
++
++	seq_printf(m, "%u\n", rqos->id);
++	return 0;
++}
++
++static int wbt_inflight_show(void *data, struct seq_file *m)
++{
++	struct rq_qos *rqos = data;
++	struct rq_wb *rwb = RQWB(rqos);
++	int i;
++
++	for (i = 0; i < WBT_NUM_RWQ; i++)
++		seq_printf(m, "%d: inflight %d\n", i,
++			   atomic_read(&rwb->rq_wait[i].inflight));
++	return 0;
++}
++
++static int wbt_min_lat_nsec_show(void *data, struct seq_file *m)
++{
++	struct rq_qos *rqos = data;
++	struct rq_wb *rwb = RQWB(rqos);
++
++	seq_printf(m, "%lu\n", rwb->min_lat_nsec);
++	return 0;
++}
++
++static int wbt_unknown_cnt_show(void *data, struct seq_file *m)
++{
++	struct rq_qos *rqos = data;
++	struct rq_wb *rwb = RQWB(rqos);
++
++	seq_printf(m, "%u\n", rwb->unknown_cnt);
++	return 0;
++}
++
++static int wbt_normal_show(void *data, struct seq_file *m)
++{
++	struct rq_qos *rqos = data;
++	struct rq_wb *rwb = RQWB(rqos);
++
++	seq_printf(m, "%u\n", rwb->wb_normal);
++	return 0;
++}
++
++static int wbt_background_show(void *data, struct seq_file *m)
++{
++	struct rq_qos *rqos = data;
++	struct rq_wb *rwb = RQWB(rqos);
++
++	seq_printf(m, "%u\n", rwb->wb_background);
++	return 0;
++}
++
++static const struct blk_mq_debugfs_attr wbt_debugfs_attrs[] = {
++	{"curr_win_nsec", 0400, wbt_curr_win_nsec_show},
++	{"enabled", 0400, wbt_enabled_show},
++	{"id", 0400, wbt_id_show},
++	{"inflight", 0400, wbt_inflight_show},
++	{"min_lat_nsec", 0400, wbt_min_lat_nsec_show},
++	{"unknown_cnt", 0400, wbt_unknown_cnt_show},
++	{"wb_normal", 0400, wbt_normal_show},
++	{"wb_background", 0400, wbt_background_show},
++	{},
++};
++#endif
++
+ static struct rq_qos_ops wbt_rqos_ops = {
+ 	.throttle = wbt_wait,
+ 	.issue = wbt_issue,
+@@ -723,6 +811,9 @@ static struct rq_qos_ops wbt_rqos_ops = {
+ 	.done = wbt_done,
+ 	.cleanup = wbt_cleanup,
+ 	.exit = wbt_exit,
++#ifdef CONFIG_BLK_DEBUG_FS
++	.debugfs_attrs = wbt_debugfs_attrs,
 +#endif
  };
  
- struct rq_qos_ops {
-@@ -33,6 +40,7 @@ struct rq_qos_ops {
- 	void (*done_bio)(struct rq_qos *, struct bio *);
- 	void (*cleanup)(struct rq_qos *, struct bio *);
- 	void (*exit)(struct rq_qos *);
-+	const struct blk_mq_debugfs_attr *debugfs_attrs;
- };
- 
- struct rq_depth {
-@@ -66,6 +74,17 @@ static inline struct rq_qos *blkcg_rq_qos(struct request_queue *q)
- 	return rq_qos_id(q, RQ_QOS_CGROUP);
- }
- 
-+static inline const char *rq_qos_id_to_name(enum rq_qos_id id)
-+{
-+	switch (id) {
-+	case RQ_QOS_WBT:
-+		return "wbt";
-+	case RQ_QOS_CGROUP:
-+		return "cgroup";
-+	}
-+	return "unknown";
-+}
-+
- static inline void rq_wait_init(struct rq_wait *rq_wait)
- {
- 	atomic_set(&rq_wait->inflight, 0);
-@@ -76,6 +95,9 @@ static inline void rq_qos_add(struct request_queue *q, struct rq_qos *rqos)
- {
- 	rqos->next = q->rq_qos;
- 	q->rq_qos = rqos;
-+
-+	if (rqos->ops->debugfs_attrs)
-+		blk_mq_debugfs_register_rqos(rqos);
- }
- 
- static inline void rq_qos_del(struct request_queue *q, struct rq_qos *rqos)
-@@ -91,6 +113,8 @@ static inline void rq_qos_del(struct request_queue *q, struct rq_qos *rqos)
- 		}
- 		prev = cur;
- 	}
-+
-+	blk_mq_debugfs_unregister_rqos(rqos);
- }
- 
- typedef bool (acquire_inflight_cb_t)(struct rq_wait *rqw, void *private_data);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 81f1b105946b..45552e6eae1e 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -560,6 +560,7 @@ struct request_queue {
- #ifdef CONFIG_BLK_DEBUG_FS
- 	struct dentry		*debugfs_dir;
- 	struct dentry		*sched_debugfs_dir;
-+	struct dentry		*rqos_debugfs_dir;
- #endif
- 
- 	bool			mq_sysfs_init_done;
+ int wbt_init(struct request_queue *q)
 -- 
 2.9.5
 
