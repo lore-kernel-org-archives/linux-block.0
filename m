@@ -6,68 +6,63 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 284C8C43387
-	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 17:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7B8CC43387
+	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 18:28:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E72A720675
-	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 17:32:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7511F21841
+	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 18:28:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="iRDZiMIx"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="UVuabSIw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733075AbeLQRcM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Dec 2018 12:32:12 -0500
-Received: from mail-it1-f175.google.com ([209.85.166.175]:40675 "EHLO
-        mail-it1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726436AbeLQRcM (ORCPT
+        id S1728149AbeLQS2P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Dec 2018 13:28:15 -0500
+Received: from mail-it1-f169.google.com ([209.85.166.169]:56260 "EHLO
+        mail-it1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727838AbeLQS2P (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Dec 2018 12:32:12 -0500
-Received: by mail-it1-f175.google.com with SMTP id h193so56626ita.5
-        for <linux-block@vger.kernel.org>; Mon, 17 Dec 2018 09:32:11 -0800 (PST)
+        Mon, 17 Dec 2018 13:28:15 -0500
+Received: by mail-it1-f169.google.com with SMTP id m62so323770ith.5
+        for <linux-block@vger.kernel.org>; Mon, 17 Dec 2018 10:28:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=yDQuQ5NfMmJG7M7XfUWKPMZ8ksZUnZzp+yrE0PDomBU=;
-        b=iRDZiMIxWKAKIR9rT8TPM7y3MCjO3AqG8SHx9S9YXcw+Eyl9VAf5KyK+KIGspzgP0k
-         ubzREWSQIFP9/Joy4Oh7xZl/XlDc2+N9nn+tBITKGrTwLdMuPTPEdm8WPKLuWTXD8B7y
-         vEio6QaLdv7HJ+v2FyC/hvbKc+iAuu34pSQ3a3TgloPpLbsli/53g2Dle9HbqVznEj6V
-         0pmOquoX36YRFyDdNo6ftfjrDZ2F/7OGSycfbLSQcaOBUm70fQojxK8WVaCPmDizPuvI
-         lB/uPpQTlsAgkY3N3ICqOGpSfMBngcaeld0PrucC9g9g9fOFqj8pl9+yDmlRu9YI1jnO
-         qPaA==
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=u+IT8XwE8eGkqdi3FXUDg5crG9Dd5+mFhARHa1/V3CA=;
+        b=UVuabSIwoq7CCds6wCCw9iT+S1apbesds+K1Z3nD5JcLyDLDR4VAGYHeBFGLvuvYZs
+         JhlEmPauJ54vYxeQVajOsW3zn4y/Bm0uEdDnvgbeh2wGaC0IX7PiWk/Y9/MeBBIBAk3u
+         HK70pDs4zlTyycZhY0l/nb+7PwSwucDyt4hPN5c5JU6RxQOrO/lvC5uHf9gJC+m+EV4V
+         UDAt1YNXqJQW0Z3RgrxevJchYhMeiyyl5AFr6AvOgZvASYIPy8Wg43yuxxYHLxcnEXgy
+         1L5GrH4ea+PubpMyq8e2a7kkK+V8mBpUbedJTx0JjpCLJ3pXtUrZcPhMjc2eXlMg39Yg
+         dgcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=yDQuQ5NfMmJG7M7XfUWKPMZ8ksZUnZzp+yrE0PDomBU=;
-        b=AE1r8PkZtv+pkmgim1hUp1BojjUDjvHxF/xA886Oq91gyH51S+NYnVYtm5kOaBaJyQ
-         5+wZ7glR6xsyP7XSmu8kgzxFNhRQHxXif7VJnJpCayDUXg9Z2TYiITCJwg/W3bisLIbY
-         jfFNSR4PHu/bV8MXwKLLaIoDIlTn1I6gMnkyigtBwPhmaX/TZUwRmte0zdsR65yroTeH
-         uXV7ZJhev+lQ3BQmaSdOzuwpg1dWEXxPqNg/UTPFSgB66Tu+ojsqOU5cFWTz9WZ7Zl0W
-         EQ21BlI5YzSolIzkz3vDW4IXqkuMx8i7Cijh0nisfqngBoFyzcAz+RnmmtodAyfIcH7d
-         +seg==
-X-Gm-Message-State: AA+aEWb8haD80fgJOAMmMt73HSS6o298p3EdoYXYY0PCAUEV7HixIVNg
-        rbRvKLdfB7nR8oLXwoSoQWmNwA==
-X-Google-Smtp-Source: AFSGD/WX/rZnHbNRF8Arf2BKqlO4NtleANIXZr8LX5qs9j4JmCix1FqezxJJLDo1XjAxKnoCPIHr8w==
-X-Received: by 2002:a02:8ca8:: with SMTP id f37mr13347446jak.80.1545067931126;
-        Mon, 17 Dec 2018 09:32:11 -0800 (PST)
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=u+IT8XwE8eGkqdi3FXUDg5crG9Dd5+mFhARHa1/V3CA=;
+        b=Xh4PS1VEsbuGRlEJc+eWwb37wDLjRcMuoQqPZIMOGSCzYEARqzyzRfGrfp1qkqYNQk
+         K+0SNwP+aNJssCLNA9SRVqm7IJCRD3LcaTfYFOdVR8UmZci32hW8l/Zs4gqVESy9l6+/
+         YA+3YCZlb4xjKgaJ0tkAEtrItdJV6OKBqgoYEw2T1qFuGFKWHa7hrQtTLjSOaliDU8hy
+         WotX5bpfQYWf7+e0vyqjM+ueJUVB2xu/fIgNb1Th5ywhOCw4lYXVGhtOBK80Lo8a4oCL
+         prP6oIuYV9C/kLSTl7EAlMIwZcoJEMG5F8UcBZEMQGnmrXu1SWm5ow23iuFJPrSsHZN5
+         LY0A==
+X-Gm-Message-State: AA+aEWZeAxHtJhltqwrzZYUNOVT/Dm/o39tm3RYyxRsE2GDl20xPKp45
+        1ylo/tK95cPxJ8cOY6y6P53nOac5bnfnYg==
+X-Google-Smtp-Source: AFSGD/WsNbmuRWbP+L5c+INZ9+v9u7Z552+zwFTRAeFvP3NcGraF7W5jlC/t/uKhv/JoU4dG9uTV1Q==
+X-Received: by 2002:a02:8a1c:: with SMTP id j28mr13148859jak.49.1545071294088;
+        Mon, 17 Dec 2018 10:28:14 -0800 (PST)
 Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id t64sm8895987itb.5.2018.12.17.09.32.09
+        by smtp.gmail.com with ESMTPSA id r63sm203978ita.2.2018.12.17.10.28.12
+        for <linux-block@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 17 Dec 2018 09:32:10 -0800 (PST)
-Subject: Re: [PATCH] blk-mq: skip zero-queue maps in blk_mq_map_swqueue
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20181217172856.14743-1-ming.lei@redhat.com>
+        Mon, 17 Dec 2018 10:28:12 -0800 (PST)
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <745cbe77-efb1-c21d-2f8c-d0afec341b37@kernel.dk>
-Date:   Mon, 17 Dec 2018 10:32:09 -0700
+Subject: Upcoming merge window
+Message-ID: <6fe5169f-8032-ac2a-ecb7-f845c56b1d73@kernel.dk>
+Date:   Mon, 17 Dec 2018 11:28:11 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20181217172856.14743-1-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -76,16 +71,19 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/17/18 10:28 AM, Ming Lei wrote:
-> From 7e849dd9cf37 ("nvme-pci: don't share queue maps"), the mapping
-> table won't be initialized actually if map->nr_queues is zero, so
-> we can't use blk_mq_map_queue_type() to retrieve hctx any more.
-> 
-> This way still may cause broken mapping, fix it by skipping zero-queues
-> maps in blk_mq_map_swqueue().
+Hi,
 
-Applied, thanks.
+As I'm sure you're all aware, the merge window is coming up. This time
+it happens to coincide with that is a holiday for most. My plan is to
+send in an EARLY pull request to Linus, Thursday at the latest. If you're
+sitting on anything that should go in with the initial merge, then I need
+to have it ASAP.
 
+I'll do a later pull about a week in with things that were missed, but
+I'm really hoping to make that fixes only. Any driver updates etc should
+go in now.
+
+Thanks,
 -- 
 Jens Axboe
 
