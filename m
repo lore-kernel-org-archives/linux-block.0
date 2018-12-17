@@ -2,95 +2,94 @@ Return-Path: <SRS0=xbel=O2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53776C43387
-	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 02:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70644C43387
+	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 05:51:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 13A622084A
-	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 02:54:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35CEE206A2
+	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 05:51:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ZggxcNKn"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Ha+Y3KvX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726343AbeLQCy4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 16 Dec 2018 21:54:56 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:36635 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726339AbeLQCy4 (ORCPT
+        id S1726330AbeLQFvL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Dec 2018 00:51:11 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:64736 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726323AbeLQFvL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 16 Dec 2018 21:54:56 -0500
-Received: by mail-pf1-f195.google.com with SMTP id b85so5606229pfc.3
-        for <linux-block@vger.kernel.org>; Sun, 16 Dec 2018 18:54:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=8S6rOrx77lMpWQJfrLYoxOZ3xoShO48Wi6gt5SBjmvs=;
-        b=ZggxcNKnnQhgviQ8KFdh2Cij/4Bynd5a2vOYeSHwqO0A+XRc8R7TcHkZtko49QsB5M
-         MJpJz4oZucU8Ju74Cf0gtVGL+JP7tGpelTjkXGd7MBVzvs550oxDTnuA253mQvoN8ga2
-         G3IxSzeKOPrTXMmzGkWhtBnjJfwVyHk/BBds5B2nARSuFzfHzJO5EV6yEU1dl9pLOjte
-         Mj4jFtdIm74TUxSgiwTOZNsdr10PvdPQPgJIX5sQ8JL+DsQJ5rtUyHzfZBJK+h/3m7L9
-         xYgE7vsGa9H/DCBQlnUbXAEZbvHhblLv/fD2fj0JpVdNg+Er4LFHXlb8sCl8ROCzAiP2
-         qILQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8S6rOrx77lMpWQJfrLYoxOZ3xoShO48Wi6gt5SBjmvs=;
-        b=ZrpQ2F+iWC9bFg4SNV/3xIpDNHtHheIj+oRdKyQEYTMsJvJu33nqCigqGMTAnYf/7C
-         01RKbqxZe33A16sz0xUdbI01ho4193NL147Jxaf4d/UrR/vGOaj5/EcYGuiDVDEg5prU
-         1SFKeqEln+Hlu32trrS6fSvMbXzsUq87PSHtdQ42oOIzUOPXhwGo382+jHA3BuaWtfv0
-         dZ7edzdtPh+oubPItVCY5jeMPHdkcSsjFpfgHwEl9YgNxA7yyMMKzthjWXsK1vSU7DAX
-         zXutoyDQBEM2NdlZ0RQnpvdCZlnvESB9O2ZDK9+EfiRlEZ9bwdfa6H9Vzw9lxsdckqim
-         IRxg==
-X-Gm-Message-State: AA+aEWYXo7PLg0RjVOIjfTLRMv/QfOOo78PsqUo0QXMr7ZQzmXAWF8jZ
-        WuClYHF4zx1wWlKtCQS7f6mHOg==
-X-Google-Smtp-Source: AFSGD/UJQJh+1AYcv9z6WpTzHIdhJAO1nCxCgHGueNdhHiIRvLViiYbImth+EcbGj0B39WCONRkHFw==
-X-Received: by 2002:a63:9e58:: with SMTP id r24mr10993536pgo.264.1545015295782;
-        Sun, 16 Dec 2018 18:54:55 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id g65sm52245796pfa.63.2018.12.16.18.54.53
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 16 Dec 2018 18:54:54 -0800 (PST)
-Subject: Re: [PATCH V2 0/2] block: support debugfs on rq_qos & wbt
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Omar Sandoval <osandov@fb.com>, Christoph Hellwig <hch@lst.de>,
-        Josef Bacik <josef@toxicpanda.com>
-References: <20181217014601.11823-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <d15ea8f0-7925-9e88-4ad0-5013af860356@kernel.dk>
-Date:   Sun, 16 Dec 2018 19:54:52 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Mon, 17 Dec 2018 00:51:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1545025909; x=1576561909;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=1XpF4terpMKtfzfoWNMvYnKL6nRCz/bXa10U7mub71k=;
+  b=Ha+Y3KvXHL8xD+/Lif3VRtSPBqjDSrVKIi1G5zkmORCRHeYTkFbvXS0t
+   E2fZTdjTwJLJO3d/IGVqRbeDkpxaFBizObBIgC69rQlprZN4dRy+ySCp1
+   N8ftD2l6KpDwgKvIZzT5enjx6Fgwhn5VXFz+pTUH/FGZ+LF76DgGwvTb5
+   smgTFizfG4raNc2KwWvB1OI7SctkKQNt2X3uGKSXxfy3PSH8j1Ig/f1nk
+   8B1EBAcWlpMswFoDTOklsAxhWi6TxKnhUFdolin2cz/fxB3h1o6uTSK+2
+   MQuKcSn23zApRy2FXS8nLYP2DDC6AY92i2FtIQm5HWp+xu1kFuOBsLv/X
+   w==;
+X-IronPort-AV: E=Sophos;i="5.56,364,1539619200"; 
+   d="scan'208";a="194656269"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 17 Dec 2018 13:51:48 +0800
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP; 16 Dec 2018 21:33:20 -0800
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip02.wdc.com with ESMTP; 16 Dec 2018 21:51:09 -0800
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>
+Cc:     Omar Sandoval <osandov@osandov.com>
+Subject: [PATCH blktests] blktests: Fix compilation warning
+Date:   Mon, 17 Dec 2018 14:51:08 +0900
+Message-Id: <20181217055108.11461-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.19.2
 MIME-Version: 1.0
-In-Reply-To: <20181217014601.11823-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/16/18 6:45 PM, Ming Lei wrote:
-> Hi,
-> 
-> The 1st patch provides debugfs support on rq_qos.
-> 
-> The 2nd patch exports blk-wbt's internal states via debugfs.
-> 
-> V2:
-> 	- use 'const char *'
-> 	- fix one comipile failure in case of !CONFIG_BLK_DEBUG_FS
-> 	- don't output 'ns' in several attributes
+Fix strncpy length to "sizeof(buf) - 1" to avoid the compiler warning:
+cc  -O2 -Wall -Wshadow  -o sg/syzkaller1 sg/syzkaller1.c
+sg/syzkaller1.c: In function ‘syz_open_dev.constprop’:
+sg/syzkaller1.c:204:16: warning: ‘strncpy’ specified bound 1024 equals
+destination size [-Wstringop-truncation]
+     NONFAILING(strncpy(buf, (char*)a0, sizeof(buf)));
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sg/syzkaller1.c:143:7: note: in definition of macro ‘NONFAILING’
+       __VA_ARGS__;                                                     \
+       ^~~~~~~~~~~
 
-Applied, thanks Ming.
+Since the last character of buf is forced set to 0, there is no
+functional change introduced by this patch.
 
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ src/sg/syzkaller1.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/sg/syzkaller1.c b/src/sg/syzkaller1.c
+index 60bd9a6..743859a 100644
+--- a/src/sg/syzkaller1.c
++++ b/src/sg/syzkaller1.c
+@@ -201,7 +201,7 @@ static uintptr_t syz_open_dev(uintptr_t a0, uintptr_t a1, uintptr_t a2)
+   } else {
+     char buf[1024];
+     char* hash;
+-    NONFAILING(strncpy(buf, (char*)a0, sizeof(buf)));
++    NONFAILING(strncpy(buf, (char*)a0, sizeof(buf) - 1));
+     buf[sizeof(buf) - 1] = 0;
+     while ((hash = strchr(buf, '#'))) {
+       *hash = '0' + (char)(a1 % 10);
 -- 
-Jens Axboe
+2.19.2
 
