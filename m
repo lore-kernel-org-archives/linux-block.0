@@ -2,135 +2,141 @@ Return-Path: <SRS0=xbel=O2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 506CDC43387
-	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 15:43:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53542C43387
+	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 16:04:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1738F2133F
-	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 15:43:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="goGJ/EYA"
+	by mail.kernel.org (Postfix) with ESMTP id 25A992145D
+	for <linux-block@archiver.kernel.org>; Mon, 17 Dec 2018 16:04:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1545062644;
+	bh=g1cipyX/ml4CsEO/LzIRh5/VHCQ/oKWBZNNrqN2IJCY=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=HIDcIcrL5s0Oa9f9fsD65jYXsMWhKZjt0wx7d/u3R9mkqyn+dWqVkHDrHPXafswHA
+	 rKZ5vd9U+5mFdRo+ITDxk/8FaHtAIy4gwtM+bR60O5r+VzS8EFwDLPMXMWWSKQVC6V
+	 7NSYSgTRjBdfGf6V2HaXEMe6wW1xXEgaGNSBfPco=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733059AbeLQPnu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Dec 2018 10:43:50 -0500
-Received: from mail-it1-f196.google.com ([209.85.166.196]:35836 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727759AbeLQPnu (ORCPT
+        id S1727833AbeLQQD6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Dec 2018 11:03:58 -0500
+Received: from mail-yw1-f65.google.com ([209.85.161.65]:41015 "EHLO
+        mail-yw1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727279AbeLQQD5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Dec 2018 10:43:50 -0500
-Received: by mail-it1-f196.google.com with SMTP id p197so20620355itp.0
-        for <linux-block@vger.kernel.org>; Mon, 17 Dec 2018 07:43:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=AvOJfp2s55a/cxH8YXHDyQPJDoAern9AYly5FBR4TU0=;
-        b=goGJ/EYAVnBOl404uwd6GkNQnyqNl3je0RE8qQkC61kE4KhS8PV5O9uYJp0nNxtbiX
-         C0hErdca68DNI9ZVzQpUGUX+t9JOlcglJclfMTKgh+sRfnEm/TFcF95/ZvchcY2UdVQb
-         J5jDcT4K6ctKD4T4Zp61mpOCSB5GIuLmaUkYI1VwmkIlmLpNGnmiUfaCMoLd6nyXRAK6
-         Qy8cr7sONgplaviu+yOCTRstqTG+ajRBqzR1CdZZGeDZozU63AlzFz8QWyAWPND+WTak
-         Evz1/ZBR4CvNplHvacIaoBR1+184pNm1m54ofy3y13aI9wvbHR/woVfZSilKSe51xBve
-         ET2Q==
+        Mon, 17 Dec 2018 11:03:57 -0500
+Received: by mail-yw1-f65.google.com with SMTP id f65so5365164ywc.8;
+        Mon, 17 Dec 2018 08:03:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=AvOJfp2s55a/cxH8YXHDyQPJDoAern9AYly5FBR4TU0=;
-        b=rcj0dSA7DiswaNmSei/1Viq08IOLkP5tnTBcTjpjk9G7pbovTLE9q5Hs5xrTFBWWlG
-         tExIsuh24e2ABAASER7CvP1hAFRH5SxYNfghsTGWhm432sL3RmxM07cSQu4qRwEMjayO
-         4PSHByQSblIGqrVAUYCvmflrUTp7s7H/VE1avnAjyUNdLCPkxmAFAqxgVHxQfrFOAeTF
-         jIfMaZGqQvLi19nMAxPLrnpveiNvrfiL0lVGUcKYe/0tIBE4GZbVOUUpZYgifNmsfPMP
-         YcohgwdR45SyhJs0tVsucvbpSLViRNNcNYp04aw1FQKSRroHOM+6fyMYvlC+x/3qfokc
-         ElKQ==
-X-Gm-Message-State: AA+aEWYS+SdPcQhLdCfP2ryDEE6bMQFzDji0Q6wnGGW/v/c5kVXY/8Yl
-        GOFUp6Nafv/vGMGaAZMoYdMbxw==
-X-Google-Smtp-Source: AFSGD/XROs90ImHJsmvUaLooRvUu7qaKgmIijVibPEYkC8PnVzkdxMMjwLqcn1X4sawFFycTp/VChw==
-X-Received: by 2002:a05:660c:12c7:: with SMTP id k7mr11910188itd.148.1545061429254;
-        Mon, 17 Dec 2018 07:43:49 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id r139sm6295927ior.53.2018.12.17.07.43.46
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 17 Dec 2018 07:43:47 -0800 (PST)
-Subject: Re: [PATCH V3 3/3] blk-mq: fix dispatch from sw queue
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
-References: <20181217120844.8131-1-ming.lei@redhat.com>
- <20181217120844.8131-4-ming.lei@redhat.com>
- <fe4133ec-7dfa-255c-9c24-af448446bf23@kernel.dk>
- <65b5ae24-2c02-7f78-275e-3df5a860cad5@kernel.dk>
-Message-ID: <9cfcc95b-883e-db62-1ae1-3c98b8f4048f@kernel.dk>
-Date:   Mon, 17 Dec 2018 08:43:45 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <65b5ae24-2c02-7f78-275e-3df5a860cad5@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=L5rGZCuzin7GjzYmFJwbDOmDQPDvurbU8ESwuOCO24c=;
+        b=bea8MrlXnfd+yUZRDAbrVjszV486fIdELfmrRLq5X7fvxHfDASRuWnYO7SqlM8mo+w
+         5sSzcXWuObnk4lzDQvJ/iLZ5vtg8meyHFvUDF/kXs3XDQszb2YuVItQD6ilL3VFUIwyg
+         YbL02Qu41eQK8kVbFjGsvio4NHcTpK7SjeOmLcCb+ylUOxbajfAdHlLFQYmfxjXGGtQR
+         5obZ5OfslaiQauH2zwGBkzQQ8na/VGQu8VE5zgfjDgTDAgHdG/2SdIdakJ6zcKbV41UC
+         THtZeZ5sv+KLx8w6ud799ld6OHa+cGU5aak0XpVQXQGBes6tSl3sbEgS2N020SUItJgd
+         8FHw==
+X-Gm-Message-State: AA+aEWaj4oezgcCrZLc4YRp08StT2xrNYlKrQSh8k/c+dMKW3vrUA6A0
+        +xyUikUxH2pwdk1H/UWT3aDIXR/g
+X-Google-Smtp-Source: AFSGD/UFUPjAM5mtxlSqOVBxqstFvWl+qNgT2c1VtEdmY0Hzg7cqbprmNRcTCgaXG6pGSPE/Qi0nEQ==
+X-Received: by 2002:a81:7242:: with SMTP id n63mr13774603ywc.495.1545062635218;
+        Mon, 17 Dec 2018 08:03:55 -0800 (PST)
+Received: from dennisz-mbp.thefacebook.com ([199.201.65.135])
+        by smtp.gmail.com with ESMTPSA id x82sm4525642ywb.34.2018.12.17.08.03.53
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Mon, 17 Dec 2018 08:03:54 -0800 (PST)
+From:   Dennis Zhou <dennis@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Josef Bacik <josef@toxicpanda.com>
+Cc:     kernel-team@fb.com, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dennis Zhou <dennis@kernel.org>
+Subject: [PATCH v3] block: fix blk-iolatency accounting underflow
+Date:   Mon, 17 Dec 2018 11:03:51 -0500
+Message-Id: <20181217160351.27903-1-dennis@kernel.org>
+X-Mailer: git-send-email 2.13.5
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/17/18 6:29 AM, Jens Axboe wrote:
-> On 12/17/18 5:55 AM, Jens Axboe wrote:
->> On 12/17/18 5:08 AM, Ming Lei wrote:
->>> When requst is added to rq list of sw queue(ctx), the rq may be from
->>> different type of hctx, especially after multi queue mapping is introduced.
->>>
->>> So when dispach request from sw queue via blk_mq_flush_busy_ctxs() or
->>> blk_mq_dequeue_from_ctx(), one request belonging to other queue type of
->>> hctx can be dispatch to current hctx in case that read queue or poll queue
->>> is enabled.
->>>
->>> This patch fixes this issue by introducing per-queue-type list.
->>
->> Looks good, just one comment:
->>
->>> diff --git a/block/blk-mq.h b/block/blk-mq.h
->>> index d1ed096723fb..0973a91eb1dd 100644
->>> --- a/block/blk-mq.h
->>> +++ b/block/blk-mq.h
->>> @@ -12,14 +12,16 @@ struct blk_mq_ctxs {
->>>  	struct blk_mq_ctx __percpu	*queue_ctx;
->>>  };
->>>  
->>> +struct blk_mq_ctx_list {
->>> +	spinlock_t		lock;
->>> +	struct list_head	rq_list;
->>> +}  ____cacheline_aligned_in_smp;
->>> +
->>>  /**
->>>   * struct blk_mq_ctx - State for a software queue facing the submitting CPUs
->>>   */
->>>  struct blk_mq_ctx {
->>> -	struct {
->>> -		spinlock_t		lock;
->>> -		struct list_head	rq_list;
->>> -	}  ____cacheline_aligned_in_smp;
->>> +	struct blk_mq_ctx_list  list[HCTX_MAX_TYPES];
->>
->> Let's not make that use 3 cachelines. There is no good reason to split
->> these across cachelines, if we have heavy traffic to multiple of these,
->> then we're not going very fast anyway. So just make it:
->>
->> 	struct {
->> 		spinlock_t		lock;
->> 		struct list_head	rq_list[HCTX_MAX_TYPES];
->> 	}  ____cacheline_aligned_in_smp;
-> 
-> Did it just to check, turns out fine and is of course less changes.
-> Let me know.
+The blk-iolatency controller measures the time from rq_qos_throttle() to
+rq_qos_done_bio() and attributes this time to the first bio that needs
+to create the request. This means if a bio is plug-mergeable or
+bio-mergeable, it gets to bypass the blk-iolatency controller.
 
-Tests good for me, thanks for doing this work. Just a heads up that
-I'm going to queue this up, attributed to you, but just with a note
-that I changed the layout of that structure.
+The recent series [1], to tag all bios w/ blkgs undermined how iolatency
+was determining which bios it was charging and should process in
+rq_qos_done_bio(). Because all bios are being tagged, this caused the
+atomic_t for the struct rq_wait inflight count to underflow and result
+in a stall.
 
+This patch adds a new flag BIO_TRACKED to let controllers know that a
+bio is going through the rq_qos path. blk-iolatency now checks if this
+flag is set to see if it should process the bio in rq_qos_done_bio().
+
+Overloading BLK_QUEUE_ENTERED works, but makes the flag rules confusing.
+BIO_THROTTLED was another candidate, but the flag is set for all bios
+that have gone through blk-throttle code. Overloading a flag comes with
+the burden of making sure that when either implementation changes, a
+change in setting rules for one doesn't cause a bug in the other. So
+here, we unfortunately opt for adding a new flag.
+
+[1] https://lore.kernel.org/lkml/20181205171039.73066-1-dennis@kernel.org/
+
+Fixes: 5cdf2e3fea5e ("blkcg: associate blkg when associating a device")
+Signed-off-by: Dennis Zhou <dennis@kernel.org>
+Cc: Josef Bacik <josef@toxicpanda.com>
+---
+ block/blk-iolatency.c     | 2 +-
+ block/blk-rq-qos.h        | 5 +++++
+ include/linux/blk_types.h | 1 +
+ 3 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index bee092727cad..fc714ef402a6 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -593,7 +593,7 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
+ 	bool enabled = false;
+ 
+ 	blkg = bio->bi_blkg;
+-	if (!blkg)
++	if (!blkg || !bio_flagged(bio, BIO_TRACKED))
+ 		return;
+ 
+ 	iolat = blkg_to_lat(bio->bi_blkg);
+diff --git a/block/blk-rq-qos.h b/block/blk-rq-qos.h
+index fd8a0c5debd3..58f62483b537 100644
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -170,6 +170,11 @@ static inline void rq_qos_done_bio(struct request_queue *q, struct bio *bio)
+ 
+ static inline void rq_qos_throttle(struct request_queue *q, struct bio *bio)
+ {
++	/*
++	 * BIO_TRACKED lets controllers know that a bio went through the
++	 * normal rq_qos path.
++	 */
++	bio_set_flag(bio, BIO_TRACKED);
+ 	if (q->rq_qos)
+ 		__rq_qos_throttle(q->rq_qos, bio);
+ }
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 46c005d601ac..fc99474ac968 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -228,6 +228,7 @@ struct bio {
+ #define BIO_TRACE_COMPLETION 10	/* bio_endio() should trace the final completion
+ 				 * of this bio. */
+ #define BIO_QUEUE_ENTERED 11	/* can use blk_queue_enter_live() */
++#define BIO_TRACKED 12		/* set if bio goes through the rq_qos path */
+ 
+ /* See BVEC_POOL_OFFSET below before adding new flags */
+ 
 -- 
-Jens Axboe
+2.17.1
 
