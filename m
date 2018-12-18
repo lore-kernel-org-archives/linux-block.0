@@ -2,105 +2,139 @@ Return-Path: <SRS0=v1Da=O3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8EE1C43387
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 17:47:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C76D0C43612
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 17:48:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C586D21873
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 17:47:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97BD721850
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 17:48:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="JUcSIVau"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727406AbeLRRrv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Dec 2018 12:47:51 -0500
-Received: from verein.lst.de ([213.95.11.211]:42203 "EHLO newverein.lst.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726659AbeLRRrv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Dec 2018 12:47:51 -0500
-Received: by newverein.lst.de (Postfix, from userid 2407)
-        id 38CA068D8D; Tue, 18 Dec 2018 18:47:50 +0100 (CET)
-Date:   Tue, 18 Dec 2018 18:47:50 +0100
-From:   "hch@lst.de" <hch@lst.de>
-To:     Keith Busch <keith.busch@intel.com>
-Cc:     yupeng <yupeng0921@gmail.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "axboe@fb.com" <axboe@fb.com>, "hch@lst.de" <hch@lst.de>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "jthumshirn@suse.de" <jthumshirn@suse.de>
-Subject: Re: [PATCH v4 2/2] trace nvme submit queue status
-Message-ID: <20181218174750.GA14416@lst.de>
-References: <20181218045138.4282-1-yupeng0921@gmail.com> <20181218045138.4282-2-yupeng0921@gmail.com> <20181218172645.GB13768@localhost.localdomain>
+        id S1727185AbeLRRsY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Dec 2018 12:48:24 -0500
+Received: from mail-it1-f193.google.com ([209.85.166.193]:36264 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727289AbeLRRsX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Dec 2018 12:48:23 -0500
+Received: by mail-it1-f193.google.com with SMTP id c9so5461070itj.1
+        for <linux-block@vger.kernel.org>; Tue, 18 Dec 2018 09:48:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=SQja1o6bp64fDaaqlw9M9j7Kjmp3Kjz39K8MIu4uNNA=;
+        b=JUcSIVaupQqpx0kCpcTCsy8PZzPR2sgP0ihJMzd1g6vnC7JjaQHf7WhfdDCg1KoH9U
+         Sy1HYcxmZg/Srikn1yYVaHMSmpXFASx63oj6aDCHmGPjqP9mg1iTh07nGEpDNZdlSk50
+         pNu2BX150PROlIOlbnDdOSdvV8ZWIBuI5QIwOdEfHsciWRxp7rrDWFLOLnemXuWoV0ML
+         9HoR+GdaV63OONxrJKkJu8B49fyKxGVj9S64f0lLxZMJ5zCrsm3aIpH0laecxOB++ZsZ
+         Rs76y0V+Ij7laBnQKgGpelRCjimw0FBALvaLBcBiT7DUqSTdLjfBlaWo98sZ2nyGOkfU
+         VO0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=SQja1o6bp64fDaaqlw9M9j7Kjmp3Kjz39K8MIu4uNNA=;
+        b=WMdTdmgGgsNpS8rRyJ8ri9Vt1xElXOHWU4OmNa3gZedcr/aY+4eUClBdXN1Bwhnt0z
+         Q0PieFiaAbiGq3+KL8crcyfd6KXWbySnENTWrY/LQyFe6Xd1JZKl+5pY4M62MajVsu0F
+         uFrLQCzDFgnjmdEnXX/q0Io/ViE59/mA6v1R8fdzkxcX2ziR1Ru7d2Lu8cQt/7fvnSRf
+         GhA69o8hokn9fvaHG74I6Ch3P1EdesgNfcpRAGBZFTkHcA4uTaV+rDr8iGQ4Ng+nQuec
+         qY7i++JEnzZKPOTCG2AlnvK4b8y25YMB7m2mVm6ZMxSeTtLNoRleJVw6XAcWnRJMyLeE
+         MiyA==
+X-Gm-Message-State: AA+aEWajd9BnEVbf5DR8Y2PEhSLB1uJogMcMQ2DOMXPfp38L2/Gy9tZl
+        LlTX9+zWbeXmsGy1lEVIGFHH8O3aU6olqg==
+X-Google-Smtp-Source: AFSGD/WdDN2a2gHkBHjK2Zo7ugKsifVyzLP5dxoSb82/9xYWkMQkQHNPg7iu07tKclZnjZ/ykIDgxQ==
+X-Received: by 2002:a24:3282:: with SMTP id j124mr3712479ita.173.1545155301800;
+        Tue, 18 Dec 2018 09:48:21 -0800 (PST)
+Received: from [192.168.1.56] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id y21sm7486675iof.51.2018.12.18.09.48.20
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 18 Dec 2018 09:48:20 -0800 (PST)
+Subject: Re: [PATCH v2] loop: drop caches if offset or block_size are changed
+To:     Jaegeuk Kim <jaegeuk@kernel.org>, linux-kernel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <20181214203223.7063-1-jaegeuk@kernel.org>
+ <20181217194236.GA50659@jaegeuk-macbookpro.roam.corp.google.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <29369548-df14-a5a7-2bee-a40b3479df68@kernel.dk>
+Date:   Tue, 18 Dec 2018 10:48:19 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181218172645.GB13768@localhost.localdomain>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20181217194236.GA50659@jaegeuk-macbookpro.roam.corp.google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 18, 2018 at 10:26:46AM -0700, Keith Busch wrote:
-> No need for a space after the %s. __print_disk_name already appends a
-> space if there's a disk name, and we don't want the extra space if there
-> isn't one. Also, every other nvme trace has a ',' after each entry. Not
-> a big deal, just minor format consistency.
+On 12/17/18 12:42 PM, Jaegeuk Kim wrote:
+> If we don't drop caches used in old offset or block_size, we can get old data
+> from new offset/block_size, which gives unexpected data to user.
+> 
+> For example, Martijn found a loopback bug in the below scenario.
+> 1) LOOP_SET_FD loads first two pages on loop file
+> 2) LOOP_SET_STATUS64 changes the offset on the loop file
+> 3) mount is failed due to the cached pages having wrong superblock
+> 
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: linux-block@vger.kernel.org
+> Reported-by: Martijn Coenen <maco@google.com>
+> Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
+> ---
+> 
+> v1 to v2:
+>  - cover block_size change
+> 
+>  drivers/block/loop.c | 15 +++++++++++++++
+>  1 file changed, 15 insertions(+)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index cb0cc8685076..382557c81674 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1154,6 +1154,12 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>  
+>  	if (lo->lo_offset != info->lo_offset ||
+>  	    lo->lo_sizelimit != info->lo_sizelimit) {
+> +		struct block_device *bdev = lo->lo_device;
+> +
+> +		/* drop stale caches used in old offset */
+> +		sync_blockdev(bdev);
+> +		kill_bdev(bdev);
+> +
+>  		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
+>  			err = -EFBIG;
+>  			goto exit;
+> @@ -1388,6 +1394,15 @@ static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+>  	blk_queue_io_min(lo->lo_queue, arg);
+>  	loop_update_dio(lo);
+>  
+> +	/* Don't change the size if it is same as current */
+> +	if (lo->lo_queue->limits.logical_block_size != arg) {
+> +		struct block_device *bdev = lo->lo_device;
+> +
+> +		/* drop stale caches likewise set_blocksize */
+> +		sync_blockdev(bdev);
+> +		kill_bdev(bdev);
+> +	}
+> +
+>  	blk_mq_unfreeze_queue(lo->lo_queue);
+>  
+>  	return 0;
 
-Yeah.  What about something like this incremental patch to make the
-trace formatting and argument passing match what we otherwise do:
+Looks fine to me, my only worry would be verifying that we're fine calling
+sync/kill from those contexts. The queue is frozen at this point, what
+happens if we do need to flush out dirty data?
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 2477bd906904..5a0bf6a24d50 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -1004,8 +1004,7 @@ static inline void nvme_handle_cqe(struct nvme_queue *nvmeq, u16 idx)
- 	}
- 
- 	req = blk_mq_tag_to_rq(*nvmeq->tags, cqe->command_id);
--	trace_nvme_sq(req->rq_disk, nvmeq->qid, le16_to_cpu(cqe->sq_head),
--			nvmeq->sq_tail);
-+	trace_nvme_sq(req, cqe->sq_head, nvmeq->sq_tail);
- 	nvme_end_request(req, cqe->status, cqe->result);
- }
- 
-diff --git a/drivers/nvme/host/trace.h b/drivers/nvme/host/trace.h
-index cf666709bc50..3564120aa7b3 100644
---- a/drivers/nvme/host/trace.h
-+++ b/drivers/nvme/host/trace.h
-@@ -185,22 +185,24 @@ TRACE_EVENT(nvme_async_event,
- #undef aer_name
- 
- TRACE_EVENT(nvme_sq,
--	TP_PROTO(void *rq_disk, int qid, int sq_head, int sq_tail),
--	TP_ARGS(rq_disk, qid, sq_head, sq_tail),
-+	TP_PROTO(struct request *req, __le16 sq_head, int sq_tail),
-+	TP_ARGS(req, sq_head, sq_tail),
- 	TP_STRUCT__entry(
-+		__field(int, ctrl_id)
- 		__array(char, disk, DISK_NAME_LEN)
- 		__field(int, qid)
--		__field(int, sq_head)
--		__field(int, sq_tail)
-+		__field(u16, sq_head)
-+		__field(u16, sq_tail)
- 	),
- 	TP_fast_assign(
--		__assign_disk_name(__entry->disk, rq_disk);
--		__entry->qid = qid;
--		__entry->sq_head = sq_head;
-+		__entry->ctrl_id = nvme_req(req)->ctrl->instance;
-+		__assign_disk_name(__entry->disk, req->rq_disk);
-+		__entry->qid = nvme_req_qid(req);
-+		__entry->sq_head = le16_to_cpu(sq_head);
- 		__entry->sq_tail = sq_tail;
- 	),
--	TP_printk("nvme: %s qid=%d head=%d tail=%d",
--		__print_disk_name(__entry->disk),
-+	TP_printk("nvme%d: %sqid=%d, head=%u, tail=%u",
-+		__entry->ctrl_id, __print_disk_name(__entry->disk),
- 		__entry->qid, __entry->sq_head, __entry->sq_tail
- 	)
- );
+-- 
+Jens Axboe
+
