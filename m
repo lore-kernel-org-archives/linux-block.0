@@ -6,50 +6,44 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69F63C43387
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 06:47:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 856AAC43387
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 07:08:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4116F20874
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 06:47:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53D8D217D8
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 07:08:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726367AbeLRGrl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Dec 2018 01:47:41 -0500
-Received: from verein.lst.de ([213.95.11.211]:38732 "EHLO newverein.lst.de"
+        id S1726354AbeLRHI2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Dec 2018 02:08:28 -0500
+Received: from verein.lst.de ([213.95.11.211]:38887 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726331AbeLRGrl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Dec 2018 01:47:41 -0500
+        id S1726316AbeLRHI2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Dec 2018 02:08:28 -0500
 Received: by newverein.lst.de (Postfix, from userid 2407)
-        id 9C32D68D7E; Tue, 18 Dec 2018 07:47:39 +0100 (CET)
-Date:   Tue, 18 Dec 2018 07:47:39 +0100
+        id E88D568D8D; Tue, 18 Dec 2018 08:08:26 +0100 (CET)
+Date:   Tue, 18 Dec 2018 08:08:26 +0100
 From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        Jeff Moyer <jmoyer@redhat.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] blk-mq: enable IO poll if .nr_queues of type poll > 0
-Message-ID: <20181218064739.GA1219@lst.de>
-References: <20181218041529.27787-1-ming.lei@redhat.com> <95d4e41f-24a7-bdb5-e014-994e021f901a@kernel.dk>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Juergen Gross <jgross@suse.com>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: remove the "clustering" flag V2
+Message-ID: <20181218070826.GA1787@lst.de>
+References: <20181213151710.30036-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <95d4e41f-24a7-bdb5-e014-994e021f901a@kernel.dk>
+In-Reply-To: <20181213151710.30036-1-hch@lst.de>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 17, 2018 at 09:34:55PM -0700, Jens Axboe wrote:
-> On 12/17/18 9:15 PM, Ming Lei wrote:
-> > The queue mapping of type poll only exists when set->map[HCTX_TYPE_POLL].nr_queues
-> > is bigger than zero, so enhance the constraint by checking .nr_queues of type poll
-> > before enabling IO poll.
-> > 
-> > Otherwise IO race & timeout can be observed when running block/007.
-> 
-> Looks good to me, but we might consider having a helper for this, since
-> we have this check in 3 places now. But for now this is good, thanks
-> Ming.
+Martin and others:
 
-Jens, if you want this I can drop the nvme patch to set nr_maps to 2
-as it wouldn't be needed.  Not sure which one is more elegant, but
-I guess Mings version is a little more fool proof.
+can we get this reviewed and merge before the end of the merge window?
+That gets the clustering put of the way for the multipage-biovec work
+from Ming which we want to land in the block tree early in the next
+merge window.
