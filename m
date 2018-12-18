@@ -2,118 +2,94 @@ Return-Path: <SRS0=v1Da=O3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47F9DC43387
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 19:04:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52895C43387
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 21:57:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1732F21873
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 19:04:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F88E21852
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 21:57:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="aeMJvZgF"
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="bInJwsRO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726614AbeLRTEU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Dec 2018 14:04:20 -0500
-Received: from mail-io1-f41.google.com ([209.85.166.41]:43397 "EHLO
-        mail-io1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726575AbeLRTEU (ORCPT
+        id S1727462AbeLRV5c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Dec 2018 16:57:32 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:44550 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726704AbeLRV5c (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Dec 2018 14:04:20 -0500
-Received: by mail-io1-f41.google.com with SMTP id g17so1797070ioc.10
-        for <linux-block@vger.kernel.org>; Tue, 18 Dec 2018 11:04:19 -0800 (PST)
+        Tue, 18 Dec 2018 16:57:32 -0500
+Received: by mail-io1-f68.google.com with SMTP id r200so13989443iod.11
+        for <linux-block@vger.kernel.org>; Tue, 18 Dec 2018 13:57:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=from:references:in-reply-to:mime-version:thread-index:date
-         :message-id:subject:to:cc;
-        bh=hk4T3cobtaxwHNKm4terT+08lL9KwSGmqT11f/cAHgM=;
-        b=aeMJvZgFcLkC4PRH3huEWI2tflOnrVgkw2R8lg/MQ1NTiiTQWB+YpelToFZhOBPdLh
-         d8Z3d0ABULbzZjk13TiUxMEyB4e9c+eYNplJ9QIQPGtJ3jD5RbTfj6DGZxFi5Tw+MTMQ
-         PpOQpZA5GaM/1Y0Qh3ymwvqd4BuXauZQH/l3E=
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=55oujOUnmmZg2AfxbqrWeTrHQLKUmXvuMBjhtTuAsJo=;
+        b=bInJwsROZwQKH3oNQ0pNfCfC7tV+z++JE7Xj5fU2dqkgZUHO3t2M5ahUQSIwikebrU
+         mhw5aPOFvn8lizjrQvmBC4QR/nDSFIY9glQjhGDU0Q4+8C+iwprw3NgdMAwPNDuFqyRQ
+         wRzZz4JP0uFGM19hmcTWeDVWR3Rne2Qv6R3sAiNV0/bnxMOwoU2YdxwajULEkuQ4nmlu
+         QOu1z2f7QnXcVG0cINKJY6LygMI0ZG3WHWbCLp/YTCMVGKjB4Kh9vcNehRzIvlRz9UAN
+         INH5vMhV9tIFJwYQyIILG3FzOQGuXcGP1/ok8gpuRdMeKJGX06XljtVMQt3w5F6Olj0m
+         HcJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:references:in-reply-to:mime-version
-         :thread-index:date:message-id:subject:to:cc;
-        bh=hk4T3cobtaxwHNKm4terT+08lL9KwSGmqT11f/cAHgM=;
-        b=XJXSdfTFyfXesm4Y7cPeWFYMgQj0x7b31dc9bjR5sZ2PvxB7pszgVEN+iyQuVfo9w7
-         XakzhU3anp/8HWL77CZOuJNM1TRkds5acmOVx2YmEOKkyjSPsksgVC83eTB/Hbfwg/a9
-         rGERvhntV5KPUgPGPztj/V8pephWQcBZ/K31c1Lp6ijMU61v60g2dGDCwTTgGpJyZ1Uc
-         DkIwJPlfoSx3T5bhX/iD4dtEDs6FFkgLf5hz3e1q9rrPsLE7K43/HV4UUtQD20Vhknnq
-         OEd5B1b+cTPaJALVspAMzQxbN3kGY04/x5QRwf9qtf4pqQ769rlouow7A66MRCnpD5p6
-         Vx+g==
-X-Gm-Message-State: AA+aEWbwiuwg8SO9u5G+IQQ4Ym8bQyxyYVm4tlad2G7hnA5Ki8Dmse0w
-        z+sePHt7iQ9Kwnmk1u5BTNd4ysnu0gWQZRGEtYYFWncT
-X-Google-Smtp-Source: AFSGD/WXzhuG1pHQ8F7+JzTzlWqC63lM9zyj1MTBPLO8HxdlLnOXsgY4h4rRyAKM1ln1l7sdHjPOlGCfOY3zPXyZTY8=
-X-Received: by 2002:a6b:2b95:: with SMTP id r143mr15904191ior.217.1545159858876;
- Tue, 18 Dec 2018 11:04:18 -0800 (PST)
-From:   Kashyap Desai <kashyap.desai@broadcom.com>
-References: <CAHsXFKHSjBHZy9tyhdEjYJcLJeE6SqdeBPcoeq=bCaRfzvMqgw@mail.gmail.com>
- <1545149754.185366.449.camel@acm.org> <ae741e1b-ec2d-075e-82b0-a1e09d0553fd@kernel.dk>
- <41bb993fdc71d02a884cc2b793403ca7@mail.gmail.com> <9d1601bd-5b28-23f8-2a36-8fc100323422@kernel.dk>
- <e5049f63c7aadd11f64b8027f352a014@mail.gmail.com> <04e2f9e8-79fa-f1cb-ab23-4a15bf3f64cc@kernel.dk>
- <a9186c0c84f31623a544d73ce9a779d6@mail.gmail.com> <7a2b3fa5-652a-2d43-c93c-be5277b34060@kernel.dk>
- <26fb62ae415185db2df6af3bed159a68@mail.gmail.com> <cf524178-c497-373c-37f6-abee13eacf19@kernel.dk>
-In-Reply-To: <cf524178-c497-373c-37f6-abee13eacf19@kernel.dk>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=55oujOUnmmZg2AfxbqrWeTrHQLKUmXvuMBjhtTuAsJo=;
+        b=FawSAa6z72dqU8OLgdPqE2nltZvPZcQ5DK1NqopLGFsF9AisKRiudFnj8ZVhyJv42N
+         lllHEmfH6M2lIuBZtdu5LP+GY/QQJfk+wJoFX6+4RoX0IoqB7E+t3C48DmVxQzx/XCuw
+         RcLlutIFYGs99fECZ5JJKrItUBLD/W/cPpG3+KVkepndjrrNFh8kiZCPWX7FAB+5aaHm
+         /Ud0z8klYTIyJwBCoqzPPlUBOY/P0e8zYZGyaT14awhvBJ/m2+ux8wcLS7Z95IHxa9P/
+         1zVtXJLCLI8PPHHyf96tJHw0LIgDMTet83wp0Pio4GDLftHsDnDoBfeGkBVmQJazs405
+         V1vQ==
+X-Gm-Message-State: AA+aEWaGcfKvgi4/wjXd/JzDOBiPK3oXjTJFgF1H/OlBkPdTjHyBOfQP
+        +QKNH43lkTiNUbPHlizK3IaEpdi9EZWm2g==
+X-Google-Smtp-Source: AFSGD/WcB6i6Qvn7FnPDnrTCYEyezTLAl7quf3yZP5peWj5nRnvREnaHPW9stFf91irWTcogpnILGQ==
+X-Received: by 2002:a6b:7514:: with SMTP id l20mr12341582ioh.120.1545170250995;
+        Tue, 18 Dec 2018 13:57:30 -0800 (PST)
+Received: from vader ([2620:10d:c090:200::7:ffa])
+        by smtp.gmail.com with ESMTPSA id d9sm2845368iom.72.2018.12.18.13.57.30
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 18 Dec 2018 13:57:30 -0800 (PST)
+Date:   Tue, 18 Dec 2018 13:57:29 -0800
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Damien Le Moal <damien.lemoal@wdc.com>
+Cc:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>
+Subject: Re: [PATCH blktests] blktests: Fix compilation warning
+Message-ID: <20181218215729.GA12683@vader>
+References: <20181217055108.11461-1-damien.lemoal@wdc.com>
 MIME-Version: 1.0
-X-Mailer: Microsoft Outlook 15.0
-Thread-Index: AQKTtuNko6E02tULaIEHowzteDaHmgFdiSnEAolTOMIBv4s1RgHH+RzfAtR0fm4CpRS/1gH7Dy4qAokcrFwC4hOPOwKPEsCDo0+tlqA=
-Date:   Wed, 19 Dec 2018 00:34:16 +0530
-Message-ID: <b6b95326e2b61100ac34fc89c86e54ae@mail.gmail.com>
-Subject: RE: [PATCH V2] blk-mq: Set request mapping to NULL in blk_mq_put_driver_tag
-To:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        Suganath Prabu Subramani 
-        <suganath-prabu.subramani@broadcom.com>,
-        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181217055108.11461-1-damien.lemoal@wdc.com>
+User-Agent: Mutt/1.11.1 (2018-12-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->
-> I actually took a look at scsi_host_find_tag() - what I think needs fixing
-> here is
-> that it should not return a tag that isn't allocated.
-> You're just looking up random stuff, that is a recipe for disaster.
-> But even with that, there's no guarantee that the tag isn't going away.
+On Mon, Dec 17, 2018 at 02:51:08PM +0900, Damien Le Moal wrote:
+> Fix strncpy length to "sizeof(buf) - 1" to avoid the compiler warning:
+> cc  -O2 -Wall -Wshadow  -o sg/syzkaller1 sg/syzkaller1.c
+> sg/syzkaller1.c: In function ‘syz_open_dev.constprop’:
+> sg/syzkaller1.c:204:16: warning: ‘strncpy’ specified bound 1024 equals
+> destination size [-Wstringop-truncation]
+>      NONFAILING(strncpy(buf, (char*)a0, sizeof(buf)));
+>                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> sg/syzkaller1.c:143:7: note: in definition of macro ‘NONFAILING’
+>        __VA_ARGS__;                                                     \
+>        ^~~~~~~~~~~
+> 
+> Since the last character of buf is forced set to 0, there is no
+> functional change introduced by this patch.
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
 
-Got your point. Let us fix in <mpt3sas> driver.
-
->
-> The mpt3sas use case is crap. It's iterating every tag, just in case it
-> needs to do
-> something to it.
-
-Many drivers in scsi layer is having similar trouble.  May be they are less
-exposed. That was a main reason, I thought to provide common fix in block
-layer.
-
->
-> My suggestion would be to scrap that bad implementation and have
-> something available for iterating busy tags instead. That'd be more
-> appropriate and a lot more efficient that a random loop from 0..depth.
-> If you are flushing running commands, looking up tags that aren't even
-> active
-> is silly and counterproductive.
-
-We will address this issue through <mpt3sas> driver changes in two steps.
-1. I can use  driver's internal memory and will not rely on request/scsi
-command. Tag 0...depth loop  is not in main IO path, so what we need is
-contention free access of the list. Having driver's internal memory and
-array will provide that control.
-2. As you suggested best way is to use busy tag iteration.  (only for blk-mq
-stack)
-
-
-Thanks for your feedback.
-
-Kashyap
-
->
-> --
-> Jens Axboe
+Applied, thanks, Damien.
