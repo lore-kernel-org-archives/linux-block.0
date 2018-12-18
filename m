@@ -2,202 +2,150 @@ Return-Path: <SRS0=v1Da=O3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B185FC43387
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 00:54:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B685DC43387
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 03:45:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 768242080D
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 00:54:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="tM6bG+BM"
+	by mail.kernel.org (Postfix) with ESMTP id 8C84E20874
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 03:45:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726282AbeLRAyC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Dec 2018 19:54:02 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:35478 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726276AbeLRAyB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Dec 2018 19:54:01 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wBI0jOCg144959;
-        Tue, 18 Dec 2018 00:53:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2018-07-02;
- bh=YXVEv6axObWQX5lhfw0jpSFE10BTkItVYGdEhAcruSI=;
- b=tM6bG+BMhCPjyfsuMXHlURnGxAnh+2Ld4b8wtIKceQYbuky/iPbWGZAfD87ZK+k7BLsR
- ZZ0mGe3OvbgOVttlLgCTImJJaJcHPgBXjOkqFEw2ZCw6SJRwUC/krv+tVUnxD3UtSws2
- E0jf5x3JxfiFC+U24VGd3aLX/WvjjHdsRiIN5EDGVEEXz123Y//U93VGBS8SCNX8IzVN
- 6iLFQuT+FjnSGmgGT3A562cf11iTCwO+RHIXt0mxl8f+CZcYT6nYBr6j5Iq4AbmPGZBM
- JucwWf/2AiaC0E0kODn1J7/Rl5PjaoRgpJE3Bf498e0xZV0M4geWZn6dinFfnaifktPc vQ== 
-Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
-        by userp2120.oracle.com with ESMTP id 2pct8qrekb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Dec 2018 00:53:52 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id wBI0rp0U031447
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Dec 2018 00:53:52 GMT
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id wBI0roe8028487;
-        Tue, 18 Dec 2018 00:53:50 GMT
-Received: from linux.cn.oracle.com (/10.182.71.9)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 17 Dec 2018 16:53:49 -0800
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     konrad.wilk@oracle.com, roger.pau@citrix.com, axboe@kernel.dk,
-        paul.durrant@citrix.com
-Subject: [PATCH v2 1/1] xen/blkback: rework connect_ring() to avoid inconsistent xenstore 'ring-page-order' set by malicious blkfront
-Date:   Tue, 18 Dec 2018 08:55:38 +0800
-Message-Id: <1545094538-31426-1-git-send-email-dongli.zhang@oracle.com>
-X-Mailer: git-send-email 2.7.4
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9110 signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1812180004
+        id S1726309AbeLRDpn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Dec 2018 22:45:43 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:37616 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726303AbeLRDpn (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 17 Dec 2018 22:45:43 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0542445CD3;
+        Tue, 18 Dec 2018 03:45:43 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.149])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id C6CDB17B57;
+        Tue, 18 Dec 2018 03:45:39 +0000 (UTC)
+Date:   Mon, 17 Dec 2018 22:45:38 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: Upcoming merge window
+Message-ID: <20181218034538.GA15299@redhat.com>
+References: <6fe5169f-8032-ac2a-ecb7-f845c56b1d73@kernel.dk>
+ <1545088576.185366.443.camel@acm.org>
+ <8ae21d8c-81a1-891a-66c4-c94ff8bee20b@kernel.dk>
+ <69609425-5f1d-3c4f-3b1c-34f3b156006a@kernel.dk>
+ <83df36a6-f36b-43b0-8817-59feff02038e@kernel.dk>
+ <0ad2ac54-c1e4-10bb-2129-6ef3e962c43e@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0ad2ac54-c1e4-10bb-2129-6ef3e962c43e@kernel.dk>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 18 Dec 2018 03:45:43 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The xenstore 'ring-page-order' is used globally for each blkback queue and
-therefore should be read from xenstore only once. However, it is obtained
-in read_per_ring_refs() which might be called multiple times during the
-initialization of each blkback queue.
+On Mon, Dec 17 2018 at  7:26pm -0500,
+Jens Axboe <axboe@kernel.dk> wrote:
 
-If the blkfront is malicious and the 'ring-page-order' is set in different
-value by blkfront every time before blkback reads it, this may end up at
-the "WARN_ON(i != (XEN_BLKIF_REQS_PER_PAGE * blkif->nr_ring_pages));" in
-xen_blkif_disconnect() when frontend is destroyed.
+> On 12/17/18 5:16 PM, Jens Axboe wrote:
+> > On 12/17/18 4:49 PM, Jens Axboe wrote:
+> >> On 12/17/18 4:27 PM, Jens Axboe wrote:
+> >>> On 12/17/18 4:16 PM, Bart Van Assche wrote:
+> >>>> On Mon, 2018-12-17 at 11:28 -0700, Jens Axboe wrote:
+> >>>>> As I'm sure you're all aware, the merge window is coming up. This time
+> >>>>> it happens to coincide with that is a holiday for most. My plan is to
+> >>>>> send in an EARLY pull request to Linus, Thursday at the latest. If you're
+> >>>>> sitting on anything that should go in with the initial merge, then I need
+> >>>>> to have it ASAP.
+> >>>>>
+> >>>>> I'll do a later pull about a week in with things that were missed, but
+> >>>>> I'm really hoping to make that fixes only. Any driver updates etc should
+> >>>>> go in now.
+> >>>>
+> >>>> Hi Jens,
+> >>>>
+> >>>> If I run blktests/srp/002 against Linus' master branch then that test passes,
+> >>>> no matter how many times I run that test. If I run that test against your
+> >>>> for-next branch however (commit 6a252f2772c0) then that test hangs. The output
+> >>>> of my list-pending-block-requests script is as follows when the hang occurs:
+> >>>
+> >>> Ugh, I'll try and run that here again, that test is unfortunately such a pain
+> >>> to run and requires me to manually install multipath libs (and remember to
+> >>> uninstall before rebooting, or udev fails?).
+> >>>
+> >>> I'll take a look!
+> >>
+> >> Looks like what Ming was talking about. CC'ing Ming and Mike. Lots of
+> >> kworkers are stuck like this:
+> >>
+> >> [  252.310187] kworker/2:19    D14072  8147      2 0x80000000
+> >> [  252.316803] Workqueue: dio/dm-2 dio_aio_complete_work
+> >> [  252.322925] Call Trace:
+> >> [  252.326137]  ? __schedule+0x231/0x5f0
+> >> [  252.330703]  schedule+0x2a/0x80
+> >> [  252.334689]  rwsem_down_write_failed+0x204/0x320
+> >> [  252.340330]  ? generic_make_request_checks+0x55/0x370
+> >> [  252.346542]  ? call_rwsem_down_write_failed+0x13/0x20
+> >> [  252.352669]  call_rwsem_down_write_failed+0x13/0x20
+> >> [  252.358601]  down_write+0x1b/0x30
+> >> [  252.362781]  __generic_file_fsync+0x3e/0xb0
+> >> [  252.367933]  ext4_sync_file+0xcc/0x2e0
+> >> [  252.372599]  dio_complete+0x1c4/0x210
+> >> [  252.377168]  process_one_work+0x1cb/0x350
+> >> [  252.382915]  worker_thread+0x28/0x3c0
+> >> [  252.387482]  ? process_one_work+0x350/0x350
+> >> [  252.392632]  kthread+0x107/0x120
+> >> [  252.396717]  ? kthread_park+0x80/0x80
+> >> [  252.401285]  ret_from_fork+0x1f/0x30
+> >>
+> >> Where did this regression come from? This was passing just fine
+> >> recently.
+> > 
+> > Looks like this is the offending commit:
+> > 
+> > commit c4576aed8d85d808cd6443bda58393d525207d01
+> > Author: Mike Snitzer <snitzer@redhat.com>
+> > Date:   Tue Dec 11 09:10:26 2018 -0500
+> > 
+> >     dm: fix request-based dm's use of dm_wait_for_completion
+> 
+> Yep confirmed, reverted that on top and it passes. dm-2 has plenty of
+> requests that are allocated and pending dispatch, so the md_in_flight()
+> will return true. Mike, should it be checking for allocated requests or
+> in-flight?
 
-This patch reworks connect_ring() to read xenstore 'ring-page-order' only
-once.
+I thought we could just check for allocated (as blk_mq_check_busy() does
+now) but clearly that is too broad a scope because I tested your
+suggestion and it allows the srp/002 test to pass:
 
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
----
-Changed since v1:
-  * change the order of xenstore read in read_per_ring_refs(suggested by Roger Pau Monne)
-  * use xenbus_read_unsigned() in connect_ring() (suggested by Roger Pau Monne)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 6847f014606b..edbf4bb1b3e8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -812,7 +812,7 @@ static bool blk_mq_check_busy(struct blk_mq_hw_ctx *hctx, struct request *rq,
+         * If we find a request, we know the queue is busy. Return false
+         * to stop the iteration.
+         */
+-       if (rq->q == hctx->queue) {
++       if (rq->state == MQ_RQ_IN_FLIGHT && rq->q == hctx->queue) {
+                bool *busy = priv;
 
- drivers/block/xen-blkback/xenbus.c | 70 ++++++++++++++++++++++----------------
- 1 file changed, 40 insertions(+), 30 deletions(-)
+                *busy = true;
 
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index a4bc74e..7178f0f 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -926,7 +926,7 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
- 	int err, i, j;
- 	struct xen_blkif *blkif = ring->blkif;
- 	struct xenbus_device *dev = blkif->be->dev;
--	unsigned int ring_page_order, nr_grefs, evtchn;
-+	unsigned int nr_grefs, evtchn;
- 
- 	err = xenbus_scanf(XBT_NIL, dir, "event-channel", "%u",
- 			  &evtchn);
-@@ -936,43 +936,38 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
- 		return err;
- 	}
- 
--	err = xenbus_scanf(XBT_NIL, dev->otherend, "ring-page-order", "%u",
--			  &ring_page_order);
--	if (err != 1) {
--		err = xenbus_scanf(XBT_NIL, dir, "ring-ref", "%u", &ring_ref[0]);
--		if (err != 1) {
-+	nr_grefs = blkif->nr_ring_pages;
-+	WARN_ON(!nr_grefs);
-+
-+	for (i = 0; i < nr_grefs; i++) {
-+		char ring_ref_name[RINGREF_NAME_LEN];
-+
-+		snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref%u", i);
-+		err = xenbus_scanf(XBT_NIL, dir, ring_ref_name,
-+				   "%u", &ring_ref[i]);
-+
-+		if (err != 1 && (i || (!i && nr_grefs > 1))) {
- 			err = -EINVAL;
--			xenbus_dev_fatal(dev, err, "reading %s/ring-ref", dir);
-+			xenbus_dev_fatal(dev, err, "reading %s/%s",
-+					 dir, ring_ref_name);
- 			return err;
- 		}
--		nr_grefs = 1;
--	} else {
--		unsigned int i;
- 
--		if (ring_page_order > xen_blkif_max_ring_order) {
-+		if (err != 1)
-+			break;
-+	}
-+
-+	if (err != 1) {
-+		WARN_ON(nr_grefs != 1);
-+
-+		err = xenbus_scanf(XBT_NIL, dir, "ring-ref", "%u",
-+				   &ring_ref[0]);
-+		if (err != 1) {
- 			err = -EINVAL;
--			xenbus_dev_fatal(dev, err, "%s/request %d ring page order exceed max:%d",
--					 dir, ring_page_order,
--					 xen_blkif_max_ring_order);
-+			xenbus_dev_fatal(dev, err, "reading %s/ring-ref", dir);
- 			return err;
- 		}
--
--		nr_grefs = 1 << ring_page_order;
--		for (i = 0; i < nr_grefs; i++) {
--			char ring_ref_name[RINGREF_NAME_LEN];
--
--			snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref%u", i);
--			err = xenbus_scanf(XBT_NIL, dir, ring_ref_name,
--					   "%u", &ring_ref[i]);
--			if (err != 1) {
--				err = -EINVAL;
--				xenbus_dev_fatal(dev, err, "reading %s/%s",
--						 dir, ring_ref_name);
--				return err;
--			}
--		}
- 	}
--	blkif->nr_ring_pages = nr_grefs;
- 
- 	for (i = 0; i < nr_grefs * XEN_BLKIF_REQS_PER_PAGE; i++) {
- 		req = kzalloc(sizeof(*req), GFP_KERNEL);
-@@ -1030,6 +1025,7 @@ static int connect_ring(struct backend_info *be)
- 	size_t xspathsize;
- 	const size_t xenstore_path_ext_size = 11; /* sufficient for "/queue-NNN" */
- 	unsigned int requested_num_queues = 0;
-+	unsigned int ring_page_order;
- 
- 	pr_debug("%s %s\n", __func__, dev->otherend);
- 
-@@ -1075,6 +1071,20 @@ static int connect_ring(struct backend_info *be)
- 		 be->blkif->nr_rings, be->blkif->blk_protocol, protocol,
- 		 pers_grants ? "persistent grants" : "");
- 
-+	ring_page_order = xenbus_read_unsigned(dev->otherend,
-+					       "ring-page-order", 0);
-+
-+	if (ring_page_order > xen_blkif_max_ring_order) {
-+		err = -EINVAL;
-+		xenbus_dev_fatal(dev, err,
-+				 "requested ring page order %d exceed max:%d",
-+				 ring_page_order,
-+				 xen_blkif_max_ring_order);
-+		return err;
-+	}
-+
-+	be->blkif->nr_ring_pages = 1 << ring_page_order;
-+
- 	if (be->blkif->nr_rings == 1)
- 		return read_per_ring_refs(&be->blkif->rings[0], dev->otherend);
- 	else {
--- 
-2.7.4
+blk_mq_check_busy() was introduced for DM to user as a replacement for
+its own inflight accounting it was doing:
+  ae879912 blk-mq: provide a helper to check if a queue is busy
 
+So nothing else is currently calling it, but if you'd prefer to rename
+the functions to reflect the narrower MQ_RQ_IN_FLIGHT check that is fine
+by me (e.g. blk_mq_check_inflight and blk_mq_queue_has_inflight).
+
+Mike
