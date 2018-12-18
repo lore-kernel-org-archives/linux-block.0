@@ -2,90 +2,107 @@ Return-Path: <SRS0=v1Da=O3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA432C43387
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 04:34:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77830C43387
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 04:51:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B4470214C6
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 04:34:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 413A4217D8
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 04:51:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="f1g4klHT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hg8L9YAR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726309AbeLREe7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Dec 2018 23:34:59 -0500
-Received: from mail-pl1-f178.google.com ([209.85.214.178]:35504 "EHLO
-        mail-pl1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726305AbeLREe6 (ORCPT
+        id S1726626AbeLREvl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 17 Dec 2018 23:51:41 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:40598 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726601AbeLREvl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Dec 2018 23:34:58 -0500
-Received: by mail-pl1-f178.google.com with SMTP id p8so7220800plo.2
-        for <linux-block@vger.kernel.org>; Mon, 17 Dec 2018 20:34:58 -0800 (PST)
+        Mon, 17 Dec 2018 23:51:41 -0500
+Received: by mail-pl1-f195.google.com with SMTP id u18so7225179plq.7;
+        Mon, 17 Dec 2018 20:51:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=UmSdy7Oyqfmd+zr/NgQ8aaEBf5yxhw4I+bvNQyIiFp0=;
-        b=f1g4klHT4PzpO8/gxV3d6WiScb933qjO7U/cszGgALJdzN2U96SQaGAw7CZ2Qb2KlF
-         XKUKReHLZjMpdpJdjIlrdtdFH/aK7wyGZ/qQjtD43XtPnGqDIPy+mbAFcNgIL8ylqm0C
-         c5M7w/feJpwoLOPjp9KY/s96GKCFOi+VxGpBFNA717dMA2GMyCVkcHqNJXH1QdN9Lo0B
-         NsBJ1UzIgSeBZ6zHweBW3wQkrrk3VA7DS1SojygT4wJooasSqILxg39mCH9xTbYkGVbZ
-         IgismEyR84nNxL95yGbQyBESfr5nmcJZjKSzxRPxrFxBj4PSh/FEq5S2I900ZcZgOtat
-         b3gw==
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id;
+        bh=3J7R6Oz0DODsJXzkw2UPrkqCiVmzgzvObOsXweyNBpo=;
+        b=hg8L9YARkT6P8CFmIvI7rnv8quVTh0UL2dDFHBf7crYFzcP6KGHJ3yc8JV9SP0+NI4
+         r5u4CHlE64+2e/8GHQdtyu2RDoFPe6z1icxJE7CLUKKvRAem4HDD7x2LLe02fVBaABq+
+         HN1bPoDXRSDSRcVyA0lphuvUYdJLej0NOW+oC2IYrCsCZX7QOqdOmxmdlX9ZjKIkhgOm
+         sE3IUk/lJSlAzXCFNo6hvcPezmUfC5/dyG7ffLs/+Mojp+LA1gnU/efN+zuQaYNVVMrH
+         DxpNsfaebvJpN5zoN2uvS82DyFb+dEcz9Yi+YSbZ/NUX5Ij7guUrmOiQFFRDGdmoy94y
+         GHkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=UmSdy7Oyqfmd+zr/NgQ8aaEBf5yxhw4I+bvNQyIiFp0=;
-        b=a92oT3vRfbbl0cZiklpTdFpqiyAijGVds6gdvbPZYCQgJEa/8A6Fhml5/V6nywof70
-         5pVYGxN2YLWAG+FhrRTeON5JdNacnGmI/EMqwSRGsSpGXPsHEzLTJfhigMmNzW2wcjCj
-         by/5NP42P5ka1TDVhRkXJAt6fTiEbOQvN9OtIPrLr7MMvxCHauwcXLwzZ6iKLm5Ue7PM
-         AuCwjFYuMFbnWbgGpJahYOEF5jp/NcDG/i7d1DrAOcWwUaOci+l9rB0af7vewSfU96pJ
-         Ijx3t16mpA7TLfhPApDmbvG58hwTcmN7ry5zxY1C4VFsrONchPmzo+wy01tNdSaGEazH
-         j0nQ==
-X-Gm-Message-State: AA+aEWYysGZfHuRQRIeFBaYTnPl6wadjL6cEInhJpTsdqUCtQKtN+vEG
-        1UgQQRwRKGenWeeHmchn4+XfbJem+ZfHrA==
-X-Google-Smtp-Source: AFSGD/VN5alf5RZK9DFaAt6LRHQ9LnHwpQ38owFmmkEiIWCokxA/0/0tvHonQQtuyU/ueN/Bf/uIqQ==
-X-Received: by 2002:a17:902:9006:: with SMTP id a6mr14991137plp.334.1545107698096;
-        Mon, 17 Dec 2018 20:34:58 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id i21sm15543293pgm.17.2018.12.17.20.34.56
+        h=x-gm-message-state:from:to:subject:date:message-id;
+        bh=3J7R6Oz0DODsJXzkw2UPrkqCiVmzgzvObOsXweyNBpo=;
+        b=KSCTK9yJWytIyp/Qei6/y23l/ASpIzxZVjAaErlpfXlCPcRazwtXwYUsZU9XhahRmL
+         zlEIAGcqqWwXsGwZUE5xXtDcnrxws7C0xzcn4Yt8PTUlLlq637knn/gp6yR9b2XLHdL6
+         3jfBOQnJg2UUZ262Zbt5s2+Ls3fuMXWhdvTVgoZvhEwYfsDjswzgf4pJGXy/hUIVvHk7
+         bgBSu3u/GCYLbYkESi4MsR65g95tGZrNedPoUVeh1TWAkjF8Y1M18qmK6BxJnT6YeG6y
+         6YvDMAKkNYnUfNr56lowk7WCtPXejXdbBfD1BK21e2k6r9/+P9zcMiYk0mTEV5fSDfI8
+         9SWA==
+X-Gm-Message-State: AA+aEWZuiazgyvU+UmElsXhyUyaU1NTzPcWl7S/YyBzoAcFqOOCRuNmW
+        L7lgvkFGLGkduKL6ChjPeXNXdcvfH4o=
+X-Google-Smtp-Source: AFSGD/Uq8kgKTu0dievmK3w4fjldwq5GEcKI/YHRA27VKj66A8eZEzsCxFJr5/y53Tgvmq0WwNlh3g==
+X-Received: by 2002:a17:902:f091:: with SMTP id go17mr15507929plb.235.1545108700478;
+        Mon, 17 Dec 2018 20:51:40 -0800 (PST)
+Received: from localhost.localdomain ([2601:602:9602:6598:1820:defd:529e:3b95])
+        by smtp.gmail.com with ESMTPSA id e9sm18164152pff.5.2018.12.17.20.51.39
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 17 Dec 2018 20:34:57 -0800 (PST)
-Subject: Re: [PATCH] blk-mq: enable IO poll if .nr_queues of type poll > 0
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Jeff Moyer <jmoyer@redhat.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20181218041529.27787-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <95d4e41f-24a7-bdb5-e014-994e021f901a@kernel.dk>
-Date:   Mon, 17 Dec 2018 21:34:55 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <20181218041529.27787-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Mon, 17 Dec 2018 20:51:40 -0800 (PST)
+From:   yupeng <yupeng0921@gmail.com>
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, keith.busch@intel.com,
+        axboe@fb.com, hch@lst.de, sagi@grimberg.me, jthumshirn@suse.de
+Subject: [PATCH v4 1/2] export trace.c helper functions to other modules
+Date:   Mon, 17 Dec 2018 20:51:37 -0800
+Message-Id: <20181218045138.4282-1-yupeng0921@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/17/18 9:15 PM, Ming Lei wrote:
-> The queue mapping of type poll only exists when set->map[HCTX_TYPE_POLL].nr_queues
-> is bigger than zero, so enhance the constraint by checking .nr_queues of type poll
-> before enabling IO poll.
-> 
-> Otherwise IO race & timeout can be observed when running block/007.
+Export bellow three functions:
+nvme_trace_parse_admin_cmd
+nvme_trace_parse_nvm_cmd
+nvme_trace_disk_name
+Thus any other modules which depends on nvme-core could use the trace
+events in trace.h
 
-Looks good to me, but we might consider having a helper for this, since
-we have this check in 3 places now. But for now this is good, thanks
-Ming.
+Signed-off-by: yupeng <yupeng0921@gmail.com>
+---
+ drivers/nvme/host/trace.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/drivers/nvme/host/trace.c b/drivers/nvme/host/trace.c
+index 25b0e310f4a8..8ca7079ed2bc 100644
+--- a/drivers/nvme/host/trace.c
++++ b/drivers/nvme/host/trace.c
+@@ -113,6 +113,7 @@ const char *nvme_trace_parse_admin_cmd(struct trace_seq *p,
+ 		return nvme_trace_common(p, cdw10);
+ 	}
+ }
++EXPORT_SYMBOL_GPL(nvme_trace_parse_admin_cmd);
+ 
+ const char *nvme_trace_parse_nvm_cmd(struct trace_seq *p,
+ 				     u8 opcode, u8 *cdw10)
+@@ -128,6 +129,7 @@ const char *nvme_trace_parse_nvm_cmd(struct trace_seq *p,
+ 		return nvme_trace_common(p, cdw10);
+ 	}
+ }
++EXPORT_SYMBOL_GPL(nvme_trace_parse_nvm_cmd);
+ 
+ const char *nvme_trace_disk_name(struct trace_seq *p, char *name)
+ {
+@@ -139,3 +141,4 @@ const char *nvme_trace_disk_name(struct trace_seq *p, char *name)
+ 
+ 	return ret;
+ }
++EXPORT_SYMBOL_GPL(nvme_trace_disk_name);
 -- 
-Jens Axboe
+2.17.1
 
