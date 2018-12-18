@@ -2,98 +2,186 @@ Return-Path: <SRS0=v1Da=O3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B842C43387
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 10:32:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF296C43387
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 11:32:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6813721841
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 10:32:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4B6320578
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 11:32:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=scylladb-com.20150623.gappssmtp.com header.i=@scylladb-com.20150623.gappssmtp.com header.b="ptSl76kp"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="omhYynkm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726512AbeLRKc4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Dec 2018 05:32:56 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:44760 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726501AbeLRKc4 (ORCPT
+        id S1726430AbeLRLcX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Dec 2018 06:32:23 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:57266 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726341AbeLRLcX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Dec 2018 05:32:56 -0500
-Received: by mail-wr1-f66.google.com with SMTP id z5so15312028wrt.11
-        for <linux-block@vger.kernel.org>; Tue, 18 Dec 2018 02:32:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=scylladb-com.20150623.gappssmtp.com; s=20150623;
-        h=message-id:subject:from:to:cc:date:in-reply-to:references
-         :user-agent:mime-version:content-transfer-encoding;
-        bh=HROpD5dcLeoqz7+zZzPIsasLmADEMxHLeWT0KFPPcbE=;
-        b=ptSl76kplVc62sW1fQvFjB2fbqUXF5Im9bEEguBcYSFIzOXuOiIjTedaYHRAsm+Nrv
-         zZF4VeQFc3uGWrSNW52r/9HYigO66YPjD/pkmMr/roWwpgU70VZtBrOUwWfzsVCUeFcq
-         3sypTfWZ5W2Li+mwmUCLjFc3Dao9Id8NwJo8X9BfAF4NnsD9+ogZlxvqeRlSCz2j93tV
-         5txH3h2eKn3wtxTAiaiWfl1CLDDQOdPu3GSYSr+ra+ZEmSVcoCVrmpKbuC5CsEMKrHJ5
-         iQBv9TZ1ouIDEupvKN9lxKp7SH2H4cHKSMjrxAQSXpr1KQjDEt34E63mh0LjmCuZ8iiv
-         W7/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=HROpD5dcLeoqz7+zZzPIsasLmADEMxHLeWT0KFPPcbE=;
-        b=VR69PkvenrA37IhI/qa+Wb7if8NKZkIuM36tsXhGqVmklVDfUkeeoLGPeiMvMhakMJ
-         3sPaZfPOJ39YCpf+LuQh74X+iJiqeJrpOsOcfyWCEFy6cm2L34EaVh1Oee9AXL3bbu4B
-         fzEu5akRgoCk7fY2ii6Wq0j3/ZStdAYdSVQBbpM68aGPFDGbrFrlSVf3KkEDDaUvFQrh
-         tEFSBsL9FDbQy/SDf7ej8l8+TfetTOFDjwyY3StbUY5ERz2RS1a5yo5d9uICRIL5Vlrk
-         YDe4e28YCaNSeaJqKu2ZfwWDoUSuUfPGrl+L6A4N3sVwzymSZDaUxXGMYaku3OSpAXlN
-         D2cg==
-X-Gm-Message-State: AA+aEWaM+3pxNc77SbLIyU4Mii5WH3CUKmxRE2Ie00RyjAMoScuGRzOs
-        77jVnF0WGpfo5A07Sd/MFElzhg==
-X-Google-Smtp-Source: AFSGD/UvOuGs5Kgyx8sUox+11L7VqYUq/b1k/PWMS1VDqeORLIYYh1MlGWtuwPnTAoyWSlVk/0de2Q==
-X-Received: by 2002:adf:ba8e:: with SMTP id p14mr13513996wrg.230.1545129174193;
-        Tue, 18 Dec 2018 02:32:54 -0800 (PST)
-Received: from t1.scylladb.com ([84.94.198.183])
-        by smtp.gmail.com with ESMTPSA id e16sm3263004wrn.72.2018.12.18.02.32.51
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 18 Dec 2018 02:32:52 -0800 (PST)
-Message-ID: <d0ad25816ccc6fcb388b34f5e0d42ea9105c9097.camel@scylladb.com>
-Subject: Re: [PATCH 14/26] aio: support for IO polling
-From:   Benny Halevy <bhalevy@scylladb.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-aio@kvack.org
-Cc:     hch@lst.de, jmoyer@redhat.com, clm@fb.com
-Date:   Tue, 18 Dec 2018 12:32:50 +0200
-In-Reply-To: <20181213175645.22181-15-axboe@kernel.dk>
-References: <20181213175645.22181-1-axboe@kernel.dk>
-         <20181213175645.22181-15-axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.2 (3.30.2-2.fc29) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Tue, 18 Dec 2018 06:32:23 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wBIBSfAP021950;
+        Tue, 18 Dec 2018 11:32:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+ references : cc : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=rc2n2PdIOD99CHH+mQgZLbXHr29zF2EPT2WexxFdsOQ=;
+ b=omhYynkmo+qCmkZn69GZT1sHtHlKP77PTyA4IwVwWhS0BLfbfLkinZgplnB/lLN0oL38
+ mjMd+Rz/bQNz4M/X19jbqBMeC35fZgTpcNv0OSo/eV0Y39jXwAAZKvgmaeW5qRfQNhCG
+ Y/DZoOIGHsQT5z+RpaVflKwx23kImUPqso1TdSgNdjjTtxJqicqWO1F6l4zDyjGTcQ+y
+ VbmmvrSnH89kJGz8p4gWe+MfW9qG1HITzpC+MDzfjNliSSz6ikRXSMJSgZkVXmpDaDyp
+ ABGxVj2BCE2O9b9gwDyKSqzRaUNrpzuAIt3J6SUFRwbPlw3DFYB1j2HDm1WuYI4XLTyQ 8Q== 
+Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
+        by userp2120.oracle.com with ESMTP id 2pct8qtnae-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Dec 2018 11:32:13 +0000
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id wBIBWCXH002302
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Dec 2018 11:32:13 GMT
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id wBIBWBT4021035;
+        Tue, 18 Dec 2018 11:32:12 GMT
+Received: from [192.168.2.8] (/1.202.67.146)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 18 Dec 2018 03:32:11 -0800
+Subject: Re: [Xen-devel] [PATCH v2 1/1] xen/blkback: rework connect_ring() to
+ avoid inconsistent xenstore 'ring-page-order' set by malicious blkfront
+To:     =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>
+References: <1545094538-31426-1-git-send-email-dongli.zhang@oracle.com>
+ <20181218093300.qfslnloxooqnu2im@mac>
+Cc:     axboe@kernel.dk, konrad.wilk@oracle.com,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        paul.durrant@citrix.com, xen-devel@lists.xenproject.org
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+Message-ID: <51ea8086-e5fd-b1db-f935-101160ca9359@oracle.com>
+Date:   Tue, 18 Dec 2018 19:31:59 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101
+ Thunderbird/45.3.0
+MIME-Version: 1.0
+In-Reply-To: <20181218093300.qfslnloxooqnu2im@mac>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9110 signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1812180102
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2018-12-13 at 10:56 -0700, Jens Axboe wrote:
-> Add polled variants of PREAD/PREADV and PWRITE/PWRITEV. These act
-> like their non-polled counterparts, except we expect to poll for
-> completion of them. The polling happens at io_getevent() time, and
-> works just like non-polled IO.
-> 
-> To setup an io_context for polled IO, the application must call
-> io_setup2() with IOCTX_FLAG_IOPOLL as one of the flags. It is illegal
-> to mix and match polled and non-polled IO on an io_context.
-> 
-> Polled IO doesn't support the user mapped completion ring. Events
-> must be reaped through the io_getevents() system call. For non-irq
-> driven poll devices, there's no way to support completion reaping
-> from userspace by just looking at the ring. The application itself
-> is the one that pulls completion entries.
-> 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
+Hi Roger,
 
-Looks good to me, thanks.
+On 12/18/2018 05:33 PM, Roger Pau Monné wrote:
+> On Tue, Dec 18, 2018 at 08:55:38AM +0800, Dongli Zhang wrote:
+>> The xenstore 'ring-page-order' is used globally for each blkback queue and
+>> therefore should be read from xenstore only once. However, it is obtained
+>> in read_per_ring_refs() which might be called multiple times during the
+>> initialization of each blkback queue.
+>>
+>> If the blkfront is malicious and the 'ring-page-order' is set in different
+>> value by blkfront every time before blkback reads it, this may end up at
+>> the "WARN_ON(i != (XEN_BLKIF_REQS_PER_PAGE * blkif->nr_ring_pages));" in
+>> xen_blkif_disconnect() when frontend is destroyed.
+>>
+>> This patch reworks connect_ring() to read xenstore 'ring-page-order' only
+>> once.
+>>
+>> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+>> ---
+>> Changed since v1:
+>>   * change the order of xenstore read in read_per_ring_refs(suggested by Roger Pau Monne)
+>>   * use xenbus_read_unsigned() in connect_ring() (suggested by Roger Pau Monne)
+>>
+>>  drivers/block/xen-blkback/xenbus.c | 70 ++++++++++++++++++++++----------------
+>>  1 file changed, 40 insertions(+), 30 deletions(-)
+>>
+>> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+>> index a4bc74e..7178f0f 100644
+>> --- a/drivers/block/xen-blkback/xenbus.c
+>> +++ b/drivers/block/xen-blkback/xenbus.c
+>> @@ -926,7 +926,7 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
+>>  	int err, i, j;
+>>  	struct xen_blkif *blkif = ring->blkif;
+>>  	struct xenbus_device *dev = blkif->be->dev;
+>> -	unsigned int ring_page_order, nr_grefs, evtchn;
+>> +	unsigned int nr_grefs, evtchn;
+>>  
+>>  	err = xenbus_scanf(XBT_NIL, dir, "event-channel", "%u",
+>>  			  &evtchn);
+>> @@ -936,43 +936,38 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
+>>  		return err;
+>>  	}
+>>  
+>> -	err = xenbus_scanf(XBT_NIL, dev->otherend, "ring-page-order", "%u",
+>> -			  &ring_page_order);
+>> -	if (err != 1) {
+>> -		err = xenbus_scanf(XBT_NIL, dir, "ring-ref", "%u", &ring_ref[0]);
+>> -		if (err != 1) {
+>> +	nr_grefs = blkif->nr_ring_pages;
+>> +	WARN_ON(!nr_grefs);
+>> +
+>> +	for (i = 0; i < nr_grefs; i++) {
+>> +		char ring_ref_name[RINGREF_NAME_LEN];
+>> +
+>> +		snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref%u", i);
+>> +		err = xenbus_scanf(XBT_NIL, dir, ring_ref_name,
+>> +				   "%u", &ring_ref[i]);
+>> +
+>> +		if (err != 1 && (i || (!i && nr_grefs > 1))) {
+> 
+> AFAICT the above condition can be simplified as "err != 1 &&
+> nr_grefs".
+> 
+>>  			err = -EINVAL;
+> 
+> There's no point in setting err here...
+> 
+>> -			xenbus_dev_fatal(dev, err, "reading %s/ring-ref", dir);
+>> +			xenbus_dev_fatal(dev, err, "reading %s/%s",
+>> +					 dir, ring_ref_name);
+>>  			return err;
+> 
+> ...since you can just return -EINVAL (same applies to the other
+> instance below).
 
-Benny
+I would like to confirm if I would keep the err = -EINVAL in below because most
+of the below code is copied from original implementation without modification.
+
+There is no err set by xenbus_read_unsigned().
+
++       ring_page_order = xenbus_read_unsigned(dev->otherend,
++                                              "ring-page-order", 0);
++
++       if (ring_page_order > xen_blkif_max_ring_order) {
++               err = -EINVAL;
++               xenbus_dev_fatal(dev, err,
++                                "requested ring page order %d exceed max:%d",
++                                ring_page_order,
++                                xen_blkif_max_ring_order);
++               return err;
++       }
++
++       be->blkif->nr_ring_pages = 1 << ring_page_order;
 
 
+For the rest, I would do something like:
+
++               err = xenbus_scanf(XBT_NIL, dir, ring_ref_name,
++                                  "%u", &ring_ref[i]);
++
++               if (err != 1 && nr_grefs > 1) {
++                       xenbus_dev_fatal(dev, err, "reading %s/%s",
++                                        dir, ring_ref_name);
++                       return -EINVAL;
++               }
+
+
+Thank you very much!
+
+Dongi Zhang
