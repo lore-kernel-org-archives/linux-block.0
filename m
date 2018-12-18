@@ -2,195 +2,125 @@ Return-Path: <SRS0=v1Da=O3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D71FC43387
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 23:35:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 610A8C43387
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 23:48:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C702C2184C
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 23:35:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21FA0218A2
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 23:48:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gf4jtzAc"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dt6c/Lac"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726817AbeLRXfi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Dec 2018 18:35:38 -0500
-Received: from mail-wm1-f43.google.com ([209.85.128.43]:40532 "EHLO
-        mail-wm1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726763AbeLRXfh (ORCPT
+        id S1726953AbeLRXsz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Dec 2018 18:48:55 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:43144 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726648AbeLRXsz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Dec 2018 18:35:37 -0500
-Received: by mail-wm1-f43.google.com with SMTP id f188so3821953wmf.5
-        for <linux-block@vger.kernel.org>; Tue, 18 Dec 2018 15:35:36 -0800 (PST)
+        Tue, 18 Dec 2018 18:48:55 -0500
+Received: by mail-lf1-f66.google.com with SMTP id u18so13622566lff.10
+        for <linux-block@vger.kernel.org>; Tue, 18 Dec 2018 15:48:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Akuk/2UwnRVc4ivoj0d1MG9Y2gTYwtpUSc2Gb253rUM=;
-        b=Gf4jtzAcQDXjz9zqCzOrqiC2GYvD1CJc/Glw3+gyTSNd9D2eefumSVGu3kqcEajR5n
-         PQpEeugTXtPC7bCmKkS5eTe0wXhaHHpHTjoYp2uablP9FtgmeUDhqQNEaV3uZQcxCgzh
-         TAwc9HNs6HP/QC5CMW2GfJ23roYyEY1b63YtE=
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=r6JNUe+1KLYLDTG9gz5ximEZyypROrOAcH4v0ek4GHg=;
+        b=dt6c/Lacdpa2VAMKL0GcIIXXKYdFSegEE2UDcOcgLDUrluu4NLaljm2n/TtDCGyn6H
+         oAkrWXlAB3DKKxX3naIhVaPNpH3XcfIlFms438jUDsv2Z0BVvSbYLGbeZ7OKAt/LyNnx
+         gqyoDz27NZrDuvhefxPPfaaYLKE8CCley64rc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Akuk/2UwnRVc4ivoj0d1MG9Y2gTYwtpUSc2Gb253rUM=;
-        b=g21m0EL69fD1XShSEWFOhbTnbn+j957ldzQfYZE2tyRiuf4jCiIGjAZmL3GS8KqOwY
-         vEBubL2oQdf2OOu8wXHpJ5vveYIIHQA2IzXjRp9k1fbo472HrS3yg/mKJylWd7LaopWn
-         z9foCcQI+EDXqDXrgknCcJtNxqWx4JjIXWfN6v6K0zXBCMGmKZ0ycg5esvQV+SVCWgXC
-         8N94T/WhCtUQ5IMDK5gaUoD6NArkwkoLkdAoDgQCvEmfZZQ0LFQEOxSi4Klre6U48567
-         tkaDY+8Y7aGEUPeNCqpqFcNArHDituFDknN+VLO24E3SxvEhPhzrpsYsdbLDqWVZYW+K
-         +ntA==
-X-Gm-Message-State: AA+aEWahphwjqEzFpnn1cppoCJpHdW6PFAxXdrbWUyV5dj3BJj9OqTo7
-        oPhGS9+iMXv/6vV5lhdVXvcdeJMZ87Q=
-X-Google-Smtp-Source: AFSGD/X5e/+JHelbP1Gkb4xhBFyuSGfE3SgaYYSaa8F4EAbFE6glXQ1h9mcTvfZua32O8sLtoL0QmQ==
-X-Received: by 2002:a1c:4855:: with SMTP id v82mr4955883wma.15.1545176135202;
-        Tue, 18 Dec 2018 15:35:35 -0800 (PST)
-Received: from [192.168.0.100] ([84.33.70.123])
-        by smtp.gmail.com with ESMTPSA id e19sm6369762wrc.25.2018.12.18.15.35.34
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=r6JNUe+1KLYLDTG9gz5ximEZyypROrOAcH4v0ek4GHg=;
+        b=ugRRITJjwLiSUkgckrbNEALJ2OqCxO0GmF1YOsLIyvhONhO4FtZOt3++WolK2sdFpU
+         gY0bHhvbwit9N9SuPyU1Y22U01VSkCy9Ocs0HOuFtCFoOQkbtZJUfTFL6/075+bNMxZl
+         BssQ3ChF0ZXXaAq8IYBFsAaYNvkiP1aUwfcTLpXhSg1Rv37C41Ot9DAuQV8u/pbMmiik
+         O54glLLZsMigcYQK1RO5uzqrluLuIgZW7tA0GKPG8xMEQQHspIPkmJdHpG8VVCSV22Tk
+         910WuJ9uo1Ywrgn0VgWLTw8dhgJs+O0c6q+C1CpJY0w8FBNueoeasGNxst0EdSQbP9hq
+         YIjg==
+X-Gm-Message-State: AA+aEWZtBIhSNU8mhGqXX4m9j5y1L5FbswSjOBlCSRpZ5NqhCUotodFl
+        YrMYxQY/iGfAyvA7WHnQot9Ag6zDZxI=
+X-Google-Smtp-Source: AFSGD/Wri2xh9b6JHy8d1hSTdBMnevMF/qi+9EIdFxYb3Tuph2VqcM1Ouogt8QKw+Z4sCzyRaHqlDQ==
+X-Received: by 2002:a19:5e5d:: with SMTP id z29mr10741785lfi.105.1545176933179;
+        Tue, 18 Dec 2018 15:48:53 -0800 (PST)
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com. [209.85.167.51])
+        by smtp.gmail.com with ESMTPSA id q2sm3656915lfa.63.2018.12.18.15.48.52
+        for <linux-block@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 18 Dec 2018 15:35:34 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: confusion about nr of pending I/O requests
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <4db2cb0f-e500-44da-e85d-ed417b74dae5@kernel.dk>
-Date:   Wed, 19 Dec 2018 00:35:33 +0100
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Mark Brown <broonie@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <92700F6D-AAF6-4F31-8775-CE6A7995C0CE@linaro.org>
-References: <E0E52FD0-1020-4F5B-9AC8-F48BDFE142C0@linaro.org>
- <4db2cb0f-e500-44da-e85d-ed417b74dae5@kernel.dk>
-To:     Jens Axboe <axboe@kernel.dk>
-X-Mailer: Apple Mail (2.3445.102.3)
+        Tue, 18 Dec 2018 15:48:52 -0800 (PST)
+Received: by mail-lf1-f51.google.com with SMTP id p6so13644727lfc.1
+        for <linux-block@vger.kernel.org>; Tue, 18 Dec 2018 15:48:52 -0800 (PST)
+X-Received: by 2002:a19:1cb:: with SMTP id 194mr10918031lfb.61.1545176931758;
+ Tue, 18 Dec 2018 15:48:51 -0800 (PST)
+MIME-Version: 1.0
+References: <20181030230624.61834-1-evgreen@chromium.org> <20181030230624.61834-3-evgreen@chromium.org>
+ <20181128012624.GB11128@ming.t460p> <CAE=gft7Fyq+Jb3ZG3PSTR=C0Wjt3uu57+H2bshM6Gu=_0W0YQw@mail.gmail.com>
+ <20181205011059.GA17845@ming.t460p> <CAE=gft7K2OrN93c8TQ5ozOpXzXf5ZD-PNnVHWP9SbZXZqp2dHw@mail.gmail.com>
+ <yq1va47pcqp.fsf@oracle.com> <CAE=gft7ymeVu0chvCYWn8tw9ss_pZgyUHt=5sSdxfRenDD46Xw@mail.gmail.com>
+In-Reply-To: <CAE=gft7ymeVu0chvCYWn8tw9ss_pZgyUHt=5sSdxfRenDD46Xw@mail.gmail.com>
+From:   Evan Green <evgreen@chromium.org>
+Date:   Tue, 18 Dec 2018 15:48:15 -0800
+X-Gmail-Original-Message-ID: <CAE=gft7X2D-wiikFUqTpdCi40dP_4h74Z=CX=+917_XuhYWvNA@mail.gmail.com>
+Message-ID: <CAE=gft7X2D-wiikFUqTpdCi40dP_4h74Z=CX=+917_XuhYWvNA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] loop: Better discard support for block devices
+To:     martin.petersen@oracle.com
+Cc:     ming.lei@redhat.com, axboe@kernel.dk,
+        Gwendal Grignou <gwendal@chromium.org>, asavery@chromium.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Dec 10, 2018 at 9:31 AM Evan Green <evgreen@chromium.org> wrote:
+>
+> On Wed, Dec 5, 2018 at 7:15 PM Martin K. Petersen
+> <martin.petersen@oracle.com> wrote:
+> >
+> >
+> > Evan,
+> >
+> > > Ah, I see. But I think it's useful to reflect max_discard_sectors,
+> > > max_write_zeroes_sectors, discard_granularity, and discard_alignment
+> > > from the block device to the loop device. With the exception of
+> > > discard_alignment, these parameters are visible via sysfs,
+> >
+> > discard_alignment is visible in sysfs, just not in the queue directory
+> > since alignment can be different on a per-partition basis. So there is
+> > one discard_alignment at the root of each /sys/block/foo directory and
+> > one for each partition subdirectory. This mirrors the alignment_offset
+> > variable which indicates a partitions alignment wrt. the underlying
+> > physical block size.
+> >
+> > That said, there are not many devices that actually report a non-zero
+> > discard alignment so it's not as useful as the device manufacturers
+> > (that were looking for an implementation shortcut) envisioned.
+>
+> Ah ok, thanks.
+>
+> >
+> > > I'm not totally sure about discard_alignment, that seems to be useful
+> > > in cases of merging blk requests. So I can stop mirroring that one if
+> > > it's harmful or not helpful. But unless it's a nak, I'd really love to
+> > > keep most of the mirroring. In which case the bool doesn't do a whole
+> > > lot of simplifying.
+> >
+> > I think it's fine to export these. The block device topology was
+> > explicitly designed to be stackable like this.
+>
+> Yeah, it seemed to fall in pretty naturally, which is why I was hoping
+> it might not be so controversial. Thanks Martin.
 
+Any other thoughts about this series?
 
-> Il giorno 18 dic 2018, alle ore 19:50, Jens Axboe <axboe@kernel.dk> ha =
-scritto:
->=20
-> On 12/18/18 5:45 AM, Paolo Valente wrote:
->> Hi Jens,
->> sorry for the following silly question, but maybe you can solve very
->> quickly a doubt for which I'd spend much more time investigating.
->>=20
->> While doing some tests with scsi_debug, I've just seen that (at =
-least)
->> with direct I/O, the maximum number of pending I/O requests (at least
->> in the I/O schedulers) is equal, unexpectedly, to the queue depth of
->> the drive and not to
->> /sys/block/<dev>/queue/nr_requests
->>=20
->> For example, after:
->>=20
->> sudo modprobe scsi_debug max_queue=3D4
->>=20
->> and with fio executed as follows:
->>=20
->> job: (g=3D0): rw=3Dread, bs=3D(R) 4096B-4096B, (W) 4096B-4096B, (T) =
-4096B-4096B, ioengine=3Dlibaio, iodepth=3D20
->>=20
->> I get this periodic trace, where four insertions are followed by four
->> completions, and so on, till the end of the I/O.  This trace is taken
->> with none, but the result is the same with bfq.
->>=20
->>             fio-20275 [001] d...  7560.655213:   8,48   I   R 281088 =
-+ 8 [fio]
->>             fio-20275 [001] d...  7560.655288:   8,48   I   R 281096 =
-+ 8 [fio]
->>             fio-20275 [001] d...  7560.655311:   8,48   I   R 281104 =
-+ 8 [fio]
->>             fio-20275 [001] d...  7560.655331:   8,48   I   R 281112 =
-+ 8 [fio]
->>          <idle>-0     [001] d.h.  7560.749868:   8,48   C   R 281088 =
-+ 8 [0]
->>          <idle>-0     [001] dNh.  7560.749912:   8,48   C   R 281096 =
-+ 8 [0]
->>          <idle>-0     [001] dNh.  7560.749928:   8,48   C   R 281104 =
-+ 8 [0]
->>          <idle>-0     [001] dNh.  7560.749934:   8,48   C   R 281112 =
-+ 8 [0]
->>             fio-20275 [001] d...  7560.750023:   8,48   I   R 281120 =
-+ 8 [fio]
->>             fio-20275 [001] d...  7560.750196:   8,48   I   R 281128 =
-+ 8 [fio]
->>             fio-20275 [001] d...  7560.750229:   8,48   I   R 281136 =
-+ 8 [fio]
->>             fio-20275 [001] d...  7560.750250:   8,48   I   R 281144 =
-+ 8 [fio]
->>          <idle>-0     [001] d.h.  7560.842510:   8,48   C   R 281120 =
-+ 8 [0]
->>          <idle>-0     [001] dNh.  7560.842551:   8,48   C   R 281128 =
-+ 8 [0]
->>          <idle>-0     [001] dNh.  7560.842556:   8,48   C   R 281136 =
-+ 8 [0]
->>          <idle>-0     [001] dNh.  7560.842562:   8,48   C   R 281144 =
-+ 8 [0]
->>=20
->> Shouldn't the total number of pending requests reach
->> /sys/block/<dev>/queue/nr_requests ?
->>=20
->> The latter is of course equal to 8.
->=20
-> With a scheduler, the depth is what the scheduler provides. You cannot
-> exceed the hardware queue depth in any situation. You just have 8
-> requests available for scheduling, with a max of 4 being inflight on
-> the device side.
->=20
-> If both were 4, for instance, then you would have nothing to schedule
-> with, as all of them could reside on the hardware side. That's why
-> the scheduler defaults to twice the hardware queue depth.
->=20
-
-That's exactly what I expected, thanks.  But not what happened.  Let
-me add also dispatch lines to my filtered-trace snippet.  The
-repetitive pattern becomes:
-
-             fio-5180  [001] d...   786.931956:   8,48   I  WS 333824 + =
-1024 [fio]
-             fio-5180  [001] d...   786.932010:   8,48   D  WS 333824 + =
-1024 [fio]
-             fio-5180  [001] d...   786.932137:   8,48   I  WS 334848 + =
-1024 [fio]
-             fio-5180  [001] d...   786.932160:   8,48   D  WS 334848 + =
-1024 [fio]
-             fio-5180  [001] d...   786.932318:   8,48   I  WS 335872 + =
-1024 [fio]
-             fio-5180  [001] d...   786.932354:   8,48   D  WS 335872 + =
-1024 [fio]
-             fio-5180  [001] d...   786.932467:   8,48   I  WS 336896 + =
-1024 [fio]
-             fio-5180  [001] d...   786.932489:   8,48   D  WS 336896 + =
-1024 [fio]
-          <idle>-0     [001] d.h.   787.023945:   8,48   C  WS 333824 + =
-1024 [0]
-          <idle>-0     [001] d.h.   787.023978:   8,48   C  WS 334848 + =
-1024 [0]
-          <idle>-0     [001] d.h.   787.024080:   8,48   C  WS 335872 + =
-1024 [0]
-          <idle>-0     [001] d.h.   787.024237:   8,48   C  WS 336896 + =
-1024 [0]
-
-So, after the four dispatches, there are 0 requests in the scheduler,
-and 4 requests inflight.  But *no* new request is inserted into the
-scheduler before *all* four inflight requests are completed.
-
-So the total number of requests available seems 4 and not 8.
-
-Am I missing something?
-
-Thanks,
-Paolo
-
-> --=20
-> Jens Axboe
-
+Ming, I did go back and experiment a little. The pseudocode you had
+proposed earlier would work, and solve the error prints I was seeing.
+But I still would like to keep the reflection of the block device
+properties, since that allows discard to be used on block devices that
+do support it.
+-Evan
