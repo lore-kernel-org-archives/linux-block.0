@@ -2,163 +2,181 @@ Return-Path: <SRS0=v1Da=O3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2BD1C43612
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 18:05:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBEE8C43387
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 18:08:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 77CB521871
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 18:05:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9AFA6218A3
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 18:08:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="X4NhPEvv"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="fu6MSQRI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727465AbeLRSFs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Dec 2018 13:05:48 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:37338 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727319AbeLRSFr (ORCPT
+        id S1726739AbeLRSIv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Dec 2018 13:08:51 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:41086 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726658AbeLRSIu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Dec 2018 13:05:47 -0500
-Received: by mail-wm1-f66.google.com with SMTP id g67so3748756wmd.2
-        for <linux-block@vger.kernel.org>; Tue, 18 Dec 2018 10:05:45 -0800 (PST)
+        Tue, 18 Dec 2018 13:08:50 -0500
+Received: by mail-io1-f65.google.com with SMTP id s22so13479242ioc.8
+        for <linux-block@vger.kernel.org>; Tue, 18 Dec 2018 10:08:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=6lEfEC1lHx7ice2Le/HKQJGJ1GtmYuRqhVayCgxWRhY=;
-        b=X4NhPEvvQIRX7udARiL0IrXceTbHRgn4yeGsIf0NAv5+fanbfYkF8e72S+/3RrMvY1
-         Zt5O1SOYcocxeEBMtuaPV6i58TpJToRHnelhtLHhbSUcRsxSg71MWH5QLC6xaZwQDH03
-         yZsnvi7qBhnpRX2CWL3N4I0JyVHGMVCCXgGbA=
+        d=broadcom.com; s=google;
+        h=from:references:in-reply-to:mime-version:thread-index:date
+         :message-id:subject:to:cc;
+        bh=anlqaLUju00Y1MzB9rgdJz8dGoTv7VemKf0EE6JIKzg=;
+        b=fu6MSQRIB2cchbtD05k/R4mQUcUm8EDIARl73nuL5QcgIfUoSrn7pvNRvZgpJKi0tg
+         MVkBR6yfTPyWpyRj+PYIjjyngD6vQMNJMuq4te8CUotrN8lAk3hUIKAJeyb/k4If1G3n
+         4mIiJ8y4S0J7DV+JpI1ciT5ArAHOm5Wdh2xw8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=6lEfEC1lHx7ice2Le/HKQJGJ1GtmYuRqhVayCgxWRhY=;
-        b=DxgurHKcI8THvIpVYnwequHVa/nBeFIgCl6ozrQN8pzLk1/y4Qzkkad1HOY7ji8O6h
-         WMuGXxoN+7J0MZXvq9H4bFxr3+9yfnHSLizLPvRflTTavpJ4B7Zws0QBR7wVVRBoTQ92
-         CPjaULQCuDMTzOX/DqxiF7HCf4q7TXjm8uuAM+hTY4usoGiPusm+fFPH1zDttF1V6uAo
-         c1GIwcM+rYdzu/Ndr48RXX2BrwFfdMy/9SPcSp/4iJ9bNJlr+EQr4WDiUIahzM7HmgaD
-         Ae4xlh4tpjXcb/4iZRBx4X27Tpz0pzMzDRuFtuHA6+mSP/dHJd1WvTSx1i3RNnqUEaeI
-         6Thw==
-X-Gm-Message-State: AA+aEWZUT9pv6Ed7PrF7mVkcYrPAI2dWIjU9nsSUkd9Ytn3Qfd4L7DaG
-        2UK2Fxk57l+v4zURK+M/RGfJ8g==
-X-Google-Smtp-Source: AFSGD/VjRiKTxDSQVTm80qu8/gLvMTgqv6imP+pKKhsM+8csuBJ4iBUxZbVnRPVQBg3rdMGI47yBjg==
-X-Received: by 2002:a1c:1741:: with SMTP id 62mr3954903wmx.25.1545156344847;
-        Tue, 18 Dec 2018 10:05:44 -0800 (PST)
-Received: from [192.168.0.100] ([84.33.66.6])
-        by smtp.gmail.com with ESMTPSA id y185sm1943751wmg.34.2018.12.18.10.05.43
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 18 Dec 2018 10:05:44 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH V2 00/10] unify the interface of the proportional-share
- policy in blkio/io
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <EC4F9B54-2352-4D85-B56C-5800CFEBCCB8@linaro.org>
-Date:   Tue, 18 Dec 2018 19:05:42 +0100
-Cc:     Tejun Heo <tj@kernel.org>,
-        Angelo Ruocco <angelo.ruocco.90@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Li Zefan <lizefan@huawei.com>,
-        Angelo Ruocco <angeloruocco90@gmail.com>,
-        Dennis Zhou <dennis@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Liu Bo <bo.liu@linux.alibaba.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
+        h=x-gm-message-state:from:references:in-reply-to:mime-version
+         :thread-index:date:message-id:subject:to:cc;
+        bh=anlqaLUju00Y1MzB9rgdJz8dGoTv7VemKf0EE6JIKzg=;
+        b=mhVghw7LJg5BciMJ6tr1YDH5ZInmTFLL4ESim8xpDAXBqKdpyvuL/FZONuzmMG6xkf
+         g6ntO/Us7m0V7kn90cDDHRY4SGNH/ouqScNrO8Jptlsm2QVrvfc9O2Nx8LIuNkTJmGfS
+         rsdEZVTnhs1QNm807QCcc72yi1+sAlahmlgMO860icogmHa/z+BM+jiopUWG9l8gh8RV
+         sTQdnzJib5arkW46dep+vgVTu38WAFVbN0UPYqPnaPPArKDK/mmeAdDyytWfXnKSXhc+
+         hS3QrYHjadwW8OLqfxlATAOyiCqmtjJcLDORG0WBghtEl1KzEKPofTUimdncHDHivd2t
+         1bGg==
+X-Gm-Message-State: AA+aEWZj6xMfh/YOJJ9VT8WBx2lDtJBelbvMt6Vh3s3DPlUUAOMBk6B4
+        f9AuNn81PoNhigEpR4y2qsxnFe2crQJ6tz+gxGP4eg==
+X-Google-Smtp-Source: AFSGD/XhyqYRm7bPf6XbvTi5XTlFajBeSDTJtKfCad9og38jLP7ZA2IXyomWCFNOTuvrDi1jsp7wMvt6jbVgf8JjLC8=
+X-Received: by 2002:a5e:9511:: with SMTP id r17mr1963676ioj.224.1545156529631;
+ Tue, 18 Dec 2018 10:08:49 -0800 (PST)
+From:   Kashyap Desai <kashyap.desai@broadcom.com>
+References: <CAHsXFKHSjBHZy9tyhdEjYJcLJeE6SqdeBPcoeq=bCaRfzvMqgw@mail.gmail.com>
+ <1545149754.185366.449.camel@acm.org> <ae741e1b-ec2d-075e-82b0-a1e09d0553fd@kernel.dk>
+ <41bb993fdc71d02a884cc2b793403ca7@mail.gmail.com> <9d1601bd-5b28-23f8-2a36-8fc100323422@kernel.dk>
+ <e5049f63c7aadd11f64b8027f352a014@mail.gmail.com> <04e2f9e8-79fa-f1cb-ab23-4a15bf3f64cc@kernel.dk>
+In-Reply-To: <04e2f9e8-79fa-f1cb-ab23-4a15bf3f64cc@kernel.dk>
+MIME-Version: 1.0
+X-Mailer: Microsoft Outlook 15.0
+Thread-Index: AQKTtuNko6E02tULaIEHowzteDaHmgFdiSnEAolTOMIBv4s1RgHH+RzfAtR0fm4CpRS/1qOfSVdQ
+Date:   Tue, 18 Dec 2018 23:38:45 +0530
+Message-ID: <a9186c0c84f31623a544d73ce9a779d6@mail.gmail.com>
+Subject: RE: [PATCH V2] blk-mq: Set request mapping to NULL in blk_mq_put_driver_tag
+To:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
         linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>, broonie@kernel.org,
-        oleksandr@natalenko.name, cgroups@vger.kernel.org,
-        linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <E6C76EEB-122B-4FE5-A670-FA066F813C1D@linaro.org>
-References: <20181119103424.3853-1-paolo.valente@linaro.org>
- <20181120162816.GV2509588@devbig004.ftw2.facebook.com>
- <25296DAE-73EC-46CC-9A98-A8B7E9017BB7@linaro.org>
- <7D7FAB43-5F62-4402-A9B3-E7C2E30AE680@linaro.org>
- <20181130184256.GI2509588@devbig004.ftw2.facebook.com>
- <5534B7D4-A5D9-4F44-9620-970A7F9EC140@linaro.org>
- <CADiTV-29TmkB5-k=TtQfoJqjP2Qv7GSsGLXAPBaTB6DoQ+6yyw@mail.gmail.com>
- <874A0232-2103-4364-BD88-F33B85D6A764@linaro.org>
- <20181218164126.GX2509588@devbig004.ftw2.facebook.com>
- <EC4F9B54-2352-4D85-B56C-5800CFEBCCB8@linaro.org>
-To:     bfq-iosched@googlegroups.com
-X-Mailer: Apple Mail (2.3445.102.3)
+        linux-scsi <linux-scsi@vger.kernel.org>
+Cc:     Ming Lei <ming.lei@redhat.com>,
+        Suganath Prabu Subramani 
+        <suganath-prabu.subramani@broadcom.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        Sathya Prakash Veerichetty <sathya.prakash@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+> On 12/18/18 10:48 AM, Kashyap Desai wrote:
+> >>
+> >> On 12/18/18 10:08 AM, Kashyap Desai wrote:
+> >>>>>
+> >>>>> Other block drivers (e.g. ib_srp, skd) do not need this to work
+> >>>>> reliably.
+> >>>>> It has been explained to you that the bug that you reported can be
+> >>>>> fixed by modifying the mpt3sas driver. So why to fix this by
+> >>>>> modifying the block layer? Additionally, what prevents that a race
+> >>>>> condition occurs between the block layer clearing
+> >>>>> hctx->tags->rqs[rq->tag] and
+> >>>>> scsi_host_find_tag() reading that same array element? I'm afraid
+> >>>>> that this is an attempt to paper over a real problem instead of
+> >>>>> fixing the root
+> >>>> cause.
+> >>>>
+> >>>> I have to agree with Bart here, I just don't see how the mpt3sas
+> >>>> use case is special. The change will paper over the issue in any
+> >>>> case.
+> >>>
+> >>> Hi Jens, Bart
+> >>>
+> >>> One of the key requirement for iterating whole tagset  using
+> >>> scsi_host_find_tag is to block scsi host. Once we are done that, we
+> >>> should be good. No race condition is possible if that part is taken
+> >>> care.
+> >>> Without this patch, if driver still receive scsi command from the
+> >>> hctx->tags->rqs which is really not outstanding.  I am finding this
+> >>> hctx->tags->is
+> >>> common issue for many scsi low level drivers.
+> >>>
+> >>> Just for example <fnic> - fnic_is_abts_pending() function has below
+> >>> code -
+> >>>
+> >>>         for (tag = 0; tag < fnic->fnic_max_tag_id; tag++) {
+> >>>                 sc = scsi_host_find_tag(fnic->lport->host, tag);
+> >>>                 /*
+> >>>                  * ignore this lun reset cmd or cmds that do not
+> >>> belong to
+> >>>                  * this lun
+> >>>                  */
+> >>>                 if (!sc || (lr_sc && (sc->device != lun_dev || sc ==
+> >>> lr_sc)))
+> >>>                         continue;
+> >>>
+> >>> Above code also has similar exposure of kernel panic like <mpt3sas>
+> >>> driver while accessing sc->device.
+> >>>
+> >>> Panic is more obvious if we have add/removal of scsi device before
+> >>> looping through scsi_host_find_tag().
+> >>>
+> >>> Avoiding block layer changes is also attempted in <mpt3sas> but our
+> >>> problem is to convert that code common for non-mq and mq.
+> >>> Temporary to unblock this issue, We have fixed <mpt3sas> using
+> >>> driver internals scsiio_tracker() instead of piggy back in
+> >>> scsi_command.
+> >>
+> >> For mq, the requests never go out of scope, they are always valid. So
+> >> the key question here is WHY they have been freed. If the queue gets
+> >> killed, then one potential solution would be to clear pointers in the
+> >> tag map belonging to that queue. That also takes it out of the hot
+> >> path.
+> >
+> > At driver load whenever driver does scsi_add_host_with_dma(), it
+> > follows below code path in block layer.
+> >
+> > scsi_mq_setup_tags
+> >   ->blk_mq_alloc_tag_set
+> >           -> blk_mq_alloc_rq_maps
+> >                      -> __blk_mq_alloc_rq_maps
+> >
+> > SML create two set of request pool. One is per HBA and other is per
+> > SDEV. I was confused why SML creates request pool per HBA.
+> >
+> > Example - IF HBA queue depth is 1K and there are 8 device behind that
+> > HBA, total request pool is created is 1K + 8 * scsi_device queue
+> > depth. 1K will be always static, but other request pool is managed
+> > whenever scsi device is added/removed.
+> >
+> > I never observe requests allocated per HBA is used in IO path. It is
+> > always request allocated per scsi device is what active.
+> > Also, what I observed is whenever scsi_device is deleted, associated
+> > request is also deleted. What is missing is - "Deleted request still
+> > available in
+> > hctx->tags->rqs[rq->tag]."
+>
+> So that sounds like the issue. If the device is deleted and its requests
+> go away,
+> those pointers should be cleared. That's what your patch should do, not do
+> it
+> for each IO.
 
+At the time of device removal,  it requires reverse traversing.  Find out if
+each requests associated with sdev is part of hctx->tags->rqs() and clear
+that entry.
+Not sure about atomic traverse if more than one device removal is happening
+in parallel.  May be more error prone. ?
 
-> Il giorno 18 dic 2018, alle ore 18:22, Paolo Valente =
-<paolo.valente@linaro.org> ha scritto:
->=20
->=20
->=20
->> Il giorno 18 dic 2018, alle ore 17:41, Tejun Heo <tj@kernel.org> ha =
-scritto:
->>=20
->> Hello, Paolo.
->>=20
->> On Tue, Dec 18, 2018 at 08:48:10AM +0100, Paolo Valente wrote:
->>> If Tejun cannot see any solution to his concern, then can we just
->>> switch to this extension, considering that
->>> - for non-shared names the interface is *identical* to the current
->>> one;
->>> - by using this new interface, and getting feedback we could
->>> understand how to better handle Tejun's concern?
->>> A lot of systems do use weights, and people don't even know that =
-these
->>> systems don't work correctly in blk-mq.  And they won't work =
-correctly
->>> in any available configuration from 4.21, if we don't fix this =
-problem.
->>=20
->> So, when seen from userland, how it should behave isn't vague or
->> complicated.  For a given device and policy type, there can be only
->> one implementation active.
->=20
-> Yes, but the problem is the opposite. You may have
-> - two different policies, with the same interface parameter,=20
-> - one active on one device
-> - the other one active on another device
->=20
-> In that case, statistics from one policy necessarily differ from
-> statistics from the other policy.
->=20
-> In this respect, in a system with more than one drive it already
-> happens that the same policy is active on different devices.  When
-> printing a statistics interface file for the policy, the output will
-> be a list of separate statistics, with a bunch of statistics *for
-> each* drive (plus a grand total in some cases).
->=20
-> So, our proposal simply extends this scheme in the most natural way:
-> if, now, also two or more policies share the same statistics file,
-> then the output will be a list of separate statistics, one for each
-> policy.  The statistics for each policy will be tagged with the policy
-> name, and will have the same identical form as above.  It seems the
-> most natural hierarchical extension of the same scheme.
->=20
-> At any rate, if you don't like it, just tell us how you prefer it
-> done.  Do you prefer the sharing of statistics file to be simply
-> forbidden?  (If this can be done.) I think such an incomplete solution
-> would preserve part of the current mess; but, if this allows us to
-> exit from this impasse, then it is ok for me.
->=20
-> *Any* feasible option is ok for me. Just pick one.
->=20
->> It doesn't make sense to have two weight
->> mechanisms active on one device, right?
->=20
-> (Un)fortunately, the problem are not weights.  There won't be two
-> weights for two policies expiring a weight parameter.  The problems
+Just wondering both the way we will be removing invalid request from array.
+Are you suspecting any performance issue if we do it per IO ?
 
-s/expiring/sharing sorry
+Kashyap
 
+>
+>
+> --
+> Jens Axboe
