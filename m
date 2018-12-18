@@ -2,158 +2,154 @@ Return-Path: <SRS0=v1Da=O3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEF82C43387
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 04:51:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 121BCC43387
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 06:36:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AD078217D8
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 04:51:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D17182133F
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 06:36:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o38O87s2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="caGZDsEB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726674AbeLREvm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 17 Dec 2018 23:51:42 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:38040 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726601AbeLREvm (ORCPT
+        id S1726346AbeLRGgF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Dec 2018 01:36:05 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:40457 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726322AbeLRGgF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 17 Dec 2018 23:51:42 -0500
-Received: by mail-pl1-f195.google.com with SMTP id e5so7236543plb.5;
-        Mon, 17 Dec 2018 20:51:41 -0800 (PST)
+        Tue, 18 Dec 2018 01:36:05 -0500
+Received: by mail-wm1-f68.google.com with SMTP id f188so823475wmf.5;
+        Mon, 17 Dec 2018 22:36:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references;
-        bh=LNjZOu9ti/CUDcrkv4geNqby8F0/i8MG9p2fY1WFuZ4=;
-        b=o38O87s2nTdZWz0DcU/hO0OYs5kgvygwn/D3tK7NDJy1e2vebQ14afy6tSY9wkXVxu
-         OUb9Kh+lrVr9pBw8TRgXBoPOdLeXMXa0DPtRFcYHKilks1wWPA5XGQAjNAEQPrXjMFhL
-         g/ZtZ4O4tLg28gQkrRxtLJqLVlA3+hItmqovvq3uGzCtbLwI9lVBm/pm2iCM3nDFvw4C
-         cbnGOPZUcgWX5ot0ulalNmHb+ZwyOAlAwtqVcFibpcJBno+OUIYwzVkEEvyRhbKlTiVv
-         adEdYEKyHWMu9FvyKIWFFMOSKu4dZoI48ul385uf/DBbrQBKuI/8S5ukJelkz9A8VQ8N
-         A1iQ==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=KwCH+thL5U4lLkPa1gGp+cMWQO9zXv6eoQ2cbOuVf2I=;
+        b=caGZDsEBQgJJip2UWAFk3qGOjMwg4UFI4ismBiiF/GI89hkC4G8wasmBzKj75Uzep0
+         eknT4qLdUwkjpIpd7UrXkm2G9N8XYjjHMYVm9C+hQUWHX+uR1mX40147ce4y9aNF46/L
+         US7DH4GKOrMlDGyaV2Lv+kcQOHvGAtDRYzUKiwBxpRDwlRSAWFRgkqVo4WJBG0Q54Ui4
+         Hu0Bn8CKmJOLvrgu0Cy3Q9dkahSI0V1NDkyPsRAj5qzl1rI4ul72dTfpC2tm7UqlbuMQ
+         wYsAK3W1sUVYRj4sf5aBYxOzwjeD7IVpHapC6RxMg4McUbaiVeFFVmby6erfVuGOtKm/
+         y1TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references;
-        bh=LNjZOu9ti/CUDcrkv4geNqby8F0/i8MG9p2fY1WFuZ4=;
-        b=t10W8anrkBUNI5wmHYU2XoJ3nopvb0JpMWv/jLixURHYhy8dBMqG9XZDTzQ2YeoXIP
-         HGPLK0Ok69S6GTd1YhsBnmP6uHAx4rY5fALVClP2ifJMgyjWzxzMl1sd30KfbVpQ5y5T
-         v1DikpmbKC3Fl4Vu+ZsMse/KZZb8BSlLZMxvPrbEtS/A1yWP1kbTchfRXAHrDqcgEVlP
-         SO65fcdWpru49PYYGLS70gwzJZfTwK2CZkOqPi6JxBNPYo+ryzNPgD4b7Zlg/l4w9GcE
-         SNuudeRmqJaKiIO7C2g5MueVWl3VpfFG12xOSX1K+JFpAHgYmkqaOGjfysd1+D5toO9p
-         Adjg==
-X-Gm-Message-State: AA+aEWaz/h/TeCXLLFaW0FnIVi656heYQhJMO/Hg0a3NNxUbv7qKH5QM
-        J0tbEXR9KYqD98vUgBUa8vzRHyTs6N4=
-X-Google-Smtp-Source: AFSGD/VXyvdab3SEHK9Yz4r21Xx/jFw8mFcOLerZSE+Ov8W/cXKEG3624w23vEUpKR79S7eZHJHeeA==
-X-Received: by 2002:a17:902:e085:: with SMTP id cb5mr14991076plb.24.1545108701367;
-        Mon, 17 Dec 2018 20:51:41 -0800 (PST)
-Received: from localhost.localdomain ([2601:602:9602:6598:1820:defd:529e:3b95])
-        by smtp.gmail.com with ESMTPSA id e9sm18164152pff.5.2018.12.17.20.51.40
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 17 Dec 2018 20:51:40 -0800 (PST)
-From:   yupeng <yupeng0921@gmail.com>
-To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, keith.busch@intel.com,
-        axboe@fb.com, hch@lst.de, sagi@grimberg.me, jthumshirn@suse.de
-Subject: [PATCH v4 2/2] trace nvme submit queue status
-Date:   Mon, 17 Dec 2018 20:51:38 -0800
-Message-Id: <20181218045138.4282-2-yupeng0921@gmail.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20181218045138.4282-1-yupeng0921@gmail.com>
-References: <20181218045138.4282-1-yupeng0921@gmail.com>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=KwCH+thL5U4lLkPa1gGp+cMWQO9zXv6eoQ2cbOuVf2I=;
+        b=Ldd57UrVupbL60gHSJ5sZR1olC3SUYt6X8OYDaDyaMhZXoXNSk7hw6GiaNkawvHIo/
+         tAj4cORdUcHUsSuUU/cQuh4Qnbat2fBnq5BjayASROIxWc0ypHF+POMYs+mWgTtgKiwG
+         VktkmjpdvvBGpxcDJo5vuC64Dwb6a8krjNJX6AnbeWlIKSlKnB9tTXISEscCDmKywVcS
+         K1+qsq/6uq6TkXz8ccDmO1qp6fbYfobpadQBUaQKT6P60+ws3xP9THo0bQ9RKzNxgK/2
+         mgoKMamOa8MCQJTjTPM2JavMbG9b3sd6jhZfJzEeNmsxtyINXLXMjaaqak8EYfk6hdCA
+         Q88g==
+X-Gm-Message-State: AA+aEWYV4C83qY5Kg6cRRAEP/q87AJxZmdAkr28JbZsNbzbjlxquGuZ7
+        cWFV1E34QkBZY0IXWNRIWdgce3zQn8MDrshIx5pSPKXA
+X-Google-Smtp-Source: AFSGD/XK4RYb6WQade4WTFA3XRqfzlFF1hUhzoDbLlxnL10fi41tz1ulUdZ5xeK+8htSCoQDARaXM4P8e+T0UvJ8QTE=
+X-Received: by 2002:a1c:4681:: with SMTP id t123mr1820368wma.24.1545114962145;
+ Mon, 17 Dec 2018 22:36:02 -0800 (PST)
+MIME-Version: 1.0
+From:   Junhui Tang <tang.junhui.linux@gmail.com>
+Date:   Tue, 18 Dec 2018 14:37:14 +0800
+Message-ID: <CA+NNRhE8438XuoZ25kdCRjYvZv6nHJU+Yoyg6hacWuptjWWDfA@mail.gmail.com>
+Subject: [PATCH] bcache: treat stale && dirty keys as bad keys
+To:     colyli@suse.de
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-export nvme disk name, queue id, sq_head, sq_tail to trace event
-usage example:
-go to the event directory:
-cd /sys/kernel/debug/tracing/events/nvme/nvme_sq
-filter by disk name:
-echo 'disk=="nvme1n1"' > filter
-enable the event:
-echo 1 > enable
-check results from trace_pipe:
-cat /sys/kernel/debug/tracing/trace_pipe
-In practice, this patch help me debug hardware related
-performant issue.
+From 8ca52771f1d3b83ff55dc80ba633901a081963bf Mon Sep 17 00:00:00 2001
+From: Tang Junhui <tang.junhui.linux@gmail.com>
+Date: Tue, 18 Dec 2018 10:38:26 +0800
+Subject: [PATCH] bcache: treat stale && dirty keys as bad keys
 
-Signed-off-by: yupeng <yupeng0921@gmail.com>
+Stale && dirty keys can be produced in the follow way:
+After writeback in write_dirty_finish(), dirty keys k1 will
+replace by clean keys k2
+==>ret = bch_btree_insert(dc->disk.c, &keys, NULL, &w->key);
+==>btree_insert_fn(struct btree_op *b_op, struct btree *b)
+==>static int bch_btree_insert_node(struct btree *b,
+       struct btree_op *op,
+       struct keylist *insert_keys,
+       atomic_t *journal_ref,
+Then two steps:
+A) update k1 to k2 in btree node memory;
+   bch_btree_insert_keys(b, op, insert_keys, replace_key)
+B) Write the bset(contains k2) to cache disk by a 30s delay work
+   bch_btree_leaf_dirty(b, journal_ref).
+But before the 30s delay work write the bset to cache device,
+these things happend:
+A) GC works, and reclaim the bucket k2 point to;
+B) Allocator works, and invalidate the bucket k2 point to,
+   and increase the gen of the bucket, and place it into free_inc
+   fifo;
+C) Until now, the 30s delay work still does not finish work,
+   so in the disk, the key still is k1, it is dirty and stale
+   (its gen is smaller than the gen of the bucket). and then the
+   machine power off suddenly happens;
+D) When the machine power on again, after the btree reconstruction,
+   the stale dirty key appear.
+
+In bch_extent_bad(), when expensive_debug_checks is off, it would
+treat the dirty key as good even it is stale keys, and it would
+cause bellow probelms:
+A) In read_dirty() it would cause machine crash:
+   BUG_ON(ptr_stale(dc->disk.c, &w->key, 0));
+B) It could be worse when reads hits stale dirty keys, it would
+   read old incorrect data.
+
+This patch tolerate the existence of these stale && dirty keys,
+and treat them as bad key in bch_extent_bad().
+
+Signed-off-by: Tang Junhui <tang.junhui.linux@gmail.com>
 ---
- drivers/nvme/host/pci.c   |  5 +++++
- drivers/nvme/host/trace.c |  2 ++
- drivers/nvme/host/trace.h | 21 +++++++++++++++++++++
- 3 files changed, 28 insertions(+)
+ drivers/md/bcache/extents.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index c33bb201b884..52df2f7fef37 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -32,6 +32,7 @@
- #include <linux/sed-opal.h>
- #include <linux/pci-p2pdma.h>
- 
-+#include "trace.h"
- #include "nvme.h"
- 
- #define SQ_SIZE(depth)		(depth * sizeof(struct nvme_command))
-@@ -899,6 +900,10 @@ static inline void nvme_handle_cqe(struct nvme_queue *nvmeq, u16 idx)
- 	}
- 
- 	req = blk_mq_tag_to_rq(*nvmeq->tags, cqe->command_id);
-+	trace_nvme_sq(req->rq_disk,
-+		nvmeq->qid,
-+		le16_to_cpu(cqe->sq_head),
-+		nvmeq->sq_tail);
- 	nvme_end_request(req, cqe->status, cqe->result);
- }
- 
-diff --git a/drivers/nvme/host/trace.c b/drivers/nvme/host/trace.c
-index 8ca7079ed2bc..7bfaace23e1e 100644
---- a/drivers/nvme/host/trace.c
-+++ b/drivers/nvme/host/trace.c
-@@ -142,3 +142,5 @@ const char *nvme_trace_disk_name(struct trace_seq *p, char *name)
- 	return ret;
- }
- EXPORT_SYMBOL_GPL(nvme_trace_disk_name);
+diff --git a/drivers/md/bcache/extents.c b/drivers/md/bcache/extents.c
+index 1d09674..f9eb03c 100644
+--- a/drivers/md/bcache/extents.c
++++ b/drivers/md/bcache/extents.c
+@@ -535,6 +535,7 @@ static bool bch_extent_bad(struct btree_keys *bk,
+const struct bkey *k)
+ {
+  struct btree *b = container_of(bk, struct btree, keys);
+  unsigned i, stale;
++ char buf[80];
+
+  if (!KEY_PTRS(k) ||
+      bch_extent_invalid(bk, k))
+@@ -544,19 +545,20 @@ static bool bch_extent_bad(struct btree_keys
+*bk, const struct bkey *k)
+  if (!ptr_available(b->c, k, i))
+  return true;
+
+- if (!expensive_debug_checks(b->c) && KEY_DIRTY(k))
+- return false;
+-
+  for (i = 0; i < KEY_PTRS(k); i++) {
+  stale = ptr_stale(b->c, k, i);
+
++ if (stale && KEY_DIRTY(k)) {
++ bch_extent_to_text(buf, sizeof(buf), k);
++ pr_info("stale dirty pointer, stale %u, key: %s",
++     stale,
++     buf);
++ }
 +
-+EXPORT_TRACEPOINT_SYMBOL(nvme_sq);
-diff --git a/drivers/nvme/host/trace.h b/drivers/nvme/host/trace.h
-index 196d5bd56718..3606cd7000f4 100644
---- a/drivers/nvme/host/trace.h
-+++ b/drivers/nvme/host/trace.h
-@@ -184,6 +184,27 @@ TRACE_EVENT(nvme_async_event,
- 
- #undef aer_name
- 
-+TRACE_EVENT(nvme_sq,
-+	TP_PROTO(void *rq_disk, int qid, int sq_head, int sq_tail),
-+	TP_ARGS(rq_disk, qid, sq_head, sq_tail),
-+	TP_STRUCT__entry(
-+		__array(char, disk, DISK_NAME_LEN)
-+		__field(int, qid)
-+		__field(int, sq_head)
-+		__field(int, sq_tail)
-+	),
-+	TP_fast_assign(
-+		__assign_disk_name(__entry->disk, rq_disk);
-+		__entry->qid = qid;
-+		__entry->sq_head = sq_head;
-+		__entry->sq_tail = sq_tail;
-+	),
-+	TP_printk("nvme: %s qid=%d head=%d tail=%d",
-+		__print_disk_name(__entry->disk),
-+		__entry->qid, __entry->sq_head, __entry->sq_tail
-+	)
-+);
-+
- #endif /* _TRACE_NVME_H */
- 
- #undef TRACE_INCLUDE_PATH
+  btree_bug_on(stale > 96, b,
+       "key too stale: %i, need_gc %u",
+       stale, b->c->need_gc);
+
+- btree_bug_on(stale && KEY_DIRTY(k) && KEY_SIZE(k),
+-      b, "stale dirty pointer");
+-
+  if (stale)
+  return true;
+
 -- 
-2.17.1
-
+1.8.3.1
