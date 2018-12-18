@@ -2,124 +2,117 @@ Return-Path: <SRS0=v1Da=O3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A68CDC43387
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 09:22:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7442C43387
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 09:33:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 72EB2217D9
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 09:22:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20150623.gappssmtp.com header.i=@linbit-com.20150623.gappssmtp.com header.b="pqJbbzYf"
+	by mail.kernel.org (Postfix) with ESMTP id 7CD642133F
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 09:33:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726395AbeLRJWI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Dec 2018 04:22:08 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53123 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726365AbeLRJWI (ORCPT
+        id S1726364AbeLRJdI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Dec 2018 04:33:08 -0500
+Received: from smtp.eu.citrix.com ([185.25.65.24]:41907 "EHLO
+        SMTP.EU.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726358AbeLRJdI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Dec 2018 04:22:08 -0500
-Received: by mail-wm1-f67.google.com with SMTP id m1so1875949wml.2
-        for <linux-block@vger.kernel.org>; Tue, 18 Dec 2018 01:22:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=reJDQjip8OvNsd/j/JXEkcYjvOIxqRk/9WRj/efcj0I=;
-        b=pqJbbzYfX/Z64Xtnn6yfO2dRE6W+8UI6mgWlIBlKZza21Kaufd/KWPbykdOXq6AWg/
-         BNqxsQp+eU/T6tfI5w5meCpPSSnBpEUwQIxF8H3Ek5/MNATXbCv5Q6XSsJ0ZaPUVUcvL
-         PJn7T+lTDWHbQIyphebcXE3p5V6rVDpDAPsshzOL4yhni+et2e+GjVd77jg14UFhL4Sr
-         rf9daEn6qE9NBs8hwZqWpA9Yi+xwuztuGnAb6sSOOCIz13YzXv4sNkxdv40wC8Zgc7/2
-         ZK6Oqre/7D/l+XskFeScwyMXmoQnyIS8J0nicff/a63xZCUI85nxef0sSYS/icnYNdNS
-         nvgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to:user-agent;
-        bh=reJDQjip8OvNsd/j/JXEkcYjvOIxqRk/9WRj/efcj0I=;
-        b=aTfyXuwGCt5nlWlDPJXIE/DjEsVDXBMNU6Y3PCEZDXkr21jh4N5NJmuCryFJC2sX51
-         gu/xL6cGNMLl2vMRwJDJYCunIj0WKMPL1pQXQkHtkLGL+sOqpfIsHnv2d//O+Z+e1oBS
-         e4REOJyRX/w0b98N5C+7+FN7x+ABAj5dCtD39Gm8T1WaAfn8SnPM9WXPpsWsLuBB3ETY
-         AMePiIDNdXKI/zIwBnpN1hOxAq60abiUb9dnw0AvEJMK8AAxVqisT1/07v2IQGUHATOv
-         fWFDTe3omn2RsQEycCiGsc9/B4TAwCgE8nQmovlSsWNcfX2ID4LRJYvcBcf1mEn5I9qo
-         BXBw==
-X-Gm-Message-State: AA+aEWbU3h0ndSGoPf3zLHEdApnagTGRUSyAweCgiSEym0tgbj5V0tl0
-        1wl3ha0wJMh/354YNmQkKliKLQ==
-X-Google-Smtp-Source: AFSGD/XIEEU9DQlJqNvps/ObjEWsldN32cqEJGbpNvRVX/VpQ0Vtb6F269EHnMZdVyf/mT9Hz0uOqw==
-X-Received: by 2002:a1c:7306:: with SMTP id d6mr2293444wmb.98.1545124926061;
-        Tue, 18 Dec 2018 01:22:06 -0800 (PST)
-Received: from soda.linbit (212-186-191-219.static.upcbusiness.at. [212.186.191.219])
-        by smtp.gmail.com with ESMTPSA id w18sm1686607wru.54.2018.12.18.01.22.04
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 18 Dec 2018 01:22:05 -0800 (PST)
-Date:   Tue, 18 Dec 2018 10:22:02 +0100
-From:   Lars Ellenberg <lars.ellenberg@linbit.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Nathan Chancellor <natechancellor@gmail.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH v2] drbd: Avoid Clang warning about pointless switch
- statment
-Message-ID: <20181218092202.GJ5026@soda.linbit>
-Mail-Followup-To: Jens Axboe <axboe@kernel.dk>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        Nick Desaulniers <ndesaulniers@google.com>
-References: <20181002171447.10765-1-natechancellor@gmail.com>
- <20181004200912.32348-1-natechancellor@gmail.com>
- <20181217172401.GA30635@flashbox>
- <0110d874-7595-1786-77e3-e2b0daec2327@kernel.dk>
+        Tue, 18 Dec 2018 04:33:08 -0500
+X-IronPort-AV: E=Sophos;i="5.56,367,1539648000"; 
+   d="scan'208";a="83480015"
+Date:   Tue, 18 Dec 2018 10:33:00 +0100
+From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To:     Dongli Zhang <dongli.zhang@oracle.com>
+CC:     <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <konrad.wilk@oracle.com>,
+        <axboe@kernel.dk>, <paul.durrant@citrix.com>
+Subject: Re: [PATCH v2 1/1] xen/blkback: rework connect_ring() to avoid
+ inconsistent xenstore 'ring-page-order' set by malicious blkfront
+Message-ID: <20181218093300.qfslnloxooqnu2im@mac>
+References: <1545094538-31426-1-git-send-email-dongli.zhang@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <0110d874-7595-1786-77e3-e2b0daec2327@kernel.dk>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+In-Reply-To: <1545094538-31426-1-git-send-email-dongli.zhang@oracle.com>
+User-Agent: NeoMutt/20180716
+X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
+ AMSPEX02CL01.citrite.net (10.69.22.125)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 17, 2018 at 10:29:38AM -0700, Jens Axboe wrote:
-> > Hi Lars and Philipp,
-> > 
-> > Could you please make sure that this patch and the other one I sent make
-> > it into 4.21/5.0? I am not sure when you were planning on sending the
-> > pull request to Jens that you mentioned in the other thread but I've
-> > noticed most maintainers typically send their requests for the impending
-> > merge window around -rc7 or so and I wanted to make sure it was on your
-> > radar.
+On Tue, Dec 18, 2018 at 08:55:38AM +0800, Dongli Zhang wrote:
+> The xenstore 'ring-page-order' is used globally for each blkback queue and
+> therefore should be read from xenstore only once. However, it is obtained
+> in read_per_ring_refs() which might be called multiple times during the
+> initialization of each blkback queue.
+> 
+> If the blkfront is malicious and the 'ring-page-order' is set in different
+> value by blkfront every time before blkback reads it, this may end up at
+> the "WARN_ON(i != (XEN_BLKIF_REQS_PER_PAGE * blkif->nr_ring_pages));" in
+> xen_blkif_disconnect() when frontend is destroyed.
+> 
+> This patch reworks connect_ring() to read xenstore 'ring-page-order' only
+> once.
+> 
+> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> ---
+> Changed since v1:
+>   * change the order of xenstore read in read_per_ring_refs(suggested by Roger Pau Monne)
+>   * use xenbus_read_unsigned() in connect_ring() (suggested by Roger Pau Monne)
+> 
+>  drivers/block/xen-blkback/xenbus.c | 70 ++++++++++++++++++++++----------------
+>  1 file changed, 40 insertions(+), 30 deletions(-)
+> 
+> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+> index a4bc74e..7178f0f 100644
+> --- a/drivers/block/xen-blkback/xenbus.c
+> +++ b/drivers/block/xen-blkback/xenbus.c
+> @@ -926,7 +926,7 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
+>  	int err, i, j;
+>  	struct xen_blkif *blkif = ring->blkif;
+>  	struct xenbus_device *dev = blkif->be->dev;
+> -	unsigned int ring_page_order, nr_grefs, evtchn;
+> +	unsigned int nr_grefs, evtchn;
+>  
+>  	err = xenbus_scanf(XBT_NIL, dir, "event-channel", "%u",
+>  			  &evtchn);
+> @@ -936,43 +936,38 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
+>  		return err;
+>  	}
+>  
+> -	err = xenbus_scanf(XBT_NIL, dev->otherend, "ring-page-order", "%u",
+> -			  &ring_page_order);
+> -	if (err != 1) {
+> -		err = xenbus_scanf(XBT_NIL, dir, "ring-ref", "%u", &ring_ref[0]);
+> -		if (err != 1) {
+> +	nr_grefs = blkif->nr_ring_pages;
+> +	WARN_ON(!nr_grefs);
+> +
+> +	for (i = 0; i < nr_grefs; i++) {
+> +		char ring_ref_name[RINGREF_NAME_LEN];
+> +
+> +		snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref%u", i);
+> +		err = xenbus_scanf(XBT_NIL, dir, ring_ref_name,
+> +				   "%u", &ring_ref[i]);
+> +
+> +		if (err != 1 && (i || (!i && nr_grefs > 1))) {
 
-I'm sorry.
-From my point of view, "fixing the pointless switch" is just "pointless",
-so it (again) fell through.  I get it that it is important to others,
-and getting rid of Clang warnings is a good thing.  So sorry again.
+AFAICT the above condition can be simplified as "err != 1 &&
+nr_grefs".
 
-> It needs to get here now, but drbd hasn't really sent anything in for
-> about a year,
+>  			err = -EINVAL;
 
-Last actual fix was 2018-06-25 64dafbc9530c drbd: fix access after free
-so almost six month, yes.
+There's no point in setting err here...
 
-> so I'm starting to doubt how maintained it is at this
-> point.
+> -			xenbus_dev_fatal(dev, err, "reading %s/ring-ref", dir);
+> +			xenbus_dev_fatal(dev, err, "reading %s/%s",
+> +					 dir, ring_ref_name);
+>  			return err;
 
-Oh, it is maintained.  It is just happens to be "stable".
-We don't add new features there,
-and I'm currently not aware of any misbehavior.
+...since you can just return -EINVAL (same applies to the other
+instance below).
 
-I'll prepare a pull request containing this,
-the other Clang warning patch from Nathan,
-and possibly other small stuff that accumulated,
-if I can find any, and send that out later today.
-
-Thanks for the reminder,
-
-    Lars
-
+The rest LGTM, Thanks.
