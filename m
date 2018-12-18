@@ -2,110 +2,105 @@ Return-Path: <SRS0=v1Da=O3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB388C43387
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 17:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8EE1C43387
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 17:47:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B8C692133F
-	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 17:36:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C586D21873
+	for <linux-block@archiver.kernel.org>; Tue, 18 Dec 2018 17:47:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727159AbeLRRgo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Dec 2018 12:36:44 -0500
-Received: from gateway21.websitewelcome.com ([192.185.45.89]:29033 "EHLO
-        gateway21.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727154AbeLRRgn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Dec 2018 12:36:43 -0500
-X-Greylist: delayed 4916 seconds by postgrey-1.27 at vger.kernel.org; Tue, 18 Dec 2018 12:36:43 EST
-Received: from cm11.websitewelcome.com (cm11.websitewelcome.com [100.42.49.5])
-        by gateway21.websitewelcome.com (Postfix) with ESMTP id 1D2244010220A
-        for <linux-block@vger.kernel.org>; Tue, 18 Dec 2018 10:14:47 -0600 (CST)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id ZI19gQR7tdnCeZI19gaUCA; Tue, 18 Dec 2018 10:14:47 -0600
-X-Authority-Reason: nr=8
-Received: from [189.250.106.44] (port=57630 helo=embeddedor)
-        by gator4166.hostgator.com with esmtpa (Exim 4.91)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1gZI18-000jNo-FI; Tue, 18 Dec 2018 10:14:46 -0600
-Date:   Tue, 18 Dec 2018 10:14:45 -0600
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] loop: Fix potential Spectre v1 vulnerability
-Message-ID: <20181218161445.GA10311@embeddedor>
+        id S1727406AbeLRRrv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Dec 2018 12:47:51 -0500
+Received: from verein.lst.de ([213.95.11.211]:42203 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726659AbeLRRrv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 18 Dec 2018 12:47:51 -0500
+Received: by newverein.lst.de (Postfix, from userid 2407)
+        id 38CA068D8D; Tue, 18 Dec 2018 18:47:50 +0100 (CET)
+Date:   Tue, 18 Dec 2018 18:47:50 +0100
+From:   "hch@lst.de" <hch@lst.de>
+To:     Keith Busch <keith.busch@intel.com>
+Cc:     yupeng <yupeng0921@gmail.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "axboe@fb.com" <axboe@fb.com>, "hch@lst.de" <hch@lst.de>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "jthumshirn@suse.de" <jthumshirn@suse.de>
+Subject: Re: [PATCH v4 2/2] trace nvme submit queue status
+Message-ID: <20181218174750.GA14416@lst.de>
+References: <20181218045138.4282-1-yupeng0921@gmail.com> <20181218045138.4282-2-yupeng0921@gmail.com> <20181218172645.GB13768@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 189.250.106.44
-X-Source-L: No
-X-Exim-ID: 1gZI18-000jNo-FI
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: (embeddedor) [189.250.106.44]:57630
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 2
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+In-Reply-To: <20181218172645.GB13768@localhost.localdomain>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-type is indirectly controlled by user-space, hence leading to
-a potential exploitation of the Spectre variant 1 vulnerability.
+On Tue, Dec 18, 2018 at 10:26:46AM -0700, Keith Busch wrote:
+> No need for a space after the %s. __print_disk_name already appends a
+> space if there's a disk name, and we don't want the extra space if there
+> isn't one. Also, every other nvme trace has a ',' after each entry. Not
+> a big deal, just minor format consistency.
 
-This issue was detected with the help of Smatch:
+Yeah.  What about something like this incremental patch to make the
+trace formatting and argument passing match what we otherwise do:
 
-drivers/block/loop.c:1208 loop_set_status() warn: potential spectre issue 'xfer_funcs' [r] (local cap)
-
-Fix this by sanitizing type before using it to index xfer_funcs.
-
-Notice that given that speculation windows are large, the policy is
-to kill the speculation on the first load and not worry if it can be
-completed with a dependent load/store [1].
-
-[1] https://marc.info/?l=linux-kernel&m=152449131114778&w=2
-
-Cc: stable@vger.kernel.org
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- drivers/block/loop.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 0939f36548c9..015d255f451b 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -83,6 +83,8 @@
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 2477bd906904..5a0bf6a24d50 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -1004,8 +1004,7 @@ static inline void nvme_handle_cqe(struct nvme_queue *nvmeq, u16 idx)
+ 	}
  
- #include <linux/uaccess.h>
+ 	req = blk_mq_tag_to_rq(*nvmeq->tags, cqe->command_id);
+-	trace_nvme_sq(req->rq_disk, nvmeq->qid, le16_to_cpu(cqe->sq_head),
+-			nvmeq->sq_tail);
++	trace_nvme_sq(req, cqe->sq_head, nvmeq->sq_tail);
+ 	nvme_end_request(req, cqe->status, cqe->result);
+ }
  
-+#include <linux/nospec.h>
-+
- static DEFINE_IDR(loop_index_idr);
- static DEFINE_MUTEX(loop_ctl_mutex);
+diff --git a/drivers/nvme/host/trace.h b/drivers/nvme/host/trace.h
+index cf666709bc50..3564120aa7b3 100644
+--- a/drivers/nvme/host/trace.h
++++ b/drivers/nvme/host/trace.h
+@@ -185,22 +185,24 @@ TRACE_EVENT(nvme_async_event,
+ #undef aer_name
  
-@@ -1205,6 +1207,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
- 			err = -EINVAL;
- 			goto out_unfreeze;
- 		}
-+		type = array_index_nospec(type, MAX_LO_CRYPT);
- 		xfer = xfer_funcs[type];
- 		if (xfer == NULL) {
- 			err = -EINVAL;
--- 
-2.19.2
-
+ TRACE_EVENT(nvme_sq,
+-	TP_PROTO(void *rq_disk, int qid, int sq_head, int sq_tail),
+-	TP_ARGS(rq_disk, qid, sq_head, sq_tail),
++	TP_PROTO(struct request *req, __le16 sq_head, int sq_tail),
++	TP_ARGS(req, sq_head, sq_tail),
+ 	TP_STRUCT__entry(
++		__field(int, ctrl_id)
+ 		__array(char, disk, DISK_NAME_LEN)
+ 		__field(int, qid)
+-		__field(int, sq_head)
+-		__field(int, sq_tail)
++		__field(u16, sq_head)
++		__field(u16, sq_tail)
+ 	),
+ 	TP_fast_assign(
+-		__assign_disk_name(__entry->disk, rq_disk);
+-		__entry->qid = qid;
+-		__entry->sq_head = sq_head;
++		__entry->ctrl_id = nvme_req(req)->ctrl->instance;
++		__assign_disk_name(__entry->disk, req->rq_disk);
++		__entry->qid = nvme_req_qid(req);
++		__entry->sq_head = le16_to_cpu(sq_head);
+ 		__entry->sq_tail = sq_tail;
+ 	),
+-	TP_printk("nvme: %s qid=%d head=%d tail=%d",
+-		__print_disk_name(__entry->disk),
++	TP_printk("nvme%d: %sqid=%d, head=%u, tail=%u",
++		__entry->ctrl_id, __print_disk_name(__entry->disk),
+ 		__entry->qid, __entry->sq_head, __entry->sq_tail
+ 	)
+ );
