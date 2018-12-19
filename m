@@ -2,129 +2,206 @@ Return-Path: <SRS0=7Y8O=O4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5E5FC43387
-	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 11:32:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CFBCC43387
+	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 11:45:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 80BA220815
-	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 11:32:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 610F4217D7
+	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 11:45:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KgV94P3v"
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="H39zhfuH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727696AbeLSLcn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Dec 2018 06:32:43 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:38724 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725294AbeLSLcn (ORCPT
+        id S1728043AbeLSLpo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Dec 2018 06:45:44 -0500
+Received: from mail-wm1-f47.google.com ([209.85.128.47]:37030 "EHLO
+        mail-wm1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726774AbeLSLpo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Dec 2018 06:32:43 -0500
-Received: by mail-wr1-f66.google.com with SMTP id v13so19136224wrw.5;
-        Wed, 19 Dec 2018 03:32:42 -0800 (PST)
+        Wed, 19 Dec 2018 06:45:44 -0500
+Received: by mail-wm1-f47.google.com with SMTP id g67so6078169wmd.2
+        for <linux-block@vger.kernel.org>; Wed, 19 Dec 2018 03:45:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=5cNZS7evFTFSuXmMPyBEfnlXRcsOfk928yjxP33/FaA=;
-        b=KgV94P3v1mmWrphbDKxeSPaJ26/B4cCwvhrdc3MQVvKSD2T22m/0Izwn0KvVoxUeSv
-         qFPqHOGPghQqHIW5XVsbvZZyj4wN/xoh8KkpSe5TDsupTzDHso79qOmPzoHdBQ5dc9iK
-         Cdu5Zofe1iaVElLw1p1NsvzlHTvcBd9UejAVmCZmxsexch12iO2aqWeaMsALPA7nH9uD
-         8Q4SPvzf8KJ8O9uUnTlONSn4ZcQ7A82QvakfsdYWKDfkrkZyZ6LXtU6iX9KgDRxaef8q
-         SHa4bkHJuIsR46JZLQxwkSzAt3SUMzTwotrgAMl8+uyDjf5VaX7OP15s09AQ3XM0/gyL
-         Z/7g==
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Yjux7Fen1yl830Ha2uJsucwIYuMbormI6R5scWlTygc=;
+        b=H39zhfuHS30yqTzsLI1gE1YP86TTr6pOD+sbGbNnaWJ4z4jWuK/gQ7l3Y5yUpeYn2P
+         feQdQB+eBnLAXekP5XlOmxTRqD66TcMItWh3BPmhS2MYCwhzfGQtG3ZKPnTq00HDYY0t
+         QuJ0J77/VqS3LuI5gNYMkOpwzaBGzJnTjOG1A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=5cNZS7evFTFSuXmMPyBEfnlXRcsOfk928yjxP33/FaA=;
-        b=Z1S27VrkQBNcvnJA2Fj6VFMWJLa8RseUQMusCFOp3w/fvYUxCjOLZ7D0zO01ToFCxi
-         MGNp2WqNO7tzhj+DZsVLBNdIOPc2Z6ipeCUSlD89sjZpYzQtINg9uVQYTMQLRhsqF+Wd
-         ZpAbhiH5wmXWtFvDWEI5j0oPgZ6MeBODLydXJTBUVi33C/wD4WThpNN8+Lg0x9y4FiXZ
-         BgYK5YqIS6H03UaMv7SRSyJfVdJFbsvsQdWIUKZ1JYKDRb7w7NoTlK8xEeXbSxOvfnZ9
-         HENlPXh8U46kgZs+Lm2EUREGTupB64v4C3pJnJ21BPZoixc8KWo9oT5LpQrTh3UCnJ/w
-         kKAQ==
-X-Gm-Message-State: AA+aEWbe24hW0g25rJJVJZP/9QyAurTweYiGrohLeYMk+Hz7V4Oivoax
-        zbMnRouQWMi/cIQW2IbrnQ==
-X-Google-Smtp-Source: AFSGD/Vl7M8DXkE/BAnu4j7Lsslhfe6P6EbeNoPHtVxSjMnZEj+yDghmCfzXnIXpiY3Tq9iMkNJTrg==
-X-Received: by 2002:adf:db51:: with SMTP id f17mr17194787wrj.90.1545219161308;
-        Wed, 19 Dec 2018 03:32:41 -0800 (PST)
-Received: from kmo-pixel ([93.240.4.121])
-        by smtp.gmail.com with ESMTPSA id b129sm3128976wmd.24.2018.12.19.03.32.40
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 19 Dec 2018 03:32:40 -0800 (PST)
-Date:   Wed, 19 Dec 2018 06:32:38 -0500
-From:   Kent Overstreet <kent.overstreet@gmail.com>
-To:     Junhui Tang <tang.junhui.linux@gmail.com>
-Cc:     colyli@suse.de, linux-bcache@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] bcache: treat stale && dirty keys as bad keys
-Message-ID: <20181219113238.GA13550@kmo-pixel>
-References: <CA+NNRhE8438XuoZ25kdCRjYvZv6nHJU+Yoyg6hacWuptjWWDfA@mail.gmail.com>
- <20181218140157.GB7144@kmo-pixel>
- <CA+NNRhFgAqHSxYP2TqDx_bLNGYOEe8paHU9dz7Nos=dhMDK9gQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+NNRhFgAqHSxYP2TqDx_bLNGYOEe8paHU9dz7Nos=dhMDK9gQ@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Yjux7Fen1yl830Ha2uJsucwIYuMbormI6R5scWlTygc=;
+        b=qhwjsjgrvPvIbOY9zse/dItIw7FioBTGfivtlBRxFHOq41nFcsdSBo9bhDmz1OWkvz
+         GRp/zsU4kc2T+P5Xdrg0lGgBOGbC8axJB7Wxo1wIJsHJqZINicBVygknn1VEXPof7FBi
+         HO140t+6Ud+Q0ang7O+zyvnvGdcNVKCEdLPa4p6ZuPhE+F83dOdwK4soFBTUFZUFajQL
+         aUd9Onq/SKConnm9kOXB6N11AA/lMgyMS2ENkiTFmZItC9OeK6SbDzw3xp6cI23naSGv
+         TsTrVWScW1Llaca1AIZcdY1C/vEMmt+CS3kUxNbHFIullneDjxUlPO67o0BQg20QXGVI
+         G/OA==
+X-Gm-Message-State: AA+aEWaB1bQspxQr6Fl4zOspHJ+92pvBQF4Tr45NxOMGiITvuvIeM9VZ
+        mbb/tn0wR+oCsUx/jiwG+cEaJg==
+X-Google-Smtp-Source: AFSGD/WiNxAm+dYx2P6gbyMslkDW1Va+PD9TEExUTlfal2svjxw1ihunTObs792DJdVdBw7uksYE4Q==
+X-Received: by 2002:a1c:99ce:: with SMTP id b197mr7158013wme.75.1545219941911;
+        Wed, 19 Dec 2018 03:45:41 -0800 (PST)
+Received: from wifi-122_dhcprange-7.wifi.unimo.it (wifi-122_dhcprange-7.wifi.unimo.it. [155.185.122.7])
+        by smtp.gmail.com with ESMTPSA id n5sm8064459wrr.94.2018.12.19.03.45.40
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 19 Dec 2018 03:45:41 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: confusion about nr of pending I/O requests
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <CACVXFVO1ZE_8e=DDBanm8id+=672BOs5nt6AJtnztt48GZ1vnw@mail.gmail.com>
+Date:   Wed, 19 Dec 2018 12:45:38 +0100
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Mark Brown <broonie@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <197CF8DC-F4FD-47C6-8E62-5B8257173D6E@linaro.org>
+References: <E0E52FD0-1020-4F5B-9AC8-F48BDFE142C0@linaro.org>
+ <4db2cb0f-e500-44da-e85d-ed417b74dae5@kernel.dk>
+ <CACVXFVML3ZJ0ezsRBC6T_6zbJHqXRFXVQJxVhsK9spKEfgKipQ@mail.gmail.com>
+ <80B060E9-48E9-45D3-9456-64E94947F048@linaro.org>
+ <CACVXFVO1ZE_8e=DDBanm8id+=672BOs5nt6AJtnztt48GZ1vnw@mail.gmail.com>
+To:     Ming Lei <tom.leiming@gmail.com>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Dec 19, 2018 at 09:32:55AM +0800, Junhui Tang wrote:
-> hello Kent
-> 
-> Long long no see, glad to hear you again.
-> 
-> >> Then two steps:
-> >> A) update k1 to k2 in btree node memory;
-> >>    bch_btree_insert_keys(b, op, insert_keys, replace_key)
-> >> B) Write the bset(contains k2) to cache disk by a 30s delay work
-> >>    bch_btree_leaf_dirty(b, journal_ref).
-> >> But before the 30s delay work write the bset to cache device,
-> >> these things happend:
-> >> A) GC works, and reclaim the bucket k2 point to;
-> >> B) Allocator works, and invalidate the bucket k2 point to,
-> >>    and increase the gen of the bucket, and place it into free_inc
-> >>    fifo;
-> >> C) Until now, the 30s delay work still does not finish work,
-> >>    so in the disk, the key still is k1, it is dirty and stale
-> >>    (its gen is smaller than the gen of the bucket). and then the
-> >>    machine power off suddenly happens;
-> >> D) When the machine power on again, after the btree reconstruction,
-> >>    the stale dirty key appear.
-> 
-> > Only prior to journal replay, right? Or did you uncover something more severe?
-> No, it's after the journal replay, and in write_dirty_finish(), when
-> replace a dirty key with a clean key by calling bch_btree_insert(),
-> no journal will write.
 
-Holy crap you're right, this was from before I moved journalling to be driven by
-the btree update path.
 
-I think a better fix here would be to journal the btree updates writeback does,
-but given that we haven't been journalling those updates all this time your fix
-does make sense too.
+> Il giorno 19 dic 2018, alle ore 11:32, Ming Lei =
+<tom.leiming@gmail.com> ha scritto:
+>=20
+> On Wed, Dec 19, 2018 at 2:18 PM Paolo Valente =
+<paolo.valente@linaro.org> wrote:
+>>=20
+>>=20
+>>=20
+>>> Il giorno 19 dic 2018, alle ore 04:45, Ming Lei =
+<tom.leiming@gmail.com> ha scritto:
+>>>=20
+>>> On Wed, Dec 19, 2018 at 2:52 AM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>=20
+>>>> On 12/18/18 5:45 AM, Paolo Valente wrote:
+>>>>> Hi Jens,
+>>>>> sorry for the following silly question, but maybe you can solve =
+very
+>>>>> quickly a doubt for which I'd spend much more time investigating.
+>>>>>=20
+>>>>> While doing some tests with scsi_debug, I've just seen that (at =
+least)
+>>>>> with direct I/O, the maximum number of pending I/O requests (at =
+least
+>>>>> in the I/O schedulers) is equal, unexpectedly, to the queue depth =
+of
+>>>>> the drive and not to
+>>>>> /sys/block/<dev>/queue/nr_requests
+>>>>>=20
+>>>>> For example, after:
+>>>>>=20
+>>>>> sudo modprobe scsi_debug max_queue=3D4
+>>>>>=20
+>>>>> and with fio executed as follows:
+>>>>>=20
+>>>>> job: (g=3D0): rw=3Dread, bs=3D(R) 4096B-4096B, (W) 4096B-4096B, =
+(T) 4096B-4096B, ioengine=3Dlibaio, iodepth=3D20
+>>>>>=20
+>>>>> I get this periodic trace, where four insertions are followed by =
+four
+>>>>> completions, and so on, till the end of the I/O.  This trace is =
+taken
+>>>>> with none, but the result is the same with bfq.
+>>>>>=20
+>>>>>            fio-20275 [001] d...  7560.655213:   8,48   I   R =
+281088 + 8 [fio]
+>>>>>            fio-20275 [001] d...  7560.655288:   8,48   I   R =
+281096 + 8 [fio]
+>>>>>            fio-20275 [001] d...  7560.655311:   8,48   I   R =
+281104 + 8 [fio]
+>>>>>            fio-20275 [001] d...  7560.655331:   8,48   I   R =
+281112 + 8 [fio]
+>>>>>         <idle>-0     [001] d.h.  7560.749868:   8,48   C   R =
+281088 + 8 [0]
+>>>>>         <idle>-0     [001] dNh.  7560.749912:   8,48   C   R =
+281096 + 8 [0]
+>>>>>         <idle>-0     [001] dNh.  7560.749928:   8,48   C   R =
+281104 + 8 [0]
+>>>>>         <idle>-0     [001] dNh.  7560.749934:   8,48   C   R =
+281112 + 8 [0]
+>>>>>            fio-20275 [001] d...  7560.750023:   8,48   I   R =
+281120 + 8 [fio]
+>>>>>            fio-20275 [001] d...  7560.750196:   8,48   I   R =
+281128 + 8 [fio]
+>>>>>            fio-20275 [001] d...  7560.750229:   8,48   I   R =
+281136 + 8 [fio]
+>>>>>            fio-20275 [001] d...  7560.750250:   8,48   I   R =
+281144 + 8 [fio]
+>>>>>         <idle>-0     [001] d.h.  7560.842510:   8,48   C   R =
+281120 + 8 [0]
+>>>>>         <idle>-0     [001] dNh.  7560.842551:   8,48   C   R =
+281128 + 8 [0]
+>>>>>         <idle>-0     [001] dNh.  7560.842556:   8,48   C   R =
+281136 + 8 [0]
+>>>>>         <idle>-0     [001] dNh.  7560.842562:   8,48   C   R =
+281144 + 8 [0]
+>>>>>=20
+>>>>> Shouldn't the total number of pending requests reach
+>>>>> /sys/block/<dev>/queue/nr_requests ?
+>>>>>=20
+>>>>> The latter is of course equal to 8.
+>>>>=20
+>>>> With a scheduler, the depth is what the scheduler provides. You =
+cannot
+>>>> exceed the hardware queue depth in any situation. You just have 8
+>>>> requests available for scheduling, with a max of 4 being inflight =
+on
+>>>> the device side.
+>>>>=20
+>>>> If both were 4, for instance, then you would have nothing to =
+schedule
+>>>> with, as all of them could reside on the hardware side. That's why
+>>>> the scheduler defaults to twice the hardware queue depth.
+>>>=20
+>>> The default twice to hw queue depth might not be reasonable for =
+multi LUN.
+>>>=20
+>>> Maybe it should be set twice of sdev->queue_depth for SCSI or
+>>> hw queue depth/hctx->nr_active.  But either way may become =
+complicated
+>>> because both can be adjusted runtime.
+>>>=20
+>>=20
+>> Could you please explain why it is not working (if it is not working)
+>> in my example, where there should be only one LUN?
+>=20
+> I didn't say it isn't working, and I mean it isn't perfect.
+>=20
+> The hardware queue depth is host-wide, that means it is shared by all =
+LUNs.
+> Of course, lots of LUNs may be attached to one single HBA. You can =
+setup
+> this setting via 'modprobe scsi_debug max_luns=3D16 max_queue=3D4' =
+easily,
+> then all 4 LUNs share the 4 tags.
+>=20
 
-> 
-> >> In bch_extent_bad(), when expensive_debug_checks is off, it would
-> >> treat the dirty key as good even it is stale keys, and it would
-> >> cause bellow probelms:
-> >> A) In read_dirty() it would cause machine crash:
-> >>    BUG_ON(ptr_stale(dc->disk.c, &w->key, 0));
-> >> B) It could be worse when reads hits stale dirty keys, it would
-> >>    read old incorrect data.
-> 
-> >Neither of these can happen until after journal replay is finished. Prior to
-> >journal replay we expect to find stale dirty keys - if we find any after journal
-> >replay then it's indicative of a real bug.
-> As I said previous, since no journal writes after inserting a replace key in
-> writeback, so this issue has nothing to do with journal.
-> 
-> This is a real problem in my environment, after running IO sometimes, I turn off
-> the power suddenly,  then turn on the power, and the machine crash in
-> read_dirty() due to the stale && dirty keys.
+Ok, so you are talking about the opposite problem, in a sense.  What
+I'm saying here is that tags had to be 8, as Jens pointed out, but
+they are 4.
+
+Thanks,
+Paolo
+
+> Thanks,
+> Ming Lei
+
