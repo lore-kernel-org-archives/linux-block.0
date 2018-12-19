@@ -2,195 +2,130 @@ Return-Path: <SRS0=7Y8O=O4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	T_MIXED_ES autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1453C43387
-	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 16:35:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4611BC43387
+	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 18:34:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A0F06218AE
-	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 16:35:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1536F20672
+	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 18:34:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="SpXom1Q4"
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="0+l4rs83"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728872AbeLSQff (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Dec 2018 11:35:35 -0500
-Received: from mail-io1-f65.google.com ([209.85.166.65]:40116 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728741AbeLSQff (ORCPT
+        id S1727383AbeLSSed (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Dec 2018 13:34:33 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:35946 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728106AbeLSSed (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Dec 2018 11:35:35 -0500
-Received: by mail-io1-f65.google.com with SMTP id a11so1452704ioq.7
-        for <linux-block@vger.kernel.org>; Wed, 19 Dec 2018 08:35:34 -0800 (PST)
+        Wed, 19 Dec 2018 13:34:33 -0500
+Received: by mail-pl1-f195.google.com with SMTP id g9so9835063plo.3
+        for <linux-block@vger.kernel.org>; Wed, 19 Dec 2018 10:34:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=aep8MeD8BM+nDc1aF+jYs9lklX8fOyAMCTjO7jeigFM=;
-        b=SpXom1Q47OyniKRmI9WH6ElLrsWFOmSs6otFQrRffxbI2LDZT0t60AEFrCXm6jH96b
-         qzQlgXpn1f0qyns50Jd6idvlF/YOdgicw8fHZnqhonFVhRjqgormv3cFqIYStvS/jCMk
-         ymbDQwTLlAC4KEU36kG28e8INXSfydOTxiHb8pKmolItXi1DFgrpnjILuFxi67X4WWHp
-         xMy3PZOcZhTtyhlGGhlHKWWLWodrcptYeiqsXH3omei7eGFfheutpG4S/adNjj6af2GG
-         PbBG6shQgAMJZ+RoTW/ZS16VFyR8eB2s1kWMu6nnEeBuK8uFPH35F1iEGJChbdaSQJRf
-         0q3w==
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=NMluk1dSaqOVHHQuIeq1XElkHO19xJV52Y8Bn6Z1Hug=;
+        b=0+l4rs835VLEFaZwcKa62ve5kneEGVp731hXUQGMC1aufAjLg8Z+u2D+07RWrQ0SSB
+         D0MwJF2bgJE7kZueJYdI8XLWIBvAwoL3GM7UUxF8Yfy37a6xc4TY++8RBQXTDR1SWrKH
+         mxtxGr1DwX5AjA0REOE7i02uhZKaKoN7PCfx/OiOSykrpz09KHOob5gvuYgVoIY/8ZeK
+         J4WUSsWkNI3O0LZw/GWQrJs+k9/HPh7x36wqQPP09ZsG7MGUDyIVnUm7FjDc4wm0xoHm
+         PC4sncGB+ivsIZNaV7py/2rRe4qqArVP9zgHre0kxM/HHZ4x76DOkeA/o1K3juERZR2h
+         xn8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=aep8MeD8BM+nDc1aF+jYs9lklX8fOyAMCTjO7jeigFM=;
-        b=IH2tNe11zcklBEJcKYf8PLe80jrg7yVKvcTdgM5s4KwAxXD/S0q8N61cwePf+dkV7U
-         Wk8zfZOa0s2dUUfmNwErwQpV1Y3Nem4lMXjUtV100dGDEOrsLcrgChDQdC5C1o9Tetc9
-         NfMRxFjvk8SXDbVAxTzjdaPJKkhCLQITx0jbFOyQQ/+4Pdw2EmPscJKzxNeBEjHLOl7G
-         9eDVeW3POF2JcqQla0QjxQ3z55yzDrMGOGEM6KF3mzmaR24JpWaXZOgbUQLTb0pFzuqf
-         It2gt2/LjghS6xWnvNIM5HWfJD+iEgwL0ldoYH4j0dKUZjNWIXqlWkqwsQs7Furiq12o
-         8Pqw==
-X-Gm-Message-State: AA+aEWaqQ5fH59UyfbbNz0ErYnKftuq3YckB0ZRY8R+HpTRJ2WZVPBWR
-        BRrr/v3+qwafKBxIHEehfj2MNw==
-X-Google-Smtp-Source: AFSGD/VGL9+SRqtX2flOyRzNYrnvw/wdbMgubgjkEq9ztM9eWRlE/82B1Uextwp/m+IvPdSmYK4ndA==
-X-Received: by 2002:a6b:b717:: with SMTP id h23mr17601227iof.14.1545237334303;
-        Wed, 19 Dec 2018 08:35:34 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id c102sm3553585itd.38.2018.12.19.08.35.32
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 19 Dec 2018 08:35:33 -0800 (PST)
-Subject: Re: [PATCH] block: save irq state in blkg_lookup_create()
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Mike Snitzer <snitzer@redhat.com>,
-        Dennis Zhou <dennis@kernel.org>
-References: <20181219162915.23512-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <af58246a-67a4-4d55-a846-b4da6adcfd9c@kernel.dk>
-Date:   Wed, 19 Dec 2018 09:35:32 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=NMluk1dSaqOVHHQuIeq1XElkHO19xJV52Y8Bn6Z1Hug=;
+        b=b9nNkj3IVVs0Ii9ZJ5W5M1CEVsEMoiUypcc1n0U7NsPMe/T7FUP2m8xTVJvtcaADKM
+         KJAhM0UhIrYEL7VMwDxtoEm+RBCUa31uaz8Uf5LGm9ojWc8CF3f0+NF0Qc8U8GIyJH9D
+         DF7fPrJCIvqox73lBZhfuvP5/1lZtmR+HywXH+ckOFLN/hQfYMyVgA6njFVZH0AkPu6P
+         n+a/GH/fWL0Z/NtkjM0AhmtqCe7G8shHEbUo//7vSquZhT26WoxwBJZZot1FyuCrSLzp
+         zypvKar5bNFOqZvyXlp9eiScvKNZ2hG0nAH7B5TfSZztv9AjM/bLGxOiDsj+VeO5adBW
+         tJJA==
+X-Gm-Message-State: AA+aEWYv/h5kt9Vfg1AarPDW11g8so+hHecR/6c7B5NKtS146x0LWahd
+        C6oyYVNWwrw6m3oKuBBe1a4FRA==
+X-Google-Smtp-Source: AFSGD/U5ADhQyfYegzyDCtylg+iKPd4somQAn/M7F0vuE4Og7a528mBg7pzQlHeimiescqTku2xalg==
+X-Received: by 2002:a17:902:4025:: with SMTP id b34mr21520478pld.181.1545244472042;
+        Wed, 19 Dec 2018 10:34:32 -0800 (PST)
+Received: from vader ([2620:10d:c090:180::1:81e])
+        by smtp.gmail.com with ESMTPSA id w5sm23402562pfn.89.2018.12.19.10.34.31
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 19 Dec 2018 10:34:31 -0800 (PST)
+Date:   Wed, 19 Dec 2018 10:34:30 -0800
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Dennis Zhou <dennis@kernel.org>
+Cc:     Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>,
+        kernel-team@fb.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH blktests 1/2] blktests: split out cgroup2 controller and
+ file check
+Message-ID: <20181219183430.GA11852@vader>
+References: <20181212230959.69975-1-dennis@kernel.org>
+ <20181212230959.69975-2-dennis@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20181219162915.23512-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181212230959.69975-2-dennis@kernel.org>
+User-Agent: Mutt/1.11.1 (2018-12-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/19/18 9:29 AM, Ming Lei wrote:
-> blkg_lookup_create() may be called from pool_map() in which
-> irq state is saved, so we have to do that in blkg_lookup_create().
+On Wed, Dec 12, 2018 at 06:09:58PM -0500, Dennis Zhou wrote:
+> This is a prep patch for a new test that will race blkg association and
+> request_queue cleanup. As blkg association is a underlying cgroup io
+> controller feature, we need the ability to check if the controller is
+> available.
 > 
-> Otherwise, the following lockdep warning can be triggered:
+> Signed-off-by: Dennis Zhou <dennis@kernel.org>
+> ---
+>  common/cgroup | 18 +++++++++++++-----
+>  1 file changed, 13 insertions(+), 5 deletions(-)
 > 
-> [  104.258537] ================================
-> [  104.259129] WARNING: inconsistent lock state
-> [  104.259725] 4.20.0-rc6+ #545 Not tainted
-> [  104.260268] --------------------------------
-> [  104.260865] inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
-> [  104.261727] swapper/49/0 [HC0[0]:SC1[1]:HE0:SE0] takes:
-> [  104.262444] 00000000db365b5d (&(&pool->lock)->rlock#3){+.?.}, at: thin_endio+0xcf/0x2a3 [dm_thin_pool]
-> [  104.263747] {SOFTIRQ-ON-W} state was registered at:
-> [  104.264417]   _raw_spin_unlock_irq+0x29/0x4c
-> [  104.265014]   blkg_lookup_create+0xdc/0xe6
-> [  104.265609]   bio_associate_blkg_from_css+0xd3/0x13f
-> [  104.266312]   bio_associate_blkg+0x15a/0x1bb
-> [  104.266913]   pool_map+0xe8/0x103 [dm_thin_pool]
-> [  104.267572]   __map_bio+0x98/0x29c [dm_mod]
-> [  104.268162]   __split_and_process_non_flush+0x29e/0x306 [dm_mod]
-> [  104.269003]   __split_and_process_bio+0x16a/0x25b [dm_mod]
-> [  104.269971]   __dm_make_request.isra.14+0xdc/0x124 [dm_mod]
-> [  104.270973]   generic_make_request+0x3f5/0x68b
-> [  104.271676]   process_prepared_mapping+0x166/0x1ef [dm_thin_pool]
-> [  104.272531]   schedule_zero+0x239/0x273 [dm_thin_pool]
-> [  104.273245]   process_cell+0x60c/0x6f1 [dm_thin_pool]
-> [  104.273967]   do_worker+0x60c/0xca8 [dm_thin_pool]
-> [  104.274635]   process_one_work+0x4eb/0x834
-> [  104.275203]   worker_thread+0x318/0x484
-> [  104.275740]   kthread+0x1d1/0x1e1
-> [  104.276203]   ret_from_fork+0x3a/0x50
-> [  104.276714] irq event stamp: 170003
-> [  104.277201] hardirqs last  enabled at (170002): [<ffffffff81bcc33e>] _raw_spin_unlock_irqrestore+0x44/0x6b
-> [  104.278535] hardirqs last disabled at (170003): [<ffffffff81bcc1ad>] _raw_spin_lock_irqsave+0x20/0x55
-> [  104.280273] softirqs last  enabled at (169978): [<ffffffff810d13d4>] irq_enter+0x4c/0x73
-> [  104.281617] softirqs last disabled at (169979): [<ffffffff810d1479>] irq_exit+0x7e/0x11d
-> [  104.282744]
-> [  104.282744] other info that might help us debug this:
-> [  104.283640]  Possible unsafe locking scenario:
-> [  104.283640]
-> [  104.284452]        CPU0
-> [  104.284803]        ----
-> [  104.285150]   lock(&(&pool->lock)->rlock#3);
-> [  104.285762]   <Interrupt>
-> [  104.286130]     lock(&(&pool->lock)->rlock#3);
-> [  104.286750]
-> [  104.286750]  *** DEADLOCK ***
-> [  104.286750]
-> [  104.287564] no locks held by swapper/49/0.
-> [  104.288129]
-> [  104.288129] stack backtrace:
-> [  104.288738] CPU: 49 PID: 0 Comm: swapper/49 Not tainted 4.20.0-rc6+ #545
-> [  104.289700] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.10.2-2.fc27 04/01/2014
-> [  104.290858] Call Trace:
-> [  104.291204]  <IRQ>
-> [  104.291502]  dump_stack+0x9a/0xe6
-> [  104.291968]  mark_lock+0x56c/0x7a6
-> [  104.292442]  ? check_usage_backwards+0x209/0x209
-> [  104.293086]  __lock_acquire+0x400/0x15bf
-> [  104.293662]  ? check_chain_key+0x150/0x1aa
-> [  104.294236]  lock_acquire+0x1a6/0x1e3
-> [  104.294768]  ? thin_endio+0xcf/0x2a3 [dm_thin_pool]
-> [  104.295444]  ? _raw_spin_unlock_irqrestore+0x44/0x6b
-> [  104.296143]  ? process_prepared_discard_fail+0x36/0x36 [dm_thin_pool]
-> [  104.297031]  _raw_spin_lock_irqsave+0x46/0x55
-> [  104.297659]  ? thin_endio+0xcf/0x2a3 [dm_thin_pool]
-> [  104.298335]  thin_endio+0xcf/0x2a3 [dm_thin_pool]
-> [  104.298997]  ? process_prepared_discard_fail+0x36/0x36 [dm_thin_pool]
-> [  104.299886]  ? check_flags+0x20a/0x20a
-> [  104.300408]  ? lock_acquire+0x1a6/0x1e3
-> [  104.300954]  ? process_prepared_discard_fail+0x36/0x36 [dm_thin_pool]
-> [  104.301865]  clone_endio+0x1bb/0x22d [dm_mod]
-> [  104.302491]  ? disable_write_zeroes+0x20/0x20 [dm_mod]
-> [  104.303200]  ? bio_disassociate_blkg+0xc6/0x15f
-> [  104.303836]  ? bio_endio+0x2b2/0x2da
-> [  104.304349]  clone_endio+0x1f3/0x22d [dm_mod]
-> [  104.304978]  ? disable_write_zeroes+0x20/0x20 [dm_mod]
-> [  104.305709]  ? bio_disassociate_blkg+0xc6/0x15f
-> [  104.306333]  ? bio_endio+0x2b2/0x2da
-> [  104.306853]  clone_endio+0x1f3/0x22d [dm_mod]
-> [  104.307476]  ? disable_write_zeroes+0x20/0x20 [dm_mod]
-> [  104.308185]  ? bio_disassociate_blkg+0xc6/0x15f
-> [  104.308817]  ? bio_endio+0x2b2/0x2da
-> [  104.309319]  blk_update_request+0x2de/0x4cc
-> [  104.309927]  blk_mq_end_request+0x2a/0x183
-> [  104.310498]  blk_done_softirq+0x16a/0x1a6
-> [  104.311051]  ? blk_softirq_cpu_dead+0xe2/0xe2
-> [  104.311653]  ? __lock_is_held+0x2a/0x87
-> [  104.312186]  __do_softirq+0x250/0x4e8
-> [  104.312705]  irq_exit+0x7e/0x11d
-> [  104.313157]  call_function_single_interrupt+0xf/0x20
-> [  104.313860]  </IRQ>
-> [  104.314163] RIP: 0010:native_safe_halt+0x2/0x3
-> [  104.314792] Code: 63 02 df f0 83 44 24 fc 00 48 89 df e8 cc 3f 7a ff 48 8b 03 a8 08 74 0b 65 81 25 9d 31 45 7e ff ff ff 7f 5b 5d 41 5c c3 fb f4 <c3> f4 c3 0f 1f 44 00 00 41 56 41 55 41 54 55 53 e8 a2 0d 5c ff e8
-> [  104.317339] RSP: 0018:ffff888106c9fdc0 EFLAGS: 00000246 ORIG_RAX: ffffffffffffff04
-> [  104.318390] RAX: 1ffff11020d92100 RBX: 0000000000000000 RCX: ffffffff81159ac7
-> [  104.319366] RDX: 1ffffffff05d5e69 RSI: 0000000000000007 RDI: ffff888106c90d1c
-> [  104.320339] RBP: 0000000000000000 R08: dffffc0000000000 R09: 0000000000000001
-> [  104.321313] R10: ffffed1025d57ba0 R11: ffffed1025d57b9f R12: 1ffff11020d93fbf
-> [  104.322328] R13: 0000000000000031 R14: ffff888106c90040 R15: 0000000000000000
-> [  104.323307]  ? lockdep_hardirqs_on+0x26b/0x278
-> [  104.323927]  default_idle+0xd9/0x1a8
-> [  104.324427]  do_idle+0x162/0x2b2
-> [  104.324891]  ? arch_cpu_idle_exit+0x28/0x28
-> [  104.325467]  ? mark_held_locks+0x28/0x7f
-> [  104.326031]  ? _raw_spin_unlock_irqrestore+0x44/0x6b
-> [  104.326719]  cpu_startup_entry+0x1d/0x1f
-> [  104.327261]  start_secondary+0x2cb/0x308
-> [  104.327806]  ? set_cpu_sibling_map+0x8a3/0x8a3
-> [  104.328421]  secondary_startup_64+0xa4/0xb0
+> diff --git a/common/cgroup b/common/cgroup
+> index d445093..3481458 100644
+> --- a/common/cgroup
+> +++ b/common/cgroup
+> @@ -37,19 +37,27 @@ _have_cgroup2()
+>  	return 0
+>  }
+>  
+> -_have_cgroup2_controller_file()
+> +_have_cgroup2_controller()
+>  {
+> -	_have_cgroup2 || return 1
+> -
+>  	local controller="$1"
+> -	local file="$2"
+> -	local dir
+> +
+> +	_have_cgroup2 || return 1
+>  
+>  	dir="$(_cgroup2_base_dir)"
+> +
+>  	if ! grep -q "$controller" "$dir/cgroup.controllers"; then
+>  		SKIP_REASON="no support for $controller cgroup controller; if it is enabled, you may need to boot with cgroup_no_v1=$controller"
+>  		return 1
+>  	fi
+> +}
+> +
+> +_have_cgroup2_controller_file()
+> +{
+> +	local controller="$1"
+> +	local file="$2"
+> +	local dir
+> +
+> +	_have_cgroup_2_controller "$controller" || return 1
 
-Thanks Ming, definitely looks correct. I took a look at the other locking
-in there, but nothing sticks out as being called from completion context
-(and hence needing _save).
+This should be _have_cgroup2_controller. I'll fix it when I apply it.
 
--- 
-Jens Axboe
-
+>  
+>  	mkdir "$dir/blktests"
+>  	echo "+$controller" > "$dir/cgroup.subtree_control"
+> -- 
+> 2.17.1
+> 
