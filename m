@@ -2,206 +2,207 @@ Return-Path: <SRS0=7Y8O=O4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CFBCC43387
-	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 11:45:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7166C43387
+	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 13:21:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 610F4217D7
-	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 11:45:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1A6021873
+	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 13:21:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="H39zhfuH"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="GIg13CaF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728043AbeLSLpo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Dec 2018 06:45:44 -0500
-Received: from mail-wm1-f47.google.com ([209.85.128.47]:37030 "EHLO
-        mail-wm1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726774AbeLSLpo (ORCPT
+        id S1727111AbeLSNV3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Dec 2018 08:21:29 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:47502 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726833AbeLSNV2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Dec 2018 06:45:44 -0500
-Received: by mail-wm1-f47.google.com with SMTP id g67so6078169wmd.2
-        for <linux-block@vger.kernel.org>; Wed, 19 Dec 2018 03:45:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Yjux7Fen1yl830Ha2uJsucwIYuMbormI6R5scWlTygc=;
-        b=H39zhfuHS30yqTzsLI1gE1YP86TTr6pOD+sbGbNnaWJ4z4jWuK/gQ7l3Y5yUpeYn2P
-         feQdQB+eBnLAXekP5XlOmxTRqD66TcMItWh3BPmhS2MYCwhzfGQtG3ZKPnTq00HDYY0t
-         QuJ0J77/VqS3LuI5gNYMkOpwzaBGzJnTjOG1A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=Yjux7Fen1yl830Ha2uJsucwIYuMbormI6R5scWlTygc=;
-        b=qhwjsjgrvPvIbOY9zse/dItIw7FioBTGfivtlBRxFHOq41nFcsdSBo9bhDmz1OWkvz
-         GRp/zsU4kc2T+P5Xdrg0lGgBOGbC8axJB7Wxo1wIJsHJqZINicBVygknn1VEXPof7FBi
-         HO140t+6Ud+Q0ang7O+zyvnvGdcNVKCEdLPa4p6ZuPhE+F83dOdwK4soFBTUFZUFajQL
-         aUd9Onq/SKConnm9kOXB6N11AA/lMgyMS2ENkiTFmZItC9OeK6SbDzw3xp6cI23naSGv
-         TsTrVWScW1Llaca1AIZcdY1C/vEMmt+CS3kUxNbHFIullneDjxUlPO67o0BQg20QXGVI
-         G/OA==
-X-Gm-Message-State: AA+aEWaB1bQspxQr6Fl4zOspHJ+92pvBQF4Tr45NxOMGiITvuvIeM9VZ
-        mbb/tn0wR+oCsUx/jiwG+cEaJg==
-X-Google-Smtp-Source: AFSGD/WiNxAm+dYx2P6gbyMslkDW1Va+PD9TEExUTlfal2svjxw1ihunTObs792DJdVdBw7uksYE4Q==
-X-Received: by 2002:a1c:99ce:: with SMTP id b197mr7158013wme.75.1545219941911;
-        Wed, 19 Dec 2018 03:45:41 -0800 (PST)
-Received: from wifi-122_dhcprange-7.wifi.unimo.it (wifi-122_dhcprange-7.wifi.unimo.it. [155.185.122.7])
-        by smtp.gmail.com with ESMTPSA id n5sm8064459wrr.94.2018.12.19.03.45.40
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 19 Dec 2018 03:45:41 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: confusion about nr of pending I/O requests
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <CACVXFVO1ZE_8e=DDBanm8id+=672BOs5nt6AJtnztt48GZ1vnw@mail.gmail.com>
-Date:   Wed, 19 Dec 2018 12:45:38 +0100
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Mark Brown <broonie@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <197CF8DC-F4FD-47C6-8E62-5B8257173D6E@linaro.org>
-References: <E0E52FD0-1020-4F5B-9AC8-F48BDFE142C0@linaro.org>
- <4db2cb0f-e500-44da-e85d-ed417b74dae5@kernel.dk>
- <CACVXFVML3ZJ0ezsRBC6T_6zbJHqXRFXVQJxVhsK9spKEfgKipQ@mail.gmail.com>
- <80B060E9-48E9-45D3-9456-64E94947F048@linaro.org>
- <CACVXFVO1ZE_8e=DDBanm8id+=672BOs5nt6AJtnztt48GZ1vnw@mail.gmail.com>
-To:     Ming Lei <tom.leiming@gmail.com>
-X-Mailer: Apple Mail (2.3445.102.3)
+        Wed, 19 Dec 2018 08:21:28 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wBJDIV1e040500;
+        Wed, 19 Dec 2018 13:21:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2018-07-02;
+ bh=euAumByCSm7kN28p5B2dIhcyTedrVQCoKnMXG35mlOY=;
+ b=GIg13CaFsilx7OmpNMnJh7O/GAJ2azdeQTkUeb4/TK7K+SHdfqug6ED8d3nbVynqXgch
+ bRuFapV84DYFAcwYtnRX8fuOODikbcR2reYQpdsuAIJXekj2ei3JcGJ2GL98k3HVQHav
+ t2tmVhnABbKpiflTNnuaLzjASuNopSSFSnaZ1hyhMTA83i7EsyrHXS+EX2x5QYjKrJRa
+ C2888uunm6dW4H1LLR5A7U/va+KjjZCvcniYREMLsx9osQpGvu4biZqQUfgkuABTZ37L
+ MtUrBWGkeAZQ9WTcXP9SDaIgHXy8RQ1bgS+ZQVXz5GX8CpV56Ru/Ub8ouCJ24eEvVddy HA== 
+Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
+        by userp2120.oracle.com with ESMTP id 2pfn1yrh8e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Dec 2018 13:21:19 +0000
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id wBJDLItJ024268
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Dec 2018 13:21:18 GMT
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id wBJDLHaS031163;
+        Wed, 19 Dec 2018 13:21:17 GMT
+Received: from linux.cn.oracle.com (/10.182.71.9)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 19 Dec 2018 05:21:17 -0800
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     konrad.wilk@oracle.com, roger.pau@citrix.com, axboe@kernel.dk,
+        paul.durrant@citrix.com
+Subject: [PATCH v3 1/1] xen/blkback: rework connect_ring() to avoid inconsistent xenstore 'ring-page-order' set by malicious blkfront
+Date:   Wed, 19 Dec 2018 21:23:02 +0800
+Message-Id: <1545225782-31403-1-git-send-email-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.7.4
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9111 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1812190115
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+The xenstore 'ring-page-order' is used globally for each blkback queue and
+therefore should be read from xenstore only once. However, it is obtained
+in read_per_ring_refs() which might be called multiple times during the
+initialization of each blkback queue.
 
+If the blkfront is malicious and the 'ring-page-order' is set in different
+value by blkfront every time before blkback reads it, this may end up at
+the "WARN_ON(i != (XEN_BLKIF_REQS_PER_PAGE * blkif->nr_ring_pages));" in
+xen_blkif_disconnect() when frontend is destroyed.
 
-> Il giorno 19 dic 2018, alle ore 11:32, Ming Lei =
-<tom.leiming@gmail.com> ha scritto:
->=20
-> On Wed, Dec 19, 2018 at 2:18 PM Paolo Valente =
-<paolo.valente@linaro.org> wrote:
->>=20
->>=20
->>=20
->>> Il giorno 19 dic 2018, alle ore 04:45, Ming Lei =
-<tom.leiming@gmail.com> ha scritto:
->>>=20
->>> On Wed, Dec 19, 2018 at 2:52 AM Jens Axboe <axboe@kernel.dk> wrote:
->>>>=20
->>>> On 12/18/18 5:45 AM, Paolo Valente wrote:
->>>>> Hi Jens,
->>>>> sorry for the following silly question, but maybe you can solve =
-very
->>>>> quickly a doubt for which I'd spend much more time investigating.
->>>>>=20
->>>>> While doing some tests with scsi_debug, I've just seen that (at =
-least)
->>>>> with direct I/O, the maximum number of pending I/O requests (at =
-least
->>>>> in the I/O schedulers) is equal, unexpectedly, to the queue depth =
-of
->>>>> the drive and not to
->>>>> /sys/block/<dev>/queue/nr_requests
->>>>>=20
->>>>> For example, after:
->>>>>=20
->>>>> sudo modprobe scsi_debug max_queue=3D4
->>>>>=20
->>>>> and with fio executed as follows:
->>>>>=20
->>>>> job: (g=3D0): rw=3Dread, bs=3D(R) 4096B-4096B, (W) 4096B-4096B, =
-(T) 4096B-4096B, ioengine=3Dlibaio, iodepth=3D20
->>>>>=20
->>>>> I get this periodic trace, where four insertions are followed by =
-four
->>>>> completions, and so on, till the end of the I/O.  This trace is =
-taken
->>>>> with none, but the result is the same with bfq.
->>>>>=20
->>>>>            fio-20275 [001] d...  7560.655213:   8,48   I   R =
-281088 + 8 [fio]
->>>>>            fio-20275 [001] d...  7560.655288:   8,48   I   R =
-281096 + 8 [fio]
->>>>>            fio-20275 [001] d...  7560.655311:   8,48   I   R =
-281104 + 8 [fio]
->>>>>            fio-20275 [001] d...  7560.655331:   8,48   I   R =
-281112 + 8 [fio]
->>>>>         <idle>-0     [001] d.h.  7560.749868:   8,48   C   R =
-281088 + 8 [0]
->>>>>         <idle>-0     [001] dNh.  7560.749912:   8,48   C   R =
-281096 + 8 [0]
->>>>>         <idle>-0     [001] dNh.  7560.749928:   8,48   C   R =
-281104 + 8 [0]
->>>>>         <idle>-0     [001] dNh.  7560.749934:   8,48   C   R =
-281112 + 8 [0]
->>>>>            fio-20275 [001] d...  7560.750023:   8,48   I   R =
-281120 + 8 [fio]
->>>>>            fio-20275 [001] d...  7560.750196:   8,48   I   R =
-281128 + 8 [fio]
->>>>>            fio-20275 [001] d...  7560.750229:   8,48   I   R =
-281136 + 8 [fio]
->>>>>            fio-20275 [001] d...  7560.750250:   8,48   I   R =
-281144 + 8 [fio]
->>>>>         <idle>-0     [001] d.h.  7560.842510:   8,48   C   R =
-281120 + 8 [0]
->>>>>         <idle>-0     [001] dNh.  7560.842551:   8,48   C   R =
-281128 + 8 [0]
->>>>>         <idle>-0     [001] dNh.  7560.842556:   8,48   C   R =
-281136 + 8 [0]
->>>>>         <idle>-0     [001] dNh.  7560.842562:   8,48   C   R =
-281144 + 8 [0]
->>>>>=20
->>>>> Shouldn't the total number of pending requests reach
->>>>> /sys/block/<dev>/queue/nr_requests ?
->>>>>=20
->>>>> The latter is of course equal to 8.
->>>>=20
->>>> With a scheduler, the depth is what the scheduler provides. You =
-cannot
->>>> exceed the hardware queue depth in any situation. You just have 8
->>>> requests available for scheduling, with a max of 4 being inflight =
-on
->>>> the device side.
->>>>=20
->>>> If both were 4, for instance, then you would have nothing to =
-schedule
->>>> with, as all of them could reside on the hardware side. That's why
->>>> the scheduler defaults to twice the hardware queue depth.
->>>=20
->>> The default twice to hw queue depth might not be reasonable for =
-multi LUN.
->>>=20
->>> Maybe it should be set twice of sdev->queue_depth for SCSI or
->>> hw queue depth/hctx->nr_active.  But either way may become =
-complicated
->>> because both can be adjusted runtime.
->>>=20
->>=20
->> Could you please explain why it is not working (if it is not working)
->> in my example, where there should be only one LUN?
->=20
-> I didn't say it isn't working, and I mean it isn't perfect.
->=20
-> The hardware queue depth is host-wide, that means it is shared by all =
-LUNs.
-> Of course, lots of LUNs may be attached to one single HBA. You can =
-setup
-> this setting via 'modprobe scsi_debug max_luns=3D16 max_queue=3D4' =
-easily,
-> then all 4 LUNs share the 4 tags.
->=20
+This patch reworks connect_ring() to read xenstore 'ring-page-order' only
+once.
 
-Ok, so you are talking about the opposite problem, in a sense.  What
-I'm saying here is that tags had to be 8, as Jens pointed out, but
-they are 4.
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+---
+Changed since v1:
+  * change the order of xenstore read in read_per_ring_refs
+  * use xenbus_read_unsigned() in connect_ring()
 
-Thanks,
-Paolo
+Changed since v2:
+  * simplify the condition check as "(err != 1 && nr_grefs > 1)"
+  * avoid setting err as -EINVAL to remove extra one line of code
 
-> Thanks,
-> Ming Lei
+ drivers/block/xen-blkback/xenbus.c | 74 +++++++++++++++++++++-----------------
+ 1 file changed, 41 insertions(+), 33 deletions(-)
+
+diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+index a4bc74e..dfea3a4 100644
+--- a/drivers/block/xen-blkback/xenbus.c
++++ b/drivers/block/xen-blkback/xenbus.c
+@@ -926,7 +926,7 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
+ 	int err, i, j;
+ 	struct xen_blkif *blkif = ring->blkif;
+ 	struct xenbus_device *dev = blkif->be->dev;
+-	unsigned int ring_page_order, nr_grefs, evtchn;
++	unsigned int nr_grefs, evtchn;
+ 
+ 	err = xenbus_scanf(XBT_NIL, dir, "event-channel", "%u",
+ 			  &evtchn);
+@@ -936,43 +936,36 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
+ 		return err;
+ 	}
+ 
+-	err = xenbus_scanf(XBT_NIL, dev->otherend, "ring-page-order", "%u",
+-			  &ring_page_order);
++	nr_grefs = blkif->nr_ring_pages;
++	WARN_ON(!nr_grefs);
++
++	for (i = 0; i < nr_grefs; i++) {
++		char ring_ref_name[RINGREF_NAME_LEN];
++
++		snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref%u", i);
++		err = xenbus_scanf(XBT_NIL, dir, ring_ref_name,
++				   "%u", &ring_ref[i]);
++
++		if (err != 1 && nr_grefs > 1) {
++			xenbus_dev_fatal(dev, err, "reading %s/%s",
++					 dir, ring_ref_name);
++			return -EINVAL;
++		}
++
++		if (err != 1)
++			break;
++	}
++
+ 	if (err != 1) {
+-		err = xenbus_scanf(XBT_NIL, dir, "ring-ref", "%u", &ring_ref[0]);
++		WARN_ON(nr_grefs != 1);
++
++		err = xenbus_scanf(XBT_NIL, dir, "ring-ref", "%u",
++				   &ring_ref[0]);
+ 		if (err != 1) {
+-			err = -EINVAL;
+ 			xenbus_dev_fatal(dev, err, "reading %s/ring-ref", dir);
+-			return err;
+-		}
+-		nr_grefs = 1;
+-	} else {
+-		unsigned int i;
+-
+-		if (ring_page_order > xen_blkif_max_ring_order) {
+-			err = -EINVAL;
+-			xenbus_dev_fatal(dev, err, "%s/request %d ring page order exceed max:%d",
+-					 dir, ring_page_order,
+-					 xen_blkif_max_ring_order);
+-			return err;
+-		}
+-
+-		nr_grefs = 1 << ring_page_order;
+-		for (i = 0; i < nr_grefs; i++) {
+-			char ring_ref_name[RINGREF_NAME_LEN];
+-
+-			snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref%u", i);
+-			err = xenbus_scanf(XBT_NIL, dir, ring_ref_name,
+-					   "%u", &ring_ref[i]);
+-			if (err != 1) {
+-				err = -EINVAL;
+-				xenbus_dev_fatal(dev, err, "reading %s/%s",
+-						 dir, ring_ref_name);
+-				return err;
+-			}
++			return -EINVAL;
+ 		}
+ 	}
+-	blkif->nr_ring_pages = nr_grefs;
+ 
+ 	for (i = 0; i < nr_grefs * XEN_BLKIF_REQS_PER_PAGE; i++) {
+ 		req = kzalloc(sizeof(*req), GFP_KERNEL);
+@@ -1030,6 +1023,7 @@ static int connect_ring(struct backend_info *be)
+ 	size_t xspathsize;
+ 	const size_t xenstore_path_ext_size = 11; /* sufficient for "/queue-NNN" */
+ 	unsigned int requested_num_queues = 0;
++	unsigned int ring_page_order;
+ 
+ 	pr_debug("%s %s\n", __func__, dev->otherend);
+ 
+@@ -1075,6 +1069,20 @@ static int connect_ring(struct backend_info *be)
+ 		 be->blkif->nr_rings, be->blkif->blk_protocol, protocol,
+ 		 pers_grants ? "persistent grants" : "");
+ 
++	ring_page_order = xenbus_read_unsigned(dev->otherend,
++					       "ring-page-order", 0);
++
++	if (ring_page_order > xen_blkif_max_ring_order) {
++		err = -EINVAL;
++		xenbus_dev_fatal(dev, err,
++				 "requested ring page order %d exceed max:%d",
++				 ring_page_order,
++				 xen_blkif_max_ring_order);
++		return err;
++	}
++
++	be->blkif->nr_ring_pages = 1 << ring_page_order;
++
+ 	if (be->blkif->nr_rings == 1)
+ 		return read_per_ring_refs(&be->blkif->rings[0], dev->otherend);
+ 	else {
+-- 
+2.7.4
 
