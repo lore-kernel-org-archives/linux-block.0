@@ -2,98 +2,89 @@ Return-Path: <SRS0=7Y8O=O4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B52D1C43387
-	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 04:32:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F1A5C43387
+	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 04:39:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 81ACF21850
-	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 04:32:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5028F21873
+	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 04:39:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YhA8wkhI"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Iz5021rU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727144AbeLSEc1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 18 Dec 2018 23:32:27 -0500
-Received: from mail-pf1-f172.google.com ([209.85.210.172]:33969 "EHLO
-        mail-pf1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726704AbeLSEc1 (ORCPT
+        id S1726920AbeLSEjy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 18 Dec 2018 23:39:54 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:35480 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726704AbeLSEjy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 18 Dec 2018 23:32:27 -0500
-Received: by mail-pf1-f172.google.com with SMTP id h3so9230454pfg.1
-        for <linux-block@vger.kernel.org>; Tue, 18 Dec 2018 20:32:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=Eba0mjjypEjbuZ72sKaUTFdFDAsmCoihdXRZ8dEThkI=;
-        b=YhA8wkhIIe2W4UibcP4akei767FvNf8BezcR0iVISuxGQAZBfrg3W5Cunfza2aW+nk
-         N0ZbkuQEIAhadKC5So+RoMQBJOWOhEW4mDByb5CEzIGRSlO8lgvTG/Efv4g/PD66Qf63
-         imckUBwSbbbG6YFxIVbiST3WwQNcxuXQvS4iDNWdZeB592UQnSKZmhZ51zn7JjFm3/K2
-         eo8rQS//ahlQB5yfkJLmB71AKBnGLxLCoMWeXmWclYFQ+wrtkA214hCCi8+WOMeES0/O
-         zR5WkOyiK7erTtyghX6Rh2TAaMM9T2vg+titKTIGPAhvl5fOwsqLeXJNqaff5NOPvI2i
-         z12w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Eba0mjjypEjbuZ72sKaUTFdFDAsmCoihdXRZ8dEThkI=;
-        b=D9zPvwRc85qDhWR1LDQQshea/6v6PY7TvYLJ3jM4mNjqoRF4/kLX37vjT9XTw9SoGE
-         Jo1EzLIoqUeSQTTgpH0gn/TNGLJzWQgnIwrahqlhMXmMvuBjpslXd+atGcez/oNuvqlj
-         kBBRUUxZXw0ZZds8/EPI3aP0vqPRzG1uBLh8OCgGT+J4oGz+gR0PwIxcPGyocDRb1kCU
-         SbCT5ZaI9ZNsB41z/NsvuEl9XG0zjP7CRtdCFh1u7l3SXHvefvIhHjgqKPor6ax6n6TW
-         4Wf1wjtQVc3ZWXYgjmIKkIx9xmciQVcJk1Pwp2qiD1bpnr3EJWyb0CQfGF6a6oR54N9m
-         YbsA==
-X-Gm-Message-State: AA+aEWaNcg8XdmZNksGuqyKbStJRalepAZgHpWzsmqvgy3P2dye5ED5r
-        XbP2YoB4xiyyZ2yrusEglioQGQ==
-X-Google-Smtp-Source: AFSGD/XTO6gbVyhvCwATfMglHaU8ar0y5CL0Y0Ug5MQPmfeKSgq7xd0fROis44CJkZSTAhRlrT5www==
-X-Received: by 2002:a63:ec13:: with SMTP id j19mr17978648pgh.6.1545193946872;
-        Tue, 18 Dec 2018 20:32:26 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id v62sm28862284pfd.163.2018.12.18.20.32.25
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 18 Dec 2018 20:32:25 -0800 (PST)
-Subject: Re: block: percpu ref (blkg_release) <= 0 (0) after switching to
- atomic
-To:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        Dennis Zhou <dennis@kernel.org>
-References: <20181219032520.GA4451@ming.t460p>
- <20181219032738.GB4451@ming.t460p>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4d404262-007c-2229-ed65-e1c52ed56d85@kernel.dk>
-Date:   Tue, 18 Dec 2018 21:32:24 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Tue, 18 Dec 2018 23:39:54 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wBJ4XuhY035602;
+        Wed, 19 Dec 2018 04:39:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=bBwhX3lpejVmiGFeCN8f6Pj5poTcWGky8EzcWHLT3gQ=;
+ b=Iz5021rUeZNmqu4VsmvpceinKyp+pXTPalF6FsG4d1M1+cK3Z5jq++88IXJfqMKYY3YI
+ HlVF0JMx8YUY1nVKjJYvyNX67tMCw48eDU3wP6w8d0sAlAHzsUaQZaFTI3Afa0LjNoSf
+ 1PN+jOwGEXFgzLRIu1FFbGxdY+KhU/mlpms3nblvgjALfYoO+bOEdvMb5/iewFaL7H5G
+ i+GJflQURQZV9bjmPlk5MZZMbZyYcEuSHaaH9T3EFJpsXuAcut4rc15EVl1HdBj4rp+o
+ LnfFVb6fZ4PE3wMrw0BrZIuLiR1Xys7YSZ7WWLo5YvPTjshhjTi8Jyf9PrmKubJmzT1x Lg== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by userp2120.oracle.com with ESMTP id 2pct8qxyu1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Dec 2018 04:39:43 +0000
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id wBJ4dhNn026652
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 Dec 2018 04:39:43 GMT
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id wBJ4dgER014931;
+        Wed, 19 Dec 2018 04:39:42 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 18 Dec 2018 20:39:41 -0800
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Juergen Gross <jgross@suse.com>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: remove the "clustering" flag V2
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20181213151710.30036-1-hch@lst.de> <20181218070826.GA1787@lst.de>
+        <yq136qui1q3.fsf@oracle.com>
+        <f80d28bc-e76a-0c9d-cbd6-34c7082963d8@kernel.dk>
+Date:   Tue, 18 Dec 2018 23:39:39 -0500
+In-Reply-To: <f80d28bc-e76a-0c9d-cbd6-34c7082963d8@kernel.dk> (Jens Axboe's
+        message of "Tue, 18 Dec 2018 21:31:19 -0700")
+Message-ID: <yq1lg4mgmes.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20181219032738.GB4451@ming.t460p>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9111 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=672
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1812190038
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/18/18 8:27 PM, Ming Lei wrote:
-> On Wed, Dec 19, 2018 at 11:25:21AM +0800, Ming Lei wrote:
->> Hi Jens and Dennis,
->>
->> The following warning can be triggered on for-4.21/block when running
->> xfstests generic/475(xfs), and it is introduced by recent Dennis's patches.
->>
->> test disk: virtio-blk
->> scratch: nvme-pci disk
-> 
-> oops, the test disk is virtio-scsi, and seems it isn't easy to trigger
-> on virtio-blk.
 
-I can reproduce this. Dennis is looking at it, we'll get this solved one
-way or another tomorrow.
+Jens,
 
-Thanks for reporting!
+> You can add my reviewed-by to 10 and add that one too, that makes more
+> sense than me adding it for a post-merge pull. But either way works
+> for me.
+
+OK, done.
 
 -- 
-Jens Axboe
-
+Martin K. Petersen	Oracle Linux Engineering
