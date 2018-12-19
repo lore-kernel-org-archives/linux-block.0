@@ -2,207 +2,117 @@ Return-Path: <SRS0=7Y8O=O4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7166C43387
-	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 13:21:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E73C43387
+	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 14:20:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A1A6021873
-	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 13:21:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A528E2084A
+	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 14:20:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="GIg13CaF"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="B84DkrWN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727111AbeLSNV3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Dec 2018 08:21:29 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:47502 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726833AbeLSNV2 (ORCPT
+        id S1728401AbeLSOUU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Dec 2018 09:20:20 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:49672 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729323AbeLSOUU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Dec 2018 08:21:28 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id wBJDIV1e040500;
-        Wed, 19 Dec 2018 13:21:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2018-07-02;
- bh=euAumByCSm7kN28p5B2dIhcyTedrVQCoKnMXG35mlOY=;
- b=GIg13CaFsilx7OmpNMnJh7O/GAJ2azdeQTkUeb4/TK7K+SHdfqug6ED8d3nbVynqXgch
- bRuFapV84DYFAcwYtnRX8fuOODikbcR2reYQpdsuAIJXekj2ei3JcGJ2GL98k3HVQHav
- t2tmVhnABbKpiflTNnuaLzjASuNopSSFSnaZ1hyhMTA83i7EsyrHXS+EX2x5QYjKrJRa
- C2888uunm6dW4H1LLR5A7U/va+KjjZCvcniYREMLsx9osQpGvu4biZqQUfgkuABTZ37L
- MtUrBWGkeAZQ9WTcXP9SDaIgHXy8RQ1bgS+ZQVXz5GX8CpV56Ru/Ub8ouCJ24eEvVddy HA== 
-Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
-        by userp2120.oracle.com with ESMTP id 2pfn1yrh8e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Dec 2018 13:21:19 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id wBJDLItJ024268
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 19 Dec 2018 13:21:18 GMT
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id wBJDLHaS031163;
-        Wed, 19 Dec 2018 13:21:17 GMT
-Received: from linux.cn.oracle.com (/10.182.71.9)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 19 Dec 2018 05:21:17 -0800
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     konrad.wilk@oracle.com, roger.pau@citrix.com, axboe@kernel.dk,
-        paul.durrant@citrix.com
-Subject: [PATCH v3 1/1] xen/blkback: rework connect_ring() to avoid inconsistent xenstore 'ring-page-order' set by malicious blkfront
-Date:   Wed, 19 Dec 2018 21:23:02 +0800
-Message-Id: <1545225782-31403-1-git-send-email-dongli.zhang@oracle.com>
-X-Mailer: git-send-email 2.7.4
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9111 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1812190115
+        Wed, 19 Dec 2018 09:20:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=lIpQgA0nbVjG5cS6Y3emdcp/477lZ1qJEPobct/fUwY=; b=B84DkrWNOwoxLg570f1cHxOYGw
+        A9L00A2m9cgn3D0vNSh0304ePbxmFjfxwOAc2reVrSepY+JY/2XR7oFvm5LdZT4Ra/oFC6S8qTsds
+        e/O1DwHfXQBqVQIjgOtWUCEw2WayTMrRsKtpJm4lZz1khC04fzowdsVz99D9PghfP317BGgYz+pPS
+        13zlr+YrgNsXah1z6LDVumPHJjsS5J4d9R1y0F84lW9o8/8n/SHcP3Ad09Bkl74hfN2s4r2pW//+U
+        cMk8LNXnsUUOKdbzNBl+YuX4sS/vAxyJSkRgCLDNjBjp1hiICkO32YaFFJ/VYHT5mT2+b0BLgw8i0
+        L2RJSbWA==;
+Received: from clnet-p19-102.ikbnet.co.at ([83.175.77.102] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gZchu-0004yY-Dy; Wed, 19 Dec 2018 14:20:18 +0000
+Date:   Wed, 19 Dec 2018 15:20:15 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+Subject: [GIT PULL] third batch of nvme updates for 4.21
+Message-ID: <20181219142015.GA960@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The xenstore 'ring-page-order' is used globally for each blkback queue and
-therefore should be read from xenstore only once. However, it is obtained
-in read_per_ring_refs() which might be called multiple times during the
-initialization of each blkback queue.
+Hi Jens,
 
-If the blkfront is malicious and the 'ring-page-order' is set in different
-value by blkfront every time before blkback reads it, this may end up at
-the "WARN_ON(i != (XEN_BLKIF_REQS_PER_PAGE * blkif->nr_ring_pages));" in
-xen_blkif_disconnect() when frontend is destroyed.
+the remaining nvme updates for this merge window below.  This contains
+a series from Sagi to restore poll support for nvme-rdma, a new
+tracepoint from yupeng and various fixes.
 
-This patch reworks connect_ring() to read xenstore 'ring-page-order' only
-once.
 
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
----
-Changed since v1:
-  * change the order of xenstore read in read_per_ring_refs
-  * use xenbus_read_unsigned() in connect_ring()
+The following changes since commit cd19181bf9ad4b7f40f2a4e0355d052109c76529:
 
-Changed since v2:
-  * simplify the condition check as "(err != 1 && nr_grefs > 1)"
-  * avoid setting err as -EINVAL to remove extra one line of code
+  blk-mq: enable IO poll if .nr_queues of type poll > 0 (2018-12-17 21:35:07 -0700)
 
- drivers/block/xen-blkback/xenbus.c | 74 +++++++++++++++++++++-----------------
- 1 file changed, 41 insertions(+), 33 deletions(-)
+are available in the Git repository at:
 
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index a4bc74e..dfea3a4 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -926,7 +926,7 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
- 	int err, i, j;
- 	struct xen_blkif *blkif = ring->blkif;
- 	struct xenbus_device *dev = blkif->be->dev;
--	unsigned int ring_page_order, nr_grefs, evtchn;
-+	unsigned int nr_grefs, evtchn;
- 
- 	err = xenbus_scanf(XBT_NIL, dir, "event-channel", "%u",
- 			  &evtchn);
-@@ -936,43 +936,36 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
- 		return err;
- 	}
- 
--	err = xenbus_scanf(XBT_NIL, dev->otherend, "ring-page-order", "%u",
--			  &ring_page_order);
-+	nr_grefs = blkif->nr_ring_pages;
-+	WARN_ON(!nr_grefs);
-+
-+	for (i = 0; i < nr_grefs; i++) {
-+		char ring_ref_name[RINGREF_NAME_LEN];
-+
-+		snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref%u", i);
-+		err = xenbus_scanf(XBT_NIL, dir, ring_ref_name,
-+				   "%u", &ring_ref[i]);
-+
-+		if (err != 1 && nr_grefs > 1) {
-+			xenbus_dev_fatal(dev, err, "reading %s/%s",
-+					 dir, ring_ref_name);
-+			return -EINVAL;
-+		}
-+
-+		if (err != 1)
-+			break;
-+	}
-+
- 	if (err != 1) {
--		err = xenbus_scanf(XBT_NIL, dir, "ring-ref", "%u", &ring_ref[0]);
-+		WARN_ON(nr_grefs != 1);
-+
-+		err = xenbus_scanf(XBT_NIL, dir, "ring-ref", "%u",
-+				   &ring_ref[0]);
- 		if (err != 1) {
--			err = -EINVAL;
- 			xenbus_dev_fatal(dev, err, "reading %s/ring-ref", dir);
--			return err;
--		}
--		nr_grefs = 1;
--	} else {
--		unsigned int i;
--
--		if (ring_page_order > xen_blkif_max_ring_order) {
--			err = -EINVAL;
--			xenbus_dev_fatal(dev, err, "%s/request %d ring page order exceed max:%d",
--					 dir, ring_page_order,
--					 xen_blkif_max_ring_order);
--			return err;
--		}
--
--		nr_grefs = 1 << ring_page_order;
--		for (i = 0; i < nr_grefs; i++) {
--			char ring_ref_name[RINGREF_NAME_LEN];
--
--			snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref%u", i);
--			err = xenbus_scanf(XBT_NIL, dir, ring_ref_name,
--					   "%u", &ring_ref[i]);
--			if (err != 1) {
--				err = -EINVAL;
--				xenbus_dev_fatal(dev, err, "reading %s/%s",
--						 dir, ring_ref_name);
--				return err;
--			}
-+			return -EINVAL;
- 		}
- 	}
--	blkif->nr_ring_pages = nr_grefs;
- 
- 	for (i = 0; i < nr_grefs * XEN_BLKIF_REQS_PER_PAGE; i++) {
- 		req = kzalloc(sizeof(*req), GFP_KERNEL);
-@@ -1030,6 +1023,7 @@ static int connect_ring(struct backend_info *be)
- 	size_t xspathsize;
- 	const size_t xenstore_path_ext_size = 11; /* sufficient for "/queue-NNN" */
- 	unsigned int requested_num_queues = 0;
-+	unsigned int ring_page_order;
- 
- 	pr_debug("%s %s\n", __func__, dev->otherend);
- 
-@@ -1075,6 +1069,20 @@ static int connect_ring(struct backend_info *be)
- 		 be->blkif->nr_rings, be->blkif->blk_protocol, protocol,
- 		 pers_grants ? "persistent grants" : "");
- 
-+	ring_page_order = xenbus_read_unsigned(dev->otherend,
-+					       "ring-page-order", 0);
-+
-+	if (ring_page_order > xen_blkif_max_ring_order) {
-+		err = -EINVAL;
-+		xenbus_dev_fatal(dev, err,
-+				 "requested ring page order %d exceed max:%d",
-+				 ring_page_order,
-+				 xen_blkif_max_ring_order);
-+		return err;
-+	}
-+
-+	be->blkif->nr_ring_pages = 1 << ring_page_order;
-+
- 	if (be->blkif->nr_rings == 1)
- 		return read_per_ring_refs(&be->blkif->rings[0], dev->otherend);
- 	else {
--- 
-2.7.4
+  git://git.infradead.org/nvme.git nvme-4.21
 
+for you to fetch changes up to 604c01d567cb9ee7d19dc598272cb90ab6229a8a:
+
+  nvme-pci: trace SQ status on completions (2018-12-19 08:35:36 +0100)
+
+----------------------------------------------------------------
+Chaitanya Kulkarni (1):
+      nvmet: use a macro for default error location
+
+Christoph Hellwig (4):
+      nvme-pci: only set nr_maps to 2 if poll queues are supported
+      nvme-pci: refactor nvme_poll_irqdisable to make sparse happy
+      nvmet-tcp: fix endianess annotations
+      nvme-tcp: fix endianess annotations
+
+Colin Ian King (2):
+      nvmet: fix comparison of a u16 with -1
+      nvme-tcp: fix spelling mistake "attepmpt" -> "attempt"
+
+Sagi Grimberg (5):
+      block: make request_to_qc_t public
+      nvme-core: optionally poll sync commands
+      nvme-fabrics: allow nvmf_connect_io_queue to poll
+      nvme-fabrics: allow user to pass in nr_poll_queues
+      nvme-rdma: implement polling queue map
+
+yupeng (1):
+      nvme-pci: trace SQ status on completions
+
+ block/blk-mq.c              |  8 --------
+ drivers/nvme/host/core.c    | 38 ++++++++++++++++++++++++++++++-----
+ drivers/nvme/host/fabrics.c | 25 +++++++++++++++++------
+ drivers/nvme/host/fabrics.h |  5 ++++-
+ drivers/nvme/host/fc.c      |  2 +-
+ drivers/nvme/host/nvme.h    |  2 +-
+ drivers/nvme/host/pci.c     | 17 ++++++++++------
+ drivers/nvme/host/rdma.c    | 49 +++++++++++++++++++++++++++++++++++++++------
+ drivers/nvme/host/tcp.c     | 13 ++++++------
+ drivers/nvme/host/trace.c   |  3 +++
+ drivers/nvme/host/trace.h   | 23 +++++++++++++++++++++
+ drivers/nvme/target/core.c  |  4 ++--
+ drivers/nvme/target/loop.c  |  2 +-
+ drivers/nvme/target/nvmet.h |  1 +
+ drivers/nvme/target/tcp.c   |  4 ++--
+ include/linux/blk-mq.h      | 10 +++++++++
+ include/linux/blk_types.h   | 11 ----------
+ 17 files changed, 161 insertions(+), 56 deletions(-)
