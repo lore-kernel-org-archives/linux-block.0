@@ -2,154 +2,154 @@ Return-Path: <SRS0=7Y8O=O4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 854E6C43387
-	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 09:09:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA083C43387
+	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 10:32:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E3C620874
-	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 09:09:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BAC7B21873
+	for <linux-block@archiver.kernel.org>; Wed, 19 Dec 2018 10:32:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MKchAHwl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728313AbeLSJJP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Dec 2018 04:09:15 -0500
-Received: from smtp.eu.citrix.com ([185.25.65.24]:55326 "EHLO
-        SMTP.EU.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728282AbeLSJJP (ORCPT
+        id S1728986AbeLSKcq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Dec 2018 05:32:46 -0500
+Received: from mail-wm1-f51.google.com ([209.85.128.51]:36819 "EHLO
+        mail-wm1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726812AbeLSKcq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Dec 2018 04:09:15 -0500
-X-IronPort-AV: E=Sophos;i="5.56,372,1539648000"; 
-   d="scan'208";a="83540675"
-Date:   Wed, 19 Dec 2018 10:09:06 +0100
-From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-To:     Dongli Zhang <dongli.zhang@oracle.com>
-CC:     <axboe@kernel.dk>, <konrad.wilk@oracle.com>,
-        <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <paul.durrant@citrix.com>, <xen-devel@lists.xenproject.org>
-Subject: Re: [Xen-devel] [PATCH v2 1/1] xen/blkback: rework connect_ring() to
- avoid inconsistent xenstore 'ring-page-order' set by malicious blkfront
-Message-ID: <20181219090906.y4ouwhroydie7zk5@mac>
-References: <1545094538-31426-1-git-send-email-dongli.zhang@oracle.com>
- <20181218093300.qfslnloxooqnu2im@mac>
- <51ea8086-e5fd-b1db-f935-101160ca9359@oracle.com>
- <20181218151331.iwkq3roqwigf3e2r@mac>
- <c3e3919c-3f82-2db5-23cf-c548bc8731ea@oracle.com>
+        Wed, 19 Dec 2018 05:32:46 -0500
+Received: by mail-wm1-f51.google.com with SMTP id p6so5543968wmc.1
+        for <linux-block@vger.kernel.org>; Wed, 19 Dec 2018 02:32:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SOVr8F17cwKDn5P2cN2PetFc/LaJMmUgsrmuYwGhjn0=;
+        b=MKchAHwlgHZL67xNv3fkvcRZG2ylcUp3qY+B/tSwwDqYkauMFv0BpWla/tbic3GBGQ
+         MTAfie52jOcsxWiXwqLuyu3eOKLJcebJhHHv2TUgpfLrHcK2kRXSJNd27VyvxxMyUAu3
+         DmyuGCoHK+o1xWmIY2R657j++BZHjbenCe5xXyULRlDwc7FN+sbYe38x0UnJ8oQVxRHC
+         HXQCqxlKGamLT6RlXpeVgP9gK3/pwBnlUezKFbef38hN/tnVjsctEQetXqK/QxYyUxbU
+         CQFUFufnEsyBVCJ8d9jGrqJsg+4t/1sN4/zc1L/aFAiveEci6+I4mLx3KMwIRpFS1teh
+         grIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SOVr8F17cwKDn5P2cN2PetFc/LaJMmUgsrmuYwGhjn0=;
+        b=ZzvxvShdHFim3n++majMsp6pF5rRklNubfKTKymsTckc/bZ8ydcmWADz9WMaOu1zz3
+         zSCnGDFUasFDJCBCRMn5Bo+xLz1Qy8koa61VLuIkbppPg4/OdLkVnCPyDnV6LBw1cpKW
+         Yy4FG0aq1R3xefYU7yyNQAssjXyfprYe9vk4VOdalhVMjJ9+tZ4HIgKTa3vWFI5R3i34
+         8Tf7iH61lPd+T8lDUvsIj8UsJ7Xn0qc1su6+YTxZGB8lrULppoYoHhnog/v91SMbubMw
+         DNZ7Ustog9PquxFUcYqjjrfMFsan28mLTT7v3e61FpPWHZIznGnsZifcdax2bEAXUc6a
+         GELw==
+X-Gm-Message-State: AA+aEWZucjj+BTZXNm/8dUZRYyq/AVsAbL5jiTbxXaFknb5seGAJjwO9
+        DIdPw16MevH9DoBicOIQsaF+SiIs4nP56FWGvT8=
+X-Google-Smtp-Source: AFSGD/XIOD1V8vYbT5yA8on88cod1tQd5u9NEf4Kyaj9twnazklvTeILCl4i3Qbi6mgY1y+wrdsEMWfZyyqUSFqY9Oc=
+X-Received: by 2002:a7b:c853:: with SMTP id c19mr6322249wml.61.1545215564064;
+ Wed, 19 Dec 2018 02:32:44 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c3e3919c-3f82-2db5-23cf-c548bc8731ea@oracle.com>
-User-Agent: NeoMutt/20180716
-X-ClientProxiedBy: AMSPEX02CAS01.citrite.net (10.69.22.112) To
- AMSPEX02CL02.citrite.net (10.69.22.126)
+References: <E0E52FD0-1020-4F5B-9AC8-F48BDFE142C0@linaro.org>
+ <4db2cb0f-e500-44da-e85d-ed417b74dae5@kernel.dk> <CACVXFVML3ZJ0ezsRBC6T_6zbJHqXRFXVQJxVhsK9spKEfgKipQ@mail.gmail.com>
+ <80B060E9-48E9-45D3-9456-64E94947F048@linaro.org>
+In-Reply-To: <80B060E9-48E9-45D3-9456-64E94947F048@linaro.org>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Wed, 19 Dec 2018 18:32:31 +0800
+Message-ID: <CACVXFVO1ZE_8e=DDBanm8id+=672BOs5nt6AJtnztt48GZ1vnw@mail.gmail.com>
+Subject: Re: confusion about nr of pending I/O requests
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Mark Brown <broonie@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Dec 18, 2018 at 11:29:16PM +0800, Dongli Zhang wrote:
-> 
-> 
-> On 12/18/2018 11:13 PM, Roger Pau Monné wrote:
-> > On Tue, Dec 18, 2018 at 07:31:59PM +0800, Dongli Zhang wrote:
-> >> Hi Roger,
+On Wed, Dec 19, 2018 at 2:18 PM Paolo Valente <paolo.valente@linaro.org> wrote:
+>
+>
+>
+> > Il giorno 19 dic 2018, alle ore 04:45, Ming Lei <tom.leiming@gmail.com> ha scritto:
+> >
+> > On Wed, Dec 19, 2018 at 2:52 AM Jens Axboe <axboe@kernel.dk> wrote:
 > >>
-> >> On 12/18/2018 05:33 PM, Roger Pau Monné wrote:
-> >>> On Tue, Dec 18, 2018 at 08:55:38AM +0800, Dongli Zhang wrote:
-> >>>> The xenstore 'ring-page-order' is used globally for each blkback queue and
-> >>>> therefore should be read from xenstore only once. However, it is obtained
-> >>>> in read_per_ring_refs() which might be called multiple times during the
-> >>>> initialization of each blkback queue.
-> >>>>
-> >>>> If the blkfront is malicious and the 'ring-page-order' is set in different
-> >>>> value by blkfront every time before blkback reads it, this may end up at
-> >>>> the "WARN_ON(i != (XEN_BLKIF_REQS_PER_PAGE * blkif->nr_ring_pages));" in
-> >>>> xen_blkif_disconnect() when frontend is destroyed.
-> >>>>
-> >>>> This patch reworks connect_ring() to read xenstore 'ring-page-order' only
-> >>>> once.
-> >>>>
-> >>>> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-> >>>> ---
-> >>>> Changed since v1:
-> >>>>   * change the order of xenstore read in read_per_ring_refs(suggested by Roger Pau Monne)
-> >>>>   * use xenbus_read_unsigned() in connect_ring() (suggested by Roger Pau Monne)
-> >>>>
-> >>>>  drivers/block/xen-blkback/xenbus.c | 70 ++++++++++++++++++++++----------------
-> >>>>  1 file changed, 40 insertions(+), 30 deletions(-)
-> >>>>
-> >>>> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-> >>>> index a4bc74e..7178f0f 100644
-> >>>> --- a/drivers/block/xen-blkback/xenbus.c
-> >>>> +++ b/drivers/block/xen-blkback/xenbus.c
-> >>>> @@ -926,7 +926,7 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
-> >>>>  	int err, i, j;
-> >>>>  	struct xen_blkif *blkif = ring->blkif;
-> >>>>  	struct xenbus_device *dev = blkif->be->dev;
-> >>>> -	unsigned int ring_page_order, nr_grefs, evtchn;
-> >>>> +	unsigned int nr_grefs, evtchn;
-> >>>>  
-> >>>>  	err = xenbus_scanf(XBT_NIL, dir, "event-channel", "%u",
-> >>>>  			  &evtchn);
-> >>>> @@ -936,43 +936,38 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
-> >>>>  		return err;
-> >>>>  	}
-> >>>>  
-> >>>> -	err = xenbus_scanf(XBT_NIL, dev->otherend, "ring-page-order", "%u",
-> >>>> -			  &ring_page_order);
-> >>>> -	if (err != 1) {
-> >>>> -		err = xenbus_scanf(XBT_NIL, dir, "ring-ref", "%u", &ring_ref[0]);
-> >>>> -		if (err != 1) {
-> >>>> +	nr_grefs = blkif->nr_ring_pages;
-> >>>> +	WARN_ON(!nr_grefs);
-> >>>> +
-> >>>> +	for (i = 0; i < nr_grefs; i++) {
-> >>>> +		char ring_ref_name[RINGREF_NAME_LEN];
-> >>>> +
-> >>>> +		snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref%u", i);
-> >>>> +		err = xenbus_scanf(XBT_NIL, dir, ring_ref_name,
-> >>>> +				   "%u", &ring_ref[i]);
-> >>>> +
-> >>>> +		if (err != 1 && (i || (!i && nr_grefs > 1))) {
+> >> On 12/18/18 5:45 AM, Paolo Valente wrote:
+> >>> Hi Jens,
+> >>> sorry for the following silly question, but maybe you can solve very
+> >>> quickly a doubt for which I'd spend much more time investigating.
 > >>>
-> >>> AFAICT the above condition can be simplified as "err != 1 &&
-> >>> nr_grefs".
+> >>> While doing some tests with scsi_debug, I've just seen that (at least)
+> >>> with direct I/O, the maximum number of pending I/O requests (at least
+> >>> in the I/O schedulers) is equal, unexpectedly, to the queue depth of
+> >>> the drive and not to
+> >>> /sys/block/<dev>/queue/nr_requests
 > >>>
-> >>>>  			err = -EINVAL;
+> >>> For example, after:
 > >>>
-> >>> There's no point in setting err here...
+> >>> sudo modprobe scsi_debug max_queue=4
 > >>>
-> >>>> -			xenbus_dev_fatal(dev, err, "reading %s/ring-ref", dir);
-> >>>> +			xenbus_dev_fatal(dev, err, "reading %s/%s",
-> >>>> +					 dir, ring_ref_name);
-> >>>>  			return err;
+> >>> and with fio executed as follows:
 > >>>
-> >>> ...since you can just return -EINVAL (same applies to the other
-> >>> instance below).
+> >>> job: (g=0): rw=read, bs=(R) 4096B-4096B, (W) 4096B-4096B, (T) 4096B-4096B, ioengine=libaio, iodepth=20
+> >>>
+> >>> I get this periodic trace, where four insertions are followed by four
+> >>> completions, and so on, till the end of the I/O.  This trace is taken
+> >>> with none, but the result is the same with bfq.
+> >>>
+> >>>             fio-20275 [001] d...  7560.655213:   8,48   I   R 281088 + 8 [fio]
+> >>>             fio-20275 [001] d...  7560.655288:   8,48   I   R 281096 + 8 [fio]
+> >>>             fio-20275 [001] d...  7560.655311:   8,48   I   R 281104 + 8 [fio]
+> >>>             fio-20275 [001] d...  7560.655331:   8,48   I   R 281112 + 8 [fio]
+> >>>          <idle>-0     [001] d.h.  7560.749868:   8,48   C   R 281088 + 8 [0]
+> >>>          <idle>-0     [001] dNh.  7560.749912:   8,48   C   R 281096 + 8 [0]
+> >>>          <idle>-0     [001] dNh.  7560.749928:   8,48   C   R 281104 + 8 [0]
+> >>>          <idle>-0     [001] dNh.  7560.749934:   8,48   C   R 281112 + 8 [0]
+> >>>             fio-20275 [001] d...  7560.750023:   8,48   I   R 281120 + 8 [fio]
+> >>>             fio-20275 [001] d...  7560.750196:   8,48   I   R 281128 + 8 [fio]
+> >>>             fio-20275 [001] d...  7560.750229:   8,48   I   R 281136 + 8 [fio]
+> >>>             fio-20275 [001] d...  7560.750250:   8,48   I   R 281144 + 8 [fio]
+> >>>          <idle>-0     [001] d.h.  7560.842510:   8,48   C   R 281120 + 8 [0]
+> >>>          <idle>-0     [001] dNh.  7560.842551:   8,48   C   R 281128 + 8 [0]
+> >>>          <idle>-0     [001] dNh.  7560.842556:   8,48   C   R 281136 + 8 [0]
+> >>>          <idle>-0     [001] dNh.  7560.842562:   8,48   C   R 281144 + 8 [0]
+> >>>
+> >>> Shouldn't the total number of pending requests reach
+> >>> /sys/block/<dev>/queue/nr_requests ?
+> >>>
+> >>> The latter is of course equal to 8.
 > >>
-> >> I would like to confirm if I would keep the err = -EINVAL in below because most
-> >> of the below code is copied from original implementation without modification.
+> >> With a scheduler, the depth is what the scheduler provides. You cannot
+> >> exceed the hardware queue depth in any situation. You just have 8
+> >> requests available for scheduling, with a max of 4 being inflight on
+> >> the device side.
 > >>
-> >> There is no err set by xenbus_read_unsigned().
-> > 
-> > Right, but instead of doing:
-> > 
-> > err = -EINVAL;
-> > return err;
-> > 
-> > You can just do:
-> > 
-> > return -EINVAL;
-> > 
-> > Which is one line shorter :).
-> 
-> However, for the "ring-page-order" case, the err used in xenbus_dev_fatal() is
-> not set as xenbus_read_unsigned() does not return any err?
-> 
-> For "ring-page-order", I would still need to set err = -EINVAL with extra one
-> line of code?
+> >> If both were 4, for instance, then you would have nothing to schedule
+> >> with, as all of them could reside on the hardware side. That's why
+> >> the scheduler defaults to twice the hardware queue depth.
+> >
+> > The default twice to hw queue depth might not be reasonable for multi LUN.
+> >
+> > Maybe it should be set twice of sdev->queue_depth for SCSI or
+> > hw queue depth/hctx->nr_active.  But either way may become complicated
+> > because both can be adjusted runtime.
+> >
+>
+> Could you please explain why it is not working (if it is not working)
+> in my example, where there should be only one LUN?
 
-Given this, I don't have a strong opinion, so do as you please.
+I didn't say it isn't working, and I mean it isn't perfect.
 
-Thanks, Roger.
+The hardware queue depth is host-wide, that means it is shared by all LUNs.
+Of course, lots of LUNs may be attached to one single HBA. You can setup
+this setting via 'modprobe scsi_debug max_luns=16 max_queue=4' easily,
+then all 4 LUNs share the 4 tags.
+
+Thanks,
+Ming Lei
