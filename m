@@ -2,125 +2,181 @@ Return-Path: <SRS0=9Hvz=O5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9138C43387
-	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 02:54:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 425A3C43387
+	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 03:17:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 743A920989
-	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 02:54:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 066FD2176F
+	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 03:17:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="CVHw2JYO"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="EGJr+SXf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727850AbeLTCye (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 19 Dec 2018 21:54:34 -0500
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:55548 "EHLO
-        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726725AbeLTCye (ORCPT
+        id S1727502AbeLTDRk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 19 Dec 2018 22:17:40 -0500
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:39235 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728706AbeLTDRk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 19 Dec 2018 21:54:34 -0500
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20181220025432euoutp02dd4f7cccfa58697e547e625cc1874aa2~x6vH2gZu92282122821euoutp02A;
-        Thu, 20 Dec 2018 02:54:32 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20181220025432euoutp02dd4f7cccfa58697e547e625cc1874aa2~x6vH2gZu92282122821euoutp02A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1545274472;
-        bh=Q53Pu7zmhtbb0/XI07udDW76NOsU+s+62s8EsnuoaQA=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=CVHw2JYO0aoAMnItOQ/wYEMS2DMdV5PvUiO22ncKz0i/l7eVR+OK7NCu/245JQBKp
-         Icxto88T7rAA32a6/XqArdtQ0a66ytWwH/AVAGqK5S+tJ1HQkeNPtsZgTP2NqQM1Il
-         mXGpMBHbsoYuFv2ToQ8VueEmGjvrgtoleROxFAfY=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20181220025431eucas1p22349c3afae2c93094fb5bdd8241ef56e~x6vHdp0y70881608816eucas1p2M;
-        Thu, 20 Dec 2018 02:54:31 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges2new.samsung.com (EUCPMTA) with SMTP id 10.8F.04294.7640B1C5; Thu, 20
-        Dec 2018 02:54:31 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20181220025430eucas1p2850d6fc8565162908f0540db57d4ec32~x6vF565000358903589eucas1p2T;
-        Thu, 20 Dec 2018 02:54:30 +0000 (GMT)
-X-AuditID: cbfec7f4-84fff700000010c6-8c-5c1b0467df00
-Received: from eusync1.samsung.com ( [203.254.199.211]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id 4A.B9.04284.5640B1C5; Thu, 20
-        Dec 2018 02:54:29 +0000 (GMT)
-Received: from localhost.localdomain ([10.88.99.240]) by eusync1.samsung.com
-        (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May  5
-        2014)) with ESMTPA id <0PK0002QHLEL6A30@eusync1.samsung.com>; Thu, 20 Dec
-        2018 02:54:29 +0000 (GMT)
-From:   Huijin Park <huijin.park@samsung.com>
-To:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Cc:     Huijin Park <huijin.park@samsung.com>,
-        Huijin Park <bbanghj.park@gmail.com>,
-        Jungseung Lee <js07.lee@samsung.com>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: [PATCH] zram: avoid calling bio_endio() before io complete
-Date:   Wed, 19 Dec 2018 21:54:14 -0500
-Message-id: <1545274454-1535-1-git-send-email-huijin.park@samsung.com>
-X-Mailer: git-send-email 2.7.4
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprHIsWRmVeSWpSXmKPExsWy7djP87rpLNIxBsv6JCxe7j3EbNFx0cXi
-        0c3frBZ7b2lbXN41h81i2df37BYbWmaxWzyaMInJgcNj56y77B6bVnWyefRtWcXosfPTZlaP
-        z5vkAlijuGxSUnMyy1KL9O0SuDIW7TrLVNDCUdHQdpi5gfEkWxcjJ4eEgIlES/N1pi5GLg4h
-        gRWMEv3PJrFAOJ8ZJV4cuwTkcIBV9V42gYgvY5R48GUjVMdfRokfp1aygIxiE9CWuL52KyOI
-        LSJQL9Hw4AU7SBGzwBZGiQMdO5hBEsICzhKvT+5mB7FZBFQlli+GaOYVcJN4t/o0M8RNchI3
-        z3UygzRLCHxllTi6/AhUwkVi4o/jUIcLS7w6voUdwpaR6Ow4yARhZ0v8etQKdXaFxNt5KhBh
-        Y4l3b9eCjWEW4JOYtG06M0QJr0RHmxBEiYfE8qOLwUqEBGIlrh08xTiBUWIBI8MqRvHU0uLc
-        9NRio7zUcr3ixNzi0rx0veT83E2MwFg7/e/4lx2Mu/4kHWIU4GBU4uGdESUVI8SaWFZcmXuI
-        UYKDWUmEV30zUIg3JbGyKrUoP76oNCe1+BCjNAeLkjhvNcODaCGB9MSS1OzU1ILUIpgsEwen
-        VAPjvJ17PoT3nP/NzfR7RbD0LBEmkaNSX658f5bcorAt6dnj4779jUqPQw49Zv6oPcv+r3KK
-        m/+2BzMOcDXadDOGr5h+muew2fTLHzlD4rSnz5jxpULQLkPugqjW44lLm7d/XKTFKnx9+y3R
-        QhcTq0dximwWPhOd58mVvz5xelJimeLyf5tZt4nYKrEUZyQaajEXFScCAG+gsv2xAgAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrEJMWRmVeSWpSXmKPExsVy+t/xy7qpLNIxBtPWaVm83HuI2aLjoovF
-        o5u/WS323tK2uLxrDpvFsq/v2S02tMxit3g0YRKTA4fHzll32T02repk8+jbsorRY+enzawe
-        nzfJBbBGcdmkpOZklqUW6dslcGUs2nWWqaCFo6Kh7TBzA+NJti5GDg4JAROJ3ssmXYxcHEIC
-        SxglZizsY4Jw/jNKNB85wNLFyMnBJqAtcX3tVkYQW0SgXuJT934WkCJmgS2MErunLWIFSQgL
-        OEu8PrmbHcRmEVCVWL54JVgzr4CbxLvVp5lBbAkBOYmb5zqZJzByLWBkWMUoklpanJueW2yo
-        V5yYW1yal66XnJ+7iREYEtuO/dy8g/HSxuBDjAIcjEo8vDOipGKEWBPLiitzDzFKcDArifCq
-        bwYK8aYkVlalFuXHF5XmpBYfYpTmYFES5z1vUBklJJCeWJKanZpakFoEk2Xi4JRqYGx5/Nif
-        ScWZfQ137fSzWbkSLL/m+UyWLSq1/ix8dPfbdSnsJ8SPLPufdMV44XH37oLaG8UTzncYCr+8
-        n2o0Xy1We+7BCxyhDGU6MQEWxy7PZbm5WGz/WfnYwI5tz03t+jIveQSVpaqn21WJv962QHLL
-        7pNuy9a5Red9fX764a7bj1rKXz3/naDEUpyRaKjFXFScCADtyJMNBQIAAA==
-X-CMS-MailID: 20181220025430eucas1p2850d6fc8565162908f0540db57d4ec32
-X-Msg-Generator: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20181220025430eucas1p2850d6fc8565162908f0540db57d4ec32
-References: <CGME20181220025430eucas1p2850d6fc8565162908f0540db57d4ec32@eucas1p2.samsung.com>
+        Wed, 19 Dec 2018 22:17:40 -0500
+Received: by mail-pl1-f196.google.com with SMTP id 101so177898pld.6
+        for <linux-block@vger.kernel.org>; Wed, 19 Dec 2018 19:17:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=yfEEP4263lkspoaJbIhhidqfDl3lrqQiHLez4hpR6fE=;
+        b=EGJr+SXf3a1wyDlKUJlICd6jKgB0bBg1buDkoHTim2ZRaVIoArx2vLkbMozWzAID53
+         +b3rulATxuDorzF+iY/tIoi3iI1i+cEnwWiebysqkYgi3deO/+nZSx07ahL55CrZTqWt
+         8d37iBnf2Ns9vL21eynHGhzG43F1LCtHZ5ce66gwZHSCuqo1R4EZ5DC/ERrCNwhOk78L
+         jRKAqzSXEmKgbzEhTBWRV+VWjzg9jdXScFIHKnVvRvpHaGJ/z/xaVhMzfqPQlk44dHdG
+         e76/3KTVInO+A/uS5Ky3RTEh9hofbKRAwFY38MoCggmtjltYy4JuBYif48W+WrU+D9ez
+         o4Bg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=yfEEP4263lkspoaJbIhhidqfDl3lrqQiHLez4hpR6fE=;
+        b=NdKqQlBph3MRb63NUyVysvWw8xD+p10ZhEP5ex6uoQgZzWpwaF2jm8Hd7ISx1YKhJe
+         Ql7fYOU5wpzvfeNarm89BkzlmyiI1IcWkHhaNTU+F1pMCmtwa1V8FdJk/GxaMoreiuFa
+         cB+ht0u/B7ye4LWPmnXMazz24KNP5Zr2pWkqnRquRGr0nNLOYdWdtvGjmhCKsJ0st360
+         IRC3DmTBEYD6panoRMSI/3j10aoiHt6Ptz+tbKkPXAtOGQDJBRu59Pt/ePPOFmajPLm8
+         8L7SGT7avH0l3yP7yVPf0NHXib0hKRqr2FSsLLDebsUOZaEAaEOdJY4MX7EFE9cHJoME
+         zPgg==
+X-Gm-Message-State: AA+aEWYksdo1/LbqKVElMLFBu7wYUPk4rSQIwYSKoXUkr/6nbGOih0R0
+        s5fCcndr7VmpPs6fVTuAdyKijmD0bMyiPw==
+X-Google-Smtp-Source: AFSGD/Vy1CGLcmR9Q2r9Zcy+4kwcReYi/+MwifPVzQ+U859d0FxtrOKYVkDJlc8v7jDHVj+1HNFHxQ==
+X-Received: by 2002:a17:902:28c1:: with SMTP id f59mr22571456plb.37.1545275858562;
+        Wed, 19 Dec 2018 19:17:38 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id u126sm41529350pgb.2.2018.12.19.19.17.36
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 19 Dec 2018 19:17:37 -0800 (PST)
+Subject: Re: v4.20-rc6: Sporadic use-after-free in bt_iter()
+To:     Bart Van Assche <bvanassche@acm.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <1545261885.185366.488.camel@acm.org>
+ <74c0280c-e557-ad03-cd75-98dd6d868da3@kernel.dk>
+ <1545265001.185366.496.camel@acm.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <1ca5cd37-87ce-8cff-6cb4-1fdb29bd4da2@kernel.dk>
+Date:   Wed, 19 Dec 2018 20:17:35 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+MIME-Version: 1.0
+In-Reply-To: <1545265001.185366.496.camel@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When the bio is given as parameter, zram calls the bio_endio() with
-given bio after zram io finished.
-However in the case of partial writing, the __zram_bvec_read() calls
-the bio_endio() with the given bio regardless of the write operation.
-In other words, the bio_endio() may be called at an unwanted time.
-So this patch avoids calling bio_endio() with given bio before
-writing is completed.
+On 12/19/18 5:16 PM, Bart Van Assche wrote:
+> On Wed, 2018-12-19 at 16:27 -0700, Jens Axboe wrote:
+>> On 12/19/18 4:24 PM, Bart Van Assche wrote:
+>>> Hello,
+>>>
+>>> If I run the srp blktests in a loop then I see the below call stack appearing
+>>> sporadically. I have not yet had the time to analyze this but I'm reporting
+>>> this here in case someone else would already have had a look at this.
+>>>
+>>> Bart.
+>>>
+>>> ==================================================================
+>>> BUG: KASAN: use-after-free in bt_iter+0x86/0xf0
+>>> Read of size 8 at addr ffff88803b335240 by task fio/21412
+>>>
+>>> CPU: 0 PID: 21412 Comm: fio Tainted: G        W         4.20.0-rc6-dbg+ #3
+>>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+>>> Call Trace:
+>>>  dump_stack+0x86/0xca
+>>>  print_address_description+0x71/0x239
+>>>  kasan_report.cold.5+0x242/0x301
+>>>  __asan_load8+0x54/0x90
+>>>  bt_iter+0x86/0xf0
+>>>  blk_mq_queue_tag_busy_iter+0x373/0x5e0
+>>>  blk_mq_in_flight+0x96/0xb0
+>>>  part_in_flight+0x40/0x140
+>>>  part_round_stats+0x18e/0x370
+>>>  blk_account_io_start+0x3d7/0x670
+>>>  blk_mq_bio_to_request+0x19c/0x3a0
+>>>  blk_mq_make_request+0x7a9/0xcb0
+>>>  generic_make_request+0x41d/0x960
+>>>  submit_bio+0x9b/0x250
+>>>  do_blockdev_direct_IO+0x435c/0x4c70
+>>>  __blockdev_direct_IO+0x79/0x88
+>>>  ext4_direct_IO+0x46c/0xc00
+>>>  generic_file_direct_write+0x119/0x210
+>>>  __generic_file_write_iter+0x11c/0x280
+>>>  ext4_file_write_iter+0x1b8/0x6f0
+>>>  aio_write+0x204/0x310
+>>>  io_submit_one+0x9d3/0xe80
+>>>  __x64_sys_io_submit+0x115/0x340
+>>>  do_syscall_64+0x71/0x210
+>>>  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>>> RIP: 0033:0x7f02cf043219
+>>
+>> I've seen this one before as well, it's not a new thing. As far as I can
+>> tell, it's a false positive. There should be no possibility for a
+>> use-after-free iterating the static tags/requests.
+> 
+> Are you sure this is a false positive?
 
-Signed-off-by: Huijin Park <huijin.park@samsung.com>
----
- drivers/block/zram/zram_drv.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+No I'm not, but the few times I have seen it, I haven't been able to
+make much sense of it. It goes back quite a bit.
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index 4879595..b3d3ba2 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1226,7 +1226,7 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
- 		if (!page)
- 			return -ENOMEM;
- 
--		ret = __zram_bvec_read(zram, page, index, bio, true);
-+		ret = __zram_bvec_read(zram, page, index, NULL, true);
- 		if (ret)
- 			goto out;
- 
+I have not yet encountered any false
+> positive KASAN complaints. According to the following gdb output this complaint
+> refers to reading rq->q:
+> 
+> (gdb) list *(bt_iter+0x86)
+> 0xffffffff816b9346 is in bt_iter (block/blk-mq-tag.c:237).
+> 232
+> 233             /*
+> 234              * We can hit rq == NULL here, because the tagging functions
+> 235              * test and set the bit before assigning ->rqs[].
+> 236              */
+> 237             if (rq && rq->q == hctx->queue)
+> 238                     iter_data->fn(hctx, rq, iter_data->data, reserved);
+> 239             return true;
+> 240     }
+> 241
+> 
+> From the disassembly output:
+> 
+> 232
+> 233             /*
+> 234              * We can hit rq == NULL here, because the tagging functions
+> 235              * test and set the bit before assigning ->rqs[].
+> 236              */
+> 237             if (rq && rq->q == hctx->queue)
+>    0xffffffff816b9339 <+121>:   test   %r12,%r12
+>    0xffffffff816b933c <+124>:   je     0xffffffff816b935f <bt_iter+159>
+>    0xffffffff816b933e <+126>:   mov    %r12,%rdi
+>    0xffffffff816b9341 <+129>:   callq  0xffffffff813bd3e0 <__asan_load8>
+>    0xffffffff816b9346 <+134>:   lea    0x138(%r13),%rdi
+>    0xffffffff816b934d <+141>:   mov    (%r12),%r14
+>    0xffffffff816b9351 <+145>:   callq  0xffffffff813bd3e0 <__asan_load8>
+>    0xffffffff816b9356 <+150>:   cmp    0x138(%r13),%r14
+>    0xffffffff816b935d <+157>:   je     0xffffffff816b936f <bt_iter+175>
+> 
+> BTW, rq may but does not have to refer to tags->static_rqs[...]. It may also
+> refer to hctx->fq.flush_rq.
+
+But even those are persistent for the lifetime of the queue... But since
+kasan complains it belongs to a specific page, I'm guessing it's one
+of the regular requests since those are out of a chopped up page. Which
+means it makes even less sense.
+
+Is this happening while devices are being actively torn down? And
+are you using shared tags? That's the only way I could see this
+triggering.
+
 -- 
-1.7.9.5
+Jens Axboe
 
