@@ -2,85 +2,96 @@ Return-Path: <SRS0=9Hvz=O5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76869C43387
-	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 17:36:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C2C1C43387
+	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 17:37:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 48C72218D4
-	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 17:36:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE1A62186A
+	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 17:37:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="o2PWvMNS"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="gCBe3G9W"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387686AbeLTRgX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Dec 2018 12:36:23 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:59320 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387591AbeLTRgX (ORCPT
+        id S1733055AbeLTRhI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Dec 2018 12:37:08 -0500
+Received: from mail-it1-f174.google.com ([209.85.166.174]:52454 "EHLO
+        mail-it1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725799AbeLTRhI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Dec 2018 12:36:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=Lh/UE2rcWeNuVlT6YYAIu+vONrVf+TLl/qV0NMHx9/k=; b=o2PWvMNSj4TxlAv9ddKOz/DIX
-        +eabdGN8hPtEp3A4Dzo8NjRwiZAxFUzeRiIXWrgw3rlj5LqYwhfiUdDpe1xYQUG3TlgtjA7lzh9hc
-        MpUVdBe+eNXEdIhM7dHFbHDraw9zPH+hxWDmH3UdApf+eHNdBUidgGvPFSpp/My1kyPToUwpR4BbO
-        VrsOm+qoB60IDkeAieAwolHX9Z0yIoEyTToyBTI/924u/gp8N32XdenhwVR2UX2q5gk1S7w6QMtlH
-        H4/9dkU+LGUEDwdfdyX3qvF221SuqS23fHiCzXe/EiBU2uJnoGrr/9pVwUtkeunJFlxiYcBdQ/LIW
-        /m8jrBhmg==;
-Received: from 089144198147.atnat0007.highway.a1.net ([89.144.198.147] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1ga2FC-0006uj-Nm; Thu, 20 Dec 2018 17:36:23 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH v2] bsg: deprecate BIDI support in bsg
-Date:   Thu, 20 Dec 2018 18:36:20 +0100
-Message-Id: <20181220173620.29120-1-hch@lst.de>
-X-Mailer: git-send-email 2.19.2
+        Thu, 20 Dec 2018 12:37:08 -0500
+Received: by mail-it1-f174.google.com with SMTP id g76so3177645itg.2
+        for <linux-block@vger.kernel.org>; Thu, 20 Dec 2018 09:37:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ZA9Fi67cs0K4625PwGqe3l2X2/yszPPV36PLDFMHLpU=;
+        b=gCBe3G9WlcH8kKJziBDz4V9//7M0upNAUt1TINldxplSU7ZLzC+dl549FPGj6dg7Ek
+         UFTVakuRSVDKX3w4dQsYOesCAtvI2iPwbxtXXAiaP8BF1HLl7530C3EcehYhI48/lYZH
+         5CMVeXkxDC7BhLuy38NVYiD+ShNfnT0ttlOSCNJFLjc11TZgXfDRCzzUW67L0cTTHd+z
+         /loqifJ0QQ3Co0VsKcr25DjFI7l8mxiTULUEI2UInEbYM3hyNfPS/8eFHXQ5kZSuvb9j
+         NVrauFmtoxoM2Ozto/aKl4MCEcB0YJmU+hzG55JD0WLaXEhXuR8Ki3tZSyA96PYk5Mn1
+         Aklg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ZA9Fi67cs0K4625PwGqe3l2X2/yszPPV36PLDFMHLpU=;
+        b=LGvdACOJSBiFzs0uyTy9umu4ti2MaIDc/VKFX4SjecWZ7iryi8otAI9zQ66vswKOTs
+         IbI+eiRP18m75L0DFDUpi4RKIBYeR1/KsQ/l4Cmyk9LoiW5j+CzuqS7EGoU4Pq8S6AEp
+         nNps4Whaznc8ox+1cjwX2t5g4yrHpJVDO9lNyPTw0mQkxXwvsgh9xQILGNrrcqYUQzje
+         ERG6IcrMc2GBUzAYybvJrY7mK72MzHRn0WCTiNgX6dEBep2qQrVPXe6e3S4lNxwUVVdu
+         7lrVg2mOddx3U5ho/76fSvRqOSYQTi8tcLNo04e+qmVmRYpMJvCZFHJDoQNmFsuxrRVn
+         YfLw==
+X-Gm-Message-State: AA+aEWZk1LzSK7NsKwh+Fza4Bv57N6Br+zjTuSO+1CDhKiq702qGa/vN
+        kb97QvL9dGl5xkSMmiB3OU4T1g==
+X-Google-Smtp-Source: AFSGD/WPtEWeK0pNz8CqbT8dp7eUX2I5N5g5DzL+1UeLp7jueXUpoKTG1EoTn0koNVRSjg9KNhSpAQ==
+X-Received: by 2002:a24:c105:: with SMTP id e5mr9911948itg.87.1545327427220;
+        Thu, 20 Dec 2018 09:37:07 -0800 (PST)
+Received: from [192.168.1.56] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id o2sm89334iop.76.2018.12.20.09.37.05
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 20 Dec 2018 09:37:06 -0800 (PST)
+Subject: Re: [PATCHSET v2] Fix kyber hang
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, osandov@osandov.com
+References: <20181220160149.4042-1-axboe@kernel.dk>
+ <20181220165638.GB27758@ming.t460p>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <87b7cc80-88cf-4836-4776-96d6208d500a@kernel.dk>
+Date:   Thu, 20 Dec 2018 10:37:05 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20181220165638.GB27758@ming.t460p>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Besides the OSD command set that never got traction, the only SCSI
-command using bidirectional buffers is XDWRITEREAD in the 10 and 32 byte
-variants, which is extremely esoteric and has been removed from the spec
-again as of SBC4r15.  It probably doesn't make sense to keep the support
-code around just for that, so start deprecating the support.
+On 12/20/18 9:56 AM, Ming Lei wrote:
+> On Thu, Dec 20, 2018 at 09:01:47AM -0700, Jens Axboe wrote:
+>> Since the wrong kyber patch was included in the first one, here's a
+>> v2 with just that one line corrected.
+>>
+>> First one adds the necessary sbitmap helpers for users to be able to
+>> do add_wait_queue() and list_del(wait_entry) type operations, and
+>> still work with the optimized wakeup checking.
+>>
+>> Second one converts kyber to use it, fixing a hang with domain tokens.
+> 
+> With the two patches, can't reproduce the io hang issue any more when
+> kyber is used.
+> 
+> Tested-by: Ming Lei <ming.lei@redhat.com>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
+Awesome, thanks for reporting and testing the patches!
 
-Changes since v1:
- - mention that XDWRITEREAD has been removed from SBC
-
- block/bsg.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/block/bsg.c b/block/bsg.c
-index 44f6028b9567..50e5f8f666f2 100644
---- a/block/bsg.c
-+++ b/block/bsg.c
-@@ -177,6 +177,10 @@ bsg_map_hdr(struct request_queue *q, struct sg_io_v4 *hdr, fmode_t mode)
- 			goto out;
- 		}
- 
-+		pr_warn_once(
-+			"BIDI support in bsg has been deprecated and might be removed. "
-+			"Please report your use case to linux-scsi@vger.kernel.org\n");
-+
- 		next_rq = blk_get_request(q, REQ_OP_SCSI_IN, 0);
- 		if (IS_ERR(next_rq)) {
- 			ret = PTR_ERR(next_rq);
 -- 
-2.19.2
+Jens Axboe
 
