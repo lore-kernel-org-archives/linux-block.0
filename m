@@ -2,86 +2,136 @@ Return-Path: <SRS0=9Hvz=O5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-4.0 required=3.0 tests=INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E02CBC43387
-	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 17:38:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83540C43387
+	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 18:01:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AB5E32186A
-	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 17:38:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="v91F5Oks"
+	by mail.kernel.org (Postfix) with ESMTP id 5F683217D9
+	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 18:01:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387567AbeLTRiK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Dec 2018 12:38:10 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:50958 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732058AbeLTRiJ (ORCPT
+        id S2388265AbeLTSBI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Dec 2018 13:01:08 -0500
+Received: from mail-pl1-f174.google.com ([209.85.214.174]:47046 "EHLO
+        mail-pl1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729293AbeLTSBI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Dec 2018 12:38:09 -0500
-Received: by mail-it1-f193.google.com with SMTP id z7so3196798iti.0
-        for <linux-block@vger.kernel.org>; Thu, 20 Dec 2018 09:38:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=IJbjPaTRDz2ATyIeQcfwTFt+GaPBYJxP9I720dJkZA0=;
-        b=v91F5OksszPj/0iCvTNIc/kiL8TWJXmEh8LB5j9ifE7i71p4dD9yfHbSshBztPRSns
-         j+F2kQcbSL6N/Um5TL9G4ZF7q5yMdEQ+or5HW7SkizxTOkB9dMeSHIbuHExKlQIa7pj+
-         UYFZaeC/ZyKfiorL42q4kVtlgEnu3GPv63HCyBrt/3nqeNQp7tc9VMUhdTLlmnaWuwht
-         Xcg3a0BLQ+tjMeMRgYQ4d277IJgrNXtf0K7NDFMO5m61iJIHsFEkMw7hT06YL5Za2Kch
-         80ZGo/mM2K1Gh9QOFk5wuAVz3SwPkDX2c7URniA7S8FQGL2MUqs/rZ1xdK4xAenwJzVt
-         GK/g==
+        Thu, 20 Dec 2018 13:01:08 -0500
+Received: by mail-pl1-f174.google.com with SMTP id t13so1213169ply.13
+        for <linux-block@vger.kernel.org>; Thu, 20 Dec 2018 10:01:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=IJbjPaTRDz2ATyIeQcfwTFt+GaPBYJxP9I720dJkZA0=;
-        b=f/CKUi44CNu09iYng0zoN+wRbuY/UvSLIAj7SNjDvMDyy9MVWdGlUV4cVLbjaKc03g
-         6QOBoK/+yqSKACQcc8bNT5SV7xhSJ/tQ8AmnzbjGw6KWarghPTLoeway/iM/n/ggvYak
-         Bhbyn7Kn/UaSU31FLMhqjbG3EFe8paD1Mnh/RfJFn45ZiqGby4dHQRtXUyKJ6y8kJ50z
-         wB4fH+FkNlzpSs7DTvZutEZH4upOQy6bFdB+CmbdPkTQnzKsodRlLsfNyYszDhK7ga0E
-         AbzwvIdkEWV8BTI7Oq9qa93eJoEWaI58Aza1cInWd1nksLfQuunBAfD+B30YgoJhdvg0
-         fc6A==
-X-Gm-Message-State: AA+aEWav6dYFQtfI5BoJ8N+jQlpeyC8gdNkwCzr8Hf87hWzAih7nm31V
-        WlloCNw4NUlxXoXEVJ1znEAShQ==
-X-Google-Smtp-Source: AFSGD/VRiQGW6UF51Q9Vuyu9uRjUQfx2f2NvYhVCDANUtHZd5jrUA75P/Gkv2+kD7xR2JtFPvbFPTA==
-X-Received: by 2002:a24:cfc4:: with SMTP id y187mr10275277itf.144.1545327488807;
-        Thu, 20 Dec 2018 09:38:08 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id y23sm7223666ita.1.2018.12.20.09.38.07
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 20 Dec 2018 09:38:08 -0800 (PST)
-Subject: Re: [PATCH v2] bsg: deprecate BIDI support in bsg
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-References: <20181220173620.29120-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c991ddba-a171-16b5-4221-b21146c75196@kernel.dk>
-Date:   Thu, 20 Dec 2018 10:38:07 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <20181220173620.29120-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=YXf5jSMnQO5miM2Bd5EY5xzeSakMfHGzuZw2UyBQ/Ec=;
+        b=P+VzZ/hBI56m1MU6n51xgjE1brG7/BAOVv1neKWyuK5ZZyQZ7T+aW7JrGtoHoLEFQh
+         YWasImMEdTzATSeNePBqnT1KBLsiWFl3DbGHr1hZl0+tmnwrZUqhFK7m7DUC1508MUsA
+         EIlYogpFxU4z3Rgo+2FD4wtNUDR80OapqAmoj4i0Coe9OeDzf7RxPpli4RAvCGBCQkat
+         T1gjbLXUg8h7Emo4weMPVk1Dao3VfgnB+Ms2Qdw9h0YGWn6rGVu/i8gPSuwi7MEzyS9A
+         QkrfDz1S2GMo5pcbdqANrwUl9W6YT4PEMtEgiAy3yswJbzgcfyjcUPVSCZCkq1Ip9TZ4
+         ei6w==
+X-Gm-Message-State: AA+aEWb9QVStD/P9G254wb2ANP+fedQVuIbXY2+WJl+6XbDC8amKKUch
+        mxw1oaQZ8jPrSEJZn82yVhQ=
+X-Google-Smtp-Source: AFSGD/Wm69eFxbroKHk3ZxmFaLeXKP9yhfkANi+Aa2Nj9vP+BUA93NuymmuXhMOpNLb/gEJXBus+8A==
+X-Received: by 2002:a17:902:2aaa:: with SMTP id j39mr25644801plb.335.1545328867531;
+        Thu, 20 Dec 2018 10:01:07 -0800 (PST)
+Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id l19sm49096283pfi.71.2018.12.20.10.01.06
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 20 Dec 2018 10:01:06 -0800 (PST)
+Message-ID: <1545328865.185366.508.camel@acm.org>
+Subject: Re: v4.20-rc6: Sporadic use-after-free in bt_iter()
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>,
+        "jianchao.wang" <jianchao.w.wang@oracle.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Date:   Thu, 20 Dec 2018 10:01:05 -0800
+In-Reply-To: <6ae35005-7ba9-91e1-f315-d128f410c12c@kernel.dk>
+References: <1545261885.185366.488.camel@acm.org>
+         <74c0280c-e557-ad03-cd75-98dd6d868da3@kernel.dk>
+         <1545265001.185366.496.camel@acm.org>
+         <1ca5cd37-87ce-8cff-6cb4-1fdb29bd4da2@kernel.dk>
+         <0560802f-efc0-e9ec-99f7-4bdbdbc234f8@oracle.com>
+         <c078750c-ff6b-4939-281b-7556d31dc74d@kernel.dk>
+         <fe9dfe60-3cfc-9cfa-56c3-1365cbe8ec53@oracle.com>
+         <a45c9931-ce8b-0ac8-f304-412c6042eff9@kernel.dk>
+         <372d2960-ff0c-1135-28f9-23eea8670463@oracle.com>
+         <ccf50ee5-ff34-39a0-d7eb-3853fee55a4c@kernel.dk>
+         <6ae35005-7ba9-91e1-f315-d128f410c12c@kernel.dk>
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/20/18 10:36 AM, Christoph Hellwig wrote:
-> Besides the OSD command set that never got traction, the only SCSI
-> command using bidirectional buffers is XDWRITEREAD in the 10 and 32 byte
-> variants, which is extremely esoteric and has been removed from the spec
-> again as of SBC4r15.  It probably doesn't make sense to keep the support
-> code around just for that, so start deprecating the support.
+On Thu, 2018-12-20 at 06:07 -0700, Jens Axboe wrote:
++AD4 On 12/20/18 6:02 AM, Jens Axboe wrote:
++AD4 +AD4 +AD4 I'm afraid this cannot work.
++AD4 +AD4 +AD4 
++AD4 +AD4 +AD4 The 'tags' here could be the hctx-+AD4-sched+AF8-tags, but what we need to
++AD4 +AD4 +AD4 clear is hctx-+AD4-tags-+AD4-rqs+AFsAXQ.
++AD4 +AD4 
++AD4 +AD4 You are right, of course, a bit too quick on the trigger. This one
++AD4 +AD4 should work better, and also avoids that silly quadratic loop. I don't
++AD4 +AD4 think we need the tag +AD0APQ -1 check, but probably best to be safe.
++AD4 
++AD4 Sent out the wrong one, here it is. Bart, if you can reproduce, can you
++AD4 give it a whirl?
++AD4 
++AD4 
++AD4 diff --git a/block/blk-mq.c b/block/blk-mq.c
++AD4 index 2de972857496..fc04bb648f18 100644
++AD4 --- a/block/blk-mq.c
++AD4 +-+-+- b/block/blk-mq.c
++AD4 +AEAAQA -2025,7 +-2025,7 +AEAAQA void blk+AF8-mq+AF8-free+AF8-rqs(struct blk+AF8-mq+AF8-tag+AF8-set +ACo-set, struct blk+AF8-mq+AF8-tags +ACo-tags,
++AD4  +AHs
++AD4  	struct page +ACo-page+ADs
++AD4  
++AD4 -	if (tags-+AD4-rqs +ACYAJg set-+AD4-ops-+AD4-exit+AF8-request) +AHs
++AD4 +-	if (tags-+AD4-rqs) +AHs
++AD4  		int i+ADs
++AD4  
++AD4  		for (i +AD0 0+ADs i +ADw tags-+AD4-nr+AF8-tags+ADs i+-+-) +AHs
++AD4 +AEAAQA -2033,8 +-2033,14 +AEAAQA void blk+AF8-mq+AF8-free+AF8-rqs(struct blk+AF8-mq+AF8-tag+AF8-set +ACo-set, struct blk+AF8-mq+AF8-tags +ACo-tags,
++AD4  
++AD4  			if (+ACE-rq)
++AD4  				continue+ADs
++AD4 -			set-+AD4-ops-+AD4-exit+AF8-request(set, rq, hctx+AF8-idx)+ADs
++AD4 +-			if (set-+AD4-ops-+AD4-exit+AF8-request)
++AD4 +-				set-+AD4-ops-+AD4-exit+AF8-request(set, rq, hctx+AF8-idx)+ADs
++AD4  			tags-+AD4-static+AF8-rqs+AFs-i+AF0 +AD0 NULL+ADs
++AD4 +-
++AD4 +-			if (rq-+AD4-tag +AD0APQ -1)
++AD4 +-				continue+ADs
++AD4 +-			if (set-+AD4-tags+AFs-hctx+AF8-idx+AF0--+AD4-rqs+AFs-rq-+AD4-tag+AF0 +AD0APQ rq)
++AD4 +-				set-+AD4-tags+AFs-hctx+AF8-idx+AF0--+AD4-rqs+AFs-rq-+AD4-tag+AF0 +AD0 NULL+ADs
++AD4  		+AH0
++AD4  	+AH0
++AD4  
++AD4 +AEAAQA -2113,6 +-2119,7 +AEAAQA static int blk+AF8-mq+AF8-init+AF8-request(struct blk+AF8-mq+AF8-tag+AF8-set +ACo-set, struct request +ACo-rq,
++AD4  			return ret+ADs
++AD4  	+AH0
++AD4  
++AD4 +-	rq-+AD4-tag +AD0 -1+ADs
++AD4  	WRITE+AF8-ONCE(rq-+AD4-state, MQ+AF8-RQ+AF8-IDLE)+ADs
++AD4  	return 0+ADs
++AD4  +AH0
 
-Applied, thanks.
+Hi Jens,
 
--- 
-Jens Axboe
+Are you sure this is sufficient? My understanding is that
+blk+AF8-mq+AF8-queue+AF8-tag+AF8-busy+AF8-iter() iterates over all tags in the tag set. So if the
+request queue on which part+AF8-in+AF8-flight() is called and the request queue for
+which blk+AF8-mq+AF8-free+AF8-rqs() is called share their tag set then part+AF8-in+AF8-flight()
+and blk+AF8-mq+AF8-free+AF8-rqs() can run concurrently. That can cause ugly race
+conditions. Do you think it would be a good idea to modify the inflight
+accounting code such that it only considers the requests of a single request
+queue instead of all requests for a given tag set?
 
+Thanks,
+
+Bart.
