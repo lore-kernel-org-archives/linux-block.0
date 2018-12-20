@@ -6,62 +6,61 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39815C43387
-	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 22:33:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9489C43387
+	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 22:47:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CE5A421903
-	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 22:33:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C1B92186A
+	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 22:47:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lbOpYvr4"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="rlyV7ldk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732764AbeLTWdi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Dec 2018 17:33:38 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:36485 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730002AbeLTWdh (ORCPT
+        id S1730467AbeLTWrf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Dec 2018 17:47:35 -0500
+Received: from mail-it1-f172.google.com ([209.85.166.172]:36006 "EHLO
+        mail-it1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730294AbeLTWrf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Dec 2018 17:33:37 -0500
-Received: by mail-it1-f193.google.com with SMTP id c9so4087665itj.1
-        for <linux-block@vger.kernel.org>; Thu, 20 Dec 2018 14:33:36 -0800 (PST)
+        Thu, 20 Dec 2018 17:47:35 -0500
+Received: by mail-it1-f172.google.com with SMTP id c9so4130481itj.1
+        for <linux-block@vger.kernel.org>; Thu, 20 Dec 2018 14:47:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:from:to:references:message-id:date:user-agent:mime-version
          :in-reply-to:content-language:content-transfer-encoding;
-        bh=zhDoH0VSMN/jxzD0TAi1Gl8AV2pPn5ReB2X+M6pygt4=;
-        b=lbOpYvr4KPzHUJWxX7RWfkyTv6owPOi9wTAGuoH5E7mxqZcLcUIPxqMsQaDesHBIds
-         pxVq1JjKpArUJ+tGDVqovL59wEZvaKGnfkf8M1TBYevyN3u3Ow965ULAaqpLF2T12Yit
-         lFqqg9UXTQvWyMHPBYU88nqA2Y5EFklTrBgWtAT7DmnQdg2VVmJPVtjkRL7ZYzV1dRvf
-         bndMZUmrWIegLRAefSgcV7O3WrV4Xtp1YyAPWZT+7oiRZzU9gEwUSSZfTkzQEV1Y+edt
-         hcMZ5KMBLZ5ZjXifTK2RH7d9L2NBrPvx0QVLc4zjwVrJBEGh5EwcNFfDleIqU9DTzV7x
-         5kBA==
+        bh=yb1/LImG0itNlqt0FFaRPcD5BJWS9OI24zekaIcxu08=;
+        b=rlyV7ldk9LcmQeUPAfdcvDWV5Z6Tb2ZIR6ph3lj5ZwnWoXEflD45EmWxpyIaaDSI1t
+         E6hyi1Iu7AhMSdRh3gEZvRCpXFcTuATIU2GgxrDK8j1Qd01qWcdWcrYiUsWkQh5MRcn8
+         EVANJlZG+xiIafnJjvAljzFx+iLi5IZl2Ieef6NFa3WuVvxwObe5UyHToC7TpQW8/hP1
+         U0DJGwznxMaLIuw1XbGWCXWoKaRnCCsKuTdXG9XZWMTM2ZTSrAQIXeKnPMbdKQjQdBGC
+         qOL4visC1SQikuCJnvHknoAa80F9K59ny/PvfhavvIfNkugiwAEPA0yJ5azo0GGLvDbj
+         WJzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:from:to:references:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=zhDoH0VSMN/jxzD0TAi1Gl8AV2pPn5ReB2X+M6pygt4=;
-        b=OxnV9DleKjvPA/A+TVfeCUs2E0Z/k1ENeV5Nb/vI6ICYX9EMVOegVrX4eGmX2CETB1
-         uYJNfOYwiUQa0BRnRt7D4LWqNW6A3dhgJMV+Q+rxY7mNatKWIHSwHo4n7VfbpDwG1TUd
-         SFWzM/RvMyQ3dBYTj33tRYyU/3/em/yHl0ZcsNhERzbf7VCYL5bIk7pBc/Vu50x8zRXQ
-         BDmXe+ssg+0jzbk3KNjXC0Wmc+CfwG+IBNQZ0Wh96aIUIGQKqDxFADctCXtkN7rpEOWO
-         bl2wu45Y62vtWEevmLvcjLG8/v0y+Rjq9RxIpVkOj1cH12egLdV9+STams1dxTLByJLQ
-         Ezjg==
-X-Gm-Message-State: AA+aEWZ5E4wRlYAdqiYvsKdaQscR1sQBI0mmSbww533HgCJ28AkH832d
-        dRK5W0YuurpOtJh44KOtJ4Sp4/xCC/6Atw==
-X-Google-Smtp-Source: AFSGD/VcjZtbYZELs9xmSO1QTp26LZ7A6jQAzKVxhANyUob06Qhqt+mMZRbzHcNOb0g0WNTFZRSZag==
-X-Received: by 2002:a02:9951:: with SMTP id d17mr34618jak.134.1545345215797;
-        Thu, 20 Dec 2018 14:33:35 -0800 (PST)
+        bh=yb1/LImG0itNlqt0FFaRPcD5BJWS9OI24zekaIcxu08=;
+        b=KrBYP0TPygxl5ETFbF9BmUG2mXPW3huqpIpHHjX21UfVgXNucT0UAufwCfkEls049w
+         YQgUmr8KHfodqI/k0/moKCR9nzq96uFkRliI5sIAwJgE5FEPJazgCQW48tRjnM+fr0QR
+         Ohue5F5Hbf9U5lK8j2Ay2HQrvQfEKsRMDtw9tzSI4VbkYHQEmX6CWxKGcKf3YHuvR9lM
+         eBpgr6in0UBp+T47xdUKsBh3xmgxGkbVeyvpPREm1wMB85PtxlWacbCn+la8bIOYN6AO
+         JHxk4kAeH14+KPrhBld//r58mwShyT49W0IH1ZTFKzJPiEL7eWTCg2njSj9GdoC994th
+         K5BQ==
+X-Gm-Message-State: AA+aEWZisqnuVtOWAv9oxtFiEO3fgTb58DnD4F/ur8mHQ9rr0cg0995K
+        unh+0/GcoaROHlv/4Y4OVxkc+fzEqBo4+Q==
+X-Google-Smtp-Source: AFSGD/VsCR9ZMCsF2KDwGoxTSVxNs7E0sZ4fEG+fSdw4DMBIbIx865bc8DBPKPWAb1IlOVEsiPII8A==
+X-Received: by 2002:a02:88cf:: with SMTP id b15mr86711jak.10.1545346053614;
+        Thu, 20 Dec 2018 14:47:33 -0800 (PST)
 Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id j129sm5578814itb.41.2018.12.20.14.33.34
+        by smtp.gmail.com with ESMTPSA id 14sm5188631itm.3.2018.12.20.14.47.32
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 20 Dec 2018 14:33:34 -0800 (PST)
+        Thu, 20 Dec 2018 14:47:32 -0800 (PST)
 Subject: Re: v4.20-rc6: Sporadic use-after-free in bt_iter()
 From:   Jens Axboe <axboe@kernel.dk>
 To:     Bart Van Assche <bvanassche@acm.org>,
         "jianchao.wang" <jianchao.w.wang@oracle.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 References: <1545261885.185366.488.camel@acm.org>
- <c078750c-ff6b-4939-281b-7556d31dc74d@kernel.dk>
  <fe9dfe60-3cfc-9cfa-56c3-1365cbe8ec53@oracle.com>
  <a45c9931-ce8b-0ac8-f304-412c6042eff9@kernel.dk>
  <372d2960-ff0c-1135-28f9-23eea8670463@oracle.com>
@@ -81,12 +80,13 @@ References: <1545261885.185366.488.camel@acm.org>
  <68c73daa-10e7-29da-b890-bf167ec164c2@kernel.dk>
  <1545344398.185366.531.camel@acm.org>
  <1864f5b8-cf64-a406-a3e0-9f5124ff95b5@kernel.dk>
-Message-ID: <a04dee3c-f355-4d28-caa4-21c7265ccae4@kernel.dk>
-Date:   Thu, 20 Dec 2018 15:33:33 -0700
+ <a04dee3c-f355-4d28-caa4-21c7265ccae4@kernel.dk>
+Message-ID: <5869f2ed-dc65-135f-f12f-c14a1184125e@kernel.dk>
+Date:   Thu, 20 Dec 2018 15:47:31 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <1864f5b8-cf64-a406-a3e0-9f5124ff95b5@kernel.dk>
+In-Reply-To: <a04dee3c-f355-4d28-caa4-21c7265ccae4@kernel.dk>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -95,70 +95,75 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/20/18 3:23 PM, Jens Axboe wrote:
-> On 12/20/18 3:19 PM, Bart Van Assche wrote:
->> On Thu, 2018-12-20 at 14:48 -0700, Jens Axboe wrote:
->>> -void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
->>> -		     unsigned int hctx_idx)
->>> +static void blk_mq_rcu_free_pages(struct work_struct *work)
->>>  {
->>> +	struct blk_mq_tags *tags = container_of(to_rcu_work(work),
->>> +						struct blk_mq_tags, rcu_work);
->>>  	struct page *page;
->>>  
->>> +	while (!list_empty(&tags->page_list)) {
->>> +		page = list_first_entry(&tags->page_list, struct page, lru);
->>> +		list_del_init(&page->lru);
->>> +		/*
->>> +		 * Remove kmemleak object previously allocated in
->>> +		 * blk_mq_init_rq_map().
->>> +		 */
->>> +		kmemleak_free(page_address(page));
->>> +		__free_pages(page, page->private);
->>> +	}
->>> +}
->>> +
->>> +void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
->>> +		     unsigned int hctx_idx)
->>> +{
->>>  	if (tags->rqs && set->ops->exit_request) {
->>>  		int i;
->>>  
->>> @@ -2038,16 +2061,9 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
->>>  		}
->>>  	}
->>>  
->>> -	while (!list_empty(&tags->page_list)) {
->>> -		page = list_first_entry(&tags->page_list, struct page, lru);
->>> -		list_del_init(&page->lru);
->>> -		/*
->>> -		 * Remove kmemleak object previously allocated in
->>> -		 * blk_mq_init_rq_map().
->>> -		 */
->>> -		kmemleak_free(page_address(page));
->>> -		__free_pages(page, page->private);
->>> -	}
->>> +	/* Punt to RCU free, so we don't race with tag iteration */
->>> +	INIT_RCU_WORK(&tags->rcu_work, blk_mq_rcu_free_pages);
->>> +	queue_rcu_work(system_wq, &tags->rcu_work);
->>>  }
+On 12/20/18 3:33 PM, Jens Axboe wrote:
+> On 12/20/18 3:23 PM, Jens Axboe wrote:
+>> On 12/20/18 3:19 PM, Bart Van Assche wrote:
+>>> On Thu, 2018-12-20 at 14:48 -0700, Jens Axboe wrote:
+>>>> -void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+>>>> -		     unsigned int hctx_idx)
+>>>> +static void blk_mq_rcu_free_pages(struct work_struct *work)
+>>>>  {
+>>>> +	struct blk_mq_tags *tags = container_of(to_rcu_work(work),
+>>>> +						struct blk_mq_tags, rcu_work);
+>>>>  	struct page *page;
+>>>>  
+>>>> +	while (!list_empty(&tags->page_list)) {
+>>>> +		page = list_first_entry(&tags->page_list, struct page, lru);
+>>>> +		list_del_init(&page->lru);
+>>>> +		/*
+>>>> +		 * Remove kmemleak object previously allocated in
+>>>> +		 * blk_mq_init_rq_map().
+>>>> +		 */
+>>>> +		kmemleak_free(page_address(page));
+>>>> +		__free_pages(page, page->private);
+>>>> +	}
+>>>> +}
+>>>> +
+>>>> +void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+>>>> +		     unsigned int hctx_idx)
+>>>> +{
+>>>>  	if (tags->rqs && set->ops->exit_request) {
+>>>>  		int i;
+>>>>  
+>>>> @@ -2038,16 +2061,9 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+>>>>  		}
+>>>>  	}
+>>>>  
+>>>> -	while (!list_empty(&tags->page_list)) {
+>>>> -		page = list_first_entry(&tags->page_list, struct page, lru);
+>>>> -		list_del_init(&page->lru);
+>>>> -		/*
+>>>> -		 * Remove kmemleak object previously allocated in
+>>>> -		 * blk_mq_init_rq_map().
+>>>> -		 */
+>>>> -		kmemleak_free(page_address(page));
+>>>> -		__free_pages(page, page->private);
+>>>> -	}
+>>>> +	/* Punt to RCU free, so we don't race with tag iteration */
+>>>> +	INIT_RCU_WORK(&tags->rcu_work, blk_mq_rcu_free_pages);
+>>>> +	queue_rcu_work(system_wq, &tags->rcu_work);
+>>>>  }
+>>>
+>>> This can only work correctly if blk_mq_rcu_free_pages() is called before
+>>> INIT_RCU_WORK() is called a second time for the same bkl_mq_tags structure
+>>> and if blk_mq_rcu_free_pages() is called before struct blk_mq_tags is freed.
+>>> What provides these guarantees? Did I perhaps miss something?
 >>
->> This can only work correctly if blk_mq_rcu_free_pages() is called before
->> INIT_RCU_WORK() is called a second time for the same bkl_mq_tags structure
->> and if blk_mq_rcu_free_pages() is called before struct blk_mq_tags is freed.
->> What provides these guarantees? Did I perhaps miss something?
+>> We don't call it twice. Protecting against that is outside the scope
+>> of this function. But we call and clear form the regular shutdown path,
+>> and the rest is error handling on setup.
+>>
+>> But yes, we do need to ensure that 'tags' doesn't go away. Probably best
+>> to rework it to shove it somewhere else for freeing for that case, and
+>> leave the rest of the shutdown alone. I'll update the patch.
 > 
-> We don't call it twice. Protecting against that is outside the scope
-> of this function. But we call and clear form the regular shutdown path,
-> and the rest is error handling on setup.
-> 
-> But yes, we do need to ensure that 'tags' doesn't go away. Probably best
-> to rework it to shove it somewhere else for freeing for that case, and
-> leave the rest of the shutdown alone. I'll update the patch.
+> Here's a version that doesn't rely on tags, we just dynamically allocate
+> the structure. For the very odd case where we fail, we just punt to
+> an on-stack structure and use the big synchronize_rcu() hammer first.
 
-Here's a version that doesn't rely on tags, we just dynamically allocate
-the structure. For the very odd case where we fail, we just punt to
-an on-stack structure and use the big synchronize_rcu() hammer first.
+Forgot to init the lists... This one I actually booted, works for me.
+Outside of that, not tested, in terms of verifying the use-after-free is
+gone for tag iteration.
 
 
 diff --git a/block/blk-flush.c b/block/blk-flush.c
@@ -280,7 +285,7 @@ index 61deab0b5a5a..bb84d1f099c7 100644
  
  static inline bool blk_mq_tag_is_reserved(struct blk_mq_tags *tags,
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2de972857496..d104bcb4308f 100644
+index 2de972857496..c17103c00362 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
 @@ -298,13 +298,16 @@ static struct request *blk_mq_rq_ctx_init(struct blk_mq_alloc_data *data,
@@ -381,7 +386,7 @@ index 2de972857496..d104bcb4308f 100644
  
  	if (tags->rqs && set->ops->exit_request) {
  		int i;
-@@ -2038,15 +2069,26 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+@@ -2038,15 +2069,28 @@ void blk_mq_free_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
  		}
  	}
  
@@ -393,6 +398,7 @@ index 2de972857496..d104bcb4308f 100644
 +
 +	rpl = kmalloc(sizeof(*rpl), GFP_NOIO);
 +	if (rpl) {
++		INIT_LIST_HEAD(&rpl->list);
 +		list_splice_init(&tags->page_list, &rpl->list);
 +
 +		/* Punt to RCU free, so we don't race with tag iteration */
@@ -409,13 +415,14 @@ index 2de972857496..d104bcb4308f 100644
  		 */
 -		kmemleak_free(page_address(page));
 -		__free_pages(page, page->private);
++		INIT_LIST_HEAD(&stack_rpl.list);
 +		list_splice_init(&tags->page_list, &stack_rpl.list);
 +		synchronize_rcu();
 +		blk_mq_rcu_free_pages(&stack_rpl.rcu_work.work);
  	}
  }
  
-@@ -2077,7 +2119,7 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
+@@ -2077,7 +2121,7 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
  	if (!tags)
  		return NULL;
  
@@ -437,7 +444,6 @@ index 848278c52030..785207fc8a30 100644
  };
  
  extern struct kmem_cache *blk_requestq_cachep;
-
 
 -- 
 Jens Axboe
