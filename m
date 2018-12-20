@@ -2,98 +2,117 @@ Return-Path: <SRS0=9Hvz=O5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C660DC43387
-	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 18:18:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D38EDC43387
+	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 18:18:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9836E218D9
-	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 18:18:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1071218D9
+	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 18:18:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1545329911;
-	bh=xj1yrDDF4dxZ0jgmpjhzECD0N7zPdcyGIQnnyUmFHiY=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=ACFMV0ZOheEtdmfHY80yZVDNzDZozsUgaF5KJF90V833orQChvthBs+CczrQNgpk8
-	 6nneKvUClNMaXqeiNurdSwFTgX7mkxN/w4u25EGmRuyDfT/BMF1yZ/hjpRfuMQz+Sf
-	 /08XZcYPtMP5bKYMgTcd9VX502gXFWxJuSfevJks=
+	s=default; t=1545329912;
+	bh=NZIhO5AfwvmEiWz5d+dpa/D/+Eu/ZySEOT/8TkSu/qU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=Tg821pgO98+vL+7LGDXiNdfaiUYbEwv5mQtncAZzidxg7I7jnX3J3vqC7TXkxRcti
+	 Kqxb8NsvHgs7g9C1RdNekvcUQz5SBvDD4nPzt7N9g6hSgmYBKNelkKS/uEp9dMng5l
+	 DhXjkfFwtAcl/9FURCVoA7Q6FylgGD1N3FhBP7pw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731379AbeLTSSb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Dec 2018 13:18:31 -0500
-Received: from mail-yw1-f65.google.com ([209.85.161.65]:45962 "EHLO
+        id S1732063AbeLTSSc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Dec 2018 13:18:32 -0500
+Received: from mail-yw1-f65.google.com ([209.85.161.65]:43261 "EHLO
         mail-yw1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730897AbeLTSSa (ORCPT
+        with ESMTP id S1730897AbeLTSSc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Dec 2018 13:18:30 -0500
-Received: by mail-yw1-f65.google.com with SMTP id d190so1041955ywd.12
-        for <linux-block@vger.kernel.org>; Thu, 20 Dec 2018 10:18:30 -0800 (PST)
+        Thu, 20 Dec 2018 13:18:32 -0500
+Received: by mail-yw1-f65.google.com with SMTP id n21so1046769ywd.10
+        for <linux-block@vger.kernel.org>; Thu, 20 Dec 2018 10:18:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=YyRuqjnW4LfNozhJsM7mwJlgob5Pj0wj7b6QRgp6XXM=;
-        b=tJSsmO4Y99IDopu3FdzH4DyiYKKcWt7MRzAvCKz+8P6TLRydZMaqlIKk/pPdegeVDp
-         v/YEJdJHM4vttKt8K8n1r2AuUH6D7Swd8TdMI3lywB549R7NHRKcWnHTiYekJ7bYWPAF
-         qNFSvR12lSMwFWoBP5352ywzJGG+w0kzod/iNjL+7eIu6rIpOMuXRXSGAYqGXjh4iOke
-         XbYrFdan8E+XIbzyIvU4Jg6gQ1O0WDZN6BzvVjkBVPkwzLJ/wWO+EFBPzSSzFrPEMWi9
-         DQbg9PuTP0BRYSyz9es3rbN+sJqM88OBEp3k9zNmS/utVVqLYx+ohL3bcOFANTvUzLF8
-         LiwQ==
-X-Gm-Message-State: AA+aEWZtdrIyo6QmN7M62KUyy8DJA9l5nMvt6WODLb+AfqwPfRpRtDgN
-        UAFZYnSaeNrP30fowbn6HSKrti4TB30=
-X-Google-Smtp-Source: AFSGD/XtFSsPNhIZbXAPReKrX2PObMHhD+6BmbLjQ9iW5U7UPXO9jcgSXEXIb2UBsVnYggppFLeHQw==
-X-Received: by 2002:a81:a748:: with SMTP id e69mr26753005ywh.309.1545329909972;
-        Thu, 20 Dec 2018 10:18:29 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=DjzoohP8ri7b1Fvpz3Cnv3WgJh5EJUJ6dAteQ8S5u2E=;
+        b=j1z6jHCmy7VnMtaD3x9054tHI3510vU0C41qaePl0Z4sGtXjORr0y0mIBSqcz1g2UE
+         8OJQy8j2MVy1c+pioNshSZFcteNiuJRGbXy5iglq4orh1CoZ6dFHqnMyvrsq9cQcIkzk
+         LyHjz0YwJuhfRxuGK+6RV3xu1OwDOrF57IkBc8oy/c57lIP+/vkr9mQnYGnb0fNjEWj2
+         y+HFhS4fhRCdvHyvY/JuNJ0WPhiH58TZG10SUbjjn+k3vauqeG9MeqUVkohHoDO6jEhC
+         VBpctSX1kOvutHfMUR6Oqbq444cb8bFN+BBk2B3H6O6/ehFyNYQR1rTGxM31TOMsE4WX
+         YIMA==
+X-Gm-Message-State: AA+aEWYjR6clo8GjpXNibUdrNQKzgTlrGKXXZMYum2iCythjGQMijGdp
+        953KMPAMEB5ZJUY8rGAQa7Q=
+X-Google-Smtp-Source: AFSGD/W+UTIk4F29XEAzXqhA8I9IzzPlMRxNgv1BPQ1tmR+DKQ7o/aslSIl+z34mzhcyvGU00l2Now==
+X-Received: by 2002:a81:c44d:: with SMTP id s13mr28473829ywj.411.1545329911278;
+        Thu, 20 Dec 2018 10:18:31 -0800 (PST)
 Received: from dennisz-mbp.thefacebook.com ([199.201.65.2])
-        by smtp.gmail.com with ESMTPSA id q185sm7115113ywe.87.2018.12.20.10.18.28
+        by smtp.gmail.com with ESMTPSA id q185sm7115113ywe.87.2018.12.20.10.18.30
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Thu, 20 Dec 2018 10:18:28 -0800 (PST)
+        Thu, 20 Dec 2018 10:18:30 -0800 (PST)
 From:   Dennis Zhou <dennis@kernel.org>
 To:     Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>
 Cc:     kernel-team@fb.com, linux-block@vger.kernel.org,
         Dennis Zhou <dennis@kernel.org>
-Subject: [PATCH blktests v2 0/2] Add scsi-stress-remove to blktests
-Date:   Thu, 20 Dec 2018 12:18:24 -0600
-Message-Id: <20181220181826.55481-1-dennis@kernel.org>
+Subject: [PATCH blktests 1/2] blktests: split out cgroup2 controller and file check
+Date:   Thu, 20 Dec 2018 12:18:25 -0600
+Message-Id: <20181220181826.55481-2-dennis@kernel.org>
 X-Mailer: git-send-email 2.13.5
+In-Reply-To: <20181220181826.55481-1-dennis@kernel.org>
+References: <20181220181826.55481-1-dennis@kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+This is a prep patch for a new test that will race blkg association and
+request_queue cleanup. As blkg association is a underlying cgroup io
+controller feature, we need the ability to check if the controller is
+available.
 
+Signed-off-by: Dennis Zhou <dennis@kernel.org>
+---
 v2:
-There was a minor typo in 0001 pointed out by Omar which I fixed here.
-0002 was refactored to use common/scsi_debug. I also rebased onto the
-top of osandov#josef changing the test from block/022 -> block/027.
+- fixed minor typo.
 
-From v1:
-Ming Lei's scsi-stress-remove test found a bug in blkg destruction [1]
-where bios being created when the request_queue was being cleaned up
-threw a NPE in blkg association. The fix is currently being discussed in
-[2]. To make this test more accessible, I've ported it to blktests with
-Ming Lei's copyright. I've tested this in my qemu instance and verified
-we do not see the NPE on a fixed kernel.
+ common/cgroup | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-Ming, please let me know if you have any objections.
+diff --git a/common/cgroup b/common/cgroup
+index d445093..48e546f 100644
+--- a/common/cgroup
++++ b/common/cgroup
+@@ -37,19 +37,27 @@ _have_cgroup2()
+ 	return 0
+ }
+ 
+-_have_cgroup2_controller_file()
++_have_cgroup2_controller()
+ {
+-	_have_cgroup2 || return 1
+-
+ 	local controller="$1"
+-	local file="$2"
+-	local dir
++
++	_have_cgroup2 || return 1
+ 
+ 	dir="$(_cgroup2_base_dir)"
++
+ 	if ! grep -q "$controller" "$dir/cgroup.controllers"; then
+ 		SKIP_REASON="no support for $controller cgroup controller; if it is enabled, you may need to boot with cgroup_no_v1=$controller"
+ 		return 1
+ 	fi
++}
++
++_have_cgroup2_controller_file()
++{
++	local controller="$1"
++	local file="$2"
++	local dir
++
++	_have_cgroup2_controller "$controller" || return 1
+ 
+ 	mkdir "$dir/blktests"
+ 	echo "+$controller" > "$dir/cgroup.subtree_control"
+-- 
+2.17.1
 
-[1] https://lore.kernel.org/linux-block/CACVXFVO_QXipD3cmPvpLyBYSiEcWPN_ThQ=0pO9AwLqN-Lv93w@mail.gmail.com
-[2] https://lore.kernel.org/lkml/20181211230308.66276-1-dennis@kernel.org/
-
-This patchset is ontop of osandov#josef 98db2e11c97f.
-
-diffstats below:
-
-Dennis Zhou (2):
-  blktests: split out cgroup2 controller and file check
-  blktests: add Ming Lei's scsi-stress-remove
-
- common/cgroup       | 18 +++++++----
- tests/block/027     | 73 +++++++++++++++++++++++++++++++++++++++++++++
- tests/block/027.out |  2 ++
- 3 files changed, 88 insertions(+), 5 deletions(-)
- create mode 100755 tests/block/027
- create mode 100644 tests/block/027.out
-
-Thanks,
-Dennis
