@@ -6,61 +6,61 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F324AC43387
-	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 21:44:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 168B7C43387
+	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 21:48:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ADF6921903
-	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 21:44:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1D0F21903
+	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 21:48:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="KIqWzVQS"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="kmTbnt0Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390076AbeLTVoO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Dec 2018 16:44:14 -0500
-Received: from mail-io1-f44.google.com ([209.85.166.44]:42598 "EHLO
-        mail-io1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732606AbeLTVoN (ORCPT
+        id S2390074AbeLTVsz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Dec 2018 16:48:55 -0500
+Received: from mail-it1-f180.google.com ([209.85.166.180]:51623 "EHLO
+        mail-it1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730700AbeLTVsy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Dec 2018 16:44:13 -0500
-Received: by mail-io1-f44.google.com with SMTP id x6so2047378ioa.9
-        for <linux-block@vger.kernel.org>; Thu, 20 Dec 2018 13:44:12 -0800 (PST)
+        Thu, 20 Dec 2018 16:48:54 -0500
+Received: by mail-it1-f180.google.com with SMTP id w18so4234272ite.1
+        for <linux-block@vger.kernel.org>; Thu, 20 Dec 2018 13:48:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
+        h=subject:from:to:references:message-id:date:user-agent:mime-version
          :in-reply-to:content-language:content-transfer-encoding;
-        bh=Kq2ooDdPuw9xoSNTMW5wE2teKWLRwUe0kZXisWKHUCo=;
-        b=KIqWzVQSdQ8PICnAIc+20ZmfCUDJ2IWz0byAgPYpj6ID4izpZytk23/KB+TlRGPV+t
-         LVogSqqKkF0iipGJdxI17kxfKfIBIUiv/5cvLg/mpvj0N5KWPuIVXPlYWnaRQDebtlqH
-         03/OkfkbCneBeCIiI6wO4FU26uIWxJD2npkA4uZz+MD/sFGka4DkEKkkuJHJsHFit8DM
-         lsvU+y1R1T+W6y68w9VoN2qqYSs2Cdhv6tRHiAYaa0LJLELDu79Xg4L1uk21pLs+ZyG/
-         74PW8W82qBQcxVAeNSNJFn7cfkB2/ccMexSJQ8d/NYsBYOF80Azw4ZsY1wNkFXqaYZvW
-         JELw==
+        bh=jRO/UbTw8HbuTIn4YrOnp30M5hpMWbRVxOShDvCrTYg=;
+        b=kmTbnt0ZKhI23HNq9lSRmV/2M0uxtk2jFMU6YvoFKznZHahnMetu7zmlcoGRHGd972
+         EcljGgiHApkA50c5a1sPNHQpTwSe5YiqY9nSvsf6YbmiFY6SvZzuRCSFfh2rxjSK8Zfc
+         DCKu2yb8PphQkqlEDObju7BEH98IfdCV6G6bxkaHbd+dre2lmguUrCBY5yo2vAVSAADX
+         5Ogt9dQ7EJvr9mdRxr6NQsWxDyyqqKfLmPosvlXE3fxN/GBnDjlhFW6aaPl8KKOmKNaQ
+         qUqVtqRm7dz9E7YVyhOMNGhiIwlXLiR0vGyD844/VulnBgq11r8IMESVoZR/6ePjN1sj
+         uOCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
+        h=x-gm-message-state:subject:from:to:references:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Kq2ooDdPuw9xoSNTMW5wE2teKWLRwUe0kZXisWKHUCo=;
-        b=ArJzPYU75t+9xrvViMLQZNYaFkBxMMWshIbQCyKJJZJprMXNZ0LWlXb6sxjevwl6QY
-         Lvij1m4+9fnz8ldrKZisBfBr4vbW9EAW/RuNhMAp9ea/rmcoLiSwhXBT6EckMeN5aRtp
-         Qxj9MQgy6hEFcd35xDb7N5kbyT3p5vreKp53BIeSuhlo8FwwJozIwAxGVoPqN1m4u98b
-         wnc/xR87p+kewLVmC/WBT9lGTwGyaqrdsSyr1Ee0kIT/7bWD3Rfyobc7q0eGNK76j8qd
-         aeuM9FuYm3lruLZUnbsJHWxPcuDUA5p3LwAJ02T6b6kfP2KcBPS//ljl1rThkS5cmfoB
-         YDDg==
-X-Gm-Message-State: AA+aEWa785lZmQoMRChWXk12Mpddc8DWGrU5RpxJ90l8L9zvP6sxZcEK
-        /I/Bg0i1sFLdEJvXtcB7m+1tdlKwaeXUTw==
-X-Google-Smtp-Source: AFSGD/WUNqtQEae4fc1Y66V8hIvwsEzDYaWASaLcKk3rsnQ0JqEDsrQmx+O2620bZME0UYBRXnlb9A==
-X-Received: by 2002:a6b:4e14:: with SMTP id c20mr21109629iob.65.1545342250774;
-        Thu, 20 Dec 2018 13:44:10 -0800 (PST)
+        bh=jRO/UbTw8HbuTIn4YrOnp30M5hpMWbRVxOShDvCrTYg=;
+        b=L/OBtHtVP6NGWb9ggqTdBfxuCgTqJ6/pLrJJwK66cWoDToZFh/Dt+0SY/VFWbIzTNL
+         dcZRXVZq/Lr7HuKUyz+ULrbCbuYJozGvaA46bKEfMkoccVbUvuet6orC/iKp9+jvhjyc
+         2RdIwL+aLYgdbr4nWSvZDZY9RSjlqfNHEIc0ktKDNrhdztXDR5Zy2tVQOquEJCUEJEq0
+         EFF3kmHAU6RrqYhzlki6Q3YevKjfjxXbkd2RjJKJYh71x+at9Z/MyMXxyCpZD7RCIBRk
+         In/SWOYouU2o+NPRD4MT9o1Ku3nn7um9IY0H0naPw0IX9ODWC5xydzQMKLtz+/9JPOft
+         fkPA==
+X-Gm-Message-State: AA+aEWaCRFaIEVHhep7KWmD+u6qKayYy3nr62hf66N1P/p7vndKzLnK3
+        xOQZ6ylR8P7eWK+fiqGwnngB8DCMJajH+Q==
+X-Google-Smtp-Source: ALg8bN78m0COHGEPBn+LKbb+uuHcwud2YiBKJ7ig50KvKiW6DDHoFfvoSmedhfOXPC3+M4447FXNLA==
+X-Received: by 2002:a24:5015:: with SMTP id m21mr306533itb.2.1545342532771;
+        Thu, 20 Dec 2018 13:48:52 -0800 (PST)
 Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id t64sm9064021itb.5.2018.12.20.13.44.09
+        by smtp.gmail.com with ESMTPSA id h64sm5553562itb.14.2018.12.20.13.48.51
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 20 Dec 2018 13:44:09 -0800 (PST)
+        Thu, 20 Dec 2018 13:48:51 -0800 (PST)
 Subject: Re: v4.20-rc6: Sporadic use-after-free in bt_iter()
+From:   Jens Axboe <axboe@kernel.dk>
 To:     Bart Van Assche <bvanassche@acm.org>,
         "jianchao.wang" <jianchao.w.wang@oracle.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 References: <1545261885.185366.488.camel@acm.org>
- <74c0280c-e557-ad03-cd75-98dd6d868da3@kernel.dk>
  <1545265001.185366.496.camel@acm.org>
  <1ca5cd37-87ce-8cff-6cb4-1fdb29bd4da2@kernel.dk>
  <0560802f-efc0-e9ec-99f7-4bdbdbc234f8@oracle.com>
@@ -80,14 +80,14 @@ References: <1545261885.185366.488.camel@acm.org>
  <1545341470.185366.519.camel@acm.org>
  <61515137-0565-e3b7-e6de-554af7d49753@kernel.dk>
  <1545342043.185366.523.camel@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <60b4819c-4c19-a4e3-41f3-e21b0544c9a4@kernel.dk>
-Date:   Thu, 20 Dec 2018 14:44:08 -0700
+ <60b4819c-4c19-a4e3-41f3-e21b0544c9a4@kernel.dk>
+Message-ID: <68c73daa-10e7-29da-b890-bf167ec164c2@kernel.dk>
+Date:   Thu, 20 Dec 2018 14:48:51 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <1545342043.185366.523.camel@acm.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <60b4819c-4c19-a4e3-41f3-e21b0544c9a4@kernel.dk>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -95,29 +95,61 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/20/18 2:40 PM, Bart Van Assche wrote:
-> On Thu, 2018-12-20 at 14:34 -0700, Jens Axboe wrote:
->> Yeah, I don't think it's bullet proof either, it just closes the gap.
->> I'm fine with fiddling with the tag iteration. On top of what I sent, we
->> could have tag iteration hold the RCU read lock, and then we just need
->> to ensure that the tags are freed with RCU.
+On 12/20/18 2:44 PM, Jens Axboe wrote:
+> On 12/20/18 2:40 PM, Bart Van Assche wrote:
+>> On Thu, 2018-12-20 at 14:34 -0700, Jens Axboe wrote:
+>>> Yeah, I don't think it's bullet proof either, it just closes the gap.
+>>> I'm fine with fiddling with the tag iteration. On top of what I sent, we
+>>> could have tag iteration hold the RCU read lock, and then we just need
+>>> to ensure that the tags are freed with RCU.
+>>
+>> Do you mean using call_rcu() to free tags? Would that require to add a
+>> struct rcu_head to every request? Would it be acceptable to increase the
+>> size of struct request with an rcu_head? Additionally, could that reduce
+>> the queue depth if the time between grace periods is larger than the time
+>> between I/O submissions?
 > 
-> Do you mean using call_rcu() to free tags? Would that require to add a
-> struct rcu_head to every request? Would it be acceptable to increase the
-> size of struct request with an rcu_head? Additionally, could that reduce
-> the queue depth if the time between grace periods is larger than the time
-> between I/O submissions?
+> No no, the requests are out of full pages, we just need one per blk_mq_tags.
+> Something like the below... And then the tag iteration needs to grab the
+> RCU read lock to prevent the page freeing from happening.
+> 
+> This should essentially be free, as rcu read lock for tag iteration is
+> basically a no-op.
+> 
+> Need to handle the flush request on top of this as well.
 
-No no, the requests are out of full pages, we just need one per blk_mq_tags.
-Something like the below... And then the tag iteration needs to grab the
-RCU read lock to prevent the page freeing from happening.
-
-This should essentially be free, as rcu read lock for tag iteration is
-basically a no-op.
-
-Need to handle the flush request on top of this as well.
+With FQ handled as well.
 
 
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index a3fc7191c694..23e1f5fb091f 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -491,12 +491,22 @@ struct blk_flush_queue *blk_alloc_flush_queue(struct request_queue *q,
+ 	return NULL;
+ }
+ 
++static void blk_fq_rcu_free(struct work_struct *work)
++{
++	struct blk_flush_queue *fq = container_of(to_rcu_work(work),
++							struct blk_flush_queue,
++							rcu_work);
++
++	kfree(fq->flush_rq);
++	kfree(fq);
++}
++	
+ void blk_free_flush_queue(struct blk_flush_queue *fq)
+ {
+ 	/* bio based request queue hasn't flush queue */
+ 	if (!fq)
+ 		return;
+ 
+-	kfree(fq->flush_rq);
+-	kfree(fq);
++	INIT_RCU_WORK(&fq->rcu_work, blk_fq_rcu_free);
++	queue_rcu_work(system_wq, &fq->rcu_work);
+ }
 diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
 index 2089c6c62f44..c39b58391ae8 100644
 --- a/block/blk-mq-tag.c
@@ -336,6 +368,19 @@ index 2de972857496..4decd1e7d2d9 100644
  				 GFP_NOIO | __GFP_NOWARN | __GFP_NORETRY,
  				 node);
  	if (!tags->rqs) {
+diff --git a/block/blk.h b/block/blk.h
+index 848278c52030..785207fc8a30 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -29,6 +29,8 @@ struct blk_flush_queue {
+ 	 */
+ 	struct request		*orig_rq;
+ 	spinlock_t		mq_flush_lock;
++
++	struct rcu_work		rcu_work;
+ };
+ 
+ extern struct kmem_cache *blk_requestq_cachep;
 
 -- 
 Jens Axboe
