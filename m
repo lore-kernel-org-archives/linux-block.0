@@ -6,60 +6,60 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52D6EC43612
-	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 16:01:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56494C43387
+	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 16:01:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1CFF220645
-	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 16:01:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25FBB20645
+	for <linux-block@archiver.kernel.org>; Thu, 20 Dec 2018 16:01:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Sf/re0i2"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="wPfJ4U5O"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731220AbeLTQBz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 20 Dec 2018 11:01:55 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:51910 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731635AbeLTQBz (ORCPT
+        id S1731654AbeLTQB5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 20 Dec 2018 11:01:57 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:37100 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731635AbeLTQB5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 20 Dec 2018 11:01:55 -0500
-Received: by mail-it1-f193.google.com with SMTP id w18so2710794ite.1
-        for <linux-block@vger.kernel.org>; Thu, 20 Dec 2018 08:01:54 -0800 (PST)
+        Thu, 20 Dec 2018 11:01:57 -0500
+Received: by mail-io1-f68.google.com with SMTP id k4so1204570iop.4
+        for <linux-block@vger.kernel.org>; Thu, 20 Dec 2018 08:01:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=oB+0q7Lt2osTwYPEl0P7d/WPaYr05Cl62XCYWW8dKTA=;
-        b=Sf/re0i2hroaycGGP6A4x+ImVc1oRT4WMza6G9ZX2ArpLS3z6+ZJPXEwB1c8ruJSyu
-         p2FB94BW0hSrNTEpuXViT1Qp7zbmWRSw3+TYLfVn+JdqpQk25iOWvW7iaT4tN2ZBqqPF
-         cFsqvE09r+7cLSn51Txeu4yia2hpFgOePK/dT0x4waJCO5BqdFPTc+ML1yY0VYZ/On/4
-         RXPi2WDGt67iUQEKtzhZ4qqepLu3oTJDeYUk1AaOUYw8R6Zo6Xe6AI0BMe5eE0mOmqAj
-         TSsRDjsEcYSxLrETu+o7Mg5JypAaXvYJpkZkXUDpx93V2oPkd7mAJxvXOXFqocaBdQgl
-         5V+g==
+        bh=GAH+nRBrJvV+C2KRMcJCO0VU6aOQWle7L/rpTK098Mk=;
+        b=wPfJ4U5OgVUzI68v4xLMo0DJ3XgowymJB+71CAl/IFal9OqPKxZfkoIll/XCGtzUYQ
+         J/jhe5LdM4io2mUzmUhgrf/I5BHos8kFy8K/dXRoGsD4SvL1Q7hUrY82ibp8s6S1PJPq
+         wcFNTL6sGpT4S92nAFMyTUsA1beTUfJ1gEknfiDqgUcPeFskzZ1564NpSZgqSeHh2HlR
+         tv60VA8oZuWkN6iPkhy3PlRv0jxYE1iKBW2mu2CUzi1C5utSExgy2iaq6bm7Qu0NPIw5
+         VFuiIOwYDQrA3DtLal4ZcQkPkHo6hZiUpJD7c+gb4ylOiekRlMJsGBlKX4rZ8IjRDB57
+         MkAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=oB+0q7Lt2osTwYPEl0P7d/WPaYr05Cl62XCYWW8dKTA=;
-        b=iY+/QxEoMxUrP8TOYAgTfJ07Z9cLZ9iK2rax6k8V1j6uN3m1dXDCMPF63Pepf9pH2a
-         OiU/Koyn/4LrSgzWjVPxY59RikPDC1fdxhpqmjVKsMl1rzKe72QOlfOatpWm/USx9ZRT
-         q5UZ3W00ijJUS8Rr1svYC8KPpSvTgm+mC9eUzzEXkL9Xp/s7MWrKt9ibt82/Q7hrYun8
-         6AF3Qj0HQ1tQ/5L3yvvjD8VzqiLwLnekZMePNojg+4kLNrD0Ra63JqeC5yFV8nSUVNN9
-         MigKdhIxE7ahBLypS2mzRFAlxf1WZvnfNjU2BDFU0R1C7IJ1Z4O3h5xv023x0qpVCXZb
-         nwzA==
-X-Gm-Message-State: AA+aEWbYCKu7l8RvYvTunyWnS7cZdyAwe3W1I0tuei/hoNcroIaSRVMX
-        vEoCLthyN6+cVtsXmye89ceZSLEFQV0LSA==
-X-Google-Smtp-Source: AFSGD/XvoMuGtg20yp3M+6DosoEN2TbbYnSKUMTGkHWsqzmjuPHX/nF8ZNdemmj0DI/NjuRmCKmJRA==
-X-Received: by 2002:a02:8527:: with SMTP id g36mr21696205jai.135.1545321713663;
-        Thu, 20 Dec 2018 08:01:53 -0800 (PST)
+        bh=GAH+nRBrJvV+C2KRMcJCO0VU6aOQWle7L/rpTK098Mk=;
+        b=ExpcosfYrHeh8AFF8e0uvxE4BV8iLdrGH1IL0gYcZixKGGD+w+K9Um6zPAk7gY7j6E
+         HWZL6vJgI44JAjsDr8+GAhLhHzr6bQ1q1+pq2cMKYus0nEDzC7aYCh0twViGuRa+xSTB
+         9OZTLuigkapArQ3Il9y/kCr4qHMXf9Obm2rk3635ibx5MeEYVrxxQoPVEH6J1hWENTWO
+         34wOOWujrtSlZi03XY3KKWLkuQZgBydjZufaXMl+rSFR2/zqjCerWzIul27ceEiUU1YA
+         /2/SW2KITat8VeXbKgUMW4lQD55MbEnhOrbh7XiBzhywiw8HwA/PpBFfe5UgknOkliD6
+         1ZUA==
+X-Gm-Message-State: AA+aEWaTmbeFBFG/W9R1l8cL6zUHl+8PhEu39Lp/yZkg766Qx53puGXR
+        g4t11hqjwzM932oXaCt/xz8CqEpgfHyoWg==
+X-Google-Smtp-Source: AFSGD/V/KtOiwxHdMMMksnsYjEIZUXriajt3izgPKH4nd/uHRBa17XrJiyTAiPqotSxWeZnamhIDLQ==
+X-Received: by 2002:a6b:156:: with SMTP id 83mr21031061iob.63.1545321715336;
+        Thu, 20 Dec 2018 08:01:55 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id x99sm4974365ita.23.2018.12.20.08.01.52
+        by smtp.gmail.com with ESMTPSA id x99sm4974365ita.23.2018.12.20.08.01.53
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 20 Dec 2018 08:01:52 -0800 (PST)
+        Thu, 20 Dec 2018 08:01:54 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-block@vger.kernel.org
 Cc:     ming.lei@redhat.com, osandov@osandov.com,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/2] sbitmap: add helpers for add/del wait queue handling
-Date:   Thu, 20 Dec 2018 09:01:48 -0700
-Message-Id: <20181220160149.4042-2-axboe@kernel.dk>
+Subject: [PATCH 2/2] kyber: use sbitmap add_wait_queue/list_del wait helpers
+Date:   Thu, 20 Dec 2018 09:01:49 -0700
+Message-Id: <20181220160149.4042-3-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181220160149.4042-1-axboe@kernel.dk>
 References: <20181220160149.4042-1-axboe@kernel.dk>
@@ -68,111 +68,111 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-After commit 5d2ee7122c73, users of sbitmap that need wait queue
-handling must use the provided helpers. But we only added
-prepare_to_wait()/finish_wait() style helpers, add the equivalent
-add_wait_queue/list_del wrappers as we..
+sbq_wake_ptr() checks sbq->ws_active to know if it needs to loop
+the wait indexes or not. This requires the use of the sbitmap
+waitqueue wrappers, but kyber doesn't use those for its domain
+token waitqueue handling.
 
-This is needed to ensure kyber plays by the sbitmap waitqueue
-rules.
+Convert kyber to use the helpers. This fixes a hang with waiting
+for domain tokens.
 
+Fixes: 5d2ee7122c73 ("sbitmap: optimize wakeup check")
+Reported-by: Ming Lei <ming.lei@redhat.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- include/linux/sbitmap.h | 16 ++++++++++++++--
- lib/sbitmap.c           | 30 ++++++++++++++++++++++++++----
- 2 files changed, 40 insertions(+), 6 deletions(-)
+ block/kyber-iosched.c | 28 +++++++++++++++-------------
+ 1 file changed, 15 insertions(+), 13 deletions(-)
 
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index 03f50fcedc79..14d558146aea 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -560,13 +560,13 @@ void sbitmap_queue_wake_up(struct sbitmap_queue *sbq);
- void sbitmap_queue_show(struct sbitmap_queue *sbq, struct seq_file *m);
- 
- struct sbq_wait {
--	int accounted;
-+	struct sbitmap_queue *sbq;	/* if set, sbq_wait is accounted */
- 	struct wait_queue_entry wait;
+diff --git a/block/kyber-iosched.c b/block/kyber-iosched.c
+index de78e8aa7b0a..ec6a04e01bc1 100644
+--- a/block/kyber-iosched.c
++++ b/block/kyber-iosched.c
+@@ -195,7 +195,7 @@ struct kyber_hctx_data {
+ 	unsigned int batching;
+ 	struct kyber_ctx_queue *kcqs;
+ 	struct sbitmap kcq_map[KYBER_NUM_DOMAINS];
+-	wait_queue_entry_t domain_wait[KYBER_NUM_DOMAINS];
++	struct sbq_wait domain_wait[KYBER_NUM_DOMAINS];
+ 	struct sbq_wait_state *domain_ws[KYBER_NUM_DOMAINS];
+ 	atomic_t wait_index[KYBER_NUM_DOMAINS];
  };
+@@ -501,10 +501,11 @@ static int kyber_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int hctx_idx)
  
- #define DEFINE_SBQ_WAIT(name)							\
- 	struct sbq_wait name = {						\
--		.accounted = 0,							\
-+		.sbq = NULL,							\
- 		.wait = {							\
- 			.private	= current,				\
- 			.func		= autoremove_wake_function,		\
-@@ -588,4 +588,16 @@ void sbitmap_prepare_to_wait(struct sbitmap_queue *sbq,
- void sbitmap_finish_wait(struct sbitmap_queue *sbq, struct sbq_wait_state *ws,
- 				struct sbq_wait *sbq_wait);
- 
-+/*
-+ * Wrapper around add_wait_queue(), which maintains some extra internal state
-+ */
-+void sbitmap_add_wait_queue(struct sbitmap_queue *sbq,
-+			    struct sbq_wait_state *ws,
-+			    struct sbq_wait *sbq_wait);
-+
-+/*
-+ * Must be paired with sbitmap_add_wait_queue()
-+ */
-+void sbitmap_del_wait_queue(struct sbq_wait *sbq_wait);
-+
- #endif /* __LINUX_SCALE_BITMAP_H */
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 5b3e56d68dab..65c2d06250a6 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -671,13 +671,35 @@ void sbitmap_queue_show(struct sbitmap_queue *sbq, struct seq_file *m)
- }
- EXPORT_SYMBOL_GPL(sbitmap_queue_show);
- 
-+void sbitmap_add_wait_queue(struct sbitmap_queue *sbq,
-+			    struct sbq_wait_state *ws,
-+			    struct sbq_wait *sbq_wait)
-+{
-+	if (!sbq_wait->sbq) {
-+		sbq_wait->sbq = sbq;
-+		atomic_inc(&sbq->ws_active);
-+	}
-+	add_wait_queue(&ws->wait, &sbq_wait->wait);
-+}
-+EXPORT_SYMBOL_GPL(sbitmap_add_wait_queue);
-+
-+void sbitmap_del_wait_queue(struct sbq_wait *sbq_wait)
-+{
-+	list_del_init(&sbq_wait->wait.entry);
-+	if (sbq_wait->sbq) {
-+		atomic_dec(&sbq_wait->sbq->ws_active);
-+		sbq_wait->sbq = NULL;
-+	}
-+}
-+EXPORT_SYMBOL_GPL(sbitmap_del_wait_queue);
-+
- void sbitmap_prepare_to_wait(struct sbitmap_queue *sbq,
- 			     struct sbq_wait_state *ws,
- 			     struct sbq_wait *sbq_wait, int state)
- {
--	if (!sbq_wait->accounted) {
-+	if (!sbq_wait->sbq) {
- 		atomic_inc(&sbq->ws_active);
--		sbq_wait->accounted = 1;
-+		sbq_wait->sbq = sbq;
+ 	for (i = 0; i < KYBER_NUM_DOMAINS; i++) {
+ 		INIT_LIST_HEAD(&khd->rqs[i]);
+-		init_waitqueue_func_entry(&khd->domain_wait[i],
++		khd->domain_wait[i].sbq = NULL;
++		init_waitqueue_func_entry(&khd->domain_wait[i].wait,
+ 					  kyber_domain_wake);
+-		khd->domain_wait[i].private = hctx;
+-		INIT_LIST_HEAD(&khd->domain_wait[i].entry);
++		khd->domain_wait[i].wait.private = hctx;
++		INIT_LIST_HEAD(&khd->domain_wait[i].wait.entry);
+ 		atomic_set(&khd->wait_index[i], 0);
  	}
- 	prepare_to_wait_exclusive(&ws->wait, &sbq_wait->wait, state);
+ 
+@@ -698,12 +699,13 @@ static void kyber_flush_busy_kcqs(struct kyber_hctx_data *khd,
+ 			     flush_busy_kcq, &data);
  }
-@@ -687,9 +709,9 @@ void sbitmap_finish_wait(struct sbitmap_queue *sbq, struct sbq_wait_state *ws,
- 			 struct sbq_wait *sbq_wait)
+ 
+-static int kyber_domain_wake(wait_queue_entry_t *wait, unsigned mode, int flags,
++static int kyber_domain_wake(wait_queue_entry_t *wqe, unsigned mode, int flags,
+ 			     void *key)
  {
- 	finish_wait(&ws->wait, &sbq_wait->wait);
--	if (sbq_wait->accounted) {
-+	if (sbq_wait->sbq) {
- 		atomic_dec(&sbq->ws_active);
--		sbq_wait->accounted = 0;
-+		sbq_wait->sbq = NULL;
- 	}
+-	struct blk_mq_hw_ctx *hctx = READ_ONCE(wait->private);
++	struct blk_mq_hw_ctx *hctx = READ_ONCE(wqe->private);
++	struct sbq_wait *wait = container_of(wqe, struct sbq_wait, wait);
+ 
+-	list_del_init(&wait->entry);
++	sbitmap_del_wait_queue(wait);
+ 	blk_mq_run_hw_queue(hctx, true);
+ 	return 1;
  }
- EXPORT_SYMBOL_GPL(sbitmap_finish_wait);
+@@ -714,7 +716,7 @@ static int kyber_get_domain_token(struct kyber_queue_data *kqd,
+ {
+ 	unsigned int sched_domain = khd->cur_domain;
+ 	struct sbitmap_queue *domain_tokens = &kqd->domain_tokens[sched_domain];
+-	wait_queue_entry_t *wait = &khd->domain_wait[sched_domain];
++	struct sbq_wait *wait = &khd->domain_wait[sched_domain];
+ 	struct sbq_wait_state *ws;
+ 	int nr;
+ 
+@@ -725,11 +727,11 @@ static int kyber_get_domain_token(struct kyber_queue_data *kqd,
+ 	 * run when one becomes available. Note that this is serialized on
+ 	 * khd->lock, but we still need to be careful about the waker.
+ 	 */
+-	if (nr < 0 && list_empty_careful(&wait->entry)) {
++	if (nr < 0 && list_empty_careful(&wait->wait.entry)) {
+ 		ws = sbq_wait_ptr(domain_tokens,
+ 				  &khd->wait_index[sched_domain]);
+ 		khd->domain_ws[sched_domain] = ws;
+-		add_wait_queue(&ws->wait, wait);
++		sbitmap_add_wait_queue(domain_tokens, ws, wait);
+ 
+ 		/*
+ 		 * Try again in case a token was freed before we got on the wait
+@@ -745,10 +747,10 @@ static int kyber_get_domain_token(struct kyber_queue_data *kqd,
+ 	 * between the !list_empty_careful() check and us grabbing the lock, but
+ 	 * list_del_init() is okay with that.
+ 	 */
+-	if (nr >= 0 && !list_empty_careful(&wait->entry)) {
++	if (nr >= 0 && !list_empty_careful(&wait->wait.entry)) {
+ 		ws = khd->domain_ws[sched_domain];
+ 		spin_lock_irq(&ws->wait.lock);
+-		list_del_init(&wait->entry);
++		sbitmap_del_wait_queue(wait);
+ 		spin_unlock_irq(&ws->wait.lock);
+ 	}
+ 
+@@ -951,7 +953,7 @@ static int kyber_##name##_waiting_show(void *data, struct seq_file *m)	\
+ {									\
+ 	struct blk_mq_hw_ctx *hctx = data;				\
+ 	struct kyber_hctx_data *khd = hctx->sched_data;			\
+-	wait_queue_entry_t *wait = &khd->domain_wait[domain];		\
++	wait_queue_entry_t *wait = &khd->domain_wait[domain].wait;	\
+ 									\
+ 	seq_printf(m, "%d\n", !list_empty_careful(&wait->entry));	\
+ 	return 0;							\
 -- 
 2.17.1
 
