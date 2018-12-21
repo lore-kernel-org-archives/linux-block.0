@@ -6,60 +6,60 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 578E0C43387
-	for <linux-block@archiver.kernel.org>; Fri, 21 Dec 2018 19:23:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C898EC43387
+	for <linux-block@archiver.kernel.org>; Fri, 21 Dec 2018 19:23:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 244B221928
-	for <linux-block@archiver.kernel.org>; Fri, 21 Dec 2018 19:23:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 940792192D
+	for <linux-block@archiver.kernel.org>; Fri, 21 Dec 2018 19:23:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="N+Lt4/Zu"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cp/Jii7S"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391675AbeLUTXB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Dec 2018 14:23:01 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:55956 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391631AbeLUTXA (ORCPT
+        id S2391679AbeLUTXE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 21 Dec 2018 14:23:04 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:38662 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391631AbeLUTXD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Dec 2018 14:23:00 -0500
-Received: by mail-it1-f195.google.com with SMTP id m62so8432913ith.5
-        for <linux-block@vger.kernel.org>; Fri, 21 Dec 2018 11:22:59 -0800 (PST)
+        Fri, 21 Dec 2018 14:23:03 -0500
+Received: by mail-it1-f194.google.com with SMTP id h65so8019258ith.3
+        for <linux-block@vger.kernel.org>; Fri, 21 Dec 2018 11:23:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=JDeCVsy7jDLcbGUHdnLQfCWULqbGuJjXneNakcz9EtU=;
-        b=N+Lt4/Zus7cYcd3vbDF015+9Z9P3hIMyV1hhIcz74/iSKQVo2YsXn+LaBlq/ZeB9TU
-         tz7AGfNgRy9ZEGZncnLcX2K0fSXWmBK+6kEyJR3UeryQqALp+xZKXNsfy5e2C7z/Wf4g
-         qQmndFcay8mOSzT4NqRCxxrvmW8d2Gr6WjRuHRcOKCIOkguVyzCb/ml54T2of3UBs88T
-         zpJaHo70YV3dCk9rfEBAvoh3opddgKtN9GynsdfRqiO/7KgeywtXwCV5VqDt29AlWXEc
-         WE1eIwsNxcGNiZ+cwG9wM560EbxxFhTJq7wQHBVgStFsdoUD5eRUrcYgP170/SiSix9j
-         X7cQ==
+        bh=YmQh69OWzMNazR4KrWCsmkjt1yT30wP5g9jvy5MLpIs=;
+        b=cp/Jii7SBmo3EhtD1ncY3a8m96TLgDO09oejwE8faq6w8Q+uDuP/IfJv12OfQq11vd
+         MtyrsItRDAOumwjpIbSTKTPtujz9Hmugyc4QEs/KzVw2QQwmDAsdUn1J2MKSbnECfX1R
+         HyvzT8dMD3g5mXFgokS1+JpU6zyQ2bvKRvLWoZMn5VzuE38NIM37YtJOiqJPECcebSH9
+         TiJA36NVkxCA89jryWjbeT31n0e8KXQmag29XRL4XAwjdW/xYJ18KvF19APrcTr94it+
+         ce3ZKxKiXp47TIFUubTWtTv/TRK9RAgXjXba0BF73KlJQRPD0N84SGR/CVnO7I/6usUu
+         8LJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=JDeCVsy7jDLcbGUHdnLQfCWULqbGuJjXneNakcz9EtU=;
-        b=jn+XGxo97vhPHlKsGo2hdcKTWi6GX2EK4h7LQoYa5nRj0dcYHFlETz13+vU2M2aXvC
-         ohitBi31E1JogWEPtv+6keYmikRB0GtEPD0QjnqkTIVdL+YEgF17soeXzTvdqWPVSGqK
-         /eVEkzLY8SKcBjUQe8bF0HwuYqu4SNj/g5iR/9c7QnERu5SjeVV6JOhGNqHDSrBkVXPV
-         qq0Wbe+U/ULCajIDRwrrNQJTGAM08PTTn+1anktLlv1T2bB7oJJ1KlCeuUohVV8MgnjZ
-         2xCxgE4pkOrONafzQNwhGli/yJR2UGuGWBforUJNlE/z+BxtJLNYX4ykOhOHUGfY7ixb
-         GZBg==
-X-Gm-Message-State: AA+aEWYcUz2CuIBMC4IzjNA4y7WHencFFS+XcwnKx62KTexXGVO1A8U+
-        X5yWJ9UP5YzIPCFKtbsWJHKrvA==
-X-Google-Smtp-Source: AFSGD/XNknEu1MesUURics0AZoJJ8UhJFgcMl0teTbiM2/r7DbS7mN/ahX4sGb6MBaG/PlTaXrt8kw==
-X-Received: by 2002:a24:fa04:: with SMTP id v4mr2483408ith.175.1545420179465;
-        Fri, 21 Dec 2018 11:22:59 -0800 (PST)
+        bh=YmQh69OWzMNazR4KrWCsmkjt1yT30wP5g9jvy5MLpIs=;
+        b=I43lkYPtBPMGMJTf7q6KUtm85oSZlAQtSugQ1E3dT/4AIfX4Hbk1XmNE6GgJULaVR9
+         yaX/LwyxzFPihr9RN6wnQNXDVM80CbdLm7trbK0W6S17JnAjA7+sCAv1IPdRB4p+drxK
+         T5aXd7J9+w1I9NAF6Wjn4x8HZ9hzhGizUb3H/sqZatQ+wMY0uaTbMDDdEs51Iy1EMTyS
+         XQIM9Y8L5Qn58reR0X7vlEJEy2Ijv7EeZNBUPYXSS5m2+YcLyAp9EwQW7wU1oCq8YbZ6
+         ItC9j2yBloynQs9fxIB4DbMbfQnWxQXdyLSbhOEHJrkn1riOGx4LeZRPrRwoJj08tirf
+         pIXA==
+X-Gm-Message-State: AA+aEWZkvkA3PbauSFTT2u9sEKz3a+U2GdyTU+KPq5JUL5mT44D16z7Y
+        TJtk7P02PSVKYlJTIQD9o+dUwg==
+X-Google-Smtp-Source: AFSGD/WQugzEmJWuku7bCPQqogQu+14Ams5MXrL+s1Fm4fTd8//hkzO4luC2E3rw0iwymYjOSMHwwQ==
+X-Received: by 2002:a24:838c:: with SMTP id d134mr2700519ite.3.1545420182796;
+        Fri, 21 Dec 2018 11:23:02 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id t1sm12456290iol.85.2018.12.21.11.22.58
+        by smtp.gmail.com with ESMTPSA id t1sm12456290iol.85.2018.12.21.11.23.01
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 21 Dec 2018 11:22:58 -0800 (PST)
+        Fri, 21 Dec 2018 11:23:01 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
         linux-block@vger.kernel.org
 Cc:     hch@lst.de, viro@zeniv.linux.org.uk, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 12/22] aio: split iocb init from allocation
-Date:   Fri, 21 Dec 2018 12:22:26 -0700
-Message-Id: <20181221192236.12866-13-axboe@kernel.dk>
+Subject: [PATCH 14/22] aio: split old ring complete out from aio_complete()
+Date:   Fri, 21 Dec 2018 12:22:28 -0700
+Message-Id: <20181221192236.12866-15-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20181221192236.12866-1-axboe@kernel.dk>
 References: <20181221192236.12866-1-axboe@kernel.dk>
@@ -68,49 +68,47 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In preparation from having pre-allocated requests, that we then just
-need to initialize before use.
-
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/aio.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+ fs/aio.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
 
 diff --git a/fs/aio.c b/fs/aio.c
-index 33d1d2c0d6fe..093e6c8e9e09 100644
+index 513ecd3fa681..d33417bee594 100644
 --- a/fs/aio.c
 +++ b/fs/aio.c
-@@ -1091,6 +1091,16 @@ static bool get_reqs_available(struct kioctx *ctx)
- 	return __get_reqs_available(ctx);
+@@ -1198,12 +1198,9 @@ static void aio_fill_event(struct io_event *ev, struct aio_kiocb *iocb,
+ 	ev->res2 = res2;
  }
  
-+static void aio_iocb_init(struct kioctx *ctx, struct aio_kiocb *req)
-+{
-+	percpu_ref_get(&ctx->reqs);
-+	req->ki_ctx = ctx;
-+	INIT_LIST_HEAD(&req->ki_list);
-+	req->ki_flags = 0;
-+	refcount_set(&req->ki_refcnt, 0);
-+	req->ki_eventfd = NULL;
+-/* aio_complete
+- *	Called when the io request on the given iocb is complete.
+- */
+-static void aio_complete(struct aio_kiocb *iocb, long res, long res2)
++static void aio_ring_complete(struct kioctx *ctx, struct aio_kiocb *iocb,
++			      long res, long res2)
+ {
+-	struct kioctx	*ctx = iocb->ki_ctx;
+ 	struct aio_ring	*ring;
+ 	struct io_event	*ev_page, *event;
+ 	unsigned tail, pos, head;
+@@ -1253,6 +1250,16 @@ static void aio_complete(struct aio_kiocb *iocb, long res, long res2)
+ 	spin_unlock_irqrestore(&ctx->completion_lock, flags);
+ 
+ 	pr_debug("added to ring %p at [%u]\n", iocb, tail);
 +}
 +
- /* aio_get_req
-  *	Allocate a slot for an aio request.
-  * Returns NULL if no requests are free.
-@@ -1103,12 +1113,7 @@ static inline struct aio_kiocb *aio_get_req(struct kioctx *ctx)
- 	if (unlikely(!req))
- 		return NULL;
++/* aio_complete
++ *	Called when the io request on the given iocb is complete.
++ */
++static void aio_complete(struct aio_kiocb *iocb, long res, long res2)
++{
++	struct kioctx *ctx = iocb->ki_ctx;
++
++	aio_ring_complete(ctx, iocb, res, res2);
  
--	percpu_ref_get(&ctx->reqs);
--	req->ki_ctx = ctx;
--	INIT_LIST_HEAD(&req->ki_list);
--	req->ki_flags = 0;
--	refcount_set(&req->ki_refcnt, 0);
--	req->ki_eventfd = NULL;
-+	aio_iocb_init(ctx, req);
- 	return req;
- }
- 
+ 	/*
+ 	 * Check if the user asked us to deliver the result through an
 -- 
 2.17.1
 
