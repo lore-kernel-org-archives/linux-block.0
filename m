@@ -1,87 +1,76 @@
-Return-Path: <SRS0=3SAf=O6=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=4yxV=O7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEED9C43387
-	for <linux-block@archiver.kernel.org>; Fri, 21 Dec 2018 19:25:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0EB0C43387
+	for <linux-block@archiver.kernel.org>; Sat, 22 Dec 2018 16:54:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9848E21929
-	for <linux-block@archiver.kernel.org>; Fri, 21 Dec 2018 19:25:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="gB/pOVSu"
+	by mail.kernel.org (Postfix) with ESMTP id 9CA5A219FC
+	for <linux-block@archiver.kernel.org>; Sat, 22 Dec 2018 16:54:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732200AbeLUTZK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 21 Dec 2018 14:25:10 -0500
-Received: from mail-io1-f46.google.com ([209.85.166.46]:33029 "EHLO
-        mail-io1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729640AbeLUTZJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 21 Dec 2018 14:25:09 -0500
-Received: by mail-io1-f46.google.com with SMTP id t24so4520220ioi.0
-        for <linux-block@vger.kernel.org>; Fri, 21 Dec 2018 11:25:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=1fY/u2LihyrsGpFpycU0YdxYfkBoJNuQ5vx08+YHK18=;
-        b=gB/pOVSudKAcqRGKoHBJL+HtiCTnlm8TPoDE4f1qPAzkepDPbedObkiRjIa4mKB5gq
-         hc1Dnc2lHtALsV2OaswJWqjI+jNXpY1w2OLTojgAHWQvLgsWr2eFeFYHv9OiB/io8mHz
-         0Es2+syG8/Kbm6767sAMJGQVZs5UxnZNJAQ/JXgyMyURrg+hlUem6nXVN31fiYDzpzzf
-         g1Qbb/NAiym5hNOiWU31FzpmGJLFch83zWuRd8HqOtZZWswpR4oKgIsFNwEixr1h+8Ni
-         IWiCo3/3vV0npmIt+WZha/SJU5EbOjRcsJyILBAEYf5XoTPKuIC26xLiyWZm4vVpDZmU
-         zCSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1fY/u2LihyrsGpFpycU0YdxYfkBoJNuQ5vx08+YHK18=;
-        b=QlTQ6AoFdiaIVTRfdafNQcSjdfu905FxAJcN0uebKIBvaTg2QnAf1qYqRItQocNkXg
-         6jOuM+OHLcAJI1faNs60gTx/fTwX4/mgvfZQ3exKzqbnAgjubw4Nwqa2NyEI4tWGXZme
-         jcYLlL6T6i2kyxS35puaSuuJ+WYBgwUXTOCpUj+pf8rPMjSSGesYK0VRhIQTCBHni4iz
-         t7wYCXFtuoR7cpRqaki1qjfJ7tivWRKfO1Q3vxtZAeTCz4sz/UjxUlFyKMZpKw3eGlMw
-         6b+QLQI2uVhW+6vSJY0c0CSLpt1hHlJWEpYe+88QBx02whmMw+SD6Wx/to9UbBIt9K7s
-         u7Nw==
-X-Gm-Message-State: AJcUukcMciQ74kTJ5GtF6/8WyJQfMRZ+4M+3w6nMgc8ticx674kkbbaV
-        uY+ZUcKCRFMDVmSeFrrvdC3j/g==
-X-Google-Smtp-Source: ALg8bN5t4bL5yQf0HyVeYPqkj5mBjeUmo3SnjeLuc7EUkMyXYWacx0Quj9GyPHSql/NGwEkvoy6gNg==
-X-Received: by 2002:a6b:d20f:: with SMTP id q15mr2672879iob.100.1545420309140;
-        Fri, 21 Dec 2018 11:25:09 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id u20sm630259ioc.44.2018.12.21.11.25.07
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 21 Dec 2018 11:25:08 -0800 (PST)
-Subject: Re: [PATCH 04/22] block: use REQ_HIPRI_ASYNC for non-sync polled IO
-To:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
-        linux-block@vger.kernel.org
-Cc:     hch@lst.de, viro@zeniv.linux.org.uk
-References: <20181221192236.12866-1-axboe@kernel.dk>
- <20181221192236.12866-5-axboe@kernel.dk>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c34a6e3a-1142-4763-dfbe-9fa1b3579211@kernel.dk>
-Date:   Fri, 21 Dec 2018 12:25:07 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <20181221192236.12866-5-axboe@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1731094AbeLVQyg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 22 Dec 2018 11:54:36 -0500
+Received: from mout.gmx.net ([212.227.17.20]:54221 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729246AbeLVQyg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 22 Dec 2018 11:54:36 -0500
+Received: from localhost.localdomain ([116.30.194.149]) by mail.gmx.com
+ (mrgmx101 [212.227.17.174]) with ESMTPSA (Nemesis) id
+ 0LpwZn-1h4Ebk2jCB-00flgo; Sat, 22 Dec 2018 13:47:24 +0100
+From:   Chengguang Xu <cgxu519@gmx.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, Chengguang Xu <cgxu519@gmx.com>
+Subject: [PATCH] block: loop: remvoe redundant code
+Date:   Sat, 22 Dec 2018 20:47:15 +0800
+Message-Id: <20181222124715.29051-1-cgxu519@gmx.com>
+X-Mailer: git-send-email 2.17.2
+X-Provags-ID: V03:K1:xFNEeEXKssKrcdcl2IVKFcm9hoVDkh/RghvYDX7CWaL2fIDcrO/
+ 1sTd/KG+hNEviu7ykeSvmesSR+2qwPJyqSkH8VNbbVyUjNB+q0qyE/b7DvxpgvT/333htV/
+ ZmyF/4mycN9vi/3VIar+Dph84TUWuZ45EfTW1FZ28/fZdr6zqV89SLR4sjnANx/yW4ZlK/P
+ 59gs7C5Xq95LkWVSJraLA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:BrSANh5ronE=:RFb1cwllVCDxsWq5EyUbrv
+ RzGpB/3L4ccitE1njccvlnc7ACDhE/VvFHp5gbErxAhIo/hlXjwLDBKAjRMs7y8klQReNy82w
+ uArfj1KXTdx2/7O+ZuDa5thmTzt/heVDQrG5Q94DJFHkPQkS7xP5YCxIrVW44yg0V3nH+pC9C
+ glKnniOOdGdU0HwrmQXHCiP7xAkVPj+OrBuVB/l2lNgi9kF/Zbbt/gPZwhAp3aTDFFkiqPNl8
+ LEdwRyj71wmNGJSLexDKLVtjt+O+qa7PDW67+h1KCo5NSxCa8QCsX4+x7aJ1WVc2rYFoYfiZB
+ GPFx8yNDyclNkAbft93MWcLxvGUV7NpuBz+yFcILBOIHqhVTNMq1FQgwxi6r8L9xYQ36pQSOQ
+ K94pqSTU9sU32WNi/NfH9eUBEzGFAL7zyBlMHeqFlY7jp9KgJZfaDTZ9/5SyWAuNrQas3ZOQ1
+ hudV//s2YpuGiXTECORLC7t+1sBpKLhDaAQnwI3GwNWaE0jtIHGq/XzC9LdYjBbMRzcuhX1DG
+ EO7CpFTZVG8CBJIt1AJ2jEjJn0l3UT4squjmJJEbOtf7lLrzHRZXvh6i6d6yD3es+bhyi/tmd
+ RZ2Yc+p8soQOyp3b+kmUwIRbSg5nhvpplifgtcqcatWAMnzNr+4MBk4c7o8vK+a1DJBxLABlJ
+ k40LVUzZ2mmliDuVlE24nJV1XuAcF0nh0RfyU5OtWNkv0KFkeS9SxuLJ86CrnudrLhk1gH1OL
+ iVd9c1dRpIyJjM++Wrchyq6wf08zdm1DQTWyh8z70c/gjeDLa8cap/pRdjSDdS3sndF8EMrDj
+ lggpekH+nj7PGCKksujmsLC+wjmZd1/0nkVUSRJ0xaG0qHjzvVjCQgHNG1sl1GdU7/Aj7TxX8
+ CCxM2eda4EyJHfjsBQJRzXWMEjm/KpSBTyIuWc+nc=
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/21/18 12:22 PM, Jens Axboe wrote:
-> Tell the block layer if it's a sync or async polled request, so it can
-> do the right thing.
+Code cleanup for removing redundant break in switch case.
 
-Forgot to drop this one, please disregard it as it's super ceded by the
-next patch anyway...
+Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
+---
+ drivers/block/loop.c | 1 -
+ 1 file changed, 1 deletion(-)
 
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index cb0cc8685076..4e1d8aa6e1e9 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -615,7 +615,6 @@ static int do_req_filebacked(struct loop_device *lo, struct request *rq)
+ 	default:
+ 		WARN_ON_ONCE(1);
+ 		return -EIO;
+-		break;
+ 	}
+ }
+ 
 -- 
-Jens Axboe
+2.17.2
 
