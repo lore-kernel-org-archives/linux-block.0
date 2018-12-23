@@ -3,31 +3,31 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCFB8C43387
-	for <linux-block@archiver.kernel.org>; Sun, 23 Dec 2018 11:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66A9FC43387
+	for <linux-block@archiver.kernel.org>; Sun, 23 Dec 2018 11:10:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AF6B521903
-	for <linux-block@archiver.kernel.org>; Sun, 23 Dec 2018 11:10:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F2F121903
+	for <linux-block@archiver.kernel.org>; Sun, 23 Dec 2018 11:10:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728010AbeLWLKa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 23 Dec 2018 06:10:30 -0500
-Received: from mx2.suse.de ([195.135.220.15]:49516 "EHLO mx1.suse.de"
+        id S1728014AbeLWLKe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 23 Dec 2018 06:10:34 -0500
+Received: from mx2.suse.de ([195.135.220.15]:49550 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725868AbeLWLKa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 23 Dec 2018 06:10:30 -0500
+        id S1725868AbeLWLKe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 23 Dec 2018 06:10:34 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay1.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id D75DDAF0B;
-        Sun, 23 Dec 2018 11:10:28 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id C958DAF0B;
+        Sun, 23 Dec 2018 11:10:32 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     linux-bcache@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>
-Subject: [PATCH 03/11] bcache: add sysfs_strtoul_bool() for setting bit-field variables
-Date:   Sun, 23 Dec 2018 19:09:29 +0800
-Message-Id: <20181223110937.11559-4-colyli@suse.de>
+Subject: [PATCH 04/11] bcache: use sysfs_strtoul_bool() to set bit-field variables
+Date:   Sun, 23 Dec 2018 19:09:30 +0800
+Message-Id: <20181223110937.11559-5-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20181223110937.11559-1-colyli@suse.de>
 References: <20181223110937.11559-1-colyli@suse.de>
@@ -36,48 +36,69 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When setting bool values via sysfs interface, e.g. writeback_metadata,
-if writing 1 into writeback_metadata file, dc->writeback_metadata is
-set to 1, but if writing 2 into the file, dc->writeback_metadata is
-0. This is misleading, a better result should be 1 for all non-zero
-input value.
+When setting bcache parameters via sysfs, there are some variables are
+defined as bit-field value. Current bcache code in sysfs.c uses either
+d_strtoul() or sysfs_strtoul() to convert the input string to unsigned
+integer value and set it to the corresponded bit-field value.
 
-It is because dc->writeback_metadata is a bit-field variable, and
-current code simply use d_strtoul() to convert a string into integer
-and takes the lowest bit value. To fix such error, we need a routine
-to convert the input string into unsigned integer, and set target
-variable to 1 if the converted integer is non-zero.
+The problem is, the bit-field value only takes the lowest bit of the
+converted value. If input is 2, the expected value (like bool value)
+of the bit-field value should be 1, but indeed it is 0.
 
-This patch introduces a new macro called sysfs_strtoul_bool(), it can
-be used to convert input string into bool value, we can use it to set
-bool value for bit-field vairables.
+The following sysfs files for bit-field variables have such problem,
+	bypass_torture_test,	for dc->bypass_torture_test
+	writeback_metadata,	for dc->writeback_metadata
+	writeback_running,	for dc->writeback_running
+	verify,			for c->verify
+	key_merging_disabled,	for c->key_merging_disabled
+	gc_always_rewrite,	for c->gc_always_rewrite
+	btree_shrinker_disabled,for c->shrinker_disabled
+	copy_gc_enabled,	for c->copy_gc_enabled
+
+This patch uses sysfs_strtoul_bool() to set such bit-field variables,
+then if the converted value is non-zero, the bit-field variables will
+be set to 1, like setting a bool value like expensive_debug_checks.
 
 Signed-off-by: Coly Li <colyli@suse.de>
 ---
- drivers/md/bcache/sysfs.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ drivers/md/bcache/sysfs.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/md/bcache/sysfs.h b/drivers/md/bcache/sysfs.h
-index 3fe82425859c..c89bf6d78c03 100644
---- a/drivers/md/bcache/sysfs.h
-+++ b/drivers/md/bcache/sysfs.h
-@@ -79,6 +79,16 @@ do {									\
- 		return strtoul_safe(buf, var) ?: (ssize_t) size;	\
- } while (0)
+diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+index 29564bcb76c3..8dcafae6dd8a 100644
+--- a/drivers/md/bcache/sysfs.c
++++ b/drivers/md/bcache/sysfs.c
+@@ -274,9 +274,9 @@ STORE(__cached_dev)
  
-+#define sysfs_strtoul_bool(file, var)					\
-+do {									\
-+	if (attr == &sysfs_## file) {					\
-+		unsigned long v = strtoul_or_return(buf);		\
-+									\
-+		var = v ? 1 : 0;					\
-+		return size;						\
-+	}								\
-+} while (0)
-+
- #define sysfs_strtoul_clamp(file, var, min, max)			\
- do {									\
- 	if (attr == &sysfs_ ## file)					\
+ 	sysfs_strtoul(data_csum,	dc->disk.data_csum);
+ 	d_strtoul(verify);
+-	d_strtoul(bypass_torture_test);
+-	d_strtoul(writeback_metadata);
+-	d_strtoul(writeback_running);
++	sysfs_strtoul_bool(bypass_torture_test, dc->bypass_torture_test);
++	sysfs_strtoul_bool(writeback_metadata, dc->writeback_metadata);
++	sysfs_strtoul_bool(writeback_running, dc->writeback_running);
+ 	d_strtoul(writeback_delay);
+ 
+ 	sysfs_strtoul_clamp(writeback_percent, dc->writeback_percent, 0, 40);
+@@ -804,12 +804,12 @@ STORE(__bch_cache_set)
+ 	}
+ 
+ 	sysfs_strtoul(journal_delay_ms,		c->journal_delay_ms);
+-	sysfs_strtoul(verify,			c->verify);
+-	sysfs_strtoul(key_merging_disabled,	c->key_merging_disabled);
++	sysfs_strtoul_bool(verify,		c->verify);
++	sysfs_strtoul_bool(key_merging_disabled, c->key_merging_disabled);
+ 	sysfs_strtoul(expensive_debug_checks,	c->expensive_debug_checks);
+-	sysfs_strtoul(gc_always_rewrite,	c->gc_always_rewrite);
+-	sysfs_strtoul(btree_shrinker_disabled,	c->shrinker_disabled);
+-	sysfs_strtoul(copy_gc_enabled,		c->copy_gc_enabled);
++	sysfs_strtoul_bool(gc_always_rewrite,	c->gc_always_rewrite);
++	sysfs_strtoul_bool(btree_shrinker_disabled, c->shrinker_disabled);
++	sysfs_strtoul_bool(copy_gc_enabled,	c->copy_gc_enabled);
+ 
+ 	return size;
+ }
 -- 
 2.16.4
 
