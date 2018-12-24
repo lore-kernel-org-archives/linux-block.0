@@ -1,179 +1,122 @@
-Return-Path: <SRS0=sUj2=PA=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=jPL+=PB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-9.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F2BC43387
-	for <linux-block@archiver.kernel.org>; Sun, 23 Dec 2018 12:57:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F2A4C43387
+	for <linux-block@archiver.kernel.org>; Mon, 24 Dec 2018 11:06:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7674121849
-	for <linux-block@archiver.kernel.org>; Sun, 23 Dec 2018 12:57:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 17D8620869
+	for <linux-block@archiver.kernel.org>; Mon, 24 Dec 2018 11:06:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725868AbeLWM5N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 23 Dec 2018 07:57:13 -0500
-Received: from mail-wm1-f46.google.com ([209.85.128.46]:51803 "EHLO
-        mail-wm1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725807AbeLWM5N (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 23 Dec 2018 07:57:13 -0500
-Received: by mail-wm1-f46.google.com with SMTP id b11so9272732wmj.1;
-        Sun, 23 Dec 2018 04:57:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:cc:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding;
-        bh=0mZjSL5rVJFEYazbO6PanpYGXm9y36Qt//elXnmS2/Y=;
-        b=L8S6KX3lSIi2zssIvjvNtFRxOxzl0g/Zg63p7qaELDe7I1nv5vqaxzhoXJmKnkAjt2
-         i5/r4SI1tTR+QR6mTC1G7UXfUWwEzvqA2gpWIjGPtY5OfWAowwJoXsMC19FC8mTd//8X
-         K7TRA2M138wGpjEEGqae7E0IgCO3JtLUcU42yDKhFlyJhV/RX+uPBU9nWsD/GRsz7PYA
-         ZVBGR8+5NSYqWStuCLaIRAhy/jep6rFE6h8aVrSQKg4Lxq/Xv28P7LRmoMn7+sU/NXJu
-         Ce1D2/+XNU6IiDiHzE2VGuUZiqeCjVaYBXgYwzdslAcey4K28bsQcsso6KvqnwqgSY84
-         ICgg==
-X-Gm-Message-State: AJcUukfATOEHX4EokntvkW6+Wal6ZY6zQ5fEoFF6J74Ll2oFMIE0KaQq
-        Cp6HDPka74DVUHMhIL1OzXsKy/GW
-X-Google-Smtp-Source: ALg8bN6epES0eI7MhIyRivM2ASYgSpHbUyUH8v6jO2t5+4Bx8bdRAMyE1HLdX8sh7hI0+9ejM1cUsg==
-X-Received: by 2002:a1c:2408:: with SMTP id k8mr9000749wmk.110.1545569829837;
-        Sun, 23 Dec 2018 04:57:09 -0800 (PST)
-Received: from [10.0.0.5] ([207.232.55.62])
-        by smtp.gmail.com with ESMTPSA id c9sm25214731wmh.27.2018.12.23.04.57.07
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 23 Dec 2018 04:57:09 -0800 (PST)
-Subject: Re: remove exofs, the T10 OSD code and block/scsi bidi support V3
-To:     Christoph Hellwig <hch@lst.de>,
-        Douglas Gilbert <dgilbert@interlog.com>
-References: <20181111133211.13926-1-hch@lst.de>
- <4f4b6aff-6726-c500-e3e4-f8b73d641851@electrozaur.com>
- <20181219144347.GB23410@lst.de>
- <0e8b8d45-cfeb-ba9d-c92f-953cabede1ee@interlog.com>
- <20181220072656.GA10011@lst.de>
-Cc:     axboe@kernel.dk, martin.petersen@oracle.com,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Benjamin Block <bblock@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-From:   Boaz Harrosh <ooo@electrozaur.com>
-Message-ID: <406d1a96-2a97-2e35-e52e-22525555fc09@electrozaur.com>
-Date:   Sun, 23 Dec 2018 14:57:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101
- Thunderbird/45.4.0
+        id S1725298AbeLXLG1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 24 Dec 2018 06:06:27 -0500
+Received: from mout.gmx.net ([212.227.15.18]:48675 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725616AbeLXLGZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 24 Dec 2018 06:06:25 -0500
+Received: from localhost.localdomain ([218.18.229.179]) by mail.gmx.com
+ (mrgmx002 [212.227.17.184]) with ESMTPSA (Nemesis) id
+ 0LtIZH-1hMIXV1qXb-012qNC; Mon, 24 Dec 2018 12:06:23 +0100
+From:   Chengguang Xu <cgxu519@gmx.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, Chengguang Xu <cgxu519@gmx.com>
+Subject: [PATCH] block: change return type to bool from int
+Date:   Mon, 24 Dec 2018 19:05:54 +0800
+Message-Id: <20181224110554.4007-1-cgxu519@gmx.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20181220072656.GA10011@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:7yod04UcUip1nxmgB3/3sRhm0OgfPBNMj9GakIFtw/9fF82mCp0
+ 5sNR2zZ7wrJY4sHVAeqTfcnf0MIRPQn3yP45KKJ6sksfFarRG75vyp8eBsq7PpBcwlQnAIU
+ jI6Axq0Jo8WR7odF8P9Sb8b8lYHtxaIEl/ovRgTtIwURgVWN5VdwktCe6N14OdRteZ9/nap
+ 2oKJm9rTd0cCKo2vgzQpQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:XPFjrBgJu/s=:qUXn8qWLTpiF1BVBF/Bh29
+ da43lS4DofFBUCsxm4yNRUbnKx0N88Ck++MTf/QIl7LVdsRgFwULZaM3LBGyD8G5gq2hU+wK0
+ d5EmM3CDdz9bwL7Ce9hjY0fY9v9gLQMmgdLx/yv1uJJTB5lD7LuNXSztux/7St9LBieWUaWBD
+ UogotHUka7PeuWibLwzb0MEbAe8fSbvlXyrljHpWkBAOXtBfrSJBSE6/sKrq6NJkIiNLfdhDY
+ H/fzwx9jNhxEXPMX9TPCgT+2YkQZaRa8TIvtcFX7P5DQJNSERZZZ9ErvVRFzSLtuq0ui+Sfpm
+ EVkgQSM0aSaZuGFKyhuBDjhdOkXNd7dVaIM1+/D1/uOxPTw/9yEqCHy3yOWXMyUZcmd3qqaKw
+ Lllvj1Trp3WfnlHoce3EFXdP3oB5hBD+9EhHxFhktfSSsOLwEygi4q4nbmNPw7luG50LqfzoX
+ b1CnUJXSxJgEIUpPYb/HlNuswQGmeniVayJ05scR1tehg5q6rlytPSlW/Ugx68rSuj/gcNcL4
+ a5VOZ9/dj6hTSKZYm+bB7Gq2u4cJGGkVKQ7OpDrIQp9cxxeN0Dozdc2DfNTZ57FhkFp+Cmp3u
+ DuapHrzFPSgQxQiCMNmQKnmzswdR5bRe+3E81yEaSweriDkeAQk3H05RcSAiAyOmIlZUrldM/
+ HhMYEPWY1cVjIRRsuYWafxHdQi753DzQGgHhdOBJxS0ppLevyUH7EK3ZCaZiRPxf7HPIpFVpx
+ eV9Q6l5GHGm0K3nqhNNdgQkTGfK2kP5Aieqq6zkYCbF9bURMEk6QmdfJpvis1ZDBT8t/E/Lrz
+ qBe2TCU97W/hl52tbKYmHCqodXsF/V1omfnQRhb7Oom8Q8D+GGZUdUAmBlLPPfWu4u36+/fjg
+ UAcSBPaQX6dmkEaXYN+rTsy7IxNqWcqDV2KL1r/HQ=
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 20/12/18 09:26, Christoph Hellwig wrote:
-> On Wed, Dec 19, 2018 at 09:01:53PM -0500, Douglas Gilbert wrote:
->>>   1) reduce the size of every kernel with block layer support, and
->>>      even more for every kernel with scsi support
->>
->> By proposing the removal of bidi support from the block layer, it isn't
->> just the SCSI subsystem that will be impacted. Those NVMe documents
->> that you referred me to earlier in the year, in the command tables
->> in 1.3c and earlier you have noticed the 2 bit direction field and
->> what 11b means? Even if there aren't any bidi NVMe commands *** yet,
->> the fact that NVMe's 64 byte command format has provision for 4
->> (not 2) independent data transfers (data + meta, for each direction).
->> Surely NVMe will sooner or later take advantage of those ... a
->> command like READ GATHERED comes to mind.
-> 
-> NVMe on the other hand does have support for separate read and write
-> buffers as in the current SCSI bidi support, as it encodes the data
-> transfers in that SQE.  So IFF NVMe does bidi commands it would have
-> to use a single buffer for data in/out, 
+Change some functions' return type to bool from int
+because their checking results could represnt in bool
+value.
 
-There is no such thing as "buffer" there is at first a bio, and after
-virtual-to-iommu mapping a scatter-gather-list. All these are currently
-governed by a struct request.
-request, bio, and sgl, have a single direction, All API's expect a single
-direction.
+Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
+---
+ block/cfq-iosched.c      | 4 ++--
+ block/elevator.c         | 2 +-
+ include/linux/elevator.h | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-All BIDI did was to say. Lets not change any API or structure but just
-use two of them at the same time.
-
-All the wiser is the very high level user, and the very low HW driver like
-iscsi. All the middlewere was never touched.
-
-In the view of a bidi target like say an osd. It all stream looks like a single
-"Buffer" on the wire, were some of it is read and some of it is written
-to.
-
-> which can be easily done
-
-?? Did you try. It will take much more than an additional pointer sir
-
-> in the block layer without the current bidi support that chains
-> two struct request instances for data in and data out.
-> 
-
-That was the all trick of not changing a single API or structure
-Just have two of the same thing, we already know how to handle
-
->>>   2) reduce the size of the critical struct request structure by
->>>      128 bits, thus reducing the memory used by every blk-mq driver
->>>      significantly, never mind the cache effects
->>
->> Hmm, one pointer (that is null in the non-bidi case) should be enough,
->> that's 64 or 32 bits.
-> 
-> Due to the way we use request chaining we need two fields at the
-> moment.  ->special and ->next_rq.  
-
-No! ->special is nothing to do with bidi. ->special is a field to be
-used by LLD's only and are not to be touched by block layer or transports
-or high level users.
+diff --git a/block/cfq-iosched.c b/block/cfq-iosched.c
+index ed41aa978c4a..b58969b8b6ea 100644
+--- a/block/cfq-iosched.c
++++ b/block/cfq-iosched.c
+@@ -2582,7 +2582,7 @@ cfq_merged_requests(struct request_queue *q, struct request *rq,
+ 		cfq_del_cfqq_rr(cfqd, cfqq);
+ }
  
-Request has the single ->next_rq for bidi. And could be eliminated by
-sharing space with the elevator info. Do you want a patch?
-
-(So in effect it can be taking 0 bytes, and yes a little bit of code)
-
-> If we'd refactor the whole thing
-> for the basically non-existent user we could indeed probably get it
-> down to a single pointer. 
-> 
->> While on the subject of bidi, the order of transfers: is the data-out
->> (to the target) always before the data-in or is it the target device
->> that decides (depending on the semantics of the command) who is first?
-> 
-> The way I read SAM data needs to be transferred to the device for
-> processing first, then the processing occurs and then it is transferred
-> out, so the order seems fixed.
-> 
-
-Not sure what is the "SAM" above. But most of the BIDI commands I know,
-osd and otherwise, the order is command specific, and many times it is
-done in parallel.
-Read some bits than write some bits, rinse and repeat ...
-
-(You see in scsi the all OUT buffer is part of the actual CDB, so in effect
- any READ is a BIDI. The novelty here is the variable sizes and the SW stack
- memory targets for the different operations)
-
->>
->> Doug Gilbert
->>
->>  *** there could already be vendor specific bidi NVMe commands out
->>     there (ditto for SCSI)
-> 
-> For NVMe they'd need to transfer data in and out in the same buffer
-> to sort work, and even then only if we don't happen to be bounce
-> buffering using swiotlb, or using a network transport.  Similarly for
-> SCSI only iSCSI at the moment supports bidi CDBs, so we could have
-> applications using vendor specific bidi commands on iSCSI, which
-> is exactly what we're trying to find out, but it is a bit of a very
-> niche use case.
-> 
-
-Again bidi works NOW. Did not yet see the big gain, of throwing it
-out.
-
-Jai Maa
-Boaz
+-static int cfq_allow_bio_merge(struct request_queue *q, struct request *rq,
++static bool cfq_allow_bio_merge(struct request_queue *q, struct request *rq,
+ 			       struct bio *bio)
+ {
+ 	struct cfq_data *cfqd = q->elevator->elevator_data;
+@@ -2608,7 +2608,7 @@ static int cfq_allow_bio_merge(struct request_queue *q, struct request *rq,
+ 	return cfqq == RQ_CFQQ(rq);
+ }
+ 
+-static int cfq_allow_rq_merge(struct request_queue *q, struct request *rq,
++static bool cfq_allow_rq_merge(struct request_queue *q, struct request *rq,
+ 			      struct request *next)
+ {
+ 	return RQ_CFQQ(rq) == RQ_CFQQ(next);
+diff --git a/block/elevator.c b/block/elevator.c
+index 8fdcd64ae12e..432717fc782f 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -56,7 +56,7 @@ static LIST_HEAD(elv_list);
+  * Query io scheduler to see if the current process issuing bio may be
+  * merged with rq.
+  */
+-static int elv_iosched_allow_bio_merge(struct request *rq, struct bio *bio)
++static bool elv_iosched_allow_bio_merge(struct request *rq, struct bio *bio)
+ {
+ 	struct request_queue *q = rq->q;
+ 	struct elevator_queue *e = q->elevator;
+diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+index 015bb59c0331..f6928aa5cc3d 100644
+--- a/include/linux/elevator.h
++++ b/include/linux/elevator.h
+@@ -30,10 +30,10 @@ typedef void (elevator_merge_req_fn) (struct request_queue *, struct request *,
+ 
+ typedef void (elevator_merged_fn) (struct request_queue *, struct request *, enum elv_merge);
+ 
+-typedef int (elevator_allow_bio_merge_fn) (struct request_queue *,
++typedef bool (elevator_allow_bio_merge_fn) (struct request_queue *,
+ 					   struct request *, struct bio *);
+ 
+-typedef int (elevator_allow_rq_merge_fn) (struct request_queue *,
++typedef bool (elevator_allow_rq_merge_fn) (struct request_queue *,
+ 					  struct request *, struct request *);
+ 
+ typedef void (elevator_bio_merged_fn) (struct request_queue *,
+-- 
+2.19.2
 
