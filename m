@@ -1,4 +1,4 @@
-Return-Path: <SRS0=oKFV=PD=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=Cd4S=PE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -7,52 +7,54 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3145C43387
-	for <linux-block@archiver.kernel.org>; Wed, 26 Dec 2018 14:36:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51E78C43387
+	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 00:19:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 990C6218EA
-	for <linux-block@archiver.kernel.org>; Wed, 26 Dec 2018 14:36:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FB27208E4
+	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 00:19:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727184AbeLZOgN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 26 Dec 2018 09:36:13 -0500
-Received: from mout.gmx.net ([212.227.15.15]:55581 "EHLO mout.gmx.net"
+        id S1727268AbeL0AT2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 26 Dec 2018 19:19:28 -0500
+Received: from mout.gmx.net ([212.227.17.20]:41297 "EHLO mout.gmx.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726666AbeLZOgN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 26 Dec 2018 09:36:13 -0500
+        id S1727070AbeL0AT2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 26 Dec 2018 19:19:28 -0500
 Received: from localhost.localdomain ([116.30.192.185]) by mail.gmx.com
- (mrgmx001 [212.227.17.184]) with ESMTPSA (Nemesis) id
- 0MRGTX-1gnYXs0vZH-00UacR; Wed, 26 Dec 2018 15:36:11 +0100
+ (mrgmx103 [212.227.17.174]) with ESMTPSA (Nemesis) id
+ 0M4Wwq-1hYnCb1ksO-00yiNA; Thu, 27 Dec 2018 01:19:26 +0100
 From:   Chengguang Xu <cgxu519@gmx.com>
 To:     axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, Chengguang Xu <cgxu519@gmx.com>
-Subject: [PATCH] block: fix a typo in description of ioprio
-Date:   Wed, 26 Dec 2018 22:36:00 +0800
-Message-Id: <20181226143600.21923-1-cgxu519@gmx.com>
+Subject: [PATCH] block: add prio data check for IOPRIO_CLASS_IDLE
+Date:   Thu, 27 Dec 2018 08:19:10 +0800
+Message-Id: <20181227001910.3343-1-cgxu519@gmx.com>
 X-Mailer: git-send-email 2.17.2
-X-Provags-ID: V03:K1:lTUZnEsqGzhCYFCyDVrNsGlKpULwRts/+q4Oi9al8ItuoKYjAbM
- tD45kgEUo/6aVLVVoaf5rwE6S8tVkZeO06jqzAHOiUYI8dNctwssHLVOh4+fkRwjGFLDtwb
- 5hRPydavhZDzSEEcVFawV/oGaXMLmkIWcj7IN4mWCCjQrdQRWkN4svoQDcClVilBvhuS7dX
- 3Bu/q9E5Vzq0MJ+ZwIKrQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:7Tdl0lRlImE=:id9LqXrVdOfDErds65csEp
- K8VV47QGX7Nc9DM/qRfnNygj0D65xpATjYVpV/2apJCPfou52v4v1O7A19uHX+Jyf27NF76Qa
- hde0hGGBmYaajjxYnX8k9/sBWrYjaW3l6IqPLn6/BbbMEVvovyqfeU8uO5FEEB++h8CPT3E5M
- dLFaoA/YQccoWg9gGHVC4+WRo6bZul7QiUBXy87kJ5l4ybPpdom7UVzjcEM6X0asTFKA7mlAq
- +0uawJHt6B4ZSe6Bj8dmt9SG17Qa0q3zzwLYqTBa2vsPCJqSLsa7Xzto+0i3gNt4e0ME0QTT/
- s0DmGYxWur4MYr0DN9r8mDH5ajqmywYsdVvTbJP7Tw5k+Ozj3GuUMCcBMxxDP5mt8gZgWeCYO
- +nNw//ohygCEvJMgjVL4GqvAj1maeFf8bnAFCbVIlMWG2DbicY/0cOndm96wVPgFVrl5HUAnt
- LX0zYQ0G3fGZM3XL2WgnfFpnFXncfhM6gnhkmEsUX7XwhtKre6bIgH2MrlhaZcMQZyAHNgteN
- DjDq9AFf4vm6qTyK4stj3AYyT6ebv/h3aEZC5y+PlaAiZB+/b8j4/1gc+kkpfW2ODTCeW5XyB
- PalI0q9kpsJZsh9noSuEr6Ngk1I7YetjRmOcE2Vn/3ZQJQ9HbhdmDvQfuCEe/rwoUVXUG0SEm
- TI1gAF6I8s90+Y4f+cf8RfLlJixZ+20DhtPXaHciDsq7diIr3KmvAssWuBGsvW0weCmdo+o45
- z5/kk4xHXSSu1/UQ5p4I4Tji3QN54aNc5wE2qjktfTnad2Slf/KmMHPYZh6CcARH3RcvsYCAW
- 1aFdZ2z1elcUhgliJWPApCZXWT3Fe6x6dtY6ev08DHmftgy2x7Ulq/ZV0+Jr163yPx/Oi7YNX
- iRcsy/mZfE0L0ljqONXhdbW9s+0sfwjxt87YjkpQI=
+X-Provags-ID: V03:K1:JThDEjnOgXHf6KdnL/T3Xw0U9KAfODddczp7kW/JqCX9FCw4Zz8
+ qWio5h69bDB6cMaCOTOrWNdSS8kSsC2W7HX3aawrmInMGrAWcCJ7ygU8c++hSErVkivHpTX
+ fxJ19hPSz0EF/Oe3OeG3TU2xjLJZxHp2jA4aywtnJiQSAaCRBTWfB+6cn5AVZKpDkyGpfCQ
+ gY6S2zUBgi+5cLG9NXxYg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:+ZH4BwxDMMw=:cGESbTdZCJittE9GgKEruN
+ Cljk4E3XDABPJ7FgcbCUZ+/UtRsHblmXr3fk33hKcKnNMr3WR6fFUk9o5wwVmDid9o5IYP4Jn
+ /AZCSBhwSQnU+LZDLX1TIKR1IrPF1qsi3hCLO0Um/foJ4xcnVlMXemwDrPgnmEqejhU+6VI5o
+ FZQlMLEWMCH47lHASSWoY/iNLuoZjuwgsEpgQiOKT9rRCrjkCoCoQ0f0YbxdgMjym72D2+lCK
+ 9l+StxYt7nW5hsX0l3ZsR5XxjQsYPR4a4k4t5/9KdYGGxut6n7akXS6Wc6wMB3k8uuEnvT4PE
+ zNZJ8MyZq0dm0MkII2CpZR7L6O6RLtFt5WrJ8co7/FfmXgStmGp6nlvApH//TDQhm0gRpAJy1
+ 9ILOyhSkFKfmRk/Y6dyprQ0bn3kP1nYLZ3bwA3oFNrE4evLESJDFBZ5r7gBZQVNm7LREnykJT
+ UmbkOPO+cUZ6SJPmndQglqgIF1+q8sKGQPajS7LTgUebgXNIpxTJPRqefa2HAUe2dGAXS281O
+ t/Pte9Fl7oQUwjIVA9qaLpIlpgD6aQfnlemnHw0MLQf1y9XRUDJi3MhjEyWuMsed9Js+ZLzHM
+ L0NYiMsSnddCMnOCcG8HxCLjn6Nte9qRq5lBuc4Rgyq6jGQEulvfl+nffTws0tgyQevMSYGdR
+ YieiwqrnMjZ2LqlejVceIoWI/Gj0nIjcAzaHSNT8R2iuuFfk5Ee5foPE6rOLRxo8Np3/zTqSv
+ u0Mbo4+0Ic1KpDBDNqU+iAwaV/cVgDm6KyspnCBCWw/gpFRkGPzlTKLwcyGOud2jhPK0QLasX
+ WBTHMOZYvBJnFkQwAphoqrlX7eHKKASnD2LJjKXLIR8JlH62zVSoY+pcblp80Lr7SXp/v/edp
+ MKgqauBI4AxA/GHH3n3ezkvMhMoLDqhz7OYg80DfQ=
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just fix a typo in description of ioprio.
+The idle class does not have class data, so let's
+fall through to case IOPRIO_CLASS_NONE to check
+the specification of data field.
 
 Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
 ---
@@ -60,18 +62,18 @@ Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/ioprio.c b/block/ioprio.c
-index f9821080c92c..8c0f971015c9 100644
+index 8c0f971015c9..63db916f86fb 100644
 --- a/block/ioprio.c
 +++ b/block/ioprio.c
-@@ -4,7 +4,7 @@
-  * Copyright (C) 2004 Jens Axboe <axboe@kernel.dk>
-  *
-  * Helper functions for setting/querying io priorities of processes. The
-- * system calls closely mimmick getpriority/setpriority, see the man page for
-+ * system calls closely mimic getpriority/setpriority, see the man page for
-  * those. The prio argument is a composite of prio class and prio data, where
-  * the data argument has meaning within that class. The standard scheduling
-  * classes have 8 distinct prio levels, with 0 being the highest prio and 7
+@@ -78,7 +78,7 @@ int ioprio_check_cap(int ioprio)
+ 
+ 			break;
+ 		case IOPRIO_CLASS_IDLE:
+-			break;
++			/* fall through */
+ 		case IOPRIO_CLASS_NONE:
+ 			if (data)
+ 				return -EINVAL;
 -- 
 2.17.2
 
