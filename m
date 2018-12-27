@@ -2,168 +2,95 @@ Return-Path: <SRS0=Cd4S=PE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C49DC43387
-	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 16:09:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F049C43387
+	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 20:22:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 18E6220873
-	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 16:09:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 466D5218FE
+	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 20:22:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="BQZ5tKm3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727963AbeL0QJ5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Dec 2018 11:09:57 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:36062 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727962AbeL0QJ5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Dec 2018 11:09:57 -0500
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id DD6E6C050E19;
-        Thu, 27 Dec 2018 16:09:55 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.149])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 954D160BE5;
-        Thu, 27 Dec 2018 16:09:45 +0000 (UTC)
-Date:   Thu, 27 Dec 2018 11:09:44 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        AliOS system security <alios_sys_security@linux.alibaba.com>,
-        Colin Ian King <colin.king@canonical.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Heinz Mauelshagen <heinzm@redhat.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Nikos Tsironis <ntsironis@arrikto.com>,
-        Shenghui Wang <shhuiw@foxmail.com>,
-        Sweet Tea <sweettea@redhat.com>,
-        wuzhouhui <wuzhouhui14@mails.ucas.ac.cn>
-Subject: [git pull] device mapper changes for 4.21
-Message-ID: <20181227160944.GA12190@redhat.com>
+        id S1729719AbeL0UWz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Dec 2018 15:22:55 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:37754 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729700AbeL0UWz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 27 Dec 2018 15:22:55 -0500
+Received: by mail-pg1-f193.google.com with SMTP id c25so9177300pgb.4
+        for <linux-block@vger.kernel.org>; Thu, 27 Dec 2018 12:22:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=pNi1Whdsli9omogARo3YV43tDdm9p8Nj+zBNpLVDgsM=;
+        b=BQZ5tKm3yK10J4PApkiJ7YfDBeFjgZdn58N5bDantBr10ugODaAeai9foPvzWFIMRk
+         PJsEysihsnhN+9k08g78GiUjBtUxdUctwGVaPcvOfMVMPKrt0AOIhSZHeJUmnqLtgQ2I
+         jE8eRMPui3mlLCO2bEfP99do9OnfHt3mPKuCjmqU3lnbzPtiihDGg0ZLDkFOqbVk+fmG
+         DP33LW55DpX7H2HvkpKxrj7qcjPn8Pr84M8xppBmm0l48vo2+ZmC6L08ku7G1m89zvqE
+         ZWiu0rrSC+Nx3Dtc7RTkrjyMmj8P94SY8gDiSTLl31ApUibqsl17bin6vucvwdsOXNyp
+         R8ag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=pNi1Whdsli9omogARo3YV43tDdm9p8Nj+zBNpLVDgsM=;
+        b=li9jiD5ZZaYnnvBOAEtsIzQPv1nHLXt8C1TJm+CRU9C8a+PN6nGFF7gBkOd9M8LwX9
+         zlB807poJy5Ot8oTWIM/bMUp7YR4uCBv/ccsvpZj47rHChctHmEagzlrF6O088dZVi/4
+         rEHl8gLtCep7ETpsc9R2WPFL4gvKZKpe8KZjygN0CwLLARu0EmXCGg9ADSU85TvVFKzG
+         8Ki7O90dKGjcrPkGX5jNcd/9WFPzJ8SD1Jh7Cve4UjEtXEil3y3M09jjkz6nf5p/X/40
+         qHQPA5BV7UB9k+Mpy84a0IdyvC8mwXyAELvkf5eND6+l4vcWhFfjT8QE6/3sUcdBxKbe
+         qROA==
+X-Gm-Message-State: AA+aEWborUoi6ek6vU9clrLEOYH33rMDFFXLR27dtX1M7Dh4/n2BUKow
+        QqZ+QR1nEGY9t08w/X0mGNuLqw==
+X-Google-Smtp-Source: ALg8bN4l/476ommB54aKM7mmGqLKssA5kPWivUldaeLEiGcDhVScte5YGluLRjCbDC7equAeXjDc1w==
+X-Received: by 2002:a62:b15:: with SMTP id t21mr26403970pfi.136.1545942174095;
+        Thu, 27 Dec 2018 12:22:54 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id m20sm48883974pgv.93.2018.12.27.12.22.52
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 27 Dec 2018 12:22:53 -0800 (PST)
+Subject: Re: [PATCH 04/22] block: use REQ_HIPRI_ASYNC for non-sync polled IO
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
+        linux-block@vger.kernel.org, hch@lst.de, viro@zeniv.linux.org.uk
+References: <20181221192236.12866-1-axboe@kernel.dk>
+ <20181221192236.12866-5-axboe@kernel.dk>
+ <c34a6e3a-1142-4763-dfbe-9fa1b3579211@kernel.dk>
+ <20181227131553.GA22342@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <6cd2e234-6fae-7e90-6291-7eba7a7757ea@kernel.dk>
+Date:   Thu, 27 Dec 2018 13:22:51 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Thu, 27 Dec 2018 16:09:56 +0000 (UTC)
+In-Reply-To: <20181227131553.GA22342@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 12/27/18 6:15 AM, Christoph Hellwig wrote:
+> On Fri, Dec 21, 2018 at 12:25:07PM -0700, Jens Axboe wrote:
+>> On 12/21/18 12:22 PM, Jens Axboe wrote:
+>>> Tell the block layer if it's a sync or async polled request, so it can
+>>> do the right thing.
+>>
+>> Forgot to drop this one, please disregard it as it's super ceded by the
+>> next patch anyway...
+> 
+> FYI, I'd just add the users in the patch introducing bio_set_polled.
 
-The DM tree is based on the block tree for this cycle because a fair
-amount of my time was spent working on the percpu inflight IO counters
-changes and other block fixes (which impact DM) that are in Jens' block
-pull.
+Folded.
 
-The following changes since commit cd19181bf9ad4b7f40f2a4e0355d052109c76529:
+-- 
+Jens Axboe
 
-  blk-mq: enable IO poll if .nr_queues of type poll > 0 (2018-12-17 21:35:07 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-4.21/dm-changes
-
-for you to fetch changes up to c6d6e9b0f6b4201c77f2cea3964dd122697e3543:
-
-  dm: do not allow readahead to limit IO size (2018-12-18 14:23:41 -0500)
-
-Please pull, thanks.
-Mike
-
-----------------------------------------------------------------
-- Eliminate a couple indirect calls from bio-based DM core.
-
-- Fix DM to allow reads that exceed readahead limits by setting io_pages
-  in the backing_dev_info.
-
-- A couple code cleanups in request-based DM.
-
-- Fix various DM targets to check for device sector overflow if
-  CONFIG_LBDAF is not set.
-
-- Use u64 instead of sector_t to store iv_offset in DM crypt; sector_t
-  isn't large enough on 32bit when CONFIG_LBDAF is not set.
-
-- Performance fixes to DM's kcopyd and the snapshot target focused on
-  limiting memory use and workqueue stalls.
-
-- Fix typos in the integrity and writecache targets.
-
-- Log which algorithm is used for dm-crypt's encryption and
-  dm-integrity's hashing.
-
-- Fix false -EBUSY errors in DM raid target's handling of check/repair
-  messages.
-
-- Fix DM flakey target's corrupt_bio_byte feature to reliably corrupt
-  the Nth byte in a bio's payload.
-
-----------------------------------------------------------------
-AliOS system security (1):
-      dm crypt: use u64 instead of sector_t to store iv_offset
-
-Colin Ian King (1):
-      dm integrity: fix spelling mistake in workqueue name
-
-Eric Biggers (2):
-      dm crypt: log the encryption algorithm implementation
-      dm verity: log the hash algorithm implementation
-
-Heinz Mauelshagen (1):
-      dm raid: fix false -EBUSY when handling check/repair message
-
-Jaegeuk Kim (1):
-      dm: do not allow readahead to limit IO size
-
-Mike Snitzer (3):
-      dm rq: remove unused arguments from rq_completed()
-      dm: remove indirect calls from __send_changing_extent_only()
-      dm rq: cleanup leftover code from recently removed q->mq_ops branching
-
-Mikulas Patocka (1):
-      dm: avoid indirect call in __dm_make_request
-
-Milan Broz (1):
-      dm: Check for device sector overflow if CONFIG_LBDAF is not set
-
-Nikos Tsironis (2):
-      dm snapshot: Fix excessive memory usage and workqueue stalls
-      dm kcopyd: Fix bug causing workqueue stalls
-
-Shenghui Wang (2):
-      dm writecache: fix typo in error msg for creating writecache_flush_thread
-      dm bufio: update comment in dm-bufio.c
-
-Sweet Tea (1):
-      dm flakey: Properly corrupt multi-page bios.
-
-wuzhouhui (1):
-      dm mpath: only flush workqueue when needed
-
- drivers/md/dm-bufio.c         | 12 +++++------
- drivers/md/dm-crypt.c         | 17 ++++++++++++----
- drivers/md/dm-delay.c         |  2 +-
- drivers/md/dm-flakey.c        | 35 +++++++++++++++++++++-----------
- drivers/md/dm-integrity.c     |  2 +-
- drivers/md/dm-kcopyd.c        | 19 +++++++++++++-----
- drivers/md/dm-linear.c        |  2 +-
- drivers/md/dm-mpath.c         |  6 ++++--
- drivers/md/dm-raid.c          |  3 +--
- drivers/md/dm-raid1.c         |  3 ++-
- drivers/md/dm-rq.c            | 18 ++++++-----------
- drivers/md/dm-snap.c          | 22 +++++++++++++++++++++
- drivers/md/dm-table.c         |  3 +++
- drivers/md/dm-unstripe.c      |  2 +-
- drivers/md/dm-verity-target.c |  9 +++++++++
- drivers/md/dm-writecache.c    |  2 +-
- drivers/md/dm.c               | 46 ++++++++++++-------------------------------
- 17 files changed, 121 insertions(+), 82 deletions(-)
