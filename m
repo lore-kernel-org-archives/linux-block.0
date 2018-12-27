@@ -6,69 +6,70 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A5B3C43387
-	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 20:31:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E620CC43387
+	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 20:34:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 23F6421741
-	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 20:31:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AAAE921741
+	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 20:34:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="RwHiJJkb"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YRrO3t5B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729911AbeL0Ubs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Dec 2018 15:31:48 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:34194 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729817AbeL0Ubs (ORCPT
+        id S1730005AbeL0Ueu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Dec 2018 15:34:50 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:34829 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729867AbeL0Uet (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Dec 2018 15:31:48 -0500
-Received: by mail-pf1-f195.google.com with SMTP id h3so9558930pfg.1
-        for <linux-block@vger.kernel.org>; Thu, 27 Dec 2018 12:31:47 -0800 (PST)
+        Thu, 27 Dec 2018 15:34:49 -0500
+Received: by mail-pg1-f194.google.com with SMTP id s198so9189477pgs.2
+        for <linux-block@vger.kernel.org>; Thu, 27 Dec 2018 12:34:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ddrF0glPGFUqP3hdn3AnpwdQGteTd5PF49cqNEIi1rA=;
-        b=RwHiJJkbZUM/acEjgsI1eWXgcJWluV1SL0Tm6COA0kIdHFTbujfEkp5QiAO/dh2Ghr
-         5lDC/9vE1/pSXfXWFHd2CCSJec1DNCU/n6Sgz35+gLck+4t6J2iIsEmfqVII3EZoy4c1
-         YxMFPXH/SsHfW07DOpWJF/BBC5OHfMO10OjmGfnx7nVz/M1YNfYIIgjgtimB+t97YhWM
-         qKZ0RLY3jWach/SdufJijcrtHngCl5d3ygzGrpTgtjFMjBcJ6fFt5MvAyy6X30YMe7MT
-         NS4wzyFrC/jsYTDDMl1br9n0sZtXgXoOeZLiuXQtnJzLthiy7ZvPdCQDskrz5qK37Hbm
-         9kjA==
+        bh=DbmXm2+UYTLE/sM4gbM3yhpOgDyP8hE9QQ0YcBCEj2Q=;
+        b=YRrO3t5BNpQLjSiGh0cy+d6OROpMGdDISskqJ0cIyLoIMOJ0wRWkONrdsTfoAbHlsI
+         vDPLefniPt5VsdZxOv+eMxfZtOtiFl+qs1WxoAyTMCPcifFV1KjFhiJU+E3pnmB3aaFw
+         OSGmfPWaI8AOTVj9GA+MPdrw3KNJessdWQG4se/F65fhj7DKP6dzo+FM2sqx2rQ9XJBx
+         wPRBZf1m0Qwgfuimfs31NBT3d5mnRBfpT2gAY5NTzQQoweVpwGQF70JKQ354EC6qFTka
+         WGFXs5VUJ3sejvxg6yUC0MhnGCd96Y7EunjPkiwsx4XByU6zkNIvW6xR3A8LR3N5wO4M
+         nyhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ddrF0glPGFUqP3hdn3AnpwdQGteTd5PF49cqNEIi1rA=;
-        b=ZxLE2+WDf1hsDhfsny1gTujascDflMlcVhFkg8xEQVaDIQ2Z7HSpAUFZyNjBQyyxSb
-         TLnzQFj4WjlwP1vGRs8OeB/dhXeJqgVAvUbumZgq15MsmuuBWMucTeRxo/BA/FRCN2SN
-         PqCE3SFXXfBdZ8ov5hsgczOTofN2pabX9g5b7qtZytCHA/ZEHky1808EcUS1G8iSg++6
-         DjGqv5pd0qqroJnv6Kb0z/XB/c6mjbLc0FZxMxORfo6J3WugQr6pPGhyKjceH8Th8jBQ
-         0pZ38KyX1ifRo6Pf8seNXl+ekieyaprKiF5b7oShVGhJX7F7p2g7G0Dupvvo+qZJ/WaP
-         hUlA==
-X-Gm-Message-State: AJcUukcD6rGnsT0E0KWYqMavtxc+xMj3Je45KayNBrNRBtb6DBRYie5p
-        gUXbvG89UtodbdDlEXhHKXcDmQ==
-X-Google-Smtp-Source: ALg8bN6LV+KfCOcr/LYkcRgvSgpV6MKgXt0TJKwEJ3BeavnLDcZaV4ZjCaovXk2z63knggpaEMiS4g==
-X-Received: by 2002:a65:60c2:: with SMTP id r2mr24164579pgv.393.1545942707193;
-        Thu, 27 Dec 2018 12:31:47 -0800 (PST)
+        bh=DbmXm2+UYTLE/sM4gbM3yhpOgDyP8hE9QQ0YcBCEj2Q=;
+        b=rJhllpp9fn7M+5+N61NJoNfkG+Sp5foLCX5s3U2BWTYdCzyImfv6YoH7svLiXqxvt9
+         6pUNAXPsu2rCu4hs/wqZgPpYLLn9H3fl/PcO+qJQtetxzy+5KpCNbkxpx41yl/tAwOMR
+         X51GvL2yfdGFm70SITyajsk0dkry+GoAyjZpKEhN2vr/HG6Uh/rrLjZLSGbmFFIBI4Q0
+         GoJkUgQJf5rFh4ns9yzOfNV78BJHkBS/kzFIihlkCvf0GO+SIKgG1tlUiKcbLciwDukd
+         e0+TYHGRkByqNMdGN7NHpVTQWTCXWeUI5BDVrTeEotiSRCQrz8/gpVQJE0zx7UY0gM8C
+         WE6w==
+X-Gm-Message-State: AA+aEWZ/eG/aZe6YKqFYaLAZIRJLSNMK07NeiOmnNqiFIOVQRJi9QXDF
+        UTxmf0hrDwEWLuhQ6ScrihqRVw==
+X-Google-Smtp-Source: AFSGD/WD+NQt1xG0DLf0+ukmxPyLCxUo7stN1rRgSiKUShLH95To4daZdYgRpiWsMakCQQG0Yr4zWw==
+X-Received: by 2002:a62:c42:: with SMTP id u63mr25010103pfi.73.1545942888853;
+        Thu, 27 Dec 2018 12:34:48 -0800 (PST)
 Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id g70sm65024806pfg.98.2018.12.27.12.31.45
+        by smtp.gmail.com with ESMTPSA id 84sm77179881pfk.134.2018.12.27.12.34.47
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 27 Dec 2018 12:31:46 -0800 (PST)
-Subject: Re: [PATCH 09/22] aio: add submission side request cache
+        Thu, 27 Dec 2018 12:34:47 -0800 (PST)
+Subject: Re: [PATCH 19/22] aio: support kernel side submission for aio with
+ SCQRING
 To:     Christoph Hellwig <hch@infradead.org>
 Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
         linux-block@vger.kernel.org, hch@lst.de, viro@zeniv.linux.org.uk
 References: <20181221192236.12866-1-axboe@kernel.dk>
- <20181221192236.12866-10-axboe@kernel.dk>
- <20181227135656.GC25525@infradead.org>
+ <20181221192236.12866-20-axboe@kernel.dk>
+ <20181227135753.GE25525@infradead.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b930953e-0df3-5c85-bf5b-dd642339e50c@kernel.dk>
-Date:   Thu, 27 Dec 2018 13:31:44 -0700
+Message-ID: <48838356-101d-d1f6-9b84-9d5a502dd5b7@kernel.dk>
+Date:   Thu, 27 Dec 2018 13:34:46 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20181227135656.GC25525@infradead.org>
+In-Reply-To: <20181227135753.GE25525@infradead.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -77,30 +78,27 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/27/18 6:56 AM, Christoph Hellwig wrote:
->> +/*
->> + * After the iocb has been issued, it's safe to be found on the poll list.
->> + * Adding the kiocb to the list AFTER submission ensures that we don't
->> + * find it from a io_getevents() thread before the issuer is done accessing
->> + * the kiocb cookie.
->> + */
->> +static void aio_iopoll_iocb_issued(struct aio_submit_state *state,
->> +				   struct aio_kiocb *kiocb)
->> +{
->> +	if (!state || !IS_ENABLED(CONFIG_BLOCK))
->> +		aio_iopoll_iocb_add_list(kiocb);
+On 12/27/18 6:57 AM, Christoph Hellwig wrote:
+> On Fri, Dec 21, 2018 at 12:22:33PM -0700, Jens Axboe wrote:
+>> If an application sets IOCTX_FLAG_SCQTHREAD, the io_context gets a
+>> single thread backing. If used with buffered IO, this will limit
+>> the device queue depth to 1, but it will be async, IOs will simply
+>> be serialized.
+>>
+>> Or an application can set IOCTX_FLAG_SQWQ, in which case the io_context
+>> gets a work queue backing. The concurrency level is the mininum of
+>> twice the available CPUs, or the queue depth specific for the context.
+>> For this mode, we attempt to do buffered reads inline, in case they are
+>> cached. So we should only punt to a workqueue, if we would have to block
+>> to get our data.
 > 
-> This still looks odd to me.  Why would be make a batch or not batch
-> decision based on CONFIG_BLOCK availability?  Either batching is safe
-> for all ops, in which case we should always enabled it, or it only makes
-> sense for block devices / block backed filesystem in which case we need
-> a per-operation check.
+> I'm really worried about having this code present twice.  Do we have
+> strong use cases for both?  Can't we emulate IOCTX_FLAG_SCQTHREAD good
+> enough with a workqueue without concurrency management?
 
-It is safe for any device, but ideally we want the schedule flush to
-be enabled to not sit on requests if we block.
-
-The alternative is to make the plug cb handling available with
-!CONFIG_BLOCK and not need these checks.
+A work item is not a good fit for this. If we want the polled
+submission, which I think is pretty nifty, then you need a higher
+context than a wq item that comes and goes.
 
 -- 
 Jens Axboe
