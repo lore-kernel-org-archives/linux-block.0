@@ -2,104 +2,92 @@ Return-Path: <SRS0=Cd4S=PE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E620CC43387
-	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 20:34:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A687C43387
+	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 21:31:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AAAE921741
-	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 20:34:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A614208E4
+	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 21:31:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YRrO3t5B"
+	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="iy7/oaDE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730005AbeL0Ueu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Dec 2018 15:34:50 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:34829 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729867AbeL0Uet (ORCPT
+        id S1728948AbeL0Vbj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Dec 2018 16:31:39 -0500
+Received: from mail-wm1-f53.google.com ([209.85.128.53]:34053 "EHLO
+        mail-wm1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728503AbeL0Vbj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Dec 2018 15:34:49 -0500
-Received: by mail-pg1-f194.google.com with SMTP id s198so9189477pgs.2
-        for <linux-block@vger.kernel.org>; Thu, 27 Dec 2018 12:34:49 -0800 (PST)
+        Thu, 27 Dec 2018 16:31:39 -0500
+Received: by mail-wm1-f53.google.com with SMTP id y185so24828333wmd.1
+        for <linux-block@vger.kernel.org>; Thu, 27 Dec 2018 13:31:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=DbmXm2+UYTLE/sM4gbM3yhpOgDyP8hE9QQ0YcBCEj2Q=;
-        b=YRrO3t5BNpQLjSiGh0cy+d6OROpMGdDISskqJ0cIyLoIMOJ0wRWkONrdsTfoAbHlsI
-         vDPLefniPt5VsdZxOv+eMxfZtOtiFl+qs1WxoAyTMCPcifFV1KjFhiJU+E3pnmB3aaFw
-         OSGmfPWaI8AOTVj9GA+MPdrw3KNJessdWQG4se/F65fhj7DKP6dzo+FM2sqx2rQ9XJBx
-         wPRBZf1m0Qwgfuimfs31NBT3d5mnRBfpT2gAY5NTzQQoweVpwGQF70JKQ354EC6qFTka
-         WGFXs5VUJ3sejvxg6yUC0MhnGCd96Y7EunjPkiwsx4XByU6zkNIvW6xR3A8LR3N5wO4M
-         nyhQ==
+        d=googlemail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=kGrqOub0tTP4H0YSlAG61QiLz8n8Wr+BbzDwfcsaZFM=;
+        b=iy7/oaDEiwKiq/nAS6s09TFXcLZY/iivWCfbeiwe7myC5lSd0tXaBhed4FQN/sOXWt
+         DpJTEFTdM90NyaJ9dzUQGiJ9qYlfEr/nAcifAXNqBLz7HSaOD4P29tMP5wSlD+G9GWwl
+         yolMVmdJjlDBvJzgiwrhBCUklzDBqsitIlL5YnrKaAV7qVfOzweFcK5gSpCN72OCw6Xc
+         7Kl/2oFZiINwOWtLmoxAJU/F3srSpawk8Jk2EAEgPJ8NpDapgtk/pYSXDJ1mViHud8q2
+         DMlOzhJuGSZPdpWrs7cathAOddaIGIRNZ3t9eTPKIFeIDdcdSM7wUSrgPfB+5yEtmInz
+         sBWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
          :content-transfer-encoding;
-        bh=DbmXm2+UYTLE/sM4gbM3yhpOgDyP8hE9QQ0YcBCEj2Q=;
-        b=rJhllpp9fn7M+5+N61NJoNfkG+Sp5foLCX5s3U2BWTYdCzyImfv6YoH7svLiXqxvt9
-         6pUNAXPsu2rCu4hs/wqZgPpYLLn9H3fl/PcO+qJQtetxzy+5KpCNbkxpx41yl/tAwOMR
-         X51GvL2yfdGFm70SITyajsk0dkry+GoAyjZpKEhN2vr/HG6Uh/rrLjZLSGbmFFIBI4Q0
-         GoJkUgQJf5rFh4ns9yzOfNV78BJHkBS/kzFIihlkCvf0GO+SIKgG1tlUiKcbLciwDukd
-         e0+TYHGRkByqNMdGN7NHpVTQWTCXWeUI5BDVrTeEotiSRCQrz8/gpVQJE0zx7UY0gM8C
-         WE6w==
-X-Gm-Message-State: AA+aEWZ/eG/aZe6YKqFYaLAZIRJLSNMK07NeiOmnNqiFIOVQRJi9QXDF
-        UTxmf0hrDwEWLuhQ6ScrihqRVw==
-X-Google-Smtp-Source: AFSGD/WD+NQt1xG0DLf0+ukmxPyLCxUo7stN1rRgSiKUShLH95To4daZdYgRpiWsMakCQQG0Yr4zWw==
-X-Received: by 2002:a62:c42:: with SMTP id u63mr25010103pfi.73.1545942888853;
-        Thu, 27 Dec 2018 12:34:48 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id 84sm77179881pfk.134.2018.12.27.12.34.47
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 27 Dec 2018 12:34:47 -0800 (PST)
-Subject: Re: [PATCH 19/22] aio: support kernel side submission for aio with
- SCQRING
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
-        linux-block@vger.kernel.org, hch@lst.de, viro@zeniv.linux.org.uk
-References: <20181221192236.12866-1-axboe@kernel.dk>
- <20181221192236.12866-20-axboe@kernel.dk>
- <20181227135753.GE25525@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <48838356-101d-d1f6-9b84-9d5a502dd5b7@kernel.dk>
-Date:   Thu, 27 Dec 2018 13:34:46 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        bh=kGrqOub0tTP4H0YSlAG61QiLz8n8Wr+BbzDwfcsaZFM=;
+        b=KKhTrywaMXdNNP57uXtX2TkWMmmxvHqPTW66Y8Mo7fHry2A5/b47Mprhz9RtX8BCRd
+         kqQiCnhj42YQPzYVXq/8WVaPBdPTWZlKTkMXqHK0NfW+3V4PjeUu1N3dB4/JzVavAK9o
+         AfLo+8mJxFQvVynxwsxH3Cp/DwjJ2pUwdjCbN9OGGI5GsSLrr81lDtJHErfkIpUtJT4E
+         ytC0m14EXj6ISoL7sxjpMadd2im/gyHkGA4a3vH4O6npAQistYbzIWXLPWt9hLAvrn5l
+         0CPsKK5pIM7ASR0ZsBNtUxyxqBeb0fPqJcTrWDxpYP93mHN0EhbSSTJGOc20+9O2pe30
+         3RZA==
+X-Gm-Message-State: AJcUukdFKoF4lvzXbSmT3ZUxq9LXUxrmV71deSzyuZogcfcHxXCutT1c
+        kdeABOCUMUq75eXHf6j9mlIkaAzef7xzYfUMzOWbw99pkFA=
+X-Google-Smtp-Source: AFSGD/VFeK/UggnDgvSXnOhqjIE7PdemTQLKdBJOLWkfG799Yb1QIJQNnheJbSyOpkZiUXyu962+7DibTvj/hLHro0Q=
+X-Received: by 2002:a1c:7306:: with SMTP id d6mr21647227wmb.98.1545946296722;
+ Thu, 27 Dec 2018 13:31:36 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20181227135753.GE25525@infradead.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+From:   Kieran Kunhya <kieran618@googlemail.com>
+Date:   Thu, 27 Dec 2018 21:31:24 +0000
+Message-ID: <CABGuwEk4NhAKeCDMsH4cZbeTySO67+q=Z6GJ2Jrq0MvKUc8fqA@mail.gmail.com>
+Subject: DMA memory from block layer vs pci_alloc_consistent
+To:     linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 12/27/18 6:57 AM, Christoph Hellwig wrote:
-> On Fri, Dec 21, 2018 at 12:22:33PM -0700, Jens Axboe wrote:
->> If an application sets IOCTX_FLAG_SCQTHREAD, the io_context gets a
->> single thread backing. If used with buffered IO, this will limit
->> the device queue depth to 1, but it will be async, IOs will simply
->> be serialized.
->>
->> Or an application can set IOCTX_FLAG_SQWQ, in which case the io_context
->> gets a work queue backing. The concurrency level is the mininum of
->> twice the available CPUs, or the queue depth specific for the context.
->> For this mode, we attempt to do buffered reads inline, in case they are
->> cached. So we should only punt to a workqueue, if we would have to block
->> to get our data.
-> 
-> I'm really worried about having this code present twice.  Do we have
-> strong use cases for both?  Can't we emulate IOCTX_FLAG_SCQTHREAD good
-> enough with a workqueue without concurrency management?
+Hello,
 
-A work item is not a good fit for this. If we want the polled
-submission, which I think is pretty nifty, then you need a higher
-context than a wq item that comes and goes.
+I=E2=80=99ve been reverse engineering Sony SxS memory cards, which are simp=
+le
+PCIe based block devices. I am able to read successfully from the
+device with DMA memory allocated using pci_alloc_consistent and
+memcpying to the buffer the block device layer provides.
 
--- 
-Jens Axboe
+But if I use the dma_addr_t provided by the block device DMA layer, I
+get a soft lockup. Is there something special about the dma_addr_t
+that comes from the block layer? Is there anything I need to do to it
+before passing it to the hardware.
 
+The device=E2=80=99s block size is 2048, the block layer reads two blocks a=
+t a time.
+
+Memcpy code is here:
+https://github.com/kierank/sxs-linux/blob/master/sxs.c#L98
+
+DMA code is here:
+https://github.com/kierank/sxs-linux/blob/dma/sxs.c#L101
+
+Apologies for the untidiness of the code, it=E2=80=99s entirely reverse eng=
+ineered.
+Any help would be appreciated.
+
+Kieran
