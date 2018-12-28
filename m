@@ -1,119 +1,86 @@
-Return-Path: <SRS0=Cd4S=PE=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=yOtT=PF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EDC6C43444
-	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 23:42:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A16BFC43387
+	for <linux-block@archiver.kernel.org>; Fri, 28 Dec 2018 01:05:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D73A218FE
-	for <linux-block@archiver.kernel.org>; Thu, 27 Dec 2018 23:42:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1545954125;
-	bh=k6p7gJ05xPVEAlLpXeuRETqv2Lu6OouHV4sFMd/s5k0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=gon7T/Z9xP0q0NhgShXbc057H8TgiGjhBlKS80bjdkNwmlktb5RKHeKNoKFEsLKc7
-	 lWvZ36RiC+SMMj2JnxPulyDlVnZ+m0zzJTPpvAYuJYrXZ3pVjD9reG9b2pipJyrmPj
-	 WZGuhgC9AKgwmEBJ+LH8AKjxGC9tPj3ezXvB8whA=
+	by mail.kernel.org (Postfix) with ESMTP id 6B26420874
+	for <linux-block@archiver.kernel.org>; Fri, 28 Dec 2018 01:05:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730386AbeL0Xlu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 27 Dec 2018 18:41:50 -0500
-Received: from mail-yb1-f196.google.com ([209.85.219.196]:40510 "EHLO
-        mail-yb1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727907AbeL0Xlu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 27 Dec 2018 18:41:50 -0500
-Received: by mail-yb1-f196.google.com with SMTP id x201so4030458ybg.7;
-        Thu, 27 Dec 2018 15:41:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=xXBTIXHVAax3PJVgWEmGAt722IyPRVkq/7ftu76zskQ=;
-        b=nHfNQX9WXbd4v1mYIWQy9AJqEYEykYb6VEtomgVx398VGjNDSzl1QME1bez7OOt2Vw
-         wSqtfmtGl2Gc9HatZWi/yVq3upLi8AJolttyrb0KzXCS+OGY+dsUPieA7cy199UNekp4
-         pPzQcLgMIGp1H+wAlId3XaC5phb2GrqvWxY1ZIOjP23OxnhDaIA9C1IPYlXkYoNBwQar
-         u97YBGsc2chKeilI6xnMZ2oVYWXKbWOi3ucrHJkfmRlc/JnJHq8WVIyDoQwGTM3iGhbM
-         Q5PIgAeFdI4adTRai6O64MmXbIFRr0EhhZ06navKwHiU5mFIpXG+ofq4TJkz89aleImg
-         XvsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=xXBTIXHVAax3PJVgWEmGAt722IyPRVkq/7ftu76zskQ=;
-        b=nqcIdhueK6hjdrT6g/ts6tPodjw7mu1CWs8PYNjm2RJUZGAlOUgXgvb46sLWtNkuu6
-         Xt+t3W+/2JBFkRV4VrGbTpBpWPBdxGAVxUbN+L//4aE8DMkWn+/WaC+zBtgt5bhOtJuZ
-         kzeI8qcMvZOqRFdYmJ4JbPJmmEyLXeDW8VP7v06dh2VR4l07tHsQl0Y+YAFeef5oAeUN
-         /8rV0Tkb0N3rCegV33Se/vr1DmfUhH/0aqalGxR04Ny9NHcdws9M/SlY97KQGlRa4ZLs
-         zlRocP0yQ60vXyvUplzwGA4xq5dpQV6rVQRJJJg2o7l0dcFvW3+teAI2/8SMXQuniR6A
-         1nlQ==
-X-Gm-Message-State: AJcUukf1IyJbM/FHIPP6Qa3QM+bInzbtfzKjhN2rfIhtgvtyT52C529p
-        fsnCE0HAavJKt3mHvBSEdFg=
-X-Google-Smtp-Source: AFSGD/VzIZXeDLBlBNwHflUwXYh0UgkX4wlTAZfzxQkH57xCRgOFqGov3CIUJ2Go8/Y5FqpPwM9LCA==
-X-Received: by 2002:a25:15c1:: with SMTP id 184-v6mr25095796ybv.332.1545954108520;
-        Thu, 27 Dec 2018 15:41:48 -0800 (PST)
-Received: from localhost ([2620:10d:c091:180::1:7729])
-        by smtp.gmail.com with ESMTPSA id z186sm21072531ywd.107.2018.12.27.15.41.46
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 27 Dec 2018 15:41:47 -0800 (PST)
-Date:   Thu, 27 Dec 2018 15:41:44 -0800
-From:   Tejun Heo <tj@kernel.org>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     bfq-iosched@googlegroups.com,
-        Angelo Ruocco <angelo.ruocco.90@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Li Zefan <lizefan@huawei.com>,
-        Angelo Ruocco <angeloruocco90@gmail.com>,
-        Dennis Zhou <dennis@kernel.org>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Liu Bo <bo.liu@linux.alibaba.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>, broonie@kernel.org,
-        oleksandr@natalenko.name, cgroups@vger.kernel.org,
-        linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH V2 00/10] unify the interface of the proportional-share
- policy in blkio/io
-Message-ID: <20181227234144.GE2509588@devbig004.ftw2.facebook.com>
-References: <20181120162816.GV2509588@devbig004.ftw2.facebook.com>
- <25296DAE-73EC-46CC-9A98-A8B7E9017BB7@linaro.org>
- <7D7FAB43-5F62-4402-A9B3-E7C2E30AE680@linaro.org>
- <20181130184256.GI2509588@devbig004.ftw2.facebook.com>
- <5534B7D4-A5D9-4F44-9620-970A7F9EC140@linaro.org>
- <CADiTV-29TmkB5-k=TtQfoJqjP2Qv7GSsGLXAPBaTB6DoQ+6yyw@mail.gmail.com>
- <874A0232-2103-4364-BD88-F33B85D6A764@linaro.org>
- <20181218164126.GX2509588@devbig004.ftw2.facebook.com>
- <EC4F9B54-2352-4D85-B56C-5800CFEBCCB8@linaro.org>
- <A360EBDC-B297-4754-AF5C-0A6C30D725B4@linaro.org>
+        id S1727623AbeL1BFs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 27 Dec 2018 20:05:48 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:17064 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727339AbeL1BFs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 27 Dec 2018 20:05:48 -0500
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 38597741B5CAC;
+        Fri, 28 Dec 2018 09:05:43 +0800 (CST)
+Received: from [127.0.0.1] (10.184.213.217) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.408.0; Fri, 28 Dec 2018
+ 09:05:34 +0800
+Subject: Re: [PATCH] block: Add secure discard check in blk_ioctl_discard
+To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+CC:     <houtao1@huawei.com>, <zhaohongjiang@huawei.com>
+References: <1545716663-123177-1-git-send-email-zhengbin13@huawei.com>
+From:   "zhengbin (A)" <zhengbin13@huawei.com>
+Message-ID: <b27807a5-55e3-a597-8cef-0f742815e150@huawei.com>
+Date:   Fri, 28 Dec 2018 09:05:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <A360EBDC-B297-4754-AF5C-0A6C30D725B4@linaro.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <1545716663-123177-1-git-send-email-zhengbin13@huawei.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.184.213.217]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello, Paolo.
+hi, Jens Axboe
 
-On Sun, Dec 23, 2018 at 12:00:14PM +0100, Paolo Valente wrote:
-> 4.21 is coming ...  and the legacy proportional share interface will
-> be gone with cfq.  This will break legacy code using the
-> proportional-share interface on top of bfq.  This code may just fail
-> when trying to use interface files that don't exist any longer.
+When you have time, confirm it? thanks
 
-Sounds like inheriting .cfq namespace would be the easiest.  Would
-that work?
+On 2018/12/25 13:44, zhengbin wrote:
+> blkdev_ioctl--->blk_ioctl_discard(BLKDISCARD or BLKSECDISCARD).
+> If cmd is BLKSECDISCARD and device does not support this cmd,
+> we will drop page cache(should not be dropped) and return
+> EOPNOTSUPP to caller. This patch fixes that.
+> 
+> Fixes: 351499a172c0 ("block: Invalidate cache on discard v2")
+> Signed-off-by: zhengbin <zhengbin13@huawei.com>
+> ---
+>  block/ioctl.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/block/ioctl.c b/block/ioctl.c
+> index 4825c78..ee3a6af 100644
+> --- a/block/ioctl.c
+> +++ b/block/ioctl.c
+> @@ -212,6 +212,11 @@ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
+>  	if (!blk_queue_discard(q))
+>  		return -EOPNOTSUPP;
+> 
+> +	if (flags & BLKDEV_DISCARD_SECURE) {
+> +		if (!blk_queue_secure_erase(q))
+> +			return -EOPNOTSUPP;
+> +	}
+> +
+>  	if (copy_from_user(range, (void __user *)arg, sizeof(range)))
+>  		return -EFAULT;
+> 
+> --
+> 2.7.4
+> 
+> 
+> .
+> 
 
-Thanks.
-
--- 
-tejun
