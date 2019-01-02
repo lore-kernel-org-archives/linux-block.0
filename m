@@ -1,77 +1,81 @@
-Return-Path: <SRS0=7TId=PJ=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=PKU6=PK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F7B5C43387
-	for <linux-block@archiver.kernel.org>; Tue,  1 Jan 2019 13:35:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF6EC43387
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jan 2019 03:13:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 503E3218B0
-	for <linux-block@archiver.kernel.org>; Tue,  1 Jan 2019 13:35:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 195F12089F
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jan 2019 03:13:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728567AbfAANfh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Jan 2019 08:35:37 -0500
-Received: from mout.gmx.net ([212.227.17.21]:58993 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728493AbfAANfh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 1 Jan 2019 08:35:37 -0500
-Received: from localhost.localdomain ([113.116.158.159]) by mail.gmx.com
- (mrgmx103 [212.227.17.174]) with ESMTPSA (Nemesis) id
- 0LhNwC-1h9F6U1yNs-00mZLC; Tue, 01 Jan 2019 14:35:35 +0100
-From:   Chengguang Xu <cgxu519@gmx.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, Chengguang Xu <cgxu519@gmx.com>
-Subject: [PATCH] block: add sanity check for uid in syscall of ioprio_get()
-Date:   Tue,  1 Jan 2019 21:35:27 +0800
-Message-Id: <20190101133527.18227-1-cgxu519@gmx.com>
-X-Mailer: git-send-email 2.17.2
-X-Provags-ID: V03:K1:ugRLGInYY+7KQAnqsloCX1qd2WD3vvHGlGhmU9AxrHAbL05zThG
- elJwkYARj5C0Upe0NIVW0JOIl/1qfw7/rU5PEZTuGSzD4Kd3nalMGWGvQYqHoRaU90cTUCI
- DYRX5YWer6kOOsEgM4d04EeeAb2H2VKF8BjNTGlakkCXgdmuQY4lfolxwnEIPUf78exwOQr
- JH4NWfQ4VMMAhtG7kL9eA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:pKeCEHy/L4M=:tPy9kcX2O0C8SZxf6eCNTu
- AxAYfb/TADCNrFRhBtm2LgpzJ/GzvO+kcPKXq1WJwgbb2PKrIg/I1TxkV0tPgVVWZJD9fbRnP
- ByaE4W5aCNYBp+PxuvG0BV54wHGR7IYzfvCRx6ECm/x/J7RtSlwJ+D9y6ZlO6EAjkvn7R1v+/
- 34z94noRbBHq8J2DFiolp3ICDVLyUgaIOWhNxuXsIrh35Bv5CUIxv2RY/v874wo38hAqPlxgG
- aFHs3yoS2lLV2sMaeNLM+7vmQQUltZRqnss1o6Oq3PCIEeLw48BistQDV3XqQ6RJl/++ROlCs
- wrDsYlLVMs9JMs3TnQx1kfy+y781KEaQ+LsMf1VO36AhytUa1jOrOiBRoZJ3UU3GRHje/5zsx
- jt4p/2a3ijQRSg9Z5IRdgVuGk00UeSYvlDqi4SmzP8QnDcpAy8FEyjqgxLN7pDGbtQwQPprab
- 5nkWQ+fA2U+dy6jrkGpul+fAXEj1m0cgkF2eEb9ecrAPtlJKD3IJTeS+X9ftObrOMUJ2+X9Nj
- z6WzkoKCS8zFWvagl13d6NSvezeV68IcgrCozo91XoRHOcAhfm9PPkNfwPthR+bry5Bz898pD
- CyqLl37A4u37jJJrdAIDvl6fGZtevnWG9L0FbCQ8UpWt6RZIuGgPvLbTjhoAsgqnAobwZkgzk
- Smrb/RqHmP8SS8XvWRr/D1jxxX6VS5MhvY0iPsFRksM4SLGPKB4GGjcXqcD5fqfT19pax6Y+8
- kRCLXsMN87xZn5xTwcHw8yZtcV4yE5L306gHgn8TuKhpwNAPnSWiJG/6B6gI7zdmunCEN5Ahp
- jC/Y9tUBoJBcgl6AMIfO6UvucelMOMzuze4AB7eks6GReZyq9wTRXV7ydJ7z6KSurGgYN1gB4
- WgT0LXBYu8A8G5Uvzs0b4pFDgtT+NT9VSA5lrLJ9g=
+        id S1727105AbfABDNK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Jan 2019 22:13:10 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:46733 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726595AbfABDNJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Jan 2019 22:13:09 -0500
+Received: by mail-pg1-f196.google.com with SMTP id w7so14007662pgp.13
+        for <linux-block@vger.kernel.org>; Tue, 01 Jan 2019 19:13:09 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=kryuA/mCmmbL1zlSuTxcMOhzEGYdc/RAi4QiwQXEerY=;
+        b=SEp+cft4zLXcdxZ2rOCMKNXTKlin34uoIhAZVShvgv/3GJXFbi0+Nox6QUagIJFvXB
+         RW0+cXHODbj9bJ1LpTZl5HST4BiXGKmg9nziCxh9EXfGyVPb0khljMujPF6wzzC5m2G3
+         IRWN1P61JIsNjaL2nwxRXmnktn5ZZj/6Y9BCsU2ZtQUbMYNPmKOSiR29NMqF/mrnUpod
+         YOd4JMQukFfHpVOpOleiFQXwe050Sr93FvW4GHwCsKPELwBfbT4vWVr/N5YzUqYP2qgv
+         sMwWYPky9SmPLf73S0ICbkt9natrmdNeMTaCqXNdn1hKpSxBFRzp5OPGDcwQysJFRkwt
+         3qAg==
+X-Gm-Message-State: AA+aEWYQ5035lbl9zdYuOVf28OV7kcEjtlXmL3ZuvL/TPm8LWpUTU6c9
+        9t2dBBNFEVFYu0IA1hjyExRJE+P/
+X-Google-Smtp-Source: ALg8bN7FmPY96H71Zuc6ru9eQZ814P26wUqh4CrTxRMwucMK5UQvZltaLOqWOw5MGxyarNzpOJf8WA==
+X-Received: by 2002:a62:b15:: with SMTP id t21mr44608009pfi.136.1546398788668;
+        Tue, 01 Jan 2019 19:13:08 -0800 (PST)
+Received: from asus.site (c-73-222-28-29.hsd1.ca.comcast.net. [73.222.28.29])
+        by smtp.gmail.com with ESMTPSA id g15sm233867630pfj.131.2019.01.01.19.13.07
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 01 Jan 2019 19:13:07 -0800 (PST)
+Subject: Re: [PATCH 1/3] blktests: add cgroup2 infrastructure
+To:     Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
+        kernel-team@fb.com, osandov@fb.com
+References: <20181204174733.7423-1-josef@toxicpanda.com>
+ <20181204174733.7423-2-josef@toxicpanda.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <1211bf78-c442-ea71-9e71-f6d86681ed56@acm.org>
+Date:   Tue, 1 Jan 2019 19:13:06 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.3
+MIME-Version: 1.0
+In-Reply-To: <20181204174733.7423-2-josef@toxicpanda.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It better to validate uid info which is from userspace.
+On 12/4/18 9:47 AM, Josef Bacik wrote:
+> In order to test io.latency and other cgroup related things we need some
+> supporting helpers to setup and tear down cgroup2.  This adds support
+> for checking that we can even configure cgroup2 things, set them up if
+> need be, and then add the cleanup stuff to the main cleanup function so
+> everything is always in a clean state.
 
-Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
----
- block/ioprio.c | 2 ++
- 1 file changed, 2 insertions(+)
+Is this the patch that went in as commit ae7daae7e35a ("blktests: add 
+cgroup2 infrastructure")? I think that commit introduced a regression. 
+With that patch applied the SRP tests fail as follows:
 
-diff --git a/block/ioprio.c b/block/ioprio.c
-index f9821080c92c..b59397662da6 100644
---- a/block/ioprio.c
-+++ b/block/ioprio.c
-@@ -218,6 +218,8 @@ SYSCALL_DEFINE2(ioprio_get, int, which, int, who)
- 			break;
- 		case IOPRIO_WHO_USER:
- 			uid = make_kuid(current_user_ns(), who);
-+			if (!uid_valid(uid))
-+				break;
- 			if (!who)
- 				user = current_user();
- 			else
--- 
-2.17.2
+# ./check -q srp/001
+srp/001 (Create and remove LUNs)
+     runtime  4.067s  ...
+common/cgroup: line 25: CGROUP2_DIR: unbound variable
 
+Is this a known issue?
+
+Bart.
