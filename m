@@ -2,175 +2,92 @@ Return-Path: <SRS0=PKU6=PK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05D43C43387
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jan 2019 17:55:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCC64C43387
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jan 2019 18:08:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C01E7218DE
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jan 2019 17:55:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B2364218D3
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jan 2019 18:08:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="y88m9lGY"
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="fTNNXjfG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726937AbfABRzl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Jan 2019 12:55:41 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:39196 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726240AbfABRzk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jan 2019 12:55:40 -0500
-Received: by mail-io1-f67.google.com with SMTP id k7so25096502iob.6
-        for <linux-block@vger.kernel.org>; Wed, 02 Jan 2019 09:55:40 -0800 (PST)
+        id S1727083AbfABSIF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Jan 2019 13:08:05 -0500
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:39802 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726756AbfABSIE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jan 2019 13:08:04 -0500
+Received: by mail-lf1-f67.google.com with SMTP id n18so21532214lfh.6
+        for <linux-block@vger.kernel.org>; Wed, 02 Jan 2019 10:08:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=iN/CCl/uvW24O8idIOW4YlHr8fVFsek/JELJk4qX5Rc=;
-        b=y88m9lGYlKwAfiImLZKAo9pxnLELILGToeDtyoxpQ/eo8MWEzGaMuUECbUV/lGerpc
-         /Et1HjgK9V9VpPoNyKR1K5VavsuD9WB79Y9PVdDrEVXyriePs/X59/aMHcN31k1g19u5
-         B726KqE4aQYI4y/X7vxpsFf6+d4vrWlJ/pX5jwHJW2wsG82M/w0p2kiiunz+8qUbX1fU
-         wuFGHF0lgX//Sfhdacgyvdc6cI+n0mZhabQ9e1gedQ4MugiPHOJpUVHOdC0kWgz9TIND
-         Ue8vJt5F/FC/3CjEwNjMEEiXeA5Bd0Eom2xojAi7en9A75BjHegF/RKTR9Esfg0rIwUi
-         h22g==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2rkWzYmHqIRZvpCQHP6mHU3okpvhSh7FsEKo3ekFGr8=;
+        b=fTNNXjfGuQ1+MKjvWsBPE5N9jmauMN4O0mUmKgbC5Rvm/yQhAt+URg+GKsNkF2lFku
+         mJph/ey8kkLtihBt0wG+jQIH8qhz/S9Hx1GstzMHKEk4OsyLYxzpVThOT7tysqjQ7xJE
+         cfpzFAGTm8+fVGfq5aNX/B/n+YVtVwFze8UEY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=iN/CCl/uvW24O8idIOW4YlHr8fVFsek/JELJk4qX5Rc=;
-        b=mVMQNUMLkPVckd+GNBwBOlxuc21foW/bVY1EuJ+dk6OJNUL2TyQN0OL1zYkCM0P1WJ
-         Vo3gA945vuOzaOE3zvl7hPE2jaLa9mbsBtdLlAAdr0mRsBM+V1W6I77LR5WN4r+3R+iR
-         oTzxzImEVM5tXk3g1P9PSyG/epCV94fZK+DE25bAfmd0wNNrFybbyi1h2DT6Dazqal+e
-         YtRxWgRSpaKAhjVHdzuDxDTAAHVZIRA3cTVw13BOokseF78qfpefyg8nDwYWB54wGsr8
-         KCMVn1FiLCTKgrl00wPwvSboHyGaOrONNZ5P1lToUPrj8nwm4X7TrD04Ma7/TKkoB6LA
-         jadA==
-X-Gm-Message-State: AJcUukd6geMmptAmQf0IXcSuT9QliL0bs/hA1kmZGeYg+It8uXlx2uzy
-        JthV1ri2YsdiJV68Fn+DQMAmAzPxIXKy4A==
-X-Google-Smtp-Source: ALg8bN6Y5532s3lpm+odHuOHRZGf22d0iTU0+ubWHgEYcBUBjDPjESodzEda1s5vp9fuvzCGs7i9fw==
-X-Received: by 2002:a6b:39c6:: with SMTP id g189mr29300087ioa.255.1546451739671;
-        Wed, 02 Jan 2019 09:55:39 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id 70sm22175089ity.9.2019.01.02.09.55.37
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2rkWzYmHqIRZvpCQHP6mHU3okpvhSh7FsEKo3ekFGr8=;
+        b=s3CsqSQUBErmrAVsytGqHpbzp6L/9C8X6FTbz12YQQGNDKmAR0cmTX2HVGlAf+JKJf
+         GdY9Dkx/FErZMZAcVFdZqpQ6cWLOkIa7NWfCYxpZ9LzbXcHPAiOKS3V/l2g+JbovMQ3+
+         Lcx6MQaMIM0vrLs8oWIJFR3qEP/eNQCnuhnJ4x6jTbbiaCP/tI9hKyJpTXR6c6cH4gfa
+         JMMiXDDsJMnbZ38IyOZAsCBygGxnhVgYTVf1d7sGD89nA+KMmOABiHPrX4Y2h0NnGAVV
+         Y+VLd1XUb4t4Ua3dyuTTlvjOwyI4KvxmG03sEfBX5NZ1g8XvwtHp0qRX9VermVsD9cR+
+         qX6A==
+X-Gm-Message-State: AA+aEWZ8xC4Ncs3ECttuoTaerznv2EX1fJsgpMJ6q5FnOcIfnvtpxlEq
+        cSM7fXsbH87FPLFFV0J/ULLk5nU6O3w=
+X-Google-Smtp-Source: AFSGD/Vj60BOPbU0tHYvIPSqhgl3/tKUzjgGEiuJhldu8K+lObIcdrR5wL4xQSBIeL2xEfcm0ICT0w==
+X-Received: by 2002:a19:f89:: with SMTP id 9mr21431898lfp.10.1546452482216;
+        Wed, 02 Jan 2019 10:08:02 -0800 (PST)
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com. [209.85.167.53])
+        by smtp.gmail.com with ESMTPSA id l21-v6sm11436541ljj.48.2019.01.02.10.08.01
+        for <linux-block@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 02 Jan 2019 09:55:38 -0800 (PST)
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: block: only use __set_current_state() for polled IO
-Message-ID: <181e0aa7-34a5-5445-70b2-45770a81659d@kernel.dk>
-Date:   Wed, 2 Jan 2019 10:55:37 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Wed, 02 Jan 2019 10:08:01 -0800 (PST)
+Received: by mail-lf1-f53.google.com with SMTP id c16so21536461lfj.8
+        for <linux-block@vger.kernel.org>; Wed, 02 Jan 2019 10:08:01 -0800 (PST)
+X-Received: by 2002:a19:982:: with SMTP id 124mr21166558lfj.138.1546452480835;
+ Wed, 02 Jan 2019 10:08:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <181e0aa7-34a5-5445-70b2-45770a81659d@kernel.dk>
+In-Reply-To: <181e0aa7-34a5-5445-70b2-45770a81659d@kernel.dk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed, 2 Jan 2019 10:07:44 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wicNcMhY_YCkT5Nsdcxake8x+sfYUByvbhTzp2v-LWjeA@mail.gmail.com>
+Message-ID: <CAHk-=wicNcMhY_YCkT5Nsdcxake8x+sfYUByvbhTzp2v-LWjeA@mail.gmail.com>
+Subject: Re: block: only use __set_current_state() for polled IO
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A previous commit deemed it safe to use __set_current_state() for IRQ
-driven O_DIRECT, but that's isn't necessarily the case. Be safer and
-only apply that optimization to polled IO, where we know the the task is
-going to find the completions itself.
+On Wed, Jan 2, 2019 at 9:55 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> A previous commit deemed it safe to use __set_current_state() for IRQ
+> driven O_DIRECT, but that's isn't necessarily the case. Be safer and
+> only apply that optimization to polled IO, where we know the the task is
+> going to find the completions itself.
 
-Fixes: 849a370016a5 ("block: avoid ordered task state change for polled IO")
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
+No.
 
----
+We're just reverting 849a370016a5.
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index e1886cc7048f..b5fba2922504 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -193,6 +193,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 	struct bio_vec inline_vecs[DIO_INLINE_BIO_VECS], *vecs, *bvec;
- 	loff_t pos = iocb->ki_pos;
- 	bool should_dirty = false;
-+	bool is_poll;
- 	struct bio bio;
- 	ssize_t ret;
- 	blk_qc_t qc;
-@@ -232,18 +233,21 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 		bio.bi_opf = dio_bio_write_op(iocb);
- 		task_io_account_write(ret);
- 	}
--	if (iocb->ki_flags & IOCB_HIPRI)
-+	is_poll = (iocb->ki_flags & IOCB_HIPRI) != 0;
-+	if (is_poll)
- 		bio.bi_opf |= REQ_HIPRI;
- 
- 	qc = submit_bio(&bio);
- 	for (;;) {
--		__set_current_state(TASK_UNINTERRUPTIBLE);
-+		if (is_poll)
-+			__set_current_state(TASK_UNINTERRUPTIBLE);
-+		else
-+			set_current_state(TASK_UNINTERRUPTIBLE);
- 
- 		if (!READ_ONCE(bio.bi_private))
- 			break;
- 
--		if (!(iocb->ki_flags & IOCB_HIPRI) ||
--		    !blk_poll(bdev_get_queue(bdev), qc, true))
-+		if (!is_poll || !blk_poll(bdev_get_queue(bdev), qc, true))
- 			io_schedule();
- 	}
- 	__set_current_state(TASK_RUNNING);
-@@ -426,13 +430,15 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 		return -EIOCBQUEUED;
- 
- 	for (;;) {
--		__set_current_state(TASK_UNINTERRUPTIBLE);
-+		if (is_poll)
-+			__set_current_state(TASK_UNINTERRUPTIBLE);
-+		else
-+			set_current_state(TASK_UNINTERRUPTIBLE);
- 
- 		if (!READ_ONCE(dio->waiter))
- 			break;
- 
--		if (!(iocb->ki_flags & IOCB_HIPRI) ||
--		    !blk_poll(bdev_get_queue(bdev), qc, true))
-+		if (!is_poll || !blk_poll(bdev_get_queue(bdev), qc, true))
- 			io_schedule();
- 	}
- 	__set_current_state(TASK_RUNNING);
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 9a5bf1e8925b..30c5b7d9aca9 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -1790,6 +1790,7 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 	size_t count = iov_iter_count(iter);
- 	loff_t pos = iocb->ki_pos, start = pos;
- 	loff_t end = iocb->ki_pos + count - 1, ret = 0;
-+	bool is_poll = (iocb->ki_flags & IOCB_HIPRI) != 0;
- 	unsigned int flags = IOMAP_DIRECT;
- 	struct blk_plug plug;
- 	struct iomap_dio *dio;
-@@ -1908,13 +1909,15 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 			return -EIOCBQUEUED;
- 
- 		for (;;) {
--			__set_current_state(TASK_UNINTERRUPTIBLE);
-+			if (is_poll)
-+				__set_current_state(TASK_UNINTERRUPTIBLE);
-+			else
-+				set_current_state(TASK_UNINTERRUPTIBLE);
- 
- 			if (!READ_ONCE(dio->submit.waiter))
- 				break;
- 
--			if (!(iocb->ki_flags & IOCB_HIPRI) ||
--			    !dio->submit.last_queue ||
-+			if (!is_poll || !dio->submit.last_queue ||
- 			    !blk_poll(dio->submit.last_queue,
- 					 dio->submit.cookie, true))
- 				io_schedule();
+There is absolutely no point in trying to avoid a memory barrier that
+is maybe 15 CPU cycles.
 
--- 
-Jens Axboe
+Stop this craziness. The optimization is garbage. If you want to save
+15 cycles, get rid of code, don't add new code in an area where the
+block maintainers have already shown that they can't get it right.
 
+               Linus
