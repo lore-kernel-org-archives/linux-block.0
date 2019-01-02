@@ -2,75 +2,95 @@ Return-Path: <SRS0=PKU6=PK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69A97C43387
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jan 2019 19:11:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4EF9C43387
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jan 2019 20:32:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 35684218FC
-	for <linux-block@archiver.kernel.org>; Wed,  2 Jan 2019 19:11:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 617802171F
+	for <linux-block@archiver.kernel.org>; Wed,  2 Jan 2019 20:32:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WynEQvhe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729020AbfABTLp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Jan 2019 14:11:45 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:49538 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729016AbfABTLp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 2 Jan 2019 14:11:45 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 36C54D963D;
-        Wed,  2 Jan 2019 19:11:45 +0000 (UTC)
-Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 63B0B5C207;
-        Wed,  2 Jan 2019 19:11:44 +0000 (UTC)
-From:   Jeff Moyer <jmoyer@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
+        id S1726821AbfABUcz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Jan 2019 15:32:55 -0500
+Received: from mail-it1-f196.google.com ([209.85.166.196]:33320 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726690AbfABUcz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Jan 2019 15:32:55 -0500
+Received: by mail-it1-f196.google.com with SMTP id m8so39607924itk.0
+        for <linux-block@vger.kernel.org>; Wed, 02 Jan 2019 12:32:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=N2O0kcjHGnO09HGlUrXXwcY+Fn6d7BmBRrn1AD5iYQw=;
+        b=WynEQvhecZPVVrZRfs8Dp03UaPt/edl1Wso4OuZ72ocP9KQaBkjhXhkAtEHbx7nMZG
+         LeUstbo0Lm68dGnzm1ClxP+XVbKQe+ORBzZ425gBPlBgRtpTRwO+mq+2SvoDrTB/Uhn0
+         e+Bzjg50J26+mxZU6Z73KHN58PTACHY4syStdCHPTtZYfUHYTHpSH+h8S2mpAuo4kZgQ
+         rtV5hb6Svg6FaYZIaFdyLYcYafXeqpAjeI6h844UyE3RGRcNNGk5E8hilimHbhw9oXMd
+         vT43RiWouErX2FH6svJx0Yvy6oYubfoKQRieglawL4iXEwV2MJJ3cyQAtlT39xSzbSZk
+         SDiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=N2O0kcjHGnO09HGlUrXXwcY+Fn6d7BmBRrn1AD5iYQw=;
+        b=BZ89LhSV6TjG//7Apnxw3FfJcIZH3z+ZPqhwV8dKeBU8UM4aMJqmliKP/dHzhZDysc
+         jEsooQ+UzHCihqZUO0iTl6hN+gIBWX3qkYiFnLJlkfbE5aUkrEMr283EFR8GF8MOoBSd
+         AOmJ5ZQrx3RTTJK1YjAEk9VVKWAVq+MPjjr+iEaEDkK+UuqR42JC078Swy8UjJOdDuwr
+         YdQwGlNsf54shCS2b5FE4lfIucJDQcBNapmNuxkwmIPdEiEGF8+DEWD82ckAT6UK39Jq
+         qW1c+QiyeBruMBSd/4obKAIeO0T4cCayeqZJehhvjDKrbYJaROI0fFOU6qeMCqUzyyEk
+         qtQw==
+X-Gm-Message-State: AA+aEWap1RJG+81IBX+1gQaUejy5g32qkxcKofmk/tA9v5y/26gvMbJt
+        GaqDJsJRZ/U15f8hugUUJabUWA==
+X-Google-Smtp-Source: AFSGD/WhLzXxdJ27JxtEqJo/nJf1omQcQdz2srCDX6BdCaPRPdmmwWIZ0LKsBlfD6596D2hRRbfSaw==
+X-Received: by 2002:a24:6ac7:: with SMTP id l190mr31465091itc.135.1546461174659;
+        Wed, 02 Jan 2019 12:32:54 -0800 (PST)
+Received: from [192.168.1.56] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id 81sm26138915itz.15.2019.01.02.12.32.53
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 02 Jan 2019 12:32:53 -0800 (PST)
+Subject: Re: [PATCH 16/22] aio: add support for submission/completion rings
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Christoph Hellwig <hch@infradead.org>
 Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
         linux-block@vger.kernel.org, hch@lst.de, viro@zeniv.linux.org.uk
-Subject: Re: [PATCH 16/22] aio: add support for submission/completion rings
 References: <20181221192236.12866-1-axboe@kernel.dk>
-        <20181221192236.12866-17-axboe@kernel.dk>
-X-PGP-KeyID: 1F78E1B4
-X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
-Date:   Wed, 02 Jan 2019 14:11:43 -0500
-In-Reply-To: <20181221192236.12866-17-axboe@kernel.dk> (Jens Axboe's message
-        of "Fri, 21 Dec 2018 12:22:30 -0700")
-Message-ID: <x49ftuaho28.fsf@segfault.boston.devel.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+ <20181221192236.12866-17-axboe@kernel.dk>
+ <20181227134737.GA24160@infradead.org>
+ <91c8d717-37ab-9696-ff41-700f339a1960@kernel.dk>
+Message-ID: <ff1d6ba7-e99f-a6e4-e3f8-aacb114befed@kernel.dk>
+Date:   Wed, 2 Jan 2019 13:32:52 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Wed, 02 Jan 2019 19:11:45 +0000 (UTC)
+In-Reply-To: <91c8d717-37ab-9696-ff41-700f339a1960@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Jens Axboe <axboe@kernel.dk> writes:
+On 1/2/19 9:28 AM, Jens Axboe wrote:
+>> We'd much rather allocate a file descriptor using anon_inode_getfd
+>> and operate on that.  That also means we can just close that fd
+>> instead of needing the magic io_destroy, and save all the checks for
+>> which kind of FD we operate on.
+> 
+> I'm not against doing something else for setup, but we still need some
+> way of passing in information about what we want. Things like ring
+> sizing. The actual rings we could mmap from known offsets if we went the
+> anon route. 
 
-> The submission queue (SQ) and completion queue (CQ) rings are shared
-> between the application and the kernel. This eliminates the need to
-> copy data back and forth to submit and complete IO. We use the same
-> structures as the old aio interface. The SQ rings are indexes into a
-> struct iocb array, like we would submit through io_submit(), and the
-> CQ rings are struct io_event, like we would pass in (and copy back)
-> from io_getevents().
->
-> A new system call is added for this, io_ring_enter(). This system call
-> submits IO that is stored in the SQ ring, and/or completes IO and stores
-> the results in the CQ ring. Hence it's possible to both complete and
-> submit IO in a single system call.
->
-> For IRQ driven IO, an application only needs to enter the kernel for
-> completions if it wants to wait for them to occur.
+OK, so we could go the anon_inode_getfd() route and make it ioctls. Move
+the gup stuff to mmap off that inode. I'll try and play with it a bit.
 
-It looks like the memory for the submission and completion queues is
-not migratable (scq rings are non-migratory!  [1]).  Maybe you should use
-the aio pseudofs for allocations, like is done with the original aio
-ring.  I realize that would change the api...
+-- 
+Jens Axboe
 
--Jeff
-
-[1] https://www.youtube.com/watch?v=liIlW-ovx0Y
