@@ -2,68 +2,95 @@ Return-Path: <SRS0=Dd+4=PL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F18BC43387
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jan 2019 03:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C75BC43387
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jan 2019 07:27:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 19AA020833
-	for <linux-block@archiver.kernel.org>; Thu,  3 Jan 2019 03:05:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1546484718;
-	bh=rzaIyE9UMcKfKBHmnli8J6R1PF9VnRKzlNcZLoD/VME=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=meFYlprbFqoRX0gkZn5Pce3rgcL+Yww/PEt+HAvEm4m6nHWrKHliq49BRo4QX+Wsp
-	 2BMivofuNu4C52lOVdPIZbNxG65MJRt3rsWn+PG7875BrUs3T3J/n/uyEGe1w463Ux
-	 +kQfDwl6Vy8fWQgFDTgzG0rQSEJaswXMQiEBwstI=
+	by mail.kernel.org (Postfix) with ESMTP id 06CFC2073D
+	for <linux-block@archiver.kernel.org>; Thu,  3 Jan 2019 07:27:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VVQq6MsK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728645AbfACDFQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Jan 2019 22:05:16 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38646 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727057AbfACDFH (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 2 Jan 2019 22:05:07 -0500
-Subject: Re: [GIT PULL] libata change for this merge window
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1546484706;
-        bh=rzaIyE9UMcKfKBHmnli8J6R1PF9VnRKzlNcZLoD/VME=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=AxdvzsK6vcI5F0AKk28drXn7H8Fwg/fWU7vvZEuKABrUZNPoBBt4OCqKbtZ7kOW6O
-         0tS2CLqZv1A3BJVOUsBZz77MhDOKuMd78XvfMpasiZVCYjg+XTPOYFh7QTQlPKzlJg
-         XGuNfxv6U4QYj2perCI1u4Rd3hGG1mUGFVEky8nI=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <14f317bc-b328-f4e8-30b2-b5e73b2b62c5@kernel.dk>
-References: <14f317bc-b328-f4e8-30b2-b5e73b2b62c5@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <14f317bc-b328-f4e8-30b2-b5e73b2b62c5@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
- tags/for-4.21/libata-20190102
-X-PR-Tracked-Commit-Id: 745d51dc8a29e00e9ba14e090aa3c8a41e7221d9
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: b79f9f93eb483f2757b089bb4e1eb3827a609080
-Message-Id: <20190103030506.10885.43467.pr-tracker-bot@pdx-korg-gitolite-1.ci.codeaurora.org>
-Date:   Thu, 03 Jan 2019 03:05:06 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        IDE/ATA development list <linux-ide@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        id S1728356AbfACH16 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Jan 2019 02:27:58 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:39122 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726284AbfACH15 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Jan 2019 02:27:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=1TPZzdOpDPWLPOhH8mxvDnHt4hhXxuCtSeUDHqDjyNs=; b=VVQq6MsKqREbh+OCjpKp2k/0m
+        TFSob1y3qINFvFlX7fOdPuuA2DiHb7+7/PWkhYBW2Qx5DHpKIX4xE6E3Q/2fX9Er++4j+H329h7BW
+        Z5S4OZ2k4GAyLsXLiGL5/S3rg3QC/XRX5+UwMbgn/Y0HbdNMQ7CHeZM3gkpGEQNomnNc0PqCpqriH
+        HYpDsBc0Ovg2spG2HXE6SwkJi1kEV0wfmhkH+8lvgVnkZs5m1ZydjXxe5EnncUKoH+NtJC1GP1zqV
+        W9RhhDR2iAxgwwqn7eto7sDfC/Ss/CTNT/3Lf203qTaPIHe4iTTYhLd+MIm9K7bO6JW9omGMp9vHG
+        AA852GB4A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gexQ2-00023L-V4; Thu, 03 Jan 2019 07:27:54 +0000
+Date:   Wed, 2 Jan 2019 23:27:54 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Mikulas Patocka <mpatocka@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        linux-block <linux-block@vger.kernel.org>,
+        Alasdair G Kergon <agk@redhat.com>,
+        AliOS system security <alios_sys_security@linux.alibaba.com>,
+        Colin Ian King <colin.king@canonical.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Heinz Mauelshagen <heinzm@redhat.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Milan Broz <gmazyland@gmail.com>,
+        Nikos Tsironis <ntsironis@arrikto.com>,
+        Shenghui Wang <shhuiw@foxmail.com>,
+        Sweet Tea <sweettea@redhat.com>,
+        wuzhouhui <wuzhouhui14@mails.ucas.ac.cn>
+Subject: Re: [git pull] device mapper changes for 4.21
+Message-ID: <20190103072754.GA2667@infradead.org>
+References: <20181227160944.GA12190@redhat.com>
+ <20181230090646.GB1022@infradead.org>
+ <alpine.LRH.2.02.1812301413220.7178@file01.intranet.prod.int.rdu2.redhat.com>
+ <CAHk-=wh89gmqGaK4K7+ns9S6CSeCfuUmiy8GPeVz8_ntMz-DYg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wh89gmqGaK4K7+ns9S6CSeCfuUmiy8GPeVz8_ntMz-DYg@mail.gmail.com>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Wed, 2 Jan 2019 12:02:32 -0700:
+On Sun, Dec 30, 2018 at 04:25:46PM -0800, Linus Torvalds wrote:
+> On Sun, Dec 30, 2018 at 11:15 AM Mikulas Patocka <mpatocka@redhat.com> wrote:
+> >
+> > But you're right that 2TiB devices are common and that perhaps this option
+> > should go away.
+> 
+> 2TiB devices are definitely not common in the one situation where this
+> option might matter: small embedded devices.
+> 
+> I don't think the cost of 64 bit is in the arithmetic, but it might be
+> in some of the data structures.
+> 
+> But my gut feel is that it probably doesn't much matter, and we could
+> get rid of the config option without anybody ever noticing. I don't
+> think we have that many data structures with 'sector_t' in them.
+> 
+> We might try to first just force the option on, and see if anybody even cares.
 
-> git://git.kernel.dk/linux-block.git tags/for-4.21/libata-20190102
+Our smallest embedded devices use raw flash using the MTD subsystem,
+and even that is using 64-bit size types everywhere.  So I'd be really
+surprised if it is an issue.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/b79f9f93eb483f2757b089bb4e1eb3827a609080
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+> 
+>                   Linus
+---end quoted text---
