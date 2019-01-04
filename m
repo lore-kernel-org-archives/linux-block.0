@@ -2,153 +2,79 @@ Return-Path: <SRS0=wxXg=PM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D474DC43387
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jan 2019 08:55:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D106C43387
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jan 2019 14:25:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7A90206C0
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jan 2019 08:55:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C0DA208E3
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jan 2019 14:25:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727103AbfADIyt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Jan 2019 03:54:49 -0500
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:58352 "EHLO
-        SMTP.EU.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727291AbfADIys (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Jan 2019 03:54:48 -0500
-X-IronPort-AV: E=Sophos;i="5.56,437,1539648000"; 
-   d="scan'208";a="84132450"
-From:   Paul Durrant <Paul.Durrant@citrix.com>
-To:     'Dongli Zhang' <dongli.zhang@oracle.com>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC:     "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
-        Roger Pau Monne <roger.pau@citrix.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: RE: [PATCH v3 1/1] xen/blkback: rework connect_ring() to avoid
- inconsistent xenstore 'ring-page-order' set by malicious blkfront
-Thread-Topic: [PATCH v3 1/1] xen/blkback: rework connect_ring() to avoid
- inconsistent xenstore 'ring-page-order' set by malicious blkfront
-Thread-Index: AQHUo8zawIy3TZpueECGz8zbAfARkKWeymfQ
-Date:   Fri, 4 Jan 2019 08:54:44 +0000
-Message-ID: <d29d869a9ebb4755bf82e8ee0dd4d4dc@AMSPEX02CL03.citrite.net>
-References: <1545225782-31403-1-git-send-email-dongli.zhang@oracle.com>
- <620a62e3-204d-b5f2-e76f-7277492c2fb7@oracle.com>
-In-Reply-To: <620a62e3-204d-b5f2-e76f-7277492c2fb7@oracle.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+        id S1726514AbfADOZf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Jan 2019 09:25:35 -0500
+Received: from mout.gmx.net ([212.227.15.19]:32991 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725939AbfADOZf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 4 Jan 2019 09:25:35 -0500
+Received: from localhost.localdomain ([113.116.156.175]) by mail.gmx.com
+ (mrgmx002 [212.227.17.184]) with ESMTPSA (Nemesis) id
+ 0MexFh-1gytCX2sIr-00OV4Z; Fri, 04 Jan 2019 15:25:33 +0100
+From:   Chengguang Xu <cgxu519@gmx.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, Chengguang Xu <cgxu519@gmx.com>
+Subject: [PATCH] block: return NULL if request_module() failed in elevator_get()
+Date:   Fri,  4 Jan 2019 22:25:20 +0800
+Message-Id: <20190104142520.24699-1-cgxu519@gmx.com>
+X-Mailer: git-send-email 2.17.2
+X-Provags-ID: V03:K1:CtjiCsouY5bFNsYi02XdODF4BA9b8XxNCoXVZiHkJBNGLwF/KMb
+ oClcnChm5lerKx7VOzZcRFL7NZ6qeTrio/Gm3A6qBp3/oAd4Rk/L4GMVh/9/6nLMRsHHG76
+ 4E/keVop1W5Ltl/vx4ttXSB5nI6k5j1wqmjadFxYJlUgl+BcgdpfpLy7Icw0OU7XJuWvcch
+ +QX4PmMDG/R2YSZIic9mA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:NdpNDjiEtbk=:S6tfHtQh7N21FYVjBRvGuE
+ UaMJYnrFZQnPtEaSQJrgjte+la6B6fC3WNLRvjts4K/CLyg18nIRB6WboXoX0LCs8zO4SyclP
+ 5KpnEdhUI3cUY8d89exYEHeGZw7B5oqLeImeBjAaI++heBb9GolVRYCM5Rw5gT2rRnp06yHWR
+ kWFZL5H6lsVtTh4ua1g2m9Q0tk3eTC9VaiXTbBrazB2ky4YwFtHfb4ID+LpuvAGOrHKlCSJ6O
+ xZmoFyquHeyyMxMhXXG10sJipzGZmNM4DkbIpWVGcnbONqSJw38Z+ZikfX+/LfbcHo9JicOjj
+ sqtpdh6ZE3E8dktOZouPqhENXK40AVQ1O0mPXNI2Rw09BKfhA/rup6+sFXzJBSVkefTOWTt0/
+ Sq3sPXAHJU2yCqdqsjNfrT/kfbL+0PLWP7VVte5omEZ5tHQ07xi+58d2eOmWMsVindqYZqg0N
+ Hxj5rVk5PvysIRwGDPZ1u27YQAiLfxiK7RDev7oo7UE49y5YGJ6AUqPfxI7Oh4mCQkrw+SUuB
+ F/UbeU4GnIzzki85iGFdtU42n+E8+qJEs9QzI2WOBKqDGBOzmebGi2FQ6loMMar+OnSNTzcj+
+ OyDEoS223Yfkx06tnWIsOS83UMSGbfmCS9brN6JqTM8sjBXQS5fxnxLie0XMUkF2V11FBDZ+G
+ QlJlUWYfC8z9jmasKYAbbMJrHltUIeQe+0ObIYJ9vUGI+c6aT/EHkBWpsJVBCBWVbsbBY3zX/
+ GA4OfeNSEWMl4rtsSsD9ZGxaeO7MnIAK1b9yJyofKpqRZU0GDbeFjIh/SZViR5x3LhH/r7ZCr
+ GDT1xm3+Nv4tA9Q2mg1RAf8bfJA+PF7T9mJQKBbQohSN1hMaEzt9UJKUc63+ipGuSANiyB4SF
+ RnQpvYsTHbIxP3TvsT0DQ/CSQJezTOCcvzVW+wR8w=
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBPbiAxMi8xOS8yMDE4IDA5OjIzIFBNLCBE
-b25nbGkgWmhhbmcgd3JvdGU6DQo+ID4gVGhlIHhlbnN0b3JlICdyaW5nLXBhZ2Utb3JkZXInIGlz
-IHVzZWQgZ2xvYmFsbHkgZm9yIGVhY2ggYmxrYmFjayBxdWV1ZQ0KPiBhbmQNCj4gPiB0aGVyZWZv
-cmUgc2hvdWxkIGJlIHJlYWQgZnJvbSB4ZW5zdG9yZSBvbmx5IG9uY2UuIEhvd2V2ZXIsIGl0IGlz
-DQo+IG9idGFpbmVkDQo+ID4gaW4gcmVhZF9wZXJfcmluZ19yZWZzKCkgd2hpY2ggbWlnaHQgYmUg
-Y2FsbGVkIG11bHRpcGxlIHRpbWVzIGR1cmluZyB0aGUNCj4gPiBpbml0aWFsaXphdGlvbiBvZiBl
-YWNoIGJsa2JhY2sgcXVldWUuDQo+ID4NCj4gPiBJZiB0aGUgYmxrZnJvbnQgaXMgbWFsaWNpb3Vz
-IGFuZCB0aGUgJ3JpbmctcGFnZS1vcmRlcicgaXMgc2V0IGluDQo+IGRpZmZlcmVudA0KPiA+IHZh
-bHVlIGJ5IGJsa2Zyb250IGV2ZXJ5IHRpbWUgYmVmb3JlIGJsa2JhY2sgcmVhZHMgaXQsIHRoaXMg
-bWF5IGVuZCB1cCBhdA0KPiA+IHRoZSAiV0FSTl9PTihpICE9IChYRU5fQkxLSUZfUkVRU19QRVJf
-UEFHRSAqIGJsa2lmLT5ucl9yaW5nX3BhZ2VzKSk7IiBpbg0KPiA+IHhlbl9ibGtpZl9kaXNjb25u
-ZWN0KCkgd2hlbiBmcm9udGVuZCBpcyBkZXN0cm95ZWQuDQo+ID4NCj4gPiBUaGlzIHBhdGNoIHJl
-d29ya3MgY29ubmVjdF9yaW5nKCkgdG8gcmVhZCB4ZW5zdG9yZSAncmluZy1wYWdlLW9yZGVyJw0K
-PiBvbmx5DQo+ID4gb25jZS4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IERvbmdsaSBaaGFuZyA8
-ZG9uZ2xpLnpoYW5nQG9yYWNsZS5jb20+DQo+ID4gLS0tDQo+ID4gQ2hhbmdlZCBzaW5jZSB2MToN
-Cj4gPiAgICogY2hhbmdlIHRoZSBvcmRlciBvZiB4ZW5zdG9yZSByZWFkIGluIHJlYWRfcGVyX3Jp
-bmdfcmVmcw0KPiA+ICAgKiB1c2UgeGVuYnVzX3JlYWRfdW5zaWduZWQoKSBpbiBjb25uZWN0X3Jp
-bmcoKQ0KPiA+DQo+ID4gQ2hhbmdlZCBzaW5jZSB2MjoNCj4gPiAgICogc2ltcGxpZnkgdGhlIGNv
-bmRpdGlvbiBjaGVjayBhcyAiKGVyciAhPSAxICYmIG5yX2dyZWZzID4gMSkiDQo+ID4gICAqIGF2
-b2lkIHNldHRpbmcgZXJyIGFzIC1FSU5WQUwgdG8gcmVtb3ZlIGV4dHJhIG9uZSBsaW5lIG9mIGNv
-ZGUNCj4gPg0KPiA+ICBkcml2ZXJzL2Jsb2NrL3hlbi1ibGtiYWNrL3hlbmJ1cy5jIHwgNzQgKysr
-KysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLQ0KPiAtLS0tLS0tDQo+ID4gIDEgZmlsZSBjaGFu
-Z2VkLCA0MSBpbnNlcnRpb25zKCspLCAzMyBkZWxldGlvbnMoLSkNCj4gPg0KPiA+IGRpZmYgLS1n
-aXQgYS9kcml2ZXJzL2Jsb2NrL3hlbi1ibGtiYWNrL3hlbmJ1cy5jIGIvZHJpdmVycy9ibG9jay94
-ZW4tDQo+IGJsa2JhY2sveGVuYnVzLmMNCj4gPiBpbmRleCBhNGJjNzRlLi5kZmVhM2E0IDEwMDY0
-NA0KPiA+IC0tLSBhL2RyaXZlcnMvYmxvY2sveGVuLWJsa2JhY2sveGVuYnVzLmMNCj4gPiArKysg
-Yi9kcml2ZXJzL2Jsb2NrL3hlbi1ibGtiYWNrL3hlbmJ1cy5jDQo+ID4gQEAgLTkyNiw3ICs5MjYs
-NyBAQCBzdGF0aWMgaW50IHJlYWRfcGVyX3JpbmdfcmVmcyhzdHJ1Y3QgeGVuX2Jsa2lmX3JpbmcN
-Cj4gKnJpbmcsIGNvbnN0IGNoYXIgKmRpcikNCj4gPiAgCWludCBlcnIsIGksIGo7DQo+ID4gIAlz
-dHJ1Y3QgeGVuX2Jsa2lmICpibGtpZiA9IHJpbmctPmJsa2lmOw0KPiA+ICAJc3RydWN0IHhlbmJ1
-c19kZXZpY2UgKmRldiA9IGJsa2lmLT5iZS0+ZGV2Ow0KPiA+IC0JdW5zaWduZWQgaW50IHJpbmdf
-cGFnZV9vcmRlciwgbnJfZ3JlZnMsIGV2dGNobjsNCj4gPiArCXVuc2lnbmVkIGludCBucl9ncmVm
-cywgZXZ0Y2huOw0KPiA+DQo+ID4gIAllcnIgPSB4ZW5idXNfc2NhbmYoWEJUX05JTCwgZGlyLCAi
-ZXZlbnQtY2hhbm5lbCIsICIldSIsDQo+ID4gIAkJCSAgJmV2dGNobik7DQo+ID4gQEAgLTkzNiw0
-MyArOTM2LDM2IEBAIHN0YXRpYyBpbnQgcmVhZF9wZXJfcmluZ19yZWZzKHN0cnVjdA0KPiB4ZW5f
-YmxraWZfcmluZyAqcmluZywgY29uc3QgY2hhciAqZGlyKQ0KPiA+ICAJCXJldHVybiBlcnI7DQo+
-ID4gIAl9DQo+ID4NCj4gPiAtCWVyciA9IHhlbmJ1c19zY2FuZihYQlRfTklMLCBkZXYtPm90aGVy
-ZW5kLCAicmluZy1wYWdlLW9yZGVyIiwgIiV1IiwNCj4gPiAtCQkJICAmcmluZ19wYWdlX29yZGVy
-KTsNCj4gPiArCW5yX2dyZWZzID0gYmxraWYtPm5yX3JpbmdfcGFnZXM7DQo+ID4gKwlXQVJOX09O
-KCFucl9ncmVmcyk7DQoNCldoeSBub3QgZXhpdCBpZiAhbnJfZ3JlZnM/IFRoZXJlJ3Mgbm90aGlu
-ZyB1c2VmdWwgZm9yIHRoaXMgZnVuY3Rpb24gdG8gZG8gaW4gdGhhdCBjYXNlLg0KDQo+ID4gKw0K
-PiA+ICsJZm9yIChpID0gMDsgaSA8IG5yX2dyZWZzOyBpKyspIHsNCj4gPiArCQljaGFyIHJpbmdf
-cmVmX25hbWVbUklOR1JFRl9OQU1FX0xFTl07DQo+ID4gKw0KPiA+ICsJCXNucHJpbnRmKHJpbmdf
-cmVmX25hbWUsIFJJTkdSRUZfTkFNRV9MRU4sICJyaW5nLXJlZiV1IiwgaSk7DQo+ID4gKwkJZXJy
-ID0geGVuYnVzX3NjYW5mKFhCVF9OSUwsIGRpciwgcmluZ19yZWZfbmFtZSwNCj4gPiArCQkJCSAg
-ICIldSIsICZyaW5nX3JlZltpXSk7DQo+ID4gKw0KPiA+ICsJCWlmIChlcnIgIT0gMSAmJiBucl9n
-cmVmcyA+IDEpIHsNCj4gPiArCQkJeGVuYnVzX2Rldl9mYXRhbChkZXYsIGVyciwgInJlYWRpbmcg
-JXMvJXMiLA0KPiA+ICsJCQkJCSBkaXIsIHJpbmdfcmVmX25hbWUpOw0KPiA+ICsJCQlyZXR1cm4g
-LUVJTlZBTDsNCj4gPiArCQl9DQo+ID4gKw0KPiA+ICsJCWlmIChlcnIgIT0gMSkNCj4gPiArCQkJ
-YnJlYWs7DQoNClNlZW1zIG9kZCB0byB0ZXN0IChlcnIgIT0gMSkgdHdpY2UuIEknZCBwcmVmZXI6
-DQoNCmlmIChlcnIgIT0gMSkgew0KICAgIGlmIChucl9ncmVmcyA9PSAxKQ0KICAgICAgICBicmVh
-azsNCg0KICAgIDxmYXRhbCBlcnJvciBleGl0Pg0KfQ0KDQpFaXRoZXIgdGhhdCBvciBzaW1wbHkg
-YnJlYWsgaWYgZXJyICE9IDEgYW5kIHRoZW4uLi4NCg0KPiA+ICsJfQ0KPiA+ICsNCj4gPiAgCWlm
-IChlcnIgIT0gMSkgew0KDQouLi5hZGQgYSBjaGVjayBhbmQgZmF0YWwgZXJyb3IgZXhpdCBoZXJl
-IGlmIG5yX2dyZWZzICE9IDEuDQoNCj4gPiAtCQllcnIgPSB4ZW5idXNfc2NhbmYoWEJUX05JTCwg
-ZGlyLCAicmluZy1yZWYiLCAiJXUiLA0KPiAmcmluZ19yZWZbMF0pOw0KPiA+ICsJCVdBUk5fT04o
-bnJfZ3JlZnMgIT0gMSk7DQo+ID4gKw0KPiA+ICsJCWVyciA9IHhlbmJ1c19zY2FuZihYQlRfTklM
-LCBkaXIsICJyaW5nLXJlZiIsICIldSIsDQo+ID4gKwkJCQkgICAmcmluZ19yZWZbMF0pOw0KPiA+
-ICAJCWlmIChlcnIgIT0gMSkgew0KPiA+IC0JCQllcnIgPSAtRUlOVkFMOw0KPiA+ICAJCQl4ZW5i
-dXNfZGV2X2ZhdGFsKGRldiwgZXJyLCAicmVhZGluZyAlcy9yaW5nLXJlZiIsIGRpcik7DQo+ID4g
-LQkJCXJldHVybiBlcnI7DQo+ID4gLQkJfQ0KPiA+IC0JCW5yX2dyZWZzID0gMTsNCj4gPiAtCX0g
-ZWxzZSB7DQo+ID4gLQkJdW5zaWduZWQgaW50IGk7DQo+ID4gLQ0KPiA+IC0JCWlmIChyaW5nX3Bh
-Z2Vfb3JkZXIgPiB4ZW5fYmxraWZfbWF4X3Jpbmdfb3JkZXIpIHsNCj4gPiAtCQkJZXJyID0gLUVJ
-TlZBTDsNCj4gPiAtCQkJeGVuYnVzX2Rldl9mYXRhbChkZXYsIGVyciwgIiVzL3JlcXVlc3QgJWQg
-cmluZyBwYWdlDQo+IG9yZGVyIGV4Y2VlZCBtYXg6JWQiLA0KPiA+IC0JCQkJCSBkaXIsIHJpbmdf
-cGFnZV9vcmRlciwNCj4gPiAtCQkJCQkgeGVuX2Jsa2lmX21heF9yaW5nX29yZGVyKTsNCj4gPiAt
-CQkJcmV0dXJuIGVycjsNCj4gPiAtCQl9DQo+ID4gLQ0KPiA+IC0JCW5yX2dyZWZzID0gMSA8PCBy
-aW5nX3BhZ2Vfb3JkZXI7DQo+ID4gLQkJZm9yIChpID0gMDsgaSA8IG5yX2dyZWZzOyBpKyspIHsN
-Cj4gPiAtCQkJY2hhciByaW5nX3JlZl9uYW1lW1JJTkdSRUZfTkFNRV9MRU5dOw0KPiA+IC0NCj4g
-PiAtCQkJc25wcmludGYocmluZ19yZWZfbmFtZSwgUklOR1JFRl9OQU1FX0xFTiwgInJpbmctcmVm
-JXUiLA0KPiBpKTsNCj4gPiAtCQkJZXJyID0geGVuYnVzX3NjYW5mKFhCVF9OSUwsIGRpciwgcmlu
-Z19yZWZfbmFtZSwNCj4gPiAtCQkJCQkgICAiJXUiLCAmcmluZ19yZWZbaV0pOw0KPiA+IC0JCQlp
-ZiAoZXJyICE9IDEpIHsNCj4gPiAtCQkJCWVyciA9IC1FSU5WQUw7DQo+ID4gLQkJCQl4ZW5idXNf
-ZGV2X2ZhdGFsKGRldiwgZXJyLCAicmVhZGluZyAlcy8lcyIsDQo+ID4gLQkJCQkJCSBkaXIsIHJp
-bmdfcmVmX25hbWUpOw0KPiA+IC0JCQkJcmV0dXJuIGVycjsNCj4gPiAtCQkJfQ0KPiA+ICsJCQly
-ZXR1cm4gLUVJTlZBTDsNCj4gPiAgCQl9DQo+ID4gIAl9DQo+ID4gLQlibGtpZi0+bnJfcmluZ19w
-YWdlcyA9IG5yX2dyZWZzOw0KPiA+DQo+ID4gIAlmb3IgKGkgPSAwOyBpIDwgbnJfZ3JlZnMgKiBY
-RU5fQkxLSUZfUkVRU19QRVJfUEFHRTsgaSsrKSB7DQo+ID4gIAkJcmVxID0ga3phbGxvYyhzaXpl
-b2YoKnJlcSksIEdGUF9LRVJORUwpOw0KPiA+IEBAIC0xMDMwLDYgKzEwMjMsNyBAQCBzdGF0aWMg
-aW50IGNvbm5lY3RfcmluZyhzdHJ1Y3QgYmFja2VuZF9pbmZvICpiZSkNCj4gPiAgCXNpemVfdCB4
-c3BhdGhzaXplOw0KPiA+ICAJY29uc3Qgc2l6ZV90IHhlbnN0b3JlX3BhdGhfZXh0X3NpemUgPSAx
-MTsgLyogc3VmZmljaWVudCBmb3IgIi9xdWV1ZS0NCj4gTk5OIiAqLw0KPiA+ICAJdW5zaWduZWQg
-aW50IHJlcXVlc3RlZF9udW1fcXVldWVzID0gMDsNCj4gPiArCXVuc2lnbmVkIGludCByaW5nX3Bh
-Z2Vfb3JkZXI7DQo+ID4NCj4gPiAgCXByX2RlYnVnKCIlcyAlc1xuIiwgX19mdW5jX18sIGRldi0+
-b3RoZXJlbmQpOw0KPiA+DQo+ID4gQEAgLTEwNzUsNiArMTA2OSwyMCBAQCBzdGF0aWMgaW50IGNv
-bm5lY3RfcmluZyhzdHJ1Y3QgYmFja2VuZF9pbmZvICpiZSkNCj4gPiAgCQkgYmUtPmJsa2lmLT5u
-cl9yaW5ncywgYmUtPmJsa2lmLT5ibGtfcHJvdG9jb2wsIHByb3RvY29sLA0KPiA+ICAJCSBwZXJz
-X2dyYW50cyA/ICJwZXJzaXN0ZW50IGdyYW50cyIgOiAiIik7DQo+ID4NCj4gPiArCXJpbmdfcGFn
-ZV9vcmRlciA9IHhlbmJ1c19yZWFkX3Vuc2lnbmVkKGRldi0+b3RoZXJlbmQsDQo+ID4gKwkJCQkJ
-ICAgICAgICJyaW5nLXBhZ2Utb3JkZXIiLCAwKTsNCj4gPiArDQo+ID4gKwlpZiAocmluZ19wYWdl
-X29yZGVyID4geGVuX2Jsa2lmX21heF9yaW5nX29yZGVyKSB7DQo+ID4gKwkJZXJyID0gLUVJTlZB
-TDsNCj4gPiArCQl4ZW5idXNfZGV2X2ZhdGFsKGRldiwgZXJyLA0KPiA+ICsJCQkJICJyZXF1ZXN0
-ZWQgcmluZyBwYWdlIG9yZGVyICVkIGV4Y2VlZCBtYXg6JWQiLA0KPiA+ICsJCQkJIHJpbmdfcGFn
-ZV9vcmRlciwNCj4gPiArCQkJCSB4ZW5fYmxraWZfbWF4X3Jpbmdfb3JkZXIpOw0KPiA+ICsJCXJl
-dHVybiBlcnI7DQo+ID4gKwl9DQo+ID4gKw0KPiA+ICsJYmUtPmJsa2lmLT5ucl9yaW5nX3BhZ2Vz
-ID0gMSA8PCByaW5nX3BhZ2Vfb3JkZXI7DQo+ID4gKw0KDQpUaGF0J3Mgb25lIG1vcmUgYmUtPmJs
-a2lmLiBJIHRoaW5rIGl0J3Mgb3ZlcmR1ZSB0byBpbml0aWFsaXplIGEgJ2Jsa2lmJyBzdGFjayB2
-YXJpYWJsZSBpbiB0aGlzIGZ1bmN0aW9uIGFuZCB1c2UgdGhhdC4NCg0KICBQYXVsDQoNCj4gPiAg
-CWlmIChiZS0+YmxraWYtPm5yX3JpbmdzID09IDEpDQo+ID4gIAkJcmV0dXJuIHJlYWRfcGVyX3Jp
-bmdfcmVmcygmYmUtPmJsa2lmLT5yaW5nc1swXSwgZGV2LQ0KPiA+b3RoZXJlbmQpOw0KPiA+ICAJ
-ZWxzZSB7DQo+ID4NCg==
+If request_module() failed then it seems no reason to lookup
+the iosched again, so add a check to handle this case.
+
+Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
+---
+ block/elevator.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/block/elevator.c b/block/elevator.c
+index 8fdcd64ae12e..f89527951243 100644
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@ -124,7 +124,9 @@ static struct elevator_type *elevator_get(struct request_queue *q,
+ 	e = elevator_find(name, q->mq_ops != NULL);
+ 	if (!e && try_loading) {
+ 		spin_unlock(&elv_list_lock);
+-		request_module("%s-iosched", name);
++		if (request_module("%s-iosched", name))
++			return e;
++
+ 		spin_lock(&elv_list_lock);
+ 		e = elevator_find(name, q->mq_ops != NULL);
+ 	}
+-- 
+2.17.2
+
