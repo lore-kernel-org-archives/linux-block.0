@@ -2,129 +2,101 @@ Return-Path: <SRS0=wxXg=PM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 886CDC43387
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jan 2019 21:30:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F306EC43387
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jan 2019 21:49:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E07321872
-	for <linux-block@archiver.kernel.org>; Fri,  4 Jan 2019 21:30:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="JXmZYj7c"
+	by mail.kernel.org (Postfix) with ESMTP id C5DC42087F
+	for <linux-block@archiver.kernel.org>; Fri,  4 Jan 2019 21:49:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726094AbfADVa3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Jan 2019 16:30:29 -0500
-Received: from mail-io1-f50.google.com ([209.85.166.50]:38694 "EHLO
-        mail-io1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726021AbfADVa3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Jan 2019 16:30:29 -0500
-Received: by mail-io1-f50.google.com with SMTP id l14so30585989ioj.5
-        for <linux-block@vger.kernel.org>; Fri, 04 Jan 2019 13:30:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=LdXRPU2TcB1MD0N/ZfF7MHUrayCZOC4dBbnIW01pmLI=;
-        b=JXmZYj7cyiYyaajLIh5Tr1m14jcryOeZQoT4I0U8OnuIKDrsemd25yiMdmhHp9Cf6N
-         qaEzedXc9xrjmliiqdvwtGiZa2jaeswgVjFi51Cld8yEIUOp9NyrcrRuZjpLYjo9JBOQ
-         qxk2aBhaIQNQptL374Xin4fs+ZB1haPRo+XhsKCS2pDtqogNYbQZfdt1TnqvHeBwRebs
-         LqYPC3x2UfDYETgVDgZk5WVbPNJNYoEsuog5Br3vL2ICdWp5e1Ls08NQIUBBJ+oTKuMi
-         NIWTwGgrv+dVJ4s66Lmz4Epj1CpsfOXogqSYfTR+6/5WB4/W7gBSu39HzUzDigc0L1ol
-         3JzA==
+        id S1726235AbfADVtm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Jan 2019 16:49:42 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:45833 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726094AbfADVtm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Jan 2019 16:49:42 -0500
+Received: by mail-pf1-f194.google.com with SMTP id g62so18861135pfd.12
+        for <linux-block@vger.kernel.org>; Fri, 04 Jan 2019 13:49:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=LdXRPU2TcB1MD0N/ZfF7MHUrayCZOC4dBbnIW01pmLI=;
-        b=lblzTIcoH7hq8PPgnMAF8IlhgCaOO4EmQnF1m8sYvuWAKPuEKZYga8v92LzxKqXvHJ
-         SWl5jRMS1grP2Hg2UzdSuAFaoRXmK4ovNMs/Ccpa11vCmODnd6qUm77f2N/MjZ3eFW3g
-         3Ss6dxturYUrktLt4hbCJcM4hkpbrBaXZQTCBszNOpktXM74zsduFi0o3aSZlDlkb/fy
-         9reXDhBa2E9AEfdWgO2TFn49V1a+EsepJ37qHi27AtPQZwIwJE8X4L7hiboOoytUMBis
-         D6gwkXK00+rwMgepb/qOOVLAuB9imWCgv4mCVq9iyT9yZbgW6ZapEFGa4V5RIfKDamlC
-         3QHQ==
-X-Gm-Message-State: AJcUuke3LPZDoCCvuFi4TlnuBWbEfvzXR4KdeuC9PT58EIUKGaXwIOvC
-        gsk1N0XTdj60c6znKqmFm2HO9q0+p3nICg==
-X-Google-Smtp-Source: ALg8bN5DKGYp59ns6XsuQcnEivAbGA2friiMua7jpGATOEs3dEGRCh4RLi4cJfTStjYi+HUC8mXdjA==
-X-Received: by 2002:a6b:cb08:: with SMTP id b8mr34928516iog.200.1546637427574;
-        Fri, 04 Jan 2019 13:30:27 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id e68sm1001813ite.7.2019.01.04.13.30.26
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 04 Jan 2019 13:30:26 -0800 (PST)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes
-Message-ID: <03b6bedf-e57b-0449-1e27-1585720f0432@kernel.dk>
-Date:   Fri, 4 Jan 2019 14:30:25 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=jnvOqR4dV81pgmWN3mUz75T7FyYCAiAGJVJP6YJWFIc=;
+        b=qfLumtSijroPjU7ooz6rRaONJ5ThkUOsuFj9jK1R9gyrq4T0JkNlhDYizXRDfyLWsM
+         7gHYA7DFFtpaVGHSNRSCcJkqoqtf4zokk5/CtUPr/lLzuXTXv9pCjawS0z6K6tHs+izz
+         22O7WCoFX/NV5WcheUrNmsZCCNiCZQ7I/QBE7saMCF5KBX4a0a+WI06VaurT6vAEc7np
+         nB7+UBav8bYuRTuMHqsSINVdNptJS5lE7urc4KDJltvPLZV72rH2Y+/zvkHGYsrcrUT/
+         sn0rAgpT8wmisg7VfC1bO/sswadC+xBRJ+LACvAN99OBCp7gGcnIbpc1PlcFtGQ1vITc
+         UxWg==
+X-Gm-Message-State: AA+aEWaEX2vXK21WNibsQaUweKXbE6VES8UMeWsLawr1/lR3hu+Peysv
+        /am4EMevXdi/ou+L50UOYf4=
+X-Google-Smtp-Source: ALg8bN4R9vnL6VBC2fXUl4OedcKJP/bUvsAqiJxU+qZeT1ka7rkcxF6LDFQ1xsg1Jh526HU53Al5qA==
+X-Received: by 2002:a62:18ce:: with SMTP id 197mr55563233pfy.88.1546638580850;
+        Fri, 04 Jan 2019 13:49:40 -0800 (PST)
+Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id i2sm24934134pfi.66.2019.01.04.13.49.39
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 04 Jan 2019 13:49:40 -0800 (PST)
+Message-ID: <1546638578.83374.6.camel@acm.org>
+Subject: Re: [PATCH v2] null_blk: add zoned config support information
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     John Pittman <jpittman@redhat.com>, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, loberman@redhat.com
+Date:   Fri, 04 Jan 2019 13:49:38 -0800
+In-Reply-To: <20190104170637.8218-1-jpittman@redhat.com>
+References: <20190104170637.8218-1-jpittman@redhat.com>
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Fri, 2019-01-04 at 12:06 -0500, John Pittman wrote:
++AD4 If the kernel is built without CONFIG+AF8-BLK+AF8-DEV+AF8-ZONED, a modprobe
++AD4 of the null+AF8-blk driver with zoned+AD0-1 fails with 'Invalid argument'.
++AD4 This can be confusing to users, prompting a search as to why the
++AD4 parameter is invalid. To assist in that search, add a bit more
++AD4 information to the failure, additionally adding to the documentation
++AD4 that CONFIG+AF8-BLK+AF8-DEV+AF8-ZONED is needed for zoned+AD0-1.
++AD4 
++AD4 Signed-off-by: John Pittman +ADw-jpittman+AEA-redhat.com+AD4
++AD4 ---
++AD4  Documentation/block/null+AF8-blk.txt +AHw 3 +-+--
++AD4  drivers/block/null+AF8-blk.h         +AHw 1 +-
++AD4  2 files changed, 3 insertions(+-), 1 deletion(-)
++AD4 
++AD4 diff --git a/Documentation/block/null+AF8-blk.txt b/Documentation/block/null+AF8-blk.txt
++AD4 index ea2dafe49ae8..4cad1024fff7 100644
++AD4 --- a/Documentation/block/null+AF8-blk.txt
++AD4 +-+-+- b/Documentation/block/null+AF8-blk.txt
++AD4 +AEAAQA -88,7 +-88,8 +AEAAQA shared+AF8-tags+AD0AWw-0/1+AF0: Default: 0
++AD4  
++AD4  zoned+AD0AWw-0/1+AF0: Default: 0
++AD4    0: Block device is exposed as a random-access block device.
++AD4 -  1: Block device is exposed as a host-managed zoned block device.
++AD4 +-  1: Block device is exposed as a host-managed zoned block device. Requires
++AD4 +-     CONFIG+AF8-BLK+AF8-DEV+AF8-ZONED.
++AD4  
++AD4  zone+AF8-size+AD0AWw-MB+AF0: Default: 256
++AD4    Per zone size when exposed as a zoned block device. Must be a power of two.
++AD4 diff --git a/drivers/block/null+AF8-blk.h b/drivers/block/null+AF8-blk.h
++AD4 index b3df2793e7cd..cab4808f14bd 100644
++AD4 --- a/drivers/block/null+AF8-blk.h
++AD4 +-+-+- b/drivers/block/null+AF8-blk.h
++AD4 +AEAAQA -97,6 +-97,7 +AEAAQA void null+AF8-zone+AF8-reset(struct nullb+AF8-cmd +ACo-cmd, sector+AF8-t sector)+ADs
++AD4  +ACM-else
++AD4  static inline int null+AF8-zone+AF8-init(struct nullb+AF8-device +ACo-dev)
++AD4  +AHs
++AD4 +-	pr+AF8-err(+ACI-CONFIG+AF8-BLK+AF8-DEV+AF8-ZONED not enabled+AFw-n+ACI)+ADs
++AD4  	return -EINVAL+ADs
++AD4  +AH0
++AD4  static inline void null+AF8-zone+AF8-exit(struct nullb+AF8-device +ACo-dev) +AHsAfQ
 
-Final merge window pull request. This pull request contains:
-
-- Pulled in MD changes that Shaohua had queued up for 4.21.
-  Unfortunately we lost Shaohua late 2018, I'm sending these in on his
-  behalf.
-
-- In conjunction with the above, I added a CREDITS entry for Shaoua.
-
-- sunvdc queue restart fix (Ming)
-
-
-Please pull.
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20190104
-
-
-----------------------------------------------------------------
-Chengguang Xu (1):
-      md: remvoe redundant condition check
-
-Daniel Verkamp (5):
-      lib/raid6: add missing include for raid6test
-      lib/raid6: avoid __attribute_const__ redefinition
-      lib/raid6: check for assembler SSSE3 support
-      lib/raid6: sort algos in rough performance order
-      lib/raid6: add option to skip algo benchmarking
-
-Guoqing Jiang (2):
-      raid10: refactor common wait code from regular read/write request
-      md: fix raid10 hang issue caused by barrier
-
-Jens Axboe (2):
-      Merge branch 'for-next' of git://git.kernel.org/.../shli/md into for-linus
-      Add CREDITS entry for Shaohua Li
-
-Ming Lei (1):
-      block: sunvdc: don't run hw queue synchronously from irq context
-
-Yue Haibing (1):
-      md: remove set but not used variable 'bi_rdev'
-
- CREDITS                 |  6 ++++
- drivers/block/sunvdc.c  |  2 +-
- drivers/md/md.c         | 14 +++------
- drivers/md/raid10.c     | 76 ++++++++++++++++++----------------------------
- include/linux/raid/pq.h |  8 ++++-
- lib/Kconfig             |  8 +++++
- lib/raid6/algos.c       | 81 ++++++++++++++++++++++++++-----------------------
- lib/raid6/test/Makefile |  3 ++
- 8 files changed, 101 insertions(+), 97 deletions(-)
-
--- 
-Jens Axboe
+Reviewed-by: Bart Van Assche +ADw-bvanassche+AEA-acm.org+AD4
 
