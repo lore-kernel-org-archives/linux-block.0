@@ -7,307 +7,150 @@ X-Spam-Status: No, score=-4.9 required=3.0 tests=DATE_IN_PAST_96_XX,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0488C43387
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CED2C43612
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:05:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8555120675
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:05:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1AC6420675
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:05:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="V1xGB8SH"
+	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="kkaL5lMA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387586AbfAPXFI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S2387612AbfAPXFI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 16 Jan 2019 18:05:08 -0500
-Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:45722 "EHLO
+Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:45700 "EHLO
         mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728319AbfAPXD5 (ORCPT
+        with ESMTP id S1726362AbfAPXD4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Jan 2019 18:03:57 -0500
+        Wed, 16 Jan 2019 18:03:56 -0500
 Received: from localhost (localhost [127.0.0.1])
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id 46AB6AFD6C;
-        Wed, 16 Jan 2019 23:56:03 +0100 (CET)
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id E7883AE0C6;
+        Wed, 16 Jan 2019 23:55:37 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1547679363; i=@fjfi.cvut.cz;
-        bh=+bodnmxnalG6Z9VELEJzJB4TJfoYrpGNJ2Dfw8sRVYI=;
+        s=20151024; t=1547679337; i=@fjfi.cvut.cz;
+        bh=UBxIMAPDODPNIQgGigLkcRAIWQR7DtqhIBTjJHo7StA=;
         h=From:Date:Subject:To:Cc;
-        b=V1xGB8SHNuW8aYXzB2kU+Y+452ddiZ2Q52DFyDE4KZWFnlabCvYfWcPSZa1av2wff
-         6iin+g62jAVszJnXweG4Wn2wK5lSz8550VOiktaIcqJdRuR5+dbDtdGLkLhYaOdyMd
-         +ofDrqb0Zjul8gmDC77xtBdgyQtD26rzlFRsNeis=
+        b=kkaL5lMAJeo6xdUy3g3F4ethNBTwuC+HT1EnH9jdYAsOAzzHKBtX41Tfittv96Gye
+         e4VP+e+fERd6oyA+UkxoxsNCAj38BFyB9NfJtP/E9FHmDRgnhcYoI0BdS3Og6bCEIC
+         nxZ4EMTjIgCxBZ3+3aJqoYxBNsBu9kUznYLrX8uY=
 X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
 Received: from mailgw1.fjfi.cvut.cz ([127.0.0.1])
         by localhost (mailgw1.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id zCA1IS2-WQlN; Wed, 16 Jan 2019 23:55:58 +0100 (CET)
+        with ESMTP id zl1W4sOpkHIQ; Wed, 16 Jan 2019 23:55:35 +0100 (CET)
 Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 3A4EBB0438;
-        Wed, 16 Jan 2019 23:55:50 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 3A4EBB0438
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 03EA9ADF0E;
+        Wed, 16 Jan 2019 23:55:35 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 03EA9ADF0E
 Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id 1F9C06004E; Wed, 16 Jan 2019 23:55:50 +0100 (CET)
+        id D1B586004E; Wed, 16 Jan 2019 23:55:34 +0100 (CET)
 From:   David Kozub <zub@linux.fjfi.cvut.cz>
-Date:   Thu, 3 Jan 2019 23:58:08 +0100
-Subject: [PATCH 15/16] block: sed-opal: don't repeat opal_discovery0 in each
- steps array
+Date:   Sat, 5 Jan 2019 22:23:56 +0100
+Subject: [PATCH 01/16] block: sed-opal: fix typos and formatting
 To:     Jens Axboe <axboe@kernel.dk>, Scott Bauer <scott.bauer@intel.com>,
         Jonathan Derrick <jonathan.derrick@intel.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Message-Id: <20190116225550.1F9C06004E@linux.fjfi.cvut.cz>
+Message-Id: <20190116225534.D1B586004E@linux.fjfi.cvut.cz>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Originally each of the opal functions that call next include
-opal_discovery0 in the array of steps. This is superfluous and
-can be done always inside next.
+This should make no change in functionality.
+The formatting changes were triggered by checkpatch.pl.
 
 Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
 ---
- block/sed-opal.c | 88 +++++++++++++++++++++++-------------------------
- 1 file changed, 42 insertions(+), 46 deletions(-)
+ block/sed-opal.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 82ef81b66ed5..cedf4d12138d 100644
+index e0de4dd448b3..c882a193e162 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
-@@ -221,6 +221,7 @@ static const u8 opalmethod[][OPAL_METHOD_LENGTH] = {
- };
+@@ -11,8 +11,8 @@
+  *
+  * This program is distributed in the hope it will be useful, but WITHOUT
+  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+- * more details.
++ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
++ * for more details.
+  */
  
- static int end_opal_session_error(struct opal_dev *dev);
-+static int opal_discovery0_step(struct opal_dev *dev);
+ #define pr_fmt(fmt) KBUILD_MODNAME ":OPAL: " fmt
+@@ -157,7 +157,7 @@ static const u8 opaluid[][OPAL_UID_LENGTH] = {
  
- struct opal_suspend_data {
- 	struct opal_lock_unlock unlk;
-@@ -386,36 +387,41 @@ static void check_geometry(struct opal_dev *dev, const void *data)
- 	dev->lowest_lba = geo->lowest_aligned_lba;
- }
+ 	/* C_PIN_TABLE object ID's */
  
-+static int execute_step(struct opal_dev *dev,
-+			const struct opal_step *step, size_t stepIndex)
-+{
-+	int error = step->fn(dev, step->data);
+-        [OPAL_C_PIN_MSID] =
++	[OPAL_C_PIN_MSID] =
+ 		{ 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x84, 0x02},
+ 	[OPAL_C_PIN_SID] =
+ 		{ 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x01},
+@@ -623,7 +623,7 @@ static int build_locking_range(u8 *buffer, size_t length, u8 lr)
+ static int build_locking_user(u8 *buffer, size_t length, u8 lr)
+ {
+ 	if (length > OPAL_UID_LENGTH) {
+-		pr_debug("Can't build locking range user, Length OOB\n");
++		pr_debug("Can't build locking range user. Length OOB\n");
+ 		return -ERANGE;
+ 	}
+ 
+@@ -1324,6 +1324,7 @@ static int start_SIDASP_opal_session(struct opal_dev *dev, void *data)
+ 
+ 	if (!key) {
+ 		const struct opal_key *okey = data;
 +
-+	if (error) {
-+		pr_debug("Step %zu (%pS) failed with error %d: %s\n",
-+			 stepIndex, step->fn, error,
-+			 opal_error_to_human(error));
-+	}
+ 		ret = start_generic_opal_session(dev, OPAL_SID_UID,
+ 						 OPAL_ADMINSP_UID,
+ 						 okey->key,
+@@ -1341,6 +1342,7 @@ static int start_SIDASP_opal_session(struct opal_dev *dev, void *data)
+ static int start_admin1LSP_opal_session(struct opal_dev *dev, void *data)
+ {
+ 	struct opal_key *key = data;
 +
-+	return error;
-+}
-+
- static int next(struct opal_dev *dev, const struct opal_step *steps,
- 		size_t n_steps)
- {
--	const struct opal_step *step;
- 	size_t state;
--	int error = 0;
-+	int error;
- 
--	for (state = 0; !error && state < n_steps; state++) {
--		step = &steps[state];
--
--		error = step->fn(dev, step->data);
--		if (error) {
--			pr_debug("Step %zu (%pS) failed with error %d: %s\n",
--				 state, step->fn, error,
--				 opal_error_to_human(error));
--
--			/* For each OPAL command we do a discovery0 then we
--			 * start some sort of session.
--			 * If we haven't passed state 1 then there was an error
--			 * on discovery0 or during the attempt to start a
--			 * session. Therefore we shouldn't attempt to terminate
--			 * a session, as one has not yet been created.
--			 */
--			if (state > 1) {
--				end_opal_session_error(dev);
--				return error;
--			}
-+	/* first do a discovery0 */
-+	error = opal_discovery0_step(dev);
- 
--		}
--	}
-+	for (state = 0; !error && state < n_steps; state++)
-+		error = execute_step(dev, &steps[state], state);
-+
-+	/* For each OPAL command the first step in steps starts some sort
-+	 * of session. If an error occurred in the initial discovery0 or if
-+	 * an error stopped the loop in state 0 then there was an error
-+	 * before or during the attempt to start a session. Therefore we
-+	 * shouldn't attempt to terminate a session, as one has not yet
-+	 * been created.
-+	 */
-+	if (error && state > 0)
-+		end_opal_session_error(dev);
- 
- 	return error;
- }
-@@ -513,6 +519,14 @@ static int opal_discovery0(struct opal_dev *dev, void *data)
- 	return opal_discovery0_end(dev);
- }
- 
-+static int opal_discovery0_step(struct opal_dev *dev)
-+{
-+	const struct opal_step discovery0_step = {
-+		opal_discovery0,
-+	};
-+	return execute_step(dev, &discovery0_step, 0);
-+}
-+
- static size_t remaining_size(struct opal_dev *cmd)
- {
- 	return IO_BUFFER_LENGTH - cmd->pos;
-@@ -1937,10 +1951,10 @@ static int end_opal_session(struct opal_dev *dev, void *data)
- 
- static int end_opal_session_error(struct opal_dev *dev)
- {
--	const struct opal_step error_end_session[] = {
--		{ end_opal_session, }
-+	const struct opal_step error_end_session = {
-+		end_opal_session,
- 	};
--	return next(dev, error_end_session, ARRAY_SIZE(error_end_session));
-+	return execute_step(dev, &error_end_session, 0);
- }
- 
- static inline void setup_opal_dev(struct opal_dev *dev)
-@@ -1952,14 +1966,11 @@ static inline void setup_opal_dev(struct opal_dev *dev)
- 
- static int check_opal_support(struct opal_dev *dev)
- {
--	const struct opal_step steps[] = {
--		{ opal_discovery0, }
--	};
- 	int ret;
- 
- 	mutex_lock(&dev->dev_lock);
- 	setup_opal_dev(dev);
--	ret = next(dev, steps, ARRAY_SIZE(steps));
-+	ret = opal_discovery0_step(dev);
- 	dev->supported = !ret;
- 	mutex_unlock(&dev->dev_lock);
- 	return ret;
-@@ -2012,7 +2023,6 @@ static int opal_secure_erase_locking_range(struct opal_dev *dev,
- 					   struct opal_session_info *opal_session)
- {
- 	const struct opal_step erase_steps[] = {
--		{ opal_discovery0, },
- 		{ start_auth_opal_session, opal_session },
- 		{ get_active_key, &opal_session->opal_key.lr },
- 		{ gen_key, },
-@@ -2031,7 +2041,6 @@ static int opal_erase_locking_range(struct opal_dev *dev,
- 				    struct opal_session_info *opal_session)
- {
- 	const struct opal_step erase_steps[] = {
--		{ opal_discovery0, },
- 		{ start_auth_opal_session, opal_session },
- 		{ erase_locking_range, opal_session },
- 		{ end_opal_session, }
-@@ -2051,7 +2060,6 @@ static int opal_enable_disable_shadow_mbr(struct opal_dev *dev,
- 	u8 token = opal_mbr->enable_disable == OPAL_MBR_ENABLE
- 		? OPAL_TRUE : OPAL_FALSE;
- 	const struct opal_step mbr_steps[] = {
--		{ opal_discovery0, },
- 		{ start_admin1LSP_opal_session, &opal_mbr->key },
- 		{ set_mbr_done, &token },
- 		{ end_opal_session, },
-@@ -2077,7 +2085,6 @@ static int opal_mbr_status(struct opal_dev *dev, struct opal_mbr_data *opal_mbr)
- 	u8 token = opal_mbr->enable_disable == OPAL_MBR_ENABLE
- 		? OPAL_TRUE : OPAL_FALSE;
- 	const struct opal_step mbr_steps[] = {
--		{ opal_discovery0, },
- 		{ start_admin1LSP_opal_session, &opal_mbr->key },
- 		{ set_mbr_done, &token },
- 		{ end_opal_session, }
-@@ -2099,7 +2106,6 @@ static int opal_write_shadow_mbr(struct opal_dev *dev,
- 				 struct opal_shadow_mbr *info)
- {
- 	const struct opal_step mbr_steps[] = {
--		{ opal_discovery0, },
- 		{ start_admin1LSP_opal_session, &info->key },
- 		{ write_shadow_mbr, info },
- 		{ end_opal_session, }
-@@ -2141,7 +2147,6 @@ static int opal_add_user_to_lr(struct opal_dev *dev,
- 			       struct opal_lock_unlock *lk_unlk)
- {
- 	const struct opal_step steps[] = {
--		{ opal_discovery0, },
- 		{ start_admin1LSP_opal_session, &lk_unlk->session.opal_key },
- 		{ add_user_to_lr, lk_unlk },
- 		{ end_opal_session, }
-@@ -2175,7 +2180,6 @@ static int opal_add_user_to_lr(struct opal_dev *dev,
- static int opal_reverttper(struct opal_dev *dev, struct opal_key *opal)
- {
- 	const struct opal_step revert_steps[] = {
--		{ opal_discovery0, },
- 		{ start_SIDASP_opal_session, opal },
- 		{ revert_tper, } /* controller will terminate session */
- 	};
-@@ -2200,13 +2204,11 @@ static int __opal_lock_unlock(struct opal_dev *dev,
- 			      struct opal_lock_unlock *lk_unlk)
- {
- 	const struct opal_step unlock_steps[] = {
--		{ opal_discovery0, },
- 		{ start_auth_opal_session, &lk_unlk->session },
- 		{ lock_unlock_locking_range, lk_unlk },
- 		{ end_opal_session, }
- 	};
- 	const struct opal_step unlock_sum_steps[] = {
--		{ opal_discovery0, },
- 		{ start_auth_opal_session, &lk_unlk->session },
- 		{ lock_unlock_locking_range_sum, lk_unlk },
- 		{ end_opal_session, }
-@@ -2223,7 +2225,6 @@ static int __opal_set_mbr_done(struct opal_dev *dev, struct opal_key *key)
+ 	return start_generic_opal_session(dev, OPAL_ADMIN1_UID,
+ 					  OPAL_LOCKINGSP_UID,
+ 					  key->key, key->key_len);
+@@ -1714,7 +1716,7 @@ static int lock_unlock_locking_range(struct opal_dev *dev, void *data)
+ 		write_locked = 0;
+ 		break;
+ 	case OPAL_LK:
+-		/* vars are initalized to locked */
++		/* vars are initialized to locked */
+ 		break;
+ 	default:
+ 		pr_debug("Tried to set an invalid locking state... returning to uland\n");
+@@ -1775,7 +1777,7 @@ static int lock_unlock_locking_range_sum(struct opal_dev *dev, void *data)
+ 		write_locked = 0;
+ 		break;
+ 	case OPAL_LK:
+-		/* vars are initalized to locked */
++		/* vars are initialized to locked */
+ 		break;
+ 	default:
+ 		pr_debug("Tried to set an invalid locking state.\n");
+@@ -2222,7 +2224,7 @@ static int __opal_lock_unlock(struct opal_dev *dev,
+ static int __opal_set_mbr_done(struct opal_dev *dev, struct opal_key *key)
  {
  	u8 mbr_done_tf = 1;
- 	const struct opal_step mbrdone_step[] = {
--		{ opal_discovery0, },
+-	const struct opal_step mbrdone_step [] = {
++	const struct opal_step mbrdone_step[] = {
+ 		{ opal_discovery0, },
  		{ start_admin1LSP_opal_session, key },
  		{ set_mbr_done, &mbr_done_tf },
- 		{ end_opal_session, }
-@@ -2250,7 +2251,6 @@ static int opal_lock_unlock(struct opal_dev *dev,
- static int opal_take_ownership(struct opal_dev *dev, struct opal_key *opal)
- {
- 	const struct opal_step owner_steps[] = {
--		{ opal_discovery0, },
- 		{ start_anybodyASP_opal_session, },
- 		{ get_msid_cpin_pin, },
- 		{ end_opal_session, },
-@@ -2274,7 +2274,6 @@ static int opal_activate_lsp(struct opal_dev *dev,
- 			     struct opal_lr_act *opal_lr_act)
+@@ -2273,7 +2275,8 @@ static int opal_take_ownership(struct opal_dev *dev, struct opal_key *opal)
+ 	return ret;
+ }
+ 
+-static int opal_activate_lsp(struct opal_dev *dev, struct opal_lr_act *opal_lr_act)
++static int opal_activate_lsp(struct opal_dev *dev,
++			     struct opal_lr_act *opal_lr_act)
  {
  	const struct opal_step active_steps[] = {
--		{ opal_discovery0, },
- 		{ start_SIDASP_opal_session, &opal_lr_act->key },
- 		{ get_lsp_lifecycle, },
- 		{ activate_lsp, opal_lr_act },
-@@ -2296,7 +2295,6 @@ static int opal_setup_locking_range(struct opal_dev *dev,
- 				    struct opal_user_lr_setup *opal_lrs)
- {
- 	const struct opal_step lr_steps[] = {
--		{ opal_discovery0, },
- 		{ start_auth_opal_session, &opal_lrs->session },
- 		{ setup_locking_range, opal_lrs },
- 		{ end_opal_session, }
-@@ -2313,7 +2311,6 @@ static int opal_setup_locking_range(struct opal_dev *dev,
- static int opal_set_new_pw(struct opal_dev *dev, struct opal_new_pw *opal_pw)
- {
- 	const struct opal_step pw_steps[] = {
--		{ opal_discovery0, },
- 		{ start_auth_opal_session, &opal_pw->session },
- 		{ set_new_pw, &opal_pw->new_user_pw },
- 		{ end_opal_session, }
-@@ -2337,7 +2334,6 @@ static int opal_activate_user(struct opal_dev *dev,
- 			      struct opal_session_info *opal_session)
- {
- 	const struct opal_step act_steps[] = {
--		{ opal_discovery0, },
- 		{ start_admin1LSP_opal_session, &opal_session->opal_key },
- 		{ internal_activate_user, opal_session },
- 		{ end_opal_session, }
+ 		{ opal_discovery0, },
 -- 
 2.20.1
 
