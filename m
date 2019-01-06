@@ -6,68 +6,68 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4AE5C43387
-	for <linux-block@archiver.kernel.org>; Sun,  6 Jan 2019 17:58:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF706C43387
+	for <linux-block@archiver.kernel.org>; Sun,  6 Jan 2019 19:23:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 971962085A
-	for <linux-block@archiver.kernel.org>; Sun,  6 Jan 2019 17:58:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87B8520830
+	for <linux-block@archiver.kernel.org>; Sun,  6 Jan 2019 19:23:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cpB30Oc7"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="uNfkcuTR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726060AbfAFR6t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Jan 2019 12:58:49 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:40030 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726012AbfAFR6t (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Jan 2019 12:58:49 -0500
-Received: by mail-pl1-f193.google.com with SMTP id u18so19747878plq.7
-        for <linux-block@vger.kernel.org>; Sun, 06 Jan 2019 09:58:49 -0800 (PST)
+        id S1726050AbfAFTXe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Jan 2019 14:23:34 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:42163 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726045AbfAFTXe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Jan 2019 14:23:34 -0500
+Received: by mail-pg1-f195.google.com with SMTP id d72so19723699pga.9
+        for <linux-block@vger.kernel.org>; Sun, 06 Jan 2019 11:23:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=0OEMYSAbvlEMnPmB4RHCAdYP+ZdVMVQyrKEc45S5CmM=;
-        b=cpB30Oc7kuX+KVB6g897NFtrSMgpHC/5fan6tojXe9z5XxhBWLUJUbOfF+EyXuihpu
-         5bLNJ+pgMyIi5e5HDA/ezEAYb9TlRL3hxgLlgYjH/U55YRtk/8kGCoLHc3iJiAKPtdHv
-         RyiddqGLWyHZB2MNB80fwH0oxthwXMCe+a44l/nSzFl0N4m3cWBJSys76a6HXMmIcdPb
-         xaZYcXfyQmqhzL6+PPRK3keAa2gxrccdb20eULC9j60hilLHRDxE9wdjwKvWFAJtp5Fr
-         lW92UqWVV5ceu65CXf3bpgQw4THGxRl9T/0p8yHNTpE9xGMIL6W5O9BajpqEhzWUqb8g
-         p/lg==
+        bh=RvA0y35qCLja6k9PMYIFZ1nrlyy7oVm/17HJNaDtZL0=;
+        b=uNfkcuTRZXqLRL2FFVOGMNQu0/ZjWBma4JDUgESlEbUMvbKiolvoKztH7lDzcYvEEX
+         dJav0lNYJB/X9+/lHK9jQBZP9iD41keIdR3IIcZduerjQ4EImGGOwxUKoYHIi4wSmWax
+         vSHc8pP/bod0/EguXW1ZYNXKit1DiIds30c613pbKEBjLggmbPMxGaSw3ZjvYP4GUWY0
+         qmfG/yeQjYJgpLtl9c6lBnoXda1kd50XQRwGu5HmxfR9DMX7YjRd/Mv5UpY+y27J8M4p
+         HWhCUXpJhiIN2Ki4LTyUbIrPlpiMbmPc5zYlLzkSJ9MdVIOD+Ami0USW9vNcwWSbuqrp
+         xCGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=0OEMYSAbvlEMnPmB4RHCAdYP+ZdVMVQyrKEc45S5CmM=;
-        b=i4wL5VYAMI4be/jhXZTMi6UYMqaq6UaEK+ta1zhc7Wva7PmrOTqUhNvF268bsAC5fH
-         SWWpJl/1mxeIXancEB97fxAoArsy3sO9gOhRbxUKoBGC13HQpvLy9ZlUqQu185OTlLPv
-         0ekN1nbKQJO5B6sYRzhu9AbzUAECLyu7S9lItPL3vqFYy/zH7mgIT2yXYNYHtYCWQOF4
-         9+8+FGoS4JvUWlqieueT1YTZ8oklXL7Jok2yfXvOV/i+A7OxsAJewdfkdwzLBml7M7rz
-         Z/NmCutXNRApElWgjMN0TqLj9Qobg8k6Hjc0HbWc7OReyvTWPCet5NKEHV2J7YWJO3n8
-         JAyg==
-X-Gm-Message-State: AJcUukeBu7YF4os+i8b3iKwXMeWaqZ28U5Eql3SDXy6/VGfZ16GkEXDo
-        pTocSDLhYjQpw/tHqkLIhxZIwoPRB5H6eQ==
-X-Google-Smtp-Source: ALg8bN5ON9GKrlneGu2KnJTSN0JrrmuQXYmDOvLsqwibzFyKsxOtHuDgUYwCr04o7k/VjH1gMqE0mQ==
-X-Received: by 2002:a17:902:8c98:: with SMTP id t24mr58311942plo.130.1546797529066;
-        Sun, 06 Jan 2019 09:58:49 -0800 (PST)
+        bh=RvA0y35qCLja6k9PMYIFZ1nrlyy7oVm/17HJNaDtZL0=;
+        b=nYbDye++VI9CUpwpD2fOqCF1Q5s/l4VkuD3+U/aXl/F1QId/f4u20LUIDX/3uK/bbO
+         TRFl1Cb18TexMyrk/tvZ0Q3kdGYttyON+NslHQYAOKlA2jm6eTd4CdWQIIv7bS5n1nuh
+         /fclHpc83VRhGIim5CZpbMYHncSMZNp9gUWV0vukOUS0GmWw1R0mpRuSefg/JHkwfiE9
+         W8ZYJgS4dzi8/OLnS32emuD4QUn1QNs6JXvi30Ya/1ds/4ORTlSTcMFcIHt1C6tMxox7
+         BW8P7jqDFyTJHfw8iAmz8F9N4L6dom8kgsBdACoybvsf/7j9U51me6fAL+Qrb2skV6M7
+         ffQA==
+X-Gm-Message-State: AJcUukc6ah3dAMMoqesFThMP1Zt4czcz6yCUzspbr05XZcb8eu/isxOR
+        8WFo5Z/RQoTgKPJyut8wfWWFHtmyhrpm8Q==
+X-Google-Smtp-Source: ALg8bN6Z3bQdETT508XuTmRJW91jjLnd9hsMxKoR4Ohv9vmgyz1UGu4AmFFLh4ZqgrlIXmiw2AbWsg==
+X-Received: by 2002:a63:4745:: with SMTP id w5mr8761036pgk.377.1546802613106;
+        Sun, 06 Jan 2019 11:23:33 -0800 (PST)
 Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id x3sm198520135pgt.45.2019.01.06.09.58.47
+        by smtp.gmail.com with ESMTPSA id g6sm11692127pgq.18.2019.01.06.11.23.30
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 06 Jan 2019 09:58:48 -0800 (PST)
-Subject: Re: [PATCH v2] null_blk: add zoned config support information
+        Sun, 06 Jan 2019 11:23:31 -0800 (PST)
+Subject: Re: [PATCH] null_blk: add zoned config support information
 To:     John Pittman <jpittman@redhat.com>,
         Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, Laurence Oberman <loberman@redhat.com>
-References: <20190104170637.8218-1-jpittman@redhat.com>
- <1546638578.83374.6.camel@acm.org>
- <CA+RJvhy1tJ93g3Ne2D4RLFRF62nU5=dWvofZpmPUa0yZt0EFhQ@mail.gmail.com>
+Cc:     linux-block@vger.kernel.org
+References: <20190104154243.3538-1-jpittman@redhat.com>
+ <1546620417.163063.45.camel@acm.org>
+ <CA+RJvhyfKrLwFkxAOxqAW=Mthu5HaF_JU6_rgKLjL07uD8TM+g@mail.gmail.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <45d53ef5-6460-e4ed-ff2d-9232c659f8f1@kernel.dk>
-Date:   Sun, 6 Jan 2019 10:58:46 -0700
+Message-ID: <bdf278c3-312d-d714-b06c-be2bd6db07e4@kernel.dk>
+Date:   Sun, 6 Jan 2019 12:23:30 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <CA+RJvhy1tJ93g3Ne2D4RLFRF62nU5=dWvofZpmPUa0yZt0EFhQ@mail.gmail.com>
+In-Reply-To: <CA+RJvhyfKrLwFkxAOxqAW=Mthu5HaF_JU6_rgKLjL07uD8TM+g@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -76,13 +76,25 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/5/19 5:44 AM, John Pittman wrote:
-> Jens, Bart, It occurred to me just now that on the pr_err() message,
-> "null_blk: CONFIG_BLK_DEV_ZONED not enabled" is a little better
-> than "CONFIG_BLK_DEV_ZONED not enabled".  It was my intent
-> to include that 'null_blk:', but it slipped my mind at the last moment.
+On 1/4/19 1:37 PM, John Pittman wrote:
+> Thanks Bart; I made the changes and sent them in as a v2, I'm sure you
+> already saw.  I have a quick, unrelated question if you have a moment.
+> In testing the null_blk driver, I found that trim commands sent by fio
+> were rejected due to lack of support.  Tracking down Shaohua's commit
+> 306eb6b4a ("nullb: support discard"), he mentions that "discard makes
+> sense for memory backed disk".  Just to see what would happen, I
+> edited the source to make discard a configurable parameter at
+> modprobe, and after the edit & build, the trim commands submitted
+> fine.  Does this sort of change make sense?  I mean the ability to do
+> discard to null_blk without it being memory backed;  solely for
+> testing/benchmarking purposes.  I haven't found any good instructions
+> on creating a memory backed or discard enabled null_blk device from
+> the command line, so I assume a higher level driver would have to hook
+> in and enable these features manually.  Thanks for your time and any
+> information.
 
-I applied it just now, and added the prefix to the error message.
+I think that would be fine, no option needed. It's really no different
+than reads/writes being completed without having a memory backing.
 
 -- 
 Jens Axboe
