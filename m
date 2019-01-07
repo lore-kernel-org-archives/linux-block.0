@@ -2,231 +2,149 @@ Return-Path: <SRS0=Upb7=PP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3C25C43387
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jan 2019 19:41:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD451C43387
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jan 2019 21:13:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 623922085A
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jan 2019 19:41:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93C632173C
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jan 2019 21:13:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=mit.edu header.i=@mit.edu header.b="HdgKPgTx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726745AbfAGTlP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Jan 2019 14:41:15 -0500
-Received: from ale.deltatee.com ([207.54.116.67]:42508 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726742AbfAGTlP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 7 Jan 2019 14:41:15 -0500
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtp (Exim 4.89)
-        (envelope-from <logang@deltatee.com>)
-        id 1ggalp-0008U0-HS; Mon, 07 Jan 2019 12:41:12 -0700
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-From:   Logan Gunthorpe <logang@deltatee.com>
-Message-ID: <da851333-eadd-163a-8c78-e1f4ec5ec857@deltatee.com>
-Date:   Mon, 7 Jan 2019 12:41:06 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.0
+        id S1726392AbfAGVNc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Jan 2019 16:13:32 -0500
+Received: from mail-eopbgr750123.outbound.protection.outlook.com ([40.107.75.123]:32634
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726667AbfAGVNb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 7 Jan 2019 16:13:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9jM1RotnqEtMw6HpdzD4RNBozgIDiHb81abw+7LSjdA=;
+ b=HdgKPgTxiGJ6ruI9lSYDxtFcattp2qo6pe0K5cokLIHUqf0D70GeZVBQmPBakgC6nyRGWYEZezzdGw1p4iLUqtGLpT1ZHGCdewT2qbG/X/f8AiCG6DAbR7V8MPMlrOmGMSBLA+Rh1pUcFhRywlzGMbZrKpAxcgi30VE+vGCNrlc=
+Received: from BL0PR0102CA0021.prod.exchangelabs.com (2603:10b6:207:18::34) by
+ BN6PR01MB2435.prod.exchangelabs.com (2603:10b6:404:51::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1495.10; Mon, 7 Jan 2019 21:13:26 +0000
+Received: from DM3NAM03FT013.eop-NAM03.prod.protection.outlook.com
+ (2a01:111:f400:7e49::209) by BL0PR0102CA0021.outlook.office365.com
+ (2603:10b6:207:18::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1495.7 via Frontend
+ Transport; Mon, 7 Jan 2019 21:13:26 +0000
+Authentication-Results: spf=pass (sender IP is 18.9.28.11)
+ smtp.mailfrom=mit.edu; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=bestguesspass action=none
+ header.from=mit.edu;
+Received-SPF: Pass (protection.outlook.com: domain of mit.edu designates
+ 18.9.28.11 as permitted sender) receiver=protection.outlook.com;
+ client-ip=18.9.28.11; helo=outgoing.mit.edu;
+Received: from outgoing.mit.edu (18.9.28.11) by
+ DM3NAM03FT013.mail.protection.outlook.com (10.152.82.79) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.1471.13 via Frontend Transport; Mon, 7 Jan 2019 21:13:25 +0000
+Received: from callcc.thunk.org (guestnat-104-133-0-100.corp.google.com [104.133.0.100] (may be forged))
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x07LDOvA026019
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 7 Jan 2019 16:13:25 -0500
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id 028A27A02E7; Mon,  7 Jan 2019 16:13:23 -0500 (EST)
+From:   Theodore Ts'o <tytso@mit.edu>
+To:     <linux-block@vger.kernel.org>
+CC:     Theodore Ts'o <tytso@mit.edu>
+Subject: [PATCH blktests] src/sg/syzkaller1.c: fix portability problem for syscall(__NR_mmap, ...)
+Date:   Mon, 7 Jan 2019 16:13:16 -0500
+Message-ID: <20190107211316.17578-1-tytso@mit.edu>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------CB830E2FF86FDCA8B6E7F1D5"
-Content-Language: en-CA
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, axboe@kernel.dk, hch@lst.de
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Regression in v5.0-rc1: Panic at boot
-X-SA-Exim-Version: 4.2.1 (built Tue, 02 Aug 2016 21:08:31 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-Forefront-Antispam-Report: CIP:18.9.28.11;IPV:CAL;SCL:-1;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(10019020)(39860400002)(376002)(346002)(396003)(136003)(2980300002)(189003)(199004)(316002)(476003)(2616005)(86362001)(575784001)(786003)(126002)(6916009)(4326008)(246002)(336012)(1076003)(50226002)(52956003)(6266002)(26005)(51416003)(186003)(47776003)(2351001)(356004)(6666004)(103686004)(106466001)(8936002)(50466002)(48376002)(90966002)(305945005)(106002)(36756003)(5660300001)(2870700001)(486006)(75432002)(88552002)(36906005)(8676002)(42186006)(478600001)(2906002)(26826003)(42866002);DIR:OUT;SFP:1102;SCL:1;SRVR:BN6PR01MB2435;H:outgoing.mit.edu;FPR:;SPF:Pass;LANG:en;PTR:outgoing-auth-1.mit.edu;MX:1;A:1;
+X-Microsoft-Exchange-Diagnostics: 1;DM3NAM03FT013;1:w8shWEGgXHi6nonIIRBX5Md9t2Z9JEC9hobLHd4I1OBTxTKksHB4JNCqlxdPWYhFLeN0anBIkZlzJqqz5o/rJ202z0d8YLeo199Xjq/LnDcXNXyfu7r+2CWVRfV+/Dt+
+Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 25e4008b-da6b-4339-ac82-08d674e4f6d5
+X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600109)(711020)(4608076)(4709027)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7153060);SRVR:BN6PR01MB2435;
+X-Microsoft-Exchange-Diagnostics: 1;BN6PR01MB2435;3:wj6UTP0zLHemI9tPKMoLpFEsgkeOEeJKKhiVLwzzWE6e0KJhC3jDbaWVaQcysU71Mu+zeEYr1kyM5cbrA6goDeAgrxs5ZG6/TaW0zdMCUNwT3j4bwQpGh5PIsPMHPTionASSsRY0Dfh2fXpOCc9j+Dxm34+YtwEMbiHMU9/FyXnoEZISSTI+2Y6ZJlSuk2TNUz4Ekir2nMCcbigpiLIhhpdhpGnmHDBKfXR/TF7TB56+gSTStNVMwAZgwkEeD2au9LiFfxTebbdkwnLpAIqEUKcM+fHkiFO7JY5sMz1VE0S8SLUv0sK7bM/SwROj+v+lx5hmik1+vM0+KyiUvQZBWeN2KqwXe3rxqUR/2nvHewM8vv7poHu9FbgVu9bYcZ28;25:LEQvK7i2qpacKAn9BhV7mi5JygI3IvSYCCGKvVLTX0O6qnbs9brmNQpLXFuwicKiEtL9FVLJTrLhkV/lfopOm4sSErV14IKs4mAekVTezGoZefzBR6pBt0MV6Mwqiux7is4O1yh1Zt4I3HWex1QIJndle6Cfy53g3uD1WrMa9BwFWsDS3EfJ0Y60m42jEkddqsbDHg52ii1NOhRB2tnZ987safcM1++tHDW6JRHVxkaitJOsCYqRa87TQZjIHdtOCwnKS00iTpYVmG654OHWusm8S5g0UTO2OLHbiQUHGmaJM9exB+1ye8gUSiM0+2M/Lrnddi/Ts9QKzobvRsBD5A==
+X-MS-TrafficTypeDiagnostic: BN6PR01MB2435:
+X-LD-Processed: 64afd9ba-0ecf-4acf-bc36-935f6235ba8b,ExtAddr
+X-Microsoft-Exchange-Diagnostics: 1;BN6PR01MB2435;31:v8YtKjr4ki8i8NH+xIZ8ruYGF+tz7IkicD7AV6TnhLX9BW45OPOoCefru3aQseZ/LuBR3h5fgkjMGBWIymPMjsS7XKlmf8V6p2/L/1YLE78IUzqPxEG1UlZlKAi2qs0OC2QzSyHSFTO+9d/791Nw16XrZAmte6jlJ26dB9PbJYMCvXWoiycRRYmBbSBBSXNwOex9iFksYAOQWNvLxh14gSJvDh3iBDewq24j5r5FJWE=;20:S/MumAmxBZaN6+3wQiNLOwt27tGDN2y9WOMDJrQiQl5ZXr9myl31Djpr+MzEG3g0Ny7Ll7wg45F1IlkrtAelxyC8GP7XnV3WlHKMAhybK13JliiVyIBGd6zyznLzoOVK/gqQqeN+cazDU8GsxNTHcy7ioC50Ke3yqfqBdrP+YK5p8cS7LDk7WFndGVfWp0h/TnFpdknYJH5YBI4LHwshqiAMQ8yXoBzQM6b0NBymg0mo6Hsiyp81bMzj7LX9z3FUEfh6KpbD2OOcNUVvgA7IIfXK4/VjZfxuqIqwx6m+ftQSamVGlQaj7ij32qii7t7/ebu5fNJtJEfoDhsOUhGlfq6NOYYUCpCcBl134gX/Qq9J7SIeMOpxuue08/iPDAxCtKW1R7tFqXU/e1cFAKCC4aMdeHmSO/z11wRhgwLVM9WadyQw3ec/06v3CL90BVDj7HxpDQiPlKIc6rSzGNneSKM+16ijCOiL/HmIMlO4lFK35NTpSr27X/2VAZ7YKbuG
+X-Microsoft-Antispam-PRVS: <BN6PR01MB24359D8FCE0BDC3C77EB6F34B5890@BN6PR01MB2435.prod.exchangelabs.com>
+X-Exchange-Antispam-Report-CFA-Test: BCL:0;PCL:0;RULEID:(8211001083)(3230021)(908002)(999002)(5005026)(6040522)(8220060)(2401047)(8121501046)(3002001)(10201501046)(93006095)(93004095)(3231475)(944501520)(52105112)(6041310)(20161123564045)(20161123560045)(20161123562045)(201703131423095)(201702281528075)(201702281529075)(20161123555045)(201703061421075)(201703061406153)(20161123558120)(201708071742011)(7699051)(76991095);SRVR:BN6PR01MB2435;BCL:0;PCL:0;RULEID:;SRVR:BN6PR01MB2435;
+X-Microsoft-Exchange-Diagnostics: 1;BN6PR01MB2435;4:MWXdbe/BD1+10BBWh5OYKIndSNRynmVYVYmg10tNuYSodIb3O+PvzRd5TMEy18XN8IZ1ZDrg0q2JBt2jVQc9N3aJlUTwLRfW+unoJjhnTWTGmXmAD7hwob7u16gFfCNedy6PBT+52T5Vy1iSfyhofaq5izJssnpYZfBbBRff4/2PNlKKUNGgA5fwl15hAZ/XcjmHujwaUkh7C1WmPLmu2mGFsn39SP8VZ1sCdfbaaKmp+PLv26mBtD1CPFNVb45LLQ8JOEJoP6I7t+NY0fQ0h+ZuvDepQaPWA9hiuoEO7Lg=
+X-Forefront-PRVS: 0910AAF391
+X-Microsoft-Exchange-Diagnostics: =?us-ascii?Q?1;BN6PR01MB2435;23:o2Ib3LZkzWz85J0WjG7DCzV8VZfnGCQ8B7b6zWPQI?=
+ =?us-ascii?Q?jG3IsNEGyhK1skg1NMUtYJcZlR8Qh7Yum5tu4AI8wzsicC6k9GBz6w1+BA41?=
+ =?us-ascii?Q?dO2eYNKnIXigX3BHXkrSJOp1ENry0btK+eDfVE5iO6aaZ8kFPO6mKMx2Dqea?=
+ =?us-ascii?Q?KRFsPHrj1XEJYrvje2zfYbz+LkfgGI4Rm4WZnX4cvOybjW/O8+cBVsJEjsEE?=
+ =?us-ascii?Q?r7M+5HkL86Nz3d55vChyazkkrLX/fE18gjDFjbXi5zQDuZI4MqSpQQMI3UYS?=
+ =?us-ascii?Q?DfMwhsDlPKu7r03Ir0dNVaKRgymUpzErcwG0hBLc6909O+tScsUj9VzZSYx3?=
+ =?us-ascii?Q?ToAXZhvEDBw/np8du3hgbrXBNY40641yWvPB6f2MMQfaB9KA3FszQZMScl26?=
+ =?us-ascii?Q?juySIAMQ1Y7PJobc5u3fVYKKzI3B4hYh3h5BMr9t2OsRR9O8LlbDj31claEo?=
+ =?us-ascii?Q?EvoyQTPBBMGAlnhESBBZdmuEfZ5M6Fs+Yv7ZDvHwBk3wlBdM+bMY69IBaJ5f?=
+ =?us-ascii?Q?EnaGqCnS/UudyTVXVr3rnLEin196I9Aa5W0qc8wNkeJChPwvHZrBalJX2Fog?=
+ =?us-ascii?Q?n8NsKP5Yd/eFhervPoF7ycLzPfiW5+F+OxcsQV9vOutUl7XypuX38CBnai2m?=
+ =?us-ascii?Q?sqA/Lc0Wjl9OgVVCoIMa4jE8Eph+H8IKnWMxnjA4gsr0z68BhbBuoZnx3qAh?=
+ =?us-ascii?Q?aXDBsDZrdZnps3Cw+f+cy+VI+vhAHswX+6s4L5QGH2dYgciRWCDdhHcNolcr?=
+ =?us-ascii?Q?DPLNuTWwFE+aaSqSlXqGRro2N+Vn3Ws7n2tYwMMwi78+VQ5VAzDXwCXQ8tJD?=
+ =?us-ascii?Q?kKBvX/tzX/gbRJqt0mtNMc2hlnP1Vv/ZKI+GGdIEyBNONPZbZ4yXURVTx/5J?=
+ =?us-ascii?Q?yLK1Me2NcyfXZ5qXnUU991tsDJMUs0u+UXuFWu8N7KizxO9iKcH4xlFrYW9E?=
+ =?us-ascii?Q?ZweTSXhXjaBwk5k4FmxznFK1DRupdgfSdTKNz2weASXRFu2MpAydoCZANsVL?=
+ =?us-ascii?Q?M/zPaxi+8t+CLsZfRCiRW3rKyIsAXp1XpyTJ4k3Tw+PYvf8jes6qC/a9mPJe?=
+ =?us-ascii?Q?CviygSye/OM2vjZxr40aoXYNpBXLbtJ0w0+VTEOW9K2jn1HQXuchF1kDG8xP?=
+ =?us-ascii?Q?3wgUJPOSrA9DlEkfKROpxrFT8fUIlO0?=
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam-Message-Info: 31NsbYCMNc/OZ2iDl1I84KxGSiLNpQe7xEKh4z1aubD4JJ3o1Q6w3XLSV+R4ordKbHIPXgThYQ9TFalR7d9qxlWjxUOQ3p86whI+bZVuLOXDZdwY+A58HC0M/frkTqMqVJzaRVx2EdsVAdGKSNLeLXe9HOVAx66Ipkq9CkcTlII2dUJvUN23hJ7fI3bzAH3eFlrHCtT5ZuQbMp4Td779Cjqwio+/HqLt0flmbDAWRUMYX4lIE4unHgtX9vEYvR8vA8T7irQaO6BQRm0ISVKQx3Vvzm1A4/YVGTCdL8xWxqyNhnQYUwCRSZjERa5igeSy
+X-Microsoft-Exchange-Diagnostics: 1;BN6PR01MB2435;6:aDfs3jGGyqsg3hDgORvWkjoqYNPih/us+vR+jdbKhIIh0NbUCA0lhWYLcDrh+n6LxlCBGWRc2fivkhv4q7XbN1fvYvzowOfIOUoQuI15NgkS4+YrU0Jj/VeNmlKULOn2/0BcDqVP5NSZHEpbj1Yehb1w01Szc468OEFIZwM+2fFCSG6K0PRvZB62qU52cf9rppR4jkYt5epkyVSvJvZ+e8LP/MTV8dO8GSeMhh3y9uhGhGDni+RGYdZRX9T+5xlP2guhLk2omaBPZ/iy4XOxavrP9VCbD5yX7zJTjtu0aqOpxZz14eLo9PL4RqJ1lE+VldwCr7dAsl3IJCQGLakYIumkpKOafZnj2vohyMLth//lEV12zAvfcdDU7BK25vOEzPT81FzOGPL365q4dqzOhlof/6z8MllKrokR7p6OwQi0xFbM+wQDY8+clFQPO4Tjg34OX374zxEwOTrZWOS/7A==;5:bzeAVuQ3BNZqU+tY5iI16WJBaKaNmrlop/MlrreIDVh5DouSqUcQurQRS1TyYP17reZywMYsbl7UBhPHfKaeEwyxml8djWQTyAAetZHv6+Cma1Xglt86U/dZv5mlLS+LDpmhtQkLWaCxBjoQPIDS2awnKKvVEkwuS1+ewiFg/eiH0F3Vz1o+4B2NqPrxYje/GT8HdId3+Y7vPhyxkKa1jw==;7:ax05H89KnxMQ/TtcYWCqmX5fbh9KOapeDATb+g7izcCzoeER26RM9Qfxz+Sl9mntSgzXhcYHhHStvUkSN/P7BBX2LeTByzGD2QkVBXspeJ7pQ9NwLiJirM9nfr8d3NGvYOME8m2cV6Lp1B7SAt4Dug==
+SpamDiagnosticOutput: 1:99
+SpamDiagnosticMetadata: NSPM
+X-OriginatorOrg: mit.edu
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2019 21:13:25.9411
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 25e4008b-da6b-4339-ac82-08d674e4f6d5
+X-MS-Exchange-CrossTenant-Id: 64afd9ba-0ecf-4acf-bc36-935f6235ba8b
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=64afd9ba-0ecf-4acf-bc36-935f6235ba8b;Ip=[18.9.28.11];Helo=[outgoing.mit.edu]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR01MB2435
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------CB830E2FF86FDCA8B6E7F1D5
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+How mmap is mapped to a raw system call varies across different
+archiecture.  On some architectures (such as 32-bit ARM), __NR_mmap
+may not exist at all; glibc will use __NR_mmap2 to implement mmap(2).
+Syzkaller is using mmap() as a non-portable version of malloc(3), so
+it should be safe to use the glibc's mmap wrapper instead of trying to
+directly call the system call.
 
-Hey,
+Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+---
+ src/sg/syzkaller1.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-I found a regression in v5.0-rc1 this morning. My system panics on boot.
-I've attached a log of the panic.
+diff --git a/src/sg/syzkaller1.c b/src/sg/syzkaller1.c
+index 743859a..e254d4a 100644
+--- a/src/sg/syzkaller1.c
++++ b/src/sg/syzkaller1.c
+@@ -401,8 +401,10 @@ long r[15];
+ void test()
+ {
+   memset(r, -1, sizeof(r));
+-  r[0] = execute_syscall(__NR_mmap, 0x20000000ul, 0x5000ul, 0x3ul,
+-                         0x32ul, (uintptr_t)(-1ul), 0x0ul, 0, 0, 0);
++//r[0] = execute_syscall(__NR_mmap, 0x20000000ul, 0x5000ul, 0x3ul,
++//                       0x32ul, (uintptr_t)(-1ul), 0x0ul, 0, 0, 0);
++  r[0] = (long) mmap((void *) 0x20000000, (size_t) 0x5000,
++                     PROT_READ | PROT_WRITE, MAP_FIXED | MAP_ANONYMOUS, -1, 0);
+   NONFAILING(memcpy((void*)0x20000000,
+                     dev_sg, strlen(dev_sg)));
+   r[2] = execute_syscall(__NR_syz_open_dev, 0x20000000ul, 0x0ul, 0x2ul,
+-- 
+2.19.1
 
-I bisected to find the problematic commit is:
-
-Fixes: 9d037ad707ed ("block: remove req->timeout_list")
-
-But it makes no sense to me why this commit would cause a problem like
-this. I've attached a bisect log. I've also tested v5.0-rc1 with this
-commit reverted and that boots fine.
-
-The traceback seems to indicate the problem is on the bip_get_seed()
-line in t10_pi_complete(). Which suggests that bio_integrity() is
-returning NULL.
-
-Thanks,
-
-Logan
-
---------------CB830E2FF86FDCA8B6E7F1D5
-Content-Type: text/x-log;
- name="bisect.log"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="bisect.log"
-
-git bisect start
-# good: [8fe28cb58bcb235034b64cbbb7550a8a43fd88be] Linux 4.20
-git bisect good 8fe28cb58bcb235034b64cbbb7550a8a43fd88be
-# bad: [bfeffd155283772bbe78c6a05dec7c0128ee500c] Linux 5.0-rc1
-git bisect bad bfeffd155283772bbe78c6a05dec7c0128ee500c
-# good: [e0c38a4d1f196a4b17d2eba36afff8f656a4f1de] Merge git://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next
-git bisect good e0c38a4d1f196a4b17d2eba36afff8f656a4f1de
-# bad: [02061181d3a9ccfe15ef6bc15fa56283acc47620] Merge tag 'staging-4.21-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/staging
-git bisect bad 02061181d3a9ccfe15ef6bc15fa56283acc47620
-# bad: [75f95da078b2891cd186f074ffc15a8e7c3f082d] Merge tag 'libnvdimm-for-4.21' of git://git.kernel.org/pub/scm/linux/kernel/git/nvdimm/nvdimm
-git bisect bad 75f95da078b2891cd186f074ffc15a8e7c3f082d
-# bad: [0e9da3fbf7d81f0f913b491c8de1ba7883d4f217] Merge tag 'for-4.21/block-20181221' of git://git.kernel.dk/linux-block
-git bisect bad 0e9da3fbf7d81f0f913b491c8de1ba7883d4f217
-# good: [b12a9124eeb71d766a3e3eb594ebbb3fefc66902] Merge tag 'y2038-for-4.21' of ssh://gitolite.kernel.org:/pub/scm/linux/kernel/git/arnd/playground
-git bisect good b12a9124eeb71d766a3e3eb594ebbb3fefc66902
-# bad: [c6d962aebaf8ec5d867aac09ee33e3f528c2539d] nvme-pci: only allow polling with separate poll queues
-git bisect bad c6d962aebaf8ec5d867aac09ee33e3f528c2539d
-# bad: [511c49fe1804671800947b69281e07719fad25e2] fnic: fix fnic_scsi_host_{start,end}_tag
-git bisect bad 511c49fe1804671800947b69281e07719fad25e2
-# good: [3110fc79606fb6003949246c6fb325dd43445273] blk-mq: improve plug list sorting
-git bisect good 3110fc79606fb6003949246c6fb325dd43445273
-# good: [7baa85727d0406ffd2b2303cd803a145aa35c505] blk-mq-tag: change busy_iter_fn to return whether to continue or not
-git bisect good 7baa85727d0406ffd2b2303cd803a145aa35c505
-# good: [55c7bc37e05b5f7593b76d1c74e254b996b73d1a] mtip32xx: remove mtip_get_int_command
-git bisect good 55c7bc37e05b5f7593b76d1c74e254b996b73d1a
-# bad: [785ba83b4f3e4fde236f03205dd1cd98fd6a5255] scsi: push blk_status_t up into scsi_setup_{fs,scsi}_cmnd
-git bisect bad 785ba83b4f3e4fde236f03205dd1cd98fd6a5255
-# bad: [9d037ad707ed6069fbea4e38e6ee37e027b13f1d] block: remove req->timeout_list
-git bisect bad 9d037ad707ed6069fbea4e38e6ee37e027b13f1d
-# good: [27d420bc475e68c85d567d96caf215999d76fd16] mtip32xxx: use for_each_sg
-git bisect good 27d420bc475e68c85d567d96caf215999d76fd16
-# first bad commit: [9d037ad707ed6069fbea4e38e6ee37e027b13f1d] block: remove req->timeout_list
-# good: [27d420bc475e68c85d567d96caf215999d76fd16] mtip32xxx: use for_each_sg
-git bisect good 27d420bc475e68c85d567d96caf215999d76fd16
-# first bad commit: [9d037ad707ed6069fbea4e38e6ee37e027b13f1d] block: remove req->timeout_list
-
---------------CB830E2FF86FDCA8B6E7F1D5
-Content-Type: text/x-log;
- name="panic.log"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="panic.log"
-
-[    8.542203] BUG: unable to handle kernel NULL pointer dereference at 0000000000000008
-[    8.551091] PGD 0 P4D 0 
-[    8.554022] Oops: 0000 [#1] SMP PTI
-[    8.558020] CPU: 7 PID: 0 Comm: swapper/7 Not tainted 4.20.0-rc1.direct-00174-g9d037ad707ed #1410
-[    8.568067] Hardware name: Supermicro SYS-7047GR-TRF/X9DRG-QF, BIOS 3.0a 12/05/2013
-[    8.576759] RIP: 0010:t10_pi_complete+0x77/0x1c0
-[    8.582021] Code: 65 4c 8b 2c 25 80 4d 01 00 4c 89 2c 24 44 88 64 24 17 48 8b 44 24 08 45 31 db f6 40 12 01 74 04 4c 8b 58 78 44 0f b6 54 24 17 <41> 8b 53 08 45 8b 43 10 45 8b 4b 14 41 8b 7b 18 45 85 c0 0f 84 ee
-[    8.603162] RSP: 0018:ffff880479b83e90 EFLAGS: 00010246
-[    8.609094] RAX: ffff88047569fe00 RBX: 0000000000000000 RCX: 00000000fffffff7
-[    8.617172] RDX: 0000000000000008 RSI: 0000000000000000 RDI: ffff88047569fe00
-[    8.625252] RBP: 0000000000000008 R08: 0000000000000000 R09: 0000000000000200
-[    8.633329] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-[    8.641407] R13: ffff8804785eee40 R14: ffff880272457080 R15: ffff880274c7a400
-[    8.649485] FS:  0000000000000000(0000) GS:ffff880479b80000(0000) knlGS:0000000000000000
-[    8.658654] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    8.665178] CR2: 0000000000000008 CR3: 0000000475aae005 CR4: 00000000000606e0
-[    8.673255] Call Trace:
-[    8.676090]  <IRQ>
-[    8.678444]  sd_done+0xf5/0x340
-[    8.682057]  scsi_finish_command+0xc3/0x120
-[    8.686840]  blk_done_softirq+0x83/0xb0
-[    8.691242]  __do_softirq+0xa1/0x2e6
-[    8.695341]  irq_exit+0xbc/0xd0
-[    8.698958]  call_function_single_interrupt+0xf/0x20
-[    8.704608]  </IRQ>
-[    8.707054] RIP: 0010:cpuidle_enter_state+0xbc/0x330
-[    8.712695] Code: 77 7e e8 57 e2 88 ff 49 89 c7 8b 05 46 52 c9 00 85 c0 7f 79 31 ff e8 f3 ec 88 ff 80 7c 24 0f 00 0f 85 fc 00 00 00 fb 45 85 ed <0f> 88 27 02 00 00 4c 2b 7c 24 10 48 ba cf f7 53 e3 a5 9b c4 20 4c
-[    8.733836] RSP: 0018:ffffc90001a27e88 EFLAGS: 00000202 ORIG_RAX: ffffffffffffff04
-[    8.742412] RAX: ffff880479ba1200 RBX: ffffffff824adfe0 RCX: 000000000000001f
-[    8.750491] RDX: 00000001fd27837e RSI: 00000000355559b4 RDI: 0000000000000000
-[    8.758562] RBP: ffffe8ffffd979c0 R08: 0000000000000004 R09: 0000000000020a80
-[    8.766632] R10: 00000000ffffffff R11: 0000000000000169 R12: ffff8804785eee40
-[    8.774711] R13: 0000000000000002 R14: 0000000000000002 R15: 00000001fd27837e
-[    8.782790]  ? cpuidle_enter_state+0xad/0x330
-[    8.787754]  do_idle+0x1e1/0x240
-[    8.791460]  cpu_startup_entry+0x19/0x20
-[    8.795948]  start_secondary+0x196/0x1e0
-[    8.800432]  secondary_startup_64+0xa4/0xb0
-[    8.805213] Modules linked in:
-[    8.808725] CR2: 0000000000000008
-[    8.812537] ---[ end trace 28b6363ca135f1f8 ]---
-[    8.822574] RIP: 0010:t10_pi_complete+0x77/0x1c0
-[    8.827836] Code: 65 4c 8b 2c 25 80 4d 01 00 4c 89 2c 24 44 88 64 24 17 48 8b 44 24 08 45 31 db f6 40 12 01 74 04 4c 8b 58 78 44 0f b6 54 24 17 <41> 8b 53 08 45 8b 43 10 45 8b 4b 14 41 8b 7b 18 45 85 c0 0f 84 ee
-[    8.848977] RSP: 0018:ffff880479b83e90 EFLAGS: 00010246
-[    8.854925] RAX: ffff88047569fe00 RBX: 0000000000000000 RCX: 00000000fffffff7
-[    8.863003] RDX: 0000000000000008 RSI: 0000000000000000 RDI: ffff88047569fe00
-[    8.871083] RBP: 0000000000000008 R08: 0000000000000000 R09: 0000000000000200
-[    8.879162] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-[    8.887241] R13: ffff8804785eee40 R14: ffff880272457080 R15: ffff880274c7a400
-[    8.895311] FS:  0000000000000000(0000) GS:ffff880479b80000(0000) knlGS:0000000000000000
-[    8.904471] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    8.910995] CR2: 0000000000000008 CR3: 0000000475aae005 CR4: 00000000000606e0
-[    8.919072] Kernel panic - not syncing: Fatal exception in interrupt
-[    8.926340] Kernel Offset: disabled
-[    8.933578] ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
-[    8.942179] unchecked MSR access error: WRMSR to 0x83f (tried to write 0x00000000000000f6) at rIP: 0xffffffff810acf24 (native_apic_msr_write+0x24/0x40)
-[    8.957469] Call Trace:
-[    8.960301]  <IRQ>
-[    8.962649]  arch_irq_work_raise+0x28/0x40
-[    8.967331]  irq_work_queue+0x98/0xa0
-[    8.971524]  enqueue_entity+0x6f3/0x7a0
-[    8.975913]  enqueue_task_fair+0xa5/0x6d0
-[    8.980496]  ? vt_console_print+0x223/0x3d0
-[    8.985273]  ttwu_do_activate+0x44/0x80
-[    8.989659]  sched_ttwu_pending+0x87/0xd0
-[    8.994240]  scheduler_ipi+0x4d/0x130
-[    8.998434]  reschedule_interrupt+0xf/0x20
-[    9.003119] RIP: 0010:panic+0x20e/0x253
-[    9.007503] Code: 48 83 c3 64 eb a6 83 3d d2 cf a6 01 00 74 05 e8 4b 40 02 00 48 c7 c6 00 28 b6 82 48 c7 c7 c8 c3 22 82 e8 e6 c9 05 00 fb 31 db <e8> a0 74 0b 00 4c 39 eb 7c 1d 41 83 f4 01 48 8b 05 80 cf a6 01 44
-[    9.028644] RSP: 0018:ffff880479b83ce0 EFLAGS: 00000246 ORIG_RAX: ffffffffffffff02
-[    9.037220] RAX: 0000000000000046 RBX: 0000000000000000 RCX: ffffffff82454f38
-[    9.045297] RDX: 0000000000000000 RSI: 0000000000000096 RDI: ffffffff82b690cc
-[    9.053374] RBP: ffff880479b83d58 R08: 0000000000000000 R09: 0000000000000000
-[    9.061452] R10: 0000000000000019 R11: ffffffff82b6b10d R12: 0000000000000000
-[    9.069530] R13: 0000000000000000 R14: 0000000000000046 R15: 0000000000000009
-[    9.077609]  ? reschedule_interrupt+0xa/0x20
-[    9.082477]  oops_end+0xbb/0xc0
-[    9.086089]  no_context+0x1aa/0x3a0
-[    9.090086]  page_fault+0x1e/0x30
-[    9.093890] RIP: 0010:t10_pi_complete+0x77/0x1c0
-[    9.099150] Code: 65 4c 8b 2c 25 80 4d 01 00 4c 89 2c 24 44 88 64 24 17 48 8b 44 24 08 45 31 db f6 40 12 01 74 04 4c 8b 58 78 44 0f b6 54 24 17 <41> 8b 53 08 45 8b 43 10 45 8b 4b 14 41 8b 7b 18 45 85 c0 0f 84 ee
-[    9.120291] RSP: 0018:ffff880479b83e90 EFLAGS: 00010246
-[    9.126222] RAX: ffff88047569fe00 RBX: 0000000000000000 RCX: 00000000fffffff7
-[    9.134300] RDX: 0000000000000008 RSI: 0000000000000000 RDI: ffff88047569fe00
-[    9.142379] RBP: 0000000000000008 R08: 0000000000000000 R09: 0000000000000200
-[    9.150456] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-[    9.158534] R13: ffff8804785eee40 R14: ffff880272457080 R15: ffff880274c7a400
-[    9.166614]  sd_done+0xf5/0x340
-[    9.170223]  scsi_finish_command+0xc3/0x120
-[    9.174999]  blk_done_softirq+0x83/0xb0
-[    9.179386]  __do_softirq+0xa1/0x2e6
-[    9.183481]  irq_exit+0xbc/0xd0
-[    9.187081]  call_function_single_interrupt+0xf/0x20
-[    9.192730]  </IRQ>
-[    9.195172] RIP: 0010:cpuidle_enter_state+0xbc/0x330
-[    9.200819] Code: 77 7e e8 57 e2 88 ff 49 89 c7 8b 05 46 52 c9 00 85 c0 7f 79 31 ff e8 f3 ec 88 ff 80 7c 24 0f 00 0f 85 fc 00 00 00 fb 45 85 ed <0f> 88 27 02 00 00 4c 2b 7c 24 10 48 ba cf f7 53 e3 a5 9b c4 20 4c
-[    9.221960] RSP: 0018:ffffc90001a27e88 EFLAGS: 00000202 ORIG_RAX: ffffffffffffff04
-[    9.230545] RAX: ffff880479ba1200 RBX: ffffffff824adfe0 RCX: 000000000000001f
-[    9.238622] RDX: 00000001fd27837e RSI: 00000000355559b4 RDI: 0000000000000000
-[    9.246700] RBP: ffffe8ffffd979c0 R08: 0000000000000004 R09: 0000000000020a80
-[    9.254777] R10: 00000000ffffffff R11: 0000000000000169 R12: ffff8804785eee40
-[    9.262855] R13: 0000000000000002 R14: 0000000000000002 R15: 00000001fd27837e
-[    9.270935]  ? cpuidle_enter_state+0xad/0x330
-[    9.275905]  do_idle+0x1e1/0x240
-[    9.279610]  cpu_startup_entry+0x19/0x20
-[    9.284095]  start_secondary+0x196/0x1e0
-[    9.288579]  secondary_startup_64+0xa4/0xb0
-
---------------CB830E2FF86FDCA8B6E7F1D5--
