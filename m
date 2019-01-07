@@ -2,168 +2,150 @@ Return-Path: <SRS0=Upb7=PP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_SBL,
+	URIBL_SBL_A,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C0F2C43387
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jan 2019 12:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 479BDC43387
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jan 2019 13:11:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E3EE120665
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jan 2019 12:07:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 119D72089F
+	for <linux-block@archiver.kernel.org>; Mon,  7 Jan 2019 13:11:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726649AbfAGMHr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Jan 2019 07:07:47 -0500
-Received: from smtp.eu.citrix.com ([185.25.65.24]:64211 "EHLO
-        SMTP.EU.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726589AbfAGMHr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jan 2019 07:07:47 -0500
-X-IronPort-AV: E=Sophos;i="5.56,450,1539648000"; 
-   d="scan'208";a="84222505"
-Date:   Mon, 7 Jan 2019 13:01:07 +0100
-From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-To:     Dongli Zhang <dongli.zhang@oracle.com>
-CC:     <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <konrad.wilk@oracle.com>,
-        <axboe@kernel.dk>, <Paul.Durrant@citrix.com>
-Subject: Re: [PATCH v4 2/2] xen/blkback: rework connect_ring() to avoid
- inconsistent xenstore 'ring-page-order' set by malicious blkfront
-Message-ID: <20190107120107.euf7mrq7gk6bmibz@mac>
-References: <1546839359-5478-1-git-send-email-dongli.zhang@oracle.com>
- <1546839359-5478-2-git-send-email-dongli.zhang@oracle.com>
+        id S1727597AbfAGNL4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Jan 2019 08:11:56 -0500
+Received: from mx2.didichuxing.com ([36.110.17.22]:3314 "HELO
+        bsf01.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S1727392AbfAGNIB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jan 2019 08:08:01 -0500
+X-ASG-Debug-ID: 1546865546-0e40881182836300001-Cu09wu
+Received: from BJEXCAS03.didichuxing.com (bogon [172.20.36.245]) by bsf01.didichuxing.com with ESMTP id gYKRaKP6Z5tHluVa; Mon, 07 Jan 2019 20:52:26 +0800 (CST)
+X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
+Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
+ (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1263.5; Mon, 7 Jan
+ 2019 20:52:26 +0800
+Date:   Mon, 7 Jan 2019 20:52:21 +0800
+From:   Weiping Zhang <zhangweiping@didiglobal.com>
+To:     <axboe@kernel.dk>
+CC:     <bvanassche@acm.org>, <hch@infradead.org>,
+        <linux-block@vger.kernel.org>
+Subject: [PATCH] block: don't show io_timeout if driver has no timeout handler
+Message-ID: <20190107125215.GA5039@192.168.3.9>
+X-ASG-Orig-Subj: [PATCH] block: don't show io_timeout if driver has no timeout handler
+Mail-Followup-To: axboe@kernel.dk, bvanassche@acm.org, hch@infradead.org,
+        linux-block@vger.kernel.org
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <1546839359-5478-2-git-send-email-dongli.zhang@oracle.com>
-User-Agent: NeoMutt/20180716
-X-ClientProxiedBy: AMSPEX02CAS01.citrite.net (10.69.22.112) To
- AMSPEX02CL02.citrite.net (10.69.22.126)
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Originating-IP: [172.22.50.20]
+X-ClientProxiedBy: BJEXCAS002.didichuxing.com (172.20.1.42) To
+ BJSGEXMBX03.didichuxing.com (172.20.15.133)
+X-Barracuda-Connect: bogon[172.20.36.245]
+X-Barracuda-Start-Time: 1546865546
+X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at didichuxing.com
+X-Barracuda-Scan-Msg-Size: 2586
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0546 1.0000 -1.6707
+X-Barracuda-Spam-Score: -1.67
+X-Barracuda-Spam-Status: No, SCORE=-1.67 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.65269
+        Rule breakdown below
+         pts rule name              description
+        ---- ---------------------- --------------------------------------------------
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 07, 2019 at 01:35:59PM +0800, Dongli Zhang wrote:
-> The xenstore 'ring-page-order' is used globally for each blkback queue and
-> therefore should be read from xenstore only once. However, it is obtained
-> in read_per_ring_refs() which might be called multiple times during the
-> initialization of each blkback queue.
-> 
-> If the blkfront is malicious and the 'ring-page-order' is set in different
-> value by blkfront every time before blkback reads it, this may end up at
-> the "WARN_ON(i != (XEN_BLKIF_REQS_PER_PAGE * blkif->nr_ring_pages));" in
-> xen_blkif_disconnect() when frontend is destroyed.
-> 
-> This patch reworks connect_ring() to read xenstore 'ring-page-order' only
-> once.
-> 
-> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-> ---
-> Changed since v1:
->   * change the order of xenstore read in read_per_ring_refs
->   * use xenbus_read_unsigned() in connect_ring()
-> 
-> Changed since v2:
->   * simplify the condition check as "(err != 1 && nr_grefs > 1)"
->   * avoid setting err as -EINVAL to remove extra one line of code
-> 
-> Changed since v3:
->   * exit at the beginning if !nr_grefs
->   * change the if statements to avoid test (err != 1) twice
->   * initialize a 'blkif' stack variable (refer to PATCH 1/2)
-> 
->  drivers/block/xen-blkback/xenbus.c | 76 +++++++++++++++++++++-----------------
->  1 file changed, 43 insertions(+), 33 deletions(-)
-> 
-> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-> index a4aadac..a2acbc9 100644
-> --- a/drivers/block/xen-blkback/xenbus.c
-> +++ b/drivers/block/xen-blkback/xenbus.c
-> @@ -926,7 +926,7 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
->  	int err, i, j;
->  	struct xen_blkif *blkif = ring->blkif;
->  	struct xenbus_device *dev = blkif->be->dev;
-> -	unsigned int ring_page_order, nr_grefs, evtchn;
-> +	unsigned int nr_grefs, evtchn;
->  
->  	err = xenbus_scanf(XBT_NIL, dir, "event-channel", "%u",
->  			  &evtchn);
-> @@ -936,43 +936,38 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
->  		return err;
->  	}
->  
-> -	err = xenbus_scanf(XBT_NIL, dev->otherend, "ring-page-order", "%u",
-> -			  &ring_page_order);
-> -	if (err != 1) {
-> -		err = xenbus_scanf(XBT_NIL, dir, "ring-ref", "%u", &ring_ref[0]);
-> +	nr_grefs = blkif->nr_ring_pages;
-> +
-> +	if (unlikely(!nr_grefs))
-> +		return -EINVAL;
+If the low level driver has no timerout handler, the
+/sys/block/<disk>/queue/io_timeout will not be displayed.
 
-Is this even possible? AFAICT read_per_ring_refs will always be called
-with blkif->nr_ring_pages != 0?
+Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
+---
+ block/blk-sysfs.c | 33 +++++++++++++++++++++++++++++++--
+ 1 file changed, 31 insertions(+), 2 deletions(-)
 
-If so, I would consider turning this into a BUG_ON/WARN_ON.
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 0619c8922893..e9ee81c43d36 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -726,7 +726,7 @@ static struct queue_sysfs_entry throtl_sample_time_entry = {
+ };
+ #endif
+ 
+-static struct attribute *default_attrs[] = {
++static struct attribute *queue_attrs[] = {
+ 	&queue_requests_entry.attr,
+ 	&queue_ra_entry.attr,
+ 	&queue_max_hw_sectors_entry.attr,
+@@ -768,6 +768,26 @@ static struct attribute *default_attrs[] = {
+ 	NULL,
+ };
+ 
++static umode_t queue_attr_visible(struct kobject *kobj, struct attribute *attr,
++				int n)
++{
++	struct request_queue *q =
++		container_of(kobj, struct request_queue, kobj);
++
++	if (attr == &queue_io_timeout_entry.attr) {
++		if (!q->mq_ops || !q->mq_ops->timeout)
++			return 0;
++	}
++
++	return attr->mode;
++}
++
++static struct attribute_group queue_attr_group = {
++	.attrs = queue_attrs,
++	.is_visible = queue_attr_visible,
++};
++
++
+ #define to_queue(atr) container_of((atr), struct queue_sysfs_entry, attr)
+ 
+ static ssize_t
+@@ -893,7 +913,6 @@ static const struct sysfs_ops queue_sysfs_ops = {
+ 
+ struct kobj_type blk_queue_ktype = {
+ 	.sysfs_ops	= &queue_sysfs_ops,
+-	.default_attrs	= default_attrs,
+ 	.release	= blk_release_queue,
+ };
+ 
+@@ -942,6 +961,14 @@ int blk_register_queue(struct gendisk *disk)
+ 		goto unlock;
+ 	}
+ 
++	ret = sysfs_create_group(&q->kobj, &queue_attr_group);
++	if (ret) {
++		kobject_del(&q->kobj);
++		blk_trace_remove_sysfs(dev);
++		kobject_put(&dev->kobj);
++		goto unlock;
++	}
++
+ 	if (queue_is_mq(q)) {
+ 		__blk_mq_register_dev(dev, q);
+ 		blk_mq_debugfs_register(q);
+@@ -958,6 +985,7 @@ int blk_register_queue(struct gendisk *disk)
+ 		if (ret) {
+ 			mutex_unlock(&q->sysfs_lock);
+ 			kobject_uevent(&q->kobj, KOBJ_REMOVE);
++			sysfs_remove_group(&q->kobj, &queue_attr_group);
+ 			kobject_del(&q->kobj);
+ 			blk_trace_remove_sysfs(dev);
+ 			kobject_put(&dev->kobj);
+@@ -1006,6 +1034,7 @@ void blk_unregister_queue(struct gendisk *disk)
+ 		blk_mq_unregister_dev(disk_to_dev(disk), q);
+ 	mutex_unlock(&q->sysfs_lock);
+ 
++	sysfs_remove_group(&q->kobj, &queue_attr_group);
+ 	kobject_uevent(&q->kobj, KOBJ_REMOVE);
+ 	kobject_del(&q->kobj);
+ 	blk_trace_remove_sysfs(disk_to_dev(disk));
+-- 
+2.14.1
 
-> +
-> +	for (i = 0; i < nr_grefs; i++) {
-> +		char ring_ref_name[RINGREF_NAME_LEN];
-> +
-> +		snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref%u", i);
-> +		err = xenbus_scanf(XBT_NIL, dir, ring_ref_name,
-> +				   "%u", &ring_ref[i]);
-> +
->  		if (err != 1) {
-> -			err = -EINVAL;
-> -			xenbus_dev_fatal(dev, err, "reading %s/ring-ref", dir);
-> -			return err;
-> -		}
-> -		nr_grefs = 1;
-> -	} else {
-> -		unsigned int i;
-> -
-> -		if (ring_page_order > xen_blkif_max_ring_order) {
-> -			err = -EINVAL;
-> -			xenbus_dev_fatal(dev, err, "%s/request %d ring page order exceed max:%d",
-> -					 dir, ring_page_order,
-> -					 xen_blkif_max_ring_order);
-> -			return err;
-> +			if (nr_grefs == 1)
-> +				break;
-> +
-
-You need to either set err to EINVAL before calling xenbus_dev_fatal,
-or call xenbus_dev_fatal with EINVAL as the second parameter.
-
-> +			xenbus_dev_fatal(dev, err, "reading %s/%s",
-> +					 dir, ring_ref_name);
-> +			return -EINVAL;
->  		}
-> +	}
->  
-> -		nr_grefs = 1 << ring_page_order;
-> -		for (i = 0; i < nr_grefs; i++) {
-> -			char ring_ref_name[RINGREF_NAME_LEN];
-> -
-> -			snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref%u", i);
-> -			err = xenbus_scanf(XBT_NIL, dir, ring_ref_name,
-> -					   "%u", &ring_ref[i]);
-> -			if (err != 1) {
-> -				err = -EINVAL;
-> -				xenbus_dev_fatal(dev, err, "reading %s/%s",
-> -						 dir, ring_ref_name);
-> -				return err;
-> -			}
-> +	if (err != 1) {
-> +		WARN_ON(nr_grefs != 1);
-> +
-> +		err = xenbus_scanf(XBT_NIL, dir, "ring-ref", "%u",
-> +				   &ring_ref[0]);
-> +		if (err != 1) {
-> +			xenbus_dev_fatal(dev, err, "reading %s/ring-ref", dir);
-
-Second parameter should be EINVAL, or err should be set to EINVAL
-before calling xenbus_dev_fatal.
-
-Thanks, Roger.
