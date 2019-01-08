@@ -2,173 +2,106 @@ Return-Path: <SRS0=D8nw=PQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1070EC43612
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 20:08:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1892C43387
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 20:24:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D314620660
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 20:08:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1546978081;
-	bh=bYYme8szVfV4nzB1y+4P8/YNwYpSCa4xpJx7++A+c2s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=uPHqpB/qMpeIwYePSyy4IEJHoKNgq6tLcXgf4ezPbw4JoA2sd659ClOjtMgDgSZS7
-	 jRhLj0srVvQf9nNc6myyvew9a3dgDvQKMc8a9/L4JqDiUirO8P3phGgr1kuIzFUhwp
-	 Si1M1mFXczI+QSLR540XmZ8LCIBRjXuu8occWkhA=
+	by mail.kernel.org (Postfix) with ESMTP id 7A83820827
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 20:24:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729777AbfAHUIA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jan 2019 15:08:00 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33836 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728348AbfAHT1f (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Jan 2019 14:27:35 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 939612070B;
-        Tue,  8 Jan 2019 19:27:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1546975654;
-        bh=bYYme8szVfV4nzB1y+4P8/YNwYpSCa4xpJx7++A+c2s=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=2jI+cfdBUr+ORVnHpVWs+dhDxW2lKM/Cu59ZY7Plz1mXUdmio8KUKxaOlTSdlDVj/
-         zvEhAwipbvFaDnQWRwyZ0k23ILLxnSa1BE1lWloKEB1B63JbuVBHjOvtwZh817U5Pl
-         T0TVTeywoO5mse21KuCFIIyAIzXadmlDdvizWZG4=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Yufen Yu <yuyufen@huawei.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.20 035/117] block: use rcu_work instead of call_rcu to avoid sleep in softirq
-Date:   Tue,  8 Jan 2019 14:25:03 -0500
-Message-Id: <20190108192628.121270-35-sashal@kernel.org>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190108192628.121270-1-sashal@kernel.org>
-References: <20190108192628.121270-1-sashal@kernel.org>
+        id S1728987AbfAHUYj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jan 2019 15:24:39 -0500
+Received: from gateway36.websitewelcome.com ([50.116.125.2]:14460 "EHLO
+        gateway36.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728469AbfAHUYj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Jan 2019 15:24:39 -0500
+X-Greylist: delayed 1501 seconds by postgrey-1.27 at vger.kernel.org; Tue, 08 Jan 2019 15:24:39 EST
+Received: from cm10.websitewelcome.com (cm10.websitewelcome.com [100.42.49.4])
+        by gateway36.websitewelcome.com (Postfix) with ESMTP id D56AE40164968
+        for <linux-block@vger.kernel.org>; Tue,  8 Jan 2019 12:49:20 -0600 (CST)
+Received: from gator4166.hostgator.com ([108.167.133.22])
+        by cmsmtp with SMTP
+        id gxBegwCYi2PzOgxBegaqts; Tue, 08 Jan 2019 13:37:18 -0600
+X-Authority-Reason: nr=8
+Received: from [189.250.130.205] (port=57412 helo=embeddedor)
+        by gator4166.hostgator.com with esmtpa (Exim 4.91)
+        (envelope-from <gustavo@embeddedor.com>)
+        id 1ggxBd-003gLX-F1; Tue, 08 Jan 2019 13:37:17 -0600
+Date:   Tue, 8 Jan 2019 13:37:14 -0600
+From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Subject: [PATCH] bio-integrity: use struct_size() in kmalloc()
+Message-ID: <20190108193714.GA24832@embeddedor>
 MIME-Version: 1.0
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 189.250.130.205
+X-Source-L: No
+X-Exim-ID: 1ggxBd-003gLX-F1
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: (embeddedor) [189.250.130.205]:57412
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 6
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yufen Yu <yuyufen@huawei.com>
+One of the more common cases of allocation size calculations is finding
+the size of a structure that has a zero-sized array at the end, along
+with memory for some number of elements for that array. For example:
 
-[ Upstream commit 94a2c3a32b62e868dc1e3d854326745a7f1b8c7a ]
+struct foo {
+    int stuff;
+    void *entry[];
+};
 
-We recently got a stack by syzkaller like this:
+instance = kmalloc(sizeof(struct foo) + sizeof(void *) * count, GFP_KERNEL);
 
-BUG: sleeping function called from invalid context at mm/slab.h:361
-in_atomic(): 1, irqs_disabled(): 0, pid: 6644, name: blkid
-INFO: lockdep is turned off.
-CPU: 1 PID: 6644 Comm: blkid Not tainted 4.4.163-514.55.6.9.x86_64+ #76
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
- 0000000000000000 5ba6a6b879e50c00 ffff8801f6b07b10 ffffffff81cb2194
- 0000000041b58ab3 ffffffff833c7745 ffffffff81cb2080 5ba6a6b879e50c00
- 0000000000000000 0000000000000001 0000000000000004 0000000000000000
-Call Trace:
- <IRQ>  [<ffffffff81cb2194>] __dump_stack lib/dump_stack.c:15 [inline]
- <IRQ>  [<ffffffff81cb2194>] dump_stack+0x114/0x1a0 lib/dump_stack.c:51
- [<ffffffff8129a981>] ___might_sleep+0x291/0x490 kernel/sched/core.c:7675
- [<ffffffff8129ac33>] __might_sleep+0xb3/0x270 kernel/sched/core.c:7637
- [<ffffffff81794c13>] slab_pre_alloc_hook mm/slab.h:361 [inline]
- [<ffffffff81794c13>] slab_alloc_node mm/slub.c:2610 [inline]
- [<ffffffff81794c13>] slab_alloc mm/slub.c:2692 [inline]
- [<ffffffff81794c13>] kmem_cache_alloc_trace+0x2c3/0x5c0 mm/slub.c:2709
- [<ffffffff81cbe9a7>] kmalloc include/linux/slab.h:479 [inline]
- [<ffffffff81cbe9a7>] kzalloc include/linux/slab.h:623 [inline]
- [<ffffffff81cbe9a7>] kobject_uevent_env+0x2c7/0x1150 lib/kobject_uevent.c:227
- [<ffffffff81cbf84f>] kobject_uevent+0x1f/0x30 lib/kobject_uevent.c:374
- [<ffffffff81cbb5b9>] kobject_cleanup lib/kobject.c:633 [inline]
- [<ffffffff81cbb5b9>] kobject_release+0x229/0x440 lib/kobject.c:675
- [<ffffffff81cbb0a2>] kref_sub include/linux/kref.h:73 [inline]
- [<ffffffff81cbb0a2>] kref_put include/linux/kref.h:98 [inline]
- [<ffffffff81cbb0a2>] kobject_put+0x72/0xd0 lib/kobject.c:692
- [<ffffffff8216f095>] put_device+0x25/0x30 drivers/base/core.c:1237
- [<ffffffff81c4cc34>] delete_partition_rcu_cb+0x1d4/0x2f0 block/partition-generic.c:232
- [<ffffffff813c08bc>] __rcu_reclaim kernel/rcu/rcu.h:118 [inline]
- [<ffffffff813c08bc>] rcu_do_batch kernel/rcu/tree.c:2705 [inline]
- [<ffffffff813c08bc>] invoke_rcu_callbacks kernel/rcu/tree.c:2973 [inline]
- [<ffffffff813c08bc>] __rcu_process_callbacks kernel/rcu/tree.c:2940 [inline]
- [<ffffffff813c08bc>] rcu_process_callbacks+0x59c/0x1c70 kernel/rcu/tree.c:2957
- [<ffffffff8120f509>] __do_softirq+0x299/0xe20 kernel/softirq.c:273
- [<ffffffff81210496>] invoke_softirq kernel/softirq.c:350 [inline]
- [<ffffffff81210496>] irq_exit+0x216/0x2c0 kernel/softirq.c:391
- [<ffffffff82c2cd7b>] exiting_irq arch/x86/include/asm/apic.h:652 [inline]
- [<ffffffff82c2cd7b>] smp_apic_timer_interrupt+0x8b/0xc0 arch/x86/kernel/apic/apic.c:926
- [<ffffffff82c2bc25>] apic_timer_interrupt+0xa5/0xb0 arch/x86/entry/entry_64.S:746
- <EOI>  [<ffffffff814cbf40>] ? audit_kill_trees+0x180/0x180
- [<ffffffff8187d2f7>] fd_install+0x57/0x80 fs/file.c:626
- [<ffffffff8180989e>] do_sys_open+0x45e/0x550 fs/open.c:1043
- [<ffffffff818099c2>] SYSC_open fs/open.c:1055 [inline]
- [<ffffffff818099c2>] SyS_open+0x32/0x40 fs/open.c:1050
- [<ffffffff82c299e1>] entry_SYSCALL_64_fastpath+0x1e/0x9a
+Instead of leaving these open-coded and prone to type mistakes, we can
+now use the new struct_size() helper:
 
-In softirq context, we call rcu callback function delete_partition_rcu_cb(),
-which may allocate memory by kzalloc with GFP_KERNEL flag. If the
-allocation cannot be satisfied, it may sleep. However, That is not allowed
-in softirq contex.
+instance = kmalloc(struct_size(instance, entry, count), GFP_KERNEL);
 
-Although we found this problem on linux 4.4, the latest kernel version
-seems to have this problem as well. And it is very similar to the
-previous one:
-	https://lkml.org/lkml/2018/7/9/391
+This code was detected with the help of Coccinelle.
 
-Fix it by using RCU workqueue, which allows sleep.
-
-Reviewed-by: Paul E. McKenney <paulmck@linux.ibm.com>
-Signed-off-by: Yufen Yu <yuyufen@huawei.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
 ---
- block/partition-generic.c | 8 +++++---
- include/linux/genhd.h     | 2 +-
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ block/bio-integrity.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index d3d14e81fb12..5f8db5c5140f 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -249,9 +249,10 @@ struct device_type part_type = {
- 	.uevent		= part_uevent,
- };
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 1b633a3526d4..ae8c68ecc0ca 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -57,8 +57,8 @@ struct bio_integrity_payload *bio_integrity_alloc(struct bio *bio,
+ 	unsigned inline_vecs;
  
--static void delete_partition_rcu_cb(struct rcu_head *head)
-+static void delete_partition_work_fn(struct work_struct *work)
- {
--	struct hd_struct *part = container_of(head, struct hd_struct, rcu_head);
-+	struct hd_struct *part = container_of(to_rcu_work(work), struct hd_struct,
-+					rcu_work);
- 
- 	part->start_sect = 0;
- 	part->nr_sects = 0;
-@@ -262,7 +263,8 @@ static void delete_partition_rcu_cb(struct rcu_head *head)
- void __delete_partition(struct percpu_ref *ref)
- {
- 	struct hd_struct *part = container_of(ref, struct hd_struct, ref);
--	call_rcu(&part->rcu_head, delete_partition_rcu_cb);
-+	INIT_RCU_WORK(&part->rcu_work, delete_partition_work_fn);
-+	queue_rcu_work(system_wq, &part->rcu_work);
- }
- 
- /*
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 70fc838e6773..0c5ee17b4d88 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -129,7 +129,7 @@ struct hd_struct {
- 	struct disk_stats dkstats;
- #endif
- 	struct percpu_ref ref;
--	struct rcu_head rcu_head;
-+	struct rcu_work rcu_work;
- };
- 
- #define GENHD_FL_REMOVABLE			1
+ 	if (!bs || !mempool_initialized(&bs->bio_integrity_pool)) {
+-		bip = kmalloc(sizeof(struct bio_integrity_payload) +
+-			      sizeof(struct bio_vec) * nr_vecs, gfp_mask);
++		bip = kmalloc(struct_size(bip, bip_inline_vecs, nr_vecs),
++			      gfp_mask);
+ 		inline_vecs = nr_vecs;
+ 	} else {
+ 		bip = mempool_alloc(&bs->bio_integrity_pool, gfp_mask);
 -- 
-2.19.1
+2.20.1
 
