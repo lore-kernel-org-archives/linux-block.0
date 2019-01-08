@@ -4,63 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61A29C43387
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 16:57:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6A3CC43387
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 16:57:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 25EAC218A3
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 16:57:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B74E92173C
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 16:57:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="GTw9t09S"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bpehgh9D"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729233AbfAHQ5R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jan 2019 11:57:17 -0500
-Received: from mail-io1-f65.google.com ([209.85.166.65]:38818 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729181AbfAHQ5P (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jan 2019 11:57:15 -0500
-Received: by mail-io1-f65.google.com with SMTP id l14so3664732ioj.5
-        for <linux-block@vger.kernel.org>; Tue, 08 Jan 2019 08:57:15 -0800 (PST)
+        id S1729282AbfAHQ5X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jan 2019 11:57:23 -0500
+Received: from mail-it1-f196.google.com ([209.85.166.196]:35293 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729229AbfAHQ5W (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jan 2019 11:57:22 -0500
+Received: by mail-it1-f196.google.com with SMTP id p197so6945161itp.0
+        for <linux-block@vger.kernel.org>; Tue, 08 Jan 2019 08:57:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=Lz/3jHz1x36txQZ/D99mDx/1sUz8ZTGETsX8P4ZemoU=;
-        b=GTw9t09Sg1AxtJ5+L7hLtOSEycum9LC9wgqFCHQ9uF75Dqqv442Kk5IWnZrDu00Yi0
-         7lyXBSzesZXeo5NpHfoRuNr1ndCPc+pedh3RljiZS/2VPEfC7xGYvJJWHKbCRu51NCsZ
-         irRZq/pGVj79I22DkV6AU4wWKr9QgeRWF7cJkDOKUUNhwx5OiqXVNn8TX8pONZkmCF76
-         ds/P7H+Q6wgWz6bwxN7eSIIWnRvKFbL2vhewVKweNH9wkZxPeumRbsn8KyQxbdKTd7Fa
-         +7iSPYIFhij2fOb8hNj8O8wNSHsRdXw/GtaFQY4UUDK3SFr5ob4IAeC+JLOy6GiNnk/V
-         7WLw==
+        bh=JNGzHMnuawXZ2jXlVzeC+GxiAaklWr1vP40pdXT+hKc=;
+        b=bpehgh9DDK5WDCcCbulj1IgtC8kIw5R84av9H6wjlTzTFX8FN6a8UR7lIEIc3y1r4+
+         1KgSl5dTK7cJArcwvlOPO34wzP0/1myHfRURDPqgDreCRdSTHdn1XgHIEpw2Wz/bDnQ1
+         SxsIu9yf9QiiaQYahYWNnEcC/L5vdTN8tDokuElcoFhfc0yrXEU7HfE4sz0QbiYTBNf6
+         WG2k5sFj1ejGrpameQizvszKIS/Y3jFeLN9K+b3982XXVqXouSL3Yql9bRBdFGoejjBm
+         3PNbSXl62S2nS8tez9iyVXCx5OB75RJs4Lxkth12VCoatA3LEnw22YYDMVlLdL8694gS
+         OwtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=Lz/3jHz1x36txQZ/D99mDx/1sUz8ZTGETsX8P4ZemoU=;
-        b=Lilggdgxxo+0ABNKI/btQ5pEJK30s71Z8T6cHrf3j7FZIZh1BDqN2xrK4tBR/Sdw/f
-         NiIPASFk1rgROcZjjLofTR6OcgxVIEsHCl3FAc4p2g2SB3AXzWXosUmQR3lVSvhGXdct
-         O0fx13BuKWQaY9uaxEh4MR04QgYthu2bdolfuN9Rlfybgu+UFT8v9W/XzoZ7eooTGNpJ
-         nwShBtKyWbw3zCJRwn/eomvZETfv8Iy4D09j8o9IhXk7xuROWCV+Ihq/eHO3PBRqPqDn
-         ugLnEV1KtYz4UsLnAqQZq5tOu8HoMhOPqbi5svXA+x3FsikuT2qNTWDYMjn3GrTka/bk
-         y06g==
-X-Gm-Message-State: AJcUukchjOQwywa0y1wF1NGAAUW+rQkvyOBvslkLxgwgkBrGDX5GX2Mx
-        SK/MF1DBd/k+BblQwDss9G4g2A==
-X-Google-Smtp-Source: ALg8bN4GaweI0iaMptEgJJ71xKVQKMRUtVLv45mHwX1U8C/cBBILXlgWDeHxCpbxHZlUhxCxIg00pA==
-X-Received: by 2002:a6b:dd0b:: with SMTP id f11mr1588813ioc.45.1546966634597;
-        Tue, 08 Jan 2019 08:57:14 -0800 (PST)
+        bh=JNGzHMnuawXZ2jXlVzeC+GxiAaklWr1vP40pdXT+hKc=;
+        b=ulqcHIDy0FSzpBUaaKecphnP2VhA68YvifikL83RjkA6Rdie+h20Vru95jFedz4+ym
+         TK4h7UbN9btglh0FdOJiBkq/I/UNiVBr6PFqd9Ozw9TX7uyp9NQQBLLWeeS2hdmDbGEh
+         f3uz9G2veRAXF9zqOdnW+7w0sA4Hhtq1wsdx3yLT9bJymVOg/PiJwWATOSL/p5D7nOeK
+         Y4W3EVCXVqJ0cQhazv2d8Vr2TxoJlTsPyWTgaRjHwOuM+AUaVKRApCECENWwjgyZdIbC
+         9y860b0mu3X5T1nk41fg79ynVrguRh0srjAsgdLUbT8gnh7ZBMAMBMfWNdrnue3r9Mjj
+         WRtw==
+X-Gm-Message-State: AJcUukeiA4cjJFeDegc4DnBt1rmpWjE3Y06KbeAndb7dqzaow1Fx415R
+        bWhYlykAcNe9R0cgVmDMCZoW3g==
+X-Google-Smtp-Source: ALg8bN41HEg0pjekki/EOMUuCmJZVFsL8lHd3AR+Kh06EZzPQAQhJkKttRGANOf9fkwD17ny83bhFw==
+X-Received: by 2002:a24:52cc:: with SMTP id d195mr1565683itb.29.1546966641543;
+        Tue, 08 Jan 2019 08:57:21 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id m10sm17563442ioq.25.2019.01.08.08.57.12
+        by smtp.gmail.com with ESMTPSA id m10sm17563442ioq.25.2019.01.08.08.57.19
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 08 Jan 2019 08:57:13 -0800 (PST)
+        Tue, 08 Jan 2019 08:57:20 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
         linux-block@vger.kernel.org, linux-arch@vger.kernel.org
 Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 12/16] block: implement bio helper to add iter bvec pages to bio
-Date:   Tue,  8 Jan 2019 09:56:41 -0700
-Message-Id: <20190108165645.19311-13-axboe@kernel.dk>
+Subject: [PATCH 16/16] io_uring: add io_uring_event cache hit information
+Date:   Tue,  8 Jan 2019 09:56:45 -0700
+Message-Id: <20190108165645.19311-17-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190108165645.19311-1-axboe@kernel.dk>
 References: <20190108165645.19311-1-axboe@kernel.dk>
@@ -69,166 +69,54 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For an ITER_BVEC, we can just iterate the iov and add the pages
-to the bio directly. This requires that the caller doesn't releases
-the pages on IO completion, we add a BIO_HOLD_PAGES flag for that.
-
-The current two callers of bio_iov_iter_get_pages() are updated to
-check if they need to release pages on completion. This makes them
-work with bvecs that contain kernel mapped pages already.
+Add hint on whether a read was served out of the page cache, or if it
+hit media. This is useful for buffered async IO, O_DIRECT reads would
+never have this set (for obvious reasons).
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/bio.c               | 59 ++++++++++++++++++++++++++++++++-------
- fs/block_dev.c            |  5 ++--
- fs/iomap.c                |  5 ++--
- include/linux/blk_types.h |  1 +
- 4 files changed, 56 insertions(+), 14 deletions(-)
+ fs/io_uring.c                 | 6 +++++-
+ include/uapi/linux/io_uring.h | 5 +++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 4db1008309ed..7af4f45d2ed6 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -828,6 +828,23 @@ int bio_add_page(struct bio *bio, struct page *page,
- }
- EXPORT_SYMBOL(bio_add_page);
- 
-+static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
-+{
-+	const struct bio_vec *bv = iter->bvec;
-+	unsigned int len;
-+	size_t size;
-+
-+	len = min_t(size_t, bv->bv_len, iter->count);
-+	size = bio_add_page(bio, bv->bv_page, len,
-+				bv->bv_offset + iter->iov_offset);
-+	if (size == len) {
-+		iov_iter_advance(iter, size);
-+		return 0;
-+	}
-+
-+	return -EINVAL;
-+}
-+
- #define PAGE_PTRS_PER_BVEC     (sizeof(struct bio_vec) / sizeof(struct page *))
- 
- /**
-@@ -876,23 +893,43 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- }
- 
- /**
-- * bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
-+ * bio_iov_iter_get_pages - add user or kernel pages to a bio
-  * @bio: bio to add pages to
-- * @iter: iov iterator describing the region to be mapped
-+ * @iter: iov iterator describing the region to be added
-+ *
-+ * This takes either an iterator pointing to user memory, or one pointing to
-+ * kernel pages (BVEC iterator). If we're adding user pages, we pin them and
-+ * map them into the kernel. On IO completion, the caller should put those
-+ * pages. If we're adding kernel pages, we just have to add the pages to the
-+ * bio directly. We don't grab an extra reference to those pages (the user
-+ * should already have that), and we don't put the page on IO completion.
-+ * The caller needs to check if the bio is flagged BIO_HOLD_PAGES on IO
-+ * completion. If it isn't, then pages should be released.
-  *
-- * Pins pages from *iter and appends them to @bio's bvec array. The
-- * pages will have to be released using put_page() when done.
-  * The function tries, but does not guarantee, to pin as many pages as
-- * fit into the bio, or are requested in *iter, whatever is smaller.
-- * If MM encounters an error pinning the requested pages, it stops.
-- * Error is returned only if 0 pages could be pinned.
-+ * fit into the bio, or are requested in *iter, whatever is smaller. If
-+ * MM encounters an error pinning the requested pages, it stops. Error
-+ * is returned only if 0 pages could be pinned.
-  */
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 6c10841e4342..50b9cfa8c861 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -524,12 +524,16 @@ static void io_fill_cq_error(struct io_ring_ctx *ctx, unsigned ki_index,
+ static void io_complete_scqring_rw(struct kiocb *kiocb, long res, long res2)
  {
-+	const bool is_bvec = iov_iter_is_bvec(iter);
- 	unsigned short orig_vcnt = bio->bi_vcnt;
+ 	struct io_kiocb *iocb = container_of(kiocb, struct io_kiocb, rw);
++	unsigned ev_flags = 0;
  
-+	/*
-+	 * If this is a BVEC iter, then the pages are kernel pages. Don't
-+	 * release them on IO completion.
-+	 */
-+	if (is_bvec)
-+		bio_set_flag(bio, BIO_HOLD_PAGES);
+ 	kiocb_end_write(kiocb);
+ 
+ 	fput(kiocb->ki_filp);
+ 
+-	io_complete_scqring(iocb, res, 0);
++	if (res > 0 && test_bit(KIOCB_F_FORCE_NONBLOCK, &iocb->ki_flags))
++		ev_flags = IOEV_FLAG_CACHEHIT;
 +
- 	do {
--		int ret = __bio_iov_iter_get_pages(bio, iter);
-+		int ret;
++	io_complete_scqring(iocb, res, ev_flags);
+ }
+ 
+ static void io_complete_scqring_iopoll(struct kiocb *kiocb, long res, long res2)
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index bd665d38dd97..7dd21126f142 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -56,6 +56,11 @@ struct io_uring_event {
+ 	__u32	flags;
+ };
+ 
++/*
++ * io_uring_event->flags
++ */
++#define IOEV_FLAG_CACHEHIT	(1 << 0)	/* IO did not hit media */
 +
-+		if (is_bvec)
-+			ret = __bio_iov_bvec_add_pages(bio, iter);
-+		else
-+			ret = __bio_iov_iter_get_pages(bio, iter);
- 
- 		if (unlikely(ret))
- 			return bio->bi_vcnt > orig_vcnt ? 0 : ret;
-@@ -1634,7 +1671,8 @@ static void bio_dirty_fn(struct work_struct *work)
- 		next = bio->bi_private;
- 
- 		bio_set_pages_dirty(bio);
--		bio_release_pages(bio);
-+		if (!bio_flagged(bio, BIO_HOLD_PAGES))
-+			bio_release_pages(bio);
- 		bio_put(bio);
- 	}
- }
-@@ -1650,7 +1688,8 @@ void bio_check_pages_dirty(struct bio *bio)
- 			goto defer;
- 	}
- 
--	bio_release_pages(bio);
-+	if (!bio_flagged(bio, BIO_HOLD_PAGES))
-+		bio_release_pages(bio);
- 	bio_put(bio);
- 	return;
- defer:
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 2ebd2a0d7789..b7742014c9de 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -324,8 +324,9 @@ static void blkdev_bio_end_io(struct bio *bio)
- 		struct bio_vec *bvec;
- 		int i;
- 
--		bio_for_each_segment_all(bvec, bio, i)
--			put_page(bvec->bv_page);
-+		if (!bio_flagged(bio, BIO_HOLD_PAGES))
-+			bio_for_each_segment_all(bvec, bio, i)
-+				put_page(bvec->bv_page);
- 		bio_put(bio);
- 	}
- }
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 4ee50b76b4a1..0a64c9c51203 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -1582,8 +1582,9 @@ static void iomap_dio_bio_end_io(struct bio *bio)
- 		struct bio_vec *bvec;
- 		int i;
- 
--		bio_for_each_segment_all(bvec, bio, i)
--			put_page(bvec->bv_page);
-+		if (!bio_flagged(bio, BIO_HOLD_PAGES))
-+			bio_for_each_segment_all(bvec, bio, i)
-+				put_page(bvec->bv_page);
- 		bio_put(bio);
- 	}
- }
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 5c7e7f859a24..97e206855cd3 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -215,6 +215,7 @@ struct bio {
  /*
-  * bio flags
+  * Magic offsets for the application to mmap the data it needs
   */
-+#define BIO_HOLD_PAGES	0	/* don't put O_DIRECT pages */
- #define BIO_SEG_VALID	1	/* bi_phys_segments valid */
- #define BIO_CLONED	2	/* doesn't own data */
- #define BIO_BOUNCED	3	/* bio is a bounce bio */
 -- 
 2.17.1
 
