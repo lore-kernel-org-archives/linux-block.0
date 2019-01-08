@@ -1,75 +1,144 @@
-Return-Path: <SRS0=Upb7=PP=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=D8nw=PQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0EF2C43387
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jan 2019 21:30:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20072C43387
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 07:06:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7162E2087F
-	for <linux-block@archiver.kernel.org>; Mon,  7 Jan 2019 21:30:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5D5C2087F
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 07:06:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DFIQnkDD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726638AbfAGVaD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Jan 2019 16:30:03 -0500
-Received: from mail-pl1-f170.google.com ([209.85.214.170]:46645 "EHLO
-        mail-pl1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726392AbfAGVaD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Jan 2019 16:30:03 -0500
-Received: by mail-pl1-f170.google.com with SMTP id t13so738475ply.13
-        for <linux-block@vger.kernel.org>; Mon, 07 Jan 2019 13:30:03 -0800 (PST)
+        id S1727295AbfAHHGi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jan 2019 02:06:38 -0500
+Received: from mail-vk1-f182.google.com ([209.85.221.182]:33667 "EHLO
+        mail-vk1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726333AbfAHHGi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jan 2019 02:06:38 -0500
+Received: by mail-vk1-f182.google.com with SMTP id d201so664406vka.0;
+        Mon, 07 Jan 2019 23:06:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DQM6khskQIeEmRfxZTuTbZZte1lnAveX0wU/7msS24Y=;
+        b=DFIQnkDDkwKxUgn3G2RScT7rNXiUnpxFhDp6+HuqOaEj5KSHX1ftp4B9SvILv5JAG6
+         vUTSQJ3cwjNfIYrRdXOIxc2Ij9qzKFWf2CXWHEpH8WMEPP7oXws6qaSAy7CmAmeTcpvA
+         +CCJqEKfsQT8yAXdzowoAE0KvwE1JZCx6D+ytG6fJKz89Bz8/BWw/Ej666cBcP4iTGA5
+         XP6kwLmIzfp/iebgmfSicSnkXZjarZ7V5HOZuuBWnWalFB/249uPDY0PG1mgr0NLoIg8
+         lnms+34364eA1HzBkfFCSep1vTjMc0awW1IcYulFJny0Wm9t3NeFuBsq9GyMXRGJxNEZ
+         PfAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=77lHhy7ipdnkHsNmNO8xUU7xxAiUxG3JEbN1nWi3Cvo=;
-        b=CgVQyvPOCYF+siBrpS05kN8XXheHy9NF4Bnka8NfTYZFN7GIQqV8FyL+uRD2H5IbD7
-         LQYI3M7ZwQafD4VQv1VS10eNvkgyRg/MdOlSoERe/cDA17hIfgXuOy80w/yzCgTt6YIr
-         3lfZGj1im5YHgVIXdpDzd/vMHJiUd1aJ+AOirUs/km6GDnsXjioD4xPLhFEyAqNykCna
-         vv6kU/9bswunG9zuXngOk1ilClW75WNHxd1cGRmrioZPi4q4szks279UWfmngHPe5Itu
-         D1ebkM9dL2NuLCc350IFG/vonTJIq4A9BerkR0STzDw8AmJbp5M32Ih9Kb6Y978ANjdf
-         9tPA==
-X-Gm-Message-State: AJcUukdNxtOStkh2phcnCNniv38yy9SXHdHvXQy5gClFb3pc9fiwcOWU
-        AcwkNZ4vzEqlEqPTgbGxBpo=
-X-Google-Smtp-Source: ALg8bN5rSEaCD8sYCqUJbq1U/c5lSFfEYHuxcM+Bm85N9iykFg9/tvHOxu6eV5E6rpfrfugBrErI9Q==
-X-Received: by 2002:a17:902:6683:: with SMTP id e3mr56048186plk.93.1546896602766;
-        Mon, 07 Jan 2019 13:30:02 -0800 (PST)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id u8sm99394696pfl.16.2019.01.07.13.30.01
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 07 Jan 2019 13:30:02 -0800 (PST)
-Message-ID: <1546896601.83374.26.camel@acm.org>
-Subject: Re: Kernel v5.0-rc1 and blk-mq
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date:   Mon, 07 Jan 2019 13:30:01 -0800
-In-Reply-To: <1546896114.83374.22.camel@acm.org>
-References: <1546896114.83374.22.camel@acm.org>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DQM6khskQIeEmRfxZTuTbZZte1lnAveX0wU/7msS24Y=;
+        b=D5dOg1xtOwIUoqOvH2LsFlEQKX+dJDvnZPwUDkXy3UT4X+UAqtfgZkgXs6up2Sg+3Y
+         lAabEk1VouVkdxLW1wtWgncInH8vR1d7IOc7BZj212BdB7gixw5ig0UI61r6Mowxc98R
+         AomBQM8HhNDd39zh4Ksn67yEjvgeq//IeMVtCR1Pb5RzfK3Iv/1dAY5QbsajhsMVxov7
+         9bLBiiVta/0Ow+/MyxuFdGRgg0aECWbhZ/SLtXdcDGyk+FTtfQU+9b71fEF3419EWQjW
+         hrhTMXm/rX41mwd0T660MDgMNu6SFIMXLk6l3Q6df95lu9bKM5/nXuktG6DTthWjcA8v
+         Z/kw==
+X-Gm-Message-State: AJcUukfiXEKgVviSLx0u71YhKvlg+cHc04Tqmg4Y+c2D3S4np1Wcwwzx
+        jwA17cnduoz3tV5pXm4rgT2NhGy6ZkTbvMPXZe4=
+X-Google-Smtp-Source: ALg8bN40agLBMdpNYWQoF9UYR75/JrPQd38npPO4W3EXwBJWLj5lNRLANbWnG6CVNk8LR6GiCYN6Zb5WRb+BGpHjp7s=
+X-Received: by 2002:a1f:6b14:: with SMTP id g20mr203794vkc.47.1546931196460;
+ Mon, 07 Jan 2019 23:06:36 -0800 (PST)
+MIME-Version: 1.0
+References: <CALjAwxgOhbYF=A4PbVipP9M+XnwnRG+c2Pcid=cZjtBe0uDUHw@mail.gmail.com>
+ <CALjAwxj8LHFomCJJNCDmne1PZ6ygjtzKyvA+09kQA62vQZ3OBA@mail.gmail.com>
+ <1546445424.29282.1.camel@redhat.com> <1546540117.24199.0.camel@redhat.com>
+ <1546548458.24199.2.camel@redhat.com> <CALjAwxhOb_HLD1Adux-n0LUienLK_FhrOnyBw=UMLj49aN6_5A@mail.gmail.com>
+ <1546555220.2666.1.camel@redhat.com> <CALjAwxgtCGLEJkV3xw4Amp4gdkuacgmTVkYn=w8ZHucJ6ffDew@mail.gmail.com>
+ <4c231a3e-1ae3-c872-f6f8-06b19ddfd20b@suse.de> <CALjAwxiaVRpqgxs4rtjxDM4J5YDnrKAyCwn79h5tdhxwZX8iTA@mail.gmail.com>
+ <b7ab94d7-8282-425a-3dcd-38a538a44d24@suse.de>
+In-Reply-To: <b7ab94d7-8282-425a-3dcd-38a538a44d24@suse.de>
+From:   Sitsofe Wheeler <sitsofe@gmail.com>
+Date:   Tue, 8 Jan 2019 07:06:10 +0000
+Message-ID: <CALjAwxjaffzBMSEC=R1ftW1upb2LZWuYinOxORGGUU9THm4vbA@mail.gmail.com>
+Subject: Re: failed command: WRITE FPDMA QUEUED with Samsung 860 EVO
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Laurence Oberman <loberman@redhat.com>, linux-ide@vger.kernel.org,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2019-01-07 at 13:21 -0800, Bart Van Assche wrote:
-+AD4 When I tried to run the SRP tests from the blktests repository against the
-+AD4 v5.0 kernel several issues were reported. The same tests pass against kernel
-+AD4 v4.20.
+On Mon, 7 Jan 2019 at 08:46, Hannes Reinecke <hare@suse.de> wrote:
+>
+> On 1/7/19 8:41 AM, Sitsofe Wheeler wrote:
+> > On Mon, 7 Jan 2019 at 07:17, Hannes Reinecke <hare@suse.de> wrote:
+> >>
+> >> On 1/4/19 8:33 AM, Sitsofe Wheeler wrote:
+> >>> Blimey Laurence - you're really pushing the boat out on this one!
+> >>>
+> >> [ .. ]
+> >>> I've yet to attach the disk directly to the mobo. It's a bit fiddly as
+> >>> the most accessible port is meant for the DVD drive and I think it's
+> >>> speed is slower than the others.
+> >>>
+> >>> The speed of the ATA ports is lower than you might expect (this
+> >>> machine is fairly old):
+> >>>
+> >> [ .. ]
+> >>> [    3.242623] ata2.00: FORCE: horkage modified (noncq)
+> >>> [    3.242683] ata2.00: supports DRM functions and may not be fully accessible
+> >>> [    3.242686] ata2.00: ATA-11: Samsung SSD 860 EVO 500GB, RVT01B6Q,
+> >>> max UDMA/133
+> >>> [    3.242689] ata2.00: 976773168 sectors, multi 1: LBA48 NCQ (not used)
+> >>> [    3.245518] ata2.00: supports DRM functions and may not be fully accessible
+> >>> [    3.247611] ata2.00: configured for UDMA/133
+> >>
+> >> 'slower' is an understatement.
+> >
+> > Are you surprised that there would be such a dramatic difference in
+> > the speeds between the two SSDs (Samsung 860 EVO, Crucial MX500) on
+> > that particular workload in that same machine?
+> >
+> Not at all.
 
-A correction: this was triggered by a new test (+ACI-Run sg+AF8-reset while I/O is ongoing+ACI).
-Anyway, I don't think that such a test should trigger the following statement in
-blk+AF8-mq+AF8-start+AF8-request():
+Fair enough :-) My understanding is that both SSDs (when unloaded and
+mostly empty etc) would be far faster than what this particular
+machine could do but I stand corrected.
 
-	WARN+AF8-ON+AF8-ONCE(blk+AF8-mq+AF8-rq+AF8-state(rq) +ACEAPQ MQ+AF8-RQ+AF8-IDLE)+ADs
+> >> That adapter can't do NCQ, hence 'WRITE FPDMA QUEUED' (which _is_ an NCQ
+> >> command) will never be issued.
+> >> So I'd be _very_ surprised if you still see this problem there ...
+> >
+> > I'm curious, why would using the libata.force=2.00:noncq kernel
+> > command line (only mentioned in my very first mail) make using that
+> > drive more stable if the adapter could never accept that command
+> > anyway? Shouldn't the sending of that command have been disabled if
+> > anything along the way can't actually accept it?
+> >
+> 'WRITE FPDMA QUEUED' will ever be issued if the drive _and_ adapter can
+> do NCQ. As this is the offending command it's not surprising that
+> switching off NCQ (and hence the use of that command) will make the
+> machine more stable.
+>
+> Although I'd be curious about the 'more' bit in 'more stable'.
+> I would have thought that the machine would be stable after disabling
+> NCQ; do you still see issues after disabling NCQ?
 
-A few kernel versions back I ran sg+AF8-reset manually while I/O was ongoing and that
-test passed. So this test result may indicate an issue in the blk-mq request state
-rework.
+I was inaccurate when I said "more": it has been totally stable since
+disabling NCQ on that port.
 
-Bart.
+> As for the NCQ issues: it might be that the adapter has issues with NCQ
+> (quite some older adapters do).
+> It might also be a problem with the _previous_ command which failed; can
+> you enable libata tracing to figure out the command flow?
+
+OK I'll see if I can get around to this one tomorrow.
+
+Cheers!
+
+-- 
+Sitsofe | http://sucs.org/~sits/
