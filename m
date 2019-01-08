@@ -2,143 +2,163 @@ Return-Path: <SRS0=D8nw=PQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20072C43387
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 07:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11161C43387
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 08:13:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D5D5C2087F
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 07:06:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2B1020665
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 08:13:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DFIQnkDD"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="xoKgzDvE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727295AbfAHHGi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jan 2019 02:06:38 -0500
-Received: from mail-vk1-f182.google.com ([209.85.221.182]:33667 "EHLO
-        mail-vk1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726333AbfAHHGi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jan 2019 02:06:38 -0500
-Received: by mail-vk1-f182.google.com with SMTP id d201so664406vka.0;
-        Mon, 07 Jan 2019 23:06:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DQM6khskQIeEmRfxZTuTbZZte1lnAveX0wU/7msS24Y=;
-        b=DFIQnkDDkwKxUgn3G2RScT7rNXiUnpxFhDp6+HuqOaEj5KSHX1ftp4B9SvILv5JAG6
-         vUTSQJ3cwjNfIYrRdXOIxc2Ij9qzKFWf2CXWHEpH8WMEPP7oXws6qaSAy7CmAmeTcpvA
-         +CCJqEKfsQT8yAXdzowoAE0KvwE1JZCx6D+ytG6fJKz89Bz8/BWw/Ej666cBcP4iTGA5
-         XP6kwLmIzfp/iebgmfSicSnkXZjarZ7V5HOZuuBWnWalFB/249uPDY0PG1mgr0NLoIg8
-         lnms+34364eA1HzBkfFCSep1vTjMc0awW1IcYulFJny0Wm9t3NeFuBsq9GyMXRGJxNEZ
-         PfAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DQM6khskQIeEmRfxZTuTbZZte1lnAveX0wU/7msS24Y=;
-        b=D5dOg1xtOwIUoqOvH2LsFlEQKX+dJDvnZPwUDkXy3UT4X+UAqtfgZkgXs6up2Sg+3Y
-         lAabEk1VouVkdxLW1wtWgncInH8vR1d7IOc7BZj212BdB7gixw5ig0UI61r6Mowxc98R
-         AomBQM8HhNDd39zh4Ksn67yEjvgeq//IeMVtCR1Pb5RzfK3Iv/1dAY5QbsajhsMVxov7
-         9bLBiiVta/0Ow+/MyxuFdGRgg0aECWbhZ/SLtXdcDGyk+FTtfQU+9b71fEF3419EWQjW
-         hrhTMXm/rX41mwd0T660MDgMNu6SFIMXLk6l3Q6df95lu9bKM5/nXuktG6DTthWjcA8v
-         Z/kw==
-X-Gm-Message-State: AJcUukfiXEKgVviSLx0u71YhKvlg+cHc04Tqmg4Y+c2D3S4np1Wcwwzx
-        jwA17cnduoz3tV5pXm4rgT2NhGy6ZkTbvMPXZe4=
-X-Google-Smtp-Source: ALg8bN40agLBMdpNYWQoF9UYR75/JrPQd38npPO4W3EXwBJWLj5lNRLANbWnG6CVNk8LR6GiCYN6Zb5WRb+BGpHjp7s=
-X-Received: by 2002:a1f:6b14:: with SMTP id g20mr203794vkc.47.1546931196460;
- Mon, 07 Jan 2019 23:06:36 -0800 (PST)
+        id S1727980AbfAHINi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jan 2019 03:13:38 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:49600 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727958AbfAHINh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jan 2019 03:13:37 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0883QuV068912;
+        Tue, 8 Jan 2019 08:13:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=corp-2018-07-02;
+ bh=WSAc1PrUxV217qpEoJIJGE/bDMBd/wJqWFbATuzxKGw=;
+ b=xoKgzDvEb6VC9q39YAooG0lcDc4G9e+lIAU9m7ppzC0H+wVnirFAOIDKzXoo4pXVT+ii
+ m59me8sdm9vVxQ5yxEu9jETUAuGla2Opma/bOe2pfmXdpFe5uhBI74+jYGdWo8K9IwL3
+ BwDIv38uorYF/TuhO3AYNEXpQJsxxOlIOuKvIlyExU8ot6izJ+oUCbcNwQt+Lt6LqegL
+ Qq3JucOdvmmMUiohbOEpT+Wu9ZbyThVITkCKb6qa0t0uu7sKqgMjd+DGIofcaRRwUJxu
+ IyO0TMgH3hhb1UClW0+JZhOs+MXdMDlzEWejDMDs1lwYv5c65X7wfREnesY8MMR3Ftf0 rg== 
+Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
+        by userp2120.oracle.com with ESMTP id 2ptn7qstj3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 08 Jan 2019 08:13:31 +0000
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x088DVdl010128
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 8 Jan 2019 08:13:31 GMT
+Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x088DU3K023106;
+        Tue, 8 Jan 2019 08:13:31 GMT
+Received: from linux.cn.oracle.com (/10.182.71.41)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 08 Jan 2019 00:13:30 -0800
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     konrad.wilk@oracle.com, roger.pau@citrix.com, axboe@kernel.dk,
+        paul.durrant@citrix.com
+Subject: [PATCH v5 1/2] xen/blkback: add stack variable 'blkif' in connect_ring()
+Date:   Tue,  8 Jan 2019 16:15:49 +0800
+Message-Id: <1546935350-20957-1-git-send-email-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-References: <CALjAwxgOhbYF=A4PbVipP9M+XnwnRG+c2Pcid=cZjtBe0uDUHw@mail.gmail.com>
- <CALjAwxj8LHFomCJJNCDmne1PZ6ygjtzKyvA+09kQA62vQZ3OBA@mail.gmail.com>
- <1546445424.29282.1.camel@redhat.com> <1546540117.24199.0.camel@redhat.com>
- <1546548458.24199.2.camel@redhat.com> <CALjAwxhOb_HLD1Adux-n0LUienLK_FhrOnyBw=UMLj49aN6_5A@mail.gmail.com>
- <1546555220.2666.1.camel@redhat.com> <CALjAwxgtCGLEJkV3xw4Amp4gdkuacgmTVkYn=w8ZHucJ6ffDew@mail.gmail.com>
- <4c231a3e-1ae3-c872-f6f8-06b19ddfd20b@suse.de> <CALjAwxiaVRpqgxs4rtjxDM4J5YDnrKAyCwn79h5tdhxwZX8iTA@mail.gmail.com>
- <b7ab94d7-8282-425a-3dcd-38a538a44d24@suse.de>
-In-Reply-To: <b7ab94d7-8282-425a-3dcd-38a538a44d24@suse.de>
-From:   Sitsofe Wheeler <sitsofe@gmail.com>
-Date:   Tue, 8 Jan 2019 07:06:10 +0000
-Message-ID: <CALjAwxjaffzBMSEC=R1ftW1upb2LZWuYinOxORGGUU9THm4vbA@mail.gmail.com>
-Subject: Re: failed command: WRITE FPDMA QUEUED with Samsung 860 EVO
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Laurence Oberman <loberman@redhat.com>, linux-ide@vger.kernel.org,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9129 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1901080067
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 7 Jan 2019 at 08:46, Hannes Reinecke <hare@suse.de> wrote:
->
-> On 1/7/19 8:41 AM, Sitsofe Wheeler wrote:
-> > On Mon, 7 Jan 2019 at 07:17, Hannes Reinecke <hare@suse.de> wrote:
-> >>
-> >> On 1/4/19 8:33 AM, Sitsofe Wheeler wrote:
-> >>> Blimey Laurence - you're really pushing the boat out on this one!
-> >>>
-> >> [ .. ]
-> >>> I've yet to attach the disk directly to the mobo. It's a bit fiddly as
-> >>> the most accessible port is meant for the DVD drive and I think it's
-> >>> speed is slower than the others.
-> >>>
-> >>> The speed of the ATA ports is lower than you might expect (this
-> >>> machine is fairly old):
-> >>>
-> >> [ .. ]
-> >>> [    3.242623] ata2.00: FORCE: horkage modified (noncq)
-> >>> [    3.242683] ata2.00: supports DRM functions and may not be fully accessible
-> >>> [    3.242686] ata2.00: ATA-11: Samsung SSD 860 EVO 500GB, RVT01B6Q,
-> >>> max UDMA/133
-> >>> [    3.242689] ata2.00: 976773168 sectors, multi 1: LBA48 NCQ (not used)
-> >>> [    3.245518] ata2.00: supports DRM functions and may not be fully accessible
-> >>> [    3.247611] ata2.00: configured for UDMA/133
-> >>
-> >> 'slower' is an understatement.
-> >
-> > Are you surprised that there would be such a dramatic difference in
-> > the speeds between the two SSDs (Samsung 860 EVO, Crucial MX500) on
-> > that particular workload in that same machine?
-> >
-> Not at all.
+As 'be->blkif' is used for many times in connect_ring(), the stack variable
+'blkif' is added to substitute 'be-blkif'.
 
-Fair enough :-) My understanding is that both SSDs (when unloaded and
-mostly empty etc) would be far faster than what this particular
-machine could do but I stand corrected.
+Suggested-by: Paul Durrant <paul.durrant@citrix.com>
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+Reviewed-by: Paul Durrant <paul.durrant@citrix.com>
+Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
+---
+ drivers/block/xen-blkback/xenbus.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
-> >> That adapter can't do NCQ, hence 'WRITE FPDMA QUEUED' (which _is_ an NCQ
-> >> command) will never be issued.
-> >> So I'd be _very_ surprised if you still see this problem there ...
-> >
-> > I'm curious, why would using the libata.force=2.00:noncq kernel
-> > command line (only mentioned in my very first mail) make using that
-> > drive more stable if the adapter could never accept that command
-> > anyway? Shouldn't the sending of that command have been disabled if
-> > anything along the way can't actually accept it?
-> >
-> 'WRITE FPDMA QUEUED' will ever be issued if the drive _and_ adapter can
-> do NCQ. As this is the offending command it's not surprising that
-> switching off NCQ (and hence the use of that command) will make the
-> machine more stable.
->
-> Although I'd be curious about the 'more' bit in 'more stable'.
-> I would have thought that the machine would be stable after disabling
-> NCQ; do you still see issues after disabling NCQ?
-
-I was inaccurate when I said "more": it has been totally stable since
-disabling NCQ on that port.
-
-> As for the NCQ issues: it might be that the adapter has issues with NCQ
-> (quite some older adapters do).
-> It might also be a problem with the _previous_ command which failed; can
-> you enable libata tracing to figure out the command flow?
-
-OK I'll see if I can get around to this one tomorrow.
-
-Cheers!
-
+diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+index a4bc74e..a4aadac 100644
+--- a/drivers/block/xen-blkback/xenbus.c
++++ b/drivers/block/xen-blkback/xenbus.c
+@@ -1023,6 +1023,7 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
+ static int connect_ring(struct backend_info *be)
+ {
+ 	struct xenbus_device *dev = be->dev;
++	struct xen_blkif *blkif = be->blkif;
+ 	unsigned int pers_grants;
+ 	char protocol[64] = "";
+ 	int err, i;
+@@ -1033,25 +1034,25 @@ static int connect_ring(struct backend_info *be)
+ 
+ 	pr_debug("%s %s\n", __func__, dev->otherend);
+ 
+-	be->blkif->blk_protocol = BLKIF_PROTOCOL_DEFAULT;
++	blkif->blk_protocol = BLKIF_PROTOCOL_DEFAULT;
+ 	err = xenbus_scanf(XBT_NIL, dev->otherend, "protocol",
+ 			   "%63s", protocol);
+ 	if (err <= 0)
+ 		strcpy(protocol, "unspecified, assuming default");
+ 	else if (0 == strcmp(protocol, XEN_IO_PROTO_ABI_NATIVE))
+-		be->blkif->blk_protocol = BLKIF_PROTOCOL_NATIVE;
++		blkif->blk_protocol = BLKIF_PROTOCOL_NATIVE;
+ 	else if (0 == strcmp(protocol, XEN_IO_PROTO_ABI_X86_32))
+-		be->blkif->blk_protocol = BLKIF_PROTOCOL_X86_32;
++		blkif->blk_protocol = BLKIF_PROTOCOL_X86_32;
+ 	else if (0 == strcmp(protocol, XEN_IO_PROTO_ABI_X86_64))
+-		be->blkif->blk_protocol = BLKIF_PROTOCOL_X86_64;
++		blkif->blk_protocol = BLKIF_PROTOCOL_X86_64;
+ 	else {
+ 		xenbus_dev_fatal(dev, err, "unknown fe protocol %s", protocol);
+ 		return -ENOSYS;
+ 	}
+ 	pers_grants = xenbus_read_unsigned(dev->otherend, "feature-persistent",
+ 					   0);
+-	be->blkif->vbd.feature_gnt_persistent = pers_grants;
+-	be->blkif->vbd.overflow_max_grants = 0;
++	blkif->vbd.feature_gnt_persistent = pers_grants;
++	blkif->vbd.overflow_max_grants = 0;
+ 
+ 	/*
+ 	 * Read the number of hardware queues from frontend.
+@@ -1067,16 +1068,16 @@ static int connect_ring(struct backend_info *be)
+ 				requested_num_queues, xenblk_max_queues);
+ 		return -ENOSYS;
+ 	}
+-	be->blkif->nr_rings = requested_num_queues;
+-	if (xen_blkif_alloc_rings(be->blkif))
++	blkif->nr_rings = requested_num_queues;
++	if (xen_blkif_alloc_rings(blkif))
+ 		return -ENOMEM;
+ 
+ 	pr_info("%s: using %d queues, protocol %d (%s) %s\n", dev->nodename,
+-		 be->blkif->nr_rings, be->blkif->blk_protocol, protocol,
++		 blkif->nr_rings, blkif->blk_protocol, protocol,
+ 		 pers_grants ? "persistent grants" : "");
+ 
+-	if (be->blkif->nr_rings == 1)
+-		return read_per_ring_refs(&be->blkif->rings[0], dev->otherend);
++	if (blkif->nr_rings == 1)
++		return read_per_ring_refs(&blkif->rings[0], dev->otherend);
+ 	else {
+ 		xspathsize = strlen(dev->otherend) + xenstore_path_ext_size;
+ 		xspath = kmalloc(xspathsize, GFP_KERNEL);
+@@ -1085,10 +1086,10 @@ static int connect_ring(struct backend_info *be)
+ 			return -ENOMEM;
+ 		}
+ 
+-		for (i = 0; i < be->blkif->nr_rings; i++) {
++		for (i = 0; i < blkif->nr_rings; i++) {
+ 			memset(xspath, 0, xspathsize);
+ 			snprintf(xspath, xspathsize, "%s/queue-%u", dev->otherend, i);
+-			err = read_per_ring_refs(&be->blkif->rings[i], xspath);
++			err = read_per_ring_refs(&blkif->rings[i], xspath);
+ 			if (err) {
+ 				kfree(xspath);
+ 				return err;
 -- 
-Sitsofe | http://sucs.org/~sits/
+2.7.4
+
