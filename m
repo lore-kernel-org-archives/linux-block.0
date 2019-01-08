@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC026C43387
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 19:54:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1070EC43612
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 20:08:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 90026206BB
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 19:54:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D314620660
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 20:08:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1546977270;
-	bh=U4OoqIiJ4QuP7dXlysjRbWTqkuQ7rETP9U1UxyBPDj0=;
+	s=default; t=1546978081;
+	bh=bYYme8szVfV4nzB1y+4P8/YNwYpSCa4xpJx7++A+c2s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=W+yetGtuaadjey7uyTd5X4+FyJRcQ1eKulm7wmICG6OPC9MMz9vOTCp9nPa8ZSFUz
-	 kH0cpomTrmaDF50kQ654RJYt8lacSq4YqHsDh/VPhidrdScj9oatLqaG5c18Rlw34M
-	 0tBTrfRzx1HVOax1EzRWyPnV4iUfM36TGIEsynNk=
+	b=uPHqpB/qMpeIwYePSyy4IEJHoKNgq6tLcXgf4ezPbw4JoA2sd659ClOjtMgDgSZS7
+	 jRhLj0srVvQf9nNc6myyvew9a3dgDvQKMc8a9/L4JqDiUirO8P3phGgr1kuIzFUhwp
+	 Si1M1mFXczI+QSLR540XmZ8LCIBRjXuu8occWkhA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730841AbfAHTam (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jan 2019 14:30:42 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38316 "EHLO mail.kernel.org"
+        id S1729777AbfAHUIA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jan 2019 15:08:00 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33836 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730792AbfAHTad (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Jan 2019 14:30:33 -0500
+        id S1728348AbfAHT1f (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 8 Jan 2019 14:27:35 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4183F20665;
-        Tue,  8 Jan 2019 19:30:31 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 939612070B;
+        Tue,  8 Jan 2019 19:27:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1546975831;
-        bh=U4OoqIiJ4QuP7dXlysjRbWTqkuQ7rETP9U1UxyBPDj0=;
+        s=default; t=1546975654;
+        bh=bYYme8szVfV4nzB1y+4P8/YNwYpSCa4xpJx7++A+c2s=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=A6nOfR6AWhzxEgs3IOONbFWPNJpLyyqf2eC8NmPJgoyNpIT2taA192NIQUPKIzDNO
-         1Bx7vgVVnHQaiDZ/ynhpmcryy4uW5Bu84bYTnXUol4C2nLdA2zXBb+g1cpaXKDWh9G
-         gAYCiPSqD5N3+6kdZ1YB9Dp9V52K2rUpSSUQlclY=
+        b=2jI+cfdBUr+ORVnHpVWs+dhDxW2lKM/Cu59ZY7Plz1mXUdmio8KUKxaOlTSdlDVj/
+         zvEhAwipbvFaDnQWRwyZ0k23ILLxnSa1BE1lWloKEB1B63JbuVBHjOvtwZh817U5Pl
+         T0TVTeywoO5mse21KuCFIIyAIzXadmlDdvizWZG4=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Yufen Yu <yuyufen@huawei.com>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 27/97] block: use rcu_work instead of call_rcu to avoid sleep in softirq
-Date:   Tue,  8 Jan 2019 14:28:36 -0500
-Message-Id: <20190108192949.122407-27-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.20 035/117] block: use rcu_work instead of call_rcu to avoid sleep in softirq
+Date:   Tue,  8 Jan 2019 14:25:03 -0500
+Message-Id: <20190108192628.121270-35-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190108192949.122407-1-sashal@kernel.org>
-References: <20190108192949.122407-1-sashal@kernel.org>
+In-Reply-To: <20190108192628.121270-1-sashal@kernel.org>
+References: <20190108192628.121270-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -157,7 +157,7 @@ index d3d14e81fb12..5f8db5c5140f 100644
  
  /*
 diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 25c08c6c7f99..f767293b00e6 100644
+index 70fc838e6773..0c5ee17b4d88 100644
 --- a/include/linux/genhd.h
 +++ b/include/linux/genhd.h
 @@ -129,7 +129,7 @@ struct hd_struct {
