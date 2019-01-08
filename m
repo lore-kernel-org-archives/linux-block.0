@@ -2,122 +2,125 @@ Return-Path: <SRS0=D8nw=PQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FB20C43387
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 21:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38445C43387
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 21:30:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4687020883
-	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 21:25:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE01C20883
+	for <linux-block@archiver.kernel.org>; Tue,  8 Jan 2019 21:30:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bind6z0U"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730051AbfAHVZ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jan 2019 16:25:29 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53600 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729511AbfAHVZ3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 8 Jan 2019 16:25:29 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 5AF58C065F95;
-        Tue,  8 Jan 2019 21:25:28 +0000 (UTC)
-Received: from segfault.boston.devel.redhat.com (segfault.boston.devel.redhat.com [10.19.60.26])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 18F101001F5E;
-        Tue,  8 Jan 2019 21:25:27 +0000 (UTC)
-From:   Jeff Moyer <jmoyer@redhat.com>
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Intel SCU Linux support <intel-linux-scu@intel.com>,
+        id S1729511AbfAHVan (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jan 2019 16:30:43 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:32960 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729504AbfAHVan (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jan 2019 16:30:43 -0500
+Received: by mail-io1-f65.google.com with SMTP id t24so4374252ioi.0
+        for <linux-block@vger.kernel.org>; Tue, 08 Jan 2019 13:30:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=GTPRWlanFQfEpyiJDqi1SxvDYh4Pf0VcEum9gF01aaE=;
+        b=bind6z0U3eNgDyDvJGBeGb9gkfHDVJBScwaPME18fn7Z9zmQ2rdIG5ue+V2PLBKbKi
+         RSFYKnTy0rkCi37HUmihGE3/QUwhJ5tGTesphZxS4FoYcAp0knhXxZ+DOir0M1j0sQHo
+         zXcB6ZYSGO4M6+xyhl3oCjdNrLPdvJLIE2htNIW4lXmEYP02po2HEjZwGjjXfDmN/kx2
+         +mXL9NsITvFUf2B7TnnRspFO8wE4hjlXgG1XolQ8iJ9CUIIa298PytBAISuDjgpXh5yp
+         ri65MNJV7whUzmEqy0HQNnfcRkFW2sr5lou+yoPM14bdTPon7kape1rb5eJiemkzuJHM
+         jTDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=GTPRWlanFQfEpyiJDqi1SxvDYh4Pf0VcEum9gF01aaE=;
+        b=WEeZbRpYsKN5VpR/vJTdh84zHuTUB03eLYE88FfHKnxITdGLbn1gTgj9OnfN4fySRQ
+         JDl90RNQWUG6am6dgsJXra0IUbfPAN92mTja94WtFBfZ6oJo08XpGeNu/uWN8F1aJcrz
+         cYr9KxgpDFAJXRqjCwQLWSMY7k5WqSw6CBOQCIOJjj2YDZhy+gXcgSmXZAtej/QZrbX1
+         NQIzKgDEG5UWeOdu6HMMh2LeDbNC4Jj1Ocy+XmIHXGOYLi7zJtJMDKdoldl+7/3ETtkR
+         G5stQjFLfT6VvIGkuTNaWE3w8UIieQC/tUh94Vwaj7unu8KZOeGO9J3ihhbFOZvqcOQY
+         4QLg==
+X-Gm-Message-State: AJcUukfvbM9auwRFoZLKZ+FtiR1Sf9xzsox0vaT2JytLgLgSkcbs85X/
+        8augHibnWvDmk4ZlVnnRZuG+OA==
+X-Google-Smtp-Source: ALg8bN6WjVdCkRpWik/d77rdhn0+PeDhSG8oGaHkb1Qbz4bAe7VSe/6hEcWXQ5euDKaGVh6KZeBNDA==
+X-Received: by 2002:a6b:5b12:: with SMTP id v18mr2282292ioh.157.1546983042201;
+        Tue, 08 Jan 2019 13:30:42 -0800 (PST)
+Received: from [192.168.1.56] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id m7sm5133381itk.38.2019.01.08.13.30.40
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 08 Jan 2019 13:30:41 -0800 (PST)
+Subject: Re: [PATCH] scsi: isci: initialize shost fully before calling
+ scsi_add_host()
+To:     Logan Gunthorpe <logang@deltatee.com>, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Intel SCU Linux support <intel-linux-scu@intel.com>,
         Artur Paszkiewicz <artur.paszkiewicz@intel.com>,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        james.smart@broadcom.com, dick.kennedy@broadcom.com
-Subject: Re: [PATCH] scsi: isci: initialize shost fully before calling scsi_add_host()
+        Christoph Hellwig <hch@lst.de>, Jeff Moyer <jmoyer@redhat.com>
 References: <20190108205043.3122-1-logang@deltatee.com>
-X-PGP-KeyID: 1F78E1B4
-X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
-Date:   Tue, 08 Jan 2019 16:25:26 -0500
-In-Reply-To: <20190108205043.3122-1-logang@deltatee.com> (Logan Gunthorpe's
-        message of "Tue, 8 Jan 2019 13:50:43 -0700")
-Message-ID: <x49imyy7sft.fsf@segfault.boston.devel.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <0d986fa7-b510-07d0-02bd-cf4da11fd84e@kernel.dk>
+Date:   Tue, 8 Jan 2019 14:30:36 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Tue, 08 Jan 2019 21:25:28 +0000 (UTC)
+In-Reply-To: <20190108205043.3122-1-logang@deltatee.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Logan Gunthorpe <logang@deltatee.com> writes:
-
+On 1/8/19 1:50 PM, Logan Gunthorpe wrote:
 > scsi_mq_setup_tags(), which is called by scsi_add_host(), calculates
 > the command size to allocate based on the prot_capabilities. In the
 > isci driver, scsi_host_set_prot() is called after scsi_add_host()
 > so the command size gets calculated to be smaller than it needs to be.
 > Eventually, scsi_mq_init_request() locates the 'prot_sdb' after the command
 > assuming it was sized correctly and a buffer overrun may occur.
-
-[...]
-
+> 
+> However, seeing blk_mq_alloc_rqs() rounds up to the nearest cache line
+> size, the mistake can go unnoticed.
+> 
+> The bug was noticed after the struct request size was reduced by
+> commit 9d037ad707ed ("block: remove req->timeout_list")
+> 
+> Which likely reduced the allocated space for the request by an entire
+> cache line, enough that the overflow could be hit and it caused a panic,
+> on boot, at:
+> 
+>   RIP: 0010:t10_pi_complete+0x77/0x1c0
+>   Call Trace:
+>     <IRQ>
+>     sd_done+0xf5/0x340
+>     scsi_finish_command+0xc3/0x120
+>     blk_done_softirq+0x83/0xb0
+>     __do_softirq+0xa1/0x2e6
+>     irq_exit+0xbc/0xd0
+>     call_function_single_interrupt+0xf/0x20
+>     </IRQ>
+> 
+> sd_done() would call scsi_prot_sg_count() which reads the number of
+> entities in 'prot_sdb', but seeing 'prot_sdb' is located after the end of
+> the allocated space it reads a garbage number and erroneously calls
+> t10_pi_complete().
+> 
 > To prevent this, the calls to scsi_host_set_prot() are moved into
 > isci_host_alloc() before the call to scsi_add_host(). Out of caution,
 > also move the similar call to scsi_host_set_guard().
->
-> Fixes: 3d2d75254915 ("[SCSI] isci: T10 DIF support")
-> Link: http://lkml.kernel.org/r/da851333-eadd-163a-8c78-e1f4ec5ec857@deltatee.com
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> Cc: Intel SCU Linux support <intel-linux-scu@intel.com>
-> Cc: Artur Paszkiewicz <artur.paszkiewicz@intel.com>
-> Cc: "James E.J. Bottomley" <jejb@linux.ibm.com>
-> Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-> Cc: Christoph Hellwig <hch@lst.de>
-> Cc: Jens Axboe <axboe@kernel.dk>
-> Cc: Jeff Moyer <jmoyer@redhat.com>
 
-Nice job, and excellent commit message.  We'll need a similar patch for
-lpfc.
+Nice work!
 
-Reviewed-by: Jeff Moyer <jmoyer@redhat.com>
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
 
-> ---
->  drivers/scsi/isci/init.c | 14 +++++++-------
->  1 file changed, 7 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/scsi/isci/init.c b/drivers/scsi/isci/init.c
-> index 68b90c4f79a3..1727d0c71b12 100644
-> --- a/drivers/scsi/isci/init.c
-> +++ b/drivers/scsi/isci/init.c
-> @@ -576,6 +576,13 @@ static struct isci_host *isci_host_alloc(struct pci_dev *pdev, int id)
->  	shost->max_lun = ~0;
->  	shost->max_cmd_len = MAX_COMMAND_SIZE;
->  
-> +	/* turn on DIF support */
-> +	scsi_host_set_prot(shost,
-> +			   SHOST_DIF_TYPE1_PROTECTION |
-> +			   SHOST_DIF_TYPE2_PROTECTION |
-> +			   SHOST_DIF_TYPE3_PROTECTION);
-> +	scsi_host_set_guard(shost, SHOST_DIX_GUARD_CRC);
-> +
->  	err = scsi_add_host(shost, &pdev->dev);
->  	if (err)
->  		goto err_shost;
-> @@ -663,13 +670,6 @@ static int isci_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  			goto err_host_alloc;
->  		}
->  		pci_info->hosts[i] = h;
-> -
-> -		/* turn on DIF support */
-> -		scsi_host_set_prot(to_shost(h),
-> -				   SHOST_DIF_TYPE1_PROTECTION |
-> -				   SHOST_DIF_TYPE2_PROTECTION |
-> -				   SHOST_DIF_TYPE3_PROTECTION);
-> -		scsi_host_set_guard(to_shost(h), SHOST_DIX_GUARD_CRC);
->  	}
->  
->  	err = isci_setup_interrupts(pdev);
+-- 
+Jens Axboe
+
