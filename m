@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 693EFC43387
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 01:36:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BDCEC43387
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 01:36:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3043620821
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 01:36:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C842C2146F
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 01:36:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="A90d5th4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="hvxvQHIO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729405AbfAIBgM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jan 2019 20:36:12 -0500
+        id S1729067AbfAIBgQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jan 2019 20:36:16 -0500
 Received: from esa1.hgst.iphmx.com ([68.232.141.245]:65001 "EHLO
         esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729067AbfAIBgM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jan 2019 20:36:12 -0500
+        with ESMTP id S1728854AbfAIBgQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jan 2019 20:36:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1546997772; x=1578533772;
+  t=1546997775; x=1578533775;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Y2UIcQFZV2VSO5LWLyFpXLVsByLyTKQT6N4J5lGA0pk=;
-  b=A90d5th4b8TkMHDbRZrEdU1YsrQ0VG2FhcAURTDngTUzLodgQlWxhHIe
-   qyu+vGJ6JyGNZFk3aCN1MQtF4WwyQ8Z2chTu3WCIIfChSdDDmBmSzzp9q
-   mmfftcXImpDVCnhkewYjjp8gD5rid8hEi2nzPbgxtaededwu9cxEgVDx3
-   bVWslL25sn4sLohzXa1wOLx5Zi7/mDzwvm521pzSJSpEzbNp8gXSp5hsw
-   CNhp4fxIGYbnnL2iswBhR2DnzEqscqam3ateqdqVv8D6RR4cVIMI9xgOT
-   Kd3NmDG2ZeLNCO5FkQal//JtM9eip3494GKAEn1lLSMUJ24ICXTei674h
-   w==;
+  bh=9+xnckddNMm49webjnZi2TS72ew50ly01dfQYJFtOps=;
+  b=hvxvQHIOBD9WRFe+MnXI9x2EclgXeqUnzNXw76PV9I2FF10V23lpD/EX
+   wNiZXVZXiMWgeWmt5JZR8EXzL9nFl1FQEho4NuPH1WnkZFlE6Mh5mT+8z
+   gPJx5h7NYY3s+BOsqTnLSN/ovDjlI1L+6HCTSjyxMNF1WF8P4kNZfOFQU
+   m+lf8uhKJY9eEe/ug4gMOadIFKjfnfHlrrifU1cjqPfk7uhvGdq24cDOd
+   uPIuhP2DMf4LMEvIKX01yOd7GFLqV7d3u338APTLy5i2KTuFoEKODP2uJ
+   dyiQmIEmnTUvqmyu1HNmyivlB8IeSLVXOK3Aa5+GnQjsWBw0TYGPmwUGm
+   g==;
 X-IronPort-AV: E=Sophos;i="5.56,455,1539619200"; 
-   d="scan'208";a="203169159"
+   d="scan'208";a="203169180"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 09 Jan 2019 09:36:11 +0800
+  by ob1.hgst.iphmx.com with ESMTP; 09 Jan 2019 09:36:15 +0800
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP; 08 Jan 2019 17:16:12 -0800
+  by uls-op-cesaep01.wdc.com with ESMTP; 08 Jan 2019 17:16:16 -0800
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 08 Jan 2019 17:36:09 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 08 Jan 2019 17:36:13 -0800
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Masato Suzuki <masato.suzuki@wdc.com>,
@@ -51,9 +51,9 @@ Cc:     Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@kernel.dk>,
         Hannes Reinecke <hare@suse.de>,
         Mike Snitzer <snitzer@redhat.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH blktests 04/14] block/004: Adjust fio conditions for zoned block device
-Date:   Wed,  9 Jan 2019 10:35:32 +0900
-Message-Id: <20190109013542.23686-5-damien.lemoal@wdc.com>
+Subject: [PATCH blktests 05/14] block/013: Skip for zoned block devices
+Date:   Wed,  9 Jan 2019 10:35:33 +0900
+Message-Id: <20190109013542.23686-6-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190109013542.23686-1-damien.lemoal@wdc.com>
 References: <20190109013542.23686-1-damien.lemoal@wdc.com>
@@ -66,42 +66,34 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 
-For a random write pattern to a zoned block device, fio requires --direct=1
-and --zonemode=zbd options as well as deadline I/O scheduler to be
-specified. Specify these options and set the I/O scheduler if the target
-device is a zoned block device.
+block/013 runs mkfs.ext3 but ext3 file system does not support zoned
+block devices. Add device_requires() implementation to automatically
+skip the test if the target device is a zoned block device.
 
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- tests/block/004 | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ tests/block/013 | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/tests/block/004 b/tests/block/004
-index 4c14c4b..d9b8209 100755
---- a/tests/block/004
-+++ b/tests/block/004
-@@ -16,10 +16,20 @@ requires() {
+diff --git a/tests/block/013 b/tests/block/013
+index 35fc181..fe68cc1 100755
+--- a/tests/block/013
++++ b/tests/block/013
+@@ -19,6 +19,14 @@ requires() {
+ 	_have_program mkfs.ext3
+ }
+ 
++device_requires() {
++	if _test_dev_is_zoned; then
++		SKIP_REASON="${TEST_DEV} is a zoned block device (not supported by ext3)"
++		return 1
++	fi
++	return 0
++}
++
  test_device() {
  	echo "Running ${TEST_NAME}"
  
-+	local directio=""
-+	local zbdmode=""
-+
-+	if _test_dev_is_zoned; then
-+		directio="--direct=1"
-+		zbdmode="--zonemode=zbd"
-+		set_scheduler "$(basename "$(readlink -f "${TEST_DEV}")")" \
-+			      deadline
-+	fi
-+
- 	FIO_PERF_FIELDS=("write iops")
- 	_fio_perf --bs=4k --rw=randwrite --norandommap --fsync=1 \
- 		--number_ios=256 --numjobs=64 --name=flushes \
--		--filename="$TEST_DEV"
-+		${directio} ${zbdmode} --filename="$TEST_DEV"
- 
- 	echo "Test complete"
- }
 -- 
 2.20.1
 
