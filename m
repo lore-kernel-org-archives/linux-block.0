@@ -7,165 +7,206 @@ X-Spam-Status: No, score=-13.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04919C43387
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA88DC43444
 	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 15:33:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C8DCC20859
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 15:33:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F59A206BA
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 15:33:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="WGfrZKVq"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="RbQMq7Eh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732325AbfAIPdp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jan 2019 10:33:45 -0500
-Received: from mailout1.samsung.com ([203.254.224.24]:23873 "EHLO
+        id S1730795AbfAIPdq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jan 2019 10:33:46 -0500
+Received: from mailout1.samsung.com ([203.254.224.24]:23882 "EHLO
         mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730795AbfAIPdp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jan 2019 10:33:45 -0500
-Received: from epcas2p1.samsung.com (unknown [182.195.41.53])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20190109153341epoutp0108490a71856cf34bf85be9739a779bbb~4N-qNnKg72870128701epoutp01F;
-        Wed,  9 Jan 2019 15:33:41 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20190109153341epoutp0108490a71856cf34bf85be9739a779bbb~4N-qNnKg72870128701epoutp01F
+        with ESMTP id S1732319AbfAIPdq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jan 2019 10:33:46 -0500
+Received: from epcas2p4.samsung.com (unknown [182.195.41.56])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20190109153343epoutp01aade55d00b4d12363f962139a34c553c~4N-sa-2Ck2879428794epoutp015;
+        Wed,  9 Jan 2019 15:33:43 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20190109153343epoutp01aade55d00b4d12363f962139a34c553c~4N-sa-2Ck2879428794epoutp015
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1547048021;
-        bh=G264A4t+LV342oJ1Jco1jrCuJHTuuRU0aNShvcfmYJU=;
+        s=mail20170921; t=1547048023;
+        bh=k7MfEcBGovQbLgQhfFJFSQ6L27BmOdyxHRZwS8mBT2Q=;
         h=From:To:Cc:Subject:Date:In-reply-to:References:From;
-        b=WGfrZKVqX/yLx/T8zj8cfVnMn57BB5ICEwjYGUKca7Uz22PlXbNDt79+15Gozf27R
-         6JHhGJ8QavS+k7SI5a7ViDWcVO650H8O5u7M9LcSexxLmN3bs3mgBMS7jFhYoymHBw
-         3TcZtvFP4rBjxf3U7hkOIAcxX6fLp/U5Ga1KJh2E=
-Received: from epsmges2p4.samsung.com (unknown [182.195.42.72]) by
-        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
-        20190109153339epcas2p28f65e137eb7f5eef85b15a7e77df1d5b~4N-o_Pv8w0299902999epcas2p22;
-        Wed,  9 Jan 2019 15:33:39 +0000 (GMT)
-Received: from epcas2p2.samsung.com ( [182.195.41.54]) by
-        epsmges2p4.samsung.com (Symantec Messaging Gateway) with SMTP id
-        B9.18.04055.354163C5; Thu, 10 Jan 2019 00:33:39 +0900 (KST)
+        b=RbQMq7Eho+yDlMbjXrHj73f3Y1zZchGnx8M/gcPkcvbZYUHrROnD6bHsr2WViXbIX
+         cRWHzauWpnN7JLTUKgcJivMAI4YLSDghU4pKPhyWzDHlF0uPKUrIl0f1f+tYpZAbYm
+         H1KyAZtFpnZg2WvxxzBhbyzSutCTfIB0X+m9fDwQ=
+Received: from epsmges2p1.samsung.com (unknown [182.195.42.69]) by
+        epcas2p3.samsung.com (KnoxPortal) with ESMTP id
+        20190109153342epcas2p36510eaa713c1b6fb7fb69b95c8c2a0a6~4N-rqqlQQ3045830458epcas2p31;
+        Wed,  9 Jan 2019 15:33:42 +0000 (GMT)
+Received: from epcas2p1.samsung.com ( [182.195.41.53]) by
+        epsmges2p1.samsung.com (Symantec Messaging Gateway) with SMTP id
+        DB.40.04055.654163C5; Thu, 10 Jan 2019 00:33:42 +0900 (KST)
 Received: from epsmgms2p2new.samsung.com (unknown [182.195.42.143]) by
-        epcas2p4.samsung.com (KnoxPortal) with ESMTP id
-        20190109153339epcas2p4691a898dde0174a7565d62fcb3be0b6d~4N-oeeB7Y3007730077epcas2p4Y;
-        Wed,  9 Jan 2019 15:33:39 +0000 (GMT)
-X-AuditID: b6c32a48-3a9ff70000000fd7-b0-5c361453007c
+        epcas2p3.samsung.com (KnoxPortal) with ESMTP id
+        20190109153342epcas2p3208f62a4dd876f8e1765b48f8aec2432~4N-q-kSRM3044430444epcas2p3B;
+        Wed,  9 Jan 2019 15:33:42 +0000 (GMT)
+X-AuditID: b6c32a45-711ff70000000fd7-51-5c3614567586
 Received: from epmmp1.local.host ( [203.254.227.16]) by
         epsmgms2p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        CC.6D.03627.354163C5; Thu, 10 Jan 2019 00:33:39 +0900 (KST)
+        7D.6D.03627.554163C5; Thu, 10 Jan 2019 00:33:42 +0900 (KST)
 Received: from test-PowerEdge-R720.sa.corp.samsungelectronics.net
         ([107.108.221.212]) by mmp1.samsung.com (Oracle Communications Messaging
         Server 7.0.5.31.0 64bit (built May  5 2014)) with ESMTPA id
-        <0PL2000VLLVH1220@mmp1.samsung.com>; Thu, 10 Jan 2019 00:33:39 +0900 (KST)
+        <0PL2000VLLVH1220@mmp1.samsung.com>; Thu, 10 Jan 2019 00:33:41 +0900 (KST)
 From:   Kanchan Joshi <joshi.k@samsung.com>
 To:     linux-fsdevel@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
         linux-nvme@lists.infradead.org, jack@suse.com, david@fromorbit.com,
         tytso@mit.edu, prakash.v@samsung.com,
         Kanchan Joshi <joshi.k@samsung.com>
-Subject: [PATCH 3/4] fs: introduce APIs to enable sending write-hint with
- buffer-head
-Date:   Wed, 09 Jan 2019 21:01:00 +0530
-Message-id: <1547047861-7271-4-git-send-email-joshi.k@samsung.com>
+Subject: [PATCH 4/4] fs/ext4,jbd2: add support for passing write-hint with
+ journal.
+Date:   Wed, 09 Jan 2019 21:01:01 +0530
+Message-id: <1547047861-7271-5-git-send-email-joshi.k@samsung.com>
 X-Mailer: git-send-email 2.7.4
 In-reply-to: <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrMIsWRmVeSWpSXmKPExsWy7bCmmW6wiFmMwdJmI4stx+4xWjxfvpjR
-        4uj/t2wWe29pW8ycd4fNYs/ekywW85c9Zbe4MmURs0Vrz092B06PU4skPDYvqfdoOnOU2aNv
-        yypGj/VbrrJ4fN4kF8AWxWWTkpqTWZZapG+XwJXxYPI69oJzwhWnF7E3MO4Q6GLk5JAQMJFo
-        +3aJsYuRi0NIYAejRPP9L8wQzncgZ+1cZpiqdd9+sEIkdjNKdP2dyg7hTGeSOLhxEVAVBweb
-        gKbEhcmlIKaIgKLE5fdOICXMAucYJZZ+nMgEMkhYIFyib9ITNhCbRUBVYvqblWBxXgEniWU7
-        e9khlslJ3DzXCbaYU8BZ4lfPT7CLJAQWsEkcur+DBaLIReJ723UoW1ji1fEtUM3SEs9WbWSE
-        sIslft05CtXcwShxvWEmVIO9xMU9f8E2MwvwSXQc/ssOcrWEAK9ER5sQRImHxM53B6FBMY1R
-        Yuu8q8wTGCUXMDKsYhRLLSjOTU8tNiow0StOzC0uzUvXS87P3cQIjkotjx2MB875HGIU4GBU
-        4uFN+GcaI8SaWFZcmXuIUYKDWUmEV/2OSYwQb0piZVVqUX58UWlOavEhRmkOFiVx3ofSc6OF
-        BNITS1KzU1MLUotgskwcnFINjMYX+HX7O6sKGY9YPTq07dqOuSlxwnLBK59NY5K7ayKZWnjM
-        V1zno0z845yqIOUJe24sl/PbKuTWeHU6t4GJUmfyfqt7q0/IySSf+r+Q5//k6ZfXzF97aEZj
-        /QqhhT/YlHv68kyuTZx1fkfYdZUqWX6LSL/YzCfC12bd15JaFzMlR7yX+9UFFSWW4oxEQy3m
-        ouJEAIc51w/GAgAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprKLMWRmVeSWpSXmKPExsVy+t9jAd1gEbMYg/kvBCy2HLvHaPF8+WJG
-        i6P/37JZ7L2lbTFz3h02iz17T7JYzF/2lN3iypRFzBatPT/ZHTg9Ti2S8Ni8pN6j6cxRZo++
-        LasYPdZvucri8XmTXABbFJdNSmpOZllqkb5dAlfGg8nr2AvOCVecXsTewLhDoIuRk0NCwERi
-        3bcfrF2MXBxCAjsZJWZMes4IkhASmMkk8eKqdxcjBwebgKbEhcmlIKaIgKLE5fdOIOXMAucY
-        Ja7f6GAGKRcWCJfom/SEDcRmEVCVmP5mJROIzSvgJLFsZy87xC45iZvnOsHqOQWcJX71/GSG
-        WOUkcfHWVbYJjDwLGBlWMUqmFhTnpucWGxUY5aWW6xUn5haX5qXrJefnbmIEBta2w1r9Oxgf
-        L4k/xCjAwajEw5vwzzRGiDWxrLgy9xCjBAezkgiv+h2TGCHelMTKqtSi/Pii0pzU4kOM0hws
-        SuK8/PnHIoUE0hNLUrNTUwtSi2CyTBycUg2MFeV60muPG+Zu/OvAWVPsnRzG6fXl6RLLrUvZ
-        uWtqJ7j8bQxomfWM4b01W6Fie9mkgh6l9T2fJP3OTvp459C1hM/K666J9AcccPyf8HWN94sv
-        J2u0vlq5zFtQNFVprkDcvNWrv3AVf1fdP0fuFdusL58OMTwOZZorcumObdl72cCIt7uqpdJ/
-        K7EUZyQaajEXFScCAAyekXIoAgAA
-X-CMS-MailID: 20190109153339epcas2p4691a898dde0174a7565d62fcb3be0b6d
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrMIsWRmVeSWpSXmKPExsWy7bCmqW6YiFmMwYPTmhZbjt1jtHi+fDGj
+        xdH/b9ks9t7Stpg57w6bxZ69J1ks5i97ym5xZcoiZovWnp/sDpwepxZJeGxeUu/RdOYos0ff
+        llWMHuu3XGXx+LxJLoAtissmJTUnsyy1SN8ugSvj/LtzLAU9shW33uxhb2CcJtHFyMkhIWAi
+        0dQ/j62LkYtDSGAHo8Tbz90sEM53IGfuH1aYqmW9k6CqdjNK7D99ixXCmc4k0fyxk7GLkYOD
+        TUBT4sLkUhBTREBR4vJ7J5ASZoFzjBJLP05kAhkkLBAqMW3fJBYQm0VAVWJp+x52EJtXwEni
+        3YdtUMvkJG6e62QGsTkFnCV+9fxkBhkkITCHTeL5ucVsEEUuEtObnzJC2MISr45vYYewpSWe
+        rdoIFS+W+HXnKFRzB6PE9YaZLBAJe4mLe/6CXcQswCfRcfgvO8jVEgK8Eh1tQhCmh8TveXEQ
+        P05jlDj+opVtAqPkAkaGVYxiqQXFuempxUYFhnrFibnFpXnpesn5uZsYwVGp5bqDccY5n0OM
+        AhyMSjy8Cf9MY4RYE8uKK3MPMUpwMCuJ8KrfMYkR4k1JrKxKLcqPLyrNSS0+xCjNwaIkzvtI
+        em60kEB6YklqdmpqQWoRTJaJg1OqgfHkD6fy3lMc3qrL3+Vf3zDh7QGX9Ze3pz4XqBRknpnq
+        c5+xsCrVNW/3noW5RdL+ZoX6tld/F875vSx4FXfbM64Ik8NxV5027iiftCxsPVvNtvPNj56c
+        uGeYrf0m866t9vMpszYwC03t3hVh8fwrU3CD9GR57/ybB6SXeKlKGYo/zNqvlpZ5uVeJpTgj
+        0VCLuag4EQBfxiZ1xgIAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprGLMWRmVeSWpSXmKPExsVy+t9jAd0wEbMYg03qFluO3WO0eL58MaPF
+        0f9v2Sz23tK2mDnvDpvFnr0nWSzmL3vKbnFlyiJmi9aen+wOnB6nFkl4bF5S79F05iizR9+W
+        VYwe67dcZfH4vEkugC2KyyYlNSezLLVI3y6BK+P8u3MsBT2yFbfe7GFvYJwm0cXIySEhYCKx
+        rHcSWxcjF4eQwE5GiXV3prFAODOZJPpfTGDuYuTgYBPQlLgwuRTEFBFQlLj83gmkhFngHKPE
+        9RsdzCCDhAVCJabtm8QCYrMIqEosbd/DDmLzCjhJvPuwjRVimZzEzXOdYPWcAs4Sv3p+gtlC
+        QDUXb11lm8DIs4CRYRWjZGpBcW56brFRgVFearlecWJucWleul5yfu4mRmBobTus1b+D8fGS
+        +EOMAhyMSjy8Cf9MY4RYE8uKK3MPMUpwMCuJ8KrfMYkR4k1JrKxKLcqPLyrNSS0+xCjNwaIk
+        zsuffyxSSCA9sSQ1OzW1ILUIJsvEwSnVwMicc/KyfoTrtR392Qw99+33LemdcvngnKpz072f
+        3VJLt9f/98L7VO4xhX0XenoD3thuj2c8vyxBYkt4mkKDeEcEw0t9ZSGT60nnpO1s9u9SupF/
+        4QUbY3yN98zNWbb8Ey5lcmYZluxmbuRwOMH4RU1PgrOy9+yZNgXrBVMav5vx/7ZviS90UGIp
+        zkg01GIuKk4EAIdh2bApAgAA
+X-CMS-MailID: 20190109153342epcas2p3208f62a4dd876f8e1765b48f8aec2432
 X-Msg-Generator: CA
 CMS-TYPE: 102P
-X-CMS-RootMailID: 20190109153339epcas2p4691a898dde0174a7565d62fcb3be0b6d
+X-CMS-RootMailID: 20190109153342epcas2p3208f62a4dd876f8e1765b48f8aec2432
 References: <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
-        <CGME20190109153339epcas2p4691a898dde0174a7565d62fcb3be0b6d@epcas2p4.samsung.com>
+        <CGME20190109153342epcas2p3208f62a4dd876f8e1765b48f8aec2432@epcas2p3.samsung.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-submit_bh and write_dirty_buffer do not take write-hint as parameter.
-This patch introduces variants which do.
+For NAND based SSDs, mixing of data with different life-time reduces
+efficiency of internal garbage-collection. During FS operations, series
+of journal updates will follow/precede series of data/meta updates, causing
+intermixing inside SSD. By passing a write-hint with journal, its write
+can be isolated from other data/meta writes, leading to endurance/performance
+benefit on SSD.
+
+This patch introduces "j_writehint" member in JBD2 journal, using which
+Ext4 specifies write-hint (as SHORT) for journal.
 
 Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
 ---
- fs/buffer.c                 | 18 ++++++++++++++++--
- include/linux/buffer_head.h |  3 +++
- 2 files changed, 19 insertions(+), 2 deletions(-)
+ fs/ext4/super.c      |  2 ++
+ fs/jbd2/commit.c     | 11 +++++++----
+ fs/jbd2/journal.c    |  3 ++-
+ fs/jbd2/revoke.c     |  3 ++-
+ include/linux/jbd2.h |  8 ++++++++
+ 5 files changed, 21 insertions(+), 6 deletions(-)
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index d60d61e..2a94676 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -3094,6 +3094,13 @@ int submit_bh(int op, int op_flags, struct buffer_head *bh)
- }
- EXPORT_SYMBOL(submit_bh);
+diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+index d6c142d..3af4049 100644
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -4289,6 +4289,8 @@ static int ext4_fill_super(struct super_block *sb, void *data, int silent)
  
-+int submit_bh_write_hint(int op, int op_flags, struct buffer_head *bh,
-+			 enum rw_hint hint)
-+{
-+	return submit_bh_wbc(op, op_flags, bh, hint, NULL);
-+}
-+EXPORT_SYMBOL(submit_bh_write_hint);
-+
- /**
-  * ll_rw_block: low-level access to block devices (DEPRECATED)
-  * @op: whether to %READ or %WRITE
-@@ -3151,6 +3158,13 @@ EXPORT_SYMBOL(ll_rw_block);
+ 	set_task_ioprio(sbi->s_journal->j_task, journal_ioprio);
  
- void write_dirty_buffer(struct buffer_head *bh, int op_flags)
- {
-+	write_dirty_buffer_with_hint(bh, op_flags, 0);
-+}
-+EXPORT_SYMBOL(write_dirty_buffer);
++	sbi->s_journal->j_writehint = KERN_WRITE_LIFE_SHORT;
 +
-+void write_dirty_buffer_with_hint(struct buffer_head *bh, int op_flags,
-+				   enum rw_hint hint)
-+{
- 	lock_buffer(bh);
- 	if (!test_clear_buffer_dirty(bh)) {
- 		unlock_buffer(bh);
-@@ -3158,9 +3172,9 @@ void write_dirty_buffer(struct buffer_head *bh, int op_flags)
- 	}
- 	bh->b_end_io = end_buffer_write_sync;
+ 	sbi->s_journal->j_commit_callback = ext4_journal_commit_callback;
+ 
+ no_journal:
+diff --git a/fs/jbd2/commit.c b/fs/jbd2/commit.c
+index 2eb55c3..6da4c28 100644
+--- a/fs/jbd2/commit.c
++++ b/fs/jbd2/commit.c
+@@ -153,10 +153,12 @@ static int journal_submit_commit_record(journal_t *journal,
+ 
+ 	if (journal->j_flags & JBD2_BARRIER &&
+ 	    !jbd2_has_feature_async_commit(journal))
+-		ret = submit_bh(REQ_OP_WRITE,
+-			REQ_SYNC | REQ_PREFLUSH | REQ_FUA, bh);
++		ret = submit_bh_write_hint(REQ_OP_WRITE,
++			REQ_SYNC | REQ_PREFLUSH | REQ_FUA, bh,
++			journal->j_writehint);
+ 	else
+-		ret = submit_bh(REQ_OP_WRITE, REQ_SYNC, bh);
++		ret = submit_bh_write_hint(REQ_OP_WRITE, REQ_SYNC, bh,
++			journal->j_writehint);
+ 
+ 	*cbh = bh;
+ 	return ret;
+@@ -711,7 +713,8 @@ void jbd2_journal_commit_transaction(journal_t *journal)
+ 				clear_buffer_dirty(bh);
+ 				set_buffer_uptodate(bh);
+ 				bh->b_end_io = journal_end_buffer_io_sync;
+-				submit_bh(REQ_OP_WRITE, REQ_SYNC, bh);
++				submit_bh_write_hint(REQ_OP_WRITE, REQ_SYNC,
++						bh, journal->j_writehint);
+ 			}
+ 			cond_resched();
+ 			stats.run.rs_blocks_logged += bufs;
+diff --git a/fs/jbd2/journal.c b/fs/jbd2/journal.c
+index 8ef6b6d..804dc2c 100644
+--- a/fs/jbd2/journal.c
++++ b/fs/jbd2/journal.c
+@@ -1384,7 +1384,8 @@ static int jbd2_write_superblock(journal_t *journal, int write_flags)
+ 	jbd2_superblock_csum_set(journal, sb);
  	get_bh(bh);
--	submit_bh(REQ_OP_WRITE, op_flags, bh);
-+	submit_bh_wbc(REQ_OP_WRITE, op_flags, bh, hint, NULL);
+ 	bh->b_end_io = end_buffer_write_sync;
+-	ret = submit_bh(REQ_OP_WRITE, write_flags, bh);
++	ret = submit_bh_write_hint(REQ_OP_WRITE, write_flags, bh,
++				journal->j_writehint);
+ 	wait_on_buffer(bh);
+ 	if (buffer_write_io_error(bh)) {
+ 		clear_buffer_write_io_error(bh);
+diff --git a/fs/jbd2/revoke.c b/fs/jbd2/revoke.c
+index a1143e5..376b1d8 100644
+--- a/fs/jbd2/revoke.c
++++ b/fs/jbd2/revoke.c
+@@ -642,7 +642,8 @@ static void flush_descriptor(journal_t *journal,
+ 	set_buffer_jwrite(descriptor);
+ 	BUFFER_TRACE(descriptor, "write");
+ 	set_buffer_dirty(descriptor);
+-	write_dirty_buffer(descriptor, REQ_SYNC);
++	write_dirty_buffer_with_hint(descriptor, REQ_SYNC,
++				journal->j_writehint);
  }
--EXPORT_SYMBOL(write_dirty_buffer);
-+EXPORT_SYMBOL(write_dirty_buffer_with_hint);
+ #endif
  
- /*
-  * For a data-integrity writeout, we need to wait upon any in-progress I/O
-diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
-index 7b73ef7..3d682ac 100644
---- a/include/linux/buffer_head.h
-+++ b/include/linux/buffer_head.h
-@@ -200,7 +200,10 @@ void ll_rw_block(int, int, int, struct buffer_head * bh[]);
- int sync_dirty_buffer(struct buffer_head *bh);
- int __sync_dirty_buffer(struct buffer_head *bh, int op_flags);
- void write_dirty_buffer(struct buffer_head *bh, int op_flags);
-+void write_dirty_buffer_with_hint(struct buffer_head *bh, int op_flags,
-+				   enum rw_hint hint);
- int submit_bh(int, int, struct buffer_head *);
-+int submit_bh_write_hint(int, int, struct buffer_head *, enum rw_hint hint);
- void write_boundary_block(struct block_device *bdev,
- 			sector_t bblock, unsigned blocksize);
- int bh_uptodate_or_lock(struct buffer_head *bh);
+diff --git a/include/linux/jbd2.h b/include/linux/jbd2.h
+index 0f919d5..918f21e 100644
+--- a/include/linux/jbd2.h
++++ b/include/linux/jbd2.h
+@@ -1139,6 +1139,14 @@ struct journal_s
+ 	 */
+ 	__u32 j_csum_seed;
+ 
++	/**
++	 * @j_writehint:
++	 *
++	 * write-hint for journal (set by FS).
++	 */
++	enum rw_hint	j_writehint;
++
++
+ #ifdef CONFIG_DEBUG_LOCK_ALLOC
+ 	/**
+ 	 * @j_trans_commit_map:
 -- 
 2.7.4
 
