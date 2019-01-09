@@ -2,97 +2,120 @@ Return-Path: <SRS0=RPGG=PR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79ED3C43387
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 02:46:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4BB3C43387
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 03:07:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5503D206BB
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 02:46:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9571A20821
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 03:07:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uV0Qdu/4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728403AbfAICqi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jan 2019 21:46:38 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:43655 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728389AbfAICqi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jan 2019 21:46:38 -0500
-Received: by mail-pg1-f195.google.com with SMTP id v28so2612622pgk.10
-        for <linux-block@vger.kernel.org>; Tue, 08 Jan 2019 18:46:38 -0800 (PST)
+        id S1727947AbfAIDHe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jan 2019 22:07:34 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:46942 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727857AbfAIDHe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jan 2019 22:07:34 -0500
+Received: by mail-wr1-f66.google.com with SMTP id l9so6096782wrt.13
+        for <linux-block@vger.kernel.org>; Tue, 08 Jan 2019 19:07:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dmHJmSGQF9qRCyO0l54bRywO36lCwl/wYEo9L5ldb/E=;
+        b=uV0Qdu/4tUBJqfd0MDKQXeZ9FU2VMW44d8nN1eAtAzcq/gIjxauKkjXcA50LgZd/px
+         1J5u2Df8wYeQbXukbDbsoyJfXg6JSXZubuxzhPG4ZgWMeBe5KvycNK73MgWcKZ+tFNyc
+         lkqh+T0rUkRvEYP+bRKiEY8E3HBEEU+L8J1qAx8ZvfOogOxiDFhufiS9BupUr7e4Iyeh
+         FIuxWwmt8lxcTwmTorGsvrqzfPS/mDL7GhmGwPGcEB3T9Zl6VtFvDo1bREEYP23yJ3+l
+         IBLAo9JKjcPh0Z3tWdpaVCUjvES1PsvMiRdH+xWTm4F75X837PgS4hE+7xwmzLGI2LaF
+         lNig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=eFvxdBpJbxxAEHSLor6Tt7ib7ckYg/RORv+ZVefTcxQ=;
-        b=ZoOmYwDu0M8QQ0ioCyyOPcz/APKbAZY/HRkEX7rDXPp3JkkgVQ0wLPxk3SK4KIR4en
-         GF/woVFIlXz+PQy3/EmMg/zSMQUXY6wrNXQW5jwVESjm/veT/f2MHpjM/wF8JIUnnntD
-         oE180Pxi3fDg8zPGcR7FkKR/of1X+XaT+0pjtc64ROPKhUnl5AytkqhvlvSzwZ+keSBY
-         Bwg2hWoLPw/0pSEpB+MC9R7JLF6+mVG6u3L5pB4AWIprRuF7WjLpKKHDR+ypHIArHt+C
-         3UepI+nMmBNrT1hlIFf+mRsouoKUsVyEqr3wPZ05ZXgokE/hzXqwy+DLc1/BP8DhmJPf
-         SsDw==
-X-Gm-Message-State: AJcUuken3lkJkiWHke8uK3BO4+SwqTc5xd9Wb9Gzf5dY1nu7T2Bjs0cb
-        w8fjLr4AQSeMwmqIz9SsRPNNwLaF
-X-Google-Smtp-Source: ALg8bN6aQOS62rwMxuc2v/zd9zMOp1a9ilM+KlgCXm2NZr5Ff0AKfFR0r9R4iNumlY3wKDPCtIGldw==
-X-Received: by 2002:a62:c683:: with SMTP id x3mr4163668pfk.10.1547001997781;
-        Tue, 08 Jan 2019 18:46:37 -0800 (PST)
-Received: from asus.site (c-73-222-28-29.hsd1.ca.comcast.net. [73.222.28.29])
-        by smtp.gmail.com with ESMTPSA id h19sm91125010pfn.114.2019.01.08.18.46.36
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 08 Jan 2019 18:46:36 -0800 (PST)
-Subject: Re: [PATCH blktests] src/sg/syzkaller1.c: fix portability problem for
- syscall(__NR_mmap, ...)
-To:     Theodore Ts'o <tytso@mit.edu>, linux-block@vger.kernel.org
-References: <20190107211316.17578-1-tytso@mit.edu>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <5423ce34-1d3c-2363-da4e-fe35b02c988b@acm.org>
-Date:   Tue, 8 Jan 2019 18:46:35 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.3
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dmHJmSGQF9qRCyO0l54bRywO36lCwl/wYEo9L5ldb/E=;
+        b=jYP/DhVhwvqW8PaCZtAvRClgxxvWXfcOrmKdJdl8Rt9G2o5UVWn4OnasQYxnDJX7DQ
+         NhBYVOpXNv31ysHyQAZcqozUQ8oTPtBbHMRNm8Pf0DOV1oaG0yFunKFzqDQ+FSa0b6dt
+         TlNop9EtdLKcNX87VMCiHX4pjD7S0QiwZMZOfqP1K7NGlDaX0WsAidU7EOrJOTr0th/a
+         ocCwCswowf6q/afJdWswwTtQPwwI2x0yYPXGE+5bunzs/iXzgoD5ecotPah1Ga9i1DZl
+         Wvzocebux/0kc5rG+tzhu51J7kkOjQ0cJYeAnLpU9UfFkFSMxiXmpwQMvz7qoCJ4uVo3
+         RDuQ==
+X-Gm-Message-State: AJcUukdYgQCeZ2Lb4XfiuCvS6sZSMmGmCYYAqhJP5NbsFrSUTend5cW2
+        NCifL5xWd4W7ErT2bZoOTpIlQ6KEVfMTAdsZySj9D3kq
+X-Google-Smtp-Source: ALg8bN4Tr6qKxF+mkaw74CC0S739UwnqgQ4HoWnYeLnOZSa9iTvfl0GNMUgc6VEx8hTk3G3wVE9GcbGJ6H0RYqMuLpk=
+X-Received: by 2002:adf:e8c1:: with SMTP id k1mr3107679wrn.104.1547003252757;
+ Tue, 08 Jan 2019 19:07:32 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190107211316.17578-1-tytso@mit.edu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <x49a7ka7qy9.fsf@segfault.boston.devel.redhat.com>
+In-Reply-To: <x49a7ka7qy9.fsf@segfault.boston.devel.redhat.com>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Wed, 9 Jan 2019 11:07:20 +0800
+Message-ID: <CACVXFVOEdHAnm9h-CywX1sgW=wc+PDLcttn9OFhL9eVpRiDEuA@mail.gmail.com>
+Subject: Re: [patch] block: clarify documentation for blk_{start|finish}_plug
+To:     Jeff Moyer <jmoyer@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Darrick J. Wong" <darrick.wong@oracle.com>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/7/19 1:13 PM, Theodore Ts'o wrote:
-> How mmap is mapped to a raw system call varies across different
-> archiecture.  On some architectures (such as 32-bit ARM), __NR_mmap
-   ^^^^^^^^^^^
-   architectures?
-> may not exist at all; glibc will use __NR_mmap2 to implement mmap(2).
-> Syzkaller is using mmap() as a non-portable version of malloc(3), so
-> it should be safe to use the glibc's mmap wrapper instead of trying to
-> directly call the system call.
-> 
-> Signed-off-by: Theodore Ts'o <tytso@mit.edu>
-> ---
->   src/sg/syzkaller1.c | 6 ++++--
->   1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/src/sg/syzkaller1.c b/src/sg/syzkaller1.c
-> index 743859a..e254d4a 100644
-> --- a/src/sg/syzkaller1.c
-> +++ b/src/sg/syzkaller1.c
-> @@ -401,8 +401,10 @@ long r[15];
->   void test()
->   {
->     memset(r, -1, sizeof(r));
-> -  r[0] = execute_syscall(__NR_mmap, 0x20000000ul, 0x5000ul, 0x3ul,
-> -                         0x32ul, (uintptr_t)(-1ul), 0x0ul, 0, 0, 0);
-> +//r[0] = execute_syscall(__NR_mmap, 0x20000000ul, 0x5000ul, 0x3ul,
-> +//                       0x32ul, (uintptr_t)(-1ul), 0x0ul, 0, 0, 0);
-> +  r[0] = (long) mmap((void *) 0x20000000, (size_t) 0x5000,
-> +                     PROT_READ | PROT_WRITE, MAP_FIXED | MAP_ANONYMOUS, -1, 0);
->     NONFAILING(memcpy((void*)0x20000000,
->                       dev_sg, strlen(dev_sg)));
->     r[2] = execute_syscall(__NR_syz_open_dev, 0x20000000ul, 0x0ul, 0x2ul,
+On Wed, Jan 9, 2019 at 5:59 AM Jeff Moyer <jmoyer@redhat.com> wrote:
+>
+> There was some confusion about what these functions did.  Make it clear
+> that this is a hint for upper layers to pass to the block layer, and
+> that it does not guarantee that I/O will not be submitted between a
+> start and finish plug.
+>
+> Reported-by: "Darrick J. Wong" <darrick.wong@oracle.com>
+> Signed-off-by: Jeff Moyer <jmoyer@redhat.com>
+>
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index c78042975737..f2732f106a2e 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1683,6 +1683,15 @@ EXPORT_SYMBOL(kblockd_mod_delayed_work_on);
+>   * @plug:      The &struct blk_plug that needs to be initialized
+>   *
+>   * Description:
+> + *   blk_start_plug() indicates to the block layer an intent by the caller
+> + *   to submit multiple I/O requests in a batch.  The block layer may use
+> + *   this hint to defer submitting I/Os from the caller until blk_finish_plug()
+> + *   is called.  However, the block layer may choose to submit requests
+> + *   before a call to blk_finish_plug() if the number of queued I/Os
+> + *   exceeds %BLK_MAX_REQUEST_COUNT, or if the size of the I/O is larger than
+> + *   %BLK_PLUG_FLUSH_SIZE.  The queued I/Os may also be submitted early if
+> + *   the task schedules (see below).
+> + *
+>   *   Tracking blk_plug inside the task_struct will help with auto-flushing the
+>   *   pending I/O should the task end up blocking between blk_start_plug() and
+>   *   blk_finish_plug(). This is important from a performance perspective, but
+> @@ -1765,6 +1774,16 @@ void blk_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+>                 blk_mq_flush_plug_list(plug, from_schedule);
+>  }
+>
+> +/**
+> + * blk_finish_plug - mark the end of a batch of submitted I/O
+> + * @plug:      The &struct blk_plug passed to blk_start_plug()
+> + *
+> + * Description:
+> + * Indicate that a batch of I/O submissions is complete.  This function
+> + * must be paired with an initial call to blk_start_plug().  The intent
+> + * is to allow the block layer to optimize I/O submission.  See the
+> + * documentation for blk_start_plug() for more information.
+> + */
+>  void blk_finish_plug(struct blk_plug *plug)
+>  {
+>         if (plug != current->plug)
 
-Anyway:
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Thanks,
+Ming Lei
