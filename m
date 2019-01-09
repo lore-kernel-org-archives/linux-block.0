@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BDCEC43387
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 01:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76714C43387
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 01:36:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C842C2146F
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 01:36:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D3702146F
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 01:36:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="hvxvQHIO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="hati+OwL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729067AbfAIBgQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jan 2019 20:36:16 -0500
+        id S1729415AbfAIBgT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jan 2019 20:36:19 -0500
 Received: from esa1.hgst.iphmx.com ([68.232.141.245]:65001 "EHLO
         esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728854AbfAIBgQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jan 2019 20:36:16 -0500
+        with ESMTP id S1728854AbfAIBgT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jan 2019 20:36:19 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1546997775; x=1578533775;
+  t=1546997779; x=1578533779;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9+xnckddNMm49webjnZi2TS72ew50ly01dfQYJFtOps=;
-  b=hvxvQHIOBD9WRFe+MnXI9x2EclgXeqUnzNXw76PV9I2FF10V23lpD/EX
-   wNiZXVZXiMWgeWmt5JZR8EXzL9nFl1FQEho4NuPH1WnkZFlE6Mh5mT+8z
-   gPJx5h7NYY3s+BOsqTnLSN/ovDjlI1L+6HCTSjyxMNF1WF8P4kNZfOFQU
-   m+lf8uhKJY9eEe/ug4gMOadIFKjfnfHlrrifU1cjqPfk7uhvGdq24cDOd
-   uPIuhP2DMf4LMEvIKX01yOd7GFLqV7d3u338APTLy5i2KTuFoEKODP2uJ
-   dyiQmIEmnTUvqmyu1HNmyivlB8IeSLVXOK3Aa5+GnQjsWBw0TYGPmwUGm
-   g==;
+  bh=QAGyZQ7+FNpyiXRbTxcNB1esL7HID4qGdn8aQyoIJoU=;
+  b=hati+OwLquiuE18ZXMw8ZlhdAMDXI9r95dak4KiDEYfwQtXA8qWzdWGS
+   aAxviFWwfuVljBgyJSLTewilieKYRLrum1QufT4rNOnv0yBchjeizj0uF
+   HUcsCVAC3ZYPYbDiLHm6X4jGmfmR79LtGHcg5T093nqPLh8vMqkYgJY3p
+   3jMeyOng4x7+9Wp2MpesID/uWt8Q4D3PCaBuyTjmwH3VBbNzew31BrJDC
+   gtZJOTYNn/87tBwjy1/MNiDesGt68QTe5PMvwfpRJx1PnRLkJJA1uMI7e
+   HmCrBn0Z+vpTU/xgA+G3ysrppk+cmNhzi3o09YhhJOGTt3MiToT4S1QPf
+   A==;
 X-IronPort-AV: E=Sophos;i="5.56,455,1539619200"; 
-   d="scan'208";a="203169180"
+   d="scan'208";a="203169196"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 09 Jan 2019 09:36:15 +0800
+  by ob1.hgst.iphmx.com with ESMTP; 09 Jan 2019 09:36:18 +0800
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP; 08 Jan 2019 17:16:16 -0800
+  by uls-op-cesaep01.wdc.com with ESMTP; 08 Jan 2019 17:16:19 -0800
 Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip01.wdc.com with ESMTP; 08 Jan 2019 17:36:13 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 08 Jan 2019 17:36:16 -0800
 From:   Damien Le Moal <damien.lemoal@wdc.com>
 To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Masato Suzuki <masato.suzuki@wdc.com>,
@@ -51,9 +51,9 @@ Cc:     Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@kernel.dk>,
         Hannes Reinecke <hare@suse.de>,
         Mike Snitzer <snitzer@redhat.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH blktests 05/14] block/013: Skip for zoned block devices
-Date:   Wed,  9 Jan 2019 10:35:33 +0900
-Message-Id: <20190109013542.23686-6-damien.lemoal@wdc.com>
+Subject: [PATCH blktests 06/14] block/018,024: Skip when ZONED is set
+Date:   Wed,  9 Jan 2019 10:35:34 +0900
+Message-Id: <20190109013542.23686-7-damien.lemoal@wdc.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190109013542.23686-1-damien.lemoal@wdc.com>
 References: <20190109013542.23686-1-damien.lemoal@wdc.com>
@@ -66,34 +66,42 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 
-block/013 runs mkfs.ext3 but ext3 file system does not support zoned
-block devices. Add device_requires() implementation to automatically
-skip the test if the target device is a zoned block device.
+These tests do not execute a purely sequential write pattern which will
+cause I/O failures when ZONED is set and null_blk is created with zoned
+mode. Skip the tests in such case.
 
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- tests/block/013 | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ tests/block/018 | 2 +-
+ tests/block/024 | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/block/013 b/tests/block/013
-index 35fc181..fe68cc1 100755
---- a/tests/block/013
-+++ b/tests/block/013
-@@ -19,6 +19,14 @@ requires() {
- 	_have_program mkfs.ext3
+diff --git a/tests/block/018 b/tests/block/018
+index 7312723..3c1eca4 100755
+--- a/tests/block/018
++++ b/tests/block/018
+@@ -11,7 +11,7 @@ DESCRIPTION="do I/O and check iostats times"
+ QUICK=1
+ 
+ requires() {
+-	_have_null_blk
++	_have_null_blk && _null_blk_not_zoned
  }
  
-+device_requires() {
-+	if _test_dev_is_zoned; then
-+		SKIP_REASON="${TEST_DEV} is a zoned block device (not supported by ext3)"
-+		return 1
-+	fi
-+	return 0
-+}
-+
- test_device() {
- 	echo "Running ${TEST_NAME}"
+ init_times() {
+diff --git a/tests/block/024 b/tests/block/024
+index cf14707..c8dd1f7 100755
+--- a/tests/block/024
++++ b/tests/block/024
+@@ -13,7 +13,7 @@ DESCRIPTION="do I/O faster than a jiffy and check iostats times"
+ QUICK=1
  
+ requires() {
+-	_have_null_blk
++	_have_null_blk && _null_blk_not_zoned
+ }
+ 
+ init_times() {
 -- 
 2.20.1
 
