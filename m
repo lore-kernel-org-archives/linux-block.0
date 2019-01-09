@@ -2,74 +2,73 @@ Return-Path: <SRS0=RPGG=PR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07016C43387
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 20:08:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0094AC43444
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 20:49:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C727E214C6
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 20:08:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C025320859
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 20:49:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="C2/iqom0"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="AQjO+up9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726146AbfAIUIV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jan 2019 15:08:21 -0500
-Received: from mail-it1-f194.google.com ([209.85.166.194]:40081 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725468AbfAIUIU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jan 2019 15:08:20 -0500
-Received: by mail-it1-f194.google.com with SMTP id h193so12917744ita.5
-        for <linux-block@vger.kernel.org>; Wed, 09 Jan 2019 12:08:20 -0800 (PST)
+        id S1726951AbfAIUtE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jan 2019 15:49:04 -0500
+Received: from mail-it1-f195.google.com ([209.85.166.195]:39423 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726904AbfAIUtE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jan 2019 15:49:04 -0500
+Received: by mail-it1-f195.google.com with SMTP id a6so13106735itl.4
+        for <linux-block@vger.kernel.org>; Wed, 09 Jan 2019 12:49:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ckGbLXy5DYCjJFEqXZAqDD8gp104p4g66g0Ex87iOho=;
-        b=C2/iqom0nHp4m/FSpbBOcq7MalckGDSxYXuXaFI1bc3ohNXrYwpvKFArDlRnvELvdU
-         uZ0kP6ASZrZJiClW3uFASDNUH8OvZwJw2RT23eGGaiza8Qo2JpHxKLhHSLLkz/trKuId
-         OjqZZXBtxr6KHAY21Ol4HIGIJz+soVbVYA8v+lsl/5EGVRM6aBeYMTmvM+wzkZ2kbLG0
-         bja4oI2x/3Z/cQkOdwwZ/YlM4BH2NcY9gM9K9x66pnxncBcKbFFlBF6P9cUXZU3YSCpz
-         5T60buGQfmJvFdJ+qYYgb8BJV1UQrHwB4QujML9zCVHgUWUnMtuFne6PY4Aji/L92tm6
-         JCKQ==
+        bh=jfiAVzCJdieZUM0VyXbKk6sflFmsIoMHTLabyhRVgiU=;
+        b=AQjO+up9sIXB+a7ADFuybFlJgKNh8vdiWl+HPWv3UvJfG2gnQ0+VpKf+6CdI0esYo/
+         2kT49FfTmTWlg/WdENZfJ/y9b0gkW4Y+3Mow4Aw+J0+bwAO1UjY9nYS72XAXDo9S/aeb
+         k9oS0WoBKSH+LDoqOl7fn4ZWEPkkyWx3DrobxoLMtzvs4xX7nyneL5iwrev/Ls1IBUUX
+         7nAwGxKLuyJnVh//K9Wld2Fad89QZIKWF/jUDZqLSihsUuAdkLPhaVR90bXT/ouKbEX1
+         D9rSeyPqZpO0FgC6rcSPHOvoyK/SVmeS+K+qkK8UdwJv+aeysB+hVIW/FDpQiCb4gXcg
+         nMqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ckGbLXy5DYCjJFEqXZAqDD8gp104p4g66g0Ex87iOho=;
-        b=doTqDbbTZrRPIi6GQEe4CymEn454K0AI/UdM6yk1UmfmwqEgYo+vyVd7tHwKK01b10
-         uC9W7jToyoF0o2/PvtsxYFl743/2j0gAUYLGoSfeYujcC7GlrXr7JRvqwl1BzJr79Nid
-         8yddlFMwpKvrdSRiTNeMKzNRUIZnTNfaXjXvRpLcep1dzaz047esvRrhOH1Q1HatAkRc
-         S2JrXCxp6/tZSTFNKB4LhxAKTTiBV3wu6LgvlVz9DHpbZLCjXdfllqUtBJYkWBfIhQyH
-         hKzOTZNU6pWFKHi4UYUTTOs3y+vtwYK2w7Rm6LKNe7PUNflozqlGVw2P9Rs0dYQe1tmI
-         EMwQ==
-X-Gm-Message-State: AJcUukfCxjS5LyeY1MJhFYMJCgwVTiF0WpqAyPTcaK6ipdCPmQYbKhz9
-        GUvribXMTK8cwjp2kBu6doAoVA==
-X-Google-Smtp-Source: ALg8bN6CowxHpkkNIpODxH7NJrtVvE3nPa1U99lPJ5aXNzFn8k0Rs0Iq1W5OiqX7rgkE32J+NNWt/w==
-X-Received: by 2002:a24:e44:: with SMTP id 65mr4507849ite.154.1547064500166;
-        Wed, 09 Jan 2019 12:08:20 -0800 (PST)
+        bh=jfiAVzCJdieZUM0VyXbKk6sflFmsIoMHTLabyhRVgiU=;
+        b=SK+wlhOyX5LhCQRzD5dyqVYdLx07AjA5Hai6IyucoNvzeQUhD7stKmGZP0WfloXEuv
+         GXDwE+q4aEhObbwK+9Kr+VwgP+yPG6jy4id78hNpnDzAh/Ys3boCjVrroq696o/26OOO
+         6GxiVZsi6KQtug84Dl3bJz5HhA11SpErpPYbddPilmag0OCGVPv7NqTqpou7HLqqFP59
+         OR7BDpkZQG8vm0sF3E1R9PFz5f0i0txLmKaTEiOaXG+qnAtDrwcyKCOvjFiwN/eee1/x
+         pqKd29pDiwBT/q6bWEYk//Mlbr7lmzVmyXZxigp0H2AJwv1qS9w6eNprDPjVKhpb3Glk
+         wRfw==
+X-Gm-Message-State: AJcUukfhQs3K7xNRQ8vziVu49yU1u9MPdS5G7AC0xD/emnbg0YJQgHEX
+        QaXTw+0PCoeXxJfVPvuSVy9Iow==
+X-Google-Smtp-Source: ALg8bN7Ze9wrtJWMdNXOTFoAHPaZX2Zl+5CemZxccMQZVqfAddNr17Z7NclHpFdnHvu1ARIGR2Rh5g==
+X-Received: by 2002:a05:660c:34f:: with SMTP id b15mr2853685itl.146.1547066943448;
+        Wed, 09 Jan 2019 12:49:03 -0800 (PST)
 Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id m45sm7938999iti.10.2019.01.09.12.08.18
+        by smtp.gmail.com with ESMTPSA id r21sm8266439ita.27.2019.01.09.12.49.01
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 09 Jan 2019 12:08:19 -0800 (PST)
-Subject: Re: [PATCH 11/16] io_uring: batch io_kiocb allocation
+        Wed, 09 Jan 2019 12:49:02 -0800 (PST)
+Subject: Re: [PATCH 14/16] io_uring: support kernel side submission
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
         linux-block@vger.kernel.org, linux-arch@vger.kernel.org,
         jmoyer@redhat.com, avi@scylladb.com
 References: <20190108165645.19311-1-axboe@kernel.dk>
- <20190108165645.19311-12-axboe@kernel.dk> <20190109121340.GD13779@lst.de>
- <0a91dd38-69b8-84ab-f96a-225f09a54ec9@kernel.dk>
- <20190109190321.GA22645@lst.de>
+ <20190108165645.19311-15-axboe@kernel.dk> <20190109190638.GB22645@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <68c5faf6-913b-e94f-ccf7-a1fe158091f7@kernel.dk>
-Date:   Wed, 9 Jan 2019 13:08:17 -0700
+Message-ID: <205e9c21-e524-f56d-3684-26db6e87b54e@kernel.dk>
+Date:   Wed, 9 Jan 2019 13:49:01 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20190109190321.GA22645@lst.de>
+In-Reply-To: <20190109190638.GB22645@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,28 +77,33 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/9/19 12:03 PM, Christoph Hellwig wrote:
-> On Wed, Jan 09, 2019 at 09:57:59AM -0700, Jens Axboe wrote:
->> On 1/9/19 5:13 AM, Christoph Hellwig wrote:
->>>> +	if (!state)
->>>> +		req = kmem_cache_alloc(kiocb_cachep, GFP_KERNEL);
->>>
->>> Just return an error here if kmem_cache_alloc fails.
->>>
->>>> +	if (req)
->>>> +		io_req_init(ctx, req);
->>>
->>> Because all the other ones can't reached this with a NULL req.
->>
->> This is different in the current tree, since I properly fixed the
->> ctx ref issue.
+On 1/9/19 12:06 PM, Christoph Hellwig wrote:
+>> +struct iocb_submit {
+>> +	const struct io_uring_iocb *iocb;
+>> +	unsigned int index;
+>> +};
+>> +
+>> +struct io_work {
+>> +	struct work_struct work;
+>> +	struct io_ring_ctx *ctx;
+>> +	struct io_uring_iocb iocb;
+>> +	unsigned iocb_index;
+>> +};
 > 
-> Your tree does a percpu_ref_tryget very first, and then leaks that if
-> kmem_cache_alloc_bulk fails, and also is inconsistent for NULL vs
-> ERR_PTR returns.  I think you want something like this on top:
+> I think we should use struct iocb_submit everywhere where we pass
+> an iocb + index, including in the io_work structure.  Here is how
+> I did that to my old tree:
+> 
+> http://git.infradead.org/users/hch/misc.git/commitdiff/65929ed6f143a1c996305a10a15fd7f64d32595f
 
-I fixed it up while doing the rebase already. Just haven't pushed anything
-out until I've had a chance to run it through testing.
+I like that unification.
+
+> Btw, I think we can also remove the separate io_work allocation,
+> just do the io_get_req in the submission context, and overlay
+> the io_work onto the iocb in a union of some sort.  This avoids
+> a whole memory allocation.
+
+I'll take a look at that.
 
 -- 
 Jens Axboe
