@@ -7,121 +7,165 @@ X-Spam-Status: No, score=-13.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BE19C43387
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 15:33:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04919C43387
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 15:33:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C06B206BA
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 15:33:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8DCC20859
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 15:33:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="vcrafkA3"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="WGfrZKVq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732303AbfAIPdl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jan 2019 10:33:41 -0500
-Received: from mailout3.samsung.com ([203.254.224.33]:11926 "EHLO
-        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730795AbfAIPdl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jan 2019 10:33:41 -0500
-Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20190109153338epoutp033e1a8d4f92ebff06ef93949804004170~4N-nPBSCe3068430684epoutp03V;
-        Wed,  9 Jan 2019 15:33:38 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20190109153338epoutp033e1a8d4f92ebff06ef93949804004170~4N-nPBSCe3068430684epoutp03V
+        id S1732325AbfAIPdp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jan 2019 10:33:45 -0500
+Received: from mailout1.samsung.com ([203.254.224.24]:23873 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730795AbfAIPdp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jan 2019 10:33:45 -0500
+Received: from epcas2p1.samsung.com (unknown [182.195.41.53])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20190109153341epoutp0108490a71856cf34bf85be9739a779bbb~4N-qNnKg72870128701epoutp01F;
+        Wed,  9 Jan 2019 15:33:41 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20190109153341epoutp0108490a71856cf34bf85be9739a779bbb~4N-qNnKg72870128701epoutp01F
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1547048018;
-        bh=epx2bnJrUEuff/WcKh3w2qFRZarWKsQXniPc8QtJDU8=;
+        s=mail20170921; t=1547048021;
+        bh=G264A4t+LV342oJ1Jco1jrCuJHTuuRU0aNShvcfmYJU=;
         h=From:To:Cc:Subject:Date:In-reply-to:References:From;
-        b=vcrafkA3wnOa4ahipKIyiFV/+Rv/+SCh/lKqBu5MnFoORfT78aviWxpueT7UOCgbR
-         dHkTq3ApE2/JN6pFiYhj0xDFcq3KL7Vv96bxdgjHKQr3mYC9BzgSxkMHa/E5REzSO4
-         EmCraXWqx9SUbOt0u0cVIoOMJ32sOI7Hrx203KkU=
-Received: from epsmges2p3.samsung.com (unknown [182.195.42.71]) by
+        b=WGfrZKVqX/yLx/T8zj8cfVnMn57BB5ICEwjYGUKca7Uz22PlXbNDt79+15Gozf27R
+         6JHhGJ8QavS+k7SI5a7ViDWcVO650H8O5u7M9LcSexxLmN3bs3mgBMS7jFhYoymHBw
+         3TcZtvFP4rBjxf3U7hkOIAcxX6fLp/U5Ga1KJh2E=
+Received: from epsmges2p4.samsung.com (unknown [182.195.42.72]) by
         epcas2p2.samsung.com (KnoxPortal) with ESMTP id
-        20190109153337epcas2p24a66f600d22bf42496d9aad4668b65db~4N-mR3aAd2607426074epcas2p2G;
-        Wed,  9 Jan 2019 15:33:37 +0000 (GMT)
-Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
-        epsmges2p3.samsung.com (Symantec Messaging Gateway) with SMTP id
-        84.D1.04062.054163C5; Thu, 10 Jan 2019 00:33:36 +0900 (KST)
+        20190109153339epcas2p28f65e137eb7f5eef85b15a7e77df1d5b~4N-o_Pv8w0299902999epcas2p22;
+        Wed,  9 Jan 2019 15:33:39 +0000 (GMT)
+Received: from epcas2p2.samsung.com ( [182.195.41.54]) by
+        epsmges2p4.samsung.com (Symantec Messaging Gateway) with SMTP id
+        B9.18.04055.354163C5; Thu, 10 Jan 2019 00:33:39 +0900 (KST)
 Received: from epsmgms2p2new.samsung.com (unknown [182.195.42.143]) by
-        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
-        20190109153336epcas2p29b3275b6c545e483a3f43b92268f08bf~4N-l3nmYp0300403004epcas2p2m;
-        Wed,  9 Jan 2019 15:33:36 +0000 (GMT)
-X-AuditID: b6c32a47-30fff70000000fde-0f-5c3614506338
+        epcas2p4.samsung.com (KnoxPortal) with ESMTP id
+        20190109153339epcas2p4691a898dde0174a7565d62fcb3be0b6d~4N-oeeB7Y3007730077epcas2p4Y;
+        Wed,  9 Jan 2019 15:33:39 +0000 (GMT)
+X-AuditID: b6c32a48-3a9ff70000000fd7-b0-5c361453007c
 Received: from epmmp1.local.host ( [203.254.227.16]) by
         epsmgms2p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        2C.6D.03627.054163C5; Thu, 10 Jan 2019 00:33:36 +0900 (KST)
+        CC.6D.03627.354163C5; Thu, 10 Jan 2019 00:33:39 +0900 (KST)
 Received: from test-PowerEdge-R720.sa.corp.samsungelectronics.net
         ([107.108.221.212]) by mmp1.samsung.com (Oracle Communications Messaging
         Server 7.0.5.31.0 64bit (built May  5 2014)) with ESMTPA id
-        <0PL2000VLLVH1220@mmp1.samsung.com>; Thu, 10 Jan 2019 00:33:36 +0900 (KST)
+        <0PL2000VLLVH1220@mmp1.samsung.com>; Thu, 10 Jan 2019 00:33:39 +0900 (KST)
 From:   Kanchan Joshi <joshi.k@samsung.com>
 To:     linux-fsdevel@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
         linux-nvme@lists.infradead.org, jack@suse.com, david@fromorbit.com,
         tytso@mit.edu, prakash.v@samsung.com,
         Kanchan Joshi <joshi.k@samsung.com>
-Subject: [PATCH 2/4] fs: introduce four macros for in-kernel hints
-Date:   Wed, 09 Jan 2019 21:00:59 +0530
-Message-id: <1547047861-7271-3-git-send-email-joshi.k@samsung.com>
+Subject: [PATCH 3/4] fs: introduce APIs to enable sending write-hint with
+ buffer-head
+Date:   Wed, 09 Jan 2019 21:01:00 +0530
+Message-id: <1547047861-7271-4-git-send-email-joshi.k@samsung.com>
 X-Mailer: git-send-email 2.7.4
 In-reply-to: <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrPIsWRmVeSWpSXmKPExsWy7bCmuW6AiFmMwaZzNhZbjt1jtHi+fDGj
-        xdH/b9ks9t7Stpg57w6bxZ69J1ks5i97ym5xZcoiZovWnp/sDpwepxZJeGxeUu/RdOYos0ff
-        llWMHuu3XGXx+LxJLoAtissmJTUnsyy1SN8ugStj5X3Jgr1sFXved7E2MG5i7WLk4JAQMJFY
-        +dmmi5GTQ0hgB6PEqhlFXYxcQPZ3RokHx6ewgiRAaqafO8cGkdjNKNE7dwMThDOdSWLtzGNM
-        IJPYBDQlLkwuBTFFBBQlLr93AilhFjjHKLH040QmkEHCAk4SC78eYwOxWQRUJT7+/QJm8wLF
-        pxxcxw6xTE7i5rlOZhCbU8BZ4lfPT2aQQRICc9gkjt24wAhxtYvE609CEPXCEq+Ob4HqlZZ4
-        tmojI4RdLPHrzlGo3g5GiesNM1kgEvYSF/f8BTuIWYBPouPwX3aImbwSHW1CEKaHRN8UXYgX
-        pzFKTH9/n2kCo+QCRoZVjGKpBcW56anFRgXGesWJucWleel6yfm5mxjB0ajlvoNx2zmfQ4wC
-        HIxKPLw7GMxihFgTy4orcw8xSnAwK4nwqt8xiRHiTUmsrEotyo8vKs1JLT7EKM3BoiTO+1B6
-        brSQQHpiSWp2ampBahFMlomDU6qBMftrssrWOM8uj50uXOaTtOa/mXxBaOuMxoAH5+5/2Jqx
-        duW7Gb/ahFg4bZ/N3Pnj7tNqRi2PQ+9sbf1lYr2X6B4Okc1u27mdp2a1fd/FW50b8vjMKrLr
-        13+8lfme86x1wK4yjlXPbSp9Vom2yi2tqXnj/Gf+10PVvnvv6AdqiPh9YFijyHrqtBJLcUai
-        oRZzUXEiANMjEs3CAgAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprGLMWRmVeSWpSXmKPExsVy+t9jAd0AEbMYg82TFCy2HLvHaPF8+WJG
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrMIsWRmVeSWpSXmKPExsWy7bCmmW6wiFmMwdJmI4stx+4xWjxfvpjR
+        4uj/t2wWe29pW8ycd4fNYs/ekywW85c9Zbe4MmURs0Vrz092B06PU4skPDYvqfdoOnOU2aNv
+        yypGj/VbrrJ4fN4kF8AWxWWTkpqTWZZapG+XwJXxYPI69oJzwhWnF7E3MO4Q6GLk5JAQMJFo
+        +3aJsYuRi0NIYAejRPP9L8wQzncgZ+1cZpiqdd9+sEIkdjNKdP2dyg7hTGeSOLhxEVAVBweb
+        gKbEhcmlIKaIgKLE5fdOICXMAucYJZZ+nMgEMkhYIFyib9ITNhCbRUBVYvqblWBxXgEniWU7
+        e9khlslJ3DzXCbaYU8BZ4lfPT7CLJAQWsEkcur+DBaLIReJ723UoW1ji1fEtUM3SEs9WbWSE
+        sIslft05CtXcwShxvWEmVIO9xMU9f8E2MwvwSXQc/ssOcrWEAK9ER5sQRImHxM53B6FBMY1R
+        Yuu8q8wTGCUXMDKsYhRLLSjOTU8tNiow0StOzC0uzUvXS87P3cQIjkotjx2MB875HGIU4GBU
+        4uFN+GcaI8SaWFZcmXuIUYKDWUmEV/2OSYwQb0piZVVqUX58UWlOavEhRmkOFiVx3ofSc6OF
+        BNITS1KzU1MLUotgskwcnFINjMYX+HX7O6sKGY9YPTq07dqOuSlxwnLBK59NY5K7ayKZWnjM
+        V1zno0z845yqIOUJe24sl/PbKuTWeHU6t4GJUmfyfqt7q0/IySSf+r+Q5//k6ZfXzF97aEZj
+        /QqhhT/YlHv68kyuTZx1fkfYdZUqWX6LSL/YzCfC12bd15JaFzMlR7yX+9UFFSWW4oxEQy3m
+        ouJEAIc51w/GAgAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprKLMWRmVeSWpSXmKPExsVy+t9jAd1gEbMYg/kvBCy2HLvHaPF8+WJG
         i6P/37JZ7L2lbTFz3h02iz17T7JYzF/2lN3iypRFzBatPT/ZHTg9Ti2S8Ni8pN6j6cxRZo++
-        LasYPdZvucri8XmTXABbFJdNSmpOZllqkb5dAlfGyvuSBXvZKva872JtYNzE2sXIySEhYCIx
-        /dw5ti5GLg4hgZ2MEktO3WeEcGYySZxZ1sTexcjBwSagKXFhcimIKSKgKHH5vRNICbPAOUaJ
-        6zc6mEEGCQs4SSz8eowNxGYRUJX4+PcLmM0LFJ9ycB07xDI5iZvnOsHqOQWcJX71/ASzhYBq
-        Lt66yjaBkWcBI8MqRsnUguLc9NxiowKjvNRyveLE3OLSvHS95PzcTYzA0Np2WKt/B+PjJfGH
-        GAU4GJV4eBP+mcYIsSaWFVfmHmKU4GBWEuFVv2MSI8SbklhZlVqUH19UmpNafIhRmoNFSZyX
-        P/9YpJBAemJJanZqakFqEUyWiYNTqoFxt93nqMNbEqYV9UzS3lHlfrTf6kHH+ruWsixTg64K
-        5wafETr6fhXnlu5r+mFXT94XW3nmuWNph57v8l9fLFd8aHKdsIjrVlCS9u692z+9cfCp332c
-        1Vhh8+VnKtcE/+7bdyw0LtWM8Ydm91KpLY8eOP3/mze/44h326fHrbYyFhN6L3L+4L3zSYml
-        OCPRUIu5qDgRACgmQ3MpAgAA
-X-CMS-MailID: 20190109153336epcas2p29b3275b6c545e483a3f43b92268f08bf
+        LasYPdZvucri8XmTXABbFJdNSmpOZllqkb5dAlfGg8nr2AvOCVecXsTewLhDoIuRk0NCwERi
+        3bcfrF2MXBxCAjsZJWZMes4IkhASmMkk8eKqdxcjBwebgKbEhcmlIKaIgKLE5fdOIOXMAucY
+        Ja7f6GAGKRcWCJfom/SEDcRmEVCVmP5mJROIzSvgJLFsZy87xC45iZvnOsHqOQWcJX71/GSG
+        WOUkcfHWVbYJjDwLGBlWMUqmFhTnpucWGxUY5aWW6xUn5haX5qXrJefnbmIEBta2w1r9Oxgf
+        L4k/xCjAwajEw5vwzzRGiDWxrLgy9xCjBAezkgiv+h2TGCHelMTKqtSi/Pii0pzU4kOM0hws
+        SuK8/PnHIoUE0hNLUrNTUwtSi2CyTBycUg2MFeV60muPG+Zu/OvAWVPsnRzG6fXl6RLLrUvZ
+        uWtqJ7j8bQxomfWM4b01W6Fie9mkgh6l9T2fJP3OTvp459C1hM/K666J9AcccPyf8HWN94sv
+        J2u0vlq5zFtQNFVprkDcvNWrv3AVf1fdP0fuFdusL58OMTwOZZorcumObdl72cCIt7uqpdJ/
+        K7EUZyQaajEXFScCAAyekXIoAgAA
+X-CMS-MailID: 20190109153339epcas2p4691a898dde0174a7565d62fcb3be0b6d
 X-Msg-Generator: CA
 CMS-TYPE: 102P
-X-CMS-RootMailID: 20190109153336epcas2p29b3275b6c545e483a3f43b92268f08bf
+X-CMS-RootMailID: 20190109153339epcas2p4691a898dde0174a7565d62fcb3be0b6d
 References: <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
-        <CGME20190109153336epcas2p29b3275b6c545e483a3f43b92268f08bf@epcas2p2.samsung.com>
+        <CGME20190109153339epcas2p4691a898dde0174a7565d62fcb3be0b6d@epcas2p4.samsung.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Exiting write-hints are exposed to user-mode. There is a possiblity
-of conflict if kernel happens to use those. This patch introduces four
-write-hints for exclusive kernel-mode use.
+submit_bh and write_dirty_buffer do not take write-hint as parameter.
+This patch introduces variants which do.
 
 Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
 ---
- include/linux/fs.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ fs/buffer.c                 | 18 ++++++++++++++++--
+ include/linux/buffer_head.h |  3 +++
+ 2 files changed, 19 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 811c777..e8548eb 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -291,6 +291,11 @@ enum rw_hint {
- 	WRITE_LIFE_MEDIUM	= RWH_WRITE_LIFE_MEDIUM,
- 	WRITE_LIFE_LONG		= RWH_WRITE_LIFE_LONG,
- 	WRITE_LIFE_EXTREME	= RWH_WRITE_LIFE_EXTREME,
-+/* below ones are meant for in-kernel use */
-+	KERN_WRITE_LIFE_SHORT,
-+	KERN_WRITE_LIFE_MEDIUM,
-+	KERN_WRITE_LIFE_LONG,
-+	KERN_WRITE_LIFE_EXTREME
- };
+diff --git a/fs/buffer.c b/fs/buffer.c
+index d60d61e..2a94676 100644
+--- a/fs/buffer.c
++++ b/fs/buffer.c
+@@ -3094,6 +3094,13 @@ int submit_bh(int op, int op_flags, struct buffer_head *bh)
+ }
+ EXPORT_SYMBOL(submit_bh);
  
- #define IOCB_EVENTFD		(1 << 0)
++int submit_bh_write_hint(int op, int op_flags, struct buffer_head *bh,
++			 enum rw_hint hint)
++{
++	return submit_bh_wbc(op, op_flags, bh, hint, NULL);
++}
++EXPORT_SYMBOL(submit_bh_write_hint);
++
+ /**
+  * ll_rw_block: low-level access to block devices (DEPRECATED)
+  * @op: whether to %READ or %WRITE
+@@ -3151,6 +3158,13 @@ EXPORT_SYMBOL(ll_rw_block);
+ 
+ void write_dirty_buffer(struct buffer_head *bh, int op_flags)
+ {
++	write_dirty_buffer_with_hint(bh, op_flags, 0);
++}
++EXPORT_SYMBOL(write_dirty_buffer);
++
++void write_dirty_buffer_with_hint(struct buffer_head *bh, int op_flags,
++				   enum rw_hint hint)
++{
+ 	lock_buffer(bh);
+ 	if (!test_clear_buffer_dirty(bh)) {
+ 		unlock_buffer(bh);
+@@ -3158,9 +3172,9 @@ void write_dirty_buffer(struct buffer_head *bh, int op_flags)
+ 	}
+ 	bh->b_end_io = end_buffer_write_sync;
+ 	get_bh(bh);
+-	submit_bh(REQ_OP_WRITE, op_flags, bh);
++	submit_bh_wbc(REQ_OP_WRITE, op_flags, bh, hint, NULL);
+ }
+-EXPORT_SYMBOL(write_dirty_buffer);
++EXPORT_SYMBOL(write_dirty_buffer_with_hint);
+ 
+ /*
+  * For a data-integrity writeout, we need to wait upon any in-progress I/O
+diff --git a/include/linux/buffer_head.h b/include/linux/buffer_head.h
+index 7b73ef7..3d682ac 100644
+--- a/include/linux/buffer_head.h
++++ b/include/linux/buffer_head.h
+@@ -200,7 +200,10 @@ void ll_rw_block(int, int, int, struct buffer_head * bh[]);
+ int sync_dirty_buffer(struct buffer_head *bh);
+ int __sync_dirty_buffer(struct buffer_head *bh, int op_flags);
+ void write_dirty_buffer(struct buffer_head *bh, int op_flags);
++void write_dirty_buffer_with_hint(struct buffer_head *bh, int op_flags,
++				   enum rw_hint hint);
+ int submit_bh(int, int, struct buffer_head *);
++int submit_bh_write_hint(int, int, struct buffer_head *, enum rw_hint hint);
+ void write_boundary_block(struct block_device *bdev,
+ 			sector_t bblock, unsigned blocksize);
+ int bh_uptodate_or_lock(struct buffer_head *bh);
 -- 
 2.7.4
 
