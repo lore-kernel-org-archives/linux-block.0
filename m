@@ -2,126 +2,282 @@ Return-Path: <SRS0=RPGG=PR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42C46C43387
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 08:46:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BEE2C43387
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 12:10:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1985F2075C
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 08:46:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C01B206BB
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 12:10:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727947AbfAIIqE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jan 2019 03:46:04 -0500
-Received: from mx2.suse.de ([195.135.220.15]:57032 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728138AbfAIIqE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 9 Jan 2019 03:46:04 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay1.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id EFE88AF58;
-        Wed,  9 Jan 2019 08:46:01 +0000 (UTC)
-Subject: Re: [PATCH blktests 02/14] common: Introduce _test_dev_is_zoned()
- helper function
-To:     Damien Le Moal <damien.lemoal@wdc.com>,
-        linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Masato Suzuki <masato.suzuki@wdc.com>,
-        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@kernel.dk>,
-        Matias Bjorling <matias.bjorling@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-References: <20190109013542.23686-1-damien.lemoal@wdc.com>
- <20190109013542.23686-3-damien.lemoal@wdc.com>
-From:   Johannes Thumshirn <jthumshirn@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <351233c0-eba7-a675-cbfc-4ab03847b77f@suse.de>
-Date:   Wed, 9 Jan 2019 09:46:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1730572AbfAIMKc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jan 2019 07:10:32 -0500
+Received: from verein.lst.de ([213.95.11.211]:41144 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726154AbfAIMKc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 9 Jan 2019 07:10:32 -0500
+Received: by newverein.lst.de (Postfix, from userid 2407)
+        id 5377B67358; Wed,  9 Jan 2019 13:10:30 +0100 (CET)
+Date:   Wed, 9 Jan 2019 13:10:30 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
+        linux-block@vger.kernel.org, linux-arch@vger.kernel.org,
+        hch@lst.de, jmoyer@redhat.com, avi@scylladb.com
+Subject: Re: [PATCH 05/16] Add io_uring IO interface
+Message-ID: <20190109121030.GA13779@lst.de>
+References: <20190108165645.19311-1-axboe@kernel.dk> <20190108165645.19311-6-axboe@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <20190109013542.23686-3-damien.lemoal@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190108165645.19311-6-axboe@kernel.dk>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09/01/2019 02:35, Damien Le Moal wrote:
-> From: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> +_test_dev_is_zoned() {
-> +	local zoned_file="${TEST_DEV_SYSFS}/queue/zoned"
-> +	if grep -q -e "none" "${zoned_file}" ; then
+> index 293733f61594..9ef9987b4192 100644
+> --- a/fs/Makefile
+> +++ b/fs/Makefile
+> @@ -29,7 +29,7 @@ obj-$(CONFIG_SIGNALFD)		+= signalfd.o
+>  obj-$(CONFIG_TIMERFD)		+= timerfd.o
+>  obj-$(CONFIG_EVENTFD)		+= eventfd.o
+>  obj-$(CONFIG_USERFAULTFD)	+= userfaultfd.o
+> -obj-$(CONFIG_AIO)               += aio.o
+> +obj-$(CONFIG_AIO)               += aio.o io_uring.o
 
-Nit: I think we can leave the zoned_file variable out
-	if grep -qe "none" "${TEST_DEV_SYSFS}/queue/zoned"; then
-	[...]
-works as well and is a bit more descriptive
+It is probablt worth adding a new config symbol for the uring as no
+code is shared with aio.
 
+> diff --git a/fs/io_uring.c b/fs/io_uring.c
+> new file mode 100644
+> index 000000000000..ae2b886282bb
+> --- /dev/null
+> +++ b/fs/io_uring.c
+> @@ -0,0 +1,849 @@
+> +/*
+> + * Shared application/kernel submission and completion ring pairs, for
+> + * supporting fast/efficient IO.
+> + *
+> + * Copyright (C) 2019 Jens Axboe
+> + */
 
--- 
-Johannes Thumshirn                            SUSE Labs Filesystems
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Add an SPDX header to all new files, please.
+
+> +struct io_sq_ring {
+> +	struct io_uring		r;
+> +	u32			ring_mask;
+> +	u32			ring_entries;
+> +	u32			dropped;
+> +	u32			flags;
+> +	u32			array[0];
+> +};
+
+field[0] is a legacy gcc extension, the proper C99+ way is field[].
+
+> +
+> +struct io_iocb_ring {
+> +	struct			io_sq_ring *ring;
+> +	unsigned		entries;
+> +	unsigned		ring_mask;
+> +	struct io_uring_iocb	*iocbs;
+> +};
+> +
+> +struct io_event_ring {
+> +	struct io_cq_ring	*ring;
+> +	unsigned		entries;
+> +	unsigned		ring_mask;
+> +};
+
+Btw, do we really need there structures?  It would seem simpler
+to just embedd them into the containing structure as:
+
+	struct io_sq_ring	*sq_ring;
+	unsigned		sq_ring_entries;
+	unsigned		sq_ring_mask;
+	struct io_uring_iocb	*sq_ring_iocbs;
+
+	struct io_cq_ring	*cq_ring;
+	unsigned		cq_ring_entries;
+	unsigned		cq_ring_mask;
+	
+
+> +struct io_ring_ctx {
+> +	struct percpu_ref	refs;
+> +
+> +	unsigned int		flags;
+> +	unsigned int		max_reqs;
+
+max_reqs can probably go away in favour of the sq ring nr_entries
+field.
+
+> +	struct io_iocb_ring	sq_ring;
+> +	struct io_event_ring	cq_ring;
+> +
+> +	struct work_struct	work;
+> +
+> +	struct {
+> +		struct mutex uring_lock;
+> +	} ____cacheline_aligned_in_smp;
+> +
+> +	struct {
+> +		struct mutex    ring_lock;
+> +		wait_queue_head_t wait;
+> +	} ____cacheline_aligned_in_smp;
+> +
+> +	struct {
+> +		spinlock_t      completion_lock;
+> +	} ____cacheline_aligned_in_smp;
+> +};
+
+Can you take a deep look if we need to keep all of ring_lock,
+completion_lock and the later added poll locking?  From a quick look
+is isn't entirely clear what the locking strategy on the completion
+side is.  It needs to be documented and can hopefully be simplified.
+
+> +struct fsync_iocb {
+> +	struct work_struct	work;
+> +	struct file		*file;
+> +	bool			datasync;
+> +};
+
+Do we actually need this?  Can't we just reuse the later thread
+offload for fsync?  Maybe just add fsync support once everything else
+is done to make that simpler.
+
+> +static const struct file_operations io_scqring_fops;
+> +
+> +static void io_ring_ctx_free(struct work_struct *work);
+> +static void io_ring_ctx_ref_free(struct percpu_ref *ref);
+
+Can you try to avoid to need the forward delcaration?  (except for the
+fops, where we probably need it).
+
+>
+> +
+> +static struct io_ring_ctx *io_ring_ctx_alloc(struct io_uring_params *p)
+> +{
+> +	struct io_ring_ctx *ctx;
+> +
+> +	ctx = kmem_cache_zalloc(ioctx_cachep, GFP_KERNEL);
+> +	if (!ctx)
+> +		return NULL;
+
+Do we really need an explicit slab for the contexts?
+
+> +static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx)
+
+Maybe replace the req name with something matching the structure
+name?  (and more on the structure name later).
+
+> +{
+> +	struct io_kiocb *req;
+> +
+> +	req = kmem_cache_alloc(kiocb_cachep, GFP_KERNEL);
+> +	if (!req)
+> +		return NULL;
+> +
+> +	percpu_ref_get(&ctx->refs);
+> +	req->ki_ctx = ctx;
+> +	INIT_LIST_HEAD(&req->ki_list);
+
+We never do a list_empty ceck on ki_list, so there should be no need
+to initialize it.
+
+> +static void io_fill_event(struct io_uring_event *ev, struct io_kiocb *kiocb,
+> +			  long res, unsigned flags)
+> +{
+> +	ev->index = kiocb->ki_index;
+> +	ev->res = res;
+> +	ev->flags = flags;
+> +}
+
+Probably no need for this helper.
+
+> +static void io_complete_scqring(struct io_kiocb *iocb, long res, unsigned flags)
+> +{
+> +	io_cqring_fill_event(iocb, res, flags);
+> +	io_complete_iocb(iocb->ki_ctx, iocb);
+> +}
+
+Probably no need for this helper either.
+
+> +	ret = kiocb_set_rw_flags(req, iocb->rw_flags);
+> +	if (unlikely(ret))
+> +		goto out_fput;
+> +
+> +	/* no one is going to poll for this I/O */
+> +	req->ki_flags &= ~IOCB_HIPRI;
+
+Now that we don't have the aio legacy to deal with should we just
+reject IOCB_HIPRI on a non-polled context?
+
+> +static int io_setup_rw(int rw, const struct io_uring_iocb *iocb,
+> +		       struct iovec **iovec, struct iov_iter *iter)
+> +{
+> +	void __user *buf = (void __user *)(uintptr_t)iocb->addr;
+> +	size_t ret;
+> +
+> +	ret = import_single_range(rw, buf, iocb->len, *iovec, iter);
+> +	*iovec = NULL;
+> +	return ret;
+> +}
+
+Is there any point in supporting non-vectored operations here?
+
+> +		if (S_ISREG(file_inode(file)->i_mode)) {
+> +			__sb_start_write(file_inode(file)->i_sb, SB_FREEZE_WRITE, true);
+> +			__sb_writers_release(file_inode(file)->i_sb, SB_FREEZE_WRITE);
+> +		}
+
+Overly long lines.
+
+> +static int __io_submit_one(struct io_ring_ctx *ctx,
+> +			   const struct io_uring_iocb *iocb,
+> +			   unsigned long ki_index)
+
+Maybe calls this io_ring_submit_one?  Or generally find a nice prefix
+for all the functions in this file?
+
+> +	f = fdget(fd);
+> +	if (f.file) {
+> +		struct io_ring_ctx *ctx;
+
+Please just return early on fialure instead of forcing another level
+of indentation.
+
+> +
+> +	ctx->sq_ring.iocbs = io_mem_alloc(sizeof(struct io_uring_iocb) *
+> +						p->sq_entries);
+
+Use array_size().
+
+> +/*
+> + * sys_io_uring_setup:
+> + *	Sets up an aio uring context, and returns the fd. Applications asks
+> + *	for a ring size, we return the actual sq/cq ring sizes (among other
+> + *	things) in the params structure passed in.
+> + */
+
+Can we drop this odd aio-style comment format?  In fact the syscall
+documentation probably just belongs into the man page only anyway.
+
+Same for the uring_enter syscall.
+
+> +struct io_uring_iocb {
+
+Should we just call this io_uring_sqe?
+
+> +/*
+> + * IO completion data structure
+> + */
+> +struct io_uring_event {
+> +	__u64	index;		/* what iocb this event came from */
+> +	__s32	res;		/* result code for this event */
+> +	__u32	flags;
+> +};
+
+io_uring_cqe?
