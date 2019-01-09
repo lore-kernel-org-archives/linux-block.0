@@ -2,129 +2,125 @@ Return-Path: <SRS0=RPGG=PR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5073C43387
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 15:33:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22D5CC43444
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 15:33:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 78B86206BA
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 15:33:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7A352070B
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 15:33:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="YRQbvR8I"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="aiLv0fyH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731288AbfAIPdd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jan 2019 10:33:33 -0500
-Received: from mailout3.samsung.com ([203.254.224.33]:11904 "EHLO
+        id S1731483AbfAIPdg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jan 2019 10:33:36 -0500
+Received: from mailout3.samsung.com ([203.254.224.33]:11916 "EHLO
         mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730795AbfAIPdc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jan 2019 10:33:32 -0500
-Received: from epcas2p4.samsung.com (unknown [182.195.41.56])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20190109153330epoutp032fd5ea9b75aa5604ea01a598025debff~4N-fzeiXT3068430684epoutp03S;
-        Wed,  9 Jan 2019 15:33:30 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20190109153330epoutp032fd5ea9b75aa5604ea01a598025debff~4N-fzeiXT3068430684epoutp03S
+        with ESMTP id S1730795AbfAIPdg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jan 2019 10:33:36 -0500
+Received: from epcas1p2.samsung.com (unknown [182.195.41.46])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20190109153333epoutp0374cee62f09b6a818d48543556c6aa6e3~4N-i_N-5Q3068430684epoutp03U;
+        Wed,  9 Jan 2019 15:33:33 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20190109153333epoutp0374cee62f09b6a818d48543556c6aa6e3~4N-i_N-5Q3068430684epoutp03U
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1547048010;
-        bh=UmHmkE2620GBxCzOvQOBJNl4cT+yi2heu2GHx2lhi4A=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=YRQbvR8Ib4DQ4xmtpVZCDpsCJJhM1WA2XKBiEke2dUY6nUmft2FBIuqicALmSTHv4
-         4DPulz73SemExmUqtWl9qIq7VCNYFhsjCWSXxa5kgABY4DHC4r7eXG1N3T/UNHCWoz
-         3rxP4rOhXsJ88GmSWlhHTIKss6wT0kykZAi4pXFE=
-Received: from epsmges2p1.samsung.com (unknown [182.195.42.69]) by
-        epcas2p4.samsung.com (KnoxPortal) with ESMTP id
-        20190109153329epcas2p488f4dbd867165110c13594b33e8aacd5~4N-fRZn-h0641506415epcas2p4o;
-        Wed,  9 Jan 2019 15:33:29 +0000 (GMT)
-Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
-        epsmges2p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A8.40.04055.944163C5; Thu, 10 Jan 2019 00:33:29 +0900 (KST)
-Received: from epsmgms2p2new.samsung.com (unknown [182.195.42.143]) by
-        epcas2p4.samsung.com (KnoxPortal) with ESMTP id
-        20190109153328epcas2p4643cbdc7a2182b47893a2bcaa0778e17~4N-eI2r030641106411epcas2p4k;
-        Wed,  9 Jan 2019 15:33:28 +0000 (GMT)
-X-AuditID: b6c32a45-711ff70000000fd7-37-5c361449d2b8
+        s=mail20170921; t=1547048013;
+        bh=KEEdHPxt8zVpWOJmHeHM+ChnuJz6QXi5nwb717WENh8=;
+        h=From:To:Cc:Subject:Date:In-reply-to:References:From;
+        b=aiLv0fyHTyzu5dSzbilHtnzVYMFEHTydvY11PtgyQWCW4yMPZ4hzCcZicSo+Qpx78
+         OpLJFnuJoxco3lOU4rjnB567utP+r6aN8DdV6av68r/vzbiXT/wTvA/9h46zokZLEY
+         br5CPfptFplqthWmq6bogr7/0tlx6Fz/p8g+3s24=
+Received: from epsmges1p2.samsung.com (unknown [182.195.42.54]) by
+        epcas1p3.samsung.com (KnoxPortal) with ESMTP id
+        20190109153332epcas1p30513979c98743197b120f5b530caf081~4N-ig42hR2086620866epcas1p3V;
+        Wed,  9 Jan 2019 15:33:32 +0000 (GMT)
+Received: from epcas1p3.samsung.com ( [182.195.41.47]) by
+        epsmges1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        6A.A3.04057.C44163C5; Thu, 10 Jan 2019 00:33:32 +0900 (KST)
+Received: from epsmgms2p1new.samsung.com (unknown [182.195.42.142]) by
+        epcas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20190109153332epcas1p187b419176a8d1d0be4982a275c0b9e86~4N-iMGEwl0086100861epcas1p1b;
+        Wed,  9 Jan 2019 15:33:32 +0000 (GMT)
+X-AuditID: b6c32a36-d31ff70000000fd9-f5-5c36144cb0e0
 Received: from epmmp1.local.host ( [203.254.227.16]) by
-        epsmgms2p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        8B.6D.03627.844163C5; Thu, 10 Jan 2019 00:33:28 +0900 (KST)
+        epsmgms2p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        B5.7C.03601.C44163C5; Thu, 10 Jan 2019 00:33:32 +0900 (KST)
 Received: from test-PowerEdge-R720.sa.corp.samsungelectronics.net
         ([107.108.221.212]) by mmp1.samsung.com (Oracle Communications Messaging
         Server 7.0.5.31.0 64bit (built May  5 2014)) with ESMTPA id
-        <0PL2000VLLVH1220@mmp1.samsung.com>; Thu, 10 Jan 2019 00:33:28 +0900 (KST)
+        <0PL2000VLLVH1220@mmp1.samsung.com>; Thu, 10 Jan 2019 00:33:32 +0900 (KST)
 From:   Kanchan Joshi <joshi.k@samsung.com>
 To:     linux-fsdevel@vger.kernel.org
 Cc:     linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
         linux-nvme@lists.infradead.org, jack@suse.com, david@fromorbit.com,
         tytso@mit.edu, prakash.v@samsung.com,
         Kanchan Joshi <joshi.k@samsung.com>
-Subject: [PATCH v2 0/4] Write-hint for FS journal
-Date:   Wed, 09 Jan 2019 21:00:57 +0530
-Message-id: <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
+Subject: [PATCH 1/4] block: Increase count of supported write-hints
+Date:   Wed, 09 Jan 2019 21:00:58 +0530
+Message-id: <1547047861-7271-2-git-send-email-joshi.k@samsung.com>
 X-Mailer: git-send-email 2.7.4
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrKIsWRmVeSWpSXmKPExsWy7bCmua6niFmMwd6zUhZbjt1jtHi+fDGj
+In-reply-to: <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrEIsWRmVeSWpSXmKPExsWy7bCmvq6PiFmMwaajVhZbjt1jtHi+fDGj
         xdH/b9ks9t7Stpg57w6bxZ69J1ks5i97ym5xZcoiZovWnp/sDpwepxZJeGxeUu/RdOYos0ff
-        llWMHuu3XGXx+LxJLoAtissmJTUnsyy1SN8ugStj9aZ9zAUzeStO919la2B8xd7FyMkhIWAi
-        saPrFnMXIxeHkMAORol3KyexQjjfGSU+bzoB5HCAVfVtZIKI72aUOHX7AyOEM51JYseXf2BF
-        bAKaEhcml4KYIgKKEpffO4GUMAucY5RY+nEiE8g2YQFDidk/XoBtZhFQlXi5dwoLiM0r4CQx
-        v3sTG8RFchI3z3WCXSQh0MEm0fFsLhNEwkXiy/orjBC2sMSr41ugXpCWeLZqI1S8WOLXnaMw
-        zYwS1xtmskAk7CUu7vkLNohZgE+i4/BfdojPeCU62oQgTA+JD781QCqEBGIlOr8tYpzAKLGA
-        kWEVo1hqQXFuemqxUYGhXnFibnFpXrpecn7uJkZw5Gm57mCccc7nEKMAB6MSD2/CP9MYIdbE
-        suLK3EOMEhzMSiK86ndMYoR4UxIrq1KL8uOLSnNSiw8xSnOwKInzPpKeGy0kkJ5YkpqdmlqQ
-        WgSTZeLglGpgfOz77L/Psrnz+hTuLn3Ns+Va2LIpL3ZLzHoxY3bcfTf1J8e+PD9k3mumq/ts
-        0k+/qInV8qKzbkx4WxG6VP747cVas365n5V9M3/jjmeKRpUWP1d8kN4xi99ccUq0+jlj5seq
-        5aFHxD0NpK7fajbu7kqdkhawV2QHd17zsZsLFJ/dX77uqtOJaZOVWIozEg21mIuKEwFFbOQ2
-        uAIAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrHJMWRmVeSWpSXmKPExsVy+t9jAV0PEbMYg+uNPBZbjt1jtHi+fDGj
+        llWMHuu3XGXx+LxJLoAtissmJTUnsyy1SN8ugStj86W1TAU3WStaLy9jaWB8xNLFyMkhIWAi
+        sXDOC8YuRi4OIYEdjBLP985nh3C+M0qcO/OWEabqyLV3bBCJ3YwST97OA0sICUxnknixwbKL
+        kYODTUBT4sLkUhBTREBR4vJ7J5ByZoFzjBJLP05kAikXFnCW+LjsGSuIzSKgKvFs0Rkwm1fA
+        SeL9jblQF8lJ3DzXyQxicwLV/+r5yQwySEJgDpvEox9v2SGKXCQuLTgJZQtLvDq+hR1ksYSA
+        tMSlo7YQ4WKJX3eOQvV2MEpcb5gJtcBe4uKev2AHMQvwSbz72sMK0csr0dEmBFHiIfHszk9W
+        iH+nMUo8nP2UdQKj5AJGhlWMYqkFxbnpqcWGBUZ6xYm5xaV56XrJ+bmbGMExqWW2g3HROZ9D
+        jAIcjEo8vAn/TGOEWBPLiitzDzFKcDArifCq3zGJEeJNSaysSi3Kjy8qzUktPsQozcGiJM77
+        RGputJBAemJJanZqakFqEUyWiYNTqoGxRtG/wNzD8HlV+63F6RIO0ROb1IMaNSQj789JCrv4
+        v6nVrucuz2utkiy+wrgfvFWrUjoPp5hOSWldnn9JYaLu5oL+6T+yT2X8Wrb63wLH5wcuxp59
+        XKgrH8J1dJVOp17K0dB3TZmHJz48ePKWFVPVbxOxVUuqkm46vtWoOrUrvWGNm8AXc14lluKM
+        REMt5qLiRABG9swVxQIAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprOLMWRmVeSWpSXmKPExsVy+t9jAV0fEbMYg6aJChZbjt1jtHi+fDGj
         xdH/b9ks9t7Stpg57w6bxZ69J1ks5i97ym5xZcoiZovWnp/sDpwepxZJeGxeUu/RdOYos0ff
-        llWMHuu3XGXx+LxJLoAtissmJTUnsyy1SN8ugStj9aZ9zAUzeStO919la2B8xd7FyMEhIWAi
-        0beRqYuRi0NIYCejxPPJExkhnJlMEj3PZrKAFLEJaEpcmFwKYooIKEpcfu8EUsIscI5R4vqN
-        DuYuRk4OYQFDidk/XrCD2CwCqhIv905hAbF5BZwk5ndvYgOxJQTkJG6e62SewMi1gJFhFaNk
-        akFxbnpusVGBUV5quV5xYm5xaV66XnJ+7iZGYKhsO6zVv4Px8ZL4Q4wCHIxKPLwJ/0xjhFgT
-        y4orcw8xSnAwK4nwqt8xiRHiTUmsrEotyo8vKs1JLT7EKM3BoiTOy59/LFJIID2xJDU7NbUg
-        tQgmy8TBKdXA2PyB2+xwkkLDo3/BgX+21h179aNZ6rHTSr1TE86v3imyn+9ksYvM37p9z+Mc
-        zRXjLau+F6sYzVo044Vt4BauA5Hrf0/ZZtmaLLRmh/FbAQlhz9DXTVd6fNb3enU4nGyKm/E9
-        7r5+9gO+V6f02baGzN3R9Vp66+TzN7uW1MsZn0jLzE+YFCzyWImlOCPRUIu5qDgRAAAE5agR
-        AgAA
-X-CMS-MailID: 20190109153328epcas2p4643cbdc7a2182b47893a2bcaa0778e17
+        llWMHuu3XGXx+LxJLoAtissmJTUnsyy1SN8ugStj86W1TAU3WStaLy9jaWB8xNLFyMkhIWAi
+        ceTaO7YuRi4OIYGdjBKPTj1ihHBmMklc/rWSvYuRg4NNQFPiwuRSEFNEQFHi8nsnkBJmgXOM
+        EtdvdDCDDBIWcJb4uOwZK4jNIqAq8WzRGTCbV8BJ4v2NuVDL5CRunusEq+cEqv/V8xPMFgKq
+        uXjrKtsERp4FjAyrGCVTC4pz03OLjQoM81LL9YoTc4tL89L1kvNzNzECg2vbYa2+HYz3l8Qf
+        YhTgYFTi4U34ZxojxJpYVlyZe4hRgoNZSYRX/Y5JjBBvSmJlVWpRfnxRaU5q8SFGaQ4WJXHe
+        23nHIoUE0hNLUrNTUwtSi2CyTBycUg2M2UlC88xWZl85aeD977Jx9O3LGyO0Lm88rRy6/k/j
+        rheqB9I+ceguKfE7WvRrZ8MiiYmTOBKPTCnt8ss2jOY6qHsiofJP+bWDoWxOh+7HpvQ4zK2c
+        VtFvL/dshiRbnXainXDZEx3JqTv1e/ZK/YyyVPknlyz/asJ5++YZnV/3PhHzDNj2wdhaiaU4
+        I9FQi7moOBEARxNr3ioCAAA=
+X-CMS-MailID: 20190109153332epcas1p187b419176a8d1d0be4982a275c0b9e86
 X-Msg-Generator: CA
-CMS-TYPE: 102P
-X-CMS-RootMailID: 20190109153328epcas2p4643cbdc7a2182b47893a2bcaa0778e17
-References: <CGME20190109153328epcas2p4643cbdc7a2182b47893a2bcaa0778e17@epcas2p4.samsung.com>
+CMS-TYPE: 101P
+X-CMS-RootMailID: 20190109153332epcas1p187b419176a8d1d0be4982a275c0b9e86
+References: <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
+        <CGME20190109153332epcas1p187b419176a8d1d0be4982a275c0b9e86@epcas1p1.samsung.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Towards supporing write-hints/streams for filesystem journal.                   
-                                                                                
-Here is the v1 patch for background -                                           
-https://marc.info/?l=linux-fsdevel&m=154444637519020&w=2                        
-                                                                                
-Changes since v1:                                                               
-- introduce four more hints for in-kernel use, as recommended by Dave chinner   
-  & Jens axboe. This isolates kernel-mode hints from user-mode ones.            
-- remove mount-option to specify write-hint, as recommended by Jan kara &       
-  Dave chinner. Rather, FS always sets write-hint for journal. This gets ignored
-  if device does not support stream.                                            
-- Removed code-redundancy for write_dirty_buffer (Jan kara's review comment)
+This patch bumps up write-hint count to support four new, in-kernel
+hints.
 
+Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+---
+ include/linux/blkdev.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Kanchan Joshi (4):
-  block: Increase count of supported write-hints
-  fs: introduce four macros for in-kernel hints
-  fs: introduce APIs to enable sending write-hint with buffer-head
-  fs/ext4,jbd2: add support for passing write-hint with journal.
-
- fs/buffer.c                 | 18 ++++++++++++++++--
- fs/ext4/super.c             |  2 ++
- fs/jbd2/commit.c            | 11 +++++++----
- fs/jbd2/journal.c           |  3 ++-
- fs/jbd2/revoke.c            |  3 ++-
- include/linux/blkdev.h      |  5 ++++-
- include/linux/buffer_head.h |  3 +++
- include/linux/fs.h          |  5 +++++
- include/linux/jbd2.h        |  8 ++++++++
- 9 files changed, 49 insertions(+), 9 deletions(-)
-
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 338604d..df07759 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -568,7 +568,10 @@ struct request_queue {
+ 
+ 	struct work_struct	release_work;
+ 
+-#define BLK_MAX_WRITE_HINTS	5
++#define BLK_MAX_USER_WRITE_HINTS	5
++#define BLK_MAX_KERNEL_WRITE_HINTS	4
++#define BLK_MAX_WRITE_HINTS	(BLK_MAX_USER_WRITE_HINTS + \
++				BLK_MAX_KERNEL_WRITE_HINTS)
+ 	u64			write_hints[BLK_MAX_WRITE_HINTS];
+ };
+ 
 -- 
 2.7.4
 
