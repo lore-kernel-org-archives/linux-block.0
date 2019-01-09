@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E8F3C43387
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 20:07:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07016C43387
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 20:08:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D05AD20661
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 20:07:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C727E214C6
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 20:08:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="dSNTWJRt"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="C2/iqom0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726113AbfAIUHf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Jan 2019 15:07:35 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:54047 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725681AbfAIUHe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jan 2019 15:07:34 -0500
-Received: by mail-it1-f193.google.com with SMTP id g85so13589584ita.3
-        for <linux-block@vger.kernel.org>; Wed, 09 Jan 2019 12:07:34 -0800 (PST)
+        id S1726146AbfAIUIV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jan 2019 15:08:21 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:40081 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725468AbfAIUIU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Jan 2019 15:08:20 -0500
+Received: by mail-it1-f194.google.com with SMTP id h193so12917744ita.5
+        for <linux-block@vger.kernel.org>; Wed, 09 Jan 2019 12:08:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=p4E46kAY3H5qyhjrpM73hxbwYDWqbzq3BlyVO4e1hOA=;
-        b=dSNTWJRtXOjABG3+WRvLfLLz4acEWZJifCzzHKyuT7wEuHUBaRHszPjm7lVkecrZir
-         8ZwOWnudTnY6aeO+cNuKiiltq8r++wnLAOnFunJ3ppyN6IopXqOhqs0z+bW7di6OkKUk
-         myx+oelHt1vNeUs282ASlodxAEGOvmPcPI3o9hgXriOg5b1nIGfbPE6gpA/rHoIu4s36
-         4W8JVTL1f6+vCb3mgJB+NuX3MYrZqVbBG6LHbAYnWdDMlH7KI/BdwZu6cYI0dTjGPAnt
-         ACt0WJrayJGz2g4paxZZAFzUCdAuXsTh1eEwoLWAeOc7Kov/c+mlAIH4oT+qZWx2Dt7j
-         0aGw==
+        bh=ckGbLXy5DYCjJFEqXZAqDD8gp104p4g66g0Ex87iOho=;
+        b=C2/iqom0nHp4m/FSpbBOcq7MalckGDSxYXuXaFI1bc3ohNXrYwpvKFArDlRnvELvdU
+         uZ0kP6ASZrZJiClW3uFASDNUH8OvZwJw2RT23eGGaiza8Qo2JpHxKLhHSLLkz/trKuId
+         OjqZZXBtxr6KHAY21Ol4HIGIJz+soVbVYA8v+lsl/5EGVRM6aBeYMTmvM+wzkZ2kbLG0
+         bja4oI2x/3Z/cQkOdwwZ/YlM4BH2NcY9gM9K9x66pnxncBcKbFFlBF6P9cUXZU3YSCpz
+         5T60buGQfmJvFdJ+qYYgb8BJV1UQrHwB4QujML9zCVHgUWUnMtuFne6PY4Aji/L92tm6
+         JCKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=p4E46kAY3H5qyhjrpM73hxbwYDWqbzq3BlyVO4e1hOA=;
-        b=mNDVSReETyfYJi1w8u7xiro7+u8Snwi9s4ilB+TcikDiFPynYhWOIq90bLyBA+CeBS
-         6gmx0if6ALS131PjXspXcIutxMeZbMfrPh+Y6g3iIFWb6BEQNFEb0ut53YYPh+A6BLCR
-         1kiQO73gLVLucuYwx1PEatWzFIPdA02+IetZ4RMhnvVmhVgfD/cGXDeSgsdQPn37Z7kb
-         x/rrUwG5aywYM3Uq3ua02W9Yjy1/NqfngYAPXwZM3fWE/JFHbJTc5VI4ov2osmi/FSdX
-         +S7SknpK6Haw8oTbkD0s+SFGJNNynQ3PKK7Gr139slkaB3wiMUxYyyAzOe0SCVi0yolf
-         0VGA==
-X-Gm-Message-State: AJcUukdt9weTGrM77dUGzbXyMWiiSZE45oOK2+DPT4Pd+iMmAhCVUvN2
-        qlI1uxmF5VFurCIb12UUTBJ7zA==
-X-Google-Smtp-Source: ALg8bN61CN8RhTcEbFz529VVeCIApNnzM7Wzm3sJwdnEem10plvLUDohAaaVpP19m8VtEC9d3jevSA==
-X-Received: by 2002:a02:6:: with SMTP id 6mr4808648jaa.19.1547064453579;
-        Wed, 09 Jan 2019 12:07:33 -0800 (PST)
+        bh=ckGbLXy5DYCjJFEqXZAqDD8gp104p4g66g0Ex87iOho=;
+        b=doTqDbbTZrRPIi6GQEe4CymEn454K0AI/UdM6yk1UmfmwqEgYo+vyVd7tHwKK01b10
+         uC9W7jToyoF0o2/PvtsxYFl743/2j0gAUYLGoSfeYujcC7GlrXr7JRvqwl1BzJr79Nid
+         8yddlFMwpKvrdSRiTNeMKzNRUIZnTNfaXjXvRpLcep1dzaz047esvRrhOH1Q1HatAkRc
+         S2JrXCxp6/tZSTFNKB4LhxAKTTiBV3wu6LgvlVz9DHpbZLCjXdfllqUtBJYkWBfIhQyH
+         hKzOTZNU6pWFKHi4UYUTTOs3y+vtwYK2w7Rm6LKNe7PUNflozqlGVw2P9Rs0dYQe1tmI
+         EMwQ==
+X-Gm-Message-State: AJcUukfCxjS5LyeY1MJhFYMJCgwVTiF0WpqAyPTcaK6ipdCPmQYbKhz9
+        GUvribXMTK8cwjp2kBu6doAoVA==
+X-Google-Smtp-Source: ALg8bN6CowxHpkkNIpODxH7NJrtVvE3nPa1U99lPJ5aXNzFn8k0Rs0Iq1W5OiqX7rgkE32J+NNWt/w==
+X-Received: by 2002:a24:e44:: with SMTP id 65mr4507849ite.154.1547064500166;
+        Wed, 09 Jan 2019 12:08:20 -0800 (PST)
 Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id b14sm19049544ioj.26.2019.01.09.12.07.32
+        by smtp.gmail.com with ESMTPSA id m45sm7938999iti.10.2019.01.09.12.08.18
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 09 Jan 2019 12:07:32 -0800 (PST)
-Subject: Re: [PATCH 05/16] Add io_uring IO interface
+        Wed, 09 Jan 2019 12:08:19 -0800 (PST)
+Subject: Re: [PATCH 11/16] io_uring: batch io_kiocb allocation
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
         linux-block@vger.kernel.org, linux-arch@vger.kernel.org,
         jmoyer@redhat.com, avi@scylladb.com
 References: <20190108165645.19311-1-axboe@kernel.dk>
- <20190108165645.19311-6-axboe@kernel.dk> <20190109121030.GA13779@lst.de>
- <1576557b-a65f-86eb-5fcc-00f332ec2dd5@kernel.dk>
- <20190109183059.GA21824@lst.de>
+ <20190108165645.19311-12-axboe@kernel.dk> <20190109121340.GD13779@lst.de>
+ <0a91dd38-69b8-84ab-f96a-225f09a54ec9@kernel.dk>
+ <20190109190321.GA22645@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <762caadb-1deb-19c4-705b-c11abd8c1abf@kernel.dk>
-Date:   Wed, 9 Jan 2019 13:07:31 -0700
+Message-ID: <68c5faf6-913b-e94f-ccf7-a1fe158091f7@kernel.dk>
+Date:   Wed, 9 Jan 2019 13:08:17 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20190109183059.GA21824@lst.de>
+In-Reply-To: <20190109190321.GA22645@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,34 +78,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/9/19 11:30 AM, Christoph Hellwig wrote:
-> On Wed, Jan 09, 2019 at 08:53:31AM -0700, Jens Axboe wrote:
->>>> +static int io_setup_rw(int rw, const struct io_uring_iocb *iocb,
->>>> +		       struct iovec **iovec, struct iov_iter *iter)
->>>> +{
->>>> +	void __user *buf = (void __user *)(uintptr_t)iocb->addr;
->>>> +	size_t ret;
->>>> +
->>>> +	ret = import_single_range(rw, buf, iocb->len, *iovec, iter);
->>>> +	*iovec = NULL;
->>>> +	return ret;
->>>> +}
+On 1/9/19 12:03 PM, Christoph Hellwig wrote:
+> On Wed, Jan 09, 2019 at 09:57:59AM -0700, Jens Axboe wrote:
+>> On 1/9/19 5:13 AM, Christoph Hellwig wrote:
+>>>> +	if (!state)
+>>>> +		req = kmem_cache_alloc(kiocb_cachep, GFP_KERNEL);
 >>>
->>> Is there any point in supporting non-vectored operations here?
+>>> Just return an error here if kmem_cache_alloc fails.
+>>>
+>>>> +	if (req)
+>>>> +		io_req_init(ctx, req);
+>>>
+>>> Because all the other ones can't reached this with a NULL req.
 >>
->> Not sure I follow?
+>> This is different in the current tree, since I properly fixed the
+>> ctx ref issue.
 > 
-> This version only supports non-vectored read and write, that is
-> the equivalent of pread/pwrite.  Many AIO users really need vectored
-> operations, that is preadv/pwritev semantics indirecting through
-> a struct iovec array.  The non-vectored version can be trivially
-> emulated using a vector of 1, which is what we do in the kernel
-> I/O stack everywhere.  So I think we should just support the vectored
-> version here, and not the non-vectored one.  See my io_uring branch
-> for the sketeched implementation.
+> Your tree does a percpu_ref_tryget very first, and then leaks that if
+> kmem_cache_alloc_bulk fails, and also is inconsistent for NULL vs
+> ERR_PTR returns.  I think you want something like this on top:
 
-OK, I see what you mean, so only supported the vectored version.
-Probably makes more sense, I'll make the change.
+I fixed it up while doing the rebase already. Just haven't pushed anything
+out until I've had a chance to run it through testing.
 
 -- 
 Jens Axboe
