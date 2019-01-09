@@ -2,90 +2,159 @@ Return-Path: <SRS0=RPGG=PR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B035FC43387
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 03:50:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CA43C43387
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 05:22:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 70AC0214C6
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 03:50:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="aa1tLiSU"
+	by mail.kernel.org (Postfix) with ESMTP id 6983420883
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 05:22:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1547011357;
+	bh=4+gpQWAzKL285mAFcSkebQtdYiJ07ZSZGgKxHBuSDx4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=1kXT2wTFGOIxcKPo+SOg2KJ7tLpmpYRfS6AOF6NBY+Be9dRWn813vB7GclH1rNpM+
+	 SKmVxWJnc+hTQSdmGdYFYLiw0vXJBmlaTEgSQjogt3tTW3vvQU0ix7Kf2yGmuep9q9
+	 2P4xg+z5yPqxWhr3Dpi75S5BoI2jiUxRLI96YPa0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728398AbfAIDuv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jan 2019 22:50:51 -0500
-Received: from mail-pf1-f174.google.com ([209.85.210.174]:42117 "EHLO
-        mail-pf1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727828AbfAIDuv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jan 2019 22:50:51 -0500
-Received: by mail-pf1-f174.google.com with SMTP id 64so2965281pfr.9
-        for <linux-block@vger.kernel.org>; Tue, 08 Jan 2019 19:50:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=4vn7CzcDB26W7TBlaGhppXhuR1mc3Gjd8NV0dhUXsRA=;
-        b=aa1tLiSU/eW1fXURSM+xgPR/Cfgx9FO7J89vaXFNXcnO02DYWQ1upYtczeRbqzEmkm
-         KVA8NKB9UkhlH0hBVu+KEuImLgmKnIoOHQ+ALtTNbx1wQR3G7HV3BkOrls366qV6nROv
-         uwErT+3WKd9XpPEzdDTTfoGetH9DLd+a0ZBza5jlgKtvGiVyO68A/z8uCHnZu+EvvCWH
-         t3uKVgYexKNYpoWuCRlz744rTSObZ1Uv3iCUuUeBJHDw1jU3b+D48JyGs5BUolbpMFnN
-         Gp7+WBbyjXN5ZLDDmea2s8Mu2b9bVMwPMgB3If7qt3e4J6IzvZe0TBh8piRAOkQztbma
-         WeFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4vn7CzcDB26W7TBlaGhppXhuR1mc3Gjd8NV0dhUXsRA=;
-        b=fxPoWd/0p4xMRQc3j/WYr+EqY4rZ6RyUBwoI6lcKqaGMpJLdme0PswfMLGEUwNkeCy
-         gNWTdekqWLlQHIRUhbPbELzy7ib36kmJErWMMUboHWpyK+Z/XFyUpeZaqZR/vcVedlAm
-         CMSIpMZPQtUanE2Zt8i6R+7O7o2kGoP+ASiTm6i72UdYEGAKfjviKWHOutfTp/jXpkkD
-         +VjUec9LxypOMybdyrNPMfGAtMd9Qns8gFujAGTYbsgxtix+KM45VIPgp9H6/Z6h9+0x
-         CxdhCqlXskP+zEJ8uPrk1H47A0Uu0A/AWs3KrJI2rqJYtOdWGQ9X770usP2ZH5d3+Trv
-         wu3g==
-X-Gm-Message-State: AJcUukc5yiuTzf6HXE5vPPt8Fh4nItFWsU13roKEdC4iIWT+ucCtI2DY
-        wRpjWRsXKf7idBKUv8QKSOsoKjWZ/WfSfA==
-X-Google-Smtp-Source: ALg8bN5my4qt/qz+LSttqk0rRRoYUtFwaRbQlQzKSemhgxS7Ub5JrpRv+0Aba4NUKv2qBp0BFFfrXw==
-X-Received: by 2002:a62:6e07:: with SMTP id j7mr4492667pfc.135.1547005850220;
-        Tue, 08 Jan 2019 19:50:50 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id g185sm99231079pfc.174.2019.01.08.19.50.48
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 08 Jan 2019 19:50:49 -0800 (PST)
-Subject: Re: [patch] block: clarify documentation for blk_{start|finish}_plug
-To:     Jeff Moyer <jmoyer@redhat.com>
-Cc:     "Darrick J. Wong" <darrick.wong@oracle.com>,
-        linux-block@vger.kernel.org
-References: <x49a7ka7qy9.fsf@segfault.boston.devel.redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <de3d3d0a-4d44-bb1b-133b-feabb281e467@kernel.dk>
-Date:   Tue, 8 Jan 2019 20:50:47 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1729209AbfAIFWg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Jan 2019 00:22:36 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60174 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729132AbfAIFWg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 9 Jan 2019 00:22:36 -0500
+Received: from localhost (unknown [104.132.1.85])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8548620883;
+        Wed,  9 Jan 2019 05:22:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1547011355;
+        bh=4+gpQWAzKL285mAFcSkebQtdYiJ07ZSZGgKxHBuSDx4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=gTxtz3mWApTaR0ATun8FzKXnOli/6jt7rw6jRIZp5HQeupr3SFF9nNWwYHkA3ISr0
+         S03J5SpJQx9P/mGAS2+dXOZrA6J5WtwDqwPCgrYZN59V8R0PLsCQmDbax6Pg3lehFd
+         JxjPhfgPDLk3Z7scjOUsfboZecstqQyCi2NIbyPI=
+Date:   Tue, 8 Jan 2019 21:22:34 -0800
+From:   Jaegeuk Kim <jaegeuk@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v3] loop: drop caches if offset or block_size are changed
+Message-ID: <20190109052234.GA81011@jaegeuk-macbookpro.roam.corp.google.com>
+References: <20181214203223.7063-1-jaegeuk@kernel.org>
+ <20181217194236.GA50659@jaegeuk-macbookpro.roam.corp.google.com>
+ <29369548-df14-a5a7-2bee-a40b3479df68@kernel.dk>
+ <20181218224139.GB31062@jaegeuk-macbookpro.roam.corp.google.com>
 MIME-Version: 1.0
-In-Reply-To: <x49a7ka7qy9.fsf@segfault.boston.devel.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181218224139.GB31062@jaegeuk-macbookpro.roam.corp.google.com>
+User-Agent: Mutt/1.8.2 (2017-04-18)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/8/19 2:57 PM, Jeff Moyer wrote:
-> There was some confusion about what these functions did.  Make it clear
-> that this is a hint for upper layers to pass to the block layer, and
-> that it does not guarantee that I/O will not be submitted between a
-> start and finish plug.
+Hi Jens,
 
-Thanks Jeff, that's definitely an improvement, I like how it's phrased
-as intent, there are no guarantees and we can change things down the
-line as well (the auto-unplug threshold is a good example of that).
+May I ask whether this patch is acceptable?
 
-Applied for 5.0.
+Thanks,
 
--- 
-Jens Axboe
-
+On 12/18, Jaegeuk Kim wrote:
+> If we don't drop caches used in old offset or block_size, we can get old data
+> from new offset/block_size, which gives unexpected data to user.
+> 
+> For example, Martijn found a loopback bug in the below scenario.
+> 1) LOOP_SET_FD loads first two pages on loop file
+> 2) LOOP_SET_STATUS64 changes the offset on the loop file
+> 3) mount is failed due to the cached pages having wrong superblock
+> 
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: linux-block@vger.kernel.org
+> Reported-by: Martijn Coenen <maco@google.com>
+> Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
+> ---
+> v2 -> v3:
+>  - avoid to submit IOs on frozen mq
+> 
+> Jens, how about this?
+> 
+> Thanks,
+> 
+>  drivers/block/loop.c | 29 +++++++++++++++++++++++++++--
+>  1 file changed, 27 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index cb0cc8685076..6b03121d62aa 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1126,6 +1126,12 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>  	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE)
+>  		return -EINVAL;
+>  
+> +	if (lo->lo_offset != info->lo_offset ||
+> +	    lo->lo_sizelimit != info->lo_sizelimit) {
+> +		sync_blockdev(lo->lo_device);
+> +		kill_bdev(lo->lo_device);
+> +	}
+> +
+>  	/* I/O need to be drained during transfer transition */
+>  	blk_mq_freeze_queue(lo->lo_queue);
+>  
+> @@ -1154,6 +1160,11 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+>  
+>  	if (lo->lo_offset != info->lo_offset ||
+>  	    lo->lo_sizelimit != info->lo_sizelimit) {
+> +		/* kill_bdev should have truncated all the pages */
+> +		if (lo->lo_device->bd_inode->i_mapping->nrpages) {
+> +			err = -EAGAIN;
+> +			goto exit;
+> +		}
+>  		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
+>  			err = -EFBIG;
+>  			goto exit;
+> @@ -1375,22 +1386,36 @@ static int loop_set_dio(struct loop_device *lo, unsigned long arg)
+>  
+>  static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
+>  {
+> +	int err = 0;
+> +
+>  	if (lo->lo_state != Lo_bound)
+>  		return -ENXIO;
+>  
+>  	if (arg < 512 || arg > PAGE_SIZE || !is_power_of_2(arg))
+>  		return -EINVAL;
+>  
+> +	if (lo->lo_queue->limits.logical_block_size != arg) {
+> +		sync_blockdev(lo->lo_device);
+> +		kill_bdev(lo->lo_device);
+> +	}
+> +
+>  	blk_mq_freeze_queue(lo->lo_queue);
+>  
+> +	/* kill_bdev should have truncated all the pages */
+> +	if (lo->lo_queue->limits.logical_block_size != arg &&
+> +			lo->lo_device->bd_inode->i_mapping->nrpages) {
+> +		err = -EAGAIN;
+> +		goto out;
+> +	}
+> +
+>  	blk_queue_logical_block_size(lo->lo_queue, arg);
+>  	blk_queue_physical_block_size(lo->lo_queue, arg);
+>  	blk_queue_io_min(lo->lo_queue, arg);
+>  	loop_update_dio(lo);
+> -
+> +out:
+>  	blk_mq_unfreeze_queue(lo->lo_queue);
+>  
+> -	return 0;
+> +	return err;
+>  }
+>  
+>  static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+> -- 
+> 2.19.0.605.g01d371f741-goog
