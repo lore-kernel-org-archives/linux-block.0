@@ -2,121 +2,153 @@ Return-Path: <SRS0=RPGG=PR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 898DCC43387
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 00:57:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA53C43612
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 01:35:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5F5D820883
-	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 00:57:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00F9E20821
+	for <linux-block@archiver.kernel.org>; Wed,  9 Jan 2019 01:35:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="pAeBrDzX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728559AbfAIA5n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Jan 2019 19:57:43 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:34720 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727829AbfAIA5n (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jan 2019 19:57:43 -0500
-Received: by mail-pg1-f194.google.com with SMTP id j10so2520642pga.1
-        for <linux-block@vger.kernel.org>; Tue, 08 Jan 2019 16:57:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=iN7r0ygJFbaIpQCveVVdIXEWuuY14muYD6sH3JURit0=;
-        b=ObpmScuepEuhrp4LI9axHiWFb65LW3MnwajnzmdGCK4U4hhFQAkkfgkd72pLJ98Nf0
-         LPLiXXgNjkDFiC65c5mwI65HBlpCDLvJCknphUBmOrQbWR0Bea0nFIRMWERijtc9ZFIT
-         Dj1zY/lu5Pd1N18FrHyFs4yRuyZyfz9MML5bExGyJ8stWnLZmt0+RpfuSL9jtlrBsnot
-         Q3y9n8SBIooB60UdhrnTPfeU+2K1EQUsBUozOIoizVkTK7Mlv5/AkAMPl3i3YX1IUu7/
-         zlTzZ1t5BOvr/q9pqZuRbnBadco4KY3FmD28Y6A75p6U9R6tFMKjOoybK/x3ACzd7U1o
-         kEvQ==
-X-Gm-Message-State: AJcUukcvKt9YFDPx+yzP0SBvPx1Qmvr1G9JKk8UYeZz15HaUUXNfsMzE
-        1IVOjaR0ccx25P1rXZjdvxheG1CQGTo=
-X-Google-Smtp-Source: ALg8bN4FNORYqe5JnOu/m8TjGcmLvkubayC1CznVAuqVgr9Hs3C1vIefbV2Uq0giL+7FutcbZ+Gpww==
-X-Received: by 2002:a62:5444:: with SMTP id i65mr4029167pfb.193.1546995462169;
-        Tue, 08 Jan 2019 16:57:42 -0800 (PST)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id a15sm99236376pgb.1.2019.01.08.16.57.41
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 08 Jan 2019 16:57:41 -0800 (PST)
-Message-ID: <1546995460.83374.37.camel@acm.org>
-Subject: Re: [PATCH] block: don't show io_timeout if driver has no timeout
- handler
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Weiping Zhang <zhangweiping@didiglobal.com>, axboe@kernel.dk
-Cc:     hch@infradead.org, linux-block@vger.kernel.org
-Date:   Tue, 08 Jan 2019 16:57:40 -0800
-In-Reply-To: <20190107125215.GA5039@192.168.3.9>
-References: <20190107125215.GA5039@192.168.3.9>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S1729100AbfAIBfr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Jan 2019 20:35:47 -0500
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:43884 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729067AbfAIBfr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Jan 2019 20:35:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1546997747; x=1578533747;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=lvHoK0wXxKr7f9x0T4q8uIseuWD7SsbjITwmY5GYfWQ=;
+  b=pAeBrDzXQesQZj7s+r8/5qMs8lONfeOh8mA3/gBMYtjr9Cj8mEKcZ+fB
+   PjEPa8NL6UQMQKVQKYh+S79Re5GOsIouI89yumW6aYNZCAVmgXxf/i3hh
+   A9RMwepdByp6Pks79O6V90511nwjbrTbqjcmUELXOSCeANN0rC8IgeEoe
+   kmnghIkcRrMPIypjQhMbg8xG9zom9GR/68NGv4KP7L8BoJZ+GWdh0RJIg
+   sk1tytWC3H9b42RXntpQdm5oXnLJdsQwYsXfwZ2npTz3MUkSExj/8EF1u
+   RZ7KKbDi3ZWQcaDo4R06fz9X75Vw3wKBp/QbCpnte+xSZkRvRbfp8oyjz
+   g==;
+X-IronPort-AV: E=Sophos;i="5.56,455,1539619200"; 
+   d="scan'208";a="100066841"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 09 Jan 2019 09:35:47 +0800
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP; 08 Jan 2019 17:15:47 -0800
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip01.wdc.com with ESMTP; 08 Jan 2019 17:35:44 -0800
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Masato Suzuki <masato.suzuki@wdc.com>,
+        Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@kernel.dk>,
+        Matias Bjorling <matias.bjorling@wdc.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Mike Snitzer <snitzer@redhat.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH blktests 00/14] Implement zoned block device support
+Date:   Wed,  9 Jan 2019 10:35:28 +0900
+Message-Id: <20190109013542.23686-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2019-01-07 at 20:52 +-0800, Weiping Zhang wrote:
-+AD4 If the low level driver has no timerout handler, the
-                                 +AF4AXgBeAF4AXgBeAF4AXg
-                                 timeout?
+The current blktests infrastucture and test cases do not support zoned block
+devices and no specific test cases exist to test these block devices special
+features (zone report and reset, sequential write constraint). This patch series
+implement this missing support.
 
-+AD4 +-static umode+AF8-t queue+AF8-attr+AF8-visible(struct kobject +ACo-kobj, struct attribute +ACo-attr,
-+AD4 +-				int n)
-+AD4 +-+AHs
-+AD4 +-	struct request+AF8-queue +ACo-q +AD0
-+AD4 +-		container+AF8-of(kobj, struct request+AF8-queue, kobj)+ADs
-+AD4 +-
-+AD4 +-	if (attr +AD0APQ +ACY-queue+AF8-io+AF8-timeout+AF8-entry.attr) +AHs
-+AD4 +-		if (+ACE-q-+AD4-mq+AF8-ops +AHwAfA +ACE-q-+AD4-mq+AF8-ops-+AD4-timeout)
-+AD4 +-			return 0+ADs
-+AD4 +-	+AH0
+The series addresses two aspects: the first 6 patches introduce changes to the
+common scripts and configuration are introduced to allow existing test cases to
+run against a null_blk device with zone mode enabled (new ZONED config variable)
+or for these test cases to be skipped if a test declare itself as not zoned
+compliant. Helper functions are introduced to facilitate checking a device
+zone model.
 
-Are there any legacy block drivers left? Do we really need the mq+AF8-ops test?
+The second part, composed of the last 8 patches, introduce the new zbd test
+group to cover zoned block device specific test cases. All these test cases are
+implemented using the test_device() function so that target devices can be
+specified in the TEST_DEVS config variable, to cover a variety of zoned block
+devices: physical real drives, partitions and dm-linear setups on top of zoned
+block devices, etc. Furthermore, using the infrastructure changes of the first
+part, the TEST_DEVS definition can be left empty, resulting in the zbd test
+cases to be run against an automatically created null_blk device with zoned
+mode enabled.
 
-Additionally, please combine the two nested if-statements into a single
-if-statement.
+5 test cases are added to the new zbd test group to check the kernel ioctl and
+sysfs interface, zone report operation, zone reset and write command handling.
+These tests are simple but only a start. We will in the future send more test
+cases to cover at least the regressions and bugs found and fixed in the zoned
+block device code since its introduction with kernel 4.10.
 
-+AD4 +AEAAQA -942,6 +-961,14 +AEAAQA int blk+AF8-register+AF8-queue(struct gendisk +ACo-disk)
-+AD4  		goto unlock+ADs
-+AD4  	+AH0
-+AD4  
-+AD4 +-	ret +AD0 sysfs+AF8-create+AF8-group(+ACY-q-+AD4-kobj, +ACY-queue+AF8-attr+AF8-group)+ADs
-+AD4 +-	if (ret) +AHs
-+AD4 +-		kobject+AF8-del(+ACY-q-+AD4-kobj)+ADs
-+AD4 +-		blk+AF8-trace+AF8-remove+AF8-sysfs(dev)+ADs
-+AD4 +-		kobject+AF8-put(+ACY-dev-+AD4-kobj)+ADs
-+AD4 +-		goto unlock+ADs
-+AD4 +-	+AH0
+Another still to be added part is support for host-managed ZBC emulation in
+scsi-debug to further improve test coverage without requiring a physical SMR
+disk. This work is ongoing and will be added to blktests once the relevant
+scsi-debug changes are accepted in the kernel.
 
-Are you sure the +ACI-goto unlock+ACI is OK here? Shouldn't kobject+AF8-del() be called
-to undo the kobject+AF8-add() call if sysfs+AF8-create+AF8-group() fails?
+Masato Suzuki (6):
+  tests: Introduce zbd test group
+  zbd/001: sysfs and ioctl consistency test
+  zbd/002: report zone test
+  zbd/003: Test sequential zones reset
+  zbd/004: Check write split accross sequential zones
+  zbd/005: Test write ordering
 
-+AD4  	if (queue+AF8-is+AF8-mq(q)) +AHs
-+AD4  		+AF8AXw-blk+AF8-mq+AF8-register+AF8-dev(dev, q)+ADs
-+AD4  		blk+AF8-mq+AF8-debugfs+AF8-register(q)+ADs
-+AD4 +AEAAQA -958,6 +-985,7 +AEAAQA int blk+AF8-register+AF8-queue(struct gendisk +ACo-disk)
-+AD4  		if (ret) +AHs
-+AD4  			mutex+AF8-unlock(+ACY-q-+AD4-sysfs+AF8-lock)+ADs
-+AD4  			kobject+AF8-uevent(+ACY-q-+AD4-kobj, KOBJ+AF8-REMOVE)+ADs
-+AD4 +-			sysfs+AF8-remove+AF8-group(+ACY-q-+AD4-kobj, +ACY-queue+AF8-attr+AF8-group)+ADs
-+AD4  			kobject+AF8-del(+ACY-q-+AD4-kobj)+ADs
-+AD4  			blk+AF8-trace+AF8-remove+AF8-sysfs(dev)+ADs
-+AD4  			kobject+AF8-put(+ACY-dev-+AD4-kobj)+ADs
-+AD4 +AEAAQA -1006,6 +-1034,7 +AEAAQA void blk+AF8-unregister+AF8-queue(struct gendisk +ACo-disk)
-+AD4  		blk+AF8-mq+AF8-unregister+AF8-dev(disk+AF8-to+AF8-dev(disk), q)+ADs
-+AD4  	mutex+AF8-unlock(+ACY-q-+AD4-sysfs+AF8-lock)+ADs
-+AD4  
-+AD4 +-	sysfs+AF8-remove+AF8-group(+ACY-q-+AD4-kobj, +ACY-queue+AF8-attr+AF8-group)+ADs
-+AD4  	kobject+AF8-uevent(+ACY-q-+AD4-kobj, KOBJ+AF8-REMOVE)+ADs
-+AD4  	kobject+AF8-del(+ACY-q-+AD4-kobj)+ADs
-+AD4  	blk+AF8-trace+AF8-remove+AF8-sysfs(disk+AF8-to+AF8-dev(disk))+ADs
+Shin'ichiro Kawasaki (8):
+  config: Introduce ZONED variable
+  common: Introduce _test_dev_is_zoned() helper function
+  common: Move set_scheduler() function from multipath-over-rdma to rc
+  block/004: Adjust fio conditions for zoned block device
+  block/013: Skip for zoned block devices
+  block/018,024: Skip when ZONED is set
+  check: Introduce group_exit() function
+  src: Introduce zbdioctl program
 
-Is it necessary to call sysfs+AF8-remove+AF8-group() explicitly? Isn't this something
-kobject+AF8-del() does automatically?
+ Documentation/running-tests.md |  11 ++
+ check                          |   6 +
+ common/multipath-over-rdma     |  24 ----
+ common/null_blk                |  23 ++-
+ common/rc                      |  33 +++++
+ src/.gitignore                 |   1 +
+ src/Makefile                   |   3 +-
+ src/zbdioctl.c                 |  83 +++++++++++
+ tests/block/004                |  12 +-
+ tests/block/013                |   8 ++
+ tests/block/018                |   2 +-
+ tests/block/024                |   2 +-
+ tests/zbd/001                  |  66 +++++++++
+ tests/zbd/001.out              |   2 +
+ tests/zbd/002                  |  99 +++++++++++++
+ tests/zbd/002.out              |   2 +
+ tests/zbd/003                  |  69 +++++++++
+ tests/zbd/003.out              |   2 +
+ tests/zbd/004                  |  81 +++++++++++
+ tests/zbd/004.out              |   2 +
+ tests/zbd/005                  |  57 ++++++++
+ tests/zbd/005.out              |   2 +
+ tests/zbd/rc                   | 250 +++++++++++++++++++++++++++++++++
+ 23 files changed, 811 insertions(+), 29 deletions(-)
+ create mode 100644 src/zbdioctl.c
+ create mode 100755 tests/zbd/001
+ create mode 100644 tests/zbd/001.out
+ create mode 100755 tests/zbd/002
+ create mode 100644 tests/zbd/002.out
+ create mode 100755 tests/zbd/003
+ create mode 100644 tests/zbd/003.out
+ create mode 100755 tests/zbd/004
+ create mode 100644 tests/zbd/004.out
+ create mode 100755 tests/zbd/005
+ create mode 100644 tests/zbd/005.out
+ create mode 100644 tests/zbd/rc
 
-Thanks,
-
-Bart.
+-- 
+2.20.1
 
