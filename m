@@ -2,157 +2,131 @@ Return-Path: <SRS0=tdSH=PS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB5C2C43387
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 16:05:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A217C43387
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 17:02:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8656F214C6
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 16:05:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C95AC20685
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 17:02:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="BWeUz19l"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mx3G+nBq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726242AbfAJQF1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jan 2019 11:05:27 -0500
-Received: from mail-io1-f65.google.com ([209.85.166.65]:33876 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726560AbfAJQF0 (ORCPT
+        id S1728435AbfAJRC3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jan 2019 12:02:29 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:49128 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727836AbfAJRC2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jan 2019 11:05:26 -0500
-Received: by mail-io1-f65.google.com with SMTP id b16so9366820ior.1
-        for <linux-block@vger.kernel.org>; Thu, 10 Jan 2019 08:05:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=oGZRRg/XQME9zVWTx4BFpLvvTae7/ugtnBZ/uVbwmvk=;
-        b=BWeUz19lVXyDeQgGycJ+FPqMU/w0owO5CAygVx3ULnd1/E1G9ZG5+Fml9mw1ptGcn0
-         tw2BroruMK8YHcx4jeWcTUxTI0IQ9QYVUqjK7JNhdFjIZ7buR7/5CT97SqGrUtWLMzyI
-         Th3jUhQzEqfJkA1lSJnph+3aPBG4qOvily5DK4HzYbLLxifZxT/9zUUCY3Gtv3b5rbiZ
-         BGXW8lgMh0etPmDvu5LFkbQcq7RXIwgxpN4Cgno8dXts+F9xlnI+iSGlSZzw3M0XMLlc
-         E6G4pILw4rYbl7K99iTGx3bofMU8FGyd7NfRGopj+hu/kZc2P2D9QGe/UPMKdc9GZHJJ
-         zQAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=oGZRRg/XQME9zVWTx4BFpLvvTae7/ugtnBZ/uVbwmvk=;
-        b=gP38oFyWqvt42SH/xxqORPU4IGEEvKS6LPMPNLjcdoDIuhUyUysaRBnzBc2JYYvheh
-         Nm31pr4GYUGRSgfFKdtEHMXxln3rJtuV8JdevLB7u+ATZwHAbaaCMUh2cDwKDARzf0Xc
-         GtKA0jpL4G/CpBwq2rfsBBTq4zjBFMn911/r6jeFbNVKJAMAHIKjdbUoQyzu5KzW/39w
-         J/QRZihtfPzoF66YWrGAwVzKdFLXxLtDPDlJxRHBOWaKYUo4otrq/CfXZWE7POju0554
-         kuFTn5HdHFIAIl1zSukJ7YdbOn31Ar7T86DCu8E+IxnMLML5qwx7ca7PpTbVJqW3hrVJ
-         kqfA==
-X-Gm-Message-State: AJcUukdv68Jy6wZgumL3JGkTR90S2SesQrHXHEWO7Lq9/kGLvaE/J69L
-        gxs0Bs+VMBv2cAczjpxbwVAAmA==
-X-Google-Smtp-Source: ALg8bN6zzv2BAk/c4vlc6hZQVOYeBFlysRpC15KFuV5XM2aDhBlWsfIse+ynGsiigyui7dcSHnCoWg==
-X-Received: by 2002:a6b:b90a:: with SMTP id j10mr6842369iof.172.1547136325586;
-        Thu, 10 Jan 2019 08:05:25 -0800 (PST)
-Received: from [192.168.1.56] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id f10sm9745279itf.41.2019.01.10.08.05.23
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 10 Jan 2019 08:05:24 -0800 (PST)
-Subject: Re: [PATCH 03/16] block: add bio_set_polled() helper
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
-        linux-block@vger.kernel.org, linux-arch@vger.kernel.org,
-        hch@lst.de, jmoyer@redhat.com, avi@scylladb.com
-References: <20190108165645.19311-1-axboe@kernel.dk>
- <20190108165645.19311-4-axboe@kernel.dk> <20190110094355.GA13512@ming.t460p>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <f1a6ae88-1436-e947-1124-41e10b3ea9bc@kernel.dk>
-Date:   Thu, 10 Jan 2019 09:05:23 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Thu, 10 Jan 2019 12:02:28 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0AGxTLh179520;
+        Thu, 10 Jan 2019 17:02:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=jnCKMZoBc1lLvLQ8sW1g6t1cZ7Wd/SFilvKOlPJEmag=;
+ b=mx3G+nBqOr0JDGW/7kptr3FQzgsNCuSesb4LdwjoI1v2B9t/McMmpbCpCt10UjhBp9+h
+ 0Gh4bQp68MQElFuBqfRKlooy1a/B6c+Q5I+z9LTjDxRAsfnS5XPVcDwehl2+v1zvmhMU
+ OsuDzRdLeopTkrmOVogRdntuo/KbWeng7ZLoKDHyHq2cFVHhMyL3NxbLeIiFqVCn20vZ
+ 3i5uQmJXaBfhi/NKc4sesipxHAx/4o+rQG8S0BQj0b9MXWgrcMIMS/XxkL0VIxgOtCao
+ mnZOKpkZzs+juVmhixXF+1bg1IyE36uiXl+fxVGFO2n8JpcKeTBBxnRFMkuBEWRArcjv GQ== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by aserp2130.oracle.com with ESMTP id 2ptj3e8nad-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 10 Jan 2019 17:02:09 +0000
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x0AH28OL029311
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 10 Jan 2019 17:02:08 GMT
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x0AH27jl002612;
+        Thu, 10 Jan 2019 17:02:07 GMT
+Received: from char.us.oracle.com (/10.152.32.25)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 10 Jan 2019 09:02:07 -0800
+Received: by char.us.oracle.com (Postfix, from userid 1000)
+        id B9DC56A0126; Thu, 10 Jan 2019 12:02:05 -0500 (EST)
+Date:   Thu, 10 Jan 2019 12:02:05 -0500
+From:   Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, jfehlig@suse.com,
+        jon.grimm@amd.com, brijesh.singh@amd.com, hch@lst.de,
+        Joerg Roedel <jroedel@suse.de>
+Subject: Re: [PATCH 1/3] swiotlb: Export maximum allocation size
+Message-ID: <20190110170205.GB27546@char.us.oracle.com>
+References: <20190110134433.15672-1-joro@8bytes.org>
+ <20190110134433.15672-2-joro@8bytes.org>
 MIME-Version: 1.0
-In-Reply-To: <20190110094355.GA13512@ming.t460p>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190110134433.15672-2-joro@8bytes.org>
+User-Agent: Mutt/1.8.3 (2017-05-23)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9131 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1901100133
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/10/19 2:43 AM, Ming Lei wrote:
-> On Tue, Jan 08, 2019 at 09:56:32AM -0700, Jens Axboe wrote:
->> For the upcoming async polled IO, we can't sleep allocating requests.
->> If we do, then we introduce a deadlock where the submitter already
->> has async polled IO in-flight, but can't wait for them to complete
->> since polled requests must be active found and reaped.
->>
->> Utilize the helper in the blockdev DIRECT_IO code.
->>
->> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->> ---
->>  fs/block_dev.c      |  4 ++--
->>  include/linux/bio.h | 14 ++++++++++++++
->>  2 files changed, 16 insertions(+), 2 deletions(-)
->>
->> diff --git a/fs/block_dev.c b/fs/block_dev.c
->> index 5415579f3e14..2ebd2a0d7789 100644
->> --- a/fs/block_dev.c
->> +++ b/fs/block_dev.c
->> @@ -233,7 +233,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
->>  		task_io_account_write(ret);
->>  	}
->>  	if (iocb->ki_flags & IOCB_HIPRI)
->> -		bio.bi_opf |= REQ_HIPRI;
->> +		bio_set_polled(&bio, iocb);
->>  
->>  	qc = submit_bio(&bio);
->>  	for (;;) {
->> @@ -401,7 +401,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
->>  		nr_pages = iov_iter_npages(iter, BIO_MAX_PAGES);
->>  		if (!nr_pages) {
->>  			if (iocb->ki_flags & IOCB_HIPRI)
->> -				bio->bi_opf |= REQ_HIPRI;
->> +				bio_set_polled(bio, iocb);
->>  
->>  			qc = submit_bio(bio);
->>  			WRITE_ONCE(iocb->ki_cookie, qc);
->> diff --git a/include/linux/bio.h b/include/linux/bio.h
->> index 7380b094dcca..f6f0a2b3cbc8 100644
->> --- a/include/linux/bio.h
->> +++ b/include/linux/bio.h
->> @@ -823,5 +823,19 @@ static inline int bio_integrity_add_page(struct bio *bio, struct page *page,
->>  
->>  #endif /* CONFIG_BLK_DEV_INTEGRITY */
->>  
->> +/*
->> + * Mark a bio as polled. Note that for async polled IO, the caller must
->> + * expect -EWOULDBLOCK if we cannot allocate a request (or other resources).
->> + * We cannot block waiting for requests on polled IO, as those completions
->> + * must be found by the caller. This is different than IRQ driven IO, where
->> + * it's safe to wait for IO to complete.
->> + */
->> +static inline void bio_set_polled(struct bio *bio, struct kiocb *kiocb)
->> +{
->> +	bio->bi_opf |= REQ_HIPRI;
->> +	if (!is_sync_kiocb(kiocb))
->> +		bio->bi_opf |= REQ_NOWAIT;
->> +}
->> +
+On Thu, Jan 10, 2019 at 02:44:31PM +0100, Joerg Roedel wrote:
+> From: Joerg Roedel <jroedel@suse.de>
 > 
-> REQ_NOWAIT doesn't cover allocating split bio, is that a issue?
+> The SWIOTLB implementation has a maximum size it can
+> allocate dma-handles for. This needs to be exported so that
+> device drivers don't try to allocate larger chunks.
+> 
+> This is especially important for block device drivers like
+> virtio-blk, that might do DMA through SWIOTLB.
 
-Yes, that might be an issue. I'll look into what we should do about that,
-for now it's not a huge problem.
-
-> BTW, could you explain a bit about the deadlock in case of sleep from
-> request allocation?
-
-It's more a live lock I guess, but the issue is that with polled IO, we don't
-get an IRQ. For normal IO, if you run out, you can just sleep and wait for
-an IRQ to come in, trigger a completion (or multiple), which will then wake
-you up. For polled IO, you have to find those completions. Hence if you just
-go to sleep, nobody is going to find those completions for you. You'll then
-be waiting forever for an event, that will never trigger.
-
--- 
-Jens Axboe
-
+Why not use swiotlb_nr_tbl ? That is how drivers/gpu/drm use to figure if they
+need to limit the size of pages.
+> 
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  include/linux/swiotlb.h | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/include/linux/swiotlb.h b/include/linux/swiotlb.h
+> index 7c007ed7505f..0bcc80a97036 100644
+> --- a/include/linux/swiotlb.h
+> +++ b/include/linux/swiotlb.h
+> @@ -72,6 +72,11 @@ static inline bool is_swiotlb_buffer(phys_addr_t paddr)
+>  	return paddr >= io_tlb_start && paddr < io_tlb_end;
+>  }
+>  
+> +static inline size_t swiotlb_max_alloc_size(void)
+> +{
+> +	return ((1UL << IO_TLB_SHIFT) * IO_TLB_SEGSIZE);
+> +}
+> +
+>  bool swiotlb_map(struct device *dev, phys_addr_t *phys, dma_addr_t *dma_addr,
+>  		size_t size, enum dma_data_direction dir, unsigned long attrs);
+>  void __init swiotlb_exit(void);
+> @@ -95,6 +100,13 @@ static inline unsigned int swiotlb_max_segment(void)
+>  {
+>  	return 0;
+>  }
+> +
+> +static inline size_t swiotlb_max_alloc_size(void)
+> +{
+> +	/* There is no limit when SWIOTLB isn't used */
+> +	return ~0UL;
+> +}
+> +
+>  #endif /* CONFIG_SWIOTLB */
+>  
+>  extern void swiotlb_print_info(void);
+> -- 
+> 2.17.1
+> 
