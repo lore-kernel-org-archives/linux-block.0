@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C8A3C43387
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C94AFC43387
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3ED182173B
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9075D214DA
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="deUqitne"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="mzecDYNJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727929AbfAJJij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jan 2019 04:38:39 -0500
+        id S1727848AbfAJJio (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jan 2019 04:38:44 -0500
 Received: from esa6.hgst.iphmx.com ([216.71.154.45]:16282 "EHLO
         esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727848AbfAJJij (ORCPT
+        with ESMTP id S1727961AbfAJJio (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jan 2019 04:38:39 -0500
+        Thu, 10 Jan 2019 04:38:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1547113120; x=1578649120;
+  t=1547113124; x=1578649124;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=BZ1h5LjRdO7LTJ+9LXrgZ4Qm9QNctb7y8Q91viicv7E=;
-  b=deUqitneCq9zaiRks2rk21o6JcJQLSeyvU0utYFkB9lz5eYLplNarHfZ
-   BF8fC/9y2g2mzPpdZ2h5oedHRo5jEb0LIWU0zZmn1uGTXnauIRJlEDTZR
-   KE5VPOYz915Xakq18Q9NaMr2BD6Qrg9vtb4Yd9wYJ006kOQZIUlB0rtgX
-   EeCEpEZ2S92sxbX2o64PbN9McTzucogowFaODIlqYIgBsTFflGo2kPvLC
-   pT6mGUsQVFNxnMf4WFdeYM3FfTbvo0kPtpz8s1MuXbIOkyNK00VESAIlF
-   nadXMZ+Dat2gcsbuyKTT5ods3oOE5pKf6EIDEIt7gprHxa7eqpBxHE9ds
-   g==;
+  bh=KttUW25DXSCzueklgKuVjkva9JoW+uEw7MOvlYCeB/E=;
+  b=mzecDYNJSQ9mLdiG4obkcLfAvZP2QLxlfQCcdY4Zq1qj79OLWV0Lo9rf
+   8rUVIsz0zHpPUispUMDOJ2G+0zeCXemXFQFdbJPnm5jxwOSFDQQfkURem
+   ioHA5XnGR9D+jAQEu4yXqq8PVNUoy9aN0Ez9gnmHXALEyzItoC36ERFdq
+   DQNdFr1IthPKWpd3to8j4wmxOOJLVvxC1MFd+KQr7BGo0v7+B2Z5Yb6uk
+   /Lpf7n7/1i8HxwP/F9w+07yNvGXkXlANKgiAi+v2E1tWe3FvPx5xf+hIu
+   M4NikHPxl5nJ3HS/B58bAFbzt+lm0HxVumXbQhIuaZf/e5H78dLvO0REe
+   w==;
 X-IronPort-AV: E=Sophos;i="5.56,460,1539619200"; 
-   d="scan'208";a="100223381"
+   d="scan'208";a="100223386"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2019 17:38:40 +0800
+  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2019 17:38:44 +0800
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP; 10 Jan 2019 01:20:10 -0800
+  by uls-op-cesaep02.wdc.com with ESMTP; 10 Jan 2019 01:20:14 -0800
 Received: from shin_dev.dhcp.fujisawa.hgst.com (HELO shin_dev.fujisawa.hgst.com) ([10.149.52.166])
-  by uls-op-cesaip01.wdc.com with ESMTP; 10 Jan 2019 01:38:36 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 10 Jan 2019 01:38:40 -0800
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Masato Suzuki <masato.suzuki@wdc.com>,
@@ -53,9 +53,9 @@ Cc:     Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@kernel.dk>,
         Mike Snitzer <snitzer@redhat.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: [PATCH blktests v2 15/16] zbd/004: Check write split accross sequential zones
-Date:   Thu, 10 Jan 2019 18:37:24 +0900
-Message-Id: <20190110093725.32675-16-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2 16/16] zbd/005: Test write ordering
+Date:   Thu, 10 Jan 2019 18:37:25 +0900
+Message-Id: <20190110093725.32675-17-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190110093725.32675-1-shinichiro.kawasaki@wdc.com>
 References: <20190110093725.32675-1-shinichiro.kawasaki@wdc.com>
@@ -68,112 +68,91 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Masato Suzuki <masato.suzuki@wdc.com>
 
-Check that write operations spanning a zone boundary are correctly
-processed as 2 different write operations each fully within a single
-zone.
+Run a high queue depth direct sequential write fio job to check that
+write requests are not being reordered when the deadline scheduler is
+used. This test allowed to catch a bug fixed with commit
+80e02039721 "block: mq-deadline: Fix write completion handling".
 
 Signed-off-by: Masato Suzuki <masato.suzuki@wdc.com>
 ---
- tests/zbd/004     | 81 +++++++++++++++++++++++++++++++++++++++++++++++
- tests/zbd/004.out |  2 ++
- 2 files changed, 83 insertions(+)
- create mode 100755 tests/zbd/004
- create mode 100644 tests/zbd/004.out
+ tests/zbd/005     | 59 +++++++++++++++++++++++++++++++++++++++++++++++
+ tests/zbd/005.out |  2 ++
+ 2 files changed, 61 insertions(+)
+ create mode 100755 tests/zbd/005
+ create mode 100644 tests/zbd/005.out
 
-diff --git a/tests/zbd/004 b/tests/zbd/004
+diff --git a/tests/zbd/005 b/tests/zbd/005
 new file mode 100755
-index 0000000..7d708f4
+index 0000000..5286a6d
 --- /dev/null
-+++ b/tests/zbd/004
-@@ -0,0 +1,81 @@
++++ b/tests/zbd/005
+@@ -0,0 +1,59 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-3.0+
 +# Copyright (C) 2018 Western Digital Corporation or its affiliates.
 +#
-+# Check kernel splits write operations across a zone border. Select two
-+# contiguous sequential write required zones and confirm write oprations
-+# across the two zones succeed.
++# Run a high queue depth direct sequential write fio job to check that
++# write requests are not being reordered when the deadline scheduler is
++# used. This test allowed to catch a bug fixed with commit 80e02039721
++# "block: mq-deadline: Fix write completion handling".
 +
 +. tests/zbd/rc
 +
-+DESCRIPTION="write split across sequential zones"
-+QUICK=1
++DESCRIPTION="write command ordering"
++TIMED=1
 +
-+_check_zone_cond() {
-+	local -i idx=${1}
-+	local -i cond=${2}
++requires() {
++	_have_fio_zbd_zonemode
++}
 +
-+	if [[ ${ZONE_CONDS[idx]} -ne ${cond} ]]; then
-+		echo -n "Zone ${idx} condition is not ${ZONE_COND_ARRAY[cond]} "
-+		echo "cond: ${ZONE_COND_ARRAY[ZONE_CONDS[idx]]}"
-+		return 1
-+	fi
++_find_first_sequential_zone() {
++	for ((idx =  NR_CONV_ZONES; idx < REPORTED_COUNT; idx++)); do
++		if [[ ${ZONE_TYPES[idx]} -eq ${ZONE_TYPE_SEQ_WRITE_REQUIRED} ]];
++		then
++			echo "${idx}"
++			return 0
++		fi
++	done
++	echo "Sequential write required zone not found"
++
++	return 1
 +}
 +
 +test_device() {
-+	local -i idx
-+	local -i phys_blk_size
-+	local -i phys_blk_sectors
++	local -i zone_idx
++	local -i offset
 +
 +	echo "Running ${TEST_NAME}"
 +
-+	# Get physical block size and sectors for dd.
 +	_get_sysfs_variable "${TEST_DEV}" || return $?
-+	phys_blk_size=${SYSFS_VARS[SV_PHYS_BLK_SIZE]}
-+	phys_blk_sectors=${SYSFS_VARS[SV_PHYS_BLK_SECTORS]}
++	_get_blkzone_report "${TEST_DEV}" || return $?
++
++	zone_idx=$(_find_first_sequential_zone) || return $?
++	offset=$((ZONE_STARTS[zone_idx] * 512))
++
++	blkzone reset -o "${ZONE_STARTS[zone_idx]}" "${TEST_DEV}"
++
++	set_scheduler "$(basename "$(readlink -f "${TEST_DEV}")")" \
++		      deadline || return $?
++
++	: "${TIMEOUT:=30}"
++	FIO_PERF_FIELDS=("write io" "write iops")
++	_fio_perf --filename="${TEST_DEV}" --name zbdwo --rw=write --direct=1 \
++		  --ioengine=libaio --iodepth=128 --bs=256k \
++		  --offset="${offset}"
++
++	_put_blkzone_report
 +	_put_sysfs_variable
-+
-+	# Find target sequential required zones and reset write pointers
-+	_get_blkzone_report "${TEST_DEV}" || return $?
-+	idx=$(_find_two_contiguous_seq_zones) || return $?
-+	_reset_zones "${TEST_DEV}" "${idx}" "2"
-+
-+	# Confirm the zones are initialized
-+	_put_blkzone_report
-+	_get_blkzone_report "${TEST_DEV}" || return $?
-+	_check_zone_cond "${idx}" "${ZONE_COND_EMPTY}" || return $?
-+	_check_zone_cond "$((idx+1))" "${ZONE_COND_EMPTY}" || return $?
-+
-+	# Fill first target zone, remaining a physical block to write
-+	if ! _dd "${TEST_DEV}" "write" "${ZONE_STARTS[idx]}" \
-+	     $((ZONE_LENGTHS[idx] - phys_blk_sectors)) ${phys_blk_size} ; then
-+		echo "Fill zone failed"
-+		return 1
-+	fi
-+
-+	# Write across the zone border as a single block write
-+	local -i start_sector=$((ZONE_STARTS[idx+1] - phys_blk_sectors))
-+	if ! _dd "${TEST_DEV}" "write" ${start_sector} \
-+	     $((phys_blk_sectors * 2)) $((phys_blk_size * 2)) ; then
-+		echo "Write across zone border failed"
-+		return 1
-+	fi
-+
-+	# Confirm the zone conditions are as expected
-+	_put_blkzone_report
-+	_get_blkzone_report "${TEST_DEV}" || return $?
-+	_check_zone_cond "${idx}" "${ZONE_COND_FULL}" || return $?
-+	_check_zone_cond "$((idx+1))" "${ZONE_COND_IMPLICIT_OPEN}" || return $?
-+	if [[ ${ZONE_WPTRS[idx+1]} -ne ${phys_blk_sectors} ]]; then
-+		echo -n "Unexpected write pointer for zone $((idx+1)) "
-+		echo "wp: ${ZONE_WPTRS[idx+1]}"
-+		return 1
-+	fi
-+
-+	# Clean up
-+	_reset_zones "${TEST_DEV}" "${idx}" "2"
-+	_put_blkzone_report
 +
 +	echo "Test complete"
 +}
-+
-diff --git a/tests/zbd/004.out b/tests/zbd/004.out
+diff --git a/tests/zbd/005.out b/tests/zbd/005.out
 new file mode 100644
-index 0000000..dd4ea94
+index 0000000..3ff78c6
 --- /dev/null
-+++ b/tests/zbd/004.out
++++ b/tests/zbd/005.out
 @@ -0,0 +1,2 @@
-+Running zbd/004
++Running zbd/005
 +Test complete
 -- 
 2.20.1
