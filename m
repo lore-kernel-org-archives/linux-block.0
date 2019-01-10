@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE315C43387
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 708F7C43387
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BEB4A214DA
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 403DF214DA
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="SgVFKLT1"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="qd8yquOE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727915AbfAJJic (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jan 2019 04:38:32 -0500
+        id S1727934AbfAJJif (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jan 2019 04:38:35 -0500
 Received: from esa6.hgst.iphmx.com ([216.71.154.45]:16282 "EHLO
         esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727848AbfAJJic (ORCPT
+        with ESMTP id S1727848AbfAJJif (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jan 2019 04:38:32 -0500
+        Thu, 10 Jan 2019 04:38:35 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1547113112; x=1578649112;
+  t=1547113116; x=1578649116;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=OBGBtYmwjJ8wWnNKjXnkEfAyt68CuDq6gtWu3cK56ow=;
-  b=SgVFKLT1BLks3RucYZ4Ea3JPEdC5cdTNE7gfKkwsHhc3Lc3v4jdAgR0b
-   zPaKFA69mwmfE4xk1iGvKIkaN3MtkO3n0fXFx16l609cj0VGjDpSt+5KJ
-   GMn0iTHSuSI/SEr6x218O9G88oFCzqPlMbG1UpnUmxs+Nu44wDOZSlPyy
-   DwXrX9zkOG1MsOF7zNFznb4g6KPeSlVebP0wSUjt50qPO6dyTO9CaI2Gz
-   +vdBit4R8GDrOOAUvrWLwH/56F9q+iabby2DLdfmWcbwk5p04v0kWSK9N
-   zV8XLt7xl9XekND3fUplEevUo2QhvHHFPpydSnsjTw2DMnkWGFusZXivx
-   w==;
+  bh=FRStSmA3z7y5GT4HO7DZcFbbF37eLE/fboNsTo5oOSo=;
+  b=qd8yquOEj35SufcEWkfXLYoC/8AaALr5Hmys573gu3yL2LJO0QouJ6Cc
+   fMKeu4b+rROfIFkPb7TGmY57vli52URZxlk1hzRwOzJ0/34xTUSO6cmjH
+   YvCeT1Y2CXBoYlXjWsiF7ZJ0WVt5MvMMlMew+6DnCQjZxte6FBxsJi+7G
+   k55dDWZSmIZBkXISyl60nxHyyk9RTfHyw34kjyVd2R3tMMJzHjNWCuD0/
+   pLaTEptu7rJKpHX8UnvKS75+5XEop9P5To9J2Y16peEfiQjVSNYEmtyiB
+   mGB9OHBIwp9oqetqjLYWILwbQZHPsmKtOgPBtJ8i4drYzEcZCjQdwlW6h
+   A==;
 X-IronPort-AV: E=Sophos;i="5.56,460,1539619200"; 
-   d="scan'208";a="100223371"
+   d="scan'208";a="100223376"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2019 17:38:32 +0800
+  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2019 17:38:36 +0800
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP; 10 Jan 2019 01:20:02 -0800
+  by uls-op-cesaep02.wdc.com with ESMTP; 10 Jan 2019 01:20:06 -0800
 Received: from shin_dev.dhcp.fujisawa.hgst.com (HELO shin_dev.fujisawa.hgst.com) ([10.149.52.166])
-  by uls-op-cesaip01.wdc.com with ESMTP; 10 Jan 2019 01:38:28 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 10 Jan 2019 01:38:32 -0800
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Masato Suzuki <masato.suzuki@wdc.com>,
@@ -53,9 +53,9 @@ Cc:     Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@kernel.dk>,
         Mike Snitzer <snitzer@redhat.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: [PATCH blktests v2 13/16] zbd/002: report zone test
-Date:   Thu, 10 Jan 2019 18:37:22 +0900
-Message-Id: <20190110093725.32675-14-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2 14/16] zbd/003: Test sequential zones reset
+Date:   Thu, 10 Jan 2019 18:37:23 +0900
+Message-Id: <20190110093725.32675-15-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190110093725.32675-1-shinichiro.kawasaki@wdc.com>
 References: <20190110093725.32675-1-shinichiro.kawasaki@wdc.com>
@@ -68,129 +68,101 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Masato Suzuki <masato.suzuki@wdc.com>
 
-Get a report for all zones and confirm that the reported values are
-valid and consistent with regard to the device capacity and zone size.
+Test zone reset operation to make sure that the BLKRESETZONE ioctl call
+works as expected but also that the zone sector remapping that may be
+done for logical devices (partitions or dm-linear devices) is correct.
 
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Signed-off-by: Masato Suzuki <masato.suzuki@wdc.com>
 ---
- tests/zbd/002     | 99 +++++++++++++++++++++++++++++++++++++++++++++++
- tests/zbd/002.out |  2 +
- 2 files changed, 101 insertions(+)
- create mode 100755 tests/zbd/002
- create mode 100644 tests/zbd/002.out
+ tests/zbd/003     | 69 +++++++++++++++++++++++++++++++++++++++++++++++
+ tests/zbd/003.out |  2 ++
+ 2 files changed, 71 insertions(+)
+ create mode 100755 tests/zbd/003
+ create mode 100644 tests/zbd/003.out
 
-diff --git a/tests/zbd/002 b/tests/zbd/002
+diff --git a/tests/zbd/003 b/tests/zbd/003
 new file mode 100755
-index 0000000..aec4813
+index 0000000..a44960d
 --- /dev/null
-+++ b/tests/zbd/002
-@@ -0,0 +1,99 @@
++++ b/tests/zbd/003
+@@ -0,0 +1,69 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-3.0+
 +# Copyright (C) 2018 Western Digital Corporation or its affiliates.
 +#
-+# Issue report zone command and confirm consistency of reported values.
++# Confirm that reset zone command for 2 contiguous sequential write
++# requried zones works as expected.
 +
 +. tests/zbd/rc
 +
-+DESCRIPTION="report zone"
++DESCRIPTION="reset sequential required zones"
++QUICK=1
 +
-+_check_blkzone_report() {
-+	# Utilize local variables as much as possible to speed up loop execution
-+	local -i max_idx=$((REPORTED_COUNT - 1))
-+	local -i chunk_sectors=${SYSFS_VARS[$SV_CHUNK_SECTORS]}
-+	local -i cur_start=${ZONE_STARTS[0]}
-+	local -i next_start=0
-+	local -i len=0
-+	local -i wptr=0
-+	local -i cond=0
-+	local -i zone_type=0
-+
-+	# Confirm number of reported zones
-+	if [[ ${REPORTED_COUNT} -ne ${SYSFS_VARS[$SV_NR_ZONES]} ]]; then
-+		echo "The number of zones reported differ from sysfs nr_zones"
-+		echo -n "Reported zones count: ${REPORTED_COUNT}  "
-+		echo "sysfs nr_zones: ${SYSFS_VARS[$SV_NR_ZONES]}"
-+		return 1
-+	fi
-+
-+	# Check consistency between last zone size and capacity
-+	local -i last_zone_end=$((ZONE_STARTS[max_idx] + ZONE_LENGTHS[max_idx]))
-+	if [[ ${last_zone_end} -gt ${SYSFS_VARS[$SV_CAPACITY]} ]]; then
-+		echo "Last zone start sector + length exceeds capacity"
-+		echo -n "Capacity: ${SYSFS_VARS[$SV_CAPACITY]}, "
-+		echo "last zone start sector + length: ${last_zone_end}"
-+		return 1
-+	fi
-+
-+	# Check each zone parameter validity and that all zones are contiguous
-+	for ((idx = 0; idx <= max_idx; idx++)); do
-+
-+		next_start=${ZONE_STARTS[$((idx+1))]}
-+		len=${ZONE_LENGTHS[$idx]}
-+		wptr=${ZONE_WPTRS[$idx]}
-+		cond=${ZONE_CONDS[$idx]}
-+		zone_type=${ZONE_TYPES[$idx]}
-+
-+		# Check two zones are contiguous
-+		if [[ $((cur_start+len)) -ne ${next_start} ]]; then
-+			echo -n "Zones are not contiguous at zone ${idx}. "
-+			echo "cur:${cur_start}+${len}, next:${next_start}"
-+			return 1
-+		fi
-+
-+		# Check zone size
-+		if [[ ${len} -ne ${chunk_sectors} &&
-+		      ${idx} -ne ${max_idx} ]]; then
-+			echo -n "Zone size is not same as chunk_sectors "
-+			echo -n "at zone ${idx}. "
-+			echo "size: ${len}, chunk_sectors: ${chunk_sectors}"
-+			return 1
-+		fi
-+
-+		# Check write pointer
-+		if [[ ${wptr} -lt 0 || ${wptr} -gt ${len} ]]; then
-+			echo -n "Write pointer is invalid at zone ${idx}. "
-+			echo "wp:${wptr}"
-+			return 1
-+		fi
-+
-+		# Check zone condition
-+		if [[ ! ${ZONE_COND_ARRAY[cond]} ]]; then
-+			echo -n "Zone condition is incorrect at zone ${idx}. "
-+			echo "condition: ${cond}"
-+			return 1
-+		fi
-+
-+		# Check zone type
-+		if [[ ! ${ZONE_TYPE_ARRAY[zone_type]} ]]; then
-+			echo -n "Zone type is incorrect at zone ${idx}. "
-+			echo "type: ${zone_type}"
-+			return 1
-+		fi
-+		cur_start=${next_start}
-+	done
-+	return 0
++requires() {
++	_have_program blkzone
 +}
 +
 +test_device() {
++	local -i zone_idx
++	local -a target_zones
++	local -i phys_blk_size
++
 +	echo "Running ${TEST_NAME}"
 +
++	# Get physical block size for dd
 +	_get_sysfs_variable "${TEST_DEV}" || return $?
-+	_get_blkzone_report "${TEST_DEV}" || return $?
-+	_check_blkzone_report || return $?
-+	_put_blkzone_report
++	phys_blk_size=${SYSFS_VARS[$SV_PHYS_BLK_SIZE]}
 +	_put_sysfs_variable
++
++	# Select 2 target zones so that reset zone range also get tested
++	_get_blkzone_report "${TEST_DEV}" || return $?
++	zone_idx=$(_find_two_contiguous_seq_zones) || return $?
++	target_zones=( "${zone_idx}" "$((zone_idx + 1))" )
++
++	# Reset the 2 target zones and write 4KB in each zone to increment
++	# their write pointer positions
++	_reset_zones "${TEST_DEV}" "${zone_idx}" "2"
++	for i in "${target_zones[@]}"; do
++		_dd "${TEST_DEV}" "write" "${ZONE_STARTS[$i]}" \
++		    "8" "${phys_blk_size}"
++	done
++	_put_blkzone_report
++
++	# Check that the write pointers have moved by 8x512 B sectors
++	_get_blkzone_report "${TEST_DEV}" || return $?
++	for i in "${target_zones[@]}"; do
++		if [[ ${ZONE_WPTRS[$i]} -ne 8 ]]; then
++			echo -n "Unexpected write poiter position in zone ${i} "
++			echo "wp: ${ZONE_WPTRS[i]}"
++			return 1
++		fi
++	done
++
++	# Reset the 2 target zones
++	_reset_zones "${TEST_DEV}" "${zone_idx}" "2"
++	_put_blkzone_report
++
++	# Check that the write pointers have moved back to position 0
++	_get_blkzone_report "${TEST_DEV}" || return $?
++	for i in "${target_zones[@]}"; do
++		if [[ ${ZONE_WPTRS[i]} -ne 0 ]]; then
++			echo -n "Unexpected non-zero write poiter in zone ${i} "
++			echo "wp: ${ZONE_WPTRS[i]}"
++			return 1
++		fi
++	done
++	_put_blkzone_report
 +
 +	echo "Test complete"
 +}
-diff --git a/tests/zbd/002.out b/tests/zbd/002.out
+diff --git a/tests/zbd/003.out b/tests/zbd/003.out
 new file mode 100644
-index 0000000..7317541
+index 0000000..7326ae4
 --- /dev/null
-+++ b/tests/zbd/002.out
++++ b/tests/zbd/003.out
 @@ -0,0 +1,2 @@
-+Running zbd/002
++Running zbd/003
 +Test complete
 -- 
 2.20.1
