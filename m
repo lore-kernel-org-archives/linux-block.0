@@ -2,78 +2,74 @@ Return-Path: <SRS0=tdSH=PS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69FFCC43387
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 14:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 998B2C43387
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 14:30:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 33675214DA
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 14:26:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73FC5214C6
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 14:30:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728175AbfAJO0m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jan 2019 09:26:42 -0500
-Received: from 8bytes.org ([81.169.241.247]:56652 "EHLO theia.8bytes.org"
+        id S1728993AbfAJOa4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jan 2019 09:30:56 -0500
+Received: from mga04.intel.com ([192.55.52.120]:22476 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727768AbfAJO0m (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jan 2019 09:26:42 -0500
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id E1B2D22E; Thu, 10 Jan 2019 15:26:40 +0100 (CET)
-Date:   Thu, 10 Jan 2019 15:26:40 +0100
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, jfehlig@suse.com,
-        jon.grimm@amd.com, brijesh.singh@amd.com
-Subject: Re: [PATCH 0/3] Fix virtio-blk issue with SWIOTLB
-Message-ID: <20190110142640.GA5825@8bytes.org>
-References: <20190110134433.15672-1-joro@8bytes.org>
- <20190110135952.GC9255@lst.de>
+        id S1728746AbfAJOaz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 10 Jan 2019 09:30:55 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 10 Jan 2019 06:30:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.56,461,1539673200"; 
+   d="scan'208";a="126590311"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orsmga001.jf.intel.com with ESMTP; 10 Jan 2019 06:30:53 -0800
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+        id A3ACF108; Thu, 10 Jan 2019 16:30:52 +0200 (EET)
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Matias Bjorling <mb@lightnvm.io>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v1] : Switch to use new generic UUID API
+Date:   Thu, 10 Jan 2019 16:30:51 +0200
+Message-Id: <20190110143051.52305-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190110135952.GC9255@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
+There are new types and helpers that are supposed to be used in new code.
 
-On Thu, Jan 10, 2019 at 02:59:52PM +0100, Christoph Hellwig wrote:
-> On Thu, Jan 10, 2019 at 02:44:30PM +0100, Joerg Roedel wrote:
+As a preparation to get rid of legacy types and API functions do
+the conversion here.
 
-> > The problem is a limitation of the SWIOTLB implementation,
-> > which does not support allocations larger than 256kb. When
-> > the virtio-blk driver tries to read/write a block larger
-> > than that, the allocation of the dma-handle fails and an IO
-> > error is reported.
-> 
-> s/allocations/mappings/, right?  We don't use the swiotlb
-> buffer for the coherent allocations anymore, and I don't think
-> virtio-blk uses them anyway.
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/lightnvm/pblk.h | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-'Allocation' in the sense that there are address ranges allocated, not
-memory, but mappings would also be right.
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 85e38ed62f85..0a0aeb6ef314 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -1362,10 +1362,7 @@ static inline unsigned int pblk_get_secs(struct bio *bio)
+ 
+ static inline void pblk_setup_uuid(struct pblk *pblk)
+ {
+-	uuid_le uuid;
+-
+-	uuid_le_gen(&uuid);
+-	memcpy(pblk->instance_uuid, uuid.b, 16);
++	guid_gen((guid_t *)&pblk->instance_uuid);
+ }
+ 
+ static inline char *pblk_disk_name(struct pblk *pblk)
+-- 
+2.20.1
 
-> I really don't like the fact that we hardcode swiotlb specific.
-> This needs to be indirect through the dma ops or struct device,
-> as various iommu implementations also have limits (although
-> usually much larger ones).
-
-I though about exposing it through DMA-API, but didn't go that route as
-I didn't want to extend a generic API for some SWIOTLB specifics. But if
-there are more implementations that have a size limitation it makes
-certainly sense to put it into the DMA-API. I'll change that in the
-next version.
-
-Thanks,
-
-	Joerg
