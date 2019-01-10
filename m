@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EF9AC43387
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C42B5C43387
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 50586214DA
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D1982173B
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="LqQ3M1/+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="jNHZIXfS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727882AbfAJJiL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jan 2019 04:38:11 -0500
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:25576 "EHLO
-        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727848AbfAJJiL (ORCPT
+        id S1727868AbfAJJiY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jan 2019 04:38:24 -0500
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:16282 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727848AbfAJJiX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jan 2019 04:38:11 -0500
+        Thu, 10 Jan 2019 04:38:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1547113097; x=1578649097;
+  t=1547113104; x=1578649104;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=jVwSaPPGPxBy8T2rj8Y+/TioJuCb2a9sAlKrvvDZMcQ=;
-  b=LqQ3M1/+R5oR8o2jGitebuC70UAELSXg/Qt9ct+Q87YB5piwwgOJQhHc
-   wqdFSX/FwYuV88i76mJwmv47TbmV+2klkdI6F/0V+A6GRrSsy5Y/obHGf
-   1i8cuL7Ou897WNVjSk0ua6ubr1SdIgRrutavB5Z1N5Dem+h1km6whpGye
-   auZ/nWhQ10h+K2cNem+H9DcdxFVNFPmgvVxcfTkCsixxHIG3mgj8hfUF+
-   9QEh8FGhgss+P3iekyQ9YzNlrBm5U/ZgMEu9TiAXlRzj/t/aSvnfJu7+s
-   rT8Knxc0BVnt9sGbwLBXHb7JZrJRmGzzV52xYzGM780+zONg49p8wxXvK
-   g==;
+  bh=D0kLPT+HCsxdgiItaYFS2rsC6DVeH0hABJYkRTR4zoo=;
+  b=jNHZIXfS9GsjHpmVI4Tks3rCZ5R9S4HZ5fzQTLhTJ1ibdPqtYxNsKj6M
+   54FBubdcNCJvHPy/v3rX4j71fTLeBkbb0DTLIbfrWo5docMn+ZF3Gai90
+   K/8/096280a9cHzH0Jg5YJnZAkaG8CXJntakeqfkwNWsxu5Jxcn/WNZ5m
+   S77hUN44+/1hlrZ9/xNo8zxB0la/FNdLtOq2uu8B0OfpxAXSaN2px8Q95
+   EBCGbw9Gc3VYfg76DP0PxE7qGMkhVJhH5H8CLA3pztRg5oH1AecV3hl1U
+   Jv5cRfsW+hits1RwvY8A8ws5tl9Dj7HLqqarSmY3dk8tbMMtg7dp8uzyE
+   A==;
 X-IronPort-AV: E=Sophos;i="5.56,460,1539619200"; 
-   d="scan'208";a="196469022"
+   d="scan'208";a="100223360"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2019 17:38:16 +0800
+  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2019 17:38:24 +0800
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP; 10 Jan 2019 01:19:42 -0800
+  by uls-op-cesaep02.wdc.com with ESMTP; 10 Jan 2019 01:19:54 -0800
 Received: from shin_dev.dhcp.fujisawa.hgst.com (HELO shin_dev.fujisawa.hgst.com) ([10.149.52.166])
-  by uls-op-cesaip01.wdc.com with ESMTP; 10 Jan 2019 01:38:08 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 10 Jan 2019 01:38:20 -0800
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Masato Suzuki <masato.suzuki@wdc.com>,
@@ -53,9 +53,9 @@ Cc:     Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@kernel.dk>,
         Mike Snitzer <snitzer@redhat.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: [PATCH blktests v2 10/16] common: Introduce _dd() helper function
-Date:   Thu, 10 Jan 2019 18:37:19 +0900
-Message-Id: <20190110093725.32675-11-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2 11/16] tests: Introduce zbd test group
+Date:   Thu, 10 Jan 2019 18:37:20 +0900
+Message-Id: <20190110093725.32675-12-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190110093725.32675-1-shinichiro.kawasaki@wdc.com>
 References: <20190110093725.32675-1-shinichiro.kawasaki@wdc.com>
@@ -66,54 +66,255 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-To analyze dd command failures found by blktests, need to confirm dd
-command options. Introduce the helper function which executes dd and
-records dd command options in FULL file for quick analysis.
+From: Masato Suzuki <masato.suzuki@wdc.com>
+
+The zoned block device (zbd) test group is used to gather all tests
+specific to zoned block devices (null_blk device with zoned mode enabled,
+SMR disks, dm-linear on top of zoned devices, etc). Execution of this group
+requires that the kernel be compiled with the block layer
+CONFIG_BLK_DEV_ZONED option enabled and also requires the null_blk driver
+to have zoned mode support (added in kernel 4.19).
+
+This group rc script allows all tests to operate even if TEST_DEVS is not
+set in the config. If TEST_DEVS is not set, the rc script creates a
+null_blk device with zoned mode enabled and the created device assigned to
+TEST_DEVS. If TEST_DEVS is set, all tests are executed against the
+specified devices, which all must be zoned. With this, all tests scripts
+can be written by only defining the test_device() function while allowing
+operation on both nullblk and user specified devices.
 
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Signed-off-by: Masato Suzuki <masato.suzuki@wdc.com>
 ---
- common/rc | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ tests/zbd/rc | 219 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 219 insertions(+)
+ create mode 100644 tests/zbd/rc
 
-diff --git a/common/rc b/common/rc
-index 0b99e84..190e450 100644
---- a/common/rc
-+++ b/common/rc
-@@ -246,3 +246,34 @@ set_scheduler() {
- 		return 1
- 	fi
- }
+diff --git a/tests/zbd/rc b/tests/zbd/rc
+new file mode 100644
+index 0000000..207a7f3
+--- /dev/null
++++ b/tests/zbd/rc
+@@ -0,0 +1,219 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2018 Western Digital Corporation or its affiliates.
++#
++# Tests for Zone Block Device.
 +
-+# Issue dd command with five arguments and record command line in FULL file.
-+# args: target device, r/w, start sector, sector len, block size in bytes
-+_dd() {
-+	local target_dev=${1}
-+	local rw=${2}
-+	local -i start_sector=${3}
-+	local -i start_byte=$(( start_sector * 512 ))
-+	local -i sector_count=${4}
-+	local -i bs=${5}
-+	local -i block_count=$(( sector_count * 512 / bs ))
++. common/rc
++. common/null_blk
 +
-+	local _cmd="dd bs=${bs} count=${block_count}"
++#
++# Test requirement check functions
++#
 +
-+	if [[ ${rw} = "read" ]]; then
-+		_cmd="${_cmd} if=${target_dev} of=/dev/null"
-+		_cmd="${_cmd} iflag=skip_bytes skip=${start_byte}"
-+	elif [[ ${rw} = "write" ]]; then
-+		_cmd="${_cmd} if=/dev/zero of=${target_dev}"
-+		_cmd="${_cmd} oflag=seek_bytes,direct seek=${start_byte}"
++group_requires() {
++	_have_root || return $?
++	_have_program blkzone || return $?
++	_have_program dd || return $?
++	_have_kernel_option BLK_DEV_ZONED || return $?
++	_have_modules null_blk && _have_module_param null_blk zoned
++
++	# If TEST_DEVS is set in config file, use it as is.
++	# Otherwise, create a zoned null_blk device and set TEST_DEVS.
++	if [[ -n "${TEST_DEVS}" ]] ; then
++		return 0
 +	fi
 +
-+	echo "${_cmd}" >> "$FULL" 2>&1
++	local test_dev
++	local sysfs_dir
++	if ! _init_null_blk zone_size=4 gb=1 zoned=1 ; then
++		return 1
++	fi
++	test_dev=/dev/nullb0
++	if ! sysfs_dir="$(_find_sysfs_dir "$test_dev")"; then
++		_error "could not find sysfs directory for ${test_dev}"
++		return 1
++	fi
++	_NULL_BLK_ZONED_CREATED=1
++	TEST_DEVS+=( "${test_dev}" )
 +
-+	if ! eval "${_cmd}" >> "$FULL" 2>&1 ; then
-+		echo "dd command failed"
++	# shellcheck disable=SC2034
++	TEST_DEV_SYSFS_DIRS["$test_dev"]="$sysfs_dir"
++
++	return 0
++}
++
++group_device_requires() {
++	_test_dev_is_zoned
++}
++
++group_exit() {
++	if [[ -n "${_NULL_BLK_ZONED_CREATED}" ]] ; then
++		_exit_null_blk
++		unset _NULL_BLK_ZONED_CREATED
++	fi
++}
++
++#
++# Zone types and conditions
++#
++export ZONE_TYPE_CONVENTIONAL=1
++export ZONE_TYPE_SEQ_WRITE_REQUIRED=2
++export ZONE_TYPE_SEQ_WRITE_PREFERRED=3
++
++export ZONE_COND_EMPTY=1
++export ZONE_COND_IMPLICIT_OPEN=2
++export ZONE_COND_FULL=14
++
++export ZONE_TYPE_ARRAY=(
++	[1]="CONVENTIONAL"
++	[2]="SEQ_WRITE_REQUIRED"
++	[3]="SEQ_WRITE_PREFERRED"
++)
++
++export ZONE_COND_ARRAY=(
++	[0]="NOT_WP"
++	[1]="EMPTY"
++	[2]="IMPLICIT_OPEN"
++	[3]="EXPLICIT_OPEN"
++	[4]="CLOSE"
++	[13]="READ_ONLY"
++	[14]="FULL"
++	[15]="OFFLINE"
++)
++
++# sysfs variable array indices
++export SV_CAPACITY=0
++export SV_CHUNK_SECTORS=1
++export SV_PHYS_BLK_SIZE=2
++export SV_PHYS_BLK_SECTORS=3
++export SV_NR_ZONES=4
++
++#
++# Helper functions
++#
++
++# Obtain zone related sysfs variables and keep in a global array until put
++# function call.
++_get_sysfs_variable() {
++	unset SYSFS_VARS
++	local _dir=${TEST_DEV_SYSFS}
++	SYSFS_VARS[$SV_CAPACITY]=$(<"${_dir}"/size)
++	SYSFS_VARS[$SV_CHUNK_SECTORS]=$(<"${_dir}"/queue/chunk_sectors)
++	SYSFS_VARS[$SV_PHYS_BLK_SIZE]=$(<"${_dir}"/queue/physical_block_size)
++	SYSFS_VARS[$SV_PHYS_BLK_SECTORS]=$((SYSFS_VARS[SV_PHYS_BLK_SIZE] / 512))
++
++	# If the nr_zones sysfs attribute exists, get its value. Otherwise,
++	# calculate its value based on the total capacity and zone size, taking
++	# into account that the last zone can be smaller than other zones.
++	if [[ -e ${TEST_DEV_SYSFS}/queue/nr_zones ]]; then
++		SYSFS_VARS[$SV_NR_ZONES]=$(<"${_dir}"/queue/nr_zones)
++	else
++		SYSFS_VARS[$SV_NR_ZONES]=$(( (SYSFS_VARS[SV_CAPACITY] - 1) \
++				/ SYSFS_VARS[SV_CHUNK_SECTORS] + 1 ))
++	fi
++}
++
++_put_sysfs_variable() {
++	unset SYSFS_VARS
++}
++
++# Issue zone report command and keep reported information in global arrays
++# until put function call.
++_get_blkzone_report() {
++	local target_dev=${1}
++
++	# Initialize arrays to store parsed blkzone reports.
++	# Number of reported zones is set in REPORTED_COUNT.
++	# The arrays have REPORTED_COUNT+1 elements with additional one at tail
++	# to simplify loop operation.
++	ZONE_STARTS=()
++	ZONE_LENGTHS=()
++	ZONE_WPTRS=()
++	ZONE_CONDS=()
++	ZONE_TYPES=()
++	NR_CONV_ZONES=0
++	REPORTED_COUNT=0
++
++	TMP_REPORT_FILE=${TMPDIR}/blkzone_report
++	if ! blkzone report "${target_dev}" > "${TMP_REPORT_FILE}"; then
++		echo "blkzone command failed"
++		return $?
++	fi
++
++	local _IFS=$IFS
++	local -i loop=0
++	IFS=$' ,:'
++	while read -r -a _tokens
++	do
++		ZONE_STARTS+=($((_tokens[1])))
++		ZONE_LENGTHS+=($((_tokens[3])))
++		ZONE_WPTRS+=($((_tokens[5])))
++		ZONE_CONDS+=($((${_tokens[11]%\(*})))
++		ZONE_TYPES+=($((${_tokens[13]%\(*})))
++		if [[ ${ZONE_TYPES[-1]} -eq ${ZONE_TYPE_CONVENTIONAL} ]]; then
++			(( NR_CONV_ZONES++ ))
++		fi
++		(( loop++ ))
++	done < "${TMP_REPORT_FILE}"
++	IFS="$_IFS"
++	REPORTED_COUNT=${loop}
++
++	if [[ ${REPORTED_COUNT} -eq 0 ]] ; then
++		echo "blkzone report returned no zone"
 +		return 1
 +	fi
 +
-+	sync
++	# Set value to allow additioanl element access at array end
++	local -i max_idx=$((REPORTED_COUNT - 1))
++	ZONE_STARTS+=( $((ZONE_STARTS[max_idx] + ZONE_LENGTHS[max_idx])) )
++	ZONE_LENGTHS+=( "${ZONE_LENGTHS[max_idx]}" )
++	ZONE_WPTRS+=( "${ZONE_WPTRS[max_idx]}" )
++	ZONE_CONDS+=( "${ZONE_CONDS[max_idx]}" )
++	ZONE_TYPES+=( "${ZONE_TYPES[max_idx]}" )
++
++	rm -f "${TMP_REPORT_FILE}"
 +}
++
++_put_blkzone_report() {
++	unset ZONE_STARTS
++	unset ZONE_LENGTHS
++	unset ZONE_WPTRS
++	unset ZONE_CONDS
++	unset ZONE_TYPES
++	unset REPORTED_COUNT
++	unset NR_CONV_ZONES
++}
++
++# Issue reset zone command with zone count option.
++# Call _get_blkzone_report() beforehand.
++_reset_zones() {
++	local target_dev=${1}
++	local -i idx=${2}
++	local -i count=${3}
++
++	if ! blkzone reset -o "${ZONE_STARTS[idx]}" -c "${count}" \
++	     "${target_dev}" >> "$FULL" 2>&1 ; then
++		echo "blkzone reset command failed"
++		return 1
++	fi
++}
++
++# Search zones and find two contiguous sequential required zones.
++# Return index of the first zone of the found two zones.
++# Call _get_blkzone_report() beforehand.
++_find_two_contiguous_seq_zones() {
++	local -i type_seq=${ZONE_TYPE_SEQ_WRITE_REQUIRED}
++
++	for ((idx = NR_CONV_ZONES; idx < REPORTED_COUNT; idx++)); do
++		if [[ ${ZONE_TYPES[idx]} -eq ${type_seq} &&
++		      ${ZONE_TYPES[idx+1]} -eq ${type_seq} ]]; then
++			echo "${idx}"
++			return 0
++		fi
++	done
++
++	echo "Contiguous sequential write required zones not found"
++	return 1
++}
++
 -- 
 2.20.1
 
