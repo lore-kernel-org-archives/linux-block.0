@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C9A5C43613
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69C24C43387
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3504A2173B
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DDC8214DA
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="XO75WRSM"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ZuAy79Yy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727780AbfAJJiE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jan 2019 04:38:04 -0500
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:25562 "EHLO
+        id S1727956AbfAJJiH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jan 2019 04:38:07 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:25565 "EHLO
         esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727934AbfAJJiE (ORCPT
+        with ESMTP id S1727934AbfAJJiH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jan 2019 04:38:04 -0500
+        Thu, 10 Jan 2019 04:38:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1547113086; x=1578649086;
+  t=1547113091; x=1578649091;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Nkqv/ycijaqi1SgvdSnleRcBm5gIb4Cr9XrVnPiS8D8=;
-  b=XO75WRSMat1lUMfsaEhS67nduEGUC+8E+L/8GcEeZowVw0ATDn5phVxq
-   NyKFwqhKwAM6bLqwr3Wdu61/TFTOFtOidEoKR6/4MeByq3nO3PIWC0RIA
-   qQLXyFCcZBYdKZ8nbbGRt99VT+nSW5D2Catn7OZjyJEWjBq7cjpQViz+7
-   ReA1d0Cf+CQ/Yoy4JOlIQfOO5yaqjydSwJ+JlOyVxFRQakwcksbLNEO+o
-   o8HMOzu5QxjlWj0yHzIx9zRLRG4p2RZn5ZgXcw+j9jZMvTIBQfIhPGISv
-   M6CHHBY4+ysFYfI/RaEildpWZ7SCbBWXp5SS+KqXYPCX1UYiJEH03nYy9
-   g==;
+  bh=z8Pb2zTInRMN1PR/pXA6dcbSKZE+cS0z7wrOF+mM2Po=;
+  b=ZuAy79YyDEtfvrawvpEvNhYwscJylNL8Iqqfac90Uf6t4aFiNG8IY2Vx
+   lZVOD/XDnP8zohRwFs0r9RTTKIUtj9n+htyfyDGh+3EGwjucN0umuPyxm
+   WgwcyAyofdmYaJ0v2HD/AD9ZrXN64UTNlIK346qhs2hJmYF8IHUkg3veZ
+   1cc2TIIBc6Qybppy4ke0TcHYnLoMkKvLHZJCec7J2UNyWpzm5Rbl8m+Vg
+   nVF8fwHVhv29qa+gIcsKUr8zZkvpCNdJaOtx6tOxTkqawS39O1bfJhC8d
+   QsyDW4BvK/aETiHzqVPqes+w7aNIX4bV/3sVAhojWe3xjzt7yYxXULAuW
+   w==;
 X-IronPort-AV: E=Sophos;i="5.56,460,1539619200"; 
-   d="scan'208";a="196468995"
+   d="scan'208";a="196468997"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2019 17:38:06 +0800
+  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2019 17:38:10 +0800
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP; 10 Jan 2019 01:19:34 -0800
+  by uls-op-cesaep02.wdc.com with ESMTP; 10 Jan 2019 01:19:38 -0800
 Received: from shin_dev.dhcp.fujisawa.hgst.com (HELO shin_dev.fujisawa.hgst.com) ([10.149.52.166])
-  by uls-op-cesaip01.wdc.com with ESMTP; 10 Jan 2019 01:38:00 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 10 Jan 2019 01:38:04 -0800
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Masato Suzuki <masato.suzuki@wdc.com>,
@@ -53,9 +53,9 @@ Cc:     Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@kernel.dk>,
         Mike Snitzer <snitzer@redhat.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: [PATCH blktests v2 08/16] check: Introduce group_exit() function
-Date:   Thu, 10 Jan 2019 18:37:17 +0900
-Message-Id: <20190110093725.32675-9-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2 09/16] src: Introduce zbdioctl program
+Date:   Thu, 10 Jan 2019 18:37:18 +0900
+Message-Id: <20190110093725.32675-10-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190110093725.32675-1-shinichiro.kawasaki@wdc.com>
 References: <20190110093725.32675-1-shinichiro.kawasaki@wdc.com>
@@ -66,31 +66,130 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This optional function can be defined by a test group rc script. When
-defined, it is executed after all tests of the group complete, allowing
-cleaning up resources used by all tests of the group.
+zbdioctl implements calls to zoned block devices ioctls that are not
+supported currently by sys-utils blkzone utility, namely BLKGETZONESZ
+and BLKGETNRZONES.
 
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- check | 5 +++++
- 1 file changed, 5 insertions(+)
+ src/.gitignore |  1 +
+ src/Makefile   |  3 +-
+ src/zbdioctl.c | 83 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 86 insertions(+), 1 deletion(-)
+ create mode 100644 src/zbdioctl.c
 
-diff --git a/check b/check
-index 141ebb6..360f61b 100755
---- a/check
-+++ b/check
-@@ -467,6 +467,11 @@ _run_group() {
- 			ret=1
- 		fi
- 	done
-+
-+	if declare -fF group_exit >/dev/null ; then
-+		group_exit
-+	fi
-+
- 	return $ret
- }
+diff --git a/src/.gitignore b/src/.gitignore
+index 8c95785..2108f56 100644
+--- a/src/.gitignore
++++ b/src/.gitignore
+@@ -6,3 +6,4 @@
+ /nbdsetsize
+ /sg/dxfer-from-dev
+ /sg/syzkaller1
++/zbdioctl
+diff --git a/src/Makefile b/src/Makefile
+index c4094b4..5a0556f 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -5,7 +5,8 @@ C_TARGETS := \
+ 	sg/dxfer-from-dev \
+ 	sg/syzkaller1 \
+ 	nbdsetsize \
+-	loop_change_fd
++	loop_change_fd \
++	zbdioctl
  
+ CXX_TARGETS := \
+ 	discontiguous-io
+diff --git a/src/zbdioctl.c b/src/zbdioctl.c
+new file mode 100644
+index 0000000..1ea72e8
+--- /dev/null
++++ b/src/zbdioctl.c
+@@ -0,0 +1,83 @@
++// SPDX-License-Identifier: GPL-3.0+
++// Copyright (C) 2018 Western Digital Corporation or its affiliates.
++#include <stdio.h>
++#include <string.h>
++#include <stdlib.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <sys/ioctl.h>
++#include <linux/blkzoned.h>
++#include <linux/types.h>
++
++#if !defined(BLKGETZONESZ) || !defined(BLKGETNRZONES)
++
++int main(int argc, char **argv)
++{
++	return EXIT_FAILURE;
++}
++
++#else
++
++struct request {
++	const char *name;
++	unsigned long code;
++} requests[] = {
++	{ "-s", BLKGETZONESZ},
++	{ "-n", BLKGETNRZONES},
++	{ NULL, 0},
++};
++
++void usage(const char *progname)
++{
++	int i = 0;
++
++	fprintf(stderr, "usage: %s <request> <device file>\n", progname);
++	fprintf(stderr, "<request> can be:\n");
++	while (requests[i].name) {
++		fprintf(stderr, "\t%s\n", requests[i].name);
++		i++;
++	}
++	exit(EXIT_FAILURE);
++}
++
++int main(int argc, char **argv)
++{
++	int i = 0, fd, ret;
++	unsigned int val;
++	unsigned long code = 0;
++
++	if (argc != 3)
++		usage(argv[0]);
++
++	while (requests[i].name) {
++		if (strcmp(argv[1], requests[i].name) == 0) {
++			code = requests[i].code;
++			break;
++		}
++		i++;
++	}
++	if (code == 0)
++		usage(argv[0]);
++
++	fd = open(argv[2], O_RDWR);
++	if (fd < 0) {
++		perror("open");
++		return EXIT_FAILURE;
++	}
++
++	ret = ioctl(fd, code, &val);
++	if (ret < 0) {
++		perror("ioctl");
++		close(fd);
++		return EXIT_FAILURE;
++	}
++
++	printf("%u\n", val);
++
++	close(fd);
++
++	return EXIT_SUCCESS;
++}
++
++#endif
++
 -- 
 2.20.1
 
