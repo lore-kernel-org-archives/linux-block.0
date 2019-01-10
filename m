@@ -6,20 +6,20 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AA8EC43387
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 13:44:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 816C2C43387
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 13:44:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3140A20879
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 13:44:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A08920879
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 13:44:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728907AbfAJNoh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jan 2019 08:44:37 -0500
-Received: from 8bytes.org ([81.169.241.247]:56510 "EHLO theia.8bytes.org"
+        id S1729047AbfAJNow (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jan 2019 08:44:52 -0500
+Received: from 8bytes.org ([81.169.241.247]:56522 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729048AbfAJNoh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1729049AbfAJNoh (ORCPT <rfc822;linux-block@vger.kernel.org>);
         Thu, 10 Jan 2019 08:44:37 -0500
 Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 852EC22E; Thu, 10 Jan 2019 14:44:35 +0100 (CET)
+        id 97512434; Thu, 10 Jan 2019 14:44:35 +0100 (CET)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     "Michael S . Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
@@ -30,9 +30,9 @@ Cc:     Jens Axboe <axboe@kernel.dk>,
         iommu@lists.linux-foundation.org, jfehlig@suse.com,
         jon.grimm@amd.com, brijesh.singh@amd.com, hch@lst.de,
         Joerg Roedel <jroedel@suse.de>
-Subject: [PATCH 2/3] virtio: Introduce virtio_max_dma_size()
-Date:   Thu, 10 Jan 2019 14:44:32 +0100
-Message-Id: <20190110134433.15672-3-joro@8bytes.org>
+Subject: [PATCH 3/3] virtio-blk: Consider virtio_max_dma_size() for maximum segment size
+Date:   Thu, 10 Jan 2019 14:44:33 +0100
+Message-Id: <20190110134433.15672-4-joro@8bytes.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190110134433.15672-1-joro@8bytes.org>
 References: <20190110134433.15672-1-joro@8bytes.org>
@@ -43,56 +43,49 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-This function returns the maximum segment size for a single
-dma transaction of a virtio device. The possible limit comes
-from the SWIOTLB implementation in the Linux kernel, that
-has an upper limit of (currently) 256kb of contiguous
-memory it can map.
-
-The functions return the lower limie when SWIOTLB is used for DMA
-transactions of the device and -1U otherwise.
+Segments can't be larger than the maximum DMA allocation
+size supported by virtio on the platform. Take that into
+account when setting the maximum segment size for a block
+device.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- drivers/virtio/virtio_ring.c | 11 +++++++++++
- include/linux/virtio.h       |  2 ++
- 2 files changed, 13 insertions(+)
+ drivers/block/virtio_blk.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-index cd7e755484e3..c8d229da203e 100644
---- a/drivers/virtio/virtio_ring.c
-+++ b/drivers/virtio/virtio_ring.c
-@@ -266,6 +266,17 @@ static bool vring_use_dma_api(struct virtio_device *vdev)
- 	return false;
- }
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index b16a887bbd02..6062faa8d213 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -723,7 +723,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 	struct request_queue *q;
+ 	int err, index;
  
-+size_t virtio_max_dma_size(struct virtio_device *vdev)
-+{
-+	const struct dma_map_ops *ops = get_dma_ops(&vdev->dev);
-+	size_t max_segment_size = -1U;
-+
-+	if (vring_use_dma_api(vdev) && dma_is_direct(ops))
-+		max_segment_size = swiotlb_max_alloc_size();
-+
-+	return max_segment_size;
-+}
-+
- static void *vring_alloc_queue(struct virtio_device *vdev, size_t size,
- 			      dma_addr_t *dma_handle, gfp_t flag)
- {
-diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-index fa1b5da2804e..673fe3ef3607 100644
---- a/include/linux/virtio.h
-+++ b/include/linux/virtio.h
-@@ -157,6 +157,8 @@ int virtio_device_freeze(struct virtio_device *dev);
- int virtio_device_restore(struct virtio_device *dev);
- #endif
+-	u32 v, blk_size, sg_elems, opt_io_size;
++	u32 v, blk_size, seg_size, sg_elems, opt_io_size;
+ 	u16 min_io_size;
+ 	u8 physical_block_exp, alignment_offset;
  
-+size_t virtio_max_dma_size(struct virtio_device *vdev);
-+
- #define virtio_device_for_each_vq(vdev, vq) \
- 	list_for_each_entry(vq, &vdev->vqs, list)
+@@ -826,14 +826,16 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 	/* No real sector limit. */
+ 	blk_queue_max_hw_sectors(q, -1U);
  
++	seg_size = virtio_max_dma_size(vdev);
++
+ 	/* Host can optionally specify maximum segment size and number of
+ 	 * segments. */
+ 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_SIZE_MAX,
+ 				   struct virtio_blk_config, size_max, &v);
+ 	if (!err)
+-		blk_queue_max_segment_size(q, v);
+-	else
+-		blk_queue_max_segment_size(q, -1U);
++		seg_size = min(v, seg_size);
++
++	blk_queue_max_segment_size(q, seg_size);
+ 
+ 	/* Host can optionally specify the block size of the device */
+ 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_BLK_SIZE,
 -- 
 2.17.1
 
