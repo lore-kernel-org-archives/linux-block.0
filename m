@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 708F7C43387
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C8A3C43387
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 403DF214DA
-	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3ED182173B
+	for <linux-block@archiver.kernel.org>; Thu, 10 Jan 2019 09:38:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="qd8yquOE"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="deUqitne"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727934AbfAJJif (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Jan 2019 04:38:35 -0500
+        id S1727929AbfAJJij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Jan 2019 04:38:39 -0500
 Received: from esa6.hgst.iphmx.com ([216.71.154.45]:16282 "EHLO
         esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727848AbfAJJif (ORCPT
+        with ESMTP id S1727848AbfAJJij (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Jan 2019 04:38:35 -0500
+        Thu, 10 Jan 2019 04:38:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1547113116; x=1578649116;
+  t=1547113120; x=1578649120;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=FRStSmA3z7y5GT4HO7DZcFbbF37eLE/fboNsTo5oOSo=;
-  b=qd8yquOEj35SufcEWkfXLYoC/8AaALr5Hmys573gu3yL2LJO0QouJ6Cc
-   fMKeu4b+rROfIFkPb7TGmY57vli52URZxlk1hzRwOzJ0/34xTUSO6cmjH
-   YvCeT1Y2CXBoYlXjWsiF7ZJ0WVt5MvMMlMew+6DnCQjZxte6FBxsJi+7G
-   k55dDWZSmIZBkXISyl60nxHyyk9RTfHyw34kjyVd2R3tMMJzHjNWCuD0/
-   pLaTEptu7rJKpHX8UnvKS75+5XEop9P5To9J2Y16peEfiQjVSNYEmtyiB
-   mGB9OHBIwp9oqetqjLYWILwbQZHPsmKtOgPBtJ8i4drYzEcZCjQdwlW6h
-   A==;
+  bh=BZ1h5LjRdO7LTJ+9LXrgZ4Qm9QNctb7y8Q91viicv7E=;
+  b=deUqitneCq9zaiRks2rk21o6JcJQLSeyvU0utYFkB9lz5eYLplNarHfZ
+   BF8fC/9y2g2mzPpdZ2h5oedHRo5jEb0LIWU0zZmn1uGTXnauIRJlEDTZR
+   KE5VPOYz915Xakq18Q9NaMr2BD6Qrg9vtb4Yd9wYJ006kOQZIUlB0rtgX
+   EeCEpEZ2S92sxbX2o64PbN9McTzucogowFaODIlqYIgBsTFflGo2kPvLC
+   pT6mGUsQVFNxnMf4WFdeYM3FfTbvo0kPtpz8s1MuXbIOkyNK00VESAIlF
+   nadXMZ+Dat2gcsbuyKTT5ods3oOE5pKf6EIDEIt7gprHxa7eqpBxHE9ds
+   g==;
 X-IronPort-AV: E=Sophos;i="5.56,460,1539619200"; 
-   d="scan'208";a="100223376"
+   d="scan'208";a="100223381"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2019 17:38:36 +0800
+  by ob1.hgst.iphmx.com with ESMTP; 10 Jan 2019 17:38:40 +0800
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP; 10 Jan 2019 01:20:06 -0800
+  by uls-op-cesaep02.wdc.com with ESMTP; 10 Jan 2019 01:20:10 -0800
 Received: from shin_dev.dhcp.fujisawa.hgst.com (HELO shin_dev.fujisawa.hgst.com) ([10.149.52.166])
-  by uls-op-cesaip01.wdc.com with ESMTP; 10 Jan 2019 01:38:32 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 10 Jan 2019 01:38:36 -0800
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Masato Suzuki <masato.suzuki@wdc.com>,
@@ -53,9 +53,9 @@ Cc:     Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@kernel.dk>,
         Mike Snitzer <snitzer@redhat.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: [PATCH blktests v2 14/16] zbd/003: Test sequential zones reset
-Date:   Thu, 10 Jan 2019 18:37:23 +0900
-Message-Id: <20190110093725.32675-15-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v2 15/16] zbd/004: Check write split accross sequential zones
+Date:   Thu, 10 Jan 2019 18:37:24 +0900
+Message-Id: <20190110093725.32675-16-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190110093725.32675-1-shinichiro.kawasaki@wdc.com>
 References: <20190110093725.32675-1-shinichiro.kawasaki@wdc.com>
@@ -68,101 +68,112 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Masato Suzuki <masato.suzuki@wdc.com>
 
-Test zone reset operation to make sure that the BLKRESETZONE ioctl call
-works as expected but also that the zone sector remapping that may be
-done for logical devices (partitions or dm-linear devices) is correct.
+Check that write operations spanning a zone boundary are correctly
+processed as 2 different write operations each fully within a single
+zone.
 
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Signed-off-by: Masato Suzuki <masato.suzuki@wdc.com>
 ---
- tests/zbd/003     | 69 +++++++++++++++++++++++++++++++++++++++++++++++
- tests/zbd/003.out |  2 ++
- 2 files changed, 71 insertions(+)
- create mode 100755 tests/zbd/003
- create mode 100644 tests/zbd/003.out
+ tests/zbd/004     | 81 +++++++++++++++++++++++++++++++++++++++++++++++
+ tests/zbd/004.out |  2 ++
+ 2 files changed, 83 insertions(+)
+ create mode 100755 tests/zbd/004
+ create mode 100644 tests/zbd/004.out
 
-diff --git a/tests/zbd/003 b/tests/zbd/003
+diff --git a/tests/zbd/004 b/tests/zbd/004
 new file mode 100755
-index 0000000..a44960d
+index 0000000..7d708f4
 --- /dev/null
-+++ b/tests/zbd/003
-@@ -0,0 +1,69 @@
++++ b/tests/zbd/004
+@@ -0,0 +1,81 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-3.0+
 +# Copyright (C) 2018 Western Digital Corporation or its affiliates.
 +#
-+# Confirm that reset zone command for 2 contiguous sequential write
-+# requried zones works as expected.
++# Check kernel splits write operations across a zone border. Select two
++# contiguous sequential write required zones and confirm write oprations
++# across the two zones succeed.
 +
 +. tests/zbd/rc
 +
-+DESCRIPTION="reset sequential required zones"
++DESCRIPTION="write split across sequential zones"
 +QUICK=1
 +
-+requires() {
-+	_have_program blkzone
++_check_zone_cond() {
++	local -i idx=${1}
++	local -i cond=${2}
++
++	if [[ ${ZONE_CONDS[idx]} -ne ${cond} ]]; then
++		echo -n "Zone ${idx} condition is not ${ZONE_COND_ARRAY[cond]} "
++		echo "cond: ${ZONE_COND_ARRAY[ZONE_CONDS[idx]]}"
++		return 1
++	fi
 +}
 +
 +test_device() {
-+	local -i zone_idx
-+	local -a target_zones
++	local -i idx
 +	local -i phys_blk_size
++	local -i phys_blk_sectors
 +
 +	echo "Running ${TEST_NAME}"
 +
-+	# Get physical block size for dd
++	# Get physical block size and sectors for dd.
 +	_get_sysfs_variable "${TEST_DEV}" || return $?
-+	phys_blk_size=${SYSFS_VARS[$SV_PHYS_BLK_SIZE]}
++	phys_blk_size=${SYSFS_VARS[SV_PHYS_BLK_SIZE]}
++	phys_blk_sectors=${SYSFS_VARS[SV_PHYS_BLK_SECTORS]}
 +	_put_sysfs_variable
 +
-+	# Select 2 target zones so that reset zone range also get tested
++	# Find target sequential required zones and reset write pointers
 +	_get_blkzone_report "${TEST_DEV}" || return $?
-+	zone_idx=$(_find_two_contiguous_seq_zones) || return $?
-+	target_zones=( "${zone_idx}" "$((zone_idx + 1))" )
++	idx=$(_find_two_contiguous_seq_zones) || return $?
++	_reset_zones "${TEST_DEV}" "${idx}" "2"
 +
-+	# Reset the 2 target zones and write 4KB in each zone to increment
-+	# their write pointer positions
-+	_reset_zones "${TEST_DEV}" "${zone_idx}" "2"
-+	for i in "${target_zones[@]}"; do
-+		_dd "${TEST_DEV}" "write" "${ZONE_STARTS[$i]}" \
-+		    "8" "${phys_blk_size}"
-+	done
++	# Confirm the zones are initialized
 +	_put_blkzone_report
-+
-+	# Check that the write pointers have moved by 8x512 B sectors
 +	_get_blkzone_report "${TEST_DEV}" || return $?
-+	for i in "${target_zones[@]}"; do
-+		if [[ ${ZONE_WPTRS[$i]} -ne 8 ]]; then
-+			echo -n "Unexpected write poiter position in zone ${i} "
-+			echo "wp: ${ZONE_WPTRS[i]}"
-+			return 1
-+		fi
-+	done
++	_check_zone_cond "${idx}" "${ZONE_COND_EMPTY}" || return $?
++	_check_zone_cond "$((idx+1))" "${ZONE_COND_EMPTY}" || return $?
 +
-+	# Reset the 2 target zones
-+	_reset_zones "${TEST_DEV}" "${zone_idx}" "2"
++	# Fill first target zone, remaining a physical block to write
++	if ! _dd "${TEST_DEV}" "write" "${ZONE_STARTS[idx]}" \
++	     $((ZONE_LENGTHS[idx] - phys_blk_sectors)) ${phys_blk_size} ; then
++		echo "Fill zone failed"
++		return 1
++	fi
++
++	# Write across the zone border as a single block write
++	local -i start_sector=$((ZONE_STARTS[idx+1] - phys_blk_sectors))
++	if ! _dd "${TEST_DEV}" "write" ${start_sector} \
++	     $((phys_blk_sectors * 2)) $((phys_blk_size * 2)) ; then
++		echo "Write across zone border failed"
++		return 1
++	fi
++
++	# Confirm the zone conditions are as expected
 +	_put_blkzone_report
-+
-+	# Check that the write pointers have moved back to position 0
 +	_get_blkzone_report "${TEST_DEV}" || return $?
-+	for i in "${target_zones[@]}"; do
-+		if [[ ${ZONE_WPTRS[i]} -ne 0 ]]; then
-+			echo -n "Unexpected non-zero write poiter in zone ${i} "
-+			echo "wp: ${ZONE_WPTRS[i]}"
-+			return 1
-+		fi
-+	done
++	_check_zone_cond "${idx}" "${ZONE_COND_FULL}" || return $?
++	_check_zone_cond "$((idx+1))" "${ZONE_COND_IMPLICIT_OPEN}" || return $?
++	if [[ ${ZONE_WPTRS[idx+1]} -ne ${phys_blk_sectors} ]]; then
++		echo -n "Unexpected write pointer for zone $((idx+1)) "
++		echo "wp: ${ZONE_WPTRS[idx+1]}"
++		return 1
++	fi
++
++	# Clean up
++	_reset_zones "${TEST_DEV}" "${idx}" "2"
 +	_put_blkzone_report
 +
 +	echo "Test complete"
 +}
-diff --git a/tests/zbd/003.out b/tests/zbd/003.out
++
+diff --git a/tests/zbd/004.out b/tests/zbd/004.out
 new file mode 100644
-index 0000000..7326ae4
+index 0000000..dd4ea94
 --- /dev/null
-+++ b/tests/zbd/003.out
++++ b/tests/zbd/004.out
 @@ -0,0 +1,2 @@
-+Running zbd/003
++Running zbd/004
 +Test complete
 -- 
 2.20.1
