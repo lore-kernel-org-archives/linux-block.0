@@ -3,179 +3,162 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E9C6C43387
-	for <linux-block@archiver.kernel.org>; Fri, 11 Jan 2019 11:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66034C43444
+	for <linux-block@archiver.kernel.org>; Fri, 11 Jan 2019 14:57:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B46C20663
-	for <linux-block@archiver.kernel.org>; Fri, 11 Jan 2019 11:08:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 380D520872
+	for <linux-block@archiver.kernel.org>; Fri, 11 Jan 2019 14:57:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730113AbfAKLGD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Jan 2019 06:06:03 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:52316 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725267AbfAKLGD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Jan 2019 06:06:03 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D317FE3281;
-        Fri, 11 Jan 2019 11:06:01 +0000 (UTC)
-Received: from localhost (ovpn-8-28.pek2.redhat.com [10.72.8.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 949DC60603;
-        Fri, 11 Jan 2019 11:05:47 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
-        Omar Sandoval <osandov@fb.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Dave Chinner <dchinner@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
-        Christoph Hellwig <hch@lst.de>, linux-ext4@vger.kernel.org,
-        Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
-        Boaz Harrosh <ooo@electrozaur.com>,
-        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V13 15/19] block: enable multipage bvecs
-Date:   Fri, 11 Jan 2019 19:01:23 +0800
-Message-Id: <20190111110127.21664-16-ming.lei@redhat.com>
-In-Reply-To: <20190111110127.21664-1-ming.lei@redhat.com>
-References: <20190111110127.21664-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Fri, 11 Jan 2019 11:06:02 +0000 (UTC)
+        id S2390965AbfAKO5Q convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Jan 2019 09:57:16 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:41003 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389695AbfAKO5P (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 11 Jan 2019 09:57:15 -0500
+Received: by mail-ot1-f67.google.com with SMTP id u16so13310607otk.8;
+        Fri, 11 Jan 2019 06:57:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=JGzfeS2moeGKrgbjYztqlSp3x8nVRM2tLKzBtYuE4IA=;
+        b=YInLNuCgDrXZy+DE7XfmrgzujpHNntol40vFAgOier14G/PrjWC4IHemEdSIBo2rj5
+         a2j3uEr2wABMPMT8EuDk0Txo+ajdGMGhrT3TRnc+R4OMsxJ+ZawCN0np4bFm8tn6tYB1
+         7R+7nMycC0U4E67j0xSVm1a3DLg7GzMC0avLTQA8DwFdYAo7/xGUUdDZ3c8gN6XNjWlU
+         s/dDiK4PgwG+TQXTnXfM62XEek051IgbcTUAx1sdF7ss6/s0LrqPuccD84BAU2iZ93rM
+         SYS2h4FXa1WeGd2Le89tr4iWaA7FPmgiV1a4txeoUyxx/eGu6LfvhG41z5OohT1AQYIf
+         H4GA==
+X-Gm-Message-State: AJcUukflCtJhds7yS6zGr6fQfGmsiS1OjUoCisFL33ZQ3HXHOKdeJvNu
+        v1cujv0KEO2DZFgtGoS0T0SP9dAZ5uv/GJM4IC0=
+X-Google-Smtp-Source: ALg8bN7u9dodIM0o2cAk2ZRM5QOUptT7ubs4+QkZDq1cZiM48WpMhSndJGY/pxu+Tyw2Ssp/lh1qsXU5pM0LqDH9yzU=
+X-Received: by 2002:a9d:75da:: with SMTP id c26mr10569533otl.39.1547218633801;
+ Fri, 11 Jan 2019 06:57:13 -0800 (PST)
+MIME-Version: 1.0
+References: <1546839359-5478-1-git-send-email-dongli.zhang@oracle.com>
+ <1546839359-5478-2-git-send-email-dongli.zhang@oracle.com>
+ <20190107120107.euf7mrq7gk6bmibz@mac> <35c7d495-2d6c-5fec-abf8-c5aef55cf866@oracle.com>
+ <56819579-def2-b045-f414-4de45188fe2e@oracle.com> <20190107152708.z4mecdm2apfxz2rk@mac>
+ <d347524f-20e1-6ce4-70f5-95b699374bb2@oracle.com>
+In-Reply-To: <d347524f-20e1-6ce4-70f5-95b699374bb2@oracle.com>
+From:   =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <royger@freebsd.org>
+Date:   Fri, 11 Jan 2019 15:57:02 +0100
+Message-ID: <CAPLaKK4VAS1EXAXRmSxSShdxQK=ZdShVRMeCkswg=RPEjvRVog@mail.gmail.com>
+Subject: Re: [Xen-devel] [PATCH v4 2/2] xen/blkback: rework connect_ring() to
+ avoid inconsistent xenstore 'ring-page-order' set by malicious blkfront
+To:     Dongli Zhang <dongli.zhang@oracle.com>
+Cc:     =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+        axboe@kernel.dk, Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Paul Durrant <Paul.Durrant@citrix.com>,
+        xen-devel <xen-devel@lists.xenproject.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch pulls the trigger for multi-page bvecs.
+On Tue, Jan 8, 2019 at 10:53 AM Dongli Zhang <dongli.zhang@oracle.com> wrote:
+>
+> Hi Roger,
+>
+> On 01/07/2019 11:27 PM, Roger Pau Monné wrote:
+> > On Mon, Jan 07, 2019 at 10:07:34PM +0800, Dongli Zhang wrote:
+> >>
+> >>
+> >> On 01/07/2019 10:05 PM, Dongli Zhang wrote:
+> >>>
+> >>>
+> >>> On 01/07/2019 08:01 PM, Roger Pau Monné wrote:
+> >>>> On Mon, Jan 07, 2019 at 01:35:59PM +0800, Dongli Zhang wrote:
+> >>>>> The xenstore 'ring-page-order' is used globally for each blkback queue and
+> >>>>> therefore should be read from xenstore only once. However, it is obtained
+> >>>>> in read_per_ring_refs() which might be called multiple times during the
+> >>>>> initialization of each blkback queue.
+> >>>>>
+> >>>>> If the blkfront is malicious and the 'ring-page-order' is set in different
+> >>>>> value by blkfront every time before blkback reads it, this may end up at
+> >>>>> the "WARN_ON(i != (XEN_BLKIF_REQS_PER_PAGE * blkif->nr_ring_pages));" in
+> >>>>> xen_blkif_disconnect() when frontend is destroyed.
+> >>>>>
+> >>>>> This patch reworks connect_ring() to read xenstore 'ring-page-order' only
+> >>>>> once.
+> >>>>>
+> >>>>> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> >>>>> ---
+> >>>>> Changed since v1:
+> >>>>>   * change the order of xenstore read in read_per_ring_refs
+> >>>>>   * use xenbus_read_unsigned() in connect_ring()
+> >>>>>
+> >>>>> Changed since v2:
+> >>>>>   * simplify the condition check as "(err != 1 && nr_grefs > 1)"
+> >>>>>   * avoid setting err as -EINVAL to remove extra one line of code
+> >>>>>
+> >>>>> Changed since v3:
+> >>>>>   * exit at the beginning if !nr_grefs
+> >>>>>   * change the if statements to avoid test (err != 1) twice
+> >>>>>   * initialize a 'blkif' stack variable (refer to PATCH 1/2)
+> >>>>>
+> >>>>>  drivers/block/xen-blkback/xenbus.c | 76 +++++++++++++++++++++-----------------
+> >>>>>  1 file changed, 43 insertions(+), 33 deletions(-)
+> >>>>>
+> >>>>> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+> >>>>> index a4aadac..a2acbc9 100644
+> >>>>> --- a/drivers/block/xen-blkback/xenbus.c
+> >>>>> +++ b/drivers/block/xen-blkback/xenbus.c
+> >>>>> @@ -926,7 +926,7 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
+> >>>>>   int err, i, j;
+> >>>>>   struct xen_blkif *blkif = ring->blkif;
+> >>>>>   struct xenbus_device *dev = blkif->be->dev;
+> >>>>> - unsigned int ring_page_order, nr_grefs, evtchn;
+> >>>>> + unsigned int nr_grefs, evtchn;
+> >>>>>
+> >>>>>   err = xenbus_scanf(XBT_NIL, dir, "event-channel", "%u",
+> >>>>>                     &evtchn);
+> >>>>> @@ -936,43 +936,38 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
+> >>>>>           return err;
+> >>>>>   }
+> >>>>>
+> >>>>> - err = xenbus_scanf(XBT_NIL, dev->otherend, "ring-page-order", "%u",
+> >>>>> -                   &ring_page_order);
+> >>>>> - if (err != 1) {
+> >>>>> -         err = xenbus_scanf(XBT_NIL, dir, "ring-ref", "%u", &ring_ref[0]);
+> >>>>> + nr_grefs = blkif->nr_ring_pages;
+> >>>>> +
+> >>>>> + if (unlikely(!nr_grefs))
+> >>>>> +         return -EINVAL;
+> >>>>
+> >>>> Is this even possible? AFAICT read_per_ring_refs will always be called
+> >>>> with blkif->nr_ring_pages != 0?
+> >>>>
+> >>>> If so, I would consider turning this into a BUG_ON/WARN_ON.
+> >>>
+> >>> It used to be "WARN_ON(!nr_grefs);" in the v3 of the patch.
+> >>>
+> >>> I would turn it into WARN_ON if it is fine with both Paul and you.
+> >>
+> >> To clarify, I would use WARN_ON() before exit with -EINVAL (when
+> >> blkif->nr_ring_pages is 0).
+> >
+> > Given that this function will never be called with nr_ring_pages == 0
+> > I would be fine with just using a BUG_ON, getting here with
+> > nr_ring_pages == 0 would imply memory corruption or some other severe
+> > issue has happened, and there's no possible recovery.
+> >
+> > If you want to instead keep the return, please use plain WARN instead
+> > of WARN_ON.
+> >
+> > Thanks, Roger.
+> >
+>
+> Is there any reason using WARN than WARN_ON? Because of the message printed by
+> WARN? something like below?
 
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c         | 22 +++++++++++++++-------
- fs/iomap.c          |  4 ++--
- fs/xfs/xfs_aops.c   |  4 ++--
- include/linux/bio.h |  2 +-
- 4 files changed, 20 insertions(+), 12 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index 968b12fea564..83a2dfa417ca 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -753,6 +753,8 @@ EXPORT_SYMBOL(bio_add_pc_page);
-  * @page: page to add
-  * @len: length of the data to add
-  * @off: offset of the data in @page
-+ * @same_page: if %true only merge if the new data is in the same physical
-+ *		page as the last segment of the bio.
-  *
-  * Try to add the data at @page + @off to the last bvec of @bio.  This is a
-  * a useful optimisation for file systems with a block size smaller than the
-@@ -761,19 +763,25 @@ EXPORT_SYMBOL(bio_add_pc_page);
-  * Return %true on success or %false on failure.
-  */
- bool __bio_try_merge_page(struct bio *bio, struct page *page,
--		unsigned int len, unsigned int off)
-+		unsigned int len, unsigned int off, bool same_page)
- {
- 	if (WARN_ON_ONCE(bio_flagged(bio, BIO_CLONED)))
- 		return false;
- 
- 	if (bio->bi_vcnt > 0) {
- 		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
-+		phys_addr_t vec_end_addr = page_to_phys(bv->bv_page) +
-+			bv->bv_offset + bv->bv_len - 1;
-+		phys_addr_t page_addr = page_to_phys(page);
- 
--		if (page == bv->bv_page && off == bv->bv_offset + bv->bv_len) {
--			bv->bv_len += len;
--			bio->bi_iter.bi_size += len;
--			return true;
--		}
-+		if (vec_end_addr + 1 != page_addr + off)
-+			return false;
-+		if (same_page && (vec_end_addr & PAGE_MASK) != page_addr)
-+			return false;
-+
-+		bv->bv_len += len;
-+		bio->bi_iter.bi_size += len;
-+		return true;
- 	}
- 	return false;
- }
-@@ -819,7 +827,7 @@ EXPORT_SYMBOL_GPL(__bio_add_page);
- int bio_add_page(struct bio *bio, struct page *page,
- 		 unsigned int len, unsigned int offset)
- {
--	if (!__bio_try_merge_page(bio, page, len, offset)) {
-+	if (!__bio_try_merge_page(bio, page, len, offset, false)) {
- 		if (bio_full(bio))
- 			return 0;
- 		__bio_add_page(bio, page, len, offset);
-diff --git a/fs/iomap.c b/fs/iomap.c
-index af736acd9006..0c350e658b7f 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -318,7 +318,7 @@ iomap_readpage_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
- 	 */
- 	sector = iomap_sector(iomap, pos);
- 	if (ctx->bio && bio_end_sector(ctx->bio) == sector) {
--		if (__bio_try_merge_page(ctx->bio, page, plen, poff))
-+		if (__bio_try_merge_page(ctx->bio, page, plen, poff, true))
- 			goto done;
- 		is_contig = true;
- 	}
-@@ -349,7 +349,7 @@ iomap_readpage_actor(struct inode *inode, loff_t pos, loff_t length, void *data,
- 		ctx->bio->bi_end_io = iomap_read_end_io;
- 	}
- 
--	__bio_add_page(ctx->bio, page, plen, poff);
-+	bio_add_page(ctx->bio, page, plen, poff);
- done:
- 	/*
- 	 * Move the caller beyond our range so that it keeps making progress.
-diff --git a/fs/xfs/xfs_aops.c b/fs/xfs/xfs_aops.c
-index 1f1829e506e8..b9fd44168f61 100644
---- a/fs/xfs/xfs_aops.c
-+++ b/fs/xfs/xfs_aops.c
-@@ -616,12 +616,12 @@ xfs_add_to_ioend(
- 				bdev, sector);
- 	}
- 
--	if (!__bio_try_merge_page(wpc->ioend->io_bio, page, len, poff)) {
-+	if (!__bio_try_merge_page(wpc->ioend->io_bio, page, len, poff, true)) {
- 		if (iop)
- 			atomic_inc(&iop->write_count);
- 		if (bio_full(wpc->ioend->io_bio))
- 			xfs_chain_bio(wpc->ioend, wbc, bdev, sector);
--		__bio_add_page(wpc->ioend->io_bio, page, len, poff);
-+		bio_add_page(wpc->ioend->io_bio, page, len, poff);
- 	}
- 
- 	wpc->ioend->io_size += len;
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index c5231e5c7e85..1ece9f30294b 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -441,7 +441,7 @@ extern int bio_add_page(struct bio *, struct page *, unsigned int,unsigned int);
- extern int bio_add_pc_page(struct request_queue *, struct bio *, struct page *,
- 			   unsigned int, unsigned int);
- bool __bio_try_merge_page(struct bio *bio, struct page *page,
--		unsigned int len, unsigned int off);
-+		unsigned int len, unsigned int off, bool same_page);
- void __bio_add_page(struct bio *bio, struct page *page,
- 		unsigned int len, unsigned int off);
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter);
--- 
-2.9.5
-
+Oh, so WARN also takes a condition, I was expecting WARN to not take
+any parameters. Just use WARN_ON(true); then, there's no need to
+re-evaluate !nr_grefs.
