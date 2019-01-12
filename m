@@ -1,118 +1,109 @@
-Return-Path: <SRS0=DRnZ=PT=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=tPwK=PU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B0FC43387
-	for <linux-block@archiver.kernel.org>; Fri, 11 Jan 2019 18:34:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7AB8C43612
+	for <linux-block@archiver.kernel.org>; Sat, 12 Jan 2019 02:34:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0D7F020872
-	for <linux-block@archiver.kernel.org>; Fri, 11 Jan 2019 18:34:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A32A204FD
+	for <linux-block@archiver.kernel.org>; Sat, 12 Jan 2019 02:34:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="YaRRhW4r"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="d2bTrNOG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731813AbfAKSep (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Jan 2019 13:34:45 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:43361 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729697AbfAKSep (ORCPT
+        id S1726460AbfALCer (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Jan 2019 21:34:47 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:55908 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726449AbfALCer (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Jan 2019 13:34:45 -0500
-Received: by mail-pf1-f196.google.com with SMTP id w73so7323411pfk.10
-        for <linux-block@vger.kernel.org>; Fri, 11 Jan 2019 10:34:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=lszYkSIu7S0G0GkbSWA6G+IUU99PAcTok/8iYuS+0Ig=;
-        b=YaRRhW4r0sXDl899rnnW0bmtsUu+0KKxCP0jj2tRzDrR0dusN6rJEBnDBw4WhY28Ph
-         deJyTcNTtTuSVoPZbVLfyFyftncmg5WG/TGIfCwSy/WnR/w4qFbhv5ABKq0HKrpDykud
-         LncFXcN00wus7FWpzGxANj1xB+GiTiAWNtikIP6kBLUxXpanH/2DtKG1U+r6znZQlIV2
-         yhyvAzSfoGrvMMPXWSKeyhB21q9S0VZcPCvUqavsvvJDbaSOAH+nIH14ZZvcKFKExxmw
-         jOc/Tz3KllhN3w8diLSnCnyI2OkizfiNFFbAl3UoxSEag8mUZnBmOpFN8NQ0NyS2fU24
-         M0Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=lszYkSIu7S0G0GkbSWA6G+IUU99PAcTok/8iYuS+0Ig=;
-        b=lzVOlchAHy2RaveMgtp4BR4pEiDvo2Q6P7h23eu856uGQs8EwtkNfh0q0v8RGL66bD
-         KUDVV0KyRqvzKGpibYJZUjb/l5qFLVlZCDbb5Jc1Yn3hdWZX/cCoNbN3CxtRlsGtdbfb
-         DizX60/GLrTjteatqK5ZRpj50hcEyxT/CxWBSw1rmCzJ08YHpPXM8FeoHPNkvyEpU6u+
-         TWJOWk3iuJDekgz2dDMQ9N1mR6QazS5sgvj3TYTXH2mDzfWODK3ZTfmffxO3aRTG8dUj
-         3OD3Zc5FAVGhFTp9BVH99/kkzhBA2Mh7j4i3fYDIyCVTIKFMqcXdIrY3SRrodXcPlSKo
-         dW1Q==
-X-Gm-Message-State: AJcUukcipX7lHJ9ABPMo3Nd4Qe2KxayHYCjizSYicwHxc6I0QIp9NPPN
-        UxGm633ikSyaVl8Xn2LhTgnspA==
-X-Google-Smtp-Source: ALg8bN6xID5YBAtKrZY68YrPvVJLAiahon10dfUNpDL3hYzG5nv9ljX9bXqwuVpp0uDT7xWsDYs+Eg==
-X-Received: by 2002:a63:2c82:: with SMTP id s124mr14048409pgs.73.1547231684220;
-        Fri, 11 Jan 2019 10:34:44 -0800 (PST)
-Received: from ?IPv6:2620:10d:c081:1131::1250? ([2620:10d:c090:180::1:fab8])
-        by smtp.gmail.com with ESMTPSA id k191sm92447325pgd.9.2019.01.11.10.34.41
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 11 Jan 2019 10:34:42 -0800 (PST)
-Subject: Re: [PATCH 05/15] Add io_uring IO interface
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
-        linux-block@vger.kernel.org, linux-arch@vger.kernel.org,
-        hch@lst.de, jmoyer@redhat.com, avi@scylladb.com
-References: <20190110024404.25372-1-axboe@kernel.dk>
- <20190110024404.25372-6-axboe@kernel.dk> <yq1sgxzys3s.fsf@oracle.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <f97a5b9f-68f3-c4af-649d-7dffbc35e37f@kernel.dk>
-Date:   Fri, 11 Jan 2019 11:34:40 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Fri, 11 Jan 2019 21:34:47 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0C2YQH3144399;
+        Sat, 12 Jan 2019 02:34:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=2grzZ8KhBlAoecpkfOhrU3PmA2ozXi3hys0ShEeMTqE=;
+ b=d2bTrNOGnst0Vt8Wr6FLa7G4u+ZNqg36IPYNBldTg3E1wyG0p0ZKp0d8Eab0VEp2fWme
+ HfXRKJBzf1mHtzDUk9c90hhYcMC3Qx0oO7/bupRGjABUxSmn+tl9EIqDRi9c574RJfWB
+ ZeUmJPVDkwJqw7ZChcyoJWBHM5GbzQLO+0krgmB6Nuerd7nOT6pLnWVoKVVtOMVwAepK
+ ppmOvTRO8nJoAH7dNM/kdMvpUfmmpIfZAAgdgqXEsR65b+9GH+Fnnd8CGtQ5ebd78ASI
+ beM4Q8HZ57TDCdGjwCoZ71vqbpFP9oJArqn4pGmmARo3bz+5YMpSK68PX4zcpPjXpuhz vw== 
+Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
+        by userp2130.oracle.com with ESMTP id 2ptm0uqssw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 12 Jan 2019 02:34:26 +0000
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x0C2YONo027807
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 12 Jan 2019 02:34:24 GMT
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x0C2YMOg009452;
+        Sat, 12 Jan 2019 02:34:22 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 11 Jan 2019 18:34:22 -0800
+To:     John Garry <john.garry@huawei.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Intel SCU Linux support <intel-linux-scu@intel.com>,
+        Artur Paszkiewicz <artur.paszkiewicz@intel.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, Jeff Moyer <jmoyer@redhat.com>,
+        chenxiang <chenxiang66@hisilicon.com>
+Subject: Re: [PATCH] scsi: isci: initialize shost fully before calling scsi_add_host()
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20190108205043.3122-1-logang@deltatee.com>
+        <20190109184105.GB22070@lst.de>
+        <8d96b40d-fc83-9218-9479-3de423594ddb@huawei.com>
+Date:   Fri, 11 Jan 2019 21:34:19 -0500
+In-Reply-To: <8d96b40d-fc83-9218-9479-3de423594ddb@huawei.com> (John Garry's
+        message of "Thu, 10 Jan 2019 09:11:44 +0000")
+Message-ID: <yq1lg3qy578.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <yq1sgxzys3s.fsf@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9133 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1901120019
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/11/19 11:19 AM, Martin K. Petersen wrote:
-> 
-> Jens,
-> 
->> +struct io_uring_sqe {
->> +	__u8	opcode;
->> +	__u8	flags;
->> +	__u16	ioprio;
->> +	__s32	fd;
->> +	__u64	off;
->> +	union {
->> +		void	*addr;
->> +		__u64	__pad;
->> +	};
->> +	__u32	len;
->> +	union {
->> +		__kernel_rwf_t	rw_flags;
->> +		__u32		__resv;
->> +	};
->> +};
-> 
-> A bit tongue in cheek and yet somewhat serious: While I'm super excited
-> about the 4 x 64 bitness of the sqe, where does the integrity buffer go?
-> Or the 128-bit KV store key. How do we extend this interface beyond the
-> flags?
 
-For integrity buffers, how about we stash them on the side? The newer
-series has an extra system call, io_uring_register(), which is currently
-used for registering files and buffers for IO on the side. You could
-trivially tie an integrity buffer to an sqe through that.
+John,
 
-For KV, I thint that's an actually interesting use case (sorry,
-integrity), and we might just want to bite the bullet and extend the sqe
-to full 64 bytes.  We're currently at 48 bytes, which leaves us with 16
-bytes of space for KV, and other use cases.
+> So how about just drop these APIs and let the user set the shost
+> protection parameters directly, like other shost parameters,
+
+The protection interfaces here obviously predate the block layer
+allocation changes that made this particular issue pop up.
+
+> which should make it a bit clearer when these should be set,
+> i.e. before scsi_add_host()?
+
+In general, I am not so keen on the somewhat messy intersection between
+the host parameters and the host template. The static host templates
+made lots of sense in the days of Seagate ST01 and fixed hardware
+capabilities.  But reality is that most modern controllers have to query
+firmware interfaces to figure out what their actual capabilities are.
+
+So in this case I think that accessor functions are actually better
+because they allow us to print a big fat warning when you twiddle
+something you shouldn't post-initialization. So that's something I think
+we could--and should--improve.
 
 -- 
-Jens Axboe
-
+Martin K. Petersen	Oracle Linux Engineering
