@@ -2,169 +2,230 @@ Return-Path: <SRS0=tPwK=PU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B16C43387
-	for <linux-block@archiver.kernel.org>; Sat, 12 Jan 2019 21:09:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF5D8C43387
+	for <linux-block@archiver.kernel.org>; Sat, 12 Jan 2019 21:30:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 308B9206B7
-	for <linux-block@archiver.kernel.org>; Sat, 12 Jan 2019 21:09:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A08E920872
+	for <linux-block@archiver.kernel.org>; Sat, 12 Jan 2019 21:30:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="GX05d6lS"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="1gRq5157"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726553AbfALVJV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 12 Jan 2019 16:09:21 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:41760 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726399AbfALVJV (ORCPT
+        id S1726525AbfALVaU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 12 Jan 2019 16:30:20 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:42063 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726255AbfALVaU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 12 Jan 2019 16:09:21 -0500
-Received: by mail-pl1-f195.google.com with SMTP id u6so8338211plm.8
-        for <linux-block@vger.kernel.org>; Sat, 12 Jan 2019 13:09:21 -0800 (PST)
+        Sat, 12 Jan 2019 16:30:20 -0500
+Received: by mail-pg1-f196.google.com with SMTP id d72so7785521pga.9
+        for <linux-block@vger.kernel.org>; Sat, 12 Jan 2019 13:30:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=vlw27pvDHSB3annpzDZqjhQGmZ0TEuGYbMwl6+Ifb0w=;
-        b=GX05d6lSA9n6Jmk0DfevGi/AzpQAZWwqK3mou32tEIQ09FEk9u7vWu0hUPZFd4RRc9
-         ODaZo2OwJMoNNQBJ2ks6R91H2WuaQoRWzlAv0miEX+hdULqSpWWfpHbn919A+ZRjsnh9
-         MtQw0ajJ/VFoY0lSzPux2zN5uzK0NaV4Rt7BxckeICT9HSc3Wl188xraWJQLRcBE2vQ7
-         X5AXdBSnYEpM4DgxYR78/TU9s65jOGvM0Y0YXHNbAUaxl3r5GuwWAXBci5n1iYVkw/wK
-         Pq0Pw6/2w5+m8kGppVXq8zFjqr3f3PwPlim1zAXeKoy2dd+2930rZOt9WqJ1tzwAqUvk
-         OZzg==
+        h=from:to:cc:subject:date:message-id;
+        bh=IbJfq8FCmhDPooa8/j2eXvqahKXF7IZHL0mOUhIMpP8=;
+        b=1gRq5157nl99m/VsoBf/EYdSJG+higKd4k5haK5rnewufCClktH1JE5q/Hl6HRNwrv
+         ADZal534voeUXYS6EW64UTaqfiphQglByzyAmRIiG48yPGEnpvejCcYVHVEV8hsY1QSj
+         CpA4AecOAIml61bE/creFZYHPmo7Xk7pcbGIQ0c5biNzeG6lOdIyFIndIz1BuVMAfJZs
+         uHF8htOQ3nrtvabZF1lyBfUkot4hcFsjUE2nVQpBO9Z8Fq5Bit/8xTu8MjkGLK+aveC3
+         YJQeFh6s3KGhAkY2tvof7jTDoB4RhjovAJkQ1hsXVX1APZXmW8CHDJ58Zt5C0J+rmH2I
+         nqlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=vlw27pvDHSB3annpzDZqjhQGmZ0TEuGYbMwl6+Ifb0w=;
-        b=Px1xjSmgckklWI8jIhnD1gqeUqtP5gLEY7ZG3fYzp7ExUMvSfXLkvSJJJLq+0XGtb5
-         N2EKHJYCcsLW5Uf2Z9gqwCap6GA0khwesrz6mYBnIHFxCMjvKj4XxPR+mvSIHF4KYx2v
-         ta4RiitFghcgyTCeiYywl7l07CUU0+BSj5nFEwnNoZv4d8/J8ksbNvUoAwJ9J5Dtepay
-         Hi315rhSUi2G+noM0eydIc4dqvCHAyrtiKPXdB10la88ZOh0blx6UZrnjUWbCaI3qnu5
-         fwz96rVK32JAi85CQxivB5VKcuo0brUIO09BPkPI8c9B+ks/wwBUX8UAZe1ac9o+Tbgr
-         p/FQ==
-X-Gm-Message-State: AJcUukdUIEao6CUVEKfW5is3sC/PeLS3wcH9ZctHA7Vy4yjiQiy6heu1
-        NoZ4Qd78FlQ9cTjeZZ6LCLvQ422SpsaW1Q==
-X-Google-Smtp-Source: ALg8bN4zbKNHrII1mvYHhAJdp2gxDWDe5UMJTzD+PFPofFkTuXvrnriPQlxNwLwsa6lgKBC4SBNAWQ==
-X-Received: by 2002:a17:902:7e0d:: with SMTP id b13mr20082404plm.154.1547327360054;
-        Sat, 12 Jan 2019 13:09:20 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id b9sm114969767pfi.118.2019.01.12.13.09.17
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=IbJfq8FCmhDPooa8/j2eXvqahKXF7IZHL0mOUhIMpP8=;
+        b=AzRSas4c70YSH4b8suOgoUWly/BFKRZCqCGk0GjnRCszKLtwnJnz1jSQSejl/zsZ5E
+         A8BdW8kIjAIfA1U0hgLfQV77rvwdh8MLtceBJvW/e9/nXwynJyGdue+c8CaIUQ3Uzy3j
+         wORucq/6jhZP9WnBCBB1OCSXoT25fEzhzcrUOqyZgn782CYCmtaHNUmMidI2hN/d0aaf
+         n2/RfV7cwzgl/rILE310en+sBMqQuyZXoFqOqzbCgOeBMNBKsokOBlBFj5l3nwqDL7uM
+         s757jHWvOhTDysyJlfBh8mqaCOfKaXGDI+Hhq5dD6xROros7eSKdwqVDn+o9XnQ/yzNv
+         4uTg==
+X-Gm-Message-State: AJcUukcktj/b5P97cJtPphaTFxnsvcSNKWjDeltr0JCC5kWuog+55Pvb
+        5KppJ1sh+RWhYbqJ0OcQFR5ubw==
+X-Google-Smtp-Source: ALg8bN4m/zbKe2ji8INLkfJsgc+pImQzCsqo7iEz9nnuxZjK8KGAjYrFyYammh0IcBmVl2qGZ8ToYA==
+X-Received: by 2002:a62:62c5:: with SMTP id w188mr19964310pfb.160.1547328619470;
+        Sat, 12 Jan 2019 13:30:19 -0800 (PST)
+Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id y6sm151629818pfd.104.2019.01.12.13.30.16
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 12 Jan 2019 13:09:18 -0800 (PST)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Sat, 12 Jan 2019 13:30:18 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.0-rc2
-Message-ID: <8137c662-f43e-ddc2-807c-155016e46fed@kernel.dk>
-Date:   Sat, 12 Jan 2019 14:09:16 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
+        linux-block@vger.kernel.org, linux-arch@vger.kernel.org
+Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com
+Subject: [PATCHSET v3] io_uring IO interface
+Date:   Sat, 12 Jan 2019 14:29:55 -0700
+Message-Id: <20190112213011.1439-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Here's v3 of the io_uring interface. Since data structures etc have
+changed since the v1 posting, here's a refresher of what io_uring
+is and how it works.
 
-Here's a set of fixes that should make it into this series. This pull
-request contains:
+io_uring is a submission queue (SQ) and completion queue (CQ) pair that
+an application can use to communicate with the kernel for doing IO. This
+isn't aio/libaio, but it provides a similar set of features, as well as
+some new ones:
 
-- NVMe pull request from Christoph, with little fixes all over the map
+- io_uring is a lot more efficient than aio. A lot, and in many ways.
 
-- Loop caching fix for offset/bs change (Jaegeuk Kim)
+- io_uring supports buffered aio. Not just that, but efficiently as
+  well. Cached data isn't punted to an async context.
 
-- Block documentation tweaks (Jeff, Jon, Weiping, John)
+- io_uring supports polled IO, it takes advantage of the blk-mq polling
+  work that went into 5.0-rc.
 
-- null_blk zoned tweak (John)
+- io_uring supports kernel side submissions for polled IO. This enables
+  IO without ever having to do a system call.
 
-- ahch mvebu suspend/resume support. Should have gone into the merge
-  window, but there was some confusion on which tree had it. (Miquel)
+- io_uring supports fixed buffers for O_DIRECT. Buffers can be
+  registered after an io_uring context has been setup, which eliminates
+  the need to do get_user_pages() / put_pages() for each and every IO.
 
-Please pull!
+To use io_uring, you must first setup an io_uring context. This is done
+through the first of three new system calls:
+
+io_uring_setup(entries, params)
+	Sets up a context for doing async IO. On success, returns a file
+	descriptor that the application can mmap to gain access to the
+	SQ ring, CQ ring, and io_uring_sqe's.
+
+Once the rings are setup, the application then mmap's these rings to
+communicate with the kernel. See a sample application I wrote that
+natively does this:
+
+http://git.kernel.dk/cgit/fio/plain/t/io_uring.c
+
+IO is done by filling out an io_uring_sqe, and updating the SQ ring. The
+format of the sqe is as follows:
+
+struct io_uring_sqe {
+	__u8	opcode;		/* type of operation for this sqe */
+	__u8	flags;		/* IOSQE_ flags */
+	__u16	ioprio;		/* ioprio for the request */
+	__s32	fd;		/* file descriptor to do IO on */
+	__u64	off;		/* offset into file */
+	union {
+		void	*addr;	/* buffer or iovecs */
+		__u64	__pad;
+	};
+	__u32	len;		/* buffer size or number of iovecs */
+	union {
+		__kernel_rwf_t	rw_flags;
+		__u32		fsync_flags;
+	};
+	__u16	buf_index;	/* index into fixed buffers, if used */
+	__u16	__pad2;
+	__u32	__pad3;
+	__u64	user_data;	/* data to be passed back at completion time */
+};
+
+Most of this is self explanatory. The ->user_data field is passed back
+through a completion event, so the application can track IOs
+individually.
+
+Completions are posted on the CQ ring when an sqe completes, they are a
+struct io_uring_cqe and the format is as follows:
+
+struct io_uring_cqe {
+	__u64	user_data;	/* sqe->data submission passed back */
+	__s32	res;		/* result code for this event */
+	__u32	flags;
+};
+
+To either submit IO or reap completions, there's a 2nd new system call:
+
+io_uring_enter(fd, to_submit, min_complete, flags)
+	Initiates IO against the rings mapped to this fd, or waits for
+	them to complete, or both The behavior is controlled by the
+	parameters passed in. If 'min_complete' is non-zero, then we'll
+	try and submit new IO. If IORING_ENTER_GETEVENTS is set, the
+	kernel will wait for 'min_complete' events, if they aren't
+	already available.
+
+The sample application mentioned above uses the rings directly, but for
+most uses cases, I intend to have the necessary support in a liburing
+library that abstracts it enough for application to use in a performant
+way, without having to deal with the intricacies of the ring. There's
+already some basic support there and a few test applications, but that
+side definitely needs some work. Find that repo here:
+
+git://git.kernel.dk/liburing
+
+io_uring is designed to be fast and scalable. I've demonstrated 1.6M 4k
+IOPS from a single core on my aging test box, and on the latency front,
+we're also doing extremely well. It's designed to both be async and
+batching, if you wish, the application gets to control how to use that
+side.
+
+If you want to play with io_uring, see the sample app above, the
+liburing repo, or the fio io_uring engine as well.
+
+Patches are against 5.0-rc1 (ish), and can also be found in my
+'io_uring' git branch:
+
+git://git.kernel.dk/linux-block io_uring
 
 
-  git://git.kernel.dk/linux-block.git tags/for-linus-20190112
+Since v2
+- Separate fixed buffers from sqe entries. register/unregister them
+  through the new io_uring_register(2) system call
+- sqe->index is now sqe->buf_index to make it clearer
+- fixed buffers require sqe->flags to have IOSQE_FIXED_BUFFER set
+- Add sqe field that is passed back at completion through the cqe, instead
+  of passing back the original sqe index. This is more useful as it allows
+  per-life of IO data, ->index did not.
+- Cleanup async IO punting
+- Don't punt O_DIRECT writes to async handling
+- Make sq thread just for polling (submissions and completions)
+- Always enable sq workqueue for async offload
+- Use GFP_ATOMIC for req allocation
+- Fix bio_vec being an unknown type on some kconfigs
+- New IORING_OP_FSYNC implementation
+- Add fixed fileset support through io_uring_register(2)
+- Integrate workqueue support into main patchset
+- Fix io_sq_thread() logic for when to grab current->mm
+- Fix io_sq_thread() off-by-one
+- Improve polling performance for multiple files in an io_uring context
+- Have CONFIG_IO_URING select ANON_INODES
+- Don't make io_kiocb->ki_flags atomic
+- Be fully consistent in naming, for some reason we used the same
+  mess that aio.c is, where io_kiocb,kiocb,iocb are used interchangably.
+  'req' is now always io_kiocb, 'kiocb' is always kiocb.
+- Rename KIOCB_F_* flags as they are req flags, REQ_F_*.
 
 
-----------------------------------------------------------------
-Andrey Smirnov (1):
-      nvme: don't initlialize ctrl->cntlid twice
-
-Hannes Reinecke (1):
-      nvme-multipath: zero out ANA log buffer
-
-Hongbo Yao (1):
-      nvme-pci: fix out of bounds access in nvme_cqe_pending
-
-Jaegeuk Kim (1):
-      loop: drop caches if offset or block_size are changed
-
-James Dingwall (1):
-      nvme: introduce NVME_QUIRK_IGNORE_DEV_SUBNQN
-
-Jeff Moyer (1):
-      block: clarify documentation for blk_{start|finish}_plug
-
-Jens Axboe (1):
-      Merge branch 'nvme-5.0' of git://git.infradead.org/nvme into for-linus
-
-Jianchao Wang (1):
-      nvme-pci: fix the wrong setting of nr_maps
-
-John Pittman (2):
-      null_blk: add zoned config support information
-      block: doc: add slice_idle_us to bfq documentation
-
-Jonathan Corbet (1):
-      block: fix kerneldoc comment for blk_attempt_plug_merge()
-
-Keith Busch (2):
-      nvme-pci: rerun irq setup on IO queue init errors
-      nvme: pad fake subsys NQN vid and ssvid with zeros
-
-Liviu Dudau (1):
-      nvme-pci: use the same attributes when freeing host_mem_desc_bufs.
-
-Miquel Raynal (5):
-      ata: libahci_platform: comply to PHY framework
-      ata: ahci: mvebu: remove stale comment
-      ata: ahci: mvebu: do Armada 38x configuration only on relevant SoCs
-      ata: ahci: mvebu: add Armada 3700 initialization needed for S2RAM
-      ata: ahci: mvebu: request PHY suspend/resume for Armada 3700
-
-Sagi Grimberg (3):
-      nvme-tcp: remove dead code
-      nvme-tcp: don't ask if controller is fabrics
-      nvme-fabrics: unset write/poll queues for discovery controllers
-
-Weiping Zhang (1):
-      block: add documentation for io_timeout
-
- Documentation/ABI/testing/sysfs-block |  9 ++++
- Documentation/block/bfq-iosched.txt   |  7 +++
- Documentation/block/null_blk.txt      |  3 +-
- Documentation/block/queue-sysfs.txt   |  7 +++
- block/blk-core.c                      | 20 +++++++-
- drivers/ata/ahci.h                    |  2 +
- drivers/ata/ahci_mvebu.c              | 87 ++++++++++++++++++++++++++---------
- drivers/ata/libahci_platform.c        | 13 ++++++
- drivers/block/loop.c                  | 35 +++++++++++++-
- drivers/block/null_blk.h              |  1 +
- drivers/nvme/host/core.c              | 19 ++++----
- drivers/nvme/host/fabrics.c           |  2 +
- drivers/nvme/host/multipath.c         |  2 +
- drivers/nvme/host/nvme.h              |  5 ++
- drivers/nvme/host/pci.c               | 67 +++++++++++++++++++--------
- drivers/nvme/host/tcp.c               | 16 +++----
- 16 files changed, 229 insertions(+), 66 deletions(-)
+ Documentation/filesystems/vfs.txt      |    3 +
+ arch/x86/entry/syscalls/syscall_64.tbl |    3 +
+ block/bio.c                            |   59 +-
+ fs/Makefile                            |    1 +
+ fs/block_dev.c                         |   19 +-
+ fs/file.c                              |   15 +-
+ fs/file_table.c                        |    9 +-
+ fs/gfs2/file.c                         |    2 +
+ fs/io_uring.c                          | 2023 ++++++++++++++++++++++++
+ fs/iomap.c                             |   48 +-
+ fs/xfs/xfs_file.c                      |    1 +
+ include/linux/bio.h                    |   14 +
+ include/linux/blk_types.h              |    1 +
+ include/linux/file.h                   |    2 +
+ include/linux/fs.h                     |    6 +-
+ include/linux/iomap.h                  |    1 +
+ include/linux/syscalls.h               |    7 +
+ include/uapi/linux/io_uring.h          |  147 ++
+ init/Kconfig                           |    9 +
+ kernel/sys_ni.c                        |    3 +
+ 20 files changed, 2334 insertions(+), 39 deletions(-)
 
 -- 
 Jens Axboe
+
 
