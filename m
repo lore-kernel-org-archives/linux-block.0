@@ -2,126 +2,108 @@ Return-Path: <SRS0=EL0S=PV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 178ACC43387
-	for <linux-block@archiver.kernel.org>; Sun, 13 Jan 2019 16:22:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F46CC43387
+	for <linux-block@archiver.kernel.org>; Sun, 13 Jan 2019 22:42:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D2DEB20854
-	for <linux-block@archiver.kernel.org>; Sun, 13 Jan 2019 16:22:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="h9BCgz12"
+	by mail.kernel.org (Postfix) with ESMTP id 5640A20850
+	for <linux-block@archiver.kernel.org>; Sun, 13 Jan 2019 22:42:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726721AbfAMQWW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Jan 2019 11:22:22 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:45853 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726659AbfAMQWV (ORCPT
+        id S1726581AbfAMWms (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Jan 2019 17:42:48 -0500
+Received: from ipmail06.adl6.internode.on.net ([150.101.137.145]:15530 "EHLO
+        ipmail06.adl6.internode.on.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726565AbfAMWms (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Jan 2019 11:22:21 -0500
-Received: by mail-pf1-f194.google.com with SMTP id g62so9194667pfd.12
-        for <linux-block@vger.kernel.org>; Sun, 13 Jan 2019 08:22:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=xGTUGaUsnkrHE3I4ytaWS6tuX9Ef328HUPpl0Zip+JA=;
-        b=h9BCgz12uXcjyXiN19LiCb0lSGdfKtJ+KsvKDmu8XuK7K/zZsG/OSHKTGif4h9EH7c
-         BXNm7eIQuUG7GQVQBuC1HqSmgyWtw+GNKghvU2fIvWsVza9UhYlMrT6at/SeTiCv3Pfe
-         hOypNja0ktrzn6CVWx1MKd5cTllDBdOu5yymi1cdvCG4Z1mFsdkuqiZ7mwiblGGcT33t
-         OiIJFu/Wt8kirJvhdpH8u+LPsIQzgi0yBiiX2GCFKkaoFDMYnqTofgE04Q1dwzJWZWp1
-         I6Nx2Izvh66ZpBThxiJ2HlywkbIl3CtxMeYppSxVkb8z8o1xNoUOtWMWapQB7ju4dlqA
-         CqCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=xGTUGaUsnkrHE3I4ytaWS6tuX9Ef328HUPpl0Zip+JA=;
-        b=PXdcLdsSumJRS+feumnM89D3F+JoiMOsh4bIZLeTBpP2GJhP+PRpsKzxcyXx1bf/iO
-         gYT6SnqbD/lhGGCgNg8gFjLCRT3pe7B9YqEoNi708fMLElBbneDTvBaIJqJfuD6jQfr2
-         wyWvB/m81VlPaVziJ4IBIVcqBTFZHRlpbZEREG9YmKGhxP2GMr8HEqnhQaK0RqzCmddM
-         dxVx1lLEmDwtLd6zUmu/8FDoXTKRmDiySGCMKCBZpqWYUBVAxaUEj7WAE9l7h63cekMH
-         jdxHcjXeKeKKgbODcPXRZjPnRRI0uHKfS3dRKDI9GXpVm+QhRi9xuSJ0pHN8rBVMf1wS
-         0abw==
-X-Gm-Message-State: AJcUukfj0PHjaDFXQaqOLdxPwlyvHb7F/coGG0M7zdRBnk1Ss7MyLxyh
-        /PX2vfX46zxlIJqmpWCxxaNNFQ==
-X-Google-Smtp-Source: ALg8bN43/u+99uzhQ/tJtqNbJtgZ7cajVfkImzFThqWf5uC+iqK6E5cQjQq3Ov1aoO3/7n98SvSVMA==
-X-Received: by 2002:a63:314d:: with SMTP id x74mr19887928pgx.10.1547396540496;
-        Sun, 13 Jan 2019 08:22:20 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id e187sm106139906pfa.130.2019.01.13.08.22.17
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 13 Jan 2019 08:22:18 -0800 (PST)
-Subject: Re: [PATCH 05/15] Add io_uring IO interface
-From:   Jens Axboe <axboe@kernel.dk>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
-        linux-block@vger.kernel.org, linux-arch@vger.kernel.org,
-        hch@lst.de, jmoyer@redhat.com, avi@scylladb.com
-References: <20190110024404.25372-1-axboe@kernel.dk>
- <20190110024404.25372-6-axboe@kernel.dk> <yq1sgxzys3s.fsf@oracle.com>
- <f97a5b9f-68f3-c4af-649d-7dffbc35e37f@kernel.dk>
-Message-ID: <54976aac-bef2-880f-dc10-e3030189a08a@kernel.dk>
-Date:   Sun, 13 Jan 2019 09:22:16 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Sun, 13 Jan 2019 17:42:48 -0500
+Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
+  by ipmail06.adl6.internode.on.net with ESMTP; 14 Jan 2019 09:12:45 +1030
+Received: from dave by dastard with local (Exim 4.80)
+        (envelope-from <david@fromorbit.com>)
+        id 1gioSq-0007Dr-Cs; Mon, 14 Jan 2019 09:42:44 +1100
+Date:   Mon, 14 Jan 2019 09:42:44 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Kurt Miller <kurt@intricatesoftware.com>
+Cc:     linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: Block device flush ordering
+Message-ID: <20190113224244.GC4205@dastard>
+References: <1547130601.20294.152.camel@intricatesoftware.com>
 MIME-Version: 1.0
-In-Reply-To: <f97a5b9f-68f3-c4af-649d-7dffbc35e37f@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1547130601.20294.152.camel@intricatesoftware.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/11/19 11:34 AM, Jens Axboe wrote:
-> On 1/11/19 11:19 AM, Martin K. Petersen wrote:
->>
->> Jens,
->>
->>> +struct io_uring_sqe {
->>> +	__u8	opcode;
->>> +	__u8	flags;
->>> +	__u16	ioprio;
->>> +	__s32	fd;
->>> +	__u64	off;
->>> +	union {
->>> +		void	*addr;
->>> +		__u64	__pad;
->>> +	};
->>> +	__u32	len;
->>> +	union {
->>> +		__kernel_rwf_t	rw_flags;
->>> +		__u32		__resv;
->>> +	};
->>> +};
->>
->> A bit tongue in cheek and yet somewhat serious: While I'm super excited
->> about the 4 x 64 bitness of the sqe, where does the integrity buffer go?
->> Or the 128-bit KV store key. How do we extend this interface beyond the
->> flags?
+[ cc'd linux-block@vger.kernel.org, where questions about block
+device behaviour are better directed. ]
+
+On Thu, Jan 10, 2019 at 09:30:01AM -0500, Kurt Miller wrote:
+> For a well behaved block device that has a writeback cache,
+> what is the proper behavior of flush when there are more
+> then one outstanding flush operations? Is it;
 > 
-> For integrity buffers, how about we stash them on the side? The newer
-> series has an extra system call, io_uring_register(), which is currently
-> used for registering files and buffers for IO on the side. You could
-> trivially tie an integrity buffer to an sqe through that.
+> Flush all writes seen since the last flush.
+> or
+> Flush all writes received prior to the flush including
+> those before any prior flush.
 > 
-> For KV, I thint that's an actually interesting use case (sorry,
-> integrity), and we might just want to bite the bullet and extend the sqe
-> to full 64 bytes.  We're currently at 48 bytes, which leaves us with 16
-> bytes of space for KV, and other use cases.
+> For example take the following order of requests presented
+> to the block device:
+> 
+> 	writes 1-5
+> 	flush 1
+> 	write 6
+> 	flush 2
+> 
+> Can flush 2 finish with success as soon as write 6 is flushed
+> (which may be before flush 1 success)? Or must it wait for
+> all prior write operations to flush (writes 1-6)?
 
-I bit the bullet and bumped the size. 64 bytes is a nicer size in terms
-of cachelines anyway, and I really doubt that 48 vs 64 bytes makes a
-size consumption problem for anyone.
+Don't take what I say as gospel, but according to block/blk-flush.c:
 
-The buf_index is only used for the fixed buffers, which means that we have
-16 bytes / 128 bits that we can grab for things like KV.
+.....
+ * Currently, the following conditions are used to determine when to issue
+ * flush.
+ *
+ * C1. At any given time, only one flush shall be in progress.  This makes
+ *     double buffering sufficient.
+.....
 
+However, flushes can be deferred and re-ordered vs other non-flush
+write IO dispatch. As such, the rules we work to with filesystems is
+that a flush only guarantees IO that is already completed will be
+written to stable storage.  i.e. the filesystem has to wait for IO
+completion of a write IO it needs to be stable before it can issue
+(and wait for) a flush that will guarantee that it is on stable
+storage.
+
+IOWs, if your above scenario is:
+
+	submit writes 1-5
+	flush 1
+	submit write 6
+	writes 1,3,5 complete
+	flush 2
+	writes 2,4,6 complete
+
+Then flush 1 does not guarantee any of the writes are on stable
+storage. They *may* be on stable storage if the timing is right, but
+it is not guaranteed by the OS code. Likewise, flush 2 only
+guarantees writes 1, 3 and 5 are on stable storage becase they are
+the only writes that have been signalled as complete when flush 2
+was submitted.
+
+Cheers,
+
+Dave.
 -- 
-Jens Axboe
-
+Dave Chinner
+david@fromorbit.com
