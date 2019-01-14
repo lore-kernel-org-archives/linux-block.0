@@ -2,113 +2,83 @@ Return-Path: <SRS0=WI6O=PW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7C19C43387
-	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 19:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EAD7C43387
+	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 20:19:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C01B220651
-	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 19:24:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D50F206B7
+	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 20:19:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726753AbfANTYY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Jan 2019 14:24:24 -0500
-Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:39266 "EHLO
-        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726734AbfANTYY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Jan 2019 14:24:24 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R501e4;CH=green;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e07486;MF=bo.liu@linux.alibaba.com;NM=1;PH=DS;RN=2;SR=0;TI=SMTPD_---0TIEqqEp_1547493709;
-Received: from localhost(mailfrom:bo.liu@linux.alibaba.com fp:SMTPD_---0TIEqqEp_1547493709)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 15 Jan 2019 03:21:49 +0800
-From:   Liu Bo <bo.liu@linux.alibaba.com>
-To:     linux-block@vger.kernel.org
-Cc:     Josef Bacik <josef@toxicpanda.com>
-Subject: [PATCH] blk-iolatency: fix IO hang due to negative inflight counter
-Date:   Tue, 15 Jan 2019 03:21:37 +0800
-Message-Id: <20190114192137.111275-1-bo.liu@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.2.gb21ebb6
+        id S1726808AbfANUTh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Jan 2019 15:19:37 -0500
+Received: from verein.lst.de ([213.95.11.211]:48694 "EHLO newverein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726760AbfANUTh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 14 Jan 2019 15:19:37 -0500
+Received: by newverein.lst.de (Postfix, from userid 2407)
+        id 296D968D93; Mon, 14 Jan 2019 21:19:35 +0100 (CET)
+Date:   Mon, 14 Jan 2019 21:19:35 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Joerg Roedel <joro@8bytes.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, jfehlig@suse.com,
+        jon.grimm@amd.com, brijesh.singh@amd.com
+Subject: Re: [PATCH 0/3] Fix virtio-blk issue with SWIOTLB
+Message-ID: <20190114201935.GA10781@lst.de>
+References: <20190110134433.15672-1-joro@8bytes.org> <5ae1341e-62ec-0478-552b-259eabf9fb17@redhat.com> <20190111091502.GC5825@8bytes.org> <38bcbd46-674c-348a-cbd6-66bd431e986a@redhat.com> <20190114095002.GA29874@lst.de> <ac6d83d8-02de-dbdf-e309-3a1115642d50@redhat.com> <20190114131114-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190114131114-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Our test reported the following stack, and vmcore showed that
-->inflight counter is -1.
+On Mon, Jan 14, 2019 at 01:20:45PM -0500, Michael S. Tsirkin wrote:
+> I don't think so - the issue is really that DMA API does not yet handle
+> the SEV case 100% correctly. I suspect passthrough devices would have
+> the same issue.
 
-[ffffc9003fcc38d0] __schedule at ffffffff8173d95d
-[ffffc9003fcc3958] schedule at ffffffff8173de26
-[ffffc9003fcc3970] io_schedule at ffffffff810bb6b6
-[ffffc9003fcc3988] blkcg_iolatency_throttle at ffffffff813911cb
-[ffffc9003fcc3a20] rq_qos_throttle at ffffffff813847f3
-[ffffc9003fcc3a48] blk_mq_make_request at ffffffff8137468a
-[ffffc9003fcc3b08] generic_make_request at ffffffff81368b49
-[ffffc9003fcc3b68] submit_bio at ffffffff81368d7d
-[ffffc9003fcc3bb8] ext4_io_submit at ffffffffa031be00 [ext4]
-[ffffc9003fcc3c00] ext4_writepages at ffffffffa03163de [ext4]
-[ffffc9003fcc3d68] do_writepages at ffffffff811c49ae
-[ffffc9003fcc3d78] __filemap_fdatawrite_range at ffffffff811b6188
-[ffffc9003fcc3e30] filemap_write_and_wait_range at ffffffff811b6301
-[ffffc9003fcc3e60] ext4_sync_file at ffffffffa030cee8 [ext4]
-[ffffc9003fcc3ea8] vfs_fsync_range at ffffffff8128594b
-[ffffc9003fcc3ee8] do_fsync at ffffffff81285abd
-[ffffc9003fcc3f18] sys_fsync at ffffffff81285d50
-[ffffc9003fcc3f28] do_syscall_64 at ffffffff81003c04
-[ffffc9003fcc3f50] entry_SYSCALL_64_after_swapgs at ffffffff81742b8e
+The DMA API handles the SEV case perfectly.  Its just that virtio_blk
+supports huge segments that virtio does not generally support, but that
+is not related to SEV in any way.
 
-The ->inflight counter may be negative (-1) if
+> In fact whoever sets IOMMU_PLATFORM is completely unaffected by
+> Christoph's pet peeve.
 
-0) blk-throttle had been enabled when the IO was issued, so its bio
-has a associated blkg,
+No, the above happens only when we set IOMMU_PLATFORM.
 
-1) blk-iolatency was disabled when the IO was issued, so iolatency_grp
-in this blkg was not available by then,
+> Christoph is saying that !IOMMU_PLATFORM devices should hide the
+> compatibility code in a special per-device DMA API implementation.
+> Which would be fine especially if we can manage not to introduce a bunch
+> of indirect calls all over the place and hurt performance.  It's just
+> that the benefit is unlikely to be big (e.g. we can't also get rid of
+> the virtio specific memory barriers) so no one was motivated enough to
+> work on it.
 
-2) blk-iolatency was enabled before this IO reached its endio, so that
-iolatency_grp became available when the IO did the endio.
+No.  The problem is that we still haven't fully specified what
+IOMMU_PLATFORM and !IOMMU_PLATFORM actually mean.  Your
+"ACCESS_PLATFORM/ORDER_PLATFORM" commit in the virtio-spec repo
+improves it a little bit, but it is still far from enough.
 
-3) the ->inflight counter is decreased from 0 to -1.
+As a start VIRTIO_F_ORDER_PLATFORM and VIRTIO_F_ACCESS_PLATFORM
+absolutely MUST be set for hardware implementations.  Otherwise said
+hardware has no chance of working on anything but the most x86-like
+systems.
 
-This uses atomic_dec_is_positive() instead to avoid the negative
-inflight counter.
+Second software implementations SHOULD set VIRTIO_F_ACCESS_PLATFORM,
+because otherwise we can't add proper handling for things like SEV or
+the IBM "secure hypervisor" thing.
 
-Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
----
- block/blk-iolatency.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 159af76d60e6..da4ede5c5ddf 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -660,7 +660,12 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
- 		}
- 		rqw = &iolat->rq_wait;
- 
--		atomic_dec(&rqw->inflight);
-+		/*
-+		 * if blkg is enabled by another throttler (e.g. blk-throttle)
-+		 * and blk-iolatency is enabled while IO is inflight,
-+		 * blk-iolatency's ->inflight counter may be still 0.
-+		 */
-+		atomic_dec_if_positive(&rqw->inflight);
- 		if (!enabled || iolat->min_lat_nsec == 0)
- 			goto next;
- 		iolatency_record_time(iolat, &bio->bi_issue, now,
-@@ -692,7 +697,8 @@ static void blkcg_iolatency_cleanup(struct rq_qos *rqos, struct bio *bio)
- 			goto next;
- 
- 		rqw = &iolat->rq_wait;
--		atomic_dec(&rqw->inflight);
-+		/* see comments in blkcg_iolatency_done_io() */
-+		atomic_dec_if_positive(&rqw->inflight);
- 		wake_up(&rqw->wait);
- next:
- 		blkg = blkg->parent;
--- 
-2.20.1.2.gb21ebb6
-
+Last but not least a lot of wording outside the area describing these
+flags really needs some major updates in terms of DMA access.
