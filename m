@@ -2,105 +2,101 @@ Return-Path: <SRS0=WI6O=PW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D20EFC43387
-	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 16:45:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EBE0C43387
+	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 18:20:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A15BD206B7
-	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 16:45:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OvPzBeLk"
+	by mail.kernel.org (Postfix) with ESMTP id 41D6C20659
+	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 18:20:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726852AbfANQpv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Jan 2019 11:45:51 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:45458 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726782AbfANQpv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Jan 2019 11:45:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=wGTzQHBcMyTcVWE6+t1dFeMTCAS+VeKwcnuwc7zF/UE=; b=OvPzBeLkd8hmKunlz9uA0RhfR
-        N/e2H+oD4giWXNO0L9XhIR6oDP6ulwsJ4BIKZQvivMmpBtVDPN/4W11iYV9NZu7ojqZYOZuQxCrHK
-        o/07lPjJFARkldHPqjnv6bGg+/RmghNM8L+lvrTCuPq7WoBfWwJm3pROvORM5Audqoy9+xVI0SG6s
-        61+NnKLGBUDM5fHR48RUqNQSnRqpZMIP190DBTRX9YkzFp1cutDnuKzqkg+6/al2HQoDyZr46cb7D
-        caZF/tM+mjUJ+f1rS1rJpnEWFluDA+F3zE52FXRD/a6RKOtyEsHP5UuxMe/PPCV1U3bFA5xYxJ07h
-        NkZEhuy+A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gj5Mz-0001qN-Ea; Mon, 14 Jan 2019 16:45:49 +0000
-Date:   Mon, 14 Jan 2019 08:45:49 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Kurt Miller <kurt@intricatesoftware.com>,
-        linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: Block device flush ordering
-Message-ID: <20190114164549.GA26523@infradead.org>
-References: <1547130601.20294.152.camel@intricatesoftware.com>
- <20190113224244.GC4205@dastard>
+        id S1726754AbfANSUs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Jan 2019 13:20:48 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:45244 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726744AbfANSUs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 14 Jan 2019 13:20:48 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id AA04C9FDCC;
+        Mon, 14 Jan 2019 18:20:47 +0000 (UTC)
+Received: from redhat.com (ovpn-124-229.rdu2.redhat.com [10.10.124.229])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BB42219744;
+        Mon, 14 Jan 2019 18:20:45 +0000 (UTC)
+Date:   Mon, 14 Jan 2019 13:20:45 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Joerg Roedel <joro@8bytes.org>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, jfehlig@suse.com,
+        jon.grimm@amd.com, brijesh.singh@amd.com
+Subject: Re: [PATCH 0/3] Fix virtio-blk issue with SWIOTLB
+Message-ID: <20190114131114-mutt-send-email-mst@kernel.org>
+References: <20190110134433.15672-1-joro@8bytes.org>
+ <5ae1341e-62ec-0478-552b-259eabf9fb17@redhat.com>
+ <20190111091502.GC5825@8bytes.org>
+ <38bcbd46-674c-348a-cbd6-66bd431e986a@redhat.com>
+ <20190114095002.GA29874@lst.de>
+ <ac6d83d8-02de-dbdf-e309-3a1115642d50@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190113224244.GC4205@dastard>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ac6d83d8-02de-dbdf-e309-3a1115642d50@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Mon, 14 Jan 2019 18:20:48 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 14, 2019 at 09:42:44AM +1100, Dave Chinner wrote:
-> On Thu, Jan 10, 2019 at 09:30:01AM -0500, Kurt Miller wrote:
-> > For a well behaved block device that has a writeback cache,
-> > what is the proper behavior of flush when there are more
-> > then one outstanding flush operations? Is it;
-> > 
-> > Flush all writes seen since the last flush.
-> > or
-> > Flush all writes received prior to the flush including
-> > those before any prior flush.
+On Mon, Jan 14, 2019 at 08:41:37PM +0800, Jason Wang wrote:
+> 
+> On 2019/1/14 下午5:50, Christoph Hellwig wrote:
+> > On Mon, Jan 14, 2019 at 05:41:56PM +0800, Jason Wang wrote:
+> > > On 2019/1/11 下午5:15, Joerg Roedel wrote:
+> > > > On Fri, Jan 11, 2019 at 11:29:31AM +0800, Jason Wang wrote:
+> > > > > Just wonder if my understanding is correct IOMMU_PLATFORM must be set for
+> > > > > all virtio devices under AMD-SEV guests?
+> > > > Yes, that is correct. Emulated DMA can only happen on the SWIOTLB
+> > > > aperture, because that memory is not encrypted. The guest bounces the
+> > > > data then to its encrypted memory.
+> > > > 
+> > > > Regards,
+> > > > 
+> > > > 	Joerg
+> > > 
+> > > Thanks, have you tested vhost-net in this case. I suspect it may not work
+> > Which brings me back to my pet pevee that we need to take actions
+> > that virtio uses the proper dma mapping API by default with quirks
+> > for legacy cases.  The magic bypass it uses is just causing problems
+> > over problems.
+> 
+> 
+> Yes, I fully agree with you. This is probably an exact example of such
+> problem.
+> 
+> Thanks
 
-The requirement is that all write operations that have been completed
-before the flush was seen are on stable storage.  How that is
-implemented in detail is up to the device.  The typical implementation
-is simply to writeback the whole cache everytime a flush operation
-is received.
+I don't think so - the issue is really that DMA API does not yet handle
+the SEV case 100% correctly. I suspect passthrough devices would have
+the same issue.
 
-> > 
-> > For example take the following order of requests presented
-> > to the block device:
-> > 
-> > 	writes 1-5
-> > 	flush 1
-> > 	write 6
-> > 	flush 2
-> > 
-> > Can flush 2 finish with success as soon as write 6 is flushed
-> > (which may be before flush 1 success)? Or must it wait for
-> > all prior write operations to flush (writes 1-6)?
+In fact whoever sets IOMMU_PLATFORM is completely unaffected by
+Christoph's pet peeve.
 
-No.  For all the usual protocols as well as the linux kernel semantics
-there is no overall command ordering, especially as there is no way
-to even enforce that in a multi-queue environment.
+Christoph is saying that !IOMMU_PLATFORM devices should hide the
+compatibility code in a special per-device DMA API implementation.
+Which would be fine especially if we can manage not to introduce a bunch
+of indirect calls all over the place and hurt performance.  It's just
+that the benefit is unlikely to be big (e.g. we can't also get rid of
+the virtio specific memory barriers) so no one was motivated enough to
+work on it.
 
->
->  * C1. At any given time, only one flush shall be in progress.  This makes
->  *     double buffering sufficient.
-
-Very specific implementation detail inside the request layer.
-
-> Then flush 1 does not guarantee any of the writes are on stable
-> storage. They *may* be on stable storage if the timing is right, but
-> it is not guaranteed by the OS code. Likewise, flush 2 only
-> guarantees writes 1, 3 and 5 are on stable storage becase they are
-> the only writes that have been signalled as complete when flush 2
-> was submitted.
-
-Exactly.
+-- 
+MST
