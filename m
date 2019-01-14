@@ -2,223 +2,105 @@ Return-Path: <SRS0=WI6O=PW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC039C43387
-	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 16:40:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D20EFC43387
+	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 16:45:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A2F63206B7
-	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 16:40:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A15BD206B7
+	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 16:45:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="k9jh7n29"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="OvPzBeLk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726751AbfANQk5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Jan 2019 11:40:57 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:56698 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726656AbfANQk4 (ORCPT
+        id S1726852AbfANQpv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Jan 2019 11:45:51 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:45458 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726782AbfANQpv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Jan 2019 11:40:56 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0EGcuB9076765;
-        Mon, 14 Jan 2019 16:39:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=bjG2+jD4y3xjhrpcGAAkButRYY8jiqy38ebHVxFGNhw=;
- b=k9jh7n292/wl4D9X1WRecr6eY3u5GsDAU4NFJGpKNAN+Fh07GiR7qGT+D2unIG9eQF/9
- Fg/hBZeKB1GKuATOK66kkXHyuMnEiMtIMoPnfoZGQmUYDdwmdn/tLRerDGWTyVngd564
- kM/Me7qYBqmAVg/xiW7AE3Csf9K8StioeQJOvUzwdOYgxZ4VjIL9R57TuQZzxtjcKhmm
- FLZuHEw4OEtdwGmj6dUkqnT/JsusFEeWqAfNNPQM3supETwzbfh0J+zwUrF6j9nExKJ6
- 9r+vHx5GWzA9OVGFddipnJBnSg0gQAH2CBCOaikr34yhA4MRrYvK99VcFuRiBGo5LP4y MA== 
-Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by userp2130.oracle.com with ESMTP id 2pybkc6jvt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Jan 2019 16:39:40 +0000
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x0EGdYxF014368
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 14 Jan 2019 16:39:34 GMT
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x0EGdXQm002318;
-        Mon, 14 Jan 2019 16:39:33 GMT
-Received: from linux.cn.oracle.com (/10.182.71.41)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 14 Jan 2019 08:39:33 -0800
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     konrad.wilk@oracle.com, roger.pau@citrix.com, axboe@kernel.dk,
-        royger@freebsd.org, Paul.Durrant@citrix.com
-Subject: [PATCH v6 2/2] xen/blkback: rework connect_ring() to avoid inconsistent xenstore 'ring-page-order' set by malicious blkfront
-Date:   Tue, 15 Jan 2019 00:41:44 +0800
-Message-Id: <1547484104-20625-2-git-send-email-dongli.zhang@oracle.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1547484104-20625-1-git-send-email-dongli.zhang@oracle.com>
-References: <1547484104-20625-1-git-send-email-dongli.zhang@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9136 signatures=668680
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1901140137
+        Mon, 14 Jan 2019 11:45:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=wGTzQHBcMyTcVWE6+t1dFeMTCAS+VeKwcnuwc7zF/UE=; b=OvPzBeLkd8hmKunlz9uA0RhfR
+        N/e2H+oD4giWXNO0L9XhIR6oDP6ulwsJ4BIKZQvivMmpBtVDPN/4W11iYV9NZu7ojqZYOZuQxCrHK
+        o/07lPjJFARkldHPqjnv6bGg+/RmghNM8L+lvrTCuPq7WoBfWwJm3pROvORM5Audqoy9+xVI0SG6s
+        61+NnKLGBUDM5fHR48RUqNQSnRqpZMIP190DBTRX9YkzFp1cutDnuKzqkg+6/al2HQoDyZr46cb7D
+        caZF/tM+mjUJ+f1rS1rJpnEWFluDA+F3zE52FXRD/a6RKOtyEsHP5UuxMe/PPCV1U3bFA5xYxJ07h
+        NkZEhuy+A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gj5Mz-0001qN-Ea; Mon, 14 Jan 2019 16:45:49 +0000
+Date:   Mon, 14 Jan 2019 08:45:49 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Kurt Miller <kurt@intricatesoftware.com>,
+        linux-xfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: Block device flush ordering
+Message-ID: <20190114164549.GA26523@infradead.org>
+References: <1547130601.20294.152.camel@intricatesoftware.com>
+ <20190113224244.GC4205@dastard>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190113224244.GC4205@dastard>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The xenstore 'ring-page-order' is used globally for each blkback queue and
-therefore should be read from xenstore only once. However, it is obtained
-in read_per_ring_refs() which might be called multiple times during the
-initialization of each blkback queue.
+On Mon, Jan 14, 2019 at 09:42:44AM +1100, Dave Chinner wrote:
+> On Thu, Jan 10, 2019 at 09:30:01AM -0500, Kurt Miller wrote:
+> > For a well behaved block device that has a writeback cache,
+> > what is the proper behavior of flush when there are more
+> > then one outstanding flush operations? Is it;
+> > 
+> > Flush all writes seen since the last flush.
+> > or
+> > Flush all writes received prior to the flush including
+> > those before any prior flush.
 
-If the blkfront is malicious and the 'ring-page-order' is set in different
-value by blkfront every time before blkback reads it, this may end up at
-the "WARN_ON(i != (XEN_BLKIF_REQS_PER_PAGE * blkif->nr_ring_pages));" in
-xen_blkif_disconnect() when frontend is destroyed.
+The requirement is that all write operations that have been completed
+before the flush was seen are on stable storage.  How that is
+implemented in detail is up to the device.  The typical implementation
+is simply to writeback the whole cache everytime a flush operation
+is received.
 
-This patch reworks connect_ring() to read xenstore 'ring-page-order' only
-once.
+> > 
+> > For example take the following order of requests presented
+> > to the block device:
+> > 
+> > 	writes 1-5
+> > 	flush 1
+> > 	write 6
+> > 	flush 2
+> > 
+> > Can flush 2 finish with success as soon as write 6 is flushed
+> > (which may be before flush 1 success)? Or must it wait for
+> > all prior write operations to flush (writes 1-6)?
 
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
----
-Changed since v1:
-  * change the order of xenstore read in read_per_ring_refs
-  * use xenbus_read_unsigned() in connect_ring()
+No.  For all the usual protocols as well as the linux kernel semantics
+there is no overall command ordering, especially as there is no way
+to even enforce that in a multi-queue environment.
 
-Changed since v2:
-  * simplify the condition check as "(err != 1 && nr_grefs > 1)"
-  * avoid setting err as -EINVAL to remove extra one line of code
+>
+>  * C1. At any given time, only one flush shall be in progress.  This makes
+>  *     double buffering sufficient.
 
-Changed since v3:
-  * exit at the beginning if !nr_grefs
-  * change the if statements to avoid test (err != 1) twice
-  * initialize a 'blkif' stack variable (refer to PATCH 1/2)
+Very specific implementation detail inside the request layer.
 
-Changed since v4:
-  * use BUG_ON() when (nr_grefs == 0) to reminder the developer
-  * set err = -EINVAL before xenbus_dev_fatal()
+> Then flush 1 does not guarantee any of the writes are on stable
+> storage. They *may* be on stable storage if the timing is right, but
+> it is not guaranteed by the OS code. Likewise, flush 2 only
+> guarantees writes 1, 3 and 5 are on stable storage becase they are
+> the only writes that have been signalled as complete when flush 2
+> was submitted.
 
-Changed since v5:
-  * use WARN_ON() instead of BUG_ON()
-
- drivers/block/xen-blkback/xenbus.c | 72 +++++++++++++++++++++++---------------
- 1 file changed, 43 insertions(+), 29 deletions(-)
-
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index a4aadac..0878e55 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -926,7 +926,7 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
- 	int err, i, j;
- 	struct xen_blkif *blkif = ring->blkif;
- 	struct xenbus_device *dev = blkif->be->dev;
--	unsigned int ring_page_order, nr_grefs, evtchn;
-+	unsigned int nr_grefs, evtchn;
- 
- 	err = xenbus_scanf(XBT_NIL, dir, "event-channel", "%u",
- 			  &evtchn);
-@@ -936,43 +936,42 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
- 		return err;
- 	}
- 
--	err = xenbus_scanf(XBT_NIL, dev->otherend, "ring-page-order", "%u",
--			  &ring_page_order);
--	if (err != 1) {
--		err = xenbus_scanf(XBT_NIL, dir, "ring-ref", "%u", &ring_ref[0]);
-+	nr_grefs = blkif->nr_ring_pages;
-+
-+	if (unlikely(!nr_grefs)) {
-+		WARN_ON(true);
-+		return -EINVAL;
-+	}
-+
-+	for (i = 0; i < nr_grefs; i++) {
-+		char ring_ref_name[RINGREF_NAME_LEN];
-+
-+		snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref%u", i);
-+		err = xenbus_scanf(XBT_NIL, dir, ring_ref_name,
-+				   "%u", &ring_ref[i]);
-+
- 		if (err != 1) {
-+			if (nr_grefs == 1)
-+				break;
-+
- 			err = -EINVAL;
--			xenbus_dev_fatal(dev, err, "reading %s/ring-ref", dir);
-+			xenbus_dev_fatal(dev, err, "reading %s/%s",
-+					 dir, ring_ref_name);
- 			return err;
- 		}
--		nr_grefs = 1;
--	} else {
--		unsigned int i;
-+	}
-+
-+	if (err != 1) {
-+		WARN_ON(nr_grefs != 1);
- 
--		if (ring_page_order > xen_blkif_max_ring_order) {
-+		err = xenbus_scanf(XBT_NIL, dir, "ring-ref", "%u",
-+				   &ring_ref[0]);
-+		if (err != 1) {
- 			err = -EINVAL;
--			xenbus_dev_fatal(dev, err, "%s/request %d ring page order exceed max:%d",
--					 dir, ring_page_order,
--					 xen_blkif_max_ring_order);
-+			xenbus_dev_fatal(dev, err, "reading %s/ring-ref", dir);
- 			return err;
- 		}
--
--		nr_grefs = 1 << ring_page_order;
--		for (i = 0; i < nr_grefs; i++) {
--			char ring_ref_name[RINGREF_NAME_LEN];
--
--			snprintf(ring_ref_name, RINGREF_NAME_LEN, "ring-ref%u", i);
--			err = xenbus_scanf(XBT_NIL, dir, ring_ref_name,
--					   "%u", &ring_ref[i]);
--			if (err != 1) {
--				err = -EINVAL;
--				xenbus_dev_fatal(dev, err, "reading %s/%s",
--						 dir, ring_ref_name);
--				return err;
--			}
--		}
- 	}
--	blkif->nr_ring_pages = nr_grefs;
- 
- 	for (i = 0; i < nr_grefs * XEN_BLKIF_REQS_PER_PAGE; i++) {
- 		req = kzalloc(sizeof(*req), GFP_KERNEL);
-@@ -1031,6 +1030,7 @@ static int connect_ring(struct backend_info *be)
- 	size_t xspathsize;
- 	const size_t xenstore_path_ext_size = 11; /* sufficient for "/queue-NNN" */
- 	unsigned int requested_num_queues = 0;
-+	unsigned int ring_page_order;
- 
- 	pr_debug("%s %s\n", __func__, dev->otherend);
- 
-@@ -1076,6 +1076,20 @@ static int connect_ring(struct backend_info *be)
- 		 blkif->nr_rings, blkif->blk_protocol, protocol,
- 		 pers_grants ? "persistent grants" : "");
- 
-+	ring_page_order = xenbus_read_unsigned(dev->otherend,
-+					       "ring-page-order", 0);
-+
-+	if (ring_page_order > xen_blkif_max_ring_order) {
-+		err = -EINVAL;
-+		xenbus_dev_fatal(dev, err,
-+				 "requested ring page order %d exceed max:%d",
-+				 ring_page_order,
-+				 xen_blkif_max_ring_order);
-+		return err;
-+	}
-+
-+	blkif->nr_ring_pages = 1 << ring_page_order;
-+
- 	if (blkif->nr_rings == 1)
- 		return read_per_ring_refs(&blkif->rings[0], dev->otherend);
- 	else {
--- 
-2.7.4
-
+Exactly.
