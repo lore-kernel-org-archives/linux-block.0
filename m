@@ -2,127 +2,164 @@ Return-Path: <SRS0=WI6O=PW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F56C43444
-	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 13:26:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD80C43387
+	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 16:40:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 52F302086D
-	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 13:26:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55AE72087E
+	for <linux-block@archiver.kernel.org>; Mon, 14 Jan 2019 16:40:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="eCasF6U/"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ZJddo/Wz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726639AbfANN0O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Jan 2019 08:26:14 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:43932 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726554AbfANN0O (ORCPT
+        id S1726752AbfANQkp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Jan 2019 11:40:45 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:55830 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726656AbfANQkp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Jan 2019 08:26:14 -0500
-Received: by mail-pf1-f194.google.com with SMTP id w73so10344721pfk.10
-        for <linux-block@vger.kernel.org>; Mon, 14 Jan 2019 05:26:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=aubFD5Gq1gq/mvCOyz5wzJwe55pl3rSMUOZl6C6NQGM=;
-        b=eCasF6U/w30uMpy2O/9TVNs2Z2uMsSytK69FvPCCe+fff4Bfd/9JNBRAb6ai7/rs7K
-         4KOxMHQpmUtRoL9SmXNg+zE1mkMsegycBiCYl7DAYKumgoU4xl/v1buw44bosj1U0G18
-         PS2avHyCcLzCCWeqTPYDwFQBES9BpzGZS/pou5A/sDovRbXJNJlpc4k7aDb5Bn76EXuL
-         Hlg3LiL4er0eax7ftcJEmPu9FXrJwnN+eIfBJMOsLly2cOQPGZKpc8JEJ8L29yh4IUJO
-         SU+WVrj56wrwUCCR5exeKFke6sd0OuSgst/K4KWq2oJE8m9oAN13MbZg3AYBEHCgVzU4
-         j0MA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=aubFD5Gq1gq/mvCOyz5wzJwe55pl3rSMUOZl6C6NQGM=;
-        b=URBwxdqLmZm5xSZtaFCRE8KCsQdhE78YknhMPVxc8DVhWqJ48OaPXwTpKEbdIw9NRH
-         9bxORvrU0qPKB8gxrcxokGdwRZ7dsfOTYqaeP1Ehk+Sx3boo4xDsiIg14qYcW4jgUqVR
-         BO7lvNZUhLuM/Rbvc+umoeVRWzvMQOpWEPGkDJ/aUhOsCgOUPZo4UXBpifTmvbxYfm7X
-         Bfv7XUgOCSQ4ieF/bHy2oSECmWcogRvWrg8LsH4LgTi814iuBw6pk5VwPRQsko1oeqHB
-         eITVczuRm4KaphdcR1MvBNZ4aZos0nl3X3A+CiR35r6YoFddnb35eSepGbpW889VmVED
-         dQ9w==
-X-Gm-Message-State: AJcUukcQE8fYPzvUb77lSpjEsjGvQuM+E2ILrmtLNztco5XQLsjPFVKF
-        TbhIqUj8B6AujuH/QiP0lqE6lQ==
-X-Google-Smtp-Source: ALg8bN6spBFlTlaRU8DbIwhfRmuBtRDRr2lxpsmxwpLglDOfooxOj4I7osPpgRQC+NCiF3vAedPirA==
-X-Received: by 2002:a63:2f07:: with SMTP id v7mr21434916pgv.368.1547472373273;
-        Mon, 14 Jan 2019 05:26:13 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id m19sm1024468pgn.35.2019.01.14.05.26.11
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 14 Jan 2019 05:26:12 -0800 (PST)
-Subject: Re: [PATCH BUGFIX 0/2] bfq: fix unbalanced decrements causing loss of
- throughput
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Mark Brown <broonie@kernel.org>, bfq-iosched@googlegroups.com,
-        oleksandr@natalenko.name, federico@willer.it
-References: <20181206181819.11148-1-paolo.valente@linaro.org>
- <09393ef1-9559-2042-6c83-75ed3fd529d3@kernel.dk>
- <8753C347-2BFD-40D4-A97E-DA955BC0207C@linaro.org>
- <16d4065e-c0d1-7a85-3d9a-242bfd92923e@kernel.dk>
- <F7FF3405-74FF-40C3-8C0E-12108170CEF0@linaro.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <cfe7c5d1-040a-33a7-bb63-ac591c6eec14@kernel.dk>
-Date:   Mon, 14 Jan 2019 06:26:09 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Mon, 14 Jan 2019 11:40:45 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0EGcubo033797;
+        Mon, 14 Jan 2019 16:39:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=corp-2018-07-02;
+ bh=WSAc1PrUxV217qpEoJIJGE/bDMBd/wJqWFbATuzxKGw=;
+ b=ZJddo/WznIErK+unfz3zaC0ve2P0PD+t/cpO6O7M+glrRDnbLd2zEmDPQlOrInJ1nHyX
+ pi035DHIYuIiWy5znaCrguZ02HYNcp3QxUtSTUWLyuxzXeCcWZ75amYdcSiGeM2Zipkz
+ Fa8J0tXUy/nlca279cbgIKEBwXO4GdipPHkJVdRGakOtz81WJQ5dDXyTdFWnaBnCeGLz
+ FvBTH99ifWVzvULmU5DOTnLiMh9AXKThjkLpqO9y5TS3y/7U3CICQ1aknp3zYuNvkoj6
+ YFAQR4gWrJReWnwxXaJmxJl7I74FMz6U6M1VkMjzOS4R6rUzZOD60GlUodBPN4L0AUgS gQ== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by userp2120.oracle.com with ESMTP id 2pybjrxjxd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Jan 2019 16:39:32 +0000
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x0EGdVL6010035
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Jan 2019 16:39:31 GMT
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x0EGdUp3011768;
+        Mon, 14 Jan 2019 16:39:30 GMT
+Received: from linux.cn.oracle.com (/10.182.71.41)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 14 Jan 2019 08:39:30 -0800
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     konrad.wilk@oracle.com, roger.pau@citrix.com, axboe@kernel.dk,
+        royger@freebsd.org, Paul.Durrant@citrix.com
+Subject: [PATCH v6 1/2] xen/blkback: add stack variable 'blkif' in connect_ring()
+Date:   Tue, 15 Jan 2019 00:41:43 +0800
+Message-Id: <1547484104-20625-1-git-send-email-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-In-Reply-To: <F7FF3405-74FF-40C3-8C0E-12108170CEF0@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9136 signatures=668680
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1901140137
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/14/19 2:09 AM, Paolo Valente wrote:
-> 
-> 
->> Il giorno 7 dic 2018, alle ore 15:40, Jens Axboe <axboe@kernel.dk> ha scritto:
->>
->> On 12/7/18 3:01 AM, Paolo Valente wrote:
->>>
->>>
->>>> Il giorno 7 dic 2018, alle ore 03:23, Jens Axboe <axboe@kernel.dk> ha scritto:
->>>>
->>>> On 12/6/18 11:18 AM, Paolo Valente wrote:
->>>>> Hi Jens,
->>>>> the first patch in this series fixes an error in the decrementing of
->>>>> the counter of the number of groups with pending I/O. This wrong
->>>>> decrement caused loss of throughput or, less likely, of control on
->>>>> I/O. The second patch is a fix of some wrong comments, which somehow
->>>>> contributed to making the above bug more difficult to find.
->>>>
->>>> Are you fine with this going into 4.21? I can't quite tell what your
->>>> intent is. The first patch has a Fixes for something
->>>
->>> yep, that fixes a serious error.
->>>
->>>> that went into
->>>> this series, but then patch 2 is a comment update that would not
->>>> normally be something to be applied at this stage.
->>>>
->>>
->>> and yes, only comments changed by the second one
->>>
->>> May it make sense to apply them in two steps, one in the 4.20 and the other one in the 4.21?
->>
->> I think so, I'll do that.
-> 
-> Hi Jens,
-> is the second patch still queued?
+As 'be->blkif' is used for many times in connect_ring(), the stack variable
+'blkif' is added to substitute 'be-blkif'.
 
-That got dropped for some reason, I've applied it now.
+Suggested-by: Paul Durrant <paul.durrant@citrix.com>
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+Reviewed-by: Paul Durrant <paul.durrant@citrix.com>
+Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
+---
+ drivers/block/xen-blkback/xenbus.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
+diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
+index a4bc74e..a4aadac 100644
+--- a/drivers/block/xen-blkback/xenbus.c
++++ b/drivers/block/xen-blkback/xenbus.c
+@@ -1023,6 +1023,7 @@ static int read_per_ring_refs(struct xen_blkif_ring *ring, const char *dir)
+ static int connect_ring(struct backend_info *be)
+ {
+ 	struct xenbus_device *dev = be->dev;
++	struct xen_blkif *blkif = be->blkif;
+ 	unsigned int pers_grants;
+ 	char protocol[64] = "";
+ 	int err, i;
+@@ -1033,25 +1034,25 @@ static int connect_ring(struct backend_info *be)
+ 
+ 	pr_debug("%s %s\n", __func__, dev->otherend);
+ 
+-	be->blkif->blk_protocol = BLKIF_PROTOCOL_DEFAULT;
++	blkif->blk_protocol = BLKIF_PROTOCOL_DEFAULT;
+ 	err = xenbus_scanf(XBT_NIL, dev->otherend, "protocol",
+ 			   "%63s", protocol);
+ 	if (err <= 0)
+ 		strcpy(protocol, "unspecified, assuming default");
+ 	else if (0 == strcmp(protocol, XEN_IO_PROTO_ABI_NATIVE))
+-		be->blkif->blk_protocol = BLKIF_PROTOCOL_NATIVE;
++		blkif->blk_protocol = BLKIF_PROTOCOL_NATIVE;
+ 	else if (0 == strcmp(protocol, XEN_IO_PROTO_ABI_X86_32))
+-		be->blkif->blk_protocol = BLKIF_PROTOCOL_X86_32;
++		blkif->blk_protocol = BLKIF_PROTOCOL_X86_32;
+ 	else if (0 == strcmp(protocol, XEN_IO_PROTO_ABI_X86_64))
+-		be->blkif->blk_protocol = BLKIF_PROTOCOL_X86_64;
++		blkif->blk_protocol = BLKIF_PROTOCOL_X86_64;
+ 	else {
+ 		xenbus_dev_fatal(dev, err, "unknown fe protocol %s", protocol);
+ 		return -ENOSYS;
+ 	}
+ 	pers_grants = xenbus_read_unsigned(dev->otherend, "feature-persistent",
+ 					   0);
+-	be->blkif->vbd.feature_gnt_persistent = pers_grants;
+-	be->blkif->vbd.overflow_max_grants = 0;
++	blkif->vbd.feature_gnt_persistent = pers_grants;
++	blkif->vbd.overflow_max_grants = 0;
+ 
+ 	/*
+ 	 * Read the number of hardware queues from frontend.
+@@ -1067,16 +1068,16 @@ static int connect_ring(struct backend_info *be)
+ 				requested_num_queues, xenblk_max_queues);
+ 		return -ENOSYS;
+ 	}
+-	be->blkif->nr_rings = requested_num_queues;
+-	if (xen_blkif_alloc_rings(be->blkif))
++	blkif->nr_rings = requested_num_queues;
++	if (xen_blkif_alloc_rings(blkif))
+ 		return -ENOMEM;
+ 
+ 	pr_info("%s: using %d queues, protocol %d (%s) %s\n", dev->nodename,
+-		 be->blkif->nr_rings, be->blkif->blk_protocol, protocol,
++		 blkif->nr_rings, blkif->blk_protocol, protocol,
+ 		 pers_grants ? "persistent grants" : "");
+ 
+-	if (be->blkif->nr_rings == 1)
+-		return read_per_ring_refs(&be->blkif->rings[0], dev->otherend);
++	if (blkif->nr_rings == 1)
++		return read_per_ring_refs(&blkif->rings[0], dev->otherend);
+ 	else {
+ 		xspathsize = strlen(dev->otherend) + xenstore_path_ext_size;
+ 		xspath = kmalloc(xspathsize, GFP_KERNEL);
+@@ -1085,10 +1086,10 @@ static int connect_ring(struct backend_info *be)
+ 			return -ENOMEM;
+ 		}
+ 
+-		for (i = 0; i < be->blkif->nr_rings; i++) {
++		for (i = 0; i < blkif->nr_rings; i++) {
+ 			memset(xspath, 0, xspathsize);
+ 			snprintf(xspath, xspathsize, "%s/queue-%u", dev->otherend, i);
+-			err = read_per_ring_refs(&be->blkif->rings[i], xspath);
++			err = read_per_ring_refs(&blkif->rings[i], xspath);
+ 			if (err) {
+ 				kfree(xspath);
+ 				return err;
 -- 
-Jens Axboe
+2.7.4
 
