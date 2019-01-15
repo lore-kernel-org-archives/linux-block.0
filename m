@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38BD8C43387
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 02:55:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2412AC43444
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 02:55:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 018DC206B7
+	by mail.kernel.org (Postfix) with ESMTP id E61B920656
 	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 02:55:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="1Cwkp42p"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="1n63Z3L+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727019AbfAOCzm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727943AbfAOCzm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 14 Jan 2019 21:55:42 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:45937 "EHLO
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:38160 "EHLO
         mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727644AbfAOCzl (ORCPT
+        with ESMTP id S1727573AbfAOCzk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Jan 2019 21:55:41 -0500
-Received: by mail-pl1-f194.google.com with SMTP id a14so558061plm.12
-        for <linux-block@vger.kernel.org>; Mon, 14 Jan 2019 18:55:41 -0800 (PST)
+        Mon, 14 Jan 2019 21:55:40 -0500
+Received: by mail-pl1-f194.google.com with SMTP id e5so578565plb.5
+        for <linux-block@vger.kernel.org>; Mon, 14 Jan 2019 18:55:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=IbkWyHpTil5Vluy4ET88nT33hqg2kUPldnzNz+Wucw8=;
-        b=1Cwkp42pzc3TzLpFjXri5KnMaqYwKiBgOTq0zmwo8xgPZAdG50EEO8wcpb1oUYKpp4
-         2gtJiJAHu1CEEY41ldqr52/s9EtLU5a3wrlk69XdPf9MRm3cnrh9Lom4tv3eifFFcF7m
-         ZuriRU5KN/NlwaiXYgqa0RgRX+CN/IJBGoyjQIIkr53H+6BW3+syTSebGtnRslOGUm6h
-         6P7usXboSByNTHRRbpCencI6EIpE60JFHZyqrTjTnV3kB2LH3LuQ8XJpfE9N7K2VnhyQ
-         m7eVEEz1xcIzq42nWdfPTTIifaeH4vrrtO8Lva35r6noqjjtClQP9z2S5eggZoB5Wg1+
-         7gYg==
+        bh=AAKxls5Es8ExKqpwMiUOBUcGduRQU3BNIbRWpRo7VtQ=;
+        b=1n63Z3L+WalVM2JJ9cm201K70QNwbNg3PeLxo5EJqG5NdqlbFuqOa1rpvxCvT7/yBw
+         eMMy3lsAXxnojDwAnawiv5RRyqSbz2pjMYsg74yAb9Lae8CLj4e6uPdGLiqG2ffM6rfQ
+         Iyoima14bP+U467QDmYJh405CpfY8rstPd/tPFKjVs1EI852xVBL5QopDV+vZ0ie1L+Q
+         iucJ5M/iZwc7bt/Z6huNhCZsfmriHJqjNGvBGHxvi5kA0iIQmKDAc1XEsUPvGh7294EQ
+         3KioslnwrO3y1Tu2vnaXRlGK2QCle9SXcw7anPv97Anw5hzttB5VJAEkWNWYcr+gNw+O
+         3M3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=IbkWyHpTil5Vluy4ET88nT33hqg2kUPldnzNz+Wucw8=;
-        b=njk64iQLx2F2igP9X4pj4bf7+D4R0sL8hKXC76OlYxHgMopG5xs2WTblOnuytW4YF1
-         s98eOY1bZDmW+uXxvyUZ6ynlild2caYFNSvoJto4PyCW0NoeAOAI+Zpixsh7U0W6hHEG
-         dMhBgC8jKgLp6KMyCZrKdX4e9dy/fOcS9JlJYJL5SHFZTT14oDNomVyAXlHJAHaePs9d
-         2w4hTMjwqQhWfLR7gXLQcX2qdSAv5zSpb2fjkJUPdBw6gkDXoIrpmbvAFVjVNLVK8/BU
-         ye+JVIjwpj0J2ULIDslsoKto//0z07zZV/nj8ODgYrVEZrj1ttIXD8MfEuhwak0yOiqq
-         jajA==
-X-Gm-Message-State: AJcUukd40sI/R1IsqKaNF1d+DCTuUAE53E3s2XVbLJMeMT08TvLwK0di
-        DvqPkrcpDjV5Ss7fU8qCYwOqVQ==
-X-Google-Smtp-Source: ALg8bN5dQy/eJUh933iBx5FO5OYoV3hAKueWRM3ZcQzQ4o7O1onoFCEW+tUl0uSEdzbj+zvmVsO9ZA==
-X-Received: by 2002:a17:902:43e4:: with SMTP id j91mr1721514pld.147.1547520941206;
-        Mon, 14 Jan 2019 18:55:41 -0800 (PST)
+        bh=AAKxls5Es8ExKqpwMiUOBUcGduRQU3BNIbRWpRo7VtQ=;
+        b=XDd6PagumBhUJkSiLyTrd0A7e5HzxDZ4tsV3g7Euu8EO7zHn9xmBb1tzPbbM0DkUje
+         nkAhopxDgtqxaVGmftnuurXW6qfOPn34HoCLhYMAzDBzCa/Hx0HhV895+FlSdJAaBXLd
+         FXLsFT3TxbUPnB/zYyvDHVyhmzdxiisXU/Xi3FCvKqzBOhVvphEGbuUQ4AxXMgrYmaV8
+         1EkdguhGwciXMDl9M621vaHbSQ7OrKYiAgAdgEZ6ECghlSM0oXw/RIpve4VGcM5yyHMm
+         EDKArt0ogkaUBqe5RAydTCdirriIEhV/0QA1PyeXOJsSBHz1t6V7DUMZog/Sg2Ft8882
+         GC7g==
+X-Gm-Message-State: AJcUukdN7v58OfZ6eLqqVC6/oWihOhhW0jv6T+ptm03DuUgbmpa8dPVB
+        4Ep2rooJs7kq2WRCtUKPn5qXXw2brRuLrw==
+X-Google-Smtp-Source: ALg8bN6Rcmuhxb+AObX2pINyJgEJOy3fJECMqIeiqavnx5uwO8Hh1L28VW5+sddCJDOaWUnwYaxkFA==
+X-Received: by 2002:a17:902:6b0c:: with SMTP id o12mr1743172plk.291.1547520939331;
+        Mon, 14 Jan 2019 18:55:39 -0800 (PST)
 Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id c23sm2415544pfi.83.2019.01.14.18.55.39
+        by smtp.gmail.com with ESMTPSA id c23sm2415544pfi.83.2019.01.14.18.55.37
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 14 Jan 2019 18:55:40 -0800 (PST)
+        Mon, 14 Jan 2019 18:55:38 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
         linux-block@vger.kernel.org, linux-arch@vger.kernel.org
 Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 02/16] block: wire up block device iopoll method
-Date:   Mon, 14 Jan 2019 19:55:17 -0700
-Message-Id: <20190115025531.13985-3-axboe@kernel.dk>
+Subject: [PATCH 01/16] fs: add an iopoll method to struct file_operations
+Date:   Mon, 14 Jan 2019 19:55:16 -0700
+Message-Id: <20190115025531.13985-2-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190115025531.13985-1-axboe@kernel.dk>
 References: <20190115025531.13985-1-axboe@kernel.dk>
@@ -72,51 +72,65 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Christoph Hellwig <hch@lst.de>
 
-Just call blk_poll on the iocb cookie, we can derive the block device
-from the inode trivially.
+This new methods is used to explicitly poll for I/O completion for an
+iocb.  It must be called for any iocb submitted asynchronously (that
+is with a non-null ki_complete) which has the IOCB_HIPRI flag set.
+
+The method is assisted by a new ki_cookie field in struct iocb to store
+the polling cookie.
+
+TODO: we can probably union ki_cookie with the existing hint and I/O
+priority fields to avoid struct kiocb growth.
 
 Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/block_dev.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ Documentation/filesystems/vfs.txt | 3 +++
+ include/linux/fs.h                | 2 ++
+ 2 files changed, 5 insertions(+)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index c546cdce77e6..5415579f3e14 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -279,6 +279,14 @@ struct blkdev_dio {
+diff --git a/Documentation/filesystems/vfs.txt b/Documentation/filesystems/vfs.txt
+index 8dc8e9c2913f..761c6fd24a53 100644
+--- a/Documentation/filesystems/vfs.txt
++++ b/Documentation/filesystems/vfs.txt
+@@ -857,6 +857,7 @@ struct file_operations {
+ 	ssize_t (*write) (struct file *, const char __user *, size_t, loff_t *);
+ 	ssize_t (*read_iter) (struct kiocb *, struct iov_iter *);
+ 	ssize_t (*write_iter) (struct kiocb *, struct iov_iter *);
++	int (*iopoll)(struct kiocb *kiocb, bool spin);
+ 	int (*iterate) (struct file *, struct dir_context *);
+ 	int (*iterate_shared) (struct file *, struct dir_context *);
+ 	__poll_t (*poll) (struct file *, struct poll_table_struct *);
+@@ -902,6 +903,8 @@ otherwise noted.
  
- static struct bio_set blkdev_dio_pool;
+   write_iter: possibly asynchronous write with iov_iter as source
  
-+static int blkdev_iopoll(struct kiocb *kiocb, bool wait)
-+{
-+	struct block_device *bdev = I_BDEV(kiocb->ki_filp->f_mapping->host);
-+	struct request_queue *q = bdev_get_queue(bdev);
++  iopoll: called when aio wants to poll for completions on HIPRI iocbs
 +
-+	return blk_poll(q, READ_ONCE(kiocb->ki_cookie), wait);
-+}
-+
- static void blkdev_bio_end_io(struct bio *bio)
- {
- 	struct blkdev_dio *dio = bio->bi_private;
-@@ -396,6 +404,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 				bio->bi_opf |= REQ_HIPRI;
+   iterate: called when the VFS needs to read the directory contents
  
- 			qc = submit_bio(bio);
-+			WRITE_ONCE(iocb->ki_cookie, qc);
- 			break;
- 		}
+   iterate_shared: called when the VFS needs to read the directory contents
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 811c77743dad..ccb0b7a63aa5 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -310,6 +310,7 @@ struct kiocb {
+ 	int			ki_flags;
+ 	u16			ki_hint;
+ 	u16			ki_ioprio; /* See linux/ioprio.h */
++	unsigned int		ki_cookie; /* for ->iopoll */
+ } __randomize_layout;
  
-@@ -2068,6 +2077,7 @@ const struct file_operations def_blk_fops = {
- 	.llseek		= block_llseek,
- 	.read_iter	= blkdev_read_iter,
- 	.write_iter	= blkdev_write_iter,
-+	.iopoll		= blkdev_iopoll,
- 	.mmap		= generic_file_mmap,
- 	.fsync		= blkdev_fsync,
- 	.unlocked_ioctl	= block_ioctl,
+ static inline bool is_sync_kiocb(struct kiocb *kiocb)
+@@ -1786,6 +1787,7 @@ struct file_operations {
+ 	ssize_t (*write) (struct file *, const char __user *, size_t, loff_t *);
+ 	ssize_t (*read_iter) (struct kiocb *, struct iov_iter *);
+ 	ssize_t (*write_iter) (struct kiocb *, struct iov_iter *);
++	int (*iopoll)(struct kiocb *kiocb, bool spin);
+ 	int (*iterate) (struct file *, struct dir_context *);
+ 	int (*iterate_shared) (struct file *, struct dir_context *);
+ 	__poll_t (*poll) (struct file *, struct poll_table_struct *);
 -- 
 2.17.1
 
