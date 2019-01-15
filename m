@@ -2,87 +2,101 @@ Return-Path: <SRS0=gCKl=PX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A28C43387
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 04:31:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F2A1C43387
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 04:34:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1536520859
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 04:31:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30CA22085A
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 04:34:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="iMLX7rrw"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lx6YXLf7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727247AbfAOEbm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Jan 2019 23:31:42 -0500
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:46170 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727036AbfAOEbm (ORCPT
+        id S1727427AbfAOEel (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Jan 2019 23:34:41 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:43774 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726769AbfAOEel (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Jan 2019 23:31:42 -0500
-Received: by mail-lj1-f196.google.com with SMTP id v15-v6so1095493ljh.13
-        for <linux-block@vger.kernel.org>; Mon, 14 Jan 2019 20:31:41 -0800 (PST)
+        Mon, 14 Jan 2019 23:34:41 -0500
+Received: by mail-pg1-f195.google.com with SMTP id v28so653084pgk.10
+        for <linux-block@vger.kernel.org>; Mon, 14 Jan 2019 20:34:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cQnBN5/Jx81RiLADTLUbDOi14v+DA6NTSGhZCm0jiJk=;
-        b=iMLX7rrw8zwmiiVQ/iOh26XJYOc/uX9iQK4Uvqz1lvlTMdMRx0usVNwm01PJFDuDtc
-         R3ufnI1GzV7MClV4t5g3PsMF7Wqru3wgBZxQ8K6BEaM1q+152nlvDfP5heAk0QvjaBlk
-         iJGeW7mhsvppVapnClwE4Lpp5+jCBv06aAagk=
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=zK501jD2/GZKzdJMzveevnFqSdl6gSxA278Ms2OysRc=;
+        b=lx6YXLf7vYtR69neQ/wznBdW33BkxHtu1GOR/6phbiU5d4Le8Gi/TWdlfCC0f9opmi
+         stI5lLqq4DeddpUW/FobFmv5BfSZR83CdNOtsgNSdwQFfoOmgavLggTB4b+1zEslPTxA
+         Itoal9UfSW3BvnMS+Ol7++GWLzH15Wx0qPyxt8rijTopmwm/0RnfMt8LE7EfH2AtI4Zr
+         jVjjInWgaqXr+hnW4M3s0rl+A/RO6WKnJTIrW7FaWk48BzdTtFWIJHxWqznisvBS9Uqi
+         3teTwGaCYor+zppxfmp1Ur4l918tivNQ77gU1VhY+8XQuxMXAdGSyhbpOGOo+6ZW371w
+         FCpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cQnBN5/Jx81RiLADTLUbDOi14v+DA6NTSGhZCm0jiJk=;
-        b=ewiOYigDFyBdMulRHevb0pNrG9GSy5MlCR6y2i+B7VI/DENREaTT/9tQ8OLdyOwOlM
-         iuxZ0F8gPPxi+CV+ygnKHAomO6OdA1DlMEM9mt2+I1DiIc6rzzsxvdOKRHmWlp901TWl
-         O+rU/MmiXG2I692r1njqicrc1h6sKmIUCiwV4p+a2t8CEm0sftLGro/+eB5YMadYjVaa
-         UjRRX7mBnhy/hl+yl6yo7Q/o4lO/mFxXjf6xN3TtmnE3fTlsfaZZxkSh3eEP8C2tf7wz
-         ja2kPrH3Zsy6p026DzrOK1shIUuALW1Z2Gor8aXnlxPJ5v9NT30S1tYo5F8GPZfHrE1s
-         aJDA==
-X-Gm-Message-State: AJcUukeQIKv/jLODEWx7esG1TYVYScpww6iL7vJd0ZVAhAj0EajpT030
-        rW6NELz8FcyBA5Dgk0H+nSex6GnrUCg=
-X-Google-Smtp-Source: ALg8bN6VcQFDkdNDIP/rP40QVoqGz45MClPqq2zh9nVAnic3SKL3m0NElEclrCDJgOENcLgMkXaKFA==
-X-Received: by 2002:a2e:914b:: with SMTP id q11-v6mr1289885ljg.164.1547526700108;
-        Mon, 14 Jan 2019 20:31:40 -0800 (PST)
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com. [209.85.208.170])
-        by smtp.gmail.com with ESMTPSA id d15-v6sm373024lja.38.2019.01.14.20.31.39
-        for <linux-block@vger.kernel.org>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=zK501jD2/GZKzdJMzveevnFqSdl6gSxA278Ms2OysRc=;
+        b=eG2L0GinNYrwU9zEiTB71MxzJjzjq5OLSkXFJqNnNJCA4cXgJhcpBUJmQ2XSNK+K0u
+         B4UpvnOfGL44nLP3r8AL0QDNA6Q/z1QcbR6lSMhMi0hDanY8hJB1uEL5klm9ny7+juss
+         zLrZrD7W4p9nUkXIx6bxU6JJ9DEPUZRnG/iGIOfUeEUe4UZAwbfrl/oyPqR9vgab8+5V
+         aOvuIUa4KPxJJwxIuJ9zqiUzt3vGyHMzNXh9BrIPzOLaw9ThP1ErbsABR0IiwOOJraY7
+         XAVLV6p4ZwdlS2stzuVM2PoeM1UFTzb4JhGSlwt8XTVyIOqW+aNXdXMX72GQ5OuflYtN
+         RBNA==
+X-Gm-Message-State: AJcUukdhmwypH8EQvPzlmADpjQZ0r9GBSxdR93bp6CHU3Sg8Sn7vmWVx
+        ugZDvBJVf/LqP+WruMAlhhtYeQ==
+X-Google-Smtp-Source: ALg8bN64ktdiCTl++L9YfbxJDVKKI+mT3Bc65KMmq3mvY1RUrWzWG7DI9RBGDf+pgLB30Ctr6ia+vg==
+X-Received: by 2002:aa7:8802:: with SMTP id c2mr2059833pfo.20.1547526880807;
+        Mon, 14 Jan 2019 20:34:40 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id v89sm2449973pfk.12.2019.01.14.20.34.38
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 14 Jan 2019 20:31:39 -0800 (PST)
-Received: by mail-lj1-f170.google.com with SMTP id g11-v6so1160675ljk.3
-        for <linux-block@vger.kernel.org>; Mon, 14 Jan 2019 20:31:39 -0800 (PST)
-X-Received: by 2002:a2e:310a:: with SMTP id x10-v6mr1395922ljx.6.1547526698543;
- Mon, 14 Jan 2019 20:31:38 -0800 (PST)
-MIME-Version: 1.0
-References: <20190115035952.13325-1-ming.lei@redhat.com> <e2bebd6a-cc89-d6c2-8203-718b5c12ea4f@kernel.dk>
-In-Reply-To: <e2bebd6a-cc89-d6c2-8203-718b5c12ea4f@kernel.dk>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Tue, 15 Jan 2019 16:31:22 +1200
-X-Gmail-Original-Message-ID: <CAHk-=wg76gE51qx6erfMxNh4B_cYvwxgVr1ReqEyzpNjkpMJQw@mail.gmail.com>
-Message-ID: <CAHk-=wg76gE51qx6erfMxNh4B_cYvwxgVr1ReqEyzpNjkpMJQw@mail.gmail.com>
+        Mon, 14 Jan 2019 20:34:39 -0800 (PST)
 Subject: Re: [PATCH] sbitmap: Protect swap_lock from hardirq
-To:     Jens Axboe <axboe@kernel.dk>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     Ming Lei <ming.lei@redhat.com>,
         linux-block <linux-block@vger.kernel.org>,
         Clark Williams <williams@redhat.com>,
         Guenter Roeck <linux@roeck-us.net>,
         Steven Rostedt <rostedt@goodmis.org>,
         Linux List Kernel Mailing <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <20190115035952.13325-1-ming.lei@redhat.com>
+ <e2bebd6a-cc89-d6c2-8203-718b5c12ea4f@kernel.dk>
+ <CAHk-=wg76gE51qx6erfMxNh4B_cYvwxgVr1ReqEyzpNjkpMJQw@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a8659157-652d-c66e-8d9d-6ff2133645c0@kernel.dk>
+Date:   Mon, 14 Jan 2019 21:34:37 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+MIME-Version: 1.0
+In-Reply-To: <CAHk-=wg76gE51qx6erfMxNh4B_cYvwxgVr1ReqEyzpNjkpMJQw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 15, 2019 at 4:28 PM Jens Axboe <axboe@kernel.dk> wrote:
->
-> Thanks Ming, I'll queue this up for shipping this week.
+On 1/14/19 9:31 PM, Linus Torvalds wrote:
+> On Tue, Jan 15, 2019 at 4:28 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> Thanks Ming, I'll queue this up for shipping this week.
+> 
+> Oops. I _just_ applied it to my tree as a follow-up to Steven's
+> softirq version. I just hadn't had time to build test and push out
+> yet.
 
-Oops. I _just_ applied it to my tree as a follow-up to Steven's
-softirq version. I just hadn't had time to build test and push out
-yet.
+No big deal, fwiw, this is what I queued up:
 
-               Linus
+http://git.kernel.dk/cgit/linux-block/commit/?h=for-linus&id=8218a55b6b911d396565da4ed5ca8b18bf0d38fb
+
+which has a spelling error fixed, and the indentation a bit nicer
+for the locking scenario. But I can just drop it.
+
+-- 
+Jens Axboe
+
