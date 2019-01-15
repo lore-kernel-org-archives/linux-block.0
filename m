@@ -2,101 +2,184 @@ Return-Path: <SRS0=gCKl=PX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F2A1C43387
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 04:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2A34C43387
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 07:39:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 30CA22085A
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 04:34:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lx6YXLf7"
+	by mail.kernel.org (Postfix) with ESMTP id 7685B20859
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 07:39:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727427AbfAOEel (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Jan 2019 23:34:41 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:43774 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726769AbfAOEel (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Jan 2019 23:34:41 -0500
-Received: by mail-pg1-f195.google.com with SMTP id v28so653084pgk.10
-        for <linux-block@vger.kernel.org>; Mon, 14 Jan 2019 20:34:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=zK501jD2/GZKzdJMzveevnFqSdl6gSxA278Ms2OysRc=;
-        b=lx6YXLf7vYtR69neQ/wznBdW33BkxHtu1GOR/6phbiU5d4Le8Gi/TWdlfCC0f9opmi
-         stI5lLqq4DeddpUW/FobFmv5BfSZR83CdNOtsgNSdwQFfoOmgavLggTB4b+1zEslPTxA
-         Itoal9UfSW3BvnMS+Ol7++GWLzH15Wx0qPyxt8rijTopmwm/0RnfMt8LE7EfH2AtI4Zr
-         jVjjInWgaqXr+hnW4M3s0rl+A/RO6WKnJTIrW7FaWk48BzdTtFWIJHxWqznisvBS9Uqi
-         3teTwGaCYor+zppxfmp1Ur4l918tivNQ77gU1VhY+8XQuxMXAdGSyhbpOGOo+6ZW371w
-         FCpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zK501jD2/GZKzdJMzveevnFqSdl6gSxA278Ms2OysRc=;
-        b=eG2L0GinNYrwU9zEiTB71MxzJjzjq5OLSkXFJqNnNJCA4cXgJhcpBUJmQ2XSNK+K0u
-         B4UpvnOfGL44nLP3r8AL0QDNA6Q/z1QcbR6lSMhMi0hDanY8hJB1uEL5klm9ny7+juss
-         zLrZrD7W4p9nUkXIx6bxU6JJ9DEPUZRnG/iGIOfUeEUe4UZAwbfrl/oyPqR9vgab8+5V
-         aOvuIUa4KPxJJwxIuJ9zqiUzt3vGyHMzNXh9BrIPzOLaw9ThP1ErbsABR0IiwOOJraY7
-         XAVLV6p4ZwdlS2stzuVM2PoeM1UFTzb4JhGSlwt8XTVyIOqW+aNXdXMX72GQ5OuflYtN
-         RBNA==
-X-Gm-Message-State: AJcUukdhmwypH8EQvPzlmADpjQZ0r9GBSxdR93bp6CHU3Sg8Sn7vmWVx
-        ugZDvBJVf/LqP+WruMAlhhtYeQ==
-X-Google-Smtp-Source: ALg8bN64ktdiCTl++L9YfbxJDVKKI+mT3Bc65KMmq3mvY1RUrWzWG7DI9RBGDf+pgLB30Ctr6ia+vg==
-X-Received: by 2002:aa7:8802:: with SMTP id c2mr2059833pfo.20.1547526880807;
-        Mon, 14 Jan 2019 20:34:40 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id v89sm2449973pfk.12.2019.01.14.20.34.38
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 14 Jan 2019 20:34:39 -0800 (PST)
-Subject: Re: [PATCH] sbitmap: Protect swap_lock from hardirq
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Ming Lei <ming.lei@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Clark Williams <williams@redhat.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Linux List Kernel Mailing <linux-kernel@vger.kernel.org>
-References: <20190115035952.13325-1-ming.lei@redhat.com>
- <e2bebd6a-cc89-d6c2-8203-718b5c12ea4f@kernel.dk>
- <CAHk-=wg76gE51qx6erfMxNh4B_cYvwxgVr1ReqEyzpNjkpMJQw@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a8659157-652d-c66e-8d9d-6ff2133645c0@kernel.dk>
-Date:   Mon, 14 Jan 2019 21:34:37 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726886AbfAOHj6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jan 2019 02:39:58 -0500
+Received: from mx2.suse.de ([195.135.220.15]:41492 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726594AbfAOHj6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Jan 2019 02:39:58 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 9F3DDAE15;
+        Tue, 15 Jan 2019 07:39:56 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 617FA1E087B; Tue, 15 Jan 2019 08:39:55 +0100 (CET)
+Date:   Tue, 15 Jan 2019 08:39:55 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Josef Bacik <jbacik@fb.com>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Subject: Re: [PATCH] loop: Add test for changing capacity when filesystem is
+ mounted
+Message-ID: <20190115073955.GA29524@quack2.suse.cz>
+References: <20190114084811.14455-1-jack@suse.cz>
+ <20190114084811.14455-4-jack@suse.cz>
+ <f3988910-5c64-2ab4-a4e8-8255d72458b1@i-love.sakura.ne.jp>
+ <20190114104119.GE13316@quack2.suse.cz>
+ <20190114105001.GF13316@quack2.suse.cz>
+ <BYAPR04MB45026647498A4B84C5001EA686800@BYAPR04MB4502.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHk-=wg76gE51qx6erfMxNh4B_cYvwxgVr1ReqEyzpNjkpMJQw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <BYAPR04MB45026647498A4B84C5001EA686800@BYAPR04MB4502.namprd04.prod.outlook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/14/19 9:31 PM, Linus Torvalds wrote:
-> On Tue, Jan 15, 2019 at 4:28 PM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> Thanks Ming, I'll queue this up for shipping this week.
+On Mon 14-01-19 19:10:17, Chaitanya Kulkarni wrote:
+> Hi Jan,
 > 
-> Oops. I _just_ applied it to my tree as a follow-up to Steven's
-> softirq version. I just hadn't had time to build test and push out
-> yet.
+> Thanks for the test.
+> 
+>      1	From 45a003672775cb6dcebc99d7ddfe19a1c9507ac3 Mon Sep 17 00:00:00 2001
+>      2	From: Jan Kara <jack@suse.cz>
+>      3	Date: Mon, 14 Jan 2019 09:23:42 +0100
+>      4	Subject: [PATCH v2] loop: Add test for changing capacity when filesystem is
+>      5	 mounted
+>      6	
+>      7	Add test for changing capacity of a loop device when a filesystem with
+>      8	non-default block size is mounted on it. This is a regression test for
+>      9	"blockdev: Fix livelocks on loop device".
+>     10	
+>     11	Signed-off-by: Jan Kara <jack@suse.cz>
+>     12	---
+>     13	 tests/loop/007     | 38 ++++++++++++++++++++++++++++++++++++++
+>     14	 tests/loop/007.out |  2 ++
+>     15	 2 files changed, 40 insertions(+)
+>     16	 create mode 100755 tests/loop/007
+>     17	 create mode 100644 tests/loop/007.out
+>     18	
+>     19	diff --git a/tests/loop/007 b/tests/loop/007
+>     20	new file mode 100755
+>     21	index 000000000000..3598aeba4443
+>     22	--- /dev/null
+>     23	+++ b/tests/loop/007
+>     24	@@ -0,0 +1,38 @@
+>     25	+#!/bin/bash
+>     26	+# SPDX-License-Identifier: GPL-3.0+
+>     27	+# Copyright (C) 2019 Jan Kara
+>     28	+#
+>     29	+# Test loop device capacity change handling with filesystem mounted on top.
+>     30	+#
+>     31	+# Regression test for patch "blockdev: Fix livelocks on loop device".
+>     32	+#
+>     33	+
+>     34	+. tests/loop/rc
+>     35	+
+>     36	+DESCRIPTION="update loop device capacity with filesystem"
+>     37	+
+>     38	+QUICK=1
+>     39	+
+>     40	+requires() {
+>     41	+	_have_program mkfs.ext4
+>     42	+}
+>     43	+
+>     44	+test() {
+>     45	+	echo "Running ${TEST_NAME}"
+>     46	+
+> Can we add loop module load/unload at the start and end of the test case
+> ?  or is there any specific reason we are not loading and unloading the
+> module in this test ?
 
-No big deal, fwiw, this is what I queued up:
+Well, no other loop tests do this AFAICT. Normally, loop module gets
+auto-loaded when first opening some loop device so manual loading usually
+is not needed. Also unloading can easily fail if there are other users of
+the loop module independent of the test suite.
 
-http://git.kernel.dk/cgit/linux-block/commit/?h=for-linus&id=8218a55b6b911d396565da4ed5ca8b18bf0d38fb
+So to sum it up, I can add loading / unloading to all loop tests but IMO
+the benefit is doubtful.
 
-which has a spelling error fixed, and the indentation a bit nicer
-for the locking scenario. But I can just drop it.
+								Honza
 
+>     47	+	local mount_dir="/mnt/blktests/"
+>     48	+
+>     49	+	truncate -s 1G "$TMPDIR/img"
+>     50	+	mkdir -p "$mount_dir"
+>     51	+	local loop_device="$(losetup -P -f --show "$TMPDIR/img")"
+>     52	+	mkfs.ext4 -b 1024 "$loop_device" &>/dev/null
+>     53	+	mount -t ext4 "$loop_device" "$mount_dir"
+>     54	+	losetup -c "$loop_device"
+>     55	+	# This hangs if rereading capacity changed block size
+>     56	+	ls -l "$mount_dir" >/dev/null
+>     57	+	umount "$mount_dir"
+>     58	+	losetup -d "$loop_device"
+>     59	+	rm -fr "$mount_dir" "$TMPDIR/img"
+>     60	+
+>     61	+	echo "Test complete"
+>     62	+}
+>     63	diff --git a/tests/loop/007.out b/tests/loop/007.out
+>     64	new file mode 100644
+>     65	index 000000000000..32752934d48a
+>     66	--- /dev/null
+>     67	+++ b/tests/loop/007.out
+>     68	@@ -0,0 +1,2 @@
+>     69	+Running loop/007
+>     70	+Test complete
+>     71	-- 
+>     72	2.16.4
+>     73	
+> 
+> 
+> -ck
+> 
+> 
+> 
+> 
+> From: linux-block-owner@vger.kernel.org <linux-block-owner@vger.kernel.org> on behalf of Jan Kara <jack@suse.cz>
+> Sent: Monday, January 14, 2019 2:50 AM
+> To: Jens Axboe
+> Cc: Jan Kara; linux-block@vger.kernel.org; Josef Bacik; Tetsuo Handa
+> Subject: Re: [PATCH] loop: Add test for changing capacity when filesystem is mounted
+>   
+>  
+> On Mon 14-01-19 11:41:19, Jan Kara wrote:
+> > On Mon 14-01-19 18:44:22, Tetsuo Handa wrote:
+> > > Thank you for the patch.
+> > > 
+> > > On 2019/01/14 17:48, Jan Kara wrote:
+> > > > + # This hangs if rereading capacity changed block size
+> > > > + l /mnt
+> > > 
+> > > Is 'l' defined as an alias to 'ls' ? I suggest not depending on such alias,
+> > > for at least 'l' is not defined in my environment.
+> > 
+> > Yeah, my bad. I have it everywhere and my finger memory just typed it into
+> > the test :). Of course 'ls -l' is better for the test so I'll fix it up in
+> > the next version. Thanks for review.
+> 
+> The test had a couple more bugs which should be fixed now so attached is a
+> new version which I've actually tested inside the blktests framework ;).
+> 
+>                                                                 Honza
+> -- 
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
+>     
 -- 
-Jens Axboe
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
