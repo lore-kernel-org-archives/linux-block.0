@@ -2,84 +2,86 @@ Return-Path: <SRS0=gCKl=PX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EF2FC43387
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 16:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C590C43387
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 16:51:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 66DFD20866
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 16:23:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DD5E20645
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 16:51:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729199AbfAOQXY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jan 2019 11:23:24 -0500
-Received: from 8bytes.org ([81.169.241.247]:57836 "EHLO theia.8bytes.org"
+        id S1729516AbfAOQvg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jan 2019 11:51:36 -0500
+Received: from ms.lwn.net ([45.79.88.28]:43578 "EHLO ms.lwn.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728911AbfAOQXY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jan 2019 11:23:24 -0500
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 18D90477; Tue, 15 Jan 2019 17:23:23 +0100 (CET)
-Date:   Tue, 15 Jan 2019 17:23:22 +0100
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, jfehlig@suse.com,
-        jon.grimm@amd.com, brijesh.singh@amd.com, jroedel@suse.de
-Subject: Re: [PATCH 2/3] dma: Introduce dma_max_mapping_size()
-Message-ID: <20190115162322.GA4681@8bytes.org>
-References: <20190115132257.6426-1-joro@8bytes.org>
- <20190115132257.6426-3-joro@8bytes.org>
- <20190115133754.GB29225@lst.de>
+        id S1731289AbfAOQvg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Jan 2019 11:51:36 -0500
+Received: from lwn.net (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ms.lwn.net (Postfix) with ESMTPSA id 611CA2DD;
+        Tue, 15 Jan 2019 16:51:35 +0000 (UTC)
+Date:   Tue, 15 Jan 2019 09:51:34 -0700
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
+        linux-block@vger.kernel.org, linux-arch@vger.kernel.org,
+        hch@lst.de, jmoyer@redhat.com, avi@scylladb.com
+Subject: Re: [PATCH 05/16] Add io_uring IO interface
+Message-ID: <20190115095134.6286b7d6@lwn.net>
+In-Reply-To: <20190115025531.13985-6-axboe@kernel.dk>
+References: <20190115025531.13985-1-axboe@kernel.dk>
+        <20190115025531.13985-6-axboe@kernel.dk>
+Organization: LWN.net
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190115133754.GB29225@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 15, 2019 at 02:37:54PM +0100, Christoph Hellwig wrote:
-> > +size_t dma_direct_max_mapping_size(struct device *dev)
-> > +{
-> > +	/*
-> > +	 * Return the minimum of the direct DMA limit and the SWIOTLB limit.
-> > +	 * Since direct DMA has no limit, it is fine to just return the SWIOTLB
-> > +	 * limit.
-> > +	 */
-> > +	return swiotlb_max_mapping_size(dev);
+On Mon, 14 Jan 2019 19:55:20 -0700
+Jens Axboe <axboe@kernel.dk> wrote:
+
+So the [0/16] cover letter seems to have gone astray this time?
+
+Anyway, a couple of minor notes/questions:
+
+> The submission queue (SQ) and completion queue (CQ) rings are shared
+> between the application and the kernel. This eliminates the need to
+> copy data back and forth to submit and complete IO.
 > 
-> Well, if we don't actually use the swiotlb buffers despite it being
-> compiled in or even allocated we don't need the limit.
+> IO submissions use the io_uring_sqe data structure, and completions
+> are generated in the form of io_uring_sqe data structures. The SQ
+> ring is an index into the io_uring_sqe array, which makes it possible
+> to submit a batch of IOs without them being contiguous in the ring.
+> The CQ ring is always contiguous, as completion events are inherently
+> unordered and can point to any io_uring_iocb.
+> 
+> Two new system calls are added for this:
+> 
+> io_uring_setup(entries, iovecs, params)
+> 	Sets up a context for doing async IO. On success, returns a file
+> 	descriptor that the application can mmap to gain access to the
+> 	SQ ring, CQ ring, and io_uring_iocbs.
 
-Right, I thought about that too, but didn't find a generic way to check
-for all the cases. There are various checks that could be done:
+Looking at the code, it would appear that the "iovecs" parameter doesn't
+actually exist.
 
-	1) Check if SWIOTLB is initialized at all, if not, return
-	   SIZE_MAX as the limit. This can't be checked from dma-direct
-	   code right now, but could be easily implemented.
+> io_uring_enter(fd, to_submit, min_complete, flags)
+> 	Initiates IO against the rings mapped to this fd, or waits for
+> 	them to complete, or both The behavior is controlled by the
+> 	parameters passed in. If 'min_complete' is non-zero, then we'll
+> 	try and submit new IO. If IORING_ENTER_GETEVENTS is set, the
+> 	kernel will wait for 'min_complete' events, if they aren't
+> 	already available.
 
-	2) Check for swiotlb=force needs to be done.
+I feel like I'm missing something here.  Rather than have the
+IORING_ENTER_GETEVENTS flag, why not just wait if min_complete > 0 ?
 
-	3) Check whether the device can access all of available RAM. I
-	   have no idea how to check that in an architecture independent
-	   way. It also has to take memory hotplug into account as well
-	   as the DMA mask of the device.
+Thanks,
 
-	   An easy approximation could be to omit the limit if the
-	   dma-mask covers all of the physical address bits available
-	   on the platform. It would require to pass the dma-mask as an
-	   additional parameter like it is done in dma_supported().
-
-Any better ideas for how to implement 3)?
-
-Regards,
-
-	Joerg
+jon
