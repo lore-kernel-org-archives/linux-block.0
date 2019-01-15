@@ -4,64 +4,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 927E7C43444
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 02:55:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59CD3C43387
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 02:56:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 60DA620656
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 02:55:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B25D20656
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 02:56:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ijGq39i/"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="LJg8fvyM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727971AbfAOCz4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Jan 2019 21:55:56 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:36189 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727969AbfAOCz4 (ORCPT
+        id S1727977AbfAOC4A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Jan 2019 21:56:00 -0500
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:35035 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727975AbfAOC4A (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Jan 2019 21:55:56 -0500
-Received: by mail-pf1-f194.google.com with SMTP id b85so585501pfc.3
-        for <linux-block@vger.kernel.org>; Mon, 14 Jan 2019 18:55:55 -0800 (PST)
+        Mon, 14 Jan 2019 21:56:00 -0500
+Received: by mail-pf1-f196.google.com with SMTP id z9so593210pfi.2
+        for <linux-block@vger.kernel.org>; Mon, 14 Jan 2019 18:55:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=scNBCeOhysecepgCupm97WAYtsMfIFMGuolJ4I0NyhI=;
-        b=ijGq39i/GYZRVfPMN25h6aBbPDSVgpCfbEIPCUq2Cn26p5zkha3h9AptKxTRQj4SPz
-         T1uXLrSbHFKEbPlSToC31FzKAjSuehD8T52uzTBrDAaCNgNuaGyqTlf5A4duZVWe/8XX
-         vOZNpOXAjJdwq/mmnEtgRfK0iC/iXI0cYiGdWN492ls4P2IVe+iRohv8rZB1XuQJnI3c
-         K5N8rUxM3PLjNnHQ3cGVaTHG3FFJT7J0MuOsuInnkovFtcP0/qh0ezkd6U42lqFsc3lh
-         VdDiHx+rm00Tf9KH2nezR90NBZmUbQo1zfQjBiMbdmIjDIajl1zWSttbsFBDWU03wB5F
-         o+pA==
+        bh=VoYrPtRXJ9nQQpUfIFiP2jxPJWS+L1ggj48G/VBnDmk=;
+        b=LJg8fvyMx9ZXqRNN/UyOrzI0pPVIGoGv0PyE8ldZ3O4gDwqsPTiYAJdWNqsrv0owRo
+         jN8w4t/LxaTfiijA1Q9MVmJUp3+SZfoJ6Ko8WN7G0NqmmfSlRKX/bi9BOn9UJ2VmpKcM
+         gRlyoxaFmycrSsKPaupXvmQQ4IP4eAyXQxppTggkfeX1w9Ft8PQ26ZkbqcVNRya+qeQ9
+         URmZJVZyeEUUAGCeOL3THCPvLoyuw6++/4v/PKun2x8W6GPj/a+mriv7fP5Vsxou1vhQ
+         rzCAimXqIDqZUnczSfWwVNQU3HADo5UAHtzbnZqigdv1q7PqNig8TgEbNR3DuClKiXgc
+         9Daw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=scNBCeOhysecepgCupm97WAYtsMfIFMGuolJ4I0NyhI=;
-        b=NAhIdYZuGPkvn1RukdHxKIs0yzCG8iFv9MZExJbXr+kyy15LgU4LHpPFvxzPJtLLWf
-         8H8laUI5ZIhsk+9B6Ldka9h5jW3DWJXuscwkEbq1eZtly6qaqW6LTZTUyvI0IoNnrVpI
-         IinS9XKJWIwjlyBnv+JSleOu7CJiCzjB+tQ1P2qlMLeyPi/LoCg2NN0Lv/MzUDPAWent
-         1josDUFlyOKU9EQ/UDxwrtVyCJf2WyUXnGGuo7w8aR5LRhTAWGB0rdQXqfApdqwOcmsg
-         pruRaO+AMF5RbUkm05eftHCX1Dz+NQwWmX5OfL1z5Be4NwTcBLCFlHcDEGE4BpeH/rY1
-         F3PQ==
-X-Gm-Message-State: AJcUukfJNS49t1hL2KIBc6d9FslgNn5i7HcDvwhaKOAx4dJh/du5EWbe
-        rXv488h3SQcbcr3K1wJvZFRuyQ==
-X-Google-Smtp-Source: ALg8bN4YxSdVOLWW+eKpYDluuB9JcceHklc6TytCJv17DCrGX35OMo0HuYaL8zyGonxQQYJpW3noUw==
-X-Received: by 2002:a63:a35c:: with SMTP id v28mr1654234pgn.205.1547520955558;
-        Mon, 14 Jan 2019 18:55:55 -0800 (PST)
+        bh=VoYrPtRXJ9nQQpUfIFiP2jxPJWS+L1ggj48G/VBnDmk=;
+        b=II7Lv2Q8TXoB2Y8i9BeQufMPar3Qz5mjFnroimDSlgV25KpTjcFL0CHAzeevW0iz+C
+         uNVyi1bowYp4spVe44zre/m8M+aRfqxkEa1Oa2uhQAbeeRSfg91A5uglBDL7UKtuuYMa
+         Mo+7ilxbg6adl16a+lu8ft77Q8bQZQsRFWm0niO9I8xUx+oGB6vNDMfKTdCShgFBeJ/G
+         Sz86XGpJqBC0iLmoDJhfIyCDBXmwdTq2c5oxrYu2lkWUZoLcxDSapZD2FEo1HIfFyb9J
+         R+s9eEOhZwgZKqDnNYjyiRiY5k/zMlmeyFgN8qe7Mcl7Nc3P4AbcYMRTYC9g8X8gPR5N
+         D9SQ==
+X-Gm-Message-State: AJcUukfwU9iD3cMASPBdCHTLBHMTAQtF4g/4lCwZxX+xvIjd6ePArMUz
+        Ln4H6SBol9A0D/x+3MKZWQFvuQ==
+X-Google-Smtp-Source: ALg8bN4TQmvTcn37kaEb7ABZtiuctisdY9ll5iS2uXAugW1QYZ2AnC5clRriS+99sJpufM0IGLwsHg==
+X-Received: by 2002:a62:d206:: with SMTP id c6mr572884pfg.245.1547520959286;
+        Mon, 14 Jan 2019 18:55:59 -0800 (PST)
 Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id c23sm2415544pfi.83.2019.01.14.18.55.53
+        by smtp.gmail.com with ESMTPSA id c23sm2415544pfi.83.2019.01.14.18.55.57
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 14 Jan 2019 18:55:54 -0800 (PST)
+        Mon, 14 Jan 2019 18:55:58 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
         linux-block@vger.kernel.org, linux-arch@vger.kernel.org
 Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 09/16] fs: add fget_many() and fput_many()
-Date:   Mon, 14 Jan 2019 19:55:24 -0700
-Message-Id: <20190115025531.13985-10-axboe@kernel.dk>
+Subject: [PATCH 11/16] io_uring: batch io_kiocb allocation
+Date:   Mon, 14 Jan 2019 19:55:26 -0700
+Message-Id: <20190115025531.13985-12-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190115025531.13985-1-axboe@kernel.dk>
 References: <20190115025531.13985-1-axboe@kernel.dk>
@@ -70,140 +70,128 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Some uses cases repeatedly get and put references to the same file, but
-the only exposed interface is doing these one at the time. As each of
-these entail an atomic inc or dec on a shared structure, that cost can
-add up.
-
-Add fget_many(), which works just like fget(), except it takes an
-argument for how many references to get on the file. Ditto fput_many(),
-which can drop an arbitrary number of references to a file.
+Similarly to how we use the state->ios_left to know how many references
+to get to a file, we can use it to allocate the io_kiocb's we need in
+bulk.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/file.c            | 15 ++++++++++-----
- fs/file_table.c      |  9 +++++++--
- include/linux/file.h |  2 ++
- include/linux/fs.h   |  4 +++-
- 4 files changed, 22 insertions(+), 8 deletions(-)
+ fs/io_uring.c | 66 ++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 50 insertions(+), 16 deletions(-)
 
-diff --git a/fs/file.c b/fs/file.c
-index 3209ee271c41..e0d7ce70e860 100644
---- a/fs/file.c
-+++ b/fs/file.c
-@@ -705,7 +705,7 @@ void do_close_on_exec(struct files_struct *files)
- 	spin_unlock(&files->file_lock);
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 0d7c44a2d424..d0e4e37592fe 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -140,6 +140,13 @@ struct io_submit_state {
+ 	struct list_multi req_list;
+ 	unsigned int req_count;
+ 
++	/*
++	 * io_kiocb alloc cache
++	 */
++	void *reqs[IO_IOPOLL_BATCH];
++	unsigned int free_reqs;
++	unsigned int cur_req;
++
+ 	/*
+ 	 * File reference cache
+ 	 */
+@@ -244,29 +251,52 @@ static void io_fill_cq_error(struct io_ring_ctx *ctx, struct sqe_submit *s,
+ 		wake_up(&ctx->wait);
  }
  
--static struct file *__fget(unsigned int fd, fmode_t mask)
-+static struct file *__fget(unsigned int fd, fmode_t mask, unsigned int refs)
+-static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx)
++static void io_ring_drop_ctx_refs(struct io_ring_ctx *ctx, unsigned refs)
  {
- 	struct files_struct *files = current->files;
- 	struct file *file;
-@@ -720,7 +720,7 @@ static struct file *__fget(unsigned int fd, fmode_t mask)
- 		 */
- 		if (file->f_mode & mask)
- 			file = NULL;
--		else if (!get_file_rcu(file))
-+		else if (!get_file_rcu_many(file, refs))
- 			goto loop;
- 	}
- 	rcu_read_unlock();
-@@ -728,15 +728,20 @@ static struct file *__fget(unsigned int fd, fmode_t mask)
- 	return file;
- }
- 
-+struct file *fget_many(unsigned int fd, unsigned int refs)
-+{
-+	return __fget(fd, FMODE_PATH, refs);
++	percpu_ref_put_many(&ctx->refs, refs);
++
++	if (waitqueue_active(&ctx->wait))
++		wake_up(&ctx->wait);
 +}
 +
- struct file *fget(unsigned int fd)
- {
--	return __fget(fd, FMODE_PATH);
-+	return fget_many(fd, 1);
- }
- EXPORT_SYMBOL(fget);
- 
- struct file *fget_raw(unsigned int fd)
- {
--	return __fget(fd, 0);
-+	return __fget(fd, 0, 1);
- }
- EXPORT_SYMBOL(fget_raw);
- 
-@@ -767,7 +772,7 @@ static unsigned long __fget_light(unsigned int fd, fmode_t mask)
- 			return 0;
- 		return (unsigned long)file;
- 	} else {
--		file = __fget(fd, mask);
-+		file = __fget(fd, mask, 1);
- 		if (!file)
- 			return 0;
- 		return FDPUT_FPUT | (unsigned long)file;
-diff --git a/fs/file_table.c b/fs/file_table.c
-index 5679e7fcb6b0..155d7514a094 100644
---- a/fs/file_table.c
-+++ b/fs/file_table.c
-@@ -326,9 +326,9 @@ void flush_delayed_fput(void)
- 
- static DECLARE_DELAYED_WORK(delayed_fput_work, delayed_fput);
- 
--void fput(struct file *file)
-+void fput_many(struct file *file, unsigned int refs)
- {
--	if (atomic_long_dec_and_test(&file->f_count)) {
-+	if (atomic_long_sub_and_test(refs, &file->f_count)) {
- 		struct task_struct *task = current;
- 
- 		if (likely(!in_interrupt() && !(task->flags & PF_KTHREAD))) {
-@@ -347,6 +347,11 @@ void fput(struct file *file)
- 	}
- }
- 
-+void fput(struct file *file)
++static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx,
++				   struct io_submit_state *state)
 +{
-+	fput_many(file, 1);
-+}
++	gfp_t gfp = GFP_ATOMIC | __GFP_NOWARN;
+ 	struct io_kiocb *req;
+ 
+ 	if (!percpu_ref_tryget(&ctx->refs))
+ 		return NULL;
+ 
+-	req = kmem_cache_alloc(req_cachep, GFP_ATOMIC | __GFP_NOWARN);
+-	if (!req)
+-		return NULL;
+-
+-	req->ctx = ctx;
+-	INIT_LIST_HEAD(&req->list);
+-	req->flags = 0;
+-	return req;
+-}
++	if (!state)
++		req = kmem_cache_alloc(req_cachep, gfp);
++	else if (!state->free_reqs) {
++		size_t sz;
++		int ret;
 +
++		sz = min_t(size_t, state->ios_left, ARRAY_SIZE(state->reqs));
++		ret = kmem_cache_alloc_bulk(req_cachep, gfp, sz,
++						state->reqs);
++		if (ret <= 0)
++			goto out;
++		state->free_reqs = ret - 1;
++		state->cur_req = 1;
++		req = state->reqs[0];
++	} else {
++		req = state->reqs[state->cur_req];
++		state->free_reqs--;
++		state->cur_req++;
++	}
+ 
+-static void io_ring_drop_ctx_refs(struct io_ring_ctx *ctx, unsigned refs)
+-{
+-	percpu_ref_put_many(&ctx->refs, refs);
++	if (req) {
++		req->ctx = ctx;
++		req->flags = 0;
++		return req;
++	}
+ 
+-	if (waitqueue_active(&ctx->wait))
+-		wake_up(&ctx->wait);
++out:
++	io_ring_drop_ctx_refs(ctx, 1);
++	return NULL;
+ }
+ 
+ static void io_free_req_many(struct io_ring_ctx *ctx, void **reqs, int *nr)
+@@ -910,7 +940,7 @@ static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
+ 	struct io_kiocb *req;
+ 	ssize_t ret;
+ 
+-	req = io_get_req(ctx);
++	req = io_get_req(ctx, state);
+ 	if (unlikely(!req))
+ 		return -EAGAIN;
+ 
+@@ -947,6 +977,9 @@ static void io_submit_state_end(struct io_submit_state *state)
+ 	if (!list_empty(&state->req_list.list))
+ 		io_flush_state_reqs(state->ctx, state);
+ 	io_file_put(state, NULL);
++	if (state->free_reqs)
++		kmem_cache_free_bulk(req_cachep, state->free_reqs,
++					&state->reqs[state->cur_req]);
+ }
+ 
  /*
-  * synchronous analog of fput(); for kernel threads that might be needed
-  * in some umount() (and thus can't use flush_delayed_fput() without
-diff --git a/include/linux/file.h b/include/linux/file.h
-index 6b2fb032416c..3fcddff56bc4 100644
---- a/include/linux/file.h
-+++ b/include/linux/file.h
-@@ -13,6 +13,7 @@
- struct file;
- 
- extern void fput(struct file *);
-+extern void fput_many(struct file *, unsigned int);
- 
- struct file_operations;
- struct vfsmount;
-@@ -44,6 +45,7 @@ static inline void fdput(struct fd fd)
- }
- 
- extern struct file *fget(unsigned int fd);
-+extern struct file *fget_many(unsigned int fd, unsigned int refs);
- extern struct file *fget_raw(unsigned int fd);
- extern unsigned long __fdget(unsigned int fd);
- extern unsigned long __fdget_raw(unsigned int fd);
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index ccb0b7a63aa5..acaad78b6781 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -952,7 +952,9 @@ static inline struct file *get_file(struct file *f)
- 	atomic_long_inc(&f->f_count);
- 	return f;
- }
--#define get_file_rcu(x) atomic_long_inc_not_zero(&(x)->f_count)
-+#define get_file_rcu_many(x, cnt)	\
-+	atomic_long_add_unless(&(x)->f_count, (cnt), 0)
-+#define get_file_rcu(x) get_file_rcu_many((x), 1)
- #define fput_atomic(x)	atomic_long_add_unless(&(x)->f_count, -1, 1)
- #define file_count(x)	atomic_long_read(&(x)->f_count)
- 
+@@ -958,6 +991,7 @@ static void io_submit_state_start(struct io_submit_state *state,
+ 	state->ctx = ctx;
+ 	INIT_LIST_HEAD(&state->req_list.list);
+ 	state->req_count = 0;
++	state->free_reqs = 0;
+ 	state->file = NULL;
+ 	state->ios_left = max_ios;
+ #ifdef CONFIG_BLOCK
 -- 
 2.17.1
 
