@@ -3,23 +3,23 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D0F7C43387
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 13:23:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1747DC43387
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 13:23:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E6C520657
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 13:23:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD85020868
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 13:23:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729250AbfAONXQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jan 2019 08:23:16 -0500
-Received: from 8bytes.org ([81.169.241.247]:57788 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729323AbfAONXC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        id S1729398AbfAONXC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 15 Jan 2019 08:23:02 -0500
+Received: from 8bytes.org ([81.169.241.247]:57748 "EHLO theia.8bytes.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729252AbfAONXB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Jan 2019 08:23:01 -0500
 Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 989C844A; Tue, 15 Jan 2019 14:23:00 +0100 (CET)
+        id 4682F1FC; Tue, 15 Jan 2019 14:23:00 +0100 (CET)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     "Michael S . Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
@@ -31,9 +31,9 @@ Cc:     Jens Axboe <axboe@kernel.dk>,
         iommu@lists.linux-foundation.org, jfehlig@suse.com,
         jon.grimm@amd.com, brijesh.singh@amd.com, joro@8bytes.org,
         jroedel@suse.de
-Subject: [PATCH 3/3] virtio-blk: Consider dma_max_mapping_size() for maximum segment size
-Date:   Tue, 15 Jan 2019 14:22:57 +0100
-Message-Id: <20190115132257.6426-4-joro@8bytes.org>
+Subject: [PATCH 1/3] swiotlb: Introduce swiotlb_max_mapping_size()
+Date:   Tue, 15 Jan 2019 14:22:55 +0100
+Message-Id: <20190115132257.6426-2-joro@8bytes.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190115132257.6426-1-joro@8bytes.org>
 References: <20190115132257.6426-1-joro@8bytes.org>
@@ -44,48 +44,52 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-Segments can't be larger than the maximum DMA mapping size
-supported on the platform. Take that into account when
-setting the maximum segment size for a block device.
+The function returns the maximum size that can be remapped
+by the SWIOTLB implementation. This function will be later
+exposed to users through the DMA-API.
 
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- drivers/block/virtio_blk.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ include/linux/swiotlb.h | 5 +++++
+ kernel/dma/swiotlb.c    | 5 +++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index b16a887bbd02..6193962a7fec 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -723,7 +723,7 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	struct request_queue *q;
- 	int err, index;
+diff --git a/include/linux/swiotlb.h b/include/linux/swiotlb.h
+index 7c007ed7505f..ceb623321f38 100644
+--- a/include/linux/swiotlb.h
++++ b/include/linux/swiotlb.h
+@@ -62,6 +62,7 @@ extern void swiotlb_tbl_sync_single(struct device *hwdev,
  
--	u32 v, blk_size, sg_elems, opt_io_size;
-+	u32 v, blk_size, max_size, sg_elems, opt_io_size;
- 	u16 min_io_size;
- 	u8 physical_block_exp, alignment_offset;
+ extern int
+ swiotlb_dma_supported(struct device *hwdev, u64 mask);
++extern size_t swiotlb_max_mapping_size(struct device *dev);
  
-@@ -826,14 +826,16 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	/* No real sector limit. */
- 	blk_queue_max_hw_sectors(q, -1U);
+ #ifdef CONFIG_SWIOTLB
+ extern enum swiotlb_force swiotlb_force;
+@@ -95,6 +96,10 @@ static inline unsigned int swiotlb_max_segment(void)
+ {
+ 	return 0;
+ }
++static inline size_t swiotlb_max_mapping_size(struct device *dev)
++{
++	return SIZE_MAX;
++}
+ #endif /* CONFIG_SWIOTLB */
  
-+	max_size = dma_max_mapping_size(&vdev->dev);
+ extern void swiotlb_print_info(void);
+diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
+index d6361776dc5c..c950b3e9f683 100644
+--- a/kernel/dma/swiotlb.c
++++ b/kernel/dma/swiotlb.c
+@@ -660,3 +660,8 @@ swiotlb_dma_supported(struct device *hwdev, u64 mask)
+ {
+ 	return __phys_to_dma(hwdev, io_tlb_end - 1) <= mask;
+ }
 +
- 	/* Host can optionally specify maximum segment size and number of
- 	 * segments. */
- 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_SIZE_MAX,
- 				   struct virtio_blk_config, size_max, &v);
- 	if (!err)
--		blk_queue_max_segment_size(q, v);
--	else
--		blk_queue_max_segment_size(q, -1U);
-+		max_size = min(max_size, v);
-+
-+	blk_queue_max_segment_size(q, max_size);
- 
- 	/* Host can optionally specify the block size of the device */
- 	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_BLK_SIZE,
++size_t swiotlb_max_mapping_size(struct device *dev)
++{
++	return ((size_t)1 << IO_TLB_SHIFT) * IO_TLB_SEGSIZE;
++}
 -- 
 2.17.1
 
