@@ -2,68 +2,61 @@ Return-Path: <SRS0=gCKl=PX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C474C43387
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 08:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1EAAC43387
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 08:37:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5859A20859
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 08:20:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6EA92063F
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 08:37:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728145AbfAOIUn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jan 2019 03:20:43 -0500
-Received: from smtp.eu.citrix.com ([185.25.65.24]:2019 "EHLO
-        SMTP.EU.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728085AbfAOIUn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jan 2019 03:20:43 -0500
-X-IronPort-AV: E=Sophos;i="5.56,481,1539648000"; 
-   d="scan'208";a="84595790"
-Date:   Tue, 15 Jan 2019 09:20:36 +0100
-From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-To:     Dongli Zhang <dongli.zhang@oracle.com>
-CC:     <xen-devel@lists.xenproject.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <axboe@kernel.dk>,
-        <Paul.Durrant@citrix.com>, <konrad.wilk@oracle.com>
-Subject: Re: [Xen-devel] [PATCH v6 2/2] xen/blkback: rework connect_ring() to
- avoid inconsistent xenstore 'ring-page-order' set by malicious blkfront
-Message-ID: <20190115082036.y7svi3xz3dkqd4w4@mac>
-References: <1547484104-20625-1-git-send-email-dongli.zhang@oracle.com>
- <1547484104-20625-2-git-send-email-dongli.zhang@oracle.com>
+        id S1727731AbfAOIho (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jan 2019 03:37:44 -0500
+Received: from 8bytes.org ([81.169.241.247]:57666 "EHLO theia.8bytes.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727601AbfAOIho (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 15 Jan 2019 03:37:44 -0500
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id 87B9239A; Tue, 15 Jan 2019 09:37:42 +0100 (CET)
+Date:   Tue, 15 Jan 2019 09:37:42 +0100
+From:   Joerg Roedel <joro@8bytes.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, jfehlig@suse.com,
+        jon.grimm@amd.com, brijesh.singh@amd.com
+Subject: Re: [PATCH 0/3] Fix virtio-blk issue with SWIOTLB
+Message-ID: <20190115083742.GF5825@8bytes.org>
+References: <20190110134433.15672-1-joro@8bytes.org>
+ <5ae1341e-62ec-0478-552b-259eabf9fb17@redhat.com>
+ <20190111091502.GC5825@8bytes.org>
+ <38bcbd46-674c-348a-cbd6-66bd431e986a@redhat.com>
+ <20190114095002.GA29874@lst.de>
+ <ac6d83d8-02de-dbdf-e309-3a1115642d50@redhat.com>
+ <20190114131114-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1547484104-20625-2-git-send-email-dongli.zhang@oracle.com>
-User-Agent: NeoMutt/20180716
-X-ClientProxiedBy: AMSPEX02CAS02.citrite.net (10.69.22.113) To
- AMSPEX02CL02.citrite.net (10.69.22.126)
+In-Reply-To: <20190114131114-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 15, 2019 at 12:41:44AM +0800, Dongli Zhang wrote:
-> The xenstore 'ring-page-order' is used globally for each blkback queue and
-> therefore should be read from xenstore only once. However, it is obtained
-> in read_per_ring_refs() which might be called multiple times during the
-> initialization of each blkback queue.
-> 
-> If the blkfront is malicious and the 'ring-page-order' is set in different
-> value by blkfront every time before blkback reads it, this may end up at
-> the "WARN_ON(i != (XEN_BLKIF_REQS_PER_PAGE * blkif->nr_ring_pages));" in
-> xen_blkif_disconnect() when frontend is destroyed.
-> 
-> This patch reworks connect_ring() to read xenstore 'ring-page-order' only
-> once.
-> 
-> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+On Mon, Jan 14, 2019 at 01:20:45PM -0500, Michael S. Tsirkin wrote:
+> Which would be fine especially if we can manage not to introduce a bunch
+> of indirect calls all over the place and hurt performance.
 
-LGTM:
+Which indirect calls? In case of unset dma_ops the DMA-API functions
+call directly into the dma-direct implementation, no indirect calls at
+all.
 
-Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
+Regards,
 
-Thanks!
+	Joerg
