@@ -2,135 +2,86 @@ Return-Path: <SRS0=gCKl=PX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 872B9C43444
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 16:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 796CEC43444
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 16:57:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 54EDF20645
-	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 16:55:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="rRrH8TQ1"
+	by mail.kernel.org (Postfix) with ESMTP id 4641220645
+	for <linux-block@archiver.kernel.org>; Tue, 15 Jan 2019 16:57:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388077AbfAOQzi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jan 2019 11:55:38 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:34429 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730573AbfAOQzh (ORCPT
+        id S1726123AbfAOQ5b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jan 2019 11:57:31 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:39410 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732652AbfAOQko (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jan 2019 11:55:37 -0500
-Received: by mail-pf1-f195.google.com with SMTP id h3so1599181pfg.1
-        for <linux-block@vger.kernel.org>; Tue, 15 Jan 2019 08:55:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ze4bAj+Nuy3S2uragiLBlzirMPoVEPScDM5+5nQvM9Y=;
-        b=rRrH8TQ1wEZoZOuk7GUNU0OGwe03KeY3igkI9053ZrK1JZOphsKdUH3m5JgUAfVxet
-         B3Eqv46rkVLDBg1JZydwv/3Yti9tQEczBIz+loBAnzQf4pvmjzdGMEUxfON3WgYTPCFu
-         KPwAq26XUayX+ej9C7OagljU0QbQScNB16dcMJqJ04prLKajv0li2hE3i8p6UD4nUsds
-         OgFXqmJ92bEL1otQwcC1QjVVQUWrbQ2jb/E63Y5ts+XTlE/xO3wmOQk1P8UnZPj4j4D0
-         ycPu1P46Q0vou7diuSw4Z7gtkK6fu5VCzALCj096WwWOa5oOjpZjg5Tk/vKcz5qb8XmK
-         OB5w==
+        Tue, 15 Jan 2019 11:40:44 -0500
+Received: by mail-pg1-f193.google.com with SMTP id w6so1455236pgl.6
+        for <linux-block@vger.kernel.org>; Tue, 15 Jan 2019 08:40:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ze4bAj+Nuy3S2uragiLBlzirMPoVEPScDM5+5nQvM9Y=;
-        b=fB5VbzE4TLJYFlpGONNsDukWePqN/3yeFeMAHSj2Zl5jh1JGK7Uy0jvlztTlrY0FXF
-         +vTx+XhDdDjf+BnXnPqDp8uzzfmit0pBEwD7X/R1w0RZHONcDOwQc/NheQ2otLt90eK5
-         axrIMNmqnGlLF0iT7ds+9+pRfknKv+vu7Fbj5dRjHfCCRd0fwwefz9p+9oHp1tFhoDrD
-         +Ra3NUbOx7vK5MSY1I5wqKib+S84oVoHXrfPeJNUY/YMQ+PW2PywBtIAjTzTGkPla/dT
-         qVsSAqhDYwnNpuXL2RYzgAT91xw5UMl5AyKwTKwCmIXCu2SQGiyskCfoOj2DNZwumpY8
-         QXmQ==
-X-Gm-Message-State: AJcUukdTO9ieHXERwzw7ET6wRzRytT+vFzNVJJqQNeYXY0EvpUhupEcV
-        lpmIvZ9dCgm5rr0KhuqK0oNL6A==
-X-Google-Smtp-Source: ALg8bN480JXegH0QHHd7t2Op1tzPHQHIR26bAO1ZZpofdf0+SDjTjov2s2r2emlXsHSZkMaxlUPKBA==
-X-Received: by 2002:a63:184a:: with SMTP id 10mr4545065pgy.81.1547571335571;
-        Tue, 15 Jan 2019 08:55:35 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id o1sm5315470pgn.63.2019.01.15.08.55.33
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 15 Jan 2019 08:55:34 -0800 (PST)
-Subject: Re: [PATCH 05/16] Add io_uring IO interface
-To:     Jonathan Corbet <corbet@lwn.net>
-Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
-        linux-block@vger.kernel.org, linux-arch@vger.kernel.org,
-        hch@lst.de, jmoyer@redhat.com, avi@scylladb.com
-References: <20190115025531.13985-1-axboe@kernel.dk>
- <20190115025531.13985-6-axboe@kernel.dk> <20190115095134.6286b7d6@lwn.net>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <5e1fe0b7-7998-d15d-267b-4dbbc01b0b53@kernel.dk>
-Date:   Tue, 15 Jan 2019 09:55:32 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <20190115095134.6286b7d6@lwn.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=MnUMQKfmpqPrNgt1v1amnwGUjNngd4NfzjUoApmpKzg=;
+        b=I0Zb+Lw1OllWbTr0Wm36NLduWGcjBp1okp1Eg7GxzYZzrJgehXqRyvHUSZ69ic/t7i
+         VsI+RP4sol6ltSe3WQGMVhPdDNHXdCfggPPm9dO75WMQSMEeRhiRHZTKGbtxYHgZtl7k
+         yjld+8TSBi5I1SVgXrqeKVhzc0FasszePfl/IBZx4J37mmB0Whz0YwJSjBMut5b9SS7Y
+         yUP0dqkarf2MUtdDws1pgCDwK+AZLgfIVjQh6P+PuoodYWf5hcapx+rziuyObyWhoSHM
+         XRomG2T9bw2gGInXwSbGK9ChLRjYY7nUhWE1JalpjJ4JNPj6jEKrdNbjB8x82thJOGoU
+         yqAg==
+X-Gm-Message-State: AJcUukfDAqf5udn7/KZylGkPrOXsz3Gl9a+0FCbNIOndDemT5qpvnXc5
+        iwOLKpoQIveF5YGcmQr9bsjx/Z4e
+X-Google-Smtp-Source: ALg8bN5wnkQnKR/4i6397YdZ6ehCeC5Gbp/k4t0Si6hzHqPSuK/hc+IfOBbPKYdT+8MCKOyyMpK3Pg==
+X-Received: by 2002:a62:1f9d:: with SMTP id l29mr4940545pfj.14.1547570443572;
+        Tue, 15 Jan 2019 08:40:43 -0800 (PST)
+Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id s2sm6085703pfa.167.2019.01.15.08.40.42
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 15 Jan 2019 08:40:42 -0800 (PST)
+Message-ID: <1547570441.83374.112.camel@acm.org>
+Subject: Re: [PATCH 1/3] blktests: add cgroup2 infrastructure
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
+        kernel-team@fb.com, osandov@fb.com
+Date:   Tue, 15 Jan 2019 08:40:41 -0800
+In-Reply-To: <1211bf78-c442-ea71-9e71-f6d86681ed56@acm.org>
+References: <20181204174733.7423-1-josef@toxicpanda.com>
+         <20181204174733.7423-2-josef@toxicpanda.com>
+         <1211bf78-c442-ea71-9e71-f6d86681ed56@acm.org>
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/15/19 9:51 AM, Jonathan Corbet wrote:
-> On Mon, 14 Jan 2019 19:55:20 -0700
-> Jens Axboe <axboe@kernel.dk> wrote:
-> 
-> So the [0/16] cover letter seems to have gone astray this time?
+On Tue, 2019-01-01 at 19:13 -0800, Bart Van Assche wrote:
++AD4 On 12/4/18 9:47 AM, Josef Bacik wrote:
++AD4 +AD4 In order to test io.latency and other cgroup related things we need some
++AD4 +AD4 supporting helpers to setup and tear down cgroup2.  This adds support
++AD4 +AD4 for checking that we can even configure cgroup2 things, set them up if
++AD4 +AD4 need be, and then add the cleanup stuff to the main cleanup function so
++AD4 +AD4 everything is always in a clean state.
++AD4 
++AD4 Is this the patch that went in as commit ae7daae7e35a (+ACI-blktests: add 
++AD4 cgroup2 infrastructure+ACI)? I think that commit introduced a regression. 
++AD4 With that patch applied the SRP tests fail as follows:
++AD4 
++AD4 +ACM ./check -q srp/001
++AD4 srp/001 (Create and remove LUNs)
++AD4      runtime  4.067s  ...
++AD4 common/cgroup: line 25: CGROUP2+AF8-DIR: unbound variable
++AD4 
++AD4 Is this a known issue?
 
-It did go out, but I forgot to add a Subject line to it...
+Hi Josef,
 
-https://marc.info/?l=linux-block&m=154752095709422&w=2
+Had you noticed this e-mail?
 
+Thanks,
 
->> The submission queue (SQ) and completion queue (CQ) rings are shared
->> between the application and the kernel. This eliminates the need to
->> copy data back and forth to submit and complete IO.
->>
->> IO submissions use the io_uring_sqe data structure, and completions
->> are generated in the form of io_uring_sqe data structures. The SQ
->> ring is an index into the io_uring_sqe array, which makes it possible
->> to submit a batch of IOs without them being contiguous in the ring.
->> The CQ ring is always contiguous, as completion events are inherently
->> unordered and can point to any io_uring_iocb.
->>
->> Two new system calls are added for this:
->>
->> io_uring_setup(entries, iovecs, params)
->> 	Sets up a context for doing async IO. On success, returns a file
->> 	descriptor that the application can mmap to gain access to the
->> 	SQ ring, CQ ring, and io_uring_iocbs.
-> 
-> Looking at the code, it would appear that the "iovecs" parameter doesn't
-> actually exist.
-
-Indeed, need to update that commit message. and io_uring_iocbs should
-now be io_uring_sqes.
-
-The iovec/file registration is done through io_uring_register(2).
-
->> io_uring_enter(fd, to_submit, min_complete, flags)
->> 	Initiates IO against the rings mapped to this fd, or waits for
->> 	them to complete, or both The behavior is controlled by the
->> 	parameters passed in. If 'min_complete' is non-zero, then we'll
->> 	try and submit new IO. If IORING_ENTER_GETEVENTS is set, the
->> 	kernel will wait for 'min_complete' events, if they aren't
->> 	already available.
-> 
-> I feel like I'm missing something here.  Rather than have the
-> IORING_ENTER_GETEVENTS flag, why not just wait if min_complete > 0 ?
-
-For polled IO, it's useful to be able to check if we have events that
-can be readily reaped. If min_complete > 0, then you're asking the
-interface to wait/poll for these events. IORING_ENTER_GETEVENTS +
-min_complete == 0 is a valid combination to just reap events that are
-already completed.
-
--- 
-Jens Axboe
-
+Bart.
