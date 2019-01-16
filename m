@@ -2,160 +2,112 @@ Return-Path: <SRS0=7Bp6=PY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA69C43387
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:17:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCDBFC43387
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:56:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7DC5B20840
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:17:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="S2SubGSy"
+	by mail.kernel.org (Postfix) with ESMTP id A549A20675
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:56:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728828AbfAPXRG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Jan 2019 18:17:06 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:38502 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726835AbfAPXRF (ORCPT
+        id S1727795AbfAPX4Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Jan 2019 18:56:24 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:32825 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727660AbfAPX4Y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Jan 2019 18:17:05 -0500
-Received: by mail-pf1-f196.google.com with SMTP id q1so3811646pfi.5
-        for <linux-block@vger.kernel.org>; Wed, 16 Jan 2019 15:17:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=8uscjfs9KYoR1JSWPlxk5jvDeiuQcOBYO5ZOfRO5uYE=;
-        b=S2SubGSyINQBlZ39+O9PHKiC0x+pF/TA0iUMJV4mcOk4QZp0PomBgevpbBPk44H3qf
-         GfbPHds6POb3+V/qtO1xgVis92+Gl5roED/hV/JUNGjoBWLabZQ0RZOrcliDDrFrjQ6V
-         kr7NOy1cE0/lXo/PwFk13HmDeOPYy+oZTLmDuoodoi+pqLZLY0fJDbPZDylhZZ8xV1R7
-         mgvjVBIEyC68reQBSxGtkTQMR2UeBh/bhhYRTeAOH2X7mCERntzOwnbCEfj1+BiAd2VW
-         3KkxKkr6sNRN1rzQwOUEOK+9WqWXr8yQFI0ART3sOl1lfXCX2y3co+g131Tt6IgePWEB
-         NwlQ==
+        Wed, 16 Jan 2019 18:56:24 -0500
+Received: by mail-pg1-f194.google.com with SMTP id z11so3556843pgu.0;
+        Wed, 16 Jan 2019 15:56:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=8uscjfs9KYoR1JSWPlxk5jvDeiuQcOBYO5ZOfRO5uYE=;
-        b=koMsmHrerPKcerfLDUuHgSD3PxRIhpjAmvLGmc2UG54lsYm39y2kg8j5SVHn6LDypg
-         OnazzlcjLS3vqF0B/LaAj/aDX4zY2PbMaI9dStZ/xpkmoo15vdB/SCS3K/lavk4xSM5Q
-         8HyqIj5UFMP+MG9Gr7aecg2tEJkW6X29vkOXM92FUjFB7ZJACHGtPus1NfniMyUhcZ8A
-         WdJqaeLHM2i9nDH5sPefmUYHR3AerlPnMJ3+A0KgqDgX2QQk+U3/tFjArWp7TqXf5C8V
-         tdjTQ1s1B+i3bPdVSFxKUqe4j5vYwrca8MD9hpVv3zLRS8UDXIX71hPl/cmeEboAfnVb
-         iBgg==
-X-Gm-Message-State: AJcUukeYUYtnOhVRlnK+25i1+rMPlF3BSBcVZl4qXC3moqvyLEL7uIA9
-        JGqYUI1A95ju0XX5uexHLCCCPQ==
-X-Google-Smtp-Source: ALg8bN4ppODphmzFFddYIXMrM4HMkIazOC1TZ+aFqJbMlmxkowpgNjhfPX+rysTljas2ES675gemMg==
-X-Received: by 2002:a62:b15:: with SMTP id t21mr12766762pfi.136.1547680624587;
-        Wed, 16 Jan 2019 15:17:04 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id q75sm13727241pfa.38.2019.01.16.15.17.02
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 16 Jan 2019 15:17:03 -0800 (PST)
-Subject: Re: [PATCH 12/15] io_uring: add support for pre-mapped user IO
- buffers
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
-        linux-block@vger.kernel.org, linux-arch@vger.kernel.org,
-        hch@lst.de, jmoyer@redhat.com, avi@scylladb.com
-References: <20190116175003.17880-1-axboe@kernel.dk>
- <20190116175003.17880-13-axboe@kernel.dk> <20190116205338.GQ4205@dastard>
- <9db63405-6797-9305-3ce1-fdc11edbf49c@kernel.dk>
- <20190116220938.GR4205@dastard>
- <7fd5cb40-2288-3c54-41d1-3163098b25ef@kernel.dk>
- <20190116230920.GT4205@dastard>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <29622208-d155-4f76-78d5-e7dd54ee807b@kernel.dk>
-Date:   Wed, 16 Jan 2019 16:17:01 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <20190116230920.GT4205@dastard>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=4bOz8YlXJ8FLcF1hxh1wajCkXrSrJ+pb9Qicthv3D1s=;
+        b=BKjd/JwSoXRjpS0v9tcEFaKTXSj8VLs/97MAtcf5ABhjGfChJuYZ52whtEhcutUfJM
+         bTcNeKPHTaW/f9RjcbLSRGi55X4Jn4LwvxGbD/FT3n+AVPaRYnDWyJXxujP/nY9E+ci9
+         vZylvkF2UQB+jz652L79Fk/oImP8Eyz7AQ1p5HZoOFsgolkWyImYjbQJ1cKonOBl4XBH
+         mRvQMYFQ9hIhXeg338CXTKJRI/gw5C8UWR5mOzm0fT5iHeR5X8S7JLiT6ttFagevFmB7
+         LupxZySpFruqU34xsKZTUcSfeU5D8qYcLUXNqxFaGle8EsBtDoTbi5eVFO5YrG8yoj7I
+         JM4Q==
+X-Gm-Message-State: AJcUukcyelkUiCr7npe8DGf/KaeHPJhIaoNO9VRB/H5KldrN2fk6jCiF
+        xaGeHfzx9jfFe7iXIvvz4xo=
+X-Google-Smtp-Source: ALg8bN4ABiBxGFqmruaBZegi5y8N3+pDK5ojSejzoUOT0caf1OKEQ7k/Tmuqh9Jho/86k6pefs32xw==
+X-Received: by 2002:a62:6e07:: with SMTP id j7mr12815406pfc.135.1547682982563;
+        Wed, 16 Jan 2019 15:56:22 -0800 (PST)
+Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id u70sm9828242pfa.176.2019.01.16.15.56.21
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 16 Jan 2019 15:56:21 -0800 (PST)
+Message-ID: <1547682979.83374.126.camel@acm.org>
+Subject: Re: [PATCH fix] scsi_lib: make sure scsi_request.sense valid
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Douglas Gilbert <dgilbert@interlog.com>, hch@infradead.org,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     martin.petersen@oracle.com, jejb@linux.vnet.ibm.com
+Date:   Wed, 16 Jan 2019 15:56:19 -0800
+In-Reply-To: <20190116155700.28967-1-dgilbert@interlog.com>
+References: <20190116155700.28967-1-dgilbert@interlog.com>
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/16/19 4:09 PM, Dave Chinner wrote:
-> On Wed, Jan 16, 2019 at 03:21:21PM -0700, Jens Axboe wrote:
->> On 1/16/19 3:09 PM, Dave Chinner wrote:
->>> On Wed, Jan 16, 2019 at 02:20:53PM -0700, Jens Axboe wrote:
->>>> On 1/16/19 1:53 PM, Dave Chinner wrote:
->>>> I'd be fine with that restriction, especially since it can get relaxed
->>>> down the line. Do we have an appropriate API for this?  And why isn't
->>>> get_user_pages_longterm() that exact API already?
->>>
->>> get_user_pages_longterm() is the right thing to use to ensure DAX
->>> doesn't trip over this - it's effectively just get_user_pages()
->>> with a "if (vma_is_fsdax(vma))" check in it to abort and return
->>> -EOPNOTSUPP. IOWs, this is safe on DAX but it's not safe on anything
->>> else. :/
->>>
->>> Unfortunately, disallowing userspace GUP pins on non-DAX file backed
->>> pages will break existing "mostly just work" userspace apps all over
->>> the place. And so right now there are discussions ongoing about how
->>> to map gup references avoid the writeback races and be able to be
->>> seen/tracked by other kernel infrastructure (see the long, long
->>> thread "[PATCH 0/2] put_user_page*(): start converting the call
->>> sites" on -fsdevel). Progress is slow, but I think we're starting to
->>> close on a workable solution.
->>>
->>> FWIW, this doesn't solve the "long term user pin will block
->>> filesystem operations until unpin" problem, that's what moving to
->>> using revocable file layout leases is intended to solve. There have
->>> been patches posted some time ago to add this user API for this, but
->>> we've got to solve the other problems first....
->>>
->>>> Would seem that most
->>>> (all?) callers of this API is currently broken then.
->>>
->>> Yup, there's a long, long history of machines using userspace RDMA
->>> panicing because filesystems have detected or tripped over invalid
->>> page cache state during writeback attempts. This is not a new
->>> problem....
->>
->> Thanks for your detailed answer, Dave! I didn't see it before I sent
->> out the previous email. FWIW, I've updated the patch:
->>
->> http://git.kernel.dk/cgit/linux-block/commit/?h=io_uring&id=0c8f2299f8069af6b2fa8f99a10d81646d1237a7
->>
->> Checks for file backed memory, fails the registration with EOPNOTSUPP
->> if the check fails.
-> 
-> Doesn't it need to call put_pages() on all the pages picked up by
-> get_user_pages_longterm() when it returns -EOPNOTSUPP? They haven't
-> been mapped into the imu->bvec array yet, so AFAICT there's nothing
-> to release the page references on teardown here.
+On Wed, 2019-01-16 at 10:57 -0500, Douglas Gilbert wrote:
++AD4 The block layer assumes scsi+AF8-request:sense is always a valid
++AD4 pointer. This is set up once in scsi+AF8-mq+AF8-init+AF8-request() and the
++AD4 containing scsi+AF8-cmnd object is used often, being re-initialized
++AD4 by scsi+AF8-init+AF8-command(). That works unless some code re-purposes
++AD4 part of the scsi+AF8-cmnd object for something else. And that is
++AD4 what bidi handling does in scsi+AF8-mq+AF8-prep+AF8-fn(). The result is an
++AD4 oops at some later time when the partly overwritten object is
++AD4 re-used. The overwrite is from d285203cf647d but 'git blame'
++AD4 does not show removed code, so that commit may not be the
++AD4 culprit.
++AD4 
++AD4 Signed-off-by: Douglas Gilbert +ADw-dgilbert+AEA-interlog.com+AD4
++AD4 ---
++AD4 
++AD4 This was found while injecting errors (thus generating sense data)
++AD4 into a sequence of bidi commands. At some later time the block
++AD4 layer blew up with a scsi+AF8-request::sense NULL dereference in
++AD4 sg+AF8-rq+AF8-end+AF8-io(). Without testing I'm confident the bsg driver,
++AD4 the osd ULD and exofs are exposed to this bug.
++AD4 
++AD4  drivers/scsi/scsi+AF8-lib.c +AHw 1 +-
++AD4  1 file changed, 1 insertion(+-)
++AD4 
++AD4 diff --git a/drivers/scsi/scsi+AF8-lib.c b/drivers/scsi/scsi+AF8-lib.c
++AD4 index b13cc9288ba0..71259bd4040a 100644
++AD4 --- a/drivers/scsi/scsi+AF8-lib.c
++AD4 +-+-+- b/drivers/scsi/scsi+AF8-lib.c
++AD4 +AEAAQA -1175,6 +-1175,7 +AEAAQA void scsi+AF8-init+AF8-command(struct scsi+AF8-device +ACo-dev, struct scsi+AF8-cmnd +ACo-cmd)
++AD4  
++AD4  	cmd-+AD4-device +AD0 dev+ADs
++AD4  	cmd-+AD4-sense+AF8-buffer +AD0 buf+ADs
++AD4 +-	cmd-+AD4-req.sense +AD0 buf+ADs
++AD4  	cmd-+AD4-prot+AF8-sdb +AD0 prot+ADs
++AD4  	cmd-+AD4-flags +AD0 flags+ADs
++AD4  	INIT+AF8-DELAYED+AF8-WORK(+ACY-cmd-+AD4-abort+AF8-work, scmd+AF8-eh+AF8-abort+AF8-handler)+ADs
 
-Oops, yes good point. The usual error handling won't work for this, need
-to put them.
+Hi Doug,
 
-> Also, not a vma expert here, but the vma array contents may only be
-> valid while the mmap_sem is held - I think vmas can come and go
-> after it has been dropped and so accessing vmas to check
-> vma->vm_file after the mmap_sem has been dropped may be open to
-> read-after-free races.
+The description of this patch does not look correct to me. scsi+AF8-init+AF8-command()
+does not overwrite the sense pointer. From the body of that function:
 
-I did fix that one right after sending out the email:
+	/+ACo zero out the cmd, except for the embedded scsi+AF8-request +ACo-/
+	memset((char +ACo)cmd +- sizeof(cmd-+AD4-req), 0,
+		sizeof(+ACo-cmd) - sizeof(cmd-+AD4-req) +- dev-+AD4-host-+AD4-hostt-+AD4-cmd+AF8-size)+ADs
 
-http://git.kernel.dk/cgit/linux-block/commit/?h=io_uring&id=d2b44723d5bceeb9966c858255a03596ed62929c
+It is not clear to me which code overwrites the sense pointer. I think that
+needs to be figured out before discussion of this patch can continue.
 
-I'll fix the missing put_pages() on error and update it.
+Thanks,
 
->> That should handle the issue on the io_uring side at least, and it's a
->> restriction that can always be relaxed/lifted, when appropriate solutions
->> to file backed buffers exists.
-> 
-> Modulo the issue above, that works for me.
-
-Great!
-
--- 
-Jens Axboe
-
+Bart.
