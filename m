@@ -2,84 +2,121 @@ Return-Path: <SRS0=7Bp6=PY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48802C43387
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 02:52:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A07C43444
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 02:54:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E39FB20866
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 02:52:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1196B20859
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 02:54:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="DDsl2cIy"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="EauE9qCQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730170AbfAPCwO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Jan 2019 21:52:14 -0500
-Received: from mail-pl1-f176.google.com ([209.85.214.176]:40952 "EHLO
-        mail-pl1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729698AbfAPCwO (ORCPT
+        id S1728624AbfAPCyc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Jan 2019 21:54:32 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:33580 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727883AbfAPCyb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Jan 2019 21:52:14 -0500
-Received: by mail-pl1-f176.google.com with SMTP id u18so2247173plq.7
-        for <linux-block@vger.kernel.org>; Tue, 15 Jan 2019 18:52:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=GRtSCSRSjRqHxGmG1ueNvjK0x8AAftbAdLRxqaOPi+k=;
-        b=DDsl2cIydoW3/LV4LrAwOgr/zO+eFQw9kQcXUNGO+MZSBwoGSybtp2fci8DYYRiwHP
-         UcJLsjGz3Oxx6fkwkPqRVLGP6TykjGnuJpdgx7/Bv1vjZBUcfwHmm7w82OQnr/4CnDZS
-         dzO1pEm5mqXJsoflUDPuOne7RSXshdxezQDljhLVF1/r6Mrd1Ku4AnGnB/OgiI5BNC1U
-         wGzHQA4orevvBGe5c7bdYXV8kwf7CYDr07mP8TNX35+0YurbqbfyzG+nPADQw24Ro16j
-         h4PM8Wryod1NMY6+EeIMbWIzX1Z+58FHVeyg3p2SF2PVq4ePz23uXS3b99M0srmQsQ5P
-         Ng2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GRtSCSRSjRqHxGmG1ueNvjK0x8AAftbAdLRxqaOPi+k=;
-        b=dNNfxD/l522E8JOVK0tI9m9Zi8qgeSPea/oGyruMg7/y9CllUiBT9HVGeDMOr5o2kY
-         v2jQBa9cimNphKL6SoSIrZypjigWSUSwA9KwKE+cDxjUDzTGwgPmsmU2CMCHiq1tnOD1
-         RNNYYxmgJOLSqnuibR2UDNtawpuruH0fb1XQSZ5Li2w727tfODSYD+70YxLH6l/U4iFg
-         C8P3fyYMdVO/VOjtgehI3JRNeSzhR8aR1bBK3UQtelPoQCwc7GLb6qt8Qt4whRNUCPI9
-         ZPdIQ3mghcWXG4I5yGx3Kvk6KSp1caA2hVA45KpIOA7BgmfFadp+le4DaWNdNA2Mg38g
-         Czzw==
-X-Gm-Message-State: AJcUukeAJ0aXFf88JCnMB9bo9QwqB9vXfal+1OcbH8A0d1W6jCscgQWU
-        JO50m5h82v6FS4xtrfKvIfQu/A==
-X-Google-Smtp-Source: ALg8bN7SdCmwgsCurikj1RdBc1h2tE6umCqapVe1Rwp74KI0F1MZf5le14mnzUkM5QMiPFd9sCjk3A==
-X-Received: by 2002:a17:902:1105:: with SMTP id d5mr7210752pla.47.1547607133315;
-        Tue, 15 Jan 2019 18:52:13 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id l19sm8116191pfi.71.2019.01.15.18.52.11
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 15 Jan 2019 18:52:11 -0800 (PST)
-Subject: Re: [PATCH] fs: gfs2: fix build failure
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20190116021602.27130-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <95332016-e712-2e7f-896a-0f8f10d7c824@kernel.dk>
-Date:   Tue, 15 Jan 2019 19:52:10 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Tue, 15 Jan 2019 21:54:31 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0G2n0IT059256;
+        Wed, 16 Jan 2019 02:54:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=Zz8m98MU4N2uGF+u5jyRhPDg9Shkpx1mVlDyrwF/fPU=;
+ b=EauE9qCQc/LfVXMrB0SGFs93iQKmdYvqsRs9whM3rkzcBPZJ5wxtJ3OMBYOzbDnfCCRe
+ 3mE+WKv9R5MwZvXLVrv2xZoTkooIA7C71OAknT93HTkQj6vKvpHji30ksq8LbCFdLzLR
+ Z35WZSjQHQXFJO/sO9qdosriPAxYr90NlNWElbK+LSCPHn5sBKa2SOttNr6KguO4MlMT
+ nYC6PTj//bxZvDyzExwKH6R4NV4Z5pMV5e4q7Ih33kQyiUFl8m+jFY8JeEaYQM7+tXCw
+ VDOQfBetBbpD5/apmJ1aw9lR5MxJF2UNv4xCmhhLc46aCwFO4z+AwTuymrE2khH/VL6A cg== 
+Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
+        by userp2120.oracle.com with ESMTP id 2pybjs7buh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Jan 2019 02:54:12 +0000
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x0G2s6fI012763
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Jan 2019 02:54:06 GMT
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x0G2s4Tc025392;
+        Wed, 16 Jan 2019 02:54:05 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 15 Jan 2019 18:54:04 -0800
+To:     John Garry <john.garry@huawei.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        <linux-scsi@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Intel SCU Linux support <intel-linux-scu@intel.com>,
+        Artur Paszkiewicz <artur.paszkiewicz@intel.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        Jens Axboe <axboe@kernel.dk>, Jeff Moyer <jmoyer@redhat.com>,
+        chenxiang <chenxiang66@hisilicon.com>
+Subject: Re: [PATCH] scsi: isci: initialize shost fully before calling scsi_add_host()
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20190108205043.3122-1-logang@deltatee.com>
+        <20190109184105.GB22070@lst.de>
+        <8d96b40d-fc83-9218-9479-3de423594ddb@huawei.com>
+        <yq1lg3qy578.fsf@oracle.com>
+        <0ffaf166-c7e5-b135-fdc5-bcac24148e62@huawei.com>
+Date:   Tue, 15 Jan 2019 21:54:01 -0500
+In-Reply-To: <0ffaf166-c7e5-b135-fdc5-bcac24148e62@huawei.com> (John Garry's
+        message of "Mon, 14 Jan 2019 12:10:23 +0000")
+Message-ID: <yq1sgxts46u.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20190116021602.27130-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9137 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=886
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1901160020
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/15/19 7:16 PM, Ming Lei wrote:
-> There is one bio_for_each_segment_all() not converted, so fix it.
 
-Just pushed it out yesterday, I'll just fold this in.
+Hi John,
+
+>> So in this case I think that accessor functions are actually better
+>> because they allow us to print a big fat warning when you twiddle
+>> something you shouldn't post-initialization. So that's something I think
+>> we could--and should--improve.
+>>
+> Sure, this is an alternative, but I would rather make it obvious when
+> these parameters should be set so that this would not be required.
+
+I would like to have a mechanism in place that warns if you twiddle
+things that break assumptions made at host registration time. That's not
+a scenario the old registration interface was designed to handle.
+
+I am not sure I agree with your assertion that setting these masks in
+the struct prior to scsi_add_host() makes this ordering requirement much
+more obvious. It is not like you are passing in a list of parameters and
+then receiving a separately instantiated immutable scsi_host object. You
+are performing an operation on something you already have and own.
+
+That's why I commented that the current intersection between
+compile-time static host template, dynamically discovered
+pre-registration scsi_host parameters, and the registered runtime
+scsi_host struct is somewhat messy.
+
+Btw. I have no attachment to the prot wrappers whatsoever. The reason
+they exist is that the SCSI integrity support was optional. And
+therefore we had stub functions so things could be compiled without any
+of the integrity fields being present in the various SCSI structs. So I
+don't have any problem killing the wrappers except they may actually be
+handy for regressions like this one where you could #error if the driver
+writer violates the ordering requirement.
 
 -- 
-Jens Axboe
-
+Martin K. Petersen	Oracle Linux Engineering
