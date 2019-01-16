@@ -2,236 +2,118 @@ Return-Path: <SRS0=7Bp6=PY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DATE_IN_PAST_96_XX,
-	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNWANTED_LANGUAGE_BODY
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 211DEC43387
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:05:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D2AC43387
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:09:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DB08D20675
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:05:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="YvIgHfgM"
+	by mail.kernel.org (Postfix) with ESMTP id 7C11B20840
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:09:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726362AbfAPXFU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Jan 2019 18:05:20 -0500
-Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:45652 "EHLO
-        mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726196AbfAPXDz (ORCPT
+        id S2387901AbfAPXJc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Jan 2019 18:09:32 -0500
+Received: from ipmail01.adl2.internode.on.net ([150.101.137.133]:31607 "EHLO
+        ipmail01.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731892AbfAPXJb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Jan 2019 18:03:55 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id 90E1AB03C8;
-        Wed, 16 Jan 2019 23:55:43 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1547679343; i=@fjfi.cvut.cz;
-        bh=zhDqzAiUIfAJYs/kqmBNjAqyV8MAuWGL2Hmgk0052M0=;
-        h=From:Date:Subject:To:Cc;
-        b=YvIgHfgMrP8e4Mhz2quJLFiFug2JxG0NG+z2YxmJYyo7Kpbgai8PMEkeuH4AAu2Tw
-         i3N7aW4XGm+ZDmbArIQbPjHhEK+MD8zvzJhUuRijCLQVLtl7/d00U96TaC1cvsKeMw
-         13UK56EKtKCzGtFEYkUDoKPaUIuJta7zHvuR5zkI=
-X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
-Received: from mailgw1.fjfi.cvut.cz ([127.0.0.1])
-        by localhost (mailgw1.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id qHnGM52njcXe; Wed, 16 Jan 2019 23:55:38 +0100 (CET)
-Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 47BEBADF0E;
-        Wed, 16 Jan 2019 23:55:38 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 47BEBADF0E
-Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id 2333D6004E; Wed, 16 Jan 2019 23:55:38 +0100 (CET)
-From:   David Kozub <zub@linux.fjfi.cvut.cz>
-Date:   Thu, 8 Nov 2018 22:50:19 +0100
-Subject: [PATCH 04/16] block: sed-opal: close parameter list in cmd_finalize
-To:     Jens Axboe <axboe@kernel.dk>, Scott Bauer <scott.bauer@intel.com>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Message-Id: <20190116225538.2333D6004E@linux.fjfi.cvut.cz>
+        Wed, 16 Jan 2019 18:09:31 -0500
+Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
+  by ipmail01.adl2.internode.on.net with ESMTP; 17 Jan 2019 09:39:21 +1030
+Received: from dave by dastard with local (Exim 4.80)
+        (envelope-from <david@fromorbit.com>)
+        id 1gjuJE-0003Bq-OE; Thu, 17 Jan 2019 10:09:20 +1100
+Date:   Thu, 17 Jan 2019 10:09:20 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
+        linux-block@vger.kernel.org, linux-arch@vger.kernel.org,
+        hch@lst.de, jmoyer@redhat.com, avi@scylladb.com
+Subject: Re: [PATCH 12/15] io_uring: add support for pre-mapped user IO
+ buffers
+Message-ID: <20190116230920.GT4205@dastard>
+References: <20190116175003.17880-1-axboe@kernel.dk>
+ <20190116175003.17880-13-axboe@kernel.dk>
+ <20190116205338.GQ4205@dastard>
+ <9db63405-6797-9305-3ce1-fdc11edbf49c@kernel.dk>
+ <20190116220938.GR4205@dastard>
+ <7fd5cb40-2288-3c54-41d1-3163098b25ef@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7fd5cb40-2288-3c54-41d1-3163098b25ef@kernel.dk>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Every step ends by calling cmd_finalize (via finalize_and_send)
-yet every step adds the token OPAL_ENDLIST on its own. Moving
-this into cmd_finalize decreases code duplication.
+On Wed, Jan 16, 2019 at 03:21:21PM -0700, Jens Axboe wrote:
+> On 1/16/19 3:09 PM, Dave Chinner wrote:
+> > On Wed, Jan 16, 2019 at 02:20:53PM -0700, Jens Axboe wrote:
+> >> On 1/16/19 1:53 PM, Dave Chinner wrote:
+> >> I'd be fine with that restriction, especially since it can get relaxed
+> >> down the line. Do we have an appropriate API for this?  And why isn't
+> >> get_user_pages_longterm() that exact API already?
+> > 
+> > get_user_pages_longterm() is the right thing to use to ensure DAX
+> > doesn't trip over this - it's effectively just get_user_pages()
+> > with a "if (vma_is_fsdax(vma))" check in it to abort and return
+> > -EOPNOTSUPP. IOWs, this is safe on DAX but it's not safe on anything
+> > else. :/
+> > 
+> > Unfortunately, disallowing userspace GUP pins on non-DAX file backed
+> > pages will break existing "mostly just work" userspace apps all over
+> > the place. And so right now there are discussions ongoing about how
+> > to map gup references avoid the writeback races and be able to be
+> > seen/tracked by other kernel infrastructure (see the long, long
+> > thread "[PATCH 0/2] put_user_page*(): start converting the call
+> > sites" on -fsdevel). Progress is slow, but I think we're starting to
+> > close on a workable solution.
+> > 
+> > FWIW, this doesn't solve the "long term user pin will block
+> > filesystem operations until unpin" problem, that's what moving to
+> > using revocable file layout leases is intended to solve. There have
+> > been patches posted some time ago to add this user API for this, but
+> > we've got to solve the other problems first....
+> > 
+> >> Would seem that most
+> >> (all?) callers of this API is currently broken then.
+> > 
+> > Yup, there's a long, long history of machines using userspace RDMA
+> > panicing because filesystems have detected or tripped over invalid
+> > page cache state during writeback attempts. This is not a new
+> > problem....
+> 
+> Thanks for your detailed answer, Dave! I didn't see it before I sent
+> out the previous email. FWIW, I've updated the patch:
+> 
+> http://git.kernel.dk/cgit/linux-block/commit/?h=io_uring&id=0c8f2299f8069af6b2fa8f99a10d81646d1237a7
+> 
+> Checks for file backed memory, fails the registration with EOPNOTSUPP
+> if the check fails.
 
-Co-authored-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
-Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
----
- block/sed-opal.c | 25 +++----------------------
- 1 file changed, 3 insertions(+), 22 deletions(-)
+Doesn't it need to call put_pages() on all the pages picked up by
+get_user_pages_longterm() when it returns -EOPNOTSUPP? They haven't
+been mapped into the imu->bvec array yet, so AFAICT there's nothing
+to release the page references on teardown here.
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 980705681806..35b1747b650f 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -661,6 +661,9 @@ static int cmd_finalize(struct opal_dev *cmd, u32 hsn, u32 tsn)
- 	struct opal_header *hdr;
- 	int err = 0;
- 
-+	/* close parameter list */
-+	add_token_u8(&err, cmd, OPAL_ENDLIST);
-+
- 	add_token_u8(&err, cmd, OPAL_ENDOFDATA);
- 	add_token_u8(&err, cmd, OPAL_STARTLIST);
- 	add_token_u8(&err, cmd, 0);
-@@ -1079,7 +1082,6 @@ static int gen_key(struct opal_dev *dev, void *data)
- 	add_token_bytestring(&err, dev, opalmethod[OPAL_GENKEY],
- 			     OPAL_UID_LENGTH);
- 	add_token_u8(&err, dev, OPAL_STARTLIST);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building gen key command\n");
-@@ -1142,7 +1144,6 @@ static int get_active_key(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, 10); /* ActiveKey */
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	if (err) {
- 		pr_debug("Error building get active key command\n");
- 		return err;
-@@ -1188,7 +1189,6 @@ static int generic_lr_enable_disable(struct opal_dev *dev,
- 
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	return err;
- }
- 
-@@ -1254,8 +1254,6 @@ static int setup_locking_range(struct opal_dev *dev, void *data)
- 
- 		add_token_u8(&err, dev, OPAL_ENDLIST);
- 		add_token_u8(&err, dev, OPAL_ENDNAME);
--		add_token_u8(&err, dev, OPAL_ENDLIST);
--
- 	}
- 	if (err) {
- 		pr_debug("Error building Setup Locking range command.\n");
-@@ -1295,7 +1293,6 @@ static int start_generic_opal_session(struct opal_dev *dev,
- 
- 	switch (auth) {
- 	case OPAL_ANYBODY_UID:
--		add_token_u8(&err, dev, OPAL_ENDLIST);
- 		break;
- 	case OPAL_ADMIN1_UID:
- 	case OPAL_SID_UID:
-@@ -1308,7 +1305,6 @@ static int start_generic_opal_session(struct opal_dev *dev,
- 		add_token_bytestring(&err, dev, opaluid[auth],
- 				     OPAL_UID_LENGTH);
- 		add_token_u8(&err, dev, OPAL_ENDNAME);
--		add_token_u8(&err, dev, OPAL_ENDLIST);
- 		break;
- 	default:
- 		pr_debug("Cannot start Admin SP session with auth %d\n", auth);
-@@ -1406,7 +1402,6 @@ static int start_auth_opal_session(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, 3);
- 	add_token_bytestring(&err, dev, lk_ul_user, OPAL_UID_LENGTH);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building STARTSESSION command.\n");
-@@ -1429,7 +1424,6 @@ static int revert_tper(struct opal_dev *dev, void *data)
- 	add_token_bytestring(&err, dev, opalmethod[OPAL_REVERT],
- 			     OPAL_UID_LENGTH);
- 	add_token_u8(&err, dev, OPAL_STARTLIST);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	if (err) {
- 		pr_debug("Error building REVERT TPER command.\n");
- 		return err;
-@@ -1463,7 +1457,6 @@ static int internal_activate_user(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building Activate UserN command.\n");
-@@ -1490,7 +1483,6 @@ static int erase_locking_range(struct opal_dev *dev, void *data)
- 	add_token_bytestring(&err, dev, opalmethod[OPAL_ERASE],
- 			     OPAL_UID_LENGTH);
- 	add_token_u8(&err, dev, OPAL_STARTLIST);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building Erase Locking Range Command.\n");
-@@ -1521,7 +1513,6 @@ static int set_mbr_done(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error Building set MBR Done command\n");
-@@ -1553,7 +1544,6 @@ static int set_mbr_enable_disable(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error Building set MBR done command\n");
-@@ -1585,7 +1575,6 @@ static int generic_pw_cmd(u8 *key, size_t key_len, u8 *cpin_uid,
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	return err;
- }
-@@ -1694,7 +1683,6 @@ static int add_user_to_lr(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building add user to locking range command.\n");
-@@ -1755,7 +1743,6 @@ static int lock_unlock_locking_range(struct opal_dev *dev, void *data)
- 
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building SET command.\n");
-@@ -1843,11 +1830,8 @@ static int activate_lsp(struct opal_dev *dev, void *data)
- 		}
- 		add_token_u8(&err, dev, OPAL_ENDLIST);
- 		add_token_u8(&err, dev, OPAL_ENDNAME);
--		add_token_u8(&err, dev, OPAL_ENDLIST);
--
- 	} else {
- 		add_token_u8(&err, dev, OPAL_STARTLIST);
--		add_token_u8(&err, dev, OPAL_ENDLIST);
- 	}
- 
- 	if (err) {
-@@ -1904,7 +1888,6 @@ static int get_lsp_lifecycle(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, 6); /* Lifecycle Column */
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
-@@ -1964,8 +1947,6 @@ static int get_msid_cpin_pin(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, 4); /* End Column */
- 	add_token_u8(&err, dev, 3); /* Lifecycle Column */
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
+Also, not a vma expert here, but the vma array contents may only be
+valid while the mmap_sem is held - I think vmas can come and go
+after it has been dropped and so accessing vmas to check
+vma->vm_file after the mmap_sem has been dropped may be open to
+read-after-free races.
+
+> That should handle the issue on the io_uring side at least, and it's a
+> restriction that can always be relaxed/lifted, when appropriate solutions
+> to file backed buffers exists.
+
+Modulo the issue above, that works for me.
+
+Cheers,
+
+Dave.
 -- 
-2.20.1
-
+Dave Chinner
+david@fromorbit.com
