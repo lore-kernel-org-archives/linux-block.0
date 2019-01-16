@@ -2,148 +2,190 @@ Return-Path: <SRS0=7Bp6=PY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24901C43387
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 22:14:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05614C43387
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 22:21:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EEDF420675
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 22:14:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B199F20840
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 22:21:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Uu0k5/E6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732666AbfAPWOq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Jan 2019 17:14:46 -0500
-Received: from ipmail02.adl2.internode.on.net ([150.101.137.139]:65372 "EHLO
-        ipmail02.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732540AbfAPWOq (ORCPT
+        id S1733021AbfAPWV1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Jan 2019 17:21:27 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:36574 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732933AbfAPWV1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Jan 2019 17:14:46 -0500
-X-Greylist: delayed 303 seconds by postgrey-1.27 at vger.kernel.org; Wed, 16 Jan 2019 17:14:44 EST
-Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
-  by ipmail02.adl2.internode.on.net with ESMTP; 17 Jan 2019 08:39:39 +1030
-Received: from dave by dastard with local (Exim 4.80)
-        (envelope-from <david@fromorbit.com>)
-        id 1gjtNS-000380-VF; Thu, 17 Jan 2019 09:09:39 +1100
-Date:   Thu, 17 Jan 2019 09:09:38 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Jens Axboe <axboe@kernel.dk>
+        Wed, 16 Jan 2019 17:21:27 -0500
+Received: by mail-pl1-f194.google.com with SMTP id g9so3692311plo.3
+        for <linux-block@vger.kernel.org>; Wed, 16 Jan 2019 14:21:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=XyBgbopUwDKI6fMMbYB0qY0wGv+ZufRqEVSGbmr9ah8=;
+        b=Uu0k5/E6HhYBozQ8g2Fwg3ByflOSE/C2HZGdEVb+BGwtzns8eKpc8XlrcWVY17jyGD
+         iG0T6Ly+1cAYPMNVrImV6D7OxGo/0EOZGN0wTdNGt2lno9eYrU6HDG67nhsGAs5c44Uo
+         4rX9cHab6MtQuvV5V0gwRvj5YBWG142sNqMjtol50QpJxM6Yi8Rudb1yjg3HI5Mm4eNv
+         V6YQIaBH0RSc9WUqNcC6BVJYbbPiQjXQSi6TBNihGWQtWwuEA7WE8ByNrOwt3qU6QeQY
+         pqJAfnl9ldO9gYKTfdbgJDG/Mx4AD9jPSKJkF7t1ScGryTblc3fHp2r5FpUP1FKFL6Va
+         XB0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=XyBgbopUwDKI6fMMbYB0qY0wGv+ZufRqEVSGbmr9ah8=;
+        b=qU5QRzbPrzWnEYbIo4KtSG0hyABbb8WUvm4Di2iFbFYgggHgBNpCGY7VKIuEEowhMC
+         7JZVfJNVCG99IsX8mkNvN6W2lVuytMfreWUIbOF2GmsmFJa9FnHU2HQDPgIr2G4tNhoI
+         CkWcy3GI8fqsV92Ad3+NB+4h9gXsJESNZGPpDYKy8tDFbhRJ8hLBKBbJBHiR1h9bZUcU
+         1lXcISatUZmAeLwLfg737OxFQrYd5o68AKNUTVQTPn3sFtXLi9t3ugX/fidGdhWpq1Yw
+         M999wA1oHEPGctba7vrF9QndgtF1XJdaAdOf1ywyxj/3lRaApvHMWFxezxX/5eQpbDMn
+         5tCw==
+X-Gm-Message-State: AJcUukcSTiKuH3UFM4smyuujdIMqNCtqlbxukO744JegPJVkeQyKAmdY
+        bhUr4M7V0rSX8mNIYz+2YC+/YQ==
+X-Google-Smtp-Source: ALg8bN7/JtIFpqjMIoxCXIPhmLAUA9sROVguLAr9baPU7wfWqj0bGucG3bJMgukmtgfiQSE8U/ytyQ==
+X-Received: by 2002:a17:902:7e44:: with SMTP id a4mr12256310pln.338.1547677285561;
+        Wed, 16 Jan 2019 14:21:25 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id m85sm11111336pfj.171.2019.01.16.14.21.22
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 16 Jan 2019 14:21:24 -0800 (PST)
+Subject: Re: [PATCH 12/15] io_uring: add support for pre-mapped user IO
+ buffers
+To:     Dave Chinner <david@fromorbit.com>
 Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
         linux-block@vger.kernel.org, linux-arch@vger.kernel.org,
         hch@lst.de, jmoyer@redhat.com, avi@scylladb.com
-Subject: Re: [PATCH 12/15] io_uring: add support for pre-mapped user IO
- buffers
-Message-ID: <20190116220938.GR4205@dastard>
 References: <20190116175003.17880-1-axboe@kernel.dk>
- <20190116175003.17880-13-axboe@kernel.dk>
- <20190116205338.GQ4205@dastard>
+ <20190116175003.17880-13-axboe@kernel.dk> <20190116205338.GQ4205@dastard>
  <9db63405-6797-9305-3ce1-fdc11edbf49c@kernel.dk>
+ <20190116220938.GR4205@dastard>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <7fd5cb40-2288-3c54-41d1-3163098b25ef@kernel.dk>
+Date:   Wed, 16 Jan 2019 15:21:21 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9db63405-6797-9305-3ce1-fdc11edbf49c@kernel.dk>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20190116220938.GR4205@dastard>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 16, 2019 at 02:20:53PM -0700, Jens Axboe wrote:
-> On 1/16/19 1:53 PM, Dave Chinner wrote:
-> > On Wed, Jan 16, 2019 at 10:50:00AM -0700, Jens Axboe wrote:
-> >> If we have fixed user buffers, we can map them into the kernel when we
-> >> setup the io_context. That avoids the need to do get_user_pages() for
-> >> each and every IO.
-> > .....
-> >> +			return -ENOMEM;
-> >> +	} while (atomic_long_cmpxchg(&ctx->user->locked_vm, cur_pages,
-> >> +					new_pages) != cur_pages);
-> >> +
-> >> +	return 0;
-> >> +}
-> >> +
-> >> +static int io_sqe_buffer_unregister(struct io_ring_ctx *ctx)
-> >> +{
-> >> +	int i, j;
-> >> +
-> >> +	if (!ctx->user_bufs)
-> >> +		return -EINVAL;
-> >> +
-> >> +	for (i = 0; i < ctx->sq_entries; i++) {
-> >> +		struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
-> >> +
-> >> +		for (j = 0; j < imu->nr_bvecs; j++) {
-> >> +			set_page_dirty_lock(imu->bvec[j].bv_page);
-> >> +			put_page(imu->bvec[j].bv_page);
-> >> +		}
-> > 
-> > Hmmm, so we call set_page_dirty() when the gup reference is dropped...
-> > 
-> > .....
-> > 
-> >> +static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
-> >> +				  unsigned nr_args)
-> >> +{
-> > 
-> > .....
-> > 
-> >> +		down_write(&current->mm->mmap_sem);
-> >> +		pret = get_user_pages_longterm(ubuf, nr_pages, FOLL_WRITE,
-> >> +						pages, NULL);
-> >> +		up_write(&current->mm->mmap_sem);
-> > 
-> > Thought so. This has the same problem as RDMA w.r.t. using
-> > file-backed mappings for the user buffer.  It is not synchronised
-> > against truncate, hole punches, async page writeback cleaning the
-> > page, etc, and so can lead to data corruption and/or kernel panics.
-> > 
-> > It also can't be used with DAX because the above problems are
-> > actually a user-after-free of storage space, not just a dangling
-> > page reference that can be cleaned up after the gup pin is dropped.
-> > 
-> > Perhaps, at least until we solve the GUP problems w.r.t. file backed
-> > pages and/or add and require file layout leases for these reference,
-> > we should error out if the  user buffer pages are file-backed
-> > mappings?
+On 1/16/19 3:09 PM, Dave Chinner wrote:
+> On Wed, Jan 16, 2019 at 02:20:53PM -0700, Jens Axboe wrote:
+>> On 1/16/19 1:53 PM, Dave Chinner wrote:
+>>> On Wed, Jan 16, 2019 at 10:50:00AM -0700, Jens Axboe wrote:
+>>>> If we have fixed user buffers, we can map them into the kernel when we
+>>>> setup the io_context. That avoids the need to do get_user_pages() for
+>>>> each and every IO.
+>>> .....
+>>>> +			return -ENOMEM;
+>>>> +	} while (atomic_long_cmpxchg(&ctx->user->locked_vm, cur_pages,
+>>>> +					new_pages) != cur_pages);
+>>>> +
+>>>> +	return 0;
+>>>> +}
+>>>> +
+>>>> +static int io_sqe_buffer_unregister(struct io_ring_ctx *ctx)
+>>>> +{
+>>>> +	int i, j;
+>>>> +
+>>>> +	if (!ctx->user_bufs)
+>>>> +		return -EINVAL;
+>>>> +
+>>>> +	for (i = 0; i < ctx->sq_entries; i++) {
+>>>> +		struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
+>>>> +
+>>>> +		for (j = 0; j < imu->nr_bvecs; j++) {
+>>>> +			set_page_dirty_lock(imu->bvec[j].bv_page);
+>>>> +			put_page(imu->bvec[j].bv_page);
+>>>> +		}
+>>>
+>>> Hmmm, so we call set_page_dirty() when the gup reference is dropped...
+>>>
+>>> .....
+>>>
+>>>> +static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
+>>>> +				  unsigned nr_args)
+>>>> +{
+>>>
+>>> .....
+>>>
+>>>> +		down_write(&current->mm->mmap_sem);
+>>>> +		pret = get_user_pages_longterm(ubuf, nr_pages, FOLL_WRITE,
+>>>> +						pages, NULL);
+>>>> +		up_write(&current->mm->mmap_sem);
+>>>
+>>> Thought so. This has the same problem as RDMA w.r.t. using
+>>> file-backed mappings for the user buffer.  It is not synchronised
+>>> against truncate, hole punches, async page writeback cleaning the
+>>> page, etc, and so can lead to data corruption and/or kernel panics.
+>>>
+>>> It also can't be used with DAX because the above problems are
+>>> actually a user-after-free of storage space, not just a dangling
+>>> page reference that can be cleaned up after the gup pin is dropped.
+>>>
+>>> Perhaps, at least until we solve the GUP problems w.r.t. file backed
+>>> pages and/or add and require file layout leases for these reference,
+>>> we should error out if the  user buffer pages are file-backed
+>>> mappings?
+>>
+>> Thanks for taking a look at this.
+>>
+>> I'd be fine with that restriction, especially since it can get relaxed
+>> down the line. Do we have an appropriate API for this?  And why isn't
+>> get_user_pages_longterm() that exact API already?
 > 
-> Thanks for taking a look at this.
+> get_user_pages_longterm() is the right thing to use to ensure DAX
+> doesn't trip over this - it's effectively just get_user_pages()
+> with a "if (vma_is_fsdax(vma))" check in it to abort and return
+> -EOPNOTSUPP. IOWs, this is safe on DAX but it's not safe on anything
+> else. :/
 > 
-> I'd be fine with that restriction, especially since it can get relaxed
-> down the line. Do we have an appropriate API for this?  And why isn't
-> get_user_pages_longterm() that exact API already?
+> Unfortunately, disallowing userspace GUP pins on non-DAX file backed
+> pages will break existing "mostly just work" userspace apps all over
+> the place. And so right now there are discussions ongoing about how
+> to map gup references avoid the writeback races and be able to be
+> seen/tracked by other kernel infrastructure (see the long, long
+> thread "[PATCH 0/2] put_user_page*(): start converting the call
+> sites" on -fsdevel). Progress is slow, but I think we're starting to
+> close on a workable solution.
+> 
+> FWIW, this doesn't solve the "long term user pin will block
+> filesystem operations until unpin" problem, that's what moving to
+> using revocable file layout leases is intended to solve. There have
+> been patches posted some time ago to add this user API for this, but
+> we've got to solve the other problems first....
+> 
+>> Would seem that most
+>> (all?) callers of this API is currently broken then.
+> 
+> Yup, there's a long, long history of machines using userspace RDMA
+> panicing because filesystems have detected or tripped over invalid
+> page cache state during writeback attempts. This is not a new
+> problem....
 
-get_user_pages_longterm() is the right thing to use to ensure DAX
-doesn't trip over this - it's effectively just get_user_pages()
-with a "if (vma_is_fsdax(vma))" check in it to abort and return
--EOPNOTSUPP. IOWs, this is safe on DAX but it's not safe on anything
-else. :/
+Thanks for your detailed answer, Dave! I didn't see it before I sent
+out the previous email. FWIW, I've updated the patch:
 
-Unfortunately, disallowing userspace GUP pins on non-DAX file backed
-pages will break existing "mostly just work" userspace apps all over
-the place. And so right now there are discussions ongoing about how
-to map gup references avoid the writeback races and be able to be
-seen/tracked by other kernel infrastructure (see the long, long
-thread "[PATCH 0/2] put_user_page*(): start converting the call
-sites" on -fsdevel). Progress is slow, but I think we're starting to
-close on a workable solution.
+http://git.kernel.dk/cgit/linux-block/commit/?h=io_uring&id=0c8f2299f8069af6b2fa8f99a10d81646d1237a7
 
-FWIW, this doesn't solve the "long term user pin will block
-filesystem operations until unpin" problem, that's what moving to
-using revocable file layout leases is intended to solve. There have
-been patches posted some time ago to add this user API for this, but
-we've got to solve the other problems first....
+Checks for file backed memory, fails the registration with EOPNOTSUPP
+if the check fails.
 
-> Would seem that most
-> (all?) callers of this API is currently broken then.
+That should handle the issue on the io_uring side at least, and it's a
+restriction that can always be relaxed/lifted, when appropriate solutions
+to file backed buffers exists.
 
-Yup, there's a long, long history of machines using userspace RDMA
-panicing because filesystems have detected or tripped over invalid
-page cache state during writeback attempts. This is not a new
-problem....
-
-Cheers,
-
-Dave.
 -- 
-Dave Chinner
-david@fromorbit.com
+Jens Axboe
+
