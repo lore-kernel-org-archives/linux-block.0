@@ -2,93 +2,110 @@ Return-Path: <SRS0=7Bp6=PY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32744C43387
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 13:46:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88DD8C43387
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 14:05:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EA68520859
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 13:46:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cdO+z5DL"
+	by mail.kernel.org (Postfix) with ESMTP id 5FFAB20657
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 14:05:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390750AbfAPNqf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Jan 2019 08:46:35 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:57690 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390707AbfAPNqe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Jan 2019 08:46:34 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0GDdDUH166178;
-        Wed, 16 Jan 2019 13:45:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2018-07-02;
- bh=xxgXSWUT67f49fw4ZpzihxahKicR2Mjqt7I/SL7+Cmg=;
- b=cdO+z5DLtcsFK3gbvaqFIjXvV+MXR1xm8AC5+nxPN62rXmu/Z4m6adcue9LIh3gZzJmA
- KPhaqTjyW1qN79JxBXkVPMgtZOk/G3HbHal79Plku2x4yomXj0kG4PGBHNUMR8W6afgo
- NV+OMkh1emG2Ya6SjrRaJD2nmwauD0vxjfwhP2bX8VaXhxZgxu8B0dyCaU7qGV9kDTBM
- MJhZEArAj2l565wPKLgiIW2w4Sz5heNwF2A3Ku9dG4Hnp8GyLeD4BBt835XXsRkIQMaC
- U3tqsw5ffPsCEQryTfmH6hSYDnkblmyn9k9zu0ltteCWqOMffvulJprDYJ/XLrYKao0S 0A== 
-Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
-        by userp2120.oracle.com with ESMTP id 2pybjs9yuj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Jan 2019 13:45:28 +0000
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x0GDjRfg008788
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 16 Jan 2019 13:45:27 GMT
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x0GDjQoO006720;
-        Wed, 16 Jan 2019 13:45:26 GMT
-Received: from linux.cn.oracle.com (/10.182.71.41)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 16 Jan 2019 05:45:26 -0800
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     konrad.wilk@oracle.com, roger.pau@citrix.com, axboe@kernel.dk
-Subject: [PATCH 1/1] xen-blkback: do not wake up shutdown_wq after xen_blkif_schedule() is stopped
-Date:   Wed, 16 Jan 2019 21:47:41 +0800
-Message-Id: <1547646461-29803-1-git-send-email-dongli.zhang@oracle.com>
-X-Mailer: git-send-email 2.7.4
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9137 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1901160114
+        id S2390590AbfAPOFr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Jan 2019 09:05:47 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51885 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390192AbfAPOFr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 16 Jan 2019 09:05:47 -0500
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id AA7455C9;
+        Wed, 16 Jan 2019 14:05:46 +0000 (UTC)
+Received: from redhat.com (ovpn-120-67.rdu2.redhat.com [10.10.120.67])
+        by smtp.corp.redhat.com (Postfix) with SMTP id A8A1B1C934;
+        Wed, 16 Jan 2019 14:05:40 +0000 (UTC)
+Date:   Wed, 16 Jan 2019 09:05:40 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, jfehlig@suse.com,
+        jon.grimm@amd.com, brijesh.singh@amd.com, jroedel@suse.de
+Subject: Re: [PATCH 3/3] virtio-blk: Consider dma_max_mapping_size() for
+ maximum segment size
+Message-ID: <20190116090355-mutt-send-email-mst@kernel.org>
+References: <20190115132257.6426-1-joro@8bytes.org>
+ <20190115132257.6426-4-joro@8bytes.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190115132257.6426-4-joro@8bytes.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Wed, 16 Jan 2019 14:05:47 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is no need to wake up xen_blkif_schedule() as kthread_stop() is able
-to already wake up the kernel thread.
+On Tue, Jan 15, 2019 at 02:22:57PM +0100, Joerg Roedel wrote:
+> From: Joerg Roedel <jroedel@suse.de>
+> 
+> Segments can't be larger than the maximum DMA mapping size
+> supported on the platform. Take that into account when
+> setting the maximum segment size for a block device.
+> 
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  drivers/block/virtio_blk.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index b16a887bbd02..6193962a7fec 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -723,7 +723,7 @@ static int virtblk_probe(struct virtio_device *vdev)
+>  	struct request_queue *q;
+>  	int err, index;
+>  
+> -	u32 v, blk_size, sg_elems, opt_io_size;
+> +	u32 v, blk_size, max_size, sg_elems, opt_io_size;
+>  	u16 min_io_size;
+>  	u8 physical_block_exp, alignment_offset;
+>  
+> @@ -826,14 +826,16 @@ static int virtblk_probe(struct virtio_device *vdev)
+>  	/* No real sector limit. */
+>  	blk_queue_max_hw_sectors(q, -1U);
+>  
+> +	max_size = dma_max_mapping_size(&vdev->dev);
+> +
 
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
----
- drivers/block/xen-blkback/xenbus.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index a4bc74e..37ac59e 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -254,10 +254,8 @@ static int xen_blkif_disconnect(struct xen_blkif *blkif)
- 		if (!ring->active)
- 			continue;
- 
--		if (ring->xenblkd) {
-+		if (ring->xenblkd)
- 			kthread_stop(ring->xenblkd);
--			wake_up(&ring->shutdown_wq);
--		}
- 
- 		/* The above kthread_stop() guarantees that at this point we
- 		 * don't have any discard_io or other_io requests. So, checking
--- 
-2.7.4
+Should this be limited to ACCESS_PLATFORM?
 
+I see no reason to limit this without as guest can
+access any memory.
+
+
+I'd like a bit of time to consider this point.
+
+>  	/* Host can optionally specify maximum segment size and number of
+>  	 * segments. */
+>  	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_SIZE_MAX,
+>  				   struct virtio_blk_config, size_max, &v);
+>  	if (!err)
+> -		blk_queue_max_segment_size(q, v);
+> -	else
+> -		blk_queue_max_segment_size(q, -1U);
+> +		max_size = min(max_size, v);
+> +
+> +	blk_queue_max_segment_size(q, max_size);
+>  
+>  	/* Host can optionally specify the block size of the device */
+>  	err = virtio_cread_feature(vdev, VIRTIO_BLK_F_BLK_SIZE,
+> -- 
+> 2.17.1
