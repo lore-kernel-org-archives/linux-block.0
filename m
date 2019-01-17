@@ -2,83 +2,108 @@ Return-Path: <SRS0=sC6v=PZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2A62C43387
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 15:22:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 908D4C43387
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 15:29:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B6B41205C9
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 15:22:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FCC220856
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 15:29:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Gh+jqDZI"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KNKcV8rG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728544AbfAQPWY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Jan 2019 10:22:24 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:48408 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727606AbfAQPWX (ORCPT
+        id S1726162AbfAQP31 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Jan 2019 10:29:27 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:40086 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725970AbfAQP31 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Jan 2019 10:22:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=sgSScnt1QgVVEcuj+G3pWGQu+BBf+74x7z1h6AeXWRw=; b=Gh+jqDZInJpqo+rDIQmUlY/PB
-        au9IPKApynMgAy19qVeeL/pETLA61jXdN/bLIBRAhLKR1UrCcJPCk4+bwhtCqKwhduxOZEnQPUnFr
-        TboIWo4cT2vlmoSrEjRswmYOBjiZZSnggQmV89lQb4DPlUzUlBtHKrVBl0ylTA6Jw3sXLQiHRy2Eq
-        PxndiS717CKZjpH6C5Au83D892XmJF6YNcHWKmmzuTqKQRvdyiA8j/0xcytgNh09ai1jZTeRvTcRJ
-        5g2ukhR8y0vR9VAK8qPWgQcfec4ZwRukDLjpT/KH3CxeZmAktTUm+LyhQoJ5AXGAc/aBMaAjx8fqY
-        EufVQdk2A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gk9Uq-0007QA-Mt; Thu, 17 Jan 2019 15:22:20 +0000
-Date:   Thu, 17 Jan 2019 07:22:20 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     David Kozub <zub@linux.fjfi.cvut.cz>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Scott Bauer <scott.bauer@intel.com>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Subject: Re: [PATCH 00/16] block: sed-opal: support shadow MBR done flag and
- write
-Message-ID: <20190117152220.GC20359@infradead.org>
-References: <20190116225533.BD1396004E@linux.fjfi.cvut.cz>
- <20190117085727.GA14092@infradead.org>
- <alpine.LRH.2.21.1901171030320.26315@linux.fjfi.cvut.cz>
+        Thu, 17 Jan 2019 10:29:27 -0500
+Received: by mail-qt1-f194.google.com with SMTP id k12so11689980qtf.7;
+        Thu, 17 Jan 2019 07:29:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to
+         :user-agent;
+        bh=1q9JcQzfXCyTHN8xEENUcIAYmg2fHESb/RPq3VsRrmY=;
+        b=KNKcV8rGGm3ft/hCosy6yKw8HejebNF0+qFVCsIl0msAI9t35IT7w2cYV5lF9Pgyeq
+         g8NT/0Srx1tUMm7vhL/5mfVK9c6Cq7RLUEZpX+XLadE4g4ggX9ggplBobmehHEMo5J86
+         pmv1mxp+IZEznqecjT/QtwOBGRvspEd66lpFu1j7zWSpqhDdmD4hdhGmhoGdQ1fxZGKh
+         1STqKno5w0PNYKpK1u3JZzr5xs/OS3Wes/OVzUC9h9tiERyzmL1neiWjnfHU9sx9JJBB
+         hMz83wqjIKg84Fht+1BY5AKF7ajwaKGU9XyVBIkbj9Zdfg/vePAupohuVzMK9NPJacOv
+         DtrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to:user-agent;
+        bh=1q9JcQzfXCyTHN8xEENUcIAYmg2fHESb/RPq3VsRrmY=;
+        b=L1gE+NCg/vM7vnfb7q7V6bj2/tJCvw8NbNrbxxBwXJ8KnDkehDn2bC7QXGf+9kiBlJ
+         h+uSLgyG7rZDjSGY7tnSKzlqy0kMLziN5XjfgaD06osxDkmwAPYZXYmKUa1ESRa85Zxa
+         9V7v5pO5jnV3x9r9xY2DtKdKOK5Er5L8ADywrRYGr4Pz02CsK5NpS8QzB0XHkBRWarCQ
+         wj295EjqBf5F8WQMgKH44pWDtH1TWuKbvZAueOsgrimGy5KLkcWemo+r4uuisyrPF7BP
+         dKMFcTjfrgj+oO77P68IlbFgnhAsKiCKrmvx+ZYKT8HYpptAnSbIxVP/DAc4Pgs0ubBw
+         nozg==
+X-Gm-Message-State: AJcUukdNfrot1pLhcq/y22vAk/xKWbTWIDB8Xe+Bs/DsKFtu1mHrxpbt
+        yPXVZxKv0BCvZ7Hw+VUf32I=
+X-Google-Smtp-Source: ALg8bN7719gK8HKltZETIMhi3ikam+Q5tzFe4BGnczduIbW21flkO9npy1NbKol8LRW1pPxaFI6rYg==
+X-Received: by 2002:aed:2dc5:: with SMTP id i63mr12227248qtd.173.1547738965969;
+        Thu, 17 Jan 2019 07:29:25 -0800 (PST)
+Received: from localhost.localdomain (198-0-156-163-static.hfc.comcastbusiness.net. [198.0.156.163])
+        by smtp.gmail.com with ESMTPSA id l4sm6574411qtf.22.2019.01.17.07.29.24
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 17 Jan 2019 07:29:25 -0800 (PST)
+Date:   Thu, 17 Jan 2019 10:29:23 -0500
+From:   Konrad Rzeszutek Wilk <konrad@darnok.org>
+To:     Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>
+Cc:     Dongli Zhang <dongli.zhang@oracle.com>,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        Paul.Durrant@citrix.com, konrad.wilk@oracle.com
+Subject: Re: [Xen-devel] [PATCH v6 2/2] xen/blkback: rework connect_ring() to
+ avoid inconsistent xenstore 'ring-page-order' set by malicious blkfront
+Message-ID: <20190117152919.GA26079@localhost.localdomain>
+References: <1547484104-20625-1-git-send-email-dongli.zhang@oracle.com>
+ <1547484104-20625-2-git-send-email-dongli.zhang@oracle.com>
+ <20190115082036.y7svi3xz3dkqd4w4@mac>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <alpine.LRH.2.21.1901171030320.26315@linux.fjfi.cvut.cz>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190115082036.y7svi3xz3dkqd4w4@mac>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 17, 2019 at 10:40:49AM +0100, David Kozub wrote:
-> On Thu, 17 Jan 2019, Christoph Hellwig wrote:
+On Tue, Jan 15, 2019 at 09:20:36AM +0100, Roger Pau Monné wrote:
+> On Tue, Jan 15, 2019 at 12:41:44AM +0800, Dongli Zhang wrote:
+> > The xenstore 'ring-page-order' is used globally for each blkback queue and
+> > therefore should be read from xenstore only once. However, it is obtained
+> > in read_per_ring_refs() which might be called multiple times during the
+> > initialization of each blkback queue.
+> > 
+> > If the blkfront is malicious and the 'ring-page-order' is set in different
+> > value by blkfront every time before blkback reads it, this may end up at
+> > the "WARN_ON(i != (XEN_BLKIF_REQS_PER_PAGE * blkif->nr_ring_pages));" in
+> > xen_blkif_disconnect() when frontend is destroyed.
+> > 
+> > This patch reworks connect_ring() to read xenstore 'ring-page-order' only
+> > once.
+> > 
+> > Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
 > 
-> > the way the series appear looks odd, because it wasn't threaded or
-> > even ordered, and the patches from Jonas seem to have been sent out
-> > by you under his name.  Can you resend them carefully threaded, all
-> > mails from you with the additional from header for resends?
+> LGTM:
 > 
-> Ouch. I'm sorry about the ordering/threading. I (wrongly) assumed that if I
-> just send the mails in order, that suffices. I'll try to fix that in v2.
-> 
-> W.r.t. "from": Most of the patches were originally created by Jonas. I
-> touched some in order to apply review suggestions or make some small fixes.
-> But some stayed identical to Jonas' version and I didn't want to strip him
-> of authorship. I used git format-patch to produce the mails and the commit
-> author was propagated to the from header.
-> 
-> What is the proper way when I am not the author?
+> Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
 
-Send the actual mail as from you, and put another From: line for
-the original author into the mail body as the first non-empty line.
+Applied.
+
+Will push out to Jens in a couple of days. Thank you!
+> 
+> Thanks!
