@@ -6,55 +6,55 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F29C43387
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 13:54:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8419DC43387
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 14:01:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C11A920855
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 13:54:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DD1120652
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 14:01:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="nZJrXeLq"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bJUpjyDp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727279AbfAQNyU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Jan 2019 08:54:20 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:44593 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726805AbfAQNyU (ORCPT
+        id S1726031AbfAQOBL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Jan 2019 09:01:11 -0500
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:42937 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727721AbfAQOBL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Jan 2019 08:54:20 -0500
-Received: by mail-pg1-f194.google.com with SMTP id t13so4471187pgr.11
-        for <linux-block@vger.kernel.org>; Thu, 17 Jan 2019 05:54:19 -0800 (PST)
+        Thu, 17 Jan 2019 09:01:11 -0500
+Received: by mail-pl1-f196.google.com with SMTP id y1so4784522plp.9
+        for <linux-block@vger.kernel.org>; Thu, 17 Jan 2019 06:01:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=2pB3Sy1nsN8br99qlgkRZ1OXNL0JnrGQxDKXfgA9KK0=;
-        b=nZJrXeLqGAlsa/Ofbkbns2uDP0VDoBuUNt8uuc7hdmJJhAY2x4XifJLVWZXaHCXfyP
-         RQKRG6ag5E8GaIRG8Du/ZpUpCgZxyyu8eYUuQPYH1xQbAYSLUfa4S9cYcWfkTxTW/BKm
-         9bEb05lhtuVLXC71fkAizidrDg9GEaAo6PB1noBpGaVA7E+YZHarDSDjbWm2tJn/u3TM
-         zZdFgGMX05+JpDJe8/1yQh9nejkWZEjApfdeHl/yMy5Rnus1JNaqyfDlzf6KasSuvgLS
-         e/qjJNpfm4PDGGJ5TONrH0onWuGtVwH3EX5iU4oCQxIZlhc4cy+oRlC2wKKtj//WO/iy
-         7e6w==
+        bh=6DURJBU2LPktSmQs0avBnVbSqSha42w+cjRSumzK+kg=;
+        b=bJUpjyDpJ4bjW/6Rhh0mFQyeGebjTlIoH6TaMCBjLGQFoMEocZARjZ2vFn9z5nsjnF
+         9H7ePinfDIDeAtzgPd2tnLVIAHOTW/k7lsNW0Qme+OPqS4Abi1ZSf3hZDSI0LC8EDiIC
+         hyJ1f+pd9wbqGLiQxP0+9a5n8MMd12UZ/9T1onXFoNsN9Kls1mPPczpbOlswUvxzBtHb
+         MRyioV01LsrFpsY1KMnoyuvvavdB3gUCLW4LIbAjGhtjJmuSALCCKJ32rCghmdf+2Z/y
+         JlVKMaZOvo1KkF2IFp/Aplegh9Q5EWVomd5ktqrb7bOw66esCz9eWcxsdXkDDQCFQdbS
+         EXXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=2pB3Sy1nsN8br99qlgkRZ1OXNL0JnrGQxDKXfgA9KK0=;
-        b=ARCkVcPH+YGpd1vMMLgVHhu682IVpTEo4/QcFbliajtPKS/Ca/T9B0/ti7Rad2KVor
-         IWwl0N4M99I+zSoqxQ2JF8Jdf4xvQvvhNiZjTXSwotP5zLZLDP73fPILw8v7HVN5nzC+
-         pZtbsf8E/LI24xTaSDpjRtsKgLlaoDgjCGaxdxql79edeMvLNj2AiG71oON69TZLScpa
-         p0ggH0VLwJJ1b00K4a7pAbiihZ4ACs1EamWi6fWl1PaxwrHp1+ZjIKUemyo64DI3uUOD
-         lHMpZQwqVbiW0qvKn56t2Nx0d4I1lNrPFzqAc8JlHou/xHoXlNHDZhq1C/AiP7DuKorO
-         LXKw==
-X-Gm-Message-State: AJcUukeMMZtOXR1k8Q5qZgIK3EG9WwpzkWfr/vVuiJi4xiNjmdscRrYX
-        aP24DY38Gm7kzkNDysJJWsaFEQ==
-X-Google-Smtp-Source: ALg8bN6SDO82K2p6rgeJ5pBDM9X331XM5qOuvQZti+ymKzNdyTUr9pejlDuvcMKPFhgWQnazDARAUQ==
-X-Received: by 2002:a63:5723:: with SMTP id l35mr13059633pgb.228.1547733259352;
-        Thu, 17 Jan 2019 05:54:19 -0800 (PST)
+        bh=6DURJBU2LPktSmQs0avBnVbSqSha42w+cjRSumzK+kg=;
+        b=ZFy4ki3dU6pqj7pIeT72igYaaE9pS4Fvx338xMeF19bS3CxY5rm6KL6qim8ssFmyzC
+         hcYYKHEp9Bkur/GfEWAPSNazrZ4fUZ3gU0D/6QT46BuDpE3deUlCRVcIEJIfnkQqxFLe
+         hwr1zwY2b1KVjk+uREe4LOjBF8LSubjYvwzTzkEnT7vYodroDnzvAbk3Yx1zbQbK1aTn
+         TKGSqbFa532hENdFIKlKUmAfuL7BDc4h8AkDmqOyBw4meLfAHsq4eQnAaRyn1sRoOVjd
+         I8Uwa1p987dgBh6boGlKPdp0YD3qr7Pi/ZLLwT39oFGxyztBWFKmNCt4L6i36n6g2mua
+         Mvrw==
+X-Gm-Message-State: AJcUukcjToQwiAHsl1f7qaOC8CAfKsMMb15edteOCFCvuyDwO9QL6HmA
+        8/oHpYDpN9E3havDPOCS30a0/Q==
+X-Google-Smtp-Source: ALg8bN7p1Qq19Il1e6GkCii0Pv2sePwKv7xeNwvRT6377OZ3U+QxcmwlRTAD6O/09fZNjexrPsl1fg==
+X-Received: by 2002:a17:902:8306:: with SMTP id bd6mr15113770plb.217.1547733670951;
+        Thu, 17 Jan 2019 06:01:10 -0800 (PST)
 Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id v15sm2438883pfn.94.2019.01.17.05.54.16
+        by smtp.gmail.com with ESMTPSA id r4sm5288400pgn.54.2019.01.17.06.01.08
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 17 Jan 2019 05:54:18 -0800 (PST)
+        Thu, 17 Jan 2019 06:01:09 -0800 (PST)
 Subject: Re: [PATCH 05/15] Add io_uring IO interface
 To:     Roman Penyaev <rpenyaev@suse.de>
 Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
@@ -63,14 +63,14 @@ Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
         linux-block-owner@vger.kernel.org
 References: <20190116175003.17880-1-axboe@kernel.dk>
  <20190116175003.17880-6-axboe@kernel.dk>
- <362738449bd3f83d18cb1056acc9b875@suse.de>
+ <718b4d1fbe9f97592d6d7b76d7a4537d@suse.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <cf948a5c-a05f-82c8-2ce9-937dec069567@kernel.dk>
-Date:   Thu, 17 Jan 2019 06:54:15 -0700
+Message-ID: <af41e99c-54f2-a94c-a876-d673fe477e0a@kernel.dk>
+Date:   Thu, 17 Jan 2019 07:01:07 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <362738449bd3f83d18cb1056acc9b875@suse.de>
+In-Reply-To: <718b4d1fbe9f97592d6d7b76d7a4537d@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,31 +79,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/17/19 5:02 AM, Roman Penyaev wrote:
-> Hi Jens,
-> 
+On 1/17/19 5:48 AM, Roman Penyaev wrote:
 > On 2019-01-16 18:49, Jens Axboe wrote:
 > 
 > [...]
 > 
->> +static void *io_mem_alloc(size_t size)
+>> +static int io_allocate_scq_urings(struct io_ring_ctx *ctx,
+>> +				  struct io_uring_params *p)
 >> +{
->> +	gfp_t gfp_flags = GFP_KERNEL | __GFP_ZERO | __GFP_NOWARN | __GFP_COMP 
->> |
->> +				__GFP_NORETRY;
+>> +	struct io_sq_ring *sq_ring;
+>> +	struct io_cq_ring *cq_ring;
+>> +	size_t size;
+>> +	int ret;
 >> +
->> +	return (void *) __get_free_pages(gfp_flags, get_order(size));
+>> +	sq_ring = io_mem_alloc(struct_size(sq_ring, array, p->sq_entries));
 > 
-> Since these pages are shared between kernel and userspace, do we need
-> to care about d-cache aliasing on armv6 (or other "strange" archs
-> which I've never seen) with vivt or vipt cpu caches?
-> 
-> E.g. vmalloc_user() targets this problem by aligning kernel address
-> on SHMLBA, so no flush_dcache_page() is required.
+> It seems that sq_entries, cq_entries are not limited at all.  Can nasty
+> app consume a lot of kernel pages calling io_setup_uring() from a loop
+> passing random entries number? (or even better: decreasing entries 
+> number,
+> in order to consume all pages orders with min number of loops).
 
-I'm honestly not sure, it'd be trivial enough to stick a
-flush_dcache_page() into the few areas we'd need it. The rings are
-already page (SHMLBA) aligned.
+Yes, that's an oversight, we should have a limit in place. I'll add that.
 
 -- 
 Jens Axboe
