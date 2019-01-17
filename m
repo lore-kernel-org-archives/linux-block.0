@@ -7,51 +7,52 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FB8DC43613
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 21:34:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20A99C43387
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 21:34:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA75B20855
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 21:34:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E48EF20859
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 21:34:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="DnUOl4CV"
+	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="BkwbGKGW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728254AbfAQVeK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Jan 2019 16:34:10 -0500
-Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:35540 "EHLO
+        id S1728388AbfAQVd3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Jan 2019 16:33:29 -0500
+Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:35466 "EHLO
         mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727171AbfAQVda (ORCPT
+        with ESMTP id S1729738AbfAQVd0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Jan 2019 16:33:30 -0500
+        Thu, 17 Jan 2019 16:33:26 -0500
 Received: from localhost (localhost [127.0.0.1])
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id B0642A3997;
-        Thu, 17 Jan 2019 22:33:27 +0100 (CET)
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id C21E5A3964;
+        Thu, 17 Jan 2019 22:33:22 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1547760807; i=@fjfi.cvut.cz;
-        bh=hoekDxEgp2sh9NBt3/ADRu57HmGBacwC1Yo6EWm4pRU=;
+        s=20151024; t=1547760802; i=@fjfi.cvut.cz;
+        bh=uX2eDIOSDa5Anhf6mUlNXG64ORX24xhnNJO0u9bCxaY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=DnUOl4CVPYWq3vqiSC/TMziBcuKW5/tvpWDyJI7rUMgO8AhmwDo1lbzIT2GgYwP1F
-         Q/qtaQwURycGEflT64DLCY3/GRcu5/impN/oQ1rOzgAdrjkYuBqP6DExaL34DywFvj
-         xcTFeVKQhwLXzmdZffM0ZlvdvkzCem/g22xLW/w0=
+        b=BkwbGKGWg5p0jtiyN1oZxn6lWLWaIE6FWbz/kWXibOpMB+rEgXpHmyXhCnpusO/80
+         Axo/AcjWLfIgKsAbOGK+RFU5CN4TEAdBroy1D5GaxRPF1CAAnkSbAwK06/YSSdzRVq
+         Hk5RhHneAFZBw2TCmfwHySIiWOLBOprhmBhLcDnE=
 X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
 Received: from mailgw1.fjfi.cvut.cz ([127.0.0.1])
         by localhost (mailgw1.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id kkkyuD2J6MCQ; Thu, 17 Jan 2019 22:33:20 +0100 (CET)
+        with ESMTP id 42Mm6Jcgea19; Thu, 17 Jan 2019 22:33:13 +0100 (CET)
 Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 78C23A3971;
-        Thu, 17 Jan 2019 22:33:12 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 78C23A3971
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 0BFD5A2F18;
+        Thu, 17 Jan 2019 22:33:09 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 0BFD5A2F18
 Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id 4F58860050; Thu, 17 Jan 2019 22:33:11 +0100 (CET)
+        id D48F06004E; Thu, 17 Jan 2019 22:33:08 +0100 (CET)
 From:   David Kozub <zub@linux.fjfi.cvut.cz>
 To:     Jens Axboe <axboe@kernel.dk>,
         Jonathan Derrick <jonathan.derrick@intel.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Subject: [PATCH v2 10/16] block: sed-opal: add ioctl for done-mark of shadow mbr
-Date:   Thu, 17 Jan 2019 22:31:50 +0100
-Message-Id: <1547760716-7304-11-git-send-email-zub@linux.fjfi.cvut.cz>
+Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
+        David Kozub <zub@linux.fjfi.cvut.cz>
+Subject: [PATCH v2 07/16] block: sed-opal: reuse response_get_token to decrease code duplication
+Date:   Thu, 17 Jan 2019 22:31:47 +0100
+Message-Id: <1547760716-7304-8-git-send-email-zub@linux.fjfi.cvut.cz>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1547760716-7304-1-git-send-email-zub@linux.fjfi.cvut.cz>
 References: <1547760716-7304-1-git-send-email-zub@linux.fjfi.cvut.cz>
@@ -60,101 +61,103 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+response_get_token had already been in place, its functionality had
+been duplicated within response_get_{u64,bytestring} with the same error
+handling. Unify the handling by reusing response_get_token within the
+other functions.
 
-Enable users to mark the shadow mbr as done without completely
-deactivating the shadow mbr feature. This may be useful on reboots,
-when the power to the disk is not disconnected in between and the shadow
-mbr stores the required boot files. Of course, this saves also the
-(few) commands required to enable the feature if it is already enabled
-and one only wants to mark the shadow mbr as done.
-
+Co-authored-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
 Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 ---
- block/sed-opal.c              | 33 +++++++++++++++++++++++++++++++--
- include/linux/sed-opal.h      |  1 +
- include/uapi/linux/sed-opal.h |  1 +
- 3 files changed, 33 insertions(+), 2 deletions(-)
+ block/sed-opal.c | 46 +++++++++++++++-------------------------------
+ 1 file changed, 15 insertions(+), 31 deletions(-)
 
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index db966bbc5a05..f85d9e53aab8 100644
+index 537cd73ea88a..1332547e5a99 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
-@@ -1996,13 +1996,39 @@ static int opal_erase_locking_range(struct opal_dev *dev,
- static int opal_enable_disable_shadow_mbr(struct opal_dev *dev,
- 					  struct opal_mbr_data *opal_mbr)
+@@ -889,27 +889,19 @@ static size_t response_get_string(const struct parsed_resp *resp, int n,
+ 				  const char **store)
  {
-+	u8 token = opal_mbr->enable_disable == OPAL_MBR_ENABLE
-+		? OPAL_TRUE : OPAL_FALSE;
- 	const struct opal_step mbr_steps[] = {
- 		{ opal_discovery0, },
- 		{ start_admin1LSP_opal_session, &opal_mbr->key },
--		{ set_mbr_done, &opal_mbr->enable_disable },
-+		{ set_mbr_done, &token },
- 		{ end_opal_session, },
- 		{ start_admin1LSP_opal_session, &opal_mbr->key },
--		{ set_mbr_enable_disable, &opal_mbr->enable_disable },
-+		{ set_mbr_enable_disable, &token },
-+		{ end_opal_session, },
-+		{ NULL, }
-+	};
-+	int ret;
-+
-+	if (opal_mbr->enable_disable != OPAL_MBR_ENABLE &&
-+	    opal_mbr->enable_disable != OPAL_MBR_DISABLE)
-+		return -EINVAL;
-+
-+	mutex_lock(&dev->dev_lock);
-+	setup_opal_dev(dev, mbr_steps);
-+	ret = next(dev);
-+	mutex_unlock(&dev->dev_lock);
-+	return ret;
-+}
-+
-+static int opal_mbr_status(struct opal_dev *dev, struct opal_mbr_data *opal_mbr)
-+{
-+	u8 token = opal_mbr->enable_disable == OPAL_MBR_ENABLE
-+		? OPAL_TRUE : OPAL_FALSE;
-+	const struct opal_step mbr_steps[] = {
-+		{ opal_discovery0, },
-+		{ start_admin1LSP_opal_session, &opal_mbr->key },
-+		{ set_mbr_done, &token },
- 		{ end_opal_session, },
- 		{ NULL, }
- 	};
-@@ -2349,6 +2375,9 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
- 	case IOC_OPAL_ENABLE_DISABLE_MBR:
- 		ret = opal_enable_disable_shadow_mbr(dev, p);
- 		break;
-+	case IOC_OPAL_MBR_STATUS:
-+		ret = opal_mbr_status(dev, p);
-+		break;
- 	case IOC_OPAL_ERASE_LR:
- 		ret = opal_erase_locking_range(dev, p);
- 		break;
-diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
-index 04b124fca51e..b38dc602cae3 100644
---- a/include/linux/sed-opal.h
-+++ b/include/linux/sed-opal.h
-@@ -47,6 +47,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
- 	case IOC_OPAL_ENABLE_DISABLE_MBR:
- 	case IOC_OPAL_ERASE_LR:
- 	case IOC_OPAL_SECURE_ERASE_LR:
-+	case IOC_OPAL_MBR_STATUS:
- 		return true;
- 	}
- 	return false;
-diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
-index 627624d35030..0cb9890cdc04 100644
---- a/include/uapi/linux/sed-opal.h
-+++ b/include/uapi/linux/sed-opal.h
-@@ -116,5 +116,6 @@ struct opal_mbr_data {
- #define IOC_OPAL_ENABLE_DISABLE_MBR _IOW('p', 229, struct opal_mbr_data)
- #define IOC_OPAL_ERASE_LR           _IOW('p', 230, struct opal_session_info)
- #define IOC_OPAL_SECURE_ERASE_LR    _IOW('p', 231, struct opal_session_info)
-+#define IOC_OPAL_MBR_STATUS         _IOW('p', 232, struct opal_mbr_data)
+ 	u8 skip;
+-	const struct opal_resp_tok *token;
++	const struct opal_resp_tok *tok;
  
- #endif /* _UAPI_SED_OPAL_H */
+ 	*store = NULL;
+-	if (!resp) {
+-		pr_debug("Response is NULL\n");
+-		return 0;
+-	}
+-
+-	if (n >= resp->num) {
+-		pr_debug("Response has %d tokens. Can't access %d\n",
+-			 resp->num, n);
++	tok = response_get_token(resp, n);
++	if (IS_ERR(tok))
+ 		return 0;
+-	}
+ 
+-	token = &resp->toks[n];
+-	if (token->type != OPAL_DTA_TOKENID_BYTESTRING) {
++	if (tok->type != OPAL_DTA_TOKENID_BYTESTRING) {
+ 		pr_debug("Token is not a byte string!\n");
+ 		return 0;
+ 	}
+ 
+-	switch (token->width) {
++	switch (tok->width) {
+ 	case OPAL_WIDTH_TINY:
+ 	case OPAL_WIDTH_SHORT:
+ 		skip = 1;
+@@ -925,37 +917,29 @@ static size_t response_get_string(const struct parsed_resp *resp, int n,
+ 		return 0;
+ 	}
+ 
+-	*store = token->pos + skip;
+-	return token->len - skip;
++	*store = tok->pos + skip;
++	return tok->len - skip;
+ }
+ 
+ static u64 response_get_u64(const struct parsed_resp *resp, int n)
+ {
+-	if (!resp) {
+-		pr_debug("Response is NULL\n");
+-		return 0;
+-	}
++	const struct opal_resp_tok *tok;
+ 
+-	if (n >= resp->num) {
+-		pr_debug("Response has %d tokens. Can't access %d\n",
+-			 resp->num, n);
++	tok = response_get_token(resp, n);
++	if (IS_ERR(tok))
+ 		return 0;
+-	}
+ 
+-	if (resp->toks[n].type != OPAL_DTA_TOKENID_UINT) {
+-		pr_debug("Token is not unsigned it: %d\n",
+-			 resp->toks[n].type);
++	if (tok->type != OPAL_DTA_TOKENID_UINT) {
++		pr_debug("Token is not unsigned int: %d\n", tok->type);
+ 		return 0;
+ 	}
+ 
+-	if (!(resp->toks[n].width == OPAL_WIDTH_TINY ||
+-	      resp->toks[n].width == OPAL_WIDTH_SHORT)) {
+-		pr_debug("Atom is not short or tiny: %d\n",
+-			 resp->toks[n].width);
++	if (tok->width != OPAL_WIDTH_TINY && tok->width != OPAL_WIDTH_SHORT) {
++		pr_debug("Atom is not short or tiny: %d\n", tok->width);
+ 		return 0;
+ 	}
+ 
+-	return resp->toks[n].stored.u;
++	return tok->stored.u;
+ }
+ 
+ static bool response_token_matches(const struct opal_resp_tok *token, u8 match)
 -- 
 2.20.1
 
