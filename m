@@ -2,125 +2,128 @@ Return-Path: <SRS0=sC6v=PZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D658C43387
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 02:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0062C43387
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 02:31:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C67220675
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 02:23:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="la054NaQ"
+	by mail.kernel.org (Postfix) with ESMTP id 9FE4620651
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 02:31:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726942AbfAQCXB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Jan 2019 21:23:01 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:34964 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725385AbfAQCXB (ORCPT
+        id S1726984AbfAQCbz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Jan 2019 21:31:55 -0500
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:45572 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726958AbfAQCby (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Jan 2019 21:23:01 -0500
-Received: by mail-pg1-f195.google.com with SMTP id s198so3714166pgs.2
-        for <linux-block@vger.kernel.org>; Wed, 16 Jan 2019 18:23:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=wBUJlFheRtapZ5fsNqpngAVBkuJLQBld4r7qLvPmOLw=;
-        b=la054NaQ7bq5O92v2XJa0GqDFFFTGW7RmNNyJ3tkvcxBriIzSUSfVAACFISXYD74Ep
-         4ZJLXxqADtXCEs0WEOKB7kDfqCkTMW+67ycWrR0A+HkmIX/qKTfO09idAbrAoe0NBzoc
-         MLnEzRwipn0EC5OUktQE2GeO4yvAS2VoSruDbS2dh2vXkd3ZlWndEzDEao4cUJIFSAT1
-         aQyhKuOHMvF9RPONPYK+vih0+qETzPAb12/9I+i9CyQlD3S4gplph7/DK1VLlJ8wHKQy
-         7PsxHGimXuPFa9kbgTcI09vsvoxQSAJYtVOmOfDEpXIcKTemcLFO7Wxd8qtnv7CSMrkQ
-         i76w==
+        Wed, 16 Jan 2019 21:31:54 -0500
+Received: by mail-pl1-f196.google.com with SMTP id a14so3948843plm.12
+        for <linux-block@vger.kernel.org>; Wed, 16 Jan 2019 18:31:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=wBUJlFheRtapZ5fsNqpngAVBkuJLQBld4r7qLvPmOLw=;
-        b=tacG4OSzIISCqpLWXJwzdQJnBE8nzMWin0yRRxRPCPnSUT8+zawNH2n7FmMnB2kgrO
-         VxQ+2iI6NK0ZSR6bdnz744sCrcjTpPK7tMI4ZRpiy+E73f1yO6jstH3nOLh/ViH5jXya
-         l5z8leGcKR5EP6FvwKRL65omXH1C5/mJ8VaMIocJjy/usi3loY9AbEVKQhH/sp6mJk9Y
-         O6VeBK4S8tC90zlrCWaIoT3wBSxl/03WOyMLo/OPltX0UAzbVbMLToPCT2fTW45LoHpD
-         ZgyDlUYPjsHIywHz61Z23jYFVGKU1Hpkig2wnwydlc1/1QpmmVJMjzd9oHU1zaNKLQUw
-         j6yg==
-X-Gm-Message-State: AJcUukc4ZniAJ+5IO5VsWMf9w5LlEDW3T1GvHjp/elqxffR9Yr1F6Znq
-        v/5nuhSAkn9H/+sJUFHIMjBxYg==
-X-Google-Smtp-Source: ALg8bN7iSVixIPLucELfCbHcIOCcTSK/VDp4f8FlnesXoSRnoPTk7uIxg3ZQ0ohMRFa47Z26vyUviA==
-X-Received: by 2002:a63:7b06:: with SMTP id w6mr11750658pgc.288.1547691780079;
-        Wed, 16 Jan 2019 18:23:00 -0800 (PST)
-Received: from vader ([2601:602:8b00:55d3:e6a7:a0ff:fe0b:c9a8])
-        by smtp.gmail.com with ESMTPSA id u186sm169025pfu.51.2019.01.16.18.22.59
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 16 Jan 2019 18:22:59 -0800 (PST)
-Date:   Wed, 16 Jan 2019 18:22:58 -0800
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Masato Suzuki <masato.suzuki@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Matias Bjorling <matias.bjorling@wdc.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Mike Snitzer <snitzer@redhat.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: Re: [PATCH blktests v2 04/16] common: Introduce
- _have_fio_zbd_zonemode() helper function
-Message-ID: <20190117022258.GD25494@vader>
-References: <20190110093725.32675-1-shinichiro.kawasaki@wdc.com>
- <20190110093725.32675-5-shinichiro.kawasaki@wdc.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=O0uFvd2+f81KaU+7Y9if+mq4dlepuILnVwQ8ZWBfjR8=;
+        b=B53IdARyEwvjuBtmJ97alsn7IyTZD3CbOS+eHJvync/Tj7RI8gPhCJFNCbjnoVHGA/
+         JMzrbbsCcWKUnXbddcryN0apfwzHyTzjEUk8Hoo1f8R1IfqqkaS3sipNNvdxJxzbR+N+
+         z2qIqWOD234yC9mH2NM5fvATD+2jvd+NyDD48fEnNLiTl/5o1SON6wCxLe5AA/9CSpMg
+         QgwU/fIzNWlEWcciEPmOXGXqe1B63gq5DYmf/3tKLrliY0RcPFU1u0fd1/rteEulOFpK
+         KfJKkqhGWEmw5ncTr1+Hwi3LCrDET+Lqsl0pXNFcz6y7aBgxC1KPnOpZz5dk2D/rBsKJ
+         IAFQ==
+X-Gm-Message-State: AJcUukctsSxgK+Wub2tz4UyVo4egUY8auoh7QeTDh2EQWy5aNskhL6sK
+        CLF3LyvP5ZK6nAr2KpweoZY=
+X-Google-Smtp-Source: ALg8bN5kg1mvkIBU9nbIJDCT1v3erp7uMJQRc/VMrDVTpp1l1BV913n3OS5EQJkEh8ha1aMoNjmFzw==
+X-Received: by 2002:a17:902:7b88:: with SMTP id w8mr13014197pll.320.1547692313485;
+        Wed, 16 Jan 2019 18:31:53 -0800 (PST)
+Received: from asus.site ([2601:647:4000:5dd1:a41e:80b4:deb3:fb66])
+        by smtp.gmail.com with ESMTPSA id z62sm206685pfl.33.2019.01.16.18.31.51
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 16 Jan 2019 18:31:52 -0800 (PST)
+Subject: Re: [PATCH 1/3] blktests: add cgroup2 infrastructure
+To:     Omar Sandoval <osandov@osandov.com>
+Cc:     Josef Bacik <josef@toxicpanda.com>, linux-block@vger.kernel.org,
+        kernel-team@fb.com, osandov@fb.com
+References: <20181204174733.7423-1-josef@toxicpanda.com>
+ <20181204174733.7423-2-josef@toxicpanda.com>
+ <1211bf78-c442-ea71-9e71-f6d86681ed56@acm.org>
+ <1547570441.83374.112.camel@acm.org> <20190117014039.GA25494@vader>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <781ed848-e7a1-47c7-12d1-4260f1e8924b@acm.org>
+Date:   Wed, 16 Jan 2019 18:31:51 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190110093725.32675-5-shinichiro.kawasaki@wdc.com>
-User-Agent: Mutt/1.11.2 (2019-01-07)
+In-Reply-To: <20190117014039.GA25494@vader>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 10, 2019 at 06:37:13PM +0900, Shin'ichiro Kawasaki wrote:
-> Fio zbd zone mode is necessary for zoned block devices. Introduce the
-> helper function _have_fio_zbd_zonemode() to check that the installed
-> fio version supports the option --zonemode=zbd.
-
-Testing version numbers is fragile. How about
-
-if ! fio --cmdhelp=zonemode | grep -q zbd; then
-	SKIP_REASON="Fio version too old (does not support --zonemode=zbd)"
-	return 1
-fi
-
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> ---
->  common/fio | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+On 1/16/19 5:40 PM, Omar Sandoval wrote:
+> On Tue, Jan 15, 2019 at 08:40:41AM -0800, Bart Van Assche wrote:
+>> On Tue, 2019-01-01 at 19:13 -0800, Bart Van Assche wrote:
+>>> On 12/4/18 9:47 AM, Josef Bacik wrote:
+>>>> In order to test io.latency and other cgroup related things we need some
+>>>> supporting helpers to setup and tear down cgroup2.  This adds support
+>>>> for checking that we can even configure cgroup2 things, set them up if
+>>>> need be, and then add the cleanup stuff to the main cleanup function so
+>>>> everything is always in a clean state.
+>>>
+>>> Is this the patch that went in as commit ae7daae7e35a ("blktests: add
+>>> cgroup2 infrastructure")? I think that commit introduced a regression.
+>>> With that patch applied the SRP tests fail as follows:
+>>>
+>>> # ./check -q srp/001
+>>> srp/001 (Create and remove LUNs)
+>>>       runtime  4.067s  ...
+>>> common/cgroup: line 25: CGROUP2_DIR: unbound variable
+>>>
+>>> Is this a known issue?
+>>
+>> Hi Josef,
+>>
+>> Had you noticed this e-mail?
+>>
+>> Thanks,
+>>
+>> Bart.
 > 
-> diff --git a/common/fio b/common/fio
-> index e407088..44d9c86 100644
-> --- a/common/fio
-> +++ b/common/fio
-> @@ -17,6 +17,18 @@ _have_fio() {
->  	return 0
->  }
->  
-> +_have_fio_zbd_zonemode() {
-> +	local -a v
-> +
-> +	_have_fio || return $?
-> +	mapfile -t v < <(fio --version | tr -s -c "[:digit:]" "\n")
-> +	if [[ ${v[1]} -lt 3 || ( ${v[1]} -eq 3 && ${v[2]} -lt 9 ) ]]; then
-> +		SKIP_REASON="Fio version too old (does not support --zonemode=zbd)"
-> +		return 1
-> +	fi
-> +	return 0
-> +}
-> +
->  declare -A FIO_TERSE_FIELDS
->  FIO_TERSE_FIELDS=(
->  	# Read status
-> -- 
-> 2.20.1
+> Hey, Bart, I just pushed a fix for this:
 > 
+> commit 8a274578e2895b9f0b66c09f3a8f63b5ff1293b2
+> Author: Omar Sandoval <osandov@fb.com>
+> Date:   Wed Jan 16 17:34:19 2019 -0800
+> 
+>      cgroup: test if CGROUP2_DIR is set with -v instead of -n
+>      
+>      common/multipath-over-rdma does set -u, so -n "$CGROUP2_DIR" fails with
+>      an unbound variable error. Instead, use -v to test if the variable was
+>      set.
+>      
+>      Signed-off-by: Omar Sandoval <osandov@fb.com>
+> 
+> diff --git a/common/cgroup b/common/cgroup
+> index 48e546f..554ebf7 100644
+> --- a/common/cgroup
+> +++ b/common/cgroup
+> @@ -22,7 +22,7 @@ _init_cgroup2()
+>   
+>   _exit_cgroup2()
+>   {
+> -	if [[ -n $CGROUP2_DIR ]]; then
+> +	if [[ -v CGROUP2_DIR ]]; then
+>   		find "$CGROUP2_DIR" -type d -delete
+>   		unset CGROUP2_DIR
+>   	fi
+
+That change looks good to me. Thanks!
+
+Bart.
+
+
