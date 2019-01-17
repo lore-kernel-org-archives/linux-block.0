@@ -2,127 +2,66 @@ Return-Path: <SRS0=sC6v=PZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 202CCC43387
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 08:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 472A9C43387
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 08:57:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E131D20657
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 08:20:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C41920855
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 08:57:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CzGzbMTP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728702AbfAQIUz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Jan 2019 03:20:55 -0500
-Received: from smtp.ctxuk.citrix.com ([185.25.65.24]:7788 "EHLO
-        SMTP.EU.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728331AbfAQIUz (ORCPT
+        id S1727443AbfAQI5e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Jan 2019 03:57:34 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:54824 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727021AbfAQI5e (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Jan 2019 03:20:55 -0500
-X-IronPort-AV: E=Sophos;i="5.56,488,1539648000"; 
-   d="scan'208";a="84713258"
-Date:   Thu, 17 Jan 2019 09:20:43 +0100
-From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
-To:     Dongli Zhang <dongli.zhang@oracle.com>
-CC:     <linux-block@vger.kernel.org>, <xen-devel@lists.xenproject.org>,
-        <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
-        <konrad.wilk@oracle.com>
-Subject: Re: [Xen-devel] [PATCH 1/1] xen-blkback: do not wake up shutdown_wq
- after xen_blkif_schedule() is stopped
-Message-ID: <20190117082043.7y4gl4uave5pgawf@mac>
-References: <1547646461-29803-1-git-send-email-dongli.zhang@oracle.com>
- <20190116145215.igakzdkklc6f7h6k@mac>
- <30770f68-34e0-d707-b087-c43f0b51cd81@oracle.com>
+        Thu, 17 Jan 2019 03:57:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=T8UtIB+T3zr1IacjNUJbhbpN4vCjaQRrKMJruhvE+/M=; b=CzGzbMTPR7mdPm6HHjmPn6dBd
+        KKtJ0nEA+JlUHOvPP4ttu0BiG4uXMH9Aok8DDWG/nasNi+6iLj6VkLp0RDJFhFEF47gEREQ33lCbt
+        2UYcH4se6rb39F+GVDRnZ9L3CY6YaEEXySJwYL/8cZZcg7TPVYFG7FTJByY8wOegGXLEA+r745lQH
+        KZTC0c9LYIFYl7/C1nKm+WxOn+JVJOGpFaeIIwTEBYfQHBD79jKNCylgZ999/qNlvSHJZqVQPm7vN
+        9OqWjNIdmFGFOvG15agvm4XiT82qj7VI0nj+tpJkeKQbh4yrH2tbrdDNXn6ERxSrVPRocWDN0IB5m
+        gEUjoc5Gw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gk3UN-0005PJ-MY; Thu, 17 Jan 2019 08:57:27 +0000
+Date:   Thu, 17 Jan 2019 00:57:27 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     David Kozub <zub@linux.fjfi.cvut.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>, Scott Bauer <scott.bauer@intel.com>,
+        Jonathan Derrick <jonathan.derrick@intel.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+Subject: Re: [PATCH 00/16] block: sed-opal: support shadow MBR done flag and
+ write
+Message-ID: <20190117085727.GA14092@infradead.org>
+References: <20190116225533.BD1396004E@linux.fjfi.cvut.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <30770f68-34e0-d707-b087-c43f0b51cd81@oracle.com>
-User-Agent: NeoMutt/20180716
-X-ClientProxiedBy: AMSPEX02CAS01.citrite.net (10.69.22.112) To
- AMSPEX02CL02.citrite.net (10.69.22.126)
+In-Reply-To: <20190116225533.BD1396004E@linux.fjfi.cvut.cz>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 17, 2019 at 10:10:00AM +0800, Dongli Zhang wrote:
-> Hi Roger,
-> 
-> On 2019/1/16 下午10:52, Roger Pau Monné wrote:
-> > On Wed, Jan 16, 2019 at 09:47:41PM +0800, Dongli Zhang wrote:
-> >> There is no need to wake up xen_blkif_schedule() as kthread_stop() is able
-> >> to already wake up the kernel thread.
-> >>
-> >> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-> >> ---
-> >>  drivers/block/xen-blkback/xenbus.c | 4 +---
-> >>  1 file changed, 1 insertion(+), 3 deletions(-)
-> >>
-> >> diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-> >> index a4bc74e..37ac59e 100644
-> >> --- a/drivers/block/xen-blkback/xenbus.c
-> >> +++ b/drivers/block/xen-blkback/xenbus.c
-> >> @@ -254,10 +254,8 @@ static int xen_blkif_disconnect(struct xen_blkif *blkif)
-> >>  		if (!ring->active)
-> >>  			continue;
-> >>  
-> >> -		if (ring->xenblkd) {
-> >> +		if (ring->xenblkd)
-> >>  			kthread_stop(ring->xenblkd);
-> >> -			wake_up(&ring->shutdown_wq);
-> > 
-> > I've now realized that shutdown_wq is basically useless, and should be
-> > removed, could you please do it in this patch?
-> 
-> I do not think shutdown_wq is useless.
-> 
-> It is used to halt the xen_blkif_schedule() kthread when
-> RING_REQUEST_PROD_OVERFLOW() returns true in __do_block_io_op():
-> 
-> 1121 static int
-> 1122 __do_block_io_op(struct xen_blkif_ring *ring)
-> ... ...
-> 1134         if (RING_REQUEST_PROD_OVERFLOW(&blk_rings->common, rp)) {
-> 1135                 rc = blk_rings->common.rsp_prod_pvt;
-> 1136                 pr_warn("Frontend provided bogus ring requests (%d - %d =
-> %d). Halting ring processing on dev=%04x\n",
-> 1137                         rp, rc, rp - rc, ring->blkif->vbd.pdevice);
-> 1138                 return -EACCES;
-> 1139         }
-> 
-> 
-> If there is bogus/invalid ring requests, __do_block_io_op() would return -EACCES
-> without modifying prod/cons index.
-> 
-> Without shutdown_wq (just simply assuming we remove the below code without
-> handling -EACCES in xen_blkif_schedule()), the kernel thread would continue the
-> while loop.
-> 
-> 648                 if (ret == -EACCES)
-> 649                         wait_event_interruptible(ring->shutdown_wq,
-> 650                                                  kthread_should_stop());
-> 
-> 
-> If xen_blkif_be_int() is triggered again (let's assume there is no optimization
-> on guest part and guest would send event for every request it puts on ring
-> buffer), we may come to do_block_io_op() again.
-> 
-> 
-> As the prod/cons index are not modified last time the code runs into
-> do_block_io_op() to process bogus request, we would hit the bogus request issue
-> again.
-> 
-> 
-> With shutdown_wq, the kernel kthread is blocked forever until such queue/ring is
-> destroyed. If we remove shutdown_wq, we are changing the policy to handle bogus
-> requests on ring buffer?
+Hi David,
 
-AFAICT the only wakeup call to shutdown_wq is removed in this patch,
-hence waiting on it seems useless. I would replace the
-wait_event_interruptible call in xen_blkif_schedule with a break, so
-that the kthread ends as soon as a bogus request is found. I think
-there's no point in waiting for xen_blkif_disconnect to stop the
-kthread.
+the way the series appear looks odd, because it wasn't threaded or
+even ordered, and the patches from Jonas seem to have been sent out
+by you under his name.  Can you resend them carefully threaded, all
+mails from you with the additional from header for resends?
 
-Thanks, Roger.
+git-send-email will do it all for you, but it can also be done manually.
