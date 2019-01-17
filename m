@@ -6,52 +6,52 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75FA5C43387
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 06:18:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25316C43387
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 06:21:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3618620851
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 06:18:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D94CC20856
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 06:21:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Hk8DUxYM";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="THexjzUz"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="NYyU8/Rx";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="PeU2BGiP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730038AbfAQGSY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Jan 2019 01:18:24 -0500
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:26666 "EHLO
+        id S1730060AbfAQGVQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Jan 2019 01:21:16 -0500
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:26868 "EHLO
         esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725320AbfAQGSY (ORCPT
+        with ESMTP id S1730005AbfAQGVQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Jan 2019 01:18:24 -0500
+        Thu, 17 Jan 2019 01:21:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1547705904; x=1579241904;
+  t=1547706076; x=1579242076;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=RKQ2lp8bC7ZRmlVaGzwKb9ZiBHtHKJo6mXRCCR5HUVI=;
-  b=Hk8DUxYMLro7YwIcuH2nhmeFCWCk4wZWE5jrk94kn9uMhBn7IiWWQGnP
-   G5ZYR+7QRePl82dTe7aGH2P5FJLd8byyMXQHW0qlYvCXpWuld2GSZKTGr
-   fPAhT3kkdmqhDzaLH8qF2OS+oZQXbWH7IV4reQsW3/+20uDUMY+p9spO8
-   AQKfVZKsvGKZRz+tUiEV1dW+Oj+RK58/WSoqp//NI1UmJNxXS1F8ehJVO
-   ELVSG70aeo7ZWRao9RCnjZgM3BWTtm2sH9zalMKfoHpypsqu5e86PwoWw
-   SP6YH2AMJVF/SsS1oIO7P621q3w2bOLb7zDz126t0+LfjXfkmUikGp6Kv
+  bh=/oGKpV0Q0Y5YM3qAXtrYBOHKxWy5a9rjOFI6SUyTWHg=;
+  b=NYyU8/Rxp7Nw9Fi/14+P9s2h0j6PtILltR90RTNimraS6Ni9OIFYVSf4
+   cetmc3DezzsRlC6R9bMB4PzWVLXcY19L9jHGnEYbe4c9XjiiEOCvqSdKP
+   WOBUvmeU86KyLD2YvKlE14Zwdgd8WqU2W5DsBbedjppQLntwODey7CckA
+   nJEm8gABz6ZgajwZMYbQ5qlGrcAmEfDRSNTHf5vVQu7jsPZFisz8Hpb0x
+   tDldFc9P7ebwqmiNHzsQRveHc7iPZp2JFqgR4NkQF6/FwsY9F2Ac9Pqy0
+   SdwpeYxb7ImK+puyUSPH9p/tr1SPElQDPLkY3bbsW1UKZs8Wq70EE1BVJ
    g==;
 X-IronPort-AV: E=Sophos;i="5.56,488,1539619200"; 
-   d="scan'208";a="103955341"
-Received: from mail-co1nam04lp2052.outbound.protection.outlook.com (HELO NAM04-CO1-obe.outbound.protection.outlook.com) ([104.47.45.52])
-  by ob1.hgst.iphmx.com with ESMTP; 17 Jan 2019 14:18:23 +0800
+   d="scan'208";a="103955631"
+Received: from mail-co1nam04lp2050.outbound.protection.outlook.com (HELO NAM04-CO1-obe.outbound.protection.outlook.com) ([104.47.45.50])
+  by ob1.hgst.iphmx.com with ESMTP; 17 Jan 2019 14:21:15 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RKQ2lp8bC7ZRmlVaGzwKb9ZiBHtHKJo6mXRCCR5HUVI=;
- b=THexjzUzLV8+BL0vjnt4re992qE6TqVswhmSnvA6mlg6oJR7r7y4txYDQvfsY0teouof4v4N4jCIfF7w/ajhqRKNRxs2M4kNXoxyKUXLS9m42mxvNa7ifPw5yvo1SwHVchvbIHhCl7thpd5QstS/kqYi6teJXi2qNyIlDzJ+xNE=
+ bh=gheEhEh1Y4mD8eY+oOjYsEevp6BOLSRvrUAuwoosXhE=;
+ b=PeU2BGiP5mNyjfFMNc1WEV/eVQUNM+j16YrXe0E9Ehsi7Zm7bAUuBiBSkO70yVsI4mvps898NdIDXLiVdN9Dvy8oU4HMSi1S7azQOC6KxO+xXsW+VVZQ5MCu8vaQPCLJR5oQ8NDr3cLwxEKxfkkAWJRjKgWYe8vRhwZdiYISBDk=
 Received: from CY1PR04MB2268.namprd04.prod.outlook.com (10.167.9.7) by
  CY1PR04MB2042.namprd04.prod.outlook.com (10.166.191.136) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1537.26; Thu, 17 Jan 2019 06:18:22 +0000
+ 15.20.1537.26; Thu, 17 Jan 2019 06:21:14 +0000
 Received: from CY1PR04MB2268.namprd04.prod.outlook.com
  ([fe80::9431:bb6e:5c5f:ca67]) by CY1PR04MB2268.namprd04.prod.outlook.com
  ([fe80::9431:bb6e:5c5f:ca67%6]) with mapi id 15.20.1537.018; Thu, 17 Jan 2019
- 06:18:22 +0000
+ 06:21:14 +0000
 From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     Omar Sandoval <osandov@osandov.com>
 CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -63,16 +63,16 @@ CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Mike Snitzer <snitzer@redhat.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: Re: [PATCH blktests v2 03/16] common: Move set_scheduler() function
- definition
-Thread-Topic: [PATCH blktests v2 03/16] common: Move set_scheduler() function
- definition
-Thread-Index: AQHUqMgl2Aet2kYBMUeS9geMqb0dGw==
-Date:   Thu, 17 Jan 2019 06:18:22 +0000
-Message-ID: <CY1PR04MB2268CE31060A326C6E4B4BA5ED830@CY1PR04MB2268.namprd04.prod.outlook.com>
+Subject: Re: [PATCH blktests v2 04/16] common: Introduce
+ _have_fio_zbd_zonemode() helper function
+Thread-Topic: [PATCH blktests v2 04/16] common: Introduce
+ _have_fio_zbd_zonemode() helper function
+Thread-Index: AQHUqMgo3nLxctnTpEOLw7CzRdIglw==
+Date:   Thu, 17 Jan 2019 06:21:14 +0000
+Message-ID: <CY1PR04MB226888D625A90F0A1DD0096FED830@CY1PR04MB2268.namprd04.prod.outlook.com>
 References: <20190110093725.32675-1-shinichiro.kawasaki@wdc.com>
- <20190110093725.32675-4-shinichiro.kawasaki@wdc.com>
- <20190117021845.GC25494@vader>
+ <20190110093725.32675-5-shinichiro.kawasaki@wdc.com>
+ <20190117022258.GD25494@vader>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -81,26 +81,26 @@ authentication-results: spf=none (sender IP is )
  smtp.mailfrom=shinichiro.kawasaki@wdc.com; 
 x-originating-ip: [199.255.47.11]
 x-ms-publictraffictype: Email
-x-microsoft-exchange-diagnostics: 1;CY1PR04MB2042;6:02M6zrvMsZR+/CtDsKjA7JEi+FhweORqfc5UwVAES+BxT/9fOWmJK+nZ9suYhISqY0OEs5SEVh/HkxVe+6NHnDpQWLQDCO1+SFPYFfoGI0CHEzELg6dezI31zfEUDi9F92lXio16R7zaeXLGZh8DGbaNylCHCAdDCK7e0/tEHEEQZRChtDHU3ujQ7UD4fJ7glSKxJYWXRr/Nz7Q0ysEJAjDKpyJikRsijinu4N6FX4wCVXhohqaUBvNWAhAvrujqrAV6ZfbyifeAhfA3WyKRuIBNO4J0KFHspBvMGXKaHZSrKpQ1uJLjUOlvVVjw9lTmnmlgAsdNQbOv759VeXynSuprnrJP/To8Spe52ydlMCcmlnWU9h7KFd6fmKHky0nkHol7SrwHn7I9DNlIYIJ4J9foHZTLZ0+Fhg+G31fTxkHJOpzM2aovtuarRHkF9S2i4miTUlczz0/bXtmVGZ0b3g==;5:IVNJx8gmFNRkKW4tPPsHBksW5E991ntXr+j+0URxIk69sYT07AM9rm6EbffCPM4VK7Ap30Fsw1wxlwdFKBXFR36FgMKJdZZsuwZj9ikAMCpu5wKWzvDg67jpH2qkRtk+PW7UZJrSESorUGMMBzdUhgyrBZ9I7IcfSuHD0LgPOPHOToLioQ7cUz9HRpbxHsP6tifOZATSvMlXTqTKCVp2ew==;7:/wAxOkyC3cuXtMkdLGNnqmMlSi4UbxMDM+gj8HqA6ek0J78d5QDJhL56SScM3d4kSO7x5sSHHOoPNzn5sL8o5Y2uX4VJ2CaYHUWhup9EBOWDNVjdFaMHMH+bRsukrH+Si24+j+qg/LKcfDLN1D1HXg==
+x-microsoft-exchange-diagnostics: 1;CY1PR04MB2042;6:IG/gQxC3SfIPRrRcbUkj96LXf5aGEt0eShhfz2iZoREyEDvt6focCKwEsRIh874LSvTOjX1bBAE+dJLE+e10aVW8WdjedHLSTMdggvhLH1qhPK9mw8kQd9GHIxLW9qDaeX8sG5r2mY7yPMeIqPLZ6wQyIpN/ZaKbNTRR8b/WNj0Mpz5Pbuta/2UMbXxXWig9ewzO8S/ugxYSjWSqKNYNFyZ0w+5fAFKiga5Cs2B1wvrw8vFYi0p38+CQfn6BarVwdqLaaih5AC5/u/DJiSEJO/sngjdzI4/1/AhVfQSI2uuaynnGZIOmAdFAnyUgwKG4q/CQY7/UtCLu6A9iEtWAz/YhsDcFicVUs3V7l3uwdbpkossPzSxZnAO107VobTudQfIf4yYk27GKIzlryPz3NhIRCxQZz28eNsZCB/MOJbv0+IL1DYRLe+rHBLuaU6l5lO6hLZpTlsA9XnsOwe3cLg==;5:jaOFlIOjVXEbb4DAgMwuyOYWmnmH3W76pu4csZ/MjYPXDMx4GA9kX+rSTqb3myGJgFsO7P9Md8XEeS+U/EzKSRhtgm2vir/FCKlyd60/MXyyc4sl6+xt0f8Xxh29xPKZBiFe7WbTlZMFU3+uXv//6Tnd+NWat32R1p/yY3BjVBsPe5S32XHh4qaQK9fBqyiWVrRz1MNCb1Cuzd0LOmU+aA==;7:lCWiqFT3R1L53LkrKpGYEeUGAbZPyvkns8r5q/HGddYKbbqtnY5GMl9tO2LiG3/c76+4XHMxLAIOzQLjADUPMxKxlxvy0ghCCf3ffTxlAnvjns+zpCEwQfJDFWHhnTnTvd5buoCXNMsANBNve4PDdw==
 x-ms-exchange-antispam-srfa-diagnostics: SOS;SOR;
-x-ms-office365-filtering-correlation-id: 1f792bae-6520-4436-1de7-08d67c4394ff
+x-ms-office365-filtering-correlation-id: e46baf60-fe4f-45a1-4653-08d67c43fb88
 x-ms-office365-filtering-ht: Tenant
 x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600109)(711020)(4618075)(2017052603328)(7153060)(7193020);SRVR:CY1PR04MB2042;
 x-ms-traffictypediagnostic: CY1PR04MB2042:
 wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <CY1PR04MB20423DCD60CC314F8A95A4FCED830@CY1PR04MB2042.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <CY1PR04MB20427EF0DD3B9685F8C3D175ED830@CY1PR04MB2042.namprd04.prod.outlook.com>
 x-forefront-prvs: 0920602B08
 x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(39860400002)(366004)(376002)(346002)(136003)(396003)(199004)(189003)(305945005)(7736002)(8676002)(8936002)(55016002)(81156014)(81166006)(53936002)(9686003)(5660300001)(14454004)(44832011)(97736004)(86362001)(2906002)(68736007)(478600001)(6436002)(3846002)(6116002)(26005)(71200400001)(6246003)(25786009)(71190400001)(186003)(4744005)(74316002)(7696005)(76176011)(6506007)(53546011)(33656002)(256004)(102836004)(316002)(54906003)(4326008)(99286004)(229853002)(446003)(105586002)(106356001)(6916009)(66066001)(486006)(476003);DIR:OUT;SFP:1102;SCL:1;SRVR:CY1PR04MB2042;H:CY1PR04MB2268.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 0WX1XWlOArE+FHOcQQSCMB6inzz0FYYbS8we4DQqQhS2V92HyovngGSIUbESGjxSD0g1g7PEtF9ULbGmX7O0u6CAzDk/3pcvtZYczGzTBlcGkLGMjwl7Db1gVadG2K1rM/YKZdfWRTegYtVVEamn+Pe3XvO0K+6D4Jgu4zUDsCVikUTEHt06p9gXBfvJyTAGzhZPQ7EBkODDxo/QzpBIzUZlQPn57MxODysu7T56B3K5OmOZB0+m4n+LUnwK07mJtPXTm4dTW6bNHKjGK+SPl0W57DoBLZLnWuZF1M89Q6RKEushNuhux+T3PG6E1chtRzUe1ISLfa/SlDF4KihIi3xI3dqXhCz+sO7rPtDqULyHml1kTILaTQb+CTvRm5Ah4QnPq9INBnwW1UzIUPW6y4bUwuRCtbnMPvMV8klw/7I=
+x-microsoft-antispam-message-info: thG540v4IBdAhhFOIGJBIODgRSY0NDFVGXQmFVjsQVVYtZJtjLOoT1qHLGYyMgbE+Jc3ozvKtz2Wg1AB7PeFOn3CQaT8H11f1h4lze2t5xGgKGzMB0xE5V/9VoEFuzSzomJOOU57Nq+/3ghze5Go4CBPVMzg3BYgO03VUYP9iQXJ3I/gvoZlbIGJf0k6Lm3RNsfRawWftqyGp35FWErSo5sr43VSfUz5AB0WEjT9/43BqEVBHBU5R/L19rR2sttsnUR88WIs4EMJNF1ECaJ9iHBPfhhjWk6ZasFaSdKtjE8bkulaxQafNQLXMVx9co/PnsNZodHPcjR68eYDLJBCHlQ4dOKrHG89b2wHYO2flo89cy9ktfU8eusZ2Lv219hoaQueqh8EyyYFvn12+S6XjTP5FxRr1Bp7j53nYLUIfUQ=
 spamdiagnosticoutput: 1:99
 spamdiagnosticmetadata: NSPM
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1f792bae-6520-4436-1de7-08d67c4394ff
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jan 2019 06:18:22.3223
+X-MS-Exchange-CrossTenant-Network-Message-Id: e46baf60-fe4f-45a1-4653-08d67c43fb88
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jan 2019 06:21:14.2958
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
@@ -110,24 +110,21 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/17/19 11:18 AM, Omar Sandoval wrote:=0A=
-> On Thu, Jan 10, 2019 at 06:37:12PM +0900, Shin'ichiro Kawasaki wrote:=0A=
->> set_scheduler() function defined in common/multipath-over-rdma is useful=
-=0A=
->> to set up a specific IO scheduler not only for multipath tests but also=
-=0A=
->> for zoned block device tests. Move this function to common/rc to allow=
-=0A=
->> its use in test groups other than multipath.=0A=
+On 1/17/19 11:23 AM, Omar Sandoval wrote:=0A=
+> On Thu, Jan 10, 2019 at 06:37:13PM +0900, Shin'ichiro Kawasaki wrote:=0A=
+>> Fio zbd zone mode is necessary for zoned block devices. Introduce the=0A=
+>> helper function _have_fio_zbd_zonemode() to check that the installed=0A=
+>> fio version supports the option --zonemode=3Dzbd.=0A=
 > =0A=
-> The preferred way to set the scheduler is:=0A=
+> Testing version numbers is fragile. How about=0A=
 > =0A=
-> _test_dev_queue_set scheduler "$scheduler"=0A=
-> =0A=
-> This function is in the multipath tests because it was a preexisting=0A=
-> test suite which was merged into blktests.=0A=
+> if ! fio --cmdhelp=3Dzonemode | grep -q zbd; then=0A=
+> 	SKIP_REASON=3D"Fio version too old (does not support --zonemode=3Dzbd)"=
 =0A=
-OK. Will use _test_dev_queue_set instead.=0A=
+> 	return 1=0A=
+> fi=0A=
+=0A=
+OK. Will change as suggested. Thanks!=0A=
 =0A=
 -- =0A=
 Best Regards,=0A=
