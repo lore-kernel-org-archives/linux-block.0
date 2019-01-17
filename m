@@ -3,82 +3,123 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C37CC43387
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 00:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 001D7C43387
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 00:54:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 54C8420657
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 00:50:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE49A20657
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 00:54:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726098AbfAQAuN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Jan 2019 19:50:13 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:39402 "EHLO mx1.redhat.com"
+        id S1727055AbfAQAyy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Jan 2019 19:54:54 -0500
+Received: from smtp.infotech.no ([82.134.31.41]:45637 "EHLO smtp.infotech.no"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726119AbfAQAuN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Jan 2019 19:50:13 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A35578666E;
-        Thu, 17 Jan 2019 00:50:13 +0000 (UTC)
-Received: from segfault.boston.devel.redhat.com (unknown [10.18.25.74])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 035BC608E0;
-        Thu, 17 Jan 2019 00:50:12 +0000 (UTC)
-From:   Jeff Moyer <jmoyer@redhat.com>
-To:     axboe@kernel.dk
-Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
-        linux-block@vger.kernel.org
-Subject: [patch] io_uring: don't allow duplicate registrations
-X-PGP-KeyID: 1F78E1B4
-X-PGP-CertKey: F6FE 280D 8293 F72C 65FD  5A58 1FF8 A7CA 1F78 E1B4
-Date:   Wed, 16 Jan 2019 19:50:12 -0500
-Message-ID: <x497ef4hzuj.fsf@segfault.boston.devel.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        id S1726188AbfAQAyy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 16 Jan 2019 19:54:54 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by smtp.infotech.no (Postfix) with ESMTP id 48E7B204237;
+        Thu, 17 Jan 2019 01:54:51 +0100 (CET)
+X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
+Received: from smtp.infotech.no ([127.0.0.1])
+        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id ptcb4IXvIIvT; Thu, 17 Jan 2019 01:54:44 +0100 (CET)
+Received: from [192.168.48.23] (host-192.252-161-233.dyn.295.ca [192.252.161.233])
+        by smtp.infotech.no (Postfix) with ESMTPA id 64165204144;
+        Thu, 17 Jan 2019 01:54:42 +0100 (CET)
+Reply-To: dgilbert@interlog.com
+Subject: Re: [PATCH fix] scsi_lib: make sure scsi_request.sense valid
+To:     Bart Van Assche <bvanassche@acm.org>, hch@infradead.org,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     martin.petersen@oracle.com, jejb@linux.vnet.ibm.com
+References: <20190116155700.28967-1-dgilbert@interlog.com>
+ <1547682979.83374.126.camel@acm.org>
+From:   Douglas Gilbert <dgilbert@interlog.com>
+Message-ID: <023a9df4-8295-bf2e-ed3e-e191994b5fb1@interlog.com>
+Date:   Wed, 16 Jan 2019 19:54:39 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Thu, 17 Jan 2019 00:50:13 +0000 (UTC)
+In-Reply-To: <1547682979.83374.126.camel@acm.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, Jens,
+On 2019-01-16 6:56 p.m., Bart Van Assche wrote:
+> On Wed, 2019-01-16 at 10:57 -0500, Douglas Gilbert wrote:
+>> The block layer assumes scsi_request:sense is always a valid
+>> pointer. This is set up once in scsi_mq_init_request() and the
+>> containing scsi_cmnd object is used often, being re-initialized
+>> by scsi_init_command(). That works unless some code re-purposes
+>> part of the scsi_cmnd object for something else. And that is
+>> what bidi handling does in scsi_mq_prep_fn(). The result is an
+>> oops at some later time when the partly overwritten object is
+>> re-used. The overwrite is from d285203cf647d but 'git blame'
+>> does not show removed code, so that commit may not be the
+>> culprit.
+>>
+>> Signed-off-by: Douglas Gilbert <dgilbert@interlog.com>
+>> ---
+>>
+>> This was found while injecting errors (thus generating sense data)
+>> into a sequence of bidi commands. At some later time the block
+>> layer blew up with a scsi_request::sense NULL dereference in
+>> sg_rq_end_io(). Without testing I'm confident the bsg driver,
+>> the osd ULD and exofs are exposed to this bug.
+>>
+>>   drivers/scsi/scsi_lib.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+>> index b13cc9288ba0..71259bd4040a 100644
+>> --- a/drivers/scsi/scsi_lib.c
+>> +++ b/drivers/scsi/scsi_lib.c
+>> @@ -1175,6 +1175,7 @@ void scsi_init_command(struct scsi_device *dev, struct scsi_cmnd *cmd)
+>>   
+>>   	cmd->device = dev;
+>>   	cmd->sense_buffer = buf;
+>> +	cmd->req.sense = buf;
+>>   	cmd->prot_sdb = prot;
+>>   	cmd->flags = flags;
+>>   	INIT_DELAYED_WORK(&cmd->abort_work, scmd_eh_abort_handler);
+> 
+> Hi Doug,
+> 
+> The description of this patch does not look correct to me. scsi_init_command()
+> does not overwrite the sense pointer. From the body of that function:
+> 
+> 	/* zero out the cmd, except for the embedded scsi_request */
+> 	memset((char *)cmd + sizeof(cmd->req), 0,
+> 		sizeof(*cmd) - sizeof(cmd->req) + dev->host->hostt->cmd_size);
+> 
+> It is not clear to me which code overwrites the sense pointer. I think that
+> needs to be figured out before discussion of this patch can continue.
 
-It looks to me like calling io_uring_register more than once (for either
-IORING_REGISTER_BUFFERS or IORING_REGISTER_FILES) will leak the
-references taken in previous calls.
+Bart,
+Please re-read the explanation. The two sentences in the middle should tell
+you that you are looking at the wrong memset().
 
-Signed-off-by: Jeff Moyer <jmoyer@redhat.com>
+And I'm waiting for the person who wrote the questionable code to comment.
 
----
 
-If this makes sense to you, feel free to just fold this into your
-patches w/o any attribution.
+If you don't believe me, try sending a device reset to a scsi_debug device.
+Then use sg_raw *** to send a XDWRITREAD(10) bidi command to the same scsi_debug
+device, you should get a Unit Attention concerning that device reset. If
+you do, keep sending that bidi command. Make sure you have no important
+files open because that machine will lock solid. Basically what happens
+when a rq_end_io() callback de-references a NULL pointer. It looks like
+it has been there since 2014 and took me 2 days to find. Sorry that I can't
+explain it in one simple sentence.
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 3650e8b63a32..f0492b0e23a0 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -1399,6 +1399,9 @@ static int io_sqe_files_register(struct io_ring_ctx *ctx, void __user *arg,
- 	if (!nr_args)
- 		return -EINVAL;
- 
-+	if (ctx->user_files)
-+		return -EINVAL;
-+
- 	ctx->user_files = kcalloc(nr_args, sizeof(struct file *), GFP_KERNEL);
- 	if (!ctx->user_files)
- 		return -ENOMEM;
-@@ -1580,6 +1583,9 @@ static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
- 	if (!nr_args || nr_args > UIO_MAXIOV)
- 		return -EINVAL;
- 
-+	if (ctx->user_bufs)
-+		return -EINVAL;
-+
- 	ctx->user_bufs = kcalloc(nr_args, sizeof(struct io_mapped_ubuf),
- 					GFP_KERNEL);
- 	if (!ctx->user_bufs)
+Douglas
+
+
+*** Use 'man sg_raw' and see the EXAMPLES section (second to last example)
+     You can use a bsg device as shown.
+
+
