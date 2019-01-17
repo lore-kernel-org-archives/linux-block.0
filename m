@@ -2,240 +2,87 @@ Return-Path: <SRS0=sC6v=PZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=FAKE_REPLY_C,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBDCEC43387
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 21:34:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC1E0C43387
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 22:10:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AD38A20855
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 21:34:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="JIt1RAEh"
+	by mail.kernel.org (Postfix) with ESMTP id 898AB20868
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 22:10:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729682AbfAQVdR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Jan 2019 16:33:17 -0500
-Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:35202 "EHLO
-        mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727128AbfAQVdQ (ORCPT
+        id S1728288AbfAQWK3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Jan 2019 17:10:29 -0500
+Received: from bout01.mta.xmission.com ([166.70.11.15]:40063 "EHLO
+        bout01.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726898AbfAQWK2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Jan 2019 16:33:16 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id 96195A3980;
-        Thu, 17 Jan 2019 22:33:13 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1547760793; i=@fjfi.cvut.cz;
-        bh=zhDqzAiUIfAJYs/kqmBNjAqyV8MAuWGL2Hmgk0052M0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=JIt1RAEhrlgN9MENt633EFqpMCl++0clEIM259WfWrfIE7OYpCtFxSsVVsWYVxpOS
-         7FlRc52rrddJenOniuIVFAW3qMwoxL3GvVR8QjCQiOHy56aP0WeHAxiVTbfu+8uT89
-         tgF3WW6TEZ75r7B7s0+RWvNdaw/bXxhh8zTReAOg=
-X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
-Received: from mailgw1.fjfi.cvut.cz ([127.0.0.1])
-        by localhost (mailgw1.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id 5Y7l4MoZi5fy; Thu, 17 Jan 2019 22:33:06 +0100 (CET)
-Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 45EEDA395B;
-        Thu, 17 Jan 2019 22:33:06 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 45EEDA395B
-Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id 1BB5C6004E; Thu, 17 Jan 2019 22:33:06 +0100 (CET)
-From:   David Kozub <zub@linux.fjfi.cvut.cz>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
-        David Kozub <zub@linux.fjfi.cvut.cz>
-Subject: [PATCH v2 04/16] block: sed-opal: close parameter list in cmd_finalize
-Date:   Thu, 17 Jan 2019 22:31:44 +0100
-Message-Id: <1547760716-7304-5-git-send-email-zub@linux.fjfi.cvut.cz>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1547760716-7304-1-git-send-email-zub@linux.fjfi.cvut.cz>
-References: <1547760716-7304-1-git-send-email-zub@linux.fjfi.cvut.cz>
+        Thu, 17 Jan 2019 17:10:28 -0500
+X-Greylist: delayed 3381 seconds by postgrey-1.27 at vger.kernel.org; Thu, 17 Jan 2019 17:10:28 EST
+Received: from mx04.mta.xmission.com ([166.70.13.214])
+        by bout01.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.87)
+        (envelope-from <sbauer@plzdonthack.me>)
+        id 1gkEz5-0005TA-Uk; Thu, 17 Jan 2019 14:13:56 -0700
+Received: from plesk14-shared.xmission.com ([166.70.198.161] helo=plesk14.xmission.com)
+        by mx04.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.87)
+        (envelope-from <sbauer@plzdonthack.me>)
+        id 1gkEz5-0001Wh-DM; Thu, 17 Jan 2019 14:13:55 -0700
+Received: from hacktheplanet (unknown [66.244.75.217])
+        by plesk14.xmission.com (Postfix) with ESMTPSA id AEC64210DB9;
+        Thu, 17 Jan 2019 21:13:54 +0000 (UTC)
+Date:   Thu, 17 Jan 2019 16:13:52 -0500
+From:   Scott Bauer <sbauer@plzdonthack.me>
+To:     David Kozub <zub@linux.fjfi.cvut.cz>
+Cc:     linux-kernel@vger.kernel.org, hch@infradead.org,
+        jonathan.derrick@intel.com, linux-block@vger.kernel.org
+Message-ID: <20190117211306.GA29671@hacktheplanet>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-XM-SPF: eid=1gkEz5-0001Wh-DM;;;mid=<20190117211306.GA29671@hacktheplanet>;;;hst=mx04.mta.xmission.com;;;ip=166.70.198.161;;;frm=sbauer@plzdonthack.me;;;spf=none
+X-SA-Exim-Connect-IP: 166.70.198.161
+X-SA-Exim-Mail-From: sbauer@plzdonthack.me
+Subject: Re: [PATCH 00/16] block: sed-opal: support shadow MBR done flag and
+ write
+X-SA-Exim-Version: 4.2.1 (built Thu, 05 May 2016 13:38:54 -0600)
+X-SA-Exim-Scanned: Yes (on mx04.mta.xmission.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Every step ends by calling cmd_finalize (via finalize_and_send)
-yet every step adds the token OPAL_ENDLIST on its own. Moving
-this into cmd_finalize decreases code duplication.
+On Wed, Jan 16, 2019 at 09:56:51PM +0000, David Kozub wrote:
+>   block: sed-opal: rename next to execute_steps
 
-Co-authored-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
-Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
----
- block/sed-opal.c | 25 +++----------------------
- 1 file changed, 3 insertions(+), 22 deletions(-)
+I don't see this change anywhere on the lists. I have 0->15, but am missing 16/16.
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 980705681806..35b1747b650f 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -661,6 +661,9 @@ static int cmd_finalize(struct opal_dev *cmd, u32 hsn, u32 tsn)
- 	struct opal_header *hdr;
- 	int err = 0;
- 
-+	/* close parameter list */
-+	add_token_u8(&err, cmd, OPAL_ENDLIST);
-+
- 	add_token_u8(&err, cmd, OPAL_ENDOFDATA);
- 	add_token_u8(&err, cmd, OPAL_STARTLIST);
- 	add_token_u8(&err, cmd, 0);
-@@ -1079,7 +1082,6 @@ static int gen_key(struct opal_dev *dev, void *data)
- 	add_token_bytestring(&err, dev, opalmethod[OPAL_GENKEY],
- 			     OPAL_UID_LENGTH);
- 	add_token_u8(&err, dev, OPAL_STARTLIST);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building gen key command\n");
-@@ -1142,7 +1144,6 @@ static int get_active_key(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, 10); /* ActiveKey */
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	if (err) {
- 		pr_debug("Error building get active key command\n");
- 		return err;
-@@ -1188,7 +1189,6 @@ static int generic_lr_enable_disable(struct opal_dev *dev,
- 
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	return err;
- }
- 
-@@ -1254,8 +1254,6 @@ static int setup_locking_range(struct opal_dev *dev, void *data)
- 
- 		add_token_u8(&err, dev, OPAL_ENDLIST);
- 		add_token_u8(&err, dev, OPAL_ENDNAME);
--		add_token_u8(&err, dev, OPAL_ENDLIST);
--
- 	}
- 	if (err) {
- 		pr_debug("Error building Setup Locking range command.\n");
-@@ -1295,7 +1293,6 @@ static int start_generic_opal_session(struct opal_dev *dev,
- 
- 	switch (auth) {
- 	case OPAL_ANYBODY_UID:
--		add_token_u8(&err, dev, OPAL_ENDLIST);
- 		break;
- 	case OPAL_ADMIN1_UID:
- 	case OPAL_SID_UID:
-@@ -1308,7 +1305,6 @@ static int start_generic_opal_session(struct opal_dev *dev,
- 		add_token_bytestring(&err, dev, opaluid[auth],
- 				     OPAL_UID_LENGTH);
- 		add_token_u8(&err, dev, OPAL_ENDNAME);
--		add_token_u8(&err, dev, OPAL_ENDLIST);
- 		break;
- 	default:
- 		pr_debug("Cannot start Admin SP session with auth %d\n", auth);
-@@ -1406,7 +1402,6 @@ static int start_auth_opal_session(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, 3);
- 	add_token_bytestring(&err, dev, lk_ul_user, OPAL_UID_LENGTH);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building STARTSESSION command.\n");
-@@ -1429,7 +1424,6 @@ static int revert_tper(struct opal_dev *dev, void *data)
- 	add_token_bytestring(&err, dev, opalmethod[OPAL_REVERT],
- 			     OPAL_UID_LENGTH);
- 	add_token_u8(&err, dev, OPAL_STARTLIST);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	if (err) {
- 		pr_debug("Error building REVERT TPER command.\n");
- 		return err;
-@@ -1463,7 +1457,6 @@ static int internal_activate_user(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building Activate UserN command.\n");
-@@ -1490,7 +1483,6 @@ static int erase_locking_range(struct opal_dev *dev, void *data)
- 	add_token_bytestring(&err, dev, opalmethod[OPAL_ERASE],
- 			     OPAL_UID_LENGTH);
- 	add_token_u8(&err, dev, OPAL_STARTLIST);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building Erase Locking Range Command.\n");
-@@ -1521,7 +1513,6 @@ static int set_mbr_done(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error Building set MBR Done command\n");
-@@ -1553,7 +1544,6 @@ static int set_mbr_enable_disable(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error Building set MBR done command\n");
-@@ -1585,7 +1575,6 @@ static int generic_pw_cmd(u8 *key, size_t key_len, u8 *cpin_uid,
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	return err;
- }
-@@ -1694,7 +1683,6 @@ static int add_user_to_lr(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building add user to locking range command.\n");
-@@ -1755,7 +1743,6 @@ static int lock_unlock_locking_range(struct opal_dev *dev, void *data)
- 
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building SET command.\n");
-@@ -1843,11 +1830,8 @@ static int activate_lsp(struct opal_dev *dev, void *data)
- 		}
- 		add_token_u8(&err, dev, OPAL_ENDLIST);
- 		add_token_u8(&err, dev, OPAL_ENDNAME);
--		add_token_u8(&err, dev, OPAL_ENDLIST);
--
- 	} else {
- 		add_token_u8(&err, dev, OPAL_STARTLIST);
--		add_token_u8(&err, dev, OPAL_ENDLIST);
- 	}
- 
- 	if (err) {
-@@ -1904,7 +1888,6 @@ static int get_lsp_lifecycle(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, 6); /* Lifecycle Column */
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
-@@ -1964,8 +1947,6 @@ static int get_msid_cpin_pin(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, 4); /* End Column */
- 	add_token_u8(&err, dev, 3); /* Lifecycle Column */
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
--- 
-2.20.1
+Please resend v2 with the changes Christoph requested, so it's easier to review.
 
+Lastly, please CC me on the changes, and I will review them:
+sbauer@plzdonthack.me
+
+I don't work at Intel anymore -- maintainers never got updated.
+
+
+> Jonas Rabenstein (8):
+>   block: sed-opal: use correct macro for method length
+>   block: sed-opal: unify space check in add_token_*
+>   block: sed-opal: print failed function address
+>   block: sed-opal: split generation of bytestring header and content
+>   block: sed-opal: add ioctl for done-mark of shadow mbr
+>   block: sed-opal: ioctl for writing to shadow mbr
+>   block: sed-opal: unify retrieval of table columns
+>   block: sed-opal: check size of shadow mbr
+> 
+>  block/opal_proto.h            |  18 +
+>  block/sed-opal.c              | 843 +++++++++++++++++-----------------
+>  include/linux/sed-opal.h      |   2 +
+>  include/uapi/linux/sed-opal.h |   9 +
+>  4 files changed, 449 insertions(+), 423 deletions(-)
+> 
+> -- 
+> 2.20.1
