@@ -2,112 +2,109 @@ Return-Path: <SRS0=7Bp6=PY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCDBFC43387
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:56:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4EBBC43387
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:59:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A549A20675
-	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:56:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91C7E20578
+	for <linux-block@archiver.kernel.org>; Wed, 16 Jan 2019 23:59:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Qtq4Z6pY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727795AbfAPX4Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Jan 2019 18:56:24 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:32825 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727660AbfAPX4Y (ORCPT
+        id S1728014AbfAPX6z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Jan 2019 18:58:55 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:55852 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726398AbfAPX6z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Jan 2019 18:56:24 -0500
-Received: by mail-pg1-f194.google.com with SMTP id z11so3556843pgu.0;
-        Wed, 16 Jan 2019 15:56:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=4bOz8YlXJ8FLcF1hxh1wajCkXrSrJ+pb9Qicthv3D1s=;
-        b=BKjd/JwSoXRjpS0v9tcEFaKTXSj8VLs/97MAtcf5ABhjGfChJuYZ52whtEhcutUfJM
-         bTcNeKPHTaW/f9RjcbLSRGi55X4Jn4LwvxGbD/FT3n+AVPaRYnDWyJXxujP/nY9E+ci9
-         vZylvkF2UQB+jz652L79Fk/oImP8Eyz7AQ1p5HZoOFsgolkWyImYjbQJ1cKonOBl4XBH
-         mRvQMYFQ9hIhXeg338CXTKJRI/gw5C8UWR5mOzm0fT5iHeR5X8S7JLiT6ttFagevFmB7
-         LupxZySpFruqU34xsKZTUcSfeU5D8qYcLUXNqxFaGle8EsBtDoTbi5eVFO5YrG8yoj7I
-         JM4Q==
-X-Gm-Message-State: AJcUukcyelkUiCr7npe8DGf/KaeHPJhIaoNO9VRB/H5KldrN2fk6jCiF
-        xaGeHfzx9jfFe7iXIvvz4xo=
-X-Google-Smtp-Source: ALg8bN4ABiBxGFqmruaBZegi5y8N3+pDK5ojSejzoUOT0caf1OKEQ7k/Tmuqh9Jho/86k6pefs32xw==
-X-Received: by 2002:a62:6e07:: with SMTP id j7mr12815406pfc.135.1547682982563;
-        Wed, 16 Jan 2019 15:56:22 -0800 (PST)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id u70sm9828242pfa.176.2019.01.16.15.56.21
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 16 Jan 2019 15:56:21 -0800 (PST)
-Message-ID: <1547682979.83374.126.camel@acm.org>
-Subject: Re: [PATCH fix] scsi_lib: make sure scsi_request.sense valid
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Douglas Gilbert <dgilbert@interlog.com>, hch@infradead.org,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     martin.petersen@oracle.com, jejb@linux.vnet.ibm.com
-Date:   Wed, 16 Jan 2019 15:56:19 -0800
-In-Reply-To: <20190116155700.28967-1-dgilbert@interlog.com>
-References: <20190116155700.28967-1-dgilbert@interlog.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Wed, 16 Jan 2019 18:58:55 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0GNmx4K128574;
+        Wed, 16 Jan 2019 23:58:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=etc5YvJqwGSZnbtw4kuSRfxGnElE/rSPICQSIL85AVs=;
+ b=Qtq4Z6pYE6Ovkgt2VGUjrUqIDYpheLqmgG/5RMlCPvquBWAZTgBlMrZUZOR/h6gprzZw
+ bHXs/VmJRCTYed0/yWkKIoWiqacWNoOhsGFoHN9ZX8ee3qMTIM8BgWpE6nlUyxbn41NV
+ JLpOIpaix9ztqJ5QKEgBeD1E5sED4QYZbX0ylr4wdI2t8UHslo/giOUxAwD2rD0GCfis
+ HcQrCS73NjNb0p+tA/P212uDoXJtoRn8robanm7Ld+bnVg+wzgrZSnd9rbg57yKkAKJ6
+ BPh0CVqu2x/hACkRwb98jnPQ54RZV5sRHc6uiIs5lMG2YFmD8HxLEIdC+sQyhTLabSmq zw== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by userp2130.oracle.com with ESMTP id 2pybkcn0wb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Jan 2019 23:58:47 +0000
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x0GNwlmQ026587
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Jan 2019 23:58:47 GMT
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x0GNwks4028994;
+        Wed, 16 Jan 2019 23:58:47 GMT
+Received: from [10.182.71.41] (/10.182.71.41)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 16 Jan 2019 15:58:46 -0800
+Subject: Re: [Xen-devel] [PATCH v5 2/2] xen/blkback: rework connect_ring() to
+ avoid inconsistent xenstore 'ring-page-order' set by malicious blkfront
+To:     Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc:     axboe@kernel.dk, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, paul.durrant@citrix.com,
+        xen-devel@lists.xenproject.org, roger.pau@citrix.com
+References: <1546935350-20957-1-git-send-email-dongli.zhang@oracle.com>
+ <1546935350-20957-2-git-send-email-dongli.zhang@oracle.com>
+ <5c3760a1-4f45-a67b-3b70-80fa68ee4358@oracle.com>
+ <20190116163227.GC7892@char.us.oracle.com>
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+Message-ID: <982c7ac4-132f-739c-e296-bf874828c79c@oracle.com>
+Date:   Thu, 17 Jan 2019 08:01:05 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+MIME-Version: 1.0
+In-Reply-To: <20190116163227.GC7892@char.us.oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9138 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1901160190
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2019-01-16 at 10:57 -0500, Douglas Gilbert wrote:
-+AD4 The block layer assumes scsi+AF8-request:sense is always a valid
-+AD4 pointer. This is set up once in scsi+AF8-mq+AF8-init+AF8-request() and the
-+AD4 containing scsi+AF8-cmnd object is used often, being re-initialized
-+AD4 by scsi+AF8-init+AF8-command(). That works unless some code re-purposes
-+AD4 part of the scsi+AF8-cmnd object for something else. And that is
-+AD4 what bidi handling does in scsi+AF8-mq+AF8-prep+AF8-fn(). The result is an
-+AD4 oops at some later time when the partly overwritten object is
-+AD4 re-used. The overwrite is from d285203cf647d but 'git blame'
-+AD4 does not show removed code, so that commit may not be the
-+AD4 culprit.
-+AD4 
-+AD4 Signed-off-by: Douglas Gilbert +ADw-dgilbert+AEA-interlog.com+AD4
-+AD4 ---
-+AD4 
-+AD4 This was found while injecting errors (thus generating sense data)
-+AD4 into a sequence of bidi commands. At some later time the block
-+AD4 layer blew up with a scsi+AF8-request::sense NULL dereference in
-+AD4 sg+AF8-rq+AF8-end+AF8-io(). Without testing I'm confident the bsg driver,
-+AD4 the osd ULD and exofs are exposed to this bug.
-+AD4 
-+AD4  drivers/scsi/scsi+AF8-lib.c +AHw 1 +-
-+AD4  1 file changed, 1 insertion(+-)
-+AD4 
-+AD4 diff --git a/drivers/scsi/scsi+AF8-lib.c b/drivers/scsi/scsi+AF8-lib.c
-+AD4 index b13cc9288ba0..71259bd4040a 100644
-+AD4 --- a/drivers/scsi/scsi+AF8-lib.c
-+AD4 +-+-+- b/drivers/scsi/scsi+AF8-lib.c
-+AD4 +AEAAQA -1175,6 +-1175,7 +AEAAQA void scsi+AF8-init+AF8-command(struct scsi+AF8-device +ACo-dev, struct scsi+AF8-cmnd +ACo-cmd)
-+AD4  
-+AD4  	cmd-+AD4-device +AD0 dev+ADs
-+AD4  	cmd-+AD4-sense+AF8-buffer +AD0 buf+ADs
-+AD4 +-	cmd-+AD4-req.sense +AD0 buf+ADs
-+AD4  	cmd-+AD4-prot+AF8-sdb +AD0 prot+ADs
-+AD4  	cmd-+AD4-flags +AD0 flags+ADs
-+AD4  	INIT+AF8-DELAYED+AF8-WORK(+ACY-cmd-+AD4-abort+AF8-work, scmd+AF8-eh+AF8-abort+AF8-handler)+ADs
 
-Hi Doug,
 
-The description of this patch does not look correct to me. scsi+AF8-init+AF8-command()
-does not overwrite the sense pointer. From the body of that function:
+On 2019/1/17 上午12:32, Konrad Rzeszutek Wilk wrote:
+> On Tue, Jan 08, 2019 at 04:24:32PM +0800, Dongli Zhang wrote:
+>> oops. Please ignore this v5 patch.
+>>
+>> I just realized Linus suggested in an old email not use BUG()/BUG_ON() in the code.
+>>
+>> I will switch to the WARN() solution and resend again.
+> 
+> OK. Did I miss it?
 
-	/+ACo zero out the cmd, except for the embedded scsi+AF8-request +ACo-/
-	memset((char +ACo)cmd +- sizeof(cmd-+AD4-req), 0,
-		sizeof(+ACo-cmd) - sizeof(cmd-+AD4-req) +- dev-+AD4-host-+AD4-hostt-+AD4-cmd+AF8-size)+ADs
+Hi Konrad,
 
-It is not clear to me which code overwrites the sense pointer. I think that
-needs to be figured out before discussion of this patch can continue.
+If you are talking about the new patch set:
 
-Thanks,
+https://lists.xenproject.org/archives/html/xen-devel/2019-01/msg00977.html
+https://lists.xenproject.org/archives/html/xen-devel/2019-01/msg00978.html
 
-Bart.
+About Linus' suggestion:
+
+http://lkml.iu.edu/hypermail/linux/kernel/1610.0/00878.html
+
+Dongli Zhang
+
+> 
+> _______________________________________________
+> Xen-devel mailing list
+> Xen-devel@lists.xenproject.org
+> https://lists.xenproject.org/mailman/listinfo/xen-devel
+> 
