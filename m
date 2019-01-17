@@ -2,56 +2,56 @@ Return-Path: <SRS0=sC6v=PZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDA17C43444
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 21:34:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FB8DC43613
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 21:34:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8368420855
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 21:34:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA75B20855
+	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 21:34:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="GwD/ki0d"
+	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="DnUOl4CV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729831AbfAQVdi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Jan 2019 16:33:38 -0500
-Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:35736 "EHLO
+        id S1728254AbfAQVeK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Jan 2019 16:34:10 -0500
+Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:35540 "EHLO
         mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728440AbfAQVdi (ORCPT
+        with ESMTP id S1727171AbfAQVda (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Jan 2019 16:33:38 -0500
+        Thu, 17 Jan 2019 16:33:30 -0500
 Received: from localhost (localhost [127.0.0.1])
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id E8608A39B1;
-        Thu, 17 Jan 2019 22:33:35 +0100 (CET)
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id B0642A3997;
+        Thu, 17 Jan 2019 22:33:27 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1547760815; i=@fjfi.cvut.cz;
-        bh=2aYKtOf7uPxLMeotH69yBheZwMF+799kJZvQt8e0J3s=;
+        s=20151024; t=1547760807; i=@fjfi.cvut.cz;
+        bh=hoekDxEgp2sh9NBt3/ADRu57HmGBacwC1Yo6EWm4pRU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=GwD/ki0dq16mXnpINFFn0UdiItJOGyFnn4Au6roUPDUovGugf+TpFleCVeiQQhkxD
-         0is1mt/oWXRCsotrEO1zxVIRq8ua2puGdKxePJr+4e/q23x8AVfM3k+5/gyrgQG00B
-         fYio6jwVg/qRB+Rq2j8unfp+P0studWibUPCGbxA=
+        b=DnUOl4CVPYWq3vqiSC/TMziBcuKW5/tvpWDyJI7rUMgO8AhmwDo1lbzIT2GgYwP1F
+         Q/qtaQwURycGEflT64DLCY3/GRcu5/impN/oQ1rOzgAdrjkYuBqP6DExaL34DywFvj
+         xcTFeVKQhwLXzmdZffM0ZlvdvkzCem/g22xLW/w0=
 X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
 Received: from mailgw1.fjfi.cvut.cz ([127.0.0.1])
         by localhost (mailgw1.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id Z3EEa4kAssGF; Thu, 17 Jan 2019 22:33:27 +0100 (CET)
+        with ESMTP id kkkyuD2J6MCQ; Thu, 17 Jan 2019 22:33:20 +0100 (CET)
 Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 006EDA3985;
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 78C23A3971;
         Thu, 17 Jan 2019 22:33:12 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 006EDA3985
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 78C23A3971
 Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id D6B7B6004E; Thu, 17 Jan 2019 22:33:12 +0100 (CET)
+        id 4F58860050; Thu, 17 Jan 2019 22:33:11 +0100 (CET)
 From:   David Kozub <zub@linux.fjfi.cvut.cz>
 To:     Jens Axboe <axboe@kernel.dk>,
         Jonathan Derrick <jonathan.derrick@intel.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Subject: [PATCH v2 12/16] block: sed-opal: unify retrieval of table columns
-Date:   Thu, 17 Jan 2019 22:31:52 +0100
-Message-Id: <1547760716-7304-13-git-send-email-zub@linux.fjfi.cvut.cz>
+Subject: [PATCH v2 10/16] block: sed-opal: add ioctl for done-mark of shadow mbr
+Date:   Thu, 17 Jan 2019 22:31:50 +0100
+Message-Id: <1547760716-7304-11-git-send-email-zub@linux.fjfi.cvut.cz>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1547760716-7304-1-git-send-email-zub@linux.fjfi.cvut.cz>
 References: <1547760716-7304-1-git-send-email-zub@linux.fjfi.cvut.cz>
@@ -62,214 +62,99 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 
-Instead of having multiple places defining the same argument list to get
-a specific column of a sed-opal table, provide a generic version and
-call it from those functions.
+Enable users to mark the shadow mbr as done without completely
+deactivating the shadow mbr feature. This may be useful on reboots,
+when the power to the disk is not disconnected in between and the shadow
+mbr stores the required boot files. Of course, this saves also the
+(few) commands required to enable the feature if it is already enabled
+and one only wants to mark the shadow mbr as done.
 
 Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 ---
- block/opal_proto.h |   2 +
- block/sed-opal.c   | 132 +++++++++++++++++----------------------------
- 2 files changed, 50 insertions(+), 84 deletions(-)
+ block/sed-opal.c              | 33 +++++++++++++++++++++++++++++++--
+ include/linux/sed-opal.h      |  1 +
+ include/uapi/linux/sed-opal.h |  1 +
+ 3 files changed, 33 insertions(+), 2 deletions(-)
 
-diff --git a/block/opal_proto.h b/block/opal_proto.h
-index e20be8258854..b6e352cfe982 100644
---- a/block/opal_proto.h
-+++ b/block/opal_proto.h
-@@ -170,6 +170,8 @@ enum opal_token {
- 	OPAL_READLOCKED = 0x07,
- 	OPAL_WRITELOCKED = 0x08,
- 	OPAL_ACTIVEKEY = 0x0A,
-+	/* lockingsp table */
-+	OPAL_LIFECYCLE = 0x06,
- 	/* locking info table */
- 	OPAL_MAXRANGES = 0x04,
- 	 /* mbr control */
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index ee24e4e7ad6e..034cb940b34a 100644
+index db966bbc5a05..f85d9e53aab8 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
-@@ -1089,6 +1089,37 @@ static int finalize_and_send(struct opal_dev *dev, cont_fn cont)
- 	return opal_send_recv(dev, cont);
- }
- 
-+/*
-+ * request @column from table @table on device @dev. On success, the column
-+ * data will be available in dev->resp->tok[4]
-+ */
-+static int generic_get_column(struct opal_dev *dev, const u8 *table,
-+			      u64 column)
-+{
-+	int err;
+@@ -1996,13 +1996,39 @@ static int opal_erase_locking_range(struct opal_dev *dev,
+ static int opal_enable_disable_shadow_mbr(struct opal_dev *dev,
+ 					  struct opal_mbr_data *opal_mbr)
+ {
++	u8 token = opal_mbr->enable_disable == OPAL_MBR_ENABLE
++		? OPAL_TRUE : OPAL_FALSE;
+ 	const struct opal_step mbr_steps[] = {
+ 		{ opal_discovery0, },
+ 		{ start_admin1LSP_opal_session, &opal_mbr->key },
+-		{ set_mbr_done, &opal_mbr->enable_disable },
++		{ set_mbr_done, &token },
+ 		{ end_opal_session, },
+ 		{ start_admin1LSP_opal_session, &opal_mbr->key },
+-		{ set_mbr_enable_disable, &opal_mbr->enable_disable },
++		{ set_mbr_enable_disable, &token },
++		{ end_opal_session, },
++		{ NULL, }
++	};
++	int ret;
 +
-+	err = cmd_start(dev, table, opalmethod[OPAL_GET]);
++	if (opal_mbr->enable_disable != OPAL_MBR_ENABLE &&
++	    opal_mbr->enable_disable != OPAL_MBR_DISABLE)
++		return -EINVAL;
 +
-+	add_token_u8(&err, dev, OPAL_STARTLIST);
-+
-+	add_token_u8(&err, dev, OPAL_STARTNAME);
-+	add_token_u8(&err, dev, OPAL_STARTCOLUMN);
-+	add_token_u64(&err, dev, column);
-+	add_token_u8(&err, dev, OPAL_ENDNAME);
-+
-+	add_token_u8(&err, dev, OPAL_STARTNAME);
-+	add_token_u8(&err, dev, OPAL_ENDCOLUMN);
-+	add_token_u64(&err, dev, column);
-+	add_token_u8(&err, dev, OPAL_ENDNAME);
-+
-+	add_token_u8(&err, dev, OPAL_ENDLIST);
-+
-+	if (err)
-+		return err;
-+
-+	return finalize_and_send(dev, parse_and_check_status);
++	mutex_lock(&dev->dev_lock);
++	setup_opal_dev(dev, mbr_steps);
++	ret = next(dev);
++	mutex_unlock(&dev->dev_lock);
++	return ret;
 +}
 +
- static int gen_key(struct opal_dev *dev, void *data)
- {
- 	u8 uid[OPAL_UID_LENGTH];
-@@ -1143,23 +1174,11 @@ static int get_active_key(struct opal_dev *dev, void *data)
- 	if (err)
- 		return err;
- 
--	err = cmd_start(dev, uid, opalmethod[OPAL_GET]);
--	add_token_u8(&err, dev, OPAL_STARTLIST);
--	add_token_u8(&err, dev, OPAL_STARTNAME);
--	add_token_u8(&err, dev, 3); /* startCloumn */
--	add_token_u8(&err, dev, 10); /* ActiveKey */
--	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_STARTNAME);
--	add_token_u8(&err, dev, 4); /* endColumn */
--	add_token_u8(&err, dev, 10); /* ActiveKey */
--	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
--	if (err) {
--		pr_debug("Error building get active key command\n");
-+	err = generic_get_column(dev, uid, OPAL_ACTIVEKEY);
-+	if (err)
- 		return err;
--	}
- 
--	return finalize_and_send(dev, get_active_key_cont);
-+	return get_active_key_cont(dev);
- }
- 
- static int generic_lr_enable_disable(struct opal_dev *dev,
-@@ -1819,17 +1838,19 @@ static int activate_lsp(struct opal_dev *dev, void *data)
- 	return finalize_and_send(dev, parse_and_check_status);
- }
- 
--static int get_lsp_lifecycle_cont(struct opal_dev *dev)
-+/* Determine if we're in the Manufactured Inactive or Active state */
-+static int get_lsp_lifecycle(struct opal_dev *dev, void *data)
- {
- 	u8 lc_status;
--	int error = 0;
-+	int err;
- 
--	error = parse_and_check_status(dev);
--	if (error)
--		return error;
-+	err = generic_get_column(dev, opaluid[OPAL_LOCKINGSP_UID],
-+				 OPAL_LIFECYCLE);
-+	if (err)
-+		return err;
- 
- 	lc_status = response_get_u64(&dev->parsed, 4);
--	/* 0x08 is Manufacured Inactive */
-+	/* 0x08 is Manufactured Inactive */
- 	/* 0x09 is Manufactured */
- 	if (lc_status != OPAL_MANUFACTURED_INACTIVE) {
- 		pr_debug("Couldn't determine the status of the Lifecycle state\n");
-@@ -1839,49 +1860,19 @@ static int get_lsp_lifecycle_cont(struct opal_dev *dev)
- 	return 0;
- }
- 
--/* Determine if we're in the Manufactured Inactive or Active state */
--static int get_lsp_lifecycle(struct opal_dev *dev, void *data)
--{
--	int err;
--
--	err = cmd_start(dev, opaluid[OPAL_LOCKINGSP_UID],
--			opalmethod[OPAL_GET]);
--
--	add_token_u8(&err, dev, OPAL_STARTLIST);
--
--	add_token_u8(&err, dev, OPAL_STARTNAME);
--	add_token_u8(&err, dev, 3); /* Start Column */
--	add_token_u8(&err, dev, 6); /* Lifecycle Column */
--	add_token_u8(&err, dev, OPAL_ENDNAME);
--
--	add_token_u8(&err, dev, OPAL_STARTNAME);
--	add_token_u8(&err, dev, 4); /* End Column */
--	add_token_u8(&err, dev, 6); /* Lifecycle Column */
--	add_token_u8(&err, dev, OPAL_ENDNAME);
--
--	add_token_u8(&err, dev, OPAL_ENDLIST);
--
--	if (err) {
--		pr_debug("Error Building GET Lifecycle Status command\n");
--		return err;
--	}
--
--	return finalize_and_send(dev, get_lsp_lifecycle_cont);
--}
--
--static int get_msid_cpin_pin_cont(struct opal_dev *dev)
-+static int get_msid_cpin_pin(struct opal_dev *dev, void *data)
- {
- 	const char *msid_pin;
- 	size_t strlen;
--	int error = 0;
-+	int err;
- 
--	error = parse_and_check_status(dev);
--	if (error)
--		return error;
-+	err = generic_get_column(dev, opaluid[OPAL_C_PIN_MSID], OPAL_PIN);
-+	if (err)
-+		return err;
- 
- 	strlen = response_get_string(&dev->parsed, 4, &msid_pin);
- 	if (!msid_pin) {
--		pr_debug("%s: Couldn't extract PIN from response\n", __func__);
-+		pr_debug("Couldn't extract MSID_CPIN from response\n");
- 		return OPAL_INVAL_PARAM;
++static int opal_mbr_status(struct opal_dev *dev, struct opal_mbr_data *opal_mbr)
++{
++	u8 token = opal_mbr->enable_disable == OPAL_MBR_ENABLE
++		? OPAL_TRUE : OPAL_FALSE;
++	const struct opal_step mbr_steps[] = {
++		{ opal_discovery0, },
++		{ start_admin1LSP_opal_session, &opal_mbr->key },
++		{ set_mbr_done, &token },
+ 		{ end_opal_session, },
+ 		{ NULL, }
+ 	};
+@@ -2349,6 +2375,9 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+ 	case IOC_OPAL_ENABLE_DISABLE_MBR:
+ 		ret = opal_enable_disable_shadow_mbr(dev, p);
+ 		break;
++	case IOC_OPAL_MBR_STATUS:
++		ret = opal_mbr_status(dev, p);
++		break;
+ 	case IOC_OPAL_ERASE_LR:
+ 		ret = opal_erase_locking_range(dev, p);
+ 		break;
+diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
+index 04b124fca51e..b38dc602cae3 100644
+--- a/include/linux/sed-opal.h
++++ b/include/linux/sed-opal.h
+@@ -47,6 +47,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
+ 	case IOC_OPAL_ENABLE_DISABLE_MBR:
+ 	case IOC_OPAL_ERASE_LR:
+ 	case IOC_OPAL_SECURE_ERASE_LR:
++	case IOC_OPAL_MBR_STATUS:
+ 		return true;
  	}
+ 	return false;
+diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
+index 627624d35030..0cb9890cdc04 100644
+--- a/include/uapi/linux/sed-opal.h
++++ b/include/uapi/linux/sed-opal.h
+@@ -116,5 +116,6 @@ struct opal_mbr_data {
+ #define IOC_OPAL_ENABLE_DISABLE_MBR _IOW('p', 229, struct opal_mbr_data)
+ #define IOC_OPAL_ERASE_LR           _IOW('p', 230, struct opal_session_info)
+ #define IOC_OPAL_SECURE_ERASE_LR    _IOW('p', 231, struct opal_session_info)
++#define IOC_OPAL_MBR_STATUS         _IOW('p', 232, struct opal_mbr_data)
  
-@@ -1894,33 +1885,6 @@ static int get_msid_cpin_pin_cont(struct opal_dev *dev)
- 	return 0;
- }
- 
--static int get_msid_cpin_pin(struct opal_dev *dev, void *data)
--{
--	int err;
--
--	err = cmd_start(dev, opaluid[OPAL_C_PIN_MSID],
--			opalmethod[OPAL_GET]);
--
--	add_token_u8(&err, dev, OPAL_STARTLIST);
--	add_token_u8(&err, dev, OPAL_STARTNAME);
--	add_token_u8(&err, dev, 3); /* Start Column */
--	add_token_u8(&err, dev, 3); /* PIN */
--	add_token_u8(&err, dev, OPAL_ENDNAME);
--
--	add_token_u8(&err, dev, OPAL_STARTNAME);
--	add_token_u8(&err, dev, 4); /* End Column */
--	add_token_u8(&err, dev, 3); /* Lifecycle Column */
--	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
--
--	if (err) {
--		pr_debug("Error building Get MSID CPIN PIN command.\n");
--		return err;
--	}
--
--	return finalize_and_send(dev, get_msid_cpin_pin_cont);
--}
--
- static int end_opal_session(struct opal_dev *dev, void *data)
- {
- 	int err = 0;
+ #endif /* _UAPI_SED_OPAL_H */
 -- 
 2.20.1
 
