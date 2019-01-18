@@ -2,71 +2,73 @@ Return-Path: <SRS0=kGct=P2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 336E1C43387
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 12:58:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87785C43387
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 13:35:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E5EF420823
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 12:58:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C31520896
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 13:35:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ZGA3vA8n"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="xSVSBBBZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727803AbfARM6Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jan 2019 07:58:24 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:45697 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727724AbfARM6X (ORCPT
+        id S1727020AbfARNfd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jan 2019 08:35:33 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:34172 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727080AbfARNfd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jan 2019 07:58:23 -0500
-Received: by mail-pg1-f196.google.com with SMTP id y4so6019751pgc.12
-        for <linux-block@vger.kernel.org>; Fri, 18 Jan 2019 04:58:23 -0800 (PST)
+        Fri, 18 Jan 2019 08:35:33 -0500
+Received: by mail-pg1-f194.google.com with SMTP id j10so6096083pga.1
+        for <linux-block@vger.kernel.org>; Fri, 18 Jan 2019 05:35:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=La4xuNGy3TBKj3iIaP7RqSo6LwMxUU9aoIHLDKtG+Ws=;
-        b=ZGA3vA8n3fX/ThuJTQgHC4udM8nzDIuW9JVnkznOnR4L8iuHADN9JpzhphKeIQ4sMZ
-         BZ3JlZJfuEzVjsPOFIM0N69lCDRYDYc75o+fOnEgYfItIDgYH0pb+AKdRiJ+x9cCh/ud
-         TMIrfkOMaATQTijvYeo/OsaY4IGjRe5GL99nBWL4l7p5/6qwjGGgkGrzo6ZgYO7O5tqd
-         d9YXFCUerwGiGt9AJhkSYT+RDsH4Ur0WA3kHgr2UjQALP7egIaSjJYaIGc9WtPttGZF3
-         P4vRbyIF/XNiEZLQ6SHL9DkNX0QMB0yD+LtJMDd8ar4I8ttoPYL0/uhgPc3rsp/oPngx
-         48pQ==
+        bh=0XfBUH0h6UMegExJfFNoxqar+AsBx1JRamqr0+nxNYQ=;
+        b=xSVSBBBZMkxQKk2R2c552R4GY5GXtThhAu3xsEcMscb6Ba9xW00NLul3tHaOcshrR+
+         RmkVgoqsf2KhLlhs3S6eOyIa6Z3Vi+iFHiQ/uKhtkTCCblMWpyiNDmdrRQuRobkF/7zc
+         dmVudXPhXQ1iSI5UlLUmOVlUK/0Sbe9pTGWsaagZMHQq/837Y8vXg27tWb0lWEeP5zgJ
+         KT8KpAJ6TLpnWPdZTrCaxOC7VpN2AP91GwY96g0uhh2xQVOyj97EYnLpVYpsv/KmkFQS
+         sqajQDZ4wscBoDY12KMCgJzTKjwoHt7X6d+QPxHp+rG7WkZsBeGiLUxo/oE4kODz/Zzm
+         Vl2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=La4xuNGy3TBKj3iIaP7RqSo6LwMxUU9aoIHLDKtG+Ws=;
-        b=cG8nVUGXM5kl5FvQv4xr11nU0N0fX7xTfTzikz1z2zDmEhy9hRVyggMBb+CN4KE4GO
-         vkel1WyKcJqq8/1SEuc1Gi7VKAK0Yas9HykIE55MiOI/nQrWupD4ufrcnnjYEbYBspY7
-         iKSJWMBDSRg3pi/EQJprSZ0fG+easQfFl2GIgi4mpP65HtdB327fDqQDfbzlBDwkdU3W
-         y+3RWSOn78+xnfl07vauBZ2Wstnkcp0FtlxW/jKI9wM21l5U2VZWRp5H+giH7NVUPV8h
-         kmP0AcunkWkzntXlkkUGK+yxwwGZppoWYtWshPU2Y9O3/OadwmSyKiVhrqGa1REJ4P7+
-         KWZQ==
-X-Gm-Message-State: AJcUukcjwBiSIS9aPaL4Uasxo8nhLwjHQDiS3PXJbPoYAlFc06ygpj9F
-        qKcmBxRXWpPPCTPvySG1dhbTB7qjJvsfGQ==
-X-Google-Smtp-Source: ALg8bN4kI56R1k+qmKv7FWidBGPh7cNK+PbytMpv+Kpah5TFJep0AYhedbX8uKfVQUpc3xek7xAcsQ==
-X-Received: by 2002:a62:6408:: with SMTP id y8mr19104367pfb.202.1547816302508;
-        Fri, 18 Jan 2019 04:58:22 -0800 (PST)
+        bh=0XfBUH0h6UMegExJfFNoxqar+AsBx1JRamqr0+nxNYQ=;
+        b=susXLsUVsTyS/tS6Tx8PScXpWUOexfZUpL4MyhOqIOWbNytQB6656C13JPkkUVO8rI
+         qCSuvEvDEpJloie7YujGdjJ3ToLzBsii9/DJN51HlV5pytLKGZrFosXP252807Hg13aW
+         iJQslhCJS1n0U+UCh+tiGYR89ywYkjKF67lxGcJkdU50Ujh1PvyDogDttOlbEuKIsBDE
+         z6PRJhAD3HVidooY6aXhd6BAOVHyHXJlwdCZoXv7+e7OFjnvvdf8PsKwdyuC5t5TK3FV
+         uSc+xwwLF2AG5vMt5alK8G1mSwyYIikcKQuB5HaDpOFktJDTrh4eeIipDqyUcAYzvCmu
+         405g==
+X-Gm-Message-State: AJcUuke9i0ggvTrC3k8I/TMoeZaP7kATEO55JwPxL+70zDWEamY37mxC
+        wky5DCFP2mR0VI0dD4naQF0J6g==
+X-Google-Smtp-Source: ALg8bN657NAG2e9wuKo26Z+vlGdKTIfVboS5bVlKmFVyVfjp/4JQD3cbb2nU+sSA+XsFler5+zjJ4A==
+X-Received: by 2002:a63:8e43:: with SMTP id k64mr17551699pge.346.1547818532211;
+        Fri, 18 Jan 2019 05:35:32 -0800 (PST)
 Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id l5sm10300593pgu.86.2019.01.18.04.58.20
+        by smtp.gmail.com with ESMTPSA id m19sm12315464pgn.35.2019.01.18.05.35.28
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 18 Jan 2019 04:58:21 -0800 (PST)
-Subject: Re: [PATCH] blk-iolatency: fix IO hang due to negative inflight
- counter
-To:     Liu Bo <bo.liu@linux.alibaba.com>, linux-block@vger.kernel.org
-Cc:     Josef Bacik <josef@toxicpanda.com>
-References: <20190114192137.111275-1-bo.liu@linux.alibaba.com>
+        Fri, 18 Jan 2019 05:35:30 -0800 (PST)
+Subject: Re: [PATCH BUGFIX RFC 0/2] reverting two commits causing freezes
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ulf.hansson@linaro.org, linus.walleij@linaro.org,
+        broonie@kernel.org, bfq-iosched@googlegroups.com,
+        oleksandr@natalenko.name, hurikhan77+bko@gmail.com
+References: <20190118115219.63576-1-paolo.valente@linaro.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <16ab732a-6537-3627-52ed-05013188a3f5@kernel.dk>
-Date:   Fri, 18 Jan 2019 05:58:18 -0700
+Message-ID: <c3b182a2-7f82-2860-436b-c1d59d6661ff@kernel.dk>
+Date:   Fri, 18 Jan 2019 06:35:28 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <20190114192137.111275-1-bo.liu@linux.alibaba.com>
+In-Reply-To: <20190118115219.63576-1-paolo.valente@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,49 +77,92 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/14/19 12:21 PM, Liu Bo wrote:
-> Our test reported the following stack, and vmcore showed that
-> ->inflight counter is -1.
-> 
-> [ffffc9003fcc38d0] __schedule at ffffffff8173d95d
-> [ffffc9003fcc3958] schedule at ffffffff8173de26
-> [ffffc9003fcc3970] io_schedule at ffffffff810bb6b6
-> [ffffc9003fcc3988] blkcg_iolatency_throttle at ffffffff813911cb
-> [ffffc9003fcc3a20] rq_qos_throttle at ffffffff813847f3
-> [ffffc9003fcc3a48] blk_mq_make_request at ffffffff8137468a
-> [ffffc9003fcc3b08] generic_make_request at ffffffff81368b49
-> [ffffc9003fcc3b68] submit_bio at ffffffff81368d7d
-> [ffffc9003fcc3bb8] ext4_io_submit at ffffffffa031be00 [ext4]
-> [ffffc9003fcc3c00] ext4_writepages at ffffffffa03163de [ext4]
-> [ffffc9003fcc3d68] do_writepages at ffffffff811c49ae
-> [ffffc9003fcc3d78] __filemap_fdatawrite_range at ffffffff811b6188
-> [ffffc9003fcc3e30] filemap_write_and_wait_range at ffffffff811b6301
-> [ffffc9003fcc3e60] ext4_sync_file at ffffffffa030cee8 [ext4]
-> [ffffc9003fcc3ea8] vfs_fsync_range at ffffffff8128594b
-> [ffffc9003fcc3ee8] do_fsync at ffffffff81285abd
-> [ffffc9003fcc3f18] sys_fsync at ffffffff81285d50
-> [ffffc9003fcc3f28] do_syscall_64 at ffffffff81003c04
-> [ffffc9003fcc3f50] entry_SYSCALL_64_after_swapgs at ffffffff81742b8e
-> 
-> The ->inflight counter may be negative (-1) if
-> 
-> 0) blk-throttle had been enabled when the IO was issued, so its bio
-> has a associated blkg,
-> 
-> 1) blk-iolatency was disabled when the IO was issued, so iolatency_grp
-> in this blkg was not available by then,
-> 
-> 2) blk-iolatency was enabled before this IO reached its endio, so that
-> iolatency_grp became available when the IO did the endio.
-> 
-> 3) the ->inflight counter is decreased from 0 to -1.
-> 
-> This uses atomic_dec_is_positive() instead to avoid the negative
-> inflight counter.
+On 1/18/19 4:52 AM, Paolo Valente wrote:
+> Hi Jens,
+> a user reported a warning, followed by freezes, in case he increases
+> nr_requests to more than 64 [1]. After reproducing the issues, I
+> reverted the commit f0635b8a416e ("bfq: calculate shallow depths at
+> init time"), plus the related commit bd7d4ef6a4c9 ("bfq-iosched:
+> remove unused variable"). The problem went away.
 
-The problem with that is that it'll hide a lot of other issues, too.
-Any way we can either track if this rqw is in flight, and only dec
-if it is, or quiesce when enabling?
+For reverts, please put the justification into the actual revert
+commit. With this series, if applied as-is, we'd have two patches
+in the tree that just says "revert X" without any hint as to why
+that was done.
+
+> Maybe the assumption in commit f0635b8a416e ("bfq: calculate shallow
+> depths at init time") does not hold true?
+
+It apparently doesn't! But let's try and figure this out instead of
+blindly reverting it. OK, I think I see it. For the sched_tags
+case, when we grow the requests, we allocate a new set. Hence any
+old cache would be stale at that point.
+
+How about something like this? It still keeps the code of having
+to update this out of the hot IO path, and only calls it when we
+actually change the depths.
+
+Totally untested...
+
+
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index cd307767a134..b09589915667 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5342,7 +5342,7 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
+ 	return min_shallow;
+ }
+ 
+-static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
++static void bfq_depth_updated(struct blk_mq_hw_ctx *hctx)
+ {
+ 	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
+ 	struct blk_mq_tags *tags = hctx->sched_tags;
+@@ -5350,6 +5350,11 @@ static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
+ 
+ 	min_shallow = bfq_update_depths(bfqd, &tags->bitmap_tags);
+ 	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, min_shallow);
++}
++
++static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
++{
++	bfq_depth_updated(hctx);
+ 	return 0;
+ }
+ 
+@@ -5772,6 +5777,7 @@ static struct elevator_type iosched_bfq_mq = {
+ 		.requests_merged	= bfq_requests_merged,
+ 		.request_merged		= bfq_request_merged,
+ 		.has_work		= bfq_has_work,
++		.depth_updated		= bfq_depth_updated,
+ 		.init_hctx		= bfq_init_hctx,
+ 		.init_sched		= bfq_init_queue,
+ 		.exit_sched		= bfq_exit_queue,
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3ba37b9e15e9..a047b297ade5 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3101,6 +3101,8 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ 		}
+ 		if (ret)
+ 			break;
++		if (q->elevator && q->elevator->type->ops.depth_updated)
++			q->elevator->type->ops.depth_updated(hctx);
+ 	}
+ 
+ 	if (!ret)
+diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+index 2e9e2763bf47..6e8bc53740f0 100644
+--- a/include/linux/elevator.h
++++ b/include/linux/elevator.h
+@@ -31,6 +31,7 @@ struct elevator_mq_ops {
+ 	void (*exit_sched)(struct elevator_queue *);
+ 	int (*init_hctx)(struct blk_mq_hw_ctx *, unsigned int);
+ 	void (*exit_hctx)(struct blk_mq_hw_ctx *, unsigned int);
++	void (*depth_updated)(struct blk_mq_hw_ctx *);
+ 
+ 	bool (*allow_merge)(struct request_queue *, struct request *, struct bio *);
+ 	bool (*bio_merge)(struct blk_mq_hw_ctx *, struct bio *);
 
 -- 
 Jens Axboe
