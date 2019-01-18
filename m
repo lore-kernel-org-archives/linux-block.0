@@ -2,137 +2,204 @@ Return-Path: <SRS0=kGct=P2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66B0BC5ACD5
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 17:12:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2932CC07EBF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 17:24:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 30BDF20896
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 17:12:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1AFD20823
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 17:24:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="Th71br3Z"
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="dw8SHWcc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728474AbfARRME (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jan 2019 12:12:04 -0500
-Received: from mail-yb1-f193.google.com ([209.85.219.193]:34647 "EHLO
-        mail-yb1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727986AbfARRME (ORCPT
+        id S1727448AbfARRYh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jan 2019 12:24:37 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46658 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727791AbfARRYg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jan 2019 12:12:04 -0500
-Received: by mail-yb1-f193.google.com with SMTP id a35so865704ybi.1
-        for <linux-block@vger.kernel.org>; Fri, 18 Jan 2019 09:12:03 -0800 (PST)
+        Fri, 18 Jan 2019 12:24:36 -0500
+Received: by mail-wr1-f67.google.com with SMTP id l9so15926081wrt.13
+        for <linux-block@vger.kernel.org>; Fri, 18 Jan 2019 09:24:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=Yy+kA1vOcpZaoYU+BJnjwo66nMUhjetEBGne753c72A=;
-        b=Th71br3ZIWXqVzix6cgs4EeSsv+xZXidib55aVqQUFpIORoaL9eEyI+jdw9DYNy2Vm
-         dMd+CEYfN4qH6+bf9keQ9WSuYj4dBThoBqp5TJ/r54ikGiDXX/7l9ibumrPShSvu2+7W
-         ABGAi58TH1HWfI8RHeBrRZjfw3xTQZPv0l1ElSyrepx4kE6QyEUkYLFBgokvNoFZQeCn
-         IicncPHrv/+NmxcS5xH1F5Rebp7X3IesmBhbTulPF2Xh6vOL1wwrXj9XNdq9N8BfWLKB
-         sPWUi5x+0hcdUaA0UJcauRrws7VwpN2Bb+UaeSyt2QyoW6JhUZS1rrKAXr1IIJSLeAhn
-         gxbA==
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=LdL19VvuwiQZZQ+oXgplGPEqEZFpfJRXauSkt/RaFu0=;
+        b=dw8SHWcckTunJdkNoFnXE9/1uLqJo1Ul0ji/kVYmUGizIdZsq5AtLEVZKRZQmTU6q4
+         Oyle3luglOWNJhxQVbllJcj7mzXylQlO+0uFFT1bAt5XJ2X7BtYk+bOws30Z0VECps1h
+         /fxxUUxgJ1vl9h/rOz7i090tg2UzohxHLBq1I=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Yy+kA1vOcpZaoYU+BJnjwo66nMUhjetEBGne753c72A=;
-        b=eFtuoQGx7fClyOXR/Psb7e0Bb9FPs7zvGAp0mU2IqilrTTOWYBkH/qaTVcJ17B821p
-         /t26MN9p9LF+wsQDU9zCotbJ5OXF5l3SaeP5Bc6/dc+eyPyJRME2RFdrZud8SGtcLyYe
-         508QCj/3qKGN0kCFnpuYxQFVCKfxS/j8d/P+BXIp83+BVcKQnkC4B1zgsag+MFJ1QSZ4
-         ehe/NUGNtaEJnmFQVavWliEU+3YT70ZRP5DbxdzwNzzHusxDKhylYJGLVJABs8Omq2jc
-         5dmz1dPz5qA8GhUcy3r0ta9WLmyRy9+iNO4YQuDQvzH0rrvvE16hszj09PvEKkUDgGqS
-         1jqw==
-X-Gm-Message-State: AJcUukcCkFrAA5wnDilzTW/2JrspNA03xf4kybja4i5bHxf/KTcyuqLU
-        X7oSAingw7RUnw6NL22q6mIEbA==
-X-Google-Smtp-Source: ALg8bN7rpXGav+dYODwSoU2wNCw7ChIV9gDr9NTz+Es094wrvwWpTup3fl/CbO59pi+bwGV3Q6KLVA==
-X-Received: by 2002:a5b:107:: with SMTP id 7mr7215248ybx.518.1547831522851;
-        Fri, 18 Jan 2019 09:12:02 -0800 (PST)
-Received: from localhost ([2620:10d:c091:180::1:e09e])
-        by smtp.gmail.com with ESMTPSA id t129sm2239884ywe.11.2019.01.18.09.12.01
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=LdL19VvuwiQZZQ+oXgplGPEqEZFpfJRXauSkt/RaFu0=;
+        b=oynSKeb/wGpTM+5jk0pjrUWa+RJNxnnVylE0SsVCAytQS2DvEVMPIZBQBQsWH9ehMX
+         qnlPS+axng6OgdUOuuk5GtKdZqARjrD3IPYySPLZy1dZ6O2tnpEjcuWiw/h68DAqwFOe
+         rezhQS9Z9qGQPTU4rqSKSkI4BG5SIy4Qj+CificgOBY3Peux9vzWCisPsjNaBq22NcbB
+         Yj/oYmKNLg5M+AuPWvwe/KjWF2P2lWmsR8NXQmtXGPqA0/xJRmzDCFnfsyPFDrbvjsbK
+         GGbbsfk+900KvCm4nVRbfzqIMrEm1zNfuWNOr8y/W2fhWasgfQ9gHZ5j+R91knLafoeH
+         pXaw==
+X-Gm-Message-State: AJcUukdmN3w0FYqdrIQc8yifaAT7r5YPsc2g5S4v9w8CPrsuUF5m5u+5
+        jx63QWfX32/Zmr94t2n2h9bnbg==
+X-Google-Smtp-Source: ALg8bN4Dl+CL/2xjoCyOnR1Xdx4SElgTQLwfilZORA/roIRlMyjSJyXcbf3BEXk5LyPL908EzT9JDw==
+X-Received: by 2002:adf:eec9:: with SMTP id a9mr17041395wrp.242.1547832274351;
+        Fri, 18 Jan 2019 09:24:34 -0800 (PST)
+Received: from [192.168.43.112] ([37.162.17.17])
+        by smtp.gmail.com with ESMTPSA id c129sm29970547wma.48.2019.01.18.09.24.33
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 18 Jan 2019 09:12:02 -0800 (PST)
-Date:   Fri, 18 Jan 2019 12:12:01 -0500
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Josef Bacik <josef@toxicpanda.com>,
-        Andrea Righi <righi.andrea@gmail.com>,
-        Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jens Axboe <axboe@kernel.dk>, Vivek Goyal <vgoyal@redhat.com>,
-        Dennis Zhou <dennis@kernel.org>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/3] cgroup: fsio throttle controller
-Message-ID: <20190118171200.bxpvzeuwwiwpviet@macbook-pro-91.dhcp.thefacebook.com>
-References: <20190118103127.325-1-righi.andrea@gmail.com>
- <20190118163530.w5wpzpjkcnkektsp@macbook-pro-91.dhcp.thefacebook.com>
- <F576C256-A032-4E62-99EA-F60162B6E069@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <F576C256-A032-4E62-99EA-F60162B6E069@linaro.org>
-User-Agent: NeoMutt/20180716
+        Fri, 18 Jan 2019 09:24:33 -0800 (PST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: [PATCH BUGFIX RFC 0/2] reverting two commits causing freezes
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <c3b182a2-7f82-2860-436b-c1d59d6661ff@kernel.dk>
+Date:   Fri, 18 Jan 2019 18:24:31 +0100
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Mark Brown <broonie@kernel.org>,
+        'Paolo Valente' via bfq-iosched 
+        <bfq-iosched@googlegroups.com>, oleksandr@natalenko.name,
+        hurikhan77+bko@gmail.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <D212BCED-49BD-47F0-AF7F-0CCDBC82D131@linaro.org>
+References: <20190118115219.63576-1-paolo.valente@linaro.org>
+ <c3b182a2-7f82-2860-436b-c1d59d6661ff@kernel.dk>
+To:     Jens Axboe <axboe@kernel.dk>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 18, 2019 at 06:07:45PM +0100, Paolo Valente wrote:
-> 
-> 
-> > Il giorno 18 gen 2019, alle ore 17:35, Josef Bacik <josef@toxicpanda.com> ha scritto:
-> > 
-> > On Fri, Jan 18, 2019 at 11:31:24AM +0100, Andrea Righi wrote:
-> >> This is a redesign of my old cgroup-io-throttle controller:
-> >> https://lwn.net/Articles/330531/
-> >> 
-> >> I'm resuming this old patch to point out a problem that I think is still
-> >> not solved completely.
-> >> 
-> >> = Problem =
-> >> 
-> >> The io.max controller works really well at limiting synchronous I/O
-> >> (READs), but a lot of I/O requests are initiated outside the context of
-> >> the process that is ultimately responsible for its creation (e.g.,
-> >> WRITEs).
-> >> 
-> >> Throttling at the block layer in some cases is too late and we may end
-> >> up slowing down processes that are not responsible for the I/O that
-> >> is being processed at that level.
-> > 
-> > How so?  The writeback threads are per-cgroup and have the cgroup stuff set
-> > properly.  So if you dirty a bunch of pages, they are associated with your
-> > cgroup, and then writeback happens and it's done in the writeback thread
-> > associated with your cgroup and then that is throttled.  Then you are throttled
-> > at balance_dirty_pages() because the writeout is taking longer.
-> > 
-> 
-> IIUC, Andrea described this problem: certain processes in a certain group dirty a
-> lot of pages, causing write back to start.  Then some other blameless
-> process in the same group experiences very high latency, in spite of
-> the fact that it has to do little I/O.
-> 
 
-In that case the io controller isn't doing it's job and needs to be fixed (or
-reconfigured).  io.latency guards against this, I assume io.max would keep this
-from happening if it were configured properly.
 
-> Does your blk_cgroup_congested() stuff solves this issue?
-> 
-> Or simply I didn't get what Andrea meant at all :)
-> 
+> Il giorno 18 gen 2019, alle ore 14:35, Jens Axboe <axboe@kernel.dk> ha =
+scritto:
+>=20
+> On 1/18/19 4:52 AM, Paolo Valente wrote:
+>> Hi Jens,
+>> a user reported a warning, followed by freezes, in case he increases
+>> nr_requests to more than 64 [1]. After reproducing the issues, I
+>> reverted the commit f0635b8a416e ("bfq: calculate shallow depths at
+>> init time"), plus the related commit bd7d4ef6a4c9 ("bfq-iosched:
+>> remove unused variable"). The problem went away.
+>=20
+> For reverts, please put the justification into the actual revert
+> commit. With this series, if applied as-is, we'd have two patches
+> in the tree that just says "revert X" without any hint as to why
+> that was done.
+>=20
 
-I _think_ Andrea is talking about the fact that we can generate IO indirectly
-and never get throttled for it, which is what blk_cgroup_congested() is meant to
-address.  I added it specifically because some low prio task was just allocating
-all of the memory on the system and causing a lot of pressure because of
-swapping, but there was no direct feedback loop there.  blk_cgroup_congested()
-provides that feedback loop.
+I forget to say explicitly that these patches were meant only to give
+you and anybody else something concrete to test and check.
 
-Course I could be wrong too and we're all just talking past each other ;).
+With me you're as safe as houses, in terms of amount of comments in
+final patches :)
+
+>> Maybe the assumption in commit f0635b8a416e ("bfq: calculate shallow
+>> depths at init time") does not hold true?
+>=20
+> It apparently doesn't! But let's try and figure this out instead of
+> blindly reverting it.
+
+Totally agree.
+
+> OK, I think I see it. For the sched_tags
+> case, when we grow the requests, we allocate a new set. Hence any
+> old cache would be stale at that point.
+>=20
+
+ok
+
+> How about something like this? It still keeps the code of having
+> to update this out of the hot IO path, and only calls it when we
+> actually change the depths.
+>=20
+
+Looks rather clean and efficient.
+
+> Totally untested...
+>=20
+
+It seems to work here too.
+
 Thanks,
+Paolo
 
-Josef
+>=20
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index cd307767a134..b09589915667 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -5342,7 +5342,7 @@ static unsigned int bfq_update_depths(struct =
+bfq_data *bfqd,
+> 	return min_shallow;
+> }
+>=20
+> -static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int =
+index)
+> +static void bfq_depth_updated(struct blk_mq_hw_ctx *hctx)
+> {
+> 	struct bfq_data *bfqd =3D hctx->queue->elevator->elevator_data;
+> 	struct blk_mq_tags *tags =3D hctx->sched_tags;
+> @@ -5350,6 +5350,11 @@ static int bfq_init_hctx(struct blk_mq_hw_ctx =
+*hctx, unsigned int index)
+>=20
+> 	min_shallow =3D bfq_update_depths(bfqd, &tags->bitmap_tags);
+> 	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, =
+min_shallow);
+> +}
+> +
+> +static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int =
+index)
+> +{
+> +	bfq_depth_updated(hctx);
+> 	return 0;
+> }
+>=20
+> @@ -5772,6 +5777,7 @@ static struct elevator_type iosched_bfq_mq =3D {
+> 		.requests_merged	=3D bfq_requests_merged,
+> 		.request_merged		=3D bfq_request_merged,
+> 		.has_work		=3D bfq_has_work,
+> +		.depth_updated		=3D bfq_depth_updated,
+> 		.init_hctx		=3D bfq_init_hctx,
+> 		.init_sched		=3D bfq_init_queue,
+> 		.exit_sched		=3D bfq_exit_queue,
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 3ba37b9e15e9..a047b297ade5 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3101,6 +3101,8 @@ int blk_mq_update_nr_requests(struct =
+request_queue *q, unsigned int nr)
+> 		}
+> 		if (ret)
+> 			break;
+> +		if (q->elevator && q->elevator->type->ops.depth_updated)
+> +			q->elevator->type->ops.depth_updated(hctx);
+> 	}
+>=20
+> 	if (!ret)
+> diff --git a/include/linux/elevator.h b/include/linux/elevator.h
+> index 2e9e2763bf47..6e8bc53740f0 100644
+> --- a/include/linux/elevator.h
+> +++ b/include/linux/elevator.h
+> @@ -31,6 +31,7 @@ struct elevator_mq_ops {
+> 	void (*exit_sched)(struct elevator_queue *);
+> 	int (*init_hctx)(struct blk_mq_hw_ctx *, unsigned int);
+> 	void (*exit_hctx)(struct blk_mq_hw_ctx *, unsigned int);
+> +	void (*depth_updated)(struct blk_mq_hw_ctx *);
+>=20
+> 	bool (*allow_merge)(struct request_queue *, struct request *, =
+struct bio *);
+> 	bool (*bio_merge)(struct blk_mq_hw_ctx *, struct bio *);
+>=20
+> --=20
+> Jens Axboe
+>=20
+
