@@ -2,70 +2,79 @@ Return-Path: <SRS0=kGct=P2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 888EAC07EBF
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 17:34:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7580C07EBF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 17:36:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5BED820823
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 17:34:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1BD820823
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 17:36:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="n6yTvmKl"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="RzNmViVD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728070AbfARReT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jan 2019 12:34:19 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:45746 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727527AbfARReT (ORCPT
+        id S1727895AbfARRgM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jan 2019 12:36:12 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:33425 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727527AbfARRgL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jan 2019 12:34:19 -0500
-Received: by mail-pl1-f194.google.com with SMTP id a14so6624277plm.12
-        for <linux-block@vger.kernel.org>; Fri, 18 Jan 2019 09:34:19 -0800 (PST)
+        Fri, 18 Jan 2019 12:36:11 -0500
+Received: by mail-pf1-f195.google.com with SMTP id c123so6944989pfb.0
+        for <linux-block@vger.kernel.org>; Fri, 18 Jan 2019 09:36:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=iv/8tGr2QG8tvDKiAW6NKCoBq5ytclf3WOxCL3sDLtM=;
-        b=n6yTvmKl5CbACq7QWT0zEWdNhNqeMxKCZyDCV4JGIiz2n7jIHj8kMBkdXSDO/wCObe
-         y3CM5iglj8rEgzWZ6FzZ0Toj3IFvhE8YV0uVPy7cxPZrZFGbtzvuGM/uur/cEDbh9yHu
-         VtX6++71kjON1nW6yQJlaUW8/wBTzhp8uNEpvIAsseL1wgRPL561kK3rM8Y0+3jdAJuw
-         lUpaZcrrWp98LqZoYfZ19JMGrGzw35qG5NaSmy8kRkwXHNGi8M6CcQ6m/60n5WRfHgjz
-         li6NztSMSejsIuTaodwZdt61NA2Mxf74GbDjAHC67mWl9chy9YeYDiKS3/ETzKiPPnhK
-         GNXQ==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=bKSIFPBF+v78PFDhVKvKQmlvYTfQ3KGZScyZBkJNyYA=;
+        b=RzNmViVDZ6s3sPiW8khVjfgCqssaD0LbgUC01YUT3P/a5TMHIQLq1XwbMo3ZEK6WF7
+         2M22D963crPSZ4FkSFUru+ipDN4+35hNKFrsyLc2Ltj+uFQK1l8kcqlWiW6DzALSt5EZ
+         zkYinm3hCpxdpHZQPq3Bku9PHFk4TOmaL/796JKq+XMGmk3sAz29njyLxW5LvWlxQkvU
+         FoPWN8n5Hv7Hd3CpzyX9+RY0UzDY7nlzXyZsPZF6XOQSTyHJfStic+bt6PbRMjoPPUs8
+         49L0Byrx+TxF2liUSRbG8HPRAQLnNESWuVJKKPUbVP2PieDNKO26+HaW+ktOseYLpbHa
+         3uaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=iv/8tGr2QG8tvDKiAW6NKCoBq5ytclf3WOxCL3sDLtM=;
-        b=J8fqddTy6Y4yUDxJ14C56vQDeDRLO3evd/cy9C4r4BbcCtkIk0MQtv99I+eTC86DeY
-         4OBxMCLPQCY8ZyaTij0s951F7waZ+BRKxX42My+JAEI3uj7bBhETEixxLKmw5MKpLGar
-         lfIV7dY3zk5W4d2wc0E1jIyAnWK0iPvga7ZVJf7Z0CMEW/MscYTbvz3Y6JIjs3elRd0R
-         H05jSqBUuIfw8AKcekQTYnDwEBODCmCrUEM2qkpAy7COGMHyABKl9J3pRiYybXwm4RNa
-         S/JSJEBFMRW2z0QukIFNpesCtC/EOoqXCFrUKZlcu7k1hXdoER70/QhILb/ZmJYywqFa
-         +OGw==
-X-Gm-Message-State: AJcUukc9Oz2XVb5JCDCyXn4qsPH3AoXKugzJ3NO0E7qxEWytvMw9gFWt
-        sZtEV2c0kOcQYit+yOrobe+wSdRUL1lOgw==
-X-Google-Smtp-Source: ALg8bN4TvKRZ1qL6s1QKv0TJ2DPTsztvslWOVH5Sbwq4Xx4M9i0YsAzmKgu1gOQP1WkPgiTZkh/fLA==
-X-Received: by 2002:a17:902:722:: with SMTP id 31mr20119562pli.271.1547832859047;
-        Fri, 18 Jan 2019 09:34:19 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=bKSIFPBF+v78PFDhVKvKQmlvYTfQ3KGZScyZBkJNyYA=;
+        b=BOB24z8rxnhwAKscPd2M+4w1Yv6aIt//SbWgSCBZb1o7oHnQSVPn3ymY45z8+4spC8
+         kC+WlAAF1geHQy8YIJPTiNPFwq8lEypn5CiTHbya5FUIv8iQ8mEHjpNwNwDGHOJsXOxW
+         t2USgvgerDW66pwMWtLIx9QsWg0B9EQT7DVMjKiWgRnqhOXGQmDf98ik8WFVlVxuFC0O
+         hwwelNa/Ci4fraZqxAh6f285+NMhW6+dlKvN2xXSpn0enZfYkeVJbsA51dFbxlvtimv6
+         Dx7iPfLSh/LG8zMh7N1HBy8XyTkP5EGUHuJj4uSiAhN50vIbGAQW51otopTZrWfQ1jgS
+         2ozA==
+X-Gm-Message-State: AJcUukdBCHc4lFtZ2rOXocgT+eUJQFlxPLCHUcrSGSUkjKlQQ573cGcx
+        dhrNh/SF2oDy2/+AorsyQUBMNg==
+X-Google-Smtp-Source: ALg8bN6WJQUSS1F/PUYr83VMHwRnUptYxZkVBOWfekzvKPsLmqP7Xd+GZcnQUZ0//hz7KeuGEspUVQ==
+X-Received: by 2002:a63:6b05:: with SMTP id g5mr18113653pgc.15.1547832970989;
+        Fri, 18 Jan 2019 09:36:10 -0800 (PST)
 Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id c7sm7839400pfh.18.2019.01.18.09.34.17
+        by smtp.gmail.com with ESMTPSA id z191sm6069460pgd.74.2019.01.18.09.36.08
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 18 Jan 2019 09:34:18 -0800 (PST)
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     Paolo Valente <paolo.valente@linaro.org>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Fri, 18 Jan 2019 09:36:10 -0800 (PST)
+Subject: Re: [PATCH BUGFIX RFC 0/2] reverting two commits causing freezes
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Mark Brown <broonie@kernel.org>,
+        'Paolo Valente' via bfq-iosched 
+        <bfq-iosched@googlegroups.com>, oleksandr@natalenko.name,
         hurikhan77+bko@gmail.com
+References: <20190118115219.63576-1-paolo.valente@linaro.org>
+ <c3b182a2-7f82-2860-436b-c1d59d6661ff@kernel.dk>
+ <D212BCED-49BD-47F0-AF7F-0CCDBC82D131@linaro.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: bfq: update internal depth state when queue depth changes
-Message-ID: <013ca038-559d-0a56-4d49-366c7ec79ac3@kernel.dk>
-Date:   Fri, 18 Jan 2019 10:34:16 -0700
+Message-ID: <c71255da-c142-8ea1-2dc4-840a6581689b@kernel.dk>
+Date:   Fri, 18 Jan 2019 10:36:07 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
+In-Reply-To: <D212BCED-49BD-47F0-AF7F-0CCDBC82D131@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,78 +83,64 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A previous commit moved the shallow depth and BFQ depth map calculations
-to be done at init time, moving it outside of the hotter IO path. This
-potentially causes hangs if the users changes the depth of the scheduler
-map, by writing to the 'nr_requests' sysfs file for that device.
+On 1/18/19 10:24 AM, Paolo Valente wrote:
+> 
+> 
+>> Il giorno 18 gen 2019, alle ore 14:35, Jens Axboe <axboe@kernel.dk> ha scritto:
+>>
+>> On 1/18/19 4:52 AM, Paolo Valente wrote:
+>>> Hi Jens,
+>>> a user reported a warning, followed by freezes, in case he increases
+>>> nr_requests to more than 64 [1]. After reproducing the issues, I
+>>> reverted the commit f0635b8a416e ("bfq: calculate shallow depths at
+>>> init time"), plus the related commit bd7d4ef6a4c9 ("bfq-iosched:
+>>> remove unused variable"). The problem went away.
+>>
+>> For reverts, please put the justification into the actual revert
+>> commit. With this series, if applied as-is, we'd have two patches
+>> in the tree that just says "revert X" without any hint as to why
+>> that was done.
+>>
+> 
+> I forget to say explicitly that these patches were meant only to give
+> you and anybody else something concrete to test and check.
+> 
+> With me you're as safe as houses, in terms of amount of comments in
+> final patches :)
 
-Add a blk-mq-sched hook that allows blk-mq to inform the scheduler if
-the depth changes, so that the scheduler can update its internal state.
+It's almost an example of the classic case of "if you want a real
+solution to a problem, post a knowingly bad and half assed solution".
+That always gets people out of the woodwork :-)
 
-Reported-by: Paolo Valente <paolo.valente@linaro.org>
-Fixes: f0635b8a416e ("bfq: calculate shallow depths at init time")
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
+>>> Maybe the assumption in commit f0635b8a416e ("bfq: calculate shallow
+>>> depths at init time") does not hold true?
+>>
+>> It apparently doesn't! But let's try and figure this out instead of
+>> blindly reverting it.
+> 
+> Totally agree.
+> 
+>> OK, I think I see it. For the sched_tags
+>> case, when we grow the requests, we allocate a new set. Hence any
+>> old cache would be stale at that point.
+>>
+> 
+> ok
+> 
+>> How about something like this? It still keeps the code of having
+>> to update this out of the hot IO path, and only calls it when we
+>> actually change the depths.
+>>
+> 
+> Looks rather clean and efficient.
+> 
+>> Totally untested...
+>>
+> 
+> It seems to work here too.
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index cd307767a134..b09589915667 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5342,7 +5342,7 @@ static unsigned int bfq_update_depths(struct bfq_data *bfqd,
- 	return min_shallow;
- }
+OK good, I've posted it "officially" now.
  
--static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
-+static void bfq_depth_updated(struct blk_mq_hw_ctx *hctx)
- {
- 	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
- 	struct blk_mq_tags *tags = hctx->sched_tags;
-@@ -5350,6 +5350,11 @@ static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
- 
- 	min_shallow = bfq_update_depths(bfqd, &tags->bitmap_tags);
- 	sbitmap_queue_min_shallow_depth(&tags->bitmap_tags, min_shallow);
-+}
-+
-+static int bfq_init_hctx(struct blk_mq_hw_ctx *hctx, unsigned int index)
-+{
-+	bfq_depth_updated(hctx);
- 	return 0;
- }
- 
-@@ -5772,6 +5777,7 @@ static struct elevator_type iosched_bfq_mq = {
- 		.requests_merged	= bfq_requests_merged,
- 		.request_merged		= bfq_request_merged,
- 		.has_work		= bfq_has_work,
-+		.depth_updated		= bfq_depth_updated,
- 		.init_hctx		= bfq_init_hctx,
- 		.init_sched		= bfq_init_queue,
- 		.exit_sched		= bfq_exit_queue,
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3ba37b9e15e9..a047b297ade5 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3101,6 +3101,8 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
- 		}
- 		if (ret)
- 			break;
-+		if (q->elevator && q->elevator->type->ops.depth_updated)
-+			q->elevator->type->ops.depth_updated(hctx);
- 	}
- 
- 	if (!ret)
-diff --git a/include/linux/elevator.h b/include/linux/elevator.h
-index 2e9e2763bf47..6e8bc53740f0 100644
---- a/include/linux/elevator.h
-+++ b/include/linux/elevator.h
-@@ -31,6 +31,7 @@ struct elevator_mq_ops {
- 	void (*exit_sched)(struct elevator_queue *);
- 	int (*init_hctx)(struct blk_mq_hw_ctx *, unsigned int);
- 	void (*exit_hctx)(struct blk_mq_hw_ctx *, unsigned int);
-+	void (*depth_updated)(struct blk_mq_hw_ctx *);
- 
- 	bool (*allow_merge)(struct request_queue *, struct request *, struct bio *);
- 	bool (*bio_merge)(struct blk_mq_hw_ctx *, struct bio *);
-
 -- 
 Jens Axboe
 
