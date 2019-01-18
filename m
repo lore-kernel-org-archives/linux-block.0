@@ -5,55 +5,55 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C89CC43387
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 10:32:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CFFC43387
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 10:32:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 21B682087E
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 10:32:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F37C2087E
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 10:32:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d5qrVfAn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uZF7UkoW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727128AbfARKbz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jan 2019 05:31:55 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45031 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726442AbfARKbr (ORCPT
+        id S1726927AbfARKbp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jan 2019 05:31:45 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:36870 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726442AbfARKbo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jan 2019 05:31:47 -0500
-Received: by mail-wr1-f67.google.com with SMTP id z5so14366169wrt.11;
-        Fri, 18 Jan 2019 02:31:45 -0800 (PST)
+        Fri, 18 Jan 2019 05:31:44 -0500
+Received: by mail-wr1-f68.google.com with SMTP id s12so14417442wrt.4;
+        Fri, 18 Jan 2019 02:31:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=bJZKyQhLGckyRl2vzdSeAHUxaeeCyICyHV3vsVcaZAA=;
-        b=d5qrVfAnwhDEn+LzYX2TWatO8uiaaxy6O0cBzq+14zoPcHkCGIBBhHCk3xDxdN+wO5
-         y1quHDCeReugFONlqY9U2oIBpR/lb3JY+aHzY9n9/2M552/QjsQTOibPdGTC7ueCj4uK
-         bRtf7SfmM/4KEGY15qvgh8Jj8wPOJL2CbfTfcxgdkWyQOgjWNxDtBPHJAchCGDVGSwGy
-         ZpWrZ2a3w8/T7Ep9ya+c9WNQF3uE4A1v1dWF9Y34kCtDky5wRfSKZ7En743NC08HNV75
-         gXb5HxZ2y9gFJuZtYSer2c3E+kuHvVRvuXJLEint2oBiRMJ149H15Bu4mTU1fUkmft16
-         S52g==
+        bh=ydxFy/2Bm4LOh73jyZznaFZU/ozC3N50GLlK25DN1HY=;
+        b=uZF7UkoWqAOS8InqNGoU+Xy56e0FXChmxbtUDcxGtitnfvoq5J69RWhz0T4GLa1XN7
+         ic2JWQNYvNwQ7FNdzgTmFlYPuyuMYePIvJOTAkt1rq1qv3npOIlJKnEnuduR5WWdHEMU
+         MlEV6xYWBmZqHHmJfgKOCTyUrPl9QLTy0f69SqrgJg39k0nzLx+lxkK10qryRH6si66h
+         SstsLC8pwuIVUh/PIvbFTJRHxY8UMxObgeOZiAcdSLK0QxKEj/cCnxFDfynRiCt2uUpM
+         bEcteokvSKR89Sej9dLKUFm5hBLlwGls8IDK7sEpaqI46nshsh4x2VRpezr1CsIKYPsC
+         DZKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=bJZKyQhLGckyRl2vzdSeAHUxaeeCyICyHV3vsVcaZAA=;
-        b=hKNjWxen3WFW2kQoDLDdAj+ktQk6SZOv1yilFG72APM98u8bGce0aHI2Arq7WgQESB
-         5BO4saFALrr5wSZErm3hzkDGrGlmtLnhyMe0ala/cKtLHMyD7XJ+G9iu2qBhNktX8jDH
-         uEORNR4DgCd1BhItdsevB7TrwjJdZp13lA6X6JO1miwkhtutBwUpifAAOpT5d7jnfiQm
-         gszNH2EaJzo3Yjh8FsSZmlWwE9D5j99JbihEwO/2OPJsnyJHsmI5RtqdZlTrdCH0QKRE
-         lLNGmnF6uj/1GJ8bWzVmhVrlsifKYxdDvQmJlKvP05aDwMGBVV5vvZGw6ZR+Xb1gPeYK
-         xTSQ==
-X-Gm-Message-State: AJcUukfMjfKeMhtMcZ7V4S6PMW4iLFYQ+Z8iEhb0dPJd35NSIHqEe7nt
-        TTa/Vz19A/4Zq30m41U9/oni8/ZU5g==
-X-Google-Smtp-Source: ALg8bN6+dR8Gm8adN2uvkLNU3TTIY3oILo8+c+B5cOsI1VgTDmM/IdpNYfpy5fdjIMFX05KLyQoYvg==
-X-Received: by 2002:adf:fc51:: with SMTP id e17mr15561451wrs.268.1547807504711;
-        Fri, 18 Jan 2019 02:31:44 -0800 (PST)
+        bh=ydxFy/2Bm4LOh73jyZznaFZU/ozC3N50GLlK25DN1HY=;
+        b=no6shRfODKRhls8Nd2L1gll5YLEpOcGXu5HmjXFTxvZcWpmifjPbaMbhnRgUQvVQsE
+         2S6Kg93f0+ijoBRN+/xYL0jJdGBWcvlZ7D6txByP2nS6WRcppRCosTjylFfCHqvoukog
+         ITsVzC8aEiRGxhT4ebVawalGutPBCtMUdMRL4Mn3p9+T0ENdVP5G6p7sG4DedfppTCgQ
+         PENIe4hRQRu6V/KkQerLsNWxOqyQ0BLrc0TLdpUrV8AaymDtmidCdBAmeiUDyfDKYHTc
+         gPFejT2aLQVSyxSJLIuvFW4lCnfTFbTRpUzoii+dkUa2e7vNVvvxF2cDXMW6k+xG2Cam
+         Tkww==
+X-Gm-Message-State: AJcUukfGl3/jZlg7Tlbvwokm3iX5H7olqvT8yD2AjjtZbIYIv6g1fs4p
+        b6dbkrbkCR2IGU6L4Ry51g==
+X-Google-Smtp-Source: ALg8bN6Cqcrjp3e6Cz7WFU23YJq5O2/aUYTSzUeLmqK15QNrqZLmKt7cMABpfofO0GTuS7A/NCqhPg==
+X-Received: by 2002:adf:ee46:: with SMTP id w6mr16290136wro.261.1547807502038;
+        Fri, 18 Jan 2019 02:31:42 -0800 (PST)
 Received: from xps-13.homenet.telecomitalia.it (host89-130-dynamic.43-79-r.retail.telecomitalia.it. [79.43.130.89])
-        by smtp.gmail.com with ESMTPSA id g9sm39949652wmg.44.2019.01.18.02.31.43
+        by smtp.gmail.com with ESMTPSA id g9sm39949652wmg.44.2019.01.18.02.31.40
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 18 Jan 2019 02:31:44 -0800 (PST)
+        Fri, 18 Jan 2019 02:31:41 -0800 (PST)
 From:   Andrea Righi <righi.andrea@gmail.com>
 To:     Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
         Johannes Weiner <hannes@cmpxchg.org>
@@ -62,9 +62,9 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Vivek Goyal <vgoyal@redhat.com>,
         Dennis Zhou <dennis@kernel.org>, cgroups@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Andrea Righi <righi.andrea@gmail.com>
-Subject: [RFC PATCH 3/3] fsio-throttle: instrumentation
-Date:   Fri, 18 Jan 2019 11:31:27 +0100
-Message-Id: <20190118103127.325-4-righi.andrea@gmail.com>
+Subject: [RFC PATCH 1/3] fsio-throttle: documentation
+Date:   Fri, 18 Jan 2019 11:31:25 +0100
+Message-Id: <20190118103127.325-2-righi.andrea@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190118103127.325-1-righi.andrea@gmail.com>
 References: <20190118103127.325-1-righi.andrea@gmail.com>
@@ -73,219 +73,163 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Apply the fsio controller to the opportune kernel functions to evaluate
-and throttle filesystem I/O.
+Document the filesystem I/O controller: description, usage, design,
+etc.
 
 Signed-off-by: Andrea Righi <righi.andrea@gmail.com>
 ---
- block/blk-core.c          | 10 ++++++++++
- include/linux/writeback.h |  7 ++++++-
- mm/filemap.c              | 20 +++++++++++++++++++-
- mm/page-writeback.c       | 14 ++++++++++++--
- 4 files changed, 47 insertions(+), 4 deletions(-)
+ Documentation/cgroup-v1/fsio-throttle.txt | 142 ++++++++++++++++++++++
+ 1 file changed, 142 insertions(+)
+ create mode 100644 Documentation/cgroup-v1/fsio-throttle.txt
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 3c5f61ceeb67..4b4717f64ac1 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -16,6 +16,7 @@
- #include <linux/backing-dev.h>
- #include <linux/bio.h>
- #include <linux/blkdev.h>
-+#include <linux/fsio-throttle.h>
- #include <linux/blk-mq.h>
- #include <linux/highmem.h>
- #include <linux/mm.h>
-@@ -956,6 +957,15 @@ generic_make_request_checks(struct bio *bio)
- 	 */
- 	create_io_context(GFP_ATOMIC, q->node);
- 
-+	/*
-+	 * Account only READs at this layer (WRITEs are accounted and throttled
-+	 * in balance_dirty_pages()) and don't enfore sleeps (state=0): in this
-+	 * way we can prevent potential lock contentions and priority inversion
-+	 * problems at the filesystem layer.
-+	 */
-+	if (bio_op(bio) == REQ_OP_READ)
-+		fsio_throttle(bio_dev(bio), bio->bi_iter.bi_size, 0);
+diff --git a/Documentation/cgroup-v1/fsio-throttle.txt b/Documentation/cgroup-v1/fsio-throttle.txt
+new file mode 100644
+index 000000000000..4f33cae2adea
+--- /dev/null
++++ b/Documentation/cgroup-v1/fsio-throttle.txt
+@@ -0,0 +1,142 @@
 +
- 	if (!blkcg_bio_issue_check(q, bio))
- 		return false;
- 
-diff --git a/include/linux/writeback.h b/include/linux/writeback.h
-index 738a0c24874f..1e161c7969e5 100644
---- a/include/linux/writeback.h
-+++ b/include/linux/writeback.h
-@@ -356,7 +356,12 @@ void global_dirty_limits(unsigned long *pbackground, unsigned long *pdirty);
- unsigned long wb_calc_thresh(struct bdi_writeback *wb, unsigned long thresh);
- 
- void wb_update_bandwidth(struct bdi_writeback *wb, unsigned long start_time);
--void balance_dirty_pages_ratelimited(struct address_space *mapping);
++                 Filesystem I/O throttling controller
 +
-+#define balance_dirty_pages_ratelimited(__mapping) \
-+	__balance_dirty_pages_ratelimited(__mapping, false)
-+void __balance_dirty_pages_ratelimited(struct address_space *mapping,
-+				       bool redirty);
++----------------------------------------------------------------------
++1. OVERVIEW
 +
- bool wb_over_bg_thresh(struct bdi_writeback *wb);
- 
- typedef int (*writepage_t)(struct page *page, struct writeback_control *wbc,
-diff --git a/mm/filemap.c b/mm/filemap.c
-index 9f5e323e883e..5cc0959274d6 100644
---- a/mm/filemap.c
-+++ b/mm/filemap.c
-@@ -29,6 +29,7 @@
- #include <linux/backing-dev.h>
- #include <linux/pagevec.h>
- #include <linux/blkdev.h>
-+#include <linux/fsio-throttle.h>
- #include <linux/security.h>
- #include <linux/cpuset.h>
- #include <linux/hugetlb.h>
-@@ -2040,6 +2041,7 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
- {
- 	struct file *filp = iocb->ki_filp;
- 	struct address_space *mapping = filp->f_mapping;
-+	struct block_device *bdev = as_to_bdev(mapping);
- 	struct inode *inode = mapping->host;
- 	struct file_ra_state *ra = &filp->f_ra;
- 	loff_t *ppos = &iocb->ki_pos;
-@@ -2068,6 +2070,7 @@ static ssize_t generic_file_buffered_read(struct kiocb *iocb,
- 
- 		cond_resched();
- find_page:
-+		fsio_throttle(bdev_to_dev(bdev), 0, TASK_INTERRUPTIBLE);
- 		if (fatal_signal_pending(current)) {
- 			error = -EINTR;
- 			goto out;
-@@ -2308,11 +2311,17 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
- 	if (iocb->ki_flags & IOCB_DIRECT) {
- 		struct file *file = iocb->ki_filp;
- 		struct address_space *mapping = file->f_mapping;
-+		struct block_device *bdev = as_to_bdev(mapping);
- 		struct inode *inode = mapping->host;
- 		loff_t size;
- 
- 		size = i_size_read(inode);
- 		if (iocb->ki_flags & IOCB_NOWAIT) {
-+			unsigned long long sleep;
++This controller allows to limit filesystem I/O of mounted devices of specific
++process containers (cgroups [1]) enforcing delays to the processes that exceed
++the limits defined for their cgroup.
 +
-+			sleep = fsio_throttle(bdev_to_dev(bdev), 0, 0);
-+			if (sleep)
-+				return -EAGAIN;
- 			if (filemap_range_has_page(mapping, iocb->ki_pos,
- 						   iocb->ki_pos + count - 1))
- 				return -EAGAIN;
-@@ -2322,6 +2331,7 @@ generic_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
- 					        iocb->ki_pos + count - 1);
- 			if (retval < 0)
- 				goto out;
-+			fsio_throttle(bdev_to_dev(bdev), 0, TASK_INTERRUPTIBLE);
- 		}
- 
- 		file_accessed(file);
-@@ -2366,9 +2376,11 @@ EXPORT_SYMBOL(generic_file_read_iter);
- static int page_cache_read(struct file *file, pgoff_t offset, gfp_t gfp_mask)
- {
- 	struct address_space *mapping = file->f_mapping;
-+	struct block_device *bdev = as_to_bdev(mapping);
- 	struct page *page;
- 	int ret;
- 
-+	fsio_throttle(bdev_to_dev(bdev), 0, TASK_INTERRUPTIBLE);
- 	do {
- 		page = __page_cache_alloc(gfp_mask);
- 		if (!page)
-@@ -2498,11 +2510,15 @@ vm_fault_t filemap_fault(struct vm_fault *vmf)
- 	 */
- 	page = find_get_page(mapping, offset);
- 	if (likely(page) && !(vmf->flags & FAULT_FLAG_TRIED)) {
-+		struct block_device *bdev = as_to_bdev(mapping);
- 		/*
- 		 * We found the page, so try async readahead before
- 		 * waiting for the lock.
- 		 */
- 		do_async_mmap_readahead(vmf->vma, ra, file, page, offset);
-+		if (unlikely(!PageUptodate(page)))
-+			fsio_throttle(bdev_to_dev(bdev), 0,
-+				      TASK_INTERRUPTIBLE);
- 	} else if (!page) {
- 		/* No page in the page cache at all */
- 		do_sync_mmap_readahead(vmf->vma, ra, file, offset);
-@@ -3172,6 +3188,7 @@ ssize_t generic_perform_write(struct file *file,
- 	long status = 0;
- 	ssize_t written = 0;
- 	unsigned int flags = 0;
-+	unsigned int dirty;
- 
- 	do {
- 		struct page *page;
-@@ -3216,6 +3233,7 @@ ssize_t generic_perform_write(struct file *file,
- 		copied = iov_iter_copy_from_user_atomic(page, i, offset, bytes);
- 		flush_dcache_page(page);
- 
-+		dirty = PageDirty(page);
- 		status = a_ops->write_end(file, mapping, pos, bytes, copied,
- 						page, fsdata);
- 		if (unlikely(status < 0))
-@@ -3241,7 +3259,7 @@ ssize_t generic_perform_write(struct file *file,
- 		pos += copied;
- 		written += copied;
- 
--		balance_dirty_pages_ratelimited(mapping);
-+		__balance_dirty_pages_ratelimited(mapping, dirty);
- 	} while (iov_iter_count(i));
- 
- 	return written ? written : status;
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 7d1010453fb9..694ede8783f3 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -20,6 +20,7 @@
- #include <linux/slab.h>
- #include <linux/pagemap.h>
- #include <linux/writeback.h>
-+#include <linux/fsio-throttle.h>
- #include <linux/init.h>
- #include <linux/backing-dev.h>
- #include <linux/task_io_accounting_ops.h>
-@@ -1858,10 +1859,12 @@ DEFINE_PER_CPU(int, dirty_throttle_leaks) = 0;
-  * limit we decrease the ratelimiting by a lot, to prevent individual processes
-  * from overshooting the limit by (ratelimit_pages) each.
-  */
--void balance_dirty_pages_ratelimited(struct address_space *mapping)
-+void __balance_dirty_pages_ratelimited(struct address_space *mapping,
-+				       bool redirty)
- {
- 	struct inode *inode = mapping->host;
- 	struct backing_dev_info *bdi = inode_to_bdi(inode);
-+	struct block_device *bdev = as_to_bdev(mapping);
- 	struct bdi_writeback *wb = NULL;
- 	int ratelimit;
- 	int *p;
-@@ -1878,6 +1881,13 @@ void balance_dirty_pages_ratelimited(struct address_space *mapping)
- 	if (wb->dirty_exceeded)
- 		ratelimit = min(ratelimit, 32 >> (PAGE_SHIFT - 10));
- 
-+	/*
-+	 * Throttle filesystem I/O only if page was initially clean: re-writing
-+	 * a dirty page doesn't generate additional I/O.
-+	 */
-+	if (!redirty)
-+		fsio_throttle(bdev_to_dev(bdev), PAGE_SIZE, TASK_KILLABLE);
++The goal of the filesystem I/O controller is to improve performance
++predictability from applications' point of view and provide performance
++isolation of different control groups sharing the same filesystems.
 +
- 	preempt_disable();
- 	/*
- 	 * This prevents one CPU to accumulate too many dirtied pages without
-@@ -1911,7 +1921,7 @@ void balance_dirty_pages_ratelimited(struct address_space *mapping)
- 
- 	wb_put(wb);
- }
--EXPORT_SYMBOL(balance_dirty_pages_ratelimited);
-+EXPORT_SYMBOL(__balance_dirty_pages_ratelimited);
- 
- /**
-  * wb_over_bg_thresh - does @wb need to be written back?
++----------------------------------------------------------------------
++2. DESIGN
++
++I/O activity generated by READs is evaluated at the block layer, WRITEs are
++evaluated when a page changes from clear to dirty (rewriting a page that was
++already dirty doesn't generate extra I/O activity).
++
++Throttling is always performed at the VFS layer.
++
++This solution has the advantage of always being able to determine the
++task/cgroup that originally generated the I/O request and it prevents
++filesystem locking contention and potential priority inversion problems
++(example: journal I/O being throttled that may slow down the entire system).
++
++The downside of this solution is that the controller is more fuzzy (compared to
++the blkio controller) and it allows I/O bursts that may happen at the I/O
++scheduler layer.
++
++----------------------------------------------------------------------
++2.1. TOKEN BUCKET THROTTLING
++
++            Tokens (I/O rate) - <mb_per_second>
++                o
++                o
++                o
++              ....... <--.
++              \     /    | Bucket size (burst limit)
++               \ooo/     | <bucket_size_in_mb>
++                ---   <--'
++                 |ooo
++    Incoming --->|---> Conforming
++    I/O          |oo   I/O
++    requests  -->|-->  requests
++                 |
++            ---->|
++
++Token bucket [2] throttling: <mb_per_second> tokens are added to the bucket
++every seconds; the bucket can hold at the most <bucket_size_in_mb> tokens; I/O
++requests are accepted if there are available tokens in the bucket; when a
++request of N bytes arrives, N tokens are removed from the bucket; if less than
++N tokens are available in the bucket, the request is delayed until a sufficient
++amount of token is available again in the bucket.
++
++----------------------------------------------------------------------
++3. USER INTERFACE
++
++A new I/O limit (in MB/s) can be defined using the file:
++- fsio.max_mbs
++
++The syntax of a throttling policy is the following:
++
++"<major>:<minor> <mb_per_second> <bucket_size_in_mb>"
++
++Examples:
++
++- set a maximum I/O rate of 10MB/s on /dev/sda (8:0), bucket size = 10MB:
++
++  # echo "8:0 10 10" > /sys/fs/cgroup/cg1/fsio.max_mbs
++
++- remove the I/O limit defined for /dev/sda (8:0):
++
++  # echo "8:0 0 0" > /sys/fs/cgroup/cg1/fsio.max_mbs
++
++----------------------------------------------------------------------
++4. Additional parameters
++
++----------------------------------------------------------------------
++4.1. Sleep timeslice
++
++Sleep timeslice is a configurable parameter that allows to decide the minimum
++time of sleep to enforce to throttled tasks. Tasks will never be put to sleep
++for less than the sleep timeslice. Moreover wakeup timers will be always
++aligned to a multiple of the sleep timeslice.
++
++Increasing the sleep timeslice has the advantage of reducing the overhead of
++the controller: with a more coarse-grained control, less timers are created to
++wake-up tasks, that means less softirq pressure in the system and less overhead
++introduced. However, a bigger sleep timeslice makes the controller more fuzzy
++since throttled tasks are going to receive less throttling events with larger
++sleeps.
++
++The parameter can be changed via:
++/sys/module/fsio_throttle/parameters/throttle_timeslice_ms
++
++The default value is 250 ms.
++
++Example:
++  - set the sleep timeslice to 1s:
++
++    # echo 1000 > /sys/module/fsio_throttle/parameters/throttle_timeslice_ms
++
++----------------------------------------------------------------------
++4.2. Sleep timeframe
++
++This parameter defines maximum time to sleep for a throttled task.
++
++The parameter can be changed via:
++/sys/module/fsio_throttle/parameters/throttle_timeslice_ms
++
++The default value is 2 sec.
++
++Example:
++  - set the sleep timeframe to 5s:
++
++    # echo 5000 > /sys/module/fsio_throttle/parameters/throttle_timeframe_ms
++
++4.3. Throttle kernel threads
++
++By default kernel threads are never throttled or accounted for any I/O
++activity. It is possible to change this behavior by setting 1 to:
++
++/sys/module/fsio_throttle/parameters/throttle_kernel_threads
++
++It is strongly recommended to not change this setting unless you know what you
++are doing.
++
++----------------------------------------------------------------------
++5. TODO
++
++- Integration with the blkio controller
++- Provide distinct read/write limits, as well as MBs vs iops
++- Provide additional statistics in cgroupfs
++
++----------------------------------------------------------------------
++6. REFERENCES
++
++[1] Documentation/admin-guide/cgroup-v2.rst
++[2] http://en.wikipedia.org/wiki/Token_bucket
 -- 
 2.17.1
 
