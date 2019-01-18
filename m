@@ -1,73 +1,72 @@
-Return-Path: <SRS0=sC6v=PZ=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=kGct=P2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F8F0C43387
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 23:46:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2F72C43387
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 00:04:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B9B3920855
-	for <linux-block@archiver.kernel.org>; Thu, 17 Jan 2019 23:46:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C9D320896
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 00:04:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="BO2Mrbl3";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="TlmuGX2L"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="K1nv6afq";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="k/hQ3LsJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726919AbfAQXq3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Jan 2019 18:46:29 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:37423 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726008AbfAQXq3 (ORCPT
+        id S1725983AbfARAEW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Jan 2019 19:04:22 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:14323 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725889AbfARAEW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Jan 2019 18:46:29 -0500
+        Thu, 17 Jan 2019 19:04:22 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1547768789; x=1579304789;
+  t=1547769862; x=1579305862;
   h=from:to:cc:subject:date:message-id:references:
    in-reply-to:content-transfer-encoding:mime-version;
-  bh=msfv+9HdCByARxEA6cTAdqaNKeUJT7wTtxfETU0b878=;
-  b=BO2Mrbl3M8F1U+f5ChW/s4RRA+42WgBfdK0x3gYAK7HCd0BA4yxdA8Gs
-   Duql2H9ihF0I4+RDFN178U7KjVOINudtjMxsg2C10MWyBJAb88fe/LHRS
-   jeEoZcuZRgwpEKfiBXNApzPcw0Ew6d2W5K2ogMpMbuxJFKhDLRuPlfxdW
-   E74+1IHlTvhQNfJHPA8KGLajZ2baFWTqVagXuxG9Hi2uu0wMUcgcNh4JE
-   bNdcTz1cTQ35WYDnUW4krH7+xd9BmgJGgUxaOuaqfAWaFtw6SjK/EfkCj
-   3EH0mdYTxmMa3UJy/SqagA9DsR0ofpyKL6a3ecsJpMnjbznObBieG21fi
-   A==;
+  bh=swWFNMzqlNOfR7OKvhugPo+litgDuiJbqiIPASbHnCM=;
+  b=K1nv6afqvSAvoj0dx+guqnqSdK0vxjMLJaPbT0LdRiyeNC1hkXx6kE2C
+   XygxkRr0gJN7N7XV8M2ZLtZj8ZrFZaVFTWJSxW+XBJoz5t9gxo0LXQ90b
+   9kvK5lQv8vnEXtPCb3q1smDp61tjPPZv/1IUyPLE6jS4K0HFXm0rE1pos
+   1azLbdtK73TaV21F4ugENYwFigyJQKH07PoQRf7OqGU83YPI8W+gCL1h3
+   aczNLY38MYMR93WHdEH4PpXSLMw5/ZBCAQ5nlD0cmKE0cQKN+/fAnA+TZ
+   42Dej8iQIe+oFx2Y6GC2a86Oh5ps28gbbURF4XyK79QdZNIB3718/NTwc
+   g==;
 X-IronPort-AV: E=Sophos;i="5.56,489,1539619200"; 
-   d="scan'208";a="99123379"
-Received: from mail-bn3nam01lp2056.outbound.protection.outlook.com (HELO NAM01-BN3-obe.outbound.protection.outlook.com) ([104.47.33.56])
-  by ob1.hgst.iphmx.com with ESMTP; 18 Jan 2019 07:46:28 +0800
+   d="scan'208";a="100326447"
+Received: from mail-sn1nam04lp2052.outbound.protection.outlook.com (HELO NAM04-SN1-obe.outbound.protection.outlook.com) ([104.47.44.52])
+  by ob1.hgst.iphmx.com with ESMTP; 18 Jan 2019 08:04:21 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0vK/I9l8MvZPZ0rkDEdxg76hxbRxrI7msc6Kxsi7I7w=;
- b=TlmuGX2L232EGm+BiYLQ91c9NZQuTUHvZLIo28lrAp3G2hFMAgAHI+633JYW+jesUB8RABchXJbhSqLDKZN2fCGD5wYe8XGZIYWYftlaJXUACYB2ds/Vrh3w+KnvIbl1PIigr1/we/ZQtlDKdVsn5B2+4I0HymL1Y1iUIiwaxFQ=
+ bh=ccR08tTo3XK5fAxUw1UcLfmdwOmnpNRoD/MQwPpRT2c=;
+ b=k/hQ3LsJyb+EKlkktW65Y0cmgNfb+bXrYFgXDKuIipV1MJJOgR51gqQUhjihNsCrzjSLrXB1Rdh4ij7cL6VNw6e/YA20P5WHySq4nr1p35FhZpHbMPEmfZQOCV8NrYZIpRDTrMDtCver6aVebMyBYtqQYGKDvhkgjLC/h6p28yQ=
 Received: from BYAPR04MB4502.namprd04.prod.outlook.com (52.135.238.11) by
- BYAPR04MB4727.namprd04.prod.outlook.com (52.135.240.30) with Microsoft SMTP
+ BYAPR04MB4903.namprd04.prod.outlook.com (52.135.232.208) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1516.19; Thu, 17 Jan 2019 23:46:26 +0000
+ 15.20.1537.24; Fri, 18 Jan 2019 00:04:19 +0000
 Received: from BYAPR04MB4502.namprd04.prod.outlook.com
  ([fe80::11c:b9cd:4076:a667]) by BYAPR04MB4502.namprd04.prod.outlook.com
- ([fe80::11c:b9cd:4076:a667%3]) with mapi id 15.20.1537.018; Thu, 17 Jan 2019
- 23:46:26 +0000
+ ([fe80::11c:b9cd:4076:a667%3]) with mapi id 15.20.1537.018; Fri, 18 Jan 2019
+ 00:04:19 +0000
 From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
 To:     Johannes Thumshirn <jthumshirn@suse.de>,
         Omar Sandoval <osandov@osandov.com>
 CC:     Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
         Linux NVMe Mailinglist <linux-nvme@lists.infradead.org>,
         Anthony Iliopoulos <ailiopoulos@suse.de>
-Subject: Re: [PATCH blktests 1/2] nvme: enable buffered_io for file-backed
- namespaces
-Thread-Topic: [PATCH blktests 1/2] nvme: enable buffered_io for file-backed
- namespaces
-Thread-Index: AQHUrmR4qRT1ezDLmE2OtZRZp8tpgKW0H7tw
-Date:   Thu, 17 Jan 2019 23:46:26 +0000
-Message-ID: <BYAPR04MB45024AB8410374A9B1AD81A186830@BYAPR04MB4502.namprd04.prod.outlook.com>
-References: <20190117125906.15479-1-jthumshirn@suse.de>
-In-Reply-To: <20190117125906.15479-1-jthumshirn@suse.de>
+Subject: Re: [PATCH blktests 2/2] nvme: test resize of a namespace with
+ file-backed ns
+Thread-Topic: [PATCH blktests 2/2] nvme: test resize of a namespace with
+ file-backed ns
+Thread-Index: AQHUrmR8fZmOH7CZlEi1oiqoXxWrL6W0Iykn
+Date:   Fri, 18 Jan 2019 00:04:19 +0000
+Message-ID: <BYAPR04MB4502DFB8875F3D6835086C6086830@BYAPR04MB4502.namprd04.prod.outlook.com>
+References: <20190117125906.15479-1-jthumshirn@suse.de>,<20190117125906.15479-2-jthumshirn@suse.de>
+In-Reply-To: <20190117125906.15479-2-jthumshirn@suse.de>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -76,40 +75,38 @@ authentication-results: spf=none (sender IP is )
  smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
 x-originating-ip: [199.255.44.250]
 x-ms-publictraffictype: Email
-x-microsoft-exchange-diagnostics: 1;BYAPR04MB4727;6:UBUIEdKKcIwTq8GgrV3f9rIsuTVrMqBUmpQaMgxeBoa1qyVC25EM5fYUSob53PiKZDUBSU1lKD6nGP5o38TMsl1d/bqiCPqJ2MPDGR7FesZtxLdHeWKbzytj28Y/WT2dmnLHtnMCG43iNbtxYRmv40Ma73wDDQqPnSB61SBnVMgYMFng7lu6pJnW3OPDPv3rBheTD6JM9cjgktJo+R3BuL3XGOyPwZ8wTJDLOU8h7sLnx6SXd6SE99nDyJEX2JZMg3N/NHbVmAF4/drnfMBoj/cfrI2QOuEbUaZPNnvSBQ0T02K/frJ3zbk95olOjiz27sJYfdiSWhkhBX2JHyLf5idlGSVN6Ad0jEw2gfE15WbX5Uw1eIuBuG8EcWjQXtQ4X1FU11XWt3M3x5Xarpy+iESUSsIwY3UIeBxcQyKt4CH6s22G9r7oGR+SAnXs/xlG4Dga+Daa7CoTryx2g4PaMA==;5:b2PwZKcBz64p1BWYzBsXqsUBmTHcjn6BarlFc/2sL3Xnq8BUo+LX/GXtw3qCIuAyZ5OT4qPBKD2On3vxcytpmmhLHkZpbB6xbRniSLbRQFp5kVkXR/V2Jl4SkclzAniJ0p3EdjbL/HrjcYmIYFg5zvYZkxvVpMk3p74+QqjpZ/dLmykOctChUjE7+c/g07cY3TRU8pK4Z5JrF5/4z1MSPg==;7:qVmtRf8PXLAoG59mDo94ebXn4Dg00WIMkLhTJHSUaohUMlKg6rhDB8A8Q0eI5ZqI3I09YoMcF5MeUG9rzu1B54L32tnWQ5prPivvzEKv7st1i6sroiGdAyzYtVMroUXNalJxq85sZ/tRAzo1UMrREg==
-x-ms-office365-filtering-correlation-id: 87aadf34-6eea-4374-5238-08d67cd5fedc
+x-microsoft-exchange-diagnostics: 1;BYAPR04MB4903;6:szd2/sixOa+ZKDDr/bVl1d7zTk0j1a12285ZE/hrTgQm90rH32aSPpgaX/KvhXobsP23+ju6xTdD7cc25c7hg2kegFRpqaiPcOMJk6r6ILGEF7HiGl4s7vz7CiYLAnyFQtqMBj1tzdTd2FMwFNfSm6/AiczBWk/7q8vG5qu1qSlR9R/UcqLV4IJzSZXBAwDCa0VYeD09OfrnLDyBCZFBYGH1cw8WTnRVWF/1vCeUX/kbRoigxu3q3xnrH9HyTVoyNr5/VsnRHjOR5KmtFklTEyY3fZEGPgCz6wXrKd05zWh/o7iB89ZCv1FX3cd17Qjrqg2XXoMHxO9BHx7wyGulWzYk4D4nP2jZ0CMLN+s/NDOqvDSYRluk35anhMJI3grzXN2xRY+NW0k+89h9ISm5Jo3BKI2KaXBKeyfYvz99fgIJILxelXPxJzSrk18BuqaL/o0sS9kmTz3ChFkj6WJkwA==;5:cwUGpJxwnoE1Zn1lDpNC/nxNnNFaKaNfdmUGeDXqVo4rKrWA/L3s72ivjo7ozz5UKl/jksHTK18JZXZKCIoWnxyRzdXFnk9e+3qFDI/lyZPV81qBlASludY4RnxowBIsePdmMekVYuB+dESHDgNDdh1wsrpqR87bQNtiECZ1okcCdlH5k/2IlDCDtE8bVH+r9tx/41zMqiapKi4yoF449Q==;7:nUfu2KOQB7R8v+8IsZD5OEwOPdE+5+og6it7qEnGW2tdakeybGypVhO2fGwV/Q1dseOHvRzENHQ0Fakv5fJWvKfO2FG2+Lo4BltO5PSv8cWPwgVK8xG9aDkdSja1nvVMJE0Jd58vtbgZ6iGxfQNBlA==
+x-ms-office365-filtering-correlation-id: 3525c0df-f1c8-4c06-322a-08d67cd87e67
 x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600109)(711020)(4618075)(2017052603328)(7153060)(7193020);SRVR:BYAPR04MB4727;
-x-ms-traffictypediagnostic: BYAPR04MB4727:
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600109)(711020)(4618075)(2017052603328)(7153060)(7193020);SRVR:BYAPR04MB4903;
+x-ms-traffictypediagnostic: BYAPR04MB4903:
 wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <BYAPR04MB4727FB08EC79807E4F4F4F4086830@BYAPR04MB4727.namprd04.prod.outlook.com>
-x-forefront-prvs: 0920602B08
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(376002)(346002)(39860400002)(396003)(136003)(199004)(189003)(6116002)(86362001)(33656002)(8936002)(72206003)(7696005)(74316002)(76176011)(53546011)(66066001)(2906002)(3846002)(102836004)(9686003)(476003)(4326008)(6246003)(6436002)(256004)(25786009)(97736004)(53936002)(6506007)(5660300001)(316002)(186003)(54906003)(110136005)(26005)(229853002)(55016002)(486006)(305945005)(7736002)(11346002)(8676002)(105586002)(81156014)(71190400001)(71200400001)(81166006)(14454004)(446003)(99286004)(68736007)(106356001)(478600001);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4727;H:BYAPR04MB4502.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-microsoft-antispam-prvs: <BYAPR04MB49036CD51DDEE58A57FB12E9869C0@BYAPR04MB4903.namprd04.prod.outlook.com>
+x-forefront-prvs: 0921D55E4F
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(376002)(39860400002)(366004)(346002)(136003)(189003)(51914003)(199004)(106356001)(105586002)(25786009)(72206003)(478600001)(476003)(11346002)(486006)(446003)(33656002)(4326008)(9686003)(71190400001)(71200400001)(66066001)(229853002)(55016002)(6436002)(8936002)(74316002)(8676002)(256004)(305945005)(53936002)(102836004)(26005)(81166006)(6246003)(97736004)(76176011)(6506007)(3846002)(6116002)(53546011)(186003)(2906002)(7696005)(99286004)(7736002)(68736007)(5660300001)(316002)(110136005)(54906003)(14454004)(81156014)(86362001);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4903;H:BYAPR04MB4502.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: rtkGI/97HoQ8capg9Wo6tbwDcUgdhY35w5TMyBaxmAyAHR/cS7BM/Vjt+/meo3vqHPfYUe6eh9uo8bT6nWq3spFE3/Bs3l5K6jroCJh4UBoLF+TIwCM8Xj9Yb37Uj07PfuSQHSECjE+0SKn5MntAEjupfWq360LiJUVuNR+3QRVbgp3AUWdaRiNA9rp46yKiaLkKBvNRlfxz+F1yngJ3w3uCDm1agSgGC7FMv5wkHRn2GTfvpVh6GTkzZR9sMSi93vqn9ib0Y4Hx5x+CaBNsEr7ZTis6GKqPTZBCJpBQ/J89vWXXGZREZuf4sVGhAPSbdgFZiZQS8R5CoWy/JrjniU4f6fiysHC8NbvZqS6OqQvgiTeyxgwDoL2XYBCXsK3skKXL9eb8qp4Q3tupnpf+h3l6dyotlQ8tcLDVw+mrkvo=
+x-microsoft-antispam-message-info: UbNxWVoikT8rum2dOno92SUdDscuZD6fTryp+5lwklREJ1fexgQaAJ1fgFL40kvgIU8N/8UzfNH0yxEk9bID2B5kLeSCkZ3raTmIA2bXXs3oFUP56kTRnhQvYlB2UEjGA6yV1hPejd+R/AT8K+BnrgtAwtrG6bjqx0CW85qup0kBtZVIMZBUyOxovbVp8YK7ctsQR+7mebopm3OTfM9uJgAAaT4HAkbkgYZ5MK4yhjnLM+aH1hYtn69Egtw2W+srjiCk9SvsSjypoTDGRahFHwMrlhG43bNru+stOW4pCRQlnN2QrOAOp9RtGZFoqmBwXuQ28zRzfdlmcOuVbHkOShXMzLqFzFUbLp0OIveyxBLcLakze0vPEEQGzjL/g4Q2JyVj0kWfE7JSMZA+aFDAY40wsL2BhVyMKcdYM66iGTU=
 spamdiagnosticoutput: 1:99
 spamdiagnosticmetadata: NSPM
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 87aadf34-6eea-4374-5238-08d67cd5fedc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jan 2019 23:46:26.3462
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3525c0df-f1c8-4c06-322a-08d67cd87e67
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jan 2019 00:04:19.2604
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4727
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4903
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This will force the user to run all tests in the buffered_io mode.
 
-What we really need is a config for the nvme category option which user can=
- set and decide
-whether to run buffered_io or direct_io, you can set by default to the buff=
-ered_io mode.
+Thanks for the test, I actually have a patch for this one, if Christoph and=
+ Sagi okay with that I can work on it.
+Although, not sure if we want that sort of management code in the target.
 
 
 From: linux-block-owner@vger.kernel.org <linux-block-owner@vger.kernel.org>=
@@ -118,53 +115,123 @@ Sent: Thursday, January 17, 2019 4:59 AM
 To: Omar Sandoval
 Cc: Linux Block Layer Mailinglist; Linux NVMe Mailinglist; Anthony Iliopoul=
 os; Johannes Thumshirn
-Subject: [PATCH blktests 1/2] nvme: enable buffered_io for file-backed name=
-spaces
+Subject: [PATCH blktests 2/2] nvme: test resize of a namespace with file-ba=
+cked ns
 =A0=20
 =20
-All file-based NVMe over Fabrics tests fail in my test environment as I'm
-running these tests form within an initramfs. It turns out the file backing
-store of the NVMe target defaults to using direct I/O which is not
-available on tmpfs for obvious reasons.
+Test resizing of a NVMe namespace by creating a file backed namespace over
+nvme-loop with 1G size, connecting to it and then resizing it to 2G.
 
-If the backing store of an nvme target is file-based enable the use of
-buffered I/O.
+Check if /proc/partitions and blkdev --getsz $DEVICE see the updated size.
 
 Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
 ---
-=A0tests/nvme/rc | 7 +++++--
-=A01 file changed, 5 insertions(+), 2 deletions(-)
+=A0tests/nvme/029=A0=A0=A0=A0 | 67 ++++++++++++++++++++++++++++++++++++++++=
+++++++++++++++
+=A0tests/nvme/029.out | 10 ++++++++
+=A02 files changed, 77 insertions(+)
+=A0create mode 100755 tests/nvme/029
+=A0create mode 100644 tests/nvme/029.out
 
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index eff1dd992460..ec92e41396be 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -48,7 +48,7 @@ _remove_nvmet_port() {
-=A0_create_nvmet_ns() {
-=A0=A0=A0=A0=A0=A0=A0=A0 local nvmet_subsystem=3D"$1"
-=A0=A0=A0=A0=A0=A0=A0=A0 local nsid=3D"$2"
--=A0=A0=A0=A0=A0=A0 local blkdev=3D"$3"
-+=A0=A0=A0=A0=A0=A0 local backstore=3D"$3"
-=A0=A0=A0=A0=A0=A0=A0=A0 local uuid=3D"00000000-0000-0000-0000-000000000000=
-"
-=A0=A0=A0=A0=A0=A0=A0=A0 local subsys_path=3D"${NVMET_CFS}/subsystems/${nvm=
-et_subsystem}"
-=A0=A0=A0=A0=A0=A0=A0=A0 local ns_path=3D"${subsys_path}/namespaces/${nsid}=
-"
-@@ -58,8 +58,11 @@ _create_nvmet_ns() {
-=A0=A0=A0=A0=A0=A0=A0=A0 fi
-=A0
-=A0=A0=A0=A0=A0=A0=A0=A0 mkdir "${ns_path}"
--=A0=A0=A0=A0=A0=A0 printf "%s" "${blkdev}" > "${ns_path}/device_path"
-+=A0=A0=A0=A0=A0=A0 printf "%s" "${backstore}" > "${ns_path}/device_path"
-=A0=A0=A0=A0=A0=A0=A0=A0 printf "%s" "${uuid}" > "${ns_path}/device_uuid"
-+=A0=A0=A0=A0=A0=A0 if [[ -f ${backstore} ]]; then
-+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 printf 1 > "${ns_path}/buffered=
-_io"
-+=A0=A0=A0=A0=A0=A0 fi
-=A0=A0=A0=A0=A0=A0=A0=A0 printf 1 > "${ns_path}/enable"
-=A0}
-=A0
+diff --git a/tests/nvme/029 b/tests/nvme/029
+new file mode 100755
+index 000000000000..8c94af039d0f
+--- /dev/null
++++ b/tests/nvme/029
+@@ -0,0 +1,67 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0+
++# Copyright (c) 2019 Johannes Thumshirn
++#
++# Test resize of a namespace with file-backed ns
++
++. tests/nvme/rc
++
++DESCRIPTION=3D"test resize of a namespace with file-backed ns"
++QUICK=3D1
++
++requires() {
++=A0=A0=A0=A0=A0=A0 _have_program nvme && _have_modules loop nvme-loop nvme=
+t && \
++=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 _have_configfs
+do we really need loop module here ?
+also missinghave_program blockdev ?
++}
++
++test() {
++=A0=A0=A0=A0=A0=A0 echo "Running ${TEST_NAME}"
++
++=A0=A0=A0=A0=A0=A0 modprobe nvmet
++=A0=A0=A0=A0=A0=A0 modprobe nvme-loop
++
++=A0=A0=A0=A0=A0=A0 local port
++=A0=A0=A0=A0=A0=A0 local nvmedev
++=A0=A0=A0=A0=A0=A0 local namespace
++=A0=A0=A0=A0=A0=A0 local file_path=3D"$TMPDIR/img"
++=A0=A0=A0=A0=A0=A0 local subsys_name=3D"blktests-subsystem-1"
++
++=A0=A0=A0=A0=A0=A0 truncate -s 1G "${file_path}"
++
++=A0=A0=A0=A0=A0=A0 _create_nvmet_subsystem "${subsys_name}" "${file_path}"=
+ \
++=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 "91fdba0d-f87b-4c25-b80f-db7be1=
+418b9e"
++=A0=A0=A0=A0=A0=A0 port=3D"$(_create_nvmet_port "loop")"
++=A0=A0=A0=A0=A0=A0 _add_nvmet_subsys_to_port "${port}" "${subsys_name}"
++
++=A0=A0=A0=A0=A0=A0 nvme connect -t loop -n "${subsys_name}"
++
++=A0=A0=A0=A0=A0=A0 nvmedev=3D"$(_find_nvme_loop_dev)"
++=A0=A0=A0=A0=A0=A0 namespace=3D"${nvmedev}n1"
++=A0=A0=A0=A0=A0=A0 cat "/sys/block/${namespace}/uuid"
++=A0=A0=A0=A0=A0=A0 cat "/sys/block/${namespace}/wwid"
++
++=A0=A0=A0=A0=A0=A0 cat /proc/partitions | grep ${namespace} | awk '{ print=
+ $3 }'
++=A0=A0=A0=A0=A0=A0 blockdev --getsz /dev/${namespace}
++
++=A0=A0=A0=A0=A0=A0 echo "Resizing"
++=A0=A0=A0=A0=A0=A0 truncate -s +1G "${file_path}"
++=A0=A0=A0=A0=A0=A0 printf 0 > ${NVMET_CFS}/subsystems/${subsys_name}/names=
+paces/1/enable
++=A0=A0=A0=A0=A0=A0 printf 1 > ${NVMET_CFS}/subsystems/${subsys_name}/names=
+paces/1/enable
++=A0=A0=A0=A0=A0=A0 sleep 1
++
++=A0=A0=A0=A0=A0=A0 cat /proc/partitions | grep ${namespace} | awk '{ print=
+ $3 }'
++=A0=A0=A0=A0=A0=A0 blockdev --getsz /dev/${namespace}
++
++=A0=A0=A0=A0=A0=A0 nvme disconnect -n "${subsys_name}"
++
++=A0=A0=A0=A0=A0=A0 _remove_nvmet_subsystem_from_port "${port}" "${subsys_n=
+ame}"
++=A0=A0=A0=A0=A0=A0 _remove_nvmet_subsystem "${subsys_name}"
++=A0=A0=A0=A0=A0=A0 _remove_nvmet_port "${port}"
++
++=A0=A0=A0=A0=A0=A0 rm -f "${file_path}"
++
++=A0=A0=A0=A0=A0=A0 modprobe -r nvme-loop
++=A0=A0=A0=A0=A0=A0 modprobe -r nvmet
++
++=A0=A0=A0=A0=A0=A0 echo "Test complete"
++}
+diff --git a/tests/nvme/029.out b/tests/nvme/029.out
+new file mode 100644
+index 000000000000..e9571c7c9300
+--- /dev/null
++++ b/tests/nvme/029.out
+@@ -0,0 +1,10 @@
++Running nvme/029
++91fdba0d-f87b-4c25-b80f-db7be1418b9e
++uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
++1048576
++2097152
++Resizing
++2097152
++4194304
++NQN:blktests-subsystem-1 disconnected 1 controller(s)
++Test complete
 --=20
 2.16.4
 
