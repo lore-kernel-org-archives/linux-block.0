@@ -2,174 +2,123 @@ Return-Path: <SRS0=kGct=P2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D82A3C43387
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 16:32:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D20CC43387
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 16:35:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ABB0E20850
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 16:32:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DEC820896
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 16:35:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="LjdJq9+4"
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="tIjSoPl2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728033AbfARQcx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jan 2019 11:32:53 -0500
-Received: from mail-pg1-f172.google.com ([209.85.215.172]:38448 "EHLO
-        mail-pg1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728340AbfARQc0 (ORCPT
+        id S1727994AbfARQfe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jan 2019 11:35:34 -0500
+Received: from mail-yb1-f193.google.com ([209.85.219.193]:38845 "EHLO
+        mail-yb1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727490AbfARQfe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jan 2019 11:32:26 -0500
-Received: by mail-pg1-f172.google.com with SMTP id g189so6285592pgc.5
-        for <linux-block@vger.kernel.org>; Fri, 18 Jan 2019 08:32:26 -0800 (PST)
+        Fri, 18 Jan 2019 11:35:34 -0500
+Received: by mail-yb1-f193.google.com with SMTP id x9so4577804ybj.5
+        for <linux-block@vger.kernel.org>; Fri, 18 Jan 2019 08:35:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=xvbE8XZmtCZCSs5MWpPwk6dkNccrBNOLuVifdX7k3Xo=;
-        b=LjdJq9+4pb+pmC/Blh3PEwkS70/QkT1TVnSry47lIMUuwJ4SEtOb5bJ9zLEU3ZbHH5
-         DJZUbeCLK7uhJUvWts8m1XSlJwJSqkeXjBikPmU6g/T+qw5rkeJ0+5/essWHv+UT4dKp
-         pX+esyEV6f5LYJO1VpXM4QX/EDXBC+2Fi7IH79nKJvF/4gO4qhU52ApuMsx3pt8/ArWL
-         0L+rDeV/ETA3KBWyUxqiLfoUCvWT/Dht+1YPvWyBfGlRFqb10p3bnWRy1o0wmGNeSPVv
-         mL7FeL33mMO6LqYkDPDOqDaMbAKjLBgJOvPTJE1Dwj79uH5f2AWp28w5y1FjByESBfiH
-         KiXA==
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=goW1Z0jvHsdrb1efjgnzxYsLnKmpr74zaTtESzdE3TE=;
+        b=tIjSoPl2crufU7iL8VGWE+B4GzYPKI0nj9xPJyPBwBD3uKkJgxSCf7N1JalfxM+MCk
+         jCNr0/9IYpsKBKcA4neuOLYyfeeSVev1PmMDF84r3m+CCjrWKySXmbciaHcGw/GxYV17
+         85wSekhP2/vApxYqtdicAWqvm1sjMXah7j2aEAL1o3tbW4ZJMW5ZTBjbXHGpjMfhI5tN
+         xV6x0QEnwqoOI10bK1I/zLjkitKKE3DShOLxws8zyiDow4XDIV98e3ejM2hez+sWsnBO
+         PcnjjZZm81DjPD3IMiRVcTa8SnMUSAkRye5BzIbMkqSbjoSftjRmHezAgSWOp0deLwHT
+         G60Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=xvbE8XZmtCZCSs5MWpPwk6dkNccrBNOLuVifdX7k3Xo=;
-        b=GgaDPI/dzgunF8Y+kWdHrlG3v2kTsKTzhKDNYVKkgcSTe97WnSwkvcSloEPOg4mANt
-         DxztaX53Z2vSFxPcXCUDzQzVHBmkpD97iFwqJl4n16tdyUdVPqnhlyYStshBt8BJiX4z
-         NqRBE9HDjApmzm1n7bk2g+g481PRQcwjgZ5Vx85dAcwLYQrLFe2wAln6pOtLHy3vu9mW
-         Cfkib7bL8IMn8xbnFi+RAc437mV1n2odBbKCpT18GRspE+8uIChivM3rrWBMxWIuulEn
-         MX9E2tsI9y0WWdB35qCHCo/Grx3pssiRNwtnxa3+XPGPnOxklccDVPa/R5VhmcgEP61I
-         cFjA==
-X-Gm-Message-State: AJcUukeIAuTUZYl4reoq0OL1yfBt3Aqayeky0iHa2AZbgVhxfsCA0+Xx
-        KmcEJipSEX76Ta1xNvvzt1ikFw==
-X-Google-Smtp-Source: ALg8bN41vU7C41MgW8QMNhvyh4+lddekKSCXC1hud8wGDbcdP86lo7b+0XyB9n/KJl5lDmjxE+QpSg==
-X-Received: by 2002:a62:8c11:: with SMTP id m17mr20034783pfd.224.1547829145672;
-        Fri, 18 Jan 2019 08:32:25 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id l70sm12344130pgd.20.2019.01.18.08.32.23
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=goW1Z0jvHsdrb1efjgnzxYsLnKmpr74zaTtESzdE3TE=;
+        b=jssYzEGD2rSLB0KY19sVENk+u+1wAoLuLRyS2KId3e9woA+ev48i4cZfYzOh3a9GzP
+         PiJQsHVlZpbIMSUHxYRukW5DNe3yLKowgnrR6TrTkmnBOQ37CKxq3JVH1FrGaacA5JbJ
+         oBvjWXWzuRKuULh/LkhCd475k9xNuPQ7wbQvL/PgxQteNWYhoSCTGwUOqxDI5IqC3l16
+         HAE4FSO7lwp5x8yeTBVv0PkrfJH6BCJrHw9EZ5rcWrpoLPlwGX96ETHeqxDWmgA2eg2q
+         zshfRR35uOTTUoK0M01ZQ9XtGsDHQifsx8GXTr15WrPPW4y/IenFzDFAU4o+SLc1xVhz
+         9OAg==
+X-Gm-Message-State: AJcUuke/xsyHjQidlouafxT61Tha9+s+UMnw6OZVXTh4EiqLD6Ptlo7T
+        bIu42BbakK1ssNaLGVfOl/E54g==
+X-Google-Smtp-Source: ALg8bN4LqSMUqSIubxs+eeY8ann6PlQ91Xe1dord5OagoviT2y+A7CQqPvW3m6/ilKCtHivtYPrD8g==
+X-Received: by 2002:a25:2046:: with SMTP id g67mr1648536ybg.259.1547829333177;
+        Fri, 18 Jan 2019 08:35:33 -0800 (PST)
+Received: from localhost ([2620:10d:c091:180::1:e09e])
+        by smtp.gmail.com with ESMTPSA id s185sm4611635yws.69.2019.01.18.08.35.32
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 18 Jan 2019 08:32:24 -0800 (PST)
-To:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        IDE/ATA development list <linux-ide@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: LSF/MM 2019: Call for Proposals
-Message-ID: <51b4b263-a0f2-113d-7bdc-f7960b540929@kernel.dk>
-Date:   Fri, 18 Jan 2019 09:32:22 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Fri, 18 Jan 2019 08:35:32 -0800 (PST)
+Date:   Fri, 18 Jan 2019 11:35:31 -0500
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Andrea Righi <righi.andrea@gmail.com>
+Cc:     Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jens Axboe <axboe@kernel.dk>, Vivek Goyal <vgoyal@redhat.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Dennis Zhou <dennis@kernel.org>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/3] cgroup: fsio throttle controller
+Message-ID: <20190118163530.w5wpzpjkcnkektsp@macbook-pro-91.dhcp.thefacebook.com>
+References: <20190118103127.325-1-righi.andrea@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190118103127.325-1-righi.andrea@gmail.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Fri, Jan 18, 2019 at 11:31:24AM +0100, Andrea Righi wrote:
+> This is a redesign of my old cgroup-io-throttle controller:
+> https://lwn.net/Articles/330531/
+> 
+> I'm resuming this old patch to point out a problem that I think is still
+> not solved completely.
+> 
+> = Problem =
+> 
+> The io.max controller works really well at limiting synchronous I/O
+> (READs), but a lot of I/O requests are initiated outside the context of
+> the process that is ultimately responsible for its creation (e.g.,
+> WRITEs).
+> 
+> Throttling at the block layer in some cases is too late and we may end
+> up slowing down processes that are not responsible for the I/O that
+> is being processed at that level.
 
-The annual Linux Storage, Filesystem and Memory Management (LSF/MM)
-Summit for 2019 will be held from April 30 - May 2 at the Sheraton
-Puerto Rico Hotel & Casino Lodges in San Juan, Puerto Rico. LSF/MM is an
-invitation-only technical workshop to map out improvements to the Linux
-storage, filesystem and memory management subsystems that will make
-their way into the mainline kernel within the coming years.
+How so?  The writeback threads are per-cgroup and have the cgroup stuff set
+properly.  So if you dirty a bunch of pages, they are associated with your
+cgroup, and then writeback happens and it's done in the writeback thread
+associated with your cgroup and then that is throttled.  Then you are throttled
+at balance_dirty_pages() because the writeout is taking longer.
 
-https://events.linuxfoundation.org/events/linux-storage-filesystem-mm-summit-2019/
+I introduced the blk_cgroup_congested() stuff for paths that it's not easy to
+clearly tie IO to the thing generating the IO, such as readahead and such.  If
+you are running into this case that may be something worth using.  Course it
+only works for io.latency now but there's no reason you can't add support to it
+for io.max or whatever.
 
-LSF/MM 2019 will be a three day, stand-alone conference with three
-subsystem-specific tracks, cross-track discussions, as well as BoF and
-hacking sessions.
+> 
+> = Proposed solution =
+> 
+> The main idea of this controller is to split I/O measurement and I/O
+> throttling: I/O is measured at the block layer for READS, at page cache
+> (dirty pages) for WRITEs, and processes are limited while they're
+> generating I/O at the VFS level, based on the measured I/O.
+> 
 
-On behalf of the committee I am issuing a call for agenda proposals
-that are suitable for cross-track discussion as well as technical
-subjects for the breakout sessions.
+This is what blk_cgroup_congested() is meant to accomplish, I would suggest
+looking into that route and simply changing the existing io controller you are
+using to take advantage of that so it will actually throttle things.  Then just
+sprinkle it around the areas where we indirectly generate IO.  Thanks,
 
-If advance notice is required for visa applications then please point
-that out in your proposal or request to attend, and submit the topic
-as soon as possible.
-
-1) Proposals for agenda topics should be sent before February 15th,
-2019 to:
-
-	lsf-pc@lists.linux-foundation.org
-
-and CC the mailing lists that are relevant for the topic in question:
-
-	FS:	linux-fsdevel@vger.kernel.org
-	MM:	linux-mm@kvack.org
-	Block:	linux-block@vger.kernel.org
-	ATA:	linux-ide@vger.kernel.org
-	SCSI:	linux-scsi@vger.kernel.org
-	NVMe:	linux-nvme@lists.infradead.org
-
-Please tag your proposal with [LSF/MM TOPIC] to make it easier to
-track. In addition, please make sure to start a new thread for each
-topic rather than following up to an existing one. Agenda topics and
-attendees will be selected by the program committee, but the final
-agenda will be formed by consensus of the attendees on the day.
-
-2) Requests to attend the summit for those that are not proposing a
-topic should be sent to:
-
-	lsf-pc@lists.linux-foundation.org
-
-Please summarize what expertise you will bring to the meeting, and
-what you would like to discuss. Please also tag your email with
-[LSF/MM ATTEND] and send it as a new thread so there is less chance of
-it getting lost.
-
-We will try to cap attendance at around 25-30 per track to facilitate
-discussions although the final numbers will depend on the room sizes
-at the venue.
-
-For discussion leaders, slides and visualizations are encouraged to
-outline the subject matter and focus the discussions. Please refrain
-from lengthy presentations and talks; the sessions are supposed to be
-interactive, inclusive discussions.
-
-There will be no recording or audio bridge. However, we expect that
-written minutes will be published as we did in previous years:
-
-2018: https://lwn.net/Articles/lsfmm2018/
-
-2017: https://lwn.net/Articles/lsfmm2017/
-
-2016: https://lwn.net/Articles/lsfmm2016/
-
-2015: https://lwn.net/Articles/lsfmm2015/
-
-2014: http://lwn.net/Articles/LSFMM2014/
-
-2013: http://lwn.net/Articles/548089/
-
-3) If you have feedback on last year's meeting that we can use to
-improve this year's, please also send that to:
-
-	lsf-pc@lists.linux-foundation.org
-
-Thank you on behalf of the program committee:
-
-	Anna Schumaker (Filesystems)
-	Josef Bacik (Filesystems)
-	Martin K. Petersen (Storage)
-	Jens Axboe (Storage)
-	Michal Hocko (MM)
-	Rik van Riel (MM)
-	Johannes Weiner (MM)
-
--- 
-Jens Axboe
-
+Josef
