@@ -2,179 +2,136 @@ Return-Path: <SRS0=kGct=P2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB47FC5AC81
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 19:00:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50330C07EBF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 19:02:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AC3472086D
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 19:00:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FBE620883
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 19:02:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="dunjGScR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hLAJqvdq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728543AbfARTA6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jan 2019 14:00:58 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:43195 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729242AbfARTA5 (ORCPT
+        id S1728764AbfARTCb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jan 2019 14:02:31 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45667 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728583AbfARTCb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jan 2019 14:00:57 -0500
-Received: by mail-pg1-f194.google.com with SMTP id v28so6464747pgk.10
-        for <linux-block@vger.kernel.org>; Fri, 18 Jan 2019 11:00:56 -0800 (PST)
+        Fri, 18 Jan 2019 14:02:31 -0500
+Received: by mail-wr1-f67.google.com with SMTP id t6so16292145wrr.12;
+        Fri, 18 Jan 2019 11:02:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=yfBlyynR755OjSbhKTiQ0PqRJqFi7tSrB6SBleZABgI=;
-        b=dunjGScRSr90OVJidwPBnNo2qD21x4RSKPhNQhk+RE4OsiS2QK6ex0U6qKsCvRPZcP
-         82Ac3+NDJPtAtcXA+U0XrJZmzszqNbVVYHx4uWnZavjQMerox0G1qUMdvM6ZDbfnSypc
-         4yDT548zulPnY6tAXD188ZKBBloISdn5SEfk4ltg9pmBFZ7UU3xkw0OS0XAOQV6ZjHjH
-         4GSMuiQyPwvrGryWbQvXqSNaElNE7+H78VzT7aLz/Lgb+n+MHOxstlMKwFE28ab/aVrU
-         COUuSVmN8Oomm7COoBIdqcg2MdBh0VdvNbppinB2wABXS7vrlAixzwTOJnT2gvRp58M5
-         Za3w==
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=1UMa4yCXmM3OK38bryfUjoNkHrVdY+842bxFOYwuFrA=;
+        b=hLAJqvdqa5AmoAZ8dykKzHIvpLwfc/1enH5Qndq2pLDg3c0WHNnomUGTN6V8M/h03L
+         wDSs5wP2dW+1ktrRparURlTqi4fwUyCW02xYH6j0Xydo9r9u/rX8DVlKeuAljhAVHRlq
+         Z1IHAnvmvyGRMJJYYu6KSArZ/p1wbzjiLIplwznGq9ZzG7JH6yTmEu0tTjOo3vCS6iAA
+         vMj5S58YJeklAQZiAQ/hn9k7Ac0BaEJcfb+LYKuGlQf9En0H1Xp58H6bvlc/X7xBQ1LR
+         8+FaBdcMoGLfxmPnjWR8DRKYpukSxJIcmLAT1j+vMOaBE73QYxV5lNxz1aEMJj4DEWX/
+         mZLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=yfBlyynR755OjSbhKTiQ0PqRJqFi7tSrB6SBleZABgI=;
-        b=Mfk/CE+bXNEZjg1Ql4QZc8LLyeM2igcnu4A20eWSacgQN6C8dUHVKfCrakVG8bzZLi
-         hSdi3X9xqWjLxou+NLQDvpr0ioAH27RdENkoH8GSMC1fmuVJaATwfU6f3rjTVjh54kk2
-         KCN8rgQ3EVME2iTtjCbYC2XDITu+LxMgl/Pc0puyCBUPMMoptm7ZTN3gUlC8iqLlp9Hl
-         tajcP9QZsLQWsUxFFhbaS8aIdc/FoMJ3CN1mxZSlN2N+r461NU3BnX2wYJQlwk6xiRFV
-         HGD+IzjN/9jlZh7OfuIR+nZXVXTkN33G3OUpSqxpVYPtm+GTYdMngaq8psWmIX36WgOF
-         M/mw==
-X-Gm-Message-State: AJcUukfH4HRaL0yOVrZBOeqhrQYVlgoIvd1Bh0kOx7sC0V5B1Edv+SK+
-        avuzZt4MbrvGSu/W7mYC89cWqg==
-X-Google-Smtp-Source: ALg8bN40yCEBM2MC5BRuhj3wucG/p7kSRiczSRBbL7BOFTscgPDfNjPyeZed+8ACtazyMHIj7hlRLQ==
-X-Received: by 2002:a62:1a44:: with SMTP id a65mr20853577pfa.30.1547838056201;
-        Fri, 18 Jan 2019 11:00:56 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id x26sm7486592pfn.50.2019.01.18.11.00.53
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 18 Jan 2019 11:00:55 -0800 (PST)
-Subject: Re: dd hangs when reading large partitions
-To:     Bart Van Assche <bvanassche@acm.org>,
-        "jianchao.wang" <jianchao.w.wang@oracle.com>,
-        Marc Gonzalez <marc.w.gonzalez@free.fr>,
-        fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-Cc:     SCSI <linux-scsi@vger.kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jan Kara <jack@suse.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Joao Pinto <jpinto@synopsys.com>,
-        Fujita Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-        Paolo Valente <paolo.valente@linaro.org>
-References: <f792574c-e083-b218-13b4-c89be6566015@free.fr>
- <398a6e83-d482-6e72-5806-6d5bbe8bfdd9@oracle.com>
- <ef734b94-e72b-771f-350b-08d8054a58f3@kernel.dk>
- <1547833876.102272.0.camel@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <f62f7e5b-c6ab-e58a-a9a9-6d4acfc38722@kernel.dk>
-Date:   Fri, 18 Jan 2019 12:00:52 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=1UMa4yCXmM3OK38bryfUjoNkHrVdY+842bxFOYwuFrA=;
+        b=FP7gU75BpobA3SwOWx70xUYusDBvmqd8PMjLbh63oUqdY3yJmJv9lyY+cnd3DpqOtZ
+         JVq9OXhDs96KibvI+Hyfon9s1RmCsguiJQxuIhb2xS2a6t5LnS8AL4iPgkbkjo/1mtyn
+         Pt4IioXXqn5F3z0ka9eAYG8WXaOcsCmPygNYQgUYRRb7DRr/x9T/5FWwa4zSm8nlVoRP
+         ASlC1iXh5cg/HXI7IXe6mYrPIzi7W+ddze+4pGHR4uXX2JG3xvMM3bl1stp2KB8b7Wt9
+         h4bka8OpsNokGY/yuaw1cTlcOMtZgK5NnT4063RO9MxcyyqpdKeqAyUp7XxldLt8lBEA
+         0ZaQ==
+X-Gm-Message-State: AJcUukc/IisineDMV1KGVofaE0O6jEHV6BUy3SbPwtp9ncAdftxe5OTD
+        fj6HOOZy3+FYoj1CHdR8tg==
+X-Google-Smtp-Source: ALg8bN5xKgUapCYysy92WvHP8KiJgbPshZesVo6BzhrUlrN2olYNSch4Mo/MWfp8Qqw4+ZLrHIijJw==
+X-Received: by 2002:adf:f848:: with SMTP id d8mr18850760wrq.178.1547838148828;
+        Fri, 18 Jan 2019 11:02:28 -0800 (PST)
+Received: from localhost (host89-130-dynamic.43-79-r.retail.telecomitalia.it. [79.43.130.89])
+        by smtp.gmail.com with ESMTPSA id l20sm175173029wrb.93.2019.01.18.11.02.27
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 18 Jan 2019 11:02:28 -0800 (PST)
+Date:   Fri, 18 Jan 2019 20:02:27 +0100
+From:   Andrea Righi <righi.andrea@gmail.com>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Josef Bacik <josef@toxicpanda.com>, Tejun Heo <tj@kernel.org>,
+        Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jens Axboe <axboe@kernel.dk>, Vivek Goyal <vgoyal@redhat.com>,
+        Dennis Zhou <dennis@kernel.org>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/3] cgroup: fsio throttle controller
+Message-ID: <20190118190227.GC1535@xps-13>
+References: <20190118103127.325-1-righi.andrea@gmail.com>
+ <20190118163530.w5wpzpjkcnkektsp@macbook-pro-91.dhcp.thefacebook.com>
+ <F576C256-A032-4E62-99EA-F60162B6E069@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1547833876.102272.0.camel@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <F576C256-A032-4E62-99EA-F60162B6E069@linaro.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/18/19 10:51 AM, Bart Van Assche wrote:
-> On Fri, 2019-01-18 at 10:48 -0700, Jens Axboe wrote:
->> It's UFS that totally buggy, if you look at its queuecommand, it does:
->>
->>         if (!down_read_trylock(&hba->clk_scaling_lock))                         
->>                 return SCSI_MLQUEUE_HOST_BUSY;
->>
->> UFS either needs to get fixed up, or we'll want a way to do something like
->> the below.
->>
->> Marc, can you test this?
->>
->>
->> diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
->> index eaf329db3973..e28c3420a9d9 100644
->> --- a/drivers/scsi/hosts.c
->> +++ b/drivers/scsi/hosts.c
->> @@ -412,6 +412,7 @@ struct Scsi_Host *scsi_host_alloc(struct scsi_host_template *sht, int privsize)
->>  	shost->hostt = sht;
->>  	shost->this_id = sht->this_id;
->>  	shost->can_queue = sht->can_queue;
->> +	shost->queue_may_block = sht->queue_may_block;
->>  	shost->sg_tablesize = sht->sg_tablesize;
->>  	shost->sg_prot_tablesize = sht->sg_prot_tablesize;
->>  	shost->cmd_per_lun = sht->cmd_per_lun;
->> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
->> index b13cc9288ba0..4e266af2871f 100644
->> --- a/drivers/scsi/scsi_lib.c
->> +++ b/drivers/scsi/scsi_lib.c
->> @@ -1902,6 +1902,8 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
->>  	shost->tag_set.flags = BLK_MQ_F_SHOULD_MERGE | BLK_MQ_F_SG_MERGE;
->>  	shost->tag_set.flags |=
->>  		BLK_ALLOC_POLICY_TO_MQ_FLAG(shost->hostt->tag_alloc_policy);
->> +	if (shost->queue_may_blocK)
->> +		shost->tag_set.flags |= BLK_MQ_F_BLOCKING;
->>  	shost->tag_set.driver_data = shost;
->>  
->>  	return blk_mq_alloc_tag_set(&shost->tag_set);
->> diff --git a/drivers/scsi/ufs/ufshcd.c b/drivers/scsi/ufs/ufshcd.c
->> index 9ba7671b84f8..9ab354e43630 100644
->> --- a/drivers/scsi/ufs/ufshcd.c
->> +++ b/drivers/scsi/ufs/ufshcd.c
->> @@ -6981,6 +6981,7 @@ static struct scsi_host_template ufshcd_driver_template = {
->>  	.sg_tablesize		= SG_ALL,
->>  	.cmd_per_lun		= UFSHCD_CMD_PER_LUN,
->>  	.can_queue		= UFSHCD_CAN_QUEUE,
->> +	.queue_may_block	= 1,
->>  	.max_host_blocked	= 1,
->>  	.track_queue_depth	= 1,
->>  	.sdev_groups		= ufshcd_driver_groups,
->> diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
->> index 6ca954e9f752..30aa7b6c4342 100644
->> --- a/include/scsi/scsi_host.h
->> +++ b/include/scsi/scsi_host.h
->> @@ -339,6 +339,11 @@ struct scsi_host_template {
->>  	 */
->>  	int can_queue;
->>  
->> +	/*
->> +	 * If the ->queuecommand() ever blocks, this should be set
->> +	 */
->> +	int queue_may_block;
->> +
->>  	/*
->>  	 * In many instances, especially where disconnect / reconnect are
->>  	 * supported, our host also has an ID on the SCSI bus.  If this is
->> @@ -584,6 +589,7 @@ struct Scsi_Host {
->>  
->>  	int this_id;
->>  	int can_queue;
->> +	int queue_may_block;
->>  	short cmd_per_lun;
->>  	short unsigned int sg_tablesize;
->>  	short unsigned int sg_prot_tablesize;
+On Fri, Jan 18, 2019 at 06:07:45PM +0100, Paolo Valente wrote:
 > 
-> Hi Jens,
 > 
-> Did you perhaps want to include a change from down_read_trylock() into
-> down_read() in the UFS queuecommand function in this patch?
+> > Il giorno 18 gen 2019, alle ore 17:35, Josef Bacik <josef@toxicpanda.com> ha scritto:
+> > 
+> > On Fri, Jan 18, 2019 at 11:31:24AM +0100, Andrea Righi wrote:
+> >> This is a redesign of my old cgroup-io-throttle controller:
+> >> https://lwn.net/Articles/330531/
+> >> 
+> >> I'm resuming this old patch to point out a problem that I think is still
+> >> not solved completely.
+> >> 
+> >> = Problem =
+> >> 
+> >> The io.max controller works really well at limiting synchronous I/O
+> >> (READs), but a lot of I/O requests are initiated outside the context of
+> >> the process that is ultimately responsible for its creation (e.g.,
+> >> WRITEs).
+> >> 
+> >> Throttling at the block layer in some cases is too late and we may end
+> >> up slowing down processes that are not responsible for the I/O that
+> >> is being processed at that level.
+> > 
+> > How so?  The writeback threads are per-cgroup and have the cgroup stuff set
+> > properly.  So if you dirty a bunch of pages, they are associated with your
+> > cgroup, and then writeback happens and it's done in the writeback thread
+> > associated with your cgroup and then that is throttled.  Then you are throttled
+> > at balance_dirty_pages() because the writeout is taking longer.
+> > 
+> 
+> IIUC, Andrea described this problem: certain processes in a certain group dirty a
+> lot of pages, causing write back to start.  Then some other blameless
+> process in the same group experiences very high latency, in spite of
+> the fact that it has to do little I/O.
+> 
+> Does your blk_cgroup_congested() stuff solves this issue?
+> 
+> Or simply I didn't get what Andrea meant at all :)
+> 
+> Thanks,
+> Paolo
 
-Yeah, that should be done as well. But honestly, looking at UFS, it's in
-dire need of love from someone that has some experience in writing a
-driver. The locking is absolutely miserable.
+Yes, there is also this problem: provide fairness among processes
+running inside the same cgroup.
 
-For one, the clk_scaling_lock needs to die. The clock scaling change
-should coordinate with the requests, not try to lock out request
-handling. It's totally an upside down approach.
+This is a tough one, because once the I/O limit is reached whoever
+process comes next gets punished, even if it hasn't done any I/O before.
 
--- 
-Jens Axboe
+Well, my proposal doesn't solve this problem. To solve this one in the
+"throttling" scenario, we should probably save some information about
+the previously generated I/O activity and apply a delay proportional to
+that (like a dynamic weight for each process inside each cgroup).
 
+AFAICS the io.max controller doesn't solve this problem either.
+
+-Andrea
