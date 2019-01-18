@@ -7,19 +7,19 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87637C43387
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAEFEC43612
 	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 09:45:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4F5D82086D
+	by mail.kernel.org (Postfix) with ESMTP id 9C7C12086D
 	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 09:45:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="GIRwV1Yd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="GqPdo8We"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726334AbfARJpn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jan 2019 04:45:43 -0500
+        id S1726288AbfARJpo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jan 2019 04:45:44 -0500
 Received: from esa4.hgst.iphmx.com ([216.71.154.42]:8856 "EHLO
         esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726288AbfARJpn (ORCPT
+        with ESMTP id S1725898AbfARJpn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 18 Jan 2019 04:45:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
@@ -27,22 +27,22 @@ DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   t=1547804744; x=1579340744;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=wONpaa8KC9keYspWe5/MYQFaOwEXehto04D3/Q6+B3w=;
-  b=GIRwV1YddwvkEDdz5Q9zUEfKuSDaCgraGWzhbg2CaxHE7MiZiAOKQZiD
-   tC8AMRv9zWgnhU9blSVQXNFSs6r6M6IGLI7rjk1fkO07qezhW6liop4FQ
-   fijzlaI5IadrNLA3sPLAwJEzTrpfc1bhfgcE7+D3SJ1OHVqmN0s1gKSWZ
-   8bZqrJfBFQD1GqcsD0V9Oet08DoripPtHS2ZpBI/Dm+67tfhejwD4uVJ+
-   28zKN2ledMyTrJV4tSEhLZY0pHP/A253Dj9FsZgWYr0B06ErhzoFeQW1b
-   MyYRd1GRAb8xnm6cHCNOKmqmhsOwK65mDI+7RMrNezvE3yUfUNDMwd/SV
-   Q==;
+  bh=abHhg2wcbdF25eLMhxDmHJ2SklmyEaucqIIwjuf8MIk=;
+  b=GqPdo8Weze7wYpem/2izQAcZEJ1ln+IkN/Z61ZF9ZUQyVbDfTZzIya6u
+   s5Ux6vvD5gim+n2R9HYWpQMHA/T6+brfRTNRZhkqxDKQpw6zR5CTKwYGM
+   9FY2orTQSuI/uYPGQRStFpbDp7c0QnmuBG1kandtxggZBCD08f507ue8K
+   dNlb0O655RB9Xyo6fj9OuGNAemm8MgP2BobFN+segtrwy2CCoQNKloPIc
+   qNJWrbhy2bkWtUaFJEJJIfRxurlEMs9nB7ZXJqBzM86GLUmI+cMyKUgd9
+   bcvPszqXnWnt4U7dhHn3K7cl4CAN+3bIDObT/zJdnIU2Ugf1HbEUVXeJC
+   g==;
 X-IronPort-AV: E=Sophos;i="5.56,489,1539619200"; 
-   d="scan'208";a="99182284"
+   d="scan'208";a="99182297"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 18 Jan 2019 17:45:25 +0800
+  by ob1.hgst.iphmx.com with ESMTP; 18 Jan 2019 17:45:29 +0800
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP; 18 Jan 2019 01:26:43 -0800
+  by uls-op-cesaep02.wdc.com with ESMTP; 18 Jan 2019 01:26:47 -0800
 Received: from shin_dev.dhcp.fujisawa.hgst.com (HELO shin_dev.fujisawa.hgst.com) ([10.149.52.166])
-  by uls-op-cesaip02.wdc.com with ESMTP; 18 Jan 2019 01:45:21 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 18 Jan 2019 01:45:26 -0800
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Masato Suzuki <masato.suzuki@wdc.com>,
@@ -53,9 +53,9 @@ Cc:     Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@kernel.dk>,
         Mike Snitzer <snitzer@redhat.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: [PATCH blktests v3 06/13] common: Introduce _dd() helper function
-Date:   Fri, 18 Jan 2019 18:44:46 +0900
-Message-Id: <20190118094453.13773-7-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v3 07/13] src: Introduce zbdioctl program
+Date:   Fri, 18 Jan 2019 18:44:47 +0900
+Message-Id: <20190118094453.13773-8-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190118094453.13773-1-shinichiro.kawasaki@wdc.com>
 References: <20190118094453.13773-1-shinichiro.kawasaki@wdc.com>
@@ -66,55 +66,131 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-To analyze dd command failures found by blktests, need to confirm dd
-command options. Introduce the helper function which executes dd and
-records dd command options in FULL file for quick analysis.
+zbdioctl implements calls to zoned block devices ioctls that are not
+supported currently by sys-utils blkzone utility, namely BLKGETZONESZ
+and BLKGETNRZONES.
 
 Reviewed-by: Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- common/rc | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ src/.gitignore |  1 +
+ src/Makefile   |  3 +-
+ src/zbdioctl.c | 83 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 86 insertions(+), 1 deletion(-)
+ create mode 100644 src/zbdioctl.c
 
-diff --git a/common/rc b/common/rc
-index 153a323..fe0e5d8 100644
---- a/common/rc
-+++ b/common/rc
-@@ -214,3 +214,34 @@ _test_dev_in_hotplug_slot() {
- _filter_xfs_io_error() {
- 	sed -e 's/^\(.*\)64\(: .*$\)/\1\2/'
- }
+diff --git a/src/.gitignore b/src/.gitignore
+index 8c95785..2108f56 100644
+--- a/src/.gitignore
++++ b/src/.gitignore
+@@ -6,3 +6,4 @@
+ /nbdsetsize
+ /sg/dxfer-from-dev
+ /sg/syzkaller1
++/zbdioctl
+diff --git a/src/Makefile b/src/Makefile
+index c4094b4..5a0556f 100644
+--- a/src/Makefile
++++ b/src/Makefile
+@@ -5,7 +5,8 @@ C_TARGETS := \
+ 	sg/dxfer-from-dev \
+ 	sg/syzkaller1 \
+ 	nbdsetsize \
+-	loop_change_fd
++	loop_change_fd \
++	zbdioctl
+ 
+ CXX_TARGETS := \
+ 	discontiguous-io
+diff --git a/src/zbdioctl.c b/src/zbdioctl.c
+new file mode 100644
+index 0000000..1ea72e8
+--- /dev/null
++++ b/src/zbdioctl.c
+@@ -0,0 +1,83 @@
++// SPDX-License-Identifier: GPL-3.0+
++// Copyright (C) 2018 Western Digital Corporation or its affiliates.
++#include <stdio.h>
++#include <string.h>
++#include <stdlib.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <sys/ioctl.h>
++#include <linux/blkzoned.h>
++#include <linux/types.h>
 +
-+# Issue dd command with five arguments and record command line in FULL file.
-+# args: target device, r/w, start sector, sector len, block size in bytes
-+_dd() {
-+	local target_dev=${1}
-+	local rw=${2}
-+	local -i start_sector=${3}
-+	local -i start_byte=$(( start_sector * 512 ))
-+	local -i sector_count=${4}
-+	local -i bs=${5}
-+	local -i block_count=$(( sector_count * 512 / bs ))
++#if !defined(BLKGETZONESZ) || !defined(BLKGETNRZONES)
 +
-+	local _cmd="dd bs=${bs} count=${block_count}"
-+
-+	if [[ ${rw} = "read" ]]; then
-+		_cmd="${_cmd} if=${target_dev} of=/dev/null"
-+		_cmd="${_cmd} iflag=skip_bytes skip=${start_byte}"
-+	elif [[ ${rw} = "write" ]]; then
-+		_cmd="${_cmd} if=/dev/zero of=${target_dev}"
-+		_cmd="${_cmd} oflag=seek_bytes,direct seek=${start_byte}"
-+	fi
-+
-+	echo "${_cmd}" >> "$FULL" 2>&1
-+
-+	if ! eval "${_cmd}" >> "$FULL" 2>&1 ; then
-+		echo "dd command failed"
-+		return 1
-+	fi
-+
-+	sync
++int main(int argc, char **argv)
++{
++	return EXIT_FAILURE;
 +}
++
++#else
++
++struct request {
++	const char *name;
++	unsigned long code;
++} requests[] = {
++	{ "-s", BLKGETZONESZ},
++	{ "-n", BLKGETNRZONES},
++	{ NULL, 0},
++};
++
++void usage(const char *progname)
++{
++	int i = 0;
++
++	fprintf(stderr, "usage: %s <request> <device file>\n", progname);
++	fprintf(stderr, "<request> can be:\n");
++	while (requests[i].name) {
++		fprintf(stderr, "\t%s\n", requests[i].name);
++		i++;
++	}
++	exit(EXIT_FAILURE);
++}
++
++int main(int argc, char **argv)
++{
++	int i = 0, fd, ret;
++	unsigned int val;
++	unsigned long code = 0;
++
++	if (argc != 3)
++		usage(argv[0]);
++
++	while (requests[i].name) {
++		if (strcmp(argv[1], requests[i].name) == 0) {
++			code = requests[i].code;
++			break;
++		}
++		i++;
++	}
++	if (code == 0)
++		usage(argv[0]);
++
++	fd = open(argv[2], O_RDWR);
++	if (fd < 0) {
++		perror("open");
++		return EXIT_FAILURE;
++	}
++
++	ret = ioctl(fd, code, &val);
++	if (ret < 0) {
++		perror("ioctl");
++		close(fd);
++		return EXIT_FAILURE;
++	}
++
++	printf("%u\n", val);
++
++	close(fd);
++
++	return EXIT_SUCCESS;
++}
++
++#endif
++
 -- 
 2.20.1
 
