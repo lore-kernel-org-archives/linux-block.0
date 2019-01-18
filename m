@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28AE9C43387
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 09:45:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E132C43387
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 09:45:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF4262086D
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 09:45:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D8A212087E
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 09:45:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="KYAVVqOW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="aiSmtoax"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725784AbfARJpC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jan 2019 04:45:02 -0500
+        id S1726873AbfARJpI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jan 2019 04:45:08 -0500
 Received: from esa6.hgst.iphmx.com ([216.71.154.45]:34681 "EHLO
         esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726288AbfARJpC (ORCPT
+        with ESMTP id S1726288AbfARJpI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jan 2019 04:45:02 -0500
+        Fri, 18 Jan 2019 04:45:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1547804703; x=1579340703;
+  t=1547804709; x=1579340709;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=rJtgDZkkRZf0LQYp77VMpsZko8wlDUStddWAOBwzLgI=;
-  b=KYAVVqOWafX2acwbUa3gzXXhSKDmCKMrwHYC/+LrI5eTeifQfv2GPx2H
-   DZWwV3X1JcquFFpvBPeWY5dvSRL8xwLdzXaMW1ZTwn6ztisyimer1nKUL
-   OfenqwWpTpDAbfaHipDnxJZpZtUyHTcw03AaAud+hIRuB0rGFAJpby2O/
-   QCflwDVg4Ua1RZgzeqGYg+5f9BR9QCBsraRBBGgKybvjq9RdoSedHWBoQ
-   Ioj0yb6zaLx+LCIwaVSb1LGo5wGKNOaeingPxWMa6jkDJQMuM4FvtQF64
-   ZKklgXza1aghfkaS+cIcSZc6dXoHg6Ar1pJAEKQS5OYuUZPmq8YdRZBMJ
-   A==;
+  bh=xr1OyQaLlTmPYAsiFIzba9jjn+m6h3teH3K/mzCBlhc=;
+  b=aiSmtoax9lxFeRFCNEZlOiQxQkY4RMLOhLweEhuujjBRjx16q8pvHnqc
+   VtBI0iBSIyFqqBZoVO5oEZxQKEExaqacJe+HmjKn8G1VN47l0UmfqDH7Y
+   rnXHsuT0g5/dAvbcTgzCEPvNxVzQYBOEeKdQ+by9pWgxr+4oT6VLTgHlO
+   RJBS62mmW3UQdEI/t0Y9Z2jbHnR2pIzfYgIPhHip3KAmbatI4EpsXkZRT
+   u/mW1co88uKn+lkz52XQo6eej8y6OA/ESchQjvaLAW2IC5idf9OWxPf8k
+   mkY2XOxslgKfO0LF3C5rt+XIdQTzaYDbs8Gtf4nuOnQze3x8JzfwnAw1w
+   g==;
 X-IronPort-AV: E=Sophos;i="5.56,489,1539619200"; 
-   d="scan'208";a="100920228"
+   d="scan'208";a="100920244"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 18 Jan 2019 17:45:03 +0800
+  by ob1.hgst.iphmx.com with ESMTP; 18 Jan 2019 17:45:07 +0800
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP; 18 Jan 2019 01:26:20 -0800
+  by uls-op-cesaep02.wdc.com with ESMTP; 18 Jan 2019 01:26:24 -0800
 Received: from shin_dev.dhcp.fujisawa.hgst.com (HELO shin_dev.fujisawa.hgst.com) ([10.149.52.166])
-  by uls-op-cesaip02.wdc.com with ESMTP; 18 Jan 2019 01:44:58 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 18 Jan 2019 01:45:02 -0800
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Masato Suzuki <masato.suzuki@wdc.com>,
@@ -52,9 +52,9 @@ Cc:     Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@kernel.dk>,
         Mike Snitzer <snitzer@redhat.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: [PATCH blktests v3 01/13] config: Introduce RUN_ZONED_TESTS variable and CAN_BE_ZONED flag
-Date:   Fri, 18 Jan 2019 18:44:41 +0900
-Message-Id: <20190118094453.13773-2-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v3 02/13] common: Introduce _have_fio_zbd_zonemode() helper function
+Date:   Fri, 18 Jan 2019 18:44:42 +0900
+Message-Id: <20190118094453.13773-3-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190118094453.13773-1-shinichiro.kawasaki@wdc.com>
 References: <20190118094453.13773-1-shinichiro.kawasaki@wdc.com>
@@ -65,207 +65,35 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-To allow running tests using a null_blk device with the zoned mode
-disabled (current setup) as well as enabled, introduce the config
-the RUN_ZONED_TESTS config variable and the per-test flag CAN_BE_ZONED.
-
-RUN_ZONED_TESTS=1 indicates that tests run against null_blk will be
-executed twice, first with null_blk as a regular block device
-(RUN_FOR_ZONED=0) and a second time with null_blk set as a zoned block
-device (RUN_FOR_ZONED=1). This applies only to tests cases that have the
-variable CAN_BE_ZONED set to 1, indicating that the test case applies to
-zoned block devices. If CAN_BE_ZONED is not defined by a test case, the
-test is executed only with the regular null_blk device.
-
-_init_null_blk is modified to prepare null_blk as a zoned blocked device
-if RUN_FOR_ZONED is set and as a regular block device otherwise. To avoid
-"modprobe -r null_blk" failures, rmdir calls on all sysfs nullbX
-directories is added.
-
-When a zoned block device is specified in TEST_DEVS, failures of test
-cases that do not set CAN_BE_ZONED are avoided by automatically skipping
-the test. The new helper function _test_dev_is_zoned() is introduced to
-implement this.
-
-The use of the RUN_ZONED_TESTS variable requires that the kernel be
-compiled with CONFIG_BLK_DEV_ZONED enabled.
+Fio zbd zone mode is necessary for zoned block devices. Introduce the
+helper function _have_fio_zbd_zonemode() to check that the installed
+fio version supports the option --zonemode=zbd.
 
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 ---
- Documentation/running-tests.md | 13 +++++++++++++
- check                          | 29 ++++++++++++++++++++++++++---
- common/null_blk                | 23 ++++++++++++++++++++++-
- common/shellcheck              |  2 +-
- new                            |  4 ++++
- 5 files changed, 66 insertions(+), 5 deletions(-)
+ common/fio | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
-index 8f32af3..459c96b 100644
---- a/Documentation/running-tests.md
-+++ b/Documentation/running-tests.md
-@@ -82,6 +82,19 @@ passing the `-d` command line option or setting the `DEVICE_ONLY` variable.
- DEVICE_ONLY=1
- ```
- 
-+### Zoned Block Device
-+
-+To run test cases for zoned block devices, set `RUN_ZONED_TESTS` variable.
-+When this variable is set and a test case can prepare a virtual devices such
-+as null_blk with zoned mode, the test case is executed twice: first with
-+non-zoned mode and second with zoned mode. The use of the RUN_ZONED_TESTS
-+variable requires that the kernel be compiled with CONFIG_BLK_DEV_ZONED
-+enabled.
-+
-+```sh
-+RUN_ZONED_TESTS=1
-+```
-+
- ### Custom Setup
- 
- The `config` file is really just a bash file that is sourced at the beginning
-diff --git a/check b/check
-index 6c6d9f5..4563d62 100755
---- a/check
-+++ b/check
-@@ -17,7 +17,7 @@ _found_test() {
- 	local test_name="$1"
- 	local explicit="$2"
- 
--	unset DESCRIPTION QUICK TIMED requires device_requires test test_device
-+	unset DESCRIPTION QUICK TIMED CAN_BE_ZONED requires device_requires test test_device
- 
- 	# shellcheck disable=SC1090
- 	if ! . "tests/${test_name}"; then
-@@ -182,11 +182,14 @@ _write_test_run() {
- _output_status() {
- 	local test="$1"
- 	local status="$2"
-+	local zoned=" "
-+
-+	if (( RUN_FOR_ZONED )); then zoned=" (zoned) "; fi
- 
- 	if [[ -v DESCRIPTION ]]; then
--		printf '%-60s' "$test ($DESCRIPTION)"
-+		printf '%-60s' "${test}${zoned}($DESCRIPTION)"
- 	else
--		printf '%-60s' "$test"
-+		printf '%-60s' "${test}${zoned}"
- 	fi
- 	if [[ -z $status ]]; then
- 		echo
-@@ -391,10 +394,19 @@ _call_test() {
- 	fi
+diff --git a/common/fio b/common/fio
+index e407088..4c771fc 100644
+--- a/common/fio
++++ b/common/fio
+@@ -17,6 +17,15 @@ _have_fio() {
+ 	return 0
  }
  
-+_test_dev_is_zoned() {
-+	if grep -qe "none" "${TEST_DEV_SYSFS}/queue/zoned" ; then
-+		SKIP_REASON="${TEST_DEV} is not a zoned block device"
++_have_fio_zbd_zonemode() {
++	_have_fio || return $?
++	if ! fio --cmdhelp=zonemode 2>&1 | grep -q zbd ; then
++		SKIP_REASON="Fio version too old (does not support --zonemode=zbd)"
 +		return 1
 +	fi
 +	return 0
 +}
 +
- _run_test() {
- 	TEST_NAME="$1"
- 	CHECK_DMESG=1
- 	DMESG_FILTER="cat"
-+	RUN_FOR_ZONED=0
- 
- 	# shellcheck disable=SC1090
- 	. "tests/${TEST_NAME}"
-@@ -407,6 +419,11 @@ _run_test() {
- 
- 		RESULTS_DIR="$OUTPUT/nodev"
- 		_call_test test
-+		if (( RUN_ZONED_TESTS && CAN_BE_ZONED )); then
-+			RESULTS_DIR="$OUTPUT/nodev_zoned"
-+			RUN_FOR_ZONED=1
-+			_call_test test
-+		fi
- 	else
- 		if [[ ${#TEST_DEVS[@]} -eq 0 ]]; then
- 			return 0
-@@ -420,6 +437,11 @@ _run_test() {
- 		local ret=0
- 		for TEST_DEV in "${TEST_DEVS[@]}"; do
- 			TEST_DEV_SYSFS="${TEST_DEV_SYSFS_DIRS["$TEST_DEV"]}"
-+			if (( !CAN_BE_ZONED )) && _test_dev_is_zoned; then
-+				SKIP_REASON="${TEST_DEV} is a zoned block device"
-+				_output_notrun "$TEST_NAME => $(basename "$TEST_DEV")"
-+				continue
-+			fi
- 			if declare -fF device_requires >/dev/null && ! device_requires; then
- 				_output_notrun "$TEST_NAME => $(basename "$TEST_DEV")"
- 				continue
-@@ -591,6 +613,7 @@ fi
- # Default configuration.
- : "${DEVICE_ONLY:=0}"
- : "${QUICK_RUN:=0}"
-+: "${RUN_ZONED_TESTS:=0}"
- : "${OUTPUT:=results}"
- if [[ -v EXCLUDE ]] && ! declare -p EXCLUDE | grep -q '^declare -a'; then
- 	# If EXCLUDE was not defined as an array, convert it to one.
-diff --git a/common/null_blk b/common/null_blk
-index 937ece0..fd035b7 100644
---- a/common/null_blk
-+++ b/common/null_blk
-@@ -8,8 +8,29 @@ _have_null_blk() {
- 	_have_modules null_blk
- }
- 
-+_null_blk_not_zoned() {
-+	if [[ "${ZONED}" != "0" ]]; then
-+		# shellcheck disable=SC2034
-+		SKIP_REASON="null_blk zoned mode not supported"
-+		return 1
-+	fi
-+	return 0
-+}
-+
- _init_null_blk() {
--	if ! modprobe -r null_blk || ! modprobe null_blk "$@"; then
-+	for d in /sys/kernel/config/nullb/*;
-+	do [[ -d "$d" ]] && rmdir "$d";	done
-+
-+	local _zoned=""
-+	if [[ ${RUN_FOR_ZONED} -ne 0 ]] ; then
-+		if ! _have_kernel_option BLK_DEV_ZONED ; then
-+			echo -n "ZONED specified for kernel with "
-+			echo "CONFIG_BLK_DEV_ZONED disabled"
-+			return 1
-+		fi
-+		_zoned="zoned=1"
-+	fi
-+	if ! modprobe -r null_blk || ! modprobe null_blk "$@" "${_zoned}" ; then
- 		return 1
- 	fi
- 
-diff --git a/common/shellcheck b/common/shellcheck
-index 5f46c00..b9be7d2 100644
---- a/common/shellcheck
-+++ b/common/shellcheck
-@@ -6,5 +6,5 @@
- 
- # Suppress unused global variable warnings.
- _silence_sc2034() {
--	echo "$CGROUP2_DIR $CHECK_DMESG $DESCRIPTION $DMESG_FILTER $FIO_PERF_FIELDS $FIO_PERF_PREFIX $QUICK $SKIP_REASON ${TEST_RUN[*]} $TIMED" > /dev/null
-+	echo "$CGROUP2_DIR $CHECK_DMESG $DESCRIPTION $DMESG_FILTER $FIO_PERF_FIELDS $FIO_PERF_PREFIX $QUICK $SKIP_REASON ${TEST_RUN[*]} $TIMED $CAN_BE_ZONED" > /dev/null
- }
-diff --git a/new b/new
-index 63e36cd..d7d5f7c 100755
---- a/new
-+++ b/new
-@@ -145,6 +145,10 @@ DESCRIPTION=""
- # Alternatively, you can filter out any unimportant messages in dmesg like so:
- # DMESG_FILTER="grep -v sysfs"
- 
-+# TODO: if this test can be run for both regular block devices and zoned block
-+# devices, uncomment the line below.
-+# CAN_BE_ZONED=1
-+
- # TODO: if this test has any extra requirements, it should define a requires()
- # function. If the test can be run, requires() should return 0. Otherwise, it
- # should return non-zero and set the \$SKIP_REASON variable. Usually,
+ declare -A FIO_TERSE_FIELDS
+ FIO_TERSE_FIELDS=(
+ 	# Read status
 -- 
 2.20.1
 
