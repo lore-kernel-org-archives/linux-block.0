@@ -3,24 +3,24 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA422C1B0F7
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 21:33:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 288C7C1B0FD
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 22:28:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8C68B2086D
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 21:33:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED27A20823
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 22:28:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729725AbfARVdA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jan 2019 16:33:00 -0500
-Received: from smtp2.provo.novell.com ([137.65.250.81]:51676 "EHLO
+        id S1729950AbfARW2s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jan 2019 17:28:48 -0500
+Received: from smtp2.provo.novell.com ([137.65.250.81]:43633 "EHLO
         smtp2.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729672AbfARVc6 (ORCPT
+        with ESMTP id S1729932AbfARW2r (ORCPT
         <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
-        Fri, 18 Jan 2019 16:32:58 -0500
+        Fri, 18 Jan 2019 17:28:47 -0500
 Received: from apollon.suse.de.de (prv-ext-foundry1int.gns.novell.com [137.65.251.240])
-        by smtp2.provo.novell.com with ESMTP (TLS encrypted); Fri, 18 Jan 2019 14:32:45 -0700
+        by smtp2.provo.novell.com with ESMTP (TLS encrypted); Fri, 18 Jan 2019 15:28:39 -0700
 From:   Martin Wilck <mwilck@suse.com>
 To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
         Hannes Reinecke <hare@suse.de>
@@ -29,13 +29,12 @@ Cc:     Martin Wilck <mwilck@suse.com>, linux-scsi@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         James Bottomley <jejb@linux.vnet.ibm.com>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>
-Subject: [PATCH 4/4] block: check_events: don't bother with events if unsupported
-Date:   Fri, 18 Jan 2019 22:32:07 +0100
-Message-Id: <20190118213207.2309-5-mwilck@suse.com>
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        Borislav Petkov <bp@alien8.de>
+Subject: [PATCH v2 2/4] Revert "ide: unexport DISK_EVENT_MEDIA_CHANGE for ide-gd and ide-cd"
+Date:   Fri, 18 Jan 2019 23:28:05 +0100
+Message-Id: <20190118222805.30373-1-mwilck@suse.com>
 X-Mailer: git-send-email 2.19.2
-In-Reply-To: <20190118213207.2309-1-mwilck@suse.com>
-References: <20190118213207.2309-1-mwilck@suse.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -43,98 +42,76 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Drivers now report to the block layer if they support media change
-events. If this is not the case, there's no need to allocate
-the event structure, and all event handling code can effectively
-be skipped. This simplifies code flow in particular for
-non-removable sd devices.
+This reverts commit 7eec77a1816a7042591a6cbdb4820e9e7ebffe0e.
 
-This effectively reverts commit 75e3f3ee3c64 ("block: always allocate
-genhd->ev if check_events is implemented").
+Instead of leaving disk->events completely empty, we now export the supported
+events again, and tell the block layer not to forward events to user space by
+not setting DISK_EVENT_FLAG_UEVENT. This allows the block layer to distinguish
+between devices that for which events should be handled in kernel only, and
+devices which don't support any meda change events at all.
 
-The sysfs files for the events are kept in place even if no events
-are supported, as user space may rely on them being present. The only
-difference is that an error code is now returned if the user tries
-to set poll_msecs.
+Changed wrt v1: fixed editing error made during revert.
 
+Cc: Borislav Petkov <bp@alien8.de>
 Signed-off-by: Martin Wilck <mwilck@suse.com>
 ---
- block/genhd.c | 28 +++++++++++++++++-----------
- 1 file changed, 17 insertions(+), 11 deletions(-)
+ drivers/ide/ide-cd.c       | 1 +
+ drivers/ide/ide-cd_ioctl.c | 5 +++--
+ drivers/ide/ide-gd.c       | 6 ++++--
+ 3 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index bcd16f6..55b6570 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1909,6 +1909,9 @@ static ssize_t disk_events_poll_msecs_show(struct device *dev,
- {
- 	struct gendisk *disk = dev_to_disk(dev);
+diff --git a/drivers/ide/ide-cd.c b/drivers/ide/ide-cd.c
+index 1f03884..3b15adc 100644
+--- a/drivers/ide/ide-cd.c
++++ b/drivers/ide/ide-cd.c
+@@ -1797,6 +1797,7 @@ static int ide_cd_probe(ide_drive_t *drive)
+ 	ide_cd_read_toc(drive);
+ 	g->fops = &idecd_ops;
+ 	g->flags |= GENHD_FL_REMOVABLE | GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE;
++	g->events = DISK_EVENT_MEDIA_CHANGE;
+ 	device_add_disk(&drive->gendev, g, NULL);
+ 	return 0;
  
-+	if (!disk->ev)
-+		return sprintf(buf, "-1\n");
-+
- 	return sprintf(buf, "%ld\n", disk->ev->poll_msecs);
- }
+diff --git a/drivers/ide/ide-cd_ioctl.c b/drivers/ide/ide-cd_ioctl.c
+index 4a6e1a4..f9f4bac 100644
+--- a/drivers/ide/ide-cd_ioctl.c
++++ b/drivers/ide/ide-cd_ioctl.c
+@@ -82,8 +82,9 @@ int ide_cdrom_drive_status(struct cdrom_device_info *cdi, int slot_nr)
  
-@@ -1925,6 +1928,9 @@ static ssize_t disk_events_poll_msecs_store(struct device *dev,
- 	if (intv < 0 && intv != -1)
- 		return -EINVAL;
+ /*
+  * ide-cd always generates media changed event if media is missing, which
+- * makes it impossible to use for proper event reporting, so disk->events
+- * is cleared to 0 and the following function is used only to trigger
++ * makes it impossible to use for proper event reporting, so
++ * DISK_EVENT_FLAG_UEVENT is cleared in disk->events
++ * and the following function is used only to trigger
+  * revalidation and never propagated to userland.
+  */
+ unsigned int ide_cdrom_check_events_real(struct cdrom_device_info *cdi,
+diff --git a/drivers/ide/ide-gd.c b/drivers/ide/ide-gd.c
+index 04e008e..88dceef 100644
+--- a/drivers/ide/ide-gd.c
++++ b/drivers/ide/ide-gd.c
+@@ -299,8 +299,9 @@ static unsigned int ide_gd_check_events(struct gendisk *disk,
+ 	/*
+ 	 * The following is used to force revalidation on the first open on
+ 	 * removeable devices, and never gets reported to userland as
+-	 * genhd->events is 0.  This is intended as removeable ide disk
+-	 * can't really detect MEDIA_CHANGE events.
++	 * DISK_EVENT_FLAG_UEVENT isn't set in genhd->events.
++	 * This is intended as removeable ide disk can't really detect
++	 * MEDIA_CHANGE events.
+ 	 */
+ 	ret = drive->dev_flags & IDE_DFLAG_MEDIA_CHANGED;
+ 	drive->dev_flags &= ~IDE_DFLAG_MEDIA_CHANGED;
+@@ -416,6 +417,7 @@ static int ide_gd_probe(ide_drive_t *drive)
+ 	if (drive->dev_flags & IDE_DFLAG_REMOVABLE)
+ 		g->flags = GENHD_FL_REMOVABLE;
+ 	g->fops = &ide_gd_ops;
++	g->events = DISK_EVENT_MEDIA_CHANGE;
+ 	device_add_disk(&drive->gendev, g, NULL);
+ 	return 0;
  
-+	if (!disk->ev)
-+		return -ENODEV;
-+
- 	disk_block_events(disk);
- 	disk->ev->poll_msecs = intv;
- 	__disk_unblock_events(disk, true);
-@@ -1989,7 +1995,8 @@ static void disk_alloc_events(struct gendisk *disk)
- {
- 	struct disk_events *ev;
- 
--	if (!disk->fops->check_events)
-+	if (!disk->fops->check_events ||
-+	    !(disk->events & DISK_EVENT_TYPES_MASK))
- 		return;
- 
- 	ev = kzalloc(sizeof(*ev), GFP_KERNEL);
-@@ -2011,14 +2018,14 @@ static void disk_alloc_events(struct gendisk *disk)
- 
- static void disk_add_events(struct gendisk *disk)
- {
--	if (!disk->ev)
--		return;
--
- 	/* FIXME: error handling */
- 	if (sysfs_create_files(&disk_to_dev(disk)->kobj, disk_events_attrs) < 0)
- 		pr_warn("%s: failed to create sysfs files for events\n",
- 			disk->disk_name);
- 
-+	if (!disk->ev)
-+		return;
-+
- 	mutex_lock(&disk_events_mutex);
- 	list_add_tail(&disk->ev->node, &disk_events);
- 	mutex_unlock(&disk_events_mutex);
-@@ -2032,14 +2039,13 @@ static void disk_add_events(struct gendisk *disk)
- 
- static void disk_del_events(struct gendisk *disk)
- {
--	if (!disk->ev)
--		return;
-+	if (disk->ev) {
-+		disk_block_events(disk);
- 
--	disk_block_events(disk);
--
--	mutex_lock(&disk_events_mutex);
--	list_del_init(&disk->ev->node);
--	mutex_unlock(&disk_events_mutex);
-+		mutex_lock(&disk_events_mutex);
-+		list_del_init(&disk->ev->node);
-+		mutex_unlock(&disk_events_mutex);
-+	}
- 
- 	sysfs_remove_files(&disk_to_dev(disk)->kobj, disk_events_attrs);
- }
 -- 
 2.19.2
 
