@@ -4,44 +4,45 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C1EC43444
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 09:45:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F07EFC43444
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 09:45:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 960CB2086D
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 09:45:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB50F2087E
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 09:45:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="EEg+RK7M"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="aYizh53U"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727186AbfARJpw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jan 2019 04:45:52 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:8861 "EHLO
+        id S1727364AbfARJpz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jan 2019 04:45:55 -0500
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:8872 "EHLO
         esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726956AbfARJpp (ORCPT
+        with ESMTP id S1726956AbfARJpy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jan 2019 04:45:45 -0500
+        Fri, 18 Jan 2019 04:45:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1547804745; x=1579340745;
+  t=1547804754; x=1579340754;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ZuAoGLlnQKEbYDiO6jPdNjX8klQL9nBbv/TjzQXA7Ec=;
-  b=EEg+RK7M6GeTl3nXn5SR2oPy7BP5FX++VJx+Hf1ut5Lfrs6dQa4ktrMf
-   5IjR8kuUb4FQz/DELEl1CjVGGgAiDcZ+gRC/ZUTAzYbWkuE/R8oaTPRwn
-   Svk6EJRGjRmYCKkXrWF4hsQUYGMbYnvNDAnLizGRemJ5QwpaPB4i+mCSf
-   juNtf8e8mPXfVr7ouycKj7iQY/UpRkonTv1rxhgcTJ/fXbNh5mWBmfd/T
-   ronT+6DYwCronZoRHMrsIh2uVGE244xQjZOtZMZzTIcDp/QLuQggFfoAi
-   iEvGZJf2srHLx5/ZxT9jftHYhgGulBgD7xdJ/QBARtjoXeIpBCyO2kjdf
-   g==;
+  bh=HhLivrf1ZOQNPDV2UpJ0kdP7WmFbE6YMCJKyYi+AggQ=;
+  b=aYizh53U0FFv/FdxWNXSiujKhLHsqLNWfOESIcPphQ9NL/mhBI1HndCD
+   8XXars++MQS76I6m747l2MOg2QoA83jsxW9eBvDnZuN00vLWXlE5lKsT0
+   9d8hPrSEd0h7fEtBN5n7QVcFlz++pEFox3SDpxvU0IGClb5Yu1BqitVFl
+   t9n0aTp6K57XbZwBXmM+Bwxrgf4BP8kMro62nCpjAcMCnc1pvOmYmtGJ3
+   nHhX8264qsZhKcmrtH9HoeGRsBpmzfMLf64+oOF9qhMSJ9Wh1x3d3rc9+
+   53Xa23qx68go8YR+PUb7b8Ngda6Tmr8Bv0XI9P1tmAVQY86WEi8dU18PT
+   A==;
 X-IronPort-AV: E=Sophos;i="5.56,489,1539619200"; 
-   d="scan'208";a="99182327"
+   d="scan'208";a="99182391"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 18 Jan 2019 17:45:38 +0800
+  by ob1.hgst.iphmx.com with ESMTP; 18 Jan 2019 17:45:54 +0800
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP; 18 Jan 2019 01:26:55 -0800
+  by uls-op-cesaep02.wdc.com with ESMTP; 18 Jan 2019 01:27:12 -0800
 Received: from shin_dev.dhcp.fujisawa.hgst.com (HELO shin_dev.fujisawa.hgst.com) ([10.149.52.166])
-  by uls-op-cesaip02.wdc.com with ESMTP; 18 Jan 2019 01:45:34 -0800
+  by uls-op-cesaip02.wdc.com with ESMTP; 18 Jan 2019 01:45:50 -0800
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Masato Suzuki <masato.suzuki@wdc.com>,
@@ -52,9 +53,9 @@ Cc:     Omar Sandoval <osandov@osandov.com>, Jens Axboe <axboe@kernel.dk>,
         Mike Snitzer <snitzer@redhat.com>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: [PATCH blktests v3 09/13] zbd/001: sysfs and ioctl consistency test
-Date:   Fri, 18 Jan 2019 18:44:49 +0900
-Message-Id: <20190118094453.13773-10-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests v3 13/13] zbd/005: Test write ordering
+Date:   Fri, 18 Jan 2019 18:44:53 +0900
+Message-Id: <20190118094453.13773-14-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190118094453.13773-1-shinichiro.kawasaki@wdc.com>
 References: <20190118094453.13773-1-shinichiro.kawasaki@wdc.com>
@@ -67,39 +68,42 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Masato Suzuki <masato.suzuki@wdc.com>
 
-Obtain a zoned block device attributes from sysfs and using ioctl calls
-and confirm the consistency of the values.
+Run a high queue depth direct sequential write fio job to check that
+write requests are not being reordered when the deadline scheduler is
+used. This test allowed to catch a bug fixed with commit
+80e02039721 "block: mq-deadline: Fix write completion handling".
 
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Signed-off-by: Masato Suzuki <masato.suzuki@wdc.com>
 ---
- tests/zbd/001     | 75 +++++++++++++++++++++++++++++++++++++++++++++++
- tests/zbd/001.out |  2 ++
- 2 files changed, 77 insertions(+)
- create mode 100755 tests/zbd/001
- create mode 100644 tests/zbd/001.out
+ tests/zbd/005     | 67 +++++++++++++++++++++++++++++++++++++++++++++++
+ tests/zbd/005.out |  2 ++
+ 2 files changed, 69 insertions(+)
+ create mode 100755 tests/zbd/005
+ create mode 100644 tests/zbd/005.out
 
-diff --git a/tests/zbd/001 b/tests/zbd/001
+diff --git a/tests/zbd/005 b/tests/zbd/005
 new file mode 100755
-index 0000000..ccb6e6c
+index 0000000..bc9cad5
 --- /dev/null
-+++ b/tests/zbd/001
-@@ -0,0 +1,75 @@
++++ b/tests/zbd/005
+@@ -0,0 +1,67 @@
 +#!/bin/bash
 +# SPDX-License-Identifier: GPL-3.0+
 +# Copyright (C) 2018 Western Digital Corporation or its affiliates.
 +#
-+# Check zoned block device sysfs and ioctl parameter availability and
-+# confirm consistency among them.
++# Run a high queue depth direct sequential write fio job to check that
++# write requests are not being reordered when the deadline scheduler is
++# used. This test allowed to catch a bug fixed with commit 80e02039721
++# "block: mq-deadline: Fix write completion handling".
 +
 +. tests/zbd/rc
 +
-+DESCRIPTION="sysfs and ioctl"
-+QUICK=1
++DESCRIPTION="write command ordering"
++TIMED=1
 +CAN_BE_ZONED=1
 +
 +requires() {
-+	_have_src_program zbdioctl
++	_have_fio_zbd_zonemode
 +}
 +
 +fallback_device() {
@@ -110,63 +114,53 @@ index 0000000..ccb6e6c
 +	_exit_null_blk
 +}
 +
++_find_first_sequential_zone() {
++	for ((idx =  NR_CONV_ZONES; idx < REPORTED_COUNT; idx++)); do
++		if [[ ${ZONE_TYPES[idx]} -eq ${ZONE_TYPE_SEQ_WRITE_REQUIRED} ]];
++		then
++			echo "${idx}"
++			return 0
++		fi
++	done
++	echo "Sequential write required zone not found"
++
++	return 1
++}
++
 +test_device() {
++	local -i zone_idx
++	local -i offset
++
 +	echo "Running ${TEST_NAME}"
 +
-+	# Get and keep sysfs variables
 +	_get_sysfs_variable "${TEST_DEV}" || return $?
-+	local -i capacity=${SYSFS_VARS[$SV_CAPACITY]}
-+	local -i chunk_sectors=${SYSFS_VARS[$SV_CHUNK_SECTORS]}
++	_get_blkzone_report "${TEST_DEV}" || return $?
 +
-+	# Calculate expected number of zones based on the total capacity and
-+	# zone size, taking into account that the last zone can be smaller
-+	# than other zones.
-+	local -i nr_zones=$(( (capacity - 1) / chunk_sectors + 1 ))
++	zone_idx=$(_find_first_sequential_zone) || return $?
++	offset=$((ZONE_STARTS[zone_idx] * 512))
 +
-+	# Compare sysfs values and ioctl values
-+	if [[ -e "${TEST_DEV_SYSFS}"/queue/nr_zones ]]; then
-+		local -i sysfs_nr_zones=${SYSFS_VARS[$SV_NR_ZONES]}
-+		local -i ioctl_nr_zones
-+		local -i ioctl_zonesize
++	blkzone reset -o "${ZONE_STARTS[zone_idx]}" "${TEST_DEV}"
 +
-+		ioctl_zonesize=$(src/zbdioctl -s "${TEST_DEV}")
-+		if [[ ${chunk_sectors} -ne ${ioctl_zonesize} ]]; then
-+			echo -n "ioctl zone size:${ioctl_zonesize} != "
-+			echo "sysfs chunk_sectors:${chunk_sectors}"
-+			return 1
-+		fi
++	_test_dev_queue_set scheduler deadline
 +
-+		ioctl_nr_zones=$(src/zbdioctl -n "${TEST_DEV}")
-+		if [[ ${nr_zones} -ne ${ioctl_nr_zones} ]]; then
-+			echo -n "ioctl nr_zones:${ioctl_nr_zones} != "
-+			echo "nr_zones:${nr_zones}"
-+			return 1
-+		fi
++	: "${TIMEOUT:=30}"
++	FIO_PERF_FIELDS=("write io" "write iops")
++	_fio_perf --filename="${TEST_DEV}" --name zbdwo --rw=write --direct=1 \
++		  --ioengine=libaio --iodepth=128 --bs=256k \
++		  --offset="${offset}"
 +
-+		if [[ ${nr_zones} -ne ${sysfs_nr_zones} ]]; then
-+			echo -n "sysfs nr_zones:${sysfs_nr_zones} != "
-+			echo "nr_zones:${nr_zones}"
-+			return 1
-+		fi
-+	fi
-+
++	_put_blkzone_report
 +	_put_sysfs_variable
-+	{
-+		echo "Capacity: ${capacity} sectors"
-+		echo "Zone: ${chunk_sectors} sectors"
-+		echo "Number of zones: ${nr_zones} zones"
-+	} >> "$FULL" 2>&1
 +
 +	echo "Test complete"
 +}
-+
-diff --git a/tests/zbd/001.out b/tests/zbd/001.out
+diff --git a/tests/zbd/005.out b/tests/zbd/005.out
 new file mode 100644
-index 0000000..7d72a8f
+index 0000000..3ff78c6
 --- /dev/null
-+++ b/tests/zbd/001.out
++++ b/tests/zbd/005.out
 @@ -0,0 +1,2 @@
-+Running zbd/001
++Running zbd/005
 +Test complete
 -- 
 2.20.1
