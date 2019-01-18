@@ -2,177 +2,697 @@ Return-Path: <SRS0=kGct=P2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B378C43387
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 10:31:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BB37C43387
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 10:31:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E01EF2087E
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 10:31:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14AD92086D
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 10:31:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FktayEwl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IS6VmF5T"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726741AbfARKbn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jan 2019 05:31:43 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:33949 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726416AbfARKbm (ORCPT
+        id S1727020AbfARKbr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jan 2019 05:31:47 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:46874 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726876AbfARKbr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jan 2019 05:31:42 -0500
-Received: by mail-wr1-f67.google.com with SMTP id j2so14474892wrw.1;
-        Fri, 18 Jan 2019 02:31:41 -0800 (PST)
+        Fri, 18 Jan 2019 05:31:47 -0500
+Received: by mail-wr1-f68.google.com with SMTP id l9so14327855wrt.13;
+        Fri, 18 Jan 2019 02:31:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=DG6bk1ejVh8rxbtQA/jlQO7ic8ssgX5N3kx62jr5skA=;
-        b=FktayEwlolfuR8urYX2+zd96A4rZG4Xk3Kq6P8EQ+r7A6kUQKipD/GNTK6QUGai9Vz
-         4WJ2wCTF/PnrPUEoVg8dPqihrxX2iqKxowv6My5G7AiV0GVPAjDOitj1LKaV6uzE0jld
-         O+j/cwrmmfzXlyQINSFotgNUX/aMRdIBjYNcbX3fhi8XbqNFjAUsFzLpDJ0ELFL2ysWQ
-         u7/tCE//kFxCdtOAL/CnhePTdXtEvpeVDE4l8kquh5OsA8QoCrcbOPoz7RDjLA3akHT7
-         QISJZt6GtUQza+GZOdkEe2r23LqQidFoBZfHFSiBJtkdc4pL27+Gmt7V4OUdG1kFOXf8
-         3XRQ==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=inHfsq74/pGw38ScfkC1tTFdlvR5n5Lc+bi28/v53+g=;
+        b=IS6VmF5TYk4IJsP/qj3R6nq756RpY00XfgQ0NuhJhCZJSloG4611vya4oLXfOdQGei
+         I8pqqfV+siBd9JNmB8EFr3a7DFNloqkwBDDCplw+VdVq7GDwjf7SlQLlO4v/Bl2gR9ta
+         UzRsN0Pv1ig+BVkNk4kbMXIHfnhYoF+UQL8p7g5ypiKHhv72RX2WGrXMIOoKpWqka1Hn
+         tpfxV2ztyfztrYX1Lr6l0fYc/ZawYGAUYRglhhQxbr5tTCgDYMMiVt6K0ZyG8L4xk4D1
+         ai1UWKw9cr9iLEXKZHFbfL0P2aexAdK1smaqM/9ob5zysqp0Y6UlZ2ljy9GrMw+Vih/a
+         tEtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=DG6bk1ejVh8rxbtQA/jlQO7ic8ssgX5N3kx62jr5skA=;
-        b=lBi1oUKUFLbC4uHEJZ7QvOSjcrrzIZyWQPjjoqFVg3APqNKnx7voCVuClQs/ZHAR2O
-         Ufx6WNrFb5gEj85nE6o1Wwk6jF37rC10ZGCP1hUPjY7f+x+HICXWuSoF8/kRly50/6sA
-         Ov7jkCBKqBZeKllY2pAoNQVcoY58ssPLnFVleW2CL83n98KMTFoBSoqtv7fppgXMkgKs
-         6KF2dufjA7e1nCnoA7sDKwErhOjRFtjVspwb0Re+YJevYkBk9nNBs4iHugewblZzn5Dj
-         CBO9xLB3U1ElIdLjU1zuh+s37JKS7ecpTJTWHVy27Xww/uJYpF7Oqd2304mP5i9k1SUB
-         c9tA==
-X-Gm-Message-State: AJcUukfMRpJqzt0OgnMJLLWTytSNnXAJWIsQ92S361Y3bKqZytIXEPCo
-        /vd5HijwNWpjk+Pkpt/FSg==
-X-Google-Smtp-Source: ALg8bN4kmPfQ1YD7LKC7QAf4jnXdvBqN8xleSfsv59k7rA6FXtjTCB9cHfbxBVjjZNwVYjX6M0MRBQ==
-X-Received: by 2002:adf:c846:: with SMTP id e6mr15221224wrh.243.1547807500291;
-        Fri, 18 Jan 2019 02:31:40 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=inHfsq74/pGw38ScfkC1tTFdlvR5n5Lc+bi28/v53+g=;
+        b=a8rMK5Ifg8qSmsq2geW4+tYjQ5k4ALjIAnrIOivuAuFBD4FCVhLTSRivz1w+pbi3TG
+         UgxY7lzdQfBnSqE3oJZv8T4APetjY8tDYXIidq3eFOODTlUuwMIXlvd7cdBKW2BPxiFw
+         YddaYx4Dt9+qVWc04Qdwx2nY3ZDpj1ECXd2HV9sAW6YAjNGYrRvtGXKUNoVl6uEB9DDJ
+         tBI9s/MmB7kKEilgcQyLKtt6UQ/ZeN/wl6x8A0WcnqRUpaIUeeitSpuo78kmfqi4576v
+         Cz8nJ2aTbH0QjjiM6C4ip5aSbx177s/DYbOX9H+fj5fkLU6rC1i2uVP2XA8ofv63r9Ad
+         tOqA==
+X-Gm-Message-State: AJcUukf4gFJVOCQh9KxLa+grY/AnwXUwaW+W2/eGqTVAWXIvxqXnjG7N
+        GZdhRur0/QFqMR4EqxdYmw==
+X-Google-Smtp-Source: ALg8bN5QT4MSFiwpvNEnYyXIUkgR4XQmNf7LbBSBhIXJeIMgzVvga2+Ok06W8l2rXUjm+kWlhOJYgg==
+X-Received: by 2002:a5d:68c3:: with SMTP id p3mr16363946wrw.34.1547807503314;
+        Fri, 18 Jan 2019 02:31:43 -0800 (PST)
 Received: from xps-13.homenet.telecomitalia.it (host89-130-dynamic.43-79-r.retail.telecomitalia.it. [79.43.130.89])
-        by smtp.gmail.com with ESMTPSA id g9sm39949652wmg.44.2019.01.18.02.31.39
+        by smtp.gmail.com with ESMTPSA id g9sm39949652wmg.44.2019.01.18.02.31.42
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 18 Jan 2019 02:31:39 -0800 (PST)
+        Fri, 18 Jan 2019 02:31:42 -0800 (PST)
 From:   Andrea Righi <righi.andrea@gmail.com>
 To:     Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
         Johannes Weiner <hannes@cmpxchg.org>
 Cc:     Jens Axboe <axboe@kernel.dk>, Vivek Goyal <vgoyal@redhat.com>,
         Josef Bacik <josef@toxicpanda.com>,
         Dennis Zhou <dennis@kernel.org>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 0/3] cgroup: fsio throttle controller
-Date:   Fri, 18 Jan 2019 11:31:24 +0100
-Message-Id: <20190118103127.325-1-righi.andrea@gmail.com>
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Andrea Righi <righi.andrea@gmail.com>
+Subject: [RFC PATCH 2/3] fsio-throttle: controller infrastructure
+Date:   Fri, 18 Jan 2019 11:31:26 +0100
+Message-Id: <20190118103127.325-3-righi.andrea@gmail.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190118103127.325-1-righi.andrea@gmail.com>
+References: <20190118103127.325-1-righi.andrea@gmail.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is a redesign of my old cgroup-io-throttle controller:
-https://lwn.net/Articles/330531/
+This is the core of the fsio-throttle controller: it defines the
+interface to the cgroup subsystem and implements the I/O measurement and
+throttling logic.
 
-I'm resuming this old patch to point out a problem that I think is still
-not solved completely.
+Signed-off-by: Andrea Righi <righi.andrea@gmail.com>
+---
+ include/linux/cgroup_subsys.h |   4 +
+ include/linux/fsio-throttle.h |  43 +++
+ init/Kconfig                  |  11 +
+ kernel/cgroup/Makefile        |   1 +
+ kernel/cgroup/fsio-throttle.c | 501 ++++++++++++++++++++++++++++++++++
+ 5 files changed, 560 insertions(+)
+ create mode 100644 include/linux/fsio-throttle.h
+ create mode 100644 kernel/cgroup/fsio-throttle.c
 
-= Problem =
-
-The io.max controller works really well at limiting synchronous I/O
-(READs), but a lot of I/O requests are initiated outside the context of
-the process that is ultimately responsible for its creation (e.g.,
-WRITEs).
-
-Throttling at the block layer in some cases is too late and we may end
-up slowing down processes that are not responsible for the I/O that
-is being processed at that level.
-
-= Proposed solution =
-
-The main idea of this controller is to split I/O measurement and I/O
-throttling: I/O is measured at the block layer for READS, at page cache
-(dirty pages) for WRITEs, and processes are limited while they're
-generating I/O at the VFS level, based on the measured I/O.
-
-= Example =
-
-Here's a trivial example: create 2 cgroups, set an io.max limit of
-10MB/s, run a write-intensive workload on both and after a while, from a
-root cgroup, run "sync".
-
- # cat /proc/self/cgroup
- 0::/cg1
- # fio --rw=write --bs=1M --size=32M --numjobs=16 --name=seeker --time_based --runtime=30
-
- # cat /proc/self/cgroup
- 0::/cg2
- # fio --rw=write --bs=1M --size=32M --numjobs=16 --name=seeker --time_based --runtime=30
-
- - io.max controller:
-
- # echo "259:0 rbps=10485760 wbps=10485760" > /sys/fs/cgroup/unified/cg1/io.max
- # echo "259:0 rbps=10485760 wbps=10485760" > /sys/fs/cgroup/unified/cg2/io.max
-
- # cat /proc/self/cgroup
- 0::/
- # time sync
-
- real	0m51,241s
- user	0m0,000s
- sys	0m0,113s
-
-Ideally "sync" should complete almost immediately, because the root
-cgroup is unlimited and it's not doing any I/O at all, but instead it's
-blocked for more than 50 sec with io.max, because the writeback is
-throttled to satisfy the io.max limits.
-
-- fsio controller:
-
- # echo "259:0 10 10" > /sys/fs/cgroup/unified/cg1/fsio.max_mbs
- # echo "259:0 10 10" > /sys/fs/cgroup/unified/cg2/fsio.max_mbs
-
- [you can find details about the syntax in the documentation patch]
-
- # cat /proc/self/cgroup
- 0::/
- # time sync
-
- real	0m0,146s
- user	0m0,003s
- sys	0m0,001s
-
-= Questions =
-
-Q: Do we need another controller?
-A: Probably no, I think it would be better to integrate this policy (or
-   something similar) in the current blkio controller, this is just to
-   highlight the problem and get some ideas on how to address it.
-
-Q: What about proportional limits / latency?
-A: It should be trivial to add latency-based limits if we integrate this in the
-   current I/O controller. About proportional limits (weights), they're
-   strictly related to I/O scheduling and since this controller doesn't touch
-   I/O dispatching policies it's not trivial to implement proportional limits
-   (bandwidth limiting is definitely more straightforward).
-
-Q: Applying delays at the VFS layer doesn't prevent I/O spikes during
-   writeback, right?
-A: Correct, the tradeoff here is to tolerate I/O bursts during writeback to
-   avoid priority inversion problems in the system.
-
-Andrea Righi (3):
-  fsio-throttle: documentation
-  fsio-throttle: controller infrastructure
-  fsio-throttle: instrumentation
-
- Documentation/cgroup-v1/fsio-throttle.txt | 142 +++++++++
- block/blk-core.c                          |  10 +
- include/linux/cgroup_subsys.h             |   4 +
- include/linux/fsio-throttle.h             |  43 +++
- include/linux/writeback.h                 |   7 +-
- init/Kconfig                              |  11 +
- kernel/cgroup/Makefile                    |   1 +
- kernel/cgroup/fsio-throttle.c             | 501 ++++++++++++++++++++++++++++++
- mm/filemap.c                              |  20 +-
- mm/page-writeback.c                       |  14 +-
- 10 files changed, 749 insertions(+), 4 deletions(-)
+diff --git a/include/linux/cgroup_subsys.h b/include/linux/cgroup_subsys.h
+index acb77dcff3b4..33beb70c0eca 100644
+--- a/include/linux/cgroup_subsys.h
++++ b/include/linux/cgroup_subsys.h
+@@ -61,6 +61,10 @@ SUBSYS(pids)
+ SUBSYS(rdma)
+ #endif
+ 
++#if IS_ENABLED(CONFIG_CGROUP_FSIO_THROTTLE)
++SUBSYS(fsio)
++#endif
++
+ /*
+  * The following subsystems are not supported on the default hierarchy.
+  */
+diff --git a/include/linux/fsio-throttle.h b/include/linux/fsio-throttle.h
+new file mode 100644
+index 000000000000..3a46df712475
+--- /dev/null
++++ b/include/linux/fsio-throttle.h
+@@ -0,0 +1,43 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef __FSIO_THROTTLE_H__
++#define __FSIO_THROTTLE_H__
++
++#include <linux/fs.h>
++#include <linux/genhd.h>
++
++#ifdef CONFIG_BLOCK
++static inline dev_t bdev_to_dev(struct block_device *bdev)
++{
++	return bdev ? MKDEV(MAJOR(bdev->bd_inode->i_rdev),
++			    bdev->bd_disk->first_minor) : 0;
++}
++
++static inline struct block_device *as_to_bdev(struct address_space *mapping)
++{
++	return (mapping->host && mapping->host->i_sb->s_bdev) ?
++		mapping->host->i_sb->s_bdev : NULL;
++}
++#else /* CONFIG_BLOCK */
++static dev_t bdev_to_dev(struct block_device *bdev)
++{
++	return 0;
++}
++
++static inline struct block_device *as_to_bdev(struct address_space *mapping)
++{
++	return NULL;
++}
++#endif /* CONFIG_BLOCK */
++
++#ifdef CONFIG_CGROUP_FSIO_THROTTLE
++int fsio_throttle(dev_t dev, ssize_t bytes, int state);
++#else /* CONFIG_CGROUP_FSIO_THROTTLE */
++static inline int
++fsio_throttle(dev_t dev, ssize_t bytes, int state)
++{
++	return 0;
++}
++#endif /* CONFIG_CGROUP_FSIO_THROTTLE */
++
++#endif /* __FSIO_THROTTLE_H__ */
+diff --git a/init/Kconfig b/init/Kconfig
+index d47cb77a220e..95d7342801eb 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -775,6 +775,17 @@ config CGROUP_WRITEBACK
+ 	depends on MEMCG && BLK_CGROUP
+ 	default y
+ 
++config CGROUP_FSIO_THROTTLE
++	bool "Filesystem I/O throttling controller"
++	default n
++	depends on BLOCK
++	help
++	  This option enables filesystem I/O throttling infrastructure.
++
++	  This allows to properly throttle reads and writes at the filesystem
++	  level, without introducing I/O locking contentions or priority
++	  inversion problems.
++
+ menuconfig CGROUP_SCHED
+ 	bool "CPU controller"
+ 	default n
+diff --git a/kernel/cgroup/Makefile b/kernel/cgroup/Makefile
+index bfcdae896122..12de828b36cd 100644
+--- a/kernel/cgroup/Makefile
++++ b/kernel/cgroup/Makefile
+@@ -2,6 +2,7 @@
+ obj-y := cgroup.o rstat.o namespace.o cgroup-v1.o
+ 
+ obj-$(CONFIG_CGROUP_FREEZER) += freezer.o
++obj-$(CONFIG_CGROUP_FSIO_THROTTLE) += fsio-throttle.o
+ obj-$(CONFIG_CGROUP_PIDS) += pids.o
+ obj-$(CONFIG_CGROUP_RDMA) += rdma.o
+ obj-$(CONFIG_CPUSETS) += cpuset.o
+diff --git a/kernel/cgroup/fsio-throttle.c b/kernel/cgroup/fsio-throttle.c
+new file mode 100644
+index 000000000000..46f3ffd4015b
+--- /dev/null
++++ b/kernel/cgroup/fsio-throttle.c
+@@ -0,0 +1,501 @@
++// SPDX-License-Identifier: GPL-2.0
++
++/*
++ * fsio-throttle.c - I/O cgroup controller
++ *
++ * Copyright (C) 2019 Andrea Righi <righi.andrea@gmail.com>
++ */
++
++#include <linux/types.h>
++#include <linux/string.h>
++#include <linux/jiffies.h>
++#include <linux/spinlock.h>
++#include <linux/timer.h>
++#include <linux/moduleparam.h>
++#include <linux/genhd.h>
++#include <linux/slab.h>
++#include <linux/vmalloc.h>
++#include <linux/sched/signal.h>
++#include <linux/cgroup.h>
++#include <linux/fsio-throttle.h>
++
++#define KB(x)   ((x) * 1024)
++#define MB(x)   (KB(KB(x)))
++#define GB(x)   (MB(KB(x)))
++
++static int throttle_kernel_threads __read_mostly;
++module_param(throttle_kernel_threads, int, 0644);
++MODULE_PARM_DESC(throttle_kernel_threads,
++		  "enable/disable I/O throttling for kernel threads");
++
++static int throttle_timeslice_ms __read_mostly = 250;
++module_param(throttle_timeslice_ms, int, 0644);
++MODULE_PARM_DESC(throttle_kernel_threads,
++		  "throttling time slice (default 250ms)");
++
++static int throttle_timeframe_ms __read_mostly = 2000;
++module_param(throttle_timeframe_ms, int, 0644);
++MODULE_PARM_DESC(throttle_kernel_threads,
++		  "maximum sleep time enforced (default 2000ms)");
++
++struct iothrottle {
++	struct cgroup_subsys_state css;
++	struct list_head list;
++	/* protect the list of iothrottle_node elements (list) */
++	struct mutex lock;
++	wait_queue_head_t wait;
++	struct timer_list timer;
++	bool timer_cancel;
++	/* protect the wait queue elements */
++	spinlock_t wait_lock;
++};
++
++struct iothrottle_limit {
++	unsigned long long usage;
++	unsigned long long bucket_size;
++	unsigned long long limit;
++	unsigned long long timestamp;
++	/* protect all of the above */
++	spinlock_t lock;
++};
++
++struct iothrottle_node {
++	struct list_head node;
++	struct rcu_head rcu;
++	struct iothrottle_limit bw;
++	dev_t dev;
++};
++
++static inline bool iothrottle_disabled(void)
++{
++	return !cgroup_subsys_enabled(fsio_cgrp_subsys);
++}
++
++static struct iothrottle *css_to_iothrottle(struct cgroup_subsys_state *css)
++{
++	return css ? container_of(css, struct iothrottle, css) : NULL;
++}
++
++struct iothrottle *task_to_iothrottle(struct task_struct *p)
++{
++	if (unlikely(!p))
++		return NULL;
++	return css_to_iothrottle(task_css(p, fsio_cgrp_id));
++}
++
++static inline unsigned long long
++iothrottle_limit_delta_t(struct iothrottle_limit *res)
++{
++	return (long long)get_jiffies_64() - (long long)res->timestamp;
++}
++
++static void iothrottle_limit_init(struct iothrottle_limit *res,
++				 unsigned long long limit,
++				 unsigned long long bucket_size)
++{
++	spin_lock_init(&res->lock);
++	res->limit = limit;
++	res->usage = 0;
++	res->bucket_size = bucket_size;
++	res->timestamp = get_jiffies_64();
++}
++
++static unsigned long long
++iothrottle_limit_sleep(struct iothrottle_limit *res, unsigned long long size)
++{
++	unsigned long long delta;
++	long long tok;
++	unsigned long flags;
++
++	spin_lock_irqsave(&res->lock, flags);
++	res->usage -= size;
++	delta = jiffies_to_msecs(iothrottle_limit_delta_t(res));
++	res->timestamp = get_jiffies_64();
++	tok = (long long)res->usage * MSEC_PER_SEC;
++	if (delta) {
++		long long max = (long long)res->bucket_size * MSEC_PER_SEC;
++
++		tok += delta * res->limit;
++		tok = min_t(long long, tok, max);
++		res->usage = (unsigned long long)div_s64(tok, MSEC_PER_SEC);
++	}
++	spin_unlock_irqrestore(&res->lock, flags);
++
++	return (tok < 0) ? msecs_to_jiffies(div_u64(-tok, res->limit)) : 0;
++}
++
++static void iothrottle_limit_reset(struct iothrottle_limit *res)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(&res->lock, flags);
++	res->usage = 0;
++	spin_unlock_irqrestore(&res->lock, flags);
++}
++
++static inline int iothrottle_node_size(void)
++{
++	return sizeof(struct iothrottle_node);
++}
++
++static struct iothrottle_node *iothrottle_node_alloc(gfp_t flags)
++{
++	struct iothrottle_node *n;
++	int size = iothrottle_node_size();
++
++	if (size < PAGE_SIZE)
++		n = kmalloc(size, flags);
++	else
++		n = vmalloc(size);
++	if (n)
++		memset(n, 0, size);
++	return n;
++}
++
++static void iothrottle_node_free(struct iothrottle_node *n)
++{
++	if (iothrottle_node_size() < PAGE_SIZE)
++		kfree(n);
++	else
++		vfree(n);
++}
++
++static struct iothrottle_node *
++iothrottle_node_search(const struct iothrottle *iot, dev_t dev)
++{
++	struct iothrottle_node *n;
++
++	list_for_each_entry_rcu(n, &iot->list, node)
++		if (n->dev == dev)
++			return n;
++	return NULL;
++}
++
++static void iothrottle_node_reclaim(struct rcu_head *rp)
++{
++	struct iothrottle_node *n;
++
++	n = container_of(rp, struct iothrottle_node, rcu);
++	iothrottle_node_free(n);
++}
++
++static int iothrottle_parse_args(char *buf, size_t nbytes,
++				 dev_t *dev,
++				 unsigned long long *io_limit,
++				 unsigned long long *bucket_size)
++{
++	struct gendisk *disk;
++	unsigned int major, minor;
++	unsigned long long limit, size;
++	int part, ret = 0;
++
++	if (sscanf(buf, "%u:%u %llu %llu", &major, &minor, &limit, &size) != 4)
++		return -EINVAL;
++	disk = get_gendisk(MKDEV(major, minor), &part);
++	if (!disk)
++		return -ENODEV;
++	if (part) {
++		ret = -ENODEV;
++		goto out;
++	}
++	*dev = MKDEV(major, minor);
++	*io_limit = MB(limit);
++	*bucket_size = MB(size);
++out:
++	put_disk_and_module(disk);
++
++	return ret;
++}
++
++static ssize_t iothrottle_write(struct kernfs_open_file *of,
++				char *buffer, size_t nbytes, loff_t off)
++{
++	struct iothrottle *iot;
++	struct iothrottle_node *n, *newn = NULL;
++	unsigned long long io_limit, bucket_size;
++	dev_t dev;
++	char *buf;
++	int ret;
++
++	/*
++	 * We need to allocate a new buffer here, because
++	 * iothrottle_parse_args() can modify it and the buffer provided by
++	 * write_string is supposed to be const.
++	 */
++	buf = kmalloc(nbytes + 1, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++	memcpy(buf, buffer, nbytes + 1);
++
++	ret = iothrottle_parse_args(buf, nbytes, &dev, &io_limit, &bucket_size);
++	if (ret)
++		goto out_free;
++
++	newn = iothrottle_node_alloc(GFP_KERNEL);
++	if (!newn) {
++		ret = -ENOMEM;
++		goto out_free;
++	}
++	newn->dev = dev;
++	iothrottle_limit_init(&newn->bw, io_limit, bucket_size);
++
++	iot = css_to_iothrottle(of_css(of));
++	if (unlikely(!iot)) {
++		WARN_ON_ONCE(1);
++		goto out_free;
++	}
++	mutex_lock(&iot->lock);
++	n = iothrottle_node_search(iot, dev);
++	if (!n) {
++		/* Insert new node */
++		if (io_limit) {
++			list_add_rcu(&newn->node, &iot->list);
++			newn = NULL;
++		}
++	} else if (!io_limit) {
++		/* Delete existing node */
++		list_del_rcu(&n->node);
++	} else {
++		/* Update existing node */
++		list_replace_rcu(&n->node, &newn->node);
++		newn = NULL;
++	}
++	mutex_unlock(&iot->lock);
++	if (n)
++		call_rcu(&n->rcu, iothrottle_node_reclaim);
++	ret = nbytes;
++out_free:
++	if (newn)
++		iothrottle_node_free(newn);
++	kfree(buf);
++	return ret;
++}
++
++static void iothrottle_show_limit(struct seq_file *m,
++				  dev_t dev, struct iothrottle_limit *res)
++{
++	seq_put_decimal_ull(m, "", MAJOR(dev));
++	seq_put_decimal_ull(m, ":", MINOR(dev));
++	seq_put_decimal_ull(m, " ", res->limit);
++	seq_put_decimal_ull(m, " ", res->usage);
++	seq_put_decimal_ull(m, " ", res->bucket_size);
++	seq_put_decimal_ull(m, " ",
++			    jiffies_to_clock_t(iothrottle_limit_delta_t(res)));
++	seq_putc(m, '\n');
++}
++
++static int iothrottle_read(struct seq_file *m, void *v)
++{
++	struct iothrottle *iot = css_to_iothrottle(seq_css(m));
++	struct iothrottle_node *n;
++
++	rcu_read_lock();
++	list_for_each_entry_rcu(n, &iot->list, node)
++		iothrottle_show_limit(m, n->dev, &n->bw);
++	rcu_read_unlock();
++
++	return 0;
++}
++
++static struct cftype iothrottle_files[] = {
++	{
++		.name = "max_mbs",
++		.seq_show = iothrottle_read,
++		.write = iothrottle_write,
++		.flags = CFTYPE_NOT_ON_ROOT,
++	},
++};
++
++static void iothrottle_wakeup(struct iothrottle *iot, bool timer_cancel)
++{
++	spin_lock_bh(&iot->wait_lock);
++	if (timer_cancel)
++		iot->timer_cancel = true;
++	wake_up_all(&iot->wait);
++	spin_unlock_bh(&iot->wait_lock);
++}
++
++static void iothrottle_timer_wakeup(struct timer_list *t)
++{
++	struct iothrottle *iot = from_timer(iot, t, timer);
++
++	iothrottle_wakeup(iot, false);
++}
++
++static struct cgroup_subsys_state *
++iothrottle_css_alloc(struct cgroup_subsys_state *parent)
++{
++	struct iothrottle *iot;
++
++	iot = kzalloc(sizeof(*iot), GFP_KERNEL);
++	if (!iot)
++		return ERR_PTR(-ENOMEM);
++	INIT_LIST_HEAD(&iot->list);
++	mutex_init(&iot->lock);
++	init_waitqueue_head(&iot->wait);
++	spin_lock_init(&iot->wait_lock);
++	iot->timer_cancel = false;
++	timer_setup(&iot->timer, iothrottle_timer_wakeup, 0);
++
++	return &iot->css;
++}
++
++static void iothrottle_css_offline(struct cgroup_subsys_state *css)
++{
++	struct iothrottle *iot = css_to_iothrottle(css);
++
++	spin_lock_bh(&iot->wait_lock);
++	iot->timer_cancel = true;
++	spin_unlock_bh(&iot->wait_lock);
++
++	iothrottle_wakeup(iot, true);
++}
++
++static void iothrottle_css_free(struct cgroup_subsys_state *css)
++{
++	struct iothrottle_node *n, *p;
++	struct iothrottle *iot = css_to_iothrottle(css);
++
++	del_timer_sync(&iot->timer);
++	/*
++	 * don't worry about locking here, at this point there's no reference
++	 * to the list.
++	 */
++	list_for_each_entry_safe(n, p, &iot->list, node)
++		iothrottle_node_free(n);
++	kfree(iot);
++}
++
++static inline bool is_kernel_thread(void)
++{
++	return !!(current->flags & (PF_KTHREAD | PF_KSWAPD));
++}
++
++static inline bool is_urgent_task(void)
++{
++	/* Never throttle tasks that are going to exit */
++	if (current->flags & PF_EXITING)
++		return true;
++	/* Throttle kernel threads only if throttle_kernel_threads is set */
++	return is_kernel_thread() && !throttle_kernel_threads;
++}
++
++static struct iothrottle *try_get_iothrottle_from_task(struct task_struct *p)
++{
++	struct iothrottle *iot = NULL;
++
++	rcu_read_lock();
++	if (!task_css_is_root(p, fsio_cgrp_id)) {
++		do {
++			iot = task_to_iothrottle(p);
++			if (unlikely(!iot))
++				break;
++		} while (!css_tryget_online(&iot->css));
++	}
++	rcu_read_unlock();
++
++	return iot;
++}
++
++static int iothrottle_evaluate_sleep(struct iothrottle *iot, dev_t dev,
++				     ssize_t bytes, int state)
++{
++	struct iothrottle_node *n;
++	unsigned long long sleep = 0;
++
++	rcu_read_lock();
++	n = iothrottle_node_search(iot, dev);
++	if (n) {
++		sleep = iothrottle_limit_sleep(&n->bw, bytes);
++		/*
++		 * state == 0 is used to do only I/O accounting without
++		 * enforcing sleeps.
++		 */
++		if (!state || sleep < msecs_to_jiffies(throttle_timeslice_ms))
++			sleep = 0;
++		if (sleep)
++			iothrottle_limit_reset(&n->bw);
++	}
++	rcu_read_unlock();
++
++	return sleep;
++}
++
++static noinline void iothrottle_force_sleep(struct iothrottle *iot,
++					    unsigned long long sleep,
++					    int state)
++{
++	unsigned long expire, now;
++
++	/*
++	 * Allow small IO bursts, by waking up the throttled task after a
++	 * maximum sleep of throttle_timeframe millisec.
++	 */
++	if (sleep > msecs_to_jiffies(throttle_timeframe_ms))
++		sleep = msecs_to_jiffies(throttle_timeframe_ms);
++
++	now = READ_ONCE(jiffies);
++	expire = now + sleep;
++
++	/*
++	 * Round up the time to sleep to a multiple of the sleep timeslice.
++	 *
++	 * In this way we can strongly reduce timer softirqs and
++	 * context switches in the system even when there are a lot of
++	 * different cgroups.
++	 */
++	expire = roundup(expire, msecs_to_jiffies(throttle_timeslice_ms));
++
++	/* Force sleep */
++	do {
++		DEFINE_WAIT(wait);
++
++		spin_lock_bh(&iot->wait_lock);
++		if (unlikely(iot->timer_cancel)) {
++			spin_unlock_bh(&iot->wait_lock);
++			break;
++		}
++		mod_timer(&iot->timer, expire);
++		spin_unlock_bh(&iot->wait_lock);
++
++		/*
++		 * Do not enforce interruptible sleep if there are pending
++		 * signals, otherwise we'll end up into a busy loop.
++		 */
++		if (signal_pending(current))
++			state = TASK_KILLABLE;
++
++		/* Send to sleep */
++		prepare_to_wait(&iot->wait, &wait, state);
++		schedule();
++		finish_wait(&iot->wait, &wait);
++	} while (!fatal_signal_pending(current) &&
++		 time_is_after_jiffies(expire));
++}
++
++int fsio_throttle(dev_t dev, ssize_t bytes, int state)
++{
++	struct iothrottle *iot;
++	unsigned long long sleep = 0;
++
++	if (iothrottle_disabled() || is_urgent_task())
++		return 0;
++	if (!dev)
++		return 0;
++	iot = try_get_iothrottle_from_task(current);
++	if (!iot)
++		return 0;
++	sleep = iothrottle_evaluate_sleep(iot, dev, bytes, state);
++	if (unlikely(sleep))
++		iothrottle_force_sleep(iot, sleep, state);
++	css_put(&iot->css);
++
++	return sleep;
++}
++
++struct cgroup_subsys fsio_cgrp_subsys = {
++	.css_alloc = iothrottle_css_alloc,
++	.css_free = iothrottle_css_free,
++	.css_offline = iothrottle_css_offline,
++	.dfl_cftypes = iothrottle_files,
++};
+-- 
+2.17.1
 
