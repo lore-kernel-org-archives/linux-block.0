@@ -2,136 +2,168 @@ Return-Path: <SRS0=kGct=P2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50330C07EBF
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 19:02:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18EF0C07EBF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 19:10:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1FBE620883
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 19:02:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D13E320896
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 19:10:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hLAJqvdq"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Nqj4MrOR";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="XJKWJeE1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728764AbfARTCb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jan 2019 14:02:31 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45667 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728583AbfARTCb (ORCPT
+        id S1729176AbfARTKs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jan 2019 14:10:48 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:36130 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729115AbfARTKr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jan 2019 14:02:31 -0500
-Received: by mail-wr1-f67.google.com with SMTP id t6so16292145wrr.12;
-        Fri, 18 Jan 2019 11:02:29 -0800 (PST)
+        Fri, 18 Jan 2019 14:10:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1547838670; x=1579374670;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=NfbzGNNjPR8kChZasInzoYeopGGIUkGMpKZdGjX4Bg0=;
+  b=Nqj4MrORWJEuVKl+98KW4jOlX2p7SRZiVmirZ69fRlAA+e1tXXRdyBlc
+   6vud4aiukTvoUSo7FNxVJojUDIZSndxTI1LINqFS/tYKi5fpi3L99fDdh
+   gtJv5u1NcacHqX0UGqsByH/2f55SdJBMLgeD+eenvmoASsyqUuMsAJL6j
+   kTJxhfO11IupNnXbmPx1nkthElVM6a405jDoWxEY1ycIr8RpxgvDykj+p
+   6Tdl0wax23RFQKf0MM256RbOCScpyeRy3mCveYEpKMNdPHPlLvhhyehOi
+   77US0HLJFuiXYR08CoSux57FRuR/GVnI9XY4DNtU8PYjLDMcPhCX3zQR2
+   g==;
+X-IronPort-AV: E=Sophos;i="5.56,491,1539619200"; 
+   d="scan'208";a="197251304"
+Received: from mail-by2nam05lp2057.outbound.protection.outlook.com (HELO NAM05-BY2-obe.outbound.protection.outlook.com) ([104.47.50.57])
+  by ob1.hgst.iphmx.com with ESMTP; 19 Jan 2019 03:11:09 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=1UMa4yCXmM3OK38bryfUjoNkHrVdY+842bxFOYwuFrA=;
-        b=hLAJqvdqa5AmoAZ8dykKzHIvpLwfc/1enH5Qndq2pLDg3c0WHNnomUGTN6V8M/h03L
-         wDSs5wP2dW+1ktrRparURlTqi4fwUyCW02xYH6j0Xydo9r9u/rX8DVlKeuAljhAVHRlq
-         Z1IHAnvmvyGRMJJYYu6KSArZ/p1wbzjiLIplwznGq9ZzG7JH6yTmEu0tTjOo3vCS6iAA
-         vMj5S58YJeklAQZiAQ/hn9k7Ac0BaEJcfb+LYKuGlQf9En0H1Xp58H6bvlc/X7xBQ1LR
-         8+FaBdcMoGLfxmPnjWR8DRKYpukSxJIcmLAT1j+vMOaBE73QYxV5lNxz1aEMJj4DEWX/
-         mZLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=1UMa4yCXmM3OK38bryfUjoNkHrVdY+842bxFOYwuFrA=;
-        b=FP7gU75BpobA3SwOWx70xUYusDBvmqd8PMjLbh63oUqdY3yJmJv9lyY+cnd3DpqOtZ
-         JVq9OXhDs96KibvI+Hyfon9s1RmCsguiJQxuIhb2xS2a6t5LnS8AL4iPgkbkjo/1mtyn
-         Pt4IioXXqn5F3z0ka9eAYG8WXaOcsCmPygNYQgUYRRb7DRr/x9T/5FWwa4zSm8nlVoRP
-         ASlC1iXh5cg/HXI7IXe6mYrPIzi7W+ddze+4pGHR4uXX2JG3xvMM3bl1stp2KB8b7Wt9
-         h4bka8OpsNokGY/yuaw1cTlcOMtZgK5NnT4063RO9MxcyyqpdKeqAyUp7XxldLt8lBEA
-         0ZaQ==
-X-Gm-Message-State: AJcUukc/IisineDMV1KGVofaE0O6jEHV6BUy3SbPwtp9ncAdftxe5OTD
-        fj6HOOZy3+FYoj1CHdR8tg==
-X-Google-Smtp-Source: ALg8bN5xKgUapCYysy92WvHP8KiJgbPshZesVo6BzhrUlrN2olYNSch4Mo/MWfp8Qqw4+ZLrHIijJw==
-X-Received: by 2002:adf:f848:: with SMTP id d8mr18850760wrq.178.1547838148828;
-        Fri, 18 Jan 2019 11:02:28 -0800 (PST)
-Received: from localhost (host89-130-dynamic.43-79-r.retail.telecomitalia.it. [79.43.130.89])
-        by smtp.gmail.com with ESMTPSA id l20sm175173029wrb.93.2019.01.18.11.02.27
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 18 Jan 2019 11:02:28 -0800 (PST)
-Date:   Fri, 18 Jan 2019 20:02:27 +0100
-From:   Andrea Righi <righi.andrea@gmail.com>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Josef Bacik <josef@toxicpanda.com>, Tejun Heo <tj@kernel.org>,
-        Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jens Axboe <axboe@kernel.dk>, Vivek Goyal <vgoyal@redhat.com>,
-        Dennis Zhou <dennis@kernel.org>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/3] cgroup: fsio throttle controller
-Message-ID: <20190118190227.GC1535@xps-13>
-References: <20190118103127.325-1-righi.andrea@gmail.com>
- <20190118163530.w5wpzpjkcnkektsp@macbook-pro-91.dhcp.thefacebook.com>
- <F576C256-A032-4E62-99EA-F60162B6E069@linaro.org>
+ d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5hYpYFqTSYyofRGf+hwSEXmdFA3Q7SdsApxICZpq/Q4=;
+ b=XJKWJeE16ZexWmttXXfk1oa8cOWRxMChInasTEuT1lO2acU8VjbN0B0xXDT6z0EMBB72GspkWV8KgBZ38r+KU+fxExAcRM6cyOfL9GpkYdRrOPt4JvtrZoQOKg0UnjO7Z1PQY3IskAGADhf/Fra+FZVxPmSVI6bYs7NGItl0JL8=
+Received: from BYAPR04MB4502.namprd04.prod.outlook.com (52.135.238.11) by
+ BYAPR04MB4135.namprd04.prod.outlook.com (20.176.250.24) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1537.24; Fri, 18 Jan 2019 19:10:43 +0000
+Received: from BYAPR04MB4502.namprd04.prod.outlook.com
+ ([fe80::11c:b9cd:4076:a667]) by BYAPR04MB4502.namprd04.prod.outlook.com
+ ([fe80::11c:b9cd:4076:a667%3]) with mapi id 15.20.1537.018; Fri, 18 Jan 2019
+ 19:10:43 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Johannes Thumshirn <jthumshirn@suse.de>,
+        Omar Sandoval <osandov@osandov.com>
+CC:     Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        Linux NVMe Mailinglist <linux-nvme@lists.infradead.org>,
+        Anthony Iliopoulos <ailiopoulos@suse.de>
+Subject: Re: [PATCH blktests 1/2] nvme: enable buffered_io for file-backed
+ namespaces
+Thread-Topic: [PATCH blktests 1/2] nvme: enable buffered_io for file-backed
+ namespaces
+Thread-Index: AQHUrmR4qRT1ezDLmE2OtZRZp8tpgKW0H7twgAB/IYCAAMZo/w==
+Date:   Fri, 18 Jan 2019 19:10:43 +0000
+Message-ID: <BYAPR04MB4502509DB53BE33C7383F7CF869C0@BYAPR04MB4502.namprd04.prod.outlook.com>
+References: <20190117125906.15479-1-jthumshirn@suse.de>
+ <BYAPR04MB45024AB8410374A9B1AD81A186830@BYAPR04MB4502.namprd04.prod.outlook.com>,<20beebf9-f582-08b3-1905-8a246f12268e@suse.de>
+In-Reply-To: <20beebf9-f582-08b3-1905-8a246f12268e@suse.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.44.250]
+x-ms-publictraffictype: Email
+x-microsoft-exchange-diagnostics: 1;BYAPR04MB4135;6:s0lWeqZAWdc5I3eavqbNR6WPZ3IsU6U/ijRRmUq28qfN82160E/sZ3ukUEnFW2jYEzzJTBuxmCOe/yV5H31UTRt9Msgbiszs0NrQpLSUGl8qOvT9cTPdtxZQWTYfXWSSxIfp+MrBGgYQ3xnNZHDMWwFoD9ssHbg0j8YAFqZpBxSd4eNlGVSbtBmkrGMtdw3qLzySeGkErIbgqBx1ovYTj9tmL7zFQW1DVt0Mjfjlzf4aI93YwIMjCRex2D0z+ZMd1kv02yOoubGNTJ+tCy2UuS4QrRCrzBCRLljwi9wrDJJk/l4H3gPQMbU/NoK0stuTSkt55L6MuEoJD61M7SCk7UCXevf4dL6dqoxCQFtXONbKQlezRpWl9hEAhXNktX1hIZNKACp0cO8/2PQ3nT05FfbEHw/NAetXsjbTMaDEgJRvTFFbRemdaKHsFnfZp8XhGnnz5lt62tcUdlKByD1LAg==;5:TQQJ7agjIlE9r9ZWAJ0CaAGrfhiAnRoQUqF7nF1u8NYsQ9gbUmwGSiDGceeCCvudyPYQG7GkYWGW1G6Iv4FvdnNPd4ct/6YM0gsawZc2qixiNSq2dqOimfaXIfSc6dk9M27d2JtRMNyruo0K654ynfVIps/59j4xFc5Ak5IrGj2G4C2m1UnmpsKTn9HD9r+M4gWUIkaczX4Nxca3E3o5XA==;7:VstamRtI1XRr4h4Sjo6oTP4u6lF6w5wONnuuSr3hxjK8Lgcov1o0cupTU6uA6TSOXgAB8BYGE1h2kk/hd5GnDkkwZiA6s2AQRuOu5Uog7LoGRl+dr70GI60zT56T1JOkiZBEDMWjrZvZ8ER2UZh8sg==
+x-ms-office365-filtering-correlation-id: 04742c69-afed-4345-f2b4-08d67d78a4e3
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600109)(711020)(4618075)(2017052603328)(7153060)(7193020);SRVR:BYAPR04MB4135;
+x-ms-traffictypediagnostic: BYAPR04MB4135:
+wdcipoutbound: EOP-TRUE
+x-microsoft-antispam-prvs: <BYAPR04MB41350AC478ABBFBC54638C75869C0@BYAPR04MB4135.namprd04.prod.outlook.com>
+x-forefront-prvs: 0921D55E4F
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(396003)(376002)(136003)(346002)(39860400002)(199004)(189003)(26005)(3846002)(97736004)(25786009)(99286004)(4326008)(66066001)(6116002)(102836004)(14454004)(53546011)(6506007)(5660300001)(53936002)(478600001)(76176011)(186003)(6246003)(105586002)(7696005)(33656002)(256004)(72206003)(110136005)(106356001)(8936002)(86362001)(55016002)(316002)(74316002)(229853002)(9686003)(486006)(81166006)(68736007)(8676002)(11346002)(2906002)(81156014)(7736002)(71190400001)(6436002)(446003)(476003)(54906003)(71200400001)(305945005);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR04MB4135;H:BYAPR04MB4502.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: hFaQNver//qjyvE1htiKZdLc6e1FMMogFXLTXKS7T87VS09TkAxMRn307pkPL4CUZLZgqprIIWeHF5L3GR4ksP6WEtuzeR8Q9I3Mvs7tB8JM/29Iy/pyUeIIF50S/wlgBVkxeUdvmXv7CsbrHG5yS4U1xmtr0mOzVYqKO3yalCToV4UkXujCjKbiKz4UmK+Vebp5+iKkVxMuOYY7aLhqYRZCg6InC94d1Ig4Hf5JVqKNwNsascNnMth918DzUteWcDY4o5fmlEkMqyERkEhXOanYqrhabOdJ1NxJdSd8DGXYIMFYQpDHep/1fUG+TPNPTtbTCiGJYDr+lGqjXLUeHQsD7nGEd4SBn9t9lomonObOFjYRB14CVdw3WZCpOzpBtpBL2O7D3gefg0J7Aw6cK+H2dKANLzZdqCMAeKr1L9Q=
+spamdiagnosticoutput: 1:99
+spamdiagnosticmetadata: NSPM
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <F576C256-A032-4E62-99EA-F60162B6E069@linaro.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 04742c69-afed-4345-f2b4-08d67d78a4e3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jan 2019 19:10:43.3171
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4135
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 18, 2019 at 06:07:45PM +0100, Paolo Valente wrote:
-> 
-> 
-> > Il giorno 18 gen 2019, alle ore 17:35, Josef Bacik <josef@toxicpanda.com> ha scritto:
-> > 
-> > On Fri, Jan 18, 2019 at 11:31:24AM +0100, Andrea Righi wrote:
-> >> This is a redesign of my old cgroup-io-throttle controller:
-> >> https://lwn.net/Articles/330531/
-> >> 
-> >> I'm resuming this old patch to point out a problem that I think is still
-> >> not solved completely.
-> >> 
-> >> = Problem =
-> >> 
-> >> The io.max controller works really well at limiting synchronous I/O
-> >> (READs), but a lot of I/O requests are initiated outside the context of
-> >> the process that is ultimately responsible for its creation (e.g.,
-> >> WRITEs).
-> >> 
-> >> Throttling at the block layer in some cases is too late and we may end
-> >> up slowing down processes that are not responsible for the I/O that
-> >> is being processed at that level.
-> > 
-> > How so?  The writeback threads are per-cgroup and have the cgroup stuff set
-> > properly.  So if you dirty a bunch of pages, they are associated with your
-> > cgroup, and then writeback happens and it's done in the writeback thread
-> > associated with your cgroup and then that is throttled.  Then you are throttled
-> > at balance_dirty_pages() because the writeout is taking longer.
-> > 
-> 
-> IIUC, Andrea described this problem: certain processes in a certain group dirty a
-> lot of pages, causing write back to start.  Then some other blameless
-> process in the same group experiences very high latency, in spite of
-> the fact that it has to do little I/O.
-> 
-> Does your blk_cgroup_congested() stuff solves this issue?
-> 
-> Or simply I didn't get what Andrea meant at all :)
-> 
-> Thanks,
-> Paolo
+xfstest has the following nicely written routine may be we can re-use that?
 
-Yes, there is also this problem: provide fairness among processes
-running inside the same cgroup.
+from  git://git.kernel.org/pub/scm/fs/xfs/xfstests-dev.git, ${XFSTEST_HOME}=
+/common/rc :-
 
-This is a tough one, because once the I/O limit is reached whoever
-process comes next gets punished, even if it hasn't done any I/O before.
 
-Well, my proposal doesn't solve this problem. To solve this one in the
-"throttling" scenario, we should probably save some information about
-the previously generated I/O activity and apply a delay proportional to
-that (like a dynamic weight for each process inside each cgroup).
+  2185	# check that kernel and filesystem support direct I/O
+  2186	_require_odirect()
+  2187	{
+  2188		if [ $FSTYP =3D "ext4" ] ; then
+  2189			if echo "$MOUNT_OPTIONS" | grep -q "test_dummy_encryption"; then
+  2190				_notrun "ext4 encryption doesn't support O_DIRECT"
+  2191			elif echo "$MOUNT_OPTIONS" | grep -q "data=3Djournal"; then
+  2192				_notrun "ext4 data journaling doesn't support O_DIRECT"
+  2193			fi
+  2194		fi
+  2195		local testfile=3D$TEST_DIR/$$.direct
+  2196		$XFS_IO_PROG -F -f -d -c "pwrite 0 20k" $testfile > /dev/null 2>&1
+  2197		if [ $? -ne 0 ]; then
+  2198			_notrun "O_DIRECT is not supported"
+  2199		fi
+  2200		rm -f $testfile 2>&1 > /dev/null
+  2201	}
+  2202=09
 
-AFAICS the io.max controller doesn't solve this problem either.
+This will require to have xfs_io program.
 
--Andrea
+
+From: Johannes Thumshirn <jthumshirn@suse.de>
+Sent: Thursday, January 17, 2019 11:17 PM
+To: Chaitanya Kulkarni; Omar Sandoval
+Cc: Linux Block Layer Mailinglist; Linux NVMe Mailinglist; Anthony Iliopoul=
+os
+Subject: Re: [PATCH blktests 1/2] nvme: enable buffered_io for file-backed =
+namespaces
+=A0=20
+=20
+On 18/01/2019 00:46, Chaitanya Kulkarni wrote:
+> This will force the user to run all tests in the buffered_io mode.
+>=20
+> What we really need is a config for the nvme category option which user c=
+an set and decide
+> whether to run buffered_io or direct_io, you can set by default to the bu=
+ffered_io mode.
+
+We could also introduce a check if we can use direct IO on the
+underlying FS, but the only way I can think of from a shell script is
+doing a 'dd of=3D$TMPDIR/testfile oflag=3Ddirect' and then populate the
+result to the helper functions.
+
+Chaitanya, Omar any ideas?
+
+--=20
+Johannes Thumshirn=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0 SUSE Labs Filesystems
+jthumshirn@suse.de=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=
+=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0 +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 N=FCrnberg
+GF: Felix Imend=F6rffer, Jane Smithard, Graham Norton
+HRB 21284 (AG N=FCrnberg)
+Key fingerprint =3D EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+    =
