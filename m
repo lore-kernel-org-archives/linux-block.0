@@ -6,119 +6,103 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39A8BC43387
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 07:17:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB961C43387
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 08:23:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0F6D42087E
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 07:17:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB1B420896
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 08:23:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727285AbfARHRN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jan 2019 02:17:13 -0500
-Received: from mx2.suse.de ([195.135.220.15]:50420 "EHLO mx1.suse.de"
+        id S1727615AbfARIXz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jan 2019 03:23:55 -0500
+Received: from mx2.suse.de ([195.135.220.15]:59754 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727204AbfARHRN (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jan 2019 02:17:13 -0500
+        id S1727502AbfARIXz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 18 Jan 2019 03:23:55 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 41CB6AE5E;
-        Fri, 18 Jan 2019 07:17:11 +0000 (UTC)
-Subject: Re: [PATCH blktests 1/2] nvme: enable buffered_io for file-backed
- namespaces
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Omar Sandoval <osandov@osandov.com>
-Cc:     Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Linux NVMe Mailinglist <linux-nvme@lists.infradead.org>,
-        Anthony Iliopoulos <ailiopoulos@suse.de>
-References: <20190117125906.15479-1-jthumshirn@suse.de>
- <BYAPR04MB45024AB8410374A9B1AD81A186830@BYAPR04MB4502.namprd04.prod.outlook.com>
-From:   Johannes Thumshirn <jthumshirn@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <20beebf9-f582-08b3-1905-8a246f12268e@suse.de>
-Date:   Fri, 18 Jan 2019 08:17:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        by mx1.suse.de (Postfix) with ESMTP id BA4C6AEF5;
+        Fri, 18 Jan 2019 08:23:53 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB45024AB8410374A9B1AD81A186830@BYAPR04MB4502.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Fri, 18 Jan 2019 09:23:53 +0100
+From:   Roman Penyaev <rpenyaev@suse.de>
+To:     Jeff Moyer <jmoyer@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+        linux-aio@kvack.org, linux-block@vger.kernel.org,
+        linux-arch@vger.kernel.org, hch@lst.de, avi@scylladb.com,
+        linux-block-owner@vger.kernel.org
+Subject: Re: [PATCH 05/15] Add io_uring IO interface
+In-Reply-To: <x4936pr80uw.fsf@segfault.boston.devel.redhat.com>
+References: <20190116175003.17880-1-axboe@kernel.dk>
+ <20190116175003.17880-6-axboe@kernel.dk>
+ <718b4d1fbe9f97592d6d7b76d7a4537d@suse.de>
+ <af41e99c-54f2-a94c-a876-d673fe477e0a@kernel.dk>
+ <x49bm4f831e.fsf@segfault.boston.devel.redhat.com>
+ <f5ecdead-ea0f-6b79-5f70-b002a103e503@kernel.dk>
+ <02568485-cd10-182d-98e3-619077cf9bdc@kernel.dk>
+ <x4936pr80uw.fsf@segfault.boston.devel.redhat.com>
+Message-ID: <3189352fb5866022d782811a65022a50@suse.de>
+X-Sender: rpenyaev@suse.de
+User-Agent: Roundcube Webmail
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 18/01/2019 00:46, Chaitanya Kulkarni wrote:
-> This will force the user to run all tests in the buffered_io mode.
+On 2019-01-17 21:50, Jeff Moyer wrote:
+> Jens Axboe <axboe@kernel.dk> writes:
 > 
-> What we really need is a config for the nvme category option which user can set and decide
-> whether to run buffered_io or direct_io, you can set by default to the buffered_io mode.
+>> On 1/17/19 1:09 PM, Jens Axboe wrote:
+>>> On 1/17/19 1:03 PM, Jeff Moyer wrote:
+>>>> Jens Axboe <axboe@kernel.dk> writes:
+>>>> 
+>>>>> On 1/17/19 5:48 AM, Roman Penyaev wrote:
+>>>>>> On 2019-01-16 18:49, Jens Axboe wrote:
+>>>>>> 
+>>>>>> [...]
+>>>>>> 
+>>>>>>> +static int io_allocate_scq_urings(struct io_ring_ctx *ctx,
+>>>>>>> +				  struct io_uring_params *p)
+>>>>>>> +{
+>>>>>>> +	struct io_sq_ring *sq_ring;
+>>>>>>> +	struct io_cq_ring *cq_ring;
+>>>>>>> +	size_t size;
+>>>>>>> +	int ret;
+>>>>>>> +
+>>>>>>> +	sq_ring = io_mem_alloc(struct_size(sq_ring, array, 
+>>>>>>> p->sq_entries));
+>>>>>> 
+>>>>>> It seems that sq_entries, cq_entries are not limited at all.  Can 
+>>>>>> nasty
+>>>>>> app consume a lot of kernel pages calling io_setup_uring() from a 
+>>>>>> loop
+>>>>>> passing random entries number? (or even better: decreasing entries
+>>>>>> number,
+>>>>>> in order to consume all pages orders with min number of loops).
+>>>>> 
+>>>>> Yes, that's an oversight, we should have a limit in place. I'll add 
+>>>>> that.
+>>>> 
+>>>> Can we charge the ring memory to the RLIMIT_MEMLOCK as well?  I'd 
+>>>> prefer
+>>>> not to repeat the mistake of fs.aio-max-nr.
+>>> 
+>>> Sure, we can do that. With the ring limited in size (it's now 4k 
+>>> entries
+>>> at most), the amount of memory gobbled up by that is much smaller 
+>>> than
+>>> the fixed buffers. A max sized ring is about 256k of memory.
+> 
+> Per io_uring.  Nothing prevents a user from calling io_uring_setup in a
+> loop and continuing to gobble up memory.
 
-We could also introduce a check if we can use direct IO on the
-underlying FS, but the only way I can think of from a shell script is
-doing a 'dd of=$TMPDIR/testfile oflag=direct' and then populate the
-result to the helper functions.
+What if we set a sane limit for a uring instance (not for the whole 
+io_uring),
+but allocate rings on mmap?  Then greedy / nasty app will be killed by 
+oom.
 
-Chaitanya, Omar any ideas?
+--
+Roman
 
--- 
-Johannes Thumshirn                            SUSE Labs Filesystems
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
