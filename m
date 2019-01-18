@@ -2,164 +2,146 @@ Return-Path: <SRS0=kGct=P2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7441FC43444
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 15:17:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8547DC43387
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 16:12:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4647020883
-	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 15:17:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CDE920896
+	for <linux-block@archiver.kernel.org>; Fri, 18 Jan 2019 16:12:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="FKbP+hHt"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="xqirShNa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727478AbfARPRd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Jan 2019 10:17:33 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:48352 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727448AbfARPRd (ORCPT
+        id S1727491AbfARQMe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Jan 2019 11:12:34 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:39326 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727241AbfARQMe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Jan 2019 10:17:33 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0IF8ip1092650;
-        Fri, 18 Jan 2019 15:17:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=D4DIOqT7zPf5gQjMhw+FSUOxTVmr/GQyTUHzTnlvF5U=;
- b=FKbP+hHtL5Y9awTsQUOlA0qDIzHgbDX/ES/LgUWhxdsrS3m/uFPcVOObZJ9VDz3v39kH
- 2ofHHIKG3OAnN+A3+yl5VpV41zunftvACp1VaDafqy12dmUigFRa/WE8lb/bPN1/GxLY
- rPi7YI15FZ4l9iLkXRebvyCAaNBXSvvYNKgDNshPzBzfz8wzwTNRdhHnGCQh/OGSUaLK
- d258+CqMz9W5YWsfb1ksc3vDs/2Ts5/KJEmsAm+P6MZrpgvcdRLzye3C9B7EVEm+Akdb
- KMDmMYDk4/fUduv7Kj/dBJOBJUHzdYjx4DqAylfNWcaicMXYI7iDUpg1CvJqtLA6hbx9 aA== 
-Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by userp2120.oracle.com with ESMTP id 2pybjsp4wa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 18 Jan 2019 15:17:09 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x0IFH8d4023093
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 18 Jan 2019 15:17:08 GMT
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x0IFH6rr026900;
-        Fri, 18 Jan 2019 15:17:06 GMT
-Received: from [10.191.21.13] (/10.191.21.13)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 18 Jan 2019 07:17:06 -0800
-Subject: Re: dd hangs when reading large partitions
-To:     Marc Gonzalez <marc.w.gonzalez@free.fr>,
-        fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
-Cc:     SCSI <linux-scsi@vger.kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jan Kara <jack@suse.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Joao Pinto <jpinto@synopsys.com>, Jens Axboe <axboe@kernel.dk>,
-        Fujita Tomonori <fujita.tomonori@lab.ntt.co.jp>,
-        Paolo Valente <paolo.valente@linaro.org>
-References: <f792574c-e083-b218-13b4-c89be6566015@free.fr>
-From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <398a6e83-d482-6e72-5806-6d5bbe8bfdd9@oracle.com>
-Date:   Fri, 18 Jan 2019 23:18:49 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <f792574c-e083-b218-13b4-c89be6566015@free.fr>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9139 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1901180109
+        Fri, 18 Jan 2019 11:12:34 -0500
+Received: by mail-pf1-f193.google.com with SMTP id r136so6815540pfc.6
+        for <linux-block@vger.kernel.org>; Fri, 18 Jan 2019 08:12:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=61povrd1ttKvrmraQY7nV3Ej8+f2a79KcHlyUya/OTk=;
+        b=xqirShNapZsaA3Rg1CadrJOnVn1hSlxqLtNRl0/V6WlnGgwQTb8Z0Ri1IuzxpbLIFe
+         WoF9gC7vyTn0LEtneV4dWy5/twjn44iv503inh+p7dajcaBMYplCCgDQnfbC0hGNFr5W
+         Vk+aqLYBtg5GIW9MFaWRAc8oeY5SI8EHWtI+IyQ84aJgOZ/0Hiu5Wi/HxD/j/7wUaAXg
+         s9ZEt8YrEPtZSlae7nvHNlxbYI9OnKXGFhHqeN618usTFhuKE1bkRT2op/Rm5dGpP0IS
+         DpIu/TVFsIA1cYzqBfPmvoBC4D5qkwLmc9SCrgv5tsiADGRzmxQgwC9ifwS+w0J1xQpt
+         JSvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=61povrd1ttKvrmraQY7nV3Ej8+f2a79KcHlyUya/OTk=;
+        b=UynkhWZ3KzQ/0y1vY4dKzNSDeJzqK83+rzS9hkMevfYsu/7y/wP2p57+w5D13g6VHN
+         svKh/zb6AKz/B4j5/sHHG4C6eGZRk31YWTeGOUYzo5HG2kKdJJSarPLy5M/El+YJDVSo
+         Gcuuu90RsmoQZ/H5Wf7miUiuDtgdp0F7nhY3r/CUxh5+rcfK7+EGeqt1nKTVaTJtjwHs
+         45RhCd8o26yXGGfNeeB314b5yyqeeHp16eSITBV5sTDmuaUBcBhECpbucq/bw9bLV4Iy
+         riMFqkChZ3IQHqXGPRqYQnzLYPmchsaab5izZ+rK4grP761pNAv/owkGyOo+lEtKVmyy
+         dsoQ==
+X-Gm-Message-State: AJcUukdLxzYZWUccDRf95PR1nX04N5lX3VSR3xiGEJx/Yro0SWz3i0vt
+        5WA7Ol137PwdzfWJAaI8TDyJtw==
+X-Google-Smtp-Source: ALg8bN5racFIDgNRtcYrCBFK32Di+GgNfXCMFFOu4otVA03Ibv/AVjNobgyByy7nySQd5ji9jPZtrg==
+X-Received: by 2002:a63:5026:: with SMTP id e38mr18340348pgb.123.1547827952999;
+        Fri, 18 Jan 2019 08:12:32 -0800 (PST)
+Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id m20sm5317804pgv.93.2019.01.18.08.12.30
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 18 Jan 2019 08:12:31 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
+        linux-block@vger.kernel.org
+Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com
+Subject: [PATCHSET v6] io_uring IO interface
+Date:   Fri, 18 Jan 2019 09:12:08 -0700
+Message-Id: <20190118161225.4545-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello
+Here's v6 of the io_uring interface. Various tweaks and fixes to the
+internals, especially in terms of the application facing API. See
+changelog below for those.
 
-On 1/18/19 8:10 PM, Marc Gonzalez wrote:
-> Hello,
-> 
-> I'm running into an issue which I don't know how to debug.
-> So I'm open to ideas and suggestions :-)
-> 
-> On my arm64 board, I have enabled Universal Flash Storage support.
-> 
-> I wanted to benchmark read performance, and noticed that the system
-> locks up when I read partitions larger than 3.5 GB, unless I tell
-> dd to use direct IO:
-> 
-> *** WITH O_DIRECT ***
-> # dd if=/dev/sda of=/dev/null bs=1M iflag=direct status=progress
-> 57892929536 bytes (58 GB, 54 GiB) copied, 697.006 s, 83.1 MB/s 
-> 55256+0 records in
-> 55256+0 records out
-> 57940115456 bytes (58 GB, 54 GiB) copied, 697.575 s, 83.1 MB/s
-> 
-> *** WITHOUT O_DIRECT ***
-> # dd if=/dev/sda of=/dev/null bs=1M status=progress
-> 3853516800 bytes (3.9 GB, 3.6 GiB) copied, 49.0002 s, 78.6 MB/s
-> 
-> 
-> rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-> rcu:    1-...0: (8242 ticks this GP) idle=106/1/0x4000000000000000 softirq=168/171 fqs=2626 
-> rcu:    6-...0: (99 GPs behind) idle=ec2/1/0x4000000000000000 softirq=71/71 fqs=2626 
-> rcu:    (detected by 7, t=5254 jiffies, g=-275, q=2)
-> Task dump for CPU 1:
-> kworker/1:1H    R  running task        0   675      2 0x0000002a
-> Workqueue: kblockd blk_mq_run_work_fn
-> Call trace:
->  __switch_to+0x168/0x1d0
+In terms of features, the ring_fd (returned from io_uring_setup(2)) is
+now pollable, so you can use poll(2)/epoll(2) and friends to get
+notified of completions.
 
-It looks like the blk_mq_run_work_fn went to sleep with rcu lock (preempt), isn't it ?
-Can you share the symbol of the following address ?
+In the same ballpark, I stole the IOCB_CMD_POLL feature from aio, and
+Christoph massaged it to better fit the new API. This means we now have
+two new commands:
 
->  0xffffffc0f6efbbc8
+- IORING_OP_POLL_ADD. Adds an fd to poll for. A cqe will be posted to
+  the CQ ring when the desired events are available.
+
+- IORING_OP_POLL_REMOVE. Remove a previous queued POLL_ADD.
+
+The io_uring instance is now accounted fully, and will fail if we cannot
+get enough memory under the RLIMIT_MEMLOCK limit.
+
+The liburing library has grown a few test cases, and now also the
+beginnings of man pages for the project. So far we have
+io_uring_register(2) documented, io_uring_setup(2) and io_uring_enter(2)
+should be coming shortly, as well as a io_uring(7) man page. Thanks to
+Jeff Moyer for leading this effort! Clone the liburing repo here:
+
+git://git.kernel.dk/liburing
+
+As usual, patches are against 5.0-rc2, and can also be found in my
+io_uring branch here:
+
+git://git.kernel.dk/linux-block io_uring
 
 
->  blk_mq_run_work_fn+0x28/0x40
->  process_one_work+0x208/0x470
->  worker_thread+0x48/0x460
->  kthread+0x128/0x130
->  ret_from_fork+0x10/0x1c
-> Task dump for CPU 6:
-> kthreadd        R  running task        0     2      0 0x0000002a
-> Call trace:
->  __switch_to+0x168/0x1d0
->  0x5b36396f4e7d4000
-> 
-> 
-> rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-> rcu:    1-...0: (8242 ticks this GP) idle=106/1/0x4000000000000000 softirq=168/171 fqs=10500 
-> rcu:    6-...0: (99 GPs behind) idle=ec2/1/0x4000000000000000 softirq=71/71 fqs=10500 
-> rcu:    (detected by 7, t=21009 jiffies, g=-275, q=2)
-> Task dump for CPU 1:
-> kworker/1:1H    R  running task        0   675      2 0x0000002a
-> Workqueue: kblockd blk_mq_run_work_fn
-> Call trace:
->  __switch_to+0x168/0x1d0
->  0xffffffc0f6efbbc8
->  blk_mq_run_work_fn+0x28/0x40
->  process_one_work+0x208/0x470
->  worker_thread+0x48/0x460
->  kthread+0x128/0x130
->  ret_from_fork+0x10/0x1c
-> Task dump for CPU 6:
-> kthreadd        R  running task        0     2      0 0x0000002a
-> Call trace:
->  __switch_to+0x168/0x1d0
->  0x5b36396f4e7d4000
-> 
-> 
-> The system always hangs around the 3.6 GiB mark, wherever I start from.
-> How can I debug this issue?
-> 
-> Regards.
-> 
+Changes since v5:
+- Limit fixed buffers to UIO_MAXIOV (was USHRT_MAX)
+- Limit fixed buffers to non-file backed memory (Dave Chinner)
+- Fail file/buffer registration if already setup (Jeff Moyer)
+- Return -ENXIO for attempt to enter dead ring
+- Reorder two patches
+- Cleanup some patch dependencies
+- Add support for polling the ring_fd (poll(2)/epoll(2))
+- Add IORING_OP_POLL_ADD/IORING_OP_POLL_REMOVE support
+- Limit io_uring SQ size to 4k entries (IORING_MAX_ENTRIES)
+- Check sqe->flags validity in one location, not for each opcode
+- Account ring memory in RLIMIT_MEMLOCK
+- Re-init completion event after io_uring_register()
+- Fix SQ thread missing submission
+- Fix silly use-after-free in io_free_req()
 
-Thanks
-Jianchao
+
+ Documentation/filesystems/vfs.txt      |    3 +
+ arch/x86/entry/syscalls/syscall_32.tbl |    3 +
+ arch/x86/entry/syscalls/syscall_64.tbl |    3 +
+ block/bio.c                            |   59 +-
+ fs/Makefile                            |    1 +
+ fs/block_dev.c                         |   19 +-
+ fs/file.c                              |   15 +-
+ fs/file_table.c                        |    9 +-
+ fs/gfs2/file.c                         |    2 +
+ fs/io_uring.c                          | 2376 ++++++++++++++++++++++++
+ fs/iomap.c                             |   48 +-
+ fs/xfs/xfs_file.c                      |    1 +
+ include/linux/bio.h                    |   14 +
+ include/linux/blk_types.h              |    1 +
+ include/linux/file.h                   |    2 +
+ include/linux/fs.h                     |    6 +-
+ include/linux/iomap.h                  |    1 +
+ include/linux/sched/user.h             |    2 +-
+ include/linux/syscalls.h               |    7 +
+ include/uapi/linux/io_uring.h          |  141 ++
+ init/Kconfig                           |    9 +
+ kernel/sys_ni.c                        |    4 +
+ 22 files changed, 2686 insertions(+), 40 deletions(-)
+
+-- 
+Jens Axboe
+
+
