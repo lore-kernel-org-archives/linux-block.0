@@ -6,60 +6,60 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4FBAC61CE8
-	for <linux-block@archiver.kernel.org>; Sat, 19 Jan 2019 18:05:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECB0FC61CE8
+	for <linux-block@archiver.kernel.org>; Sat, 19 Jan 2019 18:05:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 939BC2087E
-	for <linux-block@archiver.kernel.org>; Sat, 19 Jan 2019 18:05:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF56D2087E
+	for <linux-block@archiver.kernel.org>; Sat, 19 Jan 2019 18:05:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UkL0pU3t"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PM+BS3Hn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728892AbfASSFQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 19 Jan 2019 13:05:16 -0500
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:36785 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728668AbfASSFP (ORCPT
+        id S1728916AbfASSFS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 19 Jan 2019 13:05:18 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:46339 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728668AbfASSFS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 19 Jan 2019 13:05:15 -0500
-Received: by mail-qt1-f195.google.com with SMTP id t13so18823014qtn.3
-        for <linux-block@vger.kernel.org>; Sat, 19 Jan 2019 10:05:15 -0800 (PST)
+        Sat, 19 Jan 2019 13:05:18 -0500
+Received: by mail-qt1-f194.google.com with SMTP id y20so18747339qtm.13
+        for <linux-block@vger.kernel.org>; Sat, 19 Jan 2019 10:05:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=Xam2qz/iGZ2SU9NuNxXD/C9OzO4f5Xq2vH+9/0d7tVw=;
-        b=UkL0pU3tdzXtytpB3DbrJUcKw/8NxBnYXSpmwtXHHh0R4iL2Mx9RB5RYDYSJeeCRYy
-         3PslZyC4PMF716nTYbe1Tn+g6qC0aEBvMXcqw0GK/XkfKtDcY18OzCKMWqh3PwHmhuqS
-         TIHekK7rGpTZMec2AAHYutFl2Rz7+CZomjgwujekSWl3WBCiIUmuYEndnKlGoVx3uZrO
-         m4GNBXvK39bm8YvGWyRZT7PRtXuO7qndG1/KWaiKyKxfZMI/F3aEPRntgLsAaayDvA5v
-         hfNK6yHfFk5IirSOi3sxJRsJNZVfxKs9OHdc/tCx+yeP7FXx86pVPVNzdSAqPdvHZOlC
-         jvoQ==
+        bh=g45qMdy3Kp0PFHIpUrKiuZWWVQgkrHivQ30JFr3/2Mw=;
+        b=PM+BS3HnV9IdKEIU1dB30FSOEx6NWB6oGOj1QG3mKGnmBiy08GSqOnW2la6KUZCOGt
+         lNVMT0BfUMmd8Q5dCCOR/3zuYrr8S9leCR+qIC08iCiczfDOAVXJB5qBkCgWMGjRC1sk
+         xio56TbeJr+WtElGMP8OugM92mO58PL6VGDHDO6xcrvx2TuGCo/sSC8qQ2g8MEpfhmOW
+         3NtAelMmJj8q8PsP0JLwEsKIdJL7jhCs7M1umf1J6oujVnOSOS8I2D9qZuVp3LEOBfEt
+         JYcc0bviJEAf8FUWYAY4wDMYFNznjlCskuMp1GIdgQJIKJIYDuCyDC6yzDH3FqbJwoEC
+         RkAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=Xam2qz/iGZ2SU9NuNxXD/C9OzO4f5Xq2vH+9/0d7tVw=;
-        b=EaC91pQ0zmE7ZJG9W2yQVdihx2HXloP4G2dDhC11zoD7G0vPdqHjBMRKKSUDq5r3XZ
-         V5HGqQCL1fJisVMGun5UWPBYZK3+UGCLaV5Cp97Vn+khXW/lqwZRQELjLn5wMeXibUe0
-         +owrV1qD0z/Oq4PhSimk5nzGUOvXwKpLqiPDOr7BK5I1D3e0J0Sdg6fUpP+Mb+e/HO69
-         wHDcP33cv8AFK+We78M9pE5etRU66h+a5OtgU5d5kbLezWuCkZSMK96QsZPabeAbONsy
-         CN5NLnd6posUWzCqB3uuPCxElPmBHaGfRZ4EsZaPmfEI0NZS932qT6Z8CV/rn4ly6L3Y
-         v/5A==
-X-Gm-Message-State: AJcUukfPPX6HEKWzF5SV9FSU5y7zzdMp8oHylkWRX6Ef61kZmQHJHv+j
-        TS/6IGNY2q+8INHw3mapwVg=
-X-Google-Smtp-Source: ALg8bN7yTv8YKdR7o1QnjRohywutXXp77B/qhQzlxPgyK/2Y/13Afm3nB5navmTvsFkD8HTFqOhXlA==
-X-Received: by 2002:aed:3b76:: with SMTP id q51mr20739358qte.229.1547921114718;
-        Sat, 19 Jan 2019 10:05:14 -0800 (PST)
+        bh=g45qMdy3Kp0PFHIpUrKiuZWWVQgkrHivQ30JFr3/2Mw=;
+        b=MCUBwArwIPTKtM9wQUBQu7TBC1lbC0qX/DL5Lh3HfgUubgcVEE1gHPcu+gAsFv/RJN
+         kizii6IIl1ZPxvJmzTsOmYWHhJyE5eJDgQGkWd7U7NHQnpx5n9w14eumQTp8jR4K9at8
+         6n5iO7LyaR0ggerlzeA7cuVL+ScUJIOnRl0oY7RNAzGoAT8X6GDg3fLPGvUiOEsNhBsf
+         AvIehwQvbFSUEcKdePVQn7eg6Vd0aepGiwwF3FX1JRwQUdqAf+s3Mr1S/Hfx+TJo2s6J
+         W4j0Tyn79phFGwbMcBO7fQX548ALS5XT+NKMzpVOyxbtlrmqjQwSI1W9g/LMMcLNsYqN
+         bt3w==
+X-Gm-Message-State: AJcUukdJ3L6Wkbjm/pBHoLycbMn/E1UB9JtytGuTPJ0eLF8TBSWBza50
+        V5Cn9cRiy6YHAFW5yAP9g/E=
+X-Google-Smtp-Source: ALg8bN6PEMJUiaxDn2v09hGoE6IweZyZL5k9aIsELqSZhXdr0DHxwOO3b/HTIFMA+KTs3OM8YJgMEg==
+X-Received: by 2002:aed:3968:: with SMTP id l95mr20974027qte.344.1547921116591;
+        Sat, 19 Jan 2019 10:05:16 -0800 (PST)
 Received: from localhost (pool-68-160-176-113.bstnma.fios.verizon.net. [68.160.176.113])
-        by smtp.gmail.com with ESMTPSA id o21sm64275035qto.18.2019.01.19.10.05.13
+        by smtp.gmail.com with ESMTPSA id n92sm48474086qtd.85.2019.01.19.10.05.15
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 19 Jan 2019 10:05:13 -0800 (PST)
+        Sat, 19 Jan 2019 10:05:15 -0800 (PST)
 From:   Mike Snitzer <snitzer@redhat.com>
 To:     dm-devel@redhat.com
 Cc:     NeilBrown <neilb@suse.com>, Ming Lei <ming.lei@redhat.com>,
         axboe@kernel.dk, linux-block@vger.kernel.org
-Subject: [PATCH 3/4] dm: fix missing bio_split() pattern code in __split_and_process_bio()
-Date:   Sat, 19 Jan 2019 13:05:05 -0500
-Message-Id: <20190119180506.1300-4-snitzer@redhat.com>
+Subject: [PATCH 4/4] dm: fix dm_wq_work() to only use __split_and_process_bio() if appropriate
+Date:   Sat, 19 Jan 2019 13:05:06 -0500
+Message-Id: <20190119180506.1300-5-snitzer@redhat.com>
 X-Mailer: git-send-email 2.15.0
 In-Reply-To: <20190119180506.1300-1-snitzer@redhat.com>
 References: <20190119180506.1300-1-snitzer@redhat.com>
@@ -68,36 +68,60 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use the same BIO_QUEUE_ENTERED pattern that was established by commit
-cd4a4ae4683dc ("block: don't use blocking queue entered for recursive
-bio submits") by setting BIO_QUEUE_ENTERED after bio_split() and before
-recursing via generic_make_request().
+Otherwise targets that don't support/expect IO splitting could resubmit
+bios using code paths with unnecessary IO splitting complexity.
 
-Also add trace_block_split() because it provides useful context about
-bio splits in blktrace.
-
-Depends-on: cd4a4ae4683dc ("block: don't use blocking queue entered for recursive bio submits")
-Fixes: 18a25da84354 ("dm: ensure bio submission follows a depth-first tree walk")
-Cc: stable@vger.kernel.org # 4.16+
+Depends-on: 24113d487843 ("dm: avoid indirect call in __dm_make_request")
+Fixes: 978e51ba38e00 ("dm: optimize bio-based NVMe IO submission")
 Signed-off-by: Mike Snitzer <snitzer@redhat.com>
 ---
- drivers/md/dm.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/md/dm.c | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index fbadda68e23b..6e29c2d99b99 100644
+index 6e29c2d99b99..aa7e429646b3 100644
 --- a/drivers/md/dm.c
 +++ b/drivers/md/dm.c
-@@ -1654,7 +1654,9 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
- 						   sectors[op_stat_group(bio_op(bio))], ci.sector_count);
- 				part_stat_unlock();
+@@ -1727,6 +1727,15 @@ static blk_qc_t __process_bio(struct mapped_device *md,
+ 	return ret;
+ }
  
-+				bio_set_flag(bio, BIO_QUEUE_ENTERED);
- 				bio_chain(b, bio);
-+				trace_block_split(md->queue, b, bio->bi_iter.bi_sector);
- 				ret = generic_make_request(bio);
- 				break;
- 			}
++static blk_qc_t dm_process_bio(struct mapped_device *md,
++			       struct dm_table *map, struct bio *bio)
++{
++	if (dm_get_md_type(md) == DM_TYPE_NVME_BIO_BASED)
++		return __process_bio(md, map, bio);
++	else
++		return __split_and_process_bio(md, map, bio);
++}
++
+ static blk_qc_t dm_make_request(struct request_queue *q, struct bio *bio)
+ {
+ 	struct mapped_device *md = q->queuedata;
+@@ -1747,10 +1756,7 @@ static blk_qc_t dm_make_request(struct request_queue *q, struct bio *bio)
+ 		return ret;
+ 	}
+ 
+-	if (dm_get_md_type(md) == DM_TYPE_NVME_BIO_BASED)
+-		ret = __process_bio(md, map, bio);
+-	else
+-		ret = __split_and_process_bio(md, map, bio);
++	ret = dm_process_bio(md, map, bio);
+ 
+ 	dm_put_live_table(md, srcu_idx);
+ 	return ret;
+@@ -2429,9 +2435,9 @@ static void dm_wq_work(struct work_struct *work)
+ 			break;
+ 
+ 		if (dm_request_based(md))
+-			generic_make_request(c);
++			(void) generic_make_request(c);
+ 		else
+-			__split_and_process_bio(md, map, c);
++			(void) dm_process_bio(md, map, c);
+ 	}
+ 
+ 	dm_put_live_table(md, srcu_idx);
 -- 
 2.15.0
 
