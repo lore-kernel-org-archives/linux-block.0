@@ -2,103 +2,67 @@ Return-Path: <SRS0=VL3J=P3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85B9BC61CE8
-	for <linux-block@archiver.kernel.org>; Sat, 19 Jan 2019 20:47:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47976C6369F
+	for <linux-block@archiver.kernel.org>; Sat, 19 Jan 2019 22:00:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4CC382087E
-	for <linux-block@archiver.kernel.org>; Sat, 19 Jan 2019 20:47:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1743D2087E
+	for <linux-block@archiver.kernel.org>; Sat, 19 Jan 2019 22:00:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1547935224;
+	bh=/UQJy4/9s9NkcK4Tg0KwSNMSBJiKy+3x3QBAlguaP2M=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=aT87HSBduBXQ+U1f9W7U3k0SIB7h5gDv1tCroGwHDoiQEktNljIS9DQXfv2O4+wAq
+	 4B/zlSQ024ZAsNct/yNc88mdf1vSHJpBi+ov6SHX+BY2WBhy6vRyS/95N5920qneRp
+	 a70A3Wf6U6DwtyujFJXydQwCNC8w+Lmhg8JQm8Bg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729370AbfASUrB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 19 Jan 2019 15:47:01 -0500
-Received: from smtp4-g21.free.fr ([212.27.42.4]:39170 "EHLO smtp4-g21.free.fr"
+        id S1729818AbfASWAD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 19 Jan 2019 17:00:03 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38160 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729318AbfASUrB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 19 Jan 2019 15:47:01 -0500
-Received: from [192.168.1.42] (unknown [77.207.133.132])
-        (Authenticated sender: marc.w.gonzalez)
-        by smtp4-g21.free.fr (Postfix) with ESMTPSA id 5857319F4C8;
-        Sat, 19 Jan 2019 21:45:58 +0100 (CET)
-Subject: Re: dd hangs when reading large partitions
-From:   Marc Gonzalez <marc.w.gonzalez@free.fr>
-To:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc:     fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        SCSI <linux-scsi@vger.kernel.org>,
-        Joao Pinto <jpinto@synopsys.com>,
-        Subhash Jadavani <subhashj@codeaurora.org>,
-        Sayali Lokhande <sayalil@codeaurora.org>,
-        Can Guo <cang@codeaurora.org>,
-        Asutosh Das <asutoshd@codeaurora.org>,
-        Vijay Viswanath <vviswana@codeaurora.org>,
-        Venkat Gopalakrishnan <venkatg@codeaurora.org>,
-        Ritesh Harjani <riteshh@codeaurora.org>,
-        Vivek Gautam <vivek.gautam@codeaurora.org>,
-        Jeffrey Hugo <jhugo@codeaurora.org>,
-        Maya Erez <merez@codeaurora.org>,
-        Evan Green <evgreen@chromium.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Douglas Anderson <dianders@chromium.org>,
-        Stephen Boyd <swboyd@chromium.org>,
-        Tomas Winkler <tomas.winkler@intel.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Martin Petersen <martin.petersen@oracle.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>
-References: <f792574c-e083-b218-13b4-c89be6566015@free.fr>
- <398a6e83-d482-6e72-5806-6d5bbe8bfdd9@oracle.com>
- <ef734b94-e72b-771f-350b-08d8054a58f3@kernel.dk>
- <20190119095601.GA7440@infradead.org>
- <07b2df5d-e1fe-9523-7c11-f3058a966f8a@free.fr>
-Message-ID: <67344f49-5b56-86d3-eb2b-97441029ee82@free.fr>
-Date:   Sat, 19 Jan 2019 21:45:58 +0100
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Firefox/52.0 SeaMonkey/2.49.4
-MIME-Version: 1.0
-In-Reply-To: <07b2df5d-e1fe-9523-7c11-f3058a966f8a@free.fr>
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: 7bit
+        id S1729886AbfASWAC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 19 Jan 2019 17:00:02 -0500
+Subject: Re: [GIT PULL] Block fixes for 5.0-rc3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1547935202;
+        bh=/UQJy4/9s9NkcK4Tg0KwSNMSBJiKy+3x3QBAlguaP2M=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=OzeP3XAeKRwTYL+gmL9m0LTZYNNY9RZH9KpFEj049oMOdh8eR7IgGVpUSGoDCOpAU
+         U9ZZZKtF/lnPnUa7Pn/4bW/DX1LkPmGRU4keoPIH0OKyTc5fDprIgqztjbX71rf9cv
+         rLvkc97OhXojWMdCwlMf9gUdxedVZWfJveRLYlY8=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <c2a330c3-0acb-6f39-8cf2-e1659fe39440@kernel.dk>
+References: <c2a330c3-0acb-6f39-8cf2-e1659fe39440@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <c2a330c3-0acb-6f39-8cf2-e1659fe39440@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
+ tags/for-linus-20190118
+X-PR-Tracked-Commit-Id: 38197ca176fc259fa4c871d07bcf8389d044a895
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 0facb892456ff922924e704f78cafcaa7be85e8c
+Message-Id: <154793520216.21907.15567196662680209995.pr-tracker-bot@kernel.org>
+Date:   Sat, 19 Jan 2019 22:00:02 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19/01/2019 20:47, Marc Gonzalez wrote:
+The pull request you sent on Fri, 18 Jan 2019 12:59:07 -0700:
 
-> On 19/01/2019 10:56, Christoph Hellwig wrote:
-> 
->> On Jan 18, 2019 at 10:48:15AM -0700, Jens Axboe wrote:
->>
->>> It's UFS that totally buggy, if you look at its queuecommand, it does:
->>>
->>>         if (!down_read_trylock(&hba->clk_scaling_lock))                         
->>>                 return SCSI_MLQUEUE_HOST_BUSY;
->>>
->>> UFS either needs to get fixed up, or we'll want a way to do something like
->>> the below.
->>
->> I think the right answer is to just revert the offending patch instead
->> of papering over it in the SCSI code.
-> 
-> [ Adjusting recipients list ]
-> 
-> Full thread, for new recipients:
-> https://www.spinics.net/lists/linux-fsdevel/msg138601.html
-> 
-> Christoph, do you mean a3cd5ec55f6c7 ?
+> git://git.kernel.dk/linux-block.git tags/for-linus-20190118
 
-And by the way, can someone explain these two oddities:
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/0facb892456ff922924e704f78cafcaa7be85e8c
 
-1) the system only hangs if we try to read more than 3.8 GB
-   (starting point is irrelevant)
+Thank you!
 
-2) the system does not hang if we use iflag=direct
-
-Regards.
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
