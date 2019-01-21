@@ -2,97 +2,105 @@ Return-Path: <SRS0=XolY=P5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54EE9C282DB
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 09:43:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D89FCC7113B
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 12:02:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2BCD22085A
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 09:43:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0E7121019
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 12:02:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727776AbfAUJn1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jan 2019 04:43:27 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:36464 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726872AbfAUJnZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jan 2019 04:43:25 -0500
-Received: by mail-pf1-f195.google.com with SMTP id b85so9885740pfc.3;
-        Mon, 21 Jan 2019 01:43:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ctU1IKwGbIHB/qxu9fzPzOndQlgD5hRgjY4uIUshvTY=;
-        b=ZK+UNms6mWgpgYjstaV6ModqemMUmQxaMqmV75D1o0PWBNhJ1ERHGGBTg05ZaCgJ1z
-         PPWFV/dVoSiGzmWP0syRm0T+UT00+K66DhbfI80VhqDokvLpAMT+40s8LHYAeKj5Dlwb
-         RR2xmxUmnl45nZVuH0dvvPyLQ6nTUpjetwyNH8w6rTniN+bD8dGM1Mkf30t6d1UCXdcG
-         b/2Vsx/XL7yP7IOPi6/a0qBSb9tEVLGXQGxFdRVRrs23Hyg8ZpjLX7zC0blpxqTvgD53
-         5W60hYH3cqML5PuhrQrJr0l/5hpiPDhNescn+1qH+xweircgonV5DhJbmpdLNiVaMlyQ
-         FEZg==
-X-Gm-Message-State: AJcUukdE5XGmtUfansUIM42/82WAyX9/ByrDfNORjQyGxuP5EJ4Bwv/E
-        IEbW5diaW8azqW4naizolXs=
-X-Google-Smtp-Source: ALg8bN6P7/Ncr76xD/uxTtsl2LRvnNdrOYt8IlcTvDVHidHRO2no14YHVCiCcwzatwkiVv+sBDrECA==
-X-Received: by 2002:a62:5b83:: with SMTP id p125mr29320606pfb.116.1548063803783;
-        Mon, 21 Jan 2019 01:43:23 -0800 (PST)
-Received: from ?IPv6:2601:647:4800:973f:749d:e9f0:491e:d7d5? ([2601:647:4800:973f:749d:e9f0:491e:d7d5])
-        by smtp.gmail.com with ESMTPSA id m198sm21820819pga.10.2019.01.21.01.43.22
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 21 Jan 2019 01:43:23 -0800 (PST)
-Subject: Re: [PATCH V14 00/18] block: support multi-page bvec
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
-        Omar Sandoval <osandov@fb.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
-        Christoph Hellwig <hch@lst.de>, linux-ext4@vger.kernel.org,
-        Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
-        Boaz Harrosh <ooo@electrozaur.com>,
-        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-References: <20190121081805.32727-1-ming.lei@redhat.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <61dfaa1e-e7bf-75f1-410b-ed32f97d0782@grimberg.me>
-Date:   Mon, 21 Jan 2019 01:43:21 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <20190121081805.32727-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        id S1727909AbfAUMCL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jan 2019 07:02:11 -0500
+Received: from mx2.suse.de ([195.135.220.15]:38906 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728139AbfAUMCK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Jan 2019 07:02:10 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id C11E3AF18;
+        Mon, 21 Jan 2019 12:02:09 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 68D081E1584; Mon, 21 Jan 2019 13:02:09 +0100 (CET)
+From:   Jan Kara <jack@suse.cz>
+To:     Omar Sandoval <osandov@fb.com>
+Cc:     <linux-block@vger.kernel.org>, Jan Kara <jack@suse.cz>
+Subject: [PATCH v2] loop: Add test for changing capacity when filesystem is mounted
+Date:   Mon, 21 Jan 2019 13:02:03 +0100
+Message-Id: <20190121120203.13644-1-jack@suse.cz>
+X-Mailer: git-send-email 2.16.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Add test for changing capacity of a loop device when a filesystem with
+non-default block size is mounted on it. This is a regression test for
+"blockdev: Fix livelocks on loop device".
 
-> V14:
-> 	- drop patch(patch 4 in V13) for renaming bvec helpers, as suggested by Jens
-> 	- use mp_bvec_* as multi-page bvec helper name
-> 	- fix one build issue, which is caused by missing one converion of
-> 	bio_for_each_segment_all in fs/gfs2
-> 	- fix one 32bit ARCH specific issue caused by segment boundary mask
-> 	overflow
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ tests/loop/007     | 39 +++++++++++++++++++++++++++++++++++++++
+ tests/loop/007.out |  2 ++
+ 2 files changed, 41 insertions(+)
+ create mode 100755 tests/loop/007
+ create mode 100644 tests/loop/007.out
 
-Hey Ming,
+diff --git a/tests/loop/007 b/tests/loop/007
+new file mode 100755
+index 000000000000..97e6468de4e5
+--- /dev/null
++++ b/tests/loop/007
+@@ -0,0 +1,39 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-3.0+
++# Copyright (C) 2019 Jan Kara
++#
++# Test loop device capacity change handling with filesystem mounted on top.
++#
++# Regression test for commit 04906b2f542c "blockdev: Fix livelocks on loop
++# device".
++#
++
++. tests/loop/rc
++
++DESCRIPTION="update loop device capacity with filesystem"
++
++QUICK=1
++
++requires() {
++	_have_program mkfs.ext4
++}
++
++test() {
++	echo "Running ${TEST_NAME}"
++
++	local mount_dir="/mnt/blktests/"
++
++	truncate -s 1G "$TMPDIR/img"
++	mkdir -p "$mount_dir"
++	local loop_device="$(losetup -P -f --show "$TMPDIR/img")"
++	mkfs.ext4 -b 1024 "$loop_device" &>/dev/null
++	mount -t ext4 "$loop_device" "$mount_dir"
++	losetup -c "$loop_device"
++	# This hangs if rereading capacity changed block size
++	ls -l "$mount_dir" >/dev/null
++	umount "$mount_dir"
++	losetup -d "$loop_device"
++	rm -fr "$mount_dir" "$TMPDIR/img"
++
++	echo "Test complete"
++}
+diff --git a/tests/loop/007.out b/tests/loop/007.out
+new file mode 100644
+index 000000000000..32752934d48a
+--- /dev/null
++++ b/tests/loop/007.out
+@@ -0,0 +1,2 @@
++Running loop/007
++Test complete
+-- 
+2.16.4
 
-So is nvme-tcp also affected here? The only point where I see nvme-tcp
-can be affected is when initializing a bvec iter using bio_segments() as
-everywhere else we use iters which should transparently work..
-
-I see that loop was converted, does it mean that nvme-tcp needs to
-call something like?
---
-	bio_for_each_mp_bvec(bv, bio, iter)
-		nr_bvecs++;
---
