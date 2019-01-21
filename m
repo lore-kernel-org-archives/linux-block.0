@@ -2,90 +2,84 @@ Return-Path: <SRS0=XolY=P5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1094C37123
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 21:10:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D9B5C37120
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 21:47:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7A5D621019
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 21:10:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CD922085A
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 21:47:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727785AbfAUVKS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jan 2019 16:10:18 -0500
-Received: from gfuc.org ([88.99.83.187]:47844 "EHLO gfuc.org"
+        id S1726244AbfAUVrQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jan 2019 16:47:16 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46612 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726837AbfAUVKS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jan 2019 16:10:18 -0500
-X-Greylist: delayed 496 seconds by postgrey-1.27 at vger.kernel.org; Mon, 21 Jan 2019 16:10:17 EST
-Received: from [192.168.178.72] (dslb-092-075-222-085.092.075.pools.vodafone-ip.de [92.75.222.85])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        id S1726004AbfAUVrQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Jan 2019 16:47:16 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by gfuc.org (Postfix) with ESMTPSA id 04B781E00A5
-        for <linux-block@vger.kernel.org>; Mon, 21 Jan 2019 21:01:59 +0000 (UTC)
-From:   Florian Stecker <m19@florianstecker.de>
-Subject: fsync hangs after scsi rejected a request
-To:     linux-block@vger.kernel.org
-Message-ID: <70df6d90-31eb-96f4-908d-462ea58dea6e@florianstecker.de>
-Date:   Mon, 21 Jan 2019 22:01:59 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        by mx1.redhat.com (Postfix) with ESMTPS id 3C2F97F6CB;
+        Mon, 21 Jan 2019 21:47:16 +0000 (UTC)
+Received: from horse.redhat.com (unknown [10.18.25.156])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 118C1648AF;
+        Mon, 21 Jan 2019 21:47:15 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+        id 7771922024A; Mon, 21 Jan 2019 16:47:15 -0500 (EST)
+Date:   Mon, 21 Jan 2019 16:47:15 -0500
+From:   Vivek Goyal <vgoyal@redhat.com>
+To:     Andrea Righi <righi.andrea@gmail.com>
+Cc:     Josef Bacik <josef@toxicpanda.com>, Tejun Heo <tj@kernel.org>,
+        Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jens Axboe <axboe@kernel.dk>, Dennis Zhou <dennis@kernel.org>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 0/3] cgroup: fsio throttle controller
+Message-ID: <20190121214715.GA27713@redhat.com>
+References: <20190118103127.325-1-righi.andrea@gmail.com>
+ <20190118163530.w5wpzpjkcnkektsp@macbook-pro-91.dhcp.thefacebook.com>
+ <20190118184403.GB1535@xps-13>
+ <20190118194652.gg5j2yz3h2llecpj@macbook-pro-91.dhcp.thefacebook.com>
+ <20190119100827.GA1630@xps-13>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US-large
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190119100827.GA1630@xps-13>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Mon, 21 Jan 2019 21:47:16 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi everyone,
+On Sat, Jan 19, 2019 at 11:08:27AM +0100, Andrea Righi wrote:
 
-on my laptop, I am experiencing occasional hangs of applications during 
-fsync(), which are sometimes up to 30 seconds long. I'm using a BTRFS 
-which spans two partitions on the same SSD (one of them used to contain 
-a Windows, but I removed it and added the partition to the BTRFS volume 
-instead). Also, the problem only occurs when an I/O scheduler 
-(mq-deadline) is in use. I'm running kernel version 4.20.3.
+[..]
+> Alright, let's skip the root cgroup for now. I think the point here is
+> if we want to provide sync() isolation among cgroups or not.
+> 
+> According to the manpage:
+> 
+>        sync()  causes  all  pending  modifications  to filesystem metadata and cached file data to be
+>        written to the underlying filesystems.
+> 
+> And:
+>        According to the standard specification (e.g., POSIX.1-2001), sync() schedules the writes, but
+>        may  return  before  the actual writing is done.  However Linux waits for I/O completions, and
+>        thus sync() or syncfs() provide the same guarantees as fsync called on every file in the  sys‐
+>        tem or filesystem respectively.
+> 
+> Excluding the root cgroup, do you think a sync() issued inside a
+> specific cgroup should wait for I/O completions only for the writes that
+> have been generated by that cgroup?
 
- From what I understand so far, what happens is that a sync request 
-fails in the SCSI/ATA layer, in ata_std_qc_defer(), because it is a 
-"Non-NCQ command" and can not be queued together with other commands. 
-This propagates up into blk_mq_dispatch_rq_list(), where the call
+Can we account I/O towards the cgroup which issued "sync" only if write
+rate of sync cgroup is higher than cgroup to which page belongs to. Will
+that solve problem, assuming its doable?
 
-ret = q->mq_ops->queue_rq(hctx, &bd);
-
-returns BLK_STS_DEV_RESOURCE. Later in blk_mq_dispatch_rq_list(), there 
-is the piece of code
-
-needs_restart = blk_mq_sched_needs_restart(hctx);
-if (!needs_restart ||
-	(no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
-	blk_mq_run_hw_queue(hctx, true);
-else if (needs_restart && (ret == BLK_STS_RESOURCE))
-	blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
-
-which restarts the queue after a delay if BLK_STS_RESOURCE was returned, 
-but somehow not for BLK_STS_DEV_RESOURCE. Instead, nothing happens and 
-fsync() seems to hang until some other process wants to do I/O.
-
-So if I do
-
-- else if (needs_restart && (ret == BLK_STS_RESOURCE))
-+ else if (needs_restart && (ret == BLK_STS_RESOURCE || ret == 
-BLK_STS_DEV_RESOURCE))
-
-it fixes my problem. But was there a reason why BLK_STS_DEV_RESOURCE was 
-treated differently that BLK_STS_RESOURCE here?
-
-In any case, it seems wrong to me that ret is used here at all, as it 
-just contains the return value of the last request in the list, and 
-whether we rerun the queue should probably not only depend on the last 
-request?
-
-Can anyone of the experts tell me whether this makes sense or I got 
-something completely wrong?
-
-Best,
-Florian
+Vivek
