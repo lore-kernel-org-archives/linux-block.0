@@ -2,124 +2,149 @@ Return-Path: <SRS0=XolY=P5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C825C2F421
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 15:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DCACC2F421
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 16:02:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5D4E720823
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 15:58:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E456A20879
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 16:02:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729344AbfAUP6K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jan 2019 10:58:10 -0500
-Received: from mx2.suse.de ([195.135.220.15]:38230 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728761AbfAUP6K (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jan 2019 10:58:10 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 3BEE3AC3B;
-        Mon, 21 Jan 2019 15:58:09 +0000 (UTC)
+        id S1729192AbfAUQCG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jan 2019 11:02:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51052 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728761AbfAUQCG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Jan 2019 11:02:06 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 0316E1326B7;
+        Mon, 21 Jan 2019 16:02:06 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9E1A1608DD;
+        Mon, 21 Jan 2019 16:02:05 +0000 (UTC)
+Date:   Mon, 21 Jan 2019 11:02:04 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     dm-devel@redhat.com, NeilBrown <neilb@suse.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 3/4] dm: fix missing bio_split() pattern code in
+ __split_and_process_bio()
+Message-ID: <20190121160204.GA32117@redhat.com>
+References: <20190119180506.1300-1-snitzer@redhat.com>
+ <20190119180506.1300-4-snitzer@redhat.com>
+ <20190121032153.GA24610@ming.t460p>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 21 Jan 2019 16:58:07 +0100
-From:   Roman Penyaev <rpenyaev@suse.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
-        linux-block@vger.kernel.org, hch@lst.de, jmoyer@redhat.com,
-        avi@scylladb.com, linux-block-owner@vger.kernel.org
-Subject: Re: [PATCH 05/17] Add io_uring IO interface
-In-Reply-To: <801e00ef-b21d-4420-9fa3-2b19fe2398b2@kernel.dk>
-References: <20190118161225.4545-1-axboe@kernel.dk>
- <20190118161225.4545-6-axboe@kernel.dk>
- <20204806b30147da55990e639586cce1@suse.de>
- <801e00ef-b21d-4420-9fa3-2b19fe2398b2@kernel.dk>
-Message-ID: <eb1e623843cd26ced5d06deb7fdb7851@suse.de>
-X-Sender: rpenyaev@suse.de
-User-Agent: Roundcube Webmail
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190121032153.GA24610@ming.t460p>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Mon, 21 Jan 2019 16:02:06 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019-01-21 16:30, Jens Axboe wrote:
-> On 1/21/19 2:13 AM, Roman Penyaev wrote:
->> On 2019-01-18 17:12, Jens Axboe wrote:
->> 
->> [...]
->> 
->>> +
->>> +static int io_uring_create(unsigned entries, struct io_uring_params
->>> *p,
->>> +			   bool compat)
->>> +{
->>> +	struct user_struct *user = NULL;
->>> +	struct io_ring_ctx *ctx;
->>> +	int ret;
->>> +
->>> +	if (entries > IORING_MAX_ENTRIES)
->>> +		return -EINVAL;
->>> +
->>> +	/*
->>> +	 * Use twice as many entries for the CQ ring. It's possible for the
->>> +	 * application to drive a higher depth than the size of the SQ 
->>> ring,
->>> +	 * since the sqes are only used at submission time. This allows for
->>> +	 * some flexibility in overcommitting a bit.
->>> +	 */
->>> +	p->sq_entries = roundup_pow_of_two(entries);
->>> +	p->cq_entries = 2 * p->sq_entries;
->>> +
->>> +	if (!capable(CAP_IPC_LOCK)) {
->>> +		user = get_uid(current_user());
->>> +		ret = __io_account_mem(user, ring_pages(p->sq_entries,
->>> +							p->cq_entries));
->>> +		if (ret) {
->>> +			free_uid(user);
->>> +			return ret;
->>> +		}
->>> +	}
->>> +
->>> +	ctx = io_ring_ctx_alloc(p);
->>> +	if (!ctx)
->>> +		return -ENOMEM;
->> 
->> Hi Jens,
->> 
->> It seems pages should be "unaccounted" back here and uid freed if path
->> with "if (!capable(CAP_IPC_LOCK))" above was taken.
+On Sun, Jan 20 2019 at 10:21P -0500,
+Ming Lei <ming.lei@redhat.com> wrote:
+
+> On Sat, Jan 19, 2019 at 01:05:05PM -0500, Mike Snitzer wrote:
+> > Use the same BIO_QUEUE_ENTERED pattern that was established by commit
+> > cd4a4ae4683dc ("block: don't use blocking queue entered for recursive
+> > bio submits") by setting BIO_QUEUE_ENTERED after bio_split() and before
+> > recursing via generic_make_request().
+> > 
+> > Also add trace_block_split() because it provides useful context about
+> > bio splits in blktrace.
+> > 
+> > Depends-on: cd4a4ae4683dc ("block: don't use blocking queue entered for recursive bio submits")
+> > Fixes: 18a25da84354 ("dm: ensure bio submission follows a depth-first tree walk")
+> > Cc: stable@vger.kernel.org # 4.16+
+> > Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+> > ---
+> >  drivers/md/dm.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> > index fbadda68e23b..6e29c2d99b99 100644
+> > --- a/drivers/md/dm.c
+> > +++ b/drivers/md/dm.c
+> > @@ -1654,7 +1654,9 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
+> >  						   sectors[op_stat_group(bio_op(bio))], ci.sector_count);
+> >  				part_stat_unlock();
+> >  
+> > +				bio_set_flag(bio, BIO_QUEUE_ENTERED);
+> >  				bio_chain(b, bio);
+> > +				trace_block_split(md->queue, b, bio->bi_iter.bi_sector);
+> >  				ret = generic_make_request(bio);
+> >  				break;
+> >  			}
 > 
-> Thanks, yes that is leaky. I'll fix that up.
-> 
->> But really, could please someone explain me what is wrong with
->> allocating
->> all urings in mmap() without touching RLIMIT_MEMLOCK at all?  Thus all
->> memory will be accounted to the caller app and if app is greedy it 
->> will
->> be killed by oom.  What I'm missing?
-> 
-> I don't really what that'd change, if we do it off the ->mmap() or when
-> we setup the io_uring instance with io_uring_setup(2). We need this 
-> memory
-> to be pinned, we can't fault on it.
+> In theory, BIO_QUEUE_ENTERED is only required when __split_and_process_bio() is
+> called from generic_make_request(). However, it may be called from dm_wq_work(),
+> this way might cause trouble on operation to q->q_usage_counter.
 
-Hm, I thought that for pinning there is a separate counter ->pinned_vm
-(introduced by bc3e53f682d9 ("mm: distinguish between mlocked and pinned
-pages")  Which seems not wired up with anything, just a counter, used by
-couple of drivers. Hmmm.. Frankly, now I am lost. You map these pages
-through remap_pfn_range(), so virtual user mapping won't fault, right?
-And these pages you allocate with GFP_KERNEL, so they are already 
-pinned.
-So now I do not understand why this accounting is needed at all :)
-The only reason I had in mind is some kind of accounting, to filter out
-greedy and nasty apps.  If this is not the case, then I am lost.
-Could you please explain?
+Good point, I've tweaked this patch to clear BIO_QUEUE_ENTERED in
+dm_make_request().
 
---
-Roman
+And to Neil's point: yes, these changes really do need to made
+common since it appears all bio_split() callers do go on to call
+generic_make_request().
 
+Anyway, here is the updated patch that is now staged in linux-next:
 
+From: Mike Snitzer <snitzer@redhat.com>
+Date: Fri, 18 Jan 2019 01:21:11 -0500
+Subject: [PATCH v2] dm: fix missing bio_split() pattern code in __split_and_process_bio()
+
+Use the same BIO_QUEUE_ENTERED pattern that was established by commit
+cd4a4ae4683dc ("block: don't use blocking queue entered for recursive
+bio submits") by setting BIO_QUEUE_ENTERED after bio_split() and before
+recursing via generic_make_request().
+
+Also add trace_block_split() because it provides useful context about
+bio splits in blktrace.
+
+Depends-on: cd4a4ae4683dc ("block: don't use blocking queue entered for recursive bio submits")
+Fixes: 18a25da84354 ("dm: ensure bio submission follows a depth-first tree walk")
+Cc: stable@vger.kernel.org # 4.16+
+Signed-off-by: Mike Snitzer <snitzer@redhat.com>
+---
+ drivers/md/dm.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index fbadda68e23b..25884f833a32 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -1654,7 +1654,9 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
+ 						   sectors[op_stat_group(bio_op(bio))], ci.sector_count);
+ 				part_stat_unlock();
+ 
++				bio_set_flag(bio, BIO_QUEUE_ENTERED);
+ 				bio_chain(b, bio);
++				trace_block_split(md->queue, b, bio->bi_iter.bi_sector);
+ 				ret = generic_make_request(bio);
+ 				break;
+ 			}
+@@ -1734,6 +1736,13 @@ static blk_qc_t dm_make_request(struct request_queue *q, struct bio *bio)
+ 
+ 	map = dm_get_live_table(md, &srcu_idx);
+ 
++	/*
++	 * Clear the bio-reentered-generic_make_request() flag,
++	 * will be set again as needed if bio needs to be split.
++	 */
++	if (bio_flagged(bio, BIO_QUEUE_ENTERED))
++		bio_clear_flag(bio, BIO_QUEUE_ENTERED);
++
+ 	/* if we're suspended, we have to queue this io for later */
+ 	if (unlikely(test_bit(DMF_BLOCK_IO_FOR_SUSPEND, &md->flags))) {
+ 		dm_put_live_table(md, srcu_idx);
+-- 
+2.15.0
 
