@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE634C2F3C7
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 13:53:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36C45C2F3A0
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 14:04:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BE2672084C
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 13:53:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 03E692089F
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 14:04:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548078833;
-	bh=jGuGdLqgpHk+E+/Bbwp81yoJ7Rt9O10fe2Bilcho3KU=;
+	s=default; t=1548079440;
+	bh=7Xqk6gEQ+jsPV7sQwgndu7gZnzvEpItK+CAFXxzBGac=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=K4X/AB9r//5nb/P/xN1av2prcD8TSl1D78BVTisTh/rKNODk1rSsl1EUqByNV+mUb
-	 W4NtNWZBIUYcZXcomfgnCOVP6rYgb4Le1X62kFbfzxZCmokcD/qnkjlb7992leNLHA
-	 0aCY69rci+77sdL9FQbvoK5YxF0NaUBkFhTXWTmI=
+	b=r4sOAIWK3P9I99rz++sXKcmJwr1RPEEgQHXaqImH8Qqc2mYcMF0nqPZ8XzqOoDrfq
+	 J20P/Ny+8/uLIMDftF9+l7ITPfyfoynNeltnakQ8dX5aOyGlJ3XmH8WTE31CHhJxHb
+	 WNDXT77ZKqaq5VVi9rmqoSoDuEsrm1+0AMdh0YIE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730907AbfAUNxw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jan 2019 08:53:52 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37788 "EHLO mail.kernel.org"
+        id S1729077AbfAUODx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jan 2019 09:03:53 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50400 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731347AbfAUNxv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jan 2019 08:53:51 -0500
+        id S1732841AbfAUOCk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Jan 2019 09:02:40 -0500
 Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AD23A2084C;
-        Mon, 21 Jan 2019 13:53:49 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0F1BC2089F;
+        Mon, 21 Jan 2019 14:02:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548078830;
-        bh=jGuGdLqgpHk+E+/Bbwp81yoJ7Rt9O10fe2Bilcho3KU=;
+        s=default; t=1548079359;
+        bh=7Xqk6gEQ+jsPV7sQwgndu7gZnzvEpItK+CAFXxzBGac=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=veZiTmmrPaWRRt4GtWf/+uE02n0CVpuXk+P8CMSh4N0rUDFlnAkqC/4GehZfFLlAp
-         fueR13KRmwkBZXRNwiwdgVDTHF5T+z8H7xcmqhrnTeKZ8BdqdN208AVwdpbEGFMu6f
-         fC95C5RXQqkN4TSsTMh4TtHTxbpB6uGoaG6khrPk=
+        b=Ht9TaF3sazWHieMXSnG6EufXn1nKYTEO4Zfqv6SDloIm2lZvMvc9VtWWbVyHOJoZZ
+         avSsaljTwh/6T0GewChd//GmIF0FmySQjBMy1qZh1Jo4hVolhrUiDTPWGaTDGRymDb
+         VePojbpf8NtQbqihRGxhNGCDVnZw2MebFeXmb0ss=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -45,12 +45,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-block@vger.kernel.org, Martijn Coenen <maco@google.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Jaegeuk Kim <jaegeuk@kernel.org>
-Subject: [PATCH 4.14 58/59] loop: drop caches if offset or block_size are changed
-Date:   Mon, 21 Jan 2019 14:44:23 +0100
-Message-Id: <20190121122503.771813232@linuxfoundation.org>
+Subject: [PATCH 4.19 97/99] loop: drop caches if offset or block_size are changed
+Date:   Mon, 21 Jan 2019 14:49:29 +0100
+Message-Id: <20190121134919.906386817@linuxfoundation.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190121122456.529172919@linuxfoundation.org>
-References: <20190121122456.529172919@linuxfoundation.org>
+In-Reply-To: <20190121134913.924726465@linuxfoundation.org>
+References: <20190121134913.924726465@linuxfoundation.org>
 User-Agent: quilt/0.65
 X-stable: review
 X-Patchwork-Hint: ignore
@@ -62,7 +62,7 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-4.14-stable review patch.  If anyone has any objections, please let me know.
+4.19-stable review patch.  If anyone has any objections, please let me know.
 
 ------------------
 
@@ -92,9 +92,9 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -1097,6 +1097,12 @@ loop_set_status(struct loop_device *lo,
- 	if ((unsigned int) info->lo_encrypt_key_size > LO_KEY_SIZE)
- 		return -EINVAL;
+@@ -1191,6 +1191,12 @@ loop_set_status(struct loop_device *lo,
+ 		goto out_unlock;
+ 	}
  
 +	if (lo->lo_offset != info->lo_offset ||
 +	    lo->lo_sizelimit != info->lo_sizelimit) {
@@ -105,7 +105,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  	/* I/O need to be drained during transfer transition */
  	blk_mq_freeze_queue(lo->lo_queue);
  
-@@ -1125,6 +1131,14 @@ loop_set_status(struct loop_device *lo,
+@@ -1219,6 +1225,14 @@ loop_set_status(struct loop_device *lo,
  
  	if (lo->lo_offset != info->lo_offset ||
  	    lo->lo_sizelimit != info->lo_sizelimit) {
@@ -115,12 +115,12 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 +			pr_warn("%s: loop%d (%s) has still dirty pages (nrpages=%lu)\n",
 +				__func__, lo->lo_number, lo->lo_file_name,
 +				lo->lo_device->bd_inode->i_mapping->nrpages);
-+			goto exit;
++			goto out_unfreeze;
 +		}
  		if (figure_loop_size(lo, info->lo_offset, info->lo_sizelimit)) {
  			err = -EFBIG;
- 			goto exit;
-@@ -1346,22 +1360,39 @@ static int loop_set_dio(struct loop_devi
+ 			goto out_unfreeze;
+@@ -1444,22 +1458,39 @@ static int loop_set_dio(struct loop_devi
  
  static int loop_set_block_size(struct loop_device *lo, unsigned long arg)
  {
@@ -161,6 +161,6 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 +	return err;
  }
  
- static int lo_ioctl(struct block_device *bdev, fmode_t mode,
+ static int lo_simple_ioctl(struct loop_device *lo, unsigned int cmd,
 
 
