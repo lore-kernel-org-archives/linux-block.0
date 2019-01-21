@@ -2,87 +2,75 @@ Return-Path: <SRS0=XolY=P5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF5CBC282DB
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 08:23:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1000BC282DB
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 08:33:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E0572084A
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 08:23:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C285420855
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 08:33:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bs7HDq84"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729066AbfAUIUy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jan 2019 03:20:54 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:29140 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728673AbfAUIUx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jan 2019 03:20:53 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 6C9BC5F797;
-        Mon, 21 Jan 2019 08:20:53 +0000 (UTC)
-Received: from localhost (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2C63F5D756;
-        Mon, 21 Jan 2019 08:20:38 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
-        Omar Sandoval <osandov@fb.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Dave Chinner <dchinner@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        id S1728836AbfAUIdW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jan 2019 03:33:22 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:47064 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727979AbfAUIdW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Jan 2019 03:33:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=3vLTqArO6IlnvIpVNNwtBoC44J5aee9wRIhosCflYV8=; b=bs7HDq84GmSf0zN6cm0CvvZbU
+        hr83ehxSwLRzfxBIPX2eo7i24iEE27zN5bqbVeVF9UsC1jK1gg4Sf2pyCgglPhDYfDrFJEnNUuz9V
+        BH2Q1PDzIwiKEd01Smjf7TQHg0GwOQsEaaVcd+tc/8u0gIJKjWP7AmfTAXigZkeqSGB5Ut9h2e+fw
+        YCcsG2blbVrVExCZGRgEimr95NxNBeqDNdWV8WHWaf7RcYvfTJfAWX++V9ybvGXWHtCjV4XDoX1qV
+        ih/ZbglQkXIowNwYL5ncWEINPxeQxOEkpHliKzCc2EllQVuS0I8yNFF9Mcw882VCgTKfVy5vb6sBg
+        JsbvsGhDg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1glV1B-0007Wk-Gj; Mon, 21 Jan 2019 08:33:17 +0000
+Date:   Mon, 21 Jan 2019 00:33:17 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "jianchao.wang" <jianchao.w.wang@oracle.com>,
+        Marc Gonzalez <marc.w.gonzalez@free.fr>,
+        fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        SCSI <linux-scsi@vger.kernel.org>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
-        Christoph Hellwig <hch@lst.de>, linux-ext4@vger.kernel.org,
-        Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
-        Boaz Harrosh <ooo@electrozaur.com>,
-        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V14 09/18] fs/buffer.c: use bvec iterator to truncate the bio
-Date:   Mon, 21 Jan 2019 16:17:56 +0800
-Message-Id: <20190121081805.32727-10-ming.lei@redhat.com>
-In-Reply-To: <20190121081805.32727-1-ming.lei@redhat.com>
-References: <20190121081805.32727-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Mon, 21 Jan 2019 08:20:53 +0000 (UTC)
+        Jan Kara <jack@suse.com>, Joao Pinto <jpinto@synopsys.com>,
+        Fujita Tomonori <fujita.tomonori@lab.ntt.co.jp>,
+        Paolo Valente <paolo.valente@linaro.org>
+Subject: Re: dd hangs when reading large partitions
+Message-ID: <20190121083317.GA20900@infradead.org>
+References: <f792574c-e083-b218-13b4-c89be6566015@free.fr>
+ <398a6e83-d482-6e72-5806-6d5bbe8bfdd9@oracle.com>
+ <ef734b94-e72b-771f-350b-08d8054a58f3@kernel.dk>
+ <20190119095601.GA7440@infradead.org>
+ <ea0ebc4b-2634-1f6b-b5cf-0dc1bbb83749@acm.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ea0ebc4b-2634-1f6b-b5cf-0dc1bbb83749@acm.org>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Once multi-page bvec is enabled, the last bvec may include more than one
-page, this patch use mp_bvec_last_segment() to truncate the bio.
+On Sat, Jan 19, 2019 at 08:09:18AM -0800, Bart Van Assche wrote:
+> Which patch are you referring to?
 
-Reviewed-by: Omar Sandoval <osandov@fb.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- fs/buffer.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+a3cd5ec55f6 ("scsi: ufs: add load based scaling of UFS gear")
 
-diff --git a/fs/buffer.c b/fs/buffer.c
-index 52d024bfdbc1..817871274c77 100644
---- a/fs/buffer.c
-+++ b/fs/buffer.c
-@@ -3032,7 +3032,10 @@ void guard_bio_eod(int op, struct bio *bio)
- 
- 	/* ..and clear the end of the buffer for reads */
- 	if (op == REQ_OP_READ) {
--		zero_user(bvec->bv_page, bvec->bv_offset + bvec->bv_len,
-+		struct bio_vec bv;
-+
-+		mp_bvec_last_segment(bvec, &bv);
-+		zero_user(bv.bv_page, bv.bv_offset + bv.bv_len,
- 				truncated_bytes);
- 	}
- }
--- 
-2.9.5
-
+That being said it doesn't seem entirely trivial to revert due to
+later additions, so this might require a little more work.
