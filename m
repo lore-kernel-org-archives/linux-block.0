@@ -3,97 +3,96 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A164C282DB
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 09:13:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54EE9C282DB
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 09:43:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DED202084A
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 09:13:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BCD22085A
+	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 09:43:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726284AbfAUJNe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jan 2019 04:13:34 -0500
-Received: from mx2.suse.de ([195.135.220.15]:52578 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726030AbfAUJNe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jan 2019 04:13:34 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id C225FAF81;
-        Mon, 21 Jan 2019 09:13:32 +0000 (UTC)
+        id S1727776AbfAUJn1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jan 2019 04:43:27 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:36464 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726872AbfAUJnZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Jan 2019 04:43:25 -0500
+Received: by mail-pf1-f195.google.com with SMTP id b85so9885740pfc.3;
+        Mon, 21 Jan 2019 01:43:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ctU1IKwGbIHB/qxu9fzPzOndQlgD5hRgjY4uIUshvTY=;
+        b=ZK+UNms6mWgpgYjstaV6ModqemMUmQxaMqmV75D1o0PWBNhJ1ERHGGBTg05ZaCgJ1z
+         PPWFV/dVoSiGzmWP0syRm0T+UT00+K66DhbfI80VhqDokvLpAMT+40s8LHYAeKj5Dlwb
+         RR2xmxUmnl45nZVuH0dvvPyLQ6nTUpjetwyNH8w6rTniN+bD8dGM1Mkf30t6d1UCXdcG
+         b/2Vsx/XL7yP7IOPi6/a0qBSb9tEVLGXQGxFdRVRrs23Hyg8ZpjLX7zC0blpxqTvgD53
+         5W60hYH3cqML5PuhrQrJr0l/5hpiPDhNescn+1qH+xweircgonV5DhJbmpdLNiVaMlyQ
+         FEZg==
+X-Gm-Message-State: AJcUukdE5XGmtUfansUIM42/82WAyX9/ByrDfNORjQyGxuP5EJ4Bwv/E
+        IEbW5diaW8azqW4naizolXs=
+X-Google-Smtp-Source: ALg8bN6P7/Ncr76xD/uxTtsl2LRvnNdrOYt8IlcTvDVHidHRO2no14YHVCiCcwzatwkiVv+sBDrECA==
+X-Received: by 2002:a62:5b83:: with SMTP id p125mr29320606pfb.116.1548063803783;
+        Mon, 21 Jan 2019 01:43:23 -0800 (PST)
+Received: from ?IPv6:2601:647:4800:973f:749d:e9f0:491e:d7d5? ([2601:647:4800:973f:749d:e9f0:491e:d7d5])
+        by smtp.gmail.com with ESMTPSA id m198sm21820819pga.10.2019.01.21.01.43.22
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 21 Jan 2019 01:43:23 -0800 (PST)
+Subject: Re: [PATCH V14 00/18] block: support multi-page bvec
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
+        Omar Sandoval <osandov@fb.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
+        Christoph Hellwig <hch@lst.de>, linux-ext4@vger.kernel.org,
+        Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
+        Boaz Harrosh <ooo@electrozaur.com>,
+        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
+References: <20190121081805.32727-1-ming.lei@redhat.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <61dfaa1e-e7bf-75f1-410b-ed32f97d0782@grimberg.me>
+Date:   Mon, 21 Jan 2019 01:43:21 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <20190121081805.32727-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date:   Mon, 21 Jan 2019 10:13:32 +0100
-From:   Roman Penyaev <rpenyaev@suse.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
-        linux-block@vger.kernel.org, hch@lst.de, jmoyer@redhat.com,
-        avi@scylladb.com, linux-block-owner@vger.kernel.org
-Subject: Re: [PATCH 05/17] Add io_uring IO interface
-In-Reply-To: <20190118161225.4545-6-axboe@kernel.dk>
-References: <20190118161225.4545-1-axboe@kernel.dk>
- <20190118161225.4545-6-axboe@kernel.dk>
-Message-ID: <20204806b30147da55990e639586cce1@suse.de>
-X-Sender: rpenyaev@suse.de
-User-Agent: Roundcube Webmail
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019-01-18 17:12, Jens Axboe wrote:
 
-[...]
+> V14:
+> 	- drop patch(patch 4 in V13) for renaming bvec helpers, as suggested by Jens
+> 	- use mp_bvec_* as multi-page bvec helper name
+> 	- fix one build issue, which is caused by missing one converion of
+> 	bio_for_each_segment_all in fs/gfs2
+> 	- fix one 32bit ARCH specific issue caused by segment boundary mask
+> 	overflow
 
-> +
-> +static int io_uring_create(unsigned entries, struct io_uring_params 
-> *p,
-> +			   bool compat)
-> +{
-> +	struct user_struct *user = NULL;
-> +	struct io_ring_ctx *ctx;
-> +	int ret;
-> +
-> +	if (entries > IORING_MAX_ENTRIES)
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * Use twice as many entries for the CQ ring. It's possible for the
-> +	 * application to drive a higher depth than the size of the SQ ring,
-> +	 * since the sqes are only used at submission time. This allows for
-> +	 * some flexibility in overcommitting a bit.
-> +	 */
-> +	p->sq_entries = roundup_pow_of_two(entries);
-> +	p->cq_entries = 2 * p->sq_entries;
-> +
-> +	if (!capable(CAP_IPC_LOCK)) {
-> +		user = get_uid(current_user());
-> +		ret = __io_account_mem(user, ring_pages(p->sq_entries,
-> +							p->cq_entries));
-> +		if (ret) {
-> +			free_uid(user);
-> +			return ret;
-> +		}
-> +	}
-> +
-> +	ctx = io_ring_ctx_alloc(p);
-> +	if (!ctx)
-> +		return -ENOMEM;
+Hey Ming,
 
-Hi Jens,
+So is nvme-tcp also affected here? The only point where I see nvme-tcp
+can be affected is when initializing a bvec iter using bio_segments() as
+everywhere else we use iters which should transparently work..
 
-It seems pages should be "unaccounted" back here and uid freed if path
-with "if (!capable(CAP_IPC_LOCK))" above was taken.
-
-But really, could please someone explain me what is wrong with 
-allocating
-all urings in mmap() without touching RLIMIT_MEMLOCK at all?  Thus all
-memory will be accounted to the caller app and if app is greedy it will
-be killed by oom.  What I'm missing?
-
+I see that loop was converted, does it mean that nvme-tcp needs to
+call something like?
 --
-Roman
-
-
+	bio_for_each_mp_bvec(bv, bio, iter)
+		nr_bvecs++;
+--
