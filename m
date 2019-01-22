@@ -4,49 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68BDBC282C3
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 15:25:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCB52C282C3
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 15:26:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2DBEE217D6
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 15:25:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 935CD217D6
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 15:26:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548170752;
-	bh=H5F4UgyusDZ7Ef0oy+Za7vJwL7xKGf1CV3vNOpALKd8=;
+	s=default; t=1548170819;
+	bh=YdMOG5hIPebuBTE0TS4QbtMeuiflJa1UNYVFoBVxNu8=;
 	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=So1BUCHx/GQQ2Uc8qsvJ91RG6QHBvpWeQ7L7fWkRgoIvGjrQmaVT1/NrZslaitcSw
-	 Ew4iGqmipP3q8ua9wqjXbLhhO2XDRIoMHIZI/2R7m61nAkqxZvcKDHdzWe663fvl90
-	 PQ5FbhJwKjMFJGcNi6b8luEbADdTDpq56mz94Mcw=
+	b=yT2j3WcYM7pHBRlo8rAP/8GBPNY2xoE1JhCqXwUFYWBkXzn3MCKuXYfDoLiIcC5Wp
+	 trIgIlhGVlD3SqjDJEvO5tRBTE8ULJBbHE6hOeKzAvJF6v6aKyfHSAT5NKxdn+gxVP
+	 f+jT/+1Ocn2oInNsibzY0hRUtUdz2cSTr5g4On50=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729853AbfAVPXb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Jan 2019 10:23:31 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36602 "EHLO mail.kernel.org"
+        id S1729776AbfAVP05 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Jan 2019 10:26:57 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35918 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729829AbfAVPXb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Jan 2019 10:23:31 -0500
+        id S1729035AbfAVPXK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Jan 2019 10:23:10 -0500
 Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 20C9A217D4;
-        Tue, 22 Jan 2019 15:23:29 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6AAAD217D4;
+        Tue, 22 Jan 2019 15:23:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548170610;
-        bh=H5F4UgyusDZ7Ef0oy+Za7vJwL7xKGf1CV3vNOpALKd8=;
+        s=default; t=1548170589;
+        bh=YdMOG5hIPebuBTE0TS4QbtMeuiflJa1UNYVFoBVxNu8=;
         h=From:To:Cc:Subject:Date:From;
-        b=w4g0NIzJ1raZV7zSWvX+Mc4t6iqRssVIPbzdDgyaQG3Vj958Y6tBqnVipepad/Zp2
-         ZoTu1BcrwdDUenJXVBXwE7MOBwTq934ndOwzJ9r4nw5/N4T+uJyMMV1EPFkoAzqWI2
-         dDW9Vl6V8r3dKzDLcDoQ0Ru2WMQB5cBLOMfT3/0M=
+        b=TZVkhibBwwG/kEyrjpMV5y/sO8E2LkbFUYYdDy0RKB7KYNXOoIoXqtgwySZM0t+nE
+         UOv10OBsZVwklEumxSS5JNmGgI2b/FZJaSnqKzGhXMhSMvlHgqAzgOV6yabv8dJemB
+         EMS8dpgN0jDxuKbZUhGFnt4fXBIEKu4oU2JBbtWU=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>, linux-block@vger.kernel.org
-Subject: [PATCH] blktrace: no need to check return value of debugfs_create functions
-Date:   Tue, 22 Jan 2019 16:21:41 +0100
-Message-Id: <20190122152151.16139-42-gregkh@linuxfoundation.org>
+        "Ed L. Cashin" <ed.cashin@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: [PATCH] block: aoe: no need to check return value of debugfs_create functions
+Date:   Tue, 22 Jan 2019 16:21:04 +0100
+Message-Id: <20190122152151.16139-5-gregkh@linuxfoundation.org>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -59,41 +58,45 @@ When calling debugfs functions, there is no need to ever check the
 return value.  The function can work or not, but the code logic should
 never do something different based on this.
 
+Cc: "Ed L. Cashin" <ed.cashin@acm.org>
 Cc: Jens Axboe <axboe@kernel.dk>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Cc: Ingo Molnar <mingo@redhat.com>
 Cc: linux-block@vger.kernel.org
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- kernel/trace/blktrace.c | 6 ------
- 1 file changed, 6 deletions(-)
+ drivers/block/aoe/aoeblk.c | 13 +------------
+ 1 file changed, 1 insertion(+), 12 deletions(-)
 
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index fac0ddf8a8e2..97ee6b5a2887 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -512,8 +512,6 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 	dir = debugfs_lookup(buts->name, blk_debugfs_root);
- 	if (!dir)
- 		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
--	if (!dir)
--		goto err;
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index e2c6aae2d636..b602646bfa04 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -207,14 +207,7 @@ aoedisk_add_debugfs(struct aoedev *d)
+ 	else
+ 		p++;
+ 	BUG_ON(*p == '\0');
+-	entry = debugfs_create_file(p, 0444, aoe_debugfs_dir, d,
+-				    &aoe_debugfs_fops);
+-	if (IS_ERR_OR_NULL(entry)) {
+-		pr_info("aoe: cannot create debugfs file for %s\n",
+-			d->gd->disk_name);
+-		return;
+-	}
+-	BUG_ON(d->debugfs);
++	debugfs_create_file(p, 0444, aoe_debugfs_dir, d, &aoe_debugfs_fops);
+ 	d->debugfs = entry;
+ }
+ void
+@@ -472,10 +465,6 @@ aoeblk_init(void)
+ 	if (buf_pool_cache == NULL)
+ 		return -ENOMEM;
+ 	aoe_debugfs_dir = debugfs_create_dir("aoe", NULL);
+-	if (IS_ERR_OR_NULL(aoe_debugfs_dir)) {
+-		pr_info("aoe: cannot create debugfs directory\n");
+-		aoe_debugfs_dir = NULL;
+-	}
+ 	return 0;
+ }
  
- 	bt->dev = dev;
- 	atomic_set(&bt->dropped, 0);
-@@ -522,12 +520,8 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 	ret = -EIO;
- 	bt->dropped_file = debugfs_create_file("dropped", 0444, dir, bt,
- 					       &blk_dropped_fops);
--	if (!bt->dropped_file)
--		goto err;
- 
- 	bt->msg_file = debugfs_create_file("msg", 0222, dir, bt, &blk_msg_fops);
--	if (!bt->msg_file)
--		goto err;
- 
- 	bt->rchan = relay_open("trace", dir, buts->buf_size,
- 				buts->buf_nr, &blk_relay_callbacks, bt);
 -- 
 2.20.1
 
