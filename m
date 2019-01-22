@@ -2,33 +2,48 @@ Return-Path: <SRS0=aewy=P6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 521E5C282C3
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 16:19:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15FC2C282C5
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 16:22:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1FE2021726
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 16:19:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D817821726
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 16:22:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1548174170;
+	bh=XJvHs6X0ydJ0puugVMlXnKJKSP2V9W8H397zcm1Fhk4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=D3Rk5LQ62pq+MQBrAp80+5s31ly/YxImt838bzdjNybTkAOML/+XK/8DwxsOPyEE9
+	 +TrXFQLLXOeeh26zFbdInaPdzid2N6W5aLDnhMjZ9YKeuH8leiWG05eqGvY3qltvOM
+	 3ixaNdQDJ7ui+pKLbu/G+nqGy480oQpQAhMYbelc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729123AbfAVQTB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Jan 2019 11:19:01 -0500
-Received: from smtp3-g21.free.fr ([212.27.42.3]:11063 "EHLO smtp3-g21.free.fr"
+        id S1729037AbfAVQWt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Jan 2019 11:22:49 -0500
+Received: from mail.kernel.org ([198.145.29.99]:49304 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728669AbfAVQTA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Jan 2019 11:19:00 -0500
-Received: from [192.168.108.68] (unknown [213.36.7.13])
-        (Authenticated sender: marc.w.gonzalez)
-        by smtp3-g21.free.fr (Postfix) with ESMTPSA id 36D5B13F8DA;
-        Tue, 22 Jan 2019 17:17:56 +0100 (CET)
-Subject: Re: dd hangs when reading large partitions
-From:   Marc Gonzalez <marc.w.gonzalez@free.fr>
-To:     Jianchao Wang <jianchao.w.wang@oracle.com>,
+        id S1728669AbfAVQWt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Jan 2019 11:22:49 -0500
+Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E3B4320870;
+        Tue, 22 Jan 2019 16:22:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1548174168;
+        bh=XJvHs6X0ydJ0puugVMlXnKJKSP2V9W8H397zcm1Fhk4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=D5fXr4MT9XENi1tJiGfrRWW2BwuBYHjZQ5O1sAvnUuJXuAauyO5p5loWzvbKgOujw
+         4yeetmIMuMR2QdkCfqYomH2GdyNQvHukVh6L8eKgR0e8zWO5GvYcJyaHQLAW/nsC9u
+         MuXOsnoiglm8csljK17HKUWR3dWbxvracdzUFEuk=
+Date:   Tue, 22 Jan 2019 17:22:46 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Marc Gonzalez <marc.w.gonzalez@free.fr>
+Cc:     Jianchao Wang <jianchao.w.wang@oracle.com>,
         Christoph Hellwig <hch@infradead.org>,
         Jens Axboe <axboe@kernel.dk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     fsdevel <linux-fsdevel@vger.kernel.org>,
+        fsdevel <linux-fsdevel@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
         SCSI <linux-scsi@vger.kernel.org>,
         Joao Pinto <jpinto@synopsys.com>,
@@ -53,6 +68,8 @@ Cc:     fsdevel <linux-fsdevel@vger.kernel.org>,
         Bart Van Assche <bart.vanassche@wdc.com>,
         Martin Petersen <martin.petersen@oracle.com>,
         Bjorn Andersson <bjorn.andersson@linaro.org>
+Subject: Re: dd hangs when reading large partitions
+Message-ID: <20190122162246.GA22548@kroah.com>
 References: <f792574c-e083-b218-13b4-c89be6566015@free.fr>
  <398a6e83-d482-6e72-5806-6d5bbe8bfdd9@oracle.com>
  <ef734b94-e72b-771f-350b-08d8054a58f3@kernel.dk>
@@ -61,35 +78,33 @@ References: <f792574c-e083-b218-13b4-c89be6566015@free.fr>
  <985b340c-623f-6df2-66bd-d9f4003189ea@free.fr>
  <b3910158-83d6-21fe-1606-33e88912404a@oracle.com>
  <d082bdee-62e5-d470-b63b-196c0fe3b9fb@free.fr>
-Message-ID: <fdfe4600-9bf5-0b6e-cd45-4ca836a477fe@free.fr>
-Date:   Tue, 22 Jan 2019 17:17:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+ <fdfe4600-9bf5-0b6e-cd45-4ca836a477fe@free.fr>
 MIME-Version: 1.0
-In-Reply-To: <d082bdee-62e5-d470-b63b-196c0fe3b9fb@free.fr>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fdfe4600-9bf5-0b6e-cd45-4ca836a477fe@free.fr>
+User-Agent: Mutt/1.11.2 (2019-01-07)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-+ Greg
+On Tue, Jan 22, 2019 at 05:17:56PM +0100, Marc Gonzalez wrote:
+> + Greg
+> 
+> On 22/01/2019 11:59, Marc Gonzalez wrote:
+> 
+> > FULL SESSION LOG: https://pastebin.ubuntu.com/p/YSm82GxhNW/
+> 
+> I finally got the hung_task detector to fire:
+> https://pastebin.ubuntu.com/p/XDDJjf7PTb/
+> 
+> Had a chat with GKH, who said that drivers/scsi/ufs is known to be not 100% functional,
+> and requires some cherry-picking from downstream to handle all corner cases.
 
-On 22/01/2019 11:59, Marc Gonzalez wrote:
+Note, we know it needs that for your controller, maybe not for others.
+So you can't make that kind of generalization :(
 
-> FULL SESSION LOG: https://pastebin.ubuntu.com/p/YSm82GxhNW/
+thanks,
 
-I finally got the hung_task detector to fire:
-https://pastebin.ubuntu.com/p/XDDJjf7PTb/
-
-Had a chat with GKH, who said that drivers/scsi/ufs is known to be not 100% functional,
-and requires some cherry-picking from downstream to handle all corner cases.
-
-I've sent a patch demoting drivers/scsi/ufs status from "Supported" to "Odd Fixes",
-in order to warn the next unwary fellow developers:
-
-https://patchwork.kernel.org/patch/10773503/
-
-Regards.
+greg k-h
