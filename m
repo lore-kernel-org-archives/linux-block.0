@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F99C282C4
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 10:16:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78BCFC282C3
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 10:18:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AB0D520879
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 10:16:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EDBE20879
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 10:18:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="cSjubKo6"
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="f2VVGDA1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727823AbfAVKQX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Jan 2019 05:16:23 -0500
-Received: from mail-it1-f194.google.com ([209.85.166.194]:51574 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726765AbfAVKQW (ORCPT
+        id S1726982AbfAVKSR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Jan 2019 05:18:17 -0500
+Received: from mail-it1-f196.google.com ([209.85.166.196]:35557 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727971AbfAVKSQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Jan 2019 05:16:22 -0500
-Received: by mail-it1-f194.google.com with SMTP id w18so20589020ite.1
-        for <linux-block@vger.kernel.org>; Tue, 22 Jan 2019 02:16:22 -0800 (PST)
+        Tue, 22 Jan 2019 05:18:16 -0500
+Received: by mail-it1-f196.google.com with SMTP id p197so19351893itp.0
+        for <linux-block@vger.kernel.org>; Tue, 22 Jan 2019 02:18:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=owltronix-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id;
-        bh=JWGs5toXsRmnRsCYgGfqI4n4jxxRyhhfZqoj6TXmfCQ=;
-        b=cSjubKo6bs+/vW3zncTOpWUqWMZY7O83uXhuiWdLHhXek1Wk3PoGrPIVnZvM9fiDNK
-         TYhGMm/EV4I7mBMk0Xbp46CP0Re+gnjxfzWwsOs6nyTTEjQ6xDwScXmqfIWUX1WjxxrY
-         dS0BRDlHUCfU4oC+1R/Qvpo8DjxlSQKmI79YcoK6tPsOApoonb4Jzn9HVgYKJDVggqMk
-         X7FnnlNZZocyQAa0hXOpkkQWFN7f16uJdCjAe8BEImV/lHR0tC8yxynvZt0BBvgRWdY4
-         jxvwrZ7lEewuBrRaMJy/FNo0DLOhrGHpqdpfe+nCkqkXXGgauqo1iYG6YjgnV9koSil+
-         Gg1Q==
+        bh=F14VHg3Q6CcoagSvNNNrRfEviAiUaeLFCtdR36qYta8=;
+        b=f2VVGDA1hSd/nJ6UptoYZXAWbwxFmQdq+WakgpQ0iTAqmZkMSHkqup6lTjcQsty5UF
+         a2+wIU5cCe9jU2y05niFdZQznFlIhKDqzqvZvM/2oRzHBdtrLPsZVSOjwiARElRSAa8F
+         ag7uhVTXp/xgyt/psPZQd8ZKRZLEjFHJtjHjluEwXyeI/CPrjcLiRDmssaWLMzKzc4du
+         5YFeshWpL4xy7EoGwmBdDkHAOerXxbaRUpJQF1nXvSyZNyrTuH/FkeI4z36RgUFAkZfX
+         D4kSlz9m376vBv7WymCmaAQ1vpDZ7LaY3+Q6K53Yte3a7t6AYE7m0+mj73BKQxyPZrI8
+         hrOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=JWGs5toXsRmnRsCYgGfqI4n4jxxRyhhfZqoj6TXmfCQ=;
-        b=WfXGYMw6AJKt3tGwsWabAwKcWZeSwxqGOFlgwfwu+HJft1EJ0n/1Xa2PpVlhgY4tsA
-         gydgzyWE/zhv0zoedms9DFWzDbbgQCwjiadwPTzsG3V3sodJXeFDccA2rJcNY4o7sOw2
-         lk3uk9YYbYVG+kUnHiiX8MdfZP+W5TB89oNg+Ro9xdiaBhDw3e3oIJyRJOdSqVhXtIY9
-         OJgHL0s29KMoL+dPDQ3X6Opk9TI0cQ4/4n4YIY/sxCGAj5EUaIus9KkXmDdswhXREnrm
-         dIYaS6J0659SO2TmldM7hkSaAZPP0BPycUm9ke6pLI2qp9wgjBR/Rskvi3vVYQWNKGbH
-         lIFg==
-X-Gm-Message-State: AJcUukfXtOPEWLSSDNcmKrEyPcEUxN/OsNScvKJZ2TxBzdtvWPCSfeKt
-        z4t5zwP7yWx+XeCt/G8u1HBNBA==
-X-Google-Smtp-Source: ALg8bN6Qr0A5bbgsepz6SubLpk4F1z9nC3kHx0+6wuFDoGHZfSZ91yLuPHLtcI04o6RKTlj1eSdrbQ==
-X-Received: by 2002:a02:5184:: with SMTP id s126mr18921007jaa.12.1548152181802;
-        Tue, 22 Jan 2019 02:16:21 -0800 (PST)
+        bh=F14VHg3Q6CcoagSvNNNrRfEviAiUaeLFCtdR36qYta8=;
+        b=pu5BcN+eGS8o2dI3ehvbwA9DLBXQm+fivSaPV5TlVr23pRh9Jkw1+9uorbg+Kv9Pv3
+         nuI8CHy/NHQjMA1V7ahHVBDIOz550z39s5y5CKxRzW9bTWl8hPbvOhdGijdqBfeHOL8N
+         Bg4JGYynsPeXS159pPRlmnDcl7zY076KtOkdzNHkzEl4Y5IJJAXzJjrtxcyn0NCgNNxm
+         bMJz6VXMdJcJkVnSgCQB5pQRMxNqIb+W8jz4PuJSnbJKhFmW4h4QcBwFOfag4jFFcgVS
+         6K86WidfK+qjARORzEVEJXrjBV4xqlGoxXoHhlVhwQpO0Rn2vyoVsvkPr1Uz5f85+fU+
+         i05w==
+X-Gm-Message-State: AJcUukcRHQlf7vPqIKTtV9mOM+J2u5kB0EskaC+za0ydLjYT4uQCab0U
+        dIXNGer+IYAyUf8UrAvuulcM8eXIunvgRw==
+X-Google-Smtp-Source: ALg8bN5RojFYpIuMNElloI1m/DbnckjegUxWZjF95Ydq8hEQPwQBu1KoZz/y/8IanNdcCgiCabg0Sg==
+X-Received: by 2002:a24:7c58:: with SMTP id a85mr1775263itd.9.1548152295522;
+        Tue, 22 Jan 2019 02:18:15 -0800 (PST)
 Received: from ch-lap-hans.cnexlabs.com (6164211-cl69.boa.fiberby.dk. [193.106.164.211])
-        by smtp.gmail.com with ESMTPSA id q15sm5572816ioj.64.2019.01.22.02.16.20
+        by smtp.gmail.com with ESMTPSA id 18sm7595496itk.28.2019.01.22.02.18.14
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 22 Jan 2019 02:16:21 -0800 (PST)
+        Tue, 22 Jan 2019 02:18:15 -0800 (PST)
 From:   hans@owltronix.com
 To:     Matias Bjorling <mb@lightnvm.io>
 Cc:     javier@javigon.com, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH] lightnvm: pblk: stop taking the free lock in in pblk_lines_free
-Date:   Tue, 22 Jan 2019 11:15:31 +0100
-Message-Id: <20190122101531.30893-1-hans@owltronix.com>
+Subject: [PATCH] lightnvm: pblk: use vfree to free metadata on error path
+Date:   Tue, 22 Jan 2019 11:17:59 +0100
+Message-Id: <20190122101759.31201-1-hans@owltronix.com>
 X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -69,36 +69,27 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-pblk_line_meta_free might sleep (it can end up calling vfree, depending
-on how we allocate lba lists), and this can lead to a BUG()
-if we wake up on a different cpu and release the lock.
+As chunk metadata is allocated using vmalloc, we need to free it
+using vfree.
 
-As there is no point of grabbing the free lock when pblk has shut down,
-remove the lock.
-
+Fixes: 090ee26fd512 ("lightnvm: use internal allocation for chunk log page")
 Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 ---
- drivers/lightnvm/pblk-init.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/lightnvm/pblk-core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index f9a3e47b6a93..eb0135c77805 100644
---- a/drivers/lightnvm/pblk-init.c
-+++ b/drivers/lightnvm/pblk-init.c
-@@ -584,14 +584,12 @@ static void pblk_lines_free(struct pblk *pblk)
- 	struct pblk_line *line;
- 	int i;
+diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+index 1ff165351180..1b5ff51faa63 100644
+--- a/drivers/lightnvm/pblk-core.c
++++ b/drivers/lightnvm/pblk-core.c
+@@ -141,7 +141,7 @@ struct nvm_chk_meta *pblk_get_chunk_meta(struct pblk *pblk)
  
--	spin_lock(&l_mg->free_lock);
- 	for (i = 0; i < l_mg->nr_lines; i++) {
- 		line = &pblk->lines[i];
- 
- 		pblk_line_free(line);
- 		pblk_line_meta_free(l_mg, line);
+ 	ret = nvm_get_chunk_meta(dev, ppa, geo->all_chunks, meta);
+ 	if (ret) {
+-		kfree(meta);
++		vfree(meta);
+ 		return ERR_PTR(-EIO);
  	}
--	spin_unlock(&l_mg->free_lock);
- 
- 	pblk_line_mg_free(pblk);
  
 -- 
 2.17.1
