@@ -2,203 +2,132 @@ Return-Path: <SRS0=aewy=P6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6695C282C0
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 02:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EE08C282C3
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 03:11:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C12620861
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 02:47:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4008F217D4
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 03:11:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="pGz23cxY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726435AbfAVCrE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jan 2019 21:47:04 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:45892 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725901AbfAVCrE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jan 2019 21:47:04 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id F3E0180495;
-        Tue, 22 Jan 2019 02:47:03 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-25.pek2.redhat.com [10.72.8.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E820E1001F5D;
-        Tue, 22 Jan 2019 02:46:47 +0000 (UTC)
-Date:   Tue, 22 Jan 2019 10:46:41 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     dm-devel@redhat.com, NeilBrown <neilb@suse.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/4] dm: fix missing bio_split() pattern code in
- __split_and_process_bio()
-Message-ID: <20190122024640.GA4287@ming.t460p>
-References: <20190119180506.1300-1-snitzer@redhat.com>
- <20190119180506.1300-4-snitzer@redhat.com>
- <20190121032153.GA24610@ming.t460p>
- <20190121160204.GA32117@redhat.com>
+        id S1726887AbfAVDL2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jan 2019 22:11:28 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:39356 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725901AbfAVDL2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Jan 2019 22:11:28 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0M39jct194967;
+        Tue, 22 Jan 2019 03:11:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=84FyAas9GBCX5lJ93e29JK4UigMUdkoq0yvsk/iQ8Jg=;
+ b=pGz23cxY9GEzMDiWD4wAsMLhBY3aTYlfbEw2Y45XLy+UNiE8cB6ht+l4pGLdPkzO9HEB
+ g3bIMx5a66mz3Ve5u3Q0kuD1HmSEBOJb8i6Pk1k10fN0OEihQmnEMfssEspn6il10Ftg
+ F7uqhTDo+4yGk27A6aWU1ey5wzelePMIq3NpIxraa9rMcIZxVY0Im0rftUaEGlvzyS+s
+ uSTy5VoFdxWcAMzL0UH+x3iyk5vOfTQ2UeqQO0N0MsiFgMM0qJaV/gcJ1HU2eMq5lbKS
+ TjRSNFRI3W6+LcGp+ZO+/PD9GxAOPBk6Wv1PgUpAiyM0zAYIx2OOqCFHiIX/o910a7HZ 3A== 
+Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
+        by userp2120.oracle.com with ESMTP id 2q3vhrh15s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 22 Jan 2019 03:11:07 +0000
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x0M3B6VN032362
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 22 Jan 2019 03:11:06 GMT
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x0M3B4QM017398;
+        Tue, 22 Jan 2019 03:11:04 GMT
+Received: from [10.182.69.118] (/10.182.69.118)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 21 Jan 2019 19:11:04 -0800
+Subject: Re: dd hangs when reading large partitions
+To:     Marc Gonzalez <marc.w.gonzalez@free.fr>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        SCSI <linux-scsi@vger.kernel.org>,
+        Joao Pinto <jpinto@synopsys.com>,
+        Subhash Jadavani <subhashj@codeaurora.org>,
+        Sayali Lokhande <sayalil@codeaurora.org>,
+        Can Guo <cang@codeaurora.org>,
+        Asutosh Das <asutoshd@codeaurora.org>,
+        Vijay Viswanath <vviswana@codeaurora.org>,
+        Venkat Gopalakrishnan <venkatg@codeaurora.org>,
+        Ritesh Harjani <riteshh@codeaurora.org>,
+        Vivek Gautam <vivek.gautam@codeaurora.org>,
+        Jeffrey Hugo <jhugo@codeaurora.org>,
+        Maya Erez <merez@codeaurora.org>,
+        Evan Green <evgreen@chromium.org>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Stephen Boyd <swboyd@chromium.org>,
+        Tomas Winkler <tomas.winkler@intel.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Martin Petersen <martin.petersen@oracle.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>
+References: <f792574c-e083-b218-13b4-c89be6566015@free.fr>
+ <398a6e83-d482-6e72-5806-6d5bbe8bfdd9@oracle.com>
+ <ef734b94-e72b-771f-350b-08d8054a58f3@kernel.dk>
+ <20190119095601.GA7440@infradead.org>
+ <07b2df5d-e1fe-9523-7c11-f3058a966f8a@free.fr>
+ <985b340c-623f-6df2-66bd-d9f4003189ea@free.fr>
+From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <b3910158-83d6-21fe-1606-33e88912404a@oracle.com>
+Date:   Tue, 22 Jan 2019 11:12:49 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190121160204.GA32117@redhat.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Tue, 22 Jan 2019 02:47:04 +0000 (UTC)
+In-Reply-To: <985b340c-623f-6df2-66bd-d9f4003189ea@free.fr>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9143 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1901220025
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 21, 2019 at 11:02:04AM -0500, Mike Snitzer wrote:
-> On Sun, Jan 20 2019 at 10:21P -0500,
-> Ming Lei <ming.lei@redhat.com> wrote:
+Hello
+
+On 1/21/19 11:22 PM, Marc Gonzalez wrote:
+> Well, now we know for sure that the clk_scaling_lock is a red herring.
+> I applied the patch below, and still the system locked up:
 > 
-> > On Sat, Jan 19, 2019 at 01:05:05PM -0500, Mike Snitzer wrote:
-> > > Use the same BIO_QUEUE_ENTERED pattern that was established by commit
-> > > cd4a4ae4683dc ("block: don't use blocking queue entered for recursive
-> > > bio submits") by setting BIO_QUEUE_ENTERED after bio_split() and before
-> > > recursing via generic_make_request().
-> > > 
-> > > Also add trace_block_split() because it provides useful context about
-> > > bio splits in blktrace.
-> > > 
-> > > Depends-on: cd4a4ae4683dc ("block: don't use blocking queue entered for recursive bio submits")
-> > > Fixes: 18a25da84354 ("dm: ensure bio submission follows a depth-first tree walk")
-> > > Cc: stable@vger.kernel.org # 4.16+
-> > > Signed-off-by: Mike Snitzer <snitzer@redhat.com>
-> > > ---
-> > >  drivers/md/dm.c | 2 ++
-> > >  1 file changed, 2 insertions(+)
-> > > 
-> > > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> > > index fbadda68e23b..6e29c2d99b99 100644
-> > > --- a/drivers/md/dm.c
-> > > +++ b/drivers/md/dm.c
-> > > @@ -1654,7 +1654,9 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
-> > >  						   sectors[op_stat_group(bio_op(bio))], ci.sector_count);
-> > >  				part_stat_unlock();
-> > >  
-> > > +				bio_set_flag(bio, BIO_QUEUE_ENTERED);
-> > >  				bio_chain(b, bio);
-> > > +				trace_block_split(md->queue, b, bio->bi_iter.bi_sector);
-> > >  				ret = generic_make_request(bio);
-> > >  				break;
-> > >  			}
-> > 
-> > In theory, BIO_QUEUE_ENTERED is only required when __split_and_process_bio() is
-> > called from generic_make_request(). However, it may be called from dm_wq_work(),
-> > this way might cause trouble on operation to q->q_usage_counter.
+> # dd if=/dev/sde of=/dev/null bs=1M status=progress
+> 3892314112 bytes (3.9 GB, 3.6 GiB) copied, 50.0042 s, 77.8 MB/s
 > 
-> Good point, I've tweaked this patch to clear BIO_QUEUE_ENTERED in
-> dm_make_request().
-> 
-> And to Neil's point: yes, these changes really do need to made
-> common since it appears all bio_split() callers do go on to call
-> generic_make_request().
-> 
-> Anyway, here is the updated patch that is now staged in linux-next:
-> 
-> From: Mike Snitzer <snitzer@redhat.com>
-> Date: Fri, 18 Jan 2019 01:21:11 -0500
-> Subject: [PATCH v2] dm: fix missing bio_split() pattern code in __split_and_process_bio()
-> 
-> Use the same BIO_QUEUE_ENTERED pattern that was established by commit
-> cd4a4ae4683dc ("block: don't use blocking queue entered for recursive
-> bio submits") by setting BIO_QUEUE_ENTERED after bio_split() and before
-> recursing via generic_make_request().
-> 
-> Also add trace_block_split() because it provides useful context about
-> bio splits in blktrace.
-> 
-> Depends-on: cd4a4ae4683dc ("block: don't use blocking queue entered for recursive bio submits")
-> Fixes: 18a25da84354 ("dm: ensure bio submission follows a depth-first tree walk")
-> Cc: stable@vger.kernel.org # 4.16+
-> Signed-off-by: Mike Snitzer <snitzer@redhat.com>
-> ---
->  drivers/md/dm.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> index fbadda68e23b..25884f833a32 100644
-> --- a/drivers/md/dm.c
-> +++ b/drivers/md/dm.c
-> @@ -1654,7 +1654,9 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
->  						   sectors[op_stat_group(bio_op(bio))], ci.sector_count);
->  				part_stat_unlock();
->  
-> +				bio_set_flag(bio, BIO_QUEUE_ENTERED);
->  				bio_chain(b, bio);
-> +				trace_block_split(md->queue, b, bio->bi_iter.bi_sector);
->  				ret = generic_make_request(bio);
->  				break;
->  			}
-> @@ -1734,6 +1736,13 @@ static blk_qc_t dm_make_request(struct request_queue *q, struct bio *bio)
->  
->  	map = dm_get_live_table(md, &srcu_idx);
->  
-> +	/*
-> +	 * Clear the bio-reentered-generic_make_request() flag,
-> +	 * will be set again as needed if bio needs to be split.
-> +	 */
-> +	if (bio_flagged(bio, BIO_QUEUE_ENTERED))
-> +		bio_clear_flag(bio, BIO_QUEUE_ENTERED);
-> +
->  	/* if we're suspended, we have to queue this io for later */
->  	if (unlikely(test_bit(DMF_BLOCK_IO_FOR_SUSPEND, &md->flags))) {
->  		dm_put_live_table(md, srcu_idx);
-> -- 
-> 2.15.0
+> I can't seem to get the RCU stall warning anymore. How can I get
+> to the bottom of this issue?
 > 
 
-Hi Mike,
+Can you detail the system 'locked up' ?
+dd hangs there ? any hung task warning log ?
 
-I'd suggest to fix this kind issue in the following way, then we
-can avoid to touch this flag from drivers:
+hang forever or just hang for a relatively long time.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 3c5f61ceeb67..e70103560ac2 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1024,6 +1024,8 @@ blk_qc_t generic_make_request(struct bio *bio)
- 		else
- 			bio_io_error(bio);
- 		return ret;
-+	} else {
-+		bio_set_flag(bio, BIO_QUEUE_ENTERED);
- 	}
- 
- 	if (!generic_make_request_checks(bio))
-@@ -1074,6 +1076,8 @@ blk_qc_t generic_make_request(struct bio *bio)
- 			if (blk_queue_enter(q, flags) < 0) {
- 				enter_succeeded = false;
- 				q = NULL;
-+			} else {
-+				bio_set_flag(bio, BIO_QUEUE_ENTERED);
- 			}
- 		}
- 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index b990853f6de7..8777e286bd3f 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -339,16 +339,6 @@ void blk_queue_split(struct request_queue *q, struct bio **bio)
- 		/* there isn't chance to merge the splitted bio */
- 		split->bi_opf |= REQ_NOMERGE;
- 
--		/*
--		 * Since we're recursing into make_request here, ensure
--		 * that we mark this bio as already having entered the queue.
--		 * If not, and the queue is going away, we can get stuck
--		 * forever on waiting for the queue reference to drop. But
--		 * that will never happen, as we're already holding a
--		 * reference to it.
--		 */
--		bio_set_flag(*bio, BIO_QUEUE_ENTERED);
--
- 		bio_chain(split, *bio);
- 		trace_block_split(q, split, (*bio)->bi_iter.bi_sector);
- 		generic_make_request(*bio);
+And what is the status of the dd when it hangs ?
+Can you take some samples of the /proc/<dd's pid>/status and /proc/<dd's pid>/stack during the hang ?
 
-Thanks,
-Ming
+And also would you please share the dmesg log and config ?
+
+Since always fails with buffered read with fixed bytes,
+what is the capacity of your system memory ? 
+
+
+Thanks
+Jianchao
