@@ -7,52 +7,53 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26C71C282C3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BEF0C282C5
 	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 22:33:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E45E720866
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 22:33:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 613C520866
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 22:33:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="NfcPAuv/"
+	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="I327UyOl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727310AbfAVWc6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Jan 2019 17:32:58 -0500
-Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:45834 "EHLO
-        mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727237AbfAVWct (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
+        id S1727248AbfAVWct (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 22 Jan 2019 17:32:49 -0500
+Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:45794 "EHLO
+        mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727133AbfAVWcs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Jan 2019 17:32:48 -0500
 Received: from localhost (localhost [127.0.0.1])
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id 61CE7B066F;
-        Tue, 22 Jan 2019 23:32:46 +0100 (CET)
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id 02B44B0690;
+        Tue, 22 Jan 2019 23:32:45 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1548196366; i=@fjfi.cvut.cz;
-        bh=3m1osabHxvnQjgOHh2T+FDREipOOLFO8fpNe37d736s=;
+        s=20151024; t=1548196365; i=@fjfi.cvut.cz;
+        bh=id27hWqATMA9yCpmoU6NzaCY3vOlmxflGkGXbOw5FVk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=NfcPAuv/oR97E3pGXISI4wh642dau7f3POzZwS4ZMhpqpuDZNDygTFlVHw6hbaVEJ
-         53o2smxoebi2QubY9CrudFQNWand7/bgW+xGATtfbyuFPY3oNZafFYkQe3l5V2Dnbi
-         fzMwuCijkimHCi0N0uJ/8WP8LNxOF3ycTyUzgOXM=
+        b=I327UyOl+2H+5L4YyetOuwzkuE3qSJ7O6r5FDnQtG0USn95MPZuTVH8f5xTMe1HAu
+         BAvWg3Yha8WRwEhQPdbv7qZWzhvjkeS7FsU2GOZIqFytQ837nIhikVzjOBAIYOo3Sy
+         q36CYxtJApuW1y8ncWGJCkSHfo1Oac8yjQC3+MM4=
 X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
 Received: from mailgw1.fjfi.cvut.cz ([127.0.0.1])
         by localhost (mailgw1.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id pwwQx9C4MTpe; Tue, 22 Jan 2019 23:32:41 +0100 (CET)
+        with ESMTP id MBcl2ScX1WkN; Tue, 22 Jan 2019 23:32:39 +0100 (CET)
 Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 31D2BB0664;
-        Tue, 22 Jan 2019 23:32:36 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 31D2BB0664
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 1E256B0666;
+        Tue, 22 Jan 2019 23:32:34 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 1E256B0666
 Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id 1638F6004E; Tue, 22 Jan 2019 23:32:35 +0100 (CET)
+        id 008C66004E; Tue, 22 Jan 2019 23:32:33 +0100 (CET)
 From:   David Kozub <zub@linux.fjfi.cvut.cz>
 To:     Jens Axboe <axboe@kernel.dk>,
         Jonathan Derrick <jonathan.derrick@intel.com>,
         Scott Bauer <sbauer@plzdonthack.me>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Subject: [PATCH v3 13/16] block: sed-opal: check size of shadow mbr
-Date:   Tue, 22 Jan 2019 23:31:44 +0100
-Message-Id: <1548196307-12987-14-git-send-email-zub@linux.fjfi.cvut.cz>
+Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
+        David Kozub <zub@linux.fjfi.cvut.cz>
+Subject: [PATCH v3 11/16] block: sed-opal: ioctl for writing to shadow mbr
+Date:   Tue, 22 Jan 2019 23:31:42 +0100
+Message-Id: <1548196307-12987-12-git-send-email-zub@linux.fjfi.cvut.cz>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1548196307-12987-1-git-send-email-zub@linux.fjfi.cvut.cz>
 References: <1548196307-12987-1-git-send-email-zub@linux.fjfi.cvut.cz>
@@ -63,114 +64,185 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 
-Check whether the shadow mbr does fit in the provided space on the
-target. Also a proper firmware should handle this case and return an
-error we may prevent problems or even damage with crappy firmwares.
+Allow modification of the shadow mbr. If the shadow mbr is not marked as
+done, this data will be presented read only as the device content. Only
+after marking the shadow mbr as done and unlocking a locking range the
+actual content is accessible.
 
+Co-authored-by: David Kozub <zub@linux.fjfi.cvut.cz>
 Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
 ---
- block/opal_proto.h | 16 ++++++++++++++++
- block/sed-opal.c   | 39 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 55 insertions(+)
+ block/sed-opal.c              | 89 ++++++++++++++++++++++++++++++++++-
+ include/linux/sed-opal.h      |  1 +
+ include/uapi/linux/sed-opal.h |  8 ++++
+ 3 files changed, 97 insertions(+), 1 deletion(-)
 
-diff --git a/block/opal_proto.h b/block/opal_proto.h
-index b6e352cfe982..5e8df3245eb0 100644
---- a/block/opal_proto.h
-+++ b/block/opal_proto.h
-@@ -106,6 +106,7 @@ enum opal_uid {
- 	OPAL_ENTERPRISE_BANDMASTER0_UID,
- 	OPAL_ENTERPRISE_ERASEMASTER_UID,
- 	/* tables */
-+	OPAL_TABLE_TABLE,
- 	OPAL_LOCKINGRANGE_GLOBAL,
- 	OPAL_LOCKINGRANGE_ACE_RDLOCKED,
- 	OPAL_LOCKINGRANGE_ACE_WRLOCKED,
-@@ -160,6 +161,21 @@ enum opal_token {
- 	OPAL_STARTCOLUMN = 0x03,
- 	OPAL_ENDCOLUMN = 0x04,
- 	OPAL_VALUES = 0x01,
-+	/* table table */
-+	OPAL_TABLE_UID = 0x00,
-+	OPAL_TABLE_NAME = 0x01,
-+	OPAL_TABLE_COMMON = 0x02,
-+	OPAL_TABLE_TEMPLATE = 0x03,
-+	OPAL_TABLE_KIND = 0x04,
-+	OPAL_TABLE_COLUMN = 0x05,
-+	OPAL_TABLE_COLUMNS = 0x06,
-+	OPAL_TABLE_ROWS = 0x07,
-+	OPAL_TABLE_ROWS_FREE = 0x08,
-+	OPAL_TABLE_ROW_BYTES = 0x09,
-+	OPAL_TABLE_LASTID = 0x0A,
-+	OPAL_TABLE_MIN = 0x0B,
-+	OPAL_TABLE_MAX = 0x0C,
-+
- 	/* authority table */
- 	OPAL_PIN = 0x03,
- 	/* locking tokens */
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 2459ac4d523b..3493bb979978 100644
+index e03838cfd31b..88c84906ce98 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
-@@ -139,6 +139,8 @@ static const u8 opaluid[][OPAL_UID_LENGTH] = {
+@@ -34,6 +34,9 @@
+ #define IO_BUFFER_LENGTH 2048
+ #define MAX_TOKS 64
  
- 	/* tables */
++/* Number of bytes needed by cmd_finalize. */
++#define CMD_FINALIZE_BYTES_NEEDED 7
++
+ struct opal_step {
+ 	int (*fn)(struct opal_dev *dev, void *data);
+ 	void *data;
+@@ -668,7 +671,11 @@ static int cmd_finalize(struct opal_dev *cmd, u32 hsn, u32 tsn)
+ 	struct opal_header *hdr;
+ 	int err = 0;
  
-+	[OPAL_TABLE_TABLE]
-+		{ 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01 },
- 	[OPAL_LOCKINGRANGE_GLOBAL] =
- 		{ 0x00, 0x00, 0x08, 0x02, 0x00, 0x00, 0x00, 0x01 },
- 	[OPAL_LOCKINGRANGE_ACE_RDLOCKED] =
-@@ -1120,6 +1122,29 @@ static int generic_get_column(struct opal_dev *dev, const u8 *table,
+-	/* close the parameter list opened from cmd_start */
++	/*
++	 * Close the parameter list opened from cmd_start.
++	 * The number of bytes added must be equal to
++	 * CMD_FINALIZE_BYTES_NEEDED.
++	 */
+ 	add_token_u8(&err, cmd, OPAL_ENDLIST);
+ 
+ 	add_token_u8(&err, cmd, OPAL_ENDOFDATA);
+@@ -1500,6 +1507,58 @@ static int set_mbr_enable_disable(struct opal_dev *dev, void *data)
  	return finalize_and_send(dev, parse_and_check_status);
  }
  
-+/*
-+ * see TCG SAS 5.3.2.3 for a description of the available columns
-+ *
-+ * the result is provided in dev->resp->tok[4]
-+ */
-+static int generic_get_table_info(struct opal_dev *dev, enum opal_uid table,
-+				  u64 column)
++static int write_shadow_mbr(struct opal_dev *dev, void *data)
 +{
-+	u8 uid[OPAL_UID_LENGTH];
-+	const unsigned int half = OPAL_UID_LENGTH/2;
++	struct opal_shadow_mbr *shadow = data;
++	const u8 __user *src;
++	u8 *dst;
++	size_t off = 0;
++	u64 len;
++	int err = 0;
 +
-+	/* sed-opal UIDs can be split in two halves:
-+	 *  first:  actual table index
-+	 *  second: relative index in the table
-+	 * so we have to get the first half of the OPAL_TABLE_TABLE and use the
-+	 * first part of the target table as relative index into that table
-+	 */
-+	memcpy(uid, opaluid[OPAL_TABLE_TABLE], half);
-+	memcpy(uid+half, opaluid[table], half);
++	/* do the actual transmission(s) */
++	src = (u8 *) shadow->data;
++	while (off < shadow->size) {
++		err = cmd_start(dev, opaluid[OPAL_MBR], opalmethod[OPAL_SET]);
++		add_token_u8(&err, dev, OPAL_STARTNAME);
++		add_token_u8(&err, dev, OPAL_WHERE);
++		add_token_u64(&err, dev, shadow->offset + off);
++		add_token_u8(&err, dev, OPAL_ENDNAME);
 +
-+	return generic_get_column(dev, uid, column);
++		add_token_u8(&err, dev, OPAL_STARTNAME);
++		add_token_u8(&err, dev, OPAL_VALUES);
++
++		/*
++		 * The bytestring header is either 1 or 2 bytes, so assume 2.
++		 * There also needs to be enough space to accommodate the
++		 * trailing OPAL_ENDNAME (1 byte) and tokens added by
++		 * cmd_finalize.
++		 */
++		len = min(remaining_size(dev) - (2+1+CMD_FINALIZE_BYTES_NEEDED),
++			  (size_t)(shadow->size - off));
++		pr_debug("MBR: write bytes %zu+%llu/%llu\n",
++			 off, len, shadow->size);
++
++		dst = add_bytestring_header(&err, dev, len);
++		if (!dst)
++			break;
++		if (copy_from_user(dst, src + off, len))
++			err = -EFAULT;
++		dev->pos += len;
++
++		add_token_u8(&err, dev, OPAL_ENDNAME);
++		if (err)
++			break;
++
++		err = finalize_and_send(dev, parse_and_check_status);
++		if (err)
++			break;
++
++		off += len;
++	}
++	return err;
 +}
 +
- static int gen_key(struct opal_dev *dev, void *data)
+ static int generic_pw_cmd(u8 *key, size_t key_len, u8 *cpin_uid,
+ 			  struct opal_dev *dev)
  {
- 	u8 uid[OPAL_UID_LENGTH];
-@@ -1535,6 +1560,20 @@ static int write_shadow_mbr(struct opal_dev *dev, void *data)
- 	u64 len;
- 	int err = 0;
+@@ -2045,6 +2104,31 @@ static int opal_mbr_status(struct opal_dev *dev, struct opal_mbr_data *opal_mbr)
+ 	return ret;
+ }
  
-+	/* do we fit in the available shadow mbr space? */
-+	err = generic_get_table_info(dev, OPAL_MBR, OPAL_TABLE_ROWS);
-+	if (err) {
-+		pr_debug("MBR: could not get shadow size\n");
-+		return err;
-+	}
++static int opal_write_shadow_mbr(struct opal_dev *dev,
++				 struct opal_shadow_mbr *info)
++{
++	const struct opal_step mbr_steps[] = {
++		{ opal_discovery0, },
++		{ start_admin1LSP_opal_session, &info->key },
++		{ write_shadow_mbr, info },
++		{ end_opal_session, },
++		{ NULL, }
++	};
++	int ret;
 +
-+	len = response_get_u64(&dev->parsed, 4);
-+	if (shadow->size > len || shadow->offset > len - shadow->size) {
-+		pr_debug("MBR: does not fit in shadow (%llu vs. %llu)\n",
-+			 shadow->offset + shadow->size, len);
-+		return -ENOSPC;
-+	}
++	if (info->size == 0)
++		return 0;
 +
- 	/* do the actual transmission(s) */
- 	src = (u8 *) shadow->data;
- 	while (off < shadow->size) {
++	if (!access_ok(info->data, info->size))
++		return -EINVAL;
++
++	mutex_lock(&dev->dev_lock);
++	setup_opal_dev(dev, mbr_steps);
++	ret = next(dev);
++	mutex_unlock(&dev->dev_lock);
++	return ret;
++}
++
+ static int opal_save(struct opal_dev *dev, struct opal_lock_unlock *lk_unlk)
+ {
+ 	struct opal_suspend_data *suspend;
+@@ -2378,6 +2462,9 @@ int sed_ioctl(struct opal_dev *dev, unsigned int cmd, void __user *arg)
+ 	case IOC_OPAL_MBR_STATUS:
+ 		ret = opal_mbr_status(dev, p);
+ 		break;
++	case IOC_OPAL_WRITE_SHADOW_MBR:
++		ret = opal_write_shadow_mbr(dev, p);
++		break;
+ 	case IOC_OPAL_ERASE_LR:
+ 		ret = opal_erase_locking_range(dev, p);
+ 		break;
+diff --git a/include/linux/sed-opal.h b/include/linux/sed-opal.h
+index b38dc602cae3..cf08cdc13cbd 100644
+--- a/include/linux/sed-opal.h
++++ b/include/linux/sed-opal.h
+@@ -47,6 +47,7 @@ static inline bool is_sed_ioctl(unsigned int cmd)
+ 	case IOC_OPAL_ENABLE_DISABLE_MBR:
+ 	case IOC_OPAL_ERASE_LR:
+ 	case IOC_OPAL_SECURE_ERASE_LR:
++	case IOC_OPAL_WRITE_SHADOW_MBR:
+ 	case IOC_OPAL_MBR_STATUS:
+ 		return true;
+ 	}
+diff --git a/include/uapi/linux/sed-opal.h b/include/uapi/linux/sed-opal.h
+index 0cb9890cdc04..8e84307f66d4 100644
+--- a/include/uapi/linux/sed-opal.h
++++ b/include/uapi/linux/sed-opal.h
+@@ -104,6 +104,13 @@ struct opal_mbr_data {
+ 	__u8 __align[7];
+ };
+ 
++struct opal_shadow_mbr {
++	struct opal_key key;
++	const __u64 data;
++	__u64 offset;
++	__u64 size;
++};
++
+ #define IOC_OPAL_SAVE		    _IOW('p', 220, struct opal_lock_unlock)
+ #define IOC_OPAL_LOCK_UNLOCK	    _IOW('p', 221, struct opal_lock_unlock)
+ #define IOC_OPAL_TAKE_OWNERSHIP	    _IOW('p', 222, struct opal_key)
+@@ -117,5 +124,6 @@ struct opal_mbr_data {
+ #define IOC_OPAL_ERASE_LR           _IOW('p', 230, struct opal_session_info)
+ #define IOC_OPAL_SECURE_ERASE_LR    _IOW('p', 231, struct opal_session_info)
+ #define IOC_OPAL_MBR_STATUS         _IOW('p', 232, struct opal_mbr_data)
++#define IOC_OPAL_WRITE_SHADOW_MBR   _IOW('p', 233, struct opal_shadow_mbr)
+ 
+ #endif /* _UAPI_SED_OPAL_H */
 -- 
 2.20.1
 
