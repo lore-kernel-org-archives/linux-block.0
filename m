@@ -1,85 +1,93 @@
-Return-Path: <SRS0=XolY=P5=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=aewy=P6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D9B5C37120
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 21:47:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A693CC37124
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 02:02:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4CD922085A
-	for <linux-block@archiver.kernel.org>; Mon, 21 Jan 2019 21:47:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8114120870
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 02:02:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726244AbfAUVrQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jan 2019 16:47:16 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:46612 "EHLO mx1.redhat.com"
+        id S1726802AbfAVCCJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jan 2019 21:02:09 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57730 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726004AbfAUVrQ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jan 2019 16:47:16 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        id S1726601AbfAVCCI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Jan 2019 21:02:08 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 3C2F97F6CB;
-        Mon, 21 Jan 2019 21:47:16 +0000 (UTC)
-Received: from horse.redhat.com (unknown [10.18.25.156])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 118C1648AF;
-        Mon, 21 Jan 2019 21:47:15 +0000 (UTC)
-Received: by horse.redhat.com (Postfix, from userid 10451)
-        id 7771922024A; Mon, 21 Jan 2019 16:47:15 -0500 (EST)
-Date:   Mon, 21 Jan 2019 16:47:15 -0500
-From:   Vivek Goyal <vgoyal@redhat.com>
-To:     Andrea Righi <righi.andrea@gmail.com>
-Cc:     Josef Bacik <josef@toxicpanda.com>, Tejun Heo <tj@kernel.org>,
-        Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jens Axboe <axboe@kernel.dk>, Dennis Zhou <dennis@kernel.org>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/3] cgroup: fsio throttle controller
-Message-ID: <20190121214715.GA27713@redhat.com>
-References: <20190118103127.325-1-righi.andrea@gmail.com>
- <20190118163530.w5wpzpjkcnkektsp@macbook-pro-91.dhcp.thefacebook.com>
- <20190118184403.GB1535@xps-13>
- <20190118194652.gg5j2yz3h2llecpj@macbook-pro-91.dhcp.thefacebook.com>
- <20190119100827.GA1630@xps-13>
+        by mx1.redhat.com (Postfix) with ESMTPS id D1A6BD2EE5;
+        Tue, 22 Jan 2019 02:02:07 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-25.pek2.redhat.com [10.72.8.25])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D6F65D736;
+        Tue, 22 Jan 2019 02:01:37 +0000 (UTC)
+Date:   Tue, 22 Jan 2019 10:01:30 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        Theodore Ts'o <tytso@mit.edu>, Omar Sandoval <osandov@fb.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
+        Christoph Hellwig <hch@lst.de>, linux-ext4@vger.kernel.org,
+        Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
+        Boaz Harrosh <ooo@electrozaur.com>,
+        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
+Subject: Re: [PATCH V14 00/18] block: support multi-page bvec
+Message-ID: <20190122020128.GB2490@ming.t460p>
+References: <20190121081805.32727-1-ming.lei@redhat.com>
+ <61dfaa1e-e7bf-75f1-410b-ed32f97d0782@grimberg.me>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190119100827.GA1630@xps-13>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Mon, 21 Jan 2019 21:47:16 +0000 (UTC)
+In-Reply-To: <61dfaa1e-e7bf-75f1-410b-ed32f97d0782@grimberg.me>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Tue, 22 Jan 2019 02:02:08 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jan 19, 2019 at 11:08:27AM +0100, Andrea Righi wrote:
+On Mon, Jan 21, 2019 at 01:43:21AM -0800, Sagi Grimberg wrote:
+> 
+> > V14:
+> > 	- drop patch(patch 4 in V13) for renaming bvec helpers, as suggested by Jens
+> > 	- use mp_bvec_* as multi-page bvec helper name
+> > 	- fix one build issue, which is caused by missing one converion of
+> > 	bio_for_each_segment_all in fs/gfs2
+> > 	- fix one 32bit ARCH specific issue caused by segment boundary mask
+> > 	overflow
+> 
+> Hey Ming,
+> 
+> So is nvme-tcp also affected here? The only point where I see nvme-tcp
+> can be affected is when initializing a bvec iter using bio_segments() as
+> everywhere else we use iters which should transparently work..
+> 
+> I see that loop was converted, does it mean that nvme-tcp needs to
+> call something like?
+> --
+> 	bio_for_each_mp_bvec(bv, bio, iter)
+> 		nr_bvecs++;
 
-[..]
-> Alright, let's skip the root cgroup for now. I think the point here is
-> if we want to provide sync() isolation among cgroups or not.
-> 
-> According to the manpage:
-> 
->        sync()  causes  all  pending  modifications  to filesystem metadata and cached file data to be
->        written to the underlying filesystems.
-> 
-> And:
->        According to the standard specification (e.g., POSIX.1-2001), sync() schedules the writes, but
->        may  return  before  the actual writing is done.  However Linux waits for I/O completions, and
->        thus sync() or syncfs() provide the same guarantees as fsync called on every file in the  sys‐
->        tem or filesystem respectively.
-> 
-> Excluding the root cgroup, do you think a sync() issued inside a
-> specific cgroup should wait for I/O completions only for the writes that
-> have been generated by that cgroup?
+bio_for_each_segment()/bio_segments() still works, just not as efficient
+as bio_for_each_mp_bvec() given each multi-page bvec(very similar with scatterlist)
+is returned in each loop.
 
-Can we account I/O towards the cgroup which issued "sync" only if write
-rate of sync cgroup is higher than cgroup to which page belongs to. Will
-that solve problem, assuming its doable?
+I don't look at nvme-tcp code yet. But if nvme-tcp supports this way,
+it can benefit from bio_for_each_mp_bvec().
 
-Vivek
+Thanks,
+Ming
