@@ -2,210 +2,158 @@ Return-Path: <SRS0=aewy=P6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7373C282C0
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 03:18:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D676C282C0
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 03:22:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8CDCF20870
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 03:18:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 609022089F
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 03:22:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BZTHg7UZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726853AbfAVDSG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Jan 2019 22:18:06 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34148 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726682AbfAVDSF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Jan 2019 22:18:05 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1847AD7917;
-        Tue, 22 Jan 2019 03:18:05 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D5BD95C219;
-        Tue, 22 Jan 2019 03:17:59 +0000 (UTC)
-Date:   Mon, 21 Jan 2019 22:17:58 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     dm-devel@redhat.com, NeilBrown <neilb@suse.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/4] dm: fix missing bio_split() pattern code in
- __split_and_process_bio()
-Message-ID: <20190122031758.GA7574@redhat.com>
-References: <20190119180506.1300-1-snitzer@redhat.com>
- <20190119180506.1300-4-snitzer@redhat.com>
- <20190121032153.GA24610@ming.t460p>
- <20190121160204.GA32117@redhat.com>
- <20190122024640.GA4287@ming.t460p>
+        id S1726861AbfAVDWR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Jan 2019 22:22:17 -0500
+Received: from mail-wm1-f41.google.com ([209.85.128.41]:54207 "EHLO
+        mail-wm1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726839AbfAVDWR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 21 Jan 2019 22:22:17 -0500
+Received: by mail-wm1-f41.google.com with SMTP id d15so12675416wmb.3;
+        Mon, 21 Jan 2019 19:22:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=KJ57jCHwd7NhWqt7UD6XbEjwleQOMP8p5GKXJMK3+vQ=;
+        b=BZTHg7UZ951eMg4H2fXHHqGDrC1e87MAZhHF3mj3efVQLR26hvfto26jDvFsjCd5yF
+         ayiz+WSvW2YE/DXg1NUCpaH5+jVBLHnun6TqU9ijkDObLo44aArMdJnUifQKY/WPkmVX
+         iFenMENCRs5U0PJYxSrX+uGUOSCNNbdWdNuNPWZ88KQZZ9zJD5So73qxXu54YCgISDCC
+         8Koztw2tnNG3wSSVhDft5dtpI7/fCiEUxIlIi4pjI4ZXoXfPegsXopHm7sCIkQkbSi0H
+         EaEyp2FvCNEc64nSdH2j6CX/LXFR+0GSgivc66jSxzNP1a9ThYp2kbd4n7Bgc/2gV/NT
+         Qd6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=KJ57jCHwd7NhWqt7UD6XbEjwleQOMP8p5GKXJMK3+vQ=;
+        b=Z/HRX5EGcemH4uUCpeAIhzpLsoBBqYIGhtUAOGHw1lokz+VEMIjMXXDKhFSDrDNjGN
+         5+gdhE8dqd8uQ+eV5Tv56XXxFpbf9BrKtCQjC08T4hGrQYYFaOeSI/b+8aoPEj0D7wHW
+         59x4J1wD3J9O3y7RjMYkomkd4E6secgRyWArK1/147VVZZBnP/VVN8MBflrWMZKqW0zs
+         ZnEOR7WsuDnbLlzjrk8Nc1TQufiglZK3sIqP997D+GIcky7bWMRTszgPI3fUS6NwpoYB
+         KDvXjWqjjt0HzF26fPuchyGlMLmbmSB+3ecMbhi8D/Z05wghkw7QPxN/1dsEuePvVmQg
+         x4cA==
+X-Gm-Message-State: AJcUukfPDzPPhAYfXolmlPRoc6sQlw96//r/hTkLIvLeQrz+jTwqkNCI
+        vAmcYlAluc3kGROTaMNBVCoU8noCi8HCxdz5zyK4kr29CpE=
+X-Google-Smtp-Source: ALg8bN4xC6rV62e98vDJv/yCXDfXe2zaVzvlYQrHYZDDrC9FDZZmYnUSV1+mbZ/EYershb6H+8sQtVTIWbWfLBgr4Qc=
+X-Received: by 2002:a1c:2007:: with SMTP id g7mr1603726wmg.79.1548127334787;
+ Mon, 21 Jan 2019 19:22:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190122024640.GA4287@ming.t460p>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Tue, 22 Jan 2019 03:18:05 +0000 (UTC)
+References: <70df6d90-31eb-96f4-908d-462ea58dea6e@florianstecker.de>
+In-Reply-To: <70df6d90-31eb-96f4-908d-462ea58dea6e@florianstecker.de>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Tue, 22 Jan 2019 11:22:02 +0800
+Message-ID: <CACVXFVOSHtV7jcMwEvDKZzPnsLRzkdvAEqb+ggugkM27LJvagg@mail.gmail.com>
+Subject: Re: fsync hangs after scsi rejected a request
+To:     Florian Stecker <m19@florianstecker.de>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 21 2019 at  9:46pm -0500,
-Ming Lei <ming.lei@redhat.com> wrote:
+On Tue, Jan 22, 2019 at 5:13 AM Florian Stecker <m19@florianstecker.de> wrote:
+>
+> Hi everyone,
+>
+> on my laptop, I am experiencing occasional hangs of applications during
+> fsync(), which are sometimes up to 30 seconds long. I'm using a BTRFS
+> which spans two partitions on the same SSD (one of them used to contain
+> a Windows, but I removed it and added the partition to the BTRFS volume
+> instead). Also, the problem only occurs when an I/O scheduler
+> (mq-deadline) is in use. I'm running kernel version 4.20.3.
+>
+>  From what I understand so far, what happens is that a sync request
+> fails in the SCSI/ATA layer, in ata_std_qc_defer(), because it is a
+> "Non-NCQ command" and can not be queued together with other commands.
+> This propagates up into blk_mq_dispatch_rq_list(), where the call
+>
+> ret = q->mq_ops->queue_rq(hctx, &bd);
+>
+> returns BLK_STS_DEV_RESOURCE. Later in blk_mq_dispatch_rq_list(), there
+> is the piece of code
+>
+> needs_restart = blk_mq_sched_needs_restart(hctx);
+> if (!needs_restart ||
+>         (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
+>         blk_mq_run_hw_queue(hctx, true);
+> else if (needs_restart && (ret == BLK_STS_RESOURCE))
+>         blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
+>
+> which restarts the queue after a delay if BLK_STS_RESOURCE was returned,
+> but somehow not for BLK_STS_DEV_RESOURCE. Instead, nothing happens and
+> fsync() seems to hang until some other process wants to do I/O.
+>
+> So if I do
+>
+> - else if (needs_restart && (ret == BLK_STS_RESOURCE))
+> + else if (needs_restart && (ret == BLK_STS_RESOURCE || ret ==
+> BLK_STS_DEV_RESOURCE))
+>
+> it fixes my problem. But was there a reason why BLK_STS_DEV_RESOURCE was
+> treated differently that BLK_STS_RESOURCE here?
 
-> On Mon, Jan 21, 2019 at 11:02:04AM -0500, Mike Snitzer wrote:
-> > On Sun, Jan 20 2019 at 10:21P -0500,
-> > Ming Lei <ming.lei@redhat.com> wrote:
-> > 
-> > > On Sat, Jan 19, 2019 at 01:05:05PM -0500, Mike Snitzer wrote:
-> > > > Use the same BIO_QUEUE_ENTERED pattern that was established by commit
-> > > > cd4a4ae4683dc ("block: don't use blocking queue entered for recursive
-> > > > bio submits") by setting BIO_QUEUE_ENTERED after bio_split() and before
-> > > > recursing via generic_make_request().
-> > > > 
-> > > > Also add trace_block_split() because it provides useful context about
-> > > > bio splits in blktrace.
-> > > > 
-> > > > Depends-on: cd4a4ae4683dc ("block: don't use blocking queue entered for recursive bio submits")
-> > > > Fixes: 18a25da84354 ("dm: ensure bio submission follows a depth-first tree walk")
-> > > > Cc: stable@vger.kernel.org # 4.16+
-> > > > Signed-off-by: Mike Snitzer <snitzer@redhat.com>
-> > > > ---
-> > > >  drivers/md/dm.c | 2 ++
-> > > >  1 file changed, 2 insertions(+)
-> > > > 
-> > > > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> > > > index fbadda68e23b..6e29c2d99b99 100644
-> > > > --- a/drivers/md/dm.c
-> > > > +++ b/drivers/md/dm.c
-> > > > @@ -1654,7 +1654,9 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
-> > > >  						   sectors[op_stat_group(bio_op(bio))], ci.sector_count);
-> > > >  				part_stat_unlock();
-> > > >  
-> > > > +				bio_set_flag(bio, BIO_QUEUE_ENTERED);
-> > > >  				bio_chain(b, bio);
-> > > > +				trace_block_split(md->queue, b, bio->bi_iter.bi_sector);
-> > > >  				ret = generic_make_request(bio);
-> > > >  				break;
-> > > >  			}
-> > > 
-> > > In theory, BIO_QUEUE_ENTERED is only required when __split_and_process_bio() is
-> > > called from generic_make_request(). However, it may be called from dm_wq_work(),
-> > > this way might cause trouble on operation to q->q_usage_counter.
-> > 
-> > Good point, I've tweaked this patch to clear BIO_QUEUE_ENTERED in
-> > dm_make_request().
-> > 
-> > And to Neil's point: yes, these changes really do need to made
-> > common since it appears all bio_split() callers do go on to call
-> > generic_make_request().
-> > 
-> > Anyway, here is the updated patch that is now staged in linux-next:
-> > 
-> > From: Mike Snitzer <snitzer@redhat.com>
-> > Date: Fri, 18 Jan 2019 01:21:11 -0500
-> > Subject: [PATCH v2] dm: fix missing bio_split() pattern code in __split_and_process_bio()
-> > 
-> > Use the same BIO_QUEUE_ENTERED pattern that was established by commit
-> > cd4a4ae4683dc ("block: don't use blocking queue entered for recursive
-> > bio submits") by setting BIO_QUEUE_ENTERED after bio_split() and before
-> > recursing via generic_make_request().
-> > 
-> > Also add trace_block_split() because it provides useful context about
-> > bio splits in blktrace.
-> > 
-> > Depends-on: cd4a4ae4683dc ("block: don't use blocking queue entered for recursive bio submits")
-> > Fixes: 18a25da84354 ("dm: ensure bio submission follows a depth-first tree walk")
-> > Cc: stable@vger.kernel.org # 4.16+
-> > Signed-off-by: Mike Snitzer <snitzer@redhat.com>
-> > ---
-> >  drivers/md/dm.c | 9 +++++++++
-> >  1 file changed, 9 insertions(+)
-> > 
-> > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> > index fbadda68e23b..25884f833a32 100644
-> > --- a/drivers/md/dm.c
-> > +++ b/drivers/md/dm.c
-> > @@ -1654,7 +1654,9 @@ static blk_qc_t __split_and_process_bio(struct mapped_device *md,
-> >  						   sectors[op_stat_group(bio_op(bio))], ci.sector_count);
-> >  				part_stat_unlock();
-> >  
-> > +				bio_set_flag(bio, BIO_QUEUE_ENTERED);
-> >  				bio_chain(b, bio);
-> > +				trace_block_split(md->queue, b, bio->bi_iter.bi_sector);
-> >  				ret = generic_make_request(bio);
-> >  				break;
-> >  			}
-> > @@ -1734,6 +1736,13 @@ static blk_qc_t dm_make_request(struct request_queue *q, struct bio *bio)
-> >  
-> >  	map = dm_get_live_table(md, &srcu_idx);
-> >  
-> > +	/*
-> > +	 * Clear the bio-reentered-generic_make_request() flag,
-> > +	 * will be set again as needed if bio needs to be split.
-> > +	 */
-> > +	if (bio_flagged(bio, BIO_QUEUE_ENTERED))
-> > +		bio_clear_flag(bio, BIO_QUEUE_ENTERED);
-> > +
-> >  	/* if we're suspended, we have to queue this io for later */
-> >  	if (unlikely(test_bit(DMF_BLOCK_IO_FOR_SUSPEND, &md->flags))) {
-> >  		dm_put_live_table(md, srcu_idx);
-> > -- 
-> > 2.15.0
-> > 
-> 
-> Hi Mike,
-> 
-> I'd suggest to fix this kind issue in the following way, then we
-> can avoid to touch this flag from drivers:
-> 
-> diff --git a/block/blk-core.c b/block/blk-core.c
-> index 3c5f61ceeb67..e70103560ac2 100644
-> --- a/block/blk-core.c
-> +++ b/block/blk-core.c
-> @@ -1024,6 +1024,8 @@ blk_qc_t generic_make_request(struct bio *bio)
->  		else
->  			bio_io_error(bio);
->  		return ret;
-> +	} else {
-> +		bio_set_flag(bio, BIO_QUEUE_ENTERED);
->  	}
->  
->  	if (!generic_make_request_checks(bio))
-> @@ -1074,6 +1076,8 @@ blk_qc_t generic_make_request(struct bio *bio)
->  			if (blk_queue_enter(q, flags) < 0) {
->  				enter_succeeded = false;
->  				q = NULL;
-> +			} else {
-> +				bio_set_flag(bio, BIO_QUEUE_ENTERED);
->  			}
->  		}
->  
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index b990853f6de7..8777e286bd3f 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -339,16 +339,6 @@ void blk_queue_split(struct request_queue *q, struct bio **bio)
->  		/* there isn't chance to merge the splitted bio */
->  		split->bi_opf |= REQ_NOMERGE;
->  
-> -		/*
-> -		 * Since we're recursing into make_request here, ensure
-> -		 * that we mark this bio as already having entered the queue.
-> -		 * If not, and the queue is going away, we can get stuck
-> -		 * forever on waiting for the queue reference to drop. But
-> -		 * that will never happen, as we're already holding a
-> -		 * reference to it.
-> -		 */
-> -		bio_set_flag(*bio, BIO_QUEUE_ENTERED);
-> -
->  		bio_chain(split, *bio);
->  		trace_block_split(q, split, (*bio)->bi_iter.bi_sector);
->  		generic_make_request(*bio);
-> 
+Please see the comment:
 
-Not opposed to this.
+/*
+ * BLK_STS_DEV_RESOURCE is returned from the driver to the block layer if
+ * device related resources are unavailable, but the driver can guarantee
+ * that the queue will be rerun in the future once resources become
+ * available again. This is typically the case for device specific
+ * resources that are consumed for IO. If the driver fails allocating these
+ * resources, we know that inflight (or pending) IO will free these
+ * resource upon completion.
+ *
+ * This is different from BLK_STS_RESOURCE in that it explicitly references
+ * a device specific resource. For resources of wider scope, allocation
+ * failure can happen without having pending IO. This means that we can't
+ * rely on request completions freeing these resources, as IO may not be in
+ * flight. Examples of that are kernel memory allocations, DMA mappings, or
+ * any other system wide resources.
+ */
+#define BLK_STS_DEV_RESOURCE    ((__force blk_status_t)13)
+
+>
+> In any case, it seems wrong to me that ret is used here at all, as it
+> just contains the return value of the last request in the list, and
+> whether we rerun the queue should probably not only depend on the last
+> request?
+>
+> Can anyone of the experts tell me whether this makes sense or I got
+> something completely wrong?
+
+Sounds a bug in SCSI or ata driver.
+
+I remember there is hole in SCSI wrt. returning BLK_STS_DEV_RESOURCE,
+but I never get lucky to reproduce it.
+
+scsi_queue_rq():
+        ......
+        case BLK_STS_RESOURCE:
+                if (atomic_read(&sdev->device_busy) ||
+                    scsi_device_blocked(sdev))
+                        ret = BLK_STS_DEV_RESOURCE;
+
+All in-flight request may complete between reading 'sdev->device_busy'
+and setting ret as 'BLK_STS_DEV_RESOURCE', then this IO hang may
+be triggered.
 
 Thanks,
-Mike
+Ming Lei
