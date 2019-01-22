@@ -2,106 +2,98 @@ Return-Path: <SRS0=aewy=P6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DEF8C282C3
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 14:51:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68BDBC282C3
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 15:25:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0CE5621019
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 14:51:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lFoYhRrE"
+	by mail.kernel.org (Postfix) with ESMTP id 2DBEE217D6
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 15:25:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1548170752;
+	bh=H5F4UgyusDZ7Ef0oy+Za7vJwL7xKGf1CV3vNOpALKd8=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=So1BUCHx/GQQ2Uc8qsvJ91RG6QHBvpWeQ7L7fWkRgoIvGjrQmaVT1/NrZslaitcSw
+	 Ew4iGqmipP3q8ua9wqjXbLhhO2XDRIoMHIZI/2R7m61nAkqxZvcKDHdzWe663fvl90
+	 PQ5FbhJwKjMFJGcNi6b8luEbADdTDpq56mz94Mcw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728353AbfAVOvD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Jan 2019 09:51:03 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:42573 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728318AbfAVOvD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Jan 2019 09:51:03 -0500
-Received: by mail-pf1-f196.google.com with SMTP id 64so11860698pfr.9
-        for <linux-block@vger.kernel.org>; Tue, 22 Jan 2019 06:51:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=K0AUWxcEykrdBqiSSJAm5NVxaqUnEol3wEUxyemTzn8=;
-        b=lFoYhRrE1Tr8gVrZoWXsndFNXQFRuZvySBjflcmWRvcT/xDdtGBwHw+RxarYElWazU
-         E/47Nv777xC0NctbxGRJDYUog6KykO60qleLvjVF3R2YEJ+/Mx0ROEHcarBjHMAZVVaB
-         xNMFOzNJvDJW2y1Bp9Ax6yx3moZIRMDKXre3NYtHejrtNoIjXDFCE1TPPXrHE4483ccA
-         eR+9TjMolgC8/kgQ6kgWoC+YmSN3caO80kQlbFEUAeaXgwV/eAqVerrpkUb3lgQ8P+wp
-         6yxJ5d+y/ofabkGJ6nJ5NkUE4L/lOq302rtE2khD9suyGkVhoMljn5G8POf3GUmCZheP
-         Q9cA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=K0AUWxcEykrdBqiSSJAm5NVxaqUnEol3wEUxyemTzn8=;
-        b=bYJQccEnQIN6czkI24Xpl8vYfQKjoPxw5rDeNQuRBCiyumQ/0FhOzb0YleXlkmdzNy
-         6SJtvm5CBc7C7GQoUoEfvvbG+C9HLowNpHObttAc+sgffr8fhyxXy839jewSE8+V33V+
-         RvVZCyVESKNU4aEd4soQAr9aKLWLFBBr4a+9cJhh+njiq9vK+GqNfLV0pWMVrn2gZ8zR
-         u1M5gkFeFb7d5GpBeFzJvslfBxeD33oMvCgBkw8XY/KJDGkv7jHWvA5Og8cJnCBVcUjs
-         VkxOpogTho6YytliCsvqJVTd3ToAO4DayAujFNicoxOCuxX05qxBuoSynSKZIT149mdl
-         jabw==
-X-Gm-Message-State: AJcUukfobE+s2V/9mTiXbEXEXY1JegEHEhyb7XymF/DPTEi0y82VWaXf
-        gzOPIwAhxtXC7F9EVSQJdhM=
-X-Google-Smtp-Source: ALg8bN5fo76XmtezSDcsY/osN+zh30hNfkpSWtAugr6pdrRATjq6S5r6BWRa46Tid3oxgdRQgwhwXg==
-X-Received: by 2002:a65:5387:: with SMTP id x7mr32366956pgq.412.1548168662679;
-        Tue, 22 Jan 2019 06:51:02 -0800 (PST)
-Received: from localhost.localdomain ([203.100.54.194])
-        by smtp.gmail.com with ESMTPSA id h9sm21216945pgd.53.2019.01.22.06.51.00
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 22 Jan 2019 06:51:01 -0800 (PST)
-From:   Yafang Shao <laoar.shao@gmail.com>
-To:     josef@toxicpanda.com, axboe@fb.com
-Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
-        shaoyafang@didiglobal.com, Yafang Shao <laoar.shao@gmail.com>
-Subject: [PATCH] nbd: fix possible memory leak in nbd_add_socket()
-Date:   Tue, 22 Jan 2019 22:50:43 +0800
-Message-Id: <1548168643-13981-1-git-send-email-laoar.shao@gmail.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1729853AbfAVPXb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Jan 2019 10:23:31 -0500
+Received: from mail.kernel.org ([198.145.29.99]:36602 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729829AbfAVPXb (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Jan 2019 10:23:31 -0500
+Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 20C9A217D4;
+        Tue, 22 Jan 2019 15:23:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1548170610;
+        bh=H5F4UgyusDZ7Ef0oy+Za7vJwL7xKGf1CV3vNOpALKd8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=w4g0NIzJ1raZV7zSWvX+Mc4t6iqRssVIPbzdDgyaQG3Vj958Y6tBqnVipepad/Zp2
+         ZoTu1BcrwdDUenJXVBXwE7MOBwTq934ndOwzJ9r4nw5/N4T+uJyMMV1EPFkoAzqWI2
+         dDW9Vl6V8r3dKzDLcDoQ0Ru2WMQB5cBLOMfT3/0M=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>, linux-block@vger.kernel.org
+Subject: [PATCH] blktrace: no need to check return value of debugfs_create functions
+Date:   Tue, 22 Jan 2019 16:21:41 +0100
+Message-Id: <20190122152151.16139-42-gregkh@linuxfoundation.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If kzalloc() fails, the memory allocated for the new nbd_sock by krealloc()
-will not be used until the next nbd_add_socket() call.
-That's a memory leak.
-We can fix it by adjusting the order.
+When calling debugfs functions, there is no need to ever check the
+return value.  The function can work or not, but the code logic should
+never do something different based on this.
 
-Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: linux-block@vger.kernel.org
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- drivers/block/nbd.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ kernel/trace/blktrace.c | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 08696f5..a197109 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -944,14 +944,16 @@ static int nbd_add_socket(struct nbd_device *nbd, unsigned long arg,
- 		return -EBUSY;
- 	}
+diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
+index fac0ddf8a8e2..97ee6b5a2887 100644
+--- a/kernel/trace/blktrace.c
++++ b/kernel/trace/blktrace.c
+@@ -512,8 +512,6 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ 	dir = debugfs_lookup(buts->name, blk_debugfs_root);
+ 	if (!dir)
+ 		bt->dir = dir = debugfs_create_dir(buts->name, blk_debugfs_root);
+-	if (!dir)
+-		goto err;
  
--	socks = krealloc(config->socks, (config->num_connections + 1) *
--			 sizeof(struct nbd_sock *), GFP_KERNEL);
--	if (!socks) {
-+	nsock = kzalloc(sizeof(struct nbd_sock), GFP_KERNEL);
-+	if (!nsock) {
- 		sockfd_put(sock);
- 		return -ENOMEM;
- 	}
--	nsock = kzalloc(sizeof(struct nbd_sock), GFP_KERNEL);
--	if (!nsock) {
-+
-+	socks = krealloc(config->socks, (config->num_connections + 1) *
-+			 sizeof(struct nbd_sock *), GFP_KERNEL);
-+	if (!socks) {
-+		kfree(nsock);
- 		sockfd_put(sock);
- 		return -ENOMEM;
- 	}
+ 	bt->dev = dev;
+ 	atomic_set(&bt->dropped, 0);
+@@ -522,12 +520,8 @@ static int do_blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
+ 	ret = -EIO;
+ 	bt->dropped_file = debugfs_create_file("dropped", 0444, dir, bt,
+ 					       &blk_dropped_fops);
+-	if (!bt->dropped_file)
+-		goto err;
+ 
+ 	bt->msg_file = debugfs_create_file("msg", 0222, dir, bt, &blk_msg_fops);
+-	if (!bt->msg_file)
+-		goto err;
+ 
+ 	bt->rchan = relay_open("trace", dir, buts->buf_size,
+ 				buts->buf_nr, &blk_relay_callbacks, bt);
 -- 
-1.8.3.1
+2.20.1
 
