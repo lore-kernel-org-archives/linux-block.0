@@ -2,111 +2,104 @@ Return-Path: <SRS0=aewy=P6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1E3DC282C3
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 08:20:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F99C282C4
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 10:16:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 982E920861
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 08:20:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB0D520879
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 10:16:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="cSjubKo6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727253AbfAVIUa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Jan 2019 03:20:30 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:34838 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727171AbfAVIU3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Jan 2019 03:20:29 -0500
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C30CD8764B;
-        Tue, 22 Jan 2019 08:20:29 +0000 (UTC)
-Received: from localhost (ovpn-8-29.pek2.redhat.com [10.72.8.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3BE345D9CB;
-        Tue, 22 Jan 2019 08:20:23 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Mike Snitzer <snitzer@redhat.com>, NeilBrown <neilb@suse.com>
-Subject: [PATCH] block: cover another queue enter recursion via BIO_QUEUE_ENTERED
-Date:   Tue, 22 Jan 2019 16:20:17 +0800
-Message-Id: <20190122082017.9020-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Tue, 22 Jan 2019 08:20:29 +0000 (UTC)
+        id S1727823AbfAVKQX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Jan 2019 05:16:23 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:51574 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726765AbfAVKQW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Jan 2019 05:16:22 -0500
+Received: by mail-it1-f194.google.com with SMTP id w18so20589020ite.1
+        for <linux-block@vger.kernel.org>; Tue, 22 Jan 2019 02:16:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=JWGs5toXsRmnRsCYgGfqI4n4jxxRyhhfZqoj6TXmfCQ=;
+        b=cSjubKo6bs+/vW3zncTOpWUqWMZY7O83uXhuiWdLHhXek1Wk3PoGrPIVnZvM9fiDNK
+         TYhGMm/EV4I7mBMk0Xbp46CP0Re+gnjxfzWwsOs6nyTTEjQ6xDwScXmqfIWUX1WjxxrY
+         dS0BRDlHUCfU4oC+1R/Qvpo8DjxlSQKmI79YcoK6tPsOApoonb4Jzn9HVgYKJDVggqMk
+         X7FnnlNZZocyQAa0hXOpkkQWFN7f16uJdCjAe8BEImV/lHR0tC8yxynvZt0BBvgRWdY4
+         jxvwrZ7lEewuBrRaMJy/FNo0DLOhrGHpqdpfe+nCkqkXXGgauqo1iYG6YjgnV9koSil+
+         Gg1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=JWGs5toXsRmnRsCYgGfqI4n4jxxRyhhfZqoj6TXmfCQ=;
+        b=WfXGYMw6AJKt3tGwsWabAwKcWZeSwxqGOFlgwfwu+HJft1EJ0n/1Xa2PpVlhgY4tsA
+         gydgzyWE/zhv0zoedms9DFWzDbbgQCwjiadwPTzsG3V3sodJXeFDccA2rJcNY4o7sOw2
+         lk3uk9YYbYVG+kUnHiiX8MdfZP+W5TB89oNg+Ro9xdiaBhDw3e3oIJyRJOdSqVhXtIY9
+         OJgHL0s29KMoL+dPDQ3X6Opk9TI0cQ4/4n4YIY/sxCGAj5EUaIus9KkXmDdswhXREnrm
+         dIYaS6J0659SO2TmldM7hkSaAZPP0BPycUm9ke6pLI2qp9wgjBR/Rskvi3vVYQWNKGbH
+         lIFg==
+X-Gm-Message-State: AJcUukfXtOPEWLSSDNcmKrEyPcEUxN/OsNScvKJZ2TxBzdtvWPCSfeKt
+        z4t5zwP7yWx+XeCt/G8u1HBNBA==
+X-Google-Smtp-Source: ALg8bN6Qr0A5bbgsepz6SubLpk4F1z9nC3kHx0+6wuFDoGHZfSZ91yLuPHLtcI04o6RKTlj1eSdrbQ==
+X-Received: by 2002:a02:5184:: with SMTP id s126mr18921007jaa.12.1548152181802;
+        Tue, 22 Jan 2019 02:16:21 -0800 (PST)
+Received: from ch-lap-hans.cnexlabs.com (6164211-cl69.boa.fiberby.dk. [193.106.164.211])
+        by smtp.gmail.com with ESMTPSA id q15sm5572816ioj.64.2019.01.22.02.16.20
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 22 Jan 2019 02:16:21 -0800 (PST)
+From:   hans@owltronix.com
+To:     Matias Bjorling <mb@lightnvm.io>
+Cc:     javier@javigon.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+Subject: [PATCH] lightnvm: pblk: stop taking the free lock in in pblk_lines_free
+Date:   Tue, 22 Jan 2019 11:15:31 +0100
+Message-Id: <20190122101531.30893-1-hans@owltronix.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Except for blk_queue_split(), bio_split() is used for splitting bio too,
-then the remained bio is often resubmit to queue via generic_make_request().
-So the same queue enter recursion exits in this case too. Unfortunatley
-commit cd4a4ae4683dc2 doesn't help this case.
+From: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-This patch covers the above case by setting BIO_QUEUE_ENTERED before calling
-q->make_request_fn.
+pblk_line_meta_free might sleep (it can end up calling vfree, depending
+on how we allocate lba lists), and this can lead to a BUG()
+if we wake up on a different cpu and release the lock.
 
-In theory the per-bio flag is used to simulate one stack variable, it is
-just fine to clear it after q->make_request_fn is returned. Especially
-the same bio can't be submitted from another context.
+As there is no point of grabbing the free lock when pblk has shut down,
+remove the lock.
 
-Fixes: cd4a4ae4683dc2 ("block: don't use blocking queue entered for recursive bio submits")
-Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: Mike Snitzer <snitzer@redhat.com>
-Cc: NeilBrown <neilb@suse.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 ---
- block/blk-core.c  | 11 +++++++++++
- block/blk-merge.c | 10 ----------
- 2 files changed, 11 insertions(+), 10 deletions(-)
+ drivers/lightnvm/pblk-init.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 3c5f61ceeb67..1ccec27d20c3 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1083,7 +1083,18 @@ blk_qc_t generic_make_request(struct bio *bio)
- 			/* Create a fresh bio_list for all subordinate requests */
- 			bio_list_on_stack[1] = bio_list_on_stack[0];
- 			bio_list_init(&bio_list_on_stack[0]);
-+
-+			/*
-+			 * Since we're recursing into make_request here, ensure
-+			 * that we mark this bio as already having entered the queue.
-+			 * If not, and the queue is going away, we can get stuck
-+			 * forever on waiting for the queue reference to drop. But
-+			 * that will never happen, as we're already holding a
-+			 * reference to it.
-+			 */
-+			bio_set_flag(bio, BIO_QUEUE_ENTERED);
- 			ret = q->make_request_fn(q, bio);
-+			bio_clear_flag(bio, BIO_QUEUE_ENTERED);
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index f9a3e47b6a93..eb0135c77805 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -584,14 +584,12 @@ static void pblk_lines_free(struct pblk *pblk)
+ 	struct pblk_line *line;
+ 	int i;
  
- 			/* sort new bios into those for a lower level
- 			 * and those for the same level
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index b990853f6de7..8777e286bd3f 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -339,16 +339,6 @@ void blk_queue_split(struct request_queue *q, struct bio **bio)
- 		/* there isn't chance to merge the splitted bio */
- 		split->bi_opf |= REQ_NOMERGE;
+-	spin_lock(&l_mg->free_lock);
+ 	for (i = 0; i < l_mg->nr_lines; i++) {
+ 		line = &pblk->lines[i];
  
--		/*
--		 * Since we're recursing into make_request here, ensure
--		 * that we mark this bio as already having entered the queue.
--		 * If not, and the queue is going away, we can get stuck
--		 * forever on waiting for the queue reference to drop. But
--		 * that will never happen, as we're already holding a
--		 * reference to it.
--		 */
--		bio_set_flag(*bio, BIO_QUEUE_ENTERED);
--
- 		bio_chain(split, *bio);
- 		trace_block_split(q, split, (*bio)->bi_iter.bi_sector);
- 		generic_make_request(*bio);
+ 		pblk_line_free(line);
+ 		pblk_line_meta_free(l_mg, line);
+ 	}
+-	spin_unlock(&l_mg->free_lock);
+ 
+ 	pblk_line_mg_free(pblk);
+ 
 -- 
-2.9.5
+2.17.1
 
