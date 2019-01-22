@@ -2,241 +2,161 @@ Return-Path: <SRS0=aewy=P6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6E94C282C3
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 22:33:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC964C282C3
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 23:24:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A89420866
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 22:33:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9BE5B20870
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 23:24:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="rQ2/x55Q"
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="XSWFj9zh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727078AbfAVWci (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Jan 2019 17:32:38 -0500
-Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:45510 "EHLO
-        mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727046AbfAVWch (ORCPT
+        id S1725925AbfAVXY7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Jan 2019 18:24:59 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:42651 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726604AbfAVXY6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Jan 2019 17:32:37 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id 9AF52B067E;
-        Tue, 22 Jan 2019 23:32:33 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1548196353; i=@fjfi.cvut.cz;
-        bh=zhDqzAiUIfAJYs/kqmBNjAqyV8MAuWGL2Hmgk0052M0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=rQ2/x55Q16N1OoA7xQrd0I/+V8fKYkdzguNiIf0NBzw8cnrv8ebKXD4j1FmQZtnV+
-         xrHk9baBUf6ZOVVgTlmX/w+JQm4fQj3wgHTWNIeED18Sylau8ll2CXySRtpP6S/FOc
-         buuwTTYahXxufCDuOEGqb9EBvgSz652W+XQ+IMVk=
-X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
-Received: from mailgw1.fjfi.cvut.cz ([127.0.0.1])
-        by localhost (mailgw1.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id uL0fgPwHheLn; Tue, 22 Jan 2019 23:32:26 +0100 (CET)
-Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 8FA24B0666;
-        Tue, 22 Jan 2019 23:32:26 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 8FA24B0666
-Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id 6A8AB6004E; Tue, 22 Jan 2019 23:32:26 +0100 (CET)
-From:   David Kozub <zub@linux.fjfi.cvut.cz>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        Scott Bauer <sbauer@plzdonthack.me>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
-        David Kozub <zub@linux.fjfi.cvut.cz>
-Subject: [PATCH v3 04/16] block: sed-opal: close parameter list in cmd_finalize
-Date:   Tue, 22 Jan 2019 23:31:35 +0100
-Message-Id: <1548196307-12987-5-git-send-email-zub@linux.fjfi.cvut.cz>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1548196307-12987-1-git-send-email-zub@linux.fjfi.cvut.cz>
-References: <1548196307-12987-1-git-send-email-zub@linux.fjfi.cvut.cz>
+        Tue, 22 Jan 2019 18:24:58 -0500
+Received: by mail-pl1-f195.google.com with SMTP id y1so127086plp.9
+        for <linux-block@vger.kernel.org>; Tue, 22 Jan 2019 15:24:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=KcQ135T5PCHgc64d/8py49rHZtUQ2yRKGNuA6zbkROA=;
+        b=XSWFj9zhfb+ahQe7OuW1tQ3QIZb6BZxLwEC2u2q+hv5qu2+ywVyp9DojYUJugg+kKz
+         luGzV2RTrfwF1xjSJmRYTz/FvW6ysvrherX3LTsoxb2my+pozyefSZVbWBFMJVZiBMvW
+         B2RhuAtxOf7v2d4Ke9SdPlYiErlOL36tzaJsPtvCSzd0BQhQwQ+Vym0oQ+Fb3MiDTTzA
+         ZVFtlNf5T1iwzfBz0SPhzP3n95oWnsvq/xLWkK806iDlEOrMlP6iekoDvnqFKaGq5Www
+         FNdjp5Dj4CKeDf6aJ9zuMIKK7n9igyh6tMshu2rTpvbFF+LqR9dM1L3KJgi+8Sepsk5t
+         65VQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=KcQ135T5PCHgc64d/8py49rHZtUQ2yRKGNuA6zbkROA=;
+        b=UnNjY6rgEYxmU5OUQ4Y4msOIbd7JSaw92C5+5HRMgrXIJXJ5HY9rrQbJtPf1XIPBp4
+         TMfc69Rqqoqv29xQoe06c/0nSxD+5/IeXUb0+NO8WDuH3f4Cdq/tguQ0gIrTWseF2f5N
+         Rn2xfK505SbiCkGhdHF9nNo74jnci08Y+1rFqgHUsGIl3BOyCFRJje5kFCkMxZ1c7Vjt
+         D8ag4TkXpi5sLoENWluFq8JbCGrEw2FpwFXIP2C72gwzQVay/DsgbZ8Go4JL+8H98uFA
+         MlKKCqa7bnkfZrYhp8ieKbqZ6Lq0XFxHrBZQ8Tw1xhUDKJQkdB2NGO51h2XdNvmbOZJg
+         7NsA==
+X-Gm-Message-State: AJcUuket3yzWvOi1uF5qzrxhLkyTADWBtaLvZyk0Tg3PYQidf0H3Q6F3
+        s6nvAF19vobwt2khUC9AIOd0eg==
+X-Google-Smtp-Source: ALg8bN5kil9jJMs2ovbW6FYHbe5aqokyTKCkWRo7nUkXyddLiEHBNyQIru9FvuwPOReIlRld7M8wsA==
+X-Received: by 2002:a17:902:1122:: with SMTP id d31mr36073349pla.246.1548199497883;
+        Tue, 22 Jan 2019 15:24:57 -0800 (PST)
+Received: from vader ([2620:10d:c090:200::7:930f])
+        by smtp.gmail.com with ESMTPSA id s84sm34314185pfi.15.2019.01.22.15.24.57
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 22 Jan 2019 15:24:57 -0800 (PST)
+Date:   Tue, 22 Jan 2019 15:24:56 -0800
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Omar Sandoval <osandov@fb.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: 028: block integrity funtion test
+Message-ID: <20190122232456.GB5884@vader>
+References: <20190117034425.18376-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190117034425.18376-1-ming.lei@redhat.com>
+User-Agent: Mutt/1.11.2 (2019-01-07)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Every step ends by calling cmd_finalize (via finalize_and_send)
-yet every step adds the token OPAL_ENDLIST on its own. Moving
-this into cmd_finalize decreases code duplication.
+On Thu, Jan 17, 2019 at 11:44:25AM +0800, Ming Lei wrote:
+> Use scsi_debug's dif/dix to cover block layer's integrity function
+> test, then it can serve as block integrity regeression test.
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  tests/block/028     | 42 ++++++++++++++++++++++++++++++++++++++++++
+>  tests/block/028.out |  9 +++++++++
+>  2 files changed, 51 insertions(+)
+>  create mode 100755 tests/block/028
+>  create mode 100644 tests/block/028.out
+> 
+> diff --git a/tests/block/028 b/tests/block/028
+> new file mode 100755
+> index 000000000000..9b76b93d9eb6
+> --- /dev/null
+> +++ b/tests/block/028
+> @@ -0,0 +1,42 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-3.0+
+> +# Copyright (C) 2019 Ming Lei <ming.lei@redhat.com>
+> +#
+> +# Test basic DIF/DIX test. Regression test for commit 7809167da5c86fd6
+> +# ("block: don't lose track of REQ_INTEGRITY flag")
+> +
+> +. tests/block/rc
+> +. common/scsi_debug
+> +
+> +DESCRIPTION="do scsi_debug dif/dix function test"
+> +
+> +requires() {
+> +	_have_scsi_debug
+> +}
+> +
+> +test_pi() {
+> +	if ! _init_scsi_debug dev_size_mb=128 dix=$1 dif=$2 delay=0; then
 
-Co-authored-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
-Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
----
- block/sed-opal.c | 25 +++----------------------
- 1 file changed, 3 insertions(+), 22 deletions(-)
+Missing quoting here and elsewhere. `make check` will catch this.
 
-diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 980705681806..35b1747b650f 100644
---- a/block/sed-opal.c
-+++ b/block/sed-opal.c
-@@ -661,6 +661,9 @@ static int cmd_finalize(struct opal_dev *cmd, u32 hsn, u32 tsn)
- 	struct opal_header *hdr;
- 	int err = 0;
- 
-+	/* close parameter list */
-+	add_token_u8(&err, cmd, OPAL_ENDLIST);
-+
- 	add_token_u8(&err, cmd, OPAL_ENDOFDATA);
- 	add_token_u8(&err, cmd, OPAL_STARTLIST);
- 	add_token_u8(&err, cmd, 0);
-@@ -1079,7 +1082,6 @@ static int gen_key(struct opal_dev *dev, void *data)
- 	add_token_bytestring(&err, dev, opalmethod[OPAL_GENKEY],
- 			     OPAL_UID_LENGTH);
- 	add_token_u8(&err, dev, OPAL_STARTLIST);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building gen key command\n");
-@@ -1142,7 +1144,6 @@ static int get_active_key(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, 10); /* ActiveKey */
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	if (err) {
- 		pr_debug("Error building get active key command\n");
- 		return err;
-@@ -1188,7 +1189,6 @@ static int generic_lr_enable_disable(struct opal_dev *dev,
- 
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	return err;
- }
- 
-@@ -1254,8 +1254,6 @@ static int setup_locking_range(struct opal_dev *dev, void *data)
- 
- 		add_token_u8(&err, dev, OPAL_ENDLIST);
- 		add_token_u8(&err, dev, OPAL_ENDNAME);
--		add_token_u8(&err, dev, OPAL_ENDLIST);
--
- 	}
- 	if (err) {
- 		pr_debug("Error building Setup Locking range command.\n");
-@@ -1295,7 +1293,6 @@ static int start_generic_opal_session(struct opal_dev *dev,
- 
- 	switch (auth) {
- 	case OPAL_ANYBODY_UID:
--		add_token_u8(&err, dev, OPAL_ENDLIST);
- 		break;
- 	case OPAL_ADMIN1_UID:
- 	case OPAL_SID_UID:
-@@ -1308,7 +1305,6 @@ static int start_generic_opal_session(struct opal_dev *dev,
- 		add_token_bytestring(&err, dev, opaluid[auth],
- 				     OPAL_UID_LENGTH);
- 		add_token_u8(&err, dev, OPAL_ENDNAME);
--		add_token_u8(&err, dev, OPAL_ENDLIST);
- 		break;
- 	default:
- 		pr_debug("Cannot start Admin SP session with auth %d\n", auth);
-@@ -1406,7 +1402,6 @@ static int start_auth_opal_session(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, 3);
- 	add_token_bytestring(&err, dev, lk_ul_user, OPAL_UID_LENGTH);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building STARTSESSION command.\n");
-@@ -1429,7 +1424,6 @@ static int revert_tper(struct opal_dev *dev, void *data)
- 	add_token_bytestring(&err, dev, opalmethod[OPAL_REVERT],
- 			     OPAL_UID_LENGTH);
- 	add_token_u8(&err, dev, OPAL_STARTLIST);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	if (err) {
- 		pr_debug("Error building REVERT TPER command.\n");
- 		return err;
-@@ -1463,7 +1457,6 @@ static int internal_activate_user(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building Activate UserN command.\n");
-@@ -1490,7 +1483,6 @@ static int erase_locking_range(struct opal_dev *dev, void *data)
- 	add_token_bytestring(&err, dev, opalmethod[OPAL_ERASE],
- 			     OPAL_UID_LENGTH);
- 	add_token_u8(&err, dev, OPAL_STARTLIST);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building Erase Locking Range Command.\n");
-@@ -1521,7 +1513,6 @@ static int set_mbr_done(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error Building set MBR Done command\n");
-@@ -1553,7 +1544,6 @@ static int set_mbr_enable_disable(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error Building set MBR done command\n");
-@@ -1585,7 +1575,6 @@ static int generic_pw_cmd(u8 *key, size_t key_len, u8 *cpin_uid,
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	return err;
- }
-@@ -1694,7 +1683,6 @@ static int add_user_to_lr(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building add user to locking range command.\n");
-@@ -1755,7 +1743,6 @@ static int lock_unlock_locking_range(struct opal_dev *dev, void *data)
- 
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
- 		pr_debug("Error building SET command.\n");
-@@ -1843,11 +1830,8 @@ static int activate_lsp(struct opal_dev *dev, void *data)
- 		}
- 		add_token_u8(&err, dev, OPAL_ENDLIST);
- 		add_token_u8(&err, dev, OPAL_ENDNAME);
--		add_token_u8(&err, dev, OPAL_ENDLIST);
--
- 	} else {
- 		add_token_u8(&err, dev, OPAL_STARTLIST);
--		add_token_u8(&err, dev, OPAL_ENDLIST);
- 	}
- 
- 	if (err) {
-@@ -1904,7 +1888,6 @@ static int get_lsp_lifecycle(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, 6); /* Lifecycle Column */
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
- 
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
-@@ -1964,8 +1947,6 @@ static int get_msid_cpin_pin(struct opal_dev *dev, void *data)
- 	add_token_u8(&err, dev, 4); /* End Column */
- 	add_token_u8(&err, dev, 3); /* Lifecycle Column */
- 	add_token_u8(&err, dev, OPAL_ENDNAME);
--
--	add_token_u8(&err, dev, OPAL_ENDLIST);
- 	add_token_u8(&err, dev, OPAL_ENDLIST);
- 
- 	if (err) {
--- 
-2.20.1
+> +		return 1
+> +	fi
+> +
+> +	local dev="/dev/${SCSI_DEBUG_DEVICES[0]}"
+> +	local nr_sects=`blockdev --getsz $dev`
 
+$() instead of ``, please.
+
+> +
+> +	dd if=/dev/urandom of=$dev bs=512 count=$nr_sects status=none
+> +	dd if=$dev of=/dev/null bs=512 status=none
+> +
+> +	_exit_scsi_debug
+> +}
+> +
+> +test() {
+> +	echo "Running ${TEST_NAME}"
+
+dix and dif should be local.
+
+Fixed and applied, thanks Ming.
+
+> +	for ((dix = 0; dix <= 1; dix++)); do
+> +		for ((dif = 0; dif <= 3; dif++)); do
+> +			test_pi $dix $dif
+> +			echo "Test(dix:$dix dif:$dif) complete"
+> +		done
+> +	done
+> +
+> +	rm -f "$FULL"
+> +}
+> diff --git a/tests/block/028.out b/tests/block/028.out
+> new file mode 100644
+> index 000000000000..d2512334b9f5
+> --- /dev/null
+> +++ b/tests/block/028.out
+> @@ -0,0 +1,9 @@
+> +Running block/028
+> +Test(dix:0 dif:0) complete
+> +Test(dix:0 dif:1) complete
+> +Test(dix:0 dif:2) complete
+> +Test(dix:0 dif:3) complete
+> +Test(dix:1 dif:0) complete
+> +Test(dix:1 dif:1) complete
+> +Test(dix:1 dif:2) complete
+> +Test(dix:1 dif:3) complete
+> -- 
+> 2.9.5
+> 
