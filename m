@@ -7,53 +7,52 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCF0AC282C3
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 22:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58235C282C4
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 22:32:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AB1A020866
-	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 22:32:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2681320866
+	for <linux-block@archiver.kernel.org>; Tue, 22 Jan 2019 22:32:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="cf7ypq/O"
+	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="rE2jquNe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726719AbfAVWcX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Jan 2019 17:32:23 -0500
-Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:45218 "EHLO
+        id S1726942AbfAVWc2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Jan 2019 17:32:28 -0500
+Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:45296 "EHLO
         mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726851AbfAVWcX (ORCPT
+        with ESMTP id S1726851AbfAVWc1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Jan 2019 17:32:23 -0500
+        Tue, 22 Jan 2019 17:32:27 -0500
 Received: from localhost (localhost [127.0.0.1])
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id 19D2BB0668;
-        Tue, 22 Jan 2019 23:32:20 +0100 (CET)
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id C1807B066B;
+        Tue, 22 Jan 2019 23:32:24 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1548196340; i=@fjfi.cvut.cz;
-        bh=UBxIMAPDODPNIQgGigLkcRAIWQR7DtqhIBTjJHo7StA=;
+        s=20151024; t=1548196344; i=@fjfi.cvut.cz;
+        bh=uIffuZlL+DVdKDUPDUp0OFhdvcLg3dCkynf/dwdNcIA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=cf7ypq/OByhVhgARMIRfoCq1VEiwrS6XxLraj72G53/+UQWZ1Zlp1fGg1Hnq0mHRt
-         olKwgw79U/duVAUkIZmhrZf6pjXA4k5OakaUKH+8xbESfvQLQsOqO/DW7ICvJV/wdz
-         E0Xo0FLaLYOME4ARpRwPdQxe+35RAblUuhLmePQw=
+        b=rE2jquNeH5s9Ma1CzogGEVFpiUZuxxGuT9dP7Wj4ow7q5Gq9qeGm8yFnmFKriRN4k
+         MnKaOufCLWccsnHHQY/0I2rmYb1+rFCu1f5rOkUFas55dtv1CwBYdY2qUwP9RsH4Cz
+         h7Tf+sE3TTuKFkehJTosDYFDWltobHLN8B6ox89I=
 X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
 Received: from mailgw1.fjfi.cvut.cz ([127.0.0.1])
         by localhost (mailgw1.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id XxD0yDsoOaRg; Tue, 22 Jan 2019 23:32:17 +0100 (CET)
+        with ESMTP id VC1FXjWvnnJa; Tue, 22 Jan 2019 23:32:22 +0100 (CET)
 Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id AC018B0661;
-        Tue, 22 Jan 2019 23:32:17 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz AC018B0661
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 965BBB0666;
+        Tue, 22 Jan 2019 23:32:22 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 965BBB0666
 Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id 878326004E; Tue, 22 Jan 2019 23:32:17 +0100 (CET)
+        id 7DBBA6004E; Tue, 22 Jan 2019 23:32:22 +0100 (CET)
 From:   David Kozub <zub@linux.fjfi.cvut.cz>
 To:     Jens Axboe <axboe@kernel.dk>,
         Jonathan Derrick <jonathan.derrick@intel.com>,
         Scott Bauer <sbauer@plzdonthack.me>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
-        David Kozub <zub@linux.fjfi.cvut.cz>
-Subject: [PATCH v3 01/16] block: sed-opal: fix typos and formatting
-Date:   Tue, 22 Jan 2019 23:31:32 +0100
-Message-Id: <1548196307-12987-2-git-send-email-zub@linux.fjfi.cvut.cz>
+Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+Subject: [PATCH v3 02/16] block: sed-opal: use correct macro for method length
+Date:   Tue, 22 Jan 2019 23:31:33 +0100
+Message-Id: <1548196307-12987-3-git-send-email-zub@linux.fjfi.cvut.cz>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1548196307-12987-1-git-send-email-zub@linux.fjfi.cvut.cz>
 References: <1548196307-12987-1-git-send-email-zub@linux.fjfi.cvut.cz>
@@ -62,100 +61,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This should make no change in functionality.
-The formatting changes were triggered by checkpatch.pl.
+From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 
-Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+Also the values of OPAL_UID_LENGTH and OPAL_METHOD_LENGTH are the same,
+it is weird to use OPAL_UID_LENGTH for the definition of the methods.
+
+Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 ---
- block/sed-opal.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ block/sed-opal.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index e0de4dd448b3..c882a193e162 100644
+index c882a193e162..5c123a5b4ab1 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
-@@ -11,8 +11,8 @@
-  *
-  * This program is distributed in the hope it will be useful, but WITHOUT
-  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-- * more details.
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-+ * for more details.
+@@ -181,7 +181,7 @@ static const u8 opaluid[][OPAL_UID_LENGTH] = {
+  * Derived from: TCG_Storage_Architecture_Core_Spec_v2.01_r1.00
+  * Section: 6.3 Assigned UIDs
   */
- 
- #define pr_fmt(fmt) KBUILD_MODNAME ":OPAL: " fmt
-@@ -157,7 +157,7 @@ static const u8 opaluid[][OPAL_UID_LENGTH] = {
- 
- 	/* C_PIN_TABLE object ID's */
- 
--        [OPAL_C_PIN_MSID] =
-+	[OPAL_C_PIN_MSID] =
- 		{ 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x84, 0x02},
- 	[OPAL_C_PIN_SID] =
- 		{ 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x01},
-@@ -623,7 +623,7 @@ static int build_locking_range(u8 *buffer, size_t length, u8 lr)
- static int build_locking_user(u8 *buffer, size_t length, u8 lr)
- {
- 	if (length > OPAL_UID_LENGTH) {
--		pr_debug("Can't build locking range user, Length OOB\n");
-+		pr_debug("Can't build locking range user. Length OOB\n");
- 		return -ERANGE;
- 	}
- 
-@@ -1324,6 +1324,7 @@ static int start_SIDASP_opal_session(struct opal_dev *dev, void *data)
- 
- 	if (!key) {
- 		const struct opal_key *okey = data;
-+
- 		ret = start_generic_opal_session(dev, OPAL_SID_UID,
- 						 OPAL_ADMINSP_UID,
- 						 okey->key,
-@@ -1341,6 +1342,7 @@ static int start_SIDASP_opal_session(struct opal_dev *dev, void *data)
- static int start_admin1LSP_opal_session(struct opal_dev *dev, void *data)
- {
- 	struct opal_key *key = data;
-+
- 	return start_generic_opal_session(dev, OPAL_ADMIN1_UID,
- 					  OPAL_LOCKINGSP_UID,
- 					  key->key, key->key_len);
-@@ -1714,7 +1716,7 @@ static int lock_unlock_locking_range(struct opal_dev *dev, void *data)
- 		write_locked = 0;
- 		break;
- 	case OPAL_LK:
--		/* vars are initalized to locked */
-+		/* vars are initialized to locked */
- 		break;
- 	default:
- 		pr_debug("Tried to set an invalid locking state... returning to uland\n");
-@@ -1775,7 +1777,7 @@ static int lock_unlock_locking_range_sum(struct opal_dev *dev, void *data)
- 		write_locked = 0;
- 		break;
- 	case OPAL_LK:
--		/* vars are initalized to locked */
-+		/* vars are initialized to locked */
- 		break;
- 	default:
- 		pr_debug("Tried to set an invalid locking state.\n");
-@@ -2222,7 +2224,7 @@ static int __opal_lock_unlock(struct opal_dev *dev,
- static int __opal_set_mbr_done(struct opal_dev *dev, struct opal_key *key)
- {
- 	u8 mbr_done_tf = 1;
--	const struct opal_step mbrdone_step [] = {
-+	const struct opal_step mbrdone_step[] = {
- 		{ opal_discovery0, },
- 		{ start_admin1LSP_opal_session, key },
- 		{ set_mbr_done, &mbr_done_tf },
-@@ -2273,7 +2275,8 @@ static int opal_take_ownership(struct opal_dev *dev, struct opal_key *opal)
- 	return ret;
- }
- 
--static int opal_activate_lsp(struct opal_dev *dev, struct opal_lr_act *opal_lr_act)
-+static int opal_activate_lsp(struct opal_dev *dev,
-+			     struct opal_lr_act *opal_lr_act)
- {
- 	const struct opal_step active_steps[] = {
- 		{ opal_discovery0, },
+-static const u8 opalmethod[][OPAL_UID_LENGTH] = {
++static const u8 opalmethod[][OPAL_METHOD_LENGTH] = {
+ 	[OPAL_PROPERTIES] =
+ 		{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0x01 },
+ 	[OPAL_STARTSESSION] =
 -- 
 2.20.1
 
