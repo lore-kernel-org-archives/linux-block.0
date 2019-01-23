@@ -2,173 +2,83 @@ Return-Path: <SRS0=btbQ=P7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03B66C282C2
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 07:52:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6F99C282C0
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 13:48:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C635A20870
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 07:52:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OCjO+Z3+"
+	by mail.kernel.org (Postfix) with ESMTP id AA8732184D
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 13:48:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1548251338;
+	bh=ELiE3gPS8RiO5npZuv3ICzNh1ao0Y+7e0bYWVYrD7Go=;
+	h=Date:From:To:Cc:Subject:List-ID:From;
+	b=i6ywkDM1EqFeRkXXI7dopSGeseVAWOgx39DDfEhjCqU9Xi7NCxKD3JXHyz1Sjr884
+	 SNb5y7mYjj5Vy0kVcTA2lG8K9NqJMbNJMazd7jEN9zDmAv7w1TJHt0LyUxc1jw89EG
+	 RqB8tMvJtxYepkmgveBZbhVlxJEqIZnZypKTpuS0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726168AbfAWHwT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jan 2019 02:52:19 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:40257 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725973AbfAWHwT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jan 2019 02:52:19 -0500
-Received: by mail-qt1-f196.google.com with SMTP id k12so1337592qtf.7
-        for <linux-block@vger.kernel.org>; Tue, 22 Jan 2019 23:52:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IILB4LUuqafd+/XKNROSC7h+tv71HFOOWOL01CB3JvY=;
-        b=OCjO+Z3+mxfv42W/B6vmNixNIiH+yvfGYCgyTkMoI/73Q/T74KrkoMyJm4kFPzAWge
-         XP+teSBORO7+hH8rk0F28eJETnx6khIACrIdBnC94Z+5IhP3L+wwNIuQ22kbmIWLBkn7
-         GvYiv5TAgXb6v4PRGh/3B+FZK5ZhsQrLUYlh1K/WO72dkE9zNsxYliLEbHehLgHt23Kr
-         LG48XK2wA4Jg/lbnFBDhzjXe3g1uRqQqbYqdxN2SQQYU5FwCLEWxME2jdPFT2c8BmbM+
-         3l5ri/SG53gWBrBpMkq7C/0b68nwK/i0B3G/UbO+cf7iiFqEzvmOqyKBzw7FoymAw3mJ
-         jGOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IILB4LUuqafd+/XKNROSC7h+tv71HFOOWOL01CB3JvY=;
-        b=EA1Qq8s8isn4h8MqfsvwLctu8rBmsH7M446AbFUSrcgHixPxyNwgujgKbBSqVPzy2p
-         p92wvaC7qaNDoNXBwbJHkcJ+SPXiReAe+9ogKzz7zFoE94l3rmJCH6rVwZyK705XNkmq
-         pB0NflQdsdHFh34zulgECbzcdNVox/5RFclnYMXq78CmsIa9cy/B+vhsLaMGBA6E20XE
-         emcyRzuZVigY/gfd8OOABbIqUpiAHKzPYJ/Y/A/l9cQREym98+Hmb6498eIYNxvpEDkl
-         Tczc7mWYmi4m+H4AWW4CoPWsSXQIO3ER4c0eSvKQ8uA9TQyivDOzFzhra2ihTo91De04
-         TGnQ==
-X-Gm-Message-State: AJcUukfCXlSx/8v3snAj9AeBTtdiIGr8Rp6YizzQco9gisCE5xmOpf7n
-        /OuVk99Q+rrHbYaU0IBKfFNZT/LDvW932uMwoFE=
-X-Google-Smtp-Source: ALg8bN4KV2mIhSIxlLHU5C+Ln+UHu/XrgzmDAUvwN/2YC5MDfCUKb+RsukSFr3JKwaCfB1tuqYNA9sXgae4p+uTEvTo=
-X-Received: by 2002:ac8:788:: with SMTP id l8mr1189226qth.384.1548229937789;
- Tue, 22 Jan 2019 23:52:17 -0800 (PST)
-MIME-Version: 1.0
-References: <20190114192137.111275-1-bo.liu@linux.alibaba.com>
- <16ab732a-6537-3627-52ed-05013188a3f5@kernel.dk> <20190118162117.zqdwjkq74wzsaxn3@macbook-pro-91.dhcp.thefacebook.com>
- <c9fed816-cea1-33f1-017b-10f86df0b8a8@kernel.dk> <20190118164312.muk7zdcb5yqn7fdp@macbook-pro-91.dhcp.thefacebook.com>
- <CANQeFDDv=0FNNW_-HyQVTyeaJu4Y6SWbWii1CKNHtux9=VhNjQ@mail.gmail.com> <e590d46a-32ec-6531-0618-875ebf1d7bf8@kernel.dk>
-In-Reply-To: <e590d46a-32ec-6531-0618-875ebf1d7bf8@kernel.dk>
-From:   Liu Bo <obuil.liubo@gmail.com>
-Date:   Tue, 22 Jan 2019 23:52:06 -0800
-Message-ID: <CANQeFDAtcbmXTe=uad5Vqk=Z83T8Lh9No+xHXSgKJwcKemRiQw@mail.gmail.com>
-Subject: Re: [PATCH] blk-iolatency: fix IO hang due to negative inflight counter
+        id S1726126AbfAWNs5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jan 2019 08:48:57 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59100 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725995AbfAWNs5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 23 Jan 2019 08:48:57 -0500
+Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 355D920855;
+        Wed, 23 Jan 2019 13:48:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1548251336;
+        bh=ELiE3gPS8RiO5npZuv3ICzNh1ao0Y+7e0bYWVYrD7Go=;
+        h=Date:From:To:Cc:Subject:From;
+        b=CHHibquj3l5ttf9TszKmovObl1oXhD9NvirJwlK0vB+tMNGTFzaubZZxc+nl6efm8
+         15+rItX7gNTZTm1TLP4D5kTp8RxX0x5uHG9+LOI/vE/Nv3XX3d3im5QxzCG88+OsMR
+         /Pwf8sfMmzvewuiOn3dkc+nY5ZagwdkBWBGOQjqQ=
+Date:   Wed, 23 Jan 2019 14:48:54 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Josef Bacik <josef@toxicpanda.com>,
-        Liu Bo <bo.liu@linux.alibaba.com>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Michal Hocko <mhocko@kernel.org>
+Subject: [PATCH] blk-mq: protect debugfs_create_files() from failures
+Message-ID: <20190123134854.GA25906@kroah.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.11.2 (2019-01-07)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jan 18, 2019 at 5:51 PM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 1/18/19 6:39 PM, Liu Bo wrote:
-> > On Fri, Jan 18, 2019 at 8:43 AM Josef Bacik <josef@toxicpanda.com> wrote:
-> >>
-> >> On Fri, Jan 18, 2019 at 09:28:06AM -0700, Jens Axboe wrote:
-> >>> On 1/18/19 9:21 AM, Josef Bacik wrote:
-> >>>> On Fri, Jan 18, 2019 at 05:58:18AM -0700, Jens Axboe wrote:
-> >>>>> On 1/14/19 12:21 PM, Liu Bo wrote:
-> >>>>>> Our test reported the following stack, and vmcore showed that
-> >>>>>> ->inflight counter is -1.
-> >>>>>>
-> >>>>>> [ffffc9003fcc38d0] __schedule at ffffffff8173d95d
-> >>>>>> [ffffc9003fcc3958] schedule at ffffffff8173de26
-> >>>>>> [ffffc9003fcc3970] io_schedule at ffffffff810bb6b6
-> >>>>>> [ffffc9003fcc3988] blkcg_iolatency_throttle at ffffffff813911cb
-> >>>>>> [ffffc9003fcc3a20] rq_qos_throttle at ffffffff813847f3
-> >>>>>> [ffffc9003fcc3a48] blk_mq_make_request at ffffffff8137468a
-> >>>>>> [ffffc9003fcc3b08] generic_make_request at ffffffff81368b49
-> >>>>>> [ffffc9003fcc3b68] submit_bio at ffffffff81368d7d
-> >>>>>> [ffffc9003fcc3bb8] ext4_io_submit at ffffffffa031be00 [ext4]
-> >>>>>> [ffffc9003fcc3c00] ext4_writepages at ffffffffa03163de [ext4]
-> >>>>>> [ffffc9003fcc3d68] do_writepages at ffffffff811c49ae
-> >>>>>> [ffffc9003fcc3d78] __filemap_fdatawrite_range at ffffffff811b6188
-> >>>>>> [ffffc9003fcc3e30] filemap_write_and_wait_range at ffffffff811b6301
-> >>>>>> [ffffc9003fcc3e60] ext4_sync_file at ffffffffa030cee8 [ext4]
-> >>>>>> [ffffc9003fcc3ea8] vfs_fsync_range at ffffffff8128594b
-> >>>>>> [ffffc9003fcc3ee8] do_fsync at ffffffff81285abd
-> >>>>>> [ffffc9003fcc3f18] sys_fsync at ffffffff81285d50
-> >>>>>> [ffffc9003fcc3f28] do_syscall_64 at ffffffff81003c04
-> >>>>>> [ffffc9003fcc3f50] entry_SYSCALL_64_after_swapgs at ffffffff81742b8e
-> >>>>>>
-> >>>>>> The ->inflight counter may be negative (-1) if
-> >>>>>>
-> >>>>>> 0) blk-throttle had been enabled when the IO was issued, so its bio
-> >>>>>> has a associated blkg,
-> >>>>>>
-> >>>>>> 1) blk-iolatency was disabled when the IO was issued, so iolatency_grp
-> >>>>>> in this blkg was not available by then,
-> >>>>>>
-> >>>>>> 2) blk-iolatency was enabled before this IO reached its endio, so that
-> >>>>>> iolatency_grp became available when the IO did the endio.
-> >>>>>>
-> >>>>>> 3) the ->inflight counter is decreased from 0 to -1.
-> >>>>>>
-> >>>>>> This uses atomic_dec_is_positive() instead to avoid the negative
-> >>>>>> inflight counter.
-> >>>>>
-> >>>>> The problem with that is that it'll hide a lot of other issues, too.
-> >>>>> Any way we can either track if this rqw is in flight, and only dec
-> >>>>> if it is, or quiesce when enabling?
-> >>>>>
-> >>>>
-> >>>> I worried about this too, but really the side-effect of allowing more through
-> >>>> because of mis-counting means we just let more IO through.  I think maybe we add
-> >>>> a debug option that we can turn on to see if we're messing up accounting, but in
-> >>>> general I don't see a problem with this approach.
-> >>>
-> >>> The problem is that a problem in accounting elsewhere (like missing increment)
-> >>> will now go unnoticed, which could completely screw it up. An occasional
-> >>> blip like the one described is totally fine, but that's not guaranteed to be
-> >>> the case.
-> >>>
-> >>
-> >> Yeah I agree it's kind of shitty.
-> >>
-> >>>> The problem we're running into here is there's not really a good way to tag a
-> >>>> bio as "seen by io.latency."  We just have to assume if we're on and there's a
-> >>>> bi_blkg associated that we saw it at submit time.  We can't just add a flag for
-> >>>> every io controller that starts tracking inflight io's, so for now I think this
-> >>>> is a reasonable solution.  Thanks,
-> >>>
-> >>> Can we quiesce instead when enabling/disabling?
-> >>
-> >> Actually that's not a bad idea, you want to look into that Liu?  That way we can
-> >> make sure everything is correct always.  Thanks,
-> >>
-> >
-> > Just to confirm, does "quiesce when enabling/disabling" mean "waiting
-> > for inflight IOs to complete when enabling/disabling iolatency"?
->
+If debugfs were to return a non-NULL error for a debugfs call, using
+that pointer later in debugfs_create_files() would crash.
 
-So it might not be an easy thing to quiesce queue because...
+Fix that by properly checking the pointer before referencing it.
 
-iolatency_set_limit()
-   blkg_conf_prep() // return with rcu and queue's lock
+Reported-by: Michal Hocko <mhocko@kernel.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ block/blk-mq-debugfs.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-neither freeze_queue nor quiesce_queue is allowed in rcu reader side context.
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 90d68760af08..777638f597aa 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -838,6 +838,9 @@ static const struct blk_mq_debugfs_attr blk_mq_debugfs_ctx_attrs[] = {
+ static bool debugfs_create_files(struct dentry *parent, void *data,
+ 				 const struct blk_mq_debugfs_attr *attr)
+ {
++	if (IS_ERR_OR_NULL(parent))
++		return false;
++
+ 	d_inode(parent)->i_private = data;
+ 
+ 	for (; attr->name; attr++) {
+-- 
+2.20.1
 
-If we do it outside of blkg_conf_prep/finish(), I feel like the
-overhead is more than it worths.
-
-Any thoughts?
-
-thanks,
-liubo
-
-> Precisely.
->
-> --
-> Jens Axboe
->
