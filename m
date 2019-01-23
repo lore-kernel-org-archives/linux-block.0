@@ -2,189 +2,132 @@ Return-Path: <SRS0=btbQ=P7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F055C282C2
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 15:09:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D85DC282C0
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 15:35:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BC93F21019
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 15:09:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C9832184C
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 15:35:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Vpw36+eH"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="PsIFwtCZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725971AbfAWPJw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jan 2019 10:09:52 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:38859 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725930AbfAWPJv (ORCPT
+        id S1725975AbfAWPfm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jan 2019 10:35:42 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:39213 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725930AbfAWPfm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jan 2019 10:09:51 -0500
-Received: by mail-pf1-f193.google.com with SMTP id q1so1318231pfi.5
-        for <linux-block@vger.kernel.org>; Wed, 23 Jan 2019 07:09:51 -0800 (PST)
+        Wed, 23 Jan 2019 10:35:42 -0500
+Received: by mail-pg1-f194.google.com with SMTP id w6so1229416pgl.6
+        for <linux-block@vger.kernel.org>; Wed, 23 Jan 2019 07:35:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=4zUQFrV8T7X9lG9M56CB1hsACEJlmc4lfl1BA1zVNFM=;
-        b=Vpw36+eHKJnV2E4nGwK1Na8WlTdbQ1IYghrPG0GvoQzA1vWmV9q/IjhHgOA/ypK7nH
-         n0+W0gHJmWrKs4imF/u/tq0XOlAgNHbBzcBsnLVXksFtBOwAHnPfG4H8M+CcW8O3iH84
-         TkJMk0/80/xntPtW1yrGrxlsO5TYcdgaR7T6KqlUtdvxaLxgOkQM8V2kZtXPvZbUQ4Ic
-         lpNwP2Q9FNLHBs9hz9D38A+WFAfE2s85RoGTxRhQmv1S7wevfOBA1pEr/y1Aet/OKZsf
-         l9lQxJNrvjUjzwSFAJ2qgI9g0K8xHNTGCWfMqMEH2Or1XhRinqDUvoyj5TUvjaVltd/l
-         IHhw==
+        h=from:to:cc:subject:date:message-id;
+        bh=F0ISlZr0XMW6187v57dfxwlwJzMc71qg9UaLqbnNVS0=;
+        b=PsIFwtCZmYAIAU00oVzSbaR3zyw/r6cSMGsB4sUYSnNMZnHwH7GERXRKw0/G2xG0Po
+         1GJrNddx8Xt9pL24x+zqppkhGfZyQIUFD0WyaYFdP3vBZXNg4lZ9ERmjFWDft3NAd3K6
+         oCp+/U5UWCpnZBHIps7ASrJvLwBMmmc+7KuJaIisFj66ZVTuU25USfYP3JmxTdJoo+3Y
+         esTLhePMou5n2egLzQ35qBNTjvHOcIUuJgiGp04iU3Ki3BPBmTBZJwRU2v1bztwjcd/k
+         dv+EkAVnAPjFB9sP1vpWHjKtfZwY6Qpngc8Om8OjFCLKMYQt/0zbxQn/wDr7eDpg+xJQ
+         +dVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=4zUQFrV8T7X9lG9M56CB1hsACEJlmc4lfl1BA1zVNFM=;
-        b=Ta7Q0azGqXmuIH8A9XAHyEPJUTrRFvPU9abLgXhMkEKj4lsaVUXp6kBdv7p06TN0bq
-         +tVgY46ynHSrwXvGu0x8o/JqoTRLT7K9lQBXvp6cD8MOZPh0UODQDxN6fpLM9guhT6i0
-         BNLuUzBL/yUAID+Kt4J8RQT1UmD5xLj4ekhNOcfSzHt6BlYv0OT+VhZiUF7GDB1sL4nB
-         MHZGjQ/Y19GvZ+3h4vPs4VEOnfdKwz2WXLMK/us0htmpbiseDrkUsPK0ditd58o6z+5e
-         VfiA38t7/BjVzlwLtOep0sZb0u42jliKgSzc/meGLr6anbI2ycOAL0THdPhiYBDQ7UIh
-         b4Vw==
-X-Gm-Message-State: AJcUukdL/fHCdgX0o1eorSTp+/vkW+UppQXrApHHZQQA7o0aaEfycq4X
-        VeARa87Mg2gSHM8hpAAI6iLlFdC0/I9IIw==
-X-Google-Smtp-Source: ALg8bN79CMKCtbdizBxqERC0QZ2e+sBeYntup6bN7RuEEKKg9B214CxbLlvHpNokE8rlXZWOF2gn9Q==
-X-Received: by 2002:a63:b0a:: with SMTP id 10mr2237434pgl.423.1548256189681;
-        Wed, 23 Jan 2019 07:09:49 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id o84sm39447446pfi.172.2019.01.23.07.09.47
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=F0ISlZr0XMW6187v57dfxwlwJzMc71qg9UaLqbnNVS0=;
+        b=a3EGy2gBDz4wEfXrqqlZ15/5ELcxof+DBb6OM2T+AeQ1v8/R2+1Rgt884r340t7GzW
+         qXTspMLAPQLpzcHM7XcYwzV7y2NDHhDU6/Dczfrjg4hQvSGZKJzj1LuNoT6679e8YBdt
+         99xEsGDluOfpem8AvfqPks/wS6g+8l4q8exoT1ocHnF/+qPO6JYQ62JUQNkIunh/+8fq
+         N8XpEnuNFIlOCXnxZtr/e+x4cYOpnuXCyQktDJiTicOQJ7UfOTcU8jliqZR15bZhkcJv
+         JKqgKyD0vTq1ybKOsJddLHxBU8Jueb+lJok2w/UnzkiF8mQxyg4O5NVBq9BwCTQgMlRD
+         JoqQ==
+X-Gm-Message-State: AJcUukfcAGoVsCmV1rAAXGjbhHy7/grAL6X5AyQzXI2kxULM8AvTLsim
+        J0zDxhtYxZgZCoW3zKENDGnVcg==
+X-Google-Smtp-Source: ALg8bN72eSxnP5mHQXJLPaJZE8B64IFJtbYnB0Aab4bjN4+TE5AjjfW/95MssALzQGk8R8TsXT9i6A==
+X-Received: by 2002:a62:9fd9:: with SMTP id v86mr2373768pfk.191.1548257741053;
+        Wed, 23 Jan 2019 07:35:41 -0800 (PST)
+Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id u8sm30731715pfl.16.2019.01.23.07.35.38
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 23 Jan 2019 07:09:48 -0800 (PST)
-Subject: Re: [PATCH] blk-iolatency: fix IO hang due to negative inflight
- counter
-To:     Liu Bo <obuil.liubo@gmail.com>
-Cc:     Josef Bacik <josef@toxicpanda.com>,
-        Liu Bo <bo.liu@linux.alibaba.com>, linux-block@vger.kernel.org
-References: <20190114192137.111275-1-bo.liu@linux.alibaba.com>
- <16ab732a-6537-3627-52ed-05013188a3f5@kernel.dk>
- <20190118162117.zqdwjkq74wzsaxn3@macbook-pro-91.dhcp.thefacebook.com>
- <c9fed816-cea1-33f1-017b-10f86df0b8a8@kernel.dk>
- <20190118164312.muk7zdcb5yqn7fdp@macbook-pro-91.dhcp.thefacebook.com>
- <CANQeFDDv=0FNNW_-HyQVTyeaJu4Y6SWbWii1CKNHtux9=VhNjQ@mail.gmail.com>
- <e590d46a-32ec-6531-0618-875ebf1d7bf8@kernel.dk>
- <CANQeFDAtcbmXTe=uad5Vqk=Z83T8Lh9No+xHXSgKJwcKemRiQw@mail.gmail.com>
+        Wed, 23 Jan 2019 07:35:39 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <99d47e4f-7535-fcbd-bc53-b4cc59e52a63@kernel.dk>
-Date:   Wed, 23 Jan 2019 08:09:45 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <CANQeFDAtcbmXTe=uad5Vqk=Z83T8Lh9No+xHXSgKJwcKemRiQw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
+        linux-block@vger.kernel.org
+Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com
+Subject: [PATCHSET v7] io_uring IO interface
+Date:   Wed, 23 Jan 2019 08:35:11 -0700
+Message-Id: <20190123153536.7081-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/23/19 12:52 AM, Liu Bo wrote:
-> On Fri, Jan 18, 2019 at 5:51 PM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 1/18/19 6:39 PM, Liu Bo wrote:
->>> On Fri, Jan 18, 2019 at 8:43 AM Josef Bacik <josef@toxicpanda.com> wrote:
->>>>
->>>> On Fri, Jan 18, 2019 at 09:28:06AM -0700, Jens Axboe wrote:
->>>>> On 1/18/19 9:21 AM, Josef Bacik wrote:
->>>>>> On Fri, Jan 18, 2019 at 05:58:18AM -0700, Jens Axboe wrote:
->>>>>>> On 1/14/19 12:21 PM, Liu Bo wrote:
->>>>>>>> Our test reported the following stack, and vmcore showed that
->>>>>>>> ->inflight counter is -1.
->>>>>>>>
->>>>>>>> [ffffc9003fcc38d0] __schedule at ffffffff8173d95d
->>>>>>>> [ffffc9003fcc3958] schedule at ffffffff8173de26
->>>>>>>> [ffffc9003fcc3970] io_schedule at ffffffff810bb6b6
->>>>>>>> [ffffc9003fcc3988] blkcg_iolatency_throttle at ffffffff813911cb
->>>>>>>> [ffffc9003fcc3a20] rq_qos_throttle at ffffffff813847f3
->>>>>>>> [ffffc9003fcc3a48] blk_mq_make_request at ffffffff8137468a
->>>>>>>> [ffffc9003fcc3b08] generic_make_request at ffffffff81368b49
->>>>>>>> [ffffc9003fcc3b68] submit_bio at ffffffff81368d7d
->>>>>>>> [ffffc9003fcc3bb8] ext4_io_submit at ffffffffa031be00 [ext4]
->>>>>>>> [ffffc9003fcc3c00] ext4_writepages at ffffffffa03163de [ext4]
->>>>>>>> [ffffc9003fcc3d68] do_writepages at ffffffff811c49ae
->>>>>>>> [ffffc9003fcc3d78] __filemap_fdatawrite_range at ffffffff811b6188
->>>>>>>> [ffffc9003fcc3e30] filemap_write_and_wait_range at ffffffff811b6301
->>>>>>>> [ffffc9003fcc3e60] ext4_sync_file at ffffffffa030cee8 [ext4]
->>>>>>>> [ffffc9003fcc3ea8] vfs_fsync_range at ffffffff8128594b
->>>>>>>> [ffffc9003fcc3ee8] do_fsync at ffffffff81285abd
->>>>>>>> [ffffc9003fcc3f18] sys_fsync at ffffffff81285d50
->>>>>>>> [ffffc9003fcc3f28] do_syscall_64 at ffffffff81003c04
->>>>>>>> [ffffc9003fcc3f50] entry_SYSCALL_64_after_swapgs at ffffffff81742b8e
->>>>>>>>
->>>>>>>> The ->inflight counter may be negative (-1) if
->>>>>>>>
->>>>>>>> 0) blk-throttle had been enabled when the IO was issued, so its bio
->>>>>>>> has a associated blkg,
->>>>>>>>
->>>>>>>> 1) blk-iolatency was disabled when the IO was issued, so iolatency_grp
->>>>>>>> in this blkg was not available by then,
->>>>>>>>
->>>>>>>> 2) blk-iolatency was enabled before this IO reached its endio, so that
->>>>>>>> iolatency_grp became available when the IO did the endio.
->>>>>>>>
->>>>>>>> 3) the ->inflight counter is decreased from 0 to -1.
->>>>>>>>
->>>>>>>> This uses atomic_dec_is_positive() instead to avoid the negative
->>>>>>>> inflight counter.
->>>>>>>
->>>>>>> The problem with that is that it'll hide a lot of other issues, too.
->>>>>>> Any way we can either track if this rqw is in flight, and only dec
->>>>>>> if it is, or quiesce when enabling?
->>>>>>>
->>>>>>
->>>>>> I worried about this too, but really the side-effect of allowing more through
->>>>>> because of mis-counting means we just let more IO through.  I think maybe we add
->>>>>> a debug option that we can turn on to see if we're messing up accounting, but in
->>>>>> general I don't see a problem with this approach.
->>>>>
->>>>> The problem is that a problem in accounting elsewhere (like missing increment)
->>>>> will now go unnoticed, which could completely screw it up. An occasional
->>>>> blip like the one described is totally fine, but that's not guaranteed to be
->>>>> the case.
->>>>>
->>>>
->>>> Yeah I agree it's kind of shitty.
->>>>
->>>>>> The problem we're running into here is there's not really a good way to tag a
->>>>>> bio as "seen by io.latency."  We just have to assume if we're on and there's a
->>>>>> bi_blkg associated that we saw it at submit time.  We can't just add a flag for
->>>>>> every io controller that starts tracking inflight io's, so for now I think this
->>>>>> is a reasonable solution.  Thanks,
->>>>>
->>>>> Can we quiesce instead when enabling/disabling?
->>>>
->>>> Actually that's not a bad idea, you want to look into that Liu?  That way we can
->>>> make sure everything is correct always.  Thanks,
->>>>
->>>
->>> Just to confirm, does "quiesce when enabling/disabling" mean "waiting
->>> for inflight IOs to complete when enabling/disabling iolatency"?
->>
-> 
-> So it might not be an easy thing to quiesce queue because...
-> 
-> iolatency_set_limit()
->    blkg_conf_prep() // return with rcu and queue's lock
-> 
-> neither freeze_queue nor quiesce_queue is allowed in rcu reader side context.
-> 
-> If we do it outside of blkg_conf_prep/finish(), I feel like the
-> overhead is more than it worths.
+Here's v7 of the io_uring interface. Not a lot of changes this time
+around, mostly corner cases and error handling that hadn't been
+exercised yet.
 
-I think it's hard to say it's more overhead than it's worth, when the
-current situation is clearly buggy and the proposed fix has definite
-flaws. The only other alternative I can see is to have a flag per
-throttling entity, which isn't going to work due to flag shortage.
+Only new "feature" is an improvement in sequential buffered IO
+performance. This is done by piggy backing on to existing async work if
+we're sequential to the previous work item, and it hasn't finished yet.
+This greatly reduces the overhead, context switches, and increases the
+performance a lot. Using io_uring-cp, as test program that does cp with
+io_uring, I saw a 5x improvement in speed when copying a large file.
+It's now faster than plan 'cp.
 
-So I'd very much encourage you to continue going down the path of making
-quiesce work. You could potentially do a callback based solution, if the
-context within the prep/finish is too limiting?
+The x86/x86-64 system calls were renumbered, so if you are testing,
+be sure to pull apply the renumbering. The fio and liburing repos have
+been updated.
+
+The liburing git repo now has a man page for io_uring_register(2),
+thanks to Jeff Moyer. Outside of that, not much activity there since
+last time. Clone the liburing repo here:
+
+git://git.kernel.dk/liburing
+
+Patches are against 5.0-rc3, and can also be found in my io_uring branch
+here:
+
+git://git.kernel.dk/linux-block io_uring
+
+Changes since v6:
+- Fix leak of iovec in write path for larger writes
+- Fix CQ event filling for error handling of workqueue buffered items
+- Improve sequential buffered IO performance
+- Fix leak of accounted mem in error path for io_uring_create() (Roman)
+- Rebase on v5.0-rc3
+- Check for entries == 0 in io_uring_create (Jeff)
+- Renumber system calls so they are ready for Arnds unification
+
+ Documentation/filesystems/vfs.txt      |    3 +
+ arch/x86/entry/syscalls/syscall_32.tbl |    3 +
+ arch/x86/entry/syscalls/syscall_64.tbl |    3 +
+ block/bio.c                            |   59 +-
+ fs/Makefile                            |    1 +
+ fs/block_dev.c                         |   19 +-
+ fs/file.c                              |   15 +-
+ fs/file_table.c                        |    9 +-
+ fs/gfs2/file.c                         |    2 +
+ fs/io_uring.c                          | 2540 ++++++++++++++++++++++++
+ fs/iomap.c                             |   48 +-
+ fs/xfs/xfs_file.c                      |    1 +
+ include/linux/bio.h                    |   14 +
+ include/linux/blk_types.h              |    1 +
+ include/linux/file.h                   |    2 +
+ include/linux/fs.h                     |    6 +-
+ include/linux/iomap.h                  |    1 +
+ include/linux/sched/user.h             |    2 +-
+ include/linux/syscalls.h               |    7 +
+ include/uapi/asm-generic/unistd.h      |    8 +-
+ include/uapi/linux/io_uring.h          |  141 ++
+ init/Kconfig                           |    9 +
+ kernel/sys_ni.c                        |    4 +
+ 23 files changed, 2857 insertions(+), 41 deletions(-)
 
 -- 
 Jens Axboe
+
 
