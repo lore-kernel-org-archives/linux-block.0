@@ -2,74 +2,86 @@ Return-Path: <SRS0=btbQ=P7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C84C282C3
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 00:31:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9D49C282C3
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 01:39:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 94E38217D4
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 00:31:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=noserose-net.20150623.gappssmtp.com header.i=@noserose-net.20150623.gappssmtp.com header.b="gQ4Nl7vy"
+	by mail.kernel.org (Postfix) with ESMTP id 9873D21726
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 01:39:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725985AbfAWAb3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Jan 2019 19:31:29 -0500
-Received: from mail-it1-f194.google.com ([209.85.166.194]:51625 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726207AbfAWAb3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Jan 2019 19:31:29 -0500
-Received: by mail-it1-f194.google.com with SMTP id w18so807438ite.1;
-        Tue, 22 Jan 2019 16:31:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=noserose-net.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3HfIhBZ63WOqBXt9BLrMwC7nB16ZBOfkry+Iv0A9qmo=;
-        b=gQ4Nl7vyjttTrvcX6VZn8G3Kn6YNA/7Y/H+CSaJVd8ONY/p+mV2NoMCHnAFXEUOn8t
-         4yfv18oWpnRDyPbgaXv7I7DCk4o5YRcvBGjxlsw3MdUhZ2+l3XOMkcTp9+GkTcpRpj4v
-         t3BHbZAYRlcqHuYwFeL+gU+rEM9KwP9Nyfjk96ojaaecoFZNfqTeUSpn0gWaD8A2WK08
-         9PcYBKXi2PryF2ySioqEPizFehcz2yIjGhE+V8YzwzztCL6LTcbW0Ao2YPfdR2v1Vsjg
-         hGcOuGG8+OAk1uJXqab75CnYhYKutn/d6+UcmlqC79Pr4wZekh/YXG0TuCo4Hn8OQmen
-         4ytw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3HfIhBZ63WOqBXt9BLrMwC7nB16ZBOfkry+Iv0A9qmo=;
-        b=kgs00JRPbmJD054ALrMpM/meo9lFPRtcCAcAm8hrOZHhxFSDSi+M2ztPn+3ZPomq/W
-         4HPeKcdrnXpzbut6mnR8XOwBzn13FKh8tdwzw7e8UZokmt7QxQPY3XoE2GIqT7GT4+nO
-         fGizt0rtL0nObnkPrdyUdEnYw+DwjI+6oWn2IHS0lG/GR18oxclEa/UfSjSGfPC+/cDu
-         yEhjfOT74jEBV7s8YnKe2aL7OCqUBhXlVWpMm4Y65kutJo0QnONO8cr4m5gPPmPCdwxs
-         9zgVkr8wCbV7l6kP9TQ8d4Vz0TJjUPS3IlpTN90Jrxkq0Rh9yQ6/9XxfZ4jLov9i4umR
-         qiHA==
-X-Gm-Message-State: AJcUukec+M7X29kbO97Hyf0fFWqpjBY/iMnYnl+/tGNvm3dpiXIb0xnl
-        mmfo+NS1w7FEsG5UK2MED/l2QWpLWPPB2fGAMkbLKihb
-X-Google-Smtp-Source: ALg8bN4f7mNWW14LyjGgmLOf0ZEgM17uP6AKSwj0pElfuyGXL6WBiMtMvyrF9pqacFWjelRIXE+ryj9RGrWw+gN8NqQ=
-X-Received: by 2002:a24:4d87:: with SMTP id l129mr444767itb.37.1548203488683;
- Tue, 22 Jan 2019 16:31:28 -0800 (PST)
+        id S1726960AbfAWBj1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Jan 2019 20:39:27 -0500
+Received: from mx2.suse.de ([195.135.220.15]:40532 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726885AbfAWBj0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 22 Jan 2019 20:39:26 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 5D9E2ABCB;
+        Wed, 23 Jan 2019 01:39:25 +0000 (UTC)
+Subject: Re: [PATCH] bcache: never writeback a discard operation
+To:     Daniel Axtens <dja@axtens.net>, Sasha Levin <sashal@kernel.org>
+Cc:     "Guilherme G . Piccoli" <gpiccoli@canonical.com>,
+        Michael Lyle <mlyle@lyle.org>,
+        Kent Overstreet <koverstreet@google.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-bcache@vger.kernel.org
+References: <20190118051825.18196-1-dja@axtens.net>
+ <20190122155556.478CB217D6@mail.kernel.org>
+ <87womwp71z.fsf@linkitivity.dja.id.au>
+From:   Coly Li <colyli@suse.de>
+Openpgp: preference=signencrypt
+Organization: SUSE Labs
+Message-ID: <b6f67dae-1de4-256b-1498-d377961fe27e@suse.de>
+Date:   Wed, 23 Jan 2019 09:39:15 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <20190122152151.16139-5-gregkh@linuxfoundation.org> <20190122232933.GC5884@vader>
-In-Reply-To: <20190122232933.GC5884@vader>
-From:   Ed Cashin <ecashin@noserose.net>
-Date:   Tue, 22 Jan 2019 19:31:17 -0500
-Message-ID: <CADvA-dmmZOUCDpr0QJu6zcrD0ZU_HAGT=UmguHWWnUcm0S0X6w@mail.gmail.com>
-Subject: Re: [PATCH] block: aoe: no need to check return value of
- debugfs_create functions
-To:     Omar Sandoval <osandov@osandov.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org, "Ed L. Cashin" <ed.cashin@acm.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <87womwp71z.fsf@linkitivity.dja.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 22, 2019 at 6:29 PM Omar Sandoval <osandov@osandov.com> wrote:
-...
-> Now entry is uninitialized here when we assign it to d->debugfs.
+在 2019/1/23 上午8:10, Daniel Axtens 写道:
+> Hi Sasha,
+> 
+>> This commit has been processed because it contains a "Fixes:" tag,
+>> fixing commit: 72c270612bd3 bcache: Write out full stripes.
+> 
+> I added that fixes tag because that was the commit that added the
+> code. However, I noticed that one of the bug reports mentions that the
+> problem only arising after v4.8. [1] I don't quite know what to make of
+> this: perhaps it is a consequence of another change enabling the broken
+> path. Maybe someone on one of the lists will have an idea.
+> 
 
-Thanks for noticing that.
+From code logic, bcache should not have a discard bio in cache device,
+otherwise it is a bug. Therefore no matter whether the issue happens
+before v4.8 kernel, I'd like to have the fix in.
+
+>> v4.4.171: Build failed! Errors:
+>>     drivers/md/bcache/writeback.h:71:6: error: implicit declaration of function ‘bio_op’; did you mean ‘bio_rw’? [-Werror=implicit-function-declaration]
+>>     drivers/md/bcache/writeback.h:71:21: error: ‘REQ_OP_DISCARD’ undeclared (first use in this function); did you mean ‘REQ_DISCARD’?
+>>
+>> v3.18.132: Build failed! Errors:
+>>     drivers/md/bcache/writeback.h:71:6: error: implicit declaration of function ‘bio_op’; did you mean ‘bio_rw’? [-Werror=implicit-function-declaration]
+>>     drivers/md/bcache/writeback.h:71:21: error: ‘REQ_OP_DISCARD’ undeclared (first use in this function); did you mean ‘REQ_DISCARD’?
+>>
+>>
+>> How should we proceed with this patch?
+> 
+> The patch seems reasonably easy to backport. Compile-tested only, and
+> only against v4.4.171.
+
+I don't have idea whether stable kernels accept rebased patches, for
+SUSE kernel I will do back port for all necessary kernel versions.
+
+-- 
+
+Coly Li
