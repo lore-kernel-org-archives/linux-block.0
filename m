@@ -2,76 +2,75 @@ Return-Path: <SRS0=btbQ=P7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39FE0C282C0
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 18:27:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB464C282C0
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 18:35:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0144721872
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 18:27:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1576218A1
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 18:35:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="zS6vC+In"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="1WcYOx40"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726152AbfAWS1T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jan 2019 13:27:19 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:37078 "EHLO
+        id S1726002AbfAWSfv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jan 2019 13:35:51 -0500
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:39478 "EHLO
         mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725996AbfAWS1T (ORCPT
+        with ESMTP id S1726772AbfAWSfp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jan 2019 13:27:19 -0500
-Received: by mail-ed1-f66.google.com with SMTP id h15so2495821edb.4
-        for <linux-block@vger.kernel.org>; Wed, 23 Jan 2019 10:27:17 -0800 (PST)
+        Wed, 23 Jan 2019 13:35:45 -0500
+Received: by mail-ed1-f66.google.com with SMTP id b14so2511340edt.6
+        for <linux-block@vger.kernel.org>; Wed, 23 Jan 2019 10:35:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=javigon-com.20150623.gappssmtp.com; s=20150623;
         h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
          :references;
-        bh=E417q/WkzjCoDcoMVn2h9uaBLaMupnwB0puvi86MCgw=;
-        b=zS6vC+In4GIpE8x29d3W4kh0ZXWG1KMeXX5IB33GoLXQpf5Bsb6SFMWElH4v21Qafy
-         UzUHQudRucC3BNNuTkco/fIRYofPX7SzqTb0kXaT+NZ45Tcgp1qCloCHGXuAUJD3V0eW
-         V6ay6CQaNXy03Drd4IkBbRjeSVpQOORYVEOtoyH5wdfknWua4Xj9MxfJ+IjHkMYptBad
-         9WIq9DweWtlVmgmMo96VJ4zj6zna1YI10l5bvtZ6SuTIZtQCM74+Ga4aIDDnI1bGkgk/
-         DXxJYx0F6kadzTWJZlNtd3jg+DwawGwUqSrecweXKKTHRsRDeZRNx8vgnLv7HOJvS8+W
-         wDgQ==
+        bh=teV05G8bPtIQJMZiCG/EVzI0eOkvLzZEGlVk8GwtzsY=;
+        b=1WcYOx40H0VuCp9yT4MVQVz2/3wHm6clMWhJPuKdZLSnHEz+CXpBOI9P9cyWUigkzy
+         CcQQyHtzuSchg7ZfVfyR9AkrtXHleCAJ5QTDUVNHllCZvD6x+uOqEGpxWug/EwdYdb4R
+         IKWfDPfzAy/d3RHQJ5g+lipVprL9CfQ+0o1kgZjgV0I46KHTy8SiCyI5fHV/XbeehZl4
+         MEZGDOjj7H1wiHrogSU7Y+bjofotdiUCFml/rDmMk7bpU1rNs7hdeUWQv1sz76FdAo+i
+         ocaRICIesTAWBU7HrRRQexzRqLyR/26wG+wGERet2ifeG+ecxsqqwl3yh+VnGqW/3/YU
+         X9rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:message-id:mime-version:subject:date
          :in-reply-to:cc:to:references;
-        bh=E417q/WkzjCoDcoMVn2h9uaBLaMupnwB0puvi86MCgw=;
-        b=PsgNekopEejiGHsi4lup1hdS0md7EJLv24YrryWGas4hBZxQ5uwyCV5KEXp2D1nh2H
-         5pi6dv2AVEL76b97JCUdBV7g8q6wMaF1QMz3btvSrInijo9k1Upss8WqWIBMjPtGjWsu
-         WM9qzgX1Jgv4ezta7YTJFcIkS+UXTwGb6yO/9ms+naBjSmcWnyCQVXNVwC5feVtb+NmA
-         IVPVRjB1uOZMsoo/ELdkOrvTK6tgg4BB+lgo0NIJeC/8KcompopQ1/XzYcbNRL+Jp6yr
-         wwxYxpmMrtz1hJYbI8qntj16iHfrjf49gn2+6u7qmWDTS5wgTScjPLrOJkCLABpesmrF
-         faFQ==
-X-Gm-Message-State: AJcUukevO/Pc9vmu2ntIJ0bjtwQ6vdWLXhwu0xpVZqLF1rQhoQZzyMjx
-        QDqdQFl1vwBn6X79hRpQM+1DtQ==
-X-Google-Smtp-Source: ALg8bN76USpNR7h5SYJTRsLbh35Fsp6YM446i9pcoJTqTFJMMS/WPF8OIkjHQXaPQawGuEGORQqZsQ==
-X-Received: by 2002:a50:bf02:: with SMTP id f2mr3642779edk.157.1548268037131;
-        Wed, 23 Jan 2019 10:27:17 -0800 (PST)
+        bh=teV05G8bPtIQJMZiCG/EVzI0eOkvLzZEGlVk8GwtzsY=;
+        b=suQJkGeUvgwcHSoEeeWBQlzJE5+zCdUM2zfT8ZpGLwaUW4WDc96GbQ+RQHpsCoVmNB
+         QPESforS77FDT/+5DwMHdTNmDgsX1t3JI38cqVbfOgaN5lUlPbOH0tmGyqvW9Yli6ewu
+         meSSgIu7KaYEz765Do2qGMohvDYnA+rbnabaJpiRfYQrBT2QcFnyXj1XjvaEkgWpZEmV
+         xmV22ntowliDlcwyy+xhnXhKXBwwp6t6iVaIEB1LoT1zzxhUCt7B66E6D4+x9QSHcLxl
+         Kcxb9RosPkVkj+dxax8KaTv4T4rV7fp2t8PGn4O2iawlPFPRA1dB80fPc4Z7u8LcELQ2
+         W9JA==
+X-Gm-Message-State: AJcUukfEmxaCb2rmS20NgvleOvmkkoxFVNuP4GOTUQMhrpRG7nerrsyg
+        KvIRiJshXoodhQ0zAz3YCQXqyA==
+X-Google-Smtp-Source: ALg8bN675PxHWVqY5l6ltnJXNDsf+2m5w7OqUbkk/45O152/5msrZpvBATMCltNX967FltLQZVQX5w==
+X-Received: by 2002:a17:906:6a9b:: with SMTP id p27-v6mr3419247ejr.235.1548268543655;
+        Wed, 23 Jan 2019 10:35:43 -0800 (PST)
 Received: from [192.168.1.85] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id m44sm10962346edm.54.2019.01.23.10.27.16
+        by smtp.gmail.com with ESMTPSA id p1-v6sm5440202ejo.49.2019.01.23.10.35.42
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 23 Jan 2019 10:27:16 -0800 (PST)
+        Wed, 23 Jan 2019 10:35:43 -0800 (PST)
 From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <B4980620-2CFF-41C1-8EE7-C33F1FE431C0@javigon.com>
+Message-Id: <B766FDC6-0B26-4D25-95B6-26807D3E2C79@javigon.com>
 Content-Type: multipart/signed;
-        boundary="Apple-Mail=_6C7901A7-5D20-4C9C-B665-8EEA100B55D5";
+        boundary="Apple-Mail=_128C7BFC-A885-48CF-8BEF-6C418FD2A992";
         protocol="application/pgp-signature";
         micalg=pgp-sha512
 Mime-Version: 1.0 (Mac OS X Mail 12.1 \(3445.101.1\))
-Subject: Re: [PATCH 2/4] introduce four macros for in-kernel hints
-Date:   Wed, 23 Jan 2019 19:27:12 +0100
-In-Reply-To: <1547047861-7271-3-git-send-email-joshi.k@samsung.com>
+Subject: Re: [PATCH v2 0/4] Write-hint for FS journal
+Date:   Wed, 23 Jan 2019 19:35:39 +0100
+In-Reply-To: <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
 Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
         linux-ext4@vger.kernel.org, linux-nvme@lists.infradead.org,
         jack@suse.com, david@fromorbit.com, tytso@mit.edu,
         prakash.v@samsung.com
 To:     Kanchan Joshi <joshi.k@samsung.com>
-References: <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
- <CGME20190109153336epcas2p29b3275b6c545e483a3f43b92268f08bf@epcas2p2.samsung.com>
- <1547047861-7271-3-git-send-email-joshi.k@samsung.com>
+References: <CGME20190109153328epcas2p4643cbdc7a2182b47893a2bcaa0778e17@epcas2p4.samsung.com>
+ <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
 X-Mailer: Apple Mail (2.3445.101.1)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -79,46 +78,63 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---Apple-Mail=_6C7901A7-5D20-4C9C-B665-8EEA100B55D5
-Content-Transfer-Encoding: 7bit
+--Apple-Mail=_128C7BFC-A885-48CF-8BEF-6C418FD2A992
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;
 	charset=us-ascii
 
 
 > On 9 Jan 2019, at 16.30, Kanchan Joshi <joshi.k@samsung.com> wrote:
-> 
-> Exiting write-hints are exposed to user-mode. There is a possiblity
-> of conflict if kernel happens to use those. This patch introduces four
-> write-hints for exclusive kernel-mode use.
-> 
-> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> ---
-> include/linux/fs.h | 5 +++++
-> 1 file changed, 5 insertions(+)
-> 
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 811c777..e8548eb 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -291,6 +291,11 @@ enum rw_hint {
-> 	WRITE_LIFE_MEDIUM	= RWH_WRITE_LIFE_MEDIUM,
-> 	WRITE_LIFE_LONG		= RWH_WRITE_LIFE_LONG,
-> 	WRITE_LIFE_EXTREME	= RWH_WRITE_LIFE_EXTREME,
-> +/* below ones are meant for in-kernel use */
-> +	KERN_WRITE_LIFE_SHORT,
-> +	KERN_WRITE_LIFE_MEDIUM,
-> +	KERN_WRITE_LIFE_LONG,
-> +	KERN_WRITE_LIFE_EXTREME
-> };
-> 
+>=20
+> Towards supporing write-hints/streams for filesystem journal.
+>=20
+> Here is the v1 patch for background -
+> https://marc.info/?l=3Dlinux-fsdevel&m=3D154444637519020&w=3D2
+>=20
+> Changes since v1:
+> - introduce four more hints for in-kernel use, as recommended by Dave =
+chinner
+>  & Jens axboe. This isolates kernel-mode hints from user-mode ones.
+> - remove mount-option to specify write-hint, as recommended by Jan =
+kara &
+>  Dave chinner. Rather, FS always sets write-hint for journal. This =
+gets ignored
+>  if device does not support stream.
+> - Removed code-redundancy for write_dirty_buffer (Jan kara's review =
+comment)
+>=20
+>=20
+> Kanchan Joshi (4):
+>  block: Increase count of supported write-hints
+>  fs: introduce four macros for in-kernel hints
+>  fs: introduce APIs to enable sending write-hint with buffer-head
+>  fs/ext4,jbd2: add support for passing write-hint with journal.
+>=20
+> fs/buffer.c                 | 18 ++++++++++++++++--
+> fs/ext4/super.c             |  2 ++
+> fs/jbd2/commit.c            | 11 +++++++----
+> fs/jbd2/journal.c           |  3 ++-
+> fs/jbd2/revoke.c            |  3 ++-
+> include/linux/blkdev.h      |  5 ++++-
+> include/linux/buffer_head.h |  3 +++
+> include/linux/fs.h          |  5 +++++
+> include/linux/jbd2.h        |  8 ++++++++
+> 9 files changed, 49 insertions(+), 9 deletions(-)
+>=20
+> --
+> 2.7.4
 
-I think Jens and Dave meant kernel hints to go top down. This would also
-give space for supporting more hints / streams from both ends for user
-and kernel.
+Worth sharing the paper where you describe the design and the numbers
+you collected [1]. Also, addressing Dave's comment on stream support, it
+points to a Samsung drive supporting streams (PM963). In this context,
+you should verify in V3 that we are at least passing xfstests and
+blktests with these changes.
+
+[1] https://www.usenix.org/system/files/conference/fast18/fast18-rho.pdf
 
 Javier
 
---Apple-Mail=_6C7901A7-5D20-4C9C-B665-8EEA100B55D5
+--Apple-Mail=_128C7BFC-A885-48CF-8BEF-6C418FD2A992
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
 	filename=signature.asc
@@ -128,19 +144,19 @@ Content-Description: Message signed with OpenPGP
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlxIsgAACgkQPEYBfS0l
-eODI9g//dR040m0StXwBm+NOgmUh3cPN5zgCnWTJq1ZEQDwkRwrlqT7deA9se6Dw
-cuI1L1XlPzA7vKgqzmPou6WFcE/EwxzyLNXHILMXZAxZI53OHtTDuC0HD5p1KghI
-+NV/IpSunToiOmKXuzCwAz08i5TeoXvZXX4ytoYpTTKfwt7H+OgR439haKzb0xqI
-Hr8Ftu5Wbt6Bg54r3AfxPMqiKYL0XxTbeMocyQc+d/zR+UhSZUTPyCPaaXKY6T9x
-Ud5mflJWS+t5eiztVi+yDQEQb5V+8NaIrU8+lM1pCpmK2snDCy4pq2R6fOia16yq
-u3fknZzU4uV/QTWzwQQ24hdimsqNbm2aOAuD1f1lOEJDAziiH+S7J5d2NnLjZzAc
-18Xvqemq2w7Z/3aq+PwNXHAK1i8pbmLQImEmWfQAZqKeEVwjYxKzDkUP3uCt4DVf
-9/jAHRd+EAaioNyevpQ128DO6jtuGHZ2x7fekVqCzhN/Mwh1NSL/NLtCe1o5U1sM
-U9yCaJparFCsb2GV69XhqlZaSwuHPnpdU+x+zUHdUAJRFj4TLtSmQm5Sp5pSYLQP
-Fv2RoYAQTJ0jjc1WDXf+a0Pry7t65DHagRG/mmkebXKZDyH3bqV/YKvS40X9jGR1
-nNwdSp8ShN71zFahUoNuijSAzMTrjODTMC2wPKVcrmeRXvI+/pY=
-=+41p
+iQIzBAEBCgAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlxIs/sACgkQPEYBfS0l
+eODJtBAAgwyYs2lwzgDn4YOdpjFloR4PeYu18mA2ZNNeGdeTvzSRNqOwtiP2ATGb
+8+IiMecChBGZt6Z1zQ3YtZEwCpWJsgAkdhWt5lGNLVnLMuu/NBPEvDKTh40AnDpj
+DumwBWwWxFp4QEUE2eYmyVOJE3uW5HQ3u7DYcX6l8kddK6HMdXNQZuRH+xjihxPF
+VzeGb+GB3+4deEqWpE+buBBEQbpL7Gpkjx7YMf/+05EDk9JMA7YnWnWQK/g38/i5
+j0fJWZYASSMgw3veu5PIH5HjUp9UidxC4qP+CgvJx6wOWie9BH3rDAEjUUm5IQPO
+9w4yA05GGdN38uRQHMo7xLqkETPFG4YGP8mtkHlH2UvR9I2rskqWB3rvXxwbBkIB
+XquWwT02+yrACy9jC6dek4ld4Y/Tgo1wDgAEt41V52f3w4nFhjECYlNjdnDA+5CA
+1QkRYqZDG+We4Qdv0OVKUrgMXJlYy9j+1QKRa2wTXX82nF237PVLB/6FbNH5tb68
+OFrvHr6wqttfZ4utHGxnbGviVS5WDIFyq6Ozm8CFoAxO/xwfUaBOrij7XOLTSa7m
+v5cWdikrKEhvcdoRHC3+rdckjQbF+CoCP+t1xT53tyS2YiqlxwLpK30N3x1Amx+E
+p+HLI/xmlIkCs5H1C+fqC2xxOVAoWw+vmGskyaDCJQHQ3g4HgGI=
+=v9JG
 -----END PGP SIGNATURE-----
 
---Apple-Mail=_6C7901A7-5D20-4C9C-B665-8EEA100B55D5--
+--Apple-Mail=_128C7BFC-A885-48CF-8BEF-6C418FD2A992--
