@@ -2,84 +2,189 @@ Return-Path: <SRS0=btbQ=P7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B99AC282C0
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 14:27:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F055C282C2
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 15:09:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4B45121726
-	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 14:27:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC93F21019
+	for <linux-block@archiver.kernel.org>; Wed, 23 Jan 2019 15:09:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Vpw36+eH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726934AbfAWO12 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jan 2019 09:27:28 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:60450 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726891AbfAWO12 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jan 2019 09:27:28 -0500
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id D185B66AC3E76BEC59AE;
-        Wed, 23 Jan 2019 22:27:24 +0800 (CST)
-Received: from [127.0.0.1] (10.184.213.217) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.408.0; Wed, 23 Jan 2019
- 22:27:14 +0800
-Subject: Re: [PATCH] block: Add secure discard check in blk_ioctl_discard
-To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-CC:     <houtao1@huawei.com>, <zhaohongjiang@huawei.com>,
-        <yangerkun@huawei.com>
-References: <1545716663-123177-1-git-send-email-zhengbin13@huawei.com>
-From:   "zhengbin (A)" <zhengbin13@huawei.com>
-Message-ID: <614c3753-a1a0-4982-e2d3-e1490b36ce0f@huawei.com>
-Date:   Wed, 23 Jan 2019 22:27:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.0
+        id S1725971AbfAWPJw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jan 2019 10:09:52 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:38859 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725930AbfAWPJv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 23 Jan 2019 10:09:51 -0500
+Received: by mail-pf1-f193.google.com with SMTP id q1so1318231pfi.5
+        for <linux-block@vger.kernel.org>; Wed, 23 Jan 2019 07:09:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=4zUQFrV8T7X9lG9M56CB1hsACEJlmc4lfl1BA1zVNFM=;
+        b=Vpw36+eHKJnV2E4nGwK1Na8WlTdbQ1IYghrPG0GvoQzA1vWmV9q/IjhHgOA/ypK7nH
+         n0+W0gHJmWrKs4imF/u/tq0XOlAgNHbBzcBsnLVXksFtBOwAHnPfG4H8M+CcW8O3iH84
+         TkJMk0/80/xntPtW1yrGrxlsO5TYcdgaR7T6KqlUtdvxaLxgOkQM8V2kZtXPvZbUQ4Ic
+         lpNwP2Q9FNLHBs9hz9D38A+WFAfE2s85RoGTxRhQmv1S7wevfOBA1pEr/y1Aet/OKZsf
+         l9lQxJNrvjUjzwSFAJ2qgI9g0K8xHNTGCWfMqMEH2Or1XhRinqDUvoyj5TUvjaVltd/l
+         IHhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=4zUQFrV8T7X9lG9M56CB1hsACEJlmc4lfl1BA1zVNFM=;
+        b=Ta7Q0azGqXmuIH8A9XAHyEPJUTrRFvPU9abLgXhMkEKj4lsaVUXp6kBdv7p06TN0bq
+         +tVgY46ynHSrwXvGu0x8o/JqoTRLT7K9lQBXvp6cD8MOZPh0UODQDxN6fpLM9guhT6i0
+         BNLuUzBL/yUAID+Kt4J8RQT1UmD5xLj4ekhNOcfSzHt6BlYv0OT+VhZiUF7GDB1sL4nB
+         MHZGjQ/Y19GvZ+3h4vPs4VEOnfdKwz2WXLMK/us0htmpbiseDrkUsPK0ditd58o6z+5e
+         VfiA38t7/BjVzlwLtOep0sZb0u42jliKgSzc/meGLr6anbI2ycOAL0THdPhiYBDQ7UIh
+         b4Vw==
+X-Gm-Message-State: AJcUukdL/fHCdgX0o1eorSTp+/vkW+UppQXrApHHZQQA7o0aaEfycq4X
+        VeARa87Mg2gSHM8hpAAI6iLlFdC0/I9IIw==
+X-Google-Smtp-Source: ALg8bN79CMKCtbdizBxqERC0QZ2e+sBeYntup6bN7RuEEKKg9B214CxbLlvHpNokE8rlXZWOF2gn9Q==
+X-Received: by 2002:a63:b0a:: with SMTP id 10mr2237434pgl.423.1548256189681;
+        Wed, 23 Jan 2019 07:09:49 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id o84sm39447446pfi.172.2019.01.23.07.09.47
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 23 Jan 2019 07:09:48 -0800 (PST)
+Subject: Re: [PATCH] blk-iolatency: fix IO hang due to negative inflight
+ counter
+To:     Liu Bo <obuil.liubo@gmail.com>
+Cc:     Josef Bacik <josef@toxicpanda.com>,
+        Liu Bo <bo.liu@linux.alibaba.com>, linux-block@vger.kernel.org
+References: <20190114192137.111275-1-bo.liu@linux.alibaba.com>
+ <16ab732a-6537-3627-52ed-05013188a3f5@kernel.dk>
+ <20190118162117.zqdwjkq74wzsaxn3@macbook-pro-91.dhcp.thefacebook.com>
+ <c9fed816-cea1-33f1-017b-10f86df0b8a8@kernel.dk>
+ <20190118164312.muk7zdcb5yqn7fdp@macbook-pro-91.dhcp.thefacebook.com>
+ <CANQeFDDv=0FNNW_-HyQVTyeaJu4Y6SWbWii1CKNHtux9=VhNjQ@mail.gmail.com>
+ <e590d46a-32ec-6531-0618-875ebf1d7bf8@kernel.dk>
+ <CANQeFDAtcbmXTe=uad5Vqk=Z83T8Lh9No+xHXSgKJwcKemRiQw@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <99d47e4f-7535-fcbd-bc53-b4cc59e52a63@kernel.dk>
+Date:   Wed, 23 Jan 2019 08:09:45 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <1545716663-123177-1-git-send-email-zhengbin13@huawei.com>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <CANQeFDAtcbmXTe=uad5Vqk=Z83T8Lh9No+xHXSgKJwcKemRiQw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.184.213.217]
-X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ping?
+On 1/23/19 12:52 AM, Liu Bo wrote:
+> On Fri, Jan 18, 2019 at 5:51 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> On 1/18/19 6:39 PM, Liu Bo wrote:
+>>> On Fri, Jan 18, 2019 at 8:43 AM Josef Bacik <josef@toxicpanda.com> wrote:
+>>>>
+>>>> On Fri, Jan 18, 2019 at 09:28:06AM -0700, Jens Axboe wrote:
+>>>>> On 1/18/19 9:21 AM, Josef Bacik wrote:
+>>>>>> On Fri, Jan 18, 2019 at 05:58:18AM -0700, Jens Axboe wrote:
+>>>>>>> On 1/14/19 12:21 PM, Liu Bo wrote:
+>>>>>>>> Our test reported the following stack, and vmcore showed that
+>>>>>>>> ->inflight counter is -1.
+>>>>>>>>
+>>>>>>>> [ffffc9003fcc38d0] __schedule at ffffffff8173d95d
+>>>>>>>> [ffffc9003fcc3958] schedule at ffffffff8173de26
+>>>>>>>> [ffffc9003fcc3970] io_schedule at ffffffff810bb6b6
+>>>>>>>> [ffffc9003fcc3988] blkcg_iolatency_throttle at ffffffff813911cb
+>>>>>>>> [ffffc9003fcc3a20] rq_qos_throttle at ffffffff813847f3
+>>>>>>>> [ffffc9003fcc3a48] blk_mq_make_request at ffffffff8137468a
+>>>>>>>> [ffffc9003fcc3b08] generic_make_request at ffffffff81368b49
+>>>>>>>> [ffffc9003fcc3b68] submit_bio at ffffffff81368d7d
+>>>>>>>> [ffffc9003fcc3bb8] ext4_io_submit at ffffffffa031be00 [ext4]
+>>>>>>>> [ffffc9003fcc3c00] ext4_writepages at ffffffffa03163de [ext4]
+>>>>>>>> [ffffc9003fcc3d68] do_writepages at ffffffff811c49ae
+>>>>>>>> [ffffc9003fcc3d78] __filemap_fdatawrite_range at ffffffff811b6188
+>>>>>>>> [ffffc9003fcc3e30] filemap_write_and_wait_range at ffffffff811b6301
+>>>>>>>> [ffffc9003fcc3e60] ext4_sync_file at ffffffffa030cee8 [ext4]
+>>>>>>>> [ffffc9003fcc3ea8] vfs_fsync_range at ffffffff8128594b
+>>>>>>>> [ffffc9003fcc3ee8] do_fsync at ffffffff81285abd
+>>>>>>>> [ffffc9003fcc3f18] sys_fsync at ffffffff81285d50
+>>>>>>>> [ffffc9003fcc3f28] do_syscall_64 at ffffffff81003c04
+>>>>>>>> [ffffc9003fcc3f50] entry_SYSCALL_64_after_swapgs at ffffffff81742b8e
+>>>>>>>>
+>>>>>>>> The ->inflight counter may be negative (-1) if
+>>>>>>>>
+>>>>>>>> 0) blk-throttle had been enabled when the IO was issued, so its bio
+>>>>>>>> has a associated blkg,
+>>>>>>>>
+>>>>>>>> 1) blk-iolatency was disabled when the IO was issued, so iolatency_grp
+>>>>>>>> in this blkg was not available by then,
+>>>>>>>>
+>>>>>>>> 2) blk-iolatency was enabled before this IO reached its endio, so that
+>>>>>>>> iolatency_grp became available when the IO did the endio.
+>>>>>>>>
+>>>>>>>> 3) the ->inflight counter is decreased from 0 to -1.
+>>>>>>>>
+>>>>>>>> This uses atomic_dec_is_positive() instead to avoid the negative
+>>>>>>>> inflight counter.
+>>>>>>>
+>>>>>>> The problem with that is that it'll hide a lot of other issues, too.
+>>>>>>> Any way we can either track if this rqw is in flight, and only dec
+>>>>>>> if it is, or quiesce when enabling?
+>>>>>>>
+>>>>>>
+>>>>>> I worried about this too, but really the side-effect of allowing more through
+>>>>>> because of mis-counting means we just let more IO through.  I think maybe we add
+>>>>>> a debug option that we can turn on to see if we're messing up accounting, but in
+>>>>>> general I don't see a problem with this approach.
+>>>>>
+>>>>> The problem is that a problem in accounting elsewhere (like missing increment)
+>>>>> will now go unnoticed, which could completely screw it up. An occasional
+>>>>> blip like the one described is totally fine, but that's not guaranteed to be
+>>>>> the case.
+>>>>>
+>>>>
+>>>> Yeah I agree it's kind of shitty.
+>>>>
+>>>>>> The problem we're running into here is there's not really a good way to tag a
+>>>>>> bio as "seen by io.latency."  We just have to assume if we're on and there's a
+>>>>>> bi_blkg associated that we saw it at submit time.  We can't just add a flag for
+>>>>>> every io controller that starts tracking inflight io's, so for now I think this
+>>>>>> is a reasonable solution.  Thanks,
+>>>>>
+>>>>> Can we quiesce instead when enabling/disabling?
+>>>>
+>>>> Actually that's not a bad idea, you want to look into that Liu?  That way we can
+>>>> make sure everything is correct always.  Thanks,
+>>>>
+>>>
+>>> Just to confirm, does "quiesce when enabling/disabling" mean "waiting
+>>> for inflight IOs to complete when enabling/disabling iolatency"?
+>>
+> 
+> So it might not be an easy thing to quiesce queue because...
+> 
+> iolatency_set_limit()
+>    blkg_conf_prep() // return with rcu and queue's lock
+> 
+> neither freeze_queue nor quiesce_queue is allowed in rcu reader side context.
+> 
+> If we do it outside of blkg_conf_prep/finish(), I feel like the
+> overhead is more than it worths.
 
-On 2018/12/25 13:44, zhengbin wrote:
-> blkdev_ioctl--->blk_ioctl_discard(BLKDISCARD or BLKSECDISCARD).
-> If cmd is BLKSECDISCARD and device does not support this cmd,
-> we will drop page cache(should not be dropped) and return
-> EOPNOTSUPP to caller. This patch fixes that.
-> 
-> Fixes: 351499a172c0 ("block: Invalidate cache on discard v2")
-> Signed-off-by: zhengbin <zhengbin13@huawei.com>
-> ---
->  block/ioctl.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index 4825c78..ee3a6af 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -212,6 +212,11 @@ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
->  	if (!blk_queue_discard(q))
->  		return -EOPNOTSUPP;
-> 
-> +	if (flags & BLKDEV_DISCARD_SECURE) {
-> +		if (!blk_queue_secure_erase(q))
-> +			return -EOPNOTSUPP;
-> +	}
-> +
->  	if (copy_from_user(range, (void __user *)arg, sizeof(range)))
->  		return -EFAULT;
-> 
-> --
-> 2.7.4
-> 
-> 
-> .
-> 
+I think it's hard to say it's more overhead than it's worth, when the
+current situation is clearly buggy and the proposed fix has definite
+flaws. The only other alternative I can see is to have a flag per
+throttling entity, which isn't going to work due to flag shortage.
+
+So I'd very much encourage you to continue going down the path of making
+quiesce work. You could potentially do a callback based solution, if the
+context within the prep/finish is too limiting?
+
+-- 
+Jens Axboe
 
