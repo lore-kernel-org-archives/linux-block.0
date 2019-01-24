@@ -2,106 +2,116 @@ Return-Path: <SRS0=8u48=QA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19281C282C0
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 00:17:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B02C282C0
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 00:53:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D159C21872
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 00:17:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 724A7218A1
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 00:53:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Mvd9KdmV"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="MExa9BBO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726220AbfAXARt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Jan 2019 19:17:49 -0500
-Received: from mail-pl1-f170.google.com ([209.85.214.170]:41475 "EHLO
-        mail-pl1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726168AbfAXARt (ORCPT
+        id S1726249AbfAXAxq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Jan 2019 19:53:46 -0500
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:47082 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726235AbfAXAxq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Jan 2019 19:17:49 -0500
-Received: by mail-pl1-f170.google.com with SMTP id u6so1991550plm.8
-        for <linux-block@vger.kernel.org>; Wed, 23 Jan 2019 16:17:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=d7LpOWY2zwJUJvdSQmKYT/X+eM4Haag5ezBb6ntXRY0=;
-        b=Mvd9KdmVVi4AHA8wGDLLFaeLKdoRDgetMWVoL1mQ4yZYhUytZkn7d5cnH0bexZKMet
-         E5QNhqLWmetWbAwntbWsWTSDhlks444lcwOu1+3KPz0HmQLAS1oRxKN9sqxfdLNdXMXp
-         LKt9TqaQhNqe///sPk0OPyNKYswqF6Mgcrpt7Co+kgqdsbxLGnQ3UsM3E2OVyi9/7PaO
-         pgKCy/p+2GkIoTxTWVuIvo01ouvmFrb1VZOT85YawDttfj3Vo1N9KoaPu/O6t72DJJW3
-         UUIBnkh+eJ4JkKol2A2nYpquUKNc6PENMDXNtpo+ViT6KsCHF2EtDWvlXHH84ql7Ic32
-         z7bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=d7LpOWY2zwJUJvdSQmKYT/X+eM4Haag5ezBb6ntXRY0=;
-        b=OsmVtGCw/WK7ENzdMrDs4eCYijXL+o+Czom1xkT358Pw8mw2e4xcl4hA7+Jco6eTMn
-         xDbQzsU70GjqmgjUUBxmJVfiBuDvTcwfyO0SmdhR4RaoCQqYBv8oUuZEXIGH0RmxPjcZ
-         Tz6SeOSdI/g40op2XHaESXTDtpO4mTOo+VkTFrLtmz2fOL19/kcZutbQw3Z6D9uV7k6v
-         QHnU4qDi0uN5UOEbrXP5CN44XISFQTAcBj8FwT4v5SGAVXcL3EcX5D/wZlpKdoKFrcce
-         4bYg1LmHNL9OFM1lPEDRopuh5XbWS2HGUwBV4VljhgzNw1+8I6IbSgR76vxEGgHSMZin
-         9sbA==
-X-Gm-Message-State: AJcUukfRUDF63FjvMF6OSDuJ/1AoaheYQ1qiv3jJ3cpGKtghDGWkWIe/
-        kkRenav2EIeAtcHogZ50y7Ko0rmXcKuD1g==
-X-Google-Smtp-Source: ALg8bN7+hzkyoiFzl0aaejf/lpNntCUKIQqPcpm63TLFlvpe+wP0PGoYDXpjGb2DKyDFMEntdH1mCQ==
-X-Received: by 2002:a17:902:2:: with SMTP id 2mr4491280pla.228.1548289068450;
-        Wed, 23 Jan 2019 16:17:48 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id z62sm29252165pfi.4.2019.01.23.16.17.46
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 23 Jan 2019 16:17:47 -0800 (PST)
-Subject: Re: [GIT PULL] nvme fixes for 5.0-rc4
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>
-References: <20190123214252.27491-1-sagi@grimberg.me>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <d6379865-7f4a-5609-d051-f6421660b796@kernel.dk>
-Date:   Wed, 23 Jan 2019 17:17:45 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Wed, 23 Jan 2019 19:53:46 -0500
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x0O0ofm4009225;
+        Wed, 23 Jan 2019 16:53:42 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0818;
+ bh=39seH9BIGgwKLy34+cjto5LLTAO2AKserxzbhKE1J0w=;
+ b=MExa9BBOykIjWViXcRs1p2jKLasV50Wip8NTbUfqAZzGABu/1/ciX9ZvZMLrAJaNySJY
+ 4Zqh7CGUJ6Fdxtbg1fJmkpVOB+SITDRdp9AXC19kmAG1bJi6mZAI1C41m79RPjBtOrLJ
+ 3hqd8NyZwVj90JQLFesX4w0hcXlcKenUS12WAZCjwGnZYyonDQlNLOsQWK7x77hhFBgc
+ JQbWMds6Ouvs52THnB5HLyKG2haAxbXPddd6+CJ+H6zo4V1cJQ5iFkraFtNcoW7EJD9R
+ /ompWRYxfOz2W4K4ogh0DL3py7J952peSo4NOY7s5WFbkYuO6oGCJzmGaVO+Ej1HeaEr 0A== 
+Received: from sc-exch04.marvell.com ([199.233.58.184])
+        by mx0a-0016f401.pphosted.com with ESMTP id 2q6w0khwwt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Wed, 23 Jan 2019 16:53:42 -0800
+Received: from SC-EXCH03.marvell.com (10.93.176.83) by SC-EXCH04.marvell.com
+ (10.93.176.84) with Microsoft SMTP Server (TLS) id 15.0.1367.3; Wed, 23 Jan
+ 2019 16:53:41 -0800
+Received: from maili.marvell.com (10.93.176.43) by SC-EXCH03.marvell.com
+ (10.93.176.83) with Microsoft SMTP Server id 15.0.1367.3 via Frontend
+ Transport; Wed, 23 Jan 2019 16:53:41 -0800
+Received: from an-git01.marvell.com (unknown [10.80.127.22])
+        by maili.marvell.com (Postfix) with ESMTP id 01AA13F703F;
+        Wed, 23 Jan 2019 16:53:42 -0800 (PST)
+From:   Zhoujie Wu <zjwu@marvell.com>
+To:     <mb@lightnvm.io>, <linux-block@vger.kernel.org>,
+        <hans.holmberg@cnexlabs.com>
+CC:     <hongd@marvell.com>, Zhoujie Wu <zjwu@marvell.com>
+Subject: [PATCH] lightnvm: pblk: ignore bad block wp for pblk_line_wp_is_unbalanced
+Date:   Wed, 23 Jan 2019 16:55:14 -0800
+Message-ID: <1548291314-27225-1-git-send-email-zjwu@marvell.com>
+X-Mailer: git-send-email 1.9.1
 MIME-Version: 1.0
-In-Reply-To: <20190123214252.27491-1-sagi@grimberg.me>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-01-23_12:,,
+ signatures=0
+X-Proofpoint-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=757 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1901240004
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/23/19 2:42 PM, Sagi Grimberg wrote:
-> Hey Jens,
-> 
-> Couple of nvme fixes for the next rc round.
-> 
-> - Fix nvme-rdma and nvme-tcp timeout handlers racing with queue
->   disconnections and initial connect failuers
-> - fix nvme-rdma regression in queue maps assignment introduced
->   in read/write queue map separation
-> - fix nvmet-rdma null dereference when we run out of rsps under
->   heavy load
-> - fix multipath ana log underallocation when static group ids are used
-> 
-> The following changes since commit eda14f8977df052dce3a9c54a6bf8d8f76c96eb1:
-> 
->   nvme-pci: fix nvme_setup_irqs() (2019-01-15 06:50:52 +0100)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git nvme-5.0
+The write pointer of the bad block could be 0 or undefined, ignore
+the checking of the bad block wp for pblk_line_wp_is_unbalanced to
+avoid fake warning.
 
-This is still forward of my existing branch, so I just hand
-applied these. After my next pull, I'll fast forward the
-branch for next time.
+Signed-off-by: Zhoujie Wu <zjwu@marvell.com>
+---
+ drivers/lightnvm/pblk-recovery.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 5ee20da..e1fba98 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -312,21 +312,27 @@ static int pblk_line_wp_is_unbalanced(struct pblk *pblk,
+ 	struct nvm_chk_meta *chunk;
+ 	struct ppa_addr ppa;
+ 	u64 line_wp;
+-	int pos, i;
++	int pos, i, v_blk;
+ 
+-	rlun = &pblk->luns[0];
++	v_blk = find_first_zero_bit(line->blk_bitmap, lm->blk_per_line);
++	if (v_blk > lm->blk_per_line)
++		return 0;
++	rlun = &pblk->luns[v_blk];
+ 	ppa = rlun->bppa;
+ 	pos = pblk_ppa_to_pos(geo, ppa);
+ 	chunk = &line->chks[pos];
+ 
+ 	line_wp = chunk->wp;
+ 
+-	for (i = 1; i < lm->blk_per_line; i++) {
++	for (i = v_blk + 1; i < lm->blk_per_line; i++) {
+ 		rlun = &pblk->luns[i];
+ 		ppa = rlun->bppa;
+ 		pos = pblk_ppa_to_pos(geo, ppa);
+ 		chunk = &line->chks[pos];
+ 
++		if (test_bit(pos, line->blk_bitmap))
++			continue;
++
+ 		if (chunk->wp > line_wp)
+ 			return 1;
+ 		else if (chunk->wp < line_wp)
 -- 
-Jens Axboe
+1.9.1
 
