@@ -2,80 +2,74 @@ Return-Path: <SRS0=8u48=QA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB6FFC282C3
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 14:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26B5BC282C3
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 14:46:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8426F2184B
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 14:36:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC456218A2
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 14:46:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="drx0wM4m"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="VBAqxown"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728059AbfAXOgv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Jan 2019 09:36:51 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:32888 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727924AbfAXOgv (ORCPT
+        id S1728367AbfAXOqV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Jan 2019 09:46:21 -0500
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:43650 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728164AbfAXOqV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Jan 2019 09:36:51 -0500
-Received: by mail-ed1-f66.google.com with SMTP id p6so4780449eds.0
-        for <linux-block@vger.kernel.org>; Thu, 24 Jan 2019 06:36:50 -0800 (PST)
+        Thu, 24 Jan 2019 09:46:21 -0500
+Received: by mail-ed1-f65.google.com with SMTP id f9so4758163eds.10
+        for <linux-block@vger.kernel.org>; Thu, 24 Jan 2019 06:46:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=javigon-com.20150623.gappssmtp.com; s=20150623;
         h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
          :references;
-        bh=XeARhplmILrmFnACznjH58BJN5nRjFOsozYGY0quCIE=;
-        b=drx0wM4maaDf1HG7Z+juTsEgFBaToJfuoDytGiuY+PWU2rnKCDpzjEXua7n7Missy+
-         jdzKMl+/j5d+uQ0aIIlg9DHEMAH+y8OmGEWrcLAB8Hwjk6qToO94gb46e4dKwkeSrbq7
-         r4YryffEbagU5eOvsc3JfJVRYR6PeZPix2IOXu6BE5x8cAqrrFUxPto5bAlTw1zRExRD
-         u/dBJL3hkoiadwBxAfrUQdmYzUSrUdGkXD5gm9vo+UymD+LXPFPegcojkmKHhrXGVobN
-         /ISgoHbkuIic9ACIncCqMAL85xmrGVJJ81zPjZOcKzhgsDkWV1xHnMdNdPy6jwyCe7FN
-         VG4g==
+        bh=gEm+WvrDa3DSTuCS+gpzJsDAEzonQSYyupTatHkCWe0=;
+        b=VBAqxownnhlzwWl75M0ufUH326Mvpm0n1IiE02W8x3bKJ8gbdgztNgjiu8F/xffz3L
+         jrj0uBHvC2WxfDbOfvPk7dQnYRRxAETjmiy2yzz4rF/mDP7KsCFt+IyREZXxhNh2Wj5U
+         w7/euDZgjbsvnmmysSi3x+DKzId1OjezVcwk8VG/ftGWgiPkCpOldAw4hpsSSaGk8JII
+         g/sQ3JRNiYWkx8EpEoPLags7xGQhKrDLejexj5ckvAEpmE+PJf6pMliqfNFhIVDS1Qkf
+         pou4tlw7LkYY850uDrNYy4gikJB0veEXkABPEAoQCQEZIVFcNs2R+9f/qQwyra0qWfjt
+         z8rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:message-id:mime-version:subject:date
          :in-reply-to:cc:to:references;
-        bh=XeARhplmILrmFnACznjH58BJN5nRjFOsozYGY0quCIE=;
-        b=uCWHN1HhLNq8vc966cFRpjhXeTRZxokdQgs+Znpli/ARXXzLAfvfzXJlnIuSphLdbs
-         O1Zp6l4F9bjPun+S6idi3wOiK4tjE/t/Tm+ACif3KJG/k3+0exkFITpOe2/w394kzmvd
-         y57wDHkJ8Zv5vi8bXd0FC+6wYFSlTd8XoNmwJWLBEnvOiDWj9+jE0fZ3zgzrBh53Cj8F
-         cTTZp2/HJXYJRUgTZY/Q08tf90ixItnHtBs85asRIKrf4/lhzBIZQIMXDjkoq0wUWq4o
-         5Gw+CFhXwJ3cWMdxONCkWZeqQRI9UjIjcVfC5DV9XpaKoGCZk6bf2VR7UQ8mMQdnN6Jw
-         2zmw==
-X-Gm-Message-State: AJcUukfXMuvRTkq32Buvpntj99ZlSTicgqU4V8h3/G72it47Y1Q/enc0
-        dQLKnwkHT0eJ8wDG80HcKwc/OQ==
-X-Google-Smtp-Source: ALg8bN6YkB4d6JlzaAgHfTCloMq+fZ8W6iKlFmvABsbovARTxc/rupNn1Z3W/CJRaUlydwGRKV3qeA==
-X-Received: by 2002:a50:ad0b:: with SMTP id y11mr6689419edc.113.1548340609385;
-        Thu, 24 Jan 2019 06:36:49 -0800 (PST)
+        bh=gEm+WvrDa3DSTuCS+gpzJsDAEzonQSYyupTatHkCWe0=;
+        b=qGS4KEhCrhvX55fq4Uk6PeSPVRwlOrdiIClMh+pZtW76VARJP+KTs7TfFR10o9rOqb
+         CJv279c+4B5eD6EacwnAUEOjZm/MgyaOQi5l0mml4jYip6RWPy3bkwj+tb9dNS5IyLzf
+         IrG4C0AqkbIwOeakVfX/2P+bsRrXf+xVLRRW9/3yrX5gUPvL/tHP2CgjXDn8OVvrBpOW
+         u0jnOhXPlQ/Vyy8cIvZ1KfWPJty/OROOOH+5Y5Z2uk17Tnni/MaccDFJQ+/S2Eh0bL5B
+         5RkfaW/28sD4x29omVtVa+kRVup9nR+ivcpqfG1V9BSYOXTRc38RTMsWDgbqvIQkjXCB
+         YoFQ==
+X-Gm-Message-State: AJcUukfAbkW8imGXCpFxWMtqlKx4LZ/MD2CPMc7ivTAb/IGIqAnhSjrf
+        DUxMdfKkqbKfbLM1uVBZTcpmGg==
+X-Google-Smtp-Source: ALg8bN7SCJE+9hbADxsRw2n8lsp3OIX3ims/q58YYEe9q+PRhmNW/2EFE7VteIGocYJNXENiA7n93Q==
+X-Received: by 2002:a17:906:20c2:: with SMTP id c2-v6mr6254873ejc.241.1548341178601;
+        Thu, 24 Jan 2019 06:46:18 -0800 (PST)
 Received: from [192.168.1.85] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id m10sm122172eja.38.2019.01.24.06.36.48
+        by smtp.gmail.com with ESMTPSA id x38sm11372650edx.24.2019.01.24.06.46.17
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 24 Jan 2019 06:36:48 -0800 (PST)
+        Thu, 24 Jan 2019 06:46:18 -0800 (PST)
 From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <5FF168CC-9372-4DE5-BF62-DD3A2EE08384@javigon.com>
+Message-Id: <7B226DC6-D3D0-4014-B110-26D35F6F85DA@javigon.com>
 Content-Type: multipart/signed;
-        boundary="Apple-Mail=_8F20AE3E-B846-4392-AAED-51816256F513";
+        boundary="Apple-Mail=_89066189-14C6-4A13-B98E-3C34811C5AF4";
         protocol="application/pgp-signature";
         micalg=pgp-sha512
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH v1] : Switch to use new generic UUID API
-Date:   Thu, 24 Jan 2019 15:36:47 +0100
-In-Reply-To: <CAHp75Vfd=B-AP=7KNFiDU-qER9BjB0Qw9Lyp+hb8x94NfQiZyA@mail.gmail.com>
-Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Christoph Hellwig <hch@lst.de>,
-        =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-To:     Andy Shevchenko <andy.shevchenko@gmail.com>
-References: <20190110143051.52305-1-andriy.shevchenko@linux.intel.com>
- <20190121084732.GE18680@lst.de> <20190124121659.GH9224@smile.fi.intel.com>
- <6D748F08-F9F9-4DFB-84DF-63E97C691013@javigon.com>
- <CAHp75Vf4ndBaS6BjAM==7csYB9EYDvjV9jT9C6kioDryzb_HnQ@mail.gmail.com>
- <9E0FD459-75F2-4EF1-9310-8FCDF6F87604@javigon.com>
- <CAHp75Vfd=B-AP=7KNFiDU-qER9BjB0Qw9Lyp+hb8x94NfQiZyA@mail.gmail.com>
+Subject: Re: [PATCH v1] lightnvm: Use u64 instead of __le64 for CPU visible
+ side
+Date:   Thu, 24 Jan 2019 15:46:16 +0100
+In-Reply-To: <20190124142207.9060-1-andriy.shevchenko@linux.intel.com>
+Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+References: <20190124142207.9060-1-andriy.shevchenko@linux.intel.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -83,58 +77,73 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---Apple-Mail=_8F20AE3E-B846-4392-AAED-51816256F513
+--Apple-Mail=_89066189-14C6-4A13-B98E-3C34811C5AF4
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;
 	charset=utf-8
 
-
-> On 24 Jan 2019, at 15.13, Andy Shevchenko <andy.shevchenko@gmail.com> =
-wrote:
->=20
-> On Thu, Jan 24, 2019 at 3:45 PM Javier Gonz=C3=A1lez =
-<javier@javigon.com> wrote:
->>> On 24 Jan 2019, at 14.36, Andy Shevchenko =
-<andy.shevchenko@gmail.com> wrote:
->>> On Thu, Jan 24, 2019 at 3:19 PM Javier Gonz=C3=A1lez =
-<javier@javigon.com> wrote:
->>>>> On 24 Jan 2019, at 13.16, Andy Shevchenko =
+> On 24 Jan 2019, at 15.22, Andy Shevchenko =
 <andriy.shevchenko@linux.intel.com> wrote:
 >=20
->>>>> header.uuid is defined using __u8 type, I'm not sure we can use =
-guid_t there.
->>>>=20
->>>> We can turn it into a guid_t and bump the minor version.
->>>=20
->>> It's not so easy. __uXX types are dedicated for external APIs. =
-guid_t
->>> is kernel internal type disregard of (still) presence some uapi =
-bits.
->>> So, the question is those __uXX types in the driver definition is a
->>> simple mistake, (weird) style decision, or what?
->>=20
->> I would define it as a mistake and I think it is worth fixing it. At =
-the
->> moment we are only using this uuid for recovery purposes, to discard
->> data from a different pblk instance,
+> Sparse complains about using strict data types:
 >=20
-> Does this come from outside of the kernel in any mean (user space,
-> data from device, etc)?
-> It sounds to me like it does. In this case there is no mistake and we
-> may not use guid_t there.
+> drivers/lightnvm/pblk-read.c:254:43: warning: incorrect type in =
+assignment (different base types)
+> drivers/lightnvm/pblk-read.c:254:43:    expected restricted __le64 =
+<noident>
+> drivers/lightnvm/pblk-read.c:254:43:    got unsigned long long =
+[unsigned] [usertype] <noident>
+> drivers/lightnvm/pblk-read.c:255:29: warning: cast from restricted =
+__le64
+> drivers/lightnvm/pblk-read.c:268:29: warning: cast from restricted =
+__le64
+> drivers/lightnvm/pblk-read.c:328:41: warning: incorrect type in =
+assignment (different base types)
+> drivers/lightnvm/pblk-read.c:328:41:    expected restricted __le64 =
+<noident>
+> drivers/lightnvm/pblk-read.c:328:41:    got unsigned long long =
+[unsigned] [usertype] <noident>
+>=20
+> In the code it seems explicit that lba_list_mem and lba_list_media =
+members of
+> struct pblk_pr_ctx are used on CPU side, which means they should not =
+be of
+> strict types.
+>=20
+> Change types of lba_list_mem and lba_list_media members to be u64.
+>=20
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> ---
+> drivers/lightnvm/pblk.h | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+> index 12bf02df4204..72ae8755764e 100644
+> --- a/drivers/lightnvm/pblk.h
+> +++ b/drivers/lightnvm/pblk.h
+> @@ -131,8 +131,8 @@ struct pblk_pr_ctx {
+> 	unsigned int bio_init_idx;
+> 	void *ppa_ptr;
+> 	dma_addr_t dma_ppa_list;
+> -	__le64 lba_list_mem[NVM_MAX_VLBA];
+> -	__le64 lba_list_media[NVM_MAX_VLBA];
+> +	u64 lba_list_mem[NVM_MAX_VLBA];
+> +	u64 lba_list_media[NVM_MAX_VLBA];
+> };
+>=20
+> /* Pad context */
+> --
+> 2.20.1
 
-pblk manages the metadata layout without involvement of the device or
-user space, so no, no dependency at this moment.
+Looks good to me. At some point these mapped directly to the metadata
+stored in the device and the type remained when we change it.
 
-It is not pushed anywhere yet, but I have been working on a tool to make
-a pblk recovery tool to enable FTL repairs if something fails in the
-kernel recovery path. Here, I use this uuid to identify the
-instance - is there a way to reconcile guid_t with user space, which
-currently uses the __u8?
 
-Javier
+Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
 
---Apple-Mail=_8F20AE3E-B846-4392-AAED-51816256F513
+
+
+--Apple-Mail=_89066189-14C6-4A13-B98E-3C34811C5AF4
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
 	filename=signature.asc
@@ -144,19 +153,19 @@ Content-Description: Message signed with OpenPGP
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlxJzX8ACgkQPEYBfS0l
-eOB3dxAAiXDnOPZ4wqH5rh2S9wMRLTw2ioFU1O7OxDFKVFi+7ZYXQe743ldv88YM
-1rinFBaOoKpiwP+pRH94xtLv/LlSd3qEvZtdB2yl8CfNc+sUTts3tzUqeuuWzLZw
-7/PrdT7jwN2HYuiiSRtE4M4r8Oe8wimjsXX7Gvt6gePH+aD8WScxxtI0zo+XFVbc
-i2eYWINUlO2E000LmHJthFW2H5ao5sJ9D0ow2FUyuMUirJHgOyO39+BW87kpwS1z
-U6dJuAJd0t/nwfrMHDKdUabegi2tbozeE91X0pTtCSE6km54tnPRGSWJtFUmL+r0
-tY7nRExPOWGEwJAGKgJu6bub9XLLWXQtKPLdjakCMZ6QcrXIYo5NW2bknfbimHFO
-kNdVYgQD9No/7n5oRvUbVJ8hv5QC4Fl2o/2OlWK/d0nFZE4Ya4hn5HjCWsu6fBYf
-Hd13i+KLsPkEjlvxuLZmw5BfaDdyl3VWJDGiR0flXEIQ2irEV3a9gOqMtDmA1QrD
-PPEMm8csOunYAZQ0bjL2JbPRONmQmjc/Fup6jA5Mi6CT0gW1tyrXhy0hIyG7XNdF
-MPz53Z724qQuskIinDH7tnf+oKS0NPA7UsShU8LWQeu+c9r+fYa99vmqkPpzew3z
-tiVa/yhIkEB9xz9Qq283zIvGbxpA+cyrN+16Hwx8gPq5xzUdpBg=
-=l6d2
+iQIzBAEBCgAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlxJz7gACgkQPEYBfS0l
+eODQoQ/9Hfg+Bm8OBNtmiiG0ZvuR8ZJ8Kosul1kCsyA3o12VlSrPnfjKsTdLz2y6
+nw4DTohla7q4m46VIIBaCKz2wTtFaVOj1l29Adn7V2dBFadSfwBQJi5Hb1rrHYGw
+4NMacqpd/JhfLVnwFpiqsTgnOq73DRix0EU2OBRWHILIGdygj9BJRUUe+2Jx2DWM
+M3H+mKXWemISStkcbNdZ0fI6CRzSqKHD6UdQdRThTfpBFrhYUM/C4+sjnh00fbyO
+UzaK+IJIHARBzDc5RQinxPgGLJ3bK1eebTvmasv3EyqZgPnyXGg3Jgk0CBm5mAdh
+J8NnJbFGAYa1YrcyzITy6fS1C/PwKBvAlRAm9CylzQf6XeY/WSDvPgR+7G+jLQmL
+CWeSf9N+Yldpy66egNjGjG8h/i0fs76ihQGF6wamyzfFbqZR1qs17sM9cSfEQQ7/
+MawDh6lqDmAWVj3ZhqZ5W45/Vx/K8qm7Xj3nnAFHd3NTz/u63p2lxxsokCtvBuLW
+LUGSksA8Yj85r249goOzJ0JF6y1sC3q1Li98yoRxGYOiJ+IbX2ZUz8or4tq2rVjR
+QRc6GNkC8H4UWvZ9E20OcQSFOGHybI/rClmd6bN/GQrdOIsh8xV4bhzZX1JjzHpq
+gNjoTcvZfA55GZveP7z5j4FUetzs3sLAAGHhJXwXXGHiltNpo7o=
+=u2Jq
 -----END PGP SIGNATURE-----
 
---Apple-Mail=_8F20AE3E-B846-4392-AAED-51816256F513--
+--Apple-Mail=_89066189-14C6-4A13-B98E-3C34811C5AF4--
