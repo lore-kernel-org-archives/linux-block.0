@@ -2,89 +2,85 @@ Return-Path: <SRS0=8u48=QA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD37C282C3
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 09:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F393C282C3
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 10:28:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AC1AE218A6
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 09:51:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 649D621872
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 10:28:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="tHr1GgUn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727117AbfAXJvx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Jan 2019 04:51:53 -0500
-Received: from 8bytes.org ([81.169.241.247]:59494 "EHLO theia.8bytes.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725939AbfAXJvx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Jan 2019 04:51:53 -0500
-Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 276D048C; Thu, 24 Jan 2019 10:51:51 +0100 (CET)
-Date:   Thu, 24 Jan 2019 10:51:51 +0100
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        iommu@lists.linux-foundation.org, jfehlig@suse.com,
-        jon.grimm@amd.com, brijesh.singh@amd.com, jroedel@suse.de
-Subject: Re: [PATCH 5/5] virtio-blk: Consider virtio_max_dma_size() for
- maximum segment size
-Message-ID: <20190124095150.GL32526@8bytes.org>
-References: <20190123163049.24863-1-joro@8bytes.org>
- <20190123163049.24863-6-joro@8bytes.org>
- <20190123213139.GD9032@lst.de>
- <20190124084011.GJ32526@8bytes.org>
- <20190124084221.GB19441@lst.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190124084221.GB19441@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+        id S1726036AbfAXK2I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Jan 2019 05:28:08 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:44698 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726046AbfAXK2I (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Jan 2019 05:28:08 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0OANvFS003599;
+        Thu, 24 Jan 2019 10:28:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2018-07-02;
+ bh=aDl+ytAS7V7RyMu2EPFO/emYddLI+KhMS1596c8Wtu8=;
+ b=tHr1GgUn2h4foTueONXFusaoEZBO+HGfp6SLMfpvySz9t9Dedjtc7BMXKtMzdsj7it6P
+ aIoLpvevfpAXGpx4uiG6etmkkE9TPUoBYwfKZPj+BFB+E97/gOz4R9rq2ggz6tZpUcSB
+ vDnUERR36gBg4iJcLeMl84tE6O6AsnYAxsJTMtjRmQPW4keHJI8bPpCtYCo6eYrieaeX
+ +FzDm8Uj97jXFxSJ0Ac4tNjMnMTxRjnZ5Tq8YJ/9ULOhRA1HcDiTBcJydcFH0/usXp9z
+ IryKTHobMkVOECZFzHB9v48IG0ZU6RwhtYTWoDQH901oH6mqIQNRIRqqYw0zIa2O/DAL +A== 
+Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
+        by aserp2130.oracle.com with ESMTP id 2q3sdeq781-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 24 Jan 2019 10:28:06 +0000
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x0OAS5N0008234
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 24 Jan 2019 10:28:05 GMT
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x0OAS5kv018676;
+        Thu, 24 Jan 2019 10:28:05 GMT
+Received: from will-ThinkCentre-M93p.cn.oracle.com (/10.182.70.234)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 24 Jan 2019 02:28:05 -0800
+From:   Jianchao Wang <jianchao.w.wang@oracle.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] small optimization for accessing queue map
+Date:   Thu, 24 Jan 2019 18:25:31 +0800
+Message-Id: <1548325533-1695-1-git-send-email-jianchao.w.wang@oracle.com>
+X-Mailer: git-send-email 2.7.4
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9145 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=836
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1901240076
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 24, 2019 at 09:42:21AM +0100, Christoph Hellwig wrote:
-> Yes.  But more importantly it would fix the limit for all other block
-> drivers that set large segment sizes when running over swiotlb.
+Hi Jens
 
-True, so it would be something like the diff below? I havn't worked on
-the block layer, so I don't know if that needs additional checks for
-->dev or anything.
+These two patches are small optimization for accessing the queue mapping
+in hot path. It saves the queue mapping results into blk_mq_ctx directly,
+then we needn't do the complicated bounce on queue_hw_ctx[] map[] and
+mq_map[].
 
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 3e7038e475ee..9a927280c904 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -1,6 +1,7 @@
- /*
-  * Functions related to setting various queue properties from drivers
-  */
-+#include <linux/dma-mapping.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/init.h>
-@@ -303,13 +304,17 @@ EXPORT_SYMBOL_GPL(blk_queue_max_discard_segments);
-  **/
- void blk_queue_max_segment_size(struct request_queue *q, unsigned int max_size)
- {
-+	unsigned int dma_max_size;
-+
- 	if (max_size < PAGE_SIZE) {
- 		max_size = PAGE_SIZE;
- 		printk(KERN_INFO "%s: set to minimum %d\n",
- 		       __func__, max_size);
- 	}
- 
--	q->limits.max_segment_size = max_size;
-+	dma_max_size = dma_max_mapping_size(q->backing_dev_info->dev);
-+
-+	q->limits.max_segment_size = min(max_size, dma_max_size);
- }
- EXPORT_SYMBOL(blk_queue_max_segment_size);
- 
+Jianchao Wang (2)
+blk-mq: save queue mapping result into ctx directly
+blk-mq: save default hctx into ctx->hctxs
+
+ block/blk-mq-sched.c |  2 +-
+ block/blk-mq-tag.c   |  2 +-
+ block/blk-mq.c       | 13 ++++++++++---
+ block/blk-mq.h       | 20 +++++++++-----------
+ block/blk.h          |  2 +-
+ 5 files changed, 22 insertions(+), 17 deletions(-)
+
+Thanks
+Jianchao
