@@ -6,66 +6,66 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 240BBC282C3
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 18:08:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C866C282C3
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 18:09:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D149C218D2
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 18:08:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DEA79218AF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 18:09:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="BgngmbiN"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="t/rIdCWl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729338AbfAXSIQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Jan 2019 13:08:16 -0500
-Received: from mail-it1-f196.google.com ([209.85.166.196]:36499 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729336AbfAXSIP (ORCPT
+        id S1728895AbfAXSJq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Jan 2019 13:09:46 -0500
+Received: from mail-it1-f193.google.com ([209.85.166.193]:51606 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727919AbfAXSJq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Jan 2019 13:08:15 -0500
-Received: by mail-it1-f196.google.com with SMTP id c9so5837345itj.1
-        for <linux-block@vger.kernel.org>; Thu, 24 Jan 2019 10:08:15 -0800 (PST)
+        Thu, 24 Jan 2019 13:09:46 -0500
+Received: by mail-it1-f193.google.com with SMTP id w18so6462755ite.1
+        for <linux-block@vger.kernel.org>; Thu, 24 Jan 2019 10:09:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ennrxO2+TA9zkaPve5mAjE5oq7jQGv//a4Sb+IfsDFc=;
-        b=BgngmbiN/4VsdwAnYPRQpIcT8uwPTLPvVjKvVq3uoh8oOOmfKoFcH6Wsxb0lgBCUL4
-         OtjtD8Xo6G3CTiWkXXySA7SaNDHmuJnYUrGspv0gH+98ktlBO9pmfOumRE3jmN65nMcZ
-         6kg9oS5+csEsYastPC1I+US/h0X5X3qN6Wx1ooJP0xJAX/OLPmf6x+L7CjY5NJBW9UCI
-         j7nU0FNy3gFR8Q84VtpU1lFX6ec8AZchlxntIp9rDvhWfKfPgysQneYPpNnCl7/o60jY
-         tmYWTPypyiFfMWturP9ciA0lcHfW2/L7WkKXy2pFTYLKexQtwIs9UUTQVl8RSKV95mUp
-         nrTw==
+        bh=TRGUm+EfjN52xeP+DATmClAm8sw0OQ55PTGtubkovws=;
+        b=t/rIdCWlm4/d2upHpCETOhem50T0slrN6iPM9alh6PcyvDaILwfJ++d3jlZFHzCY9X
+         U/LExLKJy4oR+l46U6fem0HXs7ne8MxOZslMSAwIqh9/EJXdUnMxAMgC1ZlWRHA6Rdb+
+         BgdJFV72EUu4bT0znrsYt4QMsLmfLivqYgMPFPOZbwRRLKPuYGhi5ZLBouXgj1/R5yO3
+         /UOB7B+wvBt+bVETPtOY/9EeVHFLMoEA705rMwLHs/Rc4OW1bv3CaqunkzDwS3f6HxYS
+         EaO6D/dSzI+SvoKP7x2kEhCt4PDlJXhWhcL9fWQv43VXeje431VHnf2EPUgomdXutA86
+         zphA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=ennrxO2+TA9zkaPve5mAjE5oq7jQGv//a4Sb+IfsDFc=;
-        b=CZNFW035aJXu1eWbZTdk4dqPM3+d0DOACkvDk6SYunmtneGprM+WsNjm+b3GSbBq+p
-         Io9E+gmXU7zafvgL/+Rb2lBRzNx8oocuTsRstVjStT2rM1RsDTK2+K19/8xcaBtIeyFK
-         4vB16tyKlsXCfi5pRUxdPnPDlfht6hVCVHi7LZeqTW1KNw5kedl4QjapYwzXF/oYj0vk
-         f05H0YwaKV6vRwSFZ5A6lVIA0aiwyvoJJVh6gYcN8H6lJfduZJ7oI0zGf0cnpGoeEDUE
-         lEP4xoePzzUIdwb4mqJTPuxoSyCx3+w7ZuKzuQ/orC9JmGNPY5uift49o+no1aaWegek
-         hdlg==
-X-Gm-Message-State: AJcUukea77wWTlZ/SxoDUFHvl69EYVmEFEecJDF5cOi2q7OBQZ6pzRxF
-        MVLu6jVp2MKLO9XrtnMbkmXxiA==
-X-Google-Smtp-Source: ALg8bN6jDY5f6E2UkMC1yvmlHrjg/zjfFpxZK8Gv/AkSibyN/L5+tVer+Vr/oDheHaj/WsIhS6HVYg==
-X-Received: by 2002:a24:9e87:: with SMTP id p129mr2017686itd.148.1548353294725;
-        Thu, 24 Jan 2019 10:08:14 -0800 (PST)
+        bh=TRGUm+EfjN52xeP+DATmClAm8sw0OQ55PTGtubkovws=;
+        b=ZA41KJwPX0CHZVeKsInvkTg8U5UgYh1739q41ZkePmr8ftw5H7bq2oqUqJMDcKBkNf
+         TD2oTpftv3Yh9b+r0eIBQrekLzI0c+memqQ42MBuI0V8aZM/wDxxpzDYHA8mliJfKpsW
+         PpeqTUii9y3LppPjfwW1zkrQ2+IkTxBuoHu0cKWF1Kh+srF5j88Ph8CGRrDP4CPYJNon
+         6bnTfNaoU+jGv2N2gAttO6a/WcyMhvKhkXYsEPgI0vazHnMoYEcjPtUgubLoERBg4TH0
+         72BQ9zvo7BXwX3Hj37ffy/qVEoG6rUkAPHjrCmyZIoqvsHT6w+JmrQ+nvMyqn4Yz22VF
+         kl4g==
+X-Gm-Message-State: AJcUukeQgw6pE7rD8FtOUr5oJ7kuhZs7f623E2wIddqtkVGC5ra39k9i
+        ptckG0SXUoDCZRloUWZZocgEyA==
+X-Google-Smtp-Source: ALg8bN78DB1K2+MDhRMAxYn8/9YNNYGvbmH2KFRVKSj6h6wHklrT94sxxquFF+zwQmyCSjQEhzsCKg==
+X-Received: by 2002:a24:9b87:: with SMTP id o129mr2195276itd.128.1548353385435;
+        Thu, 24 Jan 2019 10:09:45 -0800 (PST)
 Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id x99sm11438742ita.23.2019.01.24.10.08.13
+        by smtp.gmail.com with ESMTPSA id q9sm8828129ioh.32.2019.01.24.10.09.43
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 24 Jan 2019 10:08:13 -0800 (PST)
-Subject: Re: [PATCH 0/2] small optimization for accessing queue map
-To:     Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <1548325533-1695-1-git-send-email-jianchao.w.wang@oracle.com>
+        Thu, 24 Jan 2019 10:09:44 -0800 (PST)
+Subject: Re: [PATCH] blk-wbt: Declare local functions static
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+References: <20190123190557.118894-1-bvanassche@acm.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <531e1343-a941-0137-e21c-036ca8dfbd5a@kernel.dk>
-Date:   Thu, 24 Jan 2019 11:08:12 -0700
+Message-ID: <118da5e6-b977-6cb4-71ce-c7370a962025@kernel.dk>
+Date:   Thu, 24 Jan 2019 11:09:43 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <1548325533-1695-1-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <20190123190557.118894-1-bvanassche@acm.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,16 +74,20 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/24/19 3:25 AM, Jianchao Wang wrote:
-> Hi Jens
+On 1/23/19 12:05 PM, Bart Van Assche wrote:
+> This patch avoids that sparse reports the following warnings:
 > 
-> These two patches are small optimization for accessing the queue mapping
-> in hot path. It saves the queue mapping results into blk_mq_ctx directly,
-> then we needn't do the complicated bounce on queue_hw_ctx[] map[] and
-> mq_map[].
+>   CHECK   block/blk-wbt.c
+> block/blk-wbt.c:600:6: warning: symbol 'wbt_issue' was not declared. Should it be static?
+> block/blk-wbt.c:620:6: warning: symbol 'wbt_requeue' was not declared. Should it be static?
+>   CC      block/blk-wbt.o
+> block/blk-wbt.c:600:6: warning: no previous prototype for wbt_issue [-Wmissing-prototypes]
+>  void wbt_issue(struct rq_qos *rqos, struct request *rq)
+>       ^~~~~~~~~
+> block/blk-wbt.c:620:6: warning: no previous prototype for wbt_requeue [-Wmissing-prototypes]
+>  void wbt_requeue(struct rq_qos *rqos, struct request *rq)
 
-I like this a lot, the current double indirect does suck, and it does show
-up in profiles as well. I'll run some testing with this, thanks!
+Thanks Bart, applied.
 
 -- 
 Jens Axboe
