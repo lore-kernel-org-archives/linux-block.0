@@ -2,190 +2,89 @@ Return-Path: <SRS0=8u48=QA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FF46C282C5
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 09:23:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD37C282C3
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 09:51:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B3712184C
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 09:23:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="q8aoglYn"
+	by mail.kernel.org (Postfix) with ESMTP id AC1AE218A6
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 09:51:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725939AbfAXJXy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Jan 2019 04:23:54 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:40726 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725987AbfAXJXy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Jan 2019 04:23:54 -0500
-Received: by mail-ed1-f66.google.com with SMTP id g22so3982449edr.7
-        for <linux-block@vger.kernel.org>; Thu, 24 Jan 2019 01:23:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=hazvHEbzHlDqYsmMEu8W14zUjeP0zUZTkCQb1dt0eUQ=;
-        b=q8aoglYnAJuQYRQUnSNzn1ctrHw93ML1rLpvdb27JoNLtAIeEK3wEimXsO9NNwjju/
-         tvchnR1NGuDBRa9Ot91sQWhKeu3CJ3QgHQ+NRZzOEud+ER2vOwtXO7cASCEu8ccGzF2Z
-         torGYOBY3YNghxopWmDzGISu4LFXg7NukGQWkVIRRkSmHj+j19ZVC3lFotxJs6UgP4P9
-         ws9jYKjwjoCOEmCh/JT7Sy7bon+n3MYWc2cpuk01Q/0YrDnhxRhVOhjMY0okQ/0Z23Ae
-         6XYwVB9lScsaRXnZY6C7O5M5rtw7urcH1/2RvlGLqFdL0TYC6EVKgg9MTwlP391SYzDg
-         5g4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=hazvHEbzHlDqYsmMEu8W14zUjeP0zUZTkCQb1dt0eUQ=;
-        b=RoiKBhlqa8nfDyaExOYutqVFydb2fagsXJpXVZ4yGyz+0zf4+Y1noRTacdo6gaZ3Ln
-         dKBljH/5vteDOaopq/US9IZe1kjN6dKBGr0K3qBahgFu6kdgc1xNEOIUDL8gH+qzLmlK
-         xl2MwrGeLV8lTjXnOETJlaMPi5iKeNCsrzZCK6Vec5FWvvmP5TOOpFyVYQYbavVwslIM
-         vT4RESFzS0vDPMpe/jo50FUUXmVby9UWNyDtsva7FsMROOxG+9NfJfOnUiLqGOzIx/23
-         SNR/Ng6HvIgmKvb0Rt2Ouyj0v/MJMsFLXeoRf2PapBxYRDhmBtre0NTShYN4zinDt7pO
-         PhAA==
-X-Gm-Message-State: AJcUukfX/e+/pd3ivtrr5YRwbQAZvBXBqXpBosu5fSY5RHhAGbpnSYqI
-        hlyHWogURA0/lqqcd6nBrY2HNA==
-X-Google-Smtp-Source: ALg8bN5sxoEjzFgr0jiHUYeJuF6tyRWpjNifCnTAyCYQYadzthO/x8istF+WsPcZnvWFKEjOHlo8vA==
-X-Received: by 2002:a50:bc12:: with SMTP id j18mr6036401edh.50.1548321831072;
-        Thu, 24 Jan 2019 01:23:51 -0800 (PST)
-Received: from [192.168.1.85] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id gy12-v6sm6096573ejb.44.2019.01.24.01.23.50
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 24 Jan 2019 01:23:50 -0800 (PST)
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <2C518FDB-F9A4-4884-9317-A3AC207E316D@javigon.com>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_B00D8D2F-6C7C-4FE7-9B2E-0877BFFC739A";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha512
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 2/4] introduce four macros for in-kernel hints
-Date:   Thu, 24 Jan 2019 10:23:49 +0100
-In-Reply-To: <20190124083536.GB12184@quack2.suse.cz>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-nvme@lists.infradead.org, jack@suse.com, david@fromorbit.com,
-        tytso@mit.edu, prakash.v@samsung.com, Jens Axboe <axboe@kernel.dk>
-To:     Jan Kara <jack@suse.cz>
-References: <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
- <CGME20190109153336epcas2p29b3275b6c545e483a3f43b92268f08bf@epcas2p2.samsung.com>
- <1547047861-7271-3-git-send-email-joshi.k@samsung.com>
- <B4980620-2CFF-41C1-8EE7-C33F1FE431C0@javigon.com>
- <20190124083536.GB12184@quack2.suse.cz>
-X-Mailer: Apple Mail (2.3445.102.3)
+        id S1727117AbfAXJvx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Jan 2019 04:51:53 -0500
+Received: from 8bytes.org ([81.169.241.247]:59494 "EHLO theia.8bytes.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725939AbfAXJvx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Jan 2019 04:51:53 -0500
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id 276D048C; Thu, 24 Jan 2019 10:51:51 +0100 (CET)
+Date:   Thu, 24 Jan 2019 10:51:51 +0100
+From:   Joerg Roedel <joro@8bytes.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, jfehlig@suse.com,
+        jon.grimm@amd.com, brijesh.singh@amd.com, jroedel@suse.de
+Subject: Re: [PATCH 5/5] virtio-blk: Consider virtio_max_dma_size() for
+ maximum segment size
+Message-ID: <20190124095150.GL32526@8bytes.org>
+References: <20190123163049.24863-1-joro@8bytes.org>
+ <20190123163049.24863-6-joro@8bytes.org>
+ <20190123213139.GD9032@lst.de>
+ <20190124084011.GJ32526@8bytes.org>
+ <20190124084221.GB19441@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190124084221.GB19441@lst.de>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Jan 24, 2019 at 09:42:21AM +0100, Christoph Hellwig wrote:
+> Yes.  But more importantly it would fix the limit for all other block
+> drivers that set large segment sizes when running over swiotlb.
 
---Apple-Mail=_B00D8D2F-6C7C-4FE7-9B2E-0877BFFC739A
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+True, so it would be something like the diff below? I havn't worked on
+the block layer, so I don't know if that needs additional checks for
+->dev or anything.
 
-
-> On 24 Jan 2019, at 09.35, Jan Kara <jack@suse.cz> wrote:
->=20
-> On Wed 23-01-19 19:27:12, Javier Gonz=C3=A1lez wrote:
->>> On 9 Jan 2019, at 16.30, Kanchan Joshi <joshi.k@samsung.com> wrote:
->>>=20
->>> Exiting write-hints are exposed to user-mode. There is a possiblity
->>> of conflict if kernel happens to use those. This patch introduces =
-four
->>> write-hints for exclusive kernel-mode use.
->>>=20
->>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
->>> ---
->>> include/linux/fs.h | 5 +++++
->>> 1 file changed, 5 insertions(+)
->>>=20
->>> diff --git a/include/linux/fs.h b/include/linux/fs.h
->>> index 811c777..e8548eb 100644
->>> --- a/include/linux/fs.h
->>> +++ b/include/linux/fs.h
->>> @@ -291,6 +291,11 @@ enum rw_hint {
->>> 	WRITE_LIFE_MEDIUM	=3D RWH_WRITE_LIFE_MEDIUM,
->>> 	WRITE_LIFE_LONG		=3D RWH_WRITE_LIFE_LONG,
->>> 	WRITE_LIFE_EXTREME	=3D RWH_WRITE_LIFE_EXTREME,
->>> +/* below ones are meant for in-kernel use */
->>> +	KERN_WRITE_LIFE_SHORT,
->>> +	KERN_WRITE_LIFE_MEDIUM,
->>> +	KERN_WRITE_LIFE_LONG,
->>> +	KERN_WRITE_LIFE_EXTREME
->>> };
->>=20
->> I think Jens and Dave meant kernel hints to go top down. This would =
-also
->> give space for supporting more hints / streams from both ends for =
-user
->> and kernel.
->=20
-> Yes, that was the idea however if I understand it right, the write =
-hints do
-> not really have to be consistent boot-to-boot since they aren't stored
-> persistently by the disk, are they? If that's the case, it doesn't =
-really
-> matter which numbers we pick.
->=20
-
-I guess this is implementation specific. Some times the drive will want
-to store this to improve GC. For the current "coldness" hint I does not
-matter much, but if the hint were to express other metric it can become
-relevant.
-
-Anyway, the comment was more to separate user / kernel hints and allow
-them to grow from the ends.
-
-
-> One thing I don't quite like is the naming of KERN_WRITE_LIFE_SHORT =
-etc.. It
-> is upto filesystem to assign meanings to the write hints. So I think =
-it is
-> enough to provide something like KERN_WRITE_HINT_MIN which is the =
-first
-> hint available to the kernel and then the number of hints available to =
-the
-> kernel.
->=20
-
-Makes sense to me. Then we can rename the hint for each FS to give it
-proper mening.
-
-> 								Honza
->=20
-> --
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
-
-Javier
-
---Apple-Mail=_B00D8D2F-6C7C-4FE7-9B2E-0877BFFC739A
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlxJhCUACgkQPEYBfS0l
-eOCfqw/+OAPsQEb+p6m8d765keQKVs7rRTbuTrj9+7rwHKgCFq34+fO7NbGgcDxE
-BE8strFx3oUXGEoF3VX8+PJEXWEebKQ8FvQ6i3YylHhcW15PXBrnY0kUkPvAzshJ
-yfkn5WUZM9UTEEFP6SeYaIKUIt9lZwEB3+xOCBbEEceCs55nBcc7grb7GA6BGhWQ
-DobjMDCbFDXm7BwvDkyN+rvzj+zLvAWeTBdHrsQUQXZr1owclr9qSdxIO7+mZpJo
-2gw1ufg/U60bmb6lfgcL5Dlh9U5by1cmHdo/CJsCbOYEg2mff5MzAlcg7pWssPUv
-guJ5atDffHudLpgLi0D+skLtzOYn067otjlfYiZYSEXkwdlJE14octZAQp+B/rMQ
-xDqQ1BkrHlgmf/ex3oGHqEG3GrO/4bpW+nctgA/QdKVPHVlMaqcFGJjozhvG0ebg
-NMS91G9cNDprPjAu9jPgsVHJKBSd79exCRMmECNxyzVDtmdtl0tCo16ez12gECvq
-qkSQyPI1w4jNJYcXjpJqdn9thXinhwbF+loI9sLjtecqb+g1rUnSUYFuLWOktf92
-Yn9KRzSCtlpdCRmr9CRbJhkisL8ERr0PywqjMk7LDQfSd/Nc4vyCpewH/FX3s1U5
-2+JdCebzvIFIKypx2+ocXx50za6dY/phVmYMZFz9UYIK6iZ9Tf4=
-=tt2d
------END PGP SIGNATURE-----
-
---Apple-Mail=_B00D8D2F-6C7C-4FE7-9B2E-0877BFFC739A--
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 3e7038e475ee..9a927280c904 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -1,6 +1,7 @@
+ /*
+  * Functions related to setting various queue properties from drivers
+  */
++#include <linux/dma-mapping.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/init.h>
+@@ -303,13 +304,17 @@ EXPORT_SYMBOL_GPL(blk_queue_max_discard_segments);
+  **/
+ void blk_queue_max_segment_size(struct request_queue *q, unsigned int max_size)
+ {
++	unsigned int dma_max_size;
++
+ 	if (max_size < PAGE_SIZE) {
+ 		max_size = PAGE_SIZE;
+ 		printk(KERN_INFO "%s: set to minimum %d\n",
+ 		       __func__, max_size);
+ 	}
+ 
+-	q->limits.max_segment_size = max_size;
++	dma_max_size = dma_max_mapping_size(q->backing_dev_info->dev);
++
++	q->limits.max_segment_size = min(max_size, dma_max_size);
+ }
+ EXPORT_SYMBOL(blk_queue_max_segment_size);
+ 
