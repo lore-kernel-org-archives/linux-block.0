@@ -2,90 +2,109 @@ Return-Path: <SRS0=8u48=QA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55D93C282C3
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 10:29:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 672C3C282C3
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 12:14:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 13FE7217D4
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 10:29:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="l8XFMqIy"
+	by mail.kernel.org (Postfix) with ESMTP id 363DD21872
+	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 12:14:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726041AbfAXK34 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Jan 2019 05:29:56 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:46834 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725939AbfAXK34 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Jan 2019 05:29:56 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0OASm47006769;
-        Thu, 24 Jan 2019 10:29:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2018-07-02;
- bh=hQej6UF1LTZ0w9kwbGSYaL9fm0v3KNorNjx9k+P50rw=;
- b=l8XFMqIyFTBwwAa2iZ8X6xFqRg0QCOgUQs9Cx7v4gJgbRgu+qLyxiZsz0uB4Cw6GbwUj
- GnUWq4RIyR67c19gGF6qv/cgTxPKJtvgruWNU8Lk7NQLNDw4gLfbCCy0AdFhWzPFdFxH
- /tPgZAH9hc81CZzk5p+WwfRUQZonDxYLPvzI0MNXoD6kMXBh9dhiWF2oc7P+aqlvMKgA
- 31gvnvscT0dJxv9dleH6v8BxynxqQufptR00iLaEvjZ9hhMlCgvjk3JHBeSUpFyr/35R
- yFtMoydQGAsnmg/pvQUWDi5Fix74L34pgIRqM+iHElIUHP0bSU5aNG0tH9/U9Bz04hAO ng== 
-Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by aserp2130.oracle.com with ESMTP id 2q3sdeq7e9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Jan 2019 10:29:54 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x0OATrNc006444
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 24 Jan 2019 10:29:53 GMT
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x0OATrVR020958;
-        Thu, 24 Jan 2019 10:29:53 GMT
-Received: from will-ThinkCentre-M93p.cn.oracle.com (/10.182.70.234)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 24 Jan 2019 02:29:53 -0800
-From:   Jianchao Wang <jianchao.w.wang@oracle.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] blk-mq: fix the cmd_flag_name array
-Date:   Thu, 24 Jan 2019 18:28:55 +0800
-Message-Id: <1548325735-1760-1-git-send-email-jianchao.w.wang@oracle.com>
-X-Mailer: git-send-email 2.7.4
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9145 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=814
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1901240077
+        id S1727455AbfAXMOz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Jan 2019 07:14:55 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2226 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726105AbfAXMOz (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Jan 2019 07:14:55 -0500
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 9F4EFB7A88A84F59BDC8;
+        Thu, 24 Jan 2019 20:14:52 +0800 (CST)
+Received: from 138.huawei.com (10.175.124.28) by
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.408.0; Thu, 24 Jan 2019 20:14:48 +0800
+From:   Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+Subject: [PATCH] block: Fix a WRITE SAME BUG_ON
+Date:   Thu, 24 Jan 2019 20:13:15 +0800
+Message-ID: <20190124121315.6737-1-zhangxiaoxu5@huawei.com>
+X-Mailer: git-send-email 2.14.4
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.28]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Swap REQ_NOWAIT and REQ_NOUNMAP and add REQ_HIPRI.
+If the lvm is stacked by different logical_block_size disks,
+when WRITE SAME on it, will bug_on:
 
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+kernel BUG at drivers/scsi/sd.c:968!
+invalid opcode: 0000 [#1] SMP PTI
+CPU: 11 PID: 525 Comm: kworker/11:1H Tainted: G           O      5.0.0-rc3+ #2
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-2.fc27 04/01/2014
+Workqueue: kblockd blk_mq_run_work_fn
+RIP: 0010:sd_init_command+0x7aa/0xdb0
+Code: 30 75 00 00 c7 85 44 01 00 00 18 00 00 00 0f 85 fa 04 00 00 48 83 c4 40 48
+      89 df 5b 5d 41 5c 41 5d 41 5e 41 5f e9 b6 ca fe ff <0f> 0b 41 bc 09
+RSP: 0018:ffffb55f80ddbca0 EFLAGS: 00010206
+RAX: 0000000000001000 RBX: ffff9ed23fb927a0 RCX: 000000000000f000
+RDX: ffff9ed23f0a8400 RSI: ffff9ed27bc79800 RDI: 0000000000000000
+RBP: ffff9ed23fb92680 R08: ffff9ed27c8c0000 R09: ffff9ed23fb927d8
+R10: 0000000000000000 R11: fefefefefefefeff R12: ffff9ed27bc79800
+R13: ffff9ed2787a0000 R14: ffff9ed27bdf3400 R15: ffff9ed23fb927a0
+FS:  0000000000000000(0000) GS:ffff9ed27c8c0000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f6b14cf9341 CR3: 0000000069058000 CR4: 00000000000006e0
+Call Trace:
+ ? vp_notify+0x12/0x20
+ scsi_queue_rq+0x525/0xa30
+ blk_mq_dispatch_rq_list+0x8d/0x580
+ ? syscall_return_via_sysret+0x10/0x7f
+ ? elv_rb_del+0x1f/0x30
+ ? deadline_remove_request+0x55/0xc0
+ blk_mq_do_dispatch_sched+0x76/0x110
+ blk_mq_sched_dispatch_requests+0xf9/0x170
+ __blk_mq_run_hw_queue+0x51/0xd0
+ process_one_work+0x195/0x380
+ worker_thread+0x30/0x390
+ ? process_one_work+0x380/0x380
+ kthread+0x113/0x130
+ ? kthread_park+0x90/0x90
+ ret_from_fork+0x35/0x40
+Modules linked in: alloc(O+)
+---[ end trace dc92ddeb2e6d1fe5 ]---
+
+The logical_block_size of the LVM is the max value of the sub disks,
+it maybe different with one of the sub disk. when WRITE SAME on the
+disk, it will BUG_ON when setup WRITE SAME cmd.
+
+Close WRITE_SAME feature on the LVM if it was stacked by different
+logical_block_size disk.
+
+Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
 ---
- block/blk-mq-debugfs.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ block/blk-settings.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-index 90d6876..f812083 100644
---- a/block/blk-mq-debugfs.c
-+++ b/block/blk-mq-debugfs.c
-@@ -308,8 +308,9 @@ static const char *const cmd_flag_name[] = {
- 	CMD_FLAG_NAME(PREFLUSH),
- 	CMD_FLAG_NAME(RAHEAD),
- 	CMD_FLAG_NAME(BACKGROUND),
--	CMD_FLAG_NAME(NOUNMAP),
- 	CMD_FLAG_NAME(NOWAIT),
-+	CMD_FLAG_NAME(NOUNMAP),
-+	CMD_FLAG_NAME(HIPRI),
- };
- #undef CMD_FLAG_NAME
+diff --git a/block/blk-settings.c b/block/blk-settings.c
+index 3e7038e475ee..e1695155ad61 100644
+--- a/block/blk-settings.c
++++ b/block/blk-settings.c
+@@ -537,6 +537,10 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+ 		}
+ 	}
+ 
++	/* If the logical block size is different, forbid write same */
++	if (t->logical_block_size != b->logical_block_size)
++		t->max_write_same_sectors = 0;
++
+ 	t->logical_block_size = max(t->logical_block_size,
+ 				    b->logical_block_size);
  
 -- 
-2.7.4
+2.14.4
 
