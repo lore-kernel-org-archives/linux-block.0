@@ -7,223 +7,190 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E44A7C282C0
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 13:33:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC83C282C0
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 14:21:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9848C218CD
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 13:33:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE11C218A2
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 14:21:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="0UtD5+s2"
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="IkUpeWZi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726269AbfAYNdi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Jan 2019 08:33:38 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:40272 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726256AbfAYNdh (ORCPT
+        id S1726761AbfAYOVN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Jan 2019 09:21:13 -0500
+Received: from mail-vs1-f66.google.com ([209.85.217.66]:43155 "EHLO
+        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726100AbfAYOVM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Jan 2019 08:33:37 -0500
-Received: by mail-ed1-f66.google.com with SMTP id g22so7385409edr.7
-        for <linux-block@vger.kernel.org>; Fri, 25 Jan 2019 05:33:36 -0800 (PST)
+        Fri, 25 Jan 2019 09:21:12 -0500
+Received: by mail-vs1-f66.google.com with SMTP id x1so5731216vsc.10
+        for <linux-block@vger.kernel.org>; Fri, 25 Jan 2019 06:21:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=vm4dOblR803lam2cOcstVjN9CzpT0/0jTJUEghzvZX8=;
-        b=0UtD5+s2555Tn5bJrwywrB+fw6M2ALDD+j3H8OBAOmvLcBCahrDndkKTqBnflXk1mP
-         HlIIzpOOuahAuVXXRlwTFcQxxJTadXEgtwzj4dOpRX+QcX0e1iAstSJK/xM3a4zYaK9g
-         p6U5XTTY/MqafVSKDe3MDz6omgMc6G/m8/bYvGsJwr3FsUKzGFOAtxoZRl7oY2WTvQc0
-         uqAx0O7s6GaJLCCL0M2eN9aEkDqJpJJrFK+/7tO3qpQwjCKziBXc9GTR48a7CZhBeELc
-         wQzbvxGVz44GmH2QZw6KNVE0rN0RuDKmAgPnWIKNIpER52qKgcvFvUXRObISMg8NWKqP
-         z6pw==
+        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Pu6N6jGuNFqfIUYOymF/5XAZpuV7niHm+F6sM+3J2jg=;
+        b=IkUpeWZiNjRK/ZEn9MZpRsjsaUz+8LyBybsDxtMu4ctZTp9LudgzWJWyA+B3WyNmJy
+         tYhLfEXsBszibrAHCNvca6wtcAdzn38bYXoxXv6KKeUFSrH8rIEGi3yt2JZYpN022BJo
+         wDFvCbthvYY4o4jWAUCEIYWc6dGRxmBe9/PojXi8kf3SM+sK/lFpVZ5e3bclr0t64GJS
+         KT/Jcxhy5a4QoyMZyNvuXHlUz2/4o+VRTvLJKiTpsK/OtJVhLIh4vwLiaAYQikIjRc/e
+         U/fvaIZplxTsl1K49922Ez4iCmChvOcst/5Y/6nBEncbKCxNAH+bWTabizXwdp98rbMl
+         otPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=vm4dOblR803lam2cOcstVjN9CzpT0/0jTJUEghzvZX8=;
-        b=Jo4lDtjBEH7IkSX3N9Ag9Nv1aW0J/io4t3rOdQjL6C7RZy+mnKOTpHdWhdUPByouuZ
-         ODM16AcybCveuXj68APr24TQ1iBP7b3aZBeFpfQu1mcy3aUJWG7iA5cpdTLjNbSnhZNa
-         3qhJDivk5kUw9gp0RcMfYVJEh6DzPVj8GhZ0w9r79DEC5Lh1SPH9anHEM9e5jcnihh/G
-         xY4QWW5yRNFdRH9C2MABYRDAzTc2X9btIalF2lObAYwOqpwMb+oFVXVpwKMw2PBIUV/U
-         OS6DknKZ3yQ/M0iWxdRXaA5UxqBbXcofMcw10L10hrsbihLkODvBxqr3OeZjBOBrm5sX
-         GAXQ==
-X-Gm-Message-State: AJcUukdXUZfqfSUdCM0DsZKSwgeGBfCEC/wT/qMzNU0tKMZwmftMtpmK
-        H5/BRrp/UhMRStVduPxilaqu7g==
-X-Google-Smtp-Source: ALg8bN56ZAgRGmn1De/Uv1vwbe8EbIqPG551VJwow4VFGNgudQQKKpee2mCC3gz6yOpxwW+hbWzrLw==
-X-Received: by 2002:a50:93c5:: with SMTP id o63mr10620466eda.20.1548423215835;
-        Fri, 25 Jan 2019 05:33:35 -0800 (PST)
-Received: from [192.168.1.85] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id y53sm11909257edd.84.2019.01.25.05.33.34
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 25 Jan 2019 05:33:35 -0800 (PST)
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <8C200D38-729F-407B-B2F8-48AEA7F0FF08@javigon.com>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_749AD0B9-63BB-4FEC-9FF9-C613C0A4E5F5";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha512
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH v3] lightnvm: pblk: ignore bad block wp for
- pblk_line_wp_is_unbalanced
-Date:   Fri, 25 Jan 2019 14:33:33 +0100
-In-Reply-To: <CANr-nt0sA0DH-hjfGKSq+88R7GXypVKmSf+Z+Tgy+duMegVE3Q@mail.gmail.com>
-Cc:     Zhoujie Wu <zjwu@marvell.com>,
-        =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        linux-block@vger.kernel.org, hongd@marvell.com
-To:     Hans Holmberg <hans.ml.holmberg@owltronix.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Pu6N6jGuNFqfIUYOymF/5XAZpuV7niHm+F6sM+3J2jg=;
+        b=GOt10DF7M1u7/muYNQxkGcEJ9G4TlwjmUU64hAfa4Us6I0Kkqr5YGZf7ver1/eNH7G
+         j8XZ3drqnic843m8SXOod0/k9eKHIhfLGRTDK942cs57P6GD2grvZLpshE39ERUSnJu+
+         dEpIkP+kldpE5uAn2jyFldLzhb+KZOlJdVbwCe2JRMtxq5/cMoWY7l6xlyfQjwkwJEeM
+         KrGC+kgFb69avjIVnPiEYbGQ1miKBE58Is32Xd3edork7u2yojyAfr2ZyUgnnca779Mt
+         Ct6T+Hgdkapl+/vFtjnWUbjKx4dTjqni+hCLFvvlaeafQ5xb689ux3BAiRArTj0JJDNV
+         DbrQ==
+X-Gm-Message-State: AJcUuke697Knc/jUwciXY563dIoVYE8lUvraLnCGEgsLOJiltSOTrVIi
+        NmsPptB/2KQGw0Q8EwJIkqJNvLVAi7skrreLcE5DeA==
+X-Google-Smtp-Source: ALg8bN6aw4shiY+M0BnaNn8a4kincpZgYsXRHTv71DHVRAkER8o5qwkDjSW0wFFjz0acvnFWPEtTUKdLvSMC/CRHW8A=
+X-Received: by 2002:a67:2584:: with SMTP id l126mr4597427vsl.153.1548426071476;
+ Fri, 25 Jan 2019 06:21:11 -0800 (PST)
+MIME-Version: 1.0
 References: <1548359553-11356-1-git-send-email-zjwu@marvell.com>
  <CANr-nt3_8YftCP6Oqgnp39YzeF5qpUCBKLPUZ5=TBqP9MFw25g@mail.gmail.com>
- <CDB99159-EAC8-410A-A556-E412DB2829A1@javigon.com>
- <CANr-nt0sA0DH-hjfGKSq+88R7GXypVKmSf+Z+Tgy+duMegVE3Q@mail.gmail.com>
-X-Mailer: Apple Mail (2.3445.102.3)
+ <CDB99159-EAC8-410A-A556-E412DB2829A1@javigon.com> <CANr-nt0sA0DH-hjfGKSq+88R7GXypVKmSf+Z+Tgy+duMegVE3Q@mail.gmail.com>
+ <8C200D38-729F-407B-B2F8-48AEA7F0FF08@javigon.com>
+In-Reply-To: <8C200D38-729F-407B-B2F8-48AEA7F0FF08@javigon.com>
+From:   Hans Holmberg <hans.ml.holmberg@owltronix.com>
+Date:   Fri, 25 Jan 2019 15:21:00 +0100
+Message-ID: <CANr-nt1aS1DxfC42bX2DfVg3xo5Kkc_YJOe_CBK9k-NATh3ezQ@mail.gmail.com>
+Subject: Re: [PATCH v3] lightnvm: pblk: ignore bad block wp for pblk_line_wp_is_unbalanced
+To:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
+Cc:     Zhoujie Wu <zjwu@marvell.com>,
+        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        linux-block@vger.kernel.org, hongd@marvell.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
---Apple-Mail=_749AD0B9-63BB-4FEC-9FF9-C613C0A4E5F5
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
-
-
-> On 25 Jan 2019, at 13.59, Hans Holmberg =
-<hans.ml.holmberg@owltronix.com> wrote:
->=20
-> On Fri, Jan 25, 2019 at 10:41 AM Javier Gonz=C3=A1lez =
-<javier@javigon.com> wrote:
->>> On 25 Jan 2019, at 09.47, Hans Holmberg =
-<hans.ml.holmberg@owltronix.com> wrote:
->>>=20
->>> On Thu, Jan 24, 2019 at 8:51 PM Zhoujie Wu <zjwu@marvell.com> wrote:
->>>> The write pointer of the bad block could be 0 or undefined, ignore
->>>> the checking of the bad block wp for pblk_line_wp_is_unbalanced to
->>>> avoid fake warning.
->>>=20
->>> fake -> spurious?
->>>=20
->>>> Signed-off-by: Zhoujie Wu <zjwu@marvell.com>
->>>> ---
->>>> v3: return in case bit >=3D lm->blk_per_line.
->>>> v2: changed according to Javier's comments.
->>>>=20
->>>> drivers/lightnvm/pblk-recovery.c | 12 +++++++++---
->>>> 1 file changed, 9 insertions(+), 3 deletions(-)
->>>>=20
->>>> diff --git a/drivers/lightnvm/pblk-recovery.c =
-b/drivers/lightnvm/pblk-recovery.c
->>>> index 6761d2a..02d466e 100644
->>>> --- a/drivers/lightnvm/pblk-recovery.c
->>>> +++ b/drivers/lightnvm/pblk-recovery.c
->>>> @@ -312,21 +312,27 @@ static int pblk_line_wp_is_unbalanced(struct =
-pblk *pblk,
->>>>       struct nvm_chk_meta *chunk;
->>>>       struct ppa_addr ppa;
->>>>       u64 line_wp;
->>>> -       int pos, i;
->>>> +       int pos, i, bit;
->>>=20
->>> We don't need both bit and i, one of them is enough.
->>>=20
->>>> -       rlun =3D &pblk->luns[0];
->>>> +       bit =3D find_first_zero_bit(line->blk_bitmap, =
-lm->blk_per_line);
->>>> +       if (bit >=3D lm->blk_per_line)
->>>> +               return 0;
->>>=20
->>> If there is only one non-offline chunk in the line, the wp can't be =
-unbalanced,
->>> so it should be safe to return 0 here if bit >=3D lm->blk_per_line - =
+On Fri, Jan 25, 2019 at 2:33 PM Javier Gonz=C3=A1lez <javier@javigon.com> w=
+rote:
+>
+>
+> > On 25 Jan 2019, at 13.59, Hans Holmberg <hans.ml.holmberg@owltronix.com=
+> wrote:
+> >
+> > On Fri, Jan 25, 2019 at 10:41 AM Javier Gonz=C3=A1lez <javier@javigon.c=
+om> wrote:
+> >>> On 25 Jan 2019, at 09.47, Hans Holmberg <hans.ml.holmberg@owltronix.c=
+om> wrote:
+> >>>
+> >>> On Thu, Jan 24, 2019 at 8:51 PM Zhoujie Wu <zjwu@marvell.com> wrote:
+> >>>> The write pointer of the bad block could be 0 or undefined, ignore
+> >>>> the checking of the bad block wp for pblk_line_wp_is_unbalanced to
+> >>>> avoid fake warning.
+> >>>
+> >>> fake -> spurious?
+> >>>
+> >>>> Signed-off-by: Zhoujie Wu <zjwu@marvell.com>
+> >>>> ---
+> >>>> v3: return in case bit >=3D lm->blk_per_line.
+> >>>> v2: changed according to Javier's comments.
+> >>>>
+> >>>> drivers/lightnvm/pblk-recovery.c | 12 +++++++++---
+> >>>> 1 file changed, 9 insertions(+), 3 deletions(-)
+> >>>>
+> >>>> diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pbl=
+k-recovery.c
+> >>>> index 6761d2a..02d466e 100644
+> >>>> --- a/drivers/lightnvm/pblk-recovery.c
+> >>>> +++ b/drivers/lightnvm/pblk-recovery.c
+> >>>> @@ -312,21 +312,27 @@ static int pblk_line_wp_is_unbalanced(struct p=
+blk *pblk,
+> >>>>       struct nvm_chk_meta *chunk;
+> >>>>       struct ppa_addr ppa;
+> >>>>       u64 line_wp;
+> >>>> -       int pos, i;
+> >>>> +       int pos, i, bit;
+> >>>
+> >>> We don't need both bit and i, one of them is enough.
+> >>>
+> >>>> -       rlun =3D &pblk->luns[0];
+> >>>> +       bit =3D find_first_zero_bit(line->blk_bitmap, lm->blk_per_li=
+ne);
+> >>>> +       if (bit >=3D lm->blk_per_line)
+> >>>> +               return 0;
+> >>>
+> >>> If there is only one non-offline chunk in the line, the wp can't be u=
+nbalanced,
+> >>> so it should be safe to return 0 here if bit >=3D lm->blk_per_line - =
 1
->>>=20
->>> If you change this please document why using a comment, as it might
->>> not be obvious
->>>=20
->>>> +       rlun =3D &pblk->luns[bit];
->>>>       ppa =3D rlun->bppa;
->>>>       pos =3D pblk_ppa_to_pos(geo, ppa);
->>>>       chunk =3D &line->chks[pos];
->>>=20
->>>>       line_wp =3D chunk->wp;
->>>>=20
->>>> -       for (i =3D 1; i < lm->blk_per_line; i++) {
->>>> +       for (i =3D bit + 1; i < lm->blk_per_line; i++) {
->>>=20
->>>>               rlun =3D &pblk->luns[i];
->>>>               ppa =3D rlun->bppa;
->>>>               pos =3D pblk_ppa_to_pos(geo, ppa);
->>>>               chunk =3D &line->chks[pos];
->>>=20
->>> This code is a copy of the code above, it'd be nice to refactor it
->>> into a helper function or just do the chunk lookups in one place.
->>>=20
->>>> +               if (chunk->state & NVM_CHK_ST_OFFLINE)
->>>> +                       continue;
->>>> +
->>>=20
->>> Since we rely on the block bitmap anyway, we might as well just
->>> iterate over the zeroes in the block bitmap using find_next_zero_bit
->>> instead.
->>> We do this in lots of other places, see: git grep -n
->>> find_next_zero_bit -- drivers/lightnvm
->>=20
->> Hans, I proposed him to use the chunk->state instead. I think it is =
-way
->> more robust. We introduced the block bitmap for OCSSD 1.2, because =
-there
->> was no state. Now that we have state, it is better to use it instead. =
+> >>>
+> >>> If you change this please document why using a comment, as it might
+> >>> not be obvious
+> >>>
+> >>>> +       rlun =3D &pblk->luns[bit];
+> >>>>       ppa =3D rlun->bppa;
+> >>>>       pos =3D pblk_ppa_to_pos(geo, ppa);
+> >>>>       chunk =3D &line->chks[pos];
+> >>>
+> >>>>       line_wp =3D chunk->wp;
+> >>>>
+> >>>> -       for (i =3D 1; i < lm->blk_per_line; i++) {
+> >>>> +       for (i =3D bit + 1; i < lm->blk_per_line; i++) {
+> >>>
+> >>>>               rlun =3D &pblk->luns[i];
+> >>>>               ppa =3D rlun->bppa;
+> >>>>               pos =3D pblk_ppa_to_pos(geo, ppa);
+> >>>>               chunk =3D &line->chks[pos];
+> >>>
+> >>> This code is a copy of the code above, it'd be nice to refactor it
+> >>> into a helper function or just do the chunk lookups in one place.
+> >>>
+> >>>> +               if (chunk->state & NVM_CHK_ST_OFFLINE)
+> >>>> +                       continue;
+> >>>> +
+> >>>
+> >>> Since we rely on the block bitmap anyway, we might as well just
+> >>> iterate over the zeroes in the block bitmap using find_next_zero_bit
+> >>> instead.
+> >>> We do this in lots of other places, see: git grep -n
+> >>> find_next_zero_bit -- drivers/lightnvm
+> >>
+> >> Hans, I proposed him to use the chunk->state instead. I think it is wa=
+y
+> >> more robust. We introduced the block bitmap for OCSSD 1.2, because the=
+re
+> >> was no state. Now that we have state, it is better to use it instead. =
 In
->> fact, we should remove the bock bitmap as we have to check for the =
-state
->> either way - note that this aligns also very well with you patches
->> removing the other bitmaps.
->=20
-> These are just nitpicks.
->=20
-> Relying on two data structures(chunks, block bitmap) to be in sync in
-> this function in stead of one does not make it more robust imho.
-> Either or (checking chunks or the block bitmap) is fine by me.
-> Searching the bitmap is more efficient, so that is what I proposed.
+> >> fact, we should remove the bock bitmap as we have to check for the sta=
+te
+> >> either way - note that this aligns also very well with you patches
+> >> removing the other bitmaps.
+> >
+> > These are just nitpicks.
+> >
+> > Relying on two data structures(chunks, block bitmap) to be in sync in
+> > this function in stead of one does not make it more robust imho.
+> > Either or (checking chunks or the block bitmap) is fine by me.
+> > Searching the bitmap is more efficient, so that is what I proposed.
+>
+> chunk log page is the ground truth, so it is more robust.
+>
+> Also, pblk has a long way to start seeing bitmap search vs. integer
+> comparisons in profiling.
 
-chunk log page is the ground truth, so it is more robust.
+Hehe, yeah, but it does not hurt to use the better alternative when availab=
+le.
 
-Also, pblk has a long way to start seeing bitmap search vs. integer
-comparisons in profiling.
+> >
+> > If we want to remove the block bitmap, we can do that as a separate pat=
+ch(set)
+> > I do agree, having two copies of the chunk state is something worth
+> > getting rid of :)
+> >
+>
+> A good start is not adding code using what we want to remove.
 
->=20
-> If we want to remove the block bitmap, we can do that as a separate =
-patch(set)
-> I do agree, having two copies of the chunk state is something worth
-> getting rid of :)
->=20
+Well, I think it's very confusing to use both copies in the same function.
 
-A good start is not adding code using what we want to remove.
-
-Javier
-
---Apple-Mail=_749AD0B9-63BB-4FEC-9FF9-C613C0A4E5F5
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlxLEC0ACgkQPEYBfS0l
-eOC8Ag//UM8kbOg8FIsXiZcGi8zOhJeXLuIKNNvjFrfUgL4wp+cmbVMhQsdZZruP
-up1BV2pzJJqIuTVLYklr/SRBAFNrFD65OJgVgvKmlRzkVKoNJQuSvH1DbWR+OOCc
-mzhqgNYOgHfVsO+zhXJTpBeL75MiBHhUP3p2he0yhElhThjwUnCs1KU1rAt3Gl6r
-GIE4W19HPsqUAmOCn4T0a+3GH16vUtU3estmATpS1N9RfJ48m0l9znYjsiBcspXD
-8bTv4UWkCYdf+D4GNpyI9a/u8PvciL6tSppyGZQnr1XINgFRbj2Zz5BKfTE9m1Gz
-Phwuacqkg0v69EUXGeq6Q8rEvLcy0nEO7xZwZcvuXzaQLIe3CXEw79Rhbn2rATXL
-dGQgsWBOzqtplcfU7ljqm1EYhTqlYez8G2Gd58tUkm42i+RHDE1mP0Mhrzjdzy6n
-NnjgWgf0wI0dzVIPmmq4VCD239az++2ejtFcNPMiex/npavLgZ6C+i56qvnQRPb8
-uZxNBj4lbCZBbsuia3zv3St1txn/UsHhlHxKAy560AqeUIP3y0VqkI9q298JDFyb
-rwmLjBRGFLY5uvBA7kcLFpp1piIdMLANxFKkKy7x/aU436JiGKdFbAtinJV+aLoo
-5cV82GBCZL79wzxMQ09E8qsIZ3FU/rN8+yjxr1ZIy4U06s3GU50=
-=sjJj
------END PGP SIGNATURE-----
-
---Apple-Mail=_749AD0B9-63BB-4FEC-9FF9-C613C0A4E5F5--
+Now we're nitpicking nitpicks :)
