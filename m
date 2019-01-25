@@ -2,121 +2,127 @@ Return-Path: <SRS0=J6N0=QB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F43C282C0
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 08:17:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26AB6C282C0
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 08:30:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E43121919
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 08:17:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="MSSEySbN"
+	by mail.kernel.org (Postfix) with ESMTP id F275B2192D
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 08:30:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726761AbfAYIR7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Jan 2019 03:17:59 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:39415 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726200AbfAYIR6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Jan 2019 03:17:58 -0500
-Received: by mail-lf1-f68.google.com with SMTP id n18so6299238lfh.6
-        for <linux-block@vger.kernel.org>; Fri, 25 Jan 2019 00:17:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=9jiQno4UhpYBqTa//0Ls70fFfjYDxFXuvNUqs9ZqpgM=;
-        b=MSSEySbN5UO6m87vMtYZyqZQFMhszrz4L99zNl5hfZLuSPCxNIcU6L+x3ZDiUsM5+R
-         xXlApON/eAxmUmgJ+jKLuIss3hqZY0WsRFGlmUha9uJS1YtpK1S73Hc0ayYZj3SNuKNP
-         Od1TrmnsZ3ah2QGqnnbmUWE2Df/pRZtiO4+ZW6cUQlO9zfvgj1zHjwtWouhfJUngGmn+
-         nB+x3RHfAtOHGOl5wLQ0lO6a5EZc94HJFILh/3mfPH48dZ85kKd8q1gakl9+p0Rn9gAq
-         g+Hn8Zrx1rUNTN1l09o8vcmkY3RAGK4Tf3eMze890SZmUbckntS2oUMFqDjVcurD+kBn
-         zabQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=9jiQno4UhpYBqTa//0Ls70fFfjYDxFXuvNUqs9ZqpgM=;
-        b=mSomQGyuZ3HnsW7VM6dNM5mhNwpdBwB7oSDAIpDGIKIgELf83ifBKCf1XoXtDXNRZQ
-         MZ3lnz44UHBIPyWtuxkfvWx4gMMIukpbQKB/6M2XXQMkEQq6rAXm5st+CLyrwkHAzh6k
-         FQPI3GlnXxN25l7rNVmJu0ZnefexD7LK7izlwPkZs4iw0FTJy/wVQZzGojP6++f1d4Q6
-         a6+mHUbx72+hrc/YuyukkJoQ69AspD9TpGHu4ltBQH3hhXsIEf4W8K4EwHL83kAGbqDm
-         Gr6L79b/GY7jwH+0ILIa47e4vbDrhTTw2b9oOzJuKVhkru1RnewOGE4P5xy7bcEtA6V4
-         0n8A==
-X-Gm-Message-State: AJcUukeTWvznRLceB70E1D8NC0GDOEDJMA5PqJFSD+COTjb9r6l55JT6
-        h6+E7ZhIWekN6d33HtVvbxClQw==
-X-Google-Smtp-Source: ALg8bN7s9/hh6YJu10Qia8w6IQ+areeNtAS9ETVh4HZHOP9szGp9pljunMcfDJFTcGro58SAhkCYcw==
-X-Received: by 2002:a19:1cb:: with SMTP id 194mr7925460lfb.61.1548404276489;
-        Fri, 25 Jan 2019 00:17:56 -0800 (PST)
-Received: from [192.168.0.36] (2-111-91-225-cable.dk.customer.tdc.net. [2.111.91.225])
-        by smtp.googlemail.com with ESMTPSA id b25-v6sm1413706lji.94.2019.01.25.00.17.55
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 25 Jan 2019 00:17:55 -0800 (PST)
-Subject: Re: [PATCH] lightnvm: pblk: fix TRACE_INCLUDE_PATH
-To:     Hans Holmberg <hans.ml.holmberg@owltronix.com>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-References: <1548401030-28860-1-git-send-email-yamada.masahiro@socionext.com>
- <CANr-nt0=gw90vBLA_FMjmD7duNVYJcGmcqfk9HiQpdKxHV-A+g@mail.gmail.com>
-From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <17453c37-72ee-11e1-979d-e60a034d94e3@lightnvm.io>
-Date:   Fri, 25 Jan 2019 09:17:54 +0100
+        id S1726402AbfAYIaw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Jan 2019 03:30:52 -0500
+Received: from mx2.suse.de ([195.135.220.15]:50028 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726200AbfAYIaw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 25 Jan 2019 03:30:52 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 42CEFB050;
+        Fri, 25 Jan 2019 08:30:50 +0000 (UTC)
+Subject: Re: [PATCH v2 1/3] blk-iolatency: fix IO hang due to negative
+ inflight counter
+To:     Liu Bo <bo.liu@linux.alibaba.com>, linux-block@vger.kernel.org
+Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
+References: <20190125001249.72688-1-bo.liu@linux.alibaba.com>
+ <20190125001249.72688-2-bo.liu@linux.alibaba.com>
+From:   Johannes Thumshirn <jthumshirn@suse.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <eb65005a-572d-1640-3c85-214be541a348@suse.de>
+Date:   Fri, 25 Jan 2019 09:30:49 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <CANr-nt0=gw90vBLA_FMjmD7duNVYJcGmcqfk9HiQpdKxHV-A+g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20190125001249.72688-2-bo.liu@linux.alibaba.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/25/19 9:01 AM, Hans Holmberg wrote:
-> On Fri, Jan 25, 2019 at 8:35 AM Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->>
->> As the comment block in include/trace/define_trace.h says,
->> TRACE_INCLUDE_PATH should be a relative path to the define_trace.h
->>
->> ../../drivers/lightnvm is the correct relative path.
->>
->> ../../../drivers/lightnvm is working by coincidence because the top
->> Makefile adds -I$(srctree)/arch/$(SRCARCH)/include as a header
->> search path, but we should not rely on it.
+On 25/01/2019 01:12, Liu Bo wrote:
+> In fact the hang can be easily reproduced by the below script,
 > 
-> Nice catch, thanks!
+> H=/sys/fs/cgroup/unified/
+> P=/sys/fs/cgroup/unified/test
 > 
-> Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+> echo "+io" > $H/cgroup.subtree_control
+> mkdir -p $P
 > 
->>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->> ---
->>
->>   drivers/lightnvm/pblk-trace.h | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/lightnvm/pblk-trace.h b/drivers/lightnvm/pblk-trace.h
->> index 679e5c45..9534503 100644
->> --- a/drivers/lightnvm/pblk-trace.h
->> +++ b/drivers/lightnvm/pblk-trace.h
->> @@ -139,7 +139,7 @@ TRACE_EVENT(pblk_state,
->>   /* This part must be outside protection */
->>
->>   #undef TRACE_INCLUDE_PATH
->> -#define TRACE_INCLUDE_PATH ../../../drivers/lightnvm
->> +#define TRACE_INCLUDE_PATH ../../drivers/lightnvm
->>   #undef TRACE_INCLUDE_FILE
->>   #define TRACE_INCLUDE_FILE pblk-trace
->>   #include <trace/define_trace.h>
->> --
->> 2.7.4
->>
+> echo $$ > $P/cgroup.procs
+> 
+> xfs_io -f -d -c "pwrite 0 4k" /dev/sdg
+> 
+> echo "`cat /sys/block/sdg/dev` target=1000000" > $P/io.latency
+> 
+> xfs_io -f -d -c "pwrite 0 4k" /dev/sdg
 
-Thanks Masahiro-san. Applied for 5.1.
+Can you please turn this into a testcase for blktests as well?
+
+Thanks,
+	Johannes
+-- 
+Johannes Thumshirn                            SUSE Labs Filesystems
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
