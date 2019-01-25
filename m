@@ -2,127 +2,150 @@ Return-Path: <SRS0=J6N0=QB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26AB6C282C0
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 08:30:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14875C282C0
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 08:47:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F275B2192D
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 08:30:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C833921855
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 08:47:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="kp3Ng6Da"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726402AbfAYIaw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Jan 2019 03:30:52 -0500
-Received: from mx2.suse.de ([195.135.220.15]:50028 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726200AbfAYIaw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Jan 2019 03:30:52 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 42CEFB050;
-        Fri, 25 Jan 2019 08:30:50 +0000 (UTC)
-Subject: Re: [PATCH v2 1/3] blk-iolatency: fix IO hang due to negative
- inflight counter
-To:     Liu Bo <bo.liu@linux.alibaba.com>, linux-block@vger.kernel.org
-Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
-References: <20190125001249.72688-1-bo.liu@linux.alibaba.com>
- <20190125001249.72688-2-bo.liu@linux.alibaba.com>
-From:   Johannes Thumshirn <jthumshirn@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <eb65005a-572d-1640-3c85-214be541a348@suse.de>
-Date:   Fri, 25 Jan 2019 09:30:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726402AbfAYIr2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Jan 2019 03:47:28 -0500
+Received: from mail-ua1-f66.google.com ([209.85.222.66]:41622 "EHLO
+        mail-ua1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726200AbfAYIr2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 25 Jan 2019 03:47:28 -0500
+Received: by mail-ua1-f66.google.com with SMTP id z24so2974843ual.8
+        for <linux-block@vger.kernel.org>; Fri, 25 Jan 2019 00:47:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=YKmDBjYBvS0GyLxiY7/dEaWXQULBJfFCLjAUtl27dhc=;
+        b=kp3Ng6DaclxgsEV99cSy9sF/9zus5V28Fhnu3482e/FSZdwrQk66ed5qgzhp5befuT
+         shmbTtEU6FUsRrPLrqAqh4FciX7l4iq85jGv5BwzgfQbT5qfhXorKlVHijp/YJAYCWbt
+         IaD4ikbi8lPwerLPvghOw2uPi3ZWqmTtJVgaJci6LXTx1EJVoed2s1p3VWFJPsnpG5au
+         r8sA9wlr/4er85ciFxw+ry4dtV4qFWFBEA8rDBEY2IIFbGnBOn6mWfGIOpcO7zIxOdNb
+         f07eMHTxcNZrG/5Ipd4sfNO9/8ztSf1ua8eVeYrrT9F3YOYMzzVbZDNOlZT5ImV5GoEq
+         Qh6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=YKmDBjYBvS0GyLxiY7/dEaWXQULBJfFCLjAUtl27dhc=;
+        b=VbZXWRqCC50RqyTEuz1a7cztFVP3XfBQ4qYtgpAI+w8E+CFKOMfJZV40bcxkU0mWtk
+         xK/uMyx1BdlBrQjBBcf5tuibLpEBP52BWJhrnAUcN/kwW/OLxhyXnLvXbjiiODSLmON+
+         wClpML3GH0oyFSbfhmwprSsbB8mGD3ZRQrftDSiQyUj6+2nQEU+Z5PiP8NjvmticjTIc
+         BEeiQNwutvLgL2GXCQg8rh74eZRvmZ2Sfu8SsZcUQy1S0Cbvox+JaXgWXI2U4aLuxTQp
+         8FuKoZPOg4cUxeNhn9Ru2x3+DAt3wUg+wGlK9a6NeTCDgmoZjF4bytO+zKeYB2w3Q/1C
+         EBYw==
+X-Gm-Message-State: AJcUukffGvUsFo2tZDSxIOXnHglSHpdmpzxCm11iZEZCl9spndAxSu3w
+        li4Zv3UlZ3JucMfPOn/18uYg+kYpbx7RHsNqhxUa9Q==
+X-Google-Smtp-Source: ALg8bN4A2lSIrtBR+iXBlYRGMVAHCEvoi/Gpnedm9X5TdAqHq6SWoTU97WxsYr3TlmYc/lTtOemWgA748MC0it973YM=
+X-Received: by 2002:ab0:49ee:: with SMTP id f43mr3943324uad.29.1548406046277;
+ Fri, 25 Jan 2019 00:47:26 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190125001249.72688-2-bo.liu@linux.alibaba.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <1548359553-11356-1-git-send-email-zjwu@marvell.com>
+In-Reply-To: <1548359553-11356-1-git-send-email-zjwu@marvell.com>
+From:   Hans Holmberg <hans.ml.holmberg@owltronix.com>
+Date:   Fri, 25 Jan 2019 09:47:15 +0100
+Message-ID: <CANr-nt3_8YftCP6Oqgnp39YzeF5qpUCBKLPUZ5=TBqP9MFw25g@mail.gmail.com>
+Subject: Re: [PATCH v3] lightnvm: pblk: ignore bad block wp for pblk_line_wp_is_unbalanced
+To:     Zhoujie Wu <zjwu@marvell.com>
+Cc:     Matias Bjorling <mb@lightnvm.io>, linux-block@vger.kernel.org,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        hongd@marvell.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 25/01/2019 01:12, Liu Bo wrote:
-> In fact the hang can be easily reproduced by the below script,
-> 
-> H=/sys/fs/cgroup/unified/
-> P=/sys/fs/cgroup/unified/test
-> 
-> echo "+io" > $H/cgroup.subtree_control
-> mkdir -p $P
-> 
-> echo $$ > $P/cgroup.procs
-> 
-> xfs_io -f -d -c "pwrite 0 4k" /dev/sdg
-> 
-> echo "`cat /sys/block/sdg/dev` target=1000000" > $P/io.latency
-> 
-> xfs_io -f -d -c "pwrite 0 4k" /dev/sdg
+On Thu, Jan 24, 2019 at 8:51 PM Zhoujie Wu <zjwu@marvell.com> wrote:
+>
+> The write pointer of the bad block could be 0 or undefined, ignore
+> the checking of the bad block wp for pblk_line_wp_is_unbalanced to
+> avoid fake warning.
 
-Can you please turn this into a testcase for blktests as well?
+fake -> spurious?
 
-Thanks,
-	Johannes
--- 
-Johannes Thumshirn                            SUSE Labs Filesystems
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+>
+> Signed-off-by: Zhoujie Wu <zjwu@marvell.com>
+> ---
+> v3: return in case bit >= lm->blk_per_line.
+> v2: changed according to Javier's comments.
+>
+>  drivers/lightnvm/pblk-recovery.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+> index 6761d2a..02d466e 100644
+> --- a/drivers/lightnvm/pblk-recovery.c
+> +++ b/drivers/lightnvm/pblk-recovery.c
+> @@ -312,21 +312,27 @@ static int pblk_line_wp_is_unbalanced(struct pblk *pblk,
+>         struct nvm_chk_meta *chunk;
+>         struct ppa_addr ppa;
+>         u64 line_wp;
+> -       int pos, i;
+> +       int pos, i, bit;
+
+We don't need both bit and i, one of them is enough.
+
+>
+> -       rlun = &pblk->luns[0];
+> +       bit = find_first_zero_bit(line->blk_bitmap, lm->blk_per_line);
+> +       if (bit >= lm->blk_per_line)
+> +               return 0;
+
+If there is only one non-offline chunk in the line, the wp can't be unbalanced,
+so it should be safe to return 0 here if bit >= lm->blk_per_line - 1
+
+If you change this please document why using a comment, as it might
+not be obvious
+
+> +       rlun = &pblk->luns[bit];
+>         ppa = rlun->bppa;
+>         pos = pblk_ppa_to_pos(geo, ppa);
+>         chunk = &line->chks[pos];
+>
+
+>         line_wp = chunk->wp;
+>
+> -       for (i = 1; i < lm->blk_per_line; i++) {
+> +       for (i = bit + 1; i < lm->blk_per_line; i++) {
+
+>                 rlun = &pblk->luns[i];
+>                 ppa = rlun->bppa;
+>                 pos = pblk_ppa_to_pos(geo, ppa);
+>                 chunk = &line->chks[pos];
+
+This code is a copy of the code above, it'd be nice to refactor it
+into a helper function or just do the chunk lookups in one place.
+
+>
+> +               if (chunk->state & NVM_CHK_ST_OFFLINE)
+> +                       continue;
+> +
+
+Since we rely on the block bitmap anyway, we might as well just
+iterate over the zeroes in the block bitmap using find_next_zero_bit
+instead.
+We do this in lots of other places, see: git grep -n
+find_next_zero_bit -- drivers/lightnvm
+
+Apart from these nitpicks, the change looks good to me. Great to have
+this fixed.
+
+>                 if (chunk->wp > line_wp)
+>                         return 1;
+>                 else if (chunk->wp < line_wp)
+> --
+> 1.9.1
+>
