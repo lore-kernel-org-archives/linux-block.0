@@ -2,224 +2,164 @@ Return-Path: <SRS0=J6N0=QB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE75DC282C5
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 00:13:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 730E7C282C3
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 00:45:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A2A2E217D7
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 00:13:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39502218B0
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 00:45:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728326AbfAYANM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Jan 2019 19:13:12 -0500
-Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:59698 "EHLO
-        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726271AbfAYANL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Jan 2019 19:13:11 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04391;MF=bo.liu@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0TIwnAVc_1548375187;
-Received: from localhost(mailfrom:bo.liu@linux.alibaba.com fp:SMTPD_---0TIwnAVc_1548375187)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 25 Jan 2019 08:13:07 +0800
-From:   Liu Bo <bo.liu@linux.alibaba.com>
-To:     linux-block@vger.kernel.org
-Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH v2 1/3] blk-iolatency: fix IO hang due to negative inflight counter
-Date:   Fri, 25 Jan 2019 08:12:47 +0800
-Message-Id: <20190125001249.72688-2-bo.liu@linux.alibaba.com>
-X-Mailer: git-send-email 2.20.1.2.gb21ebb6
-In-Reply-To: <20190125001249.72688-1-bo.liu@linux.alibaba.com>
-References: <20190125001249.72688-1-bo.liu@linux.alibaba.com>
+        id S1726259AbfAYAp6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Jan 2019 19:45:58 -0500
+Received: from gfuc.org ([88.99.83.187]:47872 "EHLO gfuc.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726015AbfAYAp6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Jan 2019 19:45:58 -0500
+Received: from [192.168.178.72] (dslb-092-075-200-083.092.075.pools.vodafone-ip.de [92.75.200.83])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by gfuc.org (Postfix) with ESMTPSA id 4017E1E00A5;
+        Fri, 25 Jan 2019 00:45:55 +0000 (UTC)
+Subject: Re: fsync hangs after scsi rejected a request
+To:     Ming Lei <tom.leiming@gmail.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block <linux-block@vger.kernel.org>
+References: <70df6d90-31eb-96f4-908d-462ea58dea6e@florianstecker.de>
+ <CACVXFVOSHtV7jcMwEvDKZzPnsLRzkdvAEqb+ggugkM27LJvagg@mail.gmail.com>
+From:   Florian Stecker <m19@florianstecker.de>
+Message-ID: <a30b5868-dd7d-d3db-b7f4-c723ac279ead@florianstecker.de>
+Date:   Fri, 25 Jan 2019 01:45:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACVXFVOSHtV7jcMwEvDKZzPnsLRzkdvAEqb+ggugkM27LJvagg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US-large
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Our test reported the following stack, and vmcore showed that
-->inflight counter is -1.
 
-[ffffc9003fcc38d0] __schedule at ffffffff8173d95d
-[ffffc9003fcc3958] schedule at ffffffff8173de26
-[ffffc9003fcc3970] io_schedule at ffffffff810bb6b6
-[ffffc9003fcc3988] blkcg_iolatency_throttle at ffffffff813911cb
-[ffffc9003fcc3a20] rq_qos_throttle at ffffffff813847f3
-[ffffc9003fcc3a48] blk_mq_make_request at ffffffff8137468a
-[ffffc9003fcc3b08] generic_make_request at ffffffff81368b49
-[ffffc9003fcc3b68] submit_bio at ffffffff81368d7d
-[ffffc9003fcc3bb8] ext4_io_submit at ffffffffa031be00 [ext4]
-[ffffc9003fcc3c00] ext4_writepages at ffffffffa03163de [ext4]
-[ffffc9003fcc3d68] do_writepages at ffffffff811c49ae
-[ffffc9003fcc3d78] __filemap_fdatawrite_range at ffffffff811b6188
-[ffffc9003fcc3e30] filemap_write_and_wait_range at ffffffff811b6301
-[ffffc9003fcc3e60] ext4_sync_file at ffffffffa030cee8 [ext4]
-[ffffc9003fcc3ea8] vfs_fsync_range at ffffffff8128594b
-[ffffc9003fcc3ee8] do_fsync at ffffffff81285abd
-[ffffc9003fcc3f18] sys_fsync at ffffffff81285d50
-[ffffc9003fcc3f28] do_syscall_64 at ffffffff81003c04
-[ffffc9003fcc3f50] entry_SYSCALL_64_after_swapgs at ffffffff81742b8e
 
-The ->inflight counter may be negative (-1) if
+On 1/22/19 4:22 AM, Ming Lei wrote:
+> On Tue, Jan 22, 2019 at 5:13 AM Florian Stecker <m19@florianstecker.de> wrote:
+>>
+>> Hi everyone,
+>>
+>> on my laptop, I am experiencing occasional hangs of applications during
+>> fsync(), which are sometimes up to 30 seconds long. I'm using a BTRFS
+>> which spans two partitions on the same SSD (one of them used to contain
+>> a Windows, but I removed it and added the partition to the BTRFS volume
+>> instead). Also, the problem only occurs when an I/O scheduler
+>> (mq-deadline) is in use. I'm running kernel version 4.20.3.
+>>
+>>   From what I understand so far, what happens is that a sync request
+>> fails in the SCSI/ATA layer, in ata_std_qc_defer(), because it is a
+>> "Non-NCQ command" and can not be queued together with other commands.
+>> This propagates up into blk_mq_dispatch_rq_list(), where the call
+>>
+>> ret = q->mq_ops->queue_rq(hctx, &bd);
+>>
+>> returns BLK_STS_DEV_RESOURCE. Later in blk_mq_dispatch_rq_list(), there
+>> is the piece of code
+>>
+>> needs_restart = blk_mq_sched_needs_restart(hctx);
+>> if (!needs_restart ||
+>>          (no_tag && list_empty_careful(&hctx->dispatch_wait.entry)))
+>>          blk_mq_run_hw_queue(hctx, true);
+>> else if (needs_restart && (ret == BLK_STS_RESOURCE))
+>>          blk_mq_delay_run_hw_queue(hctx, BLK_MQ_RESOURCE_DELAY);
+>>
+>> which restarts the queue after a delay if BLK_STS_RESOURCE was returned,
+>> but somehow not for BLK_STS_DEV_RESOURCE. Instead, nothing happens and
+>> fsync() seems to hang until some other process wants to do I/O.
+>>
+>> So if I do
+>>
+>> - else if (needs_restart && (ret == BLK_STS_RESOURCE))
+>> + else if (needs_restart && (ret == BLK_STS_RESOURCE || ret ==
+>> BLK_STS_DEV_RESOURCE))
+>>
+>> it fixes my problem. But was there a reason why BLK_STS_DEV_RESOURCE was
+>> treated differently that BLK_STS_RESOURCE here?
+> 
+> Please see the comment:
+> 
+> /*
+>   * BLK_STS_DEV_RESOURCE is returned from the driver to the block layer if
+>   * device related resources are unavailable, but the driver can guarantee
+>   * that the queue will be rerun in the future once resources become
+>   * available again. This is typically the case for device specific
+>   * resources that are consumed for IO. If the driver fails allocating these
+>   * resources, we know that inflight (or pending) IO will free these
+>   * resource upon completion.
+>   *
+>   * This is different from BLK_STS_RESOURCE in that it explicitly references
+>   * a device specific resource. For resources of wider scope, allocation
+>   * failure can happen without having pending IO. This means that we can't
+>   * rely on request completions freeing these resources, as IO may not be in
+>   * flight. Examples of that are kernel memory allocations, DMA mappings, or
+>   * any other system wide resources.
+>   */
+> #define BLK_STS_DEV_RESOURCE    ((__force blk_status_t)13)
+> 
+>>
+>> In any case, it seems wrong to me that ret is used here at all, as it
+>> just contains the return value of the last request in the list, and
+>> whether we rerun the queue should probably not only depend on the last
+>> request?
+>>
+>> Can anyone of the experts tell me whether this makes sense or I got
+>> something completely wrong?
+> 
+> Sounds a bug in SCSI or ata driver.
+> 
+> I remember there is hole in SCSI wrt. returning BLK_STS_DEV_RESOURCE,
+> but I never get lucky to reproduce it.
+> 
+> scsi_queue_rq():
+>          ......
+>          case BLK_STS_RESOURCE:
+>                  if (atomic_read(&sdev->device_busy) ||
+>                      scsi_device_blocked(sdev))
+>                          ret = BLK_STS_DEV_RESOURCE;
+> 
 
-1) blk-iolatency was disabled when the IO was issued,
+OK, please tell me if I understand this right now. What is supposed to 
+happen is
 
-2) blk-iolatency was enabled before this IO reached its endio,
+- request 1 is being processed by the device
+- request 2 (sync) fails with STS_DEV_RESOURCE because request 1 is 
+still being processed
+- request 2 is put into hctx->dispatch inside blk_mq_dispatch_rq_list *
+- queue does not get rerun because of STS_DEV_RESOURCE
+- request 1 finishes
+- scsi_end_request calls blk_mq_run_hw_queues
+- blk_mq_run_hw_queue finds request 2 in hctx->dispatch **
+- runs request 2
 
-3) the ->inflight counter is decreased from 0 to -1 in endio()
+However, what happens for me is that request 1 finishes earlier, so that 
+** is executed before *, and finds an empty hctx->dispatch list.
 
-In fact the hang can be easily reproduced by the below script,
+At least this is consistent with what I see.
 
-H=/sys/fs/cgroup/unified/
-P=/sys/fs/cgroup/unified/test
+ > All in-flight request may complete between reading 'sdev->device_busy'
+ > and setting ret as 'BLK_STS_DEV_RESOURCE', then this IO hang may
+ > be triggered.
+ >
 
-echo "+io" > $H/cgroup.subtree_control
-mkdir -p $P
+More accurate would be: between reading sdev->device_busy and doing 
+list_splice_init(list,&hctx->dispatch) inside blk_mq_dispatch_rq_list.
 
-echo $$ > $P/cgroup.procs
-
-xfs_io -f -d -c "pwrite 0 4k" /dev/sdg
-
-echo "`cat /sys/block/sdg/dev` target=1000000" > $P/io.latency
-
-xfs_io -f -d -c "pwrite 0 4k" /dev/sdg
-
-This fixes the problem by freezing the queue so that while
-enabling/disabling iolatency, there is no inflight rq running.
-
-Note that quiesce_queue is not needed as this only updating iolatency
-configuration about which dispatching request_queue doesn't care.
-
-Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
----
- block/blk-iolatency.c | 52 +++++++++++++++++++++++++++++++++++++------
- 1 file changed, 45 insertions(+), 7 deletions(-)
-
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index fc714ef402a6..1893686a9c1f 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -72,6 +72,7 @@
- #include <linux/sched/loadavg.h>
- #include <linux/sched/signal.h>
- #include <trace/events/block.h>
-+#include <linux/blk-mq.h>
- #include "blk-rq-qos.h"
- #include "blk-stat.h"
- 
-@@ -601,6 +602,9 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
- 		return;
- 
- 	enabled = blk_iolatency_enabled(iolat->blkiolat);
-+	if (!enabled)
-+		return;
-+
- 	while (blkg && blkg->parent) {
- 		iolat = blkg_to_lat(blkg);
- 		if (!iolat) {
-@@ -610,7 +614,7 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
- 		rqw = &iolat->rq_wait;
- 
- 		atomic_dec(&rqw->inflight);
--		if (!enabled || iolat->min_lat_nsec == 0)
-+		if (iolat->min_lat_nsec == 0)
- 			goto next;
- 		iolatency_record_time(iolat, &bio->bi_issue, now,
- 				      issue_as_root);
-@@ -754,10 +758,13 @@ int blk_iolatency_init(struct request_queue *q)
- 	return 0;
- }
- 
--static void iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
-+/*
-+ * return 1 for enabling iolatency, return -1 for disabling iolatency, otherwise
-+ * return 0.
-+ */
-+static int iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
- {
- 	struct iolatency_grp *iolat = blkg_to_lat(blkg);
--	struct blk_iolatency *blkiolat = iolat->blkiolat;
- 	u64 oldval = iolat->min_lat_nsec;
- 
- 	iolat->min_lat_nsec = val;
-@@ -766,9 +773,10 @@ static void iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
- 				    BLKIOLATENCY_MAX_WIN_SIZE);
- 
- 	if (!oldval && val)
--		atomic_inc(&blkiolat->enabled);
-+		return 1;
- 	if (oldval && !val)
--		atomic_dec(&blkiolat->enabled);
-+		return -1;
-+	return 0;
- }
- 
- static void iolatency_clear_scaling(struct blkcg_gq *blkg)
-@@ -800,6 +808,7 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
- 	u64 lat_val = 0;
- 	u64 oldval;
- 	int ret;
-+	int enable = 0;
- 
- 	ret = blkg_conf_prep(blkcg, &blkcg_policy_iolatency, buf, &ctx);
- 	if (ret)
-@@ -834,7 +843,12 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
- 	blkg = ctx.blkg;
- 	oldval = iolat->min_lat_nsec;
- 
--	iolatency_set_min_lat_nsec(blkg, lat_val);
-+	enable = iolatency_set_min_lat_nsec(blkg, lat_val);
-+	if (enable) {
-+		WARN_ON_ONCE(!blk_get_queue(blkg->q));
-+		blkg_get(blkg);
-+	}
-+
- 	if (oldval != iolat->min_lat_nsec) {
- 		iolatency_clear_scaling(blkg);
- 	}
-@@ -842,6 +856,24 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
- 	ret = 0;
- out:
- 	blkg_conf_finish(&ctx);
-+	if (ret == 0 && enable) {
-+		struct iolatency_grp *tmp = blkg_to_lat(blkg);
-+		struct blk_iolatency *blkiolat = tmp->blkiolat;
-+
-+		blk_mq_freeze_queue(blkg->q);
-+
-+		if (enable == 1)
-+			atomic_inc(&blkiolat->enabled);
-+		else if (enable == -1)
-+			atomic_dec(&blkiolat->enabled);
-+		else
-+			WARN_ON_ONCE(1);
-+
-+		blk_mq_unfreeze_queue(blkg->q);
-+
-+		blkg_put(blkg);
-+		blk_put_queue(blkg->q);
-+	}
- 	return ret ?: nbytes;
- }
- 
-@@ -977,8 +1009,14 @@ static void iolatency_pd_offline(struct blkg_policy_data *pd)
- {
- 	struct iolatency_grp *iolat = pd_to_lat(pd);
- 	struct blkcg_gq *blkg = lat_to_blkg(iolat);
-+	struct blk_iolatency *blkiolat = iolat->blkiolat;
-+	int ret;
- 
--	iolatency_set_min_lat_nsec(blkg, 0);
-+	ret = iolatency_set_min_lat_nsec(blkg, 0);
-+	if (ret == 1)
-+		atomic_inc(&blkiolat->enabled);
-+	if (ret == -1)
-+		atomic_dec(&blkiolat->enabled);
- 	iolatency_clear_scaling(blkg);
- }
- 
--- 
-2.20.1.2.gb21ebb6
-
+I'm not sure how the SCSI driver can do anything about this except 
+returning BLK_STS_RESOURCE instead (which I guess would not be a great 
+solution), as basically everything else happens inside blk-mq. Or what 
+do you have in mind?
