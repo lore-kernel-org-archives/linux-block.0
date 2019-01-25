@@ -1,70 +1,60 @@
-Return-Path: <SRS0=8u48=QA=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=J6N0=QB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC6E1C282C3
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 20:15:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D52C1C282C5
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 00:13:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AF80F217D7
-	for <linux-block@archiver.kernel.org>; Thu, 24 Jan 2019 20:15:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548360911;
-	bh=3L70Ve72+15sqmsi0AY9xMSl/b2kSXdLfxDzXV9RHUg=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=VfzSPth2PNMVrMg3qYoEBPhks73IRF8K6pf3PiD2LYR0tLcwc72Aau0XIh9uof18e
-	 xTC5iDedFy6QX9/N+xSFxIDG/u3x17tX1fihkW8UEIqItzpLfD1gbcj9V6ylZm/GkI
-	 fUYatprSzlye82uEu18sNPprWi4T8NGvrZICFdPQ=
+	by mail.kernel.org (Postfix) with ESMTP id B4DA1218D2
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 00:13:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729092AbfAXUPG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Jan 2019 15:15:06 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37368 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728412AbfAXUPF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Jan 2019 15:15:05 -0500
-Subject: Re: [git pull] device mapper fixes for 5.0-rc4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548360904;
-        bh=3L70Ve72+15sqmsi0AY9xMSl/b2kSXdLfxDzXV9RHUg=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=jOnVKE0c9YjMLJsaC9jH91KAwL7qHd9uyBoDZFEgymq6pmbKb5aKyi/Dk5jeNrx/Z
-         kCBYmWLDlpzW/3eLZpU7Z6na7qKlQUji0bjGvdqMmrJQB300+R2rChBgx0oWg+YvDj
-         jxNXlpnNmWc9Ad57zWAxuEbUGgYzGZYDnPPrxlbk=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20190124193829.GA22312@redhat.com>
-References: <20190124193829.GA22312@redhat.com>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20190124193829.GA22312@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git
- tags/for-5.0/dm-fixes
-X-PR-Tracked-Commit-Id: 075c18c3e124a1511ebc10a89f1858c8a77dcb01
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: cffd425b90147296c627dfb13f7ea8f361d962b2
-Message-Id: <154836090475.17041.9019633015502052050.pr-tracker-bot@kernel.org>
-Date:   Thu, 24 Jan 2019 20:15:04 +0000
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Joe Thornber <ejt@redhat.com>, Milan Broz <gmazyland@gmail.com>
+        id S1727743AbfAYANJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Jan 2019 19:13:09 -0500
+Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:34583 "EHLO
+        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726173AbfAYANI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Jan 2019 19:13:08 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04420;MF=bo.liu@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0TIwm2.D_1548375186;
+Received: from localhost(mailfrom:bo.liu@linux.alibaba.com fp:SMTPD_---0TIwm2.D_1548375186)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 25 Jan 2019 08:13:07 +0800
+From:   Liu Bo <bo.liu@linux.alibaba.com>
+To:     linux-block@vger.kernel.org
+Cc:     Josef Bacik <josef@toxicpanda.com>, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH v2 0/3] iolatency bug fix
+Date:   Fri, 25 Jan 2019 08:12:46 +0800
+Message-Id: <20190125001249.72688-1-bo.liu@linux.alibaba.com>
+X-Mailer: git-send-email 2.20.1.2.gb21ebb6
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Thu, 24 Jan 2019 14:38:29 -0500:
+This set is to fix a hang case if blk-iolatency is in use.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.0/dm-fixes
+The 1st patch explains the hang problem with more details and provides
+a fix.
+The 2nd patch adds a warning for unexpected inflight counter.
+The 3rd patch is a cleanup of blk_mq_freeze_queue.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/cffd425b90147296c627dfb13f7ea8f361d962b2
+v2: reorder the actual fix to the first patch.
 
-Thank you!
+Liu Bo (3):
+  blk-iolatency: fix IO hang due to negative inflight counter
+  Blk-iolatency: warn on negative inflight IO counter
+  blk-mq: remove duplicated definition of blk_mq_freeze_queue
+
+ block/blk-iolatency.c | 56 ++++++++++++++++++++++++++++++++++++-------
+ block/blk-mq.h        |  1 -
+ 2 files changed, 48 insertions(+), 9 deletions(-)
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+2.20.1.2.gb21ebb6
+
