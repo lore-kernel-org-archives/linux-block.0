@@ -2,153 +2,195 @@ Return-Path: <SRS0=J6N0=QB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB5CCC282C6
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 14:23:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D136C282C0
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 14:35:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 988E3218A2
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 14:23:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDCED218D0
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 14:35:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="WadKhcge"
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="wU2d/P+j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728477AbfAYOXi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Jan 2019 09:23:38 -0500
-Received: from mailout3.samsung.com ([203.254.224.33]:50718 "EHLO
-        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726899AbfAYOXh (ORCPT
+        id S1726122AbfAYOfW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Jan 2019 09:35:22 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:33373 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726111AbfAYOfW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Jan 2019 09:23:37 -0500
-Received: from epcas1p1.samsung.com (unknown [182.195.41.45])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20190125142334epoutp038524800fefff976fe5905173d0fd4793~9HXApazOi2614126141epoutp03d;
-        Fri, 25 Jan 2019 14:23:34 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20190125142334epoutp038524800fefff976fe5905173d0fd4793~9HXApazOi2614126141epoutp03d
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1548426214;
-        bh=XPFJiucx4QIjip+P3jjob6oWwEnG/5Zd00rBwuUWYqo=;
-        h=Subject:To:Cc:From:Date:In-reply-to:References:From;
-        b=WadKhcgev18lrHhsObwYVriFkPVYAkQIZQtbl3vDjccy/ILbE/jsrkI+tmWsrs71n
-         I78RwH8pPv/DAIzshO5cl9DfHd/neRDvPoT8p9oTWbAkDLdNvmUDEMpKlJ7pFk4Wkq
-         8rA4bMobhZBpZV7vPj6jYn2KnenhrCF+SbkoJ0o0=
-Received: from epsmges1p1.samsung.com (unknown [182.195.42.53]) by
-        epcas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20190125142333epcas1p2d657c45aa3ecbaaaa2d98473cfa0569f~9HW-ZTzsx0185301853epcas1p2w;
-        Fri, 25 Jan 2019 14:23:33 +0000 (GMT)
-Received: from epcas1p1.samsung.com ( [182.195.41.45]) by
-        epsmges1p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        30.00.04074.5EB1B4C5; Fri, 25 Jan 2019 23:23:33 +0900 (KST)
-Received: from epsmgms2p1new.samsung.com (unknown [182.195.42.142]) by
-        epcas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20190125142331epcas1p10d435e6ffe573611b71ce4ba6ece8b98~9HW_SyXiH0363803638epcas1p1L;
-        Fri, 25 Jan 2019 14:23:31 +0000 (GMT)
-X-AuditID: b6c32a35-297ff70000000fea-66-5c4b1be5fed4
-Received: from epmmp1.local.host ( [203.254.227.16]) by
-        epsmgms2p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        79.84.04015.3EB1B4C5; Fri, 25 Jan 2019 23:23:31 +0900 (KST)
-Received: from [107.108.221.212] by mmp1.samsung.com (Oracle Communications
-        Messaging Server 7.0.5.31.0 64bit (built May  5 2014)) with ESMTPA id
-        <0PLW00H0C5AMH5A0@mmp1.samsung.com>; Fri, 25 Jan 2019 23:23:31 +0900 (KST)
-Subject: Re: [PATCH v2 0/4] Write-hint for FS journal
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-nvme@lists.infradead.org,
-        jack@suse.com, david@fromorbit.com, Jan Kara <jack@suse.cz>,
-        prakash.v@samsung.com
-From:   Kanchan Joshi <joshi.k@samsung.com>
-Message-id: <fb13c936-aa6c-46af-7d35-72548b5baaab@samsung.com>
-Date:   Fri, 25 Jan 2019 19:50:50 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-        Thunderbird/52.6.0
-MIME-version: 1.0
-In-reply-to: <20190124082933.GA12184@quack2.suse.cz>
-Content-type: text/plain; charset="utf-8"; format="flowed"
-Content-language: en-US
-Content-transfer-encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupileLIzCtJLcpLzFFi42LZdlhTV/eptHeMwYyVLBar7/azWWw5do/R
-        4vnyxYwWs6c3M1nsvaVtMXPeHTaLPXtPsljMX/aU3eLKlEXMDpwepxZJeFw+W+qxeUm9R9+W
-        VYwe67dcZfE4s+AIu8fnTXIB7FFcNimpOZllqUX6dglcGRte32Mt+MJfMeFBVgNjA3cXIyeH
-        hICJxMWjq5i6GLk4hAR2MEr8mbKFEcL5ziix/fF5dpiq8+93sEMkdjNKvDh+GqrlAaPEjsk/
-        WUGqhAVMJT5uWwFmiwgoSPT8XskGUsQscIlR4nvrKqAEBwebgKbEhcmlIDW8AnYSZz9sZgax
-        WQRUJbZ/XMAGYosKREgsnPqUEaJGUOLH5HssIDYn0BVnHywCq2EWsJJ49q+VFcIWl2huvckC
-        YctLbF7zlhlkr4TAczaJQ/dOskK84CJxd9pSZpAbJASkJS4dtYUIF0v8unMUqr6DUeJ6w0wW
-        iIS9xMU9f5kghvJJvPvawwrRyyvR0SYEYXpIfPitAQmHA4wS715cZ5rAKDMLydmzkJw6C8mp
-        s5CcuoCRZRWjWGpBcW56arFhgaFecWJucWleul5yfu4mRnAK0TLdwTjlnM8hRgEORiUe3gh+
-        7xgh1sSy4srcQ4wSHMxKIrycAkAh3pTEyqrUovz4otKc1OJDjNIcLErivOsdnGOEBNITS1Kz
-        U1MLUotgskwcnFINjBNmi/6zsNn5ceaUBqX/m3/dmLeNWUa2dlad0r53zOVvxdw/nD40jenl
-        SwUB/ZfCAnsPBjyPlVUKbLr340jwxax53bOX3ZoSONNS8Xa4jVG3UiXHwfiHVSoix59e0zuW
-        Lj1z9d3CT4vqMqTO//it8uerRtLJ2JIVLb/Do9MFIkLzNe7fzw7x+K3EUpyRaKjFXFScCABs
-        S0DUHQMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNLMWRmVeSWpSXmKPExsVy+t9jAd3H0t4xBo2TjSxW3+1ns9hy7B6j
-        xfPlixktZk9vZrLYe0vbYua8O2wWe/aeZLGYv+wpu8WVKYuYHTg9Ti2S8Lh8ttRj85J6j74t
-        qxg91m+5yuJxZsERdo/Pm+QC2KO4bFJSczLLUov07RK4Mja8vsda8IW/YsKDrAbGBu4uRk4O
-        CQETifPvd7B3MXJxCAnsZJQ4s28eM0hCSOARkNNTC2ILC5hKfNy2ghXEFhFQkOj5vZINpIFZ
-        4BKjxK/zTUwQ3YcYJXZNbwQaxcHBJqApcWFyKUgDr4CdxNkPm8GGsgioSmz/uIANxBYViJDo
-        XDmfBaJGUOLH5HtgNifQRWcfLAKrYRYwk/jy8jArhC0u0dx6kwXClpfYvOYt8wRGgVlI2mch
-        aZmFpGUWkpYFjCyrGCVTC4pz03OLjQoM81LL9YoTc4tL89L1kvNzNzECo2TbYa2+HYz3l8Qf
-        YhTgYFTi4d0g6B0jxJpYVlyZC/QkB7OSCC+nAFCINyWxsiq1KD++qDQntfgQozQHi5I47+28
-        Y5FCAumJJanZqakFqUUwWSYOTqkGxpU/T6YxlWz8FBRxs98+5jZzRHbuwcNTxC6WvTcwtFZ+
-        sPbxy9XNt48sec9uWPb1yZZljYfF5xusy156br3t910Fl7YELlvA+bFng9/JD5mdevNDQm3n
-        SLEq3pkSYD7Loe7dHslOvTNzVnB+X3/zrcL0/86hZq4VQhUPbrLy6C3heOe8/+SWkzuVWIoz
-        Eg21mIuKEwEmaF9rjgIAAA==
-X-CMS-MailID: 20190125142331epcas1p10d435e6ffe573611b71ce4ba6ece8b98
-CMS-TYPE: 101P
-X-CMS-RootMailID: 20190109153328epcas2p4643cbdc7a2182b47893a2bcaa0778e17
-References: <CGME20190109153328epcas2p4643cbdc7a2182b47893a2bcaa0778e17@epcas2p4.samsung.com>
-        <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
-        <20190124082933.GA12184@quack2.suse.cz>
+        Fri, 25 Jan 2019 09:35:22 -0500
+Received: by mail-lj1-f195.google.com with SMTP id v1-v6so8584318ljd.0
+        for <linux-block@vger.kernel.org>; Fri, 25 Jan 2019 06:35:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=lneYey9flaIRGUm1fscHIEdxW0Gk/yJ5N0GhCS0FBOM=;
+        b=wU2d/P+jENkTHSKy1Vmeaq3iX+Dt6oT1y9RnzNOJlQtEfcgPPVvkiCXbN4pzVBmf0C
+         qmLOq5GFt2mdOUhkp64Fl9rP5BOZoRI4EFKQOK5m37vjyCGHTBAWkBbApP/JwrxoiaI7
+         RES+XjKWJMRLaCIg/ddHxoUgRwlVvLT870QkkV9Wzu4PYeEJZedMg5+wo3S3viac8CYk
+         ULlDmaCbPTXEgZWZtRKivg6Vmb+euE9ofQtkUiKQR1DuEOAvgWKx3YI9DC10l/zm90ja
+         wnuU7OpiDmKzAgmqta9xOvqZ2mwlxOi04ncyfwOYc+n/5u8V/K+1YcPlEMfimX8INn5R
+         Ym9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=lneYey9flaIRGUm1fscHIEdxW0Gk/yJ5N0GhCS0FBOM=;
+        b=FLcqYntJpKcAKiauDLL/Vpc+fwtz4loVoWXhXq+8ntJOXmhGTAXXXkvh45fA91wZTi
+         +vDte1kvwhXsSIubK7KX8NE8PYNOtpHwWXZvhNVR5iyOf7LowL22lam91Ij+yj4G/ZFE
+         KkrfNOTzqOa4vh1Hx+fIaeQ/utqD1v2zluo5bwSzjmbxuHlOhhFuJrlMMYhOFamVxM1z
+         w/Z2VI9onrNlq33X6gDAhUcBMFauo+6poC2mBZzff7hR1qBglLKjTAjIINNFSyDS0J1/
+         tQ+ypOoZNuwf0Eb0UoOBOMP7cHXZwvVN7YfRHXNxNp2YDrUzlE9glS6Q0cXC81mFxy+q
+         /rBw==
+X-Gm-Message-State: AJcUukfPq5meFA0yGhrzMcP+OFWtashv/OlVUsA67ipaSdg0Ie4m6Ysi
+        VlG4+QNGpE15BMI3m3et7rtapg==
+X-Google-Smtp-Source: ALg8bN7Ws6MnyeGgo+Dqj3uzlze5A9J1Z8FKtSy2sVqeMjgLvLxtEKbH7zYC7cEqYOQCEDqKnlseyA==
+X-Received: by 2002:a2e:b00a:: with SMTP id y10-v6mr9908098ljk.109.1548426918940;
+        Fri, 25 Jan 2019 06:35:18 -0800 (PST)
+Received: from [192.168.0.36] (2-111-91-225-cable.dk.customer.tdc.net. [2.111.91.225])
+        by smtp.googlemail.com with ESMTPSA id o25sm1485254lfd.29.2019.01.25.06.35.18
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 25 Jan 2019 06:35:18 -0800 (PST)
+Subject: Re: [PATCH v3] lightnvm: pblk: ignore bad block wp for
+ pblk_line_wp_is_unbalanced
+To:     Hans Holmberg <hans.ml.holmberg@owltronix.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>
+Cc:     Zhoujie Wu <zjwu@marvell.com>, linux-block@vger.kernel.org,
+        hongd@marvell.com
+References: <1548359553-11356-1-git-send-email-zjwu@marvell.com>
+ <CANr-nt3_8YftCP6Oqgnp39YzeF5qpUCBKLPUZ5=TBqP9MFw25g@mail.gmail.com>
+ <CDB99159-EAC8-410A-A556-E412DB2829A1@javigon.com>
+ <CANr-nt0sA0DH-hjfGKSq+88R7GXypVKmSf+Z+Tgy+duMegVE3Q@mail.gmail.com>
+ <8C200D38-729F-407B-B2F8-48AEA7F0FF08@javigon.com>
+ <CANr-nt1aS1DxfC42bX2DfVg3xo5Kkc_YJOe_CBK9k-NATh3ezQ@mail.gmail.com>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <089cd48a-37f0-59e1-ac5f-78dd9cebba05@lightnvm.io>
+Date:   Fri, 25 Jan 2019 15:35:17 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
+MIME-Version: 1.0
+In-Reply-To: <CANr-nt1aS1DxfC42bX2DfVg3xo5Kkc_YJOe_CBK9k-NATh3ezQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
-Can you please have a glance on this patch series, given than attempt is 
-to extend the original architecture of write-hints.
+On 1/25/19 3:21 PM, Hans Holmberg wrote:
+> On Fri, Jan 25, 2019 at 2:33 PM Javier González <javier@javigon.com> wrote:
+>>
+>>
+>>> On 25 Jan 2019, at 13.59, Hans Holmberg <hans.ml.holmberg@owltronix.com> wrote:
+>>>
+>>> On Fri, Jan 25, 2019 at 10:41 AM Javier González <javier@javigon.com> wrote:
+>>>>> On 25 Jan 2019, at 09.47, Hans Holmberg <hans.ml.holmberg@owltronix.com> wrote:
+>>>>>
+>>>>> On Thu, Jan 24, 2019 at 8:51 PM Zhoujie Wu <zjwu@marvell.com> wrote:
+>>>>>> The write pointer of the bad block could be 0 or undefined, ignore
+>>>>>> the checking of the bad block wp for pblk_line_wp_is_unbalanced to
+>>>>>> avoid fake warning.
+>>>>>
+>>>>> fake -> spurious?
+>>>>>
+>>>>>> Signed-off-by: Zhoujie Wu <zjwu@marvell.com>
+>>>>>> ---
+>>>>>> v3: return in case bit >= lm->blk_per_line.
+>>>>>> v2: changed according to Javier's comments.
+>>>>>>
+>>>>>> drivers/lightnvm/pblk-recovery.c | 12 +++++++++---
+>>>>>> 1 file changed, 9 insertions(+), 3 deletions(-)
+>>>>>>
+>>>>>> diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+>>>>>> index 6761d2a..02d466e 100644
+>>>>>> --- a/drivers/lightnvm/pblk-recovery.c
+>>>>>> +++ b/drivers/lightnvm/pblk-recovery.c
+>>>>>> @@ -312,21 +312,27 @@ static int pblk_line_wp_is_unbalanced(struct pblk *pblk,
+>>>>>>        struct nvm_chk_meta *chunk;
+>>>>>>        struct ppa_addr ppa;
+>>>>>>        u64 line_wp;
+>>>>>> -       int pos, i;
+>>>>>> +       int pos, i, bit;
+>>>>>
+>>>>> We don't need both bit and i, one of them is enough.
+>>>>>
+>>>>>> -       rlun = &pblk->luns[0];
+>>>>>> +       bit = find_first_zero_bit(line->blk_bitmap, lm->blk_per_line);
+>>>>>> +       if (bit >= lm->blk_per_line)
+>>>>>> +               return 0;
+>>>>>
+>>>>> If there is only one non-offline chunk in the line, the wp can't be unbalanced,
+>>>>> so it should be safe to return 0 here if bit >= lm->blk_per_line - 1
+>>>>>
+>>>>> If you change this please document why using a comment, as it might
+>>>>> not be obvious
+>>>>>
+>>>>>> +       rlun = &pblk->luns[bit];
+>>>>>>        ppa = rlun->bppa;
+>>>>>>        pos = pblk_ppa_to_pos(geo, ppa);
+>>>>>>        chunk = &line->chks[pos];
+>>>>>
+>>>>>>        line_wp = chunk->wp;
+>>>>>>
+>>>>>> -       for (i = 1; i < lm->blk_per_line; i++) {
+>>>>>> +       for (i = bit + 1; i < lm->blk_per_line; i++) {
+>>>>>
+>>>>>>                rlun = &pblk->luns[i];
+>>>>>>                ppa = rlun->bppa;
+>>>>>>                pos = pblk_ppa_to_pos(geo, ppa);
+>>>>>>                chunk = &line->chks[pos];
+>>>>>
+>>>>> This code is a copy of the code above, it'd be nice to refactor it
+>>>>> into a helper function or just do the chunk lookups in one place.
+>>>>>
+>>>>>> +               if (chunk->state & NVM_CHK_ST_OFFLINE)
+>>>>>> +                       continue;
+>>>>>> +
+>>>>>
+>>>>> Since we rely on the block bitmap anyway, we might as well just
+>>>>> iterate over the zeroes in the block bitmap using find_next_zero_bit
+>>>>> instead.
+>>>>> We do this in lots of other places, see: git grep -n
+>>>>> find_next_zero_bit -- drivers/lightnvm
+>>>>
+>>>> Hans, I proposed him to use the chunk->state instead. I think it is way
+>>>> more robust. We introduced the block bitmap for OCSSD 1.2, because there
+>>>> was no state. Now that we have state, it is better to use it instead. In
+>>>> fact, we should remove the bock bitmap as we have to check for the state
+>>>> either way - note that this aligns also very well with you patches
+>>>> removing the other bitmaps.
+>>>
+>>> These are just nitpicks.
+>>>
+>>> Relying on two data structures(chunks, block bitmap) to be in sync in
+>>> this function in stead of one does not make it more robust imho.
+>>> Either or (checking chunks or the block bitmap) is fine by me.
+>>> Searching the bitmap is more efficient, so that is what I proposed.
+>>
+>> chunk log page is the ground truth, so it is more robust.
+>>
+>> Also, pblk has a long way to start seeing bitmap search vs. integer
+>> comparisons in profiling.
+> 
+> Hehe, yeah, but it does not hurt to use the better alternative when available.
+> 
+>>>
+>>> If we want to remove the block bitmap, we can do that as a separate patch(set)
+>>> I do agree, having two copies of the chunk state is something worth
+>>> getting rid of :)
+>>>
+>>
+>> A good start is not adding code using what we want to remove.
+> 
+> Well, I think it's very confusing to use both copies in the same function.
+> 
+> Now we're nitpicking nitpicks :)
+> 
 
-Thanks,
-
-On Thursday 24 January 2019 01:59 PM, Jan Kara wrote:
-> Hello,
-> 
-> On Wed 09-01-19 21:00:57, Kanchan Joshi wrote:
->> Towards supporing write-hints/streams for filesystem journal.
->>                                                                                  
->> Here is the v1 patch for background -
->> https://marc.info/?l=linux-fsdevel&m=154444637519020&w=2
->>                                                                                  
->> Changes since v1:
->> - introduce four more hints for in-kernel use, as recommended by Dave chinner
->>    & Jens axboe. This isolates kernel-mode hints from user-mode ones.
->> - remove mount-option to specify write-hint, as recommended by Jan kara &
->>    Dave chinner. Rather, FS always sets write-hint for journal. This gets ignored
->>    if device does not support stream.
->> - Removed code-redundancy for write_dirty_buffer (Jan kara's review comment)
-> 
-> I guess the series should also go to Jens since he was the original author
-> of write-hint support so he has the best idea about the architecture.
-> 
-> 								Honza
-> 
->> Kanchan Joshi (4):
->>    block: Increase count of supported write-hints
->>    fs: introduce four macros for in-kernel hints
->>    fs: introduce APIs to enable sending write-hint with buffer-head
->>    fs/ext4,jbd2: add support for passing write-hint with journal.
->>
->>   fs/buffer.c                 | 18 ++++++++++++++++--
->>   fs/ext4/super.c             |  2 ++
->>   fs/jbd2/commit.c            | 11 +++++++----
->>   fs/jbd2/journal.c           |  3 ++-
->>   fs/jbd2/revoke.c            |  3 ++-
->>   include/linux/blkdev.h      |  5 ++++-
->>   include/linux/buffer_head.h |  3 +++
->>   include/linux/fs.h          |  5 +++++
->>   include/linux/jbd2.h        |  8 ++++++++
->>   9 files changed, 49 insertions(+), 9 deletions(-)
->>
->> -- 
->> 2.7.4
->>
->>
+I look forward to a patch. Will one of you volunteer a patch?
