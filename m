@@ -6,73 +6,71 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AFDDC282C6
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 09:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB1DBC282C0
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 09:41:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 18E7021855
-	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 09:37:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CFB3218B0
+	for <linux-block@archiver.kernel.org>; Fri, 25 Jan 2019 09:41:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="wDe5kDHT"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="Bg9rlfei"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726888AbfAYJhT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Jan 2019 04:37:19 -0500
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:42164 "EHLO
+        id S1727689AbfAYJl2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Jan 2019 04:41:28 -0500
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:42534 "EHLO
         mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727689AbfAYJhS (ORCPT
+        with ESMTP id S1726888AbfAYJl2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Jan 2019 04:37:18 -0500
-Received: by mail-ed1-f68.google.com with SMTP id y20so6848073edw.9
-        for <linux-block@vger.kernel.org>; Fri, 25 Jan 2019 01:37:16 -0800 (PST)
+        Fri, 25 Jan 2019 04:41:28 -0500
+Received: by mail-ed1-f68.google.com with SMTP id y20so6857272edw.9
+        for <linux-block@vger.kernel.org>; Fri, 25 Jan 2019 01:41:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=javigon-com.20150623.gappssmtp.com; s=20150623;
         h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
          :references;
-        bh=U7xWct8fpo5uF4inpPT83b7tyag62f+IlDnqulmlW28=;
-        b=wDe5kDHT96ZRkEpQgeZv15Lq8/P4s1cKVJPH4eufmLrNh/i5ed8+HJ3iWukx6deoUy
-         OZjEnkSZyvKoTBt0NZfwNy9CwhRG/Y7LddteXDHuQGvVytyreEmNUhslw+IWapazAEQP
-         QPK0adhTvxOa7XhOYxhsaqIn7ypsPTEYI0+jgaRTdQFQCnD4Oh2hEF5poOqsLg2exOc9
-         S+XtlmNJr2NYQ4RVFyHG+1UQp1RY8WRjtSDpGzAMqLgj1Duh4K7sLR4RevMTgFU4iIfb
-         giVByJtTLADcJ3es7Gfy8/wba3k7iQaQ6kU7w7foXE6Y05RE1rpkg64nrNF1RlB6VWSq
-         ZNbg==
+        bh=UCT+jEdOTIs5VInzxkIi1lAixTxWC5dNmgiuWHtGqHE=;
+        b=Bg9rlfeitvvLlBxunw36tao6AHH1WVUzlhupJh4Q60ocsT7qToP0BDHZcolaXjqNOr
+         tvUjIKWKPP1c/tKkDZOJ0dtkxmDAmW1hMVWTMOf8tp8cmQ13VZ81TpL2h9sMChO3S1g6
+         6tQU2j6o7n6TCIO7G/phxt33pLCZHNpuAHU6y7LvryOfvE0eW4E5PCdbrkDw3V54ANRk
+         Eg6yR3z/N2BRAnnqPOtkrlzSA3TKKBUsYV139ft63F5BxgYrxcaDYhjxX6zgXu2AEQg5
+         vPI7ZjbI428dPFA8wUrjJOZye82SAu2o206V3oeAU79GNO/iIG3wZpN0OIcUyRWIY23l
+         yS0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:message-id:mime-version:subject:date
          :in-reply-to:cc:to:references;
-        bh=U7xWct8fpo5uF4inpPT83b7tyag62f+IlDnqulmlW28=;
-        b=nTXGreTSPh7/0xJRh6xGFivW/UYevtyfqkLBot4bynDWBg3f5VWGifiLDp8fcGwFRJ
-         pQ07oSVQi4QkBsyRqbe/yyf08PeNir3QAbwZguVh7y5UYZvieq7WxgyXUohaRODAUh3h
-         ssVe3IvXtH4tnmPMETKGIfgEOg8us3hCbp8lYlZcHbskh7lpju9pmRgB8IFwIQ2efgLv
-         j5Vnx4fkEoKV1hiu5DUPliYQN6S1W4dJdCgo0oBFNsMqG4AjgJ8D2Vx1sina139YpB+z
-         IVW5J3BbPhfdEdWECCswUpN+8GUaNSt9j8a4DtkRe2+HQGOrUnbR+kWHjIfIJg0e/oyl
-         cR5A==
-X-Gm-Message-State: AJcUukfrTvwIJmF9P+GdMwCAnEJzz2scgWy9bdoZhffw1B+EvPlnztYk
-        CJh+IOpsEhlPOLuiUU4JMUoeag==
-X-Google-Smtp-Source: ALg8bN6INZA6fUxYN/O52HKyif58nX39xqE03ZXJNS+xYJ1/eBQC2C4ZCN3pexXSaST8zD8YqC1a3w==
-X-Received: by 2002:a50:95b4:: with SMTP id w49mr9890358eda.186.1548409036128;
-        Fri, 25 Jan 2019 01:37:16 -0800 (PST)
+        bh=UCT+jEdOTIs5VInzxkIi1lAixTxWC5dNmgiuWHtGqHE=;
+        b=btLQoh3PDSQ1vxEAuFGRC7s5D7FKKvNmpeoPi1PBDvCXZ1kebB+UTNrPqg7YkbS8/g
+         +dsQs3wnaMgABy3aO3gJM0Eln4lBuXdJGfBM+9FYti3BLy5ZNVhIp5dUE4jJmeAqNxsV
+         09cKA8v1hnYljo+zvY1USAEI5nfvVr0lgDH8UGTFj/m9JbPZ+MFYFt4Hg2g9giCheaQj
+         hNgxvkjUOUqkse6af8d5f0knPSz6s9NR4kh7HbmW9Ptdd/qM9CpaDBkOOlL4xebuIy1f
+         xlIpCOV/HqY+0vwufGeJilvhODpIOeWl0775rvchLcqDoYVgqxlH3UCdjGwRBg/yXSu5
+         Du/w==
+X-Gm-Message-State: AJcUukeA9RNTuxRYy7r70JCubreoy77faDoBxOAxgtTvHv9Vh8yQbUd/
+        fACLXJiEWql9z9yBRyJxsa/G7Q==
+X-Google-Smtp-Source: ALg8bN7ezUpf4JsXAbmb+OfFSUCeuAMwgE0wHOz5Bqel9TBy1fpfP1XlX+VGDBcBBObs7HTOuUyxCw==
+X-Received: by 2002:a17:906:4d1a:: with SMTP id r26mr9110689eju.32.1548409286360;
+        Fri, 25 Jan 2019 01:41:26 -0800 (PST)
 Received: from [192.168.1.85] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id b45sm11629157eda.34.2019.01.25.01.37.15
+        by smtp.gmail.com with ESMTPSA id g37sm12054201edb.85.2019.01.25.01.41.25
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 25 Jan 2019 01:37:15 -0800 (PST)
+        Fri, 25 Jan 2019 01:41:25 -0800 (PST)
 From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <7BAC034D-8992-41E4-87A9-378813C821F7@javigon.com>
+Message-Id: <CDB99159-EAC8-410A-A556-E412DB2829A1@javigon.com>
 Content-Type: multipart/signed;
-        boundary="Apple-Mail=_025C617B-44BF-449F-A530-B3644883D9D7";
+        boundary="Apple-Mail=_21B4590E-DCDA-4CA9-A4F9-5FBF5DCE758E";
         protocol="application/pgp-signature";
         micalg=pgp-sha512
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH] lightnvm: pblk: stop taking the free lock in in
- pblk_lines_free
-Date:   Fri, 25 Jan 2019 10:37:14 +0100
-In-Reply-To: <CANr-nt04b06LAXm0LUV4wtGM18Qb2UZ2+Kq+D7XC79nyiptUug@mail.gmail.com>
-Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
+Subject: Re: [PATCH v3] lightnvm: pblk: ignore bad block wp for
+ pblk_line_wp_is_unbalanced
+Date:   Fri, 25 Jan 2019 10:41:24 +0100
+In-Reply-To: <CANr-nt3_8YftCP6Oqgnp39YzeF5qpUCBKLPUZ5=TBqP9MFw25g@mail.gmail.com>
+Cc:     Zhoujie Wu <zjwu@marvell.com>,
+        =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        linux-block@vger.kernel.org, hongd@marvell.com
 To:     Hans Holmberg <hans.ml.holmberg@owltronix.com>
-References: <20190122101531.30893-1-hans@owltronix.com>
- <251D7CB9-A9B0-4474-85A0-B0C23DB31272@javigon.com>
- <CANr-nt04b06LAXm0LUV4wtGM18Qb2UZ2+Kq+D7XC79nyiptUug@mail.gmail.com>
+References: <1548359553-11356-1-git-send-email-zjwu@marvell.com>
+ <CANr-nt3_8YftCP6Oqgnp39YzeF5qpUCBKLPUZ5=TBqP9MFw25g@mail.gmail.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -80,94 +78,97 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---Apple-Mail=_025C617B-44BF-449F-A530-B3644883D9D7
+--Apple-Mail=_21B4590E-DCDA-4CA9-A4F9-5FBF5DCE758E
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;
-	charset=utf-8
+	charset=us-ascii
 
 
-> On 25 Jan 2019, at 10.15, Hans Holmberg =
+> On 25 Jan 2019, at 09.47, Hans Holmberg =
 <hans.ml.holmberg@owltronix.com> wrote:
 >=20
-> On Thu, Jan 24, 2019 at 2:19 PM Javier Gonz=C3=A1lez =
-<javier@javigon.com> wrote:
->>> On 22 Jan 2019, at 11.15, hans@owltronix.com wrote:
->>>=20
->>> From: Hans Holmberg <hans.holmberg@cnexlabs.com>
->>>=20
->>> pblk_line_meta_free might sleep (it can end up calling vfree, =
-depending
->>> on how we allocate lba lists), and this can lead to a BUG()
->>> if we wake up on a different cpu and release the lock.
->>>=20
->>> As there is no point of grabbing the free lock when pblk has shut =
-down,
->>> remove the lock.
->>>=20
->>> Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
->>> ---
->>> drivers/lightnvm/pblk-init.c | 2 --
->>> 1 file changed, 2 deletions(-)
->>>=20
->>> diff --git a/drivers/lightnvm/pblk-init.c =
-b/drivers/lightnvm/pblk-init.c
->>> index f9a3e47b6a93..eb0135c77805 100644
->>> --- a/drivers/lightnvm/pblk-init.c
->>> +++ b/drivers/lightnvm/pblk-init.c
->>> @@ -584,14 +584,12 @@ static void pblk_lines_free(struct pblk *pblk)
->>>      struct pblk_line *line;
->>>      int i;
->>>=20
->>> -     spin_lock(&l_mg->free_lock);
->>>      for (i =3D 0; i < l_mg->nr_lines; i++) {
->>>              line =3D &pblk->lines[i];
->>>=20
->>>              pblk_line_free(line);
->>>              pblk_line_meta_free(l_mg, line);
->>>      }
->>> -     spin_unlock(&l_mg->free_lock);
->>>=20
->>>      pblk_line_mg_free(pblk);
->>>=20
->>> --
->>> 2.17.1
+> On Thu, Jan 24, 2019 at 8:51 PM Zhoujie Wu <zjwu@marvell.com> wrote:
+>> The write pointer of the bad block could be 0 or undefined, ignore
+>> the checking of the bad block wp for pblk_line_wp_is_unbalanced to
+>> avoid fake warning.
+>=20
+> fake -> spurious?
+>=20
+>> Signed-off-by: Zhoujie Wu <zjwu@marvell.com>
+>> ---
+>> v3: return in case bit >=3D lm->blk_per_line.
+>> v2: changed according to Javier's comments.
 >>=20
->> Can you add a comment too indicating that this is only safe on a =
-single
->> threaded shutdown?
->=20
-> To be able to free the lines, we need have stopped anything accessing
-> the lines first. That seems obvious to me.
->=20
-
-The reason I mention this is that there is assumptions on the shutdown
-logic that the line freeup will be single threaded - you can see that we
-do not lock pblk_line_mg_free() either, for the same reason as you are
-removing this lock. We can do this is only because we have a single open
-line at the time (which in close down we fill up in parallel to speed up
-the process BTW). If we have more open lines, it would be desirable to
-close them in parallel. At this point we either have a sync point when
-they are all closed and then free, or we allow them to free themselves.
-In the second case, locking will be necessary.
-
-IMHO, a comment does not hurt.
-
-> It would be nice to make a pass over the code and document pblk's
-> locking(and other concurrency handling, like the line krefs) though.
->=20
-
-True that - krefs specially would deserve some documentation. Let me see
-if I can allocate some time the following weeks to write up some
-documentation.
-
-> Thanks,
-> Hans
->=20
->> Otherwise the patch looks good.
+>> drivers/lightnvm/pblk-recovery.c | 12 +++++++++---
+>> 1 file changed, 9 insertions(+), 3 deletions(-)
 >>=20
->> Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
+>> diff --git a/drivers/lightnvm/pblk-recovery.c =
+b/drivers/lightnvm/pblk-recovery.c
+>> index 6761d2a..02d466e 100644
+>> --- a/drivers/lightnvm/pblk-recovery.c
+>> +++ b/drivers/lightnvm/pblk-recovery.c
+>> @@ -312,21 +312,27 @@ static int pblk_line_wp_is_unbalanced(struct =
+pblk *pblk,
+>>        struct nvm_chk_meta *chunk;
+>>        struct ppa_addr ppa;
+>>        u64 line_wp;
+>> -       int pos, i;
+>> +       int pos, i, bit;
+>=20
+> We don't need both bit and i, one of them is enough.
+>=20
+>> -       rlun =3D &pblk->luns[0];
+>> +       bit =3D find_first_zero_bit(line->blk_bitmap, =
+lm->blk_per_line);
+>> +       if (bit >=3D lm->blk_per_line)
+>> +               return 0;
+>=20
+> If there is only one non-offline chunk in the line, the wp can't be =
+unbalanced,
+> so it should be safe to return 0 here if bit >=3D lm->blk_per_line - 1
+>=20
+> If you change this please document why using a comment, as it might
+> not be obvious
+>=20
+>> +       rlun =3D &pblk->luns[bit];
+>>        ppa =3D rlun->bppa;
+>>        pos =3D pblk_ppa_to_pos(geo, ppa);
+>>        chunk =3D &line->chks[pos];
+>=20
+>>        line_wp =3D chunk->wp;
+>>=20
+>> -       for (i =3D 1; i < lm->blk_per_line; i++) {
+>> +       for (i =3D bit + 1; i < lm->blk_per_line; i++) {
+>=20
+>>                rlun =3D &pblk->luns[i];
+>>                ppa =3D rlun->bppa;
+>>                pos =3D pblk_ppa_to_pos(geo, ppa);
+>>                chunk =3D &line->chks[pos];
+>=20
+> This code is a copy of the code above, it'd be nice to refactor it
+> into a helper function or just do the chunk lookups in one place.
+>=20
+>> +               if (chunk->state & NVM_CHK_ST_OFFLINE)
+>> +                       continue;
+>> +
+>=20
+> Since we rely on the block bitmap anyway, we might as well just
+> iterate over the zeroes in the block bitmap using find_next_zero_bit
+> instead.
+> We do this in lots of other places, see: git grep -n
+> find_next_zero_bit -- drivers/lightnvm
+>=20
 
---Apple-Mail=_025C617B-44BF-449F-A530-B3644883D9D7
+Hans, I proposed him to use the chunk->state instead. I think it is way
+more robust. We introduced the block bitmap for OCSSD 1.2, because there
+was no state. Now that we have state, it is better to use it instead. In
+fact, we should remove the bock bitmap as we have to check for the state
+either way - note that this aligns also very well with you patches
+removing the other bitmaps.
+
+Javier
+
+--Apple-Mail=_21B4590E-DCDA-4CA9-A4F9-5FBF5DCE758E
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
 	filename=signature.asc
@@ -177,19 +178,19 @@ Content-Description: Message signed with OpenPGP
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlxK2MoACgkQPEYBfS0l
-eODJCA/7BPpAYB3Rmziu5rEtnitaNWmUSiZ2AZ5yHzVq7JmDXMmMqkOa1eXeoJu7
-HjXC3wHDcWUoBxAGxwFIUvo36+6o4h5qh2bj+RI/vt2jMP7tbBXQ5Vd6AlAGhnl+
-iTfjPf/iuB0VHpL3ViWCpf4rcgvSdk2Qi222INq2YAA9s0hihNsRiRM2SNai6UsD
-aSQsuz+fBOrWJzeYFwe7L8Ui67+eU80Su4f25YB4QXuvTP0Yal6S19RmxMWP51tc
-5I3lyL4kVFjV6riWU7TiNrG98BKQt/pqPxQaBzgpnbuGgCtBJnY+IituwH7VKidF
-YftswdrvqwXeouxnvM2EaCWWnLcI+B9XB5nSwtLWbaMlbyv9WYm5J/ZOPXUMF/8b
-bXLsh3UDudB/3tkJJYOnwJg0i4UyMli+UX93MFJdiCKyBl5+jDvK6bk04vO0G1tM
-VNMkUY4BYZeCFTEXABXVyiIz9j1cobe0T05/LSqoz5HxmZTHr3CcjStx6/GimYxr
-7fSdUD+nQecjmknjL/6WU4Al8jNuDkhgOrLcOiYnrvK3XchD2HGkXjpEpbhWR5gt
-U22vjoEvT/KZzOw3y6tofYe/wHNiUmnY4RS4UwGh7WQvLDovbIxPn4RD26jab4XV
-zQokB58h3ywvASzZ9+eNgKxOXKMS+VHXrU71kkkNXWByjsq3ACg=
-=eU8s
+iQIzBAEBCgAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlxK2cQACgkQPEYBfS0l
+eOBjrBAAxC6UmlQG6a60ji1jQ6k3zbbdbD+DfQsKGIH/d4sWw5n0/WZwgvLeohYW
+3+XX4jMtgid07Lr5fx2Mjr3gnor9DjanyHI6P57ltIwDtAn0e0qHISK5kHtHE04w
+hxwLkt5KlvD2oU1AuYImpdx4FlnUw0hAAtmd4Flysq6GE1ZvXorFPArr2HWL0vnj
+8bRzx9dD0S6zjnUPfcFM0yR5MwpoNGWZg/fpWP1OegmoHbtfgz6dFaXyQdcbao2h
+rqTzWEKGD+CxxwndMPeRUy9LRnwDpk0eZNSj0aszouJo78L0oAZoXi0Ef2zu81VU
+/4TX15+zeuIicEbZrJC1UMXlNq2yPNG513VyOKyvqWKrqnb3lgx2bYndat48dDBw
+XY45/HbBC/e2V28oNSJ7uMf1KRh2iH6XeaAKyZb2A/dTunmK/rOjRpcWiV1dfg+Y
+0BQSO7GbGqK/70EkxIcqeFybfENNVDljOM3h+gzxWn5IskxAw5oQi6szGZfO09yY
+3fPHH/wJIm9jGnodnfhKp2ZDM/31i8t8tXK/HCdSamGLKctGnY+JJkxiL6axW7Dv
+jJ0bizKusj//zhbxn6gmRCqd+NcMmCIOmFiFEgpUxGbJpdbFPsc3UjMdVympwGme
+SzzaqWDu/nP1CRRue0bGgQxdLJVyZ3m5fJirXI4AYOp0X6vCNbs=
+=Kezw
 -----END PGP SIGNATURE-----
 
---Apple-Mail=_025C617B-44BF-449F-A530-B3644883D9D7--
+--Apple-Mail=_21B4590E-DCDA-4CA9-A4F9-5FBF5DCE758E--
