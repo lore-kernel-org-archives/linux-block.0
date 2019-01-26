@@ -6,125 +6,175 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CFF0C282C7
-	for <linux-block@archiver.kernel.org>; Sat, 26 Jan 2019 10:16:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41B20C282C7
+	for <linux-block@archiver.kernel.org>; Sat, 26 Jan 2019 11:18:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 34663217D7
-	for <linux-block@archiver.kernel.org>; Sat, 26 Jan 2019 10:16:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C333218A6
+	for <linux-block@archiver.kernel.org>; Sat, 26 Jan 2019 11:18:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726335AbfAZKQE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 26 Jan 2019 05:16:04 -0500
-Received: from mx2.suse.de ([195.135.220.15]:59494 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726143AbfAZKQE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Jan 2019 05:16:04 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 5A3D2AE2B;
-        Sat, 26 Jan 2019 10:16:02 +0000 (UTC)
-Subject: Re: [PATCH v2 2/4] Revert "ide: unexport DISK_EVENT_MEDIA_CHANGE for
- ide-gd and ide-cd"
-To:     Martin Wilck <mwilck@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        Tejun Heo <tj@kernel.org>
-Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-ide@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        James Bottomley <jejb@linux.vnet.ibm.com>,
-        Bart Van Assche <Bart.VanAssche@sandisk.com>,
-        Borislav Petkov <bp@alien8.de>
-References: <20190118222805.30373-1-mwilck@suse.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <ae518b9c-50e0-3e88-0376-44408127f765@suse.de>
-Date:   Sat, 26 Jan 2019 11:16:00 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.0
+        id S1726174AbfAZLSN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 26 Jan 2019 06:18:13 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:42958 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726165AbfAZLSN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 26 Jan 2019 06:18:13 -0500
+Received: by mail-lj1-f195.google.com with SMTP id l15-v6so10466272lja.9
+        for <linux-block@vger.kernel.org>; Sat, 26 Jan 2019 03:18:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dBf8mCljPcuuQJqeZgCSw+mqZ3t1Yc27xPSCyO+nKRQ=;
+        b=qpK9vMtM1ojnqbH2ODq+dBBOODTVMucixyupyao6rpHcVsU2spFTJbNMq3QCFCQZ33
+         K2oTGFJasmR6fUzDezGI9DBNnAe9PKGMqjpeAeY5lF79JMo7La+4i8A0OOxf8Mgpb2kz
+         rBMQAQooiBb2UTN+DtZ6giz3+evPyE54fuHnEVoEopHHJSweuDXbvkAYjAB0/k6PwW9D
+         iohgFdZ4oE+wNDcIgLSvhQNV2yLawLAFzl8eslfYFFCk0XkV0QnlilxSIArrC1vR2ep4
+         zlx9hjhj0PSZYHoX61vNasDHPqAbp7PJXTm15xrWxZvRzuvsU3oYj1M5vJmDQgXFzMNk
+         fS/Q==
+X-Gm-Message-State: AHQUAuaN4Go+rtl5lSbYGu3b4cp17cjZpa6A4j2HgGqrAV5zmCnKii9T
+        WVcSitcNZNW9flTRvRKbOVlED1GudepT5zkcfCzBQQ==
+X-Google-Smtp-Source: ALg8bN4P9elZGeBmPmCX7m3ismpbyZFRqXfjHeRxgiHmCOfYJ7WODF8KzPhPetTdLxdgXEgK/JGvhsbrVigTaWnsPnQ=
+X-Received: by 2002:a2e:9e95:: with SMTP id f21-v6mr3316918ljk.128.1548501489911;
+ Sat, 26 Jan 2019 03:18:09 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190118222805.30373-1-mwilck@suse.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190125021107.4595-1-zhangxiaoxu5@huawei.com>
+In-Reply-To: <20190125021107.4595-1-zhangxiaoxu5@huawei.com>
+From:   John Dorminy <jdorminy@redhat.com>
+Date:   Sat, 26 Jan 2019 12:17:57 +0100
+Message-ID: <CAMeeMh_=UVGwo-=9WtBXRmiHTXnLAswqis97bM-aiuwnzPU0QQ@mail.gmail.com>
+Subject: Re: [dm-devel] [v2] block: Fix a WRITE SAME BUG_ON
+To:     Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>, dm-devel@redhat.com,
+        Mike Snitzer <snitzer@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/18/19 11:28 PM, Martin Wilck wrote:
-> This reverts commit 7eec77a1816a7042591a6cbdb4820e9e7ebffe0e.
-> 
-> Instead of leaving disk->events completely empty, we now export the supported
-> events again, and tell the block layer not to forward events to user space by
-> not setting DISK_EVENT_FLAG_UEVENT. This allows the block layer to distinguish
-> between devices that for which events should be handled in kernel only, and
-> devices which don't support any meda change events at all.
-> 
-> Changed wrt v1: fixed editing error made during revert.
-> 
-> Cc: Borislav Petkov <bp@alien8.de>
-> Signed-off-by: Martin Wilck <mwilck@suse.com>
+Hi. I have read a bit of DM code and spent an hour reviewing this... I
+didn't get to the point of knowing what the right fix for the problem
+is, and I may have a wrong understanding, but I have two thoughts
+about the patch:
+
+I don't think this is the right solution for two reasons:
+
+In the first place, if it's an LVM-only issue, we should fix it only
+for device-mapper devices. If this is the right way to fix it,
+possibly the way to do that would be to change DM calls to
+blk_queue_max_write_same_sectors() to only set the max sectors to more
+than 0 if and only if the logical block sizes match.
+
+In the second place, I don't think this is the problem. The line of
+code that's calling BUG_ON is, I think,
+BUG_ON(bio_offset(bio) || bio_iovec(bio).bv_len != sdp->sector_size);
+
+This is because write_same bios are supposed to have a single sector
+of data at the beginning of a page in their bio_iovec(bio) [I think,
+based on a commit message I've read] -- in other words, bio_iovec(bio)
+is supposed to say something like { .page = something, .offset = 0,
+.len = 1 native sector }. But clearly, since the BUG_ON is being
+called, one of these is not true. Have you added a log statement right
+before the BUG_ON() to print out bio_offset(bio) and
+bio_iovec(bio).bv_len to see which value defies expectations?
+
+I would be happy to help you trace through this or attempt to
+reproduce it myself -- what stack of devices can you reproduce this
+on? Is this a dm-linear device on top of a disk? Does it have a
+filesystem on top, and if so, what filesystem?
+
+Thank you!
+
+John Dorminy
+
+
+On Fri, Jan 25, 2019 at 9:53 AM Zhang Xiaoxu <zhangxiaoxu5@huawei.com> wrote:
+>
+> If the lvm is stacked by different logical_block_size disks,
+> when WRITE SAME on it, will bug_on:
+>
+> kernel BUG at drivers/scsi/sd.c:968!
+> invalid opcode: 0000 [#1] SMP PTI
+> CPU: 11 PID: 525 Comm: kworker/11:1H Tainted: G           O      5.0.0-rc3+ #2
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-2.fc27 04/01/2014
+> Workqueue: kblockd blk_mq_run_work_fn
+> RIP: 0010:sd_init_command+0x7aa/0xdb0
+> Code: 30 75 00 00 c7 85 44 01 00 00 18 00 00 00 0f 85 fa 04 00 00 48 83 c4 40 48
+>       89 df 5b 5d 41 5c 41 5d 41 5e 41 5f e9 b6 ca fe ff <0f> 0b 41 bc 09
+> RSP: 0018:ffffb55f80ddbca0 EFLAGS: 00010206
+> RAX: 0000000000001000 RBX: ffff9ed23fb927a0 RCX: 000000000000f000
+> RDX: ffff9ed23f0a8400 RSI: ffff9ed27bc79800 RDI: 0000000000000000
+> RBP: ffff9ed23fb92680 R08: ffff9ed27c8c0000 R09: ffff9ed23fb927d8
+> R10: 0000000000000000 R11: fefefefefefefeff R12: ffff9ed27bc79800
+> R13: ffff9ed2787a0000 R14: ffff9ed27bdf3400 R15: ffff9ed23fb927a0
+> FS:  0000000000000000(0000) GS:ffff9ed27c8c0000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f6b14cf9341 CR3: 0000000069058000 CR4: 00000000000006e0
+> Call Trace:
+>  ? vp_notify+0x12/0x20
+>  scsi_queue_rq+0x525/0xa30
+>  blk_mq_dispatch_rq_list+0x8d/0x580
+>  ? syscall_return_via_sysret+0x10/0x7f
+>  ? elv_rb_del+0x1f/0x30
+>  ? deadline_remove_request+0x55/0xc0
+>  blk_mq_do_dispatch_sched+0x76/0x110
+>  blk_mq_sched_dispatch_requests+0xf9/0x170
+>  __blk_mq_run_hw_queue+0x51/0xd0
+>  process_one_work+0x195/0x380
+>  worker_thread+0x30/0x390
+>  ? process_one_work+0x380/0x380
+>  kthread+0x113/0x130
+>  ? kthread_park+0x90/0x90
+>  ret_from_fork+0x35/0x40
+> Modules linked in: alloc(O+)
+> ---[ end trace dc92ddeb2e6d1fe5 ]---
+>
+> The logical_block_size of the LVM is the max value of the sub disks,
+> it maybe different with one of the sub disk. when WRITE SAME on the
+> disk, it will BUG_ON when setup WRITE SAME cmd.
+>
+> Close WRITE_SAME feature on the LVM if it was stacked by different
+> logical_block_size disk.
+>
+> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
 > ---
->   drivers/ide/ide-cd.c       | 1 +
->   drivers/ide/ide-cd_ioctl.c | 5 +++--
->   drivers/ide/ide-gd.c       | 6 ++++--
->   3 files changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/ide/ide-cd.c b/drivers/ide/ide-cd.c
-> index 1f03884..3b15adc 100644
-> --- a/drivers/ide/ide-cd.c
-> +++ b/drivers/ide/ide-cd.c
-> @@ -1797,6 +1797,7 @@ static int ide_cd_probe(ide_drive_t *drive)
->   	ide_cd_read_toc(drive);
->   	g->fops = &idecd_ops;
->   	g->flags |= GENHD_FL_REMOVABLE | GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE;
-> +	g->events = DISK_EVENT_MEDIA_CHANGE;
->   	device_add_disk(&drive->gendev, g, NULL);
->   	return 0;
->   
-> diff --git a/drivers/ide/ide-cd_ioctl.c b/drivers/ide/ide-cd_ioctl.c
-> index 4a6e1a4..f9f4bac 100644
-> --- a/drivers/ide/ide-cd_ioctl.c
-> +++ b/drivers/ide/ide-cd_ioctl.c
-> @@ -82,8 +82,9 @@ int ide_cdrom_drive_status(struct cdrom_device_info *cdi, int slot_nr)
->   
->   /*
->    * ide-cd always generates media changed event if media is missing, which
-> - * makes it impossible to use for proper event reporting, so disk->events
-> - * is cleared to 0 and the following function is used only to trigger
-> + * makes it impossible to use for proper event reporting, so
-> + * DISK_EVENT_FLAG_UEVENT is cleared in disk->events
-> + * and the following function is used only to trigger
->    * revalidation and never propagated to userland.
->    */
->   unsigned int ide_cdrom_check_events_real(struct cdrom_device_info *cdi,
-> diff --git a/drivers/ide/ide-gd.c b/drivers/ide/ide-gd.c
-> index 04e008e..88dceef 100644
-> --- a/drivers/ide/ide-gd.c
-> +++ b/drivers/ide/ide-gd.c
-> @@ -299,8 +299,9 @@ static unsigned int ide_gd_check_events(struct gendisk *disk,
->   	/*
->   	 * The following is used to force revalidation on the first open on
->   	 * removeable devices, and never gets reported to userland as
-> -	 * genhd->events is 0.  This is intended as removeable ide disk
-> -	 * can't really detect MEDIA_CHANGE events.
-> +	 * DISK_EVENT_FLAG_UEVENT isn't set in genhd->events.
-> +	 * This is intended as removeable ide disk can't really detect
-> +	 * MEDIA_CHANGE events.
->   	 */
->   	ret = drive->dev_flags & IDE_DFLAG_MEDIA_CHANGED;
->   	drive->dev_flags &= ~IDE_DFLAG_MEDIA_CHANGED;
-> @@ -416,6 +417,7 @@ static int ide_gd_probe(ide_drive_t *drive)
->   	if (drive->dev_flags & IDE_DFLAG_REMOVABLE)
->   		g->flags = GENHD_FL_REMOVABLE;
->   	g->fops = &ide_gd_ops;
-> +	g->events = DISK_EVENT_MEDIA_CHANGE;
->   	device_add_disk(&drive->gendev, g, NULL);
->   	return 0;
->   
-> 
-Ah. Good.
-
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-
-Cheers,
-
-Hannes
-
+>  block/blk-settings.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/block/blk-settings.c b/block/blk-settings.c
+> index 3e7038e475ee..e4664280edb4 100644
+> --- a/block/blk-settings.c
+> +++ b/block/blk-settings.c
+> @@ -497,8 +497,6 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>         t->max_sectors = min_not_zero(t->max_sectors, b->max_sectors);
+>         t->max_hw_sectors = min_not_zero(t->max_hw_sectors, b->max_hw_sectors);
+>         t->max_dev_sectors = min_not_zero(t->max_dev_sectors, b->max_dev_sectors);
+> -       t->max_write_same_sectors = min(t->max_write_same_sectors,
+> -                                       b->max_write_same_sectors);
+>         t->max_write_zeroes_sectors = min(t->max_write_zeroes_sectors,
+>                                         b->max_write_zeroes_sectors);
+>         t->bounce_pfn = min_not_zero(t->bounce_pfn, b->bounce_pfn);
+> @@ -537,6 +535,14 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
+>                 }
+>         }
+>
+> +       /* If the logical block size is different, forbid write same */
+> +       if (t->logical_block_size != b->logical_block_size &&
+> +           t->max_write_same_sectors != UINT_MAX)
+> +               t->max_write_same_sectors = 0;
+> +       else
+> +               t->max_write_same_sectors = min(t->max_write_same_sectors,
+> +                                               b->max_write_same_sectors);
+> +
+>         t->logical_block_size = max(t->logical_block_size,
+>                                     b->logical_block_size);
+>
+> --
+> 2.14.4
+>
+> --
+> dm-devel mailing list
+> dm-devel@redhat.com
+> https://www.redhat.com/mailman/listinfo/dm-devel
