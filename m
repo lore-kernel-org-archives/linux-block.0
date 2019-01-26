@@ -2,200 +2,102 @@ Return-Path: <SRS0=xZ4d=QC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4137FC282C0
-	for <linux-block@archiver.kernel.org>; Sat, 26 Jan 2019 01:23:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C8CAC282C7
+	for <linux-block@archiver.kernel.org>; Sat, 26 Jan 2019 10:09:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 02D8321902
-	for <linux-block@archiver.kernel.org>; Sat, 26 Jan 2019 01:23:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="3P8VYIaB"
+	by mail.kernel.org (Postfix) with ESMTP id E538A217D7
+	for <linux-block@archiver.kernel.org>; Sat, 26 Jan 2019 10:09:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726991AbfAZBXq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Jan 2019 20:23:46 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:51740 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725550AbfAZBXq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Jan 2019 20:23:46 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0Q1JVex045652;
-        Sat, 26 Jan 2019 01:23:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=qu9vxDdpFmRBgmwHL4JHREpqE+YrIWp+qSm3IsHXkeg=;
- b=3P8VYIaBgPZTdHvMQxZeSFhQI1Lv+02Eiiz0bq52apOD+PC6mM8Rb62oCD6MYZp5NdjU
- 7F8WZ5w206RIRRHevJnNKcQgjCiRwHQdZ4ARjTiWYOiwwdP1zquwgZiZvCTF5PsqbV4E
- Qyb3yp3ZlowCwH3B3nZ9Th25BuZRGwSS2PPjzniPZkvo/tXK+fi7m9zETMaylLPFVOoO
- 8d8byfGcKtjKjlILzi36lzRdbIMowuIKMP8Utv9dpplBoqR+Nlv2Un/kDLH97hBx3C9q
- NFwnvlEcyuOalDB4VIYaGdIUSq6hbb04QLMgPjF25FW0ShvKUe80eAu9LCDuRVwz6ND1 Fw== 
-Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
-        by aserp2130.oracle.com with ESMTP id 2q8d2dr2tj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 26 Jan 2019 01:23:39 +0000
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x0Q1Nchw031528
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 26 Jan 2019 01:23:38 GMT
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x0Q1Nbll009885;
-        Sat, 26 Jan 2019 01:23:37 GMT
-Received: from [10.191.30.196] (/10.191.30.196)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 25 Jan 2019 17:23:37 -0800
-Subject: Re: fsync hangs after scsi rejected a request
-To:     Florian Stecker <m19@florianstecker.de>,
-        Ming Lei <tom.leiming@gmail.com>
-Cc:     Linux SCSI List <linux-scsi@vger.kernel.org>,
+        id S1729501AbfAZKJY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 26 Jan 2019 05:09:24 -0500
+Received: from mx2.suse.de ([195.135.220.15]:58800 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726143AbfAZKJY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 26 Jan 2019 05:09:24 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 73C7CAB87;
+        Sat, 26 Jan 2019 10:09:22 +0000 (UTC)
+Subject: Re: [PATCH 1/4] block: disk_events: introduce event flags
+To:     Martin Wilck <mwilck@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        Tejun Heo <tj@kernel.org>
+Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-ide@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block <linux-block@vger.kernel.org>
-References: <70df6d90-31eb-96f4-908d-462ea58dea6e@florianstecker.de>
- <CACVXFVOSHtV7jcMwEvDKZzPnsLRzkdvAEqb+ggugkM27LJvagg@mail.gmail.com>
- <a30b5868-dd7d-d3db-b7f4-c723ac279ead@florianstecker.de>
- <CACVXFVOzwaZyJFaOJw3K-FQUHeYGWNx8sPr8kqJzCV59Rd6sqg@mail.gmail.com>
- <e18051e3-4008-e259-dee3-dd58f23642ab@oracle.com>
- <4b631218-49ee-c3ed-46be-17f9d30b663f@florianstecker.de>
- <c42631fa-3e61-e046-851e-8079906a14fb@oracle.com>
- <d9fd42a9-6105-2404-6e74-cc540da1cf16@florianstecker.de>
- <3d921990-06c4-4662-2853-7667b4e9a462@oracle.com>
-From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <4fe48ebc-43db-7ada-087b-5ccbdb64cc66@oracle.com>
-Date:   Sat, 26 Jan 2019 09:25:23 +0800
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>
+References: <20190118213207.2309-1-mwilck@suse.com>
+ <20190118213207.2309-2-mwilck@suse.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <be93f1f5-cb79-04b2-5fc1-140678245197@suse.de>
+Date:   Sat, 26 Jan 2019 11:09:19 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+ Thunderbird/60.3.0
 MIME-Version: 1.0
-In-Reply-To: <3d921990-06c4-4662-2853-7667b4e9a462@oracle.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190118213207.2309-2-mwilck@suse.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9147 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1901260005
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 1/26/19 9:18 AM, jianchao.wang wrote:
+On 1/18/19 10:32 PM, Martin Wilck wrote:
+> Currently, an empty disk->events field tells the block layer not to forward
+> media change events to user space. This was done in commit 7c88a168da80 ("block:
+> don't propagate unlisted DISK_EVENTs to userland") in order to avoid events
+> from "fringe" drivers to be forwarded to user space. By doing so, the block
+> layer lost the information which events were supported by a particular
+> block device, and most importantly, whether or not a given device supports
+> media change events at all.
 > 
+> Prepare for not interpreting the "events" field this way in the future any
+> more. This is done by adding two flag bits that can be set to have the
+> device treated like one that has the "events" field set to a non-zero value
+> before. This applies only to the sd and sr drivers, which are changed to
+> set the new flags.
 > 
-> On 1/26/19 6:10 AM, Florian Stecker wrote:
->>
->>
->> On 1/25/19 10:05 AM, jianchao.wang wrote:
->>>
->>>
->>> On 1/25/19 4:56 PM, Florian Stecker wrote:
->>>> On 1/25/19 4:49 AM, jianchao.wang wrote:
->>>>>
->>>>> It sounds like not so easy to trigger.
->>>>>
->>>>> blk_mq_dispatch_rq_list
->>>>>     scsi_queue_rq
->>>>>        if (atomic_read(&sdev->device_busy) ||
->>>>>          scsi_device_blocked(sdev))
->>>>>          ret = BLK_STS_DEV_RESOURCE;             scsi_end_request
->>>>>                                                    __blk_mq_end_request
->>>>>                                                      blk_mq_sched_restart // clear RESTART
->>>>>                                                        blk_mq_run_hw_queue
->>>>>                                                    blk_mq_run_hw_queues
->>>>>       list_splice_init(list, &hctx->dispatch)
->>>>>     needs_restart = blk_mq_sched_needs_restart(hctx)
->>>>>
->>>>> The 'needs_restart' will be false, so the queue would be rerun.
->>>>>
->>>>> Thanks
->>>>> Jianchao
->>>>
->>>> Good point. So the RESTART flag is supposed to protect against this? Now I see, this is also sort of what the lengthy comment in blk_mq_dispatch_rq_list is saying.
->>>>
->>>> May I complain that this is very unintuitive (the queue gets rerun when the RESTART flag is _not_ set) and also unreliable, as not every caller of blk_mq_dispatch_rq_list seems to set the flag, and also it does not always get cleared in __blk_mq_end_request?
->>>>
->>>> __blk_mq_end_request does the following:
->>>>
->>>>      if (rq->end_io) {
->>>>          rq_qos_done(rq->q, rq);
->>>>          rq->end_io(rq, error);
->>>>      } else {
->>>>          if (unlikely(blk_bidi_rq(rq)))
->>>>              blk_mq_free_request(rq->next_rq);
->>>>          blk_mq_free_request(rq);
->>>>      }
->>>>
->>>> and blk_mq_free_request then calls blk_mq_sched_restart, which clears the flag. But in my case, rq->end_io != 0, so blk_mq_free_request is never called.
->>>
->>> So what is your rq->end_io ?
->>> flush_end_io ? or mq_flush_data_end_io ? or other ?
->>> In normal case, the blk_mq_end_request should be finally invoked.
->>>
->>> Did you ever try the bfq io scheduler instead of mq-deadline ?
->>>
->>> Can you share your dmesg and config file here ?
->>
->> Sure.
->>
->> dmesg: https://urldefense.proofpoint.com/v2/url?u=https-3A__florianstecker.de_dmesg-2D2019-2D01-2D25.txt&d=DwIDaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=7WdAxUBeiTUTCy8v-7zXyr4qk7sx26ATvfo6QSTvZyQ&m=t_udGGsH8ivtjXHin4oQ4LxELuPoXbl_ARP7oSxiQ6k&s=DC2fhRw2g4haGhhHxOYyX4zD6FWQQ5YoERdfptVRHM4&e=
->> Note that no I/O scheduler is in use here, I deactivated them in a udev rule because I still want to be able to use my laptop. When I test this stuff I just reactivate mq-deadline manually.
->>
->> Config is the default in Arch Linux: https://urldefense.proofpoint.com/v2/url?u=https-3A__git.archlinux.org_svntogit_packages.git_tree_trunk_config-3Fh-3Dpackages_linux&d=DwIDaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=7WdAxUBeiTUTCy8v-7zXyr4qk7sx26ATvfo6QSTvZyQ&m=t_udGGsH8ivtjXHin4oQ4LxELuPoXbl_ARP7oSxiQ6k&s=GjV_fyXaKZ8za8zdB_gqmKW7yBlbla2OHRaAT0iGZkc&e=
->>
->> The problem also appears with BFQ.
->>
->> And rq->end_io is set to mq_flush_data_end_io when this happens. The only point I see where this function could invoke blk_mq_end_request is via blk_flush_complete_seq, but it does so only if seq == REQ_FSEQ_DONE. However, seq is REQ_FSEQ_POSTFLUSH for me (i.e. it just transitioned from REQ_FSEQ_DATA to REQ_FSEQ_POSTFLUSH).
+> The new flags are DISK_EVENT_FLAG_POLL to enforce polling of the device for
+> synchronous events, and DISK_EVENT_FLAG_UEVENT to tell the blocklayer to
+> generate udev events from kernel events. They can easily be fit in the int
+> reserved for event bits.
 > 
+> This patch doesn't change behavior.
 > 
-> Could it be this scenario ?
+> Signed-off-by: Martin Wilck <mwilck@suse.com>
+> ---
+>   block/genhd.c         | 22 ++++++++++++++++------
+>   drivers/scsi/sd.c     |  3 ++-
+>   drivers/scsi/sr.c     |  3 ++-
+>   include/linux/genhd.h |  7 +++++++
+>   4 files changed, 27 insertions(+), 8 deletions(-)
 > 
-> data + post flush
-> 
-> blk_flush_complete_seq          a flush
->   case REQ_FSEQ_DATA
->   blk_flush_queue_rq
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 1dd8fd6..bcd16f6 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -1631,7 +1631,8 @@ static unsigned long disk_events_poll_jiffies(struct gendisk *disk)
+>   	 */
+>   	if (ev->poll_msecs >= 0)
+>   		intv_msecs = ev->poll_msecs;
+> -	else if (disk->events & ~disk->async_events)
+> +	else if (disk->events & DISK_EVENT_FLAG_POLL
+> +		 && disk->events & ~disk->async_events)
+>   		intv_msecs = disk_events_dfl_poll_msecs;
 >   
->   finally issued to driver      blk_mq_dispatch_rq_list
->                                 try to issue a flush req
->                                 failed due to NON-NCQ command
->                                 due to RESTART is set, do nothing
->   req complete
->   req->end_io（） // doesn't check RESTART
->   mq_flush_data_end_io
-> 　  blk_flush_complete_seq
->      case REQ_FSEQ_POSTFLUSH
->      blk_kick_flush
->        do nothing because previous flush
->        has not been completed, so 
->        flush_pending_idx != flush_running_idx
-> 
+>   	return msecs_to_jiffies(intv_msecs);
+Hmm. That is an ... odd condition.
+Clearly it's pointless to have the event bit set in the ->events mask if 
+it's already part of the ->async_events mask.
+But shouldn't we better _prevent_ this from happening, ie refuse to set
+DISK_EVENT_FLAG_POLL in events if it's already in ->async_events?
+Then the above check would be simplified.
 
-If it is right, maybe we could try following
+Cheers,
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3ba37b9..3411b6a 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -549,6 +549,7 @@ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
-        if (rq->end_io) {
-                rq_qos_done(rq->q, rq);
-                rq->end_io(rq, error);
-+               blk_mq_sched_restart(hctx);
-        } else {
-                if (unlikely(blk_bidi_rq(rq)))
-                        blk_mq_free_request(rq->next_rq);
-
-
-
->   
-> 
-> 
->>>
->>
+Hannes
