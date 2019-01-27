@@ -2,67 +2,65 @@ Return-Path: <SRS0=IU7b=QD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24384C282CA
-	for <linux-block@archiver.kernel.org>; Sun, 27 Jan 2019 19:05:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64EA4C282CA
+	for <linux-block@archiver.kernel.org>; Sun, 27 Jan 2019 21:04:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E6C912146E
-	for <linux-block@archiver.kernel.org>; Sun, 27 Jan 2019 19:05:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548615908;
-	bh=Efdndb+c5lcIMo3FjnbuDk708FrNQiZ09BVRu67LjUI=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=ZYUp/5ROYWVwzlH2F3sS5/1+kLBMCernGf2Lu+DkDT49w8xYGEs7aYSj9Z2ZFtthF
-	 ye5H2HaGj7BerGNrzlrJBeeSN4g3YSFNQP01aRAURdoBYzYmVURZiy1uatmb0NcJ3r
-	 PeU5sluIKadTvB4eNOZer28mzuZPy91XStiGtnB4=
+	by mail.kernel.org (Postfix) with ESMTP id 35B122087F
+	for <linux-block@archiver.kernel.org>; Sun, 27 Jan 2019 21:04:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727087AbfA0TFG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Jan 2019 14:05:06 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43248 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726630AbfA0TFF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Jan 2019 14:05:05 -0500
-Subject: Re: [GIT PULL] Single block revert for 5.0-rc4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548615905;
-        bh=Efdndb+c5lcIMo3FjnbuDk708FrNQiZ09BVRu67LjUI=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=ybdhHbstGKWh1t09HruT6tlZFHMzLJAxx0VY6up+PsNsGDOYdXPq6qo7U9r2TTn/c
-         g15UUOtCWs0PkyGAfvAqxeXrhA41aSnKqtJkMg5+JAg0ccktDaXICNusP9srdm+TRZ
-         9ARSFLwaqKtwhpwjglgce5s7m7xivdRZuxFZOIBM=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <c47c7c79-5fda-bd0e-f308-5e989cc2cacc@kernel.dk>
-References: <c47c7c79-5fda-bd0e-f308-5e989cc2cacc@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <c47c7c79-5fda-bd0e-f308-5e989cc2cacc@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
- tags/for-linus-20190127
-X-PR-Tracked-Commit-Id: 947b7ac135b16aa60f9141ff72bd494eda0edb5e
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 419967d53fc74bb151cdc9a00d0df80a2cc37173
-Message-Id: <154861590524.4831.15684644815086199807.pr-tracker-bot@kernel.org>
-Date:   Sun, 27 Jan 2019 19:05:05 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        id S1727022AbfA0VEA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Jan 2019 16:04:00 -0500
+Received: from bout01.mta.xmission.com ([166.70.11.15]:40348 "EHLO
+        bout01.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727001AbfA0VEA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 27 Jan 2019 16:04:00 -0500
+Received: from mx04.mta.xmission.com ([166.70.13.214])
+        by bout01.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.87)
+        (envelope-from <sbauer@plzdonthack.me>)
+        id 1gnraw-0001fI-3g; Sun, 27 Jan 2019 14:03:58 -0700
+Received: from plesk14-shared.xmission.com ([166.70.198.161] helo=plesk14.xmission.com)
+        by mx04.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.87)
+        (envelope-from <sbauer@plzdonthack.me>)
+        id 1gnrau-0002Vg-E0; Sun, 27 Jan 2019 14:03:57 -0700
+Received: from hacktheplanet (c-68-50-23-202.hsd1.in.comcast.net [68.50.23.202])
+        by plesk14.xmission.com (Postfix) with ESMTPSA id 71300217B53;
+        Sun, 27 Jan 2019 21:03:55 +0000 (UTC)
+Date:   Sun, 27 Jan 2019 16:03:45 -0500
+From:   Scott Bauer <sbauer@plzdonthack.me>
+To:     David Kozub <zub@linux.fjfi.cvut.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Jonathan Derrick <jonathan.derrick@intel.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+Message-ID: <20190127210345.GA21149@hacktheplanet>
+References: <1548196307-12987-1-git-send-email-zub@linux.fjfi.cvut.cz>
+ <1548196307-12987-2-git-send-email-zub@linux.fjfi.cvut.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1548196307-12987-2-git-send-email-zub@linux.fjfi.cvut.cz>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-XM-SPF: eid=1gnrau-0002Vg-E0;;;mid=<20190127210345.GA21149@hacktheplanet>;;;hst=mx04.mta.xmission.com;;;ip=166.70.198.161;;;frm=sbauer@plzdonthack.me;;;spf=none
+X-SA-Exim-Connect-IP: 166.70.198.161
+X-SA-Exim-Mail-From: sbauer@plzdonthack.me
+Subject: Re: [PATCH v3 01/16] block: sed-opal: fix typos and formatting
+X-SA-Exim-Version: 4.2.1 (built Thu, 05 May 2016 13:38:54 -0600)
+X-SA-Exim-Scanned: Yes (on mx04.mta.xmission.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Sun, 27 Jan 2019 06:54:23 -0700:
-
-> git://git.kernel.dk/linux-block.git tags/for-linus-20190127
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/419967d53fc74bb151cdc9a00d0df80a2cc37173
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+On Tue, Jan 22, 2019 at 11:31:32PM +0100, David Kozub wrote:
+> This should make no change in functionality.
+> The formatting changes were triggered by checkpatch.pl.
+> 
+> Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
