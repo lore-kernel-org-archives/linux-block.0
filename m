@@ -3,64 +3,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64EA4C282CA
-	for <linux-block@archiver.kernel.org>; Sun, 27 Jan 2019 21:04:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 392F7C282CA
+	for <linux-block@archiver.kernel.org>; Sun, 27 Jan 2019 21:04:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 35B122087F
-	for <linux-block@archiver.kernel.org>; Sun, 27 Jan 2019 21:04:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DA6C2087F
+	for <linux-block@archiver.kernel.org>; Sun, 27 Jan 2019 21:04:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727022AbfA0VEA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Jan 2019 16:04:00 -0500
-Received: from bout01.mta.xmission.com ([166.70.11.15]:40348 "EHLO
+        id S1727192AbfA0VEa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Jan 2019 16:04:30 -0500
+Received: from bout01.mta.xmission.com ([166.70.11.15]:40360 "EHLO
         bout01.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727001AbfA0VEA (ORCPT
+        with ESMTP id S1727001AbfA0VEa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Jan 2019 16:04:00 -0500
-Received: from mx04.mta.xmission.com ([166.70.13.214])
+        Sun, 27 Jan 2019 16:04:30 -0500
+Received: from mx01.mta.xmission.com ([166.70.13.211])
         by bout01.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
         (Exim 4.87)
         (envelope-from <sbauer@plzdonthack.me>)
-        id 1gnraw-0001fI-3g; Sun, 27 Jan 2019 14:03:58 -0700
+        id 1gnrbR-0001gR-EC; Sun, 27 Jan 2019 14:04:29 -0700
 Received: from plesk14-shared.xmission.com ([166.70.198.161] helo=plesk14.xmission.com)
-        by mx04.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        by mx01.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.87)
         (envelope-from <sbauer@plzdonthack.me>)
-        id 1gnrau-0002Vg-E0; Sun, 27 Jan 2019 14:03:57 -0700
+        id 1gnrbH-0002Jb-7S; Sun, 27 Jan 2019 14:04:29 -0700
 Received: from hacktheplanet (c-68-50-23-202.hsd1.in.comcast.net [68.50.23.202])
-        by plesk14.xmission.com (Postfix) with ESMTPSA id 71300217B53;
-        Sun, 27 Jan 2019 21:03:55 +0000 (UTC)
-Date:   Sun, 27 Jan 2019 16:03:45 -0500
+        by plesk14.xmission.com (Postfix) with ESMTPSA id 8C02E217B72;
+        Sun, 27 Jan 2019 21:04:18 +0000 (UTC)
+Date:   Sun, 27 Jan 2019 16:04:11 -0500
 From:   Scott Bauer <sbauer@plzdonthack.me>
 To:     David Kozub <zub@linux.fjfi.cvut.cz>
 Cc:     Jens Axboe <axboe@kernel.dk>,
         Jonathan Derrick <jonathan.derrick@intel.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Message-ID: <20190127210345.GA21149@hacktheplanet>
+Message-ID: <20190127210411.GB21149@hacktheplanet>
 References: <1548196307-12987-1-git-send-email-zub@linux.fjfi.cvut.cz>
- <1548196307-12987-2-git-send-email-zub@linux.fjfi.cvut.cz>
+ <1548196307-12987-3-git-send-email-zub@linux.fjfi.cvut.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1548196307-12987-2-git-send-email-zub@linux.fjfi.cvut.cz>
+In-Reply-To: <1548196307-12987-3-git-send-email-zub@linux.fjfi.cvut.cz>
 User-Agent: Mutt/1.9.4 (2018-02-28)
-X-XM-SPF: eid=1gnrau-0002Vg-E0;;;mid=<20190127210345.GA21149@hacktheplanet>;;;hst=mx04.mta.xmission.com;;;ip=166.70.198.161;;;frm=sbauer@plzdonthack.me;;;spf=none
+X-XM-SPF: eid=1gnrbH-0002Jb-7S;;;mid=<20190127210411.GB21149@hacktheplanet>;;;hst=mx01.mta.xmission.com;;;ip=166.70.198.161;;;frm=sbauer@plzdonthack.me;;;spf=none
 X-SA-Exim-Connect-IP: 166.70.198.161
 X-SA-Exim-Mail-From: sbauer@plzdonthack.me
-Subject: Re: [PATCH v3 01/16] block: sed-opal: fix typos and formatting
-X-SA-Exim-Version: 4.2.1 (built Thu, 05 May 2016 13:38:54 -0600)
-X-SA-Exim-Scanned: Yes (on mx04.mta.xmission.com)
+Subject: Re: [PATCH v3 02/16] block: sed-opal: use correct macro for method
+ length
+X-SA-Exim-Version: 4.2.1 (built Fri, 13 May 2016 17:07:30 -0600)
+X-SA-Exim-Scanned: Yes (on mx01.mta.xmission.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 22, 2019 at 11:31:32PM +0100, David Kozub wrote:
-> This should make no change in functionality.
-> The formatting changes were triggered by checkpatch.pl.
+On Tue, Jan 22, 2019 at 11:31:33PM +0100, David Kozub wrote:
+> From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 > 
-> Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+> Also the values of OPAL_UID_LENGTH and OPAL_METHOD_LENGTH are the same,
+> it is weird to use OPAL_UID_LENGTH for the definition of the methods.
+> 
+> Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
