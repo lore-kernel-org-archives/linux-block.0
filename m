@@ -7,45 +7,44 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C6CC282CF
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 974FEC282C8
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 17:02:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F189320844
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:57:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 672BF2175B
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 17:02:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548694646;
-	bh=b+vHH5G6XRFGxHIJtle+zM8EJeG3KKHrhK0J9SjbFzk=;
+	s=default; t=1548694977;
+	bh=uXlKz46DVC94iM1WuhpC5ObdCWuBjQtPeWi1r4OfR3g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=LOfvmekDi5Q5A2glUWHtt3Yfe6bbpMGPbZRKIRmn1N4jJ9QE0slZMR+xfztS48tKK
-	 HIm18z3dD7+06H46mkZ7boAl4DQt1zrVGqnZdqibW3bEvVZlRhvF6gvqb8+e52+rL4
-	 AzcUiyHyXPcvcKuBwT6Z1u9UHShB2kqSd9DJbVIY=
+	b=xslKmrhTK0FiYwKadEJYbmM1qO2tmchrb/W1TzzB44DAOKDPME7xprwS0VAVbbExw
+	 tHr1l4IRI8H3UHVLrxFRKfUW5LcroHxwy3DfGqZgmkUbwWN8po3QeGHPXeRnPg1aFE
+	 /YeHuIMRvxW0FvlO4Wrk6rBwISeD9YC+JMcgPaEg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387784AbfA1Q5H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 11:57:07 -0500
-Received: from mail.kernel.org ([198.145.29.99]:51408 "EHLO mail.kernel.org"
+        id S1733216AbfA1RCu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 12:02:50 -0500
+Received: from mail.kernel.org ([198.145.29.99]:43246 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732468AbfA1QRX (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 11:17:23 -0500
+        id S2387564AbfA1QOG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Jan 2019 11:14:06 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4D14D20879;
-        Mon, 28 Jan 2019 16:17:21 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5057920855;
+        Mon, 28 Jan 2019 16:14:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548692242;
-        bh=b+vHH5G6XRFGxHIJtle+zM8EJeG3KKHrhK0J9SjbFzk=;
+        s=default; t=1548692045;
+        bh=uXlKz46DVC94iM1WuhpC5ObdCWuBjQtPeWi1r4OfR3g=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=zhj4M/r34K8x4n3w+cuIlgYzZ1Dg9xAoYwI3w9hlklCVTkMeeLYeNNPJAUHt10D1l
-         wHcGXb1ksLzuSYgsWl4VkM7A0xfnvqCluAuT7iapsyniLoJMCqS59ac5Dv+3JcTOCW
-         9oCwNjoBXDMDQ2yXJkMrRx6o76VpShxYjz1p8PXc=
+        b=Pd/VN9xVJRTjxbovmowHptiH/D5y0q5UXjB20306hOLejXVSQ9KVK2xd3mGR6xLrb
+         Vk3D0P4aTGeWp+wtpCM2sl4rZM0WEwGIGDpUTMni5g8fgVptUGe7rWX1eUPBn825qS
+         I/QdUpyYP1SaPG+BNuwj1hVQbpkwWShnaTbolAsc=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 124/170] drbd: disconnect, if the wrong UUIDs are attached on a connected peer
-Date:   Mon, 28 Jan 2019 11:11:14 -0500
-Message-Id: <20190128161200.55107-124-sashal@kernel.org>
+Cc:     Young Xiao <YangX92@hotmail.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 051/170] sunvdc: Do not spin in an infinite loop when vio_ldc_send() returns EAGAIN
+Date:   Mon, 28 Jan 2019 11:10:01 -0500
+Message-Id: <20190128161200.55107-51-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190128161200.55107-1-sashal@kernel.org>
 References: <20190128161200.55107-1-sashal@kernel.org>
@@ -57,46 +56,53 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Lars Ellenberg <lars.ellenberg@linbit.com>
+From: Young Xiao <YangX92@hotmail.com>
 
-[ Upstream commit b17b59602b6dcf8f97a7dc7bc489a48388d7063a ]
+[ Upstream commit a11f6ca9aef989b56cd31ff4ee2af4fb31a172ec ]
 
-With "on-no-data-accessible suspend-io", DRBD requires the next attach
-or connect to be to the very same data generation uuid tag it lost last.
+__vdc_tx_trigger should only loop on EAGAIN a finite
+number of times.
 
-If we first lost connection to the peer,
-then later lost connection to our own disk,
-we would usually refuse to re-connect to the peer,
-because it presents the wrong data set.
+See commit adddc32d6fde ("sunvnet: Do not spin in an
+infinite loop when vio_ldc_send() returns EAGAIN") for detail.
 
-However, if the peer first connects without a disk,
-and then attached its disk, we accepted that same wrong data set,
-which would be "unexpected" by any user of that DRBD
-and cause "undefined results" (read: very likely data corruption).
-
-The fix is to forcefully disconnect as soon as we notice that the peer
-attached to the "wrong" dataset.
-
-Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
+Signed-off-by: Young Xiao <YangX92@hotmail.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/drbd/drbd_receiver.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/block/sunvdc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index 143c5a666e25..1aad373da50e 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -4139,7 +4139,7 @@ static int receive_uuids(struct drbd_connection *connection, struct packet_info
- 	kfree(device->p_uuid);
- 	device->p_uuid = p_uuid;
+diff --git a/drivers/block/sunvdc.c b/drivers/block/sunvdc.c
+index ad9749463d4f..ed4d6276e94f 100644
+--- a/drivers/block/sunvdc.c
++++ b/drivers/block/sunvdc.c
+@@ -41,6 +41,8 @@ MODULE_VERSION(DRV_MODULE_VERSION);
+ #define WAITING_FOR_GEN_CMD	0x04
+ #define WAITING_FOR_ANY		-1
  
--	if (device->state.conn < C_CONNECTED &&
-+	if ((device->state.conn < C_CONNECTED || device->state.pdsk == D_DISKLESS) &&
- 	    device->state.disk < D_INCONSISTENT &&
- 	    device->state.role == R_PRIMARY &&
- 	    (device->ed_uuid & ~((u64)1)) != (p_uuid[UI_CURRENT] & ~((u64)1))) {
++#define	VDC_MAX_RETRIES	10
++
+ static struct workqueue_struct *sunvdc_wq;
+ 
+ struct vdc_req_entry {
+@@ -427,6 +429,7 @@ static int __vdc_tx_trigger(struct vdc_port *port)
+ 		.end_idx		= dr->prod,
+ 	};
+ 	int err, delay;
++	int retries = 0;
+ 
+ 	hdr.seq = dr->snd_nxt;
+ 	delay = 1;
+@@ -439,6 +442,8 @@ static int __vdc_tx_trigger(struct vdc_port *port)
+ 		udelay(delay);
+ 		if ((delay <<= 1) > 128)
+ 			delay = 128;
++		if (retries++ > VDC_MAX_RETRIES)
++			break;
+ 	} while (err == -EAGAIN);
+ 
+ 	if (err == -ENOTCONN)
 -- 
 2.19.1
 
