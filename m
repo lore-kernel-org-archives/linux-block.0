@@ -4,48 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39097C282CF
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:28:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 698AFC282C8
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:30:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F298120879
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:28:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39D3E20879
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:30:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548692892;
-	bh=oYPjhPoJOdKPcquVveULBy27n9+m1cqrhyL4DOJ9Z3o=;
+	s=default; t=1548693007;
+	bh=FQ+DFjdnQRjJcPVArBk30OJHovsD3c2fwh/NYq+8dVo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=C3QSlskUl5h0u1JCYsEAk4ba1yZjIlpaDAOf2CIvJExfrpJ6s8rbQWK2P69xHA8yO
-	 Du8i79xPA9vW82EONeT3vjMS5rWGoFmIRLNzjTt5AdFebUHmanMeoyb3oC1hbBayLQ
-	 mgBD61OzrK37dytzeh2tA1ZR1CD6hSsHHtnkkCPw=
+	b=z8fr0nEUvFaTzxhi2ERskPHpSgS2zmip7D7euox4lQ4CSUZZ7HomXLP+/CG65aVUE
+	 NUxGyXyH5YYp7FmtXcFKS5N3ZMkuq0vAwDZwm6v2gTmIRjsu7vgN3zleDKdoLyhEHh
+	 QfwzK7Chjhym+dtASM8vKlsjcFCiCvgkvCl6y7F4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390129AbfA1Q2K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 11:28:10 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38684 "EHLO mail.kernel.org"
+        id S1729231AbfA1Q1b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 11:27:31 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37602 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733074AbfA1Q2J (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 11:28:09 -0500
+        id S2390423AbfA1Q13 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Jan 2019 11:27:29 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7168C2177E;
-        Mon, 28 Jan 2019 16:28:07 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 24A152171F;
+        Mon, 28 Jan 2019 16:27:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548692888;
-        bh=oYPjhPoJOdKPcquVveULBy27n9+m1cqrhyL4DOJ9Z3o=;
+        s=default; t=1548692848;
+        bh=FQ+DFjdnQRjJcPVArBk30OJHovsD3c2fwh/NYq+8dVo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=zISpRvbO3CcbRUcTLmtdRnjBfl4FvryP1UxnkJJsg5HgG5mooKD6wos0kOXobNYO1
-         5Eg/J8QTURtXhVm58bogCpfCHNHkXkJE4db055pB6UuPRNPto4uspEAhTDEeZQSZfF
-         EunTlfGMOESbQwndI+2zrW/V3ifasYIa4o2HF7dE=
+        b=IeiXNNPPtyVuOkayM61+wCPiG/Gj4Usi4s1fVB1c9wzv4yIP+ytF+MKRKf452sHoH
+         sBMMOVNO50KzK+wWXjt249R3HTYIB/ZqZXySNQdwAl1bMEjRckIFHPonYHXZLnAK4w
+         BBwoC+dUsiV5qf3/YWSO5lZy5FLHAFFvyB3y4Mmc=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Finn Thain <fthain@telegraphics.com.au>,
-        linuxppc-dev@lists.ozlabs.org, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 3.18 58/61] block/swim3: Fix -EBUSY error when re-opening device after unmount
-Date:   Mon, 28 Jan 2019 11:26:20 -0500
-Message-Id: <20190128162623.59854-58-sashal@kernel.org>
+Cc:     Roland Kammerer <roland.kammerer@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 3.18 38/61] drbd: narrow rcu_read_lock in drbd_sync_handshake
+Date:   Mon, 28 Jan 2019 11:26:00 -0500
+Message-Id: <20190128162623.59854-38-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190128162623.59854-1-sashal@kernel.org>
 References: <20190128162623.59854-1-sashal@kernel.org>
@@ -57,42 +57,82 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Finn Thain <fthain@telegraphics.com.au>
+From: Roland Kammerer <roland.kammerer@linbit.com>
 
-[ Upstream commit 296dcc40f2f2e402facf7cd26cf3f2c8f4b17d47 ]
+[ Upstream commit d29e89e34952a9ad02c77109c71a80043544296e ]
 
-When the block device is opened with FMODE_EXCL, ref_count is set to -1.
-This value doesn't get reset when the device is closed which means the
-device cannot be opened again. Fix this by checking for refcount <= 0
-in the release method.
+So far there was the possibility that we called
+genlmsg_new(GFP_NOIO)/mutex_lock() while holding an rcu_read_lock().
 
-Reported-and-tested-by: Stan Johnson <userm57@yahoo.com>
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: linuxppc-dev@lists.ozlabs.org
-Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+This included cases like:
+
+drbd_sync_handshake (acquire the RCU lock)
+  drbd_asb_recover_1p
+    drbd_khelper
+      drbd_bcast_event
+        genlmsg_new(GFP_NOIO) --> may sleep
+
+drbd_sync_handshake (acquire the RCU lock)
+  drbd_asb_recover_1p
+    drbd_khelper
+      notify_helper
+        genlmsg_new(GFP_NOIO) --> may sleep
+
+drbd_sync_handshake (acquire the RCU lock)
+  drbd_asb_recover_1p
+    drbd_khelper
+      notify_helper
+        mutex_lock --> may sleep
+
+While using GFP_ATOMIC whould have been possible in the first two cases,
+the real fix is to narrow the rcu_read_lock.
+
+Reported-by: Jia-Ju Bai <baijiaju1990@163.com>
+Reviewed-by: Lars Ellenberg <lars.ellenberg@linbit.com>
+Signed-off-by: Roland Kammerer <roland.kammerer@linbit.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/swim3.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ drivers/block/drbd/drbd_receiver.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
-index 523ee8fd4c15..eaf1336623aa 100644
---- a/drivers/block/swim3.c
-+++ b/drivers/block/swim3.c
-@@ -1027,7 +1027,11 @@ static void floppy_release(struct gendisk *disk, fmode_t mode)
- 	struct swim3 __iomem *sw = fs->swim3;
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index 6960fb064731..4f18ec5198fb 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -3125,7 +3125,7 @@ static enum drbd_conns drbd_sync_handshake(struct drbd_peer_device *peer_device,
+ 	enum drbd_conns rv = C_MASK;
+ 	enum drbd_disk_state mydisk;
+ 	struct net_conf *nc;
+-	int hg, rule_nr, rr_conflict, tentative;
++	int hg, rule_nr, rr_conflict, tentative, always_asbp;
  
- 	mutex_lock(&swim3_mutex);
--	if (fs->ref_count > 0 && --fs->ref_count == 0) {
-+	if (fs->ref_count > 0)
-+		--fs->ref_count;
-+	else if (fs->ref_count == -1)
-+		fs->ref_count = 0;
-+	if (fs->ref_count == 0) {
- 		swim3_action(fs, MOTOR_OFF);
- 		out_8(&sw->control_bic, 0xff);
- 		swim3_select(fs, RELAX);
+ 	mydisk = device->state.disk;
+ 	if (mydisk == D_NEGOTIATING)
+@@ -3167,8 +3167,12 @@ static enum drbd_conns drbd_sync_handshake(struct drbd_peer_device *peer_device,
+ 
+ 	rcu_read_lock();
+ 	nc = rcu_dereference(peer_device->connection->net_conf);
++	always_asbp = nc->always_asbp;
++	rr_conflict = nc->rr_conflict;
++	tentative = nc->tentative;
++	rcu_read_unlock();
+ 
+-	if (hg == 100 || (hg == -100 && nc->always_asbp)) {
++	if (hg == 100 || (hg == -100 && always_asbp)) {
+ 		int pcount = (device->state.role == R_PRIMARY)
+ 			   + (peer_role == R_PRIMARY);
+ 		int forced = (hg == -100);
+@@ -3207,9 +3211,6 @@ static enum drbd_conns drbd_sync_handshake(struct drbd_peer_device *peer_device,
+ 			     "Sync from %s node\n",
+ 			     (hg < 0) ? "peer" : "this");
+ 	}
+-	rr_conflict = nc->rr_conflict;
+-	tentative = nc->tentative;
+-	rcu_read_unlock();
+ 
+ 	if (hg == -100) {
+ 		/* FIXME this log message is not correct if we end up here
 -- 
 2.19.1
 
