@@ -2,80 +2,121 @@ Return-Path: <SRS0=89dG=QE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E048C282C8
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 15:37:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CAF4C282C8
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 15:51:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E2D632171F
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 15:37:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C7962175B
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 15:51:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1548690700;
+	bh=1KhOWK4e3/oNkTXhksJ7qnXQEeF37QcoX3OmQbgIr0c=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=mbOaWuDgF8dntmQVidSadf5ACzuJNJdasPiLeUu1PfI4yL2owzwL6i9VgiMwUhlUl
+	 P/6w2tRl1iuyfu54wpTsj4QTQKwBz05qNKEvJ/Us9dGifqRbm9U0suW1dzqO687jic
+	 JWYPWa9xh6yXVAM53wiyYwJkVVObYko/NdMb+sNY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726695AbfA1PhU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 10:37:20 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:48822 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726693AbfA1PhU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 10:37:20 -0500
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 32BD1F30C2BA0B8F7769;
-        Mon, 28 Jan 2019 23:37:11 +0800 (CST)
-Received: from [127.0.0.1] (10.202.226.43) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.408.0; Mon, 28 Jan 2019
- 23:37:04 +0800
-From:   John Garry <john.garry@huawei.com>
-Subject: Re: [PATCH] block: set rq->cmd_flags with bio->opf instead of
- data->cmd_flags when bio is not Null
-To:     Christoph Hellwig <hch@infradead.org>,
-        "chenxiang (M)" <chenxiang66@hisilicon.com>
-References: <1548337430-66690-1-git-send-email-chenxiang66@hisilicon.com>
- <1c34d6f9-8c3c-a7ff-a956-46e9dc3c2298@hisilicon.com>
- <20190128140716.GA18162@infradead.org>
-CC:     <jejb@linux.vnet.ibm.com>, <martin.petersen@oracle.com>,
-        <linuxarm@huawei.com>, <linux-scsi@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-ID: <55972c1a-051a-1396-6796-84f349830a35@huawei.com>
-Date:   Mon, 28 Jan 2019 15:36:58 +0000
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        id S1729125AbfA1Pvi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 10:51:38 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38240 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729119AbfA1Pvi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Jan 2019 10:51:38 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F3F712177E;
+        Mon, 28 Jan 2019 15:51:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1548690697;
+        bh=1KhOWK4e3/oNkTXhksJ7qnXQEeF37QcoX3OmQbgIr0c=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=qCZ6Fq5M/s+YnRzaGzeMvD7b5yGKGIY9SMMKF/d3OpIpaYv0r1O0yUn2ffFsnfF0r
+         155SqMfdu88pLa/rA753lvXx2Pc7iDtSCYFqB5ty6ynNqNtKtQkm5cBH3GCHrS9TvC
+         7Cj3okCcL2g8ETC08u/5cbnOe/1AFFKz9ERoWGJg=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
+        =?UTF-8?q?Matias=20Bj=C3=B8rling?= <mb@lightnvm.io>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: [PATCH AUTOSEL 4.20 167/304] lightnvm: Fix uninitialized return value in nvm_get_chunk_meta()
+Date:   Mon, 28 Jan 2019 10:41:24 -0500
+Message-Id: <20190128154341.47195-167-sashal@kernel.org>
+X-Mailer: git-send-email 2.19.1
+In-Reply-To: <20190128154341.47195-1-sashal@kernel.org>
+References: <20190128154341.47195-1-sashal@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20190128140716.GA18162@infradead.org>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.226.43]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=UTF-8
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 28/01/2019 14:07, Christoph Hellwig wrote:
->>> for rq->cmd_flags. It will cause dix=0 in function
->>> sd_setup_read_write_cmnd() when enabled DIX, which will cause IO
->>> exception when enabled DIX.
->>>
->>> For some IOs such as internal IO from SCSI layer, the parameter bio of
->>> function blk_mq_get_request() is Null, so need to check bio to
->>> decise rq->cmd_flags.
->
-> We have data->cmd_flags to deal with the NULL bio case.
-> blk_mq_make_request initializes data->cmd_flags from bio->bi_opf
-> just before calling blk_mq_get_request, so I'm really missing what you
-> are trying to fix here.
+From: Geert Uytterhoeven <geert@linux-m68k.org>
 
-As I understood, the problem is the scenario of calling 
-blk_mq_make_request()->bio_integrity_prep() where we then allocate a bio 
-integrity payload in calling bio_integrity_alloc().
+[ Upstream commit 55e58c5e78aad9d3246f57e7718cf5ee7adde9e3 ]
 
-In this case, bio_integrity_alloc() sets bio->bi_opf |= REQ_INTEGRITY, 
-which is no longer consistent with data.cmd_flags.
+With gcc 4.1:
 
-John
+    drivers/lightnvm/core.c: In function ‘nvm_get_bb_meta’:
+    drivers/lightnvm/core.c:977: warning: ‘ret’ may be used uninitialized in this function
 
->
-> .
->
+and
 
+    drivers/nvme/host/lightnvm.c: In function ‘nvme_nvm_get_chk_meta’:
+    drivers/nvme/host/lightnvm.c:580: warning: ‘ret’ may be used uninitialized in this function
+
+Indeed, if (for the former) the number of channels or LUNs is zero, or
+(for both) the passed number of chunks is zero, ret will be returned
+uninitialized.
+
+Fix this by preinitializing ret to zero.
+
+Fixes: aff3fb18f957de93 ("lightnvm: move bad block and chunk state logic to core")
+Fixes: a294c199455187d1 ("lightnvm: implement get log report chunk helpers")
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Signed-off-by: Matias Bjørling <mb@lightnvm.io>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/lightnvm/core.c      | 2 +-
+ drivers/nvme/host/lightnvm.c | 3 ++-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+index efb976a863d2..73ab3cf26868 100644
+--- a/drivers/lightnvm/core.c
++++ b/drivers/lightnvm/core.c
+@@ -974,7 +974,7 @@ static int nvm_get_bb_meta(struct nvm_dev *dev, sector_t slba,
+ 	struct ppa_addr ppa;
+ 	u8 *blks;
+ 	int ch, lun, nr_blks;
+-	int ret;
++	int ret = 0;
+ 
+ 	ppa.ppa = slba;
+ 	ppa = dev_to_generic_addr(dev, ppa);
+diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
+index a4f3b263cd6c..d64805dc8efb 100644
+--- a/drivers/nvme/host/lightnvm.c
++++ b/drivers/nvme/host/lightnvm.c
+@@ -577,7 +577,8 @@ static int nvme_nvm_get_chk_meta(struct nvm_dev *ndev,
+ 	struct ppa_addr ppa;
+ 	size_t left = nchks * sizeof(struct nvme_nvm_chk_meta);
+ 	size_t log_pos, offset, len;
+-	int ret, i, max_len;
++	int i, max_len;
++	int ret = 0;
+ 
+ 	/*
+ 	 * limit requests to maximum 256K to avoid issuing arbitrary large
+-- 
+2.19.1
 
