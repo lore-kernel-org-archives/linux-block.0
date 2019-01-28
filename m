@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A706AC282C8
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 10:54:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CA11C282C8
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 12:18:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 632AA2148E
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 10:54:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 107212148E
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 12:18:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="SYh7cQ25";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="c2pbaiCH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="BvDRjU8J";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="oTtETXI1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726648AbfA1Kym (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 05:54:42 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:20367 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726611AbfA1Kym (ORCPT
+        id S1726714AbfA1MSH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 07:18:07 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:16380 "EHLO
+        esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726694AbfA1MSH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 05:54:42 -0500
+        Mon, 28 Jan 2019 07:18:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1548672883; x=1580208883;
+  t=1548677921; x=1580213921;
   h=from:to:cc:subject:date:message-id:references:
    content-transfer-encoding:mime-version;
-  bh=Ud7TG3ef/gqUZ7ZBGpYwFhUZePA7WDkgyQ/PtcbZL5w=;
-  b=SYh7cQ252Wu7KGMps69efK1t80Ucksu7s1tsRgu9c1S4KoZk5ioPYiID
-   KygUct2BZgL+kJngWwDp7KReaA9VgNay4Puv7hU/ulzpg8J1VYgfMNxsS
-   yFpWQAngk5bJej5aihMrzh0JBNC8q0q9K1rVa6QC2j8eWIRPC5oRF0VOI
-   K8NFYDoT8haWU9tLKzKisZAn2E4cfggtOr5lSIpM1jeBHceuZTxf2Ecz6
-   VWp4UMV10NiTeTVBSAW0i/YCHDRZOGRhCRx3VejO3h4ZXxG6pzB6mr8gy
-   D0Z3iTk2tYYsI32VbnmJGWFDmVpBJmyuoOZxShEaJbQpO5wKjhXAf/HVN
-   g==;
-X-IronPort-AV: E=Sophos;i="5.56,533,1539619200"; 
-   d="scan'208";a="99934808"
-Received: from mail-sn1nam04lp2056.outbound.protection.outlook.com (HELO NAM04-SN1-obe.outbound.protection.outlook.com) ([104.47.44.56])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Jan 2019 18:54:42 +0800
+  bh=Ke0nL6xLEI5VGBflDmvWcJsFK7o5l7Vp0PMs50CB6wI=;
+  b=BvDRjU8JvUs36zyD2Mkw/qi5QBMoisNNZBb/8vIyLx14sW5mAsjIJBxO
+   z1hFyUqn6MudigNRmCGkobvyVC67Lp72zAgwE0nYmfKpclL5opTK18HOW
+   0GQWtq7+x8U2gUg42pnhQShmW8ikcJorCN/D3RfRk0fV4TTn5Td0TL5dz
+   /GGyDhhg5ZVrW9qczx8/cvJGg2tC4Kts/lD+RqdvIWKx8iWZmeXK39mLr
+   ZBtsNc4avTECoENSZbMYdFhoPqSJZMv4Ntoz44AgGbhTtP5bASBsrcbho
+   u8+24aLvCDlZzgGGFXBVxGv6nvEO9UoU9YszQ5aCS/Mzgsdkc7luRGuoe
+   A==;
+X-IronPort-AV: E=Sophos;i="5.56,534,1539619200"; 
+   d="scan'208";a="198044497"
+Received: from mail-bn3nam04lp2055.outbound.protection.outlook.com (HELO NAM04-BN3-obe.outbound.protection.outlook.com) ([104.47.46.55])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Jan 2019 20:18:40 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rqeKny/ymYu3VRmjNnJCe/yuUY8WvqFXgXbeuF508oE=;
- b=c2pbaiCHApiuvfovdxKE51o7aj8yyQ3Ze2T6xOqJNzZLYHrErNlx9BVPvrCsBRZPArk6448zj6FZqvAxLblxp7ElknPfP8usxWKP032cUVlcloLiUCOGy9UvRLPv+9AK5onrYen1ROCX9QF7R1qSloPGPDKM37R5gt8Rw7hA9OA=
+ bh=gUV1gr+gIJZLXiXHdu447oNC54bP0vn2uaZeLls/fUw=;
+ b=oTtETXI1nQHNCrWJYOuUj6u16dXGHcjXN3YI8oCJCcBDiSWdI9NfWEerl80piYSthDs9P6oPCyIvmdMDD7dHCFuWJ8VmYT5nbPPwHCxWgpLiOjsdZ3RAGL2WbNMoeWOVnriJpcKdkb4bsdUn1EfNwd7Q9D1StEERzzPzWDfUTxA=
 Received: from CY1PR04MB2268.namprd04.prod.outlook.com (10.167.9.7) by
- CY1PR04MB2330.namprd04.prod.outlook.com (10.167.9.21) with Microsoft SMTP
+ CY1PR04MB2011.namprd04.prod.outlook.com (10.166.191.24) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1558.17; Mon, 28 Jan 2019 10:54:39 +0000
+ 15.20.1558.17; Mon, 28 Jan 2019 12:18:03 +0000
 Received: from CY1PR04MB2268.namprd04.prod.outlook.com
  ([fe80::9431:bb6e:5c5f:ca67]) by CY1PR04MB2268.namprd04.prod.outlook.com
  ([fe80::9431:bb6e:5c5f:ca67%6]) with mapi id 15.20.1558.023; Mon, 28 Jan 2019
- 10:54:39 +0000
+ 12:18:03 +0000
 From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     Omar Sandoval <osandov@osandov.com>
 CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -65,16 +65,15 @@ CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
         Damien Le Moal <Damien.LeMoal@wdc.com>
-Subject: Re: [PATCH blktests v3 05/13] check: Introduce fallback_device() and
- cleanup_fallback_device()
-Thread-Topic: [PATCH blktests v3 05/13] check: Introduce fallback_device() and
- cleanup_fallback_device()
-Thread-Index: AQHUrxKOmRiu8u6XIUyrQXRkEeFunw==
-Date:   Mon, 28 Jan 2019 10:54:39 +0000
-Message-ID: <CY1PR04MB226816BADD703F49533F557AED960@CY1PR04MB2268.namprd04.prod.outlook.com>
+Subject: Re: [PATCH blktests v3 06/13] common: Introduce _dd() helper function
+Thread-Topic: [PATCH blktests v3 06/13] common: Introduce _dd() helper
+ function
+Thread-Index: AQHUrxKLm34VokWSrEKGRiEXEDFdzA==
+Date:   Mon, 28 Jan 2019 12:18:03 +0000
+Message-ID: <CY1PR04MB22687FCA775E40FA427F73FCED960@CY1PR04MB2268.namprd04.prod.outlook.com>
 References: <20190118094453.13773-1-shinichiro.kawasaki@wdc.com>
- <20190118094453.13773-6-shinichiro.kawasaki@wdc.com>
- <20190125211401.GD26739@vader>
+ <20190118094453.13773-7-shinichiro.kawasaki@wdc.com>
+ <20190125211716.GE26739@vader>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -83,83 +82,80 @@ authentication-results: spf=none (sender IP is )
  smtp.mailfrom=shinichiro.kawasaki@wdc.com; 
 x-originating-ip: [199.255.47.11]
 x-ms-publictraffictype: Email
-x-microsoft-exchange-diagnostics: 1;CY1PR04MB2330;6:oEPPRC4Z9Bo7BW1IoxCV8vBI08UAi9P7nRwv6sYZXUknLQGazY/Z3+j+Wo95XamPOwHC1LVlDgin+9gqSbyOWj4hlpwCzUKTC+jzA4/ZZU1iYYp33pOV77hbDhZn8/Zhfb7qRnRPgY6j54KtaRsHxkEiKstHP+NU3G84/pBPssNQDpLLw2/MG8i57UAJK2jq+fAqY3F4AMyr5NEH2bVjDdN0eSghKU2aP2TQXwgFA2OITOuTN+Mnvnf3OwUgbBSw9CLFefYEB3UkaPkwNIi8WV3MGBW0ytHT7I8Rh5KX0SUVJaBg2vT0hvAX+9JsveA2NisJZPiCXRtxlSSn45QTodbHoQVQ3GzXk2vctmn4vi/MbEzp7efbsZ6XOJOd6u5rwdtXbpILOyIuVm78tYSH5/GG8GsLapHy5iWQNTaOyeQ0KN2HyWSNQmsHhGWIEOYJQq/G/kjM3tqtB0QP3lJUVA==;5:oky+ZcgH8T9q0pJ+oFlnE437t1GbaN/8eMf8NArJmUdQ5j7q4ueDSniDDMfDfB0AaCe8bIEbJchGClfd05eQKttm+g09ZwE5sZgCcHNV/N3aTCsZvJiu2YIzTYoF8aj48AymcvFZ4m3pdENpTYqSw+gOz6pbTtIqKhsRe1FE4UcbbaU8oEUYSjtPvrKbYVY0HzhMkkfnYfLm5QsYv67kqg==;7:mn5iV7QrSUDpb8R3NbE13xLipqRWEGnJosuq6Q7byiZlVWhtsBtlzFqYa/W1ddR/FxLBZEE6j9im+IEmCj1/G9oKJxAMhLLl8iKcf/jjWfj3n9H3nhVuQKE8lnVC37jAwTTi1Ne7puwIAz7CH+IomA==
-x-ms-office365-filtering-correlation-id: 5059aff9-6bac-40c8-a08e-08d6850f0034
+x-microsoft-exchange-diagnostics: 1;CY1PR04MB2011;6:kcL39yDsioBo4xGzjUOc9LMSVRKUQNtKvoJB2nf7rUZT/8CXyesUvhq1qTzkB1JNY0hL1dbkEh9zeIHdfJEb8sBzh2H2sBLYyu8GmiMFg9vhHXmUUULsARkb60Px96QOG7Uuj36NSJjsikAgjNJhdHI8Dolw7fSYHqL6B92YvN9SjYTRnf1W4miwMp9ti5ZhJCJB/OHUebO2GkfqtughKWaPfImU8iDdLKz+XADO6XOgnGwap37eNuAFHbTN+e+oRo0W7oYvuK3lr2hH0paPPgVrh7FfGPndGncx7ip5tjUgz3px9Js5Ao7jDAZFJvhlODCf3P8KWaspMVhcaMyP2WlbhsvAIvf4HT2++K1WoejUlYvAoKEqb4h+XlTAPcqP39RAQQzAp5Xs/t62XVPbfMuOf14oqneiQ8mMntmp5Eky9Vd2Q5TvAPDwNbEaCo+rspk/IHf0HOVrDVJncnN1DA==;5:s2Of4orzAhTXZhfiI769x501qbx+Nvs8+lD0iCV12avBLCjIzbl2w+PFCDbF/UKdtrL+LpJ2jwdSaAFuWwsUVjTRWGDHm/Mu3YK72KyhABO6sIMu+t3GFWxXw5toJzrQ34tDZhGuGZPz0E/TnPF/NKxCV60+y+P9KKbj/69kfiAUKXJsOw7Pt92FWy0sez1H7rc67bcFlwq1o4TfX6Z/yw==;7:KCclV7GExXPSyr0XvqY8cO3hFYPMkuC1rRiDrwrSHAj3m2bNvy8dSRyKI+IqYqkQ7/6HoPUtz//LPZJ+fG1OKpcfbBmnb6v27zab8L9wAkHJ9dV+i2oHG7g+fOnI28d+Z+RwC1wZWQPCQzYLQSa5yA==
+x-ms-office365-filtering-correlation-id: 69d7bd0b-3028-40fb-41d2-08d6851aa6d0
 x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600110)(711020)(4605077)(4618075)(2017052603328)(7153060)(7193020);SRVR:CY1PR04MB2330;
-x-ms-traffictypediagnostic: CY1PR04MB2330:
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600110)(711020)(4605077)(4618075)(2017052603328)(7153060)(7193020);SRVR:CY1PR04MB2011;
+x-ms-traffictypediagnostic: CY1PR04MB2011:
 wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <CY1PR04MB233045496C88B5D9F94E103EED960@CY1PR04MB2330.namprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <CY1PR04MB201119E08EDAC16F1D974423ED960@CY1PR04MB2011.namprd04.prod.outlook.com>
 x-forefront-prvs: 0931CB1479
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(346002)(366004)(39860400002)(396003)(376002)(199004)(189003)(74316002)(305945005)(229853002)(97736004)(6506007)(53546011)(68736007)(316002)(102836004)(81166006)(53936002)(44832011)(81156014)(486006)(6436002)(256004)(7736002)(66066001)(8676002)(9686003)(446003)(4326008)(54906003)(476003)(6246003)(55016002)(25786009)(71190400001)(7696005)(186003)(2906002)(86362001)(71200400001)(8936002)(6916009)(478600001)(105586002)(14454004)(6116002)(3846002)(99286004)(33656002)(26005)(76176011)(106356001);DIR:OUT;SFP:1102;SCL:1;SRVR:CY1PR04MB2330;H:CY1PR04MB2268.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(346002)(366004)(39860400002)(136003)(376002)(396003)(199004)(189003)(76176011)(81166006)(81156014)(54906003)(476003)(25786009)(66066001)(446003)(8676002)(53936002)(26005)(305945005)(7736002)(6916009)(6246003)(186003)(74316002)(4326008)(14444005)(2906002)(7696005)(86362001)(97736004)(8936002)(316002)(99286004)(256004)(44832011)(486006)(68736007)(71200400001)(105586002)(106356001)(33656002)(14454004)(229853002)(53546011)(9686003)(55016002)(71190400001)(6436002)(478600001)(6506007)(102836004)(3846002)(6116002);DIR:OUT;SFP:1102;SCL:1;SRVR:CY1PR04MB2011;H:CY1PR04MB2268.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: F3p+1cEMHYNv6ykc2cFX1BFXXnlXkLJUlKazH2kVq2HcGtL7n4r5JhkebrjAks2RJCw+XUQ/L/A3PYO5lRzjeNoHsIMctHeD0npG2WvelrIXqbLHR7HUP+FTgBIg+ray7/LKLXN482jGbSs//ZfqLC+GD0kowoNd6i9eW/rnkwPagTQ1H16c3zSS3beFag8woBKFOJ73Gaaxs8zZd4H/IkwNJSz9WpnLChSZzecEZYOW3il2qYAp6h3915f7XEgYGP485Ni/1a1FOJh/uqk0C970d8JU3P6Rr073ORLivEwy/6MMPPn2IJEMXU/4Uhfk4Fy3Sibv6BXNjnJ69e3lEbxKYwNAZvJMIIOQ6MxlrnXSC3E+1T606jjTDGfrI/VBoDsDtvJWhogLhagEm57C4Vd5JXsZe2UGxJfSCoLssCQ=
+x-microsoft-antispam-message-info: 66N8tZpvfoPebblcvCPJSMkQmgTpgDPSC43Qfy8IZXkGlaaddY90+Gusac86pthn/5jtjAacnuhxA9vvp41Ck0HVE/Q5CZDDt5wY7t/Llql1L+XzlsHgYeceQRMwMF8YaOBLv0+O5PpigRLq2mHBNFaE/4LEAUjHBJwr1Okkt7A+937ZDitoxhFxJSMK0ayW0nElMb7jenKMpaGijYjkoCCO79MXFXHm/blzAARrL+ewvleAnigOHxn+H8+DDDTKmsHX/1JoLq68neO+9PhWFwHYTmGh+PSlQyU+NCNEkkhNmD1FtX3LrCfeUQ6243g5ZfEqAX+oNUYFHYzCtq8DuU72wI8XqwLy7ffJjcGwacFX0TWStB9kZubSju4HlTLJPeQ63t8lr7BIAvnB4BXuRNYVDLV3ZZca6MOcHEWbrkI=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5059aff9-6bac-40c8-a08e-08d6850f0034
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jan 2019 10:54:39.3105
+X-MS-Exchange-CrossTenant-Network-Message-Id: 69d7bd0b-3028-40fb-41d2-08d6851aa6d0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jan 2019 12:18:03.2132
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR04MB2330
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR04MB2011
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/26/19 6:14 AM, Omar Sandoval wrote:=0A=
-> On Fri, Jan 18, 2019 at 06:44:45PM +0900, Shin'ichiro Kawasaki wrote:=0A=
->> These optional functions can be defined by a test case script. When=0A=
->> defined and TEST_DEVS is empty, the fallback_device() is executed before=
-=0A=
->> runing the test case. The fallback_device() function intializes a virtua=
-l=0A=
->> device to run the test case and return the device to be set in TEST_DEVS=
-.=0A=
->> After running the test case, cleanup_fallback_device() is executed to=0A=
->> clean up the device.=0A=
+On 1/26/19 6:17 AM, Omar Sandoval wrote:=0A=
+> On Fri, Jan 18, 2019 at 06:44:46PM +0900, Shin'ichiro Kawasaki wrote:=0A=
+>> To analyze dd command failures found by blktests, need to confirm dd=0A=
+>> command options. Introduce the helper function which executes dd and=0A=
+>> records dd command options in FULL file for quick analysis.=0A=
 >>=0A=
->> This feature allows to run test cases with test_device() function even i=
-f=0A=
->> TEST_DEVS is not set in the config, using virtaul devices such as null_b=
-lk.=0A=
->>=0A=
+>> Reviewed-by: Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>=0A=
 >> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>=0A=
 >> ---=0A=
->>   check | 25 +++++++++++++++++++++++++=0A=
->>   1 file changed, 25 insertions(+)=0A=
+>>   common/rc | 31 +++++++++++++++++++++++++++++++=0A=
+>>   1 file changed, 31 insertions(+)=0A=
 >>=0A=
->> diff --git a/check b/check=0A=
->> index 4563d62..4b66995 100755=0A=
->> --- a/check=0A=
->> +++ b/check=0A=
->> @@ -407,6 +407,7 @@ _run_test() {=0A=
->>   	CHECK_DMESG=3D1=0A=
->>   	DMESG_FILTER=3D"cat"=0A=
->>   	RUN_FOR_ZONED=3D0=0A=
->> +	FALLBACK_DEVICE=3D0=0A=
->>   =0A=
->>   	# shellcheck disable=3DSC1090=0A=
->>   	. "tests/${TEST_NAME}"=0A=
->> @@ -425,6 +426,23 @@ _run_test() {=0A=
->>   			_call_test test=0A=
->>   		fi=0A=
->>   	else=0A=
->> +		if [[ ${#TEST_DEVS[@]} -eq 0 ]] && \=0A=
->> +			declare -fF fallback_device >/dev/null && \=0A=
->> +			declare -fF cleanup_fallback_device >/dev/null; then=0A=
+>> diff --git a/common/rc b/common/rc=0A=
+>> index 153a323..fe0e5d8 100644=0A=
+>> --- a/common/rc=0A=
+>> +++ b/common/rc=0A=
+>> @@ -214,3 +214,34 @@ _test_dev_in_hotplug_slot() {=0A=
+>>   _filter_xfs_io_error() {=0A=
+>>   	sed -e 's/^\(.*\)64\(: .*$\)/\1\2/'=0A=
+>>   }=0A=
+>> +=0A=
+>> +# Issue dd command with five arguments and record command line in FULL =
+file.=0A=
+>> +# args: target device, r/w, start sector, sector len, block size in byt=
+es=0A=
+>> +_dd() {=0A=
+>> +	local target_dev=3D${1}=0A=
+>> +	local rw=3D${2}=0A=
+>> +	local -i start_sector=3D${3}=0A=
+>> +	local -i start_byte=3D$(( start_sector * 512 ))=0A=
+>> +	local -i sector_count=3D${4}=0A=
+>> +	local -i bs=3D${5}=0A=
+>> +	local -i block_count=3D$(( sector_count * 512 / bs ))=0A=
+>> +=0A=
+>> +	local _cmd=3D"dd bs=3D${bs} count=3D${block_count}"=0A=
+>> +=0A=
+>> +	if [[ ${rw} =3D "read" ]]; then=0A=
+>> +		_cmd=3D"${_cmd} if=3D${target_dev} of=3D/dev/null"=0A=
+>> +		_cmd=3D"${_cmd} iflag=3Dskip_bytes skip=3D${start_byte}"=0A=
+>> +	elif [[ ${rw} =3D "write" ]]; then=0A=
+>> +		_cmd=3D"${_cmd} if=3D/dev/zero of=3D${target_dev}"=0A=
+>> +		_cmd=3D"${_cmd} oflag=3Dseek_bytes,direct seek=3D${start_byte}"=0A=
+>> +	fi=0A=
 > =0A=
-> We should check in _found_test that cleanup_fallback_device is defined=0A=
-> if fallback_device is defined, and vice versa. Then, we can just check=0A=
-> for fallback_device here.=0A=
+> This doesn't seem to be abstracting away anything too complicated. I'd=0A=
+> rather you remove the layer of indirection and open-code calls to dd.=0A=
 =0A=
-Thanks. Will change the patch as suggested. I noticed that fallback_device =
-and =0A=
-cleanup_fallback_device should be unset at the beginning of _found_test. Wi=
-ll =0A=
-add it also.=0A=
+OK. Will replace _dd function call with dd command call.=0A=
 =0A=
 -- =0A=
 Best Regards,=0A=
