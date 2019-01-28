@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE7DC282CD
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39097C282CF
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:28:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1FD4D2171F
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:26:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F298120879
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:28:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548692782;
-	bh=yKsmlZx/Z4GFK26nt0bFCgk8J8ErEy32WhXyNwX7F30=;
+	s=default; t=1548692892;
+	bh=oYPjhPoJOdKPcquVveULBy27n9+m1cqrhyL4DOJ9Z3o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=akRsYKsFdA4Wp1FsOWDD9K2PFJVMHsy7IJr+gRxhXo0s9cV1ctwMQ+73JkeVze+Li
-	 VIhFCUS7bUuXhalkjU8bgdSBM9zO7x0HhgtBXRIA5JXIKTZ5iNN5qTMJVr/Jt92f7O
-	 F6Ap+Czq+cGjpaqecjdIwEl29WwUw4LRRft5Y9CI=
+	b=C3QSlskUl5h0u1JCYsEAk4ba1yZjIlpaDAOf2CIvJExfrpJ6s8rbQWK2P69xHA8yO
+	 Du8i79xPA9vW82EONeT3vjMS5rWGoFmIRLNzjTt5AdFebUHmanMeoyb3oC1hbBayLQ
+	 mgBD61OzrK37dytzeh2tA1ZR1CD6hSsHHtnkkCPw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389678AbfA1Q0V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 11:26:21 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35478 "EHLO mail.kernel.org"
+        id S2390129AbfA1Q2K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 11:28:10 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38684 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390135AbfA1Q0R (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 11:26:17 -0500
+        id S1733074AbfA1Q2J (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Jan 2019 11:28:09 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4F9CC2171F;
-        Mon, 28 Jan 2019 16:26:15 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7168C2177E;
+        Mon, 28 Jan 2019 16:28:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548692776;
-        bh=yKsmlZx/Z4GFK26nt0bFCgk8J8ErEy32WhXyNwX7F30=;
+        s=default; t=1548692888;
+        bh=oYPjhPoJOdKPcquVveULBy27n9+m1cqrhyL4DOJ9Z3o=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=D+NskYGXkEgOdvVnqrJSrJgvv4K1HbHzJYn+dx+yrj+NHimMyYRnGP8ba9qDw9Tk4
-         P+y3BJ7e/ICnwGlHe4EzaDU87oTIPil6X3e0SgwSenEBfl+pHPC8hFnd4d94ba6GaJ
-         blZ2T0qcW3+jQN90mBi7DTy5m+demfDPeX4N5vKA=
+        b=zISpRvbO3CcbRUcTLmtdRnjBfl4FvryP1UxnkJJsg5HgG5mooKD6wos0kOXobNYO1
+         5Eg/J8QTURtXhVm58bogCpfCHNHkXkJE4db055pB6UuPRNPto4uspEAhTDEeZQSZfF
+         EunTlfGMOESbQwndI+2zrW/V3ifasYIa4o2HF7dE=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Finn Thain <fthain@telegraphics.com.au>,
         linuxppc-dev@lists.ozlabs.org, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 76/80] block/swim3: Fix -EBUSY error when re-opening device after unmount
-Date:   Mon, 28 Jan 2019 11:23:57 -0500
-Message-Id: <20190128162401.58841-76-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 3.18 58/61] block/swim3: Fix -EBUSY error when re-opening device after unmount
+Date:   Mon, 28 Jan 2019 11:26:20 -0500
+Message-Id: <20190128162623.59854-58-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190128162401.58841-1-sashal@kernel.org>
-References: <20190128162401.58841-1-sashal@kernel.org>
+In-Reply-To: <20190128162623.59854-1-sashal@kernel.org>
+References: <20190128162623.59854-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -77,7 +77,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
-index c264f2d284a7..2e0a9e2531cb 100644
+index 523ee8fd4c15..eaf1336623aa 100644
 --- a/drivers/block/swim3.c
 +++ b/drivers/block/swim3.c
 @@ -1027,7 +1027,11 @@ static void floppy_release(struct gendisk *disk, fmode_t mode)
