@@ -4,47 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 752CFC282C8
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:42:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46ECAC282CF
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:45:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3B66A2084A
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:42:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 186052084C
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:45:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548693733;
-	bh=yKsmlZx/Z4GFK26nt0bFCgk8J8ErEy32WhXyNwX7F30=;
+	s=default; t=1548693927;
+	bh=f/mtlnFymBwttRAbewuw+ZOjoP/TxruoHmmdNlraWlg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=XzF83JCKtXNe3sBdtglaFBmi40GH/LVSS65t0N3BxmSXJE58u49fOlM3gzBWpoMr8
-	 IueQnzZWxN001UtLEjHUzCUpRn8LdfNQWamKqaVdjmVHiafgusM6SUmp1d4u1Zp7Ov
-	 B8h+vm39wqkSVYjuCTJMjqOg6XxpZeo+4MwHaRCo=
+	b=KEv0jkcPaGA++ZkEj2CxifOpeKw69nNNZPOPU6lk6pfa1M03vra7XfUJbMWA6ZD3q
+	 suQxCSwAYRUoeL1H6h/fkgpynuYtqOZQrgmrvAUCMhMloxn5UnsAVsRYCOkB/UpCEG
+	 U+XpGGsELwQKm9AbinEiS1ahDNHabuyX9sAduJZ0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389518AbfA1QXs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 11:23:48 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60102 "EHLO mail.kernel.org"
+        id S1729674AbfA1QpU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 11:45:20 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59012 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389514AbfA1QXr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 11:23:47 -0500
+        id S2389292AbfA1QWx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Jan 2019 11:22:53 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CC8C12084A;
-        Mon, 28 Jan 2019 16:23:45 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 17C3E20663;
+        Mon, 28 Jan 2019 16:22:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548692626;
-        bh=yKsmlZx/Z4GFK26nt0bFCgk8J8ErEy32WhXyNwX7F30=;
+        s=default; t=1548692573;
+        bh=f/mtlnFymBwttRAbewuw+ZOjoP/TxruoHmmdNlraWlg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=11ydRsvMZh0/MfXYsBPgIsYz6VcZnM+45s1jtqjyW7aVSiZ/XnAfE6VNeG7gU7TDD
-         jjdVCDs9H8SxoAPDCYFYcDyK73FkdLnmDk2JTneFfNX5ATesDiaGpKKPL0yvysim5t
-         B3emZA7jAVc4ecMajLGDYsNfQF37S4hGrrb1AcAs=
+        b=GNEGzoupQfdHXxY5GjP9j9B03uMUB5e7jLqohhvTJm2aIOT/olDFFfXEks4iLSUNA
+         8ahtgIgSM7smWe5yxRrch53rQett//7xH4WfrwV0dRDfhyE2QIQkNUEV0iazdWGlnm
+         gH6bJEH34QQlaHfNa7FWMENDyF8OgZg0NcoU7/rg=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Finn Thain <fthain@telegraphics.com.au>,
-        linuxppc-dev@lists.ozlabs.org, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 100/107] block/swim3: Fix -EBUSY error when re-opening device after unmount
-Date:   Mon, 28 Jan 2019 11:19:40 -0500
-Message-Id: <20190128161947.57405-100-sashal@kernel.org>
+Cc:     Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.9 073/107] drbd: skip spurious timeout (ping-timeo) when failing promote
+Date:   Mon, 28 Jan 2019 11:19:13 -0500
+Message-Id: <20190128161947.57405-73-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190128161947.57405-1-sashal@kernel.org>
 References: <20190128161947.57405-1-sashal@kernel.org>
@@ -56,42 +57,60 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Finn Thain <fthain@telegraphics.com.au>
+From: Lars Ellenberg <lars.ellenberg@linbit.com>
 
-[ Upstream commit 296dcc40f2f2e402facf7cd26cf3f2c8f4b17d47 ]
+[ Upstream commit 9848b6ddd8c92305252f94592c5e278574e7a6ac ]
 
-When the block device is opened with FMODE_EXCL, ref_count is set to -1.
-This value doesn't get reset when the device is closed which means the
-device cannot be opened again. Fix this by checking for refcount <= 0
-in the release method.
+If you try to promote a Secondary while connected to a Primary
+and allow-two-primaries is NOT set, we will wait for "ping-timeout"
+to give this node a chance to detect a dead primary,
+in case the cluster manager noticed faster than we did.
 
-Reported-and-tested-by: Stan Johnson <userm57@yahoo.com>
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: linuxppc-dev@lists.ozlabs.org
-Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
+But if we then are *still* connected to a Primary,
+we fail (after an additional timeout of ping-timout).
+
+This change skips the spurious second timeout.
+
+Most people won't notice really,
+since "ping-timeout" by default is half a second.
+
+But in some installations, ping-timeout may be 10 or 20 seconds or more,
+and spuriously delaying the error return becomes annoying.
+
+Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/swim3.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ drivers/block/drbd/drbd_nl.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
-index c264f2d284a7..2e0a9e2531cb 100644
---- a/drivers/block/swim3.c
-+++ b/drivers/block/swim3.c
-@@ -1027,7 +1027,11 @@ static void floppy_release(struct gendisk *disk, fmode_t mode)
- 	struct swim3 __iomem *sw = fs->swim3;
- 
- 	mutex_lock(&swim3_mutex);
--	if (fs->ref_count > 0 && --fs->ref_count == 0) {
-+	if (fs->ref_count > 0)
-+		--fs->ref_count;
-+	else if (fs->ref_count == -1)
-+		fs->ref_count = 0;
-+	if (fs->ref_count == 0) {
- 		swim3_action(fs, MOTOR_OFF);
- 		out_8(&sw->control_bic, 0xff);
- 		swim3_select(fs, RELAX);
+diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
+index f35db29cac76..abee91940a36 100644
+--- a/drivers/block/drbd/drbd_nl.c
++++ b/drivers/block/drbd/drbd_nl.c
+@@ -668,14 +668,15 @@ drbd_set_role(struct drbd_device *const device, enum drbd_role new_role, int for
+ 		if (rv == SS_TWO_PRIMARIES) {
+ 			/* Maybe the peer is detected as dead very soon...
+ 			   retry at most once more in this case. */
+-			int timeo;
+-			rcu_read_lock();
+-			nc = rcu_dereference(connection->net_conf);
+-			timeo = nc ? (nc->ping_timeo + 1) * HZ / 10 : 1;
+-			rcu_read_unlock();
+-			schedule_timeout_interruptible(timeo);
+-			if (try < max_tries)
++			if (try < max_tries) {
++				int timeo;
+ 				try = max_tries - 1;
++				rcu_read_lock();
++				nc = rcu_dereference(connection->net_conf);
++				timeo = nc ? (nc->ping_timeo + 1) * HZ / 10 : 1;
++				rcu_read_unlock();
++				schedule_timeout_interruptible(timeo);
++			}
+ 			continue;
+ 		}
+ 		if (rv < SS_SUCCESS) {
 -- 
 2.19.1
 
