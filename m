@@ -2,97 +2,89 @@ Return-Path: <SRS0=89dG=QE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 294ECC282C8
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:51:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E057EC282CF
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:54:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E31522173C
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:51:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548694318;
-	bh=P1BA1bYN0nDZMCHBMMGUpPGUaSDWBxc1mw/30eS3Yxk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ySg/0uexRQse2fwgv0VhY+Ib7vnVwzaOS6ew644GiS/Xmj5E5Tr+vBIOPbRv25vls
-	 rl88PH9NvsBw1ilCV06nK4g56vWi0skdzuE+wPvME/tdhBjCYRkUHLtXlCrb4/3Hp1
-	 PnzSlMi5gKeTHCKMeoNdrKa36DKrFNZqd0+k3u0c=
+	by mail.kernel.org (Postfix) with ESMTP id A716C2147A
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:54:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cbPNMJtY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388555AbfA1QTJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 11:19:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53570 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387835AbfA1QTI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 11:19:08 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 71F442084A;
-        Mon, 28 Jan 2019 16:19:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548692348;
-        bh=P1BA1bYN0nDZMCHBMMGUpPGUaSDWBxc1mw/30eS3Yxk=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=x3kfbzF4ILI6EGwlld9J4NMyxGTZ1d1rVmPAMILXCJkVKCFozGubxxQRLGIaKRp3G
-         YvMUjE8eLMCzZlklqFBRcYZZijxjoPtzkwUBBl40v0Nj+MQR0MwR2vwu852A52ZgHY
-         4rSTkvObtC/eK2Aa8wfAAaiGUnwCWuBtaGZDIyEE=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Finn Thain <fthain@telegraphics.com.au>,
-        linuxppc-dev@lists.ozlabs.org, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 159/170] block/swim3: Fix -EBUSY error when re-opening device after unmount
-Date:   Mon, 28 Jan 2019 11:11:49 -0500
-Message-Id: <20190128161200.55107-159-sashal@kernel.org>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190128161200.55107-1-sashal@kernel.org>
-References: <20190128161200.55107-1-sashal@kernel.org>
+        id S2387897AbfA1Qys (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 11:54:48 -0500
+Received: from mail-io1-f54.google.com ([209.85.166.54]:34617 "EHLO
+        mail-io1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388492AbfA1Qyp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Jan 2019 11:54:45 -0500
+Received: by mail-io1-f54.google.com with SMTP id b16so14082427ior.1
+        for <linux-block@vger.kernel.org>; Mon, 28 Jan 2019 08:54:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=qn545jIUA/UiJGCesK3Wt23HR0JM/M4iCNnNsRn8yGU=;
+        b=cbPNMJtYqFehBOTzLi6k8rZBCihN+8Mc3XvyKe/8P6dHhpZJMvz0oJvdxJM9KpaRFU
+         65tXUXUs3XXLwoR+S71hnmcsakVolLNzDcQkRaSXVoha/DEO7SA/dQyuf1uuSGTa7rLq
+         7ru6UUJ3BotzTTtpyFsuzhnTT3xL0x1NAECqqBb3FTThNgXE6VeCgyei5KHH+ZlAP8w4
+         MEHcfn4zwswfLnLW8uu9K4vKeUhvdiV2DUpv6xcXzNAt69LBmHwc9mfZauQSCZVMPv1g
+         dr4MNJuuAaIS/ogChPSrqVsrmh8TXuWseqgl2jzdR5jrpSeSu9k3v6lbvDJO+iCsgnsG
+         yGkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=qn545jIUA/UiJGCesK3Wt23HR0JM/M4iCNnNsRn8yGU=;
+        b=SLVaHAKHrX1yMjbDf1hn7eCg0lsGa1/lwFhsISkiAaICwlCMJAGtfVTvBGoha61+N/
+         eIxaBiM+dZ3SZbEJoJKrdaCIuQDFkx0GtTyV2OnPV+TsJP84dZCIX7UIUvekrkx2dKuW
+         P56V3UaKfVTKJBgMW4YerjJW6qIKXxlWJzJaI1jDb48JbnzE/1SEmzy9570mr/jEt9sm
+         haoVe24elLFs/f88RSBrJljDxTrm1jtR1u5L1N1Xkz9yXm5QwSs3cjL/nY1oz9v4bv37
+         zjDQdqCMA7scnzIKGvIWQjbLD+zWoWVj3NeBSR4CZqI9ZCaz63EVtq3pQVBP2PuIjrg+
+         HdkA==
+X-Gm-Message-State: AHQUAuYjZ+q74O+WJqu2M7SNE7LeK1TVMjSHcjUCDoRkvIsDqWH4LDyX
+        XrYFbdONMHYKW8IQz8txBxPRALo707E=
+X-Google-Smtp-Source: AHgI3IbikfwrnIykjtJpSr4rl6LZWTjeyvHM9jRW63T9GdZosSb+Jsxbpla7J11xlATjI3UdN5E/Ag==
+X-Received: by 2002:a6b:d318:: with SMTP id s24mr13206950iob.6.1548694484300;
+        Mon, 28 Jan 2019 08:54:44 -0800 (PST)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id c13sm14951097iom.57.2019.01.28.08.54.42
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 28 Jan 2019 08:54:42 -0800 (PST)
+Subject: Re: [PATCH 11/18] block: implement bio helper to add iter bvec pages
+ to bio
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
+        linux-block@vger.kernel.org, jmoyer@redhat.com, avi@scylladb.com
+References: <20190123153536.7081-1-axboe@kernel.dk>
+ <20190123153536.7081-16-axboe@kernel.dk> <20190128143109.GD9563@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <49621932-3f7e-943d-6a31-0c2c5c75f637@kernel.dk>
+Date:   Mon, 28 Jan 2019 09:54:41 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190128143109.GD9563@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Finn Thain <fthain@telegraphics.com.au>
+On 1/28/19 7:31 AM, Christoph Hellwig wrote:
+>> +#define BIO_HOLD_PAGES	0	/* don't put O_DIRECT pages */
+> 
+> They don't really have to be O_DIRECT pages, just something with
+> a permanent reference.  Maybe rename this to something BIO_NO_PAGE_REF?
 
-[ Upstream commit 296dcc40f2f2e402facf7cd26cf3f2c8f4b17d47 ]
+That is a better name, thanks. I'll make the change.
 
-When the block device is opened with FMODE_EXCL, ref_count is set to -1.
-This value doesn't get reset when the device is closed which means the
-device cannot be opened again. Fix this by checking for refcount <= 0
-in the release method.
-
-Reported-and-tested-by: Stan Johnson <userm57@yahoo.com>
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: linuxppc-dev@lists.ozlabs.org
-Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/swim3.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
-index 0d7527c6825a..2f7acdb830c3 100644
---- a/drivers/block/swim3.c
-+++ b/drivers/block/swim3.c
-@@ -1027,7 +1027,11 @@ static void floppy_release(struct gendisk *disk, fmode_t mode)
- 	struct swim3 __iomem *sw = fs->swim3;
- 
- 	mutex_lock(&swim3_mutex);
--	if (fs->ref_count > 0 && --fs->ref_count == 0) {
-+	if (fs->ref_count > 0)
-+		--fs->ref_count;
-+	else if (fs->ref_count == -1)
-+		fs->ref_count = 0;
-+	if (fs->ref_count == 0) {
- 		swim3_action(fs, MOTOR_OFF);
- 		out_8(&sw->control_bic, 0xff);
- 		swim3_select(fs, RELAX);
 -- 
-2.19.1
+Jens Axboe
 
