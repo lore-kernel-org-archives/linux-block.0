@@ -6,68 +6,68 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F23C6C282C8
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:46:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A9F0C282C8
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:48:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C28A82084C
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:46:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A82B2171F
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:48:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="D3ISQ97j"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lg+ZACfR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389084AbfA1QqV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 11:46:21 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:53213 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388649AbfA1QqU (ORCPT
+        id S2389072AbfA1Qsn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 11:48:43 -0500
+Received: from mail-it1-f196.google.com ([209.85.166.196]:36902 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389049AbfA1Qsn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 11:46:20 -0500
-Received: by mail-it1-f193.google.com with SMTP id d11so21556858itf.2
-        for <linux-block@vger.kernel.org>; Mon, 28 Jan 2019 08:46:19 -0800 (PST)
+        Mon, 28 Jan 2019 11:48:43 -0500
+Received: by mail-it1-f196.google.com with SMTP id b5so20323871iti.2
+        for <linux-block@vger.kernel.org>; Mon, 28 Jan 2019 08:48:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=/SHCNad2OK3tzpEtHidgNy8N/+erZJ2GM2ZG4pIiafQ=;
-        b=D3ISQ97j8I9Zr4MNerdOawO9AIGnS9m/LvIruDA2+pnsbL8FmHgmmICRprc+6iCSgb
-         CrCvXSkDJhEhsCMaCsc0NO2gRCzGkKFUjUgiHx3wt1vzZwjDphvn/AjKD4tXhLkf/uB/
-         KGMIoWEQ7pxNMqFWst31a9a1SMcn7pQnfQDn2CMS3B4Idqwy/mLGsgUJYutUJCsci6lf
-         RBn9Mlkt3FWUd05FJgJ89aWKIxx6PgmpTE8JZke1qLztB+ubykyMfs9/n2lU/Z7pLkOu
-         JatvbdRLvCvU4NvcomqZ3YidTHcFOS4cesp4y1MgYWQtoG1pGLWUazWSpNGxHkJbqT0l
-         IQ4w==
+        bh=fEszEDnE9WcL0Eva9wM6KWO3hgFQuwPg6XjOwfEx01E=;
+        b=lg+ZACfR3xtvhH057ReLy8PcgxRrbrXSyCI/7u8KRZtX320ChuEo8inXklTDp6mG66
+         aQvb5LYOywJnXDTZaD3r2b/vmbuuSo73tdHJSICoRNQenZdoOR703A7CA8jUrCo0zI9Q
+         vwYiz3je5RqcFst4WnDakKFbhXwLSzLExknz05AkHbA3VNq3YbJGkZrvCHYitgRrTxHm
+         4VDO4v4iOa7kDbNQpsAMYPnxnF1XOmH0kKn4SUA00LNRC9B34AtMW2B/6C+ZCz3Uu290
+         uMrBD2IjBp3II+jEXmSnLNMjwVTT4qo8mNvw2f5zB/d2HkTMt9p5fEmd+Ok+Z3X3z61E
+         1pDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=/SHCNad2OK3tzpEtHidgNy8N/+erZJ2GM2ZG4pIiafQ=;
-        b=M12roH8yRM6ixsg93911hJWOhzWnbPRFqyk5auFlLkB7wPdg5WB2UpxKpCrYpOXtG0
-         ZqG15T4u/6e1s20HE5fupAan1AxmBW5URz8XyaNM6KPd1UOBdSNUedFFe7JSyEAMt3OS
-         YqBrwpIxrd2Cwvtuyg7og7BiHMzfod+LzJ+TcPl/i58Rw+TobZQJw8gc0m4ki2Ljy9Z2
-         krrqAsxmJt8chsM+A4C87bH8z6rnsbrcmI9JIfG/EnsXmTaDtnq0Agp4huK13FjqiwK9
-         kjbvZVwG8Zs7L0kBNCQGm+5A1ZD4XZA8PDEqdwQBDYjNmN2FoVeTuHINtGyO43Ry7hCt
-         8ZGw==
-X-Gm-Message-State: AHQUAuZu4MRElgRdPWc0fvJ7t/vmkxf3wbbbtGzegUGRLr5ouY3XNh3W
-        kcdYiz6SxjwU2Xqy5MWh4gD99A==
-X-Google-Smtp-Source: ALg8bN4SMohVxfMm2GXkJULwHDol5yCZrr2W/jYjDXsb71k1vZJYqBJMCpalEtz3WL1GTCHQFGaovg==
-X-Received: by 2002:a24:4016:: with SMTP id n22mr12227617ita.25.1548693979266;
-        Mon, 28 Jan 2019 08:46:19 -0800 (PST)
+        bh=fEszEDnE9WcL0Eva9wM6KWO3hgFQuwPg6XjOwfEx01E=;
+        b=CEliKzszn5BEBADojsMqyYYMxIcYU3lEJbzeZlXyppYX2UNljsFw68Ecs0qXdtLuOh
+         lFE/kjejpvYdWyyF8D0hOx91xGW6jGv7uqtp2hRhL0sDpKz12aTgeT65QvUMqhCwcLyz
+         AZWuninv7OGMTL0YvBGVlvYL1ClwVyUgJmpk6jdC9IOIIXHaRUELJasVhNsjP3WNX1na
+         N5rtDF1giWGmjCn69+lGLgrVPrVBgxXSgnn3zU8RDuQUDQ/4/rqvMMxLLDQy8pgtZr27
+         rhUs/oSbtQetK2PxSiJA8xpQ0QVSvlkfbH5Po94o+9SaFKMxtzpJKMH0V6Y5/WQpcbna
+         DtPA==
+X-Gm-Message-State: AJcUukfuVfajdMSPqVJLM0Wi5l5bmK5vQRSQ5rvyG6H+Sm6dV4PJLAAH
+        hxX7Qvs5HbX1hlsJ3CK3C22ieQ==
+X-Google-Smtp-Source: ALg8bN7tcQ6WZ4MILUHCS7XHLf/Hli2078EJbCkvbmWQjXmu3ecqsgN3ci7NT2tfKpxrEIT+5BWdmg==
+X-Received: by 2002:a24:4a95:: with SMTP id k143mr10351560itb.77.1548694122102;
+        Mon, 28 Jan 2019 08:48:42 -0800 (PST)
 Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id 81sm911972itz.23.2019.01.28.08.46.17
+        by smtp.gmail.com with ESMTPSA id m45sm17227993iti.10.2019.01.28.08.48.40
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 28 Jan 2019 08:46:18 -0800 (PST)
-Subject: Re: [PATCH 07/18] io_uring: support for IO polling
+        Mon, 28 Jan 2019 08:48:41 -0800 (PST)
+Subject: Re: [PATCH 08/18] fs: add fget_many() and fput_many()
 To:     Christoph Hellwig <hch@lst.de>
 Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
         linux-block@vger.kernel.org, jmoyer@redhat.com, avi@scylladb.com
 References: <20190123153536.7081-1-axboe@kernel.dk>
- <20190123153536.7081-9-axboe@kernel.dk> <20190128150240.GA10110@lst.de>
+ <20190123153536.7081-10-axboe@kernel.dk> <20190128142928.GC9563@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <faca4aec-bf73-bece-6509-46137c7b7b44@kernel.dk>
-Date:   Mon, 28 Jan 2019 09:46:17 -0700
+Message-ID: <a9a60b83-0856-e634-83ed-3d8f63f0306d@kernel.dk>
+Date:   Mon, 28 Jan 2019 09:48:40 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20190128150240.GA10110@lst.de>
+In-Reply-To: <20190128142928.GC9563@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -76,36 +76,21 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/28/19 8:02 AM, Christoph Hellwig wrote:
->>  	struct {
->>  		spinlock_t		completion_lock;
->> +		unsigned		poll_multi_file;
-> 
-> This seems to be used as a bool.
-
-Fixed
-
->> -static void __io_cqring_add_event(struct io_ring_ctx *ctx, u64 ki_user_data,
->> -				  long res, unsigned ev_flags)
->> +static void io_cqring_fill_event(struct io_ring_ctx *ctx, u64 ki_user_data,
->> +				 long res, unsigned ev_flags)
->>  {
->>  	struct io_uring_cqe *cqe;
->>  
->> @@ -206,9 +213,15 @@ static void __io_cqring_add_event(struct io_ring_ctx *ctx, u64 ki_user_data,
->>  		cqe->user_data = ki_user_data;
->>  		cqe->res = res;
->>  		cqe->flags = ev_flags;
->> -		io_commit_cqring(ctx);
->>  	} else
->>  		ctx->cq_ring->overflow++;
+On 1/28/19 7:29 AM, Christoph Hellwig wrote:
+>> +struct file *fget_many(unsigned int fd, unsigned int refs)
+>> +{
+>> +	return __fget(fd, FMODE_PATH, refs);
 >> +}
+>> +
+>>  struct file *fget(unsigned int fd)
+>>  {
+>> -	return __fget(fd, FMODE_PATH);
+>> +	return fget_many(fd, 1);
 > 
-> Maybe we should have created this low-level helper already in the
-> patch introducing the code?
+> I'd still prefer removing the double indirection in this call, but
+> I know you disagree.
 
-I think that can go both ways. If we create it early, it'll just be a
-pointless helper. Don't really care too much about this particular case.
+Not a big deal, I can kill it.
 
 -- 
 Jens Axboe
