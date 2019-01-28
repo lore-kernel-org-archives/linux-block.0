@@ -2,108 +2,148 @@ Return-Path: <SRS0=89dG=QE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 956FAC282C8
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 13:20:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 470B2C282C8
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 13:54:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 64D9F20857
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 13:20:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Pl87DyKq"
+	by mail.kernel.org (Postfix) with ESMTP id 1E8142173C
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 13:54:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726750AbfA1NUh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 08:20:37 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:37156 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726661AbfA1NUh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 08:20:37 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0SDIvIE065946;
-        Mon, 28 Jan 2019 13:19:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2018-07-02;
- bh=MXXw0PChLTceT0pE6PjReEUk17vPg2HubCB+RKdTamI=;
- b=Pl87DyKqeXWO17SnB97WpLAs3T0EFiDDmC26VPiHZMhEHdP8YcRICEPy24VVPmQFs7jF
- 2esS6U9FCKR8hFpqUinyi4AQZRYehTpJj6ajlwFr4970a1vcq/ig74jHEk7NJc9tA44q
- C94uRqE09zO/fR927FWKc2hONSPClSZF0v4zeJVdum/WYHCz0HPsneskrSLeGKofF4Nd
- 1YQev3CH6aJEF+ZxR0XDhoM3Jpwj77O0w23Ce4FRC8V/hCg0uZhnBPO8kC2q6/Bljy/O
- l7pmHpQouw3ku4VKy8PmXQmnDHSsA+BMj2I20dhHQtgf+rCXL3lSdrSxSRLPLHkguLn+ 7Q== 
-Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
-        by aserp2130.oracle.com with ESMTP id 2q8d2dx73u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 28 Jan 2019 13:19:52 +0000
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x0SDJpRm003845
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 28 Jan 2019 13:19:51 GMT
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x0SDJoS0029471;
-        Mon, 28 Jan 2019 13:19:51 GMT
-Received: from kadam (/197.157.34.178)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 28 Jan 2019 05:19:50 -0800
-Date:   Mon, 28 Jan 2019 16:19:42 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Yufen Yu <yuyufen@huawei.com>
-Cc:     axboe@kernel.dk, osandov@fb.com, linux-block@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] floppy: check_events callback should not return a
- negative number
-Message-ID: <20190128131942.GH1795@kadam>
-References: <20190128090646.44747-1-yuyufen@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190128090646.44747-1-yuyufen@huawei.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9149 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1901280104
+        id S1726888AbfA1Nyo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 08:54:44 -0500
+Received: from smtp2.provo.novell.com ([137.65.250.81]:59184 "EHLO
+        smtp2.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726689AbfA1Nyo (ORCPT
+        <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
+        Mon, 28 Jan 2019 08:54:44 -0500
+Received: from apollon.mittagstun.de (prv-ext-foundry1int.gns.novell.com [137.65.251.240])
+        by smtp2.provo.novell.com with ESMTP (TLS encrypted); Mon, 28 Jan 2019 06:54:39 -0700
+Message-ID: <8ae008d68e4c532af57a5065a9ff96280e81e309.camel@suse.com>
+Subject: Re: [PATCH 1/4] block: disk_events: introduce event flags
+From:   Martin Wilck <mwilck@suse.com>
+To:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
+        Tejun Heo <tj@kernel.org>, mwilck@suse.com
+Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Date:   Mon, 28 Jan 2019 14:54:34 +0100
+In-Reply-To: <be93f1f5-cb79-04b2-5fc1-140678245197@suse.de>
+References: <20190118213207.2309-1-mwilck@suse.com>
+         <20190118213207.2309-2-mwilck@suse.com>
+         <be93f1f5-cb79-04b2-5fc1-140678245197@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.30.2 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 28, 2019 at 05:06:46PM +0800, Yufen Yu wrote:
-> Since .check_events interface return an unsigned int value,
-> floppy_check_events() should not return a negative error number.
-> Otherwise, disk_check_events() may process wiht an unexpected path.
+On Sat, 2019-01-26 at 11:09 +0100, Hannes Reinecke wrote:
+> On 1/18/19 10:32 PM, Martin Wilck wrote:
+> > Currently, an empty disk->events field tells the block layer not to
+> > forward
+> > media change events to user space. This was done in commit
+> > 7c88a168da80 ("block:
+> > don't propagate unlisted DISK_EVENTs to userland") in order to
+> > avoid events
+> > from "fringe" drivers to be forwarded to user space. By doing so,
+> > the block
+> > layer lost the information which events were supported by a
+> > particular
+> > block device, and most importantly, whether or not a given device
+> > supports
+> > media change events at all.
+> > 
+> > Prepare for not interpreting the "events" field this way in the
+> > future any
+> > more. This is done by adding two flag bits that can be set to have
+> > the
+> > device treated like one that has the "events" field set to a non-
+> > zero value
+> > before. This applies only to the sd and sr drivers, which are
+> > changed to
+> > set the new flags.
+> > 
+> > The new flags are DISK_EVENT_FLAG_POLL to enforce polling of the
+> > device for
+> > synchronous events, and DISK_EVENT_FLAG_UEVENT to tell the
+> > blocklayer to
+> > generate udev events from kernel events. They can easily be fit in
+> > the int
+> > reserved for event bits.
+> > 
+> > This patch doesn't change behavior.
+> > 
+> > Signed-off-by: Martin Wilck <mwilck@suse.com>
+> > ---
+> >   block/genhd.c         | 22 ++++++++++++++++------
+> >   drivers/scsi/sd.c     |  3 ++-
+> >   drivers/scsi/sr.c     |  3 ++-
+> >   include/linux/genhd.h |  7 +++++++
+> >   4 files changed, 27 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/block/genhd.c b/block/genhd.c
+> > index 1dd8fd6..bcd16f6 100644
+> > --- a/block/genhd.c
+> > +++ b/block/genhd.c
+> > @@ -1631,7 +1631,8 @@ static unsigned long
+> > disk_events_poll_jiffies(struct gendisk *disk)
+> >   	 */
+> >   	if (ev->poll_msecs >= 0)
+> >   		intv_msecs = ev->poll_msecs;
+> > -	else if (disk->events & ~disk->async_events)
+> > +	else if (disk->events & DISK_EVENT_FLAG_POLL
+> > +		 && disk->events & ~disk->async_events)
+> >   		intv_msecs = disk_events_dfl_poll_msecs;
+> >   
+> >   	return msecs_to_jiffies(intv_msecs);
+> Hmm. That is an ... odd condition.
+> Clearly it's pointless to have the event bit set in the ->events mask
+> if 
+> it's already part of the ->async_events mask.
+
+The "events" bit has to be set in that case. "async_events" is defined
+as a subset of "events", see genhd.h. You can trivially verify that
+this is currently true, as NO driver that sets any bit in the
+"async_events" field. I was wondering if "async_events" can't be
+ditched completely, but I didn't want to make that aggressive a change
+in this patch set.
+
+> But shouldn't we better _prevent_ this from happening, ie refuse to
+> set
+> DISK_EVENT_FLAG_POLL in events if it's already in ->async_events?
+> Then the above check would be simplified.
+
+Asynchronous events need not be polled for, therefore setting the POLL
+flag in async_events makes no sense. My intention was to use these
+"flag" bits in the "events" field only. Perhaps I should have expressed
+that more clearly?
+
+Anyway, unless I'm really blind, the condition above is actually the
+same as before, just that I now require the POLL flag to be set as
+well, which is the main point of the patch.
+
+Regards
+Martin
+
+
 > 
-> fixes: a0c80efe5956 ("floppy: fix lock_fdc() signal handling")
-> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
-> ---
->  drivers/block/floppy.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Cheers,
 > 
-> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-> index 6f2856c6d0f2..55481b40df9a 100644
-> --- a/drivers/block/floppy.c
-> +++ b/drivers/block/floppy.c
-> @@ -4075,7 +4075,7 @@ static unsigned int floppy_check_events(struct gendisk *disk,
->  
->  	if (time_after(jiffies, UDRS->last_checked + UDP->checkfreq)) {
->  		if (lock_fdc(drive))
-> -			return -EINTR;
-> +			return 0;
+> Hannes
+> 
 
-The patch is correct, but I wish the commit message had said what the
-run time impact of the patch is.  Or sometimes it's hard to say what the
-run time impact is, but it could have at least said why returning zero
-is correct.  Say something like:
+-- 
+Dr. Martin Wilck <mwilck@suse.com>, Tel. +49 (0)911 74053 2107
+SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
 
-  floppy_check_events() is supposed to return bit flags to say which
-  events occured.  We should return zero to say that no event flags are
-  set.  Only BIT(0) and BIT(1) are used in the caller.  This code
-  returns -4u  here so both BIT(0) and BIT(1) are clear.  So this patch
-  shouldn't affect runtime, but it obviously is still worth fixing.
 
-regards,
-dan carpenter
