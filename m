@@ -2,255 +2,145 @@ Return-Path: <SRS0=89dG=QE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 037C0C282CC
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 05:48:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39D20C282C8
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 06:10:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C64A620870
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 05:48:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE28720989
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 06:10:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Woino3um"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726694AbfA1Fs0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 00:48:26 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2684 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726654AbfA1Fs0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 00:48:26 -0500
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 382246ABD04E9B4184B4;
-        Mon, 28 Jan 2019 13:48:22 +0800 (CST)
-Received: from [127.0.0.1] (10.184.189.120) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.408.0; Mon, 28 Jan 2019
- 13:48:17 +0800
-Subject: Re: [dm-devel] [v2] block: Fix a WRITE SAME BUG_ON
-To:     John Dorminy <jdorminy@redhat.com>
-CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        Alasdair G Kergon <agk@redhat.com>, <dm-devel@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>
-References: <20190125021107.4595-1-zhangxiaoxu5@huawei.com>
- <CAMeeMh_=UVGwo-=9WtBXRmiHTXnLAswqis97bM-aiuwnzPU0QQ@mail.gmail.com>
-From:   "zhangxiaoxu (A)" <zhangxiaoxu5@huawei.com>
-Message-ID: <60b27267-70ed-2c57-ed9e-9ae4f6abf77b@huawei.com>
-Date:   Mon, 28 Jan 2019 13:48:15 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.0
+        id S1726137AbfA1GKw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 01:10:52 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:20978 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725782AbfA1GKw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Jan 2019 01:10:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1548655852; x=1580191852;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AtISQlgux7TuxeKz2+oiQSdEHjM7pEZHAcul/JM6PWQ=;
+  b=Woino3um7dLZVs+IC4+xcnyY03UPiwBOrXP8KvYzwaaqMvqoBMyK8KCt
+   6aAvTtCoEWaPgIfOJHQcWRsOFA7ZgegTgsY2+J/cAHQjEIiqBDWKvMURO
+   2W6PQ3d/RUni2p+vHW3DDHNsmwHVMj7iJfyEmC7nU7q7XeWN7g+GnaYTe
+   Ri5hgwD2hwZGzoFReRNGh9hfjOsFnG59IPlFLLINltk8IShjHzuH4eMfT
+   x3IHyYQ/TJ2Dk1hT9KKU64BFifn0vCXC1p9X8LkA6EsM6I/6MlfFhTkFo
+   yRb78U2nqrgbRyuxAPSEJJrbdaB/YoLdd8e7WAFXNMjbSaYBvvcGGzT1l
+   g==;
+X-IronPort-AV: E=Sophos;i="5.56,533,1539619200"; 
+   d="scan'208";a="101170523"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Jan 2019 14:10:52 +0800
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP; 27 Jan 2019 21:49:55 -0800
+Received: from washi.fujisawa.hgst.com ([10.149.53.254])
+  by uls-op-cesaip02.wdc.com with ESMTP; 27 Jan 2019 22:10:50 -0800
+From:   Damien Le Moal <damien.lemoal@wdc.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     Matias Bjorling <matias.bjorling@wdc.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH] nullb: Prevent use of legacy request queue mode
+Date:   Mon, 28 Jan 2019 15:10:48 +0900
+Message-Id: <20190128061048.20778-1-damien.lemoal@wdc.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <CAMeeMh_=UVGwo-=9WtBXRmiHTXnLAswqis97bM-aiuwnzPU0QQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.184.189.120]
-X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi， Thanks for your reply.
+When null_blk queue mode is specified together with modprobe/insmod, a
+check to prevent setting the nullb device queue mode to 1 (NULL_Q_RQ) is
+done. However, the same check is not performed when setting up a nullb
+device through configfs, resulting in a oops (NULL pointer dereference
+for the device request queue).
 
-BUG_ON is because the 'bio_iovec(bio).bv_len' not same with 'sdp->sector_size'.
+Fix this problem by checking for an invalid queue mode value in
+null_validate_conf(), propagating -EINVAL to null_add_dev() if the queue
+mode is NULL_Q_RQ. While at it, also fix the propagation to user space
+of null_add_dev() return value when a nullb device is created through
+configfs power attribute.
 
-Just as below reproducer, If the 'golden' is stacked by disks 'sda'(logical_block_size=512)
-and 'sdb'(logical_block_size=4096), call 'blkdev_issue_write_same' on it will BUG_ON because
-of the
-	bio->bi_io_vec->bv_len = bdev_logical_block_size('golden'), and the
-	bdev_logical_block_size('golden') = max_logical_block_size(sda, sdb).
+Fixes: 49f6613632f9 ("nullb: remove leftover legacy request code")
+Cc: stable@vger.kernel.org
+Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
+---
+ drivers/block/null_blk_main.c | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
 
-There are 2 solutions about the problem:
-1. Disable the WRITE SAME for that situation: Just like this patch.
-2. Improve the WRITE SAME to adapt that situation:
-	Reorganization the 'WRITE SAME' bio for the disks which logical_block_size is smaller than the logical volume.
-
-
-For now, I think we should close the 'WRITE SAME' for this situation.
-
-
-Reproducer:
-1. Start qemu with parameter:
-     -drive file=/home/qemu/disk/512k.img,if=none,format=raw,cache=none,id=data.1,discard=on \
-     -device scsi-hd,drive=data.1,id=vdata.1 \
-     -drive file=/home/qemu/disk/4096k.img,if=none,format=raw,cache=none,id=data.2,discard=on \
-     -device scsi-hd,drive=data.2,id=vdata.2,logical_block_size=4096,physical_block_size=4096 \
-
-2. Create LV:
-     vgremove golden -y
-     vgcreate golden /dev/sda /dev/sdb
-     lvcreate -L1G -n testvol -i 2 golden -y
-
-3. Call 'blkdev_issue_write_same' on the device:
-	#include <linux/module.h>
-	#include <linux/kernel.h>
-	#include <linux/init.h>
-	#include <linux/fs.h>
-	#include <linux/slab.h>
-	#include <linux/blkdev.h>
-
-	static int __init hello_module_init(void)
-	{
-		struct block_device *dev;
-		int err;
-
-		printk(KERN_ERR "/dev/golden/testvol\n");
-
-		dev = lookup_bdev("/dev/golden/testvol");
-		if (IS_ERR(dev)) {
-			pr_warn("lookup blk error!\n");
-			return 0;
-		}
-
-		err = blkdev_get(dev, FMODE_WRITE | FMODE_READ | FMODE_EXCL, (void *)&err);
-
-		if (err) {
-			pr_warn("get blk error!\n");
-			return 0;
-		}
-
-		err = blkdev_issue_write_same(dev, 8, 0xf8, GFP_NOIO, ZERO_PAGE(0));
-
-		printk(KERN_ERR "blkdev_issue_write_same return %d\n", err);
-
-		return 0;
-	}
-
-	static void __exit hello_module_exit(void)
-	{
-		pr_warn("\n");
-	}
-
-	module_init(hello_module_init);
-	module_exit(hello_module_exit);
-
-	MODULE_DESCRIPTION("hello module");
-	MODULE_LICENSE("GPL");
-
-On 1/26/2019 7:17 PM, John Dorminy wrote:
-> Hi. I have read a bit of DM code and spent an hour reviewing this... I
-> didn't get to the point of knowing what the right fix for the problem
-> is, and I may have a wrong understanding, but I have two thoughts
-> about the patch:
-> 
-> I don't think this is the right solution for two reasons:
-> 
-> In the first place, if it's an LVM-only issue, we should fix it only
-> for device-mapper devices. If this is the right way to fix it,
-> possibly the way to do that would be to change DM calls to
-> blk_queue_max_write_same_sectors() to only set the max sectors to more
-> than 0 if and only if the logical block sizes match.
-> 
-> In the second place, I don't think this is the problem. The line of
-> code that's calling BUG_ON is, I think,
-> BUG_ON(bio_offset(bio) || bio_iovec(bio).bv_len != sdp->sector_size);
-> 
-> This is because write_same bios are supposed to have a single sector
-> of data at the beginning of a page in their bio_iovec(bio) [I think,
-> based on a commit message I've read] -- in other words, bio_iovec(bio)
-> is supposed to say something like { .page = something, .offset = 0,
-> .len = 1 native sector }. But clearly, since the BUG_ON is being
-> called, one of these is not true. Have you added a log statement right
-> before the BUG_ON() to print out bio_offset(bio) and
-> bio_iovec(bio).bv_len to see which value defies expectations?
-> 
-> I would be happy to help you trace through this or attempt to
-> reproduce it myself -- what stack of devices can you reproduce this
-> on? Is this a dm-linear device on top of a disk? Does it have a
-> filesystem on top, and if so, what filesystem?
-> 
-> Thank you!
-> 
-> John Dorminy
-> 
-> 
-> On Fri, Jan 25, 2019 at 9:53 AM Zhang Xiaoxu <zhangxiaoxu5@huawei.com> wrote:
->>
->> If the lvm is stacked by different logical_block_size disks,
->> when WRITE SAME on it, will bug_on:
->>
->> kernel BUG at drivers/scsi/sd.c:968!
->> invalid opcode: 0000 [#1] SMP PTI
->> CPU: 11 PID: 525 Comm: kworker/11:1H Tainted: G           O      5.0.0-rc3+ #2
->> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-2.fc27 04/01/2014
->> Workqueue: kblockd blk_mq_run_work_fn
->> RIP: 0010:sd_init_command+0x7aa/0xdb0
->> Code: 30 75 00 00 c7 85 44 01 00 00 18 00 00 00 0f 85 fa 04 00 00 48 83 c4 40 48
->>        89 df 5b 5d 41 5c 41 5d 41 5e 41 5f e9 b6 ca fe ff <0f> 0b 41 bc 09
->> RSP: 0018:ffffb55f80ddbca0 EFLAGS: 00010206
->> RAX: 0000000000001000 RBX: ffff9ed23fb927a0 RCX: 000000000000f000
->> RDX: ffff9ed23f0a8400 RSI: ffff9ed27bc79800 RDI: 0000000000000000
->> RBP: ffff9ed23fb92680 R08: ffff9ed27c8c0000 R09: ffff9ed23fb927d8
->> R10: 0000000000000000 R11: fefefefefefefeff R12: ffff9ed27bc79800
->> R13: ffff9ed2787a0000 R14: ffff9ed27bdf3400 R15: ffff9ed23fb927a0
->> FS:  0000000000000000(0000) GS:ffff9ed27c8c0000(0000) knlGS:0000000000000000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 00007f6b14cf9341 CR3: 0000000069058000 CR4: 00000000000006e0
->> Call Trace:
->>   ? vp_notify+0x12/0x20
->>   scsi_queue_rq+0x525/0xa30
->>   blk_mq_dispatch_rq_list+0x8d/0x580
->>   ? syscall_return_via_sysret+0x10/0x7f
->>   ? elv_rb_del+0x1f/0x30
->>   ? deadline_remove_request+0x55/0xc0
->>   blk_mq_do_dispatch_sched+0x76/0x110
->>   blk_mq_sched_dispatch_requests+0xf9/0x170
->>   __blk_mq_run_hw_queue+0x51/0xd0
->>   process_one_work+0x195/0x380
->>   worker_thread+0x30/0x390
->>   ? process_one_work+0x380/0x380
->>   kthread+0x113/0x130
->>   ? kthread_park+0x90/0x90
->>   ret_from_fork+0x35/0x40
->> Modules linked in: alloc(O+)
->> ---[ end trace dc92ddeb2e6d1fe5 ]---
->>
->> The logical_block_size of the LVM is the max value of the sub disks,
->> it maybe different with one of the sub disk. when WRITE SAME on the
->> disk, it will BUG_ON when setup WRITE SAME cmd.
->>
->> Close WRITE_SAME feature on the LVM if it was stacked by different
->> logical_block_size disk.
->>
->> Signed-off-by: Zhang Xiaoxu <zhangxiaoxu5@huawei.com>
->> ---
->>   block/blk-settings.c | 10 ++++++++--
->>   1 file changed, 8 insertions(+), 2 deletions(-)
->>
->> diff --git a/block/blk-settings.c b/block/blk-settings.c
->> index 3e7038e475ee..e4664280edb4 100644
->> --- a/block/blk-settings.c
->> +++ b/block/blk-settings.c
->> @@ -497,8 +497,6 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->>          t->max_sectors = min_not_zero(t->max_sectors, b->max_sectors);
->>          t->max_hw_sectors = min_not_zero(t->max_hw_sectors, b->max_hw_sectors);
->>          t->max_dev_sectors = min_not_zero(t->max_dev_sectors, b->max_dev_sectors);
->> -       t->max_write_same_sectors = min(t->max_write_same_sectors,
->> -                                       b->max_write_same_sectors);
->>          t->max_write_zeroes_sectors = min(t->max_write_zeroes_sectors,
->>                                          b->max_write_zeroes_sectors);
->>          t->bounce_pfn = min_not_zero(t->bounce_pfn, b->bounce_pfn);
->> @@ -537,6 +535,14 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
->>                  }
->>          }
->>
->> +       /* If the logical block size is different, forbid write same */
->> +       if (t->logical_block_size != b->logical_block_size &&
->> +           t->max_write_same_sectors != UINT_MAX)
->> +               t->max_write_same_sectors = 0;
->> +       else
->> +               t->max_write_same_sectors = min(t->max_write_same_sectors,
->> +                                               b->max_write_same_sectors);
->> +
->>          t->logical_block_size = max(t->logical_block_size,
->>                                      b->logical_block_size);
->>
->> --
->> 2.14.4
->>
->> --
->> dm-devel mailing list
->> dm-devel@redhat.com
->> https://www.redhat.com/mailman/listinfo/dm-devel
-> 
-> .
-> 
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 62c9654b9ce8..5570d0da59b4 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -318,9 +318,10 @@ static ssize_t nullb_device_power_store(struct config_item *item,
+ 	if (!dev->power && newp) {
+ 		if (test_and_set_bit(NULLB_DEV_FL_UP, &dev->flags))
+ 			return count;
+-		if (null_add_dev(dev)) {
++		ret = null_add_dev(dev);
++		if (ret) {
+ 			clear_bit(NULLB_DEV_FL_UP, &dev->flags);
+-			return -ENOMEM;
++			return ret;
+ 		}
+ 
+ 		set_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);
+@@ -1561,8 +1562,13 @@ static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
+ 	return blk_mq_alloc_tag_set(set);
+ }
+ 
+-static void null_validate_conf(struct nullb_device *dev)
++static int null_validate_conf(struct nullb_device *dev)
+ {
++	if (dev->queue_mode == NULL_Q_RQ) {
++		pr_err("null_blk: legacy IO path no longer available\n");
++		return -EINVAL;
++	}
++
+ 	dev->blocksize = round_down(dev->blocksize, 512);
+ 	dev->blocksize = clamp_t(unsigned int, dev->blocksize, 512, 4096);
+ 
+@@ -1588,6 +1594,8 @@ static void null_validate_conf(struct nullb_device *dev)
+ 	/* can not stop a queue */
+ 	if (dev->queue_mode == NULL_Q_BIO)
+ 		dev->mbps = 0;
++
++	return 0;
+ }
+ 
+ #ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
+@@ -1620,7 +1628,9 @@ static int null_add_dev(struct nullb_device *dev)
+ 	struct nullb *nullb;
+ 	int rv;
+ 
+-	null_validate_conf(dev);
++	rv = null_validate_conf(dev);
++	if (rv)
++		goto out;
+ 
+ 	nullb = kzalloc_node(sizeof(*nullb), GFP_KERNEL, dev->home_node);
+ 	if (!nullb) {
+@@ -1648,8 +1658,10 @@ static int null_add_dev(struct nullb_device *dev)
+ 		if (rv)
+ 			goto out_cleanup_queues;
+ 
+-		if (!null_setup_fault())
++		if (!null_setup_fault()) {
++			rv = -EINVAL;
+ 			goto out_cleanup_queues;
++		}
+ 
+ 		nullb->tag_set->timeout = 5 * HZ;
+ 		nullb->q = blk_mq_init_queue(nullb->tag_set);
+-- 
+2.20.1
 
