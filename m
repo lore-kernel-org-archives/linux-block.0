@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FDE6C282CD
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 21:36:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D133CC282C8
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 21:36:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 16E342183F
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 21:36:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E62921738
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 21:36:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="fZZvRoXL"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="J7qGXugk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728316AbfA1VgC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 16:36:02 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:41524 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728234AbfA1VgC (ORCPT
+        id S1727674AbfA1VgD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 16:36:03 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:40440 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728153AbfA1VgD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 16:36:02 -0500
-Received: by mail-io1-f67.google.com with SMTP id s22so14830158ioc.8
-        for <linux-block@vger.kernel.org>; Mon, 28 Jan 2019 13:36:01 -0800 (PST)
+        Mon, 28 Jan 2019 16:36:03 -0500
+Received: by mail-io1-f68.google.com with SMTP id k2so14794475iog.7
+        for <linux-block@vger.kernel.org>; Mon, 28 Jan 2019 13:36:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=RtgkxgJt7cLT6y0YMZJuVq4CDVDlQ2Ht0zw/vlUzBrA=;
-        b=fZZvRoXLWkvbSgOrMsqJt111eP6lu4GpuA3OQNTZCk26MIdzugp/fEdy/VY6RUYUJi
-         RPgxSrDBS8EkngescaijVG3V3ffQk5aSGjzCGJshIoLAWU4Ws0JPr36+UVtUPjwo8bsF
-         KlSMHJ52E1KqLbdfOECl093w0lEXlMPrB5ITAG34we/NnkF6yjWEjR0pzVeZW6IskG+o
-         6AQYXC1heQZUAbIIkJkqbSX/ywSJIijeIH5eKKBKRvio4YS92g0Mj9TTG/CUxwQA7XYM
-         O7pAuYFYXqSb322muvK7oS1a99JbGv19fDU9ilSaQEo48qY8naebCakJiySJOYwoCbZ9
-         vAbw==
+        bh=HU3YUukjSp4JEwN57tU8/YdI0w30Ti9AeqKKUuT4uao=;
+        b=J7qGXugkV8Oka3Gb8gobLWl75+HThQW6pYU5ovzop9L9G013YPAmMQP0Ca8Z+t0hci
+         f/fK/B89TpfqWn8K8KPTr6HomO5qaA+tVt5cQ/gqDXshgNOix2jfJPC4DjkI7RNSfFz6
+         ay+p+kx/inD7D1PlbOJ63Qf3sJYwFfrW9d5cviCGFI1At+rctp8waH2SUxMV3WpbC14c
+         5h4Wp2s5Q6dPOtSBoX3xuHDJdTjk+GL8emsKj0WbXijUousBySa1YW9pp6g4ncKqkWrh
+         PpWhsufwtc6sW5w8A5nI3BdGgtIpe6DKI7NXlsb+igFj5L5HwLfqRvWSrVxxPRDmiwMC
+         nsDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=RtgkxgJt7cLT6y0YMZJuVq4CDVDlQ2Ht0zw/vlUzBrA=;
-        b=EI/A4sauRTx2cYU11I/e7ceVysfqqSL+ITe2UQuiHdFB/HFDp7GVlVLqxTU0XUa/++
-         qQlgBI0u5ct9q1UjJHnoW5IK+aS/cJVnnmVd0UNAZTTEeEYQQ0N9SDpe2wVWnCU7EcR9
-         un0BdUf0rocH4NCwJsxtldsLZqgcvYZau5nfMTwV9srfKoACpuYfc6UM4PApyKtLpue4
-         zjMtAwPgfQnN9JizFxikuobWL5nS3SB6oFBc83HfBLRRTbICW2jvAKpwMrORt1SkPunZ
-         bJeY8QgQxZpAiZ0jm0mqNQKoGH88toFXUjY4gonRmCGJDkDsbnjCV0sj/aUbSvswGXMI
-         XViA==
-X-Gm-Message-State: AHQUAub96RmdXzkWp0inXWcvZgM4b9Ke7KgHYPkReEwLCG3Cj9wyi2kw
-        UX1yA4Z8jqY52kCQOAaTZWGT7A==
-X-Google-Smtp-Source: AHgI3IZHTjuozYEr8V/QhfX1au2JACjYXZ7nRW8SnwnPMNmiCJ6fN7D+4BgHSsAWJH57UJeSYRZwFg==
-X-Received: by 2002:a5e:8704:: with SMTP id y4mr12117363ioj.27.1548711360791;
-        Mon, 28 Jan 2019 13:36:00 -0800 (PST)
+        bh=HU3YUukjSp4JEwN57tU8/YdI0w30Ti9AeqKKUuT4uao=;
+        b=oUpv/lhe2vFyMRuo6UGTVjiWLNmTmBJO/VNE11YvwXkvJCWHxRViWNuYlcJarcSlxa
+         KAfoFfKe8YPtlzbX2QVpIg++1/kGp9D0ofTswyl+yPCZfVzF6DcFeaNp7z6Nltibsty3
+         Wjgl7yr9YwCCorzUhijC/9lZrURpiNpa0E/Wlney2CqEY85s0/nVYx7xjwrF6i3Nj/N6
+         tEBXytqWKI/YLLV+famqK5k9zIEIqsq9si+mlYoR+L0mCeXYsH3ul9SMO+zaUWpgachu
+         erTrY3Tc971ZRk7fp1KqP32xvELed9xfzGKAIKKoQIx1bMpnuOrAwGjs3z2KT9skH3lY
+         Zqag==
+X-Gm-Message-State: AHQUAuZLSAqx3kenVuYEYhUjnXvXIT6+Tqgfdb1RJ3Lr3rqE6Dc8Y7T1
+        RaVvIkPmaiEgEFpuF0EBrX2F+t2gJAE=
+X-Google-Smtp-Source: ALg8bN6dLVRwd7ODeW2elJE3+3j/7/iydtIu8fWlTaeo9Zgp6fhX7SpIjaOC4IePt6SmUl56BSTgoA==
+X-Received: by 2002:a6b:8f08:: with SMTP id r8mr14304077iod.56.1548711362487;
+        Mon, 28 Jan 2019 13:36:02 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id u25sm13782077iob.23.2019.01.28.13.35.59
+        by smtp.gmail.com with ESMTPSA id u25sm13782077iob.23.2019.01.28.13.36.00
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 28 Jan 2019 13:35:59 -0800 (PST)
+        Mon, 28 Jan 2019 13:36:01 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-aio@kvack.org, linux-block@vger.kernel.org,
         linux-man@vger.kernel.org, linux-api@vger.kernel.org
 Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 09/18] io_uring: use fget/fput_many() for file references
-Date:   Mon, 28 Jan 2019 14:35:29 -0700
-Message-Id: <20190128213538.13486-10-axboe@kernel.dk>
+Subject: [PATCH 10/18] io_uring: batch io_kiocb allocation
+Date:   Mon, 28 Jan 2019 14:35:30 -0700
+Message-Id: <20190128213538.13486-11-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190128213538.13486-1-axboe@kernel.dk>
 References: <20190128213538.13486-1-axboe@kernel.dk>
@@ -70,309 +70,104 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a separate io_submit_state structure, to cache some of the things
-we need for IO submission.
-
-One such example is file reference batching. io_submit_state. We get as
-many references as the number of sqes we are submitting, and drop
-unused ones if we end up switching files. The assumption here is that
-we're usually only dealing with one fd, and if there are multiple,
-hopefuly they are at least somewhat ordered. Could trivially be extended
-to cover multiple fds, if needed.
-
-On the completion side we do the same thing, except this is trivially
-done just locally in io_iopoll_reap().
+Similarly to how we use the state->ios_left to know how many references
+to get to a file, we can use it to allocate the io_kiocb's we need in
+bulk.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/io_uring.c | 139 ++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 118 insertions(+), 21 deletions(-)
+ fs/io_uring.c | 39 ++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 36 insertions(+), 3 deletions(-)
 
 diff --git a/fs/io_uring.c b/fs/io_uring.c
-index ed5b605a1748..25bdd719690d 100644
+index 25bdd719690d..a33f1b1709d0 100644
 --- a/fs/io_uring.c
 +++ b/fs/io_uring.c
-@@ -131,6 +131,19 @@ struct io_kiocb {
- #define IO_PLUG_THRESHOLD		2
- #define IO_IOPOLL_BATCH			8
+@@ -134,6 +134,13 @@ struct io_kiocb {
+ struct io_submit_state {
+ 	struct blk_plug plug;
  
-+struct io_submit_state {
-+	struct blk_plug plug;
-+
 +	/*
-+	 * File reference cache
++	 * io_kiocb alloc cache
 +	 */
-+	struct file *file;
-+	unsigned int fd;
-+	unsigned int has_refs;
-+	unsigned int used_refs;
-+	unsigned int ios_left;
-+};
++	void *reqs[IO_IOPOLL_BATCH];
++	unsigned int free_reqs;
++	unsigned int cur_req;
 +
- static struct kmem_cache *req_cachep;
+ 	/*
+ 	 * File reference cache
+ 	 */
+@@ -257,20 +264,42 @@ static void io_ring_drop_ctx_refs(struct io_ring_ctx *ctx, unsigned refs)
+ 		wake_up(&ctx->wait);
+ }
  
- static const struct file_operations io_uring_fops;
-@@ -284,9 +297,11 @@ static void io_iopoll_complete(struct io_ring_ctx *ctx, unsigned int *nr_events,
- 			       struct list_head *done)
+-static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx)
++static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx,
++				   struct io_submit_state *state)
  {
- 	void *reqs[IO_IOPOLL_BATCH];
-+	int file_count, to_free;
-+	struct file *file = NULL;
++	gfp_t gfp = GFP_ATOMIC | __GFP_NOWARN;
  	struct io_kiocb *req;
--	int to_free = 0;
  
-+	file_count = to_free = 0;
- 	while (!list_empty(done)) {
- 		req = list_first_entry(done, struct io_kiocb, list);
- 		list_del(&req->list);
-@@ -296,12 +311,28 @@ static void io_iopoll_complete(struct io_ring_ctx *ctx, unsigned int *nr_events,
- 		reqs[to_free++] = req;
- 		(*nr_events)++;
+ 	/* safe to use the non tryget, as we're inside ring ref already */
+ 	percpu_ref_get(&ctx->refs);
  
--		fput(req->rw.ki_filp);
-+		/*
-+		 * Batched puts of the same file, to avoid dirtying the
-+		 * file usage count multiple times, if avoidable.
-+		 */
-+		if (!file) {
-+			file = req->rw.ki_filp;
-+			file_count = 1;
-+		} else if (file == req->rw.ki_filp) {
-+			file_count++;
-+		} else {
-+			fput_many(file, file_count);
-+			file = req->rw.ki_filp;
-+			file_count = 1;
-+		}
-+
- 		if (to_free == ARRAY_SIZE(reqs))
- 			io_free_req_many(ctx, reqs, &to_free);
- 	}
- 	io_commit_cqring(ctx);
- 
-+	if (file)
-+		fput_many(file, file_count);
- 	if (to_free)
- 		io_free_req_many(ctx, reqs, &to_free);
- }
-@@ -490,14 +521,56 @@ static void io_iopoll_req_issued(struct io_kiocb *req)
- 		list_add_tail(&req->list, &ctx->poll_list);
- }
- 
-+static void io_file_put(struct io_submit_state *state, struct file *file)
-+{
-+	if (!state) {
-+		fput(file);
-+	} else if (state->file) {
-+		int diff = state->has_refs - state->used_refs;
-+
-+		if (diff)
-+			fput_many(state->file, diff);
-+		state->file = NULL;
-+	}
-+}
-+
-+/*
-+ * Get as many references to a file as we have IOs left in this submission,
-+ * assuming most submissions are for one file, or at least that each file
-+ * has more than one submission.
-+ */
-+static struct file *io_file_get(struct io_submit_state *state, int fd)
-+{
+-	req = kmem_cache_alloc(req_cachep, GFP_ATOMIC | __GFP_NOWARN);
 +	if (!state)
-+		return fget(fd);
++		req = kmem_cache_alloc(req_cachep, gfp);
++	else if (!state->free_reqs) {
++		size_t sz;
++		int ret;
 +
-+	if (state->file) {
-+		if (state->fd == fd) {
-+			state->used_refs++;
-+			state->ios_left--;
-+			return state->file;
-+		}
-+		io_file_put(state, NULL);
++		sz = min_t(size_t, state->ios_left, ARRAY_SIZE(state->reqs));
++		ret = kmem_cache_alloc_bulk(req_cachep, gfp, sz,
++						state->reqs);
++		if (ret <= 0)
++			goto out;
++		state->free_reqs = ret - 1;
++		state->cur_req = 1;
++		req = state->reqs[0];
++	} else {
++		req = state->reqs[state->cur_req];
++		state->free_reqs--;
++		state->cur_req++;
 +	}
-+	state->file = fget_many(fd, state->ios_left);
-+	if (!state->file)
-+		return NULL;
 +
-+	state->fd = fd;
-+	state->has_refs = state->ios_left;
-+	state->used_refs = 1;
-+	state->ios_left--;
-+	return state->file;
-+}
-+
- static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
--		      bool force_nonblock)
-+		      bool force_nonblock, struct io_submit_state *state)
- {
- 	struct io_ring_ctx *ctx = req->ctx;
- 	struct kiocb *kiocb = &req->rw;
- 	int ret;
- 
--	kiocb->ki_filp = fget(sqe->fd);
-+	kiocb->ki_filp = io_file_get(state, sqe->fd);
- 	if (unlikely(!kiocb->ki_filp))
- 		return -EBADF;
- 	kiocb->ki_pos = sqe->off;
-@@ -536,7 +609,7 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+ 	if (req) {
+ 		req->ctx = ctx;
+ 		req->flags = 0;
+ 		return req;
  	}
- 	return 0;
- out_fput:
--	fput(kiocb->ki_filp);
-+	io_file_put(state, kiocb->ki_filp);
- 	return ret;
+ 
++out:
+ 	io_ring_drop_ctx_refs(ctx, 1);
+ 	return NULL;
  }
+@@ -883,7 +912,7 @@ static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
+ 	if (unlikely(s->sqe->flags))
+ 		return -EINVAL;
  
-@@ -577,7 +650,7 @@ static int io_import_iovec(struct io_ring_ctx *ctx, int rw,
- }
- 
- static ssize_t io_read(struct io_kiocb *req, const struct io_uring_sqe *sqe,
--		       bool force_nonblock)
-+		       bool force_nonblock, struct io_submit_state *state)
- {
- 	struct iovec inline_vecs[UIO_FASTIOV], *iovec = inline_vecs;
- 	struct kiocb *kiocb = &req->rw;
-@@ -585,7 +658,7 @@ static ssize_t io_read(struct io_kiocb *req, const struct io_uring_sqe *sqe,
- 	struct file *file;
- 	ssize_t ret;
- 
--	ret = io_prep_rw(req, sqe, force_nonblock);
-+	ret = io_prep_rw(req, sqe, force_nonblock, state);
- 	if (ret)
- 		return ret;
- 	file = kiocb->ki_filp;
-@@ -620,7 +693,7 @@ static ssize_t io_read(struct io_kiocb *req, const struct io_uring_sqe *sqe,
- }
- 
- static ssize_t io_write(struct io_kiocb *req, const struct io_uring_sqe *sqe,
--			bool force_nonblock)
-+			bool force_nonblock, struct io_submit_state *state)
- {
- 	struct iovec inline_vecs[UIO_FASTIOV], *iovec = inline_vecs;
- 	struct kiocb *kiocb = &req->rw;
-@@ -628,7 +701,7 @@ static ssize_t io_write(struct io_kiocb *req, const struct io_uring_sqe *sqe,
- 	struct file *file;
- 	ssize_t ret;
- 
--	ret = io_prep_rw(req, sqe, force_nonblock);
-+	ret = io_prep_rw(req, sqe, force_nonblock, state);
- 	if (ret)
- 		return ret;
- 	file = kiocb->ki_filp;
-@@ -722,7 +795,8 @@ static int io_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe,
- }
- 
- static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
--			   struct sqe_submit *s, bool force_nonblock)
-+			   struct sqe_submit *s, bool force_nonblock,
-+			   struct io_submit_state *state)
- {
- 	const struct io_uring_sqe *sqe = s->sqe;
- 	ssize_t ret;
-@@ -737,10 +811,10 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
- 		ret = io_nop(req, sqe);
- 		break;
- 	case IORING_OP_READV:
--		ret = io_read(req, sqe, force_nonblock);
-+		ret = io_read(req, sqe, force_nonblock, state);
- 		break;
- 	case IORING_OP_WRITEV:
--		ret = io_write(req, sqe, force_nonblock);
-+		ret = io_write(req, sqe, force_nonblock, state);
- 		break;
- 	case IORING_OP_FSYNC:
- 		ret = io_fsync(req, sqe, force_nonblock);
-@@ -786,7 +860,7 @@ static void io_sq_wq_submit_work(struct work_struct *work)
- 	use_mm(ctx->sqo_mm);
- 	set_fs(USER_DS);
- 
--	ret = __io_submit_sqe(ctx, req, s, false);
-+	ret = __io_submit_sqe(ctx, req, s, false, NULL);
- 
- 	set_fs(old_fs);
- 	unuse_mm(ctx->sqo_mm);
-@@ -799,7 +873,8 @@ static void io_sq_wq_submit_work(struct work_struct *work)
- 	current->files = old_files;
- }
- 
--static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s)
-+static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
-+			 struct io_submit_state *state)
- {
- 	struct io_kiocb *req;
- 	ssize_t ret;
-@@ -812,7 +887,7 @@ static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s)
+-	req = io_get_req(ctx);
++	req = io_get_req(ctx, state);
  	if (unlikely(!req))
  		return -EAGAIN;
  
--	ret = __io_submit_sqe(ctx, req, s, true);
-+	ret = __io_submit_sqe(ctx, req, s, true, state);
- 	if (ret == -EAGAIN) {
- 		memcpy(&req->submit, s, sizeof(*s));
- 		INIT_WORK(&req->work, io_sq_wq_submit_work);
-@@ -825,6 +900,26 @@ static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s)
- 	return ret;
+@@ -907,6 +936,9 @@ static void io_submit_state_end(struct io_submit_state *state)
+ {
+ 	blk_finish_plug(&state->plug);
+ 	io_file_put(state, NULL);
++	if (state->free_reqs)
++		kmem_cache_free_bulk(req_cachep, state->free_reqs,
++					&state->reqs[state->cur_req]);
  }
  
-+/*
-+ * Batched submission is done, ensure local IO is flushed out.
-+ */
-+static void io_submit_state_end(struct io_submit_state *state)
-+{
-+	blk_finish_plug(&state->plug);
-+	io_file_put(state, NULL);
-+}
-+
-+/*
-+ * Start submission side cache.
-+ */
-+static void io_submit_state_start(struct io_submit_state *state,
-+				  struct io_ring_ctx *ctx, unsigned max_ios)
-+{
-+	blk_start_plug(&state->plug);
-+	state->file = NULL;
-+	state->ios_left = max_ios;
-+}
-+
- static void io_commit_sqring(struct io_ring_ctx *ctx)
+ /*
+@@ -916,6 +948,7 @@ static void io_submit_state_start(struct io_submit_state *state,
+ 				  struct io_ring_ctx *ctx, unsigned max_ios)
  {
- 	struct io_sq_ring *ring = ctx->sq_ring;
-@@ -879,11 +974,13 @@ static bool io_get_sqring(struct io_ring_ctx *ctx, struct sqe_submit *s)
- 
- static int io_ring_submit(struct io_ring_ctx *ctx, unsigned int to_submit)
- {
-+	struct io_submit_state state, *statep = NULL;
- 	int i, ret = 0, submit = 0;
--	struct blk_plug plug;
- 
--	if (to_submit > IO_PLUG_THRESHOLD)
--		blk_start_plug(&plug);
-+	if (to_submit > IO_PLUG_THRESHOLD) {
-+		io_submit_state_start(&state, ctx, to_submit);
-+		statep = &state;
-+	}
- 
- 	for (i = 0; i < to_submit; i++) {
- 		struct sqe_submit s;
-@@ -891,7 +988,7 @@ static int io_ring_submit(struct io_ring_ctx *ctx, unsigned int to_submit)
- 		if (!io_get_sqring(ctx, &s))
- 			break;
- 
--		ret = io_submit_sqe(ctx, &s);
-+		ret = io_submit_sqe(ctx, &s, statep);
- 		if (ret) {
- 			io_drop_sqring(ctx);
- 			break;
-@@ -901,8 +998,8 @@ static int io_ring_submit(struct io_ring_ctx *ctx, unsigned int to_submit)
- 	}
- 	io_commit_sqring(ctx);
- 
--	if (to_submit > IO_PLUG_THRESHOLD)
--		blk_finish_plug(&plug);
-+	if (statep)
-+		io_submit_state_end(statep);
- 
- 	return submit ? submit : ret;
+ 	blk_start_plug(&state->plug);
++	state->free_reqs = 0;
+ 	state->file = NULL;
+ 	state->ios_left = max_ios;
  }
 -- 
 2.17.1
