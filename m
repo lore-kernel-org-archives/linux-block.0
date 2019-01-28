@@ -1,166 +1,356 @@
-Return-Path: <SRS0=89dG=QE=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=rnrW=QF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59794C282CD
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 23:50:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F248C282CD
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 00:00:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2347A2171F
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 23:50:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 128DB214DA
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 00:00:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="v6ODMQpC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H/IQnLzO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727097AbfA1XuW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 18:50:22 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:46625 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726937AbfA1XuW (ORCPT
+        id S1727608AbfA2AAA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 19:00:00 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:45232 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727859AbfA1X77 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 18:50:22 -0500
-Received: by mail-pl1-f194.google.com with SMTP id t13so8459136ply.13
-        for <linux-block@vger.kernel.org>; Mon, 28 Jan 2019 15:50:22 -0800 (PST)
+        Mon, 28 Jan 2019 18:59:59 -0500
+Received: by mail-ot1-f67.google.com with SMTP id 32so16303481ota.12
+        for <linux-block@vger.kernel.org>; Mon, 28 Jan 2019 15:59:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Ne5qLhfPQY9Q08DUBwLNL8BdHuA1uJ8INqGL1j9PAdI=;
-        b=v6ODMQpCyZAGjyrd2W3iqFEzfzo/ug2RPa2NC6SybL+9CDk+Rb9d/MDoH9ac0gd+dk
-         +aJNY1IhaRaMG0z2wKaF3bPW9uzwJ8rVyOeXo8qRPBnQnN/o98jbNYUWYV+8vnHfMps8
-         0Y56VFXfl9MPGEWbx2J3dzFTVJUIFp+PdmKELjL6S0yRzQIg5RBPp7Hsae9Ue+/zpenp
-         Ryip9CO/I9TtDpEKz9EYgwCrWZkzy9M0v68WP1eoQ4UtFLYtoc8pbXn3BZYbxRG6fC5c
-         gYSx+6S4u7K6Y2mn9jKe/1VxgZg/5HgOtN0VdfrqL02gkIx0Cc4Q7qLanaV16qG6MUvj
-         j5ZA==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mQw+W6NgezlwjnmFHcSNwRCIM9SQ2/5GqBJgGcBSPCw=;
+        b=H/IQnLzOjZL3ciPN6oK39XfyqkWxMzp+d/Hu/LOCN+8g1NYgMy0TKRpZcVTZX11M7d
+         ZImJ+M20WxS7coOTUevg+8QVipc/r4u1YjGZIs05IZaYXjIKWCyWZG/d7PWrHdiOrFxn
+         kOGQ3003SZkscqn0APFGqITojDJ/1nSDnDbCW02bSKdyX9rmF8SKehnwcgbpfRNJUn4v
+         UuZCbKG1SCyiOh3Tj9EbwJRcdgKoitbQ1NdCg4jgiRNaWUFf2/vMFFhbiORQeJ+E2kz6
+         6+aztH4B1Dw/fh0uz3DZ5RWdV6ZNdWYs/PJXVA6YofEB98p2gNiMW8AVWlTez8jm8bEk
+         uFfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Ne5qLhfPQY9Q08DUBwLNL8BdHuA1uJ8INqGL1j9PAdI=;
-        b=g50PgbFP4qCtb/dzdj9T/lfc1dn6FEQXfblUIfp2wifOLKhgz917l0lM3MufpKHym5
-         iZf4Xz0jfkWdw8YwhgrpwbwClHSCFAwioqo0r6POtVMKyCYcDNEfFU8BJFThVD44XYZQ
-         8gjTEMQGd40A4PKQWe5DvjGbFjT06p4We5bDCZnTuLMkzonD16ehbfNDbrDfvIa9l1O4
-         vYZL+aRFoZdxaBYObtqC1PoaVo/jg8Ks4bt7fFCTfJfsUJqvBhIks+f8IGKu6Id3eMYj
-         R918ImC6HwCXsHMoiFwfi0fm4e4U+DoGyGH5SrLA+/nVp1ROfdg+vrkOhchMuGl2L6OE
-         IwqA==
-X-Gm-Message-State: AJcUukd8DFtRr92liZ51K+20q2mhfReauFhOLpc4HIy3r0ahK+2143xM
-        XKHo6m95D89/P3TBmyCxqw2F2g==
-X-Google-Smtp-Source: ALg8bN7ImMDCPPlstiFL0tmzFZ4zlrBnCRb41zMu0Fo31XVQaWVh0rb5A4qFjdyGJHlIQke/LRxbHw==
-X-Received: by 2002:a17:902:9b87:: with SMTP id y7mr23961437plp.336.1548719421723;
-        Mon, 28 Jan 2019 15:50:21 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id y5sm58442325pge.49.2019.01.28.15.50.19
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 28 Jan 2019 15:50:20 -0800 (PST)
-Subject: Re: [PATCH 12/18] io_uring: add support for pre-mapped user IO
- buffers
-To:     Jann Horn <jannh@google.com>
-Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
-        linux-man <linux-man@vger.kernel.org>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mQw+W6NgezlwjnmFHcSNwRCIM9SQ2/5GqBJgGcBSPCw=;
+        b=jr9k8hTq4c00Xh6eU4aPtwHQqky7InpS1hpKcRpOw59DAbhJKHeYp8qPgzVfR1HcFY
+         YJsVhQYX4cZwOb7sujSUqvaXATvbIYuw/S4O4lH8TLo2BS/cbSOo+unnXBQIsEvH48k7
+         xBfSU6OFgeUFciEu61IaOrYsNJqsY+u2wzYkBmWeLaBR3D+SYRKlBwXpzogAxZVYnfdk
+         xCuyXdUMvzl1Rfasmhn5wlzW1cg3zgXy4bqSZO2oeb83ueTM/mTinoUjM+4ToEArOIvR
+         BOhYsDdIdKK0CMKrSQZh2fzIP/jFknREDFE19lUhSaj3u7qhmgFpOtTLEpm6PE283i/N
+         m4/Q==
+X-Gm-Message-State: AJcUukeyaCr/J6/tdO3v57vwWbOd0tnFHLvmYTV0uA08qZYkaojpJi0J
+        FaJScJMYLeavR7p0Dg+wbkyMsX9EFF4pX6SbT2j7zjATSe7Q1Q==
+X-Google-Smtp-Source: ALg8bN5e2+qsD2gdUUXn5lFX0cwrGV3zUcKk0ywHM3sc6Q36bJlSg7zUYSzmLAhy+uToSUMggiKDw3G/mkSisKetJOY=
+X-Received: by 2002:a9d:7059:: with SMTP id x25mr18500060otj.35.1548719998389;
+ Mon, 28 Jan 2019 15:59:58 -0800 (PST)
+MIME-Version: 1.0
+References: <20190128213538.13486-1-axboe@kernel.dk> <20190128213538.13486-6-axboe@kernel.dk>
+ <CAG48ez0vDqDH4ks7q4L3F+xt-4kVQrN1yw34QwFAmwQyy27FTw@mail.gmail.com> <e9326a77-54c5-e2b8-d9e5-663261462597@kernel.dk>
+In-Reply-To: <e9326a77-54c5-e2b8-d9e5-663261462597@kernel.dk>
+From:   Jann Horn <jannh@google.com>
+Date:   Tue, 29 Jan 2019 00:59:32 +0100
+Message-ID: <CAG48ez17NW0GJVRC6dFcHZTgQifFz5og1XCUbXkHKhr6f=j74Q@mail.gmail.com>
+Subject: Re: [PATCH 05/18] Add io_uring IO interface
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>, linux-aio@kvack.org,
+        linux-block@vger.kernel.org, linux-man <linux-man@vger.kernel.org>,
         Linux API <linux-api@vger.kernel.org>, hch@lst.de,
         jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>
-References: <20190128213538.13486-1-axboe@kernel.dk>
- <20190128213538.13486-13-axboe@kernel.dk>
- <CAG48ez3cJS=RUqyP630du3pNw_wBdM82KOtbX=YY6U4LxfMBew@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <cb243bfc-0e3a-d5a4-3087-90af1a1824a0@kernel.dk>
-Date:   Mon, 28 Jan 2019 16:50:19 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <CAG48ez3cJS=RUqyP630du3pNw_wBdM82KOtbX=YY6U4LxfMBew@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/28/19 4:35 PM, Jann Horn wrote:
-> On Mon, Jan 28, 2019 at 10:36 PM Jens Axboe <axboe@kernel.dk> wrote:
->> If we have fixed user buffers, we can map them into the kernel when we
->> setup the io_context. That avoids the need to do get_user_pages() for
->> each and every IO.
-> [...]
->> +static int __io_uring_register(struct io_ring_ctx *ctx, unsigned opcode,
->> +                              void __user *arg, unsigned nr_args)
->> +{
->> +       int ret;
->> +
->> +       /* Drop our initial ref and wait for the ctx to be fully idle */
->> +       percpu_ref_put(&ctx->refs);
-> 
-> The line above drops a reference that you just got in the caller...
+On Tue, Jan 29, 2019 at 12:47 AM Jens Axboe <axboe@kernel.dk> wrote:
+> On 1/28/19 3:32 PM, Jann Horn wrote:
+> > On Mon, Jan 28, 2019 at 10:35 PM Jens Axboe <axboe@kernel.dk> wrote:
+> >> The submission queue (SQ) and completion queue (CQ) rings are shared
+> >> between the application and the kernel. This eliminates the need to
+> >> copy data back and forth to submit and complete IO.
+> >>
+> >> IO submissions use the io_uring_sqe data structure, and completions
+> >> are generated in the form of io_uring_sqe data structures. The SQ
+> >> ring is an index into the io_uring_sqe array, which makes it possible
+> >> to submit a batch of IOs without them being contiguous in the ring.
+> >> The CQ ring is always contiguous, as completion events are inherently
+> >> unordered, and hence any io_uring_cqe entry can point back to an
+> >> arbitrary submission.
+> >>
+> >> Two new system calls are added for this:
+> >>
+> >> io_uring_setup(entries, params)
+> >>         Sets up a context for doing async IO. On success, returns a file
+> >>         descriptor that the application can mmap to gain access to the
+> >>         SQ ring, CQ ring, and io_uring_sqes.
+> >>
+> >> io_uring_enter(fd, to_submit, min_complete, flags, sigset, sigsetsize)
+> >>         Initiates IO against the rings mapped to this fd, or waits for
+> >>         them to complete, or both. The behavior is controlled by the
+> >>         parameters passed in. If 'to_submit' is non-zero, then we'll
+> >>         try and submit new IO. If IORING_ENTER_GETEVENTS is set, the
+> >>         kernel will wait for 'min_complete' events, if they aren't
+> >>         already available. It's valid to set IORING_ENTER_GETEVENTS
+> >>         and 'min_complete' == 0 at the same time, this allows the
+> >>         kernel to return already completed events without waiting
+> >>         for them. This is useful only for polling, as for IRQ
+> >>         driven IO, the application can just check the CQ ring
+> >>         without entering the kernel.
+> >>
+> >> With this setup, it's possible to do async IO with a single system
+> >> call. Future developments will enable polled IO with this interface,
+> >> and polled submission as well. The latter will enable an application
+> >> to do IO without doing ANY system calls at all.
+> >>
+> >> For IRQ driven IO, an application only needs to enter the kernel for
+> >> completions if it wants to wait for them to occur.
+> >>
+> >> Each io_uring is backed by a workqueue, to support buffered async IO
+> >> as well. We will only punt to an async context if the command would
+> >> need to wait for IO on the device side. Any data that can be accessed
+> >> directly in the page cache is done inline. This avoids the slowness
+> >> issue of usual threadpools, since cached data is accessed as quickly
+> >> as a sync interface.
+> >>
+> >> Sample application: http://git.kernel.dk/cgit/fio/plain/t/io_uring.c
+> > [...]
+> >> +static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+> >> +                     bool force_nonblock)
+> >> +{
+> >> +       struct kiocb *kiocb = &req->rw;
+> >> +       int ret;
+> >> +
+> >> +       kiocb->ki_filp = fget(sqe->fd);
+> >> +       if (unlikely(!kiocb->ki_filp))
+> >> +               return -EBADF;
+> >> +       kiocb->ki_pos = sqe->off;
+> >> +       kiocb->ki_flags = iocb_flags(kiocb->ki_filp);
+> >> +       kiocb->ki_hint = ki_hint_validate(file_write_hint(kiocb->ki_filp));
+> >> +       if (sqe->ioprio) {
+> >> +               ret = ioprio_check_cap(sqe->ioprio);
+> >> +               if (ret)
+> >> +                       goto out_fput;
+> >> +
+> >> +               kiocb->ki_ioprio = sqe->ioprio;
+> >> +       } else
+> >> +               kiocb->ki_ioprio = get_current_ioprio();
+> >> +
+> >> +       ret = kiocb_set_rw_flags(kiocb, sqe->rw_flags);
+> >> +       if (unlikely(ret))
+> >> +               goto out_fput;
+> >> +       if (force_nonblock) {
+> >> +               kiocb->ki_flags |= IOCB_NOWAIT;
+> >> +               req->flags |= REQ_F_FORCE_NONBLOCK;
+> >> +       }
+> >> +       if (kiocb->ki_flags & IOCB_HIPRI) {
+> >> +               ret = -EINVAL;
+> >> +               goto out_fput;
+> >> +       }
+> >> +
+> >> +       kiocb->ki_complete = io_complete_rw;
+> >> +       return 0;
+> >> +out_fput:
+> >> +       fput(kiocb->ki_filp);
+> >> +       return ret;
+> >> +}
+> > [...]
+> >> +static ssize_t io_read(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+> >> +                      bool force_nonblock)
+> >> +{
+> >> +       struct iovec inline_vecs[UIO_FASTIOV], *iovec = inline_vecs;
+> >> +       struct kiocb *kiocb = &req->rw;
+> >> +       struct iov_iter iter;
+> >> +       struct file *file;
+> >> +       ssize_t ret;
+> >> +
+> >> +       ret = io_prep_rw(req, sqe, force_nonblock);
+> >> +       if (ret)
+> >> +               return ret;
+> >> +       file = kiocb->ki_filp;
+> >> +
+> >> +       ret = -EBADF;
+> >> +       if (unlikely(!(file->f_mode & FMODE_READ)))
+> >> +               goto out_fput;
+> >> +       ret = -EINVAL;
+> >> +       if (unlikely(!file->f_op->read_iter))
+> >> +               goto out_fput;
+> >> +
+> >> +       ret = io_import_iovec(req->ctx, READ, sqe, &iovec, &iter);
+> >> +       if (ret)
+> >> +               goto out_fput;
+> >> +
+> >> +       ret = rw_verify_area(READ, file, &kiocb->ki_pos, iov_iter_count(&iter));
+> >> +       if (!ret) {
+> >> +               ssize_t ret2;
+> >> +
+> >> +               /* Catch -EAGAIN return for forced non-blocking submission */
+> >> +               ret2 = call_read_iter(file, kiocb, &iter);
+> >> +               if (!force_nonblock || ret2 != -EAGAIN)
+> >> +                       io_rw_done(kiocb, ret2);
+> >> +               else
+> >> +                       ret = -EAGAIN;
+> >> +       }
+> >> +       kfree(iovec);
+> >> +out_fput:
+> >> +       if (unlikely(ret))
+> >> +               fput(file);
+> >> +       return ret;
+> >> +}
+> > [...]
+> >> +static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+> >> +                          struct sqe_submit *s, bool force_nonblock)
+> >> +{
+> >> +       const struct io_uring_sqe *sqe = s->sqe;
+> >> +       ssize_t ret;
+> >> +
+> >> +       if (unlikely(s->index >= ctx->sq_entries))
+> >> +               return -EINVAL;
+> >> +       req->user_data = sqe->user_data;
+> >> +
+> >> +       ret = -EINVAL;
+> >> +       switch (sqe->opcode) {
+> >> +       case IORING_OP_NOP:
+> >> +               ret = io_nop(req, sqe);
+> >> +               break;
+> >> +       case IORING_OP_READV:
+> >> +               ret = io_read(req, sqe, force_nonblock);
+> >> +               break;
+> >> +       case IORING_OP_WRITEV:
+> >> +               ret = io_write(req, sqe, force_nonblock);
+> >> +               break;
+> >> +       default:
+> >> +               ret = -EINVAL;
+> >> +               break;
+> >> +       }
+> >> +
+> >> +       return ret;
+> >> +}
+> >> +
+> >> +static void io_sq_wq_submit_work(struct work_struct *work)
+> >> +{
+> >> +       struct io_kiocb *req = container_of(work, struct io_kiocb, work);
+> >> +       struct sqe_submit *s = &req->submit;
+> >> +       u64 user_data = s->sqe->user_data;
+> >> +       struct io_ring_ctx *ctx = req->ctx;
+> >> +       mm_segment_t old_fs = get_fs();
+> >> +       struct files_struct *old_files;
+> >> +       int ret;
+> >> +
+> >> +        /* Ensure we clear previously set forced non-block flag */
+> >> +       req->flags &= ~REQ_F_FORCE_NONBLOCK;
+> >> +
+> >> +       old_files = current->files;
+> >> +       current->files = ctx->sqo_files;
+> >
+> > I think you're not supposed to twiddle with current->files without
+> > holding task_lock(current).
+>
+> 'current' is the work queue item in this case, do we need to protect
+> against anything else? I can add the locking around the assignments
+> (both places).
 
-Right
+Stuff like proc_fd_link() uses get_files_struct(), which grabs a
+reference to your current files_struct protected only by task_lock();
+and it doesn't use anything like READ_ONCE(), so even if the object
+lifetime is not a problem, get_files_struct() could potentially crash
+due to a double-read (reading task->files twice and assuming that the
+result will be the same). As far as I can tell, this procfs code also
+works on kernel threads.
 
->> +       percpu_ref_kill(&ctx->refs);
->> +       wait_for_completion(&ctx->ctx_done);
->> +
->> +       switch (opcode) {
->> +       case IORING_REGISTER_BUFFERS:
->> +               ret = io_sqe_buffer_register(ctx, arg, nr_args);
->> +               break;
->> +       case IORING_UNREGISTER_BUFFERS:
->> +               ret = -EINVAL;
->> +               if (arg || nr_args)
->> +                       break;
->> +               ret = io_sqe_buffer_unregister(ctx);
->> +               break;
->> +       default:
->> +               ret = -EINVAL;
->> +               break;
->> +       }
->> +
->> +       /* bring the ctx back to life */
->> +       reinit_completion(&ctx->ctx_done);
->> +       percpu_ref_resurrect(&ctx->refs);
->> +       percpu_ref_get(&ctx->refs);
-> 
-> And then this line takes a reference that the caller will immediately
-> drop again? Why?
+> >> +       if (!mmget_not_zero(ctx->sqo_mm)) {
+> >> +               ret = -EFAULT;
+> >> +               goto err;
+> >> +       }
+> >> +
+> >> +       use_mm(ctx->sqo_mm);
+> >> +       set_fs(USER_DS);
+> >> +
+> >> +       ret = __io_submit_sqe(ctx, req, s, false);
+> >> +
+> >> +       set_fs(old_fs);
+> >> +       unuse_mm(ctx->sqo_mm);
+> >> +       mmput(ctx->sqo_mm);
+> >> +err:
+> >> +       if (ret) {
+> >> +               io_cqring_add_event(ctx, user_data, ret, 0);
+> >> +               io_free_req(req);
+> >> +       }
+> >> +       current->files = old_files;
+> >> +}
+> > [...]
+> >> +static int io_sq_offload_start(struct io_ring_ctx *ctx)
+> >> +{
+> >> +       int ret;
+> >> +
+> >> +       ctx->sqo_mm = current->mm;
+> >
+> > What keeps this thing alive?
+>
+> I think we're deadling with the same thing as the files below, I'll
+> defer to that.
+>
+> >> +       /*
+> >> +        * This is safe since 'current' has the fd installed, and if that gets
+> >> +        * closed on exit, then fops->release() is invoked which waits for the
+> >> +        * async contexts to flush and exit before exiting.
+> >> +        */
+> >> +       ret = -EBADF;
+> >> +       ctx->sqo_files = current->files;
+> >> +       if (!ctx->sqo_files)
+> >> +               goto err;
+> >
+> > That's gnarly. Adding Al Viro to the thread.
+> >
+> > I think you misunderstand the semantics of f_op->release. The ->flush
+> > handler is invoked whenever a file descriptor is closed through
+> > filp_close() (via deletion of the files_struct, sys_close(),
+> > sys_dup2(), ...), so if you had used that one, _maybe_ this would
+> > work. But the ->release handler only runs when the _last_ reference to
+> > a struct file has been dropped - so you can, for example, fork() a
+> > child, then exit() in the parent, and the ->release handler isn't
+> > invoked. So I don't see how this can work.
+>
+> The anonfd is CLOEXEC. The idea is exactly that it only runs when the
+> last reference to the file has been dropped. Not sure why you think I
+> need ->flush() here?
 
-Just want to keep it symmetric and avoid having weird "this function drops
-a reference" use cases.
+Can't I just use fcntl(fd, F_SETFD, fd, 0) to clear the CLOEXEC flag?
+Or send the fd via SCM_RIGHTS?
 
-> 
->> +       return ret;
->> +}
->> +
->> +SYSCALL_DEFINE4(io_uring_register, unsigned int, fd, unsigned int, opcode,
->> +               void __user *, arg, unsigned int, nr_args)
->> +{
->> +       struct io_ring_ctx *ctx;
->> +       long ret = -EBADF;
->> +       struct fd f;
->> +
->> +       f = fdget(fd);
->> +       if (!f.file)
->> +               return -EBADF;
->> +
->> +       ret = -EOPNOTSUPP;
->> +       if (f.file->f_op != &io_uring_fops)
->> +               goto out_fput;
->> +
->> +       ret = -ENXIO;
->> +       ctx = f.file->private_data;
->> +       if (!percpu_ref_tryget(&ctx->refs))
->> +               goto out_fput;
-> 
-> If you are holding the uring_lock of a ctx that can be accessed
-> through a file descriptor (which you do just after this point), you
-> know that the percpu_ref isn't zero, right? Why are you doing the
-> tryget here?
+> > But even if you had abused ->flush for this instead: close_files()
+> > currently has a comment in it that claims that "this is the last
+> > reference to the files structure"; this change would make that claim
+> > untrue.
+>
+> Let me see if I can explain my intent better than that comment... We
+> know the parent who set up the io_uring instance will be around for as
+> long as io_uring instance persists.
 
-Not sure I follow... We don't hold the lock at this point. I guess your
-point is that since the descriptor is open (or we'd fail the above
-check), then there's no point doing the tryget variant here? That's
-strictly true, that could just be a get().
+That's the part that I think is wrong: As far as I can tell, the
+parent can go away and you won't notice.
 
--- 
-Jens Axboe
+Also, note that "the parent" is different things for ->files and ->mm.
+You can have a multithreaded process whose threads don't have the same
+->files, or multiple process that share ->files without sharing ->mm,
+...
 
+> When we are tearing down the
+> io_uring, then we wait for any async contexts (like the one above) to
+> exit. Once they are exited, it's safe to proceed with the exit and
+> teardown ->files[].
+
+But you only do that teardown on ->release, right? And ->release
+doesn't have much to do with the process lifetime.
+
+> That's the idea... Not trying to be clever, some of this dates back to
+> the aio weirdness where it was impossible to have cross references like
+> this, since it would lead to teardown deadlocks with how exit_aio() is
+> used. I can probably grab a struct files reference above, but currently
+> I don't see why it's needed.
