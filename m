@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FCE9C282C8
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:08:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE7DC282CD
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:26:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2E2662147A
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:08:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FD4D2171F
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 16:26:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548691733;
-	bh=lW34iHSQcZJ+uNbYPwul3+/VjEc8ceDuGS7KkJJERxo=;
+	s=default; t=1548692782;
+	bh=yKsmlZx/Z4GFK26nt0bFCgk8J8ErEy32WhXyNwX7F30=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=iJLHTZyTmhXutTsCeulQQM04kYBYoGWnxbuA1gokWdgWtd5Qk5HXzqSkEZGHL1BUg
-	 /kVP6myhIcWvaY5OCHttJmfENk8ijnLQyJE2YJOe3blqxEzDhyLsLgdNYBIfS78Nuo
-	 cpJpLRpEKsGDyHkeaOMqyqgpMsyhosPh9GJUPFM4=
+	b=akRsYKsFdA4Wp1FsOWDD9K2PFJVMHsy7IJr+gRxhXo0s9cV1ctwMQ+73JkeVze+Li
+	 VIhFCUS7bUuXhalkjU8bgdSBM9zO7x0HhgtBXRIA5JXIKTZ5iNN5qTMJVr/Jt92f7O
+	 F6Ap+Czq+cGjpaqecjdIwEl29WwUw4LRRft5Y9CI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731798AbfA1QIw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 11:08:52 -0500
-Received: from mail.kernel.org ([198.145.29.99]:32828 "EHLO mail.kernel.org"
+        id S2389678AbfA1Q0V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 11:26:21 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35478 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731323AbfA1QIw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 11:08:52 -0500
+        id S2390135AbfA1Q0R (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Jan 2019 11:26:17 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EC75E2147A;
-        Mon, 28 Jan 2019 16:08:48 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4F9CC2171F;
+        Mon, 28 Jan 2019 16:26:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548691731;
-        bh=lW34iHSQcZJ+uNbYPwul3+/VjEc8ceDuGS7KkJJERxo=;
+        s=default; t=1548692776;
+        bh=yKsmlZx/Z4GFK26nt0bFCgk8J8ErEy32WhXyNwX7F30=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TbxsSvpr/R1amX6GS8KxuTzLbzNhRPQXnG8z8Q57Sm3KCuv5SMYeUT5kQ84hb+QWa
-         wnKpN/DmuCmRXkgoMNA8dvupCAiOaKR9h/d+lD0CfMfRoMZedm2Rdo27BTGW7ZFMOr
-         1msJzbYtCd+QiS7IXCbS7E+DeQ8rPgFB8xdIpDqE=
+        b=D+NskYGXkEgOdvVnqrJSrJgvv4K1HbHzJYn+dx+yrj+NHimMyYRnGP8ba9qDw9Tk4
+         P+y3BJ7e/ICnwGlHe4EzaDU87oTIPil6X3e0SgwSenEBfl+pHPC8hFnd4d94ba6GaJ
+         blZ2T0qcW3+jQN90mBi7DTy5m+demfDPeX4N5vKA=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Roland Kammerer <roland.kammerer@linbit.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 199/258] drbd: narrow rcu_read_lock in drbd_sync_handshake
-Date:   Mon, 28 Jan 2019 10:58:25 -0500
-Message-Id: <20190128155924.51521-199-sashal@kernel.org>
+Cc:     Finn Thain <fthain@telegraphics.com.au>,
+        linuxppc-dev@lists.ozlabs.org, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.4 76/80] block/swim3: Fix -EBUSY error when re-opening device after unmount
+Date:   Mon, 28 Jan 2019 11:23:57 -0500
+Message-Id: <20190128162401.58841-76-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190128155924.51521-1-sashal@kernel.org>
-References: <20190128155924.51521-1-sashal@kernel.org>
+In-Reply-To: <20190128162401.58841-1-sashal@kernel.org>
+References: <20190128162401.58841-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -57,82 +57,42 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Roland Kammerer <roland.kammerer@linbit.com>
+From: Finn Thain <fthain@telegraphics.com.au>
 
-[ Upstream commit d29e89e34952a9ad02c77109c71a80043544296e ]
+[ Upstream commit 296dcc40f2f2e402facf7cd26cf3f2c8f4b17d47 ]
 
-So far there was the possibility that we called
-genlmsg_new(GFP_NOIO)/mutex_lock() while holding an rcu_read_lock().
+When the block device is opened with FMODE_EXCL, ref_count is set to -1.
+This value doesn't get reset when the device is closed which means the
+device cannot be opened again. Fix this by checking for refcount <= 0
+in the release method.
 
-This included cases like:
-
-drbd_sync_handshake (acquire the RCU lock)
-  drbd_asb_recover_1p
-    drbd_khelper
-      drbd_bcast_event
-        genlmsg_new(GFP_NOIO) --> may sleep
-
-drbd_sync_handshake (acquire the RCU lock)
-  drbd_asb_recover_1p
-    drbd_khelper
-      notify_helper
-        genlmsg_new(GFP_NOIO) --> may sleep
-
-drbd_sync_handshake (acquire the RCU lock)
-  drbd_asb_recover_1p
-    drbd_khelper
-      notify_helper
-        mutex_lock --> may sleep
-
-While using GFP_ATOMIC whould have been possible in the first two cases,
-the real fix is to narrow the rcu_read_lock.
-
-Reported-by: Jia-Ju Bai <baijiaju1990@163.com>
-Reviewed-by: Lars Ellenberg <lars.ellenberg@linbit.com>
-Signed-off-by: Roland Kammerer <roland.kammerer@linbit.com>
+Reported-and-tested-by: Stan Johnson <userm57@yahoo.com>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: linuxppc-dev@lists.ozlabs.org
+Signed-off-by: Finn Thain <fthain@telegraphics.com.au>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/drbd/drbd_receiver.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ drivers/block/swim3.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index 75f6b47169e6..45ac5fe288e4 100644
---- a/drivers/block/drbd/drbd_receiver.c
-+++ b/drivers/block/drbd/drbd_receiver.c
-@@ -3364,7 +3364,7 @@ static enum drbd_conns drbd_sync_handshake(struct drbd_peer_device *peer_device,
- 	enum drbd_conns rv = C_MASK;
- 	enum drbd_disk_state mydisk;
- 	struct net_conf *nc;
--	int hg, rule_nr, rr_conflict, tentative;
-+	int hg, rule_nr, rr_conflict, tentative, always_asbp;
+diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
+index c264f2d284a7..2e0a9e2531cb 100644
+--- a/drivers/block/swim3.c
++++ b/drivers/block/swim3.c
+@@ -1027,7 +1027,11 @@ static void floppy_release(struct gendisk *disk, fmode_t mode)
+ 	struct swim3 __iomem *sw = fs->swim3;
  
- 	mydisk = device->state.disk;
- 	if (mydisk == D_NEGOTIATING)
-@@ -3415,8 +3415,12 @@ static enum drbd_conns drbd_sync_handshake(struct drbd_peer_device *peer_device,
- 
- 	rcu_read_lock();
- 	nc = rcu_dereference(peer_device->connection->net_conf);
-+	always_asbp = nc->always_asbp;
-+	rr_conflict = nc->rr_conflict;
-+	tentative = nc->tentative;
-+	rcu_read_unlock();
- 
--	if (hg == 100 || (hg == -100 && nc->always_asbp)) {
-+	if (hg == 100 || (hg == -100 && always_asbp)) {
- 		int pcount = (device->state.role == R_PRIMARY)
- 			   + (peer_role == R_PRIMARY);
- 		int forced = (hg == -100);
-@@ -3455,9 +3459,6 @@ static enum drbd_conns drbd_sync_handshake(struct drbd_peer_device *peer_device,
- 			     "Sync from %s node\n",
- 			     (hg < 0) ? "peer" : "this");
- 	}
--	rr_conflict = nc->rr_conflict;
--	tentative = nc->tentative;
--	rcu_read_unlock();
- 
- 	if (hg == -100) {
- 		/* FIXME this log message is not correct if we end up here
+ 	mutex_lock(&swim3_mutex);
+-	if (fs->ref_count > 0 && --fs->ref_count == 0) {
++	if (fs->ref_count > 0)
++		--fs->ref_count;
++	else if (fs->ref_count == -1)
++		fs->ref_count = 0;
++	if (fs->ref_count == 0) {
+ 		swim3_action(fs, MOTOR_OFF);
+ 		out_8(&sw->control_bic, 0xff);
+ 		swim3_select(fs, RELAX);
 -- 
 2.19.1
 
