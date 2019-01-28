@@ -2,85 +2,101 @@ Return-Path: <SRS0=89dG=QE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6FD2C282C8
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 17:31:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B83C282C8
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 17:35:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 746B92148E
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 17:31:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="B2KFs0uY"
+	by mail.kernel.org (Postfix) with ESMTP id 37EB12147A
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 17:35:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1548696905;
+	bh=R1SaADHABzNTGGkC/vQB/qXhP85i+jvWsanR+KqCYn4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=GEXamj9J5CNncS+QA0VEdbzluQfQgRoWQ5WSLqJWuMxcNNzMcQs8+AsaGWZyvN1IZ
+	 Sd210H/dg5vOdKykopFxe6dREJqC/6jZnd0WEABFNz6710s+k63C73ENKltqcf3GLu
+	 QeNm/xivj1zW2wM1eV+t/KSyJUcjJmomyEkZNlIc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730350AbfA1P6B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 10:58:01 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:50660 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729738AbfA1P6B (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 10:58:01 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=nKhBdv+Igs+P4UaZkx5EvY+zcrwZHuUbBgT3qdyrWfs=; b=B2KFs0uYk6Z2cMJtTiOz0FZvk
-        y+i/NS8nc82gKsCjTl8y2jVXutywB+HEslfb1G6HO1yCP81BNZpGdCO5gm/jOTrDnM32YoPXgRFoC
-        uyNFejzTKEx8nTPiOtWZBvuM94KiKeGUHDRpfJ57XVf9SudaYQJPdgDDIla1QbyisC6+Fu1H6IuCN
-        PYgG32Z57QUW3OPvwShHmgHnQ6rnnN7wPv6uKlhjT7rt0X94KBjWcLRB8e0lwiohVakxGoXka+vQ2
-        RkV/nxS3Pfq/lE6Cpf8JzdVS5jYXuuO8hwY37wZiU0ssyqT8MjPjs655sm0WHHM/MTizTm8ne7G3D
-        ctHVUmkLQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1go9IG-0007oc-T1; Mon, 28 Jan 2019 15:57:52 +0000
-Date:   Mon, 28 Jan 2019 07:57:52 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        "chenxiang (M)" <chenxiang66@hisilicon.com>,
-        jejb@linux.vnet.ibm.com, martin.petersen@oracle.com,
-        linuxarm@huawei.com, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org, axboe@kernel.dk,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: set rq->cmd_flags with bio->opf instead of
- data->cmd_flags when bio is not Null
-Message-ID: <20190128155752.GA29076@infradead.org>
-References: <1548337430-66690-1-git-send-email-chenxiang66@hisilicon.com>
- <1c34d6f9-8c3c-a7ff-a956-46e9dc3c2298@hisilicon.com>
- <20190128140716.GA18162@infradead.org>
- <55972c1a-051a-1396-6796-84f349830a35@huawei.com>
+        id S1729041AbfA1RfA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 12:35:00 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41442 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729929AbfA1Pzd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Jan 2019 10:55:33 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2189820989;
+        Mon, 28 Jan 2019 15:55:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1548690932;
+        bh=R1SaADHABzNTGGkC/vQB/qXhP85i+jvWsanR+KqCYn4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=ULxCU2H3bDcHcqaMEjk4em5lXgkOHe7T5qMlGDIdkb6RjHmbzzOMiEMJqTS0BybXI
+         FMpSn3cxxB7M9jShg55XQ23IPIwStuAMavo1IZhkP4+qcTI4dEbt8sqGk81fQfb4Us
+         U/evjOggR6r9rhE6YC61JzKFyiHQLB/O3TmlsNo0=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.20 238/304] drbd: disconnect, if the wrong UUIDs are attached on a connected peer
+Date:   Mon, 28 Jan 2019 10:42:35 -0500
+Message-Id: <20190128154341.47195-238-sashal@kernel.org>
+X-Mailer: git-send-email 2.19.1
+In-Reply-To: <20190128154341.47195-1-sashal@kernel.org>
+References: <20190128154341.47195-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <55972c1a-051a-1396-6796-84f349830a35@huawei.com>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 28, 2019 at 03:36:58PM +0000, John Garry wrote:
-> As I understood, the problem is the scenario of calling
-> blk_mq_make_request()->bio_integrity_prep() where we then allocate a bio
-> integrity payload in calling bio_integrity_alloc().
-> 
-> In this case, bio_integrity_alloc() sets bio->bi_opf |= REQ_INTEGRITY, which
-> is no longer consistent with data.cmd_flags.
+From: Lars Ellenberg <lars.ellenberg@linbit.com>
 
-I don't see how that could happen:
+[ Upstream commit b17b59602b6dcf8f97a7dc7bc489a48388d7063a ]
 
-static blk_qc_t blk_mq_make_request(struct request_queue *q, struct bio *bio)
-{
-	...
+With "on-no-data-accessible suspend-io", DRBD requires the next attach
+or connect to be to the very same data generation uuid tag it lost last.
 
-	if (!bio_integrity_prep(bio))
-		return BLK_QC_T_NONE;
+If we first lost connection to the peer,
+then later lost connection to our own disk,
+we would usually refuse to re-connect to the peer,
+because it presents the wrong data set.
 
-	...
+However, if the peer first connects without a disk,
+and then attached its disk, we accepted that same wrong data set,
+which would be "unexpected" by any user of that DRBD
+and cause "undefined results" (read: very likely data corruption).
 
-	data.cmd_flags = bio->bi_opf;
-        rq = blk_mq_get_request(q, bio, &data);
+The fix is to forcefully disconnect as soon as we notice that the peer
+attached to the "wrong" dataset.
+
+Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/drbd/drbd_receiver.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
+index 1b9822f264d2..e3da52b524d3 100644
+--- a/drivers/block/drbd/drbd_receiver.c
++++ b/drivers/block/drbd/drbd_receiver.c
+@@ -4143,7 +4143,7 @@ static int receive_uuids(struct drbd_connection *connection, struct packet_info
+ 	kfree(device->p_uuid);
+ 	device->p_uuid = p_uuid;
+ 
+-	if (device->state.conn < C_CONNECTED &&
++	if ((device->state.conn < C_CONNECTED || device->state.pdsk == D_DISKLESS) &&
+ 	    device->state.disk < D_INCONSISTENT &&
+ 	    device->state.role == R_PRIMARY &&
+ 	    (device->ed_uuid & ~((u64)1)) != (p_uuid[UI_CURRENT] & ~((u64)1))) {
+-- 
+2.19.1
 
