@@ -1,101 +1,202 @@
-Return-Path: <SRS0=IU7b=QD=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=89dG=QE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30055C282CA
-	for <linux-block@archiver.kernel.org>; Sun, 27 Jan 2019 21:15:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E918C282CC
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 02:40:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F27E42133F
-	for <linux-block@archiver.kernel.org>; Sun, 27 Jan 2019 21:15:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A5E920881
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 02:40:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="tB09hQXA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726913AbfA0VPA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Jan 2019 16:15:00 -0500
-Received: from bout01.mta.xmission.com ([166.70.11.15]:40669 "EHLO
-        bout01.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726302AbfA0VPA (ORCPT
+        id S1726575AbfA1Ckh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Jan 2019 21:40:37 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:33890 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726566AbfA1Ckh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Jan 2019 16:15:00 -0500
-Received: from mx04.mta.xmission.com ([166.70.13.214])
-        by bout01.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.87)
-        (envelope-from <sbauer@plzdonthack.me>)
-        id 1gnrla-00028C-Ho; Sun, 27 Jan 2019 14:14:58 -0700
-Received: from plesk14-shared.xmission.com ([166.70.198.161] helo=plesk14.xmission.com)
-        by mx04.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.87)
-        (envelope-from <sbauer@plzdonthack.me>)
-        id 1gnrla-0004vP-00; Sun, 27 Jan 2019 14:14:58 -0700
-Received: from hacktheplanet (c-68-50-23-202.hsd1.in.comcast.net [68.50.23.202])
-        by plesk14.xmission.com (Postfix) with ESMTPSA id 2CC24217FD9;
-        Sun, 27 Jan 2019 21:14:57 +0000 (UTC)
-Date:   Sun, 27 Jan 2019 16:14:49 -0500
-From:   Scott Bauer <sbauer@plzdonthack.me>
-To:     David Kozub <zub@linux.fjfi.cvut.cz>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Jonathan Derrick <jonathan.derrick@intel.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Message-ID: <20190127211449.GP21149@hacktheplanet>
-References: <1548196307-12987-1-git-send-email-zub@linux.fjfi.cvut.cz>
+        Sun, 27 Jan 2019 21:40:37 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0S2dV59004860;
+        Mon, 28 Jan 2019 02:40:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=CXpFgkgp0w3G59awZqfLBWrzkRk9czZ6dmZHXpY+d5M=;
+ b=tB09hQXAbF/PUxbE2xGor8Ji72+PBF6nfmy8Pq5ojKDHZzEToZVMlSxrd7ySUydCixqn
+ JmHaeX1bb6WMJVgrvBlNKy5kt1kvAa6oZOSSYr5fGtTFWobG7uu+6ZqdE0M+fucOsOCa
+ 6nrEanDWg+gxmCoGG3Bkd6ddGt96Kdr3DLIUb8ZaH6l5v7Za8Oi4BLadSHJr7iW+LGtV
+ xNxH2VE/xKQXQ/D63cEUVi5Vcb7ndCjNzDYLXwyL+tfyH6ij81Rv6K7t8sS0gy0b1grZ
+ QoP7WrqF6HL3Zr44fosCsUqj8SGUPZXYuRG0XbEeHRRYkXsC1zNZOgjhUWeGiaHuNe4n bw== 
+Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
+        by userp2120.oracle.com with ESMTP id 2q8g6qukc5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 28 Jan 2019 02:40:30 +0000
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x0S2eSlF005582
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 28 Jan 2019 02:40:29 GMT
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x0S2eRFI013929;
+        Mon, 28 Jan 2019 02:40:28 GMT
+Received: from [10.182.71.8] (/10.182.71.8)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sun, 27 Jan 2019 18:40:27 -0800
+Subject: Re: fsync hangs after scsi rejected a request
+To:     Florian Stecker <m19@florianstecker.de>,
+        Ming Lei <tom.leiming@gmail.com>
+Cc:     Linux SCSI List <linux-scsi@vger.kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block <linux-block@vger.kernel.org>
+References: <70df6d90-31eb-96f4-908d-462ea58dea6e@florianstecker.de>
+ <CACVXFVOSHtV7jcMwEvDKZzPnsLRzkdvAEqb+ggugkM27LJvagg@mail.gmail.com>
+ <a30b5868-dd7d-d3db-b7f4-c723ac279ead@florianstecker.de>
+ <CACVXFVOzwaZyJFaOJw3K-FQUHeYGWNx8sPr8kqJzCV59Rd6sqg@mail.gmail.com>
+ <e18051e3-4008-e259-dee3-dd58f23642ab@oracle.com>
+ <4b631218-49ee-c3ed-46be-17f9d30b663f@florianstecker.de>
+ <c42631fa-3e61-e046-851e-8079906a14fb@oracle.com>
+ <d9fd42a9-6105-2404-6e74-cc540da1cf16@florianstecker.de>
+ <3d921990-06c4-4662-2853-7667b4e9a462@oracle.com>
+ <4fe48ebc-43db-7ada-087b-5ccbdb64cc66@oracle.com>
+ <00501045-a87b-27d0-6373-72dcf243b32b@florianstecker.de>
+From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <a7a3e95e-5c66-31d6-c442-ad295f82d72c@oracle.com>
+Date:   Mon, 28 Jan 2019 10:42:23 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1548196307-12987-1-git-send-email-zub@linux.fjfi.cvut.cz>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-XM-SPF: eid=1gnrla-0004vP-00;;;mid=<20190127211449.GP21149@hacktheplanet>;;;hst=mx04.mta.xmission.com;;;ip=166.70.198.161;;;frm=sbauer@plzdonthack.me;;;spf=none
-X-SA-Exim-Connect-IP: 166.70.198.161
-X-SA-Exim-Mail-From: sbauer@plzdonthack.me
-Subject: Re: [PATCH v3 00/16] block: sed-opal: support shadow MBR done flag
- and write
-X-SA-Exim-Version: 4.2.1 (built Thu, 05 May 2016 13:38:54 -0600)
-X-SA-Exim-Scanned: Yes (on mx04.mta.xmission.com)
+In-Reply-To: <00501045-a87b-27d0-6373-72dcf243b32b@florianstecker.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9149 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1901280021
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 22, 2019 at 11:31:31PM +0100, David Kozub wrote:
-> This patch series extends OPAL support: it adds IOCTL for setting the shadow
-> MBR done flag which can be useful for unlocking an OPAL disk on boot and it adds
-> IOCTL for writing to the shadow MBR. Also included are some minor fixes and
-> improvements.
-> 
-> This series is based on the original work done by Jonas Rabenstein which was
-> submitted in March 2018.[1] I tried to apply suggestions made in review on the
-> list and do some further improvements.
-> 
-> The most contentious issue in the original series was the IOCTL for shadow MBR
-> write but I think no better approach was found[2] so this was not changed. I'm
-> open to suggestions.
-> 
-> There is a fork of sed-opal-temp that can use these new IOCTLs.[3] I tested
-> these on Samsung 840 EVO and 850 EVO drives, on x86-64 and arm64 systems.
-> 
-> The series applies on v5.0-rc3.
-> 
-> Changes from v2 to v3:
-> * review suggestions from Scott Bauer
-> 
-> As Scott suggested I tried to do a more thorough testing, esp. with things like
-> wrong passwords/invalid values. I did not observe any crash or unexpected
-> behavior.
-> 
-> David Kozub (8):
->   block: sed-opal: fix typos and formatting
->   block: sed-opal: close parameter list in cmd_finalize
->   block: sed-opal: unify cmd start
->   block: sed-opal: unify error handling of responses
->   block: sed-opal: reuse response_get_token to decrease code duplication
->   block: sed-opal: pass steps via argument rather than via opal_dev
->   block: sed-opal: don't repeat opal_discovery0 in each steps array
->   block: sed-opal: rename next to execute_steps
-> 
 
-You forgot to send 16/16 again in v3. I pulled and tested off your github page.
-If you send a v4 or just resend that patch you can add my reviewed-by, as I reviewed it
-on my tree/from your github.
 
+On 1/26/19 11:37 PM, Florian Stecker wrote:
+> 
+> 
+> On 1/26/19 2:25 AM, jianchao.wang wrote:
+...
+>>>>
+>>>> dmesg: https://urldefense.proofpoint.com/v2/url?u=https-3A__florianstecker.de_dmesg-2D2019-2D01-2D25.txt&d=DwIDaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=7WdAxUBeiTUTCy8v-7zXyr4qk7sx26ATvfo6QSTvZyQ&m=t_udGGsH8ivtjXHin4oQ4LxELuPoXbl_ARP7oSxiQ6k&s=DC2fhRw2g4haGhhHxOYyX4zD6FWQQ5YoERdfptVRHM4&e=
+>>>> Note that no I/O scheduler is in use here, I deactivated them in a udev rule because I still want to be able to use my laptop. When I test this stuff I just reactivate mq-deadline manually.
+>>>>
+>>>> Config is the default in Arch Linux: https://urldefense.proofpoint.com/v2/url?u=https-3A__git.archlinux.org_svntogit_packages.git_tree_trunk_config-3Fh-3Dpackages_linux&d=DwIDaQ&c=RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI_JnE&r=7WdAxUBeiTUTCy8v-7zXyr4qk7sx26ATvfo6QSTvZyQ&m=t_udGGsH8ivtjXHin4oQ4LxELuPoXbl_ARP7oSxiQ6k&s=GjV_fyXaKZ8za8zdB_gqmKW7yBlbla2OHRaAT0iGZkc&e=
+>>>>
+>>>> The problem also appears with BFQ.
+>>>>
+>>>> And rq->end_io is set to mq_flush_data_end_io when this happens. The only point I see where this function could invoke blk_mq_end_request is via blk_flush_complete_seq, but it does so only if seq == REQ_FSEQ_DONE. However, seq is REQ_FSEQ_POSTFLUSH for me (i.e. it just transitioned from REQ_FSEQ_DATA to REQ_FSEQ_POSTFLUSH).
+>>>
+>>>
+>>> Could it be this scenario ?
+>>>
+>>> data + post flush
+>>>
+>>> blk_flush_complete_seq          a flush
+>>>    case REQ_FSEQ_DATA
+>>>    blk_flush_queue_rq
+>>>       finally issued to driver      blk_mq_dispatch_rq_list
+>>>                                  try to issue a flush req
+>>>                                  failed due to NON-NCQ command
+>>>                                  due to RESTART is set, do nothing
+>>>    req complete
+>>>    req->end_io（） // doesn't check RESTART
+>>>    mq_flush_data_end_io
+>>> 　  blk_flush_complete_seq
+>>>       case REQ_FSEQ_POSTFLUSH
+>>>       blk_kick_flush
+>>>         do nothing because previous flush
+>>>         has not been completed, so
+>>>         flush_pending_idx != flush_running_idx
+>>>
+
+This should be corrected as following,
+ data + post flush
+ blk_flush_complete_seq          a flush
+   case REQ_FSEQ_DATA
+   blk_flush_queue_rq
+      finally issued to driver   blk_mq_dispatch_rq_list
+                                 try to issue a flush req
+                                 failed due to NON-NCQ command
+                                 return BLK_STS_DEV_RESOURCE
+
+ req complete
+ req->end_io（） // doesn't check RESTART
+ mq_flush_data_end_io
+ case REQ_FSEQ_POSTFLUSH
+    blk_kick_flush
+    do nothing because previous flush
+    has not been completed, so
+    flush_pending_idx != flush_running_idx
+ blk_mq_mq_run_hw_queue
+                                 insert rq to hctx->dispatch_list
+                                 due to RESTART is set, do nothing
+
+...
+> I'm not sure if I understand every detail, but your scenario sounds roughly the same as what I imagine. The patch solves the problem for me (except for the fact that hctx is not defined in that function).
+> 
+> Actually, it doesn't seem to me as if any of the other users of blk_mq_free_request require or even expect that it calls blk_mq_sched_restart (I could be wrong though). If that is true, how about we just call it from __blk_mq_end_request, like this (also tested successfully on my laptop)?
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 6a7566244de3..9f3d3456c4af 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -481,7 +481,6 @@ static void __blk_mq_free_request(struct request *rq)
+>                 blk_mq_put_tag(hctx, hctx->tags, ctx, rq->tag);
+>         if (sched_tag != -1)
+>                 blk_mq_put_tag(hctx, hctx->sched_tags, ctx, sched_tag);
+> -       blk_mq_sched_restart(hctx);
+>         blk_queue_exit(q);
+>  }
+> 
+> @@ -522,6 +521,7 @@ EXPORT_SYMBOL_GPL(blk_mq_free_request);
+>  inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
+>  {
+>         u64 now = ktime_get_ns();
+> +       struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(rq->q, rq->mq_ctx->cpu);
+> 
+>         if (rq->rq_flags & RQF_STATS) {
+>                 blk_mq_poll_stats_start(rq->q);
+> @@ -541,6 +541,8 @@ inline void __blk_mq_end_request(struct request *rq, blk_status_t error)
+>                         blk_mq_free_request(rq->next_rq);
+>                 blk_mq_free_request(rq);
+>         }
+> +
+> +       blk_mq_sched_restart(hctx);
+>  }
+>  EXPORT_SYMBOL(__blk_mq_end_request);
+
+We should invoke blk_mq_sched_restart before blk_queue_exit is invoked.
+
+How about this one ?
+
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index a3fc7191..6e0f2d9 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -335,7 +335,7 @@ static void mq_flush_data_end_io(struct request *rq, blk_status_t error)
+        blk_flush_complete_seq(rq, fq, REQ_FSEQ_DATA, error);
+        spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
+ 
+-       blk_mq_run_hw_queue(hctx, true);
++       blk_mq_sched_restart(hctx);
+ }
+
+Thanks
+Jianchao
