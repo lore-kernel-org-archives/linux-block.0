@@ -2,107 +2,91 @@ Return-Path: <SRS0=89dG=QE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 974FEC282C8
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 17:02:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB48BC282C8
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 17:04:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 672BF2175B
-	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 17:02:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548694977;
-	bh=uXlKz46DVC94iM1WuhpC5ObdCWuBjQtPeWi1r4OfR3g=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=xslKmrhTK0FiYwKadEJYbmM1qO2tmchrb/W1TzzB44DAOKDPME7xprwS0VAVbbExw
-	 tHr1l4IRI8H3UHVLrxFRKfUW5LcroHxwy3DfGqZgmkUbwWN8po3QeGHPXeRnPg1aFE
-	 /YeHuIMRvxW0FvlO4Wrk6rBwISeD9YC+JMcgPaEg=
+	by mail.kernel.org (Postfix) with ESMTP id 9B48021741
+	for <linux-block@archiver.kernel.org>; Mon, 28 Jan 2019 17:04:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="LHOOLUs6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733216AbfA1RCu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 12:02:50 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43246 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387564AbfA1QOG (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 11:14:06 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5057920855;
-        Mon, 28 Jan 2019 16:14:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548692045;
-        bh=uXlKz46DVC94iM1WuhpC5ObdCWuBjQtPeWi1r4OfR3g=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Pd/VN9xVJRTjxbovmowHptiH/D5y0q5UXjB20306hOLejXVSQ9KVK2xd3mGR6xLrb
-         Vk3D0P4aTGeWp+wtpCM2sl4rZM0WEwGIGDpUTMni5g8fgVptUGe7rWX1eUPBn825qS
-         I/QdUpyYP1SaPG+BNuwj1hVQbpkwWShnaTbolAsc=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Young Xiao <YangX92@hotmail.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 051/170] sunvdc: Do not spin in an infinite loop when vio_ldc_send() returns EAGAIN
-Date:   Mon, 28 Jan 2019 11:10:01 -0500
-Message-Id: <20190128161200.55107-51-sashal@kernel.org>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190128161200.55107-1-sashal@kernel.org>
-References: <20190128161200.55107-1-sashal@kernel.org>
+        id S1731662AbfA1REf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 12:04:35 -0500
+Received: from mail-it1-f196.google.com ([209.85.166.196]:35579 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387492AbfA1QNu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Jan 2019 11:13:50 -0500
+Received: by mail-it1-f196.google.com with SMTP id p197so20182660itp.0
+        for <linux-block@vger.kernel.org>; Mon, 28 Jan 2019 08:13:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=+p5W5b5YhPrIyuyCVbbojm99T2mgbhXRvn/xv6F8hBg=;
+        b=LHOOLUs67vNUfNi5Pzr8IBnyrJhJommQ1wD5/dXSHxV1e/Byqypw7l9HuPdUV7WR08
+         KsWUsDXwHqKg8ndKaZsl1KbPwhjukst2dF1zktma6b4bUae6azVxhF4KZWJIzRLgdKxO
+         ISFVbR+oc3QoNrN4Uhx/yPNhmnGSV7mBhSX/iWuZtYPp8CBtP/Dgr7Aq4LG6/++RpbwK
+         UuuD9FkWGVmtv876fiQCugajMe/BOGm9QlrwLHTdFVnfSVvGzagltwflHGVJKWst0Rkj
+         9WU3wCq1ptu/twdSHc3ROglEV2YKhxErErvWG53v2k88IJOFlRN0Jd7orUoaPJJp557S
+         ZGPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+p5W5b5YhPrIyuyCVbbojm99T2mgbhXRvn/xv6F8hBg=;
+        b=dEG+yaoihPx0tbXPLtZo7WYRsyc79UBYQXrA1USFEyoe5lJgu4pEg7/mx+eJLJP/7B
+         T/s4hthqGvr4b4WmRtJhQW1n1Dl+9wh9bVZ2O+PovSn7DIJzU8V+Zg6F6jk0RKY2Xdn+
+         THFz0YtN9UpdnKFwPveJwi4IlnRh80gUdUhXnN6xXoSk8yzAd1dZMPzNM/bhN2obspvE
+         UcQGuBLhtmM/WpMvAFFNbCAWHQjyhlxfMiW/lDNMyTpWN38YVrdzS3kD41ubL4nkYBhI
+         C+XwBC0+TPzxH7lTRkpbTcISyE9VaW+hpaYrljMtRKKZHBsIrU+4Ve2SEGVmLRSVoRan
+         hJZQ==
+X-Gm-Message-State: AJcUukd8ozVgRXnG6ccxV8I+f5ERCeRvxevBEGgAxH1uOCUl/Sf2efPX
+        w9eFsErXSVJsR402OUnl9ODvwA==
+X-Google-Smtp-Source: ALg8bN5ZYKWcFCnpQucCEYxuUVeg2pHwNa7dTDEjAoiUjUj/9OWVGhnpo2vO/jnln3PhDA5U2MpdIg==
+X-Received: by 2002:a24:9fc1:: with SMTP id c184mr4965115ite.8.1548692029125;
+        Mon, 28 Jan 2019 08:13:49 -0800 (PST)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id t69sm17265685itb.26.2019.01.28.08.13.47
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 28 Jan 2019 08:13:48 -0800 (PST)
+Subject: Re: [PATCH 01/18] fs: add an iopoll method to struct file_operations
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-fsdevel@vger.kernel.org, linux-aio@kvack.org,
+        linux-block@vger.kernel.org, jmoyer@redhat.com, avi@scylladb.com
+References: <20190123153536.7081-1-axboe@kernel.dk>
+ <20190123153536.7081-2-axboe@kernel.dk> <20190128142559.GA9563@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <d436182b-9da9-2141-0e6b-db733c66269e@kernel.dk>
+Date:   Mon, 28 Jan 2019 09:13:47 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190128142559.GA9563@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Young Xiao <YangX92@hotmail.com>
+On 1/28/19 7:25 AM, Christoph Hellwig wrote:
+> On Wed, Jan 23, 2019 at 08:35:12AM -0700, Jens Axboe wrote:
+>> TODO: we can probably union ki_cookie with the existing hint and I/O
+>> priority fields to avoid struct kiocb growth.
+> 
+> Please kill this comment.  While this should be doable the semantics
+> would be a bit nasty, so unless we have to I'd rather skip this work
+> for now.
 
-[ Upstream commit a11f6ca9aef989b56cd31ff4ee2af4fb31a172ec ]
+Agree, killed.
 
-__vdc_tx_trigger should only loop on EAGAIN a finite
-number of times.
-
-See commit adddc32d6fde ("sunvnet: Do not spin in an
-infinite loop when vio_ldc_send() returns EAGAIN") for detail.
-
-Signed-off-by: Young Xiao <YangX92@hotmail.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/sunvdc.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/block/sunvdc.c b/drivers/block/sunvdc.c
-index ad9749463d4f..ed4d6276e94f 100644
---- a/drivers/block/sunvdc.c
-+++ b/drivers/block/sunvdc.c
-@@ -41,6 +41,8 @@ MODULE_VERSION(DRV_MODULE_VERSION);
- #define WAITING_FOR_GEN_CMD	0x04
- #define WAITING_FOR_ANY		-1
- 
-+#define	VDC_MAX_RETRIES	10
-+
- static struct workqueue_struct *sunvdc_wq;
- 
- struct vdc_req_entry {
-@@ -427,6 +429,7 @@ static int __vdc_tx_trigger(struct vdc_port *port)
- 		.end_idx		= dr->prod,
- 	};
- 	int err, delay;
-+	int retries = 0;
- 
- 	hdr.seq = dr->snd_nxt;
- 	delay = 1;
-@@ -439,6 +442,8 @@ static int __vdc_tx_trigger(struct vdc_port *port)
- 		udelay(delay);
- 		if ((delay <<= 1) > 128)
- 			delay = 128;
-+		if (retries++ > VDC_MAX_RETRIES)
-+			break;
- 	} while (err == -EAGAIN);
- 
- 	if (err == -ENOTCONN)
 -- 
-2.19.1
+Jens Axboe
 
