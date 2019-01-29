@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BC18C282C7
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 11:07:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D57F7C169C4
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 11:07:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2CACF2085B
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 11:07:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A55E92084C
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 11:07:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="L/8rgA1a"
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="dzNNNTGG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728671AbfA2LHl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jan 2019 06:07:41 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:43333 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728367AbfA2LHL (ORCPT
+        id S1726952AbfA2LHr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jan 2019 06:07:47 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:36352 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728511AbfA2LHL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 29 Jan 2019 06:07:11 -0500
-Received: by mail-wr1-f65.google.com with SMTP id r10so21516360wrs.10
-        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 03:07:10 -0800 (PST)
+Received: by mail-wr1-f68.google.com with SMTP id u4so21555849wrp.3
+        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 03:07:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=ui0RozgVj782eZenovCwcdQYstEPpPQMeO8MT0fjT5o=;
-        b=L/8rgA1a0X/Tzr6jFJ7LPCtro61Yhi/kU9AXGI8zscrdDCQQoDzxOAgtOlxQEJmkqQ
-         Im3eeKa7fN2xw9GQceKjWdHYXTC11GBPY67zB3gdzRXMhhAjAD6CISk+xyKiBEO5cAtj
-         amn9Kk1fJqkf9621GzFX8GpON9gGM72ruLoC0=
+        bh=VwIs+zonmjtiCZ1USOo/5sS6ODQShYjtQFUwoinOfyA=;
+        b=dzNNNTGG5PdbsAoIUTXnKMvPIzXU2GiE2VkYxsWTf2UiyCY0wriVi0q9foVNjfoQol
+         P/FaGtCg2bXNR6bff01uCTbsm3htu93+aSrkN86YiYT7JF4IpxTl1xTYqfozHHkmz1rD
+         xO5QtpvJKdv15+MIghqrBcKbEoaxfmx0cjXzM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ui0RozgVj782eZenovCwcdQYstEPpPQMeO8MT0fjT5o=;
-        b=jgOVnyw8tOPntzYh+6AHtwuPvW3Cb7yoZwOV7Q0HDSdVAQ8CjZewoWNfILwpfgLUeN
-         L3ZpWRUmpFbS0SFg7q1Y9vKrKy1vlW+Tqk3PXyAcMyZd9tnMi33uwvvO3G22nj3HylRN
-         i2/00DxvJlyhQ7VkmNNypi+CBZ1ty5chG2DziW4cQj1XK9CCoeWZV+B/IjMaBLG3e9Fh
-         qGrE+pSMRvQBhFHnYUvfVpgUwQ9/RDj6lG45+jaBH/+rIKsfFoglVSUGR+vQN1eSf/sv
-         lXOapLboEQudHBRUfZVxLcWFUYexhu4g/hhYxv1aJzRhdDQurU4XxBdPhprxZih0IV5t
-         9VkA==
-X-Gm-Message-State: AJcUukccPOpF/YjgYE0PIi8gFFP56kp8hY1PurL5m4J3s3f7jxqv2zl1
-        uYWS+tuoS2Ly5djcTvQ9PD/J61Cjo2s=
-X-Google-Smtp-Source: ALg8bN5t0xmEieYTRN0u2FYyM7D646ckc7BUkQGUXiRkGgk2ntuTucSJK2cHBiDVXduWjX/bG7M3vw==
-X-Received: by 2002:adf:8068:: with SMTP id 95mr26094476wrk.181.1548760030187;
-        Tue, 29 Jan 2019 03:07:10 -0800 (PST)
+        bh=VwIs+zonmjtiCZ1USOo/5sS6ODQShYjtQFUwoinOfyA=;
+        b=pRbfom/3gN+ngELBi/P9gj0uDqpt848HIK2t35mZyJOb2pmtVXpz/lxH5LSSvOexmZ
+         xyNaOiT7dpjKYFted8EAdQtQcEh2tXLqfQ7Di0qNg5/pG296b0a3gVRBydJbi2+q3cQT
+         Cbrl+qZUOmvs4gbi7FxON4zSMkU8O8Fax1x32dkJ/fsn/8x8qrTTdwn+rh0cqUz0PMuc
+         Vdez+6PGcNI33HAi5Vwl7ymjyYBc15HERf5QicGxVzjqf7uFPI5ifd08BAfIwAQGqdmL
+         nT0C/vdrMcgRlDyEnCtT7hj4+Zuu1VIW04eP/SgCCAbNJxNUPBTF96kz+72CWW7oVYau
+         Cz/Q==
+X-Gm-Message-State: AJcUukdSXNCBt9LpZmHMb3+qq4MdRbEsJPaGjuS4mUY84AEI+Cu9167+
+        3REbvKPpFVsMQ4U/pqKNitv02g==
+X-Google-Smtp-Source: AHgI3IaoYkVg1V+aaV+ipWtTYVvEmycMI3EljtyJaeHGv0fpAC5NBzizUMkuaLwJoNdy0BOxILKnMQ==
+X-Received: by 2002:adf:f3c6:: with SMTP id g6mr21053279wrp.111.1548760028824;
+        Tue, 29 Jan 2019 03:07:08 -0800 (PST)
 Received: from localhost.localdomain ([88.147.67.218])
-        by smtp.gmail.com with ESMTPSA id s132sm2066112wmf.28.2019.01.29.03.07.08
+        by smtp.gmail.com with ESMTPSA id s132sm2066112wmf.28.2019.01.29.03.07.07
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 29 Jan 2019 03:07:09 -0800 (PST)
+        Tue, 29 Jan 2019 03:07:08 -0800 (PST)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         broonie@kernel.org, bfq-iosched@googlegroups.com,
         oleksandr@natalenko.name, mancha@tower-research.com,
         Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX IMPROVEMENT 10/14] block, bfq: fix queue removal from weights tree
-Date:   Tue, 29 Jan 2019 12:06:34 +0100
-Message-Id: <20190129110638.12652-11-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX IMPROVEMENT 09/14] block, bfq: fix sequential rq detection in rate estimation
+Date:   Tue, 29 Jan 2019 12:06:33 +0100
+Message-Id: <20190129110638.12652-10-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190129110638.12652-1-paolo.valente@linaro.org>
 References: <20190129110638.12652-1-paolo.valente@linaro.org>
@@ -72,113 +72,54 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bfq maintains an ordered list, through a red-black tree, of unique
-weights of active bfq_queues. This list is used to detect whether
-there are active queues with differentiated weights. The weight of a
-queue is removed from the list when both the following two conditions
-become true:
-(1) the bfq_queue is flagged as inactive
-(2) the has no in-flight request any longer;
-
-Unfortunately, in the rare cases where condition (2) becomes true
-before condition (1), the removal fails, because the function to
-remove the weight of the queue (bfq_weights_tree_remove) is rightly
-invoked in the path that deactivates the bfq_queue, but mistakenly
-invoked *before* the function that actually performs the deactivation
-(bfq_deactivate_bfqq).
-
-This commits moves the invocation of bfq_weights_tree_remove for
-condition (1) to after bfq_deactivate_bfqq. As a consequence of this
-move, it is necessary to add a further reference to the queue when the
-weight of a queue is added, because the queue might otherwise be freed
-before bfq_weights_tree_remove is invoked. This commit adds this
-reference and makes all related modifications.
+In bfq_update_peak_rate, to check whether an I/O request rq is
+sequential, only the seek distance of rq w.r.t. the last request
+dispatched is controlled. This is not sufficient for non-rotational
+storage, where the size of rq is at least as relevant. This commit
+adds the missing control.
 
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/bfq-iosched.c | 17 +++++++++++++----
- block/bfq-wf2q.c    |  6 +++---
- 2 files changed, 16 insertions(+), 7 deletions(-)
+ block/bfq-iosched.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 12228af16198..bf585ad29bb5 100644
+index c1bb5e5fcdc4..12228af16198 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -754,6 +754,7 @@ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+@@ -235,6 +235,11 @@ static struct kmem_cache *bfq_pool;
  
- inc_counter:
- 	bfqq->weight_counter->num_active++;
-+	bfqq->ref++;
- }
+ #define BFQQ_SEEK_THR		(sector_t)(8 * 100)
+ #define BFQQ_SECT_THR_NONROT	(sector_t)(2 * 32)
++#define BFQ_RQ_SEEKY(bfqd, last_pos, rq) \
++	(get_sdist(last_pos, rq) >			\
++	 BFQQ_SEEK_THR &&				\
++	 (!blk_queue_nonrot(bfqd->queue) ||		\
++	  blk_rq_sectors(rq) < BFQQ_SECT_THR_NONROT))
+ #define BFQQ_CLOSE_THR		(sector_t)(8 * 1024)
+ #define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 19)
  
- /*
-@@ -778,6 +779,7 @@ void __bfq_weights_tree_remove(struct bfq_data *bfqd,
+@@ -2754,7 +2759,7 @@ static void bfq_update_peak_rate(struct bfq_data *bfqd, struct request *rq)
  
- reset_entity_pointer:
- 	bfqq->weight_counter = NULL;
-+	bfq_put_queue(bfqq);
- }
+ 	if ((bfqd->rq_in_driver > 0 ||
+ 		now_ns - bfqd->last_completion < BFQ_MIN_TT)
+-	     && get_sdist(bfqd->last_position, rq) < BFQQ_SEEK_THR)
++	    && !BFQ_RQ_SEEKY(bfqd, bfqd->last_position, rq))
+ 		bfqd->sequential_samples++;
  
- /*
-@@ -789,9 +791,6 @@ void bfq_weights_tree_remove(struct bfq_data *bfqd,
+ 	bfqd->tot_sectors_dispatched += blk_rq_sectors(rq);
+@@ -4511,10 +4516,7 @@ bfq_update_io_seektime(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 		       struct request *rq)
  {
- 	struct bfq_entity *entity = bfqq->entity.parent;
- 
--	__bfq_weights_tree_remove(bfqd, bfqq,
--				  &bfqd->queue_weights_tree);
--
- 	for_each_entity(entity) {
- 		struct bfq_sched_data *sd = entity->my_sched_data;
- 
-@@ -825,6 +824,15 @@ void bfq_weights_tree_remove(struct bfq_data *bfqd,
- 			bfqd->num_groups_with_pending_reqs--;
- 		}
- 	}
-+
-+	/*
-+	 * Next function is invoked last, because it causes bfqq to be
-+	 * freed if the following holds: bfqq is not in service and
-+	 * has no dispatched request. DO NOT use bfqq after the next
-+	 * function invocation.
-+	 */
-+	__bfq_weights_tree_remove(bfqd, bfqq,
-+				  &bfqd->queue_weights_tree);
+ 	bfqq->seek_history <<= 1;
+-	bfqq->seek_history |=
+-		get_sdist(bfqq->last_request_pos, rq) > BFQQ_SEEK_THR &&
+-		(!blk_queue_nonrot(bfqd->queue) ||
+-		 blk_rq_sectors(rq) < BFQQ_SECT_THR_NONROT);
++	bfqq->seek_history |= BFQ_RQ_SEEKY(bfqd, bfqq->last_request_pos, rq);
  }
  
- /*
-@@ -1020,7 +1028,8 @@ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
- 
- static int bfqq_process_refs(struct bfq_queue *bfqq)
- {
--	return bfqq->ref - bfqq->allocated - bfqq->entity.on_st;
-+	return bfqq->ref - bfqq->allocated - bfqq->entity.on_st -
-+		(bfqq->weight_counter != NULL);
- }
- 
- /* Empty burst list and add just bfqq (see comments on bfq_handle_burst) */
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index ce37d709a34f..63311d1ff1ed 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -1673,15 +1673,15 @@ void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 
- 	bfqd->busy_queues[bfqq->ioprio_class - 1]--;
- 
--	if (!bfqq->dispatched)
--		bfq_weights_tree_remove(bfqd, bfqq);
--
- 	if (bfqq->wr_coeff > 1)
- 		bfqd->wr_busy_queues--;
- 
- 	bfqg_stats_update_dequeue(bfqq_group(bfqq));
- 
- 	bfq_deactivate_bfqq(bfqd, bfqq, true, expiration);
-+
-+	if (!bfqq->dispatched)
-+		bfq_weights_tree_remove(bfqd, bfqq);
- }
- 
- /*
+ static void bfq_update_has_short_ttime(struct bfq_data *bfqd,
 -- 
 2.20.1
 
