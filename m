@@ -2,125 +2,158 @@ Return-Path: <SRS0=rnrW=QF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F068C169C4
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 20:37:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D71D4C169C4
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 20:48:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CF1BA214D8
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 20:37:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FDDF214D8
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 20:48:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="zDaXDHyd"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HGKkNyC3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728472AbfA2UhN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jan 2019 15:37:13 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:56014 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727339AbfA2UhN (ORCPT
+        id S1727308AbfA2UsS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jan 2019 15:48:18 -0500
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:36328 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727339AbfA2UsR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jan 2019 15:37:13 -0500
-Received: by mail-it1-f195.google.com with SMTP id m62so6727924ith.5
-        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 12:37:12 -0800 (PST)
+        Tue, 29 Jan 2019 15:48:17 -0500
+Received: by mail-ot1-f66.google.com with SMTP id k98so19178476otk.3
+        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 12:48:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=BrCsiE5YweTTO2omkHOQBxNIbZ09smSVXXDlRhXTh5A=;
-        b=zDaXDHydIApr2pKQDxFICgd6Qk/gk+3LASEqgRSpsoZxUm6P52sKhlTK+T0QeR+4mc
-         cr/PvBmYMYyrOUe0VWSvsUW7uqOessAt0c/NzdWdXia84M5RM+/+qr2LDFkHPo3YF193
-         Fwu63JIhEGs9ZTl65mRdTezppbPbo0gZsnPgFH94PMm3yxwChnWqtTB6AOFoUvsGa1Cf
-         I2iqApzBrDuPyXVdzYOVJ2pfpxNmbC2c/rXW3l1gwcqI0V9mvCYuw9YZuw/IRY9r9saX
-         BO5hcWC5cOoardN9GDD+DDStHIcSkYtYYLDyG7ZNWnW2S4f9o0OKQElu+TO44dfoYxbT
-         qIrw==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PXkP7hOwFgiGW0oh2UjZxqbUBgpKiE6gNiSbUqfg8M0=;
+        b=HGKkNyC3ISIB4254bSbo2wW/YFxeqZTh/GTwm9Hru16YofiMZQAyHz/wEdjrTCSqjH
+         yuFim5ZRtdi+dv/PFQST7yLOPzMTNt/YWYf8CJ9bbAZnoO8tJQPlMg+U8WBHqIYz+Ok+
+         yE+x7CE5f8D4dT+HFhpnS33e0msUstfiAC6ad0NYyyq11ZvMaDSGU7MCScsSPWXtTRYy
+         Xf8+V+xsCA9QYfjqto27xbXSlJeHJaxFwa8Y5eiYh1lao89GbFc80Z4CwP3R0xKR5nQF
+         lxfSJ08nOvfZQs9WVbzxot9ngaT49O+6D9jwIyLlIkHL4efjt6e7Ds85B9Km8XE8r7lt
+         9cGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=BrCsiE5YweTTO2omkHOQBxNIbZ09smSVXXDlRhXTh5A=;
-        b=b/JIswj/VzB9LGutmhKlkO1d/L6T41QyW8QAxkXGtE2E9MyEG4xAJwQCu0W9nGs0ML
-         TDhmgJnhs1EaCyfxJaQIZkAiGZ+l3Sw83XTo/Ij539UI4judw5UtRn+rif1OqFJKrjU4
-         sz1vTJd9uEZuhv7a3SR1qlYoBpQsQIbV69gWVRZ9WRfw7gmTAlCzULto+wWtRl1qwcVK
-         rQXqcYNRRJew52YnBtSk92SzzbKPxadEfjXdvJDerqEAIqDSX3Sxk8ZIWxZTSlHH6Qrq
-         wJrn4APQA0kwRd2xhK6Y3ixZ3g0XRO+78l24kc69b90dttW5dWh7bH2QM4CNylIDqDPD
-         eAmQ==
-X-Gm-Message-State: AJcUukd9fZLBoPd5+Kmj3RQT8DaBDdgz8h9j3tEBfv/WICwYlVtO3L5Z
-        ylKr101lwPA04FEIX+AOMW5Rbg==
-X-Google-Smtp-Source: ALg8bN5o5Ze4G6hXNoZWl5FHqK+Sc4XzzGlXfyNuqzj3781xy6i+RE2NO1Dl2hqrpMI8Xn6TTrs6uA==
-X-Received: by 2002:a05:660c:54d:: with SMTP id w13mr4113258itk.50.1548794231884;
-        Tue, 29 Jan 2019 12:37:11 -0800 (PST)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id t11sm14484426iop.88.2019.01.29.12.37.09
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 29 Jan 2019 12:37:10 -0800 (PST)
-Subject: Re: [PATCH 07/18] io_uring: support for IO polling
-To:     Jeff Moyer <jmoyer@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-aio@kvack.org,
-        linux-block@vger.kernel.org, linux-man@vger.kernel.org,
-        linux-api@vger.kernel.org, avi@scylladb.com
-References: <20190128213538.13486-1-axboe@kernel.dk>
- <20190128213538.13486-8-axboe@kernel.dk> <20190129172414.GA15347@lst.de>
- <f21fc281-bbaa-3af5-3d64-a55933f1cbfb@kernel.dk>
- <cd1b43b7-7116-e53c-91fa-168e6c249e63@kernel.dk>
- <x49o97zi4ml.fsf@segfault.boston.devel.redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <79f9f2e3-7e7d-00fa-5ce6-36787d66f865@kernel.dk>
-Date:   Tue, 29 Jan 2019 13:37:09 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PXkP7hOwFgiGW0oh2UjZxqbUBgpKiE6gNiSbUqfg8M0=;
+        b=KNa3mDUpMgIeDmRuZXP6iP/0EwFz3IIhDPMUEJEr5unLQAyoPzYmIX3EG5yKyVjq83
+         Pvy4yvVzEKjfhFbREj8oNYXBoS/H+EbxkDMWCcJsD57GOHOgpG77O1RPYHPeDTMnKAzQ
+         KEhXR2pDLDTIsKZtlcZy1ro/VkE1EriqhGN//mdickQhlpVK2XsWuhG5kfKy25OTOqso
+         NnoMNWd0ge9HFLkKmJF0Vj+lb1/qaAHvOf4ZHFfxnRS5CvQ1qmI689Tj1xVUNKht5qSi
+         t6tnGRP6pW/bd9n9mEux9OGKmeiCokSBnXDgstL9IOjyPg/qH0JagSxeL/66K5D4yWcV
+         Zjpg==
+X-Gm-Message-State: AJcUukf7O3PTx5IHjd1IRl/4wd+PCY0UtIKTgo80o72Pe2Af33WidMwa
+        bkMZt3s+iqm7gKfr6G5U2FKi9bkPWfOHD0wmQXA4PA==
+X-Google-Smtp-Source: ALg8bN4QKlzc9V8t4aITlS1jV/41gzON3ViWQHRiTCG5EJcE2tAsf2FDIGmkxHeobgzPFGCzEbv9emeNshI49oozTtc=
+X-Received: by 2002:a9d:4c01:: with SMTP id l1mr20952437otf.242.1548794896591;
+ Tue, 29 Jan 2019 12:48:16 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <x49o97zi4ml.fsf@segfault.boston.devel.redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190129192702.3605-1-axboe@kernel.dk> <20190129192702.3605-8-axboe@kernel.dk>
+In-Reply-To: <20190129192702.3605-8-axboe@kernel.dk>
+From:   Jann Horn <jannh@google.com>
+Date:   Tue, 29 Jan 2019 21:47:50 +0100
+Message-ID: <CAG48ez270gG64wmHtG8pNUoBWiSwYiGxsyuSCQ_4wn7v_n_h_w@mail.gmail.com>
+Subject: Re: [PATCH 07/18] io_uring: support for IO polling
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
+        jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/29/19 1:35 PM, Jeff Moyer wrote:
-> Jens Axboe <axboe@kernel.dk> writes:
-> 
->> On 1/29/19 11:31 AM, Jens Axboe wrote:
->>>> The code looks a little clumsy to me.  Why not:
->>>>
->>>> 	while (!list_empty(&ctx->poll_list)) {
->>>> 		int ret = io_do_iopoll(ctx, nr_events, min);
->>>> 		if (ret)
->>>> 			return ret;
->>>>
->>>> 		if (!min || *nr_events >= min)
->>>> 			return 0;
->>>> 	}
->>>>
->>>> 	return 1;
->>>
->>> I think you messed up the 0/1 here, how about this:
->>>
->>> 	while (!list_empty(&ctx->poll_list)) {
->>> 		int ret;
->>>
->>> 		ret = io_do_iopoll(ctx, nr_events, min);
->>> 		if (ret < 0)
->>> 			return ret;
->>> 		if (!min || *nr_events >= min)
->>> 			return 1;
->>> 	}
->>>
->>> 	return 0;
->>
->> Or I did... I think yours is correct.
-> 
-> maybe document the return code?  ;-)
+On Tue, Jan 29, 2019 at 8:27 PM Jens Axboe <axboe@kernel.dk> wrote:
+> Add support for a polled io_uring context. When a read or write is
+> submitted to a polled context, the application must poll for completions
+> on the CQ ring through io_uring_enter(2). Polled IO may not generate
+> IRQ completions, hence they need to be actively found by the application
+> itself.
+>
+> To use polling, io_uring_setup() must be used with the
+> IORING_SETUP_IOPOLL flag being set. It is illegal to mix and match
+> polled and non-polled IO on an io_uring.
+>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+[...]
+> @@ -102,6 +102,8 @@ struct io_ring_ctx {
+>
+>         struct {
+>                 spinlock_t              completion_lock;
+> +               bool                    poll_multi_file;
+> +               struct list_head        poll_list;
 
-It is sort-of documented - <= 0 means "don't call me again", either
-because of an error (< 0) or because we have what we need. 1 means
-"I might have more".
+Please add a comment explaining what protects poll_list against
+concurrent modification, and ideally also put lockdep asserts in the
+functions that access the list to allow the kernel to sanity-check the
+locking at runtime.
 
-But yes, maybe a comment...
+As far as I understand:
+Elements are added by io_iopoll_req_issued(). io_iopoll_req_issued()
+can't race with itself because, depending on IORING_SETUP_SQPOLL,
+either you have to come through sys_io_uring_enter() (which takes the
+uring_lock), or you have to come from the single-threaded
+io_sq_thread().
+io_do_iopoll() iterates over the list and removes completed items.
+io_do_iopoll() is called through io_iopoll_getevents(), which can be
+invoked in two ways during normal operation:
+ - sys_io_uring_enter -> __io_uring_enter -> io_iopoll_check
+->io_iopoll_getevents; this is only protected by the uring_lock
+ - io_sq_thread -> io_iopoll_check ->io_iopoll_getevents; this doesn't
+hold any locks
+Additionally, the following exit paths:
+ - io_sq_thread -> io_iopoll_reap_events -> io_iopoll_getevents
+ - io_uring_release -> io_ring_ctx_wait_and_kill ->
+io_iopoll_reap_events -> io_iopoll_getevents
+ - io_uring_release -> io_ring_ctx_wait_and_kill -> io_ring_ctx_free
+-> io_iopoll_reap_events -> io_iopoll_getevents
 
--- 
-Jens Axboe
+So as far as I can tell, you can have various races around access to
+the poll_list.
 
+[...]
+> +static void io_free_req_many(struct io_ring_ctx *ctx, void **reqs, int *nr)
+> +{
+> +       if (*nr) {
+> +               kmem_cache_free_bulk(req_cachep, *nr, reqs);
+> +               io_ring_drop_ctx_refs(ctx, *nr);
+> +               *nr = 0;
+> +       }
+> +}
+[...]
+> +static void io_iopoll_complete(struct io_ring_ctx *ctx, unsigned int *nr_events,
+> +                              struct list_head *done)
+> +{
+> +       void *reqs[IO_IOPOLL_BATCH];
+> +       struct io_kiocb *req;
+> +       int to_free = 0;
+> +
+> +       while (!list_empty(done)) {
+> +               req = list_first_entry(done, struct io_kiocb, list);
+> +               list_del(&req->list);
+> +
+> +               io_cqring_fill_event(ctx, req->user_data, req->error, 0);
+> +
+> +               reqs[to_free++] = req;
+> +               (*nr_events)++;
+> +
+> +               fput(req->rw.ki_filp);
+> +               if (to_free == ARRAY_SIZE(reqs))
+> +                       io_free_req_many(ctx, reqs, &to_free);
+> +       }
+> +       io_commit_cqring(ctx);
+> +
+> +       if (to_free)
+> +               io_free_req_many(ctx, reqs, &to_free);
+
+Nit: You check here whether to_free==0, and then io_free_req_many()
+does that again. You can delete one of those checks; I'd probably
+delete this one.
+
+> +}
+[...]
