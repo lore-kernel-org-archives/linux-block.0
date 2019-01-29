@@ -6,20 +6,20 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D9ACC282D0
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 08:44:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 270FAC282C7
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 08:44:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6E5972085B
+	by mail.kernel.org (Postfix) with ESMTP id F3B952085B
 	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 08:44:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727349AbfA2Inr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727312AbfA2Inr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 29 Jan 2019 03:43:47 -0500
-Received: from 8bytes.org ([81.169.241.247]:35550 "EHLO theia.8bytes.org"
+Received: from 8bytes.org ([81.169.241.247]:35574 "EHLO theia.8bytes.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727176AbfA2Inq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jan 2019 03:43:46 -0500
+        id S1727205AbfA2Inr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Jan 2019 03:43:47 -0500
 Received: by theia.8bytes.org (Postfix, from userid 1000)
-        id 963E0364; Tue, 29 Jan 2019 09:43:44 +0100 (CET)
+        id B908439C; Tue, 29 Jan 2019 09:43:44 +0100 (CET)
 From:   Joerg Roedel <joro@8bytes.org>
 To:     "Michael S . Tsirkin" <mst@redhat.com>,
         Jason Wang <jasowang@redhat.com>,
@@ -31,9 +31,9 @@ Cc:     Jens Axboe <axboe@kernel.dk>,
         iommu@lists.linux-foundation.org, jfehlig@suse.com,
         jon.grimm@amd.com, brijesh.singh@amd.com, joro@8bytes.org,
         jroedel@suse.de
-Subject: [PATCH 2/5] swiotlb: Add is_swiotlb_active() function
-Date:   Tue, 29 Jan 2019 09:43:39 +0100
-Message-Id: <20190129084342.26030-3-joro@8bytes.org>
+Subject: [PATCH 3/5] dma: Introduce dma_max_mapping_size()
+Date:   Tue, 29 Jan 2019 09:43:40 +0100
+Message-Id: <20190129084342.26030-4-joro@8bytes.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190129084342.26030-1-joro@8bytes.org>
 References: <20190129084342.26030-1-joro@8bytes.org>
@@ -44,56 +44,97 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Joerg Roedel <jroedel@suse.de>
 
-This function will be used from dma_direct code to determine
-the maximum segment size of a dma mapping.
+The function returns the maximum size that can be mapped
+using DMA-API functions. The patch also adds the
+implementation for direct DMA and a new dma_map_ops pointer
+so that other implementations can expose their limit.
 
 Reviewed-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 Signed-off-by: Joerg Roedel <jroedel@suse.de>
 ---
- include/linux/swiotlb.h | 6 ++++++
- kernel/dma/swiotlb.c    | 9 +++++++++
- 2 files changed, 15 insertions(+)
+ Documentation/DMA-API.txt   |  8 ++++++++
+ include/linux/dma-mapping.h | 16 ++++++++++++++++
+ kernel/dma/direct.c         | 11 +++++++++++
+ 3 files changed, 35 insertions(+)
 
-diff --git a/include/linux/swiotlb.h b/include/linux/swiotlb.h
-index 1c22d96e1742..e9e786b4b598 100644
---- a/include/linux/swiotlb.h
-+++ b/include/linux/swiotlb.h
-@@ -63,6 +63,7 @@ extern void swiotlb_tbl_sync_single(struct device *hwdev,
- extern int
- swiotlb_dma_supported(struct device *hwdev, u64 mask);
- size_t swiotlb_max_mapping_size(struct device *dev);
-+bool is_swiotlb_active(void);
+diff --git a/Documentation/DMA-API.txt b/Documentation/DMA-API.txt
+index e133ccd60228..acfe3d0f78d1 100644
+--- a/Documentation/DMA-API.txt
++++ b/Documentation/DMA-API.txt
+@@ -195,6 +195,14 @@ Requesting the required mask does not alter the current mask.  If you
+ wish to take advantage of it, you should issue a dma_set_mask()
+ call to set the mask to the value returned.
  
- #ifdef CONFIG_SWIOTLB
- extern enum swiotlb_force swiotlb_force;
-@@ -100,6 +101,11 @@ static inline size_t swiotlb_max_mapping_size(struct device *dev)
- {
- 	return SIZE_MAX;
- }
++::
 +
-+static inline bool is_swiotlb_active(void)
++	size_t
++	dma_direct_max_mapping_size(struct device *dev);
++
++Returns the maximum size of a mapping for the device. The size parameter
++of the mapping functions like dma_map_single(), dma_map_page() and
++others should not be larger than the returned value.
+ 
+ Part Id - Streaming DMA mappings
+ --------------------------------
+diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
+index f6ded992c183..a3ca8a71a704 100644
+--- a/include/linux/dma-mapping.h
++++ b/include/linux/dma-mapping.h
+@@ -130,6 +130,7 @@ struct dma_map_ops {
+ 			enum dma_data_direction direction);
+ 	int (*dma_supported)(struct device *dev, u64 mask);
+ 	u64 (*get_required_mask)(struct device *dev);
++	size_t (*max_mapping_size)(struct device *dev);
+ };
+ 
+ #define DMA_MAPPING_ERROR		(~(dma_addr_t)0)
+@@ -257,6 +258,8 @@ static inline void dma_direct_sync_sg_for_cpu(struct device *dev,
+ }
+ #endif
+ 
++size_t dma_direct_max_mapping_size(struct device *dev);
++
+ #ifdef CONFIG_HAS_DMA
+ #include <asm/dma-mapping.h>
+ 
+@@ -440,6 +443,19 @@ static inline int dma_mapping_error(struct device *dev, dma_addr_t dma_addr)
+ 	return 0;
+ }
+ 
++static inline size_t dma_max_mapping_size(struct device *dev)
 +{
-+	return false;
++	const struct dma_map_ops *ops = get_dma_ops(dev);
++	size_t size = SIZE_MAX;
++
++	if (dma_is_direct(ops))
++		size = dma_direct_max_mapping_size(dev);
++	else if (ops && ops->max_mapping_size)
++		size = ops->max_mapping_size(dev);
++
++	return size;
 +}
- #endif /* CONFIG_SWIOTLB */
- 
- extern void swiotlb_print_info(void);
-diff --git a/kernel/dma/swiotlb.c b/kernel/dma/swiotlb.c
-index 9cb21259cb0b..c873f9cc2146 100644
---- a/kernel/dma/swiotlb.c
-+++ b/kernel/dma/swiotlb.c
-@@ -667,3 +667,12 @@ size_t swiotlb_max_mapping_size(struct device *dev)
- {
- 	return ((size_t)1 << IO_TLB_SHIFT) * IO_TLB_SEGSIZE;
++
+ void *dma_alloc_attrs(struct device *dev, size_t size, dma_addr_t *dma_handle,
+ 		gfp_t flag, unsigned long attrs);
+ void dma_free_attrs(struct device *dev, size_t size, void *cpu_addr,
+diff --git a/kernel/dma/direct.c b/kernel/dma/direct.c
+index 355d16acee6d..6310ad01f915 100644
+--- a/kernel/dma/direct.c
++++ b/kernel/dma/direct.c
+@@ -380,3 +380,14 @@ int dma_direct_supported(struct device *dev, u64 mask)
+ 	 */
+ 	return mask >= __phys_to_dma(dev, min_mask);
  }
 +
-+bool is_swiotlb_active(void)
++size_t dma_direct_max_mapping_size(struct device *dev)
 +{
-+	/*
-+	 * When SWIOTLB is initialized, even if io_tlb_start points to physical
-+	 * address zero, io_tlb_end surely doesn't.
-+	 */
-+	return io_tlb_end != 0;
++	size_t size = SIZE_MAX;
++
++	/* If SWIOTLB is active, use its maximum mapping size */
++	if (is_swiotlb_active())
++		size = swiotlb_max_mapping_size(dev);
++
++	return size;
 +}
 -- 
 2.17.1
