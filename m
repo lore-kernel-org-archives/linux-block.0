@@ -2,137 +2,194 @@ Return-Path: <SRS0=rnrW=QF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BAC4C169C4
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 23:42:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB505C169C4
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 23:44:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 184CF20881
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 23:42:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA9D32184D
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 23:44:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Io81cfcs"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="IDm2zoSa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727006AbfA2Xm5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jan 2019 18:42:57 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:37758 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727064AbfA2Xm5 (ORCPT
+        id S1727783AbfA2Xox (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jan 2019 18:44:53 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:34363 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727640AbfA2Xox (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jan 2019 18:42:57 -0500
-Received: by mail-ot1-f66.google.com with SMTP id s13so19561969otq.4
-        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 15:42:56 -0800 (PST)
+        Tue, 29 Jan 2019 18:44:53 -0500
+Received: by mail-pf1-f194.google.com with SMTP id h3so10487501pfg.1
+        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 15:44:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=04p0a1GArbkzaJitR5d/Duv5PJ0kPrBZq00zhIJyJm0=;
-        b=Io81cfcsQP3+BCLr6/0a9Ai4lgnFG4nd6BDm7GMDnt7S9/7C+z5ASq6qM7ZpH/sjja
-         72NXUoC91epLLTWnUWIcGYpUKdu9p0c1jXtNNP/v/mcypdajIq7ZU1zwj6SVC0NuGyE7
-         Qze0oKMEck/Jv9LYUROFTzaYvTw6jSSuhlpJX99hIkMqtGF3tjdCMUSS6CMUWpO3RaH/
-         7TALz8osM5QLnF/KJYBMAZgSqcpZbHS/E/vDcwhAD2A2b+jn3we6B7yYtIxkxwLo38ah
-         fDFUJUjQexGQVGR2yQoz0VYbTGcgifyHA9uHIRj1ukbMebFLKqb9hbtBYhaJ4M2PDvOX
-         m9FA==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=w8cJr99XJLPwz1+tE/NaP1ZhKUWthEYLgUbG8sWkKgM=;
+        b=IDm2zoSaA+edS9zuH+C0xCgXxgAab4TffbBktAZK2zQ1Ny1cN6V3BeM+ERANKYHTRH
+         83FcDnY2IJ4nQQr3wf29zLcQvocp3WoZHRrvIn4AStsfXoZmLm4GuRmlESJuPKe5h8mb
+         m4EAeYXYoTGk1bzl5rC3ZZJBvldVmI+EaYD0HG6J2y5gZPJ9Nuj9Rdi5kV2Zu9wY4eRT
+         ET8wRyVQFMgWwCl/CI/xZG7UrIaF4IUI7YYpgP4GFZGMfl4BwBGod39Nrqj5+hTh9KGz
+         qdm52KS4F4gM5ASTY0mJL4hSPDLpyvTAbp1L8fSYZVANChiAj83FeaayyZhekd2w3eVy
+         Fuvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=04p0a1GArbkzaJitR5d/Duv5PJ0kPrBZq00zhIJyJm0=;
-        b=XolDe8jR6ZOHfhMN5voKBSUA6Rb3DISdV0XeN/v1hReEa6mfzgdEl6sTGHTL+TgVpR
-         vuB/blL7eUdYB21t+XsuocPxucI68plnyUzFUPSjSzcuqzFuL5F61fB8NTcObkAyCwtU
-         9QmuwD8FMCTmln7Ipd74WDtPle4rmpZcZ2Fwq1JMY3pa8QNkb60lSLObUxiw1SOGK6G2
-         2MpwnmvtbrDQCqftGG2EbJeCsH0f5huJXanAX8OKv2pCO1F9CLBusNOhzHfIpAgg58tZ
-         KbXzZ7I5024UaE11BuAF5g2v803rw1XLw1owKamES+q/HfaGSXuk4ld9FscvDZ+ycrEA
-         KReQ==
-X-Gm-Message-State: AJcUuke4CIbGFfCukNjSinnQtaco/1qkKg6MxJqjCryxZTJVIAzWsNv5
-        odJw9nZc7bkZG2Pe3Ah3m9yxU7DD8JFuVh6v4WJtYA==
-X-Google-Smtp-Source: ALg8bN6AMOmwIZ7ondNoqVnnFGO9xD97GnbupsTc/h/2nz9cPw4XGyheWmmwVOD7YTGJujgH32GBerQSk3oJ0Rg4xEQ=
-X-Received: by 2002:a9d:460e:: with SMTP id y14mr21928216ote.198.1548805376081;
- Tue, 29 Jan 2019 15:42:56 -0800 (PST)
-MIME-Version: 1.0
-References: <20190129192702.3605-1-axboe@kernel.dk> <20190129192702.3605-13-axboe@kernel.dk>
- <CAG48ez2VkeSEZA+9H4UAcg86uC77gU=UkTG8L1V58TuR9pDEqg@mail.gmail.com>
- <dd366179-c003-752f-743d-2bea4f6b796c@kernel.dk> <CAG48ez3x5x+P=8L1p-bHvcUnypeT1TizkXq2+Q0bCP0GdE-bog@mail.gmail.com>
- <87b25ce2-a5bc-3e81-ddba-5c932c71b40f@kernel.dk> <CAG48ez1m22z0Pqi0cT=UZdsA14SCM5579T1d40cZdyD6KqBw_g@mail.gmail.com>
- <379a631f-e55b-cc31-f84a-ace73fd66ea1@kernel.dk>
-In-Reply-To: <379a631f-e55b-cc31-f84a-ace73fd66ea1@kernel.dk>
-From:   Jann Horn <jannh@google.com>
-Date:   Wed, 30 Jan 2019 00:42:30 +0100
-Message-ID: <CAG48ez3Jtq3ka+cSVxQWjMLQU=YRqV2dJuq5Kp2Nx_YLz3FsNQ@mail.gmail.com>
-Subject: Re: [PATCH 12/18] io_uring: add support for pre-mapped user IO buffers
-To:     Jens Axboe <axboe@kernel.dk>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=w8cJr99XJLPwz1+tE/NaP1ZhKUWthEYLgUbG8sWkKgM=;
+        b=giDY+MoLKOG8+DD7bj+OaFD5adEzwNefQbV7DUdJYrWI32JbA6Ky3UxGy12Qi5AqUc
+         jT/NruPvbjkOS2F0nYmi4cO+2y+DYT2gTb/Sf1vFEd0QdDWGcZjzIoXHVfIfDvtUyM0A
+         PmWDxnK1vvy/g3KftXRhG0w6IzSfZn618B3pMmuOmw26wkita/uzCw3BEgOX8QDi4t7r
+         iqpIfDbfFlZNhzCltCfjNjh6HcDAtsFzGz82sO7QHqezStBRmojNum/NHSQvcjBnSP8G
+         Zfl6GXpq9Wk0Y/Z4MJedBoZgtECPVpCvjw83enNSm/YyHc9xH+5lTCLIyRAnzCqNv5Sh
+         ZQ1Q==
+X-Gm-Message-State: AJcUukd31mqN6DSauoCGLr76RNiQk24jBQhMQn2fYDD731UEJhuK0zDg
+        su4dhaXLhjx5q9HhwMvMLaMx+A==
+X-Google-Smtp-Source: ALg8bN7W1G0ze/4Hvx9vZG7oyhcx+7NfbUN9BpC7xLrLqZSTHHMagrfyQjCTwnmTKHCYxMiqi+IsRw==
+X-Received: by 2002:a63:7f4f:: with SMTP id p15mr25774617pgn.296.1548805491805;
+        Tue, 29 Jan 2019 15:44:51 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id q5sm63334805pfi.165.2019.01.29.15.44.50
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 29 Jan 2019 15:44:50 -0800 (PST)
+Subject: Re: [PATCH 09/18] io_uring: use fget/fput_many() for file references
+To:     Jann Horn <jannh@google.com>
 Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
         Linux API <linux-api@vger.kernel.org>, hch@lst.de,
         jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20190129192702.3605-1-axboe@kernel.dk>
+ <20190129192702.3605-10-axboe@kernel.dk>
+ <CAG48ez3_1mY1Fb91Q3H-S2+4OiMsV5F9v78JX+YMjWqLteHpzw@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <bceb5e2b-9634-1296-a2a9-ed521f0e31d4@kernel.dk>
+Date:   Tue, 29 Jan 2019 16:44:48 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <CAG48ez3_1mY1Fb91Q3H-S2+4OiMsV5F9v78JX+YMjWqLteHpzw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 30, 2019 at 12:14 AM Jens Axboe <axboe@kernel.dk> wrote:
-> On 1/29/19 4:08 PM, Jann Horn wrote:
-> > On Wed, Jan 30, 2019 at 12:06 AM Jens Axboe <axboe@kernel.dk> wrote:
-> >> On 1/29/19 4:03 PM, Jann Horn wrote:
-> >>> On Tue, Jan 29, 2019 at 11:56 PM Jens Axboe <axboe@kernel.dk> wrote:
-> >>>> On 1/29/19 3:44 PM, Jann Horn wrote:
-> >>>>> On Tue, Jan 29, 2019 at 8:27 PM Jens Axboe <axboe@kernel.dk> wrote:
-> >>>>>> If we have fixed user buffers, we can map them into the kernel when we
-> >>>>>> setup the io_context. That avoids the need to do get_user_pages() for
-> >>>>>> each and every IO.
-> >>>>>>
-> >>>>>> To utilize this feature, the application must call io_uring_register()
-> >>>>>> after having setup an io_uring context, passing in
-> >>>>>> IORING_REGISTER_BUFFERS as the opcode. The argument must be a pointer
-> >>>>>> to an iovec array, and the nr_args should contain how many iovecs the
-> >>>>>> application wishes to map.
-> >>>>>>
-> >>>>>> If successful, these buffers are now mapped into the kernel, eligible
-> >>>>>> for IO. To use these fixed buffers, the application must use the
-> >>>>>> IORING_OP_READ_FIXED and IORING_OP_WRITE_FIXED opcodes, and then
-> >>>>>> set sqe->index to the desired buffer index. sqe->addr..sqe->addr+seq->len
-> >>>>>> must point to somewhere inside the indexed buffer.
-> >>>>>>
-> >>>>>> The application may register buffers throughout the lifetime of the
-> >>>>>> io_uring context. It can call io_uring_register() with
-> >>>>>> IORING_UNREGISTER_BUFFERS as the opcode to unregister the current set of
-> >>>>>> buffers, and then register a new set. The application need not
-> >>>>>> unregister buffers explicitly before shutting down the io_uring context.
-[...]
-> Just folded in this incremental, which should fix all the issues outlined
-> in your email.
->
->
-> diff --git a/fs/io_uring.c b/fs/io_uring.c
-> index 7364feebafed..d42541357969 100644
-> --- a/fs/io_uring.c
-> +++ b/fs/io_uring.c
-[...]
-> @@ -1602,6 +1605,7 @@ static int io_submit_sqes(struct io_ring_ctx *ctx, struct sqe_submit *sqes,
->
->  static int io_sq_thread(void *data)
->  {
-> +       struct io_uring_sqe lsqe[IO_IOPOLL_BATCH];
->         struct sqe_submit sqes[IO_IOPOLL_BATCH];
->         struct io_ring_ctx *ctx = data;
->         struct mm_struct *cur_mm = NULL;
-> @@ -1701,6 +1705,14 @@ static int io_sq_thread(void *data)
->                 i = 0;
->                 all_fixed = true;
->                 do {
-> +                       /*
-> +                        * Ensure sqe is stable between checking if we need
-> +                        * user access, and actually importing the iovec
-> +                        * further down the stack.
-> +                        */
-> +                       memcpy(&lsqe[i], sqes[i].sqe, sizeof(lsqe[i]));
-> +                       sqes[i].sqe = &lsqe[i];
-> +
+On 1/29/19 4:31 PM, Jann Horn wrote:
+> On Tue, Jan 29, 2019 at 8:27 PM Jens Axboe <axboe@kernel.dk> wrote:
+>> Add a separate io_submit_state structure, to cache some of the things
+>> we need for IO submission.
+>>
+>> One such example is file reference batching. io_submit_state. We get as
+>> many references as the number of sqes we are submitting, and drop
+>> unused ones if we end up switching files. The assumption here is that
+>> we're usually only dealing with one fd, and if there are multiple,
+>> hopefuly they are at least somewhat ordered. Could trivially be extended
+>> to cover multiple fds, if needed.
+>>
+>> On the completion side we do the same thing, except this is trivially
+>> done just locally in io_iopoll_reap().
+> [...]
+>> +static void io_file_put(struct io_submit_state *state, struct file *file)
+>> +{
+>> +       if (!state) {
+>> +               fput(file);
+>> +       } else if (state->file) {
+>> +               int diff = state->has_refs - state->used_refs;
+>> +
+>> +               if (diff)
+>> +                       fput_many(state->file, diff);
+>> +               state->file = NULL;
+>> +       }
+>> +}
+> 
+> Hmm, this function confuses me.
+> The state==NULL path works as I'd expect, it calls fput() on the file.
+> But if `state!=NULL && state->file==NULL`, it does nothing, it never
+> uses `file`.
+> And if `state->file!=NULL`, it drops the excess bias on the file's
+> refcount, but it doesn't drop the current reference - and again
+> without even looking at `file`.
+> 
+> So when io_prep_rw() uses io_file_get() to grab a reference on a file
+> it hasn't seen before, it will acquire `ios_left` references and
+> actually use one of them; then if it goes through the out_fput error
+> path, it goes through the path for `state->file!=NULL`, drops
+> `ios_left-1` references (leaving the refcount elevated by 1), and
+> forgets about the file?
 
-What if io_submit_sqe() gets an -EAGAIN from __io_submit_sqe() and
-queues io_sq_wq_submit_work()? Could that cause io_sq_wq_submit_work()
-to read from io_sq_thread()'s lsge[i] while io_sq_thread() is already
-in the next loop iteration of the outer loop and has copied new data
-into lsge[i]?
+I'll take a look, it's not impossible there's an off-by-one there.
+
+>> +/*
+>> + * Get as many references to a file as we have IOs left in this submission,
+>> + * assuming most submissions are for one file, or at least that each file
+>> + * has more than one submission.
+>> + */
+>> +static struct file *io_file_get(struct io_submit_state *state, int fd)
+>> +{
+>> +       if (!state)
+>> +               return fget(fd);
+>> +
+>> +       if (state->file) {
+>> +               if (state->fd == fd) {
+>> +                       state->used_refs++;
+>> +                       state->ios_left--;
+>> +                       return state->file;
+>> +               }
+>> +               io_file_put(state, NULL);
+>> +       }
+>> +       state->file = fget_many(fd, state->ios_left);
+>> +       if (!state->file)
+>> +               return NULL;
+>> +
+>> +       state->fd = fd;
+>> +       state->has_refs = state->ios_left;
+>> +       state->used_refs = 1;
+>> +       state->ios_left--;
+>> +       return state->file;
+>> +}
+>> +
+>>  static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+>> -                     bool force_nonblock)
+>> +                     bool force_nonblock, struct io_submit_state *state)
+>>  {
+>>         struct io_ring_ctx *ctx = req->ctx;
+>>         struct kiocb *kiocb = &req->rw;
+>> @@ -487,7 +560,7 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+>>         int fd, ret;
+>>
+>>         fd = READ_ONCE(sqe->fd);
+>> -       kiocb->ki_filp = fget(fd);
+>> +       kiocb->ki_filp = io_file_get(state, fd);
+>>         if (unlikely(!kiocb->ki_filp))
+>>                 return -EBADF;
+>>         kiocb->ki_pos = READ_ONCE(sqe->off);
+>> @@ -528,7 +601,7 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+>>         }
+>>         return 0;
+>>  out_fput:
+>> -       fput(kiocb->ki_filp);
+>> +       io_file_put(state, kiocb->ki_filp);
+>>         return ret;
+>>  }
+> [...]
+>> +static void io_submit_state_start(struct io_submit_state *state,
+>> +                                 struct io_ring_ctx *ctx, unsigned max_ios)
+> 
+> There are various places in your series where you use raw "unsigned"
+> instead of "unsigned int"; when I run your tree through checkpatch.pl,
+> it complains about that and a few other things. Please fix the
+> checkpatch warnings (except for warnings where you know that they
+> shouldn't apply here for some reason).
+
+Using unsigned is just fine, it's the same thing. checkpatch.pl
+complains about a lot of stuff that doesn't matter, that's one of them.
+I don't mind fixing valid warnings, but this particular one is just
+noise.
+
+-- 
+Jens Axboe
+
