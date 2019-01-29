@@ -2,112 +2,136 @@ Return-Path: <SRS0=rnrW=QF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E87A0C169C4
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 19:10:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CB62C169C4
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 19:27:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B865720869
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 19:10:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D93A20989
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 19:27:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="O5eiivpr"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="On+4Uinf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726988AbfA2TKL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jan 2019 14:10:11 -0500
-Received: from mail-it1-f196.google.com ([209.85.166.196]:55936 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727056AbfA2TKL (ORCPT
+        id S1727869AbfA2T1H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jan 2019 14:27:07 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:39694 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726852AbfA2T1H (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jan 2019 14:10:11 -0500
-Received: by mail-it1-f196.google.com with SMTP id m62so6326578ith.5
-        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 11:10:10 -0800 (PST)
+        Tue, 29 Jan 2019 14:27:07 -0500
+Received: by mail-it1-f194.google.com with SMTP id a6so6399487itl.4
+        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 11:27:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=zI5ljca5yqDtnKIcobUuAgrn44uAMEaqsB9abz9HTv4=;
-        b=O5eiivpr/4/eM+EZj377IaSV02qrGWckGEZ3OaEPGydHMKechjHHTvPV3YgDnq+3pA
-         v2FYywD9jVXJP94KCLYiEPpULrLs3g7KQHw/+YEm1SGZm5UtPzZyNvp/3Vx5tSPtV8yQ
-         1bvY3XVcHhMy4DTzoIwarIbitkHP6GsrMMC3A1bqCWftGmsYonbwttdVWUig4jBNoVVG
-         8k4i4r+FyCK725OqeKfN706Jza6PCQNzLtS+xvbB5ta1z2fUdAZ8HDTysZmpYG42LjB8
-         XcNWrrEUoo8AApNNFnfArBM1kJViR0vD6VFkY73dEONRxZXL0BAGsn33yodQY/9FcA7b
-         0Xkw==
+        h=from:to:cc:subject:date:message-id;
+        bh=5xJW0HuLHftgv+x4p++VHZmQ83Mep4USFSKzRZ5bjkU=;
+        b=On+4Uinf4WxL2frE9gmzOzJRoeHQnRXbzB3s64CesCnx6siSaBROa/LLVtOk96Icuh
+         AMuOegfF3vfdYIGQuyzMbkxre4efAQ+1gYDSwBGq9AGdYhCxwXQJf7XuCU5+M20UocI7
+         Eh0B0qxhWZvLpq+5tQCK+wzc/dCn6bcIqcVk9qC7QXcFL2eX3EhJHY9+iLBilbA9WKx1
+         B3qh1COnqBCllXGf0BNOtqNW5XawxWPSj1RkvGhBaiw+g0y0xS8Y8bBBPyMFh+sYMJ+W
+         GQmm9TsAVgObShpQr3QaAD7AF2KVwgQgskwBWrYnm9H1eZ0g3XnW7apl/V3Ka+LTxWS+
+         2xFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=zI5ljca5yqDtnKIcobUuAgrn44uAMEaqsB9abz9HTv4=;
-        b=jAAngpDupk4U8Yd6djTKqGTVrDMvE2n5BIo51Cf3I3Q3XnH1pW/oO9EaxKb3C6oSC/
-         6L6/57/WPDWiaUKNQN9ufIekGvNN55Q9lzXi62iBeu8MvSgiUjPfe40DRoGENRrrhDIf
-         wbNaxls/J/ZTgBoPfbzEvn6lVuW9zf62X8M2nGjFrg67YaPxe74GsMKnR6m+efESM/mJ
-         g0fzjTBbmt1VexFtv1Drqm1sZoRvzVubbf8bI0vXukhAeFuxBk6FTk6Spe6xvSqF49yY
-         WtRFlH27Zhw+4zSBCgp0qy6sl2d/XtpQzYxWw+n85Nln1/zj3EZZth7SLyNEzDZ0jl2A
-         fGbA==
-X-Gm-Message-State: AJcUukeIWtJYpLqf3SNGmFo4btaMD39CggzI2GULBQI217R0sAmci1ne
-        XMglQmJYBSgoHE8hb2FvDkHaEw==
-X-Google-Smtp-Source: ALg8bN6ruvDxCrFla43Lf0h+KpGeOmmnZ1IBYgcEayf88MnWIJoDyqh2uY9AgGh8xlXdzD+GtDqvag==
-X-Received: by 2002:a02:3003:: with SMTP id q3mr17428649jaq.16.1548789010507;
-        Tue, 29 Jan 2019 11:10:10 -0800 (PST)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id o21sm14839414ioa.71.2019.01.29.11.10.08
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=5xJW0HuLHftgv+x4p++VHZmQ83Mep4USFSKzRZ5bjkU=;
+        b=XfuMLqrBI+4AyVuvCEPAuprLpstY6IF8dgl8D0oUOqJvnBzsqEHXCrzKWNmg6Q0h42
+         Py7xgSVk3P2NJCiE9NUyVh+ZVydK4kHAgIOLo3+wZ2ddZPzrEQL1oOK5ZDow+qAobwaB
+         h2WyA1kAige/FOdZLgTEUAIPVDfWPxx62ICBBftUe2xQuk/dQnFI90ErpOgVXtkSoE2G
+         kgb/lJ3f914L0DEOTL1jDCLV/qL8eyYKfKqMhzCwB5G+/N7IE2EevNXKLIsAaW1FeD+E
+         EwFmTu7xF2voFd5aXTUFOXXu9aq+4V99cBq7Tq0IjQ4K3ju9jGzkNOY2uxLRJGctqWb/
+         28Hg==
+X-Gm-Message-State: AJcUukdmLejYTny4HvfIW60HD0QBHwEQ6JjBOiCi6AbHhYvQKiL2edg2
+        WZqrrotAxHVrtiKxsSusX9sz4Q==
+X-Google-Smtp-Source: ALg8bN4k2OdBQRRdfNGRcuzjLVLV6xzbltGyav3ngf5FjWfO57wJJdKGiMvFKRzodKV4BBgJHLieug==
+X-Received: by 2002:a24:6b90:: with SMTP id v138mr12712592itc.86.1548790026446;
+        Tue, 29 Jan 2019 11:27:06 -0800 (PST)
+Received: from localhost.localdomain ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id y3sm15223203iol.55.2019.01.29.11.27.04
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 29 Jan 2019 11:10:09 -0800 (PST)
-Subject: Re: [PATCH 07/18] io_uring: support for IO polling
+        Tue, 29 Jan 2019 11:27:05 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
-        linux-man@vger.kernel.org, linux-api@vger.kernel.org,
-        jmoyer@redhat.com, avi@scylladb.com
-References: <20190128213538.13486-1-axboe@kernel.dk>
- <20190128213538.13486-8-axboe@kernel.dk> <20190129172414.GA15347@lst.de>
- <f21fc281-bbaa-3af5-3d64-a55933f1cbfb@kernel.dk>
-Message-ID: <cd1b43b7-7116-e53c-91fa-168e6c249e63@kernel.dk>
-Date:   Tue, 29 Jan 2019 12:10:08 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <f21fc281-bbaa-3af5-3d64-a55933f1cbfb@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     linux-aio@kvack.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org
+Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com, jannh@google.com
+Subject: [PATCHSET v9] io_uring IO interface
+Date:   Tue, 29 Jan 2019 12:26:44 -0700
+Message-Id: <20190129192702.3605-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/29/19 11:31 AM, Jens Axboe wrote:
->> The code looks a little clumsy to me.  Why not:
->>
->> 	while (!list_empty(&ctx->poll_list)) {
->> 		int ret = io_do_iopoll(ctx, nr_events, min);
->> 		if (ret)
->> 			return ret;
->>
->> 		if (!min || *nr_events >= min)
->> 			return 0;
->> 	}
->>
->> 	return 1;
-> 
-> I think you messed up the 0/1 here, how about this:
-> 
-> 	while (!list_empty(&ctx->poll_list)) {
-> 		int ret;
-> 
-> 		ret = io_do_iopoll(ctx, nr_events, min);
-> 		if (ret < 0)
-> 			return ret;
-> 		if (!min || *nr_events >= min)
-> 			return 1;
-> 	}
-> 
-> 	return 0;
+Following up on all the great review from yesterday (and today),
+here's a v9 that addresses all known review concerns so far.
+A particular big thanks to Jann Horn for looking into the grittier
+details, which resulted in a slew of fixes. Also thanks to Christoph
+for working through the patches. I feel like we're making good
+progress here.
 
-Or I did... I think yours is correct.
+A note on ctx->compat still being there - we could store this in
+struct sqe_submit, but this doesn't work for the io_sq_thread()
+polled submission. Additionally, makes more sense to keep this in
+the ctx instead of once per IO.
+
+No new changes in the liburing user side library, but as a reference,
+you can clone that here:
+
+git://git.kernel.dk/liburing
+
+We're still missing a man page for io_uring_enter(2), but the two other
+system calls are documented.
+
+Patches are against 5.0-rc4, and can also be found in my io_uring branch
+here:
+
+git://git.kernel.dk/linux-block io_uring
+
+Changes since v8:
+- Check for p->sq_thread_cpu being possible
+- Check for valid flags in io_uring_enter(2)
+- Cap 'to_submit' at SQ ring size in io_uring_enter(2)
+- Fix files/mm references
+- Don't bother with ctx referencing in io_uring_register(2)
+- Use READ/WRITE_ONCE for ring updates/reads
+- Use percpu_ref_tryget() for io_get_req()
+- Protect sqe reads (that matter) with READ_ONCE()
+- Store compat syscall info in the ctx. Still derived from
+  in_compat_syscall(), but we need access to it from the io_sq_thread()
+  as well.
+- Don't make IORING_MAX_ENTRIES user visible
+- Address various review comments
+
+ Documentation/filesystems/vfs.txt      |    3 +
+ arch/x86/entry/syscalls/syscall_32.tbl |    3 +
+ arch/x86/entry/syscalls/syscall_64.tbl |    3 +
+ block/bio.c                            |   59 +-
+ fs/Makefile                            |    1 +
+ fs/block_dev.c                         |   19 +-
+ fs/file.c                              |   15 +-
+ fs/file_table.c                        |    9 +-
+ fs/gfs2/file.c                         |    2 +
+ fs/io_uring.c                          | 2599 ++++++++++++++++++++++++
+ fs/iomap.c                             |   48 +-
+ fs/xfs/xfs_file.c                      |    1 +
+ include/linux/bio.h                    |   14 +
+ include/linux/blk_types.h              |    1 +
+ include/linux/file.h                   |    2 +
+ include/linux/fs.h                     |    6 +-
+ include/linux/iomap.h                  |    1 +
+ include/linux/sched/user.h             |    2 +-
+ include/linux/syscalls.h               |    8 +
+ include/uapi/asm-generic/unistd.h      |    8 +-
+ include/uapi/linux/io_uring.h          |  141 ++
+ init/Kconfig                           |    9 +
+ kernel/sys_ni.c                        |    3 +
+ 23 files changed, 2916 insertions(+), 41 deletions(-)
 
 -- 
 Jens Axboe
+
 
