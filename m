@@ -2,61 +2,66 @@ Return-Path: <SRS0=rnrW=QF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49B3AC169C4
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 23:31:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BAC4C169C4
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 23:42:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 068A42184D
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 23:31:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 184CF20881
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 23:42:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IowwWKVG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Io81cfcs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727678AbfA2Xbc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jan 2019 18:31:32 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:44863 "EHLO
+        id S1727006AbfA2Xm5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jan 2019 18:42:57 -0500
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:37758 "EHLO
         mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726846AbfA2Xbc (ORCPT
+        with ESMTP id S1727064AbfA2Xm5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jan 2019 18:31:32 -0500
-Received: by mail-ot1-f66.google.com with SMTP id g16so15525552otg.11
-        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 15:31:31 -0800 (PST)
+        Tue, 29 Jan 2019 18:42:57 -0500
+Received: by mail-ot1-f66.google.com with SMTP id s13so19561969otq.4
+        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 15:42:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=DWNZAO0n0cz7IOServSg577WcC7AbpDr4VbVQ4yUSAE=;
-        b=IowwWKVGl0U8E97sjPtqEiWHEjdbuDzhhkYO4vzydMzYqBD5T8S/yUuwBnzoy7BzxU
-         aRECVbsYb+BdGI/aPDlblK2Sxdt8KNN3mWiYPZ2+mU+mjbbQnXK+BtXRnO0G1HuzGmqA
-         tMbj18BHQkBHXE0alVBnCstd2dAyftooB+X6gBrXNNinqN8LNOndsv2hP+4dMAb1yWpX
-         PdDxKgKr93YwOpG+Tk7LwL98Cbe/ChWuX1SlMgg490D48bWgsW5gSuwH3OfbmHlQDj0G
-         1rtHlK3VpdKtCD85c+Kka+9T9gvV7oXEG0ZlCM8ar1qliKIKL0TrcTrQMdkPUC9dRHKP
-         i3IA==
+        bh=04p0a1GArbkzaJitR5d/Duv5PJ0kPrBZq00zhIJyJm0=;
+        b=Io81cfcsQP3+BCLr6/0a9Ai4lgnFG4nd6BDm7GMDnt7S9/7C+z5ASq6qM7ZpH/sjja
+         72NXUoC91epLLTWnUWIcGYpUKdu9p0c1jXtNNP/v/mcypdajIq7ZU1zwj6SVC0NuGyE7
+         Qze0oKMEck/Jv9LYUROFTzaYvTw6jSSuhlpJX99hIkMqtGF3tjdCMUSS6CMUWpO3RaH/
+         7TALz8osM5QLnF/KJYBMAZgSqcpZbHS/E/vDcwhAD2A2b+jn3we6B7yYtIxkxwLo38ah
+         fDFUJUjQexGQVGR2yQoz0VYbTGcgifyHA9uHIRj1ukbMebFLKqb9hbtBYhaJ4M2PDvOX
+         m9FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=DWNZAO0n0cz7IOServSg577WcC7AbpDr4VbVQ4yUSAE=;
-        b=C4dYTL6IukLGjjP/CtS9VJW0fO+uRTh4tBbLrqvEU7QN0jEcnRmbWOUppK2QgyuiJm
-         hdqSm8z1cWMtBL5w5nfT06e1EeDj5d3/6OkgcbGGFOQ/xs+Ws6rZFOGhP5SCUq1FbBCT
-         LKHJDpv1ImQypndIlS0LdOcX6VkY/PLf3bRptIJR9bbMazWxdR11fAGWGupgxi2hEKFD
-         om6ytQHgtY8MRQZJEvA+XlM9NbLvU/l8h4jpLldftJjYgzhGvQqRWQhaYIbTShUtf/Dp
-         eV34yAxHcvPVaEkZPvII0YE8e0UNkXg3npEZCIPTvaAAfFzXdIltrpwje6CDMlKlYwsS
-         kGGg==
-X-Gm-Message-State: AJcUuke/JIyi/ZohmqogTfWEGOAgajCXWxMoT5DI3G/Qvc6a0mej/DrZ
-        lSlxSBdcwHc64jKKarKYAIKVQoNz3zRupuW/Y9BCsEamJIiwgg==
-X-Google-Smtp-Source: ALg8bN66kseHdvmLwLmXEFiz9rHW4wPbuTOCGkHV7sBm8CbbsMh104czmfF26DkDFWHIdMkUOyK8BBlISY8jASCSrQs=
-X-Received: by 2002:a9d:aa9:: with SMTP id 38mr22282118otq.255.1548804690869;
- Tue, 29 Jan 2019 15:31:30 -0800 (PST)
+        bh=04p0a1GArbkzaJitR5d/Duv5PJ0kPrBZq00zhIJyJm0=;
+        b=XolDe8jR6ZOHfhMN5voKBSUA6Rb3DISdV0XeN/v1hReEa6mfzgdEl6sTGHTL+TgVpR
+         vuB/blL7eUdYB21t+XsuocPxucI68plnyUzFUPSjSzcuqzFuL5F61fB8NTcObkAyCwtU
+         9QmuwD8FMCTmln7Ipd74WDtPle4rmpZcZ2Fwq1JMY3pa8QNkb60lSLObUxiw1SOGK6G2
+         2MpwnmvtbrDQCqftGG2EbJeCsH0f5huJXanAX8OKv2pCO1F9CLBusNOhzHfIpAgg58tZ
+         KbXzZ7I5024UaE11BuAF5g2v803rw1XLw1owKamES+q/HfaGSXuk4ld9FscvDZ+ycrEA
+         KReQ==
+X-Gm-Message-State: AJcUuke4CIbGFfCukNjSinnQtaco/1qkKg6MxJqjCryxZTJVIAzWsNv5
+        odJw9nZc7bkZG2Pe3Ah3m9yxU7DD8JFuVh6v4WJtYA==
+X-Google-Smtp-Source: ALg8bN6AMOmwIZ7ondNoqVnnFGO9xD97GnbupsTc/h/2nz9cPw4XGyheWmmwVOD7YTGJujgH32GBerQSk3oJ0Rg4xEQ=
+X-Received: by 2002:a9d:460e:: with SMTP id y14mr21928216ote.198.1548805376081;
+ Tue, 29 Jan 2019 15:42:56 -0800 (PST)
 MIME-Version: 1.0
-References: <20190129192702.3605-1-axboe@kernel.dk> <20190129192702.3605-10-axboe@kernel.dk>
-In-Reply-To: <20190129192702.3605-10-axboe@kernel.dk>
+References: <20190129192702.3605-1-axboe@kernel.dk> <20190129192702.3605-13-axboe@kernel.dk>
+ <CAG48ez2VkeSEZA+9H4UAcg86uC77gU=UkTG8L1V58TuR9pDEqg@mail.gmail.com>
+ <dd366179-c003-752f-743d-2bea4f6b796c@kernel.dk> <CAG48ez3x5x+P=8L1p-bHvcUnypeT1TizkXq2+Q0bCP0GdE-bog@mail.gmail.com>
+ <87b25ce2-a5bc-3e81-ddba-5c932c71b40f@kernel.dk> <CAG48ez1m22z0Pqi0cT=UZdsA14SCM5579T1d40cZdyD6KqBw_g@mail.gmail.com>
+ <379a631f-e55b-cc31-f84a-ace73fd66ea1@kernel.dk>
+In-Reply-To: <379a631f-e55b-cc31-f84a-ace73fd66ea1@kernel.dk>
 From:   Jann Horn <jannh@google.com>
-Date:   Wed, 30 Jan 2019 00:31:05 +0100
-Message-ID: <CAG48ez3_1mY1Fb91Q3H-S2+4OiMsV5F9v78JX+YMjWqLteHpzw@mail.gmail.com>
-Subject: Re: [PATCH 09/18] io_uring: use fget/fput_many() for file references
+Date:   Wed, 30 Jan 2019 00:42:30 +0100
+Message-ID: <CAG48ez3Jtq3ka+cSVxQWjMLQU=YRqV2dJuq5Kp2Nx_YLz3FsNQ@mail.gmail.com>
+Subject: Re: [PATCH 12/18] io_uring: add support for pre-mapped user IO buffers
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
         Linux API <linux-api@vger.kernel.org>, hch@lst.de,
@@ -67,106 +72,67 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 29, 2019 at 8:27 PM Jens Axboe <axboe@kernel.dk> wrote:
-> Add a separate io_submit_state structure, to cache some of the things
-> we need for IO submission.
->
-> One such example is file reference batching. io_submit_state. We get as
-> many references as the number of sqes we are submitting, and drop
-> unused ones if we end up switching files. The assumption here is that
-> we're usually only dealing with one fd, and if there are multiple,
-> hopefuly they are at least somewhat ordered. Could trivially be extended
-> to cover multiple fds, if needed.
->
-> On the completion side we do the same thing, except this is trivially
-> done just locally in io_iopoll_reap().
+On Wed, Jan 30, 2019 at 12:14 AM Jens Axboe <axboe@kernel.dk> wrote:
+> On 1/29/19 4:08 PM, Jann Horn wrote:
+> > On Wed, Jan 30, 2019 at 12:06 AM Jens Axboe <axboe@kernel.dk> wrote:
+> >> On 1/29/19 4:03 PM, Jann Horn wrote:
+> >>> On Tue, Jan 29, 2019 at 11:56 PM Jens Axboe <axboe@kernel.dk> wrote:
+> >>>> On 1/29/19 3:44 PM, Jann Horn wrote:
+> >>>>> On Tue, Jan 29, 2019 at 8:27 PM Jens Axboe <axboe@kernel.dk> wrote:
+> >>>>>> If we have fixed user buffers, we can map them into the kernel when we
+> >>>>>> setup the io_context. That avoids the need to do get_user_pages() for
+> >>>>>> each and every IO.
+> >>>>>>
+> >>>>>> To utilize this feature, the application must call io_uring_register()
+> >>>>>> after having setup an io_uring context, passing in
+> >>>>>> IORING_REGISTER_BUFFERS as the opcode. The argument must be a pointer
+> >>>>>> to an iovec array, and the nr_args should contain how many iovecs the
+> >>>>>> application wishes to map.
+> >>>>>>
+> >>>>>> If successful, these buffers are now mapped into the kernel, eligible
+> >>>>>> for IO. To use these fixed buffers, the application must use the
+> >>>>>> IORING_OP_READ_FIXED and IORING_OP_WRITE_FIXED opcodes, and then
+> >>>>>> set sqe->index to the desired buffer index. sqe->addr..sqe->addr+seq->len
+> >>>>>> must point to somewhere inside the indexed buffer.
+> >>>>>>
+> >>>>>> The application may register buffers throughout the lifetime of the
+> >>>>>> io_uring context. It can call io_uring_register() with
+> >>>>>> IORING_UNREGISTER_BUFFERS as the opcode to unregister the current set of
+> >>>>>> buffers, and then register a new set. The application need not
+> >>>>>> unregister buffers explicitly before shutting down the io_uring context.
 [...]
-> +static void io_file_put(struct io_submit_state *state, struct file *file)
-> +{
-> +       if (!state) {
-> +               fput(file);
-> +       } else if (state->file) {
-> +               int diff = state->has_refs - state->used_refs;
-> +
-> +               if (diff)
-> +                       fput_many(state->file, diff);
-> +               state->file = NULL;
-> +       }
-> +}
-
-Hmm, this function confuses me.
-The state==NULL path works as I'd expect, it calls fput() on the file.
-But if `state!=NULL && state->file==NULL`, it does nothing, it never
-uses `file`.
-And if `state->file!=NULL`, it drops the excess bias on the file's
-refcount, but it doesn't drop the current reference - and again
-without even looking at `file`.
-
-So when io_prep_rw() uses io_file_get() to grab a reference on a file
-it hasn't seen before, it will acquire `ios_left` references and
-actually use one of them; then if it goes through the out_fput error
-path, it goes through the path for `state->file!=NULL`, drops
-`ios_left-1` references (leaving the refcount elevated by 1), and
-forgets about the file?
-
-> +/*
-> + * Get as many references to a file as we have IOs left in this submission,
-> + * assuming most submissions are for one file, or at least that each file
-> + * has more than one submission.
-> + */
-> +static struct file *io_file_get(struct io_submit_state *state, int fd)
-> +{
-> +       if (!state)
-> +               return fget(fd);
-> +
-> +       if (state->file) {
-> +               if (state->fd == fd) {
-> +                       state->used_refs++;
-> +                       state->ios_left--;
-> +                       return state->file;
-> +               }
-> +               io_file_put(state, NULL);
-> +       }
-> +       state->file = fget_many(fd, state->ios_left);
-> +       if (!state->file)
-> +               return NULL;
-> +
-> +       state->fd = fd;
-> +       state->has_refs = state->ios_left;
-> +       state->used_refs = 1;
-> +       state->ios_left--;
-> +       return state->file;
-> +}
-> +
->  static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
-> -                     bool force_nonblock)
-> +                     bool force_nonblock, struct io_submit_state *state)
+> Just folded in this incremental, which should fix all the issues outlined
+> in your email.
+>
+>
+> diff --git a/fs/io_uring.c b/fs/io_uring.c
+> index 7364feebafed..d42541357969 100644
+> --- a/fs/io_uring.c
+> +++ b/fs/io_uring.c
+[...]
+> @@ -1602,6 +1605,7 @@ static int io_submit_sqes(struct io_ring_ctx *ctx, struct sqe_submit *sqes,
+>
+>  static int io_sq_thread(void *data)
 >  {
->         struct io_ring_ctx *ctx = req->ctx;
->         struct kiocb *kiocb = &req->rw;
-> @@ -487,7 +560,7 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
->         int fd, ret;
->
->         fd = READ_ONCE(sqe->fd);
-> -       kiocb->ki_filp = fget(fd);
-> +       kiocb->ki_filp = io_file_get(state, fd);
->         if (unlikely(!kiocb->ki_filp))
->                 return -EBADF;
->         kiocb->ki_pos = READ_ONCE(sqe->off);
-> @@ -528,7 +601,7 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
->         }
->         return 0;
->  out_fput:
-> -       fput(kiocb->ki_filp);
-> +       io_file_put(state, kiocb->ki_filp);
->         return ret;
->  }
-[...]
-> +static void io_submit_state_start(struct io_submit_state *state,
-> +                                 struct io_ring_ctx *ctx, unsigned max_ios)
+> +       struct io_uring_sqe lsqe[IO_IOPOLL_BATCH];
+>         struct sqe_submit sqes[IO_IOPOLL_BATCH];
+>         struct io_ring_ctx *ctx = data;
+>         struct mm_struct *cur_mm = NULL;
+> @@ -1701,6 +1705,14 @@ static int io_sq_thread(void *data)
+>                 i = 0;
+>                 all_fixed = true;
+>                 do {
+> +                       /*
+> +                        * Ensure sqe is stable between checking if we need
+> +                        * user access, and actually importing the iovec
+> +                        * further down the stack.
+> +                        */
+> +                       memcpy(&lsqe[i], sqes[i].sqe, sizeof(lsqe[i]));
+> +                       sqes[i].sqe = &lsqe[i];
+> +
 
-There are various places in your series where you use raw "unsigned"
-instead of "unsigned int"; when I run your tree through checkpatch.pl,
-it complains about that and a few other things. Please fix the
-checkpatch warnings (except for warnings where you know that they
-shouldn't apply here for some reason).
+What if io_submit_sqe() gets an -EAGAIN from __io_submit_sqe() and
+queues io_sq_wq_submit_work()? Could that cause io_sq_wq_submit_work()
+to read from io_sq_thread()'s lsge[i] while io_sq_thread() is already
+in the next loop iteration of the outer loop and has copied new data
+into lsge[i]?
