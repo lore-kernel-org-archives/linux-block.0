@@ -2,94 +2,113 @@ Return-Path: <SRS0=rnrW=QF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25E8CC282D0
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 00:48:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC01C282CD
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 00:55:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF31621841
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 00:47:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548722880;
-	bh=OKJP5Fh5DztKDHQi6SW3nU2kmEAGSW82rURwNmcmePU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=EOx9+AkQzGahq+9KaZR1TRDBKl47yurTp6nBgNpSRTY7nfoaEjOQEoHFXZTMpnLfi
-	 HZlhEKMcLJ1xgODvB17shRHGTTZJYoeDJEuJWuOhP1e0oNnso+8Zj/qhSbM9xwEDyP
-	 begZyqqdanZTHZIShrmRWYfNtNqztHDLAAP4OrcQ=
+	by mail.kernel.org (Postfix) with ESMTP id B57B42183F
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 00:55:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="C3ZX4WuZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727609AbfA2Ar6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Jan 2019 19:47:58 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35648 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726803AbfA2Ar6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Jan 2019 19:47:58 -0500
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3A5D7217F5
-        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 00:47:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548722877;
-        bh=OKJP5Fh5DztKDHQi6SW3nU2kmEAGSW82rURwNmcmePU=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=V9yQpe230gungDosKrbnJtMwffL0tdeJPYl9OzlXv36sNez7hz/1dAC95cSiHz+bv
-         Aixv3wtqaDIQW3fPjbadRCqU6s8H2Y0pwVWMEOYgIxiHoliQ2IEkJWYGEMLasEswO0
-         8nChADoxumvxHGiwf09sxNN8sysV9z8rSCdysRF8=
-Received: by mail-wr1-f49.google.com with SMTP id q18so20151971wrx.9
-        for <linux-block@vger.kernel.org>; Mon, 28 Jan 2019 16:47:57 -0800 (PST)
-X-Gm-Message-State: AJcUukd/uJckUz82+lGJSOwYQm+173fJI/1cG3whtOVBFOuT5w0LPIn2
-        JhHBjYUt1Y9W8uTYl53g91owwACKa2AEL3Jd4tLvjA==
-X-Google-Smtp-Source: ALg8bN6mc85CXp3I4XBLdUV/FPj7/ypCdXQxO73ptgzmwRGSAO8RzBvfBcwIsABpAvh9KYxAjghLDVZEN5BDHQQjhAs=
-X-Received: by 2002:adf:f0c5:: with SMTP id x5mr22737786wro.77.1548722875714;
- Mon, 28 Jan 2019 16:47:55 -0800 (PST)
-MIME-Version: 1.0
-References: <20190123153536.7081-1-axboe@kernel.dk> <20190123153536.7081-6-axboe@kernel.dk>
- <20190128145700.GA9795@lst.de>
-In-Reply-To: <20190128145700.GA9795@lst.de>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Mon, 28 Jan 2019 16:47:42 -0800
-X-Gmail-Original-Message-ID: <CALCETrV30uN2qOUEf+kNGWdphBtps7K3rEk8_8+VAwdtPomRkQ@mail.gmail.com>
-Message-ID: <CALCETrV30uN2qOUEf+kNGWdphBtps7K3rEk8_8+VAwdtPomRkQ@mail.gmail.com>
+        id S1727449AbfA2AzW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Jan 2019 19:55:22 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:38638 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726920AbfA2AzW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 28 Jan 2019 19:55:22 -0500
+Received: by mail-pg1-f196.google.com with SMTP id g189so7987384pgc.5
+        for <linux-block@vger.kernel.org>; Mon, 28 Jan 2019 16:55:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Av2wwZTKSuhz2t0+AX1q9j5HIZdT7zqpnF6SMoM1k9k=;
+        b=C3ZX4WuZLTDIkTcS00lKsnZ9ITjjKCHdeXi0g2D6N0BTJv4t0/m5EAuyRriMlIevMw
+         s4hZn2G0BaaTPYY2NpK7uDgxy68fXgZINY0aNHoHQvxNqYW8f35E6jzxYt9jw517620u
+         ACx6r7yHDT+pFs6SZ9Rgo3e9Gwck/Nw0wlirl0cp/0s+jCmBomRPtD1VKZHSX4UG9gPu
+         fkGkj8gL6Z8LLi0ec0brjMUetGrk/ITYDtfVZT88V96wquyEYJJyZhB8Ff5rHQLDtmec
+         ZJztOZz/Ttv5u28jalzziR+ty3wD4ruscGjgWVSO7laCbgn+Aj0wT/Bf6uxBzvStOSj4
+         jD3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Av2wwZTKSuhz2t0+AX1q9j5HIZdT7zqpnF6SMoM1k9k=;
+        b=VB8Mw9Rcwnb6/539DOmSfQ8OEV24pT4RB22HtfIpGvHJ1sicS1xusGbdFV4jyoNSAF
+         jeUAsh42etaN9zM0nrZXJzGyzMtRROjjzAk1orvy9Zu2Y/5ReitR6vaSrQAwxAjaATkb
+         gspjcl5MEj5Rp7AdQpm4crAVjLqiURtQ4gQexp3fiTfwHcYU3xDRHTdrHzykMUzp4LSv
+         w811UQNriIAhvAcxhi6psn3RW4J0SgZgFRZBGX4SfT+ydU72M4hl7b0Xz6CH/oqeTBAB
+         HVS+LtifqZzW3h/tCjTHM8bSHhGgcPtUOLRPaB2tuQyVirBSiKqBL+ky/6kjVELSegYm
+         1Oqg==
+X-Gm-Message-State: AJcUukcp7pbjiZooLBJEFg38NAsNO0sd64wFLmJYaMcWntUtyy/RLsXD
+        gRqMziIx3otRslI6iHd/0IrrtQ==
+X-Google-Smtp-Source: ALg8bN4BatF11hSK6QzugLUstuEVcmHmTo7Sz7h/+7NHHtBimKhDSGZgl2l2ni63tmh1N56/2PtwfQ==
+X-Received: by 2002:a62:425b:: with SMTP id p88mr24441416pfa.137.1548723321747;
+        Mon, 28 Jan 2019 16:55:21 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id 78sm50525408pft.184.2019.01.28.16.55.19
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 28 Jan 2019 16:55:20 -0800 (PST)
 Subject: Re: [PATCH 05/18] Add io_uring IO interface
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-aio@kvack.org, linux-block@vger.kernel.org,
-        Jeff Moyer <jmoyer@redhat.com>, Avi Kivity <avi@scylladb.com>,
-        Linux API <linux-api@vger.kernel.org>,
-        linux-man <linux-man@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     Jann Horn <jannh@google.com>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>, linux-aio@kvack.org,
+        linux-block@vger.kernel.org, linux-man <linux-man@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
+        jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>
+References: <20190128213538.13486-1-axboe@kernel.dk>
+ <20190128213538.13486-6-axboe@kernel.dk>
+ <CAG48ez0vDqDH4ks7q4L3F+xt-4kVQrN1yw34QwFAmwQyy27FTw@mail.gmail.com>
+ <e9326a77-54c5-e2b8-d9e5-663261462597@kernel.dk>
+ <CAG48ez17NW0GJVRC6dFcHZTgQifFz5og1XCUbXkHKhr6f=j74Q@mail.gmail.com>
+ <c20a1250-9f3f-a286-9baf-5b71db0c128f@kernel.dk>
+ <51c759f4-7ce5-182b-98e8-2c0e99ca4f9a@kernel.dk>
+ <CAG48ez3XGjFZbPiof4u4QGtoumBXXfCsFxOQ_2pGt=MnqqY7ZQ@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a89d28dc-d0c4-d84e-b3f2-20d10c6f673e@kernel.dk>
+Date:   Mon, 28 Jan 2019 17:55:18 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <CAG48ez3XGjFZbPiof4u4QGtoumBXXfCsFxOQ_2pGt=MnqqY7ZQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 28, 2019 at 6:57 AM Christoph Hellwig <hch@lst.de> wrote:
->
-> [please make sure linux-api and linux-man are CCed on new syscalls
-> so that we get API experts to review them]
+On 1/28/19 5:34 PM, Jann Horn wrote:
+> On Tue, Jan 29, 2019 at 1:32 AM Jens Axboe <axboe@kernel.dk> wrote:
+>> On 1/28/19 5:03 PM, Jens Axboe wrote:
+>>>> But you only do that teardown on ->release, right? And ->release
+>>>> doesn't have much to do with the process lifetime.
+>>>
+>>> Yes, only on ->relase().
+>>
+>> OK, so I reworked the files struct to just grab it, then we ensure that
+>> doesn't go away. For mm, it's a bit more tricky. I think the best
+>> solution here is to add a fops->flush() and check for the process
+>> exiting its files. If it does, we quiesce the async contexts and prevent
+>> further use of that mm. We can't just keep holding a reference to the mm
+>> like we do with the files.
+>>
+>> That should solve both cases.
+> 
+> You still have to hold a reference on the mm though, I think (for
+> example, because two tasks might be sharing the fd table without
+> sharing the mm).
 
-> > +static int io_import_iovec(struct io_ring_ctx *ctx, int rw,
-> > +                        const struct io_uring_sqe *sqe,
-> > +                        struct iovec **iovec, struct iov_iter *iter)
-> > +{
-> > +     void __user *buf = u64_to_user_ptr(sqe->addr);
-> > +
-> > +#ifdef CONFIG_COMPAT
-> > +     if (ctx->compat)
-> > +             return compat_import_iovec(rw, buf, sqe->len, UIO_FASTIOV,
-> > +                                             iovec, iter);
-> > +#endif
->
-> I think we can just check in_compat_syscall() here, which means we
-> can kill the ->compat member, and the separate compat version of the
-> setup syscall.
->
+Yes good point, except we can't hold a reference to it. But I think
+we can get around this by using an mmu notifier instead. That eliminates
+the need for ->flush() as well.
 
-Since this whole API is new, I don't suppose you could introduce a
-struct iovec64 or similar and just make the ABI be identical for
-64-bit and 32-bit code?
+-- 
+Jens Axboe
 
---Andy
