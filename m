@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5F88C169C4
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 19:27:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBEE2C169C4
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 19:27:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B524B20989
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 19:27:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95F9521848
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 19:27:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="SLPThqIK"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="k6su8z3g"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729058AbfA2T1N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jan 2019 14:27:13 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:52085 "EHLO
+        id S1729090AbfA2T1P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jan 2019 14:27:15 -0500
+Received: from mail-it1-f193.google.com ([209.85.166.193]:39714 "EHLO
         mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728991AbfA2T1M (ORCPT
+        with ESMTP id S1728971AbfA2T1O (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jan 2019 14:27:12 -0500
-Received: by mail-it1-f193.google.com with SMTP id w18so6439499ite.1
-        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 11:27:12 -0800 (PST)
+        Tue, 29 Jan 2019 14:27:14 -0500
+Received: by mail-it1-f193.google.com with SMTP id a6so6400046itl.4
+        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 11:27:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=FBZUThjVgqlafR/VslkU6xBWVbQBqldD6jr0wVQhMXM=;
-        b=SLPThqIKiqbj7HBmM5uswNYW6aEvsWxLSuxG184drJbuH24FPNHnSjq23bScQKVwJJ
-         6REm+7yGIvUu4fVbvQR43gz2S1xK5GuY8jpqRlpWr03IQdi5lRFaqPN19x76aqk3gmXj
-         jn/gl/zs0TlVXGrU5rWyVhKrgmbzt6wpnG6c7FDSJ8rtxQsEZjH9Dkq5E9CwLpx/6m0U
-         2KtlNLewwyWZynYX4D9XpQNnK0wejyPu63AuWa1O+8zsvKWT1HrhslVgiYgi+hYR7fkz
-         Nh5cYZ1LRoZct1JfpCEQeh6ja9iyHnEjgdR/veB7rkUtK2imSZY/oLUYQ7/HkeccNgTb
-         TEQg==
+        bh=tkb1muQx9x9KnElGaaM03AUkKIKh+AW+Xsb0ZQn8sQk=;
+        b=k6su8z3gRx62Kn2cmizVgOdlasqhFVpbA5BR/C9dtvF3m9i1843c8/lVJvQTQHtz9U
+         NKrVzRxrVjko4eQj+5oXf843b7qxxAYSAKe1n8IGaCFKqVfJLq90BQbmMzy0RN7B7p4J
+         /H3ApWE9+i0lhUMBcROs6RbZdKn0qwtZtjNRp2Lv3JLWBHS9kJ34/7yK90N3hZRFS9XY
+         EO7iQ9mo1vnmGLIne9JkCZ2ivO1O+Iq2DiCkYteOBGg2G1GL8Dw5lFhGcQA3ei7sgx+h
+         OvBjiskQ0GWzVYxzRbardQlMUb1NOFMlMI9bQ+uLBDLRZOmWL2JtlKJvyRjprU1YYAa5
+         kIqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=FBZUThjVgqlafR/VslkU6xBWVbQBqldD6jr0wVQhMXM=;
-        b=ZO87HFcsvTA6LPX6tGcFxtQaJwOQz/UC2bNo/jTV8b0PuM1EUB9NW4KAo2Q8qyXzeX
-         sWffzzZQLFUM51MpabmoqFGlRIEXaICM8jWKGWRm4vnpcG5ILUTen+1VFLqq/iO7paA5
-         eFuCENElbwBsWdWUbqKCLmGAWlwkK5e/tsfgbFO/VT5zQKFJsklebP9dRXPWx2hRdT93
-         7ZsPfRpq5w8XrD8JhQj41jRebC+PHtGky7Q8nhfRTvW+C/eXFrB54gwoXsQH0kQ9JsVn
-         Q0Fgr0dQckYPITx4aBWw94FG2Ubl2kYqk4L4aUyvOB1RsiSbMhZsEsXo7h+MK0cEeNo9
-         4unA==
-X-Gm-Message-State: AJcUukcdPbxewnOlEahTMPidVe7BDlrZ5MRL30lPunZZVK3q7JjpSUxw
-        5g/oQV9QrArVZg0kPGwmQc2IkQ==
-X-Google-Smtp-Source: ALg8bN7an+spzZZ/GStEdkJ21j9I5XPaV9bQigkRIQs49kQ9tDLi6v3J9+c4PZ8dPm2atFMfwQ1eDQ==
-X-Received: by 2002:a24:e44:: with SMTP id 65mr11878064ite.154.1548790031977;
-        Tue, 29 Jan 2019 11:27:11 -0800 (PST)
+        bh=tkb1muQx9x9KnElGaaM03AUkKIKh+AW+Xsb0ZQn8sQk=;
+        b=tL6InCxpmi7IeAaMQOAObvupWuUlb0Jxbi6qPnrXv3p0Rtm1U0kQi84903pA67wllK
+         arVuX1bxn9NlcP+zA/OQlSxoi45vJh5EKbvjKTynRAGd0yOuJcrabkczcC7ySNXeZrSt
+         gKm54ral0uWoyADz2Dhf4mrrpZGCrIBZuoEX7pJ1hm1J8i21ISqTvuedufsL0lrgJd8G
+         glVxpsAnTKudU4skaie84hBkVOK3cCb69ewLLjZkhhkcUTjOvLjBdrEseC+tAVb9Esj9
+         6Ah/vIKerwThRis2GAOeb8PnsObXdqWRQpSp7/pIbfjl6eAaqE9KjoAloktx+c2+NbRO
+         tvCg==
+X-Gm-Message-State: AJcUukd+5wjmRWjG5Qm4hlIUHjooY3XOormMFkC/1xUQtWQ0objboDSD
+        nItpZD3aY/1UWM+oBgAYZ+A+wQ==
+X-Google-Smtp-Source: ALg8bN6iz8Zbh2hXjaM75kA7ixs3MxerS+Cr+vZPwANqIPUR/iGl/baklpQGTCh1aLXVnNtbsM5SyA==
+X-Received: by 2002:a24:3555:: with SMTP id k82mr12814237ita.84.1548790033704;
+        Tue, 29 Jan 2019 11:27:13 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id y3sm15223203iol.55.2019.01.29.11.27.10
+        by smtp.gmail.com with ESMTPSA id y3sm15223203iol.55.2019.01.29.11.27.12
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 29 Jan 2019 11:27:11 -0800 (PST)
+        Tue, 29 Jan 2019 11:27:12 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-aio@kvack.org, linux-block@vger.kernel.org,
         linux-api@vger.kernel.org
 Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com, jannh@google.com,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 03/18] block: add bio_set_polled() helper
-Date:   Tue, 29 Jan 2019 12:26:47 -0700
-Message-Id: <20190129192702.3605-4-axboe@kernel.dk>
+Subject: [PATCH 04/18] iomap: wire up the iopoll method
+Date:   Tue, 29 Jan 2019 12:26:48 -0700
+Message-Id: <20190129192702.3605-5-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190129192702.3605-1-axboe@kernel.dk>
 References: <20190129192702.3605-1-axboe@kernel.dk>
@@ -70,66 +70,161 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For the upcoming async polled IO, we can't sleep allocating requests.
-If we do, then we introduce a deadlock where the submitter already
-has async polled IO in-flight, but can't wait for them to complete
-since polled requests must be active found and reaped.
+From: Christoph Hellwig <hch@lst.de>
 
-Utilize the helper in the blockdev DIRECT_IO code.
+Store the request queue the last bio was submitted to in the iocb
+private data in addition to the cookie so that we find the right block
+device.  Also refactor the common direct I/O bio submission code into a
+nice little helper.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+
+Modified to use bio_set_polled().
+
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/block_dev.c      |  4 ++--
- include/linux/bio.h | 14 ++++++++++++++
- 2 files changed, 16 insertions(+), 2 deletions(-)
+ fs/gfs2/file.c        |  2 ++
+ fs/iomap.c            | 43 ++++++++++++++++++++++++++++---------------
+ fs/xfs/xfs_file.c     |  1 +
+ include/linux/iomap.h |  1 +
+ 4 files changed, 32 insertions(+), 15 deletions(-)
 
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index f18d076a2596..392e2bfb636f 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -247,7 +247,7 @@ __blkdev_direct_IO_simple(struct kiocb *iocb, struct iov_iter *iter,
- 		task_io_account_write(ret);
- 	}
- 	if (iocb->ki_flags & IOCB_HIPRI)
--		bio.bi_opf |= REQ_HIPRI;
-+		bio_set_polled(&bio, iocb);
+diff --git a/fs/gfs2/file.c b/fs/gfs2/file.c
+index a2dea5bc0427..58a768e59712 100644
+--- a/fs/gfs2/file.c
++++ b/fs/gfs2/file.c
+@@ -1280,6 +1280,7 @@ const struct file_operations gfs2_file_fops = {
+ 	.llseek		= gfs2_llseek,
+ 	.read_iter	= gfs2_file_read_iter,
+ 	.write_iter	= gfs2_file_write_iter,
++	.iopoll		= iomap_dio_iopoll,
+ 	.unlocked_ioctl	= gfs2_ioctl,
+ 	.mmap		= gfs2_mmap,
+ 	.open		= gfs2_open,
+@@ -1310,6 +1311,7 @@ const struct file_operations gfs2_file_fops_nolock = {
+ 	.llseek		= gfs2_llseek,
+ 	.read_iter	= gfs2_file_read_iter,
+ 	.write_iter	= gfs2_file_write_iter,
++	.iopoll		= iomap_dio_iopoll,
+ 	.unlocked_ioctl	= gfs2_ioctl,
+ 	.mmap		= gfs2_mmap,
+ 	.open		= gfs2_open,
+diff --git a/fs/iomap.c b/fs/iomap.c
+index a3088fae567b..4ee50b76b4a1 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -1454,6 +1454,28 @@ struct iomap_dio {
+ 	};
+ };
  
- 	qc = submit_bio(&bio);
- 	for (;;) {
-@@ -415,7 +415,7 @@ __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter, int nr_pages)
- 		nr_pages = iov_iter_npages(iter, BIO_MAX_PAGES);
- 		if (!nr_pages) {
- 			if (iocb->ki_flags & IOCB_HIPRI)
--				bio->bi_opf |= REQ_HIPRI;
-+				bio_set_polled(bio, iocb);
- 
- 			qc = submit_bio(bio);
- 			WRITE_ONCE(iocb->ki_cookie, qc);
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 7380b094dcca..f6f0a2b3cbc8 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -823,5 +823,19 @@ static inline int bio_integrity_add_page(struct bio *bio, struct page *page,
- 
- #endif /* CONFIG_BLK_DEV_INTEGRITY */
- 
-+/*
-+ * Mark a bio as polled. Note that for async polled IO, the caller must
-+ * expect -EWOULDBLOCK if we cannot allocate a request (or other resources).
-+ * We cannot block waiting for requests on polled IO, as those completions
-+ * must be found by the caller. This is different than IRQ driven IO, where
-+ * it's safe to wait for IO to complete.
-+ */
-+static inline void bio_set_polled(struct bio *bio, struct kiocb *kiocb)
++int iomap_dio_iopoll(struct kiocb *kiocb, bool spin)
 +{
-+	bio->bi_opf |= REQ_HIPRI;
-+	if (!is_sync_kiocb(kiocb))
-+		bio->bi_opf |= REQ_NOWAIT;
++	struct request_queue *q = READ_ONCE(kiocb->private);
++
++	if (!q)
++		return 0;
++	return blk_poll(q, READ_ONCE(kiocb->ki_cookie), spin);
++}
++EXPORT_SYMBOL_GPL(iomap_dio_iopoll);
++
++static void iomap_dio_submit_bio(struct iomap_dio *dio, struct iomap *iomap,
++		struct bio *bio)
++{
++	atomic_inc(&dio->ref);
++
++	if (dio->iocb->ki_flags & IOCB_HIPRI)
++		bio_set_polled(bio, dio->iocb);
++
++	dio->submit.last_queue = bdev_get_queue(iomap->bdev);
++	dio->submit.cookie = submit_bio(bio);
 +}
 +
- #endif /* CONFIG_BLOCK */
- #endif /* __LINUX_BIO_H */
+ static ssize_t iomap_dio_complete(struct iomap_dio *dio)
+ {
+ 	struct kiocb *iocb = dio->iocb;
+@@ -1566,7 +1588,7 @@ static void iomap_dio_bio_end_io(struct bio *bio)
+ 	}
+ }
+ 
+-static blk_qc_t
++static void
+ iomap_dio_zero(struct iomap_dio *dio, struct iomap *iomap, loff_t pos,
+ 		unsigned len)
+ {
+@@ -1580,15 +1602,10 @@ iomap_dio_zero(struct iomap_dio *dio, struct iomap *iomap, loff_t pos,
+ 	bio->bi_private = dio;
+ 	bio->bi_end_io = iomap_dio_bio_end_io;
+ 
+-	if (dio->iocb->ki_flags & IOCB_HIPRI)
+-		flags |= REQ_HIPRI;
+-
+ 	get_page(page);
+ 	__bio_add_page(bio, page, len, 0);
+ 	bio_set_op_attrs(bio, REQ_OP_WRITE, flags);
+-
+-	atomic_inc(&dio->ref);
+-	return submit_bio(bio);
++	iomap_dio_submit_bio(dio, iomap, bio);
+ }
+ 
+ static loff_t
+@@ -1691,9 +1708,6 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+ 				bio_set_pages_dirty(bio);
+ 		}
+ 
+-		if (dio->iocb->ki_flags & IOCB_HIPRI)
+-			bio->bi_opf |= REQ_HIPRI;
+-
+ 		iov_iter_advance(dio->submit.iter, n);
+ 
+ 		dio->size += n;
+@@ -1701,11 +1715,7 @@ iomap_dio_bio_actor(struct inode *inode, loff_t pos, loff_t length,
+ 		copied += n;
+ 
+ 		nr_pages = iov_iter_npages(&iter, BIO_MAX_PAGES);
+-
+-		atomic_inc(&dio->ref);
+-
+-		dio->submit.last_queue = bdev_get_queue(iomap->bdev);
+-		dio->submit.cookie = submit_bio(bio);
++		iomap_dio_submit_bio(dio, iomap, bio);
+ 	} while (nr_pages);
+ 
+ 	/*
+@@ -1916,6 +1926,9 @@ iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 	if (dio->flags & IOMAP_DIO_WRITE_FUA)
+ 		dio->flags &= ~IOMAP_DIO_NEED_SYNC;
+ 
++	WRITE_ONCE(iocb->ki_cookie, dio->submit.cookie);
++	WRITE_ONCE(iocb->private, dio->submit.last_queue);
++
+ 	if (!atomic_dec_and_test(&dio->ref)) {
+ 		if (!dio->wait_for_completion)
+ 			return -EIOCBQUEUED;
+diff --git a/fs/xfs/xfs_file.c b/fs/xfs/xfs_file.c
+index e47425071e65..60c2da41f0fc 100644
+--- a/fs/xfs/xfs_file.c
++++ b/fs/xfs/xfs_file.c
+@@ -1203,6 +1203,7 @@ const struct file_operations xfs_file_operations = {
+ 	.write_iter	= xfs_file_write_iter,
+ 	.splice_read	= generic_file_splice_read,
+ 	.splice_write	= iter_file_splice_write,
++	.iopoll		= iomap_dio_iopoll,
+ 	.unlocked_ioctl	= xfs_file_ioctl,
+ #ifdef CONFIG_COMPAT
+ 	.compat_ioctl	= xfs_file_compat_ioctl,
+diff --git a/include/linux/iomap.h b/include/linux/iomap.h
+index 9a4258154b25..0fefb5455bda 100644
+--- a/include/linux/iomap.h
++++ b/include/linux/iomap.h
+@@ -162,6 +162,7 @@ typedef int (iomap_dio_end_io_t)(struct kiocb *iocb, ssize_t ret,
+ 		unsigned flags);
+ ssize_t iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 		const struct iomap_ops *ops, iomap_dio_end_io_t end_io);
++int iomap_dio_iopoll(struct kiocb *kiocb, bool spin);
+ 
+ #ifdef CONFIG_SWAP
+ struct file;
 -- 
 2.17.1
 
