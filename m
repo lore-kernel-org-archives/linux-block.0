@@ -7,88 +7,81 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 711CFC169C4
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 15:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B787DC169C4
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 15:39:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 40A08214DA
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 15:36:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77C5D20881
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 15:39:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YsIjk8WG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NIWc1LMC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726230AbfA2PgV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jan 2019 10:36:21 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:45528 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725747AbfA2PgV (ORCPT
+        id S1726462AbfA2PjE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jan 2019 10:39:04 -0500
+Received: from mail-oi1-f195.google.com ([209.85.167.195]:41968 "EHLO
+        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725790AbfA2PjD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jan 2019 10:36:21 -0500
-Received: by mail-ot1-f68.google.com with SMTP id 32so18175814ota.12
-        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 07:36:21 -0800 (PST)
+        Tue, 29 Jan 2019 10:39:03 -0500
+Received: by mail-oi1-f195.google.com with SMTP id j21so16465791oii.8
+        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 07:39:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=6fhtTma8g9QYg4WWKbS6DiUFalqkBt76eekqDoRV62c=;
-        b=YsIjk8WGpOotaM/7F2QRAkmGSARSRJ353Gwbm8iD5Fw/Rq8+YaCuoaJ0FbutwaeElg
-         En5hGYrY7nML1EBqAseEkChJKY3OggUXIdMNWGD4458A018UyE7npIDaSH9osXuyu548
-         AXvsP+Q0P18BZ+5YlY8tUtSQom/bFujVmqVrGG9aGzW+7Da42AF1SlUE1SkhnOKiVPn/
-         M2dA5MOTv5SPXCF/+W7iusbUQv+mui/9x9fkwJ7byuwmjkyfBOlAmpQoeqxjjnVr0I3o
-         CD1BzjVaBWMDABcmnggR/jY7Csc7fVgITczF+p0j/2+9aOxKSjpEuOk8bZwU3ppbRshd
-         T1aw==
+        bh=v1kNZNna8iImPxLDF0OjMSD6LPq39L0c3zI6goHZAVM=;
+        b=NIWc1LMCy/NSK+vHX/gJplofQMhq0V25sEOhJ/uji/fpq/P6OHeZiwx06njekx5vX5
+         A/f6BxWjAA9zYKRoylxkjI7LTCz5CsPE71DkxW8LeS+PqADhOFHHmxX99JpHPNRmbdVE
+         486UKmjUNl1784riBiPb1KUb0T/2VkACObmYrdPEkj60i8Bstsir69F+IHedjUynHe9d
+         rMBxGHCwRZDCbJ/5ZwkGOWvGxZCWl1wFiBtIby1LeZmj0wosVfpaiycxz6uuKksG0tb6
+         uWFheJuRBSmF2ouJK+56DEajSkHnL8/4yJzRa63PPUpYI+tfHEE9FVJPvXyaTimszc1C
+         4u0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=6fhtTma8g9QYg4WWKbS6DiUFalqkBt76eekqDoRV62c=;
-        b=jSETj4S3Wlsgi2ALLmTugYCOblaY6yLsHqbwBcy6kTAximXYX4oklVyHAaBfDUMMLC
-         FD55g5Q5ITiM3WCRGtNYJs0GPGW1S5dbUu8ecS4tEeJ+/9QiWaLt92gJtIA+lpNncQut
-         L/CKCjH4UdaBatMNKQOS8Up/Cc3TTBhPOWuRkyyRdC/FUiJlfIa0LpObGwF5wxnt1fm1
-         t9dZJxtnhUvh02QulEeKKdS1R8AuE5jsjyZdpZDonAw0TawBZx0zxKJoHguw1V8ynwTy
-         6Clx+7mDoZtRvRFtRU7MXv+IQ2dJGxV0N2NZXzVCM3OhQQgQti9bpThCZg9SMK0E9BbO
-         PqKg==
-X-Gm-Message-State: AJcUukdo2yIcqjeGhNVNgyRpYiAEQvc7hQKMJwnjjh0/G/G/4XbkbXIW
-        eBXhZC+qSkofCGESoBAvW746e8ubCeO15r/e5QAbGlioDto=
-X-Google-Smtp-Source: ALg8bN7Uomxaq2jtH6rRFf8A2utuskUv/SPiaPAys42bp/2q4PUAoidmDmIKeqFxPv7J0B31wjQ8kEZFNHZ5OrUxCbA=
-X-Received: by 2002:a9d:4c01:: with SMTP id l1mr20124550otf.242.1548776180499;
- Tue, 29 Jan 2019 07:36:20 -0800 (PST)
+        bh=v1kNZNna8iImPxLDF0OjMSD6LPq39L0c3zI6goHZAVM=;
+        b=WuWjXg3S5XvrOjL4okxAvLFOr3hV4xcI8QbYoMfjsN4qhEbzwZjNWcdvzhkXLs6VVt
+         8bCXKUafwJwoBIuonUsKDNzhM2El+oRIgdBF2RO/tBUwObRTDsambXZCw8ghIgfRJw33
+         TUN7T75UaweJ6ZnsiZui/Oq/6k7DCeQWpPbY/vaftQfpSGbE9OLBbvAPrEm1pK74T3rv
+         wCLQtRS/pSqDMwDugflThDTqKMuO0/+2XWpIkmvfWws7OCE0gdopnwZsMEJ4pP32E8dH
+         3Cqdhq9CPgu3yciRdnrsexkv/ZRl/NZBynzR3q2RRJ/HiP0vv3QsRDH9a9oh+ohRvm6y
+         Oy0Q==
+X-Gm-Message-State: AHQUAuY5t9UPJqtyuPxdDFrHGldMNpYVJNHNlSQk1jzA8vn11t9NyxyP
+        HA5SrBorCEnOiA3K0XPNGqpffPiF1O941CBJ5ho8iA==
+X-Google-Smtp-Source: ALg8bN6P4/rkbc+CYtS9XYwtZ8NqDGSq+jecYsYYxnBRF2sMoxH1rJbzb3vI/n5pjtvHyo/pRWqzCVgwlF/yShZtoQU=
+X-Received: by 2002:aca:c43:: with SMTP id i3mr9910948oiy.157.1548776342973;
+ Tue, 29 Jan 2019 07:39:02 -0800 (PST)
 MIME-Version: 1.0
 References: <20190128213538.13486-1-axboe@kernel.dk> <20190128213538.13486-6-axboe@kernel.dk>
-In-Reply-To: <20190128213538.13486-6-axboe@kernel.dk>
+ <87tvhrpsqg.fsf@oldenburg2.str.redhat.com> <74fd3127-75f1-3a48-d3cb-a8f6c9bd0b74@kernel.dk>
+In-Reply-To: <74fd3127-75f1-3a48-d3cb-a8f6c9bd0b74@kernel.dk>
 From:   Jann Horn <jannh@google.com>
-Date:   Tue, 29 Jan 2019 16:35:54 +0100
-Message-ID: <CAG48ez1ZM5KxjYGuDysZfNDQ_RjrrXWAM=vwyOfRi=oFdby1mQ@mail.gmail.com>
+Date:   Tue, 29 Jan 2019 16:38:36 +0100
+Message-ID: <CAG48ez0PPWP7GU5kinzejN1B3invrcxCZT2fkpnHxMK2F0pj6A@mail.gmail.com>
 Subject: Re: [PATCH 05/18] Add io_uring IO interface
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
-        jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>
+Cc:     Florian Weimer <fweimer@redhat.com>, linux-aio@kvack.org,
+        linux-block@vger.kernel.org, Linux API <linux-api@vger.kernel.org>,
+        hch@lst.de, jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jan 28, 2019 at 10:35 PM Jens Axboe <axboe@kernel.dk> wrote:
-> The submission queue (SQ) and completion queue (CQ) rings are shared
-> between the application and the kernel. This eliminates the need to
-> copy data back and forth to submit and complete IO.
-[...]
-> +static int io_import_iovec(struct io_ring_ctx *ctx, int rw,
-> +                          const struct io_uring_sqe *sqe,
-> +                          struct iovec **iovec, struct iov_iter *iter)
-> +{
-> +       void __user *buf = u64_to_user_ptr(sqe->addr);
-> +
-> +#ifdef CONFIG_COMPAT
-> +       if (in_compat_syscall())
-> +               return compat_import_iovec(rw, buf, sqe->len, UIO_FASTIOV,
-> +                                               iovec, iter);
-> +#endif
-> +
-> +       return import_iovec(rw, buf, sqe->len, UIO_FASTIOV, iovec, iter);
-> +}
+On Tue, Jan 29, 2019 at 2:35 PM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 1/29/19 5:12 AM, Florian Weimer wrote:
+> > * Jens Axboe:
+> >
+> >> +#define IORING_MAX_ENTRIES  4096
+> >
+> > Where does this constant come from?  Should it really be exposed to
+> > userspace?
+>
+> Seems pretty handy for the application to know what the limit is?
 
-This code can run in kthread context, right? I think
-in_compat_syscall() might not work if this is a kthread launched by a
-compat task; I don't see anything that propagates the compat flag to
-the kthread.
+The running kernel version might be different from the kernel version
+whose headers the userspace code was compiled with. So if this is a
+limit that might change at some point in the future, and you think
+userspace wants to know the limit, some other API might be better.
