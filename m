@@ -2,104 +2,90 @@ Return-Path: <SRS0=rnrW=QF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E622C169C4
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 09:42:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A25ADC169C4
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 10:07:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3627A2177E
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 09:42:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linbit-com.20150623.gappssmtp.com header.i=@linbit-com.20150623.gappssmtp.com header.b="Mkc6KrhC"
+	by mail.kernel.org (Postfix) with ESMTP id 7924420881
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 10:07:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726923AbfA2Jme (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jan 2019 04:42:34 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:34971 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725536AbfA2Jme (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jan 2019 04:42:34 -0500
-Received: by mail-wr1-f67.google.com with SMTP id 96so21274061wrb.2
-        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 01:42:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=H2Egnq9ngobzM8WF4zpWb1uknJJq7nzRKi8Y170uTDA=;
-        b=Mkc6KrhC37fpkEc1cjdGSc4prGRcAu+EXzaOB+JwK4KB0dJgTi0PCMQ/KAmXIirj1y
-         /PVJsANQVQFeAnlxFYFGEX/TQu7OyQKi06qs6k/WDC6Qg6WSCKuxHfdM5AimiJvnrPmu
-         Tyk3jjE7X7Fz9aoOOJA/hHO9Xzm25ynS52zb9lldvTIZo0XOU7jlSToPu7ytV4Araae9
-         KaNIOR/aNplYDncNt9J5rPKvZO077y7qnBrNj2InLp158vLxzXt1p/5fX+RYT0TR0MmF
-         0vruTpnNuxWyW3a/+r0rgtiVcR+P7bnIj/bzo1gbXSFeIQR0VamrRsKaGwwqrXEZcTp8
-         Smtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=H2Egnq9ngobzM8WF4zpWb1uknJJq7nzRKi8Y170uTDA=;
-        b=GS204wrkHzJpkopCekf8G1gYy1hloVTeXukjr6/HQaxazcI8cCv2SrybGwYLKOV5D2
-         e7lHHvVvtBg5GDCio2VVX09lhxJiO/bfPnZdyAKGlToNTW3AsHEOWoHu1akMMvub1LtK
-         jCgNKAK3tsVSLiffoi/6g2UxeAnxaRJvrof1sH4my149ErjITUSGDcImUlu2/zLtKWSD
-         iFagdh7G+gqWrAcIIpFRhfUqDreFwzm4lJlY9eweVpcBje5Vw7L6PDjfqc7pO72OiNmw
-         GEgQblHcC8sBEosnvEWdqXV/3Kt6Roha7QoyTST9H4sgorxDpqZWkkB/nVNpx1To8DDy
-         I20w==
-X-Gm-Message-State: AJcUuke6dUphRQ0xIib9IQ5cjdWu33W5c1hoItI6MM5IaWOLubERxZ6h
-        v4ie+jI2ICJFtP+FeJ7m135j7A==
-X-Google-Smtp-Source: ALg8bN7oMLYGldESo7Z7HTbVai65yGyAp0Ba8wqgiWMFahT02R8f1Vyiy4J30GK/Or0OaWqhoVvOug==
-X-Received: by 2002:a5d:4652:: with SMTP id j18mr25895841wrs.279.1548754952786;
-        Tue, 29 Jan 2019 01:42:32 -0800 (PST)
-Received: from localhost (213-47-144-126.static.upcbusiness.at. [213.47.144.126])
-        by smtp.gmail.com with ESMTPSA id z17sm87962125wrv.2.2019.01.29.01.42.31
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 29 Jan 2019 01:42:31 -0800 (PST)
-Date:   Tue, 29 Jan 2019 10:42:31 +0100
-From:   Roland Kammerer <roland.kammerer@linbit.com>
-To:     "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Cc:     Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        drbd-dev@lists.linbit.com
-Subject: Re: [Drbd-dev] [PATCH] block: Mark expected switch fall-throughs
-Message-ID: <20190129094230.ezjzpfwf5xx47luu@rck.sh>
-References: <20190123064501.GA26147@embeddedor>
+        id S1726832AbfA2KHF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jan 2019 05:07:05 -0500
+Received: from mx2.suse.de ([195.135.220.15]:36094 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725799AbfA2KHE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 29 Jan 2019 05:07:04 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 51B5DB01F;
+        Tue, 29 Jan 2019 10:07:03 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 47B8F1E3FEA; Tue, 29 Jan 2019 11:07:02 +0100 (CET)
+Date:   Tue, 29 Jan 2019 11:07:02 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Keith Busch <keith.busch@intel.com>
+Cc:     Jan Kara <jack@suse.cz>, Kanchan Joshi <joshi.k@samsung.com>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "jack@suse.com" <jack@suse.com>,
+        "david@fromorbit.com" <david@fromorbit.com>,
+        "tytso@mit.edu" <tytso@mit.edu>,
+        "prakash.v@samsung.com" <prakash.v@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH v2 0/4] Write-hint for FS journal
+Message-ID: <20190129100702.GA29981@quack2.suse.cz>
+References: <CGME20190109153328epcas2p4643cbdc7a2182b47893a2bcaa0778e17@epcas2p4.samsung.com>
+ <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
+ <20190125162353.GA11210@localhost.localdomain>
+ <20190128124709.GB27972@quack2.suse.cz>
+ <20190128232423.GD15302@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190123064501.GA26147@embeddedor>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <20190128232423.GD15302@localhost.localdomain>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jan 23, 2019 at 12:45:01AM -0600, Gustavo A. R. Silva wrote:
-> In preparation to enabling -Wimplicit-fallthrough, mark switch cases
-> where we are expecting to fall through.
+On Mon 28-01-19 16:24:24, Keith Busch wrote:
+> On Mon, Jan 28, 2019 at 04:47:09AM -0800, Jan Kara wrote:
+> > On Fri 25-01-19 09:23:53, Keith Busch wrote:
+> > > On Wed, Jan 09, 2019 at 09:00:57PM +0530, Kanchan Joshi wrote:
+> > > > Towards supporing write-hints/streams for filesystem journal.                   
+> > > >                                                                                 
+> > > > Here is the v1 patch for background -                                           
+> > > > https://marc.info/?l=linux-fsdevel&m=154444637519020&w=2                        
+> > > >                                                                                 
+> > > > Changes since v1:                                                               
+> > > > - introduce four more hints for in-kernel use, as recommended by Dave chinner   
+> > > >   & Jens axboe. This isolates kernel-mode hints from user-mode ones.            
+> > > 
+> > > The nvme driver disables streams if the controller doesn't support
+> > > BLK_MAX_WRITE_HINT number of streams, so this series breaks the feature
+> > > for controllers that only support up to 4.
+> > 
+> > Right. Do you know if there are such controllers? Or are you just afraid
+> > that there could be?
 > 
-> Warning level 3 was used: -Wimplicit-fallthrough=3
-> 
-> This patch is part of the ongoing efforts to enabling
-> -Wimplicit-fallthrough
-> 
-> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
-> ---
->  drivers/block/drbd/drbd_int.h      | 2 +-
->  drivers/block/drbd/drbd_receiver.c | 4 ++--
->  drivers/block/drbd/drbd_req.c      | 2 +-
->  drivers/block/rsxx/core.c          | 1 +
->  4 files changed, 5 insertions(+), 4 deletions(-)
-> 
+> I've asked around, and the concensus I received is all currently support
+> at least 8, but they couldn't say if that would be true for potential
+> lower budget products. Can we implement a reasonable fallback to use
+> what's available?
 
-Hi Gustavo,
+OK, thanks for input. So probably we should just map kernel stream IDs to 0
+if the device doesn't support them. But that probably means we need to
+propagate number of available streams up from NVME into the block layer so
+that this can be handled reasonably seamlessly. Jens, Kanchan?
 
-as also discussed with Lars in person, obviously OK for the DRBD part.
+								Honza
 
-Acked-by: Roland Kammerer <roland.kammerer@linbit.com>
-
-Best, rck
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
