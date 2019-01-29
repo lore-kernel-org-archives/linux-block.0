@@ -2,287 +2,106 @@ Return-Path: <SRS0=rnrW=QF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF704C282D0
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 15:50:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AF69C169C4
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 15:54:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7CA2D214DA
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 15:50:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6566821852
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 15:54:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="lG1OXiOr"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="AKFez0lR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726786AbfA2PuC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jan 2019 10:50:02 -0500
-Received: from mail-vs1-f68.google.com ([209.85.217.68]:34595 "EHLO
-        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725846AbfA2PuC (ORCPT
+        id S1726383AbfA2Pyw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jan 2019 10:54:52 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:33191 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725795AbfA2Pyw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jan 2019 10:50:02 -0500
-Received: by mail-vs1-f68.google.com with SMTP id y27so12250447vsi.1
-        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 07:50:01 -0800 (PST)
+        Tue, 29 Jan 2019 10:54:52 -0500
+Received: by mail-io1-f68.google.com with SMTP id t24so16738738ioi.0
+        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 07:54:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=vrAA2YCG0MN9FJwIUd71VNysqRSpz+WIaMTPbpQs+kM=;
-        b=lG1OXiOr+OdMF+6Xt1zYaAHUjyWMgj/h1wNZC+hK+XaheYjsyyIcJPsyj7Nx9DQe7M
-         dQgyX7so1GbDeojSMLJS2ZFZvbfSf15m8cCwQYV9JP3tMnbkHkKlkE/EqnuyvBnSxHV9
-         w8bwaaxUNtCkLKpAV4x3jpi/cvsuRGmDuaidALLpnwTnHLCKSsYgOVg5NNNg7h3VzQf+
-         jwHQI6iAloBkaZrBRKLUTPdQZnabZ+zKMuMDCLilx7p1saGowDy2ml7YDsBBkcwX2p5Z
-         Do8RjpJG19UGIGIi7/1oPjeWMJqNRvNAYRhABDBMCaj90IFcKaKCM1YQs+JC/z9W1l85
-         WwLw==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=70VXhSVFTqbfaoMFgcagL7YuqvG/9Er/tNILE+A6WeI=;
+        b=AKFez0lR5tXNJmRKHaDtAWMT+pKHV9TELyLRnM2gY97C2g5HuyH0Rc3KFBQoHgmpcc
+         0AQoj4Kuh7T3zhAu9B0TykRKKG8VPeq4tLhghCi4tYwxtWOzr5vHg1LEmURp5YS7iAP/
+         YpuJRrvZ+gcTCPwYG9yCtY6Xdp0MNZOOc2Zvkqedll06y6BkQZNxG5lvQHExRje1KC35
+         lxjZmcbW/na7Id/K+2BMahXY/ieHlwOv2vwxHc4qgFxppuN5Lx7qdy+4/etqqfT9TH3u
+         tY+DWYsOJKY2aX3fT+EEip1JzXEZW9RXD4xxY/kgBwj5SxOu28PTylQSeiBFTBokV0Cb
+         8GRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=vrAA2YCG0MN9FJwIUd71VNysqRSpz+WIaMTPbpQs+kM=;
-        b=qiX8CgRYncBnULKhKOBppwKvNKmHFux6sG+2hnlSFCFFZZfJobGuiSqvPQ/n+C9kvC
-         RFcABtEuEbhLqDKsZw0bdM9HQELaBIlpq8OdpvtsBdt/SJEMKw+g0h8zZAGybaae1cfO
-         1lZOYcA/KDwo9YUOCST5igRyNE0r4IWIOxgPEhXoSgkxMHKPu+45GVgGFQ+kCD5MTQB1
-         lzbtG2yj7eZv3zCIJek1LBLpVjG3bPgWy9urku5nXtJjQ5ph2sBfZUuF/OUFBipcz7iT
-         ghpSN5/dyneQoSKhLKaNmwEHM8CdMo8BiaI87JkLC6TWHdcEsuDkUpZL+OqetScnuygz
-         HgDw==
-X-Gm-Message-State: AJcUukcqX7JLF+9t78CSUQAKRcWFXpUTEGFCFHo65onWPxNY8yT43MWX
-        UfIodyGAUVVD9HT/XVf3qDj1cW8UIURT0w22b7C6KA==
-X-Google-Smtp-Source: ALg8bN7V8FScIjAeprGqpUaYxNe1VBjpzTVeQa2mgGq2NaTsZElEU+E2dRKGyeG8Q4yGYt5rWpstDlTMsxk5Q6lte7U=
-X-Received: by 2002:a67:1106:: with SMTP id 6mr10715231vsr.213.1548777000745;
- Tue, 29 Jan 2019 07:50:00 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=70VXhSVFTqbfaoMFgcagL7YuqvG/9Er/tNILE+A6WeI=;
+        b=BOhSV74CycatxUWMaJtivB3BS0dt73r0sR6MG5vdUIEecXCsfAmaHN9x+tZDSJNeJ7
+         UTPbM8WowNqmaZmlyo9ED1UPvCxf12NXvN4wMurj5oLTwB0cOpv044/Ar+vdDrA1wVJH
+         kG8bOS/eSGpks4FwqGcW72Ls4YpsTqBheZPu+b/uyYT+V/1U/UpD4LBSSEL4nH+1SrbK
+         PRSitFtuQrgthnal1a8baKGoUoq37+FpHa9uZQuxWDxJdUIIJ8kFP9cgPHvbpIZ+dMph
+         GLDu/p7cTWdMx8bUc7skIHMITLpoWdgY7J/77jZdU0l6MSzw+SNd4YKuu3mSx6SjRQ0p
+         YeEg==
+X-Gm-Message-State: AHQUAubFg+UxgWfIPWQsMrhpjXCGBe/Gbez/1gyPSH9tikig7Tdf15qO
+        txi7S3sJ77UlePBz3lR3Xr3JQQ==
+X-Google-Smtp-Source: AHgI3IbPvivaNO6uE9fVGgKJNI5QDvINeibotZq8X9gwICZfY9sqJHVP1nKZHSIyHKSbhafHKf66Cw==
+X-Received: by 2002:a6b:3bc8:: with SMTP id i191mr16498732ioa.23.1548777291797;
+        Tue, 29 Jan 2019 07:54:51 -0800 (PST)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id x21sm15182533iob.84.2019.01.29.07.54.50
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 29 Jan 2019 07:54:50 -0800 (PST)
+Subject: Re: [PATCH 05/18] Add io_uring IO interface
+To:     Jann Horn <jannh@google.com>
+Cc:     Florian Weimer <fweimer@redhat.com>, linux-aio@kvack.org,
+        linux-block@vger.kernel.org, Linux API <linux-api@vger.kernel.org>,
+        hch@lst.de, jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>
+References: <20190128213538.13486-1-axboe@kernel.dk>
+ <20190128213538.13486-6-axboe@kernel.dk>
+ <87tvhrpsqg.fsf@oldenburg2.str.redhat.com>
+ <74fd3127-75f1-3a48-d3cb-a8f6c9bd0b74@kernel.dk>
+ <CAG48ez0PPWP7GU5kinzejN1B3invrcxCZT2fkpnHxMK2F0pj6A@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <41d1cd0c-8a0b-73a8-32a2-c5ef31425fae@kernel.dk>
+Date:   Tue, 29 Jan 2019 08:54:49 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <20190129084737.718-1-hans@owltronix.com> <FDFE70E2-CA70-456F-8507-94BF822BF9A7@javigon.com>
- <CANr-nt34gCrRWsNrAfKS1Opy=kV5EwuR_C1VDjQbBP5MnfdgpA@mail.gmail.com> <74C79F4D-E9B0-4F47-ACF2-9335D3DB8604@javigon.com>
-In-Reply-To: <74C79F4D-E9B0-4F47-ACF2-9335D3DB8604@javigon.com>
-From:   Hans Holmberg <hans@owltronix.com>
-Date:   Tue, 29 Jan 2019 16:49:49 +0100
-Message-ID: <CANr-nt3K3OWRoe9jHT0fJWZdSBTmiro4KERTNPu9CDiZB8QgAw@mail.gmail.com>
-Subject: Re: [PATCH] lightnvm: pblk: extend line wp balance check
-To:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Cc:     =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        Zhoujie Wu <zjwu@marvell.com>, linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAG48ez0PPWP7GU5kinzejN1B3invrcxCZT2fkpnHxMK2F0pj6A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 29, 2019 at 4:03 PM Javier Gonz=C3=A1lez <javier@javigon.com> w=
-rote:
->
-> > On 29 Jan 2019, at 13.49, Hans Holmberg <hans@owltronix.com> wrote:
-> >
-> > On Tue, Jan 29, 2019 at 12:19 PM Javier Gonz=C3=A1lez <javier@javigon.c=
-om> wrote:
-> >>> On 29 Jan 2019, at 09.47, hans@owltronix.com wrote:
-> >>>
-> >>> From: Hans Holmberg <hans.holmberg@cnexlabs.com>
-> >>>
-> >>> pblk stripes writes of minimal write size across all non-offline chun=
-ks
-> >>> in a line, which means that the maximum write pointer delta should no=
-t
-> >>> exceed the minimal write size. Extend the line write pointer balance =
-check
-> >>> to cover this case.
-> >>>
-> >>> Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-> >>> ---
-> >>>
-> >>> This patch applies on top of Zhoujie's V3 of
-> >>> "lightnvm: pblk: ignore bad block wp for pblk_line_wp_is_unbalanced
-> >>>
-> >>> drivers/lightnvm/pblk-recovery.c | 60 ++++++++++++++++++++-----------=
--
-> >>> 1 file changed, 37 insertions(+), 23 deletions(-)
-> >>>
-> >>> diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk=
--recovery.c
-> >>> index 02d466e6925e..d86f580036d3 100644
-> >>> --- a/drivers/lightnvm/pblk-recovery.c
-> >>> +++ b/drivers/lightnvm/pblk-recovery.c
-> >>> @@ -302,41 +302,55 @@ static int pblk_pad_distance(struct pblk *pblk,=
- struct pblk_line *line)
-> >>>      return (distance > line->left_msecs) ? line->left_msecs : distan=
-ce;
-> >>> }
-> >>>
-> >>> -static int pblk_line_wp_is_unbalanced(struct pblk *pblk,
-> >>> -                                   struct pblk_line *line)
-> >>> +/* Return a chunk belonging to a line by stripe(write order) index *=
-/
-> >>> +static struct nvm_chk_meta *pblk_get_stripe_chunk(struct pblk *pblk,
-> >>> +                                               struct pblk_line *lin=
-e,
-> >>> +                                               int index)
-> >>> {
-> >>>      struct nvm_tgt_dev *dev =3D pblk->dev;
-> >>>      struct nvm_geo *geo =3D &dev->geo;
-> >>> -     struct pblk_line_meta *lm =3D &pblk->lm;
-> >>>      struct pblk_lun *rlun;
-> >>> -     struct nvm_chk_meta *chunk;
-> >>>      struct ppa_addr ppa;
-> >>> -     u64 line_wp;
-> >>> -     int pos, i, bit;
-> >>> +     int pos;
-> >>>
-> >>> -     bit =3D find_first_zero_bit(line->blk_bitmap, lm->blk_per_line)=
-;
-> >>> -     if (bit >=3D lm->blk_per_line)
-> >>> -             return 0;
-> >>> -     rlun =3D &pblk->luns[bit];
-> >>> +     rlun =3D &pblk->luns[index];
-> >>>      ppa =3D rlun->bppa;
-> >>>      pos =3D pblk_ppa_to_pos(geo, ppa);
-> >>> -     chunk =3D &line->chks[pos];
-> >>>
-> >>> -     line_wp =3D chunk->wp;
-> >>> +     return &line->chks[pos];
-> >>> +}
-> >>>
-> >>> -     for (i =3D bit + 1; i < lm->blk_per_line; i++) {
-> >>> -             rlun =3D &pblk->luns[i];
-> >>> -             ppa =3D rlun->bppa;
-> >>> -             pos =3D pblk_ppa_to_pos(geo, ppa);
-> >>> -             chunk =3D &line->chks[pos];
-> >>> +static int pblk_line_wps_are_unbalanced(struct pblk *pblk,
-> >>> +                                   struct pblk_line *line)
-> >>> +{
-> >>> +     struct pblk_line_meta *lm =3D &pblk->lm;
-> >>> +     int blk_in_line =3D lm->blk_per_line;
-> >>> +     struct nvm_chk_meta *chunk;
-> >>> +     u64 max_wp, min_wp;
-> >>> +     int i;
-> >>>
-> >>> -             if (chunk->state & NVM_CHK_ST_OFFLINE)
-> >>> -                     continue;
-> >>> +     i =3D find_first_zero_bit(line->blk_bitmap, blk_in_line);
-> >>> +
-> >>> +     /* If there is one or zero good chunks in the line,
-> >>> +      * the write pointers can't be unbalanced.
-> >>> +      */
-> >>> +     if (i >=3D (blk_in_line - 1))
-> >>> +             return 0;
-> >>>
-> >>> -             if (chunk->wp > line_wp)
-> >>> +     chunk =3D pblk_get_stripe_chunk(pblk, line, i);
-> >>> +     max_wp =3D chunk->wp;
-> >>> +     if (max_wp > pblk->max_write_pgs)
-> >>> +             min_wp =3D max_wp - pblk->max_write_pgs;
-> >>> +     else
-> >>> +             min_wp =3D 0;
-> >>> +
-> >>> +     i =3D find_next_zero_bit(line->blk_bitmap, blk_in_line, i + 1);
-> >>> +     while (i < blk_in_line) {
-> >>> +             chunk =3D pblk_get_stripe_chunk(pblk, line, i);
-> >>> +             if (chunk->wp > max_wp || chunk->wp < min_wp)
-> >>>                      return 1;
-> >>> -             else if (chunk->wp < line_wp)
-> >>> -                     line_wp =3D chunk->wp;
-> >>> +
-> >>> +             i =3D find_next_zero_bit(line->blk_bitmap, blk_in_line,=
- i + 1);
-> >>>      }
-> >>>
-> >>>      return 0;
-> >>> @@ -362,7 +376,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk,=
- struct pblk_line *line,
-> >>>      int ret;
-> >>>      u64 left_ppas =3D pblk_sec_in_open_line(pblk, line) - lm->smeta_=
-sec;
-> >>>
-> >>> -     if (pblk_line_wp_is_unbalanced(pblk, line))
-> >>> +     if (pblk_line_wps_are_unbalanced(pblk, line))
-> >>>              pblk_warn(pblk, "recovering unbalanced line (%d)\n", lin=
-e->id);
-> >>>
-> >>>      ppa_list =3D p.ppa_list;
-> >>> --
-> >>> 2.17.1
-> >>
-> >> If I am understanding correctly, you want to protect against the case
-> >> where a pfail has broken the ws_min partition of a chunk, right? I say
-> >> this because there is a guarantee that the minimal write size and pblk=
-'s
-> >> write size align with ws_min and ws_opt. Even if we have grown bad
-> >> blocks on pfail for the current line (which is a bigger problem becaus=
-e
-> >> we have potentially lost data), this guarantee would remain.
-> >>
-> >> If this is the case, my first reaction would be to say that the
-> >> controller is responsible for guaranteeing atomicity for both scalar a=
-nd
-> >> vector I/Os. If this is not guaranteed, we have bigger problems than
-> >> this (e.g., for the write error recovery path).
-> >>
-> >> Are you thinking of a different case?
-> >
-> > The write pointer check triggers a warning if something unexpected has
-> > happened to the chunks.
-> > i.e. if something else than pblk messed with the disk, or if the user
-> > tries to recover a pblk instance with an invalid lun configuration.
->
-> But this will only solve a very specific corner case of this, right?
-> This is, when you are writing at WP on a middle LUN exactly < ws_min.
->> For example, If the user attempts to start pblk with a different LUN
-> configuration, the alignment is the same an pblk will actually fail
-> because it cannot find any emeta.
+On 1/29/19 8:38 AM, Jann Horn wrote:
+> On Tue, Jan 29, 2019 at 2:35 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> On 1/29/19 5:12 AM, Florian Weimer wrote:
+>>> * Jens Axboe:
+>>>
+>>>> +#define IORING_MAX_ENTRIES  4096
+>>>
+>>> Where does this constant come from?  Should it really be exposed to
+>>> userspace?
+>>
+>> Seems pretty handy for the application to know what the limit is?
+> 
+> The running kernel version might be different from the kernel version
+> whose headers the userspace code was compiled with. So if this is a
+> limit that might change at some point in the future, and you think
+> userspace wants to know the limit, some other API might be better.
 
-Well, we will try to recover a line if the emeta data cannot be read
-or the data fails the crc check, and the recovery path assumes that
-the write pointers pointers have been incremented in the pblk stripe
-order. We'll get a warning now for all cases if this assumption is not
-valid.
+Probably best to just kill it, we'll error in io_uring_register() if
+it's exceeded anyway.
 
-> For completion, the original wp_unbalanced patch attempted to protect
-> against the case where several outstanding I/Os to different PUs are
-> inflight and then you have a pfail. In this case, a write to a PU that
-> is not "next" in the line bitmap completes and we have a whole, meaning
-> that if we recover this case, we risk to overwrite valid data, as we
-> break the "sequentiality" the line, which allows for recovering by
-> replaying the P2L stored on the OOB.
 
-For outstanding writes, we can leave no guarantees anyway. If a
-presync was attached to a bio, that bio will complete when the write
-completes.
+-- 
+Jens Axboe
 
->
-> >
-> > This patch adds a warning if a chunk wp is too small(i.e. if a chunk
-> > was unexpectedly reset)
->
-> I am not arguing against the implementation, I am just trying to
-> understand what you are trying to fix. If it is the case I described
-> originally, then I do not think it is possible on the Open-Channel
-> architecture. If you want to add protection against corruptions, then
-> this needs more work as many corruption cases are missing - you would
-> need something like a OOB watermark to protect open lines and something
-> like a OOB lba CRC check in emeta to validate that no data has been
-> altered.
->
-> If you ask me, I do not think the latter belongs to pblk, and if it did,
-> I would suggest a whole new (optional) feature that adds this short of
-> integrity protection, ideally, reusing NVMe PI. In the original pblk, we
-> have followed the same assumption as block devices do; you can go an
-> write on the side to a block device that has a FS on top; the block
-> device will not complain at all - if the FS detects this then they will
-> try to fix it, otherwise you lost data.
->
-> In this context, we have discussed about a pblk tool a la fsck, which can
-> cover all this cases instead of adding more complexity to the recovery
-> path in the kernel. Here, you patch makes sense we fail if something
-> suspicious has occurred and move the burden to the pblk tool for it to
-> do the repair. But again, if the goal s adding integrity protection, it
-> needs to cover the rest of the cases.
->
-> Hope this makes sense.
-
-It does! I'm not trying to do anything more than warn if the write
-pointers are not what we expect them to be.
-
-You're right, we need some sort of superblock and some recovery tool
-to make pblk more robust against corruptions.
-Now, we get a warning at least :)
