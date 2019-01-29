@@ -2,247 +2,384 @@ Return-Path: <SRS0=rnrW=QF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACD6FC169C4
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 22:10:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 785AFC169C4
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 22:45:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 55BB72087F
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 22:10:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 352BD2184D
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 22:45:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="icJ1Zvx2";
-	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="Cgj0OeX9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CyZVRPpX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727630AbfA2WKd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jan 2019 17:10:33 -0500
-Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:49584 "EHLO
-        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727332AbfA2WKd (ORCPT
+        id S1727332AbfA2WpU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jan 2019 17:45:20 -0500
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:40741 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727570AbfA2WpU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jan 2019 17:10:33 -0500
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-        by mx0b-0016f401.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x0TM2DVT017655;
-        Tue, 29 Jan 2019 14:10:23 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pfpt0818;
- bh=98qNGnFfmm4viGIOCchn71sbA9VsNeq25T8MHvJuxpU=;
- b=icJ1Zvx2caBm+5QGmMfOdgbbrsJiJIz7dd0Rsxng1ogP7GxYu4ga1PuRB3u6hHF6TaIy
- i8A5AeDrJDsmrWxfGLPjoFy0xrXpPZBkUh3J925STAv6up3A16ySXq/8+2BihYKoU22X
- m6HQcdWpNPqrm7sUeOg+dQwYzQgTv4ehW4HFtijJ586qA4Tj527dAcxCS4QO9DN/uPew
- hpls+JYS1B1egfCIEWhrEeTSlP/oFkFH7/S59M69mA+z8WTzqOhhcBWSMmfrCy52Kx7N
- 50OAugwCjCDPE6kgBWEuW3KVy82ilQxTIASiNaHfV9/+WY0njhVWJVxhm+WqyxCRmrFX sw== 
-Received: from sc-exch01.marvell.com ([199.233.58.181])
-        by mx0b-0016f401.pphosted.com with ESMTP id 2qahm737pg-2
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Tue, 29 Jan 2019 14:10:23 -0800
-Received: from SC-EXCH02.marvell.com (10.93.176.82) by SC-EXCH01.marvell.com
- (10.93.176.81) with Microsoft SMTP Server (TLS) id 15.0.1367.3; Tue, 29 Jan
- 2019 14:10:21 -0800
-Received: from NAM02-CY1-obe.outbound.protection.outlook.com (104.47.37.53) by
- SC-EXCH02.marvell.com (10.93.176.82) with Microsoft SMTP Server (TLS) id
- 15.0.1367.3 via Frontend Transport; Tue, 29 Jan 2019 14:10:21 -0800
+        Tue, 29 Jan 2019 17:45:20 -0500
+Received: by mail-ot1-f67.google.com with SMTP id s5so19434757oth.7
+        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 14:45:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector1-marvell-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=98qNGnFfmm4viGIOCchn71sbA9VsNeq25T8MHvJuxpU=;
- b=Cgj0OeX9ZzLuCpREvae/uqX1sk7Ysa30AIi4hvBW9KNfXxKl26EN/lEXSqHcPbqQbDqUZXedE697DcHRGqZU1RPFanCY/E+qklLP9FvTN3cSJo4U9QyfEIfARcBOZowPYqpJgybNdsA7emUlkblAXicfleI52b8X8guj9q0gaI4=
-Received: from MWHPR1801MB2030.namprd18.prod.outlook.com (10.164.205.31) by
- MWHPR1801MB2045.namprd18.prod.outlook.com (10.164.205.34) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1580.17; Tue, 29 Jan 2019 22:10:20 +0000
-Received: from MWHPR1801MB2030.namprd18.prod.outlook.com
- ([fe80::d467:8dc2:e78b:5309]) by MWHPR1801MB2030.namprd18.prod.outlook.com
- ([fe80::d467:8dc2:e78b:5309%2]) with mapi id 15.20.1558.023; Tue, 29 Jan 2019
- 22:10:20 +0000
-From:   Zhoujie Wu <zjwu@marvell.com>
-To:     "hans@owltronix.com" <hans@owltronix.com>,
-        Matias Bjorling <mb@lightnvm.io>
-CC:     "javier@javigon.com" <javier@javigon.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: RE: [EXT] [PATCH] lightnvm: pblk: extend line wp balance check
-Thread-Topic: [EXT] [PATCH] lightnvm: pblk: extend line wp balance check
-Thread-Index: AQHUt69Wxp69Whgu/EagayzimjQ1m6XGzhiQ
-Date:   Tue, 29 Jan 2019 22:10:20 +0000
-Message-ID: <MWHPR1801MB20300A1F6E55F7979DC0072ECA970@MWHPR1801MB2030.namprd18.prod.outlook.com>
-References: <20190129084737.718-1-hans@owltronix.com>
-In-Reply-To: <20190129084737.718-1-hans@owltronix.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [199.233.58.128]
-x-ms-publictraffictype: Email
-x-microsoft-exchange-diagnostics: 1;MWHPR1801MB2045;20:YduetZL/XZCK4D8BSlP2XNamhKS6jD3bLP1OXSdgKZzPUH2TKcw3T5MFuuZurlIL7YD/oOIK+7VMLRZhD5AftZY8in4af61mipDTtfkzijmMKfis5baXib+H4hqzDhVcT2aw19zpVeOLe29roCLVJdObkY+EPXX2Afi4mNnvOeQ=
-x-ms-office365-filtering-correlation-id: aaa0fcff-43c0-473a-9de5-08d686368ef1
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600110)(711020)(4605077)(2017052603328)(7153060)(7193020);SRVR:MWHPR1801MB2045;
-x-ms-traffictypediagnostic: MWHPR1801MB2045:
-x-microsoft-antispam-prvs: <MWHPR1801MB2045F506006C6940CDF1E0BCCA970@MWHPR1801MB2045.namprd18.prod.outlook.com>
-x-forefront-prvs: 093290AD39
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(376002)(136003)(396003)(366004)(346002)(39860400002)(199004)(13464003)(189003)(110136005)(8676002)(81156014)(81166006)(14454004)(54906003)(25786009)(3846002)(6116002)(11346002)(316002)(4326008)(2501003)(305945005)(6246003)(99286004)(7736002)(186003)(486006)(86362001)(8936002)(105586002)(106356001)(45080400002)(97736004)(55016002)(53546011)(229853002)(2906002)(71200400001)(6506007)(14444005)(446003)(74316002)(66066001)(256004)(26005)(478600001)(102836004)(33656002)(68736007)(476003)(71190400001)(9686003)(76176011)(53936002)(7696005)(6436002);DIR:OUT;SFP:1101;SCL:1;SRVR:MWHPR1801MB2045;H:MWHPR1801MB2030.namprd18.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: marvell.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: hS23dQTGIcitxzodQUXD3gZBBZLyCSgVNWEli1zv0JL100cv4i3k/U5Gio68UncDsR5e0oVvYCtWL85X0Hwm+FOwXUQYLcT+TKVbYWv2y7xOy3Au6jOEEMV0PQCnsNsdElWOzRqkRgQ/zCESRoQ47CYm7gb9tg//db25eO73hJ45oVvo6qrD+JHX95OQ4EmH8NZPJOCbWT22eS6ttE2cxPdioLflpOmRZYd2F0wdeRDxs1CVvri2ru/j+zYk+c6UOx86GoOdgO+aXOBO6gk6cO8VQtUK5ptH2S4RqGTAyIyZeg7ZbG/KH6Frl4z+V2Dyb/uMbA0t/xMDZWSgte3Wh37I2E/+gnR3OonWb7KR5I8ALcopCq0RPcRc88+wGIGpmiIYLCsgJOfbxQWLQrlCRFfoXg7Y7NtgrkF0U0zeD+A=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wIWtndDXMVhtob8e6Bpr1eAMew3PeAcXGDhe8NcxGOQ=;
+        b=CyZVRPpXuROVxKHbFKGCRJG0v5u3vAY+M+r8JR8GqgVUFx2vloWwEYy9f869bcZJ19
+         yQHNdOJGnKzhniRowWv9Cgk1AU3y/2eMJ6qs1Ycn3Kz4cX5+4Flmb3QoWrNgGqXtIvXi
+         UfGaVc3qiT0tDsYibqW0/dFlf2dIYFBGYDYsMsdBoorgaGm5k6/vOrX0dbovJk2M9H7y
+         lCwXQx+910A5yOL1czg6FRcL6kJLsRUm0aIVOeGvAQBaaVT0E12kx9FIRiAFXHJbM60t
+         xX7/1pSeniTR6SBtiFF3iB/4M5vGDznMmed3zNbsgLI97s+Sj3TFbdSCncd5UtaAkg6Y
+         g7/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wIWtndDXMVhtob8e6Bpr1eAMew3PeAcXGDhe8NcxGOQ=;
+        b=clvGotooMgmZ45kWfSnwK5ev+U2b3QTw6u494XapspQJkrgqP4Tx7cYgAkBxuH8nEi
+         HboxkVQFwNuTQFh0BOBZJR7XPDAYhhaZm7T9OdlHT4rpLSfvMts/+CzhJNGTBlztF1Hv
+         4vVWlYyP5Ocjk0vdJ78B4FXCbcHZ5bHCjSPCOjvHWYjo8GY1bbAboRXNYp9UZzycTAbc
+         GaXfseIUT2K7OSfQGfZAAANGVWiGoO2Gj3i0P7spTattQLObJNMjzrGEgNC64nxFXFAo
+         XVeHV9cdz1nlqldDzHjx1BgI+hJMJ9WOwoLIxK/7C18OEvHZCFSsXs2zJjwmTbu+AJs+
+         inqw==
+X-Gm-Message-State: AJcUukdnsJn237KLvrKQXF+PJ4Upj3/6Cwl5sLILOCAvpwjjNkoRqqbT
+        O3dWrDFwz49CXD053n8p3QPQR9YdMgHoXoa0SmUTGQ==
+X-Google-Smtp-Source: ALg8bN54cnXHWu+zSUz/CTEzeNpPPwvPLOPvsAPyvu8u1n6pzqDzWWMnY5L2aTcdV5UEx2AULQth69ZPf8uKiE1Cbf4=
+X-Received: by 2002:a9d:4c01:: with SMTP id l1mr21209011otf.242.1548801918810;
+ Tue, 29 Jan 2019 14:45:18 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: aaa0fcff-43c0-473a-9de5-08d686368ef1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jan 2019 22:10:20.2217
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1801MB2045
-X-OriginatorOrg: marvell.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-01-29_17:,,
- signatures=0
-X-Proofpoint-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1901290158
+References: <20190129192702.3605-1-axboe@kernel.dk> <20190129192702.3605-13-axboe@kernel.dk>
+In-Reply-To: <20190129192702.3605-13-axboe@kernel.dk>
+From:   Jann Horn <jannh@google.com>
+Date:   Tue, 29 Jan 2019 23:44:52 +0100
+Message-ID: <CAG48ez2VkeSEZA+9H4UAcg86uC77gU=UkTG8L1V58TuR9pDEqg@mail.gmail.com>
+Subject: Re: [PATCH 12/18] io_uring: add support for pre-mapped user IO buffers
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
+        jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Sorry that my Linux email client has configuration issue and can't reply em=
-ail. Used my outlook to reply as plain text and hope that I won't corrupt t=
-he format.
-Tested on my board and it works well. Since this is a good fix, I think you=
- don't need to do it based on my previous v3 patch and can directly apply y=
-ours:)
+On Tue, Jan 29, 2019 at 8:27 PM Jens Axboe <axboe@kernel.dk> wrote:
+> If we have fixed user buffers, we can map them into the kernel when we
+> setup the io_context. That avoids the need to do get_user_pages() for
+> each and every IO.
+>
+> To utilize this feature, the application must call io_uring_register()
+> after having setup an io_uring context, passing in
+> IORING_REGISTER_BUFFERS as the opcode. The argument must be a pointer
+> to an iovec array, and the nr_args should contain how many iovecs the
+> application wishes to map.
+>
+> If successful, these buffers are now mapped into the kernel, eligible
+> for IO. To use these fixed buffers, the application must use the
+> IORING_OP_READ_FIXED and IORING_OP_WRITE_FIXED opcodes, and then
+> set sqe->index to the desired buffer index. sqe->addr..sqe->addr+seq->len
+> must point to somewhere inside the indexed buffer.
+>
+> The application may register buffers throughout the lifetime of the
+> io_uring context. It can call io_uring_register() with
+> IORING_UNREGISTER_BUFFERS as the opcode to unregister the current set of
+> buffers, and then register a new set. The application need not
+> unregister buffers explicitly before shutting down the io_uring context.
+[...]
+> +static int io_import_fixed(struct io_ring_ctx *ctx, int rw,
+> +                          const struct io_uring_sqe *sqe,
+> +                          struct iov_iter *iter)
+> +{
+> +       size_t len = READ_ONCE(sqe->len);
+> +       struct io_mapped_ubuf *imu;
+> +       int buf_index, index;
+> +       size_t offset;
+> +       u64 buf_addr;
+> +
+> +       /* attempt to use fixed buffers without having provided iovecs */
+> +       if (unlikely(!ctx->user_bufs))
+> +               return -EFAULT;
+> +
+> +       buf_index = READ_ONCE(sqe->buf_index);
+> +       if (unlikely(buf_index >= ctx->nr_user_bufs))
+> +               return -EFAULT;
 
-Tested-by: Zhoujie Wu <zjwu@marvell.com>
+Nit: If you make the local copy of buf_index unsigned, it is slightly
+easier to see that this code is correct. (I know, it has to be
+positive anyway because the value in shared memory is a u16.)
 
+> +       index = array_index_nospec(buf_index, ctx->sq_entries);
 
------Original Message-----
-From: hans@owltronix.com <hans@owltronix.com>=20
-Sent: Tuesday, January 29, 2019 12:48 AM
-To: Matias Bjorling <mb@lightnvm.io>
-Cc: javier@javigon.com; Zhoujie Wu <zjwu@marvell.com>; linux-block@vger.ker=
-nel.org; linux-kernel@vger.kernel.org; Hans Holmberg <hans.holmberg@cnexlab=
-s.com>
-Subject: [EXT] [PATCH] lightnvm: pblk: extend line wp balance check
+This looks weird. Did you mean s/ctx->sq_entries/ctx->nr_user_bufs/?
 
-External Email
+> +       imu = &ctx->user_bufs[index];
+> +       buf_addr = READ_ONCE(sqe->addr);
+> +       if (buf_addr < imu->ubuf || buf_addr + len > imu->ubuf + imu->len)
 
-----------------------------------------------------------------------
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+This can wrap around if `buf_addr` or `len` is very big, right? Then
+you e.g. get past the first check because `buf_addr` is sufficiently
+big, and get past the second check because `buf_addr + len` wraps
+around and becomes small.
 
-pblk stripes writes of minimal write size across all non-offline chunks in =
-a line, which means that the maximum write pointer delta should not exceed =
-the minimal write size. Extend the line write pointer balance check to cove=
-r this case.
+> +               return -EFAULT;
+> +
+> +       /*
+> +        * May not be a start of buffer, set size appropriately
+> +        * and advance us to the beginning.
+> +        */
+> +       offset = buf_addr - imu->ubuf;
+> +       iov_iter_bvec(iter, rw, imu->bvec, imu->nr_bvecs, offset + len);
+> +       if (offset)
+> +               iov_iter_advance(iter, offset);
+> +       return 0;
+> +}
+> +
+>  static int io_import_iovec(struct io_ring_ctx *ctx, int rw,
+>                            const struct io_uring_sqe *sqe, struct iovec **iovec,
+>                            struct iov_iter *iter)
+>  {
+>         void __user *buf = u64_to_user_ptr(READ_ONCE(sqe->addr));
+>         size_t sqe_len = READ_ONCE(sqe->len);
+> +       int opcode;
+> +
+> +       opcode = READ_ONCE(sqe->opcode);
+> +       if (opcode == IORING_OP_READ_FIXED ||
+> +           opcode == IORING_OP_WRITE_FIXED) {
+> +               ssize_t ret = io_import_fixed(ctx, rw, sqe, iter);
+> +               *iovec = NULL;
+> +               return ret;
+> +       }
+[...]
+>
+> +static inline bool io_sqe_needs_user(const struct io_uring_sqe *sqe)
+> +{
+> +       return !(sqe->opcode == IORING_OP_READ_FIXED ||
+> +                sqe->opcode == IORING_OP_WRITE_FIXED);
+> +}
 
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
----
+This still looks racy to me?
 
-This patch applies on top of Zhoujie's V3 of
-"lightnvm: pblk: ignore bad block wp for pblk_line_wp_is_unbalanced
+>  static void io_sq_wq_submit_work(struct work_struct *work)
+>  {
+[...]
+> -       if (!mmget_not_zero(ctx->sqo_mm)) {
+> -               ret = -EFAULT;
+> -               goto err;
+> +       /*
+> +        * If we're doing IO to fixed buffers, we don't need to get/set
+> +        * user context
+> +        */
+> +       needs_user = io_sqe_needs_user(&sqe);
+> +       if (needs_user) {
+> +               if (!mmget_not_zero(ctx->sqo_mm)) {
+> +                       ret = -EFAULT;
+> +                       goto err;
+> +               }
+> +               use_mm(ctx->sqo_mm);
+> +               old_fs = get_fs();
+> +               set_fs(USER_DS);
+>         }
+>
+> -       use_mm(ctx->sqo_mm);
+> -       set_fs(USER_DS);
+> -
+>         ret = __io_submit_sqe(ctx, req, s, false, NULL);
+>
+> -       set_fs(old_fs);
+> -       unuse_mm(ctx->sqo_mm);
+> -       mmput(ctx->sqo_mm);
+> +       if (needs_user) {
+> +               set_fs(old_fs);
+> +               unuse_mm(ctx->sqo_mm);
+> +               mmput(ctx->sqo_mm);
+> +       }
+>  err:
+>         if (ret) {
+> -               io_cqring_add_event(ctx, user_data, ret, 0);
+> +               io_cqring_add_event(ctx, sqe.user_data, ret, 0);
+>                 io_free_req(req);
+>         }
+[...]
+> +static int io_copy_iov(struct io_ring_ctx *ctx, struct iovec *dst,
+> +                      void __user *arg, unsigned index)
+> +{
 
- drivers/lightnvm/pblk-recovery.c | 60 ++++++++++++++++++++------------
- 1 file changed, 37 insertions(+), 23 deletions(-)
+This function doesn't actually use the "ctx" parameter, right? You
+might want to remove it.
 
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recov=
-ery.c
-index 02d466e6925e..d86f580036d3 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -302,41 +302,55 @@ static int pblk_pad_distance(struct pblk *pblk, struc=
-t pblk_line *line)
- 	return (distance > line->left_msecs) ? line->left_msecs : distance;  }
-=20
--static int pblk_line_wp_is_unbalanced(struct pblk *pblk,
--				      struct pblk_line *line)
-+/* Return a chunk belonging to a line by stripe(write order) index */=20
-+static struct nvm_chk_meta *pblk_get_stripe_chunk(struct pblk *pblk,
-+						  struct pblk_line *line,
-+						  int index)
- {
- 	struct nvm_tgt_dev *dev =3D pblk->dev;
- 	struct nvm_geo *geo =3D &dev->geo;
--	struct pblk_line_meta *lm =3D &pblk->lm;
- 	struct pblk_lun *rlun;
--	struct nvm_chk_meta *chunk;
- 	struct ppa_addr ppa;
--	u64 line_wp;
--	int pos, i, bit;
-+	int pos;
-=20
--	bit =3D find_first_zero_bit(line->blk_bitmap, lm->blk_per_line);
--	if (bit >=3D lm->blk_per_line)
--		return 0;
--	rlun =3D &pblk->luns[bit];
-+	rlun =3D &pblk->luns[index];
- 	ppa =3D rlun->bppa;
- 	pos =3D pblk_ppa_to_pos(geo, ppa);
--	chunk =3D &line->chks[pos];
-=20
--	line_wp =3D chunk->wp;
-+	return &line->chks[pos];
-+}
-=20
--	for (i =3D bit + 1; i < lm->blk_per_line; i++) {
--		rlun =3D &pblk->luns[i];
--		ppa =3D rlun->bppa;
--		pos =3D pblk_ppa_to_pos(geo, ppa);
--		chunk =3D &line->chks[pos];
-+static int pblk_line_wps_are_unbalanced(struct pblk *pblk,
-+				      struct pblk_line *line)
-+{
-+	struct pblk_line_meta *lm =3D &pblk->lm;
-+	int blk_in_line =3D lm->blk_per_line;
-+	struct nvm_chk_meta *chunk;
-+	u64 max_wp, min_wp;
-+	int i;
-=20
--		if (chunk->state & NVM_CHK_ST_OFFLINE)
--			continue;
-+	i =3D find_first_zero_bit(line->blk_bitmap, blk_in_line);
-+
-+	/* If there is one or zero good chunks in the line,
-+	 * the write pointers can't be unbalanced.
-+	 */
-+	if (i >=3D (blk_in_line - 1))
-+		return 0;
-=20
--		if (chunk->wp > line_wp)
-+	chunk =3D pblk_get_stripe_chunk(pblk, line, i);
-+	max_wp =3D chunk->wp;
-+	if (max_wp > pblk->max_write_pgs)
-+		min_wp =3D max_wp - pblk->max_write_pgs;
-+	else
-+		min_wp =3D 0;
-+
-+	i =3D find_next_zero_bit(line->blk_bitmap, blk_in_line, i + 1);
-+	while (i < blk_in_line) {
-+		chunk =3D pblk_get_stripe_chunk(pblk, line, i);
-+		if (chunk->wp > max_wp || chunk->wp < min_wp)
- 			return 1;
--		else if (chunk->wp < line_wp)
--			line_wp =3D chunk->wp;
-+
-+		i =3D find_next_zero_bit(line->blk_bitmap, blk_in_line, i + 1);
- 	}
-=20
- 	return 0;
-@@ -362,7 +376,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struc=
-t pblk_line *line,
- 	int ret;
- 	u64 left_ppas =3D pblk_sec_in_open_line(pblk, line) - lm->smeta_sec;
-=20
--	if (pblk_line_wp_is_unbalanced(pblk, line))
-+	if (pblk_line_wps_are_unbalanced(pblk, line))
- 		pblk_warn(pblk, "recovering unbalanced line (%d)\n", line->id);
-=20
- 	ppa_list =3D p.ppa_list;
---
-2.17.1
+> +       struct iovec __user *src;
+> +
+> +#ifdef CONFIG_COMPAT
+> +       if (in_compat_syscall()) {
+> +               struct compat_iovec __user *ciovs;
+> +               struct compat_iovec ciov;
+> +
+> +               ciovs = (struct compat_iovec __user *) arg;
+> +               if (copy_from_user(&ciov, &ciovs[index], sizeof(ciov)))
+> +                       return -EFAULT;
+> +
+> +               dst->iov_base = (void __user *) (unsigned long) ciov.iov_base;
+> +               dst->iov_len = ciov.iov_len;
+> +               return 0;
+> +       }
+> +#endif
+> +       src = (struct iovec __user *) arg;
+> +       if (copy_from_user(dst, &src[index], sizeof(*dst)))
+> +               return -EFAULT;
+> +       return 0;
+> +}
+> +
+> +static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
+> +                                 unsigned nr_args)
+> +{
+> +       struct vm_area_struct **vmas = NULL;
+> +       struct page **pages = NULL;
+> +       int i, j, got_pages = 0;
+> +       int ret = -EINVAL;
+> +
+> +       if (ctx->user_bufs)
+> +               return -EBUSY;
+> +       if (!nr_args || nr_args > UIO_MAXIOV)
+> +               return -EINVAL;
+> +
+> +       ctx->user_bufs = kcalloc(nr_args, sizeof(struct io_mapped_ubuf),
+> +                                       GFP_KERNEL);
+> +       if (!ctx->user_bufs)
+> +               return -ENOMEM;
+> +
+> +       if (!capable(CAP_IPC_LOCK))
+> +               ctx->user = get_uid(current_user());
+> +
+> +       for (i = 0; i < nr_args; i++) {
+> +               struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
+> +               unsigned long off, start, end, ubuf;
+> +               int pret, nr_pages;
+> +               struct iovec iov;
+> +               size_t size;
+> +
+> +               ret = io_copy_iov(ctx, &iov, arg, i);
+> +               if (ret)
+> +                       break;
+> +
+> +               /*
+> +                * Don't impose further limits on the size and buffer
+> +                * constraints here, we'll -EINVAL later when IO is
+> +                * submitted if they are wrong.
+> +                */
+> +               ret = -EFAULT;
+> +               if (!iov.iov_base)
+> +                       goto err;
+> +
+> +               /* arbitrary limit, but we need something */
+> +               if (iov.iov_len > SZ_1G)
+> +                       goto err;
 
+You might also want to check for iov_len==0? Otherwise, if iov_base
+isn't page-aligned, the following code might grab a reference to one
+page even though the iov covers zero pages, that'd be kinda weird.
+
+> +               ubuf = (unsigned long) iov.iov_base;
+> +               end = (ubuf + iov.iov_len + PAGE_SIZE - 1) >> PAGE_SHIFT;
+> +               start = ubuf >> PAGE_SHIFT;
+> +               nr_pages = end - start;
+> +
+> +               ret = io_account_mem(ctx, nr_pages);
+> +               if (ret)
+> +                       goto err;
+> +
+> +               if (!pages || nr_pages > got_pages) {
+> +                       kfree(vmas);
+> +                       kfree(pages);
+> +                       pages = kmalloc_array(nr_pages, sizeof(struct page *),
+> +                                               GFP_KERNEL);
+> +                       vmas = kmalloc_array(nr_pages,
+> +                                       sizeof(struct vma_area_struct *),
+> +                                       GFP_KERNEL);
+> +                       if (!pages || !vmas) {
+> +                               io_unaccount_mem(ctx, nr_pages);
+> +                               goto err;
+> +                       }
+> +                       got_pages = nr_pages;
+> +               }
+> +
+> +               imu->bvec = kmalloc_array(nr_pages, sizeof(struct bio_vec),
+> +                                               GFP_KERNEL);
+> +               if (!imu->bvec) {
+> +                       io_unaccount_mem(ctx, nr_pages);
+> +                       goto err;
+> +               }
+> +
+> +               down_write(&current->mm->mmap_sem);
+
+Is there a reason why you're using down_write() and not down_read()?
+As far as I can tell, down_read() is all you need...
+
+> +               pret = get_user_pages_longterm(ubuf, nr_pages, FOLL_WRITE,
+> +                                               pages, vmas);
+> +               if (pret == nr_pages) {
+> +                       /* don't support file backed memory */
+> +                       for (j = 0; j < nr_pages; j++) {
+> +                               struct vm_area_struct *vma = vmas[j];
+> +
+> +                               if (vma->vm_file) {
+> +                                       ret = -EOPNOTSUPP;
+> +                                       break;
+> +                               }
+> +                       }
+
+Are you intentionally doing the check for vma->vm_file instead of
+calling GUP with FOLL_ANON, which would automatically verify
+vma->vm_ops==NULL for you using vma_is_anonymous()? FOLL_ANON is what
+procfs uses to avoid blocking on page faults when reading remote
+process memory via /proc/*/{cmdline,environ}. I don't entirely
+understand the motivation for this check, so I can't really tell
+whether FOLL_ANON would do the job.
+
+> +               } else {
+> +                       ret = pret < 0 ? pret : -EFAULT;
+> +               }
+> +               up_write(&current->mm->mmap_sem);
+> +               if (ret) {
+> +                       /*
+> +                        * if we did partial map, or found file backed vmas,
+> +                        * release any pages we did get
+> +                        */
+> +                       if (pret > 0) {
+> +                               for (j = 0; j < pret; j++)
+> +                                       put_page(pages[j]);
+> +                       }
+> +                       io_unaccount_mem(ctx, nr_pages);
+> +                       goto err;
+> +               }
+> +
+> +               off = ubuf & ~PAGE_MASK;
+> +               size = iov.iov_len;
+> +               for (j = 0; j < nr_pages; j++) {
+> +                       size_t vec_len;
+> +
+> +                       vec_len = min_t(size_t, size, PAGE_SIZE - off);
+> +                       imu->bvec[j].bv_page = pages[j];
+> +                       imu->bvec[j].bv_len = vec_len;
+> +                       imu->bvec[j].bv_offset = off;
+> +                       off = 0;
+> +                       size -= vec_len;
+> +               }
+> +               /* store original address for later verification */
+> +               imu->ubuf = ubuf;
+> +               imu->len = iov.iov_len;
+> +               imu->nr_bvecs = nr_pages;
+> +       }
+> +       kfree(pages);
+> +       kfree(vmas);
+> +       ctx->nr_user_bufs = nr_args;
+> +       return 0;
+> +err:
+> +       kfree(pages);
+> +       kfree(vmas);
+> +       io_sqe_buffer_unregister(ctx);
+> +       return ret;
+> +}
