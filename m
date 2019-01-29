@@ -4,54 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D57F7C169C4
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 11:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00266C169C4
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 11:07:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A55E92084C
-	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 11:07:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB3A12084C
+	for <linux-block@archiver.kernel.org>; Tue, 29 Jan 2019 11:07:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="dzNNNTGG"
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="I7GipiBy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726952AbfA2LHr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jan 2019 06:07:47 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:36352 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728511AbfA2LHL (ORCPT
+        id S1728466AbfA2LHI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jan 2019 06:07:08 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:55089 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728069AbfA2LHH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jan 2019 06:07:11 -0500
-Received: by mail-wr1-f68.google.com with SMTP id u4so21555849wrp.3
-        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 03:07:09 -0800 (PST)
+        Tue, 29 Jan 2019 06:07:07 -0500
+Received: by mail-wm1-f65.google.com with SMTP id a62so17343429wmh.4
+        for <linux-block@vger.kernel.org>; Tue, 29 Jan 2019 03:07:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=VwIs+zonmjtiCZ1USOo/5sS6ODQShYjtQFUwoinOfyA=;
-        b=dzNNNTGG5PdbsAoIUTXnKMvPIzXU2GiE2VkYxsWTf2UiyCY0wriVi0q9foVNjfoQol
-         P/FaGtCg2bXNR6bff01uCTbsm3htu93+aSrkN86YiYT7JF4IpxTl1xTYqfozHHkmz1rD
-         xO5QtpvJKdv15+MIghqrBcKbEoaxfmx0cjXzM=
+        bh=QUU3CUC8cc8cju82LpP1ETMRx5xYgBZFuzHMif5PKgE=;
+        b=I7GipiBy1jwfZzcBnanIeEjUnph/c3fRUsd0smPewaxwZgXl13jxCG7lJDGG7pRnWe
+         YnObOi6zGYuBEL6aqupczOMweeg9M3PBxM3SgnsWgpKWDIyhQRz6U+vCKr0Ur6gjFbxH
+         jvRqkwyKPT6zMzU2EqfnFgpdeCH0endlgmAd4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=VwIs+zonmjtiCZ1USOo/5sS6ODQShYjtQFUwoinOfyA=;
-        b=pRbfom/3gN+ngELBi/P9gj0uDqpt848HIK2t35mZyJOb2pmtVXpz/lxH5LSSvOexmZ
-         xyNaOiT7dpjKYFted8EAdQtQcEh2tXLqfQ7Di0qNg5/pG296b0a3gVRBydJbi2+q3cQT
-         Cbrl+qZUOmvs4gbi7FxON4zSMkU8O8Fax1x32dkJ/fsn/8x8qrTTdwn+rh0cqUz0PMuc
-         Vdez+6PGcNI33HAi5Vwl7ymjyYBc15HERf5QicGxVzjqf7uFPI5ifd08BAfIwAQGqdmL
-         nT0C/vdrMcgRlDyEnCtT7hj4+Zuu1VIW04eP/SgCCAbNJxNUPBTF96kz+72CWW7oVYau
-         Cz/Q==
-X-Gm-Message-State: AJcUukdSXNCBt9LpZmHMb3+qq4MdRbEsJPaGjuS4mUY84AEI+Cu9167+
-        3REbvKPpFVsMQ4U/pqKNitv02g==
-X-Google-Smtp-Source: AHgI3IaoYkVg1V+aaV+ipWtTYVvEmycMI3EljtyJaeHGv0fpAC5NBzizUMkuaLwJoNdy0BOxILKnMQ==
-X-Received: by 2002:adf:f3c6:: with SMTP id g6mr21053279wrp.111.1548760028824;
-        Tue, 29 Jan 2019 03:07:08 -0800 (PST)
+        bh=QUU3CUC8cc8cju82LpP1ETMRx5xYgBZFuzHMif5PKgE=;
+        b=tgvQkiooTFGg9a5d3tXkzWY8yxl7HkyQi821VrY5uekWus84hc69+P9D5yOxiFrxAg
+         rCqmtfNoptISEFWmVAjrFkxWiLnjckrzs8dbj0KjNTPTOlB16Oi4OyEU/EOp1mv+uRfP
+         11+BR14+5mNGtzAl5ceBW5eotZ1H9j3vcrLKMcrryJ3urbsOyuO4rENoyW/k33K1bqOa
+         XhfZkMzvQKyrxughZiqhAlewk0XRuNfTLlhHqDWh2ohgUC18al3U/JJvCxObKdLl2vZ8
+         v1Q/Xy3zWTLWZhqRQpgsrt3FiVvc5O81NlQwHI+iplDEXQmtyYUnWOXccvks0uQfkhYn
+         0fuA==
+X-Gm-Message-State: AJcUukcSbGj8Ipno+tNLMNBzMTc0p3IlHaPgyboPeCk9+FwMejjr0dnm
+        kawtJqXOtQBKcIE25SCaKTVJjgFrwOs=
+X-Google-Smtp-Source: ALg8bN4ORgPAWFRDmgrq9lmIgRRBZRhrFMld6DE45GDfGtmckU+2QEC3wWhFXogSwd6oXLVdTxgrjA==
+X-Received: by 2002:a1c:2457:: with SMTP id k84mr20732866wmk.139.1548760024837;
+        Tue, 29 Jan 2019 03:07:04 -0800 (PST)
 Received: from localhost.localdomain ([88.147.67.218])
-        by smtp.gmail.com with ESMTPSA id s132sm2066112wmf.28.2019.01.29.03.07.07
+        by smtp.gmail.com with ESMTPSA id s132sm2066112wmf.28.2019.01.29.03.07.03
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 29 Jan 2019 03:07:08 -0800 (PST)
+        Tue, 29 Jan 2019 03:07:04 -0800 (PST)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -59,9 +59,9 @@ Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         broonie@kernel.org, bfq-iosched@googlegroups.com,
         oleksandr@natalenko.name, mancha@tower-research.com,
         Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX IMPROVEMENT 09/14] block, bfq: fix sequential rq detection in rate estimation
-Date:   Tue, 29 Jan 2019 12:06:33 +0100
-Message-Id: <20190129110638.12652-10-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX IMPROVEMENT 06/14] block, bfq: split function bfq_better_to_idle
+Date:   Tue, 29 Jan 2019 12:06:30 +0100
+Message-Id: <20190129110638.12652-7-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190129110638.12652-1-paolo.valente@linaro.org>
 References: <20190129110638.12652-1-paolo.valente@linaro.org>
@@ -72,54 +72,226 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In bfq_update_peak_rate, to check whether an I/O request rq is
-sequential, only the seek distance of rq w.r.t. the last request
-dispatched is controlled. This is not sufficient for non-rotational
-storage, where the size of rq is at least as relevant. This commit
-adds the missing control.
+This is a preparatory commit for commits that need to check only one
+of the two main reasons for idling. This change should also improve
+the quality of the code a little bit, by splitting a function that
+contains very long, non-trivial and little related comments.
 
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/bfq-iosched.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+ block/bfq-iosched.c | 155 +++++++++++++++++++++++---------------------
+ 1 file changed, 82 insertions(+), 73 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index c1bb5e5fcdc4..12228af16198 100644
+index 6bfbfa65610b..2756f4b1432b 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -235,6 +235,11 @@ static struct kmem_cache *bfq_pool;
- 
- #define BFQQ_SEEK_THR		(sector_t)(8 * 100)
- #define BFQQ_SECT_THR_NONROT	(sector_t)(2 * 32)
-+#define BFQ_RQ_SEEKY(bfqd, last_pos, rq) \
-+	(get_sdist(last_pos, rq) >			\
-+	 BFQQ_SEEK_THR &&				\
-+	 (!blk_queue_nonrot(bfqd->queue) ||		\
-+	  blk_rq_sectors(rq) < BFQQ_SECT_THR_NONROT))
- #define BFQQ_CLOSE_THR		(sector_t)(8 * 1024)
- #define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 19)
- 
-@@ -2754,7 +2759,7 @@ static void bfq_update_peak_rate(struct bfq_data *bfqd, struct request *rq)
- 
- 	if ((bfqd->rq_in_driver > 0 ||
- 		now_ns - bfqd->last_completion < BFQ_MIN_TT)
--	     && get_sdist(bfqd->last_position, rq) < BFQQ_SEEK_THR)
-+	    && !BFQ_RQ_SEEKY(bfqd, bfqd->last_position, rq))
- 		bfqd->sequential_samples++;
- 
- 	bfqd->tot_sectors_dispatched += blk_rq_sectors(rq);
-@@ -4511,10 +4516,7 @@ bfq_update_io_seektime(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 		       struct request *rq)
- {
- 	bfqq->seek_history <<= 1;
--	bfqq->seek_history |=
--		get_sdist(bfqq->last_request_pos, rq) > BFQQ_SEEK_THR &&
--		(!blk_queue_nonrot(bfqd->queue) ||
--		 blk_rq_sectors(rq) < BFQQ_SECT_THR_NONROT);
-+	bfqq->seek_history |= BFQ_RQ_SEEKY(bfqd, bfqq->last_request_pos, rq);
+@@ -3404,53 +3404,13 @@ static bool bfq_may_expire_for_budg_timeout(struct bfq_queue *bfqq)
+ 		bfq_bfqq_budget_timeout(bfqq);
  }
  
- static void bfq_update_has_short_ttime(struct bfq_data *bfqd,
+-/*
+- * For a queue that becomes empty, device idling is allowed only if
+- * this function returns true for the queue. As a consequence, since
+- * device idling plays a critical role in both throughput boosting and
+- * service guarantees, the return value of this function plays a
+- * critical role in both these aspects as well.
+- *
+- * In a nutshell, this function returns true only if idling is
+- * beneficial for throughput or, even if detrimental for throughput,
+- * idling is however necessary to preserve service guarantees (low
+- * latency, desired throughput distribution, ...). In particular, on
+- * NCQ-capable devices, this function tries to return false, so as to
+- * help keep the drives' internal queues full, whenever this helps the
+- * device boost the throughput without causing any service-guarantee
+- * issue.
+- *
+- * In more detail, the return value of this function is obtained by,
+- * first, computing a number of boolean variables that take into
+- * account throughput and service-guarantee issues, and, then,
+- * combining these variables in a logical expression. Most of the
+- * issues taken into account are not trivial. We discuss these issues
+- * individually while introducing the variables.
+- */
+-static bool bfq_better_to_idle(struct bfq_queue *bfqq)
++static bool idling_boosts_thr_without_issues(struct bfq_data *bfqd,
++					     struct bfq_queue *bfqq)
+ {
+-	struct bfq_data *bfqd = bfqq->bfqd;
+ 	bool rot_without_queueing =
+ 		!blk_queue_nonrot(bfqd->queue) && !bfqd->hw_tag,
+ 		bfqq_sequential_and_IO_bound,
+-		idling_boosts_thr, idling_boosts_thr_without_issues,
+-		idling_needed_for_service_guarantees,
+-		asymmetric_scenario;
+-
+-	if (bfqd->strict_guarantees)
+-		return true;
+-
+-	/*
+-	 * Idling is performed only if slice_idle > 0. In addition, we
+-	 * do not idle if
+-	 * (a) bfqq is async
+-	 * (b) bfqq is in the idle io prio class: in this case we do
+-	 * not idle because we want to minimize the bandwidth that
+-	 * queues in this class can steal to higher-priority queues
+-	 */
+-	if (bfqd->bfq_slice_idle == 0 || !bfq_bfqq_sync(bfqq) ||
+-	    bfq_class_idle(bfqq))
+-		return false;
++		idling_boosts_thr;
+ 
+ 	bfqq_sequential_and_IO_bound = !BFQQ_SEEKY(bfqq) &&
+ 		bfq_bfqq_IO_bound(bfqq) && bfq_bfqq_has_short_ttime(bfqq);
+@@ -3482,8 +3442,7 @@ static bool bfq_better_to_idle(struct bfq_queue *bfqq)
+ 		 bfqq_sequential_and_IO_bound);
+ 
+ 	/*
+-	 * The value of the next variable,
+-	 * idling_boosts_thr_without_issues, is equal to that of
++	 * The return value of this function is equal to that of
+ 	 * idling_boosts_thr, unless a special case holds. In this
+ 	 * special case, described below, idling may cause problems to
+ 	 * weight-raised queues.
+@@ -3500,32 +3459,35 @@ static bool bfq_better_to_idle(struct bfq_queue *bfqq)
+ 	 * which enqueue several requests in advance, and further
+ 	 * reorder internally-queued requests.
+ 	 *
+-	 * For this reason, we force to false the value of
+-	 * idling_boosts_thr_without_issues if there are weight-raised
+-	 * busy queues. In this case, and if bfqq is not weight-raised,
+-	 * this guarantees that the device is not idled for bfqq (if,
+-	 * instead, bfqq is weight-raised, then idling will be
+-	 * guaranteed by another variable, see below). Combined with
+-	 * the timestamping rules of BFQ (see [1] for details), this
+-	 * behavior causes bfqq, and hence any sync non-weight-raised
+-	 * queue, to get a lower number of requests served, and thus
+-	 * to ask for a lower number of requests from the request
+-	 * pool, before the busy weight-raised queues get served
+-	 * again. This often mitigates starvation problems in the
+-	 * presence of heavy write workloads and NCQ, thereby
+-	 * guaranteeing a higher application and system responsiveness
+-	 * in these hostile scenarios.
++	 * For this reason, we force to false the return value if
++	 * there are weight-raised busy queues. In this case, and if
++	 * bfqq is not weight-raised, this guarantees that the device
++	 * is not idled for bfqq (if, instead, bfqq is weight-raised,
++	 * then idling will be guaranteed by another variable, see
++	 * below). Combined with the timestamping rules of BFQ (see
++	 * [1] for details), this behavior causes bfqq, and hence any
++	 * sync non-weight-raised queue, to get a lower number of
++	 * requests served, and thus to ask for a lower number of
++	 * requests from the request pool, before the busy
++	 * weight-raised queues get served again. This often mitigates
++	 * starvation problems in the presence of heavy write
++	 * workloads and NCQ, thereby guaranteeing a higher
++	 * application and system responsiveness in these hostile
++	 * scenarios.
+ 	 */
+-	idling_boosts_thr_without_issues = idling_boosts_thr &&
++	return idling_boosts_thr &&
+ 		bfqd->wr_busy_queues == 0;
++}
+ 
++static bool idling_needed_for_service_guarantees(struct bfq_data *bfqd,
++						 struct bfq_queue *bfqq)
++{
+ 	/*
+-	 * There is then a case where idling must be performed not
+-	 * for throughput concerns, but to preserve service
+-	 * guarantees.
++	 * There is a case where idling must be performed not for
++	 * throughput concerns, but to preserve service guarantees.
+ 	 *
+ 	 * To introduce this case, we can note that allowing the drive
+-	 * to enqueue more than one request at a time, and hence
++	 * to enqueue more than one request at a time, and thereby
+ 	 * delegating de facto final scheduling decisions to the
+ 	 * drive's internal scheduler, entails loss of control on the
+ 	 * actual request service order. In particular, the critical
+@@ -3682,9 +3644,9 @@ static bool bfq_better_to_idle(struct bfq_queue *bfqq)
+ 	 * to let requests be served in the desired order until all
+ 	 * the requests already queued in the device have been served.
+ 	 */
+-	asymmetric_scenario = (bfqq->wr_coeff > 1 &&
+-			       bfqd->wr_busy_queues <
+-			       bfq_tot_busy_queues(bfqd)) ||
++	bool asymmetric_scenario = (bfqq->wr_coeff > 1 &&
++				    bfqd->wr_busy_queues <
++				    bfq_tot_busy_queues(bfqd)) ||
+ 		!bfq_symmetric_scenario(bfqd);
+ 
+ 	/*
+@@ -3701,17 +3663,64 @@ static bool bfq_better_to_idle(struct bfq_queue *bfqq)
+ 	 * now establish when idling is actually needed to preserve
+ 	 * service guarantees.
+ 	 */
+-	idling_needed_for_service_guarantees =
+-		asymmetric_scenario && !bfq_bfqq_in_large_burst(bfqq);
++	return asymmetric_scenario && !bfq_bfqq_in_large_burst(bfqq);
++}
++
++/*
++ * For a queue that becomes empty, device idling is allowed only if
++ * this function returns true for that queue. As a consequence, since
++ * device idling plays a critical role for both throughput boosting
++ * and service guarantees, the return value of this function plays a
++ * critical role as well.
++ *
++ * In a nutshell, this function returns true only if idling is
++ * beneficial for throughput or, even if detrimental for throughput,
++ * idling is however necessary to preserve service guarantees (low
++ * latency, desired throughput distribution, ...). In particular, on
++ * NCQ-capable devices, this function tries to return false, so as to
++ * help keep the drives' internal queues full, whenever this helps the
++ * device boost the throughput without causing any service-guarantee
++ * issue.
++ *
++ * Most of the issues taken into account to get the return value of
++ * this function are not trivial. We discuss these issues in the two
++ * functions providing the main pieces of information needed by this
++ * function.
++ */
++static bool bfq_better_to_idle(struct bfq_queue *bfqq)
++{
++	struct bfq_data *bfqd = bfqq->bfqd;
++	bool idling_boosts_thr_with_no_issue, idling_needed_for_service_guar;
++
++	if (unlikely(bfqd->strict_guarantees))
++		return true;
++
++	/*
++	 * Idling is performed only if slice_idle > 0. In addition, we
++	 * do not idle if
++	 * (a) bfqq is async
++	 * (b) bfqq is in the idle io prio class: in this case we do
++	 * not idle because we want to minimize the bandwidth that
++	 * queues in this class can steal to higher-priority queues
++	 */
++	if (bfqd->bfq_slice_idle == 0 || !bfq_bfqq_sync(bfqq) ||
++	   bfq_class_idle(bfqq))
++		return false;
++
++	idling_boosts_thr_with_no_issue =
++		idling_boosts_thr_without_issues(bfqd, bfqq);
++
++	idling_needed_for_service_guar =
++		idling_needed_for_service_guarantees(bfqd, bfqq);
+ 
+ 	/*
+-	 * We have now all the components we need to compute the
++	 * We have now the two components we need to compute the
+ 	 * return value of the function, which is true only if idling
+ 	 * either boosts the throughput (without issues), or is
+ 	 * necessary to preserve service guarantees.
+ 	 */
+-	return idling_boosts_thr_without_issues ||
+-		idling_needed_for_service_guarantees;
++	return idling_boosts_thr_with_no_issue ||
++		idling_needed_for_service_guar;
+ }
+ 
+ /*
 -- 
 2.20.1
 
