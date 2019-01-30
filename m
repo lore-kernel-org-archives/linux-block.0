@@ -2,109 +2,106 @@ Return-Path: <SRS0=rtTj=QG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3649C169C4
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 00:13:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5B16C169C4
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 01:11:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AABDD2082E
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 00:13:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B075E21473
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 01:11:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="GhYlrmpX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727396AbfA3AN4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Jan 2019 19:13:56 -0500
-Received: from ipmail03.adl2.internode.on.net ([150.101.137.141]:43283 "EHLO
-        ipmail03.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727079AbfA3AN4 (ORCPT
+        id S1727285AbfA3BLX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Jan 2019 20:11:23 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:51874 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727219AbfA3BLX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Jan 2019 19:13:56 -0500
-Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
-  by ipmail03.adl2.internode.on.net with ESMTP; 30 Jan 2019 10:43:52 +1030
-Received: from dave by dastard with local (Exim 4.80)
-        (envelope-from <david@fromorbit.com>)
-        id 1godVl-0000N1-Fw; Wed, 30 Jan 2019 11:13:49 +1100
-Date:   Wed, 30 Jan 2019 11:13:49 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Keith Busch <keith.busch@intel.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "jack@suse.com" <jack@suse.com>, "tytso@mit.edu" <tytso@mit.edu>,
-        "prakash.v@samsung.com" <prakash.v@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH v2 0/4] Write-hint for FS journal
-Message-ID: <20190130001349.GT6173@dastard>
-References: <CGME20190109153328epcas2p4643cbdc7a2182b47893a2bcaa0778e17@epcas2p4.samsung.com>
- <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
- <20190125162353.GA11210@localhost.localdomain>
- <20190128124709.GB27972@quack2.suse.cz>
- <20190128232423.GD15302@localhost.localdomain>
- <20190129100702.GA29981@quack2.suse.cz>
+        Tue, 29 Jan 2019 20:11:23 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0U13vpj020562;
+        Wed, 30 Jan 2019 01:11:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=IFuXM0fgA7l8lZxzK+vZ9dchzz69vPVSXzmJk473HGc=;
+ b=GhYlrmpXM1qMGL3PleHikKiYBmGsJFpbxQEpOHvFcotYJTgpUbD6GGAiQXZQCKW3Uj91
+ vmZfAWMmSl9V2RH4RbBmLp+qm0rm4RGma4T6DeX3gfovP7/0rreR2SXDYj3vnM2oXVDg
+ 89ic+gnoIE9EGnVT9Cn4va0mc9J4GZpfL7HL040OShpY21BQirMB5cxqqLQoGXNwxs5F
+ yaoPYegaC20PicfnBm7CrnIDeLYj+ORUhMUC1LyE34MnywbwM1rQSwOXY0XP+TGOfRY1
+ KmZ/iBKvldXdvCUJIoWAjh7y2KGT6Wtu+Z3oOY83MfK6RhIE6WZ6cHw+n9mCbpcLdGkN kQ== 
+Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
+        by aserp2130.oracle.com with ESMTP id 2q8d2e811k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 30 Jan 2019 01:11:17 +0000
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x0U1BGdq015734
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 30 Jan 2019 01:11:17 GMT
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x0U1BFRA028316;
+        Wed, 30 Jan 2019 01:11:16 GMT
+Received: from [10.182.69.118] (/10.182.69.118)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 29 Jan 2019 17:11:15 -0800
+Subject: Re: fsync hangs after scsi rejected a request
+To:     Florian Stecker <m19@florianstecker.de>,
+        Ming Lei <tom.leiming@gmail.com>
+Cc:     Linux SCSI List <linux-scsi@vger.kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block <linux-block@vger.kernel.org>
+References: <70df6d90-31eb-96f4-908d-462ea58dea6e@florianstecker.de>
+ <CACVXFVOSHtV7jcMwEvDKZzPnsLRzkdvAEqb+ggugkM27LJvagg@mail.gmail.com>
+ <a30b5868-dd7d-d3db-b7f4-c723ac279ead@florianstecker.de>
+ <CACVXFVOzwaZyJFaOJw3K-FQUHeYGWNx8sPr8kqJzCV59Rd6sqg@mail.gmail.com>
+ <e18051e3-4008-e259-dee3-dd58f23642ab@oracle.com>
+ <4b631218-49ee-c3ed-46be-17f9d30b663f@florianstecker.de>
+ <c42631fa-3e61-e046-851e-8079906a14fb@oracle.com>
+ <d9fd42a9-6105-2404-6e74-cc540da1cf16@florianstecker.de>
+ <3d921990-06c4-4662-2853-7667b4e9a462@oracle.com>
+ <4fe48ebc-43db-7ada-087b-5ccbdb64cc66@oracle.com>
+ <00501045-a87b-27d0-6373-72dcf243b32b@florianstecker.de>
+ <a7a3e95e-5c66-31d6-c442-ad295f82d72c@oracle.com>
+From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <c5f74f0b-5a03-0478-0a5e-2232ab28713c@oracle.com>
+Date:   Wed, 30 Jan 2019 09:13:14 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190129100702.GA29981@quack2.suse.cz>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <a7a3e95e-5c66-31d6-c442-ad295f82d72c@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9151 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1901300005
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 29, 2019 at 11:07:02AM +0100, Jan Kara wrote:
-> On Mon 28-01-19 16:24:24, Keith Busch wrote:
-> > On Mon, Jan 28, 2019 at 04:47:09AM -0800, Jan Kara wrote:
-> > > On Fri 25-01-19 09:23:53, Keith Busch wrote:
-> > > > On Wed, Jan 09, 2019 at 09:00:57PM +0530, Kanchan Joshi wrote:
-> > > > > Towards supporing write-hints/streams for filesystem journal.                   
-> > > > >                                                                                 
-> > > > > Here is the v1 patch for background -                                           
-> > > > > https://marc.info/?l=linux-fsdevel&m=154444637519020&w=2                        
-> > > > >                                                                                 
-> > > > > Changes since v1:                                                               
-> > > > > - introduce four more hints for in-kernel use, as recommended by Dave chinner   
-> > > > >   & Jens axboe. This isolates kernel-mode hints from user-mode ones.            
-> > > > 
-> > > > The nvme driver disables streams if the controller doesn't support
-> > > > BLK_MAX_WRITE_HINT number of streams, so this series breaks the feature
-> > > > for controllers that only support up to 4.
-> > > 
-> > > Right. Do you know if there are such controllers? Or are you just afraid
-> > > that there could be?
-> > 
-> > I've asked around, and the concensus I received is all currently support
-> > at least 8, but they couldn't say if that would be true for potential
-> > lower budget products. Can we implement a reasonable fallback to use
-> > what's available?
-> 
-> OK, thanks for input. So probably we should just map kernel stream IDs to 0
-> if the device doesn't support them. But that probably means we need to
-> propagate number of available streams up from NVME into the block layer so
-> that this can be handled reasonably seamlessly. Jens, Kanchan?
+Hi Florian
 
-Yeah, that's basically what I said we needed to do when this was
-last discussed. i.e. that the block layer needed to know how many
-streams the hardware had and map the 4 "kernel internal" hints
-appropriately to what he device supports.
+On 1/28/19 10:42 AM, jianchao.wang wrote:
+> diff --git a/block/blk-flush.c b/block/blk-flush.c
+> index a3fc7191..6e0f2d9 100644
+> --- a/block/blk-flush.c
+> +++ b/block/blk-flush.c
+> @@ -335,7 +335,7 @@ static void mq_flush_data_end_io(struct request *rq, blk_status_t error)
+>         blk_flush_complete_seq(rq, fq, REQ_FSEQ_DATA, error);
+>         spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
+>  
+> -       blk_mq_run_hw_queue(hctx, true);
+> +       blk_mq_sched_restart(hctx);
+>  }
 
-e.g. if the device only supports 4 hints, then it needs to map the
-kernel hints either to zero. If it supports less than 8 streams,
-then they need otbe mapped into the hints above index 5. If there
-are N streams, then they need to be mapped to the hints {N-3,N}
+Does this patch work ?
 
-And, to top it all off, there needs to be guards so that if we want
-to grow the userspace hints to more than 4 hints, they don't crash
-into ranges the kernel is already reserving because of limited
-device range support.
-
-Nothing is ever simple....
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Thanks
+Jianchao
