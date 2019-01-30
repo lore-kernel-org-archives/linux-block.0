@@ -2,204 +2,159 @@ Return-Path: <SRS0=rtTj=QG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-0.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,URIBL_SBL,URIBL_SBL_A autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4543CC282D7
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 10:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0132EC282D7
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 10:48:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0936E2175B
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 10:28:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="pke4IHYp"
+	by mail.kernel.org (Postfix) with ESMTP id CF3E420857
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 10:48:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730434AbfA3K2d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Jan 2019 05:28:33 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:41372 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727752AbfA3K2d (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Jan 2019 05:28:33 -0500
-Received: by mail-ed1-f66.google.com with SMTP id a20so18531885edc.8
-        for <linux-block@vger.kernel.org>; Wed, 30 Jan 2019 02:28:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=fn7V3YbOkkbO68V7LhV3PutPtbUZbGstitGPRISHmlo=;
-        b=pke4IHYpDvM3X/T9tCxxHynPDt3jIVpFa/X9sJ9v8Je1JuckxeiJ2NagDvzaJf45rl
-         9czjROh/HoSDuISSKNB8eA3UutBWKhtthCS/B6p1m42avhHXTckdLJRIit4wPIIYjYX2
-         ZHnA2qzTiNzaLPlejsigOjNq36fTuYq3Rz4DIc955xvkagdd5ye1EaJYUfCT6QfY2/dK
-         jSKwWf0YP8YPhbDnrPpoaOX2gx2dqxTE/RixM5bwOsunBFWf5k+JI5yWV/fS2CtzQ24U
-         ESBs+pia8bk3URuhclYhaocqrNBC8xD6pF1qZikvvmKp6CsiiOTmGoG/iSHY4jbUOgtG
-         SAOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=fn7V3YbOkkbO68V7LhV3PutPtbUZbGstitGPRISHmlo=;
-        b=IPnW9NsHktnyhnm03Qn8x1YJ3W7z66zK+/t1IXatEXydCNnMhnvXmLN+5jhM/JpuFe
-         a7+gXZNsG6g41EaV5t7XN9aLckFk/8LrLpyLXyHLb4jY+/Ol1/l+wiORWXxTnxFbNYdE
-         QZLHuqCJt7Y6XPIJRgkxxpA8vgrQ6Ya1sbTBI+MrS1Ud6+46JyeZa8ZxSK8rFUzRulfN
-         f5U1WgoowwZNldeJ8FhVX//geKWMXzxfHKu43ea1PHBSjEBHVPLm7u5yAOttN2FaJf2F
-         rsovPNJWGVpmZbsPCcLHtAxQofRta1yFvVIZLaeMx5qstBu1aMV08OFQVkFA//oMbBkg
-         EDpw==
-X-Gm-Message-State: AJcUukeyT/FPiVfQ/E6Pa2JhEdtY5L2OMgdiZziHgAq/0lMyCI9d9iUm
-        HpXiIUzGxug1MpOgBaYO4O0k3W4QL7/KsQ==
-X-Google-Smtp-Source: ALg8bN6+B6SmiGEDzN8KdwsjDbTpe8m2OiXC3aglIiCX5cHqzL2rfNWG5KaruH02SqBj6nN6VVSRdA==
-X-Received: by 2002:a17:906:55b:: with SMTP id k27mr21561145eja.78.1548844110580;
-        Wed, 30 Jan 2019 02:28:30 -0800 (PST)
-Received: from ch-wrk-javier.cnexlabs.com (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id w31sm402324edw.82.2019.01.30.02.28.29
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 30 Jan 2019 02:28:29 -0800 (PST)
-From:   =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>
-To:     mb@lightnvm.io
-Cc:     hans.holmberg@cnexlabs.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Javier=20Gonz=C3=A1lez?= <javier@javigon.com>
-Subject: [PATCH V2] lightnvm: pblk: prevent stall due to wb threshold
-Date:   Wed, 30 Jan 2019 11:26:04 +0100
-Message-Id: <20190130102604.14496-1-javier@javigon.com>
-X-Mailer: git-send-email 2.17.1
+        id S1727817AbfA3KsM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Jan 2019 05:48:12 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58304 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726548AbfA3KsM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 30 Jan 2019 05:48:12 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9266B882EA;
+        Wed, 30 Jan 2019 10:48:11 +0000 (UTC)
+Received: from [10.43.2.41] (unknown [10.43.2.41])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B62FD176C2;
+        Wed, 30 Jan 2019 10:48:10 +0000 (UTC)
+From:   =?UTF-8?Q?Ond=c5=99ej_Lyson=c4=9bk?= <olysonek@redhat.com>
+Subject: Spurious device addition uevents sometimes get sent after removing a
+ loop device
+Openpgp: preference=signencrypt
+Autocrypt: addr=olysonek@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFg+zDMBCAC+5X7D1MlGuCwhGp6thNiLqOTIk625Q8CAtD/hG9r4XvMwbwOHjnKCRO43
+ JNOVz81c+x5g7RlaCx4t7CjiNZAsCGXOOY95Zo0BmWlhfNYyo/y140TM9lZcoCa+7Alwnaq3
+ Jzfc++GGXVsi1gI+eiC99ldLEMMUm/wbI52SktvfeKoeqqVbNv95XoPY4Ff2vmn87d7R82I7
+ NoK4vCzKrMxMaI32EHO3tyUQePGz/snd1oWvh4ZKSryhUfWctuyB/4pv0qtwds3SU6zvgIq/
+ ePwUG2tiHA5Ue+sPHEADNJ/MiA7q0CiftJeFbX/EeP8luq1thW6Spx31inYKp8ZHoe1TABEB
+ AAG0Jk9uZMWZZWogTHlzb27Em2sgPG9seXNvbmVrQHJlZGhhdC5jb20+iQFUBBMBCAA+AhsD
+ BQsJCAcCBhUICQoLAgQWAgMBAh4BAheAFiEE0MQtJh1N/CzvMuY4uTa3RyWJM1gFAlu+Ba4F
+ CQVgbPsACgkQuTa3RyWJM1i8oAf/QSSP+xreJuZPO0AcMO3XjL61i4qFz5Zf6hVMEsr9VOBe
+ NGqssUeSm+26eeXNxodiU8+AsrhYq7XByvjMFMFvsObnS4tbeBp/uFL/z10BkKyMy2wtEsow
+ gbjd3awfOMJhxvl/X9ISMNDaws17XVBbMMKiMzFc2Qsan6MuSYt5iyNbNT1kHDh1hUwOBkTc
+ RuSBCwpMNGcFQOPOacfguCxlrNrdlgwY7YnGK6p4PUxA7aGu7lU2VI5nfCxUxBXJUAt8z82e
+ YEPvu74xm9rSzGCREbSls9TS2rAeGuxd+FcykutO5yHU9IF+95HwH/DJAuYhhC5Hv2O+Heg7
+ yhVR30BDy7kBDQRYPswzAQgA3oSAStaoJzoq7uM+eBzSGE9rWgnTy8M8d8N9JeZuH3vHVATJ
+ lnSnrbNW4Izd3BfD0dd0ROKYHexCo5d+7rSW3SFHzCwPMCPq5IuSrYuz7zc12hARr0lfUvYE
+ jccl5KR7Uv5OjXnf3FZQ/jF0dxHSqYQeKCE1A4Nyr6b9SSM/LRuUVUR+F3NSgv8kMF7QlF87
+ Eqk+DQO8fhgHaiQz/66AdZqr4NVxqN0hsQtvrwWRm2gBXG0KBYrEGhffuiiBfGJ8A91uyPFs
+ Y+LcXUYTdh1kqUuJ3VjJli7vcVWNR201lt89S/dKlAD8oTst5D2+qLtD9HqhKr/3NdKwuO08
+ jq6LWwARAQABiQE8BBgBCAAmAhsMFiEE0MQtJh1N/CzvMuY4uTa3RyWJM1gFAlvkVWwFCQVg
+ gTkACgkQuTa3RyWJM1gqxwf/f5DR1Wk87hqmBxuK+h0oQTljlHQBU61ubGb0OFDc782CufCN
+ UtoPvjt6lA1Eeih9A5ruB3YcM86I9TPpj93QNJe4++XA8FYm9LhuxBSGTLiWsicjzgUsJ9Qf
+ emRyXmq2bWf7RxyhQ7H1x/7N8+/GSeBarlPlwSfCX0SwitrMqrjLRJ2vuPVYqxBzc2lXHUpL
+ S865iSrLgGiXH+fGmJIc0YDNMQgCpI3enhoZM2FLQ06ncXWocVNT4VqrIuUMdOi9RkhTpe3W
+ Z7cRv+XcibBt4p/oD/NSzs+PYE9J2wIAMHHdi4bmHSoajG4LfT/qOM38ishhR9I/v9uuoCbs
+ rocZkw==
+To:     axboe@kernel.dk, linux-block@vger.kernel.org
+Message-ID: <56e4bd63-1c85-7d68-3d38-1ca794e61247@redhat.com>
+Date:   Wed, 30 Jan 2019 11:48:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Wed, 30 Jan 2019 10:48:11 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In order to respect mw_cuinits, pblk's write buffer maintains a
-backpointer to protect data not yet persisted; when writing to the write
-buffer, this backpointer defines a threshold that pblk's rate-limiter
-enforces.
+Hi,
 
-On small PU configurations, the following scenarios might take place: (i)
-the threshold is larger than the write buffer and (ii) the threshold is
-smaller than the write buffer, but larger than the maximun allowed
-split bio - 256KB at this moment (Note that writes are not always
-split - we only do this when we the size of the buffer is smaller
-than the buffer). In both cases, pblk's rate-limiter prevents the I/O to
-be written to the buffer, thus stalling.
+I'd like to report a problem I ran into, where the kernel sends device
+removal uevents immediately followed by spurious device addition
+uevents. This happens after removing a loop device using the
+LOOP_CTL_REMOVE ioctl on /dev/loop-control.
 
-This patch fixes the original backpointer implementation by considering
-the threshold both on buffer creation and on the rate-limiters path,
-when bio_split is triggered (case (ii) above).
+I can reproduce it with the following program on a vanilla 5.0-rc4
+kernel, as well as Fedora's kernel-4.20.4-200.fc29.x86_64.
 
-Fixes: 766c8ceb16fc ("lightnvm: pblk: guarantee that backpointer is respected on writer stall")
-Signed-off-by: Javier González <javier@javigon.com>
----
+#include <err.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/loop.h>
+#include <unistd.h>
+#include <errno.h>
 
-  Changes since V1:
-    - Fix a bad arithmetinc on the rate-limiter max_io calculation (from
-      Hans)
+int main(void)
+{
+	const int devnum = 0;
+	int ctl_fd;
+	int removed = 0;
 
- drivers/lightnvm/pblk-rb.c | 25 +++++++++++++++++++------
- drivers/lightnvm/pblk-rl.c |  5 ++---
- drivers/lightnvm/pblk.h    |  2 +-
- 3 files changed, 22 insertions(+), 10 deletions(-)
+	ctl_fd = open("/dev/loop-control", O_RDWR);
+	if (ctl_fd == -1)
+		err(1, "ctl open");
+	if (ioctl(ctl_fd, LOOP_CTL_ADD, devnum) == -1)
+		err(1, "add ioctl");
 
-diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
-index d4ca8c64ee0f..a6133b50ed9c 100644
---- a/drivers/lightnvm/pblk-rb.c
-+++ b/drivers/lightnvm/pblk-rb.c
-@@ -45,10 +45,23 @@ void pblk_rb_free(struct pblk_rb *rb)
- /*
-  * pblk_rb_calculate_size -- calculate the size of the write buffer
-  */
--static unsigned int pblk_rb_calculate_size(unsigned int nr_entries)
-+static unsigned int pblk_rb_calculate_size(unsigned int nr_entries,
-+					   unsigned int threshold)
- {
--	/* Alloc a write buffer that can at least fit 128 entries */
--	return (1 << max(get_count_order(nr_entries), 7));
-+	unsigned int thr_sz = 1 << (get_count_order(threshold + NVM_MAX_VLBA));
-+	unsigned int max_sz = max(thr_sz, nr_entries);
-+	unsigned int max_io;
-+
-+	/* Alloc a write buffer that can (i) fit at least two split bios
-+	 * (considering max I/O size NVM_MAX_VLBA, and (ii) guarantee that the
-+	 * threshold will be respected
-+	 */
-+	max_io = (1 << max((int)(get_count_order(max_sz)),
-+				(int)(get_count_order(NVM_MAX_VLBA << 1))));
-+	if ((threshold + NVM_MAX_VLBA) >= max_io)
-+		max_io <<= 1;
-+
-+	return max_io;
- }
- 
- /*
-@@ -67,12 +80,12 @@ int pblk_rb_init(struct pblk_rb *rb, unsigned int size, unsigned int threshold,
- 	unsigned int alloc_order, order, iter;
- 	unsigned int nr_entries;
- 
--	nr_entries = pblk_rb_calculate_size(size);
-+	nr_entries = pblk_rb_calculate_size(size, threshold);
- 	entries = vzalloc(array_size(nr_entries, sizeof(struct pblk_rb_entry)));
- 	if (!entries)
- 		return -ENOMEM;
- 
--	power_size = get_count_order(size);
-+	power_size = get_count_order(nr_entries);
- 	power_seg_sz = get_count_order(seg_size);
- 
- 	down_write(&pblk_rb_lock);
-@@ -149,7 +162,7 @@ int pblk_rb_init(struct pblk_rb *rb, unsigned int size, unsigned int threshold,
- 	 * Initialize rate-limiter, which controls access to the write buffer
- 	 * by user and GC I/O
- 	 */
--	pblk_rl_init(&pblk->rl, rb->nr_entries);
-+	pblk_rl_init(&pblk->rl, rb->nr_entries, threshold);
- 
- 	return 0;
- }
-diff --git a/drivers/lightnvm/pblk-rl.c b/drivers/lightnvm/pblk-rl.c
-index 76116d5f78e4..e9e0af0df165 100644
---- a/drivers/lightnvm/pblk-rl.c
-+++ b/drivers/lightnvm/pblk-rl.c
-@@ -207,7 +207,7 @@ void pblk_rl_free(struct pblk_rl *rl)
- 	del_timer(&rl->u_timer);
- }
- 
--void pblk_rl_init(struct pblk_rl *rl, int budget)
-+void pblk_rl_init(struct pblk_rl *rl, int budget, int threshold)
- {
- 	struct pblk *pblk = container_of(rl, struct pblk, rl);
- 	struct nvm_tgt_dev *dev = pblk->dev;
-@@ -217,7 +217,6 @@ void pblk_rl_init(struct pblk_rl *rl, int budget)
- 	int sec_meta, blk_meta;
- 	unsigned int rb_windows;
- 
--
- 	/* Consider sectors used for metadata */
- 	sec_meta = (lm->smeta_sec + lm->emeta_sec[0]) * l_mg->nr_free_lines;
- 	blk_meta = DIV_ROUND_UP(sec_meta, geo->clba);
-@@ -234,7 +233,7 @@ void pblk_rl_init(struct pblk_rl *rl, int budget)
- 	/* To start with, all buffer is available to user I/O writers */
- 	rl->rb_budget = budget;
- 	rl->rb_user_max = budget;
--	rl->rb_max_io = budget >> 1;
-+	rl->rb_max_io = budget - threshold;
- 	rl->rb_gc_max = 0;
- 	rl->rb_state = PBLK_RL_HIGH;
- 
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 72ae8755764e..a6386d5acd73 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -924,7 +924,7 @@ int pblk_gc_sysfs_force(struct pblk *pblk, int force);
- /*
-  * pblk rate limiter
-  */
--void pblk_rl_init(struct pblk_rl *rl, int budget);
-+void pblk_rl_init(struct pblk_rl *rl, int budget, int threshold);
- void pblk_rl_free(struct pblk_rl *rl);
- void pblk_rl_update_rates(struct pblk_rl *rl);
- int pblk_rl_high_thrs(struct pblk_rl *rl);
--- 
-2.17.1
+	while (!removed) {
+		if (ioctl(ctl_fd, LOOP_CTL_REMOVE, devnum) == -1) {
+			/* Sometimes we get EBUSY here.
+			 * Is that expected? */
+			if (errno != EBUSY) {
+				err(1, "ioctl");
+			}
+		} else {
+			removed = 1;
+		}
+	}
+	if (close(ctl_fd) == -1) {
+		err(1, "close");
+	}
+
+	return 0;
+}
+
+If I run it like this:
+$ while sudo ./reproducer && ! test -e /dev/loop0; do true; done
+
+then after about a minute the loop terminates without any errors and
+/dev/loop0 exists.
+
+Monitoring the uevents sent by the kernel (udevadm monitor --kernel)
+reveals that during most of the executions of the program, the following
+uevents get sent:
+KERNEL[99.624241] add      /devices/virtual/bdi/7:0 (bdi)
+KERNEL[99.624392] add      /devices/virtual/block/loop0 (block)
+KERNEL[99.624779] remove   /devices/virtual/bdi/7:0 (bdi)
+KERNEL[99.624845] remove   /devices/virtual/block/loop0 (block)
+
+However, sometimes the removal uevents are followed by spurious device
+addition uevents:
+KERNEL[153.723097] add      /devices/virtual/bdi/7:0 (bdi)
+KERNEL[153.723172] add      /devices/virtual/block/loop0 (block)
+KERNEL[153.723406] remove   /devices/virtual/bdi/7:0 (bdi)
+KERNEL[153.724265] remove   /devices/virtual/block/loop0 (block)
+KERNEL[153.746690] add      /devices/virtual/bdi/7:0 (bdi)
+KERNEL[153.746931] add      /devices/virtual/block/loop0 (block)
+
+This results in /dev/loop0 being readded by udev.
+
+I can reproduce the problem more easily if I actually bind an image file
+to the loop device, e.g. like this (the referenced file.img is just
+filled with zeros):
+https://paste.fedoraproject.org/paste/o6jqJV8pBiTEk8lXIMcX-g
+
+Have you seen this?
+
+Thanks!
+
+Best regards
+Ondřej Lysoněk
 
