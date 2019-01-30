@@ -6,71 +6,72 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47182C282D7
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 15:33:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B2CC282D7
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 15:35:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 18A61218A4
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 15:33:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0DE3218A4
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 15:35:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="MfaGYnKR"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="c0OZheBE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730677AbfA3Pd4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Jan 2019 10:33:56 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:38020 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728479AbfA3Pd4 (ORCPT
+        id S1727880AbfA3Pfj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Jan 2019 10:35:39 -0500
+Received: from mail-it1-f193.google.com ([209.85.166.193]:36784 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725808AbfA3Pfj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Jan 2019 10:33:56 -0500
-Received: by mail-it1-f195.google.com with SMTP id z20so11088248itc.3
-        for <linux-block@vger.kernel.org>; Wed, 30 Jan 2019 07:33:55 -0800 (PST)
+        Wed, 30 Jan 2019 10:35:39 -0500
+Received: by mail-it1-f193.google.com with SMTP id c9so11115442itj.1
+        for <linux-block@vger.kernel.org>; Wed, 30 Jan 2019 07:35:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
+        h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=2jo0rz6J3zLmsPx45ZO1ccCSp6EZ7f1pLsxp9HSzIqc=;
-        b=MfaGYnKRjfphevmre3Nq33onA28lGOneyl0wYwTeZSGnIv88SIGsUThoaZWbAuHt8/
-         01OcPU0i2RrNQk8SkgN912kbb3ToQEdKFuS11lR5Dk3DVVfVBO6pi8H+f6dfJE0tnezs
-         VnXoKFGrMT6JUcFyLpsKjJrpJybvXxACOjiJ4WYpRWZvdKTc08gyL6ZMf2ZDarj9OMWf
-         W+PkdlM3Bj9voDkAtEN/oIOm+HdyM535+i08Kb40gqn7NcI9p0XXjoe2F5D3Ii2Bd9PS
-         eLlugAQyE3A2f861X29I2J64gqjfQNyEPC5y3/WUTs9VsJqVqmWy7YBZHoYlGTZhQThy
-         DWYA==
+        bh=TvwUEisJewc6/fT3EtlmZTvMCkdTvf5SH3EEqUgY1Gc=;
+        b=c0OZheBEi99IDp4Oboc/hS9+yO10ZJPgFvAsiuZFgiUlmGx8enDcEicRdNarFMeRMn
+         Ynfk7GUQBSK7uks6zeQXS+DzYsVtG9pUM/ocpQ0Bh8CA38dqJ0z2umyUX1i8x8sMD3nS
+         RM3XMqdd9LALQOz8F6oJ9Tt94LXJpaOewhWHOc+T3DWFRfv4yMcvFG88p8E7pBMoHhN1
+         05yjkNx00qcHTf06OkIeJfAKFWFi6JWNAcgvtgoNx5pYL+H9YrWi4pVKI0u+ZzZTQuGG
+         AF5Ukw9FQgZUHrqVCrWNaS+zpV68EpkBadsBcFWWMZlP/UN/8bmPAIkOSl84USmTWuFq
+         VZkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=2jo0rz6J3zLmsPx45ZO1ccCSp6EZ7f1pLsxp9HSzIqc=;
-        b=H50nVoWPp9j3+siIjjSHSu0O4vG6BlGd2GzY8SR+r1EVMVkg7VwoAKYz7388rNh2sg
-         EmLV9GXRjLjUwTTTcuiu0QYvafLoFjgN8/jYIb2nSnpjJg6pwoxYvBazLu3YOH9YXo3y
-         bsdTlEuNi9SU3if7K5o2+/U1drmDSvwMLvzYVm0MulWe0h9nBhFu7+GEgie6l5sbeeIL
-         rYuBiGwnEYwShg93CLWC6ke2W43IkdXPLWwjVMdzXwy4RQe/8ylysU36iWAAXJUhDxaZ
-         jprEYCItWD5ui3lOOq/K5sG/6DPoPuU1TYvoR6bcXlyXnntTAzghFgMBiDviLI6eugl8
-         ANZg==
-X-Gm-Message-State: AJcUukdeQn/tIkwPtbvoE20TB1GZ9SJeUmi2Dtq2V70iSIZiqUtlqfpO
-        bQSYGDJvPDNj963IeboQ9yOx1g==
-X-Google-Smtp-Source: ALg8bN4+yUap8MGXLfRbh2AYkG7U070ArGmVAwCkyeyoftgJwzMKqnSY1SafTz87RYLthGiwcZk/lw==
-X-Received: by 2002:a24:b951:: with SMTP id k17mr14707178iti.147.1548862435156;
-        Wed, 30 Jan 2019 07:33:55 -0800 (PST)
+        bh=TvwUEisJewc6/fT3EtlmZTvMCkdTvf5SH3EEqUgY1Gc=;
+        b=YiJmPcAXZx/5dlYS3cXaOJakdhQt0XJaS3Y2vq4FivYpe1sghE5W3RINK4/LBP+FQQ
+         cKhR1qc/mAVUyG3DjLa+SFiQxIn3C5Y0FKm5TaHQSaWOmWHui5mbCvpcgX3Xct/cQkUF
+         SK/91tT3LY8TAOgyin2Y6OBPJw/MEC0FXhZd8fBmzjecwWcznvUjUK3e7gvWEX+Xvs5J
+         dD8lp8Oi997rXdzxFVcwulADnUTbt7PreCTnY9x2fLJ207CYEM5tpE1D6HbwklddIfut
+         7RgwRyBNf6elvqhzx6Vfjygj0HJQsBfywHm5eZXIkjeItepiGma5mFE9wrtopKHyB3AQ
+         xX9A==
+X-Gm-Message-State: AJcUukcmk/mjCxLB6TK97AGqtffqCIDm6xUfo2xa1x6pLhXGYBSzHC34
+        /jOcq+BGXtK3jfIB8JRObPN/1g==
+X-Google-Smtp-Source: ALg8bN4wqnN+LYAPO2UltQCrs5CTmBaLdxY/o4GrWh4HyAyIpVjCkSes0WE8rM+VYcKxF/A79NNgdA==
+X-Received: by 2002:a24:bd48:: with SMTP id x69mr15055767ite.81.1548862538043;
+        Wed, 30 Jan 2019 07:35:38 -0800 (PST)
 Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id e10sm807963ioa.65.2019.01.30.07.33.53
+        by smtp.gmail.com with ESMTPSA id c31sm1376471itd.25.2019.01.30.07.35.36
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 30 Jan 2019 07:33:53 -0800 (PST)
-Subject: Re: [PATCH 09/18] io_uring: use fget/fput_many() for file references
-From:   Jens Axboe <axboe@kernel.dk>
+        Wed, 30 Jan 2019 07:35:37 -0800 (PST)
+Subject: Re: [PATCH 13/18] io_uring: add file set registration
 To:     Jann Horn <jannh@google.com>
 Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
         Linux API <linux-api@vger.kernel.org>, hch@lst.de,
-        jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>
+        jmoyer@redhat.com, avi@scylladb.com,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        linux-fsdevel@vger.kernel.org
 References: <20190129192702.3605-1-axboe@kernel.dk>
- <20190129192702.3605-10-axboe@kernel.dk>
- <CAG48ez3_1mY1Fb91Q3H-S2+4OiMsV5F9v78JX+YMjWqLteHpzw@mail.gmail.com>
- <bceb5e2b-9634-1296-a2a9-ed521f0e31d4@kernel.dk>
-Message-ID: <c0fd9a4c-e2ce-fa17-da95-a32b688f0ae0@kernel.dk>
-Date:   Wed, 30 Jan 2019 08:33:52 -0700
+ <20190129192702.3605-14-axboe@kernel.dk>
+ <CAG48ez2kLWUEambWesQQaeVn_u=PtjuMeDUc49yamhYspfd7Sg@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <a54c68d0-7069-a72c-5604-37b0e1ed53bf@kernel.dk>
+Date:   Wed, 30 Jan 2019 08:35:35 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <bceb5e2b-9634-1296-a2a9-ed521f0e31d4@kernel.dk>
+In-Reply-To: <CAG48ez2kLWUEambWesQQaeVn_u=PtjuMeDUc49yamhYspfd7Sg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,53 +80,141 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/29/19 4:44 PM, Jens Axboe wrote:
-> On 1/29/19 4:31 PM, Jann Horn wrote:
->> On Tue, Jan 29, 2019 at 8:27 PM Jens Axboe <axboe@kernel.dk> wrote:
->>> Add a separate io_submit_state structure, to cache some of the things
->>> we need for IO submission.
->>>
->>> One such example is file reference batching. io_submit_state. We get as
->>> many references as the number of sqes we are submitting, and drop
->>> unused ones if we end up switching files. The assumption here is that
->>> we're usually only dealing with one fd, and if there are multiple,
->>> hopefuly they are at least somewhat ordered. Could trivially be extended
->>> to cover multiple fds, if needed.
->>>
->>> On the completion side we do the same thing, except this is trivially
->>> done just locally in io_iopoll_reap().
->> [...]
->>> +static void io_file_put(struct io_submit_state *state, struct file *file)
->>> +{
->>> +       if (!state) {
->>> +               fput(file);
->>> +       } else if (state->file) {
->>> +               int diff = state->has_refs - state->used_refs;
->>> +
->>> +               if (diff)
->>> +                       fput_many(state->file, diff);
->>> +               state->file = NULL;
->>> +       }
->>> +}
+On 1/29/19 6:29 PM, Jann Horn wrote:
+> On Tue, Jan 29, 2019 at 8:27 PM Jens Axboe <axboe@kernel.dk> wrote:
+>> We normally have to fget/fput for each IO we do on a file. Even with
+>> the batching we do, the cost of the atomic inc/dec of the file usage
+>> count adds up.
 >>
->> Hmm, this function confuses me.
->> The state==NULL path works as I'd expect, it calls fput() on the file.
->> But if `state!=NULL && state->file==NULL`, it does nothing, it never
->> uses `file`.
->> And if `state->file!=NULL`, it drops the excess bias on the file's
->> refcount, but it doesn't drop the current reference - and again
->> without even looking at `file`.
+>> This adds IORING_REGISTER_FILES, and IORING_UNREGISTER_FILES opcodes
+>> for the io_uring_register(2) system call. The arguments passed in must
+>> be an array of __s32 holding file descriptors, and nr_args should hold
+>> the number of file descriptors the application wishes to pin for the
+>> duration of the io_uring context (or until IORING_UNREGISTER_FILES is
+>> called).
 >>
->> So when io_prep_rw() uses io_file_get() to grab a reference on a file
->> it hasn't seen before, it will acquire `ios_left` references and
->> actually use one of them; then if it goes through the out_fput error
->> path, it goes through the path for `state->file!=NULL`, drops
->> `ios_left-1` references (leaving the refcount elevated by 1), and
->> forgets about the file?
+>> When used, the application must set IOSQE_FIXED_FILE in the sqe->flags
+>> member. Then, instead of setting sqe->fd to the real fd, it sets sqe->fd
+>> to the index in the array passed in to IORING_REGISTER_FILES.
+>>
+>> Files are automatically unregistered when the io_uring context is
+>> torn down. An application need only unregister if it wishes to
+>> register a new set of fds.
 > 
-> I'll take a look, it's not impossible there's an off-by-one there.
+> Crazy idea:
+> 
+> Taking a step back, at a high level, basically this patch creates sort
+> of the same difference that you get when you compare the following
+> scenarios for normal multithreaded I/O in userspace:
+> 
+> ===========================================================
+> ~/tests/fdget_perf$ cat fdget_perf.c
+> #define _GNU_SOURCE
+> #include <sys/wait.h>
+> #include <sched.h>
+> #include <unistd.h>
+> #include <stdbool.h>
+> #include <string.h>
+> #include <err.h>
+> #include <signal.h>
+> #include <sys/eventfd.h>
+> #include <stdio.h>
+> 
+> // two different physical processors on my machine
+> #define CORE_A 0
+> #define CORE_B 14
+> 
+> static void pin_to_core(int coreid) {
+>   cpu_set_t set;
+>   CPU_ZERO(&set);
+>   CPU_SET(coreid, &set);
+>   if (sched_setaffinity(0, sizeof(cpu_set_t), &set))
+>     err(1, "sched_setaffinity");
+> }
+> 
+> static int fd = -1;
+> 
+> static volatile int time_over = 0;
+> static void alarm_handler(int sig) { time_over = 1; }
+> static void run_stuff(void) {
+>   unsigned long long iterations = 0;
+>   if (signal(SIGALRM, alarm_handler) == SIG_ERR) err(1, "signal");
+>   alarm(10);
+>   while (1) {
+>     uint64_t val;
+>     read(fd, &val, sizeof(val));
+>     if (time_over) {
+>       printf("iterations = 0x%llx\n", iterations);
+>       return;
+>     }
+>     iterations++;
+>   }
+> }
+> 
+> static int child_fn(void *dummy) {
+>   pin_to_core(CORE_B);
+>   run_stuff();
+>   return 0;
+> }
+> 
+> static char child_stack[1024*1024];
+> 
+> int main(int argc, char **argv) {
+>   fd = eventfd(0, EFD_NONBLOCK);
+>   if (fd == -1) err(1, "eventfd");
+> 
+>   if (argc != 2) errx(1, "bad usage");
+>   int flags = SIGCHLD;
+>   if (strcmp(argv[1], "shared") == 0) {
+>     flags |= CLONE_FILES;
+>   } else if (strcmp(argv[1], "cloned") == 0) {
+>     /* nothing */
+>   } else {
+>     errx(1, "bad usage");
+>   }
+>   pid_t child = clone(child_fn, child_stack+sizeof(child_stack), flags, NULL);
+>   if (child == -1) err(1, "clone");
+> 
+>   pin_to_core(CORE_A);
+>   run_stuff();
+>   int status;
+>   if (wait(&status) != child) err(1, "wait");
+>   return 0;
+> }
+> ~/tests/fdget_perf$ gcc -Wall -o fdget_perf fdget_perf.c
+> ~/tests/fdget_perf$ ./fdget_perf shared
+> iterations = 0x8d3010
+> iterations = 0x92d894
+> ~/tests/fdget_perf$ ./fdget_perf cloned
+> iterations = 0xad3bbd
+> iterations = 0xb08838
+> ~/tests/fdget_perf$ ./fdget_perf shared
+> iterations = 0x8cc340
+> iterations = 0x8e4e64
+> ~/tests/fdget_perf$ ./fdget_perf cloned
+> iterations = 0xada5f3
+> iterations = 0xb04b6f
+> ===========================================================
+> 
+> This kinda makes me wonder whether this is really something that
+> should be implemented specifically for the io_uring API, or whether it
+> would make sense to somehow handle part of this in the generic VFS
+> code and give the user the ability to prepare a new files_struct that
+> can then be transferred to the worker thread, or something like
+> that... I'm not sure whether there's a particularly clean way to do
+> that though.
+> 
+> Or perhaps you could add a userspace API for marking file descriptor
+> table entries as "has percpu refcounting" somehow, with one percpu
+> refcount per files_struct and one bit per fd, allocated when percpu
+> refcounting is activated for the files_struct the first time, or
+> something like that...
 
-Fixed it!
+There's undoubtedly a win by NOT sharing, obviously. Not sure how to do
+this in a generalized fashion, cleanly, it's easier (and a better fit)
+to do it for specific cases, like io_uring here. If others want to go
+down that path, io_uring could always be adapted to use that
+infrastructure.
 
 -- 
 Jens Axboe
