@@ -2,206 +2,161 @@ Return-Path: <SRS0=rtTj=QG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E9F1C282D7
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 13:57:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B782C282D7
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 14:06:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 148CC2184D
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 13:57:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1F5020882
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 14:06:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="le9sxbVQ"
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="ZIJwnOEa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731170AbfA3N5S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Jan 2019 08:57:18 -0500
-Received: from mailout3.samsung.com ([203.254.224.33]:29552 "EHLO
-        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726233AbfA3N5R (ORCPT
+        id S1730011AbfA3OGi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Jan 2019 09:06:38 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:43014 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725768AbfA3OGh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Jan 2019 08:57:17 -0500
-Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20190130135713epoutp0313ab014af4ee37731717a3cf24ccdee8~_pOb85qHt1649016490epoutp035;
-        Wed, 30 Jan 2019 13:57:13 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20190130135713epoutp0313ab014af4ee37731717a3cf24ccdee8~_pOb85qHt1649016490epoutp035
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1548856633;
-        bh=QTBuW+DrgfAwWY8gNJNWLKpQygBUuHGuL1YMrJChFe0=;
-        h=Subject:To:Cc:From:Date:In-reply-to:References:From;
-        b=le9sxbVQ7xqm8l6xY5kawZA8pC5c2JkamuyUXLiJlKM/7qYC8LgXe2m5nwCqjkFLC
-         Oxrz75thX/OzsYNTa/sQWm6dXe2r5dsq2Y9MeQ/KRUPDzAdVAPJqpfLxB5QmzFhm3c
-         NHNCU6H9SbLA7eoW9QGgq1My9jXBj5Kc7rFZs+UI=
-Received: from epsmges2p3.samsung.com (unknown [182.195.42.71]) by
-        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
-        20190130135713epcas2p2fa20cbea51f550bea9f66213adb0812f~_pObg2umW2104421044epcas2p25;
-        Wed, 30 Jan 2019 13:57:13 +0000 (GMT)
-Received: from epcas2p1.samsung.com ( [182.195.41.53]) by
-        epsmges2p3.samsung.com (Symantec Messaging Gateway) with SMTP id
-        F9.A9.04134.93DA15C5; Wed, 30 Jan 2019 22:57:13 +0900 (KST)
-Received: from epsmgms2p2new.samsung.com (unknown [182.195.42.143]) by
-        epcas2p3.samsung.com (KnoxPortal) with ESMTP id
-        20190130135713epcas2p36f828f7e372dcc1ad49f31e3547d3232~_pObP8iwm1967819678epcas2p3b;
-        Wed, 30 Jan 2019 13:57:13 +0000 (GMT)
-X-AuditID: b6c32a47-8abff70000001026-4e-5c51ad39270a
-Received: from epmmp2 ( [203.254.227.17]) by epsmgms2p2new.samsung.com
-        (Symantec Messaging Gateway) with SMTP id 54.F7.03689.83DA15C5; Wed, 30 Jan
-        2019 22:57:13 +0900 (KST)
-Received: from [107.108.221.212] by mmp2.samsung.com (Oracle Communications
-        Messaging Server 7.0.5.31.0 64bit (built May  5 2014)) with ESMTPA id
-        <0PM500CDPDF0GB70@mmp2.samsung.com>; Wed, 30 Jan 2019 22:57:12 +0900 (KST)
-Subject: Re: [PATCH v2 0/4] Write-hint for FS journal
-To:     Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>
-Cc:     Keith Busch <keith.busch@intel.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "jack@suse.com" <jack@suse.com>, "tytso@mit.edu" <tytso@mit.edu>,
-        "prakash.v@samsung.com" <prakash.v@samsung.com>,
-        Jens Axboe <axboe@fb.com>
-From:   Kanchan Joshi <joshi.k@samsung.com>
-Message-id: <0ab2f0e1-27f2-7ab4-1772-f96c1430ea3b@samsung.com>
-Date:   Wed, 30 Jan 2019 19:24:39 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
-        Thunderbird/52.6.0
-MIME-version: 1.0
-In-reply-to: <20190130001349.GT6173@dastard>
-Content-type: text/plain; charset="utf-8"; format="flowed"
-Content-language: en-US
-Content-transfer-encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprDKsWRmVeSWpSXmKPExsWy7bCmqa7l2sAYg8WdIhb/9xxjs9hy7B6j
-        xfPlixktZk9vZrK4d/QLk8XeW9oWM+fdYbPYs/cki8X8ZU/ZLa5MWcRs0drzk92B22Ni8zt2
-        j1OLJDwW73nJ5LF5Sb1H05mjzB59W1YxeqzfcpXF48yCI+wenzfJBXBGcdmkpOZklqUW6dsl
-        cGUcfitUsEqx4sGbF6wNjDcluxg5OCQETCTufGXtYuTiEBLYwShxYdZb5i5GTiDnO6PEjVfW
-        IDZIzaLfRxghijYwSly6eY4JougBo0TvYk4QW1jAVOLjthWsILaIgL3E7is7wGqYBfYyS1z9
-        pQKyjE1AU+LC5FKQMK+AncTlWVNYQGwWAVWJ2UfOMILYogIREgunPmWEqBGU+DH5HlgNp4CO
-        xNZP+xghRlpJPPvXygphi0s0t95kgbDlJTavAbmfC+jmbnaJnW+Os0I84CLxf8VWZghbWuLZ
-        qo2MEHaxxK87R6EaOhglrjfMZIFI2Etc3PMX6gE+iY7Df9khocUr0dEmBGF6SHz4rQEJkzdM
-        Eo/+NLFMYJSZheTuWUhunYXk1llIbl3AyLKKUSy1oDg3PbXYqMBYrzgxt7g0L10vOT93EyM4
-        zWi572Dcds7nEKMAB6MSD2/H6sAYIdbEsuLK3EOMEhzMSiK8hr/9Y4R4UxIrq1KL8uOLSnNS
-        iw8xSnOwKInzPpSeGy0kkJ5YkpqdmlqQWgSTZeLglGpgPPZMZKJJ1o/qC5Jaf8xjrMz0bEr+
-        lHy4IbN/g2jy2dK971ry9HhfstvYHM7m9vbncDwf3iO36+O5ib7ed37yhe+c9d9JuzOgyEbn
-        5tSPcZqbapZz3BCsdE9veDnfT4j92s/ZDL0Z8w1mmh1T35vWkf38tdmjbRMnqB6f7+q5iMW0
-        Of/M39WflFiKMxINtZiLihMB75wicS8DAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprIIsWRmVeSWpSXmKPExsVy+t9jQV3LtYExBpPnMln833OMzWLLsXuM
-        Fs+XL2a0mD29mcni3tEvTBZ7b2lbzJx3h81iz96TLBbzlz1lt7gyZRGzRWvPT3YHbo+Jze/Y
-        PU4tkvBYvOclk8fmJfUeTWeOMnv0bVnF6LF+y1UWjzMLjrB7fN4kF8AZxWWTkpqTWZZapG+X
-        wJVx+K1QwSrFigdvXrA2MN6U7GLk5JAQMJFY9PsIYxcjF4eQwDpGie17rrBDOI8YJT78m88O
-        UiUsYCrxcdsKVhBbRMBeYveVHUwgRcwCe5kl9s7fzwrR8Y5JYubbo0AOBwebgKbEhcmlIA28
-        AnYSl2dNYQGxWQRUJWYfOcMIYosKREh0rpzPAlEjKPFj8j0wm1NAR2Lrp31gNcwCZhJfXh5m
-        hbDFJZpbb7JA2PISm9e8ZZ7AKDALSfssJC2zkLTMQtKygJFlFaNkakFxbnpusVGBUV5quV5x
-        Ym5xaV66XnJ+7iZGYERtO6zVv4Px8ZL4Q4wCHIxKPLwMwQExQqyJZcWVuYcYJTiYlUR4DX/7
-        xwjxpiRWVqUW5ccXleakFh9ilOZgURLn5c8/FikkkJ5YkpqdmlqQWgSTZeLglGpgFE8W4Vs/
-        M+D8mo9LJgW5qzWZhjz5troqMlAr1k2De+0/7c0Cz9hVF08RuNe//MuSGEN52fOz259FXb+7
-        287j07+Stku/Pt2rVlkhyDnpzpOWc1Y6yfOXbHPd+OP20wsn/q1+//381NjPzZtmKGcmT94Y
-        +3l/bdJlmX8vttXf+P/XLcd1C0cQU5gSS3FGoqEWc1FxIgBvwsSHpAIAAA==
-X-CMS-MailID: 20190130135713epcas2p36f828f7e372dcc1ad49f31e3547d3232
-CMS-TYPE: 102P
-X-CMS-RootMailID: 20190109153328epcas2p4643cbdc7a2182b47893a2bcaa0778e17
-References: <CGME20190109153328epcas2p4643cbdc7a2182b47893a2bcaa0778e17@epcas2p4.samsung.com>
-        <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
-        <20190125162353.GA11210@localhost.localdomain>
-        <20190128124709.GB27972@quack2.suse.cz>
-        <20190128232423.GD15302@localhost.localdomain>
-        <20190129100702.GA29981@quack2.suse.cz> <20190130001349.GT6173@dastard>
+        Wed, 30 Jan 2019 09:06:37 -0500
+Received: by mail-pf1-f194.google.com with SMTP id w73so11444301pfk.10
+        for <linux-block@vger.kernel.org>; Wed, 30 Jan 2019 06:06:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=SNEFHnDHEV2InRGScoBt6ATM/ddSE+5UswWzWFkZm0s=;
+        b=ZIJwnOEaf74zNni6akN93jeK4w8ifnt7ICWhRVuRd/qT7zOJVkPrg/zTP0V35DP19m
+         caffGrUjYMtNmxaSGH+sDW+477Xu9lE2B5IH3D9oLxIqvCkMuXvaTwutiXwbc2671Yur
+         8iGY9Y7yyZAjvlzEUXWj9HT34Qv76wRvdc4fm5i6HcB4/rBuTOcXmu4QkKz/UgaM8BIL
+         zO+2tdqk7bAu6QHuG6au17eGKUVoK0QnYgkg/rxizoqlknt+Rv/8ChzTYUDZG6J72Sm3
+         uC2E8PsUq5SuJ1dBGabJCDE1RBNrQnz7lBpFbiCDkvPXiMjhNIxp/bTfdCPrvt8K5m+W
+         VuEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=SNEFHnDHEV2InRGScoBt6ATM/ddSE+5UswWzWFkZm0s=;
+        b=RoXVzAlMkzkcmt/Txuy3oP7bdJhupK4oepVDOhM9H/9w3g33tL/4HeSCQ3pmDLUlOY
+         Ug+/zTOH3xs36XYKllPRrqAmGoxjEmPMMNT1Lbpzzb5IjAVR9B6j6Dkr26uSXr6dM2Ko
+         C/KXHjSvwb6qNgSipH0trxrl+4RGi4RMLHLs/YtG/eEgnv4IBSBkDl6eU7q5sxY0WSSa
+         JlAFppPeGG6ZCogBVLnsd0oRq8hB/47nt6QOguxiQgUrE94TuCBfwmhvThlHZwcYxIAX
+         RPRB+NLw2h0ZT7z56qvzJgeZSQ+E5bx68Og9ky/HSQYGqPontmQFGUTeBVVsU3i+MOMF
+         93uw==
+X-Gm-Message-State: AJcUukemCIFsADFRdcOuct61DdPCdQ+28rPzZpWecdAp5wqZgu9sVe9f
+        /RjVY23wL565q/MXu13FlbgaBQ==
+X-Google-Smtp-Source: ALg8bN4n0YGuG32nnBaMV9dx8R6Ptx/d5Iw/PDQ9sCWJ6hJajV1LDBFtc09PAbE/m7L8MOSviStqIg==
+X-Received: by 2002:a65:4904:: with SMTP id p4mr27994572pgs.384.1548857196924;
+        Wed, 30 Jan 2019 06:06:36 -0800 (PST)
+Received: from [192.168.15.224] (71-6-111-190.static-ip.telepacific.net. [71.6.111.190])
+        by smtp.gmail.com with ESMTPSA id y1sm2544416pfe.9.2019.01.30.06.06.35
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 30 Jan 2019 06:06:36 -0800 (PST)
+Subject: Re: [PATCH] lightnvm: pblk: fix bio leak on large sized io
+To:     chansol.kim@samsung.com,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     "matias.bjorling@wdc.com" <matias.bjorling@wdc.com>,
+        "javier@javigon.com" <javier@javigon.com>
+References: <CGME20190130015343epcms2p14be92e88982e86f5e9d494e3bdc3fb2a@epcms2p1>
+ <20190130015343epcms2p14be92e88982e86f5e9d494e3bdc3fb2a@epcms2p1>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <5aa5596b-6394-0d09-533b-0365bc064152@lightnvm.io>
+Date:   Wed, 30 Jan 2019 15:06:34 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:60.0)
+ Gecko/20100101 Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <20190130015343epcms2p14be92e88982e86f5e9d494e3bdc3fb2a@epcms2p1>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On Wednesday 30 January 2019 05:43 AM, Dave Chinner wrote:
-> On Tue, Jan 29, 2019 at 11:07:02AM +0100, Jan Kara wrote:
->> On Mon 28-01-19 16:24:24, Keith Busch wrote:
->>> On Mon, Jan 28, 2019 at 04:47:09AM -0800, Jan Kara wrote:
->>>> On Fri 25-01-19 09:23:53, Keith Busch wrote:
->>>>> On Wed, Jan 09, 2019 at 09:00:57PM +0530, Kanchan Joshi wrote:
->>>>>> Towards supporing write-hints/streams for filesystem journal.
->>>>>>                                                                                  
->>>>>> Here is the v1 patch for background -
->>>>>> https://marc.info/?l=linux-fsdevel&m=154444637519020&w=2
->>>>>>                                                                                  
->>>>>> Changes since v1:
->>>>>> - introduce four more hints for in-kernel use, as recommended by Dave chinner
->>>>>>    & Jens axboe. This isolates kernel-mode hints from user-mode ones.
->>>>>
->>>>> The nvme driver disables streams if the controller doesn't support
->>>>> BLK_MAX_WRITE_HINT number of streams, so this series breaks the feature
->>>>> for controllers that only support up to 4.
->>>>
->>>> Right. Do you know if there are such controllers? Or are you just afraid
->>>> that there could be?
->>>
->>> I've asked around, and the concensus I received is all currently support
->>> at least 8, but they couldn't say if that would be true for potential
->>> lower budget products. Can we implement a reasonable fallback to use
->>> what's available?
->>
->> OK, thanks for input. So probably we should just map kernel stream IDs to 0
->> if the device doesn't support them. But that probably means we need to
->> propagate number of available streams up from NVME into the block layer so
->> that this can be handled reasonably seamlessly. Jens, Kanchan?
+On 1/30/19 2:53 AM, 김찬솔 wrote:
 > 
-> Yeah, that's basically what I said we needed to do when this was
-> last discussed. i.e. that the block layer needed to know how many
-> streams the hardware had and map the 4 "kernel internal" hints
-> appropriately to what he device supports.
+> Changes:
+>   1. Function pblk_rw_io to get bio* as a reference
+>   2. In pblk_rw_io bio_put call on read case removed
 > 
-> e.g. if the device only supports 4 hints, then it needs to map the
-> kernel hints either to zero. If it supports less than 8 streams,
-> then they need otbe mapped into the hints above index 5. If there
-> are N streams, then they need to be mapped to the hints {N-3,N}
+> A fix to address issue where
+>   1. pblk_make_rq calls pblk_rw_io passes bio* pointer as a value (0xA)
+>   2. pblk_rw_io calls blk_queue_split passing bio* pointer as reference
+>   3. In blk_queue_split, when there is a split, the original bio* (0xA)
+>      is passed to generic_make_requests, and the newly allocated bio is
+>      returned
+>   4. If NVM_IO_DONE returned, pblk_make_rq calls bio_endio on the bio*,
+>      that is not the one returned by blk_queue_split
+>   5. As a result bio_endio is not called on the newly allocated bio.
+
+The commit message needs a bit of massaging. The Changes: paragraph is 
+not needed (that is what the patch is for). Also, please redo the second 
+paragraph in without the bullets.
+
 > 
-> And, to top it all off, there needs to be guards so that if we want
-> to grow the userspace hints to more than 4 hints, they don't crash
-> into ranges the kernel is already reserving because of limited
-> device range support.
+> Signed-off-by: chansol.kim <chansol.kim@samsung.com>
+> ---
+>   drivers/lightnvm/pblk-init.c | 22 ++++++++--------------
+>   1 file changed, 8 insertions(+), 14 deletions(-)
 > 
-> Nothing is ever simple....
+> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+> index b57f764d..4efc929 100644
+> --- a/drivers/lightnvm/pblk-init.c
+> +++ b/drivers/lightnvm/pblk-init.c
+> @@ -31,30 +31,24 @@ static DECLARE_RWSEM(pblk_lock);
+>   struct bio_set pblk_bio_set;
+>   
+>   static int pblk_rw_io(struct request_queue *q, struct pblk *pblk,
+> -			  struct bio *bio)
+> +			  struct bio **bio)
+
+I am not sure why the **bio change is needed. Can you elaborate?
+
+>   {
+> -	int ret;
+> -
+>   	/* Read requests must be <= 256kb due to NVMe's 64 bit completion bitmap
+>   	 * constraint. Writes can be of arbitrary size.
+>   	 */
+> -	if (bio_data_dir(bio) == READ) {
+> -		blk_queue_split(q, &bio);
+> -		ret = pblk_submit_read(pblk, bio);
+> -		if (ret == NVM_IO_DONE && bio_flagged(bio, BIO_CLONED))
+> -			bio_put(bio);
+> -
+> -		return ret;
+> +	if (bio_data_dir(*bio) == READ) {
+> +		blk_queue_split(q, bio);
+> +		return pblk_submit_read(pblk, *bio);
+>   	}
+>   
+>   	/* Prevent deadlock in the case of a modest LUN configuration and large
+>   	 * user I/Os. Unless stalled, the rate limiter leaves at least 256KB
+>   	 * available for user I/O.
+>   	 */
+> -	if (pblk_get_secs(bio) > pblk_rl_max_io(&pblk->rl))
+> -		blk_queue_split(q, &bio);
+> +	if (pblk_get_secs(*bio) > pblk_rl_max_io(&pblk->rl))
+> +		blk_queue_split(q, bio);
+>   
+> -	return pblk_write_to_cache(pblk, bio, PBLK_IOTYPE_USER);
+> +	return pblk_write_to_cache(pblk, *bio, PBLK_IOTYPE_USER);
+>   }
+>   
+>   static blk_qc_t pblk_make_rq(struct request_queue *q, struct bio *bio)
+> @@ -69,7 +63,7 @@ static blk_qc_t pblk_make_rq(struct request_queue *q, struct bio *bio)
+>   		}
+>   	}
+>   
+> -	switch (pblk_rw_io(q, pblk, bio)) {
+> +	switch (pblk_rw_io(q, pblk, &bio)) {
+>   	case NVM_IO_ERR:
+>   		bio_io_error(bio);
+>   		break;
 > 
-Thanks all for feedback.
-user-hints, when they reach to kernel via fcntl path, are sanity-checked 
-(rw_hint_valid function).
-Currently streams are enabled when nvme driver is made to run with 
-"streams =1" option, while stream users always pass some write-hint, 
-without bothering whether streams (and how many of those) are 
-operational or not. This keeps configuration simple for stream users. 
-Second, block layer does not translate write-hint to stream-number, 
-rather it is done inside nvme driver. I suppose I should keep both these 
-properties intact.
-And considering all the suggestions, this is the plan for V3 -
-
-[In block layer]
-1. Introduce one macro "KERN_WRITE_HINT_MIN" which will take the value 
-"user_hint_cnt + 1".
-FS code will use this value (onwards) to define their own streams.
-
-2. Introduce another macro "BLK_MAX_KERNEL_WRITE_HINTS" which will be 
-set to 4 for now.
-
-[In nvme driver]
-1. Continue working as before if device supports just 4 streams. All 
-these streams are used by user-hints, and kernel-hints are translated to 0.
-
-2. If device supports any more than 4 streams, those will be mapped to 
-serve kernel-hints, starting from KERN_WRITE_HINT_MIN onwards.
-For example, if device has 6 streams, four streams (numbers = 1,2,3,4) 
-will be used to serve user-hints and two streams ( numbers = 65535, 
-65534) will be used to serve first two kernel hints. Other kernel-hints 
-get mapped to 0. OTOH, if device has 10 streams, first four kernel-hints 
-will be mapped to non-zero values (65535 to 65532) and anything else 
-would get turned to 0.
-
-
-Let me know if this sounds fine?
-
-
-Thanks,
-Kanchan
-
-
-
-
-
 
