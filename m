@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35B44C282D7
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 23:30:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85061C282D7
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 23:34:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D64BD218D2
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 23:30:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18EC920882
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 23:34:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="tX4oGWvP"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ISO5GH3L"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725817AbfA3XaW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Jan 2019 18:30:22 -0500
-Received: from mail-it1-f194.google.com ([209.85.166.194]:54671 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725768AbfA3XaW (ORCPT
+        id S1727042AbfA3Xec (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Jan 2019 18:34:32 -0500
+Received: from mail-it1-f195.google.com ([209.85.166.195]:36290 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726802AbfA3Xec (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Jan 2019 18:30:22 -0500
-Received: by mail-it1-f194.google.com with SMTP id i145so1065278ita.4
-        for <linux-block@vger.kernel.org>; Wed, 30 Jan 2019 15:30:21 -0800 (PST)
+        Wed, 30 Jan 2019 18:34:32 -0500
+Received: by mail-it1-f195.google.com with SMTP id c9so1175330itj.1
+        for <linux-block@vger.kernel.org>; Wed, 30 Jan 2019 15:34:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=G8T35uShc/XUaofaPvfFcDkbFt1ms1TuRNJTOihxJHM=;
-        b=tX4oGWvPvCYD1NMuEVTmGNhl5bFmGc5hWs44xDP6WPP9WfpRAOYIzhZ7YywEslSAST
-         Ez+ekYRgFVDUoZTWVGmPttvIM6eLX1rlSc+B22x00fr4zTLJxPsCy04DchVV44pIIkfi
-         OelLAPdXt504Mf9T4iAmpFnjjCcb22701qNWTD4b06ar8H+97u0EPaej+wvRvnax0UFX
-         IrboEeqTSRVPNBrb1uKp6Coyv8RmaYTy93y5a4InVHATF66rj5rHSB0wUeB6PUu35TZC
-         eZJHo2OuTpvBOiPxWRI1TXtAn6mndBFFP1/LOf1ElDSkTEJIROa0374mkAIsyGxi9q1P
-         vByQ==
+        bh=5b7Exr4PV8hVWpdNmnRGQGKmT5uzYqQuKb6M9KotwUo=;
+        b=ISO5GH3LGbbX3mi2qmXimjXKRC38oaWRsrY4LvJf/liXJms28vAerArBhu30wwX0QB
+         VIZf53K+lw6OMcKcb1nQqPpNA8N3mmivPYptt+4+HwEIi6rEcLB78eljJmLrJKV/m7ts
+         Rxs4jvFbY9OPim60UzF8OU5BhUTfAEPg7BWj6UWwC7oWp+ehXMKbMY8+urqvNa3qd8WE
+         YhDlNd3ymRcCL9W4i+xQhGlT1du/wdsySuABJHxVrOGbYrGd72KTsw0SHrhGBDlTeYSr
+         4FJhK/9s7zD+RJgkP1kRYW0O+4satKqlZ7TmCz7wqQI9gUW3r/hB/QwruGqyIEtOAxr3
+         owUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=G8T35uShc/XUaofaPvfFcDkbFt1ms1TuRNJTOihxJHM=;
-        b=b2J3nWfZEhK9LivZeMngDBCyzljgG6wIYLICkqw1qE1aRWrJjf9NQah44Y7ysjLZjb
-         8ebuOcotyF+6hVi6ZIkz/LOr8wjVxYAP5CK7BsFt6RXKKdENzlG+aaBwJOXv9EH/snaA
-         lzyFfJsnm/+vFWp1w8kz87BSKhJpR0DegyOwsnL/otL4Y6E2kTkOqtL7PjIFj8l4E34I
-         d5P44pOErKqTBi3DYHeNtwANlSuUbCgpl6Yx4aabWGImKrAegOR9IO82sWRhrsSMQH7y
-         dyRdqOwo2/0DSUEIBLIMgqpK2zr6PZoGG0rBSBfp3HK74Mq6oEjKQOkUYZdTDQzHdGbR
-         yddQ==
-X-Gm-Message-State: AJcUukcsTzhNicCVQGWHxO97c4tuCb90sNik30Vfvs55btluPIOLas5W
-        M2AYgtyX2NoOIE8UQBtbp3SAgs0Y62g=
-X-Google-Smtp-Source: ALg8bN5EGQbR777P4NUVr68BjsXKxRSHmIOSrfh13QxKa1KScpPFvn4g4OlF8X3bXqlXw3DRKl2fZQ==
-X-Received: by 2002:a24:390a:: with SMTP id l10mr16666550ita.0.1548885358636;
-        Wed, 30 Jan 2019 13:55:58 -0800 (PST)
+        bh=5b7Exr4PV8hVWpdNmnRGQGKmT5uzYqQuKb6M9KotwUo=;
+        b=ZXmtsEI3gl6EWTsU1RuXG8NJNJWNNSYZwBUKid2VZSFqfy5ZazljkUIpvh/Wi/PpHF
+         6GLu1+FgSbszcA5Btf+82NIhiATN2MfNixE32271DXf5kZtGbecXC2Al5tIKAhsIycwj
+         2yLypYMHtbU05TOjoXukddfHVwyXh7ApGrhFHS8hfuBJFYvNAFOwGvSL4lOya/9CihyJ
+         VlJQzIbjyz/KOJ/7dFI89ewyjIBb2UrK/W+phhSRFuKW71QtNo2vJ7IgdFy5ttW8+UCK
+         wcS3BrIN/MnzbenYH4cf/Zrm/n5gr5x2tof2ln/X6r30jPMj98WVUF5SxDVGOuTL+EsT
+         V0rQ==
+X-Gm-Message-State: AJcUukdBlGOpPP+7phHq0Iq2IlGjLmsH6mT5KYSzVJg50MfFFl/7CfkI
+        se6z4fdIL34mXq+BeoWebzesfQ==
+X-Google-Smtp-Source: ALg8bN4YThcSjf5d2luGnYWE8NgcLp0SFaraUn4egG5twLAAlERTlfEhVxt50OZanqlbcalqTJ/mwA==
+X-Received: by 2002:a02:57c4:: with SMTP id b65mr20536842jad.79.1548885367822;
+        Wed, 30 Jan 2019 13:56:07 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id 189sm1805081itw.33.2019.01.30.13.55.56
+        by smtp.gmail.com with ESMTPSA id 189sm1805081itw.33.2019.01.30.13.56.06
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 30 Jan 2019 13:55:57 -0800 (PST)
+        Wed, 30 Jan 2019 13:56:06 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-aio@kvack.org, linux-block@vger.kernel.org,
         linux-api@vger.kernel.org
 Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com, jannh@google.com,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 08/18] fs: add fget_many() and fput_many()
-Date:   Wed, 30 Jan 2019 14:55:30 -0700
-Message-Id: <20190130215540.20871-9-axboe@kernel.dk>
+Subject: [PATCH 13/18] io_uring: add file set registration
+Date:   Wed, 30 Jan 2019 14:55:35 -0700
+Message-Id: <20190130215540.20871-14-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190130215540.20871-1-axboe@kernel.dk>
 References: <20190130215540.20871-1-axboe@kernel.dk>
@@ -70,141 +70,328 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Some uses cases repeatedly get and put references to the same file, but
-the only exposed interface is doing these one at the time. As each of
-these entail an atomic inc or dec on a shared structure, that cost can
-add up.
+We normally have to fget/fput for each IO we do on a file. Even with
+the batching we do, the cost of the atomic inc/dec of the file usage
+count adds up.
 
-Add fget_many(), which works just like fget(), except it takes an
-argument for how many references to get on the file. Ditto fput_many(),
-which can drop an arbitrary number of references to a file.
+This adds IORING_REGISTER_FILES, and IORING_UNREGISTER_FILES opcodes
+for the io_uring_register(2) system call. The arguments passed in must
+be an array of __s32 holding file descriptors, and nr_args should hold
+the number of file descriptors the application wishes to pin for the
+duration of the io_uring context (or until IORING_UNREGISTER_FILES is
+called).
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+When used, the application must set IOSQE_FIXED_FILE in the sqe->flags
+member. Then, instead of setting sqe->fd to the real fd, it sets sqe->fd
+to the index in the array passed in to IORING_REGISTER_FILES.
+
+Files are automatically unregistered when the io_uring context is
+torn down. An application need only unregister if it wishes to
+register a new set of fds.
+
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/file.c            | 15 ++++++++++-----
- fs/file_table.c      |  9 +++++++--
- include/linux/file.h |  2 ++
- include/linux/fs.h   |  4 +++-
- 4 files changed, 22 insertions(+), 8 deletions(-)
+ fs/io_uring.c                 | 147 +++++++++++++++++++++++++++++-----
+ include/uapi/linux/io_uring.h |   9 ++-
+ 2 files changed, 133 insertions(+), 23 deletions(-)
 
-diff --git a/fs/file.c b/fs/file.c
-index 3209ee271c41..97df385d6ab0 100644
---- a/fs/file.c
-+++ b/fs/file.c
-@@ -705,7 +705,7 @@ void do_close_on_exec(struct files_struct *files)
- 	spin_unlock(&files->file_lock);
- }
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 30a1e0999c80..5a9d0483cad6 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -100,6 +100,14 @@ struct io_ring_ctx {
+ 		struct fasync_struct	*cq_fasync;
+ 	} ____cacheline_aligned_in_smp;
  
--static struct file *__fget(unsigned int fd, fmode_t mask)
-+static struct file *__fget(unsigned int fd, fmode_t mask, unsigned int refs)
- {
- 	struct files_struct *files = current->files;
- 	struct file *file;
-@@ -720,7 +720,7 @@ static struct file *__fget(unsigned int fd, fmode_t mask)
++	/*
++	 * If used, fixed file set. Writers must ensure that ->refs is dead,
++	 * readers must ensure that ->refs is alive as long as the file* is
++	 * used. Only updated through io_uring_register(2).
++	 */
++	struct file		**user_files;
++	unsigned		nr_user_files;
++
+ 	/* if used, fixed mapped user buffers */
+ 	unsigned		nr_user_bufs;
+ 	struct io_mapped_ubuf	*user_bufs;
+@@ -142,6 +150,7 @@ struct io_kiocb {
+ 	unsigned int		flags;
+ #define REQ_F_FORCE_NONBLOCK	1	/* inline submission attempt */
+ #define REQ_F_IOPOLL_COMPLETED	2	/* polled IO has completed */
++#define REQ_F_FIXED_FILE	4	/* ctx owns file */
+ 	u64			user_data;
+ 	u64			error;
+ 
+@@ -356,15 +365,17 @@ static void io_iopoll_complete(struct io_ring_ctx *ctx, unsigned int *nr_events,
+ 		 * Batched puts of the same file, to avoid dirtying the
+ 		 * file usage count multiple times, if avoidable.
  		 */
- 		if (file->f_mode & mask)
- 			file = NULL;
--		else if (!get_file_rcu(file))
-+		else if (!get_file_rcu_many(file, refs))
- 			goto loop;
+-		if (!file) {
+-			file = req->rw.ki_filp;
+-			file_count = 1;
+-		} else if (file == req->rw.ki_filp) {
+-			file_count++;
+-		} else {
+-			fput_many(file, file_count);
+-			file = req->rw.ki_filp;
+-			file_count = 1;
++		if (!(req->flags & REQ_F_FIXED_FILE)) {
++			if (!file) {
++				file = req->rw.ki_filp;
++				file_count = 1;
++			} else if (file == req->rw.ki_filp) {
++				file_count++;
++			} else {
++				fput_many(file, file_count);
++				file = req->rw.ki_filp;
++				file_count = 1;
++			}
+ 		}
+ 
+ 		if (to_free == ARRAY_SIZE(reqs))
+@@ -496,13 +507,19 @@ static void kiocb_end_write(struct kiocb *kiocb)
  	}
- 	rcu_read_unlock();
-@@ -728,15 +728,20 @@ static struct file *__fget(unsigned int fd, fmode_t mask)
- 	return file;
  }
  
-+struct file *fget_many(unsigned int fd, unsigned int refs)
++static void io_fput(struct io_kiocb *req)
 +{
-+	return __fget(fd, FMODE_PATH, refs);
++	if (!(req->flags & REQ_F_FIXED_FILE))
++		fput(req->rw.ki_filp);
 +}
 +
- struct file *fget(unsigned int fd)
+ static void io_complete_rw(struct kiocb *kiocb, long res, long res2)
  {
--	return __fget(fd, FMODE_PATH);
-+	return __fget(fd, FMODE_PATH, 1);
+ 	struct io_kiocb *req = container_of(kiocb, struct io_kiocb, rw);
+ 
+ 	kiocb_end_write(kiocb);
+ 
+-	fput(kiocb->ki_filp);
++	io_fput(req);
+ 	io_cqring_add_event(req->ctx, req->user_data, res, 0);
+ 	io_free_req(req);
  }
- EXPORT_SYMBOL(fget);
- 
- struct file *fget_raw(unsigned int fd)
+@@ -601,11 +618,22 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
  {
--	return __fget(fd, 0);
-+	return __fget(fd, 0, 1);
- }
- EXPORT_SYMBOL(fget_raw);
+ 	struct io_ring_ctx *ctx = req->ctx;
+ 	struct kiocb *kiocb = &req->rw;
+-	unsigned ioprio;
++	unsigned ioprio, flags;
+ 	int fd, ret;
  
-@@ -767,7 +772,7 @@ static unsigned long __fget_light(unsigned int fd, fmode_t mask)
- 			return 0;
- 		return (unsigned long)file;
- 	} else {
--		file = __fget(fd, mask);
-+		file = __fget(fd, mask, 1);
- 		if (!file)
- 			return 0;
- 		return FDPUT_FPUT | (unsigned long)file;
-diff --git a/fs/file_table.c b/fs/file_table.c
-index 5679e7fcb6b0..155d7514a094 100644
---- a/fs/file_table.c
-+++ b/fs/file_table.c
-@@ -326,9 +326,9 @@ void flush_delayed_fput(void)
- 
- static DECLARE_DELAYED_WORK(delayed_fput_work, delayed_fput);
- 
--void fput(struct file *file)
-+void fput_many(struct file *file, unsigned int refs)
- {
--	if (atomic_long_dec_and_test(&file->f_count)) {
-+	if (atomic_long_sub_and_test(refs, &file->f_count)) {
- 		struct task_struct *task = current;
- 
- 		if (likely(!in_interrupt() && !(task->flags & PF_KTHREAD))) {
-@@ -347,6 +347,11 @@ void fput(struct file *file)
++	flags = READ_ONCE(sqe->flags);
+ 	fd = READ_ONCE(sqe->fd);
+-	kiocb->ki_filp = io_file_get(state, fd);
++
++	if (flags & IOSQE_FIXED_FILE) {
++		if (unlikely(!ctx->user_files ||
++		    (unsigned) fd >= ctx->nr_user_files))
++			return -EBADF;
++		kiocb->ki_filp = ctx->user_files[fd];
++		req->flags |= REQ_F_FIXED_FILE;
++	} else {
++		kiocb->ki_filp = io_file_get(state, fd);
++	}
++
+ 	if (unlikely(!kiocb->ki_filp))
+ 		return -EBADF;
+ 	kiocb->ki_pos = READ_ONCE(sqe->off);
+@@ -647,10 +675,14 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
  	}
+ 	return 0;
+ out_fput:
+-	/* in case of error, we didn't use this file reference. drop it. */
+-	if (state)
+-		state->used_refs--;
+-	io_file_put(state, kiocb->ki_filp);
++	if (!(flags & IOSQE_FIXED_FILE)) {
++		/*
++		 * in case of error, we didn't use this file reference. drop it.
++		 */
++		if (state)
++			state->used_refs--;
++		io_file_put(state, kiocb->ki_filp);
++	}
+ 	return ret;
  }
  
-+void fput(struct file *file)
+@@ -781,7 +813,7 @@ static ssize_t io_read(struct io_kiocb *req, const struct sqe_submit *s,
+ 	kfree(iovec);
+ out_fput:
+ 	if (unlikely(ret))
+-		fput(file);
++		io_fput(req);
+ 	return ret;
+ }
+ 
+@@ -836,7 +868,7 @@ static ssize_t io_write(struct io_kiocb *req, const struct sqe_submit *s,
+ 	kfree(iovec);
+ out_fput:
+ 	if (unlikely(ret))
+-		fput(file);
++		io_fput(req);
+ 	return ret;
+ }
+ 
+@@ -862,7 +894,7 @@ static int io_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+ 	loff_t sqe_off = READ_ONCE(sqe->off);
+ 	loff_t sqe_len = READ_ONCE(sqe->len);
+ 	loff_t end = sqe_off + sqe_len;
+-	unsigned fsync_flags;
++	unsigned fsync_flags, flags;
+ 	struct file *file;
+ 	int ret, fd;
+ 
+@@ -880,14 +912,23 @@ static int io_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+ 		return -EINVAL;
+ 
+ 	fd = READ_ONCE(sqe->fd);
+-	file = fget(fd);
++	flags = READ_ONCE(sqe->flags);
++
++	if (flags & IOSQE_FIXED_FILE) {
++		if (unlikely(!ctx->user_files || fd >= ctx->nr_user_files))
++			return -EBADF;
++		file = ctx->user_files[fd];
++	} else {
++		file = fget(fd);
++	}
+ 	if (unlikely(!file))
+ 		return -EBADF;
+ 
+ 	ret = vfs_fsync_range(file, sqe_off, end > 0 ? end : LLONG_MAX,
+ 				fsync_flags & IORING_FSYNC_DATASYNC);
+ 
+-	fput(file);
++	if (!(flags & IOSQE_FIXED_FILE))
++		fput(file);
+ 	io_cqring_add_event(ctx, sqe->user_data, ret, 0);
+ 	io_free_req(req);
+ 	return 0;
+@@ -1025,7 +1066,7 @@ static int io_submit_sqe(struct io_ring_ctx *ctx, const struct sqe_submit *s,
+ 	ssize_t ret;
+ 
+ 	/* enforce forwards compatibility on users */
+-	if (unlikely(s->sqe->flags))
++	if (unlikely(s->sqe->flags & ~IOSQE_FIXED_FILE))
+ 		return -EINVAL;
+ 
+ 	req = io_get_req(ctx, state);
+@@ -1244,6 +1285,58 @@ static int __io_uring_enter(struct io_ring_ctx *ctx, unsigned to_submit,
+ 	return submitted ? submitted : ret;
+ }
+ 
++static int io_sqe_files_unregister(struct io_ring_ctx *ctx)
 +{
-+	fput_many(file, 1);
++	int i;
++
++	if (!ctx->user_files)
++		return -ENXIO;
++
++	for (i = 0; i < ctx->nr_user_files; i++)
++		fput(ctx->user_files[i]);
++
++	kfree(ctx->user_files);
++	ctx->user_files = NULL;
++	ctx->nr_user_files = 0;
++	return 0;
 +}
++
++static int io_sqe_files_register(struct io_ring_ctx *ctx, void __user *arg,
++				 unsigned nr_args)
++{
++	__s32 __user *fds = (__s32 __user *) arg;
++	int fd, ret = 0;
++	unsigned i;
++
++	if (ctx->user_files)
++		return -EBUSY;
++	if (!nr_args)
++		return -EINVAL;
++
++	ctx->user_files = kcalloc(nr_args, sizeof(struct file *), GFP_KERNEL);
++	if (!ctx->user_files)
++		return -ENOMEM;
++
++	for (i = 0; i < nr_args; i++) {
++		ret = -EFAULT;
++		if (copy_from_user(&fd, &fds[i], sizeof(fd)))
++			break;
++
++		ctx->user_files[i] = fget(fd);
++
++		ret = -EBADF;
++		if (!ctx->user_files[i])
++			break;
++		ctx->nr_user_files++;
++		ret = 0;
++	}
++
++	if (ret)
++		io_sqe_files_unregister(ctx);
++
++	return ret;
++}
++
+ static int io_sq_offload_start(struct io_ring_ctx *ctx)
+ {
+ 	int ret;
+@@ -1512,6 +1605,7 @@ static void io_ring_ctx_free(struct io_ring_ctx *ctx)
+ 
+ 	io_iopoll_reap_events(ctx);
+ 	io_sqe_buffer_unregister(ctx);
++	io_sqe_files_unregister(ctx);
+ 
+ 	io_mem_free(ctx->sq_ring);
+ 	io_mem_free(ctx->sq_sqes);
+@@ -1809,6 +1903,15 @@ static int __io_uring_register(struct io_ring_ctx *ctx, unsigned opcode,
+ 			break;
+ 		ret = io_sqe_buffer_unregister(ctx);
+ 		break;
++	case IORING_REGISTER_FILES:
++		ret = io_sqe_files_register(ctx, arg, nr_args);
++		break;
++	case IORING_UNREGISTER_FILES:
++		ret = -EINVAL;
++		if (arg || nr_args)
++			break;
++		ret = io_sqe_files_unregister(ctx);
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 		break;
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index 16c423d74f2e..3e79feb34a9c 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -16,7 +16,7 @@
+  */
+ struct io_uring_sqe {
+ 	__u8	opcode;		/* type of operation for this sqe */
+-	__u8	flags;		/* as of now unused */
++	__u8	flags;		/* IOSQE_ flags */
+ 	__u16	ioprio;		/* ioprio for the request */
+ 	__s32	fd;		/* file descriptor to do IO on */
+ 	__u64	off;		/* offset into file */
+@@ -33,6 +33,11 @@ struct io_uring_sqe {
+ 	};
+ };
+ 
++/*
++ * sqe->flags
++ */
++#define IOSQE_FIXED_FILE	(1U << 0)	/* use fixed fileset */
 +
  /*
-  * synchronous analog of fput(); for kernel threads that might be needed
-  * in some umount() (and thus can't use flush_delayed_fput() without
-diff --git a/include/linux/file.h b/include/linux/file.h
-index 6b2fb032416c..3fcddff56bc4 100644
---- a/include/linux/file.h
-+++ b/include/linux/file.h
-@@ -13,6 +13,7 @@
- struct file;
+  * io_uring_setup() flags
+  */
+@@ -112,5 +117,7 @@ struct io_uring_params {
+  */
+ #define IORING_REGISTER_BUFFERS		0
+ #define IORING_UNREGISTER_BUFFERS	1
++#define IORING_REGISTER_FILES		2
++#define IORING_UNREGISTER_FILES		3
  
- extern void fput(struct file *);
-+extern void fput_many(struct file *, unsigned int);
- 
- struct file_operations;
- struct vfsmount;
-@@ -44,6 +45,7 @@ static inline void fdput(struct fd fd)
- }
- 
- extern struct file *fget(unsigned int fd);
-+extern struct file *fget_many(unsigned int fd, unsigned int refs);
- extern struct file *fget_raw(unsigned int fd);
- extern unsigned long __fdget(unsigned int fd);
- extern unsigned long __fdget_raw(unsigned int fd);
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index ccb0b7a63aa5..acaad78b6781 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -952,7 +952,9 @@ static inline struct file *get_file(struct file *f)
- 	atomic_long_inc(&f->f_count);
- 	return f;
- }
--#define get_file_rcu(x) atomic_long_inc_not_zero(&(x)->f_count)
-+#define get_file_rcu_many(x, cnt)	\
-+	atomic_long_add_unless(&(x)->f_count, (cnt), 0)
-+#define get_file_rcu(x) get_file_rcu_many((x), 1)
- #define fput_atomic(x)	atomic_long_add_unless(&(x)->f_count, -1, 1)
- #define file_count(x)	atomic_long_read(&(x)->f_count)
- 
+ #endif
 -- 
 2.17.1
 
