@@ -2,185 +2,118 @@ Return-Path: <SRS0=rtTj=QG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD08C282D5
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 08:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE610C282D5
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 09:03:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA7342087F
-	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 08:19:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D1DF20870
+	for <linux-block@archiver.kernel.org>; Wed, 30 Jan 2019 09:03:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="q9ZQk53S"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="SlvlyFid"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727620AbfA3ITM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Jan 2019 03:19:12 -0500
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:42400 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725830AbfA3ITM (ORCPT
+        id S1728290AbfA3JDO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Jan 2019 04:03:14 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:52248 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725850AbfA3JDN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Jan 2019 03:19:12 -0500
-Received: by mail-lj1-f196.google.com with SMTP id l15-v6so19922715lja.9
-        for <linux-block@vger.kernel.org>; Wed, 30 Jan 2019 00:19:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id;
-        bh=FMk7KZzFNOQZxopX51HKzZjFFbjWtJbENRSvLHUIma8=;
-        b=q9ZQk53SePSRAjbg79biacXEPnGYHdd7oZcsugOIgExR7zXyogkAtKpHTlpwEyR0of
-         7IODch6/i/NFGOkiZV9U1vYWIqjaU+qZB6IfW7cMeIMA+wnNucCxwW55ldCy4g5SRz4s
-         +l+AJV3RBLw7hTT2BYgMS8vsHr6bIlxwBbiqO35DqVNAxvNKJULOwNYig/+hJkUxB4CG
-         rJawu69iKJvKSPfIOq1hSVlAe5BgMC2tdjO6Ym4tryUJhri6z63vEXeDu8gvy5D16elO
-         ++Knka9U0KyDfpq5af0JxeK6zYdTfWFgdkBRwotWg+eaJ7N/qoJ4fK/sFwSBP8HTOh9/
-         9uMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=FMk7KZzFNOQZxopX51HKzZjFFbjWtJbENRSvLHUIma8=;
-        b=i2hd/gArHXHevIx5hbHupWwEcmCh/jh13evhyO8lUnGiZ2hJjvhQA7mxEbRcKRNtbR
-         cHVWuXGuhpgOg1dHT5Ngl2k9D9bkMFMQNr9/j3bLcCA84JZm7wi88REdfZGtJ8ZX+TIz
-         eEE0ulVjQQG+/KGS/fE+KgEgizu7FnKXNizsVBbkj8L7JsWKGh8iWK/NP6H9DBFGQTh6
-         dspvRVqzJ8OXIc69ZSHeyN3DBfrNsLoPoONMrRsmfe/9NN3CswQgKQiHATfGB+CE/eGn
-         EjtUL5ITn4RGw9++gnaEwk76IH7NAW174QeoKNG2pWogFeINHKIzVa/MsZg4gUt+zM4j
-         pcmw==
-X-Gm-Message-State: AJcUukcBHZTgCRcs3Ttrb8ioG5eBh43Gc5bwZVMB/MKnNLh/3jlNkf7p
-        I0seBM6il41if2uoUOmUODbN8Q==
-X-Google-Smtp-Source: ALg8bN51VHxAoSWcNKirSyrcWCyQaqpWx7A56YqoV5GAGXrc1rVtrHhmiKdAr2+6CBgP5wCHYveENA==
-X-Received: by 2002:a2e:5054:: with SMTP id v20-v6mr24196237ljd.45.1548836350284;
-        Wed, 30 Jan 2019 00:19:10 -0800 (PST)
-Received: from ch-lap-hans.bredbandsbolaget.se (c-0bf2e055.03-91-6d6c6d4.bbcust.telenor.se. [85.224.242.11])
-        by smtp.gmail.com with ESMTPSA id r29-v6sm151220ljd.44.2019.01.30.00.19.08
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 30 Jan 2019 00:19:09 -0800 (PST)
-From:   hans@owltronix.com
-To:     Matias Bjorling <mb@lightnvm.io>
-Cc:     javier@javigon.com, Zhoujie Wu <zjwu@marvell.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Subject: [PATCH V2] lightnvm: pblk: extend line wp balance check
-Date:   Wed, 30 Jan 2019 09:18:57 +0100
-Message-Id: <20190130081857.6779-1-hans@owltronix.com>
-X-Mailer: git-send-email 2.17.1
+        Wed, 30 Jan 2019 04:03:13 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0U8wf66153750;
+        Wed, 30 Jan 2019 09:03:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2018-07-02;
+ bh=qyn410wvLlaCQXa4w+QoXzv2LmM8/MQC4WXbMeQGAow=;
+ b=SlvlyFid0eAmvM9Yj9WzMrhOw3qSlZn6MGf3uBnmo9/X0TbDtugZNYGqBpoEpVNR8R/K
+ B13LavqI/XWA3+nKcMjPl8Q4nEq/+qQM4VP/mDBUEYtBqnYwOLTZe63KuMi0eB1ylmZU
+ nFL9tcja13DI5UzwMsVpnuvK0Qh8a5DCp/o98gtbmt5nPBW0A87LB/uOMICShiGkg8wk
+ rZxmXbh5MvkSyfIvJNhjKDTBlHVKudYZka76HBVkl3cp6vVxbn4KdxK7XnnH2D+QmJON
+ 88tuV4mAJ0bYwmCnjxLCTjul4Df7u495KO+RMAaXD4BY16Zs7d5NjGyaWGqTnX2B7qTB yQ== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by aserp2130.oracle.com with ESMTP id 2q8d2e9eb4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 30 Jan 2019 09:03:08 +0000
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x0U937rJ002034
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 30 Jan 2019 09:03:07 GMT
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x0U936PM000575;
+        Wed, 30 Jan 2019 09:03:07 GMT
+Received: from will-ThinkCentre-M93p.cn.oracle.com (/10.182.70.234)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 30 Jan 2019 01:03:06 -0800
+From:   Jianchao Wang <jianchao.w.wang@oracle.com>
+To:     axboe@kernel.dk
+Cc:     m19@florianstecker.de, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] blk-mq: fix a hung issue when fsync
+Date:   Wed, 30 Jan 2019 17:01:56 +0800
+Message-Id: <1548838916-25051-1-git-send-email-jianchao.w.wang@oracle.com>
+X-Mailer: git-send-email 2.7.4
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9151 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1901300072
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Hans Holmberg <hans.holmberg@cnexlabs.com>
+Florian reported a io hung issue when fsync(). It should be
+triggered by following race condition.
 
-pblk stripes writes of minimal write size across all non-offline chunks
-in a line, which means that the maximum write pointer delta should not
-exceed the minimal write size.
+data + post flush         a flush
 
-Extend the line write pointer balance check to cover this case, and
-ignore the offline chunk wps.
+blk_flush_complete_seq
+  case REQ_FSEQ_DATA
+    blk_flush_queue_rq
+    issued to driver      blk_mq_dispatch_rq_list
+                            try to issue a flush req
+                            failed due to NON-NCQ command
+                            .queue_rq return BLK_STS_DEV_RESOURCE
 
-This will render us a warning during recovery if something unexpected
-has happened to the chunk write pointers (i.e. powerloss,  a spurious
-chunk reset, ..).
+request completion
+  req->end_io // doesn't check RESTART
+  mq_flush_data_end_io
+    case REQ_FSEQ_POSTFLUSH
+      blk_kick_flush
+        do nothing because previous flush
+        has not been completed
+     blk_mq_run_hw_queue
+                              insert rq to hctx->dispatch
+                              due to RESTART is still set, do nothing
 
-Reported-by: Zhoujie Wu <zjwu@marvell.com>
-Tested-by: Zhoujie Wu <zjwu@marvell.com>
-Signed-off-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+To fix this, replace the blk_mq_run_hw_queue in mq_flush_data_end_io
+with blk_mq_sched_restart to check and clear the RESTART flag.
+
+Fixes: bd166ef1 (blk-mq-sched: add framework for MQ capable IO schedulers)
+Reported-by: Florian Stecker <m19@florianstecker.de>
+Tested-by: Florian Stecker <m19@florianstecker.de>
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
 ---
+ block/blk-flush.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Changes since V1:
-
-	* Squashed with Zhoujie's:
-	 "lightnvm: pblk: ignore bad block wp for pblk_line_wp_is_unbalanced"
-	* Clarified commit message based on Javier's comments.
-		
-
- drivers/lightnvm/pblk-recovery.c | 56 ++++++++++++++++++++++----------
- 1 file changed, 38 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 6761d2afa4d0..d86f580036d3 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -302,35 +302,55 @@ static int pblk_pad_distance(struct pblk *pblk, struct pblk_line *line)
- 	return (distance > line->left_msecs) ? line->left_msecs : distance;
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index a3fc7191..6e0f2d9 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -335,7 +335,7 @@ static void mq_flush_data_end_io(struct request *rq, blk_status_t error)
+ 	blk_flush_complete_seq(rq, fq, REQ_FSEQ_DATA, error);
+ 	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
+ 
+-	blk_mq_run_hw_queue(hctx, true);
++	blk_mq_sched_restart(hctx);
  }
  
--static int pblk_line_wp_is_unbalanced(struct pblk *pblk,
--				      struct pblk_line *line)
-+/* Return a chunk belonging to a line by stripe(write order) index */
-+static struct nvm_chk_meta *pblk_get_stripe_chunk(struct pblk *pblk,
-+						  struct pblk_line *line,
-+						  int index)
- {
- 	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_geo *geo = &dev->geo;
--	struct pblk_line_meta *lm = &pblk->lm;
- 	struct pblk_lun *rlun;
--	struct nvm_chk_meta *chunk;
- 	struct ppa_addr ppa;
--	u64 line_wp;
--	int pos, i;
-+	int pos;
- 
--	rlun = &pblk->luns[0];
-+	rlun = &pblk->luns[index];
- 	ppa = rlun->bppa;
- 	pos = pblk_ppa_to_pos(geo, ppa);
--	chunk = &line->chks[pos];
- 
--	line_wp = chunk->wp;
-+	return &line->chks[pos];
-+}
- 
--	for (i = 1; i < lm->blk_per_line; i++) {
--		rlun = &pblk->luns[i];
--		ppa = rlun->bppa;
--		pos = pblk_ppa_to_pos(geo, ppa);
--		chunk = &line->chks[pos];
-+static int pblk_line_wps_are_unbalanced(struct pblk *pblk,
-+				      struct pblk_line *line)
-+{
-+	struct pblk_line_meta *lm = &pblk->lm;
-+	int blk_in_line = lm->blk_per_line;
-+	struct nvm_chk_meta *chunk;
-+	u64 max_wp, min_wp;
-+	int i;
-+
-+	i = find_first_zero_bit(line->blk_bitmap, blk_in_line);
- 
--		if (chunk->wp > line_wp)
-+	/* If there is one or zero good chunks in the line,
-+	 * the write pointers can't be unbalanced.
-+	 */
-+	if (i >= (blk_in_line - 1))
-+		return 0;
-+
-+	chunk = pblk_get_stripe_chunk(pblk, line, i);
-+	max_wp = chunk->wp;
-+	if (max_wp > pblk->max_write_pgs)
-+		min_wp = max_wp - pblk->max_write_pgs;
-+	else
-+		min_wp = 0;
-+
-+	i = find_next_zero_bit(line->blk_bitmap, blk_in_line, i + 1);
-+	while (i < blk_in_line) {
-+		chunk = pblk_get_stripe_chunk(pblk, line, i);
-+		if (chunk->wp > max_wp || chunk->wp < min_wp)
- 			return 1;
--		else if (chunk->wp < line_wp)
--			line_wp = chunk->wp;
-+
-+		i = find_next_zero_bit(line->blk_bitmap, blk_in_line, i + 1);
- 	}
- 
- 	return 0;
-@@ -356,7 +376,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
- 	int ret;
- 	u64 left_ppas = pblk_sec_in_open_line(pblk, line) - lm->smeta_sec;
- 
--	if (pblk_line_wp_is_unbalanced(pblk, line))
-+	if (pblk_line_wps_are_unbalanced(pblk, line))
- 		pblk_warn(pblk, "recovering unbalanced line (%d)\n", line->id);
- 
- 	ppa_list = p.ppa_list;
+ /**
 -- 
-2.17.1
+2.7.4
 
