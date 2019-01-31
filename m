@@ -3,111 +3,113 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3004FC282D8
-	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 02:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C482C282C7
+	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 05:12:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F158820881
-	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 02:23:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Vu9HuRzw"
+	by mail.kernel.org (Postfix) with ESMTP id 754E62087F
+	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 05:12:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1548911523;
+	bh=GIje4IagvFcLkyQY0xZUYSVnN7ly4UjDIjgrcQoAReY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=vrMy6o2gp+bm8Ok61PdyQ3Ivw+kaxYfxxEBKLbRN6E67cUhN45/zUJ+9iI617aBo+
+	 FGDlkyelQtqwZpbXqkzL8xKdXry2uK/2KOllWCSJ/XhcrU7tCVWrHAULFnIeVlC1sP
+	 MY1lN8eZIVlGDLB0bBBWqA8yPo4RSOLeu9akmUSk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725828AbfAaCXX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Jan 2019 21:23:23 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:56184 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725535AbfAaCXX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Jan 2019 21:23:23 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0V2Jgw9009621;
-        Thu, 31 Jan 2019 02:23:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=aGtrZn0EILekuIJeJHqdOoFOilaDVVKAR66NGrEiwTw=;
- b=Vu9HuRzwFvTpEp26eLeoJJgAzoHWO9WTHMYBDRzAI6gKilXQfKhU/srg8d2cflU5xHQ3
- KMMlYU4lBUl1qS2EDCqChJxKvd6NPS8kAcsMPSkojnZqOtmGHTkLzKKHtnbxe91bIQVD
- W3wgJzCeK5puNYFS8leOKwB9jIFER7A1qebR28Syq12ImTlz6QvoktSTMoWLhshQp5jd
- vpGTuK99ZiHkIgmJjZV9sB/4F0U5WXoQQCkUoczl3HQevLcGo5QM2SMiOU5ZawYz5ibZ
- GfI4RLqxB2Jy2DuyD6YlvUkL2N0uMHlBh5NwSA1aT5mUjg6My27t5LoUCDBiBroMEdNy TA== 
-Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
-        by aserp2130.oracle.com with ESMTP id 2q8d2ee780-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 31 Jan 2019 02:23:14 +0000
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x0V2ND9B023079
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 31 Jan 2019 02:23:13 GMT
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x0V2NDWn021872;
-        Thu, 31 Jan 2019 02:23:13 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 30 Jan 2019 18:23:12 -0800
-To:     John Dorminy <jdorminy@redhat.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Zhang Xiaoxu <zhangxiaoxu5@huawei.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Alasdair G Kergon <agk@redhat.com>
-Subject: Re: block: Fix a WRITE SAME BUG_ON
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <20190125021107.4595-1-zhangxiaoxu5@huawei.com>
-        <CAMeeMh_=UVGwo-=9WtBXRmiHTXnLAswqis97bM-aiuwnzPU0QQ@mail.gmail.com>
-        <20190128221441.GA24102@redhat.com> <yq1lg34f4i7.fsf@oracle.com>
-        <CAMeeMh85T_qui=LWd0u=b_oMN5XLqowqkvLuYGBM2Ae6tS-mzg@mail.gmail.com>
-Date:   Wed, 30 Jan 2019 21:23:09 -0500
-In-Reply-To: <CAMeeMh85T_qui=LWd0u=b_oMN5XLqowqkvLuYGBM2Ae6tS-mzg@mail.gmail.com>
-        (John Dorminy's message of "Wed, 30 Jan 2019 09:08:50 -0500")
-Message-ID: <yq1ftt9bm5u.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        id S1725796AbfAaFMC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Jan 2019 00:12:02 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38290 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725857AbfAaFMC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 31 Jan 2019 00:12:02 -0500
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C325F218DA
+        for <linux-block@vger.kernel.org>; Thu, 31 Jan 2019 05:12:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1548911521;
+        bh=GIje4IagvFcLkyQY0xZUYSVnN7ly4UjDIjgrcQoAReY=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=DQbVybqI8QhBEjIAfpyp4rEMBIn8yucQ1RMiXjryFMZ575twk+EVkAnYIu5S17OGQ
+         L1FrQUa+V9aiYS6x4rOvMySZy8nfM+NuFF6B55UO+/k0/4xUVMsl6DBtvGMRT/ht6g
+         LVZMMW0HLNvw1JEysUn4IeQKC+OC+Mul1FoWjeqY=
+Received: by mail-wm1-f45.google.com with SMTP id m22so1084681wml.3
+        for <linux-block@vger.kernel.org>; Wed, 30 Jan 2019 21:12:00 -0800 (PST)
+X-Gm-Message-State: AJcUukc2ndn7N+/S2bFMuirBwclt9SWW1sxHFRY/jMEqMXB7cXOUfmnx
+        mQK/CBzQXvZSB3rxlwjdWd4u0Q3ibvVXtqpPnUzCNA==
+X-Google-Smtp-Source: ALg8bN4MMxZVBzAEq8mD387Va/Xm33kI65QtmHg324U84VkFfNFRU8aR3W/UlI7gm+muezmTxbrOaPFp/l7mAQvVXsc=
+X-Received: by 2002:a1c:b1d5:: with SMTP id a204mr29293975wmf.32.1548911519071;
+ Wed, 30 Jan 2019 21:11:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9152 signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1901310016
+References: <20190123153536.7081-1-axboe@kernel.dk> <20190123153536.7081-6-axboe@kernel.dk>
+ <20190128145700.GA9795@lst.de> <CALCETrV30uN2qOUEf+kNGWdphBtps7K3rEk8_8+VAwdtPomRkQ@mail.gmail.com>
+ <dab3fa32-3887-3264-9fe1-bc3b7abc58b3@kernel.dk>
+In-Reply-To: <dab3fa32-3887-3264-9fe1-bc3b7abc58b3@kernel.dk>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Wed, 30 Jan 2019 21:11:46 -0800
+X-Gmail-Original-Message-ID: <CALCETrVwHcWcJB4r=14=uB2NHGasW+rRRWVoun6-UY_t3+AU2A@mail.gmail.com>
+Message-ID: <CALCETrVwHcWcJB4r=14=uB2NHGasW+rRRWVoun6-UY_t3+AU2A@mail.gmail.com>
+Subject: Re: [PATCH 05/18] Add io_uring IO interface
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Andy Lutomirski <luto@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-aio@kvack.org, linux-block@vger.kernel.org,
+        Jeff Moyer <jmoyer@redhat.com>, Avi Kivity <avi@scylladb.com>,
+        Linux API <linux-api@vger.kernel.org>,
+        linux-man <linux-man@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-John,
-
->> So disallowing WRITE SAME unless all component devices have the same LBS
->> is the correct fix.
+>>> On Jan 28, 2019, at 5:20 PM, Jens Axboe <axboe@kernel.dk> wrote:
+>>>
+>>> On 1/28/19 5:47 PM, Andy Lutomirski wrote:
+>>> On Mon, Jan 28, 2019 at 6:57 AM Christoph Hellwig <hch@lst.de> wrote:
+>>>
+>>> [please make sure linux-api and linux-man are CCed on new syscalls
+>>> so that we get API experts to review them]
+>>
+>>>> +static int io_import_iovec(struct io_ring_ctx *ctx, int rw,
+>>>> +                        const struct io_uring_sqe *sqe,
+>>>> +                        struct iovec **iovec, struct iov_iter *iter)
+>>>> +{
+>>>> +     void __user *buf = u64_to_user_ptr(sqe->addr);
+>>>> +
+>>>> +#ifdef CONFIG_COMPAT
+>>>> +     if (ctx->compat)
+>>>> +             return compat_import_iovec(rw, buf, sqe->len, UIO_FASTIOV,
+>>>> +                                             iovec, iter);
+>>>> +#endif
+>>>
+>>> I think we can just check in_compat_syscall() here, which means we
+>>> can kill the ->compat member, and the separate compat version of the
+>>> setup syscall.
+>>
+>> Since this whole API is new, I don't suppose you could introduce a
+>> struct iovec64 or similar and just make the ABI be identical for
+>> 64-bit and 32-bit code?
 >
-> Alternately, could possibly WRITE_SAME bios be accepted with the
-> minimum sector size of the stack rather than the max, e.g. 512 in this
-> example rather than 4k? They'd need to have a granularity of the
-> larger sector size, though, presumabily necessitating new queue limits
-> write_same_{granularity,block_size}, which might be too much work.
+> Sure, that would be straight forward. Is there a strong reason to do
+> so outside of "that would be nice"? It's not like it's a huge amount
+> of code.
 
-I don't have a problem restricting the buffer contents to be consistent
-within a page. Or even change the upper layer semantics to specify the
-buffer contents using a single byte (0x00..0xff).
+Here are some minor-ish benefits:
 
-But the issue of head and tail remains if there is a block size mismatch
-so it's important that we keep scaling the logical block size up when
-stacking and reject any bio that can't be honored on a 4Kn device.
+ - It avoids having a code path that is only used with 32 bit code on
+64 bit kernels and is therefore rarely tested.  (In this particular
+case, the code path doesn't diverge much, but for most compat
+syscalls, it's almost an entirely separate implementation of the main
+syscall code.)
 
-> (I use WRITE_SAME to fill devices with a particular pattern in order
-> to catch failures to initialize disk structures appropriately,
-> personally, but it's just for convenience/speed.)
+ - It makes life easier for tools like strace.
 
-The intent was for stuff like MD to use it to initialize parity disks,
-etc. But adoption has been pretty slow.
+ - It minimizes the chance of making a giant mess on x32, which isn't
+really native or compat.
 
-I don't have any problems keeping WRITE_SAME around if people are
-actually using it. It just seemed like most active users only cared
-about writing zeroes.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+--Andy
