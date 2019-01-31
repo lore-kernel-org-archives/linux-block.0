@@ -2,55 +2,56 @@ Return-Path: <SRS0=cAVD=QH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12412C169C4
-	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 22:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A487C169C4
+	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 22:13:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CEC172087F
-	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 22:13:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD1CC20B1F
+	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 22:13:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="UGD/7t3D"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="PnGGyLG3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727059AbfAaWNr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Jan 2019 17:13:47 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:33986 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725876AbfAaWNr (ORCPT
+        id S1728004AbfAaWNy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Jan 2019 17:13:54 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:43306 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727998AbfAaWNy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Jan 2019 17:13:47 -0500
-Received: by mail-pl1-f195.google.com with SMTP id w4so2123500plz.1
-        for <linux-block@vger.kernel.org>; Thu, 31 Jan 2019 14:13:46 -0800 (PST)
+        Thu, 31 Jan 2019 17:13:54 -0500
+Received: by mail-pg1-f193.google.com with SMTP id v28so1948796pgk.10
+        for <linux-block@vger.kernel.org>; Thu, 31 Jan 2019 14:13:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=CcXvSDSPy9bgfIgUOH90Lcwdn7ixN1lGbyJwaRTlUHQ=;
-        b=UGD/7t3D1sqs0Oxwzkugt+4GoJENoEhdkE18BCxu3b0cI4I8HAWmQTLcf9JCOR+KbN
-         YHJrVVaixW/p7AliIQpmYaVsMrMzVsGZKaCBAnKnh1vxBLWug7VyP4ZBNiafbPq+mECp
-         nEu4worV26FAaMW4F+XIGAnJX31wvNkBzgtGk=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=8QekRuGAcLl5aXSGWoJ5gf0Ay98dR/uMyx4ny8dqOF0=;
+        b=PnGGyLG30G9OXChzkbiZBAPDLYLUp2jD1tqLc7UMifSYDpSxH1nmZHAl1Rd61nTc5D
+         TRjmUbt9XOZHGepYgsNCbNzd/ssJ/Azp/z7Wm4NYBHI3Z1GdvZMTgjRdD66xd0idVt7n
+         199dcFNjQ189jg9QLk1D8X1nlV/AQHzo81RRQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=CcXvSDSPy9bgfIgUOH90Lcwdn7ixN1lGbyJwaRTlUHQ=;
-        b=sPc6KJMx7+ApY4nJ/pTqkXItIO2qmzuIsCb5SgX0IvNyX84LEo0f+vnQh7sHevzhFi
-         wj0uuKWqmjFH017rOBWa3Zu1AktHu8M8INXrrN+yCs2ayHjDUpMBzu4Po589/dbHX9Hm
-         klBa/a2K1ll9k8k58FqsKskUgyo0t8qxrPu7nF7rXsgXbKQHVdSMcofoKuI5vEA2tHci
-         0xjZoHcYvJYsov7uzrhQDnQizlqAmwZ/ba05U6P5JC0BRMDnb7/yJ2GuJgxqRrD09qUB
-         j9PSaopgQGCNdXmvlXi0mjdtE7/m/TjrC4s3z9oZ1ychk38L48jyjTEWSIAMekJYevHW
-         r8hg==
-X-Gm-Message-State: AJcUukdyjveVZFSCc8T6OzLkX75owj82Kq9w6xkAgiCQ8YuEUnRJnqqu
-        Nru3LEnp782rOI9s1zyZl4pbsQ==
-X-Google-Smtp-Source: ALg8bN4Y4LTCygc9vt2/BX+K3QfXCkG+pjXFtGSxIJ5tI9AehBxJJj9uDvPFN4bg2iPrTbFIZxCf5A==
-X-Received: by 2002:a17:902:264:: with SMTP id 91mr36941880plc.108.1548972826464;
-        Thu, 31 Jan 2019 14:13:46 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=8QekRuGAcLl5aXSGWoJ5gf0Ay98dR/uMyx4ny8dqOF0=;
+        b=FPRmDZQFI1VG1bJ1IVVWlB1MIVrXpOjNjfP4PmBGR4ipRyqQZiTzWrR7G2HgQ9aMRr
+         gSnLofPlyAP3V+pJjeKSj42OtQN/5MfwzKios3UqJuXY82AtaSQfSaVxUtGL4t4smBQ0
+         ev79xDvZj/FLfp3Lwua9JqHE5b+eTHnIHVi0A3TzPF+W8dmfLKjMYxniTrsRGAIMV/T3
+         rRZySIElrP3MUmFcm/gXP29l0Nf3ps08mG+KOc+sY/33vTAFQ74rPnSdmNMGT/X/NC/7
+         hkJL4Pd7D/YqVQQCx+GCYjh3k4M3ut9KZx1c24BTSfsTwFkGxj368oumh7k6zTOBJKt/
+         XzvQ==
+X-Gm-Message-State: AJcUukep1322eywpFtPYV1Rb20HjmmaAnieqCeAQ6yM2yaBw9mccwY6c
+        9tf2S/uWOWnw1rW0ERwpHtfxRg==
+X-Google-Smtp-Source: ALg8bN5Fk25ydTqhauKto3IYej3vobiyCk0NAyBYCBP0hism+OgTySJKVf/2m1ucVvoYILBcEUMRzw==
+X-Received: by 2002:a62:4641:: with SMTP id t62mr36207932pfa.141.1548972833210;
+        Thu, 31 Jan 2019 14:13:53 -0800 (PST)
 Received: from evgreen2.mtv.corp.google.com ([2620:15c:202:201:ffda:7716:9afc:1301])
-        by smtp.gmail.com with ESMTPSA id z10sm7961681pfg.120.2019.01.31.14.13.45
+        by smtp.gmail.com with ESMTPSA id z10sm7961681pfg.120.2019.01.31.14.13.52
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Thu, 31 Jan 2019 14:13:45 -0800 (PST)
+        Thu, 31 Jan 2019 14:13:52 -0800 (PST)
 From:   Evan Green <evgreen@chromium.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Gwendal Grignou <gwendal@chromium.org>,
@@ -59,10 +60,12 @@ Cc:     Gwendal Grignou <gwendal@chromium.org>,
         Ming Lei <ming.lei@redhat.com>,
         Evan Green <evgreen@chromium.org>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [RESEND PATCH 0/2] loop: Better discard for block devices
-Date:   Thu, 31 Jan 2019 14:13:26 -0800
-Message-Id: <20190131221328.85343-1-evgreen@chromium.org>
+Subject: [RESEND PATCH 1/2] loop: Report EOPNOTSUPP properly
+Date:   Thu, 31 Jan 2019 14:13:27 -0800
+Message-Id: <20190131221328.85343-2-evgreen@chromium.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190131221328.85343-1-evgreen@chromium.org>
+References: <20190131221328.85343-1-evgreen@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -70,42 +73,51 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This series addresses some errors seen when using the loop
-device directly backed by a block device. The first change plumbs
-out the correct error message, and the second change prevents the
-error from occurring in many cases.
+Properly plumb out EOPNOTSUPP from loop driver operations, which may
+get returned when for instance a discard operation is attempted but not
+supported by the underlying block device. Before this change, everything
+was reported in the log as an I/O error, which is scary and not
+helpful in debugging.
 
-The errors look like this:
-[   90.880875] print_req_error: I/O error, dev loop5, sector 0
+Signed-off-by: Evan Green <evgreen@chromium.org>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+---
 
-The errors occur when trying to do a discard or write zeroes operation
-on a loop device backed by a block device that does not support discard.
-Firstly, the error itself is incorrectly reported as I/O error, but is
-actually EOPNOTSUPP. The first patch plumbs out EOPNOTSUPP to properly
-report the error.
+ drivers/block/loop.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-The second patch prevents these errors from occurring by mirroring the
-discard capabilities of the underlying block device into the loop device.
-Before this change, discard was always reported as being supported, and
-the loop device simply turns around and does a discard operation on the
-backing device. After this change, backing block devices that do support
-discard will continue to work as before, and continue to get all the
-benefits of doing that. Backing devices that do not support discard will
-fail earlier, avoiding hitting the loop device at all and ultimately
-avoiding this error in the logs.
-
-I can also confirm that this fixes test block/003 in the blktests, when
-running blktests on a loop device backed by a block device.
-
-
-
-Evan Green (2):
-  loop: Report EOPNOTSUPP properly
-  loop: Better discard support for block devices
-
- drivers/block/loop.c | 75 ++++++++++++++++++++++++++++++--------------
- 1 file changed, 52 insertions(+), 23 deletions(-)
-
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index cf5538942834..a1ba555e3b92 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -458,8 +458,13 @@ static void lo_complete_rq(struct request *rq)
+ 
+ 	if (!cmd->use_aio || cmd->ret < 0 || cmd->ret == blk_rq_bytes(rq) ||
+ 	    req_op(rq) != REQ_OP_READ) {
+-		if (cmd->ret < 0)
+-			ret = BLK_STS_IOERR;
++		if (cmd->ret < 0) {
++			if (cmd->ret == -EOPNOTSUPP)
++				ret = BLK_STS_NOTSUPP;
++			else
++				ret = BLK_STS_IOERR;
++		}
++
+ 		goto end_io;
+ 	}
+ 
+@@ -1878,7 +1883,10 @@ static void loop_handle_cmd(struct loop_cmd *cmd)
+  failed:
+ 	/* complete non-aio request */
+ 	if (!cmd->use_aio || ret) {
+-		cmd->ret = ret ? -EIO : 0;
++		if (ret == -EOPNOTSUPP)
++			cmd->ret = ret;
++		else
++			cmd->ret = ret ? -EIO : 0;
+ 		blk_mq_complete_request(rq);
+ 	}
+ }
 -- 
 2.20.1
 
