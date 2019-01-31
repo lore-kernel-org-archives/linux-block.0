@@ -2,87 +2,83 @@ Return-Path: <SRS0=cAVD=QH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4AD4C169C4
-	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 07:01:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B206C169C4
+	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 09:26:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E4F0218AC
-	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 07:01:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548918060;
-	bh=GfoEyZ4E5ex/cQ0+BHut2xqU/ncfufpcq1DaClRefcE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=NGsUNvNWPJy0RrwxTTOEh7HDxoavnlm4si4E6mBlDU9YWOojD11mad5FChoAr86Al
-	 /MGdC332OmDjYNZMGJnxH2iRZsRPUiVJVONb9nGYzx+mgsxdrZD4H8CjYS2dXa1FSA
-	 6F2EZlwePwSZa39Kndy05KQDJtBaJ14BANds9izQ=
+	by mail.kernel.org (Postfix) with ESMTP id 04FBE20B1F
+	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 09:26:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726481AbfAaHA7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Jan 2019 02:00:59 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59798 "EHLO mail.kernel.org"
+        id S1726376AbfAaJ0S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Jan 2019 04:26:18 -0500
+Received: from mout.gmx.net ([212.227.15.15]:46809 "EHLO mout.gmx.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726440AbfAaHA7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Jan 2019 02:00:59 -0500
-Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A076620870;
-        Thu, 31 Jan 2019 07:00:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548918059;
-        bh=GfoEyZ4E5ex/cQ0+BHut2xqU/ncfufpcq1DaClRefcE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=os1QNGniLrHWSt+WmIm5AWzo9Zzh3YKQfV5gxwrMVwES4/nRPgGeaQQaoM7eZn92G
-         x/7odgoP12DqjOBuKZvJaVmD1mivZ12fr5EBvuaxIRup3klaSU/rBHiBL4N8PVhCox
-         SXDnzIZkJeN/NQ+lyx0OGxmqldlXhdpzVh4jn8H8=
-Date:   Thu, 31 Jan 2019 08:00:56 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     syzbot <syzbot+a9d09761be47db706560@syzkaller.appspotmail.com>,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: general protection fault in debugfs_create_files
-Message-ID: <20190131070056.GA2158@kroah.com>
-References: <000000000000784c000580b16bdd@google.com>
- <1956aaad-701d-2c5f-180c-0eaeb01daf21@I-love.SAKURA.ne.jp>
+        id S1726172AbfAaJ0S (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 31 Jan 2019 04:26:18 -0500
+Received: from localhost.localdomain ([218.18.229.179]) by mail.gmx.com
+ (mrgmx002 [212.227.17.184]) with ESMTPSA (Nemesis) id
+ 0M5cMq-1h4RXL3Ca8-00xdwO; Thu, 31 Jan 2019 10:26:16 +0100
+From:   Chengguang Xu <cgxu519@gmx.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, Chengguang Xu <cgxu519@gmx.com>
+Subject: [PATCH] block: use strncmp() instead of strcmp() for comparing device name
+Date:   Thu, 31 Jan 2019 17:25:20 +0800
+Message-Id: <20190131092520.20273-1-cgxu519@gmx.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1956aaad-701d-2c5f-180c-0eaeb01daf21@I-love.SAKURA.ne.jp>
-User-Agent: Mutt/1.11.2 (2019-01-07)
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:G8ttzLjmO3SCtS24IEt2XWvQNxGj2BnNgA4RmZlbTmIkRcf1TiT
+ 76gSL5N7NFkcKpaLVfuFLkYSDwGc+gE848lOQVUF1HhD2lPAdsLiVciTguzuAtsxZIOypGS
+ XgdGekxMjT+Op6uTbtv0s1GXJejDtLxVSQ62kTE37C50jgFyI+oOIZ3IZrAMk0NpjJgaWLU
+ 9rPMxfR3piKWEDAYR8VlQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:FPrPgWQGITY=:CnrogaNsxa80N5MY5YSwi7
+ DrRCkg6zEqwOxCI6F6UrLra3Y4vsC99ClnWOEY5oAI9yemNXixuehn+AjJ72hmXfmGB6Z7Ae5
+ vTXD5x4BmTvNp5bMdQKA3PbdroQ4nZsKCnhpt5ICLDHLcgl14GT1QO5WEsmi4kFlu6dzC+m9p
+ JrqvwF+0O4POWgf9+jEKxn/DRj60uQZIL1kmjD1jfQ13i7Q2FU7fCNGenJtRih+NJwgKNv3yo
+ mQSVJQmljzJCQ6L3lziSkC34xzpcH4NZXoGNBSxsqVOQzxeW0ua+K68aOPN0U2BlXVSTN2SyU
+ 7SH88haQK6ij2l5tHUOOYQ70kSUR1nmQACaXHWD1wp4p0VOJbp95vgveiuNRVOHEgEHOYJuXB
+ At5h6xE0x5Y0CpO/AMMM9ESXKDBw3YnhbzDnH0yJ4Pv3UvHt0AiueH08Utt3DHUCKrjy6Cepc
+ JwdRdoMILQMYeDWqV5/yvLG1V96J+9iLi8YmacsWLDhvHlauiFhsQl49NvN8586h6x2j7s7XM
+ nqJZ70gWTYiH7Wfc8tBs1Uux2qvQL+1WIjlBywXJ0dAOsZzNPjLjlQ3J961zND7D19D2aQHWJ
+ g+O+t4jCg54qk6RmVLeUtBulKsYgzgs/INpgFd3hc0z9bUgygf0ZJB5Rkxy7Rs+orWy8APeBD
+ mYjRJiW/s3X0fAvoZtiLp/E6n4u1MOBFzqGebpzYjhhrIN0egdGe6mRC6cT1EKVS2w+g2iqfe
+ FGwEI9d132Es37U8N5NCAu2hAGFQJUppJppNbq4BtWtiwp2EjrUxwXAuHgYA5CnKPATLOr0Wy
+ 1oYDpNo7bSo04e7XfO3mtqkB3IdRKAB1793exeP9+r+zBzjvNWFGpw323QDpj7YGVT+0AKWxo
+ Zb6wP3b0l0jOhOAMIYorDq6jtUO2Bx5HACE20qwuBCjdGH/0OjELzqLP5QcWY2
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 31, 2019 at 02:34:56PM +0900, Tetsuo Handa wrote:
-> Hello, again.
-> 
-> syzbot is hitting a similar crash due to debugfs_create_dir() returning -EEXIST.
-> Should debugfs_create_dir() return NULL as well? Or should the caller use IS_ERR_OR_NULL() ?
-> 
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -861,6 +861,8 @@ int blk_mq_debugfs_register(struct request_queue *q)
->                                             blk_debugfs_root);
->         if (!q->debugfs_dir)
->                 return -ENOMEM;
-> +       if (IS_ERR(q->debugfs_dir))
-> +               printk("debugfs_create_dir=%ld\n", PTR_ERR(q->debugfs_dir));
-> 
->         if (!debugfs_create_files(q->debugfs_dir, q,
->                                   blk_mq_debugfs_queue_attrs))
-> 
+We use strlcpy() to copy device name in register_blkdev(),
+so if the device name is longer enough(accurately longer
+than 15 bytes), the copied name is truncated to 15 bytes.
+In this case, it's better to use strncmp() to compare device
+name instead of strcmp() in unregister_blkdev(), so that
+we can recognize the device name correctly.
 
-I already posted this patch last Wednesday:
-	https://lore.kernel.org/lkml/20190123134854.GA25906@kroah.com/
-to solve this problem.
+Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
+---
+ block/genhd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I guess I should queue it up in my tree as well, to handle this issue.
-I'll go do that now.
+diff --git a/block/genhd.c b/block/genhd.c
+index 1dd8fd6613b8..efc532ae9de9 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -424,7 +424,7 @@ void unregister_blkdev(unsigned int major, const char *name)
+ 	for (n = &major_names[index]; *n; n = &(*n)->next)
+ 		if ((*n)->major == major)
+ 			break;
+-	if (!*n || strcmp((*n)->name, name)) {
++	if (!*n || strncmp((*n)->name, name, strlen((*n)->name))) {
+ 		WARN_ON(1);
+ 	} else {
+ 		p = *n;
+-- 
+2.20.1
 
-thanks,
-
-greg k-h
