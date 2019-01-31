@@ -2,157 +2,137 @@ Return-Path: <SRS0=cAVD=QH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC2BC169C4
-	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 21:15:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A2ABC169C4
+	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 21:21:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6C61820869
-	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 21:15:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D2FB62082C
+	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 21:21:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="V0w7TpRY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BtQ1i6oq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726498AbfAaVPB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Jan 2019 16:15:01 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:38112 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725854AbfAaVPB (ORCPT
+        id S1725855AbfAaVVC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Jan 2019 16:21:02 -0500
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:41736 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725730AbfAaVVC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Jan 2019 16:15:01 -0500
-Received: by mail-pf1-f194.google.com with SMTP id q1so2057660pfi.5
-        for <linux-block@vger.kernel.org>; Thu, 31 Jan 2019 13:15:01 -0800 (PST)
+        Thu, 31 Jan 2019 16:21:02 -0500
+Received: by mail-qk1-f195.google.com with SMTP id 189so2791911qkj.8
+        for <linux-block@vger.kernel.org>; Thu, 31 Jan 2019 13:21:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=+YQ/3atzQhe7kDwM5s8R0RZc7/2O72lL1GRMhSTOtVw=;
-        b=V0w7TpRY7Hs/ZGOdOG4+6nXdECX2O2DRn/LXeP1Oiz8u868HSPKFn/5SHJ4cwfIdTW
-         G/sRtHGFRJQD6w6YK8jAZJ1Ch9w2g7v165yTd5iNMxr5im7JMkdTYMLtKr5B5h+GiHaf
-         gmWbBKZodzWPQItVms77brhQVm9WbYWP7i/qA8xdj3Nbc6H9s4UFR1hY7rcJ3nhAZ2tR
-         H1Btr2jzKbWo3tbmVxLSYhCnD8kWwMGVhoeEFS39oJSzoG0WPPTKSxhD5nwAnnzZMEV9
-         PUVfDZjpAE5ZmLj4JCBS/YujVrsmKvvN6U4v/IMQjG0VVW5gi/J8o9u0tpqxxBiublf5
-         a9oQ==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5g16FN1CiLKKhVQZ/I1EKlHuZ+SK1dJlxdB/khUFP8c=;
+        b=BtQ1i6oqDgCIlMFCXtBaC/siijJWQb34PnGxq6yXhi6whVjf+7bzLFK85JkugCrspA
+         K/XqmMs+8HmY2K5FwYdzHIkoGqJPT5jPIzfKzc1pc5RiKU9PwrEPXchsj6VYI/X+/9RT
+         7Lomr9uWh90noDM7eZbTsqv3fLsyyt/UGr37pIcRdr84qvtbEhWuWJ6KmOzyyTWkCWXZ
+         cK69hGt0q3qiwBT6JwjlsBx41TKYXAD1SyMZEDhcd6BOlNF0X5byikW52YcSSOGUx9wh
+         pE6M8k4Hq8zb7fzNRhH1h7u9gbIAf0aabVdY1nDbqsd7LCNo3d7zoAn2JwJbbAw5VsdE
+         R5cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+YQ/3atzQhe7kDwM5s8R0RZc7/2O72lL1GRMhSTOtVw=;
-        b=bNciKYACv/kaHyXYg8s+mjd/+01xCHy0c7YfW5qpcOnGoCQp/GXzIhR0NPeIwSDxy0
-         vu8t/C1FWEBU9SAMtJsft013R8VWWLtnefChAKWhkewcHVJJ/OkgIB+Xtr+KObo5d5h3
-         pa+kSfvONIyodAI3lsqyrj6AKPcMrdMwv7HS7ttFpvcgW17sNGXoY5txiSWreNj1LmOA
-         yG15Pk4GUF2KnJJ6XSl5gdZN27LbN9oKReJ0/8LLbAl4xzlP68vSZkeaH9PfjDHEYQUD
-         IiRmhSEkJzLFXefNgxSf4Oq7UVMAxzH8h10noOpbFXZ6hEuQN26HG4JJ7i2WEhSy2Vgx
-         jg5g==
-X-Gm-Message-State: AJcUukdWEpJRVH41C01nzNen/qqi/1oYMk5j+/hoFLfVYh+eW6URRcj8
-        gGDlHunTxGM/ZRu8/rvTX3nwWw==
-X-Google-Smtp-Source: ALg8bN6cN8XXCRPwRpXlY0OBLh0GFhczwh0GTHwyim232rqZa1i1Eqm2ZJhAYYImPt/scblMJc533Q==
-X-Received: by 2002:a63:2784:: with SMTP id n126mr33434530pgn.48.1548969300618;
-        Thu, 31 Jan 2019 13:15:00 -0800 (PST)
-Received: from [10.111.68.238] (rap-us.hgst.com. [199.255.44.250])
-        by smtp.gmail.com with ESMTPSA id h9sm8056434pgd.53.2019.01.31.13.14.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 31 Jan 2019 13:14:59 -0800 (PST)
-Subject: Re: [PATCH] lightnvm: pblk: fix bio leak on large sized io
-To:     chansol.kim@samsung.com,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     "matias.bjorling@wdc.com" <matias.bjorling@wdc.com>,
-        "javier@javigon.com" <javier@javigon.com>
-References: <CGME20190130015343epcms2p14be92e88982e86f5e9d494e3bdc3fb2a@epcms2p1>
- <20190130015343epcms2p14be92e88982e86f5e9d494e3bdc3fb2a@epcms2p1>
-From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <0fd83092-515e-7e59-bc38-66e1d3b5d9c1@lightnvm.io>
-Date:   Thu, 31 Jan 2019 22:14:58 +0100
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:60.0)
- Gecko/20100101 Thunderbird/60.4.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5g16FN1CiLKKhVQZ/I1EKlHuZ+SK1dJlxdB/khUFP8c=;
+        b=CQjijEOoe9GOZGe3VX7OXg0bCFBEJHdkPc764BP513gjQSaobVxHoTmh54qVs/U5ka
+         0hLn5HKU/Qe1QM2qw52KiH1x6nacoIUkobQqjAQ2gZsvVaiv5pAqaPPEKEEVJthZT3r0
+         DV+GgIZtiEh0miC7EzALyEnQUDbbRz+lTVh1/n86r7+XIkdEaCMk1dFG9j1q4XXP4URz
+         eIhhgYbn4fsOsj6JrVCEkke+F1K7WZ7aP382QCiubWgEpEZkt+JMFTyLxJaSBpDwiegX
+         dlehRfsqiUTYYD4AB1wI5VBY1Q/FoguyWetmIereb3uwW7oMBVtydtYSjaJnQZZQCBMN
+         E12w==
+X-Gm-Message-State: AJcUukeKPmpaWwAh9FhV6pigrPAVELO51AjI0kltmGcvFq05CWe6j/Gz
+        vjNrUV42RXvozDJ8Y2DEBDC9mujsPm6MjC4i7jA=
+X-Google-Smtp-Source: ALg8bN52rMI/XkxtlV+sm8o3nTWPEfUw7XN48CXJPwniX0ASHT4yWveeMoNXwRp3ZEVFeo+R9HyjlooLxkHqHPC1MXo=
+X-Received: by 2002:a37:5c43:: with SMTP id q64mr32195297qkb.329.1548969660601;
+ Thu, 31 Jan 2019 13:21:00 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190130015343epcms2p14be92e88982e86f5e9d494e3bdc3fb2a@epcms2p1>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20181228115148.26474-1-xiaoguang.wang@linux.alibaba.com>
+ <9d722c67-dfae-2ee4-74ef-504164fed0bf@linux.alibaba.com> <20190131092625.GB19222@quack2.suse.cz>
+ <fa2083f1-058b-c365-338d-a9513d0f8ead@kernel.dk>
+In-Reply-To: <fa2083f1-058b-c365-338d-a9513d0f8ead@kernel.dk>
+From:   Liu Bo <obuil.liubo@gmail.com>
+Date:   Thu, 31 Jan 2019 13:20:49 -0800
+Message-ID: <CANQeFDAtw0rn2NtpF_kJtc=eXbcRmhxZewhwFT7XGBt84rzQDw@mail.gmail.com>
+Subject: Re: [PATCH] blk-throttle: limit bios to fix amount of pages entering
+ writeback prematurely
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Jan Kara <jack@suse.cz>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/30/19 2:53 AM, 김찬솔 wrote:
-> 
-> Changes:
->   1. Function pblk_rw_io to get bio* as a reference
->   2. In pblk_rw_io bio_put call on read case removed
-> 
-> A fix to address issue where
->   1. pblk_make_rq calls pblk_rw_io passes bio* pointer as a value (0xA)
->   2. pblk_rw_io calls blk_queue_split passing bio* pointer as reference
->   3. In blk_queue_split, when there is a split, the original bio* (0xA)
->      is passed to generic_make_requests, and the newly allocated bio is
->      returned
->   4. If NVM_IO_DONE returned, pblk_make_rq calls bio_endio on the bio*,
->      that is not the one returned by blk_queue_split
->   5. As a result bio_endio is not called on the newly allocated bio.
-> 
-> Signed-off-by: chansol.kim <chansol.kim@samsung.com>
-> ---
->   drivers/lightnvm/pblk-init.c | 22 ++++++++--------------
->   1 file changed, 8 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-> index b57f764d..4efc929 100644
-> --- a/drivers/lightnvm/pblk-init.c
-> +++ b/drivers/lightnvm/pblk-init.c
-> @@ -31,30 +31,24 @@ static DECLARE_RWSEM(pblk_lock);
->   struct bio_set pblk_bio_set;
->   
->   static int pblk_rw_io(struct request_queue *q, struct pblk *pblk,
-> -			  struct bio *bio)
-> +			  struct bio **bio)
->   {
-> -	int ret;
-> -
->   	/* Read requests must be <= 256kb due to NVMe's 64 bit completion bitmap
->   	 * constraint. Writes can be of arbitrary size.
->   	 */
-> -	if (bio_data_dir(bio) == READ) {
-> -		blk_queue_split(q, &bio);
-> -		ret = pblk_submit_read(pblk, bio);
-> -		if (ret == NVM_IO_DONE && bio_flagged(bio, BIO_CLONED))
-> -			bio_put(bio);
+On Thu, Jan 31, 2019 at 5:50 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 1/31/19 2:26 AM, Jan Kara wrote:
+> > Hi!
+> >
+> > On Thu 31-01-19 10:03:34, Xiaoguang Wang wrote:
+> >>> Currently in blk_throtl_bio(), if one bio exceeds its throtl_grp's bps
+> >>> or iops limit, this bio will be queued throtl_grp's throtl_service_queue,
+> >>> then obviously mm subsys will submit more pages, even underlying device
+> >>> can not handle these io requests, also this will make large amount of pages
+> >>> entering writeback prematurely, later if some process writes some of these
+> >>> pages, it will wait for long time.
+> >>>
+> >>> I have done some tests: one process does buffered writes on a 1GB file,
+> >>> and make this process's blkcg max bps limit be 10MB/s, I observe this:
+> >>>     #cat /proc/meminfo  | grep -i back
+> >>>     Writeback:        900024 kB
+> >>>     WritebackTmp:          0 kB
+> >>>
+> >>> I think this Writeback value is just too big, indeed many bios have been
+> >>> queued in throtl_grp's throtl_service_queue, if one process try to write
+> >>> the last bio's page in this queue, it will call wait_on_page_writeback(page),
+> >>> which must wait the previous bios to finish and will take long time, we
+> >>> have also see 120s hung task warning in our server.
+> >>>
+> >>> To fix this issue, we can simply limit throtl_service_queue's max queued
+> >>> bios, currently we limit it to throtl_grp's bps_limit or iops limit, if it
+> >>> still exteeds, we just sleep for a while.
+> >> Ping :)
+> >>
+> >> The fix method in this patch is not good, I had written a new patch that
+> >> uses wait queue, but do you think this is a blk-throttle design issue and
+> >> needs fixing? thanks.
+> >
+> > Well, essentially this is a priority inversion issue where low-priority
+> > process submits writes and higher priority process blocks on those, isn't
+> > it? I think the blk-wbt throttling was meant to address these issues by
+> > throttling the process already when submitting bios (i.e. something similar
+> > to what you propose in your patch). I'll defer to Jens as a maintainer
+> > whether he wants to redirect users to blk-wbt or whether improving
+> > blk-throttle to avoid similar issues is desirable. Jens?
+>
+> I think that blk-throttle usage should be phased out and we can
+> hopefully remove it at some point. I also don't think that there's a
+> large use base of it, which is good, but does seem active on the Alibaba
+> front.
+>
 
-Could we kill the NVM_DONE_IO check in the pblk_rw_io, that should 
-achieve the same?
+The concept of blk-throttle is attractive, but it doesn't make too
+much sense to applications' qos in practice because both latency and
+throughput are important and blk-throttle are a bit coarse-grained on
+this.
+So we're not going to stick with it forever.
 
-> -
-> -		return ret;
-> +	if (bio_data_dir(*bio) == READ) {
-> +		blk_queue_split(q, bio);
-> +		return pblk_submit_read(pblk, *bio);
->   	}
->   
->   	/* Prevent deadlock in the case of a modest LUN configuration and large
->   	 * user I/Os. Unless stalled, the rate limiter leaves at least 256KB
->   	 * available for user I/O.
->   	 */
-> -	if (pblk_get_secs(bio) > pblk_rl_max_io(&pblk->rl))
-> -		blk_queue_split(q, &bio);
-> +	if (pblk_get_secs(*bio) > pblk_rl_max_io(&pblk->rl))
-> +		blk_queue_split(q, bio);
->   
-> -	return pblk_write_to_cache(pblk, bio, PBLK_IOTYPE_USER);
-> +	return pblk_write_to_cache(pblk, *bio, PBLK_IOTYPE_USER);
->   }
->   
->   static blk_qc_t pblk_make_rq(struct request_queue *q, struct bio *bio)
-> @@ -69,7 +63,7 @@ static blk_qc_t pblk_make_rq(struct request_queue *q, struct bio *bio)
->   		}
->   	}
->   
-> -	switch (pblk_rw_io(q, pblk, bio)) {
-> +	switch (pblk_rw_io(q, pblk, &bio)) {
->   	case NVM_IO_ERR:
->   		bio_io_error(bio);
->   		break;
-> 
+Now that blk-iolatency has been there, in theory it should help a bit.
+However, another thing that what we're expecting is a proportional
+setting on IO resource shares.
 
+"Outstanding IO" or "queue depth" based solution sounds like a good
+direction, but unlike blk-sq where there's only one queue and queue
+depth is fixed, with blk-mq, the problem is that it's difficult to
+assign an accurate depth for a weight.
+
+thanks,
+liubo
