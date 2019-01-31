@@ -2,194 +2,112 @@ Return-Path: <SRS0=cAVD=QH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 572C1C282D7
-	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 02:03:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3004FC282D8
+	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 02:23:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2385A20820
-	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 02:03:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F158820881
+	for <linux-block@archiver.kernel.org>; Thu, 31 Jan 2019 02:23:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Vu9HuRzw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726163AbfAaCDx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Jan 2019 21:03:53 -0500
-Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:41720 "EHLO
-        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725828AbfAaCDx (ORCPT
+        id S1725828AbfAaCXX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Jan 2019 21:23:23 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:56184 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725535AbfAaCXX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Jan 2019 21:03:53 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R571e4;CH=green;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04452;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=3;SR=0;TI=SMTPD_---0TJIyJsD_1548900214;
-Received: from 30.5.112.255(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0TJIyJsD_1548900214)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 31 Jan 2019 10:03:48 +0800
-Subject: Re: [PATCH] blk-throttle: limit bios to fix amount of pages entering
- writeback prematurely
-From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-To:     linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, jack@suse.cz
-References: <20181228115148.26474-1-xiaoguang.wang@linux.alibaba.com>
-Message-ID: <9d722c67-dfae-2ee4-74ef-504164fed0bf@linux.alibaba.com>
-Date:   Thu, 31 Jan 2019 10:03:34 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        Wed, 30 Jan 2019 21:23:23 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.22/8.16.0.22) with SMTP id x0V2Jgw9009621;
+        Thu, 31 Jan 2019 02:23:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=aGtrZn0EILekuIJeJHqdOoFOilaDVVKAR66NGrEiwTw=;
+ b=Vu9HuRzwFvTpEp26eLeoJJgAzoHWO9WTHMYBDRzAI6gKilXQfKhU/srg8d2cflU5xHQ3
+ KMMlYU4lBUl1qS2EDCqChJxKvd6NPS8kAcsMPSkojnZqOtmGHTkLzKKHtnbxe91bIQVD
+ W3wgJzCeK5puNYFS8leOKwB9jIFER7A1qebR28Syq12ImTlz6QvoktSTMoWLhshQp5jd
+ vpGTuK99ZiHkIgmJjZV9sB/4F0U5WXoQQCkUoczl3HQevLcGo5QM2SMiOU5ZawYz5ibZ
+ GfI4RLqxB2Jy2DuyD6YlvUkL2N0uMHlBh5NwSA1aT5mUjg6My27t5LoUCDBiBroMEdNy TA== 
+Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
+        by aserp2130.oracle.com with ESMTP id 2q8d2ee780-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 31 Jan 2019 02:23:14 +0000
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x0V2ND9B023079
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 31 Jan 2019 02:23:13 GMT
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x0V2NDWn021872;
+        Thu, 31 Jan 2019 02:23:13 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 30 Jan 2019 18:23:12 -0800
+To:     John Dorminy <jdorminy@redhat.com>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Zhang Xiaoxu <zhangxiaoxu5@huawei.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Alasdair G Kergon <agk@redhat.com>
+Subject: Re: block: Fix a WRITE SAME BUG_ON
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20190125021107.4595-1-zhangxiaoxu5@huawei.com>
+        <CAMeeMh_=UVGwo-=9WtBXRmiHTXnLAswqis97bM-aiuwnzPU0QQ@mail.gmail.com>
+        <20190128221441.GA24102@redhat.com> <yq1lg34f4i7.fsf@oracle.com>
+        <CAMeeMh85T_qui=LWd0u=b_oMN5XLqowqkvLuYGBM2Ae6tS-mzg@mail.gmail.com>
+Date:   Wed, 30 Jan 2019 21:23:09 -0500
+In-Reply-To: <CAMeeMh85T_qui=LWd0u=b_oMN5XLqowqkvLuYGBM2Ae6tS-mzg@mail.gmail.com>
+        (John Dorminy's message of "Wed, 30 Jan 2019 09:08:50 -0500")
+Message-ID: <yq1ftt9bm5u.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20181228115148.26474-1-xiaoguang.wang@linux.alibaba.com>
-Content-Type: text/plain; charset=gbk; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9152 signatures=668682
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1901310016
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-hi,
 
-> Currently in blk_throtl_bio(), if one bio exceeds its throtl_grp's bps
-> or iops limit, this bio will be queued throtl_grp's throtl_service_queue,
-> then obviously mm subsys will submit more pages, even underlying device
-> can not handle these io requests, also this will make large amount of pages
-> entering writeback prematurely, later if some process writes some of these
-> pages, it will wait for long time.
-> 
-> I have done some tests: one process does buffered writes on a 1GB file,
-> and make this process's blkcg max bps limit be 10MB/s, I observe this:
-> 	#cat /proc/meminfo  | grep -i back
-> 	Writeback:        900024 kB
-> 	WritebackTmp:          0 kB
-> 
-> I think this Writeback value is just too big, indeed many bios have been
-> queued in throtl_grp's throtl_service_queue, if one process try to write
-> the last bio's page in this queue, it will call wait_on_page_writeback(page),
-> which must wait the previous bios to finish and will take long time, we
-> have also see 120s hung task warning in our server.
-> 
-> To fix this issue, we can simply limit throtl_service_queue's max queued
-> bios, currently we limit it to throtl_grp's bps_limit or iops limit, if it
-> still exteeds, we just sleep for a while.
-Ping :)
+John,
 
-The fix method in this patch is not good, I had written a new patch that
-uses wait queue, but do you think this is a blk-throttle design issue and
-needs fixing? thanks.
+>> So disallowing WRITE SAME unless all component devices have the same LBS
+>> is the correct fix.
+>
+> Alternately, could possibly WRITE_SAME bios be accepted with the
+> minimum sector size of the stack rather than the max, e.g. 512 in this
+> example rather than 4k? They'd need to have a granularity of the
+> larger sector size, though, presumabily necessitating new queue limits
+> write_same_{granularity,block_size}, which might be too much work.
 
-Regards,
-Xiaoguang Wang
+I don't have a problem restricting the buffer contents to be consistent
+within a page. Or even change the upper layer semantics to specify the
+buffer contents using a single byte (0x00..0xff).
 
-> 
-> Signed-off-by: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-> ---
->   block/blk-throttle.c       | 15 ++++++++++++++-
->   include/linux/blk-cgroup.h | 15 ++++++++++++---
->   2 files changed, 26 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 627c40f89827..59fe58c3c411 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -81,6 +81,7 @@ struct throtl_service_queue {
->   	 */
->   	struct list_head	queued[2];	/* throtl_qnode [READ/WRITE] */
->   	unsigned int		nr_queued[2];	/* number of queued bios */
-> +	unsigned int		nr_queued_bytes[2]; /* number of queued bytes */
->   
->   	/*
->   	 * RB tree of active children throtl_grp's, which are sorted by
-> @@ -1251,6 +1252,7 @@ static void throtl_add_bio_tg(struct bio *bio, struct throtl_qnode *qn,
->   	throtl_qnode_add_bio(bio, qn, &sq->queued[rw]);
->   
->   	sq->nr_queued[rw]++;
-> +	sq->nr_queued_bytes[rw] += throtl_bio_data_size(bio);
->   	blkg_rwstat_add(&tg->total_bytes_queued, bio_op(bio), bio->bi_opf,
->   			throtl_bio_data_size(bio));
->   	blkg_rwstat_add(&tg->total_io_queued, bio_op(bio), bio->bi_opf, 1);
-> @@ -1307,6 +1309,7 @@ static void tg_dispatch_one_bio(struct throtl_grp *tg, bool rw)
->   	 */
->   	bio = throtl_pop_queued(&sq->queued[rw], &tg_to_put);
->   	sq->nr_queued[rw]--;
-> +	sq->nr_queued_bytes[rw] -= throtl_bio_data_size(bio);
->   
->   	throtl_charge_bio(tg, bio);
->   
-> @@ -2563,7 +2566,7 @@ static void blk_throtl_assoc_bio(struct throtl_grp *tg, struct bio *bio)
->   }
->   
->   bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
-> -		    struct bio *bio)
-> +		    struct bio *bio, unsigned long *wait)
->   {
->   	struct throtl_qnode *qn = NULL;
->   	struct throtl_grp *orig_tg = blkg_to_tg(blkg ?: q->root_blkg);
-> @@ -2572,6 +2575,8 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
->   	bool rw = bio_data_dir(bio);
->   	bool throttled = false;
->   	struct throtl_data *td = tg->td;
-> +	u64 bps_limit;
-> +	unsigned int iops_limit;
->   
->   	WARN_ON_ONCE(!rcu_read_lock_held());
->   
-> @@ -2654,6 +2659,14 @@ bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
->   		   sq->nr_queued[READ], sq->nr_queued[WRITE]);
->   
->   	td->nr_queued[rw]++;
-> +	bps_limit = tg_bps_limit(tg, rw);
-> +	if (bps_limit != U64_MAX && sq->nr_queued_bytes[rw] > bps_limit)
-> +		*wait = HZ * 90 / 100;
-> +
-> +	iops_limit = tg_iops_limit(tg, rw);
-> +	if (iops_limit != UINT_MAX && sq->nr_queued[rw] > iops_limit)
-> +		*wait = HZ * 90 / 100;
-> +
->   	throtl_add_bio_tg(bio, qn, tg);
->   	throttled = true;
->   
-> diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-> index 2634f3696ac2..dc2174330066 100644
-> --- a/include/linux/blk-cgroup.h
-> +++ b/include/linux/blk-cgroup.h
-> @@ -721,10 +721,13 @@ static inline void blkg_update_meta_stats(struct blkcg_gq *blkg)
->   
->   #ifdef CONFIG_BLK_DEV_THROTTLING
->   extern bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
-> -			   struct bio *bio);
-> +			   struct bio *bio, unsigned long *wait);
->   #else
->   static inline bool blk_throtl_bio(struct request_queue *q, struct blkcg_gq *blkg,
-> -				  struct bio *bio) { return false; }
-> +				  struct bio *bio, unsigned long *wait)
-> +{
-> +	return false;
-> +}
->   #endif
->   
->   static inline bool blkcg_bio_issue_check(struct request_queue *q,
-> @@ -733,6 +736,7 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
->   	struct blkcg *blkcg;
->   	struct blkcg_gq *blkg;
->   	bool throtl = false;
-> +	unsigned long wait = 0;
->   
->   	rcu_read_lock();
->   	blkcg = bio_blkcg(bio);
-> @@ -742,7 +746,7 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
->   	if (unlikely(IS_ERR(blkg)))
->   		blkg = NULL;
->   
-> -	throtl = blk_throtl_bio(q, blkg, bio);
-> +	throtl = blk_throtl_bio(q, blkg, bio, &wait);
->   	spin_unlock_irq(q->queue_lock);
->   
->   	if (!throtl && !bio_flagged(bio, BIO_THROTL_COUNTED)) {
-> @@ -754,6 +758,11 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
->   	}
->   
->   	rcu_read_unlock();
-> +	if (wait > 0) {
-> +		__set_current_state(TASK_KILLABLE);
-> +		io_schedule_timeout(wait);
-> +	}
-> +
->   	return !throtl;
->   }
->   
-> 
+But the issue of head and tail remains if there is a block size mismatch
+so it's important that we keep scaling the logical block size up when
+stacking and reject any bio that can't be honored on a 4Kn device.
+
+> (I use WRITE_SAME to fill devices with a particular pattern in order
+> to catch failures to initialize disk structures appropriately,
+> personally, but it's just for convenience/speed.)
+
+The intent was for stuff like MD to use it to initialize parity disks,
+etc. But adoption has been pretty slow.
+
+I don't have any problems keeping WRITE_SAME around if people are
+actually using it. It just seemed like most active users only cared
+about writing zeroes.
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
