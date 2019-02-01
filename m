@@ -2,124 +2,88 @@ Return-Path: <SRS0=mhrr=QI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C42EC282D8
-	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 15:24:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A489EC282D8
+	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 15:34:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DFF4D218AC
-	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 15:24:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 695BA218AF
+	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 15:34:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="gf7aUSjc"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="oFsuI+hZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730032AbfBAPY4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Feb 2019 10:24:56 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:54946 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729860AbfBAPYz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Feb 2019 10:24:55 -0500
-Received: by mail-it1-f193.google.com with SMTP id i145so9600815ita.4
-        for <linux-block@vger.kernel.org>; Fri, 01 Feb 2019 07:24:54 -0800 (PST)
+        id S1727614AbfBAPeu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Feb 2019 10:34:50 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:35854 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726705AbfBAPet (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Feb 2019 10:34:49 -0500
+Received: by mail-it1-f194.google.com with SMTP id c9so10336304itj.1
+        for <linux-block@vger.kernel.org>; Fri, 01 Feb 2019 07:34:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=heCO4PqIPeaG7qS6KODVXQgGniVV6HXd/0gzeRZcYhY=;
-        b=gf7aUSjcVHIUbxSfa9eg6Nan++SJuYKNl4SFffTUk1LyEGVJ49qcPc97cR5hGjZtDt
-         UmdK3NxuuxZ5Mu1QfCD+ptp5tVAcCqeoJ3ptKSzXmIjdGexCNlyAW3KRg5sPutAfe5DW
-         xwTzD+XOcLh+dZWCOqXs7IzfUtaxuKMIkxTJbI9Ag3Sqzt70FAFY/TuL+ALDfwZIKsQv
-         SHJ6zz2RFtWYS6O5qGO5ubMLBXaOCUBEp06CmSPrZIvKWHroaOIdWoHzqW9Te02IEKvK
-         iRge9ldnodvgpI0CtdtrHyB3McUP1ZylSnTS8k2UROScf9Sj/mRVJ/rR6moYvTDhtdNz
-         QPyQ==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=7Vp+DGBZGxEE2s5PpXWlcivBg5TYRjRohltMhSZAA08=;
+        b=oFsuI+hZ+gGJk5IiMJQHDxIc+yOBR7gU198U+S4AR9cnjLDwVRkHuY97NrHy9viyMX
+         o72I5eEpNcQG0u/fKE5ZVvKW7uN8Eg4o6vtc408/XLyCl4LdlUGPvuWlmeLYFaNqL9In
+         UYoC92lymBiub5uajO3/xSdsnOlvchpCjtLk3bUABkJ7UHzzA1zK8wlY7GQh/sBXmmDI
+         4iHw/bzL7SrLvfHg0MX/D8y94Q4rAcGn6buKey8RYbha9uLMtlKigcVq6/HAFC3KIk5b
+         rKGbpJ+w2nzxkydXOLZ/klQcQz/VgU3pvtFyRh6mK8EoMVozmNvbcILdFc+vq08MNzuk
+         lNdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=heCO4PqIPeaG7qS6KODVXQgGniVV6HXd/0gzeRZcYhY=;
-        b=eOvX91eg/7jxO4W1N10YfnfO4FcwSgMDbwpH8lq/GZtzz9SYc6oM6PGUTRKlhwPbj7
-         tJiaYhbX4vXkI47juBSCT7M87wU6yFrWRMBdrLCtcAY7iLV7SgDXj3xM1FhnkO9ghzDB
-         ssX/WtHzX8R3WPS/V0Vex07lsF8BezjsqmhEfXeCGNbaEQ55Sv6+GNnHe28LP/kyolYp
-         o1R/ixsWHVkkTXqjjtxkyFyRivXnFbli6WP4xEmfGNX2/09fWaODZmXqtHbZWCftt7EF
-         u8weXegJEPuJglOGNXs0dFX76+tpns94v1Omxl/FeWvOXlVv3jlYMAUJG67wMdJRUwMV
-         n9iw==
-X-Gm-Message-State: AJcUukfxKfdeOtWpRHQjEjCz/5hrivTmeQluYPdfaxYxKbwNfaLRlbFB
-        +E4BafUuHxKcgfrO03Vy4KDs4Q==
-X-Google-Smtp-Source: ALg8bN7BB6JiR+8z3pXRfnzxjXZh9P0lwUeFl4cOiQIKgFZcHq3pFXC/mdOJFBfcBCdPmCxvvcMZBA==
-X-Received: by 2002:a02:ac8c:: with SMTP id x12mr22675098jan.72.1549034694214;
-        Fri, 01 Feb 2019 07:24:54 -0800 (PST)
-Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id t6sm3388898ioc.87.2019.02.01.07.24.52
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=7Vp+DGBZGxEE2s5PpXWlcivBg5TYRjRohltMhSZAA08=;
+        b=pRjodNC9KJoRE9NkwIH4JGz6NGNdRNnSvX+MSjWwk+cLKMx6zQB0OckslkIXb52lhm
+         IAmKxR86PHwbJYoi2gtbYTNxDIyHHsfcFoDA7iMWIhE5FX5hoDTZF1LiH0RJC3V8gkuz
+         /+hT9oFkzpinzojTDftxczpyhJFNVlf+9/nvn2jgCKij/GjTMQL42NdiZ6Gh1vzI8TAD
+         mGqA3kEOoO/VJZ/8CmzCbcADUKLTIR7PZRKtlsik/H2rgdyQU7VoxyGYOJjeIwTTl180
+         upPgHw9q16ek1SNEbvhdrldo6y6Q8WTMnKknPd5axdQo0wLM4WSV0ZA8AutlrpFEiypX
+         7UfA==
+X-Gm-Message-State: AHQUAub5pmgY0w/ClCwx6heHEmGuZRPiSQM/06Zr3xhDyligV7MT8dNi
+        1BMg7MoQ4+bo7E/RQ3AMlwnojOJMLHc=
+X-Google-Smtp-Source: AHgI3IaHJ1ruAD8kh+MPcHRHHwj62n0G27svaFXj1uQgUdU8CVpEQiJsXo3lX2RbFdZjgJCTUrz7wg==
+X-Received: by 2002:a24:3391:: with SMTP id k139mr1760528itk.25.1549035289024;
+        Fri, 01 Feb 2019 07:34:49 -0800 (PST)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id v4sm2061636itv.20.2019.02.01.07.34.47
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 01 Feb 2019 07:24:53 -0800 (PST)
+        Fri, 01 Feb 2019 07:34:48 -0800 (PST)
+Subject: Re: [PATCH 0/2] small optimization for accessing queue map
+To:     Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1548325533-1695-1-git-send-email-jianchao.w.wang@oracle.com>
 From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-aio@kvack.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org
-Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com, jannh@google.com,
-        Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 18/18] io_uring: add io_uring_event cache hit information
-Date:   Fri,  1 Feb 2019 08:24:14 -0700
-Message-Id: <20190201152414.23296-19-axboe@kernel.dk>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190201152414.23296-1-axboe@kernel.dk>
-References: <20190201152414.23296-1-axboe@kernel.dk>
+Message-ID: <94a2634f-24e2-b846-9c13-2fc9c0117e0c@kernel.dk>
+Date:   Fri, 1 Feb 2019 08:34:46 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <1548325533-1695-1-git-send-email-jianchao.w.wang@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add hint on whether a read was served out of the page cache, or if it
-hit media. This is useful for buffered async IO, O_DIRECT reads would
-never have this set (for obvious reasons).
+On 1/24/19 3:25 AM, Jianchao Wang wrote:
+> Hi Jens
+> 
+> These two patches are small optimization for accessing the queue mapping
+> in hot path. It saves the queue mapping results into blk_mq_ctx directly,
+> then we needn't do the complicated bounce on queue_hw_ctx[] map[] and
+> mq_map[].
 
-If the read hit page cache, cqe->flags will have IOCQE_FLAG_CACHEHIT
-set.
+Doing some targeted testing, the cycles wasted on the double indirect
+are reclaimed with this. I've applied both for 5.1, thanks.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- fs/io_uring.c                 | 7 ++++++-
- include/uapi/linux/io_uring.h | 5 +++++
- 2 files changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 0e700e81ac43..48234304ef02 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -560,11 +560,16 @@ static void io_fput(struct io_kiocb *req)
- static void io_complete_rw(struct kiocb *kiocb, long res, long res2)
- {
- 	struct io_kiocb *req = container_of(kiocb, struct io_kiocb, rw);
-+	unsigned ev_flags = 0;
- 
- 	kiocb_end_write(kiocb);
- 
- 	io_fput(req);
--	io_cqring_add_event(req->ctx, req->user_data, res, 0);
-+
-+	if (res > 0 && (req->flags & REQ_F_FORCE_NONBLOCK))
-+		ev_flags = IOCQE_FLAG_CACHEHIT;
-+
-+	io_cqring_add_event(req->ctx, req->user_data, res, ev_flags);
- 	io_free_req(req);
- }
- 
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index d319b2cd6319..6782e4e0464b 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -69,6 +69,11 @@ struct io_uring_cqe {
- 	__u32	flags;
- };
- 
-+/*
-+ * io_uring_event->flags
-+ */
-+#define IOCQE_FLAG_CACHEHIT	(1U << 0)	/* IO did not hit media */
-+
- /*
-  * Magic offsets for the application to mmap the data it needs
-  */
 -- 
-2.17.1
+Jens Axboe
 
