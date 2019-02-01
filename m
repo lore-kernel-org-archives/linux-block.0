@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDAA2C282D8
-	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 15:24:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6203C282D8
+	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 15:24:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9E166218EA
-	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 15:24:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95937218AF
+	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 15:24:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="aChFEgfl"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="SzAap0cd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729959AbfBAPYu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Feb 2019 10:24:50 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:55950 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729860AbfBAPYt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Feb 2019 10:24:49 -0500
-Received: by mail-it1-f193.google.com with SMTP id m62so9593017ith.5
-        for <linux-block@vger.kernel.org>; Fri, 01 Feb 2019 07:24:48 -0800 (PST)
+        id S1730016AbfBAPYw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Feb 2019 10:24:52 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:46226 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729860AbfBAPYw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Feb 2019 10:24:52 -0500
+Received: by mail-io1-f65.google.com with SMTP id s8so5921841iob.13
+        for <linux-block@vger.kernel.org>; Fri, 01 Feb 2019 07:24:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=CU9RuQlGNjt6599i3rjRfgOEgyHxaUBCJJkBrgEZ49g=;
-        b=aChFEgfl2a13oJo7T9k2d59alEtwGmJTZYQL6RIgEmL/ph1lTQSKYEHW2p0XrnUwsL
-         OjsVIl1oNmmo80URJUMv8EL/MmiwUCQi2+5vDwVmLBYPHOV2x3SywYC6EzFw6xnm3MLz
-         hQ0nSfB+3fVschi7S3Xh9WD1Ey/gm4ifE89otQdDOr58CSqumBqXoqZdhsDKsJRP1m0F
-         zy4D70HuJxwqbE75ahqI52IhSE8pCp+jFduIUf0rPCofyghvolQJO2oDn4aJfRcy7HDd
-         +pInZoxZYt/tNcFVa1HxpRNNuMBnWL/yofYHJeUzQ4DZ15YPcey1ZOWUsi1wzvo04dpn
-         k1cw==
+        bh=A4bj6KcOU8twyygmHUnhGH4fZ3aOH3dyrZALx8vxSHU=;
+        b=SzAap0cdUndsVucZpIaRHehiC77mY9Oh2yV5Zpt/wQH6XZ9KMZzOVqyEyZuF+3u47b
+         HhEVZ4e3NH55SuygNKVObO2E1TPOz6x2lqeq9xNl7hQ2HxqqGhcISIKGjRAbAueQNBGJ
+         IGw3L3e11DkaJywvEOwKiz4dwxW4HR8xPpwoet15f5m+03makpDjmHrpM5WMLbNSmqnU
+         QAH0Oy8N7jVrJXwewq3XVtMvAS6yAhZ5yAOYLW6g0SO6HbrlcBaoqpKlDXzD3KM2mT9s
+         qQ5m7H3uZ2t8L64hvCGblExsj8pSpvEFzlbxCQihAtQpPcSFIZSwckCS5S07Ad+jdPak
+         tZcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=CU9RuQlGNjt6599i3rjRfgOEgyHxaUBCJJkBrgEZ49g=;
-        b=jWnoIglCT4QZXUgWFivlExS4h+UWC8ZAvcZZTiAxvyxsEpdTXJfpEOG6+QDeI9esGG
-         cEUO5Hwly6rjQVTscDUpqrpPt2VqCphfBE+TIVarDkjrvbCR40TkmSzEqKGZ2CANeFjA
-         v4v2xlzZG8WI4rKdOZbFU+nlm/8b50Q8pBszpuOur0ISWaFkBaj5zXjlzb2O8ImCCTOs
-         CK26WxvuuuzDeIZq52HLDQEWy+d/kyPZ4DKGXkDGOvbB/7qZCQLGKaR9NRaED6ho1cgF
-         selBfw6idhsG4ZnrHt8AvveDB2fu3rXXnPHylCyCQRy5P6OXUYKScOdZpek6Y/TyyNs5
-         QxhQ==
-X-Gm-Message-State: AHQUAubiLzuT2bvaQC05q0wgQppZ0Z8LqOlqe4fM0tm9iUSQ/GKWfkSb
-        uQ41wrGiZHh1Ckd6mlrPJNZ21Q==
-X-Google-Smtp-Source: AHgI3IbV5WKPUg7FtnJW4QBTs7pRY3In/s/kBTX2x+MJ2oTqWtp37w5cKJqrSJXm9GzEPU+HZeNjHw==
-X-Received: by 2002:a24:ac02:: with SMTP id s2mr1819222ite.94.1549034688440;
-        Fri, 01 Feb 2019 07:24:48 -0800 (PST)
+        bh=A4bj6KcOU8twyygmHUnhGH4fZ3aOH3dyrZALx8vxSHU=;
+        b=F4s7Dxf+HvJJEYfYPTnvseNw8PuA2xd/EO/IEipNWw3e4ui3uB5kROg5cbi1+hEUP0
+         5bcD5BNr+IKDD7JhYZpm6yQdVcsV4+MJ6sozNWkiEtQ/9Q1Hx3GuUR3zIyhCKXqKlJuU
+         b1zwjEC2iVskpG4z5QrnP51Vp7umh/LlpNtHIPQBnfKRsoS09ggMWCzFZMOAeWv0e5WB
+         e5+h4o23mNr5DYukVa/qTLc2N93UIAmL4hOrWjOZz1fubZUuGDuT9pubfQQEKlYFiK7B
+         1eptJvnPQ16qZ0bV8RRv5pBbxhhsi1eFFPiVvf2uOM/EcBV0yYHmKjKRxzhHj6Ul4P5V
+         jemg==
+X-Gm-Message-State: AHQUAua69a6/0yY2cr5CNkS/U8mswE1u1hbmIXOWAyEmbriDvRaKXqB/
+        Ob81EudbUPOJahEwfXceG6B5WA==
+X-Google-Smtp-Source: AHgI3IYcpcnPnXkl/6lizbbpXb+VS8ROZWB4DzeC2JLdf9sjpRUIXN+RwpeOl73wVsXGQYfU3j5hng==
+X-Received: by 2002:a6b:7b49:: with SMTP id m9mr22065431iop.237.1549034690358;
+        Fri, 01 Feb 2019 07:24:50 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id t6sm3388898ioc.87.2019.02.01.07.24.45
+        by smtp.gmail.com with ESMTPSA id t6sm3388898ioc.87.2019.02.01.07.24.48
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 01 Feb 2019 07:24:46 -0800 (PST)
+        Fri, 01 Feb 2019 07:24:49 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-aio@kvack.org, linux-block@vger.kernel.org,
         linux-api@vger.kernel.org
 Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com, jannh@google.com,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 15/18] io_uring: add io_kiocb ref count
-Date:   Fri,  1 Feb 2019 08:24:11 -0700
-Message-Id: <20190201152414.23296-16-axboe@kernel.dk>
+Subject: [PATCH 16/18] io_uring: add support for IORING_OP_POLL
+Date:   Fri,  1 Feb 2019 08:24:12 -0700
+Message-Id: <20190201152414.23296-17-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190201152414.23296-1-axboe@kernel.dk>
 References: <20190201152414.23296-1-axboe@kernel.dk>
@@ -69,49 +69,352 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We'll use this for the POLL implementation. Regular requests will
-NOT be using references, so initialize it to 0. Any real use of
-the io_kiocb ref will initialize it to at least 2.
+This is basically a direct port of bfe4037e722e, which implements a
+one-shot poll command through aio. Description below is based on that
+commit as well. However, instead of adding a POLL command and relying
+on io_cancel(2) to remove it, we mimic the epoll(2) interface of
+having a command to add a poll notification, IORING_OP_POLL_ADD,
+and one to remove it again, IORING_OP_POLL_REMOVE.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+To poll for a file descriptor the application should submit an sqe of
+type IORING_OP_POLL. It will poll the fd for the events specified in the
+poll_events field.
+
+Unlike poll or epoll without EPOLLONESHOT this interface always works in
+one shot mode, that is once the sqe is completed, it will have to be
+resubmitted.
+
+Based-on-code-from: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/io_uring.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ fs/io_uring.c                 | 256 +++++++++++++++++++++++++++++++++-
+ include/uapi/linux/io_uring.h |   3 +
+ 2 files changed, 258 insertions(+), 1 deletion(-)
 
 diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 8f8cde20bb6c..97ec812b10b3 100644
+index 97ec812b10b3..fdfcd0c75278 100644
 --- a/fs/io_uring.c
 +++ b/fs/io_uring.c
-@@ -153,6 +153,7 @@ struct io_kiocb {
- 	struct io_ring_ctx	*ctx;
- 	struct list_head	list;
- 	unsigned int		flags;
-+	refcount_t		refs;
- #define REQ_F_FORCE_NONBLOCK	1	/* inline submission attempt */
- #define REQ_F_IOPOLL_COMPLETED	2	/* polled IO has completed */
- #define REQ_F_FIXED_FILE	4	/* ctx owns file */
-@@ -326,6 +327,7 @@ static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx,
+@@ -135,6 +135,7 @@ struct io_ring_ctx {
+ 		 * manipulate the list, hence no extra locking is needed there.
+ 		 */
+ 		struct list_head	poll_list;
++		struct list_head	cancel_list;
+ 	} ____cacheline_aligned_in_smp;
+ };
  
- 	req->ctx = ctx;
- 	req->flags = 0;
-+	refcount_set(&req->refs, 0);
- 	return req;
- out:
- 	io_ring_drop_ctx_refs(ctx, 1);
-@@ -343,8 +345,10 @@ static void io_free_req_many(struct io_ring_ctx *ctx, void **reqs, int *nr)
+@@ -145,8 +146,20 @@ struct sqe_submit {
+ 	bool				needs_lock;
+ };
  
- static void io_free_req(struct io_kiocb *req)
- {
--	io_ring_drop_ctx_refs(req->ctx, 1);
--	kmem_cache_free(req_cachep, req);
-+	if (!refcount_read(&req->refs) || refcount_dec_and_test(&req->refs)) {
-+		io_ring_drop_ctx_refs(req->ctx, 1);
-+		kmem_cache_free(req_cachep, req);
-+	}
++struct io_poll_iocb {
++	struct file *file;
++	struct wait_queue_head *head;
++	__poll_t events;
++	bool woken;
++	bool canceled;
++	struct wait_queue_entry wait;
++};
++
+ struct io_kiocb {
+-	struct kiocb		rw;
++	union {
++		struct kiocb		rw;
++		struct io_poll_iocb	poll;
++	};
+ 
+ 	struct sqe_submit	submit;
+ 
+@@ -217,6 +230,7 @@ static struct io_ring_ctx *io_ring_ctx_alloc(struct io_uring_params *p)
+ 	init_waitqueue_head(&ctx->wait);
+ 	spin_lock_init(&ctx->completion_lock);
+ 	INIT_LIST_HEAD(&ctx->poll_list);
++	INIT_LIST_HEAD(&ctx->cancel_list);
+ 	return ctx;
  }
  
+@@ -945,6 +959,239 @@ static int io_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+ 	return 0;
+ }
+ 
++static void io_poll_remove_one(struct io_kiocb *req)
++{
++	struct io_poll_iocb *poll = &req->poll;
++
++	spin_lock(&poll->head->lock);
++	WRITE_ONCE(poll->canceled, true);
++	if (!list_empty(&poll->wait.entry)) {
++		list_del_init(&poll->wait.entry);
++		queue_work(req->ctx->sqo_wq, &req->work);
++	}
++	spin_unlock(&poll->head->lock);
++
++	list_del_init(&req->list);
++}
++
++static void io_poll_remove_all(struct io_ring_ctx *ctx)
++{
++	struct io_kiocb *req;
++
++	spin_lock_irq(&ctx->completion_lock);
++	while (!list_empty(&ctx->cancel_list)) {
++		req = list_first_entry(&ctx->cancel_list, struct io_kiocb,list);
++		io_poll_remove_one(req);
++	}
++	spin_unlock_irq(&ctx->completion_lock);
++}
++
++/*
++ * Find a running poll command that matches one specified in sqe->addr,
++ * and remove it if found.
++ */
++static int io_poll_remove(struct io_kiocb *req, const struct io_uring_sqe *sqe)
++{
++	struct io_ring_ctx *ctx = req->ctx;
++	struct io_kiocb *poll_req, *next;
++	int ret = -ENOENT;
++
++	if (unlikely(req->ctx->flags & IORING_SETUP_IOPOLL))
++		return -EINVAL;
++	if (sqe->ioprio || sqe->off || sqe->len || sqe->buf_index ||
++	    sqe->poll_events)
++		return -EINVAL;
++
++	spin_lock_irq(&ctx->completion_lock);
++	list_for_each_entry_safe(poll_req, next, &ctx->cancel_list, list) {
++		if (READ_ONCE(sqe->addr) == poll_req->user_data) {
++			io_poll_remove_one(poll_req);
++			ret = 0;
++			break;
++		}
++	}
++	spin_unlock_irq(&ctx->completion_lock);
++
++	io_cqring_add_event(req->ctx, sqe->user_data, ret, 0);
++	io_free_req(req);
++	return 0;
++}
++
++static void io_poll_complete(struct io_kiocb *req, __poll_t mask)
++{
++	io_cqring_add_event(req->ctx, req->user_data, mangle_poll(mask), 0);
++	io_fput(req);
++	io_free_req(req);
++}
++
++static void io_poll_complete_work(struct work_struct *work)
++{
++	struct io_kiocb *req = container_of(work, struct io_kiocb, work);
++	struct io_poll_iocb *poll = &req->poll;
++	struct poll_table_struct pt = { ._key = poll->events };
++	struct io_ring_ctx *ctx = req->ctx;
++	__poll_t mask = 0;
++
++	if (!READ_ONCE(poll->canceled))
++		mask = vfs_poll(poll->file, &pt) & poll->events;
++
++	/*
++	 * Note that ->ki_cancel callers also delete iocb from active_reqs after
++	 * calling ->ki_cancel.  We need the ctx_lock roundtrip here to
++	 * synchronize with them.  In the cancellation case the list_del_init
++	 * itself is not actually needed, but harmless so we keep it in to
++	 * avoid further branches in the fast path.
++	 */
++	spin_lock_irq(&ctx->completion_lock);
++	if (!mask && !READ_ONCE(poll->canceled)) {
++		add_wait_queue(poll->head, &poll->wait);
++		spin_unlock_irq(&ctx->completion_lock);
++		return;
++	}
++	list_del_init(&req->list);
++	spin_unlock_irq(&ctx->completion_lock);
++
++	io_poll_complete(req, mask);
++}
++
++static int io_poll_wake(struct wait_queue_entry *wait, unsigned mode, int sync,
++			void *key)
++{
++	struct io_poll_iocb *poll = container_of(wait, struct io_poll_iocb,
++							wait);
++	struct io_kiocb *req = container_of(poll, struct io_kiocb, poll);
++	struct io_ring_ctx *ctx = req->ctx;
++	__poll_t mask = key_to_poll(key);
++
++	poll->woken = true;
++
++	/* for instances that support it check for an event match first: */
++	if (mask) {
++		if (!(mask & poll->events))
++			return 0;
++
++		/* try to complete the iocb inline if we can: */
++		if (spin_trylock(&ctx->completion_lock)) {
++			list_del(&req->list);
++			spin_unlock(&ctx->completion_lock);
++
++			list_del_init(&poll->wait.entry);
++			io_poll_complete(req, mask);
++			return 1;
++		}
++	}
++
++	list_del_init(&poll->wait.entry);
++	queue_work(ctx->sqo_wq, &req->work);
++	return 1;
++}
++
++struct io_poll_table {
++	struct poll_table_struct pt;
++	struct io_kiocb *req;
++	int error;
++};
++
++static void io_poll_queue_proc(struct file *file, struct wait_queue_head *head,
++			       struct poll_table_struct *p)
++{
++	struct io_poll_table *pt = container_of(p, struct io_poll_table, pt);
++
++	if (unlikely(pt->req->poll.head)) {
++		pt->error = -EINVAL;
++		return;
++	}
++
++	pt->error = 0;
++	pt->req->poll.head = head;
++	add_wait_queue(head, &pt->req->poll.wait);
++}
++
++static int io_poll_add(struct io_kiocb *req, const struct io_uring_sqe *sqe)
++{
++	struct io_poll_iocb *poll = &req->poll;
++	struct io_ring_ctx *ctx = req->ctx;
++	struct io_poll_table ipt;
++	unsigned flags;
++	__poll_t mask;
++	u16 events;
++	int fd;
++
++	if (unlikely(req->ctx->flags & IORING_SETUP_IOPOLL))
++		return -EINVAL;
++	if (sqe->addr || sqe->ioprio || sqe->off || sqe->len || sqe->buf_index)
++		return -EINVAL;
++
++	INIT_WORK(&req->work, io_poll_complete_work);
++	events = READ_ONCE(sqe->poll_events);
++	poll->events = demangle_poll(events) | EPOLLERR | EPOLLHUP;
++
++	flags = READ_ONCE(sqe->flags);
++	fd = READ_ONCE(sqe->fd);
++
++	if (flags & IOSQE_FIXED_FILE) {
++		if (unlikely(!ctx->user_files || fd >= ctx->nr_user_files))
++			return -EBADF;
++		poll->file = ctx->user_files[fd];
++		req->flags |= REQ_F_FIXED_FILE;
++	} else {
++		poll->file = fget(fd);
++	}
++	if (unlikely(!poll->file))
++		return -EBADF;
++
++	poll->head = NULL;
++	poll->woken = false;
++	poll->canceled = false;
++
++	ipt.pt._qproc = io_poll_queue_proc;
++	ipt.pt._key = poll->events;
++	ipt.req = req;
++	ipt.error = -EINVAL; /* same as no support for IOCB_CMD_POLL */
++
++	/* initialized the list so that we can do list_empty checks */
++	INIT_LIST_HEAD(&poll->wait.entry);
++	init_waitqueue_func_entry(&poll->wait, io_poll_wake);
++
++	/* one for removal from waitqueue, one for this function */
++	refcount_set(&req->refs, 2);
++
++	mask = vfs_poll(poll->file, &ipt.pt) & poll->events;
++	if (unlikely(!poll->head)) {
++		/* we did not manage to set up a waitqueue, done */
++		goto out;
++	}
++
++	spin_lock_irq(&ctx->completion_lock);
++	spin_lock(&poll->head->lock);
++	if (poll->woken) {
++		/* wake_up context handles the rest */
++		mask = 0;
++		ipt.error = 0;
++	} else if (mask || ipt.error) {
++		/* if we get an error or a mask we are done */
++		WARN_ON_ONCE(list_empty(&poll->wait.entry));
++		list_del_init(&poll->wait.entry);
++	} else {
++		/* actually waiting for an event */
++		list_add_tail(&req->list, &ctx->cancel_list);
++	}
++	spin_unlock(&poll->head->lock);
++	spin_unlock_irq(&ctx->completion_lock);
++
++out:
++	if (unlikely(ipt.error)) {
++		if (!(flags & IOSQE_FIXED_FILE))
++			fput(poll->file);
++		return ipt.error;
++	}
++
++	if (mask)
++		io_poll_complete(req, mask);
++	io_free_req(req);
++	return 0;
++}
++
+ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 			   const struct sqe_submit *s, bool force_nonblock,
+ 			   struct io_submit_state *state)
+@@ -980,6 +1227,12 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 	case IORING_OP_FSYNC:
+ 		ret = io_fsync(req, s->sqe, force_nonblock);
+ 		break;
++	case IORING_OP_POLL_ADD:
++		ret = io_poll_add(req, s->sqe);
++		break;
++	case IORING_OP_POLL_REMOVE:
++		ret = io_poll_remove(req, s->sqe);
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 		break;
+@@ -1848,6 +2101,7 @@ static void io_ring_ctx_wait_and_kill(struct io_ring_ctx *ctx)
+ 	percpu_ref_kill(&ctx->refs);
+ 	mutex_unlock(&ctx->uring_lock);
+ 
++	io_poll_remove_all(ctx);
+ 	io_iopoll_reap_events(ctx);
+ 	wait_for_completion(&ctx->ctx_done);
+ 	io_ring_ctx_free(ctx);
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index 0d85da31e260..d319b2cd6319 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -25,6 +25,7 @@ struct io_uring_sqe {
+ 	union {
+ 		__kernel_rwf_t	rw_flags;
+ 		__u32		fsync_flags;
++		__u16		poll_events;
+ 	};
+ 	__u64	user_data;	/* data to be passed back at completion time */
+ 	union {
+@@ -51,6 +52,8 @@ struct io_uring_sqe {
+ #define IORING_OP_FSYNC		3
+ #define IORING_OP_READ_FIXED	4
+ #define IORING_OP_WRITE_FIXED	5
++#define IORING_OP_POLL_ADD	6
++#define IORING_OP_POLL_REMOVE	7
+ 
  /*
+  * sqe->fsync_flags
 -- 
 2.17.1
 
