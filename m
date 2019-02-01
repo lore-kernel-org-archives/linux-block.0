@@ -2,174 +2,72 @@ Return-Path: <SRS0=mhrr=QI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89319C282D8
-	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 17:44:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C41FC282D8
+	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 18:05:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 632E8218AF
-	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 17:44:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 506E121872
+	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 18:05:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727057AbfBARov (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Feb 2019 12:44:51 -0500
-Received: from smtp.infotech.no ([82.134.31.41]:37787 "EHLO smtp.infotech.no"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726486AbfBARov (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 1 Feb 2019 12:44:51 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by smtp.infotech.no (Postfix) with ESMTP id CE3EA204247;
-        Fri,  1 Feb 2019 18:44:47 +0100 (CET)
-X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
-Received: from smtp.infotech.no ([127.0.0.1])
-        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id 11tMaoaEKVFp; Fri,  1 Feb 2019 18:44:44 +0100 (CET)
-Received: from [192.168.48.23] (host-23-91-186-62.dyn.295.ca [23.91.186.62])
-        by smtp.infotech.no (Postfix) with ESMTPA id 2C8F120417E;
-        Fri,  1 Feb 2019 18:44:42 +0100 (CET)
-Reply-To: dgilbert@interlog.com
-Subject: Re: Recent removal of bsg read/write support
-To:     Dror Levin <drorl@infinidat.com>, torvalds@linux-foundation.org
-Cc:     richard.weinberger@gmail.com, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        hch@infradead.org, axboe@kernel.dk
-References: <CAOuWhkaGjX8Q_xghkFVTqzZkDrUv-sdH=VbS7hvnqFWrT+3eOQ@mail.gmail.com>
- <CAFLxGvxX8QW4wUJKommXVMpGBj7G_H3=SOwQGjGuyPZZrhCzKw@mail.gmail.com>
- <CA+55aFyLC8PhjZ+iV7MucSZ1aGKMT=S9=EkEAQ6T1=ZRqD-xLA@mail.gmail.com>
- <CAOuWhkbNuesaVYar6ML-qFw7RAfkPsaOYUXT4Ypfiu5=Nt1kWw@mail.gmail.com>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-Message-ID: <b60e424c-9dd0-beb8-cbf5-0b4daa83c105@interlog.com>
-Date:   Fri, 1 Feb 2019 12:44:42 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1730582AbfBASFt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Feb 2019 13:05:49 -0500
+Received: from zeniv.linux.org.uk ([195.92.253.2]:56272 "EHLO
+        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726808AbfBASFt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Feb 2019 13:05:49 -0500
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.91 #2 (Red Hat Linux))
+        id 1gpdCA-0003kR-5C; Fri, 01 Feb 2019 18:05:42 +0000
+Date:   Fri, 1 Feb 2019 18:05:42 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Jann Horn <jannh@google.com>
+Cc:     Matt Mullins <mmullins@fb.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "jmoyer@redhat.com" <jmoyer@redhat.com>,
+        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+        "hch@lst.de" <hch@lst.de>,
+        "linux-man@vger.kernel.org" <linux-man@vger.kernel.org>,
+        "avi@scylladb.com" <avi@scylladb.com>
+Subject: Re: [PATCH 05/18] Add io_uring IO interface
+Message-ID: <20190201180541.GQ2217@ZenIV.linux.org.uk>
+References: <20190128213538.13486-1-axboe@kernel.dk>
+ <20190128213538.13486-6-axboe@kernel.dk>
+ <CAG48ez0vDqDH4ks7q4L3F+xt-4kVQrN1yw34QwFAmwQyy27FTw@mail.gmail.com>
+ <e9326a77-54c5-e2b8-d9e5-663261462597@kernel.dk>
+ <CAG48ez17NW0GJVRC6dFcHZTgQifFz5og1XCUbXkHKhr6f=j74Q@mail.gmail.com>
+ <05cb18f7a97a6151c305cdb7240c4abc995aed59.camel@fb.com>
+ <CAG48ez09iOOnPz83b6HxktYHTfouS2GD6i3PfQEjp8WCp+3-VA@mail.gmail.com>
+ <CAG48ez0sJys=M1MR3DBd1DJ21-qHd2W7sB8+EvjhScWbtQnizA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAOuWhkbNuesaVYar6ML-qFw7RAfkPsaOYUXT4Ypfiu5=Nt1kWw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAG48ez0sJys=M1MR3DBd1DJ21-qHd2W7sB8+EvjhScWbtQnizA@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Updated reply, see below.
+On Fri, Feb 01, 2019 at 06:23:27PM +0100, Jann Horn wrote:
 
-On 2018-09-03 4:34 a.m., Dror Levin wrote:
-> On Sun, Sep 2, 2018 at 8:55 PM Linus Torvalds
-> <torvalds@linux-foundation.org> wrote:
->>
->> On Sun, Sep 2, 2018 at 4:44 AM Richard Weinberger
->> <richard.weinberger@gmail.com> wrote:
->>>
->>> CC'ing relevant people. Otherwise your mail might get lost.
->>
->> Indeed.
+> > Oh, yuck. Uuuh... can we make "struct files_struct" doubly-refcounted,
+> > like "struct mm_struct"? One reference type to keep the contents
+> > intact (the reference type you normally use, and the type used by
+> > uring when the thread is running), and one reference type to just keep
+> > the struct itself existing, but without preserving its contents
+> > (reference held consistently by the uring thread)?
 > 
-> Sorry for that.
+> Something like this (completely untested); and then instead of the
+> current get_files_struct(), you'd do get_files_struct_weak(), and
+> while the thread is running, it protects the files_struct from dying
+> with tryget_weak_files_struct() / put_files_struct().
 > 
->>> On Sun, Sep 2, 2018 at 1:37 PM Dror Levin <drorl@infinidat.com> wrote:
->>>>
->>>> We have an internal tool that uses the bsg read/write interface to
->>>> issue SCSI commands as part of a test suite for a storage device.
->>>>
->>>> After recently reading on LWN that this interface is to be removed we
->>>> tried porting our code to use sg instead. However, that raises new
->>>> issues - mainly getting ENOMEM over iSCSI for unknown reasons.
->>
->> Is there any chance that you can make more data available?
-> 
-> Sure, I can try.
-> 
-> We use writev() to send up to SG_MAX_QUEUE tasks at a time. Occasionally not
-> all tasks are written at which point we wait for tasks to return before
-> sending more, but then writev() fails with ENOMEM and we see this in the syslog:
-> 
-> Sep  1 20:58:14 gdc-qa-io-017 kernel: sd 441:0:0:5: [sg73]
-> sg_common_write: start_req err=-12
-> 
-> Failing tasks are reads of 128KiB.
+> Al, do you have opinions on this?
 
-This is the block layer running out of resources. The sg driver is a
-relatively thin shim and when it gets a "no can do" from the layers
-below it, the driver has little option than to return said errno.
-
->> I'd rather fix the sg interface (which while also broken garbage, we
->> can't get rid of) than re-surrect the bsg interface.
->>
->> That said, the removed bsg code looks a hell of a lot prettier than
->> the nasty sg interface code does, although it also lacks ansolutely
->> _any_ kind of security checking.
-> 
-> For us the bsg interface also has several advantages over sg:
-> 1. The device name is its HCTL which is nicer than an arbitrary integer.
-
-Not much the sg driver can do about that. The minor number the sg driver
-uses and HCT are all arbitrary integers (with the L coming from the
-storage device), but I agree the HCTL is more widely used. The
-ioctl(<sg_fd>, SG_GET_SCSI_ID) fills a structure which includes HCTL. In
-my sg v4 driver rewrite the L (LUN) has been tweaked to additionally
-send back the 8 byte T10 LUN representation.
-
-The lsscsi utility will show the relationship between HCTL and sg driver
-device name with 'lsscsi -g'. It uses sysfs datamining.
-
-> 2. write() supports writing more than one sg_io_v4 struct so we don't have
->     to resort to writev().
-
-In my sg v4 rewrite the sg_io_v4 interface can only be sent through
-ioctl(SG_IO) [for sync usage] and ioctl(SG_IOSUBMIT) [for async usage].
-So it can't be sent through write(2). SG_IOSUBMIT is new and uses the
-_IOWR macro which encodes the expected length into the SG_IOSUBMIT value
-and that is the size of sg_io_v4. So you can't send an arbitrary number of
-sg_io_v4 objects through that ioctl directly. If need be, that can be
-cured with another level of indirection (e.g. with a new flag the data-out
-can be interpreted as an array sg_io_v4 objects).
-
-> 3. Queue size is the device's queue depth and not SG_MAX_QUEUE which is 16.
-
-That limit is gone in the sg v4 driver rewrite.
-
->>>> Because of this we would like to continue using the bsg interface,
->>>> even if some changes are required to meet security concerns.
->>
->> I wonder if we could at least try to unify the bsg/sg code - possibly
->> by making sg use the prettier bsg code (but definitely have to add all
->> the security measures).
->>
->> And dammit, the SCSI people need to get their heads out of their
->> arses. This whole "stream random commands over read/write" needs to go
->> the f*ck away.
->>
->> Could we perhaps extend the SG_IO interace to have an async mode?
->> Instead of "read/write", have "SG_IOSUBMIT" and "SG_IORECEIVE" and
->> have the SG_IO ioctl just be a shorthand of "both".
-
-Done.
-
-> Just my two cents - having an interface other than read/write won't allow
-> users to treat this fd as a regular file with epoll() and read(). This is
-> a major bonus for this interface - an sg/bsg device can be used just like
-> a socket or pipe in any reactor (we use boost asio for example).
-
-Well poll() certainly works (see sg3_utils beta rev 809 testing/sgs_dd.c and
-testing/sgh_dd.c) and I can't see why epoll() won't work. These calls work
-against the file descriptor and the sg driver keeps the same context around
-sg device file descriptors as it has always done. [And that is the major
-design flaw in the bsg driver: it doesn't keep proper file descriptor context.]
-
-It is the security folks who don't like the sg inspired (there in lk 1.0.0
-from 1992) write(2)/read(2) asynchronous interface. Also, ideally we need
-two streams: one for metadata (e.g. commands and responses (status and sense
-data)) and another for user data. Protection information could be a third
-stream, between the other two. Jamming that all into one stream is a bit ugly.
-
-References:
-   sg v3 driver rewrite, description and downloads:
-      http://sg.danny.cz/sg/sg_v40.html
-   sg3_utils version 1.45 beta, rev 809, link at the top of this page:
-      http://sg.danny.cz/sg
-
-Doug Gilbert
-
-
+Yes, but they are not fit for polite company.  IMO the entire approach
+is FUBAR; I'll post more detailed review, but what I'd seen so far is
+a veto fodder.
