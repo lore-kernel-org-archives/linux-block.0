@@ -2,547 +2,174 @@ Return-Path: <SRS0=mhrr=QI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA686C4151A
-	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 17:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89319C282D8
+	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 17:44:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A229A2080D
-	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 17:23:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZZ+OvctL"
+	by mail.kernel.org (Postfix) with ESMTP id 632E8218AF
+	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 17:44:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730549AbfBARX4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Feb 2019 12:23:56 -0500
-Received: from mail-oi1-f195.google.com ([209.85.167.195]:46115 "EHLO
-        mail-oi1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730259AbfBARXz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Feb 2019 12:23:55 -0500
-Received: by mail-oi1-f195.google.com with SMTP id x202so6370642oif.13
-        for <linux-block@vger.kernel.org>; Fri, 01 Feb 2019 09:23:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=O6RrDWXKZpQu48rrmk9GbYtNQRMa8JNBaE5Q22G6TV4=;
-        b=ZZ+OvctLV7XEH8HIcVwSrX0qHwv2VPZDdAKq1FZNQI03NQTA/r6v3IjOkvYlNpKoPZ
-         6ogiwZ7js37oNbdge10Sq1czdDPr3VOROTqBhn5pEZrJznuedsldOTzjo8jmB0cQvgwn
-         p1rgK222CZLrPfV0kjB+Yx6rQVt2N0Mb8cRD9X643JYYTH+KDxENRYFxH0uR3scAI+bH
-         y2snwpucYqR4x9IoJTLoQ0IL1Eorm8tb7h8XcvrOjky/lAs79xcuXpuZn8vM88HzfdG+
-         YoFg05Wg8eLY9ZC3ppyIKPhPpUljYeE/U9xKZ6XEo/oX7VBWBGt5vJxUPjnI0f2ZZQ0G
-         wffQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=O6RrDWXKZpQu48rrmk9GbYtNQRMa8JNBaE5Q22G6TV4=;
-        b=jPZDos0t+A7vIHO7luuzNhJp/eEUnHRJyif5LsVHUBkTnPmV/jvdOrikaBbBguDRaw
-         hKaOwcqk4ikdTIBXlKO9w4+UMpqep1Zi52OZewRSaYn+9yliZaUZ/yfAr4KGfaICVRs8
-         CzaTSdcIIVF4I67t459lnjHlfNnkBLeJ0/5Wa+txO5Ow8GsXHJx993rHLBnpRQoY5HmG
-         x20mS2o159BvV83EXfGMSIjfilAGE0Zpp0qCLyeS/2Or2cnG3k5npfyyUtWKa2y9Jxtu
-         9IfMiHXnZEYHQRrozxQhjsrYPruQzq3CQnJ0UiGToz691AAq0sHYhmdyahYTAIdk8aTG
-         DjTg==
-X-Gm-Message-State: AJcUukfEP72degg/MeRiwSqtRumM1sveUXBfmM5NEnz0U92D5i3fRtPP
-        dxMgVt5uNXS1LTYG2s+ZjNDoDrAMhoKCvysC8K7WcA==
-X-Google-Smtp-Source: ALg8bN5qzPCqYrcneTnhqtZVDc9elMvDcQ3X9sVw9h7napYyKRXYm812YAEr6LeBNyw8EYPmsqD6YYv4WojbuU8renQ=
-X-Received: by 2002:aca:3c06:: with SMTP id j6mr18546305oia.126.1549041833990;
- Fri, 01 Feb 2019 09:23:53 -0800 (PST)
+        id S1727057AbfBARov (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Feb 2019 12:44:51 -0500
+Received: from smtp.infotech.no ([82.134.31.41]:37787 "EHLO smtp.infotech.no"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726486AbfBARov (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 1 Feb 2019 12:44:51 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by smtp.infotech.no (Postfix) with ESMTP id CE3EA204247;
+        Fri,  1 Feb 2019 18:44:47 +0100 (CET)
+X-Virus-Scanned: by amavisd-new-2.6.6 (20110518) (Debian) at infotech.no
+Received: from smtp.infotech.no ([127.0.0.1])
+        by localhost (smtp.infotech.no [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id 11tMaoaEKVFp; Fri,  1 Feb 2019 18:44:44 +0100 (CET)
+Received: from [192.168.48.23] (host-23-91-186-62.dyn.295.ca [23.91.186.62])
+        by smtp.infotech.no (Postfix) with ESMTPA id 2C8F120417E;
+        Fri,  1 Feb 2019 18:44:42 +0100 (CET)
+Reply-To: dgilbert@interlog.com
+Subject: Re: Recent removal of bsg read/write support
+To:     Dror Levin <drorl@infinidat.com>, torvalds@linux-foundation.org
+Cc:     richard.weinberger@gmail.com, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        hch@infradead.org, axboe@kernel.dk
+References: <CAOuWhkaGjX8Q_xghkFVTqzZkDrUv-sdH=VbS7hvnqFWrT+3eOQ@mail.gmail.com>
+ <CAFLxGvxX8QW4wUJKommXVMpGBj7G_H3=SOwQGjGuyPZZrhCzKw@mail.gmail.com>
+ <CA+55aFyLC8PhjZ+iV7MucSZ1aGKMT=S9=EkEAQ6T1=ZRqD-xLA@mail.gmail.com>
+ <CAOuWhkbNuesaVYar6ML-qFw7RAfkPsaOYUXT4Ypfiu5=Nt1kWw@mail.gmail.com>
+From:   Douglas Gilbert <dgilbert@interlog.com>
+Message-ID: <b60e424c-9dd0-beb8-cbf5-0b4daa83c105@interlog.com>
+Date:   Fri, 1 Feb 2019 12:44:42 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <20190128213538.13486-1-axboe@kernel.dk> <20190128213538.13486-6-axboe@kernel.dk>
- <CAG48ez0vDqDH4ks7q4L3F+xt-4kVQrN1yw34QwFAmwQyy27FTw@mail.gmail.com>
- <e9326a77-54c5-e2b8-d9e5-663261462597@kernel.dk> <CAG48ez17NW0GJVRC6dFcHZTgQifFz5og1XCUbXkHKhr6f=j74Q@mail.gmail.com>
- <05cb18f7a97a6151c305cdb7240c4abc995aed59.camel@fb.com> <CAG48ez09iOOnPz83b6HxktYHTfouS2GD6i3PfQEjp8WCp+3-VA@mail.gmail.com>
-In-Reply-To: <CAG48ez09iOOnPz83b6HxktYHTfouS2GD6i3PfQEjp8WCp+3-VA@mail.gmail.com>
-From:   Jann Horn <jannh@google.com>
-Date:   Fri, 1 Feb 2019 18:23:27 +0100
-Message-ID: <CAG48ez0sJys=M1MR3DBd1DJ21-qHd2W7sB8+EvjhScWbtQnizA@mail.gmail.com>
-Subject: Re: [PATCH 05/18] Add io_uring IO interface
-To:     Matt Mullins <mmullins@fb.com>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, linux-fsdevel@vger.kernel.org
-Cc:     "linux-aio@kvack.org" <linux-aio@kvack.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "jmoyer@redhat.com" <jmoyer@redhat.com>,
-        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
-        "hch@lst.de" <hch@lst.de>,
-        "linux-man@vger.kernel.org" <linux-man@vger.kernel.org>,
-        "avi@scylladb.com" <avi@scylladb.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAOuWhkbNuesaVYar6ML-qFw7RAfkPsaOYUXT4Ypfiu5=Nt1kWw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-CA
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 1, 2019 at 6:04 PM Jann Horn <jannh@google.com> wrote:
->
-> On Fri, Feb 1, 2019 at 5:57 PM Matt Mullins <mmullins@fb.com> wrote:
-> > On Tue, 2019-01-29 at 00:59 +0100, Jann Horn wrote:
-> > > On Tue, Jan 29, 2019 at 12:47 AM Jens Axboe <axboe@kernel.dk> wrote:
-> > > > On 1/28/19 3:32 PM, Jann Horn wrote:
-> > > > > On Mon, Jan 28, 2019 at 10:35 PM Jens Axboe <axboe@kernel.dk> wro=
-te:
-> > > > > > The submission queue (SQ) and completion queue (CQ) rings are s=
-hared
-> > > > > > between the application and the kernel. This eliminates the nee=
-d to
-> > > > > > copy data back and forth to submit and complete IO.
-> > > > > >
-> > > > > > IO submissions use the io_uring_sqe data structure, and complet=
-ions
-> > > > > > are generated in the form of io_uring_sqe data structures. The =
-SQ
-> > > > > > ring is an index into the io_uring_sqe array, which makes it po=
-ssible
-> > > > > > to submit a batch of IOs without them being contiguous in the r=
-ing.
-> > > > > > The CQ ring is always contiguous, as completion events are inhe=
-rently
-> > > > > > unordered, and hence any io_uring_cqe entry can point back to a=
-n
-> > > > > > arbitrary submission.
-> > > > > >
-> > > > > > Two new system calls are added for this:
-> > > > > >
-> > > > > > io_uring_setup(entries, params)
-> > > > > >         Sets up a context for doing async IO. On success, retur=
-ns a file
-> > > > > >         descriptor that the application can mmap to gain access=
- to the
-> > > > > >         SQ ring, CQ ring, and io_uring_sqes.
-> > > > > >
-> > > > > > io_uring_enter(fd, to_submit, min_complete, flags, sigset, sigs=
-etsize)
-> > > > > >         Initiates IO against the rings mapped to this fd, or wa=
-its for
-> > > > > >         them to complete, or both. The behavior is controlled b=
-y the
-> > > > > >         parameters passed in. If 'to_submit' is non-zero, then =
-we'll
-> > > > > >         try and submit new IO. If IORING_ENTER_GETEVENTS is set=
-, the
-> > > > > >         kernel will wait for 'min_complete' events, if they are=
-n't
-> > > > > >         already available. It's valid to set IORING_ENTER_GETEV=
-ENTS
-> > > > > >         and 'min_complete' =3D=3D 0 at the same time, this allo=
-ws the
-> > > > > >         kernel to return already completed events without waiti=
-ng
-> > > > > >         for them. This is useful only for polling, as for IRQ
-> > > > > >         driven IO, the application can just check the CQ ring
-> > > > > >         without entering the kernel.
-> > > > > >
-> > > > > > With this setup, it's possible to do async IO with a single sys=
-tem
-> > > > > > call. Future developments will enable polled IO with this inter=
-face,
-> > > > > > and polled submission as well. The latter will enable an applic=
-ation
-> > > > > > to do IO without doing ANY system calls at all.
-> > > > > >
-> > > > > > For IRQ driven IO, an application only needs to enter the kerne=
-l for
-> > > > > > completions if it wants to wait for them to occur.
-> > > > > >
-> > > > > > Each io_uring is backed by a workqueue, to support buffered asy=
-nc IO
-> > > > > > as well. We will only punt to an async context if the command w=
-ould
-> > > > > > need to wait for IO on the device side. Any data that can be ac=
-cessed
-> > > > > > directly in the page cache is done inline. This avoids the slow=
-ness
-> > > > > > issue of usual threadpools, since cached data is accessed as qu=
-ickly
-> > > > > > as a sync interface.
-> > > > > >
-> > > > > > Sample application: https://urldefense.proofpoint.com/v2/url?u=
-=3Dhttp-3A__git.kernel.dk_cgit_fio_plain_t_io-5Furing.c&d=3DDwIBaQ&c=3D5VD0=
-RTtNlTh3ycd41b3MUw&r=3DpqM-eO4A2hNFhIFiX-7eGg&m=3DMGr14pOzNbC7Z-8_dV4GMiH3A=
-bkkH0RSQoQ894Tu0yc&s=3DmgbcubzOMiCpFpnwW-HA3ey0YDYPkgMIZ7Bmy4w6Chc&e=3D
-> > > > >
-> > > > > [...]
-> > > > > > +static int io_prep_rw(struct io_kiocb *req, const struct io_ur=
-ing_sqe *sqe,
-> > > > > > +                     bool force_nonblock)
-> > > > > > +{
-> > > > > > +       struct kiocb *kiocb =3D &req->rw;
-> > > > > > +       int ret;
-> > > > > > +
-> > > > > > +       kiocb->ki_filp =3D fget(sqe->fd);
-> > > > > > +       if (unlikely(!kiocb->ki_filp))
-> > > > > > +               return -EBADF;
-> > > > > > +       kiocb->ki_pos =3D sqe->off;
-> > > > > > +       kiocb->ki_flags =3D iocb_flags(kiocb->ki_filp);
-> > > > > > +       kiocb->ki_hint =3D ki_hint_validate(file_write_hint(kio=
-cb->ki_filp));
-> > > > > > +       if (sqe->ioprio) {
-> > > > > > +               ret =3D ioprio_check_cap(sqe->ioprio);
-> > > > > > +               if (ret)
-> > > > > > +                       goto out_fput;
-> > > > > > +
-> > > > > > +               kiocb->ki_ioprio =3D sqe->ioprio;
-> > > > > > +       } else
-> > > > > > +               kiocb->ki_ioprio =3D get_current_ioprio();
-> > > > > > +
-> > > > > > +       ret =3D kiocb_set_rw_flags(kiocb, sqe->rw_flags);
-> > > > > > +       if (unlikely(ret))
-> > > > > > +               goto out_fput;
-> > > > > > +       if (force_nonblock) {
-> > > > > > +               kiocb->ki_flags |=3D IOCB_NOWAIT;
-> > > > > > +               req->flags |=3D REQ_F_FORCE_NONBLOCK;
-> > > > > > +       }
-> > > > > > +       if (kiocb->ki_flags & IOCB_HIPRI) {
-> > > > > > +               ret =3D -EINVAL;
-> > > > > > +               goto out_fput;
-> > > > > > +       }
-> > > > > > +
-> > > > > > +       kiocb->ki_complete =3D io_complete_rw;
-> > > > > > +       return 0;
-> > > > > > +out_fput:
-> > > > > > +       fput(kiocb->ki_filp);
-> > > > > > +       return ret;
-> > > > > > +}
-> > > > >
-> > > > > [...]
-> > > > > > +static ssize_t io_read(struct io_kiocb *req, const struct io_u=
-ring_sqe *sqe,
-> > > > > > +                      bool force_nonblock)
-> > > > > > +{
-> > > > > > +       struct iovec inline_vecs[UIO_FASTIOV], *iovec =3D inlin=
-e_vecs;
-> > > > > > +       struct kiocb *kiocb =3D &req->rw;
-> > > > > > +       struct iov_iter iter;
-> > > > > > +       struct file *file;
-> > > > > > +       ssize_t ret;
-> > > > > > +
-> > > > > > +       ret =3D io_prep_rw(req, sqe, force_nonblock);
-> > > > > > +       if (ret)
-> > > > > > +               return ret;
-> > > > > > +       file =3D kiocb->ki_filp;
-> > > > > > +
-> > > > > > +       ret =3D -EBADF;
-> > > > > > +       if (unlikely(!(file->f_mode & FMODE_READ)))
-> > > > > > +               goto out_fput;
-> > > > > > +       ret =3D -EINVAL;
-> > > > > > +       if (unlikely(!file->f_op->read_iter))
-> > > > > > +               goto out_fput;
-> > > > > > +
-> > > > > > +       ret =3D io_import_iovec(req->ctx, READ, sqe, &iovec, &i=
-ter);
-> > > > > > +       if (ret)
-> > > > > > +               goto out_fput;
-> > > > > > +
-> > > > > > +       ret =3D rw_verify_area(READ, file, &kiocb->ki_pos, iov_=
-iter_count(&iter));
-> > > > > > +       if (!ret) {
-> > > > > > +               ssize_t ret2;
-> > > > > > +
-> > > > > > +               /* Catch -EAGAIN return for forced non-blocking=
- submission */
-> > > > > > +               ret2 =3D call_read_iter(file, kiocb, &iter);
-> > > > > > +               if (!force_nonblock || ret2 !=3D -EAGAIN)
-> > > > > > +                       io_rw_done(kiocb, ret2);
-> > > > > > +               else
-> > > > > > +                       ret =3D -EAGAIN;
-> > > > > > +       }
-> > > > > > +       kfree(iovec);
-> > > > > > +out_fput:
-> > > > > > +       if (unlikely(ret))
-> > > > > > +               fput(file);
-> > > > > > +       return ret;
-> > > > > > +}
-> > > > >
-> > > > > [...]
-> > > > > > +static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_=
-kiocb *req,
-> > > > > > +                          struct sqe_submit *s, bool force_non=
-block)
-> > > > > > +{
-> > > > > > +       const struct io_uring_sqe *sqe =3D s->sqe;
-> > > > > > +       ssize_t ret;
-> > > > > > +
-> > > > > > +       if (unlikely(s->index >=3D ctx->sq_entries))
-> > > > > > +               return -EINVAL;
-> > > > > > +       req->user_data =3D sqe->user_data;
-> > > > > > +
-> > > > > > +       ret =3D -EINVAL;
-> > > > > > +       switch (sqe->opcode) {
-> > > > > > +       case IORING_OP_NOP:
-> > > > > > +               ret =3D io_nop(req, sqe);
-> > > > > > +               break;
-> > > > > > +       case IORING_OP_READV:
-> > > > > > +               ret =3D io_read(req, sqe, force_nonblock);
-> > > > > > +               break;
-> > > > > > +       case IORING_OP_WRITEV:
-> > > > > > +               ret =3D io_write(req, sqe, force_nonblock);
-> > > > > > +               break;
-> > > > > > +       default:
-> > > > > > +               ret =3D -EINVAL;
-> > > > > > +               break;
-> > > > > > +       }
-> > > > > > +
-> > > > > > +       return ret;
-> > > > > > +}
-> > > > > > +
-> > > > > > +static void io_sq_wq_submit_work(struct work_struct *work)
-> > > > > > +{
-> > > > > > +       struct io_kiocb *req =3D container_of(work, struct io_k=
-iocb, work);
-> > > > > > +       struct sqe_submit *s =3D &req->submit;
-> > > > > > +       u64 user_data =3D s->sqe->user_data;
-> > > > > > +       struct io_ring_ctx *ctx =3D req->ctx;
-> > > > > > +       mm_segment_t old_fs =3D get_fs();
-> > > > > > +       struct files_struct *old_files;
-> > > > > > +       int ret;
-> > > > > > +
-> > > > > > +        /* Ensure we clear previously set forced non-block fla=
-g */
-> > > > > > +       req->flags &=3D ~REQ_F_FORCE_NONBLOCK;
-> > > > > > +
-> > > > > > +       old_files =3D current->files;
-> > > > > > +       current->files =3D ctx->sqo_files;
-> > > > >
-> > > > > I think you're not supposed to twiddle with current->files withou=
-t
-> > > > > holding task_lock(current).
-> > > >
-> > > > 'current' is the work queue item in this case, do we need to protec=
-t
-> > > > against anything else? I can add the locking around the assignments
-> > > > (both places).
-> > >
-> > > Stuff like proc_fd_link() uses get_files_struct(), which grabs a
-> > > reference to your current files_struct protected only by task_lock();
-> > > and it doesn't use anything like READ_ONCE(), so even if the object
-> > > lifetime is not a problem, get_files_struct() could potentially crash
-> > > due to a double-read (reading task->files twice and assuming that the
-> > > result will be the same). As far as I can tell, this procfs code also
-> > > works on kernel threads.
-> > >
-> > > > > > +       if (!mmget_not_zero(ctx->sqo_mm)) {
-> > > > > > +               ret =3D -EFAULT;
-> > > > > > +               goto err;
-> > > > > > +       }
-> > > > > > +
-> > > > > > +       use_mm(ctx->sqo_mm);
-> > > > > > +       set_fs(USER_DS);
-> > > > > > +
-> > > > > > +       ret =3D __io_submit_sqe(ctx, req, s, false);
-> > > > > > +
-> > > > > > +       set_fs(old_fs);
-> > > > > > +       unuse_mm(ctx->sqo_mm);
-> > > > > > +       mmput(ctx->sqo_mm);
-> > > > > > +err:
-> > > > > > +       if (ret) {
-> > > > > > +               io_cqring_add_event(ctx, user_data, ret, 0);
-> > > > > > +               io_free_req(req);
-> > > > > > +       }
-> > > > > > +       current->files =3D old_files;
-> > > > > > +}
-> > > > >
-> > > > > [...]
-> > > > > > +static int io_sq_offload_start(struct io_ring_ctx *ctx)
-> > > > > > +{
-> > > > > > +       int ret;
-> > > > > > +
-> > > > > > +       ctx->sqo_mm =3D current->mm;
-> > > > >
-> > > > > What keeps this thing alive?
-> > > >
-> > > > I think we're deadling with the same thing as the files below, I'll
-> > > > defer to that.
-> > > >
-> > > > > > +       /*
-> > > > > > +        * This is safe since 'current' has the fd installed, a=
-nd if that gets
-> > > > > > +        * closed on exit, then fops->release() is invoked whic=
-h waits for the
-> > > > > > +        * async contexts to flush and exit before exiting.
-> > > > > > +        */
-> > > > > > +       ret =3D -EBADF;
-> > > > > > +       ctx->sqo_files =3D current->files;
-> > > > > > +       if (!ctx->sqo_files)
-> > > > > > +               goto err;
-> > > > >
-> > > > > That's gnarly. Adding Al Viro to the thread.
-> > > > >
-> > > > > I think you misunderstand the semantics of f_op->release. The ->f=
-lush
-> > > > > handler is invoked whenever a file descriptor is closed through
-> > > > > filp_close() (via deletion of the files_struct, sys_close(),
-> > > > > sys_dup2(), ...), so if you had used that one, _maybe_ this would
-> > > > > work. But the ->release handler only runs when the _last_ referen=
-ce to
-> > > > > a struct file has been dropped - so you can, for example, fork() =
-a
-> > > > > child, then exit() in the parent, and the ->release handler isn't
-> > > > > invoked. So I don't see how this can work.
-> > > >
-> > > > The anonfd is CLOEXEC. The idea is exactly that it only runs when t=
-he
-> > > > last reference to the file has been dropped. Not sure why you think=
- I
-> > > > need ->flush() here?
-> > >
-> > > Can't I just use fcntl(fd, F_SETFD, fd, 0) to clear the CLOEXEC flag?
-> > > Or send the fd via SCM_RIGHTS?
-> > >
-> > > > > But even if you had abused ->flush for this instead: close_files(=
-)
-> > > > > currently has a comment in it that claims that "this is the last
-> > > > > reference to the files structure"; this change would make that cl=
-aim
-> > > > > untrue.
-> > > >
-> > > > Let me see if I can explain my intent better than that comment... W=
-e
-> > > > know the parent who set up the io_uring instance will be around for=
- as
-> > > > long as io_uring instance persists.
-> > >
-> > > That's the part that I think is wrong: As far as I can tell, the
-> > > parent can go away and you won't notice.
-> > >
-> > > Also, note that "the parent" is different things for ->files and ->mm=
-.
-> > > You can have a multithreaded process whose threads don't have the sam=
-e
-> > > ->files, or multiple process that share ->files without sharing ->mm,
-> > > ...
-> >
-> > This had actually been get_files_struct() in early versions, and I had
-> > reported to Jens that it allows something like
-> >
-> > int main() {
-> >   struct io_uring_params uring_params =3D {
-> >         .flags =3D IORING_SETUP_SQPOLL,
-> >   };
-> >   int uring_fd =3D syscall(425 /* io_uring_setup */, 16, &uring_params)=
-;
-> > }
-> >
-> > to leak both the files_struct and the kthread, as the files_struct and
-> > the uring context form a circular reference.  I haven't really come up
-> > with a good way to reconcile the requirements here; perhaps we need an
-> > exit_uring() akin to exit_aio()?
->
-> Oh, yuck. Uuuh... can we make "struct files_struct" doubly-refcounted,
-> like "struct mm_struct"? One reference type to keep the contents
-> intact (the reference type you normally use, and the type used by
-> uring when the thread is running), and one reference type to just keep
-> the struct itself existing, but without preserving its contents
-> (reference held consistently by the uring thread)?
+Updated reply, see below.
 
-Something like this (completely untested); and then instead of the
-current get_files_struct(), you'd do get_files_struct_weak(), and
-while the thread is running, it protects the files_struct from dying
-with tryget_weak_files_struct() / put_files_struct().
+On 2018-09-03 4:34 a.m., Dror Levin wrote:
+> On Sun, Sep 2, 2018 at 8:55 PM Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+>>
+>> On Sun, Sep 2, 2018 at 4:44 AM Richard Weinberger
+>> <richard.weinberger@gmail.com> wrote:
+>>>
+>>> CC'ing relevant people. Otherwise your mail might get lost.
+>>
+>> Indeed.
+> 
+> Sorry for that.
+> 
+>>> On Sun, Sep 2, 2018 at 1:37 PM Dror Levin <drorl@infinidat.com> wrote:
+>>>>
+>>>> We have an internal tool that uses the bsg read/write interface to
+>>>> issue SCSI commands as part of a test suite for a storage device.
+>>>>
+>>>> After recently reading on LWN that this interface is to be removed we
+>>>> tried porting our code to use sg instead. However, that raises new
+>>>> issues - mainly getting ENOMEM over iSCSI for unknown reasons.
+>>
+>> Is there any chance that you can make more data available?
+> 
+> Sure, I can try.
+> 
+> We use writev() to send up to SG_MAX_QUEUE tasks at a time. Occasionally not
+> all tasks are written at which point we wait for tasks to return before
+> sending more, but then writev() fails with ENOMEM and we see this in the syslog:
+> 
+> Sep  1 20:58:14 gdc-qa-io-017 kernel: sd 441:0:0:5: [sg73]
+> sg_common_write: start_req err=-12
+> 
+> Failing tasks are reads of 128KiB.
 
-Al, do you have opinions on this?
+This is the block layer running out of resources. The sg driver is a
+relatively thin shim and when it gets a "no can do" from the layers
+below it, the driver has little option than to return said errno.
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-diff --git a/fs/file.c b/fs/file.c
-index 3209ee271c41..fbf02ef2753d 100644
---- a/fs/file.c
-+++ b/fs/file.c
-@@ -281,6 +281,7 @@ struct files_struct *dup_fd(struct files_struct
-*oldf, int *errorp)
-        if (!newf)
-                goto out;
+>> I'd rather fix the sg interface (which while also broken garbage, we
+>> can't get rid of) than re-surrect the bsg interface.
+>>
+>> That said, the removed bsg code looks a hell of a lot prettier than
+>> the nasty sg interface code does, although it also lacks ansolutely
+>> _any_ kind of security checking.
+> 
+> For us the bsg interface also has several advantages over sg:
+> 1. The device name is its HCTL which is nicer than an arbitrary integer.
 
-+       kref_init(&newf->weak_refs);
-        atomic_set(&newf->count, 1);
+Not much the sg driver can do about that. The minor number the sg driver
+uses and HCT are all arbitrary integers (with the L coming from the
+storage device), but I agree the HCTL is more widely used. The
+ioctl(<sg_fd>, SG_GET_SCSI_ID) fills a structure which includes HCTL. In
+my sg v4 driver rewrite the L (LUN) has been tweaked to additionally
+send back the 8 byte T10 LUN representation.
 
-        spin_lock_init(&newf->file_lock);
-@@ -410,6 +411,26 @@ struct files_struct *get_files_struct(struct
-task_struct *task)
-        return files;
- }
+The lsscsi utility will show the relationship between HCTL and sg driver
+device name with 'lsscsi -g'. It uses sysfs datamining.
 
-+static void free_files_struct(struct kref *ref) {
-+       struct files_struct *files =3D
-+               container_of(ref, struct files_struct, weak_refs);
-+       kmem_cache_free(files_cachep, files);
-+}
-+
-+void put_files_struct_weak(struct files_struct *files) {
-+       kref_put(&files->weak_refs, free_files_struct);
-+}
-+
-+struct files_struct *get_files_struct_weak(struct task_struct *task)
-+{
-+       struct files_struct *files =3D get_files_struct(task);
-+       if (files) {
-+               kref_get(&files->weak_refs);
-+               put_files_struct(files);
-+       }
-+       return files;
-+}
-+
- void put_files_struct(struct files_struct *files)
- {
-        if (atomic_dec_and_test(&files->count)) {
-@@ -418,10 +439,17 @@ void put_files_struct(struct files_struct *files)
-                /* free the arrays if they are not embedded */
-                if (fdt !=3D &files->fdtab)
-                        __free_fdtable(fdt);
--               kmem_cache_free(files_cachep, files);
-+               put_files_struct_weak(files);
-        }
- }
+> 2. write() supports writing more than one sg_io_v4 struct so we don't have
+>     to resort to writev().
 
-+struct files_struct *tryget_weak_files_struct(struct files_struct *fs) {
-+       if (atomic_inc_not_zero(&fs->count)) {
-+               return fs;
-+       }
-+       return NULL;
-+}
-+
- void reset_files_struct(struct files_struct *files)
- {
-        struct task_struct *tsk =3D current;
-@@ -448,6 +476,7 @@ void exit_files(struct task_struct *tsk)
+In my sg v4 rewrite the sg_io_v4 interface can only be sent through
+ioctl(SG_IO) [for sync usage] and ioctl(SG_IOSUBMIT) [for async usage].
+So it can't be sent through write(2). SG_IOSUBMIT is new and uses the
+_IOWR macro which encodes the expected length into the SG_IOSUBMIT value
+and that is the size of sg_io_v4. So you can't send an arbitrary number of
+sg_io_v4 objects through that ioctl directly. If need be, that can be
+cured with another level of indirection (e.g. with a new flag the data-out
+can be interpreted as an array sg_io_v4 objects).
 
- struct files_struct init_files =3D {
-        .count          =3D ATOMIC_INIT(1),
-+       .weak_refs      =3D KREF_INIT(1),
-        .fdt            =3D &init_files.fdtab,
-        .fdtab          =3D {
-                .max_fds        =3D NR_OPEN_DEFAULT,
-diff --git a/include/linux/fdtable.h b/include/linux/fdtable.h
-index f07c55ea0c22..6ad95a95cc0b 100644
---- a/include/linux/fdtable.h
-+++ b/include/linux/fdtable.h
-@@ -14,6 +14,7 @@
- #include <linux/types.h>
- #include <linux/init.h>
- #include <linux/fs.h>
-+#include <linux/kref.h>
+> 3. Queue size is the device's queue depth and not SG_MAX_QUEUE which is 16.
 
- #include <linux/atomic.h>
+That limit is gone in the sg v4 driver rewrite.
 
-@@ -50,6 +51,7 @@ struct files_struct {
-    * read mostly part
-    */
-        atomic_t count;
-+       struct kref weak_refs;
-        bool resize_in_progress;
-        wait_queue_head_t resize_wait;
+>>>> Because of this we would like to continue using the bsg interface,
+>>>> even if some changes are required to meet security concerns.
+>>
+>> I wonder if we could at least try to unify the bsg/sg code - possibly
+>> by making sg use the prettier bsg code (but definitely have to add all
+>> the security measures).
+>>
+>> And dammit, the SCSI people need to get their heads out of their
+>> arses. This whole "stream random commands over read/write" needs to go
+>> the f*ck away.
+>>
+>> Could we perhaps extend the SG_IO interace to have an async mode?
+>> Instead of "read/write", have "SG_IOSUBMIT" and "SG_IORECEIVE" and
+>> have the SG_IO ioctl just be a shorthand of "both".
 
-@@ -107,6 +109,9 @@ struct task_struct;
+Done.
 
- struct files_struct *get_files_struct(struct task_struct *);
- void put_files_struct(struct files_struct *fs);
-+void put_files_struct_weak(struct files_struct *files);
-+struct files_struct *get_files_struct_weak(struct task_struct *);
-+struct files_struct *tryget_weak_files_struct(struct files_struct *);
- void reset_files_struct(struct files_struct *);
- int unshare_files(struct files_struct **);
- struct files_struct *dup_fd(struct files_struct *, int *) __latent_entropy=
-;
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> Just my two cents - having an interface other than read/write won't allow
+> users to treat this fd as a regular file with epoll() and read(). This is
+> a major bonus for this interface - an sg/bsg device can be used just like
+> a socket or pipe in any reactor (we use boost asio for example).
+
+Well poll() certainly works (see sg3_utils beta rev 809 testing/sgs_dd.c and
+testing/sgh_dd.c) and I can't see why epoll() won't work. These calls work
+against the file descriptor and the sg driver keeps the same context around
+sg device file descriptors as it has always done. [And that is the major
+design flaw in the bsg driver: it doesn't keep proper file descriptor context.]
+
+It is the security folks who don't like the sg inspired (there in lk 1.0.0
+from 1992) write(2)/read(2) asynchronous interface. Also, ideally we need
+two streams: one for metadata (e.g. commands and responses (status and sense
+data)) and another for user data. Protection information could be a third
+stream, between the other two. Jamming that all into one stream is a bit ugly.
+
+References:
+   sg v3 driver rewrite, description and downloads:
+      http://sg.danny.cz/sg/sg_v40.html
+   sg3_utils version 1.45 beta, rev 809, link at the top of this page:
+      http://sg.danny.cz/sg
+
+Doug Gilbert
+
+
