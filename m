@@ -4,45 +4,45 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20004C282D8
-	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 20:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25368C282D8
+	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 20:51:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E3B0B218AF
-	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 20:51:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7771218F0
+	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 20:51:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="Oa7ZXqV/"
+	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="tXzmL0SZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729720AbfBAUvO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Feb 2019 15:51:14 -0500
-Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:33380 "EHLO
+        id S1730448AbfBAUv1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Feb 2019 15:51:27 -0500
+Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:33562 "EHLO
         mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726190AbfBAUvO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Feb 2019 15:51:14 -0500
+        with ESMTP id S1730131AbfBAUv1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Feb 2019 15:51:27 -0500
 Received: from localhost (localhost [127.0.0.1])
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id C1BDAAD12F;
-        Fri,  1 Feb 2019 21:51:10 +0100 (CET)
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id F247CAD135;
+        Fri,  1 Feb 2019 21:51:24 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1549054270; i=@fjfi.cvut.cz;
-        bh=mmAtj42G3gh1E+9yS+ES4paSaUW2C9xH5J05Q+tpQRY=;
+        s=20151024; t=1549054285; i=@fjfi.cvut.cz;
+        bh=KRpiKQ1FHw5beJvLyBOUCDazpOTPgfGwzmOFdWGHs2w=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=Oa7ZXqV/t7JaZoItSwiYAkBHgnSmWScUv6SDOafFTnK3VU4yVZZwxFTi39zSFVHVM
-         uTbB4D8TBjc48VrxorLdgB0IRZlq3UYTaIP4VfKywdR68jqInmsvZfo6/gcxBaHCYV
-         TjkLjyxt+sbyYyvrU8nQJCWjbuIbkYvGblT+4Q2k=
+        b=tXzmL0SZQY7B1/lJJ1EGykksjgvjcx6lur3KbCqhCs8Exv5bJQ+zuGuA0MDGWPM5p
+         e29wYaW24mmesOYyhTOTmhffLFWmLcE7/9yzJ39sxuiplOtsDEazhzg68a0k2Gd+qL
+         /26DekzqtTPxnpDvL/Ml9P+2J0zqnMOhv0hkl1VU=
 X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
 Received: from mailgw1.fjfi.cvut.cz ([127.0.0.1])
         by localhost (mailgw1.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id 0l7pOf4_6L_3; Fri,  1 Feb 2019 21:51:03 +0100 (CET)
+        with ESMTP id I7eLcuvEgH3K; Fri,  1 Feb 2019 21:51:17 +0100 (CET)
 Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id EFD8AAD117;
-        Fri,  1 Feb 2019 21:50:46 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz EFD8AAD117
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 56E8BAD11E;
+        Fri,  1 Feb 2019 21:50:50 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 56E8BAD11E
 Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id CCDA06004E; Fri,  1 Feb 2019 21:50:46 +0100 (CET)
+        id 3EB7D6004E; Fri,  1 Feb 2019 21:50:50 +0100 (CET)
 From:   David Kozub <zub@linux.fjfi.cvut.cz>
 To:     Jens Axboe <axboe@kernel.dk>,
         Jonathan Derrick <jonathan.derrick@intel.com>,
@@ -50,9 +50,9 @@ To:     Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
         David Kozub <zub@linux.fjfi.cvut.cz>
-Subject: [PATCH v4 01/16] block: sed-opal: fix typos and formatting
-Date:   Fri,  1 Feb 2019 21:50:08 +0100
-Message-Id: <1549054223-12220-2-git-send-email-zub@linux.fjfi.cvut.cz>
+Subject: [PATCH v4 06/16] block: sed-opal: unify error handling of responses
+Date:   Fri,  1 Feb 2019 21:50:13 +0100
+Message-Id: <1549054223-12220-7-git-send-email-zub@linux.fjfi.cvut.cz>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1549054223-12220-1-git-send-email-zub@linux.fjfi.cvut.cz>
 References: <1549054223-12220-1-git-send-email-zub@linux.fjfi.cvut.cz>
@@ -61,101 +61,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This should make no change in functionality.
-The formatting changes were triggered by checkpatch.pl.
+response_get_{string,u64} include error handling for argument resp being
+NULL but response_get_token does not handle this.
 
+Make all three of response_get_{string,u64,token} handle NULL resp in
+the same way.
+
+Co-authored-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
 ---
- block/sed-opal.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ block/sed-opal.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index e0de4dd448b3..c882a193e162 100644
+index e29cb2f445ff..537cd73ea88a 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
-@@ -11,8 +11,8 @@
-  *
-  * This program is distributed in the hope it will be useful, but WITHOUT
-  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-- * more details.
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-+ * for more details.
-  */
- 
- #define pr_fmt(fmt) KBUILD_MODNAME ":OPAL: " fmt
-@@ -157,7 +157,7 @@ static const u8 opaluid[][OPAL_UID_LENGTH] = {
- 
- 	/* C_PIN_TABLE object ID's */
- 
--        [OPAL_C_PIN_MSID] =
-+	[OPAL_C_PIN_MSID] =
- 		{ 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x84, 0x02},
- 	[OPAL_C_PIN_SID] =
- 		{ 0x00, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x01},
-@@ -623,7 +623,7 @@ static int build_locking_range(u8 *buffer, size_t length, u8 lr)
- static int build_locking_user(u8 *buffer, size_t length, u8 lr)
+@@ -702,6 +702,11 @@ static const struct opal_resp_tok *response_get_token(
  {
- 	if (length > OPAL_UID_LENGTH) {
--		pr_debug("Can't build locking range user, Length OOB\n");
-+		pr_debug("Can't build locking range user. Length OOB\n");
- 		return -ERANGE;
- 	}
+ 	const struct opal_resp_tok *tok;
  
-@@ -1324,6 +1324,7 @@ static int start_SIDASP_opal_session(struct opal_dev *dev, void *data)
- 
- 	if (!key) {
- 		const struct opal_key *okey = data;
++	if (!resp) {
++		pr_debug("Response is NULL\n");
++		return ERR_PTR(-EINVAL);
++	}
 +
- 		ret = start_generic_opal_session(dev, OPAL_SID_UID,
- 						 OPAL_ADMINSP_UID,
- 						 okey->key,
-@@ -1341,6 +1342,7 @@ static int start_SIDASP_opal_session(struct opal_dev *dev, void *data)
- static int start_admin1LSP_opal_session(struct opal_dev *dev, void *data)
- {
- 	struct opal_key *key = data;
-+
- 	return start_generic_opal_session(dev, OPAL_ADMIN1_UID,
- 					  OPAL_LOCKINGSP_UID,
- 					  key->key, key->key_len);
-@@ -1714,7 +1716,7 @@ static int lock_unlock_locking_range(struct opal_dev *dev, void *data)
- 		write_locked = 0;
- 		break;
- 	case OPAL_LK:
--		/* vars are initalized to locked */
-+		/* vars are initialized to locked */
- 		break;
- 	default:
- 		pr_debug("Tried to set an invalid locking state... returning to uland\n");
-@@ -1775,7 +1777,7 @@ static int lock_unlock_locking_range_sum(struct opal_dev *dev, void *data)
- 		write_locked = 0;
- 		break;
- 	case OPAL_LK:
--		/* vars are initalized to locked */
-+		/* vars are initialized to locked */
- 		break;
- 	default:
- 		pr_debug("Tried to set an invalid locking state.\n");
-@@ -2222,7 +2224,7 @@ static int __opal_lock_unlock(struct opal_dev *dev,
- static int __opal_set_mbr_done(struct opal_dev *dev, struct opal_key *key)
- {
- 	u8 mbr_done_tf = 1;
--	const struct opal_step mbrdone_step [] = {
-+	const struct opal_step mbrdone_step[] = {
- 		{ opal_discovery0, },
- 		{ start_admin1LSP_opal_session, key },
- 		{ set_mbr_done, &mbr_done_tf },
-@@ -2273,7 +2275,8 @@ static int opal_take_ownership(struct opal_dev *dev, struct opal_key *opal)
- 	return ret;
- }
- 
--static int opal_activate_lsp(struct opal_dev *dev, struct opal_lr_act *opal_lr_act)
-+static int opal_activate_lsp(struct opal_dev *dev,
-+			     struct opal_lr_act *opal_lr_act)
- {
- 	const struct opal_step active_steps[] = {
- 		{ opal_discovery0, },
+ 	if (n >= resp->num) {
+ 		pr_debug("Token number doesn't exist: %d, resp: %d\n",
+ 			 n, resp->num);
 -- 
 2.20.1
 
