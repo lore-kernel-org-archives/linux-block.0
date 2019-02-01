@@ -2,49 +2,52 @@ Return-Path: <SRS0=mhrr=QI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB569C282D8
-	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 07:56:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A4B2C282D8
+	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 07:56:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8F60820869
-	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 07:56:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D60A520869
+	for <linux-block@archiver.kernel.org>; Fri,  1 Feb 2019 07:56:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="n19Yh2Wb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="SyY4tuJJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726763AbfBAH4H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Feb 2019 02:56:07 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:33972 "EHLO
+        id S1728710AbfBAH4L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Feb 2019 02:56:11 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:34012 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725837AbfBAH4G (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Feb 2019 02:56:06 -0500
+        with ESMTP id S1728388AbfBAH4K (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Feb 2019 02:56:10 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=cGKNHi2QmmKQIXBuU20qWHo/ZRWcynXEO8C20YUt52o=; b=n19Yh2WbLV5xsAOm3xeg8IBmo
-        8ikAt23CZfY82rT4asZZuG73r6cwZkACT+TyyYDJ2BvfiYpde2FxoWygzOCy/vdVbDd1P1M/iKFRJ
-        DH1TwIEuzMufxtk0Aun65VTAWDSWRZWG5F38ndh1h1Uf9eaWRKOCFkkXvxweaMXjSjXBZhdE2380q
-        UWiOl8QOgK0Aj/5HVwqYSIPp7N46FabAnwksLl25VYwBh49IEr0HdPp/XRN/TOrhabVNiDSA1i3Mj
-        pq6MBJzAABFjTJLPlYELTfSdbeuJRu747SF8sJJ766mhhV9Usw87dDqGF0uum8kxKyJ4aHT0QstTW
-        3zDLtdgUw==;
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
+        :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=Vgs8s65gRcIwz0B3B3lTvmdxkX+VEUFfzOjYwDNEZ38=; b=SyY4tuJJyHa7CtqJjQENjQA0JY
+        CQ6TpHj+iVusRfzJgIhvANh464Py6uLegxgohGDAph76zqbeVyReaC9F+JETTt8CH7mGSiFFKJE0w
+        PWoKDtbXQXsmXIfu2jb9jBVI3mJxgdPt/cJjhglXJePYk8tlfGOhdOIOWw2CsQCfsuD+GPBs0ChPt
+        3IcNQxcklXNa50/de/UyBZ8+ogSflRd/0GRLHwr3YwU4Yl0cPS4SauQMjHSCCZbguLfnyCQy04+Bw
+        8kBDQ7jFZwIoX3UTH71H33MKuQrwM1b/+BBKCpc1vbRZKTEPq/dULKctHA+Tg45hN6l6ky9no2Qxe
+        17Sq+iSg==;
 Received: from 089144212163.atnat0021.highway.a1.net ([89.144.212.163] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gpTg8-0005Vj-Np; Fri, 01 Feb 2019 07:56:01 +0000
+        id 1gpTgE-0005ht-F6; Fri, 01 Feb 2019 07:56:06 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     axboe@kernel.dk, martin.petersen@oracle.com, ooo@electrozaur.com
 Cc:     Johannes Thumshirn <jthumshirn@suse.de>,
         Benjamin Block <bblock@linux.vnet.ibm.com>,
         linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: remove exofs, the T10 OSD code and block/scsi bidi support V4
-Date:   Fri,  1 Feb 2019 08:55:49 +0100
-Message-Id: <20190201075557.9249-1-hch@lst.de>
+Subject: [PATCH 2/8] bsg-lib: handle bidi requests without block layer help
+Date:   Fri,  1 Feb 2019 08:55:51 +0100
+Message-Id: <20190201075557.9249-3-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190201075557.9249-1-hch@lst.de>
+References: <20190201075557.9249-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -53,28 +56,265 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The only real user of the T10 OSD protocol, the pNFS object layout
-driver never went to the point of having shipping products, and we
-removed it 1.5 years ago.  Exofs is just a simple example without
-real life users.
+We can just stash away the second request in struct bsg_job instead
+of using the block layer req->next_rq field, allowing for the eventual
+removal of the latter.
 
-The code has been mostly unmaintained for years and is getting in the
-way of block / SCSI changes, and does not even work properly currently,
-so I think it's finally time to drop it.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bsg-lib.c                   | 44 +++++++++++++++++---
+ block/bsg.c                       | 68 +++++++------------------------
+ drivers/scsi/scsi_transport_sas.c |  1 -
+ include/linux/bsg-lib.h           |  4 ++
+ 4 files changed, 56 insertions(+), 61 deletions(-)
 
-Quote from Boaz:
+diff --git a/block/bsg-lib.c b/block/bsg-lib.c
+index 192129856342..005e2b75d775 100644
+--- a/block/bsg-lib.c
++++ b/block/bsg-lib.c
+@@ -51,11 +51,40 @@ static int bsg_transport_fill_hdr(struct request *rq, struct sg_io_v4 *hdr,
+ 		fmode_t mode)
+ {
+ 	struct bsg_job *job = blk_mq_rq_to_pdu(rq);
++	int ret;
+ 
+ 	job->request_len = hdr->request_len;
+ 	job->request = memdup_user(uptr64(hdr->request), hdr->request_len);
++	if (IS_ERR(job->request))
++		return PTR_ERR(job->request);
++
++	if (hdr->dout_xfer_len && hdr->din_xfer_len) {
++		job->bidi_rq = blk_get_request(rq->q, REQ_OP_SCSI_IN, 0);
++		if (IS_ERR(job->bidi_rq)) {
++			ret = PTR_ERR(job->bidi_rq);
++			goto out;
++		}
++
++		ret = blk_rq_map_user(rq->q, job->bidi_rq, NULL,
++				uptr64(hdr->din_xferp), hdr->din_xfer_len,
++				GFP_KERNEL);
++		if (ret)
++			goto out_free_bidi_rq;
++
++		job->bidi_bio = job->bidi_rq->bio;
++	} else {
++		job->bidi_rq = NULL;
++		job->bidi_bio = NULL;
++	}
+ 
+-	return PTR_ERR_OR_ZERO(job->request);
++	return 0;
++
++out_free_bidi_rq:
++	if (job->bidi_rq)
++		blk_put_request(job->bidi_rq);
++out:
++	kfree(job->request);
++	return ret;
+ }
+ 
+ static int bsg_transport_complete_rq(struct request *rq, struct sg_io_v4 *hdr)
+@@ -93,7 +122,7 @@ static int bsg_transport_complete_rq(struct request *rq, struct sg_io_v4 *hdr)
+ 	/* we assume all request payload was transferred, residual == 0 */
+ 	hdr->dout_resid = 0;
+ 
+-	if (rq->next_rq) {
++	if (job->bidi_rq) {
+ 		unsigned int rsp_len = job->reply_payload.payload_len;
+ 
+ 		if (WARN_ON(job->reply_payload_rcv_len > rsp_len))
+@@ -111,6 +140,11 @@ static void bsg_transport_free_rq(struct request *rq)
+ {
+ 	struct bsg_job *job = blk_mq_rq_to_pdu(rq);
+ 
++	if (job->bidi_rq) {
++		blk_rq_unmap_user(job->bidi_bio);
++		blk_put_request(job->bidi_rq);
++	}
++
+ 	kfree(job->request);
+ }
+ 
+@@ -200,7 +234,6 @@ static int bsg_map_buffer(struct bsg_buffer *buf, struct request *req)
+  */
+ static bool bsg_prepare_job(struct device *dev, struct request *req)
+ {
+-	struct request *rsp = req->next_rq;
+ 	struct bsg_job *job = blk_mq_rq_to_pdu(req);
+ 	int ret;
+ 
+@@ -211,8 +244,8 @@ static bool bsg_prepare_job(struct device *dev, struct request *req)
+ 		if (ret)
+ 			goto failjob_rls_job;
+ 	}
+-	if (rsp && rsp->bio) {
+-		ret = bsg_map_buffer(&job->reply_payload, rsp);
++	if (job->bidi_rq) {
++		ret = bsg_map_buffer(&job->reply_payload, job->bidi_rq);
+ 		if (ret)
+ 			goto failjob_rls_rqst_payload;
+ 	}
+@@ -369,7 +402,6 @@ struct request_queue *bsg_setup_queue(struct device *dev, const char *name,
+ 	}
+ 
+ 	q->queuedata = dev;
+-	blk_queue_flag_set(QUEUE_FLAG_BIDI, q);
+ 	blk_queue_rq_timeout(q, BLK_DEFAULT_SG_TIMEOUT);
+ 
+ 	ret = bsg_register_queue(q, dev, name, &bsg_transport_ops);
+diff --git a/block/bsg.c b/block/bsg.c
+index a799b0ace55c..f306853c6b08 100644
+--- a/block/bsg.c
++++ b/block/bsg.c
+@@ -74,6 +74,11 @@ static int bsg_scsi_fill_hdr(struct request *rq, struct sg_io_v4 *hdr,
+ {
+ 	struct scsi_request *sreq = scsi_req(rq);
+ 
++	if (hdr->dout_xfer_len && hdr->din_xfer_len) {
++		pr_warn_once("BIDI support in bsg has been removed.\n");
++		return -EOPNOTSUPP;
++	}
++
+ 	sreq->cmd_len = hdr->request_len;
+ 	if (sreq->cmd_len > BLK_MAX_CDB) {
+ 		sreq->cmd = kzalloc(sreq->cmd_len, GFP_KERNEL);
+@@ -114,14 +119,10 @@ static int bsg_scsi_complete_rq(struct request *rq, struct sg_io_v4 *hdr)
+ 			hdr->response_len = len;
+ 	}
+ 
+-	if (rq->next_rq) {
+-		hdr->dout_resid = sreq->resid_len;
+-		hdr->din_resid = scsi_req(rq->next_rq)->resid_len;
+-	} else if (rq_data_dir(rq) == READ) {
++	if (rq_data_dir(rq) == READ)
+ 		hdr->din_resid = sreq->resid_len;
+-	} else {
++	else
+ 		hdr->dout_resid = sreq->resid_len;
+-	}
+ 
+ 	return ret;
+ }
+@@ -140,8 +141,8 @@ static const struct bsg_ops bsg_scsi_ops = {
+ 
+ static int bsg_sg_io(struct request_queue *q, fmode_t mode, void __user *uarg)
+ {
+-	struct request *rq, *next_rq = NULL;
+-	struct bio *bio, *bidi_bio = NULL;
++	struct request *rq;
++	struct bio *bio;
+ 	struct sg_io_v4 hdr;
+ 	int ret;
+ 
+@@ -164,7 +165,7 @@ static int bsg_sg_io(struct request_queue *q, fmode_t mode, void __user *uarg)
+ 
+ 	ret = q->bsg_dev.ops->fill_hdr(rq, &hdr, mode);
+ 	if (ret)
+-		goto out;
++		return ret;
+ 
+ 	rq->timeout = msecs_to_jiffies(hdr.timeout);
+ 	if (!rq->timeout)
+@@ -174,29 +175,6 @@ static int bsg_sg_io(struct request_queue *q, fmode_t mode, void __user *uarg)
+ 	if (rq->timeout < BLK_MIN_SG_TIMEOUT)
+ 		rq->timeout = BLK_MIN_SG_TIMEOUT;
+ 
+-	if (hdr.dout_xfer_len && hdr.din_xfer_len) {
+-		if (!test_bit(QUEUE_FLAG_BIDI, &q->queue_flags)) {
+-			ret = -EOPNOTSUPP;
+-			goto out;
+-		}
+-
+-		pr_warn_once(
+-			"BIDI support in bsg has been deprecated and might be removed. "
+-			"Please report your use case to linux-scsi@vger.kernel.org\n");
+-
+-		next_rq = blk_get_request(q, REQ_OP_SCSI_IN, 0);
+-		if (IS_ERR(next_rq)) {
+-			ret = PTR_ERR(next_rq);
+-			goto out;
+-		}
+-
+-		rq->next_rq = next_rq;
+-		ret = blk_rq_map_user(q, next_rq, NULL, uptr64(hdr.din_xferp),
+-				       hdr.din_xfer_len, GFP_KERNEL);
+-		if (ret)
+-			goto out_free_nextrq;
+-	}
+-
+ 	if (hdr.dout_xfer_len) {
+ 		ret = blk_rq_map_user(q, rq, NULL, uptr64(hdr.dout_xferp),
+ 				hdr.dout_xfer_len, GFP_KERNEL);
+@@ -206,38 +184,20 @@ static int bsg_sg_io(struct request_queue *q, fmode_t mode, void __user *uarg)
+ 	}
+ 
+ 	if (ret)
+-		goto out_unmap_nextrq;
++		goto out_free_rq;
+ 
+ 	bio = rq->bio;
+-	if (rq->next_rq)
+-		bidi_bio = rq->next_rq->bio;
+ 
+ 	blk_execute_rq(q, NULL, rq, !(hdr.flags & BSG_FLAG_Q_AT_TAIL));
+ 	ret = rq->q->bsg_dev.ops->complete_rq(rq, &hdr);
+-
+-	if (rq->next_rq) {
+-		blk_rq_unmap_user(bidi_bio);
+-		blk_put_request(rq->next_rq);
+-	}
+-
+ 	blk_rq_unmap_user(bio);
++
++out_free_rq:
+ 	rq->q->bsg_dev.ops->free_rq(rq);
+ 	blk_put_request(rq);
+-
+-	if (copy_to_user(uarg, &hdr, sizeof(hdr)))
++	if (!ret && copy_to_user(uarg, &hdr, sizeof(hdr)))
+ 		return -EFAULT;
+ 	return ret;
+-
+-out_unmap_nextrq:
+-	if (rq->next_rq)
+-		blk_rq_unmap_user(rq->next_rq->bio);
+-out_free_nextrq:
+-	if (rq->next_rq)
+-		blk_put_request(rq->next_rq);
+-out:
+-	q->bsg_dev.ops->free_rq(rq);
+-	blk_put_request(rq);
+-	return ret;
+ }
+ 
+ static struct bsg_device *bsg_alloc_device(void)
+diff --git a/drivers/scsi/scsi_transport_sas.c b/drivers/scsi/scsi_transport_sas.c
+index 692b46937e52..60f1a81d2034 100644
+--- a/drivers/scsi/scsi_transport_sas.c
++++ b/drivers/scsi/scsi_transport_sas.c
+@@ -213,7 +213,6 @@ static int sas_bsg_initialize(struct Scsi_Host *shost, struct sas_rphy *rphy)
+ 		to_sas_host_attrs(shost)->q = q;
+ 	}
+ 
+-	blk_queue_flag_set(QUEUE_FLAG_BIDI, q);
+ 	return 0;
+ }
+ 
+diff --git a/include/linux/bsg-lib.h b/include/linux/bsg-lib.h
+index b356e0006731..7f14517a559b 100644
+--- a/include/linux/bsg-lib.h
++++ b/include/linux/bsg-lib.h
+@@ -69,6 +69,10 @@ struct bsg_job {
+ 	int result;
+ 	unsigned int reply_payload_rcv_len;
+ 
++	/* BIDI support */
++	struct request *bidi_rq;
++	struct bio *bidi_bio;
++
+ 	void *dd_data;		/* Used for driver-specific storage */
+ };
+ 
+-- 
+2.20.1
 
-"As I said then. It is used in Universities for studies and experiments.
-Every once in a while. I get an email with questions and reports.
-
-But yes feel free to remove the all thing!!
-
-I guess I can put it up on github. In a public tree.
-
-Just that I will need to forward port it myself, til now you guys
-been doing this for me ;-)"
-
-Now the last time this caused a bit of a stir, but still no actual users,
-not even for SG_IO passthrough commands.  So here we go again, this time
-including removing everything in the scsi and block layer supporting it,
-and thus shrinking struct request.
