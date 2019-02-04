@@ -4,38 +4,37 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6533C282C4
-	for <linux-block@archiver.kernel.org>; Mon,  4 Feb 2019 14:46:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3997C282C4
+	for <linux-block@archiver.kernel.org>; Mon,  4 Feb 2019 14:46:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 74E212087C
-	for <linux-block@archiver.kernel.org>; Mon,  4 Feb 2019 14:46:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8533214DA
+	for <linux-block@archiver.kernel.org>; Mon,  4 Feb 2019 14:46:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bu5ydcS+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qym50gEx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730059AbfBDOpz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Feb 2019 09:45:55 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:44102 "EHLO
+        id S1727418AbfBDOqg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Feb 2019 09:46:36 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:44136 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727958AbfBDOpy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Feb 2019 09:45:54 -0500
+        with ESMTP id S1727002AbfBDOqg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Feb 2019 09:46:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=6hKsLwX6XEx+/oJDA7ja5f1xeMJBHCjbRbZa3dJrd8w=; b=bu5ydcS+pGo2E1JF2N9cir2cA
-        kjw+BzXAeeuBTxNaLiH8JQbDG/sp6waGD13jI4H5zJfY+URmJmNxs89/0txd5Qyb0pptHnXY8rk55
-        NSoBMGz6d+rrOSdljDIT3DxcJbZwOt2YCh67FSO7wxI4yHDOHiCv313erDUkvAeyzVe1EM4Yop23y
-        eHWjtItMQkQ2OgNIbSIbvK11H6q8GaQWUroG74ielxSF+m06KHwnL31MoFvikHZrvWaD58PK/WMXE
-        h5BqXHWjo+ozq7KR4L42wItweQkuKbOTtpKtpoIi2/IhYlCvAse9ZsWnzCV04QkO9/b3pAIurTIiT
-        mYNn6pkIg==;
+         bh=OsGEE78JUoskJbHOECoLD/JlbU9Mi9/yWhn4Mf5h8io=; b=qym50gExDlkAfbe8DgEm8GB+1
+        3UrX7KWuJ+CNEdXb7LfJXUkd7+Td47gRDgUh9fjniBvDOxm0AdNLVg5/7g0isXpRfTPn52+taQOlJ
+        LSqxVtAUnW4u26sYKqFI8aFwNswxbq+v1dYcHkVC+NDSYfET5N47A2g8s/zwfnN8j3K9EU1DCR/za
+        HXeSTSkMvWCYBJOtu4hlFtoOHoSyr9keck5kZ/T/ZZQFkpRUbUQvdL9GnNvcjBElQgbeXRVME/y7X
+        nLwSa8GSaxzanFefvS+W1lq5PiOvpKDyidsJdQlZ/7S5sw6sV3bdQwewQQ5fNejrgC4OZkPFOp3X3
+        Lv8UGJZdg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gqfVP-0001CE-Nd; Mon, 04 Feb 2019 14:45:51 +0000
-Date:   Mon, 4 Feb 2019 06:45:51 -0800
+        id 1gqfW4-0001EW-Q8; Mon, 04 Feb 2019 14:46:32 +0000
+Date:   Mon, 4 Feb 2019 06:46:32 -0800
 From:   Christoph Hellwig <hch@infradead.org>
 To:     David Kozub <zub@linux.fjfi.cvut.cz>
 Cc:     Jens Axboe <axboe@kernel.dk>,
@@ -43,15 +42,15 @@ Cc:     Jens Axboe <axboe@kernel.dk>,
         Scott Bauer <sbauer@plzdonthack.me>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-Subject: Re: [PATCH v4 06/16] block: sed-opal: unify error handling of
- responses
-Message-ID: <20190204144551.GF31132@infradead.org>
+Subject: Re: [PATCH v4 07/16] block: sed-opal: reuse response_get_token to
+ decrease code duplication
+Message-ID: <20190204144632.GG31132@infradead.org>
 References: <1549054223-12220-1-git-send-email-zub@linux.fjfi.cvut.cz>
- <1549054223-12220-7-git-send-email-zub@linux.fjfi.cvut.cz>
+ <1549054223-12220-8-git-send-email-zub@linux.fjfi.cvut.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1549054223-12220-7-git-send-email-zub@linux.fjfi.cvut.cz>
+In-Reply-To: <1549054223-12220-8-git-send-email-zub@linux.fjfi.cvut.cz>
 User-Agent: Mutt/1.9.2 (2017-12-15)
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
@@ -59,12 +58,11 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 01, 2019 at 09:50:13PM +0100, David Kozub wrote:
-> response_get_{string,u64} include error handling for argument resp being
-> NULL but response_get_token does not handle this.
-> 
-> Make all three of response_get_{string,u64,token} handle NULL resp in
-> the same way.
+On Fri, Feb 01, 2019 at 09:50:14PM +0100, David Kozub wrote:
+> response_get_token had already been in place, its functionality had
+> been duplicated within response_get_{u64,bytestring} with the same error
+> handling. Unify the handling by reusing response_get_token within the
+> other functions.
 > 
 > Co-authored-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 > Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
