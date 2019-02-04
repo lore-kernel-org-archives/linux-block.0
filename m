@@ -2,110 +2,240 @@ Return-Path: <SRS0=Gtqi=QL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E621AC282C4
-	for <linux-block@archiver.kernel.org>; Mon,  4 Feb 2019 20:31:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7AF7C282C4
+	for <linux-block@archiver.kernel.org>; Mon,  4 Feb 2019 21:01:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BB7092073D
-	for <linux-block@archiver.kernel.org>; Mon,  4 Feb 2019 20:31:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97A5D2082E
+	for <linux-block@archiver.kernel.org>; Mon,  4 Feb 2019 21:01:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="EMQnQdQe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728343AbfBDUbq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Feb 2019 15:31:46 -0500
-Received: from mail-wr1-f52.google.com ([209.85.221.52]:38236 "EHLO
-        mail-wr1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728332AbfBDUbq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Feb 2019 15:31:46 -0500
-Received: by mail-wr1-f52.google.com with SMTP id v13so1333406wrw.5;
-        Mon, 04 Feb 2019 12:31:44 -0800 (PST)
+        id S1726624AbfBDVB5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Feb 2019 16:01:57 -0500
+Received: from mail-ua1-f66.google.com ([209.85.222.66]:44090 "EHLO
+        mail-ua1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726614AbfBDVB5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Feb 2019 16:01:57 -0500
+Received: by mail-ua1-f66.google.com with SMTP id d19so445319uaq.11
+        for <linux-block@vger.kernel.org>; Mon, 04 Feb 2019 13:01:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=u2uaSjFTAzt74S+zPV9Y6fyT0EjStLAXSexFtbRvYAM=;
+        b=EMQnQdQeni3x54I+xDOZTgPtcT91nrrjdFWw1PIo5qmd7b2O6VQDW7SYf+4U1TO7jd
+         wZEfgEKvJHWcI7oh2TYlDXsRBTN6UpTk3nVtYJMH+fq3JgCjW/wdXBFDFV5/WKBHL/uU
+         R0DirO/r1JLNrBvWmONXP+snEAtNVar8jM7enOJhh7dEtic1F46ZZn6CJzSmbunr5zHJ
+         HNwgW2GN+JoPYsjlsi/YHv0cwIgl/ePbMmNtpVRW641p+VWfwDsZGcNWpddNFf5Dy+U1
+         +BA4XcwNOM4VTKc7XS8x12v3Tdc7/998FdhQLxEUo6mS9yzqFfqTDmm/A2hb5PWeZjPN
+         XJEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:cc:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding;
-        bh=antHsuw/vVJmWBDUzzccn0fS6XiezfFcD5Es3uKUq3Q=;
-        b=WgMLv9NdZQy1+ESgq8j+HNGfr7aQ81Iqo4yURlJ0/P16oqY6x81BiNeywXCsNRw9uu
-         w6geq/WxlCRF8lQrx35PPDCWSQ0m2LkA1PTlRTJUJPZecuzvhdtfWYNqE4H6qEhJ4Ekk
-         jyOcRqCUQ6acozmI9CEKr5o01QgmQy8Dkf33z1mPnSKnvJWFhSqm2/8mkEVOSgxtQLj+
-         f4hY1QmNnLO6s5kE1kgRSbjlRnIge776LKBy8wDKlTKNgDVRzc+LpOzFfThyLXWr+wvW
-         oAqDzkec20KvNYSVwvdGnsYRM9yvZy2v61U3iESn0T0n2dyszAlxljdyjN3czR3AnWot
-         0YtA==
-X-Gm-Message-State: AHQUAuaUsnzXtf36bstxfJwIOSE6YGqV4ukX7OYffWB8iikr7Yc0siah
-        Q4s40IqOmY0TaaMATEvq/0SyXJyO
-X-Google-Smtp-Source: AHgI3IbaGrOP4TGXszTgDgXcRKnaNaxxXTQ002dAKNhXMfNixDFkbFTXaR2QfqFX0qwBbfkLp/WsCw==
-X-Received: by 2002:adf:f347:: with SMTP id e7mr880844wrp.25.1549312303554;
-        Mon, 04 Feb 2019 12:31:43 -0800 (PST)
-Received: from [10.0.0.5] ([207.232.55.62])
-        by smtp.gmail.com with ESMTPSA id b18sm17301478wrw.83.2019.02.04.12.31.40
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 04 Feb 2019 12:31:41 -0800 (PST)
-Subject: Re: remove exofs, the T10 OSD code and block/scsi bidi support V4
-To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
-        martin.petersen@oracle.com
-References: <20190201075557.9249-1-hch@lst.de>
-Cc:     Johannes Thumshirn <jthumshirn@suse.de>,
-        Benjamin Block <bblock@linux.vnet.ibm.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-From:   Boaz Harrosh <ooo@electrozaur.com>
-Message-ID: <3be11773-5ea9-4c08-25a5-dc556ded2d6f@electrozaur.com>
-Date:   Mon, 4 Feb 2019 22:31:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101
- Thunderbird/45.4.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=u2uaSjFTAzt74S+zPV9Y6fyT0EjStLAXSexFtbRvYAM=;
+        b=lP7ARx47Vfb+FPmD152qTtJwTiwUmlZKMCCxWvCV44ARci6uOOUAC7iWabPSewzOG/
+         L9fjLgIEWOlbykXB4lEIt5h3874ZymvtwKm+Q5izx8JRUUHImXmSbMGH81gu/jkZou0N
+         gDtxg91rs5lCM/QcxBsJ4rP3B7WHtxhd2Zi0KFxq2h2AuMsrkaVY6YBcrrzEBmEEbvH2
+         L8pIKQj0PHgti8VjVk2lIIoMFpR5PrlNPbOWZbpFnHol9seNnqaB8bMWPvV2dIO3NPyy
+         vtnvY6x0zzbUrLbvGkP+ujaIw/vGt2/OmSEwJkNydzgh6JYtkzb/RpReUaHU757cVIb5
+         WmEA==
+X-Gm-Message-State: AHQUAuZBXCzGaAKFAtRAQh1BJseSkswlLxrB5DwlEVjVj7h8fiVTrE5v
+        b8JmiRzmyn4/kT+s//stlEzdzMvRm1EUdy9qZWhZKQ==
+X-Google-Smtp-Source: AHgI3IafxGZ+72mlT4jEytAbbMasVSX5F1ZvLq3cpS1QEtMRJl8NsOqjBmpP0IfonNGJjWruX1acPM4dy3BBFaADHDQ=
+X-Received: by 2002:ab0:77c4:: with SMTP id y4mr578797uar.45.1549314115981;
+ Mon, 04 Feb 2019 13:01:55 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190201075557.9249-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+References: <20190201023806.39895-1-hlitz@ucsc.edu> <7BC68605-5E76-4E0D-8C3E-29B2CB329FEB@javigon.com>
+In-Reply-To: <7BC68605-5E76-4E0D-8C3E-29B2CB329FEB@javigon.com>
+From:   Hans Holmberg <hans.ml.holmberg@owltronix.com>
+Date:   Mon, 4 Feb 2019 22:01:45 +0100
+Message-ID: <CANr-nt0uVoOhObd7rh2o9z1EYbHRPxszUwGbstaDnKrjP4v_sQ@mail.gmail.com>
+Subject: Re: [PATCH V2] lightnvm: pblk: fix race condition on GC
+To:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
+Cc:     Heiner Litz <hlitz@ucsc.edu>,
+        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 01/02/19 09:55, Christoph Hellwig wrote:
-> The only real user of the T10 OSD protocol, the pNFS object layout
-> driver never went to the point of having shipping products, and we
-> removed it 1.5 years ago.  Exofs is just a simple example without
-> real life users.
-> 
-> The code has been mostly unmaintained for years and is getting in the
-> way of block / SCSI changes, 
+Thanks Heiner, it's awesome to get this fixed!
 
-For the 4th time: Which ?
+Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-> and does not even work properly currently,
-> so I think it's finally time to drop it.
-> 
-> Quote from Boaz:
-> 
-
-Hello? anyone home?
-
-Please resend without the below Quote!!!
-Because yes I said that but I have also said the opposite. And I have clearly
-stated in reaction to the last 3 resends. That I now oppose to the below statement.
-And that you should please remove it.
-
-Do your own text please. Don't drag me in the mud
-
-> "As I said then. It is used in Universities for studies and experiments.
-> Every once in a while. I get an email with questions and reports.
-> 
-> But yes feel free to remove the all thing!!
-> 
-> I guess I can put it up on github. In a public tree.
-> 
-> Just that I will need to forward port it myself, til now you guys
-> been doing this for me ;-)"
-> 
-> Now the last time this caused a bit of a stir, but still no actual users,
-> not even for SG_IO passthrough commands.  So here we go again, this time
-> including removing everything in the scsi and block layer supporting it,
-> and thus shrinking struct request.
-> 
-
-NAK-by: Boaz harrosh <ooo@electrozaur.com>
-For what ever that means ...
-
-Cheers
-Boaz
-
+On Mon, Feb 4, 2019 at 9:19 AM Javier Gonz=C3=A1lez <javier@javigon.com> wr=
+ote:
+>
+> > On 1 Feb 2019, at 03.38, Heiner Litz <hlitz@ucsc.edu> wrote:
+> >
+> > This patch fixes a race condition where a write is mapped to the last
+> > sectors of a line. The write is synced to the device but the L2P is not
+> > updated yet. When the line is garbage collected before the L2P update i=
+s
+> > performed, the sectors are ignored by the GC logic and the line is free=
+d
+> > before all sectors are moved. When the L2P is finally updated, it conta=
+ins
+> > a mapping to a freed line, subsequent reads of the corresponding LBAs f=
+ail.
+> >
+> > This patch introduces a per line counter specifying the number of secto=
+rs
+> > that are synced to the device but have not been updated in the L2P. Lin=
+es
+> > with a counter of greater than zero will not be selected for GC.
+> >
+> > Signed-off-by: Heiner Litz <hlitz@ucsc.edu>
+> > ---
+> >
+> > v2: changed according to Javier's comment. Instead of performing check
+> > while holding the trans_lock, add an atomic per line counter
+> >
+> > drivers/lightnvm/pblk-core.c  |  1 +
+> > drivers/lightnvm/pblk-gc.c    | 20 +++++++++++++-------
+> > drivers/lightnvm/pblk-map.c   |  1 +
+> > drivers/lightnvm/pblk-rb.c    |  1 +
+> > drivers/lightnvm/pblk-write.c |  1 +
+> > drivers/lightnvm/pblk.h       |  1 +
+> > 6 files changed, 18 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.=
+c
+> > index eabcbc119681..b7ed0502abef 100644
+> > --- a/drivers/lightnvm/pblk-core.c
+> > +++ b/drivers/lightnvm/pblk-core.c
+> > @@ -1278,6 +1278,7 @@ static int pblk_line_prepare(struct pblk *pblk, s=
+truct pblk_line *line)
+> >       spin_unlock(&line->lock);
+> >
+> >       kref_init(&line->ref);
+> > +     atomic_set(&line->sec_to_update, 0);
+> >
+> >       return 0;
+> > }
+> > diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+> > index 2fa118c8eb71..26a52ea7ec45 100644
+> > --- a/drivers/lightnvm/pblk-gc.c
+> > +++ b/drivers/lightnvm/pblk-gc.c
+> > @@ -365,16 +365,22 @@ static struct pblk_line *pblk_gc_get_victim_line(=
+struct pblk *pblk,
+> >                                                struct list_head *group_=
+list)
+> > {
+> >       struct pblk_line *line, *victim;
+> > -     int line_vsc, victim_vsc;
+> > +     unsigned int line_vsc =3D ~0x0L, victim_vsc =3D ~0x0L;
+> >
+> >       victim =3D list_first_entry(group_list, struct pblk_line, list);
+> > +
+> >       list_for_each_entry(line, group_list, list) {
+> > -             line_vsc =3D le32_to_cpu(*line->vsc);
+> > -             victim_vsc =3D le32_to_cpu(*victim->vsc);
+> > -             if (line_vsc < victim_vsc)
+> > +             if (!atomic_read(&line->sec_to_update))
+> > +                     line_vsc =3D le32_to_cpu(*line->vsc);
+> > +             if (line_vsc < victim_vsc) {
+> >                       victim =3D line;
+> > +                     victim_vsc =3D le32_to_cpu(*victim->vsc);
+> > +             }
+> >       }
+> >
+> > +     if (victim_vsc =3D=3D ~0x0)
+> > +             return NULL;
+> > +
+> >       return victim;
+> > }
+> >
+> > @@ -448,13 +454,13 @@ static void pblk_gc_run(struct pblk *pblk)
+> >
+> >       do {
+> >               spin_lock(&l_mg->gc_lock);
+> > -             if (list_empty(group_list)) {
+> > +
+> > +             line =3D pblk_gc_get_victim_line(pblk, group_list);
+> > +             if (!line) {
+> >                       spin_unlock(&l_mg->gc_lock);
+> >                       break;
+> >               }
+> >
+> > -             line =3D pblk_gc_get_victim_line(pblk, group_list);
+> > -
+> >               spin_lock(&line->lock);
+> >               WARN_ON(line->state !=3D PBLK_LINESTATE_CLOSED);
+> >               line->state =3D PBLK_LINESTATE_GC;
+> > diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+> > index 79df583ea709..7fbc99b60cac 100644
+> > --- a/drivers/lightnvm/pblk-map.c
+> > +++ b/drivers/lightnvm/pblk-map.c
+> > @@ -73,6 +73,7 @@ static int pblk_map_page_data(struct pblk *pblk, unsi=
+gned int sentry,
+> >                */
+> >               if (i < valid_secs) {
+> >                       kref_get(&line->ref);
+> > +                     atomic_inc(&line->sec_to_update);
+> >                       w_ctx =3D pblk_rb_w_ctx(&pblk->rwb, sentry + i);
+> >                       w_ctx->ppa =3D ppa_list[i];
+> >                       meta->lba =3D cpu_to_le64(w_ctx->lba);
+> > diff --git a/drivers/lightnvm/pblk-rb.c b/drivers/lightnvm/pblk-rb.c
+> > index a6133b50ed9c..03c241b340ea 100644
+> > --- a/drivers/lightnvm/pblk-rb.c
+> > +++ b/drivers/lightnvm/pblk-rb.c
+> > @@ -260,6 +260,7 @@ static int __pblk_rb_update_l2p(struct pblk_rb *rb,=
+ unsigned int to_update)
+> >                                                       entry->cacheline)=
+;
+> >
+> >               line =3D pblk_ppa_to_line(pblk, w_ctx->ppa);
+> > +             atomic_dec(&line->sec_to_update);
+> >               kref_put(&line->ref, pblk_line_put);
+> >               clean_wctx(w_ctx);
+> >               rb->l2p_update =3D pblk_rb_ptr_wrap(rb, rb->l2p_update, 1=
+);
+> > diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-writ=
+e.c
+> > index 06d56deb645d..6593deab52da 100644
+> > --- a/drivers/lightnvm/pblk-write.c
+> > +++ b/drivers/lightnvm/pblk-write.c
+> > @@ -177,6 +177,7 @@ static void pblk_prepare_resubmit(struct pblk *pblk=
+, unsigned int sentry,
+> >                * re-map these entries
+> >                */
+> >               line =3D pblk_ppa_to_line(pblk, w_ctx->ppa);
+> > +             atomic_dec(&line->sec_to_update);
+> >               kref_put(&line->ref, pblk_line_put);
+> >       }
+> >       spin_unlock(&pblk->trans_lock);
+> > diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+> > index a6386d5acd73..ac3ab778e976 100644
+> > --- a/drivers/lightnvm/pblk.h
+> > +++ b/drivers/lightnvm/pblk.h
+> > @@ -487,6 +487,7 @@ struct pblk_line {
+> >       __le32 *vsc;                    /* Valid sector count in line */
+> >
+> >       struct kref ref;                /* Write buffer L2P references */
+> > +     atomic_t sec_to_update;         /* Outstanding L2P updates to ppa=
+ */
+> >
+> >       struct pblk_w_err_gc *w_err_gc; /* Write error gc recovery metada=
+ta */
+> >
+> > --
+> > 2.17.1
+>
+>
+> Looks good to me. Again, good marathon-catch! :)
+>
+> Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
+>
+>
