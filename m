@@ -2,86 +2,84 @@ Return-Path: <SRS0=Gtqi=QL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EEF2C282C4
-	for <linux-block@archiver.kernel.org>; Mon,  4 Feb 2019 15:10:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2119EC282CB
+	for <linux-block@archiver.kernel.org>; Mon,  4 Feb 2019 15:36:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5420E2082E
-	for <linux-block@archiver.kernel.org>; Mon,  4 Feb 2019 15:10:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="htZ0CAzV"
+	by mail.kernel.org (Postfix) with ESMTP id F059F20823
+	for <linux-block@archiver.kernel.org>; Mon,  4 Feb 2019 15:36:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728645AbfBDPK6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Feb 2019 10:10:58 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:52282 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727217AbfBDPK6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Feb 2019 10:10:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=kTb+UlVtFYsmvzBzgVBv0f79NYsXHZTJmriQS/4IGJo=; b=htZ0CAzV5V5AtH9W4Yx+hvQU0z
-        iIQFAGvJiX8XVkuAW71EL+kbytTBlTvv0c1Ah5GV1jYGji9qZlL78m+hwJcPNKs5++hzcqCAYeQae
-        FZ+8185KL1K+5qqvT8xwJxK3X/jcx7YxO23YikgEEhqU7hAaYTQGlz5ZH6tVXMwqyZANzrXiyUthU
-        Dw1UZIFefpTA3/eU6d+PR/Ycgjcjdt6uvK7I70m9LRE0tMvxm1ATAnU6OXOL+9YNRqIgfVKng/eoU
-        bxXsb5+4xD38CR0GDsljhiJPJHewcfTWEm/5IMIAsfwhoV1xpPH0blhpHMuTQLG2wRqrMJXSCV8v2
-        kFASjMqw==;
-Received: from 089144212163.atnat0021.highway.a1.net ([89.144.212.163] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gqfth-00026x-E2; Mon, 04 Feb 2019 15:10:57 +0000
-Date:   Mon, 4 Feb 2019 16:10:54 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-Subject: [GIT PULL] early nvme pull request for 5.1
-Message-ID: <20190204151054.GA32678@infradead.org>
+        id S1726565AbfBDPgV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Feb 2019 10:36:21 -0500
+Received: from bout01.mta.xmission.com ([166.70.11.15]:40137 "EHLO
+        bout01.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731303AbfBDPgV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Feb 2019 10:36:21 -0500
+Received: from mx02.mta.xmission.com ([166.70.13.212])
+        by bout01.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.87)
+        (envelope-from <sbauer@plzdonthack.me>)
+        id 1gqgIE-0000pC-RZ; Mon, 04 Feb 2019 08:36:18 -0700
+Received: from plesk14-shared.xmission.com ([166.70.198.161] helo=plesk14.xmission.com)
+        by mx02.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.87)
+        (envelope-from <sbauer@plzdonthack.me>)
+        id 1gqgIE-0002xZ-CX; Mon, 04 Feb 2019 08:36:18 -0700
+Received: from hacktheplanet (unknown [73.58.156.217])
+        by plesk14.xmission.com (Postfix) with ESMTPSA id 34E7121D5F5;
+        Mon,  4 Feb 2019 15:36:17 +0000 (UTC)
+Date:   Mon, 4 Feb 2019 10:36:10 -0500
+From:   Scott Bauer <sbauer@plzdonthack.me>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     David Kozub <zub@linux.fjfi.cvut.cz>, Jens Axboe <axboe@kernel.dk>,
+        Jonathan Derrick <jonathan.derrick@intel.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+Message-ID: <20190204153138.GA6512@hacktheplanet>
+References: <1549054223-12220-1-git-send-email-zub@linux.fjfi.cvut.cz>
+ <20190204150415.GO31132@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20190204150415.GO31132@infradead.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-XM-SPF: eid=1gqgIE-0002xZ-CX;;;mid=<20190204153138.GA6512@hacktheplanet>;;;hst=mx02.mta.xmission.com;;;ip=166.70.198.161;;;frm=sbauer@plzdonthack.me;;;spf=none
+X-SA-Exim-Connect-IP: 166.70.198.161
+X-SA-Exim-Mail-From: sbauer@plzdonthack.me
+Subject: Re: [PATCH v4 00/16] block: sed-opal: support shadow MBR done flag
+ and write
+X-SA-Exim-Version: 4.2.1 (built Fri, 13 May 2016 17:07:30 -0600)
+X-SA-Exim-Scanned: Yes (on mx02.mta.xmission.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On Mon, Feb 04, 2019 at 07:04:15AM -0800, Christoph Hellwig wrote:
+> On Fri, Feb 01, 2019 at 09:50:07PM +0100, David Kozub wrote:
+> > This patch series extends SED OPAL support: it adds IOCTL for setting the shadow
+> > MBR done flag which can be useful for unlocking an OPAL disk on boot and it adds
+> > IOCTL for writing to the shadow MBR. Also included are some minor fixes and
+> > improvements.
+> 
+> Actually most of it is really useful cleanups and small fixes for the
+> existing OPAL code.  Any chance you could resend just those bits as
+> a first series ASAP?  I'll try to spend some time to to review the
+> actual feature additions in the meantime.
+> 
+> > There is a fork of sed-opal-temp that can use these new IOCTLs.[2] I tested
+> > these on Samsung 840 EVO and 850 EVO drives, on x86-64 and arm64 systems.
+> 
+> Which brings up another question:  how do we get a properly maintained
+> version of the sed-opal tool up ASAP?  It's been a bit bitrotting
+> unfortunately, and the documentation and error handling hasn't been all
+> that great to start with.  Are we going to find a good home for it?
+> Util-linux for example?
 
-below is our current (small) queue of NVMe patches for Linux 5.1.  We
-want the re-addition of the Write Zeroes support to be in linu-next for
-a few weeks as it caused some problems last time.  The only other
-patch is a cleanup from Sagi.
+I would also like to get it off my github and into a proper location as well.
 
-The following changes since commit bb94aea1444b9859faa8d72aff3713fcd11c6696:
+Christoph, do you know off hand how we would get it in util-linux?
 
-  blk-mq: save default hctx into ctx->hctxs for not-supported type (2019-02-01 08:33:43 -0700)
-
-are available in the Git repository at:
-
-  git://git.infradead.org/nvme.git nvme-5.1
-
-for you to fetch changes up to 794a4cb3d2f7c105112f9b59525533f00ac06006:
-
-  nvme: remove the .stop_ctrl callout (2019-02-04 15:41:25 +0100)
-
-----------------------------------------------------------------
-Chaitanya Kulkarni (1):
-      nvme: add support for the Write Zeroes command
-
-Sagi Grimberg (1):
-      nvme: remove the .stop_ctrl callout
-
- drivers/nvme/host/core.c | 54 ++++++++++++++++++++++++++++++++++++++++++++----
- drivers/nvme/host/nvme.h |  1 -
- drivers/nvme/host/rdma.c | 12 +++--------
- drivers/nvme/host/tcp.c  | 10 +++------
- 4 files changed, 56 insertions(+), 21 deletions(-)
