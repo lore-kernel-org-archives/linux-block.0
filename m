@@ -6,21 +6,21 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 526B8C282D7
-	for <linux-block@archiver.kernel.org>; Tue,  5 Feb 2019 11:38:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C5F0C282CB
+	for <linux-block@archiver.kernel.org>; Tue,  5 Feb 2019 11:38:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2C0912175B
-	for <linux-block@archiver.kernel.org>; Tue,  5 Feb 2019 11:38:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C7E72083B
+	for <linux-block@archiver.kernel.org>; Tue,  5 Feb 2019 11:38:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728950AbfBELiS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Feb 2019 06:38:18 -0500
-Received: from smtp2.provo.novell.com ([137.65.250.81]:58697 "EHLO
+        id S1728992AbfBELiX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Feb 2019 06:38:23 -0500
+Received: from smtp2.provo.novell.com ([137.65.250.81]:33111 "EHLO
         smtp2.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728933AbfBELiS (ORCPT
+        with ESMTP id S1728956AbfBELiT (ORCPT
         <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
-        Tue, 5 Feb 2019 06:38:18 -0500
+        Tue, 5 Feb 2019 06:38:19 -0500
 Received: from apollon.suse.de.de (prv-ext-foundry1int.gns.novell.com [137.65.251.240])
-        by smtp2.provo.novell.com with ESMTP (TLS encrypted); Tue, 05 Feb 2019 04:38:08 -0700
+        by smtp2.provo.novell.com with ESMTP (TLS encrypted); Tue, 05 Feb 2019 04:38:13 -0700
 From:   Martin Wilck <mwilck@suse.com>
 To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
         Hannes Reinecke <hare@suse.de>
@@ -29,10 +29,12 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         Bart Van Assche <Bart.VanAssche@sandisk.com>,
         Martin Wilck <mwilck@suse.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org
-Subject: [PATCH v2 2/5] block: disk_events: introduce event flags
-Date:   Tue,  5 Feb 2019 12:37:38 +0100
-Message-Id: <20190205113741.11267-3-mwilck@suse.com>
+        linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org,
+        Jiri Kosina <jikos@kernel.org>, Tim Waugh <tim@cyberelk.net>,
+        Michal Simek <michal.simek@xilinx.com>
+Subject: [PATCH v2 4/5] Revert "block: unexport DISK_EVENT_MEDIA_CHANGE for legacy/fringe drivers"
+Date:   Tue,  5 Feb 2019 12:37:40 +0100
+Message-Id: <20190205113741.11267-5-mwilck@suse.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190205113741.11267-1-mwilck@suse.com>
 References: <20190205113741.11267-1-mwilck@suse.com>
@@ -43,125 +45,152 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, an empty disk->events field tells the block layer not to forward
-media change events to user space. This was done in
-commit 7c88a168da80 ("block: don't propagate unlisted DISK_EVENTs to userland")
-in order to avoid events from "fringe" drivers to be forwarded to user
-space. By doing so, the block layer lost the information which events were
-supported by a particular block device, and most importantly, whether or
-not a given device supports media change events at all.
+This reverts commit 9fd097b14918875bd6f125ed699d7bbbba5893ee.
 
-Prepare for not interpreting the "events" field this way in the future any
-more. This is done by adding two flag bits that can be set to have the
-device treated like one that has the "events" field set to a non-zero value
-before. This applies only to the sd and sr drivers, which are changed to
-set the new flags.
+Instead of leaving disk->events completely empty, we now export the
+supported events again, and tell the block layer not to forward events to
+user space by not setting DISK_EVENT_FLAG_UEVENT. This allows the block
+layer to distinguish between devices that for which events should be
+handled in kernel only, and devices which don't support any meda change
+events at all.
 
-The new flags are DISK_EVENT_FLAG_POLL to enforce polling of the device for
-synchronous events, and DISK_EVENT_FLAG_UEVENT to tell the blocklayer to
-generate udev events from kernel events. They can easily be fit in the int
-reserved for event bits.
-
-This patch doesn't change behavior.
-
+Cc: Jiri Kosina <jikos@kernel.org>
+Cc: Tim Waugh <tim@cyberelk.net>
+Cc: Michal Simek <michal.simek@xilinx.com>
 Signed-off-by: Martin Wilck <mwilck@suse.com>
 ---
- block/genhd.c         | 15 ++++++++++-----
- drivers/scsi/sd.c     |  3 ++-
- drivers/scsi/sr.c     |  3 ++-
- include/linux/genhd.h |  7 +++++++
- 4 files changed, 21 insertions(+), 7 deletions(-)
+ drivers/block/amiflop.c    | 1 +
+ drivers/block/ataflop.c    | 1 +
+ drivers/block/floppy.c     | 1 +
+ drivers/block/paride/pcd.c | 1 +
+ drivers/block/paride/pd.c  | 1 +
+ drivers/block/paride/pf.c  | 1 +
+ drivers/block/swim.c       | 1 +
+ drivers/block/swim3.c      | 1 +
+ drivers/block/xsysace.c    | 1 +
+ drivers/cdrom/gdrom.c      | 1 +
+ 10 files changed, 10 insertions(+)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 714459f..7f5a370 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1630,7 +1630,7 @@ static unsigned long disk_events_poll_jiffies(struct gendisk *disk)
- 	 */
- 	if (ev->poll_msecs >= 0)
- 		intv_msecs = ev->poll_msecs;
--	else if (disk->events)
-+	else if (disk->events & DISK_EVENT_FLAG_POLL)
- 		intv_msecs = disk_events_dfl_poll_msecs;
+diff --git a/drivers/block/amiflop.c b/drivers/block/amiflop.c
+index 0903e08..92b930c 100644
+--- a/drivers/block/amiflop.c
++++ b/drivers/block/amiflop.c
+@@ -1829,6 +1829,7 @@ static int __init fd_probe_drives(void)
+ 		disk->major = FLOPPY_MAJOR;
+ 		disk->first_minor = drive;
+ 		disk->fops = &floppy_fops;
++		disk->events = DISK_EVENT_MEDIA_CHANGE;
+ 		sprintf(disk->disk_name, "fd%d", drive);
+ 		disk->private_data = &unit[drive];
+ 		set_capacity(disk, 880*2);
+diff --git a/drivers/block/ataflop.c b/drivers/block/ataflop.c
+index b0dbbdf..c7b5c46 100644
+--- a/drivers/block/ataflop.c
++++ b/drivers/block/ataflop.c
+@@ -2028,6 +2028,7 @@ static int __init atari_floppy_init (void)
+ 		unit[i].disk->first_minor = i;
+ 		sprintf(unit[i].disk->disk_name, "fd%d", i);
+ 		unit[i].disk->fops = &floppy_fops;
++		unit[i].disk->events = DISK_EVENT_MEDIA_CHANGE;
+ 		unit[i].disk->private_data = &unit[i];
+ 		set_capacity(unit[i].disk, MAX_DISK_SIZE * 2);
+ 		add_disk(unit[i].disk);
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index 6f2856c..f95699e 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -4543,6 +4543,7 @@ static int __init do_floppy_init(void)
+ 		disks[drive]->major = FLOPPY_MAJOR;
+ 		disks[drive]->first_minor = TOMINOR(drive);
+ 		disks[drive]->fops = &floppy_fops;
++		disks[drive]->events = DISK_EVENT_MEDIA_CHANGE;
+ 		sprintf(disks[drive]->disk_name, "fd%d", drive);
  
- 	return msecs_to_jiffies(intv_msecs);
-@@ -1840,11 +1840,13 @@ static void disk_check_events(struct disk_events *ev,
- 
- 	/*
- 	 * Tell userland about new events.  Only the events listed in
--	 * @disk->events are reported.  Unlisted events are processed the
--	 * same internally but never get reported to userland.
-+	 * @disk->events are reported, and only if DISK_EVENT_FLAG_UEVENT
-+	 * is set. Otherwise, events are processed internally but never
-+	 * get reported to userland.
- 	 */
- 	for (i = 0; i < ARRAY_SIZE(disk_uevents); i++)
--		if (events & disk->events & (1 << i))
-+		if (events & disk->events & (1 << i) &&
-+		    disk->events & DISK_EVENT_FLAG_UEVENT)
- 			envp[nr_events++] = disk_uevents[i];
- 
- 	if (nr_events)
-@@ -1882,7 +1884,10 @@ static ssize_t disk_events_show(struct device *dev,
- {
- 	struct gendisk *disk = dev_to_disk(dev);
- 
--	return __disk_events_show(disk->events, buf);
-+	if (!(disk->events & DISK_EVENT_FLAG_UEVENT))
-+		return 0;
-+
-+	return __disk_events_show(disk->events & DISK_EVENT_TYPES_MASK, buf);
+ 		timer_setup(&motor_off_timer[drive], motor_off_callback, 0);
+diff --git a/drivers/block/paride/pcd.c b/drivers/block/paride/pcd.c
+index 96670ee..359a0d8 100644
+--- a/drivers/block/paride/pcd.c
++++ b/drivers/block/paride/pcd.c
+@@ -342,6 +342,7 @@ static void pcd_init_units(void)
+ 		strcpy(disk->disk_name, cd->name);	/* umm... */
+ 		disk->fops = &pcd_bdops;
+ 		disk->flags = GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE;
++		disk->events = DISK_EVENT_MEDIA_CHANGE;
+ 	}
  }
  
- static ssize_t disk_events_async_show(struct device *dev,
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index b2da8a0..83e736e 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -3262,7 +3262,8 @@ static void sd_probe_async(void *data, async_cookie_t cookie)
- 	gd->flags = GENHD_FL_EXT_DEVT;
- 	if (sdp->removable) {
- 		gd->flags |= GENHD_FL_REMOVABLE;
--		gd->events |= DISK_EVENT_MEDIA_CHANGE;
-+		gd->events |= DISK_EVENT_MEDIA_CHANGE |
-+			DISK_EVENT_FLAG_POLL | DISK_EVENT_FLAG_UEVENT;
+diff --git a/drivers/block/paride/pd.c b/drivers/block/paride/pd.c
+index 0ff9b12..6f9ad3f 100644
+--- a/drivers/block/paride/pd.c
++++ b/drivers/block/paride/pd.c
+@@ -897,6 +897,7 @@ static void pd_probe_drive(struct pd_unit *disk)
+ 	p->fops = &pd_fops;
+ 	p->major = major;
+ 	p->first_minor = (disk - pd) << PD_BITS;
++	p->events = DISK_EVENT_MEDIA_CHANGE;
+ 	disk->gd = p;
+ 	p->private_data = disk;
+ 
+diff --git a/drivers/block/paride/pf.c b/drivers/block/paride/pf.c
+index e92e7a8..52a74f9 100644
+--- a/drivers/block/paride/pf.c
++++ b/drivers/block/paride/pf.c
+@@ -319,6 +319,7 @@ static void __init pf_init_units(void)
+ 		disk->first_minor = unit;
+ 		strcpy(disk->disk_name, pf->name);
+ 		disk->fops = &pf_fops;
++		disk->events = DISK_EVENT_MEDIA_CHANGE;
+ 		if (!(*drives[unit])[D_PRT])
+ 			pf_drive_count++;
  	}
- 
- 	blk_pm_runtime_init(sdp->request_queue, dev);
-diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
-index 38ddbbf..3571651 100644
---- a/drivers/scsi/sr.c
-+++ b/drivers/scsi/sr.c
-@@ -716,7 +716,8 @@ static int sr_probe(struct device *dev)
- 	sprintf(disk->disk_name, "sr%d", minor);
- 	disk->fops = &sr_bdops;
- 	disk->flags = GENHD_FL_CD | GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE;
--	disk->events = DISK_EVENT_MEDIA_CHANGE | DISK_EVENT_EJECT_REQUEST;
-+	disk->events = DISK_EVENT_MEDIA_CHANGE | DISK_EVENT_EJECT_REQUEST
-+		| DISK_EVENT_FLAG_POLL | DISK_EVENT_FLAG_UEVENT;
- 
- 	blk_queue_rq_timeout(sdev->request_queue, SR_TIMEOUT);
- 
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 5f78edb..a3d5b1c 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -148,8 +148,15 @@ struct hd_struct {
- enum {
- 	DISK_EVENT_MEDIA_CHANGE			= 1 << 0, /* media changed */
- 	DISK_EVENT_EJECT_REQUEST		= 1 << 1, /* eject requested */
-+	/* Poll even if events_poll_msecs is unset */
-+	DISK_EVENT_FLAG_POLL			= 1 << 16,
-+	/* Forward events to udev */
-+	DISK_EVENT_FLAG_UEVENT			= 1 << 17,
- };
- 
-+#define DISK_EVENT_TYPES_MASK \
-+	(DISK_EVENT_MEDIA_CHANGE | DISK_EVENT_EJECT_REQUEST)
-+
- struct disk_part_tbl {
- 	struct rcu_head rcu_head;
- 	int len;
+diff --git a/drivers/block/swim.c b/drivers/block/swim.c
+index 3fa6fcc..67b5ec2 100644
+--- a/drivers/block/swim.c
++++ b/drivers/block/swim.c
+@@ -862,6 +862,7 @@ static int swim_floppy_init(struct swim_priv *swd)
+ 		swd->unit[drive].disk->first_minor = drive;
+ 		sprintf(swd->unit[drive].disk->disk_name, "fd%d", drive);
+ 		swd->unit[drive].disk->fops = &floppy_fops;
++		swd->unit[drive].disk->events = DISK_EVENT_MEDIA_CHANGE;
+ 		swd->unit[drive].disk->private_data = &swd->unit[drive];
+ 		set_capacity(swd->unit[drive].disk, 2880);
+ 		add_disk(swd->unit[drive].disk);
+diff --git a/drivers/block/swim3.c b/drivers/block/swim3.c
+index 1e2ae90d..cf42729 100644
+--- a/drivers/block/swim3.c
++++ b/drivers/block/swim3.c
+@@ -1216,6 +1216,7 @@ static int swim3_attach(struct macio_dev *mdev,
+ 	disk->first_minor = floppy_count;
+ 	disk->fops = &floppy_fops;
+ 	disk->private_data = fs;
++	disk->events = DISK_EVENT_MEDIA_CHANGE;
+ 	disk->flags |= GENHD_FL_REMOVABLE;
+ 	sprintf(disk->disk_name, "fd%d", floppy_count);
+ 	set_capacity(disk, 2880);
+diff --git a/drivers/block/xsysace.c b/drivers/block/xsysace.c
+index 87ccef4..8d29950 100644
+--- a/drivers/block/xsysace.c
++++ b/drivers/block/xsysace.c
+@@ -1032,6 +1032,7 @@ static int ace_setup(struct ace_device *ace)
+ 	ace->gd->major = ace_major;
+ 	ace->gd->first_minor = ace->id * ACE_NUM_MINORS;
+ 	ace->gd->fops = &ace_fops;
++	ace->gd->events = DISK_EVENT_MEDIA_CHANGE;
+ 	ace->gd->queue = ace->queue;
+ 	ace->gd->private_data = ace;
+ 	snprintf(ace->gd->disk_name, 32, "xs%c", ace->id + 'a');
+diff --git a/drivers/cdrom/gdrom.c b/drivers/cdrom/gdrom.c
+index f8b7345..5cf3bad 100644
+--- a/drivers/cdrom/gdrom.c
++++ b/drivers/cdrom/gdrom.c
+@@ -786,6 +786,7 @@ static int probe_gdrom(struct platform_device *devptr)
+ 		goto probe_fail_cdrom_register;
+ 	}
+ 	gd.disk->fops = &gdrom_bdops;
++	gd.disk->events = DISK_EVENT_MEDIA_CHANGE;
+ 	/* latch on to the interrupt */
+ 	err = gdrom_set_interrupt_handlers();
+ 	if (err)
 -- 
 2.20.1
 
