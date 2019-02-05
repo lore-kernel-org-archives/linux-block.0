@@ -2,25 +2,25 @@ Return-Path: <SRS0=MQDU=QM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D05C282CB
-	for <linux-block@archiver.kernel.org>; Tue,  5 Feb 2019 11:38:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 526B8C282D7
+	for <linux-block@archiver.kernel.org>; Tue,  5 Feb 2019 11:38:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4700F2083B
-	for <linux-block@archiver.kernel.org>; Tue,  5 Feb 2019 11:38:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C0912175B
+	for <linux-block@archiver.kernel.org>; Tue,  5 Feb 2019 11:38:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727783AbfBELiI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Feb 2019 06:38:08 -0500
-Received: from smtp2.provo.novell.com ([137.65.250.81]:54289 "EHLO
+        id S1728950AbfBELiS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Feb 2019 06:38:18 -0500
+Received: from smtp2.provo.novell.com ([137.65.250.81]:58697 "EHLO
         smtp2.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727039AbfBELiI (ORCPT
+        with ESMTP id S1728933AbfBELiS (ORCPT
         <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
-        Tue, 5 Feb 2019 06:38:08 -0500
+        Tue, 5 Feb 2019 06:38:18 -0500
 Received: from apollon.suse.de.de (prv-ext-foundry1int.gns.novell.com [137.65.251.240])
-        by smtp2.provo.novell.com with ESMTP (TLS encrypted); Tue, 05 Feb 2019 04:38:03 -0700
+        by smtp2.provo.novell.com with ESMTP (TLS encrypted); Tue, 05 Feb 2019 04:38:08 -0700
 From:   Martin Wilck <mwilck@suse.com>
 To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
         Hannes Reinecke <hare@suse.de>
@@ -30,10 +30,12 @@ Cc:     Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <Bart.VanAssche@sandisk.com>,
         Martin Wilck <mwilck@suse.com>, linux-block@vger.kernel.org,
         linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org
-Subject: [PATCH v2 0/5] block: skip media change event handling if unsupported
-Date:   Tue,  5 Feb 2019 12:37:36 +0100
-Message-Id: <20190205113741.11267-1-mwilck@suse.com>
+Subject: [PATCH v2 2/5] block: disk_events: introduce event flags
+Date:   Tue,  5 Feb 2019 12:37:38 +0100
+Message-Id: <20190205113741.11267-3-mwilck@suse.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190205113741.11267-1-mwilck@suse.com>
+References: <20190205113741.11267-1-mwilck@suse.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -41,79 +43,125 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The block layer currently can't distinguish between gendisk devices that
-don't support any media change events, and devices that do support them,
-but only for internal purposes. Therefore the check_events() function is
-called e.g. for ordinary non-removable SCSI disks. While these devices are
-not polled under normal conditions, the check_events function is called on
-certain synchronization points, in particular while the device is opened,
-closed, or probed.
+Currently, an empty disk->events field tells the block layer not to forward
+media change events to user space. This was done in
+commit 7c88a168da80 ("block: don't propagate unlisted DISK_EVENTs to userland")
+in order to avoid events from "fringe" drivers to be forwarded to user
+space. By doing so, the block layer lost the information which events were
+supported by a particular block device, and most importantly, whether or
+not a given device supports media change events at all.
 
-Under unfavorable conditions this can lead to processes being stalled on a
-blocked queue: a close() schedules a work item for check_events() which
-gets blocked in the work queue, and subsequent open() tries to flush the
-workqueue. The flush then stalls too, as long as the the blocked work item
-can't finish.
+Prepare for not interpreting the "events" field this way in the future any
+more. This is done by adding two flag bits that can be set to have the
+device treated like one that has the "events" field set to a non-zero value
+before. This applies only to the sd and sr drivers, which are changed to
+set the new flags.
 
-In principle, the gendisk->events field would make it very easy for the
-block layer to check only for events actually supported by the device.
-Currently this is impossible, because there are lots of drivers which don't
-set gendisk->events although they implement the check_events() method.
-This was introduced in commit 7c88a168da80 ("block: don't propagate unlisted 
-DISK_EVENTs to userland") and follow-up patches because uevent generation by
-these drivers was found to possibly generate infinite event loops between
-kernel and user space. A side effect of these patches was that the
-distinction between such devices and devices supporting no events at all
-was lost.
+The new flags are DISK_EVENT_FLAG_POLL to enforce polling of the device for
+synchronous events, and DISK_EVENT_FLAG_UEVENT to tell the blocklayer to
+generate udev events from kernel events. They can easily be fit in the int
+reserved for event bits.
 
-This series implements a slightly different approach to event handling and
-uevent suppression. The drivers are changed to set the events field again.
-Whether or not uevents should be generated is controlled by a separate flag
-bit, which is only set by the drivers that are known to generate proper
-uevents (sd and sr). Once this is done, devices that don't support any
-media change events can be clearly identified, and the whole events
-checking code path can be skipped. This simplifies handling of
-non-removable SCSI disks.
+This patch doesn't change behavior.
 
-I have tested this with removable and non-removable SCSI disks, SCSI cdrom,
-and ide-cd.
+Signed-off-by: Martin Wilck <mwilck@suse.com>
+---
+ block/genhd.c         | 15 ++++++++++-----
+ drivers/scsi/sd.c     |  3 ++-
+ drivers/scsi/sr.c     |  3 ++-
+ include/linux/genhd.h |  7 +++++++
+ 4 files changed, 21 insertions(+), 7 deletions(-)
 
-This patch set targets the same problem as Hannes' late submission "sd:
-skip non-removable devices in sd_check_events()".
-
-Changes in v2:
-
-Removed the unused async_events field from struct gendisk.
-This simplifies the event handling logic a bit.
-
-Martin Wilck (5):
-  block: genhd: remove async_events field
-  block: disk_events: introduce event flags
-  Revert "ide: unexport DISK_EVENT_MEDIA_CHANGE for ide-gd and ide-cd"
-  Revert "block: unexport DISK_EVENT_MEDIA_CHANGE for legacy/fringe
-    drivers"
-  block: check_events: don't bother with events if unsupported
-
- block/genhd.c              | 51 ++++++++++++++++++++++----------------
- drivers/block/amiflop.c    |  1 +
- drivers/block/ataflop.c    |  1 +
- drivers/block/floppy.c     |  1 +
- drivers/block/paride/pcd.c |  1 +
- drivers/block/paride/pd.c  |  1 +
- drivers/block/paride/pf.c  |  1 +
- drivers/block/pktcdvd.c    |  1 -
- drivers/block/swim.c       |  1 +
- drivers/block/swim3.c      |  1 +
- drivers/block/xsysace.c    |  1 +
- drivers/cdrom/gdrom.c      |  1 +
- drivers/ide/ide-cd.c       |  1 +
- drivers/ide/ide-cd_ioctl.c |  5 ++--
- drivers/ide/ide-gd.c       |  6 +++--
- drivers/scsi/sd.c          |  3 ++-
- drivers/scsi/sr.c          |  3 ++-
- include/linux/genhd.h      |  8 +++++-
- 18 files changed, 59 insertions(+), 29 deletions(-)
-
+diff --git a/block/genhd.c b/block/genhd.c
+index 714459f..7f5a370 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1630,7 +1630,7 @@ static unsigned long disk_events_poll_jiffies(struct gendisk *disk)
+ 	 */
+ 	if (ev->poll_msecs >= 0)
+ 		intv_msecs = ev->poll_msecs;
+-	else if (disk->events)
++	else if (disk->events & DISK_EVENT_FLAG_POLL)
+ 		intv_msecs = disk_events_dfl_poll_msecs;
+ 
+ 	return msecs_to_jiffies(intv_msecs);
+@@ -1840,11 +1840,13 @@ static void disk_check_events(struct disk_events *ev,
+ 
+ 	/*
+ 	 * Tell userland about new events.  Only the events listed in
+-	 * @disk->events are reported.  Unlisted events are processed the
+-	 * same internally but never get reported to userland.
++	 * @disk->events are reported, and only if DISK_EVENT_FLAG_UEVENT
++	 * is set. Otherwise, events are processed internally but never
++	 * get reported to userland.
+ 	 */
+ 	for (i = 0; i < ARRAY_SIZE(disk_uevents); i++)
+-		if (events & disk->events & (1 << i))
++		if (events & disk->events & (1 << i) &&
++		    disk->events & DISK_EVENT_FLAG_UEVENT)
+ 			envp[nr_events++] = disk_uevents[i];
+ 
+ 	if (nr_events)
+@@ -1882,7 +1884,10 @@ static ssize_t disk_events_show(struct device *dev,
+ {
+ 	struct gendisk *disk = dev_to_disk(dev);
+ 
+-	return __disk_events_show(disk->events, buf);
++	if (!(disk->events & DISK_EVENT_FLAG_UEVENT))
++		return 0;
++
++	return __disk_events_show(disk->events & DISK_EVENT_TYPES_MASK, buf);
+ }
+ 
+ static ssize_t disk_events_async_show(struct device *dev,
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index b2da8a0..83e736e 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -3262,7 +3262,8 @@ static void sd_probe_async(void *data, async_cookie_t cookie)
+ 	gd->flags = GENHD_FL_EXT_DEVT;
+ 	if (sdp->removable) {
+ 		gd->flags |= GENHD_FL_REMOVABLE;
+-		gd->events |= DISK_EVENT_MEDIA_CHANGE;
++		gd->events |= DISK_EVENT_MEDIA_CHANGE |
++			DISK_EVENT_FLAG_POLL | DISK_EVENT_FLAG_UEVENT;
+ 	}
+ 
+ 	blk_pm_runtime_init(sdp->request_queue, dev);
+diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
+index 38ddbbf..3571651 100644
+--- a/drivers/scsi/sr.c
++++ b/drivers/scsi/sr.c
+@@ -716,7 +716,8 @@ static int sr_probe(struct device *dev)
+ 	sprintf(disk->disk_name, "sr%d", minor);
+ 	disk->fops = &sr_bdops;
+ 	disk->flags = GENHD_FL_CD | GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE;
+-	disk->events = DISK_EVENT_MEDIA_CHANGE | DISK_EVENT_EJECT_REQUEST;
++	disk->events = DISK_EVENT_MEDIA_CHANGE | DISK_EVENT_EJECT_REQUEST
++		| DISK_EVENT_FLAG_POLL | DISK_EVENT_FLAG_UEVENT;
+ 
+ 	blk_queue_rq_timeout(sdev->request_queue, SR_TIMEOUT);
+ 
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 5f78edb..a3d5b1c 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -148,8 +148,15 @@ struct hd_struct {
+ enum {
+ 	DISK_EVENT_MEDIA_CHANGE			= 1 << 0, /* media changed */
+ 	DISK_EVENT_EJECT_REQUEST		= 1 << 1, /* eject requested */
++	/* Poll even if events_poll_msecs is unset */
++	DISK_EVENT_FLAG_POLL			= 1 << 16,
++	/* Forward events to udev */
++	DISK_EVENT_FLAG_UEVENT			= 1 << 17,
+ };
+ 
++#define DISK_EVENT_TYPES_MASK \
++	(DISK_EVENT_MEDIA_CHANGE | DISK_EVENT_EJECT_REQUEST)
++
+ struct disk_part_tbl {
+ 	struct rcu_head rcu_head;
+ 	int len;
 -- 
 2.20.1
 
