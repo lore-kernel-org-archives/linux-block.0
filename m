@@ -2,146 +2,115 @@ Return-Path: <SRS0=MQDU=QM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C1ACC282CC
-	for <linux-block@archiver.kernel.org>; Tue,  5 Feb 2019 11:50:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2534FC282CC
+	for <linux-block@archiver.kernel.org>; Tue,  5 Feb 2019 13:24:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 743A82080D
-	for <linux-block@archiver.kernel.org>; Tue,  5 Feb 2019 11:50:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F02A92073D
+	for <linux-block@archiver.kernel.org>; Tue,  5 Feb 2019 13:24:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728213AbfBELuv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Feb 2019 06:50:51 -0500
-Received: from mx2.suse.de ([195.135.220.15]:38094 "EHLO mx1.suse.de"
+        id S1729377AbfBENYd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Feb 2019 08:24:33 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:36972 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726622AbfBELuv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 5 Feb 2019 06:50:51 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id EAFCFAF20;
-        Tue,  5 Feb 2019 11:50:48 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 4F44D1E3FED; Tue,  5 Feb 2019 12:50:48 +0100 (CET)
-Date:   Tue, 5 Feb 2019 12:50:48 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
-        Keith Busch <keith.busch@intel.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "jack@suse.com" <jack@suse.com>, "tytso@mit.edu" <tytso@mit.edu>,
-        "prakash.v@samsung.com" <prakash.v@samsung.com>,
-        Jens Axboe <axboe@fb.com>
-Subject: Re: [PATCH v2 0/4] Write-hint for FS journal
-Message-ID: <20190205115048.GC3872@quack2.suse.cz>
-References: <CGME20190109153328epcas2p4643cbdc7a2182b47893a2bcaa0778e17@epcas2p4.samsung.com>
- <1547047861-7271-1-git-send-email-joshi.k@samsung.com>
- <20190125162353.GA11210@localhost.localdomain>
- <20190128124709.GB27972@quack2.suse.cz>
- <20190128232423.GD15302@localhost.localdomain>
- <20190129100702.GA29981@quack2.suse.cz>
- <20190130001349.GT6173@dastard>
- <0ab2f0e1-27f2-7ab4-1772-f96c1430ea3b@samsung.com>
+        id S1726276AbfBENYd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 5 Feb 2019 08:24:33 -0500
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id BBC4D76E2761F58CA833;
+        Tue,  5 Feb 2019 21:24:30 +0800 (CST)
+Received: from [127.0.0.1] (10.202.227.238) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.408.0; Tue, 5 Feb 2019
+ 21:24:21 +0800
+Subject: Re: Question on handling managed IRQs when hotplugging CPUs
+To:     Hannes Reinecke <hare@suse.de>,
+        Thomas Gleixner <tglx@linutronix.de>
+References: <f6f6e031-8b79-439d-c2af-8d3e76f30710@huawei.com>
+ <20190129154433.GF15302@localhost.localdomain>
+ <757902fc-a9ea-090b-7853-89944a0ce1b5@huawei.com>
+ <20190129172059.GC17132@localhost.localdomain>
+ <3fe63dab-0791-f476-69c4-9866b70e8520@huawei.com>
+ <alpine.DEB.2.21.1901301338170.5537@nanos.tec.linutronix.de>
+ <86d5028d-44ab-3696-f7fe-828d7655faa9@huawei.com>
+ <745609be-b215-dd2d-c31f-0bd84572f49f@suse.de>
+ <alpine.DEB.2.21.1902012255550.8200@nanos.tec.linutronix.de>
+ <d93ff049-e96d-36ce-7e58-ec97cbb27ed0@suse.de>
+CC:     Keith Busch <keith.busch@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "Marc Zyngier" <marc.zyngier@arm.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "Peter Zijlstra" <peterz@infradead.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Linuxarm <linuxarm@huawei.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Hannes Reinecke <hare@suse.com>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   John Garry <john.garry@huawei.com>
+Message-ID: <42d149c5-0380-c357-8811-81015159ac04@huawei.com>
+Date:   Tue, 5 Feb 2019 13:24:11 +0000
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0ab2f0e1-27f2-7ab4-1772-f96c1430ea3b@samsung.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <d93ff049-e96d-36ce-7e58-ec97cbb27ed0@suse.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.227.238]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 30-01-19 19:24:39, Kanchan Joshi wrote:
-> 
-> On Wednesday 30 January 2019 05:43 AM, Dave Chinner wrote:
-> > On Tue, Jan 29, 2019 at 11:07:02AM +0100, Jan Kara wrote:
-> > > On Mon 28-01-19 16:24:24, Keith Busch wrote:
-> > > > On Mon, Jan 28, 2019 at 04:47:09AM -0800, Jan Kara wrote:
-> > > > > On Fri 25-01-19 09:23:53, Keith Busch wrote:
-> > > > > > On Wed, Jan 09, 2019 at 09:00:57PM +0530, Kanchan Joshi wrote:
-> > > > > > > Towards supporing write-hints/streams for filesystem journal.
-> > > > > > > Here is the v1 patch for background -
-> > > > > > > https://marc.info/?l=linux-fsdevel&m=154444637519020&w=2
-> > > > > > > Changes since v1:
-> > > > > > > - introduce four more hints for in-kernel use, as recommended by Dave chinner
-> > > > > > >    & Jens axboe. This isolates kernel-mode hints from user-mode ones.
-> > > > > > 
-> > > > > > The nvme driver disables streams if the controller doesn't support
-> > > > > > BLK_MAX_WRITE_HINT number of streams, so this series breaks the feature
-> > > > > > for controllers that only support up to 4.
-> > > > > 
-> > > > > Right. Do you know if there are such controllers? Or are you just afraid
-> > > > > that there could be?
-> > > > 
-> > > > I've asked around, and the concensus I received is all currently support
-> > > > at least 8, but they couldn't say if that would be true for potential
-> > > > lower budget products. Can we implement a reasonable fallback to use
-> > > > what's available?
-> > > 
-> > > OK, thanks for input. So probably we should just map kernel stream IDs to 0
-> > > if the device doesn't support them. But that probably means we need to
-> > > propagate number of available streams up from NVME into the block layer so
-> > > that this can be handled reasonably seamlessly. Jens, Kanchan?
-> > 
-> > Yeah, that's basically what I said we needed to do when this was
-> > last discussed. i.e. that the block layer needed to know how many
-> > streams the hardware had and map the 4 "kernel internal" hints
-> > appropriately to what he device supports.
-> > 
-> > e.g. if the device only supports 4 hints, then it needs to map the
-> > kernel hints either to zero. If it supports less than 8 streams,
-> > then they need otbe mapped into the hints above index 5. If there
-> > are N streams, then they need to be mapped to the hints {N-3,N}
-> > 
-> > And, to top it all off, there needs to be guards so that if we want
-> > to grow the userspace hints to more than 4 hints, they don't crash
-> > into ranges the kernel is already reserving because of limited
-> > device range support.
-> > 
-> > Nothing is ever simple....
-> > 
-> Thanks all for feedback.
-> user-hints, when they reach to kernel via fcntl path, are sanity-checked
-> (rw_hint_valid function).
-> Currently streams are enabled when nvme driver is made to run with "streams
-> =1" option, while stream users always pass some write-hint, without
-> bothering whether streams (and how many of those) are operational or not.
-> This keeps configuration simple for stream users. Second, block layer does
-> not translate write-hint to stream-number, rather it is done inside nvme
-> driver. I suppose I should keep both these properties intact.
-> And considering all the suggestions, this is the plan for V3 -
-> 
-> [In block layer]
-> 1. Introduce one macro "KERN_WRITE_HINT_MIN" which will take the value
-> "user_hint_cnt + 1".
-> FS code will use this value (onwards) to define their own streams.
-> 
-> 2. Introduce another macro "BLK_MAX_KERNEL_WRITE_HINTS" which will be set to
-> 4 for now.
-> 
-> [In nvme driver]
-> 1. Continue working as before if device supports just 4 streams. All these
-> streams are used by user-hints, and kernel-hints are translated to 0.
-> 
-> 2. If device supports any more than 4 streams, those will be mapped to serve
-> kernel-hints, starting from KERN_WRITE_HINT_MIN onwards.
-> For example, if device has 6 streams, four streams (numbers = 1,2,3,4) will
-> be used to serve user-hints and two streams ( numbers = 65535, 65534) will
-> be used to serve first two kernel hints. Other kernel-hints get mapped to 0.
-> OTOH, if device has 10 streams, first four kernel-hints will be mapped to
-> non-zero values (65535 to 65532) and anything else would get turned to 0.
+On 04/02/2019 07:12, Hannes Reinecke wrote:
+> On 2/1/19 10:57 PM, Thomas Gleixner wrote:
+>> On Fri, 1 Feb 2019, Hannes Reinecke wrote:
+>>> Thing is, if we have _managed_ CPU hotplug (ie if the hardware
+>>> provides some
+>>> means of quiescing the CPU before hotplug) then the whole thing is
+>>> trivial;
+>>> disable SQ and wait for all outstanding commands to complete.
+>>> Then trivially all requests are completed and the issue is resolved.
+>>> Even with todays infrastructure.
+>>>
+>>> And I'm not sure if we can handle surprise CPU hotplug at all, given
+>>> all the
+>>> possible race conditions.
+>>> But then I might be wrong.
+>>
+>> The kernel would completely fall apart when a CPU would vanish by
+>> surprise,
+>> i.e. uncontrolled by the kernel. Then the SCSI driver exploding would be
+>> the least of our problems.
+>>
+> Hehe. As I thought.
 
-Well, I'm not sure if the mapping should happen in the NVME driver. In
-future, there will be potentially more drivers supporting write hints and
-we probably don't want each of them to replicate the mapping behavior. So
-IMO the mapping should rather belong to the block layer...
+Hi Hannes,
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+>
+> So, as the user then has to wait for the system to declars 'ready for
+> CPU remove', why can't we just disable the SQ and wait for all I/O to
+> complete?
+> We can make it more fine-grained by just waiting on all outstanding I/O
+> on that SQ to complete, but waiting for all I/O should be good as an
+> initial try.
+> With that we wouldn't need to fiddle with driver internals, and could
+> make it pretty generic.
+
+I don't fully understand this idea - specifically, at which layer would 
+we be waiting for all the IO to complete?
+
+> And we could always add more detailed logic if the driver has the means
+> for doing so.
+>
+
+Thanks,
+John
+
+> Cheers,
+>
+> Hannes
+
+
