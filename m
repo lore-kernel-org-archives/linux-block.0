@@ -2,126 +2,117 @@ Return-Path: <SRS0=fg2o=QN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDC38C169C4
-	for <linux-block@archiver.kernel.org>; Wed,  6 Feb 2019 13:34:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E982DC169C4
+	for <linux-block@archiver.kernel.org>; Wed,  6 Feb 2019 13:41:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B223D20B1F
-	for <linux-block@archiver.kernel.org>; Wed,  6 Feb 2019 13:34:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8D4420B1F
+	for <linux-block@archiver.kernel.org>; Wed,  6 Feb 2019 13:41:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="2Qsg1ERD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729527AbfBFNel (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Feb 2019 08:34:41 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:44368 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727350AbfBFNek (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 6 Feb 2019 08:34:40 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x16DTlxj183689
-        for <linux-block@vger.kernel.org>; Wed, 6 Feb 2019 08:34:39 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2qfxsp6h1j-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 06 Feb 2019 08:34:39 -0500
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <bblock@linux.ibm.com>;
-        Wed, 6 Feb 2019 13:34:37 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 6 Feb 2019 13:34:34 -0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x16DYXml1769828
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Wed, 6 Feb 2019 13:34:33 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F001D4C04E;
-        Wed,  6 Feb 2019 13:34:32 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D871D4C040;
-        Wed,  6 Feb 2019 13:34:32 +0000 (GMT)
-Received: from t480-pf1aa2c2 (unknown [9.152.212.148])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed,  6 Feb 2019 13:34:32 +0000 (GMT)
-Received: from bblock by t480-pf1aa2c2 with local (Exim 4.91)
-        (envelope-from <bblock@linux.ibm.com>)
-        id 1grNLU-0006JD-FE; Wed, 06 Feb 2019 14:34:32 +0100
-Date:   Wed, 6 Feb 2019 14:34:32 +0100
-From:   Benjamin Block <bblock@linux.ibm.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Keith Busch <keith.busch@intel.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Linuxarm <linuxarm@huawei.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Hannes Reinecke <hare@suse.com>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: Question on handling managed IRQs when hotplugging CPUs
-References: <alpine.DEB.2.21.1901301338170.5537@nanos.tec.linutronix.de>
- <86d5028d-44ab-3696-f7fe-828d7655faa9@huawei.com>
- <745609be-b215-dd2d-c31f-0bd84572f49f@suse.de>
- <alpine.DEB.2.21.1902012255550.8200@nanos.tec.linutronix.de>
- <d93ff049-e96d-36ce-7e58-ec97cbb27ed0@suse.de>
- <42d149c5-0380-c357-8811-81015159ac04@huawei.com>
- <20190205145244.GB28023@localhost.localdomain>
- <d4a04c13-b7db-84df-b1d3-90022905c084@huawei.com>
- <20190205182325.GA3302@lst.de>
- <3413b0b1-cb3f-3b09-106d-89cf8be30178@huawei.com>
+        id S1730548AbfBFNlE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Feb 2019 08:41:04 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:41233 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727262AbfBFNlE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Feb 2019 08:41:04 -0500
+Received: by mail-pg1-f193.google.com with SMTP id m1so2898048pgq.8
+        for <linux-block@vger.kernel.org>; Wed, 06 Feb 2019 05:41:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=cHfn0jY7aIzvbK2BJ7kPV6nGwOUL2bvT6pl6qTPl9iM=;
+        b=2Qsg1ERDhllSank5OeXngcjrmmjNNDL/nQtfPWTXNxiK8/1bFwZCtytKp8NCWaSBo4
+         Wi9o3I9bJsUqFA74qaBwBXVf/mvNpspSKBubpAL2nHgf4hGcqMhwlRJ37FDcRlPeiws0
+         gaZ6BsSIKVOWrDu512Md6FYaS/KS5GwQeh7OJUNsB6VcYDGdUrTkiQB5fAF9hG7oPoXL
+         Ryk4iKnJQNa/4BLr7GHvu2fQMF1sDeIcGdAtQoz5zVRr1LJVSHxT/es0tvv1c9nlaJxp
+         mkpdwJVrPIZeXGesIUkezqvKSGL+Tz4oVEGn8WI+FRISh1UIRMuJygk4WcJCTHqfCZj3
+         yUXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=cHfn0jY7aIzvbK2BJ7kPV6nGwOUL2bvT6pl6qTPl9iM=;
+        b=Os89P+8VWdZDDybKI6zgql5aKacHvqEzDR8nhu1xld2XK6GC1Kt87N9y94DdRHRFTD
+         uoHDi6til/SOlawC/kSFZvXBW+zvJP93V9SbcHhkjxx/8YWtuEKVPm45hWCI9Qg0DIb6
+         pG0Jr6nOZR4BzsSPgcvaxMOUd94Ixnb1CloiGNSEuZ/SN3tJYqP78ZBHgvsdIzbgxJBY
+         kfqgGFFZbuDOzPlj87mMqsVHBOcoIuy+1zgKMLiPYaqKkztRBhArWB7SSBPxD4MwMIxQ
+         l5ZKWWCVBYAHjg95v44yR2l0M2l4AR39QRtLJzP6jz4MqMwhXeTdZBIQklol2Z1CbHwI
+         Aofg==
+X-Gm-Message-State: AHQUAub8jqm3Cb5q8SR7YfdYnNRn1zj+jW6LhJjh79O9p3EWSQXzaOSf
+        stQxfM5Ok0q6E3JcF9lwQLxmtg==
+X-Google-Smtp-Source: AHgI3IYtStd3/KmHkTxiHcYLBUGKu3jii6dcSlcbc0E76FPssBB+HC0HFAOkv5q+7Xr0oML2TkzuyQ==
+X-Received: by 2002:a63:6cc8:: with SMTP id h191mr9366740pgc.366.1549460463668;
+        Wed, 06 Feb 2019 05:41:03 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id o13sm8503714pfk.57.2019.02.06.05.41.01
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 06 Feb 2019 05:41:02 -0800 (PST)
+Subject: Re: [PATCH 13/18] io_uring: add file set registration
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Jann Horn <jannh@google.com>, linux-aio@kvack.org,
+        linux-block@vger.kernel.org, Linux API <linux-api@vger.kernel.org>,
+        hch@lst.de, jmoyer@redhat.com, avi@scylladb.com,
+        linux-fsdevel@vger.kernel.org
+References: <20190129192702.3605-1-axboe@kernel.dk>
+ <20190129192702.3605-14-axboe@kernel.dk>
+ <CAG48ez2kLWUEambWesQQaeVn_u=PtjuMeDUc49yamhYspfd7Sg@mail.gmail.com>
+ <20190204025612.GR2217@ZenIV.linux.org.uk>
+ <785c6db4-095e-65b0-ded5-72b41af5174e@kernel.dk>
+ <2b2137ed-8107-f7b6-f0ca-202dcfb87c97@kernel.dk>
+ <40b27e78-9ee8-1395-feb3-a73aac87c9a7@kernel.dk>
+ <20190206005638.GU2217@ZenIV.linux.org.uk>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8f124de2-d6da-d656-25e4-b4d9e58f880e@kernel.dk>
+Date:   Wed, 6 Feb 2019 06:41:00 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <3413b0b1-cb3f-3b09-106d-89cf8be30178@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-TM-AS-GCONF: 00
-x-cbid: 19020613-4275-0000-0000-0000030C2A7D
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19020613-4276-0000-0000-0000381A2FF2
-Message-Id: <20190206133432.GB14106@t480-pf1aa2c2>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-02-06_08:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=908 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1902060107
+In-Reply-To: <20190206005638.GU2217@ZenIV.linux.org.uk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 06, 2019 at 09:21:40AM +0000, John Garry wrote:
-> On 05/02/2019 18:23, Christoph Hellwig wrote:
-> > On Tue, Feb 05, 2019 at 03:09:28PM +0000, John Garry wrote:
-> > > For SCSI devices, unfortunately not all IO sent to the HW originates from
-> > > blk-mq or any other single entity.
-> > 
-> > Where else would SCSI I/O originate from?
+On 2/5/19 5:56 PM, Al Viro wrote:
+> On Tue, Feb 05, 2019 at 12:08:25PM -0700, Jens Axboe wrote:
+>> Proof is in the pudding, here's the main commit introducing io_uring
+>> and now wiring it up to the AF_UNIX garbage collection:
+>>
+>> http://git.kernel.dk/cgit/linux-block/commit/?h=io_uring&id=158e6f42b67d0abe9ee84886b96ca8c4b3d3dfd5
+>>
+>> How does that look?
 > 
-> Please note that I was referring to other management IO, like SAS SMP, TMFs,
-> and other proprietary commands which the driver may generate for the HBA -
-> https://marc.info/?l=linux-scsi&m=154831889001973&w=2 discusses some of them
-> also.
-> 
+> In a word - wrong.  Some theory: garbage collector assumes that there is
+> a subset of file references such that
+> 	* for all files with such references there's an associated unix_sock.
+> 	* all such references are stored in SCM_RIGHTS datagrams that can be
+> found by the garbage collector (currently: for data-bearing AF_UNIX sockets -
+> queued SCM_RIGHTS datagrams, for listeners - SCM_RIGHTS datagrams sent via
+> yet-to-be-accepted connections).
+> 	* there is an efficient way to count those references for given file
+> (->inflight of the corresponding unix_sock).
+> 	* removal of those references would render the graph acyclic.
+> 	* file can _NOT_ be subject to syscalls unless there are references
+> to it outside of that subset.
 
-Especially the TMFs send via SCSI EH are a bit of a pain I guess,
-because they are entirely managed by the device drivers, but depending
-on the device driver they might not even qualify for the problem Hannes
-is seeing.
+IOW, we cannot use fget() for registering files, and we still need fget/fput
+in the fast path to retain safe use of the file. If I'm understanding you
+correctly?
+
+Just trying to ensure that I understand what you're saying here, as it seems
+to refer to the file registration part, not the main patch (which did get
+reworked, though).
 
 -- 
-With Best Regards, Benjamin Block      /      Linux on IBM Z Kernel Development
-IBM Systems & Technology Group   /  IBM Deutschland Research & Development GmbH
-Vorsitz. AufsR.: Matthias Hartmann       /      Geschäftsführung: Dirk Wittkopp
-Sitz der Gesellschaft: Böblingen / Registergericht: AmtsG Stuttgart, HRB 243294
+Jens Axboe
 
