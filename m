@@ -2,138 +2,122 @@ Return-Path: <SRS0=fg2o=QN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDDF8C169C4
-	for <linux-block@archiver.kernel.org>; Wed,  6 Feb 2019 14:08:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D2B1C169C4
+	for <linux-block@archiver.kernel.org>; Wed,  6 Feb 2019 14:37:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8092E20844
-	for <linux-block@archiver.kernel.org>; Wed,  6 Feb 2019 14:08:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yv0u9ylQ"
+	by mail.kernel.org (Postfix) with ESMTP id 1013E218A4
+	for <linux-block@archiver.kernel.org>; Wed,  6 Feb 2019 14:37:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729713AbfBFOIk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Feb 2019 09:08:40 -0500
-Received: from mail-vs1-f68.google.com ([209.85.217.68]:41541 "EHLO
-        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727929AbfBFOIk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Feb 2019 09:08:40 -0500
-Received: by mail-vs1-f68.google.com with SMTP id t17so4426857vsc.8
-        for <linux-block@vger.kernel.org>; Wed, 06 Feb 2019 06:08:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6YBjFiMLRTQ7DSf7AbeupSlp9C/FWJH3ulyojuoZqqw=;
-        b=Yv0u9ylQIM66vfFo2XLM9Z03NOQVK43CQZ7hUfAQwVIwd0WKJWo/KrQQR1mzPxT6t0
-         Ogz4qQ99Er7hMMUf/hsAuJoEJOlYwuXw/1GRgh8XKFSlFpNgDizgJ4HO5FW7ZpEnDq2a
-         i3cMIjJ6pv38Z3c6arDDty4lHEA5yqDZVbBtuRCYbdyFVe3JLUSnEZh1UbvLwx7nJ10q
-         08nlQZU8Id4B6z1VbKSmgx2mrI8+UOufI4IacPF94ZPgJxn3HaEMhmKRbzra1V3ERaNt
-         uxs6INC+8EddbEBPnq04HkcJonxOrWkct3382N0RIJEm6M00L+tb2n7mQHJGIogCGuu1
-         mW/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6YBjFiMLRTQ7DSf7AbeupSlp9C/FWJH3ulyojuoZqqw=;
-        b=eaOaQuonodARh2lXrx3UEwcLI/sRK6uv1Yw19uu2pa1rz0Iuenp5YihFLlm88Qze10
-         0yDrLngzEMQc0iH134z6HwAbsvJshUHWg5Oty03ZvLuHYc8nqAKhNdD9C5Ucz8lqdQO/
-         QMEr4BZR5330CFuq7p7+k6/wLR4Q8px2ybF+n+Yuf8mQ9kwUv+9QLOqfovTmgUHZ4Wkx
-         D1tAnbxJYBJ8d+49dzZsYR1VrpbWYJl5OZt6GAUahZf3u2eZbcmQKmtfcwJ/YKhYNfLu
-         WZ70TDydU7Z8qqx7JKb3Kf1dGp/L7SxhjIiiuzI9AZEh1bhs88eXlZfeoF0EPzHTMKzG
-         sHXA==
-X-Gm-Message-State: AHQUAuYgvm6o3zN0zhiQd1PzDUSTLm28XhwExH5JguzFJqmVcGsmn7t1
-        +11A+0vtCrZl3LL8Anso7nO0DA/sJ4KTvs05vMTwBg==
-X-Google-Smtp-Source: AHgI3IbwUJbuedJmf0eg7inBRNsXpg+2LtPQx+h0x81vCU92EUThEHfBcmF2cw27/FCUO6S41dRN4xidyUAlewQ0uBM=
-X-Received: by 2002:a67:b245:: with SMTP id s5mr4225927vsh.200.1549462119679;
- Wed, 06 Feb 2019 06:08:39 -0800 (PST)
+        id S1727868AbfBFOhr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Feb 2019 09:37:47 -0500
+Received: from www262.sakura.ne.jp ([202.181.97.72]:21215 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726914AbfBFOhr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Feb 2019 09:37:47 -0500
+Received: from fsav402.sakura.ne.jp (fsav402.sakura.ne.jp [133.242.250.101])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id x16Eba96029941;
+        Wed, 6 Feb 2019 23:37:36 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav402.sakura.ne.jp (F-Secure/fsigk_smtp/530/fsav402.sakura.ne.jp);
+ Wed, 06 Feb 2019 23:37:35 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/530/fsav402.sakura.ne.jp)
+Received: from [192.168.1.8] (softbank126126163036.bbtec.net [126.126.163.36])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id x16EbYln029932
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NO);
+        Wed, 6 Feb 2019 23:37:35 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: [PATCH v3] fs: ratelimit __find_get_block_slow() failure message.
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Dmitry Vyukov <dvyukov@google.com>, Jan Kara <jack@suse.cz>
+References: <1548078577-10353-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <d4f41aae-ec33-e2fe-05a9-3ed15269ca68@i-love.sakura.ne.jp>
+Date:   Wed, 6 Feb 2019 23:37:35 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-References: <1549385523-20521-1-git-send-email-zhays@lexmark.com>
- <CAPDyKFofTMGXfp1sKgv1Z6OSEyM9e78B-+3qZ=a6s3s2aNWybg@mail.gmail.com> <6956f0d7-0dea-b100-06ec-54148f043710@intel.com>
-In-Reply-To: <6956f0d7-0dea-b100-06ec-54148f043710@intel.com>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Wed, 6 Feb 2019 15:08:02 +0100
-Message-ID: <CAPDyKFrC4QjfrarvjRYCKYqoi7A1QOz_fQLnrOFocXARTP1kWA@mail.gmail.com>
-Subject: Re: [PATCH] mmc: block: handle complete_work on separate workqueue
-To:     Adrian Hunter <adrian.hunter@intel.com>
-Cc:     Zachary Hays <zhays@lexmark.com>, Christoph Hellwig <hch@lst.de>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1548078577-10353-1-git-send-email-penguin-kernel@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 6 Feb 2019 at 13:43, Adrian Hunter <adrian.hunter@intel.com> wrote:
->
-> On 6/02/19 2:00 PM, Ulf Hansson wrote:
-> > + Adrian, Linus
-> >
-> > On Tue, 5 Feb 2019 at 17:53, Zachary Hays <zhays@lexmark.com> wrote:
-> >>
-> >> The kblockd workqueue is created with the WQ_MEM_RECLAIM flag set.
-> >> This generates a rescuer thread for that queue that will trigger when
-> >> the CPU is under heavy load and collect the uncompleted work.
-> >>
-> >> In the case of mmc, this creates the possibility of a deadlock as
-> >> other blk-mq work is also run on the same queue. For example:
-> >>
-> >> - worker 0 claims the mmc host
-> >> - worker 1 attempts to claim the host
-> >> - worker 0 schedules complete_work to release the host
-> >> - rescuer thread is triggered after time-out and collects the dangling
-> >>   work
-> >> - rescuer thread attempts to complete the work in order starting with
-> >>   claim host
-> >> - the task to release host is now blocked by a task to claim it and
-> >>   will never be called
-> >>
-> >
-> > Adrian, I need your help to understand more of this. The above
-> > description doesn't add up to me.
-> >
-> > In principle, already when "worker 1 attempts to claim the host" as
-> > described above, it should succeed and should *not* need to wait for
-> > the host to be released. Right?
->
-> If it is the same queue, then yes.  Although in that case there is only 1
-> work for the hw queue so there cannot be another worker.  There could be
-> another attempt to send a request directly, but that will not block - if the
-> host controller is busy, BLK_STS_RESOURCE will be returned from ->queue_rq().
->
+Hello, Jens. Can we apply this patch?
 
-Right.
+On 2019/01/21 22:49, Tetsuo Handa wrote:
+> When something let __find_get_block_slow() hit all_mapped path, it calls
+> printk() for 100+ times per a second. But there is no need to print same
+> message with such high frequency; it is just asking for stall warning, or
+> at least bloating log files.
+> 
+>   [  399.866302][T15342] __find_get_block_slow() failed. block=1, b_blocknr=8
+>   [  399.873324][T15342] b_state=0x00000029, b_size=512
+>   [  399.878403][T15342] device loop0 blocksize: 4096
+>   [  399.883296][T15342] __find_get_block_slow() failed. block=1, b_blocknr=8
+>   [  399.890400][T15342] b_state=0x00000029, b_size=512
+>   [  399.895595][T15342] device loop0 blocksize: 4096
+>   [  399.900556][T15342] __find_get_block_slow() failed. block=1, b_blocknr=8
+>   [  399.907471][T15342] b_state=0x00000029, b_size=512
+>   [  399.912506][T15342] device loop0 blocksize: 4096
+> 
+> This patch reduces frequency to up to once per a second, in addition to
+> concatenating three lines into one.
+> 
+>   [  399.866302][T15342] __find_get_block_slow() failed. block=1, b_blocknr=8, b_state=0x00000029, b_size=512, device loop0 blocksize: 4096
+> 
+> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> Reviewed-by: Jan Kara <jack@suse.cz>
+> Cc: Dmitry Vyukov <dvyukov@google.com>
+> ---
+>  fs/buffer.c | 19 ++++++++++---------
+>  1 file changed, 10 insertions(+), 9 deletions(-)
+> 
+> diff --git a/fs/buffer.c b/fs/buffer.c
+> index 52d024b..48318fb 100644
+> --- a/fs/buffer.c
+> +++ b/fs/buffer.c
+> @@ -200,6 +200,7 @@ void end_buffer_write_sync(struct buffer_head *bh, int uptodate)
+>  	struct buffer_head *head;
+>  	struct page *page;
+>  	int all_mapped = 1;
+> +	static DEFINE_RATELIMIT_STATE(last_warned, HZ, 1);
+>  
+>  	index = block >> (PAGE_SHIFT - bd_inode->i_blkbits);
+>  	page = find_get_page_flags(bd_mapping, index, FGP_ACCESSED);
+> @@ -227,15 +228,15 @@ void end_buffer_write_sync(struct buffer_head *bh, int uptodate)
+>  	 * file io on the block device and getblk.  It gets dealt with
+>  	 * elsewhere, don't buffer_error if we had some unmapped buffers
+>  	 */
+> -	if (all_mapped) {
+> -		printk("__find_get_block_slow() failed. "
+> -			"block=%llu, b_blocknr=%llu\n",
+> -			(unsigned long long)block,
+> -			(unsigned long long)bh->b_blocknr);
+> -		printk("b_state=0x%08lx, b_size=%zu\n",
+> -			bh->b_state, bh->b_size);
+> -		printk("device %pg blocksize: %d\n", bdev,
+> -			1 << bd_inode->i_blkbits);
+> +	ratelimit_set_flags(&last_warned, RATELIMIT_MSG_ON_RELEASE);
+> +	if (all_mapped && __ratelimit(&last_warned)) {
+> +		printk("__find_get_block_slow() failed. block=%llu, "
+> +		       "b_blocknr=%llu, b_state=0x%08lx, b_size=%zu, "
+> +		       "device %pg blocksize: %d\n",
+> +		       (unsigned long long)block,
+> +		       (unsigned long long)bh->b_blocknr,
+> +		       bh->b_state, bh->b_size, bdev,
+> +		       1 << bd_inode->i_blkbits);
+>  	}
+>  out_unlock:
+>  	spin_unlock(&bd_mapping->private_lock);
+> 
 
-> >
-> > The hole point with the commit 6c0cedd1ef95 ("mmc: core: Introduce
-> > host claiming by context"), was to allow the mmc host to be
-> > re-claimable for blk I/O requests, no matter from what worker/thread
-> > the claim/release is done from.
-> >
-> > Is it not working as expected you think? What am I missing here?
->
-> I assumed we were talking about a situation where there are multiple
-> internal eMMC partitions each with their own disk and queue.  In that case,
-> a queue waits if there is another queue that is using the eMMC.
-
-Of course! I totally forgot about this case, that is most certainly
-what must be happening!
-
->
-> We should clarify whether that is the scenario we are looking at.  Zachary?
-
-Yes, please.
-
-Assuming this is the case, I would also prefer an updated changelog
-that describe this scenario.
-
-Adrian, thanks a lot for you help!
-
-[...]
-
-Kind regards
-Uffe
