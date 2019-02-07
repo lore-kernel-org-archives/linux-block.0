@@ -2,195 +2,119 @@ Return-Path: <SRS0=wMCK=QO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B64EDC282C2
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 09:23:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14CB1C282C2
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 10:45:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7DCE121904
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 09:23:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="JELjyQ3y"
+	by mail.kernel.org (Postfix) with ESMTP id DF20121872
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 10:45:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726642AbfBGJXA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Feb 2019 04:23:00 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:54056 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726448AbfBGJW7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Feb 2019 04:22:59 -0500
-Received: by mail-wm1-f68.google.com with SMTP id d15so5305229wmb.3
-        for <linux-block@vger.kernel.org>; Thu, 07 Feb 2019 01:22:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=j2scvD+tXKod9KY4Tp0JnlAlCLc3ovezukIRv7Om5mo=;
-        b=JELjyQ3ygXn/s8SjbpyX81WJTZIUy5t3dcGV9R0KpjPOPebai1Kb3uXFm9M7J288Bi
-         5myYBQghDsQxEWrX1QF5S9b+juRgxNitGU2pUeuh2QobDn74WeQVzK/CyBIs8uqg9QLK
-         Y/w+0oijH36NecNTi9j34Vx2MPXp+pdIc429w=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=j2scvD+tXKod9KY4Tp0JnlAlCLc3ovezukIRv7Om5mo=;
-        b=ERRmKnLXzLF5Qxg5tIHRnXic/q5KTvcxy0Moz580ZbpDj2ZPvyw/LHOG5PueS4vw83
-         bcqeCIrSaKu0X0MhqPvmtRIQHnkeNwxcsyGNvOz+5H9HTpXT55pVVlh91RY/8ZElZxeZ
-         fkvI73tuoqGsieAtBFtcxv6h4jXfI2zDrcgqDSO3flJNGyXWxhoDVSeZxK6TUkOFI7WC
-         kBZ/9C/xITKBbdT5rz2g+GFBggVJIfyR1pIQnCPeR3AKsBj8MoiB6ejxKUIIRWCuKzIe
-         2LXUVVYvwWhG9IoIvxUJG8sskC9gjQDwztd5k0jCK2ZwabV9Kz7q0thxEm+wPWb5wD6b
-         OMkA==
-X-Gm-Message-State: AHQUAuYHRvn7r+HnQEiQcCnun8s5GWjZ7BxGo2YkofsPOppgydo6Gg2R
-        82TI2GBM2hVJtqsSTnbQckAZ5Q==
-X-Google-Smtp-Source: AHgI3IbWsyfI3AJsk0KyazzNfxdlM7gofVperoV7s0J+N8oRhKsQsk9nxXGTm6qn309z8ijDtkvNYA==
-X-Received: by 2002:a1c:9692:: with SMTP id y140mr6689370wmd.67.1549531377015;
-        Thu, 07 Feb 2019 01:22:57 -0800 (PST)
-Received: from veci.piliscsaba.redhat.com (catv-212-96-48-140.catv.broadband.hu. [212.96.48.140])
-        by smtp.gmail.com with ESMTPSA id w14sm3731969wrt.95.2019.02.07.01.22.55
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 07 Feb 2019 01:22:56 -0800 (PST)
-Date:   Thu, 7 Feb 2019 10:22:53 +0100
-From:   Miklos Szeredi <miklos@szeredi.hu>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jann Horn <jannh@google.com>,
-        linux-aio@kvack.org, linux-block@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
-        jmoyer@redhat.com, avi@scylladb.com, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 13/18] io_uring: add file set registration
-Message-ID: <20190207092253.GD19821@veci.piliscsaba.redhat.com>
-References: <20190129192702.3605-1-axboe@kernel.dk>
- <20190129192702.3605-14-axboe@kernel.dk>
- <CAG48ez2kLWUEambWesQQaeVn_u=PtjuMeDUc49yamhYspfd7Sg@mail.gmail.com>
- <20190204025612.GR2217@ZenIV.linux.org.uk>
- <785c6db4-095e-65b0-ded5-72b41af5174e@kernel.dk>
- <2b2137ed-8107-f7b6-f0ca-202dcfb87c97@kernel.dk>
- <40b27e78-9ee8-1395-feb3-a73aac87c9a7@kernel.dk>
- <20190206005638.GU2217@ZenIV.linux.org.uk>
- <8f124de2-d6da-d656-25e4-b4d9e58f880e@kernel.dk>
- <20190207040058.GW2217@ZenIV.linux.org.uk>
+        id S1726750AbfBGKpe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Feb 2019 05:45:34 -0500
+Received: from smtp3-g21.free.fr ([212.27.42.3]:48484 "EHLO smtp3-g21.free.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726732AbfBGKpe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 7 Feb 2019 05:45:34 -0500
+Received: from [192.168.108.68] (unknown [213.36.7.13])
+        (Authenticated sender: marc.w.gonzalez)
+        by smtp3-g21.free.fr (Postfix) with ESMTPSA id 89E2D13F8CD;
+        Thu,  7 Feb 2019 11:44:34 +0100 (CET)
+Subject: Re: dd hangs when reading large partitions
+From:   Marc Gonzalez <marc.w.gonzalez@free.fr>
+To:     linux-mm <linux-mm@kvack.org>,
+        linux-block <linux-block@vger.kernel.org>
+Cc:     Jianchao Wang <jianchao.w.wang@oracle.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        fsdevel <linux-fsdevel@vger.kernel.org>,
+        SCSI <linux-scsi@vger.kernel.org>,
+        Joao Pinto <jpinto@synopsys.com>,
+        Jeffrey Hugo <jhugo@codeaurora.org>,
+        Evan Green <evgreen@chromium.org>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Stephen Boyd <swboyd@chromium.org>,
+        Tomas Winkler <tomas.winkler@intel.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Martin Petersen <martin.petersen@oracle.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
+        Roman Gushchin <guro@fb.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@suse.com>
+References: <f792574c-e083-b218-13b4-c89be6566015@free.fr>
+ <398a6e83-d482-6e72-5806-6d5bbe8bfdd9@oracle.com>
+ <ef734b94-e72b-771f-350b-08d8054a58f3@kernel.dk>
+ <20190119095601.GA7440@infradead.org>
+ <07b2df5d-e1fe-9523-7c11-f3058a966f8a@free.fr>
+ <985b340c-623f-6df2-66bd-d9f4003189ea@free.fr>
+ <b3910158-83d6-21fe-1606-33e88912404a@oracle.com>
+ <d082bdee-62e5-d470-b63b-196c0fe3b9fb@free.fr>
+ <5132e41b-cb1a-5b81-4a72-37d0f9ea4bb9@oracle.com>
+ <7bd8b010-bf0c-ad64-f927-2d2187a18d0b@free.fr>
+ <0cfe1ed2-41e1-66a4-8d98-ebc0d9645d21@free.fr>
+Message-ID: <d91e8342-4672-d51d-1bde-74e910e5a959@free.fr>
+Date:   Thu, 7 Feb 2019 11:44:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190207040058.GW2217@ZenIV.linux.org.uk>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <0cfe1ed2-41e1-66a4-8d98-ebc0d9645d21@free.fr>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 07, 2019 at 04:00:59AM +0000, Al Viro wrote:
++ linux-mm
 
-> So in theory it would be possible to have
-> 	* thread A: sendmsg() has SCM_RIGHTS created and populated,
-> complete with file refcount and ->inflight increments implied,
-> at which point it gets preempted and loses the timeslice.
-> 	* thread B: gets to run and removes all references
-> from descriptor table it shares with thread A.
-> 	* on another CPU we have garbage collector triggered;
-> it determines the set of potentially unreachable unix_sock and
-> everything in our SCM_RIGHTS _is_ in that set, now that no
-> other references remain.
-> 	* on the first CPU, thread A regains the timeslice
-> and inserts its SCM_RIGHTS into queue.  And it does contain
-> references to sockets from the candidate set of running
-> garbage collector, confusing the hell out of it.
+Summarizing the issue for linux-mm readers:
 
-Reminds me: long time ago there was a bug report, and based on that I found a
-bug in MSG_PEEK handling (not confirmed to have fixed the reported bug).  This
-fix, although pretty simple, got lost somehow.  While unix gc code is in your
-head, can you please review and I'll resend through davem?
+If I read data from a storage device larger than my system's RAM, the system freezes
+once dd has read more data than available RAM.
 
-Thanks,
-Miklos
----
+# dd if=/dev/sde of=/dev/null bs=1M & while true; do echo m > /proc/sysrq-trigger; echo; echo; sleep 1; done
+https://pastebin.ubuntu.com/p/HXzdqDZH4W/
 
-From: Miklos Szeredi <mszeredi@redhat.com>
-Subject: af_unix: fix garbage collect vs. MSG_PEEK
+A few seconds before the system hangs, Mem-Info shows:
 
-Gc assumes that in-flight sockets that don't have an external ref can't
-gain one while unix_gc_lock is held.  That is true because
-unix_notinflight() will be called before detaching fds, which takes
-unix_gc_lock.
+[   90.986784] Node 0 active_anon:7060kB inactive_anon:13644kB active_file:0kB inactive_file:3797500kB [...]
 
-Only MSG_PEEK was somehow overlooked.  That one also clones the fds, also
-keeping them in the skb.  But through MSG_PEEK an external reference can
-definitely be gained without ever touching unix_gc_lock.
+=> 3797500kB is basically all of RAM.
 
-This patch adds unix_gc_barrier() that waits for a garbage collect run to
-finish (if there is one), before actually installing the peeked in-flight
-files to file descriptors.  This prevents problems from a pure in-flight
-socket having its buffers modified while the garbage collect is taking
-place.
+I tried to locate where "inactive_file" was being increased from, and saw two signatures:
 
-Signed-off-by: Miklos Szeredi <mszeredi@redhat.com>
-Cc: <stable@vger.kernel.org>
----
- include/net/af_unix.h |    1 +
- net/unix/af_unix.c    |   15 +++++++++++++--
- net/unix/garbage.c    |    6 ++++++
- 3 files changed, 20 insertions(+), 2 deletions(-)
+[  255.606019] __mod_node_page_state | __pagevec_lru_add_fn | pagevec_lru_move_fn | __lru_cache_add | lru_cache_add | add_to_page_cache_lru | mpage_readpages | blkdev_readpages | read_pages | __do_page_cache_readahead | ondemand_readahead | page_cache_sync_readahead
 
---- a/include/net/af_unix.h
-+++ b/include/net/af_unix.h
-@@ -12,6 +12,7 @@ void unix_inflight(struct user_struct *u
- void unix_notinflight(struct user_struct *user, struct file *fp);
- void unix_gc(void);
- void wait_for_unix_gc(void);
-+void unix_gc_barrier(void);
- struct sock *unix_get_socket(struct file *filp);
- struct sock *unix_peer_get(struct sock *sk);
- 
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -1547,6 +1547,17 @@ static int unix_attach_fds(struct scm_co
- 	return 0;
- }
- 
-+static void unix_peek_fds(struct scm_cookie *scm, struct sk_buff *skb)
-+{
-+	scm->fp = scm_fp_dup(UNIXCB(skb).fp);
-+	/*
-+	 * During garbage collection it is assumed that in-flight sockets don't
-+	 * get a new external reference.  So we need to wait until current run
-+	 * finishes.
-+	 */
-+	unix_gc_barrier();
-+}
-+
- static int unix_scm_to_skb(struct scm_cookie *scm, struct sk_buff *skb, bool send_fds)
- {
- 	int err = 0;
-@@ -2171,7 +2182,7 @@ static int unix_dgram_recvmsg(struct soc
- 		sk_peek_offset_fwd(sk, size);
- 
- 		if (UNIXCB(skb).fp)
--			scm.fp = scm_fp_dup(UNIXCB(skb).fp);
-+			unix_peek_fds(&scm, skb);
- 	}
- 	err = (flags & MSG_TRUNC) ? skb->len - skip : size;
- 
-@@ -2412,7 +2423,7 @@ static int unix_stream_read_generic(stru
- 			/* It is questionable, see note in unix_dgram_recvmsg.
- 			 */
- 			if (UNIXCB(skb).fp)
--				scm.fp = scm_fp_dup(UNIXCB(skb).fp);
-+				unix_peek_fds(&scm, skb);
- 
- 			sk_peek_offset_fwd(sk, chunk);
- 
---- a/net/unix/garbage.c
-+++ b/net/unix/garbage.c
-@@ -267,6 +267,12 @@ void wait_for_unix_gc(void)
- 	wait_event(unix_gc_wait, gc_in_progress == false);
- }
- 
-+void unix_gc_barrier(void)
-+{
-+	spin_lock(&unix_gc_lock);
-+	spin_unlock(&unix_gc_lock);
-+}
-+
- /* The external entry point: unix_gc() */
- void unix_gc(void)
- {
+[  255.637238] __mod_node_page_state | __pagevec_lru_add_fn | pagevec_lru_move_fn | __lru_cache_add | lru_cache_add | lru_cache_add_active_or_unevictable | __handle_mm_fault | handle_mm_fault | do_page_fault | do_translation_fault | do_mem_abort | el1_da
+
+Are these expected?
+
+NB: the system does not hang if I specify 'iflag=direct' to dd.
+
+According to the RCU watchdog:
+
+[  108.466240] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+[  108.466420] rcu:     1-...0: (130 ticks this GP) idle=79e/1/0x4000000000000000 softirq=2393/2523 fqs=2626 
+[  108.471436] rcu:     (detected by 4, t=5252 jiffies, g=133, q=85)
+[  108.480605] Task dump for CPU 1:
+[  108.486483] kworker/1:1H    R  running task        0   680      2 0x0000002a
+[  108.489977] Workqueue: kblockd blk_mq_run_work_fn
+[  108.496908] Call trace:
+[  108.501513]  __switch_to+0x174/0x1e0
+[  108.503757]  blk_mq_run_work_fn+0x28/0x40
+[  108.507589]  process_one_work+0x208/0x480
+[  108.511486]  worker_thread+0x48/0x460
+[  108.515480]  kthread+0x124/0x130
+[  108.519123]  ret_from_fork+0x10/0x1c
+
+Can anyone shed some light on what's going on?
+
+Regards.
