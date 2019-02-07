@@ -2,97 +2,118 @@ Return-Path: <SRS0=wMCK=QO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39066C282C2
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 13:11:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 966FFC282CC
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 13:31:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 01CD92190A
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 13:11:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6EB9620663
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 13:31:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726732AbfBGNLx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Feb 2019 08:11:53 -0500
-Received: from mx2.suse.de ([195.135.220.15]:45908 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726789AbfBGNLx (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 7 Feb 2019 08:11:53 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id A3C8FB124;
-        Thu,  7 Feb 2019 13:11:51 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     linux-bcache@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
-        stable@vger.kernel.org, Dave Chinner <david@fromorbit.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2] bcache: use (REQ_META|REQ_PRIO) to indicate bio for metadata
-Date:   Thu,  7 Feb 2019 21:11:44 +0800
-Message-Id: <20190207131144.3385-1-colyli@suse.de>
-X-Mailer: git-send-email 2.16.4
+        id S1727191AbfBGNbl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Feb 2019 08:31:41 -0500
+Received: from zeniv.linux.org.uk ([195.92.253.2]:36398 "EHLO
+        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726809AbfBGNbl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Feb 2019 08:31:41 -0500
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.91 #2 (Red Hat Linux))
+        id 1grjmB-0003mr-7o; Thu, 07 Feb 2019 13:31:35 +0000
+Date:   Thu, 7 Feb 2019 13:31:35 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Miklos Szeredi <miklos@szeredi.hu>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jann Horn <jannh@google.com>,
+        linux-aio@kvack.org, linux-block@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
+        jmoyer@redhat.com, avi@scylladb.com, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 13/18] io_uring: add file set registration
+Message-ID: <20190207133135.GZ2217@ZenIV.linux.org.uk>
+References: <20190129192702.3605-14-axboe@kernel.dk>
+ <CAG48ez2kLWUEambWesQQaeVn_u=PtjuMeDUc49yamhYspfd7Sg@mail.gmail.com>
+ <20190204025612.GR2217@ZenIV.linux.org.uk>
+ <785c6db4-095e-65b0-ded5-72b41af5174e@kernel.dk>
+ <2b2137ed-8107-f7b6-f0ca-202dcfb87c97@kernel.dk>
+ <40b27e78-9ee8-1395-feb3-a73aac87c9a7@kernel.dk>
+ <20190206005638.GU2217@ZenIV.linux.org.uk>
+ <8f124de2-d6da-d656-25e4-b4d9e58f880e@kernel.dk>
+ <20190207040058.GW2217@ZenIV.linux.org.uk>
+ <20190207092253.GD19821@veci.piliscsaba.redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190207092253.GD19821@veci.piliscsaba.redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In 'commit 752f66a75aba ("bcache: use REQ_PRIO to indicate bio for
-metadata")' REQ_META is replaced by REQ_PRIO to indicate metadata bio.
-This assumption is not always correct, e.g. XFS uses REQ_META to mark
-metadata bio other than REQ_PRIO. This is why Nix noticed that bcache
-does not cache metadata for XFS after the above commit.
+On Thu, Feb 07, 2019 at 10:22:53AM +0100, Miklos Szeredi wrote:
+> On Thu, Feb 07, 2019 at 04:00:59AM +0000, Al Viro wrote:
+> 
+> > So in theory it would be possible to have
+> > 	* thread A: sendmsg() has SCM_RIGHTS created and populated,
+> > complete with file refcount and ->inflight increments implied,
+> > at which point it gets preempted and loses the timeslice.
+> > 	* thread B: gets to run and removes all references
+> > from descriptor table it shares with thread A.
+> > 	* on another CPU we have garbage collector triggered;
+> > it determines the set of potentially unreachable unix_sock and
+> > everything in our SCM_RIGHTS _is_ in that set, now that no
+> > other references remain.
+> > 	* on the first CPU, thread A regains the timeslice
+> > and inserts its SCM_RIGHTS into queue.  And it does contain
+> > references to sockets from the candidate set of running
+> > garbage collector, confusing the hell out of it.
+> 
+> Reminds me: long time ago there was a bug report, and based on that I found a
+> bug in MSG_PEEK handling (not confirmed to have fixed the reported bug).  This
+> fix, although pretty simple, got lost somehow.  While unix gc code is in your
+> head, can you please review and I'll resend through davem?
 
-Thanks to Dave Chinner, he explains the difference between REQ_META and
-REQ_PRIO from view of file system developer. Here I quote part of his
-explanation from mailing list,
-   REQ_META is used for metadata. REQ_PRIO is used to communicate to
-   the lower layers that the submitter considers this IO to be more
-   important that non REQ_PRIO IO and so dispatch should be expedited.
+Umm...  I think the bug is real (something that looks like an eviction
+candidate, but actually is referenced from the reachable queue might
+get peeked via that queue, then have _its_ queue modified via new
+external reference, all between two passes over that queue, confusing the
+fuck out of unix_gc()), but I think the fix is an overkill...
 
-   IOWs, if the filesystem considers metadata IO to be more important
-   that user data IO, then it will use REQ_PRIO | REQ_META rather than
-   just REQ_META.
+Am I right assuming that this queue-modifying operation is accept(), removing
+an embryo unix_sock from the queue of listener and thus hiding SCM_RIGHTS in
+_its_ queue from scan_children()?
 
-Then it seems bios with REQ_META or REQ_PRIO should both be cached for
-performance optimation, because they are all probably low I/O latency
-demand by upper layer (e.g. file system).
+Let me think of it a bit, OK?  While we are at it, some questions from digging
+through the current net/unix/garbage.c:
+	1) is there any need for ->inflight to be atomic?  All accesses are under
+unix_gc_lock, after all...
+	2) pumping unix_gc on each sodding reference in SCM_RIGHTS (within
+unix_notinflight()/unix_inflight()) looks atrocious... wouldn't it be better to
+hold it over that loop?
+	3) unix_get_socket() probably ought to be static nowadays...
+	4) I wonder if in scan_inflight()/scan_children() we would be better
+off with explicit switch (by enum argument) instead of an indirect call.
+	5) do we really need UNIX_GC_MAYBE_CYCLE?  Looks like the only
+real use is in inc_inflight_move_tail(), and AFAICS it could bloody well
+have been
+	u->inflight++;
+	if (u->inflight == 1)	// just got from zero to non-zero
+		list_move_tail(&u->link, &gc_candidates);
+The logics there is "we'd found a reference to something that still was
+a candidate for eviction in a reachable SCM_RIGHTS, so it's actually
+reachable and needs to be scanned (and removed from the set of candidates);
+move to the end of list, so that the main loop gets around to it".
+If it *was* past the cursor in the list, there's no need to move it; if
+we got past it, it must've had zero ->inflight (or we would've removed
+it from the set back when we got past it).  Note that it's only called if
+UNIX_GC_CANDIDATE is set (i.e. if it's in the initial candidate set),
+so for this one ->inflight is guaranteed to mean the number of SCM_RIGHTS
+refs from outside of the current candidate set...
+	6) unix_get_socket() looks like it might benefit from another
+FMODE bit; not sure where it's best set, though - the obvious way would
+be SOCK_GC_CARES in sock->flags, set by e.g. unix_create1(), with
+sock_alloc_file() propagating it into file->f_mode.  Then unix_get_socket()
+would be able to bugger off with NULL for most of the references in
+SCM_RIGHTS, without looking into inode...
 
-So in this patch, when we want to decide whether to bypass the cache,
-REQ_META and REQ_PRIO are both checked. Then both metadata and
-high priority I/O requests will be handled properly.
-
-Reported-by: Nix <nix@esperi.org.uk>
-Signed-off-by: Coly Li <colyli@suse.de>
-Reviewed-by: Andre Noll <maan@tuebingen.mpg.de>
-Cc: stable@vger.kernel.org
-Cc: Dave Chinner <david@fromorbit.com>
-Cc: Christoph Hellwig <hch@lst.de>
----
- drivers/md/bcache/request.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index 3bf35914bb57..62bda90a38dc 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -395,7 +395,7 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
- 	 * unless the read-ahead request is for metadata (eg, for gfs2 or xfs).
- 	 */
- 	if (bio->bi_opf & (REQ_RAHEAD|REQ_BACKGROUND) &&
--	    !(bio->bi_opf & REQ_PRIO))
-+	    !(bio->bi_opf & (REQ_META|REQ_PRIO)))
- 		goto skip;
- 
- 	if (bio->bi_iter.bi_sector & (c->sb.block_size - 1) ||
-@@ -877,7 +877,7 @@ static int cached_dev_cache_miss(struct btree *b, struct search *s,
- 	}
- 
- 	if (!(bio->bi_opf & REQ_RAHEAD) &&
--	    !(bio->bi_opf & REQ_PRIO) &&
-+	    !(bio->bi_opf & (REQ_META|REQ_PRIO)) &&
- 	    s->iop.c->gc_stats.in_use < CUTOFF_CACHE_READA)
- 		reada = min_t(sector_t, dc->readahead >> 9,
- 			      get_capacity(bio->bi_disk) - bio_end_sector(bio));
--- 
-2.16.4
-
+Comments?  IIRC, you'd done the last serious round of rewriting unix_gc()
+and friends...
