@@ -2,90 +2,135 @@ Return-Path: <SRS0=wMCK=QO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30075C282DA
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 19:08:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5785CC282C2
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 19:56:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F25A62192C
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 19:08:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C8432173B
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 19:56:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="DiBorQqs"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="O4VTT0DA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726994AbfBGTIs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Feb 2019 14:08:48 -0500
-Received: from mail-it1-f196.google.com ([209.85.166.196]:36702 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726997AbfBGTIp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Feb 2019 14:08:45 -0500
-Received: by mail-it1-f196.google.com with SMTP id c9so2547460itj.1
-        for <linux-block@vger.kernel.org>; Thu, 07 Feb 2019 11:08:44 -0800 (PST)
+        id S1727262AbfBGTz7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Feb 2019 14:55:59 -0500
+Received: from mail-it1-f193.google.com ([209.85.166.193]:38046 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727211AbfBGTz7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Feb 2019 14:55:59 -0500
+Received: by mail-it1-f193.google.com with SMTP id z20so2937822itc.3
+        for <linux-block@vger.kernel.org>; Thu, 07 Feb 2019 11:55:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=b2nE7qIiS+6gxKEBlirTtJrR36SmIXPOF3JmCVu6kGM=;
-        b=DiBorQqs1Ek9B2OqqvtMvESlRjKQ87XsTHAmupJIwJeBoTaaY4XUDhJdXPHui3J0nJ
-         y1vqLYDV/E2HpfS/ASGdf5XMJ1fyUa+WM8MgyLPMy912wv0f2p9Ua/FFm4iC3o9DHObL
-         6ncxsuDKnYEt3i+uUx1YzJD5Y2QzpbZl0IjYY=
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=g2xc1nw84AxkDuPsydMqw35Ze0BbEN8TxzeA3ef4ACY=;
+        b=O4VTT0DA4VZmQjpugswmufrKF16aZoXxvclm0R+WcaOxU+2V4N28sW3xcgUvmO+ZW6
+         2wLoOIahw2fpyxf0v6Mr4bNVjfBAGcLDFJj/XNoKfcXn2b3RWoPxsATDKlAY/lQ2g7aF
+         YLZIcI0bHJzSj7yW/uQSj20bByw9OsYDvz4v/4DPtjCwG2gq+xAoxtdQvMJr0/rveuKJ
+         o5CBD1gnxiGTrO/0YVwTzQWYhLjTs9u6LcprrXzeQVagdmse/bHgKV0yYzznUmZw6UZo
+         JnP+LjDKDtJD/WiCvLJ+6pjQbF6WiO5htTv5Dd8KrrzWBHIcRZU9ypadMtGcFvQTXN7F
+         iEpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=b2nE7qIiS+6gxKEBlirTtJrR36SmIXPOF3JmCVu6kGM=;
-        b=MCyeXGck0XPpxf8xiZrbDNVXCXouDt6Z9eCvOmm0CWPjQcJXjbuWYRxdMmcWyNoAlu
-         uDEiz9PefZIxYSbfgcy2oUnrYz0ZhalugQeaJHrhitCN/bwn9XOvuzW7hxVAk71xH/Fm
-         wAVsv54jyUsaAk07QYmgTS/nUkku39ytY51PqNdGMO16cpNM1rz9zreNaPqY347pZLJ6
-         Ck4YnhtRSaFq2DEKylVoOrTBaDqtVwqRhHoR/dKShLcq+PS3vIzjhfOLnFLsJUGH1Ykm
-         Wm+jXGOrfKsjfXeEAvoJr+msTZF++2f35E6EIZLZSuGuAefNrE8r0XDpUIi92Q1k8EjL
-         ofnQ==
-X-Gm-Message-State: AHQUAuZOsy1MiR/rkLEvZPM2dEwGxmqho6jYS3BmYePG0QEK0Y9Ub+8T
-        aGTBgs1g8eJX91cqRXj3JswXO+aQ1qcgP/bGXt+qHA==
-X-Google-Smtp-Source: AHgI3IYcbNj07Gt2/Dteg7tD6dKOfVWRzUy4aoKp8OW1W7fzdXKQLCaP7OZy241J9MVtWb5uqOeHyu9pxF9veOw/6DI=
-X-Received: by 2002:a24:7907:: with SMTP id z7mr5044663itc.69.1549566524315;
- Thu, 07 Feb 2019 11:08:44 -0800 (PST)
-MIME-Version: 1.0
-References: <2b2137ed-8107-f7b6-f0ca-202dcfb87c97@kernel.dk>
- <40b27e78-9ee8-1395-feb3-a73aac87c9a7@kernel.dk> <20190206005638.GU2217@ZenIV.linux.org.uk>
- <8f124de2-d6da-d656-25e4-b4d9e58f880e@kernel.dk> <20190207040058.GW2217@ZenIV.linux.org.uk>
- <20190207092253.GD19821@veci.piliscsaba.redhat.com> <20190207133135.GZ2217@ZenIV.linux.org.uk>
- <CAJfpegutRaXZ8EC_Am_PomxwdmSoH7eQkxAewaLfUrMALjym-w@mail.gmail.com>
- <20190207152002.GC2217@ZenIV.linux.org.uk> <CAJfpegvayM_ZmuVetfYzpK+qqZJPkVzfQVRQ7OO98f1=reqiYA@mail.gmail.com>
- <20190207162605.GD2217@ZenIV.linux.org.uk>
-In-Reply-To: <20190207162605.GD2217@ZenIV.linux.org.uk>
-From:   Miklos Szeredi <miklos@szeredi.hu>
-Date:   Thu, 7 Feb 2019 20:08:32 +0100
-Message-ID: <CAJfpegvkC=jinq6_XW_88vMfsNOHDNOzTsKw1YJ2HBmqffX5JQ@mail.gmail.com>
-Subject: Re: [PATCH 13/18] io_uring: add file set registration
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jann Horn <jannh@google.com>,
-        linux-aio <linux-aio@kvack.org>, linux-block@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Jeff Moyer <jmoyer@redhat.com>,
-        Avi Kivity <avi@scylladb.com>, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=g2xc1nw84AxkDuPsydMqw35Ze0BbEN8TxzeA3ef4ACY=;
+        b=CViXqt9ncZYP1zdfnVBxD0WmAHCAJ3uTla+TgtHuO7y6fSqy5ny2JUhzsYuyVnYsiB
+         ayiVwQCx4FPDwAXY/iTYomBbvj7g549fhpv5IOMSqjHD9R+JP75rOjoemlpTafWX8BCp
+         i5X5hKO7KfwcCtCja02i7ouj7hCPpzsoDfYTaj2lQSpwi2c9yhRu7u0Dc+gcR2qnXzo9
+         H+VVhXHaHIzG41bKisk3rkhTuiSRIxBfSXnY2eBEtuXevf2vS0qI135TAnGPoRRCyp9W
+         EficPwUjZw+5eslGhatGud8mT6E0OeAXd+P3J0EwrqwpzwSWsn67MuipIFi0lWxO+ktA
+         IIEA==
+X-Gm-Message-State: AHQUAua6K6hLaRs2y3+GkCegyWSoDL9GjoqrYQPVqZbU0FPaTUWLHsRu
+        /dSwGR1Nqeeqn6Dm5t0EIh3G7JrNBKDICA==
+X-Google-Smtp-Source: AHgI3IZRQXyzMcuho4ieM4BiG4jWMYM7vATNoXw+DITmsnjQ1KKIJIafQK2JknuqfiY+bZCV/XHqMg==
+X-Received: by 2002:a02:9c6e:: with SMTP id h43mr4734032jal.46.1549569358351;
+        Thu, 07 Feb 2019 11:55:58 -0800 (PST)
+Received: from localhost.localdomain ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id y26sm5092782iob.16.2019.02.07.11.55.56
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 07 Feb 2019 11:55:57 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-aio@kvack.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org
+Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com, jannh@google.com,
+        viro@ZenIV.linux.org.uk
+Subject: [PATCHSET v12] io_uring IO interface
+Date:   Thu,  7 Feb 2019 12:55:34 -0700
+Message-Id: <20190207195552.22770-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 7, 2019 at 5:26 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
+Here's v12 of the io_uring project. This is the Al Viro special, where
+Al tries to beat into my head how UNIX fd passing will mess you up. I
+think we have all cases handled now. I've added the resulting test case
+into the liburing test/ directory.
 
-> I'm trying to put together some formal description of what's going on in there.
-> Another question, BTW: updates of user->unix_inflight would seem to be movable
-> into the callers of unix_{not,}inflight().  Any objections against lifting
-> it into unix_{attach,detach}_fds()?  We do, after all, have fp->count right
-> there, so what's the point incrementing/decrementing the sucker one-by-one?
-> _And_ we are checking it right there (in too_many_unix_fds() called from
-> unix_attach_fds())...
+Outside of that, various little cleanups and fixes, and a revert of
+using FOLL_ANON to map IO buffers. This makes it fail with huge pages,
+something that we can (and do want to) support. We're now back to just
+checking for a file backing in the vma.
 
-I see no issues with that.
+As far as I'm concerned, this project is ready to get staged for 5.1.
+Please do review carefully so we can fix any minor nits that might still
+exist.
 
-Also shouldn't the rlimit check be made against user->unix_inflight +
-fp->count?  Althought I'm not quite following if fp->user can end up
-different from current_user() and what should happen in that case...
+The liburing git repo has a full set of man pages for this, though they
+could probably still use a bit of polish. I'd also like to see a
+io_uring(7) man page to describe the overall design of the project,
+expect that in the not-so-distant future. You can clone that here:
 
-Thanks,
-Miklos
+git://git.kernel.dk/liburing
+
+Patches are against 5.0-rc5, and can also be found in my io_uring branch
+here:
+
+git://git.kernel.dk/linux-block io_uring
+
+Since v11:
+- Get rid of the need for storing a files_struct
+- Protect against release loop when UNIX fd passing is used
+- Retain kiocb state for EAGAIN async retry
+- Cleanup io memory accounting
+- Revert to using non-FOLL_ANON, as we do want to support huge pages
+- Fix uid leak
+- Address various review comments
+- Rebase on v5.0-rc5
+
+ Documentation/filesystems/vfs.txt      |    3 +
+ arch/x86/entry/syscalls/syscall_32.tbl |    3 +
+ arch/x86/entry/syscalls/syscall_64.tbl |    3 +
+ block/bio.c                            |   59 +-
+ fs/Makefile                            |    1 +
+ fs/block_dev.c                         |   19 +-
+ fs/file.c                              |   15 +-
+ fs/file_table.c                        |    9 +-
+ fs/gfs2/file.c                         |    2 +
+ fs/io_uring.c                          | 2741 ++++++++++++++++++++++++
+ fs/iomap.c                             |   48 +-
+ fs/xfs/xfs_file.c                      |    1 +
+ include/linux/bio.h                    |   14 +
+ include/linux/blk_types.h              |    1 +
+ include/linux/file.h                   |    2 +
+ include/linux/fs.h                     |   15 +-
+ include/linux/iomap.h                  |    1 +
+ include/linux/sched/user.h             |    2 +-
+ include/linux/syscalls.h               |    8 +
+ include/net/af_unix.h                  |    1 +
+ include/uapi/asm-generic/unistd.h      |    8 +-
+ include/uapi/linux/io_uring.h          |  142 ++
+ init/Kconfig                           |    9 +
+ kernel/sys_ni.c                        |    3 +
+ net/unix/af_unix.c                     |    2 +-
+ net/unix/garbage.c                     |    3 +
+ 26 files changed, 3073 insertions(+), 42 deletions(-)
+
+-- 
+Jens Axboe
+
+
