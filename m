@@ -2,109 +2,127 @@ Return-Path: <SRS0=wMCK=QO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E4DFC4151A
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 16:58:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF757C282C4
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 17:12:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 53CEE21920
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 16:58:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CE882173B
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 17:12:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pCq+d/Oz"
+	dkim=pass (1024-bit key) header.d=raithlin.onmicrosoft.com header.i=@raithlin.onmicrosoft.com header.b="cLJKbULx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726952AbfBGQ6o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Feb 2019 11:58:44 -0500
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:40733 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726821AbfBGQ6n (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Feb 2019 11:58:43 -0500
-Received: by mail-qt1-f193.google.com with SMTP id j36so624348qta.7
-        for <linux-block@vger.kernel.org>; Thu, 07 Feb 2019 08:58:43 -0800 (PST)
+        id S1726821AbfBGRM4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Feb 2019 12:12:56 -0500
+Received: from mail-eopbgr660102.outbound.protection.outlook.com ([40.107.66.102]:15808
+        "EHLO CAN01-QB1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726196AbfBGRM4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 7 Feb 2019 12:12:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=tGS+/06TiNKR/0AwMCNv7SAY8WZTxjjr0AM7Q3DY3TU=;
-        b=pCq+d/OzE2rcu87S060ZiT9VywBi/7zrdYWYUt/77vAUezP+LUWR+6XcW548Zi6JVp
-         XqOnUsOnQHAbnpQG/rC2PPCNN3nkw6EjhBfnizXTiigsLfgy6j43Z6245eqZ2JpjdSer
-         PYr3Ncgw9l0WbEu6UKJF8h0m7iaJxlhAGJBR8xa/6kbZiEeTAAH0mg+boL4ufZR+6VtO
-         f9tGwbAJ04Ai0KHWMQ8WxTjx7Tg7TU5XKt3XylrcgXUqM8t75j+fCEAE4tfJM2K8xPeW
-         zwqzcSrCcmbbuU/jbcnt4shohMALFFHZfpGnrtS2I49aVMBHpdSwgLH+mpjPguRY5kHg
-         IeuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition:user-agent;
-        bh=tGS+/06TiNKR/0AwMCNv7SAY8WZTxjjr0AM7Q3DY3TU=;
-        b=t90xqJmZSyJENv7Dey4TvrRdaPymZH8ogxN6bMOvDFtRgAZy36hXcPrn7dAMg1w4FJ
-         49/i0CsI3oN/bo1cUm4ukxB4DVbSw4TyipI50CPD0/GqAI3wHXPT48VhHaBhoQ75ZNul
-         lidLqNScpIfToPHrRuiyvm3VKMgGkStQAJJq7eEPKt8x46XAoR2Udg1Yf9H+xVP3NwLB
-         4LJg/WeRqrphkhYO5A9NW8o+Og/9JNlUiDByvB2+oEhxvceya07SwdVgNJajLyrbCVb1
-         wukYHm5uxrT3QpgQBCJvMTt1ecmVmu3WbVVY7VjBVJhL2ARtr47DzX72XRmWyLMvIFVy
-         HmDw==
-X-Gm-Message-State: AHQUAuacPn0KjCs7eIXf0CJATPqwU6cZhZOo23H3p2ly24VRR8JacwfB
-        uRm3096E6S4kDGd0GYs6c7I=
-X-Google-Smtp-Source: AHgI3IYReDMx8yRD4U0jQAqw1I13+HNF75bl7p5O0nxr05XORBdnRjgW383XmGKeF0wNxl3aCf2aig==
-X-Received: by 2002:aed:3b92:: with SMTP id r18mr4071282qte.7.1549558722552;
-        Thu, 07 Feb 2019 08:58:42 -0800 (PST)
-Received: from localhost (nat-pool-bos-t.redhat.com. [66.187.233.206])
-        by smtp.gmail.com with ESMTPSA id t10sm8492541qtt.63.2019.02.07.08.58.41
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 Feb 2019 08:58:41 -0800 (PST)
-Date:   Thu, 7 Feb 2019 11:58:40 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
-        Alasdair G Kergon <agk@redhat.com>,
-        Mikulas Patocka <mpatocka@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>
-Subject: [git pull] device mapper fixes for 5.0-rc6
-Message-ID: <20190207165840.GA62096@redhat.com>
+ d=raithlin.onmicrosoft.com; s=selector1-raithlin-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xhkX4kyquyhfAPut4hwfVsgQ6KPYouVvKuAcCGy6uVc=;
+ b=cLJKbULxmNaB2tSbn5gukDIHvXEQ6PAgBmuOAnlFxzMsxOyaLXlcclnIbLR37ZtMuFL61M7HHqLXs0UjMy0Wz3RGdOl3Q0H0UNJ+pWkcKDqvo6C/uATzDxId/naL41uTqVqdotGPsyW6hZnUhB7OlwSjKYBjnqoWMHidJhU4dzI=
+Received: from YQXPR0101MB0728.CANPRD01.PROD.OUTLOOK.COM (52.132.75.145) by
+ YQXPR0101MB1096.CANPRD01.PROD.OUTLOOK.COM (52.132.78.150) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1601.19; Thu, 7 Feb 2019 17:12:52 +0000
+Received: from YQXPR0101MB0728.CANPRD01.PROD.OUTLOOK.COM
+ ([fe80::3984:214:c472:b3d7]) by YQXPR0101MB0728.CANPRD01.PROD.OUTLOOK.COM
+ ([fe80::3984:214:c472:b3d7%2]) with mapi id 15.20.1601.016; Thu, 7 Feb 2019
+ 17:12:52 +0000
+From:   "Stephen  Bates" <sbates@raithlin.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        IDE/ATA development list <linux-ide@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Logan Gunthorpe <logang@deltatee.com>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+        "ast@kernel.org" <ast@kernel.org>
+Subject: [LSF/MM TOPIC] BPF for Block Devices
+Thread-Topic: [LSF/MM TOPIC] BPF for Block Devices
+Thread-Index: AQHUvwhboOvoMzJnxEqbA/z88fpLtw==
+Date:   Thu, 7 Feb 2019 17:12:52 +0000
+Message-ID: <40D2EB06-6BF2-4233-9196-7A26AC43C64E@raithlin.com>
+Accept-Language: en-CA, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Microsoft-MacOutlook/10.16.0.190203
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=sbates@raithlin.com; 
+x-originating-ip: [70.65.250.31]
+x-ms-publictraffictype: Email
+x-microsoft-exchange-diagnostics: 1;YQXPR0101MB1096;6:ob6azazJQUOEsRZD3gVCXkxJoaGEQ4oaRr29iFRgd6B4ZOSU36ZYy2D9SXgqQwxYRKcPdbO0P2tlm7MsB0A4Mu8OA2tzZxRFlVJnURmhAVM2Mg00q5hHHe75te2PRbmsdEtS44fBXBQ89TuOaW9oAYrC6tz17sNMggQ5U3yVQ5Tdcto2xwp8sM8iiauN7R3hfMq2TFA5mPCAgpYULUv+AZNIlAwm8OdbbOEu9ftQ/GBOgDUIk0vycXxydXXEA8CzpBWwNmawFQ3ZVtc54gbMJ+Uprbe5MY6i9OLaAjcenoPoLkUlqBsb6h5+sPHiRSDl/LdMafRMe27pOuY7bN2B1n3dt3zgRrc6IHpXVM/bqng4q3CYFu0mr5Gzxfz5P0mXIVMYpHEoN6Cdr2gpWBXk8RejtQI97PtWKB+uAzs7YsNFZNUR3NvS3e7bGXwhMHY8oUF8xC5KJ7cQSRw1g036Uw==;5:fBzSAnsB9JER0Ld1ad0Jx85+NrMF1y415qL7qHvyNrbHbPngSB5/T/SmCH2N0I4vPIuDWtr629xsEm6V+NwShrLViYYXhcORRiuFRm6Ze1hJKZc0wYZ4uX2usWhtIGoOP5JGoQXVXm6WRyVVySRGmeE6kcKOaATi5YdHc+YwTXlgKX26x65GiuNLr9TwhvocVM7HmgFnCMv0LPuN/IUd7Q==;7:vwtk3Hf5BLBrleCgmILXEE0McusnAynS3HfL78URuvS9XeKJj5Ik0rmKSxAylIQYUcUqeXQHxFm5P+LPFx4qoYBr87Eqp/gN9QkvtM2rQl8B9NGVMzd8jlEyng2D/GvfAmlYTjM69MAGjXB0eBAhyA==
+x-ms-office365-filtering-correlation-id: e627a5eb-b078-428f-a380-08d68d1f7e5b
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(7021145)(8989299)(4534185)(7022145)(4603075)(4627221)(201702281549075)(8990200)(7048125)(7024125)(7027125)(7023125)(5600110)(711020)(4605077)(2017052603328)(7153060)(7193020);SRVR:YQXPR0101MB1096;
+x-ms-traffictypediagnostic: YQXPR0101MB1096:
+x-microsoft-antispam-prvs: <YQXPR0101MB109684F0B1A4A96A46C95C29AA680@YQXPR0101MB1096.CANPRD01.PROD.OUTLOOK.COM>
+x-forefront-prvs: 0941B96580
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(346002)(136003)(376002)(39830400003)(396003)(199004)(189003)(53754006)(8676002)(476003)(186003)(486006)(7416002)(6506007)(102836004)(110136005)(54906003)(81166006)(81156014)(2616005)(58126008)(26005)(7736002)(86362001)(6306002)(36756003)(99286004)(105586002)(316002)(305945005)(106356001)(256004)(14444005)(68736007)(14454004)(4326008)(3846002)(966005)(6116002)(25786009)(2906002)(83716004)(71200400001)(71190400001)(2501003)(33656002)(6512007)(82746002)(508600001)(66066001)(97736004)(8936002)(53936002)(6436002)(6486002);DIR:OUT;SFP:1102;SCL:1;SRVR:YQXPR0101MB1096;H:YQXPR0101MB0728.CANPRD01.PROD.OUTLOOK.COM;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: raithlin.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: MxvFc1fOz11+eyBeylzZK2apkhk30AJza2Zu79KJh2GEgyZW4/iJloqAQDFkETtEVbLol4H3uoyd9/lhTkHqFzA95Hd24vK8wkZgbx4OoSvwQUpns6Id3a/uLRpY5ZbF7yK+cnOUcAH7ZlTS8Q99t8h9uXsrwnCYInkd9jrpmDBmAMvv6cB2ZS/iyRrQVC5tU4Do4lcIawimvQdpw1skcRqzVuuqCxg6dN1QYKrPdoklnnOU8aVzRDDzEWWd7JKm93/Uz8JzdJdgeNUW8L5j+jyy/jaNwpUU6yWRLoOfFgALU/xBfkjFYB9gUT2tTUQUYH23mz37dgJ3sXEBGiV7lf9TRAkNwIclArS/x5mAe2cORSE8F+FVgBgNZZ9BP94VtmhJ7uoup2gNKAj2tvGSb1i9C5i8chGCCel+AKSfk8s=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <80AE72F32E8C7642AD78708C57CA9358@CANPRD01.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.11.2 (2019-01-07)
+X-OriginatorOrg: raithlin.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e627a5eb-b078-428f-a380-08d68d1f7e5b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Feb 2019 17:12:52.1490
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 18519031-7ff4-4cbb-bbcb-c3252d330f4b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: YQXPR0101MB1096
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
-
-Both of these fixes address issues in changes merged for 5.0-rc4.
-
-The following changes since commit 8834f5600cf3c8db365e18a3d5cac2c2780c81e5:
-
-  Linux 5.0-rc5 (2019-02-03 13:48:04 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.0/dm-fixes-2
-
-for you to fetch changes up to fa8db4948f5224dae33a0e783e7dec682e145f88:
-
-  dm: don't use bio_trim() afterall (2019-02-06 17:24:37 -0500)
-
-Please pull, thanks.
-Mike
-
-----------------------------------------------------------------
-- Fix DM core's missing memory barrier before waitqueue_active() calls.
-
-- Fix DM core's clone_bio() to work when cloning a subset of a bio with
-  an integrity payload; bio_integrity_trim() wasn't getting called due
-  to bio_trim()'s early return.
-
-----------------------------------------------------------------
-Mike Snitzer (1):
-      dm: don't use bio_trim() afterall
-
-Mikulas Patocka (1):
-      dm: add memory barrier before waitqueue_active
-
- drivers/md/dm-rq.c | 2 +-
- drivers/md/dm.c    | 8 ++++++--
- 2 files changed, 7 insertions(+), 3 deletions(-)
+SGkgQWxsDQoNCj4gQSBCUEYgdHJhY2sgd2lsbCBqb2luIHRoZSBhbm51YWwgTFNGL01NIFN1bW1p
+dCB0aGlzIHllYXIhIFBsZWFzZSByZWFkIHRoZSB1cGRhdGVkIGRlc2NyaXB0aW9uIGFuZCBDRlAg
+aW5mb3JtYXRpb24gYmVsb3cuDQoNCldlbGwgaWYgd2UgYXJlIGFkZGluZyBCUEYgdG8gTFNGL01N
+IEkgaGF2ZSB0byBzdWJtaXQgYSByZXF1ZXN0IHRvIGRpc2N1c3MgQlBGIGZvciBibG9jayBkZXZp
+Y2VzIHBsZWFzZSENCg0KVGhlcmUgaGFzIGJlZW4gcXVpdGUgYSBiaXQgb2YgYWN0aXZpdHkgYXJv
+dW5kIHRoZSBjb25jZXB0IG9mIENvbXB1dGF0aW9uYWwgU3RvcmFnZSBpbiB0aGUgcGFzdCAxMiBt
+b250aHMuIFNOSUEgcmVjZW50bHkgZm9ybWVkIGEgVGVjaG5pY2FsIFdvcmtpbmcgR3JvdXAgKFRX
+RykgYW5kIGl0IGlzIGV4cGVjdGVkIHRoYXQgdGhpcyBUV0cgd2lsbCBiZSBtYWtpbmcgcHJvcG9z
+YWxzIHRvIHN0YW5kYXJkcyBsaWtlIE5WTSBFeHByZXNzIHRvIGFkZCBBUElzIGZvciBjb21wdXRh
+dGlvbiBlbGVtZW50cyB0aGF0IHJlc2lkZSBvbiBvciBuZWFyIGJsb2NrIGRldmljZXMuDQoNCldo
+aWxlIHNvbWUgb2YgdGhlc2UgQ29tcHV0YXRpb25hbCBTdG9yYWdlIGFjY2VsZXJhdG9ycyB3aWxs
+IHByb3ZpZGUgZml4ZWQgZnVuY3Rpb25zIChlLmcuIGEgUkFJRCwgZW5jcnlwdGlvbiBvciBjb21w
+cmVzc2lvbiksIG90aGVycyB3aWxsIGJlIG1vcmUgZmxleGlibGUuIFNvbWUgb2YgdGhlc2UgZmxl
+eGlibGUgYWNjZWxlcmF0b3JzIHdpbGwgYmUgY2FwYWJsZSBvZiBydW5uaW5nIEJQRiBjb2RlIG9u
+IHRoZW0gKHNvbWV0aGluZyB0aGF0IGNlcnRhaW4gTGludXggZHJpdmVycyBmb3IgU21hcnROSUNz
+IHN1cHBvcnQgdG9kYXkgWzFdKS4gSSB3b3VsZCBsaWtlIHRvIGRpc2N1c3Mgd2hhdCBzdWNoIGEg
+ZnJhbWV3b3JrIGNvdWxkIGxvb2sgbGlrZSBmb3IgdGhlIHN0b3JhZ2UgbGF5ZXIgYW5kIHRoZSBm
+aWxlLXN5c3RlbSBsYXllci4gSSdkIGxpa2UgdG8gZGlzY3VzcyBob3cgZGV2aWNlcyBjb3VsZCBh
+ZHZlcnRpc2UgdGhpcyBjYXBhYmlsaXR5IChhIHNwZWNpYWwgdHlwZSBvZiBOVk1lIG5hbWVzcGFj
+ZSBvciBTQ1NJIExVTiBwZXJoYXBzPykgYW5kIGhvdyB0aGUgQlBGIGVuZ2luZSBjb3VsZCBiZSBw
+cm9ncmFtbWVkIGFuZCB0aGVuIHVzZWQgYWdhaW5zdCBibG9jayBJTy4gSWRlYWxseSBJJ2QgbGlr
+ZSB0byBkaXNjdXNzIGRvaW5nIHRoaXMgaW4gYSB2ZW5kb3ItbmV1dHJhbCB3YXkgYW5kIGRldmVs
+b3AgaWRlYXMgSSBjYW4gdGFrZSBiYWNrIHRvIE5WTWUgYW5kIHRoZSBTTklBIFRXRyB0byBoZWxw
+IHNoYXBlIGhvdyB0aGVzZSBzdGFuZGFyZCBldm9sdmUuDQoNClRvIHByb3ZpZGUgYW4gZXhhbXBs
+ZSB1c2UtY2FzZSBvbmUgY291bGQgY29uc2lkZXIgYSBCUEYgY2FwYWJsZSBhY2NlbGVyYXRvciBi
+ZWluZyB1c2VkIHRvIHBlcmZvcm0gYSBmaWx0ZXJpbmcgZnVuY3Rpb24gYW5kIHRoZW4gdXNpbmcg
+cDJwZG1hIHRvIHNjYW4gZGF0YSBvbiBhIG51bWJlciBvZiBhZGphY2VudCBOVk1lIFNTRHMsIGZp
+bHRlcmluZyBzYWlkIGRhdGEgYW5kIHRoZW4gb25seSBwcm92aWRpbmcgZmlsdGVyLW1hdGNoZWQg
+TEJBcyB0byB0aGUgaG9zdC4gTWFueSBvdGhlciBwb3RlbnRpYWwgYXBwbGljYXRpb25zIGFwcGx5
+LiANCg0KQWxzbywgSSBhbSBpbnRlcmVzdGVkIGluIHRoZSAiVGhlIGVuZCBvZiB0aGUgREFYIEV4
+cGVyaW1lbnQiIHRvcGljIHByb3Bvc2VkIGJ5IERhbiBhbmQgdGhlICIgWm9uZWQgQmxvY2sgRGV2
+aWNlcyIgZnJvbSBNYXRpYXMgYW5kIERhbWllbi4NCg0KQ2hlZXJzDQogDQpTdGVwaGVuDQoNClsx
+XSBodHRwczovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC90b3J2YWxk
+cy9saW51eC5naXQvdHJlZS9kcml2ZXJzL25ldC9ldGhlcm5ldC9uZXRyb25vbWUvbmZwL2JwZi9v
+ZmZsb2FkLmM/aD12NS4wLXJjNQ0KIA0KICAgIA0KDQo=
