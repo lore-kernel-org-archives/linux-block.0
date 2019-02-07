@@ -6,167 +6,308 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F53C282CC
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 15:35:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0EF6C282C2
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 16:14:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 34A8F2077B
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 15:35:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95F162190A
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 16:14:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="v7wRl+42"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="txAGdZ05"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727003AbfBGPfL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Feb 2019 10:35:11 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:35581 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726171AbfBGPfK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Feb 2019 10:35:10 -0500
-Received: by mail-pl1-f195.google.com with SMTP id p8so99198plo.2
-        for <linux-block@vger.kernel.org>; Thu, 07 Feb 2019 07:35:10 -0800 (PST)
+        id S1726796AbfBGQOq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Feb 2019 11:14:46 -0500
+Received: from mail-it1-f195.google.com ([209.85.166.195]:36972 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726558AbfBGQOp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Feb 2019 11:14:45 -0500
+Received: by mail-it1-f195.google.com with SMTP id b5so1039403iti.2
+        for <linux-block@vger.kernel.org>; Thu, 07 Feb 2019 08:14:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=from:subject:to:cc:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=vfrucWasRxu8wXy8I+OWsttiphZ78Pxa89vVhirKE38=;
-        b=v7wRl+42sRdc90Xr3bwo4dY+lG2m08Os2TWzjMUluAmfAXx53mYWdZk9xDGg4xBjPe
-         phtFtdx9z2YZiuseCKwB6wNwa2/fqva9NyZ/nXkNtJdZkrPOwVxZqDxmIo7EDYTmH3Qq
-         EfZciWgD188NKkDlMzfjm1CPZHfI3m7W3YENaMgUJ9FH2VmtbKk6zehcK6lMjIi8mU50
-         03SS12dLlPCftTfVBHVWEfc7hYSNgDG9nxXsw24l4ylQkYFKvZ7/qiNoOuwpy+z58d7u
-         U51cvcKmneEnevbHXoLNmee3w5yw8/Cv/Yx5uRByM2pPq3Omm2b0gH8pr4GItIQ84SfK
-         aySg==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language;
+        bh=NL6PL5NFMTFRV4/xHaDMyQroxt1YRF0sagjPasq8Sm8=;
+        b=txAGdZ05xDNPW1k+uM1vaWqcsb9+9mk16VfBdNwPvc2F+lYJEWEnlApbnoWznjvf4o
+         zFOjioxHKZ7nG8XP2dnqaIW9XXBrrubxDIlXt2NZBoi6EkrnVKZmFWI0gazjymTmfUK1
+         v/Qc0gegnsJeWDkXDU9vbtulNudIn3s9dAMGonlOdTF3i2HrTPLDgxm6VjuDpoLhZ+K2
+         DzqmmeabpX+0SmgR/K5SwcqqI1LYOgVk5epqqRZpI3UWDr3uC09fDvkAyyfYcVQX56tB
+         V5Gbf2fkreb/J5tTb9aRuuXDwe1LFXPDszWh8o7mP3hVarjtehv4sehtvNjS9RNMliBy
+         HStg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=vfrucWasRxu8wXy8I+OWsttiphZ78Pxa89vVhirKE38=;
-        b=jOiI126cL3lbi1ZawibAnt4xqZtOHQ6cu1lb4ThjhFtpfMZQviXD968nxOUgCxKq1O
-         nhm9MkQ8mJocjvAhkKSUJur+Ck2vORXQBB79K1nLT0K245b8AhYUw1A7TY6ICtNCfa8B
-         OZWCA1/CkEzOX0Z2t5aNkVpjTQPlzbmOKx0mVY+wV5mrI5KsiEtKgafGNJdEuRAJHZpM
-         q8v+yPEbHoYU7qw0rqUr8n17NP/ilHyNKaV+ME8KdKT4ayoVbHERlMwydNA1Ml31K/s4
-         cJbm4lSHDTDdJy/ZOj2Ogn90UY7dm0l6RfyrOppJkx+3RnSlSqhnroO9dxcT9y11RP62
-         I+2g==
-X-Gm-Message-State: AHQUAuYsVW0eMFGqfS/hywRB0WJAC4zYvLO+AwyIcjRhBgMbhZQ0vqgz
-        qHPcRLNoQf6a/qmUherijsQcwA==
-X-Google-Smtp-Source: AHgI3IaVoMYYKhs8M27q2ZqhI+OfSw6Mv04jJk+GiXW7+JfxddzpCbSEEmMoiRDT4kfCHGPvz5JH/Q==
-X-Received: by 2002:a17:902:7c8a:: with SMTP id y10mr16635068pll.71.1549553710158;
-        Thu, 07 Feb 2019 07:35:10 -0800 (PST)
-Received: from ?IPv6:2600:380:7712:367d:9d7:f8fb:d4f4:2531? ([2600:380:7712:367d:9d7:f8fb:d4f4:2531])
-        by smtp.gmail.com with ESMTPSA id s2sm12302582pfa.167.2019.02.07.07.35.07
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language;
+        bh=NL6PL5NFMTFRV4/xHaDMyQroxt1YRF0sagjPasq8Sm8=;
+        b=YJEY7Fg1ET+HL/JfKGryJHOHaISCn6y7lSwXoShE3qyZ9loNiMDDjIGouigzJUxtv7
+         RLDh0T1C3Ao+R9ODbASjZXnHx3lKKhINK/xE5l0Qf1eG9T0BvJJLbP2aKToUEjAVjT2P
+         dPWUUb4ZZUORgQ5GsoC78brkl5mGyiPek/mZ8TXMlO7VsUiUO9/jUWn5N5AIPudkYS0s
+         +EXsQfQG4SK66lmgLK2UmIUbbHHgWqVZimbRLzsiVeDAYb12NBk4iH7+Qffq4Gk2YkQ7
+         y6IrA326DXhzYejI6QA9Jjyrv2yeKtULLbUPP5g6Cu8MOHBTvdNpdIDIhDK2PJhuLVA0
+         FoBg==
+X-Gm-Message-State: AHQUAubGRd+KpOdMPIQjLY4hTTt3HtTeH2yvCSpF+rznjBBhGfXZ/YBD
+        Fa3ujkHw/TUgw+Wb3Q2UHRd4mg==
+X-Google-Smtp-Source: AHgI3IZyM9SAUrEwj5t3NgvX/kiNj/d1z8ZsXKoHnLwL4/Fp05zp/jJbHGPK5hrl4GfAVjSZwiSWwA==
+X-Received: by 2002:a24:214a:: with SMTP id e71mr5922672ita.60.1549556084212;
+        Thu, 07 Feb 2019 08:14:44 -0800 (PST)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id k1sm4103095iob.2.2019.02.07.08.14.42
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 Feb 2019 07:35:09 -0800 (PST)
+        Thu, 07 Feb 2019 08:14:43 -0800 (PST)
+Subject: Re: [PATCH 13/18] io_uring: add file set registration
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Jann Horn <jannh@google.com>, linux-aio@kvack.org,
+        linux-block@vger.kernel.org, Linux API <linux-api@vger.kernel.org>,
+        hch@lst.de, jmoyer@redhat.com, avi@scylladb.com,
+        linux-fsdevel@vger.kernel.org
+References: <20190129192702.3605-1-axboe@kernel.dk>
+ <20190129192702.3605-14-axboe@kernel.dk>
+ <CAG48ez2kLWUEambWesQQaeVn_u=PtjuMeDUc49yamhYspfd7Sg@mail.gmail.com>
+ <20190204025612.GR2217@ZenIV.linux.org.uk>
+ <785c6db4-095e-65b0-ded5-72b41af5174e@kernel.dk>
+ <2b2137ed-8107-f7b6-f0ca-202dcfb87c97@kernel.dk>
+ <40b27e78-9ee8-1395-feb3-a73aac87c9a7@kernel.dk>
+ <0d2e5085-32ff-e86e-d628-6000071fd132@kernel.dk>
+ <20190206010104.GV2217@ZenIV.linux.org.uk>
+ <608c1102-5818-e38c-cfc7-b1cec5a1ecb4@kernel.dk>
+ <20190207040547.GX2217@ZenIV.linux.org.uk>
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: LSF/MM 2019: Call for Proposals (UPDATED!)
-To:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        IDE/ATA development list <linux-ide@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>, bpf@vger.kernel.org,
-        ast@kernel.org
-Message-ID: <4f5a15c1-4f9e-acae-5094-2f38c8eebd96@kernel.dk>
-Date:   Thu, 7 Feb 2019 08:35:06 -0700
+Message-ID: <51f167c6-aacc-dd5b-4481-7168c6f8b413@kernel.dk>
+Date:   Thu, 7 Feb 2019 09:14:41 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190207040547.GX2217@ZenIV.linux.org.uk>
+Content-Type: multipart/mixed;
+ boundary="------------B3C7112CC1CD3B17843EA982"
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+This is a multi-part message in MIME format.
+--------------B3C7112CC1CD3B17843EA982
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-This is an important UPDATE to the previous LSF/MM announcement:
+On 2/6/19 9:05 PM, Al Viro wrote:
+> On Wed, Feb 06, 2019 at 10:56:41AM -0700, Jens Axboe wrote:
+>> On 2/5/19 6:01 PM, Al Viro wrote:
+>>> On Tue, Feb 05, 2019 at 05:27:29PM -0700, Jens Axboe wrote:
+>>>
+>>>> This should be better, passes some basic testing, too:
+>>>>
+>>>> http://git.kernel.dk/cgit/linux-block/commit/?h=io_uring&id=01a93aa784319a02ccfa6523371b93401c9e0073
+>>>>
+>>>> Verified that we're grabbing the right refs, and don't hold any
+>>>> ourselves. For the file registration, forbid registration of the
+>>>> io_uring fd, as that is pointless and will introduce a loop regardless
+>>>> of fd passing.
+>>>
+>>> *shrug*
+>>>
+>>> So pass it to AF_UNIX socket and register _that_ - does't change the
+>>> underlying problem.
+>>
+>> Maybe I'm being dense here, but it's an f_op match. Should catch a
+>> passed fd as well, correct?
+> 
+> f_op match on _what_?
+> 
+>> With that, how can there be a loop?
+> 
+> 	io_uring_fd = ....
+> 	socketpair(PF_UNIX, SOCK_STREAM, 0, sock_fds);
+> 	register sock_fds[0] and sock_fds[1] to io_uring_fd
+> 	send SCM_RIGHTS datagram with io_uring_fd to sock_fds[0]
+> 	close sock_fds[0], sock_fds[1] and io_uring_fd
+> 
+> And there's your unreachable loop.
 
-https://lore.kernel.org/linux-block/51b4b263-a0f2-113d-7bdc-f7960b540929@kernel.dk/
+I created a small app to do just that, and ran it and verified that
+->release() is called and the io_uring is released as expected. This
+is run on the current -git branch, which has a socket backing for
+the io_uring fd itself, but not for the registered files.
 
-A BPF track will join the annual LSF/MM Summit this year! Please read
-the updated description and CFP information below.
-
-It will be held from April 30 - May 2 at the Sheraton Puerto Rico Hotel &
-Casino Lodges in San Juan, Puerto Rico.
-LSF/MM is an invitation-only technical workshop to map out improvements to
-the Linux storage, filesystem, memory management, and bpf subsystems that
-will make their way into the mainline kernel within the coming years.
-
-https://events.linuxfoundation.org/events/linux-storage-filesystem-mm-summit-2019/
-
-LSF/MM 2019 will be a three day, stand-alone conference with three
-subsystem-specific tracks, cross-track discussions, as well as BoF and
-hacking sessions.
-
-On behalf of the committee I am issuing a call for agenda proposals
-that are suitable for cross-track discussion as well as technical
-subjects for the breakout sessions.
-
-If advance notice is required for visa applications then please point
-that out in your proposal or request to attend, and submit the topic
-as soon as possible.
-
-1) Proposals for agenda topics should be sent before February 22th,
-2019 to:
-
-	lsf-pc@lists.linux-foundation.org
-
-and CC the mailing lists that are relevant for the topic in question:
-
-	FS:	linux-fsdevel@vger.kernel.org
-	MM:	linux-mm@kvack.org
-	Block:	linux-block@vger.kernel.org
-	ATA:	linux-ide@vger.kernel.org
-	SCSI:	linux-scsi@vger.kernel.org
-	NVMe:	linux-nvme@lists.infradead.org
-        BPF:    bpf@vger.kernel.org
-
-Note that we have extended the original deadline by a week, to
-accommodate the late arrival of the BPF track.
-
-Please tag your proposal with [LSF/MM TOPIC] to make it easier to
-track. In addition, please make sure to start a new thread for each
-topic rather than following up to an existing one. Agenda topics and
-attendees will be selected by the program committee, but the final
-agenda will be formed by consensus of the attendees on the day.
-
-2) Requests to attend the summit for those that are not proposing a
-topic should be sent to:
-
-	lsf-pc@lists.linux-foundation.org
-
-Please summarize what expertise you will bring to the meeting, and
-what you would like to discuss. Please also tag your email with
-[LSF/MM ATTEND] and send it as a new thread so there is less chance of
-it getting lost.
-
-We will try to cap attendance at around 25-30 per track to facilitate
-discussions although the final numbers will depend on the room sizes
-at the venue. Note that BPF track will be limited to 10-15 attendees.
-
-For discussion leaders, slides and visualizations are encouraged to
-outline the subject matter and focus the discussions. Please refrain
-from lengthy presentations and talks; the sessions are supposed to be
-interactive, inclusive discussions.
-
-In particular BPF topics are encouraged to be storage, fs, mm, tracing,
-security related or advancing the state of the art of BPF core.
-BPF and networking related topics are recommended to be submitted for
-Linux Plumbers Conference and corresponding Networking and BPF microconf
-later this year.
-
-Thank you on behalf of the program committee:
-
-	Anna Schumaker (Filesystems)
-	Josef Bacik (Filesystems)
-	Martin K. Petersen (Storage)
-	Jens Axboe (Storage)
-	Michal Hocko (MM)
-	Rik van Riel (MM)
-	Johannes Weiner (MM)
-        Alexei Starovoitov (BPF)
+What am I missing here? Attaching the program as a reference.
 
 -- 
 Jens Axboe
 
+
+--------------B3C7112CC1CD3B17843EA982
+Content-Type: text/x-csrc;
+ name="viro.c"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="viro.c"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <stddef.h>
+#include <signal.h>
+#include <inttypes.h>
+#include <sys/types.h>
+#include <sys/syscall.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <linux/fs.h>
+
+struct io_sqring_offsets {
+	__u32 head;
+	__u32 tail;
+	__u32 ring_mask;
+	__u32 ring_entries;
+	__u32 flags;
+	__u32 dropped;
+	__u32 array;
+	__u32 resv[3];
+};
+
+struct io_cqring_offsets {
+	__u32 head;
+	__u32 tail;
+	__u32 ring_mask;
+	__u32 ring_entries;
+	__u32 overflow;
+	__u32 cqes;
+	__u32 resv[4];
+};
+
+struct io_uring_params {
+	__u32 sq_entries;
+	__u32 cq_entries;
+	__u32 flags;
+	__u32 sq_thread_cpu;
+	__u32 sq_thread_idle;
+	__u32 resv[5];
+	struct io_sqring_offsets sq_off;
+	struct io_cqring_offsets cq_off;
+};
+
+#define IORING_REGISTER_FILES		2
+
+#define __NR_sys_io_uring_setup		425
+#define __NR_sys_io_uring_register	427
+
+static int io_uring_register_files(int ring_fd, int fd1, int fd2)
+{
+	__s32 *fds;
+
+	fds = calloc(2, sizeof(__s32));
+	fds[0] = fd1;
+	fds[1] = fd2;
+
+	return syscall(__NR_sys_io_uring_register, ring_fd,
+			IORING_REGISTER_FILES, fds, 2);
+}
+
+static int io_uring_setup(unsigned entries, struct io_uring_params *p)
+{
+	return syscall(__NR_sys_io_uring_setup, entries, p);
+}
+
+static int get_ring_fd(void)
+{
+	struct io_uring_params p;
+	int fd;
+
+	memset(&p, 0, sizeof(p));
+
+	fd = io_uring_setup(2, &p);
+	if (fd < 0) {
+		perror("io_uring_setup");
+		return -1;
+	}
+
+	return fd;
+}
+
+static void send_fd(int socket, int fd)
+{
+	char buf[CMSG_SPACE(sizeof(fd))];
+	struct cmsghdr *cmsg;
+	struct msghdr msg;
+
+	memset(buf, 0, sizeof(buf));
+	memset(&msg, 0, sizeof(msg));
+
+	msg.msg_control = buf;
+	msg.msg_controllen = sizeof(buf);
+
+	cmsg = CMSG_FIRSTHDR(&msg);
+	cmsg->cmsg_level = SOL_SOCKET;
+	cmsg->cmsg_type = SCM_RIGHTS;
+	cmsg->cmsg_len = CMSG_LEN(sizeof(fd));
+
+	memmove(CMSG_DATA(cmsg), &fd, sizeof(fd));
+
+	msg.msg_controllen = CMSG_SPACE(sizeof(fd));
+
+	if (sendmsg(socket, &msg, 0) < 0)
+		perror("sendmsg");
+}
+
+static int recv_fd(int socket)
+{
+	struct msghdr msg;
+	char c_buffer[256];
+	struct cmsghdr *cmsg;
+	int fd;
+
+	memset(&msg, 0, sizeof(msg));
+
+	msg.msg_control = c_buffer;
+	msg.msg_controllen = sizeof(c_buffer);
+
+	if (recvmsg(socket, &msg, 0) < 0)
+		perror("recvmsg\n");
+
+	cmsg = CMSG_FIRSTHDR(&msg);
+	memmove(&fd, CMSG_DATA(cmsg), sizeof(fd));
+	return fd;
+}
+
+int main(int argc, char *argv[])
+{
+	int sp[2], pid, ring_fd, ret;
+
+	if (socketpair(AF_UNIX, SOCK_DGRAM, 0, sp) != 0) {
+		perror("Failed to create Unix-domain socket pair\n");
+		return 1;
+	}
+
+	ring_fd = get_ring_fd();
+	if (ring_fd < 0)
+		return 1;
+
+	ret = io_uring_register_files(ring_fd, sp[0], sp[1]);
+	if (ret < 0) {
+		perror("register files");
+		return 1;
+	}
+
+	pid = fork();
+	if (pid) {
+		printf("Sending fd %d\n", ring_fd);
+
+		send_fd(sp[0], ring_fd);
+	} else {
+		int fd;
+
+		fd = recv_fd(sp[1]);
+		printf("Got fd %d\n", fd);
+		close(fd);
+	}
+
+	usleep(500000);
+	close(ring_fd);
+	close(sp[0]);
+	close(sp[1]);
+	return 0;
+}
+
+--------------B3C7112CC1CD3B17843EA982--
