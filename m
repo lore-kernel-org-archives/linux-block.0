@@ -2,95 +2,171 @@ Return-Path: <SRS0=wMCK=QO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA20C282C2
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 15:27:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66F53C282CC
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 15:35:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 932F521872
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 15:27:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 34A8F2077B
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 15:35:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="n4pFB99G"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="v7wRl+42"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726319AbfBGP1Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Feb 2019 10:27:25 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:53961 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726048AbfBGP1Z (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Feb 2019 10:27:25 -0500
-Received: by mail-it1-f193.google.com with SMTP id g85so601420ita.3
-        for <linux-block@vger.kernel.org>; Thu, 07 Feb 2019 07:27:25 -0800 (PST)
+        id S1727003AbfBGPfL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Feb 2019 10:35:11 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:35581 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726171AbfBGPfK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Feb 2019 10:35:10 -0500
+Received: by mail-pl1-f195.google.com with SMTP id p8so99198plo.2
+        for <linux-block@vger.kernel.org>; Thu, 07 Feb 2019 07:35:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3fXOh7Vtpm+ljDTmRDGf0oFspFn1OGiKztfFcuq/Tts=;
-        b=n4pFB99GibY8mdUbe3hD0fqlYFV/rEP89feTrEVyUrKB5fwBYZ5nqba6Zp8KJFw5D2
-         2XZO5log9tB/mrShYZZDYfgT4K9wZpos8cucCBWfLp3U3TQI0smaWljtnsbrEGXse47G
-         GuCkxrDKahQKpxYvLxg0sN9ZJg16BsZuE5oqQ=
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=from:subject:to:cc:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=vfrucWasRxu8wXy8I+OWsttiphZ78Pxa89vVhirKE38=;
+        b=v7wRl+42sRdc90Xr3bwo4dY+lG2m08Os2TWzjMUluAmfAXx53mYWdZk9xDGg4xBjPe
+         phtFtdx9z2YZiuseCKwB6wNwa2/fqva9NyZ/nXkNtJdZkrPOwVxZqDxmIo7EDYTmH3Qq
+         EfZciWgD188NKkDlMzfjm1CPZHfI3m7W3YENaMgUJ9FH2VmtbKk6zehcK6lMjIi8mU50
+         03SS12dLlPCftTfVBHVWEfc7hYSNgDG9nxXsw24l4ylQkYFKvZ7/qiNoOuwpy+z58d7u
+         U51cvcKmneEnevbHXoLNmee3w5yw8/Cv/Yx5uRByM2pPq3Omm2b0gH8pr4GItIQ84SfK
+         aySg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3fXOh7Vtpm+ljDTmRDGf0oFspFn1OGiKztfFcuq/Tts=;
-        b=MF/bCuLbstaeHCX6FyD02BO7IQAiGfxHWTyFWaCEzW1IgLF/ayplHopu4LFLYlPO52
-         pEEPSQkrnFDRqwIf/yIbTYNdoKdyz33NZnC9MLeDXi9stz7em5osbET+PrO2sUqKfTuG
-         PFMZl2O8r1s6eOti2pIwTFrPSqP9vfn0O+man7bgRARM2Bzcrs/22qI+db8jDAlXHud3
-         lV2LJwUS+elvH3N9aC11/D7g8SKHYgBfYmxpmMtrUfrdkUM+bKyFUaIihlKjtn42d6tC
-         ol3iwBE/blLRWIJblaHLyWARHEpCUT8TPrIQ4ZFv1Iyy7tMhlTseOciJs9b3pMUfml2A
-         pKsQ==
-X-Gm-Message-State: AHQUAuZIASel54iOrxZ8xl/VZcjd5KztsiKv3KmQqpnXO166acN1/9I6
-        7acb2BZWnRmUw22QYDfvDFO9HF6txrZoZnXmq8oJtQ==
-X-Google-Smtp-Source: AHgI3Ib8W5h3+sAglw2na15VfxaNxbvlk0EoY0/TDSDK52bP1VSy6edgccyieSDQFTLIgZpixHpAXSS6FX56AKC+My8=
-X-Received: by 2002:a24:a08a:: with SMTP id o132mr5836567ite.1.1549553244872;
- Thu, 07 Feb 2019 07:27:24 -0800 (PST)
+        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=vfrucWasRxu8wXy8I+OWsttiphZ78Pxa89vVhirKE38=;
+        b=jOiI126cL3lbi1ZawibAnt4xqZtOHQ6cu1lb4ThjhFtpfMZQviXD968nxOUgCxKq1O
+         nhm9MkQ8mJocjvAhkKSUJur+Ck2vORXQBB79K1nLT0K245b8AhYUw1A7TY6ICtNCfa8B
+         OZWCA1/CkEzOX0Z2t5aNkVpjTQPlzbmOKx0mVY+wV5mrI5KsiEtKgafGNJdEuRAJHZpM
+         q8v+yPEbHoYU7qw0rqUr8n17NP/ilHyNKaV+ME8KdKT4ayoVbHERlMwydNA1Ml31K/s4
+         cJbm4lSHDTDdJy/ZOj2Ogn90UY7dm0l6RfyrOppJkx+3RnSlSqhnroO9dxcT9y11RP62
+         I+2g==
+X-Gm-Message-State: AHQUAuYsVW0eMFGqfS/hywRB0WJAC4zYvLO+AwyIcjRhBgMbhZQ0vqgz
+        qHPcRLNoQf6a/qmUherijsQcwA==
+X-Google-Smtp-Source: AHgI3IaVoMYYKhs8M27q2ZqhI+OfSw6Mv04jJk+GiXW7+JfxddzpCbSEEmMoiRDT4kfCHGPvz5JH/Q==
+X-Received: by 2002:a17:902:7c8a:: with SMTP id y10mr16635068pll.71.1549553710158;
+        Thu, 07 Feb 2019 07:35:10 -0800 (PST)
+Received: from ?IPv6:2600:380:7712:367d:9d7:f8fb:d4f4:2531? ([2600:380:7712:367d:9d7:f8fb:d4f4:2531])
+        by smtp.gmail.com with ESMTPSA id s2sm12302582pfa.167.2019.02.07.07.35.07
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 07 Feb 2019 07:35:09 -0800 (PST)
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: LSF/MM 2019: Call for Proposals (UPDATED!)
+To:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        IDE/ATA development list <linux-ide@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>, bpf@vger.kernel.org,
+        ast@kernel.org
+Message-ID: <4f5a15c1-4f9e-acae-5094-2f38c8eebd96@kernel.dk>
+Date:   Thu, 7 Feb 2019 08:35:06 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-References: <20190204025612.GR2217@ZenIV.linux.org.uk> <785c6db4-095e-65b0-ded5-72b41af5174e@kernel.dk>
- <2b2137ed-8107-f7b6-f0ca-202dcfb87c97@kernel.dk> <40b27e78-9ee8-1395-feb3-a73aac87c9a7@kernel.dk>
- <20190206005638.GU2217@ZenIV.linux.org.uk> <8f124de2-d6da-d656-25e4-b4d9e58f880e@kernel.dk>
- <20190207040058.GW2217@ZenIV.linux.org.uk> <20190207092253.GD19821@veci.piliscsaba.redhat.com>
- <20190207133135.GZ2217@ZenIV.linux.org.uk> <CAJfpegutRaXZ8EC_Am_PomxwdmSoH7eQkxAewaLfUrMALjym-w@mail.gmail.com>
- <20190207152002.GC2217@ZenIV.linux.org.uk>
-In-Reply-To: <20190207152002.GC2217@ZenIV.linux.org.uk>
-From:   Miklos Szeredi <miklos@szeredi.hu>
-Date:   Thu, 7 Feb 2019 16:27:13 +0100
-Message-ID: <CAJfpegvayM_ZmuVetfYzpK+qqZJPkVzfQVRQ7OO98f1=reqiYA@mail.gmail.com>
-Subject: Re: [PATCH 13/18] io_uring: add file set registration
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jann Horn <jannh@google.com>,
-        linux-aio <linux-aio@kvack.org>, linux-block@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>, Jeff Moyer <jmoyer@redhat.com>,
-        Avi Kivity <avi@scylladb.com>, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 7, 2019 at 4:20 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
->
-> On Thu, Feb 07, 2019 at 03:20:06PM +0100, Miklos Szeredi wrote:
->
-> > > Am I right assuming that this queue-modifying operation is accept(), removing
-> > > an embryo unix_sock from the queue of listener and thus hiding SCM_RIGHTS in
-> > > _its_ queue from scan_children()?
-> >
-> > Hmm... How about just receiving an SCM_RIGHTS socket (which was a
-> > candidate) from the queue of the peeked socket?
->
-> Right, skb unlinked before unix_detach_fds().  I was actually thinking of a stream
-> case, where unlink is done after that...
->
-> *grumble*
->
-> The entire thing is far too brittle for my taste ;-/
+Hi,
 
-If it gets used as part of io_uring, I guess it's worth a fresh look.
-I wrote it without basically any experience with either networking or
-garbage collecting, so no wonder it has rough edges.
+This is an important UPDATE to the previous LSF/MM announcement:
 
-Thanks,
-Miklos
+https://lore.kernel.org/linux-block/51b4b263-a0f2-113d-7bdc-f7960b540929@kernel.dk/
+
+A BPF track will join the annual LSF/MM Summit this year! Please read
+the updated description and CFP information below.
+
+It will be held from April 30 - May 2 at the Sheraton Puerto Rico Hotel &
+Casino Lodges in San Juan, Puerto Rico.
+LSF/MM is an invitation-only technical workshop to map out improvements to
+the Linux storage, filesystem, memory management, and bpf subsystems that
+will make their way into the mainline kernel within the coming years.
+
+https://events.linuxfoundation.org/events/linux-storage-filesystem-mm-summit-2019/
+
+LSF/MM 2019 will be a three day, stand-alone conference with three
+subsystem-specific tracks, cross-track discussions, as well as BoF and
+hacking sessions.
+
+On behalf of the committee I am issuing a call for agenda proposals
+that are suitable for cross-track discussion as well as technical
+subjects for the breakout sessions.
+
+If advance notice is required for visa applications then please point
+that out in your proposal or request to attend, and submit the topic
+as soon as possible.
+
+1) Proposals for agenda topics should be sent before February 22th,
+2019 to:
+
+	lsf-pc@lists.linux-foundation.org
+
+and CC the mailing lists that are relevant for the topic in question:
+
+	FS:	linux-fsdevel@vger.kernel.org
+	MM:	linux-mm@kvack.org
+	Block:	linux-block@vger.kernel.org
+	ATA:	linux-ide@vger.kernel.org
+	SCSI:	linux-scsi@vger.kernel.org
+	NVMe:	linux-nvme@lists.infradead.org
+        BPF:    bpf@vger.kernel.org
+
+Note that we have extended the original deadline by a week, to
+accommodate the late arrival of the BPF track.
+
+Please tag your proposal with [LSF/MM TOPIC] to make it easier to
+track. In addition, please make sure to start a new thread for each
+topic rather than following up to an existing one. Agenda topics and
+attendees will be selected by the program committee, but the final
+agenda will be formed by consensus of the attendees on the day.
+
+2) Requests to attend the summit for those that are not proposing a
+topic should be sent to:
+
+	lsf-pc@lists.linux-foundation.org
+
+Please summarize what expertise you will bring to the meeting, and
+what you would like to discuss. Please also tag your email with
+[LSF/MM ATTEND] and send it as a new thread so there is less chance of
+it getting lost.
+
+We will try to cap attendance at around 25-30 per track to facilitate
+discussions although the final numbers will depend on the room sizes
+at the venue. Note that BPF track will be limited to 10-15 attendees.
+
+For discussion leaders, slides and visualizations are encouraged to
+outline the subject matter and focus the discussions. Please refrain
+from lengthy presentations and talks; the sessions are supposed to be
+interactive, inclusive discussions.
+
+In particular BPF topics are encouraged to be storage, fs, mm, tracing,
+security related or advancing the state of the art of BPF core.
+BPF and networking related topics are recommended to be submitted for
+Linux Plumbers Conference and corresponding Networking and BPF microconf
+later this year.
+
+Thank you on behalf of the program committee:
+
+	Anna Schumaker (Filesystems)
+	Josef Bacik (Filesystems)
+	Martin K. Petersen (Storage)
+	Jens Axboe (Storage)
+	Michal Hocko (MM)
+	Rik van Riel (MM)
+	Johannes Weiner (MM)
+        Alexei Starovoitov (BPF)
+
+-- 
+Jens Axboe
+
