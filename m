@@ -2,119 +2,66 @@ Return-Path: <SRS0=wMCK=QO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14CB1C282C2
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 10:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 364EDC282C2
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 10:54:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF20121872
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 10:45:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0BE7C21872
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 10:54:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726750AbfBGKpe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Feb 2019 05:45:34 -0500
-Received: from smtp3-g21.free.fr ([212.27.42.3]:48484 "EHLO smtp3-g21.free.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726732AbfBGKpe (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 7 Feb 2019 05:45:34 -0500
-Received: from [192.168.108.68] (unknown [213.36.7.13])
-        (Authenticated sender: marc.w.gonzalez)
-        by smtp3-g21.free.fr (Postfix) with ESMTPSA id 89E2D13F8CD;
-        Thu,  7 Feb 2019 11:44:34 +0100 (CET)
-Subject: Re: dd hangs when reading large partitions
-From:   Marc Gonzalez <marc.w.gonzalez@free.fr>
-To:     linux-mm <linux-mm@kvack.org>,
-        linux-block <linux-block@vger.kernel.org>
-Cc:     Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        fsdevel <linux-fsdevel@vger.kernel.org>,
-        SCSI <linux-scsi@vger.kernel.org>,
-        Joao Pinto <jpinto@synopsys.com>,
-        Jeffrey Hugo <jhugo@codeaurora.org>,
-        Evan Green <evgreen@chromium.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Douglas Anderson <dianders@chromium.org>,
-        Stephen Boyd <swboyd@chromium.org>,
-        Tomas Winkler <tomas.winkler@intel.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Alim Akhtar <alim.akhtar@samsung.com>,
-        Avri Altman <avri.altman@wdc.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Martin Petersen <martin.petersen@oracle.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
-        Roman Gushchin <guro@fb.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal Hocko <mhocko@suse.com>
-References: <f792574c-e083-b218-13b4-c89be6566015@free.fr>
- <398a6e83-d482-6e72-5806-6d5bbe8bfdd9@oracle.com>
- <ef734b94-e72b-771f-350b-08d8054a58f3@kernel.dk>
- <20190119095601.GA7440@infradead.org>
- <07b2df5d-e1fe-9523-7c11-f3058a966f8a@free.fr>
- <985b340c-623f-6df2-66bd-d9f4003189ea@free.fr>
- <b3910158-83d6-21fe-1606-33e88912404a@oracle.com>
- <d082bdee-62e5-d470-b63b-196c0fe3b9fb@free.fr>
- <5132e41b-cb1a-5b81-4a72-37d0f9ea4bb9@oracle.com>
- <7bd8b010-bf0c-ad64-f927-2d2187a18d0b@free.fr>
- <0cfe1ed2-41e1-66a4-8d98-ebc0d9645d21@free.fr>
-Message-ID: <d91e8342-4672-d51d-1bde-74e910e5a959@free.fr>
-Date:   Thu, 7 Feb 2019 11:44:34 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1726549AbfBGKyC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Feb 2019 05:54:02 -0500
+Received: from mx2.suse.de ([195.135.220.15]:51550 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726186AbfBGKyC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 7 Feb 2019 05:54:02 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id DF56FACD4;
+        Thu,  7 Feb 2019 10:54:00 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 47CF01E3DB5; Thu,  7 Feb 2019 11:54:00 +0100 (CET)
+Date:   Thu, 7 Feb 2019 11:54:00 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] blktrace: Show requests without sector
+Message-ID: <20190207105400.GC3597@quack2.suse.cz>
+References: <20190206120440.26557-1-jack@suse.cz>
+ <04f7afa6-a137-823c-75be-a09422a63998@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <0cfe1ed2-41e1-66a4-8d98-ebc0d9645d21@free.fr>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <04f7afa6-a137-823c-75be-a09422a63998@kernel.dk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-+ linux-mm
+On Wed 06-02-19 12:49:46, Jens Axboe wrote:
+> On 2/6/19 5:04 AM, Jan Kara wrote:
+> > Currently, blktrace will not show requests that don't have any data as
+> > rq->__sector is initialized to -1 which is out of device range and thus
+> > discarded by act_log_check(). This is most notably the case for cache
+> > flush requests sent to the device. Fix the problem by making
+> > blk_rq_trace_sector() return 0 for requests without initialized sector.
+> 
+> Concept is fine, but man, that's not very readable. How about:
+> 
+> if (blk_rq_passthrough(rq) || blk_rq_pos(rq) == (sector_t) -1)
+> 	return 0;
+> 
+> return blk_rq_pos(rq);
+> 
+> instead? Preferably with a comment on why blk_rq_pos() will be -1.
 
-Summarizing the issue for linux-mm readers:
+Good points. Will send v2 shortly. Thanks!
 
-If I read data from a storage device larger than my system's RAM, the system freezes
-once dd has read more data than available RAM.
-
-# dd if=/dev/sde of=/dev/null bs=1M & while true; do echo m > /proc/sysrq-trigger; echo; echo; sleep 1; done
-https://pastebin.ubuntu.com/p/HXzdqDZH4W/
-
-A few seconds before the system hangs, Mem-Info shows:
-
-[   90.986784] Node 0 active_anon:7060kB inactive_anon:13644kB active_file:0kB inactive_file:3797500kB [...]
-
-=> 3797500kB is basically all of RAM.
-
-I tried to locate where "inactive_file" was being increased from, and saw two signatures:
-
-[  255.606019] __mod_node_page_state | __pagevec_lru_add_fn | pagevec_lru_move_fn | __lru_cache_add | lru_cache_add | add_to_page_cache_lru | mpage_readpages | blkdev_readpages | read_pages | __do_page_cache_readahead | ondemand_readahead | page_cache_sync_readahead
-
-[  255.637238] __mod_node_page_state | __pagevec_lru_add_fn | pagevec_lru_move_fn | __lru_cache_add | lru_cache_add | lru_cache_add_active_or_unevictable | __handle_mm_fault | handle_mm_fault | do_page_fault | do_translation_fault | do_mem_abort | el1_da
-
-Are these expected?
-
-NB: the system does not hang if I specify 'iflag=direct' to dd.
-
-According to the RCU watchdog:
-
-[  108.466240] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-[  108.466420] rcu:     1-...0: (130 ticks this GP) idle=79e/1/0x4000000000000000 softirq=2393/2523 fqs=2626 
-[  108.471436] rcu:     (detected by 4, t=5252 jiffies, g=133, q=85)
-[  108.480605] Task dump for CPU 1:
-[  108.486483] kworker/1:1H    R  running task        0   680      2 0x0000002a
-[  108.489977] Workqueue: kblockd blk_mq_run_work_fn
-[  108.496908] Call trace:
-[  108.501513]  __switch_to+0x174/0x1e0
-[  108.503757]  blk_mq_run_work_fn+0x28/0x40
-[  108.507589]  process_one_work+0x208/0x480
-[  108.511486]  worker_thread+0x48/0x460
-[  108.515480]  kthread+0x124/0x130
-[  108.519123]  ret_from_fork+0x10/0x1c
-
-Can anyone shed some light on what's going on?
-
-Regards.
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
