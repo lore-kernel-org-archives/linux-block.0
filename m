@@ -2,71 +2,94 @@ Return-Path: <SRS0=wMCK=QO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4DC7C282C2
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 10:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D91ECC282C2
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 11:59:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8DC7D21872
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 10:55:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2ADF21902
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 11:59:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726732AbfBGKzn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Feb 2019 05:55:43 -0500
-Received: from mx2.suse.de ([195.135.220.15]:51820 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726186AbfBGKzn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 7 Feb 2019 05:55:43 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 81A7CAD27;
-        Thu,  7 Feb 2019 10:55:42 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 4D10B1E3DB5; Thu,  7 Feb 2019 11:55:42 +0100 (CET)
-From:   Jan Kara <jack@suse.cz>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     <linux-block@vger.kernel.org>, Jan Kara <jack@suse.cz>
-Subject: [PATCH v2] blktrace: Show requests without sector
-Date:   Thu,  7 Feb 2019 11:55:39 +0100
-Message-Id: <20190207105539.8815-1-jack@suse.cz>
-X-Mailer: git-send-email 2.16.4
+        id S1726769AbfBGL7W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Feb 2019 06:59:22 -0500
+Received: from 8bytes.org ([81.169.241.247]:38750 "EHLO theia.8bytes.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726561AbfBGL7W (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 7 Feb 2019 06:59:22 -0500
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id 2E0A03A2; Thu,  7 Feb 2019 12:59:21 +0100 (CET)
+From:   Joerg Roedel <joro@8bytes.org>
+To:     "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        iommu@lists.linux-foundation.org, jfehlig@suse.com,
+        jon.grimm@amd.com, brijesh.singh@amd.com, joro@8bytes.org,
+        jroedel@suse.de, Thomas.Lendacky@amd.com
+Subject: [PATCH v7 0/5] Fix virtio-blk issue with SWIOTLB 
+Date:   Thu,  7 Feb 2019 12:59:12 +0100
+Message-Id: <20190207115917.20535-1-joro@8bytes.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, blktrace will not show requests that don't have any data as
-rq->__sector is initialized to -1 which is out of device range and thus
-discarded by act_log_check(). This is most notably the case for cache
-flush requests sent to the device. Fix the problem by making
-blk_rq_trace_sector() return 0 for requests without initialized sector.
+Hi,
 
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- include/linux/blktrace_api.h | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+here is the next version of this patch-set. Previous
+versions can be found here:
 
-diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
-index 8804753805ac..7bb2d8de9f30 100644
---- a/include/linux/blktrace_api.h
-+++ b/include/linux/blktrace_api.h
-@@ -116,7 +116,13 @@ extern void blk_fill_rwbs(char *rwbs, unsigned int op, int bytes);
- 
- static inline sector_t blk_rq_trace_sector(struct request *rq)
- {
--	return blk_rq_is_passthrough(rq) ? 0 : blk_rq_pos(rq);
-+	/*
-+	 * Tracing should ignore starting sector for passthrough requests and
-+	 * requests where starting sector didn't get set.
-+	 */
-+	if (blk_rq_is_passthrough(rq) || blk_rq_pos(rq) == (sector_t)-1)
-+		return 0;
-+	return blk_rq_pos(rq);
- }
- 
- static inline unsigned int blk_rq_trace_nr_sectors(struct request *rq)
+	V1: https://lore.kernel.org/lkml/20190110134433.15672-1-joro@8bytes.org/
+
+	V2: https://lore.kernel.org/lkml/20190115132257.6426-1-joro@8bytes.org/
+
+	V3: https://lore.kernel.org/lkml/20190123163049.24863-1-joro@8bytes.org/
+
+	V4: https://lore.kernel.org/lkml/20190129084342.26030-1-joro@8bytes.org/
+
+	V5: https://lore.kernel.org/lkml/20190130164007.26497-1-joro@8bytes.org/
+
+	V6: https://lore.kernel.org/lkml/20190131163403.11363-1-joro@8bytes.org/
+
+The problem solved here is a limitation of the SWIOTLB implementation,
+which does not support allocations larger than 256kb.  When the
+virtio-blk driver tries to read/write a block larger than that, the
+allocation of the dma-handle fails and an IO error is reported.
+
+Changes to v6 are:
+
+	- Fix build errors with CONFIG_SWIOTLB=n
+
+Please review.
+
+Thanks,
+
+	Joerg
+
+Joerg Roedel (5):
+  swiotlb: Introduce swiotlb_max_mapping_size()
+  swiotlb: Add is_swiotlb_active() function
+  dma: Introduce dma_max_mapping_size()
+  virtio: Introduce virtio_max_dma_size()
+  virtio-blk: Consider virtio_max_dma_size() for maximum segment size
+
+ Documentation/DMA-API.txt    |  8 ++++++++
+ drivers/block/virtio_blk.c   | 10 ++++++----
+ drivers/virtio/virtio_ring.c | 11 +++++++++++
+ include/linux/dma-mapping.h  |  8 ++++++++
+ include/linux/swiotlb.h      | 11 +++++++++++
+ include/linux/virtio.h       |  2 ++
+ kernel/dma/direct.c          | 11 +++++++++++
+ kernel/dma/mapping.c         | 14 ++++++++++++++
+ kernel/dma/swiotlb.c         | 14 ++++++++++++++
+ 9 files changed, 85 insertions(+), 4 deletions(-)
+
 -- 
-2.16.4
+2.17.1
 
