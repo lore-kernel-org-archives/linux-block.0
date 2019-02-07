@@ -2,160 +2,66 @@ Return-Path: <SRS0=wMCK=QO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC242C282CC
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 14:20:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94D15C282CC
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 15:20:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA5372147C
-	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 14:20:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=szeredi.hu header.i=@szeredi.hu header.b="iLTGMaDW"
+	by mail.kernel.org (Postfix) with ESMTP id 6C2C02190A
+	for <linux-block@archiver.kernel.org>; Thu,  7 Feb 2019 15:20:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727021AbfBGOUU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Feb 2019 09:20:20 -0500
-Received: from mail-it1-f194.google.com ([209.85.166.194]:53591 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726965AbfBGOUU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Feb 2019 09:20:20 -0500
-Received: by mail-it1-f194.google.com with SMTP id g85so14488ita.3
-        for <linux-block@vger.kernel.org>; Thu, 07 Feb 2019 06:20:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=szeredi.hu; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=COf9njknVt0xfgbzll0rW9n/qR9oO3cUUPpI8n+W6+s=;
-        b=iLTGMaDWAmuFVq+YNY4E1QDw0wJqIla9lZf+23N6DaSpnuokjwdwLchE4pUYYXP65b
-         uQHD4kI/E96iS2Q02qY7U6YK8GvlurU/hgLszEU9qGK+7UGBUXpc3Nnxyh+PVTcdRaEV
-         ob+iP0Vk2o5J5db/W1jzxSuiErSDhY6v+P68o=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=COf9njknVt0xfgbzll0rW9n/qR9oO3cUUPpI8n+W6+s=;
-        b=tBm3eKnidzbFCz2P1ZvPwrCajYT08akGIM65v555Yj4ceqNeEPCEp7oPpxJQlbBgQn
-         UHoIC5LosLM1An5Qe1MSiuu8yjuE6ErLqaWNrcAqQK9znFPd82vzPoJShJnW4mCN+ouR
-         yrpHUAp2fd4yLjUiH6oMPivELCgbvjjUyihOAl/WcEIagKmbQtnqkgtDadKWWgQ2ZDRK
-         nDzah1DHbHz7XTgE+r1+n2ARH4aJqQrBTGbVTzoSpTcFJ08qAJU+ywK3vJ/HxhcPDBGQ
-         xLiQqnuxtW6L0Co959TzkIESmTo/lGRTFy6plf3FqTA/oUFCuPlpsrEz2O+YPDqKj9aX
-         Vu7g==
-X-Gm-Message-State: AHQUAuagojiMfoeXVAMuoP0cOGvQPS1m7nA4vHLwKrwfAdOJ5FyRt1oM
-        S1Om5ZKchbF3UDNx6vPM4MeRrM/TrsFpRVlNez8XRg==
-X-Google-Smtp-Source: AHgI3IYbLCvmuFdX/ZcyhQS4kK2tm7MfCdcL91mF7qTTf4FbMTM9oMWTLo0NBf2gQ8IKE7jPsd4BZ2NzwkmCjdA3Es8=
-X-Received: by 2002:a6b:e506:: with SMTP id y6mr3153640ioc.246.1549549218829;
- Thu, 07 Feb 2019 06:20:18 -0800 (PST)
-MIME-Version: 1.0
-References: <20190129192702.3605-14-axboe@kernel.dk> <CAG48ez2kLWUEambWesQQaeVn_u=PtjuMeDUc49yamhYspfd7Sg@mail.gmail.com>
- <20190204025612.GR2217@ZenIV.linux.org.uk> <785c6db4-095e-65b0-ded5-72b41af5174e@kernel.dk>
- <2b2137ed-8107-f7b6-f0ca-202dcfb87c97@kernel.dk> <40b27e78-9ee8-1395-feb3-a73aac87c9a7@kernel.dk>
- <20190206005638.GU2217@ZenIV.linux.org.uk> <8f124de2-d6da-d656-25e4-b4d9e58f880e@kernel.dk>
- <20190207040058.GW2217@ZenIV.linux.org.uk> <20190207092253.GD19821@veci.piliscsaba.redhat.com>
- <20190207133135.GZ2217@ZenIV.linux.org.uk>
-In-Reply-To: <20190207133135.GZ2217@ZenIV.linux.org.uk>
-From:   Miklos Szeredi <miklos@szeredi.hu>
-Date:   Thu, 7 Feb 2019 15:20:06 +0100
-Message-ID: <CAJfpegutRaXZ8EC_Am_PomxwdmSoH7eQkxAewaLfUrMALjym-w@mail.gmail.com>
-Subject: Re: [PATCH 13/18] io_uring: add file set registration
-To:     Al Viro <viro@zeniv.linux.org.uk>
+        id S1726528AbfBGPUJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Feb 2019 10:20:09 -0500
+Received: from zeniv.linux.org.uk ([195.92.253.2]:37684 "EHLO
+        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726037AbfBGPUJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Feb 2019 10:20:09 -0500
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.91 #2 (Red Hat Linux))
+        id 1grlT8-0007Ip-R7; Thu, 07 Feb 2019 15:20:02 +0000
+Date:   Thu, 7 Feb 2019 15:20:02 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Miklos Szeredi <miklos@szeredi.hu>
 Cc:     Jens Axboe <axboe@kernel.dk>, Jann Horn <jannh@google.com>,
         linux-aio <linux-aio@kvack.org>, linux-block@vger.kernel.org,
         Linux API <linux-api@vger.kernel.org>,
         Christoph Hellwig <hch@lst.de>, Jeff Moyer <jmoyer@redhat.com>,
         Avi Kivity <avi@scylladb.com>, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH 13/18] io_uring: add file set registration
+Message-ID: <20190207152002.GC2217@ZenIV.linux.org.uk>
+References: <20190204025612.GR2217@ZenIV.linux.org.uk>
+ <785c6db4-095e-65b0-ded5-72b41af5174e@kernel.dk>
+ <2b2137ed-8107-f7b6-f0ca-202dcfb87c97@kernel.dk>
+ <40b27e78-9ee8-1395-feb3-a73aac87c9a7@kernel.dk>
+ <20190206005638.GU2217@ZenIV.linux.org.uk>
+ <8f124de2-d6da-d656-25e4-b4d9e58f880e@kernel.dk>
+ <20190207040058.GW2217@ZenIV.linux.org.uk>
+ <20190207092253.GD19821@veci.piliscsaba.redhat.com>
+ <20190207133135.GZ2217@ZenIV.linux.org.uk>
+ <CAJfpegutRaXZ8EC_Am_PomxwdmSoH7eQkxAewaLfUrMALjym-w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJfpegutRaXZ8EC_Am_PomxwdmSoH7eQkxAewaLfUrMALjym-w@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 7, 2019 at 2:31 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
->
-> On Thu, Feb 07, 2019 at 10:22:53AM +0100, Miklos Szeredi wrote:
-> > On Thu, Feb 07, 2019 at 04:00:59AM +0000, Al Viro wrote:
-> >
-> > > So in theory it would be possible to have
-> > >     * thread A: sendmsg() has SCM_RIGHTS created and populated,
-> > > complete with file refcount and ->inflight increments implied,
-> > > at which point it gets preempted and loses the timeslice.
-> > >     * thread B: gets to run and removes all references
-> > > from descriptor table it shares with thread A.
-> > >     * on another CPU we have garbage collector triggered;
-> > > it determines the set of potentially unreachable unix_sock and
-> > > everything in our SCM_RIGHTS _is_ in that set, now that no
-> > > other references remain.
-> > >     * on the first CPU, thread A regains the timeslice
-> > > and inserts its SCM_RIGHTS into queue.  And it does contain
-> > > references to sockets from the candidate set of running
-> > > garbage collector, confusing the hell out of it.
-> >
-> > Reminds me: long time ago there was a bug report, and based on that I found a
-> > bug in MSG_PEEK handling (not confirmed to have fixed the reported bug).  This
-> > fix, although pretty simple, got lost somehow.  While unix gc code is in your
-> > head, can you please review and I'll resend through davem?
->
-> Umm...  I think the bug is real (something that looks like an eviction
-> candidate, but actually is referenced from the reachable queue might
-> get peeked via that queue, then have _its_ queue modified via new
-> external reference, all between two passes over that queue, confusing the
-> fuck out of unix_gc()), but I think the fix is an overkill...
->
-> Am I right assuming that this queue-modifying operation is accept(), removing
-> an embryo unix_sock from the queue of listener and thus hiding SCM_RIGHTS in
-> _its_ queue from scan_children()?
+On Thu, Feb 07, 2019 at 03:20:06PM +0100, Miklos Szeredi wrote:
 
-Hmm... How about just receiving an SCM_RIGHTS socket (which was a
-candidate) from the queue of the peeked socket?
+> > Am I right assuming that this queue-modifying operation is accept(), removing
+> > an embryo unix_sock from the queue of listener and thus hiding SCM_RIGHTS in
+> > _its_ queue from scan_children()?
+> 
+> Hmm... How about just receiving an SCM_RIGHTS socket (which was a
+> candidate) from the queue of the peeked socket?
 
-> Let me think of it a bit, OK?  While we are at it, some questions from digging
-> through the current net/unix/garbage.c:
->         1) is there any need for ->inflight to be atomic?  All accesses are under
-> unix_gc_lock, after all...
+Right, skb unlinked before unix_detach_fds().  I was actually thinking of a stream
+case, where unlink is done after that...
 
-Seems so.  Probably historic.
+*grumble*
 
->         2) pumping unix_gc on each sodding reference in SCM_RIGHTS (within
-> unix_notinflight()/unix_inflight()) looks atrocious... wouldn't it be better to
-> hold it over that loop?
-
-Sure.  I guess SCM_RIGHTS are not too performance sensitive, but
-that's a trivial cleanup...
-
-
->         3) unix_get_socket() probably ought to be static nowadays...
->         4) I wonder if in scan_inflight()/scan_children() we would be better
-> off with explicit switch (by enum argument) instead of an indirect call.
-
-Right.
-
->         5) do we really need UNIX_GC_MAYBE_CYCLE?  Looks like the only
-> real use is in inc_inflight_move_tail(), and AFAICS it could bloody well
-> have been
->         u->inflight++;
->         if (u->inflight == 1)   // just got from zero to non-zero
->                 list_move_tail(&u->link, &gc_candidates);
-> The logics there is "we'd found a reference to something that still was
-> a candidate for eviction in a reachable SCM_RIGHTS, so it's actually
-> reachable and needs to be scanned (and removed from the set of candidates);
-> move to the end of list, so that the main loop gets around to it".
-> If it *was* past the cursor in the list, there's no need to move it; if
-> we got past it, it must've had zero ->inflight (or we would've removed
-> it from the set back when we got past it).  Note that it's only called if
-> UNIX_GC_CANDIDATE is set (i.e. if it's in the initial candidate set),
-> so for this one ->inflight is guaranteed to mean the number of SCM_RIGHTS
-> refs from outside of the current candidate set...
-
-Right, makes sense.
-
->         6) unix_get_socket() looks like it might benefit from another
-> FMODE bit; not sure where it's best set, though - the obvious way would
-> be SOCK_GC_CARES in sock->flags, set by e.g. unix_create1(), with
-> sock_alloc_file() propagating it into file->f_mode.  Then unix_get_socket()
-> would be able to bugger off with NULL for most of the references in
-> SCM_RIGHTS, without looking into inode...
-
-Yep, sounds good.
-
-Thanks,
-Miklos
+The entire thing is far too brittle for my taste ;-/
