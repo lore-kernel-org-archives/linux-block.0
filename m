@@ -4,64 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1C71C169C4
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 17:35:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E818BC282CB
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 17:35:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B18F3217D8
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 17:35:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE28F2146E
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 17:35:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="LgBi6Spc"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="VmR90r01"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727894AbfBHRfC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Feb 2019 12:35:02 -0500
-Received: from mail-it1-f194.google.com ([209.85.166.194]:40046 "EHLO
+        id S1727902AbfBHRfD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Feb 2019 12:35:03 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:39723 "EHLO
         mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727860AbfBHRfA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Feb 2019 12:35:00 -0500
-Received: by mail-it1-f194.google.com with SMTP id h193so10786990ita.5
-        for <linux-block@vger.kernel.org>; Fri, 08 Feb 2019 09:35:00 -0800 (PST)
+        with ESMTP id S1727893AbfBHRfC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Feb 2019 12:35:02 -0500
+Received: by mail-it1-f194.google.com with SMTP id a6so10789110itl.4
+        for <linux-block@vger.kernel.org>; Fri, 08 Feb 2019 09:35:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=OyuM0dnPuVU7KgrSQK34TQOUl0fgJTh6boF0RdVGlFw=;
-        b=LgBi6Spcp+Pwwd879uefw24SXzKawrhdzCeYg7evYuUj1cBDlnq8QhKzi3+BKK1Lj+
-         FE/Fbrno+OQnL/U4FhUb2d5ohfTtgzi4AzHNvqhuJXglpKqW8Y2xLbS0G7U36+iU+7Td
-         doXGfgIqUQjTUuiWRAkkazBKjcMxVU2pmma5YPtaxaP2bYDCFOLrQ3vwhD6+L3XIUHCu
-         TSHHpCtN35vpBF/93uzgF4OgriGHsLIuWRlCtTVnnrOfrt/8LrcYvCAb4Z5Ngp8BbB85
-         1vnZV0g1TuiH0rLX8TGrMs1owuivMwF9wocslIZoHPapcvPFvS7L+9zhjXtwYsjzJIk5
-         bFpw==
+        bh=FZkS+q/agP1QJGRdfV1OXrUYFKJXE2PZeWRC5FCJlOc=;
+        b=VmR90r01oblMG1PvliGd+9eNFQo/h6B5Fx9uTN7f4UrtTBtYCITyyUfSDq1D9NLAwR
+         +MeESEUmbhIkrEUv2lOgY6PLXX8/wFirwlw56yNL0lGZBvIVogvrjPZK8S92LrpOEKxt
+         dK2/u4PoOQIeGJVHJBIotYrFAIeMcbRkXrSDF/CG5aswyjkOU38b7sd16RcMRgCvgWic
+         1Pdiu9Rd7Jvzgk36UPPObweLTRuNAfIRDPNJshcI7tUCYVuqTdjMf29xIxyKck8q7S5k
+         kJY1UjVE+qyuKfQ2rSHwkT92ovoTJudipBg/JjYqrEvbnBxbq7YwyiSDGxFg6IlP6YI2
+         yJZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=OyuM0dnPuVU7KgrSQK34TQOUl0fgJTh6boF0RdVGlFw=;
-        b=aSKnYuLa7ZcRXT1Z6pGGvTgO1x+Y3bwaLa280xdYnJ8MBBG54guArfKjrb1sLFP8xd
-         CyO52phEv3IiuVE1c32A0NZXjRsSd2BO4Npn2+GDTe/7+N3xIHH7scaJGS7WBneK1x2r
-         MDRcjmHxfZIhQlo684CFBSYUoBAOgAcmV1vgcdX4pILn59D4eAJ6cYtrmqQK11Sgc+6R
-         W4gY4TbbW5bnrRVoNTdDVeuckiZaJAzy0vY8Gd1sNjiyzZUDxJvll8gUH9/4mXDbbuRr
-         9E17LehCpGcfFzku/sBe6NlCLfyrgmCxSHZVoTIfdtYuBI/s69lvZzmEI2HyO3F70Gjn
-         6xCA==
-X-Gm-Message-State: AHQUAuaeRZcLKP/9u5CiFNZdwcBVJcE2qjnG+Pc7w0Y5/72XK0mPsItr
-        lqVBIBZn7IcrKRwnUQM4pgej+w==
-X-Google-Smtp-Source: AHgI3IbyNn8UiVHVfI+zf5IVICGvjQ1CXhU/XcGg08nF7t3P8RuRccc+3DH4AMKqCIti455V/80T4g==
-X-Received: by 2002:a24:6f51:: with SMTP id x78mr6719044itb.121.1549647299486;
-        Fri, 08 Feb 2019 09:34:59 -0800 (PST)
+        bh=FZkS+q/agP1QJGRdfV1OXrUYFKJXE2PZeWRC5FCJlOc=;
+        b=oyB8qA/wJynVIWnGL9fMkXyxs5TJdg1nfvhu8AvmIx5VdCp0Bg7UJbDCkgzwos5dXc
+         J67er+3q3HlfYVH7bA+yAXwJ0PFiYFC9F8eFrSQR69JUw4wxUHLbxPwdJn2N5vFw66j2
+         76L+uVFClSidMc+A1AGOTv9j/1TKYGaCWr7gANpkLHzMBaDCwBxbn7VXXXNME7muJ0jU
+         Dx85doprc1S8E/OuXPxL6lSpgQOe0rF87zIi3/zFEJn9m0A72h6UsjOZcqyTyh47YRmI
+         x9GoyPeI5uv9dGEB4hWnWgIRL6AtU+vj6ODBFgn6x3UdVepkhjR1FMxDrOyleeuK0cV9
+         9ifw==
+X-Gm-Message-State: AHQUAuYXiDAve3DFfWMY/4vtzgcQQq/fMXmACxKdUvf8LkRdva87DLn+
+        8aU143kJSTVtcg5LJ2ZDA3+59Q==
+X-Google-Smtp-Source: AHgI3IboKQuvyNVbfBmzk8VV9P9yQ5cWdyH2eRXkFHeKYO9TQ7sS8pdFUwJS75qih5S4uusjmkznTA==
+X-Received: by 2002:a05:660c:a48:: with SMTP id j8mr7257222itl.26.1549647301539;
+        Fri, 08 Feb 2019 09:35:01 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id f142sm1522627itc.15.2019.02.08.09.34.57
+        by smtp.gmail.com with ESMTPSA id f142sm1522627itc.15.2019.02.08.09.34.59
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 08 Feb 2019 09:34:58 -0800 (PST)
+        Fri, 08 Feb 2019 09:35:00 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-aio@kvack.org, linux-block@vger.kernel.org,
         linux-api@vger.kernel.org
 Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com, jannh@google.com,
-        viro@ZenIV.linux.org.uk, Jens Axboe <axboe@kernel.dk>,
-        netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>
-Subject: [PATCH 13/19] net: split out functions related to registering inflight socket files
-Date:   Fri,  8 Feb 2019 10:34:17 -0700
-Message-Id: <20190208173423.27014-14-axboe@kernel.dk>
+        viro@ZenIV.linux.org.uk, Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 14/19] io_uring: add file set registration
+Date:   Fri,  8 Feb 2019 10:34:18 -0700
+Message-Id: <20190208173423.27014-15-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190208173423.27014-1-axboe@kernel.dk>
 References: <20190208173423.27014-1-axboe@kernel.dk>
@@ -70,402 +69,460 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We need this functionality for the io_uring file registration, but
-we cannot rely on it since CONFIG_UNIX can be modular. Move the helpers
-to a separate file, that's always builtin to the kernel if CONFIG_UNIX is
-m/y.
+We normally have to fget/fput for each IO we do on a file. Even with
+the batching we do, the cost of the atomic inc/dec of the file usage
+count adds up.
 
-No functional changes in this patch, just moving code around.
+This adds IORING_REGISTER_FILES, and IORING_UNREGISTER_FILES opcodes
+for the io_uring_register(2) system call. The arguments passed in must
+be an array of __s32 holding file descriptors, and nr_args should hold
+the number of file descriptors the application wishes to pin for the
+duration of the io_uring instance (or until IORING_UNREGISTER_FILES is
+called).
 
-Cc: netdev@vger.kernel.org
-Cc: David S. Miller <davem@davemloft.net>
+When used, the application must set IOSQE_FIXED_FILE in the sqe->flags
+member. Then, instead of setting sqe->fd to the real fd, it sets sqe->fd
+to the index in the array passed in to IORING_REGISTER_FILES.
+
+Files are automatically unregistered when the io_uring instance is torn
+down. An application need only unregister if it wishes to register a new
+set of fds.
+
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- include/net/af_unix.h |   1 +
- net/unix/Kconfig      |   5 ++
- net/unix/Makefile     |   2 +
- net/unix/af_unix.c    |  63 +-----------------
- net/unix/garbage.c    |  71 +-------------------
- net/unix/scm.c        | 146 ++++++++++++++++++++++++++++++++++++++++++
- net/unix/scm.h        |  10 +++
- 7 files changed, 168 insertions(+), 130 deletions(-)
- create mode 100644 net/unix/scm.c
- create mode 100644 net/unix/scm.h
+ fs/io_uring.c                 | 256 ++++++++++++++++++++++++++++++----
+ include/uapi/linux/io_uring.h |   9 +-
+ 2 files changed, 235 insertions(+), 30 deletions(-)
 
-diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-index ddbba838d048..3426d6dacc45 100644
---- a/include/net/af_unix.h
-+++ b/include/net/af_unix.h
-@@ -10,6 +10,7 @@
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 50c48e43d56e..244fb71e3424 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -29,6 +29,7 @@
+ #include <linux/net.h>
+ #include <net/sock.h>
+ #include <net/af_unix.h>
++#include <net/scm.h>
+ #include <linux/anon_inodes.h>
+ #include <linux/sched/mm.h>
+ #include <linux/uaccess.h>
+@@ -41,6 +42,7 @@
+ #include "internal.h"
  
- void unix_inflight(struct user_struct *user, struct file *fp);
- void unix_notinflight(struct user_struct *user, struct file *fp);
-+void unix_destruct_scm(struct sk_buff *skb);
- void unix_gc(void);
- void wait_for_unix_gc(void);
- struct sock *unix_get_socket(struct file *filp);
-diff --git a/net/unix/Kconfig b/net/unix/Kconfig
-index 8b31ab85d050..3b9e450656a4 100644
---- a/net/unix/Kconfig
-+++ b/net/unix/Kconfig
-@@ -19,6 +19,11 @@ config UNIX
+ #define IORING_MAX_ENTRIES	4096
++#define IORING_MAX_FIXED_FILES	1024
  
- 	  Say Y unless you know what you are doing.
+ struct io_uring {
+ 	u32 head ____cacheline_aligned_in_smp;
+@@ -102,6 +104,14 @@ struct io_ring_ctx {
+ 		struct fasync_struct	*cq_fasync;
+ 	} ____cacheline_aligned_in_smp;
  
-+config UNIX_SCM
-+	bool
-+	depends on UNIX
-+	default y
++	/*
++	 * If used, fixed file set. Writers must ensure that ->refs is dead,
++	 * readers must ensure that ->refs is alive as long as the file* is
++	 * used. Only updated through io_uring_register(2).
++	 */
++	struct file		**user_files;
++	unsigned		nr_user_files;
 +
- config UNIX_DIAG
- 	tristate "UNIX: socket monitoring interface"
- 	depends on UNIX
-diff --git a/net/unix/Makefile b/net/unix/Makefile
-index ffd0a275c3a7..54e58cc4f945 100644
---- a/net/unix/Makefile
-+++ b/net/unix/Makefile
-@@ -10,3 +10,5 @@ unix-$(CONFIG_SYSCTL)	+= sysctl_net_unix.o
+ 	/* if used, fixed mapped user buffers */
+ 	unsigned		nr_user_bufs;
+ 	struct io_mapped_ubuf	*user_bufs;
+@@ -149,6 +159,7 @@ struct io_kiocb {
+ 	unsigned int		flags;
+ #define REQ_F_FORCE_NONBLOCK	1	/* inline submission attempt */
+ #define REQ_F_IOPOLL_COMPLETED	2	/* polled IO has completed */
++#define REQ_F_FIXED_FILE	4	/* ctx owns file */
+ 	u64			user_data;
+ 	u64			error;
  
- obj-$(CONFIG_UNIX_DIAG)	+= unix_diag.o
- unix_diag-y		:= diag.o
-+
-+obj-$(CONFIG_UNIX_SCM)	+= scm.o
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 74d1eed7cbd4..2ce32dbb2feb 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -119,6 +119,8 @@
- #include <linux/freezer.h>
- #include <linux/file.h>
+@@ -376,15 +387,17 @@ static void io_iopoll_complete(struct io_ring_ctx *ctx, unsigned int *nr_events,
+ 		 * Batched puts of the same file, to avoid dirtying the
+ 		 * file usage count multiple times, if avoidable.
+ 		 */
+-		if (!file) {
+-			file = req->rw.ki_filp;
+-			file_count = 1;
+-		} else if (file == req->rw.ki_filp) {
+-			file_count++;
+-		} else {
+-			fput_many(file, file_count);
+-			file = req->rw.ki_filp;
+-			file_count = 1;
++		if (!(req->flags & REQ_F_FIXED_FILE)) {
++			if (!file) {
++				file = req->rw.ki_filp;
++				file_count = 1;
++			} else if (file == req->rw.ki_filp) {
++				file_count++;
++			} else {
++				fput_many(file, file_count);
++				file = req->rw.ki_filp;
++				file_count = 1;
++			}
+ 		}
  
-+#include "scm.h"
-+
- struct hlist_head unix_socket_table[2 * UNIX_HASH_SIZE];
- EXPORT_SYMBOL_GPL(unix_socket_table);
- DEFINE_SPINLOCK(unix_table_lock);
-@@ -1486,67 +1488,6 @@ static int unix_getname(struct socket *sock, struct sockaddr *uaddr, int peer)
- 	return err;
+ 		if (to_free == ARRAY_SIZE(reqs))
+@@ -516,13 +529,19 @@ static void kiocb_end_write(struct kiocb *kiocb)
+ 	}
  }
  
--static void unix_detach_fds(struct scm_cookie *scm, struct sk_buff *skb)
--{
--	int i;
--
--	scm->fp = UNIXCB(skb).fp;
--	UNIXCB(skb).fp = NULL;
--
--	for (i = scm->fp->count-1; i >= 0; i--)
--		unix_notinflight(scm->fp->user, scm->fp->fp[i]);
--}
--
--static void unix_destruct_scm(struct sk_buff *skb)
--{
--	struct scm_cookie scm;
--	memset(&scm, 0, sizeof(scm));
--	scm.pid  = UNIXCB(skb).pid;
--	if (UNIXCB(skb).fp)
--		unix_detach_fds(&scm, skb);
--
--	/* Alas, it calls VFS */
--	/* So fscking what? fput() had been SMP-safe since the last Summer */
--	scm_destroy(&scm);
--	sock_wfree(skb);
--}
--
--/*
-- * The "user->unix_inflight" variable is protected by the garbage
-- * collection lock, and we just read it locklessly here. If you go
-- * over the limit, there might be a tiny race in actually noticing
-- * it across threads. Tough.
-- */
--static inline bool too_many_unix_fds(struct task_struct *p)
--{
--	struct user_struct *user = current_user();
--
--	if (unlikely(user->unix_inflight > task_rlimit(p, RLIMIT_NOFILE)))
--		return !capable(CAP_SYS_RESOURCE) && !capable(CAP_SYS_ADMIN);
--	return false;
--}
--
--static int unix_attach_fds(struct scm_cookie *scm, struct sk_buff *skb)
--{
--	int i;
--
--	if (too_many_unix_fds(current))
--		return -ETOOMANYREFS;
--
--	/*
--	 * Need to duplicate file references for the sake of garbage
--	 * collection.  Otherwise a socket in the fps might become a
--	 * candidate for GC while the skb is not yet queued.
--	 */
--	UNIXCB(skb).fp = scm_fp_dup(scm->fp);
--	if (!UNIXCB(skb).fp)
--		return -ENOMEM;
--
--	for (i = scm->fp->count - 1; i >= 0; i--)
--		unix_inflight(scm->fp->user, scm->fp->fp[i]);
--	return 0;
--}
--
- static int unix_scm_to_skb(struct scm_cookie *scm, struct sk_buff *skb, bool send_fds)
- {
- 	int err = 0;
-diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index f81854d74c7d..8bbe1b8e4ff7 100644
---- a/net/unix/garbage.c
-+++ b/net/unix/garbage.c
-@@ -86,80 +86,13 @@
- #include <net/scm.h>
- #include <net/tcp_states.h>
- 
-+#include "scm.h"
-+
- /* Internal data structures and random procedures: */
- 
--static LIST_HEAD(gc_inflight_list);
- static LIST_HEAD(gc_candidates);
--static DEFINE_SPINLOCK(unix_gc_lock);
- static DECLARE_WAIT_QUEUE_HEAD(unix_gc_wait);
- 
--unsigned int unix_tot_inflight;
--
--struct sock *unix_get_socket(struct file *filp)
--{
--	struct sock *u_sock = NULL;
--	struct inode *inode = file_inode(filp);
--
--	/* Socket ? */
--	if (S_ISSOCK(inode->i_mode) && !(filp->f_mode & FMODE_PATH)) {
--		struct socket *sock = SOCKET_I(inode);
--		struct sock *s = sock->sk;
--
--		/* PF_UNIX ? */
--		if (s && sock->ops && sock->ops->family == PF_UNIX)
--			u_sock = s;
--	} else {
--		/* Could be an io_uring instance */
--		u_sock = io_uring_get_socket(filp);
--	}
--	return u_sock;
--}
--
--/* Keep the number of times in flight count for the file
-- * descriptor if it is for an AF_UNIX socket.
-- */
--
--void unix_inflight(struct user_struct *user, struct file *fp)
--{
--	struct sock *s = unix_get_socket(fp);
--
--	spin_lock(&unix_gc_lock);
--
--	if (s) {
--		struct unix_sock *u = unix_sk(s);
--
--		if (atomic_long_inc_return(&u->inflight) == 1) {
--			BUG_ON(!list_empty(&u->link));
--			list_add_tail(&u->link, &gc_inflight_list);
--		} else {
--			BUG_ON(list_empty(&u->link));
--		}
--		unix_tot_inflight++;
--	}
--	user->unix_inflight++;
--	spin_unlock(&unix_gc_lock);
--}
--
--void unix_notinflight(struct user_struct *user, struct file *fp)
--{
--	struct sock *s = unix_get_socket(fp);
--
--	spin_lock(&unix_gc_lock);
--
--	if (s) {
--		struct unix_sock *u = unix_sk(s);
--
--		BUG_ON(!atomic_long_read(&u->inflight));
--		BUG_ON(list_empty(&u->link));
--
--		if (atomic_long_dec_and_test(&u->inflight))
--			list_del_init(&u->link);
--		unix_tot_inflight--;
--	}
--	user->unix_inflight--;
--	spin_unlock(&unix_gc_lock);
--}
--
- static void scan_inflight(struct sock *x, void (*func)(struct unix_sock *),
- 			  struct sk_buff_head *hitlist)
- {
-diff --git a/net/unix/scm.c b/net/unix/scm.c
-new file mode 100644
-index 000000000000..ed1624588934
---- /dev/null
-+++ b/net/unix/scm.c
-@@ -0,0 +1,146 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+#include <linux/string.h>
-+#include <linux/socket.h>
-+#include <linux/net.h>
-+#include <linux/fs.h>
-+#include <net/af_unix.h>
-+#include <net/scm.h>
-+#include <linux/init.h>
-+
-+#include "scm.h"
-+
-+unsigned int unix_tot_inflight;
-+
-+LIST_HEAD(gc_inflight_list);
-+DEFINE_SPINLOCK(unix_gc_lock);
-+
-+struct sock *unix_get_socket(struct file *filp)
++static void io_fput(struct io_kiocb *req)
 +{
-+	struct sock *u_sock = NULL;
-+	struct inode *inode = file_inode(filp);
++	if (!(req->flags & REQ_F_FIXED_FILE))
++		fput(req->rw.ki_filp);
++}
 +
-+	/* Socket ? */
-+	if (S_ISSOCK(inode->i_mode) && !(filp->f_mode & FMODE_PATH)) {
-+		struct socket *sock = SOCKET_I(inode);
-+		struct sock *s = sock->sk;
+ static void io_complete_rw(struct kiocb *kiocb, long res, long res2)
+ {
+ 	struct io_kiocb *req = container_of(kiocb, struct io_kiocb, rw);
+ 
+ 	kiocb_end_write(kiocb);
+ 
+-	fput(kiocb->ki_filp);
++	io_fput(req);
+ 	io_cqring_add_event(req->ctx, req->user_data, res, 0);
+ 	io_free_req(req);
+ }
+@@ -638,19 +657,29 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+ {
+ 	struct io_ring_ctx *ctx = req->ctx;
+ 	struct kiocb *kiocb = &req->rw;
+-	unsigned ioprio;
++	unsigned ioprio, flags;
+ 	int fd, ret;
+ 
+ 	/* For -EAGAIN retry, everything is already prepped */
+ 	if (kiocb->ki_filp)
+ 		return 0;
+ 
++	flags = READ_ONCE(sqe->flags);
+ 	fd = READ_ONCE(sqe->fd);
+-	kiocb->ki_filp = io_file_get(state, fd);
+-	if (unlikely(!kiocb->ki_filp))
+-		return -EBADF;
+-	if (force_nonblock && !io_file_supports_async(kiocb->ki_filp))
+-		force_nonblock = false;
 +
-+		/* PF_UNIX ? */
-+		if (s && sock->ops && sock->ops->family == PF_UNIX)
-+			u_sock = s;
++	if (flags & IOSQE_FIXED_FILE) {
++		if (unlikely(!ctx->user_files ||
++		    (unsigned) fd >= ctx->nr_user_files))
++			return -EBADF;
++		kiocb->ki_filp = ctx->user_files[fd];
++		req->flags |= REQ_F_FIXED_FILE;
 +	} else {
-+		/* Could be an io_uring instance */
-+		u_sock = io_uring_get_socket(filp);
++		kiocb->ki_filp = io_file_get(state, fd);
++		if (unlikely(!kiocb->ki_filp))
++			return -EBADF;
++		if (force_nonblock && !io_file_supports_async(kiocb->ki_filp))
++			force_nonblock = false;
 +	}
-+	return u_sock;
-+}
-+EXPORT_SYMBOL(unix_get_socket);
+ 	kiocb->ki_pos = READ_ONCE(sqe->off);
+ 	kiocb->ki_flags = iocb_flags(kiocb->ki_filp);
+ 	kiocb->ki_hint = ki_hint_validate(file_write_hint(kiocb->ki_filp));
+@@ -690,10 +719,14 @@ static int io_prep_rw(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+ 	}
+ 	return 0;
+ out_fput:
+-	/* in case of error, we didn't use this file reference. drop it. */
+-	if (state)
+-		state->used_refs--;
+-	io_file_put(state, kiocb->ki_filp);
++	if (!(flags & IOSQE_FIXED_FILE)) {
++		/*
++		 * in case of error, we didn't use this file reference. drop it.
++		 */
++		if (state)
++			state->used_refs--;
++		io_file_put(state, kiocb->ki_filp);
++	}
+ 	return ret;
+ }
+ 
+@@ -825,7 +858,7 @@ static ssize_t io_read(struct io_kiocb *req, const struct sqe_submit *s,
+ out_fput:
+ 	/* Hold on to the file for -EAGAIN */
+ 	if (unlikely(ret && ret != -EAGAIN))
+-		fput(file);
++		io_fput(req);
+ 	return ret;
+ }
+ 
+@@ -879,7 +912,7 @@ static ssize_t io_write(struct io_kiocb *req, const struct sqe_submit *s,
+ 	kfree(iovec);
+ out_fput:
+ 	if (unlikely(ret))
+-		fput(file);
++		io_fput(req);
+ 	return ret;
+ }
+ 
+@@ -905,7 +938,7 @@ static int io_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+ 	loff_t sqe_off = READ_ONCE(sqe->off);
+ 	loff_t sqe_len = READ_ONCE(sqe->len);
+ 	loff_t end = sqe_off + sqe_len;
+-	unsigned fsync_flags;
++	unsigned fsync_flags, flags;
+ 	struct file *file;
+ 	int ret, fd;
+ 
+@@ -923,14 +956,23 @@ static int io_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe,
+ 		return -EINVAL;
+ 
+ 	fd = READ_ONCE(sqe->fd);
+-	file = fget(fd);
++	flags = READ_ONCE(sqe->flags);
 +
-+/* Keep the number of times in flight count for the file
-+ * descriptor if it is for an AF_UNIX socket.
-+ */
-+void unix_inflight(struct user_struct *user, struct file *fp)
++	if (flags & IOSQE_FIXED_FILE) {
++		if (unlikely(!ctx->user_files || fd >= ctx->nr_user_files))
++			return -EBADF;
++		file = ctx->user_files[fd];
++	} else {
++		file = fget(fd);
++	}
+ 	if (unlikely(!file))
+ 		return -EBADF;
+ 
+ 	ret = vfs_fsync_range(file, sqe_off, end > 0 ? end : LLONG_MAX,
+ 				fsync_flags & IORING_FSYNC_DATASYNC);
+ 
+-	fput(file);
++	if (!(flags & IOSQE_FIXED_FILE))
++		fput(file);
+ 	io_cqring_add_event(ctx, sqe->user_data, ret, 0);
+ 	io_free_req(req);
+ 	return 0;
+@@ -1067,7 +1109,7 @@ static int io_submit_sqe(struct io_ring_ctx *ctx, const struct sqe_submit *s,
+ 	ssize_t ret;
+ 
+ 	/* enforce forwards compatibility on users */
+-	if (unlikely(s->sqe->flags))
++	if (unlikely(s->sqe->flags & ~IOSQE_FIXED_FILE))
+ 		return -EINVAL;
+ 
+ 	req = io_get_req(ctx, state);
+@@ -1255,6 +1297,151 @@ static int io_cqring_wait(struct io_ring_ctx *ctx, int min_events,
+ 	return ring->r.head == ring->r.tail ? ret : 0;
+ }
+ 
++static void __io_sqe_files_unregister(struct io_ring_ctx *ctx)
 +{
-+	struct sock *s = unix_get_socket(fp);
++#if defined(CONFIG_UNIX)
++	if (ctx->ring_sock) {
++		struct sock *sock = ctx->ring_sock->sk;
++		struct sk_buff *skb;
 +
-+	spin_lock(&unix_gc_lock);
-+
-+	if (s) {
-+		struct unix_sock *u = unix_sk(s);
-+
-+		if (atomic_long_inc_return(&u->inflight) == 1) {
-+			BUG_ON(!list_empty(&u->link));
-+			list_add_tail(&u->link, &gc_inflight_list);
-+		} else {
-+			BUG_ON(list_empty(&u->link));
-+		}
-+		unix_tot_inflight++;
++		while ((skb = skb_dequeue(&sock->sk_receive_queue)) != NULL)
++			kfree_skb(skb);
 +	}
-+	user->unix_inflight++;
-+	spin_unlock(&unix_gc_lock);
++#else
++	int i;
++
++	for (i = 0; i < ctx->nr_user_files; i++)
++		fput(ctx->user_files[i]);
++#endif
 +}
 +
-+void unix_notinflight(struct user_struct *user, struct file *fp)
++static int io_sqe_files_unregister(struct io_ring_ctx *ctx)
 +{
-+	struct sock *s = unix_get_socket(fp);
++	if (!ctx->user_files)
++		return -ENXIO;
 +
-+	spin_lock(&unix_gc_lock);
++	__io_sqe_files_unregister(ctx);
++	kfree(ctx->user_files);
++	ctx->user_files = NULL;
++	return 0;
++}
 +
-+	if (s) {
-+		struct unix_sock *u = unix_sk(s);
++#if defined(CONFIG_UNIX)
++static int __io_sqe_files_scm(struct io_ring_ctx *ctx, int nr, int offset)
++{
++	struct scm_fp_list *fpl;
++	struct sk_buff *skb;
++	int i;
 +
-+		BUG_ON(!atomic_long_read(&u->inflight));
-+		BUG_ON(list_empty(&u->link));
++	fpl = kzalloc(sizeof(*fpl), GFP_KERNEL);
++	if (!fpl)
++		return -ENOMEM;
 +
-+		if (atomic_long_dec_and_test(&u->inflight))
-+			list_del_init(&u->link);
-+		unix_tot_inflight--;
++	skb = alloc_skb(0, GFP_KERNEL);
++	if (!skb) {
++		kfree(fpl);
++		return -ENOMEM;
 +	}
-+	user->unix_inflight--;
-+	spin_unlock(&unix_gc_lock);
++
++	skb->sk = ctx->ring_sock->sk;
++	skb->destructor = unix_destruct_scm;
++
++	fpl->user = get_uid(ctx->user);
++	for (i = 0; i < nr; i++) {
++		fpl->fp[i] = get_file(ctx->user_files[i + offset]);
++		unix_inflight(fpl->user, fpl->fp[i]);
++		fput(fpl->fp[i]);
++	}
++
++	fpl->max = fpl->count = nr;
++	UNIXCB(skb).fp = fpl;
++	skb_queue_head(&ctx->ring_sock->sk->sk_receive_queue, skb);
++	return 0;
 +}
 +
 +/*
-+ * The "user->unix_inflight" variable is protected by the garbage
-+ * collection lock, and we just read it locklessly here. If you go
-+ * over the limit, there might be a tiny race in actually noticing
-+ * it across threads. Tough.
++ * If UNIX sockets are enabled, fd passing can cause a reference cycle which
++ * causes regular reference counting to break down. We rely on the UNIX
++ * garbage collection to take care of this problem for us.
 + */
-+static inline bool too_many_unix_fds(struct task_struct *p)
++static int io_sqe_files_scm(struct io_ring_ctx *ctx)
 +{
-+	struct user_struct *user = current_user();
++	unsigned left, total;
++	int ret = 0;
 +
-+	if (unlikely(user->unix_inflight > task_rlimit(p, RLIMIT_NOFILE)))
-+		return !capable(CAP_SYS_RESOURCE) && !capable(CAP_SYS_ADMIN);
-+	return false;
++	total = 0;
++	left = ctx->nr_user_files;
++	while (left) {
++		unsigned this_files = min_t(unsigned, left, SCM_MAX_FD);
++		int ret;
++
++		ret = __io_sqe_files_scm(ctx, this_files, total);
++		if (ret)
++			break;
++		left -= this_files;
++		total += this_files;
++	}
++
++	return ret;
 +}
-+
-+int unix_attach_fds(struct scm_cookie *scm, struct sk_buff *skb)
++#else
++static int io_sqe_files_scm(struct io_ring_ctx *ctx)
 +{
-+	int i;
-+
-+	if (too_many_unix_fds(current))
-+		return -ETOOMANYREFS;
-+
-+	/*
-+	 * Need to duplicate file references for the sake of garbage
-+	 * collection.  Otherwise a socket in the fps might become a
-+	 * candidate for GC while the skb is not yet queued.
-+	 */
-+	UNIXCB(skb).fp = scm_fp_dup(scm->fp);
-+	if (!UNIXCB(skb).fp)
-+		return -ENOMEM;
-+
-+	for (i = scm->fp->count - 1; i >= 0; i--)
-+		unix_inflight(scm->fp->user, scm->fp->fp[i]);
 +	return 0;
 +}
-+EXPORT_SYMBOL(unix_attach_fds);
-+
-+void unix_detach_fds(struct scm_cookie *scm, struct sk_buff *skb)
-+{
-+	int i;
-+
-+	scm->fp = UNIXCB(skb).fp;
-+	UNIXCB(skb).fp = NULL;
-+
-+	for (i = scm->fp->count-1; i >= 0; i--)
-+		unix_notinflight(scm->fp->user, scm->fp->fp[i]);
-+}
-+EXPORT_SYMBOL(unix_detach_fds);
-+
-+void unix_destruct_scm(struct sk_buff *skb)
-+{
-+	struct scm_cookie scm;
-+
-+	memset(&scm, 0, sizeof(scm));
-+	scm.pid  = UNIXCB(skb).pid;
-+	if (UNIXCB(skb).fp)
-+		unix_detach_fds(&scm, skb);
-+
-+	/* Alas, it calls VFS */
-+	/* So fscking what? fput() had been SMP-safe since the last Summer */
-+	scm_destroy(&scm);
-+	sock_wfree(skb);
-+}
-diff --git a/net/unix/scm.h b/net/unix/scm.h
-new file mode 100644
-index 000000000000..5a255a477f16
---- /dev/null
-+++ b/net/unix/scm.h
-@@ -0,0 +1,10 @@
-+#ifndef NET_UNIX_SCM_H
-+#define NET_UNIX_SCM_H
-+
-+extern struct list_head gc_inflight_list;
-+extern spinlock_t unix_gc_lock;
-+
-+int unix_attach_fds(struct scm_cookie *scm, struct sk_buff *skb);
-+void unix_detach_fds(struct scm_cookie *scm, struct sk_buff *skb);
-+
 +#endif
++
++static int io_sqe_files_register(struct io_ring_ctx *ctx, void __user *arg,
++				 unsigned nr_args)
++{
++	__s32 __user *fds = (__s32 __user *) arg;
++	int fd, ret = 0;
++	unsigned i;
++
++	if (ctx->user_files)
++		return -EBUSY;
++	if (!nr_args)
++		return -EINVAL;
++	if (nr_args > IORING_MAX_FIXED_FILES)
++		return -EMFILE;
++
++	ctx->user_files = kcalloc(nr_args, sizeof(struct file *), GFP_KERNEL);
++	if (!ctx->user_files)
++		return -ENOMEM;
++
++	for (i = 0; i < nr_args; i++) {
++		ret = -EFAULT;
++		if (copy_from_user(&fd, &fds[i], sizeof(fd)))
++			break;
++
++		ctx->user_files[i] = fget(fd);
++
++		ret = -EBADF;
++		if (!ctx->user_files[i])
++			break;
++		/*
++		 * Don't allow io_uring instances to be registered. If UNIX
++		 * isn't enabled, then this causes a reference cycle and this
++		 * instance can never get freed. If UNIX is enabled we'll
++		 * handle it just fine, but there's still no point in allowing
++		 * a ring fd as it doesn't suppor regular read/write anyway.
++		 */
++		if (ctx->user_files[i]->f_op == &io_uring_fops) {
++			fput(ctx->user_files[i]);
++			break;
++		}
++		ctx->nr_user_files++;
++		ret = 0;
++	}
++
++	if (!ret)
++		ret = io_sqe_files_scm(ctx);
++	if (ret)
++		io_sqe_files_unregister(ctx);
++
++	return ret;
++}
++
+ static int io_sq_offload_start(struct io_ring_ctx *ctx)
+ {
+ 	int ret;
+@@ -1521,14 +1708,16 @@ static void io_ring_ctx_free(struct io_ring_ctx *ctx)
+ 		destroy_workqueue(ctx->sqo_wq);
+ 	if (ctx->sqo_mm)
+ 		mmdrop(ctx->sqo_mm);
++
++	io_iopoll_reap_events(ctx);
++	io_sqe_buffer_unregister(ctx);
++	io_sqe_files_unregister(ctx);
++
+ #if defined(CONFIG_UNIX)
+ 	if (ctx->ring_sock)
+ 		sock_release(ctx->ring_sock);
+ #endif
+ 
+-	io_iopoll_reap_events(ctx);
+-	io_sqe_buffer_unregister(ctx);
+-
+ 	io_mem_free(ctx->sq_ring);
+ 	io_mem_free(ctx->sq_sqes);
+ 	io_mem_free(ctx->cq_ring);
+@@ -1886,6 +2075,15 @@ static int __io_uring_register(struct io_ring_ctx *ctx, unsigned opcode,
+ 			break;
+ 		ret = io_sqe_buffer_unregister(ctx);
+ 		break;
++	case IORING_REGISTER_FILES:
++		ret = io_sqe_files_register(ctx, arg, nr_args);
++		break;
++	case IORING_UNREGISTER_FILES:
++		ret = -EINVAL;
++		if (arg || nr_args)
++			break;
++		ret = io_sqe_files_unregister(ctx);
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 		break;
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index cf28f7a11f12..6257478d55e9 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -16,7 +16,7 @@
+  */
+ struct io_uring_sqe {
+ 	__u8	opcode;		/* type of operation for this sqe */
+-	__u8	flags;		/* as of now unused */
++	__u8	flags;		/* IOSQE_ flags */
+ 	__u16	ioprio;		/* ioprio for the request */
+ 	__s32	fd;		/* file descriptor to do IO on */
+ 	__u64	off;		/* offset into file */
+@@ -33,6 +33,11 @@ struct io_uring_sqe {
+ 	};
+ };
+ 
++/*
++ * sqe->flags
++ */
++#define IOSQE_FIXED_FILE	(1U << 0)	/* use fixed fileset */
++
+ /*
+  * io_uring_setup() flags
+  */
+@@ -113,5 +118,7 @@ struct io_uring_params {
+  */
+ #define IORING_REGISTER_BUFFERS		0
+ #define IORING_UNREGISTER_BUFFERS	1
++#define IORING_REGISTER_FILES		2
++#define IORING_UNREGISTER_FILES		3
+ 
+ #endif
 -- 
 2.17.1
 
