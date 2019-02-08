@@ -2,104 +2,274 @@ Return-Path: <SRS0=HTWS=QP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BF22C169C4
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 19:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9295C169C4
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 20:26:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B3ED21841
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 19:51:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5781920844
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 20:26:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Hg/N1PLb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ApK/nDdo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726896AbfBHTvt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Feb 2019 14:51:49 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:40849 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726018AbfBHTvt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Feb 2019 14:51:49 -0500
-Received: by mail-it1-f195.google.com with SMTP id h193so11882492ita.5
-        for <linux-block@vger.kernel.org>; Fri, 08 Feb 2019 11:51:48 -0800 (PST)
+        id S1727106AbfBHU02 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Feb 2019 15:26:28 -0500
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:41176 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726211AbfBHU02 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Feb 2019 15:26:28 -0500
+Received: by mail-ot1-f66.google.com with SMTP id u16so7989024otk.8
+        for <linux-block@vger.kernel.org>; Fri, 08 Feb 2019 12:26:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=GWVppPOEhGOVkE9N5iXJ57tNN87KWELCEZAs4rg1ih8=;
-        b=Hg/N1PLbp9z3oRPEMlGv2eHv519osEoOQvoRJrh2fdDV9C1otaVM1xSUlZkK5iScDn
-         Hh82ApHzFsbQPvQUiRYjgFELYQIGUsQQpYQxQ8UYFtNkxrA6NHhPZkTH40/63duaqBZa
-         bk8GbYa8KPzk+nIebA+7m5DdMxhhVQLBUWJSpdQhCha3oBUZxUAsK6eGzcwhTHmwr0co
-         RFVPDF/QZr7GqatwTtjqwDBi/bW9EVXT1VlcNZCMexc4EQdYJfrwJnIH3sIk0h6acQmb
-         2QaaWIoaxQkHbZwVjYF3Rsf7j0ujVoAjvPKzpgv+NoB0ti75Qo9dpq+v5Ayu7UZ1IjQn
-         qRIQ==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WQ1Uiw7yG7bX1y/wPZuih6fVwfW+HixcxpxeyUyTJak=;
+        b=ApK/nDdo4fJvBZQeRAJy3NYJ+9gMCprJgp3pGfTai1K2WeVBFHpePKCZoLAjm/pUeq
+         n0s++vpQPM7OK9/zlLAeh70yKGlI/wFqBb0Gj7PD4nchKpdO3gYXwX0vsKm+QO4Ei5Re
+         kMW/m0LleSCfdEpVKdKEdJMa3SeqeT9dK0EJZmadakq337nbmoHaB3wV5Jg1il4kl5BS
+         Saa7AkVhAqYKmdKHlHC9BRSlE7mGuLc6oRCLVsnc/7Oa9w+FYICgvQbC2irNx4tFuVvI
+         v/hURkq147/SSAkL4fHw6NFWMzJZ3S0E41Z+RWaGxCMlEvTe+WbgbIt5uiMtW7PR6/01
+         5myA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GWVppPOEhGOVkE9N5iXJ57tNN87KWELCEZAs4rg1ih8=;
-        b=ZUffsaAgfec63uSG2wHRrHSH8p3auVXHmxZSCrblqovyW6w67sz9HKEpJjug7JxX3L
-         d41C54lMXHfSWEo8gseBEv/WjniVZznlS/yRqBtaKjjSEgEyg30AlpK3foYQ4z57eoj8
-         RXZTR8v2OgVVqDZhAq9l0zz6DrnjljukwXLDkYLtdRCKdA1XsBD/UZ6KFXhpbWux8puX
-         hnTHKPHXInAfj8PpZUTvjJH3O8V5gzv7dVAo+cEXOqkXIrpCOziTZLSLfKyt/7n5Irwl
-         9gSYCRJF3ds0IWmRd6V+vd/QN/bEhdnExpDv4pwP91qhcPHIAQagBZu9iFCy7WrJgbLK
-         ol9Q==
-X-Gm-Message-State: AHQUAuYH+vLTxZihvvknR6YPVG+rr9Mvk0vWpG6LvYsWr28YKmsCIj4S
-        mohWSh2C4bVOr/HrEsZ9vs08Og==
-X-Google-Smtp-Source: AHgI3IbSWAxKw/Q+d2Doo7nFmeXEs9T4hhDyV3CzuxxqX/2ZcZQex/YtzuzOERyRpeR7bhGNDZ7fLA==
-X-Received: by 2002:a24:10cb:: with SMTP id 194mr108017ity.173.1549655508287;
-        Fri, 08 Feb 2019 11:51:48 -0800 (PST)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id x6sm1255046iol.19.2019.02.08.11.51.46
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 08 Feb 2019 11:51:47 -0800 (PST)
-Subject: Re: [PATCH 13/19] net: split out functions related to registering
- inflight socket files
-To:     David Miller <davem@davemloft.net>
-Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org, hch@lst.de, jmoyer@redhat.com,
-        avi@scylladb.com, jannh@google.com, viro@ZenIV.linux.org.uk,
-        netdev@vger.kernel.org
-References: <20190208173423.27014-1-axboe@kernel.dk>
- <20190208173423.27014-14-axboe@kernel.dk>
- <20190208.114909.2274258441884310233.davem@davemloft.net>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <234470b5-ab86-a526-84bd-1b81254c3c14@kernel.dk>
-Date:   Fri, 8 Feb 2019 12:51:46 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WQ1Uiw7yG7bX1y/wPZuih6fVwfW+HixcxpxeyUyTJak=;
+        b=JpLCxtO9urqX83qQCz8YqPbHPhZhqa947Gix/JNC6bbfsSMinzeX5pCZqomxjhBCgU
+         PBLHRPsbBQQx6VYKWxBMx8XJFsFzjya3rpnAI5AyqsNDGJE+j2ep0nowis5lRJN8U3EK
+         5Ks3encmw1IZ6cCV91GAuvSc2uRkL7jaINA45++EJdAFeEcTwDpty9CpRP81apv0Op5M
+         4rDSFldIalEeGdfXY4wL6uxo05Jccwx53l3RGH6xwa0LgdRqRKnWkxZwgvPhD6v0TDFb
+         VaH0+OAbSvDV2l7Mi86921g3///X8C5r+dvM/7VraaFI4vEoK2/kQL8o8C17TlMEzlNB
+         zgvQ==
+X-Gm-Message-State: AHQUAuZ3pP9i4/+HIW+OFmvybm6B/Z2xFA+PcBY6Iwzdqam34HHBsGHJ
+        deYKrUoAhbNmur1ffnOlklJeSPfQX2ZZ94HZz+4oYADu4ZIKyg==
+X-Google-Smtp-Source: AHgI3IZA2d0EMgmZ1T2+ZyDk+0AJt6Je5t5aHSTt50Wbkus0erVY6Y5yd7wscP/LAnoixp1vZeU/9s+8fD72hnhTchc=
+X-Received: by 2002:a9d:638f:: with SMTP id w15mr14250777otk.230.1549657587054;
+ Fri, 08 Feb 2019 12:26:27 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190208.114909.2274258441884310233.davem@davemloft.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190208173423.27014-1-axboe@kernel.dk> <20190208173423.27014-15-axboe@kernel.dk>
+In-Reply-To: <20190208173423.27014-15-axboe@kernel.dk>
+From:   Jann Horn <jannh@google.com>
+Date:   Fri, 8 Feb 2019 21:26:01 +0100
+Message-ID: <CAG48ez2Fp10zQ4Y-x4RJh3Cu=vABu9w8ZrAJThvkh6pr74ZiQw@mail.gmail.com>
+Subject: Re: [PATCH 14/19] io_uring: add file set registration
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
+        jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>,
+        Al Viro <viro@zeniv.linux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/8/19 12:49 PM, David Miller wrote:
-> From: Jens Axboe <axboe@kernel.dk>
-> Date: Fri,  8 Feb 2019 10:34:17 -0700
-> 
->> We need this functionality for the io_uring file registration, but
->> we cannot rely on it since CONFIG_UNIX can be modular. Move the helpers
->> to a separate file, that's always builtin to the kernel if CONFIG_UNIX is
->> m/y.
->>
->> No functional changes in this patch, just moving code around.
->>
->> Cc: netdev@vger.kernel.org
->> Cc: David S. Miller <davem@davemloft.net>
->> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> No objections on my end, feel free to merge this in with your series.
-> 
-> Acked-by: David S. Miller <davem@davemloft.net>
+On Fri, Feb 8, 2019 at 6:35 PM Jens Axboe <axboe@kernel.dk> wrote:
+> We normally have to fget/fput for each IO we do on a file. Even with
+> the batching we do, the cost of the atomic inc/dec of the file usage
+> count adds up.
+>
+> This adds IORING_REGISTER_FILES, and IORING_UNREGISTER_FILES opcodes
+> for the io_uring_register(2) system call. The arguments passed in must
+> be an array of __s32 holding file descriptors, and nr_args should hold
+> the number of file descriptors the application wishes to pin for the
+> duration of the io_uring instance (or until IORING_UNREGISTER_FILES is
+> called).
+>
+> When used, the application must set IOSQE_FIXED_FILE in the sqe->flags
+> member. Then, instead of setting sqe->fd to the real fd, it sets sqe->fd
+> to the index in the array passed in to IORING_REGISTER_FILES.
+>
+> Files are automatically unregistered when the io_uring instance is torn
+> down. An application need only unregister if it wishes to register a new
+> set of fds.
 
-Great, thanks Dave! I'll add your ack.
+I think the overall concept here is still broken: You're giving the
+user_files to the GC, and I think the GC can drop their refcounts, but
+I don't see you actually getting feedback from the GC anywhere that
+would let the GC break your references? E.g. in io_prep_rw() you grab
+file pointers from ctx->user_files after simply checking
+ctx->nr_user_files, and there is no path from the GC that touches
+those fields. As far as I can tell, the GC is just going to go through
+unix_destruct_scm() and drop references on your files, causing
+use-after-free.
 
--- 
-Jens Axboe
+But the unix GC is complicated, and maybe I'm just missing something...
 
+> +static void __io_sqe_files_unregister(struct io_ring_ctx *ctx)
+> +{
+> +#if defined(CONFIG_UNIX)
+> +       if (ctx->ring_sock) {
+> +               struct sock *sock = ctx->ring_sock->sk;
+> +               struct sk_buff *skb;
+> +
+> +               while ((skb = skb_dequeue(&sock->sk_receive_queue)) != NULL)
+> +                       kfree_skb(skb);
+> +       }
+> +#else
+> +       int i;
+> +
+> +       for (i = 0; i < ctx->nr_user_files; i++)
+> +               fput(ctx->user_files[i]);
+> +#endif
+> +}
+> +
+> +static int io_sqe_files_unregister(struct io_ring_ctx *ctx)
+> +{
+> +       if (!ctx->user_files)
+> +               return -ENXIO;
+> +
+> +       __io_sqe_files_unregister(ctx);
+> +       kfree(ctx->user_files);
+> +       ctx->user_files = NULL;
+> +       return 0;
+> +}
+> +
+> +#if defined(CONFIG_UNIX)
+> +static int __io_sqe_files_scm(struct io_ring_ctx *ctx, int nr, int offset)
+> +{
+> +       struct scm_fp_list *fpl;
+> +       struct sk_buff *skb;
+> +       int i;
+> +
+> +       fpl = kzalloc(sizeof(*fpl), GFP_KERNEL);
+> +       if (!fpl)
+> +               return -ENOMEM;
+> +
+> +       skb = alloc_skb(0, GFP_KERNEL);
+> +       if (!skb) {
+> +               kfree(fpl);
+> +               return -ENOMEM;
+> +       }
+> +
+> +       skb->sk = ctx->ring_sock->sk;
+> +       skb->destructor = unix_destruct_scm;
+> +
+> +       fpl->user = get_uid(ctx->user);
+> +       for (i = 0; i < nr; i++) {
+> +               fpl->fp[i] = get_file(ctx->user_files[i + offset]);
+> +               unix_inflight(fpl->user, fpl->fp[i]);
+> +               fput(fpl->fp[i]);
+
+This pattern is almost always superfluous. You increment the file's
+refcount, maybe insert the file into a list (essentially), and drop
+the file's refcount back down. You're already holding a stable
+reference, and you're not temporarily lending that to anyone else.
+
+> +       }
+> +
+> +       fpl->max = fpl->count = nr;
+> +       UNIXCB(skb).fp = fpl;
+> +       skb_queue_head(&ctx->ring_sock->sk->sk_receive_queue, skb);
+> +       return 0;
+> +}
+> +
+> +/*
+> + * If UNIX sockets are enabled, fd passing can cause a reference cycle which
+> + * causes regular reference counting to break down. We rely on the UNIX
+> + * garbage collection to take care of this problem for us.
+> + */
+> +static int io_sqe_files_scm(struct io_ring_ctx *ctx)
+> +{
+> +       unsigned left, total;
+> +       int ret = 0;
+> +
+> +       total = 0;
+> +       left = ctx->nr_user_files;
+> +       while (left) {
+> +               unsigned this_files = min_t(unsigned, left, SCM_MAX_FD);
+> +               int ret;
+> +
+> +               ret = __io_sqe_files_scm(ctx, this_files, total);
+> +               if (ret)
+> +                       break;
+> +               left -= this_files;
+> +               total += this_files;
+> +       }
+> +
+> +       return ret;
+> +}
+> +#else
+> +static int io_sqe_files_scm(struct io_ring_ctx *ctx)
+> +{
+> +       return 0;
+> +}
+> +#endif
+> +
+> +static int io_sqe_files_register(struct io_ring_ctx *ctx, void __user *arg,
+> +                                unsigned nr_args)
+> +{
+> +       __s32 __user *fds = (__s32 __user *) arg;
+> +       int fd, ret = 0;
+> +       unsigned i;
+> +
+> +       if (ctx->user_files)
+> +               return -EBUSY;
+> +       if (!nr_args)
+> +               return -EINVAL;
+> +       if (nr_args > IORING_MAX_FIXED_FILES)
+> +               return -EMFILE;
+> +
+> +       ctx->user_files = kcalloc(nr_args, sizeof(struct file *), GFP_KERNEL);
+> +       if (!ctx->user_files)
+> +               return -ENOMEM;
+> +
+> +       for (i = 0; i < nr_args; i++) {
+> +               ret = -EFAULT;
+> +               if (copy_from_user(&fd, &fds[i], sizeof(fd)))
+> +                       break;
+> +
+> +               ctx->user_files[i] = fget(fd);
+> +
+> +               ret = -EBADF;
+> +               if (!ctx->user_files[i])
+> +                       break;
+> +               /*
+> +                * Don't allow io_uring instances to be registered. If UNIX
+> +                * isn't enabled, then this causes a reference cycle and this
+> +                * instance can never get freed. If UNIX is enabled we'll
+> +                * handle it just fine, but there's still no point in allowing
+> +                * a ring fd as it doesn't suppor regular read/write anyway.
+
+nit: support
+
+> +                */
+> +               if (ctx->user_files[i]->f_op == &io_uring_fops) {
+> +                       fput(ctx->user_files[i]);
+> +                       break;
+> +               }
+> +               ctx->nr_user_files++;
+> +               ret = 0;
+> +       }
+> +
+> +       if (!ret)
+> +               ret = io_sqe_files_scm(ctx);
+> +       if (ret)
+> +               io_sqe_files_unregister(ctx);
+> +
+> +       return ret;
+> +}
+> +
+>  static int io_sq_offload_start(struct io_ring_ctx *ctx)
+>  {
+>         int ret;
+> @@ -1521,14 +1708,16 @@ static void io_ring_ctx_free(struct io_ring_ctx *ctx)
+>                 destroy_workqueue(ctx->sqo_wq);
+>         if (ctx->sqo_mm)
+>                 mmdrop(ctx->sqo_mm);
+> +
+> +       io_iopoll_reap_events(ctx);
+> +       io_sqe_buffer_unregister(ctx);
+> +       io_sqe_files_unregister(ctx);
+> +
+>  #if defined(CONFIG_UNIX)
+>         if (ctx->ring_sock)
+>                 sock_release(ctx->ring_sock);
+>  #endif
+>
+> -       io_iopoll_reap_events(ctx);
+> -       io_sqe_buffer_unregister(ctx);
