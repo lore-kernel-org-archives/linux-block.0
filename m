@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 897BDC282CB
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 17:35:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A74C169C4
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 17:38:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 59B5B218D4
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 17:35:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EEBE2217D8
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 17:38:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="TMgJCzez"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="sJN6o3mJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727970AbfBHRfI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Feb 2019 12:35:08 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:55181 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727944AbfBHRfG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Feb 2019 12:35:06 -0500
-Received: by mail-it1-f195.google.com with SMTP id i145so10657806ita.4
-        for <linux-block@vger.kernel.org>; Fri, 08 Feb 2019 09:35:06 -0800 (PST)
+        id S1727859AbfBHRii (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Feb 2019 12:38:38 -0500
+Received: from mail-it1-f196.google.com ([209.85.166.196]:39786 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728008AbfBHRfN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Feb 2019 12:35:13 -0500
+Received: by mail-it1-f196.google.com with SMTP id a6so10790568itl.4
+        for <linux-block@vger.kernel.org>; Fri, 08 Feb 2019 09:35:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=8zkyREBIrKQ0HvbZ1wj0qlZpaBpErgZ9IGppgDbR9QY=;
-        b=TMgJCzez4idSxsrC8s5C4LEXrJ9jsC4a4q/C/MS9EPg46Ynua1ToGQqzL9iO7zA5Aa
-         noUFGdrV0MOCn65jDGDwHp9lP+kDRWbGFNQMjI0OnIirJsS5h05gkU+nvwl4iz5u704A
-         f69v9+qqFRYnn544sdcq14JwGT+b8pJHdaW5S4YCjEKfB1m+dBe5Kr3BlL0L0460kN5j
-         FRjuPORQNaJQ3ge+b8LCjuxBPLyrzSSRHmXhX+9orTDc4smIC3lUJPlgvM6CkVjXA9Ky
-         Aj6Z2dLM2Yzt5hjnLC6uctCDX3zJdZIxQcUQt/9LvqWWIY/ZXvL/z5nMcOOQZFnfg1YJ
-         2wlA==
+        bh=Ie3XSgY/RoieGTFSahZTNBAOsQCDh/k/ejXusljNQ68=;
+        b=sJN6o3mJmvenBwynryEfEP9TCuSGHxg4zqjmJL0X3oZF3V7yLjFqIkoPFICL7P4JzF
+         AlLfB19aIqaltgsKjOlvFt/3OVRFAE7L9RivKL5VZpIxUpbbcqk0r65WeqsIghN6hwe9
+         zIm5DUinq3kWmqkjOrAMipu5PUzgrErwS9Lpf53bgNnjVevZNJy/OacdKbEOAJXs6FYx
+         krgGR0iHxvEmznDz6m+sDXtGSHOLXhdSkhvFQcxVr9HEsEzCZa82k4LHtwtRdvKywRuy
+         0c4k6UTGoNDIHfNS3z+vnVSVbUkC7eIuDPqTXHjghbJcbCFZd2AFh626Unq8emSEvO2d
+         vwaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=8zkyREBIrKQ0HvbZ1wj0qlZpaBpErgZ9IGppgDbR9QY=;
-        b=lCy6yB9yJ7cME1jN5vviMs0eveMngwslvxXuXbD6nsYcdv0vMvLb2mK56/QzAtcyz4
-         lCiLg8+YMO3ZG07O3xoLfy5vgI1bnXTJCF8WFngpD/CU2XCRjIgcLFsCedQmLTw/I1Ck
-         y8jqAd7ST7Oh4Rydewght57yzH+p+33eCVQwtC7FpWtmP7YoHWcQiIdvsgxiHjUflIbx
-         Pu8S/MHjNOV+elY8dbRn17XilGxGm0/6PxNBVER6HVkHsiM3dYaPO6NKKOu3UOgILynO
-         NAc5Jmi/vVRyM7S+z6VZPFq2hKCYSxmcF8plfz7o0AzboK9DLjVJ+jReXgyzT9l4LiQq
-         MZsg==
-X-Gm-Message-State: AHQUAuaSO6b4Jjq3BKSirzYQMNm1PyiL4hnObvWCWBnJ9sQRZMVEK1XJ
-        X+kHefftN1M3pcTRnJ+DEGNCyQ==
-X-Google-Smtp-Source: AHgI3Ibe8NUVbMFgNZrDH8sa0QfYhwVnElSiBoALnDeJuorCZe92zmTlZWTuKhRBfomuMBzxLKAaHw==
-X-Received: by 2002:a24:4d05:: with SMTP id l5mr9381301itb.147.1549647305683;
-        Fri, 08 Feb 2019 09:35:05 -0800 (PST)
+        bh=Ie3XSgY/RoieGTFSahZTNBAOsQCDh/k/ejXusljNQ68=;
+        b=CFL+NblfxMjBPiLa/e3ulQIcWzVSkD7YEZFz7Vx4Wm5f9XtZKHyhG0MkZXpzNzDYf9
+         qdmujZynS/DyvYCgOGLa3VyvEsRgwey5mKXN558txT4r99y0//nwRKQ7q2WhUv2+edTh
+         qy3JhGa5cVmvMAplvKoFzh7kNj8rOwJyaSPjEWLz/w+Jqkr4mQ3aM7ahUGmF5qX5dfoh
+         GkUlY9C5fgq4r6+750Fa3IdSr3Sja6zhQXSATMUQDhaPAqaKRWRl9Y253aDAu1EuAgTT
+         Yh3rmWbAm9yKtdiCpLJ9Y8n8Qu+fv7W2aZnAw1kR+cdt9DCOORUdpnJdFHUuDVYffOxW
+         xhMg==
+X-Gm-Message-State: AHQUAubnFx9EvUD76dWuDNL0vK/VANsMY5l139mpmM4TC8Drj0W38umi
+        pWfaww5tAyAeRYtDWdn2ofIvsQ==
+X-Google-Smtp-Source: AHgI3IbdiXkkHq+moA+MaupqpOQf2DWt22ywS0cZBJN8SM8h4gbAoXYeNd4t1uMBUBe/31AHgEes9w==
+X-Received: by 2002:a24:2208:: with SMTP id o8mr8083242ito.23.1549647312430;
+        Fri, 08 Feb 2019 09:35:12 -0800 (PST)
 Received: from localhost.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id f142sm1522627itc.15.2019.02.08.09.35.03
+        by smtp.gmail.com with ESMTPSA id f142sm1522627itc.15.2019.02.08.09.35.10
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 08 Feb 2019 09:35:04 -0800 (PST)
+        Fri, 08 Feb 2019 09:35:11 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-aio@kvack.org, linux-block@vger.kernel.org,
         linux-api@vger.kernel.org
 Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com, jannh@google.com,
         viro@ZenIV.linux.org.uk, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 16/19] io_uring: add io_kiocb ref count
-Date:   Fri,  8 Feb 2019 10:34:20 -0700
-Message-Id: <20190208173423.27014-17-axboe@kernel.dk>
+Subject: [PATCH 19/19] io_uring: add io_uring_event cache hit information
+Date:   Fri,  8 Feb 2019 10:34:23 -0700
+Message-Id: <20190208173423.27014-20-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190208173423.27014-1-axboe@kernel.dk>
 References: <20190208173423.27014-1-axboe@kernel.dk>
@@ -69,49 +69,57 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We'll use this for the POLL implementation. Regular requests will
-NOT be using references, so initialize it to 0. Any real use of
-the io_kiocb ref will initialize it to at least 2.
+Add hint on whether a read was served out of the page cache, or if it
+hit media. This is useful for buffered async IO, O_DIRECT reads would
+never have this set (for obvious reasons).
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+If the read hit page cache, cqe->flags will have IOCQE_FLAG_CACHEHIT
+set.
+
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/io_uring.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ fs/io_uring.c                 | 7 ++++++-
+ include/uapi/linux/io_uring.h | 5 +++++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
 diff --git a/fs/io_uring.c b/fs/io_uring.c
-index e6b9cef4665d..9b28f2cd29db 100644
+index 175dac00eb47..48e864de5dca 100644
 --- a/fs/io_uring.c
 +++ b/fs/io_uring.c
-@@ -163,6 +163,7 @@ struct io_kiocb {
- 	struct io_ring_ctx	*ctx;
- 	struct list_head	list;
- 	unsigned int		flags;
-+	refcount_t		refs;
- #define REQ_F_FORCE_NONBLOCK	1	/* inline submission attempt */
- #define REQ_F_IOPOLL_COMPLETED	2	/* polled IO has completed */
- #define REQ_F_FIXED_FILE	4	/* ctx owns file */
-@@ -349,6 +350,7 @@ static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx,
- 
- 	req->ctx = ctx;
- 	req->flags = 0;
-+	refcount_set(&req->refs, 0);
- 	return req;
- out:
- 	io_ring_drop_ctx_refs(ctx, 1);
-@@ -366,8 +368,10 @@ static void io_free_req_many(struct io_ring_ctx *ctx, void **reqs, int *nr)
- 
- static void io_free_req(struct io_kiocb *req)
+@@ -583,11 +583,16 @@ static void io_fput(struct io_kiocb *req)
+ static void io_complete_rw(struct kiocb *kiocb, long res, long res2)
  {
--	io_ring_drop_ctx_refs(req->ctx, 1);
--	kmem_cache_free(req_cachep, req);
-+	if (!refcount_read(&req->refs) || refcount_dec_and_test(&req->refs)) {
-+		io_ring_drop_ctx_refs(req->ctx, 1);
-+		kmem_cache_free(req_cachep, req);
-+	}
+ 	struct io_kiocb *req = container_of(kiocb, struct io_kiocb, rw);
++	unsigned ev_flags = 0;
+ 
+ 	kiocb_end_write(kiocb);
+ 
+ 	io_fput(req);
+-	io_cqring_add_event(req->ctx, req->user_data, res, 0);
++
++	if (res > 0 && (req->flags & REQ_F_FORCE_NONBLOCK))
++		ev_flags = IOCQE_FLAG_CACHEHIT;
++
++	io_cqring_add_event(req->ctx, req->user_data, res, ev_flags);
+ 	io_free_req(req);
  }
  
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index e23408692118..24906e99fdc7 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -69,6 +69,11 @@ struct io_uring_cqe {
+ 	__u32	flags;
+ };
+ 
++/*
++ * io_uring_event->flags
++ */
++#define IOCQE_FLAG_CACHEHIT	(1U << 0)	/* IO did not hit media */
++
  /*
+  * Magic offsets for the application to mmap the data it needs
+  */
 -- 
 2.17.1
 
