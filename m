@@ -3,33 +3,37 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 572CCC169C4
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:57:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78C7EC169C4
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:57:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B93621841
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:57:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BA6321841
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:57:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726747AbfBHW5d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Feb 2019 17:57:33 -0500
-Received: from mga06.intel.com ([134.134.136.31]:3994 "EHLO mga06.intel.com"
+        id S1727007AbfBHW5n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Feb 2019 17:57:43 -0500
+Received: from mga05.intel.com ([192.55.52.43]:44781 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726704AbfBHW5d (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Feb 2019 17:57:33 -0500
-X-Amp-Result: UNSCANNABLE
+        id S1726704AbfBHW5n (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Feb 2019 17:57:43 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Feb 2019 14:57:32 -0800
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Feb 2019 14:57:42 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.58,348,1544515200"; 
-   d="p7s'?scan'208";a="142776840"
-Received: from orsmsx109.amr.corp.intel.com ([10.22.240.7])
-  by fmsmga004.fm.intel.com with ESMTP; 08 Feb 2019 14:57:31 -0800
+   d="p7s'?scan'208";a="123088457"
+Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
+  by fmsmga008.fm.intel.com with ESMTP; 08 Feb 2019 14:57:42 -0800
+Received: from orsmsx116.amr.corp.intel.com (10.22.240.14) by
+ ORSMSX110.amr.corp.intel.com (10.22.240.8) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Fri, 8 Feb 2019 14:57:41 -0800
 Received: from orsmsx101.amr.corp.intel.com ([169.254.8.11]) by
- ORSMSX109.amr.corp.intel.com ([169.254.11.11]) with mapi id 14.03.0415.000;
- Fri, 8 Feb 2019 14:57:31 -0800
+ ORSMSX116.amr.corp.intel.com ([169.254.7.135]) with mapi id 14.03.0415.000;
+ Fri, 8 Feb 2019 14:57:41 -0800
 From:   "Derrick, Jonathan" <jonathan.derrick@intel.com>
 To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "zub@linux.fjfi.cvut.cz" <zub@linux.fjfi.cvut.cz>,
@@ -38,43 +42,42 @@ To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "axboe@kernel.dk" <axboe@kernel.dk>
 CC:     "jonas.rabenstein@studium.uni-erlangen.de" 
         <jonas.rabenstein@studium.uni-erlangen.de>
-Subject: Re: [PATCH v4 04/16] block: sed-opal: close parameter list in
- cmd_finalize
-Thread-Topic: [PATCH v4 04/16] block: sed-opal: close parameter list in
- cmd_finalize
-Thread-Index: AQHUum/jCOrJ80gFkUyJXYLhQjwYaKXXFJGA
-Date:   Fri, 8 Feb 2019 22:57:31 +0000
-Message-ID: <1549666649.10972.52.camel@intel.com>
+Subject: Re: [PATCH v4 05/16] block: sed-opal: unify cmd start
+Thread-Topic: [PATCH v4 05/16] block: sed-opal: unify cmd start
+Thread-Index: AQHUum/otCNcPEgwT02NsUIityk1/KXXFJwA
+Date:   Fri, 8 Feb 2019 22:57:40 +0000
+Message-ID: <1549666658.10972.53.camel@intel.com>
 References: <1549054223-12220-1-git-send-email-zub@linux.fjfi.cvut.cz>
-         <1549054223-12220-5-git-send-email-zub@linux.fjfi.cvut.cz>
-In-Reply-To: <1549054223-12220-5-git-send-email-zub@linux.fjfi.cvut.cz>
+         <1549054223-12220-6-git-send-email-zub@linux.fjfi.cvut.cz>
+In-Reply-To: <1549054223-12220-6-git-send-email-zub@linux.fjfi.cvut.cz>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: yes
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.232.112.141]
 Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-dEtyq3TXA9LzJm/VDePm"
+        protocol="application/x-pkcs7-signature"; boundary="=-mgH4rMqACoiuVFToGEeB"
 MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---=-dEtyq3TXA9LzJm/VDePm
+--=-mgH4rMqACoiuVFToGEeB
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Normally I wouldn't like decreasing the readability (having a STARTLIST
-without an ENDLIST in the same function), but this makes a lot of sense
-with 5/16
+Looks fine with 4/16
 
 Acked-by: Jon Derrick <jonathan.derrick@intel.com>
 
 On Fri, 2019-02-01 at 21:50 +0100, David Kozub wrote:
-> Every step ends by calling cmd_finalize (via finalize_and_send)
-> yet every step adds the token OPAL_ENDLIST on its own. Moving
-> this into cmd_finalize decreases code duplication.
+> Every step starts with resetting the cmd buffer as well as the comid and
+> constructs the appropriate OPAL_CALL command. Consequently, those
+> actions may be combined into one generic function. On should take care
+> that the opening and closing tokens for the argument list are already
+> emitted by cmd_start and cmd_finalize respectively and thus must not be
+> additionally added.
 >=20
 > Co-authored-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.d=
 e>
@@ -83,193 +86,483 @@ e>
 >
 > Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
 > ---
->  block/sed-opal.c | 25 +++----------------------
->  1 file changed, 3 insertions(+), 22 deletions(-)
+>  block/sed-opal.c | 228 ++++++++++++++---------------------------------
+>  1 file changed, 69 insertions(+), 159 deletions(-)
 >=20
 > diff --git a/block/sed-opal.c b/block/sed-opal.c
-> index 980705681806..35b1747b650f 100644
+> index 35b1747b650f..e29cb2f445ff 100644
 > --- a/block/sed-opal.c
 > +++ b/block/sed-opal.c
-> @@ -661,6 +661,9 @@ static int cmd_finalize(struct opal_dev *cmd, u32 hsn=
+> @@ -661,7 +661,7 @@ static int cmd_finalize(struct opal_dev *cmd, u32 hsn=
 , u32 tsn)
 >  	struct opal_header *hdr;
 >  	int err =3D 0;
 > =20
-> +	/* close parameter list */
-> +	add_token_u8(&err, cmd, OPAL_ENDLIST);
-> +
+> -	/* close parameter list */
+> +	/* close the parameter list opened from cmd_start */
+>  	add_token_u8(&err, cmd, OPAL_ENDLIST);
+> =20
 >  	add_token_u8(&err, cmd, OPAL_ENDOFDATA);
->  	add_token_u8(&err, cmd, OPAL_STARTLIST);
->  	add_token_u8(&err, cmd, 0);
-> @@ -1079,7 +1082,6 @@ static int gen_key(struct opal_dev *dev, void *data=
-)
->  	add_token_bytestring(&err, dev, opalmethod[OPAL_GENKEY],
->  			     OPAL_UID_LENGTH);
->  	add_token_u8(&err, dev, OPAL_STARTLIST);
-> -	add_token_u8(&err, dev, OPAL_ENDLIST);
+> @@ -1006,6 +1006,27 @@ static void clear_opal_cmd(struct opal_dev *dev)
+>  	memset(dev->cmd, 0, IO_BUFFER_LENGTH);
+>  }
+> =20
+> +static int cmd_start(struct opal_dev *dev, const u8 *uid, const u8 *meth=
+od)
+> +{
+> +	int err =3D 0;
+> +
+> +	clear_opal_cmd(dev);
+> +	set_comid(dev, dev->comid);
+> +
+> +	add_token_u8(&err, dev, OPAL_CALL);
+> +	add_token_bytestring(&err, dev, uid, OPAL_UID_LENGTH);
+> +	add_token_bytestring(&err, dev, method, OPAL_METHOD_LENGTH);
+> +
+> +	/*
+> +	 * Every method call is followed by its parameters enclosed within
+> +	 * OPAL_STARTLIST and OPAL_ENDLIST tokens. We automatically open the
+> +	 * parameter list here and close it later in cmd_finalize.
+> +	 */
+> +	add_token_u8(&err, dev, OPAL_STARTLIST);
+> +
+> +	return err;
+> +}
+> +
+>  static int start_opal_session_cont(struct opal_dev *dev)
+>  {
+>  	u32 hsn, tsn;
+> @@ -1068,20 +1089,13 @@ static int finalize_and_send(struct opal_dev *dev=
+, cont_fn cont)
+>  static int gen_key(struct opal_dev *dev, void *data)
+>  {
+>  	u8 uid[OPAL_UID_LENGTH];
+> -	int err =3D 0;
+> -
+> -	clear_opal_cmd(dev);
+> -	set_comid(dev, dev->comid);
+> +	int err;
+> =20
+>  	memcpy(uid, dev->prev_data, min(sizeof(uid), dev->prev_d_len));
+>  	kfree(dev->prev_data);
+>  	dev->prev_data =3D NULL;
+> =20
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, uid, OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_GENKEY],
+> -			     OPAL_UID_LENGTH);
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+> +	err =3D cmd_start(dev, uid, opalmethod[OPAL_GENKEY]);
 > =20
 >  	if (err) {
 >  		pr_debug("Error building gen key command\n");
-> @@ -1142,7 +1144,6 @@ static int get_active_key(struct opal_dev *dev, voi=
-d *data)
->  	add_token_u8(&err, dev, 10); /* ActiveKey */
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
->  	add_token_u8(&err, dev, OPAL_ENDLIST);
-> -	add_token_u8(&err, dev, OPAL_ENDLIST);
->  	if (err) {
->  		pr_debug("Error building get active key command\n");
->  		return err;
-> @@ -1188,7 +1189,6 @@ static int generic_lr_enable_disable(struct opal_de=
-v *dev,
+> @@ -1119,21 +1133,14 @@ static int get_active_key_cont(struct opal_dev *d=
+ev)
+>  static int get_active_key(struct opal_dev *dev, void *data)
+>  {
+>  	u8 uid[OPAL_UID_LENGTH];
+> -	int err =3D 0;
+> +	int err;
+>  	u8 *lr =3D data;
 > =20
->  	add_token_u8(&err, dev, OPAL_ENDLIST);
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
-> -	add_token_u8(&err, dev, OPAL_ENDLIST);
->  	return err;
->  }
-> =20
-> @@ -1254,8 +1254,6 @@ static int setup_locking_range(struct opal_dev *dev=
-, void *data)
-> =20
->  		add_token_u8(&err, dev, OPAL_ENDLIST);
->  		add_token_u8(&err, dev, OPAL_ENDNAME);
-> -		add_token_u8(&err, dev, OPAL_ENDLIST);
+> -	clear_opal_cmd(dev);
+> -	set_comid(dev, dev->comid);
 > -
->  	}
->  	if (err) {
->  		pr_debug("Error building Setup Locking range command.\n");
-> @@ -1295,7 +1293,6 @@ static int start_generic_opal_session(struct opal_d=
-ev *dev,
+>  	err =3D build_locking_range(uid, sizeof(uid), *lr);
+>  	if (err)
+>  		return err;
 > =20
->  	switch (auth) {
->  	case OPAL_ANYBODY_UID:
-> -		add_token_u8(&err, dev, OPAL_ENDLIST);
->  		break;
->  	case OPAL_ADMIN1_UID:
->  	case OPAL_SID_UID:
-> @@ -1308,7 +1305,6 @@ static int start_generic_opal_session(struct opal_d=
-ev *dev,
->  		add_token_bytestring(&err, dev, opaluid[auth],
->  				     OPAL_UID_LENGTH);
->  		add_token_u8(&err, dev, OPAL_ENDNAME);
-> -		add_token_u8(&err, dev, OPAL_ENDLIST);
->  		break;
->  	default:
->  		pr_debug("Cannot start Admin SP session with auth %d\n", auth);
-> @@ -1406,7 +1402,6 @@ static int start_auth_opal_session(struct opal_dev =
-*dev, void *data)
->  	add_token_u8(&err, dev, 3);
->  	add_token_bytestring(&err, dev, lk_ul_user, OPAL_UID_LENGTH);
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
-> -	add_token_u8(&err, dev, OPAL_ENDLIST);
-> =20
->  	if (err) {
->  		pr_debug("Error building STARTSESSION command.\n");
-> @@ -1429,7 +1424,6 @@ static int revert_tper(struct opal_dev *dev, void *=
-data)
->  	add_token_bytestring(&err, dev, opalmethod[OPAL_REVERT],
->  			     OPAL_UID_LENGTH);
+> -	err =3D 0;
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, uid, OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_GET], OPAL_UID_LENGTH);
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+> +	err =3D cmd_start(dev, uid, opalmethod[OPAL_GET]);
 >  	add_token_u8(&err, dev, OPAL_STARTLIST);
-> -	add_token_u8(&err, dev, OPAL_ENDLIST);
+>  	add_token_u8(&err, dev, OPAL_STARTNAME);
+>  	add_token_u8(&err, dev, 3); /* startCloumn */
+> @@ -1156,13 +1163,10 @@ static int generic_lr_enable_disable(struct opal_=
+dev *dev,
+>  				     u8 *uid, bool rle, bool wle,
+>  				     bool rl, bool wl)
+>  {
+> -	int err =3D 0;
+> +	int err;
+> =20
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, uid, OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_SET], OPAL_UID_LENGTH);
+> +	err =3D cmd_start(dev, uid, opalmethod[OPAL_SET]);
+> =20
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+>  	add_token_u8(&err, dev, OPAL_STARTNAME);
+>  	add_token_u8(&err, dev, OPAL_VALUES);
+>  	add_token_u8(&err, dev, OPAL_STARTLIST);
+> @@ -1209,10 +1213,7 @@ static int setup_locking_range(struct opal_dev *de=
+v, void *data)
+>  	u8 uid[OPAL_UID_LENGTH];
+>  	struct opal_user_lr_setup *setup =3D data;
+>  	u8 lr;
+> -	int err =3D 0;
+> -
+> -	clear_opal_cmd(dev);
+> -	set_comid(dev, dev->comid);
+> +	int err;
+> =20
+>  	lr =3D setup->session.opal_key.lr;
+>  	err =3D build_locking_range(uid, sizeof(uid), lr);
+> @@ -1222,12 +1223,8 @@ static int setup_locking_range(struct opal_dev *de=
+v, void *data)
+>  	if (lr =3D=3D 0)
+>  		err =3D enable_global_lr(dev, uid, setup);
+>  	else {
+> -		add_token_u8(&err, dev, OPAL_CALL);
+> -		add_token_bytestring(&err, dev, uid, OPAL_UID_LENGTH);
+> -		add_token_bytestring(&err, dev, opalmethod[OPAL_SET],
+> -				     OPAL_UID_LENGTH);
+> +		err =3D cmd_start(dev, uid, opalmethod[OPAL_SET]);
+> =20
+> -		add_token_u8(&err, dev, OPAL_STARTLIST);
+>  		add_token_u8(&err, dev, OPAL_STARTNAME);
+>  		add_token_u8(&err, dev, OPAL_VALUES);
+>  		add_token_u8(&err, dev, OPAL_STARTLIST);
+> @@ -1271,22 +1268,15 @@ static int start_generic_opal_session(struct opal=
+_dev *dev,
+>  				      u8 key_len)
+>  {
+>  	u32 hsn;
+> -	int err =3D 0;
+> +	int err;
+> =20
+>  	if (key =3D=3D NULL && auth !=3D OPAL_ANYBODY_UID)
+>  		return OPAL_INVAL_PARAM;
+> =20
+> -	clear_opal_cmd(dev);
+> -
+> -	set_comid(dev, dev->comid);
+>  	hsn =3D GENERIC_HOST_SESSION_NUM;
+> +	err =3D cmd_start(dev, opaluid[OPAL_SMUID_UID],
+> +			opalmethod[OPAL_STARTSESSION]);
+> =20
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, opaluid[OPAL_SMUID_UID],
+> -			     OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_STARTSESSION],
+> -			     OPAL_UID_LENGTH);
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+>  	add_token_u64(&err, dev, hsn);
+>  	add_token_bytestring(&err, dev, opaluid[sp_type], OPAL_UID_LENGTH);
+>  	add_token_u8(&err, dev, 1);
+> @@ -1366,30 +1356,21 @@ static int start_auth_opal_session(struct opal_de=
+v *dev, void *data)
+>  	u8 *key =3D session->opal_key.key;
+>  	u32 hsn =3D GENERIC_HOST_SESSION_NUM;
+> =20
+> -	clear_opal_cmd(dev);
+> -	set_comid(dev, dev->comid);
+> -
+> -	if (session->sum) {
+> +	if (session->sum)
+>  		err =3D build_locking_user(lk_ul_user, sizeof(lk_ul_user),
+>  					 session->opal_key.lr);
+> -		if (err)
+> -			return err;
+> -
+> -	} else if (session->who !=3D OPAL_ADMIN1 && !session->sum) {
+> +	else if (session->who !=3D OPAL_ADMIN1 && !session->sum)
+>  		err =3D build_locking_user(lk_ul_user, sizeof(lk_ul_user),
+>  					 session->who - 1);
+> -		if (err)
+> -			return err;
+> -	} else
+> +	else
+>  		memcpy(lk_ul_user, opaluid[OPAL_ADMIN1_UID], OPAL_UID_LENGTH);
+> =20
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, opaluid[OPAL_SMUID_UID],
+> -			     OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_STARTSESSION],
+> -			     OPAL_UID_LENGTH);
+> +	if (err)
+> +		return err;
+> +
+> +	err =3D cmd_start(dev, opaluid[OPAL_SMUID_UID],
+> +			opalmethod[OPAL_STARTSESSION]);
+> =20
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+>  	add_token_u64(&err, dev, hsn);
+>  	add_token_bytestring(&err, dev, opaluid[OPAL_LOCKINGSP_UID],
+>  			     OPAL_UID_LENGTH);
+> @@ -1413,17 +1394,10 @@ static int start_auth_opal_session(struct opal_de=
+v *dev, void *data)
+> =20
+>  static int revert_tper(struct opal_dev *dev, void *data)
+>  {
+> -	int err =3D 0;
+> -
+> -	clear_opal_cmd(dev);
+> -	set_comid(dev, dev->comid);
+> +	int err;
+> =20
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, opaluid[OPAL_ADMINSP_UID],
+> -			     OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_REVERT],
+> -			     OPAL_UID_LENGTH);
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+> +	err =3D cmd_start(dev, opaluid[OPAL_ADMINSP_UID],
+> +			opalmethod[OPAL_REVERT]);
 >  	if (err) {
 >  		pr_debug("Error building REVERT TPER command.\n");
 >  		return err;
-> @@ -1463,7 +1457,6 @@ static int internal_activate_user(struct opal_dev *=
-dev, void *data)
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
->  	add_token_u8(&err, dev, OPAL_ENDLIST);
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
-> -	add_token_u8(&err, dev, OPAL_ENDLIST);
+> @@ -1436,18 +1410,12 @@ static int internal_activate_user(struct opal_dev=
+ *dev, void *data)
+>  {
+>  	struct opal_session_info *session =3D data;
+>  	u8 uid[OPAL_UID_LENGTH];
+> -	int err =3D 0;
+> -
+> -	clear_opal_cmd(dev);
+> -	set_comid(dev, dev->comid);
+> +	int err;
 > =20
->  	if (err) {
->  		pr_debug("Error building Activate UserN command.\n");
-> @@ -1490,7 +1483,6 @@ static int erase_locking_range(struct opal_dev *dev=
-, void *data)
->  	add_token_bytestring(&err, dev, opalmethod[OPAL_ERASE],
->  			     OPAL_UID_LENGTH);
+>  	memcpy(uid, opaluid[OPAL_USER1_UID], OPAL_UID_LENGTH);
+>  	uid[7] =3D session->who;
+> =20
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, uid, OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_SET], OPAL_UID_LENGTH);
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+> +	err =3D cmd_start(dev, uid, opalmethod[OPAL_SET]);
+>  	add_token_u8(&err, dev, OPAL_STARTNAME);
+>  	add_token_u8(&err, dev, OPAL_VALUES);
 >  	add_token_u8(&err, dev, OPAL_STARTLIST);
-> -	add_token_u8(&err, dev, OPAL_ENDLIST);
+> @@ -1470,19 +1438,12 @@ static int erase_locking_range(struct opal_dev *d=
+ev, void *data)
+>  {
+>  	struct opal_session_info *session =3D data;
+>  	u8 uid[OPAL_UID_LENGTH];
+> -	int err =3D 0;
+> -
+> -	clear_opal_cmd(dev);
+> -	set_comid(dev, dev->comid);
+> +	int err;
+> =20
+>  	if (build_locking_range(uid, sizeof(uid), session->opal_key.lr) < 0)
+>  		return -ERANGE;
+> =20
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, uid, OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_ERASE],
+> -			     OPAL_UID_LENGTH);
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+> +	err =3D cmd_start(dev, uid, opalmethod[OPAL_ERASE]);
 > =20
 >  	if (err) {
 >  		pr_debug("Error building Erase Locking Range Command.\n");
-> @@ -1521,7 +1513,6 @@ static int set_mbr_done(struct opal_dev *dev, void =
-*data)
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
->  	add_token_u8(&err, dev, OPAL_ENDLIST);
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
-> -	add_token_u8(&err, dev, OPAL_ENDLIST);
+> @@ -1494,16 +1455,11 @@ static int erase_locking_range(struct opal_dev *d=
+ev, void *data)
+>  static int set_mbr_done(struct opal_dev *dev, void *data)
+>  {
+>  	u8 *mbr_done_tf =3D data;
+> -	int err =3D 0;
+> +	int err;
 > =20
->  	if (err) {
->  		pr_debug("Error Building set MBR Done command\n");
-> @@ -1553,7 +1544,6 @@ static int set_mbr_enable_disable(struct opal_dev *=
-dev, void *data)
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
->  	add_token_u8(&err, dev, OPAL_ENDLIST);
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
-> -	add_token_u8(&err, dev, OPAL_ENDLIST);
+> -	clear_opal_cmd(dev);
+> -	set_comid(dev, dev->comid);
+> +	err =3D cmd_start(dev, opaluid[OPAL_MBRCONTROL],
+> +			opalmethod[OPAL_SET]);
 > =20
->  	if (err) {
->  		pr_debug("Error Building set MBR done command\n");
-> @@ -1585,7 +1575,6 @@ static int generic_pw_cmd(u8 *key, size_t key_len, =
-u8 *cpin_uid,
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
->  	add_token_u8(&err, dev, OPAL_ENDLIST);
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
-> -	add_token_u8(&err, dev, OPAL_ENDLIST);
-> =20
->  	return err;
->  }
-> @@ -1694,7 +1683,6 @@ static int add_user_to_lr(struct opal_dev *dev, voi=
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, opaluid[OPAL_MBRCONTROL],
+> -			     OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_SET], OPAL_UID_LENGTH);
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+>  	add_token_u8(&err, dev, OPAL_STARTNAME);
+>  	add_token_u8(&err, dev, OPAL_VALUES);
+>  	add_token_u8(&err, dev, OPAL_STARTLIST);
+> @@ -1525,16 +1481,11 @@ static int set_mbr_done(struct opal_dev *dev, voi=
 d *data)
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
->  	add_token_u8(&err, dev, OPAL_ENDLIST);
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
-> -	add_token_u8(&err, dev, OPAL_ENDLIST);
+>  static int set_mbr_enable_disable(struct opal_dev *dev, void *data)
+>  {
+>  	u8 *mbr_en_dis =3D data;
+> -	int err =3D 0;
+> +	int err;
 > =20
->  	if (err) {
->  		pr_debug("Error building add user to locking range command.\n");
-> @@ -1755,7 +1743,6 @@ static int lock_unlock_locking_range(struct opal_de=
+> -	clear_opal_cmd(dev);
+> -	set_comid(dev, dev->comid);
+> +	err =3D cmd_start(dev, opaluid[OPAL_MBRCONTROL],
+> +			opalmethod[OPAL_SET]);
+> =20
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, opaluid[OPAL_MBRCONTROL],
+> -			     OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_SET], OPAL_UID_LENGTH);
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+>  	add_token_u8(&err, dev, OPAL_STARTNAME);
+>  	add_token_u8(&err, dev, OPAL_VALUES);
+>  	add_token_u8(&err, dev, OPAL_STARTLIST);
+> @@ -1556,16 +1507,10 @@ static int set_mbr_enable_disable(struct opal_dev=
+ *dev, void *data)
+>  static int generic_pw_cmd(u8 *key, size_t key_len, u8 *cpin_uid,
+>  			  struct opal_dev *dev)
+>  {
+> -	int err =3D 0;
+> +	int err;
+> =20
+> -	clear_opal_cmd(dev);
+> -	set_comid(dev, dev->comid);
+> +	err =3D cmd_start(dev, cpin_uid, opalmethod[OPAL_SET]);
+> =20
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, cpin_uid, OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_SET],
+> -			     OPAL_UID_LENGTH);
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+>  	add_token_u8(&err, dev, OPAL_STARTNAME);
+>  	add_token_u8(&err, dev, OPAL_VALUES);
+>  	add_token_u8(&err, dev, OPAL_STARTLIST);
+> @@ -1622,10 +1567,7 @@ static int add_user_to_lr(struct opal_dev *dev, vo=
+id *data)
+>  	u8 lr_buffer[OPAL_UID_LENGTH];
+>  	u8 user_uid[OPAL_UID_LENGTH];
+>  	struct opal_lock_unlock *lkul =3D data;
+> -	int err =3D 0;
+> -
+> -	clear_opal_cmd(dev);
+> -	set_comid(dev, dev->comid);
+> +	int err;
+> =20
+>  	memcpy(lr_buffer, opaluid[OPAL_LOCKINGRANGE_ACE_RDLOCKED],
+>  	       OPAL_UID_LENGTH);
+> @@ -1640,12 +1582,8 @@ static int add_user_to_lr(struct opal_dev *dev, vo=
+id *data)
+> =20
+>  	user_uid[7] =3D lkul->session.who;
+> =20
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, lr_buffer, OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_SET],
+> -			     OPAL_UID_LENGTH);
+> +	err =3D cmd_start(dev, lr_buffer, opalmethod[OPAL_SET]);
+> =20
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+>  	add_token_u8(&err, dev, OPAL_STARTNAME);
+>  	add_token_u8(&err, dev, OPAL_VALUES);
+> =20
+> @@ -1699,9 +1637,6 @@ static int lock_unlock_locking_range(struct opal_de=
 v *dev, void *data)
+>  	u8 read_locked =3D 1, write_locked =3D 1;
+>  	int err =3D 0;
 > =20
->  	add_token_u8(&err, dev, OPAL_ENDLIST);
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
-> -	add_token_u8(&err, dev, OPAL_ENDLIST);
+> -	clear_opal_cmd(dev);
+> -	set_comid(dev, dev->comid);
+> -
+>  	if (build_locking_range(lr_buffer, sizeof(lr_buffer),
+>  				lkul->session.opal_key.lr) < 0)
+>  		return -ERANGE;
+> @@ -1723,10 +1658,8 @@ static int lock_unlock_locking_range(struct opal_d=
+ev *dev, void *data)
+>  		return OPAL_INVAL_PARAM;
+>  	}
 > =20
->  	if (err) {
->  		pr_debug("Error building SET command.\n");
-> @@ -1843,11 +1830,8 @@ static int activate_lsp(struct opal_dev *dev, void=
- *data)
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, lr_buffer, OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_SET], OPAL_UID_LENGTH);
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+> +	err =3D cmd_start(dev, lr_buffer, opalmethod[OPAL_SET]);
+> +
+>  	add_token_u8(&err, dev, OPAL_STARTNAME);
+>  	add_token_u8(&err, dev, OPAL_VALUES);
+>  	add_token_u8(&err, dev, OPAL_STARTLIST);
+> @@ -1797,17 +1730,10 @@ static int activate_lsp(struct opal_dev *dev, voi=
+d *data)
+>  	struct opal_lr_act *opal_act =3D data;
+>  	u8 user_lr[OPAL_UID_LENGTH];
+>  	u8 uint_3 =3D 0x83;
+> -	int err =3D 0, i;
+> -
+> -	clear_opal_cmd(dev);
+> -	set_comid(dev, dev->comid);
+> -
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, opaluid[OPAL_LOCKINGSP_UID],
+> -			     OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_ACTIVATE],
+> -			     OPAL_UID_LENGTH);
+> +	int err, i;
+> =20
+> +	err =3D cmd_start(dev, opaluid[OPAL_LOCKINGSP_UID],
+> +			opalmethod[OPAL_ACTIVATE]);
+> =20
+>  	if (opal_act->sum) {
+>  		err =3D build_locking_range(user_lr, sizeof(user_lr),
+> @@ -1815,7 +1741,6 @@ static int activate_lsp(struct opal_dev *dev, void =
+*data)
+>  		if (err)
+>  			return err;
+> =20
+> -		add_token_u8(&err, dev, OPAL_STARTLIST);
+>  		add_token_u8(&err, dev, OPAL_STARTNAME);
+>  		add_token_u8(&err, dev, uint_3);
+>  		add_token_u8(&err, dev, 6);
+> @@ -1830,8 +1755,6 @@ static int activate_lsp(struct opal_dev *dev, void =
+*data)
 >  		}
 >  		add_token_u8(&err, dev, OPAL_ENDLIST);
 >  		add_token_u8(&err, dev, OPAL_ENDNAME);
-> -		add_token_u8(&err, dev, OPAL_ENDLIST);
-> -
->  	} else {
->  		add_token_u8(&err, dev, OPAL_STARTLIST);
-> -		add_token_u8(&err, dev, OPAL_ENDLIST);
+> -	} else {
+> -		add_token_u8(&err, dev, OPAL_STARTLIST);
 >  	}
 > =20
 >  	if (err) {
-> @@ -1904,7 +1888,6 @@ static int get_lsp_lifecycle(struct opal_dev *dev, =
-void *data)
->  	add_token_u8(&err, dev, 6); /* Lifecycle Column */
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
-> =20
-> -	add_token_u8(&err, dev, OPAL_ENDLIST);
->  	add_token_u8(&err, dev, OPAL_ENDLIST);
-> =20
->  	if (err) {
-> @@ -1964,8 +1947,6 @@ static int get_msid_cpin_pin(struct opal_dev *dev, =
-void *data)
->  	add_token_u8(&err, dev, 4); /* End Column */
->  	add_token_u8(&err, dev, 3); /* Lifecycle Column */
->  	add_token_u8(&err, dev, OPAL_ENDNAME);
+> @@ -1865,17 +1788,11 @@ static int get_lsp_lifecycle_cont(struct opal_dev=
+ *dev)
+>  /* Determine if we're in the Manufactured Inactive or Active state */
+>  static int get_lsp_lifecycle(struct opal_dev *dev, void *data)
+>  {
+> -	int err =3D 0;
 > -
-> -	add_token_u8(&err, dev, OPAL_ENDLIST);
->  	add_token_u8(&err, dev, OPAL_ENDLIST);
+> -	clear_opal_cmd(dev);
+> -	set_comid(dev, dev->comid);
+> +	int err;
 > =20
->  	if (err) {
---=-dEtyq3TXA9LzJm/VDePm
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, opaluid[OPAL_LOCKINGSP_UID],
+> -			     OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_GET], OPAL_UID_LENGTH);
+> +	err =3D cmd_start(dev, opaluid[OPAL_LOCKINGSP_UID],
+> +			opalmethod[OPAL_GET]);
+> =20
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+>  	add_token_u8(&err, dev, OPAL_STARTLIST);
+> =20
+>  	add_token_u8(&err, dev, OPAL_STARTNAME);
+> @@ -1925,19 +1842,12 @@ static int get_msid_cpin_pin_cont(struct opal_dev=
+ *dev)
+> =20
+>  static int get_msid_cpin_pin(struct opal_dev *dev, void *data)
+>  {
+> -	int err =3D 0;
+> -
+> -	clear_opal_cmd(dev);
+> -	set_comid(dev, dev->comid);
+> +	int err;
+> =20
+> -	add_token_u8(&err, dev, OPAL_CALL);
+> -	add_token_bytestring(&err, dev, opaluid[OPAL_C_PIN_MSID],
+> -			     OPAL_UID_LENGTH);
+> -	add_token_bytestring(&err, dev, opalmethod[OPAL_GET], OPAL_UID_LENGTH);
+> +	err =3D cmd_start(dev, opaluid[OPAL_C_PIN_MSID],
+> +			opalmethod[OPAL_GET]);
+> =20
+>  	add_token_u8(&err, dev, OPAL_STARTLIST);
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+> -
+>  	add_token_u8(&err, dev, OPAL_STARTNAME);
+>  	add_token_u8(&err, dev, 3); /* Start Column */
+>  	add_token_u8(&err, dev, 3); /* PIN */
+--=-mgH4rMqACoiuVFToGEeB
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -325,13 +618,13 @@ CPVfCgq9qnmVCn5DyHWE3V/BRjJCoILLBLxAxnmSdH4pF6wJ6pYRLEw9qoyNhpzGUIJU/Lk1MYIC
 FzCCAhMCAQEwgZAweTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBD
 bGFyYTEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFs
 IEJhc2ljIElzc3VpbmcgQ0EgNEECEzMAAMamAkocC+WQNPgAAAAAxqYwCQYFKw4DAhoFAKBdMBgG
-CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDIwODIyNTcyOVowIwYJ
-KoZIhvcNAQkEMRYEFFlGtlNGIOetqgke/RqGOkG7l2kbMA0GCSqGSIb3DQEBAQUABIIBAGXzOiKI
-xHT7lmBRm2Xmmc1wZ2+kAI0krxLlwT8XCMlpiTUGtSgShZyulkrAvLCm8GrJ0HRDT33uV0sp5X+2
-YugSjYEg1hOVwSEA35lCxSf6imrcmacCjb/Zro87VP0sAhEZ8K5jobSYeD+oP5t8R26tsaga56AW
-Jt9gsr9kcaXIBSU9HjUXqvBFVEWlipr3+H8erxGKO9NvflzqLoNUd6CKJEvLbN6BoVXupF4YnvIh
-NnWLkEmRDeWyoGOX1YbkvzYlFEjM6V39ralUHrk8RsDSMGlgMeB9PpNMTs8hnwZ+OmRqInhVxNnM
-XsAuodGdjv7Ze+eaThVLlO51ttJnwz8AAAAAAAA=
+CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDIwODIyNTczOFowIwYJ
+KoZIhvcNAQkEMRYEFJWV2H8b25QQZfD9y8LJkwIeGsV/MA0GCSqGSIb3DQEBAQUABIIBAF3RW//u
+GFUpOLnehryfc735IxcfMf3yTFNEWSiUuytJI5gKdS3QE1w7SbPJRRUj+b1ZnuutSPFs5hOeyGQu
+mp/KArxInG4saDpI062h1qR9eaKVo4sbd73rQ69J2plsS0JLHZvpHZQxAeozjaKDMITJI+ZGu1hF
+w0hjeiKae8LpOGghASZ3OXCZjCSh+35x0YZAVWdJ1beh9jEHQ/gx6sqgMQdMfnh1AzRHoXI0z1VY
+aiOIMDIvVh7v72fusOKInqx88uoguA84Ml1zoxTxEHdGcDOaPK9h3ppm3HmKaKoSdn+M3IJvQupR
+HGJeF/Vp+wqR3qS/2khhCmFiIBgbOiMAAAAAAAA=
 
 
---=-dEtyq3TXA9LzJm/VDePm--
+--=-mgH4rMqACoiuVFToGEeB--
