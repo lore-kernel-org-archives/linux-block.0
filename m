@@ -2,38 +2,35 @@ Return-Path: <SRS0=HTWS=QP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C9CCC169C4
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:58:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2CA4C282CB
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:59:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E5BF821841
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:58:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63A2621841
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:59:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726791AbfBHW6y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Feb 2019 17:58:54 -0500
-Received: from mga01.intel.com ([192.55.52.88]:4136 "EHLO mga01.intel.com"
+        id S1726703AbfBHW67 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Feb 2019 17:58:59 -0500
+Received: from mga09.intel.com ([134.134.136.24]:10789 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726722AbfBHW6x (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Feb 2019 17:58:53 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1727019AbfBHW66 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Feb 2019 17:58:58 -0500
+X-Amp-Result: UNSCANNABLE
 X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Feb 2019 14:58:53 -0800
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Feb 2019 14:58:57 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.58,348,1544515200"; 
-   d="p7s'?scan'208";a="121060210"
-Received: from orsmsx105.amr.corp.intel.com ([10.22.225.132])
-  by fmsmga007.fm.intel.com with ESMTP; 08 Feb 2019 14:58:52 -0800
-Received: from orsmsx111.amr.corp.intel.com (10.22.240.12) by
- ORSMSX105.amr.corp.intel.com (10.22.225.132) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Fri, 8 Feb 2019 14:58:52 -0800
+   d="p7s'?scan'208";a="123088643"
+Received: from orsmsx106.amr.corp.intel.com ([10.22.225.133])
+  by fmsmga008.fm.intel.com with ESMTP; 08 Feb 2019 14:58:56 -0800
 Received: from orsmsx101.amr.corp.intel.com ([169.254.8.11]) by
- ORSMSX111.amr.corp.intel.com ([169.254.12.96]) with mapi id 14.03.0415.000;
- Fri, 8 Feb 2019 14:58:52 -0800
+ ORSMSX106.amr.corp.intel.com ([169.254.1.180]) with mapi id 14.03.0415.000;
+ Fri, 8 Feb 2019 14:58:39 -0800
 From:   "Derrick, Jonathan" <jonathan.derrick@intel.com>
 To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "zub@linux.fjfi.cvut.cz" <zub@linux.fjfi.cvut.cz>,
@@ -42,138 +39,257 @@ To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "axboe@kernel.dk" <axboe@kernel.dk>
 CC:     "jonas.rabenstein@studium.uni-erlangen.de" 
         <jonas.rabenstein@studium.uni-erlangen.de>
-Subject: Re: [PATCH v4 13/16] block: sed-opal: check size of shadow mbr
-Thread-Topic: [PATCH v4 13/16] block: sed-opal: check size of shadow mbr
-Thread-Index: AQHUum/0dH3ZWGnVH0m2fx7IN2xJnqXXFPIA
-Date:   Fri, 8 Feb 2019 22:58:52 +0000
-Message-ID: <1549666730.10972.60.camel@intel.com>
+Subject: Re: [PATCH v4 12/16] block: sed-opal: unify retrieval of table
+ columns
+Thread-Topic: [PATCH v4 12/16] block: sed-opal: unify retrieval of table
+ columns
+Thread-Index: AQHUum/0EASfSLRonkCgkZ9K8gOgDqXXFOEA
+Date:   Fri, 8 Feb 2019 22:58:38 +0000
+Message-ID: <1549666716.10972.59.camel@intel.com>
 References: <1549054223-12220-1-git-send-email-zub@linux.fjfi.cvut.cz>
-         <1549054223-12220-14-git-send-email-zub@linux.fjfi.cvut.cz>
-In-Reply-To: <1549054223-12220-14-git-send-email-zub@linux.fjfi.cvut.cz>
+         <1549054223-12220-13-git-send-email-zub@linux.fjfi.cvut.cz>
+In-Reply-To: <1549054223-12220-13-git-send-email-zub@linux.fjfi.cvut.cz>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: yes
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.232.112.141]
 Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-jECwJfA2e3FRyVX6bGZZ"
+        protocol="application/x-pkcs7-signature"; boundary="=-Wk6BLPrLGB82gMPS2pzU"
 MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---=-jECwJfA2e3FRyVX6bGZZ
+--=-Wk6BLPrLGB82gMPS2pzU
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+
+Looks good
+
+Reviewed-by: Jon Derrick <jonathan.derrick@intel.com>
 
 On Fri, 2019-02-01 at 21:50 +0100, David Kozub wrote:
 > From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 >=20
-> Check whether the shadow mbr does fit in the provided space on the
-> target. Also a proper firmware should handle this case and return an
-> error we may prevent problems or even damage with crappy firmwares.
+> Instead of having multiple places defining the same argument list to get
+> a specific column of a sed-opal table, provide a generic version and
+> call it from those functions.
 >=20
 > Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de=
 >
 > Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
 > ---
->  block/opal_proto.h | 16 ++++++++++++++++
->  block/sed-opal.c   | 39 +++++++++++++++++++++++++++++++++++++++
->  2 files changed, 55 insertions(+)
+>  block/opal_proto.h |   2 +
+>  block/sed-opal.c   | 132 +++++++++++++++++----------------------------
+>  2 files changed, 50 insertions(+), 84 deletions(-)
 >=20
 > diff --git a/block/opal_proto.h b/block/opal_proto.h
-> index b6e352cfe982..5e8df3245eb0 100644
+> index e20be8258854..b6e352cfe982 100644
 > --- a/block/opal_proto.h
 > +++ b/block/opal_proto.h
-> @@ -106,6 +106,7 @@ enum opal_uid {
->  	OPAL_ENTERPRISE_BANDMASTER0_UID,
->  	OPAL_ENTERPRISE_ERASEMASTER_UID,
->  	/* tables */
-> +	OPAL_TABLE_TABLE,
->  	OPAL_LOCKINGRANGE_GLOBAL,
->  	OPAL_LOCKINGRANGE_ACE_RDLOCKED,
->  	OPAL_LOCKINGRANGE_ACE_WRLOCKED,
-> @@ -160,6 +161,21 @@ enum opal_token {
->  	OPAL_STARTCOLUMN =3D 0x03,
->  	OPAL_ENDCOLUMN =3D 0x04,
->  	OPAL_VALUES =3D 0x01,
-> +	/* table table */
-> +	OPAL_TABLE_UID =3D 0x00,
-> +	OPAL_TABLE_NAME =3D 0x01,
-> +	OPAL_TABLE_COMMON =3D 0x02,
-> +	OPAL_TABLE_TEMPLATE =3D 0x03,
-> +	OPAL_TABLE_KIND =3D 0x04,
-> +	OPAL_TABLE_COLUMN =3D 0x05,
-> +	OPAL_TABLE_COLUMNS =3D 0x06,
-> +	OPAL_TABLE_ROWS =3D 0x07,
-> +	OPAL_TABLE_ROWS_FREE =3D 0x08,
-> +	OPAL_TABLE_ROW_BYTES =3D 0x09,
-> +	OPAL_TABLE_LASTID =3D 0x0A,
-> +	OPAL_TABLE_MIN =3D 0x0B,
-> +	OPAL_TABLE_MAX =3D 0x0C,
-> +
->  	/* authority table */
->  	OPAL_PIN =3D 0x03,
->  	/* locking tokens */
+> @@ -170,6 +170,8 @@ enum opal_token {
+>  	OPAL_READLOCKED =3D 0x07,
+>  	OPAL_WRITELOCKED =3D 0x08,
+>  	OPAL_ACTIVEKEY =3D 0x0A,
+> +	/* lockingsp table */
+> +	OPAL_LIFECYCLE =3D 0x06,
+>  	/* locking info table */
+>  	OPAL_MAXRANGES =3D 0x04,
+>  	 /* mbr control */
 > diff --git a/block/sed-opal.c b/block/sed-opal.c
-> index 2459ac4d523b..3493bb979978 100644
+> index 88c84906ce98..2459ac4d523b 100644
 > --- a/block/sed-opal.c
 > +++ b/block/sed-opal.c
-> @@ -139,6 +139,8 @@ static const u8 opaluid[][OPAL_UID_LENGTH] =3D {
-> =20
->  	/* tables */
-> =20
-> +	[OPAL_TABLE_TABLE]
-> +		{ 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01 },
->  	[OPAL_LOCKINGRANGE_GLOBAL] =3D
->  		{ 0x00, 0x00, 0x08, 0x02, 0x00, 0x00, 0x00, 0x01 },
->  	[OPAL_LOCKINGRANGE_ACE_RDLOCKED] =3D
-> @@ -1120,6 +1122,29 @@ static int generic_get_column(struct opal_dev *dev=
-, const u8 *table,
->  	return finalize_and_send(dev, parse_and_check_status);
+> @@ -1089,6 +1089,37 @@ static int finalize_and_send(struct opal_dev *dev,=
+ cont_fn cont)
+>  	return opal_send_recv(dev, cont);
 >  }
 > =20
 > +/*
-> + * see TCG SAS 5.3.2.3 for a description of the available columns
-> + *
-> + * the result is provided in dev->resp->tok[4]
+> + * request @column from table @table on device @dev. On success, the col=
+umn
+> + * data will be available in dev->resp->tok[4]
 > + */
-> +static int generic_get_table_info(struct opal_dev *dev, enum opal_uid ta=
-ble,
-> +				  u64 column)
+> +static int generic_get_column(struct opal_dev *dev, const u8 *table,
+> +			      u64 column)
 > +{
-> +	u8 uid[OPAL_UID_LENGTH];
-> +	const unsigned int half =3D OPAL_UID_LENGTH/2;
+> +	int err;
 > +
-> +	/* sed-opal UIDs can be split in two halves:
-> +	 *  first:  actual table index
-> +	 *  second: relative index in the table
-> +	 * so we have to get the first half of the OPAL_TABLE_TABLE and use the
-> +	 * first part of the target table as relative index into that table
-> +	 */
-> +	memcpy(uid, opaluid[OPAL_TABLE_TABLE], half);
-> +	memcpy(uid+half, opaluid[table], half);
+> +	err =3D cmd_start(dev, table, opalmethod[OPAL_GET]);
 > +
-> +	return generic_get_column(dev, uid, column);
+> +	add_token_u8(&err, dev, OPAL_STARTLIST);
+> +
+> +	add_token_u8(&err, dev, OPAL_STARTNAME);
+> +	add_token_u8(&err, dev, OPAL_STARTCOLUMN);
+> +	add_token_u64(&err, dev, column);
+> +	add_token_u8(&err, dev, OPAL_ENDNAME);
+> +
+> +	add_token_u8(&err, dev, OPAL_STARTNAME);
+> +	add_token_u8(&err, dev, OPAL_ENDCOLUMN);
+> +	add_token_u64(&err, dev, column);
+> +	add_token_u8(&err, dev, OPAL_ENDNAME);
+> +
+> +	add_token_u8(&err, dev, OPAL_ENDLIST);
+> +
+> +	if (err)
+> +		return err;
+> +
+> +	return finalize_and_send(dev, parse_and_check_status);
 > +}
 > +
 >  static int gen_key(struct opal_dev *dev, void *data)
 >  {
 >  	u8 uid[OPAL_UID_LENGTH];
-> @@ -1535,6 +1560,20 @@ static int write_shadow_mbr(struct opal_dev *dev, =
-void *data)
->  	u64 len;
->  	int err =3D 0;
+> @@ -1143,23 +1174,11 @@ static int get_active_key(struct opal_dev *dev, v=
+oid *data)
+>  	if (err)
+>  		return err;
 > =20
-> +	/* do we fit in the available shadow mbr space? */
-> +	err =3D generic_get_table_info(dev, OPAL_MBR, OPAL_TABLE_ROWS);
-Wouldn't you need to multiply this by result from OPAL_TABLE_ROWBYTES?
-What does ROWBYTES return for you?
-
-[snip]
-
---=-jECwJfA2e3FRyVX6bGZZ
+> -	err =3D cmd_start(dev, uid, opalmethod[OPAL_GET]);
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+> -	add_token_u8(&err, dev, OPAL_STARTNAME);
+> -	add_token_u8(&err, dev, 3); /* startCloumn */
+> -	add_token_u8(&err, dev, 10); /* ActiveKey */
+> -	add_token_u8(&err, dev, OPAL_ENDNAME);
+> -	add_token_u8(&err, dev, OPAL_STARTNAME);
+> -	add_token_u8(&err, dev, 4); /* endColumn */
+> -	add_token_u8(&err, dev, 10); /* ActiveKey */
+> -	add_token_u8(&err, dev, OPAL_ENDNAME);
+> -	add_token_u8(&err, dev, OPAL_ENDLIST);
+> -	if (err) {
+> -		pr_debug("Error building get active key command\n");
+> +	err =3D generic_get_column(dev, uid, OPAL_ACTIVEKEY);
+> +	if (err)
+>  		return err;
+> -	}
+> =20
+> -	return finalize_and_send(dev, get_active_key_cont);
+> +	return get_active_key_cont(dev);
+>  }
+> =20
+>  static int generic_lr_enable_disable(struct opal_dev *dev,
+> @@ -1820,17 +1839,19 @@ static int activate_lsp(struct opal_dev *dev, voi=
+d *data)
+>  	return finalize_and_send(dev, parse_and_check_status);
+>  }
+> =20
+> -static int get_lsp_lifecycle_cont(struct opal_dev *dev)
+> +/* Determine if we're in the Manufactured Inactive or Active state */
+> +static int get_lsp_lifecycle(struct opal_dev *dev, void *data)
+>  {
+>  	u8 lc_status;
+> -	int error =3D 0;
+> +	int err;
+> =20
+> -	error =3D parse_and_check_status(dev);
+> -	if (error)
+> -		return error;
+> +	err =3D generic_get_column(dev, opaluid[OPAL_LOCKINGSP_UID],
+> +				 OPAL_LIFECYCLE);
+> +	if (err)
+> +		return err;
+> =20
+>  	lc_status =3D response_get_u64(&dev->parsed, 4);
+> -	/* 0x08 is Manufacured Inactive */
+> +	/* 0x08 is Manufactured Inactive */
+>  	/* 0x09 is Manufactured */
+>  	if (lc_status !=3D OPAL_MANUFACTURED_INACTIVE) {
+>  		pr_debug("Couldn't determine the status of the Lifecycle state\n");
+> @@ -1840,49 +1861,19 @@ static int get_lsp_lifecycle_cont(struct opal_dev=
+ *dev)
+>  	return 0;
+>  }
+> =20
+> -/* Determine if we're in the Manufactured Inactive or Active state */
+> -static int get_lsp_lifecycle(struct opal_dev *dev, void *data)
+> -{
+> -	int err;
+> -
+> -	err =3D cmd_start(dev, opaluid[OPAL_LOCKINGSP_UID],
+> -			opalmethod[OPAL_GET]);
+> -
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+> -
+> -	add_token_u8(&err, dev, OPAL_STARTNAME);
+> -	add_token_u8(&err, dev, 3); /* Start Column */
+> -	add_token_u8(&err, dev, 6); /* Lifecycle Column */
+> -	add_token_u8(&err, dev, OPAL_ENDNAME);
+> -
+> -	add_token_u8(&err, dev, OPAL_STARTNAME);
+> -	add_token_u8(&err, dev, 4); /* End Column */
+> -	add_token_u8(&err, dev, 6); /* Lifecycle Column */
+> -	add_token_u8(&err, dev, OPAL_ENDNAME);
+> -
+> -	add_token_u8(&err, dev, OPAL_ENDLIST);
+> -
+> -	if (err) {
+> -		pr_debug("Error Building GET Lifecycle Status command\n");
+> -		return err;
+> -	}
+> -
+> -	return finalize_and_send(dev, get_lsp_lifecycle_cont);
+> -}
+> -
+> -static int get_msid_cpin_pin_cont(struct opal_dev *dev)
+> +static int get_msid_cpin_pin(struct opal_dev *dev, void *data)
+>  {
+>  	const char *msid_pin;
+>  	size_t strlen;
+> -	int error =3D 0;
+> +	int err;
+> =20
+> -	error =3D parse_and_check_status(dev);
+> -	if (error)
+> -		return error;
+> +	err =3D generic_get_column(dev, opaluid[OPAL_C_PIN_MSID], OPAL_PIN);
+> +	if (err)
+> +		return err;
+> =20
+>  	strlen =3D response_get_string(&dev->parsed, 4, &msid_pin);
+>  	if (!msid_pin) {
+> -		pr_debug("%s: Couldn't extract PIN from response\n", __func__);
+> +		pr_debug("Couldn't extract MSID_CPIN from response\n");
+>  		return OPAL_INVAL_PARAM;
+>  	}
+> =20
+> @@ -1895,33 +1886,6 @@ static int get_msid_cpin_pin_cont(struct opal_dev =
+*dev)
+>  	return 0;
+>  }
+> =20
+> -static int get_msid_cpin_pin(struct opal_dev *dev, void *data)
+> -{
+> -	int err;
+> -
+> -	err =3D cmd_start(dev, opaluid[OPAL_C_PIN_MSID],
+> -			opalmethod[OPAL_GET]);
+> -
+> -	add_token_u8(&err, dev, OPAL_STARTLIST);
+> -	add_token_u8(&err, dev, OPAL_STARTNAME);
+> -	add_token_u8(&err, dev, 3); /* Start Column */
+> -	add_token_u8(&err, dev, 3); /* PIN */
+> -	add_token_u8(&err, dev, OPAL_ENDNAME);
+> -
+> -	add_token_u8(&err, dev, OPAL_STARTNAME);
+> -	add_token_u8(&err, dev, 4); /* End Column */
+> -	add_token_u8(&err, dev, 3); /* Lifecycle Column */
+> -	add_token_u8(&err, dev, OPAL_ENDNAME);
+> -	add_token_u8(&err, dev, OPAL_ENDLIST);
+> -
+> -	if (err) {
+> -		pr_debug("Error building Get MSID CPIN PIN command.\n");
+> -		return err;
+> -	}
+> -
+> -	return finalize_and_send(dev, get_msid_cpin_pin_cont);
+> -}
+> -
+>  static int end_opal_session(struct opal_dev *dev, void *data)
+>  {
+>  	int err =3D 0;
+--=-Wk6BLPrLGB82gMPS2pzU
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -229,13 +345,13 @@ CPVfCgq9qnmVCn5DyHWE3V/BRjJCoILLBLxAxnmSdH4pF6wJ6pYRLEw9qoyNhpzGUIJU/Lk1MYIC
 FzCCAhMCAQEwgZAweTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBD
 bGFyYTEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFs
 IEJhc2ljIElzc3VpbmcgQ0EgNEECEzMAAMamAkocC+WQNPgAAAAAxqYwCQYFKw4DAhoFAKBdMBgG
-CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDIwODIyNTg1MFowIwYJ
-KoZIhvcNAQkEMRYEFL2uGpzt+K/qJUKvwP2h3BN4YJbLMA0GCSqGSIb3DQEBAQUABIIBAIfFUB52
-AiB76un57Qspz6vw4MeAmRPeUfHqfbxcpNrkiI9t4SqHOKuJvDyMiXhCErUvbS/4bAILzDCZppsp
-rS+tJOa34X0DGV2GeQlcn5WUVA8pxja9ZPAeFRLNhV8rbzTyn47KYgQhXp/uAc59TjU2uLwwGQbt
-NWt1f3jjJ1eOc2G5IZZY52Sw3dAG0mcU4gd9cfvM0yn5CfyR/KtbTQfEJWnVUHEAZdBnVBfYZDoO
-cDrMaFGGCNMRXIzw+eZC4PXTx3Cj8CvoePI8xwV4Z6/UM4PRi0iKbqykYF/AC8Dsm5p0gW+yiJmt
-alNLZh46rUk25pkZxB5B+9mguJEMyh0AAAAAAAA=
+CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDIwODIyNTgzNlowIwYJ
+KoZIhvcNAQkEMRYEFEG8B0ZZ2ireBnV4LSu2Bt0D9YldMA0GCSqGSIb3DQEBAQUABIIBAKBgCljn
+HCuOFersxC847WOD2eIBLu48Eww5dDTJcPgQC3CbxTfleXMAk0DZgbSrfI8m20PCmWJhXrsg0uVs
+WtlAtpaEiy5SmVZbhOxXG42CfKf0ihGI41sFB/UtBb/lBdXM1Q40KbTm80VnKQ1BUCAoQViogTKr
+c1S+AhIltRo3mr0+bMWJAR8a6rs7Cv/nBZYTobxqmSbBI97wY00oKrvSFJ4RTc5cqK5t/WfIqbpB
+eJmtCLJNeXmgp+0y3Lv/IIRe9sCbk903f7vAzV9Vdm3EKdhruiB8L8HtfBkDqqCsCH/zXaJPTw+y
+gUALMXq78BdkSB/tceMCagKZplHTaqoAAAAAAAA=
 
 
---=-jECwJfA2e3FRyVX6bGZZ--
+--=-Wk6BLPrLGB82gMPS2pzU--
