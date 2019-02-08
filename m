@@ -2,304 +2,201 @@ Return-Path: <SRS0=HTWS=QP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 486F6C169C4
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 23:38:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BACEAC282CC
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 23:38:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 06870218DA
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 23:38:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7DF6321841
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 23:38:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="OD3acEXT"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="eL4bOZXe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726211AbfBHXiX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Feb 2019 18:38:23 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:36494 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726524AbfBHXiX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Feb 2019 18:38:23 -0500
-Received: by mail-pl1-f193.google.com with SMTP id g9so2417549plo.3
-        for <linux-block@vger.kernel.org>; Fri, 08 Feb 2019 15:38:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=jA8/sA5jN/ZwQrr5ig5DCuBWnt6hLB+qjXrz6OM615o=;
-        b=OD3acEXThwesnTmcfGP3y+JLiIT9L2j6NzzOrYQzugrVtmVARpu4n2Hr5dXn6GKVUB
-         ZUyDpNqeXeuj08zJDZ1qcb+7+cYmgvZWmX/phhbtmWR8jQz/OkFdGk1MWckmVzrl4XKq
-         f//82WFWQ0t4JVqEGXzLNfHG7pknwXG2uwcilFClRfjBSxW2vZHOIkX8w8AtH8RUUHvF
-         iFftQrYu6v5OjISZJIpFj2fAxs8XDr4lxqJzEE4K2U6hY6FCQ4l6Zn/qhg4Yv8lwsSD+
-         ytoo+rzqYTzNjuRSPtNqN3wsnrTgt6xXgdIt9Yg9OuDuJyI2ChnSF37iHsSL8q+6c8me
-         jESg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=jA8/sA5jN/ZwQrr5ig5DCuBWnt6hLB+qjXrz6OM615o=;
-        b=Rd2rYAQdzc7TY5J9lTk40uxF3L5ES+YrSWuTGYSztZg7BzoSKiHIkm/2gs2/50XcBJ
-         fuNgx9Ub7i1QAjmAJIklHzJB8OBWlVZhxtDZqRnOwJmd7s+EBmnDmFeDRRmZAKfc3W3z
-         c+f5uqPdiqiK2TrqT6a2oUIcwwJIYCeSAXQaQoEgUjkfTARJOCZKoPN4gnl8km9z+EV6
-         2qM6wcQDLcHCkHS4000dOHTBybG7/QMZ4CdMfQsjlE/hqxCyyGeRmAhT/NatMjYtC8KY
-         MIjEGroR0sPmrGXku7mSktyRi0Q//X5sFa1Wn4lF+vlKd58k/CSKX+KlVmMgDgu8tQ0Z
-         qkHg==
-X-Gm-Message-State: AHQUAuYzNnb0MRG0ScBoQq6kF9P5tifA5y0xtWLemdyG0SUW3FFff5qh
-        1QDShLcCcpxtlDgcNtUNQbbM/g==
-X-Google-Smtp-Source: AHgI3IZr+IIKELkKE0VbguWn7bJNvXuqtlTm1+wCM2xnCkNE0qreO+m8C9GA4Iv6j4Kqg4MPA8ZO0A==
-X-Received: by 2002:a17:902:15a8:: with SMTP id m37mr25691240pla.129.1549669102253;
-        Fri, 08 Feb 2019 15:38:22 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id e65sm4938229pfc.184.2019.02.08.15.38.20
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 08 Feb 2019 15:38:20 -0800 (PST)
-Subject: Re: [PATCH 12/19] io_uring: add support for pre-mapped user IO
- buffers
-To:     Jann Horn <jannh@google.com>
-Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
-        jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>,
-        Al Viro <viro@zeniv.linux.org.uk>
-References: <20190208173423.27014-1-axboe@kernel.dk>
- <20190208173423.27014-13-axboe@kernel.dk>
- <CAG48ez0uH_muHobzpwFzdyBWCcWDxbnfpuxABntph6Te+tYxGg@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <2ef04b12-6a4b-af25-cbf8-9dde79b0ec1e@kernel.dk>
-Date:   Fri, 8 Feb 2019 16:38:19 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1726700AbfBHXii (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Feb 2019 18:38:38 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:34754 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726524AbfBHXii (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Feb 2019 18:38:38 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x18NTJBc185026;
+        Fri, 8 Feb 2019 23:38:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2018-07-02; bh=ZkIMWKmca3vaJxXrj51L4nPxPdd961wBcET0N/Dg3ss=;
+ b=eL4bOZXe5jTDoFfuL5fiGhKKFdREHSoEOXebCQjfQGlNd5OemwY/SNcRJI+PopegYGl0
+ uvYwvDG6H56H7/wRzi8AQsPPnABxAI3VUAf0vd3T/ySwN9qIa+qfDEk1RcQediCkx5De
+ GwjAJiwFKsvlpTHkByemtZic+Jc0y8OnxQikQEbzu9y1ED6h0gcsJQ/I9axi9va6+JD1
+ I1dZiQI7JbT5AxZZG8Dr3WuxsXkFbkZJoZOR5WJP0fDDsjSXiyz9e39wgz5oJ2nRiDKS
+ Y/+0JZeNPpIeFmw3pZ4DNq6jpQHs3Hi28RzM4roTr90d/35EVlrQoMHNKgk5LAw+Jdky nA== 
+Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
+        by userp2130.oracle.com with ESMTP id 2qd9aryad6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 08 Feb 2019 23:38:34 +0000
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x18NcXj8017471
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 8 Feb 2019 23:38:33 GMT
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x18NcWtF028909;
+        Fri, 8 Feb 2019 23:38:32 GMT
+Received: from ca-mkp.ca.oracle.com (/10.156.108.201)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 08 Feb 2019 15:38:32 -0800
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jeremy Cline <jeremy@jcline.org>,
+        Oleksii Kurochko <olkuroch@cisco.com>, stable@vger.kernel.org
+Subject: [PATCH] scsi: sd: block: Handle cases where devices come online read-only
+Date:   Fri,  8 Feb 2019 18:38:31 -0500
+Message-Id: <20190208233831.31377-1-martin.petersen@oracle.com>
+X-Mailer: git-send-email 2.19.2
 MIME-Version: 1.0
-In-Reply-To: <CAG48ez0uH_muHobzpwFzdyBWCcWDxbnfpuxABntph6Te+tYxGg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9161 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1902080158
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/8/19 3:54 PM, Jann Horn wrote:
-> On Fri, Feb 8, 2019 at 6:35 PM Jens Axboe <axboe@kernel.dk> wrote:
->> If we have fixed user buffers, we can map them into the kernel when we
->> setup the io_uring. That avoids the need to do get_user_pages() for
->> each and every IO.
->>
->> To utilize this feature, the application must call io_uring_register()
->> after having setup an io_uring instance, passing in
->> IORING_REGISTER_BUFFERS as the opcode. The argument must be a pointer to
->> an iovec array, and the nr_args should contain how many iovecs the
->> application wishes to map.
->>
->> If successful, these buffers are now mapped into the kernel, eligible
->> for IO. To use these fixed buffers, the application must use the
->> IORING_OP_READ_FIXED and IORING_OP_WRITE_FIXED opcodes, and then
->> set sqe->index to the desired buffer index. sqe->addr..sqe->addr+seq->len
->> must point to somewhere inside the indexed buffer.
->>
->> The application may register buffers throughout the lifetime of the
->> io_uring instance. It can call io_uring_register() with
->> IORING_UNREGISTER_BUFFERS as the opcode to unregister the current set of
->> buffers, and then register a new set. The application need not
->> unregister buffers explicitly before shutting down the io_uring
->> instance.
->>
->> It's perfectly valid to setup a larger buffer, and then sometimes only
->> use parts of it for an IO. As long as the range is within the originally
->> mapped region, it will work just fine.
->>
->> For now, buffers must not be file backed. If file backed buffers are
->> passed in, the registration will fail with -1/EOPNOTSUPP. This
->> restriction may be relaxed in the future.
->>
->> RLIMIT_MEMLOCK is used to check how much memory we can pin. A somewhat
->> arbitrary 1G per buffer size is also imposed.
-> [...]
->>  static int io_import_iovec(struct io_ring_ctx *ctx, int rw,
->>                            const struct sqe_submit *s, struct iovec **iovec,
->>                            struct iov_iter *iter)
->> @@ -711,6 +763,15 @@ static int io_import_iovec(struct io_ring_ctx *ctx, int rw,
->>         const struct io_uring_sqe *sqe = s->sqe;
->>         void __user *buf = u64_to_user_ptr(READ_ONCE(sqe->addr));
->>         size_t sqe_len = READ_ONCE(sqe->len);
->> +       u8 opcode;
-> 
-> (You could add a comment here if you want, something like "We're
-> reading ->opcode for the second time, but the first read doesn't care
-> whether it's _FIXED or not, so it doesn't matter whether ->opcode
-> changes concurrently. The first read does care about whether it is a
-> READ or a WRITE, so we don't trust this read for that purpose and
-> instead let the caller pass in the read/write flag.")
+Some devices come online in write protected state and switch to
+read-write once they are ready to process I/O requests. These devices
+broke with commit 20bd1d026aac ("scsi: sd: Keep disk read-only when
+re-reading partition") because we have no way to distinguish between a
+user decision to set a block_device read-only and the disk being write
+protected as a result of the hardware state.
 
-Sure, I can add that.
+To overcome this we add a third state to the gendisk read-only
+policy. This flag is exlusively used when the user forces a struct
+block_device read-only via BLKROSET. We currently don't allow
+switching ro state in sysfs so the ioctl is the only entry point for
+this new state.
 
->> +static int io_sqe_buffer_unregister(struct io_ring_ctx *ctx)
->> +{
->> +       int i, j;
->> +
->> +       if (!ctx->user_bufs)
->> +               return -ENXIO;
->> +
->> +       for (i = 0; i < ctx->sq_entries; i++) {
-> 
-> ->sq_entries? Shouldn't this be ->nr_user_bufs?
+In set_disk_ro() we check whether the user override flag is in effect
+for a disk before changing read-only state based on the device
+settings. This means that devices that have a delay before going
+read-write will now be able to clear the read-only state. And devices
+where the admin or udev has forced the disk read-only will not cause
+the gendisk policy to reflect the mode reported by the device.
 
-It should! I swear I already fixed that, odd. Maybe that was somewhere
-else...
+Cc: Jeremy Cline <jeremy@jcline.org>
+Cc: Oleksii Kurochko <olkuroch@cisco.com>
+Cc: stable@vger.kernel.org # v4.16+
+Reported-by: Oleksii Kurochko <olkuroch@cisco.com>
+Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=201221
+Fixes: 20bd1d026aac ("scsi: sd: Keep disk read-only when re-reading partition")
+Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
 
->> +               struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
->> +
->> +               for (j = 0; j < imu->nr_bvecs; j++)
->> +                       put_page(imu->bvec[j].bv_page);
->> +
->> +               io_unaccount_mem(ctx->user, imu->nr_bvecs);
->> +               kfree(imu->bvec);
->> +               imu->nr_bvecs = 0;
->> +       }
->> +
->> +       kfree(ctx->user_bufs);
->> +       ctx->user_bufs = NULL;
-> 
-> (It isn't really necessary, but you could set nr_user_bufs=0 here.)
+---
 
-Doesn't hurt to be defensive.
+I have verified that get_disk_ro() and bdev_read_only() callers all
+handle the additional value correctly. Same is true for "ro" in
+sysfs.
 
->> +       return 0;
->> +}
-> [...]
->> +static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
->> +                                 unsigned nr_args)
->> +{
->> +       struct vm_area_struct **vmas = NULL;
->> +       struct page **pages = NULL;
->> +       int i, j, got_pages = 0;
->> +       int ret = -EINVAL;
->> +
->> +       if (ctx->user_bufs)
->> +               return -EBUSY;
->> +       if (!nr_args || nr_args > UIO_MAXIOV)
->> +               return -EINVAL;
->> +
->> +       ctx->user_bufs = kcalloc(nr_args, sizeof(struct io_mapped_ubuf),
->> +                                       GFP_KERNEL);
->> +       if (!ctx->user_bufs)
->> +               return -ENOMEM;
->> +
->> +       for (i = 0; i < nr_args; i++) {
->> +               struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
->> +               unsigned long off, start, end, ubuf;
->> +               int pret, nr_pages;
->> +               struct iovec iov;
->> +               size_t size;
->> +
->> +               ret = io_copy_iov(ctx, &iov, arg, i);
->> +               if (ret)
->> +                       break;
->> +
->> +               /*
->> +                * Don't impose further limits on the size and buffer
->> +                * constraints here, we'll -EINVAL later when IO is
->> +                * submitted if they are wrong.
->> +                */
->> +               ret = -EFAULT;
->> +               if (!iov.iov_base || !iov.iov_len)
->> +                       goto err;
->> +
->> +               /* arbitrary limit, but we need something */
->> +               if (iov.iov_len > SZ_1G)
->> +                       goto err;
->> +
->> +               ubuf = (unsigned long) iov.iov_base;
->> +               end = (ubuf + iov.iov_len + PAGE_SIZE - 1) >> PAGE_SHIFT;
->> +               start = ubuf >> PAGE_SHIFT;
->> +               nr_pages = end - start;
->> +
->> +               ret = io_account_mem(ctx->user, nr_pages);
-> 
-> Technically, this accounting is probably a bit off; I think if you
-> pass in a vector of 4K areas from 1G hugepages, you're going to pin
-> factor 0x40000 more memory than you think you're pinning.
-> (get_user_pages() counts references against the head page of a
-> compound page; nothing in the kernel can tell afterwards which part of
-> the hugepage you're using.) I'm not sure how much of a problem that
-> is, but it should probably at least be documented. Unless I'm just
-> missing something?
+Note that per-partition ro settings are lost on revalidate. This has
+been broken for at least a decade and it will require major surgery to
+fix. To my knowledge nobody has complained about being unable to make
+partition read-only settings stick through a revalidate. So hopefully
+this patch will suffice as a simple fix for stable.
+---
+ block/genhd.c         | 13 ++++++++++++-
+ block/ioctl.c         |  3 ++-
+ drivers/scsi/sd.c     |  4 +---
+ include/linux/genhd.h |  6 ++++++
+ 4 files changed, 21 insertions(+), 5 deletions(-)
 
-No I think you are right, it doesn't account for the hugepage size if
-you pass in huge pages. I'll fix that up.
-
->> +               if (ret)
->> +                       goto err;
->> +
->> +               if (!pages || nr_pages > got_pages) {
->> +                       kfree(vmas);
->> +                       kfree(pages);
->> +                       pages = kmalloc_array(nr_pages, sizeof(struct page *),
->> +                                               GFP_KERNEL);
->> +                       vmas = kmalloc_array(nr_pages,
->> +                                       sizeof(struct vma_area_struct *),
->> +                                       GFP_KERNEL);
->> +                       if (!pages || !vmas) {
->> +                               ret = -ENOMEM;
->> +                               io_unaccount_mem(ctx->user, nr_pages);
->> +                               goto err;
->> +                       }
->> +                       got_pages = nr_pages;
->> +               }
->> +
->> +               imu->bvec = kmalloc_array(nr_pages, sizeof(struct bio_vec),
->> +                                               GFP_KERNEL);
->> +               if (!imu->bvec) {
->> +                       io_unaccount_mem(ctx->user, nr_pages);
->> +                       goto err;
->> +               }
->> +
->> +               down_write(&current->mm->mmap_sem);
-> 
-> Weren't you planning to make this down_read()?
-
-I think I accidentally messed that up when going back to not using
-FOLL_ANON. Fixed (again), thanks.
-
->> +               pret = get_user_pages_longterm(ubuf, nr_pages, FOLL_WRITE,
->> +                                               pages, vmas);
->> +               if (pret == nr_pages) {
->> +                       /* don't support file backed memory */
->> +                       for (j = 0; j < nr_pages; j++) {
->> +                               struct vm_area_struct *vma = vmas[j];
->> +
->> +                               if (vma->vm_file &&
->> +                                   !is_file_hugepages(vma->vm_file)) {
->> +                                       ret = -EOPNOTSUPP;
->> +                                       break;
->> +                               }
->> +                       }
->> +               } else {
->> +                       ret = pret < 0 ? pret : -EFAULT;
->> +               }
->> +               up_write(&current->mm->mmap_sem);
-> [...]
->> +}
-> [...]
->> diff --git a/include/linux/sched/user.h b/include/linux/sched/user.h
->> index 39ad98c09c58..c7b5f86b91a1 100644
->> --- a/include/linux/sched/user.h
->> +++ b/include/linux/sched/user.h
->> @@ -40,7 +40,7 @@ struct user_struct {
->>         kuid_t uid;
->>
->>  #if defined(CONFIG_PERF_EVENTS) || defined(CONFIG_BPF_SYSCALL) || \
->> -    defined(CONFIG_NET)
->> +    defined(CONFIG_NET) || defined(CONFIG_IO_URING)
->>         atomic_long_t locked_vm;
->>  #endif
-> 
-> You're already using locked_vm in patch 5, right? I think that means
-> that from patch 5 up to this patch, some kernel configs will fail to
-> build.
-
-Good point, I need to do this earlier now.
-
+diff --git a/block/genhd.c b/block/genhd.c
+index 1dd8fd6613b8..e29805bfa989 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1549,11 +1549,22 @@ void set_disk_ro(struct gendisk *disk, int flag)
+ 	struct disk_part_iter piter;
+ 	struct hd_struct *part;
+ 
++	/*
++	 * If the user has forced disk read-only with BLKROSET, ignore
++	 * any device state change requested by the driver.
++	 */
++	if (disk->part0.policy == DISK_POLICY_USER_WRITE_PROTECT)
++		return;
+ 	if (disk->part0.policy != flag) {
+ 		set_disk_ro_uevent(disk, flag);
+ 		disk->part0.policy = flag;
+ 	}
+-
++	/*
++	 * If set_disk_ro() is called from revalidate, all partitions
++	 * have already been dropped at this point and thus any
++	 * per-partition user setting lost. Each partition will
++	 * inherit part0 policy when subsequently re-added.
++	 */
+ 	disk_part_iter_init(&piter, disk, DISK_PITER_INCL_EMPTY);
+ 	while ((part = disk_part_iter_next(&piter)))
+ 		part->policy = flag;
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 4825c78a6baa..16c42e1b18c8 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -451,7 +451,8 @@ static int blkdev_roset(struct block_device *bdev, fmode_t mode,
+ 		return ret;
+ 	if (get_user(n, (int __user *)arg))
+ 		return -EFAULT;
+-	set_device_ro(bdev, n);
++	set_device_ro(bdev, n ? DISK_POLICY_USER_WRITE_PROTECT :
++		      DISK_POLICY_WRITABLE);
+ 	return 0;
+ }
+ 
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index b2da8a00ec33..9aa409b38765 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -2591,10 +2591,8 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
+ 	int res;
+ 	struct scsi_device *sdp = sdkp->device;
+ 	struct scsi_mode_data data;
+-	int disk_ro = get_disk_ro(sdkp->disk);
+ 	int old_wp = sdkp->write_prot;
+ 
+-	set_disk_ro(sdkp->disk, 0);
+ 	if (sdp->skip_ms_page_3f) {
+ 		sd_first_printk(KERN_NOTICE, sdkp, "Assuming Write Enabled\n");
+ 		return;
+@@ -2632,7 +2630,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
+ 			  "Test WP failed, assume Write Enabled\n");
+ 	} else {
+ 		sdkp->write_prot = ((data.device_specific & 0x80) != 0);
+-		set_disk_ro(sdkp->disk, sdkp->write_prot || disk_ro);
++		set_disk_ro(sdkp->disk, sdkp->write_prot);
+ 		if (sdkp->first_scan || old_wp != sdkp->write_prot) {
+ 			sd_printk(KERN_NOTICE, sdkp, "Write Protect is %s\n",
+ 				  sdkp->write_prot ? "on" : "off");
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 06c0fd594097..2bef434d4dff 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -150,6 +150,12 @@ enum {
+ 	DISK_EVENT_EJECT_REQUEST		= 1 << 1, /* eject requested */
+ };
+ 
++enum {
++	DISK_POLICY_WRITABLE			= 0, /* Default */
++	DISK_POLICY_DEVICE_WRITE_PROTECT	= 1, /* Set by device driver */
++	DISK_POLICY_USER_WRITE_PROTECT		= 2, /* Set via BLKROSET */
++};
++
+ struct disk_part_tbl {
+ 	struct rcu_head rcu_head;
+ 	int len;
 -- 
-Jens Axboe
+2.19.2
 
