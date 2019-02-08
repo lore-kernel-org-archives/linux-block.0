@@ -2,138 +2,247 @@ Return-Path: <SRS0=HTWS=QP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E491C169C4
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:59:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF51BC169C4
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:59:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F015721841
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:59:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9441F21841
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:59:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726978AbfBHW7N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Feb 2019 17:59:13 -0500
-Received: from mga06.intel.com ([134.134.136.31]:4050 "EHLO mga06.intel.com"
+        id S1726883AbfBHW7W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Feb 2019 17:59:22 -0500
+Received: from mga09.intel.com ([134.134.136.24]:10805 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726949AbfBHW7N (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Feb 2019 17:59:13 -0500
+        id S1726655AbfBHW7W (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Feb 2019 17:59:22 -0500
 X-Amp-Result: UNSCANNABLE
 X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Feb 2019 14:59:12 -0800
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Feb 2019 14:59:21 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.58,348,1544515200"; 
-   d="p7s'?scan'208";a="298333988"
-Received: from orsmsx103.amr.corp.intel.com ([10.22.225.130])
-  by orsmga005.jf.intel.com with ESMTP; 08 Feb 2019 14:59:12 -0800
-Received: from orsmsx151.amr.corp.intel.com (10.22.226.38) by
- ORSMSX103.amr.corp.intel.com (10.22.225.130) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Fri, 8 Feb 2019 14:59:12 -0800
+   d="p7s'?scan'208";a="142777209"
+Received: from orsmsx101.amr.corp.intel.com ([10.22.225.128])
+  by fmsmga004.fm.intel.com with ESMTP; 08 Feb 2019 14:59:21 -0800
+Received: from orsmsx152.amr.corp.intel.com (10.22.226.39) by
+ ORSMSX101.amr.corp.intel.com (10.22.225.128) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Fri, 8 Feb 2019 14:59:21 -0800
 Received: from orsmsx101.amr.corp.intel.com ([169.254.8.11]) by
- ORSMSX151.amr.corp.intel.com ([169.254.7.44]) with mapi id 14.03.0415.000;
- Fri, 8 Feb 2019 14:59:11 -0800
+ ORSMSX152.amr.corp.intel.com ([169.254.8.53]) with mapi id 14.03.0415.000;
+ Fri, 8 Feb 2019 14:59:20 -0800
 From:   "Derrick, Jonathan" <jonathan.derrick@intel.com>
-To:     "hch@infradead.org" <hch@infradead.org>,
-        "zub@linux.fjfi.cvut.cz" <zub@linux.fjfi.cvut.cz>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "zub@linux.fjfi.cvut.cz" <zub@linux.fjfi.cvut.cz>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "sbauer@plzdonthack.me" <sbauer@plzdonthack.me>,
-        "jonas.rabenstein@studium.uni-erlangen.de" 
-        <jonas.rabenstein@studium.uni-erlangen.de>,
         "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH v4 15/16] block: sed-opal: don't repeat opal_discovery0
- in each steps array
-Thread-Topic: [PATCH v4 15/16] block: sed-opal: don't repeat opal_discovery0
- in each steps array
-Thread-Index: AQHUum/2nWJvb0JrekO2TcaIVNjqNqXQRkMAgACBSQCABk18gA==
-Date:   Fri, 8 Feb 2019 22:59:11 +0000
-Message-ID: <1549666749.10972.62.camel@intel.com>
+CC:     "jonas.rabenstein@studium.uni-erlangen.de" 
+        <jonas.rabenstein@studium.uni-erlangen.de>
+Subject: Re: [PATCH v4 16/16] block: sed-opal: rename next to execute_steps
+Thread-Topic: [PATCH v4 16/16] block: sed-opal: rename next to execute_steps
+Thread-Index: AQHUvHtpXRh3Cnvke0+xrQTl6wy9laXXEPwA
+Date:   Fri, 8 Feb 2019 22:59:20 +0000
+Message-ID: <1549666758.10972.63.camel@intel.com>
 References: <1549054223-12220-1-git-send-email-zub@linux.fjfi.cvut.cz>
-         <1549054223-12220-16-git-send-email-zub@linux.fjfi.cvut.cz>
-         <20190204150132.GM31132@infradead.org>
-         <alpine.LRH.2.21.1902042336331.10661@linux.fjfi.cvut.cz>
-In-Reply-To: <alpine.LRH.2.21.1902042336331.10661@linux.fjfi.cvut.cz>
+         <1549054223-12220-17-git-send-email-zub@linux.fjfi.cvut.cz>
+In-Reply-To: <1549054223-12220-17-git-send-email-zub@linux.fjfi.cvut.cz>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: yes
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.232.112.141]
 Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-1AZ+TpA3EknMK6Wdnjfu"
+        protocol="application/x-pkcs7-signature"; boundary="=-IJaCfD7/EgX5owy+HXuX"
 MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---=-1AZ+TpA3EknMK6Wdnjfu
+--=-IJaCfD7/EgX5owy+HXuX
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2019-02-04 at 23:44 +0100, David Kozub wrote:
-> On Mon, 4 Feb 2019, Christoph Hellwig wrote:
->=20
-> > > +	/* first do a discovery0 */
-> > > +	error =3D opal_discovery0_step(dev);
-> > >=20
-> > > +	for (state =3D 0; !error && state < n_steps; state++)
-> > > +		error =3D execute_step(dev, &steps[state], state);
-> > > +
-> > > +	/*
-> > > +	 * For each OPAL command the first step in steps starts some sort o=
-f
-> > > +	 * session. If an error occurred in the initial discovery0 or if an
-> > > +	 * error occurred in the first step (and thus stopping the loop wit=
-h
-> > > +	 * state =3D=3D 1) then there was an error before or during the att=
-empt to
-> > > +	 * start a session. Therefore we shouldn't attempt to terminate a
-> > > +	 * session, as one has not yet been created.
-> > > +	 */
-> > > +	if (error && state > 1)
-> > > +		end_opal_session_error(dev);
-> > >=20
-> > >  	return error;
-> >=20
-> > The flow here is a little too condensed for my taste.  Why not the
-> > plain obvoious, if a little longer:
-> >=20
-> > 	error =3D error =3D opal_discovery0_step(dev);
-> > 	if (error)
-> > 		return error;
-> >=20
-> > 	for (state =3D 0; state < n_steps; state++) {
-> > 		error =3D execute_step(dev, &steps[state], state);
-> > 		if (error)
-> > 			goto out_error;
-> > 	}
-> >=20
-> > 	return 0;
-> >=20
-> > out_error:
-> > 	if (state > 1)
-> > 		end_opal_session_error(dev);
-> > 	return error;
->=20
-> No problem, I can use this version. But I think there is a minor issue -=
-=20
-> the same one I hit in my original change, just from the other direction:
->=20
-> If the loop succeds for the 0-th element of steps, and then fails for the=
-=20
-> 1st element, then state equals 1 yet the session has been started, so we=
-=20
-> should close it.
->=20
-> I think the condition in out_error should be if (state > 0).
->=20
-> Best regards,
-> David
-Looks good with Christoph's suggestion (for 14/16) and your state check fix
-
+Looks good
 
 Reviewed-by: Jon Derrick <jonathan.derrick@intel.com>
---=-1AZ+TpA3EknMK6Wdnjfu
+
+On Fri, 2019-02-01 at 21:50 +0100, David Kozub wrote:
+> As the function is responsible for executing the individual steps supplie=
+d
+> in the steps argument, execute_steps is a more descriptive name than the
+> rather generic next.
+>=20
+> Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+> Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
+> ---
+>  block/sed-opal.c | 37 +++++++++++++++++++------------------
+>  1 file changed, 19 insertions(+), 18 deletions(-)
+>=20
+> diff --git a/block/sed-opal.c b/block/sed-opal.c
+> index 3362741dd198..c09149dd5e0a 100644
+> --- a/block/sed-opal.c
+> +++ b/block/sed-opal.c
+> @@ -401,8 +401,8 @@ static int execute_step(struct opal_dev *dev,
+>  	return error;
+>  }
+> =20
+> -static int next(struct opal_dev *dev, const struct opal_step *steps,
+> -		size_t n_steps)
+> +static int execute_steps(struct opal_dev *dev,
+> +			 const struct opal_step *steps, size_t n_steps)
+>  {
+>  	size_t state;
+>  	int error;
+> @@ -2034,7 +2034,7 @@ static int opal_secure_erase_locking_range(struct o=
+pal_dev *dev,
+> =20
+>  	mutex_lock(&dev->dev_lock);
+>  	setup_opal_dev(dev);
+> -	ret =3D next(dev, erase_steps, ARRAY_SIZE(erase_steps));
+> +	ret =3D execute_steps(dev, erase_steps, ARRAY_SIZE(erase_steps));
+>  	mutex_unlock(&dev->dev_lock);
+>  	return ret;
+>  }
+> @@ -2051,7 +2051,7 @@ static int opal_erase_locking_range(struct opal_dev=
+ *dev,
+> =20
+>  	mutex_lock(&dev->dev_lock);
+>  	setup_opal_dev(dev);
+> -	ret =3D next(dev, erase_steps, ARRAY_SIZE(erase_steps));
+> +	ret =3D execute_steps(dev, erase_steps, ARRAY_SIZE(erase_steps));
+>  	mutex_unlock(&dev->dev_lock);
+>  	return ret;
+>  }
+> @@ -2077,7 +2077,7 @@ static int opal_enable_disable_shadow_mbr(struct op=
+al_dev *dev,
+> =20
+>  	mutex_lock(&dev->dev_lock);
+>  	setup_opal_dev(dev);
+> -	ret =3D next(dev, mbr_steps, ARRAY_SIZE(mbr_steps));
+> +	ret =3D execute_steps(dev, mbr_steps, ARRAY_SIZE(mbr_steps));
+>  	mutex_unlock(&dev->dev_lock);
+>  	return ret;
+>  }
+> @@ -2099,7 +2099,7 @@ static int opal_mbr_status(struct opal_dev *dev, st=
+ruct opal_mbr_data *opal_mbr)
+> =20
+>  	mutex_lock(&dev->dev_lock);
+>  	setup_opal_dev(dev);
+> -	ret =3D next(dev, mbr_steps, ARRAY_SIZE(mbr_steps));
+> +	ret =3D execute_steps(dev, mbr_steps, ARRAY_SIZE(mbr_steps));
+>  	mutex_unlock(&dev->dev_lock);
+>  	return ret;
+>  }
+> @@ -2122,7 +2122,7 @@ static int opal_write_shadow_mbr(struct opal_dev *d=
+ev,
+> =20
+>  	mutex_lock(&dev->dev_lock);
+>  	setup_opal_dev(dev);
+> -	ret =3D next(dev, mbr_steps, ARRAY_SIZE(mbr_steps));
+> +	ret =3D execute_steps(dev, mbr_steps, ARRAY_SIZE(mbr_steps));
+>  	mutex_unlock(&dev->dev_lock);
+>  	return ret;
+>  }
+> @@ -2174,7 +2174,7 @@ static int opal_add_user_to_lr(struct opal_dev *dev=
+,
+> =20
+>  	mutex_lock(&dev->dev_lock);
+>  	setup_opal_dev(dev);
+> -	ret =3D next(dev, steps, ARRAY_SIZE(steps));
+> +	ret =3D execute_steps(dev, steps, ARRAY_SIZE(steps));
+>  	mutex_unlock(&dev->dev_lock);
+>  	return ret;
+>  }
+> @@ -2189,7 +2189,7 @@ static int opal_reverttper(struct opal_dev *dev, st=
+ruct opal_key *opal)
+> =20
+>  	mutex_lock(&dev->dev_lock);
+>  	setup_opal_dev(dev);
+> -	ret =3D next(dev, revert_steps, ARRAY_SIZE(revert_steps));
+> +	ret =3D execute_steps(dev, revert_steps, ARRAY_SIZE(revert_steps));
+>  	mutex_unlock(&dev->dev_lock);
+> =20
+>  	/*
+> @@ -2217,10 +2217,11 @@ static int __opal_lock_unlock(struct opal_dev *de=
+v,
+>  	};
+> =20
+>  	if (lk_unlk->session.sum)
+> -		return next(dev, unlock_sum_steps,
+> -			    ARRAY_SIZE(unlock_sum_steps));
+> +		return execute_steps(dev, unlock_sum_steps,
+> +				     ARRAY_SIZE(unlock_sum_steps));
+>  	else
+> -		return next(dev, unlock_steps, ARRAY_SIZE(unlock_steps));
+> +		return execute_steps(dev, unlock_steps,
+> +				     ARRAY_SIZE(unlock_steps));
+>  }
+> =20
+>  static int __opal_set_mbr_done(struct opal_dev *dev, struct opal_key *ke=
+y)
+> @@ -2232,7 +2233,7 @@ static int __opal_set_mbr_done(struct opal_dev *dev=
+, struct opal_key *key)
+>  		{ end_opal_session, }
+>  	};
+> =20
+> -	return next(dev, mbrdone_step, ARRAY_SIZE(mbrdone_step));
+> +	return execute_steps(dev, mbrdone_step, ARRAY_SIZE(mbrdone_step));
+>  }
+> =20
+>  static int opal_lock_unlock(struct opal_dev *dev,
+> @@ -2267,7 +2268,7 @@ static int opal_take_ownership(struct opal_dev *dev=
+, struct opal_key *opal)
+> =20
+>  	mutex_lock(&dev->dev_lock);
+>  	setup_opal_dev(dev);
+> -	ret =3D next(dev, owner_steps, ARRAY_SIZE(owner_steps));
+> +	ret =3D execute_steps(dev, owner_steps, ARRAY_SIZE(owner_steps));
+>  	mutex_unlock(&dev->dev_lock);
+>  	return ret;
+>  }
+> @@ -2288,7 +2289,7 @@ static int opal_activate_lsp(struct opal_dev *dev,
+> =20
+>  	mutex_lock(&dev->dev_lock);
+>  	setup_opal_dev(dev);
+> -	ret =3D next(dev, active_steps, ARRAY_SIZE(active_steps));
+> +	ret =3D execute_steps(dev, active_steps, ARRAY_SIZE(active_steps));
+>  	mutex_unlock(&dev->dev_lock);
+>  	return ret;
+>  }
+> @@ -2305,7 +2306,7 @@ static int opal_setup_locking_range(struct opal_dev=
+ *dev,
+> =20
+>  	mutex_lock(&dev->dev_lock);
+>  	setup_opal_dev(dev);
+> -	ret =3D next(dev, lr_steps, ARRAY_SIZE(lr_steps));
+> +	ret =3D execute_steps(dev, lr_steps, ARRAY_SIZE(lr_steps));
+>  	mutex_unlock(&dev->dev_lock);
+>  	return ret;
+>  }
+> @@ -2327,7 +2328,7 @@ static int opal_set_new_pw(struct opal_dev *dev, st=
+ruct opal_new_pw *opal_pw)
+> =20
+>  	mutex_lock(&dev->dev_lock);
+>  	setup_opal_dev(dev);
+> -	ret =3D next(dev, pw_steps, ARRAY_SIZE(pw_steps));
+> +	ret =3D execute_steps(dev, pw_steps, ARRAY_SIZE(pw_steps));
+>  	mutex_unlock(&dev->dev_lock);
+>  	return ret;
+>  }
+> @@ -2351,7 +2352,7 @@ static int opal_activate_user(struct opal_dev *dev,
+> =20
+>  	mutex_lock(&dev->dev_lock);
+>  	setup_opal_dev(dev);
+> -	ret =3D next(dev, act_steps, ARRAY_SIZE(act_steps));
+> +	ret =3D execute_steps(dev, act_steps, ARRAY_SIZE(act_steps));
+>  	mutex_unlock(&dev->dev_lock);
+>  	return ret;
+>  }
+--=-IJaCfD7/EgX5owy+HXuX
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -189,13 +298,13 @@ CPVfCgq9qnmVCn5DyHWE3V/BRjJCoILLBLxAxnmSdH4pF6wJ6pYRLEw9qoyNhpzGUIJU/Lk1MYIC
 FzCCAhMCAQEwgZAweTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBD
 bGFyYTEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFs
 IEJhc2ljIElzc3VpbmcgQ0EgNEECEzMAAMamAkocC+WQNPgAAAAAxqYwCQYFKw4DAhoFAKBdMBgG
-CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDIwODIyNTkwOVowIwYJ
-KoZIhvcNAQkEMRYEFHGpX88IJI+pPKgL7kvkYrGR9OgYMA0GCSqGSIb3DQEBAQUABIIBAAwz3lwE
-owm+Kdgj8dxVVxDqj/vM9Zm/rgMbCQjbeIQDMV1fDoXILWEnnZTQ5zLW6z2vRPwp7vksccqgIdKQ
-mtrm51c+58mOv1eOgXSjzHv1VQ6ProX0F7FsEzN7y59Lv5vOSbtEp9dHOwardb+CTeqYD4KWjMEi
-oa4ueE5gao0iaiZmyV80dCFsb+IJH0ryM7EWF0/rTqLDkYTAtG/x20Yw4htD+Cb6B01G9Pl/urQJ
-KQ8NnI3ZCL7PvsCEnAM4dziKnx8W711p4e1lq3Pf3fAzdWJ/AhswyV6D/ZOsn3QJ5/H9hCnlq+zm
-xHlOwdwxJOHxCVLqk+AswVVALwfXwNEAAAAAAAA=
+CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDIwODIyNTkxOFowIwYJ
+KoZIhvcNAQkEMRYEFP03nbEtCaMNLBC1eOsaoyAszXZbMA0GCSqGSIb3DQEBAQUABIIBAJ3yjEeR
+6L17b7IZxaV3+y3y6ck5xmaspHA3phUtFK7LFV0lBEVGMnGgpy0CRlgW8fxGfQ7CR8udLWQ8Qpur
+ovasPhOAGy69+AUjZ6JeTFMrVgnEH+a7hUcv2i0Dvk/vocKsU5/K1aAMulkqounIfh5nGGxxfezL
+JiN9BSZGp5dqgDi5UxZyC8OIaJVRN0DmYCAjsWSCywXfDLyq4EudaMAHoKSuXzsm392aTskqMfez
+b7ShMHCkoVLSe9iKap2SQJ2I6LnEhouqyxSOGPv0Iuue+1KAw75xtRVpXV0EyjmEGLaRR3WXWpvY
+4enH5ZG8xjVr7/Pl+avNMxKs0+n/nr4AAAAAAAA=
 
 
---=-1AZ+TpA3EknMK6Wdnjfu--
+--=-IJaCfD7/EgX5owy+HXuX--
