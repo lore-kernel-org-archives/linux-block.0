@@ -6,65 +6,65 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE8FFC169C4
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 19:42:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2155CC169C4
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 19:43:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 733AA2083B
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 19:42:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCE8D2083B
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 19:43:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="m7kfLHcQ"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="GMHS6abO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726889AbfBHTmo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Feb 2019 14:42:44 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:54443 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726858AbfBHTmo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Feb 2019 14:42:44 -0500
-Received: by mail-it1-f195.google.com with SMTP id i145so11658884ita.4
-        for <linux-block@vger.kernel.org>; Fri, 08 Feb 2019 11:42:44 -0800 (PST)
+        id S1726663AbfBHTnu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Feb 2019 14:43:50 -0500
+Received: from mail-it1-f181.google.com ([209.85.166.181]:51538 "EHLO
+        mail-it1-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726522AbfBHTnu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Feb 2019 14:43:50 -0500
+Received: by mail-it1-f181.google.com with SMTP id y184so5398555itc.1
+        for <linux-block@vger.kernel.org>; Fri, 08 Feb 2019 11:43:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=xtgiuIKK7UIOxCspefQXXIdxZFEynOgd6anNxHKTO/w=;
-        b=m7kfLHcQxyKUy/jNCDcjkqi/d5RIWCYqoSQc47qPDoNpEuPcJJgpHZjIFkXcm8BZoF
-         0QBuPD8oLaeeoD1UWbvUvw7Qv18QfSuQKbPqjXYZx/v5JWZ/ICJd16jST0pSvJfvz7bZ
-         hCeXy8KzYPmVWgpj4GZJS1YU1nqt0ZNoeO0x2WQK1Idlxg3IbODTPPE1K2yiJQHKHPIh
-         vcCv48tKnSJz80T4W/xSMxuZyFnVGhbahN7IL71jNDbOPT5JK4zLamHdPd3OIhJcM3Nf
-         mx5dzDLWrgzIPYa+TYBI3Z8wmbtdPfe7co3wckMGMmTSyXSbhf5H8qhhAFW1su6JWeAa
-         sIgQ==
+        bh=0pNN/atECk3oJAeCN3JzA1Vns5R0stl/sYoPKUzhYCk=;
+        b=GMHS6abOaCR9//YUt4z4XFgjQBQ1YldOcyL1NwlN787wNmWWHGYY31oGDsR24Fr3vR
+         fFypdZq1jr/jxPPVhdUA/GKuamGuQ3IYIyl4iWSL71R3XMkkKmJyJhfab3Ao2rb2FzTV
+         4Bc9skV7Ozm8ZMTFxyIOTcq8+S5ZxrhijN2ot89MhiMMgtoQOSN4kidDavwydIJsQsW6
+         AjUqrywpCxonWQhnydVW8oSpgoZQSbumG9+52c0qx1Mdvq8w6aEcYx6nk2OslFHwO6YY
+         eEgRp/ejY0zIYYzPBcHr/R/m1yU4EZhNBci9iPrY4/cMfUmW/DKIh77gdVFILMHbjdPb
+         cr+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=xtgiuIKK7UIOxCspefQXXIdxZFEynOgd6anNxHKTO/w=;
-        b=V5HWHz92hx386AFPp7gI5rXiFaIv96c7rdj44s51bFv11MphYWhonrojUWvt0nAViP
-         3KWHPvEDzF4wy0SOyfi9Zu8+1+jvMq5wyEYtfdzKBsHhYDzlt6fnyxZemarJy43gzjEO
-         R32WZcDhy/L+sRPGC/dVtm2mH+/oxlz1eSrTIRd1AjbJRDXfCSyyKv3T7R7TRM5LS7FR
-         6vng/hThtF06g5GYbAuacMLv9jX9fqNazjdtcKJMAtsFeuI3iyvwJIepzT8tAr28BfPw
-         U/XXzmeCd5SzBeTnB+tkquMNPNce455rGQSDo9pOIlLawTmigkWwGsx8PNg/yP31nATc
-         e0rA==
-X-Gm-Message-State: AHQUAuYApR5syZeRrbg1w4dyk2Z1WF4cuA8k+cEyUkBpD52E/dyVtX+Q
-        +JvQm0s5ITOBAq9Ae7j6X6P3e5+CjuEiEA==
-X-Google-Smtp-Source: AHgI3Ia0V4ABkqosqaYamQvIw7L7r9fD6P5Nu7j9XSoylhO0a7ss/1CWPu9hEn7bv6GTvD+S8xp0gg==
-X-Received: by 2002:a02:3003:: with SMTP id q3mr13025147jaq.16.1549654963818;
-        Fri, 08 Feb 2019 11:42:43 -0800 (PST)
+        bh=0pNN/atECk3oJAeCN3JzA1Vns5R0stl/sYoPKUzhYCk=;
+        b=XsJQRdTzDVOV0mHULChpwSOBtgKo1ROh8TdxkiN9vIot9Mg0CaffD1WgQn+ETozux8
+         EI68vIMb0l0/VajRGRsjG/Pr2sedrsi/EOTKDNPGMTOugj+cXPLUsxZuldd9XcfiE/58
+         jHqQhR28fhYvO8Mb2ma4lRDaRpw34peVND2ip4+FpPyhi4fFRcvMv5zNh8nEwecz8pry
+         RZdaKX67D5pn9oWakFQT3s3pwTtmw+ny8iT01kY2sQyPOvKEzGecv4ev8Axq24DN43S4
+         +UVyoK6lnJqxv2lmjfpEI+MWU05nybvSvNunIA4VbID3PDwNUG7Pe6N42AerLB8pZRoN
+         STzg==
+X-Gm-Message-State: AHQUAubR3obMorzJVhbfzDOxp6AI0OHmKLCmli9A2qNXim/E+wEVZGBK
+        jEkS4m6U5y+Iqr+TSzG78LV2hdgm7X0i2g==
+X-Google-Smtp-Source: AHgI3IY0U5BKRbNfn5H1Emev4dnVQCnlxdqfUi4qpeoZEDFYatX5NYV6BACbDl8EBWYezbnHok1ZyQ==
+X-Received: by 2002:a5d:928b:: with SMTP id s11mr14240559iom.111.1549655028895;
+        Fri, 08 Feb 2019 11:43:48 -0800 (PST)
 Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id x17sm1288973ioa.6.2019.02.08.11.42.42
+        by smtp.gmail.com with ESMTPSA id 125sm1635607itk.28.2019.02.08.11.43.47
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 08 Feb 2019 11:42:42 -0800 (PST)
-Subject: Re: [PATCH v2 0/3] iolatency bug fix
-To:     Liu Bo <bo.liu@linux.alibaba.com>, linux-block@vger.kernel.org
-Cc:     Josef Bacik <josef@toxicpanda.com>
-References: <20190125001249.72688-1-bo.liu@linux.alibaba.com>
+        Fri, 08 Feb 2019 11:43:48 -0800 (PST)
+Subject: Re: [PATCH] block: avoid setting nr_requests to current value
+To:     Aleksei Zakharov <zakharov.a.g@yandex.ru>
+Cc:     linux-block@vger.kernel.org
+References: <1549642445-1935-1-git-send-email-zakharov.a.g@yandex.ru>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <61ffd35a-d6a5-0c46-3de8-c1c9dead506a@kernel.dk>
-Date:   Fri, 8 Feb 2019 12:42:41 -0700
+Message-ID: <9531b406-7307-5642-7014-76b6e31a56df@kernel.dk>
+Date:   Fri, 8 Feb 2019 12:43:47 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <20190125001249.72688-1-bo.liu@linux.alibaba.com>
+In-Reply-To: <1549642445-1935-1-git-send-email-zakharov.a.g@yandex.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -73,15 +73,11 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/24/19 5:12 PM, Liu Bo wrote:
-> This set is to fix a hang case if blk-iolatency is in use.
-> 
-> The 1st patch explains the hang problem with more details and provides
-> a fix.
-> The 2nd patch adds a warning for unexpected inflight counter.
-> The 3rd patch is a cleanup of blk_mq_freeze_queue.
+On 2/8/19 9:14 AM, Aleksei Zakharov wrote:
+> There's no reason to freeze queue and set nr_requests value
+> if current value is the same.
 
-Applied for 5.0, thanks.
+Applied for 5.1, thanks.
 
 -- 
 Jens Axboe
