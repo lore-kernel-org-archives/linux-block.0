@@ -2,288 +2,166 @@ Return-Path: <SRS0=HTWS=QP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A1EC169C4
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:54:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39131C169C4
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:56:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6E9A721841
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:54:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iHm7VPcr"
+	by mail.kernel.org (Postfix) with ESMTP id 07A6D21908
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:56:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726844AbfBHWyz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Feb 2019 17:54:55 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:46832 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726524AbfBHWyz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Feb 2019 17:54:55 -0500
-Received: by mail-ot1-f68.google.com with SMTP id w25so8532434otm.13
-        for <linux-block@vger.kernel.org>; Fri, 08 Feb 2019 14:54:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IILKkykGS2vraJLN5lqp22FEW9mPI/uWQoIELHXyvvQ=;
-        b=iHm7VPcrIWjpqbI0ZjMSdLFPhJFU7dbVbbCDZemGvfDm282ZSXdnlnhvSZimPApuIv
-         qtsUxOGKiULYdiO2ZRcLRzCu2KGIoBwMxjSr6m68d/VnpSj3XYAKgvLETgRTeVTDHzPP
-         Zj2V4lk/B4ZwgKu5ozK6RLe+5ibiWXSkFpULutaukMGmHpcaADIQsoVGm/kSnVGjlQyY
-         qVpa1vAG52+edMFVS9tSQT1Xrkz7YBDiDgFLTYtzumGCL6PmW9hY9CsphBQr5fAvVsKh
-         1y11ZzM6Sti9sUQgn+uo1JhSAeTenHDnZjwqXGBujkOwstIah9tDtCdLvkAO3Tol9FKp
-         ZQ1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IILKkykGS2vraJLN5lqp22FEW9mPI/uWQoIELHXyvvQ=;
-        b=t7NNX16V+IhSvhFZSFj7dernd7BJsbgWW2beWWg1f8R3OOh/V4dVS7K1E5/NJBdrSc
-         Oxgt8LAUhozNqwkcnekcmf2dwSYxiTP8WSo3ka/3TD4pjpveRaK8qQRw2SbKAcyOOS5+
-         DjKQGxfCBkPrQhiay+CN+t84solJP3mnu/nOJ14FNQGGvv4k6ktMTfulWuglTuf3Uzm9
-         5SXAbvjdF7/CnUnWbU7VgXhpOXhLkGErXXx6MCMHprPuRbhBHeblpDrjMWMNnf1Rxk/+
-         NfA//ltnFTYm2hGEkHarnTUyLEJzDGMYv7+eEUjB1IqHI8HWq+fpZxZ8T8gsEWlm5aCk
-         Nozg==
-X-Gm-Message-State: AHQUAuZhmA/CIKOERUmfTddGzVSewzVKr5wBe5WaffShyyr06S6i/hUl
-        SOBWIS1R516DJQaJxJJ8gpNS7WP9fBLFpdCdQgFXjEugpiLjfg==
-X-Google-Smtp-Source: AHgI3IbLAhDVcLV5ZI2MVr2m5xX+Kn3+47UKPVgW1w9GT26xHw3Dg2jMOwaG0UoNIDOijndR6ZUlMD2zmmZDCzF2w8k=
-X-Received: by 2002:a9d:4549:: with SMTP id p9mr14768908oti.51.1549666494445;
- Fri, 08 Feb 2019 14:54:54 -0800 (PST)
+        id S1726844AbfBHW44 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Feb 2019 17:56:56 -0500
+Received: from mga04.intel.com ([192.55.52.120]:54490 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726788AbfBHW4z (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Feb 2019 17:56:55 -0500
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Feb 2019 14:56:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,348,1544515200"; 
+   d="p7s'?scan'208";a="137038841"
+Received: from orsmsx106.amr.corp.intel.com ([10.22.225.133])
+  by orsmga001.jf.intel.com with ESMTP; 08 Feb 2019 14:56:55 -0800
+Received: from orsmsx115.amr.corp.intel.com (10.22.240.11) by
+ ORSMSX106.amr.corp.intel.com (10.22.225.133) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Fri, 8 Feb 2019 14:56:54 -0800
+Received: from orsmsx101.amr.corp.intel.com ([169.254.8.11]) by
+ ORSMSX115.amr.corp.intel.com ([169.254.4.136]) with mapi id 14.03.0415.000;
+ Fri, 8 Feb 2019 14:56:54 -0800
+From:   "Derrick, Jonathan" <jonathan.derrick@intel.com>
+To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "zub@linux.fjfi.cvut.cz" <zub@linux.fjfi.cvut.cz>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "sbauer@plzdonthack.me" <sbauer@plzdonthack.me>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+CC:     "jonas.rabenstein@studium.uni-erlangen.de" 
+        <jonas.rabenstein@studium.uni-erlangen.de>
+Subject: Re: [PATCH v4 02/16] block: sed-opal: use correct macro for method
+ length
+Thread-Topic: [PATCH v4 02/16] block: sed-opal: use correct macro for method
+ length
+Thread-Index: AQHUum/jtclvHJfJpEa6tuuGvcT13KXXFGUA
+Date:   Fri, 8 Feb 2019 22:56:53 +0000
+Message-ID: <1549666612.10972.50.camel@intel.com>
+References: <1549054223-12220-1-git-send-email-zub@linux.fjfi.cvut.cz>
+         <1549054223-12220-3-git-send-email-zub@linux.fjfi.cvut.cz>
+In-Reply-To: <1549054223-12220-3-git-send-email-zub@linux.fjfi.cvut.cz>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: yes
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.232.112.141]
+Content-Type: multipart/signed; micalg=sha-1;
+        protocol="application/x-pkcs7-signature"; boundary="=-+91WqnxDE4nDbGyx6sTm"
 MIME-Version: 1.0
-References: <20190208173423.27014-1-axboe@kernel.dk> <20190208173423.27014-13-axboe@kernel.dk>
-In-Reply-To: <20190208173423.27014-13-axboe@kernel.dk>
-From:   Jann Horn <jannh@google.com>
-Date:   Fri, 8 Feb 2019 23:54:28 +0100
-Message-ID: <CAG48ez0uH_muHobzpwFzdyBWCcWDxbnfpuxABntph6Te+tYxGg@mail.gmail.com>
-Subject: Re: [PATCH 12/19] io_uring: add support for pre-mapped user IO buffers
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
-        jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>,
-        Al Viro <viro@zeniv.linux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 8, 2019 at 6:35 PM Jens Axboe <axboe@kernel.dk> wrote:
-> If we have fixed user buffers, we can map them into the kernel when we
-> setup the io_uring. That avoids the need to do get_user_pages() for
-> each and every IO.
+--=-+91WqnxDE4nDbGyx6sTm
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Looks good
+
+Reviewed-by: Jon Derrick <jonathan.derrick@intel.com>
+
+On Fri, 2019-02-01 at 21:50 +0100, David Kozub wrote:
+> From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+>=20
+> Also the values of OPAL_UID_LENGTH and OPAL_METHOD_LENGTH are the same,
+> it is weird to use OPAL_UID_LENGTH for the definition of the methods.
+>=20
+> Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de=
 >
-> To utilize this feature, the application must call io_uring_register()
-> after having setup an io_uring instance, passing in
-> IORING_REGISTER_BUFFERS as the opcode. The argument must be a pointer to
-> an iovec array, and the nr_args should contain how many iovecs the
-> application wishes to map.
->
-> If successful, these buffers are now mapped into the kernel, eligible
-> for IO. To use these fixed buffers, the application must use the
-> IORING_OP_READ_FIXED and IORING_OP_WRITE_FIXED opcodes, and then
-> set sqe->index to the desired buffer index. sqe->addr..sqe->addr+seq->len
-> must point to somewhere inside the indexed buffer.
->
-> The application may register buffers throughout the lifetime of the
-> io_uring instance. It can call io_uring_register() with
-> IORING_UNREGISTER_BUFFERS as the opcode to unregister the current set of
-> buffers, and then register a new set. The application need not
-> unregister buffers explicitly before shutting down the io_uring
-> instance.
->
-> It's perfectly valid to setup a larger buffer, and then sometimes only
-> use parts of it for an IO. As long as the range is within the originally
-> mapped region, it will work just fine.
->
-> For now, buffers must not be file backed. If file backed buffers are
-> passed in, the registration will fail with -1/EOPNOTSUPP. This
-> restriction may be relaxed in the future.
->
-> RLIMIT_MEMLOCK is used to check how much memory we can pin. A somewhat
-> arbitrary 1G per buffer size is also imposed.
-[...]
->  static int io_import_iovec(struct io_ring_ctx *ctx, int rw,
->                            const struct sqe_submit *s, struct iovec **iovec,
->                            struct iov_iter *iter)
-> @@ -711,6 +763,15 @@ static int io_import_iovec(struct io_ring_ctx *ctx, int rw,
->         const struct io_uring_sqe *sqe = s->sqe;
->         void __user *buf = u64_to_user_ptr(READ_ONCE(sqe->addr));
->         size_t sqe_len = READ_ONCE(sqe->len);
-> +       u8 opcode;
+> Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
+> ---
+>  block/sed-opal.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/block/sed-opal.c b/block/sed-opal.c
+> index c882a193e162..5c123a5b4ab1 100644
+> --- a/block/sed-opal.c
+> +++ b/block/sed-opal.c
+> @@ -181,7 +181,7 @@ static const u8 opaluid[][OPAL_UID_LENGTH] =3D {
+>   * Derived from: TCG_Storage_Architecture_Core_Spec_v2.01_r1.00
+>   * Section: 6.3 Assigned UIDs
+>   */
+> -static const u8 opalmethod[][OPAL_UID_LENGTH] =3D {
+> +static const u8 opalmethod[][OPAL_METHOD_LENGTH] =3D {
+>  	[OPAL_PROPERTIES] =3D
+>  		{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0x01 },
+>  	[OPAL_STARTSESSION] =3D
+--=-+91WqnxDE4nDbGyx6sTm
+Content-Type: application/x-pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-(You could add a comment here if you want, something like "We're
-reading ->opcode for the second time, but the first read doesn't care
-whether it's _FIXED or not, so it doesn't matter whether ->opcode
-changes concurrently. The first read does care about whether it is a
-READ or a WRITE, so we don't trust this read for that purpose and
-instead let the caller pass in the read/write flag.")
+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
+PNauajAtxgRKfqfSMb+IcL/VXiPtVZOxVq+CTZeDJkaEmn/79vg8OYxpR+YhFF+tGlKf/Zc4id1P
+AgMBAAGjggI3MIICMzAdBgNVHQ4EFgQU4oawcWXM1cPGdwGcIszDfjORVZAwHwYDVR0jBBgwFoAU
+HmkqtNwo/kcYTiELP7ysES/wmPUwZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL3d3dy5pbnRlbC5j
+b20vcmVwb3NpdG9yeS9DUkwvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENB
+JTIwNEEuY3JsMIGfBggrBgEFBQcBAQSBkjCBjzBpBggrBgEFBQcwAoZdaHR0cDovL3d3dy5pbnRl
+bC5jb20vcmVwb3NpdG9yeS9jZXJ0aWZpY2F0ZXMvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIw
+SXNzdWluZyUyMENBJTIwNEEuY3J0MCIGCCsGAQUFBzABhhZodHRwOi8vb2NzcC5pbnRlbC5jb20v
+MAsGA1UdDwQEAwIHgDA8BgkrBgEEAYI3FQcELzAtBiUrBgEEAYI3FQiGw4x1hJnlUYP9gSiFjp9T
+gpHACWeB3r05lfBDAgFkAgEJMB8GA1UdJQQYMBYGCCsGAQUFBwMEBgorBgEEAYI3CgMMMCkGCSsG
+AQQBgjcVCgQcMBowCgYIKwYBBQUHAwQwDAYKKwYBBAGCNwoDDDBRBgNVHREESjBIoCoGCisGAQQB
+gjcUAgOgHAwaam9uYXRoYW4uZGVycmlja0BpbnRlbC5jb22BGmpvbmF0aGFuLmRlcnJpY2tAaW50
+ZWwuY29tMA0GCSqGSIb3DQEBBQUAA4IBAQBxGkHe05DNpYel4b9WbbyQqD1G6y6YA6C93TjKULZi
+p8+gO1LL096ixD44+frVm3jtXMikoadRHQJmBJdzsCywNE1KgtrYF0k4zRWr7a28nyfGgQe4UHHD
+7ARyZFeGd7AKSQ1y4/LU57I2Aw2HKx9/PXavv1JXjjO2/bqTfnZDJTQmOQ0nvlO3/gvbbABxZHqz
+NtfHZsQWS7s+Elk2xGUQ0Po2pMCQoaPo9R96mm+84UP9q3OvSqMoaZwfzoUeAx2wGJYl0h3S+ABr
+CPVfCgq9qnmVCn5DyHWE3V/BRjJCoILLBLxAxnmSdH4pF6wJ6pYRLEw9qoyNhpzGUIJU/Lk1MYIC
+FzCCAhMCAQEwgZAweTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBD
+bGFyYTEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFs
+IEJhc2ljIElzc3VpbmcgQ0EgNEECEzMAAMamAkocC+WQNPgAAAAAxqYwCQYFKw4DAhoFAKBdMBgG
+CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDIwODIyNTY1MlowIwYJ
+KoZIhvcNAQkEMRYEFGMXmc1u2qCCNpLW+O4qfYdtnlKGMA0GCSqGSIb3DQEBAQUABIIBAFdVmen0
+hI0R8L7kMJNXZtyc6RKHzGBY1971YqbB6YAhbW8eyqvthwtu+9If5CUCpJZ24qHIKAFujl5PGMwM
+FAR8FU8A1BXy22oSv0baEvvzoQ0uzzjIj3jCx+/wT6KCodYFOg84iD1GRqpNkIeDKOeRzKSnB6tR
+oJKpaQlFElUWyKRJwS/9dlLmXax0CuFJhfPjZ89I/+8BzDP5FsX140xWFCQLbbit1zXBqMWeoAFQ
+ns3yoxdM2uGgJMjXCLl4ADSlBszZ8KgXfDM5Hd8dZIp4S9o/bIJzFdghjobx74EC9u3xrINnhORb
+uSqjtol/nb7sKn5yyMC28pqsJCA1AeoAAAAAAAA=
 
-> +       opcode = READ_ONCE(sqe->opcode);
-> +       if (opcode == IORING_OP_READ_FIXED ||
-> +           opcode == IORING_OP_WRITE_FIXED) {
-> +               ssize_t ret = io_import_fixed(ctx, rw, sqe, iter);
-> +               *iovec = NULL;
-> +               return ret;
-> +       }
->
->         if (!s->has_user)
->                 return EFAULT;
-[...]
-> @@ -1242,6 +1334,187 @@ static unsigned long ring_pages(unsigned sq_entries, unsigned cq_entries)
->         return (bytes + PAGE_SIZE - 1) / PAGE_SIZE;
->  }
->
-> +static int io_sqe_buffer_unregister(struct io_ring_ctx *ctx)
-> +{
-> +       int i, j;
-> +
-> +       if (!ctx->user_bufs)
-> +               return -ENXIO;
-> +
-> +       for (i = 0; i < ctx->sq_entries; i++) {
 
-->sq_entries? Shouldn't this be ->nr_user_bufs?
-
-> +               struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
-> +
-> +               for (j = 0; j < imu->nr_bvecs; j++)
-> +                       put_page(imu->bvec[j].bv_page);
-> +
-> +               io_unaccount_mem(ctx->user, imu->nr_bvecs);
-> +               kfree(imu->bvec);
-> +               imu->nr_bvecs = 0;
-> +       }
-> +
-> +       kfree(ctx->user_bufs);
-> +       ctx->user_bufs = NULL;
-
-(It isn't really necessary, but you could set nr_user_bufs=0 here.)
-
-> +       return 0;
-> +}
-[...]
-> +static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
-> +                                 unsigned nr_args)
-> +{
-> +       struct vm_area_struct **vmas = NULL;
-> +       struct page **pages = NULL;
-> +       int i, j, got_pages = 0;
-> +       int ret = -EINVAL;
-> +
-> +       if (ctx->user_bufs)
-> +               return -EBUSY;
-> +       if (!nr_args || nr_args > UIO_MAXIOV)
-> +               return -EINVAL;
-> +
-> +       ctx->user_bufs = kcalloc(nr_args, sizeof(struct io_mapped_ubuf),
-> +                                       GFP_KERNEL);
-> +       if (!ctx->user_bufs)
-> +               return -ENOMEM;
-> +
-> +       for (i = 0; i < nr_args; i++) {
-> +               struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
-> +               unsigned long off, start, end, ubuf;
-> +               int pret, nr_pages;
-> +               struct iovec iov;
-> +               size_t size;
-> +
-> +               ret = io_copy_iov(ctx, &iov, arg, i);
-> +               if (ret)
-> +                       break;
-> +
-> +               /*
-> +                * Don't impose further limits on the size and buffer
-> +                * constraints here, we'll -EINVAL later when IO is
-> +                * submitted if they are wrong.
-> +                */
-> +               ret = -EFAULT;
-> +               if (!iov.iov_base || !iov.iov_len)
-> +                       goto err;
-> +
-> +               /* arbitrary limit, but we need something */
-> +               if (iov.iov_len > SZ_1G)
-> +                       goto err;
-> +
-> +               ubuf = (unsigned long) iov.iov_base;
-> +               end = (ubuf + iov.iov_len + PAGE_SIZE - 1) >> PAGE_SHIFT;
-> +               start = ubuf >> PAGE_SHIFT;
-> +               nr_pages = end - start;
-> +
-> +               ret = io_account_mem(ctx->user, nr_pages);
-
-Technically, this accounting is probably a bit off; I think if you
-pass in a vector of 4K areas from 1G hugepages, you're going to pin
-factor 0x40000 more memory than you think you're pinning.
-(get_user_pages() counts references against the head page of a
-compound page; nothing in the kernel can tell afterwards which part of
-the hugepage you're using.) I'm not sure how much of a problem that
-is, but it should probably at least be documented. Unless I'm just
-missing something?
-
-> +               if (ret)
-> +                       goto err;
-> +
-> +               if (!pages || nr_pages > got_pages) {
-> +                       kfree(vmas);
-> +                       kfree(pages);
-> +                       pages = kmalloc_array(nr_pages, sizeof(struct page *),
-> +                                               GFP_KERNEL);
-> +                       vmas = kmalloc_array(nr_pages,
-> +                                       sizeof(struct vma_area_struct *),
-> +                                       GFP_KERNEL);
-> +                       if (!pages || !vmas) {
-> +                               ret = -ENOMEM;
-> +                               io_unaccount_mem(ctx->user, nr_pages);
-> +                               goto err;
-> +                       }
-> +                       got_pages = nr_pages;
-> +               }
-> +
-> +               imu->bvec = kmalloc_array(nr_pages, sizeof(struct bio_vec),
-> +                                               GFP_KERNEL);
-> +               if (!imu->bvec) {
-> +                       io_unaccount_mem(ctx->user, nr_pages);
-> +                       goto err;
-> +               }
-> +
-> +               down_write(&current->mm->mmap_sem);
-
-Weren't you planning to make this down_read()?
-
-> +               pret = get_user_pages_longterm(ubuf, nr_pages, FOLL_WRITE,
-> +                                               pages, vmas);
-> +               if (pret == nr_pages) {
-> +                       /* don't support file backed memory */
-> +                       for (j = 0; j < nr_pages; j++) {
-> +                               struct vm_area_struct *vma = vmas[j];
-> +
-> +                               if (vma->vm_file &&
-> +                                   !is_file_hugepages(vma->vm_file)) {
-> +                                       ret = -EOPNOTSUPP;
-> +                                       break;
-> +                               }
-> +                       }
-> +               } else {
-> +                       ret = pret < 0 ? pret : -EFAULT;
-> +               }
-> +               up_write(&current->mm->mmap_sem);
-[...]
-> +}
-[...]
-> diff --git a/include/linux/sched/user.h b/include/linux/sched/user.h
-> index 39ad98c09c58..c7b5f86b91a1 100644
-> --- a/include/linux/sched/user.h
-> +++ b/include/linux/sched/user.h
-> @@ -40,7 +40,7 @@ struct user_struct {
->         kuid_t uid;
->
->  #if defined(CONFIG_PERF_EVENTS) || defined(CONFIG_BPF_SYSCALL) || \
-> -    defined(CONFIG_NET)
-> +    defined(CONFIG_NET) || defined(CONFIG_IO_URING)
->         atomic_long_t locked_vm;
->  #endif
-
-You're already using locked_vm in patch 5, right? I think that means
-that from patch 5 up to this patch, some kernel configs will fail to
-build.
+--=-+91WqnxDE4nDbGyx6sTm--
