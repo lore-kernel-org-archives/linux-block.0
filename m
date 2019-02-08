@@ -2,234 +2,127 @@ Return-Path: <SRS0=HTWS=QP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE12FC282C2
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 01:41:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B938C282CB
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 08:31:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A3B6C21907
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 01:41:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CEA9921919
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 08:31:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="d4jlx/3n"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726924AbfBHBl5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Feb 2019 20:41:57 -0500
-Received: from bout01.mta.xmission.com ([166.70.11.15]:45793 "EHLO
-        bout01.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726876AbfBHBl5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Feb 2019 20:41:57 -0500
-Received: from mx02.mta.xmission.com ([166.70.13.212])
-        by bout01.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.87)
-        (envelope-from <sbauer@plzdonthack.me>)
-        id 1grvAw-00087y-LO; Thu, 07 Feb 2019 18:41:54 -0700
-Received: from plesk14-shared.xmission.com ([166.70.198.161] helo=plesk14.xmission.com)
-        by mx02.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.87)
-        (envelope-from <sbauer@plzdonthack.me>)
-        id 1grvAv-0008AS-Lg; Thu, 07 Feb 2019 18:41:54 -0700
-Received: from hacktheplanet (c-68-50-23-202.hsd1.in.comcast.net [68.50.23.202])
-        by plesk14.xmission.com (Postfix) with ESMTPSA id C000A221666;
-        Fri,  8 Feb 2019 01:41:52 +0000 (UTC)
-Date:   Thu, 7 Feb 2019 20:37:18 -0500
-From:   Scott Bauer <sbauer@plzdonthack.me>
-To:     "Derrick, Jonathan" <jonathan.derrick@intel.com>
-Cc:     "hch@infradead.org" <hch@infradead.org>,
-        "zub@linux.fjfi.cvut.cz" <zub@linux.fjfi.cvut.cz>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        id S1727235AbfBHIb0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Feb 2019 03:31:26 -0500
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:44538 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727238AbfBHIbZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Feb 2019 03:31:25 -0500
+Received: by mail-lf1-f65.google.com with SMTP id z13so1888306lfe.11
+        for <linux-block@vger.kernel.org>; Fri, 08 Feb 2019 00:31:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=e9o0xEZeVxGkGRYq+FrqLeZRYKbVYwBBNVU1Vhi1O7c=;
+        b=d4jlx/3nA/a5G7syHqg2prvdxFpGgbBoY21yMrmJkBeBq03jK/tjjyC3ad2yAifFhc
+         cPqTUdPHzxs6WThF95eB9FAe9zclG3k1aJ6TbaJQfqbbDhbOwpGG9CT08esoy9vCiZLE
+         +/mPVCXFiYcAHBKiBrj+1FxDmKNJkHjCJJejVnz5i4b7PkKqVIrfU+pinba2vLJTbN6g
+         SETyheeaOhPNNm5rbtFCOdNTVLQvlzpQ/iuWf2nvSRt6SB04KW/OwluWcPTRQTXlpzsw
+         JuhdbPvzy9BLv5fNtao3neUBWc3QWFsTFa7+e7xQpCTB9dvD7ykGqkh6EfBwWGQr+WE5
+         jYAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=e9o0xEZeVxGkGRYq+FrqLeZRYKbVYwBBNVU1Vhi1O7c=;
+        b=oFw4YJA4vGhioxGC68Te3VaxfZP7u1Ja/lDFGheAM4t2ZQub2XsezSbIGTS0Oiv57g
+         kEsvyfl0pZivtAJve6wSGkU+IKFc7Y/35SGd0lQKNayhR32BcKn0V/aYAXniJ+WXuLxz
+         Zw4uxrf47jbPKb0us3US5cufol4JK5JR+Iry1KaZmg0UKDeQ9MO0mRM3T4d2HLp11El7
+         U/+THa1bh70BerK9d2GLlISOeYSIhfTF0/6kumlqDpFs3FF0zJqLUSFGiwwBj/bym0M6
+         Ev0cV8KZM13JlyHeiAZD3Ei2AvfPdim7XYnr4QoMrLpSkDNmK6P4hyrsDR9k196TvPxq
+         VJcw==
+X-Gm-Message-State: AHQUAuazL/esc7dCnjZHyKUU/YmB+bNgTH2G2AZhL5+PCeZ1a6CSQuhK
+        AoPxE4XeGLdGI0IEnBJkiRPeTDil8/4=
+X-Google-Smtp-Source: AHgI3IbZa/PxvTalxyrFemw0ERdwLiKEJ13PYlnSQyzLL5Wel6ke7icNnqLupvzfVXuGjkiT0Rh4+A==
+X-Received: by 2002:a19:9508:: with SMTP id x8mr12577498lfd.112.1549614683327;
+        Fri, 08 Feb 2019 00:31:23 -0800 (PST)
+Received: from [192.168.0.36] (2-111-91-225-cable.dk.customer.tdc.net. [2.111.91.225])
+        by smtp.googlemail.com with ESMTPSA id q10-v6sm239573ljj.3.2019.02.08.00.31.21
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 08 Feb 2019 00:31:22 -0800 (PST)
+Subject: Re: [LSF/MM TOPIC] BPF for Block Devices
+To:     Stephen Bates <sbates@raithlin.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "jonas.rabenstein@studium.uni-erlangen.de" 
-        <jonas.rabenstein@studium.uni-erlangen.de>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-Message-ID: <20190208013718.GA19254@hacktheplanet>
-References: <1549054223-12220-1-git-send-email-zub@linux.fjfi.cvut.cz>
- <1549054223-12220-11-git-send-email-zub@linux.fjfi.cvut.cz>
- <20190204145244.GJ31132@infradead.org>
- <alpine.LRH.2.21.1902072247060.29258@linux.fjfi.cvut.cz>
- <1549586652.11868.12.camel@intel.com>
+        IDE/ATA development list <linux-ide@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Logan Gunthorpe <logang@deltatee.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+        "ast@kernel.org" <ast@kernel.org>
+References: <40D2EB06-6BF2-4233-9196-7A26AC43C64E@raithlin.com>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <f1f00282-11be-1682-3802-c8bd0e6fec4b@lightnvm.io>
+Date:   Fri, 8 Feb 2019 09:31:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+In-Reply-To: <40D2EB06-6BF2-4233-9196-7A26AC43C64E@raithlin.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1549586652.11868.12.camel@intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-XM-SPF: eid=1grvAv-0008AS-Lg;;;mid=<20190208013718.GA19254@hacktheplanet>;;;hst=mx02.mta.xmission.com;;;ip=166.70.198.161;;;frm=sbauer@plzdonthack.me;;;spf=none
-X-SA-Exim-Connect-IP: 166.70.198.161
-X-SA-Exim-Mail-From: sbauer@plzdonthack.me
-Subject: Re: [PATCH v4 10/16] block: sed-opal: add ioctl for done-mark of
- shadow mbr
-X-SA-Exim-Version: 4.2.1 (built Fri, 13 May 2016 17:07:30 -0600)
-X-SA-Exim-Scanned: Yes (on mx02.mta.xmission.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 08, 2019 at 12:44:14AM +0000, Derrick, Jonathan wrote:
-> On Thu, 2019-02-07 at 23:56 +0100, David Kozub wrote:
-> > On Mon, 4 Feb 2019, Christoph Hellwig wrote:
-> > 
-> > > On Fri, Feb 01, 2019 at 09:50:17PM +0100, David Kozub wrote:
-> > > > From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-> > > > 
-> > > > Enable users to mark the shadow mbr as done without completely
-> > > > deactivating the shadow mbr feature. This may be useful on reboots,
-> > > > when the power to the disk is not disconnected in between and the shadow
-> > > > mbr stores the required boot files. Of course, this saves also the
-> > > > (few) commands required to enable the feature if it is already enabled
-> > > > and one only wants to mark the shadow mbr as done.
-> > > > 
-> > > > Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
-> > > > Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
-> > > > ---
-> > > >  block/sed-opal.c              | 33 +++++++++++++++++++++++++++++++--
-> > > >  include/linux/sed-opal.h      |  1 +
-> > > >  include/uapi/linux/sed-opal.h |  1 +
-> > > >  3 files changed, 33 insertions(+), 2 deletions(-)
-> > > > 
-> > > > diff --git a/block/sed-opal.c b/block/sed-opal.c
-> > > > index 4b0a63b9d7c9..e03838cfd31b 100644
-> > > > --- a/block/sed-opal.c
-> > > > +++ b/block/sed-opal.c
-> > > > @@ -1996,13 +1996,39 @@ static int opal_erase_locking_range(struct opal_dev *dev,
-> > > >  static int opal_enable_disable_shadow_mbr(struct opal_dev *dev,
-> > > >  					  struct opal_mbr_data *opal_mbr)
-> > > >  {
-> > > > +	u8 token = opal_mbr->enable_disable == OPAL_MBR_ENABLE
-> > > > +		? OPAL_TRUE : OPAL_FALSE;
-> > > >  	const struct opal_step mbr_steps[] = {
-> > > >  		{ opal_discovery0, },
-> > > >  		{ start_admin1LSP_opal_session, &opal_mbr->key },
-> > > > -		{ set_mbr_done, &opal_mbr->enable_disable },
-> > > > +		{ set_mbr_done, &token },
-> > > >  		{ end_opal_session, },
-> > > >  		{ start_admin1LSP_opal_session, &opal_mbr->key },
-> > > > -		{ set_mbr_enable_disable, &opal_mbr->enable_disable },
-> > > > +		{ set_mbr_enable_disable, &token },
-> > > > +		{ end_opal_session, },
-> > > > +		{ NULL, }
-> > > 
-> > > This seems to be a change of what we pass to set_mbr_done /
-> > > set_mbr_enable_disable and not really related to the new functionality
-> > > here, so it should be split into a separate patch.
-> > > 
-> > > That being said if we really care about this translation between
-> > > the two sets of constants, why not do it inside
-> > > set_mbr_done and set_mbr_enable_disable?
-> > 
-> > Hi Christoph,
-> > 
-> > I agree, this should be split. Furthermore I think I found an issue here: 
-> > OPAL_MBR_ENABLE and OPAL_MBR_DISABLE are defined as follows:
-> > 
-> > enum opal_mbr {
-> >  	OPAL_MBR_ENABLE = 0x0,
-> >  	OPAL_MBR_DISABLE = 0x01,
-> > };
-> > 
-> > ... while OPAL_TRUE and OPAL_FALSE tokens are:
-> > 
-> >  	OPAL_TRUE = 0x01,
-> >  	OPAL_FALSE = 0x00,
-> > 
-> > so in the current code in kernel, when the IOCTL input is directly passed 
-> > in place of the TRUE/FALSE tokens (in opal_enable_disable_shadow_mbr), 
-> > passing OPAL_MBR_ENABLE (0) to IOC_OPAL_ENABLE_DISABLE_MBR ends up being 
-> > interpreted as OPAL_FALSE (0) and passing OPAL_MBR_DISABLE (1) ended up 
-> > being interpreted as OPAL_TRUE (1). So the behavior is:
-> > 
-> > OPAL_MBR_ENABLE: set MBR enable to OPAL_FALSE and done to OPAL_FALSE
-> > OPAL_MBR_DISABLE: set MBR enable to OPAL_TRUE and done to OPAL_TRUE
-> > 
-> > Am I missing something here? This seems wrong to me. And I think this 
-> > patch actually changes it by introducing:
-> > 
-> > +    u8 token = opal_mbr->enable_disable == OPAL_MBR_ENABLE
-> > +            ? OPAL_TRUE : OPAL_FALSE;
-> > 
-> > which is essentially a negation (map 0 to 1 and 1 to 0).
-> > 
-> > I had a strange feeling of IOC_OPAL_ENABLE_DISABLE_MBR behaving 
-> > incorrectly when I first tried it. But when I checked later I was not able 
-> > to reproduce it - probably originally I tested without this patch.
-> > 
-> > With regard to the new IOC_OPAL_MBR_STATUS: I find the usage of 
-> > OPAL_MBR_ENABLE/DISABLE for this confusing: what should passing 
-> > OPAL_MBR_ENABLE do? Should it enable the shadow MBR? Or should it 
-> > enable the MBR-done flag? I think the implementation in this patch 
-> > interprets OPAL_MBR_ENABLE as 'set the "done" flag to true', thus hiding 
-> > the shadow MBR. But this is not obvious looking at the IOCTL name.
-> > 
-> > What if I introduced two new constants for this? OPAL_MBR_DONE and 
-> > OPAL_MBR_NOT_DONE? Maybe the IOCTL could be renamed too - 
-> > IOC_OPAL_MBR_DONE? Or is it only me who finds this confusing?
-> > 
-> > Best regards,
-> > David
+On 2/7/19 6:12 PM, Stephen  Bates wrote:
+> Hi All
 > 
-> Hi David,
+>> A BPF track will join the annual LSF/MM Summit this year! Please read the updated description and CFP information below.
 > 
-> Based on the spec and appnote [1], it does look like sed-opal-temp is
-> providing the inverted value for shadow mbr enable:
+> Well if we are adding BPF to LSF/MM I have to submit a request to discuss BPF for block devices please!
 > 
->         if (cfg.enable_mbr)
->                 mbr.enable_disable = OPAL_MBR_ENABLE;
->         else    
->                 mbr.enable_disable = OPAL_MBR_DISABLE;
+> There has been quite a bit of activity around the concept of Computational Storage in the past 12 months. SNIA recently formed a Technical Working Group (TWG) and it is expected that this TWG will be making proposals to standards like NVM Express to add APIs for computation elements that reside on or near block devices.
 > 
-> where
-> enum opal_mbr {
->         OPAL_MBR_ENABLE = 0x0,
->         OPAL_MBR_DISABLE = 0x01,
-> };
+> While some of these Computational Storage accelerators will provide fixed functions (e.g. a RAID, encryption or compression), others will be more flexible. Some of these flexible accelerators will be capable of running BPF code on them (something that certain Linux drivers for SmartNICs support today [1]). I would like to discuss what such a framework could look like for the storage layer and the file-system layer. I'd like to discuss how devices could advertise this capability (a special type of NVMe namespace or SCSI LUN perhaps?) and how the BPF engine could be programmed and then used against block IO. Ideally I'd like to discuss doing this in a vendor-neutral way and develop ideas I can take back to NVMe and the SNIA TWG to help shape how these standard evolve.
 > 
-> The appnote says as much:
-> 3.2.9.4
-> Enable the MBR Shadowing feature
-> session[TSN:HSN] -> MBRControl_UID.Set[Values = [Enable = TRUE]]
-> 0000 00000000 07FE0000 00000000 00000000
-> 0010 00000048 00001001 00000001 00000000
-> 0020 00000000 00000000 00000030 00000000
-> 0030 00000000 00000024 F8A80000 08030000
-> 0040 0001A800 00000600 000017F0 F201F0F2
-> 0050 0101F3F1 F3F1F9F0 000000F1 00000000
->       ^ ^
-> 01: Tiny Atom Token: Name: “Enable”
-> 01: Tiny Atom Token: Value: <1> (True)
+> To provide an example use-case one could consider a BPF capable accelerator being used to perform a filtering function and then using p2pdma to scan data on a number of adjacent NVMe SSDs, filtering said data and then only providing filter-matched LBAs to the host. Many other potential applications apply.
 > 
-> In order to keep the userspace interface consistent, I'll ACK your
-> change in this patch, unless Scott can fill me in on why this looks
-> wrong but is actually right.
+> Also, I am interested in the "The end of the DAX Experiment" topic proposed by Dan and the " Zoned Block Devices" from Matias and Damien.
 > 
-> We have 7 bytes in the opal_mbr_data struct we could use for DONE/NOT
-> DONE. I'm not sure how to go about keeping it consistent with old uapi,
-> although arguably opal_enable_disable_shadow_mbr is already doing the
-> wrong thing with DONE and ENABLE so it's low impact.
+> Cheers
+>   
+> Stephen
 > 
-> Acked-by: Jon Derrick <jonathan.derrick@intel.com>
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/netronome/nfp/bpf/offload.c?h=v5.0-rc5
+>   
+>      
+> 
 
-I don't have a good answer to this right now. I'm going to have to review
-this portion of the spec, as well as the implementation to understand what
-went wrong.
+If we're going down that road, we can also look at the block I/O path 
+itself.
 
-As for changing UAPI, I know that's usually a no-go, but no one actually
-uses this portion of the opal driver as far as I can tell. No distro ships
-sed-util, and enabling/disabling the mbr is a one shot deal during initial
-bring up. If I had messed up the resume from suspsend portion we wouldn't
-be able to change that, as I know people use that. But for this part I think
-we'd be okay to do this small modification.
+Now that Jens' has shown that io_uring can beat SPDK. Let's take it a 
+step further, and create an API, such that we can bypass the boilerplate 
+checking in kernel block I/O path, and go straight to issuing the I/O in 
+the block layer.
 
-If util-linux, will take a patch for the opal driver, then
-we'd be locked in for 5.1 or when ever this lands (as distros would now be
-shipping).
+For example, we could provide an API that allows applications to 
+register a fast path through the kernel — one where checks, such as 
+generic_make_request_checks(), already has been validated.
 
-Anyway, let me review again whats happened here over the weekend when I have
-some free time and mental cycles left to spare.
-
-
-
-
-
-
-
-
+The user-space application registers a BFP program with the kernel, the 
+kernel prechecks the possible I/O patterns and then green-lights all 
+I/Os that goes through that unit. In that way, the checks only have to 
+be done once, instead of every I/O. This approach could work beautifully 
+with direct io and raw devices, and with a bit more work, we can do more 
+complex use-cases as well.
