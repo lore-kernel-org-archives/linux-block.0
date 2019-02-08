@@ -3,121 +3,178 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6559CC282CB
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:57:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC0B1C169C4
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:58:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 331B521841
-	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:57:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB2C521841
+	for <linux-block@archiver.kernel.org>; Fri,  8 Feb 2019 22:58:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727125AbfBHW5q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Feb 2019 17:57:46 -0500
-Received: from mga17.intel.com ([192.55.52.151]:47248 "EHLO mga17.intel.com"
+        id S1726883AbfBHW6A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Feb 2019 17:58:00 -0500
+Received: from mga07.intel.com ([134.134.136.100]:7258 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726610AbfBHW5o (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Feb 2019 17:57:44 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1726610AbfBHW6A (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Feb 2019 17:58:00 -0500
+X-Amp-Result: UNSCANNABLE
 X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Feb 2019 14:56:41 -0800
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Feb 2019 14:57:59 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.58,348,1544515200"; 
-   d="p7s'?scan'208";a="123087813"
-Received: from orsmsx110.amr.corp.intel.com ([10.22.240.8])
-  by fmsmga008.fm.intel.com with ESMTP; 08 Feb 2019 14:56:41 -0800
-Received: from orsmsx113.amr.corp.intel.com (10.22.240.9) by
- ORSMSX110.amr.corp.intel.com (10.22.240.8) with Microsoft SMTP Server (TLS)
- id 14.3.408.0; Fri, 8 Feb 2019 14:56:40 -0800
+   d="p7s'?scan'208";a="145355733"
+Received: from orsmsx102.amr.corp.intel.com ([10.22.225.129])
+  by fmsmga001.fm.intel.com with ESMTP; 08 Feb 2019 14:57:58 -0800
 Received: from orsmsx101.amr.corp.intel.com ([169.254.8.11]) by
- ORSMSX113.amr.corp.intel.com ([169.254.9.97]) with mapi id 14.03.0415.000;
- Fri, 8 Feb 2019 14:56:40 -0800
+ ORSMSX102.amr.corp.intel.com ([169.254.3.90]) with mapi id 14.03.0415.000;
+ Fri, 8 Feb 2019 14:57:58 -0800
 From:   "Derrick, Jonathan" <jonathan.derrick@intel.com>
-To:     "hch@infradead.org" <hch@infradead.org>,
-        "zub@linux.fjfi.cvut.cz" <zub@linux.fjfi.cvut.cz>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "zub@linux.fjfi.cvut.cz" <zub@linux.fjfi.cvut.cz>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "sbauer@plzdonthack.me" <sbauer@plzdonthack.me>,
-        "jonas.rabenstein@studium.uni-erlangen.de" 
-        <jonas.rabenstein@studium.uni-erlangen.de>,
         "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH v4 01/16] block: sed-opal: fix typos and formatting
-Thread-Topic: [PATCH v4 01/16] block: sed-opal: fix typos and formatting
-Thread-Index: AQHUum/gBfmMAdzlk0ur76kJaQDiuKXQQQGAgABghwCABnLLgA==
-Date:   Fri, 8 Feb 2019 22:56:39 +0000
-Message-ID: <1549666597.10972.49.camel@intel.com>
+CC:     "jonas.rabenstein@studium.uni-erlangen.de" 
+        <jonas.rabenstein@studium.uni-erlangen.de>
+Subject: Re: [PATCH v4 07/16] block: sed-opal: reuse response_get_token to
+ decrease code duplication
+Thread-Topic: [PATCH v4 07/16] block: sed-opal: reuse response_get_token to
+ decrease code duplication
+Thread-Index: AQHUum/vGMfD2wW7nEmBBU+crwjx5aXXFLCA
+Date:   Fri, 8 Feb 2019 22:57:57 +0000
+Message-ID: <1549666675.10972.55.camel@intel.com>
 References: <1549054223-12220-1-git-send-email-zub@linux.fjfi.cvut.cz>
-         <1549054223-12220-2-git-send-email-zub@linux.fjfi.cvut.cz>
-         <20190204144243.GA31132@infradead.org>
-         <alpine.LRH.2.21.1902042110370.10661@linux.fjfi.cvut.cz>
-In-Reply-To: <alpine.LRH.2.21.1902042110370.10661@linux.fjfi.cvut.cz>
+         <1549054223-12220-8-git-send-email-zub@linux.fjfi.cvut.cz>
+In-Reply-To: <1549054223-12220-8-git-send-email-zub@linux.fjfi.cvut.cz>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: yes
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.232.112.141]
 Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-2J31QOZ31kjG5zFFY3Kh"
+        protocol="application/x-pkcs7-signature"; boundary="=-X9UNYfHkVOK6yvPEbbdw"
 MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---=-2J31QOZ31kjG5zFFY3Kh
+--=-X9UNYfHkVOK6yvPEbbdw
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Looks good otherwise
+Looks good
 
 Reviewed-by: Jon Derrick <jonathan.derrick@intel.com>
 
-On Mon, 2019-02-04 at 21:28 +0100, David Kozub wrote:
-> On Mon, 4 Feb 2019, Christoph Hellwig wrote:
+On Fri, 2019-02-01 at 21:50 +0100, David Kozub wrote:
+> response_get_token had already been in place, its functionality had
+> been duplicated within response_get_{u64,bytestring} with the same error
+> handling. Unify the handling by reusing response_get_token within the
+> other functions.
 >=20
-> > On Fri, Feb 01, 2019 at 09:50:08PM +0100, David Kozub wrote:
-> > > This should make no change in functionality.
-> > > The formatting changes were triggered by checkpatch.pl.
-> > >=20
-> > > Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
-> > > Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
-> > > ---
-> > >  block/sed-opal.c | 19 +++++++++++--------
-> > >  1 file changed, 11 insertions(+), 8 deletions(-)
-> > >=20
-> > > diff --git a/block/sed-opal.c b/block/sed-opal.c
-> > > index e0de4dd448b3..c882a193e162 100644
-> > > --- a/block/sed-opal.c
-> > > +++ b/block/sed-opal.c
-> > > @@ -11,8 +11,8 @@
-> > >   *
-> > >   * This program is distributed in the hope it will be useful, but WI=
-THOUT
-> > >   * ANY WARRANTY; without even the implied warranty of MERCHANTABILIT=
-Y or
-> > > - * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public Lic=
-ense for
-> > > - * more details.
-> > > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public Lic=
-ense
-> > > + * for more details.
-> >=20
-> > What exactly is the fix here?
-> >=20
-> > If we want to fix the licence boilerplate we should switch it to an
-> > SPDX tag instead.
-> >=20
-> > Otherwise this looks fine to me.
+> Co-authored-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.d=
+e>
+> Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+> Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de=
+>
+> Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
+> ---
+>  block/sed-opal.c | 46 +++++++++++++++-------------------------------
+>  1 file changed, 15 insertions(+), 31 deletions(-)
 >=20
-> I thought checkpatch.pl -f block/sed-opal.c complained about the line=20
-> being too long. But when I try that again now (with the original version)=
-,=20
-> it does not complain. So I probably saw a ghost.
->=20
-> I'll undo this change.
---=-2J31QOZ31kjG5zFFY3Kh
+> diff --git a/block/sed-opal.c b/block/sed-opal.c
+> index 537cd73ea88a..1332547e5a99 100644
+> --- a/block/sed-opal.c
+> +++ b/block/sed-opal.c
+> @@ -889,27 +889,19 @@ static size_t response_get_string(const struct pars=
+ed_resp *resp, int n,
+>  				  const char **store)
+>  {
+>  	u8 skip;
+> -	const struct opal_resp_tok *token;
+> +	const struct opal_resp_tok *tok;
+> =20
+>  	*store =3D NULL;
+> -	if (!resp) {
+> -		pr_debug("Response is NULL\n");
+> -		return 0;
+> -	}
+> -
+> -	if (n >=3D resp->num) {
+> -		pr_debug("Response has %d tokens. Can't access %d\n",
+> -			 resp->num, n);
+> +	tok =3D response_get_token(resp, n);
+> +	if (IS_ERR(tok))
+>  		return 0;
+> -	}
+> =20
+> -	token =3D &resp->toks[n];
+> -	if (token->type !=3D OPAL_DTA_TOKENID_BYTESTRING) {
+> +	if (tok->type !=3D OPAL_DTA_TOKENID_BYTESTRING) {
+>  		pr_debug("Token is not a byte string!\n");
+>  		return 0;
+>  	}
+> =20
+> -	switch (token->width) {
+> +	switch (tok->width) {
+>  	case OPAL_WIDTH_TINY:
+>  	case OPAL_WIDTH_SHORT:
+>  		skip =3D 1;
+> @@ -925,37 +917,29 @@ static size_t response_get_string(const struct pars=
+ed_resp *resp, int n,
+>  		return 0;
+>  	}
+> =20
+> -	*store =3D token->pos + skip;
+> -	return token->len - skip;
+> +	*store =3D tok->pos + skip;
+> +	return tok->len - skip;
+>  }
+> =20
+>  static u64 response_get_u64(const struct parsed_resp *resp, int n)
+>  {
+> -	if (!resp) {
+> -		pr_debug("Response is NULL\n");
+> -		return 0;
+> -	}
+> +	const struct opal_resp_tok *tok;
+> =20
+> -	if (n >=3D resp->num) {
+> -		pr_debug("Response has %d tokens. Can't access %d\n",
+> -			 resp->num, n);
+> +	tok =3D response_get_token(resp, n);
+> +	if (IS_ERR(tok))
+>  		return 0;
+> -	}
+> =20
+> -	if (resp->toks[n].type !=3D OPAL_DTA_TOKENID_UINT) {
+> -		pr_debug("Token is not unsigned it: %d\n",
+> -			 resp->toks[n].type);
+> +	if (tok->type !=3D OPAL_DTA_TOKENID_UINT) {
+> +		pr_debug("Token is not unsigned int: %d\n", tok->type);
+>  		return 0;
+>  	}
+> =20
+> -	if (!(resp->toks[n].width =3D=3D OPAL_WIDTH_TINY ||
+> -	      resp->toks[n].width =3D=3D OPAL_WIDTH_SHORT)) {
+> -		pr_debug("Atom is not short or tiny: %d\n",
+> -			 resp->toks[n].width);
+> +	if (tok->width !=3D OPAL_WIDTH_TINY && tok->width !=3D OPAL_WIDTH_SHORT=
+) {
+> +		pr_debug("Atom is not short or tiny: %d\n", tok->width);
+>  		return 0;
+>  	}
+> =20
+> -	return resp->toks[n].stored.u;
+> +	return tok->stored.u;
+>  }
+> =20
+>  static bool response_token_matches(const struct opal_resp_tok *token, u8=
+ match)
+--=-X9UNYfHkVOK6yvPEbbdw
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -173,13 +230,13 @@ CPVfCgq9qnmVCn5DyHWE3V/BRjJCoILLBLxAxnmSdH4pF6wJ6pYRLEw9qoyNhpzGUIJU/Lk1MYIC
 FzCCAhMCAQEwgZAweTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBD
 bGFyYTEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFs
 IEJhc2ljIElzc3VpbmcgQ0EgNEECEzMAAMamAkocC+WQNPgAAAAAxqYwCQYFKw4DAhoFAKBdMBgG
-CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDIwODIyNTYzN1owIwYJ
-KoZIhvcNAQkEMRYEFOWdTtA6puX1s+iNAQSGUr6k2y76MA0GCSqGSIb3DQEBAQUABIIBAFpspKjO
-vwsWDEyr0dLZqOEI8Vmf7iYf+wAftribZPIRdAurGobE6iUtx+gvEt0NsUIc/oo5hDBTTunQeHak
-t4wF0tcq1ziUuREcHGtGNgHZWFdUe1c2P+Rsu/vtWXUI7F9Ea77G6uLENh5VI40oGD9DM42nrZ1C
-304w5YGcNb9qhKGNTsf/dy6GYTpnxyWEwLR5S38+lvdgKNgex//LbbHFXSnRBMj+cmKTbZiSFTT0
-3ZzlqprVsUiY1FK/ZwcACC6v4R5b6AHtL8gjkFq3iQukqwOGT6og4X9mKUppkDNHdCC0P/3d7VOw
-eIzcARqPrHKzlG8CGiI/J8E4FcwZvqEAAAAAAAA=
+CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDIwODIyNTc1NVowIwYJ
+KoZIhvcNAQkEMRYEFElrU1CAmj7yc8f3Xes13EBw08c/MA0GCSqGSIb3DQEBAQUABIIBAHNLnqU6
+GEo6/ow70W/hfOXh4lFfTYWWU2Y6bjPHAdg8ckx/fi7smCTAwmnE8aT9pXzctY+TKyDn0jQowZJ9
+k+cH1NE7litSilEa/OuEgnNcwrT4vGJl4a1Z/tqfKa535WsGT5X9LVA+dc4AEMZ2KBKsePivtQ6y
+UKTSZB29SsZZH/X0sjaMJpWBgTlsu2I5yrOXeejQ7ZwRFaUkhqcX18plJd8kwMzQ4HQ9qNFPhhLy
+jKpICr0qRs/ChUBdyLKP7YcT6JzDkRjDmLw1oYYRvNnpAit1uwaGU7tRndvUEUCauokVusxdwNgO
+reWNm+fHuJ2/uqSSVO6VWaC8Q6MkRNwAAAAAAAA=
 
 
---=-2J31QOZ31kjG5zFFY3Kh--
+--=-X9UNYfHkVOK6yvPEbbdw--
