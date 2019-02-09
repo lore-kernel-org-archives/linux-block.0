@@ -6,36 +6,36 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2739C282C4
-	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 09:50:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 297F3C282C4
+	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 09:53:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9F4E3217D8
-	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 09:50:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E04D121916
+	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 09:53:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726704AbfBIJu4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Feb 2019 04:50:56 -0500
-Received: from mx2.suse.de ([195.135.220.15]:54738 "EHLO mx1.suse.de"
+        id S1726724AbfBIJxV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Feb 2019 04:53:21 -0500
+Received: from mx2.suse.de ([195.135.220.15]:55006 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725933AbfBIJu4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 9 Feb 2019 04:50:56 -0500
+        id S1725933AbfBIJxV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 9 Feb 2019 04:53:21 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 7AFDEB025;
-        Sat,  9 Feb 2019 09:50:55 +0000 (UTC)
-Subject: Re: [PATCH 14/19] io_uring: add file set registration
+        by mx1.suse.de (Postfix) with ESMTP id D7D13B025;
+        Sat,  9 Feb 2019 09:53:19 +0000 (UTC)
+Subject: Re: [PATCH 15/19] io_uring: add submission polling
 To:     Jens Axboe <axboe@kernel.dk>, linux-aio@kvack.org,
         linux-block@vger.kernel.org, linux-api@vger.kernel.org
 Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com, jannh@google.com,
         viro@ZenIV.linux.org.uk
 References: <20190208173423.27014-1-axboe@kernel.dk>
- <20190208173423.27014-15-axboe@kernel.dk>
+ <20190208173423.27014-16-axboe@kernel.dk>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <d9af9360-fc31-581c-c5c1-bd32bd4814af@suse.de>
-Date:   Sat, 9 Feb 2019 10:50:54 +0100
+Message-ID: <c2aecf8b-a203-9c66-7e77-4e9d7cec7216@suse.de>
+Date:   Sat, 9 Feb 2019 10:53:18 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.3.0
 MIME-Version: 1.0
-In-Reply-To: <20190208173423.27014-15-axboe@kernel.dk>
+In-Reply-To: <20190208173423.27014-16-axboe@kernel.dk>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -45,35 +45,42 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2/8/19 6:34 PM, Jens Axboe wrote:
-> We normally have to fget/fput for each IO we do on a file. Even with
-> the batching we do, the cost of the atomic inc/dec of the file usage
-> count adds up.
+> This enables an application to do IO, without ever entering the kernel.
+> By using the SQ ring to fill in new sqes and watching for completions
+> on the CQ ring, we can submit and reap IOs without doing a single system
+> call. The kernel side thread will poll for new submissions, and in case
+> of HIPRI/polled IO, it'll also poll for completions.
 > 
-> This adds IORING_REGISTER_FILES, and IORING_UNREGISTER_FILES opcodes
-> for the io_uring_register(2) system call. The arguments passed in must
-> be an array of __s32 holding file descriptors, and nr_args should hold
-> the number of file descriptors the application wishes to pin for the
-> duration of the io_uring instance (or until IORING_UNREGISTER_FILES is
-> called).
+> By default, we allow 1 second of active spinning. This can by changed
+> by passing in a different grace period at io_uring_register(2) time.
+> If the thread exceeds this idle time without having any work to do, it
+> will set:
 > 
-> When used, the application must set IOSQE_FIXED_FILE in the sqe->flags
-> member. Then, instead of setting sqe->fd to the real fd, it sets sqe->fd
-> to the index in the array passed in to IORING_REGISTER_FILES.
+> sq_ring->flags |= IORING_SQ_NEED_WAKEUP.
 > 
-> Files are automatically unregistered when the io_uring instance is torn
-> down. An application need only unregister if it wishes to register a new
-> set of fds.
+> The application will have to call io_uring_enter() to start things back
+> up again. If IO is kept busy, that will never be needed. Basically an
+> application that has this feature enabled will guard it's
+> io_uring_enter(2) call with:
+> 
+> read_barrier();
+> if (*sq_ring->flags & IORING_SQ_NEED_WAKEUP)
+> 	io_uring_enter(fd, 0, 0, IORING_ENTER_SQ_WAKEUP);
+> 
+> instead of calling it unconditionally.
+> 
+> It's mandatory to use fixed files with this feature. Failure to do so
+> will result in the application getting an -EBADF CQ entry when
+> submitting IO.
 > 
 > Signed-off-by: Jens Axboe <axboe@kernel.dk>
 > ---
->   fs/io_uring.c                 | 256 ++++++++++++++++++++++++++++++----
->   include/uapi/linux/io_uring.h |   9 +-
->   2 files changed, 235 insertions(+), 30 deletions(-)
+>   fs/io_uring.c                 | 249 +++++++++++++++++++++++++++++++++-
+>   include/uapi/linux/io_uring.h |  12 +-
+>   2 files changed, 253 insertions(+), 8 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
 Cheers,
 
 Hannes
-
-
