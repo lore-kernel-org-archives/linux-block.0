@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C81EC282CB
-	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 21:14:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A309AC282CB
+	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 21:14:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 29A7F2083B
-	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 21:14:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59DF621934
+	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 21:14:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="FJ78sR74"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="PMpGfJTX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727114AbfBIVOO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Feb 2019 16:14:14 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:44007 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727070AbfBIVOO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Feb 2019 16:14:14 -0500
-Received: by mail-pf1-f194.google.com with SMTP id w73so3318180pfk.10
-        for <linux-block@vger.kernel.org>; Sat, 09 Feb 2019 13:14:13 -0800 (PST)
+        id S1727116AbfBIVOQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Feb 2019 16:14:16 -0500
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:44739 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727103AbfBIVOQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Feb 2019 16:14:16 -0500
+Received: by mail-pf1-f196.google.com with SMTP id u6so3309724pfh.11
+        for <linux-block@vger.kernel.org>; Sat, 09 Feb 2019 13:14:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=iZfokheV1pDf6KDbP5uVm/d0XxEaaAaBjvft+e/J+Tk=;
-        b=FJ78sR74/cEw+hOE3dJd7lxEZx+yFaLBKWg+eoGXwvvEDbUQajT+Z+RgbQub1G5Jny
-         GrLUxafRhT7KIOuttQM0OV+4cjUHOD3UlxiQyQKSqlHJMfCbIn4Kc64QLLdeHuXHsiiW
-         41rHWShjAUiNZB6L4gxM6w4UUkvairMJXP29b0XOAzg3AQPFThZb/EkowxLtYExTfGNk
-         6lEqnvByzORvRvcL2X0SHzyP3hsKLuS7zUPIbu+UO3bsoD+lsCbOurvvuaZeQvTgQx8g
-         juYEcIOFw3WHepbl2Yz4+6Hy7xmtLVGuK5BcAkILnDVrec4jjeraAHDUeK7vD2WOtVKb
-         IjFQ==
+        bh=8FD6UgCzKThmRcFEwQhWQothP44/VH4OXYt71ZxbEYw=;
+        b=PMpGfJTXm4C6BbN4CEckO1u8AIeXAx7WbdAZjq5JVapGlmvrHaUqLLFu5aaHph0aPP
+         4ZlJEJVBhjkjV3ALn5RntMcGp0Ex4/JPiefwGtIl0OWuJjcmTefKa4u6q9KI6mQCIqoA
+         k70Oq7ouYTOvX5wJOKbkAbbwMca+Ri6M9HEvOK4/nJMFskwze6EB+PpBi3ruGHoFz7Dz
+         VOe9yYKXwYoXq1Zdaorr8jzaWFL2X8jFg4eshR2Dn8lqABsjfAGwyZZOElXGkWd6CJBl
+         Fw4ky0EYN/4K8G+oaG1O+jI2FOeXU3oJ4qgkU+bhts/a4i4VMIKdy4KmOlpIpLZ4uHM4
+         qI/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=iZfokheV1pDf6KDbP5uVm/d0XxEaaAaBjvft+e/J+Tk=;
-        b=EnlD5WnwIhvnCst/ZUjACLEysSwFQ0+XfNzdNkfliyPXwFPbQJ3CLmGj6y1+9EF1xJ
-         0T+PqK1MRaxJC5x53Rgv/4J9IXQgK1JHCFzvc5I5Fqt0cpWypO2Oeq8/VHCxuiiCvYd/
-         4EzOYAkf7ASwvcPANNbDOz7wCaPMEXuFvhPanGVUqn8s0c3sKHr9GecpcH9p4QKpAeI/
-         PwwrfnGQaiKMdWx1rPUj34n4hG1loqwRN55o5/2vOyamNRpKkjJ96d8uhPI2DqCXteeB
-         Ts/ICrGHwGFZs1vSYN4AylaVxt+nNxI6NVVmcbZyMTc+Vwi8hGYf2VXHv+8D1CFpCvlg
-         sG/Q==
-X-Gm-Message-State: AHQUAubdAxoQDQdW9rlGsv6IJy+d6cFH18uQMO9rLvClXu2batgBAkuw
-        BuPS5qjpf7kaYBk74gdjZtBkhQ==
-X-Google-Smtp-Source: AHgI3IYxstgJ2CdP93BVyA2jNFLq41+bB5aivv1MgbTThDkI3Ojuv8hU216jRGsyay4oXbqicusNiA==
-X-Received: by 2002:a62:5486:: with SMTP id i128mr28713714pfb.215.1549746853351;
-        Sat, 09 Feb 2019 13:14:13 -0800 (PST)
+        bh=8FD6UgCzKThmRcFEwQhWQothP44/VH4OXYt71ZxbEYw=;
+        b=D/HiCHZ+tyMRFrNgEImTP8QCfJzkY5key64qD6zLX+gWvT2AYLHr5buuhPtZHvPC2m
+         4XHtbSwOjmdbVj1N2dviBPvVgLbBUsHvWcTorMC8AK9zU0Am7yM8b8oACeSRtHyiH8Ub
+         bP+FBDXFw2rhPnYPYFI9E7SjJ1MWe35oEc6HqlVVdZ6GilbtlRnzWCnX7ixkSCRTxq4e
+         t9lk9PbelMywVFajfdWJPnlXVtx5OHlX8wP8KzVz6y7CENmzraS3yJ0q/dtS0cflEmb/
+         s7aGx7Lszj/xzEjfFLAgQL6QSFEkIYKuPuT0NwcPqEc9X4zM8K9Yv8wj/60wsDJJxB26
+         n4wQ==
+X-Gm-Message-State: AHQUAuZ29gEEQlkQ8lvjz6oWKUqeOBXkiaIlOH9kV3fRHAfBX4Gb1OaK
+        oO4/bQeJCjkQi2W6FcnX79W9MA==
+X-Google-Smtp-Source: AHgI3IY6Tj5drt8hXwb3lJ76nCdsO16UE2aNEQz8eLRu6qcvB4MYhdQ/sHAA7KYg3dU+oVHe8clMiQ==
+X-Received: by 2002:a62:20d1:: with SMTP id m78mr3785937pfj.250.1549746855238;
+        Sat, 09 Feb 2019 13:14:15 -0800 (PST)
 Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id a17sm7004942pgm.26.2019.02.09.13.14.11
+        by smtp.gmail.com with ESMTPSA id a17sm7004942pgm.26.2019.02.09.13.14.13
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 09 Feb 2019 13:14:12 -0800 (PST)
+        Sat, 09 Feb 2019 13:14:14 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-aio@kvack.org, linux-block@vger.kernel.org,
         linux-api@vger.kernel.org
 Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com, jannh@google.com,
         viro@ZenIV.linux.org.uk, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 11/19] block: implement bio helper to add iter bvec pages to bio
-Date:   Sat,  9 Feb 2019 14:13:38 -0700
-Message-Id: <20190209211346.26060-12-axboe@kernel.dk>
+Subject: [PATCH 12/19] io_uring: add support for pre-mapped user IO buffers
+Date:   Sat,  9 Feb 2019 14:13:39 -0700
+Message-Id: <20190209211346.26060-13-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190209211346.26060-1-axboe@kernel.dk>
 References: <20190209211346.26060-1-axboe@kernel.dk>
@@ -69,168 +69,632 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For an ITER_BVEC, we can just iterate the iov and add the pages
-to the bio directly. This requires that the caller doesn't releases
-the pages on IO completion, we add a BIO_NO_PAGE_REF flag for that.
+If we have fixed user buffers, we can map them into the kernel when we
+setup the io_uring. That avoids the need to do get_user_pages() for
+each and every IO.
 
-The current two callers of bio_iov_iter_get_pages() are updated to
-check if they need to release pages on completion. This makes them
-work with bvecs that contain kernel mapped pages already.
+To utilize this feature, the application must call io_uring_register()
+after having setup an io_uring instance, passing in
+IORING_REGISTER_BUFFERS as the opcode. The argument must be a pointer to
+an iovec array, and the nr_args should contain how many iovecs the
+application wishes to map.
+
+If successful, these buffers are now mapped into the kernel, eligible
+for IO. To use these fixed buffers, the application must use the
+IORING_OP_READ_FIXED and IORING_OP_WRITE_FIXED opcodes, and then
+set sqe->index to the desired buffer index. sqe->addr..sqe->addr+seq->len
+must point to somewhere inside the indexed buffer.
+
+The application may register buffers throughout the lifetime of the
+io_uring instance. It can call io_uring_register() with
+IORING_UNREGISTER_BUFFERS as the opcode to unregister the current set of
+buffers, and then register a new set. The application need not
+unregister buffers explicitly before shutting down the io_uring
+instance.
+
+It's perfectly valid to setup a larger buffer, and then sometimes only
+use parts of it for an IO. As long as the range is within the originally
+mapped region, it will work just fine.
+
+For now, buffers must not be file backed. If file backed buffers are
+passed in, the registration will fail with -1/EOPNOTSUPP. This
+restriction may be relaxed in the future.
+
+RLIMIT_MEMLOCK is used to check how much memory we can pin. A somewhat
+arbitrary 1G per buffer size is also imposed.
 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/bio.c               | 59 ++++++++++++++++++++++++++++++++-------
- fs/block_dev.c            |  5 ++--
- fs/iomap.c                |  5 ++--
- include/linux/blk_types.h |  1 +
- 4 files changed, 56 insertions(+), 14 deletions(-)
+ arch/x86/entry/syscalls/syscall_32.tbl |   1 +
+ arch/x86/entry/syscalls/syscall_64.tbl |   1 +
+ fs/io_uring.c                          | 371 ++++++++++++++++++++++++-
+ include/linux/syscalls.h               |   2 +
+ include/uapi/asm-generic/unistd.h      |   4 +-
+ include/uapi/linux/io_uring.h          |  13 +-
+ kernel/sys_ni.c                        |   1 +
+ 7 files changed, 377 insertions(+), 16 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 4db1008309ed..330df572cfb8 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -828,6 +828,23 @@ int bio_add_page(struct bio *bio, struct page *page,
- }
- EXPORT_SYMBOL(bio_add_page);
+diff --git a/arch/x86/entry/syscalls/syscall_32.tbl b/arch/x86/entry/syscalls/syscall_32.tbl
+index 481c126259e9..2eefd2a7c1ce 100644
+--- a/arch/x86/entry/syscalls/syscall_32.tbl
++++ b/arch/x86/entry/syscalls/syscall_32.tbl
+@@ -400,3 +400,4 @@
+ 386	i386	rseq			sys_rseq			__ia32_sys_rseq
+ 425	i386	io_uring_setup		sys_io_uring_setup		__ia32_sys_io_uring_setup
+ 426	i386	io_uring_enter		sys_io_uring_enter		__ia32_sys_io_uring_enter
++427	i386	io_uring_register	sys_io_uring_register		__ia32_sys_io_uring_register
+diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
+index 6a32a430c8e0..65c026185e61 100644
+--- a/arch/x86/entry/syscalls/syscall_64.tbl
++++ b/arch/x86/entry/syscalls/syscall_64.tbl
+@@ -345,6 +345,7 @@
+ 334	common	rseq			__x64_sys_rseq
+ 425	common	io_uring_setup		__x64_sys_io_uring_setup
+ 426	common	io_uring_enter		__x64_sys_io_uring_enter
++427	common	io_uring_register	__x64_sys_io_uring_register
  
-+static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
+ #
+ # x32-specific system call numbers start at 512 to avoid cache impact
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index d9f7e90766c8..09a3122b3b6c 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -25,6 +25,7 @@
+ #include <linux/slab.h>
+ #include <linux/workqueue.h>
+ #include <linux/blkdev.h>
++#include <linux/bvec.h>
+ #include <linux/net.h>
+ #include <net/sock.h>
+ #include <net/af_unix.h>
+@@ -32,6 +33,8 @@
+ #include <linux/sched/mm.h>
+ #include <linux/uaccess.h>
+ #include <linux/nospec.h>
++#include <linux/sizes.h>
++#include <linux/hugetlb.h>
+ 
+ #include <uapi/linux/io_uring.h>
+ 
+@@ -61,6 +64,13 @@ struct io_cq_ring {
+ 	struct io_uring_cqe	cqes[];
+ };
+ 
++struct io_mapped_ubuf {
++	u64		ubuf;
++	size_t		len;
++	struct		bio_vec *bvec;
++	unsigned int	nr_bvecs;
++};
++
+ struct io_ring_ctx {
+ 	struct {
+ 		struct percpu_ref	refs;
+@@ -93,6 +103,10 @@ struct io_ring_ctx {
+ 		struct fasync_struct	*cq_fasync;
+ 	} ____cacheline_aligned_in_smp;
+ 
++	/* if used, fixed mapped user buffers */
++	unsigned		nr_user_bufs;
++	struct io_mapped_ubuf	*user_bufs;
++
+ 	struct user_struct	*user;
+ 
+ 	struct completion	ctx_done;
+@@ -708,6 +722,44 @@ static inline void io_rw_done(struct kiocb *kiocb, ssize_t ret)
+ 	}
+ }
+ 
++static int io_import_fixed(struct io_ring_ctx *ctx, int rw,
++			   const struct io_uring_sqe *sqe,
++			   struct iov_iter *iter)
 +{
-+	const struct bio_vec *bv = iter->bvec;
-+	unsigned int len;
-+	size_t size;
++	size_t len = READ_ONCE(sqe->len);
++	struct io_mapped_ubuf *imu;
++	unsigned index, buf_index;
++	size_t offset;
++	u64 buf_addr;
 +
-+	len = min_t(size_t, bv->bv_len, iter->count);
-+	size = bio_add_page(bio, bv->bv_page, len,
-+				bv->bv_offset + iter->iov_offset);
-+	if (size == len) {
-+		iov_iter_advance(iter, size);
-+		return 0;
-+	}
++	/* attempt to use fixed buffers without having provided iovecs */
++	if (unlikely(!ctx->user_bufs))
++		return -EFAULT;
 +
-+	return -EINVAL;
++	buf_index = READ_ONCE(sqe->buf_index);
++	if (unlikely(buf_index >= ctx->nr_user_bufs))
++		return -EFAULT;
++
++	index = array_index_nospec(buf_index, ctx->nr_user_bufs);
++	imu = &ctx->user_bufs[index];
++	buf_addr = READ_ONCE(sqe->addr);
++
++	if (buf_addr + len < buf_addr)
++		return -EFAULT;
++	if (buf_addr < imu->ubuf || buf_addr + len > imu->ubuf + imu->len)
++		return -EFAULT;
++
++	/*
++	 * May not be a start of buffer, set size appropriately
++	 * and advance us to the beginning.
++	 */
++	offset = buf_addr - imu->ubuf;
++	iov_iter_bvec(iter, rw, imu->bvec, imu->nr_bvecs, offset + len);
++	if (offset)
++		iov_iter_advance(iter, offset);
++	return 0;
 +}
 +
- #define PAGE_PTRS_PER_BVEC     (sizeof(struct bio_vec) / sizeof(struct page *))
- 
- /**
-@@ -876,23 +893,43 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- }
- 
- /**
-- * bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
-+ * bio_iov_iter_get_pages - add user or kernel pages to a bio
-  * @bio: bio to add pages to
-- * @iter: iov iterator describing the region to be mapped
-+ * @iter: iov iterator describing the region to be added
-+ *
-+ * This takes either an iterator pointing to user memory, or one pointing to
-+ * kernel pages (BVEC iterator). If we're adding user pages, we pin them and
-+ * map them into the kernel. On IO completion, the caller should put those
-+ * pages. If we're adding kernel pages, we just have to add the pages to the
-+ * bio directly. We don't grab an extra reference to those pages (the user
-+ * should already have that), and we don't put the page on IO completion.
-+ * The caller needs to check if the bio is flagged BIO_NO_PAGE_REF on IO
-+ * completion. If it isn't, then pages should be released.
-  *
-- * Pins pages from *iter and appends them to @bio's bvec array. The
-- * pages will have to be released using put_page() when done.
-  * The function tries, but does not guarantee, to pin as many pages as
-- * fit into the bio, or are requested in *iter, whatever is smaller.
-- * If MM encounters an error pinning the requested pages, it stops.
-- * Error is returned only if 0 pages could be pinned.
-+ * fit into the bio, or are requested in *iter, whatever is smaller. If
-+ * MM encounters an error pinning the requested pages, it stops. Error
-+ * is returned only if 0 pages could be pinned.
-  */
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- {
-+	const bool is_bvec = iov_iter_is_bvec(iter);
- 	unsigned short orig_vcnt = bio->bi_vcnt;
- 
+ static int io_import_iovec(struct io_ring_ctx *ctx, int rw,
+ 			   const struct sqe_submit *s, struct iovec **iovec,
+ 			   struct iov_iter *iter)
+@@ -715,6 +767,23 @@ static int io_import_iovec(struct io_ring_ctx *ctx, int rw,
+ 	const struct io_uring_sqe *sqe = s->sqe;
+ 	void __user *buf = u64_to_user_ptr(READ_ONCE(sqe->addr));
+ 	size_t sqe_len = READ_ONCE(sqe->len);
++	u8 opcode;
++
 +	/*
-+	 * If this is a BVEC iter, then the pages are kernel pages. Don't
-+	 * release them on IO completion.
++	 * We're reading ->opcode for the second time, but the first read
++	 * doesn't care whether it's _FIXED or not, so it doesn't matter
++	 * whether ->opcode changes concurrently. The first read does care
++	 * about whether it is a READ or a WRITE, so we don't trust this read
++	 * for that purpose and instead let the caller pass in the read/write
++	 * flag.
 +	 */
-+	if (is_bvec)
-+		bio_set_flag(bio, BIO_NO_PAGE_REF);
++	opcode = READ_ONCE(sqe->opcode);
++	if (opcode == IORING_OP_READ_FIXED ||
++	    opcode == IORING_OP_WRITE_FIXED) {
++		ssize_t ret = io_import_fixed(ctx, rw, sqe, iter);
++		*iovec = NULL;
++		return ret;
++	}
+ 
+ 	if (!s->has_user)
+ 		return EFAULT;
+@@ -862,7 +931,7 @@ static int io_prep_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 
+ 	if (unlikely(req->ctx->flags & IORING_SETUP_IOPOLL))
+ 		return -EINVAL;
+-	if (unlikely(sqe->addr || sqe->ioprio))
++	if (unlikely(sqe->addr || sqe->ioprio || sqe->buf_index))
+ 		return -EINVAL;
+ 
+ 	fd = READ_ONCE(sqe->fd);
+@@ -921,9 +990,19 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 		ret = io_nop(req, req->user_data);
+ 		break;
+ 	case IORING_OP_READV:
++		if (unlikely(s->sqe->buf_index))
++			return -EINVAL;
+ 		ret = io_read(req, s, force_nonblock, state);
+ 		break;
+ 	case IORING_OP_WRITEV:
++		if (unlikely(s->sqe->buf_index))
++			return -EINVAL;
++		ret = io_write(req, s, force_nonblock, state);
++		break;
++	case IORING_OP_READ_FIXED:
++		ret = io_read(req, s, force_nonblock, state);
++		break;
++	case IORING_OP_WRITE_FIXED:
+ 		ret = io_write(req, s, force_nonblock, state);
+ 		break;
+ 	case IORING_OP_FSYNC:
+@@ -952,28 +1031,47 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 	return 0;
+ }
+ 
++static inline bool io_sqe_needs_user(const struct io_uring_sqe *sqe)
++{
++	u8 opcode = READ_ONCE(sqe->opcode);
 +
++	return !(opcode == IORING_OP_READ_FIXED ||
++		 opcode == IORING_OP_WRITE_FIXED);
++}
++
+ static void io_sq_wq_submit_work(struct work_struct *work)
+ {
+ 	struct io_kiocb *req = container_of(work, struct io_kiocb, work);
+ 	struct sqe_submit *s = &req->submit;
+-	u64 user_data = READ_ONCE(s->sqe->user_data);
+ 	struct io_ring_ctx *ctx = req->ctx;
+-	mm_segment_t old_fs = get_fs();
++	mm_segment_t old_fs;
++	bool needs_user;
++	u64 user_data;
+ 	int ret;
+ 
+ 	 /* Ensure we clear previously set forced non-block flag */
+ 	req->flags &= ~REQ_F_FORCE_NONBLOCK;
+ 	req->rw.ki_flags &= ~IOCB_NOWAIT;
+ 
+-	if (!mmget_not_zero(ctx->sqo_mm)) {
+-		ret = -EFAULT;
+-		goto err;
+-	}
+-
+-	use_mm(ctx->sqo_mm);
+-	set_fs(USER_DS);
+-	s->has_user = true;
++	user_data = READ_ONCE(s->sqe->user_data);
+ 	s->needs_lock = true;
++	s->has_user = false;
++
++	/*
++	 * If we're doing IO to fixed buffers, we don't need to get/set
++	 * user context
++	 */
++	needs_user = io_sqe_needs_user(s->sqe);
++	if (needs_user) {
++		if (!mmget_not_zero(ctx->sqo_mm)) {
++			ret = -EFAULT;
++			goto err;
++		}
++		use_mm(ctx->sqo_mm);
++		old_fs = get_fs();
++		set_fs(USER_DS);
++		s->has_user = true;
++	}
+ 
  	do {
--		int ret = __bio_iov_iter_get_pages(bio, iter);
-+		int ret;
+ 		ret = __io_submit_sqe(ctx, req, s, false, NULL);
+@@ -987,9 +1085,11 @@ static void io_sq_wq_submit_work(struct work_struct *work)
+ 		cond_resched();
+ 	} while (1);
+ 
+-	set_fs(old_fs);
+-	unuse_mm(ctx->sqo_mm);
+-	mmput(ctx->sqo_mm);
++	if (needs_user) {
++		set_fs(old_fs);
++		unuse_mm(ctx->sqo_mm);
++		mmput(ctx->sqo_mm);
++	}
+ err:
+ 	if (ret) {
+ 		io_cqring_add_event(ctx, user_data, ret, 0);
+@@ -1266,6 +1366,194 @@ static unsigned long ring_pages(unsigned sq_entries, unsigned cq_entries)
+ 	return (bytes + PAGE_SIZE - 1) / PAGE_SIZE;
+ }
+ 
++static int io_sqe_buffer_unregister(struct io_ring_ctx *ctx)
++{
++	int i, j;
 +
-+		if (is_bvec)
-+			ret = __bio_iov_bvec_add_pages(bio, iter);
-+		else
-+			ret = __bio_iov_iter_get_pages(bio, iter);
++	if (!ctx->user_bufs)
++		return -ENXIO;
++
++	for (i = 0; i < ctx->nr_user_bufs; i++) {
++		struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
++
++		for (j = 0; j < imu->nr_bvecs; j++)
++			put_page(imu->bvec[j].bv_page);
++
++		if (ctx->account_mem)
++			io_unaccount_mem(ctx->user, imu->nr_bvecs);
++		kfree(imu->bvec);
++		imu->nr_bvecs = 0;
++	}
++
++	kfree(ctx->user_bufs);
++	ctx->user_bufs = NULL;
++	ctx->nr_user_bufs = 0;
++	return 0;
++}
++
++static int io_copy_iov(struct io_ring_ctx *ctx, struct iovec *dst,
++		       void __user *arg, unsigned index)
++{
++	struct iovec __user *src;
++
++#ifdef CONFIG_COMPAT
++	if (ctx->compat) {
++		struct compat_iovec __user *ciovs;
++		struct compat_iovec ciov;
++
++		ciovs = (struct compat_iovec __user *) arg;
++		if (copy_from_user(&ciov, &ciovs[index], sizeof(ciov)))
++			return -EFAULT;
++
++		dst->iov_base = (void __user *) (unsigned long) ciov.iov_base;
++		dst->iov_len = ciov.iov_len;
++		return 0;
++	}
++#endif
++	src = (struct iovec __user *) arg;
++	if (copy_from_user(dst, &src[index], sizeof(*dst)))
++		return -EFAULT;
++	return 0;
++}
++
++static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
++				  unsigned nr_args)
++{
++	struct vm_area_struct **vmas = NULL;
++	struct page **pages = NULL;
++	int i, j, got_pages = 0;
++	int ret = -EINVAL;
++
++	if (ctx->user_bufs)
++		return -EBUSY;
++	if (!nr_args || nr_args > UIO_MAXIOV)
++		return -EINVAL;
++
++	ctx->user_bufs = kcalloc(nr_args, sizeof(struct io_mapped_ubuf),
++					GFP_KERNEL);
++	if (!ctx->user_bufs)
++		return -ENOMEM;
++
++	for (i = 0; i < nr_args; i++) {
++		struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
++		unsigned long off, start, end, ubuf;
++		int pret, nr_pages;
++		struct iovec iov;
++		size_t size;
++
++		ret = io_copy_iov(ctx, &iov, arg, i);
++		if (ret)
++			break;
++
++		/*
++		 * Don't impose further limits on the size and buffer
++		 * constraints here, we'll -EINVAL later when IO is
++		 * submitted if they are wrong.
++		 */
++		ret = -EFAULT;
++		if (!iov.iov_base || !iov.iov_len)
++			goto err;
++
++		/* arbitrary limit, but we need something */
++		if (iov.iov_len > SZ_1G)
++			goto err;
++
++		ubuf = (unsigned long) iov.iov_base;
++		end = (ubuf + iov.iov_len + PAGE_SIZE - 1) >> PAGE_SHIFT;
++		start = ubuf >> PAGE_SHIFT;
++		nr_pages = end - start;
++
++		if (ctx->account_mem) {
++			ret = io_account_mem(ctx->user, nr_pages);
++			if (ret)
++				goto err;
++		}
++
++		if (!pages || nr_pages > got_pages) {
++			kfree(vmas);
++			kfree(pages);
++			pages = kmalloc_array(nr_pages, sizeof(struct page *),
++						GFP_KERNEL);
++			vmas = kmalloc_array(nr_pages,
++					sizeof(struct vma_area_struct *),
++					GFP_KERNEL);
++			if (!pages || !vmas) {
++				ret = -ENOMEM;
++				if (ctx->account_mem)
++					io_unaccount_mem(ctx->user, nr_pages);
++				goto err;
++			}
++			got_pages = nr_pages;
++		}
++
++		imu->bvec = kmalloc_array(nr_pages, sizeof(struct bio_vec),
++						GFP_KERNEL);
++		if (!imu->bvec) {
++			if (ctx->account_mem)
++				io_unaccount_mem(ctx->user, nr_pages);
++			goto err;
++		}
++
++		down_read(&current->mm->mmap_sem);
++		pret = get_user_pages_longterm(ubuf, nr_pages, FOLL_WRITE,
++						pages, vmas);
++		if (pret == nr_pages) {
++			/* don't support file backed memory */
++			for (j = 0; j < nr_pages; j++) {
++				struct vm_area_struct *vma = vmas[j];
++
++				if (vma->vm_file &&
++				    !is_file_hugepages(vma->vm_file)) {
++					ret = -EOPNOTSUPP;
++					break;
++				}
++			}
++		} else {
++			ret = pret < 0 ? pret : -EFAULT;
++		}
++		up_read(&current->mm->mmap_sem);
++		if (ret) {
++			/*
++			 * if we did partial map, or found file backed vmas,
++			 * release any pages we did get
++			 */
++			if (pret > 0) {
++				for (j = 0; j < pret; j++)
++					put_page(pages[j]);
++			}
++			if (ctx->account_mem)
++				io_unaccount_mem(ctx->user, nr_pages);
++			goto err;
++		}
++
++		off = ubuf & ~PAGE_MASK;
++		size = iov.iov_len;
++		for (j = 0; j < nr_pages; j++) {
++			size_t vec_len;
++
++			vec_len = min_t(size_t, size, PAGE_SIZE - off);
++			imu->bvec[j].bv_page = pages[j];
++			imu->bvec[j].bv_len = vec_len;
++			imu->bvec[j].bv_offset = off;
++			off = 0;
++			size -= vec_len;
++		}
++		/* store original address for later verification */
++		imu->ubuf = ubuf;
++		imu->len = iov.iov_len;
++		imu->nr_bvecs = nr_pages;
++	}
++	kfree(pages);
++	kfree(vmas);
++	ctx->nr_user_bufs = nr_args;
++	return 0;
++err:
++	kfree(pages);
++	kfree(vmas);
++	io_sqe_buffer_unregister(ctx);
++	return ret;
++}
++
+ static void io_ring_ctx_free(struct io_ring_ctx *ctx)
+ {
+ 	if (ctx->sqo_wq)
+@@ -1278,6 +1566,7 @@ static void io_ring_ctx_free(struct io_ring_ctx *ctx)
+ #endif
  
- 		if (unlikely(ret))
- 			return bio->bi_vcnt > orig_vcnt ? 0 : ret;
-@@ -1634,7 +1671,8 @@ static void bio_dirty_fn(struct work_struct *work)
- 		next = bio->bi_private;
+ 	io_iopoll_reap_events(ctx);
++	io_sqe_buffer_unregister(ctx);
  
- 		bio_set_pages_dirty(bio);
--		bio_release_pages(bio);
-+		if (!bio_flagged(bio, BIO_NO_PAGE_REF))
-+			bio_release_pages(bio);
- 		bio_put(bio);
- 	}
+ 	io_mem_free(ctx->sq_ring);
+ 	io_mem_free(ctx->sq_sqes);
+@@ -1627,6 +1916,60 @@ SYSCALL_DEFINE2(io_uring_setup, u32, entries,
+ 	return io_uring_setup(entries, params);
  }
-@@ -1650,7 +1688,8 @@ void bio_check_pages_dirty(struct bio *bio)
- 			goto defer;
- 	}
  
--	bio_release_pages(bio);
-+	if (!bio_flagged(bio, BIO_NO_PAGE_REF))
-+		bio_release_pages(bio);
- 	bio_put(bio);
- 	return;
- defer:
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index 392e2bfb636f..051ab41d1c61 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -338,8 +338,9 @@ static void blkdev_bio_end_io(struct bio *bio)
- 		struct bio_vec *bvec;
- 		int i;
++static int __io_uring_register(struct io_ring_ctx *ctx, unsigned opcode,
++			       void __user *arg, unsigned nr_args)
++{
++	int ret;
++
++	percpu_ref_kill(&ctx->refs);
++	wait_for_completion(&ctx->ctx_done);
++
++	switch (opcode) {
++	case IORING_REGISTER_BUFFERS:
++		ret = io_sqe_buffer_register(ctx, arg, nr_args);
++		break;
++	case IORING_UNREGISTER_BUFFERS:
++		ret = -EINVAL;
++		if (arg || nr_args)
++			break;
++		ret = io_sqe_buffer_unregister(ctx);
++		break;
++	default:
++		ret = -EINVAL;
++		break;
++	}
++
++	/* bring the ctx back to life */
++	reinit_completion(&ctx->ctx_done);
++	percpu_ref_reinit(&ctx->refs);
++	return ret;
++}
++
++SYSCALL_DEFINE4(io_uring_register, unsigned int, fd, unsigned int, opcode,
++		void __user *, arg, unsigned int, nr_args)
++{
++	struct io_ring_ctx *ctx;
++	long ret = -EBADF;
++	struct fd f;
++
++	f = fdget(fd);
++	if (!f.file)
++		return -EBADF;
++
++	ret = -EOPNOTSUPP;
++	if (f.file->f_op != &io_uring_fops)
++		goto out_fput;
++
++	ctx = f.file->private_data;
++
++	mutex_lock(&ctx->uring_lock);
++	ret = __io_uring_register(ctx, opcode, arg, nr_args);
++	mutex_unlock(&ctx->uring_lock);
++out_fput:
++	fdput(f);
++	return ret;
++}
++
+ static int __init io_uring_init(void)
+ {
+ 	req_cachep = KMEM_CACHE(io_kiocb, SLAB_HWCACHE_ALIGN | SLAB_PANIC);
+diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+index 3072dbaa7869..3681c05ac538 100644
+--- a/include/linux/syscalls.h
++++ b/include/linux/syscalls.h
+@@ -315,6 +315,8 @@ asmlinkage long sys_io_uring_setup(u32 entries,
+ asmlinkage long sys_io_uring_enter(unsigned int fd, u32 to_submit,
+ 				u32 min_complete, u32 flags,
+ 				const sigset_t __user *sig, size_t sigsz);
++asmlinkage long sys_io_uring_register(unsigned int fd, unsigned int op,
++				void __user *arg, unsigned int nr_args);
  
--		bio_for_each_segment_all(bvec, bio, i)
--			put_page(bvec->bv_page);
-+		if (!bio_flagged(bio, BIO_NO_PAGE_REF))
-+			bio_for_each_segment_all(bvec, bio, i)
-+				put_page(bvec->bv_page);
- 		bio_put(bio);
- 	}
- }
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 2ac9eb746d44..9389cf0a1c6f 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -1591,8 +1591,9 @@ static void iomap_dio_bio_end_io(struct bio *bio)
- 		struct bio_vec *bvec;
- 		int i;
+ /* fs/xattr.c */
+ asmlinkage long sys_setxattr(const char __user *path, const char __user *name,
+diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
+index 87871e7b7ea7..d346229a1eb0 100644
+--- a/include/uapi/asm-generic/unistd.h
++++ b/include/uapi/asm-generic/unistd.h
+@@ -744,9 +744,11 @@ __SYSCALL(__NR_kexec_file_load,     sys_kexec_file_load)
+ __SYSCALL(__NR_io_uring_setup, sys_io_uring_setup)
+ #define __NR_io_uring_enter 426
+ __SYSCALL(__NR_io_uring_enter, sys_io_uring_enter)
++#define __NR_io_uring_register 427
++__SYSCALL(__NR_io_uring_register, sys_io_uring_register)
  
--		bio_for_each_segment_all(bvec, bio, i)
--			put_page(bvec->bv_page);
-+		if (!bio_flagged(bio, BIO_NO_PAGE_REF))
-+			bio_for_each_segment_all(bvec, bio, i)
-+				put_page(bvec->bv_page);
- 		bio_put(bio);
- 	}
- }
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index d66bf5f32610..791fee35df88 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -215,6 +215,7 @@ struct bio {
+ #undef __NR_syscalls
+-#define __NR_syscalls 427
++#define __NR_syscalls 428
+ 
  /*
-  * bio flags
-  */
-+#define BIO_NO_PAGE_REF	0	/* don't put release vec pages */
- #define BIO_SEG_VALID	1	/* bi_phys_segments valid */
- #define BIO_CLONED	2	/* doesn't own data */
- #define BIO_BOUNCED	3	/* bio is a bounce bio */
+  * 32 bit systems traditionally used different
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index 5c457ea396e6..cf28f7a11f12 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -27,7 +27,10 @@ struct io_uring_sqe {
+ 		__u32		fsync_flags;
+ 	};
+ 	__u64	user_data;	/* data to be passed back at completion time */
+-	__u64	__pad2[3];
++	union {
++		__u16	buf_index;	/* index into fixed buffers, if used */
++		__u64	__pad2[3];
++	};
+ };
+ 
+ /*
+@@ -39,6 +42,8 @@ struct io_uring_sqe {
+ #define IORING_OP_READV		1
+ #define IORING_OP_WRITEV	2
+ #define IORING_OP_FSYNC		3
++#define IORING_OP_READ_FIXED	4
++#define IORING_OP_WRITE_FIXED	5
+ 
+ /*
+  * sqe->fsync_flags
+@@ -103,4 +108,10 @@ struct io_uring_params {
+ 	struct io_cqring_offsets cq_off;
+ };
+ 
++/*
++ * io_uring_register(2) opcodes and arguments
++ */
++#define IORING_REGISTER_BUFFERS		0
++#define IORING_UNREGISTER_BUFFERS	1
++
+ #endif
+diff --git a/kernel/sys_ni.c b/kernel/sys_ni.c
+index ee5e523564bb..1bb6604dc19f 100644
+--- a/kernel/sys_ni.c
++++ b/kernel/sys_ni.c
+@@ -48,6 +48,7 @@ COND_SYSCALL_COMPAT(io_getevents);
+ COND_SYSCALL_COMPAT(io_pgetevents);
+ COND_SYSCALL(io_uring_setup);
+ COND_SYSCALL(io_uring_enter);
++COND_SYSCALL(io_uring_register);
+ 
+ /* fs/xattr.c */
+ 
 -- 
 2.17.1
 
