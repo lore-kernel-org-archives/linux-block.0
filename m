@@ -6,70 +6,70 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FC33C169C4
-	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 00:16:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59533C282C4
+	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 04:15:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1CFB020869
-	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 00:16:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E68DC20844
+	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 04:15:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="iTNeqsfG"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Z2SiYYIv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726244AbfBIAQJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Feb 2019 19:16:09 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:46924 "EHLO
+        id S1726655AbfBIEPj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Feb 2019 23:15:39 -0500
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:36368 "EHLO
         mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726522AbfBIAQJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Feb 2019 19:16:09 -0500
-Received: by mail-pf1-f196.google.com with SMTP id c73so2406884pfe.13
-        for <linux-block@vger.kernel.org>; Fri, 08 Feb 2019 16:16:08 -0800 (PST)
+        with ESMTP id S1726601AbfBIEPi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Feb 2019 23:15:38 -0500
+Received: by mail-pf1-f196.google.com with SMTP id d22so2571290pfo.3
+        for <linux-block@vger.kernel.org>; Fri, 08 Feb 2019 20:15:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Oryjic6xj+Y9zq3LufTvFA2Vhnmrl3DRW+gIS1Bq8eo=;
-        b=iTNeqsfGHYxq1RfX8FFV1waggm7BptqN3SeYa3PrqDgkqHM7BYEPYrkggzDxD31Fsx
-         ujKTa8+IyL7fCkeYoLNfFjlbsnphr6xBl6MMyZtsXEPaaqu2TkN0DOnUtsnNtFHtm7Qw
-         j5lBsSmJ0SRvl0e7k2CRYL7/rzQc6DIEZtg3XfwSRx0V1lh+htMWzXTx7LqDPqQ1bbG5
-         HJ8DY5YDrC8lgw1FvwlN5myeFCbSu1+ziiB0bcE+NquP/f+/WHYW31FFAQEfNrlw4NiD
-         kKdDH+JCENa8YiemEjLRJwTSemaNuK5PHqUPjZUteD8LeZMcaLfFlTlIlj80TdhvoIoP
-         pwyg==
+        bh=v+YHzvI91xGVJgmxAmMapb0BVr9TFVu0Hrz3r6C7GYY=;
+        b=Z2SiYYIvJlQ1VDujzje1Cwt5+e9iFHvg0SvAgBJxFm5CKaCg9FAJsFtW3200Bszy1C
+         dNeFendKWnIbi4Zx6KXROoTuoKt7Utgq8keswqjU3VtEVNOqyXVTzE7NOv9q5j3jmbGd
+         27gVqGFVoVpKtk3D2Cw4RXWPMlWl2as2Enkd+LGW/4ClaaIGx8RzjjCgGTzkoIgntTQg
+         zqbr3zkfE3XtFqp3uTIRtnuUnsYszHaoN/r2+NsIORQTD/ZGCXesyPSrE64YEsuLVlte
+         6r5S0RWsk3klfkZCFNFcY63YqK/XhAO1QlHNJe5wDt45XCNjasGEZzYJ2PTXFPq+/7Os
+         6x3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Oryjic6xj+Y9zq3LufTvFA2Vhnmrl3DRW+gIS1Bq8eo=;
-        b=fBghsk1w6VNADlhd6288DIKHVjehQeSCewWG/TydEo2EDzo3LQuBIruwwOcjeeomQ9
-         IZiE/+0pwk/xmgrZR4fUD6dpfbA7dY38IsQEfSfrs67kUj1W6+p8LHF0CkIR+AEFhOfZ
-         KTro82lg25EydTbbr88vmSb+roGxSs2p51YWD0HcrokfYxvyLJbL4KhBKw+WKWAHx46T
-         xnNrruEoVK50OVCEWTuNNFYWtxZT38K9ZBigF/v+vvz1VEwz3SU/t3GWm6dilNN37RZj
-         IxtMt/JwcI52eXwTOEYNlnLKxRKcUvEGfFSyshSyJV94ugP2K/SpA/puyr9Vue6JvUR5
-         d63w==
-X-Gm-Message-State: AHQUAuYT0XXR1h4UGWUS6yqQEXk2dJeYf162Z1cfRF42ErTeXhedke9d
-        mLaHmwQOMesctNT4i8nNzAJ5sw==
-X-Google-Smtp-Source: AHgI3IaT2CuLCOZQtXv3QNrvT1b25a1r/YlNYpRI55f2Rm7iE/4QJUg6JPKxJN1ep8sHyHJzNMR7Mw==
-X-Received: by 2002:a65:4507:: with SMTP id n7mr17995489pgq.34.1549671367930;
-        Fri, 08 Feb 2019 16:16:07 -0800 (PST)
+        bh=v+YHzvI91xGVJgmxAmMapb0BVr9TFVu0Hrz3r6C7GYY=;
+        b=X56XpaU3w5w9TKaljP6NpgceI6DAcAxYfkntfgy0OxS6TGjeyoB/t1fueeHPk0esmh
+         w27jyM1F6pV6ms6MBlIQrXcUmA3E06HfamhDbrnF4aDR/XfznM3RYyLo1gB0CJBkaVLR
+         I/fH0Xr7RIo3SKOvatUeom35aAYBeheYJ6tjVOWfDd24z5IiS7HLCKdEoYJ2kyFDuJQd
+         UO0DO10Ywjt8MciB6BZq+eHL+DwWhzxOLEuoHFoSHoacjY6LYy21Y7q/MXHwa03iUlW5
+         32iyBvL5keVmu8hcRiV1UCOT2kOjY9+4FBKxdQDzXoY5WyRR6L9pVNHeo+eJWUwq+i/8
+         eSvw==
+X-Gm-Message-State: AHQUAuab3PtlLXyblDAXU+GkQPrMcnNmcuzUlkrCOZ67/JFNtxA0aDI1
+        g9F4wgSAB2zecKTB8289nIuDyQ==
+X-Google-Smtp-Source: AHgI3IYWlyoqL3w3JxnenoHglgpe1LqmAjOIto0pGG2gvvELcgT70mg7uLWL9VRQNut4fN84fEY+vg==
+X-Received: by 2002:a62:1e87:: with SMTP id e129mr25622175pfe.221.1549685737598;
+        Fri, 08 Feb 2019 20:15:37 -0800 (PST)
 Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id m67sm4337020pfb.25.2019.02.08.16.16.06
+        by smtp.gmail.com with ESMTPSA id v184sm4443280pfb.182.2019.02.08.20.15.35
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 08 Feb 2019 16:16:07 -0800 (PST)
-Subject: Re: [PATCH 14/19] io_uring: add file set registration
+        Fri, 08 Feb 2019 20:15:36 -0800 (PST)
+Subject: Re: [PATCH 05/19] Add io_uring IO interface
 To:     Jann Horn <jannh@google.com>
 Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
         Linux API <linux-api@vger.kernel.org>, hch@lst.de,
         jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>,
         Al Viro <viro@zeniv.linux.org.uk>
 References: <20190208173423.27014-1-axboe@kernel.dk>
- <20190208173423.27014-15-axboe@kernel.dk>
- <CAG48ez2Fp10zQ4Y-x4RJh3Cu=vABu9w8ZrAJThvkh6pr74ZiQw@mail.gmail.com>
+ <20190208173423.27014-6-axboe@kernel.dk>
+ <CAG48ez2Qc9XOApLRb5fnNiOjxaURO8vjZ-EHX7g25gje3weZ6A@mail.gmail.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <7a003733-a1aa-0f55-324d-4bf0360a5df9@kernel.dk>
-Date:   Fri, 8 Feb 2019 17:16:05 -0700
+Message-ID: <42eea00c-81fb-2e28-d884-03be5bb229c8@kernel.dk>
+Date:   Fri, 8 Feb 2019 21:15:34 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <CAG48ez2Fp10zQ4Y-x4RJh3Cu=vABu9w8ZrAJThvkh6pr74ZiQw@mail.gmail.com>
+In-Reply-To: <CAG48ez2Qc9XOApLRb5fnNiOjxaURO8vjZ-EHX7g25gje3weZ6A@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,105 +78,281 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/8/19 1:26 PM, Jann Horn wrote:
-> On Fri, Feb 8, 2019 at 6:35 PM Jens Axboe <axboe@kernel.dk> wrote:
->> We normally have to fget/fput for each IO we do on a file. Even with
->> the batching we do, the cost of the atomic inc/dec of the file usage
->> count adds up.
+On 2/8/19 3:12 PM, Jann Horn wrote:
+> On Fri, Feb 8, 2019 at 6:34 PM Jens Axboe <axboe@kernel.dk> wrote:
+>> The submission queue (SQ) and completion queue (CQ) rings are shared
+>> between the application and the kernel. This eliminates the need to
+>> copy data back and forth to submit and complete IO.
 >>
->> This adds IORING_REGISTER_FILES, and IORING_UNREGISTER_FILES opcodes
->> for the io_uring_register(2) system call. The arguments passed in must
->> be an array of __s32 holding file descriptors, and nr_args should hold
->> the number of file descriptors the application wishes to pin for the
->> duration of the io_uring instance (or until IORING_UNREGISTER_FILES is
->> called).
+>> IO submissions use the io_uring_sqe data structure, and completions
+>> are generated in the form of io_uring_cqe data structures. The SQ
+>> ring is an index into the io_uring_sqe array, which makes it possible
+>> to submit a batch of IOs without them being contiguous in the ring.
+>> The CQ ring is always contiguous, as completion events are inherently
+>> unordered, and hence any io_uring_cqe entry can point back to an
+>> arbitrary submission.
 >>
->> When used, the application must set IOSQE_FIXED_FILE in the sqe->flags
->> member. Then, instead of setting sqe->fd to the real fd, it sets sqe->fd
->> to the index in the array passed in to IORING_REGISTER_FILES.
+>> Two new system calls are added for this:
 >>
->> Files are automatically unregistered when the io_uring instance is torn
->> down. An application need only unregister if it wishes to register a new
->> set of fds.
-> 
-> I think the overall concept here is still broken: You're giving the
-> user_files to the GC, and I think the GC can drop their refcounts, but
-> I don't see you actually getting feedback from the GC anywhere that
-> would let the GC break your references? E.g. in io_prep_rw() you grab
-> file pointers from ctx->user_files after simply checking
-> ctx->nr_user_files, and there is no path from the GC that touches
-> those fields. As far as I can tell, the GC is just going to go through
-> unix_destruct_scm() and drop references on your files, causing
-> use-after-free.
-> 
-> But the unix GC is complicated, and maybe I'm just missing something...
-
-Only when the skb is released, which is either done when the io_uring
-is torn down (and then definitely safe), or if the socket is released,
-which is again also at a safe time.
-
->> +static void __io_sqe_files_unregister(struct io_ring_ctx *ctx)
+>> io_uring_setup(entries, params)
+>>         Sets up an io_uring instance for doing async IO. On success,
+>>         returns a file descriptor that the application can mmap to
+>>         gain access to the SQ ring, CQ ring, and io_uring_sqes.
+>>
+>> io_uring_enter(fd, to_submit, min_complete, flags, sigset, sigsetsize)
+>>         Initiates IO against the rings mapped to this fd, or waits for
+>>         them to complete, or both. The behavior is controlled by the
+>>         parameters passed in. If 'to_submit' is non-zero, then we'll
+>>         try and submit new IO. If IORING_ENTER_GETEVENTS is set, the
+>>         kernel will wait for 'min_complete' events, if they aren't
+>>         already available. It's valid to set IORING_ENTER_GETEVENTS
+>>         and 'min_complete' == 0 at the same time, this allows the
+>>         kernel to return already completed events without waiting
+>>         for them. This is useful only for polling, as for IRQ
+>>         driven IO, the application can just check the CQ ring
+>>         without entering the kernel.
+>>
+>> With this setup, it's possible to do async IO with a single system
+>> call. Future developments will enable polled IO with this interface,
+>> and polled submission as well. The latter will enable an application
+>> to do IO without doing ANY system calls at all.
+>>
+>> For IRQ driven IO, an application only needs to enter the kernel for
+>> completions if it wants to wait for them to occur.
+>>
+>> Each io_uring is backed by a workqueue, to support buffered async IO
+>> as well. We will only punt to an async context if the command would
+>> need to wait for IO on the device side. Any data that can be accessed
+>> directly in the page cache is done inline. This avoids the slowness
+>> issue of usual threadpools, since cached data is accessed as quickly
+>> as a sync interface.
+> [...]
+>> +static void io_commit_cqring(struct io_ring_ctx *ctx)
 >> +{
->> +#if defined(CONFIG_UNIX)
->> +       if (ctx->ring_sock) {
->> +               struct sock *sock = ctx->ring_sock->sk;
->> +               struct sk_buff *skb;
+>> +       struct io_cq_ring *ring = ctx->cq_ring;
 >> +
->> +               while ((skb = skb_dequeue(&sock->sk_receive_queue)) != NULL)
->> +                       kfree_skb(skb);
+>> +       if (ctx->cached_cq_tail != ring->r.tail) {
+> 
+> I know that this is very unlikely to actually matter, but both because
+> I don't feel fuzzy about relying on compiler internals regarding when
+> the compiler might decide to generate dangerous double-reads (if
+> switch() can blow up, why shouldn't the compiler be able to make if()
+> blow up if it wants to, too?), and because I would like it to be as
+> clear as possible to the reader which memory is shared with userspace,
+> can we please have READ_ONCE() on *every* shared memory read, not just
+> the ones in places that look like they might plausibly blow up
+> otherwise? Sorry, shared memory is a bit of a pet peeve of mine.
+
+Sure, I've done that now.
+
+>> +               /* order cqe stores with ring update */
+>> +               smp_wmb();
+>> +               WRITE_ONCE(ring->r.tail, ctx->cached_cq_tail);
+>> +               /* write side barrier of tail update, app has read side */
+>> +               smp_wmb();
+>> +
+>> +               if (wq_has_sleeper(&ctx->cq_wait)) {
+>> +                       wake_up_interruptible(&ctx->cq_wait);
+>> +                       kill_fasync(&ctx->cq_fasync, SIGIO, POLL_IN);
+>> +               }
 >> +       }
->> +#else
->> +       int i;
+>> +}
+> [...]
+>> +static void io_cqring_fill_event(struct io_ring_ctx *ctx, u64 ki_user_data,
+>> +                                long res, unsigned ev_flags)
+>> +{
+>> +       struct io_uring_cqe *cqe;
 >> +
->> +       for (i = 0; i < ctx->nr_user_files; i++)
->> +               fput(ctx->user_files[i]);
->> +#endif
+>> +       /*
+>> +        * If we can't get a cq entry, userspace overflowed the
+>> +        * submission (by quite a lot). Increment the overflow count in
+>> +        * the ring.
+>> +        */
+>> +       cqe = io_get_cqring(ctx);
+>> +       if (cqe) {
+>> +               cqe->user_data = ki_user_data;
+>> +               cqe->res = res;
+>> +               cqe->flags = ev_flags;
+> 
+> Please use WRITE_ONCE() for stores like these.
+
+Done
+
+>> +       } else
+>> +               ctx->cq_ring->overflow++;
+>> +}
+> [...]
+>> +static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+>> +                          const struct sqe_submit *s, bool force_nonblock)
+>> +{
+>> +       ssize_t ret;
+>> +       int opcode;
+>> +
+>> +       if (unlikely(s->index >= ctx->sq_entries))
+>> +               return -EINVAL;
+>> +       req->user_data = READ_ONCE(s->sqe->user_data);
+>> +
+>> +       opcode = READ_ONCE(s->sqe->opcode);
+> 
+> There might be a sneaky bug here. Consider the following scenario:
+> 
+> 1. request gets submitted from io_sq_wq_submit_work() with opcode
+> IORING_OP_READV, io_read() is invoked
+> 2. io_read() looks up the file, taking a reference to it
+> 3. call_read_iter() returns -EAGAIN
+> 4. io_read() returns -EAGAIN without dropping its reference on the
+> file (because it expects that it'll be called again)
+> 5. __io_submit_sqe() returns -EAGAIN
+> 6. io_sq_wq_submit_work() loops back and retries __io_submit_sqe()
+> 7. __io_submit_sqe() reads opcode again, this time it's IORING_OP_NOP
+> 8. io_nop() gets called
+> 9. io_nop() uses io_free_req() to delete the request without dropping
+> its reference on the file
+> 
+> So that's a file reference leak, I think?
+
+Hmm yes, that could happen with a malicious app.
+
+For non-file using opcodes, I think we should just error the sqe if we
+have req->rw.ki_filp set. That shouldn't happen unless the app is doing
+something funky. I'll fix this.
+
+>> +       switch (opcode) {
+>> +       case IORING_OP_NOP:
+>> +               ret = io_nop(req, req->user_data);
+>> +               break;
+>> +       case IORING_OP_READV:
+>> +               ret = io_read(req, s, force_nonblock);
+>> +               break;
+>> +       case IORING_OP_WRITEV:
+>> +               ret = io_write(req, s, force_nonblock);
+>> +               break;
+>> +       default:
+>> +               ret = -EINVAL;
+>> +               break;
+>> +       }
+>> +
+>> +       return ret;
+>> +}
+> [...]
+>> +static int io_submit_sqe(struct io_ring_ctx *ctx, const struct sqe_submit *s)
+>> +{
+>> +       struct io_kiocb *req;
+>> +       ssize_t ret;
+>> +
+>> +       /* enforce forwards compatibility on users */
+>> +       if (unlikely(s->sqe->flags))
+>> +               return -EINVAL;
+>> +
+>> +       req = io_get_req(ctx);
+>> +       if (unlikely(!req))
+>> +               return -EAGAIN;
+>> +
+>> +       req->rw.ki_filp = NULL;
+>> +
+>> +       ret = __io_submit_sqe(ctx, req, s, true);
+>> +       if (ret == -EAGAIN) {
+>> +               memcpy(&req->submit, s, sizeof(*s));
+>> +               INIT_WORK(&req->work, io_sq_wq_submit_work);
+>> +               queue_work(ctx->sqo_wq, &req->work);
+>> +               ret = 0;
+>> +       }
+>> +       if (ret)
+>> +               io_free_req(req);
+>> +
+>> +       return ret;
 >> +}
 >> +
->> +static int io_sqe_files_unregister(struct io_ring_ctx *ctx)
+>> +static void io_commit_sqring(struct io_ring_ctx *ctx)
 >> +{
->> +       if (!ctx->user_files)
->> +               return -ENXIO;
+>> +       struct io_sq_ring *ring = ctx->sq_ring;
 >> +
->> +       __io_sqe_files_unregister(ctx);
->> +       kfree(ctx->user_files);
->> +       ctx->user_files = NULL;
+>> +       if (ctx->cached_sq_head != ring->r.head) {
+>> +               WRITE_ONCE(ring->r.head, ctx->cached_sq_head);
+>> +               /* write side barrier of head update, app has read side */
+>> +               smp_wmb();
+> 
+> Can you elaborate on what this memory barrier is doing? Don't you need
+> some sort of memory barrier *before* the WRITE_ONCE(), to ensure that
+> nobody sees the updated head before you're done reading the submission
+> queue entry? Or is that barrier elsewhere?
+
+The matching read barrier is in the application, it must do that before
+reading ->head for the SQ ring.
+
+For the other barrier, since the ring->r.head now has a READ_ONCE(),
+that should be all we need to ensure that loads are done.
+
+>> +       }
+>> +}
+>> +
+>> +/*
+>> + * Undo last io_get_sqring()
+>> + */
+>> +static void io_drop_sqring(struct io_ring_ctx *ctx)
+>> +{
+>> +       ctx->cached_sq_head--;
+>> +}
+> [...]
+>> +static void io_unaccount_mem(struct user_struct *user, unsigned long nr_pages)
+>> +{
+>> +       if (capable(CAP_IPC_LOCK))
+>> +               return;
+> 
+> Hrm... what happens if root creates a uring, drops CAP_IPC_LOCK, and
+> then destroys the uring? Will the pages get subtracted from
+> ->locked_vm even though they were never added to it, causing a
+> wraparound?
+> 
+> You might want to make sure that ctx->user is set if and only if the
+> creator didn't have CAP_IPC_LOCK, and then just do a `user == NULL`
+> check instead of a `capable(...)` check. Or you could do what BPF is
+> doing (AFAICS) and not treat root specially - root can just bump the
+> rlimit if necessary.
+
+That won't work since we use ->user for other items later on. But I can
+store whether we need it or not, I'll do that.
+
+> 
+>> +       atomic_long_sub(nr_pages, &user->locked_vm);
+>> +}
+>> +
+>> +static int io_account_mem(struct user_struct *user, unsigned long nr_pages)
+>> +{
+>> +       unsigned long page_limit, cur_pages, new_pages;
+>> +
+>> +       if (capable(CAP_IPC_LOCK))
+>> +               return 0;
+>> +
+>> +       /* Don't allow more pages than we can safely lock */
+>> +       page_limit = rlimit(RLIMIT_MEMLOCK) >> PAGE_SHIFT;
+>> +
+>> +       do {
+>> +               cur_pages = atomic_long_read(&user->locked_vm);
+>> +               new_pages = cur_pages + nr_pages;
+>> +               if (new_pages > page_limit)
+>> +                       return -ENOMEM;
+>> +       } while (atomic_long_cmpxchg(&user->locked_vm, cur_pages,
+>> +                                       new_pages) != cur_pages);
+>> +
 >> +       return 0;
 >> +}
->> +
->> +#if defined(CONFIG_UNIX)
->> +static int __io_sqe_files_scm(struct io_ring_ctx *ctx, int nr, int offset)
->> +{
->> +       struct scm_fp_list *fpl;
->> +       struct sk_buff *skb;
->> +       int i;
->> +
->> +       fpl = kzalloc(sizeof(*fpl), GFP_KERNEL);
->> +       if (!fpl)
->> +               return -ENOMEM;
->> +
->> +       skb = alloc_skb(0, GFP_KERNEL);
->> +       if (!skb) {
->> +               kfree(fpl);
->> +               return -ENOMEM;
->> +       }
->> +
->> +       skb->sk = ctx->ring_sock->sk;
->> +       skb->destructor = unix_destruct_scm;
->> +
->> +       fpl->user = get_uid(ctx->user);
->> +       for (i = 0; i < nr; i++) {
->> +               fpl->fp[i] = get_file(ctx->user_files[i + offset]);
->> +               unix_inflight(fpl->user, fpl->fp[i]);
->> +               fput(fpl->fp[i]);
+> [...]
+>> +config IO_URING
+>> +       bool "Enable IO uring support" if EXPERT
+>> +       select ANON_INODES
+>> +       default y
+>> +       help
+>> +         This option enables support for the io_uring interface, enabling
+>> +         applications to submit and completion IO through submission and
+>> +         completion rings that are shared between the kernel and application.
 > 
-> This pattern is almost always superfluous. You increment the file's
-> refcount, maybe insert the file into a list (essentially), and drop
-> the file's refcount back down. You're already holding a stable
-> reference, and you're not temporarily lending that to anyone else.
+> Nit: I can't parse this part: "enabling applications to submit and
+> completion IO"
 
-Actually, this is me messing up. The fput() should be done AFTER
-adding to the socket. I'll fix that.
+completion -> complete
+
+Fixed it up.
 
 -- 
 Jens Axboe
