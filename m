@@ -4,31 +4,33 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AFD1C282CB
-	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 04:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D43EC282C4
+	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 04:54:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 25A1B20857
-	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 04:54:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2451921903
+	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 04:54:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726941AbfBIEyS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Feb 2019 23:54:18 -0500
-Received: from mx2.suse.de ([195.135.220.15]:57958 "EHLO mx1.suse.de"
+        id S1726832AbfBIEyX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Feb 2019 23:54:23 -0500
+Received: from mx2.suse.de ([195.135.220.15]:57968 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726699AbfBIEyS (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Feb 2019 23:54:18 -0500
+        id S1726699AbfBIEyX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Feb 2019 23:54:23 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 431A8ABA1;
-        Sat,  9 Feb 2019 04:54:17 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 1EA0EABA1;
+        Sat,  9 Feb 2019 04:54:22 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     axboe@kernel.dk
 Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Coly Li <colyli@suse.de>
-Subject: [PATCH 18/19] bcache: fix input overflow to cache set sysfs file io_error_halflife
-Date:   Sat,  9 Feb 2019 12:53:10 +0800
-Message-Id: <20190209045311.15677-19-colyli@suse.de>
+        Coly Li <colyli@suse.de>, stable@vger.kernel.org,
+        Dave Chinner <david@fromorbit.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 19/19] bcache: use (REQ_META|REQ_PRIO) to indicate bio for metadata
+Date:   Sat,  9 Feb 2019 12:53:11 +0800
+Message-Id: <20190209045311.15677-20-colyli@suse.de>
 X-Mailer: git-send-email 2.16.4
 In-Reply-To: <20190209045311.15677-1-colyli@suse.de>
 References: <20190209045311.15677-1-colyli@suse.de>
@@ -37,44 +39,69 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Cache set sysfs entry io_error_halflife is used to set c->error_decay.
-c->error_decay is in type unsigned int, and it is converted by
-strtoul_or_return(), therefore overflow to c->error_decay is possible
-for a large input value.
+In 'commit 752f66a75aba ("bcache: use REQ_PRIO to indicate bio for
+metadata")' REQ_META is replaced by REQ_PRIO to indicate metadata bio.
+This assumption is not always correct, e.g. XFS uses REQ_META to mark
+metadata bio other than REQ_PRIO. This is why Nix noticed that bcache
+does not cache metadata for XFS after the above commit.
 
-This patch fixes the overflow by using strtoul_safe_clamp() to convert
-input string to an unsigned long value in range [0, UINT_MAX], then
-divides by 88 and set it to c->error_decay.
+Thanks to Dave Chinner, he explains the difference between REQ_META and
+REQ_PRIO from view of file system developer. Here I quote part of his
+explanation from mailing list,
+   REQ_META is used for metadata. REQ_PRIO is used to communicate to
+   the lower layers that the submitter considers this IO to be more
+   important that non REQ_PRIO IO and so dispatch should be expedited.
 
+   IOWs, if the filesystem considers metadata IO to be more important
+   that user data IO, then it will use REQ_PRIO | REQ_META rather than
+   just REQ_META.
+
+Then it seems bios with REQ_META or REQ_PRIO should both be cached for
+performance optimation, because they are all probably low I/O latency
+demand by upper layer (e.g. file system).
+
+So in this patch, when we want to decide whether to bypass the cache,
+REQ_META and REQ_PRIO are both checked. Then both metadata and
+high priority I/O requests will be handled properly.
+
+Reported-by: Nix <nix@esperi.org.uk>
 Signed-off-by: Coly Li <colyli@suse.de>
+Reviewed-by: Andre Noll <maan@tuebingen.mpg.de>
+Tested-by: Nix <nix@esperi.org.uk>
+Cc: stable@vger.kernel.org
+Cc: Dave Chinner <david@fromorbit.com>
+Cc: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/bcache/sysfs.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ drivers/md/bcache/request.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
-index 467105614324..17bae9c14ca0 100644
---- a/drivers/md/bcache/sysfs.c
-+++ b/drivers/md/bcache/sysfs.c
-@@ -804,8 +804,17 @@ STORE(__bch_cache_set)
- 	sysfs_strtoul_clamp(io_error_limit, c->error_limit, 0, UINT_MAX);
+diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+index 15070412a32e..f101bfe8657a 100644
+--- a/drivers/md/bcache/request.c
++++ b/drivers/md/bcache/request.c
+@@ -392,10 +392,11 @@ static bool check_should_bypass(struct cached_dev *dc, struct bio *bio)
  
- 	/* See count_io_errors() for why 88 */
--	if (attr == &sysfs_io_error_halflife)
--		c->error_decay = strtoul_or_return(buf) / 88;
-+	if (attr == &sysfs_io_error_halflife) {
-+		unsigned long v = 0;
-+		ssize_t ret;
-+
-+		ret = strtoul_safe_clamp(buf, v, 0, UINT_MAX);
-+		if (!ret) {
-+			c->error_decay = v / 88;
-+			return size;
-+		}
-+		return ret;
-+	}
+ 	/*
+ 	 * Flag for bypass if the IO is for read-ahead or background,
+-	 * unless the read-ahead request is for metadata (eg, for gfs2).
++	 * unless the read-ahead request is for metadata
++	 * (eg, for gfs2 or xfs).
+ 	 */
+ 	if (bio->bi_opf & (REQ_RAHEAD|REQ_BACKGROUND) &&
+-	    !(bio->bi_opf & REQ_PRIO))
++	    !(bio->bi_opf & (REQ_META|REQ_PRIO)))
+ 		goto skip;
  
- 	if (attr == &sysfs_io_disable) {
- 		v = strtoul_or_return(buf);
+ 	if (bio->bi_iter.bi_sector & (c->sb.block_size - 1) ||
+@@ -877,7 +878,7 @@ static int cached_dev_cache_miss(struct btree *b, struct search *s,
+ 	}
+ 
+ 	if (!(bio->bi_opf & REQ_RAHEAD) &&
+-	    !(bio->bi_opf & REQ_PRIO) &&
++	    !(bio->bi_opf & (REQ_META|REQ_PRIO)) &&
+ 	    s->iop.c->gc_stats.in_use < CUTOFF_CACHE_READA)
+ 		reada = min_t(sector_t, dc->readahead >> 9,
+ 			      get_capacity(bio->bi_disk) - bio_end_sector(bio));
 -- 
 2.16.4
 
