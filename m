@@ -5,70 +5,69 @@ X-Spam-Level:
 X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5CE9C282C4
-	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 18:31:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B8FC282C4
+	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 18:33:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6FBEA214DA
-	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 18:31:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0487E21916
+	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 18:33:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NTD535Rk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jsjNo9PO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727232AbfBISbt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Feb 2019 13:31:49 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:38595 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727211AbfBISbt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Feb 2019 13:31:49 -0500
-Received: by mail-qk1-f196.google.com with SMTP id p15so2447711qkl.5;
-        Sat, 09 Feb 2019 10:31:48 -0800 (PST)
+        id S1727140AbfBISdA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Feb 2019 13:33:00 -0500
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:41716 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726977AbfBISdA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Feb 2019 13:33:00 -0500
+Received: by mail-qk1-f195.google.com with SMTP id u188so4108701qkh.8;
+        Sat, 09 Feb 2019 10:32:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language;
-        bh=HTKsCuoWv3B6eRPKKnz1ZtmH6rHf+rvW+qab88WvitM=;
-        b=NTD535RkTmbNZ56wDmUu5SrBBliZ62yA7AI2yOy/or+Yle7TBJtzBSb6QrKhedSqwq
-         8/8JcE0kbSgPM5Zw3ExVIu7FpmOIcr6LQVN96+HxrjJNakDrt8NvgZYH2gFYoUj/VxRu
-         IctwJoUBw2HQLMuT66HniYQpg+GWFl7uSrtYYsWV0LyieYYMcWNpMcULGftIJLfh859f
-         Q2NNEupNlY7ECYnNOm9TjsGTB+IhezjD0xL65V9Dk2nnloW1a586abpZpiQSur08CdpM
-         zJ3KtJje+njTpwnqd1aEmPjaIHo/fkQqEhF2q6JujuOs1VwnAFT+herdqre9HTsK+efF
-         evSw==
+        bh=DgK5pMDyMltP/yC/7G/HZMduOCOiTLHdOzV0+qNTsKw=;
+        b=jsjNo9POuVgN4MXK3AebQ/QZF5GobaM3fj2dSDV+a15JBfhFw61IeH4ZwQJCrg5AzZ
+         ieQzXCpv7ybu4EoO4oqI4ldQgJKk8Qhtuncivfp4UDkrdhsPuFDxHFFWHfc2nfCRDghc
+         SkbgwH4MfGNyuC3vS+5FNXo3Sf2tEOpDRyePoxZJdXdWr52XMjSJIF7ST29jIQspRQDk
+         uv7GSAdhdX/v3L8q4bBGok68KSZMrBbr3S+p7KF3q6krvzXBSjXZjJedl2ceQedqnU6W
+         Bug2pr4UtETTxVhbSPO+LO0wt8dCLDSJtABXCZA6uHxQ7PGHuEv51JFAbZQCqGi2Xnli
+         rJRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language;
-        bh=HTKsCuoWv3B6eRPKKnz1ZtmH6rHf+rvW+qab88WvitM=;
-        b=sODz2rMGnqZstzlU5Ak+Dw0ehn8eDOfZL8sE6c4+SHGxV9nqQr3zhmFHQ+6BEm5u25
-         4nCcNLnRFxshZob4jt+lFvktBbzYv5gypmc+drT70ijzCjOyRSdkJRq0Hf2BQGuWnx0u
-         IOS4eNUxgf0UmrWArC+U282ErqIfwiBZQEABfa/H5sbcrZS0RBfM4MYLEXbYVh4hlcuO
-         5Uvd1JgcuFZIgspgnDbGF5NWZQ13UKzfKnQKStbNcr9WVrIpzbPAEC6pGXmMyo68WaTt
-         sQt0p/yPjTHt/+Cn/GMdIybSYdzQsxb0hl9BO9Z7DuHTKI41wCIi9cRDrY8yw3vgsu0L
-         pKYg==
-X-Gm-Message-State: AHQUAuaPW5DImRo+MfS4nEFuOuuVWcyXK/TIYM6B+iQ/E8+u5g1EcSOZ
-        o+FSaHC+F3z4suzHzSqx/b096J4lAVQ=
-X-Google-Smtp-Source: AHgI3IbG4uotXu9ucRHVVJAPkCtK5EwJfBCCrmE/NrkJCXahQIj+MrLH5bFTtGy6209HdBJtNir2sQ==
-X-Received: by 2002:ae9:f212:: with SMTP id m18mr19976616qkg.5.1549737107639;
-        Sat, 09 Feb 2019 10:31:47 -0800 (PST)
+        bh=DgK5pMDyMltP/yC/7G/HZMduOCOiTLHdOzV0+qNTsKw=;
+        b=dOK55adZ2OBOZ4dhIJF3DKInSvylam6/GUfqqFSgEg/snKUCoHLzXL0FJBg6iIWlzl
+         97uo/vvLKsR3yz95qj1cDNa1AVZ5LvaHNz5JarPAsTNXxYfgxURDTX0uJxFfk/R7dHmB
+         kmtscJ3ENeu7CwLz3zxlHaJdW7etb4a3sdHjrCAiUwNhdjfHhaoqZxtgzhic3O4xRHX0
+         tLHXyrU8DRTh4gRgLkXYK/ljIcBVqcNz9JO9DR6j4V5P8TN4RcUnZjeNd4Kdyw2oBNtX
+         CugblanpK39CiFhfWcgR578Mv583zgAWiE+bgE8mKnORr2eRZc020zPHyePsU4bpdv84
+         QkIA==
+X-Gm-Message-State: AHQUAuZYqsyDXErsMMIlAKhM9pvUuFXO8O3ynXcCSJm+jgDRdy0V4YVn
+        iAVr9WS0BF4pDFgyqEJc5H7QCNfOdZw=
+X-Google-Smtp-Source: AHgI3IZY5Ysi+vuhCbppeHA17JaCxTSyJBQ5NjWLhMLSK2nBewK/webrgsVMkt4eahAyvCZ4GB71lQ==
+X-Received: by 2002:a37:6e07:: with SMTP id j7mr19955878qkc.298.1549737178295;
+        Sat, 09 Feb 2019 10:32:58 -0800 (PST)
 Received: from [192.168.0.153] (189.26.177.147.dynamic.adsl.gvt.net.br. [189.26.177.147])
-        by smtp.gmail.com with ESMTPSA id 20sm5666496qts.82.2019.02.09.10.31.44
+        by smtp.gmail.com with ESMTPSA id f33sm10422736qta.91.2019.02.09.10.32.55
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Sat, 09 Feb 2019 10:31:46 -0800 (PST)
-Subject: Re: [PATCH] blk-cgroup: Fix doc related to blkcg_exit_queue
-To:     Bart Van Assche <bvanassche@acm.org>, linux-kernel@vger.kernel.org
+        Sat, 09 Feb 2019 10:32:57 -0800 (PST)
+Subject: Re: [PATCH] blk-sysfs: Rework documention of __blk_release_queue
+To:     linux-kernel@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>,
         "open list:BLOCK LAYER" <linux-block@vger.kernel.org>
-References: <20190125020142.921371-1-marcos.souza.org@gmail.com>
- <06802295-4dc7-20bd-a511-99dc37bf8777@acm.org>
+References: <20190131011139.2264742-1-marcos.souza.org@gmail.com>
 From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
-Message-ID: <bb1d8c20-d6c1-535b-fd23-f1f4bd6281ba@gmail.com>
-Date:   Sat, 9 Feb 2019 16:32:50 -0200
+Message-ID: <02fcaaa4-3667-7144-5ca2-4e5346380439@gmail.com>
+Date:   Sat, 9 Feb 2019 16:34:01 -0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.3.0
 MIME-Version: 1.0
-In-Reply-To: <06802295-4dc7-20bd-a511-99dc37bf8777@acm.org>
+In-Reply-To: <20190131011139.2264742-1-marcos.souza.org@gmail.com>
 Content-Type: multipart/mixed;
- boundary="------------503F852264E26282EE66674F"
+ boundary="------------7FEFF2AB327E4DB99FE0DFEB"
 Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -76,44 +75,82 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 This is a multi-part message in MIME format.
---------------503F852264E26282EE66674F
+--------------7FEFF2AB327E4DB99FE0DFEB
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
 Ping :)
 
-On 1/25/19 1:50 AM, Bart Van Assche wrote:
-> On 1/24/19 6:01 PM, Marcos Paulo de Souza wrote:
->> Since 4cf6324b17e9, a portion of function blk_cleanup_queue was moved =
-to
->> a newly created function called blk_exit_queue, including the call of
->> blkcg_exit_queue. So, adjust the documenation according.
->>
->> Signed-off-by: Marcos Paulo de Souza <marcos.souza.org@gmail.com>
->> ---
->> =C2=A0 block/blk-cgroup.c | 2 +-
->> =C2=A0 1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
->> index 2bed5725aa03..77f37ef8ef06 100644
->> --- a/block/blk-cgroup.c
->> +++ b/block/blk-cgroup.c
->> @@ -1269,7 +1269,7 @@ void blkcg_drain_queue(struct request_queue *q)
->> =C2=A0=C2=A0 * blkcg_exit_queue - exit and release blkcg part of reque=
-st_queue
->> =C2=A0=C2=A0 * @q: request_queue being released
->> =C2=A0=C2=A0 *
->> - * Called from blk_release_queue().=C2=A0 Responsible for exiting blk=
-cg part.
->> + * Called from blk_exit_queue().=C2=A0 Responsible for exiting blkcg =
-part.
->> =C2=A0=C2=A0 */
->> =C2=A0 void blkcg_exit_queue(struct request_queue *q)
->> =C2=A0 {
+On 1/30/19 11:11 PM, Marcos Paulo de Souza wrote:
+> The Notes section of the comment was removed, because now
+> blk_release_queue can only be executed from blk_cleanup_queue (being
+> called when the q->kobj reaches zero), and also blk_init_queue was remo=
+ved
+> in a1ce35fa4985.
 >=20
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> Signed-off-by: Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+> ---
+>  This is basically a v2 of https://lkml.org/lkml/2019/1/14/1098
+>=20
+>  But, I tried to describe when this function is called, removing redund=
+ancies.
+>  Maybe it would be better placed in blk-core.c, where the q->kobj is in=
+itialized
+>  with blk_queue_ktype (which .release pointer points to blk_release_que=
+ue)?
+>=20
+>  block/blk-sysfs.c | 19 +++++++------------
+>  1 file changed, 7 insertions(+), 12 deletions(-)
+>=20
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index 590d1ef2f961..d4dea9179fa6 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -817,21 +817,16 @@ static void blk_free_queue_rcu(struct rcu_head *r=
+cu_head)
+>  }
+> =20
+>  /**
+> - * __blk_release_queue - release a request queue when it is no longer =
+needed
+> + * __blk_release_queue - release a request queue
+>   * @work: pointer to the release_work member of the request queue to b=
+e released
+>   *
+>   * Description:
+> - *     blk_release_queue is the counterpart of blk_init_queue(). It sh=
+ould be
+> - *     called when a request queue is being released; typically when a=
+ block
+> - *     device is being de-registered. Its primary task it to free the =
+queue
+> - *     itself.
+> - *
+> - * Notes:
+> - *     The low level driver must have finished any outstanding request=
+s first
+> - *     via blk_cleanup_queue().
+> - *
+> - *     Although blk_release_queue() may be called with preemption disa=
+bled,
+> - *     __blk_release_queue() may sleep.
+> + *     This function is called when a block device is being de-registe=
+red. The
+> + *     process of releasing a request queue starts with blk_cleanup_qu=
+eue, which
+> + *     set the appropriate flags and the calls blk_put_queue, that dec=
+rements
+> + *     the reference counter of the request queue. Once the reference =
+counter
+> + *     of the request queue reaches zero, blk_release_queue is called =
+to release
+> + *     all allocated resources of the request queue.
+>   */
+>  static void __blk_release_queue(struct work_struct *work)
+>  {
+>=20
 
---------------503F852264E26282EE66674F
+--------------7FEFF2AB327E4DB99FE0DFEB
 Content-Type: application/pgp-keys;
  name="pEpkey.asc"
 Content-Transfer-Encoding: quoted-printable
@@ -152,4 +189,4 @@ LbbJ/5zeVzltzQ=3D=3D
 =3D5HUz
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------503F852264E26282EE66674F--
+--------------7FEFF2AB327E4DB99FE0DFEB--
