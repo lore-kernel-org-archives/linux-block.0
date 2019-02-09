@@ -2,59 +2,59 @@ Return-Path: <SRS0=Do5T=QQ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D53C282C4
-	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 13:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ABE2C282C4
+	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 14:08:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C05921919
-	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 13:52:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E745B2084D
+	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 14:07:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ho854t0V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jptnm/0T"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726791AbfBINwf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Feb 2019 08:52:35 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:54628 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726724AbfBINwf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Feb 2019 08:52:35 -0500
-Received: by mail-wm1-f66.google.com with SMTP id a62so8493432wmh.4;
-        Sat, 09 Feb 2019 05:52:34 -0800 (PST)
+        id S1726844AbfBIOHz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Feb 2019 09:07:55 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:38861 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726791AbfBIOHy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Feb 2019 09:07:54 -0500
+Received: by mail-wm1-f67.google.com with SMTP id v26so8342117wmh.3;
+        Sat, 09 Feb 2019 06:07:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=a1FxRbJ08wKgp4Co0znQWeKyAEWRpt3r5CDQgl/lzA4=;
-        b=ho854t0VeE6vkAj0xsMCBVg+GmgJHVfw5OjfuHOJNNggl2sV7EERA8YSfPVlbMvOI/
-         8VfPfvbCOdKdg1UTWHM/i0jDat3tgSYv0ewqUWVbUABw4sOc26cXz78V1kDZdl0FeXcU
-         fUUbDB73SdMwb9ZQit//tkf/yJmMy+BsmPYc5egWKEuM9+cJW5rYCz/vmSeWAyyx8Fsk
-         hc27LyFIpXFFNT7f/0lYIbAdpujM488pot5HUf31+3kyX5gkm3JvloV91OtiSEWmXl4a
-         S+ls75NLMEcJxwYPKh92JNiCRLHdMp4QjFpU7eGPGle1WxcJM7BvMOUeEOWjSkya9ZGO
-         1TGw==
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=qhFJHI0MUpB/qkZtdC4zNEo5CgNcks1YjBBXggGnxos=;
+        b=Jptnm/0TSLN+0SqgSQcv/qmGWDPk2bgkA90HtnL52WCtRaFsgUL/hE044Oh03h5Riz
+         3DSMOGQiOEKQsy6cNPhGtBOhAl4lMRPUGuCKcxlni/yfmSzBMBqmeFBY2a6buSJw/Tkh
+         NvDB4r/YQ1AvqzpqCmqCzC3jXxZWVv5eDCUM3nK3IFxbkPx2zSY8ZXL1nFRz6BCnHgbU
+         4w2s2TVQ2wr7jiLEHBamGqShRfVF2Ow1QGObwf7yj1+dQk68WJEhotkjVXLTlqnub7+n
+         NiP+3H9UH/c7+dZY9iGFfj2c18GC70BLCpsVStGrpYuxr/9QI3cdCxsUWohWTxbikMbM
+         aZLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=a1FxRbJ08wKgp4Co0znQWeKyAEWRpt3r5CDQgl/lzA4=;
-        b=t6BRZl1Q/YW3JS1badTRVLnueZPBU0w8U/1r7k/QExXkPggRGaler3vw/OcxU02XuK
-         /eXpT3dq050t1wKPtUrSDDk1NUMtZ80dK+S4lBgkEuCX6/cc3eAP6wr6quD8BpOHISBU
-         hvPo1l4l7uI27O6pUUmJqG+pM47nad8eUAi5o4h+kxATnXtJ2b8ytuC4U1m/b4w9zV2l
-         w470QHq/hI2kk3OqQQ+K8yEBIXWTpiXoxk9EhNU3CFJ8TK/vAkxnt7SQVsTSbC9hjeiE
-         fuiM8aR4eU8vcvSOUV8kuki3bPxrdz3GKY4SfKGgnLtXJpYcd+2xhKFqDRf+zaWcXmJ4
-         1fvA==
-X-Gm-Message-State: AHQUAua/5MdPPT2hLzzGPh/K+clJMOHdXIUFKbz+aAnhDhbZm5JO410w
-        UiwTEjiSrZOynkGp6SNe5A==
-X-Google-Smtp-Source: AHgI3IYCGgyeMoumNCNf/hlgXlYmgnGoCIA2EAC1vCyg+s6hZ7Scw34UnmRgzD6RTx7omoGjVtJXAw==
-X-Received: by 2002:adf:9004:: with SMTP id h4mr13476386wrh.121.1549720353621;
-        Sat, 09 Feb 2019 05:52:33 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=qhFJHI0MUpB/qkZtdC4zNEo5CgNcks1YjBBXggGnxos=;
+        b=Qy7UGG4mtkFOukxYMZLAu62ic6zdrJ1b7vb/k52naGbpn/1nMNB1z708E6PAvJsrLM
+         CQ7U7EAzErCp53r6QEJYuKKTup84f5c8n+LuR6l0fmFlZ08TSBY5yKUYjyeKO9QCIUFm
+         thAg6V1d/gvANmEC714zi/4CYVWnCr6/r7nGkz7pDPYEzBoUDhcRJN8kIPWLGiCdHoVj
+         OHkpkn12Yb7s3dM3j5VW3JWqpwrc+z/sZqs/q//z4zKmhq8glbzBI0L08WT8q+JL6OkJ
+         onv494dMpXoygZZPvGCjeEjRSrMZQTUun3BZlcJys5oicRzl51+0+XfhBC4v242F8jM2
+         W0oQ==
+X-Gm-Message-State: AHQUAuZc7N9E/0TZ34KFfzXRDG8bLXRriMREVWCTZFOs+0j4p0G6t1/u
+        Gnkxy/aIKsycmmrSst+mEw==
+X-Google-Smtp-Source: AHgI3Ib9PDRfAgJ2+g56cDO5j4jKS9mElHxCE7/XIbGMq9RSFhMR4Kpz7RtE6yAYs6+ycK+0WFJGiA==
+X-Received: by 2002:a5d:438a:: with SMTP id i10mr20490432wrq.111.1549721271711;
+        Sat, 09 Feb 2019 06:07:51 -0800 (PST)
 Received: from localhost ([95.238.120.247])
-        by smtp.gmail.com with ESMTPSA id r12sm6648362wrt.76.2019.02.09.05.52.32
+        by smtp.gmail.com with ESMTPSA id q9sm2805351wmc.10.2019.02.09.06.07.50
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sat, 09 Feb 2019 05:52:32 -0800 (PST)
-Date:   Sat, 9 Feb 2019 14:52:31 +0100
+        Sat, 09 Feb 2019 06:07:50 -0800 (PST)
+Date:   Sat, 9 Feb 2019 15:07:49 +0100
 From:   Andrea Righi <righi.andrea@gmail.com>
 To:     Josef Bacik <josef@toxicpanda.com>
 Cc:     Paolo Valente <paolo.valente@linaro.org>,
@@ -64,54 +64,277 @@ Cc:     Paolo Valente <paolo.valente@linaro.org>,
         Dennis Zhou <dennis@kernel.org>, cgroups@vger.kernel.org,
         linux-block@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH] blkcg: prevent priority inversion problem during
+Subject: [RFC PATCH v2] blkcg: prevent priority inversion problem during
  sync()
-Message-ID: <20190209135231.GA1910@xps-13>
-References: <20190209120633.GA2506@xps-13>
+Message-ID: <20190209140749.GB1910@xps-13>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190209120633.GA2506@xps-13>
 User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Feb 09, 2019 at 01:06:33PM +0100, Andrea Righi wrote:
-...
-> +/**
-> + * blkcg_wb_waiters_on_bdi - check for writeback waiters on a block device
-> + * @bdi: block device to check
-> + *
-> + * Return true if any other blkcg is waiting for writeback on the target block
-> + * device, false otherwise.
-> + */
-> +bool blkcg_wb_waiters_on_bdi(struct backing_dev_info *bdi)
-> +{
-> +	struct blkcg *blkcg, *curr_blkcg;
-> +	bool ret = false;
-> +
-> +	if (unlikely(!bdi))
-> +		return false;
-> +
-> +	rcu_read_lock();
-> +	curr_blkcg = css_to_blkcg(task_css(current, io_cgrp_id));
+This is an attempt to mitigate the priority inversion problem of a
+high-priority blkcg issuing a sync() and being forced to wait the
+completion of all the writeback I/O generated by any other low-priority
+blkcg, causing massive latencies to processes that shouldn't be
+I/O-throttled at all.
 
-Sorry, the logic is messed up here. We shouldn't get curr_blkcg from the
-current task, because during writeback throttling the context is
-obviously not the current task.
+The idea is to save a list of blkcg's that are waiting for writeback:
+every time a sync() is executed the current blkcg is added to the list.
 
-I'll post a new patch soon.
+Then, when I/O is throttled, if there's a blkcg waiting for writeback
+different than the current blkcg, no throttling is applied (we can
+probably refine this logic later, i.e., a better policy could be to
+adjust the throttling I/O rate using the blkcg with the highest speed
+from the list of waiters - priority inheritance, kinda).
 
-> +	list_for_each_entry_rcu(blkcg, &bdi->cgwb_waiters, cgwb_wait_node)
-> +		if (blkcg != curr_blkcg) {
-> +			ret = true;
-> +			break;
-> +		}
-> +	rcu_read_unlock();
-> +
-> +	return ret;
-> +}
+This topic has been discussed here:
+https://lwn.net/ml/cgroups/20190118103127.325-1-righi.andrea@gmail.com/
 
--Andrea
+But we didn't come up with any definitive solution.
+
+This patch is not a definitive solution either, but it's an attempt to
+continue addressing this issue and handling the priority inversion
+problem with sync() in a better way.
+
+Signed-off-by: Andrea Righi <righi.andrea@gmail.com>
+---
+Changes in v2:
+ - fix: use the proper current blkcg in blkcg_wb_waiters_on_bdi()
+
+ block/blk-cgroup.c               | 69 ++++++++++++++++++++++++++++++++
+ block/blk-throttle.c             | 11 +++--
+ fs/fs-writeback.c                |  4 ++
+ include/linux/backing-dev-defs.h |  2 +
+ include/linux/blk-cgroup.h       | 18 ++++++++-
+ mm/backing-dev.c                 |  2 +
+ 6 files changed, 102 insertions(+), 4 deletions(-)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 2bed5725aa03..21f14148a9c6 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1635,6 +1635,75 @@ static void blkcg_scale_delay(struct blkcg_gq *blkg, u64 now)
+ 	}
+ }
+ 
++/**
++ * blkcg_wb_waiters_on_bdi - check for writeback waiters on a block device
++ * @blkcg: current blkcg cgroup
++ * @bdi: block device to check
++ *
++ * Return true if any other blkcg is waiting for writeback on the target block
++ * device, false otherwise.
++ */
++bool blkcg_wb_waiters_on_bdi(struct blkcg *blkcg, struct backing_dev_info *bdi)
++{
++	struct blkcg *wait_blkcg;
++	bool ret = false;
++
++	if (unlikely(!bdi))
++		return false;
++
++	rcu_read_lock();
++	list_for_each_entry_rcu(wait_blkcg, &bdi->cgwb_waiters, cgwb_wait_node)
++		if (wait_blkcg != blkcg) {
++			ret = true;
++			break;
++		}
++	rcu_read_unlock();
++
++	return ret;
++}
++
++/**
++ * blkcg_start_wb_wait_on_bdi - add current blkcg to writeback waiters list
++ * @bdi: target block device
++ *
++ * Add current blkcg to the list of writeback waiters on target block device.
++ */
++void blkcg_start_wb_wait_on_bdi(struct backing_dev_info *bdi)
++{
++	struct blkcg *blkcg;
++
++	rcu_read_lock();
++	blkcg = css_to_blkcg(task_css(current, io_cgrp_id));
++	if (blkcg) {
++		spin_lock(&bdi->cgwb_waiters_lock);
++		list_add_rcu(&blkcg->cgwb_wait_node, &bdi->cgwb_waiters);
++		spin_unlock(&bdi->cgwb_waiters_lock);
++	}
++	rcu_read_unlock();
++}
++
++/**
++ * blkcg_stop_wb_wait_on_bdi - remove current blkcg from writeback waiters list
++ * @bdi: target block device
++ *
++ * Remove current blkcg from the list of writeback waiters on target block
++ * device.
++ */
++void blkcg_stop_wb_wait_on_bdi(struct backing_dev_info *bdi)
++{
++	struct blkcg *blkcg;
++
++	rcu_read_lock();
++	blkcg = css_to_blkcg(task_css(current, io_cgrp_id));
++	if (blkcg) {
++		spin_lock(&bdi->cgwb_waiters_lock);
++		list_del_rcu(&blkcg->cgwb_wait_node);
++		spin_unlock(&bdi->cgwb_waiters_lock);
++	}
++	rcu_read_unlock();
++	synchronize_rcu();
++}
++
+ /*
+  * This is called when we want to actually walk up the hierarchy and check to
+  * see if we need to throttle, and then actually throttle if there is some
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 1b97a73d2fb1..da817896cded 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -970,9 +970,13 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
+ {
+ 	bool rw = bio_data_dir(bio);
+ 	unsigned long bps_wait = 0, iops_wait = 0, max_wait = 0;
++	struct throtl_data *td = tg->td;
++	struct request_queue *q = td->queue;
++	struct backing_dev_info *bdi = q->backing_dev_info;
++	struct blkcg_gq *blkg = tg_to_blkg(tg);
+ 
+ 	/*
+- 	 * Currently whole state machine of group depends on first bio
++	 * Currently whole state machine of group depends on first bio
+ 	 * queued in the group bio list. So one should not be calling
+ 	 * this function with a different bio if there are other bios
+ 	 * queued.
+@@ -981,8 +985,9 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
+ 	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
+ 
+ 	/* If tg->bps = -1, then BW is unlimited */
+-	if (tg_bps_limit(tg, rw) == U64_MAX &&
+-	    tg_iops_limit(tg, rw) == UINT_MAX) {
++	if (blkcg_wb_waiters_on_bdi(blkg->blkcg, bdi) ||
++	    (tg_bps_limit(tg, rw) == U64_MAX &&
++	    tg_iops_limit(tg, rw) == UINT_MAX)) {
+ 		if (wait)
+ 			*wait = 0;
+ 		return true;
+diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
+index 36855c1f8daf..13880774af3c 100644
+--- a/fs/fs-writeback.c
++++ b/fs/fs-writeback.c
+@@ -2446,6 +2446,8 @@ void sync_inodes_sb(struct super_block *sb)
+ 		return;
+ 	WARN_ON(!rwsem_is_locked(&sb->s_umount));
+ 
++	blkcg_start_wb_wait_on_bdi(bdi);
++
+ 	/* protect against inode wb switch, see inode_switch_wbs_work_fn() */
+ 	bdi_down_write_wb_switch_rwsem(bdi);
+ 	bdi_split_work_to_wbs(bdi, &work, false);
+@@ -2453,6 +2455,8 @@ void sync_inodes_sb(struct super_block *sb)
+ 	bdi_up_write_wb_switch_rwsem(bdi);
+ 
+ 	wait_sb_inodes(sb);
++
++	blkcg_stop_wb_wait_on_bdi(bdi);
+ }
+ EXPORT_SYMBOL(sync_inodes_sb);
+ 
+diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
+index 07e02d6df5ad..095e4dd0427b 100644
+--- a/include/linux/backing-dev-defs.h
++++ b/include/linux/backing-dev-defs.h
+@@ -191,6 +191,8 @@ struct backing_dev_info {
+ 	struct rb_root cgwb_congested_tree; /* their congested states */
+ 	struct mutex cgwb_release_mutex;  /* protect shutdown of wb structs */
+ 	struct rw_semaphore wb_switch_rwsem; /* no cgwb switch while syncing */
++	struct list_head cgwb_waiters; /* list of all waiters for writeback */
++	spinlock_t cgwb_waiters_lock; /* protect cgwb_waiters list */
+ #else
+ 	struct bdi_writeback_congested *wb_congested;
+ #endif
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 76c61318fda5..5ea6b31c1df4 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -56,6 +56,7 @@ struct blkcg {
+ 
+ 	struct list_head		all_blkcgs_node;
+ #ifdef CONFIG_CGROUP_WRITEBACK
++	struct list_head		cgwb_wait_node;
+ 	struct list_head		cgwb_list;
+ 	refcount_t			cgwb_refcnt;
+ #endif
+@@ -454,6 +455,10 @@ static inline void blkcg_cgwb_put(struct blkcg *blkcg)
+ 		blkcg_destroy_blkgs(blkcg);
+ }
+ 
++bool blkcg_wb_waiters_on_bdi(struct blkcg *blkcg, struct backing_dev_info *bdi);
++void blkcg_start_wb_wait_on_bdi(struct backing_dev_info *bdi);
++void blkcg_stop_wb_wait_on_bdi(struct backing_dev_info *bdi);
++
+ #else
+ 
+ static inline void blkcg_cgwb_get(struct blkcg *blkcg) { }
+@@ -464,6 +469,14 @@ static inline void blkcg_cgwb_put(struct blkcg *blkcg)
+ 	blkcg_destroy_blkgs(blkcg);
+ }
+ 
++static inline bool
++blkcg_wb_waiters_on_bdi(struct blkcg *blkcg, struct backing_dev_info *bdi)
++{
++	return false;
++}
++static inline void blkcg_start_wb_wait_on_bdi(struct backing_dev_info *bdi) { }
++static inline void blkcg_stop_wb_wait_on_bdi(struct backing_dev_info *bdi) { }
++
+ #endif
+ 
+ /**
+@@ -772,6 +785,7 @@ static inline void blkcg_bio_issue_init(struct bio *bio)
+ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+ 					 struct bio *bio)
+ {
++	struct backing_dev_info *bdi = q->backing_dev_info;
+ 	struct blkcg_gq *blkg;
+ 	bool throtl = false;
+ 
+@@ -785,9 +799,11 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+ 			  bio_devname(bio, b));
+ 		bio_associate_blkg(bio);
+ 	}
+-
+ 	blkg = bio->bi_blkg;
+ 
++	if (blkcg_wb_waiters_on_bdi(blkg->blkcg, bdi))
++		bio_set_flag(bio, BIO_THROTTLED);
++
+ 	throtl = blk_throtl_bio(q, blkg, bio);
+ 
+ 	if (!throtl) {
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 72e6d0c55cfa..8848d26e8bf6 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -686,10 +686,12 @@ static int cgwb_bdi_init(struct backing_dev_info *bdi)
+ {
+ 	int ret;
+ 
++	INIT_LIST_HEAD(&bdi->cgwb_waiters);
+ 	INIT_RADIX_TREE(&bdi->cgwb_tree, GFP_ATOMIC);
+ 	bdi->cgwb_congested_tree = RB_ROOT;
+ 	mutex_init(&bdi->cgwb_release_mutex);
+ 	init_rwsem(&bdi->wb_switch_rwsem);
++	spin_lock_init(&bdi->cgwb_waiters_lock);
+ 
+ 	ret = wb_init(&bdi->wb, bdi, 1, GFP_KERNEL);
+ 	if (!ret) {
+-- 
+2.17.1
+
