@@ -4,63 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC260C282CC
-	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 21:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C81EC282CB
+	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 21:14:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A775C2083B
-	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 21:14:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29A7F2083B
+	for <linux-block@archiver.kernel.org>; Sat,  9 Feb 2019 21:14:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="IVO/WOfp"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="FJ78sR74"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727099AbfBIVOM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Feb 2019 16:14:12 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:42874 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727091AbfBIVOM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Feb 2019 16:14:12 -0500
-Received: by mail-pf1-f195.google.com with SMTP id n74so2068402pfi.9
-        for <linux-block@vger.kernel.org>; Sat, 09 Feb 2019 13:14:11 -0800 (PST)
+        id S1727114AbfBIVOO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Feb 2019 16:14:14 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:44007 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727070AbfBIVOO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Feb 2019 16:14:14 -0500
+Received: by mail-pf1-f194.google.com with SMTP id w73so3318180pfk.10
+        for <linux-block@vger.kernel.org>; Sat, 09 Feb 2019 13:14:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=JSVEJ2tIzhyOtRmTwa8QrgR+dpO88fkDdNIm04DsyHA=;
-        b=IVO/WOfp/Ta+csTwwe8cDFJly3bbJ8iJXfNUUOV7ESUKtSKAuZN0QncSW0cnJwqt5g
-         zJ6+Q9sR1SMzkRtjZhTaXRiCv2lGZdIcxYqNisNmoEGvc9+s+A+/kgnskKLX+Ii+kmrl
-         FC3zAKDgaa2uyY+N0wNs8PzYhE9iLJYr9PNqfy/wzWTzkjFdBeZ9MhxL7eJGPVC7/U82
-         x85jgZDV3QFL3/DGKkIDwXMUYVdrPcQN5t+cyFnSLtBU5XkLGK06/cIGB72QjixlYJm/
-         65WTXjK4K9QnpsErOwqiY8jiODucotpTxYf4vSJLXenYzDUK0QRwDAOBFj6jFXN59vvz
-         GtyQ==
+        bh=iZfokheV1pDf6KDbP5uVm/d0XxEaaAaBjvft+e/J+Tk=;
+        b=FJ78sR74/cEw+hOE3dJd7lxEZx+yFaLBKWg+eoGXwvvEDbUQajT+Z+RgbQub1G5Jny
+         GrLUxafRhT7KIOuttQM0OV+4cjUHOD3UlxiQyQKSqlHJMfCbIn4Kc64QLLdeHuXHsiiW
+         41rHWShjAUiNZB6L4gxM6w4UUkvairMJXP29b0XOAzg3AQPFThZb/EkowxLtYExTfGNk
+         6lEqnvByzORvRvcL2X0SHzyP3hsKLuS7zUPIbu+UO3bsoD+lsCbOurvvuaZeQvTgQx8g
+         juYEcIOFw3WHepbl2Yz4+6Hy7xmtLVGuK5BcAkILnDVrec4jjeraAHDUeK7vD2WOtVKb
+         IjFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=JSVEJ2tIzhyOtRmTwa8QrgR+dpO88fkDdNIm04DsyHA=;
-        b=BpDK2GUEkqP55V+bPvutZC0XAF0XaLLpXXxiQwcNsLpvNazN8M96MOkq96p8DOzXdN
-         n01YT+nUHMtZndc+gBm8v7Kdwujzff8dIpxF93olH0OI1TLsCtqIe1Ol3zV/vrV859vJ
-         OT3exAIRF5MW4aAiqCZJrHSdIu7C1wVCwef+1JlYzJYaMWqA6L9FmGD0BQxoq+odzYPn
-         JHLc3rP3w8r4vzr/KxlRoFAa2j5p+n26mE0ChXYpVcCe4cIg957V4YI06CgMNzpNsQPm
-         1BDEhAFrcMT4YLw0SdU1c6hj56rXSRbJpPL0IYZMgSYCg50pmqeV3fbnzCXJ1wZJvYjZ
-         6Shw==
-X-Gm-Message-State: AHQUAub5zfM6kK55emyLJdIGP5UmvzuA2o3r/R1odNFZ+xBz238vQ9Vb
-        shWJH6eiMdvywvtZbZvfzEz5og==
-X-Google-Smtp-Source: AHgI3IYD6atbG3GnTyc7IlAxkgMbR841j/Lit+KJkb7PvBXGaqWEftA2UJn98u+U6Sb0InBoH6dqpA==
-X-Received: by 2002:a62:8add:: with SMTP id o90mr29035625pfk.210.1549746851199;
-        Sat, 09 Feb 2019 13:14:11 -0800 (PST)
+        bh=iZfokheV1pDf6KDbP5uVm/d0XxEaaAaBjvft+e/J+Tk=;
+        b=EnlD5WnwIhvnCst/ZUjACLEysSwFQ0+XfNzdNkfliyPXwFPbQJ3CLmGj6y1+9EF1xJ
+         0T+PqK1MRaxJC5x53Rgv/4J9IXQgK1JHCFzvc5I5Fqt0cpWypO2Oeq8/VHCxuiiCvYd/
+         4EzOYAkf7ASwvcPANNbDOz7wCaPMEXuFvhPanGVUqn8s0c3sKHr9GecpcH9p4QKpAeI/
+         PwwrfnGQaiKMdWx1rPUj34n4hG1loqwRN55o5/2vOyamNRpKkjJ96d8uhPI2DqCXteeB
+         Ts/ICrGHwGFZs1vSYN4AylaVxt+nNxI6NVVmcbZyMTc+Vwi8hGYf2VXHv+8D1CFpCvlg
+         sG/Q==
+X-Gm-Message-State: AHQUAubdAxoQDQdW9rlGsv6IJy+d6cFH18uQMO9rLvClXu2batgBAkuw
+        BuPS5qjpf7kaYBk74gdjZtBkhQ==
+X-Google-Smtp-Source: AHgI3IYxstgJ2CdP93BVyA2jNFLq41+bB5aivv1MgbTThDkI3Ojuv8hU216jRGsyay4oXbqicusNiA==
+X-Received: by 2002:a62:5486:: with SMTP id i128mr28713714pfb.215.1549746853351;
+        Sat, 09 Feb 2019 13:14:13 -0800 (PST)
 Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id a17sm7004942pgm.26.2019.02.09.13.14.09
+        by smtp.gmail.com with ESMTPSA id a17sm7004942pgm.26.2019.02.09.13.14.11
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 09 Feb 2019 13:14:10 -0800 (PST)
+        Sat, 09 Feb 2019 13:14:12 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-aio@kvack.org, linux-block@vger.kernel.org,
         linux-api@vger.kernel.org
 Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com, jannh@google.com,
         viro@ZenIV.linux.org.uk, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 10/19] io_uring: batch io_kiocb allocation
-Date:   Sat,  9 Feb 2019 14:13:37 -0700
-Message-Id: <20190209211346.26060-11-axboe@kernel.dk>
+Subject: [PATCH 11/19] block: implement bio helper to add iter bvec pages to bio
+Date:   Sat,  9 Feb 2019 14:13:38 -0700
+Message-Id: <20190209211346.26060-12-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190209211346.26060-1-axboe@kernel.dk>
 References: <20190209211346.26060-1-axboe@kernel.dk>
@@ -69,108 +69,168 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Similarly to how we use the state->ios_left to know how many references
-to get to a file, we can use it to allocate the io_kiocb's we need in
-bulk.
+For an ITER_BVEC, we can just iterate the iov and add the pages
+to the bio directly. This requires that the caller doesn't releases
+the pages on IO completion, we add a BIO_NO_PAGE_REF flag for that.
+
+The current two callers of bio_iov_iter_get_pages() are updated to
+check if they need to release pages on completion. This makes them
+work with bvecs that contain kernel mapped pages already.
 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/io_uring.c | 45 ++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 38 insertions(+), 7 deletions(-)
+ block/bio.c               | 59 ++++++++++++++++++++++++++++++++-------
+ fs/block_dev.c            |  5 ++--
+ fs/iomap.c                |  5 ++--
+ include/linux/blk_types.h |  1 +
+ 4 files changed, 56 insertions(+), 14 deletions(-)
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index faf329e81570..d9f7e90766c8 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -148,6 +148,13 @@ struct io_kiocb {
- struct io_submit_state {
- 	struct blk_plug plug;
+diff --git a/block/bio.c b/block/bio.c
+index 4db1008309ed..330df572cfb8 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -828,6 +828,23 @@ int bio_add_page(struct bio *bio, struct page *page,
+ }
+ EXPORT_SYMBOL(bio_add_page);
+ 
++static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
++{
++	const struct bio_vec *bv = iter->bvec;
++	unsigned int len;
++	size_t size;
++
++	len = min_t(size_t, bv->bv_len, iter->count);
++	size = bio_add_page(bio, bv->bv_page, len,
++				bv->bv_offset + iter->iov_offset);
++	if (size == len) {
++		iov_iter_advance(iter, size);
++		return 0;
++	}
++
++	return -EINVAL;
++}
++
+ #define PAGE_PTRS_PER_BVEC     (sizeof(struct bio_vec) / sizeof(struct page *))
+ 
+ /**
+@@ -876,23 +893,43 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ }
+ 
+ /**
+- * bio_iov_iter_get_pages - pin user or kernel pages and add them to a bio
++ * bio_iov_iter_get_pages - add user or kernel pages to a bio
+  * @bio: bio to add pages to
+- * @iter: iov iterator describing the region to be mapped
++ * @iter: iov iterator describing the region to be added
++ *
++ * This takes either an iterator pointing to user memory, or one pointing to
++ * kernel pages (BVEC iterator). If we're adding user pages, we pin them and
++ * map them into the kernel. On IO completion, the caller should put those
++ * pages. If we're adding kernel pages, we just have to add the pages to the
++ * bio directly. We don't grab an extra reference to those pages (the user
++ * should already have that), and we don't put the page on IO completion.
++ * The caller needs to check if the bio is flagged BIO_NO_PAGE_REF on IO
++ * completion. If it isn't, then pages should be released.
+  *
+- * Pins pages from *iter and appends them to @bio's bvec array. The
+- * pages will have to be released using put_page() when done.
+  * The function tries, but does not guarantee, to pin as many pages as
+- * fit into the bio, or are requested in *iter, whatever is smaller.
+- * If MM encounters an error pinning the requested pages, it stops.
+- * Error is returned only if 0 pages could be pinned.
++ * fit into the bio, or are requested in *iter, whatever is smaller. If
++ * MM encounters an error pinning the requested pages, it stops. Error
++ * is returned only if 0 pages could be pinned.
+  */
+ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ {
++	const bool is_bvec = iov_iter_is_bvec(iter);
+ 	unsigned short orig_vcnt = bio->bi_vcnt;
  
 +	/*
-+	 * io_kiocb alloc cache
++	 * If this is a BVEC iter, then the pages are kernel pages. Don't
++	 * release them on IO completion.
 +	 */
-+	void *reqs[IO_IOPOLL_BATCH];
-+	unsigned int free_reqs;
-+	unsigned int cur_req;
++	if (is_bvec)
++		bio_set_flag(bio, BIO_NO_PAGE_REF);
 +
- 	/*
- 	 * File reference cache
- 	 */
-@@ -281,20 +288,40 @@ static void io_ring_drop_ctx_refs(struct io_ring_ctx *ctx, unsigned refs)
- 		wake_up(&ctx->wait);
- }
- 
--static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx)
-+static struct io_kiocb *io_get_req(struct io_ring_ctx *ctx,
-+				   struct io_submit_state *state)
- {
- 	struct io_kiocb *req;
- 
- 	if (!percpu_ref_tryget(&ctx->refs))
- 		return NULL;
- 
--	req = kmem_cache_alloc(req_cachep, __GFP_NOWARN);
--	if (req) {
--		req->ctx = ctx;
--		req->flags = 0;
--		return req;
-+	if (!state) {
-+		req = kmem_cache_alloc(req_cachep, __GFP_NOWARN);
-+		if (unlikely(!req))
-+			goto out;
-+	} else if (!state->free_reqs) {
-+		size_t sz;
+ 	do {
+-		int ret = __bio_iov_iter_get_pages(bio, iter);
 +		int ret;
 +
-+		sz = min_t(size_t, state->ios_left, ARRAY_SIZE(state->reqs));
-+		ret = kmem_cache_alloc_bulk(req_cachep, __GFP_NOWARN, sz,
-+						state->reqs);
-+		if (unlikely(ret <= 0))
-+			goto out;
-+		state->free_reqs = ret - 1;
-+		state->cur_req = 1;
-+		req = state->reqs[0];
-+	} else {
-+		req = state->reqs[state->cur_req];
-+		state->free_reqs--;
-+		state->cur_req++;
++		if (is_bvec)
++			ret = __bio_iov_bvec_add_pages(bio, iter);
++		else
++			ret = __bio_iov_iter_get_pages(bio, iter);
+ 
+ 		if (unlikely(ret))
+ 			return bio->bi_vcnt > orig_vcnt ? 0 : ret;
+@@ -1634,7 +1671,8 @@ static void bio_dirty_fn(struct work_struct *work)
+ 		next = bio->bi_private;
+ 
+ 		bio_set_pages_dirty(bio);
+-		bio_release_pages(bio);
++		if (!bio_flagged(bio, BIO_NO_PAGE_REF))
++			bio_release_pages(bio);
+ 		bio_put(bio);
+ 	}
+ }
+@@ -1650,7 +1688,8 @@ void bio_check_pages_dirty(struct bio *bio)
+ 			goto defer;
  	}
  
-+	req->ctx = ctx;
-+	req->flags = 0;
-+	return req;
-+out:
- 	io_ring_drop_ctx_refs(ctx, 1);
- 	return NULL;
+-	bio_release_pages(bio);
++	if (!bio_flagged(bio, BIO_NO_PAGE_REF))
++		bio_release_pages(bio);
+ 	bio_put(bio);
+ 	return;
+ defer:
+diff --git a/fs/block_dev.c b/fs/block_dev.c
+index 392e2bfb636f..051ab41d1c61 100644
+--- a/fs/block_dev.c
++++ b/fs/block_dev.c
+@@ -338,8 +338,9 @@ static void blkdev_bio_end_io(struct bio *bio)
+ 		struct bio_vec *bvec;
+ 		int i;
+ 
+-		bio_for_each_segment_all(bvec, bio, i)
+-			put_page(bvec->bv_page);
++		if (!bio_flagged(bio, BIO_NO_PAGE_REF))
++			bio_for_each_segment_all(bvec, bio, i)
++				put_page(bvec->bv_page);
+ 		bio_put(bio);
+ 	}
  }
-@@ -980,7 +1007,7 @@ static int io_submit_sqe(struct io_ring_ctx *ctx, const struct sqe_submit *s,
- 	if (unlikely(s->sqe->flags))
- 		return -EINVAL;
+diff --git a/fs/iomap.c b/fs/iomap.c
+index 2ac9eb746d44..9389cf0a1c6f 100644
+--- a/fs/iomap.c
++++ b/fs/iomap.c
+@@ -1591,8 +1591,9 @@ static void iomap_dio_bio_end_io(struct bio *bio)
+ 		struct bio_vec *bvec;
+ 		int i;
  
--	req = io_get_req(ctx);
-+	req = io_get_req(ctx, state);
- 	if (unlikely(!req))
- 		return -EAGAIN;
- 
-@@ -1006,6 +1033,9 @@ static void io_submit_state_end(struct io_submit_state *state)
- {
- 	blk_finish_plug(&state->plug);
- 	io_file_put(state, NULL);
-+	if (state->free_reqs)
-+		kmem_cache_free_bulk(req_cachep, state->free_reqs,
-+					&state->reqs[state->cur_req]);
+-		bio_for_each_segment_all(bvec, bio, i)
+-			put_page(bvec->bv_page);
++		if (!bio_flagged(bio, BIO_NO_PAGE_REF))
++			bio_for_each_segment_all(bvec, bio, i)
++				put_page(bvec->bv_page);
+ 		bio_put(bio);
+ 	}
  }
- 
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index d66bf5f32610..791fee35df88 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -215,6 +215,7 @@ struct bio {
  /*
-@@ -1015,6 +1045,7 @@ static void io_submit_state_start(struct io_submit_state *state,
- 				  struct io_ring_ctx *ctx, unsigned max_ios)
- {
- 	blk_start_plug(&state->plug);
-+	state->free_reqs = 0;
- 	state->file = NULL;
- 	state->ios_left = max_ios;
- }
+  * bio flags
+  */
++#define BIO_NO_PAGE_REF	0	/* don't put release vec pages */
+ #define BIO_SEG_VALID	1	/* bi_phys_segments valid */
+ #define BIO_CLONED	2	/* doesn't own data */
+ #define BIO_BOUNCED	3	/* bio is a bounce bio */
 -- 
 2.17.1
 
