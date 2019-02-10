@@ -2,253 +2,118 @@ Return-Path: <SRS0=XSHr=QR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 405ADC282C4
-	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 02:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9F25C282C2
+	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 09:17:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EBDB521929
-	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 02:58:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90C6321841
+	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 09:17:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="flAyekj7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SG0RU987"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727269AbfBJC6C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Feb 2019 21:58:02 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:39341 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727177AbfBJC6B (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Feb 2019 21:58:01 -0500
-Received: by mail-pg1-f196.google.com with SMTP id r11so3345542pgp.6
-        for <linux-block@vger.kernel.org>; Sat, 09 Feb 2019 18:58:00 -0800 (PST)
+        id S1725984AbfBJJRz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Feb 2019 04:17:55 -0500
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:41691 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725948AbfBJJRy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 10 Feb 2019 04:17:54 -0500
+Received: by mail-ot1-f65.google.com with SMTP id u16so12848767otk.8;
+        Sun, 10 Feb 2019 01:17:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=bPtCSreIkdbPRVncddJsjhQ+S7BvvNkEJBrflCWr1fw=;
-        b=flAyekj7EkXxSXKX9SMtJie5dM5S3cJbkcOXYJq8kwzAJw/lnEyMkkx91Fm9z03tU5
-         CG3F5K7N75JmqPMmHFifiJTBkunaWgRmYmeYIuZZmxa15QT6YAfY8vArIBx3RaA9vgme
-         ILTfEsLOr/kB+rlOyyzSSoluQU13A/bPPnd6zb7q0Ro50sgjl9/NbT2ImE5VVcGB0brf
-         vvmwF6HtfsMQ1u4oJcwwNF4OkvvF0VMZ4wXooPdoaGh1Zk0GfBazTrzoEPMlfarLPd76
-         D1mEShl95b5wlysO14R2/DdcXvGAWkGG7OFzRfrSBUn3wtobSyiytEVMxmyj4HHUbPXb
-         iCiw==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=EFr+hrz2O53PiwqmX3QTtSp5XOzA10YBuRNlgpk5lRI=;
+        b=SG0RU9870xNNfMYjUSgdedMKAVqHQ/Gb5wx70W29faMoiyEyK/10ZJ0tWhkflRbqn5
+         uh63T5WBN3cGijq6MdV/LKswSWMSSdhtgQBAnkxFEfTB+7gBKFhZ6BNokS0mkGEFx55N
+         uU2/IvLfLzYAaKiSJunCpANsfTc6okCLOCwykwbs7CmAXbgTaEMxf2P9MUNwtQCDpaB0
+         K8+JCCuC51xB7zEqBT03Ounxe/9psbdT2mG8sSH0fazJMNBLdzxsiA6x4Ip0nJ9rcRFP
+         pvmeROZ3fo8ZmTtwqHSWIHI4cdziZroVWqnxPyLzGBahBw0n7j4zq1tod2YXQRSt7EFf
+         33cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=bPtCSreIkdbPRVncddJsjhQ+S7BvvNkEJBrflCWr1fw=;
-        b=X8wi1uPQCeb496abfa0bjHNuPXqrE9fctM2zjx2c/P77xzCZmQopxPlV1X8La/DxvQ
-         tilcCFi5yW9HROaJCLcjP33jdUvT3SbzoAGvGFFZKfsCnEpR3Mn9vCQi0mg6nVj1TkkC
-         AC8J18kSH/rl6u04cxWIbFL7l+oUlATCvgdSQu1kkBf7cZafQCfAyMaHUn/gsQN2MLJ7
-         dzgrk1EKK78Bs4vAv6iFACmNdMhm0YgAF7V5F/0NHwfkQnU/L9uCEO0vqliuDBWsL+Hq
-         CDDmZE1kIGffhUHCRotdFutfNbO1GocWLvx2ZhjvMbQr2M7VweRGmrGvUs6M7O9IMwYd
-         qWIA==
-X-Gm-Message-State: AHQUAuavkl7lPHwun/fqWd36gRduGmj57xXRRNeV8+nmiwy5ALECBuOK
-        vfmSLU/ZrAMLpi04TaaPCeiPtw==
-X-Google-Smtp-Source: AHgI3IZyKbgTdHyPjTMs6VeHnCNhQrTQIq3NqaXKsy1FqeOVHeQwHV5IWrp0zzdXz/A9Y3UOMN22Ig==
-X-Received: by 2002:a62:bd0c:: with SMTP id a12mr9732173pff.9.1549767480500;
-        Sat, 09 Feb 2019 18:58:00 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id s9sm7331950pgl.88.2019.02.09.18.57.57
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 09 Feb 2019 18:57:58 -0800 (PST)
-Subject: Re: [PATCH 14/19] io_uring: add file set registration
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Matt Mullins <mmullins@fb.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-aio@kvack.org" <linux-aio@kvack.org>,
-        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>
-Cc:     "hch@lst.de" <hch@lst.de>, "jannh@google.com" <jannh@google.com>,
-        "viro@ZenIV.linux.org.uk" <viro@ZenIV.linux.org.uk>,
-        "avi@scylladb.com" <avi@scylladb.com>,
-        "jmoyer@redhat.com" <jmoyer@redhat.com>
-References: <20190209211346.26060-1-axboe@kernel.dk>
- <20190209211346.26060-15-axboe@kernel.dk>
- <f722cc1a73bd7615d71fb020e87e5439f59947d7.camel@fb.com>
- <73a49fa3-9c42-4b25-4a6c-75749e5c0cea@kernel.dk>
- <60e4c6a489549daad1fb2c5e8eee5496c668d79a.camel@fb.com>
- <9e3d7c97-f649-ddb5-4a6f-0ab66742fc86@kernel.dk>
-Message-ID: <a5a59573-1a61-a2a8-a8a1-24d729ab141a@kernel.dk>
-Date:   Sat, 9 Feb 2019 19:57:56 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=EFr+hrz2O53PiwqmX3QTtSp5XOzA10YBuRNlgpk5lRI=;
+        b=JvJDwU4Y1XrGS0VtMW2Dks/QBegtOiGQi2QQyJsxdOVMiAOIUp7+DCB687+ORUQkLN
+         Y5Cu9+qu8mt+ChPD1V1+iKEtb2q7sv9/YqO31VddJ9zNBTZ9h7RQJ6dRNPJzsV4e6RfI
+         /1jmNBeIBhShD6wfbvb+VICvqVijP1Ub93j6JS5iLW9U8qZOC3hAAWWuHgCy5ng1LX3w
+         z8mFu9Yryl7PhpJ32b6a3SXZQO52LDWJs0qOju2ttT89g2zYfwtRtslKNxU6Xr7gaGRU
+         LzGjNbE2ZZrhVX3d5PiPwlRiCnZ4glx0YT3uFuEYccVsRTUZDgiYeDxs59JBRZw6ZjjS
+         RnYA==
+X-Gm-Message-State: AHQUAubFr7jD/QyeiCPQOoKAsyiLUyvTkaokbBDFwv2sO2HLfdMk7Z06
+        8n20QSn1TZUnnUwshY34NSGIHarTfiwpNOZMPIfy8w==
+X-Google-Smtp-Source: AHgI3Ia61A8ocEQHNaBrWbLS0V0k/nsaEzIySZDplbldwgnmc936zox5jw3CojIg10PjHY4Ab9/YRuHWBqZR2HL8tvU=
+X-Received: by 2002:a9d:61c8:: with SMTP id h8mr20982929otk.279.1549790273575;
+ Sun, 10 Feb 2019 01:17:53 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <9e3d7c97-f649-ddb5-4a6f-0ab66742fc86@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <CAM43=SO6bdDAEULEPArfgdbjLAYDo9OiPBa8gL4fsSg7Dky=gA@mail.gmail.com>
+ <1549736341.2971.7.camel@HansenPartnership.com>
+In-Reply-To: <1549736341.2971.7.camel@HansenPartnership.com>
+From:   Mikael Pettersson <mikpelinux@gmail.com>
+Date:   Sun, 10 Feb 2019 10:17:42 +0100
+Message-ID: <CAM43=SPUMzOLRmkoT+DQSpzu2DYRTyOhU6o8KRUU_Q902o2e1Q@mail.gmail.com>
+Subject: Re: [5.0-rc5 regression] "scsi: kill off the legacy IO path" causes 5
+ minute delay during boot on Sun Blade 2500
+To:     James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc:     Linux SPARC Kernel Mailing List <sparclinux@vger.kernel.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/9/19 7:34 PM, Jens Axboe wrote:
-> On 2/9/19 6:11 PM, Matt Mullins wrote:
->> On Sat, 2019-02-09 at 17:47 -0700, Jens Axboe wrote:
->>> On 2/9/19 4:52 PM, Matt Mullins wrote:
->>>>> @@ -1292,6 +1338,154 @@ static int io_cqring_wait(struct io_ring_ctx *ctx, int min_events,
->>>>>  	return READ_ONCE(ring->r.head) == READ_ONCE(ring->r.tail) ? ret : 0;
->>>>>  }
->>>>>  
->>>>> +static void __io_sqe_files_unregister(struct io_ring_ctx *ctx)
->>>>> +{
->>>>> +#if defined(CONFIG_UNIX)
->>>>> +	if (ctx->ring_sock) {
->>>>> +		struct sock *sock = ctx->ring_sock->sk;
->>>>> +		struct sk_buff *skb;
->>>>> +
->>>>> +		while ((skb = skb_dequeue(&sock->sk_receive_queue)) != NULL)
->>>>
->>>> Something's still a bit messy with destruction.  I get a traceback here
->>>> while running
->>>>
->>>>   int main() {
->>>>     struct io_uring_params uring_params = {
->>>>         .flags = IORING_SETUP_SQPOLL | IORING_SETUP_IOPOLL,
->>>>     };
->>>>     int uring_fd = 
->>>>         syscall(425 /* io_uring_setup */, 16, &uring_params);
->>>>     
->>>>     const __s32 fds[] = {1};
->>>>     
->>>>     syscall(427 /* io_uring_register */, uring_fd,
->>>>             IORING_REGISTER_FILES, fds, sizeof(fds) / sizeof(*fds));
->>>>   }
->>>>
->>>> I end up with the following spew:
->>>>
->>>> [  195.983322] WARNING: CPU: 1 PID: 1938 at ../net/unix/af_unix.c:500 unix_sock_destructor+0x97/0xc0
->>>> [  195.989556] Modules linked in:
->>>> [  195.992738] CPU: 1 PID: 1938 Comm: aio_buffered Tainted: G        W         5.0.0-rc5+ #379
->>>> [  196.000926] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
->>>> [  196.008316] RIP: 0010:unix_sock_destructor+0x97/0xc0
->>>> [  196.010912] Code: 3f 37 f3 ff 5b 5d be 00 02 00 00 48 c7 c7 6c 5b 9a 81 e9 8c 2a 71 ff 48 89 ef e8 c4 dc 87 ff eb be 0f 0b 48 83 7b 70 00 74 8b <0f> 0b 48 83 bb 68 02 00 00 00 74 89 0f 0b eb 85 48 89 de 48 c7 c7
->>>> [  196.018887] RSP: 0018:ffffc900008a7d40 EFLAGS: 00010282
->>>> [  196.020754] RAX: 0000000000000000 RBX: ffff8881351dd000 RCX: 0000000000000000
->>>> [  196.022811] RDX: 0000000000000001 RSI: 0000000000000282 RDI: 00000000ffffffff
->>>> [  196.024901] RBP: ffff8881351dd000 R08: 0000000000024120 R09: ffffffff819a97fe
->>>> [  196.026977] R10: ffffea0004cf6800 R11: 00000000005b8d80 R12: ffffffff81294ec2
->>>> [  196.029119] R13: ffff888134e27b40 R14: ffff88813bb307a0 R15: ffff888133d59910
->>>> [  196.031071] FS:  00007f1a8a8c3740(0000) GS:ffff88813bb00000(0000) knlGS:0000000000000000
->>>> [  196.033069] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>> [  196.034438] CR2: 00007f1a8aba5920 CR3: 000000000260e004 CR4: 00000000003606a0
->>>> [  196.036310] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->>>> [  196.038399] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->>>> [  196.039794] Call Trace:
->>>> [  196.040259]  __sk_destruct+0x1c/0x150
->>>> [  196.040964]  ? io_sqe_files_unregister+0x32/0x70
->>>> [  196.041841]  unix_destruct_scm+0x76/0xa0
->>>> [  196.042587]  skb_release_head_state+0x38/0x60
->>>> [  196.043401]  skb_release_all+0x9/0x20
->>>> [  196.044034]  kfree_skb+0x2d/0xb0
->>>> [  196.044603]  io_sqe_files_unregister+0x32/0x70
->>>> [  196.045385]  io_ring_ctx_wait_and_kill+0xf6/0x1a0
->>>> [  196.046220]  io_uring_release+0x17/0x20
->>>> [  196.046881]  __fput+0x9d/0x1d0
->>>> [  196.047421]  task_work_run+0x7a/0x90
->>>> [  196.048045]  do_exit+0x301/0xc20
->>>> [  196.048626]  ? handle_mm_fault+0xf3/0x230
->>>> [  196.049321]  do_group_exit+0x35/0xa0
->>>> [  196.049944]  __x64_sys_exit_group+0xf/0x10
->>>> [  196.050658]  do_syscall_64+0x3d/0xf0
->>>> [  196.051317]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>>> [  196.052217] RIP: 0033:0x7f1a8aba5956
->>>> [  196.052859] Code: Bad RIP value.
->>>> [  196.053488] RSP: 002b:00007fffbdbcad38 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
->>>> [  196.054902] RAX: ffffffffffffffda RBX: 00007f1a8ac975c0 RCX: 00007f1a8aba5956
->>>> [  196.056124] RDX: 0000000000000000 RSI: 000000000000003c RDI: 0000000000000000
->>>> [  196.057348] RBP: 0000000000000000 R08: 00000000000000e7 R09: ffffffffffffff78
->>>> [  196.058573] R10: 00007fffbdbcabf8 R11: 0000000000000246 R12: 00007f1a8ac975c0
->>>> [  196.059459] R13: 0000000000000001 R14: 00007f1a8aca0288 R15: 0000000000000000
->>>> [  196.060731] ---[ end trace 8a7e42f9199e5f92 ]---
->>>> [  196.062671] WARNING: CPU: 1 PID: 1938 at ../net/unix/af_unix.c:501 unix_sock_destructor+0xa3/0xc0
->>>> [  196.064372] Modules linked in:
->>>> [  196.064966] CPU: 1 PID: 1938 Comm: aio_buffered Tainted: G        W         5.0.0-rc5+ #379
->>>> [  196.066546] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
->>>> [  196.068234] RIP: 0010:unix_sock_destructor+0xa3/0xc0
->>>> [  196.068999] Code: c7 c7 6c 5b 9a 81 e9 8c 2a 71 ff 48 89 ef e8 c4 dc 87 ff eb be 0f 0b 48 83 7b 70 00 74 8b 0f 0b 48 83 bb 68 02 00 00 00 74 89 <0f> 0b eb 85 48 89 de 48 c7 c7 a0 c8 42 82 5b 5d e9 31 8c 75 ff 0f
->>>> [  196.072577] RSP: 0018:ffffc900008a7d40 EFLAGS: 00010282
->>>> [  196.073595] RAX: 0000000000000000 RBX: ffff8881351dd000 RCX: 0000000000000000
->>>> [  196.074973] RDX: 0000000000000001 RSI: 0000000000000282 RDI: 00000000ffffffff
->>>> [  196.076348] RBP: ffff8881351dd000 R08: 0000000000024120 R09: ffffffff819a97fe
->>>> [  196.077709] R10: ffffea0004cf6800 R11: 00000000005b8d80 R12: ffffffff81294ec2
->>>> [  196.079072] R13: ffff888134e27b40 R14: ffff88813bb307a0 R15: ffff888133d59910
->>>> [  196.080441] FS:  00007f1a8a8c3740(0000) GS:ffff88813bb00000(0000) knlGS:0000000000000000
->>>> [  196.082026] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>> [  196.083131] CR2: 00007fbc19f96550 CR3: 0000000138d1e003 CR4: 00000000003606a0
->>>> [  196.084505] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->>>> [  196.085823] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->>>> [  196.087185] Call Trace:
->>>> [  196.087662]  __sk_destruct+0x1c/0x150
->>>> [  196.088376]  ? io_sqe_files_unregister+0x32/0x70
->>>> [  196.089299]  unix_destruct_scm+0x76/0xa0
->>>> [  196.090059]  skb_release_head_state+0x38/0x60
->>>> [  196.090929]  skb_release_all+0x9/0x20
->>>> [  196.091550]  kfree_skb+0x2d/0xb0
->>>> [  196.092745]  io_sqe_files_unregister+0x32/0x70
->>>> [  196.093535]  io_ring_ctx_wait_and_kill+0xf6/0x1a0
->>>> [  196.094358]  io_uring_release+0x17/0x20
->>>> [  196.095029]  __fput+0x9d/0x1d0
->>>> [  196.095660]  task_work_run+0x7a/0x90
->>>> [  196.096307]  do_exit+0x301/0xc20
->>>> [  196.096808]  ? handle_mm_fault+0xf3/0x230
->>>> [  196.097504]  do_group_exit+0x35/0xa0
->>>> [  196.098126]  __x64_sys_exit_group+0xf/0x10
->>>> [  196.098836]  do_syscall_64+0x3d/0xf0
->>>> [  196.099460]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>>> [  196.100334] RIP: 0033:0x7f1a8aba5956
->>>> [  196.100958] Code: Bad RIP value.
->>>> [  196.101293] RSP: 002b:00007fffbdbcad38 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
->>>> [  196.101933] RAX: ffffffffffffffda RBX: 00007f1a8ac975c0 RCX: 00007f1a8aba5956
->>>> [  196.102535] RDX: 0000000000000000 RSI: 000000000000003c RDI: 0000000000000000
->>>> [  196.103137] RBP: 0000000000000000 R08: 00000000000000e7 R09: ffffffffffffff78
->>>> [  196.103739] R10: 00007fffbdbcabf8 R11: 0000000000000246 R12: 00007f1a8ac975c0
->>>> [  196.104526] R13: 0000000000000001 R14: 00007f1a8aca0288 R15: 0000000000000000
->>>> [  196.105777] ---[ end trace 8a7e42f9199e5f93 ]---
->>>> [  196.107535] unix: Attempt to release alive unix socket: 000000003b3c1a34
->>>>
->>>> which corresponds to the WARN_ONs:
->>>>
->>>> 	WARN_ON(!sk_unhashed(sk));
->>>> 	WARN_ON(sk->sk_socket);
->>>>
->>>> This doesn't seem to happen if I omit the call to io_uring_register.
->>>
->>> Huh, I can't reproduce that here, teardown seems to work just fine. It
->>> looks like the socket is getting torn down prematurely, when we free the
->>> skb. I wonder if you have some networking options I don't? What's your
->>> .config?
->>>
->>
->> Interesting.  Attached is the config I'm using to build
->> af22d31f8b09fa36f57569c95f4943febaacb2b1.  I'll keep playing with it on
->> my end, too, maybe I've got something bad in my ccache.
-> 
-> Bingo, reproduces with your .config. Looks like the io_uring is released
-> basically as soon as we queue the skb in the socket. I'll take a look at
-> this tomorrow.
+On Sat, Feb 9, 2019 at 7:19 PM James Bottomley
+<James.Bottomley@hansenpartnership.com> wrote:
+>
+> On Sat, 2019-02-09 at 18:04 +0100, Mikael Pettersson wrote:
+> > 4.20 and earlier kernels boot fine on my Sun Blade 2500 (UltraSPARC
+> > IIIi), but the 5.0-rc kernels consistently experience a 5 minute
+> > delay
+> > late during boot, after enabling networking but before allowing user
+> > logins.  E.g. 5.0-rc5 dmesg has:
+> >
+> > [Fri Feb  8 17:13:17 2019] random: dbus-daemon: uninitialized urandom
+> > read (12 bytes read)
+> > [Fri Feb  8 17:18:14 2019] random: crng init done
+>
+> I've had the same problem on several of my test systems.  Are you sure
+> it's not this bug report:
+>
+> https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=912087
+>
+> ?
+>
+> The solution for me was to install the haveged package which does
+> active entropy gathering during boot and can make /dev/urandom
+> available much earlier.
 
-OK, I think I see it. Apparently with my options, the size of the skb is
-0 when I pass in 0. With your options, it's non-zero, which wreaks havoc
-on the ref counting.
+Thanks for the hint, I'll look into using haveged on this machine.
 
-The below should fix it. I'll fold this in now.
+>
+> > During this interval the machine answers pings but won't allow user
+> > logins either on the console or over the network.
+> >
+> > A git bisect identified commit
+> > f664a3cc17b7d0a2bc3b3ab96181e1029b0ec0e6
+> > Author: Jens Axboe <axboe@kernel.dk>
+> > Date:   Thu Nov 1 16:36:27 2018 -0600
+> >
+> >     scsi: kill off the legacy IO path
+> >
+> > as the point where this 5m delay was introduced.
+>
+> I think the reason for this is that the block mq path doesn't feed the
+> kernel entropy pool correctly, hence the need to install an entropy
+> gatherer for systems that don't have other good random number sources.
 
-diff --git a/fs/io_uring.c b/fs/io_uring.c
-index d7a10484d748..c8794a11de3e 100644
---- a/fs/io_uring.c
-+++ b/fs/io_uring.c
-@@ -2006,6 +2006,7 @@ static int __io_sqe_files_scm(struct io_ring_ctx *ctx, int nr, int offset)
- 
- 	fpl->max = fpl->count = nr;
- 	UNIXCB(skb).fp = fpl;
-+	refcount_add(skb->truesize, &ctx->ring_sock->sk->sk_wmem_alloc);
- 	skb_queue_head(&ctx->ring_sock->sk->sk_receive_queue, skb);
- 
- 	for (i = 0; i < nr; i++)
+That does sound plausible, I admit I didn't even consider the possibility that
+the old block I/O path also was an entropy source.
 
--- 
-Jens Axboe
-
+/Mikael
