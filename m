@@ -2,79 +2,117 @@ Return-Path: <SRS0=XSHr=QR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E98A9C282C2
-	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 16:39:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE115C282C2
+	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 17:22:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C4D9121773
-	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 16:39:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C20F21736
+	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 17:22:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="laa7rfJ3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726267AbfBJQjb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Feb 2019 11:39:31 -0500
-Received: from Galois.linutronix.de ([146.0.238.70]:37170 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726134AbfBJQja (ORCPT
+        id S1726207AbfBJRWH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Feb 2019 12:22:07 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:35507 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725871AbfBJRWH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Feb 2019 11:39:30 -0500
-Received: from p5492e0d8.dip0.t-ipconnect.de ([84.146.224.216] helo=nanos)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1gss8Y-0006jE-Ej; Sun, 10 Feb 2019 17:39:22 +0100
-Date:   Sun, 10 Feb 2019 17:39:20 +0100 (CET)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Ming Lei <ming.lei@redhat.com>
-cc:     Christoph Hellwig <hch@lst.de>, Bjorn Helgaas <helgaas@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org
-Subject: Re: [PATCH 4/5] nvme-pci: simplify nvme_setup_irqs() via .setup_affinity
- callback
-In-Reply-To: <20190125095347.17950-5-ming.lei@redhat.com>
-Message-ID: <alpine.DEB.2.21.1902101731370.8784@nanos.tec.linutronix.de>
-References: <20190125095347.17950-1-ming.lei@redhat.com> <20190125095347.17950-5-ming.lei@redhat.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+        Sun, 10 Feb 2019 12:22:07 -0500
+Received: by mail-qt1-f195.google.com with SMTP id p48so8198301qtk.2;
+        Sun, 10 Feb 2019 09:22:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=+BGbKnzjyDx8WuUGVQrygvBh91FJ8/nYvqrgX2NjAj8=;
+        b=laa7rfJ3/aup8ab17Zmd4IqSonpVX4q4GmV4QcO8/ZeAtFCpVZbm05N9FHp2qY2gaB
+         KxK+DnB6uMcbXi0tSrKoxlLbpd1MSyL1Bn1ISm08H0Jbm3pcZWtrTgmvNJO6gVZ+6OMU
+         0xIi5dhyZVvO7ggy6an+YNqpCRJdo4FVKeN18lZO8cPtMIVd2bJuQGuof3IzWCWFwcqX
+         P7emHGapxib4kSg3DTm79MxgGe6gXgPyzYrLM8BPq4Bn3d0r+dcc5tY6UZl47ibvGx1l
+         7RLlpumcAOK/7N4Kmlb7krm2T74/JWvvO3VDAQawK7Nq3+dvCcnY2a0xXncRVAV4mmTn
+         rtrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=+BGbKnzjyDx8WuUGVQrygvBh91FJ8/nYvqrgX2NjAj8=;
+        b=enbEBnBcXmXrr3XTXRvPfE/lt8ambu+jdqKQ//fk8xMeoRktW13OahLSfNTK3hI06G
+         qoHHrX9JJBGKqWM/ksdknuPa39yEigiiUSd5BKfRQnsB/E8gJBCISbjl1Otj72l5od6/
+         A6Oe0+KR9bDIaxP6u5N8bAuR4CcqlawyZFMTvXGQWI/qYTnMlU4kopuLE+ZHzhniXjgX
+         7js2Ozu++fUIg51YAEm3jlhjOPAhs7XfD2sPu7Uresn/Ff22y7RCOx2ZjpK8mKJeGTEb
+         dlaMWa5d7vIh9KeeIJQOT3wL2n+69WNpezWE/OYXUpXT1sI+eu6SemZCrBk/XSSYnXyo
+         RlOA==
+X-Gm-Message-State: AHQUAuaDYXFSki0fMhZq0wg9Z4MvtchhLjM7HizNuy4I9RRJF1EFXbDm
+        aI3RjGsZYH/RqIUNJtjLxPJEFBkKwss=
+X-Google-Smtp-Source: AHgI3Ia6sf3/hhwRzRvvH7muBi5C/t53A1y9Ay+8nGeBrBGPwLODmNYBJ295N27OnjUCdYsxj35WOQ==
+X-Received: by 2002:ac8:4453:: with SMTP id m19mr14065268qtn.303.1549819325855;
+        Sun, 10 Feb 2019 09:22:05 -0800 (PST)
+Received: from localhost.localdomain (189.26.177.147.dynamic.adsl.gvt.net.br. [189.26.177.147])
+        by smtp.gmail.com with ESMTPSA id e4sm6150690qkg.15.2019.02.10.09.22.02
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 10 Feb 2019 09:22:04 -0800 (PST)
+From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org (open list:BLOCK LAYER)
+Subject: [PATCH v2] blk-sysfs: Rework documention of __blk_release_queue
+Date:   Sun, 10 Feb 2019 15:22:51 -0200
+Message-Id: <20190210172251.17531-1-marcos.souza.org@gmail.com>
+X-Mailer: git-send-email 2.16.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 25 Jan 2019, Ming Lei wrote:
+The Notes section of the comment was removed, because now
+blk_release_queue can only be executed from blk_cleanup_queue (being
+called when the q->kobj reaches zero), and also blk_init_queue was removed
+in a1ce35fa4985.
 
-> Use the callback of .setup_affinity() to re-caculate number
-> of queues, and build irqs affinity with help of irq_build_affinity().
-> 
-> Then nvme_setup_irqs() gets simplified a lot.
+Signed-off-by: Marcos Paulo de Souza <marcos.souza.org@gmail.com>
+---
+ Changes from v1:
+ * Typos, suggested by Jens Axboe
 
-I'm pretty sure you can achieve the same by reworking the core code without
-that callback.
+ block/blk-sysfs.c | 19 +++++++------------
+ 1 file changed, 7 insertions(+), 12 deletions(-)
+
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 590d1ef2f961..94e1b052abbc 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -817,21 +817,16 @@ static void blk_free_queue_rcu(struct rcu_head *rcu_head)
+ }
  
-> +	/* Fill out vectors at the beginning that don't need affinity */
-> +	for (curvec = 0; curvec < affd->pre_vectors; curvec++)
-> +		cpumask_copy(&masks[curvec].mask, cpu_possible_mask);
-
-cpu_possible_mask is wrong.  Why are you deliberately trying to make this
-special? There is absolutely no reason to do so.
-
-These interrupts are not managed and therefore the initial affinity has to
-be irq_default_affinity. Setting them to cpu_possible_mask can and probably
-will evade a well thought out default affinity mask, which was set to
-isolate a set of cores from general purpose interrupts.
-
-This is exactly the thing which happens with driver special stuff and which
-needs to be avoided. There is nothing special about this NVME setup and
-yes, I can see why the current core code is a bit tedious to work with, but
-that does not justify that extra driver magic by any means.
-
-Thanks,
-
-	tglx
+ /**
+- * __blk_release_queue - release a request queue when it is no longer needed
++ * __blk_release_queue - release a request queue
+  * @work: pointer to the release_work member of the request queue to be released
+  *
+  * Description:
+- *     blk_release_queue is the counterpart of blk_init_queue(). It should be
+- *     called when a request queue is being released; typically when a block
+- *     device is being de-registered. Its primary task it to free the queue
+- *     itself.
+- *
+- * Notes:
+- *     The low level driver must have finished any outstanding requests first
+- *     via blk_cleanup_queue().
+- *
+- *     Although blk_release_queue() may be called with preemption disabled,
+- *     __blk_release_queue() may sleep.
++ *     This function is called when a block device is being unregistered. The
++ *     process of releasing a request queue starts with blk_cleanup_queue, which
++ *     set the appropriate flags and then calls blk_put_queue, that decrements
++ *     the reference counter of the request queue. Once the reference counter
++ *     of the request queue reaches zero, blk_release_queue is called to release
++ *     all allocated resources of the request queue.
+  */
+ static void __blk_release_queue(struct work_struct *work)
+ {
+-- 
+2.16.4
 
