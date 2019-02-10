@@ -2,117 +2,87 @@ Return-Path: <SRS0=XSHr=QR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE115C282C2
-	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 17:22:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D66CCC282D7
+	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 17:23:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C20F21736
-	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 17:22:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EE6F2173C
+	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 17:23:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="laa7rfJ3"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ZOckbsXP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726207AbfBJRWH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Feb 2019 12:22:07 -0500
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:35507 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725871AbfBJRWH (ORCPT
+        id S1725958AbfBJRXx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Feb 2019 12:23:53 -0500
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:43027 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726096AbfBJRXx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Feb 2019 12:22:07 -0500
-Received: by mail-qt1-f195.google.com with SMTP id p48so8198301qtk.2;
-        Sun, 10 Feb 2019 09:22:06 -0800 (PST)
+        Sun, 10 Feb 2019 12:23:53 -0500
+Received: by mail-pf1-f196.google.com with SMTP id q17so750015pfh.10
+        for <linux-block@vger.kernel.org>; Sun, 10 Feb 2019 09:23:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=+BGbKnzjyDx8WuUGVQrygvBh91FJ8/nYvqrgX2NjAj8=;
-        b=laa7rfJ3/aup8ab17Zmd4IqSonpVX4q4GmV4QcO8/ZeAtFCpVZbm05N9FHp2qY2gaB
-         KxK+DnB6uMcbXi0tSrKoxlLbpd1MSyL1Bn1ISm08H0Jbm3pcZWtrTgmvNJO6gVZ+6OMU
-         0xIi5dhyZVvO7ggy6an+YNqpCRJdo4FVKeN18lZO8cPtMIVd2bJuQGuof3IzWCWFwcqX
-         P7emHGapxib4kSg3DTm79MxgGe6gXgPyzYrLM8BPq4Bn3d0r+dcc5tY6UZl47ibvGx1l
-         7RLlpumcAOK/7N4Kmlb7krm2T74/JWvvO3VDAQawK7Nq3+dvCcnY2a0xXncRVAV4mmTn
-         rtrg==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=u7TBLiFTOhloJiBROWRCYpfEUdDb/LIToCy/X+D/lmg=;
+        b=ZOckbsXPJqY9wIJbazoH4DhjSAxS9Eem2ee9I076IihChQuEUdcHfR3RKjKB4J/SRM
+         9hsOjDz9H8W+GwWzxZS40X2PQxG+uxEKdLqVPevED2tMhSAbbwLx/Wk8mnvjK+MXuicP
+         8ap1e/3TtkAFH7vkMgWx5bp1Ul6MCfHZZPRl9hyqKYBaF76Q0LCqP8GPrpI+R8p4c0/Z
+         L2qeWkA0fRgQ6GbU8feO8wCwEcvkoz70LudfeM+TmDbiLVbMfi1ICvmWktFbp4d7e1oj
+         J1/FJMfP2oqna4Dn2lTYHFW3DSzVzoI561du5uAAo9vTlInuGguedzGv1RwVkm0wEA3p
+         0AgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=+BGbKnzjyDx8WuUGVQrygvBh91FJ8/nYvqrgX2NjAj8=;
-        b=enbEBnBcXmXrr3XTXRvPfE/lt8ambu+jdqKQ//fk8xMeoRktW13OahLSfNTK3hI06G
-         qoHHrX9JJBGKqWM/ksdknuPa39yEigiiUSd5BKfRQnsB/E8gJBCISbjl1Otj72l5od6/
-         A6Oe0+KR9bDIaxP6u5N8bAuR4CcqlawyZFMTvXGQWI/qYTnMlU4kopuLE+ZHzhniXjgX
-         7js2Ozu++fUIg51YAEm3jlhjOPAhs7XfD2sPu7Uresn/Ff22y7RCOx2ZjpK8mKJeGTEb
-         dlaMWa5d7vIh9KeeIJQOT3wL2n+69WNpezWE/OYXUpXT1sI+eu6SemZCrBk/XSSYnXyo
-         RlOA==
-X-Gm-Message-State: AHQUAuaDYXFSki0fMhZq0wg9Z4MvtchhLjM7HizNuy4I9RRJF1EFXbDm
-        aI3RjGsZYH/RqIUNJtjLxPJEFBkKwss=
-X-Google-Smtp-Source: AHgI3Ia6sf3/hhwRzRvvH7muBi5C/t53A1y9Ay+8nGeBrBGPwLODmNYBJ295N27OnjUCdYsxj35WOQ==
-X-Received: by 2002:ac8:4453:: with SMTP id m19mr14065268qtn.303.1549819325855;
-        Sun, 10 Feb 2019 09:22:05 -0800 (PST)
-Received: from localhost.localdomain (189.26.177.147.dynamic.adsl.gvt.net.br. [189.26.177.147])
-        by smtp.gmail.com with ESMTPSA id e4sm6150690qkg.15.2019.02.10.09.22.02
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=u7TBLiFTOhloJiBROWRCYpfEUdDb/LIToCy/X+D/lmg=;
+        b=b5tswpMuY7uid35IfFJCSec7v2wUZzjw+AgDQLjwtUAiicEiItHar2Lk8wP2sLDY80
+         ODtRCJ5sXlHenA0ffU4D0iBnO0AunhOihYXAlpc5tnWuw0a7MrppbDS9sNjLa2+Hd0jV
+         2e/ArjfW5IoIfsbcL3Rqp1BwJBUx5j6DUvvAapd0PBbAhBEcebSFFxGyH8lC+uMOQsEl
+         7NqlcB3IJ1ekc1HDv8+HV7JOYcOT4gCUEn6Q3We8L2031Y8hoxhP1B3clSdKYc4vYf8z
+         AXa6vH/xMx9ZL8FeDnvx66+0Hzuhss/rRsLYzFAPu22WMx3hrDkjKiEDFH8W7N0H1Wyg
+         xSNg==
+X-Gm-Message-State: AHQUAuaKm3IeniBr0/oIM0GbnXHIgzCPPr2Bid974UJYupdDWGTIvAAz
+        iR133kNUjBGgEI/9G3qHmZxkbkcIO08IgQ==
+X-Google-Smtp-Source: AHgI3IbGJ9rvJkE25VyUSnjQjnFZIPnX+bi1DCvJZoHqCzOo+Q24pLVfz0p+9c/NYr6yriJzLpUDmA==
+X-Received: by 2002:a63:184a:: with SMTP id 10mr29474181pgy.81.1549819432048;
+        Sun, 10 Feb 2019 09:23:52 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id c4sm17170802pfm.151.2019.02.10.09.23.50
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 10 Feb 2019 09:22:04 -0800 (PST)
-From:   Marcos Paulo de Souza <marcos.souza.org@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org (open list:BLOCK LAYER)
-Subject: [PATCH v2] blk-sysfs: Rework documention of __blk_release_queue
-Date:   Sun, 10 Feb 2019 15:22:51 -0200
-Message-Id: <20190210172251.17531-1-marcos.souza.org@gmail.com>
-X-Mailer: git-send-email 2.16.4
+        Sun, 10 Feb 2019 09:23:51 -0800 (PST)
+Subject: Re: [PATCH v2] blk-sysfs: Rework documention of __blk_release_queue
+To:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
+        linux-kernel@vger.kernel.org
+Cc:     "open list:BLOCK LAYER" <linux-block@vger.kernel.org>
+References: <20190210172251.17531-1-marcos.souza.org@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <d3d0bfac-4441-9227-b926-4315d78e5b75@kernel.dk>
+Date:   Sun, 10 Feb 2019 10:23:49 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <20190210172251.17531-1-marcos.souza.org@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The Notes section of the comment was removed, because now
-blk_release_queue can only be executed from blk_cleanup_queue (being
-called when the q->kobj reaches zero), and also blk_init_queue was removed
-in a1ce35fa4985.
+On 2/10/19 10:22 AM, Marcos Paulo de Souza wrote:
+> The Notes section of the comment was removed, because now
+> blk_release_queue can only be executed from blk_cleanup_queue (being
+> called when the q->kobj reaches zero), and also blk_init_queue was removed
+> in a1ce35fa4985.
 
-Signed-off-by: Marcos Paulo de Souza <marcos.souza.org@gmail.com>
----
- Changes from v1:
- * Typos, suggested by Jens Axboe
+Thanks, applied.
 
- block/blk-sysfs.c | 19 +++++++------------
- 1 file changed, 7 insertions(+), 12 deletions(-)
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 590d1ef2f961..94e1b052abbc 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -817,21 +817,16 @@ static void blk_free_queue_rcu(struct rcu_head *rcu_head)
- }
- 
- /**
-- * __blk_release_queue - release a request queue when it is no longer needed
-+ * __blk_release_queue - release a request queue
-  * @work: pointer to the release_work member of the request queue to be released
-  *
-  * Description:
-- *     blk_release_queue is the counterpart of blk_init_queue(). It should be
-- *     called when a request queue is being released; typically when a block
-- *     device is being de-registered. Its primary task it to free the queue
-- *     itself.
-- *
-- * Notes:
-- *     The low level driver must have finished any outstanding requests first
-- *     via blk_cleanup_queue().
-- *
-- *     Although blk_release_queue() may be called with preemption disabled,
-- *     __blk_release_queue() may sleep.
-+ *     This function is called when a block device is being unregistered. The
-+ *     process of releasing a request queue starts with blk_cleanup_queue, which
-+ *     set the appropriate flags and then calls blk_put_queue, that decrements
-+ *     the reference counter of the request queue. Once the reference counter
-+ *     of the request queue reaches zero, blk_release_queue is called to release
-+ *     all allocated resources of the request queue.
-  */
- static void __blk_release_queue(struct work_struct *work)
- {
 -- 
-2.16.4
+Jens Axboe
 
