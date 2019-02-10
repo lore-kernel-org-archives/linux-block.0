@@ -2,86 +2,80 @@ Return-Path: <SRS0=XSHr=QR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB28FC282C2
-	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 15:24:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D87EC282C2
+	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 15:44:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A3F3321773
-	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 15:24:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 67D1621773
+	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 15:44:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="L4JJxMaF"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="dFEsAfPK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726102AbfBJPYj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Feb 2019 10:24:39 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:36581 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726167AbfBJPYj (ORCPT
+        id S1726157AbfBJPog (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Feb 2019 10:44:36 -0500
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:38602 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726102AbfBJPog (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Feb 2019 10:24:39 -0500
-Received: by mail-pl1-f196.google.com with SMTP id g9so4070678plo.3
-        for <linux-block@vger.kernel.org>; Sun, 10 Feb 2019 07:24:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=YkBV2Luy6JDa+eoYSZZrkwq1U1aY1C2Hv2PLNg6uGwU=;
-        b=L4JJxMaFo9uVK+ZxzcxAqG6d1cFl1z6A0CILcufJbOydfQgy5IB1BLhIbLFxN7FPps
-         b1OVtbns9HfRGw3jVmMRvSULWPUOyGyN+kM9HmB9VK+amNAKoUffmHen8+qZM3pno4mz
-         19Kj1BMV7Kwr9/8FLvXc1MXZ4CNQRq/sk84qP79X3pXiBYvGKdNAMdbQUybTNuUmFd6e
-         lQR8pHd9ezJgOMOH8/wo0CrG4jWjX720N3fFbML4H+x7fxkFk20A9ZngiQhIZHwY/pC9
-         5/6OnHTUNW9aC4uvcUpvXl9tZnoAWXLLc4PIgSGE8j1O+jRSho1zVl9DaOXgRaA5sVsW
-         QcTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=YkBV2Luy6JDa+eoYSZZrkwq1U1aY1C2Hv2PLNg6uGwU=;
-        b=VQRVZsWANy+DTQIWSI1Yt0VWvrWf9VJewdRlIjcdNl/iHXl3icBm7HjWo04bDHU6mY
-         M5W622BupLqPylvc0ObbXh/5bqNCUD5w4oZsCiuhSFQFI2ty6TiWqMEnSEtqBLNq/53A
-         gksps4EttLlt9B4c1ulKYGquOmUHVANNEchufOF7/2CB49R9ByxzMgiDbs9iqSRbe4j0
-         27yIutZWP1fsSBL+a9yfa4W+s7DRRh3ar8rI9fxcAm4e4ypSZPjMErEiVsu6S00UkRkz
-         TIH5lTGMx4VEIGYIfMXgHBd+DPnh0HulnUX8/tY647OJ2vojBObJpJ4T8F7U4eQqhXfR
-         anZw==
-X-Gm-Message-State: AHQUAuYqvFkkpdEw9P6wcKSMrWdd0YhchucxxO5E0mIM/3BW0e5ACSVj
-        eKaphLaRSJDHbOJVIkV8PUeJlsfwO4aSbw==
-X-Google-Smtp-Source: AHgI3IbPIp68qq0VR4xrdSYgqWF2qXE4rnN59/mQkdJOYePV4gUQw4xj3Uci5fTQk4lAs/Xn7EMV7w==
-X-Received: by 2002:a17:902:ab92:: with SMTP id f18mr32281119plr.221.1549812278401;
-        Sun, 10 Feb 2019 07:24:38 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id 125sm11804567pfx.159.2019.02.10.07.24.37
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 10 Feb 2019 07:24:37 -0800 (PST)
-Subject: Re: [PATCH] blk-cgroup: Fix doc related to blkcg_exit_queue
-To:     Marcos Paulo de Souza <marcos.souza.org@gmail.com>,
-        linux-kernel@vger.kernel.org
-Cc:     "open list:BLOCK LAYER" <linux-block@vger.kernel.org>
-References: <20190125020142.921371-1-marcos.souza.org@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <6ba6bb55-13bb-819e-f606-d599f8e6cc7e@kernel.dk>
-Date:   Sun, 10 Feb 2019 08:24:35 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20190125020142.921371-1-marcos.souza.org@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+        Sun, 10 Feb 2019 10:44:36 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id DC5068EE241;
+        Sun, 10 Feb 2019 07:44:35 -0800 (PST)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id GmAphG2JzslT; Sun, 10 Feb 2019 07:44:35 -0800 (PST)
+Received: from [153.66.254.194] (unknown [50.35.68.20])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 51B058EE11D;
+        Sun, 10 Feb 2019 07:44:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1549813475;
+        bh=bfAHZlIHFh1pAdRQzDP3gBnaZhpc94Phapk8wrxA9mo=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=dFEsAfPK9N/4fd487b9z45FRp3pcGUNeW8yLZm+Yx1gHC2gj/DfI1gijLqTVB/tK+
+         EfAIvzBNbNdiVxKCT/NjAK/59ENEVgJ0YjIKqBuCUHE+RbGURe9P14b6bSVG0RaRTU
+         Psoawfb6ILtyDBe54HwxfXcS3iMUsydGybp7UXZA=
+Message-ID: <1549813472.4142.3.camel@HansenPartnership.com>
+Subject: Re: [5.0-rc5 regression] "scsi: kill off the legacy IO path" causes
+ 5 minute delay during boot on Sun Blade 2500
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Mikael Pettersson <mikpelinux@gmail.com>
+Cc:     Linux SPARC Kernel Mailing List <sparclinux@vger.kernel.org>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Sun, 10 Feb 2019 07:44:32 -0800
+In-Reply-To: <CAM43=SPUMzOLRmkoT+DQSpzu2DYRTyOhU6o8KRUU_Q902o2e1Q@mail.gmail.com>
+References: <CAM43=SO6bdDAEULEPArfgdbjLAYDo9OiPBa8gL4fsSg7Dky=gA@mail.gmail.com>
+         <1549736341.2971.7.camel@HansenPartnership.com>
+         <CAM43=SPUMzOLRmkoT+DQSpzu2DYRTyOhU6o8KRUU_Q902o2e1Q@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.26.6 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/24/19 7:01 PM, Marcos Paulo de Souza wrote:
-> Since 4cf6324b17e9, a portion of function blk_cleanup_queue was moved to
-> a newly created function called blk_exit_queue, including the call of
-> blkcg_exit_queue. So, adjust the documenation according.
+On Sun, 2019-02-10 at 10:17 +0100, Mikael Pettersson wrote:
+> On Sat, Feb 9, 2019 at 7:19 PM James Bottomley
+> <James.Bottomley@hansenpartnership.com> wrote:
+[...]
+> > I think the reason for this is that the block mq path doesn't feed
+> > the kernel entropy pool correctly, hence the need to install an
+> > entropy gatherer for systems that don't have other good random
+> > number sources.
+> 
+> That does sound plausible, I admit I didn't even consider the
+> possibility that the old block I/O path also was an entropy source.
 
-Applied, thanks.
+In theory, the new one should be as well since the rotational entropy
+collector is on the SCSI completion path.   I'd seen the same problem
+but had assumed it was something someone had done to our internal
+entropy pool and thus hadn't bisected it.
 
--- 
-Jens Axboe
+James
 
