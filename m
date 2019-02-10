@@ -2,150 +2,65 @@ Return-Path: <SRS0=XSHr=QR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDACCC282C2
-	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 20:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95E01C282C2
+	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 20:27:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5082213F2
-	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 20:26:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="bB4C9sw+"
+	by mail.kernel.org (Postfix) with ESMTP id 687C62145D
+	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 20:27:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726118AbfBJU0C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Feb 2019 15:26:02 -0500
-Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:47306 "EHLO
-        mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725958AbfBJU0C (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Feb 2019 15:26:02 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id C80E4A23A0;
-        Sun, 10 Feb 2019 21:25:59 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1549830359; i=@fjfi.cvut.cz;
-        bh=8+vPETOh21HZkj7Q1AJIt7PeOhTv3OGHRvFPTDOcldE=;
-        h=Date:From:To:cc:Subject:In-Reply-To:References;
-        b=bB4C9sw+QsR57QG8EiKjszaVkiRn5PTkmNPI6Fw6JLVgyqzSII4dmgME/3Jzc8Kgg
-         ETPjdsbdY3c5UnUVlGlLu/xOm28eOYM65qt8zm2cAQS2YNA1nN7JGUejToonIP+f87
-         RHI4wqUk3NZznm628jmdt1UoSz7tX/fzx9m023pU=
-X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
-Received: from mailgw1.fjfi.cvut.cz ([127.0.0.1])
-        by localhost (mailgw1.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id wKqFhbHanzBN; Sun, 10 Feb 2019 21:25:57 +0100 (CET)
-Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 619C4A040D;
-        Sun, 10 Feb 2019 21:25:55 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 619C4A040D
-Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id 329AC6004E; Sun, 10 Feb 2019 21:25:55 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-        by linux.fjfi.cvut.cz (Postfix) with ESMTP id 21C736004D;
-        Sun, 10 Feb 2019 21:25:55 +0100 (CET)
-Date:   Sun, 10 Feb 2019 21:25:55 +0100 (CET)
-From:   David Kozub <zub@linux.fjfi.cvut.cz>
-To:     Scott Bauer <sbauer@plzdonthack.me>
-cc:     "Derrick, Jonathan" <jonathan.derrick@intel.com>,
-        "hch@infradead.org" <hch@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "jonas.rabenstein@studium.uni-erlangen.de" 
-        <jonas.rabenstein@studium.uni-erlangen.de>,
-        "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH v4 10/16] block: sed-opal: add ioctl for done-mark of
- shadow mbr
-In-Reply-To: <20190210182655.GA20491@hacktheplanet>
-Message-ID: <alpine.LRH.2.21.1902102117220.8545@linux.fjfi.cvut.cz>
-References: <1549054223-12220-1-git-send-email-zub@linux.fjfi.cvut.cz> <1549054223-12220-11-git-send-email-zub@linux.fjfi.cvut.cz> <20190204145244.GJ31132@infradead.org> <alpine.LRH.2.21.1902072247060.29258@linux.fjfi.cvut.cz> <1549586652.11868.12.camel@intel.com>
- <20190210182655.GA20491@hacktheplanet>
-User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
+        id S1726530AbfBJU1G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Feb 2019 15:27:06 -0500
+Received: from mx2.cyber.ee ([193.40.6.72]:45571 "EHLO mx2.cyber.ee"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725958AbfBJU1G (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 10 Feb 2019 15:27:06 -0500
+Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
+To:     linux-alpha@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org
+References: <fb63a4d0-d124-21c8-7395-90b34b57c85a@linux.ee>
+From:   Meelis Roos <mroos@linux.ee>
+Message-ID: <1c26eab4-3277-9066-5dce-6734ca9abb96@linux.ee>
+Date:   Sun, 10 Feb 2019 22:27:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
+In-Reply-To: <fb63a4d0-d124-21c8-7395-90b34b57c85a@linux.ee>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: et-EE
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, 10 Feb 2019, Scott Bauer wrote:
+02.01.19 17:52 I wrote:
 
-> On Fri, Feb 08, 2019 at 12:44:14AM +0000, Derrick, Jonathan wrote:
->> On Thu, 2019-02-07 at 23:56 +0100, David Kozub wrote:
->>> On Mon, 4 Feb 2019, Christoph Hellwig wrote:
->>>>>  static int opal_enable_disable_shadow_mbr(struct opal_dev *dev,
->>>>>  					  struct opal_mbr_data *opal_mbr)
->>>>>  {
->>>>> +	u8 token = opal_mbr->enable_disable == OPAL_MBR_ENABLE
->>>>> +		? OPAL_TRUE : OPAL_FALSE;
->>>>>  	const struct opal_step mbr_steps[] = {
->>>>>  		{ opal_discovery0, },
->>>>>  		{ start_admin1LSP_opal_session, &opal_mbr->key },
->>>>> -		{ set_mbr_done, &opal_mbr->enable_disable },
->>>>> +		{ set_mbr_done, &token },
->
->>> Am I missing something here? This seems wrong to me. And I think this
->>> patch actually changes it by introducing:
->>>
->>> +    u8 token = opal_mbr->enable_disable == OPAL_MBR_ENABLE
->>> +            ? OPAL_TRUE : OPAL_FALSE;
->>>
->>> which is essentially a negation (map 0 to 1 and 1 to 0).
->
-> Agreed the original code did the opposite of what the user wanted, looks like
-> when I authored it I messed up that enum which set everything off.
->
->
->
->>> With regard to the new IOC_OPAL_MBR_STATUS: I find the usage of
->>> OPAL_MBR_ENABLE/DISABLE for this confusing: what should passing
->>> OPAL_MBR_ENABLE do? Should it enable the shadow MBR? Or should it
->>> enable the MBR-done flag? I think the implementation in this patch
->>> interprets OPAL_MBR_ENABLE as 'set the "done" flag to true', thus hiding
->>> the shadow MBR. But this is not obvious looking at the IOCTL name.
->
-> For the new ioctl I think we should just add a new enum with the correct
-> nomenclature.  So OPAL_MBR_DONE, OPAL_MBR_NOT_DONE.
->
->
->> In order to keep the userspace interface consistent, I'll ACK your
->> change in this patch, unless Scott can fill me in on why this looks
->> wrong but is actually right.
->
-> I think it is just wrong.
->
->
->>
->> We have 7 bytes in the opal_mbr_data struct we could use for DONE/NOT
->> DONE. I'm not sure how to go about keeping it consistent with old uapi,
->> although arguably opal_enable_disable_shadow_mbr is already doing the
->> wrong thing with DONE and ENABLE so it's low impact.
->
-> Can we keep the old mbr struct the same and just add a new struct with new enums
-> for the new done ioctl? I think this will keep the new ioctl cleaner instead
-> of trying to apply older, some what incorrectly named, enums.
+> I have noticed ext4 filesystem corruption on two of my test alphas with 4.20.0-09062-gd8372ba8ce28.
 
-I like this proposal, I'll try to implement it. Although currently I plan 
-to first re-submit the cleanup parts, as suggested by Christoph[1]. So 
-this will happen after that.
+Retried it, still happens with 5.0.0-rc5-00358-gdf3865f8f568 - rsync of emerge --sync just fail with nothing in dmesg.
+  
+> On AlphaServer DS10:
+> [10749.664418] EXT4-fs error (device sda2): __ext4_iget:5052: inode #1853093: block 1: comm rsync: invalid block
+> 
+> On AlphaServer DS10L:
+> [ 5325.064656] EXT4-fs error (device sda2): htree_dirblock_to_tree:1007: inode #1191951: block 4731728: comm rm: bad entry in directory: directory entry overrun - offset=76, inode=417080, rec_len=61816, name_len=35, size=4096
+> [ 5325.069539] EXT4-fs error (device sda2): htree_dirblock_to_tree:1007: inode #1191951: block 4731728: comm rm: bad entry in directory: directory entry overrun - offset=76, inode=417080, rec_len=61816, name_len=35, size=4096
+> [ 5325.077351] EXT4-fs error (device sda2): ext4_empty_dir:2718: inode #1191951: block 4731728: comm rm: bad entry in directory: directory entry overrun - offset=76, inode=417080, rec_len=61816, name_len=35, size=4096
+> 
+> Two other alphas, PC-164 and Eiger, worked fine with the same kernel version (different kernel configs according to hardware).
+> 
+> The details:
+> 4.20 worked fine, with gentoo emerge package update after bootup.
+> Next, 4.20.0-06428-g00c569b567c7 worked fine, with gentoo emerge after bootup.
+> Next, 4.20.0-09062-gd8372ba8ce28 booted up fine but rsync and rm during start of gentoo emerge errored out like above.
+> 
+> So the corruption _might_ have happened during bootup of previous kernel but it looks more likely that only the latest kernel with blk-mq introduced the problems. mq-deadline is in use on all the alphas.
+> 
+> DS10 has Symbios 53C896 SCSI (sym2 driver), DS10L has QLogic ISP1040, so they are different. Working Eiger and PC164 have sym2 based scsi controllers too.
 
-> Lastly someone will need to backport his
->
->>>>> +       u8 token = opal_mbr->enable_disable == OPAL_MBR_ENABLE
->>>>> +               ? OPAL_TRUE : OPAL_FALSE;
->
-> to stable so we can fix up my broken coding in older kernels.
->
->
-> I can do that or, if David wants to do that that's fine... just want to coordinate.
-
-I'm quite busy juggling patches in this series. If you can find the time, 
-please do it.
-
-Best regards,
-David
-
-[1] https://lore.kernel.org/lkml/20190204150415.GO31132@infradead.org/
-
+-- 
+Meelis Roos <mroos@linux.ee>
