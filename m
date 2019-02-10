@@ -2,139 +2,137 @@ Return-Path: <SRS0=XSHr=QR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EC84C282C2
-	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 17:46:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 021A2C282C2
+	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 18:27:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F1FB320855
-	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 17:46:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="JEJf9iuq"
+	by mail.kernel.org (Postfix) with ESMTP id CB37420874
+	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 18:27:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725958AbfBJRqx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Feb 2019 12:46:53 -0500
-Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:42732 "EHLO
-        mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725896AbfBJRqw (ORCPT
+        id S1726057AbfBJS1Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Feb 2019 13:27:25 -0500
+Received: from bout01.mta.xmission.com ([166.70.11.15]:46678 "EHLO
+        bout01.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726000AbfBJS1Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Feb 2019 12:46:52 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id DBB66A0FE8;
-        Sun, 10 Feb 2019 18:46:50 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1549820810; i=@fjfi.cvut.cz;
-        bh=0nviwiTjbKqCgLvjB3i/IvE9KpLn1tfKfIa0mw0Dfgo=;
-        h=Date:From:To:cc:Subject:In-Reply-To:References;
-        b=JEJf9iuqlurIiqbyrB+Bl6bDCKFJFLN1Z5kcFJO41S1C1lXOeAKqKycUM1exSEGYO
-         sZv2MkGr1+TzRnpabHDdQxhrUlyQFqyGfSMhVatMlDwZLy6dxwSQg0d4qANkgejSiJ
-         rMDAyzNbUs7VLP/8CooSoRjVGtFqnBJbfmHHlmO0=
-X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
-Received: from mailgw1.fjfi.cvut.cz ([127.0.0.1])
-        by localhost (mailgw1.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id sDMAb4WvOfG2; Sun, 10 Feb 2019 18:46:43 +0100 (CET)
-Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id BD025A14F1;
-        Sun, 10 Feb 2019 18:46:18 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz BD025A14F1
-Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id 8CF526004E; Sun, 10 Feb 2019 18:46:18 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-        by linux.fjfi.cvut.cz (Postfix) with ESMTP id 79E886004D;
-        Sun, 10 Feb 2019 18:46:18 +0100 (CET)
-Date:   Sun, 10 Feb 2019 18:46:18 +0100 (CET)
-From:   David Kozub <zub@linux.fjfi.cvut.cz>
+        Sun, 10 Feb 2019 13:27:25 -0500
+Received: from mx03.mta.xmission.com ([166.70.13.213])
+        by bout01.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.87)
+        (envelope-from <sbauer@plzdonthack.me>)
+        id 1gstp4-000613-Ag; Sun, 10 Feb 2019 11:27:22 -0700
+Received: from plesk14-shared.xmission.com ([166.70.198.161] helo=plesk14.xmission.com)
+        by mx03.mta.xmission.com with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.87)
+        (envelope-from <sbauer@plzdonthack.me>)
+        id 1gstp3-0001xG-H4; Sun, 10 Feb 2019 11:27:22 -0700
+Received: from hacktheplanet (c-68-50-23-202.hsd1.in.comcast.net [68.50.23.202])
+        by plesk14.xmission.com (Postfix) with ESMTPSA id 79C4D221D90;
+        Sun, 10 Feb 2019 18:27:20 +0000 (UTC)
+Date:   Sun, 10 Feb 2019 13:26:55 -0500
+From:   Scott Bauer <sbauer@plzdonthack.me>
 To:     "Derrick, Jonathan" <jonathan.derrick@intel.com>
-cc:     "hch@infradead.org" <hch@infradead.org>,
+Cc:     "hch@infradead.org" <hch@infradead.org>,
+        "zub@linux.fjfi.cvut.cz" <zub@linux.fjfi.cvut.cz>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "sbauer@plzdonthack.me" <sbauer@plzdonthack.me>,
         "jonas.rabenstein@studium.uni-erlangen.de" 
         <jonas.rabenstein@studium.uni-erlangen.de>,
         "axboe@kernel.dk" <axboe@kernel.dk>
-Subject: Re: [PATCH v4 15/16] block: sed-opal: don't repeat opal_discovery0
- in each steps array
-In-Reply-To: <1549666749.10972.62.camel@intel.com>
-Message-ID: <alpine.LRH.2.21.1902101840020.28071@linux.fjfi.cvut.cz>
-References: <1549054223-12220-1-git-send-email-zub@linux.fjfi.cvut.cz>  <1549054223-12220-16-git-send-email-zub@linux.fjfi.cvut.cz>  <20190204150132.GM31132@infradead.org>  <alpine.LRH.2.21.1902042336331.10661@linux.fjfi.cvut.cz>
- <1549666749.10972.62.camel@intel.com>
-User-Agent: Alpine 2.21 (LRH 202 2017-01-01)
+Message-ID: <20190210182655.GA20491@hacktheplanet>
+References: <1549054223-12220-1-git-send-email-zub@linux.fjfi.cvut.cz>
+ <1549054223-12220-11-git-send-email-zub@linux.fjfi.cvut.cz>
+ <20190204145244.GJ31132@infradead.org>
+ <alpine.LRH.2.21.1902072247060.29258@linux.fjfi.cvut.cz>
+ <1549586652.11868.12.camel@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1549586652.11868.12.camel@intel.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-XM-SPF: eid=1gstp3-0001xG-H4;;;mid=<20190210182655.GA20491@hacktheplanet>;;;hst=mx03.mta.xmission.com;;;ip=166.70.198.161;;;frm=sbauer@plzdonthack.me;;;spf=none
+X-SA-Exim-Connect-IP: 166.70.198.161
+X-SA-Exim-Mail-From: sbauer@plzdonthack.me
+Subject: Re: [PATCH v4 10/16] block: sed-opal: add ioctl for done-mark of
+ shadow mbr
+X-SA-Exim-Version: 4.2.1 (built Thu, 05 May 2016 13:38:54 -0600)
+X-SA-Exim-Scanned: Yes (on mx03.mta.xmission.com)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 8 Feb 2019, Derrick, Jonathan wrote:
+On Fri, Feb 08, 2019 at 12:44:14AM +0000, Derrick, Jonathan wrote:
+> On Thu, 2019-02-07 at 23:56 +0100, David Kozub wrote:
+> > On Mon, 4 Feb 2019, Christoph Hellwig wrote:
+> > > >  static int opal_enable_disable_shadow_mbr(struct opal_dev *dev,
+> > > >  					  struct opal_mbr_data *opal_mbr)
+> > > >  {
+> > > > +	u8 token = opal_mbr->enable_disable == OPAL_MBR_ENABLE
+> > > > +		? OPAL_TRUE : OPAL_FALSE;
+> > > >  	const struct opal_step mbr_steps[] = {
+> > > >  		{ opal_discovery0, },
+> > > >  		{ start_admin1LSP_opal_session, &opal_mbr->key },
+> > > > -		{ set_mbr_done, &opal_mbr->enable_disable },
+> > > > +		{ set_mbr_done, &token },
 
-> On Mon, 2019-02-04 at 23:44 +0100, David Kozub wrote:
->> On Mon, 4 Feb 2019, Christoph Hellwig wrote:
->>
->>>> +	/* first do a discovery0 */
->>>> +	error = opal_discovery0_step(dev);
->>>>
->>>> +	for (state = 0; !error && state < n_steps; state++)
->>>> +		error = execute_step(dev, &steps[state], state);
->>>> +
->>>> +	/*
->>>> +	 * For each OPAL command the first step in steps starts some sort of
->>>> +	 * session. If an error occurred in the initial discovery0 or if an
->>>> +	 * error occurred in the first step (and thus stopping the loop with
->>>> +	 * state == 1) then there was an error before or during the attempt to
->>>> +	 * start a session. Therefore we shouldn't attempt to terminate a
->>>> +	 * session, as one has not yet been created.
->>>> +	 */
->>>> +	if (error && state > 1)
->>>> +		end_opal_session_error(dev);
->>>>
->>>>  	return error;
->>>
->>> The flow here is a little too condensed for my taste.  Why not the
->>> plain obvoious, if a little longer:
->>>
->>> 	error = error = opal_discovery0_step(dev);
->>> 	if (error)
->>> 		return error;
->>>
->>> 	for (state = 0; state < n_steps; state++) {
->>> 		error = execute_step(dev, &steps[state], state);
->>> 		if (error)
->>> 			goto out_error;
->>> 	}
->>>
->>> 	return 0;
->>>
->>> out_error:
->>> 	if (state > 1)
->>> 		end_opal_session_error(dev);
->>> 	return error;
->>
->> No problem, I can use this version. But I think there is a minor issue -
->> the same one I hit in my original change, just from the other direction:
->>
->> If the loop succeds for the 0-th element of steps, and then fails for the
->> 1st element, then state equals 1 yet the session has been started, so we
->> should close it.
->>
->> I think the condition in out_error should be if (state > 0).
->>
->> Best regards,
->> David
-> Looks good with Christoph's suggestion (for 14/16) and your state check fix
->
->
-> Reviewed-by: Jon Derrick <jonathan.derrick@intel.com>
+> > Am I missing something here? This seems wrong to me. And I think this 
+> > patch actually changes it by introducing:
+> > 
+> > +    u8 token = opal_mbr->enable_disable == OPAL_MBR_ENABLE
+> > +            ? OPAL_TRUE : OPAL_FALSE;
+> > 
+> > which is essentially a negation (map 0 to 1 and 1 to 0).
 
-Hi Jon,
+Agreed the original code did the opposite of what the user wanted, looks like
+when I authored it I messed up that enum which set everything off.
 
-What suggestion by Christoph you have in mind? I don't see any for 14/16. 
-Currently, in my git repo, for this patch, I applied Christoph suggestion 
-for this (15/16) patch + the "state > 0" fix. Is this what you mean?
 
-Best regards,
-David
+
+> > With regard to the new IOC_OPAL_MBR_STATUS: I find the usage of 
+> > OPAL_MBR_ENABLE/DISABLE for this confusing: what should passing 
+> > OPAL_MBR_ENABLE do? Should it enable the shadow MBR? Or should it 
+> > enable the MBR-done flag? I think the implementation in this patch 
+> > interprets OPAL_MBR_ENABLE as 'set the "done" flag to true', thus hiding 
+> > the shadow MBR. But this is not obvious looking at the IOCTL name.
+
+For the new ioctl I think we should just add a new enum with the correct
+nomenclature.  So OPAL_MBR_DONE, OPAL_MBR_NOT_DONE.
+
+
+> In order to keep the userspace interface consistent, I'll ACK your
+> change in this patch, unless Scott can fill me in on why this looks
+> wrong but is actually right.
+
+I think it is just wrong. 
+
+
+> 
+> We have 7 bytes in the opal_mbr_data struct we could use for DONE/NOT
+> DONE. I'm not sure how to go about keeping it consistent with old uapi,
+> although arguably opal_enable_disable_shadow_mbr is already doing the
+> wrong thing with DONE and ENABLE so it's low impact.
+
+Can we keep the old mbr struct the same and just add a new struct with new enums
+for the new done ioctl? I think this will keep the new ioctl cleaner instead
+of trying to apply older, some what incorrectly named, enums.
+
+Lastly someone will need to backport his
+
+> > > > +       u8 token = opal_mbr->enable_disable == OPAL_MBR_ENABLE
+> > > > +               ? OPAL_TRUE : OPAL_FALSE;
+
+to stable so we can fix up my broken coding in older kernels.
+
+
+I can do that or, if David wants to do that that's fine... just want to coordinate.
+
+
+
+
+
+
+
