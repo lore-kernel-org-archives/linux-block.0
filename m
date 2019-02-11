@@ -6,66 +6,66 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74029C169C4
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 15:20:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4632CC282CE
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 15:21:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3AC0A222AC
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 15:20:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1447521B1A
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 15:21:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="UjKH0LWc"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="0i3C6hsu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727847AbfBKPU3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Feb 2019 10:20:29 -0500
-Received: from mail-it1-f176.google.com ([209.85.166.176]:40064 "EHLO
-        mail-it1-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730581AbfBKPU2 (ORCPT
+        id S2391247AbfBKPVx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Feb 2019 10:21:53 -0500
+Received: from mail-it1-f172.google.com ([209.85.166.172]:53053 "EHLO
+        mail-it1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391504AbfBKPVw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Feb 2019 10:20:28 -0500
-Received: by mail-it1-f176.google.com with SMTP id i2so3010352ite.5
-        for <linux-block@vger.kernel.org>; Mon, 11 Feb 2019 07:20:27 -0800 (PST)
+        Mon, 11 Feb 2019 10:21:52 -0500
+Received: by mail-it1-f172.google.com with SMTP id r11so21779651itc.2
+        for <linux-block@vger.kernel.org>; Mon, 11 Feb 2019 07:21:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=j5yFh6XcnwkgVJwWMXJtRihfN5KvU/tNJXigBepJdmk=;
-        b=UjKH0LWcfgSct/qb6LgDynj/pynxcaj00R8KTwbRaMH4IuaLzL7AqHh1MU6GN52bg6
-         J3zu8qFHV5owSi9OG5lXO2VcEdO6KmoJUlhZaChldtyOqcPh6KPXCj6xSG0nD7Pj3dfr
-         u31oLut1ebrtbJa9fWJFfQ2PO0EGy+4Ax8AZPTfHDZ/B3bDPtNAost+IKVFRHxCHC4R/
-         vao654hQl26nTPNtxFsYDWTlLPHiadNQx/U5t8TKi+L+bJOkMkUOvLXLcXgwr6sSVyJq
-         s4V3uz0QvOqzLvllKE44e2RWRkNXT4ouNtraJcdXR/kO2JvndH9tIODVEdVAiNp4lrWS
-         nurg==
+        bh=KfkAQZ+9G8+m0CU3a1j2o7j0gjCnDCH+NGOMm61ahcs=;
+        b=0i3C6hsu12PTpkbAmuZsuX4soIc/E9Vh+ua9IAgZB2KI1uuIPIvjs8ab0093t2OEAm
+         8+He9xslTM8G/BmEIgTBSyKhDeKb2VUl6tMaG8OEvU2Zdv7TXpmz5djmf0EPd5t+F6zw
+         QthohYyQD8F0jnXuECZQFMEqSZihhpT4GsKVKDQVaW14JjIdtpga4i7xsyA0l8DsTWZb
+         swz9pSoI3F7HJ/vMCY+7r6OekXRwg9U0AxBoCbJ+smFMneDyHPA/hDtoDjpCrAFR2LSo
+         8tJGY6GOUtvPd+MFp/DQCx9pAMuxgCtpfKUcOxE+iYzMWZqOcmxCvq/ZlCIg3FeOdX/3
+         Dupg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=j5yFh6XcnwkgVJwWMXJtRihfN5KvU/tNJXigBepJdmk=;
-        b=dGbAXMQzRqeN80e1epjCCmNu7Pf+WTvolWZYkqGsneowQeXV3Kqb3COtZeltjkihsV
-         T/Ut6jN3cXo3XelKUtX6mJpj6LP2Evp2zfW7M2FGYCAueYlglrHkZmzbbOa6HO/5cBJI
-         OP69hBhZDnkKP2au9JkXk1rxZ4g+vVWgA6vfJP5hL4TTUlIEPFEaELrAv0a33ouJr3IU
-         XdS+qGMQlwnuay7dvm70JcOoDwtdXZZmHDfDt2pYfV423gmsSSeOXIMxXkGNQwkwLGXs
-         BmT1heg5Wxc3fH3MdnnRllsczePlWuI36BD6J/mcjR2a//IhYiI9piqG/PC/J8pY8Hlc
-         A4Iw==
-X-Gm-Message-State: AHQUAuYpv1vuqz0XKZ853VYwl+yX6kOCiuE4pJEuWKPVkmmtaiCUl926
-        dXYcuqx6PLDU5pICCEz+xKjVYLW+RJlpcg==
-X-Google-Smtp-Source: AHgI3IalAI00Q/iTkHKZYWCiE6rLEXptSXFDWbKccjYN4AUzpiy3hEpEb7NzWEpZJBzv2UBIaqzyIw==
-X-Received: by 2002:a5e:9615:: with SMTP id a21mr17516508ioq.126.1549898426932;
-        Mon, 11 Feb 2019 07:20:26 -0800 (PST)
+        bh=KfkAQZ+9G8+m0CU3a1j2o7j0gjCnDCH+NGOMm61ahcs=;
+        b=BUNIaT8R7mYAv7N92+8fEvb4YjmUI9KyOz7hcYXmEsRd7L6TpUBagCS1YLAy+Ifedk
+         8hZl68AlZLNkFLsuE+Ns0xZXNYnFApVOL0IOmr4FwVG1j6L9ZibNH4sjYjonf6w1emtU
+         +/JblJJ2Jy78YCtlbgjlOa8n3XAwIyejtapOtVAsrFxmUGkE0KUawNMutEu4l/GKdCKu
+         RzJ8g+H5j2DtnTkMUb8KIQHKqrUD4IPrs21bI6vVVxSrolH+FO9H6VJupuXWpkoUzIbR
+         SYmvaDzNLjOu8iW4cVoaa3FbrSDmWmaoWyF+4Z7lYp8ZcbEXgJsLhmPU2xFPXY4qrHik
+         d43A==
+X-Gm-Message-State: AHQUAubZd8r3BovUT/Z772CdHevqIcmL6h6FDgttq5yT9IKfDLN0cjel
+        EFGhXeyU8CpxkIy7oiHOkaTVoI5xr4tDRw==
+X-Google-Smtp-Source: AHgI3IZaUn1FLGqWwt0GGjRyUvWPzKZpqk56EtFuELDCbrQ/4r9/QsSt6kDZ/cTKDl4cCOq+ASnOVA==
+X-Received: by 2002:a02:40c9:: with SMTP id n192mr17222161jaa.78.1549898511325;
+        Mon, 11 Feb 2019 07:21:51 -0800 (PST)
 Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id e5sm4727819ios.50.2019.02.11.07.20.25
+        by smtp.gmail.com with ESMTPSA id 196sm5442878itu.37.2019.02.11.07.21.49
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Feb 2019 07:20:25 -0800 (PST)
-Subject: Re: [PATCH] block: avoid setting wbt_lat_usec to current value
+        Mon, 11 Feb 2019 07:21:50 -0800 (PST)
+Subject: Re: [PATCH] block: avoid setting none scheduler if it's already none
 To:     Aleksei Zakharov <zakharov.a.g@yandex.ru>
 Cc:     linux-block@vger.kernel.org
-References: <1549879834-24837-1-git-send-email-zakharov.a.g@yandex.ru>
+References: <1549882237-28183-1-git-send-email-zakharov.a.g@yandex.ru>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <215eaec2-22ab-c2f0-f1c9-40bcff976807@kernel.dk>
-Date:   Mon, 11 Feb 2019 08:20:24 -0700
+Message-ID: <6a6c264f-70ae-30d4-8c94-c9c3e5d5cb35@kernel.dk>
+Date:   Mon, 11 Feb 2019 08:21:49 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <1549879834-24837-1-git-send-email-zakharov.a.g@yandex.ru>
+In-Reply-To: <1549882237-28183-1-git-send-email-zakharov.a.g@yandex.ru>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,9 +74,9 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/11/19 3:10 AM, Aleksei Zakharov wrote:
-> There's no reason to set wbt min lat and freeze request queue
-> if current value is the same.
+On 2/11/19 3:50 AM, Aleksei Zakharov wrote:
+> There's no reason to freeze queue and remove scheduler
+> if there's no scheduler already.
 
 Applied, thanks.
 
