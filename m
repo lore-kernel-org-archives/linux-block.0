@@ -1,66 +1,211 @@
-Return-Path: <SRS0=XSHr=QR=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=vmzB=QS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95E01C282C2
-	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 20:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40880C282C2
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 03:28:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 687C62145D
-	for <linux-block@archiver.kernel.org>; Sun, 10 Feb 2019 20:27:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C91620873
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 03:28:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726530AbfBJU1G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Feb 2019 15:27:06 -0500
-Received: from mx2.cyber.ee ([193.40.6.72]:45571 "EHLO mx2.cyber.ee"
+        id S1726154AbfBKD2N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Feb 2019 22:28:13 -0500
+Received: from mout.gmx.net ([212.227.15.15]:58625 "EHLO mout.gmx.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725958AbfBJU1G (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Feb 2019 15:27:06 -0500
-Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
-To:     linux-alpha@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org
-References: <fb63a4d0-d124-21c8-7395-90b34b57c85a@linux.ee>
-From:   Meelis Roos <mroos@linux.ee>
-Message-ID: <1c26eab4-3277-9066-5dce-6734ca9abb96@linux.ee>
-Date:   Sun, 10 Feb 2019 22:27:03 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+        id S1726102AbfBKD2N (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 10 Feb 2019 22:28:13 -0500
+Received: from localhost.localdomain ([218.18.229.179]) by mail.gmx.com
+ (mrgmx001 [212.227.17.184]) with ESMTPSA (Nemesis) id
+ 0LwJRe-1h9r0O09mw-0181Xg; Mon, 11 Feb 2019 04:28:10 +0100
+From:   Chengguang Xu <cgxu519@gmx.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, Chengguang Xu <cgxu519@gmx.com>
+Subject: [PATCH] block: refactor register_blkdev() to compare major number when allocating unused major number
+Date:   Mon, 11 Feb 2019 11:26:19 +0800
+Message-Id: <20190211032619.29208-1-cgxu519@gmx.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <fb63a4d0-d124-21c8-7395-90b34b57c85a@linux.ee>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: et-EE
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:V+cJZ0pdJeZbiFkDkQa9BFO/CYjrqlBb0SmMPOTJ3GsARuWsj8D
+ 1O+sIRSXyGaVDJIjs3nKQf9QZz/PKxgy2FrRNBW2M2VEnpggCh+toAbL4jgjhFzfYsWiKAn
+ MPuAOLXCcXmdwlRn/0riAPhemNWdreBlyND9TzIZf2HyV12O4Brh2c/yMHUBAH1H8mPC6IC
+ 39wwcPiSrwAPWWbFJJduw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Jo0MizC7U1A=:dBGr24Qy2TxfGfyYabWX1+
+ XEWhHIt/3lORmiK3wlQS65rOPS6v1bdgWYzBvHE6sILmARYywjVxvwWssvw/Y82PJYLccTNSk
+ xkpHbmOYCl1yocEAuj9lmlW/HtTyWHrCYXMG0JpQrJMKbbv6guKZe6LYHzaoDWBbEK/v48BhX
+ /+MYxuR+Rq5A47ZRlTMJxtieQY64Cq6c2dmyk1oYchaNrZhpmLfHrUqJ5lgRdn5WUEH+aO1cs
+ GP6xbYS3lQbVt0N2jDvknQnhabR3BMlnl5zCjzWtHt1gscVLb/Y5PPyJhgbE/PiUFiWeozWv8
+ DBRgNeINNWSa3BtIw/6URbv3YSpRfBHd1bOUDfFV0RBaxdR8tu1p94okalxMAiypXRm9FloBy
+ pjq2WXviZb3yKVW5yaJCiZOS6lnNK50KISKCXRM6B92Y4j0Uf3XuOF1BmIwgdDPr8KYQ1vzR5
+ ypRoWc2KegEhXLSpOGEcjW7MVR1vveVMgWWhS7KwXsmabCRZY4ocWrd1YpxZnJtz3bo3RLkGo
+ Kq4ZqHBf/hrZSXgMEbOuLI0306xkqomYcjX7UxYSFnSfxsQO78bF8IcgVeLAtyIcn+3vsYrlp
+ jF5uq4qbahSnuM3+3OmrxSKAr9cqO+oZBwRUOPc4Wg3IgZeBXoGDOd2W9mPWxzqjYdIruw8A5
+ So6cpXPSIstI+wOux4DeEV7Yzy/HZPpLqKL5y0Y/tzDJfxJ0/Tch33d/T80fculKLBQR1EVQz
+ RC16qVKIPEv4uAR5GBdGXYVommjGxXGYD4MGv+4qciYIUWrFSWvaGvqnHvbrUNbFSdlyjBJ9K
+ q6JwulYzYw191MEok2VE7W+fDDXLXJN+ScIyKHWwpMMdPvKrUxnu24Iw9Q6j8RhRTx1/Ri2RQ
+ Svm717aXKnh0UnhIQQxSk373r1u8y6S1E0WkJLQOFkXo0tcGgTpop43ZfQYgRN
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-02.01.19 17:52 I wrote:
+Currently when specifying major number as 0,
+register_blkdev() will try to alloc any unused
+major number in the range. However, the allocating
+logic does not accuretaly compare major number
+with existing entries, so even we have plenty of
+available major numbers but still might fail with
+-EBUSY in extreme case.
 
-> I have noticed ext4 filesystem corruption on two of my test alphas with 4.20.0-09062-gd8372ba8ce28.
+Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
+---
+ block/genhd.c | 103 ++++++++++++++++++++++++++------------------------
+ 1 file changed, 54 insertions(+), 49 deletions(-)
 
-Retried it, still happens with 5.0.0-rc5-00358-gdf3865f8f568 - rsync of emerge --sync just fail with nothing in dmesg.
-  
-> On AlphaServer DS10:
-> [10749.664418] EXT4-fs error (device sda2): __ext4_iget:5052: inode #1853093: block 1: comm rsync: invalid block
-> 
-> On AlphaServer DS10L:
-> [ 5325.064656] EXT4-fs error (device sda2): htree_dirblock_to_tree:1007: inode #1191951: block 4731728: comm rm: bad entry in directory: directory entry overrun - offset=76, inode=417080, rec_len=61816, name_len=35, size=4096
-> [ 5325.069539] EXT4-fs error (device sda2): htree_dirblock_to_tree:1007: inode #1191951: block 4731728: comm rm: bad entry in directory: directory entry overrun - offset=76, inode=417080, rec_len=61816, name_len=35, size=4096
-> [ 5325.077351] EXT4-fs error (device sda2): ext4_empty_dir:2718: inode #1191951: block 4731728: comm rm: bad entry in directory: directory entry overrun - offset=76, inode=417080, rec_len=61816, name_len=35, size=4096
-> 
-> Two other alphas, PC-164 and Eiger, worked fine with the same kernel version (different kernel configs according to hardware).
-> 
-> The details:
-> 4.20 worked fine, with gentoo emerge package update after bootup.
-> Next, 4.20.0-06428-g00c569b567c7 worked fine, with gentoo emerge after bootup.
-> Next, 4.20.0-09062-gd8372ba8ce28 booted up fine but rsync and rm during start of gentoo emerge errored out like above.
-> 
-> So the corruption _might_ have happened during bootup of previous kernel but it looks more likely that only the latest kernel with blk-mq introduced the problems. mq-deadline is in use on all the alphas.
-> 
-> DS10 has Symbios 53C896 SCSI (sym2 driver), DS10L has QLogic ISP1040, so they are different. Working Eiger and PC164 have sym2 based scsi controllers too.
-
+diff --git a/block/genhd.c b/block/genhd.c
+index 1dd8fd6613b8..80b788ed17d1 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -330,6 +330,40 @@ void blkdev_show(struct seq_file *seqf, off_t offset)
+ }
+ #endif /* CONFIG_PROC_FS */
+ 
++static int __register_blkdev(unsigned int major, const char *name,
++			     struct blk_major_name *new)
++{
++	struct blk_major_name *n, *p = NULL;
++	int index = major_to_index(major);
++
++	for (n = major_names[index]; n; n = n->next) {
++		if (n->major == major)
++			return -EBUSY;
++		p = n;
++	}
++
++	new->major = major;
++	if (p == NULL)
++		major_names[index] = new;
++	else
++		p->next = new;
++
++	return 0;
++}
++
++static int alloc_blkdev(unsigned int major, const char *name,
++			struct blk_major_name *new)
++{
++	int index;
++
++	for (index = ARRAY_SIZE(major_names) - 1; index; index--) {
++		if (__register_blkdev(index, name, new) == 0)
++			return index;
++	}
++
++	return -EBUSY;
++}
++
+ /**
+  * register_blkdev - register a new block device
+  *
+@@ -345,73 +379,44 @@ void blkdev_show(struct seq_file *seqf, off_t offset)
+  *    then the function returns zero on success, or a negative error code
+  *  - if any unused major number was requested with @major = 0 parameter
+  *    then the return value is the allocated major number in range
+- *    [1..BLKDEV_MAJOR_MAX-1] or a negative error code otherwise
++ *    [1..BLKDEV_MAJOR_HASH_SIZE-1] or a negative error code otherwise
+  *
+  * See Documentation/admin-guide/devices.txt for the list of allocated
+  * major numbers.
+  */
+ int register_blkdev(unsigned int major, const char *name)
+ {
+-	struct blk_major_name **n, *p;
+-	int index, ret = 0;
+-
+-	mutex_lock(&block_class_lock);
+-
+-	/* temporary */
+-	if (major == 0) {
+-		for (index = ARRAY_SIZE(major_names)-1; index > 0; index--) {
+-			if (major_names[index] == NULL)
+-				break;
+-		}
+-
+-		if (index == 0) {
+-			printk("register_blkdev: failed to get major for %s\n",
+-			       name);
+-			ret = -EBUSY;
+-			goto out;
+-		}
+-		major = index;
+-		ret = major;
+-	}
++	struct blk_major_name *new;
++	int ret;
+ 
+ 	if (major >= BLKDEV_MAJOR_MAX) {
+-		pr_err("register_blkdev: major requested (%u) is greater than the maximum (%u) for %s\n",
+-		       major, BLKDEV_MAJOR_MAX-1, name);
+-
+-		ret = -EINVAL;
+-		goto out;
++		pr_err("%s: major requested (%u) is greater than the maximum (%u) for %s\n",
++			__func__, major, BLKDEV_MAJOR_MAX-1, name);
++		return -EINVAL;
+ 	}
+ 
+-	p = kmalloc(sizeof(struct blk_major_name), GFP_KERNEL);
+-	if (p == NULL) {
+-		ret = -ENOMEM;
+-		goto out;
+-	}
++	new = kmalloc(sizeof(struct blk_major_name), GFP_KERNEL);
++	if (new == NULL)
++		return -ENOMEM;
+ 
+-	p->major = major;
+-	strlcpy(p->name, name, sizeof(p->name));
+-	p->next = NULL;
+-	index = major_to_index(major);
++	strlcpy(new->name, name, sizeof(new->name));
++	new->next = NULL;
+ 
+-	for (n = &major_names[index]; *n; n = &(*n)->next) {
+-		if ((*n)->major == major)
+-			break;
+-	}
+-	if (!*n)
+-		*n = p;
++	mutex_lock(&block_class_lock);
++	if (major == 0)
++		ret = alloc_blkdev(major, name, new);
+ 	else
+-		ret = -EBUSY;
++		ret = __register_blkdev(major, name, new);
++	mutex_unlock(&block_class_lock);
+ 
+ 	if (ret < 0) {
+-		printk("register_blkdev: cannot get major %u for %s\n",
+-		       major, name);
+-		kfree(p);
++		kfree(new);
++		pr_err("%s: cannot get major for %s, major requested (%u)\n",
++			__func__, name, major);
+ 	}
+-out:
+-	mutex_unlock(&block_class_lock);
++
+ 	return ret;
+ }
+-
+ EXPORT_SYMBOL(register_blkdev);
+ 
+ void unregister_blkdev(unsigned int major, const char *name)
 -- 
-Meelis Roos <mroos@linux.ee>
+2.20.1
+
