@@ -2,66 +2,66 @@ Return-Path: <SRS0=vmzB=QS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 027D2C169C4
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AF65C282CE
 	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 19:01:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C0915222A0
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 19:01:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F7FE222A0
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 19:01:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="LyCQ5kIg"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="vSbty8NJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732994AbfBKTBV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Feb 2019 14:01:21 -0500
-Received: from mail-it1-f196.google.com ([209.85.166.196]:37070 "EHLO
+        id S2387495AbfBKTBb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Feb 2019 14:01:31 -0500
+Received: from mail-it1-f196.google.com ([209.85.166.196]:37110 "EHLO
         mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733288AbfBKTBU (ORCPT
+        with ESMTP id S2387479AbfBKTBa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Feb 2019 14:01:20 -0500
-Received: by mail-it1-f196.google.com with SMTP id b5so914821iti.2
-        for <linux-block@vger.kernel.org>; Mon, 11 Feb 2019 11:01:20 -0800 (PST)
+        Mon, 11 Feb 2019 14:01:30 -0500
+Received: by mail-it1-f196.google.com with SMTP id b5so916309iti.2
+        for <linux-block@vger.kernel.org>; Mon, 11 Feb 2019 11:01:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=80yuM+MDzhESEs22kJBxcN12JeS3xfhO17J+3EYvHLY=;
-        b=LyCQ5kIgQ7fR57aRpzPUBIhtXkFxFWszK96n9Da2tLUzuZMNjQzt9CYhBaaH8W8Ps9
-         FCgvPcPjrUEQGime534QMQBT+LYe26ZZwR7Vv7UXXBznlo/aXxAV8bIQAYExO63z+1s3
-         seCTrHeM/Tnuo6IQVOT3EmhVpddR+FLwpJH8c2aL1ebDLrqBhvcrRPcsZC5pqrS/Dn9A
-         d2YgvtjzM6JRC2bl98enTsvATTRJPSDpZY9l3BZS+TzOUenafnYlpBKHemzNip5mvQJm
-         UGS96JgKk1HRG+L/F0HvwICZdsiVwI/RAboiavuw70OmA9CqN0OQNjc2RpdqdS2e2Mif
-         8UeA==
+        bh=dR9zfDOVcdqDjymCroOlYbc9PPo0y7QrVWMjVOKoMiA=;
+        b=vSbty8NJ/RcwcYCXuoONpqX8H5qqFGA17ZLdrSUA/IAYGL70ms1Yfr2ex6TmqY8mhg
+         kuoKvEOrdXLxix29A9PS26K5SRQ2G0u+jkBHbPsWlAvqbVTNWqmch+95P00TTJf1CNbN
+         gxjibUwJq9t/S9Hk46Re6UaUj9AceVvp04lLDUmLkZQDTIHPPveyD3eDOdz9T1FfXNje
+         i3dYApAwVsI5nF6nqGY2z2eyc/L7gZfuGZ+O4hN7WIKAuUwIGsbs2ekKmQNr16CoJmLT
+         twQN143b3rfK439mng95natOzhW5aa5Mki2Ehi9xZlVtVBkxJ7jxE4fppcXJR0fUBl6n
+         O1lA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=80yuM+MDzhESEs22kJBxcN12JeS3xfhO17J+3EYvHLY=;
-        b=cm5IsTwISd/lckmtVOu06W3CyqltuFYJyOYK8qUipfihwZFlMCZeWdzneDIXJPldBW
-         rfCUUP5bqs5+3n5OFyuE5nEidrIFj7G9PHBP6DkCsEdl6M2h3dUr0eOkADMmkaGm8bVN
-         utALyH+Fb3H8Zf/Tf9cRV9A6B1RdSYJP9k6pVPeLJ0SQQtpZ5qRxv3/C41twiSZNo08H
-         GE3UwpU2jAklpk7pG8efuzECh1qus4XNYcfWeqMf7DG+LDAHPHVSHanpYjLrIrB4XF6d
-         eJEgZtswJeGSdNd8mI09pm0LbkdN8vD2DQwMfXnzXSoi9BlJ6/wm6WJcZtf2J5dXUvXK
-         Ph9g==
-X-Gm-Message-State: AHQUAuaCZ5Bdn8buV06dlOPjzCuuS4yHI/1OwHKogc1dD3Gz6POZwC6S
-        6sVWcMGP15nWRlou4AnF+CEqSw==
-X-Google-Smtp-Source: AHgI3IbImTgvCI2O1GywpUrKGiA9lmXiyq+hPPB0vLfcPAT7FdIAw84jgq7jInoadzkXhBtU16CQbQ==
-X-Received: by 2002:a24:3a0d:: with SMTP id m13mr527604itm.74.1549911679454;
-        Mon, 11 Feb 2019 11:01:19 -0800 (PST)
+        bh=dR9zfDOVcdqDjymCroOlYbc9PPo0y7QrVWMjVOKoMiA=;
+        b=Y2LCH0fNsST+yAtM7DGAN5z1JATrWUWSVxOum5yDwXHHLtKZQXix9zMagsYlyveTEA
+         VG9oZ/ZKmUeHXZ9AzFbe1SgutoYILtLotqzQecoGCKNtF3tWUWHbyCDqemm1k0jXvN7K
+         4l8WbnDx6iqsuoJL7IyYxAgNDtjQBPXovD5R2IrsV/QGrL+K9HSNbvIRV39u0T36Ly8D
+         zGZSzrQXtq/Ege9zI1ptwSPB6pUh4InDs1/eBXlPT011ZMKCD0nOst4nphYtetVr0izr
+         FWVSY6bRiWSAbNrsb2qXxvCe+bN1yMBBYWCKSsN7WHDFPvdIxpYv3ViojI5b8oLS7Lk0
+         +jKg==
+X-Gm-Message-State: AHQUAuZ5jAIY2F+mBB+85lX/V/OT7VlSyq8Gh7MRzzjVIGHsoSDgR1NG
+        lBoYlEbuxHEhRApZrN5hfpoKgA==
+X-Google-Smtp-Source: AHgI3IauvODBsw8bUTwPmwe8GEbeESTa0DxuV27xsuF8cUvYVg9lMhlQNFEjhYv0Lv49cXlIF79u5A==
+X-Received: by 2002:a24:5a8f:: with SMTP id v137mr547100ita.65.1549911688799;
+        Mon, 11 Feb 2019 11:01:28 -0800 (PST)
 Received: from x1.localdomain ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id h184sm62446ith.41.2019.02.11.11.01.17
+        by smtp.gmail.com with ESMTPSA id h184sm62446ith.41.2019.02.11.11.01.27
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Feb 2019 11:01:17 -0800 (PST)
+        Mon, 11 Feb 2019 11:01:27 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-aio@kvack.org, linux-block@vger.kernel.org,
         linux-api@vger.kernel.org
 Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com, jannh@google.com,
         viro@ZenIV.linux.org.uk, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 13/19] net: split out functions related to registering inflight socket files
-Date:   Mon, 11 Feb 2019 12:00:43 -0700
-Message-Id: <20190211190049.7888-15-axboe@kernel.dk>
+Subject: [PATCH 18/19] io_uring: allow workqueue item to handle multiple buffered requests
+Date:   Mon, 11 Feb 2019 12:00:48 -0700
+Message-Id: <20190211190049.7888-20-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190211190049.7888-1-axboe@kernel.dk>
 References: <20190211190049.7888-1-axboe@kernel.dk>
@@ -70,421 +70,447 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We need this functionality for the io_uring file registration, but
-we cannot rely on it since CONFIG_UNIX can be modular. Move the helpers
-to a separate file, that's always builtin to the kernel if CONFIG_UNIX is
-m/y.
+Right now we punt any buffered request that ends up triggering an
+-EAGAIN to an async workqueue. This works fine in terms of providing
+async execution of them, but it also can create quite a lot of work
+queue items. For sequentially buffered IO, it's advantageous to
+serialize the issue of them. For reads, the first one will trigger a
+read-ahead, and subsequent request merely end up waiting on later pages
+to complete. For writes, devices usually respond better to streamed
+sequential writes.
 
-No functional changes in this patch, just moving code around.
+Add state to track the last buffered request we punted to a work queue,
+and if the next one is sequential to the previous, attempt to get the
+previous work item to handle it. We limit the number of sequential
+add-ons to the a multiple (8) of the max read-ahead size of the file.
+This should be a good number for both reads and wries, as it defines the
+max IO size the device can do directly.
+
+This drastically cuts down on the number of context switches we need to
+handle buffered sequential IO, and a basic test case of copying a big
+file with io_uring sees a 5x speedup.
 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
-Acked-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- include/net/af_unix.h |   1 +
- net/Makefile          |   2 +-
- net/unix/Kconfig      |   5 ++
- net/unix/Makefile     |   2 +
- net/unix/af_unix.c    |  63 +-----------------
- net/unix/garbage.c    |  71 +-------------------
- net/unix/scm.c        | 151 ++++++++++++++++++++++++++++++++++++++++++
- net/unix/scm.h        |  10 +++
- 8 files changed, 174 insertions(+), 131 deletions(-)
- create mode 100644 net/unix/scm.c
- create mode 100644 net/unix/scm.h
+ fs/io_uring.c | 281 ++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 229 insertions(+), 52 deletions(-)
 
-diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-index ddbba838d048..3426d6dacc45 100644
---- a/include/net/af_unix.h
-+++ b/include/net/af_unix.h
-@@ -10,6 +10,7 @@
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index a0513d4bc35d..ce446f59f092 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -94,6 +94,16 @@ struct io_mapped_ubuf {
+ 	unsigned int	nr_bvecs;
+ };
  
- void unix_inflight(struct user_struct *user, struct file *fp);
- void unix_notinflight(struct user_struct *user, struct file *fp);
-+void unix_destruct_scm(struct sk_buff *skb);
- void unix_gc(void);
- void wait_for_unix_gc(void);
- struct sock *unix_get_socket(struct file *filp);
-diff --git a/net/Makefile b/net/Makefile
-index bdaf53925acd..449fc0b221f8 100644
---- a/net/Makefile
-+++ b/net/Makefile
-@@ -18,7 +18,7 @@ obj-$(CONFIG_NETFILTER)		+= netfilter/
- obj-$(CONFIG_INET)		+= ipv4/
- obj-$(CONFIG_TLS)		+= tls/
- obj-$(CONFIG_XFRM)		+= xfrm/
--obj-$(CONFIG_UNIX)		+= unix/
-+obj-$(CONFIG_UNIX_SCM)		+= unix/
- obj-$(CONFIG_NET)		+= ipv6/
- obj-$(CONFIG_BPFILTER)		+= bpfilter/
- obj-$(CONFIG_PACKET)		+= packet/
-diff --git a/net/unix/Kconfig b/net/unix/Kconfig
-index 8b31ab85d050..3b9e450656a4 100644
---- a/net/unix/Kconfig
-+++ b/net/unix/Kconfig
-@@ -19,6 +19,11 @@ config UNIX
- 
- 	  Say Y unless you know what you are doing.
- 
-+config UNIX_SCM
-+	bool
-+	depends on UNIX
-+	default y
++struct async_list {
++	spinlock_t		lock;
++	atomic_t		cnt;
++	struct list_head	list;
 +
- config UNIX_DIAG
- 	tristate "UNIX: socket monitoring interface"
- 	depends on UNIX
-diff --git a/net/unix/Makefile b/net/unix/Makefile
-index ffd0a275c3a7..54e58cc4f945 100644
---- a/net/unix/Makefile
-+++ b/net/unix/Makefile
-@@ -10,3 +10,5 @@ unix-$(CONFIG_SYSCTL)	+= sysctl_net_unix.o
- 
- obj-$(CONFIG_UNIX_DIAG)	+= unix_diag.o
- unix_diag-y		:= diag.o
++	struct file		*file;
++	off_t			io_end;
++	size_t			io_pages;
++};
 +
-+obj-$(CONFIG_UNIX_SCM)	+= scm.o
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 74d1eed7cbd4..2ce32dbb2feb 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -119,6 +119,8 @@
- #include <linux/freezer.h>
- #include <linux/file.h>
+ struct io_ring_ctx {
+ 	struct {
+ 		struct percpu_ref	refs;
+@@ -164,6 +174,8 @@ struct io_ring_ctx {
+ 		struct list_head	cancel_list;
+ 	} ____cacheline_aligned_in_smp;
  
-+#include "scm.h"
++	struct async_list	pending_async[2];
 +
- struct hlist_head unix_socket_table[2 * UNIX_HASH_SIZE];
- EXPORT_SYMBOL_GPL(unix_socket_table);
- DEFINE_SPINLOCK(unix_table_lock);
-@@ -1486,67 +1488,6 @@ static int unix_getname(struct socket *sock, struct sockaddr *uaddr, int peer)
- 	return err;
+ #if defined(CONFIG_UNIX)
+ 	struct socket		*ring_sock;
+ #endif
+@@ -201,6 +213,7 @@ struct io_kiocb {
+ #define REQ_F_FORCE_NONBLOCK	1	/* inline submission attempt */
+ #define REQ_F_IOPOLL_COMPLETED	2	/* polled IO has completed */
+ #define REQ_F_FIXED_FILE	4	/* ctx owns file */
++#define REQ_F_SEQ_PREV		8	/* sequential with previous */
+ 	u64			user_data;
+ 	u64			error;
+ 
+@@ -257,6 +270,7 @@ static void io_ring_ctx_ref_free(struct percpu_ref *ref)
+ static struct io_ring_ctx *io_ring_ctx_alloc(struct io_uring_params *p)
+ {
+ 	struct io_ring_ctx *ctx;
++	int i;
+ 
+ 	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+ 	if (!ctx)
+@@ -272,6 +286,11 @@ static struct io_ring_ctx *io_ring_ctx_alloc(struct io_uring_params *p)
+ 	init_completion(&ctx->ctx_done);
+ 	mutex_init(&ctx->uring_lock);
+ 	init_waitqueue_head(&ctx->wait);
++	for (i = 0; i < ARRAY_SIZE(ctx->pending_async); i++) {
++		spin_lock_init(&ctx->pending_async[i].lock);
++		INIT_LIST_HEAD(&ctx->pending_async[i].list);
++		atomic_set(&ctx->pending_async[i].cnt, 0);
++	}
+ 	spin_lock_init(&ctx->completion_lock);
+ 	INIT_LIST_HEAD(&ctx->poll_list);
+ 	INIT_LIST_HEAD(&ctx->cancel_list);
+@@ -885,6 +904,47 @@ static int io_import_iovec(struct io_ring_ctx *ctx, int rw,
+ 	return import_iovec(rw, buf, sqe_len, UIO_FASTIOV, iovec, iter);
  }
  
--static void unix_detach_fds(struct scm_cookie *scm, struct sk_buff *skb)
--{
--	int i;
--
--	scm->fp = UNIXCB(skb).fp;
--	UNIXCB(skb).fp = NULL;
--
--	for (i = scm->fp->count-1; i >= 0; i--)
--		unix_notinflight(scm->fp->user, scm->fp->fp[i]);
--}
--
--static void unix_destruct_scm(struct sk_buff *skb)
--{
--	struct scm_cookie scm;
--	memset(&scm, 0, sizeof(scm));
--	scm.pid  = UNIXCB(skb).pid;
--	if (UNIXCB(skb).fp)
--		unix_detach_fds(&scm, skb);
--
--	/* Alas, it calls VFS */
--	/* So fscking what? fput() had been SMP-safe since the last Summer */
--	scm_destroy(&scm);
--	sock_wfree(skb);
--}
--
--/*
-- * The "user->unix_inflight" variable is protected by the garbage
-- * collection lock, and we just read it locklessly here. If you go
-- * over the limit, there might be a tiny race in actually noticing
-- * it across threads. Tough.
-- */
--static inline bool too_many_unix_fds(struct task_struct *p)
--{
--	struct user_struct *user = current_user();
--
--	if (unlikely(user->unix_inflight > task_rlimit(p, RLIMIT_NOFILE)))
--		return !capable(CAP_SYS_RESOURCE) && !capable(CAP_SYS_ADMIN);
--	return false;
--}
--
--static int unix_attach_fds(struct scm_cookie *scm, struct sk_buff *skb)
--{
--	int i;
--
--	if (too_many_unix_fds(current))
--		return -ETOOMANYREFS;
--
--	/*
--	 * Need to duplicate file references for the sake of garbage
--	 * collection.  Otherwise a socket in the fps might become a
--	 * candidate for GC while the skb is not yet queued.
--	 */
--	UNIXCB(skb).fp = scm_fp_dup(scm->fp);
--	if (!UNIXCB(skb).fp)
--		return -ENOMEM;
--
--	for (i = scm->fp->count - 1; i >= 0; i--)
--		unix_inflight(scm->fp->user, scm->fp->fp[i]);
--	return 0;
--}
--
- static int unix_scm_to_skb(struct scm_cookie *scm, struct sk_buff *skb, bool send_fds)
- {
- 	int err = 0;
-diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index f81854d74c7d..8bbe1b8e4ff7 100644
---- a/net/unix/garbage.c
-+++ b/net/unix/garbage.c
-@@ -86,80 +86,13 @@
- #include <net/scm.h>
- #include <net/tcp_states.h>
- 
-+#include "scm.h"
-+
- /* Internal data structures and random procedures: */
- 
--static LIST_HEAD(gc_inflight_list);
- static LIST_HEAD(gc_candidates);
--static DEFINE_SPINLOCK(unix_gc_lock);
- static DECLARE_WAIT_QUEUE_HEAD(unix_gc_wait);
- 
--unsigned int unix_tot_inflight;
--
--struct sock *unix_get_socket(struct file *filp)
--{
--	struct sock *u_sock = NULL;
--	struct inode *inode = file_inode(filp);
--
--	/* Socket ? */
--	if (S_ISSOCK(inode->i_mode) && !(filp->f_mode & FMODE_PATH)) {
--		struct socket *sock = SOCKET_I(inode);
--		struct sock *s = sock->sk;
--
--		/* PF_UNIX ? */
--		if (s && sock->ops && sock->ops->family == PF_UNIX)
--			u_sock = s;
--	} else {
--		/* Could be an io_uring instance */
--		u_sock = io_uring_get_socket(filp);
--	}
--	return u_sock;
--}
--
--/* Keep the number of times in flight count for the file
-- * descriptor if it is for an AF_UNIX socket.
-- */
--
--void unix_inflight(struct user_struct *user, struct file *fp)
--{
--	struct sock *s = unix_get_socket(fp);
--
--	spin_lock(&unix_gc_lock);
--
--	if (s) {
--		struct unix_sock *u = unix_sk(s);
--
--		if (atomic_long_inc_return(&u->inflight) == 1) {
--			BUG_ON(!list_empty(&u->link));
--			list_add_tail(&u->link, &gc_inflight_list);
--		} else {
--			BUG_ON(list_empty(&u->link));
--		}
--		unix_tot_inflight++;
--	}
--	user->unix_inflight++;
--	spin_unlock(&unix_gc_lock);
--}
--
--void unix_notinflight(struct user_struct *user, struct file *fp)
--{
--	struct sock *s = unix_get_socket(fp);
--
--	spin_lock(&unix_gc_lock);
--
--	if (s) {
--		struct unix_sock *u = unix_sk(s);
--
--		BUG_ON(!atomic_long_read(&u->inflight));
--		BUG_ON(list_empty(&u->link));
--
--		if (atomic_long_dec_and_test(&u->inflight))
--			list_del_init(&u->link);
--		unix_tot_inflight--;
--	}
--	user->unix_inflight--;
--	spin_unlock(&unix_gc_lock);
--}
--
- static void scan_inflight(struct sock *x, void (*func)(struct unix_sock *),
- 			  struct sk_buff_head *hitlist)
- {
-diff --git a/net/unix/scm.c b/net/unix/scm.c
-new file mode 100644
-index 000000000000..8c40f2b32392
---- /dev/null
-+++ b/net/unix/scm.c
-@@ -0,0 +1,151 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <linux/module.h>
-+#include <linux/kernel.h>
-+#include <linux/string.h>
-+#include <linux/socket.h>
-+#include <linux/net.h>
-+#include <linux/fs.h>
-+#include <net/af_unix.h>
-+#include <net/scm.h>
-+#include <linux/init.h>
-+
-+#include "scm.h"
-+
-+unsigned int unix_tot_inflight;
-+EXPORT_SYMBOL(unix_tot_inflight);
-+
-+LIST_HEAD(gc_inflight_list);
-+EXPORT_SYMBOL(gc_inflight_list);
-+
-+DEFINE_SPINLOCK(unix_gc_lock);
-+EXPORT_SYMBOL(unix_gc_lock);
-+
-+struct sock *unix_get_socket(struct file *filp)
-+{
-+	struct sock *u_sock = NULL;
-+	struct inode *inode = file_inode(filp);
-+
-+	/* Socket ? */
-+	if (S_ISSOCK(inode->i_mode) && !(filp->f_mode & FMODE_PATH)) {
-+		struct socket *sock = SOCKET_I(inode);
-+		struct sock *s = sock->sk;
-+
-+		/* PF_UNIX ? */
-+		if (s && sock->ops && sock->ops->family == PF_UNIX)
-+			u_sock = s;
-+	} else {
-+		/* Could be an io_uring instance */
-+		u_sock = io_uring_get_socket(filp);
-+	}
-+	return u_sock;
-+}
-+EXPORT_SYMBOL(unix_get_socket);
-+
-+/* Keep the number of times in flight count for the file
-+ * descriptor if it is for an AF_UNIX socket.
-+ */
-+void unix_inflight(struct user_struct *user, struct file *fp)
-+{
-+	struct sock *s = unix_get_socket(fp);
-+
-+	spin_lock(&unix_gc_lock);
-+
-+	if (s) {
-+		struct unix_sock *u = unix_sk(s);
-+
-+		if (atomic_long_inc_return(&u->inflight) == 1) {
-+			BUG_ON(!list_empty(&u->link));
-+			list_add_tail(&u->link, &gc_inflight_list);
-+		} else {
-+			BUG_ON(list_empty(&u->link));
-+		}
-+		unix_tot_inflight++;
-+	}
-+	user->unix_inflight++;
-+	spin_unlock(&unix_gc_lock);
-+}
-+
-+void unix_notinflight(struct user_struct *user, struct file *fp)
-+{
-+	struct sock *s = unix_get_socket(fp);
-+
-+	spin_lock(&unix_gc_lock);
-+
-+	if (s) {
-+		struct unix_sock *u = unix_sk(s);
-+
-+		BUG_ON(!atomic_long_read(&u->inflight));
-+		BUG_ON(list_empty(&u->link));
-+
-+		if (atomic_long_dec_and_test(&u->inflight))
-+			list_del_init(&u->link);
-+		unix_tot_inflight--;
-+	}
-+	user->unix_inflight--;
-+	spin_unlock(&unix_gc_lock);
-+}
-+
 +/*
-+ * The "user->unix_inflight" variable is protected by the garbage
-+ * collection lock, and we just read it locklessly here. If you go
-+ * over the limit, there might be a tiny race in actually noticing
-+ * it across threads. Tough.
++ * Make a note of the last file/offset/direction we punted to async
++ * context. We'll use this information to see if we can piggy back a
++ * sequential request onto the previous one, if it's still hasn't been
++ * completed by the async worker.
 + */
-+static inline bool too_many_unix_fds(struct task_struct *p)
++static void io_async_list_note(int rw, struct io_kiocb *req, size_t len)
 +{
-+	struct user_struct *user = current_user();
++	struct async_list *async_list = &req->ctx->pending_async[rw];
++	struct kiocb *kiocb = &req->rw;
++	struct file *filp = kiocb->ki_filp;
++	off_t io_end = kiocb->ki_pos + len;
 +
-+	if (unlikely(user->unix_inflight > task_rlimit(p, RLIMIT_NOFILE)))
-+		return !capable(CAP_SYS_RESOURCE) && !capable(CAP_SYS_ADMIN);
-+	return false;
++	if (filp == async_list->file && kiocb->ki_pos == async_list->io_end) {
++		unsigned long max_pages;
++
++		/* Use 8x RA size as a decent limiter for both reads/writes */
++		max_pages = filp->f_ra.ra_pages;
++		if (!max_pages)
++			max_pages = VM_MAX_READAHEAD >> (PAGE_SHIFT - 10);
++		max_pages *= 8;
++
++		/* If max pages are exceeded, reset the state */
++		len >>= PAGE_SHIFT;
++		if (async_list->io_pages + len <= max_pages) {
++			req->flags |= REQ_F_SEQ_PREV;
++			async_list->io_pages += len;
++		} else {
++			io_end = 0;
++			async_list->io_pages = 0;
++		}
++	}
++
++	/* New file? Reset state. */
++	if (async_list->file != filp) {
++		async_list->io_pages = 0;
++		async_list->file = filp;
++	}
++	async_list->io_end = io_end;
 +}
 +
-+int unix_attach_fds(struct scm_cookie *scm, struct sk_buff *skb)
+ static ssize_t io_read(struct io_kiocb *req, const struct sqe_submit *s,
+ 		       bool force_nonblock, struct io_submit_state *state)
+ {
+@@ -892,6 +952,7 @@ static ssize_t io_read(struct io_kiocb *req, const struct sqe_submit *s,
+ 	struct kiocb *kiocb = &req->rw;
+ 	struct iov_iter iter;
+ 	struct file *file;
++	size_t iov_count;
+ 	ssize_t ret;
+ 
+ 	ret = io_prep_rw(req, s, force_nonblock, state);
+@@ -910,16 +971,24 @@ static ssize_t io_read(struct io_kiocb *req, const struct sqe_submit *s,
+ 	if (ret)
+ 		goto out_fput;
+ 
+-	ret = rw_verify_area(READ, file, &kiocb->ki_pos, iov_iter_count(&iter));
++	iov_count = iov_iter_count(&iter);
++	ret = rw_verify_area(READ, file, &kiocb->ki_pos, iov_count);
+ 	if (!ret) {
+ 		ssize_t ret2;
+ 
+ 		/* Catch -EAGAIN return for forced non-blocking submission */
+ 		ret2 = call_read_iter(file, kiocb, &iter);
+-		if (!force_nonblock || ret2 != -EAGAIN)
++		if (!force_nonblock || ret2 != -EAGAIN) {
+ 			io_rw_done(kiocb, ret2);
+-		else
++		} else {
++			/*
++			 * If ->needs_lock is true, we're already in async
++			 * context.
++			 */
++			if (!s->needs_lock)
++				io_async_list_note(READ, req, iov_count);
+ 			ret = -EAGAIN;
++		}
+ 	}
+ 	kfree(iovec);
+ out_fput:
+@@ -936,14 +1005,12 @@ static ssize_t io_write(struct io_kiocb *req, const struct sqe_submit *s,
+ 	struct kiocb *kiocb = &req->rw;
+ 	struct iov_iter iter;
+ 	struct file *file;
++	size_t iov_count;
+ 	ssize_t ret;
+ 
+ 	ret = io_prep_rw(req, s, force_nonblock, state);
+ 	if (ret)
+ 		return ret;
+-	/* Hold on to the file for -EAGAIN */
+-	if (force_nonblock && !(kiocb->ki_flags & IOCB_DIRECT))
+-		return -EAGAIN;
+ 
+ 	ret = -EBADF;
+ 	file = kiocb->ki_filp;
+@@ -957,8 +1024,17 @@ static ssize_t io_write(struct io_kiocb *req, const struct sqe_submit *s,
+ 	if (ret)
+ 		goto out_fput;
+ 
+-	ret = rw_verify_area(WRITE, file, &kiocb->ki_pos,
+-				iov_iter_count(&iter));
++	iov_count = iov_iter_count(&iter);
++
++	ret = -EAGAIN;
++	if (force_nonblock && !(kiocb->ki_flags & IOCB_DIRECT)) {
++		/* If ->needs_lock is true, we're already in async context. */
++		if (!s->needs_lock)
++			io_async_list_note(WRITE, req, iov_count);
++		goto out_free;
++	}
++
++	ret = rw_verify_area(WRITE, file, &kiocb->ki_pos, iov_count);
+ 	if (!ret) {
+ 		/*
+ 		 * Open-code file_start_write here to grab freeze protection,
+@@ -976,9 +1052,11 @@ static ssize_t io_write(struct io_kiocb *req, const struct sqe_submit *s,
+ 		kiocb->ki_flags |= IOCB_WRITE;
+ 		io_rw_done(kiocb, call_write_iter(file, kiocb, &iter));
+ 	}
++out_free:
+ 	kfree(iovec);
+ out_fput:
+-	if (unlikely(ret))
++	/* Hold on to the file for -EAGAIN */
++	if (unlikely(ret && ret != -EAGAIN))
+ 		io_fput(req);
+ 	return ret;
+ }
+@@ -1374,6 +1452,21 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
+ 	return 0;
+ }
+ 
++static struct async_list *io_async_list_from_sqe(struct io_ring_ctx *ctx,
++						 const struct io_uring_sqe *sqe)
 +{
-+	int i;
-+
-+	if (too_many_unix_fds(current))
-+		return -ETOOMANYREFS;
-+
-+	/*
-+	 * Need to duplicate file references for the sake of garbage
-+	 * collection.  Otherwise a socket in the fps might become a
-+	 * candidate for GC while the skb is not yet queued.
-+	 */
-+	UNIXCB(skb).fp = scm_fp_dup(scm->fp);
-+	if (!UNIXCB(skb).fp)
-+		return -ENOMEM;
-+
-+	for (i = scm->fp->count - 1; i >= 0; i--)
-+		unix_inflight(scm->fp->user, scm->fp->fp[i]);
-+	return 0;
++	switch (sqe->opcode) {
++	case IORING_OP_READV:
++	case IORING_OP_READ_FIXED:
++		return &ctx->pending_async[READ];
++	case IORING_OP_WRITEV:
++	case IORING_OP_WRITE_FIXED:
++		return &ctx->pending_async[WRITE];
++	default:
++		return NULL;
++	}
 +}
-+EXPORT_SYMBOL(unix_attach_fds);
 +
-+void unix_detach_fds(struct scm_cookie *scm, struct sk_buff *skb)
+ static inline bool io_sqe_needs_user(const struct io_uring_sqe *sqe)
+ {
+ 	u8 opcode = READ_ONCE(sqe->opcode);
+@@ -1385,61 +1478,138 @@ static inline bool io_sqe_needs_user(const struct io_uring_sqe *sqe)
+ static void io_sq_wq_submit_work(struct work_struct *work)
+ {
+ 	struct io_kiocb *req = container_of(work, struct io_kiocb, work);
+-	struct sqe_submit *s = &req->submit;
+-	const struct io_uring_sqe *sqe = s->sqe;
+ 	struct io_ring_ctx *ctx = req->ctx;
++	struct mm_struct *cur_mm = NULL;
++	struct async_list *async_list;
++	LIST_HEAD(req_list);
+ 	mm_segment_t old_fs;
+-	bool needs_user;
+ 	int ret;
+ 
+-	 /* Ensure we clear previously set forced non-block flag */
+-	req->flags &= ~REQ_F_FORCE_NONBLOCK;
+-	req->rw.ki_flags &= ~IOCB_NOWAIT;
++	async_list = io_async_list_from_sqe(ctx, req->submit.sqe);
++restart:
++	do {
++		struct sqe_submit *s = &req->submit;
++		const struct io_uring_sqe *sqe = s->sqe;
++
++		/* Ensure we clear previously set forced non-block flag */
++		req->flags &= ~REQ_F_FORCE_NONBLOCK;
++		req->rw.ki_flags &= ~IOCB_NOWAIT;
+ 
+-	s->needs_lock = true;
+-	s->has_user = false;
++		ret = 0;
++		if (io_sqe_needs_user(sqe) && !cur_mm) {
++			if (!mmget_not_zero(ctx->sqo_mm)) {
++				ret = -EFAULT;
++			} else {
++				cur_mm = ctx->sqo_mm;
++				use_mm(cur_mm);
++				old_fs = get_fs();
++				set_fs(USER_DS);
++			}
++		}
++
++		if (!ret) {
++			s->has_user = cur_mm != NULL;
++			s->needs_lock = true;
++			do {
++				ret = __io_submit_sqe(ctx, req, s, false, NULL);
++				/*
++				 * We can get EAGAIN for polled IO even though
++				 * we're forcing a sync submission from here,
++				 * since we can't wait for request slots on the
++				 * block side.
++				 */
++				if (ret != -EAGAIN)
++					break;
++				cond_resched();
++			} while (1);
++		}
++		if (ret) {
++			io_cqring_add_event(ctx, sqe->user_data, ret, 0);
++			io_free_req(req);
++		}
++
++		/* async context always use a copy of the sqe */
++		kfree(sqe);
++
++		if (!async_list)
++			break;
++		if (!list_empty(&req_list)) {
++			req = list_first_entry(&req_list, struct io_kiocb,
++						list);
++			list_del(&req->list);
++			continue;
++		}
++		if (list_empty(&async_list->list))
++			break;
++
++		req = NULL;
++		spin_lock(&async_list->lock);
++		if (list_empty(&async_list->list)) {
++			spin_unlock(&async_list->lock);
++			break;
++		}
++		list_splice_init(&async_list->list, &req_list);
++		spin_unlock(&async_list->lock);
++
++		req = list_first_entry(&req_list, struct io_kiocb, list);
++		list_del(&req->list);
++	} while (req);
+ 
+ 	/*
+-	 * If we're doing IO to fixed buffers, we don't need to get/set
+-	 * user context
++	 * Rare case of racing with a submitter. If we find the count has
++	 * dropped to zero AND we have pending work items, then restart
++	 * the processing. This is a tiny race window.
+ 	 */
+-	needs_user = io_sqe_needs_user(s->sqe);
+-	if (needs_user) {
+-		if (!mmget_not_zero(ctx->sqo_mm)) {
+-			ret = -EFAULT;
+-			goto err;
++	if (async_list) {
++		ret = atomic_dec_return(&async_list->cnt);
++		while (!ret && !list_empty(&async_list->list)) {
++			spin_lock(&async_list->lock);
++			atomic_inc(&async_list->cnt);
++			list_splice_init(&async_list->list, &req_list);
++			spin_unlock(&async_list->lock);
++
++			if (!list_empty(&req_list)) {
++				req = list_first_entry(&req_list,
++							struct io_kiocb, list);
++				list_del(&req->list);
++				goto restart;
++			}
++			ret = atomic_dec_return(&async_list->cnt);
+ 		}
+-		use_mm(ctx->sqo_mm);
+-		old_fs = get_fs();
+-		set_fs(USER_DS);
+-		s->has_user = true;
+ 	}
+ 
+-	do {
+-		ret = __io_submit_sqe(ctx, req, s, false, NULL);
+-		/*
+-		 * We can get EAGAIN for polled IO even though we're forcing
+-		 * a sync submission from here, since we can't wait for
+-		 * request slots on the block side.
+-		 */
+-		if (ret != -EAGAIN)
+-			break;
+-		cond_resched();
+-	} while (1);
+-
+-	if (needs_user) {
++	if (cur_mm) {
+ 		set_fs(old_fs);
+-		unuse_mm(ctx->sqo_mm);
+-		mmput(ctx->sqo_mm);
+-	}
+-err:
+-	if (ret) {
+-		io_cqring_add_event(ctx, sqe->user_data, ret, 0);
+-		io_free_req(req);
++		unuse_mm(cur_mm);
++		mmput(cur_mm);
+ 	}
++}
+ 
+-	/* async context always use a copy of the sqe */
+-	kfree(sqe);
++/*
++ * See if we can piggy back onto previously submitted work, that is still
++ * running. We currently only allow this if the new request is sequential
++ * to the previous one we punted.
++ */
++static bool io_add_to_prev_work(struct async_list *list, struct io_kiocb *req)
 +{
-+	int i;
++	bool ret = false;
 +
-+	scm->fp = UNIXCB(skb).fp;
-+	UNIXCB(skb).fp = NULL;
++	if (!list)
++		return false;
++	if (!(req->flags & REQ_F_SEQ_PREV))
++		return false;
++	if (!atomic_read(&list->cnt))
++		return false;
 +
-+	for (i = scm->fp->count-1; i >= 0; i--)
-+		unix_notinflight(scm->fp->user, scm->fp->fp[i]);
-+}
-+EXPORT_SYMBOL(unix_detach_fds);
++	ret = true;
++	spin_lock(&list->lock);
++	list_add_tail(&req->list, &list->list);
++	if (!atomic_read(&list->cnt)) {
++		list_del_init(&req->list);
++		ret = false;
++	}
++	spin_unlock(&list->lock);
++	return ret;
+ }
+ 
+ static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
+@@ -1464,12 +1634,19 @@ static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
+ 
+ 		sqe_copy = kmalloc(sizeof(*sqe_copy), GFP_KERNEL);
+ 		if (sqe_copy) {
++			struct async_list *list;
 +
-+void unix_destruct_scm(struct sk_buff *skb)
-+{
-+	struct scm_cookie scm;
-+
-+	memset(&scm, 0, sizeof(scm));
-+	scm.pid  = UNIXCB(skb).pid;
-+	if (UNIXCB(skb).fp)
-+		unix_detach_fds(&scm, skb);
-+
-+	/* Alas, it calls VFS */
-+	/* So fscking what? fput() had been SMP-safe since the last Summer */
-+	scm_destroy(&scm);
-+	sock_wfree(skb);
-+}
-+EXPORT_SYMBOL(unix_destruct_scm);
-diff --git a/net/unix/scm.h b/net/unix/scm.h
-new file mode 100644
-index 000000000000..5a255a477f16
---- /dev/null
-+++ b/net/unix/scm.h
-@@ -0,0 +1,10 @@
-+#ifndef NET_UNIX_SCM_H
-+#define NET_UNIX_SCM_H
-+
-+extern struct list_head gc_inflight_list;
-+extern spinlock_t unix_gc_lock;
-+
-+int unix_attach_fds(struct scm_cookie *scm, struct sk_buff *skb);
-+void unix_detach_fds(struct scm_cookie *scm, struct sk_buff *skb);
-+
-+#endif
+ 			memcpy(sqe_copy, s->sqe, sizeof(*sqe_copy));
+ 			s->sqe = sqe_copy;
+ 
+ 			memcpy(&req->submit, s, sizeof(*s));
+-			INIT_WORK(&req->work, io_sq_wq_submit_work);
+-			queue_work(ctx->sqo_wq, &req->work);
++			list = io_async_list_from_sqe(ctx, s->sqe);
++			if (!io_add_to_prev_work(list, req)) {
++				if (list)
++					atomic_inc(&list->cnt);
++				INIT_WORK(&req->work, io_sq_wq_submit_work);
++				queue_work(ctx->sqo_wq, &req->work);
++			}
+ 			ret = 0;
+ 		}
+ 	}
 -- 
 2.17.1
 
