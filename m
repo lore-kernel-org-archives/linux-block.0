@@ -2,210 +2,130 @@ Return-Path: <SRS0=vmzB=QS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40880C282C2
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 03:28:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32F01C169C4
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 03:54:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0C91620873
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 03:28:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0AB0420855
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 03:54:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726154AbfBKD2N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Feb 2019 22:28:13 -0500
-Received: from mout.gmx.net ([212.227.15.15]:58625 "EHLO mout.gmx.net"
+        id S1726243AbfBKDyN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Feb 2019 22:54:13 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51396 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726102AbfBKD2N (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Feb 2019 22:28:13 -0500
-Received: from localhost.localdomain ([218.18.229.179]) by mail.gmx.com
- (mrgmx001 [212.227.17.184]) with ESMTPSA (Nemesis) id
- 0LwJRe-1h9r0O09mw-0181Xg; Mon, 11 Feb 2019 04:28:10 +0100
-From:   Chengguang Xu <cgxu519@gmx.com>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, Chengguang Xu <cgxu519@gmx.com>
-Subject: [PATCH] block: refactor register_blkdev() to compare major number when allocating unused major number
-Date:   Mon, 11 Feb 2019 11:26:19 +0800
-Message-Id: <20190211032619.29208-1-cgxu519@gmx.com>
-X-Mailer: git-send-email 2.20.1
+        id S1726102AbfBKDyN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 10 Feb 2019 22:54:13 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C442FC0669AC;
+        Mon, 11 Feb 2019 03:54:12 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2803360BE0;
+        Mon, 11 Feb 2019 03:54:04 +0000 (UTC)
+Date:   Mon, 11 Feb 2019 11:54:00 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Christoph Hellwig <hch@lst.de>, Bjorn Helgaas <helgaas@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org
+Subject: Re: [PATCH 2/5] genirq/affinity: allow driver to setup managed IRQ's
+ affinity
+Message-ID: <20190211035358.GA8638@ming.t460p>
+References: <20190125095347.17950-1-ming.lei@redhat.com>
+ <20190125095347.17950-3-ming.lei@redhat.com>
+ <alpine.DEB.2.21.1902101723400.8784@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:V+cJZ0pdJeZbiFkDkQa9BFO/CYjrqlBb0SmMPOTJ3GsARuWsj8D
- 1O+sIRSXyGaVDJIjs3nKQf9QZz/PKxgy2FrRNBW2M2VEnpggCh+toAbL4jgjhFzfYsWiKAn
- MPuAOLXCcXmdwlRn/0riAPhemNWdreBlyND9TzIZf2HyV12O4Brh2c/yMHUBAH1H8mPC6IC
- 39wwcPiSrwAPWWbFJJduw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Jo0MizC7U1A=:dBGr24Qy2TxfGfyYabWX1+
- XEWhHIt/3lORmiK3wlQS65rOPS6v1bdgWYzBvHE6sILmARYywjVxvwWssvw/Y82PJYLccTNSk
- xkpHbmOYCl1yocEAuj9lmlW/HtTyWHrCYXMG0JpQrJMKbbv6guKZe6LYHzaoDWBbEK/v48BhX
- /+MYxuR+Rq5A47ZRlTMJxtieQY64Cq6c2dmyk1oYchaNrZhpmLfHrUqJ5lgRdn5WUEH+aO1cs
- GP6xbYS3lQbVt0N2jDvknQnhabR3BMlnl5zCjzWtHt1gscVLb/Y5PPyJhgbE/PiUFiWeozWv8
- DBRgNeINNWSa3BtIw/6URbv3YSpRfBHd1bOUDfFV0RBaxdR8tu1p94okalxMAiypXRm9FloBy
- pjq2WXviZb3yKVW5yaJCiZOS6lnNK50KISKCXRM6B92Y4j0Uf3XuOF1BmIwgdDPr8KYQ1vzR5
- ypRoWc2KegEhXLSpOGEcjW7MVR1vveVMgWWhS7KwXsmabCRZY4ocWrd1YpxZnJtz3bo3RLkGo
- Kq4ZqHBf/hrZSXgMEbOuLI0306xkqomYcjX7UxYSFnSfxsQO78bF8IcgVeLAtyIcn+3vsYrlp
- jF5uq4qbahSnuM3+3OmrxSKAr9cqO+oZBwRUOPc4Wg3IgZeBXoGDOd2W9mPWxzqjYdIruw8A5
- So6cpXPSIstI+wOux4DeEV7Yzy/HZPpLqKL5y0Y/tzDJfxJ0/Tch33d/T80fculKLBQR1EVQz
- RC16qVKIPEv4uAR5GBdGXYVommjGxXGYD4MGv+4qciYIUWrFSWvaGvqnHvbrUNbFSdlyjBJ9K
- q6JwulYzYw191MEok2VE7W+fDDXLXJN+ScIyKHWwpMMdPvKrUxnu24Iw9Q6j8RhRTx1/Ri2RQ
- Svm717aXKnh0UnhIQQxSk373r1u8y6S1E0WkJLQOFkXo0tcGgTpop43ZfQYgRN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.21.1902101723400.8784@nanos.tec.linutronix.de>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Mon, 11 Feb 2019 03:54:12 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently when specifying major number as 0,
-register_blkdev() will try to alloc any unused
-major number in the range. However, the allocating
-logic does not accuretaly compare major number
-with existing entries, so even we have plenty of
-available major numbers but still might fail with
--EBUSY in extreme case.
+Hello Thomas,
 
-Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
----
- block/genhd.c | 103 ++++++++++++++++++++++++++------------------------
- 1 file changed, 54 insertions(+), 49 deletions(-)
+On Sun, Feb 10, 2019 at 05:30:41PM +0100, Thomas Gleixner wrote:
+> Ming,
+> 
+> On Fri, 25 Jan 2019, Ming Lei wrote:
+> 
+> > This patch introduces callback of .setup_affinity into 'struct
+> > irq_affinity', so that:
+> 
+> Please see Documentation/process/submitting-patches.rst. Search for 'This
+> patch' ....
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 1dd8fd6613b8..80b788ed17d1 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -330,6 +330,40 @@ void blkdev_show(struct seq_file *seqf, off_t offset)
- }
- #endif /* CONFIG_PROC_FS */
- 
-+static int __register_blkdev(unsigned int major, const char *name,
-+			     struct blk_major_name *new)
-+{
-+	struct blk_major_name *n, *p = NULL;
-+	int index = major_to_index(major);
-+
-+	for (n = major_names[index]; n; n = n->next) {
-+		if (n->major == major)
-+			return -EBUSY;
-+		p = n;
-+	}
-+
-+	new->major = major;
-+	if (p == NULL)
-+		major_names[index] = new;
-+	else
-+		p->next = new;
-+
-+	return 0;
-+}
-+
-+static int alloc_blkdev(unsigned int major, const char *name,
-+			struct blk_major_name *new)
-+{
-+	int index;
-+
-+	for (index = ARRAY_SIZE(major_names) - 1; index; index--) {
-+		if (__register_blkdev(index, name, new) == 0)
-+			return index;
-+	}
-+
-+	return -EBUSY;
-+}
-+
- /**
-  * register_blkdev - register a new block device
-  *
-@@ -345,73 +379,44 @@ void blkdev_show(struct seq_file *seqf, off_t offset)
-  *    then the function returns zero on success, or a negative error code
-  *  - if any unused major number was requested with @major = 0 parameter
-  *    then the return value is the allocated major number in range
-- *    [1..BLKDEV_MAJOR_MAX-1] or a negative error code otherwise
-+ *    [1..BLKDEV_MAJOR_HASH_SIZE-1] or a negative error code otherwise
-  *
-  * See Documentation/admin-guide/devices.txt for the list of allocated
-  * major numbers.
-  */
- int register_blkdev(unsigned int major, const char *name)
- {
--	struct blk_major_name **n, *p;
--	int index, ret = 0;
--
--	mutex_lock(&block_class_lock);
--
--	/* temporary */
--	if (major == 0) {
--		for (index = ARRAY_SIZE(major_names)-1; index > 0; index--) {
--			if (major_names[index] == NULL)
--				break;
--		}
--
--		if (index == 0) {
--			printk("register_blkdev: failed to get major for %s\n",
--			       name);
--			ret = -EBUSY;
--			goto out;
--		}
--		major = index;
--		ret = major;
--	}
-+	struct blk_major_name *new;
-+	int ret;
- 
- 	if (major >= BLKDEV_MAJOR_MAX) {
--		pr_err("register_blkdev: major requested (%u) is greater than the maximum (%u) for %s\n",
--		       major, BLKDEV_MAJOR_MAX-1, name);
--
--		ret = -EINVAL;
--		goto out;
-+		pr_err("%s: major requested (%u) is greater than the maximum (%u) for %s\n",
-+			__func__, major, BLKDEV_MAJOR_MAX-1, name);
-+		return -EINVAL;
- 	}
- 
--	p = kmalloc(sizeof(struct blk_major_name), GFP_KERNEL);
--	if (p == NULL) {
--		ret = -ENOMEM;
--		goto out;
--	}
-+	new = kmalloc(sizeof(struct blk_major_name), GFP_KERNEL);
-+	if (new == NULL)
-+		return -ENOMEM;
- 
--	p->major = major;
--	strlcpy(p->name, name, sizeof(p->name));
--	p->next = NULL;
--	index = major_to_index(major);
-+	strlcpy(new->name, name, sizeof(new->name));
-+	new->next = NULL;
- 
--	for (n = &major_names[index]; *n; n = &(*n)->next) {
--		if ((*n)->major == major)
--			break;
--	}
--	if (!*n)
--		*n = p;
-+	mutex_lock(&block_class_lock);
-+	if (major == 0)
-+		ret = alloc_blkdev(major, name, new);
- 	else
--		ret = -EBUSY;
-+		ret = __register_blkdev(major, name, new);
-+	mutex_unlock(&block_class_lock);
- 
- 	if (ret < 0) {
--		printk("register_blkdev: cannot get major %u for %s\n",
--		       major, name);
--		kfree(p);
-+		kfree(new);
-+		pr_err("%s: cannot get major for %s, major requested (%u)\n",
-+			__func__, name, major);
- 	}
--out:
--	mutex_unlock(&block_class_lock);
-+
- 	return ret;
- }
--
- EXPORT_SYMBOL(register_blkdev);
- 
- void unregister_blkdev(unsigned int major, const char *name)
--- 
-2.20.1
+Sorry for that, because I am not a native English speaker and it looks a bit
+difficult for me to understand the subtle difference.
 
+> 
+> > 
+> > 1) allow drivers to customize the affinity for managed IRQ, for
+> > example, now NVMe has special requirement for read queues & poll
+> > queues
+> 
+> That's nothing new and already handled today.
+> 
+> > 2) 6da4b3ab9a6e9 ("genirq/affinity: Add support for allocating interrupt sets")
+> > makes pci_alloc_irq_vectors_affinity() a bit difficult to use for
+> > allocating interrupt sets: 'max_vecs' is required to same with 'min_vecs'.
+> 
+> So it's a bit difficult, but you fail to explain why it's not sufficient.
+
+The introduced limit is that 'max_vecs' has to be same with 'min_vecs' for
+pci_alloc_irq_vectors_affinity() wrt. NVMe's use case since commit
+6da4b3ab9a6e9, then NVMe has to deal with irq vectors allocation failure in
+the awkward way of retrying.
+
+And the topic has been discussed in the following links:
+
+https://marc.info/?l=linux-pci&m=154655595615575&w=2
+https://marc.info/?l=linux-pci&m=154646930922174&w=2
+
+Bjorn and Keith thought this usage/interface is a bit awkward because the passed
+'min_vecs' should have avoided driver's retrying.
+
+For NVMe, when irq vectors are run out of from pci_alloc_irq_vectors_affinity(),
+the requested number has to be decreased and retry until it succeeds, then the
+allocated irq vectors has to be re-distributed among the whole irq sets. Turns
+out the re-distribution need driver's knowledge, that is why the callback is
+introduced.
+
+> 
+> > With this patch, driver can implement their own .setup_affinity to
+> > customize the affinity, then the above thing can be solved easily.
+> 
+> Well, I don't really understand what is solved easily and you are merily
+> describing the fact that the new callback allows drivers to customize
+> something. What's the rationale? If it's just the 'bit difficult' part,
+> then what is the reason for not making the core functionality easier to use
+> instead of moving stuff into driver space again?
+
+Another solution mentioned in previous discussion is to split building & setting up
+affinities from allocating irq vectors, but one big problem is that allocating
+'irq_desc' needs the affinity mask for figuring out 'node', see alloc_descs().
+
+> 
+> NVME is not special and all this achieves is that all drivers writers will
+
+I mean that NVMe is the only user of irq sets.
+
+> claim that their device is special and needs its own affinity setter
+> routine. The whole point of having the generic code is to exactly avoid
+> that. If it has shortcomings, then they need to be addressed, but not
+> worked around with random driver callbacks.
+
+Understood.
+
+Thanks,
+Ming
