@@ -2,71 +2,135 @@ Return-Path: <SRS0=vmzB=QS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B12EC282D7
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 15:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B180C169C4
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 15:59:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5447021B18
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 15:55:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38D0A218D8
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 15:59:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="eOSFAq41"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731254AbfBKPzh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Feb 2019 10:55:37 -0500
-Received: from ms.lwn.net ([45.79.88.28]:46286 "EHLO ms.lwn.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730236AbfBKPzg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Feb 2019 10:55:36 -0500
-Received: from localhost.localdomain (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ms.lwn.net (Postfix) with ESMTPSA id 494EF9AE;
-        Mon, 11 Feb 2019 15:55:35 +0000 (UTC)
-Date:   Mon, 11 Feb 2019 08:55:33 -0700
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Al Viro <viro@zeniv.linux.org.uk>, Jann Horn <jannh@google.com>,
-        linux-aio@kvack.org, linux-block@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
-        jmoyer@redhat.com, avi@scylladb.com, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 13/18] io_uring: add file set registration
-Message-ID: <20190211085533.35190404@lwn.net>
-In-Reply-To: <73e23146-2138-5a46-46ed-9c7f1f912a04@kernel.dk>
-References: <20190129192702.3605-1-axboe@kernel.dk>
-        <20190129192702.3605-14-axboe@kernel.dk>
-        <CAG48ez2kLWUEambWesQQaeVn_u=PtjuMeDUc49yamhYspfd7Sg@mail.gmail.com>
-        <20190204025612.GR2217@ZenIV.linux.org.uk>
-        <785c6db4-095e-65b0-ded5-72b41af5174e@kernel.dk>
-        <2b2137ed-8107-f7b6-f0ca-202dcfb87c97@kernel.dk>
-        <40b27e78-9ee8-1395-feb3-a73aac87c9a7@kernel.dk>
-        <20190206005638.GU2217@ZenIV.linux.org.uk>
-        <8f124de2-d6da-d656-25e4-b4d9e58f880e@kernel.dk>
-        <20190207040058.GW2217@ZenIV.linux.org.uk>
-        <73e23146-2138-5a46-46ed-9c7f1f912a04@kernel.dk>
-Organization: LWN.net
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1730873AbfBKP7g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Feb 2019 10:59:36 -0500
+Received: from mail-it1-f193.google.com ([209.85.166.193]:56103 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730114AbfBKP7e (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Feb 2019 10:59:34 -0500
+Received: by mail-it1-f193.google.com with SMTP id f18so16459665itb.5
+        for <linux-block@vger.kernel.org>; Mon, 11 Feb 2019 07:59:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=F04iFmw5as0JwRGyMGw9f6xTEAeCIzyG3ctTbOKxOhQ=;
+        b=eOSFAq41ffwj0VS2QVCR6YByB0twcGu1osYkNYMNUAXGMMgZUN0z5YsarWSxZS2PCk
+         VhPfTSKV80bVPU4eqrA0w6HJvy0JPLNAHF+Po/niSLA9xh33STp5vtvD4f6F6VzNCPfz
+         LchH3mqVvChh41xr1i6IZWHOjHgD6aEZqWWPUzLgwtwPG9GT6J1khjm+Ov8nx4iMrroG
+         izkZP1u0Z/2qEIEohOevhnyvTJ5NGKBSJpvRbefg9wkJnh3hbyCiHOm6rKVmKIlqCYtP
+         D70lhEdMHrGLn4tpDbH+TGx0iLSIRlFzigd/YI3IJYPSQU5M1gBb1Ko3XmvT9RKz4Zsv
+         Ol6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=F04iFmw5as0JwRGyMGw9f6xTEAeCIzyG3ctTbOKxOhQ=;
+        b=bS7Sz9IetfEKw/evexXGmZTphF/AjPr+gQ4F8MsEgdQlXpaZuRgdrfNKg98+I0+bTh
+         FY5l/dTR8F46wBwg1B/sgf0C/89ZC5uAQm9CibWLFgV+WMRA8Nz8iDpK+rxgNsmRsD1t
+         wHu6k6yVOgWMlKaTMWJKRNE0JopOqBTOC6+bysNeQ1bW+X2ZfG67BZ0FGxX+vxzofkaS
+         hfK1lQhLebJLZBH6qd739QLcKgYUMgNH9fhHVK+vV0GNpAvZvSc1+vr9M6a/tltsJ2k3
+         Hj8JiuOFPmHGknV10YRskb+jIdsCFa0SOd66//8kB6g8MwmiyBE+RionebaR8/jfB5pS
+         THtQ==
+X-Gm-Message-State: AHQUAuZOV8RTJvDXoiyr1Fe5q5fenhSzVUa1l7uzEpsH48gDnztZ3qaT
+        z7ekjtQAmERem9mZvrLS2U7Drw==
+X-Google-Smtp-Source: AHgI3IacriPZPD6nqnkoI7fWdojvHgGOsMRdbWNYCsCmwokZ2WG0dnNuz2U+16SMEwnipXtLsDRHoA==
+X-Received: by 2002:a5d:9913:: with SMTP id x19mr16828644iol.99.1549900773398;
+        Mon, 11 Feb 2019 07:59:33 -0800 (PST)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id e19sm4577174iob.70.2019.02.11.07.59.31
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 11 Feb 2019 07:59:32 -0800 (PST)
+Subject: Re: [PATCH] blk-mq: insert rq with DONTPREP to hctx dispatch list
+ when requeue
+To:     Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1549863665-1691-1-git-send-email-jianchao.w.wang@oracle.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <937e9207-dcf7-dab5-1917-8a10303edc67@kernel.dk>
+Date:   Mon, 11 Feb 2019 08:59:31 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1549863665-1691-1-git-send-email-jianchao.w.wang@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 7 Feb 2019 11:45:40 -0700
-Jens Axboe <axboe@kernel.dk> wrote:
-
-> > OK, braindump time:  
+On 2/10/19 10:41 PM, Jianchao Wang wrote:
+> When requeue, if RQF_DONTPREP, rq has contained some driver
+> specific data, so insert it to hctx dispatch list to avoid any
+> merge. Take scsi as example, here is the trace event log (no
+> io scheduler, because RQF_STARTED would prevent merging),
 > 
-> [snip]
+>    kworker/0:1H-339   [000] ...1  2037.209289: block_rq_insert: 8,0 R 4096 () 32768 + 8 [kworker/0:1H]
+> scsi_inert_test-1987  [000] ....  2037.220465: block_bio_queue: 8,0 R 32776 + 8 [scsi_inert_test]
+> scsi_inert_test-1987  [000] ...2  2037.220466: block_bio_backmerge: 8,0 R 32776 + 8 [scsi_inert_test]
+>    kworker/0:1H-339   [000] ....  2047.220913: block_rq_issue: 8,0 R 8192 () 32768 + 16 [kworker/0:1H]
+> scsi_inert_test-1996  [000] ..s1  2047.221007: block_rq_complete: 8,0 R () 32768 + 8 [0]
+> scsi_inert_test-1996  [000] .Ns1  2047.221045: block_rq_requeue: 8,0 R () 32776 + 8 [0]
+>    kworker/0:1H-339   [000] ...1  2047.221054: block_rq_insert: 8,0 R 4096 () 32776 + 8 [kworker/0:1H]
+>    kworker/0:1H-339   [000] ...1  2047.221056: block_rq_issue: 8,0 R 4096 () 32776 + 8 [kworker/0:1H]
+> scsi_inert_test-1986  [000] ..s1  2047.221119: block_rq_complete: 8,0 R () 32776 + 8 [0]
 > 
-> This is great info, and I think it belongs in Documentation/ somewhere.
-> Not sure I've ever seen such a good and detailed dump of this before.
+> (32768 + 8) was requeued by scsi_queue_insert and had RQF_DONTPREP.
+> Then it was merged with (32776 + 8) and issued. Due to RQF_DONTPREP,
+> the sdb only contained the part of (32768 + 8), then only that part
+> was completed. The lucky thing was that scsi_io_completion detected
+> it and requeued the remaining part. So we didn't get corrupted data.
+> However, the requeue of (32776 + 8) is not expected.
 
-I suspect I might be able to make something like that happen :)  Stay
-tuned.
+Good catch, but how about something like this? Makes it more integrated,
+I think that's cleaner.
 
-Thanks,
 
-jon
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 44d471ff8754..4c26bbb4330f 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -737,12 +737,20 @@ static void blk_mq_requeue_work(struct work_struct *work)
+ 	spin_unlock_irq(&q->requeue_lock);
+ 
+ 	list_for_each_entry_safe(rq, next, &rq_list, queuelist) {
+-		if (!(rq->rq_flags & RQF_SOFTBARRIER))
++		/*
++		 * If RQF_DONTPREP is set, rq may contain some driver
++		 * specific data. Insert it to hctx dispatch list to avoid
++		 * any merge.
++		 */
++		if (!(rq->rq_flags & (RQF_SOFTBARRIER | RQF_DONTPREP)))
+ 			continue;
+ 
+ 		rq->rq_flags &= ~RQF_SOFTBARRIER;
+ 		list_del_init(&rq->queuelist);
+-		blk_mq_sched_insert_request(rq, true, false, false);
++		if (rq->rq_flags & RQF_SOFTBARRIER)
++			blk_mq_sched_insert_request(rq, true, false, false);
++		else
++			blk_mq_request_bypass_insert(rq, false);
+ 	}
+ 
+ 	while (!list_empty(&rq_list)) {
+
+
+-- 
+Jens Axboe
+
