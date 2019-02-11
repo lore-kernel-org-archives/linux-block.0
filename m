@@ -2,85 +2,73 @@ Return-Path: <SRS0=vmzB=QS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3DBAC169C4
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 16:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4415C282CE
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 16:37:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 962C221773
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 16:31:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="o9ktg4Gs"
+	by mail.kernel.org (Postfix) with ESMTP id BDF842229F
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 16:37:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727548AbfBKQbL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Feb 2019 11:31:11 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:51910 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726244AbfBKQbK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Feb 2019 11:31:10 -0500
-Received: by mail-it1-f195.google.com with SMTP id y184so21513730itc.1
-        for <linux-block@vger.kernel.org>; Mon, 11 Feb 2019 08:31:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=NB6mV9B8vcQ152ozOfFKlg62KKBFeup4CBAijLKW/ok=;
-        b=o9ktg4Gs1pR2ot43fRr2uBAEWLSaH4mM7rwVLUvhTgPBdDb1CHqP9VJ3P9KjCWBNgQ
-         0GYpdrwdSWoMMpooa1FTJbJz0RtlldwhXVwHCGGLIYxc3dmJSIvfMf7T7ol3d3ipwLl9
-         J8hNW1dsE6yE3fIF8/kDVwYZl1h+PAIzkvYpH0NXz482bSM5X6C0ymDPBfLgDeE4zNSb
-         1MW/EP5ggq+3baJo0YesVXofqgIVOwJvkiVX2vvKHGpcmXmRHawRY39zcquvz29cpX5U
-         gToU55rh+jDx4r2aZyIDHASI04rooWIt6ncbifS+BbHh2KUq9R90B1Fj8l7OEyjMtEvf
-         ckYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=NB6mV9B8vcQ152ozOfFKlg62KKBFeup4CBAijLKW/ok=;
-        b=KZ7Z+hb4HbbFx2V92P9ylD4oWibaIpKDOtdnNUUmUM5p2LO2xkfIoc37zsmEwORu3S
-         ZAtZf2fuGmRe3qasTS4OvW3CYaRdXpzNqnen/YW4bbL+ugYvJj5fmAa+hpT7ksKBT+Jp
-         xfGc/UVbzq/DQBK3uomEHxoGYpZ6wVLmd5GjIZwMkHMQYSvqmwAXoaAOYTEaf0kZp8Fp
-         CyapW+sXArFLkvSVSBuUDhxVV3rkpbcIBy2ihdwnPcEdzKsE0GCbMze9OZpgg4L55MvH
-         FGZeR2KKp8Jj95ePRK+wKNqyVZV2DF4vs6h1VcwFlt5kfRrTfop+4HPTwfdCnn/cdRLB
-         Yj/Q==
-X-Gm-Message-State: AHQUAuZkFfR1zpznZdogZrhOT8TRBzyk/HubT3mQvZ5I2ZLZZExC53+Q
-        v3dw4GcTUPo/XLU847yjo0fT1Q==
-X-Google-Smtp-Source: AHgI3IadP15Qd5ZG8A352PrfgFG/NRP+ZvGkasnxxN2HSL9LI06kWkOHzDR0uN2/wqPO6qA3KWrnNg==
-X-Received: by 2002:a5e:8517:: with SMTP id i23mr19001527ioj.28.1549902670078;
-        Mon, 11 Feb 2019 08:31:10 -0800 (PST)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id 196sm5507266itu.33.2019.02.11.08.31.07
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Feb 2019 08:31:08 -0800 (PST)
-Subject: Re: [5.0-rc5 regression] "scsi: kill off the legacy IO path" causes 5
- minute delay during boot on Sun Blade 2500
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Mikael Pettersson <mikpelinux@gmail.com>
-Cc:     Linux SPARC Kernel Mailing List <sparclinux@vger.kernel.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <CAM43=SO6bdDAEULEPArfgdbjLAYDo9OiPBa8gL4fsSg7Dky=gA@mail.gmail.com>
- <1549736341.2971.7.camel@HansenPartnership.com>
- <CAM43=SPUMzOLRmkoT+DQSpzu2DYRTyOhU6o8KRUU_Q902o2e1Q@mail.gmail.com>
- <1549813472.4142.3.camel@HansenPartnership.com>
- <3380ed8e-ae02-96f2-142b-7cce09459df8@kernel.dk>
- <1549815924.4142.8.camel@HansenPartnership.com>
- <0e6e5d67-d305-dd00-2e42-e2299166c8b2@kernel.dk>
- <1549898730.2831.6.camel@HansenPartnership.com>
- <44bb4374-0b7c-733b-a53e-92d2f03f2f49@kernel.dk>
- <1549899773.2831.12.camel@HansenPartnership.com>
- <1a00da0e-cb8e-30ea-8d17-120f97242b2f@kernel.dk>
- <1549902521.2831.23.camel@HansenPartnership.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <fce66227-ff41-3a4e-4c6a-f4c2ca492b95@kernel.dk>
-Date:   Mon, 11 Feb 2019 09:31:07 -0700
+        id S1728905AbfBKQhI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Feb 2019 11:37:08 -0500
+Received: from smtp3-g21.free.fr ([212.27.42.3]:7431 "EHLO smtp3-g21.free.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727247AbfBKQhH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Feb 2019 11:37:07 -0500
+Received: from [192.168.108.68] (unknown [213.36.7.13])
+        (Authenticated sender: marc.w.gonzalez)
+        by smtp3-g21.free.fr (Postfix) with ESMTPSA id 707ED13F8C1;
+        Mon, 11 Feb 2019 17:36:13 +0100 (CET)
+Subject: Re: dd hangs when reading large partitions
+To:     Bart Van Assche <bvanassche@acm.org>,
+        linux-mm <linux-mm@kvack.org>,
+        linux-block <linux-block@vger.kernel.org>
+Cc:     Jianchao Wang <jianchao.w.wang@oracle.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        fsdevel <linux-fsdevel@vger.kernel.org>,
+        SCSI <linux-scsi@vger.kernel.org>,
+        Jeffrey Hugo <jhugo@codeaurora.org>,
+        Evan Green <evgreen@chromium.org>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Stephen Boyd <swboyd@chromium.org>,
+        Tomas Winkler <tomas.winkler@intel.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Martin Petersen <martin.petersen@oracle.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
+        Roman Gushchin <guro@fb.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@suse.com>,
+        James Bottomley <jejb@linux.ibm.com>
+References: <f792574c-e083-b218-13b4-c89be6566015@free.fr>
+ <398a6e83-d482-6e72-5806-6d5bbe8bfdd9@oracle.com>
+ <ef734b94-e72b-771f-350b-08d8054a58f3@kernel.dk>
+ <20190119095601.GA7440@infradead.org>
+ <07b2df5d-e1fe-9523-7c11-f3058a966f8a@free.fr>
+ <985b340c-623f-6df2-66bd-d9f4003189ea@free.fr>
+ <b3910158-83d6-21fe-1606-33e88912404a@oracle.com>
+ <d082bdee-62e5-d470-b63b-196c0fe3b9fb@free.fr>
+ <5132e41b-cb1a-5b81-4a72-37d0f9ea4bb9@oracle.com>
+ <7bd8b010-bf0c-ad64-f927-2d2187a18d0b@free.fr>
+ <0cfe1ed2-41e1-66a4-8d98-ebc0d9645d21@free.fr>
+ <d91e8342-4672-d51d-1bde-74e910e5a959@free.fr>
+ <27165898-88c3-ab42-c6c9-dd52bf0a41c8@free.fr>
+ <66419195-594c-aa83-c19d-f091ad3b296d@free.fr>
+ <1549640986.34241.78.camel@acm.org>
+From:   Marc Gonzalez <marc.w.gonzalez@free.fr>
+Message-ID: <690af800-1cd2-3e68-94d9-bc4825790837@free.fr>
+Date:   Mon, 11 Feb 2019 17:36:13 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <1549902521.2831.23.camel@HansenPartnership.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1549640986.34241.78.camel@acm.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -88,58 +76,40 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/11/19 9:28 AM, James Bottomley wrote:
-> On Mon, 2019-02-11 at 08:46 -0700, Jens Axboe wrote:
->> On 2/11/19 8:42 AM, James Bottomley wrote:
->>> On Mon, 2019-02-11 at 08:28 -0700, Jens Axboe wrote:
->>>> On 2/11/19 8:25 AM, James Bottomley wrote:
->>>>> On Sun, 2019-02-10 at 09:35 -0700, Jens Axboe wrote:
->>>>>> On 2/10/19 9:25 AM, James Bottomley wrote:
-> [...]
->>>>>>> That check wasn't changed by the code removal.
->>>>>>
->>>>>> As I said above, for sd. This isn't true for non-disks.
->>>>>
->>>>> Yes, but the behaviour above doesn't change across a switch to
->>>>> MQ, so I don't quite understand how it bisects back to that
->>>>> change.  If we're not gathering entropy for the device now, we
->>>>> wouldn't have been before the switch, so the entropy
->>>>> characteristics shouldn't have changed.
->>>>
->>>> But it does, as I also wrote in that first email. The legacy
->>>> queue flags had QUEUE_FLAG_ADD_RANDOM set by default, the MQ ones
->>>> do not. Hence any non-sd device would previously ALWAYS have
->>>> ADD_RANDOM set, now none of them do. Also see the patch I sent.
->>>
->>> So your theory is that the disk in question never gets to the
->>> rotational check?  because the check will clear the flag if it's
->>> non-rotational and set it if it's not, so the default state of the
->>> flag shouldn't matter.
->>
->> No, my point is about non-disks, devices that aren't driven by sd.
->> The behavior for sd hasn't changed, as it sets/clears it
->> unconditionally.
-> 
-> I agree, but I don't think any of them were significant entropy
-> contributors before: things like nvme have always been outside of this
-> and sr and st don't really contribute much to the seek load during boot
-> because they're probed but not used by the boot sequence, so I can't
-> see how they would cause this behaviour.  I suppose it could be target
-> probing, but even that seems unlikely because it should be dwarfed by
-> the number of root disk reads during boot.
-> 
-> For the rng to take an additional 5 minutes to initialize, we must have
-> lost a significant entropy source somewhere.
+On 08/02/2019 16:49, Bart Van Assche wrote:
 
-I agree it's not a significant amount of entropy, but even just one bit
-could mean a long stall if that put us over the edge of just not having
-enough for whatever is blocking on /dev/random. Mikael's boot did have a
-CDROM, it's not impossible that the handful of commands we end up doing
-to that device would have contributed enough entropy to get the boot
-done without stalling for minutes.
+> Does this problem only occur with block devices backed by the UFS driver
+> or does this problem also occur with other block drivers?
 
-One way to know for sure, and that's if Mikael tests the patch.
+Yes, same issue with a USB3 mass storage device:
 
--- 
-Jens Axboe
+usb 2-1: new SuperSpeed Gen 1 USB device number 2 using xhci-hcd
+usb 2-1: New USB device found, idVendor=05dc, idProduct=a838, bcdDevice=11.00
+usb 2-1: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+usb 2-1: Product: USB Flash Drive
+usb 2-1: Manufacturer: Lexar
+usb 2-1: SerialNumber: AAYW2W7I13BAR0JC
+usb-storage 2-1:1.0: USB Mass Storage device detected
+scsi host0: usb-storage 2-1:1.0
+scsi 0:0:0:0: Direct-Access     Lexar    USB Flash Drive  1100 PQ: 0 ANSI: 6
+sd 0:0:0:0: [sda] 62517248 512-byte logical blocks: (32.0 GB/29.8 GiB)
+sd 0:0:0:0: [sda] Write Protect is off
+sd 0:0:0:0: [sda] Mode Sense: 43 00 00 00
+sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
+ sda: sda1
+sd 0:0:0:0: [sda] Attached SCSI removable disk
 
+# dd if=/dev/sda of=/dev/null bs=1M status=progress
+3879731200 bytes (3.9 GB, 3.6 GiB) copied, 56.0097 s, 69.3 MB/s
+
+This definitively rules out drivers/scsi/ufs
+(Dropping UFS people)
+
+So the problem could be in SCSI glue, or block, or mm?
+
+How can I pinpoint the bug?
+
+Problem statement and logs:
+https://lore.kernel.org/linux-block/66419195-594c-aa83-c19d-f091ad3b296d@free.fr/
+
+Regards.
