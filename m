@@ -2,70 +2,154 @@ Return-Path: <SRS0=vmzB=QS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B39EAC169C4
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 20:33:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E60BC282CE
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 20:40:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 817FD218F0
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 20:33:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1998D218A4
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 20:40:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c8Dpw+3t"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727319AbfBKUdj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Feb 2019 15:33:39 -0500
-Received: from ms.lwn.net ([45.79.88.28]:47478 "EHLO ms.lwn.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726207AbfBKUdj (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Feb 2019 15:33:39 -0500
-Received: from localhost.localdomain (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ms.lwn.net (Postfix) with ESMTPSA id B32159AE;
-        Mon, 11 Feb 2019 20:33:37 +0000 (UTC)
-Date:   Mon, 11 Feb 2019 13:33:35 -0700
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     Al Viro <viro@zeniv.linux.org.uk>
-Cc:     Jens Axboe <axboe@kernel.dk>, Jann Horn <jannh@google.com>,
-        linux-aio@kvack.org, linux-block@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
-        jmoyer@redhat.com, avi@scylladb.com, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 13/18] io_uring: add file set registration
-Message-ID: <20190211133335.2b114df8@lwn.net>
-In-Reply-To: <20190211173521.GI2217@ZenIV.linux.org.uk>
-References: <CAG48ez2kLWUEambWesQQaeVn_u=PtjuMeDUc49yamhYspfd7Sg@mail.gmail.com>
-        <20190204025612.GR2217@ZenIV.linux.org.uk>
-        <785c6db4-095e-65b0-ded5-72b41af5174e@kernel.dk>
-        <2b2137ed-8107-f7b6-f0ca-202dcfb87c97@kernel.dk>
-        <40b27e78-9ee8-1395-feb3-a73aac87c9a7@kernel.dk>
-        <20190206005638.GU2217@ZenIV.linux.org.uk>
-        <8f124de2-d6da-d656-25e4-b4d9e58f880e@kernel.dk>
-        <20190207040058.GW2217@ZenIV.linux.org.uk>
-        <73e23146-2138-5a46-46ed-9c7f1f912a04@kernel.dk>
-        <20190211085533.35190404@lwn.net>
-        <20190211173521.GI2217@ZenIV.linux.org.uk>
-Organization: LWN.net
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S1727197AbfBKUkd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Feb 2019 15:40:33 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34990 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726892AbfBKUkd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Feb 2019 15:40:33 -0500
+Received: by mail-wr1-f68.google.com with SMTP id t18so284967wrx.2;
+        Mon, 11 Feb 2019 12:40:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=aRRtjcrcVo+Gfaj/zX8Bw1iJ3MLE2kmxEDTa4rlrB10=;
+        b=c8Dpw+3tPDH4dqPl8avgxjKxKfbxB7sXLA1eCltNVPmOgXV49okHrFlPpvJiBkUJOU
+         CVYJyM/WWWE95z+5t1CscflAI3ljDt7nltAPQlUSDZIFc5t/AWddrIWKXEM9hH27Kdjq
+         jdjkv7NcUJmEqxDJCg8LtVbyj7seo/r96FOuqwMvPlCY3RoyuPX6htWxj1KYM14PDxTy
+         mSZhMDVKDx8rIFLr+GnLXOsSJSvGRfJpiPZHRLyuOdwsslNOI2fR3CcyBkhnwxNhvUNA
+         2xLzXdhYPWsMcKwxYMl5P9Aub8MGdL9ZtQ7d334VMYiJgAqT3/4Rrumi2lxnQpiwtU+E
+         oGQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=aRRtjcrcVo+Gfaj/zX8Bw1iJ3MLE2kmxEDTa4rlrB10=;
+        b=DKcs11v17xDSgz3Swb7/Co0G7XlUyJcKZSc+VsRWdKsn750FoE2MxdPuM0DMBXRlrv
+         pQvwVVDmtEMEhBU+3n1k/75jQfQfiI81hwv+7CUgWFNHy6Q7tSGvQxzW70ewL4GosIaq
+         XDOEKT22NFW59yr3xPWeQ1cdxaw/nRwHRto4ui7YsJoTPU8qw+CmAb1W1aLEYpeIf2vu
+         AS4jFSVxRj+YyExlrT4fy8xScDTnSGTDM/fGm4xY+lVltJK7wohDoOQ+lC55++XzXN7d
+         WpogTdVM5EI657zwzenrpuSadyO6O5ql2i8nRrWw9GXzMCjdFbu0IXI6wrbvPvTD6Vg3
+         H9GQ==
+X-Gm-Message-State: AHQUAua41+JeRoLjjEMY3mkLepKbsQjbmM9iaMCsRgcoq2ZoH/JxwxKy
+        /1yjZhTXkLRjI7D3eJCDWw==
+X-Google-Smtp-Source: AHgI3IY5TG3Z9EP68R9xnD7caOTWZlOc+FwnEu9lJPOMZgKlSDNrTR1qwhbn4mTnEhZftd2y09+ejQ==
+X-Received: by 2002:adf:ee82:: with SMTP id b2mr57625wro.185.1549917630648;
+        Mon, 11 Feb 2019 12:40:30 -0800 (PST)
+Received: from localhost ([95.238.120.247])
+        by smtp.gmail.com with ESMTPSA id e4sm10742811wrt.53.2019.02.11.12.40.29
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 11 Feb 2019 12:40:30 -0800 (PST)
+Date:   Mon, 11 Feb 2019 21:40:29 +0100
+From:   Andrea Righi <righi.andrea@gmail.com>
+To:     Josef Bacik <josef@toxicpanda.com>
+Cc:     Paolo Valente <paolo.valente@linaro.org>,
+        Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jens Axboe <axboe@kernel.dk>, Vivek Goyal <vgoyal@redhat.com>,
+        Dennis Zhou <dennis@kernel.org>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v2] blkcg: prevent priority inversion problem during
+ sync()
+Message-ID: <20190211204029.GB1520@xps-13>
+References: <20190209140749.GB1910@xps-13>
+ <20190211153933.p26pu5jmbmisbkos@macbook-pro-91.dhcp.thefacebook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190211153933.p26pu5jmbmisbkos@macbook-pro-91.dhcp.thefacebook.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 11 Feb 2019 17:35:21 +0000
-Al Viro <viro@zeniv.linux.org.uk> wrote:
+On Mon, Feb 11, 2019 at 10:39:34AM -0500, Josef Bacik wrote:
+> On Sat, Feb 09, 2019 at 03:07:49PM +0100, Andrea Righi wrote:
+> > This is an attempt to mitigate the priority inversion problem of a
+> > high-priority blkcg issuing a sync() and being forced to wait the
+> > completion of all the writeback I/O generated by any other low-priority
+> > blkcg, causing massive latencies to processes that shouldn't be
+> > I/O-throttled at all.
+> > 
+> > The idea is to save a list of blkcg's that are waiting for writeback:
+> > every time a sync() is executed the current blkcg is added to the list.
+> > 
+> > Then, when I/O is throttled, if there's a blkcg waiting for writeback
+> > different than the current blkcg, no throttling is applied (we can
+> > probably refine this logic later, i.e., a better policy could be to
+> > adjust the throttling I/O rate using the blkcg with the highest speed
+> > from the list of waiters - priority inheritance, kinda).
+> > 
+> > This topic has been discussed here:
+> > https://lwn.net/ml/cgroups/20190118103127.325-1-righi.andrea@gmail.com/
+> > 
+> > But we didn't come up with any definitive solution.
+> > 
+> > This patch is not a definitive solution either, but it's an attempt to
+> > continue addressing this issue and handling the priority inversion
+> > problem with sync() in a better way.
+> > 
+> > Signed-off-by: Andrea Righi <righi.andrea@gmail.com>
+> 
+> Talked with Tejun about this some and we agreed the following is probably the
+> best way forward
 
-> If you turn that thing into a coherent text, I'd appreciate a chance
-> to take a look at the result and see if anything else needs to be
-> corrected...
+First of all thanks for the update!
 
-Thanks for the updated info!
+> 
+> 1) Track the submitter of the wb work to the writeback code.
 
-I'm likely to do a watered-down version for some disreputable web site
-first; after that, I'll try to do it properly for Documentation/.  You'll
-certainly see the result in your inbox once it's ready to be looked at.
+Are we going to track the cgroup that originated the dirty pages (or
+maybe dirty inodes) or do you have any idea in particular?
+
+> 2) Sync() defaults to the root cg, and and it writes all the things as the root
+>    cg.
+
+OK.
+
+> 3) Add a flag to the cgroups that would make sync()'ers in that group only be
+>    allowed to write out things that belong to its group.
+
+So, IIUC, when this flag is enabled a cgroup that is doing sync() would
+trigger the writeback of the pages that belong to that cgroup only and
+it waits only for these pages to be sync-ed, right? In this case
+writeback can still go at cgroup's speed.
+
+Instead when the flag is disabled, sync() would trigger writeback I/O
+globally, as usual, and it goes at full speed (root cgroup's speed).
+
+Am I understanding correctly?
+
+> 
+> This way we avoid the priority inversion of having things like systemd or random
+> logged in user doing sync() and having to wait, and we keep low prio cgroups
+> from causing big IO storms by syncing out stuff and getting upgraded to root
+> priority just to avoid the inversion.
+> 
+> Obviously by default we want this flag to be off since its such a big change,
+> but people/setups really worried about this behavior (Facebook for instance
+> would likely use this flag) can go ahead and set it and be sure we're getting
+> good isolation and still avoiding the priority inversion associated with running
+> sync from a high priority context.  Thanks,
+> 
+> Josef
 
 Thanks,
-
-jon
+-Andrea
