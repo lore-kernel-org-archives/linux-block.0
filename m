@@ -2,79 +2,50 @@ Return-Path: <SRS0=vmzB=QS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70CD6C169C4
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 10:20:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E807C169C4
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 10:31:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A52020838
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 10:20:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="iHpNVE2i"
+	by mail.kernel.org (Postfix) with ESMTP id D567320821
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 10:31:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726173AbfBKKUM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Feb 2019 05:20:12 -0500
-Received: from forward103o.mail.yandex.net ([37.140.190.177]:41719 "EHLO
-        forward103o.mail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725996AbfBKKUM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Feb 2019 05:20:12 -0500
-X-Greylist: delayed 418 seconds by postgrey-1.27 at vger.kernel.org; Mon, 11 Feb 2019 05:20:11 EST
-Received: from mxback12j.mail.yandex.net (mxback12j.mail.yandex.net [IPv6:2a02:6b8:0:1619::87])
-        by forward103o.mail.yandex.net (Yandex) with ESMTP id 6F9685F820EB;
-        Mon, 11 Feb 2019 13:13:12 +0300 (MSK)
-Received: from smtp4o.mail.yandex.net (smtp4o.mail.yandex.net [2a02:6b8:0:1a2d::28])
-        by mxback12j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id Ru6WfEz2fU-DCSeehcZ;
-        Mon, 11 Feb 2019 13:13:12 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail; t=1549879992;
-        bh=ISPu5tIpHwpshOYfg8lSfgKtASJCv4J8FWzh/LEOkbQ=;
-        h=From:To:Cc:Subject:Date:Message-Id;
-        b=iHpNVE2i1G1nFwU8mco0qSaQNsTT/7CVLlCe7CxKe8uTRcU9JurMcER3dg2HdpfEC
-         tJ8lvOLK2kjEiMm/0h47YrkynCElphtoaYLVd0mOrtcjeQwr7J7RPFyAZz6M1SDfD7
-         DBbrJkp52cs/c45i/leNaTSrOFhxM8oHkCn9k55A=
-Authentication-Results: mxback12j.mail.yandex.net; dkim=pass header.i=@yandex.ru
-Received: by smtp4o.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id YPvs6NoGcc-DBGCWst4;
-        Mon, 11 Feb 2019 13:13:11 +0300
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (Client certificate not present)
-From:   Aleksei Zakharov <zakharov.a.g@yandex.ru>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org,
-        Aleksei Zakharov <zakharov.a.g@yandex.ru>
-Subject: [PATCH] block: avoid setting wbt_lat_usec to current value
-Date:   Mon, 11 Feb 2019 13:10:34 +0300
-Message-Id: <1549879834-24837-1-git-send-email-zakharov.a.g@yandex.ru>
-X-Mailer: git-send-email 2.7.4
+        id S1726045AbfBKKb4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Feb 2019 05:31:56 -0500
+Received: from mx2.suse.de ([195.135.220.15]:35286 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725931AbfBKKb4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Feb 2019 05:31:56 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 0C349AFAE;
+        Mon, 11 Feb 2019 10:31:55 +0000 (UTC)
+Date:   Mon, 11 Feb 2019 11:31:54 +0100
+From:   Johannes Thumshirn <jthumshirn@suse.de>
+To:     Aleksei Zakharov <zakharov.a.g@yandex.ru>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: avoid setting wbt_lat_usec to current value
+Message-ID: <20190211103154.GB7427@linux-x5ow.site>
+References: <1549879834-24837-1-git-send-email-zakharov.a.g@yandex.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1549879834-24837-1-git-send-email-zakharov.a.g@yandex.ru>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There's no reason to set wbt min lat and freeze request queue
-if current value is the same.
-
-Signed-off-by: Aleksei Zakharov <zakharov.a.g@yandex.ru>
----
- block/blk-sysfs.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 590d1ef..d0df883 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -468,6 +468,9 @@ static ssize_t queue_wb_lat_store(struct request_queue *q, const char *page,
- 	else if (val >= 0)
- 		val *= 1000ULL;
- 
-+	if (wbt_get_min_lat(q) == val)
-+		return count;
-+
- 	/*
- 	 * Ensure that the queue is idled, in case the latency update
- 	 * ends up either enabling or disabling wbt completely. We can't
+Looks good,
+Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
 -- 
-2.7.4
-
+Johannes Thumshirn                            SUSE Labs Filesystems
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
