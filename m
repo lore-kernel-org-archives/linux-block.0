@@ -2,116 +2,101 @@ Return-Path: <SRS0=vmzB=QS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6325C282CE
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 17:28:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C81C169C4
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 17:35:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 811602229E
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 17:28:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB5082229F
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 17:35:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728310AbfBKR2f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Feb 2019 12:28:35 -0500
-Received: from smtp3-g21.free.fr ([212.27.42.3]:30214 "EHLO smtp3-g21.free.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726140AbfBKR2f (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Feb 2019 12:28:35 -0500
-Received: from [192.168.108.68] (unknown [213.36.7.13])
-        (Authenticated sender: marc.w.gonzalez)
-        by smtp3-g21.free.fr (Postfix) with ESMTPSA id D39E613F81D;
-        Mon, 11 Feb 2019 18:27:41 +0100 (CET)
-Subject: Re: dd hangs when reading large partitions
-From:   Marc Gonzalez <marc.w.gonzalez@free.fr>
-To:     Bart Van Assche <bvanassche@acm.org>,
-        linux-mm <linux-mm@kvack.org>,
-        linux-block <linux-block@vger.kernel.org>
-Cc:     Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        fsdevel <linux-fsdevel@vger.kernel.org>,
-        SCSI <linux-scsi@vger.kernel.org>,
-        Jeffrey Hugo <jhugo@codeaurora.org>,
-        Evan Green <evgreen@chromium.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Douglas Anderson <dianders@chromium.org>,
-        Stephen Boyd <swboyd@chromium.org>,
-        Tomas Winkler <tomas.winkler@intel.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Martin Petersen <martin.petersen@oracle.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
-        Roman Gushchin <guro@fb.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Michal Hocko <mhocko@suse.com>,
-        James Bottomley <jejb@linux.ibm.com>
-References: <f792574c-e083-b218-13b4-c89be6566015@free.fr>
- <398a6e83-d482-6e72-5806-6d5bbe8bfdd9@oracle.com>
- <ef734b94-e72b-771f-350b-08d8054a58f3@kernel.dk>
- <20190119095601.GA7440@infradead.org>
- <07b2df5d-e1fe-9523-7c11-f3058a966f8a@free.fr>
- <985b340c-623f-6df2-66bd-d9f4003189ea@free.fr>
- <b3910158-83d6-21fe-1606-33e88912404a@oracle.com>
- <d082bdee-62e5-d470-b63b-196c0fe3b9fb@free.fr>
- <5132e41b-cb1a-5b81-4a72-37d0f9ea4bb9@oracle.com>
- <7bd8b010-bf0c-ad64-f927-2d2187a18d0b@free.fr>
- <0cfe1ed2-41e1-66a4-8d98-ebc0d9645d21@free.fr>
- <d91e8342-4672-d51d-1bde-74e910e5a959@free.fr>
- <27165898-88c3-ab42-c6c9-dd52bf0a41c8@free.fr>
- <66419195-594c-aa83-c19d-f091ad3b296d@free.fr>
- <1549640986.34241.78.camel@acm.org>
- <690af800-1cd2-3e68-94d9-bc4825790837@free.fr>
-Message-ID: <493e04e4-849d-8f25-95e3-408f775fab64@free.fr>
-Date:   Mon, 11 Feb 2019 18:27:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1727393AbfBKRfa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Feb 2019 12:35:30 -0500
+Received: from zeniv.linux.org.uk ([195.92.253.2]:51048 "EHLO
+        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726243AbfBKRfa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Feb 2019 12:35:30 -0500
+Received: from viro by ZenIV.linux.org.uk with local (Exim 4.91 #2 (Red Hat Linux))
+        id 1gtFUH-00067j-UB; Mon, 11 Feb 2019 17:35:21 +0000
+Date:   Mon, 11 Feb 2019 17:35:21 +0000
+From:   Al Viro <viro@zeniv.linux.org.uk>
+To:     Jonathan Corbet <corbet@lwn.net>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jann Horn <jannh@google.com>,
+        linux-aio@kvack.org, linux-block@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
+        jmoyer@redhat.com, avi@scylladb.com, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 13/18] io_uring: add file set registration
+Message-ID: <20190211173521.GI2217@ZenIV.linux.org.uk>
+References: <CAG48ez2kLWUEambWesQQaeVn_u=PtjuMeDUc49yamhYspfd7Sg@mail.gmail.com>
+ <20190204025612.GR2217@ZenIV.linux.org.uk>
+ <785c6db4-095e-65b0-ded5-72b41af5174e@kernel.dk>
+ <2b2137ed-8107-f7b6-f0ca-202dcfb87c97@kernel.dk>
+ <40b27e78-9ee8-1395-feb3-a73aac87c9a7@kernel.dk>
+ <20190206005638.GU2217@ZenIV.linux.org.uk>
+ <8f124de2-d6da-d656-25e4-b4d9e58f880e@kernel.dk>
+ <20190207040058.GW2217@ZenIV.linux.org.uk>
+ <73e23146-2138-5a46-46ed-9c7f1f912a04@kernel.dk>
+ <20190211085533.35190404@lwn.net>
 MIME-Version: 1.0
-In-Reply-To: <690af800-1cd2-3e68-94d9-bc4825790837@free.fr>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190211085533.35190404@lwn.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/02/2019 17:36, Marc Gonzalez wrote:
-
-> On 08/02/2019 16:49, Bart Van Assche wrote:
+On Mon, Feb 11, 2019 at 08:55:33AM -0700, Jonathan Corbet wrote:
+> On Thu, 7 Feb 2019 11:45:40 -0700
+> Jens Axboe <axboe@kernel.dk> wrote:
 > 
->> Does this problem only occur with block devices backed by the UFS driver
->> or does this problem also occur with other block drivers?
+> > > OK, braindump time:  
+> > 
+> > [snip]
+> > 
+> > This is great info, and I think it belongs in Documentation/ somewhere.
+> > Not sure I've ever seen such a good and detailed dump of this before.
 > 
-> Yes, same issue with a USB3 mass storage device:
-> 
-> usb 2-1: new SuperSpeed Gen 1 USB device number 2 using xhci-hcd
-> usb 2-1: New USB device found, idVendor=05dc, idProduct=a838, bcdDevice=11.00
-> usb 2-1: New USB device strings: Mfr=1, Product=2, SerialNumber=3
-> usb 2-1: Product: USB Flash Drive
-> usb 2-1: Manufacturer: Lexar
-> usb 2-1: SerialNumber: AAYW2W7I13BAR0JC
-> usb-storage 2-1:1.0: USB Mass Storage device detected
-> scsi host0: usb-storage 2-1:1.0
-> scsi 0:0:0:0: Direct-Access     Lexar    USB Flash Drive  1100 PQ: 0 ANSI: 6
-> sd 0:0:0:0: [sda] 62517248 512-byte logical blocks: (32.0 GB/29.8 GiB)
-> sd 0:0:0:0: [sda] Write Protect is off
-> sd 0:0:0:0: [sda] Mode Sense: 43 00 00 00
-> sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, doesn't support DPO or FUA
->  sda: sda1
-> sd 0:0:0:0: [sda] Attached SCSI removable disk
-> 
-> # dd if=/dev/sda of=/dev/null bs=1M status=progress
-> 3879731200 bytes (3.9 GB, 3.6 GiB) copied, 56.0097 s, 69.3 MB/s
-> 
-> So the problem could be in SCSI glue, or block, or mm?
+> I suspect I might be able to make something like that happen :)  Stay
+> tuned.
 
-Unlikely. Someone else would have been affected...
+There are several typos I see in there (e.g. in
 
-A colleague pointed out that some memory areas are reserved downstream.
-Perhaps the FW goes haywire once the kernel touches reserved memory?
+        * struct file instances A and B being AF_UNIX sockets.
+        * A is a listener
+        * B is an established connection, with the other end
+yet to be accepted on A
+        * the only references to A and B are in an SCM_RIGHTS
+datagram sent over by A.
 
-I'm off to test that hypothesis.
+the last line should be "datagram sent over by B", of course - you can't
+send anything over a listener socket, to start with).
 
-Regards.
+Another thing is this:
+
+        * references cannot be extracted from SCM_RIGHTS datagrams
+while the garbage collector is running (achieved by having
+unix_notinflight() done before references out of SCM_RIGHTS)
+        * removal of SCM_RIGHTS associated with a socket can't
+be done without a reference to that socket _outside_ of any
+SCM_RIGHTS (automatically true).
+
+That's worse than a typo - that's an actual bug (see the subthread
+with Miklos).  Correct version would be
+	* any references extracted from SCM_RIGHTS during the
+garbage collector run will not be actually used until the end
+of garbage collection.  For normal recvmsg() it is guaranteed
+by having unix_notinflight() called between the extraction of
+scm_fp_list from the packet and doing anything else with the
+references extracted.  For MSG_PEEK recvmsg() it's actually
+broken and lacks synchronization; Miklos has proposed to grab
+and release unix_gc_lock in those, between scm_fp_dup() and
+doing anything else with the references copied.
+
+If you turn that thing into a coherent text, I'd appreciate a chance
+to take a look at the result and see if anything else needs to be
+corrected...
