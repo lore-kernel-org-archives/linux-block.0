@@ -2,82 +2,70 @@ Return-Path: <SRS0=vmzB=QS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB87C169C4
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 20:08:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B39EAC169C4
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 20:33:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E92FC217FA
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 20:08:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="1ErJuzd1"
+	by mail.kernel.org (Postfix) with ESMTP id 817FD218F0
+	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 20:33:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728947AbfBKUIc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Feb 2019 15:08:32 -0500
-Received: from mail-pl1-f170.google.com ([209.85.214.170]:37435 "EHLO
-        mail-pl1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727073AbfBKUIb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Feb 2019 15:08:31 -0500
-Received: by mail-pl1-f170.google.com with SMTP id b5so76807plr.4
-        for <linux-block@vger.kernel.org>; Mon, 11 Feb 2019 12:08:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
-         :user-agent;
-        bh=CgKmuNLHySyo6WC+PSY7NZ1hSB4C1/nIn7zZ6pHdVBo=;
-        b=1ErJuzd1EYdkYSINNrydbzUTRvf9AgsrXmagRMd40ojgrQKacoVk2nrDBTwHkJ3/xa
-         sgv7toXgT1rCCAUnOgri/YDPlRFtLqh9mMPLRaf6fB/9hpUGGISkxblK+NgNTo54RNl0
-         paw46k9wYmPuB8LSlP1GF1vvgcEcFQTp4eSSjD1sgmdXQ8BWi8bMR8MvBrVqTYdxpLTD
-         Hb2mXb6Z82EwOtHQPgK9f/I5y+N0K/kwTcZSHtoRSWigLs5wveCK//VXZjSSANN+U55n
-         wXgikuI2/u3Wv6TBXDNKmpJ0DfUgAVdmAH5L2fyDRrqXUQ7FiZJOR9wu6dCxpJjSv5S6
-         ymHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=CgKmuNLHySyo6WC+PSY7NZ1hSB4C1/nIn7zZ6pHdVBo=;
-        b=rILFEvR8Eq/RDhTZoQiwhAkxjDca+ZLlQep0ae+nlA0OoU+UIpYwkWuBxSPUDQOd4B
-         imGCbKBP+d5Nmsx+Mol3ZcmGvSYWBNUj/Ni3p3jCd8XbV2Hd/e/rbd28/7hyoaBEgEHW
-         tAT7GOdWqPNQOoAyOmzYQTZkjzgsJIbOHQY2p2yOUpPGO5bhrSfnqL9BxccW3zqoxtTw
-         17oumkz7ZEZqzQN6gwNczjiKKwLfeh85k3F7fBXjmFn4ZykWe6f5dUjZsCv8brQJ093C
-         LgOadKLvY7qRoCoFHL+jxUUrec404jlEoN+g+V8ttU3m+ofXR58xXsHooUtpYDnOgqWx
-         +U/A==
-X-Gm-Message-State: AHQUAuYG/MmCy2I8sWHgQ73swFr1Y8G9saqmJxLak2h/CL1D7JzYV8Rf
-        h2Zcmwe+1A+R+ySR2DNShHODZ2O5uww=
-X-Google-Smtp-Source: AHgI3IZ2NxS6J6yvizqW4FX3KYCRditq/x+j05DdseQrAzEkMZQgVQpCqAonbosU0bFdXNiaJs0wwQ==
-X-Received: by 2002:a17:902:31a4:: with SMTP id x33mr38258517plb.198.1549915710819;
-        Mon, 11 Feb 2019 12:08:30 -0800 (PST)
-Received: from vader ([2601:602:8b00:55d3:e6a7:a0ff:fe0b:c9a8])
-        by smtp.gmail.com with ESMTPSA id b2sm13599008pgg.87.2019.02.11.12.08.29
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 11 Feb 2019 12:08:30 -0800 (PST)
-Date:   Mon, 11 Feb 2019 12:08:29 -0800
-From:   Omar Sandoval <osandov@osandov.com>
-To:     lsf-pc@lists.linux-foundation.org
-Cc:     linux-block@vger.kernel.org
-Subject: [LSF/MM ATTEND] blktests, misc block layer and filesystem topics
-Message-ID: <20190211200829.GA28773@vader>
+        id S1727319AbfBKUdj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Feb 2019 15:33:39 -0500
+Received: from ms.lwn.net ([45.79.88.28]:47478 "EHLO ms.lwn.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726207AbfBKUdj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Feb 2019 15:33:39 -0500
+Received: from localhost.localdomain (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ms.lwn.net (Postfix) with ESMTPSA id B32159AE;
+        Mon, 11 Feb 2019 20:33:37 +0000 (UTC)
+Date:   Mon, 11 Feb 2019 13:33:35 -0700
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Jens Axboe <axboe@kernel.dk>, Jann Horn <jannh@google.com>,
+        linux-aio@kvack.org, linux-block@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
+        jmoyer@redhat.com, avi@scylladb.com, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH 13/18] io_uring: add file set registration
+Message-ID: <20190211133335.2b114df8@lwn.net>
+In-Reply-To: <20190211173521.GI2217@ZenIV.linux.org.uk>
+References: <CAG48ez2kLWUEambWesQQaeVn_u=PtjuMeDUc49yamhYspfd7Sg@mail.gmail.com>
+        <20190204025612.GR2217@ZenIV.linux.org.uk>
+        <785c6db4-095e-65b0-ded5-72b41af5174e@kernel.dk>
+        <2b2137ed-8107-f7b6-f0ca-202dcfb87c97@kernel.dk>
+        <40b27e78-9ee8-1395-feb3-a73aac87c9a7@kernel.dk>
+        <20190206005638.GU2217@ZenIV.linux.org.uk>
+        <8f124de2-d6da-d656-25e4-b4d9e58f880e@kernel.dk>
+        <20190207040058.GW2217@ZenIV.linux.org.uk>
+        <73e23146-2138-5a46-46ed-9c7f1f912a04@kernel.dk>
+        <20190211085533.35190404@lwn.net>
+        <20190211173521.GI2217@ZenIV.linux.org.uk>
+Organization: LWN.net
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.11.3 (2019-02-01)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Mon, 11 Feb 2019 17:35:21 +0000
+Al Viro <viro@zeniv.linux.org.uk> wrote:
 
-I'd like to attend LSF/MM to discuss:
+> If you turn that thing into a coherent text, I'd appreciate a chance
+> to take a look at the result and see if anything else needs to be
+> corrected...
 
-- Blktests (see Chaitanya's topic proposal [1], which we hope to present
-  together).
-- Core block layer work.
-- Filesystem topics, especially relating to Btrfs.
+Thanks for the updated info!
 
-Thanks!
+I'm likely to do a watered-down version for some disreputable web site
+first; after that, I'll try to do it properly for Documentation/.  You'll
+certainly see the result in your inbox once it's ready to be looked at.
 
-1: https://www.spinics.net/lists/linux-block/msg36761.html
+Thanks,
+
+jon
