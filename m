@@ -2,71 +2,70 @@ Return-Path: <SRS0=MN5j=QT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B38AC282C4
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 08:09:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA907C282C4
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 08:21:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 38DE621773
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 08:09:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="I+gCxE2d"
+	by mail.kernel.org (Postfix) with ESMTP id 9F5BF218AD
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 08:21:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728217AbfBLIJm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Feb 2019 03:09:42 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:33584 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727784AbfBLIJm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Feb 2019 03:09:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=vu9AScBBB/V1d5AoJvQYMVgNiqdAXC6jfdZDIq3GRRI=; b=I+gCxE2d17dB1w5Iwvtcev5RI
-        97ZR/KxNvCO6Hz0Ekb56JaJmc7inBH1kp4+o7n3l50gyss/fi5SbOLgCk7K2buhw097XIaiqLviDV
-        IhmTLm4PUBbVyqhB99sZoR+RTBzIMHXR/XFYPyD2gHZSaBbnCXi+YT3aeM09K3tTZdQQfndDUpUCo
-        xDn6a9scXUt6oOsgIsO5gQdSRodYSP0znffGd1RDtssnYMLobVaKli4R89Hrbjz8hOS9rnSLYg0Ji
-        9vhSDsU0140Frjzhlp5sFb3fQjG4yowYVZVx9ck6A3qhHro2d4Lf4gkrtjpTfFfAOgTKdgeaB/pLA
-        VJaOR/LNA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gtT8P-0001EN-Vk; Tue, 12 Feb 2019 08:09:41 +0000
-Date:   Tue, 12 Feb 2019 00:09:41 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Subject: Re: [PATCH 2/2] block: queue flag cleanup
-Message-ID: <20190212080941.GB1807@infradead.org>
-References: <20190209224424.7560-1-axboe@kernel.dk>
- <20190209224424.7560-3-axboe@kernel.dk>
+        id S1728027AbfBLIV6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Feb 2019 03:21:58 -0500
+Received: from mx2.cyber.ee ([193.40.6.72]:49027 "EHLO mx2.cyber.ee"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728009AbfBLIV6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Feb 2019 03:21:58 -0500
+Subject: Re: qla2xxx init warning with blk_mq at drivers/pci/msi.c:1273
+ pci_irq_get_affinity+0xf4/0x120
+To:     Giridhar Malavali <gmalavali@marvell.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "qla2xxx-upstream@qlogic.com" <qla2xxx-upstream@qlogic.com>
+References: <c58b0ffc-434b-9db4-9ed5-07650368f336@linux.ee>
+ <9D8CA1BB-21B3-42AD-B2A7-7986A40C06EB@marvell.com>
+From:   Meelis Roos <mroos@linux.ee>
+Message-ID: <f9334c87-644b-b584-d3cc-60cfc148790c@linux.ee>
+Date:   Tue, 12 Feb 2019 10:21:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190209224424.7560-3-axboe@kernel.dk>
-User-Agent: Mutt/1.9.2 (2017-12-15)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <9D8CA1BB-21B3-42AD-B2A7-7986A40C06EB@marvell.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: et-EE
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Feb 09, 2019 at 03:44:24PM -0700, Jens Axboe wrote:
-> We have QUEUE_FLAG_DEFAULT defined, but it's not used anymore since
-> the legacy IO stack is gone. Kill it.
-> 
-> Sanitize the queue flags in general, they use spaces (for some
-> reason), and the space is pretty sparse. With the flags renumbered,
-> we can more clearly see how many we have available.
-> 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> We are working on this and we will have an update for this.
+>      I tested todays 5.0.0-rc5-00358-gdf3865f on my sparcs and a couple of servers that have qla2xxx
+>      FC adapter gave me this warning:
+>      
+>      [   19.746300] qla2xxx [0000:00:00.0]-0005: : QLogic Fibre Channel HBA Driver: 10.00.00.12-k.
+>      [   19.746599] qla2xxx [0000:02:00.0]-001d: : Found an ISP2432 irq 18 iobase 0x(____ptrval____).
+>      [   20.203186] ------------[ cut here ]------------
+>      [   20.203306] WARNING: CPU: 8 PID: 268 at drivers/pci/msi.c:1273 pci_irq_get_affinity+0xf4/0x120
+Today I tried another sparc with newer OS and gcc and older hardware platform (Sun V445)
+and that did not exhibit the problem with QLA2422. PCI-MSI is still present there too but
+does not seem to be used for qla2xxx (it has "sun4v -IVEC" irq type).
 
-Looks good,
+Relevant dmesg lines:
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+[   47.905692] qla2xxx [0000:00:00.0]-0005: : QLogic Fibre Channel HBA Driver: 10.00.00.12-k.
+[   47.905801] qla2xxx [0000:06:01.0]-001d: : Found an ISP2422 irq 6 iobase 0x(____ptrval____).
+[   48.744347] scsi host3: qla2xxx
+[   48.864173] qla2xxx [0000:06:01.0]-00fb:3: QLogic QLA2460 - SG-(X)PCI1FC-QF4, Sun StorageTek 4 Gb FC Enterprise PCI-X Single Channel Host B.
+[   48.938909] scsi: waiting for bus probes to complete ...
+[   49.044973] qla2xxx [0000:06:01.0]-00fc:3: ISP2422: PCI-X Mode 1 (133 MHz) @ 0000:06:01.0 hdma- host#=3 fw=8.07.00 (9496).
+[   49.045110] qla2xxx [0001:08:02.0]-001d: : Found an ISP2422 irq 17 iobase 0x(____ptrval____).
+[   49.604393] scsi host4: qla2xxx
+[   49.794640] qla2xxx [0001:08:02.0]-00fb:4: QLogic QLA2460 - SG-(X)PCI1FC-QF4, Sun StorageTek 4 Gb FC Enterprise PCI-X Single Channel Host B.
+[   50.160011] qla2xxx [0001:08:02.0]-00fc:4: ISP2422: PCI-X Mode 1 (100 MHz) @ 0001:08:02.0 hdma- host#=4 fw=8.07.00 (9496).
+[   69.884173] qla2xxx [0000:06:01.0]-8038:3: Cable is unplugged...
+[   71.068227] qla2xxx [0001:08:02.0]-8038:4: Cable is unplugged...
 
-Btw, I think we should kill off QUEUE_FLAG_MQ_DEFAULT as well and open
-code it in blk_mq_init_allocated_queue instead.
+-- 
+Meelis Roos <mroos@linux.ee>
