@@ -2,86 +2,79 @@ Return-Path: <SRS0=MN5j=QT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 879B7C169C4
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 03:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68636C169C4
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 03:17:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5AD4E217FA
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 03:12:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36C582083E
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 03:17:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726655AbfBLDMJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Feb 2019 22:12:09 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3280 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726226AbfBLDMJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Feb 2019 22:12:09 -0500
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 45F2DD684A69A4395FE9;
-        Tue, 12 Feb 2019 11:12:07 +0800 (CST)
-Received: from [127.0.0.1] (10.184.189.120) by DGGEMS402-HUB.china.huawei.com
- (10.3.19.202) with Microsoft SMTP Server id 14.3.408.0; Tue, 12 Feb 2019
- 11:12:04 +0800
-Subject: Re: [dm-devel] block: Fix a WRITE SAME BUG_ON
-To:     Christoph Hellwig <hch@infradead.org>,
-        Heinz Mauelshagen <heinzm@redhat.com>,
-        John Dorminy <jdorminy@redhat.com>
-CC:     <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "Mike Snitzer" <snitzer@redhat.com>, <linux-block@vger.kernel.org>,
-        <dm-devel@redhat.com>, Alasdair G Kergon <agk@redhat.com>
-References: <20190125021107.4595-1-zhangxiaoxu5@huawei.com>
- <CAMeeMh_=UVGwo-=9WtBXRmiHTXnLAswqis97bM-aiuwnzPU0QQ@mail.gmail.com>
- <20190128221441.GA24102@redhat.com> <yq1lg34f4i7.fsf@oracle.com>
- <CAMeeMh85T_qui=LWd0u=b_oMN5XLqowqkvLuYGBM2Ae6tS-mzg@mail.gmail.com>
- <20190131103924.GA22503@infradead.org>
- <CAMeeMh-uxiee7rKutnr3jrMjzkc8=R2Y3DPPBLvLYjqSwjfi_w@mail.gmail.com>
- <20190201073527.GA14758@infradead.org>
- <CAMeeMh-wAZ8377sMrnyQZUt2HT1hB02DHSROJURLmPsaZPkeQQ@mail.gmail.com>
- <f7b05928-316c-4c73-b04b-bba38ea60b27@redhat.com>
- <20190201161803.GA21124@infradead.org>
-From:   "zhangxiaoxu (A)" <zhangxiaoxu5@huawei.com>
-Message-ID: <d693e299-3c7d-b3cb-e8c7-a1f94bba4697@huawei.com>
-Date:   Tue, 12 Feb 2019 11:11:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.0
+        id S1726756AbfBLDRk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Feb 2019 22:17:40 -0500
+Received: from mout.gmx.net ([212.227.15.18]:41571 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726699AbfBLDRk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Feb 2019 22:17:40 -0500
+Received: from localhost.localdomain ([218.18.229.179]) by mail.gmx.com
+ (mrgmx002 [212.227.17.184]) with ESMTPSA (Nemesis) id
+ 0M6jMS-1hGgcP2Rtc-00wZ4M; Tue, 12 Feb 2019 04:17:38 +0100
+From:   Chengguang Xu <cgxu519@gmx.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, Chengguang Xu <cgxu519@gmx.com>
+Subject: [PATCH] block: remove redundant unlikely annotation
+Date:   Tue, 12 Feb 2019 11:16:57 +0800
+Message-Id: <20190212031657.14324-1-cgxu519@gmx.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190201161803.GA21124@infradead.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.184.189.120]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:jKosQEJQT+jxK9WNDOMQI0oIh9KlD5NCBV4sK3/0ztei/VDRax2
+ ECH4WThjTocJMvUYjHc8jrrlIKKBIPp8TjSAIA2P8NXTkxu4DYPhCWhHWw7pGcR1DCqB4zY
+ ulaq9NeM4Tl5m0bT+6pHCEztmpHYWKuS7FYOKW2+wbfe5LmikKpFul4F4/Mcu+seIQXsD83
+ jpC2quTjNQV9b1qvds1iA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:GyW9gXjyodw=:X13FHi+AXOvE4mX2GWDpJh
+ M/P5r3wKljsnGl8jhJczGfBKSqlKq8wSYHFgC4T/axavgNeGTcDRWJwchZEUDVOuwWbbqiA5C
+ 6rsPJrAEpBfx23d5c/30WqKKKyg18Z+8p6thS10Ml+iK1OdzQIuasPOV5P3iUvQG+yLwE4Y9F
+ OI5O3zMhYTIWb5syHdVCTOsz384T7lCFOweFmYmsySKE3elp0FBDo2BzrgtDfhQKJTUi1O8nE
+ KE7JQN7bCvlpCmD81OfLtl5MwEo+LaYxJfSr4mzMh7jn3FVrHzW3CNVECCb8wI6LqdMfgXtES
+ QdZuCMNWJ1T6Vmm3rSPcte43+L5o3eH1q0STe6BVnUROvSSJQbBlyXwUKVNMK2bj2DfUrBJtm
+ Sc1BnoABr+ogPL6rDop2Qw4USi0Z6E118foINySp1Y/+suniRcgI/Z8GbyVfOiJxGxOL4vOLp
+ tkLKU6vG7zZNW2UseFycnc1e5rMPm+dYKho3zG1CkpC71LcfIf7qoGMMI0di4pq4Ux2r/r+mr
+ 8QBtyficyFlDLTrxfmQHjrrez8G8Fe9Zob8rB1kbtfbk6cEH/q/rE3p4u0QQEQozcvl4ehuZG
+ o/QanGOfIB8zl64z4cdoSTVsL9+cmDFR6c3KIop9zYN3+L4RFTdyT+eQJqg9I8gU6N1c5MW0j
+ zPkz1iotKzfoFSnlPDqhS3ArZXuggLyVb0woU54NJHS0frLchcIE5Aa/ZN0EqQOu+tR25gXgZ
+ b8qJ6NDYPhr+8ApwoA+eWYMnRZc9ae0Jd32H6grDVbtfayiYXYh7571ZCVFobWnSAxP2rWrVb
+ 3hns+8u6YDSsfjFS67harGU0T+AaZJnZayS0XgvpLBQXLWNKmGUG9RcX42TIlCgQupJmkPBqZ
+ z5e7wtYg0OYPjhSmO4aPbKGja0e900o+tFfpVns5iSniOAipk/TeJ+sSd6XPGL
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Any progress about the problme?
-Should we disable the write same when stack the different LBA disks?
+unlikely has already included in IS_ERR(),
+so just remove it.
 
-On 2/2/2019 12:18 AM, Christoph Hellwig wrote:
-> On Fri, Feb 01, 2019 at 05:03:40PM +0100, Heinz Mauelshagen wrote:
->> On 2/1/19 3:09 PM, John Dorminy wrote:
->>> I didn't know such a thing existed... does it work on any block
->>> device? Where do I read more about this?
->>
->>
->> Use sg_write_same(8) from package sg3_utils.
->>
->> For instance 'sg_write_same --in=foobarfile --lba=0 --num=20000
->> --xferlen=512 /dev/sdwhatever'
->>
->> will read the pattern to write same from file 'foobarfile' with length
->> explicitely set to 512 bytes
->> (rather than derived from foobarfile's size) and write it 20000 times
->> starting at LBA 0 to /dev/sdwhatever.
-> 
-> Yeah.  Note that this will only work on SCSI disks (and maybe ATA
-> for a very specific corner case).  But for actual devices and not
-> remappers the same is true of REQ_OP_WRITE_SAME.
-> 
-> .
-> 
+Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
+---
+ block/blk-cgroup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 2bed5725aa03..699dba716c83 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -880,7 +880,7 @@ int blkg_conf_prep(struct blkcg *blkcg, const struct blkcg_policy *pol,
+ 			blkg_free(new_blkg);
+ 		} else {
+ 			blkg = blkg_create(pos, q, new_blkg);
+-			if (unlikely(IS_ERR(blkg))) {
++			if (IS_ERR(blkg)) {
+ 				ret = PTR_ERR(blkg);
+ 				goto fail_unlock;
+ 			}
+-- 
+2.20.1
 
