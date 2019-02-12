@@ -2,240 +2,93 @@ Return-Path: <SRS0=MN5j=QT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6121BC282CE
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 17:33:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14D49C282C4
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 18:38:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1E2B520821
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 17:33:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="UbllP/2A"
+	by mail.kernel.org (Postfix) with ESMTP id E446C2190B
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 18:38:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731002AbfBLRdI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Feb 2019 12:33:08 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:37083 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728066AbfBLRdH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Feb 2019 12:33:07 -0500
-Received: by mail-it1-f193.google.com with SMTP id b5so9612055iti.2
-        for <linux-block@vger.kernel.org>; Tue, 12 Feb 2019 09:33:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=VvrEK3+715paSWL5+YIBNkfQ4m9roausALc06nzMAiI=;
-        b=UbllP/2ADkG4hH86t0doAABK8Qa6dZC8ZEx3soKiwl35p9D5fUN4qxZNbkLluawCqX
-         dekeJ92Vs/DoroZu2sCjOrR0s2wHaElRJfBC2z/hYtgrhAdLd8im5QcJc8pdkgqYprxm
-         CMNd6b7awZYFIsUL/APX7Bovk6TBlvBgbsjsWf/GebV+Nxwj2PYVqFQl3GmkKnlApc4l
-         11+RYxDvU9wga/Lzswjcm3kzU9RW9quFh9pPniV09W666x39fsqCvOrz93M+/2WgfYYc
-         cBL0kPfu2UF/LCIl+DeBZYtehYMTDwp6/dEFCKWOvJCbG2jp68AXunxw0Sr6F/uHyPzK
-         P51g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=VvrEK3+715paSWL5+YIBNkfQ4m9roausALc06nzMAiI=;
-        b=R/QxIKazfcLf4QWFzFadn4aid/E/bwHp6rw5Cqug1Lr1TNDt6pQvWmSXTPXoR1oEWE
-         g2h6Gg3Ql3hQS0gHo6fjl7rr82xj9+DRSyjYzuqS/iqbjtoMYFzyQpixXf7Mx1CWgpko
-         /Ix0TF7oro/+jCBuJf/uU/HIGCWqOCo30tA5PR3yBwp6ApKP1T5anPhSxz/TYpA7bjPj
-         XEP91Rrn2svDhUM80bGC54ea1d7CsCgkJRr0fdC5KmdvnpDsh72xIcipy4k/4l6mCO06
-         aUJiwj7/R9pM0SN2xvO08dNc/Zc6Gj4F12aLUnCHSrMb4Ma5UG39iyWf8MmIdNQKAhc/
-         tWZw==
-X-Gm-Message-State: AHQUAuZg5180ot3uYUjPADxxg26jQvkknDCCYakGUa322+RbVKkmKZzP
-        m5p+S+wBSYxqvlABekhZveTAPg==
-X-Google-Smtp-Source: AHgI3IZY4eheUHhfp/Vx5vnfaIkDmV3S98EZ2vpl8vfb9c6JwpcLn042zAu3Jqm5bCyvJId+smoQIA==
-X-Received: by 2002:a6b:7505:: with SMTP id l5mr2652518ioh.244.1549992785952;
-        Tue, 12 Feb 2019 09:33:05 -0800 (PST)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id j133sm1759123itj.16.2019.02.12.09.33.04
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 12 Feb 2019 09:33:04 -0800 (PST)
-Subject: Re: [PATCH 13/18] io_uring: add file set registration
-To:     Alan Jenkins <alan.christopher.jenkins@gmail.com>,
-        linux-aio@kvack.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org
-Cc:     hch@lst.de, jmoyer@redhat.com, avi@scylladb.com, jannh@google.com,
-        viro@ZenIV.linux.org.uk
-References: <20190207195552.22770-1-axboe@kernel.dk>
- <20190207195552.22770-14-axboe@kernel.dk>
- <bfd383aa-24fb-35ae-eef5-545ab0f493c7@gmail.com>
- <2ac73020-6ab0-e351-3a1a-180d0f1f801b@kernel.dk>
- <02e71636-5b63-41e6-0ffd-646f305011c9@gmail.com>
- <ad669e88-5a33-37e1-6d69-e2b182d89891@kernel.dk>
- <c2ef6663-3e15-d071-56e3-4afba7b2d778@gmail.com>
- <1f1dc8b8-ad8f-16d1-c688-0ab1ce2df378@kernel.dk>
- <6c7ea7da-ab56-f1b8-2399-c0579b4eceec@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a326cb39-d55d-8047-a916-1562b33af76a@kernel.dk>
-Date:   Tue, 12 Feb 2019 10:33:03 -0700
+        id S1731929AbfBLSia (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Feb 2019 13:38:30 -0500
+Received: from mx2.cyber.ee ([193.40.6.72]:50165 "EHLO mx2.cyber.ee"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727469AbfBLSia (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Feb 2019 13:38:30 -0500
+Subject: Re: qla2xxx init warning with blk_mq at drivers/pci/msi.c:1273
+ pci_irq_get_affinity+0xf4/0x120
+To:     Giridhar Malavali <gmalavali@marvell.com>,
+        Meelis Roos <mroos@linux.ee>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "qla2xxx-upstream@qlogic.com" <qla2xxx-upstream@qlogic.com>
+References: <c58b0ffc-434b-9db4-9ed5-07650368f336@linux.ee>
+ <9D8CA1BB-21B3-42AD-B2A7-7986A40C06EB@marvell.com>
+From:   Meelis Roos <mroos@linux.ee>
+Message-ID: <59ea474f-347e-185b-73c7-7fa7e6cfa7b4@linux.ee>
+Date:   Tue, 12 Feb 2019 20:38:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-In-Reply-To: <6c7ea7da-ab56-f1b8-2399-c0579b4eceec@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <9D8CA1BB-21B3-42AD-B2A7-7986A40C06EB@marvell.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: et-EE
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/12/19 10:21 AM, Alan Jenkins wrote:
-> On 12/02/2019 15:17, Jens Axboe wrote:
->> On 2/12/19 5:29 AM, Alan Jenkins wrote:
->>> On 08/02/2019 15:13, Jens Axboe wrote:
->>>> On 2/8/19 7:02 AM, Alan Jenkins wrote:
->>>>> On 08/02/2019 12:57, Jens Axboe wrote:
->>>>>> On 2/8/19 5:17 AM, Alan Jenkins wrote:
->>>>>>>> +static int io_sqe_files_scm(struct io_ring_ctx *ctx)
->>>>>>>> +{
->>>>>>>> +#if defined(CONFIG_NET)
->>>>>>>> +	struct scm_fp_list *fpl = ctx->user_files;
->>>>>>>> +	struct sk_buff *skb;
->>>>>>>> +	int i;
->>>>>>>> +
->>>>>>>> +	skb =  __alloc_skb(0, GFP_KERNEL, 0, NUMA_NO_NODE);
->>>>>>>> +	if (!skb)
->>>>>>>> +		return -ENOMEM;
->>>>>>>> +
->>>>>>>> +	skb->sk = ctx->ring_sock->sk;
->>>>>>>> +	skb->destructor = unix_destruct_scm;
->>>>>>>> +
->>>>>>>> +	fpl->user = get_uid(ctx->user);
->>>>>>>> +	for (i = 0; i < fpl->count; i++) {
->>>>>>>> +		get_file(fpl->fp[i]);
->>>>>>>> +		unix_inflight(fpl->user, fpl->fp[i]);
->>>>>>>> +		fput(fpl->fp[i]);
->>>>>>>> +	}
->>>>>>>> +
->>>>>>>> +	UNIXCB(skb).fp = fpl;
->>>>>>>> +	skb_queue_head(&ctx->ring_sock->sk->sk_receive_queue, skb);
->>>>>>> This code sounds elegant if you know about the existence of unix_gc(),
->>>>>>> but quite mysterious if you don't.  (E.g. why "inflight"?)  Could we
->>>>>>> have a brief comment, to comfort mortal readers on their journey?
->>>>>>>
->>>>>>> /* A message on a unix socket can hold a reference to a file. This can
->>>>>>> cause a reference cycle. So there is a garbage collector for unix
->>>>>>> sockets, which we hook into here. */
->>>>>> Yes that's a good idea, I've added a comment as to why we go through the
->>>>>> trouble of doing this socket + skb dance.
->>>>> Great, thanks.
->>>>>
->>>>>>> I think this is bypassing too_many_unix_fds() though?  I understood that
->>>>>>> was intended to bound kernel memory allocation, at least in principle.
->>>>>> As the code stands above, it'll cap it at 253. I'm just now reworking it
->>>>>> to NOT be limited to the SCM max fd count, but still impose a limit of
->>>>>> 1024 on the number of registered files. This is important to cap the
->>>>>> memory allocation attempt as well.
->>>>> I saw you were limiting to SCM_MAX_FD per io_uring.  On the other hand,
->>>>> there's no specific limit on the number of io_urings you can open (only
->>>>> the standard limits on fds).  So this would let you allocate hundreds of
->>>>> times more files than the previous limit RLIMIT_NOFILE...
->>>> But there is, the io_uring itself is under the memlock rlimit.
->>>>
->>>>> static inline bool too_many_unix_fds(struct task_struct *p)
->>>>> {
->>>>> 	struct user_struct *user = current_user();
->>>>>
->>>>> 	if (unlikely(user->unix_inflight > task_rlimit(p, RLIMIT_NOFILE)))
->>>>> 		return !capable(CAP_SYS_RESOURCE) && !capable(CAP_SYS_ADMIN);
->>>>> 	return false;
->>>>> }
->>>>>
->>>>> RLIMIT_NOFILE is technically per-task, but here it is capping
->>>>> unix_inflight per-user.  So the way I look at this, the number of file
->>>>> descriptors per user is bounded by NOFILE * NPROC.  Then
->>>>> user->unix_inflight can have one additional process' worth (NOFILE) of
->>>>> "inflight" files.  (Plus SCM_MAX_FD slop, because too_many_fds() is only
->>>>> called once per SCM_RIGHTS).
->>>>>
->>>>> Because io_uring doesn't check too_many_unix_fds(), I think it will let
->>>>> you have about 253 (or 1024) more process' worth of open files. That
->>>>> could be big proportionally when RLIMIT_NPROC is low.
->>>>>
->>>>> I don't know if it matters.  It maybe reads like an oversight though.
->>>>>
->>>>> (If it does matter, it might be cleanest to change too_many_unix_fds()
->>>>> to get rid of the "slop".  Since that may be different between af_unix
->>>>> and io_uring; 253 v.s. 1024 or whatever. E.g. add a parameter for the
->>>>> number of inflight files we want to add.)
->>>> I don't think it matters. The files in the fixed file set have already
->>>> been opened by the application, so it counts towards the number of open
->>>> files that is allowed to have. I don't think we should impose further
->>>> limits on top of that.
->>> A process can open one io_uring and 199 other files.  Register the 199
->>> files in the io_uring, then close their file descriptors.  The main
->>> NOFILE limit only counts file descriptors.  So then you can open one
->>> io_uring, 198 other files, and repeat.
->>>
->>> You're right, I had forgotten the memlock limit on io_uring.  That makes
->>> it much less of a practical problem.
->>>
->>> But it raises a second point.  It's not just that it lets users allocate
->>> more files.  You might not want to be limited by user->unix_inflight.
->>> But you are calling unix_inflight(), which increments it!  Then if
->>> unix->inflight exceeds the NOFILE limit, you will avoid seeing any
->>> errors with io_uring, but the user will not be able to send files over
->>> unix sockets.
->>>
->>> So I think this is confusing to read, and confusing to troubleshoot if
->>> the limit is ever hit.
->>>
->>> I would be happy if io_uring didn't increment user->unix_inflight.  I'm
->>> not sure what the best way is to arrange that.
->> How about we just do something like the below? I think that's the saner
->> approach, rather than bypass user->unix_inflight. It's literally the
->> same thing.
->>
->>
->> diff --git a/fs/io_uring.c b/fs/io_uring.c
->> index a4973af1c272..5196b3aa935e 100644
->> --- a/fs/io_uring.c
->> +++ b/fs/io_uring.c
->> @@ -2041,6 +2041,13 @@ static int __io_sqe_files_scm(struct io_ring_ctx *ctx, int nr, int offset)
->>   	struct sk_buff *skb;
->>   	int i;
->>   
->> +	if (!capable(CAP_SYS_RESOURCE) && !capable(CAP_SYS_ADMIN)) {
->> +		struct user_struct *user = ctx->user;
->> +
->> +		if (user->unix_inflight > task_rlimit(current, RLIMIT_NOFILE))
->> +			return -EMFILE;
->> +	}
->> +
->>   	fpl = kzalloc(sizeof(*fpl), GFP_KERNEL);
->>   	if (!fpl)
->>   		return -ENOMEM;
->>
->>
-> 
-> Welp, you gave me exactly what I asked for.  So now I'd better be 
-> positive about it :-D.
+>      I tested todays 5.0.0-rc5-00358-gdf3865f on my sparcs and a couple of servers that have qla2xxx
+>      FC adapter gave me this warning:
 
-;-)
+Now I got a very similar one on an x86-64 server:
 
-> I hope this will be documented accurately, at least where the EMFILE 
-> result is explained for this syscall.
 
-How's this:
-
-http://git.kernel.dk/cgit/liburing/commit/?id=37e48698a09aa1e37690f8fa6dfd8da69a48ee60
-
-> Because EMFILE is different from the errno in af_unix.c, I will add a 
-> wish for the existing documentation of ETOOMANYREFS in unix(7) to 
-> reference this.
-> 
-> I'll stop bikeshedding there.  EMFILE sounds ok.  strerror() calls 
-> ETOOMANYREFS "Too many references: cannot splice"; it doesn't seem to be 
-> particularly helpful or well-known.
-
-Agree
+[   18.472568] qla2xxx [0000:00:00.0]-0005: : QLogic Fibre Channel HBA Driver: 10.00.00.12-k.
+[   18.474272] PCI Interrupt Link [LNKD] enabled at IRQ 19
+[   18.474272] qla2xxx [0000:04:00.0]-001d: : Found an ISP2432 irq 19 iobase 0x(____ptrval____).
+[   18.917293] scsi host3: qla2xxx
+[   18.917412] WARNING: CPU: 0 PID: 1650 at drivers/pci/msi.c:1273 pci_irq_get_affinity+0x35/0x80
+[   18.917554] Modules linked in: qla2xxx(+) scsi_transport_fc i2c_nforce2 e1000 pata_amd k8temp libata i2c_core hwmon forcedeth(+) powernow_k8 pcspkr autofs4
+[   18.917708] CPU: 0 PID: 1650 Comm: kworker/0:3 Not tainted 5.0.0-rc6-00013-gaa0c38cf39de #14
+[   18.917848] Hardware name: Sun Microsystems Sun Fire X4200 M2/Sun Fire X4200 M2                        , BIOS 0ABJX104 04/09/2009
+[   18.918002] Workqueue: events work_for_cpu_fn
+[   18.918082] RIP: 0010:pci_irq_get_affinity+0x35/0x80
+[   18.918164] Code: 2e 48 8b 87 b8 02 00 00 48 8d 8f b8 02 00 00 48 39 c1 74 16 85 f6 74 4e 31 d2 eb 04 39 d6 74 46 48 8b 00 ff c2 48 39 c8 75 f2 <0f> 0b 31 c0 c3 83 e2 02 48 c7 c0 c0 46 d5 b8 74 29 48 8b 97 b8 02
+[   18.918374] RSP: 0018:ffffa15f4108fcb0 EFLAGS: 00010246
+[   18.918460] RAX: ffff95e7995f52b8 RBX: 0000000000000000 RCX: ffff95e7995f52b8
+[   18.918547] RDX: 0000000000000002 RSI: 0000000000000002 RDI: ffff95e7995f5000
+[   18.918629] RBP: 0000000000000000 R08: ffffffffffffff80 R09: ffff95e799008e60
+[   18.918712] R10: 00000000b90b0f01 R11: ffffa15f4108fa90 R12: 0000000000000002
+[   18.918795] R13: ffff95e7995f5000 R14: 00000000ffffffff R15: ffff95e7969890a8
+[   18.918878] FS:  0000000000000000(0000) GS:ffff95e79b400000(0000) knlGS:0000000000000000
+[   18.919013] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   18.919103] CR2: 00007f213fb62000 CR3: 0000000217dc0000 CR4: 00000000000006f0
+[   18.919185] Call Trace:
+[   18.919269]  blk_mq_pci_map_queues+0x32/0xc0
+[   18.919354]  blk_mq_alloc_tag_set+0x12e/0x340
+[   18.919437]  scsi_add_host_with_dma+0xa1/0x310
+[   18.919549]  qla2x00_probe_one+0x1272/0x2400 [qla2xxx]
+[   18.919632]  ? try_to_wake_up+0x2c8/0x6f0
+[   18.919710]  local_pci_probe+0x4b/0xb0
+[   18.919787]  work_for_cpu_fn+0x11/0x20
+[   18.919866]  process_one_work+0x1d1/0x360
+[   18.919943]  worker_thread+0x20e/0x3f0
+[   18.920020]  ? wq_calc_node_cpumask+0x110/0x110
+[   18.920100]  kthread+0x109/0x120
+[   18.920176]  ? kthread_create_on_node+0x60/0x60
+[   18.920256]  ret_from_fork+0x35/0x40
+[   18.920334] ---[ end trace 56ed281ce2c61e69 ]---
+[   18.926988] qla2xxx [0000:04:00.0]-00fb:3: QLogic QLE2460 - SG-(X)PCIE1FC-QF4, Sun StorageTek 4 Gb FC Enterprise PCI-Express Single Channel.
+[   18.927148] qla2xxx [0000:04:00.0]-00fc:3: ISP2432: PCIe (2.5GT/s x4) @ 0000:04:00.0 hdma+ host#=3 fw=8.07.00 (9496).
+[   18.927757] qla2xxx [0000:83:00.0]-001d: : Found an ISP2432 irq 30 iobase 0x(____ptrval____).
+[   19.350303] qla2xxx [0000:83:00.0]-00fb:4: QLogic QLE2460 - SG-(X)PCIE1FC-QF4, Sun StorageTek 4 Gb FC Enterprise PCI-Express Single Channel.
+[   19.350474] qla2xxx [0000:83:00.0]-00fc:4: ISP2432: PCIe (2.5GT/s x4) @ 0000:83:00.0 hdma+ host#=4 fw=8.07.00 (9496).
+[   40.421151] qla2xxx [0000:04:00.0]-8038:3: Cable is unplugged...
+[   40.837159] qla2xxx [0000:83:00.0]-8038:4: Cable is unplugged...
 
 -- 
-Jens Axboe
-
+Meelis Roos
