@@ -6,83 +6,67 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DCB6C169C4
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 02:50:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20FF2C169C4
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 02:51:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D22520863
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 02:50:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF8E320863
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 02:51:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="rbubk3Kd"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="HpG4HgQv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726815AbfBLCud (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Feb 2019 21:50:33 -0500
-Received: from mail-pg1-f178.google.com ([209.85.215.178]:34627 "EHLO
-        mail-pg1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726226AbfBLCud (ORCPT
+        id S1727206AbfBLCvb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Feb 2019 21:51:31 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:46541 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727124AbfBLCvb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Feb 2019 21:50:33 -0500
-Received: by mail-pg1-f178.google.com with SMTP id i130so267685pgd.1
-        for <linux-block@vger.kernel.org>; Mon, 11 Feb 2019 18:50:32 -0800 (PST)
+        Mon, 11 Feb 2019 21:51:31 -0500
+Received: by mail-pf1-f195.google.com with SMTP id g6so521700pfh.13
+        for <linux-block@vger.kernel.org>; Mon, 11 Feb 2019 18:51:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=4hktLvRrYNBAIK5RvKt0ooP5Z2boEovdPPoa2tGx3BY=;
-        b=rbubk3KdIMO91/3BKlq9NkDgoIMTno7c+Chy0O1pwH6lNKMhbw1YId7jl7YDYAUtXE
-         eCdf+umqUFQsboiMY4S0CZY1rKvtYFPeL/NpfBuCyXr87/8rqTOZjFQTBsMFT7fDoeav
-         lbBbSJrKG/vLeGHIdG+8LVPz4J9BESBo5CG7A3E9oirZGQ3ACD1ookWK0h+mvEHlMEs1
-         r+mGBkPxUP8xDY95Of5VO1KMRlHRYbQ+qSwEv28PtSqdSBy70WFwbJGE89DotS7REFkO
-         muhsNKYZFUBO1G379KO5DAS4WgXHAGjob8y7lth4FF+yg4zg1QorawRiEgQZkfuPOnTf
-         0fhQ==
+        bh=5Pnxc4sYTkSQRfOA8nDVkGq77zV6G2IaOi20cBUGGEM=;
+        b=HpG4HgQvr6xIRU9ij9fQ5laMnzeR9rM3QYGyeyBBmh68Ar0BSDxpuY6XjfojR06SUe
+         VNyF0AM1AtQ2t+6sN/qK6DTEFuRRj34vLevgnOR/eWxPPjrtBVBjDRlYylA5H8iNE/WR
+         10k/6xMzqn+ip33Ve103YQjk4MlRXZiH5G7a72x/r4How5sr+aC3r/1UMF1taW7xjgxJ
+         HyiHJ/Epwnss6Gpe1HZNI0ng0dZq9q/yP9wpEDe3q2qU13Gshi2y5+cVEgxz7iiL58vw
+         7RWtejXiwQdoOmlTnaqZ9V1UnSlOKnvAIhEIZcRHTRQ0PKyALwqeZaYusX7hnibI/nfJ
+         PKHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=4hktLvRrYNBAIK5RvKt0ooP5Z2boEovdPPoa2tGx3BY=;
-        b=qE0mjM3yvVKPXAasZ3QzLap1Jy0ufJ6fn9ybES/BuPktjPFeFIZKj5m74zM72kRUNm
-         NVBAM9xl+DchSSM/HrDroNGPltJiuLDZizP8z0wWzHBjtNkBDLR8AKUnuT4VvriiKQh7
-         5uTh+jS7ICniQM6ziTEomMMwT3vQ8sRnZystvohIFGc4q+2krE9E3EATjUiEOqOeqDm3
-         rNc2gHhGeYFqpux1k4JJTIODh3/1upEwSUMp5RANEdhSmho48pOCxLNg04oh5V79u0uQ
-         W8fuiDD69LvI3sOiPLdGu3N67E9/Bmnyh7zeNjLNn5ZqBPYLorfKRJgFP6BawcrbRZEs
-         Mt8Q==
-X-Gm-Message-State: AHQUAua7bN5iCklvqn9LnxwUcYjmlOUaZLe0Pf8U2DrhX01yNlU5Sz2D
-        FFytwugmaCNrqckSKc2wh6Re6Q==
-X-Google-Smtp-Source: AHgI3IYkf/JlCJ3EKvo6KziICHXbVFoyt0+4gJq+eCit6N8r9yvm99STMDKCo8hnlfMn2k+g5NBi5g==
-X-Received: by 2002:a63:535c:: with SMTP id t28mr1546084pgl.128.1549939832350;
-        Mon, 11 Feb 2019 18:50:32 -0800 (PST)
+        bh=5Pnxc4sYTkSQRfOA8nDVkGq77zV6G2IaOi20cBUGGEM=;
+        b=t0QLpIuMcyOtP5uXDEPT2cBgxaJtUBtNYeRHtfJoi6EXOl5MI21lxz3WeL9bJOl53S
+         ik2Qdq93Ze1M0vZ+KPncETKbk5nGUXdmn6OH7GGhhH96fHsl3dSh1V7Lx1NKxK4btWc1
+         VPyDTSlEt3XnIkFpijfbQd85LPBWWgcSksUpzGducn520LkmUE13y/0U1IQSNy/1bvOR
+         CRuwSMjF3iBu+aruoGXXqDn+jYhWKl4ZLQMVYLvHw+9UikFtP67+reMXTCtIbMKkGP3I
+         4CGyRUds0Nob0WIdxUI0FgGqWXn2zqABq+LPUk25Y4erVqKna266uc+lxs9cyHlvsnMt
+         0Qdw==
+X-Gm-Message-State: AHQUAuaJwQbHGL+KpoA1AlneCuDNClyTflizuieT1jkR9wEJhfw6S7VZ
+        +GmNU50dci+JYQ0Ifiq22RVeLw==
+X-Google-Smtp-Source: AHgI3IYqi7EoCKWAWGKQC1aHu0vX+GoWusduQVU8zOYN4CuMosaT6KgLS6bhB43Hv4FPlAu44CRUjg==
+X-Received: by 2002:a63:6ac5:: with SMTP id f188mr1497632pgc.165.1549939890496;
+        Mon, 11 Feb 2019 18:51:30 -0800 (PST)
 Received: from ?IPv6:2600:380:4a5b:8858:a8b3:edff:f3de:ccc1? ([2600:380:4a5b:8858:a8b3:edff:f3de:ccc1])
-        by smtp.gmail.com with ESMTPSA id r12sm12995051pgv.83.2019.02.11.18.50.30
+        by smtp.gmail.com with ESMTPSA id q75sm18837797pfa.38.2019.02.11.18.51.28
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 Feb 2019 18:50:31 -0800 (PST)
-Subject: Re: [5.0-rc5 regression] "scsi: kill off the legacy IO path" causes 5
- minute delay during boot on Sun Blade 2500
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Mikael Pettersson <mikpelinux@gmail.com>
-Cc:     Linux SPARC Kernel Mailing List <sparclinux@vger.kernel.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi <linux-scsi@vger.kernel.org>
-References: <CAM43=SO6bdDAEULEPArfgdbjLAYDo9OiPBa8gL4fsSg7Dky=gA@mail.gmail.com>
- <1549736341.2971.7.camel@HansenPartnership.com>
- <CAM43=SPUMzOLRmkoT+DQSpzu2DYRTyOhU6o8KRUU_Q902o2e1Q@mail.gmail.com>
- <1549813472.4142.3.camel@HansenPartnership.com>
- <3380ed8e-ae02-96f2-142b-7cce09459df8@kernel.dk>
- <1549815924.4142.8.camel@HansenPartnership.com>
- <0e6e5d67-d305-dd00-2e42-e2299166c8b2@kernel.dk>
- <1549898730.2831.6.camel@HansenPartnership.com>
- <44bb4374-0b7c-733b-a53e-92d2f03f2f49@kernel.dk>
- <1549899773.2831.12.camel@HansenPartnership.com>
- <1a00da0e-cb8e-30ea-8d17-120f97242b2f@kernel.dk>
- <1549902521.2831.23.camel@HansenPartnership.com>
- <fce66227-ff41-3a4e-4c6a-f4c2ca492b95@kernel.dk>
- <1549937598.2857.8.camel@HansenPartnership.com>
+        Mon, 11 Feb 2019 18:51:29 -0800 (PST)
+Subject: Re: [PATCH V2] blk-mq: insert rq with DONTPREP to hctx dispatch list
+ when requeue
+To:     Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1549936585-1702-1-git-send-email-jianchao.w.wang@oracle.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <fc547d40-9a42-a823-b62f-460c3244fe7d@kernel.dk>
-Date:   Mon, 11 Feb 2019 19:50:28 -0700
+Message-ID: <077964ab-0502-49ab-132d-657d32df7461@kernel.dk>
+Date:   Mon, 11 Feb 2019 19:51:27 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.4.0
 MIME-Version: 1.0
-In-Reply-To: <1549937598.2857.8.camel@HansenPartnership.com>
+In-Reply-To: <1549936585-1702-1-git-send-email-jianchao.w.wang@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -91,74 +75,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/11/19 7:13 PM, James Bottomley wrote:
-> On Mon, 2019-02-11 at 09:31 -0700, Jens Axboe wrote:
->> On 2/11/19 9:28 AM, James Bottomley wrote:
->>> On Mon, 2019-02-11 at 08:46 -0700, Jens Axboe wrote:
->>>> On 2/11/19 8:42 AM, James Bottomley wrote:
->>>>> On Mon, 2019-02-11 at 08:28 -0700, Jens Axboe wrote:
->>>>>> On 2/11/19 8:25 AM, James Bottomley wrote:
->>>>>>> On Sun, 2019-02-10 at 09:35 -0700, Jens Axboe wrote:
->>>>>>>> On 2/10/19 9:25 AM, James Bottomley wrote:
->>>
->>> [...]
->>>>>>>>> That check wasn't changed by the code removal.
->>>>>>>>
->>>>>>>> As I said above, for sd. This isn't true for non-disks.
->>>>>>>
->>>>>>> Yes, but the behaviour above doesn't change across a switch
->>>>>>> to MQ, so I don't quite understand how it bisects back to
->>>>>>> that change.  If we're not gathering entropy for the device
->>>>>>> now, we wouldn't have been before the switch, so the
->>>>>>> entropy characteristics shouldn't have changed.
->>>>>>
->>>>>> But it does, as I also wrote in that first email. The legacy
->>>>>> queue flags had QUEUE_FLAG_ADD_RANDOM set by default, the MQ
->>>>>> ones do not. Hence any non-sd device would previously ALWAYS
->>>>>> have ADD_RANDOM set, now none of them do. Also see the patch
->>>>>> I sent.
->>>>>
->>>>> So your theory is that the disk in question never gets to the
->>>>> rotational check?  because the check will clear the flag if
->>>>> it's non-rotational and set it if it's not, so the default
->>>>> state of the flag shouldn't matter.
->>>>
->>>> No, my point is about non-disks, devices that aren't driven by
->>>> sd. The behavior for sd hasn't changed, as it sets/clears it
->>>> unconditionally. 
->>>
->>> I agree, but I don't think any of them were significant entropy
->>> contributors before: things like nvme have always been outside of
->>> this and sr and st don't really contribute much to the seek load
->>> during boot because they're probed but not used by the boot
->>> sequence, so I can't see how they would cause this behaviour.  I
->>> suppose it could be target probing, but even that seems unlikely
->>> because it should be dwarfed by the number of root disk reads
->>> during boot.
->>>
->>> For the rng to take an additional 5 minutes to initialize, we must
->>> have lost a significant entropy source somewhere.
->>
->> I agree it's not a significant amount of entropy, but even just one
->> bit could mean a long stall if that put us over the edge of just not
->> having enough for whatever is blocking on /dev/random. Mikael's boot
->> did have a CDROM, it's not impossible that the handful of commands we
->> end up doing to that device would have contributed enough entropy to
->> get the boot done without stalling for minutes.
->>
->> One way to know for sure, and that's if Mikael tests the patch.
+On 2/11/19 6:56 PM, Jianchao Wang wrote:
+> When requeue, if RQF_DONTPREP, rq has contained some driver
+> specific data, so insert it to hctx dispatch list to avoid any
+> merge. Take scsi as example, here is the trace event log (no
+> io scheduler, because RQF_STARTED would prevent merging),
 > 
-> I think I've got the root cause.  I have one system in my test bed
-> exhibiting this behaviour.  It turns out the disk in it has no
-> characteristics VPD page.  The 0xB1 VPD was a SBC-3 addition, so that's
-> not surprising.  However, the characteristics check bails before
-> setting the flags, so it takes the default flag which has flipped.
+>    kworker/0:1H-339   [000] ...1  2037.209289: block_rq_insert: 8,0 R 4096 () 32768 + 8 [kworker/0:1H]
+> scsi_inert_test-1987  [000] ....  2037.220465: block_bio_queue: 8,0 R 32776 + 8 [scsi_inert_test]
+> scsi_inert_test-1987  [000] ...2  2037.220466: block_bio_backmerge: 8,0 R 32776 + 8 [scsi_inert_test]
+>    kworker/0:1H-339   [000] ....  2047.220913: block_rq_issue: 8,0 R 8192 () 32768 + 16 [kworker/0:1H]
+> scsi_inert_test-1996  [000] ..s1  2047.221007: block_rq_complete: 8,0 R () 32768 + 8 [0]
+> scsi_inert_test-1996  [000] .Ns1  2047.221045: block_rq_requeue: 8,0 R () 32776 + 8 [0]
+>    kworker/0:1H-339   [000] ...1  2047.221054: block_rq_insert: 8,0 R 4096 () 32776 + 8 [kworker/0:1H]
+>    kworker/0:1H-339   [000] ...1  2047.221056: block_rq_issue: 8,0 R 4096 () 32776 + 8 [kworker/0:1H]
+> scsi_inert_test-1986  [000] ..s1  2047.221119: block_rq_complete: 8,0 R () 32776 + 8 [0]
 > 
-> We can either fix this by setting the QUEUE_FLAG_ADD_RANDOM if there's
-> no 0xB1 page or by setting the default as Jens proposed.
+> (32768 + 8) was requeued by scsi_queue_insert and had RQF_DONTPREP.
+> Then it was merged with (32776 + 8) and issued. Due to RQF_DONTPREP,
+> the sdb only contained the part of (32768 + 8), then only that part
+> was completed. The lucky thing was that scsi_io_completion detected
+> it and requeued the remaining part. So we didn't get corrupted data.
+> However, the requeue of (32776 + 8) is not expected.
 
-I'd recommend just doing my patch, since that'll be the same behavior
-that SCSI had before.
+Looks good to me, I'll add this for 5.0.
 
 -- 
 Jens Axboe
