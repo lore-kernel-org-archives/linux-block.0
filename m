@@ -2,127 +2,117 @@ Return-Path: <SRS0=MN5j=QT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73F7BC282CA
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:47:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E685C282CE
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:48:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 42E7D2184E
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:47:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="oX/Xn2Su"
+	by mail.kernel.org (Postfix) with ESMTP id 0818E218D8
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:48:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731194AbfBLQra (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Feb 2019 11:47:30 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:60242 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730844AbfBLQr3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Feb 2019 11:47:29 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1CGhp0r145776;
-        Tue, 12 Feb 2019 16:47:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=1wofqb9/fkyDx2OI0+iElXtq3/BKWApe3iz2P9LvOto=;
- b=oX/Xn2SujmbaBFCFopVkLzxf4T2bkzNf9az/PFOymLxj4y4DED+DYzovbnTlGXDdW+Fj
- zGh1+O1RETQTKVA18gbGWoUqAUWwPnZ1PDy0NbHFChQYcsVMCm3JshGMu2t5BgZZkC05
- 5/rmXEl+iZDSR4eUb+ImWYr4Sp/VSkLW31VvKnO301SvJolxd3F5/AxjFiMLrytVCPze
- q3AIj9IbGvVFj0vp2NGJeN/D08dV3O8bDyCdA8orq787Cj8fYt52XpgiguNjw+fNq9Tk
- q8S9/Iw6GO92Yr0UKCdwidNNzLeCeif9iM9CANqnacAsefSzNZNOHlioYscr+Oj+YJ0a NA== 
-Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
-        by userp2130.oracle.com with ESMTP id 2qhrekd4ku-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 12 Feb 2019 16:47:16 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x1CGlFbd009621
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 12 Feb 2019 16:47:16 GMT
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x1CGlFM7020783;
-        Tue, 12 Feb 2019 16:47:15 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 12 Feb 2019 08:47:15 -0800
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Jeremy Cline <jeremy@jcline.org>,
-        Oleksii Kurochko <olkuroch@cisco.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] scsi: sd: block: Handle cases where devices come online read-only
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <20190208233831.31377-1-martin.petersen@oracle.com>
-        <20190212080319.GA10547@infradead.org>
-Date:   Tue, 12 Feb 2019 11:47:12 -0500
-In-Reply-To: <20190212080319.GA10547@infradead.org> (Christoph Hellwig's
-        message of "Tue, 12 Feb 2019 00:03:19 -0800")
-Message-ID: <yq1d0nxuf73.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        id S1731135AbfBLQsm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Feb 2019 11:48:42 -0500
+Received: from mx2.suse.de ([195.135.220.15]:41376 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730086AbfBLQsm (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Feb 2019 11:48:42 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id E732AAF76;
+        Tue, 12 Feb 2019 16:48:39 +0000 (UTC)
+Subject: Re: [PATCH 19/19] bcache: use (REQ_META|REQ_PRIO) to indicate bio for
+ metadata
+To:     Sasha Levin <sashal@kernel.org>
+Cc:     axboe@kernel.dk, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org, stable@vger.kernel.org,
+        Dave Chinner <david@fromorbit.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20190209045311.15677-20-colyli@suse.de>
+ <20190212132824.1D1502084E@mail.kernel.org>
+From:   Coly Li <colyli@suse.de>
+Openpgp: preference=signencrypt
+Organization: SUSE Labs
+Message-ID: <7fc65caf-8982-61d2-776b-ab08cb29711e@suse.de>
+Date:   Wed, 13 Feb 2019 00:48:33 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9165 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1902120119
+In-Reply-To: <20190212132824.1D1502084E@mail.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 2019/2/12 9:28 下午, Sasha Levin wrote:
+> Hi,
+> 
+> [This is an automated email]
+> 
+> This commit has been processed because it contains a -stable tag.
+> The stable tag indicates that it's relevant for the following trees: all
+> 
+> The bot has tested the following trees: v4.20.7, v4.19.20, v4.14.98, v4.9.155, v4.4.173, v3.18.134.
+> 
+> v4.20.7: Build OK!
+> v4.19.20: Failed to apply! Possible dependencies:
+>     752f66a75aba ("bcache: use REQ_PRIO to indicate bio for metadata")
+> 
+> v4.14.98: Failed to apply! Possible dependencies:
+>     752f66a75aba ("bcache: use REQ_PRIO to indicate bio for metadata")
+>     b41c9b0266e8 ("bcache: update bio->bi_opf bypass/writeback REQ_ flag hints")
+> 
+> v4.9.155: Failed to apply! Possible dependencies:
+>     752f66a75aba ("bcache: use REQ_PRIO to indicate bio for metadata")
+>     83b5df67c509 ("bcache: use op_is_sync to check for synchronous requests")
+>     b41c9b0266e8 ("bcache: update bio->bi_opf bypass/writeback REQ_ flag hints")
+> 
+> v4.4.173: Failed to apply! Possible dependencies:
+>     09cbfeaf1a5a ("mm, fs: get rid of PAGE_CACHE_* and page_cache_{get,release} macros")
+>     1c2e54e1ed6f ("dm thin: bump thin and thin-pool target versions")
+>     1eff9d322a44 ("block: rename bio bi_rw to bi_opf")
+>     202bae52934d ("dm thin: unroll issue_discard() to create longer discard bio chains")
+>     38f252553300 ("block: add __blkdev_issue_discard")
+>     3dba53a958a7 ("dm thin: use __blkdev_issue_discard for async discard support")
+>     4e49ea4a3d27 ("block/fs/drivers: remove rw argument from submit_bio")
+>     83b5df67c509 ("bcache: use op_is_sync to check for synchronous requests")
+>     9082e87bfbf8 ("block: remove struct bio_batch")
+>     a6111d11b8b5 ("btrfs: raid56: Use raid_write_end_io for scrub")
+>     b41c9b0266e8 ("bcache: update bio->bi_opf bypass/writeback REQ_ flag hints")
+>     bbd848e0fade ("block: reinstate early return of -EOPNOTSUPP from blkdev_issue_discard")
+>     c3667cc61904 ("dm thin: consistently return -ENOSPC if pool has run out of data space")
+>     c8d93247f1d0 ("bcache: use op_is_write instead of checking for REQ_WRITE")
+>     d57d611505d9 ("kernel/fs: fix I/O wait not accounted for RW O_DSYNC")
+> 
+> v3.18.134: Failed to apply! Possible dependencies:
+>     1b94b5567e9c ("Btrfs, raid56: use a variant to record the operation type")
+>     1eff9d322a44 ("block: rename bio bi_rw to bi_opf")
+>     2c8cdd6ee4e7 ("Btrfs, replace: write dirty pages into the replace target device")
+>     326e1dbb5736 ("block: remove management of bi_remaining when restoring original bi_end_io")
+>     4245215d6a8d ("Btrfs, raid56: fix use-after-free problem in the final device replace procedure on raid56")
+>     5a6ac9eacb49 ("Btrfs, raid56: support parity scrub on raid56")
+>     6e9606d2a2dc ("Btrfs: add ref_count and free function for btrfs_bio")
+>     83b5df67c509 ("bcache: use op_is_sync to check for synchronous requests")
+>     8e5cfb55d3f7 ("Btrfs: Make raid_map array be inlined in btrfs_bio structure")
+>     af8e2d1df984 ("Btrfs, scrub: repair the common data on RAID5/6 if it is corrupted")
+>     b41c9b0266e8 ("bcache: update bio->bi_opf bypass/writeback REQ_ flag hints")
+>     b7c44ed9d2fc ("block: manipulate bio->bi_flags through helpers")
+>     b89e1b012c7f ("Btrfs, raid56: don't change bbio and raid_map")
+>     c4cf5261f8bf ("bio: skip atomic inc/dec of ->bi_remaining for non-chains")
+>     c8d93247f1d0 ("bcache: use op_is_write instead of checking for REQ_WRITE")
+>     f90523d1aa3c ("Btrfs: remove noused bbio_ret in __btrfs_map_block in condition")
+> 
+> 
+> How should we proceed with this patch?
 
-Christoph,
+Can I rebase this patch for each stable kernel, and send the patch to
+stable@vger.kernel.org ?
 
->> Some devices come online in write protected state and switch to
->> read-write once they are ready to process I/O requests.
->
-> That is really weird.  What kind of devices are these?
-
-There are several. I have many bug reports, ranging from USB sticks to
-arrays.
-
->> Note that per-partition ro settings are lost on revalidate. This has
->> been broken for at least a decade and it will require major surgery to
->> fix. To my knowledge nobody has complained about being unable to make
->> partition read-only settings stick through a revalidate. So hopefully
->> this patch will suffice as a simple fix for stable.
->
-> Should we warn when we lost these settings on a revalidate?
-
-Would be nice. But as I wrote, it's going to require major surgery to
-the gendisk code to handle this particular scenario correctly since we
-currently do not keep any partition state between revalidate calls.
-
-> I have to say I don't like the tristate too much - it seems to allow
-> setting a hardware write protected device writable again by user
-> interfaction, right?
-
-The original policy was that the user policy was ineffective since the
-device setting always won.
-
-Jeremy's patch allowed the user setting to override the device setting
-but broke the case where devices subsequently change state at runtime.
-
-My workaround is that the user ioctl ro state, if set, overrides
-whatever the device reports. And once the user clears the flag, the
-current device setting will take effect on revalidate.
-
-> Should we just have a hardware and a user policy field that are
-> separate instead?
-
-All this needs to be completely rewritten. However, my attempt at fixing
-it up properly got pretty convoluted and thus unsuitable for stable.
-
-The intent with this patch was merely as a workaround for people stuck
-with write-protected drives after boot. The tristate wasn't my first
-choice, but it turned out to be the path of least resistance for a
-stable fix.
+Thanks.
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+
+Coly Li
