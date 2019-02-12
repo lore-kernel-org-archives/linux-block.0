@@ -2,100 +2,79 @@ Return-Path: <SRS0=MN5j=QT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FF06C282CE
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63C61C282C4
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:27:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F325217D9
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:26:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="P56MdWZs"
+	by mail.kernel.org (Postfix) with ESMTP id 30EC420842
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:27:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731042AbfBLQ0y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Feb 2019 11:26:54 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:36136 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730567AbfBLQ0y (ORCPT
+        id S1728495AbfBLQ1T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Feb 2019 11:27:19 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:36480 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728297AbfBLQ1T (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Feb 2019 11:26:54 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1CGO2iU126696;
-        Tue, 12 Feb 2019 16:26:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=qa/Mcl3P4LGjsDxxDtc2qexHPPaqUDmPqz22lvZtFPI=;
- b=P56MdWZs+UsXXPTXHAgX1vJdg/BF80uLz5Ahcye0yj2/FnrCPOYnBS7VQPAZ9Mrdzzoy
- nXXPeyvvQYJSa2giDdN2TMAgcC8XtXIttVvBN4daOhuJ4Ey9josCqy+oKXRe/KwmHswL
- bGTlPPf+H9R3qQCgjyVP+FGcC6ZQxXngCyo3ivbUBuE/XB14Ss/YgeWxACevaSTcwnqM
- Z0kFZB1rXZtO/KE6ElZKPH9ICITBEnFi+uHzlYgFkF33wOgdnoqtESr8CraMIUCrG2cN
- dv+w1Aix/qC/8Pv2WW9ou8cMW1UDayTZjYLO+XgLN5vVIQYI+bvjyjSKR0vl9WwbZEDm wg== 
-Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
-        by userp2130.oracle.com with ESMTP id 2qhrekd0a5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 12 Feb 2019 16:26:50 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x1CGQnfP019060
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 12 Feb 2019 16:26:49 GMT
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x1CGQmd5004977;
-        Tue, 12 Feb 2019 16:26:48 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 12 Feb 2019 08:26:48 -0800
-To:     Jeremy Cline <jeremy@jcline.org>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        Oleksii Kurochko <olkuroch@cisco.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] scsi: sd: block: Handle cases where devices come online read-only
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
+        Tue, 12 Feb 2019 11:27:19 -0500
+Received: by mail-pg1-f193.google.com with SMTP id r124so1491132pgr.3;
+        Tue, 12 Feb 2019 08:27:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Hi34Lv6aCME11eE04JEM+wiyPLK4KZl+2OwrOXJ10vI=;
+        b=m65589nDlcISiTazCR/b0x0+dYJFRfz4ld+Eau9njdXrnoD07khOBC+RxfFerciM+n
+         Arjnkz/zcdHTLX8TCOzP6culWnnSOSjUuEagPpQWhQTpHwmbERZtTR9JOaRScBRI/fGx
+         K4BTxQCekbrGAyi50azM+M9F3hAaWqCffsieaqXSlfzsASW5GAOwele3NbtJwDh4dPO2
+         MUiF/JMbOAfc+j4K54j1fxrbyEasEGKQ3B+ZOg6SgqKTMK6xgc4Sp3e1kH0+MEJTQ711
+         b+7nehGRDXF3ViIvns5vVFzWNJR1id43s/We4S5f4Bb5gd+qWs7dw4cM2vef6TaYuwq2
+         Wm4A==
+X-Gm-Message-State: AHQUAuaoEN1UuLlApRPM1aSG0HXCfXjMMt0JwUZfMZOU/XutgetEG9XH
+        YwR+NinhmTssj0BmSYmsu34=
+X-Google-Smtp-Source: AHgI3IZ40pPFdcZLVxHhaBMGvhVzCKUVNGMySt0e6vG6BNjMYE8l2D6Q5HOFpSK2IXoDs+PevV9THg==
+X-Received: by 2002:a63:1013:: with SMTP id f19mr4416022pgl.38.1549988838000;
+        Tue, 12 Feb 2019 08:27:18 -0800 (PST)
+Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id n68sm35116569pfb.62.2019.02.12.08.27.16
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 12 Feb 2019 08:27:17 -0800 (PST)
+Message-ID: <1549988835.19311.29.camel@acm.org>
+Subject: Re: [PATCH] scsi: sd: block: Handle cases where devices come online
+ read-only
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     Jeremy Cline <jeremy@jcline.org>,
+        Oleksii Kurochko <olkuroch@cisco.com>
+Date:   Tue, 12 Feb 2019 08:27:15 -0800
+In-Reply-To: <20190208233831.31377-1-martin.petersen@oracle.com>
 References: <20190208233831.31377-1-martin.petersen@oracle.com>
-        <01000168dd40a901-e418f724-3fe3-47e3-bbea-05fea79f169e-000000@email.amazonses.com>
-Date:   Tue, 12 Feb 2019 11:26:46 -0500
-In-Reply-To: <01000168dd40a901-e418f724-3fe3-47e3-bbea-05fea79f169e-000000@email.amazonses.com>
-        (Jeremy Cline's message of "Mon, 11 Feb 2019 15:50:28 +0000")
-Message-ID: <yq1h8d9ug55.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9165 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1902120116
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Fri, 2019-02-08 at 18:38 -0500, Martin K. Petersen wrote:
++AD4 diff --git a/block/genhd.c b/block/genhd.c
++AD4 index 1dd8fd6613b8..e29805bfa989 100644
++AD4 --- a/block/genhd.c
++AD4 +-+-+- b/block/genhd.c
++AD4 +AEAAQA -1549,11 +-1549,22 +AEAAQA void set+AF8-disk+AF8-ro(struct gendisk +ACo-disk, int flag)
 
-Jeremy,
+Hi Martin,
 
-> I noticed drivers/s390/block/dasd_ioctl.c calls set_disk_ro() to set the
-> policy, where-as the policy is set with set_device_ro() in the generic
-> ioctl.
+Please change the data type of flag from 'int' into enum disk+AF8-policy. Please
+also change the return type of get+AF8-disk+AF8-ro() and please also update the data
+type of the policy member in struct gendisk.
 
-There's a subtle distinction here:
+Thanks,
 
- - set_disk_ro() sets the policy for a whole disk
+Bart.
 
- - set_device_ro() sets the policy for a block_device (typically
-   partition)
-
-> It's not setting the policy to DISK_POLICY_USER_WRITE_PROTECT so I
-> think it would only be a problem if the user set it to 2 instead of 1
-> assuming any truthy value is acceptable. Then the user wouldn't be
-> able to mark the disk as writable again since this would be
-> true. Perhaps it's a somewhat far-fetched scenario.
-
-OK, I missed that particular entry point. Will fix.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
