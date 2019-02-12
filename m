@@ -2,91 +2,100 @@ Return-Path: <SRS0=MN5j=QT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CCBEC282C4
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FF06C282CE
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:26:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 09F8421773
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:13:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F325217D9
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:26:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="jUpSI+ko"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="P56MdWZs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728386AbfBLQNc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Feb 2019 11:13:32 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:51034 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727993AbfBLQNc (ORCPT
+        id S1731042AbfBLQ0y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Feb 2019 11:26:54 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:36136 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730567AbfBLQ0y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Feb 2019 11:13:32 -0500
-Received: by mail-it1-f195.google.com with SMTP id z7so8534202iti.0
-        for <linux-block@vger.kernel.org>; Tue, 12 Feb 2019 08:13:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=AFaQZtnNrrgsB4YEdsdJIa0sQY3vuum87jj0X9EtiO4=;
-        b=jUpSI+kopFAEt77hYBDsGVogbFXUQwO4WBcXashtxV+NRko5q0q/rm3L8KTzCmlbow
-         06khbHhmJC/CnLGghjPB39Xm5tYC32lhwkzRxG4pHC8kb872P7bkBf8GtnF8q0prgLit
-         0nwFUfWiUO419VJ/LZxllmQk7qGYd1PAoYyxrWs0ejoQmj5UhPFrkHhicKlAkI/waFa9
-         AMfde9sDB5rgS+mf5A8/T16pMk2cgGie6LbVfnIYOkPq5QdpnrEWgHK1CZGWe5HnDg6v
-         Oj/XuboBrv0KKtajQGBruD4DR+MCBTCJCPgT6ZXSlKRFqoU/TN8dgJoMs6G87WOv3zTv
-         K38g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=AFaQZtnNrrgsB4YEdsdJIa0sQY3vuum87jj0X9EtiO4=;
-        b=hQpCLay67v/mjtEz3a53vJ+ZL82A4w4l0lti3D79VKiTPL8Ub7mNYNX+rIepGTTKXh
-         GEeu1cjNaXVPwKzcLf2eJU1fPQMlY5zSIn8XNlKjSYWscAnuG6MlAVCrLzQSYQPZ47hZ
-         mMzZmKuRBBz8OZTufdLTm6YZstIVSFYZPiSPCjGhY2WBBJwMVaXETdFe0pccm406B/3j
-         oYtaQOk4vkNq2t2mkYcflvv04b06Sq8Ij9y4fHNi8FbP0Oo2keMSn4MwZvJJQUS7hqbk
-         BGqp/N+ALe2aSqydzBkzkBx5SgPFtPxVQGV3sGdh/oZVFhhyw+tC2DEmk/B7jDZQ9Jjt
-         rQ3w==
-X-Gm-Message-State: AHQUAuZu8RVhCqjudz42o53sAwc5Ctq3gDNW+Yvz/a3YwvPwMv8+ZKum
-        QxyADNzhoAi64cNiJtgxVkOR5Q==
-X-Google-Smtp-Source: AHgI3IbUghMmxoDM+8BrXh1hR2LSRKZGBKTjUCtyT2HakGkNeL4Vs/nOE5PiRUrkiq7dnBqf/1lZbw==
-X-Received: by 2002:a24:7f81:: with SMTP id r123mr1181796itc.89.1549988011239;
-        Tue, 12 Feb 2019 08:13:31 -0800 (PST)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id j133sm1655954itj.16.2019.02.12.08.13.29
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 12 Feb 2019 08:13:30 -0800 (PST)
-Subject: Re: [PATCH v2] floppy: check_events callback should not return a
- negative number
-To:     Yufen Yu <yuyufen@huawei.com>, dan.carpenter@oracle.com
-Cc:     linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
-References: <20190129083404.47318-1-yuyufen@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8bf64920-f0fe-b9da-8759-0d05a0fa39e0@kernel.dk>
-Date:   Tue, 12 Feb 2019 09:13:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        Tue, 12 Feb 2019 11:26:54 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1CGO2iU126696;
+        Tue, 12 Feb 2019 16:26:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=qa/Mcl3P4LGjsDxxDtc2qexHPPaqUDmPqz22lvZtFPI=;
+ b=P56MdWZs+UsXXPTXHAgX1vJdg/BF80uLz5Ahcye0yj2/FnrCPOYnBS7VQPAZ9Mrdzzoy
+ nXXPeyvvQYJSa2giDdN2TMAgcC8XtXIttVvBN4daOhuJ4Ey9josCqy+oKXRe/KwmHswL
+ bGTlPPf+H9R3qQCgjyVP+FGcC6ZQxXngCyo3ivbUBuE/XB14Ss/YgeWxACevaSTcwnqM
+ Z0kFZB1rXZtO/KE6ElZKPH9ICITBEnFi+uHzlYgFkF33wOgdnoqtESr8CraMIUCrG2cN
+ dv+w1Aix/qC/8Pv2WW9ou8cMW1UDayTZjYLO+XgLN5vVIQYI+bvjyjSKR0vl9WwbZEDm wg== 
+Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
+        by userp2130.oracle.com with ESMTP id 2qhrekd0a5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Feb 2019 16:26:50 +0000
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x1CGQnfP019060
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Feb 2019 16:26:49 GMT
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x1CGQmd5004977;
+        Tue, 12 Feb 2019 16:26:48 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 12 Feb 2019 08:26:48 -0800
+To:     Jeremy Cline <jeremy@jcline.org>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Oleksii Kurochko <olkuroch@cisco.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] scsi: sd: block: Handle cases where devices come online read-only
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20190208233831.31377-1-martin.petersen@oracle.com>
+        <01000168dd40a901-e418f724-3fe3-47e3-bbea-05fea79f169e-000000@email.amazonses.com>
+Date:   Tue, 12 Feb 2019 11:26:46 -0500
+In-Reply-To: <01000168dd40a901-e418f724-3fe3-47e3-bbea-05fea79f169e-000000@email.amazonses.com>
+        (Jeremy Cline's message of "Mon, 11 Feb 2019 15:50:28 +0000")
+Message-ID: <yq1h8d9ug55.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20190129083404.47318-1-yuyufen@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9165 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1902120116
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 1/29/19 1:34 AM, Yufen Yu wrote:
-> floppy_check_events() is supposed to return bit flags to say which
-> events occured. We should return zero to say that no event flags are
-> set.  Only BIT(0) and BIT(1) are used in the caller. And .check_events
-> interface also expect to return an unsigned int value.
-> 
-> However, after commit a0c80efe5956, it may return -EINTR (-4u).
-> Here, both BIT(0) and BIT(1) are cleared. So this patch shouldn't
-> affect runtime, but it obviously is still worth fixing.
 
-Applied, thanks.
+Jeremy,
+
+> I noticed drivers/s390/block/dasd_ioctl.c calls set_disk_ro() to set the
+> policy, where-as the policy is set with set_device_ro() in the generic
+> ioctl.
+
+There's a subtle distinction here:
+
+ - set_disk_ro() sets the policy for a whole disk
+
+ - set_device_ro() sets the policy for a block_device (typically
+   partition)
+
+> It's not setting the policy to DISK_POLICY_USER_WRITE_PROTECT so I
+> think it would only be a problem if the user set it to 2 instead of 1
+> assuming any truthy value is acceptable. Then the user wouldn't be
+> able to mark the disk as writable again since this would be
+> true. Perhaps it's a somewhat far-fetched scenario.
+
+OK, I missed that particular entry point. Will fix.
 
 -- 
-Jens Axboe
-
+Martin K. Petersen	Oracle Linux Engineering
