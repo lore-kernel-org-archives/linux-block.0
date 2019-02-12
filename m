@@ -2,155 +2,127 @@ Return-Path: <SRS0=MN5j=QT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C8D1C282C4
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73F7BC282CA
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:47:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA7962184E
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:42:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42E7D2184E
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:47:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="oX/Xn2Su"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731049AbfBLQm2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Feb 2019 11:42:28 -0500
-Received: from mx2.suse.de ([195.135.220.15]:40126 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728035AbfBLQm1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Feb 2019 11:42:27 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 0E436AE15;
-        Tue, 12 Feb 2019 16:42:26 +0000 (UTC)
-Subject: Re: [PATCH 06/19] bcache: treat stale && dirty keys as bad keys
-To:     Sasha Levin <sashal@kernel.org>,
-        Tang Junhui <tang.junhui.linux@gmail.com>
-Cc:     axboe@kernel.dk, linux-bcache@vger.kernel.org,
-        linux-block@vger.kernel.org, stable@vger.kernel.org
-References: <20190209045311.15677-7-colyli@suse.de>
- <20190212132825.E476F217D9@mail.kernel.org>
-From:   Coly Li <colyli@suse.de>
-Openpgp: preference=signencrypt
-Organization: SUSE Labs
-Message-ID: <7cc56107-e680-90ba-11ef-927a068d7c60@suse.de>
-Date:   Wed, 13 Feb 2019 00:42:17 +0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.5.0
+        id S1731194AbfBLQra (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Feb 2019 11:47:30 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:60242 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730844AbfBLQr3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Feb 2019 11:47:29 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1CGhp0r145776;
+        Tue, 12 Feb 2019 16:47:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2018-07-02;
+ bh=1wofqb9/fkyDx2OI0+iElXtq3/BKWApe3iz2P9LvOto=;
+ b=oX/Xn2SujmbaBFCFopVkLzxf4T2bkzNf9az/PFOymLxj4y4DED+DYzovbnTlGXDdW+Fj
+ zGh1+O1RETQTKVA18gbGWoUqAUWwPnZ1PDy0NbHFChQYcsVMCm3JshGMu2t5BgZZkC05
+ 5/rmXEl+iZDSR4eUb+ImWYr4Sp/VSkLW31VvKnO301SvJolxd3F5/AxjFiMLrytVCPze
+ q3AIj9IbGvVFj0vp2NGJeN/D08dV3O8bDyCdA8orq787Cj8fYt52XpgiguNjw+fNq9Tk
+ q8S9/Iw6GO92Yr0UKCdwidNNzLeCeif9iM9CANqnacAsefSzNZNOHlioYscr+Oj+YJ0a NA== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by userp2130.oracle.com with ESMTP id 2qhrekd4ku-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Feb 2019 16:47:16 +0000
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x1CGlFbd009621
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Feb 2019 16:47:16 GMT
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x1CGlFM7020783;
+        Tue, 12 Feb 2019 16:47:15 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 12 Feb 2019 08:47:15 -0800
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Jeremy Cline <jeremy@jcline.org>,
+        Oleksii Kurochko <olkuroch@cisco.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] scsi: sd: block: Handle cases where devices come online read-only
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+References: <20190208233831.31377-1-martin.petersen@oracle.com>
+        <20190212080319.GA10547@infradead.org>
+Date:   Tue, 12 Feb 2019 11:47:12 -0500
+In-Reply-To: <20190212080319.GA10547@infradead.org> (Christoph Hellwig's
+        message of "Tue, 12 Feb 2019 00:03:19 -0800")
+Message-ID: <yq1d0nxuf73.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20190212132825.E476F217D9@mail.kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9165 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1902120119
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019/2/12 9:28 下午, Sasha Levin wrote:
-> Hi,
-> 
-> [This is an automated email]
-> 
-> This commit has been processed because it contains a -stable tag.
-> The stable tag indicates that it's relevant for the following trees: all
-> 
-> The bot has tested the following trees: v4.20.7, v4.19.20, v4.14.98, v4.9.155, v4.4.173, v3.18.134.
-> 
-> v4.20.7: Build OK!
-> v4.19.20: Failed to apply! Possible dependencies:
->     149d0efada77 ("bcache: replace hard coded number with BUCKET_GC_GEN_MAX")
-> 
-> v4.14.98: Failed to apply! Possible dependencies:
->     1d316e658374 ("bcache: implement PI controller for writeback rate")
->     25d8be77e192 ("block: move bio_alloc_pages() to bcache")
->     27a40ab9269e ("bcache: add backing_request_endio() for bi_end_io")
->     2831231d4c3f ("bcache: reduce cache_set devices iteration by devices_max_used")
->     3b304d24a718 ("bcache: convert cached_dev.count from atomic_t to refcount_t")
->     3fd47bfe55b0 ("bcache: stop dc->writeback_rate_update properly")
->     5138ac6748e3 ("bcache: fix misleading error message in bch_count_io_errors()")
->     539d39eb2708 ("bcache: fix wrong return value in bch_debug_init()")
->     5fa89fb9a86b ("bcache: don't write back data if reading it failed")
->     6f10f7d1b02b ("bcache: style fix to replace 'unsigned' by 'unsigned int'")
->     771f393e8ffc ("bcache: add CACHE_SET_IO_DISABLE to struct cache_set flags")
->     7ba0d830dc0e ("bcache: set error_limit correctly")
->     7e027ca4b534 ("bcache: add stop_when_cache_set_failed option to backing device")
->     804f3c6981f5 ("bcache: fix cached_dev->count usage for bch_cache_set_error()")
->     a8500fc816b1 ("bcache: rearrange writeback main thread ratelimit")
->     b1092c9af9ed ("bcache: allow quick writeback when backing idle")
->     bc082a55d25c ("bcache: fix inaccurate io state for detached bcache devices")
->     c7b7bd07404c ("bcache: add io_disable to struct cached_dev")
-> 
-> v4.9.155: Failed to apply! Possible dependencies:
->     1d316e658374 ("bcache: implement PI controller for writeback rate")
->     2831231d4c3f ("bcache: reduce cache_set devices iteration by devices_max_used")
->     297e3d854784 ("blk-throttle: make throtl_slice tunable")
->     3fd47bfe55b0 ("bcache: stop dc->writeback_rate_update properly")
->     4e4cbee93d56 ("block: switch bios to blk_status_t")
->     5138ac6748e3 ("bcache: fix misleading error message in bch_count_io_errors()")
->     6f10f7d1b02b ("bcache: style fix to replace 'unsigned' by 'unsigned int'")
->     7e027ca4b534 ("bcache: add stop_when_cache_set_failed option to backing device")
->     87760e5eef35 ("block: hook up writeback throttling")
->     9e234eeafbe1 ("blk-throttle: add a simple idle detection")
->     c7b7bd07404c ("bcache: add io_disable to struct cached_dev")
->     cf43e6be865a ("block: add scalable completion tracking of requests")
->     e806402130c9 ("block: split out request-only flags into a new namespace")
->     fbbaf700e7b1 ("block: trace completion of all bios.")
-> 
-> v4.4.173: Failed to apply! Possible dependencies:
->     005411ea7ee7 ("doc: update block/queue-sysfs.txt entries")
->     1d316e658374 ("bcache: implement PI controller for writeback rate")
->     27489a3c827b ("blk-mq: turn hctx->run_work into a regular work struct")
->     2831231d4c3f ("bcache: reduce cache_set devices iteration by devices_max_used")
->     297e3d854784 ("blk-throttle: make throtl_slice tunable")
->     38f8baae8905 ("block: factor out chained bio completion")
->     3fd47bfe55b0 ("bcache: stop dc->writeback_rate_update properly")
->     4e4cbee93d56 ("block: switch bios to blk_status_t")
->     511cbce2ff8b ("irq_poll: make blk-iopoll available outside the block layer")
->     5138ac6748e3 ("bcache: fix misleading error message in bch_count_io_errors()")
->     6f10f7d1b02b ("bcache: style fix to replace 'unsigned' by 'unsigned int'")
->     7e027ca4b534 ("bcache: add stop_when_cache_set_failed option to backing device")
->     87760e5eef35 ("block: hook up writeback throttling")
->     8d354f133e86 ("blk-mq: improve layout of blk_mq_hw_ctx")
->     9467f85960a3 ("blk-mq/cpu-notif: Convert to new hotplug state machine")
->     9e234eeafbe1 ("blk-throttle: add a simple idle detection")
->     af3e3a5259e3 ("block: don't unecessarily clobber bi_error for chained bios")
->     ba8c6967b739 ("block: cleanup bio_endio")
->     c7b7bd07404c ("bcache: add io_disable to struct cached_dev")
->     cf43e6be865a ("block: add scalable completion tracking of requests")
->     e57690fe009b ("blk-mq: don't overwrite rq->mq_ctx")
->     fbbaf700e7b1 ("block: trace completion of all bios.")
-> 
-> v3.18.134: Failed to apply! Possible dependencies:
->     0f8087ecdeac ("block: Consolidate static integrity profile properties")
->     1b94b5567e9c ("Btrfs, raid56: use a variant to record the operation type")
->     1d316e658374 ("bcache: implement PI controller for writeback rate")
->     2831231d4c3f ("bcache: reduce cache_set devices iteration by devices_max_used")
->     2c8cdd6ee4e7 ("Btrfs, replace: write dirty pages into the replace target device")
->     326e1dbb5736 ("block: remove management of bi_remaining when restoring original bi_end_io")
->     3fd47bfe55b0 ("bcache: stop dc->writeback_rate_update properly")
->     4246a0b63bd8 ("block: add a bi_error field to struct bio")
->     4e4cbee93d56 ("block: switch bios to blk_status_t")
->     5138ac6748e3 ("bcache: fix misleading error message in bch_count_io_errors()")
->     5a6ac9eacb49 ("Btrfs, raid56: support parity scrub on raid56")
->     6e9606d2a2dc ("Btrfs: add ref_count and free function for btrfs_bio")
->     6f10f7d1b02b ("bcache: style fix to replace 'unsigned' by 'unsigned int'")
->     7e027ca4b534 ("bcache: add stop_when_cache_set_failed option to backing device")
->     8e5cfb55d3f7 ("Btrfs: Make raid_map array be inlined in btrfs_bio structure")
->     af8e2d1df984 ("Btrfs, scrub: repair the common data on RAID5/6 if it is corrupted")
->     b89e1b012c7f ("Btrfs, raid56: don't change bbio and raid_map")
->     c4cf5261f8bf ("bio: skip atomic inc/dec of ->bi_remaining for non-chains")
->     c7b7bd07404c ("bcache: add io_disable to struct cached_dev")
->     f90523d1aa3c ("Btrfs: remove noused bbio_ret in __btrfs_map_block in condition")
-> 
-> 
-> How should we proceed with this patch?
 
-Can we rebase this patch for stable kernels, and send them to stable
-kernel maintainers separately? If this behavior is accepted for stable
-kernel maintenance, I would suggest Junhui Tang to think about to rebase
-for these stable kernels.
+Christoph,
 
-Thanks.
+>> Some devices come online in write protected state and switch to
+>> read-write once they are ready to process I/O requests.
+>
+> That is really weird.  What kind of devices are these?
+
+There are several. I have many bug reports, ranging from USB sticks to
+arrays.
+
+>> Note that per-partition ro settings are lost on revalidate. This has
+>> been broken for at least a decade and it will require major surgery to
+>> fix. To my knowledge nobody has complained about being unable to make
+>> partition read-only settings stick through a revalidate. So hopefully
+>> this patch will suffice as a simple fix for stable.
+>
+> Should we warn when we lost these settings on a revalidate?
+
+Would be nice. But as I wrote, it's going to require major surgery to
+the gendisk code to handle this particular scenario correctly since we
+currently do not keep any partition state between revalidate calls.
+
+> I have to say I don't like the tristate too much - it seems to allow
+> setting a hardware write protected device writable again by user
+> interfaction, right?
+
+The original policy was that the user policy was ineffective since the
+device setting always won.
+
+Jeremy's patch allowed the user setting to override the device setting
+but broke the case where devices subsequently change state at runtime.
+
+My workaround is that the user ioctl ro state, if set, overrides
+whatever the device reports. And once the user clears the flag, the
+current device setting will take effect on revalidate.
+
+> Should we just have a hardware and a user policy field that are
+> separate instead?
+
+All this needs to be completely rewritten. However, my attempt at fixing
+it up properly got pretty convoluted and thus unsuitable for stable.
+
+The intent with this patch was merely as a workaround for people stuck
+with write-protected drives after boot. The tristate wasn't my first
+choice, but it turned out to be the path of least resistance for a
+stable fix.
 
 -- 
-
-Coly Li
+Martin K. Petersen	Oracle Linux Engineering
