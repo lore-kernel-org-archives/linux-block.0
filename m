@@ -1,163 +1,152 @@
-Return-Path: <SRS0=vmzB=QS=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=MN5j=QT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE1FEC169C4
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 23:47:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75306C169C4
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 01:54:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 977DB20873
-	for <linux-block@archiver.kernel.org>; Mon, 11 Feb 2019 23:47:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4222E20836
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 01:54:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Yo63PetL"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JdZSJk5r"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727330AbfBKXrT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Feb 2019 18:47:19 -0500
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:14651 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727122AbfBKXrT (ORCPT
+        id S1726821AbfBLByl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Feb 2019 20:54:41 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:43332 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726815AbfBLByl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Feb 2019 18:47:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1549928840; x=1581464840;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xeencaVU0zzDDnuC7Mrp3HNbHWbTnU3Mqs3piQX/xW0=;
-  b=Yo63PetLF2KWPIKcbAiQsFkhwevv4009+eTqGYytDxxfS+3OzHfy378F
-   YC690d8mvOu0aTU7sMmovdzksx+NlDh+d2BMqBulUExyvzyXQPmbPJTmg
-   jLkF7FXVdArcI07YyZsO2jqmXNi68w+fH+fYlE7x4mZgy8b0cFk1fGxOm
-   UbUxzUDKwqN+F4RZlU5xtuYYSwNz4WEFnh5RQM+MZ9mW5ryAOJdc9ZqC+
-   4ZU+CbaS3J6UJpdueNdh88AN5QNTZ1VxvDRSpWLQecgtMfRdmSr1pBJp1
-   chJR44uhwAVKf1ZgQy5+pgg3T0ocz6dXK0HM4Y00Rj2tpU6LO3FmeN1s9
-   w==;
-X-IronPort-AV: E=Sophos;i="5.58,360,1544457600"; 
-   d="scan'208";a="102736660"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 12 Feb 2019 07:47:19 +0800
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP; 11 Feb 2019 15:27:56 -0800
-Received: from washi.fujisawa.hgst.com ([10.149.53.254])
-  by uls-op-cesaip02.wdc.com with ESMTP; 11 Feb 2019 15:47:17 -0800
-From:   Damien Le Moal <damien.lemoal@wdc.com>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-Cc:     Matias Bjorling <matias.bjorling@wdc.com>
-Subject: [PATCH v3] nullb: Prevent use of legacy request queue mode
-Date:   Tue, 12 Feb 2019 08:47:16 +0900
-Message-Id: <20190211234716.18816-1-damien.lemoal@wdc.com>
-X-Mailer: git-send-email 2.20.1
+        Mon, 11 Feb 2019 20:54:41 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1C1nHrl006938;
+        Tue, 12 Feb 2019 01:54:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=YJXzhy7WlbTUkMbSYIK8Xtmwi248YbHdbKAh+N2PN8Y=;
+ b=JdZSJk5rhI5GCoAN6/fYvHl7yUwZRnaPFsUfhbHQ83s2BTX0Jy/ogR8aobA71yZ88Sfk
+ PUCpj4YTl1kfRhn8rv3sPjlfN8mh8cbJR3WPXDXMBEpwpXsxqQ9Dg4ioToHYzj+TxLou
+ 8MckK3+QPaGz/09bkCk6qv2rd8mamUesCNBOWyT6a+ejDpiNi+SDupaPraQI5e9td+py
+ TqJ+vRVlo+mqkbJP0/TSkc+a/dyKGlZGieodgCaFCmYkDwjj+om4jseOaEaDKHcZ22bc
+ dInyyBkBJjvxIjSqCwihWMMj08dSyaFA8fCN1kZ16aW+QlBGtW7kO0xy1DjMzPoZzlZS UA== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by userp2130.oracle.com with ESMTP id 2qhrek9802-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Feb 2019 01:54:38 +0000
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x1C1sbt1008754
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 12 Feb 2019 01:54:38 GMT
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x1C1sbEB011237;
+        Tue, 12 Feb 2019 01:54:37 GMT
+Received: from [10.182.69.118] (/10.182.69.118)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 11 Feb 2019 17:54:37 -0800
+Subject: Re: [PATCH] blk-mq: insert rq with DONTPREP to hctx dispatch list
+ when requeue
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1549863665-1691-1-git-send-email-jianchao.w.wang@oracle.com>
+ <937e9207-dcf7-dab5-1917-8a10303edc67@kernel.dk>
+ <82deee13-a4ff-9bf5-5e01-0e4df01b7ff7@kernel.dk>
+ <e68f8017-2f56-6305-1c08-2368435b274b@kernel.dk>
+From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <0ae89a37-7b6e-0cc4-f474-2e5c45cc1aec@oracle.com>
+Date:   Tue, 12 Feb 2019 09:56:56 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <e68f8017-2f56-6305-1c08-2368435b274b@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9164 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1902120011
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When null_blk queue mode is specified together with modprobe/insmod, a
-check to prevent setting the nullb device queue mode to 1 (NULL_Q_RQ) is
-done. However, the same check is not performed when setting up a nullb
-device through configfs, resulting in a oops (NULL pointer dereference
-for the device request queue).
+Hi Jens
 
-Fix this problem by checking for an invalid queue mode value in
-null_validate_conf(), propagating -EINVAL to null_add_dev() if the queue
-mode is NULL_Q_RQ. While at it, also fix the propagation to user space
-of null_add_dev() return value when a nullb device is created through
-the power attribute of configfs.
+Thanks for your kindly response.
 
-Finally, remove the "1=rq" value from the list of possible values of
-the queue_mode module argument to make it clear that this is no longer
-a valid setting.
+On 2/12/19 7:20 AM, Jens Axboe wrote:
+> On 2/11/19 4:15 PM, Jens Axboe wrote:
+>> On 2/11/19 8:59 AM, Jens Axboe wrote:
+>>> On 2/10/19 10:41 PM, Jianchao Wang wrote:
+>>>> When requeue, if RQF_DONTPREP, rq has contained some driver
+>>>> specific data, so insert it to hctx dispatch list to avoid any
+>>>> merge. Take scsi as example, here is the trace event log (no
+>>>> io scheduler, because RQF_STARTED would prevent merging),
+>>>>
+>>>>    kworker/0:1H-339   [000] ...1  2037.209289: block_rq_insert: 8,0 R 4096 () 32768 + 8 [kworker/0:1H]
+>>>> scsi_inert_test-1987  [000] ....  2037.220465: block_bio_queue: 8,0 R 32776 + 8 [scsi_inert_test]
+>>>> scsi_inert_test-1987  [000] ...2  2037.220466: block_bio_backmerge: 8,0 R 32776 + 8 [scsi_inert_test]
+>>>>    kworker/0:1H-339   [000] ....  2047.220913: block_rq_issue: 8,0 R 8192 () 32768 + 16 [kworker/0:1H]
+>>>> scsi_inert_test-1996  [000] ..s1  2047.221007: block_rq_complete: 8,0 R () 32768 + 8 [0]
+>>>> scsi_inert_test-1996  [000] .Ns1  2047.221045: block_rq_requeue: 8,0 R () 32776 + 8 [0]
+>>>>    kworker/0:1H-339   [000] ...1  2047.221054: block_rq_insert: 8,0 R 4096 () 32776 + 8 [kworker/0:1H]
+>>>>    kworker/0:1H-339   [000] ...1  2047.221056: block_rq_issue: 8,0 R 4096 () 32776 + 8 [kworker/0:1H]
+>>>> scsi_inert_test-1986  [000] ..s1  2047.221119: block_rq_complete: 8,0 R () 32776 + 8 [0]
+>>>>
+>>>> (32768 + 8) was requeued by scsi_queue_insert and had RQF_DONTPREP.
+>>>> Then it was merged with (32776 + 8) and issued. Due to RQF_DONTPREP,
+>>>> the sdb only contained the part of (32768 + 8), then only that part
+>>>> was completed. The lucky thing was that scsi_io_completion detected
+>>>> it and requeued the remaining part. So we didn't get corrupted data.
+>>>> However, the requeue of (32776 + 8) is not expected.
+>>>
+>>> Good catch, but how about something like this? Makes it more integrated,
+>>> I think that's cleaner.
+>>
+>> This is probably better (and safer):
+> 
+> Here's the one I wanted to send, not a half done one. Maybe I'll be
+> luckier this time around?
+> 
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 8f5b533764ca..35e6aba52808 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -737,12 +737,21 @@ static void blk_mq_requeue_work(struct work_struct *work)
+>  	spin_unlock_irq(&q->requeue_lock);
+>  
+>  	list_for_each_entry_safe(rq, next, &rq_list, queuelist) {
+> -		if (!(rq->rq_flags & RQF_SOFTBARRIER))
+> +		if (!(rq->rq_flags & (RQF_SOFTBARRIER | RQF_DONTPREP)))
+>  			continue;
+>  
+>  		rq->rq_flags &= ~RQF_SOFTBARRIER;
+>  		list_del_init(&rq->queuelist);
+> -		blk_mq_sched_insert_request(rq, true, false, false);
+> +
+> +		/*
+> +		 * If RQF_DONTPREP is set, rq may contain some driver
+> +		 * specific data. Insert it to hctx dispatch list to avoid
+> +		 * any merge.
+> +		 */
+> +		if (rq->rq_flags & RQF_DONTPREP)
+> +			blk_mq_request_bypass_insert(rq, false);
+> +		else
+> +			blk_mq_sched_insert_request(rq, true, false, false);
+>  	}
+>  
+>  	while (!list_empty(&rq_list)) {
+> 
 
-Fixes: e50b1e327aeb ("null_blk: remove legacy IO path")
-Cc: stable@vger.kernel.org
-Signed-off-by: Damien Le Moal <damien.lemoal@wdc.com>
----
+The test is OK.
+And I will send out the V2 based on this.
 
-Changes from v2:
-* Fixed "Fixes" tag
-Changes from v1:
-* Removed reference to rq mode from queue_mode description
-
- drivers/block/null_blk_main.c | 24 ++++++++++++++++++------
- 1 file changed, 18 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 62c9654b9ce8..155dcef3b21a 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -130,7 +130,7 @@ static const struct kernel_param_ops null_queue_mode_param_ops = {
- };
- 
- device_param_cb(queue_mode, &null_queue_mode_param_ops, &g_queue_mode, 0444);
--MODULE_PARM_DESC(queue_mode, "Block interface to use (0=bio,1=rq,2=multiqueue)");
-+MODULE_PARM_DESC(queue_mode, "Block interface to use (0=bio,2=multiqueue)");
- 
- static int g_gb = 250;
- module_param_named(gb, g_gb, int, 0444);
-@@ -318,9 +318,10 @@ static ssize_t nullb_device_power_store(struct config_item *item,
- 	if (!dev->power && newp) {
- 		if (test_and_set_bit(NULLB_DEV_FL_UP, &dev->flags))
- 			return count;
--		if (null_add_dev(dev)) {
-+		ret = null_add_dev(dev);
-+		if (ret) {
- 			clear_bit(NULLB_DEV_FL_UP, &dev->flags);
--			return -ENOMEM;
-+			return ret;
- 		}
- 
- 		set_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);
-@@ -1561,8 +1562,13 @@ static int null_init_tag_set(struct nullb *nullb, struct blk_mq_tag_set *set)
- 	return blk_mq_alloc_tag_set(set);
- }
- 
--static void null_validate_conf(struct nullb_device *dev)
-+static int null_validate_conf(struct nullb_device *dev)
- {
-+	if (dev->queue_mode == NULL_Q_RQ) {
-+		pr_err("null_blk: legacy IO path no longer available\n");
-+		return -EINVAL;
-+	}
-+
- 	dev->blocksize = round_down(dev->blocksize, 512);
- 	dev->blocksize = clamp_t(unsigned int, dev->blocksize, 512, 4096);
- 
-@@ -1588,6 +1594,8 @@ static void null_validate_conf(struct nullb_device *dev)
- 	/* can not stop a queue */
- 	if (dev->queue_mode == NULL_Q_BIO)
- 		dev->mbps = 0;
-+
-+	return 0;
- }
- 
- #ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
-@@ -1620,7 +1628,9 @@ static int null_add_dev(struct nullb_device *dev)
- 	struct nullb *nullb;
- 	int rv;
- 
--	null_validate_conf(dev);
-+	rv = null_validate_conf(dev);
-+	if (rv)
-+		goto out;
- 
- 	nullb = kzalloc_node(sizeof(*nullb), GFP_KERNEL, dev->home_node);
- 	if (!nullb) {
-@@ -1648,8 +1658,10 @@ static int null_add_dev(struct nullb_device *dev)
- 		if (rv)
- 			goto out_cleanup_queues;
- 
--		if (!null_setup_fault())
-+		if (!null_setup_fault()) {
-+			rv = -EINVAL;
- 			goto out_cleanup_queues;
-+		}
- 
- 		nullb->tag_set->timeout = 5 * HZ;
- 		nullb->q = blk_mq_init_queue(nullb->tag_set);
--- 
-2.20.1
-
+Thanks
+Jianchao
