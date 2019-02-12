@@ -2,151 +2,155 @@ Return-Path: <SRS0=MN5j=QT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C328C282CA
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:39:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C8D1C282C4
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:42:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C6E3120855
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:39:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mit.edu header.i=@mit.edu header.b="RGZ9Nhy5"
+	by mail.kernel.org (Postfix) with ESMTP id CA7962184E
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 16:42:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729633AbfBLQju (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Feb 2019 11:39:50 -0500
-Received: from mail-eopbgr800109.outbound.protection.outlook.com ([40.107.80.109]:2477
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        id S1731049AbfBLQm2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Feb 2019 11:42:28 -0500
+Received: from mx2.suse.de ([195.135.220.15]:40126 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731150AbfBLQju (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Feb 2019 11:39:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H1IzLCCwVEI9IHjTEO78jR2XVTh7HabU6F/cG7G3gHg=;
- b=RGZ9Nhy5dwSXQ3XIPX8z4f9pk+K0rS6LL09KRykHOs3dz7bBIHoAb9yWLuMgjN7SCggfa4gWmufN8NXFHuCH92ySj4NCThEPEQN99+CdWArSOe0McSdqosfb2J70Ve1ztE7SuYjS3+xNbuxTSTfIOre2h3Fvxy7ZIn4O4IUyg+c=
-Received: from BYAPR01CA0071.prod.exchangelabs.com (2603:10b6:a03:94::48) by
- CY4PR01MB3206.prod.exchangelabs.com (2603:10b6:903:e1::22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1622.16; Tue, 12 Feb 2019 16:39:45 +0000
-Received: from DM3NAM03FT058.eop-NAM03.prod.protection.outlook.com
- (2a01:111:f400:7e49::205) by BYAPR01CA0071.outlook.office365.com
- (2603:10b6:a03:94::48) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1622.16 via Frontend
- Transport; Tue, 12 Feb 2019 16:39:45 +0000
-Authentication-Results: spf=pass (sender IP is 18.9.28.11)
- smtp.mailfrom=mit.edu; wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=bestguesspass action=none header.from=mit.edu;
-Received-SPF: Pass (protection.outlook.com: domain of mit.edu designates
- 18.9.28.11 as permitted sender) receiver=protection.outlook.com;
- client-ip=18.9.28.11; helo=outgoing.mit.edu;
-Received: from outgoing.mit.edu (18.9.28.11) by
- DM3NAM03FT058.mail.protection.outlook.com (10.152.82.212) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.1580.10 via Frontend Transport; Tue, 12 Feb 2019 16:39:44 +0000
-Received: from callcc.thunk.org (guestnat-104-133-0-100.corp.google.com [104.133.0.100] (may be forged))
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x1CGdfl3000828
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 Feb 2019 11:39:43 -0500
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id 27DE57A4EA7; Tue, 12 Feb 2019 11:39:41 -0500 (EST)
-Date:   Tue, 12 Feb 2019 11:39:41 -0500
-From:   "Theodore Y. Ts'o" <tytso@mit.edu>
-To:     <linux-block@vger.kernel.org>
-CC:     Omar Sandoval <osandov@fb.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: blktests nvme/013 failing
-Message-ID: <20190212163941.GA7967@mit.edu>
+        id S1728035AbfBLQm1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Feb 2019 11:42:27 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 0E436AE15;
+        Tue, 12 Feb 2019 16:42:26 +0000 (UTC)
+Subject: Re: [PATCH 06/19] bcache: treat stale && dirty keys as bad keys
+To:     Sasha Levin <sashal@kernel.org>,
+        Tang Junhui <tang.junhui.linux@gmail.com>
+Cc:     axboe@kernel.dk, linux-bcache@vger.kernel.org,
+        linux-block@vger.kernel.org, stable@vger.kernel.org
+References: <20190209045311.15677-7-colyli@suse.de>
+ <20190212132825.E476F217D9@mail.kernel.org>
+From:   Coly Li <colyli@suse.de>
+Openpgp: preference=signencrypt
+Organization: SUSE Labs
+Message-ID: <7cc56107-e680-90ba-11ef-927a068d7c60@suse.de>
+Date:   Wed, 13 Feb 2019 00:42:17 +0800
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-EOPAttributedMessage: 0
-X-Forefront-Antispam-Report: CIP:18.9.28.11;IPV:CAL;SCL:-1;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(10019020)(39860400002)(136003)(376002)(396003)(346002)(2980300002)(189003)(199004)(23726003)(246002)(6266002)(50466002)(75432002)(316002)(16586007)(42186006)(786003)(58126008)(36756003)(305945005)(8936002)(8676002)(54906003)(186003)(1076003)(356004)(336012)(476003)(2616005)(126002)(486006)(46406003)(106002)(47776003)(33656002)(2351001)(90966002)(478600001)(86362001)(88552002)(4326008)(106466001)(52956003)(2906002)(26005)(36906005)(6916009)(14444005)(103686004)(97756001)(26826003)(18370500001)(42866002);DIR:OUT;SFP:1102;SCL:1;SRVR:CY4PR01MB3206;H:outgoing.mit.edu;FPR:;SPF:Pass;LANG:en;PTR:outgoing-auth-1.mit.edu;MX:1;A:1;
-X-Microsoft-Exchange-Diagnostics: 1;DM3NAM03FT058;1:A808yFzj3XKDf4kdnbiTDqdpMXwop3eLlKT6L+6Qcv4MYmLAllII1dLMgPoNwHTYhtMsPBfkp9QMRq6mQN4hko6C8DMs5q58i22QsZILeYiQ/uVskOGB/rk7oxu8ofUwoJxBB1v3aSh2uUd9Q+1VAQ==
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7485b923-11b8-48e0-f93c-08d69108b216
-X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600110)(711020)(4605077)(4608076)(4709027)(2017052603328)(7153060);SRVR:CY4PR01MB3206;
-X-MS-TrafficTypeDiagnostic: CY4PR01MB3206:
-X-LD-Processed: 64afd9ba-0ecf-4acf-bc36-935f6235ba8b,ExtAddr
-X-Microsoft-Exchange-Diagnostics: 1;CY4PR01MB3206;20:DVpfSxtfAeeNmHyZk3bhhE02ChufpGif6rwRfYcn2cRDvi4vfRwqN8PDQN0Jdr8OtkzGoY6GMM7OcwkgEnrZAjF6FarOx34IRynVPI3a7WBJ2y1fgJJz06gETn08DGtWU6EIMdOdFBzJV56FweLd8vykzpPZx913wKlH9YifkkeJWIv3HxcLhKArm72dT2bPbqFaeFVKATq3iVKRr6xRcg0vc9XpGy/8V4h+CuiaICZZ0W5IxLkDcxsGnV8IzsKXsJWsETQzqt6PKxtlprxWvHEnhKcrzHCikGDFmxHzsvLtVXBE1MOMtKVJLLxKIEKXW1aLyyaPabmM4jYLhEQbtgy23sn1otA48x8c7pmTVJNZVul+Zx1SwtL1qSzvaCR+k+d38BvMQDbICWqtEqf1QlnHG7csFOq/ekYufepIq17PwAaNM/79R/kNI/BDOhkzIjTmdkLkohpPUwk7yDsbaHet0xiyxBTSuYKXiLADKMfQ9xE82TfUAFzZL1/XJAZqviWXUIxXg6PKyqu2qthr1y0+2Q7Qe7o7VWpRSWHnxLH/MdUxMCvOVSJrcX4OeSPg9hghovRAjGEyIbEA9kg3BSuO2OOI0/dL/L63MuqYn3k=
-X-Microsoft-Antispam-PRVS: <CY4PR01MB3206A88F24BB28CD5DD20AD4B5650@CY4PR01MB3206.prod.exchangelabs.com>
-X-Forefront-PRVS: 0946DC87A1
-X-Microsoft-Exchange-Diagnostics: =?us-ascii?Q?1;CY4PR01MB3206;23:NAUHnhvgZJlSKUI4Dm7O+bF0GiKMXcBdqpgaPBhG5?=
- =?us-ascii?Q?yHhOwrnJHwEw0YNoH2BYEUDKB5CyB5XsIJfAfrJE4b+4n882tvRzeequfDdZ?=
- =?us-ascii?Q?e2+OU+eIgvwhL56KBxo90QEtuwzeB7gyIWSvDoqlm8DRDAN4trktqxL68HTd?=
- =?us-ascii?Q?qaA5nu6ZJ9NYhpDoemDDa1m4Kk5ipSA+tg4c+iDUMtsYOHNPtY7NjFUxhDu0?=
- =?us-ascii?Q?ihEFvQOtx+iUEqVLGeDM3tbfrWGvor5Ve1wH0c4VWDCxnwmRZCsHTcWyA/zi?=
- =?us-ascii?Q?/aomH+upQherjlkb8Do2O54StQwRtT2Edk4PnWF1XKDeR8Iakpd1DupbG3L8?=
- =?us-ascii?Q?BYLMPySkZ692FexJNnIBhB9eUowQ+S6zg7lSnmFEKGL1cFuFaNO9qcpZSTxA?=
- =?us-ascii?Q?92C032aJx4GOUzTBp2Ojp1pvrnfxI6QFiATNm/WDKS66HUMrBAXY4KRbbDCo?=
- =?us-ascii?Q?cxwr4+wKDRbumz3puTEJsIPIlGqUV0ublJy/4/ILf95gr8zRrrFRK6VDXtFa?=
- =?us-ascii?Q?qQQSDO7Tkn4XaB68YXr+G7JJ9Z/bmma0Qu8/bAyOfh5asUXJIjd3pAXPVjfV?=
- =?us-ascii?Q?8WrChN4RKAIoq1quPiAMGomEmycbUjAVugaPFNClslq6Ad53ngW6JO+uCfi5?=
- =?us-ascii?Q?tPSiTlc5p/L+qdTbF1p8HLAqH9nFRydZvh+VrQln9HYFfJCFZWa8ytzPtA+4?=
- =?us-ascii?Q?46CBxCYomEuRnQsVIEXqKyuIPTKghofq6t9ZBu0+RewsDGmThFsqzQrxR19o?=
- =?us-ascii?Q?y1saRHOH/kd+ONM+IcagBby+ikys6Kab+xfh0aV24bH+g1BY+8OS3AaAyLOp?=
- =?us-ascii?Q?LGlbFjs92CiqVlLSbR0f/DwgmK/I6Mf5KCdWOP2gDMAV0MHT6j2b99/Fv+MS?=
- =?us-ascii?Q?gS0KDMVmO4EvP/HvtaIs78rtcDQ0cfacirPAYd7VG9tmaTHDostjASi0Msf8?=
- =?us-ascii?Q?eixcs+BVBZyFsyxKiUkzrDI+YYSno8WeWFyfn1rNdT0n/wkFx13EJTEg8pGm?=
- =?us-ascii?Q?vco4pq45e8HlFfAVM9+nzea0Hjw39JNxxAcVCcIsZUQ5Inr0HjDjvVIVNj4J?=
- =?us-ascii?Q?9G/RslkrUabWxGA9vwErKeqwtpuUkBuSp50MlwTU1vT3E+5rhW+dFky+3cqR?=
- =?us-ascii?Q?pTrQRPM4OTIaLn9MWfN2zpgt69nwKJJwSC7fX46yzXid0jXb2052CUGfh5xG?=
- =?us-ascii?Q?Cdf4Q7Jlbmttgc=3D?=
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam-Message-Info: uV57iSzTQU1jdAEftv0XMkgP98R9khiSwNrS002rerJuOILf0VmWlxQNabAuZoy+iw9udiGm1NIH12jRMZMEqgeM17Oro3Px8JZprajs1FOThpvDXy670LPxiavh90h2qGeq4g6zDU/Qe3bLfz7yERsTdc9mH+bzCPZywIYqLbY/2DoLdbm+Gteyufc1E+cY4mtsAWHM2FOVrspbuew6hNzarV1AXKC6nDnlrmfo043NA4jS0aynNOwFLYmcpW0kcRiIQm9mmHXi5eMyVZW7RbqwoPIPTJu8C7UFiRJ0NNIqXL5LUrRuREJ5Pxz/tMtexvefbT1J69kcMxHj9QnxT6FwQZpDruOu76TgfygqxzvCz5rOOXr6NKt9ztlEZ0Yg8x/G8si78XE312MQ0EyCXYsJNvCH+Swk4JYMjVH7Qhc=
-X-OriginatorOrg: mit.edu
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2019 16:39:44.9987
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7485b923-11b8-48e0-f93c-08d69108b216
-X-MS-Exchange-CrossTenant-Id: 64afd9ba-0ecf-4acf-bc36-935f6235ba8b
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=64afd9ba-0ecf-4acf-bc36-935f6235ba8b;Ip=[18.9.28.11];Helo=[outgoing.mit.edu]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR01MB3206
+In-Reply-To: <20190212132825.E476F217D9@mail.kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There are a number of NVMeOF tests which are failing of which nvme/013
-is the first one.  Are these test failures known?  It's often not
-clear to me whether blktests problems are due to kernel bugs, kernel
-misconfiguration, out-of-date or missing userspace components, or test
-bugs.
+On 2019/2/12 9:28 下午, Sasha Levin wrote:
+> Hi,
+> 
+> [This is an automated email]
+> 
+> This commit has been processed because it contains a -stable tag.
+> The stable tag indicates that it's relevant for the following trees: all
+> 
+> The bot has tested the following trees: v4.20.7, v4.19.20, v4.14.98, v4.9.155, v4.4.173, v3.18.134.
+> 
+> v4.20.7: Build OK!
+> v4.19.20: Failed to apply! Possible dependencies:
+>     149d0efada77 ("bcache: replace hard coded number with BUCKET_GC_GEN_MAX")
+> 
+> v4.14.98: Failed to apply! Possible dependencies:
+>     1d316e658374 ("bcache: implement PI controller for writeback rate")
+>     25d8be77e192 ("block: move bio_alloc_pages() to bcache")
+>     27a40ab9269e ("bcache: add backing_request_endio() for bi_end_io")
+>     2831231d4c3f ("bcache: reduce cache_set devices iteration by devices_max_used")
+>     3b304d24a718 ("bcache: convert cached_dev.count from atomic_t to refcount_t")
+>     3fd47bfe55b0 ("bcache: stop dc->writeback_rate_update properly")
+>     5138ac6748e3 ("bcache: fix misleading error message in bch_count_io_errors()")
+>     539d39eb2708 ("bcache: fix wrong return value in bch_debug_init()")
+>     5fa89fb9a86b ("bcache: don't write back data if reading it failed")
+>     6f10f7d1b02b ("bcache: style fix to replace 'unsigned' by 'unsigned int'")
+>     771f393e8ffc ("bcache: add CACHE_SET_IO_DISABLE to struct cache_set flags")
+>     7ba0d830dc0e ("bcache: set error_limit correctly")
+>     7e027ca4b534 ("bcache: add stop_when_cache_set_failed option to backing device")
+>     804f3c6981f5 ("bcache: fix cached_dev->count usage for bch_cache_set_error()")
+>     a8500fc816b1 ("bcache: rearrange writeback main thread ratelimit")
+>     b1092c9af9ed ("bcache: allow quick writeback when backing idle")
+>     bc082a55d25c ("bcache: fix inaccurate io state for detached bcache devices")
+>     c7b7bd07404c ("bcache: add io_disable to struct cached_dev")
+> 
+> v4.9.155: Failed to apply! Possible dependencies:
+>     1d316e658374 ("bcache: implement PI controller for writeback rate")
+>     2831231d4c3f ("bcache: reduce cache_set devices iteration by devices_max_used")
+>     297e3d854784 ("blk-throttle: make throtl_slice tunable")
+>     3fd47bfe55b0 ("bcache: stop dc->writeback_rate_update properly")
+>     4e4cbee93d56 ("block: switch bios to blk_status_t")
+>     5138ac6748e3 ("bcache: fix misleading error message in bch_count_io_errors()")
+>     6f10f7d1b02b ("bcache: style fix to replace 'unsigned' by 'unsigned int'")
+>     7e027ca4b534 ("bcache: add stop_when_cache_set_failed option to backing device")
+>     87760e5eef35 ("block: hook up writeback throttling")
+>     9e234eeafbe1 ("blk-throttle: add a simple idle detection")
+>     c7b7bd07404c ("bcache: add io_disable to struct cached_dev")
+>     cf43e6be865a ("block: add scalable completion tracking of requests")
+>     e806402130c9 ("block: split out request-only flags into a new namespace")
+>     fbbaf700e7b1 ("block: trace completion of all bios.")
+> 
+> v4.4.173: Failed to apply! Possible dependencies:
+>     005411ea7ee7 ("doc: update block/queue-sysfs.txt entries")
+>     1d316e658374 ("bcache: implement PI controller for writeback rate")
+>     27489a3c827b ("blk-mq: turn hctx->run_work into a regular work struct")
+>     2831231d4c3f ("bcache: reduce cache_set devices iteration by devices_max_used")
+>     297e3d854784 ("blk-throttle: make throtl_slice tunable")
+>     38f8baae8905 ("block: factor out chained bio completion")
+>     3fd47bfe55b0 ("bcache: stop dc->writeback_rate_update properly")
+>     4e4cbee93d56 ("block: switch bios to blk_status_t")
+>     511cbce2ff8b ("irq_poll: make blk-iopoll available outside the block layer")
+>     5138ac6748e3 ("bcache: fix misleading error message in bch_count_io_errors()")
+>     6f10f7d1b02b ("bcache: style fix to replace 'unsigned' by 'unsigned int'")
+>     7e027ca4b534 ("bcache: add stop_when_cache_set_failed option to backing device")
+>     87760e5eef35 ("block: hook up writeback throttling")
+>     8d354f133e86 ("blk-mq: improve layout of blk_mq_hw_ctx")
+>     9467f85960a3 ("blk-mq/cpu-notif: Convert to new hotplug state machine")
+>     9e234eeafbe1 ("blk-throttle: add a simple idle detection")
+>     af3e3a5259e3 ("block: don't unecessarily clobber bi_error for chained bios")
+>     ba8c6967b739 ("block: cleanup bio_endio")
+>     c7b7bd07404c ("bcache: add io_disable to struct cached_dev")
+>     cf43e6be865a ("block: add scalable completion tracking of requests")
+>     e57690fe009b ("blk-mq: don't overwrite rq->mq_ctx")
+>     fbbaf700e7b1 ("block: trace completion of all bios.")
+> 
+> v3.18.134: Failed to apply! Possible dependencies:
+>     0f8087ecdeac ("block: Consolidate static integrity profile properties")
+>     1b94b5567e9c ("Btrfs, raid56: use a variant to record the operation type")
+>     1d316e658374 ("bcache: implement PI controller for writeback rate")
+>     2831231d4c3f ("bcache: reduce cache_set devices iteration by devices_max_used")
+>     2c8cdd6ee4e7 ("Btrfs, replace: write dirty pages into the replace target device")
+>     326e1dbb5736 ("block: remove management of bi_remaining when restoring original bi_end_io")
+>     3fd47bfe55b0 ("bcache: stop dc->writeback_rate_update properly")
+>     4246a0b63bd8 ("block: add a bi_error field to struct bio")
+>     4e4cbee93d56 ("block: switch bios to blk_status_t")
+>     5138ac6748e3 ("bcache: fix misleading error message in bch_count_io_errors()")
+>     5a6ac9eacb49 ("Btrfs, raid56: support parity scrub on raid56")
+>     6e9606d2a2dc ("Btrfs: add ref_count and free function for btrfs_bio")
+>     6f10f7d1b02b ("bcache: style fix to replace 'unsigned' by 'unsigned int'")
+>     7e027ca4b534 ("bcache: add stop_when_cache_set_failed option to backing device")
+>     8e5cfb55d3f7 ("Btrfs: Make raid_map array be inlined in btrfs_bio structure")
+>     af8e2d1df984 ("Btrfs, scrub: repair the common data on RAID5/6 if it is corrupted")
+>     b89e1b012c7f ("Btrfs, raid56: don't change bbio and raid_map")
+>     c4cf5261f8bf ("bio: skip atomic inc/dec of ->bi_remaining for non-chains")
+>     c7b7bd07404c ("bcache: add io_disable to struct cached_dev")
+>     f90523d1aa3c ("Btrfs: remove noused bbio_ret in __btrfs_map_block in condition")
+> 
+> 
+> How should we proceed with this patch?
 
-nvme/013 (run mkfs and data verification fio job on NVMeOF file-backed ns) [failed]
-    runtime  ...  31.249s
-    --- tests/nvme/013.out	2019-02-11 18:57:39.000000000 -0500
-    +++ /results/nodev/nvme/013.out.bad	2019-02-11 21:00:42.839324301 -0500
-    @@ -1,5 +1,9 @@
-     Running nvme/013
-     91fdba0d-f87b-4c25-b80f-db7be1418b9e
-     uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
-    +fio: io_u error on file /mnt/blktests///verify.0.0: Input/output error: write offset=216387584, buflen=4096
-    +fio: io_u error on file /mnt/blktests///verify.0.0: Input/output error: write offset=207941632, buflen=4096
-    +fio exited with status 0
-    ...
+Can we rebase this patch for stable kernels, and send them to stable
+kernel maintainers separately? If this behavior is accepted for stable
+kernel maintenance, I would suggest Junhui Tang to think about to rebase
+for these stable kernels.
 
-Found in syslog:
+Thanks.
 
-Feb 11 21:00:11 xfstests-tytso-20190211202457 root: run blktests nvme/013
-Feb 11 21:00:11 xfstests-tytso-20190211202457 kernel: [ 2065.131191] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-Feb 11 21:00:11 xfstests-tytso-20190211202457 kernel: [ 2065.144934] nvmet: creating controller 1 for subsystem blktests-subsystem-1 for NQN nqn.2014-08.org.nvmexpress:uuid:41c2b863-9912-450a-87ca-7996c9228743.
-Feb 11 21:00:11 xfstests-tytso-20190211202457 kernel: [ 2065.160868] nvme nvme0: ANA group 1: optimized.
-Feb 11 21:00:11 xfstests-tytso-20190211202457 kernel: [ 2065.167407] nvme nvme0: creating 2 I/O queues.
-Feb 11 21:00:11 xfstests-tytso-20190211202457 kernel: [ 2065.174566] nvme nvme0: new ctrl: "blktests-subsystem-1"
-Feb 11 21:00:11 xfstests-tytso-20190211202457 kernel: [ 2065.384041] print_req_error: 1452 callbacks suppressed
-Feb 11 21:00:11 xfstests-tytso-20190211202457 kernel: [ 2065.384044] print_req_error: I/O error, dev nvme0c1n1, sector 0 flags 1000801
-Feb 11 21:00:11 xfstests-tytso-20190211202457 kernel: [ 2065.412748] XFS (nvme0n1): Mounting V5 Filesystem
-Feb 11 21:00:11 xfstests-tytso-20190211202457 kernel: [ 2065.446064] XFS (nvme0n1): Ending clean mount
-Feb 11 21:00:42 xfstests-tytso-20190211202457 kernel: [ 2095.710995] print_req_error: I/O error, dev nvme0c1n1, sector 1048648 flags 1021801
-Feb 11 21:00:42 xfstests-tytso-20190211202457 kernel: [ 2095.718852] XFS (nvme0n1): metadata I/O error in "xlog_iodone" at daddr 0x100048 len 64 error 5
-Feb 11 21:00:42 xfstests-tytso-20190211202457 kernel: [ 2095.727729] XFS (nvme0n1): xfs_do_force_shutdown(0x2) called from line 1271 of file fs/xfs/xfs_log.c. Return address = 00000000588c28c5
-Feb 11 21:00:42 xfstests-tytso-20190211202457 kernel: [ 2095.740041] XFS (nvme0n1): Log I/O Error Detected. Shutting down filesystem
-   ... (and things go downhill from here)
+-- 
 
-Thanks,
-
-					- Ted
+Coly Li
