@@ -6,37 +6,38 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A00C282CA
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 13:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 517A7C282C4
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 13:42:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1D302218B0
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 13:38:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2272A2184A
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 13:42:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729879AbfBLNiH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Feb 2019 08:38:07 -0500
-Received: from Galois.linutronix.de ([146.0.238.70]:43367 "EHLO
+        id S1729881AbfBLNmP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Feb 2019 08:42:15 -0500
+Received: from Galois.linutronix.de ([146.0.238.70]:43385 "EHLO
         Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729630AbfBLNiH (ORCPT
+        with ESMTP id S1729887AbfBLNmP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Feb 2019 08:38:07 -0500
+        Tue, 12 Feb 2019 08:42:15 -0500
 Received: from [5.158.153.52] (helo=nanos.tec.linutronix.de)
         by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
         (Exim 4.80)
         (envelope-from <tglx@linutronix.de>)
-        id 1gtYG6-0003ut-0j; Tue, 12 Feb 2019 14:37:58 +0100
-Date:   Tue, 12 Feb 2019 14:37:57 +0100 (CET)
+        id 1gtYK4-00041t-Ol; Tue, 12 Feb 2019 14:42:04 +0100
+Date:   Tue, 12 Feb 2019 14:42:04 +0100 (CET)
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     Ming Lei <ming.lei@redhat.com>
 cc:     Christoph Hellwig <hch@lst.de>, Bjorn Helgaas <helgaas@kernel.org>,
         Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org, Keith Busch <keith.busch@intel.com>
-Subject: Re: [PATCH V2 2/4] genirq/affinity: add new callback for caculating
- set vectors
-In-Reply-To: <20190212130439.14501-3-ming.lei@redhat.com>
-Message-ID: <alpine.DEB.2.21.1902121435330.3710@nanos.tec.linutronix.de>
-References: <20190212130439.14501-1-ming.lei@redhat.com> <20190212130439.14501-3-ming.lei@redhat.com>
+        linux-nvme@lists.infradead.org,
+        LKML <linux-kernel@vger.kernel.org>, linux-pci@vger.kernel.org,
+        Keith Busch <keith.busch@intel.com>
+Subject: Re: [PATCH V2 0/4] genirq/affinity: add .calc_sets for improving
+ IRQ allocation & spread
+In-Reply-To: <20190212130439.14501-1-ming.lei@redhat.com>
+Message-ID: <alpine.DEB.2.21.1902121438310.3710@nanos.tec.linutronix.de>
+References: <20190212130439.14501-1-ming.lei@redhat.com>
 User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -47,6 +48,8 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 On Tue, 12 Feb 2019, Ming Lei wrote:
 
+> Hi,
+> 
 > Currently pre-caculated set vectors are provided by driver for
 > allocating & spread vectors. This way only works when drivers passes
 > same 'max_vecs' and 'min_vecs' to pci_alloc_irq_vectors_affinity(),
@@ -63,28 +66,14 @@ On Tue, 12 Feb 2019, Ming Lei wrote:
 > driver can caculate set vectors after IRQ vector is allocated and
 > before spread IRQ vectors. Add 'priv' so that driver may retrieve
 > its private data via the 'struct irq_affinity'.
+> 
+> 
+> V2:
+> 	- add .calc_sets instead of .setup_affinity() which is easy to
+> 	be abused by drivers
 
-Nice changelog!
-
->  	 * Spread on present CPUs starting from affd->pre_vectors. If we
->  	 * have multiple sets, build each sets affinity mask separately.
->  	 */
-> -	nr_sets = affd->nr_sets;
-> -	if (!nr_sets) {
-> +	if (affd->calc_sets) {
-> +		affd->calc_sets(affd, nvecs);
-> +		nr_sets = affd->nr_sets;
-> +	} else if (!affd->nr_sets) {
->  		nr_sets = 1;
->  		affd->set_vectors[0] = affvecs;
-> -	}
-> +	} else
-> +		nr_sets = affd->nr_sets;
-
-Lacks curly brackets.
-
-Aside of that it might make sense to get rid of the local variable, but
-that should be done in patch 1 if at all. No strong opinion though.
+This looks really well done. If you can address the minor nitpicks, then
+this is good to go, unless someone has objections.
 
 Thanks,
 
