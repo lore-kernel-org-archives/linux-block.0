@@ -2,183 +2,99 @@ Return-Path: <SRS0=MN5j=QT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+X-Spam-Status: No, score=-1.0 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D873AC282CA
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 15:24:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25151C282CE
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 15:27:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7A7020863
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 15:24:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="be4ovrtR"
+	by mail.kernel.org (Postfix) with ESMTP id E20B72084E
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 15:27:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728524AbfBLPYN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Feb 2019 10:24:13 -0500
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:33934 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727248AbfBLPYM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Feb 2019 10:24:12 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 457DE8EE1A4;
-        Tue, 12 Feb 2019 07:24:12 -0800 (PST)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id BB-nU0NLE4nO; Tue, 12 Feb 2019 07:24:12 -0800 (PST)
-Received: from [153.66.254.194] (unknown [50.35.68.20])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 8C9CF8EE0E9;
-        Tue, 12 Feb 2019 07:24:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1549985051;
-        bh=aMg0DSQ4n/Oa8YY0OlX8mifTi163h3Bndg4yTi/z6Tk=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=be4ovrtRhytJQRNLZfvQPLyez4/TQjFDRQ/hzMI/wetdnkVfnHpQisZouLO/26J0V
-         rZt54HVJXf9+n6Osv5uAEBWiACdtaCjXR9//SYaIfEG+OoCD/2tMc4If+yTY50ZkUw
-         0XsGJj0Bavpjtbu4MnnXjCu/OA5pzUH2RxI19lRE=
-Message-ID: <1549985049.3173.3.camel@HansenPartnership.com>
-Subject: Re: [5.0-rc5 regression] "scsi: kill off the legacy IO path" causes
- 5 minute delay during boot on Sun Blade 2500
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Mikael Pettersson <mikpelinux@gmail.com>,
-        Xuewei Zhang <xueweiz@google.com>
-Cc:     Linux SPARC Kernel Mailing List <sparclinux@vger.kernel.org>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi <linux-scsi@vger.kernel.org>
-Date:   Tue, 12 Feb 2019 07:24:09 -0800
-In-Reply-To: <fc547d40-9a42-a823-b62f-460c3244fe7d@kernel.dk>
-References: <CAM43=SO6bdDAEULEPArfgdbjLAYDo9OiPBa8gL4fsSg7Dky=gA@mail.gmail.com>
-         <1549736341.2971.7.camel@HansenPartnership.com>
-         <CAM43=SPUMzOLRmkoT+DQSpzu2DYRTyOhU6o8KRUU_Q902o2e1Q@mail.gmail.com>
-         <1549813472.4142.3.camel@HansenPartnership.com>
-         <3380ed8e-ae02-96f2-142b-7cce09459df8@kernel.dk>
-         <1549815924.4142.8.camel@HansenPartnership.com>
-         <0e6e5d67-d305-dd00-2e42-e2299166c8b2@kernel.dk>
-         <1549898730.2831.6.camel@HansenPartnership.com>
-         <44bb4374-0b7c-733b-a53e-92d2f03f2f49@kernel.dk>
-         <1549899773.2831.12.camel@HansenPartnership.com>
-         <1a00da0e-cb8e-30ea-8d17-120f97242b2f@kernel.dk>
-         <1549902521.2831.23.camel@HansenPartnership.com>
-         <fce66227-ff41-3a4e-4c6a-f4c2ca492b95@kernel.dk>
-         <1549937598.2857.8.camel@HansenPartnership.com>
-         <fc547d40-9a42-a823-b62f-460c3244fe7d@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
+        id S1730471AbfBLP1F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Feb 2019 10:27:05 -0500
+Received: from smtp3-g21.free.fr ([212.27.42.3]:48425 "EHLO smtp3-g21.free.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728273AbfBLP1E (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Feb 2019 10:27:04 -0500
+Received: from [192.168.108.68] (unknown [213.36.7.13])
+        (Authenticated sender: marc.w.gonzalez)
+        by smtp3-g21.free.fr (Postfix) with ESMTPSA id 45D1F13F8C0;
+        Tue, 12 Feb 2019 16:26:10 +0100 (CET)
+Subject: [SOLVED] dd hangs when reading large partitions
+From:   Marc Gonzalez <marc.w.gonzalez@free.fr>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        linux-mm <linux-mm@kvack.org>,
+        linux-block <linux-block@vger.kernel.org>
+Cc:     Jianchao Wang <jianchao.w.wang@oracle.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        fsdevel <linux-fsdevel@vger.kernel.org>,
+        SCSI <linux-scsi@vger.kernel.org>,
+        Jeffrey Hugo <jhugo@codeaurora.org>,
+        Evan Green <evgreen@chromium.org>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Douglas Anderson <dianders@chromium.org>,
+        Stephen Boyd <swboyd@chromium.org>,
+        Tomas Winkler <tomas.winkler@intel.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Martin Petersen <martin.petersen@oracle.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Ming Lei <ming.lei@redhat.com>, Omar Sandoval <osandov@fb.com>,
+        Roman Gushchin <guro@fb.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Michal Hocko <mhocko@suse.com>,
+        James Bottomley <jejb@linux.ibm.com>
+References: <f792574c-e083-b218-13b4-c89be6566015@free.fr>
+ <398a6e83-d482-6e72-5806-6d5bbe8bfdd9@oracle.com>
+ <ef734b94-e72b-771f-350b-08d8054a58f3@kernel.dk>
+ <20190119095601.GA7440@infradead.org>
+ <07b2df5d-e1fe-9523-7c11-f3058a966f8a@free.fr>
+ <985b340c-623f-6df2-66bd-d9f4003189ea@free.fr>
+ <b3910158-83d6-21fe-1606-33e88912404a@oracle.com>
+ <d082bdee-62e5-d470-b63b-196c0fe3b9fb@free.fr>
+ <5132e41b-cb1a-5b81-4a72-37d0f9ea4bb9@oracle.com>
+ <7bd8b010-bf0c-ad64-f927-2d2187a18d0b@free.fr>
+ <0cfe1ed2-41e1-66a4-8d98-ebc0d9645d21@free.fr>
+ <d91e8342-4672-d51d-1bde-74e910e5a959@free.fr>
+ <27165898-88c3-ab42-c6c9-dd52bf0a41c8@free.fr>
+ <66419195-594c-aa83-c19d-f091ad3b296d@free.fr>
+ <1549640986.34241.78.camel@acm.org>
+ <690af800-1cd2-3e68-94d9-bc4825790837@free.fr>
+ <493e04e4-849d-8f25-95e3-408f775fab64@free.fr>
+Message-ID: <734274cc-d22b-5fe9-1650-b13c692c5b9d@free.fr>
+Date:   Tue, 12 Feb 2019 16:26:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <493e04e4-849d-8f25-95e3-408f775fab64@free.fr>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2019-02-11 at 19:50 -0700, Jens Axboe wrote:
-> On 2/11/19 7:13 PM, James Bottomley wrote:
-> > On Mon, 2019-02-11 at 09:31 -0700, Jens Axboe wrote:
-> > > On 2/11/19 9:28 AM, James Bottomley wrote:
-> > > > On Mon, 2019-02-11 at 08:46 -0700, Jens Axboe wrote:
-> > > > > On 2/11/19 8:42 AM, James Bottomley wrote:
-> > > > > > On Mon, 2019-02-11 at 08:28 -0700, Jens Axboe wrote:
-> > > > > > > On 2/11/19 8:25 AM, James Bottomley wrote:
-> > > > > > > > On Sun, 2019-02-10 at 09:35 -0700, Jens Axboe wrote:
-> > > > > > > > > On 2/10/19 9:25 AM, James Bottomley wrote:
-> > > > 
-> > > > [...]
-> > > > > > > > > > That check wasn't changed by the code removal.
-> > > > > > > > > 
-> > > > > > > > > As I said above, for sd. This isn't true for non-
-> > > > > > > > > disks.
-> > > > > > > > 
-> > > > > > > > Yes, but the behaviour above doesn't change across a
-> > > > > > > > switch
-> > > > > > > > to MQ, so I don't quite understand how it bisects back
-> > > > > > > > to
-> > > > > > > > that change.  If we're not gathering entropy for the
-> > > > > > > > device
-> > > > > > > > now, we wouldn't have been before the switch, so the
-> > > > > > > > entropy characteristics shouldn't have changed.
-> > > > > > > 
-> > > > > > > But it does, as I also wrote in that first email. The
-> > > > > > > legacy
-> > > > > > > queue flags had QUEUE_FLAG_ADD_RANDOM set by default, the
-> > > > > > > MQ
-> > > > > > > ones do not. Hence any non-sd device would previously
-> > > > > > > ALWAYS
-> > > > > > > have ADD_RANDOM set, now none of them do. Also see the
-> > > > > > > patch
-> > > > > > > I sent.
-> > > > > > 
-> > > > > > So your theory is that the disk in question never gets to
-> > > > > > the
-> > > > > > rotational check?  because the check will clear the flag if
-> > > > > > it's non-rotational and set it if it's not, so the default
-> > > > > > state of the flag shouldn't matter.
-> > > > > 
-> > > > > No, my point is about non-disks, devices that aren't driven
-> > > > > by
-> > > > > sd. The behavior for sd hasn't changed, as it sets/clears it
-> > > > > unconditionally. 
-> > > > 
-> > > > I agree, but I don't think any of them were significant entropy
-> > > > contributors before: things like nvme have always been outside
-> > > > of
-> > > > this and sr and st don't really contribute much to the seek
-> > > > load
-> > > > during boot because they're probed but not used by the boot
-> > > > sequence, so I can't see how they would cause this
-> > > > behaviour.  I
-> > > > suppose it could be target probing, but even that seems
-> > > > unlikely
-> > > > because it should be dwarfed by the number of root disk reads
-> > > > during boot.
-> > > > 
-> > > > For the rng to take an additional 5 minutes to initialize, we
-> > > > must
-> > > > have lost a significant entropy source somewhere.
-> > > 
-> > > I agree it's not a significant amount of entropy, but even just
-> > > one
-> > > bit could mean a long stall if that put us over the edge of just
-> > > not
-> > > having enough for whatever is blocking on /dev/random. Mikael's
-> > > boot
-> > > did have a CDROM, it's not impossible that the handful of
-> > > commands we
-> > > end up doing to that device would have contributed enough entropy
-> > > to
-> > > get the boot done without stalling for minutes.
-> > > 
-> > > One way to know for sure, and that's if Mikael tests the patch.
-> > 
-> > I think I've got the root cause.  I have one system in my test bed
-> > exhibiting this behaviour.  It turns out the disk in it has no
-> > characteristics VPD page.  The 0xB1 VPD was a SBC-3 addition, so
-> > that's
-> > not surprising.  However, the characteristics check bails before
-> > setting the flags, so it takes the default flag which has flipped.
-> > 
-> > We can either fix this by setting the QUEUE_FLAG_ADD_RANDOM if
-> > there's
-> > no 0xB1 page or by setting the default as Jens proposed.
-> 
-> I'd recommend just doing my patch, since that'll be the same behavior
-> that SCSI had before.
+On 11/02/2019 18:27, Marc Gonzalez wrote:
 
-I've got the history now, it's this patch
+> A colleague pointed out that some memory areas are reserved downstream.
+> Perhaps the FW goes haywire once the kernel touches reserved memory?
 
-Author: Xuewei Zhang <xueweiz@google.com>
-Date:   Thu Sep 6 13:37:19 2018 -0700
+Bingo! FW quirk.
 
-    scsi: sd: Contribute to randomness when running rotational device
+https://patchwork.kernel.org/patch/10808173/
 
-It added the else branch to the if (rot == 1).  It's the position of
-that else branch which is wrong because not all disks have a SBC-3
-characteristics VPD page, so they're the ones under MQ which stop
-contributing entropy.  Whichever patch we go with will need a fixes:
-for this.
+Once the reserved memory range is extended, I am finally able
+to read large partitions:
 
-James
+# dd if=/dev/sda of=/dev/null bs=1M
+55256+0 records in
+55256+0 records out
+57940115456 bytes (58 GB, 54 GiB) copied, 786.165 s, 73.7 MB/s
 
+Thanks to everyone who provided suggestions and guidance.
+
+Regards.
