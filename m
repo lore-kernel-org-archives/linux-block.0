@@ -2,137 +2,283 @@ Return-Path: <SRS0=MN5j=QT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29475C282CA
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 23:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ADC9C282C4
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 23:46:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB4C7222C9
-	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 23:42:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1550014949;
-	bh=+ljDVPXUImG1Z+vSoOkg9hae4sm9zQLd0klZvq3ppo0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=PuRpbRwo9q1juCe9PbJYzoSx4A8B6tRKBpxnKW2C4Irdk+Bx8qzXINaBPFDXarEnF
-	 Ho7ay781ctGUX1fENEfgE89D4KENyGJam1QMp/iXtM/0QyxJsiuDHKd1OFc6KrCYsh
-	 FzOmOK7dJb6g+I91VvORiZrFFS9BZdOICzG2jS8s=
+	by mail.kernel.org (Postfix) with ESMTP id B67442084E
+	for <linux-block@archiver.kernel.org>; Tue, 12 Feb 2019 23:46:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="riIz2Vq+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732236AbfBLXm1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Feb 2019 18:42:27 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44108 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732343AbfBLXm1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Feb 2019 18:42:27 -0500
-Received: from localhost (unknown [69.71.4.100])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B5B012084E;
-        Tue, 12 Feb 2019 23:42:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1550014946;
-        bh=+ljDVPXUImG1Z+vSoOkg9hae4sm9zQLd0klZvq3ppo0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=UnGd2/YVAge9uRcZZCgcz5V08Kl8zL+g1nV66TA1iBWAbXqrxEUyoGnk0oM6JDPiV
-         ueWRe0fctmjmpYtNdzULLonc0fgP/UThgAwDYwLMRcyWLTMIG2DTnP3jEGB7Nk4mvp
-         ak3CFx0o/u68xiGHuNw0MPxHwswS4uwwR+Smoq9E=
-Date:   Tue, 12 Feb 2019 17:42:24 -0600
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org, Keith Busch <keith.busch@intel.com>
-Subject: Re: [PATCH V2 4/4] genirq/affinity: Document .calc_sets as required
- in case of multiple sets
-Message-ID: <20190212234224.GA96272@google.com>
-References: <20190212130439.14501-1-ming.lei@redhat.com>
- <20190212130439.14501-5-ming.lei@redhat.com>
+        id S1727039AbfBLXqd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Feb 2019 18:46:33 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:46903 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731414AbfBLXqc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 12 Feb 2019 18:46:32 -0500
+Received: by mail-pg1-f195.google.com with SMTP id w7so205535pgp.13
+        for <linux-block@vger.kernel.org>; Tue, 12 Feb 2019 15:46:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ihB1euXXWZFCt/Lg6sLzbBcyC+eMHHH+Yy14WWm3xHQ=;
+        b=riIz2Vq+QVWlyp9NiDyF/XWhVJ9eGs7vDpbVFxEZQDCbZZ8uLYg3+50W6q6vO4JZ5U
+         bL8TBTBnj9hxibZeBxB6HeOe95nmj+sUaRHwW1b75+Upq6jy6dCvWRYuzZ+epeNkTyQf
+         wTZ1UT3K1e+f3xei4jScME2JANuexgAYP9q0vxl4TOnAAyH3NejICvMYx1ybuOlm3Sgp
+         GCpN2KchPt+ljwGjjfzzvcu074Ur4ZWd1IUu8t9EzwN4Vi9bzzK9wxvHmYUneUJRePSN
+         dcsNdMuQfG2aa213aMiYiEERh+0KP9lUXk+vXQ0o9fJFW/Wqd4W5aQkEk3eJm8WTvbRF
+         LLug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ihB1euXXWZFCt/Lg6sLzbBcyC+eMHHH+Yy14WWm3xHQ=;
+        b=X+540qp78f8NiJcFd+c2GFZwCGjf1fFWzKnXLOe2yhG2OUTW9VEb35tIynBWWascdf
+         Wtiar0749kL7j2ozUNzdHj1suNJNU2laH+lr3kuFqmZvgmbczNZ1Zyx1qtQpXZG8HrBT
+         QEmnrx9DO6m/iam+F90QNM73J0Dd663FfAPKPcwTsMYdLzxBH9EwLAIXoedwbGqWJZ0T
+         Q6E0+kEfQb9AZIxGUbj+koCjrwVmIf/4dForkBCWfiMivT4JTtfrnQA7eLYlDIGQUTha
+         iiVmH8FW3VVgMECedDuHk1ZqHVT/I3f3IFiB/eGnB5b4hE0HYoFeEWCTDXYIdaubUXj1
+         4kGA==
+X-Gm-Message-State: AHQUAualqcA0tQ+zuiiPfFN5qF8Lb2O7f+WWnHdacTLnQfdaWkNAYHsD
+        0T+MXdtGXR98qg3/SIZTVAqb3g==
+X-Google-Smtp-Source: AHgI3Ia+xhvGb8aNKE2SPo3ISj9rRUusYVnj+Fog9ljlviWVAxZZAhcefFIBOOZfK5zeQ+PyZ82nSA==
+X-Received: by 2002:a62:e716:: with SMTP id s22mr3754230pfh.35.1550015191431;
+        Tue, 12 Feb 2019 15:46:31 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id h8sm16788343pgv.27.2019.02.12.15.46.29
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 12 Feb 2019 15:46:30 -0800 (PST)
+Subject: Re: [PATCH 05/19] Add io_uring IO interface
+To:     Jann Horn <jannh@google.com>
+Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
+        jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>,
+        Al Viro <viro@zeniv.linux.org.uk>
+References: <20190208173423.27014-1-axboe@kernel.dk>
+ <20190208173423.27014-6-axboe@kernel.dk>
+ <CAG48ez2Qc9XOApLRb5fnNiOjxaURO8vjZ-EHX7g25gje3weZ6A@mail.gmail.com>
+ <42eea00c-81fb-2e28-d884-03be5bb229c8@kernel.dk>
+ <CAG48ez2c=7f34AX_FFKTFFnNqJojULs9GwdqaMv=WO2tYLZE3g@mail.gmail.com>
+ <1ca9f039-c6f0-cae7-8484-7db0a4e4e213@kernel.dk>
+ <f20b8e79-d10f-6316-561f-3c77cab71ee0@kernel.dk>
+ <CAG48ez0rJU8bx4EFJwzXOpUX1C2J86pDFHtwEdvKf2K2tsWuig@mail.gmail.com>
+ <041f1c67-b62e-a593-fdc0-b44e35a4da4e@kernel.dk>
+ <7149d509-25a1-eb3b-b4c6-6bb2d7a87465@kernel.dk>
+ <CAG48ez09zTXuxEJE4KKfv-9yeYPGbFm_b9YnYK70csTQ1UXiuA@mail.gmail.com>
+ <beb052ba-2c4a-0201-d673-c7b8eef294dd@kernel.dk>
+ <CAG48ez22G1orwZ43tZ6VK3rngQitar0qH9zJXdTv8kX2e2HqOQ@mail.gmail.com>
+ <0641e74d-0277-9cdb-2b13-63ee60f9196d@kernel.dk>
+ <CAG48ez3PESTFsySiZ1T2w-+4xo6mqkHRBv+Hgs2BKy-4w+7yug@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <e70a7451-2fb4-5800-500d-6ae46fbfe5f4@kernel.dk>
+Date:   Tue, 12 Feb 2019 16:46:28 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190212130439.14501-5-ming.lei@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <CAG48ez3PESTFsySiZ1T2w-+4xo6mqkHRBv+Hgs2BKy-4w+7yug@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 12, 2019 at 09:04:39PM +0800, Ming Lei wrote:
-> Now NVMe has implemented the .calc_sets callback for caculating each
-> set's vectors.
+On 2/12/19 4:28 PM, Jann Horn wrote:
+> On Wed, Feb 13, 2019 at 12:19 AM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> On 2/12/19 4:11 PM, Jann Horn wrote:
+>>> On Wed, Feb 13, 2019 at 12:00 AM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>
+>>>> On 2/12/19 3:57 PM, Jann Horn wrote:
+>>>>> On Tue, Feb 12, 2019 at 11:52 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>
+>>>>>> On 2/12/19 3:45 PM, Jens Axboe wrote:
+>>>>>>> On 2/12/19 3:40 PM, Jann Horn wrote:
+>>>>>>>> On Tue, Feb 12, 2019 at 11:06 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>>>>
+>>>>>>>>> On 2/12/19 3:03 PM, Jens Axboe wrote:
+>>>>>>>>>> On 2/12/19 2:42 PM, Jann Horn wrote:
+>>>>>>>>>>> On Sat, Feb 9, 2019 at 5:15 AM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>>>>>>> On 2/8/19 3:12 PM, Jann Horn wrote:
+>>>>>>>>>>>>> On Fri, Feb 8, 2019 at 6:34 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>>>>>>>>> The submission queue (SQ) and completion queue (CQ) rings are shared
+>>>>>>>>>>>>>> between the application and the kernel. This eliminates the need to
+>>>>>>>>>>>>>> copy data back and forth to submit and complete IO.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> IO submissions use the io_uring_sqe data structure, and completions
+>>>>>>>>>>>>>> are generated in the form of io_uring_cqe data structures. The SQ
+>>>>>>>>>>>>>> ring is an index into the io_uring_sqe array, which makes it possible
+>>>>>>>>>>>>>> to submit a batch of IOs without them being contiguous in the ring.
+>>>>>>>>>>>>>> The CQ ring is always contiguous, as completion events are inherently
+>>>>>>>>>>>>>> unordered, and hence any io_uring_cqe entry can point back to an
+>>>>>>>>>>>>>> arbitrary submission.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> Two new system calls are added for this:
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> io_uring_setup(entries, params)
+>>>>>>>>>>>>>>         Sets up an io_uring instance for doing async IO. On success,
+>>>>>>>>>>>>>>         returns a file descriptor that the application can mmap to
+>>>>>>>>>>>>>>         gain access to the SQ ring, CQ ring, and io_uring_sqes.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> io_uring_enter(fd, to_submit, min_complete, flags, sigset, sigsetsize)
+>>>>>>>>>>>>>>         Initiates IO against the rings mapped to this fd, or waits for
+>>>>>>>>>>>>>>         them to complete, or both. The behavior is controlled by the
+>>>>>>>>>>>>>>         parameters passed in. If 'to_submit' is non-zero, then we'll
+>>>>>>>>>>>>>>         try and submit new IO. If IORING_ENTER_GETEVENTS is set, the
+>>>>>>>>>>>>>>         kernel will wait for 'min_complete' events, if they aren't
+>>>>>>>>>>>>>>         already available. It's valid to set IORING_ENTER_GETEVENTS
+>>>>>>>>>>>>>>         and 'min_complete' == 0 at the same time, this allows the
+>>>>>>>>>>>>>>         kernel to return already completed events without waiting
+>>>>>>>>>>>>>>         for them. This is useful only for polling, as for IRQ
+>>>>>>>>>>>>>>         driven IO, the application can just check the CQ ring
+>>>>>>>>>>>>>>         without entering the kernel.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> With this setup, it's possible to do async IO with a single system
+>>>>>>>>>>>>>> call. Future developments will enable polled IO with this interface,
+>>>>>>>>>>>>>> and polled submission as well. The latter will enable an application
+>>>>>>>>>>>>>> to do IO without doing ANY system calls at all.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> For IRQ driven IO, an application only needs to enter the kernel for
+>>>>>>>>>>>>>> completions if it wants to wait for them to occur.
+>>>>>>>>>>>>>>
+>>>>>>>>>>>>>> Each io_uring is backed by a workqueue, to support buffered async IO
+>>>>>>>>>>>>>> as well. We will only punt to an async context if the command would
+>>>>>>>>>>>>>> need to wait for IO on the device side. Any data that can be accessed
+>>>>>>>>>>>>>> directly in the page cache is done inline. This avoids the slowness
+>>>>>>>>>>>>>> issue of usual threadpools, since cached data is accessed as quickly
+>>>>>>>>>>>>>> as a sync interface.
+>>>>>>>>>>> [...]
+>>>>>>>>>>>>>> +static int io_submit_sqe(struct io_ring_ctx *ctx, const struct sqe_submit *s)
+>>>>>>>>>>>>>> +{
+>>>>>>>>>>>>>> +       struct io_kiocb *req;
+>>>>>>>>>>>>>> +       ssize_t ret;
+>>>>>>>>>>>>>> +
+>>>>>>>>>>>>>> +       /* enforce forwards compatibility on users */
+>>>>>>>>>>>>>> +       if (unlikely(s->sqe->flags))
+>>>>>>>>>>>>>> +               return -EINVAL;
+>>>>>>>>>>>>>> +
+>>>>>>>>>>>>>> +       req = io_get_req(ctx);
+>>>>>>>>>>>>>> +       if (unlikely(!req))
+>>>>>>>>>>>>>> +               return -EAGAIN;
+>>>>>>>>>>>>>> +
+>>>>>>>>>>>>>> +       req->rw.ki_filp = NULL;
+>>>>>>>>>>>>>> +
+>>>>>>>>>>>>>> +       ret = __io_submit_sqe(ctx, req, s, true);
+>>>>>>>>>>>>>> +       if (ret == -EAGAIN) {
+>>>>>>>>>>>>>> +               memcpy(&req->submit, s, sizeof(*s));
+>>>>>>>>>>>>>> +               INIT_WORK(&req->work, io_sq_wq_submit_work);
+>>>>>>>>>>>>>> +               queue_work(ctx->sqo_wq, &req->work);
+>>>>>>>>>>>>>> +               ret = 0;
+>>>>>>>>>>>>>> +       }
+>>>>>>>>>>>>>> +       if (ret)
+>>>>>>>>>>>>>> +               io_free_req(req);
+>>>>>>>>>>>>>> +
+>>>>>>>>>>>>>> +       return ret;
+>>>>>>>>>>>>>> +}
+>>>>>>>>>>>>>> +
+>>>>>>>>>>>>>> +static void io_commit_sqring(struct io_ring_ctx *ctx)
+>>>>>>>>>>>>>> +{
+>>>>>>>>>>>>>> +       struct io_sq_ring *ring = ctx->sq_ring;
+>>>>>>>>>>>>>> +
+>>>>>>>>>>>>>> +       if (ctx->cached_sq_head != ring->r.head) {
+>>>>>>>>>>>>>> +               WRITE_ONCE(ring->r.head, ctx->cached_sq_head);
+>>>>>>>>>>>>>> +               /* write side barrier of head update, app has read side */
+>>>>>>>>>>>>>> +               smp_wmb();
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> Can you elaborate on what this memory barrier is doing? Don't you need
+>>>>>>>>>>>>> some sort of memory barrier *before* the WRITE_ONCE(), to ensure that
+>>>>>>>>>>>>> nobody sees the updated head before you're done reading the submission
+>>>>>>>>>>>>> queue entry? Or is that barrier elsewhere?
+>>>>>>>>>>>>
+>>>>>>>>>>>> The matching read barrier is in the application, it must do that before
+>>>>>>>>>>>> reading ->head for the SQ ring.
+>>>>>>>>>>>>
+>>>>>>>>>>>> For the other barrier, since the ring->r.head now has a READ_ONCE(),
+>>>>>>>>>>>> that should be all we need to ensure that loads are done.
+>>>>>>>>>>>
+>>>>>>>>>>> READ_ONCE() / WRITE_ONCE are not hardware memory barriers that enforce
+>>>>>>>>>>> ordering with regard to concurrent execution on other cores. They are
+>>>>>>>>>>> only compiler barriers, influencing the order in which the compiler
+>>>>>>>>>>> emits things. (Well, unless you're on alpha, where READ_ONCE() implies
+>>>>>>>>>>> a memory barrier that prevents reordering of dependent reads.)
+>>>>>>>>>>>
+>>>>>>>>>>> As far as I can tell, between the READ_ONCE(ring->array[...]) in
+>>>>>>>>>>> io_get_sqring() and the WRITE_ONCE() in io_commit_sqring(), you have
+>>>>>>>>>>> no *hardware* memory barrier that prevents reordering against
+>>>>>>>>>>> concurrently running userspace code. As far as I can tell, the
+>>>>>>>>>>> following could happen:
+>>>>>>>>>>>
+>>>>>>>>>>>  - The kernel reads from ring->array in io_get_sqring(), then updates
+>>>>>>>>>>> the head in io_commit_sqring(). The CPU reorders the memory accesses
+>>>>>>>>>>> such that the write to the head becomes visible before the read from
+>>>>>>>>>>> ring->array has completed.
+>>>>>>>>>>>  - Userspace observes the write to the head and reuses the array slots
+>>>>>>>>>>> the kernel has freed with the write, clobbering ring->array before the
+>>>>>>>>>>> kernel reads from ring->array.
+>>>>>>>>>>
+>>>>>>>>>> I'd say this is highly theoretical for the normal use case, as we
+>>>>>>>>>> will have submitted IO in between. Hence the load must have been done.
+>>>>>>>>
+>>>>>>>> Sorry, I'm confused. Who is "we", and which load are you referring to?
+>>>>>>>> io_sq_thread() goes directly from io_get_sqring() to
+>>>>>>>> io_commit_sqring(), with only a conditional io_sqe_needs_user() in
+>>>>>>>> between, if the `i == ARRAY_SIZE(sqes)` check triggers. There is no
+>>>>>>>> "submitting IO" in the middle.
+>>>>>>>
+>>>>>>> You are right, the patch I sent IS needed for the sq thread case! It's
+>>>>>>> only true for the "normal" case that we don't need the smp_mb() before
+>>>>>>> writing the sq ring head, as sqes are fully consumed at that point.
+>>>>>
+>>>>> Hmm... does that actually matter? As long as you don't have an
+>>>>> explicit barrier for this, the CPU could still reorder things, right?
+>>>>> Pull the store in front of everything else?
+>>>>
+>>>> If the IO has been submitted, by definition the loads have completed.
+>>>> At that point it should be fine to commit the ring head that the
+>>>> application sees.
+>>>
+>>> What exactly do you mean by "the IO has been submitted"? Are you
+>>> talking about interaction with hardware, or about the end of the
+>>> syscall, or something else?
+>>
+>> I mean that the loads from the sqe, which the IO is made of, have been
+>> done. That's what we care about here, right? The sqe has either been
+>> turned into an io request and has been submitted, or it has been copied.
 > 
-> For other cases of multiple irq sets, it isn't a good way to pre-caculate
-> each set's vectors before allocating IRQ vectors because NVMe's same issue
-> exists too.
+> But they might not actually be done. AFAIU the CPU is allowed to do
+> the WRITE_ONCE of the head before doing any of the reads from the sqe
+> - loads and stores you do, as observed by a concurrently executing
+> thread, can happen in an order independent of the order in which you
+> write them in your code unless you use memory barriers. So the CPU
+> might decide to first write the new head, then do the read for
+> io_get_sqring(), and then do the __io_submit_sqe(), potentially
+> reading e.g. a IORING_OP_NOP opcode that has been written by
+> concurrently executing userspace after userspace has observed the
+> bumped head.
 
-s/irq/IRQ/ so it's consistent in the paragraph.
+For that to be possible, we'd need NO ordering in between the IO
+submission and when we write the sq ring head. A single spin lock
+should do it, right?
 
-> Document .calc_sets as required explicitly for multiple sets.
-> 
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+It's not that I'm set against adding an smp_mb() to io_commit_sqring(),
+but I think we're going off the deep end a little bit here on
+theoretical vs what can practically happen.
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+For the regular IO cases, we will have done at least one lock/unlock
+cycle. This is true for nops as well, and poll. The only case that could
+potentially NOT have one is the fsync, for the case where we punt and
+don't add it to existing work, we don't have any locking in between.
 
-Note minor comments below.
+I'll add the smp_mb() for peace of mind.
 
-> ---
->  drivers/pci/msi.c         | 4 ++--
->  include/linux/interrupt.h | 3 ++-
->  2 files changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
-> index 4c0b47867258..9f91fa713141 100644
-> --- a/drivers/pci/msi.c
-> +++ b/drivers/pci/msi.c
-> @@ -1039,7 +1039,7 @@ static int __pci_enable_msi_range(struct pci_dev *dev, int minvec, int maxvec,
->  	 * If the caller is passing in sets, we can't support a range of
->  	 * vectors. The caller needs to handle that.
+-- 
+Jens Axboe
 
-Looks like this comment needs to be tweaked, maybe along the lines of:
-
-  If the caller requests multiple sets of IRQs where each set requires
-  different affinity, it must also supply a ->calc_sets() callback to
-  compute the affinity cpumask for each set.
-
-(I'm not 100% clear on how calc_sets() works, so I might not have
-described this exactly right.)
-
->  	 */
-> -	if (affd && affd->nr_sets && minvec != maxvec)
-> +	if (affd && affd->nr_sets > 1 && !affd->calc_sets)
->  		return -EINVAL;
->  
->  	if (WARN_ON_ONCE(dev->msi_enabled))
-> @@ -1097,7 +1097,7 @@ static int __pci_enable_msix_range(struct pci_dev *dev,
->  	 * If the caller is passing in sets, we can't support a range of
->  	 * supported vectors. The caller needs to handle that.
-
-Similar comment update here?
-
->  	 */
-> -	if (affd && affd->nr_sets && minvec != maxvec)
-> +	if (affd && affd->nr_sets > 1 && !affd->calc_sets)
->  		return -EINVAL;
->  
->  	if (WARN_ON_ONCE(dev->msix_enabled))
-> diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
-> index 7a27f6ba1f2f..a053f7fb0ff1 100644
-> --- a/include/linux/interrupt.h
-> +++ b/include/linux/interrupt.h
-> @@ -269,7 +269,8 @@ struct irq_affinity_notify {
->   *			the MSI(-X) vector space
->   * @nr_sets:		Length of passed in *sets array
->   * @set_vectors:	Number of affinitized sets
-> - * @calc_sets:		Callback for caculating set vectors
-> + * @calc_sets:		Callback for caculating set vectors, required for
-> + * 			multiple irq sets.
->   * @priv:		Private data of @calc_sets
->   */
->  struct irq_affinity {
-> -- 
-> 2.9.5
-> 
