@@ -2,321 +2,238 @@ Return-Path: <SRS0=Y8Hj=QU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9808FC282C4
-	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 00:24:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B557EC282CA
+	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 02:57:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 516C6214DA
-	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 00:24:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77E3F20835
+	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 02:57:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="gNs3ISqQ"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="FEwoQyaM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732077AbfBMAYS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Feb 2019 19:24:18 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:41955 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732071AbfBMAYS (ORCPT
+        id S2388230AbfBMC5d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Feb 2019 21:57:33 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:44064 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732214AbfBMC51 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Feb 2019 19:24:18 -0500
-Received: by mail-pg1-f196.google.com with SMTP id m1so259510pgq.8
-        for <linux-block@vger.kernel.org>; Tue, 12 Feb 2019 16:24:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=W+KgqQWMww6YamFpFstc6qz4GwHz4KnTQFhYHwnwUd8=;
-        b=gNs3ISqQ4j1eu9EIJUQiUdHGdEvqwwesrhFrlw4Ac+lEdzYQ6Lyg4SjdbQlbuobyf8
-         +aVYfjkw1vMPGlWPAq8mvnaMaLRoqo2P8QnDm/SMWFNbW6P9OcmurnZvM6FbLrKbpigp
-         rahFunJ55umbnWRjG6X/VGtiZf+q7AWe7FQ2hfnp0GPZ3rBtnjoYICM6CSdn1E4M84VM
-         E8nS9gYjzMEFk8Qcqn/65thTezDeYm3eI0nxlxq4rGvGrDhGDsWz51nPD3rO1GWf2Y3j
-         3DaMr+Bl/nCed3NPB+soSVFTSrwUOqIo6J8RAgep3UshHonEekI9UEOifMMr1kDd4EZC
-         71uA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=W+KgqQWMww6YamFpFstc6qz4GwHz4KnTQFhYHwnwUd8=;
-        b=LD1Z3PTkwBvi/QyoSwWOy5TuzEZZrGIWTfqGt/Di796aMrLJh2GfNoDdhUqoDGGo+N
-         XWXuSXvLilD9pMBjY/Sb0HKaA391HGjR5vjjUDD/ghfYc/lzGOGF6gDqz9o98yhOatHQ
-         OJperTS+L378v9LU2ertqlsxiTRN4yFvzBFop3gxMBu7im6CeAeucBGoQWqCRr7suh2g
-         V0yugKd7CHaZA/FaZHciLTkimYlsL47/a1ByOHXLJKqZsWzc9Hl43f9cc8XwKU46/rs9
-         9nB1etPeXwlBzgIqGpV2xhOEpxNSuS6fX7eNDVcYkDwakxxTOt10MwKJm3PJPeXvpEPs
-         bvQA==
-X-Gm-Message-State: AHQUAuaxvBds+yLwtRGppDjRDK9wHAdkyq0Cg36hzv3YpCVgHEMt/ZXD
-        PVw082AxcPghkFSErZSjiLYPJw==
-X-Google-Smtp-Source: AHgI3Iah21fZ/RrX9wTmwHu5GJc7lM5lcVNnOBm/e3dOiBO6nLUC8Xjk1qkKegYFFpQkVZNAQ/DKmQ==
-X-Received: by 2002:a65:4807:: with SMTP id h7mr6057338pgs.15.1550017456831;
-        Tue, 12 Feb 2019 16:24:16 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id m7sm3934853pfj.162.2019.02.12.16.24.14
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 12 Feb 2019 16:24:15 -0800 (PST)
-Subject: Re: [PATCH 05/19] Add io_uring IO interface
-To:     Andy Lutomirski <luto@amacapital.net>
-Cc:     Jann Horn <jannh@google.com>, linux-aio@kvack.org,
-        linux-block@vger.kernel.org, Linux API <linux-api@vger.kernel.org>,
-        hch@lst.de, jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>,
-        Al Viro <viro@zeniv.linux.org.uk>
-References: <20190208173423.27014-1-axboe@kernel.dk>
- <CAG48ez2Qc9XOApLRb5fnNiOjxaURO8vjZ-EHX7g25gje3weZ6A@mail.gmail.com>
- <42eea00c-81fb-2e28-d884-03be5bb229c8@kernel.dk>
- <CAG48ez2c=7f34AX_FFKTFFnNqJojULs9GwdqaMv=WO2tYLZE3g@mail.gmail.com>
- <1ca9f039-c6f0-cae7-8484-7db0a4e4e213@kernel.dk>
- <f20b8e79-d10f-6316-561f-3c77cab71ee0@kernel.dk>
- <CAG48ez0rJU8bx4EFJwzXOpUX1C2J86pDFHtwEdvKf2K2tsWuig@mail.gmail.com>
- <041f1c67-b62e-a593-fdc0-b44e35a4da4e@kernel.dk>
- <7149d509-25a1-eb3b-b4c6-6bb2d7a87465@kernel.dk>
- <CAG48ez09zTXuxEJE4KKfv-9yeYPGbFm_b9YnYK70csTQ1UXiuA@mail.gmail.com>
- <beb052ba-2c4a-0201-d673-c7b8eef294dd@kernel.dk>
- <CAG48ez22G1orwZ43tZ6VK3rngQitar0qH9zJXdTv8kX2e2HqOQ@mail.gmail.com>
- <0641e74d-0277-9cdb-2b13-63ee60f9196d@kernel.dk>
- <CAG48ez3PESTFsySiZ1T2w-+4xo6mqkHRBv+Hgs2BKy-4w+7yug@mail.gmail.com>
- <e70a7451-2fb4-5800-500d-6ae46fbfe5f4@kernel.dk>
- <7452c409-f232-2017-9101-0cd6c6946d64@kernel.dk>
- <08141EFF-E805-405B-9970-ABFE9A1C3F58@amacapital.net>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <ad4c78cb-071f-dd6c-bc97-5e75cac05a0b@kernel.dk>
-Date:   Tue, 12 Feb 2019 17:24:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        Tue, 12 Feb 2019 21:57:27 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1D2sJMx043653;
+        Wed, 13 Feb 2019 02:57:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2018-07-02;
+ bh=n8ZhwwLZ+O77rNHP76IlYQc5TNriHiGwASwyYHk5D7g=;
+ b=FEwoQyaMcP9mOwhSSqtKLm8RttU+SA7zj/Oi8pEckxAK/2pXLFHr9JZnYRQz3Dw/MEox
+ GjAr9k/iHCVlSKVpaUCZuKHFJ1wGlLvpDgVa4hMWcvca9SDIenRhZVQ7e/cdcp+5iLxh
+ zRz16Lhq9EDHU4m48MJD/zqquaMdPVRNTT32LJA9MHnow+jFte69W+ivVT5eUg5t/DCx
+ K0YNhAtEUffXi4aWFG4PJ1DS9vDcstoKgueArCMSi0Yt9/iVDm/py3eBDmNcfRwFaCZz
+ dOvPCP7PI0/R0uoLGzUCn+5VbYi3cDPSERZD35ltwV85f2TVCqq91VFeOqYTnQcoq86X BQ== 
+Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
+        by userp2120.oracle.com with ESMTP id 2qhredygx6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Feb 2019 02:57:23 +0000
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x1D2vMts020956
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 13 Feb 2019 02:57:22 GMT
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x1D2vLbJ021547;
+        Wed, 13 Feb 2019 02:57:22 GMT
+Received: from ca-mkp.ca.oracle.com (/10.156.108.201)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 12 Feb 2019 18:57:21 -0800
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jeremy Cline <jeremy@jcline.org>,
+        Oleksii Kurochko <olkuroch@cisco.com>, stable@vger.kernel.org
+Subject: [PATCH v2] scsi: sd: block: Fix regressions in read-only block device handling
+Date:   Tue, 12 Feb 2019 21:57:17 -0500
+Message-Id: <20190213025717.20057-1-martin.petersen@oracle.com>
+X-Mailer: git-send-email 2.19.2
+In-Reply-To: <yq1d0nxuf73.fsf@oracle.com>
+References: <yq1d0nxuf73.fsf@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <08141EFF-E805-405B-9970-ABFE9A1C3F58@amacapital.net>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9165 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1902130017
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/12/19 5:07 PM, Andy Lutomirski wrote:
-> 
-> 
->> On Feb 12, 2019, at 3:53 PM, Jens Axboe <axboe@kernel.dk> wrote:
->>
->>> On 2/12/19 4:46 PM, Jens Axboe wrote:
->>>> On 2/12/19 4:28 PM, Jann Horn wrote:
->>>>> On Wed, Feb 13, 2019 at 12:19 AM Jens Axboe <axboe@kernel.dk> wrote:
->>>>>
->>>>>> On 2/12/19 4:11 PM, Jann Horn wrote:
->>>>>>> On Wed, Feb 13, 2019 at 12:00 AM Jens Axboe <axboe@kernel.dk> wrote:
->>>>>>>
->>>>>>>> On 2/12/19 3:57 PM, Jann Horn wrote:
->>>>>>>>> On Tue, Feb 12, 2019 at 11:52 PM Jens Axboe <axboe@kernel.dk> wrote:
->>>>>>>>>
->>>>>>>>>> On 2/12/19 3:45 PM, Jens Axboe wrote:
->>>>>>>>>>> On 2/12/19 3:40 PM, Jann Horn wrote:
->>>>>>>>>>>> On Tue, Feb 12, 2019 at 11:06 PM Jens Axboe <axboe@kernel.dk> wrote:
->>>>>>>>>>>>
->>>>>>>>>>>>> On 2/12/19 3:03 PM, Jens Axboe wrote:
->>>>>>>>>>>>>> On 2/12/19 2:42 PM, Jann Horn wrote:
->>>>>>>>>>>>>>> On Sat, Feb 9, 2019 at 5:15 AM Jens Axboe <axboe@kernel.dk> wrote:
->>>>>>>>>>>>>>>> On 2/8/19 3:12 PM, Jann Horn wrote:
->>>>>>>>>>>>>>>>> On Fri, Feb 8, 2019 at 6:34 PM Jens Axboe <axboe@kernel.dk> wrote:
->>>>>>>>>>>>>>>>> The submission queue (SQ) and completion queue (CQ) rings are shared
->>>>>>>>>>>>>>>>> between the application and the kernel. This eliminates the need to
->>>>>>>>>>>>>>>>> copy data back and forth to submit and complete IO.
->>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>> IO submissions use the io_uring_sqe data structure, and completions
->>>>>>>>>>>>>>>>> are generated in the form of io_uring_cqe data structures. The SQ
->>>>>>>>>>>>>>>>> ring is an index into the io_uring_sqe array, which makes it possible
->>>>>>>>>>>>>>>>> to submit a batch of IOs without them being contiguous in the ring.
->>>>>>>>>>>>>>>>> The CQ ring is always contiguous, as completion events are inherently
->>>>>>>>>>>>>>>>> unordered, and hence any io_uring_cqe entry can point back to an
->>>>>>>>>>>>>>>>> arbitrary submission.
->>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>> Two new system calls are added for this:
->>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>> io_uring_setup(entries, params)
->>>>>>>>>>>>>>>>>        Sets up an io_uring instance for doing async IO. On success,
->>>>>>>>>>>>>>>>>        returns a file descriptor that the application can mmap to
->>>>>>>>>>>>>>>>>        gain access to the SQ ring, CQ ring, and io_uring_sqes.
->>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>> io_uring_enter(fd, to_submit, min_complete, flags, sigset, sigsetsize)
->>>>>>>>>>>>>>>>>        Initiates IO against the rings mapped to this fd, or waits for
->>>>>>>>>>>>>>>>>        them to complete, or both. The behavior is controlled by the
->>>>>>>>>>>>>>>>>        parameters passed in. If 'to_submit' is non-zero, then we'll
->>>>>>>>>>>>>>>>>        try and submit new IO. If IORING_ENTER_GETEVENTS is set, the
->>>>>>>>>>>>>>>>>        kernel will wait for 'min_complete' events, if they aren't
->>>>>>>>>>>>>>>>>        already available. It's valid to set IORING_ENTER_GETEVENTS
->>>>>>>>>>>>>>>>>        and 'min_complete' == 0 at the same time, this allows the
->>>>>>>>>>>>>>>>>        kernel to return already completed events without waiting
->>>>>>>>>>>>>>>>>        for them. This is useful only for polling, as for IRQ
->>>>>>>>>>>>>>>>>        driven IO, the application can just check the CQ ring
->>>>>>>>>>>>>>>>>        without entering the kernel.
->>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>> With this setup, it's possible to do async IO with a single system
->>>>>>>>>>>>>>>>> call. Future developments will enable polled IO with this interface,
->>>>>>>>>>>>>>>>> and polled submission as well. The latter will enable an application
->>>>>>>>>>>>>>>>> to do IO without doing ANY system calls at all.
->>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>> For IRQ driven IO, an application only needs to enter the kernel for
->>>>>>>>>>>>>>>>> completions if it wants to wait for them to occur.
->>>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>>> Each io_uring is backed by a workqueue, to support buffered async IO
->>>>>>>>>>>>>>>>> as well. We will only punt to an async context if the command would
->>>>>>>>>>>>>>>>> need to wait for IO on the device side. Any data that can be accessed
->>>>>>>>>>>>>>>>> directly in the page cache is done inline. This avoids the slowness
->>>>>>>>>>>>>>>>> issue of usual threadpools, since cached data is accessed as quickly
->>>>>>>>>>>>>>>>> as a sync interface.
->>>>>>>>>>>>>> [...]
->>>>>>>>>>>>>>>>> +static int io_submit_sqe(struct io_ring_ctx *ctx, const struct sqe_submit *s)
->>>>>>>>>>>>>>>>> +{
->>>>>>>>>>>>>>>>> +       struct io_kiocb *req;
->>>>>>>>>>>>>>>>> +       ssize_t ret;
->>>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>>> +       /* enforce forwards compatibility on users */
->>>>>>>>>>>>>>>>> +       if (unlikely(s->sqe->flags))
->>>>>>>>>>>>>>>>> +               return -EINVAL;
->>>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>>> +       req = io_get_req(ctx);
->>>>>>>>>>>>>>>>> +       if (unlikely(!req))
->>>>>>>>>>>>>>>>> +               return -EAGAIN;
->>>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>>> +       req->rw.ki_filp = NULL;
->>>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>>> +       ret = __io_submit_sqe(ctx, req, s, true);
->>>>>>>>>>>>>>>>> +       if (ret == -EAGAIN) {
->>>>>>>>>>>>>>>>> +               memcpy(&req->submit, s, sizeof(*s));
->>>>>>>>>>>>>>>>> +               INIT_WORK(&req->work, io_sq_wq_submit_work);
->>>>>>>>>>>>>>>>> +               queue_work(ctx->sqo_wq, &req->work);
->>>>>>>>>>>>>>>>> +               ret = 0;
->>>>>>>>>>>>>>>>> +       }
->>>>>>>>>>>>>>>>> +       if (ret)
->>>>>>>>>>>>>>>>> +               io_free_req(req);
->>>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>>> +       return ret;
->>>>>>>>>>>>>>>>> +}
->>>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>>> +static void io_commit_sqring(struct io_ring_ctx *ctx)
->>>>>>>>>>>>>>>>> +{
->>>>>>>>>>>>>>>>> +       struct io_sq_ring *ring = ctx->sq_ring;
->>>>>>>>>>>>>>>>> +
->>>>>>>>>>>>>>>>> +       if (ctx->cached_sq_head != ring->r.head) {
->>>>>>>>>>>>>>>>> +               WRITE_ONCE(ring->r.head, ctx->cached_sq_head);
->>>>>>>>>>>>>>>>> +               /* write side barrier of head update, app has read side */
->>>>>>>>>>>>>>>>> +               smp_wmb();
->>>>>>>>>>>>>>>>
->>>>>>>>>>>>>>>> Can you elaborate on what this memory barrier is doing? Don't you need
->>>>>>>>>>>>>>>> some sort of memory barrier *before* the WRITE_ONCE(), to ensure that
->>>>>>>>>>>>>>>> nobody sees the updated head before you're done reading the submission
->>>>>>>>>>>>>>>> queue entry? Or is that barrier elsewhere?
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> The matching read barrier is in the application, it must do that before
->>>>>>>>>>>>>>> reading ->head for the SQ ring.
->>>>>>>>>>>>>>>
->>>>>>>>>>>>>>> For the other barrier, since the ring->r.head now has a READ_ONCE(),
->>>>>>>>>>>>>>> that should be all we need to ensure that loads are done.
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> READ_ONCE() / WRITE_ONCE are not hardware memory barriers that enforce
->>>>>>>>>>>>>> ordering with regard to concurrent execution on other cores. They are
->>>>>>>>>>>>>> only compiler barriers, influencing the order in which the compiler
->>>>>>>>>>>>>> emits things. (Well, unless you're on alpha, where READ_ONCE() implies
->>>>>>>>>>>>>> a memory barrier that prevents reordering of dependent reads.)
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> As far as I can tell, between the READ_ONCE(ring->array[...]) in
->>>>>>>>>>>>>> io_get_sqring() and the WRITE_ONCE() in io_commit_sqring(), you have
->>>>>>>>>>>>>> no *hardware* memory barrier that prevents reordering against
->>>>>>>>>>>>>> concurrently running userspace code. As far as I can tell, the
->>>>>>>>>>>>>> following could happen:
->>>>>>>>>>>>>>
->>>>>>>>>>>>>> - The kernel reads from ring->array in io_get_sqring(), then updates
->>>>>>>>>>>>>> the head in io_commit_sqring(). The CPU reorders the memory accesses
->>>>>>>>>>>>>> such that the write to the head becomes visible before the read from
->>>>>>>>>>>>>> ring->array has completed.
->>>>>>>>>>>>>> - Userspace observes the write to the head and reuses the array slots
->>>>>>>>>>>>>> the kernel has freed with the write, clobbering ring->array before the
->>>>>>>>>>>>>> kernel reads from ring->array.
->>>>>>>>>>>>>
->>>>>>>>>>>>> I'd say this is highly theoretical for the normal use case, as we
->>>>>>>>>>>>> will have submitted IO in between. Hence the load must have been done.
->>>>>>>>>>>
->>>>>>>>>>> Sorry, I'm confused. Who is "we", and which load are you referring to?
->>>>>>>>>>> io_sq_thread() goes directly from io_get_sqring() to
->>>>>>>>>>> io_commit_sqring(), with only a conditional io_sqe_needs_user() in
->>>>>>>>>>> between, if the `i == ARRAY_SIZE(sqes)` check triggers. There is no
->>>>>>>>>>> "submitting IO" in the middle.
->>>>>>>>>>
->>>>>>>>>> You are right, the patch I sent IS needed for the sq thread case! It's
->>>>>>>>>> only true for the "normal" case that we don't need the smp_mb() before
->>>>>>>>>> writing the sq ring head, as sqes are fully consumed at that point.
->>>>>>>>
->>>>>>>> Hmm... does that actually matter? As long as you don't have an
->>>>>>>> explicit barrier for this, the CPU could still reorder things, right?
->>>>>>>> Pull the store in front of everything else?
->>>>>>>
->>>>>>> If the IO has been submitted, by definition the loads have completed.
->>>>>>> At that point it should be fine to commit the ring head that the
->>>>>>> application sees.
->>>>>>
->>>>>> What exactly do you mean by "the IO has been submitted"? Are you
->>>>>> talking about interaction with hardware, or about the end of the
->>>>>> syscall, or something else?
->>>>>
->>>>> I mean that the loads from the sqe, which the IO is made of, have been
->>>>> done. That's what we care about here, right? The sqe has either been
->>>>> turned into an io request and has been submitted, or it has been copied.
->>>>
->>>> But they might not actually be done. AFAIU the CPU is allowed to do
->>>> the WRITE_ONCE of the head before doing any of the reads from the sqe
->>>> - loads and stores you do, as observed by a concurrently executing
->>>> thread, can happen in an order independent of the order in which you
->>>> write them in your code unless you use memory barriers. So the CPU
->>>> might decide to first write the new head, then do the read for
->>>> io_get_sqring(), and then do the __io_submit_sqe(), potentially
->>>> reading e.g. a IORING_OP_NOP opcode that has been written by
->>>> concurrently executing userspace after userspace has observed the
->>>> bumped head.
->>>
->>> For that to be possible, we'd need NO ordering in between the IO
->>> submission and when we write the sq ring head. A single spin lock
->>> should do it, right?
->>>
->>> It's not that I'm set against adding an smp_mb() to io_commit_sqring(),
->>> but I think we're going off the deep end a little bit here on
->>> theoretical vs what can practically happen.
->>>
->>> For the regular IO cases, we will have done at least one lock/unlock
->>> cycle. This is true for nops as well, and poll. The only case that could
->>> potentially NOT have one is the fsync, for the case where we punt and
->>> don't add it to existing work, we don't have any locking in between.
->>>
->>> I'll add the smp_mb() for peace of mind.
->>
->> For reference, folded in:
->>
->>
->> diff --git a/fs/io_uring.c b/fs/io_uring.c
->> index 8d68569f9ba9..755ff8f411da 100644
->> --- a/fs/io_uring.c
->> +++ b/fs/io_uring.c
->> @@ -1690,6 +1690,13 @@ static void io_commit_sqring(struct io_ring_ctx *ctx)
->>    struct io_sq_ring *ring = ctx->sq_ring;
->>
->>    if (ctx->cached_sq_head != READ_ONCE(ring->r.head)) {
->> +        /*
->> +         * Ensure any loads from the SQEs are done at this point,
->> +         * since once we write the new head, the application could
->> +         * write new data to them.
->> +         */
->> +        smp_mb();
->> +
->>        WRITE_ONCE(ring->r.head, ctx->cached_sq_head);
->>        /*
->>         * write side barrier of head update, app has read side. See
->>
->>
-> 
-> I haven’t followed the full set of machinations here, but would
-> smp_store_release() be sufficient?  It is a *lot* faster on some
-> architectures.
+Some devices come online in write protected state and switch to
+read-write once they are ready to process I/O requests. These devices
+broke with commit 20bd1d026aac ("scsi: sd: Keep disk read-only when
+re-reading partition") because we had no way to distinguish between a
+user decision to set a block_device read-only and the actual hardware
+device being write-protected.
 
-Thanks for the hint, yes that looks more appropriate.
+Because partitions are dropped and recreated on revalidate we are
+unable to persist any user-provided policy in hd_struct. Introduce a
+bitmap in struct gendisk to track the user configuration. This bitmap
+is updated when BLKROSET is called on a given disk or partition.
 
+A helper function, get_user_ro(), is provided to determine whether the
+ioctl has forced read-only state for a given block device. This helper
+is used by set_disk_ro() and add_partition() to ensure that both
+existing and newly created partitions will get the correct state.
+
+ - If BLKROSET sets a whole disk device read-only, all partitions will
+   now end up in a read-only state.
+
+ - If BLKROSET sets a given partition read-only, that partition will
+   remain read-only post revalidate.
+
+ - Otherwise both the whole disk device and any partitions will
+   reflect the write protect state of the underlying device.
+
+Cc: Jeremy Cline <jeremy@jcline.org>
+Cc: Oleksii Kurochko <olkuroch@cisco.com>
+Cc: stable@vger.kernel.org # v4.16+
+Reported-by: Oleksii Kurochko <olkuroch@cisco.com>
+Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=201221
+Fixes: 20bd1d026aac ("scsi: sd: Keep disk read-only when re-reading partition")
+Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+---
+
+v2:
+	- Track user read-only state in a bitmap
+
+	- Work around the regression that caused us to drop user
+	  preferences on revalidate
+---
+ block/genhd.c             | 22 +++++++++++++++++-----
+ block/ioctl.c             |  4 ++++
+ block/partition-generic.c |  2 +-
+ drivers/scsi/sd.c         |  4 +---
+ include/linux/genhd.h     |  2 ++
+ 5 files changed, 25 insertions(+), 9 deletions(-)
+
+diff --git a/block/genhd.c b/block/genhd.c
+index 1dd8fd6613b8..34667eb1d3cc 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -1544,19 +1544,31 @@ void set_device_ro(struct block_device *bdev, int flag)
+ 
+ EXPORT_SYMBOL(set_device_ro);
+ 
++bool get_user_ro(struct gendisk *disk, unsigned int partno)
++{
++	/* Is the user read-only bit set for the whole disk device? */
++	if (test_bit(0, disk->user_ro_bitmap))
++		return true;
++
++	/* Is the user read-only bit set for this particular partition? */
++	if (test_bit(partno, disk->user_ro_bitmap))
++		return true;
++
++	return false;
++}
++EXPORT_SYMBOL(get_user_ro);
++
+ void set_disk_ro(struct gendisk *disk, int flag)
+ {
+ 	struct disk_part_iter piter;
+ 	struct hd_struct *part;
+ 
+-	if (disk->part0.policy != flag) {
++	if (disk->part0.policy != flag)
+ 		set_disk_ro_uevent(disk, flag);
+-		disk->part0.policy = flag;
+-	}
+ 
+-	disk_part_iter_init(&piter, disk, DISK_PITER_INCL_EMPTY);
++	disk_part_iter_init(&piter, disk, DISK_PITER_INCL_EMPTY_PART0);
+ 	while ((part = disk_part_iter_next(&piter)))
+-		part->policy = flag;
++		part->policy = get_user_ro(disk, part->partno) ?: flag;
+ 	disk_part_iter_exit(&piter);
+ }
+ 
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 4825c78a6baa..41206df89485 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -451,6 +451,10 @@ static int blkdev_roset(struct block_device *bdev, fmode_t mode,
+ 		return ret;
+ 	if (get_user(n, (int __user *)arg))
+ 		return -EFAULT;
++	if (n)
++		set_bit(bdev->bd_partno, bdev->bd_disk->user_ro_bitmap);
++	else
++		clear_bit(bdev->bd_partno, bdev->bd_disk->user_ro_bitmap);
+ 	set_device_ro(bdev, n);
+ 	return 0;
+ }
+diff --git a/block/partition-generic.c b/block/partition-generic.c
+index 8e596a8dff32..c6a3c21c2496 100644
+--- a/block/partition-generic.c
++++ b/block/partition-generic.c
+@@ -338,7 +338,7 @@ struct hd_struct *add_partition(struct gendisk *disk, int partno,
+ 		queue_limit_discard_alignment(&disk->queue->limits, start);
+ 	p->nr_sects = len;
+ 	p->partno = partno;
+-	p->policy = get_disk_ro(disk);
++	p->policy = get_user_ro(disk, partno) ?: get_disk_ro(disk);
+ 
+ 	if (info) {
+ 		struct partition_meta_info *pinfo = alloc_part_info(disk);
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 67cc439b86e4..5dfe37b08d3b 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -2591,10 +2591,8 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
+ 	int res;
+ 	struct scsi_device *sdp = sdkp->device;
+ 	struct scsi_mode_data data;
+-	int disk_ro = get_disk_ro(sdkp->disk);
+ 	int old_wp = sdkp->write_prot;
+ 
+-	set_disk_ro(sdkp->disk, 0);
+ 	if (sdp->skip_ms_page_3f) {
+ 		sd_first_printk(KERN_NOTICE, sdkp, "Assuming Write Enabled\n");
+ 		return;
+@@ -2632,7 +2630,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
+ 			  "Test WP failed, assume Write Enabled\n");
+ 	} else {
+ 		sdkp->write_prot = ((data.device_specific & 0x80) != 0);
+-		set_disk_ro(sdkp->disk, sdkp->write_prot || disk_ro);
++		set_disk_ro(sdkp->disk, sdkp->write_prot);
+ 		if (sdkp->first_scan || old_wp != sdkp->write_prot) {
+ 			sd_printk(KERN_NOTICE, sdkp, "Write Protect is %s\n",
+ 				  sdkp->write_prot ? "on" : "off");
+diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+index 06c0fd594097..9645c2604465 100644
+--- a/include/linux/genhd.h
++++ b/include/linux/genhd.h
+@@ -194,6 +194,7 @@ struct gendisk {
+ 	 */
+ 	struct disk_part_tbl __rcu *part_tbl;
+ 	struct hd_struct part0;
++	DECLARE_BITMAP(user_ro_bitmap, DISK_MAX_PARTS);
+ 
+ 	const struct block_device_operations *fops;
+ 	struct request_queue *queue;
+@@ -433,6 +434,7 @@ extern struct block_device *bdget_disk(struct gendisk *disk, int partno);
+ 
+ extern void set_device_ro(struct block_device *bdev, int flag);
+ extern void set_disk_ro(struct gendisk *disk, int flag);
++extern bool get_user_ro(struct gendisk *disk, unsigned int partno);
+ 
+ static inline int get_disk_ro(struct gendisk *disk)
+ {
 -- 
-Jens Axboe
+2.19.2
 
