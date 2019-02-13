@@ -2,238 +2,129 @@ Return-Path: <SRS0=Y8Hj=QU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B557EC282CA
-	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 02:57:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66741C282C4
+	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 02:57:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 77E3F20835
-	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 02:57:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3477620835
+	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 02:57:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="FEwoQyaM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uz157ZNy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388230AbfBMC5d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Feb 2019 21:57:33 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:44064 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732214AbfBMC51 (ORCPT
+        id S1732820AbfBMC5y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Feb 2019 21:57:54 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:32858 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732568AbfBMCg6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Feb 2019 21:57:27 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1D2sJMx043653;
-        Wed, 13 Feb 2019 02:57:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2018-07-02;
- bh=n8ZhwwLZ+O77rNHP76IlYQc5TNriHiGwASwyYHk5D7g=;
- b=FEwoQyaMcP9mOwhSSqtKLm8RttU+SA7zj/Oi8pEckxAK/2pXLFHr9JZnYRQz3Dw/MEox
- GjAr9k/iHCVlSKVpaUCZuKHFJ1wGlLvpDgVa4hMWcvca9SDIenRhZVQ7e/cdcp+5iLxh
- zRz16Lhq9EDHU4m48MJD/zqquaMdPVRNTT32LJA9MHnow+jFte69W+ivVT5eUg5t/DCx
- K0YNhAtEUffXi4aWFG4PJ1DS9vDcstoKgueArCMSi0Yt9/iVDm/py3eBDmNcfRwFaCZz
- dOvPCP7PI0/R0uoLGzUCn+5VbYi3cDPSERZD35ltwV85f2TVCqq91VFeOqYTnQcoq86X BQ== 
-Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by userp2120.oracle.com with ESMTP id 2qhredygx6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Feb 2019 02:57:23 +0000
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x1D2vMts020956
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Feb 2019 02:57:22 GMT
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x1D2vLbJ021547;
-        Wed, 13 Feb 2019 02:57:22 GMT
-Received: from ca-mkp.ca.oracle.com (/10.156.108.201)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 12 Feb 2019 18:57:21 -0800
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-To:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jeremy Cline <jeremy@jcline.org>,
-        Oleksii Kurochko <olkuroch@cisco.com>, stable@vger.kernel.org
-Subject: [PATCH v2] scsi: sd: block: Fix regressions in read-only block device handling
-Date:   Tue, 12 Feb 2019 21:57:17 -0500
-Message-Id: <20190213025717.20057-1-martin.petersen@oracle.com>
-X-Mailer: git-send-email 2.19.2
-In-Reply-To: <yq1d0nxuf73.fsf@oracle.com>
-References: <yq1d0nxuf73.fsf@oracle.com>
+        Tue, 12 Feb 2019 21:36:58 -0500
+Received: by mail-wm1-f68.google.com with SMTP id h22so770910wmb.0;
+        Tue, 12 Feb 2019 18:36:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4J/JVQ7t1M3Tmj1Fx+slCbFMC4ywy0iXC6y5v96C9Gg=;
+        b=uz157ZNyhHjYBvLQ1ioG6EU4GGlxMNAqT+HFQdujlRH+KMWaFFEqkGJPW8FfK/j3Fx
+         lmyFQpUCC7ZUSulPUHZPlwhreQaYo3OC+gg7x079DnsKsY34qi9JKfdtd7enn/YEw112
+         1l/iiMMWclkJcTzmtLtiHSTkiHPYJYiXNrd5OJujI/rDR63e1ugpMzdbWjnRDuh7L3ut
+         b8vEb43IKC5qWE3XPXHfxB6VInwl0NKum/LTM4koy9V8EZbo1Xp7VBDA5mWhyyQQzD/E
+         4qWbzKqcAttszbpFJ4ozXiMa6PGKVwZCLfKQI2+Dr0B+F5psBB08pmFtERUzoYJQfVd/
+         07TQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4J/JVQ7t1M3Tmj1Fx+slCbFMC4ywy0iXC6y5v96C9Gg=;
+        b=YpGcHJ4R4ibYmv302UJPrOJUaIVofbzS0X/IGVzoBMbBdjogS/SlF6CvFeaQnl4AF0
+         kw1gTxigU5V2hzzV+a0DDm7xl9OMokY3tLy0UF7AUXNnrZ3o20iId9ofMwQiEsPgVdEv
+         P/NBsAZ1woBIGnVJBX/b0PuSccTjDphiKowSgk0Z5iHG0MAa+IhthaKjwOU+NeajpRsE
+         HkNIlzM/m0AGMD51awEAnFTIWYsPIEoa9DQo7ZCTskjLWLkvSRFusyjtey7YzxBuTU5F
+         BYtvHv0dnvjr+sVn5D2sstmMWt+nrpCNhgECuuCF3ehPKMwCZQoA2UjJo4l8tStor5dA
+         b1/w==
+X-Gm-Message-State: AHQUAuZ0YpFyvWW2mz3m2v4x4WIau5Pggz0QEsU9/DMFey6Bl9yfwmQJ
+        YlRHGW0f2CzNNcB24XAoNhJbgfw8nNcx1j6vRbg=
+X-Google-Smtp-Source: AHgI3IZZw/qC7iTg+Q2qwGibGwtbEnM+7In2fPZGTBwjTpB4nNevDyq5E/biSVA/o9zYgCBoVgM/IKDc7ZkDWKf/kVI=
+X-Received: by 2002:a7b:c7c1:: with SMTP id z1mr1222280wmk.77.1550025415744;
+ Tue, 12 Feb 2019 18:36:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9165 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1902130017
+References: <c58b0ffc-434b-9db4-9ed5-07650368f336@linux.ee>
+ <9D8CA1BB-21B3-42AD-B2A7-7986A40C06EB@marvell.com> <59ea474f-347e-185b-73c7-7fa7e6cfa7b4@linux.ee>
+In-Reply-To: <59ea474f-347e-185b-73c7-7fa7e6cfa7b4@linux.ee>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Wed, 13 Feb 2019 10:36:44 +0800
+Message-ID: <CACVXFVM04AW1vVcX4KCsi7eS1EWZcWkhUGYY5db=LJdmPGE4yw@mail.gmail.com>
+Subject: Re: qla2xxx init warning with blk_mq at drivers/pci/msi.c:1273 pci_irq_get_affinity+0xf4/0x120
+To:     Meelis Roos <mroos@linux.ee>
+Cc:     Giridhar Malavali <gmalavali@marvell.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "qla2xxx-upstream@qlogic.com" <qla2xxx-upstream@qlogic.com>,
+        Himanshu Madhani <hmadhani@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Some devices come online in write protected state and switch to
-read-write once they are ready to process I/O requests. These devices
-broke with commit 20bd1d026aac ("scsi: sd: Keep disk read-only when
-re-reading partition") because we had no way to distinguish between a
-user decision to set a block_device read-only and the actual hardware
-device being write-protected.
+On Wed, Feb 13, 2019 at 5:36 AM Meelis Roos <mroos@linux.ee> wrote:
+>
+> >      I tested todays 5.0.0-rc5-00358-gdf3865f on my sparcs and a couple of servers that have qla2xxx
+> >      FC adapter gave me this warning:
+>
+> Now I got a very similar one on an x86-64 server:
+>
+>
+> [   18.472568] qla2xxx [0000:00:00.0]-0005: : QLogic Fibre Channel HBA Driver: 10.00.00.12-k.
+> [   18.474272] PCI Interrupt Link [LNKD] enabled at IRQ 19
+> [   18.474272] qla2xxx [0000:04:00.0]-001d: : Found an ISP2432 irq 19 iobase 0x(____ptrval____).
+> [   18.917293] scsi host3: qla2xxx
+> [   18.917412] WARNING: CPU: 0 PID: 1650 at drivers/pci/msi.c:1273 pci_irq_get_affinity+0x35/0x80
+> [   18.917554] Modules linked in: qla2xxx(+) scsi_transport_fc i2c_nforce2 e1000 pata_amd k8temp libata i2c_core hwmon forcedeth(+) powernow_k8 pcspkr autofs4
+> [   18.917708] CPU: 0 PID: 1650 Comm: kworker/0:3 Not tainted 5.0.0-rc6-00013-gaa0c38cf39de #14
+> [   18.917848] Hardware name: Sun Microsystems Sun Fire X4200 M2/Sun Fire X4200 M2                        , BIOS 0ABJX104 04/09/2009
+> [   18.918002] Workqueue: events work_for_cpu_fn
+> [   18.918082] RIP: 0010:pci_irq_get_affinity+0x35/0x80
+> [   18.918164] Code: 2e 48 8b 87 b8 02 00 00 48 8d 8f b8 02 00 00 48 39 c1 74 16 85 f6 74 4e 31 d2 eb 04 39 d6 74 46 48 8b 00 ff c2 48 39 c8 75 f2 <0f> 0b 31 c0 c3 83 e2 02 48 c7 c0 c0 46 d5 b8 74 29 48 8b 97 b8 02
+> [   18.918374] RSP: 0018:ffffa15f4108fcb0 EFLAGS: 00010246
+> [   18.918460] RAX: ffff95e7995f52b8 RBX: 0000000000000000 RCX: ffff95e7995f52b8
+> [   18.918547] RDX: 0000000000000002 RSI: 0000000000000002 RDI: ffff95e7995f5000
+> [   18.918629] RBP: 0000000000000000 R08: ffffffffffffff80 R09: ffff95e799008e60
+> [   18.918712] R10: 00000000b90b0f01 R11: ffffa15f4108fa90 R12: 0000000000000002
+> [   18.918795] R13: ffff95e7995f5000 R14: 00000000ffffffff R15: ffff95e7969890a8
+> [   18.918878] FS:  0000000000000000(0000) GS:ffff95e79b400000(0000) knlGS:0000000000000000
+> [   18.919013] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [   18.919103] CR2: 00007f213fb62000 CR3: 0000000217dc0000 CR4: 00000000000006f0
+> [   18.919185] Call Trace:
+> [   18.919269]  blk_mq_pci_map_queues+0x32/0xc0
+> [   18.919354]  blk_mq_alloc_tag_set+0x12e/0x340
+> [   18.919437]  scsi_add_host_with_dma+0xa1/0x310
+> [   18.919549]  qla2x00_probe_one+0x1272/0x2400 [qla2xxx]
+> [   18.919632]  ? try_to_wake_up+0x2c8/0x6f0
+> [   18.919710]  local_pci_probe+0x4b/0xb0
+> [   18.919787]  work_for_cpu_fn+0x11/0x20
+> [   18.919866]  process_one_work+0x1d1/0x360
+> [   18.919943]  worker_thread+0x20e/0x3f0
+> [   18.920020]  ? wq_calc_node_cpumask+0x110/0x110
+> [   18.920100]  kthread+0x109/0x120
+> [   18.920176]  ? kthread_create_on_node+0x60/0x60
+> [   18.920256]  ret_from_fork+0x35/0x40
+> [   18.920334] ---[ end trace 56ed281ce2c61e69 ]---
+> [   18.926988] qla2xxx [0000:04:00.0]-00fb:3: QLogic QLE2460 - SG-(X)PCIE1FC-QF4, Sun StorageTek 4 Gb FC Enterprise PCI-Express Single Channel.
+> [   18.927148] qla2xxx [0000:04:00.0]-00fc:3: ISP2432: PCIe (2.5GT/s x4) @ 0000:04:00.0 hdma+ host#=3 fw=8.07.00 (9496).
+> [   18.927757] qla2xxx [0000:83:00.0]-001d: : Found an ISP2432 irq 30 iobase 0x(____ptrval____).
+> [   19.350303] qla2xxx [0000:83:00.0]-00fb:4: QLogic QLE2460 - SG-(X)PCIE1FC-QF4, Sun StorageTek 4 Gb FC Enterprise PCI-Express Single Channel.
+> [   19.350474] qla2xxx [0000:83:00.0]-00fc:4: ISP2432: PCIe (2.5GT/s x4) @ 0000:83:00.0 hdma+ host#=4 fw=8.07.00 (9496).
+> [   40.421151] qla2xxx [0000:04:00.0]-8038:3: Cable is unplugged...
+> [   40.837159] qla2xxx [0000:83:00.0]-8038:4: Cable is unplugged...
 
-Because partitions are dropped and recreated on revalidate we are
-unable to persist any user-provided policy in hd_struct. Introduce a
-bitmap in struct gendisk to track the user configuration. This bitmap
-is updated when BLKROSET is called on a given disk or partition.
+We saw such issue too in which .msix_count is too small, and equal to
+.pre_vectors, and Himanshu is working on it.
 
-A helper function, get_user_ro(), is provided to determine whether the
-ioctl has forced read-only state for a given block device. This helper
-is used by set_disk_ro() and add_partition() to ensure that both
-existing and newly created partitions will get the correct state.
-
- - If BLKROSET sets a whole disk device read-only, all partitions will
-   now end up in a read-only state.
-
- - If BLKROSET sets a given partition read-only, that partition will
-   remain read-only post revalidate.
-
- - Otherwise both the whole disk device and any partitions will
-   reflect the write protect state of the underlying device.
-
-Cc: Jeremy Cline <jeremy@jcline.org>
-Cc: Oleksii Kurochko <olkuroch@cisco.com>
-Cc: stable@vger.kernel.org # v4.16+
-Reported-by: Oleksii Kurochko <olkuroch@cisco.com>
-Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=201221
-Fixes: 20bd1d026aac ("scsi: sd: Keep disk read-only when re-reading partition")
-Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
-
----
-
-v2:
-	- Track user read-only state in a bitmap
-
-	- Work around the regression that caused us to drop user
-	  preferences on revalidate
----
- block/genhd.c             | 22 +++++++++++++++++-----
- block/ioctl.c             |  4 ++++
- block/partition-generic.c |  2 +-
- drivers/scsi/sd.c         |  4 +---
- include/linux/genhd.h     |  2 ++
- 5 files changed, 25 insertions(+), 9 deletions(-)
-
-diff --git a/block/genhd.c b/block/genhd.c
-index 1dd8fd6613b8..34667eb1d3cc 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1544,19 +1544,31 @@ void set_device_ro(struct block_device *bdev, int flag)
- 
- EXPORT_SYMBOL(set_device_ro);
- 
-+bool get_user_ro(struct gendisk *disk, unsigned int partno)
-+{
-+	/* Is the user read-only bit set for the whole disk device? */
-+	if (test_bit(0, disk->user_ro_bitmap))
-+		return true;
-+
-+	/* Is the user read-only bit set for this particular partition? */
-+	if (test_bit(partno, disk->user_ro_bitmap))
-+		return true;
-+
-+	return false;
-+}
-+EXPORT_SYMBOL(get_user_ro);
-+
- void set_disk_ro(struct gendisk *disk, int flag)
- {
- 	struct disk_part_iter piter;
- 	struct hd_struct *part;
- 
--	if (disk->part0.policy != flag) {
-+	if (disk->part0.policy != flag)
- 		set_disk_ro_uevent(disk, flag);
--		disk->part0.policy = flag;
--	}
- 
--	disk_part_iter_init(&piter, disk, DISK_PITER_INCL_EMPTY);
-+	disk_part_iter_init(&piter, disk, DISK_PITER_INCL_EMPTY_PART0);
- 	while ((part = disk_part_iter_next(&piter)))
--		part->policy = flag;
-+		part->policy = get_user_ro(disk, part->partno) ?: flag;
- 	disk_part_iter_exit(&piter);
- }
- 
-diff --git a/block/ioctl.c b/block/ioctl.c
-index 4825c78a6baa..41206df89485 100644
---- a/block/ioctl.c
-+++ b/block/ioctl.c
-@@ -451,6 +451,10 @@ static int blkdev_roset(struct block_device *bdev, fmode_t mode,
- 		return ret;
- 	if (get_user(n, (int __user *)arg))
- 		return -EFAULT;
-+	if (n)
-+		set_bit(bdev->bd_partno, bdev->bd_disk->user_ro_bitmap);
-+	else
-+		clear_bit(bdev->bd_partno, bdev->bd_disk->user_ro_bitmap);
- 	set_device_ro(bdev, n);
- 	return 0;
- }
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 8e596a8dff32..c6a3c21c2496 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -338,7 +338,7 @@ struct hd_struct *add_partition(struct gendisk *disk, int partno,
- 		queue_limit_discard_alignment(&disk->queue->limits, start);
- 	p->nr_sects = len;
- 	p->partno = partno;
--	p->policy = get_disk_ro(disk);
-+	p->policy = get_user_ro(disk, partno) ?: get_disk_ro(disk);
- 
- 	if (info) {
- 		struct partition_meta_info *pinfo = alloc_part_info(disk);
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index 67cc439b86e4..5dfe37b08d3b 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -2591,10 +2591,8 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
- 	int res;
- 	struct scsi_device *sdp = sdkp->device;
- 	struct scsi_mode_data data;
--	int disk_ro = get_disk_ro(sdkp->disk);
- 	int old_wp = sdkp->write_prot;
- 
--	set_disk_ro(sdkp->disk, 0);
- 	if (sdp->skip_ms_page_3f) {
- 		sd_first_printk(KERN_NOTICE, sdkp, "Assuming Write Enabled\n");
- 		return;
-@@ -2632,7 +2630,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
- 			  "Test WP failed, assume Write Enabled\n");
- 	} else {
- 		sdkp->write_prot = ((data.device_specific & 0x80) != 0);
--		set_disk_ro(sdkp->disk, sdkp->write_prot || disk_ro);
-+		set_disk_ro(sdkp->disk, sdkp->write_prot);
- 		if (sdkp->first_scan || old_wp != sdkp->write_prot) {
- 			sd_printk(KERN_NOTICE, sdkp, "Write Protect is %s\n",
- 				  sdkp->write_prot ? "on" : "off");
-diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 06c0fd594097..9645c2604465 100644
---- a/include/linux/genhd.h
-+++ b/include/linux/genhd.h
-@@ -194,6 +194,7 @@ struct gendisk {
- 	 */
- 	struct disk_part_tbl __rcu *part_tbl;
- 	struct hd_struct part0;
-+	DECLARE_BITMAP(user_ro_bitmap, DISK_MAX_PARTS);
- 
- 	const struct block_device_operations *fops;
- 	struct request_queue *queue;
-@@ -433,6 +434,7 @@ extern struct block_device *bdget_disk(struct gendisk *disk, int partno);
- 
- extern void set_device_ro(struct block_device *bdev, int flag);
- extern void set_disk_ro(struct gendisk *disk, int flag);
-+extern bool get_user_ro(struct gendisk *disk, unsigned int partno);
- 
- static inline int get_disk_ro(struct gendisk *disk)
- {
--- 
-2.19.2
-
+Thanks,
+Ming Lei
