@@ -7,124 +7,149 @@ X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66741C282C4
-	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 02:57:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CECFC282C2
+	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 04:27:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3477620835
-	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 02:57:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01F37222B6
+	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 04:27:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uz157ZNy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jUGir3ab"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732820AbfBMC5y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Feb 2019 21:57:54 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:32858 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732568AbfBMCg6 (ORCPT
+        id S1729234AbfBME13 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Feb 2019 23:27:29 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:51027 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726530AbfBME13 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Feb 2019 21:36:58 -0500
-Received: by mail-wm1-f68.google.com with SMTP id h22so770910wmb.0;
-        Tue, 12 Feb 2019 18:36:56 -0800 (PST)
+        Tue, 12 Feb 2019 23:27:29 -0500
+Received: by mail-wm1-f67.google.com with SMTP id x7so892819wmj.0
+        for <linux-block@vger.kernel.org>; Tue, 12 Feb 2019 20:27:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=4J/JVQ7t1M3Tmj1Fx+slCbFMC4ywy0iXC6y5v96C9Gg=;
-        b=uz157ZNyhHjYBvLQ1ioG6EU4GGlxMNAqT+HFQdujlRH+KMWaFFEqkGJPW8FfK/j3Fx
-         lmyFQpUCC7ZUSulPUHZPlwhreQaYo3OC+gg7x079DnsKsY34qi9JKfdtd7enn/YEw112
-         1l/iiMMWclkJcTzmtLtiHSTkiHPYJYiXNrd5OJujI/rDR63e1ugpMzdbWjnRDuh7L3ut
-         b8vEb43IKC5qWE3XPXHfxB6VInwl0NKum/LTM4koy9V8EZbo1Xp7VBDA5mWhyyQQzD/E
-         4qWbzKqcAttszbpFJ4ozXiMa6PGKVwZCLfKQI2+Dr0B+F5psBB08pmFtERUzoYJQfVd/
-         07TQ==
+        bh=S27Y/k0YS2Qp4xxodm73GD/YeY7V4Ydz/jo2k+BsWYg=;
+        b=jUGir3abyurgE2sx4/fYPLEPZyPZ1+WQFnlvB4XtyDMIkk7Zjy53EfbWPOqc7Ua83x
+         fbYTcvsoJlSrxrYbnpTrgiHupGF/ZcQSR3rgBQB/NTLiPJilvyGmy6r0w6MQME+qJSef
+         LcHRy6KO/PVdz+SwGVI3QT9cXdHup+Ysl3XivBPzhwjg0Db00zE9bRMo1NfcOXvPQQw9
+         BYaZt/SNn2b1bKp4adKE/X/Ar05fWf6TSYplp1A+JqJfxoHr9BRlz2NHM8xmF85bldFT
+         upsm44Jize5HLmdgZ8lbWx74B76MMzbL+e+NRRRurlfFOwRE25dszf7DprFLzQv7hK4O
+         lU7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=4J/JVQ7t1M3Tmj1Fx+slCbFMC4ywy0iXC6y5v96C9Gg=;
-        b=YpGcHJ4R4ibYmv302UJPrOJUaIVofbzS0X/IGVzoBMbBdjogS/SlF6CvFeaQnl4AF0
-         kw1gTxigU5V2hzzV+a0DDm7xl9OMokY3tLy0UF7AUXNnrZ3o20iId9ofMwQiEsPgVdEv
-         P/NBsAZ1woBIGnVJBX/b0PuSccTjDphiKowSgk0Z5iHG0MAa+IhthaKjwOU+NeajpRsE
-         HkNIlzM/m0AGMD51awEAnFTIWYsPIEoa9DQo7ZCTskjLWLkvSRFusyjtey7YzxBuTU5F
-         BYtvHv0dnvjr+sVn5D2sstmMWt+nrpCNhgECuuCF3ehPKMwCZQoA2UjJo4l8tStor5dA
-         b1/w==
-X-Gm-Message-State: AHQUAuZ0YpFyvWW2mz3m2v4x4WIau5Pggz0QEsU9/DMFey6Bl9yfwmQJ
-        YlRHGW0f2CzNNcB24XAoNhJbgfw8nNcx1j6vRbg=
-X-Google-Smtp-Source: AHgI3IZZw/qC7iTg+Q2qwGibGwtbEnM+7In2fPZGTBwjTpB4nNevDyq5E/biSVA/o9zYgCBoVgM/IKDc7ZkDWKf/kVI=
-X-Received: by 2002:a7b:c7c1:: with SMTP id z1mr1222280wmk.77.1550025415744;
- Tue, 12 Feb 2019 18:36:55 -0800 (PST)
+        bh=S27Y/k0YS2Qp4xxodm73GD/YeY7V4Ydz/jo2k+BsWYg=;
+        b=c8NdQ24NT6kNsDQa9gdLWx0lxryDwHN4eTIuBoMHbU28Q5N+a1LkMn6ZL1mXIihjCV
+         ybeB938fatISYEC2oPWp4mGUDSS+/rAJjo/5eFvY23vuu+T9QR96ptu+Z8Oaq/TaaxWV
+         IaOmQxKzyHxY8k9FFOgmBP/tXqwAOOtLa88T5YEimVYg6ZhPl8T5qGBJr7xmi2HTxdwM
+         QZCl3bJxefU9dPi+EThUQbLmKchQ1sEuw3uSCjB6IeONEaGozkbHum4/kDUmDdCD2lTT
+         6uvDrXDgERvPUVP7Eg55OiShvqZosMuYN12lN+uUA+WJUZgTgUwsxZ7hdoN4uqH8R62i
+         LXgQ==
+X-Gm-Message-State: AHQUAuYb7PFz0GKL97BcWANJPSU5p0tKA2iOHhzQNmFyQwsAAAyyGaUR
+        aKYejDw5r6EMf3mZmfziD5vQZR/eoTYvc8uyAAM=
+X-Google-Smtp-Source: AHgI3Ibmjn3EthIQw1RrqV+yPBMhPu/vRtVKBW1rNvpewKrXqNfsLfMg1GiEGT/ZgLcp481CEFAzHggNqJZV+3Jp/xw=
+X-Received: by 2002:a7b:c853:: with SMTP id c19mr1412510wml.61.1550032046978;
+ Tue, 12 Feb 2019 20:27:26 -0800 (PST)
 MIME-Version: 1.0
-References: <c58b0ffc-434b-9db4-9ed5-07650368f336@linux.ee>
- <9D8CA1BB-21B3-42AD-B2A7-7986A40C06EB@marvell.com> <59ea474f-347e-185b-73c7-7fa7e6cfa7b4@linux.ee>
-In-Reply-To: <59ea474f-347e-185b-73c7-7fa7e6cfa7b4@linux.ee>
+References: <20190212163137.GA7701@mit.edu>
+In-Reply-To: <20190212163137.GA7701@mit.edu>
 From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Wed, 13 Feb 2019 10:36:44 +0800
-Message-ID: <CACVXFVM04AW1vVcX4KCsi7eS1EWZcWkhUGYY5db=LJdmPGE4yw@mail.gmail.com>
-Subject: Re: qla2xxx init warning with blk_mq at drivers/pci/msi.c:1273 pci_irq_get_affinity+0xf4/0x120
-To:     Meelis Roos <mroos@linux.ee>
-Cc:     Giridhar Malavali <gmalavali@marvell.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "qla2xxx-upstream@qlogic.com" <qla2xxx-upstream@qlogic.com>,
-        Himanshu Madhani <hmadhani@redhat.com>,
-        Ming Lei <ming.lei@redhat.com>
+Date:   Wed, 13 Feb 2019 12:27:14 +0800
+Message-ID: <CACVXFVNWK7QC+463cbMKE4T36O72Qvkx6AjbW2RZtJX3H4RM9g@mail.gmail.com>
+Subject: Re: blktests nvme/012 triggering LOCKDEP warning
+To:     "Theodore Y. Ts'o" <tytso@mit.edu>
+Cc:     linux-block <linux-block@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 13, 2019 at 5:36 AM Meelis Roos <mroos@linux.ee> wrote:
+On Wed, Feb 13, 2019 at 12:33 AM Theodore Y. Ts'o <tytso@mit.edu> wrote:
 >
-> >      I tested todays 5.0.0-rc5-00358-gdf3865f on my sparcs and a couple of servers that have qla2xxx
-> >      FC adapter gave me this warning:
+> Is this a known issue?  nvme/012 is triggering the following lockdep warning:
 >
-> Now I got a very similar one on an x86-64 server:
+> Thanks,
 >
+>                                         - Ted
 >
-> [   18.472568] qla2xxx [0000:00:00.0]-0005: : QLogic Fibre Channel HBA Driver: 10.00.00.12-k.
-> [   18.474272] PCI Interrupt Link [LNKD] enabled at IRQ 19
-> [   18.474272] qla2xxx [0000:04:00.0]-001d: : Found an ISP2432 irq 19 iobase 0x(____ptrval____).
-> [   18.917293] scsi host3: qla2xxx
-> [   18.917412] WARNING: CPU: 0 PID: 1650 at drivers/pci/msi.c:1273 pci_irq_get_affinity+0x35/0x80
-> [   18.917554] Modules linked in: qla2xxx(+) scsi_transport_fc i2c_nforce2 e1000 pata_amd k8temp libata i2c_core hwmon forcedeth(+) powernow_k8 pcspkr autofs4
-> [   18.917708] CPU: 0 PID: 1650 Comm: kworker/0:3 Not tainted 5.0.0-rc6-00013-gaa0c38cf39de #14
-> [   18.917848] Hardware name: Sun Microsystems Sun Fire X4200 M2/Sun Fire X4200 M2                        , BIOS 0ABJX104 04/09/2009
-> [   18.918002] Workqueue: events work_for_cpu_fn
-> [   18.918082] RIP: 0010:pci_irq_get_affinity+0x35/0x80
-> [   18.918164] Code: 2e 48 8b 87 b8 02 00 00 48 8d 8f b8 02 00 00 48 39 c1 74 16 85 f6 74 4e 31 d2 eb 04 39 d6 74 46 48 8b 00 ff c2 48 39 c8 75 f2 <0f> 0b 31 c0 c3 83 e2 02 48 c7 c0 c0 46 d5 b8 74 29 48 8b 97 b8 02
-> [   18.918374] RSP: 0018:ffffa15f4108fcb0 EFLAGS: 00010246
-> [   18.918460] RAX: ffff95e7995f52b8 RBX: 0000000000000000 RCX: ffff95e7995f52b8
-> [   18.918547] RDX: 0000000000000002 RSI: 0000000000000002 RDI: ffff95e7995f5000
-> [   18.918629] RBP: 0000000000000000 R08: ffffffffffffff80 R09: ffff95e799008e60
-> [   18.918712] R10: 00000000b90b0f01 R11: ffffa15f4108fa90 R12: 0000000000000002
-> [   18.918795] R13: ffff95e7995f5000 R14: 00000000ffffffff R15: ffff95e7969890a8
-> [   18.918878] FS:  0000000000000000(0000) GS:ffff95e79b400000(0000) knlGS:0000000000000000
-> [   18.919013] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [   18.919103] CR2: 00007f213fb62000 CR3: 0000000217dc0000 CR4: 00000000000006f0
-> [   18.919185] Call Trace:
-> [   18.919269]  blk_mq_pci_map_queues+0x32/0xc0
-> [   18.919354]  blk_mq_alloc_tag_set+0x12e/0x340
-> [   18.919437]  scsi_add_host_with_dma+0xa1/0x310
-> [   18.919549]  qla2x00_probe_one+0x1272/0x2400 [qla2xxx]
-> [   18.919632]  ? try_to_wake_up+0x2c8/0x6f0
-> [   18.919710]  local_pci_probe+0x4b/0xb0
-> [   18.919787]  work_for_cpu_fn+0x11/0x20
-> [   18.919866]  process_one_work+0x1d1/0x360
-> [   18.919943]  worker_thread+0x20e/0x3f0
-> [   18.920020]  ? wq_calc_node_cpumask+0x110/0x110
-> [   18.920100]  kthread+0x109/0x120
-> [   18.920176]  ? kthread_create_on_node+0x60/0x60
-> [   18.920256]  ret_from_fork+0x35/0x40
-> [   18.920334] ---[ end trace 56ed281ce2c61e69 ]---
-> [   18.926988] qla2xxx [0000:04:00.0]-00fb:3: QLogic QLE2460 - SG-(X)PCIE1FC-QF4, Sun StorageTek 4 Gb FC Enterprise PCI-Express Single Channel.
-> [   18.927148] qla2xxx [0000:04:00.0]-00fc:3: ISP2432: PCIe (2.5GT/s x4) @ 0000:04:00.0 hdma+ host#=3 fw=8.07.00 (9496).
-> [   18.927757] qla2xxx [0000:83:00.0]-001d: : Found an ISP2432 irq 30 iobase 0x(____ptrval____).
-> [   19.350303] qla2xxx [0000:83:00.0]-00fb:4: QLogic QLE2460 - SG-(X)PCIE1FC-QF4, Sun StorageTek 4 Gb FC Enterprise PCI-Express Single Channel.
-> [   19.350474] qla2xxx [0000:83:00.0]-00fc:4: ISP2432: PCIe (2.5GT/s x4) @ 0000:83:00.0 hdma+ host#=4 fw=8.07.00 (9496).
-> [   40.421151] qla2xxx [0000:04:00.0]-8038:3: Cable is unplugged...
-> [   40.837159] qla2xxx [0000:83:00.0]-8038:4: Cable is unplugged...
+> [ 1964.751910] run blktests nvme/012 at 2019-02-11 20:58:31
+> [ 1964.977624] nvmet: adding nsid 1 to subsystem blktests-subsystem-1
+> [ 1965.006395] nvmet: creating controller 1 for subsystem blktests-subsystem-1 for NQN nqn.2014-08.org.nvmexpress:uuid:8a58b187-6d09-4c5d-bc03-593896d2d80d.
+> [ 1965.011811] nvme nvme0: ANA group 1: optimized.
+> [ 1965.011899] nvme nvme0: creating 2 I/O queues.
+> [ 1965.013966] nvme nvme0: new ctrl: "blktests-subsystem-1"
+>
+> [ 1965.282478] ============================================
+> [ 1965.287922] WARNING: possible recursive locking detected
+> [ 1965.293364] 5.0.0-rc3-xfstests-00015-g1236f7d60242 #841 Not tainted
+> [ 1965.299762] --------------------------------------------
+> [ 1965.305207] ksoftirqd/1/16 is trying to acquire lock:
+> [ 1965.310389] 000000000282032e (&(&fq->mq_flush_lock)->rlock){..-.}, at: flush_end_io+0x4e/0x1d0
+> [ 1965.319146]
+>                but task is already holding lock:
+> [ 1965.325106] 00000000cbadcbc2 (&(&fq->mq_flush_lock)->rlock){..-.}, at: flush_end_io+0x4e/0x1d0
+> [ 1965.333957]
+>                other info that might help us debug this:
+> [ 1965.340615]  Possible unsafe locking scenario:
+>
+> [ 1965.346664]        CPU0
+> [ 1965.349248]        ----
+> [ 1965.351820]   lock(&(&fq->mq_flush_lock)->rlock);
+> [ 1965.356654]   lock(&(&fq->mq_flush_lock)->rlock);
+> [ 1965.361490]
+>                 *** DEADLOCK ***
+>
+> [ 1965.367541]  May be due to missing lock nesting notation
+>
+> [ 1965.374636] 1 lock held by ksoftirqd/1/16:
+> [ 1965.378890]  #0: 00000000cbadcbc2 (&(&fq->mq_flush_lock)->rlock){..-.}, at: flush_end_io+0x4e/0x1d0
+> [ 1965.388080]
+>                stack backtrace:
+> [ 1965.392570] CPU: 1 PID: 16 Comm: ksoftirqd/1 Not tainted 5.0.0-rc3-xfstests-00015-g1236f7d60242 #841
+> [ 1965.402002] Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+> [ 1965.411411] Call Trace:
+> [ 1965.413996]  dump_stack+0x67/0x90
+> [ 1965.417433]  __lock_acquire.cold.45+0x2b4/0x313
+> [ 1965.422194]  lock_acquire+0x98/0x160
+> [ 1965.425894]  ? flush_end_io+0x4e/0x1d0
+> [ 1965.429817]  _raw_spin_lock_irqsave+0x3b/0x80
+> [ 1965.434299]  ? flush_end_io+0x4e/0x1d0
+> [ 1965.438162]  flush_end_io+0x4e/0x1d0
+> [ 1965.441909]  blk_mq_complete_request+0x76/0x110
+> [ 1965.446580]  nvmet_req_complete+0x15/0x110 [nvmet]
+> [ 1965.452098]  nvmet_bio_done+0x27/0x50 [nvmet]
+> [ 1965.456634]  blk_update_request+0xd7/0x2d0
+> [ 1965.460869]  blk_mq_end_request+0x1a/0x100
+> [ 1965.465091]  blk_flush_complete_seq+0xe5/0x350
+> [ 1965.469660]  flush_end_io+0x12f/0x1d0
+> [ 1965.473436]  blk_done_softirq+0x9f/0xd0
+> [ 1965.477398]  __do_softirq+0xca/0x440
+> [ 1965.481092]  ? smpboot_thread_fn+0x2f/0x1e0
+> [ 1965.485512]  ? smpboot_thread_fn+0x74/0x1e0
+> [ 1965.489813]  ? smpboot_thread_fn+0x118/0x1e0
+> [ 1965.494379]  run_ksoftirqd+0x24/0x50
+> [ 1965.498081]  smpboot_thread_fn+0x113/0x1e0
+> [ 1965.502399]  ? sort_range+0x20/0x20
+> [ 1965.506008]  kthread+0x121/0x140
+> [ 1965.509395]  ? kthread_park+0x80/0x80
+> [ 1965.513290]  ret_from_fork+0x3a/0x50
+> [ 1965.527032] XFS (nvme0n1): Mounting V5 Filesystem
+> [ 1965.541778] XFS (nvme0n1): Ending clean mount
+> [ 2064.142830] XFS (nvme0n1): Unmounting Filesystem
+> [ 2064.171432] nvme nvme0: Removing ctrl: NQN "blktests-subsystem-1"
 
-We saw such issue too in which .msix_count is too small, and equal to
-.pre_vectors, and Himanshu is working on it.
+That is a false positive.
+
+It is caused by calling host request's completion handler from target
+IO's completion
+handler directly, and this way should be nvme-loop only.
+
+We may need to annotate the locks in .end_io of blk-flush for avoiding
+this warning.
+
+BTW, this way of nvme-loop handling IO completion may trigger soft lockup too.
 
 Thanks,
 Ming Lei
