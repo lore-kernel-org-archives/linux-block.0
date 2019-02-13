@@ -2,108 +2,225 @@ Return-Path: <SRS0=Y8Hj=QU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08169C282C2
-	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 14:36:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E38C282C2
+	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 15:04:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BD5F7222B2
-	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 14:36:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="noxi15mC"
+	by mail.kernel.org (Postfix) with ESMTP id 58313222D0
+	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 15:04:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1550070251;
+	bh=SqXPcqHxBhu1SvS71VKiziJ8cY0e/F/LaNZdgp1ICas=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=uLrxhihSpUIci4+WKogSgLlGvjRIdOUbL6FKujAVw4IfensFE8t2WC1Tmr5UC5bbZ
+	 UlBifc7GsKV6ll3nec8hqvcS2KtyFgZsXe/HPUuX/K5bWlf29G8kKhmDnvZDipE3We
+	 ebFitZWnDE79XL6iQI0nSOgTofP/syQb0DgeADjE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389540AbfBMOgL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Feb 2019 09:36:11 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:39931 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732843AbfBMOgL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Feb 2019 09:36:11 -0500
-Received: by mail-pf1-f193.google.com with SMTP id f132so1226058pfa.6
-        for <linux-block@vger.kernel.org>; Wed, 13 Feb 2019 06:36:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=1E5DPm3qgeniIx5Gi272hRsM9mfOnn/4ZxCuFF39vOg=;
-        b=noxi15mCVj5J1M0qcQepb/SBoqa0JfYACQW52WNKPyrf+a3v3mUnq1zNP5nkR+IbVL
-         0OAGEwVoR1uJwPtJUG8GcARF2PBYunnzNUIHBPtCDlZ4rxJl4PC/LwyffJLk2DjOkAAr
-         6jG2Yxpx1VdQDUkKg1abt0m/HM5K5xlGo48gVBsXBHg/Z9buu558QNXw1U2CviOZhgM0
-         IfjaOP8eA+ul6x0XoEk6c00TCKv53O0POpuVBmjU2+Wgd+KdvlQC2fd8Q2DXcWEGgEz4
-         xjb+yBd8Xcl6s4euiWjEhAtg/aSNWiE0PUZlhtdQ0rc9QCfOQo2bCvnmxnez7WXYMDmR
-         EtiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=1E5DPm3qgeniIx5Gi272hRsM9mfOnn/4ZxCuFF39vOg=;
-        b=IrGysbnjF4SzxiQqy/Spw9WsXE0iJZ5R8tZVxEdu7CAxduCB1nofPm655vNwtLh4Sa
-         uduA4nyAn1nQOE0Yth/GNScAMgxU4tAX8K2Mg5t0nBLjjbiHOQOAXFbAkqvRaYuJttJk
-         Qntk6ii4xT640KhlmjwrIf7l19G/78Khwelbc3UweTF3aqpd43jncYSEW4z53JY6ERKM
-         5UE4bsbiGDfMS/Y5EqXo+CX4Xm3y494ki4Zu0jm47HSTCgFQPdMLFvpRDId6L7g4H5Wz
-         7NxdPTX72jROvrk158i5SMqXT3KshnqQpWOqbFVIq7Wg+BMm0Gnz1uUxOQZm2kGN0DT8
-         dVAw==
-X-Gm-Message-State: AHQUAubKT7nEbaI15zAF/ysdt3foJm68sgmrC7KcbjdUJWVjUjK/H+j1
-        f9T7jdDKRcf6PULtVKZ7shT28g==
-X-Google-Smtp-Source: AHgI3IbSWS/hKCdO37Y5ezGagJqTKDYszunhWrg0C1ii8PYrXULU3X2OLEO99KGTo8vggM58V82NHg==
-X-Received: by 2002:a63:89c7:: with SMTP id v190mr715030pgd.370.1550068570200;
-        Wed, 13 Feb 2019 06:36:10 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id e9sm74152165pfh.42.2019.02.13.06.36.08
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 13 Feb 2019 06:36:09 -0800 (PST)
-Subject: Re: [PATCH V3 0/5] genirq/affinity: add .calc_sets for improving IRQ
- allocation & spread
-To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc:     linux-block@vger.kernel.org, Sagi Grimberg <sagi@grimberg.me>,
+        id S2387714AbfBMPEK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Feb 2019 10:04:10 -0500
+Received: from mail.kernel.org ([198.145.29.99]:48794 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726317AbfBMPEK (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Feb 2019 10:04:10 -0500
+Received: from localhost (173-25-63-173.client.mchsi.com [173.25.63.173])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id BAF15222C2;
+        Wed, 13 Feb 2019 15:04:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1550070249;
+        bh=SqXPcqHxBhu1SvS71VKiziJ8cY0e/F/LaNZdgp1ICas=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ezoRB+tWGweXo0e89b9NmWSVx2ZrybRwPCMokZfaygIC6lxiZwFJnMIS5F8b14+z3
+         5UClYHGe0FgPwI6OuBKZCcAnHAHrglV3D7mM6VZJCHLA+V0uImITOLsE0SLx2xtv97
+         Xp71vpCw9Cs2hCagwPO5vRjwJxAlh2RNfqJs62NU=
+Date:   Wed, 13 Feb 2019 09:04:07 -0600
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
         linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-pci@vger.kernel.org, Keith Busch <keith.busch@intel.com>
+Subject: Re: [PATCH V3 1/5] genirq/affinity: don't mark 'affd' as const
+Message-ID: <20190213150407.GB96272@google.com>
 References: <20190213105041.13537-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a026c441-d433-2391-796d-3d67d233ab04@kernel.dk>
-Date:   Wed, 13 Feb 2019 07:36:01 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ <20190213105041.13537-2-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20190213105041.13537-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190213105041.13537-2-ming.lei@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/13/19 3:50 AM, Ming Lei wrote:
-> Hi,
+On Wed, Feb 13, 2019 at 06:50:37PM +0800, Ming Lei wrote:
+> Currently all parameters in 'affd' are read-only, so 'affd' is marked
+> as const in both pci_alloc_irq_vectors_affinity() and irq_create_affinity_masks().
+
+s/all parameters in 'affd'/the contents of '*affd'/
+
+> We have to ask driver to re-caculate set vectors after the whole IRQ
+> vectors are allocated later, and the result needs to be stored in 'affd'.
+> Also both the two interfaces are core APIs, which should be trusted.
+
+s/re-caculate/recalculate/
+s/stored in 'affd'/stored in '*affd'/
+s/both the two/both/
+
+This is a little confusing because you're talking about both "IRQ
+vectors" and these other "set vectors", which I think are different
+things.  I assume the "set vectors" are cpumasks showing the affinity
+of the IRQ vectors with some CPUs?
+
+AFAICT, *this* patch doesn't add anything that writes to *affd.  I
+think the removal of "const" should be in the same patch that makes
+the removal necessary.
+
+> So don't mark 'affd' as const both pci_alloc_irq_vectors_affinity() and
+> irq_create_affinity_masks().
 > 
-> Currently pre-caculated set vectors are provided by driver for
-> allocating & spread vectors. This way only works when drivers passes
-> same 'max_vecs' and 'min_vecs' to pci_alloc_irq_vectors_affinity(),
-> also requires driver to retry the allocating & spread.
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/pci/msi.c         | 18 +++++++++---------
+>  include/linux/interrupt.h |  2 +-
+>  include/linux/pci.h       |  4 ++--
+>  kernel/irq/affinity.c     |  2 +-
+>  4 files changed, 13 insertions(+), 13 deletions(-)
 > 
-> As Bjorn and Keith mentioned, the current usage & interface for irq sets
-> is a bit awkward because the retrying should have been avoided by providing
-> one resonable 'min_vecs'. However, if 'min_vecs' isn't same with
-> 'max_vecs', number of the allocated vectors is unknown before calling
-> pci_alloc_irq_vectors_affinity(), then each set's vectors can't be
-> pre-caculated.
+> diff --git a/drivers/pci/msi.c b/drivers/pci/msi.c
+> index 4c0b47867258..96978459e2a0 100644
+> --- a/drivers/pci/msi.c
+> +++ b/drivers/pci/msi.c
+> @@ -532,7 +532,7 @@ static int populate_msi_sysfs(struct pci_dev *pdev)
+>  }
+>  
+>  static struct msi_desc *
+> -msi_setup_entry(struct pci_dev *dev, int nvec, const struct irq_affinity *affd)
+> +msi_setup_entry(struct pci_dev *dev, int nvec, struct irq_affinity *affd)
+>  {
+>  	struct irq_affinity_desc *masks = NULL;
+>  	struct msi_desc *entry;
+> @@ -597,7 +597,7 @@ static int msi_verify_entries(struct pci_dev *dev)
+>   * which could have been allocated.
+>   */
+>  static int msi_capability_init(struct pci_dev *dev, int nvec,
+> -			       const struct irq_affinity *affd)
+> +			       struct irq_affinity *affd)
+>  {
+>  	struct msi_desc *entry;
+>  	int ret;
+> @@ -669,7 +669,7 @@ static void __iomem *msix_map_region(struct pci_dev *dev, unsigned nr_entries)
+>  
+>  static int msix_setup_entries(struct pci_dev *dev, void __iomem *base,
+>  			      struct msix_entry *entries, int nvec,
+> -			      const struct irq_affinity *affd)
+> +			      struct irq_affinity *affd)
+>  {
+>  	struct irq_affinity_desc *curmsk, *masks = NULL;
+>  	struct msi_desc *entry;
+> @@ -736,7 +736,7 @@ static void msix_program_entries(struct pci_dev *dev,
+>   * requested MSI-X entries with allocated irqs or non-zero for otherwise.
+>   **/
+>  static int msix_capability_init(struct pci_dev *dev, struct msix_entry *entries,
+> -				int nvec, const struct irq_affinity *affd)
+> +				int nvec, struct irq_affinity *affd)
+>  {
+>  	int ret;
+>  	u16 control;
+> @@ -932,7 +932,7 @@ int pci_msix_vec_count(struct pci_dev *dev)
+>  EXPORT_SYMBOL(pci_msix_vec_count);
+>  
+>  static int __pci_enable_msix(struct pci_dev *dev, struct msix_entry *entries,
+> -			     int nvec, const struct irq_affinity *affd)
+> +			     int nvec, struct irq_affinity *affd)
+>  {
+>  	int nr_entries;
+>  	int i, j;
+> @@ -1018,7 +1018,7 @@ int pci_msi_enabled(void)
+>  EXPORT_SYMBOL(pci_msi_enabled);
+>  
+>  static int __pci_enable_msi_range(struct pci_dev *dev, int minvec, int maxvec,
+> -				  const struct irq_affinity *affd)
+> +				  struct irq_affinity *affd)
+>  {
+>  	int nvec;
+>  	int rc;
+> @@ -1086,7 +1086,7 @@ EXPORT_SYMBOL(pci_enable_msi);
+>  
+>  static int __pci_enable_msix_range(struct pci_dev *dev,
+>  				   struct msix_entry *entries, int minvec,
+> -				   int maxvec, const struct irq_affinity *affd)
+> +				   int maxvec, struct irq_affinity *affd)
+>  {
+>  	int rc, nvec = maxvec;
+>  
+> @@ -1165,9 +1165,9 @@ EXPORT_SYMBOL(pci_enable_msix_range);
+>   */
+>  int pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
+>  				   unsigned int max_vecs, unsigned int flags,
+> -				   const struct irq_affinity *affd)
+> +				   struct irq_affinity *affd)
+>  {
+> -	static const struct irq_affinity msi_default_affd;
+> +	struct irq_affinity msi_default_affd = {0};
+>  	int msix_vecs = -ENOSPC;
+>  	int msi_vecs = -ENOSPC;
+>  
+> diff --git a/include/linux/interrupt.h b/include/linux/interrupt.h
+> index 7c9434652f36..1ed1014c9684 100644
+> --- a/include/linux/interrupt.h
+> +++ b/include/linux/interrupt.h
+> @@ -332,7 +332,7 @@ extern int
+>  irq_set_affinity_notifier(unsigned int irq, struct irq_affinity_notify *notify);
+>  
+>  struct irq_affinity_desc *
+> -irq_create_affinity_masks(int nvec, const struct irq_affinity *affd);
+> +irq_create_affinity_masks(int nvec, struct irq_affinity *affd);
+>  
+>  int irq_calc_affinity_vectors(int minvec, int maxvec, const struct irq_affinity *affd);
+>  
+> diff --git a/include/linux/pci.h b/include/linux/pci.h
+> index 40b327b814aa..4eca42cf611b 100644
+> --- a/include/linux/pci.h
+> +++ b/include/linux/pci.h
+> @@ -1396,7 +1396,7 @@ static inline int pci_enable_msix_exact(struct pci_dev *dev,
+>  }
+>  int pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
+>  				   unsigned int max_vecs, unsigned int flags,
+> -				   const struct irq_affinity *affd);
+> +				   struct irq_affinity *affd);
+>  
+>  void pci_free_irq_vectors(struct pci_dev *dev);
+>  int pci_irq_vector(struct pci_dev *dev, unsigned int nr);
+> @@ -1422,7 +1422,7 @@ static inline int pci_enable_msix_exact(struct pci_dev *dev,
+>  static inline int
+>  pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
+>  			       unsigned int max_vecs, unsigned int flags,
+> -			       const struct irq_affinity *aff_desc)
+> +			       struct irq_affinity *aff_desc)
+>  {
+>  	if ((flags & PCI_IRQ_LEGACY) && min_vecs == 1 && dev->irq)
+>  		return 1;
+> diff --git a/kernel/irq/affinity.c b/kernel/irq/affinity.c
+> index 118b66d64a53..9200d3b26f7d 100644
+> --- a/kernel/irq/affinity.c
+> +++ b/kernel/irq/affinity.c
+> @@ -239,7 +239,7 @@ static int irq_build_affinity_masks(const struct irq_affinity *affd,
+>   * Returns the irq_affinity_desc pointer or NULL if allocation failed.
+>   */
+>  struct irq_affinity_desc *
+> -irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
+> +irq_create_affinity_masks(int nvecs, struct irq_affinity *affd)
+>  {
+>  	int affvecs = nvecs - affd->pre_vectors - affd->post_vectors;
+>  	int curvec, usedvecs;
+> -- 
+> 2.9.5
 > 
-> Add a new callback of .calc_sets into 'struct irq_affinity' so that
-> driver can caculate set vectors after IRQ vector is allocated and
-> before spread IRQ vectors.
-
-Much improved, thanks for doing this work. You can add
-
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
-
-if you want.
-
--- 
-Jens Axboe
-
