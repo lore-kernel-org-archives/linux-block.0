@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16D29C282C2
-	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 09:53:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC3BC282C2
+	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 09:53:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DB4CC222CD
-	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 09:53:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E3172077B
+	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 09:53:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="qWLuD1DZ"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ecxi0IdO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391384AbfBMJxz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Feb 2019 04:53:55 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:53472 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732639AbfBMJxy (ORCPT
+        id S2391386AbfBMJx4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Feb 2019 04:53:56 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:58650 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387886AbfBMJx4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Feb 2019 04:53:54 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1D9mgQd163807;
-        Wed, 13 Feb 2019 09:53:48 GMT
+        Wed, 13 Feb 2019 04:53:56 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1D9mg99164813;
+        Wed, 13 Feb 2019 09:53:50 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=btF1v4tjdgTzSKMBIbwAhAtSt7P45B069orpzvat5Jc=;
- b=qWLuD1DZD6/wUpoWBSTdHIxSeQKRBla1wZg8UPPgt5bqzTn5W9KPRlKvO8bAJn8EHY4/
- PvvoQHDCUAwmLe/41X+ECE0oYqhMbyfh6nzT0AzNUBDMFxtk4e7zJPJZ2kvs/B+HoqK+
- kCwnoGxysZLmsveQgorOIinbY5Epx0RBj4h3ziSm+l/j7bzJ9KkZZIM0GTlmXm8vO45P
- 3k6KfGRPm4to53iAH+bg02GgPuO5XaGVlI3ngciTQrfsu004DGT76UWwlRgjO7ZO+i1M
- dITJbA/FsRA9kNAdWHm6Tg5ttAhPla0QaIeJSK6uXyTYiMsJQVg9aTHMwgNLYa6dxgms fQ== 
-Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by userp2120.oracle.com with ESMTP id 2qhree11te-1
+ bh=4aVe1qcdo+EJ2dG63MtwaP+x1ZR6HAKRsDn8i3GaN9E=;
+ b=ecxi0IdOKpnOGDmk6nXAIr/+fAC4uQ6O0kTcUsALwIGnNVV4If/S1lPzdxvnE7IZ9LId
+ EwvODUlyD4/QoIKeWnsfcIvQYl0mipVKMAIsRB+WwF8k+BlctE0NXp6plBNtnBoR8dfE
+ pk7uVosEL8u5F26wDp5cm0+6ukPvfMqgmcM0MivRdrGzD/UswVFTqtbGSIW5vZwIKBK1
+ XCZgSwjI7OZbTxUvUcljstjL262r+6YxqD+LfVN7JzryJQ6bKfOF4y8zFC8SQrYxpKcI
+ Xrwutb2PENMRel0xWaMY1FRN4pXobUbOywNkWCe8ylqf6aJcorttPj0YbM+8xo8c7yoC jQ== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by aserp2130.oracle.com with ESMTP id 2qhre5gyvw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Feb 2019 09:53:48 +0000
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x1D9rlxn030542
+        Wed, 13 Feb 2019 09:53:49 +0000
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x1D9rhR7010664
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Feb 2019 09:53:47 GMT
+        Wed, 13 Feb 2019 09:53:43 GMT
 Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x1D9rkId000779;
-        Wed, 13 Feb 2019 09:53:46 GMT
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x1D9rhgM005276;
+        Wed, 13 Feb 2019 09:53:43 GMT
 Received: from localhost.localdomain (/116.239.187.160)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 13 Feb 2019 09:53:46 +0000
+        with ESMTP ; Wed, 13 Feb 2019 09:53:43 +0000
 From:   Bob Liu <bob.liu@oracle.com>
 To:     linux-block@vger.kernel.org
 Cc:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         martin.petersen@oracle.com, shirley.ma@oracle.com,
         allison.henderson@oracle.com, david@fromorbit.com,
         darrick.wong@oracle.com, hch@infradead.org, adilger@dilger.ca
-Subject: [RFC PATCH v2 9/9] xfs: Add tracepoints and logging to alternate device retry
-Date:   Wed, 13 Feb 2019 17:50:44 +0800
-Message-Id: <20190213095044.29628-10-bob.liu@oracle.com>
+Subject: [RFC PATCH v2 8/9] xfs: Rewrite retried read
+Date:   Wed, 13 Feb 2019 17:50:43 +0800
+Message-Id: <20190213095044.29628-9-bob.liu@oracle.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190213095044.29628-1-bob.liu@oracle.com>
 References: <20190213095044.29628-1-bob.liu@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9165 signatures=668683
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=3 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=883 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1902130072
 Sender: linux-block-owner@vger.kernel.org
@@ -72,97 +72,33 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Allison Henderson <allison.henderson@oracle.com>
 
-This patch adds new log entries and trace points to the
-alternate device retry error path
+If we had to try more than one mirror to get a successful
+read, then write that buffer back to correct the bad mirror
 
 Signed-off-by: Allison Henderson <allison.henderson@oracle.com>
 ---
- fs/xfs/xfs_buf.c   | 10 ++++++++++
- fs/xfs/xfs_buf.h   |  1 +
- fs/xfs/xfs_trace.h |  6 +++++-
- 3 files changed, 16 insertions(+), 1 deletion(-)
+ fs/xfs/xfs_buf.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/fs/xfs/xfs_buf.c b/fs/xfs/xfs_buf.c
-index e54dbc776d15..1a0427137883 100644
+index 2c250221cb78..e54dbc776d15 100644
 --- a/fs/xfs/xfs_buf.c
 +++ b/fs/xfs/xfs_buf.c
-@@ -847,6 +847,11 @@ xfs_buf_read_map(
+@@ -861,6 +861,14 @@ xfs_buf_read_map(
  
- 		for (i = 0; i <= retries; i++) {
- 			bp->b_error = 0;
+ 		}
+ retry_done:
 +
-+			if (i > 0)
-+				xfs_alert(bp->b_target->bt_mount,
-+					  "Retrying read from disk %lu",i);
++		/*
++		 * if we had to try more than one mirror to sucessfully read
++		 * the buffer, write the buffer back
++		 */
++		if (!bp->b_error && i > 0)
++			xfs_bwrite(bp);
 +
- 			_xfs_buf_read(bp, flags);
+ 		return bp;
+ 	}
  
- 			switch (bp->b_error) {
-@@ -854,6 +859,11 @@ xfs_buf_read_map(
- 			case -EFSCORRUPTED:
- 			case -EFSBADCRC:
- 				/* loop again */
-+				trace_xfs_buf_ioretry(bp, _RET_IP_);
-+				xfs_alert(bp->b_target->bt_mount,
-+					  "Read error:%d from disk number %lu",
-+					   bp->b_error, *bp->b_rd_hint);
-+
- 				continue;
- 			default:
- 				goto retry_done;
-diff --git a/fs/xfs/xfs_buf.h b/fs/xfs/xfs_buf.h
-index af9bdff29e66..69605a50c15e 100644
---- a/fs/xfs/xfs_buf.h
-+++ b/fs/xfs/xfs_buf.h
-@@ -306,6 +306,7 @@ extern void __xfs_buf_ioerror(struct xfs_buf *bp, int error,
- 		xfs_failaddr_t failaddr);
- #define xfs_buf_ioerror(bp, err) __xfs_buf_ioerror((bp), (err), __this_address)
- extern void xfs_buf_ioerror_alert(struct xfs_buf *, const char *func);
-+extern void xfs_buf_ioretry_alert(struct xfs_buf *, const char *func);
- 
- extern int __xfs_buf_submit(struct xfs_buf *bp, bool);
- static inline int xfs_buf_submit(struct xfs_buf *bp)
-diff --git a/fs/xfs/xfs_trace.h b/fs/xfs/xfs_trace.h
-index 6fcc893dfc91..4b948cf2dd65 100644
---- a/fs/xfs/xfs_trace.h
-+++ b/fs/xfs/xfs_trace.h
-@@ -276,6 +276,7 @@ DECLARE_EVENT_CLASS(xfs_buf_class,
- 		__field(int, pincount)
- 		__field(unsigned, lockval)
- 		__field(unsigned, flags)
-+		__field(unsigned short, rd_hint)
- 		__field(unsigned long, caller_ip)
- 	),
- 	TP_fast_assign(
-@@ -289,10 +290,11 @@ DECLARE_EVENT_CLASS(xfs_buf_class,
- 		__entry->pincount = atomic_read(&bp->b_pin_count);
- 		__entry->lockval = bp->b_sema.count;
- 		__entry->flags = bp->b_flags;
-+		__entry->rd_hint = bp->b_rd_hint;
- 		__entry->caller_ip = caller_ip;
- 	),
- 	TP_printk("dev %d:%d bno 0x%llx nblks 0x%x hold %d pincount %d "
--		  "lock %d flags %s caller %pS",
-+		  "lock %d flags %s rd_hint %hu caller %pS",
- 		  MAJOR(__entry->dev), MINOR(__entry->dev),
- 		  (unsigned long long)__entry->bno,
- 		  __entry->nblks,
-@@ -300,6 +302,7 @@ DECLARE_EVENT_CLASS(xfs_buf_class,
- 		  __entry->pincount,
- 		  __entry->lockval,
- 		  __print_flags(__entry->flags, "|", XFS_BUF_FLAGS),
-+		  __entry->rd_hint,
- 		  (void *)__entry->caller_ip)
- )
- 
-@@ -312,6 +315,7 @@ DEFINE_BUF_EVENT(xfs_buf_free);
- DEFINE_BUF_EVENT(xfs_buf_hold);
- DEFINE_BUF_EVENT(xfs_buf_rele);
- DEFINE_BUF_EVENT(xfs_buf_iodone);
-+DEFINE_BUF_EVENT(xfs_buf_ioretry);
- DEFINE_BUF_EVENT(xfs_buf_submit);
- DEFINE_BUF_EVENT(xfs_buf_lock);
- DEFINE_BUF_EVENT(xfs_buf_lock_done);
 -- 
 2.17.1
 
