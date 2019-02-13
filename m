@@ -2,74 +2,224 @@ Return-Path: <SRS0=Y8Hj=QU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E233DC282CA
-	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 07:04:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AF16C282CE
+	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 07:13:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B3157222C2
-	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 07:04:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="BERQVC9K"
+	by mail.kernel.org (Postfix) with ESMTP id 38392222C0
+	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 07:13:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732175AbfBMHEq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Feb 2019 02:04:46 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:52224 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730939AbfBMHEp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Feb 2019 02:04:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=OFBAB6HlFhr5QqNN+F3bwrZdCaqpYp+te5ziTarFU9o=; b=BERQVC9K9F3Q1yz5jMKjjhRGid
-        jT+7isBUa/qegaTI3bfc8YsZStaneJXygWff8Mg2epfFFx1O0WkZ3U9Q3Y93I76t76HOlmMTphEz0
-        gf15r1f/IdNnabA6Akhin1zQ1vjgJf1dcMKwTp4MdjF/zuknMkNRXO29XFjnjQktUbAZ/2eOMOHZn
-        Eq5WECF0RVu2kOcpcPxuhq7BNKomJmaMXdZ7oR9Y202txObOjREOsYZuIycZKsIjYykl+7BA5FNJt
-        +qpFqZKY+POnTZV01xNC0aBxS7cevVYO9d7TMSlAkEOCEa9xAVb1PFt/45VAezT+CqAt6BNI1DLS4
-        muOlWDpw==;
-Received: from 089144210182.atnat0019.highway.a1.net ([89.144.210.182] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gtob1-00012v-CD; Wed, 13 Feb 2019 07:04:39 +0000
-Date:   Wed, 13 Feb 2019 08:04:38 +0100
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme fix for 5.0
-Message-ID: <20190213070438.GA11528@infradead.org>
+        id S2389072AbfBMHNF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Feb 2019 02:13:05 -0500
+Received: from mx2.suse.de ([195.135.220.15]:48274 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2387769AbfBMHNE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Feb 2019 02:13:04 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 42BFCAF60;
+        Wed, 13 Feb 2019 07:13:02 +0000 (UTC)
+Subject: Re: [PATCH v2] scsi: sd: block: Fix regressions in read-only block
+ device handling
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     Jeremy Cline <jeremy@jcline.org>,
+        Oleksii Kurochko <olkuroch@cisco.com>, stable@vger.kernel.org
+References: <yq1d0nxuf73.fsf@oracle.com>
+ <20190213025717.20057-1-martin.petersen@oracle.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <ad77d729-3f9d-ae4b-b18d-3af1ab7a5139@suse.de>
+Date:   Wed, 13 Feb 2019 08:13:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20190213025717.20057-1-martin.petersen@oracle.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit aef1897cd36dcf5e296f1d2bae7e0d268561b685:
+On 2/13/19 3:57 AM, Martin K. Petersen wrote:
+> Some devices come online in write protected state and switch to
+> read-write once they are ready to process I/O requests. These devices
+> broke with commit 20bd1d026aac ("scsi: sd: Keep disk read-only when
+> re-reading partition") because we had no way to distinguish between a
+> user decision to set a block_device read-only and the actual hardware
+> device being write-protected.
+> 
+> Because partitions are dropped and recreated on revalidate we are
+> unable to persist any user-provided policy in hd_struct. Introduce a
+> bitmap in struct gendisk to track the user configuration. This bitmap
+> is updated when BLKROSET is called on a given disk or partition.
+> 
+> A helper function, get_user_ro(), is provided to determine whether the
+> ioctl has forced read-only state for a given block device. This helper
+> is used by set_disk_ro() and add_partition() to ensure that both
+> existing and newly created partitions will get the correct state.
+> 
+>   - If BLKROSET sets a whole disk device read-only, all partitions will
+>     now end up in a read-only state.
+> 
+>   - If BLKROSET sets a given partition read-only, that partition will
+>     remain read-only post revalidate.
+> 
+>   - Otherwise both the whole disk device and any partitions will
+>     reflect the write protect state of the underlying device.
+> 
+> Cc: Jeremy Cline <jeremy@jcline.org>
+> Cc: Oleksii Kurochko <olkuroch@cisco.com>
+> Cc: stable@vger.kernel.org # v4.16+
+> Reported-by: Oleksii Kurochko <olkuroch@cisco.com>
+> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=201221
+> Fixes: 20bd1d026aac ("scsi: sd: Keep disk read-only when re-reading partition")
+> Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+> 
+> ---
+> 
+> v2:
+> 	- Track user read-only state in a bitmap
+> 
+> 	- Work around the regression that caused us to drop user
+> 	  preferences on revalidate
+> ---
+>   block/genhd.c             | 22 +++++++++++++++++-----
+>   block/ioctl.c             |  4 ++++
+>   block/partition-generic.c |  2 +-
+>   drivers/scsi/sd.c         |  4 +---
+>   include/linux/genhd.h     |  2 ++
+>   5 files changed, 25 insertions(+), 9 deletions(-)
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 1dd8fd6613b8..34667eb1d3cc 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -1544,19 +1544,31 @@ void set_device_ro(struct block_device *bdev, int flag)
+>   
+>   EXPORT_SYMBOL(set_device_ro);
+>   
+> +bool get_user_ro(struct gendisk *disk, unsigned int partno)
+> +{
+> +	/* Is the user read-only bit set for the whole disk device? */
+> +	if (test_bit(0, disk->user_ro_bitmap))
+> +		return true;
+> +
+> +	/* Is the user read-only bit set for this particular partition? */
+> +	if (test_bit(partno, disk->user_ro_bitmap))
+> +		return true;
+> +
+> +	return false;
+> +}
+> +EXPORT_SYMBOL(get_user_ro);
+> +
+>   void set_disk_ro(struct gendisk *disk, int flag)
+>   {
+>   	struct disk_part_iter piter;
+>   	struct hd_struct *part;
+>   
+> -	if (disk->part0.policy != flag) {
+> +	if (disk->part0.policy != flag)
+>   		set_disk_ro_uevent(disk, flag);
+> -		disk->part0.policy = flag;
+> -	}
+>   
+> -	disk_part_iter_init(&piter, disk, DISK_PITER_INCL_EMPTY);
+> +	disk_part_iter_init(&piter, disk, DISK_PITER_INCL_EMPTY_PART0);
+>   	while ((part = disk_part_iter_next(&piter)))
+> -		part->policy = flag;
+> +		part->policy = get_user_ro(disk, part->partno) ?: flag;
+>   	disk_part_iter_exit(&piter);
+>   }
+>   
+> diff --git a/block/ioctl.c b/block/ioctl.c
+> index 4825c78a6baa..41206df89485 100644
+> --- a/block/ioctl.c
+> +++ b/block/ioctl.c
+> @@ -451,6 +451,10 @@ static int blkdev_roset(struct block_device *bdev, fmode_t mode,
+>   		return ret;
+>   	if (get_user(n, (int __user *)arg))
+>   		return -EFAULT;
+> +	if (n)
+> +		set_bit(bdev->bd_partno, bdev->bd_disk->user_ro_bitmap);
+> +	else
+> +		clear_bit(bdev->bd_partno, bdev->bd_disk->user_ro_bitmap);
+>   	set_device_ro(bdev, n);
+>   	return 0;
+>   }
+> diff --git a/block/partition-generic.c b/block/partition-generic.c
+> index 8e596a8dff32..c6a3c21c2496 100644
+> --- a/block/partition-generic.c
+> +++ b/block/partition-generic.c
+> @@ -338,7 +338,7 @@ struct hd_struct *add_partition(struct gendisk *disk, int partno,
+>   		queue_limit_discard_alignment(&disk->queue->limits, start);
+>   	p->nr_sects = len;
+>   	p->partno = partno;
+> -	p->policy = get_disk_ro(disk);
+> +	p->policy = get_user_ro(disk, partno) ?: get_disk_ro(disk);
+>   
+>   	if (info) {
+>   		struct partition_meta_info *pinfo = alloc_part_info(disk);
+> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+> index 67cc439b86e4..5dfe37b08d3b 100644
+> --- a/drivers/scsi/sd.c
+> +++ b/drivers/scsi/sd.c
+> @@ -2591,10 +2591,8 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
+>   	int res;
+>   	struct scsi_device *sdp = sdkp->device;
+>   	struct scsi_mode_data data;
+> -	int disk_ro = get_disk_ro(sdkp->disk);
+>   	int old_wp = sdkp->write_prot;
+>   
+> -	set_disk_ro(sdkp->disk, 0);
+>   	if (sdp->skip_ms_page_3f) {
+>   		sd_first_printk(KERN_NOTICE, sdkp, "Assuming Write Enabled\n");
+>   		return;
+> @@ -2632,7 +2630,7 @@ sd_read_write_protect_flag(struct scsi_disk *sdkp, unsigned char *buffer)
+>   			  "Test WP failed, assume Write Enabled\n");
+>   	} else {
+>   		sdkp->write_prot = ((data.device_specific & 0x80) != 0);
+> -		set_disk_ro(sdkp->disk, sdkp->write_prot || disk_ro);
+> +		set_disk_ro(sdkp->disk, sdkp->write_prot);
+>   		if (sdkp->first_scan || old_wp != sdkp->write_prot) {
+>   			sd_printk(KERN_NOTICE, sdkp, "Write Protect is %s\n",
+>   				  sdkp->write_prot ? "on" : "off");
+> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
+> index 06c0fd594097..9645c2604465 100644
+> --- a/include/linux/genhd.h
+> +++ b/include/linux/genhd.h
+> @@ -194,6 +194,7 @@ struct gendisk {
+>   	 */
+>   	struct disk_part_tbl __rcu *part_tbl;
+>   	struct hd_struct part0;
+> +	DECLARE_BITMAP(user_ro_bitmap, DISK_MAX_PARTS);
+>   
+>   	const struct block_device_operations *fops;
+>   	struct request_queue *queue;
+> @@ -433,6 +434,7 @@ extern struct block_device *bdget_disk(struct gendisk *disk, int partno);
+>   
+>   extern void set_device_ro(struct block_device *bdev, int flag);
+>   extern void set_disk_ro(struct gendisk *disk, int flag);
+> +extern bool get_user_ro(struct gendisk *disk, unsigned int partno);
+>   
+>   static inline int get_disk_ro(struct gendisk *disk)
+>   {
+> 
+Hmm. Can't say I like it. But as we're dropping partitions on revalidate 
+I guess we'll have to do it that way. Oh well.
 
-  blk-mq: insert rq with DONTPREP to hctx dispatch list when requeue (2019-02-11 19:51:52 -0700)
+Reviewed-by: Hannes Reinecke <hare@suse.com>
 
-are available in the Git repository at:
+Cheers,
 
-  git://git.infradead.org/nvme.git nvme-5.0
-
-for you to fetch changes up to 4726bcf30fad37cc555cd9dcd6c73f2b2668c879:
-
-  nvme-pci: add missing unlock for reset error (2019-02-12 09:29:07 +0100)
-
-----------------------------------------------------------------
-Keith Busch (1):
-      nvme-pci: add missing unlock for reset error
-
- drivers/nvme/host/pci.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+Hannes
+-- 
+Dr. Hannes Reinecke		   Teamlead Storage & Networking
+hare@suse.de			               +49 911 74053 688
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
+HRB 21284 (AG Nürnberg)
