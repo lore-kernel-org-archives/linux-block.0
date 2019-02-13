@@ -2,251 +2,173 @@ Return-Path: <SRS0=Y8Hj=QU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5307C282C2
-	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 17:36:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 898EDC282C2
+	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 18:08:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9DE5D2175B
-	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 17:36:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42B0D222C9
+	for <linux-block@archiver.kernel.org>; Wed, 13 Feb 2019 18:08:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=mit.edu header.i=@mit.edu header.b="Gsep7byT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732687AbfBMRgR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Feb 2019 12:36:17 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:45344 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393115AbfBMRgR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Feb 2019 12:36:17 -0500
-Received: by mail-pg1-f194.google.com with SMTP id y4so1441472pgc.12
-        for <linux-block@vger.kernel.org>; Wed, 13 Feb 2019 09:36:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=8XbnEk6h1YeFHZ7ZmXRrdqBN0eikTdwGKrkoNO+p9H8=;
-        b=P+Ts1zaLyfzfO1/PwByYr1ERZlPVm5rBdvr+utZAXR+OY/GZz+eWDF+43ot3VNtaBd
-         hKuCp2QANOLeBv93M+Pwf7zqDuS270EpH+VQnA+HESoD+agayviIVoV+9i1c4rN3zHjD
-         +NvW+UMUkJqJU4S0r7dx4L6Ry03o3Mu6aoxHIuNlHD8Q9NzXydaTGLcDCEeXdplVKvAn
-         Tfapfk+Usfb0OoyvD91DwycBY5LzAfEPgf0MKnie/rPMWrA0hgs3pgKkGvuDpa8ArAEf
-         wiN26sSHHJR2LgEBj1MhZfla83yUzegm57rHXn2ab+NHYKTxkhnNyIqvZSwtVwYza4DC
-         AnuQ==
-X-Gm-Message-State: AHQUAuYjH/Ias9VVgXxBQWSnJKNgQ/vZJ6KlT5ZLWPwnBZm2FadHX7bR
-        Ny6iM3E76SxUavMDTldGGOE=
-X-Google-Smtp-Source: AHgI3IbynnPVnbIehmDLvl5dujKDxI39mi5NM6MzJnfrmj3GVt4ir7aQI9FPyAvUauKY4xr+4IGnqA==
-X-Received: by 2002:a63:b70b:: with SMTP id t11mr1432825pgf.404.1550079375477;
-        Wed, 13 Feb 2019 09:36:15 -0800 (PST)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id s12sm15971729pfm.120.2019.02.13.09.36.14
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 13 Feb 2019 09:36:14 -0800 (PST)
-Message-ID: <1550079373.19311.55.camel@acm.org>
-Subject: Re: blktests nvme/012 triggering LOCKDEP warning
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Ming Lei <tom.leiming@gmail.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     linux-block <linux-block@vger.kernel.org>
-Date:   Wed, 13 Feb 2019 09:36:13 -0800
-In-Reply-To: <CACVXFVNWK7QC+463cbMKE4T36O72Qvkx6AjbW2RZtJX3H4RM9g@mail.gmail.com>
-References: <20190212163137.GA7701@mit.edu>
-         <CACVXFVNWK7QC+463cbMKE4T36O72Qvkx6AjbW2RZtJX3H4RM9g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S2404801AbfBMSIF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Feb 2019 13:08:05 -0500
+Received: from mail-eopbgr700125.outbound.protection.outlook.com ([40.107.70.125]:43424
+        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729522AbfBMSID (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Feb 2019 13:08:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qRx/N3E9S/sMPaPch1VyZvWc1aBTaQtpGx9DHMFA1Ek=;
+ b=Gsep7byTO4xpx8UgUY5yTC6v8yLc25WED5kQu7iJtPzdT9qmHRfvRPQqcBtF+VbCzIcaqIG7vswvpUcYBc0/gQHbM7h7Fv391YOvNDs51dHOkvNJCEWmLcMo57uwwGZrHrKAGYMQtAXG+6Oy8yDVvoBRQsG/lYd6BtSitoJQ34I=
+Received: from DM5PR0101CA0020.prod.exchangelabs.com (2603:10b6:4:28::33) by
+ BN7PR01MB3844.prod.exchangelabs.com (2603:10b6:406:84::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1622.16; Wed, 13 Feb 2019 18:07:58 +0000
+Received: from CO1NAM03FT007.eop-NAM03.prod.protection.outlook.com
+ (2a01:111:f400:7e48::202) by DM5PR0101CA0020.outlook.office365.com
+ (2603:10b6:4:28::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.1622.16 via Frontend
+ Transport; Wed, 13 Feb 2019 18:07:58 +0000
+Authentication-Results: spf=pass (sender IP is 18.9.28.11)
+ smtp.mailfrom=mit.edu; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=bestguesspass action=none
+ header.from=mit.edu;
+Received-SPF: Pass (protection.outlook.com: domain of mit.edu designates
+ 18.9.28.11 as permitted sender) receiver=protection.outlook.com;
+ client-ip=18.9.28.11; helo=outgoing.mit.edu;
+Received: from outgoing.mit.edu (18.9.28.11) by
+ CO1NAM03FT007.mail.protection.outlook.com (10.152.80.117) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1580.10 via Frontend Transport; Wed, 13 Feb 2019 18:07:57 +0000
+Received: from callcc.thunk.org (guestnat-104-133-0-100.corp.google.com [104.133.0.100] (may be forged))
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x1DI7sOc005399
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 13 Feb 2019 13:07:55 -0500
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id D71947A5755; Wed, 13 Feb 2019 13:07:54 -0500 (EST)
+Date:   Wed, 13 Feb 2019 13:07:54 -0500
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     <lsf-pc@lists.linux-foundation.org>
+CC:     <linux-block@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>
+Subject: [LSF/MM TOPIC] improving storage testing
+Message-ID: <20190213180754.GX23000@mit.edu>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-EOPAttributedMessage: 0
+X-Forefront-Antispam-Report: CIP:18.9.28.11;IPV:CAL;SCL:-1;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(10019020)(376002)(346002)(136003)(396003)(39860400002)(2980300002)(189003)(199004)(54906003)(47776003)(75432002)(478600001)(88552002)(246002)(33656002)(305945005)(46406003)(90966002)(2906002)(97756001)(8936002)(26826003)(316002)(786003)(58126008)(42186006)(8676002)(16586007)(336012)(50466002)(126002)(476003)(2616005)(486006)(26005)(2351001)(106466001)(186003)(356004)(1076003)(36756003)(14444005)(23726003)(106002)(6916009)(86362001)(103686004)(6266002)(4326008)(52956003)(18370500001)(42866002);DIR:OUT;SFP:1102;SCL:1;SRVR:BN7PR01MB3844;H:outgoing.mit.edu;FPR:;SPF:Pass;LANG:en;PTR:outgoing-auth-1.mit.edu;MX:1;A:1;
+X-Microsoft-Exchange-Diagnostics: 1;CO1NAM03FT007;1:eWkPQCe7ztfpYQqV/OiDH4iC3DpUBtr5M1fzUU8z5Ed6jM2BIKI5abmf1UuLlwSuZHCvAXVSYM0FwGa/UXC8z2D0KiPcyIFdJOC/qUdeeFpsbVHENGk52qfVp3J21ilS3sQyEnni9uxDf4d3H8U1Pg==
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f0a9778b-ab83-4919-87ef-08d691de2ef0
+X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600110)(711020)(4605077)(4608076)(4709027)(2017052603328)(7153060);SRVR:BN7PR01MB3844;
+X-MS-TrafficTypeDiagnostic: BN7PR01MB3844:
+X-LD-Processed: 64afd9ba-0ecf-4acf-bc36-935f6235ba8b,ExtAddr
+X-Microsoft-Exchange-Diagnostics: 1;BN7PR01MB3844;20:lWayvbFO7AymTOZpszux2PwWrc19pA1ZeM6U+AhVhpjrUeKzjN7vM/NBQTP9tK9OsSqimrj9qKXMA1PV+10RhWLQc2t0wvCd8nATMrihVeKp08Xq6YqhHT3QnWxgFagThzrgHQoefsHWJ59vwP8C8f1QHJl429OniuDRfTwcs2JeJYFwAqCIvWbrvK9S2tsk+QOPNbbyVNr7CK9U3dFYZLOclSOcmxccWs4uI9jCUV6uGTqk8YuYqlpSvV+5UaD7fQX/hnhTgPJq3AT8OyfJlOdCvm7ARo4xUvFbeHGGsBRXs8+0y3yi0i607JpUGKLcC+qIY1qkVzWJgg11M9vLXwS5VWVvijkXMoWyem/HOIO0y0ASJfvw+bheBCM0v1J60f7NxY5k7dbKY0x6l34r5/wADJl0roN51jVbuFUXolN/2CbUiKOjK+IRqP0YG7ju+FPKIb+YM713AW2iNhWfqNTHPnd9Qf8ChRU3rrWz7PdLy8LpieMkkMBVZdiWHzbq+lJ/218MzSBHnR6QbJcB1n+sUc4g9uA7zNl35JyvvOoHjoR/yNH/k03j0BuundLlE+RQineVhBdVVlt3dgTO6GW7/7H3paNTnkLJMWkT14c=
+X-Microsoft-Antispam-PRVS: <BN7PR01MB3844EE8AB252AAAA2D9DE0E1B5660@BN7PR01MB3844.prod.exchangelabs.com>
+X-Forefront-PRVS: 094700CA91
+X-Microsoft-Exchange-Diagnostics: =?us-ascii?Q?1;BN7PR01MB3844;23:P9ByBbfxCVEvPWpZpNVncmcFWR9JSvqkDK+aRnrBY?=
+ =?us-ascii?Q?5E1hbjSjSa3lABCG8MV9wDVbXMI87C6rnAo2Pfq153XGYgqQ1+u0wZDQ5x2A?=
+ =?us-ascii?Q?6Vpr/qhTGFp73V9T7PAmYmVuB4C8fLPwlUws2U9ZP5eJoQowHwScDfX73mIV?=
+ =?us-ascii?Q?PNHFdJX8F57L0uqi9xiWdJ0Mur/yq8SFzrBVkWVsyG9LwpmKwvIKgZAcTuhr?=
+ =?us-ascii?Q?ygJpYn6WQwjRZcHKH5a1+ufK6e8zudV4vNC4H1STnZPVeXjLn7pHPl5px8yt?=
+ =?us-ascii?Q?Dd3jvVPzHXHzm8SFk/yHIL2raCZkiGLUM3yiOprd2BXaBnY0s8dSAZoB4035?=
+ =?us-ascii?Q?nKVvI9G3pjrQEFbfkqlrzNh0PjFRA/nI7z3dtlB0nPj+31oT1OxB6wDp7dxc?=
+ =?us-ascii?Q?SUPk7Htme+NBAueBBZCVISR6Now/bIO1fVPEPBUFgoNj4+VOGcTGUX+Wx5xe?=
+ =?us-ascii?Q?A+L9V6pilZr+oan/1vTMcM0iR1HOIpO6w9CJlgOVcUBvBh0S67FjiifOTS2y?=
+ =?us-ascii?Q?4Ne6NT2pwwf5OvLnnX0cozYNjoGhzUcfcaGGJSz3gESz9JOGdpDk7Ewfbc+8?=
+ =?us-ascii?Q?/OmcQp2Hxmk+mSef62SUmasHEUUJHEkoVyAF+MYkIry0zPpx8i7HhoR5IrQ0?=
+ =?us-ascii?Q?5Sl/KgTWPrFZEWNSkXJmQZFjhkAM+JoUIdbtiZ4MByGJvsR25GIo9q1j33HG?=
+ =?us-ascii?Q?J4VvutOhMNCqryzQh2HT/RWgZRHT7Ux52d1gsPOqN4GRaOtxglfO/DaNxRIv?=
+ =?us-ascii?Q?hloO2gnXBxo9wteqJLxDoWCa4H1yPXXfr7yVnXUOWv3ToP7OK6v0eX1Xb6xn?=
+ =?us-ascii?Q?SLoSCNU/eLOBcvHMvih78m7xLdVlwMg1zdeMvoC4fCZSNqnEDa+fCm4zUq52?=
+ =?us-ascii?Q?+dVShynwNuO/sV0s0gJrhP5qh6J/B5jU6uEmMxd/odfo5DdJmUzN1A8DWlf6?=
+ =?us-ascii?Q?LdGdBi7Bk1clCE/VsmVHLrL3U2xD90U78UDRJG3J3kBpUwrYj2jM5Rbqnqqz?=
+ =?us-ascii?Q?vGh28+ymg6LOEn7wjHWRWj65wHEQt05XfJhPPJT60uBezdUxs+/KiNdH8bBg?=
+ =?us-ascii?Q?u5ZBKq+DkCcMqZAkcmVVuE1UChwEDygwbeV5iw2feEB1nrHrMDYb7QJTQpYQ?=
+ =?us-ascii?Q?PYUpkHjdCBmT68T5174CP70j9qBsZNfyhSIiUXHuwCxGQT4+rEbGw=3D=3D?=
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam-Message-Info: 9/7ROHhEn9pf6TMG8W6lu0UIAHBd484JfoBVDwA6xGViXrhLUcWf/szjGkTc27zp2zdpflKL+m7KCxELua/NeN0Lc7sm7mj7HtJ1t5MbK+xefys72a3PHD1qsUYDoO4vMO76CO2gtgd7LO9LIixaxhMrVm6wy7Ae7GaEIN67oHT42s9HR6tcduvVxS/p5idrZ21bRqo15v35mmA6IIKWRjxjnqKLLxohMq/OjVmQWAtLsCPjFiqTjvgt2dE6LKK7ANvxaf+MxgHXxiobdGKdIdmyLONmb+sfmjkHbccY2jBlegyYzQahEtCl74cL1H610xqxtQmGcKSwZfQqMM9E3l7+uarZN2c/BwmOL4Ba6fhy1dXtqaulQyhCKMcOoSsTxZ2WDGwxpl2Iv/5OhX5DZR5BgipX6Wua9qRpRRZ3xeU=
+X-OriginatorOrg: mit.edu
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Feb 2019 18:07:57.2573
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f0a9778b-ab83-4919-87ef-08d691de2ef0
+X-MS-Exchange-CrossTenant-Id: 64afd9ba-0ecf-4acf-bc36-935f6235ba8b
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=64afd9ba-0ecf-4acf-bc36-935f6235ba8b;Ip=[18.9.28.11];Helo=[outgoing.mit.edu]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR01MB3844
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2019-02-13 at 12:27 +-0800, Ming Lei wrote:
-+AD4 On Wed, Feb 13, 2019 at 12:33 AM Theodore Y. Ts'o +ADw-tytso+AEA-mit.edu+AD4 wrote:
-+AD4 +AD4 
-+AD4 +AD4 Is this a known issue?  nvme/012 is triggering the following lockdep warning:
-+AD4 +AD4 
-+AD4 +AD4 Thanks,
-+AD4 +AD4 
-+AD4 +AD4                                         - Ted
-+AD4 +AD4 
-+AD4 +AD4 +AFs 1964.751910+AF0 run blktests nvme/012 at 2019-02-11 20:58:31
-+AD4 +AD4 +AFs 1964.977624+AF0 nvmet: adding nsid 1 to subsystem blktests-subsystem-1
-+AD4 +AD4 +AFs 1965.006395+AF0 nvmet: creating controller 1 for subsystem blktests-subsystem-1 for NQN nqn.2014-08.org.nvmexpress:uuid:8a58b187-6d09-4c5d-bc03-593896d2d80d.
-+AD4 +AD4 +AFs 1965.011811+AF0 nvme nvme0: ANA group 1: optimized.
-+AD4 +AD4 +AFs 1965.011899+AF0 nvme nvme0: creating 2 I/O queues.
-+AD4 +AD4 +AFs 1965.013966+AF0 nvme nvme0: new ctrl: +ACI-blktests-subsystem-1+ACI
-+AD4 +AD4 
-+AD4 +AD4 +AFs 1965.282478+AF0 +AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQ
-+AD4 +AD4 +AFs 1965.287922+AF0 WARNING: possible recursive locking detected
-+AD4 +AD4 +AFs 1965.293364+AF0 5.0.0-rc3-xfstests-00015-g1236f7d60242 +ACM-841 Not tainted
-+AD4 +AD4 +AFs 1965.299762+AF0 --------------------------------------------
-+AD4 +AD4 +AFs 1965.305207+AF0 ksoftirqd/1/16 is trying to acquire lock:
-+AD4 +AD4 +AFs 1965.310389+AF0 000000000282032e (+ACY(+ACY-fq-+AD4-mq+AF8-flush+AF8-lock)-+AD4-rlock)+AHs..-.+AH0, at: flush+AF8-end+AF8-io+-0x4e/0x1d0
-+AD4 +AD4 +AFs 1965.319146+AF0
-+AD4 +AD4                but task is already holding lock:
-+AD4 +AD4 +AFs 1965.325106+AF0 00000000cbadcbc2 (+ACY(+ACY-fq-+AD4-mq+AF8-flush+AF8-lock)-+AD4-rlock)+AHs..-.+AH0, at: flush+AF8-end+AF8-io+-0x4e/0x1d0
-+AD4 +AD4 +AFs 1965.333957+AF0
-+AD4 +AD4                other info that might help us debug this:
-+AD4 +AD4 +AFs 1965.340615+AF0  Possible unsafe locking scenario:
-+AD4 +AD4 
-+AD4 +AD4 +AFs 1965.346664+AF0        CPU0
-+AD4 +AD4 +AFs 1965.349248+AF0        ----
-+AD4 +AD4 +AFs 1965.351820+AF0   lock(+ACY(+ACY-fq-+AD4-mq+AF8-flush+AF8-lock)-+AD4-rlock)+ADs
-+AD4 +AD4 +AFs 1965.356654+AF0   lock(+ACY(+ACY-fq-+AD4-mq+AF8-flush+AF8-lock)-+AD4-rlock)+ADs
-+AD4 +AD4 +AFs 1965.361490+AF0
-+AD4 +AD4                 +ACoAKgAq DEADLOCK +ACoAKgAq
-+AD4 +AD4 
-+AD4 +AD4 +AFs 1965.367541+AF0  May be due to missing lock nesting notation
-+AD4 +AD4 
-+AD4 +AD4 +AFs 1965.374636+AF0 1 lock held by ksoftirqd/1/16:
-+AD4 +AD4 +AFs 1965.378890+AF0  +ACM-0: 00000000cbadcbc2 (+ACY(+ACY-fq-+AD4-mq+AF8-flush+AF8-lock)-+AD4-rlock)+AHs..-.+AH0, at: flush+AF8-end+AF8-io+-0x4e/0x1d0
-+AD4 +AD4 +AFs 1965.388080+AF0
-+AD4 +AD4                stack backtrace:
-+AD4 +AD4 +AFs 1965.392570+AF0 CPU: 1 PID: 16 Comm: ksoftirqd/1 Not tainted 5.0.0-rc3-xfstests-00015-g1236f7d60242 +ACM-841
-+AD4 +AD4 +AFs 1965.402002+AF0 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-+AD4 +AD4 +AFs 1965.411411+AF0 Call Trace:
-+AD4 +AD4 +AFs 1965.413996+AF0  dump+AF8-stack+-0x67/0x90
-+AD4 +AD4 +AFs 1965.417433+AF0  +AF8AXw-lock+AF8-acquire.cold.45+-0x2b4/0x313
-+AD4 +AD4 +AFs 1965.422194+AF0  lock+AF8-acquire+-0x98/0x160
-+AD4 +AD4 +AFs 1965.425894+AF0  ? flush+AF8-end+AF8-io+-0x4e/0x1d0
-+AD4 +AD4 +AFs 1965.429817+AF0  +AF8-raw+AF8-spin+AF8-lock+AF8-irqsave+-0x3b/0x80
-+AD4 +AD4 +AFs 1965.434299+AF0  ? flush+AF8-end+AF8-io+-0x4e/0x1d0
-+AD4 +AD4 +AFs 1965.438162+AF0  flush+AF8-end+AF8-io+-0x4e/0x1d0
-+AD4 +AD4 +AFs 1965.441909+AF0  blk+AF8-mq+AF8-complete+AF8-request+-0x76/0x110
-+AD4 +AD4 +AFs 1965.446580+AF0  nvmet+AF8-req+AF8-complete+-0x15/0x110 +AFs-nvmet+AF0
-+AD4 +AD4 +AFs 1965.452098+AF0  nvmet+AF8-bio+AF8-done+-0x27/0x50 +AFs-nvmet+AF0
-+AD4 +AD4 +AFs 1965.456634+AF0  blk+AF8-update+AF8-request+-0xd7/0x2d0
-+AD4 +AD4 +AFs 1965.460869+AF0  blk+AF8-mq+AF8-end+AF8-request+-0x1a/0x100
-+AD4 +AD4 +AFs 1965.465091+AF0  blk+AF8-flush+AF8-complete+AF8-seq+-0xe5/0x350
-+AD4 +AD4 +AFs 1965.469660+AF0  flush+AF8-end+AF8-io+-0x12f/0x1d0
-+AD4 +AD4 +AFs 1965.473436+AF0  blk+AF8-done+AF8-softirq+-0x9f/0xd0
-+AD4 +AD4 +AFs 1965.477398+AF0  +AF8AXw-do+AF8-softirq+-0xca/0x440
-+AD4 +AD4 +AFs 1965.481092+AF0  ? smpboot+AF8-thread+AF8-fn+-0x2f/0x1e0
-+AD4 +AD4 +AFs 1965.485512+AF0  ? smpboot+AF8-thread+AF8-fn+-0x74/0x1e0
-+AD4 +AD4 +AFs 1965.489813+AF0  ? smpboot+AF8-thread+AF8-fn+-0x118/0x1e0
-+AD4 +AD4 +AFs 1965.494379+AF0  run+AF8-ksoftirqd+-0x24/0x50
-+AD4 +AD4 +AFs 1965.498081+AF0  smpboot+AF8-thread+AF8-fn+-0x113/0x1e0
-+AD4 +AD4 +AFs 1965.502399+AF0  ? sort+AF8-range+-0x20/0x20
-+AD4 +AD4 +AFs 1965.506008+AF0  kthread+-0x121/0x140
-+AD4 +AD4 +AFs 1965.509395+AF0  ? kthread+AF8-park+-0x80/0x80
-+AD4 +AD4 +AFs 1965.513290+AF0  ret+AF8-from+AF8-fork+-0x3a/0x50
-+AD4 +AD4 +AFs 1965.527032+AF0 XFS (nvme0n1): Mounting V5 Filesystem
-+AD4 +AD4 +AFs 1965.541778+AF0 XFS (nvme0n1): Ending clean mount
-+AD4 +AD4 +AFs 2064.142830+AF0 XFS (nvme0n1): Unmounting Filesystem
-+AD4 +AD4 +AFs 2064.171432+AF0 nvme nvme0: Removing ctrl: NQN +ACI-blktests-subsystem-1+ACI
-+AD4 
-+AD4 That is a false positive.
-+AD4 
-+AD4 It is caused by calling host request's completion handler from target
-+AD4 IO's completion
-+AD4 handler directly, and this way should be nvme-loop only.
-+AD4 
-+AD4 We may need to annotate the locks in .end+AF8-io of blk-flush for avoiding
-+AD4 this warning.
-+AD4 
-+AD4 BTW, this way of nvme-loop handling IO completion may trigger soft lockup too.
+This should probably be folded into other testing proposals but I'd
+like to discuss ways that we can improve storage and file systems
+testing.  Specifically,
 
-Hi Ming,
+1) Adding some kind of "smoke test" group.  The "quick" group in
+xfstests is no longer terribly quick.  Using gce-xfstests, the time to
+run the quick group on f2fs, ext4, btrfs, and xfs is 17 minutes, 18
+minutes, 25 minutes, and 31 minutes, respectively.  It probably won't
+be too contentious to come up with some kind of criteria --- stress
+tests plus maybe a few tests added to maximize code coverage, with the
+goal of the smoke test to run in 5-10 minutes for all major file
+systems.
 
-Can you clarify that last statement?
+Perhaps more controversial might be some way of ordering the tests so
+that the ones which are most likely to fail if a bug has been
+introduced are run first, so that we can have a "fail fast" sort of
+system.
 
-You may want to know that the patch below suppresses this lockdep complaint. I will
-include it in my +ACI-dynamic lockdep key+ACI patch series.
+2) Documenting what are known failures should be for various tests on
+different file systems and kernel versions.  I think we all have our
+own way of excluding tests which are known to fail.  One extreme case
+is where the test case was added to xfstests (generic/484), but the
+patch to fix it got hung up because it was somewhat controversial, so
+it was failing on all file systems.
 
+Other cases might be when fixing a particular test failure is too
+complex to backport to stable (maybe because it would drag in all
+sorts of other changes in other subsystems), so that test is Just
+Going To Fail for a particular stable kernel series.
 
-+AFs-PATCH+AF0 block: Suppress a false positive lockdep complaint
+It probably doesn't make sense to do this in xfstests, which is why we
+all have our own individual test runners that are layered on top of
+xfstests.  But if we want to automate running xfstests for stable
+kernel series, some way of annotating fixes for different kernel
+versions would be useful, perhaps some kind of centralized clearing
+house of this information would be useful.
 
-Avoid that running test nvme/012 from the blktests suite triggers the
-following lockdep complaint:
+3) Making blktests more stable/useful.  For someone who is not a block
+layer specialist, it can be hard to determine whether the problem is a
+kernel bug, a kernel misconfiguration, some userspace component (such
+as nvme-cli) being out of date, or just a test bug.  (For example, all
+srp/* tests are currently failing in blktests upstream; I had to pull
+some not-yet-merged commits from Bart's tree in order to fix bugs that
+caused all of srp to fail.)
 
-+AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQA9AD0APQ
-WARNING: possible recursive locking detected
-5.0.0-rc3-xfstests-00015-g1236f7d60242 +ACM-841 Not tainted
---------------------------------------------
-ksoftirqd/1/16 is trying to acquire lock:
-000000000282032e (+ACY(+ACY-fq-+AD4-mq+AF8-flush+AF8-lock)-+AD4-rlock)+AHs..-.+AH0, at: flush+AF8-end+AF8-io+-0x4e/0x1d0
+Some of the things that we could do include documenting what kernel
+CONFIG options are needed to successfully run blktests, perhaps using
+a defconfig list.
 
-but task is already holding lock:
-00000000cbadcbc2 (+ACY(+ACY-fq-+AD4-mq+AF8-flush+AF8-lock)-+AD4-rlock)+AHs..-.+AH0, at: flush+AF8-end+AF8-io+-0x4e/0x1d0
+Also, there are expectations about minimum versions of bash that can
+be supported; but there aren't necessarily for other components such
+as nvme-cli, and I suspect that it is due to the use of a overly new
+version of nvme-cli from its git tree.  Is that supposed to work, or
+should I constrain myself to whatever version is being shipped in
+Fedora or some other reference distribution?  More generally, what is
+the overall expectations that should be expected?  xfstests has some
+extremely expansive set of sed scripts to normalize shell script
+output to make xfstests extremely portable; will patches along similar
+lines something that we should be doing for blktests?
 
-other info that might help us debug this:
- Possible unsafe locking scenario:
+Cheers,
 
-       CPU0
-       ----
-  lock(+ACY(+ACY-fq-+AD4-mq+AF8-flush+AF8-lock)-+AD4-rlock)+ADs
-  lock(+ACY(+ACY-fq-+AD4-mq+AF8-flush+AF8-lock)-+AD4-rlock)+ADs
-
- +ACoAKgAq DEADLOCK +ACoAKgAq
-
- May be due to missing lock nesting notation
-
-1 lock held by ksoftirqd/1/16:
- +ACM-0: 00000000cbadcbc2 (+ACY(+ACY-fq-+AD4-mq+AF8-flush+AF8-lock)-+AD4-rlock)+AHs..-.+AH0, at: flush+AF8-end+AF8-io+-0x4e/0x1d0
-
-stack backtrace:
-CPU: 1 PID: 16 Comm: ksoftirqd/1 Not tainted 5.0.0-rc3-xfstests-00015-g1236f7d60242 +ACM-841
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- dump+AF8-stack+-0x67/0x90
- +AF8AXw-lock+AF8-acquire.cold.45+-0x2b4/0x313
- lock+AF8-acquire+-0x98/0x160
- +AF8-raw+AF8-spin+AF8-lock+AF8-irqsave+-0x3b/0x80
- flush+AF8-end+AF8-io+-0x4e/0x1d0
- blk+AF8-mq+AF8-complete+AF8-request+-0x76/0x110
- nvmet+AF8-req+AF8-complete+-0x15/0x110 +AFs-nvmet+AF0
- nvmet+AF8-bio+AF8-done+-0x27/0x50 +AFs-nvmet+AF0
- blk+AF8-update+AF8-request+-0xd7/0x2d0
- blk+AF8-mq+AF8-end+AF8-request+-0x1a/0x100
- blk+AF8-flush+AF8-complete+AF8-seq+-0xe5/0x350
- flush+AF8-end+AF8-io+-0x12f/0x1d0
- blk+AF8-done+AF8-softirq+-0x9f/0xd0
- +AF8AXw-do+AF8-softirq+-0xca/0x440
- run+AF8-ksoftirqd+-0x24/0x50
- smpboot+AF8-thread+AF8-fn+-0x113/0x1e0
- kthread+-0x121/0x140
- ret+AF8-from+AF8-fork+-0x3a/0x50
-
-Signed-off-by: Bart Van Assche +ADw-bvanassche+AEA-acm.org+AD4
----
- block/blk-flush.c +AHw 4 +-+-+--
- block/blk.h       +AHw 1 +-
- 2 files changed, 4 insertions(+-), 1 deletion(-)
-
-diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 6e0f2d97fc6d..c4fa6dd73664 100644
---- a/block/blk-flush.c
-+-+-+- b/block/blk-flush.c
-+AEAAQA -472,7 +-472,8 +AEAAQA struct blk+AF8-flush+AF8-queue +ACo-blk+AF8-alloc+AF8-flush+AF8-queue(struct request+AF8-queue +ACo-q,
- 	if (+ACE-fq)
- 		goto fail+ADs
- 
--	spin+AF8-lock+AF8-init(+ACY-fq-+AD4-mq+AF8-flush+AF8-lock)+ADs
-+-	lockdep+AF8-register+AF8-key(+ACY-fq-+AD4-key)+ADs
-+-	spin+AF8-lock+AF8-init+AF8-key(+ACY-fq-+AD4-mq+AF8-flush+AF8-lock, +ACY-fq-+AD4-key)+ADs
- 
- 	rq+AF8-sz +AD0 round+AF8-up(rq+AF8-sz +- cmd+AF8-size, cache+AF8-line+AF8-size())+ADs
- 	fq-+AD4-flush+AF8-rq +AD0 kzalloc+AF8-node(rq+AF8-sz, flags, node)+ADs
-+AEAAQA -497,6 +-498,7 +AEAAQA void blk+AF8-free+AF8-flush+AF8-queue(struct blk+AF8-flush+AF8-queue +ACo-fq)
- 	if (+ACE-fq)
- 		return+ADs
- 
-+-	lockdep+AF8-unregister+AF8-key(+ACY-fq-+AD4-key)+ADs
- 	kfree(fq-+AD4-flush+AF8-rq)+ADs
- 	kfree(fq)+ADs
- +AH0
-diff --git a/block/blk.h b/block/blk.h
-index 848278c52030..10f5e19aa4a1 100644
---- a/block/blk.h
-+-+-+- b/block/blk.h
-+AEAAQA -28,6 +-28,7 +AEAAQA struct blk+AF8-flush+AF8-queue +AHs
- 	 +ACo at the same time
- 	 +ACo-/
- 	struct request		+ACo-orig+AF8-rq+ADs
-+-	struct lock+AF8-class+AF8-key	key+ADs
- 	spinlock+AF8-t		mq+AF8-flush+AF8-lock+ADs
- +AH0AOw
- 
--- 
-2.20.1.791.gb4d0f1c61a-goog
-
+					- Ted
