@@ -2,111 +2,73 @@ Return-Path: <SRS0=Oz1R=QV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86C77C43381
-	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 08:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C37AC43381
+	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 09:36:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 60FBD222B6
-	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 08:50:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0528F2229F
+	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 09:36:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437627AbfBNIue (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Feb 2019 03:50:34 -0500
-Received: from Galois.linutronix.de ([146.0.238.70]:48930 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388475AbfBNIue (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Feb 2019 03:50:34 -0500
-Received: from p5492e0d8.dip0.t-ipconnect.de ([84.146.224.216] helo=nanos)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1guCik-00008u-BE; Thu, 14 Feb 2019 09:50:14 +0100
-Date:   Thu, 14 Feb 2019 09:50:13 +0100 (CET)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Keith Busch <keith.busch@intel.com>
-cc:     Bjorn Helgaas <helgaas@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Sagi Grimberg <sagi@grimberg.me>, linux-pci@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-nvme@lists.infradead.org, Ming Lei <ming.lei@redhat.com>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Huacai Chen <chenhc@lemote.com>
-Subject: Re: [PATCH V3 1/5] genirq/affinity: don't mark 'affd' as const
-In-Reply-To: <20190213223711.GC8027@localhost.localdomain>
-Message-ID: <alpine.DEB.2.21.1902140949280.1659@nanos.tec.linutronix.de>
-References: <20190213105041.13537-1-ming.lei@redhat.com> <20190213105041.13537-2-ming.lei@redhat.com> <20190213150407.GB96272@google.com> <alpine.DEB.2.21.1902132112590.1659@nanos.tec.linutronix.de> <20190213213149.GB8027@localhost.localdomain>
- <alpine.DEB.2.21.1902132232560.1659@nanos.tec.linutronix.de> <20190213223711.GC8027@localhost.localdomain>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        id S2388196AbfBNJgs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Feb 2019 04:36:48 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:44734 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726302AbfBNJgs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Feb 2019 04:36:48 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 0106B4A9B908726E65EF;
+        Thu, 14 Feb 2019 17:36:42 +0800 (CST)
+Received: from [127.0.0.1] (10.184.189.120) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.408.0; Thu, 14 Feb 2019
+ 17:36:36 +0800
+Subject: Re: [dm-devel] block: Fix a WRITE SAME BUG_ON
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+CC:     Christoph Hellwig <hch@infradead.org>,
+        Heinz Mauelshagen <heinzm@redhat.com>,
+        John Dorminy <jdorminy@redhat.com>, <axboe@kernel.dk>,
+        Mike Snitzer <snitzer@redhat.com>,
+        <linux-block@vger.kernel.org>, <dm-devel@redhat.com>,
+        Alasdair G Kergon <agk@redhat.com>
+References: <20190125021107.4595-1-zhangxiaoxu5@huawei.com>
+ <CAMeeMh_=UVGwo-=9WtBXRmiHTXnLAswqis97bM-aiuwnzPU0QQ@mail.gmail.com>
+ <20190128221441.GA24102@redhat.com> <yq1lg34f4i7.fsf@oracle.com>
+ <CAMeeMh85T_qui=LWd0u=b_oMN5XLqowqkvLuYGBM2Ae6tS-mzg@mail.gmail.com>
+ <20190131103924.GA22503@infradead.org>
+ <CAMeeMh-uxiee7rKutnr3jrMjzkc8=R2Y3DPPBLvLYjqSwjfi_w@mail.gmail.com>
+ <20190201073527.GA14758@infradead.org>
+ <CAMeeMh-wAZ8377sMrnyQZUt2HT1hB02DHSROJURLmPsaZPkeQQ@mail.gmail.com>
+ <f7b05928-316c-4c73-b04b-bba38ea60b27@redhat.com>
+ <20190201161803.GA21124@infradead.org>
+ <d693e299-3c7d-b3cb-e8c7-a1f94bba4697@huawei.com>
+ <yq1lg2jqex7.fsf@oracle.com>
+From:   "zhangxiaoxu (A)" <zhangxiaoxu5@huawei.com>
+Message-ID: <6a00e005-656e-7b3c-6b86-1430f3e7e623@huawei.com>
+Date:   Thu, 14 Feb 2019 17:36:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+In-Reply-To: <yq1lg2jqex7.fsf@oracle.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.184.189.120]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 13 Feb 2019, Keith Busch wrote:
+Any comments about the patch?
 
-Cc+ Huacai Chen
-
-> On Wed, Feb 13, 2019 at 10:41:55PM +0100, Thomas Gleixner wrote:
-> > Btw, while I have your attention. There popped up an issue recently related
-> > to that affinity logic.
-> > 
-> > The current implementation fails when:
-> > 
-> >         /*
-> >          * If there aren't any vectors left after applying the pre/post
-> >          * vectors don't bother with assigning affinity.
-> > 	 */
-> > 	if (nvecs == affd->pre_vectors + affd->post_vectors)
-> >     		return NULL;
-> > 
-> > Now the discussion arised, that in that case the affinity sets are not
-> > allocated and filled in for the pre/post vectors, but somehow the
-> > underlying device still works and later on triggers the warning in the
-> > blk-mq code because the MSI entries do not have affinity information
-> > attached.
-> >
-> > Sure, we could make that work, but there are several issues:
-> > 
-> >     1) irq_create_affinity_masks() has another reason to return NULL:
-> >        memory allocation fails.
-> > 
-> >     2) Does it make sense at all.
-> > 
-> > Right now the PCI allocator ignores the NULL return and proceeds without
-> > setting any affinities. As a consequence nothing is managed and everything
-> > happens to work.
-> > 
-> > But that happens to work is more by chance than by design and the warning
-> > is bogus if this is an expected mode of operation.
-> > 
-> > We should address these points in some way.
+On 2/14/2019 10:31 AM, Martin K. Petersen wrote:
 > 
-> Ah, yes, that's a mistake in the nvme driver. It is assuming IO queues are
-> always on managed interrupts, but that's not true if when only 1 vector
-> could be allocated. This should be an appropriate fix to the warning:
-
-Looks correct. Chen, can you please test that?
-
-> ---
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index 022ea1ee63f8..f2ccebe1c926 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -506,7 +506,7 @@ static int nvme_pci_map_queues(struct blk_mq_tag_set *set)
->  		 * affinity), so use the regular blk-mq cpu mapping
->  		 */
->  		map->queue_offset = qoff;
-> -		if (i != HCTX_TYPE_POLL)
-> +		if (i != HCTX_TYPE_POLL && dev->num_vecs > 1)
->  			blk_mq_pci_map_queues(map, to_pci_dev(dev->dev), offset);
->  		else
->  			blk_mq_map_queues(map);
-> --
+> zhangxiaoxu,
 > 
+>> Any progress about the problme?
+>> Should we disable the write same when stack the different LBA disks?
+> 
+> Yes, please.
+> 
+
