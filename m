@@ -2,78 +2,78 @@ Return-Path: <SRS0=Oz1R=QV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E21C43381
-	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 14:04:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC350C4360F
+	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 14:08:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 395BD21927
-	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 14:04:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8BF93222DB
+	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 14:08:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1550153306;
+	bh=SANrmqaZIkvaEurcmazZUakydLRUw8HzZD4wuC6cS2w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=rNRdURZwf+PEGwHTXcyrRuLzJQs6wZA8DDK2KvXsKgiWASiOXX0r1e9yJ/rgcC1UE
+	 kIhUZKhCpUWC1K+iuq92DYv6D3p+DQIL0nbwg09gbLW4+OWKLyHidRBj9bxu2L/aI8
+	 4dlfuo3Emf5bfiSyRGWbKCIje7KVuxRdK1ewC20M=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731028AbfBNOEf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Feb 2019 09:04:35 -0500
-Received: from Galois.linutronix.de ([146.0.238.70]:49888 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727745AbfBNOEf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Feb 2019 09:04:35 -0500
-Received: from [5.158.153.52] (helo=nanos.tec.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1guHcm-00085d-Sn; Thu, 14 Feb 2019 15:04:25 +0100
-Date:   Thu, 14 Feb 2019 15:04:24 +0100 (CET)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Ming Lei <ming.lei@redhat.com>
-cc:     Christoph Hellwig <hch@lst.de>, Bjorn Helgaas <helgaas@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org, Keith Busch <keith.busch@intel.com>
-Subject: Re: [PATCH V4 1/4] genirq/affinity: store interrupt sets size in
- 'struct irq_affinity'
-In-Reply-To: <20190214122347.17372-2-ming.lei@redhat.com>
-Message-ID: <alpine.DEB.2.21.1902141502320.1561@nanos.tec.linutronix.de>
-References: <20190214122347.17372-1-ming.lei@redhat.com> <20190214122347.17372-2-ming.lei@redhat.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        id S2390824AbfBNOIZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Feb 2019 09:08:25 -0500
+Received: from mx2.suse.de ([195.135.220.15]:57544 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2389847AbfBNOIZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Feb 2019 09:08:25 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 5329BACE3;
+        Thu, 14 Feb 2019 14:08:23 +0000 (UTC)
+Date:   Thu, 14 Feb 2019 15:08:22 +0100
+From:   Michal Hocko <mhocko@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        IDE/ATA development list <linux-ide@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        bpf@vger.kernel.org,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        ast@kernel.org
+Subject: Re: [Lsf-pc] LSF/MM 2019: Call for Proposals (UPDATED!)
+Message-ID: <20190214140822.GA7251@dhcp22.suse.cz>
+References: <4f5a15c1-4f9e-acae-5094-2f38c8eebd96@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4f5a15c1-4f9e-acae-5094-2f38c8eebd96@kernel.dk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 14 Feb 2019, Ming Lei wrote:
->  /**
->   * struct irq_affinity - Description for automatic irq affinity assignements
->   * @pre_vectors:	Don't apply affinity to @pre_vectors at beginning of
-> @@ -266,13 +268,13 @@ struct irq_affinity_notify {
->   * @post_vectors:	Don't apply affinity to @post_vectors at end of
->   *			the MSI(-X) vector space
->   * @nr_sets:		Length of passed in *sets array
-> - * @sets:		Number of affinitized sets
-> + * @set_size:		Number of affinitized sets
+On Thu 07-02-19 08:35:06, Jens Axboe wrote:
+[...]
+> 2) Requests to attend the summit for those that are not proposing a
+> topic should be sent to:
+> 
+> 	lsf-pc@lists.linux-foundation.org
+> 
+> Please summarize what expertise you will bring to the meeting, and
+> what you would like to discuss. Please also tag your email with
+> [LSF/MM ATTEND] and send it as a new thread so there is less chance of
+> it getting lost.
 
-Both nr_sets and set_size comments are wrong ...
+Just a reminder. Please do not forget to send the ATTEND request and
+make it clear which track you would like to participate in the most.
+It is quite common that people only send topic proposals without and
+expclicit ATTEND request or they do not mention the track.
 
->  	nr_sets = affd->nr_sets;
-> -	if (!nr_sets)
-> +	if (!nr_sets) {
->  		nr_sets = 1;
-> +		set_size[0] = affvecs;
-> +	} else {
-> +		memcpy(set_size, affd->set_size,
-> +				IRQ_AFFINITY_MAX_SETS * sizeof(int));
-
-Uuurgh. No. This needs to be nr_sets * sizeof(int) otherwise you copy
-beyond the size of the source. nr_sets is already verified to be less than
-IRQ_AFFINITY_MAX_SETS.
-
-Fixed it up.
-
-Thanks,
-
-	tglx
-
-
+Thanks!
+-- 
+Michal Hocko
+SUSE Labs
