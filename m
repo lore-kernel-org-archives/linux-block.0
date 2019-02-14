@@ -3,29 +3,29 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84982C4360F
-	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 21:36:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4849C43381
+	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 21:36:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B59221B68
-	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 21:36:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 722642147C
+	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 21:36:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2395180AbfBNVgh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Feb 2019 16:36:37 -0500
-Received: from Galois.linutronix.de ([146.0.238.70]:51333 "EHLO
+        id S2440251AbfBNVgk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Feb 2019 16:36:40 -0500
+Received: from Galois.linutronix.de ([146.0.238.70]:51337 "EHLO
         Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2395160AbfBNVgh (ORCPT
+        with ESMTP id S2395168AbfBNVgi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Feb 2019 16:36:37 -0500
+        Thu, 14 Feb 2019 16:36:38 -0500
 Received: from localhost ([127.0.0.1] helo=nanos.tec.linutronix.de)
         by Galois.linutronix.de with esmtp (Exim 4.80)
         (envelope-from <tglx@linutronix.de>)
-        id 1guOgC-0002C8-3R; Thu, 14 Feb 2019 22:36:24 +0100
-Message-Id: <20190214211759.507891465@linutronix.de>
+        id 1guOgB-0002C5-6G; Thu, 14 Feb 2019 22:36:23 +0100
+Message-Id: <20190214211759.417990441@linutronix.de>
 User-Agent: quilt/0.65
-Date:   Thu, 14 Feb 2019 21:47:57 +0100
+Date:   Thu, 14 Feb 2019 21:47:56 +0100
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
@@ -39,8 +39,7 @@ Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
         Kashyap Desai <kashyap.desai@broadcom.com>,
         Shivasharan Srikanteshwara 
         <shivasharan.srikanteshwara@broadcom.com>
-Subject: [patch V5 2/8] genirq/affinity: Store interrupt sets size in struct
- irq_affinity
+Subject: [patch V5 1/8] genirq/affinity: Code consolidation
 References: <20190214204755.819014197@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -49,172 +48,213 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+All information and calculations in the interrupt affinity spreading code
+is strictly unsigned int. Though the code uses int all over the place.
 
-The interrupt affinity spreading mechanism supports to spread out
-affinities for one or more interrupt sets. A interrupt set contains one
-or more interrupts. Each set is mapped to a specific functionality of a
-device, e.g. general I/O queues and read I/O queus of multiqueue block
-devices.
+Convert it over to unsigned int.
 
-The number of interrupts per set is defined by the driver. It depends on
-the total number of available interrupts for the device, which is
-determined by the PCI capabilites and the availability of underlying CPU
-resources, and the number of queues which the device provides and the
-driver wants to instantiate.
-
-The driver passes initial configuration for the interrupt allocation via
-a pointer to struct irq_affinity.
-
-Right now the allocation mechanism is complex as it requires to have a
-loop in the driver to determine the maximum number of interrupts which
-are provided by the PCI capabilities and the underlying CPU resources.
-This loop would have to be replicated in every driver which wants to
-utilize this mechanism. That's unwanted code duplication and error
-prone.
-
-In order to move this into generic facilities it is required to have a
-mechanism, which allows the recalculation of the interrupt sets and
-their size, in the core code. As the core code does not have any
-knowledge about the underlying device, a driver specific callback will
-be added to struct affinity_desc, which will be invoked by the core
-code. The callback will get the number of available interupts as an
-argument, so the driver can calculate the corresponding number and size
-of interrupt sets.
-
-To support this, two modifications for the handling of struct irq_affinity
-are required:
-
-1) The (optional) interrupt sets size information is contained in a
-   separate array of integers and struct irq_affinity contains a
-   pointer to it.
-
-   This is cumbersome and as the maximum number of interrupt sets is small,
-   there is no reason to have separate storage. Moving the size array into
-   struct affinity_desc avoids indirections and makes the code simpler.
-
-2) At the moment the struct irq_affinity pointer which is handed in from
-   the driver and passed through to several core functions is marked
-   'const'.
-
-   With the upcoming callback to recalculate the number and size of
-   interrupt sets, it's necessary to remove the 'const'
-   qualifier. Otherwise the callback would not be able to update the data.
-
-Implement #1 and store the interrupt sets size in 'struct irq_affinity'.
-
-No functional change.
-
-[ tglx: Fixed the memcpy() size so it won't copy beyond the size of the
-  	source. Fixed the kernel doc comments for struct irq_affinity and
-  	de-'This patch'-ed the changelog ]
-
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-
 ---
- drivers/nvme/host/pci.c   |    7 +++----
- include/linux/interrupt.h |    9 ++++++---
- kernel/irq/affinity.c     |   16 ++++++++++++----
- 3 files changed, 21 insertions(+), 11 deletions(-)
+ include/linux/interrupt.h |   20 +++++++++-------
+ kernel/irq/affinity.c     |   56 ++++++++++++++++++++++------------------------
+ 2 files changed, 38 insertions(+), 38 deletions(-)
 
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2081,12 +2081,11 @@ static void nvme_calc_io_queues(struct n
- static int nvme_setup_irqs(struct nvme_dev *dev, unsigned int nr_io_queues)
- {
- 	struct pci_dev *pdev = to_pci_dev(dev->dev);
--	int irq_sets[2];
- 	struct irq_affinity affd = {
--		.pre_vectors = 1,
--		.nr_sets = ARRAY_SIZE(irq_sets),
--		.sets = irq_sets,
-+		.pre_vectors	= 1,
-+		.nr_sets	= 2,
- 	};
-+	unsigned int *irq_sets = affd.set_size;
- 	int result = 0;
- 	unsigned int irq_queues, this_p_queues;
- 
 --- a/include/linux/interrupt.h
 +++ b/include/linux/interrupt.h
-@@ -241,20 +241,23 @@ struct irq_affinity_notify {
- 	void (*release)(struct kref *ref);
- };
- 
-+#define	IRQ_AFFINITY_MAX_SETS  4
-+
- /**
-  * struct irq_affinity - Description for automatic irq affinity assignements
-  * @pre_vectors:	Don't apply affinity to @pre_vectors at beginning of
-  *			the MSI(-X) vector space
-  * @post_vectors:	Don't apply affinity to @post_vectors at end of
-  *			the MSI(-X) vector space
-- * @nr_sets:		Length of passed in *sets array
-- * @sets:		Number of affinitized sets
-+ * @nr_sets:		The number of interrupt sets for which affinity
-+ *			spreading is required
-+ * @set_size:		Array holding the size of each interrupt set
+@@ -251,10 +251,10 @@ struct irq_affinity_notify {
+  * @sets:		Number of affinitized sets
   */
  struct irq_affinity {
- 	unsigned int	pre_vectors;
- 	unsigned int	post_vectors;
- 	unsigned int	nr_sets;
--	unsigned int	*sets;
-+	unsigned int	set_size[IRQ_AFFINITY_MAX_SETS];
+-	int	pre_vectors;
+-	int	post_vectors;
+-	int	nr_sets;
+-	int	*sets;
++	unsigned int	pre_vectors;
++	unsigned int	post_vectors;
++	unsigned int	nr_sets;
++	unsigned int	*sets;
  };
  
  /**
+@@ -314,9 +314,10 @@ extern int
+ irq_set_affinity_notifier(unsigned int irq, struct irq_affinity_notify *notify);
+ 
+ struct irq_affinity_desc *
+-irq_create_affinity_masks(int nvec, const struct irq_affinity *affd);
++irq_create_affinity_masks(unsigned int nvec, const struct irq_affinity *affd);
+ 
+-int irq_calc_affinity_vectors(int minvec, int maxvec, const struct irq_affinity *affd);
++unsigned int irq_calc_affinity_vectors(unsigned int minvec, unsigned int maxvec,
++				       const struct irq_affinity *affd);
+ 
+ #else /* CONFIG_SMP */
+ 
+@@ -350,13 +351,14 @@ irq_set_affinity_notifier(unsigned int i
+ }
+ 
+ static inline struct irq_affinity_desc *
+-irq_create_affinity_masks(int nvec, const struct irq_affinity *affd)
++irq_create_affinity_masks(unsigned int nvec, const struct irq_affinity *affd)
+ {
+ 	return NULL;
+ }
+ 
+-static inline int
+-irq_calc_affinity_vectors(int minvec, int maxvec, const struct irq_affinity *affd)
++static inline unsigned int
++irq_calc_affinity_vectors(unsigned int minvec, unsigned int maxvec,
++			  const struct irq_affinity *affd)
+ {
+ 	return maxvec;
+ }
 --- a/kernel/irq/affinity.c
 +++ b/kernel/irq/affinity.c
-@@ -238,9 +238,10 @@ static int irq_build_affinity_masks(cons
+@@ -9,7 +9,7 @@
+ #include <linux/cpu.h>
+ 
+ static void irq_spread_init_one(struct cpumask *irqmsk, struct cpumask *nmsk,
+-				int cpus_per_vec)
++				unsigned int cpus_per_vec)
+ {
+ 	const struct cpumask *siblmsk;
+ 	int cpu, sibl;
+@@ -95,15 +95,17 @@ static int get_nodes_in_cpumask(cpumask_
+ }
+ 
+ static int __irq_build_affinity_masks(const struct irq_affinity *affd,
+-				      int startvec, int numvecs, int firstvec,
++				      unsigned int startvec,
++				      unsigned int numvecs,
++				      unsigned int firstvec,
+ 				      cpumask_var_t *node_to_cpumask,
+ 				      const struct cpumask *cpu_mask,
+ 				      struct cpumask *nmsk,
+ 				      struct irq_affinity_desc *masks)
+ {
+-	int n, nodes, cpus_per_vec, extra_vecs, done = 0;
+-	int last_affv = firstvec + numvecs;
+-	int curvec = startvec;
++	unsigned int n, nodes, cpus_per_vec, extra_vecs, done = 0;
++	unsigned int last_affv = firstvec + numvecs;
++	unsigned int curvec = startvec;
+ 	nodemask_t nodemsk = NODE_MASK_NONE;
+ 
+ 	if (!cpumask_weight(cpu_mask))
+@@ -117,18 +119,16 @@ static int __irq_build_affinity_masks(co
+ 	 */
+ 	if (numvecs <= nodes) {
+ 		for_each_node_mask(n, nodemsk) {
+-			cpumask_or(&masks[curvec].mask,
+-					&masks[curvec].mask,
+-					node_to_cpumask[n]);
++			cpumask_or(&masks[curvec].mask, &masks[curvec].mask,
++				   node_to_cpumask[n]);
+ 			if (++curvec == last_affv)
+ 				curvec = firstvec;
+ 		}
+-		done = numvecs;
+-		goto out;
++		return numvecs;
+ 	}
+ 
+ 	for_each_node_mask(n, nodemsk) {
+-		int ncpus, v, vecs_to_assign, vecs_per_node;
++		unsigned int ncpus, v, vecs_to_assign, vecs_per_node;
+ 
+ 		/* Spread the vectors per node */
+ 		vecs_per_node = (numvecs - (curvec - firstvec)) / nodes;
+@@ -163,8 +163,6 @@ static int __irq_build_affinity_masks(co
+ 			curvec = firstvec;
+ 		--nodes;
+ 	}
+-
+-out:
+ 	return done;
+ }
+ 
+@@ -174,13 +172,14 @@ static int __irq_build_affinity_masks(co
+  *	2) spread other possible CPUs on these vectors
+  */
+ static int irq_build_affinity_masks(const struct irq_affinity *affd,
+-				    int startvec, int numvecs, int firstvec,
++				    unsigned int startvec, unsigned int numvecs,
++				    unsigned int firstvec,
+ 				    struct irq_affinity_desc *masks)
+ {
+-	int curvec = startvec, nr_present, nr_others;
+-	int ret = -ENOMEM;
+-	cpumask_var_t nmsk, npresmsk;
++	unsigned int curvec = startvec, nr_present, nr_others;
+ 	cpumask_var_t *node_to_cpumask;
++	cpumask_var_t nmsk, npresmsk;
++	int ret = -ENOMEM;
+ 
+ 	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
+ 		return ret;
+@@ -239,12 +238,10 @@ static int irq_build_affinity_masks(cons
   * Returns the irq_affinity_desc pointer or NULL if allocation failed.
   */
  struct irq_affinity_desc *
--irq_create_affinity_masks(unsigned int nvecs, const struct irq_affinity *affd)
-+irq_create_affinity_masks(unsigned int nvecs, struct irq_affinity *affd)
+-irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
++irq_create_affinity_masks(unsigned int nvecs, const struct irq_affinity *affd)
  {
- 	unsigned int affvecs, curvec, usedvecs, nr_sets, i;
-+	unsigned int set_size[IRQ_AFFINITY_MAX_SETS];
+-	int affvecs = nvecs - affd->pre_vectors - affd->post_vectors;
+-	int curvec, usedvecs;
++	unsigned int affvecs, curvec, usedvecs, nr_sets, i;
  	struct irq_affinity_desc *masks = NULL;
+-	int i, nr_sets;
  
  	/*
-@@ -250,6 +251,9 @@ irq_create_affinity_masks(unsigned int n
- 	if (nvecs == affd->pre_vectors + affd->post_vectors)
- 		return NULL;
- 
-+	if (WARN_ON_ONCE(affd->nr_sets > IRQ_AFFINITY_MAX_SETS))
-+		return NULL;
-+
- 	masks = kcalloc(nvecs, sizeof(*masks), GFP_KERNEL);
- 	if (!masks)
- 		return NULL;
-@@ -263,11 +267,15 @@ irq_create_affinity_masks(unsigned int n
+ 	 * If there aren't any vectors left after applying the pre/post
+@@ -264,16 +261,17 @@ irq_create_affinity_masks(int nvecs, con
+ 	 * Spread on present CPUs starting from affd->pre_vectors. If we
+ 	 * have multiple sets, build each sets affinity mask separately.
  	 */
- 	affvecs = nvecs - affd->pre_vectors - affd->post_vectors;
++	affvecs = nvecs - affd->pre_vectors - affd->post_vectors;
  	nr_sets = affd->nr_sets;
--	if (!nr_sets)
-+	if (!nr_sets) {
+ 	if (!nr_sets)
  		nr_sets = 1;
-+		set_size[0] = affvecs;
-+	} else {
-+		memcpy(set_size, affd->set_size, nr_sets * sizeof(unsigned int));
-+	}
  
  	for (i = 0, usedvecs = 0; i < nr_sets; i++) {
--		unsigned int this_vecs = affd->sets ? affd->sets[i] : affvecs;
-+		unsigned int this_vecs = set_size[i];
+-		int this_vecs = affd->sets ? affd->sets[i] : affvecs;
++		unsigned int this_vecs = affd->sets ? affd->sets[i] : affvecs;
  		int ret;
  
  		ret = irq_build_affinity_masks(affd, curvec, this_vecs,
-@@ -314,7 +322,7 @@ unsigned int irq_calc_affinity_vectors(u
- 		unsigned int i;
+-						curvec, masks);
++					       curvec, masks);
+ 		if (ret) {
+ 			kfree(masks);
+ 			return NULL;
+@@ -303,17 +301,17 @@ irq_create_affinity_masks(int nvecs, con
+  * @maxvec:	The maximum number of vectors available
+  * @affd:	Description of the affinity requirements
+  */
+-int irq_calc_affinity_vectors(int minvec, int maxvec, const struct irq_affinity *affd)
++unsigned int irq_calc_affinity_vectors(unsigned int minvec, unsigned int maxvec,
++				       const struct irq_affinity *affd)
+ {
+-	int resv = affd->pre_vectors + affd->post_vectors;
+-	int vecs = maxvec - resv;
+-	int set_vecs;
++	unsigned int resv = affd->pre_vectors + affd->post_vectors;
++	unsigned int set_vecs;
+ 
+ 	if (resv > minvec)
+ 		return 0;
+ 
+ 	if (affd->nr_sets) {
+-		int i;
++		unsigned int i;
  
  		for (i = 0, set_vecs = 0;  i < affd->nr_sets; i++)
--			set_vecs += affd->sets[i];
-+			set_vecs += affd->set_size[i];
- 	} else {
- 		get_online_cpus();
- 		set_vecs = cpumask_weight(cpu_possible_mask);
+ 			set_vecs += affd->sets[i];
+@@ -323,5 +321,5 @@ int irq_calc_affinity_vectors(int minvec
+ 		put_online_cpus();
+ 	}
+ 
+-	return resv + min(set_vecs, vecs);
++	return resv + min(set_vecs, maxvec - resv);
+ }
 
 
