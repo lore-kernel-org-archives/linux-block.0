@@ -2,68 +2,109 @@ Return-Path: <SRS0=Oz1R=QV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E05C43381
-	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 16:19:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 328BFC43381
+	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 18:00:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A9FD4222DD
-	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 16:19:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 021142089F
+	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 18:00:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="kApAc8ju"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404678AbfBNQTx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Feb 2019 11:19:53 -0500
-Received: from mx2.suse.de ([195.135.220.15]:40952 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729942AbfBNQTw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Feb 2019 11:19:52 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id EC0A1AE58;
-        Thu, 14 Feb 2019 16:19:50 +0000 (UTC)
-Received: by ds.suse.cz (Postfix, from userid 10065)
-        id 37164DA892; Thu, 14 Feb 2019 17:21:11 +0100 (CET)
-Date:   Thu, 14 Feb 2019 17:21:09 +0100
-From:   David Sterba <dsterba@suse.cz>
-To:     Johannes Thumshirn <jthumshirn@suse.de>
-Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>,
-        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [LSF/MM TOPIC] improving storage testing
-Message-ID: <20190214162109.GC9874@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <20190213180754.GX23000@mit.edu>
- <20190214105507.GA9739@linux-x5ow.site>
+        id S1727061AbfBNSAq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Feb 2019 13:00:46 -0500
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:38103 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730119AbfBNSAp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Feb 2019 13:00:45 -0500
+Received: by mail-lf1-f67.google.com with SMTP id n15so5221207lfe.5
+        for <linux-block@vger.kernel.org>; Thu, 14 Feb 2019 10:00:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cNdmBhJV6l2CrpOn23AdUvuvbdoQzPMeGeladPJyn9A=;
+        b=kApAc8juLL1jfsml6kvJ912qHNEFbMQMO0HAg6aPT+R9mD7nmIVEz9780OYMNDENsy
+         5KLMqJuFyeTsEIyCMUFclXbwU7ny5JbACEz1fgVxx2hHfBVKBTdRRLgqMPi14FyENs/b
+         phPeh1WjjPTFjNPwtwKLdYKZ2aZAM/miG+sR0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cNdmBhJV6l2CrpOn23AdUvuvbdoQzPMeGeladPJyn9A=;
+        b=OuhJFewbwKUHeqwNbsRjDGOssuGnmHrdbYdJmvmM9f7LlfJm8yKLOyKQq+wzXXJlXn
+         2ecCuK8jAzPeoI6t8MJT1S8Vue2PE+dZk7FEFveeHVmQjbmjLj8q+7axvHUV4T/NRJZ4
+         FOk0siQJg5Wd5PtwiMqg5qmdBDAtvqMJDB09gSuB4yI0I4aIWUwaTeTlWp0qVErYPvgI
+         dNqBK5GCZgRopCaq82a61JgzvZys6cPwXh8AFEWrZqlakW9iZTT7EmjDe19D/9Xot21h
+         QOvgs7SzU8cyGSQ8Rl6gI6xyiSRBtj/rmZhrkLnAAYbl6Tl8QD4gb03hLXtUtX8ikXAP
+         /cuw==
+X-Gm-Message-State: AHQUAuZD7eKYpm2CA9B9KesddvuDo0qdrdzSIne+dcsYpYzOU+jLxsSa
+        UfA3XGgfBM08xEmmrpWs40EfbW3S7Lg=
+X-Google-Smtp-Source: AHgI3IaSPvZ/CAhZr+hI4RVJN4Hfim0MEZCUHWaLvEkmbgwJPjGsvcni1AFtAZAvrkkfuOhLhIGTLA==
+X-Received: by 2002:a19:5504:: with SMTP id n4mr3186541lfe.43.1550167243715;
+        Thu, 14 Feb 2019 10:00:43 -0800 (PST)
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com. [209.85.208.177])
+        by smtp.gmail.com with ESMTPSA id g6sm610173lfh.35.2019.02.14.10.00.42
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 14 Feb 2019 10:00:42 -0800 (PST)
+Received: by mail-lj1-f177.google.com with SMTP id f24-v6so6073160ljk.0
+        for <linux-block@vger.kernel.org>; Thu, 14 Feb 2019 10:00:42 -0800 (PST)
+X-Received: by 2002:a2e:99c9:: with SMTP id l9mr2782851ljj.60.1550167242216;
+ Thu, 14 Feb 2019 10:00:42 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190214105507.GA9739@linux-x5ow.site>
-User-Agent: Mutt/1.5.23.1 (2014-03-12)
+References: <20190207205730.199332-1-evgreen@chromium.org> <20190207205730.199332-3-evgreen@chromium.org>
+ <yq1d0nvqeix.fsf@oracle.com>
+In-Reply-To: <yq1d0nvqeix.fsf@oracle.com>
+From:   Evan Green <evgreen@chromium.org>
+Date:   Thu, 14 Feb 2019 10:00:05 -0800
+X-Gmail-Original-Message-ID: <CAE=gft6bdM2dLc9RhGYMWp8bz6_c-W8Yy-CUTM9wXe+UiYkXEw@mail.gmail.com>
+Message-ID: <CAE=gft6bdM2dLc9RhGYMWp8bz6_c-W8Yy-CUTM9wXe+UiYkXEw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] loop: Better discard support for block devices
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
+        Gwendal Grignou <gwendal@chromium.org>,
+        Alexis Savery <asavery@chromium.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 14, 2019 at 11:55:07AM +0100, Johannes Thumshirn wrote:
-> On Wed, Feb 13, 2019 at 01:07:54PM -0500, Theodore Y. Ts'o wrote:
-> > 2) Documenting what are known failures should be for various tests on
-> > different file systems and kernel versions.  I think we all have our
-> > own way of excluding tests which are known to fail.  One extreme case
-> > is where the test case was added to xfstests (generic/484), but the
-> > patch to fix it got hung up because it was somewhat controversial, so
-> > it was failing on all file systems.
-> 
-> How about having a wiki page, either in the respective filesystems wiki or a
-> common wiki, that show's the list of test that are expected to fail for kernel
-> version X?
-> 
-> This is something I'm desperately looking for for brtfs for example.
+On Wed, Feb 13, 2019 at 6:40 PM Martin K. Petersen
+<martin.petersen@oracle.com> wrote:
+>
+>
+> Evan,
+>
+> > If the backing device for a loop device is a block device, then mirror
+> > the discard properties of the underlying block device into the loop
+> > device. While in there, differentiate between REQ_OP_DISCARD and
+> > REQ_OP_WRITE_ZEROES, which are different for block devices, but which
+> > the loop device had just been lumping together.
+>
+> Bubbling up the queue limits from the backing device is fine. However,
+> I'm not sure why you are requiring a filesystem to be on a
+> discard-capable device for REQ_OP_DISCARD to have an effect? Punching a
+> hole in a file is semantically the same as discarding.
+>
 
-https://btrfs.wiki.kernel.org/index.php/Development_notes#.28x.29fstests
-
-Feel free to add what you're missing to that page. Though I'm not sure
-wiki is the best way to track such information, but it can be a start.
-Without people regularly checking that the information is accurate, it
-will be obsolete and fallback to own scripts and exclusion lists would
-happen.
+Hi Martin,
+Thanks so much for taking a look at this patch, I was getting nervous
+it was languishing again. I got confused by this comment though. My
+intention was to not change behavior for loop devices backed by a
+regular file system file. The changes in loop_config_discard() should
+result in QUEUE_FLAG_DISCARD being set for backings of regular files
+that support f_op->fallocate(), same as before my patch. The change in
+lo_discard() to call blk_queue_discard() on the loopback queue itself
+was just shorthand to avoid duplicating all those if statements from
+loop_config_discard again. Am I missing a spot where I've implicitly
+changed the behavior for file-backed loop devices?
+-Evan
