@@ -3,29 +3,29 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4849C43381
-	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 21:36:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE68C10F04
+	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 21:37:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 722642147C
-	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 21:36:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4179821B68
+	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 21:37:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440251AbfBNVgk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Feb 2019 16:36:40 -0500
-Received: from Galois.linutronix.de ([146.0.238.70]:51337 "EHLO
+        id S2440279AbfBNVg5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Feb 2019 16:36:57 -0500
+Received: from Galois.linutronix.de ([146.0.238.70]:51367 "EHLO
         Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2395168AbfBNVgi (ORCPT
+        with ESMTP id S2440296AbfBNVgz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Feb 2019 16:36:38 -0500
+        Thu, 14 Feb 2019 16:36:55 -0500
 Received: from localhost ([127.0.0.1] helo=nanos.tec.linutronix.de)
         by Galois.linutronix.de with esmtp (Exim 4.80)
         (envelope-from <tglx@linutronix.de>)
-        id 1guOgB-0002C5-6G; Thu, 14 Feb 2019 22:36:23 +0100
-Message-Id: <20190214211759.417990441@linutronix.de>
+        id 1guOgE-0002CE-0s; Thu, 14 Feb 2019 22:36:26 +0100
+Message-Id: <20190214211759.699390983@linutronix.de>
 User-Agent: quilt/0.65
-Date:   Thu, 14 Feb 2019 21:47:56 +0100
+Date:   Thu, 14 Feb 2019 21:47:59 +0100
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
@@ -39,7 +39,7 @@ Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
         Kashyap Desai <kashyap.desai@broadcom.com>,
         Shivasharan Srikanteshwara 
         <shivasharan.srikanteshwara@broadcom.com>
-Subject: [patch V5 1/8] genirq/affinity: Code consolidation
+Subject: [patch V5 4/8] nvme-pci: Simplify interrupt allocation
 References: <20190214204755.819014197@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -48,213 +48,201 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-All information and calculations in the interrupt affinity spreading code
-is strictly unsigned int. Though the code uses int all over the place.
+From: Ming Lei <ming.lei@redhat.com>
 
-Convert it over to unsigned int.
+The NVME PCI driver contains a tedious mechanism for interrupt
+allocation, which is necessary to adjust the number and size of interrupt
+sets to the maximum available number of interrupts which depends on the
+underlying PCI capabilities and the available CPU resources.
 
+It works around the former short comings of the PCI and core interrupt
+allocation mechanims in combination with interrupt sets.
+
+The PCI interrupt allocation function allows to provide a maximum and a
+minimum number of interrupts to be allocated and tries to allocate as
+many as possible. This worked without driver interaction as long as there
+was only a single set of interrupts to handle.
+
+With the addition of support for multiple interrupt sets in the generic
+affinity spreading logic, which is invoked from the PCI interrupt
+allocation, the adaptive loop in the PCI interrupt allocation did not
+work for multiple interrupt sets. The reason is that depending on the
+total number of interrupts which the PCI allocation adaptive loop tries
+to allocate in each step, the number and the size of the interrupt sets
+need to be adapted as well. Due to the way the interrupt sets support was
+implemented there was no way for the PCI interrupt allocation code or the
+core affinity spreading mechanism to invoke a driver specific function
+for adapting the interrupt sets configuration.
+
+As a consequence the driver had to implement another adaptive loop around
+the PCI interrupt allocation function and calling that with maximum and
+minimum interrupts set to the same value. This ensured that the
+allocation either succeeded or immediately failed without any attempt to
+adjust the number of interrupts in the PCI code.
+
+The core code now allows drivers to provide a callback to recalculate the
+number and the size of interrupt sets during PCI interrupt allocation,
+which in turn allows the PCI interrupt allocation function to be called
+in the same way as with a single set of interrupts. The PCI code handles
+the adaptive loop and the interrupt affinity spreading mechanism invokes
+the driver callback to adapt the interrupt set configuration to the
+current loop value. This replaces the adaptive loop in the driver
+completely.
+
+Implement the NVME specific callback which adjusts the interrupt sets
+configuration and remove the adaptive allocation loop.
+
+[ tglx: Simplify the callback further and restore the dropped adjustment of
+  	number of sets ]
+
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
----
- include/linux/interrupt.h |   20 +++++++++-------
- kernel/irq/affinity.c     |   56 ++++++++++++++++++++++------------------------
- 2 files changed, 38 insertions(+), 38 deletions(-)
 
---- a/include/linux/interrupt.h
-+++ b/include/linux/interrupt.h
-@@ -251,10 +251,10 @@ struct irq_affinity_notify {
-  * @sets:		Number of affinitized sets
-  */
- struct irq_affinity {
--	int	pre_vectors;
--	int	post_vectors;
--	int	nr_sets;
--	int	*sets;
-+	unsigned int	pre_vectors;
-+	unsigned int	post_vectors;
-+	unsigned int	nr_sets;
-+	unsigned int	*sets;
- };
- 
- /**
-@@ -314,9 +314,10 @@ extern int
- irq_set_affinity_notifier(unsigned int irq, struct irq_affinity_notify *notify);
- 
- struct irq_affinity_desc *
--irq_create_affinity_masks(int nvec, const struct irq_affinity *affd);
-+irq_create_affinity_masks(unsigned int nvec, const struct irq_affinity *affd);
- 
--int irq_calc_affinity_vectors(int minvec, int maxvec, const struct irq_affinity *affd);
-+unsigned int irq_calc_affinity_vectors(unsigned int minvec, unsigned int maxvec,
-+				       const struct irq_affinity *affd);
- 
- #else /* CONFIG_SMP */
- 
-@@ -350,13 +351,14 @@ irq_set_affinity_notifier(unsigned int i
+---
+ drivers/nvme/host/pci.c |  108 ++++++++++++------------------------------------
+ 1 file changed, 28 insertions(+), 80 deletions(-)
+
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -2041,41 +2041,32 @@ static int nvme_setup_host_mem(struct nv
+ 	return ret;
  }
  
- static inline struct irq_affinity_desc *
--irq_create_affinity_masks(int nvec, const struct irq_affinity *affd)
-+irq_create_affinity_masks(unsigned int nvec, const struct irq_affinity *affd)
+-/* irq_queues covers admin queue */
+-static void nvme_calc_io_queues(struct nvme_dev *dev, unsigned int irq_queues)
++/*
++ * nirqs is the number of interrupts available for write and read
++ * queues. The core already reserved an interrupt for the admin queue.
++ */
++static void nvme_calc_irq_sets(struct irq_affinity *affd, unsigned int nrirqs)
  {
- 	return NULL;
- }
- 
--static inline int
--irq_calc_affinity_vectors(int minvec, int maxvec, const struct irq_affinity *affd)
-+static inline unsigned int
-+irq_calc_affinity_vectors(unsigned int minvec, unsigned int maxvec,
-+			  const struct irq_affinity *affd)
- {
- 	return maxvec;
- }
---- a/kernel/irq/affinity.c
-+++ b/kernel/irq/affinity.c
-@@ -9,7 +9,7 @@
- #include <linux/cpu.h>
- 
- static void irq_spread_init_one(struct cpumask *irqmsk, struct cpumask *nmsk,
--				int cpus_per_vec)
-+				unsigned int cpus_per_vec)
- {
- 	const struct cpumask *siblmsk;
- 	int cpu, sibl;
-@@ -95,15 +95,17 @@ static int get_nodes_in_cpumask(cpumask_
- }
- 
- static int __irq_build_affinity_masks(const struct irq_affinity *affd,
--				      int startvec, int numvecs, int firstvec,
-+				      unsigned int startvec,
-+				      unsigned int numvecs,
-+				      unsigned int firstvec,
- 				      cpumask_var_t *node_to_cpumask,
- 				      const struct cpumask *cpu_mask,
- 				      struct cpumask *nmsk,
- 				      struct irq_affinity_desc *masks)
- {
--	int n, nodes, cpus_per_vec, extra_vecs, done = 0;
--	int last_affv = firstvec + numvecs;
--	int curvec = startvec;
-+	unsigned int n, nodes, cpus_per_vec, extra_vecs, done = 0;
-+	unsigned int last_affv = firstvec + numvecs;
-+	unsigned int curvec = startvec;
- 	nodemask_t nodemsk = NODE_MASK_NONE;
- 
- 	if (!cpumask_weight(cpu_mask))
-@@ -117,18 +119,16 @@ static int __irq_build_affinity_masks(co
- 	 */
- 	if (numvecs <= nodes) {
- 		for_each_node_mask(n, nodemsk) {
--			cpumask_or(&masks[curvec].mask,
--					&masks[curvec].mask,
--					node_to_cpumask[n]);
-+			cpumask_or(&masks[curvec].mask, &masks[curvec].mask,
-+				   node_to_cpumask[n]);
- 			if (++curvec == last_affv)
- 				curvec = firstvec;
- 		}
--		done = numvecs;
--		goto out;
-+		return numvecs;
- 	}
- 
- 	for_each_node_mask(n, nodemsk) {
--		int ncpus, v, vecs_to_assign, vecs_per_node;
-+		unsigned int ncpus, v, vecs_to_assign, vecs_per_node;
- 
- 		/* Spread the vectors per node */
- 		vecs_per_node = (numvecs - (curvec - firstvec)) / nodes;
-@@ -163,8 +163,6 @@ static int __irq_build_affinity_masks(co
- 			curvec = firstvec;
- 		--nodes;
- 	}
+-	unsigned int this_w_queues = write_queues;
 -
--out:
- 	return done;
- }
- 
-@@ -174,13 +172,14 @@ static int __irq_build_affinity_masks(co
-  *	2) spread other possible CPUs on these vectors
-  */
- static int irq_build_affinity_masks(const struct irq_affinity *affd,
--				    int startvec, int numvecs, int firstvec,
-+				    unsigned int startvec, unsigned int numvecs,
-+				    unsigned int firstvec,
- 				    struct irq_affinity_desc *masks)
- {
--	int curvec = startvec, nr_present, nr_others;
--	int ret = -ENOMEM;
--	cpumask_var_t nmsk, npresmsk;
-+	unsigned int curvec = startvec, nr_present, nr_others;
- 	cpumask_var_t *node_to_cpumask;
-+	cpumask_var_t nmsk, npresmsk;
-+	int ret = -ENOMEM;
- 
- 	if (!zalloc_cpumask_var(&nmsk, GFP_KERNEL))
- 		return ret;
-@@ -239,12 +238,10 @@ static int irq_build_affinity_masks(cons
-  * Returns the irq_affinity_desc pointer or NULL if allocation failed.
-  */
- struct irq_affinity_desc *
--irq_create_affinity_masks(int nvecs, const struct irq_affinity *affd)
-+irq_create_affinity_masks(unsigned int nvecs, const struct irq_affinity *affd)
- {
--	int affvecs = nvecs - affd->pre_vectors - affd->post_vectors;
--	int curvec, usedvecs;
-+	unsigned int affvecs, curvec, usedvecs, nr_sets, i;
- 	struct irq_affinity_desc *masks = NULL;
--	int i, nr_sets;
+-	WARN_ON(!irq_queues);
+-
+-	/*
+-	 * Setup read/write queue split, assign admin queue one independent
+-	 * irq vector if irq_queues is > 1.
+-	 */
+-	if (irq_queues <= 2) {
+-		dev->io_queues[HCTX_TYPE_DEFAULT] = 1;
+-		dev->io_queues[HCTX_TYPE_READ] = 0;
+-		return;
+-	}
++	struct nvme_dev *dev = affd->priv;
++	unsigned int nr_read_queues;
  
  	/*
- 	 * If there aren't any vectors left after applying the pre/post
-@@ -264,16 +261,17 @@ irq_create_affinity_masks(int nvecs, con
- 	 * Spread on present CPUs starting from affd->pre_vectors. If we
- 	 * have multiple sets, build each sets affinity mask separately.
- 	 */
-+	affvecs = nvecs - affd->pre_vectors - affd->post_vectors;
- 	nr_sets = affd->nr_sets;
- 	if (!nr_sets)
- 		nr_sets = 1;
- 
- 	for (i = 0, usedvecs = 0; i < nr_sets; i++) {
--		int this_vecs = affd->sets ? affd->sets[i] : affvecs;
-+		unsigned int this_vecs = affd->sets ? affd->sets[i] : affvecs;
- 		int ret;
- 
- 		ret = irq_build_affinity_masks(affd, curvec, this_vecs,
--						curvec, masks);
-+					       curvec, masks);
- 		if (ret) {
- 			kfree(masks);
- 			return NULL;
-@@ -303,17 +301,17 @@ irq_create_affinity_masks(int nvecs, con
-  * @maxvec:	The maximum number of vectors available
-  * @affd:	Description of the affinity requirements
-  */
--int irq_calc_affinity_vectors(int minvec, int maxvec, const struct irq_affinity *affd)
-+unsigned int irq_calc_affinity_vectors(unsigned int minvec, unsigned int maxvec,
-+				       const struct irq_affinity *affd)
- {
--	int resv = affd->pre_vectors + affd->post_vectors;
--	int vecs = maxvec - resv;
--	int set_vecs;
-+	unsigned int resv = affd->pre_vectors + affd->post_vectors;
-+	unsigned int set_vecs;
- 
- 	if (resv > minvec)
- 		return 0;
- 
- 	if (affd->nr_sets) {
--		int i;
-+		unsigned int i;
- 
- 		for (i = 0, set_vecs = 0;  i < affd->nr_sets; i++)
- 			set_vecs += affd->sets[i];
-@@ -323,5 +321,5 @@ int irq_calc_affinity_vectors(int minvec
- 		put_online_cpus();
- 	}
- 
--	return resv + min(set_vecs, vecs);
-+	return resv + min(set_vecs, maxvec - resv);
+-	 * If 'write_queues' is set, ensure it leaves room for at least
+-	 * one read queue and one admin queue
+-	 */
+-	if (this_w_queues >= irq_queues)
+-		this_w_queues = irq_queues - 2;
+-
+-	/*
+-	 * If 'write_queues' is set to zero, reads and writes will share
+-	 * a queue set.
+-	 */
+-	if (!this_w_queues) {
+-		dev->io_queues[HCTX_TYPE_DEFAULT] = irq_queues - 1;
+-		dev->io_queues[HCTX_TYPE_READ] = 0;
+-	} else {
+-		dev->io_queues[HCTX_TYPE_DEFAULT] = this_w_queues;
+-		dev->io_queues[HCTX_TYPE_READ] = irq_queues - this_w_queues - 1;
+-	}
++	 * If only one interrupt is available, combine write and read
++	 * queues. If 'write_queues' is set, ensure it leaves room for at
++	 * least one read queue.
++	 */
++	if (nrirqs == 1)
++		nr_read_queues = 0;
++	else if (write_queues >= nrirqs)
++		nr_read_queues = nrirqs - 1;
++	else
++		nr_read_queues = nrirqs - write_queues;
++
++	dev->io_queues[HCTX_TYPE_DEFAULT] = nrirqs - nr_read_queues;
++	affd->set_size[HCTX_TYPE_DEFAULT] = nrirqs - nr_read_queues;
++	dev->io_queues[HCTX_TYPE_READ] = nr_read_queues;
++	affd->set_size[HCTX_TYPE_READ] = nr_read_queues;
++	affd->nr_sets = nr_read_queues ? 2 : 1;
  }
+ 
+ static int nvme_setup_irqs(struct nvme_dev *dev, unsigned int nr_io_queues)
+@@ -2083,10 +2074,9 @@ static int nvme_setup_irqs(struct nvme_d
+ 	struct pci_dev *pdev = to_pci_dev(dev->dev);
+ 	struct irq_affinity affd = {
+ 		.pre_vectors	= 1,
+-		.nr_sets	= 2,
++		.calc_sets	= nvme_calc_irq_sets,
++		.priv		= dev,
+ 	};
+-	unsigned int *irq_sets = affd.set_size;
+-	int result = 0;
+ 	unsigned int irq_queues, this_p_queues;
+ 
+ 	/*
+@@ -2102,51 +2092,8 @@ static int nvme_setup_irqs(struct nvme_d
+ 	}
+ 	dev->io_queues[HCTX_TYPE_POLL] = this_p_queues;
+ 
+-	/*
+-	 * For irq sets, we have to ask for minvec == maxvec. This passes
+-	 * any reduction back to us, so we can adjust our queue counts and
+-	 * IRQ vector needs.
+-	 */
+-	do {
+-		nvme_calc_io_queues(dev, irq_queues);
+-		irq_sets[0] = dev->io_queues[HCTX_TYPE_DEFAULT];
+-		irq_sets[1] = dev->io_queues[HCTX_TYPE_READ];
+-		if (!irq_sets[1])
+-			affd.nr_sets = 1;
+-
+-		/*
+-		 * If we got a failure and we're down to asking for just
+-		 * 1 + 1 queues, just ask for a single vector. We'll share
+-		 * that between the single IO queue and the admin queue.
+-		 * Otherwise, we assign one independent vector to admin queue.
+-		 */
+-		if (irq_queues > 1)
+-			irq_queues = irq_sets[0] + irq_sets[1] + 1;
+-
+-		result = pci_alloc_irq_vectors_affinity(pdev, irq_queues,
+-				irq_queues,
+-				PCI_IRQ_ALL_TYPES | PCI_IRQ_AFFINITY, &affd);
+-
+-		/*
+-		 * Need to reduce our vec counts. If we get ENOSPC, the
+-		 * platform should support mulitple vecs, we just need
+-		 * to decrease our ask. If we get EINVAL, the platform
+-		 * likely does not. Back down to ask for just one vector.
+-		 */
+-		if (result == -ENOSPC) {
+-			irq_queues--;
+-			if (!irq_queues)
+-				return result;
+-			continue;
+-		} else if (result == -EINVAL) {
+-			irq_queues = 1;
+-			continue;
+-		} else if (result <= 0)
+-			return -EIO;
+-		break;
+-	} while (1);
+-
+-	return result;
++	return pci_alloc_irq_vectors_affinity(pdev, 1, irq_queues,
++			      PCI_IRQ_ALL_TYPES | PCI_IRQ_AFFINITY, &affd);
+ }
+ 
+ static void nvme_disable_io_queues(struct nvme_dev *dev)
+@@ -3021,6 +2968,7 @@ static struct pci_driver nvme_driver = {
+ 
+ static int __init nvme_init(void)
+ {
++	BUILD_BUG_ON(IRQ_AFFINITY_MAX_SETS < 2);
+ 	return pci_register_driver(&nvme_driver);
+ }
+ 
 
 
