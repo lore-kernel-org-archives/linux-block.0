@@ -2,186 +2,206 @@ Return-Path: <SRS0=aLpJ=QW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41005C43381
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 15:49:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 991C4C4360F
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 16:11:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0DA9B222C9
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 15:49:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BECB2192B
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 16:11:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="h9OUIip/"
+	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="UtrI75kJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388265AbfBOPto (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Feb 2019 10:49:44 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:50185 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731152AbfBOPtf (ORCPT
+        id S1730399AbfBOQLg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Feb 2019 11:11:36 -0500
+Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:43284 "EHLO
+        mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726354AbfBOQLe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Feb 2019 10:49:35 -0500
-Received: by mail-it1-f193.google.com with SMTP id z7so25169676iti.0
-        for <linux-block@vger.kernel.org>; Fri, 15 Feb 2019 07:49:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=gxvfq5TL/2HmGfmAumLfCM1Ftb4XqCEsXRfcSZF+1T0=;
-        b=h9OUIip/xw+IU3EFOgAuJ2mEtH+VQuLeB4N2O2e5L27iYvYrtP6ekFwJsYUVSR8Bs1
-         V392XnrQeNAUy7rzEK5X9RjrKX8vmLHjqRiG5HONgjRm2+fOgE6f7wJuvX6QtuzsWOdF
-         MfkNy1spvU8KVAOhzx2gB7lsHkND6yni833wB9wMTVzynMNMNsVhVjpfEHZ2/3qGsz9D
-         rXvPlMf1e6MpwVMTBVf+gHJWXTWyumwVlENzGzRya5qqopY95rsZqVKBmvI+tskX1FeI
-         khsRD7p9S2INbR0YIRanHv6C+VCXUUdEVjlIFSQ4S3sSSa7xj2Un1EU661Qgk61bbUHy
-         K1+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=gxvfq5TL/2HmGfmAumLfCM1Ftb4XqCEsXRfcSZF+1T0=;
-        b=Eh7/BI6QxGd+yyF+MM9lbujG17HLNDoxShn4FU9FDmFceyr2skwEdAJYKcB1wWoaV2
-         oU+df+FSH5BDyC0276tn0cGqhl/KaREuv0uurj1nopOiuBTGpnZVzL9ep7tO44IKYQvz
-         KP++1maaknMuS82acgzzg9c2P1Dxy0FQ3YpSqLq9CNmM92oX6WxTS4AsGMRA9Fo/Wwx7
-         aNG+frAGJZjm6pvSg/TQngVY7OZVpisFE61eguZpVchGjAmu0AgBw8nTmdYU9V8P8fMh
-         YR0jeoE6Heuty7A1FFxASk0+T4lVJd0d0kC5lLu85dqg+dEZnl6CI63b9/+pb195Xi9x
-         5USg==
-X-Gm-Message-State: AHQUAuYWEhv80wPC9f0vb3wOVcOaXSJDZfp6XI8/H/I4MbqsZCEnPIRB
-        nHU0p4bvPsbHtFezuUlPxeIoLw==
-X-Google-Smtp-Source: AHgI3IaV0Q9G5s5V1+OIQRz7sTqwSOWc1UGhJpRZNN56AkN2+6GPnd9+jvWg/bVCGoDtKm+mPdu3Pg==
-X-Received: by 2002:a02:984d:: with SMTP id x13mr4966711jaj.140.1550245774598;
-        Fri, 15 Feb 2019 07:49:34 -0800 (PST)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id w186sm2639569itb.15.2019.02.15.07.49.32
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 15 Feb 2019 07:49:33 -0800 (PST)
-Subject: Re: [PATCH V15 00/18] block: support multi-page bvec
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, Theodore Ts'o <tytso@mit.edu>,
-        Omar Sandoval <osandov@fb.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Dave Chinner <dchinner@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
-        Christoph Hellwig <hch@lst.de>, linux-ext4@vger.kernel.org,
-        Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
-        Boaz Harrosh <ooo@electrozaur.com>,
-        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com
-References: <20190215111324.30129-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <c52b6a8b-d1d4-67ff-f81c-371d09cc6d5b@kernel.dk>
-Date:   Fri, 15 Feb 2019 08:49:31 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
-MIME-Version: 1.0
-In-Reply-To: <20190215111324.30129-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Fri, 15 Feb 2019 11:11:34 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id B4EFBAAD4D;
+        Fri, 15 Feb 2019 17:11:31 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
+        s=20151024; t=1550247091; i=@fjfi.cvut.cz;
+        bh=CcTALm0rCGSrPSEFO5JMjD47CI9IdOjgOYt1TmoowXs=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References;
+        b=UtrI75kJouNKeLvwc0fD76ugOQ74VYMYO6BylPtRovzGBYqeYFQpYml+geZ/93bk4
+         F8/ITY9zlXL/WLkKGbcRgdEduA1/8yinNx7REVqttT7g+teMIqtmsoyuvqpU/Q4IjO
+         9t1w3/l4TIHpbG2AYooL8JkaDC50lMY0BRFl0WgM=
+X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
+Received: from mailgw1.fjfi.cvut.cz ([127.0.0.1])
+        by localhost (mailgw1.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
+        with ESMTP id Ggqqd4EZihJ7; Fri, 15 Feb 2019 17:11:26 +0100 (CET)
+Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 51D87AA26F;
+        Thu, 14 Feb 2019 01:17:10 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 51D87AA26F
+Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
+        id 299926004E; Thu, 14 Feb 2019 01:17:10 +0100 (CET)
+From:   David Kozub <zub@linux.fjfi.cvut.cz>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Jonathan Derrick <jonathan.derrick@intel.com>,
+        Scott Bauer <sbauer@plzdonthack.me>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
+        David Kozub <zub@linux.fjfi.cvut.cz>
+Subject: [PATCH 16/16] block: sed-opal: rename next to execute_steps
+Date:   Thu, 14 Feb 2019 01:16:08 +0100
+Message-Id: <1550103368-4605-17-git-send-email-zub@linux.fjfi.cvut.cz>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1550103368-4605-1-git-send-email-zub@linux.fjfi.cvut.cz>
+References: <1550103368-4605-1-git-send-email-zub@linux.fjfi.cvut.cz>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/15/19 4:13 AM, Ming Lei wrote:
-> Hi,
-> 
-> This patchset brings multi-page bvec into block layer:
-> 
-> 1) what is multi-page bvec?
-> 
-> Multipage bvecs means that one 'struct bio_bvec' can hold multiple pages
-> which are physically contiguous instead of one single page used in linux
-> kernel for long time.
-> 
-> 2) why is multi-page bvec introduced?
-> 
-> Kent proposed the idea[1] first. 
-> 
-> As system's RAM becomes much bigger than before, and huge page, transparent
-> huge page and memory compaction are widely used, it is a bit easy now
-> to see physically contiguous pages from fs in I/O. On the other hand, from
-> block layer's view, it isn't necessary to store intermediate pages into bvec,
-> and it is enough to just store the physicallly contiguous 'segment' in each
-> io vector.
-> 
-> Also huge pages are being brought to filesystem and swap [2][6], we can
-> do IO on a hugepage each time[3], which requires that one bio can transfer
-> at least one huge page one time. Turns out it isn't flexiable to change
-> BIO_MAX_PAGES simply[3][5]. Multipage bvec can fit in this case very well.
-> As we saw, if CONFIG_THP_SWAP is enabled, BIO_MAX_PAGES can be configured
-> as much bigger, such as 512, which requires at least two 4K pages for holding
-> the bvec table.
-> 
-> With multi-page bvec:
-> 
-> - Inside block layer, both bio splitting and sg map can become more
-> efficient than before by just traversing the physically contiguous
-> 'segment' instead of each page.
-> 
-> - segment handling in block layer can be improved much in future since it
-> should be quite easy to convert multipage bvec into segment easily. For
-> example, we might just store segment in each bvec directly in future.
-> 
-> - bio size can be increased and it should improve some high-bandwidth IO
-> case in theory[4].
-> 
-> - there is opportunity in future to improve memory footprint of bvecs. 
-> 
-> 3) how is multi-page bvec implemented in this patchset?
-> 
-> Patch 1 ~ 3 parpares for supporting multi-page bvec. 
-> 
-> Patches 4 ~ 14 implement multipage bvec in block layer:
-> 
-> 	- put all tricks into bvec/bio/rq iterators, and as far as
-> 	drivers and fs use these standard iterators, they are happy
-> 	with multipage bvec
-> 
-> 	- introduce bio_for_each_bvec() to iterate over multipage bvec for splitting
-> 	bio and mapping sg
-> 
-> 	- keep current bio_for_each_segment*() to itereate over singlepage bvec and
-> 	make sure current users won't be broken; especailly, convert to this
-> 	new helper prototype in single patch 21 given it is bascially a mechanism
-> 	conversion
-> 
-> 	- deal with iomap & xfs's sub-pagesize io vec in patch 13
-> 
-> 	- enalbe multipage bvec in patch 14 
-> 
-> Patch 15 redefines BIO_MAX_PAGES as 256.
-> 
-> Patch 16 documents usages of bio iterator helpers.
-> 
-> Patch 17~18 kills NO_SG_MERGE.
-> 
-> These patches can be found in the following git tree:
-> 
-> 	git:  https://github.com/ming1/linux.git  v5.0-blk_mp_bvec_v14
-                                                                   ^^^
+As the function is responsible for executing the individual steps supplied
+in the steps argument, execute_steps is a more descriptive name than the
+rather generic next.
 
-v15?
+Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Jon Derrick <jonathan.derrick@intel.com>
+---
+ block/sed-opal.c | 33 +++++++++++++++++----------------
+ 1 file changed, 17 insertions(+), 16 deletions(-)
 
-> Lots of test(blktest, xfstests, ltp io, ...) have been run with this patchset,
-> and not see regression.
-> 
-> Thanks Christoph for reviewing the early version and providing very good
-> suggestions, such as: introduce bio_init_with_vec_table(), remove another
-> unnecessary helpers for cleanup and so on.
-> 
-> Thanks Chritoph and Omar for reviewing V10/V11/V12, and provides lots of
-> helpful comments.
-
-Applied, thanks Ming. Let's hope it sticks!
-
+diff --git a/block/sed-opal.c b/block/sed-opal.c
+index b947efd6d4d9..b1aa0cc25803 100644
+--- a/block/sed-opal.c
++++ b/block/sed-opal.c
+@@ -396,8 +396,8 @@ static int execute_step(struct opal_dev *dev,
+ 	return error;
+ }
+ 
+-static int next(struct opal_dev *dev, const struct opal_step *steps,
+-		size_t n_steps)
++static int execute_steps(struct opal_dev *dev,
++			 const struct opal_step *steps, size_t n_steps)
+ {
+ 	size_t state = 0;
+ 	int error;
+@@ -1937,7 +1937,7 @@ static int opal_secure_erase_locking_range(struct opal_dev *dev,
+ 
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+-	ret = next(dev, erase_steps, ARRAY_SIZE(erase_steps));
++	ret = execute_steps(dev, erase_steps, ARRAY_SIZE(erase_steps));
+ 	mutex_unlock(&dev->dev_lock);
+ 	return ret;
+ }
+@@ -1954,7 +1954,7 @@ static int opal_erase_locking_range(struct opal_dev *dev,
+ 
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+-	ret = next(dev, erase_steps, ARRAY_SIZE(erase_steps));
++	ret = execute_steps(dev, erase_steps, ARRAY_SIZE(erase_steps));
+ 	mutex_unlock(&dev->dev_lock);
+ 	return ret;
+ }
+@@ -1981,7 +1981,7 @@ static int opal_enable_disable_shadow_mbr(struct opal_dev *dev,
+ 
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+-	ret = next(dev, mbr_steps, ARRAY_SIZE(mbr_steps));
++	ret = execute_steps(dev, mbr_steps, ARRAY_SIZE(mbr_steps));
+ 	mutex_unlock(&dev->dev_lock);
+ 	return ret;
+ }
+@@ -2033,7 +2033,7 @@ static int opal_add_user_to_lr(struct opal_dev *dev,
+ 
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+-	ret = next(dev, steps, ARRAY_SIZE(steps));
++	ret = execute_steps(dev, steps, ARRAY_SIZE(steps));
+ 	mutex_unlock(&dev->dev_lock);
+ 	return ret;
+ }
+@@ -2048,7 +2048,7 @@ static int opal_reverttper(struct opal_dev *dev, struct opal_key *opal)
+ 
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+-	ret = next(dev, revert_steps, ARRAY_SIZE(revert_steps));
++	ret = execute_steps(dev, revert_steps, ARRAY_SIZE(revert_steps));
+ 	mutex_unlock(&dev->dev_lock);
+ 
+ 	/*
+@@ -2076,10 +2076,11 @@ static int __opal_lock_unlock(struct opal_dev *dev,
+ 	};
+ 
+ 	if (lk_unlk->session.sum)
+-		return next(dev, unlock_sum_steps,
+-			    ARRAY_SIZE(unlock_sum_steps));
++		return execute_steps(dev, unlock_sum_steps,
++				     ARRAY_SIZE(unlock_sum_steps));
+ 	else
+-		return next(dev, unlock_steps, ARRAY_SIZE(unlock_steps));
++		return execute_steps(dev, unlock_steps,
++				     ARRAY_SIZE(unlock_steps));
+ }
+ 
+ static int __opal_set_mbr_done(struct opal_dev *dev, struct opal_key *key)
+@@ -2091,7 +2092,7 @@ static int __opal_set_mbr_done(struct opal_dev *dev, struct opal_key *key)
+ 		{ end_opal_session, }
+ 	};
+ 
+-	return next(dev, mbrdone_step, ARRAY_SIZE(mbrdone_step));
++	return execute_steps(dev, mbrdone_step, ARRAY_SIZE(mbrdone_step));
+ }
+ 
+ static int opal_lock_unlock(struct opal_dev *dev,
+@@ -2126,7 +2127,7 @@ static int opal_take_ownership(struct opal_dev *dev, struct opal_key *opal)
+ 
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+-	ret = next(dev, owner_steps, ARRAY_SIZE(owner_steps));
++	ret = execute_steps(dev, owner_steps, ARRAY_SIZE(owner_steps));
+ 	mutex_unlock(&dev->dev_lock);
+ 	return ret;
+ }
+@@ -2147,7 +2148,7 @@ static int opal_activate_lsp(struct opal_dev *dev,
+ 
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+-	ret = next(dev, active_steps, ARRAY_SIZE(active_steps));
++	ret = execute_steps(dev, active_steps, ARRAY_SIZE(active_steps));
+ 	mutex_unlock(&dev->dev_lock);
+ 	return ret;
+ }
+@@ -2164,7 +2165,7 @@ static int opal_setup_locking_range(struct opal_dev *dev,
+ 
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+-	ret = next(dev, lr_steps, ARRAY_SIZE(lr_steps));
++	ret = execute_steps(dev, lr_steps, ARRAY_SIZE(lr_steps));
+ 	mutex_unlock(&dev->dev_lock);
+ 	return ret;
+ }
+@@ -2186,7 +2187,7 @@ static int opal_set_new_pw(struct opal_dev *dev, struct opal_new_pw *opal_pw)
+ 
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+-	ret = next(dev, pw_steps, ARRAY_SIZE(pw_steps));
++	ret = execute_steps(dev, pw_steps, ARRAY_SIZE(pw_steps));
+ 	mutex_unlock(&dev->dev_lock);
+ 	return ret;
+ }
+@@ -2210,7 +2211,7 @@ static int opal_activate_user(struct opal_dev *dev,
+ 
+ 	mutex_lock(&dev->dev_lock);
+ 	setup_opal_dev(dev);
+-	ret = next(dev, act_steps, ARRAY_SIZE(act_steps));
++	ret = execute_steps(dev, act_steps, ARRAY_SIZE(act_steps));
+ 	mutex_unlock(&dev->dev_lock);
+ 	return ret;
+ }
 -- 
-Jens Axboe
+2.20.1
 
