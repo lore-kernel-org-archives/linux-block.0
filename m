@@ -4,46 +4,45 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FC43C43381
-	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 00:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0698C43381
+	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 00:18:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3F33F21920
-	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 00:18:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 618C821920
+	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 00:18:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="GfsS2YJC"
+	dkim=pass (1024-bit key) header.d=fjfi.cvut.cz header.i=@fjfi.cvut.cz header.b="bjGFXv+M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393638AbfBNARy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Feb 2019 19:17:54 -0500
-Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:47642 "EHLO
+        id S2404762AbfBNARC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Feb 2019 19:17:02 -0500
+Received: from mailgw1.fjfi.cvut.cz ([147.32.9.3]:47470 "EHLO
         mailgw1.fjfi.cvut.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727054AbfBNARJ (ORCPT
+        with ESMTP id S1733227AbfBNARB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Feb 2019 19:17:09 -0500
+        Wed, 13 Feb 2019 19:17:01 -0500
 Received: from localhost (localhost [127.0.0.1])
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id 6FD6BAA274;
-        Thu, 14 Feb 2019 01:17:06 +0100 (CET)
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTP id 6FDDAAA25C;
+        Thu, 14 Feb 2019 01:16:58 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fjfi.cvut.cz;
-        s=20151024; t=1550103426; i=@fjfi.cvut.cz;
-        bh=nh5BvuROgH138HfFZ0O9KjzSpFfM22JsrR5RGPXeSLQ=;
+        s=20151024; t=1550103418; i=@fjfi.cvut.cz;
+        bh=oNnRhOYcpTK47QTd2U41Yt5ssNKI/A5yqljLWMIvhTI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References;
-        b=GfsS2YJC52dQgCuCl5WbmJNlzVvjqoxEPylgjwBgnZJUyf7dQ7MW9n0SXNoY2yUHb
-         xlLMZy6qr/+1SQuTdbiEFVVvs5Uh8BbadIi2xQSyqEOSm06sH596H48EWryheZpOfn
-         w/Gi6i5sQFf6LIOdHT0hIjbV6WX4YLco6/MjxH/w=
+        b=bjGFXv+My+TKgFjW+40fpajUBNjyaizEIwSh4K8GOPpnYgZH7RcOCb1W8S48hSpGc
+         inDYl2hlMVX3zTmi4hm8t6CzgBOb8ywXFZZWWD3vQaBE8JKZ9LEIfDGM5UvdpYDXX/
+         9lQLxwnC/P9MvBYdEKtyMqVkXj3FC480UDCOxmlM=
 X-CTU-FNSPE-Virus-Scanned: amavisd-new at fjfi.cvut.cz
 Received: from mailgw1.fjfi.cvut.cz ([127.0.0.1])
         by localhost (mailgw1.fjfi.cvut.cz [127.0.0.1]) (amavisd-new, port 10022)
-        with ESMTP id 3Z8xL7XRNRQq; Thu, 14 Feb 2019 01:16:56 +0100 (CET)
+        with ESMTP id 3RVHAxhH1poI; Thu, 14 Feb 2019 01:16:53 +0100 (CET)
 Received: from linux.fjfi.cvut.cz (linux.fjfi.cvut.cz [147.32.5.111])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id 9B723AA28C;
-        Thu, 14 Feb 2019 01:16:56 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz 9B723AA28C
+        by mailgw1.fjfi.cvut.cz (Postfix) with ESMTPS id C18F9AA26F;
+        Thu, 14 Feb 2019 01:16:51 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailgw1.fjfi.cvut.cz C18F9AA26F
 Received: by linux.fjfi.cvut.cz (Postfix, from userid 1001)
-        id 71A516004E; Thu, 14 Feb 2019 01:16:56 +0100 (CET)
+        id A56126004E; Thu, 14 Feb 2019 01:16:51 +0100 (CET)
 From:   David Kozub <zub@linux.fjfi.cvut.cz>
 To:     Jens Axboe <axboe@kernel.dk>,
         Jonathan Derrick <jonathan.derrick@intel.com>,
@@ -51,9 +50,9 @@ To:     Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>,
         David Kozub <zub@linux.fjfi.cvut.cz>
-Subject: [PATCH 09/16] block: sed-opal: print failed function address
-Date:   Thu, 14 Feb 2019 01:16:01 +0100
-Message-Id: <1550103368-4605-10-git-send-email-zub@linux.fjfi.cvut.cz>
+Subject: [PATCH 07/16] block: sed-opal: unify error handling of responses
+Date:   Thu, 14 Feb 2019 01:15:59 +0100
+Message-Id: <1550103368-4605-8-git-send-email-zub@linux.fjfi.cvut.cz>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1550103368-4605-1-git-send-email-zub@linux.fjfi.cvut.cz>
 References: <1550103368-4605-1-git-send-email-zub@linux.fjfi.cvut.cz>
@@ -62,35 +61,38 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+response_get_{string,u64} include error handling for argument resp being
+NULL but response_get_token does not handle this.
 
-Add function address (and if available its symbol) to the message if a
-step function fails.
+Make all three of response_get_{string,u64,token} handle NULL resp in
+the same way.
 
-Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+Co-authored-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
+Signed-off-by: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
 Reviewed-by: Scott Bauer <sbauer@plzdonthack.me>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Jon Derrick <jonathan.derrick@intel.com
+Reviewed-by: Jon Derrick <jonathan.derrick@intel.com>
 ---
- block/sed-opal.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block/sed-opal.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/block/sed-opal.c b/block/sed-opal.c
-index 5cb8034b53c8..1f246200b574 100644
+index 0348fb896a5d..3f368b14efd9 100644
 --- a/block/sed-opal.c
 +++ b/block/sed-opal.c
-@@ -394,8 +394,8 @@ static int next(struct opal_dev *dev)
+@@ -696,6 +696,11 @@ static const struct opal_resp_tok *response_get_token(
+ {
+ 	const struct opal_resp_tok *tok;
  
- 		error = step->fn(dev, step->data);
- 		if (error) {
--			pr_debug("Error on step function: %d with error %d: %s\n",
--				 state, error,
-+			pr_debug("Step %d (%pS) failed with error %d: %s\n",
-+				 state, step->fn, error,
- 				 opal_error_to_human(error));
- 
- 			/* For each OPAL command we do a discovery0 then we
++	if (!resp) {
++		pr_debug("Response is NULL\n");
++		return ERR_PTR(-EINVAL);
++	}
++
+ 	if (n >= resp->num) {
+ 		pr_debug("Token number doesn't exist: %d, resp: %d\n",
+ 			 n, resp->num);
 -- 
 2.20.1
 
