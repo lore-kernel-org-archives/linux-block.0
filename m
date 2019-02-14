@@ -2,75 +2,120 @@ Return-Path: <SRS0=Oz1R=QV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1918C43381
-	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 19:33:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64DF4C10F04
+	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 20:14:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A0B55222D4
-	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 19:33:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 311A5222A1
+	for <linux-block@archiver.kernel.org>; Thu, 14 Feb 2019 20:14:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1550175286;
+	bh=4gGv1UmLYdG5lQFoHAkvRd+k3yDccrs8esQwELrrZk8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=tw5SaOWF2ZKhjO2z2etg1yuaWdhfmiI3AbHVc6/8lCzY9GVr1XPf5ng8dO+YhUdf+
+	 qRqTy9plQE8hMvfTryQ/GQRdmTUOS7FL9oWtBLJKqfqFINDL77iFGAF+U19SfP0Nzo
+	 UMGZAz3/K/5ZMjpxDu3SDNX1YHHv4qAnAmt2Bmss=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391880AbfBNTdu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Feb 2019 14:33:50 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:40159 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727067AbfBNTdu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Feb 2019 14:33:50 -0500
-Received: by mail-pf1-f194.google.com with SMTP id h1so3588906pfo.7;
-        Thu, 14 Feb 2019 11:33:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=2so8kiOFENLyPAkFgv1ffYpBNdVb7L0+z9Dwof+vfOo=;
-        b=O8xnYIRrQ3tH6qY+rBXYOwOlvd3/pZ/nsvSnU4BuzvV80r6dtiO9bmGZ7+USFPfOVZ
-         osWKc9c5eYUx5jis+WGdVrgw1FcC9wpjm+G1QZqzOYMFYDWMknQLzlqS8Zjt8grwzWku
-         9Sq2KBd9TI4tAOz/pUqDbv98DKf8AnFzspm3SN8MdRGqvVD1pN9Wgs/p5VvFd/PxlSvW
-         1X24j6LqbaJBJHkvOrSyCD93glge/RZElPvvbzE4Kfp5zcPS6470uylad6Sxu9H3vnlF
-         lyN++iV2ZlCiJaNyUaZqdwTAArftzK+5c0PFq11iVPH7eRG49KgCOax1R0xzi6cbE24K
-         0JuQ==
-X-Gm-Message-State: AHQUAuYpgVBVooWMe7irgPangPXEf9bsdJMJKlgsAZnYE+fIUaeAFHOw
-        5E0PS++FMKY5e9yzLBhPQhs=
-X-Google-Smtp-Source: AHgI3IaIbeUWh55fIGeN4DUxMv+KYMjLKJeaaZNr+m/dZ27nIwJ78/AdOJh9ccBkwZqWLEyJYvrh4Q==
-X-Received: by 2002:a63:a:: with SMTP id 10mr1462650pga.121.1550172829716;
-        Thu, 14 Feb 2019 11:33:49 -0800 (PST)
-Received: from ?IPv6:2620:15c:2c1:200:fb9c:664d:d2ad:c9b5? ([2620:15c:2c1:200:fb9c:664d:d2ad:c9b5])
-        by smtp.gmail.com with ESMTPSA id 64sm4371786pff.101.2019.02.14.11.33.48
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 14 Feb 2019 11:33:48 -0800 (PST)
-Message-ID: <1550172827.93548.5.camel@acm.org>
-Subject: Re: KASAN warning in bt_for_each
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Evan Green <evgreen@google.com>,
-        linux-block <linux-block@vger.kernel.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>
-Date:   Thu, 14 Feb 2019 11:33:47 -0800
-In-Reply-To: <CAE=gft4_WiL87FtZnVmZok+oXPjK=GUb5tDUPGQFijddrB0Pbg@mail.gmail.com>
-References: <CAE=gft4_WiL87FtZnVmZok+oXPjK=GUb5tDUPGQFijddrB0Pbg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S2406089AbfBNUOp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Feb 2019 15:14:45 -0500
+Received: from mail.kernel.org ([198.145.29.99]:42342 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2391479AbfBNUOp (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Feb 2019 15:14:45 -0500
+Received: from localhost (unknown [69.71.4.100])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4BA462229F;
+        Thu, 14 Feb 2019 20:14:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1550175283;
+        bh=4gGv1UmLYdG5lQFoHAkvRd+k3yDccrs8esQwELrrZk8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=C/HOcgTuIk3m6J00n4S8kG4dSTXUd/w0s5hOzBdkATuxbJNbSLNAg4Zd+Odqdr6U3
+         mNhBIoGAkHQHTMCoR9v1QLxohcnOjdF1q1dzTBPN4/Vg+zc1mpt0xdi+46QzsWbcLL
+         2ZD/rlyQUhaHvac3cBMznro0JFuQLcqV2YSQR+/k=
+Date:   Thu, 14 Feb 2019 14:14:41 -0600
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org, Keith Busch <keith.busch@intel.com>
+Subject: Re: [PATCH V4 2/4] genirq/affinity: add new callback for caculating
+ interrupt sets size
+Message-ID: <20190214201441.GM96272@google.com>
+References: <20190214122347.17372-1-ming.lei@redhat.com>
+ <20190214122347.17372-3-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190214122347.17372-3-ming.lei@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2019-02-14 at 10:04 -0800, Evan Green wrote:
-+AD4 Greetings, block experts+ACE
-+AD4 
-+AD4 I'm trying to track down a KASAN warning I'm seeing in our downstream
-+AD4 4.19 kernel, and I could use a little help. The warning looks like
-+AD4 this:
-+AD4 
-+AD4 +AFs  224.564894+AF0 BUG: KASAN: use-after-free in bt+AF8-for+AF8-each+-0x1ac/0x28c
-+AD4 +AFs  224.571195+AF0 Read of size 8 at addr ffffffc17c621340 by task fio/3851
-+AD4 +AFs  224.577745+AF0
-+AD4 +AFs  224.579320+AF0 CPU: 2 PID: 3851 Comm: fio Tainted: G W 4.19.16 +ACM-398
+On Thu, Feb 14, 2019 at 08:23:45PM +0800, Ming Lei wrote:
+> The interrupt affinity spreading mechanism supports to spread out
+> affinities for one or more interrupt sets. A interrupt set contains one
+> or more interrupts. Each set is mapped to a specific functionality of a
+> device, e.g. general I/O queues and read I/O queus of multiqueue block
+> devices.
+> 
+> The number of interrupts per set is defined by the driver. It depends on
+> the total number of available interrupts for the device, which is
+> determined by the PCI capabilites and the availability of underlying CPU
+> resources, and the number of queues which the device provides and the
+> driver wants to instantiate.
+> 
+> The driver passes initial configuration for the interrupt allocation via
+> a pointer to struct affinity_desc.
+> 
+> Right now the allocation mechanism is complex as it requires to have a
+> loop in the driver to determine the maximum number of interrupts which
+> are provided by the PCI capabilities and the underlying CPU resources.
+> This loop would have to be replicated in every driver which wants to
+> utilize this mechanism. That's unwanted code duplication and error
+> prone.
+> 
+> In order to move this into generic facilities it is required to have a
+> mechanism, which allows the recalculation of the interrupt sets and
+> their size, in the core code. As the core code does not have any
+> knowledge about the underlying device, a driver specific callback will
+> be added to struct affinity_desc, which will be invoked by the core
+> code. The callback will get the number of available interupts as an
+> argument, so the driver can calculate the corresponding number and size
+> of interrupt sets.
+> 
+> To support this, two modifications for the handling of struct
+> affinity_desc are required:
+> 
+> 1) The (optional) interrupt sets size information is contained in a
+>    separate array of integers and struct affinity_desc contains a
+>    pointer to it.
+> 
+>    This is cumbersome and as the maximum number of interrupt sets is
+>    small, there is no reason to have separate storage. Moving the size
+>    array into struct affinity_desc avoids indirections makes the code
+>    simpler.
+> 
+> 2) At the moment the struct affinity_desc pointer which is handed in from
+>    the driver and passed through to several core functions is marked
+>    'const'.
+> 
+> This patch adds callback to recalculate the number and size of interrupt sets,
+> also removes the 'const' qualifier for 'affd'.
+> 
+> Reviewed-by: Jens Axboe <axboe@kernel.dk>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
 
-Please have a look at this e-mail thread:
-https://lore.kernel.org/linux-block/1545261885.185366.488.camel+AEA-acm.org/
+I know you have something to work out in the affinity.c part of this, but
+I'm fine with the PCI part, so:
 
-Bart.
+Acked-by: Bjorn Helgaas <bhelgaas@google.com>
