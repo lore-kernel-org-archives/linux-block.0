@@ -2,152 +2,107 @@ Return-Path: <SRS0=aLpJ=QW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 201E8C43381
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 18:00:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 016C9C43381
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 18:29:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DD5E321B18
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 18:00:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C821E21920
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 18:29:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="KMz4etZx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j65XApHX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730483AbfBOR7w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Feb 2019 12:59:52 -0500
-Received: from mail-it1-f193.google.com ([209.85.166.193]:54261 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730093AbfBOR7v (ORCPT
+        id S2389819AbfBOS3t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Feb 2019 13:29:49 -0500
+Received: from mail-lj1-f178.google.com ([209.85.208.178]:35288 "EHLO
+        mail-lj1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389822AbfBOS3s (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Feb 2019 12:59:51 -0500
-Received: by mail-it1-f193.google.com with SMTP id x131so24910334itc.3
-        for <linux-block@vger.kernel.org>; Fri, 15 Feb 2019 09:59:50 -0800 (PST)
+        Fri, 15 Feb 2019 13:29:48 -0500
+Received: by mail-lj1-f178.google.com with SMTP id j13-v6so9215124ljc.2
+        for <linux-block@vger.kernel.org>; Fri, 15 Feb 2019 10:29:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=5Bgr0zj2aRmsmq9cmq2G6DDeTRau1JwWNabZdtGLuU8=;
-        b=KMz4etZxSVwp6ToDNVHa3UQ5ONXpp2fqM+/uuzn5Ym9qarUAL9M/eUOGtuee4TIrTa
-         ubCuGgOn1V8Py7fyrabLO5lRu7vcV+IDhbJ94eazYzeqeXYFWWDHttWOw+yQpiBOj1ir
-         dcFjII7LU/kMVttYP0gIeH5c1KoQHRZrKYfh3ZHvud2ojLZ3cx1ncCmK+/ompP2Ucv3z
-         RqAeHx62HuzzzrLZrkkC3mQbaifqXn7tG1FHgrYi/1RPiOdD9nLbTrDqGpbw/i6OLrR2
-         qy9Sj6sSUC5Fsxp86Toe1OSuHZYp1wmedRsen41kvhaIENqfCxh04YY76/7HUgTRKfsH
-         n3YQ==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IZgw9gaO8r8isPNWpoogJg0kwUjlbyWeTSejuDimvhI=;
+        b=j65XApHXiKnEaEFfz6BdSkuXsmD0R637bEfcjuYDx1ivn0JH3KdGBnoqXaEeO4QeUK
+         DuIHdV1Gyam4l3qUOTjAttJk6G0h6yvYJBf/0LXOOmpnAsPNpym53wSmMVvVNHQ82KeJ
+         E9G58HHvXLL2VF2iqORiFYBlJL2I1VFSt4GI1VCvHrOQpRVX40/d3QXQ5OlHctVUpowJ
+         gujMJB4J6U+e2Mepz7Vapr4N4YNSee5B7ocwLkDuDnYq9+Pyj0IBwHHf+A7cX5OgHZ8a
+         c1j1V+F9X3fhNNTjrsGDNwmId/7Ub1kKVQvt78CDkKy0FytaxTPj0FYIh2ltOKfVn9oY
+         b4Zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=5Bgr0zj2aRmsmq9cmq2G6DDeTRau1JwWNabZdtGLuU8=;
-        b=si5iWtTfOHcnMc3jO+15XANP996UGnmS1UCGgIWQluNXOSBKkgo29XHwoJw7UIxkQw
-         rx2spxR8NxigzVoKYCFC8OkvMGTaR0KITujY1gG3tXLoJJlEPx2fb2V53hZU0lG9xu5z
-         CtGXb3h3w98MlBVGZBYnir90TJvEERO93W0XHvwe+XfBNzN5pJcTS+Y64g1YzihSzkM0
-         clxVMWZOFc13YytPbMn7shXoF+14sPte2tPXeZCcNymF3AJ2scpjuMKZ1X1zMo0i4g7J
-         1uJheNbwOmNxzDVgjlDytF5Wz33hvne6XpBNtNH41yiPNc2Ub0wv1yaqexqkz0h88TS0
-         Q8eA==
-X-Gm-Message-State: AHQUAuYhmciFZmed7HcdpL/qngpl79gRFf6lNnByLzjgvAhHnviq5yr5
-        txwqA2hykNI6OkVAxdqxadyzgg==
-X-Google-Smtp-Source: AHgI3IbXlmYdrlCKnom68rsNd9Jn36YbM8bNEMGoKtZXICr/hlZrCiz2ntRDeSi7ie71hr+8xcfK8A==
-X-Received: by 2002:a02:c943:: with SMTP id u3mr5868722jao.96.1550253590448;
-        Fri, 15 Feb 2019 09:59:50 -0800 (PST)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id b25sm2440259iot.10.2019.02.15.09.59.48
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 15 Feb 2019 09:59:49 -0800 (PST)
-Subject: Re: [dm-devel] [PATCH V15 00/18] block: support multi-page bvec
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     Mike Snitzer <snitzer@redhat.com>, linux-mm@kvack.org,
-        dm-devel@redhat.com, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Omar Sandoval <osandov@fb.com>, cluster-devel@redhat.com,
-        linux-ext4@vger.kernel.org,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Boaz Harrosh <ooo@electrozaur.com>,
-        Gao Xiang <gaoxiang25@huawei.com>, Coly Li <colyli@suse.de>,
-        linux-raid@vger.kernel.org, Bob Peterson <rpeterso@redhat.com>,
-        linux-bcache@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Dave Chinner <dchinner@redhat.com>,
-        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
-        Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org
-References: <20190215111324.30129-1-ming.lei@redhat.com>
- <c52b6a8b-d1d4-67ff-f81c-371d09cc6d5b@kernel.dk>
- <1550250855.31902.102.camel@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <18c711a9-ca13-885d-43cd-4d48e683a6a2@kernel.dk>
-Date:   Fri, 15 Feb 2019 10:59:47 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IZgw9gaO8r8isPNWpoogJg0kwUjlbyWeTSejuDimvhI=;
+        b=YLx20nV7rGnKo/mAliuDyNQdHDf1ERHBnnUsjlgBcOqq0/KM3WKplPplBPpKnqKvuK
+         sq0l+jVoS0Y3F1XG4BGOJrVNtpvj5h4I8330GcLJffplBDEqYnLmPDNGhuHrGVCD/rGu
+         2NPj4y/7GsjYnkOstIkCrfO6Zz71HSkugf3M99ldXx9SdF9KZPqJab5l7c0vcp+w2RLY
+         aQXV6fl7cMinidMxXu0DKkZa+zaLFzC1Xyw+PKEnKV6Lu51UZ9oeI1y/xhFMYARsoD38
+         kPQ++NqgQkn5stp1hhuxmLEhiud+g5u+FLwSXUdicmgAWfwGqQPd8MXPHgZ/fjdvRKjB
+         1qwQ==
+X-Gm-Message-State: AHQUAuaBj9GQg6qAzuYHe9iGeFLYjumrON3E75z3q79nXRWpwk3/AnnN
+        5LjxVYQbCHMy09l5lBIdXi1i1ve+p/p44e3F2O6rDA==
+X-Google-Smtp-Source: AHgI3IZFNTIBifg9gsFllh79DurER6AX90Fz0PyXcjAadIfSDiu3Vrdfn97FcuD7UXBW6eIMAC3VHM8B/dTkB+Wkngo=
+X-Received: by 2002:a2e:9f0b:: with SMTP id u11mr6620347ljk.64.1550255385867;
+ Fri, 15 Feb 2019 10:29:45 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <1550250855.31902.102.camel@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <1545261885.185366.488.camel@acm.org> <a45c9931-ce8b-0ac8-f304-412c6042eff9@kernel.dk>
+ <372d2960-ff0c-1135-28f9-23eea8670463@oracle.com> <ccf50ee5-ff34-39a0-d7eb-3853fee55a4c@kernel.dk>
+ <6ae35005-7ba9-91e1-f315-d128f410c12c@kernel.dk> <1545328865.185366.508.camel@acm.org>
+ <bd78b521-d0d4-22ec-ff7f-2d70709ca742@kernel.dk> <b9c3bd7c-9e82-7300-d525-0bd72ed66f66@kernel.dk>
+ <1545339362.185366.511.camel@acm.org> <e7d6d857-b20a-245c-c6c7-fb9b110215e9@kernel.dk>
+ <1545340987.185366.515.camel@acm.org> <120bb59a-af93-7d8c-9afc-7087973632bf@kernel.dk>
+ <1545341470.185366.519.camel@acm.org> <61515137-0565-e3b7-e6de-554af7d49753@kernel.dk>
+ <1545342043.185366.523.camel@acm.org> <60b4819c-4c19-a4e3-41f3-e21b0544c9a4@kernel.dk>
+ <68c73daa-10e7-29da-b890-bf167ec164c2@kernel.dk> <1545344398.185366.531.camel@acm.org>
+ <1864f5b8-cf64-a406-a3e0-9f5124ff95b5@kernel.dk> <a04dee3c-f355-4d28-caa4-21c7265ccae4@kernel.dk>
+ <5869f2ed-dc65-135f-f12f-c14a1184125e@kernel.dk> <71fb9eff-43eb-24aa-fb67-be56a3a97983@kernel.dk>
+ <1550187391.31902.87.camel@acm.org>
+In-Reply-To: <1550187391.31902.87.camel@acm.org>
+From:   Evan Green <evgreen@google.com>
+Date:   Fri, 15 Feb 2019 10:29:09 -0800
+Message-ID: <CAE=gft5H83gC2ay63druSr4sCznrXKvKd=FCTXpx_c2F3Z+icA@mail.gmail.com>
+Subject: Re: v4.20-rc6: Sporadic use-after-free in bt_iter()
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "jianchao.wang" <jianchao.w.wang@oracle.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/15/19 10:14 AM, Bart Van Assche wrote:
-> On Fri, 2019-02-15 at 08:49 -0700, Jens Axboe wrote:
->> On 2/15/19 4:13 AM, Ming Lei wrote:
->>> This patchset brings multi-page bvec into block layer:
->>
->> Applied, thanks Ming. Let's hope it sticks!
-> 
-> Hi Jens and Ming,
-> 
-> Test nvmeof-mp/002 fails with Jens' for-next branch from this morning.
-> I have not yet tried to figure out which patch introduced the failure.
-> Anyway, this is what I see in the kernel log for test nvmeof-mp/002:
-> 
-> [  475.611363] BUG: unable to handle kernel NULL pointer dereference at 0000000000000020
-> [  475.621188] #PF error: [normal kernel read fault]
-> [  475.623148] PGD 0 P4D 0  
-> [  475.624737] Oops: 0000 [#1] PREEMPT SMP KASAN
-> [  475.626628] CPU: 1 PID: 277 Comm: kworker/1:1H Tainted: G    B             5.0.0-rc6-dbg+ #1
-> [  475.630232] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
-> [  475.633855] Workqueue: kblockd blk_mq_requeue_work
-> [  475.635777] RIP: 0010:__blk_recalc_rq_segments+0xbe/0x590
-> [  475.670948] Call Trace:
-> [  475.693515]  blk_recalc_rq_segments+0x2f/0x50
-> [  475.695081]  blk_insert_cloned_request+0xbb/0x1c0
-> [  475.701142]  dm_mq_queue_rq+0x3d1/0x770
-> [  475.707225]  blk_mq_dispatch_rq_list+0x5fc/0xb10
-> [  475.717137]  blk_mq_sched_dispatch_requests+0x256/0x300
-> [  475.721767]  __blk_mq_run_hw_queue+0xd6/0x180
-> [  475.725920]  __blk_mq_delay_run_hw_queue+0x25c/0x290
-> [  475.727480]  blk_mq_run_hw_queue+0x119/0x1b0
-> [  475.732019]  blk_mq_run_hw_queues+0x7b/0xa0
-> [  475.733468]  blk_mq_requeue_work+0x2cb/0x300
-> [  475.736473]  process_one_work+0x4f1/0xa40
-> [  475.739424]  worker_thread+0x67/0x5b0
-> [  475.741751]  kthread+0x1cf/0x1f0
-> [  475.746034]  ret_from_fork+0x24/0x30
-> 
-> (gdb) list *(__blk_recalc_rq_segments+0xbe)
-> 0xffffffff816a152e is in __blk_recalc_rq_segments (block/blk-merge.c:366).
-> 361                                                  struct bio *bio)
-> 362     {
-> 363             struct bio_vec bv, bvprv = { NULL };
-> 364             int prev = 0;
-> 365             unsigned int seg_size, nr_phys_segs;
-> 366             unsigned front_seg_size = bio->bi_seg_front_size;
-> 367             struct bio *fbio, *bbio;
-> 368             struct bvec_iter iter;
-> 369
-> 370             if (!bio)
+Hi Jens,
+I got all turned around while trying to understand this fix, and I'll
+admit it's probably just me. It looks like you're trying to use an rcu
+lock to prevent the iter functions from racing with free. Is that
+true? But then the race at least as I understand it wasn't that there
+was a free in-flight, it's that the free had happened a long time ago,
+and there was still a stale value in tags->rqs[bitnr]. So maybe
+there's some other issue that part is solving?
 
-Just ran a few tests, and it also seems to cause about a 5% regression
-in per-core IOPS throughput. Prior to this work, I could get 1620K 4k
-rand read IOPS out of core, now I'm at ~1535K. The cycler stealer seems
-to be blk_queue_split() and blk_rq_map_sg().
+And then it looks like you added a new struct where tags->rqs was so
+that you could compare hctx->queue without reaching through rq. I have
+no idea if that's sufficient to prevent stale accesses through rq.
+Since you're changing multiple values I think where you populate that
+structure you'd at least need to do something like: clear rq, barrier,
+set hctx, barrier, set rq. But like Bart said, that's probably not the
+right way to go.
 
--- 
-Jens Axboe
+Finally, I didn't really get why the conditional in
+blk_mq_rq_inflight() changed. Is that guarding against some other
+identified problem, or just an additional check you can do when you
+convert rqs into a struct?
 
+It looks like blk_mq_free_rqs() might be the magic function I was
+looking for earlier. Would it be possible to just clear tags[rq->tag]
+for each static_rq? Or is it possible for rqs from one set to end up
+in the tags array of another set? (Which would make what I just
+suggested insufficient).
+-Evan
