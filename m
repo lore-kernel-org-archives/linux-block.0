@@ -2,65 +2,152 @@ Return-Path: <SRS0=aLpJ=QW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51321C43381
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 17:32:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 201E8C43381
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 18:00:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 27EBF21929
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 17:32:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD5E321B18
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 18:00:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="KMz4etZx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727916AbfBORcd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Feb 2019 12:32:33 -0500
-Received: from mga18.intel.com ([134.134.136.126]:45873 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725939AbfBORca (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Feb 2019 12:32:30 -0500
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Feb 2019 09:32:30 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.58,373,1544515200"; 
-   d="scan'208";a="320730347"
-Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
-  by fmsmga005.fm.intel.com with ESMTP; 15 Feb 2019 09:32:29 -0800
-Date:   Fri, 15 Feb 2019 10:32:18 -0700
-From:   Keith Busch <keith.busch@intel.com>
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     Omar Sandoval <osandov@osandov.com>,
-        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [LSF/MM TOPIC] improving storage testing
-Message-ID: <20190215173217.GA11055@localhost.localdomain>
-References: <20190213180754.GX23000@mit.edu>
- <20190214215634.GD9819@vader>
- <20190215030202.GA723@mit.edu>
+        id S1730483AbfBOR7w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Feb 2019 12:59:52 -0500
+Received: from mail-it1-f193.google.com ([209.85.166.193]:54261 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730093AbfBOR7v (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Feb 2019 12:59:51 -0500
+Received: by mail-it1-f193.google.com with SMTP id x131so24910334itc.3
+        for <linux-block@vger.kernel.org>; Fri, 15 Feb 2019 09:59:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=5Bgr0zj2aRmsmq9cmq2G6DDeTRau1JwWNabZdtGLuU8=;
+        b=KMz4etZxSVwp6ToDNVHa3UQ5ONXpp2fqM+/uuzn5Ym9qarUAL9M/eUOGtuee4TIrTa
+         ubCuGgOn1V8Py7fyrabLO5lRu7vcV+IDhbJ94eazYzeqeXYFWWDHttWOw+yQpiBOj1ir
+         dcFjII7LU/kMVttYP0gIeH5c1KoQHRZrKYfh3ZHvud2ojLZ3cx1ncCmK+/ompP2Ucv3z
+         RqAeHx62HuzzzrLZrkkC3mQbaifqXn7tG1FHgrYi/1RPiOdD9nLbTrDqGpbw/i6OLrR2
+         qy9Sj6sSUC5Fsxp86Toe1OSuHZYp1wmedRsen41kvhaIENqfCxh04YY76/7HUgTRKfsH
+         n3YQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5Bgr0zj2aRmsmq9cmq2G6DDeTRau1JwWNabZdtGLuU8=;
+        b=si5iWtTfOHcnMc3jO+15XANP996UGnmS1UCGgIWQluNXOSBKkgo29XHwoJw7UIxkQw
+         rx2spxR8NxigzVoKYCFC8OkvMGTaR0KITujY1gG3tXLoJJlEPx2fb2V53hZU0lG9xu5z
+         CtGXb3h3w98MlBVGZBYnir90TJvEERO93W0XHvwe+XfBNzN5pJcTS+Y64g1YzihSzkM0
+         clxVMWZOFc13YytPbMn7shXoF+14sPte2tPXeZCcNymF3AJ2scpjuMKZ1X1zMo0i4g7J
+         1uJheNbwOmNxzDVgjlDytF5Wz33hvne6XpBNtNH41yiPNc2Ub0wv1yaqexqkz0h88TS0
+         Q8eA==
+X-Gm-Message-State: AHQUAuYhmciFZmed7HcdpL/qngpl79gRFf6lNnByLzjgvAhHnviq5yr5
+        txwqA2hykNI6OkVAxdqxadyzgg==
+X-Google-Smtp-Source: AHgI3IbXlmYdrlCKnom68rsNd9Jn36YbM8bNEMGoKtZXICr/hlZrCiz2ntRDeSi7ie71hr+8xcfK8A==
+X-Received: by 2002:a02:c943:: with SMTP id u3mr5868722jao.96.1550253590448;
+        Fri, 15 Feb 2019 09:59:50 -0800 (PST)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id b25sm2440259iot.10.2019.02.15.09.59.48
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 15 Feb 2019 09:59:49 -0800 (PST)
+Subject: Re: [dm-devel] [PATCH V15 00/18] block: support multi-page bvec
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>
+Cc:     Mike Snitzer <snitzer@redhat.com>, linux-mm@kvack.org,
+        dm-devel@redhat.com, Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Omar Sandoval <osandov@fb.com>, cluster-devel@redhat.com,
+        linux-ext4@vger.kernel.org,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Boaz Harrosh <ooo@electrozaur.com>,
+        Gao Xiang <gaoxiang25@huawei.com>, Coly Li <colyli@suse.de>,
+        linux-raid@vger.kernel.org, Bob Peterson <rpeterso@redhat.com>,
+        linux-bcache@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Dave Chinner <dchinner@redhat.com>,
+        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
+        Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org
+References: <20190215111324.30129-1-ming.lei@redhat.com>
+ <c52b6a8b-d1d4-67ff-f81c-371d09cc6d5b@kernel.dk>
+ <1550250855.31902.102.camel@acm.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <18c711a9-ca13-885d-43cd-4d48e683a6a2@kernel.dk>
+Date:   Fri, 15 Feb 2019 10:59:47 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190215030202.GA723@mit.edu>
-User-Agent: Mutt/1.9.1 (2017-09-22)
+In-Reply-To: <1550250855.31902.102.camel@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 14, 2019 at 10:02:02PM -0500, Theodore Y. Ts'o wrote:
-> > My (undocumented) rule of thumb has been that blktests shouldn't assume
-> > anything newer than whatever ships on Debian oldstable. I can document
-> > that requirement.
+On 2/15/19 10:14 AM, Bart Van Assche wrote:
+> On Fri, 2019-02-15 at 08:49 -0700, Jens Axboe wrote:
+>> On 2/15/19 4:13 AM, Ming Lei wrote:
+>>> This patchset brings multi-page bvec into block layer:
+>>
+>> Applied, thanks Ming. Let's hope it sticks!
 > 
-> That's definitely not true for the nvme tests; the nvme-cli from
-> Debian stable is *not* sufficient.  This is why I've started building
-> nvme-cli as part of the test appliance in xfstests-bld.  I'm now
-> somewhat suspicious that there are problems because using the latest
-> HEAD of the nvme-cli git tree may have had messages printed to
-> standard out that is subtly different from the version of nvme-cli
-> that was used to develop some of the nvme tests.
+> Hi Jens and Ming,
+> 
+> Test nvmeof-mp/002 fails with Jens' for-next branch from this morning.
+> I have not yet tried to figure out which patch introduced the failure.
+> Anyway, this is what I see in the kernel log for test nvmeof-mp/002:
+> 
+> [  475.611363] BUG: unable to handle kernel NULL pointer dereference at 0000000000000020
+> [  475.621188] #PF error: [normal kernel read fault]
+> [  475.623148] PGD 0 P4D 0  
+> [  475.624737] Oops: 0000 [#1] PREEMPT SMP KASAN
+> [  475.626628] CPU: 1 PID: 277 Comm: kworker/1:1H Tainted: G    B             5.0.0-rc6-dbg+ #1
+> [  475.630232] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+> [  475.633855] Workqueue: kblockd blk_mq_requeue_work
+> [  475.635777] RIP: 0010:__blk_recalc_rq_segments+0xbe/0x590
+> [  475.670948] Call Trace:
+> [  475.693515]  blk_recalc_rq_segments+0x2f/0x50
+> [  475.695081]  blk_insert_cloned_request+0xbb/0x1c0
+> [  475.701142]  dm_mq_queue_rq+0x3d1/0x770
+> [  475.707225]  blk_mq_dispatch_rq_list+0x5fc/0xb10
+> [  475.717137]  blk_mq_sched_dispatch_requests+0x256/0x300
+> [  475.721767]  __blk_mq_run_hw_queue+0xd6/0x180
+> [  475.725920]  __blk_mq_delay_run_hw_queue+0x25c/0x290
+> [  475.727480]  blk_mq_run_hw_queue+0x119/0x1b0
+> [  475.732019]  blk_mq_run_hw_queues+0x7b/0xa0
+> [  475.733468]  blk_mq_requeue_work+0x2cb/0x300
+> [  475.736473]  process_one_work+0x4f1/0xa40
+> [  475.739424]  worker_thread+0x67/0x5b0
+> [  475.741751]  kthread+0x1cf/0x1f0
+> [  475.746034]  ret_from_fork+0x24/0x30
+> 
+> (gdb) list *(__blk_recalc_rq_segments+0xbe)
+> 0xffffffff816a152e is in __blk_recalc_rq_segments (block/blk-merge.c:366).
+> 361                                                  struct bio *bio)
+> 362     {
+> 363             struct bio_vec bv, bvprv = { NULL };
+> 364             int prev = 0;
+> 365             unsigned int seg_size, nr_phys_segs;
+> 366             unsigned front_seg_size = bio->bi_seg_front_size;
+> 367             struct bio *fbio, *bbio;
+> 368             struct bvec_iter iter;
+> 369
+> 370             if (!bio)
 
-It does appear some expected output has hard coded values that are not
-fixed. Some of the failures are assuming an auto-incrementing generation
-number will always be 1, but that should just be a wildcard match.
+Just ran a few tests, and it also seems to cause about a 5% regression
+in per-core IOPS throughput. Prior to this work, I could get 1620K 4k
+rand read IOPS out of core, now I'm at ~1535K. The cycler stealer seems
+to be blk_queue_split() and blk_rq_map_sg().
+
+-- 
+Jens Axboe
+
