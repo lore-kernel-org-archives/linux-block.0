@@ -2,125 +2,187 @@ Return-Path: <SRS0=aLpJ=QW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 319E9C43381
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 07:53:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5309AC43381
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 09:25:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 07952222DB
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 07:53:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28FDB20838
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 09:24:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726908AbfBOHxA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Feb 2019 02:53:00 -0500
-Received: from mx2.suse.de ([195.135.220.15]:54380 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726634AbfBOHxA (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Feb 2019 02:53:00 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 0144BAF61;
-        Fri, 15 Feb 2019 07:52:57 +0000 (UTC)
-Subject: Re: [LSF/MM TOPIC] improving storage testing
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
-References: <20190213180754.GX23000@mit.edu>
- <20190214105507.GA9739@linux-x5ow.site> <1550186783.31902.81.camel@acm.org>
- <BYAPR04MB4502D20C28D486AB49CFAE0A86600@BYAPR04MB4502.namprd04.prod.outlook.com>
-From:   Johannes Thumshirn <jthumshirn@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
- xsFNBFTTwPEBEADOadCyru0ZmVLaBn620Lq6WhXUlVhtvZF5r1JrbYaBROp8ZpiaOc9YpkN3
- rXTgBx+UoDGtnz9DZnIa9fwxkcby63igMPFJEYpwt9adN6bA1DiKKBqbaV5ZbDXR1tRrSvCl
- 2V4IgvgVuO0ZJEt7gakOQlqjQaOvIzDnMIi/abKLSSzYAThsOUf6qBEn2G46r886Mk8MwkJN
- hilcQ7F5UsKfcVVGrTBoim6j69Ve6EztSXOXjFgsoBw4pEhWuBQCkDWPzxkkQof1WfkLAVJ2
- X9McVokrRXeuu3mmB+ltamYcZ/DtvBRy8K6ViAgGyNRWmLTNWdJj19Qgw9Ef+Q9O5rwfbPZy
- SHS2PVE9dEaciS+EJkFQ3/TBRMP1bGeNbZUgrMwWOvt37yguvrCOglbHW+a8/G+L7vz0hasm
- OpvD9+kyTOHjqkknVJL69BOJeCIVUtSjT9EXaAOkqw3EyNJzzhdaMXcOPwvTXNkd8rQZIHft
- SPg47zMp2SJtVdYrA6YgLv7OMMhXhNkUsvhU0HZWUhcXZnj+F9NmDnuccarez9FmLijRUNgL
- 6iU+oypB/jaBkO6XLLwo2tf7CYmBYMmvXpygyL8/wt+SIciNiM34Yc+WIx4xv5nDVzG1n09b
- +iXDTYoWH82Dq1xBSVm0gxlNQRUGMmsX1dCbCS2wmWbEJJDEeQARAQABzSdKb2hhbm5lcyBU
- aHVtc2hpcm4gPGp0aHVtc2hpcm5Ac3VzZS5kZT7CwYAEEwEIACoCGwMFCwkIBwIGFQgJCgsC
- BBYCAwECHgECF4AFCQo9ta8FAlohZmoCGQEACgkQA5OWnS12CFATLQ//ajhNDVJLK9bjjiOH
- 53B0+hCrRBj5jQiT8I60+4w+hssvRHWkgsujF+V51jcmX3NOXeSyLC1Gk43A9vCz5gXnqyqG
- tOlYm26bihzG02eAoWr/glHBQyy7RYcd97SuRSv77WzuXT3mCnM15TKiqXYNzRCK7u5nx4eu
- szAU+AoXAC/y1gtuDMvANBEuHWE4LNQLkTwJshU1vwoNcTSl+JuQWe89GB8eeeMnHuY92T6A
- ActzHN14R1SRD/51N9sebAxGVZntXzSVKyMID6eGdNegWrz4q55H56ZrOMQ6IIaa7KSz3QSj
- 3E8VIY4FawfjCSOuA2joemnXH1a1cJtuqbDPZrO2TUZlNGrO2TRi9e2nIzouShc5EdwmL6qt
- WG5nbGajkm1wCNb6t4v9ueYMPkHsr6xJorFZHlu7PKqB6YY3hRC8dMcCDSLkOPWf+iZrqtpE
- odFBlnYNfmAXp+1ynhUvaeH6eSOqCN3jvQbITUo8mMQsdVgVeJwRdeAOFhP7fsxNugii721U
- acNVDPpEz4QyxfZtfu9QGI405j9MXF/CPrHlNLD5ZM5k9NxnmIdCM9i1ii4nmWvmz9JdVJ+8
- 6LkxauROr2apgTXxMnJ3Desp+IRWaFvTVhbwfxmwC5F3Kr0ouhr5Kt8jkQeD/vuqYuxOAyDI
- egjo3Y7OGqct+5nybmbOwU0EVNPA8QEQAN/79cFVNpC+8rmudnXGbob9sk0J99qnwM2tw33v
- uvQjEGAJTVCOHrewDbHmqZ5V1X1LI9cMlLUNMR3W0+L04+MH8s/JxshFST+hOaijGc81AN2P
- NrAQD7IKpA78Q2F3I6gpbMzyMy0DxmoKF73IAMQIknrhzn37DgM+x4jQgkvhFMqnnZ/xIQ9d
- QEBKDtfxH78QPosDqCzsN9HRArC75TiKTKOxC12ZRNFZfEPnmqJ260oImtmoD/L8QiBsdA4m
- Mdkmo6Pq6iAhbGQ5phmhUVuj+7O8rTpGRXySMLZ44BimM8yHWTaiLWxCehHgfUWRNLwFbrd+
- nYJYHoqyFGueZFBNxY4bS2rIEDg+nSKiAwJv3DUJDDd/QJpikB5HIjg/5kcSm7laqfbr1pmC
- ZbR2JCTp4FTABVLxt7pJP40SuLx5He63aA/VyxoInLcZPBNvVfq/3v3fkoILphi77ZfTvKrl
- RkDdH6PkFOFpnrctdTWbIFAYfU96VvySFAOOg5fsCeLv9/zD4dQEGsvva/qKZXkH/l2LeVp3
- xEXoFsUZtajPZgyRBxer0nVWRyeVwUQnLG8kjEOcZzX27GUpughi8w42p4oMD+96tr3BKTAr
- guRHJnU1M1xwRPbw5UsNXEOgYsFc8cdto0X7hQ2Ugc07CRSDvyH50IKXf2++znOTXFDhABEB
- AAHCwV8EGAECAAkFAlTTwPECGwwACgkQA5OWnS12CFAdRg//ZGV0voLRjjgX9ODzaz6LP+IP
- /ebGLXe3I+QXz8DaTkG45evOu6B2J53IM8t1xEug0OnfnTo1z0AFg5vU53L24LAdpi12CarV
- Da53WvHzG4BzCVGOGrAvJnMvUXf0/aEm0Sen2Mvf5kvOwsr9UTHJ8N/ucEKSXAXf+KZLYJbL
- NL4LbOFP+ywxtjV+SgLpDgRotM43yCRbONUXEML64SJ2ST+uNzvilhEQT/mlDP7cY259QDk7
- 1K6B+/ACE3Dn7X0/kp8a+ZoNjUJZkQQY4JyMOkITD6+CJ1YsxhX+/few9k5uVrwK/Cw+Vmae
- A85gYfFn+OlLFO/6RGjMAKOsdtPFMltNOZoT+YjgAcW6Q9qGgtVYKcVOxusL8C3v8PAYf7Ul
- Su7c+/Ayr3YV9Sp8PH4X4jK/zk3+DDY1/ASE94c95DW1lpOcyx3n1TwQbwp6TzPMRe1IkkYe
- 0lYj9ZgKaZ8hEmzuhg6FKXk9Dah+H73LdV57M4OFN8Xwb7v+oEG23vdsb2KBVG5K6Tv7Hb2N
- sfHWRdU3quYIistrNWWeGmfTlhVLgDhEmAsKZFH05QsAv3pQv7dH/JD+Tbn6sSnNAVrATff1
- AD3dXmt+5d3qYuUxam1UFGufGzV7jqG5QNStp0yvLP0xroB8y0CnnX2FY6bAVCU+CqKu+n1B
- LGlgwABHRtLCwe0EGAEIACAWIQTsOJyrwsTyXYYA0NADk5adLXYIUAUCWsTXAwIbAgCBCRAD
- k5adLXYIUHYgBBkWCAAdFiEEx1U9vxg1xAeUwus20p7yIq+KHe4FAlrE1wMACgkQ0p7yIq+K
- He6RfAEA+frSSvrHiuatNqvgYAJcraYhp1GQJrWSWMmi2eFcGskBAJyLp47etEn3xhJBLVVh
- 2y2K4Nobb6ZgxA4Svfnkf7AAdicQALiaOKDwKD3tgf90ypEoummYzAxv8MxyPXZ7ylRnkheA
- eQDxuoc/YwMA4qyxhzf6K4tD/aT12XJd95gk+YAL6flGkJD8rA3jsEucPmo5eko4Ms2rOEdG
- jKsZetkdPKGBd2qVxxyZgzUkgRXduvyux04b9erEpJmoIXs/lE0IRbL9A9rJ6ASjFPGpXYrb
- 73pb6Dtkdpvv+hoe4cKeae4dS0AnDc7LWSW3Ub0n61uk/rqpTmKuesmTZeB2GHzLN5GAXfNj
- ELHAeSVfFLPRFrjF5jjKJkpiyq98+oUnvTtDIPMTg05wSN2JtwKnoQ0TAIHWhiF6coGeEfY8
- ikdVLSZDEjW54Td5aIXWCRTBWa6Zqz/G6oESF+Lchu/lDv5+nuN04KZRAwCpXLS++/givJWo
- M9FMnQSvt4N95dVQE3kDsasl960ct8OzxaxuevW0OV/jQEd9gH50RaFif412DTrsuaPsBz6O
- l2t2TyTuHm7wVUY2J3gJYgG723/PUGW4LaoqNrYQUr/rqo6NXw6c+EglRpm1BdpkwPwAng63
- W5VOQMdnozD2RsDM5GfA4aEFi5m00tE+8XPICCtkduyWw+Z+zIqYk2v+zraPLs9Gs0X2C7X0
- yvqY9voUoJjG6skkOToGZbqtMX9K4GOv9JAxVs075QRXL3brHtHONDt6udYobzz+
-Message-ID: <d65a562b-b7ef-6342-8cc6-e5ef42c503f3@suse.de>
-Date:   Fri, 15 Feb 2019 08:52:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.0
-MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB4502D20C28D486AB49CFAE0A86600@BYAPR04MB4502.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S1727361AbfBOJYy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Feb 2019 04:24:54 -0500
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:56804 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726473AbfBOJYy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Feb 2019 04:24:54 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 62187A78;
+        Fri, 15 Feb 2019 01:24:53 -0800 (PST)
+Received: from big-swifty.misterjones.org (usa-sjc-mx-foss1.foss.arm.com [217.140.101.70])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5EB043F557;
+        Fri, 15 Feb 2019 01:24:46 -0800 (PST)
+Date:   Fri, 15 Feb 2019 09:24:36 +0000
+Message-ID: <868syhs8tn.wl-marc.zyngier@arm.com>
+From:   Marc Zyngier <marc.zyngier@arm.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        <linux-nvme@lists.infradead.org>, <linux-pci@vger.kernel.org>,
+        Keith Busch <keith.busch@intel.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>
+Subject: Re: [patch V5 4/8] nvme-pci: Simplify interrupt allocation
+In-Reply-To: <20190214211759.699390983@linutronix.de>
+References: <20190214204755.819014197@linutronix.de>
+        <20190214211759.699390983@linutronix.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 EasyPG/1.0.0 Emacs/25.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+Organization: ARM Ltd
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 15/02/2019 03:52, Chaitanya Kulkarni wrote:
-> Hi, Bart
+On Thu, 14 Feb 2019 20:47:59 +0000,
+Thomas Gleixner <tglx@linutronix.de> wrote:
 > 
-> In this way, we may end up modifying probably most of the common tools,
-> which in long run can create a bunch of the code for the tests. If everyone
-> (test contributors and tools maintainers) agrees to have such a "test" mode
-> to all the tools, we can go for this approach.
+> From: Ming Lei <ming.lei@redhat.com>
+> 
+> The NVME PCI driver contains a tedious mechanism for interrupt
+> allocation, which is necessary to adjust the number and size of interrupt
+> sets to the maximum available number of interrupts which depends on the
+> underlying PCI capabilities and the available CPU resources.
+> 
+> It works around the former short comings of the PCI and core interrupt
+> allocation mechanims in combination with interrupt sets.
+> 
+> The PCI interrupt allocation function allows to provide a maximum and a
+> minimum number of interrupts to be allocated and tries to allocate as
+> many as possible. This worked without driver interaction as long as there
+> was only a single set of interrupts to handle.
+> 
+> With the addition of support for multiple interrupt sets in the generic
+> affinity spreading logic, which is invoked from the PCI interrupt
+> allocation, the adaptive loop in the PCI interrupt allocation did not
+> work for multiple interrupt sets. The reason is that depending on the
+> total number of interrupts which the PCI allocation adaptive loop tries
+> to allocate in each step, the number and the size of the interrupt sets
+> need to be adapted as well. Due to the way the interrupt sets support was
+> implemented there was no way for the PCI interrupt allocation code or the
+> core affinity spreading mechanism to invoke a driver specific function
+> for adapting the interrupt sets configuration.
+> 
+> As a consequence the driver had to implement another adaptive loop around
+> the PCI interrupt allocation function and calling that with maximum and
+> minimum interrupts set to the same value. This ensured that the
+> allocation either succeeded or immediately failed without any attempt to
+> adjust the number of interrupts in the PCI code.
+> 
+> The core code now allows drivers to provide a callback to recalculate the
+> number and the size of interrupt sets during PCI interrupt allocation,
+> which in turn allows the PCI interrupt allocation function to be called
+> in the same way as with a single set of interrupts. The PCI code handles
+> the adaptive loop and the interrupt affinity spreading mechanism invokes
+> the driver callback to adapt the interrupt set configuration to the
+> current loop value. This replaces the adaptive loop in the driver
+> completely.
+> 
+> Implement the NVME specific callback which adjusts the interrupt sets
+> configuration and remove the adaptive allocation loop.
+> 
+> [ tglx: Simplify the callback further and restore the dropped adjustment of
+>   	number of sets ]
+> 
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> 
+> ---
+>  drivers/nvme/host/pci.c |  108 ++++++++++++------------------------------------
+>  1 file changed, 28 insertions(+), 80 deletions(-)
+> 
+> --- a/drivers/nvme/host/pci.c
+> +++ b/drivers/nvme/host/pci.c
+> @@ -2041,41 +2041,32 @@ static int nvme_setup_host_mem(struct nv
+>  	return ret;
+>  }
+>  
+> -/* irq_queues covers admin queue */
+> -static void nvme_calc_io_queues(struct nvme_dev *dev, unsigned int irq_queues)
+> +/*
+> + * nirqs is the number of interrupts available for write and read
+> + * queues. The core already reserved an interrupt for the admin queue.
+> + */
+> +static void nvme_calc_irq_sets(struct irq_affinity *affd, unsigned int nrirqs)
+>  {
+> -	unsigned int this_w_queues = write_queues;
+> -
+> -	WARN_ON(!irq_queues);
+> -
+> -	/*
+> -	 * Setup read/write queue split, assign admin queue one independent
+> -	 * irq vector if irq_queues is > 1.
+> -	 */
+> -	if (irq_queues <= 2) {
+> -		dev->io_queues[HCTX_TYPE_DEFAULT] = 1;
+> -		dev->io_queues[HCTX_TYPE_READ] = 0;
+> -		return;
+> -	}
+> +	struct nvme_dev *dev = affd->priv;
+> +	unsigned int nr_read_queues;
+>  
+>  	/*
+> -	 * If 'write_queues' is set, ensure it leaves room for at least
+> -	 * one read queue and one admin queue
+> -	 */
+> -	if (this_w_queues >= irq_queues)
+> -		this_w_queues = irq_queues - 2;
+> -
+> -	/*
+> -	 * If 'write_queues' is set to zero, reads and writes will share
+> -	 * a queue set.
+> -	 */
+> -	if (!this_w_queues) {
+> -		dev->io_queues[HCTX_TYPE_DEFAULT] = irq_queues - 1;
+> -		dev->io_queues[HCTX_TYPE_READ] = 0;
+> -	} else {
+> -		dev->io_queues[HCTX_TYPE_DEFAULT] = this_w_queues;
+> -		dev->io_queues[HCTX_TYPE_READ] = irq_queues - this_w_queues - 1;
+> -	}
+> +	 * If only one interrupt is available, combine write and read
+> +	 * queues. If 'write_queues' is set, ensure it leaves room for at
+> +	 * least one read queue.
 
-I think going the path similar to xfstests and adding filter functions
-to normalize the output in blktests is way less of a hassle than
-changing every possible tool we might want to use to have a "test" mode.
+[Full disclaimer: I only have had two coffees this morning, and it is
+only at the fourth that my brain is able to kick in...]
 
-Just my two cents,
-	Johannes
+I don't know much about NVME, but I feel like there is a small
+disconnect between the code and the above comment, which says "leave
+room for at least one read queue"...
+
+> +	 */
+> +	if (nrirqs == 1)
+> +		nr_read_queues = 0;
+> +	else if (write_queues >= nrirqs)
+> +		nr_read_queues = nrirqs - 1;
+
+... while this seem to ensure that we carve out one write queue out of
+the irq set. It looks like a departure from the original code, which
+would set nr_read_queues to 1 in that particular case.
+
+Thanks,
+
+	M.
+
 -- 
-Johannes Thumshirn                            SUSE Labs Filesystems
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Jazz is not dead, it just smell funny.
