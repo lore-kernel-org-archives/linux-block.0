@@ -2,120 +2,78 @@ Return-Path: <SRS0=aLpJ=QW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE3DC43381
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 16:56:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AE69C43381
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 16:59:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3A1C121924
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 16:56:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="SYQTSfbO"
+	by mail.kernel.org (Postfix) with ESMTP id 6261721924
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 16:59:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729511AbfBOQ4U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Feb 2019 11:56:20 -0500
-Received: from mail-it1-f194.google.com ([209.85.166.194]:37520 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726122AbfBOQ4U (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Feb 2019 11:56:20 -0500
-Received: by mail-it1-f194.google.com with SMTP id l131so24824383ita.2
-        for <linux-block@vger.kernel.org>; Fri, 15 Feb 2019 08:56:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=ktUX7cnfJ5X7FqehWvoFu3xkgtiA493aShJ+L34ifnA=;
-        b=SYQTSfbOd3AxRHdwiNARGgE3hoG4Fglp4wBFAIG2BfHIRcezAc5jVma67yOGqIId+v
-         V9Sm3AIqi0f1F6LRVzi4PuFKIluNtMaYQ99lt4J+61eKJgnWQvFzT9efnCZO76BPDbLW
-         vCHE0Ok1v9HmPkTE1mOO52kelNJrVCocgGvSet7+WCrJl62QTygtsTI7sML/AoV9BK0P
-         Pd3JP51PHeV2OCwo2u2v2lLMG1J33xkNPrR6SKX8kPjL/4kp7z0u9bRVUme12rNxDt//
-         WcNF2XwrsS+jtMPJaWVnEhl7ukAE3x3yARWql6aQ2JJJgxaOfatFD6rXop1CinXvN36s
-         K0Fw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=ktUX7cnfJ5X7FqehWvoFu3xkgtiA493aShJ+L34ifnA=;
-        b=I+bvHyXkhLm2eryLF0rrlpsjcCz8Y/sEHch3M011MnjNxq7Gvoe3vJhRK+85jWDq3H
-         BFNDSxjrMZ02kQPwvSONPWwTp3aLe7zzqy5qKRm0mdnTBgwNYcChIOQNOs5+bk99Jwli
-         S6aDWF/Rp8NK9GOAHEWzjpAjVRvNut3NNe96BSBfFhFJfs1WyjeFGHoOYi57R1ahoDQD
-         wRo7eRdRhAErSiFYvN4O2sjRvLN716Hh6XqmnJPUS4Nq8ubXi7U46oNis1+fasbh9o4V
-         vDZ2OoQn++AGc+92AR73KcHeMEs40/gzA4ohle23sNdy9pMw6ZeKI9x+VU7THN9d7t69
-         aV+g==
-X-Gm-Message-State: AHQUAuY8LXxZvFBH6Q76JK5AwORuaEuKUl/vEULGYbFcy48ESBBu5rnB
-        PCXX9Q6deBMPQkMJze81ZI7JlUDgyaYGcQ==
-X-Google-Smtp-Source: AHgI3IY/ssw33kDFCjAx9HL5Vj2NURqLZspSBt+Fcvh4s+VShsAZibbByYIbJqMNz2NTbED4vQyxxQ==
-X-Received: by 2002:a5e:9b0b:: with SMTP id j11mr2029989iok.65.1550249778840;
-        Fri, 15 Feb 2019 08:56:18 -0800 (PST)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id o19sm2790650itb.37.2019.02.15.08.56.17
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 15 Feb 2019 08:56:17 -0800 (PST)
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.0-rc7
-Message-ID: <c74b7382-dbe3-ecc9-17fe-b0e6e3b32b26@kernel.dk>
-Date:   Fri, 15 Feb 2019 09:56:16 -0700
+        id S1726321AbfBOQ7v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Feb 2019 11:59:51 -0500
+Received: from mx2.cyber.ee ([193.40.6.72]:57832 "EHLO mx2.cyber.ee"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726122AbfBOQ7v (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Feb 2019 11:59:51 -0500
+Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
+To:     linux-alpha@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>
+References: <fb63a4d0-d124-21c8-7395-90b34b57c85a@linux.ee>
+ <1c26eab4-3277-9066-5dce-6734ca9abb96@linux.ee>
+From:   Meelis Roos <mroos@linux.ee>
+Message-ID: <076b8b72-fab0-ea98-f32f-f48949585f9d@linux.ee>
+Date:   Fri, 15 Feb 2019 18:59:48 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <1c26eab4-3277-9066-5dce-6734ca9abb96@linux.ee>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: et-EE
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+>> I have noticed ext4 filesystem corruption on two of my test alphas with 4.20.0-09062-gd8372ba8ce28.
+> 
+> Retried it, still happens with 5.0.0-rc5-00358-gdf3865f8f568 - rsync of emerge --sync just fail with nothing in dmesg.
 
-Small collection of fixes that should go into this series. This pull
-request contains:
+Finished second round of bisecting, first round did not get me far enough so
+I may still have false "goods" in my bisection history.
 
-- Ensure we insert into the hctx dispatch list, if a request is marked
-  as DONTPREP (Jianchao)
+The command I used for bisecting was Gentoos
+emerge --sync.
+that sometimes failed from error -6 or -11 from rsync.
+Usually the file system corruption did not happen and nothing was in dmesg, just file IO error from rsync.
 
-- NVMe pull request, single missing unlock on error fix (Keith)
+The result of the bisection is
+[88dbcbb3a4847f5e6dfeae952d3105497700c128] blkdev: avoid migration stalls for blkdev pages
 
-- MD pull request, single fix for a potentially data corrupting issue
-  (Nate)
+Is that result relevant for the problem or should I continue bisecting between 4.20.0 and the so far first bad commit?
 
-- Floppy check_events regression fix (Yufen)
-
-Please pull!
-
-
-  git://git.kernel.dk/linux-block.git tags/for-linus-20190215
-
-
-----------------------------------------------------------------
-Jens Axboe (2):
-      Merge branch 'md-fixes' of https://github.com/liu-song-6/linux into for-linus
-      Merge branch 'nvme-5.0' of git://git.infradead.org/nvme into for-linus
-
-Jianchao Wang (1):
-      blk-mq: insert rq with DONTPREP to hctx dispatch list when requeue
-
-Keith Busch (1):
-      nvme-pci: add missing unlock for reset error
-
-Nate Dailey (1):
-      md/raid1: don't clear bitmap bits on interrupted recovery.
-
-Yufen Yu (1):
-      floppy: check_events callback should not return a negative number
-
- block/blk-mq.c          | 12 ++++++++++--
- drivers/block/floppy.c  |  2 +-
- drivers/md/raid1.c      | 28 ++++++++++++++++++----------
- drivers/nvme/host/pci.c |  8 +++++---
- 4 files changed, 34 insertions(+), 16 deletions(-)
+>> On AlphaServer DS10:
+>> [10749.664418] EXT4-fs error (device sda2): __ext4_iget:5052: inode #1853093: block 1: comm rsync: invalid block
+>>
+>> On AlphaServer DS10L:
+>> [ 5325.064656] EXT4-fs error (device sda2): htree_dirblock_to_tree:1007: inode #1191951: block 4731728: comm rm: bad entry in directory: directory entry overrun - offset=76, inode=417080, rec_len=61816, name_len=35, size=4096
+>> [ 5325.069539] EXT4-fs error (device sda2): htree_dirblock_to_tree:1007: inode #1191951: block 4731728: comm rm: bad entry in directory: directory entry overrun - offset=76, inode=417080, rec_len=61816, name_len=35, size=4096
+>> [ 5325.077351] EXT4-fs error (device sda2): ext4_empty_dir:2718: inode #1191951: block 4731728: comm rm: bad entry in directory: directory entry overrun - offset=76, inode=417080, rec_len=61816, name_len=35, size=4096
+>>
+>> Two other alphas, PC-164 and Eiger, worked fine with the same kernel version (different kernel configs according to hardware).
+>>
+>> The details:
+>> 4.20 worked fine, with gentoo emerge package update after bootup.
+>> Next, 4.20.0-06428-g00c569b567c7 worked fine, with gentoo emerge after bootup.
+>> Next, 4.20.0-09062-gd8372ba8ce28 booted up fine but rsync and rm during start of gentoo emerge errored out like above.
+>>
+>> So the corruption _might_ have happened during bootup of previous kernel but it looks more likely that only the latest kernel with blk-mq introduced the problems. mq-deadline is in use on all the alphas.
+>>
+>> DS10 has Symbios 53C896 SCSI (sym2 driver), DS10L has QLogic ISP1040, so they are different. Working Eiger and PC164 have sym2 based scsi controllers too.
+> 
 
 -- 
-Jens Axboe
-
+Meelis Roos <mroos@linux.ee>
