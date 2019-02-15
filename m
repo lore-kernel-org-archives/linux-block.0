@@ -2,193 +2,118 @@ Return-Path: <SRS0=aLpJ=QW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28A90C43381
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 00:51:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30F99C4360F
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 02:01:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DCDE42229F
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 00:51:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09B6621B1A
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 02:01:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726124AbfBOAvr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Feb 2019 19:51:47 -0500
-Received: from gateway30.websitewelcome.com ([192.185.196.18]:44113 "EHLO
-        gateway30.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726102AbfBOAvr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Feb 2019 19:51:47 -0500
-X-Greylist: delayed 1319 seconds by postgrey-1.27 at vger.kernel.org; Thu, 14 Feb 2019 19:51:46 EST
-Received: from cm11.websitewelcome.com (cm11.websitewelcome.com [100.42.49.5])
-        by gateway30.websitewelcome.com (Postfix) with ESMTP id D3B8B9FB6
-        for <linux-block@vger.kernel.org>; Thu, 14 Feb 2019 18:29:46 -0600 (CST)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id uRNygQPNednCeuRNygP7Sl; Thu, 14 Feb 2019 18:29:46 -0600
-X-Authority-Reason: nr=8
-Received: from [189.250.119.20] (port=54054 helo=[192.168.1.76])
-        by gator4166.hostgator.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-        (Exim 4.91)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1guRNy-002JKK-C7; Thu, 14 Feb 2019 18:29:46 -0600
-To:     Jens Axboe <axboe@kernel.dk>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>
-Cc:     drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>
-References: <20190212212820.GA15942@embeddedor>
- <4a4429a8-56d4-b349-444c-282246537121@kernel.dk>
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=gustavo@embeddedor.com; keydata=
- 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
- VtSixD1uOgytAP7RWS474w==
-Subject: Re: [PATCH] drbd_receiver: mark expected switch fall-throughs
-Message-ID: <ab24df46-b6eb-bdb0-54fb-40ef4afa0527@embeddedor.com>
-Date:   Thu, 14 Feb 2019 18:29:45 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        id S1731282AbfBOCBG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Feb 2019 21:01:06 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:43398 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726360AbfBOCBF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Feb 2019 21:01:05 -0500
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A35AFC0AC371;
+        Fri, 15 Feb 2019 02:01:03 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-28.pek2.redhat.com [10.72.8.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4EA8A5D6B6;
+        Fri, 15 Feb 2019 02:00:55 +0000 (UTC)
+Date:   Fri, 15 Feb 2019 10:00:51 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@wdc.com>
+Subject: Re: [PATCH V2] blk-mq: insert rq with DONTPREP to hctx dispatch list
+ when requeue
+Message-ID: <20190215020049.GA21045@ming.t460p>
+References: <1549936585-1702-1-git-send-email-jianchao.w.wang@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <4a4429a8-56d4-b349-444c-282246537121@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 189.250.119.20
-X-Source-L: No
-X-Exim-ID: 1guRNy-002JKK-C7
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.1.76]) [189.250.119.20]:54054
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 5
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1549936585-1702-1-git-send-email-jianchao.w.wang@oracle.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Fri, 15 Feb 2019 02:01:04 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2/12/19 3:36 PM, Jens Axboe wrote:
-> On 2/12/19 2:28 PM, Gustavo A. R. Silva wrote:
->> In preparation to enabling -Wimplicit-fallthrough, mark switch
->> cases where we are expecting to fall through.
->>
->> This patch fixes the following warnings:
->>
->> drivers/block/drbd/drbd_receiver.c: In function ‘drbd_asb_recover_0p’:
->> drivers/block/drbd/drbd_receiver.c:3093:6: warning: this statement may fall through [-Wimplicit-fallthrough=]
->>    if (self == 1 && peer == 0) {
->>       ^
->> drivers/block/drbd/drbd_receiver.c:3098:2: note: here
->>   case ASB_DISCARD_OLDER_PRI:
->>   ^~~~
->> drivers/block/drbd/drbd_receiver.c:3120:6: warning: this statement may fall through [-Wimplicit-fallthrough=]
->>    if (after_sb_0p == ASB_DISCARD_ZERO_CHG)
->>       ^
->> drivers/block/drbd/drbd_receiver.c:3123:2: note: here
->>   case ASB_DISCARD_LEAST_CHG:
->>   ^~~~
->>
->> Warning level 3 was used: -Wimplicit-fallthrough=3
->>
->> Notice that in some cases, the code comment is modified in
->> accordance with what GCC is expecting to find.
->>
->> This patch is part of the ongoing efforts to enable
->> -Wimplicit-fallthrough.
->>
->> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
->> ---
->>  drivers/block/drbd/drbd_receiver.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
->> index c7ad88d91a09..78bb763a367d 100644
->> --- a/drivers/block/drbd/drbd_receiver.c
->> +++ b/drivers/block/drbd/drbd_receiver.c
->> @@ -3094,7 +3094,7 @@ static int drbd_asb_recover_0p(struct drbd_peer_device *peer_device) __must_hold
->>  			rv =  1;
->>  			break;
->>  		}
->> -		/* Else fall through to one of the other strategies... */
->> +		/* Else fall through - to one of the other strategies... */
->>  	case ASB_DISCARD_OLDER_PRI:
->>  		if (self == 0 && peer == 1) {
->>  			rv = 1;
->> @@ -3119,7 +3119,7 @@ static int drbd_asb_recover_0p(struct drbd_peer_device *peer_device) __must_hold
->>  		}
->>  		if (after_sb_0p == ASB_DISCARD_ZERO_CHG)
->>  			break;
->> -		/* else: fall through */
->> +		/* Else fall through */
+On Tue, Feb 12, 2019 at 09:56:25AM +0800, Jianchao Wang wrote:
+> When requeue, if RQF_DONTPREP, rq has contained some driver
+> specific data, so insert it to hctx dispatch list to avoid any
+> merge. Take scsi as example, here is the trace event log (no
+> io scheduler, because RQF_STARTED would prevent merging),
 > 
-> This is getting really silly, as these two hunks both aptly demonstrate. Can
-> we please inject some sanity into this fall through witch hunt?
+>    kworker/0:1H-339   [000] ...1  2037.209289: block_rq_insert: 8,0 R 4096 () 32768 + 8 [kworker/0:1H]
+> scsi_inert_test-1987  [000] ....  2037.220465: block_bio_queue: 8,0 R 32776 + 8 [scsi_inert_test]
+> scsi_inert_test-1987  [000] ...2  2037.220466: block_bio_backmerge: 8,0 R 32776 + 8 [scsi_inert_test]
+>    kworker/0:1H-339   [000] ....  2047.220913: block_rq_issue: 8,0 R 8192 () 32768 + 16 [kworker/0:1H]
+> scsi_inert_test-1996  [000] ..s1  2047.221007: block_rq_complete: 8,0 R () 32768 + 8 [0]
+> scsi_inert_test-1996  [000] .Ns1  2047.221045: block_rq_requeue: 8,0 R () 32776 + 8 [0]
+>    kworker/0:1H-339   [000] ...1  2047.221054: block_rq_insert: 8,0 R 4096 () 32776 + 8 [kworker/0:1H]
+>    kworker/0:1H-339   [000] ...1  2047.221056: block_rq_issue: 8,0 R 4096 () 32776 + 8 [kworker/0:1H]
+> scsi_inert_test-1986  [000] ..s1  2047.221119: block_rq_complete: 8,0 R () 32776 + 8 [0]
 > 
+> (32768 + 8) was requeued by scsi_queue_insert and had RQF_DONTPREP.
 
-No witch hunt here.  This work has proved to be very valuable. I've fixed years-old
-bugs thanks to this effort.
+scsi_mq_requeue_cmd() does uninit the request before requeuing, but
+__scsi_queue_insert doesn't do that.
 
-> The last hunk is updating ANOTHER patch that also attempted to silence this
-> stuff.
+
+> Then it was merged with (32776 + 8) and issued. Due to RQF_DONTPREP,
+> the sdb only contained the part of (32768 + 8), then only that part
+> was completed. The lucky thing was that scsi_io_completion detected
+> it and requeued the remaining part. So we didn't get corrupted data.
+> However, the requeue of (32776 + 8) is not expected.
 > 
+> Suggested-by: Jens Axboe <axboe@kernel.dk>
+> Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+> ---
+> V2:
+>  - refactor the code based on Jens' suggestion
+> 
+>  block/blk-mq.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 8f5b533..9437a5e 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -737,12 +737,20 @@ static void blk_mq_requeue_work(struct work_struct *work)
+>  	spin_unlock_irq(&q->requeue_lock);
+>  
+>  	list_for_each_entry_safe(rq, next, &rq_list, queuelist) {
+> -		if (!(rq->rq_flags & RQF_SOFTBARRIER))
+> +		if (!(rq->rq_flags & (RQF_SOFTBARRIER | RQF_DONTPREP)))
+>  			continue;
+>  
+>  		rq->rq_flags &= ~RQF_SOFTBARRIER;
+>  		list_del_init(&rq->queuelist);
+> -		blk_mq_sched_insert_request(rq, true, false, false);
+> +		/*
+> +		 * If RQF_DONTPREP, rq has contained some driver specific
+> +		 * data, so insert it to hctx dispatch list to avoid any
+> +		 * merge.
+> +		 */
+> +		if (rq->rq_flags & RQF_DONTPREP)
+> +			blk_mq_request_bypass_insert(rq, false);
+> +		else
+> +			blk_mq_sched_insert_request(rq, true, false, false);
+>  	}
 
-Yeah. Sorry about that.
+Suppose it is one WRITE request to zone device, this way might break
+the order.
 
-Previously, I was using level 2: -Wimplicit-fallthrough=2, but this time I'm
-using level 3: -Wimplicit-fallthrough=3, which is stricter and maps to -Wextra.
 
-Thanks
---
-Gustavo
-
+Thanks,
+Ming
