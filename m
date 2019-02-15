@@ -2,78 +2,70 @@ Return-Path: <SRS0=aLpJ=QW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AE69C43381
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 16:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F60C43381
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 17:10:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6261721924
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 16:59:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3368B21925
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 17:10:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1550250619;
+	bh=RmsxXulCLGWSEVRfnTkZp6PZIzK/eqf1LiURPDHw7tI=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=jPFh6ipXJ4hxSuQwv9UYGqJRbyanQkmY5z06gilklUdxe+bsTdfK1k3FgAMPYIWJp
+	 4dYKpn78Fn+sgp64RcGLKLq479wO5Sv/bystB3glUzbEWyxPm9ud1xW0uK+57t38Mb
+	 ltP0WWhX88rGiAlfyRb5OHYxJK2ASgBTgRXZRXkc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726321AbfBOQ7v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Feb 2019 11:59:51 -0500
-Received: from mx2.cyber.ee ([193.40.6.72]:57832 "EHLO mx2.cyber.ee"
+        id S1726146AbfBORKS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Feb 2019 12:10:18 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56912 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726122AbfBOQ7v (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Feb 2019 11:59:51 -0500
-Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
-To:     linux-alpha@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>
-References: <fb63a4d0-d124-21c8-7395-90b34b57c85a@linux.ee>
- <1c26eab4-3277-9066-5dce-6734ca9abb96@linux.ee>
-From:   Meelis Roos <mroos@linux.ee>
-Message-ID: <076b8b72-fab0-ea98-f32f-f48949585f9d@linux.ee>
-Date:   Fri, 15 Feb 2019 18:59:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
-MIME-Version: 1.0
-In-Reply-To: <1c26eab4-3277-9066-5dce-6734ca9abb96@linux.ee>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: et-EE
-Content-Transfer-Encoding: 7bit
+        id S1729112AbfBORKF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Feb 2019 12:10:05 -0500
+Subject: Re: [git pull] device mapper fixes for 5.0 final
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1550250605;
+        bh=RmsxXulCLGWSEVRfnTkZp6PZIzK/eqf1LiURPDHw7tI=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=EIO0rkxL4ervTbBQ1T3jJjUcBvApuhIthtJdKzu+0buuYtuJFikGnexYW1gLOfXAJ
+         i2+ZwLDN9NCsNTrOHbwAB/0A8iB/F8cmOVeSd0LXW7UKTrj+dhmF1YhnHUNWb440v8
+         dzweptkvKyWXbj+GxCEDkPU1lZMkWaztS2QOOBQ8=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20190215143832.GA20900@redhat.com>
+References: <20190215143832.GA20900@redhat.com>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20190215143832.GA20900@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git
+ tags/for-5.0/dm-fixes-3
+X-PR-Tracked-Commit-Id: 4ae280b4ee3463fa57bbe6eede26b97daff8a0f1
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: ae3fa8bd73c9b64416816ec0e9951cd8695c9854
+Message-Id: <155025060496.11780.7034405835420282822.pr-tracker-bot@kernel.org>
+Date:   Fri, 15 Feb 2019 17:10:04 +0000
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        Nikos Tsironis <ntsironis@arrikto.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->> I have noticed ext4 filesystem corruption on two of my test alphas with 4.20.0-09062-gd8372ba8ce28.
-> 
-> Retried it, still happens with 5.0.0-rc5-00358-gdf3865f8f568 - rsync of emerge --sync just fail with nothing in dmesg.
+The pull request you sent on Fri, 15 Feb 2019 09:38:32 -0500:
 
-Finished second round of bisecting, first round did not get me far enough so
-I may still have false "goods" in my bisection history.
+> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.0/dm-fixes-3
 
-The command I used for bisecting was Gentoos
-emerge --sync.
-that sometimes failed from error -6 or -11 from rsync.
-Usually the file system corruption did not happen and nothing was in dmesg, just file IO error from rsync.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/ae3fa8bd73c9b64416816ec0e9951cd8695c9854
 
-The result of the bisection is
-[88dbcbb3a4847f5e6dfeae952d3105497700c128] blkdev: avoid migration stalls for blkdev pages
-
-Is that result relevant for the problem or should I continue bisecting between 4.20.0 and the so far first bad commit?
-
->> On AlphaServer DS10:
->> [10749.664418] EXT4-fs error (device sda2): __ext4_iget:5052: inode #1853093: block 1: comm rsync: invalid block
->>
->> On AlphaServer DS10L:
->> [ 5325.064656] EXT4-fs error (device sda2): htree_dirblock_to_tree:1007: inode #1191951: block 4731728: comm rm: bad entry in directory: directory entry overrun - offset=76, inode=417080, rec_len=61816, name_len=35, size=4096
->> [ 5325.069539] EXT4-fs error (device sda2): htree_dirblock_to_tree:1007: inode #1191951: block 4731728: comm rm: bad entry in directory: directory entry overrun - offset=76, inode=417080, rec_len=61816, name_len=35, size=4096
->> [ 5325.077351] EXT4-fs error (device sda2): ext4_empty_dir:2718: inode #1191951: block 4731728: comm rm: bad entry in directory: directory entry overrun - offset=76, inode=417080, rec_len=61816, name_len=35, size=4096
->>
->> Two other alphas, PC-164 and Eiger, worked fine with the same kernel version (different kernel configs according to hardware).
->>
->> The details:
->> 4.20 worked fine, with gentoo emerge package update after bootup.
->> Next, 4.20.0-06428-g00c569b567c7 worked fine, with gentoo emerge after bootup.
->> Next, 4.20.0-09062-gd8372ba8ce28 booted up fine but rsync and rm during start of gentoo emerge errored out like above.
->>
->> So the corruption _might_ have happened during bootup of previous kernel but it looks more likely that only the latest kernel with blk-mq introduced the problems. mq-deadline is in use on all the alphas.
->>
->> DS10 has Symbios 53C896 SCSI (sym2 driver), DS10L has QLogic ISP1040, so they are different. Working Eiger and PC164 have sym2 based scsi controllers too.
-> 
+Thank you!
 
 -- 
-Meelis Roos <mroos@linux.ee>
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
