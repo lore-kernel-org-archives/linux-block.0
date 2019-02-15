@@ -2,74 +2,68 @@ Return-Path: <SRS0=aLpJ=QW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7BF9C43381
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 09:54:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27BE8C43381
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 09:57:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85AC021924
-	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 09:54:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F323621924
+	for <linux-block@archiver.kernel.org>; Fri, 15 Feb 2019 09:57:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732405AbfBOJyl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Feb 2019 04:54:41 -0500
-Received: from Galois.linutronix.de ([146.0.238.70]:52205 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730379AbfBOJyk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Feb 2019 04:54:40 -0500
-Received: from p5492e0d8.dip0.t-ipconnect.de ([84.146.224.216] helo=nanos)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1guaCW-0007ye-O6; Fri, 15 Feb 2019 10:54:32 +0100
-Date:   Fri, 15 Feb 2019 10:54:32 +0100 (CET)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     Marc Zyngier <marc.zyngier@arm.com>
-cc:     LKML <linux-kernel@vger.kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-        Keith Busch <keith.busch@intel.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Shivasharan Srikanteshwara 
-        <shivasharan.srikanteshwara@broadcom.com>
-Subject: Re: [patch V5 4/8] nvme-pci: Simplify interrupt allocation
-In-Reply-To: <alpine.DEB.2.21.1902151051470.1646@nanos.tec.linutronix.de>
-Message-ID: <alpine.DEB.2.21.1902151053520.1646@nanos.tec.linutronix.de>
-References: <20190214204755.819014197@linutronix.de> <20190214211759.699390983@linutronix.de> <868syhs8tn.wl-marc.zyngier@arm.com> <alpine.DEB.2.21.1902151051470.1646@nanos.tec.linutronix.de>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        id S2404782AbfBOJ5O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Feb 2019 04:57:14 -0500
+Received: from mx2.suse.de ([195.135.220.15]:36444 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1733056AbfBOJ5N (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Feb 2019 04:57:13 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 7936CAF76;
+        Fri, 15 Feb 2019 09:57:12 +0000 (UTC)
+Date:   Fri, 15 Feb 2019 10:57:12 +0100
+From:   Johannes Thumshirn <jthumshirn@suse.de>
+To:     lsf-pc@lists.linux-foundation.org
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-nvdimm@lists.01.org, linux-btrfs@vger.kernel.org,
+        hare@suse.de
+Subject: [LSF/MM TOPIC] Software RAID Support for NV-DIMM
+Message-ID: <20190215095710.GA12279@linux-x5ow.site>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 15 Feb 2019, Thomas Gleixner wrote:
-> On Fri, 15 Feb 2019, Marc Zyngier wrote:
-> > > +	 */
-> > > +	if (nrirqs == 1)
-> > > +		nr_read_queues = 0;
-> > > +	else if (write_queues >= nrirqs)
-> > > +		nr_read_queues = nrirqs - 1;
-> > 
-> > ... while this seem to ensure that we carve out one write queue out of
-> > the irq set. It looks like a departure from the original code, which
-> > would set nr_read_queues to 1 in that particular case.
-> 
-> Bah. right you are.
+(This is a joint proposal with Hannes Reinecke)
 
-That needs to be:
+Servers with NV-DIMM are slowly emerging in data centers but one key feature
+for reliability of these systems hasn't been addressed up to now, data
+redundancy.
 
-     nr_read_queues = 1;
+While it would be best to solve this issue in the memory controller of the CPU
+itself, I don't see this coming in the next few years. This puts us as the OS
+in the burden to create the redundant copies of data for the users.
 
-obviously.
+If we leave of the DAX support Linux' software RAID implementations (MD,
+device-mapper and BTRFS RAID) do already work on top of pmem devices, but they
+are incompatible with DAX.
 
-/me blushes.
+In this session Hannes and I would like to discuss eventual ways how we as an
+operating system can mitigate these issues for our users.
+
+Byte,
+	Johannes
+
+-- 
+Johannes Thumshirn                            SUSE Labs Filesystems
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Jane Smithard, Graham Norton
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
