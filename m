@@ -2,55 +2,167 @@ Return-Path: <SRS0=0P76=QX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 124D8C4360F
-	for <linux-block@archiver.kernel.org>; Sat, 16 Feb 2019 22:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF52C43381
+	for <linux-block@archiver.kernel.org>; Sat, 16 Feb 2019 23:01:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DBD4021872
-	for <linux-block@archiver.kernel.org>; Sat, 16 Feb 2019 22:29:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 353642192D
+	for <linux-block@archiver.kernel.org>; Sat, 16 Feb 2019 23:01:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727365AbfBPW3o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Feb 2019 17:29:44 -0500
-Received: from mx2.cyber.ee ([193.40.6.72]:32904 "EHLO mx2.cyber.ee"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726191AbfBPW3o (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Feb 2019 17:29:44 -0500
-Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>, linux-alpha@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
-        Jan Kara <jack@suse.cz>
-References: <fb63a4d0-d124-21c8-7395-90b34b57c85a@linux.ee>
- <1c26eab4-3277-9066-5dce-6734ca9abb96@linux.ee>
- <076b8b72-fab0-ea98-f32f-f48949585f9d@linux.ee>
- <20190216174536.GC23000@mit.edu>
-From:   Meelis Roos <mroos@linux.ee>
-Message-ID: <e175b885-082a-97c1-a0be-999040a06443@linux.ee>
-Date:   Sun, 17 Feb 2019 00:29:40 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        id S1729026AbfBPXBZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Feb 2019 18:01:25 -0500
+Received: from ipmail06.adl2.internode.on.net ([150.101.137.129]:22734 "EHLO
+        ipmail06.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727683AbfBPXBZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 16 Feb 2019 18:01:25 -0500
+Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
+  by ipmail06.adl2.internode.on.net with ESMTP; 17 Feb 2019 09:30:54 +1030
+Received: from dave by dastard with local (Exim 4.80)
+        (envelope-from <david@fromorbit.com>)
+        id 1gv8x2-0001Fu-Mi; Sun, 17 Feb 2019 10:00:52 +1100
+Date:   Sun, 17 Feb 2019 10:00:52 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Dan Williams <dan.j.williams@intel.com>
+Cc:     Johannes Thumshirn <jthumshirn@suse.de>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>,
+        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        lsf-pc@lists.linux-foundation.org, linux-btrfs@vger.kernel.org
+Subject: Re: [LSF/MM TOPIC] Software RAID Support for NV-DIMM
+Message-ID: <20190216230052.GW20493@dastard>
+References: <20190215095710.GA12279@linux-x5ow.site>
+ <20190216053133.GT20493@dastard>
+ <20190216053957.GU20493@dastard>
+ <CAPcyv4jkT5i=akskXCzS7ST47iEk=x8Oh84Cp7q+WRpdOX8hGg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190216174536.GC23000@mit.edu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: et-EE
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAPcyv4jkT5i=akskXCzS7ST47iEk=x8Oh84Cp7q+WRpdOX8hGg@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->> The result of the bisection is
->> [88dbcbb3a4847f5e6dfeae952d3105497700c128] blkdev: avoid migration stalls for blkdev pages
->>
->> Is that result relevant for the problem or should I continue bisecting between 4.20.0 and the so far first bad commit?
+On Sat, Feb 16, 2019 at 09:05:31AM -0800, Dan Williams wrote:
+> On Fri, Feb 15, 2019 at 9:40 PM Dave Chinner <david@fromorbit.com> wrote:
+> >
+> > On Sat, Feb 16, 2019 at 04:31:33PM +1100, Dave Chinner wrote:
+> > > On Fri, Feb 15, 2019 at 10:57:12AM +0100, Johannes Thumshirn wrote:
+> > > > (This is a joint proposal with Hannes Reinecke)
+> > > >
+> > > > Servers with NV-DIMM are slowly emerging in data centers but one key feature
+> > > > for reliability of these systems hasn't been addressed up to now, data
+> > > > redundancy.
+> > > >
+> > > > While it would be best to solve this issue in the memory controller of the CPU
+> > > > itself, I don't see this coming in the next few years. This puts us as the OS
+> > > > in the burden to create the redundant copies of data for the users.
+> > > >
+> > > > If we leave of the DAX support Linux' software RAID implementations (MD,
+> > > > device-mapper and BTRFS RAID) do already work on top of pmem devices, but they
+> > > > are incompatible with DAX.
+> > > >
+> > > > In this session Hannes and I would like to discuss eventual ways how we as an
+> > > > operating system can mitigate these issues for our users.
+> > >
+> > > We've supported this since mid 2018 and commit ba23cba9b3bd ("fs:
+> > > allow per-device dax status checking for filesystems"). That is,
+> > > we can have DAX on the XFS RT device indepently of the data device.
+> > >
+> > > That is, you set up pmem in three segments - two small identical
+> > > segments start get mirrored with RAID1 as the data device, and
+> > > the remainder as a block device that is dax capable set up as the
+> > > XFS realtime device. Set the RTINHERIT bit on the root directory at
+> > > mkfs time ("-d rtinherit=1") and then all the data goes to the DAX
+> > > capable realtime device, and all the metadata goes to the software
+> > > raided pmem block devices that aren't DAX capable.
+> > >
+> > > Problem already solved, yes?
+> >
+> > Sorry, this was meant to be a reply to Dan's email commenting about
+> > some people needing mirrored metadata, not the parent that was
+> > talking about whole device RAID...
+> >
+> > i.e. mirrored metadata w/ FS-DAX for data should already be a solved
+> > problem...
 > 
-> Can you try reverting the commit and see if it makes the problem go away?
+> Ah true, thanks for the clarification. I'll give it a try, the last
+> time I looked RT configurations failed with DAX, but perhaps that's
+> been fixed and I can drop if from my list of broken DAX items.
 
-Tried reverting it on top of 5.0.0-rc6-00153-g5ded5871030e and it seems to make the kernel work - emerge --sync succeeded.
+It should work. The whole reason for DAX on rt devices is that we
+can guarantee PMD sized and aligned allocations for all user data
+with the RT device (i.e. using "-r extsize=<PMD_SIZE>" mkfs option)
+so it's nearly equivalent in capability compared to using device dax
+directly. We can't guarantee such alignment with the data device as
+extent size hints are, well, just hints and it will fall back to
+smaller allocations if it's too difficult to find PMD aligned free
+space...
 
-Unfinished further bisection has also not yielded any other bad revisions so far.
+$ sudo mkfs.xfs -f -r rtdev=/dev/pmem1,extsize=2m -d rtinherit=1 /dev/pmem0
+meta-data=/dev/pmem0             isize=512    agcount=4, agsize=524288 blks
+         =                       sectsz=4096  attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=0
+         =                       reflink=0
+data     =                       bsize=4096   blocks=2097152, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0, ftype=1
+log      =internal log           bsize=4096   blocks=2560, version=2
+         =                       sectsz=4096  sunit=1 blks, lazy-count=1
+realtime =/dev/pmem1             extsz=2097152 blocks=2097152, rtextents=4096
+$ sudo mount -o dax,rtdev=/dev/pmem1 /dev/pmem0 /mnt/scratch
+$ sudo dmesg |tail -3
+XFS (pmem0): DAX enabled. Warning: EXPERIMENTAL, use at your own risk
+XFS (pmem0): Mounting V5 Filesystem
+XFS (pmem0): Ending clean mount
+$
 
+Yup, DAX is enabled on the filesystem.
+
+$ sudo xfs_io -c stat /mnt/scratch
+....
+fsxattr.xflags = 0x100 [-------t--------]
+....
+$
+
+The root dir is configured to put all new files on the rt device.
+
+$ sudo xfs_io -f -c "pwrite 0 1m" -c stat -c "bmap -vp" /mnt/scratch/foo
+wrote 1048576/1048576 bytes at offset 0
+1 MiB, 256 ops; 0.0029 sec (338.983 MiB/sec and 86779.6610 ops/sec)
+fd.path = "/mnt/scratch/foo"
+fd.flags = non-sync,non-direct,read-write
+stat.ino = 131
+stat.type = regular file
+stat.size = 1048576
+stat.blocks = 4096
+fsxattr.xflags = 0x1 [r---------------]
+fsxattr.projid = 0
+fsxattr.extsize = 0
+fsxattr.cowextsize = 0
+fsxattr.nextents = 1
+fsxattr.naextents = 0
+dioattr.mem = 0x200
+dioattr.miniosz = 512
+dioattr.maxiosz = 2147483136
+/mnt/scratch/foo:
+ EXT: FILE-OFFSET      RT-BLOCK-RANGE     TOTAL FLAGS
+   0: [0..4095]:       0..4095             4096 000000
+$
+
+Yup, /mnt/scratch/foo is on the rt device, it's got a 2MB sized and
+aligned extent allocated to it, and DAX is enabled.
+
+So it looks to me like this all just works fine.
+
+Cheers,
+
+Dave.
 -- 
-Meelis Roos
+Dave Chinner
+david@fromorbit.com
