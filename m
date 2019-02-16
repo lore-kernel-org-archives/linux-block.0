@@ -2,116 +2,89 @@ Return-Path: <SRS0=0P76=QX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C9E7C43381
-	for <linux-block@archiver.kernel.org>; Sat, 16 Feb 2019 17:05:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3725C43381
+	for <linux-block@archiver.kernel.org>; Sat, 16 Feb 2019 17:25:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DC7C92192B
-	for <linux-block@archiver.kernel.org>; Sat, 16 Feb 2019 17:05:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="RlvZGdI0"
+	by mail.kernel.org (Postfix) with ESMTP id 7B9DE222E0
+	for <linux-block@archiver.kernel.org>; Sat, 16 Feb 2019 17:25:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728088AbfBPRFn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Feb 2019 12:05:43 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:44410 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726084AbfBPRFn (ORCPT
+        id S1731744AbfBPRZy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Feb 2019 12:25:54 -0500
+Received: from Galois.linutronix.de ([146.0.238.70]:54730 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731648AbfBPRZy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Feb 2019 12:05:43 -0500
-Received: by mail-ot1-f68.google.com with SMTP id g1so21724034otj.11
-        for <linux-block@vger.kernel.org>; Sat, 16 Feb 2019 09:05:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=intel-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=E5oU+8OGWfNcbFFs3SOhhw6G8UO44WCYyxqkkn/iCiA=;
-        b=RlvZGdI0Xmjp/x40FV4IXDsNu9zn/tpczpkPTwGMfS4SNYVlks8zEf7KNUteuPEjky
-         FEhikT7DFgVH1xK2raUXdRoYjNKvUQFrbdIWIZ5gJu09Ee4JtcpZSIH/M+8iVmZAC4q7
-         IP/T+JoQDg+qHDt3Rsl4PmcsndDrg67EoHjjw5coPqgU1cWChSTjTEfG8gGxmKWL7pqH
-         /Dqbhk706Ox5wbz4oGHnDAV50W+VZ8nf104P1dLD/rq0qzJIxc4w+sqMoL7ynLBVm/SC
-         WyCqXw0Q15tI9esePgb+ItKYXFkB3IVvJbcLjlkGDiKB/41voQhpTVJ1QoVBV+I6FG+g
-         GrdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=E5oU+8OGWfNcbFFs3SOhhw6G8UO44WCYyxqkkn/iCiA=;
-        b=leDZNxuSJLXQPCFsnsolb/Rym/kxyPSdVYviDDuKoArhmbNvqxcgmf3RzVCKGvZhL9
-         rX6k1T9WFIi+NXt1B4OHaXTyJwtJ8l+3aS472tAuJno6kw12IfGYMySJui95lnFcbx7p
-         U/3J0RoO69SyQJLIeqn5OOSPBV/LS8Dd8fkOM+VozRitUVCv/d66rkq0kuiS+yVEAjdN
-         PFYyob2+tROzc33f+DBZmI040wVv5dJooul0OhR8h+JLuxlwbo6qQr88EUMTSEufNdhO
-         S64szuSfiCecH0VA5vcIbw0vBbxmY52b+9NnrwCCwZF8H2ROe0jOLUoyxmL5MqEGdLb8
-         ECWw==
-X-Gm-Message-State: AHQUAuahW19edt81D+YOYlEplWBL7QYQdc5Qo3f2i5CcNfTLULy6ScwA
-        PYeSlD9CMFC86NZmANTd+pDQoMGa2pWCrvxNeSV+iw==
-X-Google-Smtp-Source: AHgI3IYyZ0wumcjTfYgSq+CjMP8M0nxipsFzA4By+4DUlvx6zlqWN11pOaw6lB7UQ8w9nbAjUtxGhgyT+MnbAKjrpZw=
-X-Received: by 2002:aca:cc0f:: with SMTP id c15mr10317703oig.105.1550336742379;
- Sat, 16 Feb 2019 09:05:42 -0800 (PST)
-MIME-Version: 1.0
-References: <20190215095710.GA12279@linux-x5ow.site> <20190216053133.GT20493@dastard>
- <20190216053957.GU20493@dastard>
-In-Reply-To: <20190216053957.GU20493@dastard>
-From:   Dan Williams <dan.j.williams@intel.com>
-Date:   Sat, 16 Feb 2019 09:05:31 -0800
-Message-ID: <CAPcyv4jkT5i=akskXCzS7ST47iEk=x8Oh84Cp7q+WRpdOX8hGg@mail.gmail.com>
-Subject: Re: [LSF/MM TOPIC] Software RAID Support for NV-DIMM
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Johannes Thumshirn <jthumshirn@suse.de>,
-        linux-nvdimm <linux-nvdimm@lists.01.org>,
-        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        lsf-pc@lists.linux-foundation.org, linux-btrfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Sat, 16 Feb 2019 12:25:54 -0500
+Received: from localhost ([127.0.0.1] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtp (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1gv3ig-0001ia-MY; Sat, 16 Feb 2019 18:25:42 +0100
+Message-Id: <20190216171306.403545970@linutronix.de>
+User-Agent: quilt/0.65
+Date:   Sat, 16 Feb 2019 18:13:06 +0100
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     LKML <linux-kernel@vger.kernel.org>
+Cc:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+        Keith Busch <keith.busch@intel.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>
+Subject: [patch v6 0/7] genirq/affinity: Overhaul the multiple interrupt sets
+ support
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 15, 2019 at 9:40 PM Dave Chinner <david@fromorbit.com> wrote:
->
-> On Sat, Feb 16, 2019 at 04:31:33PM +1100, Dave Chinner wrote:
-> > On Fri, Feb 15, 2019 at 10:57:12AM +0100, Johannes Thumshirn wrote:
-> > > (This is a joint proposal with Hannes Reinecke)
-> > >
-> > > Servers with NV-DIMM are slowly emerging in data centers but one key feature
-> > > for reliability of these systems hasn't been addressed up to now, data
-> > > redundancy.
-> > >
-> > > While it would be best to solve this issue in the memory controller of the CPU
-> > > itself, I don't see this coming in the next few years. This puts us as the OS
-> > > in the burden to create the redundant copies of data for the users.
-> > >
-> > > If we leave of the DAX support Linux' software RAID implementations (MD,
-> > > device-mapper and BTRFS RAID) do already work on top of pmem devices, but they
-> > > are incompatible with DAX.
-> > >
-> > > In this session Hannes and I would like to discuss eventual ways how we as an
-> > > operating system can mitigate these issues for our users.
-> >
-> > We've supported this since mid 2018 and commit ba23cba9b3bd ("fs:
-> > allow per-device dax status checking for filesystems"). That is,
-> > we can have DAX on the XFS RT device indepently of the data device.
-> >
-> > That is, you set up pmem in three segments - two small identical
-> > segments start get mirrored with RAID1 as the data device, and
-> > the remainder as a block device that is dax capable set up as the
-> > XFS realtime device. Set the RTINHERIT bit on the root directory at
-> > mkfs time ("-d rtinherit=1") and then all the data goes to the DAX
-> > capable realtime device, and all the metadata goes to the software
-> > raided pmem block devices that aren't DAX capable.
-> >
-> > Problem already solved, yes?
->
-> Sorry, this was meant to be a reply to Dan's email commenting about
-> some people needing mirrored metadata, not the parent that was
-> talking about whole device RAID...
->
-> i.e. mirrored metadata w/ FS-DAX for data should already be a solved
-> problem...
+This is the final update to the series with a few corner cases fixes
+vs. V5 which can be found here:
 
-Ah true, thanks for the clarification. I'll give it a try, the last
-time I looked RT configurations failed with DAX, but perhaps that's
-been fixed and I can drop if from my list of broken DAX items.
+   https://lkml.kernel.org/r/20190214204755.819014197@linutronix.de
+
+The series applies against:
+
+   git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git master
+
+and is also available from:
+
+   git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git WIP.irq
+
+Changes vs. V5:
+
+  - Change the invocation for the driver callback so it is invoked even
+    when there are no interrupts left to spread out. That ensures that the
+    driver can adjust to the situation (in case of NVME a single interrupt)
+
+  - Make sure the callback is invoked in the legacy irq fallback case so
+    the driver is not in a stale state from a failed MSI[X} allocation
+    attempt.
+
+  - Fix the adjustment logic in the NVME driver as pointed out by Ming and
+    Marc, plus another corner case I found during testing.
+
+  - Simplify the unmanaged set support
+
+Thanks,
+
+	tglx
+
+8<-------------
+ drivers/nvme/host/pci.c         |  117 +++++++++++++---------------------------
+ drivers/pci/msi.c               |   39 +++++--------
+ drivers/scsi/be2iscsi/be_main.c |    2 
+ include/linux/interrupt.h       |   35 ++++++++---
+ include/linux/pci.h             |    4 -
+ kernel/irq/affinity.c           |  116 ++++++++++++++++++++++++---------------
+ 6 files changed, 153 insertions(+), 160 deletions(-)
+
+
