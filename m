@@ -2,72 +2,56 @@ Return-Path: <SRS0=V8DZ=QZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8951AC43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 12:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71DE4C43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 12:37:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 62B092175B
-	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 12:02:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4968921773
+	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 12:37:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728679AbfBRMCL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Feb 2019 07:02:11 -0500
-Received: from mx2.suse.de ([195.135.220.15]:56848 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727084AbfBRMCL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Feb 2019 07:02:11 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id D435AAF1B;
-        Mon, 18 Feb 2019 12:02:09 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id 82E1E1E088D; Mon, 18 Feb 2019 13:02:09 +0100 (CET)
-Date:   Mon, 18 Feb 2019 13:02:09 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Meelis Roos <mroos@linux.ee>
-Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>, linux-alpha@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
-        Jan Kara <jack@suse.cz>
+        id S1729567AbfBRMh3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Feb 2019 07:37:29 -0500
+Received: from mx2.cyber.ee ([193.40.6.72]:35794 "EHLO mx2.cyber.ee"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729203AbfBRMh2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Feb 2019 07:37:28 -0500
 Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
-Message-ID: <20190218120209.GC20919@quack2.suse.cz>
+To:     Jan Kara <jack@suse.cz>
+Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>, linux-alpha@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org
 References: <fb63a4d0-d124-21c8-7395-90b34b57c85a@linux.ee>
  <1c26eab4-3277-9066-5dce-6734ca9abb96@linux.ee>
  <076b8b72-fab0-ea98-f32f-f48949585f9d@linux.ee>
  <20190216174536.GC23000@mit.edu>
  <e175b885-082a-97c1-a0be-999040a06443@linux.ee>
+ <20190218120209.GC20919@quack2.suse.cz>
+From:   Meelis Roos <mroos@linux.ee>
+Message-ID: <7ffcadd5-47b3-e44a-bd18-7e9f1a636f8d@linux.ee>
+Date:   Mon, 18 Feb 2019 14:37:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e175b885-082a-97c1-a0be-999040a06443@linux.ee>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190218120209.GC20919@quack2.suse.cz>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: et-EE
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun 17-02-19 00:29:40, Meelis Roos wrote:
-> > > The result of the bisection is
-> > > [88dbcbb3a4847f5e6dfeae952d3105497700c128] blkdev: avoid migration stalls for blkdev pages
-> > > 
-> > > Is that result relevant for the problem or should I continue bisecting between 4.20.0 and the so far first bad commit?
-> > 
-> > Can you try reverting the commit and see if it makes the problem go away?
-> 
-> Tried reverting it on top of 5.0.0-rc6-00153-g5ded5871030e and it seems
-> to make the kernel work - emerge --sync succeeded.
-> 
-> Unfinished further bisection has also not yielded any other bad revisions
-> so far.
+> Hum, weird. I have hard time understanding how that change could be causing
+> fs corruption on Aplha but OTOH it is not completely unthinkable. With this
+> commit we may migrate some block device pages we were not able to migrate
+> previously and that could be causing some unexpected issue. I'll look into
+> this.
 
-Hum, weird. I have hard time understanding how that change could be causing
-fs corruption on Aplha but OTOH it is not completely unthinkable. With this
-commit we may migrate some block device pages we were not able to migrate
-previously and that could be causing some unexpected issue. I'll look into
-this.
+To make things more interesting, it does not happen on any alpha but only one subarch
+so far: https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1889207.html
+is my original bug report.
 
-								Honza
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Meelis Roos <mroos@linux.ee>
