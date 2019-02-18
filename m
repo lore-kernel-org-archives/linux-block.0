@@ -2,97 +2,133 @@ Return-Path: <SRS0=V8DZ=QZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41720C43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 21:32:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21CAEC4360F
+	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 22:30:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E4212084D
-	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 21:32:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E48D52146F
+	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 22:30:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pycDR0eY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730625AbfBRVci (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Feb 2019 16:32:38 -0500
-Received: from ipmail06.adl2.internode.on.net ([150.101.137.129]:42584 "EHLO
-        ipmail06.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726955AbfBRVci (ORCPT
+        id S1731847AbfBRWax (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Feb 2019 17:30:53 -0500
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:36867 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729048AbfBRWax (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Feb 2019 16:32:38 -0500
-Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
-  by ipmail06.adl2.internode.on.net with ESMTP; 19 Feb 2019 08:01:54 +1030
-Received: from dave by dastard with local (Exim 4.80)
-        (envelope-from <david@fromorbit.com>)
-        id 1gvqVy-00040z-RT; Tue, 19 Feb 2019 08:31:50 +1100
-Date:   Tue, 19 Feb 2019 08:31:50 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Bob Liu <bob.liu@oracle.com>
-Cc:     linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, martin.petersen@oracle.com,
-        shirley.ma@oracle.com, allison.henderson@oracle.com,
-        darrick.wong@oracle.com, hch@infradead.org, adilger@dilger.ca
-Subject: Re: [RFC PATCH v2 0/9] Block/XFS: Support alternative mirror device
- retry
-Message-ID: <20190218213150.GE14116@dastard>
-References: <20190213095044.29628-1-bob.liu@oracle.com>
+        Mon, 18 Feb 2019 17:30:53 -0500
+Received: by mail-qt1-f193.google.com with SMTP id a48so21026753qtb.4;
+        Mon, 18 Feb 2019 14:30:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=zQ+rW8xj/RQR5ug2h9q7b524JpzwsETcbe2rNn2M4gA=;
+        b=pycDR0eYUUpiaR+Pg2PdAYEeEf93KrZ+SfKC5mRArmhN25oFcjY+Y3rqxrlI2yXlWE
+         dGJS4hb0/3LKv9e7pT8e2VSvsJQWuib2en/zB84eIfiGRxHJT++AISnKP/rHPJkM/Yej
+         gJfrgyfq1WzX6eVfL0IOZENBl2Hfqjui7AofIXUJH3VPN6XZyKyGFWmra0Gcm68viaOJ
+         acL09wROyXqh66yyEnp/MYJFSzM8HPzm4WVJ/hm2EXBl5Dwgz6snDrlqnpxukHntQQrM
+         8YMMGzUdibWgniPPzpxRreJbC94CcLzW20pKi+JTNGMl/UmxCeB5QJ100mDWp48EheXC
+         AJXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=zQ+rW8xj/RQR5ug2h9q7b524JpzwsETcbe2rNn2M4gA=;
+        b=pzWncYPyrYGnNzYnXt2IKoidGEHqyXVHXLWLlS3Q6pu8ApYAem+8Btpf2LUW6gStUd
+         9eDm+TAH5mCV2FRiaDkafhgl+I1A8TQXUw2BRlPYVIW0pqEYA/0HymJZq73cZsJouRIv
+         83SkJmX3kMU6uQ2/feylPLH4nB28FPIRVaFAkL4dOmvDziFrLd3VFcTnO/+t2qEoINjL
+         QQfGOAhHHRoxoAZtTyl+5I98jootXPkpLnJ+HzLj5dKf/d5QhpzvmuxGjfG3yelOY5KA
+         56DlGAuDgcak9hgrTO7d9UCL+PLATXeuSBAv3p1BRwIQpLtz/tHUO5TV8uPBfcKCZjgw
+         +mdQ==
+X-Gm-Message-State: AHQUAuZOJRCSgGvaIDYIY6hP4AHc4uYmEA5hrCDsO14cYG+V6amsCO5O
+        gm++OmT+vwjg3BtLDGcjBrA3egGR8j4=
+X-Google-Smtp-Source: AHgI3IY6Yklx2L3LEMsz3lAyI3mXpcX25uBJ0jDOJd8eJUey2HGNt5+WPbh+lcKGgwaA1lAFyUJHTA==
+X-Received: by 2002:ac8:25b5:: with SMTP id e50mr21051332qte.186.1550529050902;
+        Mon, 18 Feb 2019 14:30:50 -0800 (PST)
+Received: from [192.168.1.204] (pool-108-7-72-149.bstnma.fios.verizon.net. [108.7.72.149])
+        by smtp.gmail.com with ESMTPSA id f19sm9610599qtf.1.2019.02.18.14.30.49
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 18 Feb 2019 14:30:50 -0800 (PST)
+Subject: Re: [LSF/MM TOPIC] More async operations for file systems - async
+ discard?
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     lsf-pc@lists.linux-foundation.org,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        linux-btrfs <linux-btrfs@vger.kernel.org>,
+        linux-block@vger.kernel.org
+References: <92ab41f7-35bc-0f56-056f-ed88526b8ea4@gmail.com>
+ <20190217210948.GB14116@dastard>
+ <46540876-c222-0889-ddce-44815dcaad04@gmail.com>
+ <20190218022243.GC14116@dastard>
+From:   Ric Wheeler <ricwheeler@gmail.com>
+Message-ID: <86f2588d-8567-3905-40aa-c422393daaf1@gmail.com>
+Date:   Mon, 18 Feb 2019 17:30:49 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190213095044.29628-1-bob.liu@oracle.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20190218022243.GC14116@dastard>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 13, 2019 at 05:50:35PM +0800, Bob Liu wrote:
-> Motivation:
-> When fs data/metadata checksum mismatch, lower block devices may have other
-> correct copies. e.g. If XFS successfully reads a metadata buffer off a raid1 but
-> decides that the metadata is garbage, today it will shut down the entire
-> filesystem without trying any of the other mirrors.  This is a severe
-> loss of service, and we propose these patches to have XFS try harder to
-> avoid failure.
-> 
-> This patch prototype this mirror retry idea by:
-> * Adding @nr_mirrors to struct request_queue which is similar as
->   blk_queue_nonrot(), filesystem can grab device request queue and check max
->   mirrors this block device has.
->   Helper functions were also added to get/set the nr_mirrors.
-> 
-> * Introducing bi_rd_hint just like bi_write_hint, but bi_rd_hint is a long bitmap
-> in order to support stacked layer case.
-> 
-> * Modify md/raid1 to support this retry feature.
-> 
-> * Adapter xfs to use this feature.
->   If the read verify fails, we loop over the available mirrors and retry the read.
+On 2/17/19 9:22 PM, Dave Chinner wrote:
+> On Sun, Feb 17, 2019 at 06:42:59PM -0500, Ric Wheeler wrote:
+>> On 2/17/19 4:09 PM, Dave Chinner wrote:
+>>> On Sun, Feb 17, 2019 at 03:36:10PM -0500, Ric Wheeler wrote:
+>>>> One proposal for btrfs was that we should look at getting discard
+>>>> out of the synchronous path in order to minimize the slowdown
+>>>> associated with enabling discard at mount time. Seems like an
+>>>> obvious win for "hint" like operations like discard.
+>>> We already have support for that. blkdev_issue_discard() is
+>>> synchornous, yes, but __blkdev_issue_discard() will only build the
+>>> discard bio chain - it is up to the caller to submit and wait for it.
+>>>
+>>> Some callers (XFS, dm-thinp, nvmet, etc) use a bio completion to
+>>> handle the discard IO completion, hence allowing async dispatch and
+>>> processing of the discard chain without blocking the caller. Others
+>>> (like ext4) simply call submit_bio_wait() to do wait synchronously
+>>> on completion of the discard bio chain.
+>>>
+>>>> I do wonder where we stand now with the cost of the various discard
+>>>> commands - how painful is it for modern SSD's?
+>>> AIUI, it still depends on the SSD implementation, unfortunately.
+>> I think the variability makes life really miserable for layers above it.
+> Yup, that it does.
+>
+>> Might be worth constructing some tooling that we can use to validate
+>> or shame vendors over
+> That doesn't seem to work.
+>
+>> - testing things like a full device discard,
+>> discard of fs block size and big chunks, discard against already
+>> discarded, etc.
+> We did that many years ago because discard on SSDs sucked:
+>
+> https://people.redhat.com/lczerner/discard/test_discard.html
+> https://sourceforge.net/projects/test-discard/files/
+>
+> And, really, that didn't changed a thing - discard still sucks...
+>
+> Cheers,
+>
+> Dave.
 
-Why does the filesystem have to iterate every single posible
-combination of devices that are underneath it?
+Totally forgot about that work - maybe it is time to try again and poke some 
+vendors.
 
-Wouldn't it be much simpler to be able to attach a verifier
-function to the bio, and have each layer that gets called iterate
-over all it's copies internally until the verfier function passes
-or all copies are exhausted?
+Ric
 
-This works for stacked mirrors - it can pass the higher layer
-verifier down as far as necessary. It can work for RAID5/6, too, by
-having that layer supply it's own verifier for reads that verifies
-parity and can reconstruct of failure, then when it's reconstructed
-a valid stripe it can run the verifier that was supplied to it from
-above, etc.
 
-i.e. I dont see why only filesystems should drive retries or have to
-be aware of the underlying storage stacking. ISTM that each
-layer of the storage stack should be able to verify what has been
-returned to it is valid independently of the higher layer
-requirements. The only difference from a caller point of view should
-be submit_bio(bio); vs submit_bio_verify(bio, verifier_cb_func);
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
