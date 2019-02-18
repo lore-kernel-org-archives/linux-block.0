@@ -3,96 +3,118 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE99BC43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 02:22:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF692C43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 02:49:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8DCFD218D8
-	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 02:22:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CDB3218C3
+	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 02:49:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728169AbfBRCWs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Feb 2019 21:22:48 -0500
-Received: from ipmail03.adl6.internode.on.net ([150.101.137.143]:28706 "EHLO
-        ipmail03.adl6.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727266AbfBRCWs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Feb 2019 21:22:48 -0500
-Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
-  by ipmail03.adl6.internode.on.net with ESMTP; 18 Feb 2019 12:52:45 +1030
-Received: from dave by dastard with local (Exim 4.80)
-        (envelope-from <david@fromorbit.com>)
-        id 1gvYZw-0002oT-0V; Mon, 18 Feb 2019 13:22:44 +1100
-Date:   Mon, 18 Feb 2019 13:22:43 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Ric Wheeler <ricwheeler@gmail.com>
-Cc:     lsf-pc@lists.linux-foundation.org,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-btrfs <linux-btrfs@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Subject: Re: [LSF/MM TOPIC] More async operations for file systems - async
- discard?
-Message-ID: <20190218022243.GC14116@dastard>
-References: <92ab41f7-35bc-0f56-056f-ed88526b8ea4@gmail.com>
- <20190217210948.GB14116@dastard>
- <46540876-c222-0889-ddce-44815dcaad04@gmail.com>
+        id S1728122AbfBRCtj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Feb 2019 21:49:39 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58790 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728093AbfBRCtj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 17 Feb 2019 21:49:39 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 138AD7F769;
+        Mon, 18 Feb 2019 02:49:39 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0DE1860C76;
+        Mon, 18 Feb 2019 02:49:27 +0000 (UTC)
+Date:   Mon, 18 Feb 2019 10:49:23 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+        Keith Busch <keith.busch@intel.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Shivasharan Srikanteshwara 
+        <shivasharan.srikanteshwara@broadcom.com>
+Subject: Re: [patch v6 7/7] genirq/affinity: Add support for non-managed
+ affinity sets
+Message-ID: <20190218024922.GA27779@ming.t460p>
+References: <20190216171306.403545970@linutronix.de>
+ <20190216172228.869750763@linutronix.de>
+ <20190217134522.GH7296@ming.t460p>
+ <alpine.DEB.2.21.1902172010060.1683@nanos.tec.linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <46540876-c222-0889-ddce-44815dcaad04@gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <alpine.DEB.2.21.1902172010060.1683@nanos.tec.linutronix.de>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Mon, 18 Feb 2019 02:49:39 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Feb 17, 2019 at 06:42:59PM -0500, Ric Wheeler wrote:
-> On 2/17/19 4:09 PM, Dave Chinner wrote:
-> >On Sun, Feb 17, 2019 at 03:36:10PM -0500, Ric Wheeler wrote:
-> >>One proposal for btrfs was that we should look at getting discard
-> >>out of the synchronous path in order to minimize the slowdown
-> >>associated with enabling discard at mount time. Seems like an
-> >>obvious win for "hint" like operations like discard.
-> >We already have support for that. blkdev_issue_discard() is
-> >synchornous, yes, but __blkdev_issue_discard() will only build the
-> >discard bio chain - it is up to the caller to submit and wait for it.
-> >
-> >Some callers (XFS, dm-thinp, nvmet, etc) use a bio completion to
-> >handle the discard IO completion, hence allowing async dispatch and
-> >processing of the discard chain without blocking the caller. Others
-> >(like ext4) simply call submit_bio_wait() to do wait synchronously
-> >on completion of the discard bio chain.
-> >
-> >>I do wonder where we stand now with the cost of the various discard
-> >>commands - how painful is it for modern SSD's?
-> >AIUI, it still depends on the SSD implementation, unfortunately.
+Hi Thomas,
+
+On Sun, Feb 17, 2019 at 08:17:05PM +0100, Thomas Gleixner wrote:
+> On Sun, 17 Feb 2019, Ming Lei wrote:
+> > On Sat, Feb 16, 2019 at 06:13:13PM +0100, Thomas Gleixner wrote:
+> > > Some drivers need an extra set of interrupts which should not be marked
+> > > managed, but should get initial interrupt spreading.
+> > 
+> > Could you share the drivers and their use case?
 > 
-> I think the variability makes life really miserable for layers above it.
+> You were Cc'ed on that old discussion:
+> 
+>  https://lkml.kernel.org/r/300d6fef733ca76ced581f8c6304bac6@mail.gmail.com
 
-Yup, that it does.
+Thanks for providing the link.
 
-> Might be worth constructing some tooling that we can use to validate
-> or shame vendors over
+> 
+> > > For both interrupt sets the interrupts are properly spread out, but the
+> > > second set is not marked managed.
+> > 
+> > Given drivers only care the managed vs non-managed interrupt numbers,
+> > just wondering why this case can't be covered by .pre_vectors &
+> > .post_vectors?
+> 
+> Well, yes, but post/pre are not subject to spreading and I really don't
+> want to go there.
+> 
+> > Also this kind of usage may break blk-mq easily, in which the following
+> > rule needs to be respected:
+> > 
+> > 1) all CPUs are required to spread among each interrupt set
+> > 
+> > 2) no any CPU is shared between two IRQs in same set.
+> 
+> I don't see how that would break blk-mq. The unmanaged set is not used by
+> the blk-mq stuff, that's some driver internal voodoo. So blk-mq still gets
+> a perfectly spread and managed interrupt set for the queues.
 
-That doesn't seem to work.
+From the discussion above, the use case is for megaraid_sas. And one of the
+two interrupt sets(managed and non-managed) will be chosen according to
+workloads runtime.
 
-> - testing things like a full device discard,
-> discard of fs block size and big chunks, discard against already
-> discarded, etc.
+Each interrupt set actually defines one blk-mq queue mapping, and the
+queue mapping needs to respect the rule I mentioned now. However,
+non-managed affinity can be changed to any way anytime by user-space.
 
-We did that many years ago because discard on SSDs sucked:
+Recently HPSA tried to add one module parameter to use non-managed
+IRQ[1].
 
-https://people.redhat.com/lczerner/discard/test_discard.html
-https://sourceforge.net/projects/test-discard/files/
+Also NVMe RDMA uses non-managed interrupts, and at least one CPU hotplug
+issue is never fixed yet[2]. 
 
-And, really, that didn't changed a thing - discard still sucks...
+[1] https://marc.info/?t=154387665200001&r=1&w=2
+[2] https://www.spinics.net/lists/linux-block/msg24140.html
 
-Cheers,
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+thanks,
+Ming
