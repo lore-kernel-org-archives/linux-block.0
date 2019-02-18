@@ -2,148 +2,122 @@ Return-Path: <SRS0=V8DZ=QZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E190AC43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 07:49:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D280C43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 08:01:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A6445217F5
-	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 07:49:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59410208E4
+	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 08:01:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="LPqsz4ww"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728243AbfBRHtk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Feb 2019 02:49:40 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:53296 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725881AbfBRHtk (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Feb 2019 02:49:40 -0500
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 50FDE36887;
-        Mon, 18 Feb 2019 07:49:39 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-22.pek2.redhat.com [10.72.8.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 01D95608C7;
-        Mon, 18 Feb 2019 07:49:12 +0000 (UTC)
-Date:   Mon, 18 Feb 2019 15:49:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Mike Snitzer <snitzer@redhat.com>, linux-mm@kvack.org,
-        dm-devel@redhat.com, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        Omar Sandoval <osandov@fb.com>, cluster-devel@redhat.com,
-        linux-ext4@vger.kernel.org,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Boaz Harrosh <ooo@electrozaur.com>,
-        Gao Xiang <gaoxiang25@huawei.com>, Coly Li <colyli@suse.de>,
-        linux-raid@vger.kernel.org, Bob Peterson <rpeterso@redhat.com>,
-        linux-bcache@vger.kernel.org,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Dave Chinner <dchinner@redhat.com>,
-        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
-        Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org
-Subject: Re: [dm-devel] [PATCH V15 00/18] block: support multi-page bvec
-Message-ID: <20190218074907.GA806@ming.t460p>
-References: <20190215111324.30129-1-ming.lei@redhat.com>
- <c52b6a8b-d1d4-67ff-f81c-371d09cc6d5b@kernel.dk>
- <1550250855.31902.102.camel@acm.org>
- <18c711a9-ca13-885d-43cd-4d48e683a6a2@kernel.dk>
- <20190217131332.GC7296@ming.t460p>
+        id S1727741AbfBRIBW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Feb 2019 03:01:22 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:54994 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726863AbfBRIBW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Feb 2019 03:01:22 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1I7rsrV125587;
+        Mon, 18 Feb 2019 08:01:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=yb0yjohAQQBkLYrkAUTNn2Fm+uOKEZbrBxJ9JzRMoG4=;
+ b=LPqsz4wwkw/XQuOsG0YfI8m/gmnPTxLPn9bHlQtNw5QTStS6eqvqqM9brS1AFWS1EF8B
+ 6aMujrspMqq02zuCSimZbHaYitsayjtqYdEQdpUkt0ZjTH2jIr5ototZfXtGoUUcr29Q
+ L5CFfeDUQt3D5hsLr4Amq2Wm7bBCVhKG5HJBMTH0qXiMKG6pEg8U1t+bRNyJeldGi5m0
+ yUe9yuAMMcXYVV9VcMd3fWEhAtSHgM/rIRo2qq2e2vo+sIwPb+ykhZiZ40V40XdMeuWD
+ 4yRikel5HdmNEWOs2k7JpwnRGhm9mxXbOWERmnn7DcrDNeyheHuLe9gphGEp5CTo9UKm Gg== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by userp2120.oracle.com with ESMTP id 2qpb5r4m9q-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 18 Feb 2019 08:01:01 +0000
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x1I811ds012511
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 18 Feb 2019 08:01:01 GMT
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x1I810oq021616;
+        Mon, 18 Feb 2019 08:01:00 GMT
+Received: from [10.182.69.106] (/10.182.69.106)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 18 Feb 2019 00:01:00 -0800
+Subject: Re: [Xen-devel] [PATCH v6 2/2] xen/blkback: rework connect_ring() to
+ avoid inconsistent xenstore 'ring-page-order' set by malicious blkfront
+To:     Konrad Rzeszutek Wilk <konrad@darnok.org>, konrad.wilk@oracle.com
+Cc:     =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, axboe@kernel.dk,
+        Paul.Durrant@citrix.com
+References: <1547484104-20625-1-git-send-email-dongli.zhang@oracle.com>
+ <1547484104-20625-2-git-send-email-dongli.zhang@oracle.com>
+ <20190115082036.y7svi3xz3dkqd4w4@mac>
+ <20190117152919.GA26079@localhost.localdomain>
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+Message-ID: <49564120-813d-2b80-94be-bde8123809a9@oracle.com>
+Date:   Mon, 18 Feb 2019 16:04:14 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190217131332.GC7296@ming.t460p>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Mon, 18 Feb 2019 07:49:40 +0000 (UTC)
+In-Reply-To: <20190117152919.GA26079@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9170 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1902180063
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Feb 17, 2019 at 09:13:32PM +0800, Ming Lei wrote:
-> On Fri, Feb 15, 2019 at 10:59:47AM -0700, Jens Axboe wrote:
-> > On 2/15/19 10:14 AM, Bart Van Assche wrote:
-> > > On Fri, 2019-02-15 at 08:49 -0700, Jens Axboe wrote:
-> > >> On 2/15/19 4:13 AM, Ming Lei wrote:
-> > >>> This patchset brings multi-page bvec into block layer:
-> > >>
-> > >> Applied, thanks Ming. Let's hope it sticks!
-> > > 
-> > > Hi Jens and Ming,
-> > > 
-> > > Test nvmeof-mp/002 fails with Jens' for-next branch from this morning.
-> > > I have not yet tried to figure out which patch introduced the failure.
-> > > Anyway, this is what I see in the kernel log for test nvmeof-mp/002:
-> > > 
-> > > [  475.611363] BUG: unable to handle kernel NULL pointer dereference at 0000000000000020
-> > > [  475.621188] #PF error: [normal kernel read fault]
-> > > [  475.623148] PGD 0 P4D 0  
-> > > [  475.624737] Oops: 0000 [#1] PREEMPT SMP KASAN
-> > > [  475.626628] CPU: 1 PID: 277 Comm: kworker/1:1H Tainted: G    B             5.0.0-rc6-dbg+ #1
-> > > [  475.630232] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
-> > > [  475.633855] Workqueue: kblockd blk_mq_requeue_work
-> > > [  475.635777] RIP: 0010:__blk_recalc_rq_segments+0xbe/0x590
-> > > [  475.670948] Call Trace:
-> > > [  475.693515]  blk_recalc_rq_segments+0x2f/0x50
-> > > [  475.695081]  blk_insert_cloned_request+0xbb/0x1c0
-> > > [  475.701142]  dm_mq_queue_rq+0x3d1/0x770
-> > > [  475.707225]  blk_mq_dispatch_rq_list+0x5fc/0xb10
-> > > [  475.717137]  blk_mq_sched_dispatch_requests+0x256/0x300
-> > > [  475.721767]  __blk_mq_run_hw_queue+0xd6/0x180
-> > > [  475.725920]  __blk_mq_delay_run_hw_queue+0x25c/0x290
-> > > [  475.727480]  blk_mq_run_hw_queue+0x119/0x1b0
-> > > [  475.732019]  blk_mq_run_hw_queues+0x7b/0xa0
-> > > [  475.733468]  blk_mq_requeue_work+0x2cb/0x300
-> > > [  475.736473]  process_one_work+0x4f1/0xa40
-> > > [  475.739424]  worker_thread+0x67/0x5b0
-> > > [  475.741751]  kthread+0x1cf/0x1f0
-> > > [  475.746034]  ret_from_fork+0x24/0x30
-> > > 
-> > > (gdb) list *(__blk_recalc_rq_segments+0xbe)
-> > > 0xffffffff816a152e is in __blk_recalc_rq_segments (block/blk-merge.c:366).
-> > > 361                                                  struct bio *bio)
-> > > 362     {
-> > > 363             struct bio_vec bv, bvprv = { NULL };
-> > > 364             int prev = 0;
-> > > 365             unsigned int seg_size, nr_phys_segs;
-> > > 366             unsigned front_seg_size = bio->bi_seg_front_size;
-> > > 367             struct bio *fbio, *bbio;
-> > > 368             struct bvec_iter iter;
-> > > 369
-> > > 370             if (!bio)
-> > 
-> > Just ran a few tests, and it also seems to cause about a 5% regression
-> > in per-core IOPS throughput. Prior to this work, I could get 1620K 4k
-> > rand read IOPS out of core, now I'm at ~1535K. The cycler stealer seems
-> > to be blk_queue_split() and blk_rq_map_sg().
+Hi Konrad,
+
+On 1/17/19 11:29 PM, Konrad Rzeszutek Wilk wrote:
+> On Tue, Jan 15, 2019 at 09:20:36AM +0100, Roger Pau Monné wrote:
+>> On Tue, Jan 15, 2019 at 12:41:44AM +0800, Dongli Zhang wrote:
+>>> The xenstore 'ring-page-order' is used globally for each blkback queue and
+>>> therefore should be read from xenstore only once. However, it is obtained
+>>> in read_per_ring_refs() which might be called multiple times during the
+>>> initialization of each blkback queue.
+>>>
+>>> If the blkfront is malicious and the 'ring-page-order' is set in different
+>>> value by blkfront every time before blkback reads it, this may end up at
+>>> the "WARN_ON(i != (XEN_BLKIF_REQS_PER_PAGE * blkif->nr_ring_pages));" in
+>>> xen_blkif_disconnect() when frontend is destroyed.
+>>>
+>>> This patch reworks connect_ring() to read xenstore 'ring-page-order' only
+>>> once.
+>>>
+>>> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+>>
+>> LGTM:
+>>
+>> Reviewed-by: Roger Pau Monné <roger.pau@citrix.com>
 > 
-> Could you share us your test setting?
+> Applied.
 > 
-> I will run null_blk first and see if it can be reproduced.
+> Will push out to Jens in a couple of days. Thank you!
+>>
+>> Thanks!
 
-Looks this performance drop isn't reproduced on null_blk with the following
-setting by me:
+I only see the PATCH 1/2 (xen/blkback: add stack variable 'blkif' in
+connect_ring()) on the top of below branch for Jens, would you please apply this
+one (PATCH 2/2) as well?
 
-- modprobe null_blk nr_devices=4 submit_queues=48
-- test machine : dual socket, two NUMA nodes, 24cores/socket
-- fio script:
-fio --direct=1 --size=128G --bsrange=4k-4k --runtime=40 --numjobs=48 --ioengine=libaio --iodepth=64 --group_reporting=1 --filename=/dev/nullb0 --name=randread --rw=randread
+https://git.kernel.org/pub/scm/linux/kernel/git/konrad/xen.git/log/?h=linux-next
 
-result: 10.7M IOPS(base kernel), 10.6M IOPS(patched kernel)
+1/2 is only a prerequisite for 2/2.
 
-And if 'bs' is increased to 256k, 512k, 1024k, IOPS improvement can be ~8%
-with multi-page bvec patches in above test.
+Thank you very much!
 
-BTW, there isn't cost added to bio_for_each_bvec(), so blk_queue_split() and
-blk_rq_map_sg() should be fine. However, bio_for_each_segment_all()
-may not be quick as before.
-
-
-Thanks,
-Ming
+Dongli Zhang
