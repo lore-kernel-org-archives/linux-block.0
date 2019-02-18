@@ -2,139 +2,120 @@ Return-Path: <SRS0=V8DZ=QZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFBE3C43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 17:57:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF7BC43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 18:28:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B6BE0217D9
-	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 17:57:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00A4F21773
+	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 18:28:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mit.edu header.i=@mit.edu header.b="hh+U6xGg"
+	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="tMokctLG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389767AbfBRR5D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Feb 2019 12:57:03 -0500
-Received: from mail-eopbgr690092.outbound.protection.outlook.com ([40.107.69.92]:12640
-        "EHLO NAM04-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2389053AbfBRR5D (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Feb 2019 12:57:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ehhqHTOk/PCzMkF2U7VL6n/KW4Oa8FXEYUXzqyy72/I=;
- b=hh+U6xGgqr9Z/lqS46UKCxuFyZqAXz9MA8Kuq2iBl/CDAarkN6xrT7JFH5S95KKlVadiff5vTCUl1bWXb6CIX3mvUshzVur2MYkKRFvE1CpqErBOu0ezzy3Nmacb2BhRoOXvGTN3vTETfsNZcWzGR8ItXRvlopmI7uZoVcknlMk=
-Received: from SN2PR01CA0042.prod.exchangelabs.com (2603:10b6:804:2::52) by
- BYAPR01MB4854.prod.exchangelabs.com (2603:10b6:a03:91::22) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1622.19; Mon, 18 Feb 2019 17:56:58 +0000
-Received: from DM3NAM03FT052.eop-NAM03.prod.protection.outlook.com
- (2a01:111:f400:7e49::200) by SN2PR01CA0042.outlook.office365.com
- (2603:10b6:804:2::52) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1622.16 via Frontend
- Transport; Mon, 18 Feb 2019 17:56:58 +0000
-Authentication-Results: spf=pass (sender IP is 18.9.28.11)
- smtp.mailfrom=mit.edu; vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=bestguesspass action=none
- header.from=mit.edu;
-Received-SPF: Pass (protection.outlook.com: domain of mit.edu designates
- 18.9.28.11 as permitted sender) receiver=protection.outlook.com;
- client-ip=18.9.28.11; helo=outgoing.mit.edu;
-Received: from outgoing.mit.edu (18.9.28.11) by
- DM3NAM03FT052.mail.protection.outlook.com (10.152.83.107) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.1643.13 via Frontend Transport; Mon, 18 Feb 2019 17:56:57 +0000
-Received: from callcc.thunk.org (guestnat-104-133-8-109.corp.google.com [104.133.8.109] (may be forged))
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x1IHurB2016875
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 18 Feb 2019 12:56:55 -0500
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id A03527A5774; Mon, 18 Feb 2019 12:56:51 -0500 (EST)
-Date:   Mon, 18 Feb 2019 12:56:51 -0500
-From:   "Theodore Y. Ts'o" <tytso@mit.edu>
-To:     Bob Liu <bob.liu@oracle.com>
-CC:     <linux-block@vger.kernel.org>, <linux-xfs@vger.kernel.org>,
-        <linux-fsdevel@vger.kernel.org>, <martin.petersen@oracle.com>,
-        <shirley.ma@oracle.com>, <allison.henderson@oracle.com>,
-        <david@fromorbit.com>, <darrick.wong@oracle.com>,
-        <hch@infradead.org>, <adilger@dilger.ca>
-Subject: Re: [RFC PATCH v2 1/9] block: add nr_mirrors to request_queue
-Message-ID: <20190218175651.GA5210@mit.edu>
-References: <20190213095044.29628-1-bob.liu@oracle.com>
- <20190213095044.29628-2-bob.liu@oracle.com>
- <20190213160408.GW23000@mit.edu>
- <56d2dc78-01f8-9991-9199-372fe864d9f0@oracle.com>
+        id S1731340AbfBRS2E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Feb 2019 13:28:04 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:37892 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731888AbfBRS2C (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Feb 2019 13:28:02 -0500
+Received: by mail-ot1-f68.google.com with SMTP id m1so29894822otf.5
+        for <linux-block@vger.kernel.org>; Mon, 18 Feb 2019 10:28:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=61A4/pXAOuL1qD1InScuL+ZQsJ2daF8hYngPLbv7POY=;
+        b=tMokctLGcpHhqNR/e/NSsxfB6B5p5c5imJypXFqVXPxj7LDrmVG1wKTTIiXPbsDTb6
+         IC0n1WClX0z8Y/wo/W/m7eAxOJ9LdIqJRmPJx+sSGsQ1uqUrfnq86t8Z+VL6rLnUY7uq
+         Z5hRen8gddZOi5AdNeahDrTlOTBnoOy5TJz54i3/NSjYwnlIvzCX6BXU2zUX6pW1D++m
+         WNWJHeHZOWwRl9FKPFQXW9lQ1b7Y2TdmCVNxSznJt2e31Yd3AJrFdUmj0jQa60vVVv0S
+         vqZuFmRKP5dqEmAg38rPXvEEU6GsfiyP/aCSDkO2Dqtp/iRyUA75SlzmGalM0l1gjdGQ
+         OOKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=61A4/pXAOuL1qD1InScuL+ZQsJ2daF8hYngPLbv7POY=;
+        b=SpsxhAH/2B0zaANRS/AKCSB6Ut/wnZIGD1LE+7CS0JN6SIPa6AKaZgUk6Gu9bfOL8/
+         /x7QNVmYk3zJLujfP56qjizhoSBj8WEMpVz+tUHJ4VSxk4aNBOTYiuS9TeL7iPNlbKiU
+         Zrm2esOfCCu1/4JOIGZMAXtwDuWKJJVej86LL829dRAv4/AQuOQjtSaz6yh7x5M8XBxx
+         7CBNnWpOEmDOBTfj7czkCYqpjoPthOKGO1xNBcs0o8JU1iDY6k2weAPBTLNhehsZfC1E
+         Uvq6kMXmYcKSLfdkGHI+0s/6S8qC+vl9b1lBgNee8b/+JkgEAsaMq7orWHa8ovOL6EuL
+         7TQw==
+X-Gm-Message-State: AHQUAuZC5n5/gCJnDna0rM2kSRJKC6tuZ4w9toEeiHmPaH1ZlEogvzAL
+        f8c8cRGlq7kM1hzWwjnQkeIm3ivUn7Mmd4CrYYk8QQ==
+X-Google-Smtp-Source: AHgI3IbkIgHd4N9gDtQiSpFZ73fHij9/1mD20PmrL889XoDapAta8tZ+YygnfWt8BdNz8yPa/i17b1XZW6ywlIC8Gxk=
+X-Received: by 2002:aca:3906:: with SMTP id g6mr86101oia.149.1550514481035;
+ Mon, 18 Feb 2019 10:28:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <56d2dc78-01f8-9991-9199-372fe864d9f0@oracle.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-EOPAttributedMessage: 0
-X-Forefront-Antispam-Report: CIP:18.9.28.11;IPV:CAL;SCL:-1;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(10019020)(39860400002)(136003)(346002)(396003)(376002)(2980300002)(189003)(199004)(6266002)(97756001)(8936002)(4326008)(229853002)(86362001)(6246003)(8676002)(476003)(246002)(2616005)(126002)(36906005)(7416002)(33656002)(217873002)(103686004)(47776003)(5660300002)(486006)(6916009)(478600001)(50466002)(36756003)(106466001)(26826003)(54906003)(786003)(305945005)(42186006)(106002)(1076003)(2906002)(93886005)(316002)(16586007)(26005)(88552002)(23726003)(46406003)(90966002)(11346002)(76176011)(75432002)(336012)(58126008)(186003)(52956003)(356004)(4744005)(446003)(18370500001)(42866002);DIR:OUT;SFP:1102;SCL:1;SRVR:BYAPR01MB4854;H:outgoing.mit.edu;FPR:;SPF:Pass;LANG:en;PTR:outgoing-auth-1.mit.edu;MX:1;A:1;
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8af35365-1b5b-42e9-fa9d-08d695ca79ca
-X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600110)(711020)(4605104)(4608103)(4709054)(2017052603328)(7153060);SRVR:BYAPR01MB4854;
-X-MS-TrafficTypeDiagnostic: BYAPR01MB4854:
-X-LD-Processed: 64afd9ba-0ecf-4acf-bc36-935f6235ba8b,ExtAddr
-X-Microsoft-Exchange-Diagnostics: 1;BYAPR01MB4854;20:LD0/ERwgkrL5VewofrypMT/gEDWO2blhLmPCoIk8MKSdogFTgvGKSe/dx2fnKW4LI53DQcUCJAAtPCkEONkTdcllZFyQYHSccd0Fk0lu4/1oAn86oSbh0Yax2k2wfsu7FXAonNhTvoQ0FZB2FfvufcJh9fa0LY6wP302z6jnkVPO8ZiBoh7y+V86YJEQWb6bMMnnz9L7ekhdctP1OGZfDRdFQd6vUi2BcxlG5zwF1TNllU8WC48TN/kREJHbNN7UEWfsUA3PdTrfIBgFBM694Gz9omdu32knNrSDcleiM+WdPIea3DUiKsG4Ge3WWsz5LqTXUPRsopgGe+DWectPO+xnP1Nr1o/W7em4Yb35oCVz23VAwbIwHNPMbXhAQSCWj6do7Bwbg7xGsR/R5seHjlMl4ezV0vCZVF4isK0+PFjKx0zugcvO2+CTth45pvc1bODrw8lNnk3z1IHGt+Z5nq49ZchbZ//+YWiZpXgNnHsneeRAcpsvoZIlLxixEfYSl2QC21ZJIxr1zT0jQdCHtvYUwuMQ909m4ILBndo+cnl+13XV7HFdJ+HN98CRMQ3id+2XAs4+nkknSzEENahTScMOx5sqdAImvlChiw8hgFA=
-X-Microsoft-Antispam-PRVS: <BYAPR01MB4854F56496CF7AA4613F1FA8B5630@BYAPR01MB4854.prod.exchangelabs.com>
-X-Forefront-PRVS: 09525C61DB
-X-Microsoft-Exchange-Diagnostics: =?us-ascii?Q?1;BYAPR01MB4854;23:8BsXKRSVehdQ4al3DKUN3BCW1Ngw43fzcKBm0CsMG?=
- =?us-ascii?Q?j5M8dJg2nX/d+g/9VsgJlNJV6Yv8HYSV0jo4TsuQHZQHLtO9KOWTTDZCckYL?=
- =?us-ascii?Q?i8cEYx9DS+kXunGfEDLCZ1tyzKJbp4nILK8jpV9lBQDO20DgZoA8rI+KUuZT?=
- =?us-ascii?Q?a+JHEQAw/pC//1ouacscyvT8sxCzBpVxY3G9q/nfKhtb2DVr2+DGX0j5Ps7W?=
- =?us-ascii?Q?iI8ogG7Hj8laPyKtkdvjCyriWeNqnS5r3i6o+mvDjVImURkxsVYSIK7AOpWe?=
- =?us-ascii?Q?MVonjERcNe9cSeVeu2gEEIHEBgVP4/dWR4/srei/A97e6frwyO/RR0hJyHHP?=
- =?us-ascii?Q?eL4fzGC+4b6kMg7RuhvnQjC8eln4XitR/JAq6pvQhnqrsw7/k4QejPTZPs7G?=
- =?us-ascii?Q?1OlwH94JT+isgEhO6MRQtu3QQ0d2mNasv386OYF1W/XNSn/yVrKlK/NCd35S?=
- =?us-ascii?Q?MT5738Bix6mBd/X63LpaCXpVeVIGU+FkMUkpg2UvbTYXYlliGkHHnDDV0IsR?=
- =?us-ascii?Q?pbKlER1iMfLpPsSC+YkkzrnQ1usrs4BA2W1Ed0H7AaKvDGKpPa1L+XkNsDnm?=
- =?us-ascii?Q?FovItDEnhMrQaXRGKdYwp5xey01KpN78J/5rS6v+VARhnbt3OCGeDu9P9De6?=
- =?us-ascii?Q?80x0Wi6Z711bufTmpxfBjhPiWJcgOt9kPdnwGYdvmzlwNj2u1mJ3rHh5hkYG?=
- =?us-ascii?Q?ByCKhmI/5TpX7W0b/YtpWoJAOgsTZ1v6vF6hSr/pbqt0nJbs910X8dLTWu6Q?=
- =?us-ascii?Q?JEW/WrXePUCDqvpXnFB2q+qriLP3uCN8ccZtzSLGVCH4SJXtS/AitUnMCznc?=
- =?us-ascii?Q?l5sk22HDulOJs75HBvTEekyOyHBL9k/1/EKvXPfr3mAiSHbDCqiM5YB9x4QU?=
- =?us-ascii?Q?Qgtd1rHzETLOfRrnOds8yUD1YfquU4Tlsk88OgAEN/7FKruf3HDXoyyjK11/?=
- =?us-ascii?Q?7E75spmLLhfuf7/hXDajNM0SLcV5g/T1iPDFaFamRpWcQe/BHwkCO8GdIZrM?=
- =?us-ascii?Q?A4XJqWmV75IQ0zI8PezbwNLhIxDbgs6dNZ9jNEk5Up62qrpUiNwr0HN+ycAq?=
- =?us-ascii?Q?SrIygXMjmW9YJSBQw7EQpzuKQoO4yfY2m/VuegMziZni5iBvZ6qycWp8OU2F?=
- =?us-ascii?Q?ZPkmE0qiT2U8+J1Ctb+85BVgkaE5bQzsV0lSE8wfM1oe/pVW4a8A8j8kVmAf?=
- =?us-ascii?Q?5zK3vW2VqH1++kX3WvR+DIN8CZpyV8TrdC9eEXnxZBUiDHDYEy12n0NedTg7?=
- =?us-ascii?Q?06QCTphnZEuJyZENFtSNXMqmFcKh28ZhWXs8fXtXR+nMtcJckeNX+X8tKzS/?=
- =?us-ascii?Q?Qsw17VRvtExuowi8iBBc9Ku1V9WDpkO86VAQ3uImBo2?=
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam-Message-Info: hfJRjEvagOisZn1LsIdUUoMZ+aeGaTzEQMCfpM8ZrvOG8HAB8q0y7LGoP4F35Y3klYW1a+vr9Zcir0ErDQ+MB/hPMdZII1o0/jlyvzXk3Ki0xHLEdJGV65BajkVHMhp6TNhPb/8VCO7CQSUXjCWB750XfJtE3kJYmjiMsU8vwbqj6kZYBW9kgMOHk+Gri31YU61Nr4iOi8yu+oo8yRssHIcuNO5owFb+n1ijNshH/NBH+12Y0csK5TdOUGUibkT6u6pjYu845Om6hbi0fWdGJeGBN3cDdn3nVxQwi5XPTvRzUTLK7pxHbMCQi7YZj4OhSvc8dgjvKx5g5jemnzMO6jT/PRpN4or6xC9UlRKKeRLrJGd1+lVFGOFVqIVv5f7gw+I1XdV79zwA2lbyOStNt//TXWpU+aJxCLByqtc6kTw=
-X-OriginatorOrg: mit.edu
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2019 17:56:57.1193
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8af35365-1b5b-42e9-fa9d-08d695ca79ca
-X-MS-Exchange-CrossTenant-Id: 64afd9ba-0ecf-4acf-bc36-935f6235ba8b
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=64afd9ba-0ecf-4acf-bc36-935f6235ba8b;Ip=[18.9.28.11];Helo=[outgoing.mit.edu]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR01MB4854
+References: <20190215095710.GA12279@linux-x5ow.site> <20190216053133.GT20493@dastard>
+ <20190216053957.GU20493@dastard> <66c6ad91-9e8c-a01b-d0c0-ce04e628db67@suse.de>
+In-Reply-To: <66c6ad91-9e8c-a01b-d0c0-ce04e628db67@suse.de>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Mon, 18 Feb 2019 10:27:49 -0800
+Message-ID: <CAPcyv4gYvf923G62uFhuW+tKwY2cdQ=1xqCudqkmQqRN5W0b-g@mail.gmail.com>
+Subject: Re: [LSF/MM TOPIC] Software RAID Support for NV-DIMM
+To:     Johannes Thumshirn <jthumshirn@suse.de>
+Cc:     Dave Chinner <david@fromorbit.com>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>,
+        linux-block@vger.kernel.org, Hannes Reinecke <hare@suse.de>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        lsf-pc@lists.linux-foundation.org, linux-btrfs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 14, 2019 at 01:57:20PM +0800, Bob Liu wrote:
-> 
-> Now the initial/default value is 1 indicating only one copy of data.
-> Would nr_copy be more accurate?
+On Mon, Feb 18, 2019 at 2:50 AM Johannes Thumshirn <jthumshirn@suse.de> wrote:
 >
+> On 16/02/2019 06:39, Dave Chinner wrote:
+> [..]
+>
+> >> We've supported this since mid 2018 and commit ba23cba9b3bd ("fs:
+> >> allow per-device dax status checking for filesystems"). That is,
+> >> we can have DAX on the XFS RT device indepently of the data device.
+> >>
+> >> That is, you set up pmem in three segments - two small identical
+> >> segments start get mirrored with RAID1 as the data device, and
+> >> the remainder as a block device that is dax capable set up as the
+> >> XFS realtime device. Set the RTINHERIT bit on the root directory at
+> >> mkfs time ("-d rtinherit=1") and then all the data goes to the DAX
+> >> capable realtime device, and all the metadata goes to the software
+> >> raided pmem block devices that aren't DAX capable.
+> >>
+> >> Problem already solved, yes?
+> >
+> > Sorry, this was meant to be a reply to Dan's email commenting about
+> > some people needing mirrored metadata, not the parent that was
+> > talking about whole device RAID...
+> >
+> > i.e. mirrored metadata w/ FS-DAX for data should already be a solved
+> > problem...
+>
+> Trying to answer you both.
+>
+> But deferring the data redundancy to the application sounds like a no-go
+> to me, sorry. We don't do that for "traditional" block storage (SCSI,
+> NVMe, you name it). Some applications might already be able to handle it
+> but definitively not all. I don't see your random DBMS like MariaDB or
+> Postgres already doing data duplication over interleave sets of NV-DIMMs.
 
-Well, it's at least shorter; the problem is that it's not really
-another "copy" of the data, it's just that it can simply be different
-(multiple) ways of reconstructing the data.  I suppose we could say
-that it's a virtual copy.
+Oh, definitely agreed. I was just saying for the subset of
+applications that *do* perform application level redundancy the lack
+of metadata redundancy was a liability.
 
-In any case, I can't think of a better term, so nr_copy is probably as
-good as any.
+> And if you carve out a bit of your pmem space into an own namespace for
+> the metadata (did I understand you right here?) you still have the
+> problem that all data written to the DIMMs is interleaved in an
+> interleave set, if I understand it correctly.
+>
+> So if one DIMM in your interleave set goes bad, you're lost anyways.
 
-Cheers,
-
-					- Ted
-					
+Yes, if you want to be able to survive the loss of a single-DIMM then
+you need to disable interleaving and RAID across the DIMMs. However,
+once you do that, dax for data can't work by definition, but RAID for
+metadata would work.
