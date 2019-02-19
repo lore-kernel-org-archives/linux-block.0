@@ -2,101 +2,183 @@ Return-Path: <SRS0=aQmj=Q2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=FROM_EXCESS_BASE64,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36463C43381
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 00:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBA34C43381
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 01:27:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0DF3C21773
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 00:51:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9F9EC21738
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 01:27:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gr5iHHXx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727722AbfBSAvI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Feb 2019 19:51:08 -0500
-Received: from SMTPBG357.QQ.COM ([183.61.51.175]:33538 "EHLO SMTPBG357.QQ.COM"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727269AbfBSAvI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Feb 2019 19:51:08 -0500
-X-Greylist: delayed 499 seconds by postgrey-1.27 at vger.kernel.org; Mon, 18 Feb 2019 19:51:05 EST
-X-QQ-GoodBg: 0
-X-QQ-SSF: 00100000000000F0
-X-QQ-FEAT: eiOkkG+bjm7BokoWLlqPvV5lxlNky3E8WjTKOKrHuFCZDtBGh6QoyTjoBOp0W
-        r1PuRqXXNRxQG4WXZ4Gs7O+mpxeSO78ZovfJ7eFLsvLnp4hcgjZ3i1LWGZCKvUwEMoROqAe
-        BXRGbJ4swBJarW4HPsJ7GsfQkbEUX4g8ShjFYHE0ulJ+i5jMEd4tMI/LTcSiVgD0kQv53Ef
-        23lQtKQmjak8dsulcAtYxHa8GptWibW21AMMNYysJfNwD/TwIRNQiiSD8i9wu1+kH/SmhXy
-        ZhFW0y1TwbB9L5gaWUtqLehGs=
-X-QQ-BUSINESS-ORIGIN: 2
-X-Originating-IP: 222.92.124.153
-X-QQ-STYLE: 
-X-QQ-mid: bizmailfree7t1550536947t37589
-From:   "=?utf-8?B?6ZmI5Y2O5omN?=" <chenhc@lemote.com>
-To:     "=?utf-8?B?VGhvbWFzIEdsZWl4bmVy?=" <tglx@linutronix.de>,
-        "=?utf-8?B?SHVhY2FpIENoZW4=?=" <chenhuacai@gmail.com>
-Cc:     "=?utf-8?B?S2VpdGggQnVzY2g=?=" <keith.busch@intel.com>,
-        "=?utf-8?B?Qmpvcm4gSGVsZ2Fhcw==?=" <helgaas@kernel.org>,
-        "=?utf-8?B?SmVucyBBeGJvZQ==?=" <axboe@kernel.dk>,
-        "=?utf-8?B?U2FnaSBHcmltYmVyZw==?=" <sagi@grimberg.me>,
-        "=?utf-8?B?bGludXgtcGNp?=" <linux-pci@vger.kernel.org>,
-        "=?utf-8?B?TEtNTA==?=" <linux-kernel@vger.kernel.org>,
-        "=?utf-8?B?bGludXgtbnZtZQ==?=" <linux-nvme@lists.infradead.org>,
-        "=?utf-8?B?TWluZyBMZWk=?=" <ming.lei@redhat.com>,
-        "=?utf-8?B?bGludXgtYmxvY2s=?=" <linux-block@vger.kernel.org>,
-        "=?utf-8?B?Q2hyaXN0b3BoIEhlbGx3aWc=?=" <hch@lst.de>
-Subject: Re: [PATCH V3 1/5] genirq/affinity: don't mark 'affd' as const
-Mime-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: base64
-Date:   Tue, 19 Feb 2019 08:42:27 +0800
-X-Priority: 3
-Message-ID: <tencent_6C5D1EC74B826B1E2F22293C@qq.com>
-X-QQ-MIME: TCMime 1.0 by Tencent
-X-Mailer: QQMail 2.x
-X-QQ-Mailer: QQMail 2.x
-References: <20190213105041.13537-1-ming.lei@redhat.com>
-        <20190213105041.13537-2-ming.lei@redhat.com>
-        <20190213150407.GB96272@google.com>
-        <alpine.DEB.2.21.1902132112590.1659@nanos.tec.linutronix.de>
-        <20190213213149.GB8027@localhost.localdomain>
-        <alpine.DEB.2.21.1902132232560.1659@nanos.tec.linutronix.de>
-        <20190213223711.GC8027@localhost.localdomain>
-        <alpine.DEB.2.21.1902140949280.1659@nanos.tec.linutronix.de>
-        <tencent_6460D33741AF25B57E7BE493@qq.com>
-        <alpine.DEB.2.21.1902141430190.1561@nanos.tec.linutronix.de>
-In-Reply-To: <alpine.DEB.2.21.1902141430190.1561@nanos.tec.linutronix.de>
-X-QQ-ReplyHash: 839700712
-X-QQ-SENDSIZE: 520
-Received: from qq.com (unknown [127.0.0.1])
-        by smtp.qq.com (ESMTP) with SMTP
-        id ; Tue, 19 Feb 2019 08:42:30 +0800 (CST)
-Feedback-ID: bizmailfree:lemote.com:qybgweb:qybgweb22
+        id S1732699AbfBSB1E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Feb 2019 20:27:04 -0500
+Received: from userp2120.oracle.com ([156.151.31.85]:39010 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726175AbfBSB1D (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Feb 2019 20:27:03 -0500
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1J1Nnb6141573;
+        Tue, 19 Feb 2019 01:26:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=R17V8XyrCVm8dipNbd4dGNKWnLfbOeh9TeYt21aXq3Y=;
+ b=gr5iHHXxw0URdGMMccIML6YvVS0rh6SNdOTNmx2aH768ZYBU1VAg/i9LVEB/9mXnh7O6
+ 07FzLcqo68eMHjXAuRzwC7cnIhG9rStlhGG97Q01pcHSjkCL1NdaRF139p3hom9k+soM
+ WCHA9RdLgXB6o/inqavKcXaiQqahOaxsGva16/IpA1sLlFxwZYRaJ8a+2tg7fS5NE2u1
+ bQkrQyE36pEwcNczzHNmjBQFuWNaDa3uDM3cIWYy98GZMUN6EZlnN36KJCa43h1ad/kb
+ gEo+ndG/ruiiJjA7mHrz2iDtwwed4AJDI1Lrc6wkYD0LeM3jf3vES/XqHwjE6OqDKhqp iQ== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by userp2120.oracle.com with ESMTP id 2qpb5r8b57-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Feb 2019 01:26:52 +0000
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x1J1QoRH017163
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Feb 2019 01:26:51 GMT
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x1J1QnVj005140;
+        Tue, 19 Feb 2019 01:26:49 GMT
+Received: from [10.182.69.118] (/10.182.69.118)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 18 Feb 2019 17:26:49 -0800
+Subject: Re: [RFC PATCH v2 0/9] Block/XFS: Support alternative mirror device
+ retry
+To:     Bob Liu <bob.liu@oracle.com>, linux-block@vger.kernel.org
+Cc:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        martin.petersen@oracle.com, shirley.ma@oracle.com,
+        allison.henderson@oracle.com, david@fromorbit.com,
+        darrick.wong@oracle.com, hch@infradead.org, adilger@dilger.ca
+References: <20190213095044.29628-1-bob.liu@oracle.com>
+ <c2b6ec5c-ad8a-6f69-c8b9-8e264cc6aa0d@oracle.com>
+From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <5053beac-658e-d6a7-bcf8-050e0590f18d@oracle.com>
+Date:   Tue, 19 Feb 2019 09:29:16 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <c2b6ec5c-ad8a-6f69-c8b9-8e264cc6aa0d@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9171 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1902190008
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-TXkgbGVtb3RlLmNvbSBlbWFpbCBpcyB0b28gd2VhaywgSSdsbCBzdG9wIHRvcCBwb3N0IGJl
-Y2F1c2UgdGhpcyB0aW1lIEkndmUNCmNjLWVkIG15IGdtYWlsLg0KDQpJJ3ZlIHRlc3RlZCwg
-dGhpcyBwYXRjaCBjYW4gZml4IHRoZSBudm1lIHByb2JsZW0sIGJ1dCBpdCBjYW4ndCBiZSBh
-cHBsaWVkDQp0byA0LjE5IGJlY2F1c2Ugb2YgZGlmZmVyZW50IGNvbnRleHQuIEFuZCwgSSBz
-dGlsbCB0aGluayBteSBvcmlnaW5hbCBzb2x1dGlvbg0KKGdlbmlycS9hZmZpbml0eTogQXNz
-aWduIGRlZmF1bHQgYWZmaW5pdHkgdG8gcHJlL3Bvc3QgdmVjdG9ycykgaXMgY29ycmVjdC4N
-ClRoZXJlIG1heSBiZSBzaW1pbGFyIHByb2JsZW1zIGV4Y2VwdCBudm1lLg0KIA0KSHVhY2Fp
-DQoNCi0tLS0tLS0tLS0tLS0tLS0tLSBPcmlnaW5hbCAtLS0tLS0tLS0tLS0tLS0tLS0NCkZy
-b206ICAiVGhvbWFzIEdsZWl4bmVyIjx0Z2x4QGxpbnV0cm9uaXguZGU+Ow0KRGF0ZTogIFRo
-dSwgRmViIDE0LCAyMDE5IDA5OjMxIFBNDQpUbzogICLpmYjljY7miY0iPGNoZW5oY0BsZW1v
-dGUuY29tPjsNCkNjOiAgIktlaXRoIEJ1c2NoIjxrZWl0aC5idXNjaEBpbnRlbC5jb20+OyAi
-Qmpvcm4gSGVsZ2FhcyI8aGVsZ2Fhc0BrZXJuZWwub3JnPjsgIkplbnMgQXhib2UiPGF4Ym9l
-QGtlcm5lbC5kaz47ICJTYWdpIEdyaW1iZXJnIjxzYWdpQGdyaW1iZXJnLm1lPjsgImxpbnV4
-LXBjaSI8bGludXgtcGNpQHZnZXIua2VybmVsLm9yZz47ICJMS01MIjxsaW51eC1rZXJuZWxA
-dmdlci5rZXJuZWwub3JnPjsgImxpbnV4LW52bWUiPGxpbnV4LW52bWVAbGlzdHMuaW5mcmFk
-ZWFkLm9yZz47ICJNaW5nIExlaSI8bWluZy5sZWlAcmVkaGF0LmNvbT47ICJsaW51eC1ibG9j
-ayI8bGludXgtYmxvY2tAdmdlci5rZXJuZWwub3JnPjsgIkNocmlzdG9waCBIZWxsd2lnIjxo
-Y2hAbHN0LmRlPjsNClN1YmplY3Q6ICBSZTogW1BBVENIIFYzIDEvNV0gZ2VuaXJxL2FmZmlu
-aXR5OiBkb24ndCBtYXJrICdhZmZkJyBhcyBjb25zdA0KIA0KT24gVGh1LCAxNCBGZWIgMjAx
-OSwg6ZmI5Y2O5omNIHdyb3RlOg0KDQpQbGVhc2UgZG8gbm90IHRvcCBwb3N0Li4uLg0KDQo+
-IEknbGwgdGVzdCBuZXh0IHdlZWssIGJ1dCA0LjE5IGhhcyB0aGUgc2FtZSBwcm9ibGVtLCBo
-b3cgdG8gZml4IHRoYXQgZm9yIDQuMTk/DQoNCkJ5IGFwcGx5aW5nIHRoZSB2ZXJ5IHNhbWUg
-cGF0Y2ggcGVyaGFwcz8NCg0KVGhhbmtzLA0KDQp0Z2x4
 
+
+On 2/18/19 4:08 PM, jianchao.wang wrote:
+> Hi Bob
+> 
+> On 2/13/19 5:50 PM, Bob Liu wrote:
+>> Motivation:
+>> When fs data/metadata checksum mismatch, lower block devices may have other
+>> correct copies. e.g. If XFS successfully reads a metadata buffer off a raid1 but
+>> decides that the metadata is garbage, today it will shut down the entire
+>> filesystem without trying any of the other mirrors.  This is a severe
+>> loss of service, and we propose these patches to have XFS try harder to
+>> avoid failure.
+>>
+>> This patch prototype this mirror retry idea by:
+>> * Adding @nr_mirrors to struct request_queue which is similar as
+>>   blk_queue_nonrot(), filesystem can grab device request queue and check max
+>>   mirrors this block device has.
+>>   Helper functions were also added to get/set the nr_mirrors.
+>>
+>> * Introducing bi_rd_hint just like bi_write_hint, but bi_rd_hint is a long bitmap
+>> in order to support stacked layer case.
+> 
+> Why does we need a bitmap to know which underlying device has been tried ?
+> For example, the following scenario,
+> 
+>                     md8
+>                    / | \
+>                sda sdb sdc
+> 
+> If the the raid read the data from sda and fs check and find the data is corrupted.
+> Then we may just need to let raid1 know that the data is from sda. Then based on this
+> hint, raid1 could handle it with handle_read_error to try other replica and fix the
+> error.
+
+This doesn't work.
+The md raid1 can only see IO success or failure, so fix_read_error won't fix this.
+Sorry for the noise.
+
+Thanks
+Jianchao
+
+> 
+> If this is feasible, we just need to modify the bio as following and needn't add any
+> bytes in it.
+> 
+> struct bio {
+>     ...
+>     union {
+>         unsigned short bi_write_hint;
+>         unsigned short bi_read_hint;
+>     }
+>     ...
+> }
+> 
+> Thanks
+> Jianchao
+>>
+>> * Modify md/raid1 to support this retry feature.
+>>
+>> * Adapter xfs to use this feature.
+>>   If the read verify fails, we loop over the available mirrors and retry the read.
+>>
+>> * Rewrite retried read
+>>   When the read verification fails, but the retry succeedes
+>>   write the buffer back to correct the bad mirror
+>>
+>> * Add tracepoints and logging to alternate device retry.
+>>   This patch adds new log entries and trace points to the alternate device retry
+>>   error path.
+>>
+>> Changes v2:
+>> - No more reuse bi_write_hint
+>> - Stacked layer support(see patch 4/9)
+>> - Other feedback fix
+>>
+>> Allison Henderson (5):
+>>   Add b_alt_retry to xfs_buf
+>>   xfs: Add b_rd_hint to xfs_buf
+>>   xfs: Add device retry
+>>   xfs: Rewrite retried read
+>>   xfs: Add tracepoints and logging to alternate device retry
+>>
+>> Bob Liu (4):
+>>   block: add nr_mirrors to request_queue
+>>   block: add rd_hint to bio and request
+>>   md:raid1: set mirrors correctly
+>>   md:raid1: rd_hint support and consider stacked layer case
+>>
+>>  Documentation/block/biodoc.txt |   3 +
+>>  block/bio.c                    |   1 +
+>>  block/blk-core.c               |   4 ++
+>>  block/blk-merge.c              |   6 ++
+>>  block/blk-settings.c           |  24 +++++++
+>>  block/bounce.c                 |   1 +
+>>  drivers/md/raid1.c             | 123 ++++++++++++++++++++++++++++++++-
+>>  fs/xfs/xfs_buf.c               |  58 +++++++++++++++-
+>>  fs/xfs/xfs_buf.h               |  14 ++++
+>>  fs/xfs/xfs_trace.h             |   6 +-
+>>  include/linux/blk_types.h      |   1 +
+>>  include/linux/blkdev.h         |   4 ++
+>>  include/linux/types.h          |   3 +
+>>  13 files changed, 244 insertions(+), 4 deletions(-)
+>>
+> 
