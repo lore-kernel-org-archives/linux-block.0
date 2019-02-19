@@ -2,96 +2,96 @@ Return-Path: <SRS0=aQmj=Q2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A39C0C43381
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 23:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE55C43381
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 23:28:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 711B42147A
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 23:26:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E24321738
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 23:28:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="d43isa+m"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="V+TXyqG4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727916AbfBSX0g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Feb 2019 18:26:36 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:56274 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726405AbfBSX0g (ORCPT
+        id S1729881AbfBSX23 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Feb 2019 18:28:29 -0500
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:47646 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728409AbfBSX23 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Feb 2019 18:26:36 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1JNEQpb048206;
-        Tue, 19 Feb 2019 23:26:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=A4GsdpQi/NmjSiAwkgFYWnN1QdnBsK00MyLvt6+uEtA=;
- b=d43isa+mk+Mc5TC7h12DbFWixiYz+pzknXloEL5UiKxs3lA7puyHiyRkVjrHoaifvhDe
- m5Kr5TqYrhWpE1OUSeQVK417hbO7/GlJNe8A6RUhQcmwvO2VpHYNstLJgb2BKUerV1zr
- UxU6NzU5F2ppxnSv7VuwGx9BMNZ/qTLpNvmXurPDQWgzNDAJOW4ZI5nT+Twa1alDlGhX
- 2EAhZi6/q02HTxc8Z+MESIJu/majcnbtHa1pPZVjtcWeIV+0D32SqvkhrVP1/+h0lJMk
- L9/BOjwmAsV3u0JCB5ICd0MRwb12/xL4RhLVTwgdugP9vF/Xn020P10ShVJQqSSUvPTT Sg== 
-Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
-        by userp2120.oracle.com with ESMTP id 2qpb5re9pn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Feb 2019 23:26:29 +0000
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x1JNQOpK004931
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Feb 2019 23:26:24 GMT
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x1JNQN4c028461;
-        Tue, 19 Feb 2019 23:26:23 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 19 Feb 2019 15:26:22 -0800
-To:     Ming Lei <tom.leiming@gmail.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Linux SCSI List <linux-scsi@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Jeremy Cline <jeremy@jcline.org>,
-        Oleksii Kurochko <olkuroch@cisco.com>,
-        stable <stable@vger.kernel.org>,
-        linux-usb <linux-usb@vger.kernel.org>
-Subject: Re: [PATCH v2] scsi: sd: block: Fix regressions in read-only block device handling
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <yq1d0nxuf73.fsf@oracle.com>
-        <20190213025717.20057-1-martin.petersen@oracle.com>
-        <CACVXFVN9LXodRP8+T_Vd8+5g9K=+hke7ik7N21=heb3csFhh=w@mail.gmail.com>
-Date:   Tue, 19 Feb 2019 18:26:20 -0500
-In-Reply-To: <CACVXFVN9LXodRP8+T_Vd8+5g9K=+hke7ik7N21=heb3csFhh=w@mail.gmail.com>
-        (Ming Lei's message of "Tue, 19 Feb 2019 09:36:54 +0800")
-Message-ID: <yq1h8czl5r7.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9172 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=815 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1902190158
+        Tue, 19 Feb 2019 18:28:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1550618909; x=1582154909;
+  h=from:to:cc:subject:date:message-id;
+  bh=3n0X+YjkqcMNHpFi1a2qee/6jTbAyFN6iLtFc66UG/k=;
+  b=V+TXyqG4bw5xxYwRdPWB3LB8zyI7cOwzbImT+Gv0kWqRN2jcZ9EGXiz6
+   N4Fj4dHAveoO3fM7EhjfDSA7Qc2Y0vacs9kOn1IANSvfNO+rB0gXpXRac
+   SXaDcv0KIgUT/WrCPOVHboQ5ChaJUwtHT7F7F9S/K0VA5D7EkHRSXGKfh
+   hFWCqpBKwZIww5RNyLQboDcYnz6RaCzkigGiGXcwNGgQACw6iS9ooRjDl
+   OE3lnGC7fPR/TTg8aAGm/EduriIsvnqIURi1OI14c/Vf5YVIrlRzEnN3b
+   nvNvU969uqaLdwtKwjx3u2+m5odl6GBbd0ZN8l07mz2DQUvuDrzJ9kKA2
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.58,388,1544457600"; 
+   d="scan'208";a="101666781"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 20 Feb 2019 07:28:28 +0800
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP; 19 Feb 2019 15:06:52 -0800
+Received: from cmercuryqemu.hgst.com ([10.202.65.32])
+  by uls-op-cesaip01.wdc.com with ESMTP; 19 Feb 2019 15:28:29 -0800
+From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+To:     linux-block@vger.kernel.org
+Cc:     osandov@osandov.com, bvanassche@acm.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH 0/8] nvme: misc cleanups
+Date:   Tue, 19 Feb 2019 15:28:17 -0800
+Message-Id: <1550618905-4112-1-git-send-email-chaitanya.kulkarni@wdc.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Omar,
+   
+   This is a small patch series which follows the blktests codingi
+   style format as pointed out by Bart. Also minimizes the overall
+   code for the review.
 
-Hi Ming,
+-Regards,
+Chaitanya
 
-> From the Bugzilla, looks it is only reported on the "Kingston DT
-> Ultimate G3" USB flash drive.
 
-There are several bug reports as a result of the change. It's not at all
-uncommon for a device to switch at runtime. Before Jeremy's change we
-just didn't see it because the device setting always took precedence and
-voided any user setting.
+Chaitanya Kulkarni (8):
+  nvme/021: use consistent coding style
+  nvme/022: use consistent coding style
+  nvme/023: use consistent coding style
+  nvme/024: use consistent coding style
+  nvme/025: use consistent coding style
+  nvme/026: use consistent coding style
+  nvme/027: use consistent coding style
+  nvme/028: use consistent coding style
+
+ tests/nvme/021     | 15 ++++++---------
+ tests/nvme/021.out |  1 -
+ tests/nvme/022     | 16 ++++++----------
+ tests/nvme/022.out |  1 -
+ tests/nvme/023     | 16 ++++++----------
+ tests/nvme/023.out |  1 -
+ tests/nvme/024     | 16 ++++++----------
+ tests/nvme/024.out |  1 -
+ tests/nvme/025     | 16 ++++++----------
+ tests/nvme/025.out |  1 -
+ tests/nvme/026     | 16 ++++++----------
+ tests/nvme/026.out |  1 -
+ tests/nvme/027     | 16 ++++++----------
+ tests/nvme/027.out |  1 -
+ tests/nvme/028     | 17 ++++++-----------
+ tests/nvme/028.out |  1 -
+ 16 files changed, 48 insertions(+), 88 deletions(-)
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+1.8.3.1
+
