@@ -2,108 +2,71 @@ Return-Path: <SRS0=aQmj=Q2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_MUTT
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2254AC43381
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 14:40:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63DEEC43381
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 14:45:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E657B21736
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 14:40:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 34F822146E
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 14:45:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="FgbAiY5b"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Bg+NNfXr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725845AbfBSOko (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Feb 2019 09:40:44 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:44096 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725808AbfBSOko (ORCPT
+        id S1727246AbfBSOpA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Feb 2019 09:45:00 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:33814 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725885AbfBSOpA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Feb 2019 09:40:44 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1JEdMc8176614;
-        Tue, 19 Feb 2019 14:40:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2018-07-02;
- bh=u4LSbmZRd3YfmKn1kmc/Km3VA780RbI0ABcNQMGZT0M=;
- b=FgbAiY5byL5X2Jml9RBfdE2VBMTVtIs24ujkddp4CZdYOsr1Rp4hZ9M0jbynOB5rJYRY
- qvSgs3b17EpVnwLAspcbGlU6qn+G33rUbwM6WQkGMAjc/WXqYOr/nUpztuH68xv0eXUW
- VXN8XQVNg41wS3OO5Do99QBctb6eoDMn0IkYmnZAe4Q1gLL7s2pL9moF9IkHBxQzaNen
- ZZgQEsEyFXyDivaFc9sALI+iuc22VKd3cstMwmlhsUH98GOosi8v8y4JDVy78vTW+nJS
- qEWpMqchcL6u1jXULsLLDZbHBfRQuWwNWkleRYVxb/e9KQPi1G/KRaQsvbb/zdgHxIqh CA== 
-Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
-        by userp2130.oracle.com with ESMTP id 2qp9xtuk14-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Feb 2019 14:40:39 +0000
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x1JEecp7001905
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Feb 2019 14:40:39 GMT
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x1JEec1m015774;
-        Tue, 19 Feb 2019 14:40:38 GMT
-Received: from kadam (/197.157.0.53)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 19 Feb 2019 06:40:38 -0800
-Date:   Tue, 19 Feb 2019 17:40:30 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Colin King <colin.king@canonical.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH][next][V2] block: don't dereference a potential null bio
- pointer until is has been null checked
-Message-ID: <20190219144030.GL17104@kadam>
-References: <20190219143702.11926-1-colin.king@canonical.com>
+        Tue, 19 Feb 2019 09:45:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=21DHr+RSj+xLDKfUOmmwQEe9U8Yhv3wyd3vmDfQBbJ8=; b=Bg+NNfXr8pMNxktAjX0ExkyVv
+        lOVOoBcOoNUemoyU0nqmdAKULhDXV51CARXuwixN51/frSvDKHAQyC9gWmOcQUKqwf2LBzaECW/v9
+        5T6e7ypytKZM1hjJQ5+vIH+M8S3EH0yWq0te02Qz3+j4NRy0KO+Vj8f+QrbUEO4qRquWe2sd0K4uM
+        29InieQC7y/wRfX+gkc/3SA8hQLf7Dk4jUEnQIR7wCmC+fR3QcDWxZGBHnuSnL5fxuP5FEtyfNNWs
+        wYYKgm3NuUkjYL6QAE0DtVmUV+Le0h5If2nKRN/8DgwColGlvf/ZNYAjJDstbSPcDoTIROfGBfSDm
+        4VliQC82g==;
+Received: from willy by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gw6di-0007i1-S2; Tue, 19 Feb 2019 14:44:54 +0000
+Date:   Tue, 19 Feb 2019 06:44:54 -0800
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Meelis Roos <mroos@linux.ee>, "Theodore Y. Ts'o" <tytso@mit.edu>,
+        linux-alpha@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
+Message-ID: <20190219144454.GB12668@bombadil.infradead.org>
+References: <fb63a4d0-d124-21c8-7395-90b34b57c85a@linux.ee>
+ <1c26eab4-3277-9066-5dce-6734ca9abb96@linux.ee>
+ <076b8b72-fab0-ea98-f32f-f48949585f9d@linux.ee>
+ <20190216174536.GC23000@mit.edu>
+ <e175b885-082a-97c1-a0be-999040a06443@linux.ee>
+ <20190218120209.GC20919@quack2.suse.cz>
+ <4e015688-8633-d1a0-308b-ba2a78600544@linux.ee>
+ <20190219132026.GA28293@quack2.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190219143702.11926-1-colin.king@canonical.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9171 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1902190110
+In-Reply-To: <20190219132026.GA28293@quack2.suse.cz>
+User-Agent: Mutt/1.9.2 (2017-12-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 19, 2019 at 02:37:02PM +0000, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
-> 
-> The bio pointer is being null checked hence it can be potentially null,
-> however earlier it is being derefefenced on the assignment of front_seg_size.
-> Avoid the dereference issue by only assigning front_seg_size after bios has
-> been null sanity checked.
-> 
-> Fixes: dcebd755926b ("block: use bio_for_each_bvec() to compute multi-page bvec count")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
-> ---
-> 
-> V2: remove front_seg_size assignment when it is declared
-> 
-> ---
->  block/blk-merge.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-merge.c b/block/blk-merge.c
-> index bed065904677..096947413ea9 100644
-> --- a/block/blk-merge.c
-> +++ b/block/blk-merge.c
-> @@ -363,7 +363,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
->  	struct bio_vec bv, bvprv = { NULL };
->  	int prev = 0;
->  	unsigned int seg_size, nr_phys_segs;
-> -	unsigned front_seg_size = bio->bi_seg_front_size;
-> +	unsigned front_seg_size;
+On Tue, Feb 19, 2019 at 02:20:26PM +0100, Jan Kara wrote:
+> Thanks for information. Yeah, that makes somewhat more sense. Can you ever
+> see the failure if you disable CONFIG_TRANSPARENT_HUGEPAGE? Because your
+> findings still seem to indicate that there' some problem with page
+> migration and Alpha (added MM list to CC).
 
-Smatch says bio is non-NULL but I didn't verify by hand.
-
-regards,
-dan carpenter
-
+Could
+https://lore.kernel.org/linux-mm/20190219123212.29838-1-larper@axis.com/T/#u
+be relevant?
