@@ -2,137 +2,142 @@ Return-Path: <SRS0=aQmj=Q2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0211C43381
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 16:48:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B77DC43381
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 16:50:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8995F21773
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 16:48:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40B8721773
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 16:50:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mSBjkDI3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725991AbfBSQsM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Feb 2019 11:48:12 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:36075 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725820AbfBSQsM (ORCPT
+        id S1725820AbfBSQt7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Feb 2019 11:49:59 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:40265 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726110AbfBSQt7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Feb 2019 11:48:12 -0500
-Received: by mail-pf1-f196.google.com with SMTP id n22so10494372pfa.3
-        for <linux-block@vger.kernel.org>; Tue, 19 Feb 2019 08:48:12 -0800 (PST)
+        Tue, 19 Feb 2019 11:49:59 -0500
+Received: by mail-pl1-f194.google.com with SMTP id bj4so10703370plb.7;
+        Tue, 19 Feb 2019 08:49:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:from:to:cc:subject:date:message-id;
+        bh=B2VKAD0UxqNA8Steehxbgu6qDZa4biIz9/CEmlJKQN8=;
+        b=mSBjkDI3USrO6pu1VpmMXcUL/UC54E7Mmpf+HwgmxmOG3LXt03KaH6zHQwVGmYj9Fz
+         Nbm0/qHjqdrVJxCwxQEFV+oKXTzANTJewQg3nLhA88C1N4u9fxPhL3Cpg+wxfrsupam9
+         0y+su0YB2GoTl/RP6xSutzxdLy2A6u57VYoPJ5suzXv9ES4ze2NYAWm85axGw5JWHzVw
+         MuzmLJl0J+FPMkFJrE2Ww7N91wvnYqQHMPYID22po9tcd6RGJrBc8Mer3yAHStd6EDkx
+         K13zWt1d3B/6IgkPCvJ+I3O7STeVSbLqTzkIkrT+LUqtI5ILmVrUF0Vqb3NGfsSoUyoF
+         YjHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=uaraASNSnWwxjSvT5Cp6zL7Rz8GkYfmy/keGzwwuZOo=;
-        b=iYgwj3YOjXDOh7WwYlQNM5M1IhxfSa0sEbMOmg6f0jh4SI7IA9/f4Egw4u3AGcj0gT
-         eyjouOTIpUtrS9nXk/Cc5r3CNMcSAoQ3K84cGzM2yZzmBYmjdelUJB/VktluoT4Lvqes
-         0s2md3cHIsUvXXDMNeuGBvl7KLCbXWhbFSA/XwkRnC5wNxOatCh2G3EPwcgamE/Aa/u4
-         Bc6kv+lmRQXZv5aTTXLdijHSbryXirYbeBKs1Y66DW8mefDxbc+YBI1miTG712CgNyvk
-         njcub59XLUleFG95PhxyL5rlHvzRG4evX8atqDIcxl0bYu6ASebPTXQb/8IvzlP4NOie
-         b6hw==
-X-Gm-Message-State: AHQUAuYdm+X9jfHqdj0othWao2SkNmwESgRL/2JRrN4vae69nVmT4jgW
-        GF2oEk7y90D0nkWn9nFFRMY=
-X-Google-Smtp-Source: AHgI3Ia8mVV45bGdA9hvxp0IlDhBHaVEMkB7ShOCx43/9ZKiqCrkNWTYNX2FXND7438udacDJ34QVQ==
-X-Received: by 2002:a63:be4d:: with SMTP id g13mr24864485pgo.378.1550594891619;
-        Tue, 19 Feb 2019 08:48:11 -0800 (PST)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id c124sm23932086pfb.3.2019.02.19.08.48.10
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 19 Feb 2019 08:48:10 -0800 (PST)
-Message-ID: <1550594889.31902.126.camel@acm.org>
-Subject: Re: v4.20-rc6: Sporadic use-after-free in bt_iter()
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Evan Green <evgreen@google.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "jianchao.wang" <jianchao.w.wang@oracle.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Date:   Tue, 19 Feb 2019 08:48:09 -0800
-In-Reply-To: <CAE=gft5H83gC2ay63druSr4sCznrXKvKd=FCTXpx_c2F3Z+icA@mail.gmail.com>
-References: <1545261885.185366.488.camel@acm.org>
-         <a45c9931-ce8b-0ac8-f304-412c6042eff9@kernel.dk>
-         <372d2960-ff0c-1135-28f9-23eea8670463@oracle.com>
-         <ccf50ee5-ff34-39a0-d7eb-3853fee55a4c@kernel.dk>
-         <6ae35005-7ba9-91e1-f315-d128f410c12c@kernel.dk>
-         <1545328865.185366.508.camel@acm.org>
-         <bd78b521-d0d4-22ec-ff7f-2d70709ca742@kernel.dk>
-         <b9c3bd7c-9e82-7300-d525-0bd72ed66f66@kernel.dk>
-         <1545339362.185366.511.camel@acm.org>
-         <e7d6d857-b20a-245c-c6c7-fb9b110215e9@kernel.dk>
-         <1545340987.185366.515.camel@acm.org>
-         <120bb59a-af93-7d8c-9afc-7087973632bf@kernel.dk>
-         <1545341470.185366.519.camel@acm.org>
-         <61515137-0565-e3b7-e6de-554af7d49753@kernel.dk>
-         <1545342043.185366.523.camel@acm.org>
-         <60b4819c-4c19-a4e3-41f3-e21b0544c9a4@kernel.dk>
-         <68c73daa-10e7-29da-b890-bf167ec164c2@kernel.dk>
-         <1545344398.185366.531.camel@acm.org>
-         <1864f5b8-cf64-a406-a3e0-9f5124ff95b5@kernel.dk>
-         <a04dee3c-f355-4d28-caa4-21c7265ccae4@kernel.dk>
-         <5869f2ed-dc65-135f-f12f-c14a1184125e@kernel.dk>
-         <71fb9eff-43eb-24aa-fb67-be56a3a97983@kernel.dk>
-         <1550187391.31902.87.camel@acm.org>
-         <CAE=gft5H83gC2ay63druSr4sCznrXKvKd=FCTXpx_c2F3Z+icA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=B2VKAD0UxqNA8Steehxbgu6qDZa4biIz9/CEmlJKQN8=;
+        b=hkOECSmU58xAanNPpc0sAGqb9wH7jyMSRXv/4/yA6fxGNQHa/P/FynGyqhAa/fQTD2
+         RCjco49Ns6H3wfgyp1OyvPO01Y1EPS4c64Qaq5Zntknww2wH4l9QHxD/DbUZBVboa42K
+         vzmnyjWpQi6pjXW2NHujFoWuJ65wC9A6+9xLruDDW7Dvo7Z+5vVAKa7j+ZP+eq81S87d
+         eQo/PtDRW1wdiMpQnkZIOfchl7DJNXi3vznNj/H4E6aRuuGQ25tMHAMv9u/CfNU/qoRU
+         FDZSgq2S8GKk2i4jXL9C6LBwisyX5wxbImAD3AHz2PE0GQxMxA17uSd5TDgq8NHf2/6U
+         t5gA==
+X-Gm-Message-State: AHQUAuYb0YxwCIn4U+eCzDc8rK5sJZHokM0aJxSpHvcfkQKh3BGoJWnC
+        eIiF3ModncZwBa0xxO47Q3k=
+X-Google-Smtp-Source: AHgI3Ib3vn54919FgTLq8OaDOFUnwF49IgCjjOCeu/shK+Saw2cs1q27jT8WX1GDUT2pWSw96p03vQ==
+X-Received: by 2002:a17:902:2f:: with SMTP id 44mr23276419pla.44.1550594998657;
+        Tue, 19 Feb 2019 08:49:58 -0800 (PST)
+Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id o26sm17516313pfk.139.2019.02.19.08.49.57
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 19 Feb 2019 08:49:57 -0800 (PST)
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     Michal Simek <michal.simek@xilinx.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Guenter Roeck <linux@roeck-us.net>
+Subject: [PATCH] xsysace: Fix error handling in ace_setup
+Date:   Tue, 19 Feb 2019 08:49:56 -0800
+Message-Id: <1550594996-11453-1-git-send-email-linux@roeck-us.net>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 2019-02-15 at 10:29 -0800, Evan Green wrote:
-+AD4 I got all turned around while trying to understand this fix, and I'll
-+AD4 admit it's probably just me. It looks like you're trying to use an rcu
-+AD4 lock to prevent the iter functions from racing with free. Is that
-+AD4 true? But then the race at least as I understand it wasn't that there
-+AD4 was a free in-flight, it's that the free had happened a long time ago,
-+AD4 and there was still a stale value in tags-+AD4-rqs+AFs-bitnr+AF0. So maybe
-+AD4 there's some other issue that part is solving?
-+AD4 
-+AD4 And then it looks like you added a new struct where tags-+AD4-rqs was so
-+AD4 that you could compare hctx-+AD4-queue without reaching through rq. I have
-+AD4 no idea if that's sufficient to prevent stale accesses through rq.
-+AD4 Since you're changing multiple values I think where you populate that
-+AD4 structure you'd at least need to do something like: clear rq, barrier,
-+AD4 set hctx, barrier, set rq. But like Bart said, that's probably not the
-+AD4 right way to go.
-+AD4 
-+AD4 Finally, I didn't really get why the conditional in
-+AD4 blk+AF8-mq+AF8-rq+AF8-inflight() changed. Is that guarding against some other
-+AD4 identified problem, or just an additional check you can do when you
-+AD4 convert rqs into a struct?
-+AD4 
-+AD4 It looks like blk+AF8-mq+AF8-free+AF8-rqs() might be the magic function I was
-+AD4 looking for earlier. Would it be possible to just clear tags+AFs-rq-+AD4-tag+AF0
-+AD4 for each static+AF8-rq? Or is it possible for rqs from one set to end up
-+AD4 in the tags array of another set? (Which would make what I just
-+AD4 suggested insufficient).
+If xace hardware reports a bad version number, the error handling code
+in ace_setup() calls put_disk(), followed by queue cleanup. However, since
+the disk data structure has the queue pointer set, put_disk() also
+cleans and releases the queue. This results in blk_cleanup_queue()
+accessing an already released data structure, which in turn may result
+in a crash such as the following.
 
-Hi Evan,
+[   10.681671] BUG: Kernel NULL pointer dereference at 0x00000040
+[   10.681826] Faulting instruction address: 0xc0431480
+[   10.682072] Oops: Kernel access of bad area, sig: 11 [#1]
+[   10.682251] BE PAGE_SIZE=4K PREEMPT Xilinx Virtex440
+[   10.682387] Modules linked in:
+[   10.682528] CPU: 0 PID: 1 Comm: swapper Tainted: G        W         5.0.0-rc6-next-20190218+ #2
+[   10.682733] NIP:  c0431480 LR: c043147c CTR: c0422ad8
+[   10.682863] REGS: cf82fbe0 TRAP: 0300   Tainted: G        W          (5.0.0-rc6-next-20190218+)
+[   10.683065] MSR:  00029000 <CE,EE,ME>  CR: 22000222  XER: 00000000
+[   10.683236] DEAR: 00000040 ESR: 00000000
+[   10.683236] GPR00: c043147c cf82fc90 cf82ccc0 00000000 00000000 00000000 00000002 00000000
+[   10.683236] GPR08: 00000000 00000000 c04310bc 00000000 22000222 00000000 c0002c54 00000000
+[   10.683236] GPR16: 00000000 00000001 c09aa39c c09021b0 c09021dc 00000007 c0a68c08 00000000
+[   10.683236] GPR24: 00000001 ced6d400 ced6dcf0 c0815d9c 00000000 00000000 00000000 cedf0800
+[   10.684331] NIP [c0431480] blk_mq_run_hw_queue+0x28/0x114
+[   10.684473] LR [c043147c] blk_mq_run_hw_queue+0x24/0x114
+[   10.684602] Call Trace:
+[   10.684671] [cf82fc90] [c043147c] blk_mq_run_hw_queue+0x24/0x114 (unreliable)
+[   10.684854] [cf82fcc0] [c04315bc] blk_mq_run_hw_queues+0x50/0x7c
+[   10.685002] [cf82fce0] [c0422b24] blk_set_queue_dying+0x30/0x68
+[   10.685154] [cf82fcf0] [c0423ec0] blk_cleanup_queue+0x34/0x14c
+[   10.685306] [cf82fd10] [c054d73c] ace_probe+0x3dc/0x508
+[   10.685445] [cf82fd50] [c052d740] platform_drv_probe+0x4c/0xb8
+[   10.685592] [cf82fd70] [c052abb0] really_probe+0x20c/0x32c
+[   10.685728] [cf82fda0] [c052ae58] driver_probe_device+0x68/0x464
+[   10.685877] [cf82fdc0] [c052b500] device_driver_attach+0xb4/0xe4
+[   10.686024] [cf82fde0] [c052b5dc] __driver_attach+0xac/0xfc
+[   10.686161] [cf82fe00] [c0528428] bus_for_each_dev+0x80/0xc0
+[   10.686314] [cf82fe30] [c0529b3c] bus_add_driver+0x144/0x234
+[   10.686457] [cf82fe50] [c052c46c] driver_register+0x88/0x15c
+[   10.686610] [cf82fe60] [c09de288] ace_init+0x4c/0xac
+[   10.686742] [cf82fe80] [c0002730] do_one_initcall+0xac/0x330
+[   10.686888] [cf82fee0] [c09aafd0] kernel_init_freeable+0x34c/0x478
+[   10.687043] [cf82ff30] [c0002c6c] kernel_init+0x18/0x114
+[   10.687188] [cf82ff40] [c000f2f0] ret_from_kernel_thread+0x14/0x1c
+[   10.687349] Instruction dump:
+[   10.687435] 3863ffd4 4bfffd70 9421ffd0 7c0802a6 93c10028 7c9e2378 93e1002c 38810008
+[   10.687637] 7c7f1b78 90010034 4bfffc25 813f008c <81290040> 75290100 4182002c 80810008
+[   10.688056] ---[ end trace 13c9ff51d41b9d40 ]---
 
-Multiple request queues can share a single tag set. Examples of use cases
-are NVMe namespaces associated with the same NVMe controller and SCSI LUNs
-associated with the same SCSI host. The code that allocates a request not
-only marks a tag as allocated but also updates the rqs+AFsAXQ array in the
-tag set (see also blk+AF8-mq+AF8-get+AF8-request()). The code that iterates over a
-tag set examines both the tag bitmap and the rqs+AFsAXQ array. The code that
-allocates requests and the code that iterates over requests are not
-serialized against each other. That is why the association of a tag with a
-request queue can change while iterating over a tag set.
+Fix the problem by setting the disk queue pointer to NULL before calling
+put_disk(). A more comprehensive fix might be to rearrange the code
+to check the hardware version before initializing data structures,
+but I don't know if this would have undesirable side effects, and
+it would increase the complexity of backporting the fix to older kernels.
 
-Another race condition is that a request can be allocated or freed while
-iterating over a tag set.
+Fixes: 74489a91dd43a ("Add support for Xilinx SystemACE CompactFlash interface")
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+---
+ drivers/block/xsysace.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Fixing these race conditions would require a locking mechanism and I think
-the performance overhead of such a locking mechanism is larger than
-acceptable. So code that iterates over requests either must be able to
-handle such race conditions or must suspend request processing before it
-iterates over requests.
+diff --git a/drivers/block/xsysace.c b/drivers/block/xsysace.c
+index 87ccef4bd69e..32a21b8d1d85 100644
+--- a/drivers/block/xsysace.c
++++ b/drivers/block/xsysace.c
+@@ -1090,6 +1090,8 @@ static int ace_setup(struct ace_device *ace)
+ 	return 0;
+ 
+ err_read:
++	/* prevent double queue cleanup */
++	ace->gd->queue = NULL;
+ 	put_disk(ace->gd);
+ err_alloc_disk:
+ 	blk_cleanup_queue(ace->queue);
+-- 
+2.7.4
 
-This is why I'm in favor of only modifying blk+AF8-mq+AF8-free+AF8-rqs() such that the
-memory in which the tags are stored is delayed until a grace period has
-occurred.
-
-Bart.
