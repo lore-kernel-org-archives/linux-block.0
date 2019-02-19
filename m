@@ -2,350 +2,159 @@ Return-Path: <SRS0=aQmj=Q2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A8CDC43381
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 19:09:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D69CC43381
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 20:07:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A0DA821738
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 19:09:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3E252147C
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 20:07:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v46/rNTU"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="P7NUapv4";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="Cbu4dV3c"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726078AbfBSTJE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Feb 2019 14:09:04 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:33890 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726323AbfBSTJD (ORCPT
+        id S1726473AbfBSUHu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Feb 2019 15:07:50 -0500
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:47031 "EHLO
+        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726321AbfBSUHt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Feb 2019 14:09:03 -0500
-Received: by mail-ot1-f68.google.com with SMTP id 98so36215070oty.1
-        for <linux-block@vger.kernel.org>; Tue, 19 Feb 2019 11:09:03 -0800 (PST)
+        Tue, 19 Feb 2019 15:07:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1550606869; x=1582142869;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=AcJS1SbR2x/2CQm1J1fQMMGYqb9jZP6X0vDfkW+OM2w=;
+  b=P7NUapv4cAK9rovNfGy6063DOXulH2aUH6tNUPF14Ev9+aNQnNskJz2g
+   zi5bAHl/go+R8H20RQx5KaLXjaNNOz71jwJF599GNLvHkMlbfe6/Xr9ez
+   aDIIbylxDmQvl2bRl/7Z7npgyYQWqaNZ8MKLfBo7vn5YNHecV+SwBnP04
+   5mHq9C9fqgRtzXMnZrrxpy9EuTm6bUL9LfzhX9uHPDYVK0RzrXInfr9ry
+   uPRjevSvQPexaYEQSLNk6zj2CPc9EZYGE4bbIJwHKvK1TpwnooNctX+6e
+   rAZnVSljgI24oWqlrKIE9wnj6E5NBR2V9bCTwOecR/ldsZmVIMm/2vAvK
+   g==;
+X-IronPort-AV: E=Sophos;i="5.58,388,1544457600"; 
+   d="scan'208";a="206859234"
+Received: from mail-by2nam05lp2059.outbound.protection.outlook.com (HELO NAM05-BY2-obe.outbound.protection.outlook.com) ([104.47.50.59])
+  by ob1.hgst.iphmx.com with ESMTP; 20 Feb 2019 04:07:34 +0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=bvG6b6XzrUy6ODHrru0E3gxcCFBMenPt77j8iuEmJoo=;
-        b=v46/rNTUJAX1smHBa6j6PCuum5GzWv8BdQvrHeuTVBdY6ZGXhTnK+KGocF55XHYbTz
-         5p6E1KUs4+Jm6kjfU71GiPVT74GZiGW4MQJ1ZJgcz8qCrwrOS430og0PRqsOTi3rStUd
-         TDwUab3syfLV0KoNEeC4qBhwZ305s0xqz3+LRyhPOwuRCe6NbwhEYQYyJzCGfCc5kMrM
-         xes9qRFx/ZCE0BuYx3IWv67RAHeVeKO4nwKx2WVVr1KTCbGKzUpUgBCGvoyln/6tr4Ku
-         zjAYJ4AZywaY+PPZXrEjwlCv3BaPVj9K/C6TYEHpubJq7uU10igqeEiDEKFH1T1k3fDP
-         63cA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bvG6b6XzrUy6ODHrru0E3gxcCFBMenPt77j8iuEmJoo=;
-        b=MZC9UrmyL5ca3TkBXpfW1EGYVgxDyDfklD49E46Vd6S5/2uaGA0t1KsBSLJTMIZB6f
-         /jiQ7dKoOX32LswFQv1qjf1vnl8X4X87xH+wFkut2GzDr7ntgUqfdSR4U+/KzNX26uSD
-         80FI93n5EKYeNwA3nCjTYWgmOHER4uYrBm3xhh3sNq2bRU/uC+MGuVw7cfp8tbY4SumT
-         rO3xNozCYep+UlUE6G6f/+7eIR4JcBw17hzWUpGdznqN7aLSv11+oErjjPIr3hB4ORPM
-         c5TMLZ17c3qo/h4rkGjMVvpYVZruxMnD8n2MiWQJkbFnEUGXZ5LXlclnZadV4OxjxmlR
-         6RzQ==
-X-Gm-Message-State: AHQUAuZQAepbZjVA9n6CLkTbARr1XnX4DheAfi1paZBuuLzDoj1ZJ6sh
-        UwAsiPjpPUh6GL7hAUiP3MTcymhAGwPLAv6z7pbDMg==
-X-Google-Smtp-Source: AHgI3IaxecYb647wY6dJ6uzEWW1oObGJ3vPaDTyJ9uLLHBk6jt38xKz2wKEDNWVhJKqb04AbDsQx9F1FdiDf7PjgZHg=
-X-Received: by 2002:a05:6830:14d6:: with SMTP id t22mr19855488otq.255.1550603342340;
- Tue, 19 Feb 2019 11:09:02 -0800 (PST)
+ d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=r2SmwSjqS6kQyjz4djg/L+XVFm3h2k3SSDokhYpvvLw=;
+ b=Cbu4dV3cJ6LqHhi+sPoNtkofO4VfG1YBe74udlwrWTciV/1RUk55sk+kj11ZEmQsyS9d8TcHFiRGPkdOeN+epw5YVwnkpd7ezRW38k2npypBipYeeNLnWzFx0f8YqRBomf8snJFoaeG1TeCUhBQdbZl/1BdrRF6QlVZNkcdK2R8=
+Received: from SN6PR04MB4527.namprd04.prod.outlook.com (52.135.120.25) by
+ SN6PR04MB3837.namprd04.prod.outlook.com (52.135.81.138) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1643.14; Tue, 19 Feb 2019 20:06:53 +0000
+Received: from SN6PR04MB4527.namprd04.prod.outlook.com
+ ([fe80::c1b7:3d36:3809:f71a]) by SN6PR04MB4527.namprd04.prod.outlook.com
+ ([fe80::c1b7:3d36:3809:f71a%4]) with mapi id 15.20.1643.014; Tue, 19 Feb 2019
+ 20:06:52 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC:     "osandov@osandov.com" <osandov@osandov.com>
+Subject: Re: [PATCH BLKTESTS 3/3] nvme/017: fix output format
+Thread-Topic: [PATCH BLKTESTS 3/3] nvme/017: fix output format
+Thread-Index: AQHUx7tK2FOwo9iaQk6ThojRIsaAwQ==
+Date:   Tue, 19 Feb 2019 20:06:52 +0000
+Message-ID: <SN6PR04MB4527C555ABF5CA70AEF361F3867C0@SN6PR04MB4527.namprd04.prod.outlook.com>
+References: <1550516022-16374-1-git-send-email-chaitanya.kulkarni@wdc.com>
+ <1550516022-16374-4-git-send-email-chaitanya.kulkarni@wdc.com>
+ <1550593062.31902.111.camel@acm.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [199.255.45.63]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: d36f561f-f324-4d83-8cfd-08d696a5ca6b
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600110)(711020)(4605104)(4618075)(2017052603328)(7153060)(7193020);SRVR:SN6PR04MB3837;
+x-ms-traffictypediagnostic: SN6PR04MB3837:
+wdcipoutbound: EOP-TRUE
+x-microsoft-exchange-diagnostics: =?us-ascii?Q?1;SN6PR04MB3837;23:xJC96sRdcCNDoPLmR+x0bFcgjUv/uwGKFKyJHCBJi?=
+ =?us-ascii?Q?OQFCRsypUgbT65aLRmpER/rF5W6C2P9hTOP/pOUQo/oLxnhw+h2mm+ojRnkJ?=
+ =?us-ascii?Q?rbwtaPwdRp6SWVUkITSFXCIUyjk9UxDTaurLGG3ayJ21G+lZ2qNbsFFOVfvw?=
+ =?us-ascii?Q?aLz0W7Afq8cz76Amuj7M7dj/giHNeN8n2g9CsfchEi/KaUgOa3MDOM13zJ9A?=
+ =?us-ascii?Q?HrcL/MDckHOykyfmujsXzP6Xw/ICnDPvVRsGExbd6Hifgx5U3P4wTlla3n29?=
+ =?us-ascii?Q?ovpHYSTVCjj93PCMvbKU43zWZ3hnzS6ohT1+NBuuQpNi0U39pKxxrXndl+sG?=
+ =?us-ascii?Q?AsoBEHSkAHTyKe9F09k4PK9ZPSday3ahqIV0L8DoTR+A0sSswA80V8Tfh+Mj?=
+ =?us-ascii?Q?sxnhn6EoNtco3nRXlyWPY7nD3QLRQtmEEY3uiXDuzJ/5u+lq1r3R7VlIcPx+?=
+ =?us-ascii?Q?e2ioCOZXQb+XFQXYwORlguzr7nRVuMLzqMi0QehfAzhcZZ4AITNFwKHmf7QU?=
+ =?us-ascii?Q?zwCV0qDNH5ORlVM8yNZw+3Gzuas78N0/Ypy5igiFD1P1gdwnQ3npsSAT9xjo?=
+ =?us-ascii?Q?QVg1mWTuMej4yZUOWrfSQu8+wcZD6k2cceMfWHcAehv6ZRjYlJxjg7a9h8tO?=
+ =?us-ascii?Q?OVIGR0A1gBnmKLq2aOFR1ND3Twkr4pEkDsQmxGf8isPPNhCOfwkR2bfihwZF?=
+ =?us-ascii?Q?tQXWz3D3lKRCTSnqEekbXjXoHugs47wKnbQg+yYgXWVOntX7S//lU/h33HI3?=
+ =?us-ascii?Q?pIiBDjVHDnt8P863RhFErLhIJuXfVcdRlDB8tqyVPhKRnlLBKud0tdk7u4UI?=
+ =?us-ascii?Q?Iv19jYvspugPF03D3WUjq3H9oG1/ITZKP6/6RzC9ogEm8C/1DzuPjVrma6fF?=
+ =?us-ascii?Q?4gc2ZOQIUzcaEpKS2uOPvrk686aM9L7IZa16or/uXvna+/gp8sIdyS+3XgbE?=
+ =?us-ascii?Q?elvuNEhU+LaOTcWUXlBEm+vtdcm+eJ0jBW5jU12TvOOgjOmqeSKhud/0k4HJ?=
+ =?us-ascii?Q?s9BaEP9Z3hPwPQxPt2BcGNHssEYk8kAgRmZrlELIEW7FQ9nLtG4JXX1f4sC6?=
+ =?us-ascii?Q?We0+P578pVaA9CLHteAQxQzaFm9FiSiQa8FDFuGZ+YvKcadYPVBdWNpZP3n3?=
+ =?us-ascii?Q?jwraHYdc7fAQ/TUPK74Dw5guOYL99zaJFM1jzmNSOsrDAjKwSX1AcXa0x1wQ?=
+ =?us-ascii?Q?RUDPvniZOXV07QuK1Sko4AIy7hAMTZtiGNvVWFkxG2ifhzvJUIb8bAUIw=3D?=
+ =?us-ascii?Q?=3D?=
+x-microsoft-antispam-prvs: <SN6PR04MB3837F887C4AFE2DFBD0769F9867C0@SN6PR04MB3837.namprd04.prod.outlook.com>
+x-forefront-prvs: 09538D3531
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(39860400002)(366004)(396003)(136003)(346002)(376002)(189003)(199004)(256004)(305945005)(316002)(76176011)(99286004)(217873002)(7736002)(7696005)(4326008)(110136005)(72206003)(53936002)(14454004)(81166006)(3846002)(6116002)(478600001)(8676002)(6246003)(86362001)(33656002)(66066001)(8936002)(81156014)(71190400001)(71200400001)(2501003)(105586002)(106356001)(186003)(229853002)(26005)(446003)(9686003)(74316002)(6436002)(476003)(102836004)(5660300002)(486006)(6506007)(53546011)(68736007)(2906002)(97736004)(55016002)(25786009);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR04MB3837;H:SN6PR04MB4527.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 0GdEPLEFUhkHJMCXNxNGLkI7jLLeNkgTzlU5FMcDg2NZHLleX//YS6XMvWmd/8r/395KS3rS36/VXwlGUBRh4elaw2arYtiZtc8cgZCGpQ/FOfIahmcx9eTqXnBykjT0mlhD9bOULB/fi9VydWO0q6g4ywH5+LA/PiLGbBsg+X/dmeWsOanSiqpZ8AFGpGpT0hHS89wMX2Amc+k89cm+nN13W8qE3DnVRsbTo24y/Bn3TbcAwQqu1yQoTm6VO5O5fWfIIOhnInUBfN3tVjEMoN3lg8DTl/ZDnpSzfExMLiEF65ytS/qRoEJBlkd1j6Kq4JCCrzdyqds0P51jVjdw/nrzxx5LUUsHUwsRY9lSw26+UQL/4Za52hYTLoUAgNJwYzrEHJDPNqghfbwDr1boiNM24BOOyZoq22tb28AeGkE=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20190211190049.7888-1-axboe@kernel.dk> <20190211190049.7888-14-axboe@kernel.dk>
-In-Reply-To: <20190211190049.7888-14-axboe@kernel.dk>
-From:   Jann Horn <jannh@google.com>
-Date:   Tue, 19 Feb 2019 20:08:35 +0100
-Message-ID: <CAG48ez2jrdFEATYor3-tRUx=LBpXo9581tPCWUgjWf6atMiGzA@mail.gmail.com>
-Subject: Re: [PATCH 12/19] io_uring: add support for pre-mapped user IO buffers
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
-        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
-        jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>,
-        Al Viro <viro@zeniv.linux.org.uk>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d36f561f-f324-4d83-8cfd-08d696a5ca6b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Feb 2019 20:06:52.7849
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB3837
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 11, 2019 at 8:01 PM Jens Axboe <axboe@kernel.dk> wrote:
-> If we have fixed user buffers, we can map them into the kernel when we
-> setup the io_uring. That avoids the need to do get_user_pages() for
-> each and every IO.
->
-> To utilize this feature, the application must call io_uring_register()
-> after having setup an io_uring instance, passing in
-> IORING_REGISTER_BUFFERS as the opcode. The argument must be a pointer to
-> an iovec array, and the nr_args should contain how many iovecs the
-> application wishes to map.
->
-> If successful, these buffers are now mapped into the kernel, eligible
-> for IO. To use these fixed buffers, the application must use the
-> IORING_OP_READ_FIXED and IORING_OP_WRITE_FIXED opcodes, and then
-> set sqe->index to the desired buffer index. sqe->addr..sqe->addr+seq->len
-> must point to somewhere inside the indexed buffer.
->
-> The application may register buffers throughout the lifetime of the
-> io_uring instance. It can call io_uring_register() with
-> IORING_UNREGISTER_BUFFERS as the opcode to unregister the current set of
-> buffers, and then register a new set. The application need not
-> unregister buffers explicitly before shutting down the io_uring
-> instance.
->
-> It's perfectly valid to setup a larger buffer, and then sometimes only
-> use parts of it for an IO. As long as the range is within the originally
-> mapped region, it will work just fine.
->
-> For now, buffers must not be file backed. If file backed buffers are
-> passed in, the registration will fail with -1/EOPNOTSUPP. This
-> restriction may be relaxed in the future.
->
-> RLIMIT_MEMLOCK is used to check how much memory we can pin. A somewhat
-> arbitrary 1G per buffer size is also imposed.
->
-> Reviewed-by: Hannes Reinecke <hare@suse.com>
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> ---
-[...]
->  static void io_sq_wq_submit_work(struct work_struct *work)
->  {
->         struct io_kiocb *req = container_of(work, struct io_kiocb, work);
->         struct sqe_submit *s = &req->submit;
->         const struct io_uring_sqe *sqe = s->sqe;
->         struct io_ring_ctx *ctx = req->ctx;
-> -       mm_segment_t old_fs = get_fs();
-> +       mm_segment_t old_fs;
-> +       bool needs_user;
->         int ret;
->
->          /* Ensure we clear previously set forced non-block flag */
->         req->flags &= ~REQ_F_FORCE_NONBLOCK;
->         req->rw.ki_flags &= ~IOCB_NOWAIT;
->
-> -       if (!mmget_not_zero(ctx->sqo_mm)) {
-> -               ret = -EFAULT;
-> -               goto err;
-> -       }
-> -
-> -       use_mm(ctx->sqo_mm);
-> -       set_fs(USER_DS);
-> -       s->has_user = true;
->         s->needs_lock = true;
-> +       s->has_user = false;
-> +
-> +       /*
-> +        * If we're doing IO to fixed buffers, we don't need to get/set
-> +        * user context
-> +        */
-> +       needs_user = io_sqe_needs_user(s->sqe);
-> +       if (needs_user) {
-> +               if (!mmget_not_zero(ctx->sqo_mm)) {
-> +                       ret = -EFAULT;
-> +                       goto err;
-> +               }
-> +               use_mm(ctx->sqo_mm);
-> +               old_fs = get_fs();
-> +               set_fs(USER_DS);
-> +               s->has_user = true;
-> +       }
->
->         do {
->                 ret = __io_submit_sqe(ctx, req, s, false, NULL);
-> @@ -1011,9 +1110,11 @@ static void io_sq_wq_submit_work(struct work_struct *work)
->                 cond_resched();
->         } while (1);
->
-> -       set_fs(old_fs);
-> -       unuse_mm(ctx->sqo_mm);
-> -       mmput(ctx->sqo_mm);
-> +       if (needs_user) {
-> +               set_fs(old_fs);
-> +               unuse_mm(ctx->sqo_mm);
-> +               mmput(ctx->sqo_mm);
-> +       }
->  err:
->         if (ret) {
->                 io_cqring_add_event(ctx, sqe->user_data, ret, 0);
-> @@ -1308,6 +1409,197 @@ static unsigned long ring_pages(unsigned sq_entries, unsigned cq_entries)
->         return (bytes + PAGE_SIZE - 1) / PAGE_SIZE;
->  }
->
-> +static int io_sqe_buffer_unregister(struct io_ring_ctx *ctx)
-> +{
-> +       int i, j;
-> +
-> +       if (!ctx->user_bufs)
-> +               return -ENXIO;
-> +
-> +       for (i = 0; i < ctx->nr_user_bufs; i++) {
-> +               struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
-> +
-> +               for (j = 0; j < imu->nr_bvecs; j++)
-> +                       put_page(imu->bvec[j].bv_page);
-> +
-> +               if (ctx->account_mem)
-> +                       io_unaccount_mem(ctx->user, imu->nr_bvecs);
-> +               kfree(imu->bvec);
-> +               imu->nr_bvecs = 0;
-> +       }
-> +
-> +       kfree(ctx->user_bufs);
-> +       ctx->user_bufs = NULL;
-> +       ctx->nr_user_bufs = 0;
-> +       return 0;
-> +}
-[...]
-> +static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
-> +                                 unsigned nr_args)
-> +{
-> +       struct vm_area_struct **vmas = NULL;
-> +       struct page **pages = NULL;
-> +       int i, j, got_pages = 0;
-> +       int ret = -EINVAL;
-> +
-> +       if (ctx->user_bufs)
-> +               return -EBUSY;
-> +       if (!nr_args || nr_args > UIO_MAXIOV)
-> +               return -EINVAL;
-> +
-> +       ctx->user_bufs = kcalloc(nr_args, sizeof(struct io_mapped_ubuf),
-> +                                       GFP_KERNEL);
-> +       if (!ctx->user_bufs)
-> +               return -ENOMEM;
-> +
-> +       for (i = 0; i < nr_args; i++) {
-> +               struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
-> +               unsigned long off, start, end, ubuf;
-> +               int pret, nr_pages;
-> +               struct iovec iov;
-> +               size_t size;
-> +
-> +               ret = io_copy_iov(ctx, &iov, arg, i);
-> +               if (ret)
-> +                       break;
-> +
-> +               /*
-> +                * Don't impose further limits on the size and buffer
-> +                * constraints here, we'll -EINVAL later when IO is
-> +                * submitted if they are wrong.
-> +                */
-> +               ret = -EFAULT;
-> +               if (!iov.iov_base || !iov.iov_len)
-> +                       goto err;
-> +
-> +               /* arbitrary limit, but we need something */
-> +               if (iov.iov_len > SZ_1G)
-> +                       goto err;
-> +
-> +               ubuf = (unsigned long) iov.iov_base;
-> +               end = (ubuf + iov.iov_len + PAGE_SIZE - 1) >> PAGE_SHIFT;
-> +               start = ubuf >> PAGE_SHIFT;
-> +               nr_pages = end - start;
-> +
-> +               if (ctx->account_mem) {
-> +                       ret = io_account_mem(ctx->user, nr_pages);
-> +                       if (ret)
-> +                               goto err;
-> +               }
-> +
-> +               ret = 0;
-> +               if (!pages || nr_pages > got_pages) {
-
-Nit: No need to check for `!pages` as long as `pages` and `got_pages`
-are synchronized (which guarantees that `!pages` implies
-`got_pages==0`).
-
-> +                       kfree(vmas);
-> +                       kfree(pages);
-> +                       pages = kmalloc_array(nr_pages, sizeof(struct page *),
-> +                                               GFP_KERNEL);
-> +                       vmas = kmalloc_array(nr_pages,
-> +                                       sizeof(struct vma_area_struct *),
-
-typo: s/vma_area_struct/vm_area_struct/
-
-> +                                       GFP_KERNEL);
-> +                       if (!pages || !vmas) {
-> +                               ret = -ENOMEM;
-> +                               if (ctx->account_mem)
-> +                                       io_unaccount_mem(ctx->user, nr_pages);
-> +                               goto err;
-> +                       }
-> +                       got_pages = nr_pages;
-> +               }
-> +
-> +               imu->bvec = kmalloc_array(nr_pages, sizeof(struct bio_vec),
-> +                                               GFP_KERNEL);
-> +               ret = -ENOMEM;
-> +               if (!imu->bvec) {
-> +                       if (ctx->account_mem)
-> +                               io_unaccount_mem(ctx->user, nr_pages);
-> +                       goto err;
-> +               }
-> +
-> +               ret = 0;
-> +               down_read(&current->mm->mmap_sem);
-> +               pret = get_user_pages_longterm(ubuf, nr_pages, FOLL_WRITE,
-> +                                               pages, vmas);
-> +               if (pret == nr_pages) {
-> +                       /* don't support file backed memory */
-> +                       for (j = 0; j < nr_pages; j++) {
-> +                               struct vm_area_struct *vma = vmas[j];
-> +
-> +                               if (vma->vm_file &&
-> +                                   !is_file_hugepages(vma->vm_file)) {
-> +                                       ret = -EOPNOTSUPP;
-> +                                       break;
-> +                               }
-> +                       }
-> +               } else {
-> +                       ret = pret < 0 ? pret : -EFAULT;
-> +               }
-> +               up_read(&current->mm->mmap_sem);
-> +               if (ret) {
-> +                       /*
-> +                        * if we did partial map, or found file backed vmas,
-> +                        * release any pages we did get
-> +                        */
-> +                       if (pret > 0) {
-> +                               for (j = 0; j < pret; j++)
-> +                                       put_page(pages[j]);
-> +                       }
-> +                       if (ctx->account_mem)
-> +                               io_unaccount_mem(ctx->user, nr_pages);
-> +                       goto err;
-> +               }
-> +
-> +               off = ubuf & ~PAGE_MASK;
-> +               size = iov.iov_len;
-> +               for (j = 0; j < nr_pages; j++) {
-> +                       size_t vec_len;
-> +
-> +                       vec_len = min_t(size_t, size, PAGE_SIZE - off);
-> +                       imu->bvec[j].bv_page = pages[j];
-> +                       imu->bvec[j].bv_len = vec_len;
-> +                       imu->bvec[j].bv_offset = off;
-> +                       off = 0;
-> +                       size -= vec_len;
-> +               }
-> +               /* store original address for later verification */
-> +               imu->ubuf = ubuf;
-> +               imu->len = iov.iov_len;
-> +               imu->nr_bvecs = nr_pages;
-> +       }
-> +       kfree(pages);
-> +       kfree(vmas);
-> +       ctx->nr_user_bufs = nr_args;
-> +       return 0;
-> +err:
-> +       kfree(pages);
-> +       kfree(vmas);
-> +       io_sqe_buffer_unregister(ctx);
-
-io_sqe_buffer_unregister() gets rid of elements up to
-ctx->nr_user_bufs, but as far as I can tell, ctx->nr_user_bufs is
-always zero here. I think that's going to cause a reference leak.
-
-> +       return ret;
-> +}
+On 02/19/2019 08:17 AM, Bart Van Assche wrote:=0A=
+> On Mon, 2019-02-18 at 10:53 -0800, Chaitanya Kulkarni wrote:=0A=
+>> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>=0A=
+>> ---=0A=
+>>   tests/nvme/017     |  5 ++++-=0A=
+>>   tests/nvme/017.out | 11 -----------=0A=
+>>   2 files changed, 4 insertions(+), 12 deletions(-)=0A=
+>>=0A=
+>> diff --git a/tests/nvme/017 b/tests/nvme/017=0A=
+>> index 0b86bec..db87759 100755=0A=
+>> --- a/tests/nvme/017=0A=
+>> +++ b/tests/nvme/017=0A=
+>> @@ -37,7 +37,10 @@ test() {=0A=
+>>   	port=3D"$(_create_nvmet_port "loop")"=0A=
+>>   	_add_nvmet_subsys_to_port "${port}" "${subsys_name}"=0A=
+>>=0A=
+>> -	nvme discover -t loop | sed -r -e "s/portid:  [0-9]+/portid:  X/"=0A=
+>> +	nvme discover -t loop | grep -q "${subsys_nqn}"=0A=
+>> +	if [ $? -ne 0 ]; then=0A=
+>> +		echo "nvme discover command failed"=0A=
+>> +	fi=0A=
+>=0A=
+> Hi Chaitanya,=0A=
+>=0A=
+> Please keep the code style consistent with other blktests code and write =
+that=0A=
+> if-condition as follows:=0A=
+>=0A=
+> 	if ! nvme discover -t loop | grep -q "${subsys_nqn}"; then=0A=
+> 		echo "nvme discover command failed"=0A=
+> 	fi=0A=
+>=0A=
+> Thanks,=0A=
+>=0A=
+> Bart.=0A=
+>=0A=
+=0A=
+Sounds good, will send out new revision.=0A=
