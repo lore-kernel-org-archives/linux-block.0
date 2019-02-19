@@ -7,105 +7,115 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32714C43381
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 01:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF50FC43381
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 02:20:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E6F172173C
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 01:37:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE2BC2147A
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 02:20:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dy6gKJQb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IQ4TzZjf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732813AbfBSBhJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Feb 2019 20:37:09 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:53937 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732614AbfBSBhJ (ORCPT
+        id S1726296AbfBSCUF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Feb 2019 21:20:05 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:38354 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725766AbfBSCUF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Feb 2019 20:37:09 -0500
-Received: by mail-wm1-f68.google.com with SMTP id e74so325847wmg.3;
-        Mon, 18 Feb 2019 17:37:07 -0800 (PST)
+        Mon, 18 Feb 2019 21:20:05 -0500
+Received: by mail-wr1-f66.google.com with SMTP id v13so20415521wrw.5;
+        Mon, 18 Feb 2019 18:20:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=E7aDWG0NWgAmsbi+t+B9OHfHgVt+EmCyXgUpXwE4Bls=;
-        b=Dy6gKJQb8/xRJQalUfcKU8roNbKkFzddhahDTe+DIC+ual85PEP4zXCPEzYly5MfTa
-         Am/D+A/fpVrCYP92ZdjHg+rAROT3J7dTLAI/gmc9pJ41elD1xJQ3PINkiR2ieIumbg25
-         fhCOfD2FQsrYaB4jxYWLien4ZK/b0CDMj7blXPzwdTYdjNyqUuScWiZKbigXCTnTRJ9L
-         L2oA/7CoFMlFMZKOal3LS+6Y3L0xBz8RQVNXl0N5mRGRYEYohN1Cy3/HMA0XBvzNug9T
-         qDW/ugfjKqLWk+nQ3W2u1TWxX33SBkSZ5FtGcWG8YmnLEE55xa+Mor6YT22h0tQgoAld
-         3E7A==
+        bh=agxbP0AQ1b+LcN9EvsfaxtHIbOGCh3JxR6EwJPrXbz4=;
+        b=IQ4TzZjfwbALKWeR3drtc0jD6vDkmWoCSAiqIfec99TPKvao567WpZWm2om8MGinJh
+         mr0SzSBsKpIdk0Ejiupo8YBkmtdMhpC6EI0IJ/JO1YRAkCTVcaDbJLXBQo1O+iZg6uVr
+         zH/3648cdhWnDb+z1cjKuNdUcJBcD27XRftOI6Z1xoRfux4mBXu3aNYPkinR+90ZFPcB
+         SclQwoSo+BOlhkseNgQxrwKQGwp3tkQX5zK4bGPOMLBH/Ojje/dYGOKV4b/4o1VihWyk
+         9gKF6TUvz+n2J9kKp7tQJX95i+7fYJ3OosMw4h8+jtp2Yq4zyflhBwLYVd6fdwB96kpr
+         yRkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=E7aDWG0NWgAmsbi+t+B9OHfHgVt+EmCyXgUpXwE4Bls=;
-        b=SLeI/y3i0s0WvCzmrfpF8UyQCdW3zFRnlh320ypVMRjZ/nhbc+aJpxE7cPipdYssbI
-         vkPP2kI9xUoUFGfdudhhSSxWLOv0J92YtoF0QO6f6gYGloDonrAZ8wHOC/HmrPVhPp+3
-         1v3zGQNv5E94U+FT4XXWYFk2nru1HCXxiujQ+dF6D3myITAAvnWcxyay0c3sRo3GEEs9
-         biPosRvd7C2czcY0AaaVQoGclNyReLx1wBjz55FB1+nxNIPZvPTQJCxJvf2Gpp+X6npI
-         8xSEZXmP+kIydOYNnNW3Hi+hUpbqFCkUCUfPvzzWLr9E4Bj9IYd6GJhbk5kQdLroqgt+
-         bMag==
-X-Gm-Message-State: AHQUAubNe82GFEotU/CqHIVIO4fSCyYUUEozXroCOnCaO2abiTah9/EP
-        p8YXktvtdoPRPJCeKAoUlK73bju6xlFLraSVVK4=
-X-Google-Smtp-Source: AHgI3IZx5mQVsnn5iioZAOeaddnABj05dAK9Aj/CY1UM1n/HSX3QWgF0HYaXfr6vj/1Mqo3oVVnXK7qWY7s7LHL4afQ=
-X-Received: by 2002:a1c:ed0b:: with SMTP id l11mr871340wmh.43.1550540226698;
- Mon, 18 Feb 2019 17:37:06 -0800 (PST)
+        bh=agxbP0AQ1b+LcN9EvsfaxtHIbOGCh3JxR6EwJPrXbz4=;
+        b=Svfv2U8MnLQRvCegbiw6Fv1eFeCJVVc6oTSo1UkUQscX888O2o1+6AxPRynNVYcbY0
+         E9CF3MwRmrCd8llMmNrxEnkmiFdvX0bpyFCW0sqsXbtuhcTCghRohnQfz7zEhZ3xPtF6
+         P+OxTLU9pE/SLkSopPw5u4RRIHr6fcMwKXkI30weHOSTXISIbmusIl7OIyjayVFUUVCk
+         MZXF7Q5uNazLq7HnDKnAYPZx7qkdlFTSv6eMIep8a7Iajya7K+MqUbQ+r5LhRjR7xN1i
+         2Mn0mlJ09hbjq/QyMMsnfyDSd4+uC7cmM4CCkpuYpgAmsMS0ctEoxQ5F4m6jG/vKyyKl
+         vTCA==
+X-Gm-Message-State: AHQUAubBHrvSmhjTN9erqXrgAdaz7LVdJ1EuMHZ9/HmCOUY4AsR10xUm
+        ReGBhqy8pJS39kC9uIP1xM0z1KNSstBIWa4dY88=
+X-Google-Smtp-Source: AHgI3IbXfF5oQzqDof+XtOVZ+22uYrApUeViFpDPguUR4u2fUoYZys7K3IJifZ/N6KNA6Iajk5yoGpi4Pe/x5tcA1SY=
+X-Received: by 2002:a5d:668b:: with SMTP id l11mr18242555wru.116.1550542803358;
+ Mon, 18 Feb 2019 18:20:03 -0800 (PST)
 MIME-Version: 1.0
-References: <yq1d0nxuf73.fsf@oracle.com> <20190213025717.20057-1-martin.petersen@oracle.com>
-In-Reply-To: <20190213025717.20057-1-martin.petersen@oracle.com>
+References: <99dc311f-16b6-9b0d-e309-198dcc9dcde7@suse.de>
+In-Reply-To: <99dc311f-16b6-9b0d-e309-198dcc9dcde7@suse.de>
 From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Tue, 19 Feb 2019 09:36:54 +0800
-Message-ID: <CACVXFVN9LXodRP8+T_Vd8+5g9K=+hke7ik7N21=heb3csFhh=w@mail.gmail.com>
-Subject: Re: [PATCH v2] scsi: sd: block: Fix regressions in read-only block
- device handling
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Linux SCSI List <linux-scsi@vger.kernel.org>,
+Date:   Tue, 19 Feb 2019 10:19:51 +0800
+Message-ID: <CACVXFVPj+zoT9FkE0UqagJMwTHXv8t6OzXM2KtsqrMp3=WMcEw@mail.gmail.com>
+Subject: Re: [LSF/MM TOPIC] Handling of managed IRQs when hotplugging CPUs
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        SCSI Mailing List <linux-scsi@vger.kernel.org>,
         linux-block <linux-block@vger.kernel.org>,
-        Jeremy Cline <jeremy@jcline.org>,
-        Oleksii Kurochko <olkuroch@cisco.com>,
-        stable <stable@vger.kernel.org>,
-        linux-usb <linux-usb@vger.kernel.org>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Christoph Hellwig <hch@lst.de>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 13, 2019 at 5:01 PM Martin K. Petersen
-<martin.petersen@oracle.com> wrote:
+On Tue, Feb 5, 2019 at 11:30 PM Hannes Reinecke <hare@suse.de> wrote:
 >
-> Some devices come online in write protected state and switch to
-> read-write once they are ready to process I/O requests. These devices
-> broke with commit 20bd1d026aac ("scsi: sd: Keep disk read-only when
-> re-reading partition") because we had no way to distinguish between a
-> user decision to set a block_device read-only and the actual hardware
-> device being write-protected.
+> Hi all,
 >
-> Because partitions are dropped and recreated on revalidate we are
-> unable to persist any user-provided policy in hd_struct. Introduce a
-> bitmap in struct gendisk to track the user configuration. This bitmap
-> is updated when BLKROSET is called on a given disk or partition.
+> this came up during discussion on the mailing list (cf thread "Question
+> on handling managed IRQs when hotplugging CPUs").
+> The problem is that with managed IRQs and block-mq I/O will be routed to
+> individual CPUs, and the response will be send to the IRQ assigned to
+> that CPU.
 >
-> A helper function, get_user_ro(), is provided to determine whether the
-> ioctl has forced read-only state for a given block device. This helper
-> is used by set_disk_ro() and add_partition() to ensure that both
-> existing and newly created partitions will get the correct state.
+> If now a CPU hotplug event occurs when I/O is still in-flight the IRQ
+> will _still_ be assigned to the CPU, causing any pending interrupt to be
+> lost.
+> Hence the driver will never notice that an interrupt has happened, and
+> an I/O timeout occurs.
 
-Hi Martin & Oleksii,
+Lots of driver's timeout handler only returns BLK_EH_RESET_TIMER,
+and this situation can't be covered by IO timeout for these devices.
 
-From the Bugzilla, looks it is only reported on the "Kingston DT Ultimate G3"
-USB flash drive.
+For example, we have see IO hang issue on HPSA, megaraid_sas
+before when wrong msi vector is set on IO command. Even one such
+issue on aacraid isn't fixed yet.
 
-If it is true, this particular issue might be addressed simply by applying one
-quirk on this drive, such as, by adding one delay before calling
-sd_spinup_disk()
-in the 1st sd_revalidate_disk() to wait until it is ready to process
-I/O requests.
+>
+> One proposal was to quiesce the device when a CPU hotplug event occurs,
+> and only allow for CPU hotplugging once it's fully quiesced.
 
-Otherwise if there are many such devices, I think your approach is good.
+That is the original solution, but big problem is that queue dependency
+exists, such as loop/DM's queue depends on underlying's queue, NVMe
+IO queue depends on  its admin queue.
+
+>
+> While this would be working, it will be introducing quite some system
+> stall, and it actually a rather big impact in the system.
+> Another possiblity would be to have the driver abort the requests
+> itself, but this requires specific callbacks into the driver, and, of
+> course, the driver having the ability to actually do so.
+>
+> I would like to discuss at LSF/MM how these issues can be addressed best.
+
+One related topic is that the current static queue mapping without CPU hotplug
+handler involved may waste lots of IRQ vectors[1], and how to deal
+with this problem?
+
+[1] http://lists.infradead.org/pipermail/linux-nvme/2019-January/021961.html
 
 Thanks,
 Ming Lei
