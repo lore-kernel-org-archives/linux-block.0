@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF610C43381
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 15:27:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD1ADC4360F
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 15:27:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6CCF421736
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 15:27:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B06B21736
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 15:27:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P+6GFnyV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RNxlnxyj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727566AbfBSP1t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Feb 2019 10:27:49 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:35651 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728867AbfBSP1s (ORCPT
+        id S1728872AbfBSP1q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Feb 2019 10:27:46 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:46152 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726352AbfBSP1p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Feb 2019 10:27:48 -0500
-Received: by mail-wm1-f68.google.com with SMTP id y15so3248373wma.0;
-        Tue, 19 Feb 2019 07:27:46 -0800 (PST)
+        Tue, 19 Feb 2019 10:27:45 -0500
+Received: by mail-wr1-f66.google.com with SMTP id i16so14203472wrs.13;
+        Tue, 19 Feb 2019 07:27:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=c98WFQKqSGewnmjGR+VAUu2jdbTDTi2eXPqlfHCbeCU=;
-        b=P+6GFnyVpg2KZGAIvcNuVcwUz8RKDcIJqgGs+wbGQMM/EqhXUxwX0boLM2h38zYuKH
-         JF9igYIFbiaVwv+rzAwyq7wRD9ltKKasUpaIRHZ6Hm2O5/Y18QXHx7oGN9B++3bG5TTM
-         iR4i8+mu3M4JEDaNSPlMQK2UhFh8TXwA2SoNePLRKuB/mRqi8wRVmNegc4+Pp+gcgwyn
-         IpeueEJ9cFjHGFbFu8O9LTE1svbaOhLrjToACAJNmeAqYoklqRiHW/iaaCY6LQjEd4BB
-         ulyYxlxqpdpIOshBcPLOp2qUuAOuOawp/lApQMoTcO9XLjXxH1feNEUAYwYmLn9G2FEL
-         uRtQ==
+        bh=aLP28lQlfvEaj5P3lTxct6bkK1WmE36USMTehJ7l8S0=;
+        b=RNxlnxyjZtrg+yoazOslRL0f8IqYDEOH6oa6Q9YE0VVpT2JKBSumhyXCv7JTOfIVCJ
+         PMb7RLbw1++BkSYzD0hZTW4WrOK7rRb+1mdxXhiwpli1bmaphZuU9HrhgjRrHUGXMuhh
+         KziJfX4fO5IJVPy+NL0FfxQ6WftWqijXsQZQeYK0T4P34oaNCloUy5VzPVZvNmhpBUqT
+         h47Q3GxpupqK5eK2ltM6Fyo3eU7SGA/0ytwonNDNp8tiJg4kzKwvJbMZonG5fg97ANGE
+         fruzVKQBdo7nTs+4cqxwHvlmVVgIaTySixjUX8llkoxDZRCOnBPkyZQJIHHj3CCViZ3R
+         6KnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=c98WFQKqSGewnmjGR+VAUu2jdbTDTi2eXPqlfHCbeCU=;
-        b=aYeEl9M5kw+mqWbiaZs3BeI8hMWkcY+79NHRr4EJL8hmmyptrLrD/UJfbUbASm6XWW
-         WQ8pY972ayKbwnjts4wVkiN2rMLmirRxqL6okcmoGleLjKOzSvtjaOyAxypQU7ieTvlF
-         5Rs0vH1w8tp1oBx+AJdfDIfvBPFhKcEM86EuDdJ2qlh7zI4FoFinO+MngsZpYX/vSiOR
-         dNRpJmLMsq9W8Raqp25xVOaR+3EeG2TgT6FCCyR4CtBJC/EHOlQ7XwNYTbEsyz9m2Jze
-         dBVtYH8E3cxYIDNAUomcf1pXE5kDZPzrINTxxkP56BNQFji6F64zhtDC6X0xwtzdgSlb
-         32zw==
-X-Gm-Message-State: AHQUAuau3dTyRDTGZpANU11q8PPVq4wJYdGxCF/bdxQcVefhwmeoLAJJ
-        qFx+0U7vsg1KlZ8umq+H8A==
-X-Google-Smtp-Source: AHgI3IZ5u7DQFM6uWNRQR5JFQTc+Kv+c+ywfGCH879D8R7gLQYbXK7hv5L2JhfRHOL0qscx2Es6Q+Q==
-X-Received: by 2002:a1c:1902:: with SMTP id 2mr3384191wmz.150.1550590065159;
-        Tue, 19 Feb 2019 07:27:45 -0800 (PST)
+        bh=aLP28lQlfvEaj5P3lTxct6bkK1WmE36USMTehJ7l8S0=;
+        b=dnAb/ZSrE6sDk4RD33rcBFMxxGhyk7uzFyntHorZka4iYYAmymI2HvZEQScA0Mdnoe
+         EUyknOu8CIUTjQjjCIY8nm0ngG1lgntCLiNwXEF2QAoMWfkwVCMndP+RpzSZ2MvfyvPW
+         2KgcFsHboXyoMTUX5PF0ocnImrV0vW9uD/l32ZjNowDoni4XEP2J4vwY2TWpNR2RtTrb
+         Ql5ADb0aUJvihf5Z9KZpwoHOf7hdYRAIQ8vWSnA5iBZ9Rnzrw4RQ9aSGvmYeO+qdwgxw
+         wgiIsq8mkyISkPeJdsiKA/EFZgc0K/3qAHtGRxsWbcXNX4xLOHi4SRqQ05YbHOoch2G8
+         BX9Q==
+X-Gm-Message-State: AHQUAuYHs2Xxe6YQSsbHKGD2tFAo4ExlH3U7JHGU1/ISJXl2dhKVqORk
+        ci8VIRk1BRWesiQ7VWtwBQ==
+X-Google-Smtp-Source: AHgI3IbjuIduBGr6mwILzL8HCjCozk4cl5g64v4dZ/Lk7Y41wwIt/QjSC9z0rkisQSwGionyCA9OpA==
+X-Received: by 2002:adf:8273:: with SMTP id 106mr21900010wrb.34.1550590062342;
+        Tue, 19 Feb 2019 07:27:42 -0800 (PST)
 Received: from xps-13.homenet.telecomitalia.it (host117-125-dynamic.33-79-r.retail.telecomitalia.it. [79.33.125.117])
-        by smtp.gmail.com with ESMTPSA id v6sm29029503wrd.88.2019.02.19.07.27.43
+        by smtp.gmail.com with ESMTPSA id v6sm29029503wrd.88.2019.02.19.07.27.40
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 19 Feb 2019 07:27:44 -0800 (PST)
+        Tue, 19 Feb 2019 07:27:41 -0800 (PST)
 From:   Andrea Righi <righi.andrea@gmail.com>
 To:     Josef Bacik <josef@toxicpanda.com>, Tejun Heo <tj@kernel.org>
 Cc:     Li Zefan <lizefan@huawei.com>,
@@ -63,9 +63,9 @@ Cc:     Li Zefan <lizefan@huawei.com>,
         Dennis Zhou <dennis@kernel.org>, cgroups@vger.kernel.org,
         linux-block@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] blkcg: implement sync() isolation
-Date:   Tue, 19 Feb 2019 16:27:12 +0100
-Message-Id: <20190219152712.9855-4-righi.andrea@gmail.com>
+Subject: [PATCH 1/3] blkcg: prevent priority inversion problem during sync()
+Date:   Tue, 19 Feb 2019 16:27:10 +0100
+Message-Id: <20190219152712.9855-2-righi.andrea@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190219152712.9855-1-righi.andrea@gmail.com>
 References: <20190219152712.9855-1-righi.andrea@gmail.com>
@@ -74,276 +74,302 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Keep track of the inodes that have been dirtied by each blkcg cgroup and
-make sure that a blkcg issuing a sync() can trigger the writeback + wait
-of only those pages that belong to the cgroup itself.
+Prevent priority inversion problem when a high-priority blkcg issues a
+sync() and it is forced to wait the completion of all the writeback I/O
+generated by any other low-priority blkcg, causing massive latencies to
+processes that shouldn't be I/O-throttled at all.
 
-This behavior is enabled only when io.sync_isolation is enabled in the
-cgroup, otherwise the old behavior is applied: sync() triggers the
-writeback of any dirty page.
+The idea is to save a list of blkcg's that are waiting for writeback:
+every time a sync() is executed the current blkcg is added to the list.
+
+Then, when I/O is throttled, if there's a blkcg waiting for writeback
+different than the current blkcg, no throttling is applied (we can
+probably refine this logic later, i.e., a better policy could be to
+adjust the throttling I/O rate using the blkcg with the highest speed
+from the list of waiters - priority inheritance, kinda).
 
 Signed-off-by: Andrea Righi <righi.andrea@gmail.com>
 ---
- block/blk-cgroup.c         | 47 ++++++++++++++++++++++++++++++++++
- fs/fs-writeback.c          | 52 +++++++++++++++++++++++++++++++++++---
- fs/inode.c                 |  1 +
- include/linux/blk-cgroup.h | 22 ++++++++++++++++
- include/linux/fs.h         |  4 +++
- mm/page-writeback.c        |  1 +
- 6 files changed, 124 insertions(+), 3 deletions(-)
+ block/blk-cgroup.c               | 73 ++++++++++++++++++++++++++++++++
+ block/blk-throttle.c             | 11 +++--
+ fs/fs-writeback.c                |  5 +++
+ fs/sync.c                        |  8 +++-
+ include/linux/backing-dev-defs.h |  2 +
+ include/linux/blk-cgroup.h       | 23 ++++++++++
+ mm/backing-dev.c                 |  2 +
+ 7 files changed, 120 insertions(+), 4 deletions(-)
 
 diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index fb3c39eadf92..c6ddf9eeab37 100644
+index 2bed5725aa03..fb3c39eadf92 100644
 --- a/block/blk-cgroup.c
 +++ b/block/blk-cgroup.c
-@@ -1422,6 +1422,53 @@ void blkcg_stop_wb_wait_on_bdi(struct backing_dev_info *bdi)
- 	rcu_read_unlock();
- 	synchronize_rcu();
- }
-+
+@@ -1351,6 +1351,79 @@ struct cgroup_subsys io_cgrp_subsys = {
+ };
+ EXPORT_SYMBOL_GPL(io_cgrp_subsys);
+ 
++#ifdef CONFIG_CGROUP_WRITEBACK
 +/**
-+ * blkcg_set_mapping_dirty - set owner of a dirty mapping
-+ * @mapping: target address space
++ * blkcg_wb_waiters_on_bdi - check for writeback waiters on a block device
++ * @blkcg: current blkcg cgroup
++ * @bdi: block device to check
 + *
-+ * Set the current blkcg as the owner of the address space @mapping (the first
-+ * blkcg that dirties @mapping becomes the owner).
++ * Return true if any other blkcg is waiting for writeback on the target block
++ * device, false otherwise.
 + */
-+void blkcg_set_mapping_dirty(struct address_space *mapping)
++bool blkcg_wb_waiters_on_bdi(struct blkcg *blkcg, struct backing_dev_info *bdi)
 +{
-+	struct blkcg *curr_blkcg, *blkcg;
++	struct blkcg *wait_blkcg;
++	bool ret = false;
 +
-+	if (mapping_tagged(mapping, PAGECACHE_TAG_WRITEBACK) ||
-+	    mapping_tagged(mapping, PAGECACHE_TAG_DIRTY))
-+		return;
++	if (unlikely(!bdi))
++		return false;
 +
 +	rcu_read_lock();
-+	curr_blkcg = blkcg_from_current();
-+	blkcg = blkcg_from_mapping(mapping);
-+	if (curr_blkcg != blkcg) {
-+		if (blkcg)
-+			css_put(&blkcg->css);
-+		css_get(&curr_blkcg->css);
-+		rcu_assign_pointer(mapping->i_blkcg, curr_blkcg);
-+	}
++	list_for_each_entry_rcu(wait_blkcg, &bdi->cgwb_waiters, cgwb_wait_node)
++		if (wait_blkcg != blkcg) {
++			ret = true;
++			break;
++		}
 +	rcu_read_unlock();
++
++	return ret;
 +}
 +
 +/**
-+ * blkcg_set_mapping_dirty - clear the owner of a dirty mapping
-+ * @mapping: target address space
++ * blkcg_start_wb_wait_on_bdi - add current blkcg to writeback waiters list
++ * @bdi: target block device
 + *
-+ * Unset the owner of @mapping when it becomes clean.
++ * Add current blkcg to the list of writeback waiters on target block device.
 + */
-+
-+void blkcg_set_mapping_clean(struct address_space *mapping)
++void blkcg_start_wb_wait_on_bdi(struct backing_dev_info *bdi)
 +{
 +	struct blkcg *blkcg;
 +
 +	rcu_read_lock();
-+	blkcg = rcu_dereference(mapping->i_blkcg);
++	blkcg = blkcg_from_current();
 +	if (blkcg) {
-+		css_put(&blkcg->css);
-+		RCU_INIT_POINTER(mapping->i_blkcg, NULL);
++		css_get(&blkcg->css);
++		spin_lock(&bdi->cgwb_waiters_lock);
++		list_add_rcu(&blkcg->cgwb_wait_node, &bdi->cgwb_waiters);
++		spin_unlock(&bdi->cgwb_waiters_lock);
 +	}
 +	rcu_read_unlock();
 +}
- #endif
- 
++
++/**
++ * blkcg_stop_wb_wait_on_bdi - remove current blkcg from writeback waiters list
++ * @bdi: target block device
++ *
++ * Remove current blkcg from the list of writeback waiters on target block
++ * device.
++ */
++void blkcg_stop_wb_wait_on_bdi(struct backing_dev_info *bdi)
++{
++	struct blkcg *blkcg;
++
++	rcu_read_lock();
++	blkcg = blkcg_from_current();
++	if (blkcg) {
++		spin_lock(&bdi->cgwb_waiters_lock);
++		list_del_rcu(&blkcg->cgwb_wait_node);
++		spin_unlock(&bdi->cgwb_waiters_lock);
++		css_put(&blkcg->css);
++	}
++	rcu_read_unlock();
++	synchronize_rcu();
++}
++#endif
++
  /**
+  * blkcg_activate_policy - activate a blkcg policy on a request_queue
+  * @q: request_queue of interest
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 1b97a73d2fb1..da817896cded 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -970,9 +970,13 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
+ {
+ 	bool rw = bio_data_dir(bio);
+ 	unsigned long bps_wait = 0, iops_wait = 0, max_wait = 0;
++	struct throtl_data *td = tg->td;
++	struct request_queue *q = td->queue;
++	struct backing_dev_info *bdi = q->backing_dev_info;
++	struct blkcg_gq *blkg = tg_to_blkg(tg);
+ 
+ 	/*
+- 	 * Currently whole state machine of group depends on first bio
++	 * Currently whole state machine of group depends on first bio
+ 	 * queued in the group bio list. So one should not be calling
+ 	 * this function with a different bio if there are other bios
+ 	 * queued.
+@@ -981,8 +985,9 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
+ 	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
+ 
+ 	/* If tg->bps = -1, then BW is unlimited */
+-	if (tg_bps_limit(tg, rw) == U64_MAX &&
+-	    tg_iops_limit(tg, rw) == UINT_MAX) {
++	if (blkcg_wb_waiters_on_bdi(blkg->blkcg, bdi) ||
++	    (tg_bps_limit(tg, rw) == U64_MAX &&
++	    tg_iops_limit(tg, rw) == UINT_MAX)) {
+ 		if (wait)
+ 			*wait = 0;
+ 		return true;
 diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
-index 77c039a0ec25..d003d0593f41 100644
+index 36855c1f8daf..77c039a0ec25 100644
 --- a/fs/fs-writeback.c
 +++ b/fs/fs-writeback.c
-@@ -58,6 +58,9 @@ struct wb_writeback_work {
- 
- 	struct list_head list;		/* pending work list */
- 	struct wb_completion *done;	/* set if the caller waits */
-+#ifdef CONFIG_CGROUP_WRITEBACK
-+	struct blkcg *blkcg;
-+#endif
- };
+@@ -28,6 +28,7 @@
+ #include <linux/tracepoint.h>
+ #include <linux/device.h>
+ #include <linux/memcontrol.h>
++#include <linux/blk-cgroup.h>
+ #include "internal.h"
  
  /*
-@@ -916,6 +919,29 @@ static int __init cgroup_writeback_init(void)
- }
- fs_initcall(cgroup_writeback_init);
- 
-+static void blkcg_set_sync_domain(struct wb_writeback_work *work)
-+{
-+	rcu_read_lock();
-+	work->blkcg = blkcg_from_current();
-+	rcu_read_unlock();
-+}
-+
-+static bool blkcg_same_sync_domain(struct wb_writeback_work *work,
-+				   struct address_space *mapping)
-+{
-+	struct blkcg *blkcg;
-+
-+	if (!work->blkcg || work->blkcg == &blkcg_root)
-+		return true;
-+	if (!test_bit(BLKCG_SYNC_ISOLATION, &work->blkcg->flags))
-+		return true;
-+	rcu_read_lock();
-+	blkcg = blkcg_from_mapping(mapping);
-+	rcu_read_unlock();
-+
-+	return blkcg == work->blkcg;
-+}
-+
- #else	/* CONFIG_CGROUP_WRITEBACK */
- 
- static void bdi_down_write_wb_switch_rwsem(struct backing_dev_info *bdi) { }
-@@ -959,6 +985,15 @@ static void bdi_split_work_to_wbs(struct backing_dev_info *bdi,
- 	}
- }
- 
-+static void blkcg_set_sync_domain(struct wb_writeback_work *work)
-+{
-+}
-+
-+static bool blkcg_same_sync_domain(struct wb_writeback_work *work,
-+				   struct address_space *mapping)
-+{
-+	return true;
-+}
- #endif	/* CONFIG_CGROUP_WRITEBACK */
- 
- /*
-@@ -1131,7 +1166,7 @@ static int move_expired_inodes(struct list_head *delaying_queue,
- 	LIST_HEAD(tmp);
- 	struct list_head *pos, *node;
- 	struct super_block *sb = NULL;
--	struct inode *inode;
-+	struct inode *inode, *next;
- 	int do_sb_sort = 0;
- 	int moved = 0;
- 
-@@ -1141,11 +1176,12 @@ static int move_expired_inodes(struct list_head *delaying_queue,
- 		expire_time = jiffies - (dirtytime_expire_interval * HZ);
- 		older_than_this = &expire_time;
- 	}
--	while (!list_empty(delaying_queue)) {
--		inode = wb_inode(delaying_queue->prev);
-+	list_for_each_entry_safe(inode, next, delaying_queue, i_io_list) {
- 		if (older_than_this &&
- 		    inode_dirtied_after(inode, *older_than_this))
- 			break;
-+		if (!blkcg_same_sync_domain(work, inode->i_mapping))
-+			continue;
- 		list_move(&inode->i_io_list, &tmp);
- 		moved++;
- 		if (flags & EXPIRE_DIRTY_ATIME)
-@@ -1560,6 +1596,15 @@ static long writeback_sb_inodes(struct super_block *sb,
- 			break;
- 		}
- 
-+		/*
-+		 * Only write out inodes that belong to the blkcg that issued
-+		 * the sync().
-+		 */
-+		if (!blkcg_same_sync_domain(work, inode->i_mapping)) {
-+			redirty_tail(inode, wb);
-+			continue;
-+		}
-+
- 		/*
- 		 * Don't bother with new inodes or inodes being freed, first
- 		 * kind does not need periodic writeout yet, and for the latter
-@@ -2447,6 +2492,7 @@ void sync_inodes_sb(struct super_block *sb)
+@@ -2446,6 +2447,8 @@ void sync_inodes_sb(struct super_block *sb)
  		return;
  	WARN_ON(!rwsem_is_locked(&sb->s_umount));
  
-+	blkcg_set_sync_domain(&work);
- 	blkcg_start_wb_wait_on_bdi(bdi);
- 
++	blkcg_start_wb_wait_on_bdi(bdi);
++
  	/* protect against inode wb switch, see inode_switch_wbs_work_fn() */
-diff --git a/fs/inode.c b/fs/inode.c
-index 73432e64f874..d60a2042d39a 100644
---- a/fs/inode.c
-+++ b/fs/inode.c
-@@ -564,6 +564,7 @@ static void evict(struct inode *inode)
- 		bd_forget(inode);
- 	if (S_ISCHR(inode->i_mode) && inode->i_cdev)
- 		cd_forget(inode);
-+	blkcg_set_mapping_clean(&inode->i_data);
+ 	bdi_down_write_wb_switch_rwsem(bdi);
+ 	bdi_split_work_to_wbs(bdi, &work, false);
+@@ -2453,6 +2456,8 @@ void sync_inodes_sb(struct super_block *sb)
+ 	bdi_up_write_wb_switch_rwsem(bdi);
  
- 	remove_inode_hash(inode);
+ 	wait_sb_inodes(sb);
++
++	blkcg_stop_wb_wait_on_bdi(bdi);
+ }
+ EXPORT_SYMBOL(sync_inodes_sb);
  
+diff --git a/fs/sync.c b/fs/sync.c
+index b54e0541ad89..3958b8f98b85 100644
+--- a/fs/sync.c
++++ b/fs/sync.c
+@@ -16,6 +16,7 @@
+ #include <linux/pagemap.h>
+ #include <linux/quotaops.h>
+ #include <linux/backing-dev.h>
++#include <linux/blk-cgroup.h>
+ #include "internal.h"
+ 
+ #define VALID_FLAGS (SYNC_FILE_RANGE_WAIT_BEFORE|SYNC_FILE_RANGE_WRITE| \
+@@ -76,8 +77,13 @@ static void sync_inodes_one_sb(struct super_block *sb, void *arg)
+ 
+ static void sync_fs_one_sb(struct super_block *sb, void *arg)
+ {
+-	if (!sb_rdonly(sb) && sb->s_op->sync_fs)
++	struct backing_dev_info *bdi = sb->s_bdi;
++
++	if (!sb_rdonly(sb) && sb->s_op->sync_fs) {
++		blkcg_start_wb_wait_on_bdi(bdi);
+ 		sb->s_op->sync_fs(sb, *(int *)arg);
++		blkcg_stop_wb_wait_on_bdi(bdi);
++	}
+ }
+ 
+ static void fdatawrite_one_bdev(struct block_device *bdev, void *arg)
+diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
+index 07e02d6df5ad..095e4dd0427b 100644
+--- a/include/linux/backing-dev-defs.h
++++ b/include/linux/backing-dev-defs.h
+@@ -191,6 +191,8 @@ struct backing_dev_info {
+ 	struct rb_root cgwb_congested_tree; /* their congested states */
+ 	struct mutex cgwb_release_mutex;  /* protect shutdown of wb structs */
+ 	struct rw_semaphore wb_switch_rwsem; /* no cgwb switch while syncing */
++	struct list_head cgwb_waiters; /* list of all waiters for writeback */
++	spinlock_t cgwb_waiters_lock; /* protect cgwb_waiters list */
+ #else
+ 	struct bdi_writeback_congested *wb_congested;
+ #endif
 diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 6ac5aa049334..a2bcc83c8c3e 100644
+index 76c61318fda5..0f7dcb70e922 100644
 --- a/include/linux/blk-cgroup.h
 +++ b/include/linux/blk-cgroup.h
-@@ -441,6 +441,15 @@ extern void blkcg_destroy_blkgs(struct blkcg *blkcg);
+@@ -56,6 +56,7 @@ struct blkcg {
  
+ 	struct list_head		all_blkcgs_node;
  #ifdef CONFIG_CGROUP_WRITEBACK
++	struct list_head		cgwb_wait_node;
+ 	struct list_head		cgwb_list;
+ 	refcount_t			cgwb_refcnt;
+ #endif
+@@ -252,6 +253,12 @@ static inline struct blkcg *css_to_blkcg(struct cgroup_subsys_state *css)
+ 	return css ? container_of(css, struct blkcg, css) : NULL;
+ }
  
-+static inline struct blkcg *blkcg_from_mapping(struct address_space *mapping)
++static inline struct blkcg *blkcg_from_current(void)
 +{
 +	WARN_ON_ONCE(!rcu_read_lock_held());
-+	return rcu_dereference(mapping->i_blkcg);
++	return css_to_blkcg(blkcg_css());
 +}
-+
-+void blkcg_set_mapping_dirty(struct address_space *mapping);
-+void blkcg_set_mapping_clean(struct address_space *mapping);
 +
  /**
-  * blkcg_cgwb_get - get a reference for blkcg->cgwb_list
-  * @blkcg: blkcg of interest
-@@ -474,6 +483,19 @@ void blkcg_stop_wb_wait_on_bdi(struct backing_dev_info *bdi);
+  * __bio_blkcg - internal, inconsistent version to get blkcg
+  *
+@@ -454,6 +461,10 @@ static inline void blkcg_cgwb_put(struct blkcg *blkcg)
+ 		blkcg_destroy_blkgs(blkcg);
+ }
  
++bool blkcg_wb_waiters_on_bdi(struct blkcg *blkcg, struct backing_dev_info *bdi);
++void blkcg_start_wb_wait_on_bdi(struct backing_dev_info *bdi);
++void blkcg_stop_wb_wait_on_bdi(struct backing_dev_info *bdi);
++
  #else
  
-+static inline struct blkcg *blkcg_from_mapping(struct address_space *mapping)
-+{
-+	return NULL;
-+}
-+
-+static inline void blkcg_set_mapping_dirty(struct address_space *mapping)
-+{
-+}
-+
-+static inline void blkcg_set_mapping_clean(struct address_space *mapping)
-+{
-+}
-+
  static inline void blkcg_cgwb_get(struct blkcg *blkcg) { }
+@@ -464,6 +475,14 @@ static inline void blkcg_cgwb_put(struct blkcg *blkcg)
+ 	blkcg_destroy_blkgs(blkcg);
+ }
  
- static inline void blkcg_cgwb_put(struct blkcg *blkcg)
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 29d8e2cfed0e..502a2b94f183 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -414,6 +414,7 @@ int pagecache_write_end(struct file *, struct address_space *mapping,
-  * @nrpages: Number of page entries, protected by the i_pages lock.
-  * @nrexceptional: Shadow or DAX entries, protected by the i_pages lock.
-  * @writeback_index: Writeback starts here.
-+ * @i_blkcg: blkcg owner (that dirtied the address_space)
-  * @a_ops: Methods.
-  * @flags: Error bits and flags (AS_*).
-  * @wb_err: The most recent error which has occurred.
-@@ -432,6 +433,9 @@ struct address_space {
- 	unsigned long		nrexceptional;
- 	pgoff_t			writeback_index;
- 	const struct address_space_operations *a_ops;
-+#ifdef CONFIG_CGROUP_WRITEBACK
-+	struct blkcg __rcu	*i_blkcg;
-+#endif
- 	unsigned long		flags;
- 	errseq_t		wb_err;
- 	spinlock_t		private_lock;
-diff --git a/mm/page-writeback.c b/mm/page-writeback.c
-index 7d1010453fb9..a58071ee5f1c 100644
---- a/mm/page-writeback.c
-+++ b/mm/page-writeback.c
-@@ -2410,6 +2410,7 @@ void account_page_dirtied(struct page *page, struct address_space *mapping)
- 		inode_attach_wb(inode, page);
- 		wb = inode_to_wb(inode);
++static inline bool
++blkcg_wb_waiters_on_bdi(struct blkcg *blkcg, struct backing_dev_info *bdi)
++{
++	return false;
++}
++static inline void blkcg_start_wb_wait_on_bdi(struct backing_dev_info *bdi) { }
++static inline void blkcg_stop_wb_wait_on_bdi(struct backing_dev_info *bdi) { }
++
+ #endif
  
-+		blkcg_set_mapping_dirty(mapping);
- 		__inc_lruvec_page_state(page, NR_FILE_DIRTY);
- 		__inc_zone_page_state(page, NR_ZONE_WRITE_PENDING);
- 		__inc_node_page_state(page, NR_DIRTIED);
+ /**
+@@ -772,6 +791,7 @@ static inline void blkcg_bio_issue_init(struct bio *bio)
+ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+ 					 struct bio *bio)
+ {
++	struct backing_dev_info *bdi = q->backing_dev_info;
+ 	struct blkcg_gq *blkg;
+ 	bool throtl = false;
+ 
+@@ -788,6 +808,9 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+ 
+ 	blkg = bio->bi_blkg;
+ 
++	if (blkcg_wb_waiters_on_bdi(blkg->blkcg, bdi))
++		bio_set_flag(bio, BIO_THROTTLED);
++
+ 	throtl = blk_throtl_bio(q, blkg, bio);
+ 
+ 	if (!throtl) {
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 72e6d0c55cfa..8848d26e8bf6 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -686,10 +686,12 @@ static int cgwb_bdi_init(struct backing_dev_info *bdi)
+ {
+ 	int ret;
+ 
++	INIT_LIST_HEAD(&bdi->cgwb_waiters);
+ 	INIT_RADIX_TREE(&bdi->cgwb_tree, GFP_ATOMIC);
+ 	bdi->cgwb_congested_tree = RB_ROOT;
+ 	mutex_init(&bdi->cgwb_release_mutex);
+ 	init_rwsem(&bdi->wb_switch_rwsem);
++	spin_lock_init(&bdi->cgwb_waiters_lock);
+ 
+ 	ret = wb_init(&bdi->wb, bdi, 1, GFP_KERNEL);
+ 	if (!ret) {
 -- 
 2.17.1
 
