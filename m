@@ -1,134 +1,102 @@
-Return-Path: <SRS0=V8DZ=QZ=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=aQmj=Q2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21CAEC4360F
-	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 22:30:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36463C43381
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 00:51:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E48D52146F
-	for <linux-block@archiver.kernel.org>; Mon, 18 Feb 2019 22:30:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pycDR0eY"
+	by mail.kernel.org (Postfix) with ESMTP id 0DF3C21773
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 00:51:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731847AbfBRWax (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Feb 2019 17:30:53 -0500
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:36867 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729048AbfBRWax (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Feb 2019 17:30:53 -0500
-Received: by mail-qt1-f193.google.com with SMTP id a48so21026753qtb.4;
-        Mon, 18 Feb 2019 14:30:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=zQ+rW8xj/RQR5ug2h9q7b524JpzwsETcbe2rNn2M4gA=;
-        b=pycDR0eYUUpiaR+Pg2PdAYEeEf93KrZ+SfKC5mRArmhN25oFcjY+Y3rqxrlI2yXlWE
-         dGJS4hb0/3LKv9e7pT8e2VSvsJQWuib2en/zB84eIfiGRxHJT++AISnKP/rHPJkM/Yej
-         gJfrgyfq1WzX6eVfL0IOZENBl2Hfqjui7AofIXUJH3VPN6XZyKyGFWmra0Gcm68viaOJ
-         acL09wROyXqh66yyEnp/MYJFSzM8HPzm4WVJ/hm2EXBl5Dwgz6snDrlqnpxukHntQQrM
-         8YMMGzUdibWgniPPzpxRreJbC94CcLzW20pKi+JTNGMl/UmxCeB5QJ100mDWp48EheXC
-         AJXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=zQ+rW8xj/RQR5ug2h9q7b524JpzwsETcbe2rNn2M4gA=;
-        b=pzWncYPyrYGnNzYnXt2IKoidGEHqyXVHXLWLlS3Q6pu8ApYAem+8Btpf2LUW6gStUd
-         9eDm+TAH5mCV2FRiaDkafhgl+I1A8TQXUw2BRlPYVIW0pqEYA/0HymJZq73cZsJouRIv
-         83SkJmX3kMU6uQ2/feylPLH4nB28FPIRVaFAkL4dOmvDziFrLd3VFcTnO/+t2qEoINjL
-         QQfGOAhHHRoxoAZtTyl+5I98jootXPkpLnJ+HzLj5dKf/d5QhpzvmuxGjfG3yelOY5KA
-         56DlGAuDgcak9hgrTO7d9UCL+PLATXeuSBAv3p1BRwIQpLtz/tHUO5TV8uPBfcKCZjgw
-         +mdQ==
-X-Gm-Message-State: AHQUAuZOJRCSgGvaIDYIY6hP4AHc4uYmEA5hrCDsO14cYG+V6amsCO5O
-        gm++OmT+vwjg3BtLDGcjBrA3egGR8j4=
-X-Google-Smtp-Source: AHgI3IY6Yklx2L3LEMsz3lAyI3mXpcX25uBJ0jDOJd8eJUey2HGNt5+WPbh+lcKGgwaA1lAFyUJHTA==
-X-Received: by 2002:ac8:25b5:: with SMTP id e50mr21051332qte.186.1550529050902;
-        Mon, 18 Feb 2019 14:30:50 -0800 (PST)
-Received: from [192.168.1.204] (pool-108-7-72-149.bstnma.fios.verizon.net. [108.7.72.149])
-        by smtp.gmail.com with ESMTPSA id f19sm9610599qtf.1.2019.02.18.14.30.49
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 18 Feb 2019 14:30:50 -0800 (PST)
-Subject: Re: [LSF/MM TOPIC] More async operations for file systems - async
- discard?
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     lsf-pc@lists.linux-foundation.org,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-btrfs <linux-btrfs@vger.kernel.org>,
-        linux-block@vger.kernel.org
-References: <92ab41f7-35bc-0f56-056f-ed88526b8ea4@gmail.com>
- <20190217210948.GB14116@dastard>
- <46540876-c222-0889-ddce-44815dcaad04@gmail.com>
- <20190218022243.GC14116@dastard>
-From:   Ric Wheeler <ricwheeler@gmail.com>
-Message-ID: <86f2588d-8567-3905-40aa-c422393daaf1@gmail.com>
-Date:   Mon, 18 Feb 2019 17:30:49 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.1
-MIME-Version: 1.0
-In-Reply-To: <20190218022243.GC14116@dastard>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+        id S1727722AbfBSAvI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Feb 2019 19:51:08 -0500
+Received: from SMTPBG357.QQ.COM ([183.61.51.175]:33538 "EHLO SMTPBG357.QQ.COM"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727269AbfBSAvI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Feb 2019 19:51:08 -0500
+X-Greylist: delayed 499 seconds by postgrey-1.27 at vger.kernel.org; Mon, 18 Feb 2019 19:51:05 EST
+X-QQ-GoodBg: 0
+X-QQ-SSF: 00100000000000F0
+X-QQ-FEAT: eiOkkG+bjm7BokoWLlqPvV5lxlNky3E8WjTKOKrHuFCZDtBGh6QoyTjoBOp0W
+        r1PuRqXXNRxQG4WXZ4Gs7O+mpxeSO78ZovfJ7eFLsvLnp4hcgjZ3i1LWGZCKvUwEMoROqAe
+        BXRGbJ4swBJarW4HPsJ7GsfQkbEUX4g8ShjFYHE0ulJ+i5jMEd4tMI/LTcSiVgD0kQv53Ef
+        23lQtKQmjak8dsulcAtYxHa8GptWibW21AMMNYysJfNwD/TwIRNQiiSD8i9wu1+kH/SmhXy
+        ZhFW0y1TwbB9L5gaWUtqLehGs=
+X-QQ-BUSINESS-ORIGIN: 2
+X-Originating-IP: 222.92.124.153
+X-QQ-STYLE: 
+X-QQ-mid: bizmailfree7t1550536947t37589
+From:   "=?utf-8?B?6ZmI5Y2O5omN?=" <chenhc@lemote.com>
+To:     "=?utf-8?B?VGhvbWFzIEdsZWl4bmVy?=" <tglx@linutronix.de>,
+        "=?utf-8?B?SHVhY2FpIENoZW4=?=" <chenhuacai@gmail.com>
+Cc:     "=?utf-8?B?S2VpdGggQnVzY2g=?=" <keith.busch@intel.com>,
+        "=?utf-8?B?Qmpvcm4gSGVsZ2Fhcw==?=" <helgaas@kernel.org>,
+        "=?utf-8?B?SmVucyBBeGJvZQ==?=" <axboe@kernel.dk>,
+        "=?utf-8?B?U2FnaSBHcmltYmVyZw==?=" <sagi@grimberg.me>,
+        "=?utf-8?B?bGludXgtcGNp?=" <linux-pci@vger.kernel.org>,
+        "=?utf-8?B?TEtNTA==?=" <linux-kernel@vger.kernel.org>,
+        "=?utf-8?B?bGludXgtbnZtZQ==?=" <linux-nvme@lists.infradead.org>,
+        "=?utf-8?B?TWluZyBMZWk=?=" <ming.lei@redhat.com>,
+        "=?utf-8?B?bGludXgtYmxvY2s=?=" <linux-block@vger.kernel.org>,
+        "=?utf-8?B?Q2hyaXN0b3BoIEhlbGx3aWc=?=" <hch@lst.de>
+Subject: Re: [PATCH V3 1/5] genirq/affinity: don't mark 'affd' as const
+Mime-Version: 1.0
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: base64
+Date:   Tue, 19 Feb 2019 08:42:27 +0800
+X-Priority: 3
+Message-ID: <tencent_6C5D1EC74B826B1E2F22293C@qq.com>
+X-QQ-MIME: TCMime 1.0 by Tencent
+X-Mailer: QQMail 2.x
+X-QQ-Mailer: QQMail 2.x
+References: <20190213105041.13537-1-ming.lei@redhat.com>
+        <20190213105041.13537-2-ming.lei@redhat.com>
+        <20190213150407.GB96272@google.com>
+        <alpine.DEB.2.21.1902132112590.1659@nanos.tec.linutronix.de>
+        <20190213213149.GB8027@localhost.localdomain>
+        <alpine.DEB.2.21.1902132232560.1659@nanos.tec.linutronix.de>
+        <20190213223711.GC8027@localhost.localdomain>
+        <alpine.DEB.2.21.1902140949280.1659@nanos.tec.linutronix.de>
+        <tencent_6460D33741AF25B57E7BE493@qq.com>
+        <alpine.DEB.2.21.1902141430190.1561@nanos.tec.linutronix.de>
+In-Reply-To: <alpine.DEB.2.21.1902141430190.1561@nanos.tec.linutronix.de>
+X-QQ-ReplyHash: 839700712
+X-QQ-SENDSIZE: 520
+Received: from qq.com (unknown [127.0.0.1])
+        by smtp.qq.com (ESMTP) with SMTP
+        id ; Tue, 19 Feb 2019 08:42:30 +0800 (CST)
+Feedback-ID: bizmailfree:lemote.com:qybgweb:qybgweb22
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/17/19 9:22 PM, Dave Chinner wrote:
-> On Sun, Feb 17, 2019 at 06:42:59PM -0500, Ric Wheeler wrote:
->> On 2/17/19 4:09 PM, Dave Chinner wrote:
->>> On Sun, Feb 17, 2019 at 03:36:10PM -0500, Ric Wheeler wrote:
->>>> One proposal for btrfs was that we should look at getting discard
->>>> out of the synchronous path in order to minimize the slowdown
->>>> associated with enabling discard at mount time. Seems like an
->>>> obvious win for "hint" like operations like discard.
->>> We already have support for that. blkdev_issue_discard() is
->>> synchornous, yes, but __blkdev_issue_discard() will only build the
->>> discard bio chain - it is up to the caller to submit and wait for it.
->>>
->>> Some callers (XFS, dm-thinp, nvmet, etc) use a bio completion to
->>> handle the discard IO completion, hence allowing async dispatch and
->>> processing of the discard chain without blocking the caller. Others
->>> (like ext4) simply call submit_bio_wait() to do wait synchronously
->>> on completion of the discard bio chain.
->>>
->>>> I do wonder where we stand now with the cost of the various discard
->>>> commands - how painful is it for modern SSD's?
->>> AIUI, it still depends on the SSD implementation, unfortunately.
->> I think the variability makes life really miserable for layers above it.
-> Yup, that it does.
->
->> Might be worth constructing some tooling that we can use to validate
->> or shame vendors over
-> That doesn't seem to work.
->
->> - testing things like a full device discard,
->> discard of fs block size and big chunks, discard against already
->> discarded, etc.
-> We did that many years ago because discard on SSDs sucked:
->
-> https://people.redhat.com/lczerner/discard/test_discard.html
-> https://sourceforge.net/projects/test-discard/files/
->
-> And, really, that didn't changed a thing - discard still sucks...
->
-> Cheers,
->
-> Dave.
-
-Totally forgot about that work - maybe it is time to try again and poke some 
-vendors.
-
-Ric
-
+TXkgbGVtb3RlLmNvbSBlbWFpbCBpcyB0b28gd2VhaywgSSdsbCBzdG9wIHRvcCBwb3N0IGJl
+Y2F1c2UgdGhpcyB0aW1lIEkndmUNCmNjLWVkIG15IGdtYWlsLg0KDQpJJ3ZlIHRlc3RlZCwg
+dGhpcyBwYXRjaCBjYW4gZml4IHRoZSBudm1lIHByb2JsZW0sIGJ1dCBpdCBjYW4ndCBiZSBh
+cHBsaWVkDQp0byA0LjE5IGJlY2F1c2Ugb2YgZGlmZmVyZW50IGNvbnRleHQuIEFuZCwgSSBz
+dGlsbCB0aGluayBteSBvcmlnaW5hbCBzb2x1dGlvbg0KKGdlbmlycS9hZmZpbml0eTogQXNz
+aWduIGRlZmF1bHQgYWZmaW5pdHkgdG8gcHJlL3Bvc3QgdmVjdG9ycykgaXMgY29ycmVjdC4N
+ClRoZXJlIG1heSBiZSBzaW1pbGFyIHByb2JsZW1zIGV4Y2VwdCBudm1lLg0KIA0KSHVhY2Fp
+DQoNCi0tLS0tLS0tLS0tLS0tLS0tLSBPcmlnaW5hbCAtLS0tLS0tLS0tLS0tLS0tLS0NCkZy
+b206ICAiVGhvbWFzIEdsZWl4bmVyIjx0Z2x4QGxpbnV0cm9uaXguZGU+Ow0KRGF0ZTogIFRo
+dSwgRmViIDE0LCAyMDE5IDA5OjMxIFBNDQpUbzogICLpmYjljY7miY0iPGNoZW5oY0BsZW1v
+dGUuY29tPjsNCkNjOiAgIktlaXRoIEJ1c2NoIjxrZWl0aC5idXNjaEBpbnRlbC5jb20+OyAi
+Qmpvcm4gSGVsZ2FhcyI8aGVsZ2Fhc0BrZXJuZWwub3JnPjsgIkplbnMgQXhib2UiPGF4Ym9l
+QGtlcm5lbC5kaz47ICJTYWdpIEdyaW1iZXJnIjxzYWdpQGdyaW1iZXJnLm1lPjsgImxpbnV4
+LXBjaSI8bGludXgtcGNpQHZnZXIua2VybmVsLm9yZz47ICJMS01MIjxsaW51eC1rZXJuZWxA
+dmdlci5rZXJuZWwub3JnPjsgImxpbnV4LW52bWUiPGxpbnV4LW52bWVAbGlzdHMuaW5mcmFk
+ZWFkLm9yZz47ICJNaW5nIExlaSI8bWluZy5sZWlAcmVkaGF0LmNvbT47ICJsaW51eC1ibG9j
+ayI8bGludXgtYmxvY2tAdmdlci5rZXJuZWwub3JnPjsgIkNocmlzdG9waCBIZWxsd2lnIjxo
+Y2hAbHN0LmRlPjsNClN1YmplY3Q6ICBSZTogW1BBVENIIFYzIDEvNV0gZ2VuaXJxL2FmZmlu
+aXR5OiBkb24ndCBtYXJrICdhZmZkJyBhcyBjb25zdA0KIA0KT24gVGh1LCAxNCBGZWIgMjAx
+OSwg6ZmI5Y2O5omNIHdyb3RlOg0KDQpQbGVhc2UgZG8gbm90IHRvcCBwb3N0Li4uLg0KDQo+
+IEknbGwgdGVzdCBuZXh0IHdlZWssIGJ1dCA0LjE5IGhhcyB0aGUgc2FtZSBwcm9ibGVtLCBo
+b3cgdG8gZml4IHRoYXQgZm9yIDQuMTk/DQoNCkJ5IGFwcGx5aW5nIHRoZSB2ZXJ5IHNhbWUg
+cGF0Y2ggcGVyaGFwcz8NCg0KVGhhbmtzLA0KDQp0Z2x4
 
