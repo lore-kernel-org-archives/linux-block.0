@@ -2,77 +2,67 @@ Return-Path: <SRS0=aQmj=Q2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDCB3C43381
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 09:01:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C409C43381
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 12:17:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9B59421904
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 09:01:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1550566891;
-	bh=hO5bHD3brKt+ZvBi0aqsZhusk0JCVPqgtbDD0VBMUZo=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:List-ID:From;
-	b=AhumxLakFzNGcBK+hS52QjyCVt4Zu4CGzToi4xlG4QnSbUrxuAiz0/Y+vBhYIpUzR
-	 rVERPY/3tAMW8Rt2OzTNJk4Ln34VhZtq+BCgF69gMrQVWF/fjDdaw1M/9l9MqGvZP/
-	 KbkFuHEydy88b7kz6e9MqzmZuh4P2xtT/7TKChgc=
+	by mail.kernel.org (Postfix) with ESMTP id 5648E21738
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 12:17:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727242AbfBSJB3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Feb 2019 04:01:29 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44200 "EHLO mail.kernel.org"
+        id S1726817AbfBSMRM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Feb 2019 07:17:12 -0500
+Received: from mx2.cyber.ee ([193.40.6.72]:37992 "EHLO mx2.cyber.ee"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725765AbfBSJB3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Feb 2019 04:01:29 -0500
-Received: from pobox.suse.cz (prg-ext-pat.suse.com [213.151.95.130])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0616F21902;
-        Tue, 19 Feb 2019 09:01:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1550566888;
-        bh=hO5bHD3brKt+ZvBi0aqsZhusk0JCVPqgtbDD0VBMUZo=;
-        h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-        b=agnDva5DNxOLl02FbP94T6ITnAoIgiNTS84+lvUNPERwzpvVtIvfpgQqO5qwfEGoW
-         4JbCOBKCqyyZmHXQnNlVh744b6vCIOpMqIW3xmL+1KlJ8VAkXtIF6VAqmU33dEsHeL
-         LzcjA5Be+d1wUilyOrJMVZOfZEdV7xcrDlyYawrM=
-Date:   Tue, 19 Feb 2019 10:01:25 +0100 (CET)
-From:   Jiri Kosina <jikos@kernel.org>
-To:     YueHaibing <yuehaibing@huawei.com>
-cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH -next] floppy: remove set but not used variable 'q'
-In-Reply-To: <20190218084232.193878-1-yuehaibing@huawei.com>
-Message-ID: <nycvar.YFH.7.76.1902191001070.11598@cbobk.fhfr.pm>
-References: <20190218084232.193878-1-yuehaibing@huawei.com>
-User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
+        id S1725805AbfBSMRM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Feb 2019 07:17:12 -0500
+Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
+To:     Jan Kara <jack@suse.cz>
+Cc:     "Theodore Y. Ts'o" <tytso@mit.edu>, linux-alpha@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org
+References: <fb63a4d0-d124-21c8-7395-90b34b57c85a@linux.ee>
+ <1c26eab4-3277-9066-5dce-6734ca9abb96@linux.ee>
+ <076b8b72-fab0-ea98-f32f-f48949585f9d@linux.ee>
+ <20190216174536.GC23000@mit.edu>
+ <e175b885-082a-97c1-a0be-999040a06443@linux.ee>
+ <20190218120209.GC20919@quack2.suse.cz>
+From:   Meelis Roos <mroos@linux.ee>
+Message-ID: <4e015688-8633-d1a0-308b-ba2a78600544@linux.ee>
+Date:   Tue, 19 Feb 2019 14:17:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190218120209.GC20919@quack2.suse.cz>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: et-EE
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 18 Feb 2019, YueHaibing wrote:
+>>>> The result of the bisection is
+>>>> [88dbcbb3a4847f5e6dfeae952d3105497700c128] blkdev: avoid migration stalls for blkdev pages
+>>>>
+>>>> Is that result relevant for the problem or should I continue bisecting between 4.20.0 and the so far first bad commit?
+>>>
+>>> Can you try reverting the commit and see if it makes the problem go away?
+>>
+>> Tried reverting it on top of 5.0.0-rc6-00153-g5ded5871030e and it seems
+>> to make the kernel work - emerge --sync succeeded.
+There is more to it.
 
-> Fixes gcc '-Wunused-but-set-variable' warning:
-> 
-> drivers/block/floppy.c: In function 'request_done':
-> drivers/block/floppy.c:2233:24: warning:
->  variable 'q' set but not used [-Wunused-but-set-variable]
-> 
-> It's never used and can be removed.
-> 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+After running 5.0.0-rc6-00153-g5ded5871030e-dirty (with the revert of that patch)
+successfully for Gentoo update, I upgraded the kernel to
+5.0.0-rc7-00011-gb5372fe5dc84-dirty (todays git + revert of this patch) and it broke on rsync again:
 
-Acked-by: Jiri Kosina <jkosina@suse.cz>
+RepoStorageException: command exited with status -6: rsync -a --link-dest /usr/portage --exclude=/distfiles --exclude=/local --exclude=/lost+found --exclude=/packages --exclude /.tmp-unverified-download-quarantine /usr/portage/ /usr/portage/.tmp-unverified-download-quarantine/
 
-Jens, could you please take this through your tree?
+Nothing in dmesg.
 
-Thanks.
+This means the real root reason is somewhere deeper and reverting this commit just made
+it less likely to happen.
 
 -- 
-Jiri Kosina
-SUSE Labs
-
+Meelis Roos <mroos@linux.ee>
