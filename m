@@ -2,142 +2,350 @@ Return-Path: <SRS0=aQmj=Q2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B77DC43381
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 16:50:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A8CDC43381
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 19:09:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 40B8721773
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 16:50:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0DA821738
+	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 19:09:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mSBjkDI3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v46/rNTU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725820AbfBSQt7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Feb 2019 11:49:59 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:40265 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726110AbfBSQt7 (ORCPT
+        id S1726078AbfBSTJE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Feb 2019 14:09:04 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:33890 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726323AbfBSTJD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Feb 2019 11:49:59 -0500
-Received: by mail-pl1-f194.google.com with SMTP id bj4so10703370plb.7;
-        Tue, 19 Feb 2019 08:49:59 -0800 (PST)
+        Tue, 19 Feb 2019 14:09:03 -0500
+Received: by mail-ot1-f68.google.com with SMTP id 98so36215070oty.1
+        for <linux-block@vger.kernel.org>; Tue, 19 Feb 2019 11:09:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id;
-        bh=B2VKAD0UxqNA8Steehxbgu6qDZa4biIz9/CEmlJKQN8=;
-        b=mSBjkDI3USrO6pu1VpmMXcUL/UC54E7Mmpf+HwgmxmOG3LXt03KaH6zHQwVGmYj9Fz
-         Nbm0/qHjqdrVJxCwxQEFV+oKXTzANTJewQg3nLhA88C1N4u9fxPhL3Cpg+wxfrsupam9
-         0y+su0YB2GoTl/RP6xSutzxdLy2A6u57VYoPJ5suzXv9ES4ze2NYAWm85axGw5JWHzVw
-         MuzmLJl0J+FPMkFJrE2Ww7N91wvnYqQHMPYID22po9tcd6RGJrBc8Mer3yAHStd6EDkx
-         K13zWt1d3B/6IgkPCvJ+I3O7STeVSbLqTzkIkrT+LUqtI5ILmVrUF0Vqb3NGfsSoUyoF
-         YjHQ==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=bvG6b6XzrUy6ODHrru0E3gxcCFBMenPt77j8iuEmJoo=;
+        b=v46/rNTUJAX1smHBa6j6PCuum5GzWv8BdQvrHeuTVBdY6ZGXhTnK+KGocF55XHYbTz
+         5p6E1KUs4+Jm6kjfU71GiPVT74GZiGW4MQJ1ZJgcz8qCrwrOS430og0PRqsOTi3rStUd
+         TDwUab3syfLV0KoNEeC4qBhwZ305s0xqz3+LRyhPOwuRCe6NbwhEYQYyJzCGfCc5kMrM
+         xes9qRFx/ZCE0BuYx3IWv67RAHeVeKO4nwKx2WVVr1KTCbGKzUpUgBCGvoyln/6tr4Ku
+         zjAYJ4AZywaY+PPZXrEjwlCv3BaPVj9K/C6TYEHpubJq7uU10igqeEiDEKFH1T1k3fDP
+         63cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=B2VKAD0UxqNA8Steehxbgu6qDZa4biIz9/CEmlJKQN8=;
-        b=hkOECSmU58xAanNPpc0sAGqb9wH7jyMSRXv/4/yA6fxGNQHa/P/FynGyqhAa/fQTD2
-         RCjco49Ns6H3wfgyp1OyvPO01Y1EPS4c64Qaq5Zntknww2wH4l9QHxD/DbUZBVboa42K
-         vzmnyjWpQi6pjXW2NHujFoWuJ65wC9A6+9xLruDDW7Dvo7Z+5vVAKa7j+ZP+eq81S87d
-         eQo/PtDRW1wdiMpQnkZIOfchl7DJNXi3vznNj/H4E6aRuuGQ25tMHAMv9u/CfNU/qoRU
-         FDZSgq2S8GKk2i4jXL9C6LBwisyX5wxbImAD3AHz2PE0GQxMxA17uSd5TDgq8NHf2/6U
-         t5gA==
-X-Gm-Message-State: AHQUAuYb0YxwCIn4U+eCzDc8rK5sJZHokM0aJxSpHvcfkQKh3BGoJWnC
-        eIiF3ModncZwBa0xxO47Q3k=
-X-Google-Smtp-Source: AHgI3Ib3vn54919FgTLq8OaDOFUnwF49IgCjjOCeu/shK+Saw2cs1q27jT8WX1GDUT2pWSw96p03vQ==
-X-Received: by 2002:a17:902:2f:: with SMTP id 44mr23276419pla.44.1550594998657;
-        Tue, 19 Feb 2019 08:49:58 -0800 (PST)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id o26sm17516313pfk.139.2019.02.19.08.49.57
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 19 Feb 2019 08:49:57 -0800 (PST)
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     Michal Simek <michal.simek@xilinx.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Guenter Roeck <linux@roeck-us.net>
-Subject: [PATCH] xsysace: Fix error handling in ace_setup
-Date:   Tue, 19 Feb 2019 08:49:56 -0800
-Message-Id: <1550594996-11453-1-git-send-email-linux@roeck-us.net>
-X-Mailer: git-send-email 2.7.4
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=bvG6b6XzrUy6ODHrru0E3gxcCFBMenPt77j8iuEmJoo=;
+        b=MZC9UrmyL5ca3TkBXpfW1EGYVgxDyDfklD49E46Vd6S5/2uaGA0t1KsBSLJTMIZB6f
+         /jiQ7dKoOX32LswFQv1qjf1vnl8X4X87xH+wFkut2GzDr7ntgUqfdSR4U+/KzNX26uSD
+         80FI93n5EKYeNwA3nCjTYWgmOHER4uYrBm3xhh3sNq2bRU/uC+MGuVw7cfp8tbY4SumT
+         rO3xNozCYep+UlUE6G6f/+7eIR4JcBw17hzWUpGdznqN7aLSv11+oErjjPIr3hB4ORPM
+         c5TMLZ17c3qo/h4rkGjMVvpYVZruxMnD8n2MiWQJkbFnEUGXZ5LXlclnZadV4OxjxmlR
+         6RzQ==
+X-Gm-Message-State: AHQUAuZQAepbZjVA9n6CLkTbARr1XnX4DheAfi1paZBuuLzDoj1ZJ6sh
+        UwAsiPjpPUh6GL7hAUiP3MTcymhAGwPLAv6z7pbDMg==
+X-Google-Smtp-Source: AHgI3IaxecYb647wY6dJ6uzEWW1oObGJ3vPaDTyJ9uLLHBk6jt38xKz2wKEDNWVhJKqb04AbDsQx9F1FdiDf7PjgZHg=
+X-Received: by 2002:a05:6830:14d6:: with SMTP id t22mr19855488otq.255.1550603342340;
+ Tue, 19 Feb 2019 11:09:02 -0800 (PST)
+MIME-Version: 1.0
+References: <20190211190049.7888-1-axboe@kernel.dk> <20190211190049.7888-14-axboe@kernel.dk>
+In-Reply-To: <20190211190049.7888-14-axboe@kernel.dk>
+From:   Jann Horn <jannh@google.com>
+Date:   Tue, 19 Feb 2019 20:08:35 +0100
+Message-ID: <CAG48ez2jrdFEATYor3-tRUx=LBpXo9581tPCWUgjWf6atMiGzA@mail.gmail.com>
+Subject: Re: [PATCH 12/19] io_uring: add support for pre-mapped user IO buffers
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
+        jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>,
+        Al Viro <viro@zeniv.linux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If xace hardware reports a bad version number, the error handling code
-in ace_setup() calls put_disk(), followed by queue cleanup. However, since
-the disk data structure has the queue pointer set, put_disk() also
-cleans and releases the queue. This results in blk_cleanup_queue()
-accessing an already released data structure, which in turn may result
-in a crash such as the following.
+On Mon, Feb 11, 2019 at 8:01 PM Jens Axboe <axboe@kernel.dk> wrote:
+> If we have fixed user buffers, we can map them into the kernel when we
+> setup the io_uring. That avoids the need to do get_user_pages() for
+> each and every IO.
+>
+> To utilize this feature, the application must call io_uring_register()
+> after having setup an io_uring instance, passing in
+> IORING_REGISTER_BUFFERS as the opcode. The argument must be a pointer to
+> an iovec array, and the nr_args should contain how many iovecs the
+> application wishes to map.
+>
+> If successful, these buffers are now mapped into the kernel, eligible
+> for IO. To use these fixed buffers, the application must use the
+> IORING_OP_READ_FIXED and IORING_OP_WRITE_FIXED opcodes, and then
+> set sqe->index to the desired buffer index. sqe->addr..sqe->addr+seq->len
+> must point to somewhere inside the indexed buffer.
+>
+> The application may register buffers throughout the lifetime of the
+> io_uring instance. It can call io_uring_register() with
+> IORING_UNREGISTER_BUFFERS as the opcode to unregister the current set of
+> buffers, and then register a new set. The application need not
+> unregister buffers explicitly before shutting down the io_uring
+> instance.
+>
+> It's perfectly valid to setup a larger buffer, and then sometimes only
+> use parts of it for an IO. As long as the range is within the originally
+> mapped region, it will work just fine.
+>
+> For now, buffers must not be file backed. If file backed buffers are
+> passed in, the registration will fail with -1/EOPNOTSUPP. This
+> restriction may be relaxed in the future.
+>
+> RLIMIT_MEMLOCK is used to check how much memory we can pin. A somewhat
+> arbitrary 1G per buffer size is also imposed.
+>
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+[...]
+>  static void io_sq_wq_submit_work(struct work_struct *work)
+>  {
+>         struct io_kiocb *req = container_of(work, struct io_kiocb, work);
+>         struct sqe_submit *s = &req->submit;
+>         const struct io_uring_sqe *sqe = s->sqe;
+>         struct io_ring_ctx *ctx = req->ctx;
+> -       mm_segment_t old_fs = get_fs();
+> +       mm_segment_t old_fs;
+> +       bool needs_user;
+>         int ret;
+>
+>          /* Ensure we clear previously set forced non-block flag */
+>         req->flags &= ~REQ_F_FORCE_NONBLOCK;
+>         req->rw.ki_flags &= ~IOCB_NOWAIT;
+>
+> -       if (!mmget_not_zero(ctx->sqo_mm)) {
+> -               ret = -EFAULT;
+> -               goto err;
+> -       }
+> -
+> -       use_mm(ctx->sqo_mm);
+> -       set_fs(USER_DS);
+> -       s->has_user = true;
+>         s->needs_lock = true;
+> +       s->has_user = false;
+> +
+> +       /*
+> +        * If we're doing IO to fixed buffers, we don't need to get/set
+> +        * user context
+> +        */
+> +       needs_user = io_sqe_needs_user(s->sqe);
+> +       if (needs_user) {
+> +               if (!mmget_not_zero(ctx->sqo_mm)) {
+> +                       ret = -EFAULT;
+> +                       goto err;
+> +               }
+> +               use_mm(ctx->sqo_mm);
+> +               old_fs = get_fs();
+> +               set_fs(USER_DS);
+> +               s->has_user = true;
+> +       }
+>
+>         do {
+>                 ret = __io_submit_sqe(ctx, req, s, false, NULL);
+> @@ -1011,9 +1110,11 @@ static void io_sq_wq_submit_work(struct work_struct *work)
+>                 cond_resched();
+>         } while (1);
+>
+> -       set_fs(old_fs);
+> -       unuse_mm(ctx->sqo_mm);
+> -       mmput(ctx->sqo_mm);
+> +       if (needs_user) {
+> +               set_fs(old_fs);
+> +               unuse_mm(ctx->sqo_mm);
+> +               mmput(ctx->sqo_mm);
+> +       }
+>  err:
+>         if (ret) {
+>                 io_cqring_add_event(ctx, sqe->user_data, ret, 0);
+> @@ -1308,6 +1409,197 @@ static unsigned long ring_pages(unsigned sq_entries, unsigned cq_entries)
+>         return (bytes + PAGE_SIZE - 1) / PAGE_SIZE;
+>  }
+>
+> +static int io_sqe_buffer_unregister(struct io_ring_ctx *ctx)
+> +{
+> +       int i, j;
+> +
+> +       if (!ctx->user_bufs)
+> +               return -ENXIO;
+> +
+> +       for (i = 0; i < ctx->nr_user_bufs; i++) {
+> +               struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
+> +
+> +               for (j = 0; j < imu->nr_bvecs; j++)
+> +                       put_page(imu->bvec[j].bv_page);
+> +
+> +               if (ctx->account_mem)
+> +                       io_unaccount_mem(ctx->user, imu->nr_bvecs);
+> +               kfree(imu->bvec);
+> +               imu->nr_bvecs = 0;
+> +       }
+> +
+> +       kfree(ctx->user_bufs);
+> +       ctx->user_bufs = NULL;
+> +       ctx->nr_user_bufs = 0;
+> +       return 0;
+> +}
+[...]
+> +static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
+> +                                 unsigned nr_args)
+> +{
+> +       struct vm_area_struct **vmas = NULL;
+> +       struct page **pages = NULL;
+> +       int i, j, got_pages = 0;
+> +       int ret = -EINVAL;
+> +
+> +       if (ctx->user_bufs)
+> +               return -EBUSY;
+> +       if (!nr_args || nr_args > UIO_MAXIOV)
+> +               return -EINVAL;
+> +
+> +       ctx->user_bufs = kcalloc(nr_args, sizeof(struct io_mapped_ubuf),
+> +                                       GFP_KERNEL);
+> +       if (!ctx->user_bufs)
+> +               return -ENOMEM;
+> +
+> +       for (i = 0; i < nr_args; i++) {
+> +               struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
+> +               unsigned long off, start, end, ubuf;
+> +               int pret, nr_pages;
+> +               struct iovec iov;
+> +               size_t size;
+> +
+> +               ret = io_copy_iov(ctx, &iov, arg, i);
+> +               if (ret)
+> +                       break;
+> +
+> +               /*
+> +                * Don't impose further limits on the size and buffer
+> +                * constraints here, we'll -EINVAL later when IO is
+> +                * submitted if they are wrong.
+> +                */
+> +               ret = -EFAULT;
+> +               if (!iov.iov_base || !iov.iov_len)
+> +                       goto err;
+> +
+> +               /* arbitrary limit, but we need something */
+> +               if (iov.iov_len > SZ_1G)
+> +                       goto err;
+> +
+> +               ubuf = (unsigned long) iov.iov_base;
+> +               end = (ubuf + iov.iov_len + PAGE_SIZE - 1) >> PAGE_SHIFT;
+> +               start = ubuf >> PAGE_SHIFT;
+> +               nr_pages = end - start;
+> +
+> +               if (ctx->account_mem) {
+> +                       ret = io_account_mem(ctx->user, nr_pages);
+> +                       if (ret)
+> +                               goto err;
+> +               }
+> +
+> +               ret = 0;
+> +               if (!pages || nr_pages > got_pages) {
 
-[   10.681671] BUG: Kernel NULL pointer dereference at 0x00000040
-[   10.681826] Faulting instruction address: 0xc0431480
-[   10.682072] Oops: Kernel access of bad area, sig: 11 [#1]
-[   10.682251] BE PAGE_SIZE=4K PREEMPT Xilinx Virtex440
-[   10.682387] Modules linked in:
-[   10.682528] CPU: 0 PID: 1 Comm: swapper Tainted: G        W         5.0.0-rc6-next-20190218+ #2
-[   10.682733] NIP:  c0431480 LR: c043147c CTR: c0422ad8
-[   10.682863] REGS: cf82fbe0 TRAP: 0300   Tainted: G        W          (5.0.0-rc6-next-20190218+)
-[   10.683065] MSR:  00029000 <CE,EE,ME>  CR: 22000222  XER: 00000000
-[   10.683236] DEAR: 00000040 ESR: 00000000
-[   10.683236] GPR00: c043147c cf82fc90 cf82ccc0 00000000 00000000 00000000 00000002 00000000
-[   10.683236] GPR08: 00000000 00000000 c04310bc 00000000 22000222 00000000 c0002c54 00000000
-[   10.683236] GPR16: 00000000 00000001 c09aa39c c09021b0 c09021dc 00000007 c0a68c08 00000000
-[   10.683236] GPR24: 00000001 ced6d400 ced6dcf0 c0815d9c 00000000 00000000 00000000 cedf0800
-[   10.684331] NIP [c0431480] blk_mq_run_hw_queue+0x28/0x114
-[   10.684473] LR [c043147c] blk_mq_run_hw_queue+0x24/0x114
-[   10.684602] Call Trace:
-[   10.684671] [cf82fc90] [c043147c] blk_mq_run_hw_queue+0x24/0x114 (unreliable)
-[   10.684854] [cf82fcc0] [c04315bc] blk_mq_run_hw_queues+0x50/0x7c
-[   10.685002] [cf82fce0] [c0422b24] blk_set_queue_dying+0x30/0x68
-[   10.685154] [cf82fcf0] [c0423ec0] blk_cleanup_queue+0x34/0x14c
-[   10.685306] [cf82fd10] [c054d73c] ace_probe+0x3dc/0x508
-[   10.685445] [cf82fd50] [c052d740] platform_drv_probe+0x4c/0xb8
-[   10.685592] [cf82fd70] [c052abb0] really_probe+0x20c/0x32c
-[   10.685728] [cf82fda0] [c052ae58] driver_probe_device+0x68/0x464
-[   10.685877] [cf82fdc0] [c052b500] device_driver_attach+0xb4/0xe4
-[   10.686024] [cf82fde0] [c052b5dc] __driver_attach+0xac/0xfc
-[   10.686161] [cf82fe00] [c0528428] bus_for_each_dev+0x80/0xc0
-[   10.686314] [cf82fe30] [c0529b3c] bus_add_driver+0x144/0x234
-[   10.686457] [cf82fe50] [c052c46c] driver_register+0x88/0x15c
-[   10.686610] [cf82fe60] [c09de288] ace_init+0x4c/0xac
-[   10.686742] [cf82fe80] [c0002730] do_one_initcall+0xac/0x330
-[   10.686888] [cf82fee0] [c09aafd0] kernel_init_freeable+0x34c/0x478
-[   10.687043] [cf82ff30] [c0002c6c] kernel_init+0x18/0x114
-[   10.687188] [cf82ff40] [c000f2f0] ret_from_kernel_thread+0x14/0x1c
-[   10.687349] Instruction dump:
-[   10.687435] 3863ffd4 4bfffd70 9421ffd0 7c0802a6 93c10028 7c9e2378 93e1002c 38810008
-[   10.687637] 7c7f1b78 90010034 4bfffc25 813f008c <81290040> 75290100 4182002c 80810008
-[   10.688056] ---[ end trace 13c9ff51d41b9d40 ]---
+Nit: No need to check for `!pages` as long as `pages` and `got_pages`
+are synchronized (which guarantees that `!pages` implies
+`got_pages==0`).
 
-Fix the problem by setting the disk queue pointer to NULL before calling
-put_disk(). A more comprehensive fix might be to rearrange the code
-to check the hardware version before initializing data structures,
-but I don't know if this would have undesirable side effects, and
-it would increase the complexity of backporting the fix to older kernels.
+> +                       kfree(vmas);
+> +                       kfree(pages);
+> +                       pages = kmalloc_array(nr_pages, sizeof(struct page *),
+> +                                               GFP_KERNEL);
+> +                       vmas = kmalloc_array(nr_pages,
+> +                                       sizeof(struct vma_area_struct *),
 
-Fixes: 74489a91dd43a ("Add support for Xilinx SystemACE CompactFlash interface")
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
----
- drivers/block/xsysace.c | 2 ++
- 1 file changed, 2 insertions(+)
+typo: s/vma_area_struct/vm_area_struct/
 
-diff --git a/drivers/block/xsysace.c b/drivers/block/xsysace.c
-index 87ccef4bd69e..32a21b8d1d85 100644
---- a/drivers/block/xsysace.c
-+++ b/drivers/block/xsysace.c
-@@ -1090,6 +1090,8 @@ static int ace_setup(struct ace_device *ace)
- 	return 0;
- 
- err_read:
-+	/* prevent double queue cleanup */
-+	ace->gd->queue = NULL;
- 	put_disk(ace->gd);
- err_alloc_disk:
- 	blk_cleanup_queue(ace->queue);
--- 
-2.7.4
+> +                                       GFP_KERNEL);
+> +                       if (!pages || !vmas) {
+> +                               ret = -ENOMEM;
+> +                               if (ctx->account_mem)
+> +                                       io_unaccount_mem(ctx->user, nr_pages);
+> +                               goto err;
+> +                       }
+> +                       got_pages = nr_pages;
+> +               }
+> +
+> +               imu->bvec = kmalloc_array(nr_pages, sizeof(struct bio_vec),
+> +                                               GFP_KERNEL);
+> +               ret = -ENOMEM;
+> +               if (!imu->bvec) {
+> +                       if (ctx->account_mem)
+> +                               io_unaccount_mem(ctx->user, nr_pages);
+> +                       goto err;
+> +               }
+> +
+> +               ret = 0;
+> +               down_read(&current->mm->mmap_sem);
+> +               pret = get_user_pages_longterm(ubuf, nr_pages, FOLL_WRITE,
+> +                                               pages, vmas);
+> +               if (pret == nr_pages) {
+> +                       /* don't support file backed memory */
+> +                       for (j = 0; j < nr_pages; j++) {
+> +                               struct vm_area_struct *vma = vmas[j];
+> +
+> +                               if (vma->vm_file &&
+> +                                   !is_file_hugepages(vma->vm_file)) {
+> +                                       ret = -EOPNOTSUPP;
+> +                                       break;
+> +                               }
+> +                       }
+> +               } else {
+> +                       ret = pret < 0 ? pret : -EFAULT;
+> +               }
+> +               up_read(&current->mm->mmap_sem);
+> +               if (ret) {
+> +                       /*
+> +                        * if we did partial map, or found file backed vmas,
+> +                        * release any pages we did get
+> +                        */
+> +                       if (pret > 0) {
+> +                               for (j = 0; j < pret; j++)
+> +                                       put_page(pages[j]);
+> +                       }
+> +                       if (ctx->account_mem)
+> +                               io_unaccount_mem(ctx->user, nr_pages);
+> +                       goto err;
+> +               }
+> +
+> +               off = ubuf & ~PAGE_MASK;
+> +               size = iov.iov_len;
+> +               for (j = 0; j < nr_pages; j++) {
+> +                       size_t vec_len;
+> +
+> +                       vec_len = min_t(size_t, size, PAGE_SIZE - off);
+> +                       imu->bvec[j].bv_page = pages[j];
+> +                       imu->bvec[j].bv_len = vec_len;
+> +                       imu->bvec[j].bv_offset = off;
+> +                       off = 0;
+> +                       size -= vec_len;
+> +               }
+> +               /* store original address for later verification */
+> +               imu->ubuf = ubuf;
+> +               imu->len = iov.iov_len;
+> +               imu->nr_bvecs = nr_pages;
+> +       }
+> +       kfree(pages);
+> +       kfree(vmas);
+> +       ctx->nr_user_bufs = nr_args;
+> +       return 0;
+> +err:
+> +       kfree(pages);
+> +       kfree(vmas);
+> +       io_sqe_buffer_unregister(ctx);
 
+io_sqe_buffer_unregister() gets rid of elements up to
+ctx->nr_user_bufs, but as far as I can tell, ctx->nr_user_bufs is
+always zero here. I think that's going to cause a reference leak.
+
+> +       return ret;
+> +}
