@@ -2,106 +2,106 @@ Return-Path: <SRS0=4lGM=Q3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56631C43381
-	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 19:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDE65C43381
+	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 22:06:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 29693214AF
-	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 19:36:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="aM+FyHWB"
+	by mail.kernel.org (Postfix) with ESMTP id A8B192146E
+	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 22:06:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1550700398;
+	bh=GajvTTBZrZGrWvvL+tf1V1WMJlBA6HmDvbul/1yeJEc=;
+	h=Date:From:To:Cc:Subject:List-ID:From;
+	b=vWHP5l7im1T7iF37+e0kS04de5cK7UbP1yW8xDj+S8FdzL2zafYMnpT5dAnCMnqxN
+	 jTwZRQa/96VVVwdj0lT7NgNVl/oUC8mGTAu8WjoRji7P54osp3wsoAnmOGT2UMzD2p
+	 RSmVjQ0n7iU0OrZ6ARaStsVuxD5TzhprlCeTGtjk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725915AbfBTTgz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Feb 2019 14:36:55 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:38546 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725798AbfBTTgz (ORCPT
+        id S1725869AbfBTWGh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Feb 2019 17:06:37 -0500
+Received: from mail-yw1-f54.google.com ([209.85.161.54]:37313 "EHLO
+        mail-yw1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725826AbfBTWGh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Feb 2019 14:36:55 -0500
-Received: by mail-pg1-f195.google.com with SMTP id m2so10122872pgl.5
-        for <linux-block@vger.kernel.org>; Wed, 20 Feb 2019 11:36:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=0qZUSx079tD8Vu6fGKJpHunxf0aj+rh5wYA8jiJD30k=;
-        b=aM+FyHWB1oftARzCbB7VlTwXVFq9vf+khB8T7AvbI6bl3FNC8K09rRV2NWRTrF99NJ
-         co699og0x/zTm4gHDXjKPoT+Hp7TMGowoBwubEawrxzyL/WFdv6yP9fjTSR0jz1cq31g
-         pkajh451yPWm3FNXzTp+wYTDDp20EtDph2YxxPnN0zOEzLpKyOy1jr4DKKEqs+FkDnMP
-         px2N876zN6Gt8Om2fioXlfGI3PzBjfbcHMWsi/RGhzDktNqoivJg8Ohs62bTK/ae1T9I
-         owbLpIZZnu8dHJ6KLzwlM+tWcmkroH2p2C1ptPL7w9OzS6LPphaZSk6QdcPRgrz8nITl
-         DxoQ==
+        Wed, 20 Feb 2019 17:06:37 -0500
+Received: by mail-yw1-f54.google.com with SMTP id k14so9847146ywe.4;
+        Wed, 20 Feb 2019 14:06:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=0qZUSx079tD8Vu6fGKJpHunxf0aj+rh5wYA8jiJD30k=;
-        b=iZcIa2Nt4vlmZsACRdjLZtLIsCfzAvcpAj7x/2lxUiCjkkb3CE/VtQ3pS9ZpAD0C4A
-         BDgGFP9tZSkGFr6R6hNw9YxkTQ3kMfxsYGuqd7tNCJw+UwUjkIKdUp+QgAvr77+xClJd
-         rs+bI2Y9g/DkEMx3usNJzCpa04MzZO9XRJMAWhileBbt2GXDugVbPIea3vssLw6vpWmq
-         TayJOdlxmsLkPrgbmtGi6IeJhAcAxo8D2lRzrtXUgwcpnH0TwY5tQa4vbQVwFaQBWIQ9
-         w1qzyrkK5mcNSdh5Mp/rPFeNvjVKgNohL0aRKxAthG0DIRwo2yErdxVXBuvgOxE9zTfi
-         lYYw==
-X-Gm-Message-State: AHQUAua8YF9XBDOjIwtW75rol+PO5jP3/jsqs7H0aACrAC8NA1StqrU6
-        Ex1Zvok/tXcUElI/BuNiF2qqAA==
-X-Google-Smtp-Source: AHgI3IalhoSDx9p5dWlynqGA0ZeST6acmC5LXjXlMh8bjO2bIUdo58L6XJYrA3q78kI8d2GNFGlizg==
-X-Received: by 2002:a63:e14e:: with SMTP id h14mr20044958pgk.184.1550691414166;
-        Wed, 20 Feb 2019 11:36:54 -0800 (PST)
-Received: from vader ([2601:602:8b00:55d3:e6a7:a0ff:fe0b:c9a8])
-        by smtp.gmail.com with ESMTPSA id 14sm29619934pgq.22.2019.02.20.11.36.53
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 20 Feb 2019 11:36:53 -0800 (PST)
-Date:   Wed, 20 Feb 2019 11:36:52 -0800
-From:   Omar Sandoval <osandov@osandov.com>
-To:     zhengbin <zhengbin13@huawei.com>
-Cc:     linux-block@vger.kernel.org, osandov@fb.com, yangerkun@huawei.com,
-        houtao1@huawei.com, yanaijie@huawei.com
-Subject: Re: [PATCH blktests] loop/004: Need to wait for drop caches if
- block_size is changed
-Message-ID: <20190220193652.GF8325@vader>
-References: <1550655486-132008-1-git-send-email-zhengbin13@huawei.com>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=GajvTTBZrZGrWvvL+tf1V1WMJlBA6HmDvbul/1yeJEc=;
+        b=Z7wWUahDV++wqqCajGMpuqBJSYTouo2uwgl+ohjG3aNudZ2PGzyM4v/DhyrlSbfQnC
+         ZzHN6XsMYipW+vXDmE4b09Gm8om+AgR2oENEBOVSJOT3pK6Y5wMtChGsKsTRcuubbHw9
+         tR6D0LSc9QPFys4pb1c9Fm3remUzMcAAzdwdm9JsEMXhN2tCseYGP1qIw/etUy/frXeN
+         ugXUNkbrGrRgYOaGcy2vOJlIHqaT/zwBsm4c2dBs9a1JbF6gRp1/l4Plfp9aJVJb5Wby
+         QRp/Cb/4LTbuq6Up/IxininjzERl8teussafV764mN35xu03sP65qMZ7sEBq2AZ2b8JB
+         NkVw==
+X-Gm-Message-State: AHQUAuaUPfhrza7ISSYRJzQRdW7pAUYmCCAI2OsG/4+Vvfd5sVyHIVKE
+        zPHjcrStdne+IxkOiX1OB6M=
+X-Google-Smtp-Source: AHgI3IagzPVRIbsGCiEqC/3VeS/FvVqn16mOoVs8Z/3x61ChpRhTO6YwvKHEZaveTaAD2clmBB4h7A==
+X-Received: by 2002:a81:3154:: with SMTP id x81mr28745722ywx.29.1550700396823;
+        Wed, 20 Feb 2019 14:06:36 -0800 (PST)
+Received: from dennisz-mbp.dhcp.thefacebook.com ([2620:10d:c091:200::6:9179])
+        by smtp.gmail.com with ESMTPSA id n67sm14351165ywn.1.2019.02.20.14.06.35
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 20 Feb 2019 14:06:35 -0800 (PST)
+Date:   Wed, 20 Feb 2019 17:06:33 -0500
+From:   Dennis Zhou <dennis@kernel.org>
+To:     lsf-pc@lists.linux-foundation.org
+Cc:     kernel-team@fb.com, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: [LSF/MM TOPIC] A little TLC for Discard
+Message-ID: <20190220220633.GA98019@dennisz-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1550655486-132008-1-git-send-email-zhengbin13@huawei.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 20, 2019 at 05:38:06PM +0800, zhengbin wrote:
-> When i test blktests, loop/004 will be fail. The Key test steps
-> are as follows:
-> 1. losetup -f --show  /dev/sda
-> 2. src/loblksize /dev/loop0 4096
-> 
-> step 1 will create /dev/loop0. after that, daemon systemd-udevd
-> will visit and close /dev/loop0 who will add and delete
-> i_mapping->nrpages.
-> PS: the operation of systemd-udevd is in the background.
-> 
-> step 2 will set /dev/loop0 block size, linux kernel function
-> loop_set_block_size has been changed since commit 5db470e229e2
-> ("loop: drop caches if offset or block_size are changed")
-> + if (lo->lo_queue->limits.logical_block_size != arg &&
-> +     lo->lo_device->bd_inode->i_mapping->nrpages) {
-> +               err = -EAGAIN;
-> +               pr_warn("%s: loop%d (%s) has still dirty pages\n",
-> +                       __func__, lo->lo_number, lo->lo_file_name,
-> +                       lo->lo_device->bd_inode->i_mapping->nrpages);
-> +               goto out_unfreeze;
-> +       }
-> --->maybe systemd-udevd just visited /dev/loop0, this leads to failure
-> 
-> Add a step between 1 and 2.
-> 
-> Signed-off-by: zhengbin <zhengbin13@huawei.com>
-> ---
->  tests/loop/004 | 1 +
->  1 file changed, 1 insertion(+)
+Hi everyone,
 
-Applied, thanks!
+Ric proposed a similar topic already [1], but I'd like to just add a
+little more to that discussion with a broader proposal for discussing
+discard.
+
+Proposal:
+Discard is a topic that seems to need a little bit of TLC from the
+kernel side. The two main approaches with discard are either to enable
+it as a mount option or to periodically run fstrim. At Facebook, we've
+seen performance wins with both enabling discard and disabling discard
+in favor of fstrim. I would like to find a middle ground where we don't
+have to have application developers performance tune for the hardware.
+
+XFS has had async discard support, but it has been problematic for our
+fleet. We were seeing bursts of large discard requests caused by async
+discard in XFS. This resulted in degraded drive performance increasing
+latency for dependent services.
+
+An alternative to discard is a filesystem level choice of reusing
+blocks. Rather than immediately issuing a discard, we can choose to
+reuse a block which will cause the underlying FTL to invalidate a block
+that we would have discarded. This saves the work done by the initial
+discard. There will have to be a balance here though with saving discard
+with hopes of reusing it and eventually issuing the discards.
+
+Another issue is each drive has its own proprietary FTL which introduces
+a wide variability of performance with discard. Some drives don't need
+discard to perform well and others need discard enabled. There is also a
+class of drives where discard is so not performant that it locks up the
+drive. I would like to discuss how we can quantify this and help tune
+discard within the kernel.
+
+In summary, I'd like to explore discard more and understand how we can
+build a more balanced discard experience where end users don't have to
+be super cognizant of the implications on their applications.
+
+[1] https://lore.kernel.org/linux-fsdevel/92ab41f7-35bc-0f56-056f-ed88526b8ea4@gmail.com/
+
+Thanks,
+Dennis
