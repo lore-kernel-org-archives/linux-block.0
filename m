@@ -2,128 +2,130 @@ Return-Path: <SRS0=4lGM=Q3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59A78C43381
-	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 02:06:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E7D4C43381
+	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 02:37:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D46F2146F
-	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 02:06:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3034921773
+	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 02:37:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726335AbfBTCG1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Feb 2019 21:06:27 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4227 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726235AbfBTCG1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Feb 2019 21:06:27 -0500
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 8637B811AA6B1CFA90B7;
-        Wed, 20 Feb 2019 10:06:24 +0800 (CST)
-Received: from RH5885H-V3.huawei.com (10.90.53.225) by
- DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.408.0; Wed, 20 Feb 2019 10:05:31 +0800
-From:   ZhangXiaoxu <zhangxiaoxu5@huawei.com>
-To:     <martin.petersen@oracle.com>, <hch@infradead.org>,
-        <heinzm@redhat.com>, <jdorminy@redhat.com>, <axboe@kernel.dk>,
-        <snitzer@redhat.com>, <linux-block@vger.kernel.org>,
-        <dm-devel@redhat.com>, <agk@redhat.com>, <zhangxiaoxu5@huawei.com>
-Subject: [PATCH v3] block: Fix a WRITE SAME BUG_ON
-Date:   Wed, 20 Feb 2019 10:09:43 +0800
-Message-ID: <1550628583-100041-1-git-send-email-zhangxiaoxu5@huawei.com>
-X-Mailer: git-send-email 2.7.4
+        id S1728832AbfBTChP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Feb 2019 21:37:15 -0500
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:33657 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729110AbfBTChO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Feb 2019 21:37:14 -0500
+Received: by mail-pl1-f196.google.com with SMTP id y10so11421095plp.0;
+        Tue, 19 Feb 2019 18:37:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=HP9Cnwm5mA4hdRo3xazu5Jsgd6Igy791Y/HWFPQ6N0k=;
+        b=pYuPKR/850BkZDEz1OKzSIrJ1mxKY0R7JuvXWRY6LOE/bM19IzSC39o2ViKqWz2LNX
+         eZeKASqVvPLZ/cSzU5prG6EKQqsTqquYutF+FxzS5EuZLvYBSqZymJVz/se0RtAbc50T
+         snL+MKx+V+qSgnIJx5Zx9ZnGLaJ2LssV9Yzddwrgjy4KK0vNZTy6Jt8bPIuVGQFiu9Gw
+         kDf8xNDyNX61FqcS5SeVOx3aBGuQSyIRsIggmZzSMndl180aseDGmXzmYTt1XVuDH38w
+         FKf26rNZTkazCUKaQ0Q1CW4nR++QbPpSAqN1TrAOAO2uLGEOm9+qM1owjlDw17hTXo3p
+         w6CA==
+X-Gm-Message-State: AHQUAuZbFhXcspwbCqW6gqlXPqxij8QxBc/sFe99C4+t55G6T54LQg7h
+        aPbumFdyMaukiFpVBSWHeQb1mdJ0NEg=
+X-Google-Smtp-Source: AHgI3IbH0x7YpgetqxgAAYLMYUJvhs0DuV+3/g3W/yGDT9cyuGtlfaHN5X8Oy5l+iGTZS0YQ6AYgzQ==
+X-Received: by 2002:a17:902:788d:: with SMTP id q13mr15744256pll.154.1550630233463;
+        Tue, 19 Feb 2019 18:37:13 -0800 (PST)
+Received: from asus.site ([2601:647:4000:5dd1:a41e:80b4:deb3:fb66])
+        by smtp.gmail.com with ESMTPSA id o5sm16857250pfi.118.2019.02.19.18.37.10
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 19 Feb 2019 18:37:12 -0800 (PST)
+Subject: Re: [dm-devel] [PATCH V15 00/18] block: support multi-page bvec
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
+        linux-mm@kvack.org, dm-devel@redhat.com,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Omar Sandoval <osandov@fb.com>, cluster-devel@redhat.com,
+        linux-ext4@vger.kernel.org,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Boaz Harrosh <ooo@electrozaur.com>,
+        Gao Xiang <gaoxiang25@huawei.com>, Coly Li <colyli@suse.de>,
+        linux-raid@vger.kernel.org, Bob Peterson <rpeterso@redhat.com>,
+        linux-bcache@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Dave Chinner <dchinner@redhat.com>,
+        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
+        Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org
+References: <20190215111324.30129-1-ming.lei@redhat.com>
+ <c52b6a8b-d1d4-67ff-f81c-371d09cc6d5b@kernel.dk>
+ <1550250855.31902.102.camel@acm.org> <20190217131128.GB7296@ming.t460p>
+ <1550593699.31902.115.camel@acm.org> <20190220011719.GA13035@ming.t460p>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <8253d52d-a77a-b008-1fbd-f2f0a794a022@acm.org>
+Date:   Tue, 19 Feb 2019 18:37:09 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.225]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20190220011719.GA13035@ming.t460p>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If the lvm is stacked by different lbs disks, when WRITE SAME on it, will bug_on:
+On 2/19/19 5:17 PM, Ming Lei wrote:
+> On Tue, Feb 19, 2019 at 08:28:19AM -0800, Bart Van Assche wrote:
+>> With this patch applied test nvmeof-mp/002 fails as follows:
+>>
+>> [  694.700400] kernel BUG at lib/sg_pool.c:103!
+>> [  694.705932] invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+>> [  694.708297] CPU: 2 PID: 349 Comm: kworker/2:1H Tainted: G    B             5.0.0-rc6-dbg+ #2
+>> [  694.711730] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+>> [  694.715113] Workqueue: kblockd blk_mq_run_work_fn
+>> [  694.716894] RIP: 0010:sg_alloc_table_chained+0xe5/0xf0
+>> [  694.758222] Call Trace:
+>> [  694.759645]  nvme_rdma_queue_rq+0x2aa/0xcc0 [nvme_rdma]
+>> [  694.764915]  blk_mq_try_issue_directly+0x2a5/0x4b0
+>> [  694.771779]  blk_insert_cloned_request+0x11e/0x1c0
+>> [  694.778417]  dm_mq_queue_rq+0x3d1/0x770
+>> [  694.793400]  blk_mq_dispatch_rq_list+0x5fc/0xb10
+>> [  694.798386]  blk_mq_sched_dispatch_requests+0x2f7/0x300
+>> [  694.803180]  __blk_mq_run_hw_queue+0xd6/0x180
+>> [  694.808933]  blk_mq_run_work_fn+0x27/0x30
+>> [  694.810315]  process_one_work+0x4f1/0xa40
+>> [  694.813178]  worker_thread+0x67/0x5b0
+>> [  694.814487]  kthread+0x1cf/0x1f0
+>> [  694.819134]  ret_from_fork+0x24/0x30
+>>
+>> The code in sg_pool.c that triggers the BUG() statement is as follows:
+>>
+>> int sg_alloc_table_chained(struct sg_table *table, int nents,
+>> 		struct scatterlist *first_chunk)
+>> {
+>> 	int ret;
+>>
+>> 	BUG_ON(!nents);
+>> [ ... ]
+>>
+>> Bart.
+> 
+> I can reproduce this issue("kernel BUG at lib/sg_pool.c:103") without mp-bvec patches,
+> so looks it isn't the fault of this patchset.
 
-kernel BUG at drivers/scsi/sd.c:968!
-invalid opcode: 0000 [#1] SMP PTI
-CPU: 11 PID: 525 Comm: kworker/11:1H Tainted: G           O      5.0.0-rc3+ #2
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-2.fc27 04/01/2014
-Workqueue: kblockd blk_mq_run_work_fn
-RIP: 0010:sd_init_command+0x7aa/0xdb0
-Code: 30 75 00 00 c7 85 44 01 00 00 18 00 00 00 0f 85 fa 04 00 00 48 83 c4 40 48
-      89 df 5b 5d 41 5c 41 5d 41 5e 41 5f e9 b6 ca fe ff <0f> 0b 41 bc 09
-RSP: 0018:ffffb55f80ddbca0 EFLAGS: 00010206
-RAX: 0000000000001000 RBX: ffff9ed23fb927a0 RCX: 000000000000f000
-RDX: ffff9ed23f0a8400 RSI: ffff9ed27bc79800 RDI: 0000000000000000
-RBP: ffff9ed23fb92680 R08: ffff9ed27c8c0000 R09: ffff9ed23fb927d8
-R10: 0000000000000000 R11: fefefefefefefeff R12: ffff9ed27bc79800
-R13: ffff9ed2787a0000 R14: ffff9ed27bdf3400 R15: ffff9ed23fb927a0
-FS:  0000000000000000(0000) GS:ffff9ed27c8c0000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f6b14cf9341 CR3: 0000000069058000 CR4: 00000000000006e0
-Call Trace:
- ? vp_notify+0x12/0x20
- scsi_queue_rq+0x525/0xa30
- blk_mq_dispatch_rq_list+0x8d/0x580
- ? syscall_return_via_sysret+0x10/0x7f
- ? elv_rb_del+0x1f/0x30
- ? deadline_remove_request+0x55/0xc0
- blk_mq_do_dispatch_sched+0x76/0x110
- blk_mq_sched_dispatch_requests+0xf9/0x170
- __blk_mq_run_hw_queue+0x51/0xd0
- process_one_work+0x195/0x380
- worker_thread+0x30/0x390
- ? process_one_work+0x380/0x380
- kthread+0x113/0x130
- ? kthread_park+0x90/0x90
- ret_from_fork+0x35/0x40
-Modules linked in: alloc(O+)
----[ end trace dc92ddeb2e6d1fe5 ]---
+Thanks Ming for your feedback.
 
-The logical_block_size of the LVM is the max value of the sub disks,
-it maybe different with one of the sub disk. when WRITE SAME on the
-disk, it will BUG_ON when setup WRITE SAME cmd.
+Jens, I don't see that issue with kernel v5.0-rc6. Does that mean that 
+the sg_pool BUG() is a regression in your for-next branch that predates 
+Ming's multi-page bvec patch series?
 
-Close WRITE_SAME feature on the LVM if it was stacked by different
-logical_block_size disk.
+Thanks,
 
-Signed-off-by: ZhangXiaoxu <zhangxiaoxu5@huawei.com>
----
- block/blk-settings.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-settings.c b/block/blk-settings.c
-index 3e7038e..672cd27 100644
---- a/block/blk-settings.c
-+++ b/block/blk-settings.c
-@@ -497,8 +497,6 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 	t->max_sectors = min_not_zero(t->max_sectors, b->max_sectors);
- 	t->max_hw_sectors = min_not_zero(t->max_hw_sectors, b->max_hw_sectors);
- 	t->max_dev_sectors = min_not_zero(t->max_dev_sectors, b->max_dev_sectors);
--	t->max_write_same_sectors = min(t->max_write_same_sectors,
--					b->max_write_same_sectors);
- 	t->max_write_zeroes_sectors = min(t->max_write_zeroes_sectors,
- 					b->max_write_zeroes_sectors);
- 	t->bounce_pfn = min_not_zero(t->bounce_pfn, b->bounce_pfn);
-@@ -537,6 +535,18 @@ int blk_stack_limits(struct queue_limits *t, struct queue_limits *b,
- 		}
- 	}
- 
-+	/* If the lbs is different, disable WRITE SAME.
-+	   The default value of max_write_same_sectors is UINT_MAX, and
-+	   default value of logical_block_size is 512, do not apply this
-+	   rule when first iteration.
-+	 */
-+	if (t->logical_block_size != b->logical_block_size &&
-+	    t->max_write_same_sectors != UINT_MAX)
-+		t->max_write_same_sectors = 0;
-+	else
-+		t->max_write_same_sectors = min(t->max_write_same_sectors,
-+						b->max_write_same_sectors);
-+
- 	t->logical_block_size = max(t->logical_block_size,
- 				    b->logical_block_size);
- 
--- 
-2.7.4
-
+Bart.
