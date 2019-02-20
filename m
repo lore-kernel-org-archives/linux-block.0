@@ -2,117 +2,66 @@ Return-Path: <SRS0=4lGM=Q3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC602C43381
-	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 22:59:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E212C43381
+	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 23:23:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A56E020859
-	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 22:59:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 655AD2147A
+	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 23:23:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726323AbfBTW7K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Feb 2019 17:59:10 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:42700 "EHLO mx1.redhat.com"
+        id S1726311AbfBTXXy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Feb 2019 18:23:54 -0500
+Received: from mx2.cyber.ee ([193.40.6.72]:43581 "EHLO mx2.cyber.ee"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726213AbfBTW7J (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Feb 2019 17:59:09 -0500
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 47F7985376;
-        Wed, 20 Feb 2019 22:59:09 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A98C5C277;
-        Wed, 20 Feb 2019 22:59:01 +0000 (UTC)
-Date:   Thu, 21 Feb 2019 06:58:57 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
-        linux-api@vger.kernel.org, hch@lst.de, jmoyer@redhat.com,
-        avi@scylladb.com, jannh@google.com, viro@ZenIV.linux.org.uk
-Subject: Re: [PATCH 11/19] block: implement bio helper to add iter bvec pages
- to bio
-Message-ID: <20190220225856.GB28313@ming.t460p>
-References: <20190211190049.7888-1-axboe@kernel.dk>
- <20190211190049.7888-13-axboe@kernel.dk>
+        id S1725989AbfBTXXy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Feb 2019 18:23:54 -0500
+Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
+To:     Jan Kara <jack@suse.cz>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, linux-alpha@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
+        linux-mm@kvack.org
+References: <fb63a4d0-d124-21c8-7395-90b34b57c85a@linux.ee>
+ <1c26eab4-3277-9066-5dce-6734ca9abb96@linux.ee>
+ <076b8b72-fab0-ea98-f32f-f48949585f9d@linux.ee>
+ <20190216174536.GC23000@mit.edu>
+ <e175b885-082a-97c1-a0be-999040a06443@linux.ee>
+ <20190218120209.GC20919@quack2.suse.cz>
+ <4e015688-8633-d1a0-308b-ba2a78600544@linux.ee>
+ <20190219132026.GA28293@quack2.suse.cz>
+ <20190219144454.GB12668@bombadil.infradead.org>
+ <d444f653-9b99-5e9b-3b47-97f824c29b0e@linux.ee>
+ <20190220094813.GA27474@quack2.suse.cz>
+From:   Meelis Roos <mroos@linux.ee>
+Message-ID: <2381c264-92f5-db43-b6a5-8e00bd881fef@linux.ee>
+Date:   Thu, 21 Feb 2019 01:23:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190211190049.7888-13-axboe@kernel.dk>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Wed, 20 Feb 2019 22:59:09 +0000 (UTC)
+In-Reply-To: <20190220094813.GA27474@quack2.suse.cz>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: et-EE
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 11, 2019 at 12:00:41PM -0700, Jens Axboe wrote:
-> For an ITER_BVEC, we can just iterate the iov and add the pages
-> to the bio directly. This requires that the caller doesn't releases
-> the pages on IO completion, we add a BIO_NO_PAGE_REF flag for that.
+>> First, I found out that both the problematic alphas had memory compaction and
+>> page migration and bounce buffers turned on, and working alphas had them off.
+>>
+>> Next, turing off these options makes the problematic alphas work.
 > 
-> The current two callers of bio_iov_iter_get_pages() are updated to
-> check if they need to release pages on completion. This makes them
-> work with bvecs that contain kernel mapped pages already.
-> 
-> Reviewed-by: Hannes Reinecke <hare@suse.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> ---
->  block/bio.c               | 59 ++++++++++++++++++++++++++++++++-------
->  fs/block_dev.c            |  5 ++--
->  fs/iomap.c                |  5 ++--
->  include/linux/blk_types.h |  1 +
->  4 files changed, 56 insertions(+), 14 deletions(-)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index 4db1008309ed..330df572cfb8 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -828,6 +828,23 @@ int bio_add_page(struct bio *bio, struct page *page,
->  }
->  EXPORT_SYMBOL(bio_add_page);
->  
-> +static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
-> +{
-> +	const struct bio_vec *bv = iter->bvec;
-> +	unsigned int len;
-> +	size_t size;
-> +
-> +	len = min_t(size_t, bv->bv_len, iter->count);
-> +	size = bio_add_page(bio, bv->bv_page, len,
-> +				bv->bv_offset + iter->iov_offset);
+> OK, thanks for testing! Can you narrow down whether the problem is due to
+> CONFIG_BOUNCE or CONFIG_MIGRATION + CONFIG_COMPACTION? These are two
+> completely different things so knowing where to look will help. Thanks!
 
-iter->iov_offset needs to be subtracted from 'len', looks
-the following delta change[1] is required, otherwise memory corruption
-can be observed when running xfstests over loop/dio.
+Tested both.
 
-Another interesting thing is that bio_add_page() is capable of
-adding multi contiguous pages actually, especially loop uses
-ITER_BVEC to pass multi-page bvecs. Even though pages in loop's
-ITER_BVEC may belong to user-space, looks it is still safe to not
-grab the page ref given it has been done by fs. 
+Just CONFIG_MIGRATION + CONFIG_COMPACTION breaks the alpha.
+Just CONFIG_BOUNCE has no effect in 5 tries.
 
-[1]
-diff --git a/block/bio.c b/block/bio.c
-index 3b49963676fc..df99bb3816a1 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -842,7 +842,10 @@ static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
- 	unsigned int len;
- 	size_t size;
- 
--	len = min_t(size_t, bv->bv_len, iter->count);
-+	if (WARN_ON_ONCE(iter->iov_offset > bv->bv_len))
-+		return -EINVAL;
-+
-+	len = min_t(size_t, bv->bv_len - iter->iov_offset, iter->count);
- 	size = bio_add_page(bio, bv->bv_page, len,
- 				bv->bv_offset + iter->iov_offset);
- 	if (size == len) {
-
-Thanks,
-Ming
+-- 
+Meelis Roos
