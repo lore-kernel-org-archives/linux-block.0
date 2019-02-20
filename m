@@ -2,66 +2,70 @@ Return-Path: <SRS0=4lGM=Q3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E212C43381
-	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 23:23:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1927C43381
+	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 23:47:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 655AD2147A
-	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 23:23:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A02720859
+	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 23:47:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726311AbfBTXXy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Feb 2019 18:23:54 -0500
-Received: from mx2.cyber.ee ([193.40.6.72]:43581 "EHLO mx2.cyber.ee"
+        id S1726317AbfBTXr0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Feb 2019 18:47:26 -0500
+Received: from mga07.intel.com ([134.134.136.100]:23252 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725989AbfBTXXy (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Feb 2019 18:23:54 -0500
-Subject: Re: ext4 corruption on alpha with 4.20.0-09062-gd8372ba8ce28
-To:     Jan Kara <jack@suse.cz>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, linux-alpha@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
-        linux-mm@kvack.org
-References: <fb63a4d0-d124-21c8-7395-90b34b57c85a@linux.ee>
- <1c26eab4-3277-9066-5dce-6734ca9abb96@linux.ee>
- <076b8b72-fab0-ea98-f32f-f48949585f9d@linux.ee>
- <20190216174536.GC23000@mit.edu>
- <e175b885-082a-97c1-a0be-999040a06443@linux.ee>
- <20190218120209.GC20919@quack2.suse.cz>
- <4e015688-8633-d1a0-308b-ba2a78600544@linux.ee>
- <20190219132026.GA28293@quack2.suse.cz>
- <20190219144454.GB12668@bombadil.infradead.org>
- <d444f653-9b99-5e9b-3b47-97f824c29b0e@linux.ee>
- <20190220094813.GA27474@quack2.suse.cz>
-From:   Meelis Roos <mroos@linux.ee>
-Message-ID: <2381c264-92f5-db43-b6a5-8e00bd881fef@linux.ee>
-Date:   Thu, 21 Feb 2019 01:23:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        id S1725989AbfBTXr0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Feb 2019 18:47:26 -0500
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 20 Feb 2019 15:47:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,392,1544515200"; 
+   d="scan'208";a="135900891"
+Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
+  by orsmga002.jf.intel.com with ESMTP; 20 Feb 2019 15:47:22 -0800
+Date:   Wed, 20 Feb 2019 16:47:24 -0700
+From:   Keith Busch <keith.busch@intel.com>
+To:     Ric Wheeler <ricwheeler@gmail.com>
+Cc:     Dave Chinner <david@fromorbit.com>,
+        lsf-pc@lists.linux-foundation.org,
+        linux-xfs <linux-xfs@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-ext4 <linux-ext4@vger.kernel.org>,
+        linux-btrfs <linux-btrfs@vger.kernel.org>,
+        linux-block@vger.kernel.org
+Subject: Re: [LSF/MM TOPIC] More async operations for file systems - async
+ discard?
+Message-ID: <20190220234723.GA5999@localhost.localdomain>
+References: <92ab41f7-35bc-0f56-056f-ed88526b8ea4@gmail.com>
+ <20190217210948.GB14116@dastard>
+ <46540876-c222-0889-ddce-44815dcaad04@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190220094813.GA27474@quack2.suse.cz>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: et-EE
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <46540876-c222-0889-ddce-44815dcaad04@gmail.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->> First, I found out that both the problematic alphas had memory compaction and
->> page migration and bounce buffers turned on, and working alphas had them off.
->>
->> Next, turing off these options makes the problematic alphas work.
+On Sun, Feb 17, 2019 at 06:42:59PM -0500, Ric Wheeler wrote:
+> I think the variability makes life really miserable for layers above it.
 > 
-> OK, thanks for testing! Can you narrow down whether the problem is due to
-> CONFIG_BOUNCE or CONFIG_MIGRATION + CONFIG_COMPACTION? These are two
-> completely different things so knowing where to look will help. Thanks!
+> Might be worth constructing some tooling that we can use to validate or
+> shame vendors over - testing things like a full device discard, discard of
+> fs block size and big chunks, discard against already discarded, etc.
 
-Tested both.
+With respect to fs block sizes, one thing making discards suck is that
+many high capacity SSDs' physical page sizes are larger than the fs block
+size, and a sub-page discard is worse than doing nothing.
 
-Just CONFIG_MIGRATION + CONFIG_COMPACTION breaks the alpha.
-Just CONFIG_BOUNCE has no effect in 5 tries.
+We've discussed previously about supporting block size larger than
+the system's page size, but it doesn't look like that's gone anywhere.
+Maybe it's worth revisiting since it's really inefficient if you write
+or discard at the smaller granularity.
 
--- 
-Meelis Roos
