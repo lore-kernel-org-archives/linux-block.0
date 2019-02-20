@@ -1,110 +1,136 @@
-Return-Path: <SRS0=aQmj=Q2=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=4lGM=Q3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA9CC10F00
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 23:50:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 086F6C43381
+	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 01:17:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 64C4D21773
-	for <linux-block@archiver.kernel.org>; Tue, 19 Feb 2019 23:50:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="WIo/STNA"
+	by mail.kernel.org (Postfix) with ESMTP id D5EFD21738
+	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 01:17:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728820AbfBSXun (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Feb 2019 18:50:43 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:8491 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726405AbfBSXun (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Feb 2019 18:50:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1550620243; x=1582156243;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=c6usQqzDVM1Wioj2ys5GceWCZ10w3XB69rk7+T5WlVw=;
-  b=WIo/STNA0I+63xe5eNw5uNlXTVYBv12ikRhxUIL1Vv4EmJXjmEXXAk/7
-   5t6x43zXQiw3jcg7RxViqQVGHePTMl42OEvb1gLnhdiWzky9JD3gDxAFm
-   4iwRHjVm78U/XYg+tykLkNjOogGzxmhUHbRL+jUxHgwycbiZZlChmU0En
-   GM/B+esCk8S/AaHHQPlu/8dpQ6HbcLVgtvkCVC79/kMpIXNX8n5q8eEpJ
-   +vQQU2YOz1XehveEKYgPL/l78M14gI/vKzpfsUGYpWKFbL3BcgQIVo0Z0
-   FCky3iNxi6PkzU2XalMKypCAqfuuy+l3BEY8ZjW5YztCScylS6dVUvKVP
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.58,388,1544457600"; 
-   d="scan'208";a="206871433"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 20 Feb 2019 07:28:50 +0800
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP; 19 Feb 2019 15:07:14 -0800
-Received: from cmercuryqemu.hgst.com ([10.202.65.32])
-  by uls-op-cesaip01.wdc.com with ESMTP; 19 Feb 2019 15:28:51 -0800
-From:   Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-To:     linux-block@vger.kernel.org
-Cc:     osandov@osandov.com, bvanassche@acm.org,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 4/8] nvme/024: use consistent coding style
-Date:   Tue, 19 Feb 2019 15:28:21 -0800
-Message-Id: <1550618905-4112-5-git-send-email-chaitanya.kulkarni@wdc.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1550618905-4112-1-git-send-email-chaitanya.kulkarni@wdc.com>
-References: <1550618905-4112-1-git-send-email-chaitanya.kulkarni@wdc.com>
+        id S1726084AbfBTBRu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Feb 2019 20:17:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:36102 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725616AbfBTBRt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Feb 2019 20:17:49 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 14EB83D978;
+        Wed, 20 Feb 2019 01:17:48 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-26.pek2.redhat.com [10.72.8.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 86BC461B93;
+        Wed, 20 Feb 2019 01:17:25 +0000 (UTC)
+Date:   Wed, 20 Feb 2019 09:17:20 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
+        linux-mm@kvack.org, dm-devel@redhat.com,
+        Christoph Hellwig <hch@lst.de>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        Omar Sandoval <osandov@fb.com>, cluster-devel@redhat.com,
+        linux-ext4@vger.kernel.org,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Boaz Harrosh <ooo@electrozaur.com>,
+        Gao Xiang <gaoxiang25@huawei.com>, Coly Li <colyli@suse.de>,
+        linux-raid@vger.kernel.org, Bob Peterson <rpeterso@redhat.com>,
+        linux-bcache@vger.kernel.org,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        Dave Chinner <dchinner@redhat.com>,
+        David Sterba <dsterba@suse.com>, linux-block@vger.kernel.org,
+        Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org
+Subject: Re: [dm-devel] [PATCH V15 00/18] block: support multi-page bvec
+Message-ID: <20190220011719.GA13035@ming.t460p>
+References: <20190215111324.30129-1-ming.lei@redhat.com>
+ <c52b6a8b-d1d4-67ff-f81c-371d09cc6d5b@kernel.dk>
+ <1550250855.31902.102.camel@acm.org>
+ <20190217131128.GB7296@ming.t460p>
+ <1550593699.31902.115.camel@acm.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1550593699.31902.115.camel@acm.org>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Wed, 20 Feb 2019 01:17:49 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
----
- tests/nvme/024     | 16 ++++++----------
- tests/nvme/024.out |  1 -
- 2 files changed, 6 insertions(+), 11 deletions(-)
+On Tue, Feb 19, 2019 at 08:28:19AM -0800, Bart Van Assche wrote:
+> On Sun, 2019-02-17 at 21:11 +0800, Ming Lei wrote:
+> > The following patch should fix this issue:
+> > 
+> > 
+> > diff --git a/block/blk-merge.c b/block/blk-merge.c
+> > index bed065904677..066b66430523 100644
+> > --- a/block/blk-merge.c
+> > +++ b/block/blk-merge.c
+> > @@ -363,13 +363,15 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+> >  	struct bio_vec bv, bvprv = { NULL };
+> >  	int prev = 0;
+> >  	unsigned int seg_size, nr_phys_segs;
+> > -	unsigned front_seg_size = bio->bi_seg_front_size;
+> > +	unsigned front_seg_size;
+> >  	struct bio *fbio, *bbio;
+> >  	struct bvec_iter iter;
+> >  
+> >  	if (!bio)
+> >  		return 0;
+> >  
+> > +	front_seg_size = bio->bi_seg_front_size;
+> > +
+> >  	switch (bio_op(bio)) {
+> >  	case REQ_OP_DISCARD:
+> >  	case REQ_OP_SECURE_ERASE:
+> 
+> Hi Ming,
+> 
+> With this patch applied test nvmeof-mp/002 fails as follows:
+> 
+> [  694.700400] kernel BUG at lib/sg_pool.c:103!
+> [  694.705932] invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+> [  694.708297] CPU: 2 PID: 349 Comm: kworker/2:1H Tainted: G    B             5.0.0-rc6-dbg+ #2
+> [  694.711730] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+> [  694.715113] Workqueue: kblockd blk_mq_run_work_fn
+> [  694.716894] RIP: 0010:sg_alloc_table_chained+0xe5/0xf0
+> [  694.758222] Call Trace:
+> [  694.759645]  nvme_rdma_queue_rq+0x2aa/0xcc0 [nvme_rdma]
+> [  694.764915]  blk_mq_try_issue_directly+0x2a5/0x4b0
+> [  694.771779]  blk_insert_cloned_request+0x11e/0x1c0
+> [  694.778417]  dm_mq_queue_rq+0x3d1/0x770
+> [  694.793400]  blk_mq_dispatch_rq_list+0x5fc/0xb10
+> [  694.798386]  blk_mq_sched_dispatch_requests+0x2f7/0x300
+> [  694.803180]  __blk_mq_run_hw_queue+0xd6/0x180
+> [  694.808933]  blk_mq_run_work_fn+0x27/0x30
+> [  694.810315]  process_one_work+0x4f1/0xa40
+> [  694.813178]  worker_thread+0x67/0x5b0
+> [  694.814487]  kthread+0x1cf/0x1f0
+> [  694.819134]  ret_from_fork+0x24/0x30
+> 
+> The code in sg_pool.c that triggers the BUG() statement is as follows:
+> 
+> int sg_alloc_table_chained(struct sg_table *table, int nents,
+> 		struct scatterlist *first_chunk)
+> {
+> 	int ret;
+> 
+> 	BUG_ON(!nents);
+> [ ... ]
+> 
+> Bart.
 
-diff --git a/tests/nvme/024 b/tests/nvme/024
-index 313f778..4b33717 100755
---- a/tests/nvme/024
-+++ b/tests/nvme/024
-@@ -38,11 +38,13 @@ test() {
- 	cat "/sys/block/${nvmedev}n1/uuid"
- 	cat "/sys/block/${nvmedev}n1/wwid"
- 
--	nvme smart-log "/dev/${nvmedev}" -n 1 > /dev/null 2>&1
--
--	rc=$?
-+	if ! nvme smart-log "/dev/${nvmedev}" -n 1 > /dev/null 2>&1; then
-+		echo "Test Failed"
-+	else
-+		echo "Test complete"
-+	fi
- 
--	nvme disconnect -n "${subsys_name}"
-+	nvme disconnect -n "${subsys_name}" > /dev/null 2>&1
- 
- 	_remove_nvmet_subsystem_from_port "${port}" "${subsys_name}"
- 	_remove_nvmet_subsystem "${subsys_name}"
-@@ -52,10 +54,4 @@ test() {
- 
- 	modprobe -r nvme-loop
- 	modprobe -r nvmet
--
--	if [ $rc -ne 0 ]; then
--		echo "Test Failed"
--	else
--		echo "Test complete"
--	fi
- }
-diff --git a/tests/nvme/024.out b/tests/nvme/024.out
-index 737d22f..0b1a350 100644
---- a/tests/nvme/024.out
-+++ b/tests/nvme/024.out
-@@ -1,5 +1,4 @@
- Running nvme/024
- 91fdba0d-f87b-4c25-b80f-db7be1418b9e
- uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
--NQN:blktests-subsystem-1 disconnected 1 controller(s)
- Test complete
--- 
-1.8.3.1
+I can reproduce this issue("kernel BUG at lib/sg_pool.c:103") without mp-bvec patches,
+so looks it isn't the fault of this patchset.
 
+Thanks,
+Ming
