@@ -2,117 +2,168 @@ Return-Path: <SRS0=4lGM=Q3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB90C43381
-	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 18:22:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F384AC43381
+	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 18:24:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 62FA420838
-	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 18:22:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7F4221841
+	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 18:24:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="WXtLRXVE"
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="Y4fTRZ2j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726377AbfBTSWb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Feb 2019 13:22:31 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:36152 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726089AbfBTSWb (ORCPT
+        id S1726446AbfBTSYC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Feb 2019 13:24:02 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:35086 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726120AbfBTSYC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Feb 2019 13:22:31 -0500
-Received: by mail-pg1-f196.google.com with SMTP id r124so12280084pgr.3
-        for <linux-block@vger.kernel.org>; Wed, 20 Feb 2019 10:22:30 -0800 (PST)
+        Wed, 20 Feb 2019 13:24:02 -0500
+Received: by mail-pg1-f194.google.com with SMTP id s198so12288103pgs.2
+        for <linux-block@vger.kernel.org>; Wed, 20 Feb 2019 10:24:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=osandov-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=oQA8pQFveG9EbQE4VG24sxKhAlZzk3AuMgVQEmloGR8=;
-        b=WXtLRXVE+CHclI+ejnJPx1w94p22hDf+XwSQLbIJmNb1agSXA/xhQA8RLh4LpVoM6T
-         GQzZeq8JWq1MysATHjzTDNf583pWjrsgsktd3zcJa2F3GBGdX3c71YWME22FqynmgJsp
-         M3uKpb+2Hvve50UZ/xqM2ARyz6ahr9QqDYsgAPoL+oVtU2+okqTLVtimgASNaSUVueEd
-         TA3+n/axCHb0UERXIFaklEe6l3a6nt+Mk2VIcYlZUqpFCwGKySsC0Sv2mM2dz3ZbyuR0
-         qe4/6mmuG+qdpGgBEG/rvPwnCJXtyI65kbVJbm+RX8+3+ksN6c8+dm1tqvHpraZ4Ll/N
-         H2Ig==
+        bh=kZ7TkL1FslkE3S0an31JRXMZYOnfRcmJ3Jm6QbARa3Q=;
+        b=Y4fTRZ2jnZiuA1vdNGxEO7lhLqvdl1cAb2Vn9R+mTS84Wk5hlMbfT4qjiev/XEayNl
+         M88dv5ROuLuAQg6Ikr4uLByK7uIRewRH2nFoGHxZwTAbN3DVOlp9AU3DFGj7h+in1rkk
+         LROzcP/pejma/Ny8mS+9aFrRGutvlKcq7WeuIqHOb+pt/asS1ROgFdcVn7JgvzP1Rgwn
+         ruSKF2PeSSZwceCGjGh5CaeefeM1vpYbYvcmttAk7a01/z94tS9hY9AMgF5ZFpxmqLac
+         if+L8/Os5UkGVWsURIqQMaHGmHdIud3mzyuuYnNm2t6xq93KhCCT06kyGpMthpUlR/Fa
+         tCSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=oQA8pQFveG9EbQE4VG24sxKhAlZzk3AuMgVQEmloGR8=;
-        b=D/7urqt6MglKZevNa2VMoMmd4+xIwKCyRC8L1jSzfIzpHCZqveEhYt8Yzt3wM9tllX
-         dM93vvkUhxIsSAjMDFZ5HHcoDD0EBgB5mmstdiCtZEdWd/toBN3Z2NIdTFf9d9bg70tj
-         rwi9r6eB8Ypsv9Wc93obqrZGBJ1/J/YcFnLC3qZ7PhmmfgP6A0udClWZQh7DqIAaGNsr
-         0WYGUGcKe1l+vedGJ1wt7YD4g2Gpx6nvqzKwlM7WSC6c13RIJMiQs/Y35+gYdEzzRTvK
-         t9LhtDlGjl8P6P/ijN4a+4xX9wzeVpf8WfRPl1KBJMmB8GyRO+Gv4ES79IfQG+SmtjKt
-         l28A==
-X-Gm-Message-State: AHQUAua8bVW+z03Ma59dfkOLIAcm7GyaCOmNii72+ff8ra328QQovn7V
-        cLpV5aiPDXsJDu5sGj1BtN+D3g==
-X-Google-Smtp-Source: AHgI3Ia1LwIarZEx6JqEXSGuk1A6io+4MFJ4BNTZAYlVkYu5aiSbTAoFkIBuuwO8MPl2FkLG+Q99fQ==
-X-Received: by 2002:a63:65c7:: with SMTP id z190mr30335362pgb.249.1550686950315;
-        Wed, 20 Feb 2019 10:22:30 -0800 (PST)
+        bh=kZ7TkL1FslkE3S0an31JRXMZYOnfRcmJ3Jm6QbARa3Q=;
+        b=P90vHQdLKXdYOss7KHjTEQorIJ4mbN1JW0fKWZlf7BjrITyuDhKybtXqzoINgbjcot
+         seehdNSSj9uP0QuCljDaXCvtc96gLq/a9ITRJb6nbhlQBtTHTJaYEiG9nFpcbW2AeU+l
+         o8555KHazlRmXzKsHsGirXpAOFYh6fPzOGUXgK7BXNAQoZl96iFwJ/mvKGiG21SwiOJD
+         XLdIYv4H6V9nxRHB0nfdPfbJGPkXh7VxGqSzw2APb7hDhJ94zBerT1nS8dmLQnMvPnwd
+         q/N4kP3YzeqZndiCGHe6Ecd6hUmxqMGsySFFIrpIzWjErpD0xZFsu54LA8ghitp37HiC
+         4GJg==
+X-Gm-Message-State: AHQUAuZ6zKY4I7k2dI3U+FVFuQKjp8/7NF2rf6fDZ/4tAbpJeEFmEE29
+        9x8hyyroEH/j/gKs543n8UkZwA==
+X-Google-Smtp-Source: AHgI3IZu60rTlX62sIVOl7C+LJJtwLN5Wt1WFaJWG8zM7Fmd6B6aCPGkEi5uycdJbiPz4SSH/ih2rg==
+X-Received: by 2002:a63:4f58:: with SMTP id p24mr16271271pgl.283.1550687040841;
+        Wed, 20 Feb 2019 10:24:00 -0800 (PST)
 Received: from vader ([2601:602:8b00:55d3:e6a7:a0ff:fe0b:c9a8])
-        by smtp.gmail.com with ESMTPSA id b7sm9204070pfi.36.2019.02.20.10.22.29
+        by smtp.gmail.com with ESMTPSA id q7sm53652882pfa.119.2019.02.20.10.24.00
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 20 Feb 2019 10:22:29 -0800 (PST)
-Date:   Wed, 20 Feb 2019 10:22:29 -0800
+        Wed, 20 Feb 2019 10:24:00 -0800 (PST)
+Date:   Wed, 20 Feb 2019 10:23:59 -0800
 From:   Omar Sandoval <osandov@osandov.com>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
-        Masato Suzuki <masato.suzuki@wdc.com>,
-        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: Re: [PATCH blktests 0/5] Fix failures found with zoned block devices
-Message-ID: <20190220182229.GC8325@vader>
-References: <20190220081231.15366-1-shinichiro.kawasaki@wdc.com>
+To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "bvanassche@acm.org" <bvanassche@acm.org>
+Subject: Re: [PATCH 1/8] nvme/021: use consistent coding style
+Message-ID: <20190220182359.GD8325@vader>
+References: <1550618905-4112-1-git-send-email-chaitanya.kulkarni@wdc.com>
+ <1550618905-4112-2-git-send-email-chaitanya.kulkarni@wdc.com>
+ <20190220181042.GB8325@vader>
+ <SN6PR04MB4527E6227D11DE9066855F55867D0@SN6PR04MB4527.namprd04.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190220081231.15366-1-shinichiro.kawasaki@wdc.com>
+In-Reply-To: <SN6PR04MB4527E6227D11DE9066855F55867D0@SN6PR04MB4527.namprd04.prod.outlook.com>
 User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 20, 2019 at 05:12:26PM +0900, Shin'ichiro Kawasaki wrote:
-> This patch series addresses two incorrect test failures found in the zbd test
-> group. Two other problems with the check script and the common rc script are
-> also fixed.
+On Wed, Feb 20, 2019 at 06:19:58PM +0000, Chaitanya Kulkarni wrote:
+> On 02/20/2019 10:11 AM, Omar Sandoval wrote:
+> > On Tue, Feb 19, 2019 at 03:28:18PM -0800, Chaitanya Kulkarni wrote:
+> >> ---
+> >>   tests/nvme/021     | 15 ++++++---------
+> >>   tests/nvme/021.out |  1 -
+> >>   2 files changed, 6 insertions(+), 10 deletions(-)
+> >>
+> >> diff --git a/tests/nvme/021 b/tests/nvme/021
+> >> index 8e9512a..f204a2f 100755
+> >> --- a/tests/nvme/021
+> >> +++ b/tests/nvme/021
+> >> @@ -38,11 +38,13 @@ test() {
+> >>   	cat "/sys/block/${nvmedev}n1/uuid"
+> >>   	cat "/sys/block/${nvmedev}n1/wwid"
+> >>
+> >> -	nvme list > /dev/null 2>&1
+> >> -
+> >> -	rc=$?
+> >> +	if ! nvme list | grep -q "${nvmedev}n1" > /dev/null 2>&1; then
+> >> +		echo "Test Failed"
+> >> +	else
+> >> +		echo "Test complete"
+> >> +	fi
+> >>
+> >> -	nvme disconnect -n "${subsys_name}"
+> >> +	nvme disconnect -n "${subsys_name}" > /dev/null 2>&1
+> >>
+> >>   	_remove_nvmet_subsystem_from_port "${port}" "${subsys_name}"
+> >>   	_remove_nvmet_subsystem "${subsys_name}"
+> >> @@ -53,9 +55,4 @@ test() {
+> >>   	modprobe -r nvme-loop
+> >>   	modprobe -r nvmet
+> >>
+> >> -	if [ $rc -ne 0 ]; then
+> >> -		echo "Test Failed"
+> >> -	else
+> >> -		echo "Test complete"
+> >> -	fi
+> >>   }
+> >> diff --git a/tests/nvme/021.out b/tests/nvme/021.out
+> >> index 5fb0601..b6b1a7c 100644
+> >> --- a/tests/nvme/021.out
+> >> +++ b/tests/nvme/021.out
+> >> @@ -1,5 +1,4 @@
+> >>   Running nvme/021
+> >>   91fdba0d-f87b-4c25-b80f-db7be1418b9e
+> >>   uuid.91fdba0d-f87b-4c25-b80f-db7be1418b9e
+> >> -NQN:blktests-subsystem-1 disconnected 1 controller(s)
+> >>   Test complete
+> >> --
+> >> 1.8.3.1
+> >>
+> >
+> > For all of these, I think it'd be useful to have a more descriptive
+> > error, like so:
+> >
+> > diff --git a/tests/nvme/021 b/tests/nvme/021
+> > index 8e9512a..0b215c4 100755
+> > --- a/tests/nvme/021
+> > +++ b/tests/nvme/021
+> > @@ -38,9 +38,9 @@ test() {
+> >   	cat "/sys/block/${nvmedev}n1/uuid"
+> >   	cat "/sys/block/${nvmedev}n1/wwid"
+> >
+> > -	nvme list > /dev/null 2>&1
+> > -
+> > -	rc=$?
+> > +	if ! nvme list | grep -q "${nvmedev}n1"; then
+> > +		echo "NVMeOF device not listed"
+> > +	fi
+> >
+> >   	nvme disconnect -n "${subsys_name}"
+> >
+> > @@ -53,9 +53,5 @@ test() {
+> >   	modprobe -r nvme-loop
+> >   	modprobe -r nvmet
+> >
+> > -	if [ $rc -ne 0 ]; then
+> > -		echo "Test Failed"
+> > -	else
+> > -		echo "Test complete"
+> > -	fi
+> > +	echo "Test complete"
+> >   }
+> >
 > 
-> More specifically,
-> * Patch 1 addresses an incorrect failure of block/024 caused by shorter write
->   I/O time than expected on very fast systems with a low overhead.
-> * Patch 2 fixes test zbd/004 which can fail when a disk closes an implicitly
->   open zone after completion of a write command. To avoid this failure, the
->   closed zone condition is added as an allowed condition.
-> * Patch 3 to 5 fix problems to access a block device sysfs attributes if the
->   target device is a partition.
-> 
-> Of note is that test block/004 still fails with a target device that is a
-> partition of a zoned block device. The failure cause is due to an incorrect
-> access to sysfs disk attributes by fio. A patch to fix this issue was sent to
-> fio mailing list.
+> Okay, will send out a new version along with if any more
+> comments that you have.
 
-Thanks, I merged 1 and 2. I'm not necessarily opposed to the rest, but
-I'm curious what your use case is for testing on partitions?
-
-> Masato Suzuki (1):
->   block/024: Increase I/O time
-> 
-> Shin'ichiro Kawasaki (4):
->   zbd/004: Add zone condition "Closed" for sequential write required
->     zones
->   check: Add TEST_DEV_PART_SYSFS variable
->   common: Add _test_dev_is_partition() helper function
->   zbd: Change sysfs path for partition devices
-> 
->  check           | 51 ++++++++++++++++++++++++++++++++-----------------
->  common/rc       |  8 ++++++++
->  new             | 16 ++++++++++++++--
->  tests/block/024 |  5 +++--
->  tests/zbd/004   |  9 ++++++++-
->  tests/zbd/rc    |  9 +++++++--
->  6 files changed, 74 insertions(+), 24 deletions(-)
-> 
-> -- 
-> 2.20.1
-> 
+The same comment applies for the rest, but I don't have any other
+concerns.
