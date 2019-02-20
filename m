@@ -2,89 +2,117 @@ Return-Path: <SRS0=4lGM=Q3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DAC3C43381
-	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 22:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC602C43381
+	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 22:59:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 01BA22087B
-	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 22:55:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Ft3W0+Nw"
+	by mail.kernel.org (Postfix) with ESMTP id A56E020859
+	for <linux-block@archiver.kernel.org>; Wed, 20 Feb 2019 22:59:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725847AbfBTWzU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Feb 2019 17:55:20 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:42978 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725804AbfBTWzU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Feb 2019 17:55:20 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1KMrZ3u024028;
-        Wed, 20 Feb 2019 22:55:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=XDVOiH/Hes3loBZNIbuudG/oGTZyuT5N8tNWjVjQ/sY=;
- b=Ft3W0+Nw2pbl6telQTtlxY8Xa3acygSbMbHtj75CYq0y9ysbe2+pJRsygz3gYS3q6DDm
- aTOw1Mo/Koah2xjZ3/1CMbqe3GZ0Yj6YzErOUJ6k7/V95C8luNNLnzseuxzOWNvqWFCL
- QSALzxg1vYwLWwlqK6iWwi8jrLHCMG1NUUNmi5CbCvT/Hn7iPVnh3ts96jv0zZNW9til
- sUIOAQ9E4A1IU6qtikfNareDeZFq/fFlBOff5cmDXP/QOwun+utgGxjOXd15oUyElXu3
- 7NRRVEmJyPjMapM3l++V3nNVIB7Xx/mMYBTtiTtwJmR9KcZ22oNwNZ1+g0vErbVK0C14 /A== 
-Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
-        by userp2130.oracle.com with ESMTP id 2qp9xu4p9m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Feb 2019 22:55:08 +0000
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x1KMt7Cb022100
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Feb 2019 22:55:07 GMT
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x1KMt6vo027258;
-        Wed, 20 Feb 2019 22:55:06 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 20 Feb 2019 14:55:06 -0800
-To:     Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        "linux-block\@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme\@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: Re: Regression: NVMe: kernel BUG at lib/sg_pool.c:103!
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <20190220031122.GA17298@ming.t460p>
-        <20190220141701.GA26537@lst.de>
-        <SN6PR04MB45276D80E3181896ABF39D1E867D0@SN6PR04MB4527.namprd04.prod.outlook.com>
-Date:   Wed, 20 Feb 2019 17:55:04 -0500
-In-Reply-To: <SN6PR04MB45276D80E3181896ABF39D1E867D0@SN6PR04MB4527.namprd04.prod.outlook.com>
-        (Chaitanya Kulkarni's message of "Wed, 20 Feb 2019 18:16:27 +0000")
-Message-ID: <yq1tvgyhxyv.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        id S1726323AbfBTW7K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Feb 2019 17:59:10 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:42700 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726213AbfBTW7J (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Feb 2019 17:59:09 -0500
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 47F7985376;
+        Wed, 20 Feb 2019 22:59:09 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A98C5C277;
+        Wed, 20 Feb 2019 22:59:01 +0000 (UTC)
+Date:   Thu, 21 Feb 2019 06:58:57 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
+        linux-api@vger.kernel.org, hch@lst.de, jmoyer@redhat.com,
+        avi@scylladb.com, jannh@google.com, viro@ZenIV.linux.org.uk
+Subject: Re: [PATCH 11/19] block: implement bio helper to add iter bvec pages
+ to bio
+Message-ID: <20190220225856.GB28313@ming.t460p>
+References: <20190211190049.7888-1-axboe@kernel.dk>
+ <20190211190049.7888-13-axboe@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9173 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=656 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1902200154
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190211190049.7888-13-axboe@kernel.dk>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Wed, 20 Feb 2019 22:59:09 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Feb 11, 2019 at 12:00:41PM -0700, Jens Axboe wrote:
+> For an ITER_BVEC, we can just iterate the iov and add the pages
+> to the bio directly. This requires that the caller doesn't releases
+> the pages on IO completion, we add a BIO_NO_PAGE_REF flag for that.
+> 
+> The current two callers of bio_iov_iter_get_pages() are updated to
+> check if they need to release pages on completion. This makes them
+> work with bvecs that contain kernel mapped pages already.
+> 
+> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  block/bio.c               | 59 ++++++++++++++++++++++++++++++++-------
+>  fs/block_dev.c            |  5 ++--
+>  fs/iomap.c                |  5 ++--
+>  include/linux/blk_types.h |  1 +
+>  4 files changed, 56 insertions(+), 14 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index 4db1008309ed..330df572cfb8 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -828,6 +828,23 @@ int bio_add_page(struct bio *bio, struct page *page,
+>  }
+>  EXPORT_SYMBOL(bio_add_page);
+>  
+> +static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
+> +{
+> +	const struct bio_vec *bv = iter->bvec;
+> +	unsigned int len;
+> +	size_t size;
+> +
+> +	len = min_t(size_t, bv->bv_len, iter->count);
+> +	size = bio_add_page(bio, bv->bv_page, len,
+> +				bv->bv_offset + iter->iov_offset);
 
-Chaitanya,
+iter->iov_offset needs to be subtracted from 'len', looks
+the following delta change[1] is required, otherwise memory corruption
+can be observed when running xfstests over loop/dio.
 
-> -	if (!blk_rq_payload_bytes(rq))
-> +	if (!blk_rq_nr_phys_segments(rq))
+Another interesting thing is that bio_add_page() is capable of
+adding multi contiguous pages actually, especially loop uses
+ITER_BVEC to pass multi-page bvecs. Even though pages in loop's
+ITER_BVEC may belong to user-space, looks it is still safe to not
+grab the page ref given it has been done by fs. 
 
-Wouldn't it be better to set RQF_SPECIAL_PAYLOAD and friends in
-nvme_setup_write_zeroes() like it's done for discard?
+[1]
+diff --git a/block/bio.c b/block/bio.c
+index 3b49963676fc..df99bb3816a1 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -842,7 +842,10 @@ static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
+ 	unsigned int len;
+ 	size_t size;
+ 
+-	len = min_t(size_t, bv->bv_len, iter->count);
++	if (WARN_ON_ONCE(iter->iov_offset > bv->bv_len))
++		return -EINVAL;
++
++	len = min_t(size_t, bv->bv_len - iter->iov_offset, iter->count);
+ 	size = bio_add_page(bio, bv->bv_page, len,
+ 				bv->bv_offset + iter->iov_offset);
+ 	if (size == len) {
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Thanks,
+Ming
