@@ -2,84 +2,69 @@ Return-Path: <SRS0=hB6L=Q5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 426B3C43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Feb 2019 16:45:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27764C43381
+	for <linux-block@archiver.kernel.org>; Fri, 22 Feb 2019 19:00:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 133182070D
-	for <linux-block@archiver.kernel.org>; Fri, 22 Feb 2019 16:45:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB158206C0
+	for <linux-block@archiver.kernel.org>; Fri, 22 Feb 2019 19:00:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727157AbfBVQpD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Feb 2019 11:45:03 -0500
-Received: from mga14.intel.com ([192.55.52.115]:61220 "EHLO mga14.intel.com"
+        id S1725821AbfBVTAH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Feb 2019 14:00:07 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:52430 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726485AbfBVQpD (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Feb 2019 11:45:03 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Feb 2019 08:45:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.58,400,1544515200"; 
-   d="scan'208";a="128571244"
-Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
-  by orsmga003.jf.intel.com with ESMTP; 22 Feb 2019 08:45:02 -0800
-Date:   Fri, 22 Feb 2019 09:45:05 -0700
-From:   Keith Busch <keith.busch@intel.com>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Ric Wheeler <ricwheeler@gmail.com>,
-        Dave Chinner <david@fromorbit.com>,
-        lsf-pc@lists.linux-foundation.org,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-btrfs <linux-btrfs@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Subject: Re: [LSF/MM TOPIC] More async operations for file systems - async
- discard?
-Message-ID: <20190222164504.GB10066@localhost.localdomain>
-References: <92ab41f7-35bc-0f56-056f-ed88526b8ea4@gmail.com>
- <20190217210948.GB14116@dastard>
- <46540876-c222-0889-ddce-44815dcaad04@gmail.com>
- <20190220234723.GA5999@localhost.localdomain>
- <yq18sy8ili7.fsf@oracle.com>
+        id S1725767AbfBVTAH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Feb 2019 14:00:07 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id DAFC03007E53;
+        Fri, 22 Feb 2019 19:00:06 +0000 (UTC)
+Received: from o.ww.redhat.com (ovpn-117-19.ams2.redhat.com [10.36.117.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5EEC467676;
+        Fri, 22 Feb 2019 19:00:02 +0000 (UTC)
+From:   Heinz Mauelshagen <heinzm@redhat.com>
+To:     heinzm@redhat.com, axboe@kernel.dk
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH] null_blk: fix checking for REQ_FUA
+Date:   Fri, 22 Feb 2019 20:00:01 +0100
+Message-Id: <154589c8c1b22879dfc03aec4555793329d5ce83.1550861849.git.heinzm@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq18sy8ili7.fsf@oracle.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Fri, 22 Feb 2019 19:00:07 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 21, 2019 at 09:51:12PM -0500, Martin K. Petersen wrote:
-> 
-> Keith,
-> 
-> > With respect to fs block sizes, one thing making discards suck is that
-> > many high capacity SSDs' physical page sizes are larger than the fs
-> > block size, and a sub-page discard is worse than doing nothing.
-> 
-> That ties into the whole zeroing as a side-effect thing.
-> 
-> The devices really need to distinguish between discard-as-a-hint where
-> it is free to ignore anything that's not a whole multiple of whatever
-> the internal granularity is, and the WRITE ZEROES use case where the end
-> result needs to be deterministic.
+null_handle_bio() erroneously uses the bio_op macro
+which masks respective request flag bits including REQ_FUA
+out thus failing the check.
 
-Exactly, yes, considering the deterministic zeroing behavior. For devices
-supporting that, sub-page discards turn into a read-modify-write instead
-of invalidating the page.  That increases WAF instead of improving it
-as intended, and large page SSDs are most likely to have relatively poor
-write endurance in the first place.
+Fix by checking bio->bi_opf directly.
 
-We have NVMe spec changes in the pipeline so devices can report this
-granularity. But my real concern isn't with discard per se, but more
-with the writes since we don't support "sector" sizes greater than the
-system's page size. This is a bit of a different topic from where this
-thread started, though.
+Signed-off-by: Heinz Mauelshagen <heinzm@redhat.com>
+---
+ drivers/block/null_blk_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
+index 62c9654b9ce8..04b9d415511b 100644
+--- a/drivers/block/null_blk_main.c
++++ b/drivers/block/null_blk_main.c
+@@ -1104,7 +1104,7 @@ static int null_handle_bio(struct nullb_cmd *cmd)
+ 		len = bvec.bv_len;
+ 		err = null_transfer(nullb, bvec.bv_page, len, bvec.bv_offset,
+ 				     op_is_write(bio_op(bio)), sector,
+-				     bio_op(bio) & REQ_FUA);
++				     bio->bi_opf & REQ_FUA);
+ 		if (err) {
+ 			spin_unlock_irq(&nullb->lock);
+ 			return err;
+-- 
+2.20.1
+
