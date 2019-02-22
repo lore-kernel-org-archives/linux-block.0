@@ -2,100 +2,370 @@ Return-Path: <SRS0=hB6L=Q5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5095EC43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Feb 2019 21:10:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6AFDC43381
+	for <linux-block@archiver.kernel.org>; Fri, 22 Feb 2019 22:29:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A9E1206BA
-	for <linux-block@archiver.kernel.org>; Fri, 22 Feb 2019 21:10:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 724B62075A
+	for <linux-block@archiver.kernel.org>; Fri, 22 Feb 2019 22:29:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="IUtcozDK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725900AbfBVVKL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Feb 2019 16:10:11 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:37454 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725821AbfBVVKL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Feb 2019 16:10:11 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 10207C01BC86;
-        Fri, 22 Feb 2019 21:10:11 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id BBEF51001E9E;
-        Fri, 22 Feb 2019 21:10:07 +0000 (UTC)
-Date:   Fri, 22 Feb 2019 16:10:06 -0500
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     NeilBrown <neilb@suse.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        device-mapper development <dm-devel@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: block: be more careful about status in __bio_chain_endio
-Message-ID: <20190222211006.GA10987@redhat.com>
-References: <70cda2a3-f246-d45b-f600-1f9d15ba22ff@gmail.com>
- <87eflmpqkb.fsf@notabene.neil.brown.name>
+        id S1726194AbfBVW3c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Feb 2019 17:29:32 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:34238 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725878AbfBVW3c (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Feb 2019 17:29:32 -0500
+Received: by mail-io1-f67.google.com with SMTP id e1so3085301iok.1
+        for <linux-block@vger.kernel.org>; Fri, 22 Feb 2019 14:29:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=paXDTL6ZyGcnFNkKhiGY+LudQWJx5W5Ql9apbn1fnQM=;
+        b=IUtcozDKEJEgIRokKmfqqNwv2nx2n535nF7Hxn5WFwBeoOs7YFi9eUZySVHUOYhY+f
+         ViMcpPrEmczCh5fNRLHFskNFkPWgOKHr39yo2TbcDmxK7yrDq6AEDe3VxL7Rlu/UHU0y
+         OYS3ozau0aTixCbTSSVFMFySvghNo8qaABwRf+3Yuiy6O5IqQ0ffp1MjjTchxrTaCPBY
+         ikiEbaesZjegZCE3pCUe/wPHVl4cBoqnoouBGNymRzKlhyR9sJzjXY6qXpLa2kVDaerC
+         PcU3yuUVyZvRvUSmtXXsX9RH0VPDIM0cKhs5uZcsuvd/CIOFwrudUsdgbU5Eazogvao4
+         Jnbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=paXDTL6ZyGcnFNkKhiGY+LudQWJx5W5Ql9apbn1fnQM=;
+        b=lth82OjCpOuvThmcLGK8m41T5pnnLd+fKNPlyGhVXe7UzKCqerzFMtLJUopDnAIE+j
+         eEtkDSDAqZDjRbBVbnmX1bfL4wndYXQUGkqotkk+e1lfGkLwVJFx5YWuUmKJv6ZcrEgR
+         omtmHj9PVkl77Yz9o8Kccef/Tg9cGPuplFkaoCMs6kf+iNKDp6cSyUM0bndFnJFeg2cS
+         +K3WkhSD/l4+cMV09eYbJRCTd9lucatm4+wFigxTRcSQa+x+BY9KZ+9hmW8x+JaeeHXL
+         P2jqpI/DxQyaTwGWVPR08x4FIQ20DZk9yOcauddLExYLZ1yWTJClBJa9Sg/CzBCPoeK1
+         J65g==
+X-Gm-Message-State: AHQUAuYhd1jlHbypPctIA+R7hEnaFi5vqVSmmljT2GoWn43swOBuR/3H
+        tHAd2yksyJnNiD6ndmquWm5Dmw==
+X-Google-Smtp-Source: AHgI3IbyUCgvGNmStLHvhehl/uj1nHyFDOA8aTiwe2x2WB+b+D3guunNPXD1AX0ULFKS+4KC+3NCkQ==
+X-Received: by 2002:a5e:8c14:: with SMTP id n20mr3504188ioj.200.1550874570573;
+        Fri, 22 Feb 2019 14:29:30 -0800 (PST)
+Received: from [172.19.131.32] ([8.46.76.24])
+        by smtp.gmail.com with ESMTPSA id 136sm1064300itu.35.2019.02.22.14.29.20
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 22 Feb 2019 14:29:29 -0800 (PST)
+Subject: Re: [PATCH 12/19] io_uring: add support for pre-mapped user IO
+ buffers
+To:     Jann Horn <jannh@google.com>
+Cc:     linux-aio@kvack.org, linux-block@vger.kernel.org,
+        Linux API <linux-api@vger.kernel.org>, hch@lst.de,
+        jmoyer@redhat.com, Avi Kivity <avi@scylladb.com>,
+        Al Viro <viro@zeniv.linux.org.uk>
+References: <20190211190049.7888-1-axboe@kernel.dk>
+ <20190211190049.7888-14-axboe@kernel.dk>
+ <CAG48ez2jrdFEATYor3-tRUx=LBpXo9581tPCWUgjWf6atMiGzA@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <ab313a80-deee-d044-9447-72977110cf2d@kernel.dk>
+Date:   Fri, 22 Feb 2019 15:29:15 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87eflmpqkb.fsf@notabene.neil.brown.name>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.31]); Fri, 22 Feb 2019 21:10:11 +0000 (UTC)
+In-Reply-To: <CAG48ez2jrdFEATYor3-tRUx=LBpXo9581tPCWUgjWf6atMiGzA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 15 2018 at  4:09am -0500,
-NeilBrown <neilb@suse.com> wrote:
+On 2/19/19 12:08 PM, Jann Horn wrote:
+> On Mon, Feb 11, 2019 at 8:01 PM Jens Axboe <axboe@kernel.dk> wrote:
+>> If we have fixed user buffers, we can map them into the kernel when we
+>> setup the io_uring. That avoids the need to do get_user_pages() for
+>> each and every IO.
+>>
+>> To utilize this feature, the application must call io_uring_register()
+>> after having setup an io_uring instance, passing in
+>> IORING_REGISTER_BUFFERS as the opcode. The argument must be a pointer to
+>> an iovec array, and the nr_args should contain how many iovecs the
+>> application wishes to map.
+>>
+>> If successful, these buffers are now mapped into the kernel, eligible
+>> for IO. To use these fixed buffers, the application must use the
+>> IORING_OP_READ_FIXED and IORING_OP_WRITE_FIXED opcodes, and then
+>> set sqe->index to the desired buffer index. sqe->addr..sqe->addr+seq->len
+>> must point to somewhere inside the indexed buffer.
+>>
+>> The application may register buffers throughout the lifetime of the
+>> io_uring instance. It can call io_uring_register() with
+>> IORING_UNREGISTER_BUFFERS as the opcode to unregister the current set of
+>> buffers, and then register a new set. The application need not
+>> unregister buffers explicitly before shutting down the io_uring
+>> instance.
+>>
+>> It's perfectly valid to setup a larger buffer, and then sometimes only
+>> use parts of it for an IO. As long as the range is within the originally
+>> mapped region, it will work just fine.
+>>
+>> For now, buffers must not be file backed. If file backed buffers are
+>> passed in, the registration will fail with -1/EOPNOTSUPP. This
+>> restriction may be relaxed in the future.
+>>
+>> RLIMIT_MEMLOCK is used to check how much memory we can pin. A somewhat
+>> arbitrary 1G per buffer size is also imposed.
+>>
+>> Reviewed-by: Hannes Reinecke <hare@suse.com>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> ---
+> [...]
+>>  static void io_sq_wq_submit_work(struct work_struct *work)
+>>  {
+>>         struct io_kiocb *req = container_of(work, struct io_kiocb, work);
+>>         struct sqe_submit *s = &req->submit;
+>>         const struct io_uring_sqe *sqe = s->sqe;
+>>         struct io_ring_ctx *ctx = req->ctx;
+>> -       mm_segment_t old_fs = get_fs();
+>> +       mm_segment_t old_fs;
+>> +       bool needs_user;
+>>         int ret;
+>>
+>>          /* Ensure we clear previously set forced non-block flag */
+>>         req->flags &= ~REQ_F_FORCE_NONBLOCK;
+>>         req->rw.ki_flags &= ~IOCB_NOWAIT;
+>>
+>> -       if (!mmget_not_zero(ctx->sqo_mm)) {
+>> -               ret = -EFAULT;
+>> -               goto err;
+>> -       }
+>> -
+>> -       use_mm(ctx->sqo_mm);
+>> -       set_fs(USER_DS);
+>> -       s->has_user = true;
+>>         s->needs_lock = true;
+>> +       s->has_user = false;
+>> +
+>> +       /*
+>> +        * If we're doing IO to fixed buffers, we don't need to get/set
+>> +        * user context
+>> +        */
+>> +       needs_user = io_sqe_needs_user(s->sqe);
+>> +       if (needs_user) {
+>> +               if (!mmget_not_zero(ctx->sqo_mm)) {
+>> +                       ret = -EFAULT;
+>> +                       goto err;
+>> +               }
+>> +               use_mm(ctx->sqo_mm);
+>> +               old_fs = get_fs();
+>> +               set_fs(USER_DS);
+>> +               s->has_user = true;
+>> +       }
+>>
+>>         do {
+>>                 ret = __io_submit_sqe(ctx, req, s, false, NULL);
+>> @@ -1011,9 +1110,11 @@ static void io_sq_wq_submit_work(struct work_struct *work)
+>>                 cond_resched();
+>>         } while (1);
+>>
+>> -       set_fs(old_fs);
+>> -       unuse_mm(ctx->sqo_mm);
+>> -       mmput(ctx->sqo_mm);
+>> +       if (needs_user) {
+>> +               set_fs(old_fs);
+>> +               unuse_mm(ctx->sqo_mm);
+>> +               mmput(ctx->sqo_mm);
+>> +       }
+>>  err:
+>>         if (ret) {
+>>                 io_cqring_add_event(ctx, sqe->user_data, ret, 0);
+>> @@ -1308,6 +1409,197 @@ static unsigned long ring_pages(unsigned sq_entries, unsigned cq_entries)
+>>         return (bytes + PAGE_SIZE - 1) / PAGE_SIZE;
+>>  }
+>>
+>> +static int io_sqe_buffer_unregister(struct io_ring_ctx *ctx)
+>> +{
+>> +       int i, j;
+>> +
+>> +       if (!ctx->user_bufs)
+>> +               return -ENXIO;
+>> +
+>> +       for (i = 0; i < ctx->nr_user_bufs; i++) {
+>> +               struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
+>> +
+>> +               for (j = 0; j < imu->nr_bvecs; j++)
+>> +                       put_page(imu->bvec[j].bv_page);
+>> +
+>> +               if (ctx->account_mem)
+>> +                       io_unaccount_mem(ctx->user, imu->nr_bvecs);
+>> +               kfree(imu->bvec);
+>> +               imu->nr_bvecs = 0;
+>> +       }
+>> +
+>> +       kfree(ctx->user_bufs);
+>> +       ctx->user_bufs = NULL;
+>> +       ctx->nr_user_bufs = 0;
+>> +       return 0;
+>> +}
+> [...]
+>> +static int io_sqe_buffer_register(struct io_ring_ctx *ctx, void __user *arg,
+>> +                                 unsigned nr_args)
+>> +{
+>> +       struct vm_area_struct **vmas = NULL;
+>> +       struct page **pages = NULL;
+>> +       int i, j, got_pages = 0;
+>> +       int ret = -EINVAL;
+>> +
+>> +       if (ctx->user_bufs)
+>> +               return -EBUSY;
+>> +       if (!nr_args || nr_args > UIO_MAXIOV)
+>> +               return -EINVAL;
+>> +
+>> +       ctx->user_bufs = kcalloc(nr_args, sizeof(struct io_mapped_ubuf),
+>> +                                       GFP_KERNEL);
+>> +       if (!ctx->user_bufs)
+>> +               return -ENOMEM;
+>> +
+>> +       for (i = 0; i < nr_args; i++) {
+>> +               struct io_mapped_ubuf *imu = &ctx->user_bufs[i];
+>> +               unsigned long off, start, end, ubuf;
+>> +               int pret, nr_pages;
+>> +               struct iovec iov;
+>> +               size_t size;
+>> +
+>> +               ret = io_copy_iov(ctx, &iov, arg, i);
+>> +               if (ret)
+>> +                       break;
+>> +
+>> +               /*
+>> +                * Don't impose further limits on the size and buffer
+>> +                * constraints here, we'll -EINVAL later when IO is
+>> +                * submitted if they are wrong.
+>> +                */
+>> +               ret = -EFAULT;
+>> +               if (!iov.iov_base || !iov.iov_len)
+>> +                       goto err;
+>> +
+>> +               /* arbitrary limit, but we need something */
+>> +               if (iov.iov_len > SZ_1G)
+>> +                       goto err;
+>> +
+>> +               ubuf = (unsigned long) iov.iov_base;
+>> +               end = (ubuf + iov.iov_len + PAGE_SIZE - 1) >> PAGE_SHIFT;
+>> +               start = ubuf >> PAGE_SHIFT;
+>> +               nr_pages = end - start;
+>> +
+>> +               if (ctx->account_mem) {
+>> +                       ret = io_account_mem(ctx->user, nr_pages);
+>> +                       if (ret)
+>> +                               goto err;
+>> +               }
+>> +
+>> +               ret = 0;
+>> +               if (!pages || nr_pages > got_pages) {
+> 
+> Nit: No need to check for `!pages` as long as `pages` and `got_pages`
+> are synchronized (which guarantees that `!pages` implies
+> `got_pages==0`).
 
-> 
-> If two bios are chained under the one parent (with bio_chain())
-> it is possible that one will succeed and the other will fail.
-> __bio_chain_endio must ensure that the failure error status
-> is reported for the whole, rather than the success.
-> 
-> It currently tries to be careful, but this test is racy.
-> If both children finish at the same time, they might both see that
-> parent->bi_status as zero, and so will assign their own status.
-> If the assignment to parent->bi_status by the successful bio happens
-> last, the error status will be lost which can lead to silent data
-> corruption.
-> 
-> Instead, __bio_chain_endio should only assign a non-zero status
-> to parent->bi_status.  There is then no need to test the current
-> value of parent->bi_status - a test that would be racy anyway.
-> 
-> Note that this bug hasn't been seen in practice.  It was only discovered
-> by examination after a similar bug was found in dm.c
-> 
-> Signed-off-by: NeilBrown <neilb@suse.com>
-> ---
->  block/bio.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index e1708db48258..ad77140edc6f 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -312,7 +312,7 @@ static struct bio *__bio_chain_endio(struct bio *bio)
->  {
->  	struct bio *parent = bio->bi_private;
->  
-> -	if (!parent->bi_status)
-> +	if (bio->bi_status)
->  		parent->bi_status = bio->bi_status;
->  	bio_put(bio);
->  	return parent;
-> -- 
-> 2.14.0.rc0.dirty
-> 
+I just prefer it that way, less confusion and past history this always
+confuses the compiler and then we have to deal with a bogus warning.
 
-Reviewed-by: Mike Snitzer <snitzer@redhat.com>
+>> +                       kfree(vmas);
+>> +                       kfree(pages);
+>> +                       pages = kmalloc_array(nr_pages, sizeof(struct page *),
+>> +                                               GFP_KERNEL);
+>> +                       vmas = kmalloc_array(nr_pages,
+>> +                                       sizeof(struct vma_area_struct *),
+> 
+> typo: s/vma_area_struct/vm_area_struct/
 
-Jens, this one slipped through the crack just over a year ago.
-It is available in patchwork here:
-https://patchwork.kernel.org/patch/10220727/
+Fixed, thanks.
+
+>> +                                       GFP_KERNEL);
+>> +                       if (!pages || !vmas) {
+>> +                               ret = -ENOMEM;
+>> +                               if (ctx->account_mem)
+>> +                                       io_unaccount_mem(ctx->user, nr_pages);
+>> +                               goto err;
+>> +                       }
+>> +                       got_pages = nr_pages;
+>> +               }
+>> +
+>> +               imu->bvec = kmalloc_array(nr_pages, sizeof(struct bio_vec),
+>> +                                               GFP_KERNEL);
+>> +               ret = -ENOMEM;
+>> +               if (!imu->bvec) {
+>> +                       if (ctx->account_mem)
+>> +                               io_unaccount_mem(ctx->user, nr_pages);
+>> +                       goto err;
+>> +               }
+>> +
+>> +               ret = 0;
+>> +               down_read(&current->mm->mmap_sem);
+>> +               pret = get_user_pages_longterm(ubuf, nr_pages, FOLL_WRITE,
+>> +                                               pages, vmas);
+>> +               if (pret == nr_pages) {
+>> +                       /* don't support file backed memory */
+>> +                       for (j = 0; j < nr_pages; j++) {
+>> +                               struct vm_area_struct *vma = vmas[j];
+>> +
+>> +                               if (vma->vm_file &&
+>> +                                   !is_file_hugepages(vma->vm_file)) {
+>> +                                       ret = -EOPNOTSUPP;
+>> +                                       break;
+>> +                               }
+>> +                       }
+>> +               } else {
+>> +                       ret = pret < 0 ? pret : -EFAULT;
+>> +               }
+>> +               up_read(&current->mm->mmap_sem);
+>> +               if (ret) {
+>> +                       /*
+>> +                        * if we did partial map, or found file backed vmas,
+>> +                        * release any pages we did get
+>> +                        */
+>> +                       if (pret > 0) {
+>> +                               for (j = 0; j < pret; j++)
+>> +                                       put_page(pages[j]);
+>> +                       }
+>> +                       if (ctx->account_mem)
+>> +                               io_unaccount_mem(ctx->user, nr_pages);
+>> +                       goto err;
+>> +               }
+>> +
+>> +               off = ubuf & ~PAGE_MASK;
+>> +               size = iov.iov_len;
+>> +               for (j = 0; j < nr_pages; j++) {
+>> +                       size_t vec_len;
+>> +
+>> +                       vec_len = min_t(size_t, size, PAGE_SIZE - off);
+>> +                       imu->bvec[j].bv_page = pages[j];
+>> +                       imu->bvec[j].bv_len = vec_len;
+>> +                       imu->bvec[j].bv_offset = off;
+>> +                       off = 0;
+>> +                       size -= vec_len;
+>> +               }
+>> +               /* store original address for later verification */
+>> +               imu->ubuf = ubuf;
+>> +               imu->len = iov.iov_len;
+>> +               imu->nr_bvecs = nr_pages;
+>> +       }
+>> +       kfree(pages);
+>> +       kfree(vmas);
+>> +       ctx->nr_user_bufs = nr_args;
+>> +       return 0;
+>> +err:
+>> +       kfree(pages);
+>> +       kfree(vmas);
+>> +       io_sqe_buffer_unregister(ctx);
+> 
+> io_sqe_buffer_unregister() gets rid of elements up to
+> ctx->nr_user_bufs, but as far as I can tell, ctx->nr_user_bufs is
+> always zero here. I think that's going to cause a reference leak.
+
+Fixed, thanks.
+
+-- 
+Jens Axboe
+
