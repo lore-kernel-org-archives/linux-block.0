@@ -2,157 +2,136 @@ Return-Path: <SRS0=hB6L=Q5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7816BC43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Feb 2019 14:13:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F5CFC10F00
+	for <linux-block@archiver.kernel.org>; Fri, 22 Feb 2019 14:30:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 424CE206B7
-	for <linux-block@archiver.kernel.org>; Fri, 22 Feb 2019 14:13:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D01F2075A
+	for <linux-block@archiver.kernel.org>; Fri, 22 Feb 2019 14:30:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="PIx1tUCw"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="R44PwDnD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726664AbfBVON2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Feb 2019 09:13:28 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:49446 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726362AbfBVON2 (ORCPT
+        id S1726761AbfBVO36 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Feb 2019 09:29:58 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:43912 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726663AbfBVO36 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Feb 2019 09:13:28 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1ME3oZL017205;
-        Fri, 22 Feb 2019 14:12:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=eSEnlAD8Ses7wRSS+VgOS5zr89VkEj4Sm8noepqIjNM=;
- b=PIx1tUCwgb5/do+XIYK2Fk+kt9eLNPF+MPQYyyHQTYg+b0f6l48/9VxkoyBCY5dWhFFE
- Iqt+oLAYmLVg41O49I+Q+3H9mMeNQGhmWLR5nVRUEsCOPXfLwPRriPSPsowFaGNszipq
- lfu39Rmfg8/IkY65DHye+lYmGK0hvHO2NB/SlgwBMnUA3cObmiSZeOoDGiUCZgEIAzaK
- cjmidY8y7fOHQQIO34EmfYcrF1yJ13WFlcEQcH7pfR0/h7DDbQT6eKmV/s70v6vV5S41
- 9PpoA6HtzidL0jvkZIWdVlTS5Cki39H33m+VsJLurnR4WeksPa+mVtEBc37vi2XqvoIh wQ== 
-Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
-        by userp2120.oracle.com with ESMTP id 2qpb5rybh7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Feb 2019 14:12:54 +0000
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x1MECmNk028826
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Feb 2019 14:12:48 GMT
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x1MEClAR017912;
-        Fri, 22 Feb 2019 14:12:47 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 22 Feb 2019 06:12:47 -0800
-To:     Roman Mamedov <rm@romanrm.net>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jeff Mahoney <jeffm@suse.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Ric Wheeler <ricwheeler@gmail.com>,
-        Dave Chinner <david@fromorbit.com>,
-        lsf-pc@lists.linux-foundation.org,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-btrfs <linux-btrfs@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Subject: Re: [LSF/MM TOPIC] More async operations for file systems - async discard?
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <92ab41f7-35bc-0f56-056f-ed88526b8ea4@gmail.com>
-        <20190217210948.GB14116@dastard>
-        <46540876-c222-0889-ddce-44815dcaad04@gmail.com>
-        <20190220234723.GA5999@localhost.localdomain>
-        <45c27fea-6d74-2adc-fe9d-e314ce4f3672@suse.com>
-        <yq17edsil17.fsf@oracle.com> <20190222111532.4ead81dc@natsu>
-Date:   Fri, 22 Feb 2019 09:12:44 -0500
-In-Reply-To: <20190222111532.4ead81dc@natsu> (Roman Mamedov's message of "Fri,
-        22 Feb 2019 11:15:32 +0500")
-Message-ID: <yq136ofj4ir.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        Fri, 22 Feb 2019 09:29:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=tV7/ZUUnQkgXTN/RgSMQ3P/5vAkm/xeBqs7j5CBlguc=; b=R44PwDnDa5rkopkzyWUS1S5ZA
+        j9UAuW4rPt+teUoRuNSeFjp5zczWkxoZdggftuHJ87jitMB1x3vzfT+fMb5yqNQRtQyKLJuexZPdS
+        3ss2c9wAHOJQBH2EAkuF9IPRrbXfG/jdM1dDjVoK4BztoQg3+WqTkrzQBpik1fk/cEN+AOHNF8AsY
+        SIoHIbw2oraxxnKjZSVVBCFELqUdcqNuxeWT3cU/Jw5UXk6cXNcYEZUoWcOMJxTShpaxJWlU7PM0V
+        I6avqRpsdbPOJx16kuruW61kszAW//FX1UpEzeSk1OHFbzu7Vylf1uy6Y204QMWl61gGRxz+51eqP
+        KbWlcH2VA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gxBpt-0004uB-J6; Fri, 22 Feb 2019 14:29:57 +0000
+Date:   Fri, 22 Feb 2019 06:29:57 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        Jeremy Cline <jeremy@jcline.org>,
+        Oleksii Kurochko <olkuroch@cisco.com>, stable@vger.kernel.org
+Subject: Re: [PATCH v2] scsi: sd: block: Fix regressions in read-only block
+ device handling
+Message-ID: <20190222142957.GA17324@infradead.org>
+References: <yq1d0nxuf73.fsf@oracle.com>
+ <20190213025717.20057-1-martin.petersen@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9174 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1902220100
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190213025717.20057-1-martin.petersen@oracle.com>
+User-Agent: Mutt/1.9.2 (2017-12-15)
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Feb 12, 2019 at 09:57:17PM -0500, Martin K. Petersen wrote:
+> Some devices come online in write protected state and switch to
+> read-write once they are ready to process I/O requests. These devices
+> broke with commit 20bd1d026aac ("scsi: sd: Keep disk read-only when
+> re-reading partition") because we had no way to distinguish between a
+> user decision to set a block_device read-only and the actual hardware
+> device being write-protected.
+> 
+> Because partitions are dropped and recreated on revalidate we are
+> unable to persist any user-provided policy in hd_struct. Introduce a
+> bitmap in struct gendisk to track the user configuration. This bitmap
+> is updated when BLKROSET is called on a given disk or partition.
+> 
+> A helper function, get_user_ro(), is provided to determine whether the
+> ioctl has forced read-only state for a given block device. This helper
+> is used by set_disk_ro() and add_partition() to ensure that both
+> existing and newly created partitions will get the correct state.
+> 
+>  - If BLKROSET sets a whole disk device read-only, all partitions will
+>    now end up in a read-only state.
+> 
+>  - If BLKROSET sets a given partition read-only, that partition will
+>    remain read-only post revalidate.
+> 
+>  - Otherwise both the whole disk device and any partitions will
+>    reflect the write protect state of the underlying device.
+> 
+> Cc: Jeremy Cline <jeremy@jcline.org>
+> Cc: Oleksii Kurochko <olkuroch@cisco.com>
+> Cc: stable@vger.kernel.org # v4.16+
+> Reported-by: Oleksii Kurochko <olkuroch@cisco.com>
+> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=201221
+> Fixes: 20bd1d026aac ("scsi: sd: Keep disk read-only when re-reading partition")
+> Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+> 
+> ---
+> 
+> v2:
+> 	- Track user read-only state in a bitmap
+> 
+> 	- Work around the regression that caused us to drop user
+> 	  preferences on revalidate
+> ---
+>  block/genhd.c             | 22 +++++++++++++++++-----
+>  block/ioctl.c             |  4 ++++
+>  block/partition-generic.c |  2 +-
+>  drivers/scsi/sd.c         |  4 +---
+>  include/linux/genhd.h     |  2 ++
+>  5 files changed, 25 insertions(+), 9 deletions(-)
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 1dd8fd6613b8..34667eb1d3cc 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -1544,19 +1544,31 @@ void set_device_ro(struct block_device *bdev, int flag)
+>  
+>  EXPORT_SYMBOL(set_device_ro);
+>  
+> +bool get_user_ro(struct gendisk *disk, unsigned int partno)
+> +{
+> +	/* Is the user read-only bit set for the whole disk device? */
+> +	if (test_bit(0, disk->user_ro_bitmap))
+> +		return true;
+> +
+> +	/* Is the user read-only bit set for this particular partition? */
+> +	if (test_bit(partno, disk->user_ro_bitmap))
+> +		return true;
+> +
+> +	return false;
+> +}
+> +EXPORT_SYMBOL(get_user_ro);
 
-Roman,
+No need to export this function.
 
->> Consequently, many of the modern devices that claim to support
->> discard to make us software folks happy (or to satisfy a purchase
->> order requirements) complete the commands without doing anything at
->> all.  We're simply wasting queue slots.
->
-> Any example of such devices? Let alone "many"? Where you would issue a
-> full-device blkdiscard, but then just read back old data.
+> +	p->policy = get_user_ro(disk, partno) ?: get_disk_ro(disk);
 
-I obviously can't mention names or go into implementation details. But
-there are many drives out there that return old data. And that's
-perfectly within spec.
-
-At least some of the pain in the industry in this department can be
-attributed to us Linux folks and RAID device vendors. We all wanted
-deterministic zeroes on completion of DSM TRIM, UNMAP, or DEALLOCATE.
-The device vendors weren't happy about that and we ended up with weasel
-language in the specs. This lead to the current libata whitelist mess
-for SATA SSDs and ongoing vendor implementation confusion in SCSI and
-NVMe devices.
-
-On the Linux side the problem was that we originally used discard for
-two distinct purposes: Clearing block ranges and deallocating block
-ranges. We cleaned that up a while back and now have BLKZEROOUT and
-BLKDISCARD. Those operations get translated to different operations
-depending on the device. We also cleaned up several of the
-inconsistencies in the SCSI and NVMe specs to facilitate making this
-distinction possible in the kernel.
-
-In the meantime the SSD vendors made great strides in refining their
-flash management. To the point where pretty much all enterprise device
-vendors will ask you not to issue discards. The benefits simply do not
-outweigh the costs.
-
-If you have special workloads where write amplification is a major
-concern it may still be advantageous to do the discards and reduce WA
-and prolong drive life. However, these workloads are increasingly moving
-away from the classic LBA read/write model. Open Channel originally
-targeted this space. Right now work is underway on Zoned Namespaces and
-Key-Value command sets in NVMe.
-
-These curated application workload protocols are fundamental departures
-from the traditional way of accessing storage. And my postulate is that
-where tail latency and drive lifetime management is important, those new
-command sets offer much better bang for the buck. And they make the
-notion of discard completely moot. That's why I don't think it's going
-to be terribly important in the long term.
-
-This leaves consumer devices and enterprise devices using the
-traditional LBA I/O model.
-
-For consumer devices I still think fstrim is a good compromise. Lack of
-queuing for DSM hurt us for a long time. And when it was finally added
-to the ATA command set, many device vendors got their implementations
-wrong. So it sucked for a lot longer than it should have. And of course
-FTL implementations differ.
-
-For enterprise devices we're still in the situation where vendors
-generally prefer for us not to use discard. I would love for the
-DEALLOCATE/WRITE ZEROES mess to be sorted out in their FTLs, but I have
-fairly low confidence that it's going to happen. Case in point: Despite
-a lot of leverage and purchasing power, the cloud industry has not been
-terribly successful in compelling the drive manufacturers to make
-DEALLOCATE perform well for typical application workloads. So I'm not
-holding my breath...
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Can we avoid the obsfucating non-standard (GNU extension) use of ?: here?
+Just use a local variable and a good old if.
