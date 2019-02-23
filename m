@@ -2,87 +2,114 @@ Return-Path: <SRS0=C1jc=Q6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AED7DC43381
-	for <linux-block@archiver.kernel.org>; Sat, 23 Feb 2019 03:10:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A4FC43381
+	for <linux-block@archiver.kernel.org>; Sat, 23 Feb 2019 21:20:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F26A20675
-	for <linux-block@archiver.kernel.org>; Sat, 23 Feb 2019 03:10:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D957920651
+	for <linux-block@archiver.kernel.org>; Sat, 23 Feb 2019 21:20:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1550956842;
+	bh=87570iAjPMpDHXmR1JWINE0/ACZFwa5nq4Q9bt017jc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=IEb6wAW16zqDx8yDPd6/SKZOLG1V9g2da/atTZNUU9E3jga3W+kQFNQ5F3/jCLRdL
+	 m2ndnVGj9dkmcVrr2iE/nqjHh6a5duIjc7NHLuzcLYd5HSgfj56/PLGPg2qWzqhWWq
+	 MGVZ6mosvQ0IK3N6NH0oD1PFWzY1jSXhSjx9oVB8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726693AbfBWDKw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Feb 2019 22:10:52 -0500
-Received: from mail-qt1-f177.google.com ([209.85.160.177]:33784 "EHLO
-        mail-qt1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725859AbfBWDKw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Feb 2019 22:10:52 -0500
-Received: by mail-qt1-f177.google.com with SMTP id z39so4899241qtz.0
-        for <linux-block@vger.kernel.org>; Fri, 22 Feb 2019 19:10:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FVo2yvPkQcOfnCvpRVWOLfbTevOVnB/+yEXQwluhnxg=;
-        b=fUbUleKapOIR8T3TFdu/bsi1zPRplssimpUwvel3Xi2j/CAp5u9Xt31bUdTFEjq68s
-         lVN96ekZIsaXsuAdV+0kNoxRyQ5OxpxwE3p5BeiqBCjGTAXw+zVrnTB4rxndnKH6KcQr
-         s9fboFH97wTx7PNMLV8bJDOtLWH7vIfOSZxtNgZszgbbhw2+lWDiGUzglVp460PNPvXU
-         iNbo1paEOjIo4tr3Djd9pKcBoWE8vBVTYJuWAUmuZyfsV62btnlOzF0xSvTANmPxN/eo
-         AnzlcO1N/9bx/iIKEil/nH0qElpEUlo6Nt6P/uR+tOdcj/8FMf6wXzHr9ympn0tLq/oy
-         h5Tg==
-X-Gm-Message-State: AHQUAuaaBstWrBBlAsVYaRmDK3LSY7H4ZDNXZvaftLtMwITlI/D24YG8
-        W6ToSHWeumfobGPbrRpQrC/3uuBIXCzGe7m7bmzy4A==
-X-Google-Smtp-Source: AHgI3Ia151HevhdKkieKfFIh0xt3StuTG7l/w5zA9LNpkBZ4YAfvv6MudmiETtuMEoiILVcbUgqQkxYXUtvEB1KfIbI=
-X-Received: by 2002:a0c:93ab:: with SMTP id f40mr5721776qvf.59.1550891451403;
- Fri, 22 Feb 2019 19:10:51 -0800 (PST)
+        id S1728652AbfBWVSz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 Feb 2019 16:18:55 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45102 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729537AbfBWVJ2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 23 Feb 2019 16:09:28 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 478DD20855;
+        Sat, 23 Feb 2019 21:09:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1550956168;
+        bh=87570iAjPMpDHXmR1JWINE0/ACZFwa5nq4Q9bt017jc=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=rWGdcBrzNBlYHdwnjyOTAClSZa7erxoECpSpGUpwZb+Mwjjt9A1duyuzlo1Rfg/ci
+         bXeJ2QcK4Qeb/bAGB9609OXUFe8yQgFZHmpvLIynDc7/5jA2GY/K3Tocq4c7lRrFk/
+         1mpwo79ChTJa7Poa1tokuStl69VMhXyZuBrnP28k=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Jianchao Wang <jianchao.w.wang@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 34/45] blk-mq: fix a hung issue when fsync
+Date:   Sat, 23 Feb 2019 16:08:24 -0500
+Message-Id: <20190223210835.201708-34-sashal@kernel.org>
+X-Mailer: git-send-email 2.19.1
+In-Reply-To: <20190223210835.201708-1-sashal@kernel.org>
+References: <20190223210835.201708-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <70cda2a3-f246-d45b-f600-1f9d15ba22ff@gmail.com>
- <87eflmpqkb.fsf@notabene.neil.brown.name> <20190222211006.GA10987@redhat.com>
- <7f0aeb7b-fdaa-0625-f785-05c342047550@kernel.dk> <20190222235459.GA11726@redhat.com>
- <CAMeeMh-2ANOr_Sb66EyA_HULkVRudD7fyOZsDbpRpDrshwnR2w@mail.gmail.com> <20190223024402.GA12407@redhat.com>
-In-Reply-To: <20190223024402.GA12407@redhat.com>
-From:   John Dorminy <jdorminy@redhat.com>
-Date:   Fri, 22 Feb 2019 22:10:39 -0500
-Message-ID: <CAMeeMh9qLkTByWJewPR4o844wPkA-g5Hnm7aGjszuPopPAe8vA@mail.gmail.com>
-Subject: Re: block: be more careful about status in __bio_chain_endio
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, NeilBrown <neilb@suse.com>,
-        linux-block@vger.kernel.org,
-        device-mapper development <dm-devel@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I'm also worried about the other two versions, though:
+From: Jianchao Wang <jianchao.w.wang@oracle.com>
 
-memory-barriers.txt#1724:
+[ Upstream commit 85bd6e61f34dffa8ec2dc75ff3c02ee7b2f1cbce ]
 
-1724 (*) The compiler is within its rights to invent stores to a variable,
+Florian reported a io hung issue when fsync(). It should be
+triggered by following race condition.
 
-i.e. the compiler is free to decide __bio_chain_endio looks like this:
+data + post flush         a flush
 
-static struct bio *__bio_chain_endio(struct bio *bio)
-{
-  struct bio *parent = bio->bi_private;
-  blk_status_t tmp = parent->bi_status;
-  parent->bi_status = bio->bi_status;
-  if (!bio->bi_status)
-    parent->bi_status = tmp;
-  bio_put(bio);
-  return parent;
-}
+blk_flush_complete_seq
+  case REQ_FSEQ_DATA
+    blk_flush_queue_rq
+    issued to driver      blk_mq_dispatch_rq_list
+                            try to issue a flush req
+                            failed due to NON-NCQ command
+                            .queue_rq return BLK_STS_DEV_RESOURCE
 
-In which case, the read and later store on the two different threads
-may overlap in such a way that bio_endio sometimes sees success, even
-if one child had an error.
+request completion
+  req->end_io // doesn't check RESTART
+  mq_flush_data_end_io
+    case REQ_FSEQ_POSTFLUSH
+      blk_kick_flush
+        do nothing because previous flush
+        has not been completed
+     blk_mq_run_hw_queue
+                              insert rq to hctx->dispatch
+                              due to RESTART is still set, do nothing
 
-As a result, I believe the setting of parent->bi_status needs to be a
-WRITE_ONCE() and the later reading needs to be a READ_ONCE()
-[although, since the later reading happens in many different
-functions, perhaps some other barrier to make sure all readers get the
-correct value is in order.]
+To fix this, replace the blk_mq_run_hw_queue in mq_flush_data_end_io
+with blk_mq_sched_restart to check and clear the RESTART flag.
+
+Fixes: bd166ef1 (blk-mq-sched: add framework for MQ capable IO schedulers)
+Reported-by: Florian Stecker <m19@florianstecker.de>
+Tested-by: Florian Stecker <m19@florianstecker.de>
+Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-flush.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-flush.c b/block/blk-flush.c
+index 4938bec8cfef9..6603352879e73 100644
+--- a/block/blk-flush.c
++++ b/block/blk-flush.c
+@@ -402,7 +402,7 @@ static void mq_flush_data_end_io(struct request *rq, blk_status_t error)
+ 	blk_flush_complete_seq(rq, fq, REQ_FSEQ_DATA, error);
+ 	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
+ 
+-	blk_mq_run_hw_queue(hctx, true);
++	blk_mq_sched_restart(hctx);
+ }
+ 
+ /**
+-- 
+2.19.1
+
