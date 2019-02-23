@@ -6,48 +6,48 @@ X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A4FC43381
-	for <linux-block@archiver.kernel.org>; Sat, 23 Feb 2019 21:20:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2FACC43381
+	for <linux-block@archiver.kernel.org>; Sat, 23 Feb 2019 21:25:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D957920651
-	for <linux-block@archiver.kernel.org>; Sat, 23 Feb 2019 21:20:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6334720661
+	for <linux-block@archiver.kernel.org>; Sat, 23 Feb 2019 21:25:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1550956842;
-	bh=87570iAjPMpDHXmR1JWINE0/ACZFwa5nq4Q9bt017jc=;
+	s=default; t=1550957111;
+	bh=eZ18c7scm23JgyySJPOZq8FH/zZar2O1Y2VUHbVZraQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=IEb6wAW16zqDx8yDPd6/SKZOLG1V9g2da/atTZNUU9E3jga3W+kQFNQ5F3/jCLRdL
-	 m2ndnVGj9dkmcVrr2iE/nqjHh6a5duIjc7NHLuzcLYd5HSgfj56/PLGPg2qWzqhWWq
-	 MGVZ6mosvQ0IK3N6NH0oD1PFWzY1jSXhSjx9oVB8=
+	b=1v3HSq/fGtMLynHlZEpb6N2ZYM0F/GHcmOjZ3LG0ug4KMo1MQuvBOWbH9wqcrK1cz
+	 mzCl9IGR9iYsUwAx35TUCJDFadkVvoL84R5b6XkSpCX01vyUUYPC7RgnNYJ1Z6KeuE
+	 I1LjWw0VxWu27te5wCeWSbG1tZ/Dhvm4GFqiMK8Q=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728652AbfBWVSz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 23 Feb 2019 16:18:55 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45102 "EHLO mail.kernel.org"
+        id S1729205AbfBWVIG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 Feb 2019 16:08:06 -0500
+Received: from mail.kernel.org ([198.145.29.99]:43390 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729537AbfBWVJ2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 23 Feb 2019 16:09:28 -0500
+        id S1729198AbfBWVIF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sat, 23 Feb 2019 16:08:05 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 478DD20855;
-        Sat, 23 Feb 2019 21:09:27 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E95EA2086A;
+        Sat, 23 Feb 2019 21:08:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1550956168;
-        bh=87570iAjPMpDHXmR1JWINE0/ACZFwa5nq4Q9bt017jc=;
+        s=default; t=1550956084;
+        bh=eZ18c7scm23JgyySJPOZq8FH/zZar2O1Y2VUHbVZraQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rWGdcBrzNBlYHdwnjyOTAClSZa7erxoECpSpGUpwZb+Mwjjt9A1duyuzlo1Rfg/ci
-         bXeJ2QcK4Qeb/bAGB9609OXUFe8yQgFZHmpvLIynDc7/5jA2GY/K3Tocq4c7lRrFk/
-         1mpwo79ChTJa7Poa1tokuStl69VMhXyZuBrnP28k=
+        b=LrT+8PU7Iy3NNW/1o96U4tL0hNOoX+sYW7X5tQF13c7CBbdNIDZX4cF3YfKeAfJsj
+         5rxBks0RhiawWwCOc3ROCRfu+3OZSYxOuECP4tcbmCDak+N3Er3uXVTa412GbjRLRx
+         ivcAnSLk0zuCPfecTZHuqiC++6SgZZ0JfmcjaU2I=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Jianchao Wang <jianchao.w.wang@oracle.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 34/45] blk-mq: fix a hung issue when fsync
-Date:   Sat, 23 Feb 2019 16:08:24 -0500
-Message-Id: <20190223210835.201708-34-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 53/65] blk-mq: fix a hung issue when fsync
+Date:   Sat, 23 Feb 2019 16:06:28 -0500
+Message-Id: <20190223210640.200911-53-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190223210835.201708-1-sashal@kernel.org>
-References: <20190223210835.201708-1-sashal@kernel.org>
+In-Reply-To: <20190223210640.200911-1-sashal@kernel.org>
+References: <20190223210640.200911-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -98,10 +98,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/block/blk-flush.c b/block/blk-flush.c
-index 4938bec8cfef9..6603352879e73 100644
+index ce41f666de3e1..76487948a27fa 100644
 --- a/block/blk-flush.c
 +++ b/block/blk-flush.c
-@@ -402,7 +402,7 @@ static void mq_flush_data_end_io(struct request *rq, blk_status_t error)
+@@ -424,7 +424,7 @@ static void mq_flush_data_end_io(struct request *rq, blk_status_t error)
  	blk_flush_complete_seq(rq, fq, REQ_FSEQ_DATA, error);
  	spin_unlock_irqrestore(&fq->mq_flush_lock, flags);
  
