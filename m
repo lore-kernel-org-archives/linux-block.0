@@ -2,92 +2,85 @@ Return-Path: <SRS0=0UXK=Q7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9430CC43381
-	for <linux-block@archiver.kernel.org>; Sun, 24 Feb 2019 15:39:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57184C43381
+	for <linux-block@archiver.kernel.org>; Sun, 24 Feb 2019 15:52:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 62BF7206B6
-	for <linux-block@archiver.kernel.org>; Sun, 24 Feb 2019 15:39:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 208E420652
+	for <linux-block@archiver.kernel.org>; Sun, 24 Feb 2019 15:52:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mP/lgAIP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D/Ppn11A"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728397AbfBXPhT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 24 Feb 2019 10:37:19 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:42063 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726458AbfBXPhS (ORCPT
+        id S1725927AbfBXPvF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 24 Feb 2019 10:51:05 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:35818 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725860AbfBXPvF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 24 Feb 2019 10:37:18 -0500
-Received: by mail-pl1-f194.google.com with SMTP id s1so3284323plp.9;
-        Sun, 24 Feb 2019 07:37:18 -0800 (PST)
+        Sun, 24 Feb 2019 10:51:05 -0500
+Received: by mail-wr1-f66.google.com with SMTP id t18so7265500wrx.2;
+        Sun, 24 Feb 2019 07:51:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=OC7kn1GcMpo3s3dcHCTtzeyKC4a2ZnIHHhN4xw+WDZc=;
-        b=mP/lgAIPrpq+WUjaR+QfNzLzKVcrCKEd4VYrOFsSH01scsp/yFv3VuKqx+QHrL5QCc
-         E+MmQOFrH/mJeDQlJ7slQBiXZZ5zQ7UbwPuL7KKOdxHZH4/tyFe5RPcTVJedXLCwrLQx
-         AA+AqnLyyVEuir8fJC6rcy1p/kI7u8DzN6p9dDDxJ3HMLjfbZsmHoMYz7/yIZhmCaYCO
-         2kyuTCocGn+CCtmrXBP+dyDlLuuQ6LbD5zyOLUqskaoPOYO6pA0ushxAe0XmTW8Ps3FL
-         OVIwELCMAgd9XfFMKsPR8ks0enhKyfYZHRJYVXnixCg/THuZ3NBvjWQEATQNqUV2jTsn
-         U4Dg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=C+daz3/t6diyQbRxSaNmxyitK0+xCgefRfieCdYWCQE=;
+        b=D/Ppn11AP1NWq+qmffmSjc3LhPIXemb5keXpmyFVMsu5U9WUOjwwV8GGA/Q3D0Y1Fq
+         mc3gzjfhpKUPdfigZsw4PwMfJ6MwhMcRivqKSP2xS3zxvoEP3RmRtF0xqQ0Js1J31lVK
+         b3JXAoPxGjp3uths/VCR5CiLqLzmeIqgA2ybIE1QouvR6SeMoyNW9x8Q6WWqqIvalNXN
+         U1zjrWWJLtTLmcxdRwiYVhdnS/l1DGuNkMIYQ3kV/MW7tk4iMQndlV8AWnfeLFGFajKd
+         cVrVOMOUxJny6YiMBoPHlHstihnP933kGHmFy/wMfmNLv/vlcCuLvrdJa0yAouKnWqQF
+         Gd0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=OC7kn1GcMpo3s3dcHCTtzeyKC4a2ZnIHHhN4xw+WDZc=;
-        b=XAEus+Nk9juJOLwFa3g7w3TUT8zS5yMvpmV1aqbAar157JFcQf7Ql47L9K+nuaBRbG
-         ib+xVw8P3VV/GA+AbWB0Eh85XZOpqYWIMOO+Cddu0Ej6tGJp6UtlUIsIMNKHDpp4aD5U
-         3OcuBTb7V4KFphvf37LR6IRKaC4udIEhHs9ByjYa5NUKv6Pk0n7qR4GASBV2x9XaA9Ai
-         olEz8tvevP3XWJwDmWg8vyXlViC1woGb8xfzed+jULpSNmZJKwtfd+iWURAzYZnRbhKn
-         Ap4Kv6ULis0Gx+zFhIulw/pMVcnxGMBomegFuK/QJszlfZBUHfzh+3R/GAXrIP9LGgPX
-         UlvA==
-X-Gm-Message-State: AHQUAua0iSDikYP7jcnHQAk4tdI0xY27LMtXExvgwllOExSwHHwhs546
-        2YiUPOIrl8AA+urDSveESYA=
-X-Google-Smtp-Source: AHgI3IbKfYGx9V6SKMI5r52yJoURkNInZW7c6ki1Ep8hKcohbvRdQaEK8qxXt9TGvbEdtmFWULIoag==
-X-Received: by 2002:a17:902:a03:: with SMTP id 3mr15009276plo.112.1551022638230;
-        Sun, 24 Feb 2019 07:37:18 -0800 (PST)
-Received: from bharath12345-Inspiron-5559 ([103.110.42.34])
-        by smtp.gmail.com with ESMTPSA id v26sm10588675pfg.62.2019.02.24.07.37.15
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 24 Feb 2019 07:37:17 -0800 (PST)
-Date:   Sun, 24 Feb 2019 21:07:12 +0530
-From:   Bharath Vedartham <linux.bhar@gmail.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] badblocks: Prefer unsigned int over unsigned
-Message-ID: <20190224153712.GA11981@bharath12345-Inspiron-5559>
-References: <20190224141952.GA3653@bharath12345-Inspiron-5559>
- <b96f9ac8-639c-adfa-e0a4-5ff537bc9db4@kernel.dk>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=C+daz3/t6diyQbRxSaNmxyitK0+xCgefRfieCdYWCQE=;
+        b=aTZrLvoT60mLIGFfdUVHVwTpQfBJRh0blTKL/pqFRt2Ev9oaaEzwCIO7Fc9eaSopkQ
+         2nLYhXa6JY8t7oY/f7i1zzj3CrGjGs6Z0MINO0u/BhJhKVdvjoObEgx/1fYxxISLDeuT
+         cbm8ytZXeSL3L4kd45PXa7/ZEQmKPdU2EtMLrH17lW0eJFdIABzrsmO+eB7ZH3az+uFn
+         Q7UGLen/1T+sSY9SK/yvs20ULSHVYCMy+11I+zm2dqD/m1U4gOE5rusZdUgzKfltTrgM
+         Bmq1BMDO7YMhhISE0iRFZgKYCh4WeRdLgQ7tuHB5iU7Ht9g3izdsa0gCWCSwVMWeXWYh
+         NLPg==
+X-Gm-Message-State: AHQUAub0WalF9ExEV2Sb4XfUSVouEWrebEaQOzfPeN/zTZwj8RpgzMHQ
+        117SAqxTV3bVynKOM6jfxZv1XNZKIUTLPnrPFLXEYG2F
+X-Google-Smtp-Source: AHgI3IaMD5TX1E/KOGAnRAV4bqAu3lDDtpClYmREKc3C1yXDaR+KVvw/qHgwVoj2ihsvaQiFjrwBms8nVtaUrqpxQYg=
+X-Received: by 2002:adf:e50e:: with SMTP id j14mr9339916wrm.262.1551023463132;
+ Sun, 24 Feb 2019 07:51:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b96f9ac8-639c-adfa-e0a4-5ff537bc9db4@kernel.dk>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <20190224141952.GA3653@bharath12345-Inspiron-5559>
+ <b96f9ac8-639c-adfa-e0a4-5ff537bc9db4@kernel.dk> <20190224153712.GA11981@bharath12345-Inspiron-5559>
+In-Reply-To: <20190224153712.GA11981@bharath12345-Inspiron-5559>
+From:   Richard Weinberger <richard.weinberger@gmail.com>
+Date:   Sun, 24 Feb 2019 16:50:51 +0100
+Message-ID: <CAFLxGvy1fKXEwZJwhD=aCbQ67HO+eK8T27KEfMrLu13ABvO1Wg@mail.gmail.com>
+Subject: Re: [PATCH] badblocks: Prefer unsigned int over unsigned
+To:     Bharath Vedartham <linux.bhar@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Feb 24, 2019 at 08:15:30AM -0700, Jens Axboe wrote:
-> On 2/24/19 7:19 AM, Bharath Vedartham wrote:
-> > Replace unsigned with unsigned int to improve readability.
-> 
-> Frivolous change, would make a lot more sense to get checkpatch
-> to stop complaining about this.
-> 
-> -- 
-> Jens Axboe
+On Sun, Feb 24, 2019 at 4:38 PM Bharath Vedartham <linux.bhar@gmail.com> wrote:
+> I understand. I am starting out kernel hacking. I have been working on
+> fixing checkpatch.pl warnings. If you have any tasks for me in the
+> kernel, it would be great.
 >
-I understand. I am starting out kernel hacking. I have been working on
-fixing checkpatch.pl warnings. If you have any tasks for me in the
-kernel, it would be great.
+> I have also noticed a lot of warnings to replace printk with subsystem
+> specific warning functions. Is that a valuable change?
 
-I have also noticed a lot of warnings to replace printk with subsystem
-specific warning functions. Is that a valuable change?
+This is a very good start:
+https://lists.kernelnewbies.org/pipermail/kernelnewbies/2017-April/017765.html
 
-Bharath
+Happy hacking and welcome! :-)
+
+-- 
+Thanks,
+//richard
