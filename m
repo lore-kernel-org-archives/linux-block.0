@@ -2,101 +2,105 @@ Return-Path: <SRS0=QdhR=RA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69C8DC43381
-	for <linux-block@archiver.kernel.org>; Mon, 25 Feb 2019 17:05:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97050C43381
+	for <linux-block@archiver.kernel.org>; Mon, 25 Feb 2019 17:24:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 37F3E2087C
-	for <linux-block@archiver.kernel.org>; Mon, 25 Feb 2019 17:05:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M2qt0utX"
+	by mail.kernel.org (Postfix) with ESMTP id 71A7C20684
+	for <linux-block@archiver.kernel.org>; Mon, 25 Feb 2019 17:24:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728076AbfBYRD3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Feb 2019 12:03:29 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:39619 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728028AbfBYRD3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Feb 2019 12:03:29 -0500
-Received: by mail-pf1-f193.google.com with SMTP id i20so4775149pfo.6;
-        Mon, 25 Feb 2019 09:03:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=UR8hfqhE4aa8jApKoRXT6gMsPJFMDg+eI2NHscJ5iVQ=;
-        b=M2qt0utX7Mwshpou2a29cxE1aaGT+Ynknk8VxiA60rMahoVY19SRKzCGtmqNHFqKg9
-         +P0N9EA4HY38uStBFF+NpBjDd+z0VET+f7VaBncmRWakrPTWaImJxlmJvoLiExvML+sH
-         y8dH6Hm/4FoAZHZ2oW817hPibSTfdIoLdcG5Yd5GQ/7iiefCrPIHF9+46o1QsEI0Aadp
-         PRsmAvk8f+x+e3IRXKomlGj/O2nTrTTQFtxgKOaJvJgMLGbv7LmxWbMavIMRKa+3dHg/
-         qiM74p/Gs80GtkAGA6fNn/tWfFLSGi0eCRSKJ0bIMdlZIGfoIfI6WQpkDIIcLffnWbZ7
-         eqFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=UR8hfqhE4aa8jApKoRXT6gMsPJFMDg+eI2NHscJ5iVQ=;
-        b=n0WJxIjKMEz/hrV7cUBuzPacguzq6eK5DbmeemBuYphnc6oNT6kvPBlat2TtdNe+r9
-         PR66cddL7odPAHPMcpkmUWLZI3qD3Hf+c8i3yuEUmTWI/aEoPgdAJMkKExMEefbmjmNM
-         PN2Uz8cZGWnYqEcg1JgHdPr5Q9ar7yzrkNluO4irEKxlJaLT20vnK5BpeeVmVnBJMHca
-         kLn2C9YyoO/nkRHr6XErM8F0x1Uvrj4bCIl3cnq/Xgggsa8aF6aOyKGBbPyxK0YUxcXk
-         BBrkZh7WGUuSyEJy3f+zgBbDlGEIHbDc3F4SxhOn4wlyhUeguNBD+XYamxOKzPQf5Qs1
-         02yQ==
-X-Gm-Message-State: AHQUAubIHVA1Ojacec0dVt2pAhtVUBf96UXW07eW61aBYaHrG+vGom0h
-        +PQODLrH9V+vLCVFe/cRTZM=
-X-Google-Smtp-Source: AHgI3IZckY8GBRC5LL+2y6IOKWFEVMNduE9oZAJetgzjYHpQkcPv5wPEMyVJmyxTcOXo1DtCpKzHBg==
-X-Received: by 2002:a63:c745:: with SMTP id v5mr20182029pgg.261.1551114208326;
-        Mon, 25 Feb 2019 09:03:28 -0800 (PST)
-Received: from bharath12345-Inspiron-5559 ([103.110.42.32])
-        by smtp.gmail.com with ESMTPSA id k17sm32038782pfj.92.2019.02.25.09.03.25
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 25 Feb 2019 09:03:27 -0800 (PST)
-Date:   Mon, 25 Feb 2019 22:33:22 +0530
-From:   Bharath Vedartham <linux.bhar@gmail.com>
-To:     Richard Weinberger <richard.weinberger@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] badblocks: Prefer unsigned int over unsigned
-Message-ID: <20190225170322.GA10453@bharath12345-Inspiron-5559>
-References: <20190224141952.GA3653@bharath12345-Inspiron-5559>
- <b96f9ac8-639c-adfa-e0a4-5ff537bc9db4@kernel.dk>
- <20190224153712.GA11981@bharath12345-Inspiron-5559>
- <CAFLxGvy1fKXEwZJwhD=aCbQ67HO+eK8T27KEfMrLu13ABvO1Wg@mail.gmail.com>
+        id S1728651AbfBYRW1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Feb 2019 12:22:27 -0500
+Received: from mx2.suse.de ([195.135.220.15]:59440 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728368AbfBYRW1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Feb 2019 12:22:27 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 1BED2AC96;
+        Mon, 25 Feb 2019 17:22:26 +0000 (UTC)
+Subject: Re: [LSF/MM TOPIC] Handling of managed IRQs when hotplugging CPUs
+To:     Ming Lei <tom.leiming@gmail.com>
+Cc:     "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        SCSI Mailing List <linux-scsi@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Christoph Hellwig <hch@lst.de>
+References: <99dc311f-16b6-9b0d-e309-198dcc9dcde7@suse.de>
+ <CACVXFVPj+zoT9FkE0UqagJMwTHXv8t6OzXM2KtsqrMp3=WMcEw@mail.gmail.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <7b9adff2-4e57-6441-017b-19d164661cf5@suse.de>
+Date:   Mon, 25 Feb 2019 18:22:23 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFLxGvy1fKXEwZJwhD=aCbQ67HO+eK8T27KEfMrLu13ABvO1Wg@mail.gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <CACVXFVPj+zoT9FkE0UqagJMwTHXv8t6OzXM2KtsqrMp3=WMcEw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Feb 24, 2019 at 04:50:51PM +0100, Richard Weinberger wrote:
-> On Sun, Feb 24, 2019 at 4:38 PM Bharath Vedartham <linux.bhar@gmail.com> wrote:
-> > I understand. I am starting out kernel hacking. I have been working on
-> > fixing checkpatch.pl warnings. If you have any tasks for me in the
-> > kernel, it would be great.
-> >
-> > I have also noticed a lot of warnings to replace printk with subsystem
-> > specific warning functions. Is that a valuable change?
+On 2/19/19 3:19 AM, Ming Lei wrote:
+> On Tue, Feb 5, 2019 at 11:30 PM Hannes Reinecke <hare@suse.de> wrote:
+>>
+>> Hi all,
+>>
+>> this came up during discussion on the mailing list (cf thread "Question
+>> on handling managed IRQs when hotplugging CPUs").
+>> The problem is that with managed IRQs and block-mq I/O will be routed to
+>> individual CPUs, and the response will be send to the IRQ assigned to
+>> that CPU.
+>>
+>> If now a CPU hotplug event occurs when I/O is still in-flight the IRQ
+>> will _still_ be assigned to the CPU, causing any pending interrupt to be
+>> lost.
+>> Hence the driver will never notice that an interrupt has happened, and
+>> an I/O timeout occurs.
 > 
-> This is a very good start:
-> https://lists.kernelnewbies.org/pipermail/kernelnewbies/2017-April/017765.html
+> Lots of driver's timeout handler only returns BLK_EH_RESET_TIMER,
+> and this situation can't be covered by IO timeout for these devices.
 > 
-> Happy hacking and welcome! :-)
+> For example, we have see IO hang issue on HPSA, megaraid_sas
+> before when wrong msi vector is set on IO command. Even one such
+> issue on aacraid isn't fixed yet.
 > 
-> -- 
-> Thanks,
-> //richard
+Precisely.
 
-Hey! Thanks for the link Richard! I have read it and clearly understood
-the message. I will work on understanding the kernel and writing my own
-code for my own personal learning before jumping into tasks! Thanks for
-your time!
+>>
+>> One proposal was to quiesce the device when a CPU hotplug event occurs,
+>> and only allow for CPU hotplugging once it's fully quiesced.
+> 
+> That is the original solution, but big problem is that queue dependency
+> exists, such as loop/DM's queue depends on underlying's queue, NVMe
+> IO queue depends on  its admin queue.
+> 
+Well, obviously we would have to wait for _all_ queues to be quiesced.
+And for stacked devices we will need to take the I/O stack into account, 
+true.
 
-Bharath
+>>
+>> While this would be working, it will be introducing quite some system
+>> stall, and it actually a rather big impact in the system.
+>> Another possiblity would be to have the driver abort the requests
+>> itself, but this requires specific callbacks into the driver, and, of
+>> course, the driver having the ability to actually do so.
+>>
+>> I would like to discuss at LSF/MM how these issues can be addressed best.
+> 
+> One related topic is that the current static queue mapping without CPU hotplug
+> handler involved may waste lots of IRQ vectors[1], and how to deal
+> with this problem?
+> 
+> [1] http://lists.infradead.org/pipermail/linux-nvme/2019-January/021961.html
+> 
+Good point. Let's do it.
+
+Cheers,
+
+Hannes
