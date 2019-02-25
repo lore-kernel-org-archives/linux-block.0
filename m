@@ -3,30 +3,32 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC3DCC43381
-	for <linux-block@archiver.kernel.org>; Mon, 25 Feb 2019 04:38:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D38F0C43381
+	for <linux-block@archiver.kernel.org>; Mon, 25 Feb 2019 08:48:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 82BC820842
-	for <linux-block@archiver.kernel.org>; Mon, 25 Feb 2019 04:38:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA039213F2
+	for <linux-block@archiver.kernel.org>; Mon, 25 Feb 2019 08:48:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726877AbfBYEhA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 24 Feb 2019 23:37:00 -0500
-Received: from ipmail03.adl6.internode.on.net ([150.101.137.143]:48044 "EHLO
-        ipmail03.adl6.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726511AbfBYEhA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 24 Feb 2019 23:37:00 -0500
-Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
-  by ipmail03.adl6.internode.on.net with ESMTP; 25 Feb 2019 15:06:58 +1030
-Received: from dave by dastard with local (Exim 4.80)
-        (envelope-from <david@fromorbit.com>)
-        id 1gy80W-0004WM-Bw; Mon, 25 Feb 2019 15:36:48 +1100
-Date:   Mon, 25 Feb 2019 15:36:48 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Ming Lei <ming.lei@redhat.com>
+        id S1726299AbfBYIqk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Feb 2019 03:46:40 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:51446 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725863AbfBYIqk (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Feb 2019 03:46:40 -0500
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E84A783F3F;
+        Mon, 25 Feb 2019 08:46:39 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-31.pek2.redhat.com [10.72.8.31])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 838E5600C4;
+        Mon, 25 Feb 2019 08:46:30 +0000 (UTC)
+Date:   Mon, 25 Feb 2019 16:46:25 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Dave Chinner <david@fromorbit.com>
 Cc:     "Darrick J . Wong" <darrick.wong@oracle.com>,
         linux-xfs@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -38,39 +40,50 @@ Cc:     "Darrick J . Wong" <darrick.wong@oracle.com>,
         Linux FS Devel <linux-fsdevel@vger.kernel.org>,
         linux-mm@kvack.org, linux-block@vger.kernel.org
 Subject: Re: [PATCH] xfs: allocate sector sized IO buffer via page_frag_alloc
-Message-ID: <20190225043648.GE23020@dastard>
+Message-ID: <20190225084623.GA8397@ming.t460p>
 References: <20190225040904.5557-1-ming.lei@redhat.com>
+ <20190225043648.GE23020@dastard>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190225040904.5557-1-ming.lei@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20190225043648.GE23020@dastard>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Mon, 25 Feb 2019 08:46:40 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 25, 2019 at 12:09:04PM +0800, Ming Lei wrote:
-> XFS uses kmalloc() to allocate sector sized IO buffer.
-....
-> Use page_frag_alloc() to allocate the sector sized buffer, then the
-> above issue can be fixed because offset_in_page of allocated buffer
-> is always sector aligned.
+On Mon, Feb 25, 2019 at 03:36:48PM +1100, Dave Chinner wrote:
+> On Mon, Feb 25, 2019 at 12:09:04PM +0800, Ming Lei wrote:
+> > XFS uses kmalloc() to allocate sector sized IO buffer.
+> ....
+> > Use page_frag_alloc() to allocate the sector sized buffer, then the
+> > above issue can be fixed because offset_in_page of allocated buffer
+> > is always sector aligned.
+> 
+> Didn't we already reject this approach because page frags cannot be
 
-Didn't we already reject this approach because page frags cannot be
-reused and that pages allocated to the frag pool are pinned in
-memory until all fragments allocated on the page have been freed?
+I remembered there is this kind of issue mentioned, but just not found
+the details, so post out the patch for restarting the discussion.
 
-i.e. when we consider 64k page machines and 4k block sizes (i.e.
-default config), every single metadata allocation is a sub-page
-allocation and so will use this new page frag mechanism. IOWs, it
-will result in fragmenting memory severely and typical memory
-reclaim not being able to fix it because the metadata that pins each
-page is largely unreclaimable...
+> reused and that pages allocated to the frag pool are pinned in
+> memory until all fragments allocated on the page have been freed?
 
-Cheers,
+Yes, that is one problem. But if one page is consumed, sooner or later,
+all fragments will be freed, then the page becomes available again.
 
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+> 
+> i.e. when we consider 64k page machines and 4k block sizes (i.e.
+> default config), every single metadata allocation is a sub-page
+> allocation and so will use this new page frag mechanism. IOWs, it
+> will result in fragmenting memory severely and typical memory
+> reclaim not being able to fix it because the metadata that pins each
+> page is largely unreclaimable...
+
+It can be an issue in case of IO timeout & retry.
+
+
+Thanks,
+Ming
