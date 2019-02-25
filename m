@@ -2,105 +2,110 @@ Return-Path: <SRS0=QdhR=RA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97050C43381
-	for <linux-block@archiver.kernel.org>; Mon, 25 Feb 2019 17:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52086C43381
+	for <linux-block@archiver.kernel.org>; Mon, 25 Feb 2019 20:13:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 71A7C20684
-	for <linux-block@archiver.kernel.org>; Mon, 25 Feb 2019 17:24:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A2A320842
+	for <linux-block@archiver.kernel.org>; Mon, 25 Feb 2019 20:13:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728651AbfBYRW1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Feb 2019 12:22:27 -0500
-Received: from mx2.suse.de ([195.135.220.15]:59440 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728368AbfBYRW1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Feb 2019 12:22:27 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 1BED2AC96;
-        Mon, 25 Feb 2019 17:22:26 +0000 (UTC)
-Subject: Re: [LSF/MM TOPIC] Handling of managed IRQs when hotplugging CPUs
-To:     Ming Lei <tom.leiming@gmail.com>
-Cc:     "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        SCSI Mailing List <linux-scsi@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Christoph Hellwig <hch@lst.de>
-References: <99dc311f-16b6-9b0d-e309-198dcc9dcde7@suse.de>
- <CACVXFVPj+zoT9FkE0UqagJMwTHXv8t6OzXM2KtsqrMp3=WMcEw@mail.gmail.com>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <7b9adff2-4e57-6441-017b-19d164661cf5@suse.de>
-Date:   Mon, 25 Feb 2019 18:22:23 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.0
+        id S1727400AbfBYUL2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Feb 2019 15:11:28 -0500
+Received: from ipmail07.adl2.internode.on.net ([150.101.137.131]:23589 "EHLO
+        ipmail07.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726888AbfBYUL2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Feb 2019 15:11:28 -0500
+Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
+  by ipmail07.adl2.internode.on.net with ESMTP; 26 Feb 2019 06:41:23 +1030
+Received: from dave by dastard with local (Exim 4.80)
+        (envelope-from <david@fromorbit.com>)
+        id 1gyMaw-0005N6-L2; Tue, 26 Feb 2019 07:11:22 +1100
+Date:   Tue, 26 Feb 2019 07:11:22 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Aaron Lu <aaron.lu@intel.com>,
+        Christopher Lameter <cl@linux.com>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] xfs: allocate sector sized IO buffer via page_frag_alloc
+Message-ID: <20190225201122.GF23020@dastard>
+References: <20190225040904.5557-1-ming.lei@redhat.com>
+ <20190225043648.GE23020@dastard>
+ <20190225084623.GA8397@ming.t460p>
 MIME-Version: 1.0
-In-Reply-To: <CACVXFVPj+zoT9FkE0UqagJMwTHXv8t6OzXM2KtsqrMp3=WMcEw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190225084623.GA8397@ming.t460p>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/19/19 3:19 AM, Ming Lei wrote:
-> On Tue, Feb 5, 2019 at 11:30 PM Hannes Reinecke <hare@suse.de> wrote:
->>
->> Hi all,
->>
->> this came up during discussion on the mailing list (cf thread "Question
->> on handling managed IRQs when hotplugging CPUs").
->> The problem is that with managed IRQs and block-mq I/O will be routed to
->> individual CPUs, and the response will be send to the IRQ assigned to
->> that CPU.
->>
->> If now a CPU hotplug event occurs when I/O is still in-flight the IRQ
->> will _still_ be assigned to the CPU, causing any pending interrupt to be
->> lost.
->> Hence the driver will never notice that an interrupt has happened, and
->> an I/O timeout occurs.
+On Mon, Feb 25, 2019 at 04:46:25PM +0800, Ming Lei wrote:
+> On Mon, Feb 25, 2019 at 03:36:48PM +1100, Dave Chinner wrote:
+> > On Mon, Feb 25, 2019 at 12:09:04PM +0800, Ming Lei wrote:
+> > > XFS uses kmalloc() to allocate sector sized IO buffer.
+> > ....
+> > > Use page_frag_alloc() to allocate the sector sized buffer, then the
+> > > above issue can be fixed because offset_in_page of allocated buffer
+> > > is always sector aligned.
+> > 
+> > Didn't we already reject this approach because page frags cannot be
 > 
-> Lots of driver's timeout handler only returns BLK_EH_RESET_TIMER,
-> and this situation can't be covered by IO timeout for these devices.
-> 
-> For example, we have see IO hang issue on HPSA, megaraid_sas
-> before when wrong msi vector is set on IO command. Even one such
-> issue on aacraid isn't fixed yet.
-> 
-Precisely.
+> I remembered there is this kind of issue mentioned, but just not found
+> the details, so post out the patch for restarting the discussion.
 
->>
->> One proposal was to quiesce the device when a CPU hotplug event occurs,
->> and only allow for CPU hotplugging once it's fully quiesced.
-> 
-> That is the original solution, but big problem is that queue dependency
-> exists, such as loop/DM's queue depends on underlying's queue, NVMe
-> IO queue depends on  its admin queue.
-> 
-Well, obviously we would have to wait for _all_ queues to be quiesced.
-And for stacked devices we will need to take the I/O stack into account, 
-true.
+As previously discussed, the only solution that fits all use cases
+we have to support are a slab caches that do not break object
+alignment when slab debug options are turned on.
 
->>
->> While this would be working, it will be introducing quite some system
->> stall, and it actually a rather big impact in the system.
->> Another possiblity would be to have the driver abort the requests
->> itself, but this requires specific callbacks into the driver, and, of
->> course, the driver having the ability to actually do so.
->>
->> I would like to discuss at LSF/MM how these issues can be addressed best.
+> > reused and that pages allocated to the frag pool are pinned in
+> > memory until all fragments allocated on the page have been freed?
 > 
-> One related topic is that the current static queue mapping without CPU hotplug
-> handler involved may waste lots of IRQ vectors[1], and how to deal
-> with this problem?
+> Yes, that is one problem. But if one page is consumed, sooner or later,
+> all fragments will be freed, then the page becomes available again.
+
+Ah, no, your assumption about how metadata caching in XFS works is
+flawed. Some metadata ends up being cached for the life of the
+filesystem because it is so frequently referenced it never gets
+reclaimed. AG headers, btree root blocks, etc.  And the XFS metadata
+cache hangs on to such metadata even under extreme memory pressure
+because if we reclaim it then any filesystem operation will need to
+reallocate that memory to clean dirty pages and that is the very
+last thing we want to do under extreme memory pressure conditions.
+
+If allocation cannot reuse holes in pages (i.e. works as a proper
+slab cache) then we are going to blow out the amount of memory that
+the XFS metadata cache uses very badly on filesystems where block
+size != page size. 
+
+> > i.e. when we consider 64k page machines and 4k block sizes (i.e.
+> > default config), every single metadata allocation is a sub-page
+> > allocation and so will use this new page frag mechanism. IOWs, it
+> > will result in fragmenting memory severely and typical memory
+> > reclaim not being able to fix it because the metadata that pins each
+> > page is largely unreclaimable...
 > 
-> [1] http://lists.infradead.org/pipermail/linux-nvme/2019-January/021961.html
-> 
-Good point. Let's do it.
+> It can be an issue in case of IO timeout & retry.
+
+This makes no sense to me. Exactly how does filesystem memory
+allocation affect IO timeouts and any retries the filesystem might
+issue?
 
 Cheers,
 
-Hannes
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
