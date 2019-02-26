@@ -2,42 +2,33 @@ Return-Path: <SRS0=PBJN=RB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7E24C43381
-	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 13:04:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ACEAC43381
+	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 13:45:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B245A20651
-	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 13:04:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Dm/Icpah"
+	by mail.kernel.org (Postfix) with ESMTP id E33B720863
+	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 13:44:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726795AbfBZNCe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Feb 2019 08:02:34 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:49126 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726084AbfBZNCd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Feb 2019 08:02:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=iCmFmWiV3xb5AOVJB0XEU/x7knedJSI2kLqY2YUO43c=; b=Dm/IcpahO0ZOhqdZYsO+RF9de
-        HcWTIk0ykKJwiCQ7ClRXTt33MZpvZJoBiDPktX7H6P3wZ9EX7UPTWEa50nDi8oiuAI/yvXUXWqYBO
-        3fjWdTdySwFhkitqGJ/aJDr2WJQ58BtyHaJqEydY95E1cKqnddoPiM9ZhuzewlzohU1M5pwa9Bt5B
-        G44IAyEGHk28DfhE/IfTiTb/YDRUCfaxPfITn/rb+RVNijE8duubfXeLZNga198lOoywJnnYxLWvK
-        bVa//J7t3actOLmik7JsKmn2/VnIZ6f6eA+X40kB8DVFx+415kByOpzltDAoIp69vbtdt3RGrlTQf
-        0Qlpp3tXA==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gycNS-0005tY-Bt; Tue, 26 Feb 2019 13:02:30 +0000
-Date:   Tue, 26 Feb 2019 05:02:30 -0800
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
+        id S1727177AbfBZNnR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Feb 2019 08:43:17 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:31390 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726478AbfBZNnR (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Feb 2019 08:43:17 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D712F30BC133;
+        Tue, 26 Feb 2019 13:43:15 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 09CFD5D9D2;
+        Tue, 26 Feb 2019 13:42:53 +0000 (UTC)
+Date:   Tue, 26 Feb 2019 21:42:48 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Matthew Wilcox <willy@infradead.org>
 Cc:     Ming Lei <tom.leiming@gmail.com>, Vlastimil Babka <vbabka@suse.cz>,
         Dave Chinner <david@fromorbit.com>,
         "Darrick J . Wong" <darrick.wong@oracle.com>,
@@ -56,9 +47,8 @@ Cc:     Ming Lei <tom.leiming@gmail.com>, Vlastimil Babka <vbabka@suse.cz>,
         David Rientjes <rientjes@google.com>,
         Joonsoo Kim <iamjoonsoo.kim@lge.com>
 Subject: Re: [PATCH] xfs: allocate sector sized IO buffer via page_frag_alloc
-Message-ID: <20190226130230.GD11592@bombadil.infradead.org>
-References: <20190225202630.GG23020@dastard>
- <20190226022249.GA17747@ming.t460p>
+Message-ID: <20190226134247.GA30942@ming.t460p>
+References: <20190226022249.GA17747@ming.t460p>
  <20190226030214.GI23020@dastard>
  <20190226032737.GA11592@bombadil.infradead.org>
  <20190226045826.GJ23020@dastard>
@@ -67,32 +57,127 @@ References: <20190225202630.GG23020@dastard>
  <CACVXFVMX=WpTRBbDTSibfXkTZxckk3ootetbE+rkJtHhsZkRAw@mail.gmail.com>
  <20190226121209.GC11592@bombadil.infradead.org>
  <20190226123545.GA6163@ming.t460p>
+ <20190226130230.GD11592@bombadil.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190226123545.GA6163@ming.t460p>
-User-Agent: Mutt/1.9.2 (2017-12-15)
+In-Reply-To: <20190226130230.GD11592@bombadil.infradead.org>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Tue, 26 Feb 2019 13:43:16 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 26, 2019 at 08:35:46PM +0800, Ming Lei wrote:
-> On Tue, Feb 26, 2019 at 04:12:09AM -0800, Matthew Wilcox wrote:
-> > On Tue, Feb 26, 2019 at 07:12:49PM +0800, Ming Lei wrote:
-> > > The buffer needs to be device block size aligned for dio, and now the block
-> > > size can be 512, 1024, 2048 and 4096.
+On Tue, Feb 26, 2019 at 05:02:30AM -0800, Matthew Wilcox wrote:
+> On Tue, Feb 26, 2019 at 08:35:46PM +0800, Ming Lei wrote:
+> > On Tue, Feb 26, 2019 at 04:12:09AM -0800, Matthew Wilcox wrote:
+> > > On Tue, Feb 26, 2019 at 07:12:49PM +0800, Ming Lei wrote:
+> > > > The buffer needs to be device block size aligned for dio, and now the block
+> > > > size can be 512, 1024, 2048 and 4096.
+> > > 
+> > > Why does the block size make a difference?  This requirement is due to
+> > > some storage devices having shoddy DMA controllers.  Are you saying there
+> > > are devices which can't even do 512-byte aligned I/O?
 > > 
-> > Why does the block size make a difference?  This requirement is due to
-> > some storage devices having shoddy DMA controllers.  Are you saying there
-> > are devices which can't even do 512-byte aligned I/O?
+> > Direct IO requires that, see do_blockdev_direct_IO().
+> > 
+> > This issue can be triggered when running xfs over loop/dio. We could
+> > fallback to buffered IO under this situation, but not sure it is the
+> > only case.
 > 
-> Direct IO requires that, see do_blockdev_direct_IO().
-> 
-> This issue can be triggered when running xfs over loop/dio. We could
-> fallback to buffered IO under this situation, but not sure it is the
-> only case.
+> Wait, we're imposing a ridiculous amount of complexity on XFS for no
+> reason at all?  We should just change this to 512-byte alignment.  Tying
+> it to the blocksize of the device never made any sense.
 
-Wait, we're imposing a ridiculous amount of complexity on XFS for no
-reason at all?  We should just change this to 512-byte alignment.  Tying
-it to the blocksize of the device never made any sense.
+OK, that is fine since we can fallback to buffered IO for loop in case of
+unaligned dio.
+
+Then something like the following patch should work for all fs, could
+anyone comment on this approach?
+
+--
+
+diff --git a/block/blk-lib.c b/block/blk-lib.c
+index 5f2c429d4378..76f09f23a410 100644
+--- a/block/blk-lib.c
++++ b/block/blk-lib.c
+@@ -405,3 +405,44 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
+ 	return ret;
+ }
+ EXPORT_SYMBOL(blkdev_issue_zeroout);
++
++static struct kmem_cache *sector_buf_slabs[(PAGE_SIZE >> 9) - 1];
++
++void *blk_alloc_sec_buf(unsigned size, gfp_t flags)
++{
++	int idx;
++
++	size = round_up(size, 512);
++	if (size >= PAGE_SIZE)
++		return NULL;
++
++	idx = (size >> 9) - 1;
++	if (!sector_buf_slabs[idx])
++		return NULL;
++	return kmem_cache_alloc(sector_buf_slabs[idx], flags);
++}
++EXPORT_SYMBOL_GPL(blk_alloc_sec_buf);
++
++void blk_free_sec_buf(void *buf, int size)
++{
++	size = round_up(size, 512);
++	if (size >= PAGE_SIZE)
++		return;
++
++	return kmem_cache_free(sector_buf_slabs[(size >> 9) - 1], buf);
++}
++EXPORT_SYMBOL_GPL(blk_free_sec_buf);
++
++void __init blk_sector_buf_init(void)
++{
++	unsigned size;
++
++	for (size = 512; size < PAGE_SIZE; size += 512) {
++		char name[16];
++		int idx = (size >> 9) - 1;
++
++		snprintf(name, 16, "blk_sec_buf-%u", size);
++		sector_buf_slabs[idx] = kmem_cache_create(name, size, 512,
++							  SLAB_PANIC, NULL);
++	}
++}
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index faed9d9eb84c..a4117e526715 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1657,6 +1657,9 @@ extern int bdev_read_page(struct block_device *, sector_t, struct page *);
+ extern int bdev_write_page(struct block_device *, sector_t, struct page *,
+ 						struct writeback_control *);
+ 
++extern void *blk_alloc_sec_buf(unsigned size, gfp_t flags);
++extern void blk_free_sec_buf(void *buf, int size);
++
+ #ifdef CONFIG_BLK_DEV_ZONED
+ bool blk_req_needs_zone_write_lock(struct request *rq);
+ void __blk_req_zone_write_lock(struct request *rq);
+@@ -1755,6 +1758,15 @@ static inline int blkdev_issue_flush(struct block_device *bdev, gfp_t gfp_mask,
+ 	return 0;
+ }
+ 
++static inline void *blk_alloc_sec_buf(unsigned size, gfp_t flags)
++{
++	return NULL;
++}
++
++static inline void blk_free_sec_buf(void *buf, int size)
++{
++}
++
+ #endif /* CONFIG_BLOCK */
+ 
+ static inline void blk_wake_io_task(struct task_struct *waiter)
+
+Thanks,
+Ming
