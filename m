@@ -2,147 +2,139 @@ Return-Path: <SRS0=PBJN=RB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,LOTS_OF_MONEY,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27CFFC10F0B
-	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 10:57:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C22B8C43381
+	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 11:14:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA6E42173C
-	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 10:56:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C0A92146F
+	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 11:14:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qs6e07by"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S/1urR1/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727169AbfBZKzS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Feb 2019 05:55:18 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:41241 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727051AbfBZKzR (ORCPT
+        id S1727631AbfBZLNF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Feb 2019 06:13:05 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:55974 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727051AbfBZLNE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Feb 2019 05:55:17 -0500
-Received: by mail-wr1-f67.google.com with SMTP id n2so13394840wrw.8;
-        Tue, 26 Feb 2019 02:55:16 -0800 (PST)
+        Tue, 26 Feb 2019 06:13:04 -0500
+Received: by mail-wm1-f65.google.com with SMTP id q187so1967403wme.5;
+        Tue, 26 Feb 2019 03:13:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ySN8srwOFToAgVDBdnBx2qaw3D1HebYFeaH6dGO69Oc=;
-        b=qs6e07byqT+pfaRudjoCMUSwyMqUSgPnAe9VZLvaSM45I3+PgcOCm1TxkklpqDSjXH
-         AY9V8ZCipbvGpY/bc22Cz0petjFIFCds859oyidNwit2H3wkMfRjLxrT7tZbLCIGRcp8
-         2t2HFaxvgkpvF0K7JNK1co93HcGKgVslHN7t2GPSjpJJ8yF0ZNIliPcLXJfhFnjd6djX
-         SVGhGSJF7SNsUVGcR46epchqP0rQSDElTIBXh17ubVYwRJfmQe4puWAGKzK+hMxU3nXZ
-         YyP952q6iAOwTPAgN+WQXJhM1Q+QySjcuinrbHgMYoke1iFLWx0R1IkYe0fmQvh/G2cN
-         h87A==
+        bh=QHqS9FYiG1zBoxmbf0V7JRLtAFvidK6oH6Is4fIvoJ4=;
+        b=S/1urR1/rCTfMI1kbuJXJVXFlPl3G6THigx/0Jl7udoDmkpi0LLp4elqtSaij71S0w
+         DM/045jwfOAxNjQJFtqBG8+M6eo45azAxkNwkFpJtBETXpO160FfKt0FIZJrVUQln3fm
+         NcCR/KpQHaP+QM9rZHjN5akaMlmm7nBhlvEwwY/8SExGZsAtR7BCpUuRfyWPUYMTcyUC
+         bUf20RQw5vhu2QBReLIhpMWz6gnfCgOIIYuYP6R8IYIGEYrT8NKX69I5JndO4l6RZuLi
+         FVgwenrihVyYPnNSodd0OBe7qFYgZJefpalW3heqhStIGDL04vhYyH8Cek4NrTuMlTwH
+         +h+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ySN8srwOFToAgVDBdnBx2qaw3D1HebYFeaH6dGO69Oc=;
-        b=hOb1fyKPF8V9cfO+vvwygjoF8+BZS5BiNqwAx/sSs4maoh3pyQQdKosFd1MnWsKaJH
-         Sm71q/2MkiMtA9o6knEncihmmdN8bxy4TEVYNGyyZhqSLEsO0gFdrhga14DNYIakSfB2
-         2JyQnn9yNgePhYR7/TPnn4BUc06JhA13Yr/yT9mPCuIvCZdGJCC7DJGqmvjwg1Fs3dC2
-         esO2IA6GuoYZ48teIY8dYwKaW31nJgOUdLl5SlxrXYR8rsph2SQVXFpWTjp5z3D7uqNg
-         DruoHC3p7wIAs2bO94i8h6CGtZZX4LKHyJFQdXElc/A246oymgwKF9qPQySALu0+897h
-         vYgg==
-X-Gm-Message-State: AHQUAua016IECVI2n44m/26QEcUMTEEbCdjeRctuNIGYlUVuhJ895BMo
-        fGg3BxA3KFsXP2z9NQb4ulBMQmL2LnEhowHRrf52NnDZ
-X-Google-Smtp-Source: AHgI3IbAhXUzc0SeBIn8HwuMjaleFdP9LgYkHTI0Sj7XgYt5EuqrB1NIFvl5KbXhnpM0AowRE84rJN7MZhz1dJS3IZQ=
-X-Received: by 2002:a5d:668b:: with SMTP id l11mr15674420wru.116.1551178515839;
- Tue, 26 Feb 2019 02:55:15 -0800 (PST)
+        bh=QHqS9FYiG1zBoxmbf0V7JRLtAFvidK6oH6Is4fIvoJ4=;
+        b=DNx0gdbH1uJ2hcNBWegBLCEBfpC5Gd7qK0DH1aM/3eQjkWuY1GvtojPfSfF2HPyLsT
+         sP8B8nAFYJP5bgoD44iv9ljLhXq+iAwIouH5E+tNBFpe4d24/SOWzRvGuNYURNnDciXD
+         fwzhFST91ztzRAEsRn3K9Txs/W16wznxNOA+7i6bpN5LWpNrjmh8+8ppyVccGV5O5nUc
+         9bBe8pyZB16rPpOLhkVg7KbGQJD2h193YgzRzErg3K3bG+2SvU4kI/qwerY1LicV1Hip
+         npP2J8Vkz3x9x4MRaZb9A5zsTloEcwOm92fOC/G0Z0vGa7zNdFUAFd/SE/6J3WuqoBUF
+         iwtg==
+X-Gm-Message-State: AHQUAuZx6Z7Izy+7bD+GtTn6XsPhzsqM6mnfW6KUGTtsEmSeedIA61lA
+        Y8fe8M7tcE3S+rnBBjnErYsbYh0HcGBfyboTkMk=
+X-Google-Smtp-Source: AHgI3IbJHz73B55lSuZB2tgChvWyG+f3SNNJuU9R8d5KDwOBP8Iye0XxT6ZxlngQszFhVsJ56xW2KpcEMqMJWS1vYZk=
+X-Received: by 2002:a1c:eb1a:: with SMTP id j26mr2173623wmh.43.1551179581180;
+ Tue, 26 Feb 2019 03:13:01 -0800 (PST)
 MIME-Version: 1.0
-References: <20190226105150.10717-1-cmaiolino@redhat.com>
-In-Reply-To: <20190226105150.10717-1-cmaiolino@redhat.com>
+References: <20190225040904.5557-1-ming.lei@redhat.com> <20190225043648.GE23020@dastard>
+ <5ad2ef83-8b3a-0a15-d72e-72652b807aad@suse.cz> <20190225202630.GG23020@dastard>
+ <20190226022249.GA17747@ming.t460p> <20190226030214.GI23020@dastard>
+ <20190226032737.GA11592@bombadil.infradead.org> <20190226045826.GJ23020@dastard>
+ <20190226093302.GA24879@ming.t460p> <a641feb8-ceb2-2dac-27aa-7b1df10f5ae5@suse.cz>
+In-Reply-To: <a641feb8-ceb2-2dac-27aa-7b1df10f5ae5@suse.cz>
 From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Tue, 26 Feb 2019 18:55:03 +0800
-Message-ID: <CACVXFVO6i9PyzCgaacMy=yU9pxosvpZW3gtVdigwwRcS7ei0=w@mail.gmail.com>
-Subject: Re: [PATCH V2] fs: fix guard_bio_eod to check for real EOD errors
-To:     Carlos Maiolino <cmaiolino@redhat.com>
-Cc:     Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>
+Date:   Tue, 26 Feb 2019 19:12:49 +0800
+Message-ID: <CACVXFVMX=WpTRBbDTSibfXkTZxckk3ootetbE+rkJtHhsZkRAw@mail.gmail.com>
+Subject: Re: [PATCH] xfs: allocate sector sized IO buffer via page_frag_alloc
+To:     Vlastimil Babka <vbabka@suse.cz>
+Cc:     Ming Lei <ming.lei@redhat.com>, Dave Chinner <david@fromorbit.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Aaron Lu <aaron.lu@intel.com>,
+        Christopher Lameter <cl@linux.com>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 26, 2019 at 6:52 PM Carlos Maiolino <cmaiolino@redhat.com> wrote:
+On Tue, Feb 26, 2019 at 6:07 PM Vlastimil Babka <vbabka@suse.cz> wrote:
 >
-> guard_bio_eod() can truncate a segment in bio to allow it to do IO on
-> odd last sectors of a device.
+> On 2/26/19 10:33 AM, Ming Lei wrote:
+> > On Tue, Feb 26, 2019 at 03:58:26PM +1100, Dave Chinner wrote:
+> >> On Mon, Feb 25, 2019 at 07:27:37PM -0800, Matthew Wilcox wrote:
+> >>> On Tue, Feb 26, 2019 at 02:02:14PM +1100, Dave Chinner wrote:
+> >>>>> Or what is the exact size of sub-page IO in xfs most of time? For
+> >>>>
+> >>>> Determined by mkfs parameters. Any power of 2 between 512 bytes and
+> >>>> 64kB needs to be supported. e.g:
+> >>>>
+> >>>> # mkfs.xfs -s size=512 -b size=1k -i size=2k -n size=8k ....
+> >>>>
+> >>>> will have metadata that is sector sized (512 bytes), filesystem
+> >>>> block sized (1k), directory block sized (8k) and inode cluster sized
+> >>>> (32k), and will use all of them in large quantities.
+> >>>
+> >>> If XFS is going to use each of these in large quantities, then it doesn't
+> >>> seem unreasonable for XFS to create a slab for each type of metadata?
+> >>
+> >>
+> >> Well, that is the question, isn't it? How many other filesystems
+> >> will want to make similar "don't use entire pages just for 4k of
+> >> metadata" optimisations as 64k page size machines become more
+> >> common? There are others that have the same "use slab for sector
+> >> aligned IO" which will fall foul of the same problem that has been
+> >> reported for XFS....
+> >>
+> >> If nobody else cares/wants it, then it can be XFS only. But it's
+> >> only fair we address the "will it be useful to others" question
+> >> first.....
+> >
+> > This kind of slab cache should have been global, just like interface of
+> > kmalloc(size).
+> >
+> > However, the alignment requirement depends on block device's block size,
+> > then it becomes hard to implement as genera interface, for example:
+> >
+> >       block size: 512, 1024, 2048, 4096
+> >       slab size: 512*N, 0 < N < PAGE_SIZE/512
+> >
+> > For 4k page size, 28(7*4) slabs need to be created, and 64k page size
+> > needs to create 127*4 slabs.
+> >
 >
-> It already checks if the IO starts past EOD, but it does not consider
-> the possibility of an IO request starting within device boundaries can
-> contain more than one segment past EOD.
->
-> In such cases, truncated_bytes can be bigger than PAGE_SIZE, and will
-> underflow bvec->bv_len.
->
-> Fix this by checking if truncated_bytes is lower than PAGE_SIZE.
->
-> This situation has been found on filesystems such as isofs and vfat,
-> which doesn't check the device size before mount, if the device is
-> smaller than the filesystem itself, a readahead on such filesystem,
-> which spans EOD, can trigger this situation, leading a call to
-> zero_user() with a wrong size possibly corrupting memory.
->
-> I didn't see any crash, or didn't let the system run long enough to
-> check if memory corruption will be hit somewhere, but adding
-> instrumentation to guard_bio_end() to check truncated_bytes size, was
-> enough to see the error.
->
-> The following script can trigger the error.
->
-> MNT=/mnt
-> IMG=./DISK.img
-> DEV=/dev/loop0
->
-> mkfs.vfat $IMG
-> mount $IMG $MNT
-> cp -R /etc $MNT &> /dev/null
-> umount $MNT
->
-> losetup -D
->
-> losetup --find --show --sizelimit 16247280 $IMG
-> mount $DEV $MNT
->
-> find $MNT -type f -exec cat {} + >/dev/null
->
-> Kudos to Eric Sandeen for coming up with the reproducer above
->
-> Changelog:
->
->         V2: Compare truncated_bytes agains bvec->bv_len instead of
->             PAGE_SIZE
->
-> Signed-off-by: Carlos Maiolino <cmaiolino@redhat.com>
-> ---
->  fs/buffer.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
-> diff --git a/fs/buffer.c b/fs/buffer.c
-> index 784de3dbcf28..b43347896ce0 100644
-> --- a/fs/buffer.c
-> +++ b/fs/buffer.c
-> @@ -3063,6 +3063,13 @@ void guard_bio_eod(int op, struct bio *bio)
->         /* Uhhuh. We've got a bio that straddles the device size! */
->         truncated_bytes = bio->bi_iter.bi_size - (maxsector << 9);
->
-> +       /*
-> +        * The bio contains more than one segment which spans EOD, just return
-> +        * and let IO layer turn it into an EIO
-> +        */
-> +       if (truncated_bytes > bvec->bv_len)
-> +               return;
-> +
->         /* Truncate the bio.. */
->         bio->bi_iter.bi_size -= truncated_bytes;
->         bvec->bv_len -= truncated_bytes;
+> Where does the '*4' multiplier come from?
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
+The buffer needs to be device block size aligned for dio, and now the block
+size can be 512, 1024, 2048 and 4096.
 
 Thanks,
 Ming Lei
