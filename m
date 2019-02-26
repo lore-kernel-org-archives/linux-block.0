@@ -2,184 +2,162 @@ Return-Path: <SRS0=PBJN=RB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E5D8C43381
-	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 15:55:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4990C43381
+	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 16:19:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6DFDF20C01
-	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 15:55:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 817982173C
+	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 16:19:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="g3w7aOEl"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="qQ0vpRj8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726478AbfBZPyN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Feb 2019 10:54:13 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:38268 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726624AbfBZPyN (ORCPT
+        id S1727103AbfBZQRb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Feb 2019 11:17:31 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:55764 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726507AbfBZQRb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Feb 2019 10:54:13 -0500
-Received: by mail-it1-f195.google.com with SMTP id l66so4806840itg.3
-        for <linux-block@vger.kernel.org>; Tue, 26 Feb 2019 07:54:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:from:to:cc:references:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=PSfp7jby7bJf7Iq0yet+thJT0mZpXiOS1xz90ywbKnQ=;
-        b=g3w7aOEl/L8KtnvvAEkZow1u+ovK7RNvgH76lEn/RMgVPU2QVwU4hBegehn/LWbgtD
-         PbedU/C6ytZXIkdP2lx4GrHFCtLDNcbMK1MB3Vte9AjS/JAF8HXFkUCrFFw7sN2SO2hY
-         2OGBIiiLN/p9fI5eDTcWhtp37IGDCUSC/CgTTUzAizbJxxAm0ssN7cOnL/wTHkOYkW+2
-         +OCLxwaTq+t5m9qwFVtTN0JnQFV6Cadd8C16nbKVxC09CsegmrB+RFZpykTslriix9PP
-         21GZvR++Ou/FhI38fIM8CPEixRNF/whQLAOS6czplMUSQvhLlrfEJ4jUwxD5eAGPQ9o7
-         FBTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=PSfp7jby7bJf7Iq0yet+thJT0mZpXiOS1xz90ywbKnQ=;
-        b=M0L5TZRXQKzdbXtNZ7c22a5cw2VHHWakaEJT54iCfVcktesjHh1ZY81akfTdS70zzM
-         LnE+2l5fEa+SIW56dqEaND02tteHm/5AKaZ2jr9yOssbEibXam9d/C7ICPPUSvthzwLU
-         tw9Mwh6KJ8JrqnG2yRm2kkA92i55DoXa5qvOoRK4gtkKNzBWoW7ug8F2kGtJIB1cV32o
-         zKwE8RzoTTnW2BUuyN1d4EdZDQh5K6Pp+Ain+ntZuSt1jjgcdcGTy+MCTETjUG11JUCM
-         VrqbQhx2fKPYO3L5TN7ctHPVJFl/207ZM0zaOKy6gLCuCvJM1hoIK6516nvhjxNd2OYG
-         +uhg==
-X-Gm-Message-State: AHQUAubaakyDzDdhxbdGSLzihDk1uIi+K84TIX9yK0PrJoTDMSwi00xs
-        Fg0ZlYy+jakxowvmvHwQ81ZQSQ==
-X-Google-Smtp-Source: APXvYqz5rGLSbIxoYYivRzVrhhUs6j9sM+/1pDFzmQjk2XEongI2L4ZOA2r3ktY5Q95W0DCCPkMcUQ==
-X-Received: by 2002:a24:30e:: with SMTP id e14mr2647634ite.111.1551196452273;
-        Tue, 26 Feb 2019 07:54:12 -0800 (PST)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id q133sm4761202itb.19.2019.02.26.07.54.10
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Feb 2019 07:54:11 -0800 (PST)
-Subject: Re: [PATCH 11/19] block: implement bio helper to add iter bvec pages
- to bio
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-aio@kvack.org,
-        linux-block@vger.kernel.org, linux-api@vger.kernel.org, hch@lst.de,
-        jmoyer@redhat.com, avi@scylladb.com, jannh@google.com,
-        viro@zeniv.linux.org.uk
-References: <20190211190049.7888-1-axboe@kernel.dk>
- <20190211190049.7888-13-axboe@kernel.dk> <20190220225856.GB28313@ming.t460p>
- <b143e8c3-33d5-5f09-c441-98b3bf326d81@kernel.dk>
- <20190226034613.GA676@sol.localdomain>
- <aa1184bb-b482-0637-21e4-1ddb0e7aea90@kernel.dk>
-Message-ID: <1652577e-787b-638e-625d-c200fb144a9d@kernel.dk>
-Date:   Tue, 26 Feb 2019 08:54:10 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        Tue, 26 Feb 2019 11:17:31 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1QGCqAC033528;
+        Tue, 26 Feb 2019 16:14:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=PFOmNSXERoShH2nRHfdwWjGkF5WH9Hmxoe3env79QL0=;
+ b=qQ0vpRj814sZq4kSa2WnFuCwals7O5fdfQAPqvcNMDj08ztBMyjbjb+BwfnTGRKfZbtu
+ Rro5ouRnSmoXOma1SJ1HJ9yfnxI87fYvtj4I7ancivEccqcMzfFOIIJ6GLb0+FX9qrDi
+ 4LudWZ0isLmxxCc7KzCyPhjKYypp4mTLikbNeAKFGi9NU8Dq0+KVBFOAE9Mx19qKb/WX
+ u2ZW3gNfCjrFvPymOS7ol6IZ8FORYt2fU1fL1jUXzDDiwzKNufvEAIudXZRR83+aPzoE
+ BxaY64pR+a3YClDr/rFn6+YDvbDJTZOhAmhvX8tI4fFRGltPR8AT7M4GaFUA4QvhRz4Q 5A== 
+Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
+        by userp2130.oracle.com with ESMTP id 2qtwku5m91-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 26 Feb 2019 16:14:46 +0000
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x1QGEeUj005011
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 26 Feb 2019 16:14:40 GMT
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x1QGEckn024347;
+        Tue, 26 Feb 2019 16:14:39 GMT
+Received: from localhost (/67.169.218.210)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 26 Feb 2019 08:14:38 -0800
+Date:   Tue, 26 Feb 2019 08:14:33 -0800
+From:   "Darrick J. Wong" <darrick.wong@oracle.com>
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     Ming Lei <ming.lei@redhat.com>, Ming Lei <tom.leiming@gmail.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Dave Chinner <david@fromorbit.com>,
+        "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Aaron Lu <aaron.lu@intel.com>,
+        Christopher Lameter <cl@linux.com>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-mm <linux-mm@kvack.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Pekka Enberg <penberg@kernel.org>,
+        David Rientjes <rientjes@google.com>,
+        Joonsoo Kim <iamjoonsoo.kim@lge.com>
+Subject: Re: [PATCH] xfs: allocate sector sized IO buffer via page_frag_alloc
+Message-ID: <20190226161433.GH21626@magnolia>
+References: <20190226032737.GA11592@bombadil.infradead.org>
+ <20190226045826.GJ23020@dastard>
+ <20190226093302.GA24879@ming.t460p>
+ <a641feb8-ceb2-2dac-27aa-7b1df10f5ae5@suse.cz>
+ <CACVXFVMX=WpTRBbDTSibfXkTZxckk3ootetbE+rkJtHhsZkRAw@mail.gmail.com>
+ <20190226121209.GC11592@bombadil.infradead.org>
+ <20190226123545.GA6163@ming.t460p>
+ <20190226130230.GD11592@bombadil.infradead.org>
+ <20190226134247.GA30942@ming.t460p>
+ <20190226140440.GF11592@bombadil.infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <aa1184bb-b482-0637-21e4-1ddb0e7aea90@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190226140440.GF11592@bombadil.infradead.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9178 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1902260115
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/25/19 9:34 PM, Jens Axboe wrote:
-> On 2/25/19 8:46 PM, Eric Biggers wrote:
->> Hi Jens,
->>
->> On Thu, Feb 21, 2019 at 10:45:27AM -0700, Jens Axboe wrote:
->>> On 2/20/19 3:58 PM, Ming Lei wrote:
->>>> On Mon, Feb 11, 2019 at 12:00:41PM -0700, Jens Axboe wrote:
->>>>> For an ITER_BVEC, we can just iterate the iov and add the pages
->>>>> to the bio directly. This requires that the caller doesn't releases
->>>>> the pages on IO completion, we add a BIO_NO_PAGE_REF flag for that.
->>>>>
->>>>> The current two callers of bio_iov_iter_get_pages() are updated to
->>>>> check if they need to release pages on completion. This makes them
->>>>> work with bvecs that contain kernel mapped pages already.
->>>>>
->>>>> Reviewed-by: Hannes Reinecke <hare@suse.com>
->>>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
->>>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->>>>> ---
->>>>>  block/bio.c               | 59 ++++++++++++++++++++++++++++++++-------
->>>>>  fs/block_dev.c            |  5 ++--
->>>>>  fs/iomap.c                |  5 ++--
->>>>>  include/linux/blk_types.h |  1 +
->>>>>  4 files changed, 56 insertions(+), 14 deletions(-)
->>>>>
->>>>> diff --git a/block/bio.c b/block/bio.c
->>>>> index 4db1008309ed..330df572cfb8 100644
->>>>> --- a/block/bio.c
->>>>> +++ b/block/bio.c
->>>>> @@ -828,6 +828,23 @@ int bio_add_page(struct bio *bio, struct page *page,
->>>>>  }
->>>>>  EXPORT_SYMBOL(bio_add_page);
->>>>>  
->>>>> +static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
->>>>> +{
->>>>> +	const struct bio_vec *bv = iter->bvec;
->>>>> +	unsigned int len;
->>>>> +	size_t size;
->>>>> +
->>>>> +	len = min_t(size_t, bv->bv_len, iter->count);
->>>>> +	size = bio_add_page(bio, bv->bv_page, len,
->>>>> +				bv->bv_offset + iter->iov_offset);
->>>>
->>>> iter->iov_offset needs to be subtracted from 'len', looks
->>>> the following delta change[1] is required, otherwise memory corruption
->>>> can be observed when running xfstests over loop/dio.
->>>
->>> Thanks, I folded this in.
->>>
->>> -- 
->>> Jens Axboe
->>>
->>
->> syzkaller started hitting a crash on linux-next starting with this commit, and
->> it still occurs even with your latest version that has Ming's fix folded in.
->> Specifically, commit a566653ab5ab80a from your io_uring branch with commit date
->> Sun Feb 24 08:20:53 2019 -0700.
->>
->> Reproducer:
->>
->> #define _GNU_SOURCE
->> #include <fcntl.h>
->> #include <linux/loop.h>
->> #include <sys/ioctl.h>
->> #include <sys/sendfile.h>
->> #include <sys/syscall.h>
->> #include <unistd.h>
->>
->> int main(void)
->> {
->>         int memfd, loopfd;
->>
->>         memfd = syscall(__NR_memfd_create, "foo", 0);
->>
->>         pwrite(memfd, "\xa8", 1, 4096);
->>
->>         loopfd = open("/dev/loop0", O_RDWR|O_DIRECT);
->>
->>         ioctl(loopfd, LOOP_SET_FD, memfd);
->>
->>         sendfile(loopfd, loopfd, NULL, 1000000);
->> }
->>
->>
->> Crash:
->>
->> page:ffffea0001a6aab8 count:0 mapcount:0 mapping:0000000000000000 index:0x0
->> flags: 0x100000000000000()
->> raw: 0100000000000000 ffffea0001ad2c50 ffff88807fca49d0 0000000000000000
->> raw: 0000000000000000 0000000000000000 00000000ffffffff
->> page dumped because: VM_BUG_ON_PAGE(page_ref_count(page) == 0)
+On Tue, Feb 26, 2019 at 06:04:40AM -0800, Matthew Wilcox wrote:
+> On Tue, Feb 26, 2019 at 09:42:48PM +0800, Ming Lei wrote:
+> > On Tue, Feb 26, 2019 at 05:02:30AM -0800, Matthew Wilcox wrote:
+> > > Wait, we're imposing a ridiculous amount of complexity on XFS for no
+> > > reason at all?  We should just change this to 512-byte alignment.  Tying
+> > > it to the blocksize of the device never made any sense.
+> > 
+> > OK, that is fine since we can fallback to buffered IO for loop in case of
+> > unaligned dio.
+> > 
+> > Then something like the following patch should work for all fs, could
+> > anyone comment on this approach?
 > 
-> I see what this is, I'll cut a fix for this tomorrow.
+> That's not even close to what I meant.
+> 
+> diff --git a/fs/direct-io.c b/fs/direct-io.c
+> index ec2fb6fe6d37..dee1fc47a7fc 100644
+> --- a/fs/direct-io.c
+> +++ b/fs/direct-io.c
+> @@ -1185,18 +1185,20 @@ do_blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
 
-Folded in a fix for this, it's in my current io_uring branch and my for-next
-branch.
+Wait a minute, are you all saying that /directio/ is broken on XFS too??
+XFS doesn't use blockdev_direct_IO anymore.
 
--- 
-Jens Axboe
+I thought we were talking about alignment of XFS metadata buffers
+(xfs_buf.c), which is a very different topic.
 
+As I understand the problem, in non-debug mode the slab caches give
+xfs_buf chunks of memory that are aligned well enough to work, but in
+debug mode the slabs allocate slightly more bytes to carry debug
+information which pushes the returned address up slightly, thus breaking
+the alignment requirements.
+
+So why can't we just move the debug info to the end of the object?  If
+our 512 byte allocation turns into a (512 + a few more) bytes we'll end
+up using 1024 bytes on the allocation regardless, so it shouldn't matter
+to put the debug info at offset 512.  If the reason is fear that kernel
+code will scribble off the end of the object, then return (*obj + 512).
+Maybe you all have already covered this, though?
+
+--D
+
+>  	struct dio_submit sdio = { 0, };
+>  	struct buffer_head map_bh = { 0, };
+>  	struct blk_plug plug;
+> -	unsigned long align = offset | iov_iter_alignment(iter);
+>  
+>  	/*
+>  	 * Avoid references to bdev if not absolutely needed to give
+>  	 * the early prefetch in the caller enough time.
+>  	 */
+>  
+> -	if (align & blocksize_mask) {
+> +	if (iov_iter_alignment(iter) & 511)
+> +		goto out;
+> +
+> +	if (offset & blocksize_mask) {
+>  		if (bdev)
+>  			blkbits = blksize_bits(bdev_logical_block_size(bdev));
+>  		blocksize_mask = (1 << blkbits) - 1;
+> -		if (align & blocksize_mask)
+> +		if (offset & blocksize_mask)
+>  			goto out;
+>  	}
+>  
