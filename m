@@ -2,122 +2,118 @@ Return-Path: <SRS0=PBJN=RB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36C56C43381
-	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 16:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59C96C43381
+	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 17:25:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 03EFC2173C
-	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 16:21:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2770A21848
+	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 17:25:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LjcTktzJ"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="V4/9s7fu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727320AbfBZQTR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Feb 2019 11:19:17 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:51510 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727216AbfBZQTQ (ORCPT
+        id S1727077AbfBZRXz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Feb 2019 12:23:55 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:45109 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726801AbfBZRXz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Feb 2019 11:19:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=2q/6sTclQ4HD43oxc6ZIBjMTrrqlUrCbHZqpallTMrs=; b=LjcTktzJGQ5AWHYQiVLJOCyfG
-        07+YGizkMObPDSxyZ0+9BEJ5UtOtuL3muimUQ/JRZeUVxdrLER23VMYbCAsCXR3fWs6Ydp0bCE3TA
-        kTZra2TTjuMUy5TKf+eDwvAoS/mETpq/fy49EIoFpPzsKlzctluwvsiRVvTNZpZ3Sd7Aq8k9u9EZb
-        w17SUcSpJ2bMGRr4jPOknsPiMBVz0LEN/Gmp/4h8uDdlVAXxy5QV9krqbo6cicDfCD3r2gkzaKNmL
-        v5PpbawwUQHhwngr3wFoZ+VBdiSFyu2ubwBXF3biemXEKkyOwm1tNLKGq/8bgNvT4Fq0P3gUwJ/yQ
-        9isYXMbiQ==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gyfRo-0007GC-9E; Tue, 26 Feb 2019 16:19:12 +0000
-Date:   Tue, 26 Feb 2019 08:19:12 -0800
-From:   Matthew Wilcox <willy@infradead.org>
-To:     "Darrick J. Wong" <darrick.wong@oracle.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Ming Lei <tom.leiming@gmail.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Dave Chinner <david@fromorbit.com>,
-        "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Aaron Lu <aaron.lu@intel.com>,
-        Christopher Lameter <cl@linux.com>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>
-Subject: Re: [PATCH] xfs: allocate sector sized IO buffer via page_frag_alloc
-Message-ID: <20190226161912.GG11592@bombadil.infradead.org>
-References: <20190226045826.GJ23020@dastard>
- <20190226093302.GA24879@ming.t460p>
- <a641feb8-ceb2-2dac-27aa-7b1df10f5ae5@suse.cz>
- <CACVXFVMX=WpTRBbDTSibfXkTZxckk3ootetbE+rkJtHhsZkRAw@mail.gmail.com>
- <20190226121209.GC11592@bombadil.infradead.org>
- <20190226123545.GA6163@ming.t460p>
- <20190226130230.GD11592@bombadil.infradead.org>
- <20190226134247.GA30942@ming.t460p>
- <20190226140440.GF11592@bombadil.infradead.org>
- <20190226161433.GH21626@magnolia>
+        Tue, 26 Feb 2019 12:23:55 -0500
+Received: by mail-lj1-f196.google.com with SMTP id d24so11219157ljc.12
+        for <linux-block@vger.kernel.org>; Tue, 26 Feb 2019 09:23:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9RhU8uM0ad+0+mYh4+yrj9Diioag2qapPokY1EYhEhY=;
+        b=V4/9s7fusoKlP5TdYrlE40KrLOJs5jr9+p0GabO7V7BSBppp76w4X4LFDhHrt7GZTI
+         hyM0pPL5rAKMNj+C3UV7FuJt6YF+K1UO/NL/wFRmF8QhzrGcY8wkZWk0p1ieN546u75F
+         QcPU39mz0C9u4xzEzZOG4TRF/SHIZCgHkuFsE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9RhU8uM0ad+0+mYh4+yrj9Diioag2qapPokY1EYhEhY=;
+        b=LcFY/1seaembZg88HnZUW6KGe1aIu7c5EQVkMTCtBsXbywHNjzVMz6sxIechSutOl1
+         8m+GjRtn/+qwwMEjsKGlPiYv1cCVVYuYxtknsXql5OTxZK4nLXPXAS52QyVbyA+2NzgO
+         mCyaLxFSyOj2ETDf0Dx5u6Aer5pizZbsYlcKYvyxCIiAjD6hvNmzt8HdEIbeNfDU17YT
+         c05Je/VMG+XOAWzEprNKVpiBIR/DkSpAdsNi9j/pVZR+BIwHsKQ+FhoLnvR1d6+ZyqHO
+         Qc4HdeMw/eESXblmT9uYJ6bn3tYspTPZsFxOpOlJZebht4CjdhqsWF9jBsAtKGeGqUwW
+         0AaQ==
+X-Gm-Message-State: AHQUAua/yLQyswOh8rAYJOJ9Ag+x9mt7F1VVPeJJsWrN0EYOQQYI++Br
+        gBQuYWgm5NYw+aFhUzisOB76w/LrIks=
+X-Google-Smtp-Source: AHgI3IYEZ1bJB9P17yazdtikmtoLw0H7jFnbxx07KIz7+bZaWTp9oH4/a40bj+KqxHRiBXfGBWP/6w==
+X-Received: by 2002:a2e:7a08:: with SMTP id v8mr14060217ljc.161.1551201832946;
+        Tue, 26 Feb 2019 09:23:52 -0800 (PST)
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com. [209.85.208.182])
+        by smtp.gmail.com with ESMTPSA id t18sm3570898ljc.54.2019.02.26.09.23.52
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 26 Feb 2019 09:23:52 -0800 (PST)
+Received: by mail-lj1-f182.google.com with SMTP id g80so11489954ljg.6
+        for <linux-block@vger.kernel.org>; Tue, 26 Feb 2019 09:23:52 -0800 (PST)
+X-Received: by 2002:a2e:9ad1:: with SMTP id p17mr14356563ljj.30.1551201831984;
+ Tue, 26 Feb 2019 09:23:51 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190226161433.GH21626@magnolia>
-User-Agent: Mutt/1.9.2 (2017-12-15)
+References: <20190207205730.199332-1-evgreen@chromium.org> <20190207205730.199332-3-evgreen@chromium.org>
+ <yq1d0nvqeix.fsf@oracle.com> <CAE=gft6bdM2dLc9RhGYMWp8bz6_c-W8Yy-CUTM9wXe+UiYkXEw@mail.gmail.com>
+In-Reply-To: <CAE=gft6bdM2dLc9RhGYMWp8bz6_c-W8Yy-CUTM9wXe+UiYkXEw@mail.gmail.com>
+From:   Evan Green <evgreen@chromium.org>
+Date:   Tue, 26 Feb 2019 09:23:13 -0800
+X-Gmail-Original-Message-ID: <CAE=gft4OeQwokacbX8D1t7JrawKSZGjfjNm0xZc=Qx92HqieWg@mail.gmail.com>
+Message-ID: <CAE=gft4OeQwokacbX8D1t7JrawKSZGjfjNm0xZc=Qx92HqieWg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] loop: Better discard support for block devices
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
+        Gwendal Grignou <gwendal@chromium.org>,
+        Alexis Savery <asavery@chromium.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 26, 2019 at 08:14:33AM -0800, Darrick J. Wong wrote:
-> On Tue, Feb 26, 2019 at 06:04:40AM -0800, Matthew Wilcox wrote:
-> > On Tue, Feb 26, 2019 at 09:42:48PM +0800, Ming Lei wrote:
-> > > On Tue, Feb 26, 2019 at 05:02:30AM -0800, Matthew Wilcox wrote:
-> > > > Wait, we're imposing a ridiculous amount of complexity on XFS for no
-> > > > reason at all?  We should just change this to 512-byte alignment.  Tying
-> > > > it to the blocksize of the device never made any sense.
-> > > 
-> > > OK, that is fine since we can fallback to buffered IO for loop in case of
-> > > unaligned dio.
-> > > 
-> > > Then something like the following patch should work for all fs, could
-> > > anyone comment on this approach?
-> > 
-> > That's not even close to what I meant.
-> > 
-> > diff --git a/fs/direct-io.c b/fs/direct-io.c
-> > index ec2fb6fe6d37..dee1fc47a7fc 100644
-> > --- a/fs/direct-io.c
-> > +++ b/fs/direct-io.c
-> > @@ -1185,18 +1185,20 @@ do_blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
-> 
-> Wait a minute, are you all saying that /directio/ is broken on XFS too??
-> XFS doesn't use blockdev_direct_IO anymore.
-> 
-> I thought we were talking about alignment of XFS metadata buffers
-> (xfs_buf.c), which is a very different topic.
-> 
-> As I understand the problem, in non-debug mode the slab caches give
-> xfs_buf chunks of memory that are aligned well enough to work, but in
-> debug mode the slabs allocate slightly more bytes to carry debug
-> information which pushes the returned address up slightly, thus breaking
-> the alignment requirements.
-> 
-> So why can't we just move the debug info to the end of the object?  If
-> our 512 byte allocation turns into a (512 + a few more) bytes we'll end
-> up using 1024 bytes on the allocation regardless, so it shouldn't matter
-> to put the debug info at offset 512.  If the reason is fear that kernel
-> code will scribble off the end of the object, then return (*obj + 512).
-> Maybe you all have already covered this, though?
+On Thu, Feb 14, 2019 at 10:00 AM Evan Green <evgreen@chromium.org> wrote:
+>
+> On Wed, Feb 13, 2019 at 6:40 PM Martin K. Petersen
+> <martin.petersen@oracle.com> wrote:
+> >
+> >
+> > Evan,
+> >
+> > > If the backing device for a loop device is a block device, then mirror
+> > > the discard properties of the underlying block device into the loop
+> > > device. While in there, differentiate between REQ_OP_DISCARD and
+> > > REQ_OP_WRITE_ZEROES, which are different for block devices, but which
+> > > the loop device had just been lumping together.
+> >
+> > Bubbling up the queue limits from the backing device is fine. However,
+> > I'm not sure why you are requiring a filesystem to be on a
+> > discard-capable device for REQ_OP_DISCARD to have an effect? Punching a
+> > hole in a file is semantically the same as discarding.
+> >
+>
+> Hi Martin,
+> Thanks so much for taking a look at this patch, I was getting nervous
+> it was languishing again. I got confused by this comment though. My
+> intention was to not change behavior for loop devices backed by a
+> regular file system file. The changes in loop_config_discard() should
+> result in QUEUE_FLAG_DISCARD being set for backings of regular files
+> that support f_op->fallocate(), same as before my patch. The change in
+> lo_discard() to call blk_queue_discard() on the loopback queue itself
+> was just shorthand to avoid duplicating all those if statements from
+> loop_config_discard again. Am I missing a spot where I've implicitly
+> changed the behavior for file-backed loop devices?
+> -Evan
 
-I don't know _what_ Ming Lei is saying.  I thought the problem was
-with slab redzones, which need to be before and after each object,
-but apparently the problem is with KASAN as well.
+Hi Martin,
+Did you get a chance to take a look at my reply? This error log
+plagues our Chrome OS installer, and I'm hopeful I've found an
+approach here that's upstream-friendly. But if it's not, let me know
+and I can fix it.
+-Evan
