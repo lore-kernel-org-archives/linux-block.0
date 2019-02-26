@@ -2,157 +2,115 @@ Return-Path: <SRS0=PBJN=RB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E5EC43381
-	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 19:54:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 508AAC43381
+	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 20:47:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C73A221850
-	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 19:54:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F8D721850
+	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 20:47:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728668AbfBZTxC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Feb 2019 14:53:02 -0500
-Received: from gateway33.websitewelcome.com ([192.185.145.239]:12394 "EHLO
-        gateway33.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728341AbfBZTxC (ORCPT
+        id S1728845AbfBZUpz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Feb 2019 15:45:55 -0500
+Received: from ipmail02.adl2.internode.on.net ([150.101.137.139]:63677 "EHLO
+        ipmail02.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728303AbfBZUpz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Feb 2019 14:53:02 -0500
-X-Greylist: delayed 1297 seconds by postgrey-1.27 at vger.kernel.org; Tue, 26 Feb 2019 14:53:01 EST
-Received: from cm12.websitewelcome.com (cm12.websitewelcome.com [100.42.49.8])
-        by gateway33.websitewelcome.com (Postfix) with ESMTP id E0CD62F0C80
-        for <linux-block@vger.kernel.org>; Tue, 26 Feb 2019 13:31:23 -0600 (CST)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id yiRngg9JGiQeryiRngsufD; Tue, 26 Feb 2019 13:31:23 -0600
-X-Authority-Reason: nr=8
-Received: from [189.250.127.169] (port=33990 helo=[192.168.1.76])
-        by gator4166.hostgator.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-        (Exim 4.91)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1gyiRn-0043ex-Cy; Tue, 26 Feb 2019 13:31:23 -0600
-Subject: Re: [Drbd-dev] [PATCH] block: Mark expected switch fall-throughs
-To:     Roland Kammerer <roland.kammerer@linbit.com>
-Cc:     Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        drbd-dev@lists.linbit.com, Kees Cook <keescook@chromium.org>
-References: <20190123064501.GA26147@embeddedor>
- <20190129094230.ezjzpfwf5xx47luu@rck.sh>
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=gustavo@embeddedor.com; keydata=
- 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
- VtSixD1uOgytAP7RWS474w==
-Message-ID: <577904a8-2882-1895-007b-55e92cfdf918@embeddedor.com>
-Date:   Tue, 26 Feb 2019 13:31:22 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        Tue, 26 Feb 2019 15:45:55 -0500
+Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
+  by ipmail02.adl2.internode.on.net with ESMTP; 27 Feb 2019 07:15:51 +1030
+Received: from dave by dastard with local (Exim 4.80)
+        (envelope-from <david@fromorbit.com>)
+        id 1gyjbq-0006v4-Kr; Wed, 27 Feb 2019 07:45:50 +1100
+Date:   Wed, 27 Feb 2019 07:45:50 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Aaron Lu <aaron.lu@intel.com>,
+        Christopher Lameter <cl@linux.com>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] xfs: allocate sector sized IO buffer via page_frag_alloc
+Message-ID: <20190226204550.GK23020@dastard>
+References: <20190225040904.5557-1-ming.lei@redhat.com>
+ <20190225043648.GE23020@dastard>
+ <5ad2ef83-8b3a-0a15-d72e-72652b807aad@suse.cz>
+ <20190225202630.GG23020@dastard>
+ <20190226022249.GA17747@ming.t460p>
+ <20190226030214.GI23020@dastard>
+ <20190226032737.GA11592@bombadil.infradead.org>
+ <20190226045826.GJ23020@dastard>
+ <20190226093302.GA24879@ming.t460p>
 MIME-Version: 1.0
-In-Reply-To: <20190129094230.ezjzpfwf5xx47luu@rck.sh>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 189.250.127.169
-X-Source-L: No
-X-Exim-ID: 1gyiRn-0043ex-Cy
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.1.76]) [189.250.127.169]:33990
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 28
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190226093302.GA24879@ming.t460p>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 1/29/19 3:42 AM, Roland Kammerer wrote:
-> On Wed, Jan 23, 2019 at 12:45:01AM -0600, Gustavo A. R. Silva wrote:
->> In preparation to enabling -Wimplicit-fallthrough, mark switch cases
->> where we are expecting to fall through.
->>
->> Warning level 3 was used: -Wimplicit-fallthrough=3
->>
->> This patch is part of the ongoing efforts to enabling
->> -Wimplicit-fallthrough
->>
->> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
->> ---
->>  drivers/block/drbd/drbd_int.h      | 2 +-
->>  drivers/block/drbd/drbd_receiver.c | 4 ++--
->>  drivers/block/drbd/drbd_req.c      | 2 +-
->>  drivers/block/rsxx/core.c          | 1 +
->>  4 files changed, 5 insertions(+), 4 deletions(-)
->>
+On Tue, Feb 26, 2019 at 05:33:04PM +0800, Ming Lei wrote:
+> On Tue, Feb 26, 2019 at 03:58:26PM +1100, Dave Chinner wrote:
+> > On Mon, Feb 25, 2019 at 07:27:37PM -0800, Matthew Wilcox wrote:
+> > > On Tue, Feb 26, 2019 at 02:02:14PM +1100, Dave Chinner wrote:
+> > > > > Or what is the exact size of sub-page IO in xfs most of time? For
+> > > > 
+> > > > Determined by mkfs parameters. Any power of 2 between 512 bytes and
+> > > > 64kB needs to be supported. e.g:
+> > > > 
+> > > > # mkfs.xfs -s size=512 -b size=1k -i size=2k -n size=8k ....
+> > > > 
+> > > > will have metadata that is sector sized (512 bytes), filesystem
+> > > > block sized (1k), directory block sized (8k) and inode cluster sized
+> > > > (32k), and will use all of them in large quantities.
+> > > 
+> > > If XFS is going to use each of these in large quantities, then it doesn't
+> > > seem unreasonable for XFS to create a slab for each type of metadata?
+> > 
+> > 
+> > Well, that is the question, isn't it? How many other filesystems
+> > will want to make similar "don't use entire pages just for 4k of
+> > metadata" optimisations as 64k page size machines become more
+> > common? There are others that have the same "use slab for sector
+> > aligned IO" which will fall foul of the same problem that has been
+> > reported for XFS....
+> > 
+> > If nobody else cares/wants it, then it can be XFS only. But it's
+> > only fair we address the "will it be useful to others" question
+> > first.....
 > 
-> Hi Gustavo,
+> This kind of slab cache should have been global, just like interface of
+> kmalloc(size).
 > 
-> as also discussed with Lars in person, obviously OK for the DRBD part.
+> However, the alignment requirement depends on block device's block size,
+> then it becomes hard to implement as genera interface, for example:
 > 
-> Acked-by: Roland Kammerer <roland.kammerer@linbit.com>
+> 	block size: 512, 1024, 2048, 4096
+> 	slab size: 512*N, 0 < N < PAGE_SIZE/512
 > 
+> For 4k page size, 28(7*4) slabs need to be created, and 64k page size
+> needs to create 127*4 slabs.
 
-Thank you, Roland.
+IDGI. Where's the 7/127 come from?
 
-Friendly ping:
+We only require sector alignment at most, so as long as each slab
+object is aligned to it's size, we only need one slab for each block
+size.
 
-Who can take this, please?
+Cheers,
 
-Thanks
---
-Gustavo
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
