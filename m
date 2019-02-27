@@ -2,104 +2,93 @@ Return-Path: <SRS0=Mgfj=RC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11AC6C43381
-	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 13:24:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B0A4C43381
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 13:25:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D14F220661
-	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 13:24:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E8D52133D
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 13:25:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="H5mxhftu"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="2NIQEUZA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729951AbfB0NYy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Feb 2019 08:24:54 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:49334 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726062AbfB0NYy (ORCPT
+        id S1730224AbfB0NZd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Feb 2019 08:25:33 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:38806 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726062AbfB0NZd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Feb 2019 08:24:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=XFwL8TY/dcfGWNKemGskjZiFKsKtQ8ufREkdlBJDHQg=; b=H5mxhftuDuEEx0yPZqoxnYV5F
-        /w07jIjgekwvXwQ5gjo/A21wsEX7mPyWt5Pnsd73AFk9x1UlyHDfhOjduIXaiAXeUrrYHJh5BChfb
-        SRuc9mX0/elvvzNeyKCPUOmcV4AzsO1WjhEOUUHgUrEvRt/pYhJm348qB45CksrTBtFfHB5jtZRwb
-        Ev8p8MGEJJsXWpJgGZdbBJODY80B44p1haGi0tZFVL2qBcDLwE4eORhvNiybIsJPCgCqcMu3FNcoE
-        nxeYg+bdNn0Z+o2AfjPrpki+yO9oy9x9A9vW4d0/SLQFw6uU8SZuFQ2z2XC/x0j+2G1CGL4XZ8BSq
-        FdfdGDjEQ==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1gyzCd-0005Ta-IB; Wed, 27 Feb 2019 13:24:51 +0000
-Date:   Wed, 27 Feb 2019 05:24:51 -0800
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Keith Busch <keith.busch@intel.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Ric Wheeler <ricwheeler@gmail.com>,
-        Dave Chinner <david@fromorbit.com>,
-        lsf-pc@lists.linux-foundation.org,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-ext4 <linux-ext4@vger.kernel.org>,
-        linux-btrfs <linux-btrfs@vger.kernel.org>,
-        linux-block@vger.kernel.org
-Subject: Re: [LSF/MM TOPIC] More async operations for file systems - async
- discard?
-Message-ID: <20190227132451.GL11592@bombadil.infradead.org>
-References: <92ab41f7-35bc-0f56-056f-ed88526b8ea4@gmail.com>
- <20190217210948.GB14116@dastard>
- <46540876-c222-0889-ddce-44815dcaad04@gmail.com>
- <20190220234723.GA5999@localhost.localdomain>
- <yq18sy8ili7.fsf@oracle.com>
- <20190222164504.GB10066@localhost.localdomain>
+        Wed, 27 Feb 2019 08:25:33 -0500
+Received: by mail-pf1-f194.google.com with SMTP id n125so8026100pfn.5
+        for <linux-block@vger.kernel.org>; Wed, 27 Feb 2019 05:25:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=P1F25RJCzJgtPj8lMxuO8h150lg2Ucqwwd8JGMXQ2wY=;
+        b=2NIQEUZAGN3Tch9bBL2HFCL6js+OzyW6oCP3TdkmTCNWZQp6SN9nmnAxazzzqK/AC8
+         XP+Ub3YFVx7JBe1G5Ba8ZLO+cV4fisF2FzENMh+UpNpwPr2/FB+fx5kK2fe3vhjd3ets
+         XsBH7bUtrJr9Eu/DApv/egH49tneyICvgP3Lqfpv+qCeGwFrDihgGxVZ32HlYDHEYmDX
+         n/zXdr9V+h1ziGx9FgvaBDSENK3X7JtLaIOk9k097zYKwCE15+aEZWmfd8fQFXoqrDcb
+         6pOWMnJiJGNYp2s6Dnd2UnguElSUqlOaCY8uZYG6qIA/5VzXOVGQAlTX+Ju8QUXiML2V
+         Scew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=P1F25RJCzJgtPj8lMxuO8h150lg2Ucqwwd8JGMXQ2wY=;
+        b=FJKpbFEflpasZb6IDlM9cWGTGGF7TLFvajeQ8KpY+MAOQ5hfdVua/6YaNnyuJaxQvL
+         whtpPCXClxmIv1Lniler4jTY9jFQU1hLDm0SN+iei2EqF/OZHRggtzOQKp6+TLr5XsuH
+         yLwHJ91z8efNF5cbbApWTfbMKXwZggAwOhkTaR1vQHKlxZnsa8TYGb4aW8B30bfrYz4J
+         wHHDsZzyqaPEBTO796Vn9Y0i8t4j94w6lW8c1T/1tDZhu6+9Q1nFL7uAPKhsOz/74d6f
+         YU9LAJEQAQUYMdMhukPzXck+1qf5Vdhr5mtbd03jqpInbIl2KYMCIo1EPpMJlNKBTX78
+         6WeA==
+X-Gm-Message-State: AHQUAuYxAp61+ZTcuYVpAUXB6O0N8xKFsRqIctxGFAjzP/l5BwwOJ377
+        3Ct2oOMOIDjbZvwyAvBjskYP6btpZuj1Cw==
+X-Google-Smtp-Source: AHgI3IZZ16mmatlXzkXU8oMZ2w8xTbGwyyOhIxI7sV2VkMIP9WMyfq/tZafuUuEpemH2up4fpix9JQ==
+X-Received: by 2002:a63:e447:: with SMTP id i7mr2971102pgk.70.1551273932621;
+        Wed, 27 Feb 2019 05:25:32 -0800 (PST)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id g67sm43540850pfg.13.2019.02.27.05.25.31
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 27 Feb 2019 05:25:31 -0800 (PST)
+Subject: Re: [PATCH 0/4] block: optimize for single-page bvec workloads
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org
+References: <20190227124013.4828-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <922211dc-2a0d-d030-b072-7bd3e7f6fdcf@kernel.dk>
+Date:   Wed, 27 Feb 2019 06:25:30 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190222164504.GB10066@localhost.localdomain>
-User-Agent: Mutt/1.9.2 (2017-12-15)
+In-Reply-To: <20190227124013.4828-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Feb 22, 2019 at 09:45:05AM -0700, Keith Busch wrote:
-> On Thu, Feb 21, 2019 at 09:51:12PM -0500, Martin K. Petersen wrote:
-> > 
-> > Keith,
-> > 
-> > > With respect to fs block sizes, one thing making discards suck is that
-> > > many high capacity SSDs' physical page sizes are larger than the fs
-> > > block size, and a sub-page discard is worse than doing nothing.
-> > 
-> > That ties into the whole zeroing as a side-effect thing.
-> > 
-> > The devices really need to distinguish between discard-as-a-hint where
-> > it is free to ignore anything that's not a whole multiple of whatever
-> > the internal granularity is, and the WRITE ZEROES use case where the end
-> > result needs to be deterministic.
+On 2/27/19 5:40 AM, Ming Lei wrote:
+> Hi,
 > 
-> Exactly, yes, considering the deterministic zeroing behavior. For devices
-> supporting that, sub-page discards turn into a read-modify-write instead
-> of invalidating the page.  That increases WAF instead of improving it
-> as intended, and large page SSDs are most likely to have relatively poor
-> write endurance in the first place.
+> The 1st patch introduce bvec_nth_page(), so that nth_page() can
+> be avoided if the bvec is single-page.
 > 
-> We have NVMe spec changes in the pipeline so devices can report this
-> granularity. But my real concern isn't with discard per se, but more
-> with the writes since we don't support "sector" sizes greater than the
-> system's page size. This is a bit of a different topic from where this
-> thread started, though.
+> The 2nd and 3rd patch adds fast path for single-page bvec case.
+> 
+> The last patch introduces a light-weight helper for iterating over
+> pages, which may improve __bio_iov_bvec_add_pages(). This patch
+> is for io_uring.
 
-I don't understand how reporting a larger discard granularity helps.
-Sure, if the file was written block-by-block in that large granularity
-to begin with, then the drive can invalidate an entire page.  But if
-even one page of that, say, 256kB block was rewritten, then discarding
-the 256kB block will need to discard 252kB from one erase block and 4kB
-from another erase block.
+This reclaims another 2%, we're now at 1585K for the test case.
+Definite improvement!
 
-So it looks like you really just want to report a larger "optimal IO
-size", which I thought we already had.
+-- 
+Jens Axboe
+
