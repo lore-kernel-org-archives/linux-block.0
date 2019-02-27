@@ -2,107 +2,147 @@ Return-Path: <SRS0=Mgfj=RC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D44EFC43381
-	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 17:18:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CB06C43381
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 17:39:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5F1A21850
-	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 17:18:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F9602186A
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 17:39:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1551289162;
+	bh=GlTJOFxQGa7YiUdEzm38xwKfhO/EuKwLFpIb0JOFknk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=eBKOPQFpddzKsRyOUGAJeFHO/MV190tHilv3QMri52KwjxBO2HU9IYdo7Ih9SkVxM
+	 3+/CxQZRKyihzwW+9nnvSrI7KOvH+SnWrz1qZd7bon3r9vG2/0S14DuV9QJZqPg7YV
+	 9fcpN7vZznLMaZAgaaZHqMdtAFhs+6u70H0oCvOc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729291AbfB0RSd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Feb 2019 12:18:33 -0500
-Received: from mga17.intel.com ([192.55.52.151]:13465 "EHLO mga17.intel.com"
+        id S1726419AbfB0RjV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Feb 2019 12:39:21 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38528 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726223AbfB0RSd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Feb 2019 12:18:33 -0500
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Feb 2019 09:18:32 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.58,420,1544515200"; 
-   d="scan'208";a="129819680"
-Received: from gklab-107-059.igk.intel.com ([10.102.107.59])
-  by orsmga003.jf.intel.com with ESMTP; 27 Feb 2019 09:18:31 -0800
-From:   Igor Konopko <igor.j.konopko@intel.com>
-To:     mb@lightnvm.io, javier@javigon.com, hans.holmberg@cnexlabs.com
-Cc:     linux-block@vger.kernel.org, igor.j.konopko@intel.com
-Subject: [PATCH 13/13] lightnvm: Inherit mdts from the parent nvme device
-Date:   Wed, 27 Feb 2019 18:14:42 +0100
-Message-Id: <20190227171442.11853-14-igor.j.konopko@intel.com>
-X-Mailer: git-send-email 2.9.5
-In-Reply-To: <20190227171442.11853-1-igor.j.konopko@intel.com>
-References: <20190227171442.11853-1-igor.j.konopko@intel.com>
+        id S1726356AbfB0RjV (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Feb 2019 12:39:21 -0500
+Received: from localhost (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D518120C01;
+        Wed, 27 Feb 2019 17:39:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1551289160;
+        bh=GlTJOFxQGa7YiUdEzm38xwKfhO/EuKwLFpIb0JOFknk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=tybfHo6jvqezAzrLaQnG/t+L6Y2q/sxS67STDm1g4pBt+l1hGYmYlMJwgJFs2qpjs
+         diU9YX3dqhEfE0JmU3ms1bQp+PdlNDfZNul98l10oWCEW9d7+AKpfh9zEukxrCOcog
+         UoH+L+Tra/6XyqDZUKkDa9bP23ZRTeyKBdacs+IE=
+Date:   Wed, 27 Feb 2019 12:39:18 -0500
+From:   Sasha Levin <sashal@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        NeilBrown <neilb@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 4.20 49/77] block: cover another queue enter
+ recursion via BIO_QUEUE_ENTERED
+Message-ID: <20190227173918.GL10616@sasha-vm>
+References: <20190215020855.176727-1-sashal@kernel.org>
+ <20190215020855.176727-49-sashal@kernel.org>
+ <20190215022807.GC21045@ming.t460p>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20190215022807.GC21045@ming.t460p>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Current lightnvm and pblk implementation does not care
-about NVMe max data transfer size, which can be smaller
-than 64*K=256K. This patch fixes issues related to that.
+On Fri, Feb 15, 2019 at 10:28:08AM +0800, Ming Lei wrote:
+>On Thu, Feb 14, 2019 at 09:08:27PM -0500, Sasha Levin wrote:
+>> From: Ming Lei <ming.lei@redhat.com>
+>>
+>> [ Upstream commit 698cef173983b086977e633e46476e0f925ca01e ]
+>>
+>> Except for blk_queue_split(), bio_split() is used for splitting bio too,
+>> then the remained bio is often resubmit to queue via generic_make_request().
+>> So the same queue enter recursion exits in this case too. Unfortunatley
+>> commit cd4a4ae4683dc2 doesn't help this case.
+>>
+>> This patch covers the above case by setting BIO_QUEUE_ENTERED before calling
+>> q->make_request_fn.
+>>
+>> In theory the per-bio flag is used to simulate one stack variable, it is
+>> just fine to clear it after q->make_request_fn is returned. Especially
+>> the same bio can't be submitted from another context.
+>>
+>> Fixes: cd4a4ae4683dc2 ("block: don't use blocking queue entered for recursive bio submits")
+>> Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+>> Cc: NeilBrown <neilb@suse.com>
+>> Reviewed-by:  Mike Snitzer <snitzer@redhat.com>
+>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> Signed-off-by: Sasha Levin <sashal@kernel.org>
+>> ---
+>>  block/blk-core.c  | 11 +++++++++++
+>>  block/blk-merge.c | 10 ----------
+>>  2 files changed, 11 insertions(+), 10 deletions(-)
+>>
+>> diff --git a/block/blk-core.c b/block/blk-core.c
+>> index deb56932f8c4..22260339f66f 100644
+>> --- a/block/blk-core.c
+>> +++ b/block/blk-core.c
+>> @@ -2449,7 +2449,18 @@ blk_qc_t generic_make_request(struct bio *bio)
+>>  			/* Create a fresh bio_list for all subordinate requests */
+>>  			bio_list_on_stack[1] = bio_list_on_stack[0];
+>>  			bio_list_init(&bio_list_on_stack[0]);
+>> +
+>> +			/*
+>> +			 * Since we're recursing into make_request here, ensure
+>> +			 * that we mark this bio as already having entered the queue.
+>> +			 * If not, and the queue is going away, we can get stuck
+>> +			 * forever on waiting for the queue reference to drop. But
+>> +			 * that will never happen, as we're already holding a
+>> +			 * reference to it.
+>> +			 */
+>> +			bio_set_flag(bio, BIO_QUEUE_ENTERED);
+>>  			ret = q->make_request_fn(q, bio);
+>> +			bio_clear_flag(bio, BIO_QUEUE_ENTERED);
+>>
+>>  			/* sort new bios into those for a lower level
+>>  			 * and those for the same level
+>> diff --git a/block/blk-merge.c b/block/blk-merge.c
+>> index 7695034f4b87..adfe835ab258 100644
+>> --- a/block/blk-merge.c
+>> +++ b/block/blk-merge.c
+>> @@ -272,16 +272,6 @@ void blk_queue_split(struct request_queue *q, struct bio **bio)
+>>  		/* there isn't chance to merge the splitted bio */
+>>  		split->bi_opf |= REQ_NOMERGE;
+>>
+>> -		/*
+>> -		 * Since we're recursing into make_request here, ensure
+>> -		 * that we mark this bio as already having entered the queue.
+>> -		 * If not, and the queue is going away, we can get stuck
+>> -		 * forever on waiting for the queue reference to drop. But
+>> -		 * that will never happen, as we're already holding a
+>> -		 * reference to it.
+>> -		 */
+>> -		bio_set_flag(*bio, BIO_QUEUE_ENTERED);
+>> -
+>>  		bio_chain(split, *bio);
+>>  		trace_block_split(q, split, (*bio)->bi_iter.bi_sector);
+>>  		generic_make_request(*bio);
+>> --
+>> 2.19.1
+>>
+>
+>This one should be dropped, given it has been reverted.
 
-Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
----
- drivers/lightnvm/core.c      | 9 +++++++--
- drivers/nvme/host/lightnvm.c | 1 +
- include/linux/lightnvm.h     | 1 +
- 3 files changed, 9 insertions(+), 2 deletions(-)
+Dropped, thank you.
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 5f82036fe322..c01f83b8fbaf 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -325,6 +325,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	struct nvm_target *t;
- 	struct nvm_tgt_dev *tgt_dev;
- 	void *targetdata;
-+	unsigned int mdts;
- 	int ret;
- 
- 	switch (create->conf.type) {
-@@ -412,8 +413,12 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
- 	tdisk->private_data = targetdata;
- 	tqueue->queuedata = targetdata;
- 
--	blk_queue_max_hw_sectors(tqueue,
--			(dev->geo.csecs >> 9) * NVM_MAX_VLBA);
-+	mdts = (dev->geo.csecs >> 9) * NVM_MAX_VLBA;
-+	if (dev->geo.mdts) {
-+		mdts = min_t(u32, dev->geo.mdts,
-+				(dev->geo.csecs >> 9) * NVM_MAX_VLBA);
-+	}
-+	blk_queue_max_hw_sectors(tqueue, mdts);
- 
- 	set_capacity(tdisk, tt->capacity(targetdata));
- 	add_disk(tdisk);
-diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-index b759c25c89c8..b88a39a3cbd1 100644
---- a/drivers/nvme/host/lightnvm.c
-+++ b/drivers/nvme/host/lightnvm.c
-@@ -991,6 +991,7 @@ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
- 	geo->csecs = 1 << ns->lba_shift;
- 	geo->sos = ns->ms;
- 	geo->ext = ns->ext;
-+	geo->mdts = ns->ctrl->max_hw_sectors;
- 
- 	dev->q = q;
- 	memcpy(dev->name, disk_name, DISK_NAME_LEN);
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index 5d865a5d5cdc..d3b02708e5f0 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -358,6 +358,7 @@ struct nvm_geo {
- 	u16	csecs;		/* sector size */
- 	u16	sos;		/* out-of-band area size */
- 	bool	ext;		/* metadata in extended data buffer */
-+	u32	mdts;		/* Max data transfer size*/
- 
- 	/* device write constrains */
- 	u32	ws_min;		/* minimum write size */
--- 
-2.17.1
-
+--
+Thanks,
+Sasha
