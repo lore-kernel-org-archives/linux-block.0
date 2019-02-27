@@ -2,220 +2,123 @@ Return-Path: <SRS0=Mgfj=RC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 686EDC43381
-	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 01:49:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA7FCC43381
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 01:52:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A4FA218D3
-	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 01:49:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="LPcMPZGU"
+	by mail.kernel.org (Postfix) with ESMTP id 831B0218D3
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 01:52:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729466AbfB0BsA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Feb 2019 20:48:00 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:43602 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729335AbfB0BsA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Feb 2019 20:48:00 -0500
-Received: by mail-pg1-f194.google.com with SMTP id l11so7093923pgq.10
-        for <linux-block@vger.kernel.org>; Tue, 26 Feb 2019 17:47:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=FSAx091ASGY8RhzmkfGPC7dHYWraNkDZhkYsJIeLhGM=;
-        b=LPcMPZGUZJ30uU4c/t1qhgpPhO/kLgsxCkgy216LtEYl25siuHGDFBsVMJZP2vmz3i
-         bgnd4rhO4YU3p3mmGhZToBEXHOh5tUclgscriSQS7Y/Tm33euED1GdMHvZZ08q7MGRNv
-         LbgbfH5IaMWVM89zDhP7Zmjkxzolr2PXo5OBXpgzR7JaB44qWceaN5RNQ/swplXwUVON
-         WHqarAKQsLIlE8pQyqxl1quFFPWDUkgSGDFSJKsHPXbqiH3RNZM4P6HtsDePOeBXxfrk
-         gq0iL830YWfnW3KbuLudtVOsTpzeLr+R5UOrprQUs8BuA6fSN1ouPSLbWqLJkE56gJ5X
-         AfCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=FSAx091ASGY8RhzmkfGPC7dHYWraNkDZhkYsJIeLhGM=;
-        b=af2qoyxe2hFH+GeqSDEy7DRIw5raitLANufUyPaemewUDZC2aRZPTM3pPbpccGyLwD
-         6f32Nm3xcEPZSjWk6Jr38vWi+ama6HkI40DkV+cyvwf21s11mzc370ID+kOa/4zYQFkd
-         tybOpSh1T0nwlxdjB5Jb47QiotJclVJyvVZeihJitVNhjkBHc38j/g2NS4Pk8F9DOYl4
-         dhYIk+tppS9BDtAfuTJqZQJ+Jddv8LLu4jm0ldUfaeJnmjTHXpPZtSc03QJ7zNJ+e0TA
-         LZmowvvjXA05R2E3JjbENn0zkvjZV+iiVzvhK3VFVCL9A1V70UqGaFV5NZVIR+UxA+Y5
-         SfFw==
-X-Gm-Message-State: AHQUAub9GA181gPx1WRuAIcrEvK2RNYzlm7/4S6vqg38AETKDeJv67vY
-        XRdCEzNvMz46lijVrPpayZpH+A==
-X-Google-Smtp-Source: AHgI3IYU5HyjzMVNsS4F/dM+aeUjSVd6Kts5VfHiwwmS0p4+s/ea60TINlIuhUdLASRgZUVuTPfusg==
-X-Received: by 2002:a63:3d7:: with SMTP id 206mr483926pgd.350.1551232079082;
-        Tue, 26 Feb 2019 17:47:59 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id h11sm7807542pgq.57.2019.02.26.17.47.56
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Feb 2019 17:47:57 -0800 (PST)
-Subject: Re: [PATCH 11/19] block: implement bio helper to add iter bvec pages
- to bio
-To:     Ming Lei <tom.leiming@gmail.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>, Ming Lei <ming.lei@redhat.com>,
-        "open list:AIO" <linux-aio@kvack.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-api@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Jeff Moyer <jmoyer@redhat.com>, Avi Kivity <avi@scylladb.com>,
-        jannh@google.com, Al Viro <viro@zeniv.linux.org.uk>
-References: <20190211190049.7888-1-axboe@kernel.dk>
- <20190211190049.7888-13-axboe@kernel.dk> <20190220225856.GB28313@ming.t460p>
- <b143e8c3-33d5-5f09-c441-98b3bf326d81@kernel.dk>
- <20190226034613.GA676@sol.localdomain>
- <aa1184bb-b482-0637-21e4-1ddb0e7aea90@kernel.dk>
- <1652577e-787b-638e-625d-c200fb144a9d@kernel.dk>
- <CACVXFVNOFA8_p+hVvaCffWAQ7+dgn++0b4Wn3naJzyNZN=CoFg@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <09820845-07cb-5153-e1c5-59ed185db26f@kernel.dk>
-Date:   Tue, 26 Feb 2019 18:47:54 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        id S1729521AbfB0BvO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Feb 2019 20:51:14 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:54057 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729335AbfB0BvN (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Feb 2019 20:51:13 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 679512FFC30;
+        Wed, 27 Feb 2019 01:51:13 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 45E3D5D9D3;
+        Wed, 27 Feb 2019 01:51:00 +0000 (UTC)
+Date:   Wed, 27 Feb 2019 09:50:55 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     Matthew Wilcox <willy@infradead.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        linux-xfs@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Dave Chinner <dchinner@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Aaron Lu <aaron.lu@intel.com>,
+        Christopher Lameter <cl@linux.com>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-mm@kvack.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] xfs: allocate sector sized IO buffer via page_frag_alloc
+Message-ID: <20190227015054.GC16802@ming.t460p>
+References: <20190225040904.5557-1-ming.lei@redhat.com>
+ <20190225043648.GE23020@dastard>
+ <5ad2ef83-8b3a-0a15-d72e-72652b807aad@suse.cz>
+ <20190225202630.GG23020@dastard>
+ <20190226022249.GA17747@ming.t460p>
+ <20190226030214.GI23020@dastard>
+ <20190226032737.GA11592@bombadil.infradead.org>
+ <20190226045826.GJ23020@dastard>
+ <20190226093302.GA24879@ming.t460p>
+ <20190226204550.GK23020@dastard>
 MIME-Version: 1.0
-In-Reply-To: <CACVXFVNOFA8_p+hVvaCffWAQ7+dgn++0b4Wn3naJzyNZN=CoFg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190226204550.GK23020@dastard>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.29]); Wed, 27 Feb 2019 01:51:13 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/26/19 6:21 PM, Ming Lei wrote:
-> On Tue, Feb 26, 2019 at 11:56 PM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 2/25/19 9:34 PM, Jens Axboe wrote:
->>> On 2/25/19 8:46 PM, Eric Biggers wrote:
->>>> Hi Jens,
->>>>
->>>> On Thu, Feb 21, 2019 at 10:45:27AM -0700, Jens Axboe wrote:
->>>>> On 2/20/19 3:58 PM, Ming Lei wrote:
->>>>>> On Mon, Feb 11, 2019 at 12:00:41PM -0700, Jens Axboe wrote:
->>>>>>> For an ITER_BVEC, we can just iterate the iov and add the pages
->>>>>>> to the bio directly. This requires that the caller doesn't releases
->>>>>>> the pages on IO completion, we add a BIO_NO_PAGE_REF flag for that.
->>>>>>>
->>>>>>> The current two callers of bio_iov_iter_get_pages() are updated to
->>>>>>> check if they need to release pages on completion. This makes them
->>>>>>> work with bvecs that contain kernel mapped pages already.
->>>>>>>
->>>>>>> Reviewed-by: Hannes Reinecke <hare@suse.com>
->>>>>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
->>>>>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->>>>>>> ---
->>>>>>>  block/bio.c               | 59 ++++++++++++++++++++++++++++++++-------
->>>>>>>  fs/block_dev.c            |  5 ++--
->>>>>>>  fs/iomap.c                |  5 ++--
->>>>>>>  include/linux/blk_types.h |  1 +
->>>>>>>  4 files changed, 56 insertions(+), 14 deletions(-)
->>>>>>>
->>>>>>> diff --git a/block/bio.c b/block/bio.c
->>>>>>> index 4db1008309ed..330df572cfb8 100644
->>>>>>> --- a/block/bio.c
->>>>>>> +++ b/block/bio.c
->>>>>>> @@ -828,6 +828,23 @@ int bio_add_page(struct bio *bio, struct page *page,
->>>>>>>  }
->>>>>>>  EXPORT_SYMBOL(bio_add_page);
->>>>>>>
->>>>>>> +static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
->>>>>>> +{
->>>>>>> + const struct bio_vec *bv = iter->bvec;
->>>>>>> + unsigned int len;
->>>>>>> + size_t size;
->>>>>>> +
->>>>>>> + len = min_t(size_t, bv->bv_len, iter->count);
->>>>>>> + size = bio_add_page(bio, bv->bv_page, len,
->>>>>>> +                         bv->bv_offset + iter->iov_offset);
->>>>>>
->>>>>> iter->iov_offset needs to be subtracted from 'len', looks
->>>>>> the following delta change[1] is required, otherwise memory corruption
->>>>>> can be observed when running xfstests over loop/dio.
->>>>>
->>>>> Thanks, I folded this in.
->>>>>
->>>>> --
->>>>> Jens Axboe
->>>>>
->>>>
->>>> syzkaller started hitting a crash on linux-next starting with this commit, and
->>>> it still occurs even with your latest version that has Ming's fix folded in.
->>>> Specifically, commit a566653ab5ab80a from your io_uring branch with commit date
->>>> Sun Feb 24 08:20:53 2019 -0700.
->>>>
->>>> Reproducer:
->>>>
->>>> #define _GNU_SOURCE
->>>> #include <fcntl.h>
->>>> #include <linux/loop.h>
->>>> #include <sys/ioctl.h>
->>>> #include <sys/sendfile.h>
->>>> #include <sys/syscall.h>
->>>> #include <unistd.h>
->>>>
->>>> int main(void)
->>>> {
->>>>         int memfd, loopfd;
->>>>
->>>>         memfd = syscall(__NR_memfd_create, "foo", 0);
->>>>
->>>>         pwrite(memfd, "\xa8", 1, 4096);
->>>>
->>>>         loopfd = open("/dev/loop0", O_RDWR|O_DIRECT);
->>>>
->>>>         ioctl(loopfd, LOOP_SET_FD, memfd);
->>>>
->>>>         sendfile(loopfd, loopfd, NULL, 1000000);
->>>> }
->>>>
->>>>
->>>> Crash:
->>>>
->>>> page:ffffea0001a6aab8 count:0 mapcount:0 mapping:0000000000000000 index:0x0
->>>> flags: 0x100000000000000()
->>>> raw: 0100000000000000 ffffea0001ad2c50 ffff88807fca49d0 0000000000000000
->>>> raw: 0000000000000000 0000000000000000 00000000ffffffff
->>>> page dumped because: VM_BUG_ON_PAGE(page_ref_count(page) == 0)
->>>
->>> I see what this is, I'll cut a fix for this tomorrow.
->>
->> Folded in a fix for this, it's in my current io_uring branch and my for-next
->> branch.
+On Wed, Feb 27, 2019 at 07:45:50AM +1100, Dave Chinner wrote:
+> On Tue, Feb 26, 2019 at 05:33:04PM +0800, Ming Lei wrote:
+> > On Tue, Feb 26, 2019 at 03:58:26PM +1100, Dave Chinner wrote:
+> > > On Mon, Feb 25, 2019 at 07:27:37PM -0800, Matthew Wilcox wrote:
+> > > > On Tue, Feb 26, 2019 at 02:02:14PM +1100, Dave Chinner wrote:
+> > > > > > Or what is the exact size of sub-page IO in xfs most of time? For
+> > > > > 
+> > > > > Determined by mkfs parameters. Any power of 2 between 512 bytes and
+> > > > > 64kB needs to be supported. e.g:
+> > > > > 
+> > > > > # mkfs.xfs -s size=512 -b size=1k -i size=2k -n size=8k ....
+> > > > > 
+> > > > > will have metadata that is sector sized (512 bytes), filesystem
+> > > > > block sized (1k), directory block sized (8k) and inode cluster sized
+> > > > > (32k), and will use all of them in large quantities.
+> > > > 
+> > > > If XFS is going to use each of these in large quantities, then it doesn't
+> > > > seem unreasonable for XFS to create a slab for each type of metadata?
+> > > 
+> > > 
+> > > Well, that is the question, isn't it? How many other filesystems
+> > > will want to make similar "don't use entire pages just for 4k of
+> > > metadata" optimisations as 64k page size machines become more
+> > > common? There are others that have the same "use slab for sector
+> > > aligned IO" which will fall foul of the same problem that has been
+> > > reported for XFS....
+> > > 
+> > > If nobody else cares/wants it, then it can be XFS only. But it's
+> > > only fair we address the "will it be useful to others" question
+> > > first.....
+> > 
+> > This kind of slab cache should have been global, just like interface of
+> > kmalloc(size).
+> > 
+> > However, the alignment requirement depends on block device's block size,
+> > then it becomes hard to implement as genera interface, for example:
+> > 
+> > 	block size: 512, 1024, 2048, 4096
+> > 	slab size: 512*N, 0 < N < PAGE_SIZE/512
+> > 
+> > For 4k page size, 28(7*4) slabs need to be created, and 64k page size
+> > needs to create 127*4 slabs.
 > 
-> Hi Jens,
+> IDGI. Where's the 7/127 come from?
 > 
-> I saw the following change is added:
-> 
-> + if (size == len) {
-> + /*
-> + * For the normal O_DIRECT case, we could skip grabbing this
-> + * reference and then not have to put them again when IO
-> + * completes. But this breaks some in-kernel users, like
-> + * splicing to/from a loop device, where we release the pipe
-> + * pages unconditionally. If we can fix that case, we can
-> + * get rid of the get here and the need to call
-> + * bio_release_pages() at IO completion time.
-> + */
-> + get_page(bv->bv_page);
-> 
-> Now the 'bv' may point to more than one page, so the following one may be
-> needed:
-> 
-> int i;
-> struct bvec_iter_all iter_all;
-> struct bio_vec *tmp;
-> 
-> mp_bvec_for_each_segment(tmp, bv, i, iter_all)
->       get_page(tmp->bv_page);
+> We only require sector alignment at most, so as long as each slab
+> object is aligned to it's size, we only need one slab for each block
+> size.
 
-I guess that would be the safest, even if we don't currently have more
-than one page in there. I'll fix it up.
+Each slab has fixed size, I remembered that you mentioned that the meta
+data size can be 512 * N (1 <= N <= PAGE_SIZE / 512).
 
--- 
-Jens Axboe
+https://marc.info/?l=linux-fsdevel&m=155115014513355&w=2
 
+
+Thanks, 
+Ming
