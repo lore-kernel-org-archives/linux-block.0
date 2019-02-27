@@ -2,143 +2,149 @@ Return-Path: <SRS0=Mgfj=RC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D9AC43381
-	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 13:32:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3DD6C43381
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 13:57:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8143D2133D
-	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 13:32:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0DFA20661
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 13:57:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="S8/7BKvs"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g9zFyTDb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730273AbfB0NcC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Feb 2019 08:32:02 -0500
-Received: from aserp2130.oracle.com ([141.146.126.79]:38720 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726122AbfB0NcC (ORCPT
+        id S1726866AbfB0N5n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Feb 2019 08:57:43 -0500
+Received: from mail-ua1-f67.google.com ([209.85.222.67]:46507 "EHLO
+        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730094AbfB0N5m (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Feb 2019 08:32:02 -0500
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1RDSq6H067801;
-        Wed, 27 Feb 2019 13:32:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2018-07-02;
- bh=jP1rCEWZttWuConnvNH2Dav4eb+rzhuEldM4Iax3isI=;
- b=S8/7BKvs00MG07uTa/yfH2A9KxWDULdUQVEVztWF1pGUJA6/qKyvavLzsXgHHK3HdXtZ
- M/6a/UdeRxEIwhuUnEGHawFbp+Rmh7EZeqUoz8+f4HXgIgn0JOZanD6ZhF2pJoqZk8Tf
- +bHeDZYZ1LUx0qU/uG9zI63QxUqX3CIQZKooJQvDuVtP3YodErNrWDNmzlSv1+c27+gn
- mfvaD3NAKd3LuZvvDVIap/m7bBMsJXO9xvwFxIaNeQoroNJ/JggpNhiFC5TGVxVgS6ol
- CtQV1ra9y/3u1vkZFZHUgQAmh29XMLUss3if7qdhQl4Igf1WMraR8C+tLHi1BeJjazWY ow== 
-Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
-        by aserp2130.oracle.com with ESMTP id 2qtupeb18x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 Feb 2019 13:31:59 +0000
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x1RDVwJw005468
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 Feb 2019 13:31:59 GMT
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x1RDVwoR024619;
-        Wed, 27 Feb 2019 13:31:58 GMT
-Received: from linux.cn.oracle.com (/10.182.69.106)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 27 Feb 2019 05:31:58 -0800
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-To:     linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, linux-kernel@vger.kernel.org
-Subject: [PATCH for-next 1/1] blk-mq: use HCTX_TYPE_DEFAULT but not 0 to index blk_mq_tag_set->map
-Date:   Wed, 27 Feb 2019 21:35:01 +0800
-Message-Id: <1551274501-8297-1-git-send-email-dongli.zhang@oracle.com>
-X-Mailer: git-send-email 2.7.4
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9179 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=917 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1902270091
+        Wed, 27 Feb 2019 08:57:42 -0500
+Received: by mail-ua1-f67.google.com with SMTP id j8so15335096uae.13
+        for <linux-block@vger.kernel.org>; Wed, 27 Feb 2019 05:57:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=nmnm2sTMMV4d6GqQo5/URt4/36qDlB5XGizo0sKThng=;
+        b=g9zFyTDbtK2hfdroDsh88PCfE46Qdp5FAA4gAjxLeYsl6s3WqTUdk0rO8ukcdkJvXw
+         rsJKMsQgm5gXc8gCzs4hj8CUpB+2wxcDxFcsPTfRyLpT9U/U71Ol1DTMDEYGRib+A0GE
+         y9c5f6i/fJK/XTJGAiQs93NxjzXaEFc8pj5yErs1FFYls6qUy6R32vZgJxSmwZCrhX96
+         aSCBvkYHiiiAXWWUofB8U95PcKfYLHnDt+BgB7DksGCKwwA+zdrUPHXyRv1oMaHWImnw
+         ACZ9jWAHhYiAYqOsFcTRRJFUAC86ZZmdapq5WClc9FOLFXHXFHa8ILhZ9K7SZVRq6jO7
+         ftig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nmnm2sTMMV4d6GqQo5/URt4/36qDlB5XGizo0sKThng=;
+        b=S+8N5sYQGExfw03wYSIbXLRQGTzxO5rt8P0ue2maV8BDvFBil4MEt7lqa1+iq1z3yZ
+         wtsKIZA2lUvFXtWGMvDDNym5K8ySrIQo6dY+rPl7TvY8UPmsd+aHiTmOywrN7eux8c6V
+         C1ProAPUhDDJDyYUGGHSxe1mx8xZVnpXn4HaYveUaPqzOUuL679COhtQwsyWSlzfewKZ
+         tyVNbh57PG12g0se2a9xFy7mi+DMB3/7XgpfcAHBCyZRMQxqqwfSyEEyD7LnZt0Z48bY
+         9CObtWh1WOmOJfG1Dk1VzHSDG1/gKd2X57ZjzcQYrhh4SCGvzIrem4IulEQt3mmPn8Sb
+         CEvA==
+X-Gm-Message-State: AHQUAuZm3Z2PDFtq1WO66eRkQO/SMh1mhsrMUy5U9Uq6l16wuisVPU2S
+        uYs674xKdf96hNcgI7RXjxapj6kzNYb5rpG2TY3iDw==
+X-Google-Smtp-Source: AHgI3IbToXLgiB4Du8EzWH6qE0/aUN5TcAOqNZ6PkSxOw5NPNgkFgGhNbc8VG078+q51X8q51737uX+KZPq1nuikpAU=
+X-Received: by 2002:a67:c902:: with SMTP id w2mr1781901vsk.191.1551275861028;
+ Wed, 27 Feb 2019 05:57:41 -0800 (PST)
+MIME-Version: 1.0
+References: <20190227130237.7725-1-ming.lei@redhat.com>
+In-Reply-To: <20190227130237.7725-1-ming.lei@redhat.com>
+From:   Ulf Hansson <ulf.hansson@linaro.org>
+Date:   Wed, 27 Feb 2019 14:57:04 +0100
+Message-ID: <CAPDyKFqMz3M8SzupEHP_k=r=r8wJ_dKYQRP=LMoRFUbq60E3Sg@mail.gmail.com>
+Subject: Re: [PATCH] mmc: align max segment size with logical block size
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Faiz Abbas <faiz_abbas@ti.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Replace set->map[0] with set->map[HCTX_TYPE_DEFAULT] to avoid hardcoding.
++ Christoph
 
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
----
- block/blk-mq.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+On Wed, 27 Feb 2019 at 14:02, Ming Lei <ming.lei@redhat.com> wrote:
+>
+> Logical block size is the lowest possible block size that the storage
+> device can address. Max segment size is often related with controller's
+> DMA capability. And it is reasonable to align max segment size with
+> logical block size.
+>
+> SDHCI sets un-aligned max segment size, and causes ADMA error, so
+> fix it by aligning max segment size with logical block size.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 54535f4..4e502db 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2069,7 +2069,7 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
- 	struct blk_mq_tags *tags;
- 	int node;
- 
--	node = blk_mq_hw_queue_to_node(&set->map[0], hctx_idx);
-+	node = blk_mq_hw_queue_to_node(&set->map[HCTX_TYPE_DEFAULT], hctx_idx);
- 	if (node == NUMA_NO_NODE)
- 		node = set->numa_node;
- 
-@@ -2125,7 +2125,7 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
- 	size_t rq_size, left;
- 	int node;
- 
--	node = blk_mq_hw_queue_to_node(&set->map[0], hctx_idx);
-+	node = blk_mq_hw_queue_to_node(&set->map[HCTX_TYPE_DEFAULT], hctx_idx);
- 	if (node == NUMA_NO_NODE)
- 		node = set->numa_node;
- 
-@@ -2424,7 +2424,7 @@ static void blk_mq_map_swqueue(struct request_queue *q)
- 	 * If the cpu isn't present, the cpu is mapped to first hctx.
- 	 */
- 	for_each_possible_cpu(i) {
--		hctx_idx = set->map[0].mq_map[i];
-+		hctx_idx = set->map[HCTX_TYPE_DEFAULT].mq_map[i];
- 		/* unmapped hw queue can be remapped after CPU topo changed */
- 		if (!set->tags[hctx_idx] &&
- 		    !__blk_mq_alloc_rq_map(set, hctx_idx)) {
-@@ -2434,7 +2434,7 @@ static void blk_mq_map_swqueue(struct request_queue *q)
- 			 * case, remap the current ctx to hctx[0] which
- 			 * is guaranteed to always have tags allocated
- 			 */
--			set->map[0].mq_map[i] = 0;
-+			set->map[HCTX_TYPE_DEFAULT].mq_map[i] = 0;
- 		}
- 
- 		ctx = per_cpu_ptr(q->queue_ctx, i);
-@@ -2741,7 +2741,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 		int node;
- 		struct blk_mq_hw_ctx *hctx;
- 
--		node = blk_mq_hw_queue_to_node(&set->map[0], i);
-+		node = blk_mq_hw_queue_to_node(&set->map[HCTX_TYPE_DEFAULT], i);
- 		/*
- 		 * If the hw queue has been mapped to another numa node,
- 		 * we need to realloc the hctx. If allocation fails, fallback
-@@ -2972,7 +2972,7 @@ static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
- 		return set->ops->map_queues(set);
- 	} else {
- 		BUG_ON(set->nr_maps > 1);
--		return blk_mq_map_queues(&set->map[0]);
-+		return blk_mq_map_queues(&set->map[HCTX_TYPE_DEFAULT]);
- 	}
- }
- 
-@@ -3242,7 +3242,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 			pr_warn("Increasing nr_hw_queues to %d fails, fallback to %d\n",
- 					nr_hw_queues, prev_nr_hw_queues);
- 			set->nr_hw_queues = prev_nr_hw_queues;
--			blk_mq_map_queues(&set->map[0]);
-+			blk_mq_map_queues(&set->map[HCTX_TYPE_DEFAULT]);
- 			goto fallback;
- 		}
- 		blk_mq_map_swqueue(q);
--- 
-2.7.4
+Seems reasonable. However, is this specific to MMC or should it be
+managed in block layer?
 
+>
+> Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+> Cc: Naresh Kamboju <naresh.kamboju@linaro.org>
+> Cc: Faiz Abbas <faiz_abbas@ti.com>
+> Cc: linux-block@vger.kernel.org
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  drivers/mmc/core/block.c | 6 ------
+>  drivers/mmc/core/queue.c | 9 ++++++++-
+>  2 files changed, 8 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+> index 14f3fdb8c6bb..9ce8eb51a60f 100644
+> --- a/drivers/mmc/core/block.c
+> +++ b/drivers/mmc/core/block.c
+> @@ -2380,12 +2380,6 @@ static struct mmc_blk_data *mmc_blk_alloc_req(struct mmc_card *card,
+>         snprintf(md->disk->disk_name, sizeof(md->disk->disk_name),
+>                  "mmcblk%u%s", card->host->index, subname ? subname : "");
+>
+> -       if (mmc_card_mmc(card))
+> -               blk_queue_logical_block_size(md->queue.queue,
+> -                                            card->ext_csd.data_sector_size);
+> -       else
+> -               blk_queue_logical_block_size(md->queue.queue, 512);
+> -
+>         set_capacity(md->disk, size);
+>
+>         if (mmc_host_cmd23(card->host)) {
+> diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+> index cc19e71c71d4..891bdbe14192 100644
+> --- a/drivers/mmc/core/queue.c
+> +++ b/drivers/mmc/core/queue.c
+> @@ -355,6 +355,7 @@ static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
+>  {
+>         struct mmc_host *host = card->host;
+>         u64 limit = BLK_BOUNCE_HIGH;
+> +       unsigned block_size = 512;
+>
+>         if (mmc_dev(host)->dma_mask && *mmc_dev(host)->dma_mask)
+>                 limit = (u64)dma_max_pfn(mmc_dev(host)) << PAGE_SHIFT;
+> @@ -368,7 +369,13 @@ static void mmc_setup_queue(struct mmc_queue *mq, struct mmc_card *card)
+>         blk_queue_max_hw_sectors(mq->queue,
+>                 min(host->max_blk_count, host->max_req_size / 512));
+>         blk_queue_max_segments(mq->queue, host->max_segs);
+> -       blk_queue_max_segment_size(mq->queue, host->max_seg_size);
+> +
+> +       if (mmc_card_mmc(card))
+> +               block_size = card->ext_csd.data_sector_size;
+> +
+> +       blk_queue_logical_block_size(mq->queue, block_size);
+> +       blk_queue_max_segment_size(mq->queue, host->max_seg_size &
+> +                       ~(block_size - 1));
+
+Can't we use round_down() instead? No?
+
+>
+>         INIT_WORK(&mq->recovery_work, mmc_mq_recovery_handler);
+>         INIT_WORK(&mq->complete_work, mmc_blk_mq_complete_work);
+> --
+> 2.9.5
+>
+
+Kind regards
+Uffe
