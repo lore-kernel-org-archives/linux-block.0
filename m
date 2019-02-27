@@ -2,230 +2,128 @@ Return-Path: <SRS0=Mgfj=RC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC24C43381
-	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 20:20:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49656C43381
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 20:47:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F353B213A2
-	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 20:20:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1714021850
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 20:47:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="M6munFcz"
+	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="X0dP0ili"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730186AbfB0UUS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Feb 2019 15:20:18 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:42126 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730136AbfB0UUS (ORCPT
+        id S1730136AbfB0UrY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Feb 2019 15:47:24 -0500
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:2174 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729291AbfB0UrY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Feb 2019 15:20:18 -0500
-Received: by mail-pf1-f193.google.com with SMTP id n74so8534720pfi.9
-        for <linux-block@vger.kernel.org>; Wed, 27 Feb 2019 12:20:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=gN840LcjsGueYPKzT8V5G3GCmhFsVue5RDrc94TYwF8=;
-        b=M6munFcz+irF6uSMpXEGyQ1FS0IZOhYwHpnKF6fTcirYKq9rMB44Q4W3ZQsVzEi1VO
-         /+TK3+7uHaLd9QuEu4R/YtL1uvdZ1aHS8Br8oUf7/7NKvojwoo2giADtdCGw9/8LSjD3
-         7VfN8nk1usadNipAn/CEeT8A/DBsFijk9nsTKo8HkfmJcIjGx8U3te0EWlEU7ZmRnYZR
-         vQ6zOj0TxZo37RCmEWz8L2933/wSayrUu8duQY84hkO0gcw2/rTjo6cSuOuIFVBvgGsV
-         r0PGz7vJ+jC71o8F1i2mHcOD9W3nQDzDNEeJETjEjmIE8crdwoJGwaHJ20MqOBQlJjI7
-         lM4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=gN840LcjsGueYPKzT8V5G3GCmhFsVue5RDrc94TYwF8=;
-        b=ivilkhzarO5grEhC5vDDbHYz6OnR57kUATZ4Ql0oviohtgENE3caQ7bAlGpYZNM3mi
-         6JIUl8HQmiopX2e9/Z8GUkdjbWwh3V6ZBZdqUGO2Y5xMQlSWD5eCA+TyVt2wnYvH/e9m
-         Nm0xdztN7/3U+98cap9CV+DiYKHaBrWaL9jzstxbHdS97Hhc9KJs3fbVqx3hq9ihIjyz
-         GEKjEACfUnALlpp9Nev1Qksbf5LrivPWtA/3VgfOs5RJbyST9jhXwOx5KZK8ghckcpyS
-         rf6Gg5zKe69hwzbTlvPaBZMQlsZ+fITdmHoPlR7E+WsMVnNydVvGW1GZ09Zx6LWOvkyV
-         DqmA==
-X-Gm-Message-State: AHQUAuazqEg4PNIN/1i+J28Ur5xTvQDjy1oYADFmFaEdOr/fvXlBkRAc
-        eDp3wTFSuvys9NZkYCZjsfCDzw==
-X-Google-Smtp-Source: AHgI3IazxjycYKNie2+E3IE5nKnv6fE3RWvn4cQ+ltomW4wsUE8r91kaZVvAlYnzLw/fFz9nbG3dXw==
-X-Received: by 2002:a63:f07:: with SMTP id e7mr4753621pgl.173.1551298816799;
-        Wed, 27 Feb 2019 12:20:16 -0800 (PST)
-Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id d23sm22945959pfn.180.2019.02.27.12.20.13
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 27 Feb 2019 12:20:15 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     hch@lst.de, viro@ZenIV.linux.org.uk, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/2] block: add BIO_NO_PAGE_REF flag
-Date:   Wed, 27 Feb 2019 13:20:06 -0700
-Message-Id: <20190227202006.18844-3-axboe@kernel.dk>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190227202006.18844-1-axboe@kernel.dk>
-References: <20190227202006.18844-1-axboe@kernel.dk>
+        Wed, 27 Feb 2019 15:47:24 -0500
+Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
+        id <B5c76f7630000>; Wed, 27 Feb 2019 12:47:31 -0800
+Received: from hqmail.nvidia.com ([172.20.161.6])
+  by hqpgpgate101.nvidia.com (PGP Universal service);
+  Wed, 27 Feb 2019 12:47:22 -0800
+X-PGP-Universal: processed;
+        by hqpgpgate101.nvidia.com on Wed, 27 Feb 2019 12:47:22 -0800
+Received: from [10.26.11.186] (10.124.1.5) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Wed, 27 Feb
+ 2019 20:47:12 +0000
+Subject: Re: [PATCH V15 14/18] block: enable multipage bvecs
+To:     Marek Szyprowski <m.szyprowski@samsung.com>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-mm@kvack.org>, Theodore Ts'o <tytso@mit.edu>,
+        Omar Sandoval <osandov@fb.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Dave Chinner <dchinner@redhat.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>, <dm-devel@redhat.com>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        <linux-fsdevel@vger.kernel.org>, <linux-raid@vger.kernel.org>,
+        David Sterba <dsterba@suse.com>, <linux-btrfs@vger.kernel.org>,
+        "Darrick J . Wong" <darrick.wong@oracle.com>,
+        <linux-xfs@vger.kernel.org>, Gao Xiang <gaoxiang25@huawei.com>,
+        Christoph Hellwig <hch@lst.de>, <linux-ext4@vger.kernel.org>,
+        Coly Li <colyli@suse.de>, <linux-bcache@vger.kernel.org>,
+        Boaz Harrosh <ooo@electrozaur.com>,
+        Bob Peterson <rpeterso@redhat.com>, <cluster-devel@redhat.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        'Linux Samsung SOC' <linux-samsung-soc@vger.kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        linux-tegra <linux-tegra@vger.kernel.org>
+References: <20190215111324.30129-1-ming.lei@redhat.com>
+ <20190215111324.30129-15-ming.lei@redhat.com>
+ <CGME20190221084301eucas1p11e8841a62b4b1da3cccca661b6f4c29d@eucas1p1.samsung.com>
+ <6c9ae4de-c56f-a2b3-2542-da7d8b95601d@samsung.com>
+From:   Jon Hunter <jonathanh@nvidia.com>
+Message-ID: <0dbbee64-5c6b-0374-4360-6dc218c70d58@nvidia.com>
+Date:   Wed, 27 Feb 2019 20:47:09 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <6c9ae4de-c56f-a2b3-2542-da7d8b95601d@samsung.com>
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL101.nvidia.com (172.20.187.10)
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+        t=1551300451; bh=fysy4W1JsLJNGtNiqBcR+gaIGLkCCRdCGseNbvSiG5A=;
+        h=X-PGP-Universal:Subject:To:CC:References:From:Message-ID:Date:
+         User-Agent:MIME-Version:In-Reply-To:X-Originating-IP:
+         X-ClientProxiedBy:Content-Type:Content-Language:
+         Content-Transfer-Encoding;
+        b=X0dP0iliVFercVqWdMyW/NR2Nhm0eLApUzdqUyISSWUx2H+DKhUu/OKtqWe2+3ZuT
+         au4eOklUFmE4Gr2obXchzT8IXOfMhcyX4FkEsLxzHW0xgKT/h6CV7784HRm5efp90O
+         La7tft6R64o+psxbqoi6GCRY4KpDinbyuM578z8ZIBlOABzOuvOkGz6q77lXYGVw0F
+         i4IUbygeJkCCpZ0U5/kCdyLBwxOPIqZvceHCPKG8aMbmcU8ubwJyoq9ClYgVHYmDHM
+         dxcWgdcM3oW54O+MFPY5/ZPt1Zh31nOGXIQBPU0L01WBNStNQbbLPLk/T1RrJziyxj
+         hseLr65aHTomg==
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If bio_iov_iter_get_pages() is called on an iov_iter that is flagged
-with NO_REF, then we don't need to add a page reference for the pages
-that we add.
 
-Add BIO_NO_PAGE_REF to track this in the bio, so IO completion knows
-not to drop a reference to these pages.
+On 21/02/2019 08:42, Marek Szyprowski wrote:
+> Dear All,
+> 
+> On 2019-02-15 12:13, Ming Lei wrote:
+>> This patch pulls the trigger for multi-page bvecs.
+>>
+>> Reviewed-by: Omar Sandoval <osandov@fb.com>
+>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> 
+> Since Linux next-20190218 I've observed problems with block layer on one
+> of my test devices (Odroid U3 with EXT4 rootfs on SD card). Bisecting
+> this issue led me to this change. This is also the first linux-next
+> release with this change merged. The issue is fully reproducible and can
+> be observed in the following kernel log:
+> 
+> sdhci: Secure Digital Host Controller Interface driver
+> sdhci: Copyright(c) Pierre Ossman
+> s3c-sdhci 12530000.sdhci: clock source 2: mmc_busclk.2 (100000000 Hz)
+> s3c-sdhci 12530000.sdhci: Got CD GPIO
+> mmc0: SDHCI controller on samsung-hsmmc [12530000.sdhci] using ADMA
+> mmc0: new high speed SDHC card at address aaaa
+> mmcblk0: mmc0:aaaa SL16G 14.8 GiB
+I have also noticed some failures when writing to an eMMC device on one
+of our Tegra boards. We have a simple eMMC write/read test and it is
+currently failing because the data written does not match the source.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/bio.c               | 43 ++++++++++++++++++++++-----------------
- fs/block_dev.c            | 12 ++++++-----
- fs/iomap.c                | 12 ++++++-----
- include/linux/blk_types.h |  1 +
- 4 files changed, 39 insertions(+), 29 deletions(-)
+I did not seem the same crash as reported here, however, in our case the
+rootfs is NFS mounted and so probably would not. However, the bisect
+points to this commit and reverting on top of -next fixes the issues.
 
-diff --git a/block/bio.c b/block/bio.c
-index 71a78d9fb8b7..b64cedc7f87c 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -849,20 +849,14 @@ static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
- 	size = bio_add_page(bio, bv->bv_page, len,
- 				bv->bv_offset + iter->iov_offset);
- 	if (size == len) {
--		struct page *page;
--		int i;
-+		if (!bio_flagged(bio, BIO_NO_PAGE_REF)) {
-+			struct page *page;
-+			int i;
-+
-+			mp_bvec_for_each_page(page, bv, i)
-+				get_page(page);
-+		}
- 
--		/*
--		 * For the normal O_DIRECT case, we could skip grabbing this
--		 * reference and then not have to put them again when IO
--		 * completes. But this breaks some in-kernel users, like
--		 * splicing to/from a loop device, where we release the pipe
--		 * pages unconditionally. If we can fix that case, we can
--		 * get rid of the get here and the need to call
--		 * bio_release_pages() at IO completion time.
--		 */
--		mp_bvec_for_each_page(page, bv, i)
--			get_page(page);
- 		iov_iter_advance(iter, size);
- 		return 0;
- 	}
-@@ -925,10 +919,12 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
-  * This takes either an iterator pointing to user memory, or one pointing to
-  * kernel pages (BVEC iterator). If we're adding user pages, we pin them and
-  * map them into the kernel. On IO completion, the caller should put those
-- * pages. For now, when adding kernel pages, we still grab a reference to the
-- * page. This isn't strictly needed for the common case, but some call paths
-- * end up releasing pages from eg a pipe and we can't easily control these.
-- * See comment in __bio_iov_bvec_add_pages().
-+ * pages. If we're adding kernel pages, and the caller told us it's safe to
-+ * do so, we just have to add the pages to the bio directly. We don't grab an
-+ * extra reference to those pages (the user should already have that), and we
-+ * don't put the page on IO completion. The caller needs to check if the bio is
-+ * flagged BIO_NO_PAGE_REF on IO completion. If it isn't, then pages should be
-+ * released.
-  *
-  * The function tries, but does not guarantee, to pin as many pages as
-  * fit into the bio, or are requested in *iter, whatever is smaller. If
-@@ -940,6 +936,13 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	const bool is_bvec = iov_iter_is_bvec(iter);
- 	unsigned short orig_vcnt = bio->bi_vcnt;
- 
-+	/*
-+	 * If this is a BVEC iter, then the pages are kernel pages. Don't
-+	 * release them on IO completion, if the caller asked us to.
-+	 */
-+	if (is_bvec && iov_iter_bvec_no_ref(iter))
-+		bio_set_flag(bio, BIO_NO_PAGE_REF);
-+
- 	do {
- 		int ret;
- 
-@@ -1696,7 +1699,8 @@ static void bio_dirty_fn(struct work_struct *work)
- 		next = bio->bi_private;
- 
- 		bio_set_pages_dirty(bio);
--		bio_release_pages(bio);
-+		if (!bio_flagged(bio, BIO_NO_PAGE_REF))
-+			bio_release_pages(bio);
- 		bio_put(bio);
- 	}
- }
-@@ -1713,7 +1717,8 @@ void bio_check_pages_dirty(struct bio *bio)
- 			goto defer;
- 	}
- 
--	bio_release_pages(bio);
-+	if (!bio_flagged(bio, BIO_NO_PAGE_REF))
-+		bio_release_pages(bio);
- 	bio_put(bio);
- 	return;
- defer:
-diff --git a/fs/block_dev.c b/fs/block_dev.c
-index e9faa52bb489..78d3257435c0 100644
---- a/fs/block_dev.c
-+++ b/fs/block_dev.c
-@@ -336,12 +336,14 @@ static void blkdev_bio_end_io(struct bio *bio)
- 	if (should_dirty) {
- 		bio_check_pages_dirty(bio);
- 	} else {
--		struct bio_vec *bvec;
--		int i;
--		struct bvec_iter_all iter_all;
-+		if (!bio_flagged(bio, BIO_NO_PAGE_REF)) {
-+			struct bvec_iter_all iter_all;
-+			struct bio_vec *bvec;
-+			int i;
- 
--		bio_for_each_segment_all(bvec, bio, i, iter_all)
--			put_page(bvec->bv_page);
-+			bio_for_each_segment_all(bvec, bio, i, iter_all)
-+				put_page(bvec->bv_page);
-+		}
- 		bio_put(bio);
- 	}
- }
-diff --git a/fs/iomap.c b/fs/iomap.c
-index 97cb9d486a7d..abdd18e404f8 100644
---- a/fs/iomap.c
-+++ b/fs/iomap.c
-@@ -1589,12 +1589,14 @@ static void iomap_dio_bio_end_io(struct bio *bio)
- 	if (should_dirty) {
- 		bio_check_pages_dirty(bio);
- 	} else {
--		struct bio_vec *bvec;
--		int i;
--		struct bvec_iter_all iter_all;
-+		if (!bio_flagged(bio, BIO_NO_PAGE_REF)) {
-+			struct bvec_iter_all iter_all;
-+			struct bio_vec *bvec;
-+			int i;
- 
--		bio_for_each_segment_all(bvec, bio, i, iter_all)
--			put_page(bvec->bv_page);
-+			bio_for_each_segment_all(bvec, bio, i, iter_all)
-+				put_page(bvec->bv_page);
-+		}
- 		bio_put(bio);
- 	}
- }
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index d66bf5f32610..791fee35df88 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -215,6 +215,7 @@ struct bio {
- /*
-  * bio flags
-  */
-+#define BIO_NO_PAGE_REF	0	/* don't put release vec pages */
- #define BIO_SEG_VALID	1	/* bi_phys_segments valid */
- #define BIO_CLONED	2	/* doesn't own data */
- #define BIO_BOUNCED	3	/* bio is a bounce bio */
+Cheers
+Jon
+
 -- 
-2.17.1
-
+nvpublic
