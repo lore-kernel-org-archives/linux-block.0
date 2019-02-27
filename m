@@ -2,63 +2,33 @@ Return-Path: <SRS0=Mgfj=RC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C83AC43381
-	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 02:30:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37DD1C43381
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 02:39:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C502F218D8
-	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 02:30:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="PK7YK6ce"
+	by mail.kernel.org (Postfix) with ESMTP id 0664B20643
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 02:39:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729287AbfB0C26 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Feb 2019 21:28:58 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:38176 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729276AbfB0C26 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Feb 2019 21:28:58 -0500
-Received: by mail-pg1-f196.google.com with SMTP id m2so7160831pgl.5
-        for <linux-block@vger.kernel.org>; Tue, 26 Feb 2019 18:28:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=JqGMRbjb8s+AubK9Hq8kL1nMnZxq0aim93K6Z0jRHpY=;
-        b=PK7YK6cetfh3ZxLNXNfP34YMmxSuyCpeH6njvyDLCA7/ShrNs/GHu+FDlUvAtaMFzj
-         iPFZqJtjs56OnCLZcj06AmtX4IxvUFBpoBZsac3d87/t1wJnapskAE13Y0qd+9L/5yMm
-         YXVYB1gRCABBGhEe+0gd5yrSHsBqYkzX1WiV8bzHqS/7aX0cY2MgZd8jZ4tOwV1xQoHF
-         Jb74lqx1/TqwQdasRBdqRln7ds6PePRD9kFpFzVTnjRLUI1OYGwE6owKAYU9JBkkw3UE
-         W7evImZgnMxravTpKB4jlRBOKFfYc9SNNuGasKP68mUNx3uA5nOsZ7L1s35wu0h9zkAm
-         shFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=JqGMRbjb8s+AubK9Hq8kL1nMnZxq0aim93K6Z0jRHpY=;
-        b=bhC3IuAIP4Fhitx9Sx19weRiNBOJFtn6PqOdfwlOgoAvvrjk1TjQUFqHB6PAc4tX+s
-         yRu8K9NqT2tLw2U9bH0IAvLlMtqWlFC8I0uG29b5Ra2V20danBpe+mq37sSY1T6N31zE
-         G5ROZDPXr0Qu2FQdAg4BDIo8Qf9i4BoDcH860kBh9Hg2Dfh+fPx8sgOUaxWKM+m8c6Nb
-         QEgXablldk7ZMs1CmbpnPEyZRxG1UbjMU1rwybGBHKNvdxW4g28O3DDpcct4NXHvwRkj
-         9y/bGVakz7vdYnPA3i5tgAfHlCe/mwlbZQX0B883MAiP1BDI6UIcR1KWoFj8hcke+k/9
-         BByQ==
-X-Gm-Message-State: AHQUAubRHilsrxoyTYN03uujdsYwct0Ca/W+tRlWrd5xnRefg/jMokul
-        uXcKPeJy1X7TIL+iz+Ku7y2xrA==
-X-Google-Smtp-Source: AHgI3IakprzUtcnEFMnZzyRAMKWd+/IXqQXyJrjfXXoHi+OyflcVAh/yHbWMJpr2jGfrGsdUqy323w==
-X-Received: by 2002:a65:6154:: with SMTP id o20mr622678pgv.205.1551234537332;
-        Tue, 26 Feb 2019 18:28:57 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id x1sm19324162pge.73.2019.02.26.18.28.55
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Feb 2019 18:28:56 -0800 (PST)
-Subject: Re: [PATCH 11/19] block: implement bio helper to add iter bvec pages
- to bio
-To:     Ming Lei <ming.lei@redhat.com>
+        id S1729384AbfB0Chi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Feb 2019 21:37:38 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:57622 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729276AbfB0Chh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Feb 2019 21:37:37 -0500
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 3674630BA2EB;
+        Wed, 27 Feb 2019 02:37:37 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id DB00D5DD6E;
+        Wed, 27 Feb 2019 02:37:26 +0000 (UTC)
+Date:   Wed, 27 Feb 2019 10:37:21 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Ming Lei <tom.leiming@gmail.com>,
         Eric Biggers <ebiggers@kernel.org>,
         "open list:AIO" <linux-aio@kvack.org>,
@@ -66,9 +36,10 @@ Cc:     Ming Lei <tom.leiming@gmail.com>,
         linux-api@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Jeff Moyer <jmoyer@redhat.com>, Avi Kivity <avi@scylladb.com>,
         jannh@google.com, Al Viro <viro@zeniv.linux.org.uk>
-References: <20190211190049.7888-13-axboe@kernel.dk>
- <20190220225856.GB28313@ming.t460p>
- <b143e8c3-33d5-5f09-c441-98b3bf326d81@kernel.dk>
+Subject: Re: [PATCH 11/19] block: implement bio helper to add iter bvec pages
+ to bio
+Message-ID: <20190227023719.GF16802@ming.t460p>
+References: <b143e8c3-33d5-5f09-c441-98b3bf326d81@kernel.dk>
  <20190226034613.GA676@sol.localdomain>
  <aa1184bb-b482-0637-21e4-1ddb0e7aea90@kernel.dk>
  <1652577e-787b-638e-625d-c200fb144a9d@kernel.dk>
@@ -77,192 +48,193 @@ References: <20190211190049.7888-13-axboe@kernel.dk>
  <20190227015336.GD16802@ming.t460p>
  <e4dace7b-6a6f-2606-9a7e-8ae3c97c26b0@kernel.dk>
  <20190227022144.GE16802@ming.t460p>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <b54683e8-fbff-01ab-db98-c35de8e00e9f@kernel.dk>
-Date:   Tue, 26 Feb 2019 19:28:54 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+ <b54683e8-fbff-01ab-db98-c35de8e00e9f@kernel.dk>
 MIME-Version: 1.0
-In-Reply-To: <20190227022144.GE16802@ming.t460p>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b54683e8-fbff-01ab-db98-c35de8e00e9f@kernel.dk>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Wed, 27 Feb 2019 02:37:37 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/26/19 7:21 PM, Ming Lei wrote:
-> On Tue, Feb 26, 2019 at 06:57:16PM -0700, Jens Axboe wrote:
->> On 2/26/19 6:53 PM, Ming Lei wrote:
->>> On Tue, Feb 26, 2019 at 06:47:54PM -0700, Jens Axboe wrote:
->>>> On 2/26/19 6:21 PM, Ming Lei wrote:
->>>>> On Tue, Feb 26, 2019 at 11:56 PM Jens Axboe <axboe@kernel.dk> wrote:
->>>>>>
->>>>>> On 2/25/19 9:34 PM, Jens Axboe wrote:
->>>>>>> On 2/25/19 8:46 PM, Eric Biggers wrote:
->>>>>>>> Hi Jens,
->>>>>>>>
->>>>>>>> On Thu, Feb 21, 2019 at 10:45:27AM -0700, Jens Axboe wrote:
->>>>>>>>> On 2/20/19 3:58 PM, Ming Lei wrote:
->>>>>>>>>> On Mon, Feb 11, 2019 at 12:00:41PM -0700, Jens Axboe wrote:
->>>>>>>>>>> For an ITER_BVEC, we can just iterate the iov and add the pages
->>>>>>>>>>> to the bio directly. This requires that the caller doesn't releases
->>>>>>>>>>> the pages on IO completion, we add a BIO_NO_PAGE_REF flag for that.
->>>>>>>>>>>
->>>>>>>>>>> The current two callers of bio_iov_iter_get_pages() are updated to
->>>>>>>>>>> check if they need to release pages on completion. This makes them
->>>>>>>>>>> work with bvecs that contain kernel mapped pages already.
->>>>>>>>>>>
->>>>>>>>>>> Reviewed-by: Hannes Reinecke <hare@suse.com>
->>>>>>>>>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
->>>>>>>>>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->>>>>>>>>>> ---
->>>>>>>>>>>  block/bio.c               | 59 ++++++++++++++++++++++++++++++++-------
->>>>>>>>>>>  fs/block_dev.c            |  5 ++--
->>>>>>>>>>>  fs/iomap.c                |  5 ++--
->>>>>>>>>>>  include/linux/blk_types.h |  1 +
->>>>>>>>>>>  4 files changed, 56 insertions(+), 14 deletions(-)
->>>>>>>>>>>
->>>>>>>>>>> diff --git a/block/bio.c b/block/bio.c
->>>>>>>>>>> index 4db1008309ed..330df572cfb8 100644
->>>>>>>>>>> --- a/block/bio.c
->>>>>>>>>>> +++ b/block/bio.c
->>>>>>>>>>> @@ -828,6 +828,23 @@ int bio_add_page(struct bio *bio, struct page *page,
->>>>>>>>>>>  }
->>>>>>>>>>>  EXPORT_SYMBOL(bio_add_page);
->>>>>>>>>>>
->>>>>>>>>>> +static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
->>>>>>>>>>> +{
->>>>>>>>>>> + const struct bio_vec *bv = iter->bvec;
->>>>>>>>>>> + unsigned int len;
->>>>>>>>>>> + size_t size;
->>>>>>>>>>> +
->>>>>>>>>>> + len = min_t(size_t, bv->bv_len, iter->count);
->>>>>>>>>>> + size = bio_add_page(bio, bv->bv_page, len,
->>>>>>>>>>> +                         bv->bv_offset + iter->iov_offset);
->>>>>>>>>>
->>>>>>>>>> iter->iov_offset needs to be subtracted from 'len', looks
->>>>>>>>>> the following delta change[1] is required, otherwise memory corruption
->>>>>>>>>> can be observed when running xfstests over loop/dio.
->>>>>>>>>
->>>>>>>>> Thanks, I folded this in.
->>>>>>>>>
->>>>>>>>> --
->>>>>>>>> Jens Axboe
->>>>>>>>>
->>>>>>>>
->>>>>>>> syzkaller started hitting a crash on linux-next starting with this commit, and
->>>>>>>> it still occurs even with your latest version that has Ming's fix folded in.
->>>>>>>> Specifically, commit a566653ab5ab80a from your io_uring branch with commit date
->>>>>>>> Sun Feb 24 08:20:53 2019 -0700.
->>>>>>>>
->>>>>>>> Reproducer:
->>>>>>>>
->>>>>>>> #define _GNU_SOURCE
->>>>>>>> #include <fcntl.h>
->>>>>>>> #include <linux/loop.h>
->>>>>>>> #include <sys/ioctl.h>
->>>>>>>> #include <sys/sendfile.h>
->>>>>>>> #include <sys/syscall.h>
->>>>>>>> #include <unistd.h>
->>>>>>>>
->>>>>>>> int main(void)
->>>>>>>> {
->>>>>>>>         int memfd, loopfd;
->>>>>>>>
->>>>>>>>         memfd = syscall(__NR_memfd_create, "foo", 0);
->>>>>>>>
->>>>>>>>         pwrite(memfd, "\xa8", 1, 4096);
->>>>>>>>
->>>>>>>>         loopfd = open("/dev/loop0", O_RDWR|O_DIRECT);
->>>>>>>>
->>>>>>>>         ioctl(loopfd, LOOP_SET_FD, memfd);
->>>>>>>>
->>>>>>>>         sendfile(loopfd, loopfd, NULL, 1000000);
->>>>>>>> }
->>>>>>>>
->>>>>>>>
->>>>>>>> Crash:
->>>>>>>>
->>>>>>>> page:ffffea0001a6aab8 count:0 mapcount:0 mapping:0000000000000000 index:0x0
->>>>>>>> flags: 0x100000000000000()
->>>>>>>> raw: 0100000000000000 ffffea0001ad2c50 ffff88807fca49d0 0000000000000000
->>>>>>>> raw: 0000000000000000 0000000000000000 00000000ffffffff
->>>>>>>> page dumped because: VM_BUG_ON_PAGE(page_ref_count(page) == 0)
->>>>>>>
->>>>>>> I see what this is, I'll cut a fix for this tomorrow.
->>>>>>
->>>>>> Folded in a fix for this, it's in my current io_uring branch and my for-next
->>>>>> branch.
->>>>>
->>>>> Hi Jens,
->>>>>
->>>>> I saw the following change is added:
->>>>>
->>>>> + if (size == len) {
->>>>> + /*
->>>>> + * For the normal O_DIRECT case, we could skip grabbing this
->>>>> + * reference and then not have to put them again when IO
->>>>> + * completes. But this breaks some in-kernel users, like
->>>>> + * splicing to/from a loop device, where we release the pipe
->>>>> + * pages unconditionally. If we can fix that case, we can
->>>>> + * get rid of the get here and the need to call
->>>>> + * bio_release_pages() at IO completion time.
->>>>> + */
->>>>> + get_page(bv->bv_page);
->>>>>
->>>>> Now the 'bv' may point to more than one page, so the following one may be
->>>>> needed:
->>>>>
->>>>> int i;
->>>>> struct bvec_iter_all iter_all;
->>>>> struct bio_vec *tmp;
->>>>>
->>>>> mp_bvec_for_each_segment(tmp, bv, i, iter_all)
->>>>>       get_page(tmp->bv_page);
->>>>
->>>> I guess that would be the safest, even if we don't currently have more
->>>> than one page in there. I'll fix it up.
->>>
->>> It is easy to see multipage bvec from loop, :-)
->>
->> Speaking of this, I took a quick look at why we've now regressed a lot
->> on IOPS perf with the multipage work. It looks like it's all related to
->> the (much) fatter setup around iteration, which is related to this very
->> topic too.
->>
->> Basically setup of things like bio_for_each_bvec() and indexing through
->> nth_page() is MUCH slower than before.
+On Tue, Feb 26, 2019 at 07:28:54PM -0700, Jens Axboe wrote:
+> On 2/26/19 7:21 PM, Ming Lei wrote:
+> > On Tue, Feb 26, 2019 at 06:57:16PM -0700, Jens Axboe wrote:
+> >> On 2/26/19 6:53 PM, Ming Lei wrote:
+> >>> On Tue, Feb 26, 2019 at 06:47:54PM -0700, Jens Axboe wrote:
+> >>>> On 2/26/19 6:21 PM, Ming Lei wrote:
+> >>>>> On Tue, Feb 26, 2019 at 11:56 PM Jens Axboe <axboe@kernel.dk> wrote:
+> >>>>>>
+> >>>>>> On 2/25/19 9:34 PM, Jens Axboe wrote:
+> >>>>>>> On 2/25/19 8:46 PM, Eric Biggers wrote:
+> >>>>>>>> Hi Jens,
+> >>>>>>>>
+> >>>>>>>> On Thu, Feb 21, 2019 at 10:45:27AM -0700, Jens Axboe wrote:
+> >>>>>>>>> On 2/20/19 3:58 PM, Ming Lei wrote:
+> >>>>>>>>>> On Mon, Feb 11, 2019 at 12:00:41PM -0700, Jens Axboe wrote:
+> >>>>>>>>>>> For an ITER_BVEC, we can just iterate the iov and add the pages
+> >>>>>>>>>>> to the bio directly. This requires that the caller doesn't releases
+> >>>>>>>>>>> the pages on IO completion, we add a BIO_NO_PAGE_REF flag for that.
+> >>>>>>>>>>>
+> >>>>>>>>>>> The current two callers of bio_iov_iter_get_pages() are updated to
+> >>>>>>>>>>> check if they need to release pages on completion. This makes them
+> >>>>>>>>>>> work with bvecs that contain kernel mapped pages already.
+> >>>>>>>>>>>
+> >>>>>>>>>>> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> >>>>>>>>>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> >>>>>>>>>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> >>>>>>>>>>> ---
+> >>>>>>>>>>>  block/bio.c               | 59 ++++++++++++++++++++++++++++++++-------
+> >>>>>>>>>>>  fs/block_dev.c            |  5 ++--
+> >>>>>>>>>>>  fs/iomap.c                |  5 ++--
+> >>>>>>>>>>>  include/linux/blk_types.h |  1 +
+> >>>>>>>>>>>  4 files changed, 56 insertions(+), 14 deletions(-)
+> >>>>>>>>>>>
+> >>>>>>>>>>> diff --git a/block/bio.c b/block/bio.c
+> >>>>>>>>>>> index 4db1008309ed..330df572cfb8 100644
+> >>>>>>>>>>> --- a/block/bio.c
+> >>>>>>>>>>> +++ b/block/bio.c
+> >>>>>>>>>>> @@ -828,6 +828,23 @@ int bio_add_page(struct bio *bio, struct page *page,
+> >>>>>>>>>>>  }
+> >>>>>>>>>>>  EXPORT_SYMBOL(bio_add_page);
+> >>>>>>>>>>>
+> >>>>>>>>>>> +static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
+> >>>>>>>>>>> +{
+> >>>>>>>>>>> + const struct bio_vec *bv = iter->bvec;
+> >>>>>>>>>>> + unsigned int len;
+> >>>>>>>>>>> + size_t size;
+> >>>>>>>>>>> +
+> >>>>>>>>>>> + len = min_t(size_t, bv->bv_len, iter->count);
+> >>>>>>>>>>> + size = bio_add_page(bio, bv->bv_page, len,
+> >>>>>>>>>>> +                         bv->bv_offset + iter->iov_offset);
+> >>>>>>>>>>
+> >>>>>>>>>> iter->iov_offset needs to be subtracted from 'len', looks
+> >>>>>>>>>> the following delta change[1] is required, otherwise memory corruption
+> >>>>>>>>>> can be observed when running xfstests over loop/dio.
+> >>>>>>>>>
+> >>>>>>>>> Thanks, I folded this in.
+> >>>>>>>>>
+> >>>>>>>>> --
+> >>>>>>>>> Jens Axboe
+> >>>>>>>>>
+> >>>>>>>>
+> >>>>>>>> syzkaller started hitting a crash on linux-next starting with this commit, and
+> >>>>>>>> it still occurs even with your latest version that has Ming's fix folded in.
+> >>>>>>>> Specifically, commit a566653ab5ab80a from your io_uring branch with commit date
+> >>>>>>>> Sun Feb 24 08:20:53 2019 -0700.
+> >>>>>>>>
+> >>>>>>>> Reproducer:
+> >>>>>>>>
+> >>>>>>>> #define _GNU_SOURCE
+> >>>>>>>> #include <fcntl.h>
+> >>>>>>>> #include <linux/loop.h>
+> >>>>>>>> #include <sys/ioctl.h>
+> >>>>>>>> #include <sys/sendfile.h>
+> >>>>>>>> #include <sys/syscall.h>
+> >>>>>>>> #include <unistd.h>
+> >>>>>>>>
+> >>>>>>>> int main(void)
+> >>>>>>>> {
+> >>>>>>>>         int memfd, loopfd;
+> >>>>>>>>
+> >>>>>>>>         memfd = syscall(__NR_memfd_create, "foo", 0);
+> >>>>>>>>
+> >>>>>>>>         pwrite(memfd, "\xa8", 1, 4096);
+> >>>>>>>>
+> >>>>>>>>         loopfd = open("/dev/loop0", O_RDWR|O_DIRECT);
+> >>>>>>>>
+> >>>>>>>>         ioctl(loopfd, LOOP_SET_FD, memfd);
+> >>>>>>>>
+> >>>>>>>>         sendfile(loopfd, loopfd, NULL, 1000000);
+> >>>>>>>> }
+> >>>>>>>>
+> >>>>>>>>
+> >>>>>>>> Crash:
+> >>>>>>>>
+> >>>>>>>> page:ffffea0001a6aab8 count:0 mapcount:0 mapping:0000000000000000 index:0x0
+> >>>>>>>> flags: 0x100000000000000()
+> >>>>>>>> raw: 0100000000000000 ffffea0001ad2c50 ffff88807fca49d0 0000000000000000
+> >>>>>>>> raw: 0000000000000000 0000000000000000 00000000ffffffff
+> >>>>>>>> page dumped because: VM_BUG_ON_PAGE(page_ref_count(page) == 0)
+> >>>>>>>
+> >>>>>>> I see what this is, I'll cut a fix for this tomorrow.
+> >>>>>>
+> >>>>>> Folded in a fix for this, it's in my current io_uring branch and my for-next
+> >>>>>> branch.
+> >>>>>
+> >>>>> Hi Jens,
+> >>>>>
+> >>>>> I saw the following change is added:
+> >>>>>
+> >>>>> + if (size == len) {
+> >>>>> + /*
+> >>>>> + * For the normal O_DIRECT case, we could skip grabbing this
+> >>>>> + * reference and then not have to put them again when IO
+> >>>>> + * completes. But this breaks some in-kernel users, like
+> >>>>> + * splicing to/from a loop device, where we release the pipe
+> >>>>> + * pages unconditionally. If we can fix that case, we can
+> >>>>> + * get rid of the get here and the need to call
+> >>>>> + * bio_release_pages() at IO completion time.
+> >>>>> + */
+> >>>>> + get_page(bv->bv_page);
+> >>>>>
+> >>>>> Now the 'bv' may point to more than one page, so the following one may be
+> >>>>> needed:
+> >>>>>
+> >>>>> int i;
+> >>>>> struct bvec_iter_all iter_all;
+> >>>>> struct bio_vec *tmp;
+> >>>>>
+> >>>>> mp_bvec_for_each_segment(tmp, bv, i, iter_all)
+> >>>>>       get_page(tmp->bv_page);
+> >>>>
+> >>>> I guess that would be the safest, even if we don't currently have more
+> >>>> than one page in there. I'll fix it up.
+> >>>
+> >>> It is easy to see multipage bvec from loop, :-)
+> >>
+> >> Speaking of this, I took a quick look at why we've now regressed a lot
+> >> on IOPS perf with the multipage work. It looks like it's all related to
+> >> the (much) fatter setup around iteration, which is related to this very
+> >> topic too.
+> >>
+> >> Basically setup of things like bio_for_each_bvec() and indexing through
+> >> nth_page() is MUCH slower than before.
+> > 
+> > But bio_for_each_bvec() needn't nth_page(), and only bio_for_each_segment()
+> > needs that. However, bio_for_each_segment() isn't called from
+> > blk_queue_split() and blk_rq_map_sg().
+> > 
+> > One issue is that bio_for_each_bvec() still advances by page size
+> > instead of bvec->len, I guess that is the problem, will cook a patch
+> > for your test.
 > 
-> But bio_for_each_bvec() needn't nth_page(), and only bio_for_each_segment()
-> needs that. However, bio_for_each_segment() isn't called from
-> blk_queue_split() and blk_rq_map_sg().
+> Probably won't make a difference for my test case...
 > 
-> One issue is that bio_for_each_bvec() still advances by page size
-> instead of bvec->len, I guess that is the problem, will cook a patch
-> for your test.
-
-Probably won't make a difference for my test case...
-
->> We need to do something about this, it's like tossing out months of
->> optimizations.
+> >> We need to do something about this, it's like tossing out months of
+> >> optimizations.
+> > 
+> > Some following optimization can be done, such as removing
+> > biovec_phys_mergeable() from blk_bio_segment_split().
 > 
-> Some following optimization can be done, such as removing
-> biovec_phys_mergeable() from blk_bio_segment_split().
+> I think we really need a fast path for <= PAGE_SIZE IOs, to the extent
+> that it is possible. But iteration startup cost is a problem in a lot of
+> spots, and a split fast path will only help a bit for that specific
+> case.
+> 
+> 5% regressions is HUGE. I know I've mentioned this before, I just want
+> to really stress how big of a deal that is. It's enough to make me
+> consider just reverting it again, which sucks, but I don't feel great
+> shipping something that is known that much slower.
+> 
+> Suggestions?
 
-I think we really need a fast path for <= PAGE_SIZE IOs, to the extent
-that it is possible. But iteration startup cost is a problem in a lot of
-spots, and a split fast path will only help a bit for that specific
-case.
+You mentioned nth_page() costs much in bio_for_each_bvec(), but which
+shouldn't call into nth_page(). I will look into it first.
 
-5% regressions is HUGE. I know I've mentioned this before, I just want
-to really stress how big of a deal that is. It's enough to make me
-consider just reverting it again, which sucks, but I don't feel great
-shipping something that is known that much slower.
-
-Suggestions?
-
--- 
-Jens Axboe
-
+Thanks,
+Ming
