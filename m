@@ -2,93 +2,143 @@ Return-Path: <SRS0=Mgfj=RC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B0A4C43381
-	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 13:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D9AC43381
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 13:32:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E8D52133D
-	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 13:25:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8143D2133D
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 13:32:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="2NIQEUZA"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="S8/7BKvs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730224AbfB0NZd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Feb 2019 08:25:33 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:38806 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726062AbfB0NZd (ORCPT
+        id S1730273AbfB0NcC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Feb 2019 08:32:02 -0500
+Received: from aserp2130.oracle.com ([141.146.126.79]:38720 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726122AbfB0NcC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Feb 2019 08:25:33 -0500
-Received: by mail-pf1-f194.google.com with SMTP id n125so8026100pfn.5
-        for <linux-block@vger.kernel.org>; Wed, 27 Feb 2019 05:25:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=P1F25RJCzJgtPj8lMxuO8h150lg2Ucqwwd8JGMXQ2wY=;
-        b=2NIQEUZAGN3Tch9bBL2HFCL6js+OzyW6oCP3TdkmTCNWZQp6SN9nmnAxazzzqK/AC8
-         XP+Ub3YFVx7JBe1G5Ba8ZLO+cV4fisF2FzENMh+UpNpwPr2/FB+fx5kK2fe3vhjd3ets
-         XsBH7bUtrJr9Eu/DApv/egH49tneyICvgP3Lqfpv+qCeGwFrDihgGxVZ32HlYDHEYmDX
-         n/zXdr9V+h1ziGx9FgvaBDSENK3X7JtLaIOk9k097zYKwCE15+aEZWmfd8fQFXoqrDcb
-         6pOWMnJiJGNYp2s6Dnd2UnguElSUqlOaCY8uZYG6qIA/5VzXOVGQAlTX+Ju8QUXiML2V
-         Scew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=P1F25RJCzJgtPj8lMxuO8h150lg2Ucqwwd8JGMXQ2wY=;
-        b=FJKpbFEflpasZb6IDlM9cWGTGGF7TLFvajeQ8KpY+MAOQ5hfdVua/6YaNnyuJaxQvL
-         whtpPCXClxmIv1Lniler4jTY9jFQU1hLDm0SN+iei2EqF/OZHRggtzOQKp6+TLr5XsuH
-         yLwHJ91z8efNF5cbbApWTfbMKXwZggAwOhkTaR1vQHKlxZnsa8TYGb4aW8B30bfrYz4J
-         wHHDsZzyqaPEBTO796Vn9Y0i8t4j94w6lW8c1T/1tDZhu6+9Q1nFL7uAPKhsOz/74d6f
-         YU9LAJEQAQUYMdMhukPzXck+1qf5Vdhr5mtbd03jqpInbIl2KYMCIo1EPpMJlNKBTX78
-         6WeA==
-X-Gm-Message-State: AHQUAuYxAp61+ZTcuYVpAUXB6O0N8xKFsRqIctxGFAjzP/l5BwwOJ377
-        3Ct2oOMOIDjbZvwyAvBjskYP6btpZuj1Cw==
-X-Google-Smtp-Source: AHgI3IZZ16mmatlXzkXU8oMZ2w8xTbGwyyOhIxI7sV2VkMIP9WMyfq/tZafuUuEpemH2up4fpix9JQ==
-X-Received: by 2002:a63:e447:: with SMTP id i7mr2971102pgk.70.1551273932621;
-        Wed, 27 Feb 2019 05:25:32 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id g67sm43540850pfg.13.2019.02.27.05.25.31
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 27 Feb 2019 05:25:31 -0800 (PST)
-Subject: Re: [PATCH 0/4] block: optimize for single-page bvec workloads
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org
-References: <20190227124013.4828-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <922211dc-2a0d-d030-b072-7bd3e7f6fdcf@kernel.dk>
-Date:   Wed, 27 Feb 2019 06:25:30 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
-MIME-Version: 1.0
-In-Reply-To: <20190227124013.4828-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Wed, 27 Feb 2019 08:32:02 -0500
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x1RDSq6H067801;
+        Wed, 27 Feb 2019 13:32:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2018-07-02;
+ bh=jP1rCEWZttWuConnvNH2Dav4eb+rzhuEldM4Iax3isI=;
+ b=S8/7BKvs00MG07uTa/yfH2A9KxWDULdUQVEVztWF1pGUJA6/qKyvavLzsXgHHK3HdXtZ
+ M/6a/UdeRxEIwhuUnEGHawFbp+Rmh7EZeqUoz8+f4HXgIgn0JOZanD6ZhF2pJoqZk8Tf
+ +bHeDZYZ1LUx0qU/uG9zI63QxUqX3CIQZKooJQvDuVtP3YodErNrWDNmzlSv1+c27+gn
+ mfvaD3NAKd3LuZvvDVIap/m7bBMsJXO9xvwFxIaNeQoroNJ/JggpNhiFC5TGVxVgS6ol
+ CtQV1ra9y/3u1vkZFZHUgQAmh29XMLUss3if7qdhQl4Igf1WMraR8C+tLHi1BeJjazWY ow== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by aserp2130.oracle.com with ESMTP id 2qtupeb18x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 Feb 2019 13:31:59 +0000
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x1RDVwJw005468
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 Feb 2019 13:31:59 GMT
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x1RDVwoR024619;
+        Wed, 27 Feb 2019 13:31:58 GMT
+Received: from linux.cn.oracle.com (/10.182.69.106)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 27 Feb 2019 05:31:58 -0800
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+To:     linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, linux-kernel@vger.kernel.org
+Subject: [PATCH for-next 1/1] blk-mq: use HCTX_TYPE_DEFAULT but not 0 to index blk_mq_tag_set->map
+Date:   Wed, 27 Feb 2019 21:35:01 +0800
+Message-Id: <1551274501-8297-1-git-send-email-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.7.4
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9179 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=917 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1902270091
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/27/19 5:40 AM, Ming Lei wrote:
-> Hi,
-> 
-> The 1st patch introduce bvec_nth_page(), so that nth_page() can
-> be avoided if the bvec is single-page.
-> 
-> The 2nd and 3rd patch adds fast path for single-page bvec case.
-> 
-> The last patch introduces a light-weight helper for iterating over
-> pages, which may improve __bio_iov_bvec_add_pages(). This patch
-> is for io_uring.
+Replace set->map[0] with set->map[HCTX_TYPE_DEFAULT] to avoid hardcoding.
 
-This reclaims another 2%, we're now at 1585K for the test case.
-Definite improvement!
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+---
+ block/blk-mq.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 54535f4..4e502db 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2069,7 +2069,7 @@ struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
+ 	struct blk_mq_tags *tags;
+ 	int node;
+ 
+-	node = blk_mq_hw_queue_to_node(&set->map[0], hctx_idx);
++	node = blk_mq_hw_queue_to_node(&set->map[HCTX_TYPE_DEFAULT], hctx_idx);
+ 	if (node == NUMA_NO_NODE)
+ 		node = set->numa_node;
+ 
+@@ -2125,7 +2125,7 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+ 	size_t rq_size, left;
+ 	int node;
+ 
+-	node = blk_mq_hw_queue_to_node(&set->map[0], hctx_idx);
++	node = blk_mq_hw_queue_to_node(&set->map[HCTX_TYPE_DEFAULT], hctx_idx);
+ 	if (node == NUMA_NO_NODE)
+ 		node = set->numa_node;
+ 
+@@ -2424,7 +2424,7 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+ 	 * If the cpu isn't present, the cpu is mapped to first hctx.
+ 	 */
+ 	for_each_possible_cpu(i) {
+-		hctx_idx = set->map[0].mq_map[i];
++		hctx_idx = set->map[HCTX_TYPE_DEFAULT].mq_map[i];
+ 		/* unmapped hw queue can be remapped after CPU topo changed */
+ 		if (!set->tags[hctx_idx] &&
+ 		    !__blk_mq_alloc_rq_map(set, hctx_idx)) {
+@@ -2434,7 +2434,7 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+ 			 * case, remap the current ctx to hctx[0] which
+ 			 * is guaranteed to always have tags allocated
+ 			 */
+-			set->map[0].mq_map[i] = 0;
++			set->map[HCTX_TYPE_DEFAULT].mq_map[i] = 0;
+ 		}
+ 
+ 		ctx = per_cpu_ptr(q->queue_ctx, i);
+@@ -2741,7 +2741,7 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
+ 		int node;
+ 		struct blk_mq_hw_ctx *hctx;
+ 
+-		node = blk_mq_hw_queue_to_node(&set->map[0], i);
++		node = blk_mq_hw_queue_to_node(&set->map[HCTX_TYPE_DEFAULT], i);
+ 		/*
+ 		 * If the hw queue has been mapped to another numa node,
+ 		 * we need to realloc the hctx. If allocation fails, fallback
+@@ -2972,7 +2972,7 @@ static int blk_mq_update_queue_map(struct blk_mq_tag_set *set)
+ 		return set->ops->map_queues(set);
+ 	} else {
+ 		BUG_ON(set->nr_maps > 1);
+-		return blk_mq_map_queues(&set->map[0]);
++		return blk_mq_map_queues(&set->map[HCTX_TYPE_DEFAULT]);
+ 	}
+ }
+ 
+@@ -3242,7 +3242,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 			pr_warn("Increasing nr_hw_queues to %d fails, fallback to %d\n",
+ 					nr_hw_queues, prev_nr_hw_queues);
+ 			set->nr_hw_queues = prev_nr_hw_queues;
+-			blk_mq_map_queues(&set->map[0]);
++			blk_mq_map_queues(&set->map[HCTX_TYPE_DEFAULT]);
+ 			goto fallback;
+ 		}
+ 		blk_mq_map_swqueue(q);
 -- 
-Jens Axboe
+2.7.4
 
