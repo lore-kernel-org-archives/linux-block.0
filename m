@@ -1,135 +1,204 @@
-Return-Path: <SRS0=PBJN=RB=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=Mgfj=RC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLACK
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1330DC43381
-	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 23:37:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 323ABC43381
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 01:23:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA194218D0
-	for <linux-block@archiver.kernel.org>; Tue, 26 Feb 2019 23:37:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF6A9218CD
+	for <linux-block@archiver.kernel.org>; Wed, 27 Feb 2019 01:23:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MwpVnXzh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O8UxZmeP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729136AbfBZXfa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Feb 2019 18:35:30 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:40085 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728768AbfBZXfa (ORCPT
+        id S1729030AbfB0BVY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Feb 2019 20:21:24 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:43888 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728766AbfB0BVY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Feb 2019 18:35:30 -0500
-Received: by mail-lf1-f68.google.com with SMTP id a8so5234573lfi.7;
-        Tue, 26 Feb 2019 15:35:29 -0800 (PST)
+        Tue, 26 Feb 2019 20:21:24 -0500
+Received: by mail-wr1-f66.google.com with SMTP id d17so16002846wre.10;
+        Tue, 26 Feb 2019 17:21:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:subject:to:cc:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=ZVkT2QLH5Ka9sBd9dlh3DGpeEKAnCsRCh/eX/qLvBzM=;
-        b=MwpVnXzh4sFTTycVMvYh9sbCWGMVSTgO8gXIORMXeH+Z9DT6PkQDm/NBi9/AmBNCCi
-         Aa24wFCL5FrDqF/pPas9VtK98nSvEoPlP3VL2rzZ0Na1F6iXfhvSqrtCHUimNOnwa9hD
-         n85pzP2iJaZ2I0lqs70sJmDM0rcpKNabNzIN0zYa0hM8Ph6PjnVLPDEp621UXvJNUy+f
-         pha2pzigGvxqxe1xLuwqkEOuUZMfWnK2w4s4oUvs73tnlazFTbrBQ+Pl/knfg8Y9pkoj
-         7TPe8PzK2FZCzSFf4pEFutrtdF7RqEHHsIoxyh/h8N3o5R27+9mCpdxur9ZbxhGsWQlA
-         AGXg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xjjAaXPqi8GayCAqIMUeuJBC0yn/3Txg9bC1YYFc5WU=;
+        b=O8UxZmePwKXoHyR5eNGdPT379+BKhfrv7KUmneyHd/VG5F9xHhXoa/N3Y8u5O8b8z6
+         YRqmSSdxmB6WC/Oao67SQyLLc7oyIEQl08XQJBeTkdL3Zbr+x4NXArLLOq2TXciV9ksq
+         PoyCzgCCnkwTs7NcM8mquoiqoLoSjGhwM06ROP2kHUZscqIpw2xL2IB9J4U8wSVftRpJ
+         7PCEeWmy2o7kasfjBf6gQwhZ6U0Usql4CXeuaum79iO+lKQUvVF+NSKac6Y0GXlCXXQS
+         WZAZo79APyyYsDrq4cuF/sCB5mxzUIcPCUvO4TtTNPf6Ffvr/kIbVACXnsVRgEpcXqgL
+         yvHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=ZVkT2QLH5Ka9sBd9dlh3DGpeEKAnCsRCh/eX/qLvBzM=;
-        b=Kjce3sy6xcV4i2/pFKYXrh73STRjx/y8mWvepz2eAlOTRRcH3IxDovW55VTAjEuwLa
-         aRBTzSUkLOZlsdGNGYzAJnagCs2qrVfv2bWqhIT0Wuq+0PLbJxFyfUgB47sW9cUmZgMt
-         I4QwIl9bCQggDbdaeC+N1BefiZfDBtFG15LRUsqY/RAgl9CVs6xE0XUPymzKEX2TTt9l
-         H8XtX5tlzT23SH41o82q7y2htnJiygNaNtjTmT/Nfo9qkSsyqdJaBiCYSEwVhGffCgRw
-         juJ3W1xvAyEBehnn1Q/4PLZcRLuLVyfEA0IzsThgSZfxMlUl+MiBrbsFP56XJnMyAe6s
-         ZAag==
-X-Gm-Message-State: AHQUAubyDOG68Svs3roFve+S7nHrXzJCc7w5NmU9HVmV5R7pfPKY9wp9
-        yT8w3e5Qh+5i8/wklME+Gw1WQ6TNmnU=
-X-Google-Smtp-Source: AHgI3Iba87Yvde6kTG+wOMytug3ReOQ5ubvF/CRuLXZnLkUywlIWAZZSiaqfHubxzf9UijFgGW1G2A==
-X-Received: by 2002:a19:4848:: with SMTP id v69mr6485142lfa.35.1551224127821;
-        Tue, 26 Feb 2019 15:35:27 -0800 (PST)
-Received: from [84.217.160.14] (c-0ea0d954.501502050104-0-757473696b74.bbcust.telenor.se. [84.217.160.14])
-        by smtp.gmail.com with ESMTPSA id t14sm567683lfk.83.2019.02.26.15.35.26
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Feb 2019 15:35:27 -0800 (PST)
-From:   Thomas Lindroth <thomas.lindroth@gmail.com>
-Subject: Regression caused by loopback related patches in 4.14.95
-To:     jack@suse.cz
-Cc:     linux-block@vger.kernel.org, stable@vger.kernel.org
-Message-ID: <44a918ac-55fe-b7d3-5a4d-97acf3e38d95@gmail.com>
-Date:   Wed, 27 Feb 2019 00:35:26 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xjjAaXPqi8GayCAqIMUeuJBC0yn/3Txg9bC1YYFc5WU=;
+        b=b8RZFU9lP+7USofcql6drQ0xkFkZaXtddPrUIyeurKj/7lQmXc2W4wFjKVJEYnIblK
+         OGoarUxbh69woHSvL2fb1kR86ZKwQyzTxPFXwSkqNek4XA9k2gDQKoBU4ITP2FjKiDjV
+         L7AWq1oxNNu05dVmi/HGK773+g6UKuO3QDbUqZ93HqIWKkF//IwnCxQkyJO8IzSEaMjY
+         bwg3h8+EUtmNQHgWezkQjpwRXEh0iTtmluwzBIXkMCW0maRSp2SD3PvbtSaDUL6E9tM6
+         aIuXXLaRipdYr0B77OQW6VvfWcnT5d9GX/2M6YWlMVMYBZOJP5TiY+Y9N7Nwg9Pyh//O
+         qKVg==
+X-Gm-Message-State: APjAAAVc+2mxS5VrXkH5L/eT4DX5yt+NnJr4M9jJht0izkcTyRb06pWF
+        ARxRSSLGu+Ij3ltwOSuS0RvnHDQrVIo8yKV0NZepOrZBLrs=
+X-Google-Smtp-Source: APXvYqyJIhcRib0sxTOoNAwevD8gFTmdZrlsKDj9NCrTKKGfTcfYdwd+/lmH/Jl8sg4E+tUjHIFHntg5wygoq/Kaz/c=
+X-Received: by 2002:a05:6000:10c1:: with SMTP id b1mr308226wrx.275.1551230481389;
+ Tue, 26 Feb 2019 17:21:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+References: <20190211190049.7888-1-axboe@kernel.dk> <20190211190049.7888-13-axboe@kernel.dk>
+ <20190220225856.GB28313@ming.t460p> <b143e8c3-33d5-5f09-c441-98b3bf326d81@kernel.dk>
+ <20190226034613.GA676@sol.localdomain> <aa1184bb-b482-0637-21e4-1ddb0e7aea90@kernel.dk>
+ <1652577e-787b-638e-625d-c200fb144a9d@kernel.dk>
+In-Reply-To: <1652577e-787b-638e-625d-c200fb144a9d@kernel.dk>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Wed, 27 Feb 2019 09:21:09 +0800
+Message-ID: <CACVXFVNOFA8_p+hVvaCffWAQ7+dgn++0b4Wn3naJzyNZN=CoFg@mail.gmail.com>
+Subject: Re: [PATCH 11/19] block: implement bio helper to add iter bvec pages
+ to bio
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Eric Biggers <ebiggers@kernel.org>, Ming Lei <ming.lei@redhat.com>,
+        "open list:AIO" <linux-aio@kvack.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-api@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jeff Moyer <jmoyer@redhat.com>, Avi Kivity <avi@scylladb.com>,
+        jannh@google.com, Al Viro <viro@zeniv.linux.org.uk>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When I run "losetup --verbose --partscan --read-only --find /mnt/gemini.61rn.3T/Backups/debian.raw"
-on a 4.14.103 system losetup hangs for exactly 3 minutes. After the hang the loopback device works
-like it should. The /mnt/gemini.61rn.3T mount is an ext4 fs on dm-crypt on a spinning sata disk.
+On Tue, Feb 26, 2019 at 11:56 PM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 2/25/19 9:34 PM, Jens Axboe wrote:
+> > On 2/25/19 8:46 PM, Eric Biggers wrote:
+> >> Hi Jens,
+> >>
+> >> On Thu, Feb 21, 2019 at 10:45:27AM -0700, Jens Axboe wrote:
+> >>> On 2/20/19 3:58 PM, Ming Lei wrote:
+> >>>> On Mon, Feb 11, 2019 at 12:00:41PM -0700, Jens Axboe wrote:
+> >>>>> For an ITER_BVEC, we can just iterate the iov and add the pages
+> >>>>> to the bio directly. This requires that the caller doesn't releases
+> >>>>> the pages on IO completion, we add a BIO_NO_PAGE_REF flag for that.
+> >>>>>
+> >>>>> The current two callers of bio_iov_iter_get_pages() are updated to
+> >>>>> check if they need to release pages on completion. This makes them
+> >>>>> work with bvecs that contain kernel mapped pages already.
+> >>>>>
+> >>>>> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> >>>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> >>>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> >>>>> ---
+> >>>>>  block/bio.c               | 59 ++++++++++++++++++++++++++++++++-------
+> >>>>>  fs/block_dev.c            |  5 ++--
+> >>>>>  fs/iomap.c                |  5 ++--
+> >>>>>  include/linux/blk_types.h |  1 +
+> >>>>>  4 files changed, 56 insertions(+), 14 deletions(-)
+> >>>>>
+> >>>>> diff --git a/block/bio.c b/block/bio.c
+> >>>>> index 4db1008309ed..330df572cfb8 100644
+> >>>>> --- a/block/bio.c
+> >>>>> +++ b/block/bio.c
+> >>>>> @@ -828,6 +828,23 @@ int bio_add_page(struct bio *bio, struct page *page,
+> >>>>>  }
+> >>>>>  EXPORT_SYMBOL(bio_add_page);
+> >>>>>
+> >>>>> +static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
+> >>>>> +{
+> >>>>> + const struct bio_vec *bv = iter->bvec;
+> >>>>> + unsigned int len;
+> >>>>> + size_t size;
+> >>>>> +
+> >>>>> + len = min_t(size_t, bv->bv_len, iter->count);
+> >>>>> + size = bio_add_page(bio, bv->bv_page, len,
+> >>>>> +                         bv->bv_offset + iter->iov_offset);
+> >>>>
+> >>>> iter->iov_offset needs to be subtracted from 'len', looks
+> >>>> the following delta change[1] is required, otherwise memory corruption
+> >>>> can be observed when running xfstests over loop/dio.
+> >>>
+> >>> Thanks, I folded this in.
+> >>>
+> >>> --
+> >>> Jens Axboe
+> >>>
+> >>
+> >> syzkaller started hitting a crash on linux-next starting with this commit, and
+> >> it still occurs even with your latest version that has Ming's fix folded in.
+> >> Specifically, commit a566653ab5ab80a from your io_uring branch with commit date
+> >> Sun Feb 24 08:20:53 2019 -0700.
+> >>
+> >> Reproducer:
+> >>
+> >> #define _GNU_SOURCE
+> >> #include <fcntl.h>
+> >> #include <linux/loop.h>
+> >> #include <sys/ioctl.h>
+> >> #include <sys/sendfile.h>
+> >> #include <sys/syscall.h>
+> >> #include <unistd.h>
+> >>
+> >> int main(void)
+> >> {
+> >>         int memfd, loopfd;
+> >>
+> >>         memfd = syscall(__NR_memfd_create, "foo", 0);
+> >>
+> >>         pwrite(memfd, "\xa8", 1, 4096);
+> >>
+> >>         loopfd = open("/dev/loop0", O_RDWR|O_DIRECT);
+> >>
+> >>         ioctl(loopfd, LOOP_SET_FD, memfd);
+> >>
+> >>         sendfile(loopfd, loopfd, NULL, 1000000);
+> >> }
+> >>
+> >>
+> >> Crash:
+> >>
+> >> page:ffffea0001a6aab8 count:0 mapcount:0 mapping:0000000000000000 index:0x0
+> >> flags: 0x100000000000000()
+> >> raw: 0100000000000000 ffffea0001ad2c50 ffff88807fca49d0 0000000000000000
+> >> raw: 0000000000000000 0000000000000000 00000000ffffffff
+> >> page dumped because: VM_BUG_ON_PAGE(page_ref_count(page) == 0)
+> >
+> > I see what this is, I'll cut a fix for this tomorrow.
+>
+> Folded in a fix for this, it's in my current io_uring branch and my for-next
+> branch.
 
-The hang was introduced in 4.14.95 and there are several loop related patches in 4.14.95.
-I bisected it down to commit c1e63df4f30c3918476ac9bc594355b0e9629893
-"loop: Get rid of loop_index_mutex". Reverting that commit from 4.14.103 also fixes the problem.
+Hi Jens,
 
-This could be a problem in just the 4.14 stable series. I haven't tested any other series.
+I saw the following change is added:
 
-Here is the output of dmesg when losetup hangs:
-[Feb26 21:59] systemd-udevd[996]: seq 2791 '/devices/virtual/block/loop0' is taking a long time
-[Feb26 22:01] INFO: task losetup:7694 blocked for more than 120 seconds.
-[  +0.000009]       Not tainted 4.14.103 #25
-[  +0.000002] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-[  +0.000001] losetup         D
-[  +0.000002]     0  7694   7687 0x00080000
-[  +0.000002] Call Trace:
-[  +0.000005]  ? __schedule+0x273/0x870
-[  +0.000003]  schedule+0x2f/0x90
-[  +0.000002]  schedule_preempt_disabled+0x11/0x20
-[  +0.000002]  __mutex_lock.isra.2+0x32c/0x540
-[  +0.000003]  ? __wake_up_common_lock+0x8a/0xc0
-[  +0.000004]  blkdev_reread_part+0x16/0x30
-[  +0.000100]  loop_reread_partitions+0x27/0x30
-[  +0.000004]  loop_set_status+0x335/0x410
-[  +0.000003]  loop_set_status64+0x4b/0x80
-[  +0.000003]  lo_ioctl+0x1e7/0x7d0
-[  +0.000003]  blkdev_ioctl+0x446/0x9d0
-[  +0.000004]  block_ioctl+0x39/0x40
-[  +0.000004]  do_vfs_ioctl+0xa4/0x650
-[  +0.000002]  SyS_ioctl+0x74/0x80
-[  +0.000004]  do_syscall_64+0x6e/0x170
-[  +0.000003]  entry_SYSCALL_64_after_hwframe+0x3d/0xa2
-[  +0.000003] RIP: 0033:0x7f455c7912a7
-[  +0.000002] RSP: 002b:00007ffe5a9d6908 EFLAGS: 00000246
-[  +0.000001]  ORIG_RAX: 0000000000000010
-[  +0.000003] RAX: ffffffffffffffda RBX: 00007ffe5a9d6ab0 RCX: 00007f455c7912a7
-[  +0.000002] RDX: 00007ffe5a9d6b50 RSI: 0000000000004c04 RDI: 0000000000000004
-[  +0.000002] RBP: 0000000000000004 R08: 0000000000000008 R09: 696265642f737075
-[  +0.000003] R10: 0000000000000000 R11: 0000000000000246 R12: 00007f455ce816b8
-[  +0.000002] R13: 0000000000000003 R14: 00007ffe5a9d6b50 R15: 00007ffe5a9d6930
-[  +6.555728] systemd-udevd[996]: seq 2791 '/devices/virtual/block/loop0' killed
-[  +0.000247] systemd-udevd[996]: worker [7697] terminated by signal 9 (KILL)
-[  +0.000005] systemd-udevd[996]: worker [7697] failed while handling '/devices/virtual/block/loop0'
-[  +0.052335]  loop0: p1 p2 < p5 >
++ if (size == len) {
++ /*
++ * For the normal O_DIRECT case, we could skip grabbing this
++ * reference and then not have to put them again when IO
++ * completes. But this breaks some in-kernel users, like
++ * splicing to/from a loop device, where we release the pipe
++ * pages unconditionally. If we can fix that case, we can
++ * get rid of the get here and the need to call
++ * bio_release_pages() at IO completion time.
++ */
++ get_page(bv->bv_page);
 
- From that backtrace it looks like the problem is related to --partscan. Among the
-loop related patches in 4.14.95 commit 57da9a9742200f391d1cf93fea389f7ddc25ec9a says:
+Now the 'bv' may point to more than one page, so the following one may be
+needed:
 
-   Note that syzbot is also reporting circular locking dependency between
-   bdev->bd_mutex and lo->lo_ctl_mutex [2] which is caused by calling
-   blkdev_reread_part() with lock held. This patch does not address it.
+int i;
+struct bvec_iter_all iter_all;
+struct bio_vec *tmp;
 
-   [2] https://syzkaller.appspot.com/bug?id=bf154052f0eea4bc7712499e4569505907d15889
+mp_bvec_for_each_segment(tmp, bv, i, iter_all)
+      get_page(tmp->bv_page);
 
-To me it looks like that is what is causing the hang. The syzkaller report says that the fix is
-"loop: Fix deadlock when calling blkdev_reread_part()" but I don't see that commit in the
-4.14 series.
-
-This is an x86_64 Gentoo system. Here is the .config I use http://sprunge.us/u7YNBt
+Thanks,
+Ming Lei
