@@ -2,119 +2,118 @@ Return-Path: <SRS0=9mBv=RD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1114CC43381
-	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 16:10:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA978C43381
+	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 16:36:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DB5FE218B0
-	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 16:10:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FEBB218AE
+	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 16:36:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="get1YWLw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727880AbfB1QKd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Feb 2019 11:10:33 -0500
-Received: from mx2.suse.de ([195.135.220.15]:42426 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726986AbfB1QKd (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Feb 2019 11:10:33 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 1FC9BAFD6;
-        Thu, 28 Feb 2019 16:10:31 +0000 (UTC)
-Subject: Re: [PATCH] block: optimize bvec iteration in bvec_iter_advance
-To:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk
-Cc:     ming.lei@redhat.com, linux-block@vger.kernel.org
-References: <20190228160018.3652-1-hch@lst.de>
-From:   Johannes Thumshirn <jthumshirn@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
- xsFNBFTTwPEBEADOadCyru0ZmVLaBn620Lq6WhXUlVhtvZF5r1JrbYaBROp8ZpiaOc9YpkN3
- rXTgBx+UoDGtnz9DZnIa9fwxkcby63igMPFJEYpwt9adN6bA1DiKKBqbaV5ZbDXR1tRrSvCl
- 2V4IgvgVuO0ZJEt7gakOQlqjQaOvIzDnMIi/abKLSSzYAThsOUf6qBEn2G46r886Mk8MwkJN
- hilcQ7F5UsKfcVVGrTBoim6j69Ve6EztSXOXjFgsoBw4pEhWuBQCkDWPzxkkQof1WfkLAVJ2
- X9McVokrRXeuu3mmB+ltamYcZ/DtvBRy8K6ViAgGyNRWmLTNWdJj19Qgw9Ef+Q9O5rwfbPZy
- SHS2PVE9dEaciS+EJkFQ3/TBRMP1bGeNbZUgrMwWOvt37yguvrCOglbHW+a8/G+L7vz0hasm
- OpvD9+kyTOHjqkknVJL69BOJeCIVUtSjT9EXaAOkqw3EyNJzzhdaMXcOPwvTXNkd8rQZIHft
- SPg47zMp2SJtVdYrA6YgLv7OMMhXhNkUsvhU0HZWUhcXZnj+F9NmDnuccarez9FmLijRUNgL
- 6iU+oypB/jaBkO6XLLwo2tf7CYmBYMmvXpygyL8/wt+SIciNiM34Yc+WIx4xv5nDVzG1n09b
- +iXDTYoWH82Dq1xBSVm0gxlNQRUGMmsX1dCbCS2wmWbEJJDEeQARAQABzSdKb2hhbm5lcyBU
- aHVtc2hpcm4gPGp0aHVtc2hpcm5Ac3VzZS5kZT7CwYAEEwEIACoCGwMFCwkIBwIGFQgJCgsC
- BBYCAwECHgECF4AFCQo9ta8FAlohZmoCGQEACgkQA5OWnS12CFATLQ//ajhNDVJLK9bjjiOH
- 53B0+hCrRBj5jQiT8I60+4w+hssvRHWkgsujF+V51jcmX3NOXeSyLC1Gk43A9vCz5gXnqyqG
- tOlYm26bihzG02eAoWr/glHBQyy7RYcd97SuRSv77WzuXT3mCnM15TKiqXYNzRCK7u5nx4eu
- szAU+AoXAC/y1gtuDMvANBEuHWE4LNQLkTwJshU1vwoNcTSl+JuQWe89GB8eeeMnHuY92T6A
- ActzHN14R1SRD/51N9sebAxGVZntXzSVKyMID6eGdNegWrz4q55H56ZrOMQ6IIaa7KSz3QSj
- 3E8VIY4FawfjCSOuA2joemnXH1a1cJtuqbDPZrO2TUZlNGrO2TRi9e2nIzouShc5EdwmL6qt
- WG5nbGajkm1wCNb6t4v9ueYMPkHsr6xJorFZHlu7PKqB6YY3hRC8dMcCDSLkOPWf+iZrqtpE
- odFBlnYNfmAXp+1ynhUvaeH6eSOqCN3jvQbITUo8mMQsdVgVeJwRdeAOFhP7fsxNugii721U
- acNVDPpEz4QyxfZtfu9QGI405j9MXF/CPrHlNLD5ZM5k9NxnmIdCM9i1ii4nmWvmz9JdVJ+8
- 6LkxauROr2apgTXxMnJ3Desp+IRWaFvTVhbwfxmwC5F3Kr0ouhr5Kt8jkQeD/vuqYuxOAyDI
- egjo3Y7OGqct+5nybmbOwU0EVNPA8QEQAN/79cFVNpC+8rmudnXGbob9sk0J99qnwM2tw33v
- uvQjEGAJTVCOHrewDbHmqZ5V1X1LI9cMlLUNMR3W0+L04+MH8s/JxshFST+hOaijGc81AN2P
- NrAQD7IKpA78Q2F3I6gpbMzyMy0DxmoKF73IAMQIknrhzn37DgM+x4jQgkvhFMqnnZ/xIQ9d
- QEBKDtfxH78QPosDqCzsN9HRArC75TiKTKOxC12ZRNFZfEPnmqJ260oImtmoD/L8QiBsdA4m
- Mdkmo6Pq6iAhbGQ5phmhUVuj+7O8rTpGRXySMLZ44BimM8yHWTaiLWxCehHgfUWRNLwFbrd+
- nYJYHoqyFGueZFBNxY4bS2rIEDg+nSKiAwJv3DUJDDd/QJpikB5HIjg/5kcSm7laqfbr1pmC
- ZbR2JCTp4FTABVLxt7pJP40SuLx5He63aA/VyxoInLcZPBNvVfq/3v3fkoILphi77ZfTvKrl
- RkDdH6PkFOFpnrctdTWbIFAYfU96VvySFAOOg5fsCeLv9/zD4dQEGsvva/qKZXkH/l2LeVp3
- xEXoFsUZtajPZgyRBxer0nVWRyeVwUQnLG8kjEOcZzX27GUpughi8w42p4oMD+96tr3BKTAr
- guRHJnU1M1xwRPbw5UsNXEOgYsFc8cdto0X7hQ2Ugc07CRSDvyH50IKXf2++znOTXFDhABEB
- AAHCwV8EGAECAAkFAlTTwPECGwwACgkQA5OWnS12CFAdRg//ZGV0voLRjjgX9ODzaz6LP+IP
- /ebGLXe3I+QXz8DaTkG45evOu6B2J53IM8t1xEug0OnfnTo1z0AFg5vU53L24LAdpi12CarV
- Da53WvHzG4BzCVGOGrAvJnMvUXf0/aEm0Sen2Mvf5kvOwsr9UTHJ8N/ucEKSXAXf+KZLYJbL
- NL4LbOFP+ywxtjV+SgLpDgRotM43yCRbONUXEML64SJ2ST+uNzvilhEQT/mlDP7cY259QDk7
- 1K6B+/ACE3Dn7X0/kp8a+ZoNjUJZkQQY4JyMOkITD6+CJ1YsxhX+/few9k5uVrwK/Cw+Vmae
- A85gYfFn+OlLFO/6RGjMAKOsdtPFMltNOZoT+YjgAcW6Q9qGgtVYKcVOxusL8C3v8PAYf7Ul
- Su7c+/Ayr3YV9Sp8PH4X4jK/zk3+DDY1/ASE94c95DW1lpOcyx3n1TwQbwp6TzPMRe1IkkYe
- 0lYj9ZgKaZ8hEmzuhg6FKXk9Dah+H73LdV57M4OFN8Xwb7v+oEG23vdsb2KBVG5K6Tv7Hb2N
- sfHWRdU3quYIistrNWWeGmfTlhVLgDhEmAsKZFH05QsAv3pQv7dH/JD+Tbn6sSnNAVrATff1
- AD3dXmt+5d3qYuUxam1UFGufGzV7jqG5QNStp0yvLP0xroB8y0CnnX2FY6bAVCU+CqKu+n1B
- LGlgwABHRtLCwe0EGAEIACAWIQTsOJyrwsTyXYYA0NADk5adLXYIUAUCWsTXAwIbAgCBCRAD
- k5adLXYIUHYgBBkWCAAdFiEEx1U9vxg1xAeUwus20p7yIq+KHe4FAlrE1wMACgkQ0p7yIq+K
- He6RfAEA+frSSvrHiuatNqvgYAJcraYhp1GQJrWSWMmi2eFcGskBAJyLp47etEn3xhJBLVVh
- 2y2K4Nobb6ZgxA4Svfnkf7AAdicQALiaOKDwKD3tgf90ypEoummYzAxv8MxyPXZ7ylRnkheA
- eQDxuoc/YwMA4qyxhzf6K4tD/aT12XJd95gk+YAL6flGkJD8rA3jsEucPmo5eko4Ms2rOEdG
- jKsZetkdPKGBd2qVxxyZgzUkgRXduvyux04b9erEpJmoIXs/lE0IRbL9A9rJ6ASjFPGpXYrb
- 73pb6Dtkdpvv+hoe4cKeae4dS0AnDc7LWSW3Ub0n61uk/rqpTmKuesmTZeB2GHzLN5GAXfNj
- ELHAeSVfFLPRFrjF5jjKJkpiyq98+oUnvTtDIPMTg05wSN2JtwKnoQ0TAIHWhiF6coGeEfY8
- ikdVLSZDEjW54Td5aIXWCRTBWa6Zqz/G6oESF+Lchu/lDv5+nuN04KZRAwCpXLS++/givJWo
- M9FMnQSvt4N95dVQE3kDsasl960ct8OzxaxuevW0OV/jQEd9gH50RaFif412DTrsuaPsBz6O
- l2t2TyTuHm7wVUY2J3gJYgG723/PUGW4LaoqNrYQUr/rqo6NXw6c+EglRpm1BdpkwPwAng63
- W5VOQMdnozD2RsDM5GfA4aEFi5m00tE+8XPICCtkduyWw+Z+zIqYk2v+zraPLs9Gs0X2C7X0
- yvqY9voUoJjG6skkOToGZbqtMX9K4GOv9JAxVs075QRXL3brHtHONDt6udYobzz+
-Message-ID: <c50e90b0-63af-66d2-5c51-2cddccdc4680@suse.de>
-Date:   Thu, 28 Feb 2019 17:10:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.0
+        id S1727774AbfB1Qgk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Feb 2019 11:36:40 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:37948 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726027AbfB1Qgk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Feb 2019 11:36:40 -0500
+Received: by mail-wr1-f66.google.com with SMTP id g12so10631539wrm.5
+        for <linux-block@vger.kernel.org>; Thu, 28 Feb 2019 08:36:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=6sPzpAS1AmOKmTRJOv353p5PJh7AxxPry2/1SWFFqFI=;
+        b=get1YWLwTo/gbmdSi6zjIsfcvMntDHfgwTpGj84jF+G24JDRRfLM/uTKeDwgYhIZfx
+         ISWfFLwVnufWEFyMurbj9g6zCHX9pAjqSfb3SiY9K8eQ0ZxFk/CON+ZMMBHQiJwjDb1n
+         uL4Y+0UjHvUtV3AiyVl5w5N7CZpH6GMJ1Y5JVX7oSlCYKgkcIFvhEIqbOAZgdG2sU514
+         I6tMsbidRBGATV6beV6IQ3Vr0dELI4NNpMPgH1g/5sb//4yZGIzmqwFVIyqMNcek3Bai
+         gwQLyzIVHjDoWz7Xe0aqMAxxjejVztxjLq4wq7t8aEWwCR+pWJMIEI9whMsPJfB/4Ieo
+         e0vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=6sPzpAS1AmOKmTRJOv353p5PJh7AxxPry2/1SWFFqFI=;
+        b=DxbTLpsbEMqsJCj7PoyrwUaZz/Y9u8ntczBcqUhuVptAsPvG7XNj/QHM7GzTkJ8szc
+         aBAXAISsLNc6GKo3Z6g51LUFlRZr+Erj0uUUS1V0yAt1pe3hplxwH8yfzQ4fFC+BNOb2
+         NsPzQSHv4o5kZ7QpAWrfh3dkMOSF/Mqz57oVssVyfb9aqoCAGSxz1QoPfhA08nfsvuK6
+         9MqqqPghRjlT7oZL6cik5J52j/NifDiLryiq/Njbjh8DYX8bJKbRFVkx8aYt4137U6GB
+         +xrLzuwe0MQq1rGDLtVGBB6LvkPQj8SaGvX5hllC4SHadF2u9HfeJcTtSkyw9WzfLjW8
+         rXPw==
+X-Gm-Message-State: APjAAAUiDJmtQiYw/iqYGRXiJiCDhrFM8NLNT+9DX2eL152gchw5ltR7
+        6PFWKoNNzDPn9OS1P3szdL9DmhDu16A=
+X-Google-Smtp-Source: APXvYqyhJfov8PXyTMJqCJCHgnVL89mNIhZ/WfnvKzhZFuOt7PA0zzyiicI9vIjSuiF2ZKsEToE+Jg==
+X-Received: by 2002:adf:f103:: with SMTP id r3mr221990wro.50.1551371798516;
+        Thu, 28 Feb 2019 08:36:38 -0800 (PST)
+Received: from [192.168.0.65] ([192.116.228.102])
+        by smtp.gmail.com with ESMTPSA id x6sm9034835wmg.0.2019.02.28.08.36.33
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 28 Feb 2019 08:36:36 -0800 (PST)
+Subject: Re: [PATCH 00/13] lightnvm: bugfixes and improvements
+To:     Igor Konopko <igor.j.konopko@intel.com>, javier@javigon.com,
+        hans.holmberg@cnexlabs.com
+Cc:     linux-block@vger.kernel.org
+References: <20190227171442.11853-1-igor.j.konopko@intel.com>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <18ac8f7c-4990-073e-0fa7-b73315238bf3@lightnvm.io>
+Date:   Thu, 28 Feb 2019 17:36:30 +0100
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.5.0
 MIME-Version: 1.0
-In-Reply-To: <20190228160018.3652-1-hch@lst.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190227171442.11853-1-igor.j.konopko@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 28/02/2019 17:00, Christoph Hellwig wrote:
-> There is no need to only iterate in chunks of PAGE_SIZE or less in
-> bvec_iter_advance, given that the callers pass in the chunk length that
-> they are operating on - either that already is less than PAGE_SIZE
-                           this? ^
-> because they do classic page-based iteration, or it is larger because
-> the caller operates on multi-page bvecs.
+On 2/27/19 6:14 PM, Igor Konopko wrote:
+> This series provides a group of the bugfixes
+> or improvements for lightnvm and pblk device.
 > 
-> This should help optimizing shaving off a few cycles of the I/O hot
+> Most of the patches are rather simple and covers
+> some corner cases scenario, but we were able to hit
+> most of them in some scenarios. Few others close some
+> existing gaps which we were able to found.
+> 
+> Fedback is appreciated.
+> 
+> Igor Konopko (13):
+>    lightnvm: pblk: Line reference fix in GC
+>    lightnvm: pblk: Gracefully handle GC data malloc fail
+>    lightnvm: pblk: Fix put line back behaviour
+>    lightnvm: pblk: Rollback in gc read
+>    lightnvm: pblk: Count all read errors in stats
+>    lightnvm: pblk: Ensure that erase is chunk aligned
+>    lightnvm: pblk: Cleanly fail when there is not enough memory
+>    lightnvm: pblk: Set proper read stutus in bio
+>    lightnvm: pblk: Kick writer for flush requests
+>    lightnvm: pblk: Reduce L2P DRAM footprint
+>    lightnvm: pblk: Remove unused smeta_ssec field
+>    lightnvm: pblk: close opened chunks
+>    lightnvm: Inherit mdts from the parent nvme device
+> 
+>   drivers/lightnvm/core.c          |   9 ++-
+>   drivers/lightnvm/pblk-core.c     | 128 +++++++++++++++++++++++++++++--
+>   drivers/lightnvm/pblk-gc.c       |  47 +++++++-----
+>   drivers/lightnvm/pblk-init.c     |  30 ++++++--
+>   drivers/lightnvm/pblk-map.c      |   2 +
+>   drivers/lightnvm/pblk-read.c     |  13 ++--
+>   drivers/lightnvm/pblk-recovery.c |   2 +-
+>   drivers/lightnvm/pblk.h          |   4 +-
+>   drivers/nvme/host/lightnvm.c     |   1 +
+>   include/linux/lightnvm.h         |   1 +
+>   10 files changed, 193 insertions(+), 44 deletions(-)
+> 
 
-optimizing || shaving off, both together sounds awkward.
+Thanks Igor. I'll give Hans et. al. a couple of days to digest the 
+changes.
 
-Otherwise
-Reviewed-by: Johannes Thumshirn <jthumshirn@suse.de>
-
--- 
-Johannes Thumshirn                            SUSE Labs Filesystems
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
