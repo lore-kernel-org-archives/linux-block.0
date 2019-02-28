@@ -2,188 +2,285 @@ Return-Path: <SRS0=9mBv=RD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4AB6C10F00
-	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 07:51:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02C01C43381
+	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 08:37:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 75A0521850
-	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 07:51:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="OEitEhmg"
+	by mail.kernel.org (Postfix) with ESMTP id C352B218AE
+	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 08:37:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730277AbfB1Hvs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Feb 2019 02:51:48 -0500
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:49506 "EHLO
-        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725896AbfB1Hvr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Feb 2019 02:51:47 -0500
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20190228075144euoutp029d66d76c4cb628d9849010dfb9eff93c~Hd8mjFpb81598015980euoutp02o;
-        Thu, 28 Feb 2019 07:51:44 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20190228075144euoutp029d66d76c4cb628d9849010dfb9eff93c~Hd8mjFpb81598015980euoutp02o
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1551340304;
-        bh=lK4OWNOVuPptmombO8Le5QI8Xei5HzbQ63F3nd2QMuE=;
-        h=Subject:To:Cc:From:Date:In-Reply-To:References:From;
-        b=OEitEhmg6xm1xNGq9a7lMWdvcdbmRpoQQlTTyaQVBnLfPiRLhoGVtK/nqSMWe5150
-         PJBorZxXTTIxw0xi+1zpGEvRd1cdPD+EhmV9Y84INkhrRwxuPAELK5mCIkOBW/U/Nj
-         4nQd9yMaV3lsz6H0KInKfTkJggkU/aZOp/P5ToZ0=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20190228075144eucas1p2ab4f16e339afc9266c8ccf636ad7aab2~Hd8mGHZii1866118661eucas1p2i;
-        Thu, 28 Feb 2019 07:51:44 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id D9.7B.04806.F03977C5; Thu, 28
-        Feb 2019 07:51:43 +0000 (GMT)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20190228075142eucas1p1e9d84ec53a10294a72316b3c43235949~Hd8lE3fPQ0079100791eucas1p1r;
-        Thu, 28 Feb 2019 07:51:42 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20190228075142eusmtrp1554cde5ac094e3de6c2ada0b657d9b94~Hd8kzAFzc0177101771eusmtrp1E;
-        Thu, 28 Feb 2019 07:51:42 +0000 (GMT)
-X-AuditID: cbfec7f5-34dff700000012c6-5d-5c77930f4636
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 1E.57.04128.E03977C5; Thu, 28
-        Feb 2019 07:51:42 +0000 (GMT)
-Received: from [106.116.147.30] (unknown [106.116.147.30]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20190228075141eusmtip192f07709203f64ab50824324fb4ec67b~Hd8jbN6SF2947929479eusmtip1P;
-        Thu, 28 Feb 2019 07:51:41 +0000 (GMT)
-Subject: Re: [PATCH V15 14/18] block: enable multipage bvecs
-To:     Ming Lei <ming.lei@redhat.com>, Jon Hunter <jonathanh@nvidia.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        Theodore Ts'o <tytso@mit.edu>, Omar Sandoval <osandov@fb.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Dave Chinner <dchinner@redhat.com>,
-        Kent Overstreet <kent.overstreet@gmail.com>,
-        Mike Snitzer <snitzer@redhat.com>, dm-devel@redhat.com,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-fsdevel@vger.kernel.org, linux-raid@vger.kernel.org,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        "Darrick J . Wong" <darrick.wong@oracle.com>,
-        linux-xfs@vger.kernel.org, Gao Xiang <gaoxiang25@huawei.com>,
-        Christoph Hellwig <hch@lst.de>, linux-ext4@vger.kernel.org,
-        Coly Li <colyli@suse.de>, linux-bcache@vger.kernel.org,
-        Boaz Harrosh <ooo@electrozaur.com>,
-        Bob Peterson <rpeterso@redhat.com>, cluster-devel@redhat.com,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        'Linux Samsung SOC' <linux-samsung-soc@vger.kernel.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        linux-tegra <linux-tegra@vger.kernel.org>
-From:   Marek Szyprowski <m.szyprowski@samsung.com>
-Message-ID: <01155e88-f021-fbe2-d048-42e303fe2935@samsung.com>
-Date:   Thu, 28 Feb 2019 08:51:40 +0100
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
-        Thunderbird/60.5.1
+        id S1727714AbfB1Ihm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Feb 2019 03:37:42 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50926 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726066AbfB1Ihl (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Feb 2019 03:37:41 -0500
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 728D51FE9D;
+        Thu, 28 Feb 2019 08:37:40 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-33.pek2.redhat.com [10.72.8.33])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4479B1001DEA;
+        Thu, 28 Feb 2019 08:37:25 +0000 (UTC)
+Date:   Thu, 28 Feb 2019 16:37:20 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <tom.leiming@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "open list:AIO" <linux-aio@kvack.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-api@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jeff Moyer <jmoyer@redhat.com>, Avi Kivity <avi@scylladb.com>,
+        jannh@google.com, Al Viro <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH 11/19] block: implement bio helper to add iter bvec pages
+ to bio
+Message-ID: <20190228083719.GA24857@ming.t460p>
+References: <20190227022144.GE16802@ming.t460p>
+ <b54683e8-fbff-01ab-db98-c35de8e00e9f@kernel.dk>
+ <20190227023719.GF16802@ming.t460p>
+ <9ce37f86-dd8b-ef51-7507-d457585a892a@kernel.dk>
+ <20190227030944.GG16802@ming.t460p>
+ <7a1f4293-8f88-81e0-9464-cc27e39184cb@kernel.dk>
+ <20190227034409.GH16802@ming.t460p>
+ <2a48c5da-7eea-13a1-9939-9e182e11dc9b@kernel.dk>
+ <cd8b15c7-6e93-6d13-f3c5-21b7d39fe3f6@kernel.dk>
+ <20190227194241.GA3860@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20190227232940.GA13319@ming.t460p>
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Brightmail-Tracker: H4sIAAAAAAAAA01SbUxTZxjde7/b7LJrZeGd+8rqRqZkAplkTzIkLnHJTcyWZX8MjmWr46Y4
-        aSW9ApP9AYoCpaDCFssFp4NEKVQYRBFrS2b56CqSqxIcEsCFj23SlMYNt5E41Pbixr/zPuec
-        9zkneTjS8CuzidtvPSTZrKZ8I6OneodX1LeeayjOSZtyp0No3sNAx/QxBrpdXTSEOuYYOFmm
-        sjAdvUTD6OIpFvxLTTTc+KeMgOXVcRrcHUMEVCgtFAyWl4Cq/sDCcO9tAvyTKXBrro2Fxu+m
-        GPD5QxSMeZsZmPE8omHw0TEElae9CFxqPwHVywoD3od9LAQa7AT8Hk6GgZlxChxNRxjoDEcp
-        ONr9AMER5woLwfN7QP03SO/cLHYuu2jxhH2JFS8r06yoznRTYsVghBZbffcIcWy0UOxpr2bE
-        nj/qWXHqto8Rr9wpZcTy60OkWGtfYsT7C5OUGO0fZ8S6C+3oo8S9+sxcKX9/kWRLzfpcn2e/
-        28oWDAlfTazW0KWoj3cgHYeF7bjj4jDhQHrOILQhHDo1R8QIg7CMsNqdoRF/Inzv5xHmqaN/
-        oYzSROcQPvvTZk0URXjiaoSMERuFTDx71oMciOUShffxbHZMQgpuHfYHFuJeRkjHjogj/icv
-        ZOFvr6hPMMdRwhu4rjEzBp8XcnCgtUhTbMChxvm4Uyek4cv33SiGSeFVfCnSTGo4CU/On453
-        wcKADlcHZtYi78K+651reCNeDF5gNfwSHmlwUprBjnClS2G1hxPhi819a4538UDwJh1LRApb
-        cJc3VRu/h7/3d8XHWEjAE5ENWogEXN97ktTGPK46atDUyVgJdv639uqNW+RxZFTWVVPW1VHW
-        1VH+33sGUe0oSSqULWZJftsqFW+TTRa50Gre9sVBSw96cv0jq8EHfaj/4b4AEjhkfJZ/01mU
-        Y6BNRfJhSwBhjjQm8t6q4hwDn2s6XCLZDn5mK8yX5AB6kaOMSfzXz/zyiUEwmw5JBySpQLI9
-        ZQlOt6kUbffs1V+rWDLzv1V0fUiW/+Uubf3SnNFTlzn9cpsnOfxOFfPj8X0E/YrrblN+8Zh7
-        9sBNqaYJMhK+Mf/9aaVl+INs0p+yS9pJVIW31OZad+eJltGP66WsEX7KecfX8lrJorNAplN3
-        rNSm1MDWa69nO6MvhFfOB3ZPnGlJOzEKRiMl55nSt5I22fQYCAgPtvkDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Se0xTdxTH87vvktVcC4ZfGMlmjW7RrFIq64GwxmSa/NSYmJhsETHayU0h
-        o63pbXGwxJSHOjvmi6hQVJYBKk+lM4IILOMhaRi5C6SEEYtbhUVUYCLGkWG10Jnw3yfnfD/n
-        5CRHoDX/sQlCjs0pOWzmXC0XwwyE+4OfrCo7mpkU+GUD+CcaOWgInuGgpfwmC/6GRxxcKlR4
-        CM62sjD45AoPnTOVLPz+byEF8+EAC3UNfRSUeH9ioLeoABTlFg/374xQ0Dm2CYYe3eCh4uoD
-        Djo6/QwMt1/mYLzxDQu9b84gOFnVjqBc6aLg1LyXg/bFNh66y4opePx0A/SMBxjwVB7noPnp
-        LAMnWl4iOF66wEN/05egvO5nt64jzfPlLDlXPMOTu94gT5TxFoaU9E6zpLpjiiLDgy7iqz/F
-        Ed/ceZ48GOngyL0/3Bwp+q2PJj8Uz3Dk+eQYQ2a7Ahw5fbse7YnL0KU77C6n9GG2XXZ+pt2v
-        h2SdPhV0yVtSdXqD8UBacop2syk9S8rNyZMcm02HdNnFD6v5I33iN6Ph71k3alN7kErA4hbc
-        NVnIeFCMoBFrEfZeDzHRRiL2X3SzUY7FiyMeLhqaRrjmwmO01IgV03HoWmOEeSFO3I5D+5Yi
-        tNikwqEbQTqaH6Dw3LW/l4dyoh57ppcGqQS1aMIX7ikRFgRGXI9PV6QvldeImfif4CgVjazG
-        /oqJZVUlJuG7z+uW19LiR3jx6hAd5Q9w6/Tl/zkej01UUWeRxrtC965QvCsU7wrlR8TUozjJ
-        JVstVjlZJ5utsstm0R22W30o8nh37i/cbkOemb3dSBSQ9j31x6V5mRrWnCfnW7sRFmhtnLr9
-        u6OZGnWWOb9ActgPOly5ktyNUiK3naMT1hy2R97Y5jyoT9EbIVVvNBgNn4I2Xq0k5WdoRIvZ
-        KX0tSUckxzuPElQJblT2ctjeZTj2ouXzQ4uu+Gc7/9xWn7Vx9NvrnolxqiqALSlTQ09Sf64Y
-        +Kvm7ENlt6VhR2l41r0glbxIdIQ0Te8/q2t9tYvUlDf7fv3Kn/Yqls+otpl6Bk1SQm58QYex
-        cpNT3bNVGEurCTDzJYaptb7EnOov1oVjJmuLdMdqz++b0zJytlm/kXbI5reoanrQjgMAAA==
-X-CMS-MailID: 20190228075142eucas1p1e9d84ec53a10294a72316b3c43235949
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20190221084301eucas1p11e8841a62b4b1da3cccca661b6f4c29d
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20190221084301eucas1p11e8841a62b4b1da3cccca661b6f4c29d
-References: <20190215111324.30129-1-ming.lei@redhat.com>
-        <20190215111324.30129-15-ming.lei@redhat.com>
-        <CGME20190221084301eucas1p11e8841a62b4b1da3cccca661b6f4c29d@eucas1p1.samsung.com>
-        <6c9ae4de-c56f-a2b3-2542-da7d8b95601d@samsung.com>
-        <0dbbee64-5c6b-0374-4360-6dc218c70d58@nvidia.com>
-        <20190227232940.GA13319@ming.t460p>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190227194241.GA3860@infradead.org>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Thu, 28 Feb 2019 08:37:40 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+On Wed, Feb 27, 2019 at 11:42:41AM -0800, Christoph Hellwig wrote:
+> On Tue, Feb 26, 2019 at 09:06:23PM -0700, Jens Axboe wrote:
+> > On 2/26/19 9:05 PM, Jens Axboe wrote:
+> > > On 2/26/19 8:44 PM, Ming Lei wrote:
+> > >> On Tue, Feb 26, 2019 at 08:37:05PM -0700, Jens Axboe wrote:
+> > >>> On 2/26/19 8:09 PM, Ming Lei wrote:
+> > >>>> On Tue, Feb 26, 2019 at 07:43:32PM -0700, Jens Axboe wrote:
+> > >>>>> On 2/26/19 7:37 PM, Ming Lei wrote:
+> > >>>>>> On Tue, Feb 26, 2019 at 07:28:54PM -0700, Jens Axboe wrote:
+> > >>>>>>> On 2/26/19 7:21 PM, Ming Lei wrote:
+> > >>>>>>>> On Tue, Feb 26, 2019 at 06:57:16PM -0700, Jens Axboe wrote:
+> > >>>>>>>>> On 2/26/19 6:53 PM, Ming Lei wrote:
+> > >>>>>>>>>> On Tue, Feb 26, 2019 at 06:47:54PM -0700, Jens Axboe wrote:
+> > >>>>>>>>>>> On 2/26/19 6:21 PM, Ming Lei wrote:
+> > >>>>>>>>>>>> On Tue, Feb 26, 2019 at 11:56 PM Jens Axboe <axboe@kernel.dk> wrote:
+> > >>>>>>>>>>>>>
+> > >>>>>>>>>>>>> On 2/25/19 9:34 PM, Jens Axboe wrote:
+> > >>>>>>>>>>>>>> On 2/25/19 8:46 PM, Eric Biggers wrote:
+> > >>>>>>>>>>>>>>> Hi Jens,
+> > >>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>> On Thu, Feb 21, 2019 at 10:45:27AM -0700, Jens Axboe wrote:
+> > >>>>>>>>>>>>>>>> On 2/20/19 3:58 PM, Ming Lei wrote:
+> > >>>>>>>>>>>>>>>>> On Mon, Feb 11, 2019 at 12:00:41PM -0700, Jens Axboe wrote:
+> > >>>>>>>>>>>>>>>>>> For an ITER_BVEC, we can just iterate the iov and add the pages
+> > >>>>>>>>>>>>>>>>>> to the bio directly. This requires that the caller doesn't releases
+> > >>>>>>>>>>>>>>>>>> the pages on IO completion, we add a BIO_NO_PAGE_REF flag for that.
+> > >>>>>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>>>>> The current two callers of bio_iov_iter_get_pages() are updated to
+> > >>>>>>>>>>>>>>>>>> check if they need to release pages on completion. This makes them
+> > >>>>>>>>>>>>>>>>>> work with bvecs that contain kernel mapped pages already.
+> > >>>>>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>>>>> Reviewed-by: Hannes Reinecke <hare@suse.com>
+> > >>>>>>>>>>>>>>>>>> Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > >>>>>>>>>>>>>>>>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> > >>>>>>>>>>>>>>>>>> ---
+> > >>>>>>>>>>>>>>>>>>  block/bio.c               | 59 ++++++++++++++++++++++++++++++++-------
+> > >>>>>>>>>>>>>>>>>>  fs/block_dev.c            |  5 ++--
+> > >>>>>>>>>>>>>>>>>>  fs/iomap.c                |  5 ++--
+> > >>>>>>>>>>>>>>>>>>  include/linux/blk_types.h |  1 +
+> > >>>>>>>>>>>>>>>>>>  4 files changed, 56 insertions(+), 14 deletions(-)
+> > >>>>>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>>>>> diff --git a/block/bio.c b/block/bio.c
+> > >>>>>>>>>>>>>>>>>> index 4db1008309ed..330df572cfb8 100644
+> > >>>>>>>>>>>>>>>>>> --- a/block/bio.c
+> > >>>>>>>>>>>>>>>>>> +++ b/block/bio.c
+> > >>>>>>>>>>>>>>>>>> @@ -828,6 +828,23 @@ int bio_add_page(struct bio *bio, struct page *page,
+> > >>>>>>>>>>>>>>>>>>  }
+> > >>>>>>>>>>>>>>>>>>  EXPORT_SYMBOL(bio_add_page);
+> > >>>>>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>>>>> +static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
+> > >>>>>>>>>>>>>>>>>> +{
+> > >>>>>>>>>>>>>>>>>> + const struct bio_vec *bv = iter->bvec;
+> > >>>>>>>>>>>>>>>>>> + unsigned int len;
+> > >>>>>>>>>>>>>>>>>> + size_t size;
+> > >>>>>>>>>>>>>>>>>> +
+> > >>>>>>>>>>>>>>>>>> + len = min_t(size_t, bv->bv_len, iter->count);
+> > >>>>>>>>>>>>>>>>>> + size = bio_add_page(bio, bv->bv_page, len,
+> > >>>>>>>>>>>>>>>>>> +                         bv->bv_offset + iter->iov_offset);
+> > >>>>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>>>> iter->iov_offset needs to be subtracted from 'len', looks
+> > >>>>>>>>>>>>>>>>> the following delta change[1] is required, otherwise memory corruption
+> > >>>>>>>>>>>>>>>>> can be observed when running xfstests over loop/dio.
+> > >>>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>>> Thanks, I folded this in.
+> > >>>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>>> --
+> > >>>>>>>>>>>>>>>> Jens Axboe
+> > >>>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>> syzkaller started hitting a crash on linux-next starting with this commit, and
+> > >>>>>>>>>>>>>>> it still occurs even with your latest version that has Ming's fix folded in.
+> > >>>>>>>>>>>>>>> Specifically, commit a566653ab5ab80a from your io_uring branch with commit date
+> > >>>>>>>>>>>>>>> Sun Feb 24 08:20:53 2019 -0700.
+> > >>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>> Reproducer:
+> > >>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>> #define _GNU_SOURCE
+> > >>>>>>>>>>>>>>> #include <fcntl.h>
+> > >>>>>>>>>>>>>>> #include <linux/loop.h>
+> > >>>>>>>>>>>>>>> #include <sys/ioctl.h>
+> > >>>>>>>>>>>>>>> #include <sys/sendfile.h>
+> > >>>>>>>>>>>>>>> #include <sys/syscall.h>
+> > >>>>>>>>>>>>>>> #include <unistd.h>
+> > >>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>> int main(void)
+> > >>>>>>>>>>>>>>> {
+> > >>>>>>>>>>>>>>>         int memfd, loopfd;
+> > >>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>>         memfd = syscall(__NR_memfd_create, "foo", 0);
+> > >>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>>         pwrite(memfd, "\xa8", 1, 4096);
+> > >>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>>         loopfd = open("/dev/loop0", O_RDWR|O_DIRECT);
+> > >>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>>         ioctl(loopfd, LOOP_SET_FD, memfd);
+> > >>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>>         sendfile(loopfd, loopfd, NULL, 1000000);
+> > >>>>>>>>>>>>>>> }
+> > >>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>> Crash:
+> > >>>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>>> page:ffffea0001a6aab8 count:0 mapcount:0 mapping:0000000000000000 index:0x0
+> > >>>>>>>>>>>>>>> flags: 0x100000000000000()
+> > >>>>>>>>>>>>>>> raw: 0100000000000000 ffffea0001ad2c50 ffff88807fca49d0 0000000000000000
+> > >>>>>>>>>>>>>>> raw: 0000000000000000 0000000000000000 00000000ffffffff
+> > >>>>>>>>>>>>>>> page dumped because: VM_BUG_ON_PAGE(page_ref_count(page) == 0)
+> > >>>>>>>>>>>>>>
+> > >>>>>>>>>>>>>> I see what this is, I'll cut a fix for this tomorrow.
+> > >>>>>>>>>>>>>
+> > >>>>>>>>>>>>> Folded in a fix for this, it's in my current io_uring branch and my for-next
+> > >>>>>>>>>>>>> branch.
+> > >>>>>>>>>>>>
+> > >>>>>>>>>>>> Hi Jens,
+> > >>>>>>>>>>>>
+> > >>>>>>>>>>>> I saw the following change is added:
+> > >>>>>>>>>>>>
+> > >>>>>>>>>>>> + if (size == len) {
+> > >>>>>>>>>>>> + /*
+> > >>>>>>>>>>>> + * For the normal O_DIRECT case, we could skip grabbing this
+> > >>>>>>>>>>>> + * reference and then not have to put them again when IO
+> > >>>>>>>>>>>> + * completes. But this breaks some in-kernel users, like
+> > >>>>>>>>>>>> + * splicing to/from a loop device, where we release the pipe
+> > >>>>>>>>>>>> + * pages unconditionally. If we can fix that case, we can
+> > >>>>>>>>>>>> + * get rid of the get here and the need to call
+> > >>>>>>>>>>>> + * bio_release_pages() at IO completion time.
+> > >>>>>>>>>>>> + */
+> > >>>>>>>>>>>> + get_page(bv->bv_page);
+> > >>>>>>>>>>>>
+> > >>>>>>>>>>>> Now the 'bv' may point to more than one page, so the following one may be
+> > >>>>>>>>>>>> needed:
+> > >>>>>>>>>>>>
+> > >>>>>>>>>>>> int i;
+> > >>>>>>>>>>>> struct bvec_iter_all iter_all;
+> > >>>>>>>>>>>> struct bio_vec *tmp;
+> > >>>>>>>>>>>>
+> > >>>>>>>>>>>> mp_bvec_for_each_segment(tmp, bv, i, iter_all)
+> > >>>>>>>>>>>>       get_page(tmp->bv_page);
+> > >>>>>>>>>>>
+> > >>>>>>>>>>> I guess that would be the safest, even if we don't currently have more
+> > >>>>>>>>>>> than one page in there. I'll fix it up.
+> > >>>>>>>>>>
+> > >>>>>>>>>> It is easy to see multipage bvec from loop, :-)
+> > >>>>>>>>>
+> > >>>>>>>>> Speaking of this, I took a quick look at why we've now regressed a lot
+> > >>>>>>>>> on IOPS perf with the multipage work. It looks like it's all related to
+> > >>>>>>>>> the (much) fatter setup around iteration, which is related to this very
+> > >>>>>>>>> topic too.
+> > >>>>>>>>>
+> > >>>>>>>>> Basically setup of things like bio_for_each_bvec() and indexing through
+> > >>>>>>>>> nth_page() is MUCH slower than before.
+> > >>>>>>>>
+> > >>>>>>>> But bio_for_each_bvec() needn't nth_page(), and only bio_for_each_segment()
+> > >>>>>>>> needs that. However, bio_for_each_segment() isn't called from
+> > >>>>>>>> blk_queue_split() and blk_rq_map_sg().
+> > >>>>>>>>
+> > >>>>>>>> One issue is that bio_for_each_bvec() still advances by page size
+> > >>>>>>>> instead of bvec->len, I guess that is the problem, will cook a patch
+> > >>>>>>>> for your test.
+> > >>>>>>>
+> > >>>>>>> Probably won't make a difference for my test case...
+> > >>>>>>>
+> > >>>>>>>>> We need to do something about this, it's like tossing out months of
+> > >>>>>>>>> optimizations.
+> > >>>>>>>>
+> > >>>>>>>> Some following optimization can be done, such as removing
+> > >>>>>>>> biovec_phys_mergeable() from blk_bio_segment_split().
+> > >>>>>>>
+> > >>>>>>> I think we really need a fast path for <= PAGE_SIZE IOs, to the extent
+> > >>>>>>> that it is possible. But iteration startup cost is a problem in a lot of
+> > >>>>>>> spots, and a split fast path will only help a bit for that specific
+> > >>>>>>> case.
+> > >>>>>>>
+> > >>>>>>> 5% regressions is HUGE. I know I've mentioned this before, I just want
+> > >>>>>>> to really stress how big of a deal that is. It's enough to make me
+> > >>>>>>> consider just reverting it again, which sucks, but I don't feel great
+> > >>>>>>> shipping something that is known that much slower.
+> > >>>>>>>
+> > >>>>>>> Suggestions?
+> > >>>>>>
+> > >>>>>> You mentioned nth_page() costs much in bio_for_each_bvec(), but which
+> > >>>>>> shouldn't call into nth_page(). I will look into it first.
+> > >>>>>
+> > >>>>> I'll check on the test box tomorrow, I lost connectivity before. I'll
+> > >>>>> double check in the morning.
+> > >>>>>
+> > >>>>> I'd focus on the blk_rq_map_sg() path, since that's the biggest cycle
+> > >>>>> consumer.
+> > >>>>
+> > >>>> Hi Jens,
+> > >>>>
+> > >>>> Could you test the following patch which may improve on the 4k randio
+> > >>>> test case?
+> > >>>
+> > >>> A bit, it's up 1% with this patch. I'm going to try without the
+> > >>> get_page/put_page that we had earlier, to see where we are in regards to
+> > >>> the old baseline.
+> > >>
+> > >> OK, today I will test io_uring over null_blk on one real machine and see
+> > >> if something can be improved.
+> > > 
+> > > For reference, I'm running the default t/io_uring from fio, which is
+> > > QD=128, fixed files/buffers, and polled. Running it on two devices to
+> > > max out the CPU core:
+> > > 
+> > > sudo taskset -c 0 t/io_uring /dev/nvme1n1 /dev/nvme5n1
+> > 
+> > Forgot to mention, this is loading nvme with 12 poll queues, which is of
+> > course important to get good performance on this test case.
+> 
+> Btw, is your nvme device SGL capable?  There is some low hanging fruit
+> in that IFF a device has SGL support we can basically dumb down
+> blk_mq_map_sg to never split in this case ever because we don't have
+> any segment size limits.
 
-On 2019-02-28 00:29, Ming Lei wrote:
-> On Wed, Feb 27, 2019 at 08:47:09PM +0000, Jon Hunter wrote:
->> On 21/02/2019 08:42, Marek Szyprowski wrote:
->>> On 2019-02-15 12:13, Ming Lei wrote:
->>>> This patch pulls the trigger for multi-page bvecs.
->>>>
->>>> Reviewed-by: Omar Sandoval <osandov@fb.com>
->>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>> Since Linux next-20190218 I've observed problems with block layer on one
->>> of my test devices (Odroid U3 with EXT4 rootfs on SD card). Bisecting
->>> this issue led me to this change. This is also the first linux-next
->>> release with this change merged. The issue is fully reproducible and can
->>> be observed in the following kernel log:
->>>
->>> sdhci: Secure Digital Host Controller Interface driver
->>> sdhci: Copyright(c) Pierre Ossman
->>> s3c-sdhci 12530000.sdhci: clock source 2: mmc_busclk.2 (100000000 Hz)
->>> s3c-sdhci 12530000.sdhci: Got CD GPIO
->>> mmc0: SDHCI controller on samsung-hsmmc [12530000.sdhci] using ADMA
->>> mmc0: new high speed SDHC card at address aaaa
->>> mmcblk0: mmc0:aaaa SL16G 14.8 GiB
->> I have also noticed some failures when writing to an eMMC device on one
->> of our Tegra boards. We have a simple eMMC write/read test and it is
->> currently failing because the data written does not match the source.
->>
->> I did not seem the same crash as reported here, however, in our case the
->> rootfs is NFS mounted and so probably would not. However, the bisect
->> points to this commit and reverting on top of -next fixes the issues.
-> It is sdhci, probably related with max segment size, could you test the
-> following patch:
->
-> https://marc.info/?l=linux-mmc&m=155128334122951&w=2
+Indeed.
 
-This seems to be fixing my issue too! Thanks!
+In case of SGL, big sg list may not be needed and blk_rq_map_sg() can be
+skipped if proper DMA mapping interface is to return the dma address
+for each segment. That can be one big improvement.
 
-It also fixed the boot issue from USB stick (Exynos EHCI / Mass
-Storage), but I suspect that reading the partition table from the sd
-card (which hold the bootloader and thus must be present to boot the
-device) was enough to trash memory/page cache and break the boot process.
-
-Best regards
--- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
-
+Thanks,
+Ming
