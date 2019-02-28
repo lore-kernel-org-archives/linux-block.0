@@ -4,68 +4,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF906C43381
-	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 21:03:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 830FDC43381
+	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 21:06:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 78E2320C01
-	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 21:03:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A310218D3
+	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 21:06:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Rb+5Dvng"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="RYoItzJj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388353AbfB1VDZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Feb 2019 16:03:25 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:34080 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726631AbfB1VDZ (ORCPT
+        id S2388225AbfB1VGU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Feb 2019 16:06:20 -0500
+Received: from mail-io1-f52.google.com ([209.85.166.52]:39520 "EHLO
+        mail-io1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726414AbfB1VGU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Feb 2019 16:03:25 -0500
-Received: by mail-it1-f195.google.com with SMTP id d125so8693956ith.1
-        for <linux-block@vger.kernel.org>; Thu, 28 Feb 2019 13:03:25 -0800 (PST)
+        Thu, 28 Feb 2019 16:06:20 -0500
+Received: by mail-io1-f52.google.com with SMTP id x3so17803518ior.6
+        for <linux-block@vger.kernel.org>; Thu, 28 Feb 2019 13:06:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Nv3u0G/V3fQnw0uOpLM1knoRv2ExvBRHpS5Vngv0uhI=;
-        b=Rb+5Dvngpl3lnByRKyvcQQo4lDFOSdougL9iFYjKQFlnbhAoX1dxToOrZNy/UA/HOm
-         fYAllvWj8g7D0pvBMl/vXcjOasNTdOgGyZd+nWadMpVOYgehNlcmZjHkNEj5OBNvTwhb
-         KxQ5zyfz75P+9bhDcyLaprX0VKay00LLlYU0HZmDIrdbW9W9S4OzI+ksWGPi5gQ/n7S4
-         4hBNLL0DJhnJjBtkH8uE651Bo0JlhcK7XQWbogdZQDREgrT8IQgOrSM3dQ9KyJDmGUN1
-         5p/j/cA9wv26BIUS2WDdH9iPTjjJfltUPsCHTcNeow3ttK2J1h1dPC9rGo3GCfbfhzWT
-         nasw==
+        bh=As9MHN3S0CXB+/6llIFxzGeXsdXZhyb/nrwdfM4pyiI=;
+        b=RYoItzJjL/azkC0fkDUJAc0VAP3GM+oZp97BPsslJ9Oi3tQjvYnPK5wU2BKbax5Yaq
+         Ctq0N8SdVYsqRyvJh5hL2RHbjyxDPU3yslvqqqzdP/Vd8q9NXsQhu952mK5gok2YV2a3
+         7tmEfq6fwiOMGVZgZZPzYDGpi9oA30C129mBP6BOZGW+2jL6yLWaO4I5DEFjeGX+RJe6
+         ZweyEefJpj8rY4Z9/ACVUT3hnlgbb9ZtwVRk+48I4oS4qoIdFLom4IVAODBxBwVyGvrV
+         0EIjpZ7wQBRsdmEWNgFdvtmZ+SdHAQgR5dQ7kqdok8DHuZZbSuQk3oLoOWfdJs/ZM9qp
+         4gqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=Nv3u0G/V3fQnw0uOpLM1knoRv2ExvBRHpS5Vngv0uhI=;
-        b=I5ZWfiS39RtSwFMtfPOJK8EzIXteYL7lLEipTQYX1a3pSVnkk5NW/lAnA4Um9sejrF
-         jzn+OHpTKhz2umn2paSO17L77KXdoHN+ocV2HLQgLIO24Vw9BOemzcpWwksDwL7AL8w2
-         wK6mYWhRIECwbLIAluyvJIrjRF7BYlENVeSu6h2hIWA+9AokcndkDkl1p9d2oWgS4yKT
-         82LUCdDpdL2N9beXe1eUq97rPLI/qYC+7113RdLVxB7vnkQnRTdTXOurWLM6T2WDEqse
-         DX7FGmWxlNoVFm/ATc8rEfuMbF7mT5QuEnmMfB87gw1kYh1HYOlBYE9bEEfxUlmlMy8O
-         pp2w==
-X-Gm-Message-State: APjAAAVpcHNAumTAKUZU3vj+GxvuHtLX4j3DUhRysBHZdeVLwzHchKLN
-        AQOr75UMtCDNMPEkwaPHEUpYwPEV7uPs/g==
-X-Google-Smtp-Source: APXvYqwxAb+3495RQBw9bnB4X8f2zqgDSs7FAf7da+dIuge5VO/XG8LGGTOHwxD+CpfNH2z6eiTGBg==
-X-Received: by 2002:a02:7124:: with SMTP id n36mr706400jac.122.1551387804251;
-        Thu, 28 Feb 2019 13:03:24 -0800 (PST)
+        bh=As9MHN3S0CXB+/6llIFxzGeXsdXZhyb/nrwdfM4pyiI=;
+        b=U1tlrP9FfUpuIDSOFlSyCo8/Y2GvG7jfhaiUedTYQquKBU8NjLFgjq0zX1V2ZsDiBX
+         WwzAYJv9uT7rxxYJPZjkBRUilje8FimBLJbgUypW6bXNpW6A6+W6emUQ2tmtmxQOW3rQ
+         aIvQjwZcUPrImnmvmBu13v1cm3NVFM1eg7B8uz819zMxjR+ysYsnql3fRG3POfZsk2Fq
+         /4GDlrSV2mDWkTJ1+o/09HNWVgyEYccsC882Wm0EL4uFs5afm78hF1U+d0Gmu/kGFyP/
+         PIqb/ofdpnOvAyJ/w34QKuTPZhvjoqbqvyDrU5Io4UhvMBDCbqNLDj0DG9/VbnqxGmOS
+         vdFQ==
+X-Gm-Message-State: APjAAAXn/F9ZGgl1KfAjX3PrQiaT5j2+1Dt9HzZD3eRL0pOW1Z9wsJ9t
+        i2thaHnQn9S19KQIyyoBnJ+qVw==
+X-Google-Smtp-Source: APXvYqzz8JV5koe9viHkrUdzJzQ3o4l4ggZBWfVEjQgFOynP4R87t24/K+6HrsnQIIQoRZ9arKDHmQ==
+X-Received: by 2002:a6b:fa11:: with SMTP id p17mr873993ioh.185.1551387979409;
+        Thu, 28 Feb 2019 13:06:19 -0800 (PST)
 Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id u82sm3286213itb.18.2019.02.28.13.03.22
+        by smtp.gmail.com with ESMTPSA id u10sm3256209ita.24.2019.02.28.13.06.17
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 28 Feb 2019 13:03:23 -0800 (PST)
-Subject: Re: [PATCH] null_blk: fix checking for REQ_FUA
-To:     Heinz Mauelshagen <heinzm@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-References: <154589c8c1b22879dfc03aec4555793329d5ce83.1550861849.git.heinzm@redhat.com>
+        Thu, 28 Feb 2019 13:06:18 -0800 (PST)
+Subject: Re: [PATCH -next] floppy: remove set but not used variable 'q'
+To:     YueHaibing <yuehaibing@huawei.com>, Jiri Kosina <jikos@kernel.org>
+Cc:     linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <20190218084232.193878-1-yuehaibing@huawei.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <de98873b-a47d-c200-c260-b62ef704f26a@kernel.dk>
-Date:   Thu, 28 Feb 2019 14:03:22 -0700
+Message-ID: <4a230eac-bea4-c771-5126-03f711f3e8a6@kernel.dk>
+Date:   Thu, 28 Feb 2019 14:06:17 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <154589c8c1b22879dfc03aec4555793329d5ce83.1550861849.git.heinzm@redhat.com>
+In-Reply-To: <20190218084232.193878-1-yuehaibing@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,14 +74,16 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/22/19 12:00 PM, Heinz Mauelshagen wrote:
-> null_handle_bio() erroneously uses the bio_op macro
-> which masks respective request flag bits including REQ_FUA
-> out thus failing the check.
+On 2/18/19 1:42 AM, YueHaibing wrote:
+> Fixes gcc '-Wunused-but-set-variable' warning:
 > 
-> Fix by checking bio->bi_opf directly.
+> drivers/block/floppy.c: In function 'request_done':
+> drivers/block/floppy.c:2233:24: warning:
+>  variable 'q' set but not used [-Wunused-but-set-variable]
+> 
+> It's never used and can be removed.
 
-Thanks, applied.
+Applied, thanks.
 
 -- 
 Jens Axboe
