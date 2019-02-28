@@ -2,247 +2,104 @@ Return-Path: <SRS0=9mBv=RD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2218C4360F
-	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 15:22:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D87FAC43381
+	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 15:23:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 717AF206B8
-	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 15:22:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1551367362;
-	bh=O9Nf3IsnQFghLWKMdPoeKuLyx/jWjLHrbhojycHDH20=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=glwgNHpCI9G7FeeayiaSMJZkwltAo6XFjdlCmFqktj7MZ80hZZ3Q7DXBOvhYEohXA
-	 D+ZFir1YP6i11r433B4NTEkjFnk9bAw6slX7M9FfwSuNaFHw517qWrhRn24YhMMUaM
-	 KaebXre5FgkSxbUvM2BDdlK6QBweyNmaNoD5O5Gw=
+	by mail.kernel.org (Postfix) with ESMTP id A5DE6206B8
+	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 15:23:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="a1O4ncWR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388487AbfB1PNh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Feb 2019 10:13:37 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47690 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388423AbfB1PNg (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Feb 2019 10:13:36 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8CA44218D9;
-        Thu, 28 Feb 2019 15:13:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1551366815;
-        bh=O9Nf3IsnQFghLWKMdPoeKuLyx/jWjLHrbhojycHDH20=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=DsjgbCr96Ni7cj/MHHK5eLw9q7R8svzT1i9lxXfOei38YO9nJyv6E28P+DK7EV6ZQ
-         pzu3kIQWBXYfUpw82UzTdpNYWWBpjFSe3ep3saJUnv79FXehpkYO5FUP9UKQf5VbM0
-         LD5taC/LSiHgr5f+ExGaQ/u1qZ4nJms5DiDA31P0=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Liu Bo <bo.liu@linux.alibaba.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 64/64] blk-iolatency: fix IO hang due to negative inflight counter
-Date:   Thu, 28 Feb 2019 10:11:05 -0500
-Message-Id: <20190228151105.11277-64-sashal@kernel.org>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190228151105.11277-1-sashal@kernel.org>
-References: <20190228151105.11277-1-sashal@kernel.org>
+        id S1731942AbfB1PX0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Feb 2019 10:23:26 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:34302 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727828AbfB1PX0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Feb 2019 10:23:26 -0500
+Received: by mail-io1-f67.google.com with SMTP id e1so16920376iok.1
+        for <linux-block@vger.kernel.org>; Thu, 28 Feb 2019 07:23:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=sdMNYWYK1j9emrj7/mBy1mbTlB5+hQgTU083K6cti3Y=;
+        b=a1O4ncWROUarCBf+z/xZ8ZuTtyvdGpUMlTgI8GIH9aj0/l1q5+hJ42rg8W6dl7eL84
+         1ACmDkjloLfstI7GEUVXKGf2+RrF4aGuIubbGbqNGSsM1O8w7idKVxiWuF7V3BCIj+sT
+         7hHDfIQkC+HOllcCzOeOM1J8gG7XCM6aycSJCfY0Ym15K50fdskYe7JPHm4gDUpiQ+G3
+         6u3xP+3/SQPkq3+f4JlmmPy7tLWjlMMU7VAQ0HgOdjwI3BVj/3nzYrl4ZC7J70Wag3+Y
+         +dnIDB/BuWquk1Vs3xX/KRO7JzsX45Ww0R7Baq7PbUeOyxK5Qd8/AmorIb2TxhlFuXBH
+         GmeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=sdMNYWYK1j9emrj7/mBy1mbTlB5+hQgTU083K6cti3Y=;
+        b=nR8I04ycWa428q3QgsTdj/8y6S7qGBpqCJaoUNeS2ZH1tV3ch65/xxcwpsiaMVyPE/
+         0NwJHAcn5ynlDalwRl/XblPl+bhKiSjMPQJrVJCdzBIhkZZHKyw7s9pkSUJvflPNdkiL
+         JeS0ejXoTzVmGXDpccn5w8TJi+mJZwYFLvBb/HeFw3MNzqZl7lTYLwAB3Hmlb5kpde3I
+         OMOizvokoAYzD+9YAaVTGGkt5pAcPge97aWodTAy7RtoHBoJKvAMfmy6yeh9Oe53vSTA
+         bdH8dcttNsHGUxBpjxMIcp54QPgJ/AymLQM9VlBhwmpiZDDlf87punNLhVlpd1L1tfF3
+         wvUQ==
+X-Gm-Message-State: APjAAAU1vx9Y7+69VJ0zQfvp81Z7fquamAE+bLsRM4BFkDKxMAWXs0sJ
+        WSrTX2t6MgreO+ngqK4C+/9z4w==
+X-Google-Smtp-Source: APXvYqzklb5uMHEoF0ilT4CYmzxD1y1O1bC6yKeJqhoKU8DeFdKIjGXPdXp1qrf5afphMMSEL/JTdA==
+X-Received: by 2002:a5e:aa18:: with SMTP id s24mr5697166ioe.151.1551367405639;
+        Thu, 28 Feb 2019 07:23:25 -0800 (PST)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id d139sm2858936itc.44.2019.02.28.07.23.24
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 28 Feb 2019 07:23:24 -0800 (PST)
+Subject: Re: [PATCH] block: advance by bvec's length for bio_for_each_bvec
+To:     Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20190228032421.23161-1-ming.lei@redhat.com>
+ <20190228135832.GA3182@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <22539865-7c66-2d2d-2304-cd09f2a86064@kernel.dk>
+Date:   Thu, 28 Feb 2019 08:23:23 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190228135832.GA3182@infradead.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Liu Bo <bo.liu@linux.alibaba.com>
+On 2/28/19 6:58 AM, Christoph Hellwig wrote:
+> On Thu, Feb 28, 2019 at 11:24:21AM +0800, Ming Lei wrote:
+>> bio_for_each_bvec is used in fast path of bio splitting and sg mapping,
+>> and what we want to do is to iterate over multi-page bvecs, instead of pages.
+>> However, bvec_iter_advance() is invisble for this requirement, and
+>> always advance by page size.
+>>
+>> This way isn't efficient for multipage bvec iterator, also bvec_iter_len()
+>> isn't as fast as mp_bvec_iter_len().
+>>
+>> So advance by multi-page bvec's length instead of page size for bio_for_each_bvec().
+>>
+>> More than 1% IOPS improvement can be observed in io_uring test on null_blk.
+> 
+> We've been there before, and I still insist that there is not good
+> reason ever to clamp the iteration to page size in bvec_iter_advance.
+> Callers that iterate over it already do that in the callers.
+> 
+> So here is a resurretion and rebase of my patch from back then to
+> just do the right thing:
 
-[ Upstream commit 8c772a9bfc7c07c76f4a58b58910452fbb20843b ]
+Care to resend as a proper patch?
 
-Our test reported the following stack, and vmcore showed that
-->inflight counter is -1.
-
-[ffffc9003fcc38d0] __schedule at ffffffff8173d95d
-[ffffc9003fcc3958] schedule at ffffffff8173de26
-[ffffc9003fcc3970] io_schedule at ffffffff810bb6b6
-[ffffc9003fcc3988] blkcg_iolatency_throttle at ffffffff813911cb
-[ffffc9003fcc3a20] rq_qos_throttle at ffffffff813847f3
-[ffffc9003fcc3a48] blk_mq_make_request at ffffffff8137468a
-[ffffc9003fcc3b08] generic_make_request at ffffffff81368b49
-[ffffc9003fcc3b68] submit_bio at ffffffff81368d7d
-[ffffc9003fcc3bb8] ext4_io_submit at ffffffffa031be00 [ext4]
-[ffffc9003fcc3c00] ext4_writepages at ffffffffa03163de [ext4]
-[ffffc9003fcc3d68] do_writepages at ffffffff811c49ae
-[ffffc9003fcc3d78] __filemap_fdatawrite_range at ffffffff811b6188
-[ffffc9003fcc3e30] filemap_write_and_wait_range at ffffffff811b6301
-[ffffc9003fcc3e60] ext4_sync_file at ffffffffa030cee8 [ext4]
-[ffffc9003fcc3ea8] vfs_fsync_range at ffffffff8128594b
-[ffffc9003fcc3ee8] do_fsync at ffffffff81285abd
-[ffffc9003fcc3f18] sys_fsync at ffffffff81285d50
-[ffffc9003fcc3f28] do_syscall_64 at ffffffff81003c04
-[ffffc9003fcc3f50] entry_SYSCALL_64_after_swapgs at ffffffff81742b8e
-
-The ->inflight counter may be negative (-1) if
-
-1) blk-iolatency was disabled when the IO was issued,
-
-2) blk-iolatency was enabled before this IO reached its endio,
-
-3) the ->inflight counter is decreased from 0 to -1 in endio()
-
-In fact the hang can be easily reproduced by the below script,
-
-H=/sys/fs/cgroup/unified/
-P=/sys/fs/cgroup/unified/test
-
-echo "+io" > $H/cgroup.subtree_control
-mkdir -p $P
-
-echo $$ > $P/cgroup.procs
-
-xfs_io -f -d -c "pwrite 0 4k" /dev/sdg
-
-echo "`cat /sys/block/sdg/dev` target=1000000" > $P/io.latency
-
-xfs_io -f -d -c "pwrite 0 4k" /dev/sdg
-
-This fixes the problem by freezing the queue so that while
-enabling/disabling iolatency, there is no inflight rq running.
-
-Note that quiesce_queue is not needed as this only updating iolatency
-configuration about which dispatching request_queue doesn't care.
-
-Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-iolatency.c | 52 +++++++++++++++++++++++++++++++++++++------
- 1 file changed, 45 insertions(+), 7 deletions(-)
-
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 19923f8a029dd..b154e057ca67c 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -72,6 +72,7 @@
- #include <linux/sched/loadavg.h>
- #include <linux/sched/signal.h>
- #include <trace/events/block.h>
-+#include <linux/blk-mq.h>
- #include "blk-rq-qos.h"
- #include "blk-stat.h"
- 
-@@ -568,6 +569,9 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
- 		return;
- 
- 	enabled = blk_iolatency_enabled(iolat->blkiolat);
-+	if (!enabled)
-+		return;
-+
- 	while (blkg && blkg->parent) {
- 		iolat = blkg_to_lat(blkg);
- 		if (!iolat) {
-@@ -577,7 +581,7 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
- 		rqw = &iolat->rq_wait;
- 
- 		atomic_dec(&rqw->inflight);
--		if (!enabled || iolat->min_lat_nsec == 0)
-+		if (iolat->min_lat_nsec == 0)
- 			goto next;
- 		iolatency_record_time(iolat, &bio->bi_issue, now,
- 				      issue_as_root);
-@@ -721,10 +725,13 @@ int blk_iolatency_init(struct request_queue *q)
- 	return 0;
- }
- 
--static void iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
-+/*
-+ * return 1 for enabling iolatency, return -1 for disabling iolatency, otherwise
-+ * return 0.
-+ */
-+static int iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
- {
- 	struct iolatency_grp *iolat = blkg_to_lat(blkg);
--	struct blk_iolatency *blkiolat = iolat->blkiolat;
- 	u64 oldval = iolat->min_lat_nsec;
- 
- 	iolat->min_lat_nsec = val;
-@@ -733,9 +740,10 @@ static void iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
- 				    BLKIOLATENCY_MAX_WIN_SIZE);
- 
- 	if (!oldval && val)
--		atomic_inc(&blkiolat->enabled);
-+		return 1;
- 	if (oldval && !val)
--		atomic_dec(&blkiolat->enabled);
-+		return -1;
-+	return 0;
- }
- 
- static void iolatency_clear_scaling(struct blkcg_gq *blkg)
-@@ -768,6 +776,7 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
- 	u64 lat_val = 0;
- 	u64 oldval;
- 	int ret;
-+	int enable = 0;
- 
- 	ret = blkg_conf_prep(blkcg, &blkcg_policy_iolatency, buf, &ctx);
- 	if (ret)
-@@ -803,7 +812,12 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
- 	blkg = ctx.blkg;
- 	oldval = iolat->min_lat_nsec;
- 
--	iolatency_set_min_lat_nsec(blkg, lat_val);
-+	enable = iolatency_set_min_lat_nsec(blkg, lat_val);
-+	if (enable) {
-+		WARN_ON_ONCE(!blk_get_queue(blkg->q));
-+		blkg_get(blkg);
-+	}
-+
- 	if (oldval != iolat->min_lat_nsec) {
- 		iolatency_clear_scaling(blkg);
- 	}
-@@ -811,6 +825,24 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
- 	ret = 0;
- out:
- 	blkg_conf_finish(&ctx);
-+	if (ret == 0 && enable) {
-+		struct iolatency_grp *tmp = blkg_to_lat(blkg);
-+		struct blk_iolatency *blkiolat = tmp->blkiolat;
-+
-+		blk_mq_freeze_queue(blkg->q);
-+
-+		if (enable == 1)
-+			atomic_inc(&blkiolat->enabled);
-+		else if (enable == -1)
-+			atomic_dec(&blkiolat->enabled);
-+		else
-+			WARN_ON_ONCE(1);
-+
-+		blk_mq_unfreeze_queue(blkg->q);
-+
-+		blkg_put(blkg);
-+		blk_put_queue(blkg->q);
-+	}
- 	return ret ?: nbytes;
- }
- 
-@@ -910,8 +942,14 @@ static void iolatency_pd_offline(struct blkg_policy_data *pd)
- {
- 	struct iolatency_grp *iolat = pd_to_lat(pd);
- 	struct blkcg_gq *blkg = lat_to_blkg(iolat);
-+	struct blk_iolatency *blkiolat = iolat->blkiolat;
-+	int ret;
- 
--	iolatency_set_min_lat_nsec(blkg, 0);
-+	ret = iolatency_set_min_lat_nsec(blkg, 0);
-+	if (ret == 1)
-+		atomic_inc(&blkiolat->enabled);
-+	if (ret == -1)
-+		atomic_dec(&blkiolat->enabled);
- 	iolatency_clear_scaling(blkg);
- }
- 
 -- 
-2.19.1
+Jens Axboe
 
