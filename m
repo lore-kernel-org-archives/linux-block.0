@@ -2,246 +2,93 @@ Return-Path: <SRS0=9mBv=RD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A3F9C43381
-	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 15:28:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 898B0C43381
+	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 16:00:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E10420C01
-	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 15:28:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1551367683;
-	bh=bkSAOvYwvW/GStXcAGCxOAa9EXMIxYgPTqPQneTX/X4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=rQ5ElIMharQLqHBchuAcrQyzO66IjHeZE4YjX1CSgCufHbntGHLgzND0srm1RXwR2
-	 UzI7ikEtPa/Mx3HWO2a7c9kz5oe7JNm6dLCQujGKtbASOedV9tSOsuQEPafDfx+ET+
-	 NWYYya2ECIDKg3OQanVVu5AG7c6NOroO6ZxwEQLE=
+	by mail.kernel.org (Postfix) with ESMTP id 55869218B0
+	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 16:00:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="d+ANmWtE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387854AbfB1PLF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Feb 2019 10:11:05 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44014 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387876AbfB1PLE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Feb 2019 10:11:04 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C05D6218D9;
-        Thu, 28 Feb 2019 15:11:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1551366663;
-        bh=bkSAOvYwvW/GStXcAGCxOAa9EXMIxYgPTqPQneTX/X4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=dbn/N+7skJVgXS3/g00lrF7JLf2GGGwmHInA8AZWnoc6YbH2lBzU8cQBbl1J+vET3
-         nFkNUsAICjj5fV0tEIlIoIDxK1jk1fIRUl/q7fQIZtUQHtj9mwCzUgMGEraMTD499m
-         ARdT9PDjPGZrRT0EvHuSk/phd4u4YxvSWSczAo7s=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Liu Bo <bo.liu@linux.alibaba.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.20 81/81] blk-iolatency: fix IO hang due to negative inflight counter
-Date:   Thu, 28 Feb 2019 10:08:13 -0500
-Message-Id: <20190228150813.10256-81-sashal@kernel.org>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190228150813.10256-1-sashal@kernel.org>
-References: <20190228150813.10256-1-sashal@kernel.org>
+        id S1730883AbfB1QAi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Feb 2019 11:00:38 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:41890 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727974AbfB1QAi (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Feb 2019 11:00:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=96Hca5yLpoltlyMq41bcBv67QNu0z1eOrF1d8KYhsVk=; b=d+ANmWtEmjAxmZZdMIXPeTevC
+        WBKEbdTupibo3cFi3j5bFLWOkUUfYUgonGJuWHggD0Bf+xSGrTl5Wk0iojQsF7zExKBr7AVmhI1Vh
+        3c/EoHFlmYA7uXzfk6H/q5HaBb/RjDBW5DpGH2xZudcqo69+4P+TAg4Q+IDcBz8fZ/xX7UDW5tnDN
+        bzSZaZGtULb7HWAwHgGEJkb2wZFI899t4gkf46dMsjSMS2e071D0Dp6WB4eGVwaAhl91fZbKH9vjj
+        heqdiagXFy4IiqY3sky6Hbh4KKfyYFu40gQXznr3NX9Rk8s7OMISY3m20UkIPwTP616mrvrtYR2Ua
+        bWo95ppYw==;
+Received: from rap-us.hgst.com ([199.255.44.250] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1gzO6t-0003wn-Dj; Thu, 28 Feb 2019 16:00:37 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     ming.lei@redhat.com, linux-block@vger.kernel.org
+Subject: [PATCH] block: optimize bvec iteration in bvec_iter_advance
+Date:   Thu, 28 Feb 2019 11:00:18 -0500
+Message-Id: <20190228160018.3652-1-hch@lst.de>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Liu Bo <bo.liu@linux.alibaba.com>
+There is no need to only iterate in chunks of PAGE_SIZE or less in
+bvec_iter_advance, given that the callers pass in the chunk length that
+they are operating on - either that already is less than PAGE_SIZE
+because they do classic page-based iteration, or it is larger because
+the caller operates on multi-page bvecs.
 
-[ Upstream commit 8c772a9bfc7c07c76f4a58b58910452fbb20843b ]
+This should help optimizing shaving off a few cycles of the I/O hot
+path.
 
-Our test reported the following stack, and vmcore showed that
-->inflight counter is -1.
-
-[ffffc9003fcc38d0] __schedule at ffffffff8173d95d
-[ffffc9003fcc3958] schedule at ffffffff8173de26
-[ffffc9003fcc3970] io_schedule at ffffffff810bb6b6
-[ffffc9003fcc3988] blkcg_iolatency_throttle at ffffffff813911cb
-[ffffc9003fcc3a20] rq_qos_throttle at ffffffff813847f3
-[ffffc9003fcc3a48] blk_mq_make_request at ffffffff8137468a
-[ffffc9003fcc3b08] generic_make_request at ffffffff81368b49
-[ffffc9003fcc3b68] submit_bio at ffffffff81368d7d
-[ffffc9003fcc3bb8] ext4_io_submit at ffffffffa031be00 [ext4]
-[ffffc9003fcc3c00] ext4_writepages at ffffffffa03163de [ext4]
-[ffffc9003fcc3d68] do_writepages at ffffffff811c49ae
-[ffffc9003fcc3d78] __filemap_fdatawrite_range at ffffffff811b6188
-[ffffc9003fcc3e30] filemap_write_and_wait_range at ffffffff811b6301
-[ffffc9003fcc3e60] ext4_sync_file at ffffffffa030cee8 [ext4]
-[ffffc9003fcc3ea8] vfs_fsync_range at ffffffff8128594b
-[ffffc9003fcc3ee8] do_fsync at ffffffff81285abd
-[ffffc9003fcc3f18] sys_fsync at ffffffff81285d50
-[ffffc9003fcc3f28] do_syscall_64 at ffffffff81003c04
-[ffffc9003fcc3f50] entry_SYSCALL_64_after_swapgs at ffffffff81742b8e
-
-The ->inflight counter may be negative (-1) if
-
-1) blk-iolatency was disabled when the IO was issued,
-
-2) blk-iolatency was enabled before this IO reached its endio,
-
-3) the ->inflight counter is decreased from 0 to -1 in endio()
-
-In fact the hang can be easily reproduced by the below script,
-
-H=/sys/fs/cgroup/unified/
-P=/sys/fs/cgroup/unified/test
-
-echo "+io" > $H/cgroup.subtree_control
-mkdir -p $P
-
-echo $$ > $P/cgroup.procs
-
-xfs_io -f -d -c "pwrite 0 4k" /dev/sdg
-
-echo "`cat /sys/block/sdg/dev` target=1000000" > $P/io.latency
-
-xfs_io -f -d -c "pwrite 0 4k" /dev/sdg
-
-This fixes the problem by freezing the queue so that while
-enabling/disabling iolatency, there is no inflight rq running.
-
-Note that quiesce_queue is not needed as this only updating iolatency
-configuration about which dispatching request_queue doesn't care.
-
-Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-iolatency.c | 52 +++++++++++++++++++++++++++++++++++++------
- 1 file changed, 45 insertions(+), 7 deletions(-)
+ include/linux/bvec.h | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
-index 38c35c32aff2d..c1c72b42dda0a 100644
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -72,6 +72,7 @@
- #include <linux/sched/loadavg.h>
- #include <linux/sched/signal.h>
- #include <trace/events/block.h>
-+#include <linux/blk-mq.h>
- #include "blk-rq-qos.h"
- #include "blk-stat.h"
- 
-@@ -648,6 +649,9 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
- 		return;
- 
- 	enabled = blk_iolatency_enabled(iolat->blkiolat);
-+	if (!enabled)
-+		return;
-+
- 	while (blkg && blkg->parent) {
- 		iolat = blkg_to_lat(blkg);
- 		if (!iolat) {
-@@ -657,7 +661,7 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
- 		rqw = &iolat->rq_wait;
- 
- 		atomic_dec(&rqw->inflight);
--		if (!enabled || iolat->min_lat_nsec == 0)
-+		if (iolat->min_lat_nsec == 0)
- 			goto next;
- 		iolatency_record_time(iolat, &bio->bi_issue, now,
- 				      issue_as_root);
-@@ -801,10 +805,13 @@ int blk_iolatency_init(struct request_queue *q)
- 	return 0;
- }
- 
--static void iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
-+/*
-+ * return 1 for enabling iolatency, return -1 for disabling iolatency, otherwise
-+ * return 0.
-+ */
-+static int iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
- {
- 	struct iolatency_grp *iolat = blkg_to_lat(blkg);
--	struct blk_iolatency *blkiolat = iolat->blkiolat;
- 	u64 oldval = iolat->min_lat_nsec;
- 
- 	iolat->min_lat_nsec = val;
-@@ -813,9 +820,10 @@ static void iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
- 				    BLKIOLATENCY_MAX_WIN_SIZE);
- 
- 	if (!oldval && val)
--		atomic_inc(&blkiolat->enabled);
-+		return 1;
- 	if (oldval && !val)
--		atomic_dec(&blkiolat->enabled);
-+		return -1;
-+	return 0;
- }
- 
- static void iolatency_clear_scaling(struct blkcg_gq *blkg)
-@@ -847,6 +855,7 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
- 	u64 lat_val = 0;
- 	u64 oldval;
- 	int ret;
-+	int enable = 0;
- 
- 	ret = blkg_conf_prep(blkcg, &blkcg_policy_iolatency, buf, &ctx);
- 	if (ret)
-@@ -881,7 +890,12 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
- 	blkg = ctx.blkg;
- 	oldval = iolat->min_lat_nsec;
- 
--	iolatency_set_min_lat_nsec(blkg, lat_val);
-+	enable = iolatency_set_min_lat_nsec(blkg, lat_val);
-+	if (enable) {
-+		WARN_ON_ONCE(!blk_get_queue(blkg->q));
-+		blkg_get(blkg);
-+	}
-+
- 	if (oldval != iolat->min_lat_nsec) {
- 		iolatency_clear_scaling(blkg);
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 2c32e3e151a0..cf06c0647c4f 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -112,14 +112,15 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
  	}
-@@ -889,6 +903,24 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
- 	ret = 0;
- out:
- 	blkg_conf_finish(&ctx);
-+	if (ret == 0 && enable) {
-+		struct iolatency_grp *tmp = blkg_to_lat(blkg);
-+		struct blk_iolatency *blkiolat = tmp->blkiolat;
-+
-+		blk_mq_freeze_queue(blkg->q);
-+
-+		if (enable == 1)
-+			atomic_inc(&blkiolat->enabled);
-+		else if (enable == -1)
-+			atomic_dec(&blkiolat->enabled);
-+		else
-+			WARN_ON_ONCE(1);
-+
-+		blk_mq_unfreeze_queue(blkg->q);
-+
-+		blkg_put(blkg);
-+		blk_put_queue(blkg->q);
-+	}
- 	return ret ?: nbytes;
- }
  
-@@ -1024,8 +1056,14 @@ static void iolatency_pd_offline(struct blkg_policy_data *pd)
- {
- 	struct iolatency_grp *iolat = pd_to_lat(pd);
- 	struct blkcg_gq *blkg = lat_to_blkg(iolat);
-+	struct blk_iolatency *blkiolat = iolat->blkiolat;
-+	int ret;
+ 	while (bytes) {
+-		unsigned iter_len = bvec_iter_len(bv, *iter);
+-		unsigned len = min(bytes, iter_len);
++		const struct bio_vec *cur = bv + iter->bi_idx;
++		unsigned len = min3(bytes, iter->bi_size,
++				    cur->bv_len - iter->bi_bvec_done);
  
--	iolatency_set_min_lat_nsec(blkg, 0);
-+	ret = iolatency_set_min_lat_nsec(blkg, 0);
-+	if (ret == 1)
-+		atomic_inc(&blkiolat->enabled);
-+	if (ret == -1)
-+		atomic_dec(&blkiolat->enabled);
- 	iolatency_clear_scaling(blkg);
- }
+ 		bytes -= len;
+ 		iter->bi_size -= len;
+ 		iter->bi_bvec_done += len;
  
+-		if (iter->bi_bvec_done == __bvec_iter_bvec(bv, *iter)->bv_len) {
++		if (iter->bi_bvec_done == cur->bv_len) {
+ 			iter->bi_bvec_done = 0;
+ 			iter->bi_idx++;
+ 		}
 -- 
-2.19.1
+2.20.1
 
