@@ -2,85 +2,246 @@ Return-Path: <SRS0=9mBv=RD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60F1BC43381
-	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 15:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A3F9C43381
+	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 15:28:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 23CC320C01
-	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 15:26:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E10420C01
+	for <linux-block@archiver.kernel.org>; Thu, 28 Feb 2019 15:28:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1551367595;
-	bh=1z6ttU73UyhDzsz6APPmurcdIWE5PZFUbHdA9IBqAoE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=gsQdR0esEV9ZTbqzMGzyQhMh08BpAkAcNGzXbV0DoxrjeEu52daS13ZkIKOObw/Cm
-	 jpUrncvbE21QgDlzgcZwaZd4CRphN/z0ygebsq3jHpB+McgM9fvsSqVwIaoA6xyUPW
-	 1RKtWTYi6+yz8sQJNV+IYWOI3jEt69fuo3bdQUsE=
+	s=default; t=1551367683;
+	bh=bkSAOvYwvW/GStXcAGCxOAa9EXMIxYgPTqPQneTX/X4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=rQ5ElIMharQLqHBchuAcrQyzO66IjHeZE4YjX1CSgCufHbntGHLgzND0srm1RXwR2
+	 UzI7ikEtPa/Mx3HWO2a7c9kz5oe7JNm6dLCQujGKtbASOedV9tSOsuQEPafDfx+ET+
+	 NWYYya2ECIDKg3OQanVVu5AG7c6NOroO6ZxwEQLE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726414AbfB1P0Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Feb 2019 10:26:16 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59472 "EHLO mail.kernel.org"
+        id S2387854AbfB1PLF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Feb 2019 10:11:05 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44014 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726986AbfB1P0K (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Feb 2019 10:26:10 -0500
-Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S2387876AbfB1PLE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Feb 2019 10:11:04 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3C19E2171F;
-        Thu, 28 Feb 2019 15:26:09 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C05D6218D9;
+        Thu, 28 Feb 2019 15:11:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1551367569;
-        bh=1z6ttU73UyhDzsz6APPmurcdIWE5PZFUbHdA9IBqAoE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=MiTHMnJDFAfhIqTrbEjqZsDCVY0bwilJhRv2JD27f5UJIftTHY8hdLRgdNbn1WaAF
-         LyjvYCXO73gdAOxmRI8xebHPIt4VQhJEbtj1BOPbwX32D00oGSGrqbkFGDmPzHRZbw
-         Db9ANivmq4Uu12S+taoUGkl9fVL+zOKtruU3OhPE=
-Date:   Thu, 28 Feb 2019 16:26:07 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 4.20 43/81] blk-mq: protect
- debugfs_create_files() from failures
-Message-ID: <20190228152607.GE8481@kroah.com>
+        s=default; t=1551366663;
+        bh=bkSAOvYwvW/GStXcAGCxOAa9EXMIxYgPTqPQneTX/X4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=dbn/N+7skJVgXS3/g00lrF7JLf2GGGwmHInA8AZWnoc6YbH2lBzU8cQBbl1J+vET3
+         nFkNUsAICjj5fV0tEIlIoIDxK1jk1fIRUl/q7fQIZtUQHtj9mwCzUgMGEraMTD499m
+         ARdT9PDjPGZrRT0EvHuSk/phd4u4YxvSWSczAo7s=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Liu Bo <bo.liu@linux.alibaba.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.20 81/81] blk-iolatency: fix IO hang due to negative inflight counter
+Date:   Thu, 28 Feb 2019 10:08:13 -0500
+Message-Id: <20190228150813.10256-81-sashal@kernel.org>
+X-Mailer: git-send-email 2.19.1
+In-Reply-To: <20190228150813.10256-1-sashal@kernel.org>
 References: <20190228150813.10256-1-sashal@kernel.org>
- <20190228150813.10256-43-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190228150813.10256-43-sashal@kernel.org>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 28, 2019 at 10:07:35AM -0500, Sasha Levin wrote:
-> From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> 
-> [ Upstream commit 36991ca68db9dd43bac7f3519f080ee3939263ef ]
-> 
-> If debugfs were to return a non-NULL error for a debugfs call, using
-> that pointer later in debugfs_create_files() would crash.
-> 
-> Fix that by properly checking the pointer before referencing it.
-> 
-> Reported-by: Michal Hocko <mhocko@kernel.org>
-> Reported-and-tested-by: syzbot+b382ba6a802a3d242790@syzkaller.appspotmail.com
-> Reported-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
-> ---
->  block/blk-mq-debugfs.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
+From: Liu Bo <bo.liu@linux.alibaba.com>
 
-As the commit this "fixes" should not be backported, no need for this
-patch in any stable kernel either.  Please drop from all queues.
+[ Upstream commit 8c772a9bfc7c07c76f4a58b58910452fbb20843b ]
 
-thanks,
+Our test reported the following stack, and vmcore showed that
+->inflight counter is -1.
 
-greg k-h
+[ffffc9003fcc38d0] __schedule at ffffffff8173d95d
+[ffffc9003fcc3958] schedule at ffffffff8173de26
+[ffffc9003fcc3970] io_schedule at ffffffff810bb6b6
+[ffffc9003fcc3988] blkcg_iolatency_throttle at ffffffff813911cb
+[ffffc9003fcc3a20] rq_qos_throttle at ffffffff813847f3
+[ffffc9003fcc3a48] blk_mq_make_request at ffffffff8137468a
+[ffffc9003fcc3b08] generic_make_request at ffffffff81368b49
+[ffffc9003fcc3b68] submit_bio at ffffffff81368d7d
+[ffffc9003fcc3bb8] ext4_io_submit at ffffffffa031be00 [ext4]
+[ffffc9003fcc3c00] ext4_writepages at ffffffffa03163de [ext4]
+[ffffc9003fcc3d68] do_writepages at ffffffff811c49ae
+[ffffc9003fcc3d78] __filemap_fdatawrite_range at ffffffff811b6188
+[ffffc9003fcc3e30] filemap_write_and_wait_range at ffffffff811b6301
+[ffffc9003fcc3e60] ext4_sync_file at ffffffffa030cee8 [ext4]
+[ffffc9003fcc3ea8] vfs_fsync_range at ffffffff8128594b
+[ffffc9003fcc3ee8] do_fsync at ffffffff81285abd
+[ffffc9003fcc3f18] sys_fsync at ffffffff81285d50
+[ffffc9003fcc3f28] do_syscall_64 at ffffffff81003c04
+[ffffc9003fcc3f50] entry_SYSCALL_64_after_swapgs at ffffffff81742b8e
+
+The ->inflight counter may be negative (-1) if
+
+1) blk-iolatency was disabled when the IO was issued,
+
+2) blk-iolatency was enabled before this IO reached its endio,
+
+3) the ->inflight counter is decreased from 0 to -1 in endio()
+
+In fact the hang can be easily reproduced by the below script,
+
+H=/sys/fs/cgroup/unified/
+P=/sys/fs/cgroup/unified/test
+
+echo "+io" > $H/cgroup.subtree_control
+mkdir -p $P
+
+echo $$ > $P/cgroup.procs
+
+xfs_io -f -d -c "pwrite 0 4k" /dev/sdg
+
+echo "`cat /sys/block/sdg/dev` target=1000000" > $P/io.latency
+
+xfs_io -f -d -c "pwrite 0 4k" /dev/sdg
+
+This fixes the problem by freezing the queue so that while
+enabling/disabling iolatency, there is no inflight rq running.
+
+Note that quiesce_queue is not needed as this only updating iolatency
+configuration about which dispatching request_queue doesn't care.
+
+Signed-off-by: Liu Bo <bo.liu@linux.alibaba.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/blk-iolatency.c | 52 +++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 45 insertions(+), 7 deletions(-)
+
+diff --git a/block/blk-iolatency.c b/block/blk-iolatency.c
+index 38c35c32aff2d..c1c72b42dda0a 100644
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -72,6 +72,7 @@
+ #include <linux/sched/loadavg.h>
+ #include <linux/sched/signal.h>
+ #include <trace/events/block.h>
++#include <linux/blk-mq.h>
+ #include "blk-rq-qos.h"
+ #include "blk-stat.h"
+ 
+@@ -648,6 +649,9 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
+ 		return;
+ 
+ 	enabled = blk_iolatency_enabled(iolat->blkiolat);
++	if (!enabled)
++		return;
++
+ 	while (blkg && blkg->parent) {
+ 		iolat = blkg_to_lat(blkg);
+ 		if (!iolat) {
+@@ -657,7 +661,7 @@ static void blkcg_iolatency_done_bio(struct rq_qos *rqos, struct bio *bio)
+ 		rqw = &iolat->rq_wait;
+ 
+ 		atomic_dec(&rqw->inflight);
+-		if (!enabled || iolat->min_lat_nsec == 0)
++		if (iolat->min_lat_nsec == 0)
+ 			goto next;
+ 		iolatency_record_time(iolat, &bio->bi_issue, now,
+ 				      issue_as_root);
+@@ -801,10 +805,13 @@ int blk_iolatency_init(struct request_queue *q)
+ 	return 0;
+ }
+ 
+-static void iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
++/*
++ * return 1 for enabling iolatency, return -1 for disabling iolatency, otherwise
++ * return 0.
++ */
++static int iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
+ {
+ 	struct iolatency_grp *iolat = blkg_to_lat(blkg);
+-	struct blk_iolatency *blkiolat = iolat->blkiolat;
+ 	u64 oldval = iolat->min_lat_nsec;
+ 
+ 	iolat->min_lat_nsec = val;
+@@ -813,9 +820,10 @@ static void iolatency_set_min_lat_nsec(struct blkcg_gq *blkg, u64 val)
+ 				    BLKIOLATENCY_MAX_WIN_SIZE);
+ 
+ 	if (!oldval && val)
+-		atomic_inc(&blkiolat->enabled);
++		return 1;
+ 	if (oldval && !val)
+-		atomic_dec(&blkiolat->enabled);
++		return -1;
++	return 0;
+ }
+ 
+ static void iolatency_clear_scaling(struct blkcg_gq *blkg)
+@@ -847,6 +855,7 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
+ 	u64 lat_val = 0;
+ 	u64 oldval;
+ 	int ret;
++	int enable = 0;
+ 
+ 	ret = blkg_conf_prep(blkcg, &blkcg_policy_iolatency, buf, &ctx);
+ 	if (ret)
+@@ -881,7 +890,12 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
+ 	blkg = ctx.blkg;
+ 	oldval = iolat->min_lat_nsec;
+ 
+-	iolatency_set_min_lat_nsec(blkg, lat_val);
++	enable = iolatency_set_min_lat_nsec(blkg, lat_val);
++	if (enable) {
++		WARN_ON_ONCE(!blk_get_queue(blkg->q));
++		blkg_get(blkg);
++	}
++
+ 	if (oldval != iolat->min_lat_nsec) {
+ 		iolatency_clear_scaling(blkg);
+ 	}
+@@ -889,6 +903,24 @@ static ssize_t iolatency_set_limit(struct kernfs_open_file *of, char *buf,
+ 	ret = 0;
+ out:
+ 	blkg_conf_finish(&ctx);
++	if (ret == 0 && enable) {
++		struct iolatency_grp *tmp = blkg_to_lat(blkg);
++		struct blk_iolatency *blkiolat = tmp->blkiolat;
++
++		blk_mq_freeze_queue(blkg->q);
++
++		if (enable == 1)
++			atomic_inc(&blkiolat->enabled);
++		else if (enable == -1)
++			atomic_dec(&blkiolat->enabled);
++		else
++			WARN_ON_ONCE(1);
++
++		blk_mq_unfreeze_queue(blkg->q);
++
++		blkg_put(blkg);
++		blk_put_queue(blkg->q);
++	}
+ 	return ret ?: nbytes;
+ }
+ 
+@@ -1024,8 +1056,14 @@ static void iolatency_pd_offline(struct blkg_policy_data *pd)
+ {
+ 	struct iolatency_grp *iolat = pd_to_lat(pd);
+ 	struct blkcg_gq *blkg = lat_to_blkg(iolat);
++	struct blk_iolatency *blkiolat = iolat->blkiolat;
++	int ret;
+ 
+-	iolatency_set_min_lat_nsec(blkg, 0);
++	ret = iolatency_set_min_lat_nsec(blkg, 0);
++	if (ret == 1)
++		atomic_inc(&blkiolat->enabled);
++	if (ret == -1)
++		atomic_dec(&blkiolat->enabled);
+ 	iolatency_clear_scaling(blkg);
+ }
+ 
+-- 
+2.19.1
+
