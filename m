@@ -2,113 +2,83 @@ Return-Path: <SRS0=BuC1=RE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FA44C43381
-	for <linux-block@archiver.kernel.org>; Fri,  1 Mar 2019 01:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D9D1C43381
+	for <linux-block@archiver.kernel.org>; Fri,  1 Mar 2019 01:27:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 65B9020842
-	for <linux-block@archiver.kernel.org>; Fri,  1 Mar 2019 01:24:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62FE22085A
+	for <linux-block@archiver.kernel.org>; Fri,  1 Mar 2019 01:27:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732828AbfCABYq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Feb 2019 20:24:46 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4747 "EHLO huawei.com"
+        id S1733005AbfCAB1Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Feb 2019 20:27:25 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4748 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726088AbfCABYq (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Feb 2019 20:24:46 -0500
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 295BEC8325EE75AF9755;
-        Fri,  1 Mar 2019 09:24:44 +0800 (CST)
-Received: from huawei.com (10.90.53.225) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.408.0; Fri, 1 Mar 2019
- 09:24:40 +0800
-From:   Yufen Yu <yuyufen@huawei.com>
-To:     <axboe@kernel.dk>, <Damien.LeMoal@wdc.com>,
-        <marcos.souza.org@gmail.com>, <linux-block@vger.kernel.org>
-Subject: [PATCH v2] block: add a new flag BLK_MQ_POLL_CLASSIC for hybrid poll
-Date:   Fri, 1 Mar 2019 09:28:55 +0800
-Message-ID: <20190301012855.137660-1-yuyufen@huawei.com>
-X-Mailer: git-send-email 2.16.2.dirty
+        id S1732400AbfCAB1Z (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Feb 2019 20:27:25 -0500
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id ECF566E6022BDC212B34;
+        Fri,  1 Mar 2019 09:27:23 +0800 (CST)
+Received: from [127.0.0.1] (10.184.213.217) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.408.0; Fri, 1 Mar 2019
+ 09:27:17 +0800
+Subject: Re: [PATCH 0/1] Fix NULL pointer dereference in register_disk
+To:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>
+CC:     <houtao1@huawei.com>, <yi.zhang@huawei.com>,
+        Jason Yan <yanaijie@huawei.com>
+References: <1550669225-77623-1-git-send-email-zhengbin13@huawei.com>
+ <b88dc434-5e47-f446-896c-b1b75acefa11@kernel.dk>
+From:   "zhengbin (A)" <zhengbin13@huawei.com>
+Message-ID: <6a73ee68-73d5-cc08-afe7-be8e5251d018@huawei.com>
+Date:   Fri, 1 Mar 2019 09:27:12 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.90.53.225]
+In-Reply-To: <b88dc434-5e47-f446-896c-b1b75acefa11@kernel.dk>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.184.213.217]
 X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For q->poll_nsec == -1, means doing classic poll, not hybrid poll.
-We introduce a new flag BLK_MQ_POLL_CLASSIC to replace -1, which
-may make code much easier to read.
+Thanks
 
-Signed-off-by: Yufen Yu <yuyufen@huawei.com>
----
- block/blk-mq.c         | 4 ++--
- block/blk-sysfs.c      | 4 ++--
- include/linux/blkdev.h | 3 +++
- 3 files changed, 7 insertions(+), 4 deletions(-)
+> That can/should be done when we actually deal with error handling properly
+> in this path. I have applied your patch.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 9437a5eb07cf..e70202e3b378 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2857,7 +2857,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	/*
- 	 * Default to classic polling
- 	 */
--	q->poll_nsec = -1;
-+	q->poll_nsec = BLK_MQ_POLL_CLASSIC;
- 
- 	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
- 	blk_mq_add_queue_tag_set(set, q);
-@@ -3389,7 +3389,7 @@ static bool blk_mq_poll_hybrid(struct request_queue *q,
- {
- 	struct request *rq;
- 
--	if (q->poll_nsec == -1)
-+	if (q->poll_nsec == BLK_MQ_POLL_CLASSIC)
- 		return false;
- 
- 	if (!blk_qc_t_is_internal(cookie))
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 590d1ef2f961..8639e135687e 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -360,7 +360,7 @@ static ssize_t queue_poll_delay_show(struct request_queue *q, char *page)
- {
- 	int val;
- 
--	if (q->poll_nsec == -1)
-+	if (q->poll_nsec == BLK_MQ_POLL_CLASSIC)
- 		val = -1;
- 	else
- 		val = q->poll_nsec / 1000;
-@@ -381,7 +381,7 @@ static ssize_t queue_poll_delay_store(struct request_queue *q, const char *page,
- 		return err;
- 
- 	if (val == -1)
--		q->poll_nsec = -1;
-+		q->poll_nsec = BLK_MQ_POLL_CLASSIC;
- 	else
- 		q->poll_nsec = val * 1000;
- 
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 338604dff7d0..f9c2ebf5e621 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -50,6 +50,9 @@ struct blk_stat_callback;
- /* Must be consistent with blk_mq_poll_stats_bkt() */
- #define BLK_MQ_POLL_STATS_BKTS 16
- 
-+/* Doing classic polling */
-+#define BLK_MQ_POLL_CLASSIC -1
-+
- /*
-  * Maximum number of blkcg policies allowed to be registered concurrently.
-  * Defined here to simplify include dependency.
--- 
-2.16.2.dirty
+-->So when we will actually deal with error handling properly?
+
+On 2019/3/1 5:02, Jens Axboe wrote:
+> On 2/20/19 6:27 AM, zhengbin wrote:
+>> When I use syzkaller test kernel, there is a NULL pointer dereference
+>> in register_disk. The better solution is add return code to
+>> __device_add_disk. There is a patchset(http://lists.infradead.org/pipermail
+>> /linux-nvme/2016-August/005860.html) from Fam Zheng, int this patchset, the
+>> modify is as follows:
+>>  int device_add_disk() {
+>>         ...alloc A...
+>>         retval = alloc B
+>>         if (retval)
+>>             goto fail;
+>>         ...
+>> 	fail:
+>> 	    return retval;  --->did not free A
+>>    }
+>> There are many callers, ie:
+>> loop_add-->add_disk-->device_add_disk-->__device_add_disk
+>> loop_remove-->del_gendisk
+>> ----->This will free all resources, inclue B(free fail)
+>>
+>> Maybe the better way is that if device_add_disk return fail, it should
+>> free all resources? This needs to modify all the callers(Otherwise the
+>> callers will double free), unfortunately, I am not very familiar with it.
+> 
+> That can/should be done when we actually deal with error handling properly
+> in this path. I have applied your patch.
+> 
 
