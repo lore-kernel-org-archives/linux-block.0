@@ -2,209 +2,148 @@ Return-Path: <SRS0=BuC1=RE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46FC3C4360F
-	for <linux-block@archiver.kernel.org>; Fri,  1 Mar 2019 14:14:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5874FC43381
+	for <linux-block@archiver.kernel.org>; Fri,  1 Mar 2019 16:00:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1290320851
-	for <linux-block@archiver.kernel.org>; Fri,  1 Mar 2019 14:14:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E2F320851
+	for <linux-block@archiver.kernel.org>; Fri,  1 Mar 2019 16:00:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Hh2Kqrb0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="DxWNprN8";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="M+r4F59M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732910AbfCAOOw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Mar 2019 09:14:52 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:59226 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728202AbfCAOOw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Mar 2019 09:14:52 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x21EE33t073057;
-        Fri, 1 Mar 2019 14:14:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=74z5267vdgm1m+aeUgmzm1szV69XtciQOvFQkQQ1jmQ=;
- b=Hh2Kqrb0jF9w1IWw69zsyaA6Yjch3hWGUdXGzQjGuXniCjLoQKHwqxxEpg/aN8M3FzFZ
- llti+MlhNwuaoPc1ftDRAu+odhYAociu2qlfenKPG3TrrqvS7LIw55iLVFaEvcxn8DIs
- hajWaXNlgy3NoSq4PzI9+ugJm8tPHMUdH2ITi4F/JiT4LHnriQ/Vj9i/ahJZirSgtEjm
- 16Nznn6pzVsPydWv4RkMBB5+VTCHJmGEdcqtIFqolDR5W6WoIgkshdA+Zc+nwSFGQeA/
- omawxUGopUSIbWlKPx+phZC3imCAhdt7IJtiSXhj3mslCYigO7eeXIGjT5XA6FPs/riz uw== 
-Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by userp2120.oracle.com with ESMTP id 2qtxts7f11-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 01 Mar 2019 14:14:43 +0000
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x21EEgol019654
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 1 Mar 2019 14:14:42 GMT
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x21EEfVe006294;
-        Fri, 1 Mar 2019 14:14:41 GMT
-Received: from [192.168.1.12] (/116.239.187.160)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 01 Mar 2019 06:14:41 -0800
-Subject: Re: [RFC PATCH v2 0/9] Block/XFS: Support alternative mirror device
- retry
-To:     Andreas Dilger <adilger@dilger.ca>
-Cc:     Dave Chinner <david@fromorbit.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Martin Petersen <martin.petersen@oracle.com>,
-        shirley.ma@oracle.com,
-        Allison Henderson <allison.henderson@oracle.com>,
-        darrick.wong@oracle.com, hch@infradead.org
-References: <20190213095044.29628-1-bob.liu@oracle.com>
- <20190218213150.GE14116@dastard>
- <ba78a587-04ba-58a4-f282-63e200c81e2d@oracle.com>
- <D0A57CD2-1EE2-43C9-9E79-7B09F4FCEAC6@dilger.ca>
-From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <f6612507-128e-85d1-9045-60af6c87f73e@oracle.com>
-Date:   Fri, 1 Mar 2019 22:14:31 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
-MIME-Version: 1.0
-In-Reply-To: <D0A57CD2-1EE2-43C9-9E79-7B09F4FCEAC6@dilger.ca>
-Content-Type: text/plain; charset=utf-8
+        id S1728300AbfCAQAA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Mar 2019 11:00:00 -0500
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:44037 "EHLO
+        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727952AbfCAQAA (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Mar 2019 11:00:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1551456000; x=1582992000;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=R2lJJe3hiAqGllAzJEaaBfOv+6EUdUxFl6kILumWops=;
+  b=DxWNprN8bhNIS9g9D6J8uwYo5uHjSCZEnA1uZCEjcSIR/0Xkyzt4aucU
+   FUZ+dEGfP4dr//h+11L3ZXWrkVwGwNPT4nh0EfH4Uv1Gh7Taoun5S51pu
+   iISpk8TGmL/i8DPBx72IAingZtDxryu58FQ1pWSSF+C0uGUXn9QVcbdRy
+   q/sD8kXmsKKCOvDA+JFzbUKAulVClf+/9G73PE9pgBZJRt4Gt/wdJmr07
+   yfK5zb7Lsz1W51cZUuTKykYnN8+yonikzedYsVvIdztFM+NNqE88kf5EE
+   XvenYT9shC7csKyW3zG/ZIF6ic7E72R+seXnMc8O9abfUxPCeo6d2GUMI
+   g==;
+X-IronPort-AV: E=Sophos;i="5.58,428,1544457600"; 
+   d="scan'208";a="104223354"
+Received: from mail-by2nam03lp2059.outbound.protection.outlook.com (HELO NAM03-BY2-obe.outbound.protection.outlook.com) ([104.47.42.59])
+  by ob1.hgst.iphmx.com with ESMTP; 02 Mar 2019 00:00:00 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=R2lJJe3hiAqGllAzJEaaBfOv+6EUdUxFl6kILumWops=;
+ b=M+r4F59Mcm4lT8FHcTUl8FquofRdJ25AT2zFvWyZO5sAmVagyLF/5FYLBRuO4Y7HPMx7x/fKDvVr+FxozjDhUwVaGlIyrh5rlkw7oOiBEoc+mTZzVwu6yQtOmCzE/QDlB77Q+NIKk0jTxID2y48vey0ZPI78t3HsHeFB/PjUV1Q=
+Received: from SN6PR04MB4527.namprd04.prod.outlook.com (52.135.120.25) by
+ SN6PR04MB4686.namprd04.prod.outlook.com (52.135.122.88) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1665.17; Fri, 1 Mar 2019 15:59:54 +0000
+Received: from SN6PR04MB4527.namprd04.prod.outlook.com
+ ([fe80::adbe:cbf2:4b33:dbd]) by SN6PR04MB4527.namprd04.prod.outlook.com
+ ([fe80::adbe:cbf2:4b33:dbd%4]) with mapi id 15.20.1665.017; Fri, 1 Mar 2019
+ 15:59:54 +0000
+From:   Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+To:     Omar Sandoval <osandov@osandov.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH V2 0/8] nvme: misc cleanups
+Thread-Topic: [PATCH V2 0/8] nvme: misc cleanups
+Thread-Index: AQHUyZ/pMsngZe/B6UuFPW973pdLwaX0B0uAgAKhPwA=
+Date:   Fri, 1 Mar 2019 15:59:53 +0000
+Message-ID: <80D74B0F-BB8E-4E83-ACE2-990E3B9389A8@wdc.com>
+References: <20190221044248.11096-1-chaitanya.kulkarni@wdc.com>
+ <20190227185013.GA11806@vader>
+In-Reply-To: <20190227185013.GA11806@vader>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9181 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1903010100
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Microsoft-MacOutlook/10.16.1.190220
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Chaitanya.Kulkarni@wdc.com; 
+x-originating-ip: [209.117.102.182]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 57b830f5-24f4-4ea6-d19f-08d69e5ef1d4
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4618075)(2017052603328)(7153060)(7193020);SRVR:SN6PR04MB4686;
+x-ms-traffictypediagnostic: SN6PR04MB4686:
+x-ms-exchange-purlcount: 1
+wdcipoutbound: EOP-TRUE
+x-microsoft-exchange-diagnostics: =?utf-8?B?MTtTTjZQUjA0TUI0Njg2OzIzOlNDNkVIOGc4VVVEL2x4OENwc3cyTTdSbGxh?=
+ =?utf-8?B?YVhyK3pRRnNrb0RiTElDWnRCTk5kRlNUQUFCZ3JoaWMwdlRUTVI2dlArMSsy?=
+ =?utf-8?B?Q3NlcWJ2UDhhaWtuV1dpS3Z4RTJCZXc4eEJ5Nk5SRktPSS9wTi8yekE1ODRI?=
+ =?utf-8?B?R1BXdWtSRUJmaEtHREhPSFVja08zTnpNSFpKb1JUa3gzaFlXQlc0MVZrTVlQ?=
+ =?utf-8?B?QTI5V0lnaXh0QlZrcUNvSVdFK0g0M0VlUUtEMmV6TEdkVmhOV29oa05CMXNN?=
+ =?utf-8?B?eFJlaTN4MmUzcy9Tbzc3cWZybmZPQzg0dGZSZytMS3lkQTFhODFja0UyQWkx?=
+ =?utf-8?B?ZUJoTm5DdjVBWGJaZEtqamJzU3F3MzZKaDFObUlsaTRJUmJPUmI1SldUWmNv?=
+ =?utf-8?B?Q2hVc0VGd2xHeWo2SysvcDliNU1qVVhHMDJLanp5ZGJySkJLd25sUXp2OHQr?=
+ =?utf-8?B?VXNIdnlOcXI0MkZVS1Q5RjFZSG1zdExxYmp2MGNad0h2ZWZsOCtxOFBXT3Z1?=
+ =?utf-8?B?STdlU3JtZit3QmYwc09TckxsQ1p0SXYwWCtOZjlaU2xMbWZOWGY1NUJyY09r?=
+ =?utf-8?B?eXE5ODZFZWlKYTFvbE1KNndxcURxc283MUR5M3BxSWQvdTAyR2RVcDF0eWtF?=
+ =?utf-8?B?TnRkZDh3WnpxUXNyK3dJS2VLUmhZanVGeEx1djAvMDY4VjZCQU5FbFQwS3BL?=
+ =?utf-8?B?YmQvNnM2dUhqTWEzWHhwbEJlaTNNeVd4Unp1VlBuVWszcDRTK3o3VWVIbDky?=
+ =?utf-8?B?N05ER0QzZ1hza0pKSHZrbi9vSm9hVm1oQWhxRHNLOHB1aG85V3RmZ0xaT2o5?=
+ =?utf-8?B?UmFpbUFjcVFEb3pXZXAwYTRRanIyeDU0QzRISnd5cU1Hd2dsc3NDZWpUZGNP?=
+ =?utf-8?B?T0tTQnFtYW9kOWw1bG9GMEFHY3dGa0pQU1FGVmtVZjhvcC9na1RYZG9DRWVm?=
+ =?utf-8?B?RjZXNjNaZCtLMHNBNm1MWFFrYmw0WnN3SkZsL29TOXFqby9Uc2FKd1NqRGxs?=
+ =?utf-8?B?enFnemZWQVpjaG4rSHlQTEtlcnV4cjB0YUxMZ29IMEs3dHZKZVJKUUh0K2dr?=
+ =?utf-8?B?UFV4SHhWK1BpcVlobG10WkVmNGluZVNtVWxjc1ZYUy9RQ2g2UGt2NHZJZlZ5?=
+ =?utf-8?B?dGRrTVIxRENGclNVT3M2dlNKNFc2ejYxRUxNK2taVVJWZk93N0xXQzh6SzJQ?=
+ =?utf-8?B?czA3ZGt6ZjlmWnpYbWxIMmNIR2s5WndrYmxJSEpjM2xtT01sYjBEMGZwR1g0?=
+ =?utf-8?B?QzQzZUVSRlFjQzJHS3dHeVI2NjFSNlhXU1R3RlMyRnNmNlNYTm43MDlITHQ5?=
+ =?utf-8?B?SDdwemp3SlphbndHMXBwZGtEdnVMSGUvZDM3Zk96VUhXWEQ0a1dLa1JTWFpM?=
+ =?utf-8?B?L0tqTFJ4SFU4OGI0c0RDWUtYR1hvUmhvbFAvcFNkVldqY2g1S3FTcFVXMGpG?=
+ =?utf-8?B?MFhkbUIxMnpYU1hMUUxkNHFjZ3dRdFEzYW1TZGZoL0hJMC9yRVB5ZDJGMHd1?=
+ =?utf-8?B?cnB0ZzJvR0VPRVZWdUJTenZ1bFF0c0NjWmMzOWtZbmxBVUVwcU50NVlwSEZZ?=
+ =?utf-8?B?aFZURnh2RmJvMDFWM0tOenZlUHp1amZDODdYR240b3B5OXRwRXVTcm5FakFF?=
+ =?utf-8?B?S3FGVFp1TUpuTCsvYjVMYjBmNVpiUVBYeXd5ejRNT2g4MGFDU0JyU3VBeVc4?=
+ =?utf-8?B?aHNVU2lGQ0VDRDBad0lkUTUxek5qcVQyU1hTZ1BaK3BlWXlOcENQbDdoNjlz?=
+ =?utf-8?B?a1RaajZzV3ZjcXhqaDdQUmdhaktqRC9JeEwwQUNKYTdNQ0MyWllaWGZEMXlC?=
+ =?utf-8?Q?lZs2zXDb5f32S?=
+x-microsoft-antispam-prvs: <SN6PR04MB468683727F692359D1B5F48886760@SN6PR04MB4686.namprd04.prod.outlook.com>
+x-forefront-prvs: 09634B1196
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(39860400002)(346002)(376002)(396003)(136003)(189003)(199004)(966005)(71190400001)(229853002)(58126008)(6512007)(11346002)(6306002)(6246003)(14454004)(33656002)(316002)(446003)(8676002)(81166006)(6486002)(53936002)(6436002)(25786009)(4326008)(305945005)(7736002)(476003)(3846002)(6116002)(66066001)(68736007)(81156014)(2906002)(2616005)(186003)(97736004)(5660300002)(6916009)(105586002)(86362001)(8936002)(82746002)(4744005)(102836004)(6506007)(36756003)(486006)(106356001)(99286004)(72206003)(478600001)(26005)(83716004)(14444005)(256004)(71200400001)(76176011);DIR:OUT;SFP:1102;SCL:1;SRVR:SN6PR04MB4686;H:SN6PR04MB4527.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: uRW+XXLY5cjWIzzfeNxNB5tn6EljopVI8XmPciSxMjyIgGAhQXu57f+qqW5f21AQQhhltrHeOgalo/fAAKutAYO1iWIPSlDPsun04WULDyVxt6Y1vMQ1Eh9t9DVk4xeYER2YC1OBYsgEKvkwBMr9SpUaMmCMjMzIf179DWStZO7T7WuYVx2QgtdXvzsIGQrk2nLM2UVx4qYNWqdv8eceU7H9ozSQ0LRSpPBcktYDAy5tKnjtv+K6KpUh1rFPULIoXOHYPCWZrNXkUXCyrkjpOUj02e/CQ6pqhHwHUftzAVZpF0ZpIkZ5wz8eT+dU26wgf1zXNSNB5kSVqoHw+cs2/zYG1YngQzIJTHstVsrq1Hd0w0x1/NkZhgadXt3o7ZuHl6XbaI6XkD8SKi/3Ff2e2rPK3iiOL9sKPQ+lyefrWfY=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <08B9639503B2934993B590FE65E2962A@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 57b830f5-24f4-4ea6-d19f-08d69e5ef1d4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Mar 2019 15:59:53.9233
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR04MB4686
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/1/19 7:28 AM, Andreas Dilger wrote:
-> On Feb 28, 2019, at 7:22 AM, Bob Liu <bob.liu@oracle.com> wrote:
->>
->> On 2/19/19 5:31 AM, Dave Chinner wrote:
->>> On Wed, Feb 13, 2019 at 05:50:35PM +0800, Bob Liu wrote:
->>>> Motivation:
->>>> When fs data/metadata checksum mismatch, lower block devices may have other
->>>> correct copies. e.g. If XFS successfully reads a metadata buffer off a raid1 but
->>>> decides that the metadata is garbage, today it will shut down the entire
->>>> filesystem without trying any of the other mirrors.  This is a severe
->>>> loss of service, and we propose these patches to have XFS try harder to
->>>> avoid failure.
->>>>
->>>> This patch prototype this mirror retry idea by:
->>>> * Adding @nr_mirrors to struct request_queue which is similar as
->>>>  blk_queue_nonrot(), filesystem can grab device request queue and check max
->>>>  mirrors this block device has.
->>>>  Helper functions were also added to get/set the nr_mirrors.
->>>>
->>>> * Introducing bi_rd_hint just like bi_write_hint, but bi_rd_hint is a long bitmap
->>>> in order to support stacked layer case.
->>>>
->>>> * Modify md/raid1 to support this retry feature.
->>>>
->>>> * Adapter xfs to use this feature.
->>>>  If the read verify fails, we loop over the available mirrors and retry the read.
->>>
->>> Why does the filesystem have to iterate every single posible
->>> combination of devices that are underneath it?
-> 
-> Even if the filesystem isn't doing this iteration, there needs to be
-> some way to track which devices or combinations of devices have been
-> tried for the bio, which likely still means something inside the bio.
-> 
->>> Wouldn't it be much simpler to be able to attach a verifier
->>> function to the bio, and have each layer that gets called iterate
->>> over all it's copies internally until the verfier function passes
->>> or all copies are exhausted?
->>>
->>> This works for stacked mirrors - it can pass the higher layer
->>> verifier down as far as necessary. It can work for RAID5/6, too, by
->>> having that layer supply it's own verifier for reads that verifies
->>> parity and can reconstruct of failure, then when it's reconstructed
->>> a valid stripe it can run the verifier that was supplied to it from
->>> above, etc.
->>>
->>> i.e. I dont see why only filesystems should drive retries or have to
->>> be aware of the underlying storage stacking. ISTM that each
->>> layer of the storage stack should be able to verify what has been
->>> returned to it is valid independently of the higher layer
->>> requirements. The only difference from a caller point of view should
->>> be submit_bio(bio); vs submit_bio_verify(bio, verifier_cb_func);
-> 
-> I don't think the filesystem should be aware of the stacking (nor are
-> they in the proposed implementation).  That said, the filesystem-level
-> checksums should, IMHO, be checked at the filesystem level, and this
-> proposal allows the filesystem to tell the lower layer "this read was
-> bad, try something else".
-> 
-> One option, instead of having a bitmap, with one bit for every possible
-> device/combination in the system, would be to have a counter instead.
-> This is much denser, and even the existing "__u16 bio_write_hint" field
-
-Indeed! This way is better than a bitmap.
-
-But as Dave mentioned, it's much better and simpler if attaching a verfier function to the bio..
-
--
-Thanks,
-Bob
-
-> would be enough for 2^16 different devices/combinations of devices to
-> be tried.  The main difference would be that the retry layers in the
-> device layer would need to have a deterministic iterator for the bio.
-> 
-> For stacked devices it would need to use the same API to determine how
-> many possible combinations are below it, and do a modulus to pass down
-> the per-device iteration number.  The easiest would be to iterate in
-> numeric order, but it would also be possible to use something like a
-> PRNG seeded by e.g. the block number to change the order on a per-bio
-> basis to even out the load, if that is desirable.
-> 
->> For a two layer stacked md case like:
->>                              /dev/md0
->>             /                  |                  \
->>      /dev/md1-a             /dev/md1-b          /dev/sdf
->>   /        \           /       |        \
->> /dev/sda /dev/sdb  /dev/sdc /dev/sdd  /dev/sde
-> 
-> In this case, the top-level md0 would call blk_queue_get_copies() on each
-> sub-devices to determine how many sub-devices/combinations they have,
-> and pick the maximum (3 in this case), multiplied by the number of
-> top-level devices (also 3 in this case).  That means the top-level device
-> would return blk_queue_get_copies() == 9 combinations, but the same
-> could be done recursively for more/non-uniform layers if needed.
-> 
-> The top-level device maps md1-a = [0-2], md1-b = [3-5], md1-c = [6-8],
-> and can easily map an incoming bio_read_hint to the next device, either
-> by simple increment or by predetermining a device ordering and following
-> that (e.g. 0, 3, 6, 1, 4, 7, 2, 5, 8), or any other deterministic order
-> that hits all of the devices exactly once).  During submission bio_read_hint
-> is set to the modulus of the value (so that each layer in the stack sees
-> only values in the range [0, copies), and when the bio completes the top-level
-> device will set bio_read_hint to be the next sub-device to try (like the
-> original proposal was splitting and combining the bitmaps).  If a sub-device
-> gets a bad index (e.g. md1-a sees bio_read_hint == 2, or sdf sees anything
-> other than 0) it is a no-op and returns e.g. -EAGAIN to the upper device
-> so that it moves to the next device without returning to the caller.
-> 
->>> I suspect there's a more important issue to worry about: we run the
->>> XFS read verifiers in an async work queue context after collecting
->>> the IO completion status from the bio, rather than running directly
->>> in bio->bi_end_io() call chain.
-> 
-> In this proposal, XFS would just have to save the __u16 bio_read_hint
-> field from the previous bio completion and set it in the retried bio,
-> so that it could start at the next device/combination.  Obviously,
-> this would mean that the internal device iterator couldn't have any
-> hidden state for the bio so that just setting bio_read_hint would be
-> the same as resubmitting the original bio again, but that is already
-> a given or this whole problem wouldn't exist in the first place.
-> 
-> Cheers, Andreas
-> 
-
-
+SGkgT21hciwNCg0KRXZlcnl0aGluZyBsb29rcyBnb29kLiANCg0K77u/T24gMi8yNy8xOSwgMTo1
+MCBQTSwgIk9tYXIgU2FuZG92YWwiIDxvc2FuZG92QG9zYW5kb3YuY29tPiB3cm90ZToNCg0KICAg
+IE9uIFdlZCwgRmViIDIwLCAyMDE5IGF0IDA4OjQyOjQwUE0gLTA4MDAsIENoYWl0YW55YSBLdWxr
+YXJuaSB3cm90ZToNCiAgICA+IEhpIE9tYXIsDQogICAgPiBUaGlzIGlzIGEgc21hbGwgcGF0Y2gg
+c2VyaWVzIHdoaWNoIGZvbGxvd3MgdGhlIGJsa3Rlc3RzIGNvZGluZw0KICAgID4gc3R5bGUgZm9y
+bWF0IGFzIHBvaW50ZWQgb3V0IGJ5IEJhcnQuIEFsc28gbWluaW1pemVzIHRoZSBvdmVyYWxsDQog
+ICAgPiBjb2RlIGZvciB0aGUgcmV2aWV3Lg0KICAgID4gDQogICAgPiAtUmVnYXJkcywNCiAgICA+
+IENoYWl0YW55YQ0KICAgID4gDQogICAgPiBDaGFuZ2VzIHNpbmNlIFYxOi0NCiAgICA+IDEuIEFk
+ZCB0ZXN0Y2FzZSBzcGVjaWZpYyBlcnJvciBtZXNzYWdlIG9uIGZhaWx1cmUuDQogICAgDQogICAg
+SSBhbHNvIG1hZGUgdGhlc2UgcmVkaXJlY3QgdG8gJEZVTEwgaW5zdGVhZCBvZiAvZGV2L251bGwu
+IFRoZSByZXN1bHQgaXMNCiAgICBwdXNoZWQgdG8gaHR0cHM6Ly9naXRodWIuY29tL29zYW5kb3Yv
+YmxrdGVzdHMvY29tbWl0cy9udm1lLWNsZWFudXBzLA0KICAgIGNvdWxkIHlvdSB0YWtlIGEgcXVp
+Y2sgbG9vaz8NCiAgICANCiAgICBBbHNvLCBJIGFzc3VtZSBJIGNhbiBhZGQgeW91ciBzaWduZWQt
+b2ZmLWJ5IHRvIGFsbCBvZiB0aGVzZSBjb21taXRzPw0KWWVzLCBmZWVsIGZyZWUgdG8gYWRkIHRo
+YXQuDQogICAgDQoNCg==
