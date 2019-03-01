@@ -6,163 +6,127 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2B00C43381
-	for <linux-block@archiver.kernel.org>; Fri,  1 Mar 2019 12:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C7DCC43381
+	for <linux-block@archiver.kernel.org>; Fri,  1 Mar 2019 13:27:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7D992084D
-	for <linux-block@archiver.kernel.org>; Fri,  1 Mar 2019 12:51:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C9572084D
+	for <linux-block@archiver.kernel.org>; Fri,  1 Mar 2019 13:27:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="Y+VWfcrX"
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="vRlSxKu5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728321AbfCAMvM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Mar 2019 07:51:12 -0500
-Received: from mail-ua1-f68.google.com ([209.85.222.68]:38152 "EHLO
-        mail-ua1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387735AbfCAMvK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Mar 2019 07:51:10 -0500
-Received: by mail-ua1-f68.google.com with SMTP id d4so11205390uap.5
-        for <linux-block@vger.kernel.org>; Fri, 01 Mar 2019 04:51:09 -0800 (PST)
+        id S1727492AbfCAN10 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Mar 2019 08:27:26 -0500
+Received: from mail-ua1-f67.google.com ([209.85.222.67]:34131 "EHLO
+        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726416AbfCAN10 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Mar 2019 08:27:26 -0500
+Received: by mail-ua1-f67.google.com with SMTP id a42so22417913uad.1
+        for <linux-block@vger.kernel.org>; Fri, 01 Mar 2019 05:27:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=owltronix-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=ITabl/cYkf49s/ykEjejB9SZ9cQe6+bDxqb+J58pesY=;
-        b=Y+VWfcrXJ+CU8OVgOGrKbAtgW93Ka3TgY/xG9HXqrJ+0PYOnA2z17hj37jf8DgbT/v
-         W0TxKHC+VsEQB5GGThvw8K83mYC6dhk4oBqzvG1j64AdsnKI0DDYWprdnKzBI8QWSK0O
-         V6TpHdXWt0XmdylJR/FvqtSVjAlBnes5jthORqzXXlp7FJ85M/aE+aOES2lvBC1CEuRa
-         b8xwkZvapTM0EZSwMCJdU7pJFcBDJO+Q1xJnCm0Q2ptmgSbuQ+Pu9aOWmzQYsIg5Mr/r
-         dvYWfIDlq7XJmq2SPCdqsmmpD50naDzwG4eG636sNr61ygudCNXOXPYbpdNuDccVh9IS
-         x/ng==
+         :cc;
+        bh=lC+nd+0o3HQjG4nBsKi2z+Hi4J67vMEEiN2Gpcw14t0=;
+        b=vRlSxKu5Arc/tNmWdC/QWE/Mron9pjcnHGIcTYPK6+ueD00e379ZlMDA0p1Jo9jQfX
+         uxb8CjaSL6GunB6B4nJQreUUDqUW31s1q5PgNp/JfSwa7nk6sb61gAYUgNkEMcoWi7i/
+         TJ3v+sKQEoyQsOYH6sLm7XGdGJ/T8Gk/50HYOUkKIVYvJFBHpWVQ86cg1LL5AbL58n2U
+         Tvjbl5KOt8fw+ziugLUjCfV2T//ln90fKhrjHqhmWO+TmbfjYI3Gzkh6gGsf9lk6GWkp
+         rjn0fGwnPuxhq6tMBoY91RoAq4XvRKYjPo6x3Jw+4J0YeGpBdWNuy/3sx4EY2KIGVJ3F
+         PNlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=ITabl/cYkf49s/ykEjejB9SZ9cQe6+bDxqb+J58pesY=;
-        b=FxALd+ziTOYVcr9z4Bknv9umJFOcA64J2f1T+Cvh11ejPmD/loVtJtK7/HI1tp1GVs
-         fNTDnFtV1lkDLZBEsv9V70XaI9DHvXgM5NlZ1WvSdk0h+3RTLL8evLrdGS6pjiuUttMY
-         Et6f4GfzAULlPJIv0VeZgQkktSXiZLGgW5ngpw4cpUmwxnuVni9NzY6WzmoofSvYspCn
-         M0FpCtEVzj/gIozNq8BMRLAu8unadRZmzk+NDh8ee5s5QCEoz2p1amcvThoSfJlPX2nF
-         P9YXh8hZUkHw5nzHFoYoNwwJy0laHr42wmDlbakhPpC4zyZsDNuT2/QOBJSUwN55pJED
-         hVIw==
-X-Gm-Message-State: APjAAAWGvJmTmllrwGBRJhLC9hB+9d1VzZlPQCXjYSIbWU2Bqltgep55
-        u99O1UV44smCOX/NSa1NO2IooPv4nDcMnfC9fqYroA==
-X-Google-Smtp-Source: APXvYqwFi29eQifPm4n9AMSAr3YX8v1Ou2bvSooTjXa2IIQwoveB7VI/6VYDT/PSL/78rbEEUNKPHFR3FYTxu9mM/gM=
-X-Received: by 2002:a67:fe85:: with SMTP id b5mr2573789vsr.42.1551444668652;
- Fri, 01 Mar 2019 04:51:08 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=lC+nd+0o3HQjG4nBsKi2z+Hi4J67vMEEiN2Gpcw14t0=;
+        b=a7zMMLq9cyQrdqwWfj5rQkBkLsRX9PWIWhiX/0ehqG6Jf8iS6iYqP9+s7jeZN9+rY8
+         dcbEFXALnBpMNq5dlKZkjIbKLhisDRtloS3ViPS6MQscyvxcvMhVhFPiw5m+Jg4ehN8E
+         Fzfq5e+Pm2llMPv3E+Z67bWK9Xc3Xr8bDCiI66aal1vm5cf4MSZF6absRkvjO46IQJp4
+         /V0hl5WoLL3hPw1Lxx/zYtlbqdm2MZQ2jj63CnynMX8NTC73sDJRt/henhbzIvWO2/y8
+         jysdfofe+ABcWejaMr8o5kBcWmRTNdSdL1WJGNl8PbrYhB7ThUpY7dDtCMlzJBSYnjh2
+         jOeg==
+X-Gm-Message-State: APjAAAWM7gp9aV0ZPeISHwIVpQ4Vqk5/JTmza9yYdJ6mNLT5KmUolSjO
+        PnF64Wenb11diC8aQ1q7mLxQbBG2yuvkuCfhteUOBg==
+X-Google-Smtp-Source: APXvYqwl4Xpl87+qm/3LJgMOFMXxqLZ5jENL5yLPuOUpCzptrogdgRtD+XbcuE8P5wcJX0ruHEEBnsus7iLWIrLGGNE=
+X-Received: by 2002:a67:5fc7:: with SMTP id t190mr2432443vsb.184.1551446844930;
+ Fri, 01 Mar 2019 05:27:24 -0800 (PST)
 MIME-Version: 1.0
-References: <20190227171442.11853-1-igor.j.konopko@intel.com>
- <20190227171442.11853-3-igor.j.konopko@intel.com> <7EEAD803-201C-477E-8ACA-7F152BC3C455@javigon.com>
-In-Reply-To: <7EEAD803-201C-477E-8ACA-7F152BC3C455@javigon.com>
+References: <20190227171442.11853-1-igor.j.konopko@intel.com> <20190227171442.11853-4-igor.j.konopko@intel.com>
+In-Reply-To: <20190227171442.11853-4-igor.j.konopko@intel.com>
 From:   Hans Holmberg <hans.ml.holmberg@owltronix.com>
-Date:   Fri, 1 Mar 2019 13:50:57 +0100
-Message-ID: <CANr-nt3w4UmOeRVeXLdq+yLGgLqcJ7Xa_Mvba=xqm1QoaUKMEw@mail.gmail.com>
-Subject: Re: [PATCH 02/13] lightnvm: pblk: Gracefully handle GC data malloc fail
-To:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Cc:     "Konopko, Igor J" <igor.j.konopko@intel.com>,
-        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+Date:   Fri, 1 Mar 2019 14:27:14 +0100
+Message-ID: <CANr-nt0=Mzvqi8Qt13L0d9GG1_RyZiQO3TZboP1==rkfuYjYLw@mail.gmail.com>
+Subject: Re: [PATCH 03/13] lightnvm: pblk: Fix put line back behaviour
+To:     Igor Konopko <igor.j.konopko@intel.com>
+Cc:     Matias Bjorling <mb@lightnvm.io>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
         linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Feb 28, 2019 at 6:09 PM Javier Gonz=C3=A1lez <javier@javigon.com> w=
-rote:
->
->
->
-> > On 27 Feb 2019, at 12.14, Igor Konopko <igor.j.konopko@intel.com> wrote=
-:
-> >
-> > Currently when we fail on gc rq data allocation
-> > we simply skip the data which we wanted to move
-> > and finally move the line to free state and lose
-> > that data due to that. This patch move the data
-> > allocation to some earlier phase of GC, where we
-> > can still fail gracefully by moving line back
-> > to closed state.
-> >
-> > Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-> > ---
-> > drivers/lightnvm/pblk-gc.c | 19 +++++++++----------
-> > 1 file changed, 9 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-> > index 3feadfd9418d..31fc1339faa8 100644
-> > --- a/drivers/lightnvm/pblk-gc.c
-> > +++ b/drivers/lightnvm/pblk-gc.c
-> > @@ -84,8 +84,6 @@ static void pblk_gc_line_ws(struct work_struct *work)
-> >       struct pblk_line_ws *gc_rq_ws =3D container_of(work,
-> >                                               struct pblk_line_ws, ws);
-> >       struct pblk *pblk =3D gc_rq_ws->pblk;
-> > -     struct nvm_tgt_dev *dev =3D pblk->dev;
-> > -     struct nvm_geo *geo =3D &dev->geo;
-> >       struct pblk_gc *gc =3D &pblk->gc;
-> >       struct pblk_line *line =3D gc_rq_ws->line;
-> >       struct pblk_gc_rq *gc_rq =3D gc_rq_ws->priv;
-> > @@ -93,13 +91,6 @@ static void pblk_gc_line_ws(struct work_struct *work=
-)
-> >
-> >       up(&gc->gc_sem);
-> >
-> > -     gc_rq->data =3D vmalloc(array_size(gc_rq->nr_secs, geo->csecs));
-> > -     if (!gc_rq->data) {
-> > -             pblk_err(pblk, "could not GC line:%d (%d/%d)\n",
-> > -                                     line->id, *line->vsc, gc_rq->nr_s=
-ecs);
-> > -             goto out;
-> > -     }
-> > -
-> >       /* Read from GC victim block */
-> >       ret =3D pblk_submit_read_gc(pblk, gc_rq);
-> >       if (ret) {
-> > @@ -189,6 +180,8 @@ static void pblk_gc_line_prepare_ws(struct work_str=
-uct *work)
-> >       struct pblk_line *line =3D line_ws->line;
-> >       struct pblk_line_mgmt *l_mg =3D &pblk->l_mg;
-> >       struct pblk_line_meta *lm =3D &pblk->lm;
-> > +     struct nvm_tgt_dev *dev =3D pblk->dev;
-> > +     struct nvm_geo *geo =3D &dev->geo;
-> >       struct pblk_gc *gc =3D &pblk->gc;
-> >       struct pblk_line_ws *gc_rq_ws;
-> >       struct pblk_gc_rq *gc_rq;
-> > @@ -247,9 +240,13 @@ static void pblk_gc_line_prepare_ws(struct work_st=
-ruct *work)
-> >       gc_rq->nr_secs =3D nr_secs;
-> >       gc_rq->line =3D line;
-> >
-> > +     gc_rq->data =3D vmalloc(gc_rq->nr_secs * geo->csecs);
+Looks good.
 
-Why not use array_size to do the size calculation as before? It checks
-for overflows.
-Apart from this, the patch looks good to me.
+Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-> > +     if (!gc_rq->data)
-> > +             goto fail_free_gc_rq;
-> > +
-> >       gc_rq_ws =3D kmalloc(sizeof(struct pblk_line_ws), GFP_KERNEL);
-> >       if (!gc_rq_ws)
-> > -             goto fail_free_gc_rq;
-> > +             goto fail_free_gc_data;
-> >
-> >       gc_rq_ws->pblk =3D pblk;
-> >       gc_rq_ws->line =3D line;
-> > @@ -281,6 +278,8 @@ static void pblk_gc_line_prepare_ws(struct work_str=
-uct *work)
-> >
-> >       return;
-> >
-> > +fail_free_gc_data:
-> > +     vfree(gc_rq->data);
-> > fail_free_gc_rq:
-> >       kfree(gc_rq);
-> > fail_free_lba_list:
-> > --
-> > 2.17.1
+On Wed, Feb 27, 2019 at 6:17 PM Igor Konopko <igor.j.konopko@intel.com> wrote:
 >
-> Looks good to me.
+> In current implementation of pblk_put_line_back behaviour
+> there are two cases which are not handled.
 >
-> Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
+> First one is the race condition with __pblk_map_invalidate in
+> which function we check for line state, which might be closed,
+> but still not added to any list and thus explode in list_move_tail.
+> This is due to lack of locking both gc_lock and line lock
+> in pblk_put_line_back current implementation.
+>
+> The second issue is that when we are in that function, line
+> is not on any list and pblk_line_gc_list might hit the same
+> gc group and thus not return any move_list. Then our line
+> will stuck forever unassigned to any list. Simply resetting
+> gc_list to none will fix that.
+>
+> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+> ---
+>  drivers/lightnvm/pblk-gc.c | 16 ++++++++++------
+>  1 file changed, 10 insertions(+), 6 deletions(-)
+>
+> diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+> index 31fc1339faa8..511ed0d5333c 100644
+> --- a/drivers/lightnvm/pblk-gc.c
+> +++ b/drivers/lightnvm/pblk-gc.c
+> @@ -64,19 +64,23 @@ static void pblk_put_line_back(struct pblk *pblk, struct pblk_line *line)
+>         struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+>         struct list_head *move_list;
+>
+> +       spin_lock(&l_mg->gc_lock);
+>         spin_lock(&line->lock);
+>         WARN_ON(line->state != PBLK_LINESTATE_GC);
+>         line->state = PBLK_LINESTATE_CLOSED;
+>         trace_pblk_line_state(pblk_disk_name(pblk), line->id,
+>                                         line->state);
+> +
+> +       /* We need to reset gc_group in order to ensure that
+> +        * pblk_line_gc_list will return proper move_list
+> +        * since right now current line is not on any of the
+> +        * gc lists.
+> +        */
+> +       line->gc_group = PBLK_LINEGC_NONE;
+>         move_list = pblk_line_gc_list(pblk, line);
+>         spin_unlock(&line->lock);
+> -
+> -       if (move_list) {
+> -               spin_lock(&l_mg->gc_lock);
+> -               list_add_tail(&line->list, move_list);
+> -               spin_unlock(&l_mg->gc_lock);
+> -       }
+> +       list_add_tail(&line->list, move_list);
+> +       spin_unlock(&l_mg->gc_lock);
+>  }
+>
+>  static void pblk_gc_line_ws(struct work_struct *work)
+> --
+> 2.17.1
+>
