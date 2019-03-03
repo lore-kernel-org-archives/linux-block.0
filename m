@@ -2,140 +2,151 @@ Return-Path: <SRS0=Q27d=RG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 816E6C43381
-	for <linux-block@archiver.kernel.org>; Sun,  3 Mar 2019 13:17:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32476C43381
+	for <linux-block@archiver.kernel.org>; Sun,  3 Mar 2019 23:18:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 553D620863
-	for <linux-block@archiver.kernel.org>; Sun,  3 Mar 2019 13:17:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0980020830
+	for <linux-block@archiver.kernel.org>; Sun,  3 Mar 2019 23:18:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726210AbfCCNR4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 3 Mar 2019 08:17:56 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:51969 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726197AbfCCNR4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 3 Mar 2019 08:17:56 -0500
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id DD6D7308424B;
-        Sun,  3 Mar 2019 13:17:55 +0000 (UTC)
-Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D8D1560147;
-        Sun,  3 Mar 2019 13:17:52 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Omar Sandoval <osandov@fb.com>
-Subject: [PATCH] block: fix segment calculation for passthrough IO
-Date:   Sun,  3 Mar 2019 21:17:48 +0800
-Message-Id: <20190303131748.24646-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Sun, 03 Mar 2019 13:17:56 +0000 (UTC)
+        id S1725981AbfCCXSO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 Mar 2019 18:18:14 -0500
+Received: from ipmail01.adl6.internode.on.net ([150.101.137.136]:64434 "EHLO
+        ipmail01.adl6.internode.on.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725971AbfCCXSO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 3 Mar 2019 18:18:14 -0500
+Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
+  by ipmail01.adl6.internode.on.net with ESMTP; 04 Mar 2019 09:48:10 +1030
+Received: from dave by dastard with local (Exim 4.80)
+        (envelope-from <david@fromorbit.com>)
+        id 1h0aMz-0005aM-Fj; Mon, 04 Mar 2019 10:18:09 +1100
+Date:   Mon, 4 Mar 2019 10:18:09 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Bob Liu <bob.liu@oracle.com>
+Cc:     linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, martin.petersen@oracle.com,
+        shirley.ma@oracle.com, allison.henderson@oracle.com,
+        darrick.wong@oracle.com, hch@infradead.org, adilger@dilger.ca
+Subject: Re: [RFC PATCH v2 0/9] Block/XFS: Support alternative mirror device
+ retry
+Message-ID: <20190303231809.GV23020@dastard>
+References: <20190213095044.29628-1-bob.liu@oracle.com>
+ <20190218213150.GE14116@dastard>
+ <ba78a587-04ba-58a4-f282-63e200c81e2d@oracle.com>
+ <20190228214949.GO23020@dastard>
+ <4c930f97-31cd-cbd9-effb-db3090e0f273@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4c930f97-31cd-cbd9-effb-db3090e0f273@oracle.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_recount_segments() can be called in bio_add_pc_page() for
-calculating how many segments this bio will has after one page is added
-to this bio. If the resulted segment number is beyond the queue limit,
-the added page will be removed.
+On Sun, Mar 03, 2019 at 10:37:59AM +0800, Bob Liu wrote:
+> On 3/1/19 5:49 AM, Dave Chinner wrote:
+> > On Thu, Feb 28, 2019 at 10:22:02PM +0800, Bob Liu wrote:
+> >> On 2/19/19 5:31 AM, Dave Chinner wrote:
+> >>> On Wed, Feb 13, 2019 at 05:50:35PM +0800, Bob Liu wrote:
+> >>>> Motivation:
+> >>>> When fs data/metadata checksum mismatch, lower block devices may have other
+> >>>> correct copies. e.g. If XFS successfully reads a metadata buffer off a raid1 but
+> >>>> decides that the metadata is garbage, today it will shut down the entire
+> >>>> filesystem without trying any of the other mirrors.  This is a severe
+> >>>> loss of service, and we propose these patches to have XFS try harder to
+> >>>> avoid failure.
+> >>>>
+> >>>> This patch prototype this mirror retry idea by:
+> >>>> * Adding @nr_mirrors to struct request_queue which is similar as
+> >>>>   blk_queue_nonrot(), filesystem can grab device request queue and check max
+> >>>>   mirrors this block device has.
+> >>>>   Helper functions were also added to get/set the nr_mirrors.
+> >>>>
+> >>>> * Introducing bi_rd_hint just like bi_write_hint, but bi_rd_hint is a long bitmap
+> >>>> in order to support stacked layer case.
+> >>>>
+> >>>> * Modify md/raid1 to support this retry feature.
+> >>>>
+> >>>> * Adapter xfs to use this feature.
+> >>>>   If the read verify fails, we loop over the available mirrors and retry the read.
+> >>>
+> >>> Why does the filesystem have to iterate every single posible
+> >>> combination of devices that are underneath it?
+> >>>
+> >>> Wouldn't it be much simpler to be able to attach a verifier
+> >>> function to the bio, and have each layer that gets called iterate
+> >>> over all it's copies internally until the verfier function passes
+> >>> or all copies are exhausted?
+> >>>
+> >>> This works for stacked mirrors - it can pass the higher layer
+> >>> verifier down as far as necessary. It can work for RAID5/6, too, by
+> >>> having that layer supply it's own verifier for reads that verifies
+> >>> parity and can reconstruct of failure, then when it's reconstructed
+> >>> a valid stripe it can run the verifier that was supplied to it from
+> >>> above, etc.
+> >>>
+> >>> i.e. I dont see why only filesystems should drive retries or have to
+> >>> be aware of the underlying storage stacking. ISTM that each
+> >>> layer of the storage stack should be able to verify what has been
+> >>> returned to it is valid independently of the higher layer
+> >>> requirements. The only difference from a caller point of view should
+> >>> be submit_bio(bio); vs submit_bio_verify(bio, verifier_cb_func);
+> >>>
+> >>
+> >> We already have bio->bi_end_io(), how about do the verification inside bi_end_io()?
+> >>
+> >> Then the whole sequence would like:
+> >> bio_endio()
+> >>     > 1.bio->bi_end_io()
+> >>         > xfs_buf_bio_end_io()
+> >>             > verify, set bio->bi_status = "please retry" if verify fail
+> >>         
+> >>     > 2.if found bio->bi_status = retry
+> >>     > 3.resubmit bio
+> > 
+> > As I mentioned to Darrick, this isn't cwas simple as it seems
+> > because what XFS actually does is this:
+> > 
+> > IO completion thread			Workqueue Thread
+> > bio_endio(bio)
+> >   bio->bi_end_io(bio)
+> >     xfs_buf_bio_end_io(bio)
+> >       bp->b_error = bio->bi_status
+> >       xfs_buf_ioend_async(bp)
+> >         queue_work(bp->b_ioend_wq, bp)
+> >       bio_put(bio)
+> > <io completion done>
+> > 					.....
+> > 					xfs_buf_ioend(bp)
+> > 					  bp->b_ops->read_verify()
+> > 					.....
+> > 
+> > IOWs, XFS does not do read verification inside the bio completion
+> > context, but instead defers it to an external workqueue so it does
+> > not delay processing incoming bio IO completions. Hence there is no
+> > way to get the verification status back to the bio completion (the
+> > bio has already been freed!) to resubmit from there.
+> > 
+> > This is one of the reasons I suggested a verifier be added to the
+> > submission, so the bio itself is wholly responsible for running it,
+> 
+> But then completion time of an i/o would be longer if calling verifier function inside bio_endio().
+> Would that be a problem?
 
-The try-and-fix policy requires blk_recount_segments(__blk_recalc_rq_segments)
-to not consider the segment number limit. Unfortunately bvec_split_segs()
-does check this limit, and causes small segment number returned to
-bio_add_pc_page(), then page still may be added to the bio even though
-segment number limit becomes broken.
+No, because then we don't have to do it in the filesystem. i.e. the
+filesystem doesn't complete the IO until after the verifier has run,
+so it from the perspective of the waiting reader is doesn't matter
+where it is run because the overall I/O latency is the same.
 
-Fixes this issue by not considering segment number limit when calcualting
-bio's segment number.
+Cheers,
 
-Fixes: dcebd755926b ("block: use bio_for_each_bvec() to compute multi-page bvec count")
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Omar Sandoval <osandov@fb.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-merge.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 22467f475ab4..1c9d4f0f96ea 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -180,7 +180,7 @@ static unsigned get_max_segment_size(struct request_queue *q,
-  */
- static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
- 		unsigned *nsegs, unsigned *last_seg_size,
--		unsigned *front_seg_size, unsigned *sectors)
-+		unsigned *front_seg_size, unsigned *sectors, unsigned max_segs)
- {
- 	unsigned len = bv->bv_len;
- 	unsigned total_len = 0;
-@@ -190,7 +190,7 @@ static bool bvec_split_segs(struct request_queue *q, struct bio_vec *bv,
- 	 * Multi-page bvec may be too big to hold in one segment, so the
- 	 * current bvec has to be splitted as multiple segments.
- 	 */
--	while (len && new_nsegs + *nsegs < queue_max_segments(q)) {
-+	while (len && new_nsegs + *nsegs < max_segs) {
- 		seg_size = get_max_segment_size(q, bv->bv_offset + total_len);
- 		seg_size = min(seg_size, len);
- 
-@@ -240,6 +240,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 	bool do_split = true;
- 	struct bio *new = NULL;
- 	const unsigned max_sectors = get_max_io_size(q, bio);
-+	const unsigned max_segs = queue_max_segments(q);
- 
- 	bio_for_each_bvec(bv, bio, iter) {
- 		/*
-@@ -254,14 +255,14 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 			 * Consider this a new segment if we're splitting in
- 			 * the middle of this vector.
- 			 */
--			if (nsegs < queue_max_segments(q) &&
-+			if (nsegs < max_segs &&
- 			    sectors < max_sectors) {
- 				/* split in the middle of bvec */
- 				bv.bv_len = (max_sectors - sectors) << 9;
- 				bvec_split_segs(q, &bv, &nsegs,
- 						&seg_size,
- 						&front_seg_size,
--						&sectors);
-+						&sectors, max_segs);
- 			}
- 			goto split;
- 		}
-@@ -283,7 +284,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 			continue;
- 		}
- new_segment:
--		if (nsegs == queue_max_segments(q))
-+		if (nsegs == max_segs)
- 			goto split;
- 
- 		bvprv = bv;
-@@ -296,7 +297,7 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 			if (nsegs == 1 && seg_size > front_seg_size)
- 				front_seg_size = seg_size;
- 		} else if (bvec_split_segs(q, &bv, &nsegs, &seg_size,
--				    &front_seg_size, &sectors)) {
-+				    &front_seg_size, &sectors, max_segs)) {
- 			goto split;
- 		}
- 	}
-@@ -415,7 +416,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 			bvprv = bv;
- 			prev = 1;
- 			bvec_split_segs(q, &bv, &nr_phys_segs, &seg_size,
--					&front_seg_size, NULL);
-+					&front_seg_size, NULL, UINT_MAX);
- 		}
- 		bbio = bio;
- 	}
+Dave.
 -- 
-2.9.5
-
+Dave Chinner
+david@fromorbit.com
