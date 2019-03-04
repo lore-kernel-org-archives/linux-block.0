@@ -3,49 +3,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A2DCC43381
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 12:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B922C43381
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 12:46:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 552E720815
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 12:44:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 52D0D20815
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 12:46:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726581AbfCDMo6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Mar 2019 07:44:58 -0500
-Received: from mga06.intel.com ([134.134.136.31]:47552 "EHLO mga06.intel.com"
+        id S1726585AbfCDMqS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Mar 2019 07:46:18 -0500
+Received: from mga03.intel.com ([134.134.136.65]:32219 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726522AbfCDMo6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 4 Mar 2019 07:44:58 -0500
+        id S1726578AbfCDMqS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 4 Mar 2019 07:46:18 -0500
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Mar 2019 04:44:57 -0800
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Mar 2019 04:46:18 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.58,440,1544515200"; 
-   d="scan'208";a="119452451"
+   d="scan'208";a="119452688"
 Received: from ikonopko-mobl1.ger.corp.intel.com (HELO [10.237.140.180]) ([10.237.140.180])
-  by orsmga007.jf.intel.com with ESMTP; 04 Mar 2019 04:44:56 -0800
-Subject: Re: [PATCH 06/13] lightnvm: pblk: Ensure that erase is chunk aligned
+  by orsmga007.jf.intel.com with ESMTP; 04 Mar 2019 04:46:16 -0800
+Subject: Re: [PATCH 07/13] lightnvm: pblk: Cleanly fail when there is not
+ enough memory
 To:     Hans Holmberg <hans@owltronix.com>,
         =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>
-Cc:     =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>,
+Cc:     Matias Bjorling <mb@lightnvm.io>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        linux-block@vger.kernel.org
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 References: <20190227171442.11853-1-igor.j.konopko@intel.com>
- <20190227171442.11853-7-igor.j.konopko@intel.com>
- <FA2EA171-4AB9-4D9C-A782-4BD416EC7045@javigon.com>
- <CANr-nt1877shJYYkMMwaC2StbrXaOjP7D0OOW5M1rW7LOXu=QQ@mail.gmail.com>
- <EE08736A-168C-4BED-8445-C0CFEDBB61D4@javigon.com>
- <CANr-nt30zr_5sMEAK4Uk7VCRJPWr30zjPUVrQPA_H5kBU-nfrQ@mail.gmail.com>
+ <20190227171442.11853-8-igor.j.konopko@intel.com>
+ <02F6919F-62BE-4501-BD6E-406E32DB9ABB@javigon.com>
+ <CANr-nt2Enyog9dyZHDJs0Jsge-0g1oQ5gpkYiZ=rw+QytNW68Q@mail.gmail.com>
 From:   Igor Konopko <igor.j.konopko@intel.com>
-Message-ID: <0a0fd388-98c0-f640-e031-1cc7d14372bb@intel.com>
-Date:   Mon, 4 Mar 2019 13:44:55 +0100
+Message-ID: <9c8199b7-921d-76d4-3419-d025a5e42cf4@intel.com>
+Date:   Mon, 4 Mar 2019 13:46:16 +0100
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
  Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <CANr-nt30zr_5sMEAK4Uk7VCRJPWr30zjPUVrQPA_H5kBU-nfrQ@mail.gmail.com>
+In-Reply-To: <CANr-nt2Enyog9dyZHDJs0Jsge-0g1oQ5gpkYiZ=rw+QytNW68Q@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -56,85 +55,60 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 04.03.2019 12:43, Hans Holmberg wrote:
-> On Mon, Mar 4, 2019 at 10:11 AM Javier González <javier@javigon.com> wrote:
->>
->>> On 4 Mar 2019, at 10.05, Hans Holmberg <hans.ml.holmberg@owltronix.com> wrote:
->>>
->>> I strongly disagree with adding code that would mask implantation errors.
->>>
->>> If we want more internal checks, we could add an if statement that
->>> would only be compiled in if CONFIG_NVM_PBLK_DEBUG is enabled.
->>>
->>
->> Not sure who this is for - better not to top post.
->>
->> In any case, this is a spec grey zone. I’m ok with cleaning the bits as
->> they mean nothing for the reset command. If you feel that strongly about
->> this, you can take if with Igor.
+On 04.03.2019 10:24, Hans Holmberg wrote:
+> Hi Igor,
 > 
-> Pardon the top-post. It was meant for both you and Igor.
+> I think you need to motivate (and document) why each of the new flags
+> are needed.
+
+Sure, will add such a description to v2 of the patch.
 > 
-
-OCSSD 2.0 spec for vector chunk reset (chapter 2.2.2) explicitly says 
-"The addresses in the LBA list shall be the first logical block address 
-of each chunk to be reset.". So in my understanding we suppose to clear 
-the sectors bits of the PPA address in order to be spec compliant.
-
+> Thanks,
+> Hans
+> 
+> On Mon, Mar 4, 2019 at 8:53 AM Javier González <javier@javigon.com> wrote:
 >>
+>>> On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.com> wrote:
 >>>
->>> On Mon, Mar 4, 2019 at 8:48 AM Javier González <javier@javigon.com> wrote:
->>>>> On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.com> wrote:
->>>>>
->>>>> In current pblk implementation of erase command
->>>>> there is a chance tha sector bits are set to some
->>>>> random values for erase PPA. This is unexpected
->>>>> situation, since erase shall be always chunk
->>>>> aligned. This patch fixes that issue
->>>>>
->>>>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
->>>>> ---
->>>>> drivers/lightnvm/pblk-core.c | 1 +
->>>>> drivers/lightnvm/pblk-map.c  | 2 ++
->>>>> 2 files changed, 3 insertions(+)
->>>>>
->>>>> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
->>>>> index a98b2255f963..78b1eea4ab67 100644
->>>>> --- a/drivers/lightnvm/pblk-core.c
->>>>> +++ b/drivers/lightnvm/pblk-core.c
->>>>> @@ -978,6 +978,7 @@ int pblk_line_erase(struct pblk *pblk, struct pblk_line *line)
->>>>>
->>>>>               ppa = pblk->luns[bit].bppa; /* set ch and lun */
->>>>>               ppa.a.blk = line->id;
->>>>> +             ppa.a.reserved = 0;
->>>>>
->>>>>               atomic_dec(&line->left_eblks);
->>>>>               WARN_ON(test_and_set_bit(bit, line->erase_bitmap));
->>>>> diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
->>>>> index 79df583ea709..aea46b4ec40f 100644
->>>>> --- a/drivers/lightnvm/pblk-map.c
->>>>> +++ b/drivers/lightnvm/pblk-map.c
->>>>> @@ -161,6 +161,7 @@ int pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
->>>>>
->>>>>                       *erase_ppa = ppa_list[i];
->>>>>                       erase_ppa->a.blk = e_line->id;
->>>>> +                     erase_ppa->a.reserved = 0;
->>>>>
->>>>>                       spin_unlock(&e_line->lock);
->>>>>
->>>>> @@ -202,6 +203,7 @@ int pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
->>>>>               atomic_dec(&e_line->left_eblks);
->>>>>               *erase_ppa = pblk->luns[bit].bppa; /* set ch and lun */
->>>>>               erase_ppa->a.blk = e_line->id;
->>>>> +             erase_ppa->a.reserved = 0;
->>>>>       }
->>>>>
->>>>>       return 0;
->>>>> --
->>>>> 2.17.1
->>>>
->>>> I’m fine with adding this, but note that there is actually no
->>>> requirement for the erase to be chunk aligned - the only bits that
->>>> should be looked at are group, PU and chunk.
->>>>
->>>> Reviewed-by: Javier González <javier@javigon.com>
+>>> L2P table can be huge in many cases, since
+>>> it typically requires 1GB of DRAM for 1TB
+>>> of drive. When there is not enough memory
+>>> available, OOM killer turns on and kills
+>>> random processes, which can be very annoying
+>>> for users. This patch changes the flag for
+>>> L2P table allocation on order to handle this
+>>> situation in more user friendly way
+>>>
+>>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+>>> ---
+>>> drivers/lightnvm/pblk-init.c | 9 +++++++--
+>>> 1 file changed, 7 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+>>> index 8b643d0bffae..e553105b7ba1 100644
+>>> --- a/drivers/lightnvm/pblk-init.c
+>>> +++ b/drivers/lightnvm/pblk-init.c
+>>> @@ -164,9 +164,14 @@ static int pblk_l2p_init(struct pblk *pblk, bool factory_init)
+>>>        int ret = 0;
+>>>
+>>>        map_size = pblk_trans_map_size(pblk);
+>>> -     pblk->trans_map = vmalloc(map_size);
+>>> -     if (!pblk->trans_map)
+>>> +     pblk->trans_map = __vmalloc(map_size, GFP_KERNEL | __GFP_NOWARN
+>>> +                                     | __GFP_RETRY_MAYFAIL | __GFP_HIGHMEM,
+>>> +                                     PAGE_KERNEL);
+>>> +     if (!pblk->trans_map) {
+>>> +             pblk_err(pblk, "failed to allocate L2P (need %ld of memory)\n",
+>>> +                             map_size);
+>>>                return -ENOMEM;
+>>> +     }
+>>>
+>>>        pblk_ppa_set_empty(&ppa);
+>>>
+>>> --
+>>> 2.17.1
+>>
+>> Is there any extra consideration we should take when enabling high
+>> memory for the L2P table? If not, looks good to me.
+>>
+>> Reviewed-by: Javier González <javier@javigon.com>
