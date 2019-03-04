@@ -2,163 +2,172 @@ Return-Path: <SRS0=5cmc=RH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B244C43381
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 11:45:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30FE2C43381
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 12:14:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE0AF2070B
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 11:45:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F24682075B
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 12:14:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="KBO3N1JV"
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="Xi4WdAb9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726205AbfCDLp1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Mar 2019 06:45:27 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:45669 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726090AbfCDLp1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 06:45:27 -0500
-Received: by mail-ed1-f66.google.com with SMTP id f19so3971297eds.12
-        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 03:45:26 -0800 (PST)
+        id S1726098AbfCDMOd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Mar 2019 07:14:33 -0500
+Received: from mail-vk1-f196.google.com ([209.85.221.196]:46772 "EHLO
+        mail-vk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725997AbfCDMOd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 07:14:33 -0500
+Received: by mail-vk1-f196.google.com with SMTP id j68so1061070vke.13
+        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 04:14:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=RCnaCbsrI8TEeskNvJQ9bA8lf0OcfNVvt8oJbsvFHY0=;
-        b=KBO3N1JVX5gYosm00jagpHYEgCbjJFRNmutyNK4N1lb7zLB976IRPaY2qXhfRz+SU5
-         W9He9xIFrNBgk1FXqjRnlvBZ63wpfP5wAiOUPmvvh3uvlju81mQuQExO2pa3fUxi1X0q
-         IE2A3ywnHDfVNqerBaHuQ0NMEbYgQrmuj98MmEJvkyPHy7hORtYBiev028vwht7d2TCr
-         o0g1hgwkrOSOTNUQ2C2VvlYX5XhVBv6jgcT9hs1owFQ7/Sv6xmqvre8RR7GkXo7qTS8o
-         +WyCCsVtd3GwxH4/P7emgDx/NmJjc6u6neriGCyA9DSzDrnOOy5JbwaoKGnq+pOx/N1g
-         VRiQ==
+        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Kw6yGZWQ0PXaXM2pZJPXRtLvHINAWZMyK0zlAL7pjNM=;
+        b=Xi4WdAb99oqB8NNHumaj3EzZXZtxFR1sHzI8RZv8+cEGpHvqujFgUmD5bVYWAXRjYK
+         rI/VQhOHOnfSpMwXziZjEkwuNzh4vH+NB7hkqdGHUDsDvqQuLKsFBGUbpNZhdtxWf3xj
+         s89OKHI0Tjw5lxHpJ/OvgwxwAZrw087WeY3vfV7wqt8D6/e/imvbAolHR/LrVt0VLZ0s
+         Sw5xR/XwnTUpOOAW4ky8R71Vj6pGjGD2Q8iSD0MbzwQ450ArrBnWVxrIxnZaxXYDytDy
+         jotx30TTxfN+UOiUjQfODc4K80k5P2+qVFfzujoC5nZ8J76NvKyK1y2oJ2b+yO0WjqRE
+         Hx7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=RCnaCbsrI8TEeskNvJQ9bA8lf0OcfNVvt8oJbsvFHY0=;
-        b=nas9HlgMg2z9OTo42YlmtIZVRezSEcEHh+f5bI8gK0W40f2h4p/jzpGyDS/nv017fb
-         2gKvVpf1vt0j8lAR08kAw6o02I1E5APuNY6qbb6xYm+9aROHRXmx4/Grfp6TYa7iLYh7
-         5v6B8s6sUhiRgQ7+a+fpUnHhBpT/W7qhvQbQEupkwf5wLq1ZT/v1x93hSlhPtZ2mvi2y
-         q1K9bfixstYM/UdvLgAWyrYltf6iJREGMM0V5Gjc7KM81aVJs1zH24kmxJSCj1mMsLrF
-         7ftFt79iuJvaeLxctFO/w9CSmwU3N/Y5mKpcWlC3iisPiE2skzg5u05LeNpg5+bM3R2+
-         NeeA==
-X-Gm-Message-State: APjAAAXxCrvzP1Gzi1dHk7GVVpCZdXjIie5BjdT/s9n7So62nBcEp6Z0
-        1IGKtxylhRZRKwFEswDeYOMyIw==
-X-Google-Smtp-Source: APXvYqzBlMpWQfgbjL0+Xpnqdl/qrAyxk8/bnCiV39Wmk1RBrakrIgYwf2VoEz8uJP1HivvPqiRscw==
-X-Received: by 2002:a17:906:5e0d:: with SMTP id n13mr12354036eju.139.1551699925611;
-        Mon, 04 Mar 2019 03:45:25 -0800 (PST)
-Received: from [192.168.1.119] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id k18sm1154976ejc.76.2019.03.04.03.45.24
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 04 Mar 2019 03:45:24 -0800 (PST)
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <04F04C0B-25B6-4F1A-AEB6-36E4D6BB32B7@javigon.com>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_6CCB2FCC-80B8-4E34-AEB3-C749C03FDFEA";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 05/13] lightnvm: pblk: Count all read errors in stats
-Date:   Mon, 4 Mar 2019 12:45:24 +0100
-In-Reply-To: <CANr-nt2Sj13VStWC4_GeTxCCVgztxqxm3HP7+7cNn+OoN=BCaQ@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Kw6yGZWQ0PXaXM2pZJPXRtLvHINAWZMyK0zlAL7pjNM=;
+        b=mtKRxqYfMQHqjj9buUXvIfW6+RvK4Phw61bFelB8NJ14y+E3gqR7ZPvzlMRsymZvmx
+         48Uc6iKkj9Efwmbr3XVzk0Cx/NleKbyuVE6VMCg8qqflqEbVqSTt5AcyJeFfHG9IDV+7
+         EmRrefhfRb4SVa2p0U15w6gvI97SB1CZYl18p01xV9IW3UvLxTIGMZrA9OfsnKC4qbhu
+         SSKSb9GRZtCZMQQ3CWq0s379t144SU8a5esGPiFDJh5HtfY2HWeiHc/sOovNjBucyDin
+         dBOmem1PA12AHMlyvGEOPdyV7om/qJ6jI3eWKRWgiBjK2hjN5VChtZGQQK46fAeUchOJ
+         eiFA==
+X-Gm-Message-State: APjAAAUSd7vE6JWQfMGAT+RXS9+o0zVh79yjAe7Erfh3/+WGpzYiQuSv
+        Z5HHq7k06DkHA08tv5hD1n+Kz01G7Jduhtbvwt62Vw==
+X-Google-Smtp-Source: APXvYqyvIPcsf8SxFHaUAJgigw/T9+XtRZ1ghvyVXyucHLCXI+5tJRJlMgm7BkUIEb+m2yrtWICCByzFW9CxwJrESIE=
+X-Received: by 2002:a1f:b483:: with SMTP id d125mr9558022vkf.51.1551701671812;
+ Mon, 04 Mar 2019 04:14:31 -0800 (PST)
+MIME-Version: 1.0
+References: <20190227171442.11853-1-igor.j.konopko@intel.com>
+ <20190227171442.11853-9-igor.j.konopko@intel.com> <007EC669-9C50-4B29-9522-CE73CD3CE47F@javigon.com>
+ <CANr-nt1o4ZyRW-MwwXHQ7aXTmOr8PsqRzhR3643iddh9H2kjjg@mail.gmail.com> <9076DF06-7B01-44DA-BA5F-9C784D56134E@javigon.com>
+In-Reply-To: <9076DF06-7B01-44DA-BA5F-9C784D56134E@javigon.com>
+From:   Hans Holmberg <hans@owltronix.com>
+Date:   Mon, 4 Mar 2019 13:14:21 +0100
+Message-ID: <CANr-nt0HeMvSgBOdbSaL+6tadEn9_K6LThaHfGpib+4vc6xthg@mail.gmail.com>
+Subject: Re: [PATCH 08/13] lightnvm: pblk: Set proper read stutus in bio
+To:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
 Cc:     "Konopko, Igor J" <igor.j.konopko@intel.com>,
-        =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
         linux-block@vger.kernel.org
-To:     Hans Holmberg <hans@owltronix.com>
-References: <20190227171442.11853-1-igor.j.konopko@intel.com>
- <20190227171442.11853-6-igor.j.konopko@intel.com>
- <BAC8CFE4-5D1E-4FA0-80DF-9BA655D458D1@javigon.com>
- <CANr-nt3rzEGw0wNdOmm3ba9Oz10BLh_dbHoCECobMr2cfakLhQ@mail.gmail.com>
- <3E70BD55-1CBF-4695-ADA5-91C342E40F6C@javigon.com>
- <CANr-nt2Sj13VStWC4_GeTxCCVgztxqxm3HP7+7cNn+OoN=BCaQ@mail.gmail.com>
-X-Mailer: Apple Mail (2.3445.102.3)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Mar 4, 2019 at 10:48 AM Javier Gonz=C3=A1lez <javier@javigon.com> w=
+rote:
+>
+>
+>
+> > On 4 Mar 2019, at 10.35, Hans Holmberg <hans.ml.holmberg@owltronix.com>=
+ wrote:
+> >
+> > On Mon, Mar 4, 2019 at 9:03 AM Javier Gonz=C3=A1lez <javier@javigon.com=
+> wrote:
+> >>> On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.com> wro=
+te:
+> >>>
+> >>> Currently in case of read errors, bi_status is not
+> >>> set properly which leads to returning inproper data
+> >>> to higher layer. This patch fix that by setting proper
+> >>> status in case of read errors
+> >>>
+> >>> Patch also removes unnecessary warn_once(), which does
+> >>> not make sense in that place, since user bio is not used
+> >>> for interation with drive and thus bi_status will not be
+> >>> set here.
+> >>>
+> >>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+> >>> ---
+> >>> drivers/lightnvm/pblk-read.c | 11 +++++------
+> >>> 1 file changed, 5 insertions(+), 6 deletions(-)
+> >>>
+> >>> diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-rea=
+d.c
+> >>> index 3789185144da..39c1d6ccaedb 100644
+> >>> --- a/drivers/lightnvm/pblk-read.c
+> >>> +++ b/drivers/lightnvm/pblk-read.c
+> >>> @@ -175,11 +175,10 @@ static void pblk_read_check_rand(struct pblk *p=
+blk, struct nvm_rq *rqd,
+> >>>      WARN_ONCE(j !=3D rqd->nr_ppas, "pblk: corrupted random request\n=
+");
+> >>> }
+> >>>
+> >>> -static void pblk_end_user_read(struct bio *bio)
+> >>> +static void pblk_end_user_read(struct bio *bio, int error)
+> >>> {
+> >>> -#ifdef CONFIG_NVM_PBLK_DEBUG
+> >>> -     WARN_ONCE(bio->bi_status, "pblk: corrupted read bio\n");
+> >>> -#endif
+> >>> +     if (error && error !=3D NVM_RSP_WARN_HIGHECC)
+> >>> +             bio_io_error(bio);
+> >>>      bio_endio(bio);
+> >>> }
+> >>>
+> >>> @@ -219,7 +218,7 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+> >>>      struct pblk_g_ctx *r_ctx =3D nvm_rq_to_pdu(rqd);
+> >>>      struct bio *bio =3D (struct bio *)r_ctx->private;
+> >>>
+> >>> -     pblk_end_user_read(bio);
+> >>> +     pblk_end_user_read(bio, rqd->error);
+> >>>      __pblk_end_io_read(pblk, rqd, true);
+> >>> }
+> >>>
+> >>> @@ -292,7 +291,7 @@ static void pblk_end_partial_read(struct nvm_rq *=
+rqd)
+> >>>      rqd->bio =3D NULL;
+> >>>      rqd->nr_ppas =3D nr_secs;
+> >>>
+> >>> -     bio_endio(bio);
+> >>> +     pblk_end_user_read(bio, rqd->error);
+> >>>      __pblk_end_io_read(pblk, rqd, false);
+> >>> }
+> >>>
+> >>> --
+> >>> 2.17.1
+> >>
+> >> This is by design. We do not report the read errors as in any other
+> >> block device - this is why we clone the read bio.
+> >
+> > Could you elaborate on why not reporting read errors is a good thing in=
+ pblk?
+> >
+>
+> Normal block devices do not report read errors on the completion path
+> unless it is a fatal error. This is actually not well understood by the
+> upper layers, which tend to assume that the device is completely broken.
 
---Apple-Mail=_6CCB2FCC-80B8-4E34-AEB3-C749C03FDFEA
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+So returning bogus data without even a warning is a preferred
+solution? You want to force "the upper layers" to do checksumming?
+
+It's fine to mask out NVM_RSP_WARN_HIGHECC, since that is just a
+warning that OCSSD 2.0 adds. The data should still be good.
+All other errors (see 4.6.1.2.1 in the NVMe 1.3 spec), indicates that
+the command did not complete (As far as I can tell)
 
 
-> On 4 Mar 2019, at 12.41, Hans Holmberg <hans@owltronix.com> wrote:
->=20
-> On Mon, Mar 4, 2019 at 10:23 AM Javier Gonz=C3=A1lez =
-<javier@javigon.com> wrote:
->>> On 4 Mar 2019, at 10.02, Hans Holmberg =
-<hans.ml.holmberg@owltronix.com> wrote:
->>>=20
->>> Igor: Have you seen this happening in real life?
->>>=20
->>> I think it would be better to count all expected errors and put them
->>> in the right bucket (without spamming dmesg). If we need a new =
-bucket
->>> for i.e. vendor-specific-errors, let's do that instead.
->>>=20
->>> Someone wiser than me told me that every error print in the log is a
->>> potential customer call.
->>>=20
->>> Javier: Yeah, I think S.M.A.R.T is the way to deliver this
->>> information. Why can't we let the drives expose this info and remove
->>> this from pblk? What's blocking that?
->>=20
->> Until now the spec. We added some new log information in Denali =
-exactly
->> for this. But since pblk supports OCSSD 1.2 and 2.0 I think it is =
-needed to
->> have it here, at least for debugging.
->=20
-> Why add it to the spec? Why not use whatever everyone else is using?
->=20
-> https://en.wikipedia.org/wiki/S.M.A.R.T. :
-> "S.M.A.R.T. (Self-Monitoring, Analysis and Reporting Technology; often
-> written as SMART) is a monitoring system included in computer hard
-> disk drives (HDDs), solid-state drives (SSDs),[1] and eMMC drives. Its
-> primary function is to detect and report various indicators of drive
-> reliability with the intent of anticipating imminent hardware
-> failures."
-> Sounds like what we want here.
-
-I know what smart is=E2=80=A6 You need to define the fields. Maybe you =
-want to
-read Denali again - the extensions are couple with smart.
-
-> For debugging, a trace point or something(i.e. BPF) would be a better
-> solution that would not impact hot-path performance.
-
-Cool. Look forward to the patches ;)
-
-Javier
-
---Apple-Mail=_6CCB2FCC-80B8-4E34-AEB3-C749C03FDFEA
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlx9D9QACgkQPEYBfS0l
-eOAA8BAAhWuuYheG1GmIBZhcaLemMVcj2/pOwiB8M2INw4x1VtsfXWur0EbwZiHe
-WB30UQ+7GU/OJivKsYIYnEzuRFg39rffvfSdoWhg7jRgM6eSD5VuLxGzeX1xNrMy
-6yRjxWFGmjJGrN6DhTPcVYxJlo8HKl/yNaxHGtQ66L4h9tfq/JwpBlKtpcXxG3cr
-VFk2OmA6BHdNnB4WiRQIp2Uu3Kj8aWWn0qPcjKFD6aHK9SqmahjuPZckAp1eYnTQ
-9cffoUY6jv/Qb8Kl9iXEZ18NclBfhQ2MP7iJjKuqn98iKWP0tfZ9aOcSmgwYRK4w
-yZJ/629UsMizEGMRUX2jk5UdpRcyYJ5XsQhMfyZCcei2PR64VD+x0ccAdTfCg1yk
-+egrkcQZvTGICItFKjpSzMvpPfq1v0rP/uibXFDq0h9q55iwHyGhBL+EgcSCM5un
-64NyVWKgb0Gw+MumXyHIe2R3dj6ou1XAyOV2KXFf1wmqi7Eat1KDoS5+ZenvbLfx
-KYYDXrYWGbTpw9Xq4FVbmmAXJPYz94xAUfrFdSWu2zFmC2pNeFHPWGqJJzwzMQVg
-nFH1W8GVfylCusdEyyptkZWwyLLdsElGjx5s1zGHXnc53Op6acaeWfaTlH9Dv5+J
-p72YAer4zRNO5O//1wil0Y9W6yz2vdIg3RI1wQ7ZjIza/P1TRaU=
-=KF/W
------END PGP SIGNATURE-----
-
---Apple-Mail=_6CCB2FCC-80B8-4E34-AEB3-C749C03FDFEA--
+>
+> This is a challenge for OCSSD / Denali / Zone devices as there are cases
+> where reads can fail. Unfortunately at this point, we need to mask these
+> errors and deal with them in the different layers.
+>
+> For OCSSD currently, we do this in pblk, which I think fits well the
+> model as we exposed a normal block device.
+>
+> Javier
