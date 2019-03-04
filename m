@@ -4,177 +4,130 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED453C43381
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35AB4C43381
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:24:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BC5CD20863
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:23:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F19A620449
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:24:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="gldlmBuT"
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="RYlsXJe7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726249AbfCDJXh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Mar 2019 04:23:37 -0500
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:41875 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726087AbfCDJXh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 04:23:37 -0500
-Received: by mail-ed1-f65.google.com with SMTP id x7so3625781eds.8
-        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 01:23:35 -0800 (PST)
+        id S1726111AbfCDJYT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Mar 2019 04:24:19 -0500
+Received: from mail-ua1-f65.google.com ([209.85.222.65]:38335 "EHLO
+        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726087AbfCDJYT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 04:24:19 -0500
+Received: by mail-ua1-f65.google.com with SMTP id d4so3779370uap.5
+        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 01:24:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=CuKRlIGYCiE4YpFjec3rG6SOtwBtu0qwhk+mXFT5r0E=;
-        b=gldlmBuTJri/Wc3CD8ZmzoUYu/kEJZGbsfX7ERIOYA3Usl/E6+gFZpTMnHtRcUlB82
-         bYIum468peMdbLsIl9pRTC5qLVGWlQVGj0GQrDiwF/mYWF94c0P9vmbsvqcMR1UVWBuJ
-         kOYkZLFzrj9UiFUpstVkh8uXZ7L5oSwn76jRZJYY1wp9o/5pyK2bjqWzyzcR7ESebvDr
-         YIW3SeDn5+Ybss+ZB3WQNqg0yezxgZZJy3QrNfsKSnCoZQDBQ6E3RRzohA0PNXtbqbD9
-         QBEI3g1fR/tq+uzHnQ2UG1zz3MKT4K1onBJsv4OEEPLkVxd1Bo5sfLT0hyXOtWZ1CzpP
-         GyVg==
+        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=57Jf4rQCDRVR7rMSWjk9Ownqrh/6+/fYfFUN3DcKsko=;
+        b=RYlsXJe7ZB9kjnXd1m1qHh6n8dNAsnWGMLfZ6nRLsYmIUe0fSGE9CL7nEqtu//6zNH
+         cLvo5DcQBw+FKJTNoBKQ5wKf9K3aYVXpX9HCnt8ZfC47H6PV++fqpTl3OYqZvTsupwno
+         QsXPkAdgGJf/BgwG7OJWMiZmAXTr5ukGlziwyNm/E5YhReV5MjpSXz6oaXsQ1w7hPNtM
+         503jeXci9vT7NB5fQYf+jpklJZgUcFPUYxYuqjI9NNsC4gO3Y1GqQymfT/BG86D5UziZ
+         Cl2y253VgylkUKYMgSR34VgqoNd2CK5xohPWWhVV2aQXSoJ/JQsB9sBQcxQz/r+53n8+
+         SFdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=CuKRlIGYCiE4YpFjec3rG6SOtwBtu0qwhk+mXFT5r0E=;
-        b=b2QxdWAFiXhA3UNZW62WOY4a+TB1wNzoh8pvd3wH4yOugJyFoZh3duPc62HQn6B442
-         0R7plauj5UnUkoRFmvAkifB69gY0GKyht5YYGzrM5GVnZcG7PxrdSGyXJlMRhG2t9W/a
-         ibAp6V/O/oag1+Fpq6tZatoR6XNLdBwIxl2FQ8abHHjSsNQ1cormgkMiCPbq12gUte39
-         VJ/4iQWBL5TBiVVukoQdkbpqBIHaLfv+j3bRvHPI5++JaVxBW5GcJ7jzHqmKXkNHkdcT
-         eeBgBe+T5CWQzj4U6R+2dOxUS8lgI+rLW2M1Dhe46ayeJOZ4uuIKVW0HybO5T9cywuAx
-         uN9w==
-X-Gm-Message-State: APjAAAWSrT1WwVY8x0LLh4PRgbOfWnFNqlr/zKoszF2JX9mChnXJlp97
-        CXTD8cKT62/7oVp+ZbGnbxFZdw==
-X-Google-Smtp-Source: APXvYqw2TkJnGKknzWfhYXqHym/Ct6/qb0rDgBiWThbfVw+7nui1F7OjkqkxFNnu2KuZ3PlZ1PxPnw==
-X-Received: by 2002:a17:906:4952:: with SMTP id f18mr11634544ejt.189.1551691414816;
-        Mon, 04 Mar 2019 01:23:34 -0800 (PST)
-Received: from [192.168.1.119] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id e27sm1939173eda.52.2019.03.04.01.23.34
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 04 Mar 2019 01:23:34 -0800 (PST)
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <3E70BD55-1CBF-4695-ADA5-91C342E40F6C@javigon.com>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_97D42698-9A93-42E7-979C-D3CF878FE8FF";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 05/13] lightnvm: pblk: Count all read errors in stats
-Date:   Mon, 4 Mar 2019 10:23:33 +0100
-In-Reply-To: <CANr-nt3rzEGw0wNdOmm3ba9Oz10BLh_dbHoCECobMr2cfakLhQ@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=57Jf4rQCDRVR7rMSWjk9Ownqrh/6+/fYfFUN3DcKsko=;
+        b=A87YurGLZ3fagZaPDfEX1I6Wy2Jva6P1kChnbsjiObWBwr4z/bCP/bvG/5Py3vdfB0
+         4XaV8zsQGEGNmzRz6jDZ6Ci4H0wuKy4DAgiA9xVxLvNcCvjsZok/9IrQKtKPtL5kqU6i
+         GX6w2nKNZ6Fi8DxoTFyCy6EqgGjhTyhq3ITaNRqzETWsYbGAEOMvwr92UCsA5K/qSAyC
+         sxzr3Ygne1tYnuPyHKOubKPVA9KtBH7vn46ayWPdF1KVsHs333jJlAT+JgyTr3H/VK37
+         yquXavCwLAbf6ILZMORI0XVZpbeznv6FryqULjPdxnVDTuAwFHhSR+NiJsWxsWTQrVU2
+         FprQ==
+X-Gm-Message-State: APjAAAVLZYYu2736bV78IrsXkEZHs35YEQhcYiuBP14dUfB50HRgL9V6
+        xNoOUsjw6gYXTnZaeULdEcpmkkf4NjQ1p3VASDDqLA==
+X-Google-Smtp-Source: APXvYqwMwXTyrPliJHFFWEbNvl+Z0tVHVQxQNIpEPDfV/v8zOC0PJCtDGUEp2CLdJdVacRRrKJ0aHe2aP5QnghnBq5w=
+X-Received: by 2002:a67:5fc7:: with SMTP id t190mr8489904vsb.184.1551691457748;
+ Mon, 04 Mar 2019 01:24:17 -0800 (PST)
+MIME-Version: 1.0
+References: <20190227171442.11853-1-igor.j.konopko@intel.com>
+ <20190227171442.11853-8-igor.j.konopko@intel.com> <02F6919F-62BE-4501-BD6E-406E32DB9ABB@javigon.com>
+In-Reply-To: <02F6919F-62BE-4501-BD6E-406E32DB9ABB@javigon.com>
+From:   Hans Holmberg <hans@owltronix.com>
+Date:   Mon, 4 Mar 2019 10:24:07 +0100
+Message-ID: <CANr-nt2Enyog9dyZHDJs0Jsge-0g1oQ5gpkYiZ=rw+QytNW68Q@mail.gmail.com>
+Subject: Re: [PATCH 07/13] lightnvm: pblk: Cleanly fail when there is not
+ enough memory
+To:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
 Cc:     "Konopko, Igor J" <igor.j.konopko@intel.com>,
-        =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
         linux-block@vger.kernel.org
-To:     Hans Holmberg <hans.ml.holmberg@owltronix.com>
-References: <20190227171442.11853-1-igor.j.konopko@intel.com>
- <20190227171442.11853-6-igor.j.konopko@intel.com>
- <BAC8CFE4-5D1E-4FA0-80DF-9BA655D458D1@javigon.com>
- <CANr-nt3rzEGw0wNdOmm3ba9Oz10BLh_dbHoCECobMr2cfakLhQ@mail.gmail.com>
-X-Mailer: Apple Mail (2.3445.102.3)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Igor,
 
---Apple-Mail=_97D42698-9A93-42E7-979C-D3CF878FE8FF
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+I think you need to motivate (and document) why each of the new flags
+are needed.
 
-> On 4 Mar 2019, at 10.02, Hans Holmberg =
-<hans.ml.holmberg@owltronix.com> wrote:
->=20
-> Igor: Have you seen this happening in real life?
->=20
-> I think it would be better to count all expected errors and put them
-> in the right bucket (without spamming dmesg). If we need a new bucket
-> for i.e. vendor-specific-errors, let's do that instead.
->=20
-> Someone wiser than me told me that every error print in the log is a
-> potential customer call.
->=20
-> Javier: Yeah, I think S.M.A.R.T is the way to deliver this
-> information. Why can't we let the drives expose this info and remove
-> this from pblk? What's blocking that?
+Thanks,
+Hans
 
-Until now the spec. We added some new log information in Denali exactly
-for this. But since pblk supports OCSSD 1.2 and 2.0 I think it is needed =
-to
-have it here, at least for debugging.
-
->=20
-> Thanks,
-> Hans
->=20
-> On Mon, Mar 4, 2019 at 8:42 AM Javier Gonz=C3=A1lez =
-<javier@javigon.com> wrote:
->>> On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.com> =
-wrote:
->>>=20
->>> Currently when unknown error occurs on read path
->>> there is only dmesg information about it, but it
->>> is not counted in sysfs statistics. Since this is
->>> still an error we should also count it there.
->>>=20
->>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
->>> ---
->>> drivers/lightnvm/pblk-core.c | 1 +
->>> 1 file changed, 1 insertion(+)
->>>=20
->>> diff --git a/drivers/lightnvm/pblk-core.c =
-b/drivers/lightnvm/pblk-core.c
->>> index eabcbc119681..a98b2255f963 100644
->>> --- a/drivers/lightnvm/pblk-core.c
->>> +++ b/drivers/lightnvm/pblk-core.c
->>> @@ -493,6 +493,7 @@ void pblk_log_read_err(struct pblk *pblk, struct =
-nvm_rq *rqd)
->>>              atomic_long_inc(&pblk->read_failed);
->>>              break;
->>>      default:
->>> +             atomic_long_inc(&pblk->read_failed);
->>>              pblk_err(pblk, "unknown read error:%d\n", rqd->error);
->>>      }
->>> #ifdef CONFIG_NVM_PBLK_DEBUG
->>> --
->>> 2.17.1
->>=20
->> I left this out intentionally  so that we could correlate the logs =
-from
->> the controller and the errors in the read path. Since we do not have =
-an
->> standard way to correlate this on SMART yet, let=E2=80=99s add this =
-now (I
->> assume that you are using it for something?) and we can separate the
->> error stats in the future.
->>=20
->> Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
-
---Apple-Mail=_97D42698-9A93-42E7-979C-D3CF878FE8FF
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlx87pUACgkQPEYBfS0l
-eOB9IBAAvFmP/Wiz7bqFJdgdyHR7HjmeCGy/nUdeVluarMopi5oghz/BeIUBPgjl
-2K1xTkQZTp6D2Dnw2UQiFfA3FN6nfQ1R0Kfj6cdpI4EW48LsIroK5A8DgB8Qmar5
-EiXzpYXhbXrX4sdQHyfn3tJIUOuN2wuXVP6mnlPOImYzY52bFHCyIL/SIsCd2C1W
-ULXnE2yYl0VMUkuH/MSf3esWSekCjcknW7Atq92BFTVl3D56CEWCpboaeX8vH4lZ
-20bOGFMrPaL18pL6/ES064HLv4Azp0ocmT8X3kP+m1U2Q8oa0U7rGRCt6Ucl2t7/
-7YCY9E+64QCORXCQRtrQ/CabEQlYqdy6UGbgoytHCGRNFETdm297g9a9qoy3oO68
-CEiSAQiGUbRDWWRnQ6qfd6bw7F6jjdymzk57W8ES4t2hR44nsGkS/JjBiDVEgI4Y
-tEq8fHabexqIs8V7+oo6GMXGAVh2FXMTfiUoza61kbKOWxJhA9ZI9rQEr/Wio1wr
-JHoDlChn6Mf8vXGK5NIy4xIp58sXlOlybebHTYidfZlaLHBqZoXbo1571ERtzZ7L
-V1/oqFhtJuNxAAGH7QiTtnOrKHXLfYFGVGlA+zqdRoBry85uRpTht2lg2shy7OXz
-chyttChHyqH3TKdaspKNwEvaCzQd+y6hnxj6s6DStgw6g9YrKdI=
-=GUGe
------END PGP SIGNATURE-----
-
---Apple-Mail=_97D42698-9A93-42E7-979C-D3CF878FE8FF--
+On Mon, Mar 4, 2019 at 8:53 AM Javier Gonz=C3=A1lez <javier@javigon.com> wr=
+ote:
+>
+> > On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.com> wrote=
+:
+> >
+> > L2P table can be huge in many cases, since
+> > it typically requires 1GB of DRAM for 1TB
+> > of drive. When there is not enough memory
+> > available, OOM killer turns on and kills
+> > random processes, which can be very annoying
+> > for users. This patch changes the flag for
+> > L2P table allocation on order to handle this
+> > situation in more user friendly way
+> >
+> > Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+> > ---
+> > drivers/lightnvm/pblk-init.c | 9 +++++++--
+> > 1 file changed, 7 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.=
+c
+> > index 8b643d0bffae..e553105b7ba1 100644
+> > --- a/drivers/lightnvm/pblk-init.c
+> > +++ b/drivers/lightnvm/pblk-init.c
+> > @@ -164,9 +164,14 @@ static int pblk_l2p_init(struct pblk *pblk, bool f=
+actory_init)
+> >       int ret =3D 0;
+> >
+> >       map_size =3D pblk_trans_map_size(pblk);
+> > -     pblk->trans_map =3D vmalloc(map_size);
+> > -     if (!pblk->trans_map)
+> > +     pblk->trans_map =3D __vmalloc(map_size, GFP_KERNEL | __GFP_NOWARN
+> > +                                     | __GFP_RETRY_MAYFAIL | __GFP_HIG=
+HMEM,
+> > +                                     PAGE_KERNEL);
+> > +     if (!pblk->trans_map) {
+> > +             pblk_err(pblk, "failed to allocate L2P (need %ld of memor=
+y)\n",
+> > +                             map_size);
+> >               return -ENOMEM;
+> > +     }
+> >
+> >       pblk_ppa_set_empty(&ppa);
+> >
+> > --
+> > 2.17.1
+>
+> Is there any extra consideration we should take when enabling high
+> memory for the L2P table? If not, looks good to me.
+>
+> Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
