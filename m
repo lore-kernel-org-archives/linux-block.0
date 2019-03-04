@@ -4,75 +4,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0BB3C43381
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:11:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED453C43381
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:23:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5D4F720836
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:11:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC5CD20863
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:23:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="O1nfgPQo"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="gldlmBuT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726029AbfCDJLx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Mar 2019 04:11:53 -0500
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:46278 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726014AbfCDJLx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 04:11:53 -0500
-Received: by mail-ed1-f68.google.com with SMTP id f2so3590618edy.13
-        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 01:11:51 -0800 (PST)
+        id S1726249AbfCDJXh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Mar 2019 04:23:37 -0500
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:41875 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726087AbfCDJXh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 04:23:37 -0500
+Received: by mail-ed1-f65.google.com with SMTP id x7so3625781eds.8
+        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 01:23:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=javigon-com.20150623.gappssmtp.com; s=20150623;
         h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
          :references;
-        bh=0z/4w0GW6Yt5NMm21JpVFEkkTWiq/0uCa2MgDkjYZQc=;
-        b=O1nfgPQo+1keT3cG8seNx4Ec4DiBqWNbneK4fpa3RTBBk60mSHREsWRzsyI/fq7mKP
-         2cdfDDf/f3xg3KUpSxfx0TOPHXTB/qGy86HK5Xj+SUpIoOSn4mAC6jEPBtL9vJXGkIOu
-         f8/+uHpL+Be/rCXOEDOngJC2x0174Q3wXsp8uiWxJ0kPS4lO1ysWr5bRcbm4G5Xukv6S
-         msqx8Hnq8C8MIafWlWcG+Zi+IUuRUZ4JKR7RgJ8xAKaDMM8TefQyT+mZuxID/qtuzYXd
-         2F+DlOc0/4Ks7MQuFqLKHM8wxXfpccC3ifZ+BHuzbc4GlV7mh5ADQU5NnaacLgF00S/J
-         vFfA==
+        bh=CuKRlIGYCiE4YpFjec3rG6SOtwBtu0qwhk+mXFT5r0E=;
+        b=gldlmBuTJri/Wc3CD8ZmzoUYu/kEJZGbsfX7ERIOYA3Usl/E6+gFZpTMnHtRcUlB82
+         bYIum468peMdbLsIl9pRTC5qLVGWlQVGj0GQrDiwF/mYWF94c0P9vmbsvqcMR1UVWBuJ
+         kOYkZLFzrj9UiFUpstVkh8uXZ7L5oSwn76jRZJYY1wp9o/5pyK2bjqWzyzcR7ESebvDr
+         YIW3SeDn5+Ybss+ZB3WQNqg0yezxgZZJy3QrNfsKSnCoZQDBQ6E3RRzohA0PNXtbqbD9
+         QBEI3g1fR/tq+uzHnQ2UG1zz3MKT4K1onBJsv4OEEPLkVxd1Bo5sfLT0hyXOtWZ1CzpP
+         GyVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:message-id:mime-version:subject:date
          :in-reply-to:cc:to:references;
-        bh=0z/4w0GW6Yt5NMm21JpVFEkkTWiq/0uCa2MgDkjYZQc=;
-        b=etLqxdpASlxAsaQHyJiCHYzRrO+lMB6YmbMc1lisVdvsYuJKwT0xYHv7otlhVEVYNB
-         FKIVNmKXYt7sfc6G8+JxeUqw6GPVecgngx6XvbyyuZdaJvMlXRxz2kQc18P1G1Mo9LaV
-         WpZgyqmteO9hDgfM8WYnUc8KxoZQLEEPhYJ4j1tISdZm3VBwSRIP6hGA0yvISgNIV/Tw
-         lPsj/7/A7UvZSXEV39xaJ4hp9scFs2OqLDQrKLMn8lyKWJPLRCgUdMyS9EHZ40EeIJyQ
-         Kuttz5uB1jZPsm/l0FbTwWHme/HJ90NxupiFF2fbt1XG5mUGSShlCKpWW7Cl0CPNVrP+
-         gbQg==
-X-Gm-Message-State: APjAAAX/WQYoE3B7XQ9hx5RtjabxnFSAKmmqdFXrhiCGQM2skUcWJsc/
-        YLfULjhwEhlffiNPjwIolB1meQ==
-X-Google-Smtp-Source: APXvYqz59CqORSFj7laxmtNheIyAQ82rLEUWq0EVcnk9kiIgt/+HYHD/JCj5LhwwwF+hkPPchnhB/Q==
-X-Received: by 2002:a17:906:e81:: with SMTP id p1mr11881439ejf.175.1551690710817;
-        Mon, 04 Mar 2019 01:11:50 -0800 (PST)
+        bh=CuKRlIGYCiE4YpFjec3rG6SOtwBtu0qwhk+mXFT5r0E=;
+        b=b2QxdWAFiXhA3UNZW62WOY4a+TB1wNzoh8pvd3wH4yOugJyFoZh3duPc62HQn6B442
+         0R7plauj5UnUkoRFmvAkifB69gY0GKyht5YYGzrM5GVnZcG7PxrdSGyXJlMRhG2t9W/a
+         ibAp6V/O/oag1+Fpq6tZatoR6XNLdBwIxl2FQ8abHHjSsNQ1cormgkMiCPbq12gUte39
+         VJ/4iQWBL5TBiVVukoQdkbpqBIHaLfv+j3bRvHPI5++JaVxBW5GcJ7jzHqmKXkNHkdcT
+         eeBgBe+T5CWQzj4U6R+2dOxUS8lgI+rLW2M1Dhe46ayeJOZ4uuIKVW0HybO5T9cywuAx
+         uN9w==
+X-Gm-Message-State: APjAAAWSrT1WwVY8x0LLh4PRgbOfWnFNqlr/zKoszF2JX9mChnXJlp97
+        CXTD8cKT62/7oVp+ZbGnbxFZdw==
+X-Google-Smtp-Source: APXvYqw2TkJnGKknzWfhYXqHym/Ct6/qb0rDgBiWThbfVw+7nui1F7OjkqkxFNnu2KuZ3PlZ1PxPnw==
+X-Received: by 2002:a17:906:4952:: with SMTP id f18mr11634544ejt.189.1551691414816;
+        Mon, 04 Mar 2019 01:23:34 -0800 (PST)
 Received: from [192.168.1.119] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id d47sm1937146eda.77.2019.03.04.01.11.49
+        by smtp.gmail.com with ESMTPSA id e27sm1939173eda.52.2019.03.04.01.23.34
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 04 Mar 2019 01:11:50 -0800 (PST)
+        Mon, 04 Mar 2019 01:23:34 -0800 (PST)
 From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <EE08736A-168C-4BED-8445-C0CFEDBB61D4@javigon.com>
+Message-Id: <3E70BD55-1CBF-4695-ADA5-91C342E40F6C@javigon.com>
 Content-Type: multipart/signed;
-        boundary="Apple-Mail=_AD6683BF-67B4-4219-A7A6-CBEFA4A641FB";
+        boundary="Apple-Mail=_97D42698-9A93-42E7-979C-D3CF878FE8FF";
         protocol="application/pgp-signature";
         micalg=pgp-sha256
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 06/13] lightnvm: pblk: Ensure that erase is chunk aligned
-Date:   Mon, 4 Mar 2019 10:11:49 +0100
-In-Reply-To: <CANr-nt1877shJYYkMMwaC2StbrXaOjP7D0OOW5M1rW7LOXu=QQ@mail.gmail.com>
+Subject: Re: [PATCH 05/13] lightnvm: pblk: Count all read errors in stats
+Date:   Mon, 4 Mar 2019 10:23:33 +0100
+In-Reply-To: <CANr-nt3rzEGw0wNdOmm3ba9Oz10BLh_dbHoCECobMr2cfakLhQ@mail.gmail.com>
 Cc:     "Konopko, Igor J" <igor.j.konopko@intel.com>,
         =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
         linux-block@vger.kernel.org
 To:     Hans Holmberg <hans.ml.holmberg@owltronix.com>
 References: <20190227171442.11853-1-igor.j.konopko@intel.com>
- <20190227171442.11853-7-igor.j.konopko@intel.com>
- <FA2EA171-4AB9-4D9C-A782-4BD416EC7045@javigon.com>
- <CANr-nt1877shJYYkMMwaC2StbrXaOjP7D0OOW5M1rW7LOXu=QQ@mail.gmail.com>
+ <20190227171442.11853-6-igor.j.konopko@intel.com>
+ <BAC8CFE4-5D1E-4FA0-80DF-9BA655D458D1@javigon.com>
+ <CANr-nt3rzEGw0wNdOmm3ba9Oz10BLh_dbHoCECobMr2cfakLhQ@mail.gmail.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -80,94 +79,80 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---Apple-Mail=_AD6683BF-67B4-4219-A7A6-CBEFA4A641FB
+--Apple-Mail=_97D42698-9A93-42E7-979C-D3CF878FE8FF
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;
 	charset=utf-8
 
-> On 4 Mar 2019, at 10.05, Hans Holmberg =
+> On 4 Mar 2019, at 10.02, Hans Holmberg =
 <hans.ml.holmberg@owltronix.com> wrote:
 >=20
-> I strongly disagree with adding code that would mask implantation =
-errors.
+> Igor: Have you seen this happening in real life?
 >=20
-> If we want more internal checks, we could add an if statement that
-> would only be compiled in if CONFIG_NVM_PBLK_DEBUG is enabled.
+> I think it would be better to count all expected errors and put them
+> in the right bucket (without spamming dmesg). If we need a new bucket
+> for i.e. vendor-specific-errors, let's do that instead.
 >=20
+> Someone wiser than me told me that every error print in the log is a
+> potential customer call.
+>=20
+> Javier: Yeah, I think S.M.A.R.T is the way to deliver this
+> information. Why can't we let the drives expose this info and remove
+> this from pblk? What's blocking that?
 
-Not sure who this is for - better not to top post.
-
-In any case, this is a spec grey zone. I=E2=80=99m ok with cleaning the =
-bits as
-they mean nothing for the reset command. If you feel that strongly about
-this, you can take if with Igor.
+Until now the spec. We added some new log information in Denali exactly
+for this. But since pblk supports OCSSD 1.2 and 2.0 I think it is needed =
+to
+have it here, at least for debugging.
 
 >=20
-> On Mon, Mar 4, 2019 at 8:48 AM Javier Gonz=C3=A1lez =
+> Thanks,
+> Hans
+>=20
+> On Mon, Mar 4, 2019 at 8:42 AM Javier Gonz=C3=A1lez =
 <javier@javigon.com> wrote:
 >>> On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.com> =
 wrote:
 >>>=20
->>> In current pblk implementation of erase command
->>> there is a chance tha sector bits are set to some
->>> random values for erase PPA. This is unexpected
->>> situation, since erase shall be always chunk
->>> aligned. This patch fixes that issue
+>>> Currently when unknown error occurs on read path
+>>> there is only dmesg information about it, but it
+>>> is not counted in sysfs statistics. Since this is
+>>> still an error we should also count it there.
 >>>=20
 >>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
 >>> ---
 >>> drivers/lightnvm/pblk-core.c | 1 +
->>> drivers/lightnvm/pblk-map.c  | 2 ++
->>> 2 files changed, 3 insertions(+)
+>>> 1 file changed, 1 insertion(+)
 >>>=20
 >>> diff --git a/drivers/lightnvm/pblk-core.c =
 b/drivers/lightnvm/pblk-core.c
->>> index a98b2255f963..78b1eea4ab67 100644
+>>> index eabcbc119681..a98b2255f963 100644
 >>> --- a/drivers/lightnvm/pblk-core.c
 >>> +++ b/drivers/lightnvm/pblk-core.c
->>> @@ -978,6 +978,7 @@ int pblk_line_erase(struct pblk *pblk, struct =
-pblk_line *line)
->>>=20
->>>              ppa =3D pblk->luns[bit].bppa; /* set ch and lun */
->>>              ppa.a.blk =3D line->id;
->>> +             ppa.a.reserved =3D 0;
->>>=20
->>>              atomic_dec(&line->left_eblks);
->>>              WARN_ON(test_and_set_bit(bit, line->erase_bitmap));
->>> diff --git a/drivers/lightnvm/pblk-map.c =
-b/drivers/lightnvm/pblk-map.c
->>> index 79df583ea709..aea46b4ec40f 100644
->>> --- a/drivers/lightnvm/pblk-map.c
->>> +++ b/drivers/lightnvm/pblk-map.c
->>> @@ -161,6 +161,7 @@ int pblk_map_erase_rq(struct pblk *pblk, struct =
-nvm_rq *rqd,
->>>=20
->>>                      *erase_ppa =3D ppa_list[i];
->>>                      erase_ppa->a.blk =3D e_line->id;
->>> +                     erase_ppa->a.reserved =3D 0;
->>>=20
->>>                      spin_unlock(&e_line->lock);
->>>=20
->>> @@ -202,6 +203,7 @@ int pblk_map_erase_rq(struct pblk *pblk, struct =
-nvm_rq *rqd,
->>>              atomic_dec(&e_line->left_eblks);
->>>              *erase_ppa =3D pblk->luns[bit].bppa; /* set ch and lun =
-*/
->>>              erase_ppa->a.blk =3D e_line->id;
->>> +             erase_ppa->a.reserved =3D 0;
+>>> @@ -493,6 +493,7 @@ void pblk_log_read_err(struct pblk *pblk, struct =
+nvm_rq *rqd)
+>>>              atomic_long_inc(&pblk->read_failed);
+>>>              break;
+>>>      default:
+>>> +             atomic_long_inc(&pblk->read_failed);
+>>>              pblk_err(pblk, "unknown read error:%d\n", rqd->error);
 >>>      }
->>>=20
->>>      return 0;
+>>> #ifdef CONFIG_NVM_PBLK_DEBUG
 >>> --
 >>> 2.17.1
 >>=20
->> I=E2=80=99m fine with adding this, but note that there is actually no
->> requirement for the erase to be chunk aligned - the only bits that
->> should be looked at are group, PU and chunk.
+>> I left this out intentionally  so that we could correlate the logs =
+from
+>> the controller and the errors in the read path. Since we do not have =
+an
+>> standard way to correlate this on SMART yet, let=E2=80=99s add this =
+now (I
+>> assume that you are using it for something?) and we can separate the
+>> error stats in the future.
 >>=20
 >> Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
 
---Apple-Mail=_AD6683BF-67B4-4219-A7A6-CBEFA4A641FB
+--Apple-Mail=_97D42698-9A93-42E7-979C-D3CF878FE8FF
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
 	filename=signature.asc
@@ -177,19 +162,19 @@ Content-Description: Message signed with OpenPGP
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlx869UACgkQPEYBfS0l
-eOBTWw//Q1jjxjXug9wIoVtXb47NMXSh9Qq69g7yhpUBJ0vRRizl2Vt7QdU7liYD
-q16jeyG6Xe2uZmmnexG4ZusqjOxh6AaM5J3S6Zcj60cYS7wGHJ2/qGVdI3Fk6eFD
-wLnXIQRbHKIjlZ+3c7HwWyORs5+v9MVkz9KmqwbZotTs6NyG0WtKxinsoVpWTp2y
-NuC6zae5bJkBmyiSrA8auyDjuu0osTZXjjWpwpOHHkgLR8fIJj0YZt5HJWxwf/T2
-hlR3wTvrBl4P1NZcz9MY9omVVwfHJmBCENRXXoYuqcK1Wnv8aRpYsA1/Hk6ta4Ph
-VC4ZXVUvB8AJQlIVy8OYuA+RRthR0oqgLjuG67ScFvXOgoZWtlztucLWlu80Eh0k
-p1JAaHu8y2/gexLJVFgatLZJJwUybCdPc1WnmrvTzVi31ibkW9Qac46P1+Kc1yFu
-0KUlTwi3QfZoPE5YaCZIMap2ibL0NoxzUeyAmFQ258t0n1oX/6MYLSCkIRt6Iit6
-1UgPwhRkjmdRDtBhwzgjijGgDYWTr/dlyxpdDn9d8QzF9qBafanJ5cs60gulpuP7
-PiibatERQCpsPL2UixkRAdxttsJgHdg75ny9DxY+FhrDsLl5Wg2J06ca1yGX9I/u
-Yhz3eDNSMA3q1EvcHAx67NI7TrrpjcsMfU3myFgemA7Kh66d1Cg=
-=dP6H
+iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlx87pUACgkQPEYBfS0l
+eOB9IBAAvFmP/Wiz7bqFJdgdyHR7HjmeCGy/nUdeVluarMopi5oghz/BeIUBPgjl
+2K1xTkQZTp6D2Dnw2UQiFfA3FN6nfQ1R0Kfj6cdpI4EW48LsIroK5A8DgB8Qmar5
+EiXzpYXhbXrX4sdQHyfn3tJIUOuN2wuXVP6mnlPOImYzY52bFHCyIL/SIsCd2C1W
+ULXnE2yYl0VMUkuH/MSf3esWSekCjcknW7Atq92BFTVl3D56CEWCpboaeX8vH4lZ
+20bOGFMrPaL18pL6/ES064HLv4Azp0ocmT8X3kP+m1U2Q8oa0U7rGRCt6Ucl2t7/
+7YCY9E+64QCORXCQRtrQ/CabEQlYqdy6UGbgoytHCGRNFETdm297g9a9qoy3oO68
+CEiSAQiGUbRDWWRnQ6qfd6bw7F6jjdymzk57W8ES4t2hR44nsGkS/JjBiDVEgI4Y
+tEq8fHabexqIs8V7+oo6GMXGAVh2FXMTfiUoza61kbKOWxJhA9ZI9rQEr/Wio1wr
+JHoDlChn6Mf8vXGK5NIy4xIp58sXlOlybebHTYidfZlaLHBqZoXbo1571ERtzZ7L
+V1/oqFhtJuNxAAGH7QiTtnOrKHXLfYFGVGlA+zqdRoBry85uRpTht2lg2shy7OXz
+chyttChHyqH3TKdaspKNwEvaCzQd+y6hnxj6s6DStgw6g9YrKdI=
+=GUGe
 -----END PGP SIGNATURE-----
 
---Apple-Mail=_AD6683BF-67B4-4219-A7A6-CBEFA4A641FB--
+--Apple-Mail=_97D42698-9A93-42E7-979C-D3CF878FE8FF--
