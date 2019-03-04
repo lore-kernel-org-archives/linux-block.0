@@ -4,80 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD795C43381
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 13:44:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BF9BC43381
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 13:45:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6ED3920835
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 13:44:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10DC12075B
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 13:45:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="J/UkmQPg"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="Nb8RJJtN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726061AbfCDNoS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Mar 2019 08:44:18 -0500
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:40894 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726032AbfCDNoS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 08:44:18 -0500
-Received: by mail-ed1-f68.google.com with SMTP id 10so4272767eds.7
-        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 05:44:16 -0800 (PST)
+        id S1726162AbfCDNps (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Mar 2019 08:45:48 -0500
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:36212 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726032AbfCDNpr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 08:45:47 -0500
+Received: by mail-ed1-f66.google.com with SMTP id g9so4283542eds.3
+        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 05:45:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=javigon-com.20150623.gappssmtp.com; s=20150623;
         h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
          :references;
-        bh=Tj4efxLDnajVOwe/01IXJvJ1F5TQzzVld3cShxRWgzM=;
-        b=J/UkmQPgBhcMbgItpl8WPidSIwsWcTTzG/CTLqyLJJJOmJSXnqBeAdB8uj6VgSWZsC
-         Y+/FXROIq3Juw9zylo93kKq6VzKWIUIBuxmnHrrDPHKKY7tXL/Y2Byf3dy9z5n/h0E3/
-         AfsUaYGxzw+d6J5xod4w4fEVMjcIPGsmBpOhibXWPW2qka+sj+UgltqPpWwm2zqOYDp5
-         jviWsuBDd8tfDx0vmGvRWyVh3w+aD7YecHeHzSbjdSbVmddFqCW9P2oNUpIkGDNWH5Fk
-         z0ffn7dkTuNXehC2WngWJO/PYkBRKYa+dd6u2xevwUwPVOXnUTOZkFO3Zg3u/a+yU5vt
-         SR8w==
+        bh=ZM/u2+8ZjqsoQVt02AB35CamHT68HC5i31J/LT7+eXk=;
+        b=Nb8RJJtN9JKJnGTlPesNpTNPEddSIBaNsvXYppeJqGbuPKfD1vEEeHW/NgHkBYUGCe
+         tmkCEMM0CboURaYwC7E+HGjd3H8XiqOC6zvxJUKCCu4YdXmoE/Vy7dCR7np0UgjzAwcx
+         MMUjXpd7HnOHOhCnSUb6+JVbUaVnVec1wQsphul1WI6Oe09WaXZzyDear9/MNucBR10a
+         yf/q2LuGI8f0zUhxD25+QYfKOJyz/pm/rlYRKvTM9jLrQb0+kJaA2bTSFsGXB4E+YnqR
+         buo7gLIgvG2DV1+hC1Gb2NIMIUKycyj/OnwSH5WeQ2VZMDW7TBYrrCP/1/NYs09yqgs3
+         mzQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:message-id:mime-version:subject:date
          :in-reply-to:cc:to:references;
-        bh=Tj4efxLDnajVOwe/01IXJvJ1F5TQzzVld3cShxRWgzM=;
-        b=sYDNYfRR8aTcTKpU2/Yyq4MnUO2VS7OAbOYLRmcrBsW4Q48hfGLxBoel4oBGl2hW8Q
-         1miqDk1CJgxpRV++CsdXPm4Hdv6K8nmiDh4dWLqTL7c6Hzhy28gt5bbXMPu0xC1QSr7T
-         dLwa8U9HG4jt9V565dJcy8szwbXqezqg6hf7l/PkdjTv0IsvqBkv25EoSznYiiml3O4b
-         +sTQ2o6mrNRdFFd5qhTtcKan4QCuOHzt9ep/XgdGiQiMo610MnURa/4KIPn16xUNbtm9
-         IZ9N/q3AhO1FXgCNq8FG3nabMZfy40I3+/W7K739RNkz48tT0xzCQqm5N5gGqRpfHlv5
-         +ssg==
-X-Gm-Message-State: APjAAAVtbvdCBH+2hcwpwMVfaZwRvoBLF68+ThBsOWkabYXSwkykgHI2
-        zXXtPW0sIrI/9QRutilEQ5aeHg==
-X-Google-Smtp-Source: APXvYqxb+cH39srRP4KJncZ4paR6EIT6NqQu5VL0OA0AadbtjHNoP1XUure+42MBSZlPsq1mHLmAHQ==
-X-Received: by 2002:a50:a7e5:: with SMTP id i92mr15803414edc.181.1551707055806;
-        Mon, 04 Mar 2019 05:44:15 -0800 (PST)
+        bh=ZM/u2+8ZjqsoQVt02AB35CamHT68HC5i31J/LT7+eXk=;
+        b=kjn8Q3DppfwdYxcA9Dv/wqpR1KyqOuJuBy4Vyquw2O1MQultbdjehsoBVbALMxI3Pj
+         hDm4m/pDuQGAzC639DxeokV1a2SJdiLDSk1h2tAELzspVATXhXxvwr1ElT39p0osFGRt
+         bLJEdPS2DB9iAQJp1cIpc/6ZjFgUu8qC+9OBMI0IQQ1Q8VT1ENNNI+Aya3C8dZ12a6jl
+         AA6TxNYluXgu/MN+6HAbvoRSXqsrofWXW7pswxciSD02frWUN9OX3xmpb/5To/cjkKOO
+         uB9kjf0dNfFxOze5ZG1f9YRgs6CfeViJyAtPiB1qet0nnpGodDy6UCamS0qETqli9gtY
+         vkKw==
+X-Gm-Message-State: APjAAAVrX782fco1bhB8P1Uc+iyx+snJalHmDmw3c4iO+64DllsCiBPm
+        d35OZ/c15wnrML/tAlz2MJXv1NgKDX8=
+X-Google-Smtp-Source: APXvYqyx57FDS+xNvHBdELdwlxlVHpryVd69MzxiO+pbb+Z7GaIGE/6Ilk0crJTZTypN0Rr1jMhHOA==
+X-Received: by 2002:a17:906:1c4b:: with SMTP id l11mr12553144ejg.20.1551707145215;
+        Mon, 04 Mar 2019 05:45:45 -0800 (PST)
 Received: from [192.168.1.119] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id o23sm1202211ejg.28.2019.03.04.05.44.14
+        by smtp.gmail.com with ESMTPSA id 20sm1213155ejy.68.2019.03.04.05.45.44
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 04 Mar 2019 05:44:14 -0800 (PST)
+        Mon, 04 Mar 2019 05:45:44 -0800 (PST)
 From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <EA36DDD6-5A3D-4F5C-9B18-53E266EB676F@javigon.com>
+Message-Id: <8A1CEAAD-601B-4AC8-81DC-C7A5CB24001D@javigon.com>
 Content-Type: multipart/signed;
-        boundary="Apple-Mail=_C6030077-19CF-44C5-BF41-1402E4D9280E";
+        boundary="Apple-Mail=_C60699E7-C293-4DDB-A2E2-2B58E550EB11";
         protocol="application/pgp-signature";
         micalg=pgp-sha256
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 13/13] lightnvm: Inherit mdts from the parent nvme device
-Date:   Mon, 4 Mar 2019 14:44:13 +0100
-In-Reply-To: <c6fbb977-bfde-d76d-cc4f-198a732d38d0@lightnvm.io>
-Cc:     Hans Holmberg <hans@owltronix.com>,
-        "Konopko, Igor J" <igor.j.konopko@intel.com>,
+Subject: Re: [PATCH 08/13] lightnvm: pblk: Set proper read stutus in bio
+Date:   Mon, 4 Mar 2019 14:45:43 +0100
+In-Reply-To: <4b92af86-c5ba-aa09-f39e-86975fd35460@lightnvm.io>
+Cc:     "Konopko, Igor J" <igor.j.konopko@intel.com>,
+        Hans Holmberg <hans@owltronix.com>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        linux-block@vger.kernel.org,
-        Simon Andreas Frimann Lund <slund@cnexlabs.com>,
-        Klaus Birkelund Jensen <klaus.jensen@cnexlabs.com>
+        linux-block@vger.kernel.org
 To:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>
 References: <20190227171442.11853-1-igor.j.konopko@intel.com>
- <20190227171442.11853-14-igor.j.konopko@intel.com>
- <2776B2AC-19D2-4E38-94AD-E158E3E60A37@javigon.com>
- <CANr-nt2dNY8EgeJ7qAutfVEuyose_8_j9w6WkO-mER-Ao6oXOg@mail.gmail.com>
- <54D42A19-96EE-4370-B957-A474BB912530@javigon.com>
- <CANr-nt1zQWf8XkQaesyFO+wTLULdEAvATvYjYFiDXbc_vifKGQ@mail.gmail.com>
- <CDD16047-68EF-43EA-A33B-11279A4301E6@javigon.com>
- <c6fbb977-bfde-d76d-cc4f-198a732d38d0@lightnvm.io>
+ <20190227171442.11853-9-igor.j.konopko@intel.com>
+ <007EC669-9C50-4B29-9522-CE73CD3CE47F@javigon.com>
+ <CANr-nt1o4ZyRW-MwwXHQ7aXTmOr8PsqRzhR3643iddh9H2kjjg@mail.gmail.com>
+ <9076DF06-7B01-44DA-BA5F-9C784D56134E@javigon.com>
+ <CANr-nt0HeMvSgBOdbSaL+6tadEn9_K6LThaHfGpib+4vc6xthg@mail.gmail.com>
+ <9c5a361b-d7f2-08be-7b3d-6eae68594e1d@intel.com>
+ <4b92af86-c5ba-aa09-f39e-86975fd35460@lightnvm.io>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -85,183 +84,135 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---Apple-Mail=_C6030077-19CF-44C5-BF41-1402E4D9280E
+--Apple-Mail=_C60699E7-C293-4DDB-A2E2-2B58E550EB11
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;
 	charset=utf-8
 
 
-> On 4 Mar 2019, at 14.25, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
+> On 4 Mar 2019, at 14.08, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
 >=20
-> On 3/4/19 2:19 PM, Javier Gonz=C3=A1lez wrote:
->>> On 4 Mar 2019, at 13.22, Hans Holmberg <hans@owltronix.com> wrote:
->>>=20
->>> On Mon, Mar 4, 2019 at 12:44 PM Javier Gonz=C3=A1lez =
+> On 3/4/19 1:51 PM, Igor Konopko wrote:
+>> On 04.03.2019 13:14, Hans Holmberg wrote:
+>>> On Mon, Mar 4, 2019 at 10:48 AM Javier Gonz=C3=A1lez =
 <javier@javigon.com> wrote:
->>>>> On 4 Mar 2019, at 12.30, Hans Holmberg <hans@owltronix.com> wrote:
+>>>>> On 4 Mar 2019, at 10.35, Hans Holmberg =
+<hans.ml.holmberg@owltronix.com> wrote:
 >>>>>=20
->>>>> On Mon, Mar 4, 2019 at 10:05 AM Javier Gonz=C3=A1lez =
+>>>>> On Mon, Mar 4, 2019 at 9:03 AM Javier Gonz=C3=A1lez =
 <javier@javigon.com> wrote:
 >>>>>>> On 27 Feb 2019, at 18.14, Igor Konopko =
 <igor.j.konopko@intel.com> wrote:
 >>>>>>>=20
->>>>>>> Current lightnvm and pblk implementation does not care
->>>>>>> about NVMe max data transfer size, which can be smaller
->>>>>>> than 64*K=3D256K. This patch fixes issues related to that.
->>>>>=20
->>>>> Could you describe *what* issues you are fixing?
->>>>>=20
+>>>>>>> Currently in case of read errors, bi_status is not
+>>>>>>> set properly which leads to returning inproper data
+>>>>>>> to higher layer. This patch fix that by setting proper
+>>>>>>> status in case of read errors
+>>>>>>>=20
+>>>>>>> Patch also removes unnecessary warn_once(), which does
+>>>>>>> not make sense in that place, since user bio is not used
+>>>>>>> for interation with drive and thus bi_status will not be
+>>>>>>> set here.
+>>>>>>>=20
 >>>>>>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
 >>>>>>> ---
->>>>>>> drivers/lightnvm/core.c      | 9 +++++++--
->>>>>>> drivers/nvme/host/lightnvm.c | 1 +
->>>>>>> include/linux/lightnvm.h     | 1 +
->>>>>>> 3 files changed, 9 insertions(+), 2 deletions(-)
+>>>>>>> drivers/lightnvm/pblk-read.c | 11 +++++------
+>>>>>>> 1 file changed, 5 insertions(+), 6 deletions(-)
 >>>>>>>=20
->>>>>>> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
->>>>>>> index 5f82036fe322..c01f83b8fbaf 100644
->>>>>>> --- a/drivers/lightnvm/core.c
->>>>>>> +++ b/drivers/lightnvm/core.c
->>>>>>> @@ -325,6 +325,7 @@ static int nvm_create_tgt(struct nvm_dev =
-*dev, struct nvm_ioctl_create *create)
->>>>>>>     struct nvm_target *t;
->>>>>>>     struct nvm_tgt_dev *tgt_dev;
->>>>>>>     void *targetdata;
->>>>>>> +     unsigned int mdts;
->>>>>>>     int ret;
+>>>>>>> diff --git a/drivers/lightnvm/pblk-read.c =
+b/drivers/lightnvm/pblk-read.c
+>>>>>>> index 3789185144da..39c1d6ccaedb 100644
+>>>>>>> --- a/drivers/lightnvm/pblk-read.c
+>>>>>>> +++ b/drivers/lightnvm/pblk-read.c
+>>>>>>> @@ -175,11 +175,10 @@ static void pblk_read_check_rand(struct =
+pblk *pblk, struct nvm_rq *rqd,
+>>>>>>>       WARN_ONCE(j !=3D rqd->nr_ppas, "pblk: corrupted random =
+request\n");
+>>>>>>> }
 >>>>>>>=20
->>>>>>>     switch (create->conf.type) {
->>>>>>> @@ -412,8 +413,12 @@ static int nvm_create_tgt(struct nvm_dev =
-*dev, struct nvm_ioctl_create *create)
->>>>>>>     tdisk->private_data =3D targetdata;
->>>>>>>     tqueue->queuedata =3D targetdata;
+>>>>>>> -static void pblk_end_user_read(struct bio *bio)
+>>>>>>> +static void pblk_end_user_read(struct bio *bio, int error)
+>>>>>>> {
+>>>>>>> -#ifdef CONFIG_NVM_PBLK_DEBUG
+>>>>>>> -     WARN_ONCE(bio->bi_status, "pblk: corrupted read bio\n");
+>>>>>>> -#endif
+>>>>>>> +     if (error && error !=3D NVM_RSP_WARN_HIGHECC)
+>>>>>>> +             bio_io_error(bio);
+>>>>>>>       bio_endio(bio);
+>>>>>>> }
 >>>>>>>=20
->>>>>>> -     blk_queue_max_hw_sectors(tqueue,
->>>>>>> -                     (dev->geo.csecs >> 9) * NVM_MAX_VLBA);
->>>>>>> +     mdts =3D (dev->geo.csecs >> 9) * NVM_MAX_VLBA;
->>>>>>> +     if (dev->geo.mdts) {
->>>>>>> +             mdts =3D min_t(u32, dev->geo.mdts,
->>>>>>> +                             (dev->geo.csecs >> 9) * =
-NVM_MAX_VLBA);
->>>>>>> +     }
->>>>>>> +     blk_queue_max_hw_sectors(tqueue, mdts);
+>>>>>>> @@ -219,7 +218,7 @@ static void pblk_end_io_read(struct nvm_rq =
+*rqd)
+>>>>>>>       struct pblk_g_ctx *r_ctx =3D nvm_rq_to_pdu(rqd);
+>>>>>>>       struct bio *bio =3D (struct bio *)r_ctx->private;
 >>>>>>>=20
->>>>>>>     set_capacity(tdisk, tt->capacity(targetdata));
->>>>>>>     add_disk(tdisk);
->>>>>>> diff --git a/drivers/nvme/host/lightnvm.c =
-b/drivers/nvme/host/lightnvm.c
->>>>>>> index b759c25c89c8..b88a39a3cbd1 100644
->>>>>>> --- a/drivers/nvme/host/lightnvm.c
->>>>>>> +++ b/drivers/nvme/host/lightnvm.c
->>>>>>> @@ -991,6 +991,7 @@ int nvme_nvm_register(struct nvme_ns *ns, =
-char *disk_name, int node)
->>>>>>>     geo->csecs =3D 1 << ns->lba_shift;
->>>>>>>     geo->sos =3D ns->ms;
->>>>>>>     geo->ext =3D ns->ext;
->>>>>>> +     geo->mdts =3D ns->ctrl->max_hw_sectors;
+>>>>>>> -     pblk_end_user_read(bio);
+>>>>>>> +     pblk_end_user_read(bio, rqd->error);
+>>>>>>>       __pblk_end_io_read(pblk, rqd, true);
+>>>>>>> }
 >>>>>>>=20
->>>>>>>     dev->q =3D q;
->>>>>>>     memcpy(dev->name, disk_name, DISK_NAME_LEN);
->>>>>>> diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
->>>>>>> index 5d865a5d5cdc..d3b02708e5f0 100644
->>>>>>> --- a/include/linux/lightnvm.h
->>>>>>> +++ b/include/linux/lightnvm.h
->>>>>>> @@ -358,6 +358,7 @@ struct nvm_geo {
->>>>>>>     u16     csecs;          /* sector size */
->>>>>>>     u16     sos;            /* out-of-band area size */
->>>>>>>     bool    ext;            /* metadata in extended data buffer =
-*/
->>>>>>> +     u32     mdts;           /* Max data transfer size*/
+>>>>>>> @@ -292,7 +291,7 @@ static void pblk_end_partial_read(struct =
+nvm_rq *rqd)
+>>>>>>>       rqd->bio =3D NULL;
+>>>>>>>       rqd->nr_ppas =3D nr_secs;
 >>>>>>>=20
->>>>>>>     /* device write constrains */
->>>>>>>     u32     ws_min;         /* minimum write size */
+>>>>>>> -     bio_endio(bio);
+>>>>>>> +     pblk_end_user_read(bio, rqd->error);
+>>>>>>>       __pblk_end_io_read(pblk, rqd, false);
+>>>>>>> }
+>>>>>>>=20
 >>>>>>> --
 >>>>>>> 2.17.1
 >>>>>>=20
->>>>>> I see where you are going with this and I partially agree, but =
-none of
->>>>>> the OCSSD specs define a way to define this parameter. Thus, =
-adding this
->>>>>> behavior taken from NVMe in Linux can break current =
-implementations. Is
->>>>>> this a real life problem for you? Or this is just for NVMe =
-=E2=80=9Ccorrectness=E2=80=9D?
->>>>>>=20
->>>>>> Javier
+>>>>>> This is by design. We do not report the read errors as in any =
+other
+>>>>>> block device - this is why we clone the read bio.
 >>>>>=20
->>>>> Hmm.Looking into the 2.0 spec what it says about vector reads:
->>>>>=20
->>>>> (figure 28):"The number of Logical Blocks (NLB): This field =
-indicates
->>>>> the number of logical blocks to be read. This is a 0=E2=80=99s =
-based value.
->>>>> Maximum of 64 LBAs is supported."
->>>>>=20
->>>>> You got the max limit covered, and the spec  does not say anything
->>>>> about the minimum number of LBAs to support.
->>>>>=20
->>>>> Matias: any thoughts on this?
->>>>>=20
->>>>> Javier: How would this patch break current implementations?
+>>>>> Could you elaborate on why not reporting read errors is a good =
+thing in pblk?
 >>>>=20
->>>> Say an OCSSD controller that sets mdts to a value under 64 or does =
-not
->>>> set it at all (maybe garbage). Think you can get to one pretty =
-quickly...
+>>>> Normal block devices do not report read errors on the completion =
+path
+>>>> unless it is a fatal error. This is actually not well understood by =
+the
+>>>> upper layers, which tend to assume that the device is completely =
+broken.
 >>>=20
->>> So we cant make use of a perfectly good, standardized, parameter
->>> because some hypothetical non-compliant device out there might not
->>> provide a sane value?
->> The OCSSD standard has never used NVMe parameters, so there is no
->> compliant / non-compliant. In fact, until we changed OCSSD 2.0 to
->> get the sector and OOB sizes from the standard identify
->> command, we used to have them in the geometry.
+>>> So returning bogus data without even a warning is a preferred
+>>> solution? You want to force "the upper layers" to do checksumming?
+>>>=20
+>>> It's fine to mask out NVM_RSP_WARN_HIGHECC, since that is just a
+>>> warning that OCSSD 2.0 adds. The data should still be good.
+>>> All other errors (see 4.6.1.2.1 in the NVMe 1.3 spec), indicates =
+that
+>>> the command did not complete (As far as I can tell)
+>> My approach was exactly like that. In all cases other than =
+WARN_HIGHECC we don't have a valid data. Without setting a =
+bio_io_error() we are creating the impression for other layers, that we =
+read the data correctly, what is not a case then.
+>> I'm also seeing that this patch is not the only user of =
+bio_io_error() API, also other drivers such as md uses is commonly.
 >=20
-> What the hell? Yes it has. The whole OCSSD spec is dependent on the
-> NVMe spec. It is using many commands from the NVMe specification,
-> which is not defined in the OCSSD specification.
->=20
+> Yes agree. This is an actual error in pblk that lets it return bogus =
+data.
 
-First, lower the tone.
+I am not against returning an error, I am just saying that this is not
+normal behavior on the read path.
 
-Second, no, it has not and never has, starting with all the write
-constrains, continuing with the vector commands, etc. You cannot choose
-what you want to be compliant with and what you do not. OCSSD uses the
-NVMe protocol but it is self sufficient with its geometry for all the
-read / write / erase paths - it even depends on different PCIe class
-codes to be identified=E2=80=A6 To do this in the way the rest of the =
-spec is
-defined, we either add a filed to the geometry or explicitly mention
-that MDTS is used, as we do with the sector and metadata sizes.
+The problem is that the upper layers might interpret that the device is
+broken completely, which is not true for a spa failing. Think for
+example of a host reading under mw_cunits - in reality this is not even
+a device problem but a host bug that might result in a fatal error.
 
-Third, as a maintainer of this subsystem you should care about devices
-in the field that might break due to such a change (supported by the
-company you work for or not) - even if you can argue whether the change
-is compliant or not.
-
-And Hans, as a representative of a company that has such devices out
-there, you should care too.
-
-What if we add a quirk in the feature bits for this so that newer
-devices can implement this and older devices can still function?
-
-> The MDTS field should be respected in all case, similarly to how the
-> block layer respects it. Since the lightnvm subsystem are hooking in
-> on the side, this also be honoured by pblk (or the lightnvm subsystem
-> should fix it up)
->=20
-
-This said, pblk does not care which value you give, it uses what the
-subsystem tells it - this is not arguing for this change not to be
-implemented.
-
-The only thing we should care about if implementing this is removing the
-constant defining 64 ppas and making allocations dynamic in the partial
-read and GC paths.
+Matias: I am surprised to see you answer this way - when I tried to
+define a sane read error path with meaningful errors starting in the
+spec and all the way up the stack you were the first one to argue for
+reads to always succeed no matter what. In fact, using ZBC/ZAC as an
+example...
 
 Javier
 
---Apple-Mail=_C6030077-19CF-44C5-BF41-1402E4D9280E
+--Apple-Mail=_C60699E7-C293-4DDB-A2E2-2B58E550EB11
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
 	filename=signature.asc
@@ -271,19 +222,19 @@ Content-Description: Message signed with OpenPGP
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlx9K60ACgkQPEYBfS0l
-eOBbgw/+JLOzjDbw4KrF32ao6OycutQ5F6NLrAYBO2SDbtygBjBmn2PHx5DUS0Xd
-hBHtxfaEvAeOjrR9SxKr8cJ/NR5Jsu1U8walX+QtiMY1S+KM8bMuXEHdgh0L1im5
-hxJ60nrTBbKrE+J7fn+0FCgtv/A50EfKN31dYHE1XXLT4BACF6EC3lj9jtrIu5nK
-KVRD9m6R1qcTOOnXAqJ9proSDYQYPIzpTx6fzkjejWHTug/4B+cUGosAPRLsoXg4
-44V3rxLwvsovzxUgOchYPeHlW8JyX1V7U/fWYnDn8fIh9jYIyB3gBd0DL1xNf/0z
-xJcz0tbAmqSS5PKQcPpMP123SEreIPIXSCiM6Ia/k4Rd7RQz+OHjyibv5K780esw
-vQzzUvf1FtN+XS04UE538zCgmGe7g6SmpSvRoMZZl0vOjuLJhtof1msCPx5S4GmR
-N80Ein+r2EhP/5GDYHcl3vmt9azikqQsaVb/gnQaNpbpg+mGpVBYm74xuXKizng5
-OF/cHE9S5yjJAYj4XBxGRlHyDejCu5cDKT6P4HSWnmrIs86xyPZjv9/vTf3B+BkD
-gUGnUI4PNmxwcQjAFqM2arwojkLUoP7jADB7dl+3Pdz5C6794Ox4HnGzqtivHOqN
-YN3Qqo+qEURtk8rkAKuR0kgFXCd005hbGitUd8i9/rx9C/lfQHU=
-=XbAv
+iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlx9LAcACgkQPEYBfS0l
+eOA1vQ//SEmZulpBVl8+gh42a+5uWH/q5SkiX9KjOyaUHEGtLl2rSYZknq1mox2r
+O+IIvRVQTTr3gJuHAwKkgrfS6RJdJZBXVzaxny/xKsuYeXzfQjSX9pGW793N+Nuy
+4ujvPmCrCzkTRP6hA1+TDMXgFSzGW+XpQ4NmR/i+l+yTPDGYxtRo0qvqxas6gvxd
+jCg4kWWNg7nn8V/ee+B7pFP7HBp2ZW7E1cGK6EFIrPaHajJ7yFwGlObWFeBWLxjY
+eL9pLE6Upa7Q8d8Fr58HSRrrlsaen0VROXOCCfBQ+N669tLl3wQwEZE3S82jMOcK
+vYcW8f/WAFfjFKRpUnT2bsJWgHJCabSGTH9U4oq2T2X0fMtT1TE++4XIluVeLya8
+rEUfULDksUdeaoAO7MK5cCxr0s9IujxFqc36arO9ySmVi+EPS/OKDyOjFdtxZceN
+9tXT6pCKO3/mGDqBWv+O49s0v2PymAZPTHeS8kDAB75y8EqF1uoap+6mGE2GlIfh
+Z6XMcVoxPcWw18e0IyqhfeYHXFsx+ERWk5DsL3LZZZhA0OOD1NdGELfMUqt7gake
+DrLcmXmINVn70u6iyrBS9vaWd/VSfX5/6sKmi9edMK/LhTZhhUAHzMfcIf8Qc9ct
+s3Tyw7R6/ChVJVvyIQqhmnU/pF7uFBljH1xapfHOpdFfESDoFUc=
+=B3EZ
 -----END PGP SIGNATURE-----
 
---Apple-Mail=_C6030077-19CF-44C5-BF41-1402E4D9280E--
+--Apple-Mail=_C60699E7-C293-4DDB-A2E2-2B58E550EB11--
