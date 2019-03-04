@@ -4,189 +4,139 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A545C43381
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53286C43381
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:05:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 42C8820863
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:05:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 22E9C21019
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:05:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="qJUM9vvZ"
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="cMung/G9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726038AbfCDJFW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Mar 2019 04:05:22 -0500
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:46712 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726029AbfCDJFW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 04:05:22 -0500
-Received: by mail-ed1-f68.google.com with SMTP id f2so3574554edy.13
-        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 01:05:21 -0800 (PST)
+        id S1726041AbfCDJFe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Mar 2019 04:05:34 -0500
+Received: from mail-ua1-f68.google.com ([209.85.222.68]:42075 "EHLO
+        mail-ua1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726029AbfCDJFe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 04:05:34 -0500
+Received: by mail-ua1-f68.google.com with SMTP id s26so3723259uao.9
+        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 01:05:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=jWiw/VJcyuWXtUyzbrYMWqyhcnyuhTgFSFFsOcVLeiE=;
-        b=qJUM9vvZpx04z6ugQ7odK0g+DdlyJgEsoq198f50oyWF/5d/4SDx+3WGvTUpjRwsIG
-         G3WoGaED+1MvrC1PU+XwC09dCXG5LzI/5nb2DydZGxUXm2OWbHyeVQ5eBWQcyMJ8UFmr
-         A7HMTNMiGZ/VZ8POKeGVYb81cdEhjBHgZafwpUJCK2ObE3sT2ggCYXbgCc+YfRQV4Vdq
-         kkpUK8MpR49JHUaqXqYZLYsdzi+QJ25vwiPze3ivWLVZELBC0IGZl63/fRaaC4qoFNg4
-         rZlF0DSqQ4RSvxhun9wehUOFdMfbz4+H2M2L9ZE0xW8EhcgAx0bsvnNfbvU4SRYFaNCK
-         zrzg==
+        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=p1c0n9VcE+Q8mIz5t/fHHR6y8niA4Xgu4Iyjua8YnCI=;
+        b=cMung/G9N18ZabdrWYp644dSgPYSxKi7rWGTQGn2SMAybbuby5YrVIpVdZ49MPSAVi
+         a0s5dn1056DMW4I4ivm0K4TVLRKDaEdsqjTVmXifReZVdRaOY8sruLjrwjk3bhJeSnSo
+         LvlbxsjNip6u+Pj1XZTJQ84K29B12m5xLJRJSqwqwahT/wZGATIiCcQIfT6CgvUnHUG4
+         5NvrhLyAt4BIHDt7JOStK5EW7p0tlXh5lpIyS3JsD6mSZ48KpjfMCUKmj0yhN20IHw9D
+         pvLhwYWtO6OzO/ITIWj2WqeCKHvXq+SwR0lmrR4ILd/wm3KcX1iN6TQpzcZHlLKjCzGk
+         s6wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=jWiw/VJcyuWXtUyzbrYMWqyhcnyuhTgFSFFsOcVLeiE=;
-        b=t8DnnDUf5KvTA4/KM94r6msGBoKkvMuQqPPzNMaHusiJbNkF+fxEdin/5jlRDYvgNN
-         U+Xscya9SC7Dpzdbp9RJAZkF3WgjLQzg2yCqHioDBXduvkoLykNwQQavBbWNE8xEp/J7
-         ZP2gd7RAXP9cHwJdJwj9b8QhxDUBSCP/kOKgR3Lc4xxRm630vupe+0dQGSCizRqTUVUp
-         L02upysDv4SMpYbsy4DtFlDruP1sKHqPLFZuTfjdnRWH3U/FnKT550Lg2CFKvZDcMI3N
-         qdPU3xEBXdqrztn/J6gkSwVKM3n4vgNhU6/0f2VnS1FI4VuPzk1CQjB/utnbwlmhG70L
-         I8CA==
-X-Gm-Message-State: APjAAAXe7kGeEZCYHTe8tDUEL+h6e9zeCz5EogaHVRWZvMrjb/EVQ208
-        K8TvIuMCYuWCBFMnWpM2RMKnYA==
-X-Google-Smtp-Source: APXvYqxL0/0OopJWIMcH5H1eIm3eXGUkEhKbq9sd/VHE4YmqDJir3rxD/PyqYcyr3U2N7lgGzsxwxA==
-X-Received: by 2002:a50:8786:: with SMTP id a6mr14531167eda.241.1551690320568;
-        Mon, 04 Mar 2019 01:05:20 -0800 (PST)
-Received: from [192.168.1.119] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id c50sm1921752edc.81.2019.03.04.01.05.19
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 04 Mar 2019 01:05:19 -0800 (PST)
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <2776B2AC-19D2-4E38-94AD-E158E3E60A37@javigon.com>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_667B7A9D-3668-413F-A4E9-008668FFEA78";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 13/13] lightnvm: Inherit mdts from the parent nvme device
-Date:   Mon, 4 Mar 2019 10:05:18 +0100
-In-Reply-To: <20190227171442.11853-14-igor.j.konopko@intel.com>
-Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=p1c0n9VcE+Q8mIz5t/fHHR6y8niA4Xgu4Iyjua8YnCI=;
+        b=WF8mdoJigBVBpliY3GwYp4dbQ/2IqjfVpZt+SCQ/sI5BqiX4oS9dpifVPG/2YaTGVe
+         BV1LZSnc9YumuziJKmdx7CQLqg6wVJZhLd6BWuImgP70NQ/pKjD7I2k9zZmCBVoYrt24
+         ZWA4bZVuCgj31hcpfeN/ljIdXXp1lAcbMilOxrkJ13ViusOlw6YtKDz0Sx09qmm2Z9kV
+         dUrkECbCeI7Yy2La3jZ/Udq6dU8SfdcSrn2i0ru1Cm+HeYqU96kzD3UQd5hIvSKCDmO8
+         zrOH1jjZL1nsC/Vj6siUd6sa6dHjpOR+gGv8Fwt/qxXZW+4vM3+o2Je2990CpFoMh/KH
+         CNsw==
+X-Gm-Message-State: APjAAAVV9Y3ArNNRaeESgi+gsr5twW2GMn6mAWu7zwso4DZ6791t6oUe
+        zcVPVf8vWZaRwfzszdp55z2XmHUBFay0ktIXXhhPdiYxKfVC/A==
+X-Google-Smtp-Source: APXvYqyGq87A3i0aio40fBgO6/Asaj6+C0RRmnDLBLE/Q1U4KOVgBbT+Pp/FRH+pwmeuDJtNcLbaRAWsJLDhbdeM6J0=
+X-Received: by 2002:a67:f744:: with SMTP id w4mr9417077vso.16.1551690332947;
+ Mon, 04 Mar 2019 01:05:32 -0800 (PST)
+MIME-Version: 1.0
+References: <20190227171442.11853-1-igor.j.konopko@intel.com>
+ <20190227171442.11853-7-igor.j.konopko@intel.com> <FA2EA171-4AB9-4D9C-A782-4BD416EC7045@javigon.com>
+In-Reply-To: <FA2EA171-4AB9-4D9C-A782-4BD416EC7045@javigon.com>
+From:   Hans Holmberg <hans.ml.holmberg@owltronix.com>
+Date:   Mon, 4 Mar 2019 10:05:22 +0100
+Message-ID: <CANr-nt1877shJYYkMMwaC2StbrXaOjP7D0OOW5M1rW7LOXu=QQ@mail.gmail.com>
+Subject: Re: [PATCH 06/13] lightnvm: pblk: Ensure that erase is chunk aligned
+To:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
+Cc:     "Konopko, Igor J" <igor.j.konopko@intel.com>,
+        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
         linux-block@vger.kernel.org
-To:     "Konopko, Igor J" <igor.j.konopko@intel.com>
-References: <20190227171442.11853-1-igor.j.konopko@intel.com>
- <20190227171442.11853-14-igor.j.konopko@intel.com>
-X-Mailer: Apple Mail (2.3445.102.3)
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+I strongly disagree with adding code that would mask implantation errors.
 
---Apple-Mail=_667B7A9D-3668-413F-A4E9-008668FFEA78
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
-
-> On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.com> =
-wrote:
->=20
-> Current lightnvm and pblk implementation does not care
-> about NVMe max data transfer size, which can be smaller
-> than 64*K=3D256K. This patch fixes issues related to that.
->=20
-> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-> ---
-> drivers/lightnvm/core.c      | 9 +++++++--
-> drivers/nvme/host/lightnvm.c | 1 +
-> include/linux/lightnvm.h     | 1 +
-> 3 files changed, 9 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-> index 5f82036fe322..c01f83b8fbaf 100644
-> --- a/drivers/lightnvm/core.c
-> +++ b/drivers/lightnvm/core.c
-> @@ -325,6 +325,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, =
-struct nvm_ioctl_create *create)
-> 	struct nvm_target *t;
-> 	struct nvm_tgt_dev *tgt_dev;
-> 	void *targetdata;
-> +	unsigned int mdts;
-> 	int ret;
->=20
-> 	switch (create->conf.type) {
-> @@ -412,8 +413,12 @@ static int nvm_create_tgt(struct nvm_dev *dev, =
-struct nvm_ioctl_create *create)
-> 	tdisk->private_data =3D targetdata;
-> 	tqueue->queuedata =3D targetdata;
->=20
-> -	blk_queue_max_hw_sectors(tqueue,
-> -			(dev->geo.csecs >> 9) * NVM_MAX_VLBA);
-> +	mdts =3D (dev->geo.csecs >> 9) * NVM_MAX_VLBA;
-> +	if (dev->geo.mdts) {
-> +		mdts =3D min_t(u32, dev->geo.mdts,
-> +				(dev->geo.csecs >> 9) * NVM_MAX_VLBA);
-> +	}
-> +	blk_queue_max_hw_sectors(tqueue, mdts);
->=20
-> 	set_capacity(tdisk, tt->capacity(targetdata));
-> 	add_disk(tdisk);
-> diff --git a/drivers/nvme/host/lightnvm.c =
-b/drivers/nvme/host/lightnvm.c
-> index b759c25c89c8..b88a39a3cbd1 100644
-> --- a/drivers/nvme/host/lightnvm.c
-> +++ b/drivers/nvme/host/lightnvm.c
-> @@ -991,6 +991,7 @@ int nvme_nvm_register(struct nvme_ns *ns, char =
-*disk_name, int node)
-> 	geo->csecs =3D 1 << ns->lba_shift;
-> 	geo->sos =3D ns->ms;
-> 	geo->ext =3D ns->ext;
-> +	geo->mdts =3D ns->ctrl->max_hw_sectors;
->=20
-> 	dev->q =3D q;
-> 	memcpy(dev->name, disk_name, DISK_NAME_LEN);
-> diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-> index 5d865a5d5cdc..d3b02708e5f0 100644
-> --- a/include/linux/lightnvm.h
-> +++ b/include/linux/lightnvm.h
-> @@ -358,6 +358,7 @@ struct nvm_geo {
-> 	u16	csecs;		/* sector size */
-> 	u16	sos;		/* out-of-band area size */
-> 	bool	ext;		/* metadata in extended data buffer */
-> +	u32	mdts;		/* Max data transfer size*/
->=20
-> 	/* device write constrains */
-> 	u32	ws_min;		/* minimum write size */
-> --
-> 2.17.1
-
-I see where you are going with this and I partially agree, but none of
-the OCSSD specs define a way to define this parameter. Thus, adding this
-behavior taken from NVMe in Linux can break current implementations. Is
-this a real life problem for you? Or this is just for NVMe =
-=E2=80=9Ccorrectness=E2=80=9D?
-
-Javier
+If we want more internal checks, we could add an if statement that
+would only be compiled in if CONFIG_NVM_PBLK_DEBUG is enabled.
 
 
-
-
---Apple-Mail=_667B7A9D-3668-413F-A4E9-008668FFEA78
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlx86k4ACgkQPEYBfS0l
-eOCKvBAAseIHRkxcn5IxQOXAcpUNrx37Dds9PpEFLPOH3mAE7/Zcd2l5gCD+gOE8
-IU6pw8URsJcPHQ0LyH1oqK3N9qqdAaZmnZRtj2/kY6vzWaoh89hZTDy4lrs8WfIv
-OV0qJUmZXtq2XhcVDRSd7i88S9pOlASIebYSUQE6+0eWtY70QEC9r3f1VrR4RpD/
-B/DtSUsqcV2k1bysyL7bUyfgFATyrGEx4oOr2QpYTHOlzzkQFWObYuYiBLNgOVka
-eUz3HcU28C5r4Iss/8Db+4vIPO8N4HyAkcLoIOdyGZmLsIcmGVdTKWZJ5whN4jJu
-en6wfgOI7R1Ko38ZRvA1Ien/+5dGbTtG1JO8ZMffiEyShlt4p9QWsicS+DGJo6Im
-Bhs9+rF2/JtDVpNZPPFL5k5xjsOj4o3MOIowrRk2AVo8XxK3i6ukGJx9HhV8g6A9
-Yc/DMNtgBPnqbhFMnWNPCQlY40CvhrfxsTBa8LMg3d/lCOzs8llKFMuKRh5Miqxq
-i62aba5RUFSt0Ejs709m99NuXnm9tpWzyKCH5PKRvT1QL7TaXIdRhms15pEQIBRJ
-OKD9erX7cKUDFxKAJ0Qt6xA6vNXkZOExA5JNH0YymyYZ78n6KY03r5c14MQPSsl7
-ns6iQbBxd5f7v2Jo2YzRkLtDCw5E9CQIAq1dTedQsnVJusej2eM=
-=pgKj
------END PGP SIGNATURE-----
-
---Apple-Mail=_667B7A9D-3668-413F-A4E9-008668FFEA78--
+On Mon, Mar 4, 2019 at 8:48 AM Javier Gonz=C3=A1lez <javier@javigon.com> wr=
+ote:
+>
+> > On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.com> wrote=
+:
+> >
+> > In current pblk implementation of erase command
+> > there is a chance tha sector bits are set to some
+> > random values for erase PPA. This is unexpected
+> > situation, since erase shall be always chunk
+> > aligned. This patch fixes that issue
+> >
+> > Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+> > ---
+> > drivers/lightnvm/pblk-core.c | 1 +
+> > drivers/lightnvm/pblk-map.c  | 2 ++
+> > 2 files changed, 3 insertions(+)
+> >
+> > diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.=
+c
+> > index a98b2255f963..78b1eea4ab67 100644
+> > --- a/drivers/lightnvm/pblk-core.c
+> > +++ b/drivers/lightnvm/pblk-core.c
+> > @@ -978,6 +978,7 @@ int pblk_line_erase(struct pblk *pblk, struct pblk_=
+line *line)
+> >
+> >               ppa =3D pblk->luns[bit].bppa; /* set ch and lun */
+> >               ppa.a.blk =3D line->id;
+> > +             ppa.a.reserved =3D 0;
+> >
+> >               atomic_dec(&line->left_eblks);
+> >               WARN_ON(test_and_set_bit(bit, line->erase_bitmap));
+> > diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+> > index 79df583ea709..aea46b4ec40f 100644
+> > --- a/drivers/lightnvm/pblk-map.c
+> > +++ b/drivers/lightnvm/pblk-map.c
+> > @@ -161,6 +161,7 @@ int pblk_map_erase_rq(struct pblk *pblk, struct nvm=
+_rq *rqd,
+> >
+> >                       *erase_ppa =3D ppa_list[i];
+> >                       erase_ppa->a.blk =3D e_line->id;
+> > +                     erase_ppa->a.reserved =3D 0;
+> >
+> >                       spin_unlock(&e_line->lock);
+> >
+> > @@ -202,6 +203,7 @@ int pblk_map_erase_rq(struct pblk *pblk, struct nvm=
+_rq *rqd,
+> >               atomic_dec(&e_line->left_eblks);
+> >               *erase_ppa =3D pblk->luns[bit].bppa; /* set ch and lun */
+> >               erase_ppa->a.blk =3D e_line->id;
+> > +             erase_ppa->a.reserved =3D 0;
+> >       }
+> >
+> >       return 0;
+> > --
+> > 2.17.1
+>
+> I=E2=80=99m fine with adding this, but note that there is actually no
+> requirement for the erase to be chunk aligned - the only bits that
+> should be looked at are group, PU and chunk.
+>
+> Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
+>
+>
