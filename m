@@ -4,63 +4,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25BE8C43381
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 11:42:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 417EFC43381
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 11:43:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E168720645
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 11:42:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 097F320661
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 11:43:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="k63MtNId"
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="16t5gSXq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726424AbfCDLmB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Mar 2019 06:42:01 -0500
-Received: from mail-ua1-f68.google.com ([209.85.222.68]:40007 "EHLO
-        mail-ua1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726090AbfCDLmB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 06:42:01 -0500
-Received: by mail-ua1-f68.google.com with SMTP id c5so4093176uaq.7
-        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 03:42:00 -0800 (PST)
+        id S1726418AbfCDLn5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Mar 2019 06:43:57 -0500
+Received: from mail-ua1-f65.google.com ([209.85.222.65]:37931 "EHLO
+        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726090AbfCDLn5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 06:43:57 -0500
+Received: by mail-ua1-f65.google.com with SMTP id d4so4104705uap.5
+        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 03:43:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=owltronix-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=BXx1gK6cv7TFShV/USfAhGjUPb+gMlsTzfwPpn6xMxw=;
-        b=k63MtNIdCXEhH9xjcmNORbvmaPZLlwD583k6MMsHXq5VdsLgd93ubwMczLOB4dZxjy
-         91ukjWZOLQrSIqExgw8auodxa2zH2A2biKg+vBrGUaAAFCe4GMH2KLcUM9PURwLxZSpe
-         lu/vL2ZBWKrmxQbecH4UD/+wd29UUhLCZSgtlKjkt1v8K7jyogW0yaV8UBGmNpJsGb8x
-         afznl00htFwdkJr0WDrlPG3pFJ7dsSTdaYBjL6JzBUTfS97FNRBcAJokNrTXdNhwcgUj
-         u76NthiTAY6sBn3e2tuwTI+Ac4cK9WozDbQ5mwTpBnZErgkzIC8l/kiLX0C100hhp22C
-         DIiQ==
+        bh=RpV/yh+GsZucf+mttJzK0HM9++qHu2YfPl4nKRkGNpQ=;
+        b=16t5gSXqmsTTceXi5fF8A07SZDUaM1ytYJ7nTuo5X3DVP+piEvaMEtZLCgbYWyYZpy
+         8hj2JOZnTKsTyZs1AG6bCxcQmtOIVQ/1egqzIWBbAliAYsCNucJfqv60R97et306g1ZJ
+         zA3zY4maVqFdR2FlERr9vSjFym6JzdQjzhX0rJ9GGbhVuRGCjZ4R0hlb4JOVPfu0Z9J7
+         qNewlyHPicaUJykUemf3mN+fF2tmZS7kQX5FmiphLRtrk7AQjrBvoRGDTyYjqPqXwfa/
+         0njCbUBubzuVm6pGUgy0z2LwvBBkEr0cj9fl8cXKilykZhahL25BMttRIYHbMbsI8Kys
+         zDjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=BXx1gK6cv7TFShV/USfAhGjUPb+gMlsTzfwPpn6xMxw=;
-        b=NMGhLG1u6UZ++0IGxp3N+0oryVUJ2AiFBrPxHkjAI9p1OnhxH7KEVcEt4UO+5MDacD
-         /0wzANPscYpgNjxG8555Hycd/VGkPvnSr6I0wH7nfWmaqgKp9tWctFD0jKiT6l+UMNXm
-         w/UpLnTKRU+qAzg3nfokZS8YB0KcxT8iXJVSWM+xdjP7u8VX2kyKxgqWNCcUltRALmID
-         0rrSF3XFbN0D215oXgIkCHt1ASG3x7csJIRlvxNlAzrZC8UfNz2unheZD0vXwnfn3qos
-         9znTrIflnXqTvgNOr8ugk1h4Pl0uzFkpaPJ/lFwFeqy3lGqAI3g9ftqZLY6cFY+8WaM6
-         GByA==
-X-Gm-Message-State: APjAAAWDFxD9cIvFuCVpRHXYxzg84J8odFVRUNjUl8C73L2GlN/4xdqt
-        6vYoYz7wHD5i8HOVFSnB5pHALo7yVjirT7G5kfKRTQ==
-X-Google-Smtp-Source: APXvYqwVk5s2BkiMtn+lD/Yb4douX5VVeCENq4h3PVyU09hT+V35S1Fk0WnsCjukNQ4JOUHUS4khLt0/fJkTJv6WzvA=
-X-Received: by 2002:a67:bb16:: with SMTP id m22mr9474492vsn.153.1551699719590;
- Mon, 04 Mar 2019 03:41:59 -0800 (PST)
+        bh=RpV/yh+GsZucf+mttJzK0HM9++qHu2YfPl4nKRkGNpQ=;
+        b=pZv2wnmsVQSZk5dvWH4GLpmYK38OxjckLMpJZ61yRe+CMUyijiXwHXK5Q3F3S5hNwS
+         ciBJobqEVBgmeiI4vHj5CT+Z9cb03TX2gFAj0bJMAi6ZIGP/nO3wPyO9E5ji1eWgxmMW
+         jZ7gWHFldRFGyqBor7WNFVHxACRWZ4PFXarlEUfcraDWrxauY1TuVUHok8YhQQW4FT8g
+         Lv3yBWW59umyUGd6i5/Z9FiLXyPs/ZQDQojWE8q/jpBAa2RLwRdH6fizDDDRPdx6vnAt
+         DYNNy51I4KpZvGb56bQnOjX4zihOuTuUyxkWdUmAcdD7xeYyIqRRQ+e4t1e8IMrFQU53
+         yT7A==
+X-Gm-Message-State: APjAAAWak6vSQPDDvaf6XKb8JRmi5u5mYhNwAQVayjMnsubMY1z05fdA
+        V1YsMfLdFpg84iS/Fzfj4qmhroDBr3Gd3CmBJTIvzw==
+X-Google-Smtp-Source: APXvYqzLqVqQ6MyRYdQVJtyrZxbZ+4pyPuJRDxxRScrQEjD9vfKIvMmuK3TX9d5C63yQdwOPXleKHHC4m+VGQE6K4vA=
+X-Received: by 2002:a67:fe85:: with SMTP id b5mr9488113vsr.42.1551699835958;
+ Mon, 04 Mar 2019 03:43:55 -0800 (PST)
 MIME-Version: 1.0
 References: <20190227171442.11853-1-igor.j.konopko@intel.com>
- <20190227171442.11853-6-igor.j.konopko@intel.com> <BAC8CFE4-5D1E-4FA0-80DF-9BA655D458D1@javigon.com>
- <CANr-nt3rzEGw0wNdOmm3ba9Oz10BLh_dbHoCECobMr2cfakLhQ@mail.gmail.com> <3E70BD55-1CBF-4695-ADA5-91C342E40F6C@javigon.com>
-In-Reply-To: <3E70BD55-1CBF-4695-ADA5-91C342E40F6C@javigon.com>
+ <20190227171442.11853-7-igor.j.konopko@intel.com> <FA2EA171-4AB9-4D9C-A782-4BD416EC7045@javigon.com>
+ <CANr-nt1877shJYYkMMwaC2StbrXaOjP7D0OOW5M1rW7LOXu=QQ@mail.gmail.com> <EE08736A-168C-4BED-8445-C0CFEDBB61D4@javigon.com>
+In-Reply-To: <EE08736A-168C-4BED-8445-C0CFEDBB61D4@javigon.com>
 From:   Hans Holmberg <hans@owltronix.com>
-Date:   Mon, 4 Mar 2019 12:41:48 +0100
-Message-ID: <CANr-nt2Sj13VStWC4_GeTxCCVgztxqxm3HP7+7cNn+OoN=BCaQ@mail.gmail.com>
-Subject: Re: [PATCH 05/13] lightnvm: pblk: Count all read errors in stats
-To:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Cc:     "Konopko, Igor J" <igor.j.konopko@intel.com>,
-        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+Date:   Mon, 4 Mar 2019 12:43:45 +0100
+Message-ID: <CANr-nt30zr_5sMEAK4Uk7VCRJPWr30zjPUVrQPA_H5kBU-nfrQ@mail.gmail.com>
+Subject: Re: [PATCH 06/13] lightnvm: pblk: Ensure that erase is chunk aligned
+To:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        Igor Konopko <igor.j.konopko@intel.com>
+Cc:     =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
         linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -70,88 +71,90 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 4, 2019 at 10:23 AM Javier Gonz=C3=A1lez <javier@javigon.com> w=
+On Mon, Mar 4, 2019 at 10:11 AM Javier Gonz=C3=A1lez <javier@javigon.com> w=
 rote:
 >
-> > On 4 Mar 2019, at 10.02, Hans Holmberg <hans.ml.holmberg@owltronix.com>=
+> > On 4 Mar 2019, at 10.05, Hans Holmberg <hans.ml.holmberg@owltronix.com>=
  wrote:
 > >
-> > Igor: Have you seen this happening in real life?
+> > I strongly disagree with adding code that would mask implantation error=
+s.
 > >
-> > I think it would be better to count all expected errors and put them
-> > in the right bucket (without spamming dmesg). If we need a new bucket
-> > for i.e. vendor-specific-errors, let's do that instead.
+> > If we want more internal checks, we could add an if statement that
+> > would only be compiled in if CONFIG_NVM_PBLK_DEBUG is enabled.
 > >
-> > Someone wiser than me told me that every error print in the log is a
-> > potential customer call.
-> >
-> > Javier: Yeah, I think S.M.A.R.T is the way to deliver this
-> > information. Why can't we let the drives expose this info and remove
-> > this from pblk? What's blocking that?
 >
-> Until now the spec. We added some new log information in Denali exactly
-> for this. But since pblk supports OCSSD 1.2 and 2.0 I think it is needed =
-to
-> have it here, at least for debugging.
+> Not sure who this is for - better not to top post.
+>
+> In any case, this is a spec grey zone. I=E2=80=99m ok with cleaning the b=
+its as
+> they mean nothing for the reset command. If you feel that strongly about
+> this, you can take if with Igor.
 
-Why add it to the spec? Why not use whatever everyone else is using?
-
-https://en.wikipedia.org/wiki/S.M.A.R.T. :
-"S.M.A.R.T. (Self-Monitoring, Analysis and Reporting Technology; often
-written as SMART) is a monitoring system included in computer hard
-disk drives (HDDs), solid-state drives (SSDs),[1] and eMMC drives. Its
-primary function is to detect and report various indicators of drive
-reliability with the intent of anticipating imminent hardware
-failures."
-Sounds like what we want here.
-
-For debugging, a trace point or something(i.e. BPF) would be a better
-solution that would not impact hot-path performance.
+Pardon the top-post. It was meant for both you and Igor.
 
 >
 > >
-> > Thanks,
-> > Hans
-> >
-> > On Mon, Mar 4, 2019 at 8:42 AM Javier Gonz=C3=A1lez <javier@javigon.com=
+> > On Mon, Mar 4, 2019 at 8:48 AM Javier Gonz=C3=A1lez <javier@javigon.com=
 > wrote:
 > >>> On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.com> wro=
 te:
 > >>>
-> >>> Currently when unknown error occurs on read path
-> >>> there is only dmesg information about it, but it
-> >>> is not counted in sysfs statistics. Since this is
-> >>> still an error we should also count it there.
+> >>> In current pblk implementation of erase command
+> >>> there is a chance tha sector bits are set to some
+> >>> random values for erase PPA. This is unexpected
+> >>> situation, since erase shall be always chunk
+> >>> aligned. This patch fixes that issue
 > >>>
 > >>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
 > >>> ---
 > >>> drivers/lightnvm/pblk-core.c | 1 +
-> >>> 1 file changed, 1 insertion(+)
+> >>> drivers/lightnvm/pblk-map.c  | 2 ++
+> >>> 2 files changed, 3 insertions(+)
 > >>>
 > >>> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-cor=
 e.c
-> >>> index eabcbc119681..a98b2255f963 100644
+> >>> index a98b2255f963..78b1eea4ab67 100644
 > >>> --- a/drivers/lightnvm/pblk-core.c
 > >>> +++ b/drivers/lightnvm/pblk-core.c
-> >>> @@ -493,6 +493,7 @@ void pblk_log_read_err(struct pblk *pblk, struct =
-nvm_rq *rqd)
-> >>>              atomic_long_inc(&pblk->read_failed);
-> >>>              break;
-> >>>      default:
-> >>> +             atomic_long_inc(&pblk->read_failed);
-> >>>              pblk_err(pblk, "unknown read error:%d\n", rqd->error);
+> >>> @@ -978,6 +978,7 @@ int pblk_line_erase(struct pblk *pblk, struct pbl=
+k_line *line)
+> >>>
+> >>>              ppa =3D pblk->luns[bit].bppa; /* set ch and lun */
+> >>>              ppa.a.blk =3D line->id;
+> >>> +             ppa.a.reserved =3D 0;
+> >>>
+> >>>              atomic_dec(&line->left_eblks);
+> >>>              WARN_ON(test_and_set_bit(bit, line->erase_bitmap));
+> >>> diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.=
+c
+> >>> index 79df583ea709..aea46b4ec40f 100644
+> >>> --- a/drivers/lightnvm/pblk-map.c
+> >>> +++ b/drivers/lightnvm/pblk-map.c
+> >>> @@ -161,6 +161,7 @@ int pblk_map_erase_rq(struct pblk *pblk, struct n=
+vm_rq *rqd,
+> >>>
+> >>>                      *erase_ppa =3D ppa_list[i];
+> >>>                      erase_ppa->a.blk =3D e_line->id;
+> >>> +                     erase_ppa->a.reserved =3D 0;
+> >>>
+> >>>                      spin_unlock(&e_line->lock);
+> >>>
+> >>> @@ -202,6 +203,7 @@ int pblk_map_erase_rq(struct pblk *pblk, struct n=
+vm_rq *rqd,
+> >>>              atomic_dec(&e_line->left_eblks);
+> >>>              *erase_ppa =3D pblk->luns[bit].bppa; /* set ch and lun *=
+/
+> >>>              erase_ppa->a.blk =3D e_line->id;
+> >>> +             erase_ppa->a.reserved =3D 0;
 > >>>      }
-> >>> #ifdef CONFIG_NVM_PBLK_DEBUG
+> >>>
+> >>>      return 0;
 > >>> --
 > >>> 2.17.1
 > >>
-> >> I left this out intentionally  so that we could correlate the logs fro=
-m
-> >> the controller and the errors in the read path. Since we do not have a=
-n
-> >> standard way to correlate this on SMART yet, let=E2=80=99s add this no=
-w (I
-> >> assume that you are using it for something?) and we can separate the
-> >> error stats in the future.
+> >> I=E2=80=99m fine with adding this, but note that there is actually no
+> >> requirement for the erase to be chunk aligned - the only bits that
+> >> should be looked at are group, PU and chunk.
 > >>
 > >> Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
