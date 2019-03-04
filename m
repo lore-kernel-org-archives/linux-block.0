@@ -6,213 +6,237 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29026C43381
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 13:11:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA9BC43381
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 13:16:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E34252075B
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 13:11:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B39E820830
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 13:16:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="UACaay7H"
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="JqprZE5w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726846AbfCDNL4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Mar 2019 08:11:56 -0500
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:38140 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726818AbfCDNLz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 08:11:55 -0500
-Received: by mail-ed1-f65.google.com with SMTP id h58so4199982edb.5
-        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 05:11:54 -0800 (PST)
+        id S1726734AbfCDNQg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Mar 2019 08:16:36 -0500
+Received: from mail-ua1-f68.google.com ([209.85.222.68]:40505 "EHLO
+        mail-ua1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726472AbfCDNQf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 08:16:35 -0500
+Received: by mail-ua1-f68.google.com with SMTP id c5so4322124uaq.7
+        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 05:16:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=anJnSDIbDzEJ5YFL0PLzYZAcLfDhj3dd52haiFIHKXE=;
-        b=UACaay7HP9T5Fh/GYgfOlHG+Frb0eeIpCrdangDBRCjJabEKHv0jkQtzfJrrsG2kHJ
-         iR1NKzOqs7mnFjyvJOHpt84GnzVoTcG21+9d9a17a7hbKaMFBlOadhSyh29yJUti+DpY
-         aNCmotmVSFbGRyqiWODQAfxnannTp8JhbjFIMls6Y60J8iaZ1U1NFRhwarE94VWHkTVn
-         mvC7Dkt3Ct922UnD15uUQpY33zmEI/nxlG/gfrzcXOGUTPWSXBuBLXbVsAAz3BWKX/Ul
-         g+rbn5YlEjqSJ82Rx6GlnKrL5STmDPXlqP6W648XIHATsMN8qwlYkDs1zgYGWri0Vkp+
-         zIew==
+        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=icnReoU/MUokDWjCmTP7Nnh6R6c7YrlVUiJKMPp8VGI=;
+        b=JqprZE5wLWf4ry14QOHvrOceP3/UgD4Ud7142o8GXF7PDpF6dRPLRJ+0j5F0NXWgS/
+         7Jq0egS24fW9dra2FXnGLPEouvr6cUeadIlC+NDSyzshMx7pRBQdj0kCzMhxGJ8jmkze
+         wrINFA4tkvZlpxANhe4UGh6XSvamAK9eakml9Pdn8a2ecPpY1I+u2MlRjCq1K+9Lbkra
+         jmJEbRExgkBQMbPyF0wYNsWeFf3BV615Uesgs/MpjPNqhrLjXFWrdvp8Y12JzD8hi9qe
+         WY569jEhCZguzkAhhL0WcOCKuWEhAoW5D70ghFqUFn2k1oCBcOLTb8eqpmBDzxBRr6hT
+         oMOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=anJnSDIbDzEJ5YFL0PLzYZAcLfDhj3dd52haiFIHKXE=;
-        b=KXPSLjFlBkHAkqVV2qhxNDT8mLDuH4W9eTdx3LwhkCMwHRp0KpB4jmqROA0OioT3Iu
-         5uN5fqE904Cqy8d68FBdAhOivtmrpdqyZJIwNDLviMiNY7nAx+MNthpb/YtCxKt1L/3a
-         3qHWXR+nH/aG2HsopBvTSKJlrhSg7Q1q4kTtoriZG9tWeS6ui7tDeMFiKaN7ke7RsiKE
-         Wnk6UFSxvPZTyVnhf/mAbxO3aj+ICa7l9Ht21s+xD7x4+iAk75sXy1qnpCpVMeFTDdIo
-         /sV0PnIIz0bRrqX6XE+4K8cTh2imabYnDyprW68zCGwkhwi2aHJqUWzlxgw05mjdxP1C
-         M0dQ==
-X-Gm-Message-State: APjAAAUeoo4wXrUz5JWoct1ZDKG0l3jBpxmTZceQTxOHHzyQXlRgRCm9
-        Y3U8B9S3kdRRO/MO5u21gNEjwkqbRhI=
-X-Google-Smtp-Source: APXvYqxEEDK6WkTQXBco9E/+tMxZaMjDFQjriQ/Zt+dR0Fa6ik4tP+bz9CGIPrIQS+++JLgZ0hLg8Q==
-X-Received: by 2002:a17:906:4ec6:: with SMTP id i6mr12942894ejv.56.1551705113404;
-        Mon, 04 Mar 2019 05:11:53 -0800 (PST)
-Received: from [192.168.0.36] (2-111-91-225-cable.dk.customer.tdc.net. [2.111.91.225])
-        by smtp.googlemail.com with ESMTPSA id 41sm2093752edu.85.2019.03.04.05.11.52
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 04 Mar 2019 05:11:52 -0800 (PST)
-Subject: Re: [PATCH 10/13] lightnvm: pblk: Reduce L2P DRAM footprint
-To:     Igor Konopko <igor.j.konopko@intel.com>, javier@javigon.com,
-        hans.holmberg@cnexlabs.com
-Cc:     linux-block@vger.kernel.org
-References: <20190227171442.11853-1-igor.j.konopko@intel.com>
- <20190227171442.11853-11-igor.j.konopko@intel.com>
-From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <5cd7f073-fab0-e682-1e65-a5d2966b7c56@lightnvm.io>
-Date:   Mon, 4 Mar 2019 14:11:52 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=icnReoU/MUokDWjCmTP7Nnh6R6c7YrlVUiJKMPp8VGI=;
+        b=Pz7XdqJhVI/XSqQ1zFerNsjeBEoc9l4PPKgYstlVZMUw10mtl2jHWkmuZxB0kG+7Lm
+         4yCauenDhdzz25SYm15dyM9ywFxWhnkxOGhYhW57G4XCio0HTnun8p7rlJqLP9cDPnFg
+         72Ybavq2/0COHxypydUXLZWMeRPcteadg4jNaCyQkPeDASTMh0/ezpSXYIafDYuhl5FD
+         YnUQf8pDN0Gw0nz1SlNfHjYDaVGMTCTWTUmqR8k7aHk902Wml2lsn+yPbATs2+HxHQXn
+         zykNwDqxl8QWbXBuxCcVBW7TcZt3MD9IVu7DlouYE6C/n35GJMluLKobt+JdeheMi8G/
+         KmIA==
+X-Gm-Message-State: APjAAAX1Ggb/4g2mBL7wW5Pz6PTF8RrRZnsR3q1nDbQoDIex4u/6Iy5L
+        MAuD8gKENdxgGOmKfgStQHdGNR6OdzyTjztxNNejaA==
+X-Google-Smtp-Source: APXvYqwBgGcJ0kTX9ZwJRy62MBNvhbXuxnQRuChgOJHb2Z6andTYAsjaTnazdmiY/ysGG0K5AE+bEfccQsCK421zA1A=
+X-Received: by 2002:a67:bb16:: with SMTP id m22mr9650902vsn.153.1551705394134;
+ Mon, 04 Mar 2019 05:16:34 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190227171442.11853-11-igor.j.konopko@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+References: <20190227171442.11853-1-igor.j.konopko@intel.com>
+ <20190227171442.11853-14-igor.j.konopko@intel.com> <2776B2AC-19D2-4E38-94AD-E158E3E60A37@javigon.com>
+ <CANr-nt2dNY8EgeJ7qAutfVEuyose_8_j9w6WkO-mER-Ao6oXOg@mail.gmail.com>
+ <54D42A19-96EE-4370-B957-A474BB912530@javigon.com> <CANr-nt1zQWf8XkQaesyFO+wTLULdEAvATvYjYFiDXbc_vifKGQ@mail.gmail.com>
+ <3d053281-ef87-66e3-3433-de4c18884326@intel.com>
+In-Reply-To: <3d053281-ef87-66e3-3433-de4c18884326@intel.com>
+From:   Hans Holmberg <hans@owltronix.com>
+Date:   Mon, 4 Mar 2019 14:16:23 +0100
+Message-ID: <CANr-nt1JjwoKqiZivj_MH+9m_5-r5jsN0Lr5DpUGwKMiZ6q9QA@mail.gmail.com>
+Subject: Re: [PATCH 13/13] lightnvm: Inherit mdts from the parent nvme device
+To:     Igor Konopko <igor.j.konopko@intel.com>
+Cc:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        linux-block@vger.kernel.org,
+        Simon Andreas Frimann Lund <slund@cnexlabs.com>,
+        Klaus Birkelund Jensen <klaus.jensen@cnexlabs.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2/27/19 6:14 PM, Igor Konopko wrote:
-> Currently L2P map size is calculated based on
-> the total number of available sectors, which is
-> redundant, since it contains some number of
-> over provisioning (11% by default).
-> 
-> The goal of this patch is to change this size
-> to the real capacity and thus reduce the DRAM
-> footprint significantly - with default op value
-> it is approx. 110MB of DRAM less for every 1TB
-> of pblk drive.
-> 
-> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-> ---
->   drivers/lightnvm/pblk-core.c     | 8 ++++----
->   drivers/lightnvm/pblk-init.c     | 7 +++----
->   drivers/lightnvm/pblk-read.c     | 2 +-
->   drivers/lightnvm/pblk-recovery.c | 2 +-
->   drivers/lightnvm/pblk.h          | 1 -
->   5 files changed, 9 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-> index f48f2e77f770..2e424c0275c1 100644
-> --- a/drivers/lightnvm/pblk-core.c
-> +++ b/drivers/lightnvm/pblk-core.c
-> @@ -2024,7 +2024,7 @@ void pblk_update_map(struct pblk *pblk, sector_t lba, struct ppa_addr ppa)
->   	struct ppa_addr ppa_l2p;
->   
->   	/* logic error: lba out-of-bounds. Ignore update */
-> -	if (!(lba < pblk->rl.nr_secs)) {
-> +	if (!(lba < pblk->capacity)) {
->   		WARN(1, "pblk: corrupted L2P map request\n");
->   		return;
->   	}
-> @@ -2064,7 +2064,7 @@ int pblk_update_map_gc(struct pblk *pblk, sector_t lba, struct ppa_addr ppa_new,
->   #endif
->   
->   	/* logic error: lba out-of-bounds. Ignore update */
-> -	if (!(lba < pblk->rl.nr_secs)) {
-> +	if (!(lba < pblk->capacity)) {
->   		WARN(1, "pblk: corrupted L2P map request\n");
->   		return 0;
->   	}
-> @@ -2110,7 +2110,7 @@ void pblk_update_map_dev(struct pblk *pblk, sector_t lba,
->   	}
->   
->   	/* logic error: lba out-of-bounds. Ignore update */
-> -	if (!(lba < pblk->rl.nr_secs)) {
-> +	if (!(lba < pblk->capacity)) {
->   		WARN(1, "pblk: corrupted L2P map request\n");
->   		return;
->   	}
-> @@ -2168,7 +2168,7 @@ void pblk_lookup_l2p_rand(struct pblk *pblk, struct ppa_addr *ppas,
->   		lba = lba_list[i];
->   		if (lba != ADDR_EMPTY) {
->   			/* logic error: lba out-of-bounds. Ignore update */
-> -			if (!(lba < pblk->rl.nr_secs)) {
-> +			if (!(lba < pblk->capacity)) {
->   				WARN(1, "pblk: corrupted L2P map request\n");
->   				continue;
->   			}
-> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-> index e553105b7ba1..9913a4514eb6 100644
-> --- a/drivers/lightnvm/pblk-init.c
-> +++ b/drivers/lightnvm/pblk-init.c
-> @@ -105,7 +105,7 @@ static size_t pblk_trans_map_size(struct pblk *pblk)
->   	if (pblk->addrf_len < 32)
->   		entry_size = 4;
->   
-> -	return entry_size * pblk->rl.nr_secs;
-> +	return entry_size * pblk->capacity;
->   }
->   
->   #ifdef CONFIG_NVM_PBLK_DEBUG
-> @@ -175,7 +175,7 @@ static int pblk_l2p_init(struct pblk *pblk, bool factory_init)
->   
->   	pblk_ppa_set_empty(&ppa);
->   
-> -	for (i = 0; i < pblk->rl.nr_secs; i++)
-> +	for (i = 0; i < pblk->capacity; i++)
->   		pblk_trans_map_set(pblk, i, ppa);
->   
->   	ret = pblk_l2p_recover(pblk, factory_init);
-> @@ -706,7 +706,6 @@ static int pblk_set_provision(struct pblk *pblk, int nr_free_chks)
->   	 * on user capacity consider only provisioned blocks
->   	 */
->   	pblk->rl.total_blocks = nr_free_chks;
-> -	pblk->rl.nr_secs = nr_free_chks * geo->clba;
->   
->   	/* Consider sectors used for metadata */
->   	sec_meta = (lm->smeta_sec + lm->emeta_sec[0]) * l_mg->nr_free_lines;
-> @@ -1289,7 +1288,7 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
->   
->   	pblk_info(pblk, "luns:%u, lines:%d, secs:%llu, buf entries:%u\n",
->   			geo->all_luns, pblk->l_mg.nr_lines,
-> -			(unsigned long long)pblk->rl.nr_secs,
-> +			(unsigned long long)pblk->capacity,
->   			pblk->rwb.nr_entries);
->   
->   	wake_up_process(pblk->writer_ts);
-> diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-> index 39c1d6ccaedb..65697463def8 100644
-> --- a/drivers/lightnvm/pblk-read.c
-> +++ b/drivers/lightnvm/pblk-read.c
-> @@ -561,7 +561,7 @@ static int read_rq_gc(struct pblk *pblk, struct nvm_rq *rqd,
->   		goto out;
->   
->   	/* logic error: lba out-of-bounds */
-> -	if (lba >= pblk->rl.nr_secs) {
-> +	if (lba >= pblk->capacity) {
->   		WARN(1, "pblk: read lba out of bounds\n");
->   		goto out;
->   	}
-> diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-> index d86f580036d3..83b467b5edc7 100644
-> --- a/drivers/lightnvm/pblk-recovery.c
-> +++ b/drivers/lightnvm/pblk-recovery.c
-> @@ -474,7 +474,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
->   
->   		lba_list[paddr++] = cpu_to_le64(lba);
->   
-> -		if (lba == ADDR_EMPTY || lba > pblk->rl.nr_secs)
-> +		if (lba == ADDR_EMPTY || lba >= pblk->capacity)
->   			continue;
->   
->   		line->nr_valid_lbas++;
-> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-> index a6386d5acd73..a92377530930 100644
-> --- a/drivers/lightnvm/pblk.h
-> +++ b/drivers/lightnvm/pblk.h
-> @@ -305,7 +305,6 @@ struct pblk_rl {
->   
->   	struct timer_list u_timer;
->   
-> -	unsigned long long nr_secs;
->   	unsigned long total_blocks;
->   
->   	atomic_t free_blocks;		/* Total number of free blocks (+ OP) */
-> 
+On Mon, Mar 4, 2019 at 2:04 PM Igor Konopko <igor.j.konopko@intel.com> wrot=
+e:
+>
+>
+>
+> On 04.03.2019 13:22, Hans Holmberg wrote:
+> > On Mon, Mar 4, 2019 at 12:44 PM Javier Gonz=C3=A1lez <javier@javigon.co=
+m> wrote:
+> >>
+> >>
+> >>
+> >>> On 4 Mar 2019, at 12.30, Hans Holmberg <hans@owltronix.com> wrote:
+> >>>
+> >>> On Mon, Mar 4, 2019 at 10:05 AM Javier Gonz=C3=A1lez <javier@javigon.=
+com> wrote:
+> >>>>> On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.com> w=
+rote:
+> >>>>>
+> >>>>> Current lightnvm and pblk implementation does not care
+> >>>>> about NVMe max data transfer size, which can be smaller
+> >>>>> than 64*K=3D256K. This patch fixes issues related to that.
+> >>>
+> >>> Could you describe *what* issues you are fixing?
+>
+> I'm fixing the issue related to controllers which NVMe max data transfer
+> size is lower that 256K (for example 128K, which happens for existing
+> NVMe controllers and NVMe spec compliant). Such a controllers are not
+> able to handle command which contains 64 PPAs, since the the size of
+> DMAed buffer will be above the capabilities of such a controller.
 
-Thanks Igor. Applied for 5.2. I've also updated the text a bit.
+Thanks for the explanation, that would be great to have in the commit messa=
+ge.
+
+>
+> >>>
+> >>>>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+> >>>>> ---
+> >>>>> drivers/lightnvm/core.c      | 9 +++++++--
+> >>>>> drivers/nvme/host/lightnvm.c | 1 +
+> >>>>> include/linux/lightnvm.h     | 1 +
+> >>>>> 3 files changed, 9 insertions(+), 2 deletions(-)
+> >>>>>
+> >>>>> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+> >>>>> index 5f82036fe322..c01f83b8fbaf 100644
+> >>>>> --- a/drivers/lightnvm/core.c
+> >>>>> +++ b/drivers/lightnvm/core.c
+> >>>>> @@ -325,6 +325,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, =
+struct nvm_ioctl_create *create)
+> >>>>>       struct nvm_target *t;
+> >>>>>       struct nvm_tgt_dev *tgt_dev;
+> >>>>>       void *targetdata;
+> >>>>> +     unsigned int mdts;
+> >>>>>       int ret;
+> >>>>>
+> >>>>>       switch (create->conf.type) {
+> >>>>> @@ -412,8 +413,12 @@ static int nvm_create_tgt(struct nvm_dev *dev,=
+ struct nvm_ioctl_create *create)
+> >>>>>       tdisk->private_data =3D targetdata;
+> >>>>>       tqueue->queuedata =3D targetdata;
+> >>>>>
+> >>>>> -     blk_queue_max_hw_sectors(tqueue,
+> >>>>> -                     (dev->geo.csecs >> 9) * NVM_MAX_VLBA);
+> >>>>> +     mdts =3D (dev->geo.csecs >> 9) * NVM_MAX_VLBA;
+> >>>>> +     if (dev->geo.mdts) {
+> >>>>> +             mdts =3D min_t(u32, dev->geo.mdts,
+> >>>>> +                             (dev->geo.csecs >> 9) * NVM_MAX_VLBA)=
+;
+> >>>>> +     }
+> >>>>> +     blk_queue_max_hw_sectors(tqueue, mdts);
+> >>>>>
+> >>>>>       set_capacity(tdisk, tt->capacity(targetdata));
+> >>>>>       add_disk(tdisk);
+> >>>>> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/light=
+nvm.c
+> >>>>> index b759c25c89c8..b88a39a3cbd1 100644
+> >>>>> --- a/drivers/nvme/host/lightnvm.c
+> >>>>> +++ b/drivers/nvme/host/lightnvm.c
+> >>>>> @@ -991,6 +991,7 @@ int nvme_nvm_register(struct nvme_ns *ns, char =
+*disk_name, int node)
+> >>>>>       geo->csecs =3D 1 << ns->lba_shift;
+> >>>>>       geo->sos =3D ns->ms;
+> >>>>>       geo->ext =3D ns->ext;
+> >>>>> +     geo->mdts =3D ns->ctrl->max_hw_sectors;
+> >>>>>
+> >>>>>       dev->q =3D q;
+> >>>>>       memcpy(dev->name, disk_name, DISK_NAME_LEN);
+> >>>>> diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+> >>>>> index 5d865a5d5cdc..d3b02708e5f0 100644
+> >>>>> --- a/include/linux/lightnvm.h
+> >>>>> +++ b/include/linux/lightnvm.h
+> >>>>> @@ -358,6 +358,7 @@ struct nvm_geo {
+> >>>>>       u16     csecs;          /* sector size */
+> >>>>>       u16     sos;            /* out-of-band area size */
+> >>>>>       bool    ext;            /* metadata in extended data buffer *=
+/
+> >>>>> +     u32     mdts;           /* Max data transfer size*/
+> >>>>>
+> >>>>>       /* device write constrains */
+> >>>>>       u32     ws_min;         /* minimum write size */
+> >>>>> --
+> >>>>> 2.17.1
+> >>>>
+> >>>> I see where you are going with this and I partially agree, but none =
+of
+> >>>> the OCSSD specs define a way to define this parameter. Thus, adding =
+this
+> >>>> behavior taken from NVMe in Linux can break current implementations.=
+ Is
+> >>>> this a real life problem for you? Or this is just for NVMe =E2=80=9C=
+correctness=E2=80=9D?
+> >>>>
+> >>>> Javier
+> >>>
+> >>> Hmm.Looking into the 2.0 spec what it says about vector reads:
+> >>>
+> >>> (figure 28):"The number of Logical Blocks (NLB): This field indicates
+> >>> the number of logical blocks to be read. This is a 0=E2=80=99s based =
+value.
+> >>> Maximum of 64 LBAs is supported."
+> >>>
+> >>> You got the max limit covered, and the spec  does not say anything
+> >>> about the minimum number of LBAs to support.
+> >>>
+> >>> Matias: any thoughts on this?
+> >>>
+> >>> Javier: How would this patch break current implementations?
+> >>
+> >> Say an OCSSD controller that sets mdts to a value under 64 or does not
+> >> set it at all (maybe garbage). Think you can get to one pretty quickly=
+...
+> >
+> > So we cant make use of a perfectly good, standardized, parameter
+> > because some hypothetical non-compliant device out there might not
+> > provide a sane value?
+> >
+> >>
+> >>>
+> >>> Igor: how does this patch fix the mdts restriction? There are no
+> >>> checks on i.e. the gc read path that ensures that a lower limit than
+> >>> NVM_MAX_VLBA is enforced.
+> >>
+> >> This is the other part where the implementation breaks.
+> >
+> > No, it just does not fix it.
+> >
+> > over-and-out,
+> > Hans
+>
+> IO requests issued from both garbage collector and writer thread are
+> upper limiter by pblk->max_write_pgs variable. This variable is
+> calculated based on queue_max_hw_sectors() already in pblk.
+>
+> User reads on the other hand are splitted by block layer based on
+> queue_max_hw_sectors() too.
+
+Mea culpa, right you are!
+
+>
+> Is there any other path which I'm missing, which will still tries to
+> issue IOs with higher IO size? Or am I missing sth else in my logic?
+
+I missed the adjustments of max_write_pgs in pblk_core_init. We should be g=
+ood.
+
+Thanks,
+Hans
