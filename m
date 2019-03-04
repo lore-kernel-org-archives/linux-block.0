@@ -2,133 +2,139 @@ Return-Path: <SRS0=5cmc=RH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BC0DC43381
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 12:42:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A2DCC43381
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 12:44:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D59E20815
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 12:42:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="V0UJXXhR"
+	by mail.kernel.org (Postfix) with ESMTP id 552E720815
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 12:44:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726483AbfCDMms (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Mar 2019 07:42:48 -0500
-Received: from mail-ua1-f67.google.com ([209.85.222.67]:38636 "EHLO
-        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726101AbfCDMms (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 07:42:48 -0500
-Received: by mail-ua1-f67.google.com with SMTP id d4so4243287uap.5
-        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 04:42:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=gzOlCLaBDcRafSW2CGv0UV4snOmBRy53fuZQiSwyNHI=;
-        b=V0UJXXhRmQPzaR4Ho2l1K6eUUk1KnV0aPmRZZdIyrvJViYoVM7bmSmRtUHbvJO/7R7
-         fmJUG8W557Ty3HohdMu+OacYd+ruSStlgO0+2fQiolKkSiwtlIowkmKM1Q2CkSZ7pfaR
-         QZce6k02IR02Ql3q7yoSr8m1hVZNBf4LEyBz62Qsa2R4GLx3bDPO3+hntGMe+sWLXcB/
-         0l+nd3JCzYgfNY9aa0+zzxg2Q067UBZbReRyzpXVtybOKcDfBtjMwBrMvYnHPbKL888B
-         lWgYKo2NzKuifKZmk2SZ8L4Da3U526FqXgLW8APsK9M8YOvN4KW/gD0MJ7RQON8O+4Cc
-         xCQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=gzOlCLaBDcRafSW2CGv0UV4snOmBRy53fuZQiSwyNHI=;
-        b=nVbiUb/G/SmSf+bIUU2KK5B+aslB3fR70Gt/0qycBJsK/hdGB1MflplCc3cjjuCBI9
-         UwDI3E9h+a8jY4cU3kIFw5CzS31OG8QG7itSZpgP0rXO8HTkX/ERMw1jWTg4ihT6Fk/L
-         b7TYdmbT97tv5Qrl/6GGPIkC5OkAyA7Zczyt9z5Nm91Y7FLc2UBSaJmh1Md7VyWEjRcD
-         Eu9vsSlt6Ce8xtTvM7AsOBHjjwkQN0jF29CFfwEUQ4jPsm/WXvbGSlTvioWFlvx5v8u1
-         BcBNvYfeHgA5ncPl1otDVnMEOmkzXjE5MOuCyEwOuk1pRmAQjl/peEh/Y82B46Q0DywQ
-         nZnQ==
-X-Gm-Message-State: APjAAAUjfl9M9dwTKQz6R0nlLGqnbTExBvi3wDZr/JkWhLkMpT7vbjcl
-        X7nTvUGINn1PsRLSNk/LMcXJPcH/vubwwFp+Nkwvnw==
-X-Google-Smtp-Source: APXvYqz86XgpbPb102sClZs87PeL5X4jrk5nm3H45wyWdE40lYJ8MolkeBiJkztmyJVN9CK5HJ3RU1hEEMuIXXe9e9Q=
-X-Received: by 2002:a67:f744:: with SMTP id w4mr9818226vso.16.1551703366879;
- Mon, 04 Mar 2019 04:42:46 -0800 (PST)
-MIME-Version: 1.0
-References: <20190227171442.11853-1-igor.j.konopko@intel.com>
- <20190227171442.11853-5-igor.j.konopko@intel.com> <2DABC388-6D60-4253-9DD0-5FD2FDEED619@javigon.com>
- <CANr-nt2U760+wpF_KvY2vSAqt9eSnynUsisoTAADjhj12BYJEg@mail.gmail.com> <e7517ee3-8310-f513-e0f8-6d2c5b19e868@intel.com>
-In-Reply-To: <e7517ee3-8310-f513-e0f8-6d2c5b19e868@intel.com>
-From:   Hans Holmberg <hans@owltronix.com>
-Date:   Mon, 4 Mar 2019 13:42:36 +0100
-Message-ID: <CANr-nt0OwOMWCL7XT5nSSZ-giQkh1xX-fq9T0dRrNPh7Nzbfcw@mail.gmail.com>
-Subject: Re: [PATCH 04/13] lightnvm: pblk: Rollback in gc read
-To:     Igor Konopko <igor.j.konopko@intel.com>
-Cc:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
-        Matias Bjorling <mb@lightnvm.io>,
+        id S1726581AbfCDMo6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Mar 2019 07:44:58 -0500
+Received: from mga06.intel.com ([134.134.136.31]:47552 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726522AbfCDMo6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 4 Mar 2019 07:44:58 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Mar 2019 04:44:57 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,440,1544515200"; 
+   d="scan'208";a="119452451"
+Received: from ikonopko-mobl1.ger.corp.intel.com (HELO [10.237.140.180]) ([10.237.140.180])
+  by orsmga007.jf.intel.com with ESMTP; 04 Mar 2019 04:44:56 -0800
+Subject: Re: [PATCH 06/13] lightnvm: pblk: Ensure that erase is chunk aligned
+To:     Hans Holmberg <hans@owltronix.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>
+Cc:     =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        linux-block@vger.kernel.org
+References: <20190227171442.11853-1-igor.j.konopko@intel.com>
+ <20190227171442.11853-7-igor.j.konopko@intel.com>
+ <FA2EA171-4AB9-4D9C-A782-4BD416EC7045@javigon.com>
+ <CANr-nt1877shJYYkMMwaC2StbrXaOjP7D0OOW5M1rW7LOXu=QQ@mail.gmail.com>
+ <EE08736A-168C-4BED-8445-C0CFEDBB61D4@javigon.com>
+ <CANr-nt30zr_5sMEAK4Uk7VCRJPWr30zjPUVrQPA_H5kBU-nfrQ@mail.gmail.com>
+From:   Igor Konopko <igor.j.konopko@intel.com>
+Message-ID: <0a0fd388-98c0-f640-e031-1cc7d14372bb@intel.com>
+Date:   Mon, 4 Mar 2019 13:44:55 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
+MIME-Version: 1.0
+In-Reply-To: <CANr-nt30zr_5sMEAK4Uk7VCRJPWr30zjPUVrQPA_H5kBU-nfrQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 4, 2019 at 1:39 PM Igor Konopko <igor.j.konopko@intel.com> wrot=
-e:
->
->
->
-> On 04.03.2019 09:44, Hans Holmberg wrote:
-> > Did you ever see this in the wild?
-> > The only time pblk_gc_line returns an error is if
-> > kmalloc(sizeof(struct pblk_line_ws), GFP_KERNEL); fails, and then
-> > we're in real trouble :)
->
-> I never saw this in real life, but still probably good to have a
-> "proper" handling - since we already have "some" handling.
-
-Yes!
 
 
->
-> >
-> > Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-> >
-> > On Mon, Mar 4, 2019 at 8:38 AM Javier Gonz=C3=A1lez <javier@javigon.com=
-> wrote:
-> >>
-> >>> On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.com> wro=
-te:
-> >>>
-> >>> Currently in case of error returned by pblk_gc_line
-> >>> to pblk_gc_read we leave current line unassigned
-> >>> from all the lists. This patch fixes that issue.
-> >>>
-> >>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-> >>> ---
-> >>> drivers/lightnvm/pblk-gc.c | 7 ++++++-
-> >>> 1 file changed, 6 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-> >>> index 511ed0d5333c..533da6ea3e15 100644
-> >>> --- a/drivers/lightnvm/pblk-gc.c
-> >>> +++ b/drivers/lightnvm/pblk-gc.c
-> >>> @@ -361,8 +361,13 @@ static int pblk_gc_read(struct pblk *pblk)
-> >>>
-> >>>        pblk_gc_kick(pblk);
-> >>>
-> >>> -     if (pblk_gc_line(pblk, line))
-> >>> +     if (pblk_gc_line(pblk, line)) {
-> >>>                pblk_err(pblk, "failed to GC line %d\n", line->id);
-> >>> +             /* rollback */
-> >>> +             spin_lock(&gc->r_lock);
-> >>> +             list_add_tail(&line->list, &gc->r_list);
-> >>> +             spin_unlock(&gc->r_lock);
-> >>> +     }
-> >>>
-> >>>        return 0;
-> >>> }
-> >>> --
-> >>> 2.17.1
-> >>
-> >> Looks good to me.
-> >>
-> >> Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
+On 04.03.2019 12:43, Hans Holmberg wrote:
+> On Mon, Mar 4, 2019 at 10:11 AM Javier González <javier@javigon.com> wrote:
+>>
+>>> On 4 Mar 2019, at 10.05, Hans Holmberg <hans.ml.holmberg@owltronix.com> wrote:
+>>>
+>>> I strongly disagree with adding code that would mask implantation errors.
+>>>
+>>> If we want more internal checks, we could add an if statement that
+>>> would only be compiled in if CONFIG_NVM_PBLK_DEBUG is enabled.
+>>>
+>>
+>> Not sure who this is for - better not to top post.
+>>
+>> In any case, this is a spec grey zone. I’m ok with cleaning the bits as
+>> they mean nothing for the reset command. If you feel that strongly about
+>> this, you can take if with Igor.
+> 
+> Pardon the top-post. It was meant for both you and Igor.
+> 
+
+OCSSD 2.0 spec for vector chunk reset (chapter 2.2.2) explicitly says 
+"The addresses in the LBA list shall be the first logical block address 
+of each chunk to be reset.". So in my understanding we suppose to clear 
+the sectors bits of the PPA address in order to be spec compliant.
+
+>>
+>>>
+>>> On Mon, Mar 4, 2019 at 8:48 AM Javier González <javier@javigon.com> wrote:
+>>>>> On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.com> wrote:
+>>>>>
+>>>>> In current pblk implementation of erase command
+>>>>> there is a chance tha sector bits are set to some
+>>>>> random values for erase PPA. This is unexpected
+>>>>> situation, since erase shall be always chunk
+>>>>> aligned. This patch fixes that issue
+>>>>>
+>>>>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+>>>>> ---
+>>>>> drivers/lightnvm/pblk-core.c | 1 +
+>>>>> drivers/lightnvm/pblk-map.c  | 2 ++
+>>>>> 2 files changed, 3 insertions(+)
+>>>>>
+>>>>> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+>>>>> index a98b2255f963..78b1eea4ab67 100644
+>>>>> --- a/drivers/lightnvm/pblk-core.c
+>>>>> +++ b/drivers/lightnvm/pblk-core.c
+>>>>> @@ -978,6 +978,7 @@ int pblk_line_erase(struct pblk *pblk, struct pblk_line *line)
+>>>>>
+>>>>>               ppa = pblk->luns[bit].bppa; /* set ch and lun */
+>>>>>               ppa.a.blk = line->id;
+>>>>> +             ppa.a.reserved = 0;
+>>>>>
+>>>>>               atomic_dec(&line->left_eblks);
+>>>>>               WARN_ON(test_and_set_bit(bit, line->erase_bitmap));
+>>>>> diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map.c
+>>>>> index 79df583ea709..aea46b4ec40f 100644
+>>>>> --- a/drivers/lightnvm/pblk-map.c
+>>>>> +++ b/drivers/lightnvm/pblk-map.c
+>>>>> @@ -161,6 +161,7 @@ int pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>>>>>
+>>>>>                       *erase_ppa = ppa_list[i];
+>>>>>                       erase_ppa->a.blk = e_line->id;
+>>>>> +                     erase_ppa->a.reserved = 0;
+>>>>>
+>>>>>                       spin_unlock(&e_line->lock);
+>>>>>
+>>>>> @@ -202,6 +203,7 @@ int pblk_map_erase_rq(struct pblk *pblk, struct nvm_rq *rqd,
+>>>>>               atomic_dec(&e_line->left_eblks);
+>>>>>               *erase_ppa = pblk->luns[bit].bppa; /* set ch and lun */
+>>>>>               erase_ppa->a.blk = e_line->id;
+>>>>> +             erase_ppa->a.reserved = 0;
+>>>>>       }
+>>>>>
+>>>>>       return 0;
+>>>>> --
+>>>>> 2.17.1
+>>>>
+>>>> I’m fine with adding this, but note that there is actually no
+>>>> requirement for the erase to be chunk aligned - the only bits that
+>>>> should be looked at are group, PU and chunk.
+>>>>
+>>>> Reviewed-by: Javier González <javier@javigon.com>
