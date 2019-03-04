@@ -4,59 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4532C43381
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:30:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4AD0C43381
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:35:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8C83320823
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:30:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91F0E20863
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 09:35:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="a/a+T/Mv"
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="fNjQvoAm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726082AbfCDJaF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Mar 2019 04:30:05 -0500
-Received: from mail-ua1-f65.google.com ([209.85.222.65]:35725 "EHLO
-        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726087AbfCDJaF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 04:30:05 -0500
-Received: by mail-ua1-f65.google.com with SMTP id f88so3800577uaf.2
-        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 01:30:04 -0800 (PST)
+        id S1726090AbfCDJfT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Mar 2019 04:35:19 -0500
+Received: from mail-ua1-f66.google.com ([209.85.222.66]:36127 "EHLO
+        mail-ua1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726066AbfCDJfT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 04:35:19 -0500
+Received: by mail-ua1-f66.google.com with SMTP id e15so3816581uam.3
+        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 01:35:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=owltronix-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=lQUh2qu44cW3NZwHZ0EwJqBzKRZh/wuyaLaLETDsfi0=;
-        b=a/a+T/Mv5xxOSNVj5EWHtgjOZKc7s9QMvg+wZw3HReRez7E3H4OW4m2fnAu1zkxAI5
-         s5xdTvqKVJUdpvLe0UKXUnlqZzX2n3kEAiRyvbaw55pg1tQjHxcAMqrCOrGTrYlaybIT
-         CIYM6H4A6Lw9YBaTPNtWY1RWtpmHFogad1USGho0NVoBEZB0ReToiyOonYYqKdA64IAt
-         3Y25T6Y0iAIH4gXXRmemesWOpbkS0dQgc7RzFZ5uML57FIexIHz7jY3OAiquZuePGaZe
-         WrK5BYIJj3rwR/XXIxh+C5dJ8ir/pIcGlhX4XFJtpn1z39V8lDiVfxLbcUKAzQvNYf9n
-         cD0g==
+        bh=EmlSrwdGIDFF1K3WJOeV85eO7B12tRefAchlfDhbVjE=;
+        b=fNjQvoAmS9Kc2zDCHY2jFRLxu7M4RUjqUokz0TANoM4jiCo7F5nD8RC46HhBMThlQV
+         pPfiobUvv682MAh14nse8poAMipr1QvZc9Z6Bl7928vAOT8+/bu9YzoWvwCWxEiLUBE2
+         bghjvNSpBAPvf8FcurVVbVURfx5kqo5xsMMHNFMnJjGjFQrOG/oCuJzHsRW9fSRKzpCr
+         Iqtk0e5KdahAthTE1aeFJsCRPGFagunhgF8N3NB5w6XHJSx8ITxxOiLIzRr0eYiiE1om
+         hlNVBMdgZ6eHzIXvObFqB+/h4T8HBlOp7qcpc2Z8l93p+X6TT+muRKfDKbYLQ/n9X0OL
+         Pzvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=lQUh2qu44cW3NZwHZ0EwJqBzKRZh/wuyaLaLETDsfi0=;
-        b=IUvbh4tdELzbvpmPdCaPqrAQhDPrLHAuWfuAX2tuyfaQBQ3QKr3sbUJm0VKJyRzJCJ
-         UmigQ7Rx+Q+Xv9Gxm/WKXbdILw65n81dTVOGlqw+mK8/4BhCQpNlbmmup73cU6/68RSG
-         DMCcXXsgk80fghZN0OQlsY2CkSbjv9Wp19rAQD1ZuVKs+1Hjo12Eg+zG6qJ2qrKxL2Xv
-         4G9C9617cU/zezpL2RZFXJPFqYJP2ArRC4e/ALg8YcJbDY5PA88FYA+0TZnQ35sDA2c6
-         LBsx+WXwtbFUFLpYqvhnuG9acoRfTUzI4L7JRh73NkPAbUUzfjSYcDKlu8FyJm/8TBOG
-         cspg==
-X-Gm-Message-State: APjAAAXB9avPDi3VfGWzoXWzSVUzlMZF/S1aswAeIo6RIIKO21ckc5Ju
-        AGGzqaAlliB3rFj/cFB0mth4y7N7JZaYoxNMDDsNKQ==
-X-Google-Smtp-Source: APXvYqw+jUtU2KVbaCpQ6dsoC/bzzbwWav9mETU21iRAqsHZT59HJkCZpSLoAOo0lrOix1vrXNGrEMJKh+dc1NzvHLw=
-X-Received: by 2002:a67:bb16:: with SMTP id m22mr9243830vsn.153.1551691804322;
- Mon, 04 Mar 2019 01:30:04 -0800 (PST)
+        bh=EmlSrwdGIDFF1K3WJOeV85eO7B12tRefAchlfDhbVjE=;
+        b=T6yDPUOIPdS+WCpgNsB38uMofeeFrIDwmEIxQjAAqDgkYQQROXcP7URxWb4qz6wxl7
+         0bBv/oCaZRid0uRNb7CtmOQOEZyXLyYqbHpAoUbzFnmarMTc3gzLaom0aYQZOAYK5kV0
+         +zcxdqSPKan3HrkCa6fQ84kFjW8EabhJQCaozf62Xi5n8DTdIEN8fBulZ9RJuBhRpYWG
+         LhAwM/HWppf+e4D/VlL6vUdrnFUsMyXfLKZtXT234BiJ//a4z33xjaL1UryGZW+vG1yl
+         PLZkFALj/CRGj0gnqIwu46KmAiS5SbN7MymCU6udP1e+K7HDYnJRMrknKy/djvSdjzLK
+         WrHA==
+X-Gm-Message-State: APjAAAUJsiF5KaxuxU7MbhlAK19d1ctN+CvzGIdoNWTAB4UhiD4heW30
+        WfReAJhxjNkFDZWUxyMusWREqt2SUiES6PxWmWeFwksDB08=
+X-Google-Smtp-Source: APXvYqxe3hYlk7njxdmZIPlXMtGC5SfybRe5YEnjPOSUjgVgdWByfX0VesQ+7by4v6DzhHk9pv6A1pTxQxLzE0xhOZU=
+X-Received: by 2002:a67:f744:: with SMTP id w4mr9470909vso.16.1551692118080;
+ Mon, 04 Mar 2019 01:35:18 -0800 (PST)
 MIME-Version: 1.0
 References: <20190227171442.11853-1-igor.j.konopko@intel.com>
- <20190227171442.11853-11-igor.j.konopko@intel.com> <21B438F5-31C8-4500-AE2C-E41D8B7EE73F@javigon.com>
-In-Reply-To: <21B438F5-31C8-4500-AE2C-E41D8B7EE73F@javigon.com>
-From:   Hans Holmberg <hans@owltronix.com>
-Date:   Mon, 4 Mar 2019 10:29:53 +0100
-Message-ID: <CANr-nt2=AYQuNumR_ArzVAKt14nQBWEY9g9VGUvqtg0vJGxn1A@mail.gmail.com>
-Subject: Re: [PATCH 10/13] lightnvm: pblk: Reduce L2P DRAM footprint
+ <20190227171442.11853-9-igor.j.konopko@intel.com> <007EC669-9C50-4B29-9522-CE73CD3CE47F@javigon.com>
+In-Reply-To: <007EC669-9C50-4B29-9522-CE73CD3CE47F@javigon.com>
+From:   Hans Holmberg <hans.ml.holmberg@owltronix.com>
+Date:   Mon, 4 Mar 2019 10:35:07 +0100
+Message-ID: <CANr-nt1o4ZyRW-MwwXHQ7aXTmOr8PsqRzhR3643iddh9H2kjjg@mail.gmail.com>
+Subject: Re: [PATCH 08/13] lightnvm: pblk: Set proper read stutus in bio
 To:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
 Cc:     "Konopko, Igor J" <igor.j.konopko@intel.com>,
         =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
@@ -69,174 +70,81 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Great!
-
-Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
-
-On Mon, Mar 4, 2019 at 9:17 AM Javier Gonz=C3=A1lez <javier@javigon.com> wr=
+On Mon, Mar 4, 2019 at 9:03 AM Javier Gonz=C3=A1lez <javier@javigon.com> wr=
 ote:
 >
 > > On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.com> wrote=
 :
 > >
-> > Currently L2P map size is calculated based on
-> > the total number of available sectors, which is
-> > redundant, since it contains some number of
-> > over provisioning (11% by default).
+> > Currently in case of read errors, bi_status is not
+> > set properly which leads to returning inproper data
+> > to higher layer. This patch fix that by setting proper
+> > status in case of read errors
 > >
-> > The goal of this patch is to change this size
-> > to the real capacity and thus reduce the DRAM
-> > footprint significantly - with default op value
-> > it is approx. 110MB of DRAM less for every 1TB
-> > of pblk drive.
+> > Patch also removes unnecessary warn_once(), which does
+> > not make sense in that place, since user bio is not used
+> > for interation with drive and thus bi_status will not be
+> > set here.
 > >
 > > Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
 > > ---
-> > drivers/lightnvm/pblk-core.c     | 8 ++++----
-> > drivers/lightnvm/pblk-init.c     | 7 +++----
-> > drivers/lightnvm/pblk-read.c     | 2 +-
-> > drivers/lightnvm/pblk-recovery.c | 2 +-
-> > drivers/lightnvm/pblk.h          | 1 -
-> > 5 files changed, 9 insertions(+), 11 deletions(-)
+> > drivers/lightnvm/pblk-read.c | 11 +++++------
+> > 1 file changed, 5 insertions(+), 6 deletions(-)
 > >
-> > diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.=
-c
-> > index f48f2e77f770..2e424c0275c1 100644
-> > --- a/drivers/lightnvm/pblk-core.c
-> > +++ b/drivers/lightnvm/pblk-core.c
-> > @@ -2024,7 +2024,7 @@ void pblk_update_map(struct pblk *pblk, sector_t =
-lba, struct ppa_addr ppa)
-> >       struct ppa_addr ppa_l2p;
-> >
-> >       /* logic error: lba out-of-bounds. Ignore update */
-> > -     if (!(lba < pblk->rl.nr_secs)) {
-> > +     if (!(lba < pblk->capacity)) {
-> >               WARN(1, "pblk: corrupted L2P map request\n");
-> >               return;
-> >       }
-> > @@ -2064,7 +2064,7 @@ int pblk_update_map_gc(struct pblk *pblk, sector_=
-t lba, struct ppa_addr ppa_new,
-> > #endif
-> >
-> >       /* logic error: lba out-of-bounds. Ignore update */
-> > -     if (!(lba < pblk->rl.nr_secs)) {
-> > +     if (!(lba < pblk->capacity)) {
-> >               WARN(1, "pblk: corrupted L2P map request\n");
-> >               return 0;
-> >       }
-> > @@ -2110,7 +2110,7 @@ void pblk_update_map_dev(struct pblk *pblk, secto=
-r_t lba,
-> >       }
-> >
-> >       /* logic error: lba out-of-bounds. Ignore update */
-> > -     if (!(lba < pblk->rl.nr_secs)) {
-> > +     if (!(lba < pblk->capacity)) {
-> >               WARN(1, "pblk: corrupted L2P map request\n");
-> >               return;
-> >       }
-> > @@ -2168,7 +2168,7 @@ void pblk_lookup_l2p_rand(struct pblk *pblk, stru=
-ct ppa_addr *ppas,
-> >               lba =3D lba_list[i];
-> >               if (lba !=3D ADDR_EMPTY) {
-> >                       /* logic error: lba out-of-bounds. Ignore update =
-*/
-> > -                     if (!(lba < pblk->rl.nr_secs)) {
-> > +                     if (!(lba < pblk->capacity)) {
-> >                               WARN(1, "pblk: corrupted L2P map request\=
-n");
-> >                               continue;
-> >                       }
-> > diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.=
-c
-> > index e553105b7ba1..9913a4514eb6 100644
-> > --- a/drivers/lightnvm/pblk-init.c
-> > +++ b/drivers/lightnvm/pblk-init.c
-> > @@ -105,7 +105,7 @@ static size_t pblk_trans_map_size(struct pblk *pblk=
-)
-> >       if (pblk->addrf_len < 32)
-> >               entry_size =3D 4;
-> >
-> > -     return entry_size * pblk->rl.nr_secs;
-> > +     return entry_size * pblk->capacity;
-> > }
-> >
-> > #ifdef CONFIG_NVM_PBLK_DEBUG
-> > @@ -175,7 +175,7 @@ static int pblk_l2p_init(struct pblk *pblk, bool fa=
-ctory_init)
-> >
-> >       pblk_ppa_set_empty(&ppa);
-> >
-> > -     for (i =3D 0; i < pblk->rl.nr_secs; i++)
-> > +     for (i =3D 0; i < pblk->capacity; i++)
-> >               pblk_trans_map_set(pblk, i, ppa);
-> >
-> >       ret =3D pblk_l2p_recover(pblk, factory_init);
-> > @@ -706,7 +706,6 @@ static int pblk_set_provision(struct pblk *pblk, in=
-t nr_free_chks)
-> >        * on user capacity consider only provisioned blocks
-> >        */
-> >       pblk->rl.total_blocks =3D nr_free_chks;
-> > -     pblk->rl.nr_secs =3D nr_free_chks * geo->clba;
-> >
-> >       /* Consider sectors used for metadata */
-> >       sec_meta =3D (lm->smeta_sec + lm->emeta_sec[0]) * l_mg->nr_free_l=
-ines;
-> > @@ -1289,7 +1288,7 @@ static void *pblk_init(struct nvm_tgt_dev *dev, s=
-truct gendisk *tdisk,
-> >
-> >       pblk_info(pblk, "luns:%u, lines:%d, secs:%llu, buf entries:%u\n",
-> >                       geo->all_luns, pblk->l_mg.nr_lines,
-> > -                     (unsigned long long)pblk->rl.nr_secs,
-> > +                     (unsigned long long)pblk->capacity,
-> >                       pblk->rwb.nr_entries);
-> >
-> >       wake_up_process(pblk->writer_ts);
 > > diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.=
 c
-> > index 39c1d6ccaedb..65697463def8 100644
+> > index 3789185144da..39c1d6ccaedb 100644
 > > --- a/drivers/lightnvm/pblk-read.c
 > > +++ b/drivers/lightnvm/pblk-read.c
-> > @@ -561,7 +561,7 @@ static int read_rq_gc(struct pblk *pblk, struct nvm=
-_rq *rqd,
-> >               goto out;
+> > @@ -175,11 +175,10 @@ static void pblk_read_check_rand(struct pblk *pbl=
+k, struct nvm_rq *rqd,
+> >       WARN_ONCE(j !=3D rqd->nr_ppas, "pblk: corrupted random request\n"=
+);
+> > }
 > >
-> >       /* logic error: lba out-of-bounds */
-> > -     if (lba >=3D pblk->rl.nr_secs) {
-> > +     if (lba >=3D pblk->capacity) {
-> >               WARN(1, "pblk: read lba out of bounds\n");
-> >               goto out;
-> >       }
-> > diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-r=
-ecovery.c
-> > index d86f580036d3..83b467b5edc7 100644
-> > --- a/drivers/lightnvm/pblk-recovery.c
-> > +++ b/drivers/lightnvm/pblk-recovery.c
-> > @@ -474,7 +474,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, s=
-truct pblk_line *line,
+> > -static void pblk_end_user_read(struct bio *bio)
+> > +static void pblk_end_user_read(struct bio *bio, int error)
+> > {
+> > -#ifdef CONFIG_NVM_PBLK_DEBUG
+> > -     WARN_ONCE(bio->bi_status, "pblk: corrupted read bio\n");
+> > -#endif
+> > +     if (error && error !=3D NVM_RSP_WARN_HIGHECC)
+> > +             bio_io_error(bio);
+> >       bio_endio(bio);
+> > }
 > >
-> >               lba_list[paddr++] =3D cpu_to_le64(lba);
+> > @@ -219,7 +218,7 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+> >       struct pblk_g_ctx *r_ctx =3D nvm_rq_to_pdu(rqd);
+> >       struct bio *bio =3D (struct bio *)r_ctx->private;
 > >
-> > -             if (lba =3D=3D ADDR_EMPTY || lba > pblk->rl.nr_secs)
-> > +             if (lba =3D=3D ADDR_EMPTY || lba >=3D pblk->capacity)
-> >                       continue;
+> > -     pblk_end_user_read(bio);
+> > +     pblk_end_user_read(bio, rqd->error);
+> >       __pblk_end_io_read(pblk, rqd, true);
+> > }
 > >
-> >               line->nr_valid_lbas++;
-> > diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-> > index a6386d5acd73..a92377530930 100644
-> > --- a/drivers/lightnvm/pblk.h
-> > +++ b/drivers/lightnvm/pblk.h
-> > @@ -305,7 +305,6 @@ struct pblk_rl {
+> > @@ -292,7 +291,7 @@ static void pblk_end_partial_read(struct nvm_rq *rq=
+d)
+> >       rqd->bio =3D NULL;
+> >       rqd->nr_ppas =3D nr_secs;
 > >
-> >       struct timer_list u_timer;
+> > -     bio_endio(bio);
+> > +     pblk_end_user_read(bio, rqd->error);
+> >       __pblk_end_io_read(pblk, rqd, false);
+> > }
 > >
-> > -     unsigned long long nr_secs;
-> >       unsigned long total_blocks;
-> >
-> >       atomic_t free_blocks;           /* Total number of free blocks (+=
- OP) */
 > > --
 > > 2.17.1
 >
-> Looks good to me.
+> This is by design. We do not report the read errors as in any other
+> block device - this is why we clone the read bio.
+
+Could you elaborate on why not reporting read errors is a good thing in pbl=
+k?
+
 >
-> Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
+> If you want to remove the WARN_ONCE, it is fine by me - it helped in the
+> past to debug the read path as when one read failed we go a storm of
+> them. Now we have better controller tools to debug this, so if nobody
+> else wants it there, let=E2=80=99s remove it.
+>
+> Javier
