@@ -7,65 +7,66 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50618C43381
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 01:53:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 422CCC43381
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 01:53:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0BA8720842
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 01:53:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0749020835
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 01:53:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="qc76EgKI"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="W3rnydOy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726166AbfCDBxf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 3 Mar 2019 20:53:35 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:43552 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726158AbfCDBxf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Mar 2019 20:53:35 -0500
-Received: by mail-pg1-f194.google.com with SMTP id l11so1855032pgq.10
-        for <linux-block@vger.kernel.org>; Sun, 03 Mar 2019 17:53:34 -0800 (PST)
+        id S1726195AbfCDBxm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 3 Mar 2019 20:53:42 -0500
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:44020 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726158AbfCDBxm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 3 Mar 2019 20:53:42 -0500
+Received: by mail-pf1-f196.google.com with SMTP id q17so1784002pfh.10
+        for <linux-block@vger.kernel.org>; Sun, 03 Mar 2019 17:53:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:subject:to:cc:message-id:date:user-agent:mime-version
          :content-language:content-transfer-encoding;
-        bh=V87K0u188f6fWgI25lEBoeTg2N2SmTtc5jKuScmtEHU=;
-        b=qc76EgKI5IcIjW9sqgNBwllyWvpRWTdF+raWRISd5XXA6drIYZTUL+coZjEVprTyqa
-         QDBg1mT7J4GjX3y2fjesnDoLOkC5gULG2+bDKk8xSQaL8D4SxVPvKp1SWjFU+Z1png8h
-         gi/kLS3ja83NjqOhUiY7+3CydT5yTlcBDH+ieXmxEgPkk+67BrUtTsVhqdvrZAxTyODO
-         +OV8Css7Lsr+wFSBjopa3n+V6CzQzGJ5LTb3nvWkxj95Ki+LfKuDoG+kYNVCwEwRLqvM
-         QZzlJBOEC5hLlf7657ZiyOXku09BklUMMvvegrVcHdlBwH/x1antqOwcOnxLQukX1XOV
-         EPkA==
+        bh=uJQ/hiTS1J8lSXUOjoqnNe5rwxLwoENy37yf6d5LQos=;
+        b=W3rnydOyIV5W7qYVjHK9n0WfFTVJJmYm2y7AGn1Jd8LiPMESKZnxNg1kzFj69pXp5u
+         STLeFyK+DibocXN4nsGd3HgYSVHmWQ2IMVD8xdNhizWajR3OwgyGhYmgaplX4DkkJ28/
+         6b1kyPPrYP77qTEYwv2xOcL/t8B28aSLTi8KHTUEqhuDsm+5ba5TippmzjX6JESH31eF
+         K3dN6DMyYmOPcDR79xXsrWQqHvdf6YU7R8EfBR0Bp7V84iMfz3CJm1OSCHk1IB5AV5nJ
+         Cm8wU+8glTNsD5ATsYu656m2QZyIdYFQawb2vvbz9qP98IMXq3UzEsRcGcPkimNSRVwY
+         Xxvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:subject:to:cc:message-id:date:user-agent
          :mime-version:content-language:content-transfer-encoding;
-        bh=V87K0u188f6fWgI25lEBoeTg2N2SmTtc5jKuScmtEHU=;
-        b=cVZ4c2khzK3vxcNz8MyOv3m7MIDNRNADkClEZbNn8tr2fBUZIH3Y8KROAbAxFfTnPj
-         LelEA0gZgfCPbGx/v8UlZomxKB2koTrACeElBVYvKJnSUfHVHfUD88Fo4Rl2bNiqCX1C
-         C/fjXxd/RCZJXMwv4v6UeCQivDXkhcvIfm3UhfVyNPjZPjZIU/WR2j7HqE5ibO6Lk80H
-         em4j+M7QhbB5WuB6OuVO6Wo3Xe3rB/h7FXF0K5Dowv4Vsg6xnWB/NjUIQ1VDmv7dW7+r
-         X6HhcR9zVi+RlC9AsCWaKuhWpPs1l9mxoHUlox9iWs2x7biJs3RBqqBmnRcFy+u9Gmo+
-         BsGA==
-X-Gm-Message-State: APjAAAXWVZ4nV6i2DjTzbOcx5ukTzDIF3oaX38BJOLYAlP1qrDSRhOOz
-        wPUmn48/dAdNyekq21TChe8Q0yr7UNslBQw3
-X-Google-Smtp-Source: APXvYqzOf0JZ6VImhmDeCrunoDUkMovIDiZWyL9QQkZbVugsUUF63KRJi3zrsnbmvaewmnSglynWZQ==
-X-Received: by 2002:a63:4913:: with SMTP id w19mr15985452pga.394.1551664413230;
-        Sun, 03 Mar 2019 17:53:33 -0800 (PST)
+        bh=uJQ/hiTS1J8lSXUOjoqnNe5rwxLwoENy37yf6d5LQos=;
+        b=F0DNzs7chuxnjBy0s7Ft74wHCiLXvy9auiXoVjSPg+GPptCoV2u5oj3MCdljBN4Iu4
+         l/mMqL7FtS/Up8thtnA7uO4w1MgtktGyoV/5yqWQfH5WzgbwQgibJpWxXq/OxxSmPPBD
+         cb+oW9BS+xr9ZRd5q9HBuKX5sy/ccSTrlPHh6twBbrvgGbRQX552D9F/93rlSF0l5mJU
+         /hXGc8oBB7rf8km8BcFs2qvMCdRlKeV8d5sTDmMLAU6w7hfgRdPfqr+7felucy2RHqUw
+         2x5kww9ePfUI+k8jALp0CMPnIeh+gSucZHLWobkOIkRQCIuiceYHVnvu5gJtfzqAc+Gg
+         mBmA==
+X-Gm-Message-State: APjAAAUiJfZX/ILDMe8VqjLAg4/EiptM/kdSQHh9aZO4h9DHHW+63f3O
+        mEFvbkHOaFw0BiXsOjZdmyXNa03Yf7Wi18UI
+X-Google-Smtp-Source: APXvYqx5zOyWZ22tihw27sZVRTOIr1rSQwxE9Cn5I76/92AiG1XXx5gGKwbUbkRqOZM26g9ke0Fy6g==
+X-Received: by 2002:a63:6244:: with SMTP id w65mr15947016pgb.300.1551664421086;
+        Sun, 03 Mar 2019 17:53:41 -0800 (PST)
 Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id j20sm6352693pfh.141.2019.03.03.17.53.31
+        by smtp.gmail.com with ESMTPSA id f192sm3711934pfc.180.2019.03.03.17.53.39
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 03 Mar 2019 17:53:32 -0800 (PST)
+        Sun, 03 Mar 2019 17:53:40 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block changes for 5.1
+Subject: [GIT PULL] Support for the io_uring IO interface
 To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-ID: <60f2e4cc-b0cb-1d17-bbb1-445e6a28b248@kernel.dk>
-Date:   Sun, 3 Mar 2019 18:53:30 -0700
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>
+Message-ID: <f15aeeb9-e602-27bc-f230-ce52e59f6bb2@kernel.dk>
+Date:   Sun, 3 Mar 2019 18:53:38 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -73,353 +74,118 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hi Linus,
 
-This is the main block pull request for 5.1. Not a huge amount of
-changes in this round, the biggest one is that we finally have Mings
-multi-page bvec support merged. Apart from that, this pull request
-contains:
+This pull request adds support for a new IO interface, io_uring.
+io_uring allows an application to communicate with the kernel through
+two rings, the submission queue (SQ) and completion queue (CQ) ring.
+This allows for very efficient handling of IOs, see the v5 posting for
+some basic numbers:
 
-- Small series that avoids quiescing the queue for sysfs changes that
-  match what we currently have (Aleksei)
+https://lore.kernel.org/linux-block/20190116175003.17880-1-axboe@kernel.dk/
 
-- Series of bcache fixes (via Coly)
+Outside of just efficiency, the interface is also flexible and
+extendable, and allows for future use cases like the upcoming NVMe
+key-value store API, networked IO, and so on. It also supports async
+buffered IO, something that we've always failed to support in the
+kernel.
 
-- Series of lightnvm fixes (via Mathias)
+Outside of basic IO features, it supports async polled IO as well. This
+particular feature has already been tested at Facebook months ago for
+flash storage boxes, with 25-33% improvements. It makes polled IO
+actually useful for real world use cases, where even basic flash sees a
+nice win in terms of efficiency, latency, and performance. These boxes
+were IOPS bound before, now they are not.
 
-- NVMe pull request from Christoph. Nothing major, just SPDX/license
-  cleanups, RR mp policy (Hannes), and little fixes (Bart, Chaitanya).
+This series adds three new system calls. One for setting up an io_uring
+instance (io_uring_setup(2)), one for submitting/completing IO
+(io_uring_enter(2)), and one for aux functions like registrating file
+sets, buffers, etc (io_uring_register(2)). Through the help of Arnd,
+I've coordinated the syscall numbers so merge on that front should be
+painless.
 
-- BFQ series (Paolo)
+Jon did a writeup of the interface a while back, which (except for minor
+details that have been tweaked) is still accurate. Find that here:
 
-- Save blk-mq cpu -> hw queue mapping, removing a pointer indirection
-  for the fast path (Jianchao)
+https://lwn.net/Articles/776703/
 
-- fops->iopoll() added for async IO polling, this is a feature that the
-  upcoming io_uring interface will use (Christoph, me)
+Huge thanks to Al Viro for helping getting the reference cycle code
+correct, and to Jann Horn for his extensive reviews focused on both
+security and bugs in general.
 
-- Partition scan loop fixes (Dongli)
+There's a userspace library that provides basic functionality for
+applications that don't need or want to care about how to fiddle with
+the rings directly. It has helpers to allow applications to easily set
+up an io_uring instance, and submit/complete IO through it without
+knowing about the intricacies of the rings. It also includes man pages
+(thanks to Jeff Moyer), and will continue to grow support helper
+functions and features as time progresses. Find it here:
 
-- mtip32xx conversion from managed resource API (Christoph)
+git://git.kernel.dk/liburing
 
-- cdrom registration race fix (Guenter)
+Fio has full support for the raw interface, both in the form of an IO
+engine (io_uring), but also with a small test application (t/io_uring)
+that can exercise and benchmark the interface.
 
-- MD pull from Song, two minor fixes.
+Note that this branch sits on top of my for-5.1/block branch, since the
+multi-page bvec changes caused a few conflicts with the pre-mapped
+buffer support. I also moved a few prep patches to that branch today,
+which is why it appears recently rebased (moved the 4 bottom patches
+from io_uring to for-5.1/block).
 
-- Various documentation fixes (Marcos)
-
-- Multi-page bvec feature. This brings a lot of nice improvements with
-  it, like more efficient splitting, larger IOs can be supported without
-  growing the bvec table size, and so on. (Ming)
-
-- Various little fixes to core and drivers.
-
-
-Note that this will throw a merge conflict, due to the late revert of
-the gfs2 commit ""gfs2: read journal in large chunks to locate the
-head". The resolution is trivial, since it's just deleting the code.
-
-Please pull!
+Please consider this feature for 5.1, so we can finally have something
+that's both fast, efficient, and feature rich for IO instead of the sad
+niche case that is aio/libaio.
 
 
-  git://git.kernel.dk/linux-block.git tags/for-5.1/block-20190302
+  git://git.kernel.dk/linux-block.git tags/io_uring-20190301
 
 
 ----------------------------------------------------------------
-Aleksei Zakharov (3):
-      block: avoid setting nr_requests to current value
-      block: avoid setting wbt_lat_usec to current value
-      block: avoid setting none scheduler if it's already none
+Christoph Hellwig (1):
+      io_uring: add fsync support
 
-Andy Shevchenko (2):
-      lightnvm: Use u64 instead of __le64 for CPU visible side
-      lightnvm: pblk: Switch to use new generic UUID API
+Jens Axboe (13):
+      Add io_uring IO interface
+      io_uring: support for IO polling
+      fs: add fget_many() and fput_many()
+      io_uring: use fget/fput_many() for file references
+      io_uring: batch io_kiocb allocation
+      block: implement bio helper to add iter bvec pages to bio
+      io_uring: add support for pre-mapped user IO buffers
+      net: split out functions related to registering inflight socket files
+      io_uring: add file set registration
+      io_uring: add submission polling
+      io_uring: add io_kiocb ref count
+      io_uring: add support for IORING_OP_POLL
+      io_uring: allow workqueue item to handle multiple buffered requests
 
-Bart Van Assche (6):
-      nvmet: fix indentation
-      nvme-fabrics: document the poll function argument
-      nvme-pci: check kstrtoint() return value in queue_count_set()
-      nvme: unexport nvme_delete_ctrl_sync()
-      nvme: introduce a helper function for controller deletion
-      nvme: avoid that deleting a controller triggers a circular locking complaint
-
-Carlos Maiolino (1):
-      fs: fix guard_bio_eod to check for real EOD errors
-
-Chaitanya Kulkarni (2):
-      nvme: add support for the Write Zeroes command
-      nvme-rdma: use nr_phys_segments when map rq to sgl
-
-Christoph Hellwig (19):
-      mtip32xx: ѕtop abusing the managed resource APIs
-      btrfs: look at bi_size for repair decisions
-      nvme_ioctl.h: remove duplicate GPL boilerplate
-      nvme-tcp.h: fix SPDX header
-      nvme-fabrics: convert to SPDX identifiers
-      nvme-fc: convert to SPDX identifiers
-      nvme-rdma: convert to SPDX identifiers
-      nvme-lightnvm: convert to SPDX identifiers
-      nvme-pci: convert to SPDX identifiers
-      nvme: convert to SPDX identifiers
-      nvmet-fc: convert to SPDX identifiers
-      nvmet-fcloop: convert to SPDX identifiers
-      nvme-loop: convert to SPDX identifiers
-      nvmet-rdma: convert to SPDX identifiers
-      nvmet: convert to SPDX identifiers
-      fs: add an iopoll method to struct file_operations
-      block: wire up block device iopoll method
-      iomap: wire up the iopoll method
-      block: optimize bvec iteration in bvec_iter_advance
-
-Colin Ian King (1):
-      bcache: fix indentation issue, remove tabs on a hunk of code
-
-Coly Li (16):
-      bcache: not use hard coded memset size in bch_cache_accounting_clear()
-      bcache: export backing_dev_name via sysfs
-      bcache: export backing_dev_uuid via sysfs
-      bcache: improve sysfs_strtoul_clamp()
-      bcache: fix input integer overflow of congested threshold
-      bcache: fix input overflow to sequential_cutoff
-      bcache: add sysfs_strtoul_bool() for setting bit-field variables
-      bcache: use sysfs_strtoul_bool() to set bit-field variables
-      bcache: fix input overflow to writeback_delay
-      bcache: fix potential div-zero error of writeback_rate_i_term_inverse
-      bcache: fix potential div-zero error of writeback_rate_p_term_inverse
-      bcache: fix input overflow to writeback_rate_minimum
-      bcache: fix input overflow to journal_delay_ms
-      bcache: fix input overflow to cache set io_error_limit
-      bcache: fix input overflow to cache set sysfs file io_error_halflife
-      bcache: use (REQ_META|REQ_PRIO) to indicate bio for metadata
-
-Daniel Axtens (1):
-      bcache: never writeback a discard operation
-
-Dongli Zhang (3):
-      loop: do not print warn message if partition scan is successful
-      loop: set GENHD_FL_NO_PART_SCAN after blkdev_reread_part()
-      blk-mq: use HCTX_TYPE_DEFAULT but not 0 to index blk_mq_tag_set->map
-
-Guenter Roeck (1):
-      cdrom: Fix race condition in cdrom_sysctl_register
-
-Gustavo A. R. Silva (1):
-      md-linear: use struct_size() in kzalloc()
-
-Hannes Reinecke (2):
-      nvme-multipath: round-robin I/O policy
-      nvme: return error from nvme_alloc_ns()
-
-Hans Holmberg (3):
-      lightnvm: pblk: stop taking the free lock in in pblk_lines_free
-      lightnvm: pblk: use vfree to free metadata on error path
-      lightnvm: pblk: extend line wp balance check
-
-Heiner Litz (1):
-      lightnvm: pblk: fix race condition on GC
-
-Heinz Mauelshagen (1):
-      null_blk: fix checking for REQ_FUA
-
-Javier González (1):
-      lightnvm: pblk: prevent stall due to wb threshold
-
-Jens Axboe (7):
-      Merge branch 'nvme-5.1' of git://git.infradead.org/nvme into for-5.1/block
-      Merge branch 'md-next' of https://github.com/liu-song-6/linux into for-5.1/block
-      block: kill QUEUE_FLAG_FLUSH_NQ
-      block: queue flag cleanup
-      Merge tag 'v5.0-rc6' into for-5.1/block
-      Merge branch 'nvme-5.1' of git://git.infradead.org/nvme into for-5.1/block
-      block: add bio_set_polled() helper
-
-Jianchao Wang (2):
-      blk-mq: save queue mapping result into ctx directly
-      blk-mq: save default hctx into ctx->hctxs for not-supported type
-
-Keyur Patel (1):
-      block: Replace function name in string with __func__
-
-Li RongQing (1):
-      nbd: propagate genlmsg_reply return code
-
-Marcos Paulo de Souza (2):
-      blk-cgroup: Fix doc related to blkcg_exit_queue
-      blk-sysfs: Rework documention of __blk_release_queue
-
-Masahiro Yamada (1):
-      lightnvm: pblk: fix TRACE_INCLUDE_PATH
-
-Ming Lei (24):
-      block: don't use bio->bi_vcnt to figure out segment number
-      block: remove bvec_iter_rewind()
-      block: introduce multi-page bvec helpers
-      block: introduce bio_for_each_bvec() and rq_for_each_bvec()
-      block: use bio_for_each_bvec() to compute multi-page bvec count
-      block: use bio_for_each_bvec() to map sg
-      block: introduce mp_bvec_last_segment()
-      fs/buffer.c: use bvec iterator to truncate the bio
-      btrfs: use mp_bvec_last_segment to get bio's last page
-      block: loop: pass multi-page bvec to iov_iter
-      bcache: avoid to use bio_for_each_segment_all() in bch_bio_alloc_pages()
-      block: allow bio_for_each_segment_all() to iterate over multi-page bvec
-      block: enable multipage bvecs
-      block: always define BIO_MAX_PAGES as 256
-      block: document usage of bio iterator helpers
-      block: kill QUEUE_FLAG_NO_SG_MERGE
-      block: kill BLK_MQ_F_SG_MERGE
-      block: avoid to READ fields of null bio
-      block: bounce: make sure that bvec table is updated
-      block: introduce bvec_nth_page()
-      block: optimize __blk_segment_map_sg() for single-page bvec
-      block: optimize blk_bio_segment_split for single-page bvec
-      block: introduce mp_bvec_for_each_page() for iterating over page
-      block: fix updating bio's front segment size
-
-Paolo Valente (14):
-      block, bfq: do not consider interactive queues in srt filtering
-      block, bfq: avoid selecting a queue w/o budget
-      block, bfq: make sure queue budgets are not below service received
-      block, bfq: remove case of redirected bic from insert_request
-      block, bfq: consider also ioprio classes in symmetry detection
-      block, bfq: split function bfq_better_to_idle
-      block, bfq: do not plug I/O of in-service queue when harmful
-      block, bfq: unconditionally plug I/O in asymmetric scenarios
-      block, bfq: fix sequential rq detection in rate estimation
-      block, bfq: fix queue removal from weights tree
-      block, bfq: reduce threshold for detecting command queueing
-      block, bfq: port commit "cfq-iosched: improve hw_tag detection"
-      block, bfq: do not overcharge writes in asymmetric scenarios
-      block, bfq: fix in-service-queue check for queue merging
-
-Sagi Grimberg (1):
-      nvme: remove the .stop_ctrl callout
-
-Tang Junhui (1):
-      bcache: treat stale && dirty keys as bad keys
-
-YueHaibing (1):
-      floppy: remove set but not used variable 'q'
-
-Yufen Yu (1):
-      raid1: simplify raid1_error function
-
-zhengbin (1):
-      block: fix NULL pointer dereference in register_disk
-
- Documentation/block/biovecs.txt   |  25 ++
- Documentation/filesystems/vfs.txt |   3 +
- block/bfq-iosched.c               | 705 ++++++++++++++++++++------------------
- block/bfq-iosched.h               |  11 +-
- block/bfq-wf2q.c                  |  18 +-
- block/bio.c                       |  49 ++-
- block/blk-cgroup.c                |   2 +-
- block/blk-merge.c                 | 231 +++++++++----
- block/blk-mq-debugfs.c            |   3 -
- block/blk-mq-sched.c              |   2 +-
- block/blk-mq-tag.c                |   2 +-
- block/blk-mq.c                    |  33 +-
- block/blk-mq.h                    |  20 +-
- block/blk-settings.c              |   9 -
- block/blk-sysfs.c                 |  22 +-
- block/blk.h                       |   2 +-
- block/bounce.c                    |  10 +-
- block/elevator.c                  |   5 +-
- block/genhd.c                     |  18 +-
- drivers/ata/libata-scsi.c         |   2 -
- drivers/block/floppy.c            |   3 -
- drivers/block/loop.c              |  48 ++-
- drivers/block/mtip32xx/mtip32xx.c |  37 +-
- drivers/block/nbd.c               |   5 +-
- drivers/block/null_blk_main.c     |   3 +-
- drivers/block/rbd.c               |   2 +-
- drivers/block/skd_main.c          |   1 -
- drivers/block/xen-blkfront.c      |   2 +-
- drivers/cdrom/cdrom.c             |   7 +-
- drivers/lightnvm/pblk-core.c      |   8 +-
- drivers/lightnvm/pblk-gc.c        |  20 +-
- drivers/lightnvm/pblk-init.c      |   4 +-
- drivers/lightnvm/pblk-map.c       |   1 +
- drivers/lightnvm/pblk-rb.c        |  26 +-
- drivers/lightnvm/pblk-recovery.c  |  64 ++--
- drivers/lightnvm/pblk-rl.c        |   5 +-
- drivers/lightnvm/pblk-trace.h     |   2 +-
- drivers/lightnvm/pblk-write.c     |   1 +
- drivers/lightnvm/pblk.h           |  17 +-
- drivers/md/bcache/btree.c         |   3 +-
- drivers/md/bcache/extents.c       |  13 +-
- drivers/md/bcache/request.c       |   7 +-
- drivers/md/bcache/stats.c         |   2 +-
- drivers/md/bcache/super.c         |  30 +-
- drivers/md/bcache/sysfs.c         |  81 +++--
- drivers/md/bcache/sysfs.h         |  23 +-
- drivers/md/bcache/util.c          |   6 +-
- drivers/md/bcache/writeback.h     |   3 +
- drivers/md/dm-crypt.c             |   3 +-
- drivers/md/dm-rq.c                |   2 +-
- drivers/md/dm-table.c             |  13 -
- drivers/md/md-linear.c            |   3 +-
- drivers/md/raid1.c                |   9 +-
- drivers/mmc/core/queue.c          |   3 +-
- drivers/nvme/host/core.c          | 122 +++++--
- drivers/nvme/host/fabrics.c       |  11 +-
- drivers/nvme/host/fabrics.h       |  10 +-
- drivers/nvme/host/fault_inject.c  |   2 +-
- drivers/nvme/host/fc.c            |  14 +-
- drivers/nvme/host/lightnvm.c      |  16 +-
- drivers/nvme/host/multipath.c     |  96 +++++-
- drivers/nvme/host/nvme.h          |  21 +-
- drivers/nvme/host/pci.c           |  12 +-
- drivers/nvme/host/rdma.c          |  26 +-
- drivers/nvme/host/tcp.c           |  10 +-
- drivers/nvme/host/trace.c         |  10 +-
- drivers/nvme/host/trace.h         |  10 +-
- drivers/nvme/target/admin-cmd.c   |  10 +-
- drivers/nvme/target/configfs.c    |  10 +-
- drivers/nvme/target/core.c        |  10 +-
- drivers/nvme/target/discovery.c   |  12 +-
- drivers/nvme/target/fabrics-cmd.c |  10 +-
- drivers/nvme/target/fc.c          |  14 +-
- drivers/nvme/target/fcloop.c      |  13 +-
- drivers/nvme/target/io-cmd-bdev.c |  10 +-
- drivers/nvme/target/loop.c        |  10 +-
- drivers/nvme/target/nvmet.h       |  10 +-
- drivers/nvme/target/rdma.c        |  10 +-
- drivers/scsi/scsi_lib.c           |   2 +-
- drivers/staging/erofs/data.c      |   3 +-
- drivers/staging/erofs/unzip_vle.c |   3 +-
- fs/block_dev.c                    |  28 +-
- fs/btrfs/compression.c            |   3 +-
- fs/btrfs/disk-io.c                |   3 +-
- fs/btrfs/extent_io.c              |  16 +-
- fs/btrfs/inode.c                  |   6 +-
- fs/btrfs/raid56.c                 |   3 +-
- fs/buffer.c                       |  12 +-
- fs/crypto/bio.c                   |   3 +-
- fs/direct-io.c                    |   4 +-
- fs/exofs/ore.c                    |   3 +-
- fs/exofs/ore_raid.c               |   3 +-
- fs/ext4/page-io.c                 |   3 +-
- fs/ext4/readpage.c                |   3 +-
- fs/f2fs/data.c                    |   9 +-
- fs/gfs2/file.c                    |   2 +
- fs/gfs2/lops.c                    |   9 +-
- fs/gfs2/meta_io.c                 |   3 +-
- fs/iomap.c                        |  53 ++-
- fs/mpage.c                        |   3 +-
- fs/xfs/xfs_aops.c                 |   9 +-
- fs/xfs/xfs_file.c                 |   1 +
- include/linux/bio.h               |  51 ++-
- include/linux/blk-mq.h            |   1 -
- include/linux/blkdev.h            |  68 ++--
- include/linux/bvec.h              | 123 +++++--
- include/linux/fs.h                |   2 +
- include/linux/iomap.h             |   1 +
- include/linux/nvme-fc-driver.h    |  10 +-
- include/linux/nvme-fc.h           |  14 +-
- include/linux/nvme-rdma.h         |  10 +-
- include/linux/nvme-tcp.h          |   2 +-
- include/linux/nvme.h              |  10 +-
- include/uapi/linux/nvme_ioctl.h   |   9 -
- 114 files changed, 1472 insertions(+), 1124 deletions(-)
+ arch/x86/entry/syscalls/syscall_32.tbl |    3 +
+ arch/x86/entry/syscalls/syscall_64.tbl |    3 +
+ block/bio.c                            |   62 +-
+ fs/Makefile                            |    1 +
+ fs/file.c                              |   15 +-
+ fs/file_table.c                        |    9 +-
+ fs/io_uring.c                          | 2969 ++++++++++++++++++++++++++++++++
+ include/linux/file.h                   |    2 +
+ include/linux/fs.h                     |   13 +-
+ include/linux/sched/user.h             |    2 +-
+ include/linux/syscalls.h               |    8 +
+ include/net/af_unix.h                  |    1 +
+ include/uapi/asm-generic/unistd.h      |    8 +-
+ include/uapi/linux/io_uring.h          |  137 ++
+ init/Kconfig                           |    9 +
+ kernel/sys_ni.c                        |    3 +
+ net/Makefile                           |    2 +-
+ net/unix/Kconfig                       |    5 +
+ net/unix/Makefile                      |    2 +
+ net/unix/af_unix.c                     |   63 +-
+ net/unix/garbage.c                     |   68 +-
+ net/unix/scm.c                         |  151 ++
+ net/unix/scm.h                         |   10 +
+ 23 files changed, 3400 insertions(+), 146 deletions(-)
+ create mode 100644 fs/io_uring.c
+ create mode 100644 include/uapi/linux/io_uring.h
+ create mode 100644 net/unix/scm.c
+ create mode 100644 net/unix/scm.h
 
 -- 
 Jens Axboe
