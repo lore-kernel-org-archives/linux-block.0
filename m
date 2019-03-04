@@ -3,128 +3,115 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A247EC43381
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 13:48:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EDBCC43381
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 14:06:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 715232075B
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 13:48:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FF6620835
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 14:06:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="QNLzp5Ix"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="2Mwjp+kn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726243AbfCDNsO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Mar 2019 08:48:14 -0500
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:40211 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726032AbfCDNsO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 08:48:14 -0500
-Received: by mail-ed1-f67.google.com with SMTP id 10so4282635eds.7
-        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 05:48:13 -0800 (PST)
+        id S1726626AbfCDOGe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Mar 2019 09:06:34 -0500
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:47040 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726111AbfCDOGe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 09:06:34 -0500
+Received: by mail-ed1-f66.google.com with SMTP id f2so4324324edy.13
+        for <linux-block@vger.kernel.org>; Mon, 04 Mar 2019 06:06:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=pCdpkWBhJD7USuv0YPS+EyZBn4tPeR14FbeRag9RjGs=;
-        b=QNLzp5Ix9pAdpS+uJTX90qxXeNTnJ7uJBnO6E4CzgQKg0+23omlOBbhMwz8TtfVDH9
-         1SHNOJz8jHAZ3RimyOUXa00q23j2i9FiVxh1QASO4gM5O7i0EF9LTglGHDNPftfQB4+W
-         PWthOx86bRCOp5bnbjI/LRh1JvotLZyIuRGCK4cPye/rFaHF1tWtsqY5skqwNoD0fJAb
-         ++vGxpimkGIlQR1h5lJleNKDY57LhWENfN/x5knfyxJc42DwvlgNhcqyEL8sz7RnyuAq
-         2Hwr5Dnnh9viyJ7BHSS5vK+EbDEl1rffNIQ7eQVvO3Ig2PVS2tDCqN2KLGEi0H0RmNUK
-         NFbg==
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=AL6A9wplAFszVS+FgKNbfwFSi81YuBwQ3MmDG4AprHk=;
+        b=2Mwjp+knUWz0vmEPQpd522bi6aUxSaQpXED8y/9RdDlEa0vKj+lN+z9kgGJxYW+af7
+         tpXB/QgKsUJj9q3VbFfTDCM3u5uaZNP1l1rj1DqOLsGpHhpHoMH9j0MwTAH4iDQLZmYx
+         tALuRm3D5nuwOzQS/dHE21b90w0g5Rh1HGipqSJGr62DCcolv9sxicfGY9vuzi3woO5J
+         qGHCQAUGoGGgXKx7trFbYJBu9ZBGdTDRwQnF8mZ9T1dZwSKBGqPfRVZerIV2gitOU2Ss
+         2s89bW+rkaBCGvfmFIfUSjE5H27t5ITzd25luG2b3t4upvioqtAWt2v/OV3XwUOq1amY
+         1tIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=pCdpkWBhJD7USuv0YPS+EyZBn4tPeR14FbeRag9RjGs=;
-        b=Ui8skPv/h7zBBG/Uj4ybzohX7brL6qsJ3VIyAHwXUGSTJ9ojDOg8UHox5u/bHDXiCW
-         TsYnxZdy8DNwzP8n9qtWK5SEAO1yCQFGYLiAJOvBTdeunv/eiwAnTl1sCpZ7sb2hYl5Q
-         h09SfuHOVqWLBS6hzV2HpDekefj6hfxmfkBFwLPWRFDCFBPMZFx5spsBQq4K1ord8c0a
-         Qo5OZI3lYo5jP8ysToKExGID0fR4599CtZ/5+iGWgbC0xPGRh2zg7GrM05zwSbRjvvgK
-         nZi6F1kwvRsZiU0L/pME5qTdsuWPJ6C7Vfb8V2OlYomCX75SD1NDvY4d5HonBPUTWzr4
-         ONUw==
-X-Gm-Message-State: APjAAAWFSEwWwmwcXdKQnZsgfd5nGspOI0MjdCMhkAYKWJI5isfzJH5+
-        4JNXWXs4GujeFQwbXvWtRIQcZA==
-X-Google-Smtp-Source: APXvYqx0KrNAOO/HmIOjqeX7OBM70JOxrZrttVKJ/w5P2L5SbJktbUyQRD0+nork7+cZNT2GAelQog==
-X-Received: by 2002:aa7:d445:: with SMTP id q5mr15134352edr.294.1551707292421;
-        Mon, 04 Mar 2019 05:48:12 -0800 (PST)
-Received: from [192.168.1.119] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id e27sm2111322eda.52.2019.03.04.05.48.11
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=AL6A9wplAFszVS+FgKNbfwFSi81YuBwQ3MmDG4AprHk=;
+        b=IBxx0sZQG17s1US6/VYEicU476yel186H9zj/aP5/DwsTKoXFsZr/AoSThvdEjfi/k
+         t21+cwoofgQy7zNtK3GqQ1jNN8x50x1ZZXMpAtD15uf5GXbrFXyGSV1KJHwSIiHcRxah
+         DVF6Fk19PN2CEFyfYGjZl+dZQDf91fLvIcb4REgFubAjS29a/74ejyys2Q3SPqqryYq+
+         f+e31qzgSB/NGjGQoeV+xhMYPED1I5s6FJxqkEttyp7ZqvkauRtTLd75hhBZtc7qAxgn
+         9mRmU7VTRQrepQcnyiz3ZPXoAY/qzygQ+wLiiA1Yf/HiUam80Rjh09kxR7LrLoaJ+X3F
+         e2rg==
+X-Gm-Message-State: APjAAAVShInm09CXZUBtTormIKMrCWnKScr/+UZCO6qUtYGKoke6S7Xd
+        dVVl9ryF7SbiUhAjAZ7ZIHwW8g==
+X-Google-Smtp-Source: APXvYqzsCduCztU+WPlLeix5XUyoRmheJ4tFbzf2Y906Tx6LfrZB3R64Au2mLli0BgsYgyQoKg2CKg==
+X-Received: by 2002:a05:6402:1490:: with SMTP id e16mr15287191edv.201.1551708392693;
+        Mon, 04 Mar 2019 06:06:32 -0800 (PST)
+Received: from [192.168.1.134] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
+        by smtp.gmail.com with ESMTPSA id q24sm2107296edg.20.2019.03.04.06.06.32
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 04 Mar 2019 05:48:11 -0800 (PST)
+        Mon, 04 Mar 2019 06:06:32 -0800 (PST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH 13/13] lightnvm: Inherit mdts from the parent nvme device
 From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <8B6E8B6B-1C23-4D17-8822-0A9F3E2E8932@javigon.com>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_5AA853C6-74E7-4ABA-BAC6-C7EB4FFD7B1A";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 12/13] lightnvm: pblk: close opened chunks
-Date:   Mon, 4 Mar 2019 14:48:11 +0100
-In-Reply-To: <0ee7b3e6-f471-1996-0c89-457c96f950c5@lightnvm.io>
-Cc:     Hans Holmberg <hans.ml.holmberg@owltronix.com>,
-        "Konopko, Igor J" <igor.j.konopko@intel.com>,
+X-Mailer: iPhone Mail (16D57)
+In-Reply-To: <3d053281-ef87-66e3-3433-de4c18884326@intel.com>
+Date:   Mon, 4 Mar 2019 15:06:31 +0100
+Cc:     Hans Holmberg <hans@owltronix.com>,
+        =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
         linux-block@vger.kernel.org,
+        Simon Andreas Frimann Lund <slund@cnexlabs.com>,
         Klaus Birkelund Jensen <klaus.jensen@cnexlabs.com>
-To:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>
-References: <20190227171442.11853-1-igor.j.konopko@intel.com>
- <20190227171442.11853-13-igor.j.konopko@intel.com>
- <C2286529-B0FE-4DFE-8CD1-5BB6591549A4@javigon.com>
- <CANr-nt1kkQ1H4TgF9-3yR-_S+-HkNwEnGu_t5Z607jAV30cpqw@mail.gmail.com>
- <0ee7b3e6-f471-1996-0c89-457c96f950c5@lightnvm.io>
-X-Mailer: Apple Mail (2.3445.102.3)
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4702ADD0-692C-4F46-817E-508A0403D98F@javigon.com>
+References: <20190227171442.11853-1-igor.j.konopko@intel.com> <20190227171442.11853-14-igor.j.konopko@intel.com> <2776B2AC-19D2-4E38-94AD-E158E3E60A37@javigon.com> <CANr-nt2dNY8EgeJ7qAutfVEuyose_8_j9w6WkO-mER-Ao6oXOg@mail.gmail.com> <54D42A19-96EE-4370-B957-A474BB912530@javigon.com> <CANr-nt1zQWf8XkQaesyFO+wTLULdEAvATvYjYFiDXbc_vifKGQ@mail.gmail.com> <3d053281-ef87-66e3-3433-de4c18884326@intel.com>
+To:     Igor Konopko <igor.j.konopko@intel.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---Apple-Mail=_5AA853C6-74E7-4ABA-BAC6-C7EB4FFD7B1A
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
 
-> On 4 Mar 2019, at 14.19, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
+> On 4 Mar 2019, at 14.04, Igor Konopko <igor.j.konopko@intel.com> wrote:
 >=20
->> + Klaus whom I discussed this with.
->> Yeah, i think that "early reset" is a nice feature. It would be nice
->> to extend the OCSSD spec with a new capabilities bit indicating if
->> this is indeed supported or not.
->> Matias: what do you think?
 >=20
-> I don't mind as long as it is gated by a feature bit. An ECN can be
-> made to fix that up and then software can be updated to read that bit
-> for what to do.
+>=20
+>> On 04.03.2019 13:22, Hans Holmberg wrote:
+>>> On Mon, Mar 4, 2019 at 12:44 PM Javier Gonz=C3=A1lez <javier@javigon.com=
+> wrote:
+>>>=20
+>>>=20
+>>>=20
+>>>> On 4 Mar 2019, at 12.30, Hans Holmberg <hans@owltronix.com> wrote:
+>>>>=20
+>>>> On Mon, Mar 4, 2019 at 10:05 AM Javier Gonz=C3=A1lez <javier@javigon.co=
+m> wrote:
+>>>>>> On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.com> wro=
+te:
+>>>>>>=20
+>>>>>> Current lightnvm and pblk implementation does not care
+>>>>>> about NVMe max data transfer size, which can be smaller
+>>>>>> than 64*K=3D256K. This patch fixes issues related to that.
+>>>>=20
+>>>> Could you describe *what* issues you are fixing?
+>=20
+> I'm fixing the issue related to controllers which NVMe max data transfer s=
+ize is lower that 256K (for example 128K, which happens for existing NVMe co=
+ntrollers and NVMe spec compliant). Such a controllers are not able to handl=
+e command which contains 64 PPAs, since the the size of DMAed buffer will be=
+ above the capabilities of such a controller.
+>=20
 
-Works for me.
+OK. Then let=E2=80=99s try to get support for this ASAP. If the rest agree o=
+n a feature bit then it should be straightforward. If not, let=E2=80=99s at l=
+east add a warning if MDTS < 64 so that people are able to identify where th=
+e missing performance went when updating the kernel if they are not using MD=
+TS on their OCSSD implementations.=20
 
 Javier
-
---Apple-Mail=_5AA853C6-74E7-4ABA-BAC6-C7EB4FFD7B1A
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlx9LJsACgkQPEYBfS0l
-eOB4hQ/9HIGsxuajWla1JcEXRCUuEjadlEIPYamGfOY4ye+MqEiWhprDrHbPKjTp
-nZMlsLqcT3QcSUZ75sMkc3eYpxiY7Ki84TLok/2XZJBB8cUz/sAEJcgIKqDPnlfo
-f3rqFFo/OsxBzaW9WR+folL25Bi89bYV37d4PcmatoTDwvnO11otIJJzhTjV81D1
-Tmwu5Q2x/85HZieaZJh4I1bo1YVoUOOn9y0vUTDHIWX6J3HSaHeTOACaRgZ9av4N
-d9U8tMV0mUFqPeUSAIIzBFp9xDM8xJNdxI/ffhRPfK7YFAL4GOEuG5UaUeYgW0aw
-jOTJQvZVOsnU2HPs1x+Mv8R154wZv9CKL17KfUaGRVf6SV4mXKMxVk/NEFVlpzbJ
-WLi66F/SubgdlVIxcmMIGE91/e2jjaBZSFfSsFY5ROl66SFo48bdcS9iiagc0XLf
-TEF1LwHY9hXrN42ulRUiH6K2s6DscMP4fgJXdZ/92cJLSTJgY2MUjG4gCxbVcsdK
-gtXdbAiqmshgJ4LgRxgBLQ13E7f/DEi/YsjXxFpUYUkUa+AuSKant1pBSBhpjNhl
-H8DvPSfcQ3eZRKV5sqscofQ0ien6dRQBOqoDyOlXHdX42y78fUx8fc5dpUfNRkBV
-facMYw7Dk2r7P6jNbNc04+iNBqTDTIFf1kLaR1ZL5bFmo+VFhVo=
-=xvwb
------END PGP SIGNATURE-----
-
---Apple-Mail=_5AA853C6-74E7-4ABA-BAC6-C7EB4FFD7B1A--
