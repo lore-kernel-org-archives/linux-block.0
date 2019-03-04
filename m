@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA1A1C43381
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 07:38:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E5D7C43381
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 07:42:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9F29D206B8
-	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 07:38:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B8A920863
+	for <linux-block@archiver.kernel.org>; Mon,  4 Mar 2019 07:42:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="tmuY64oB"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="ci16aR7N"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725974AbfCDHiW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 4 Mar 2019 02:38:22 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:37341 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725938AbfCDHiV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 02:38:21 -0500
-Received: by mail-ed1-f66.google.com with SMTP id m12so3393457edv.4
-        for <linux-block@vger.kernel.org>; Sun, 03 Mar 2019 23:38:20 -0800 (PST)
+        id S1725982AbfCDHmo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 4 Mar 2019 02:42:44 -0500
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:36176 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725975AbfCDHmo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 4 Mar 2019 02:42:44 -0500
+Received: by mail-ed1-f65.google.com with SMTP id g9so3402440eds.3
+        for <linux-block@vger.kernel.org>; Sun, 03 Mar 2019 23:42:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=javigon-com.20150623.gappssmtp.com; s=20150623;
         h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
          :references;
-        bh=kRVQi7wSeU3kDhDvg7bs4h+7GF7Uuyi2TK915YxVu0M=;
-        b=tmuY64oBXmOJWZa5Tofqz3jIA9cB9jTsYr7LF0wKL7WAIAycVNk0sCPWcGc7f/qRtr
-         wkqhjZvnSNnhXR3i4uXEAXmjsC1IMEw/0Qh3mbOEkS9ES4DkdlNU+FRl3lh5/1mv7H6V
-         KX+DTLvYLOaRIRYYrFEwKsz8hUMi8NYg6UJexV1r2ggt4MuKQl1O7vbXF4tNYgiXP69b
-         D3pyEFxyaLLPyCXsOzu191G6jrz1tOwc4IIhDLfPaJAbUzt550r3RgVmOFWOq3QbfbgO
-         Sd2BfLHVJt8dtcqggtOEvN+d8dsON6kysfKUm+4HELfNhDoHUuC7GK0VHg42DkZ8QMua
-         kn6A==
+        bh=pjSD2FZPGkufifazvlxHHQPmVAP8CEDnvdkWfP/tPUw=;
+        b=ci16aR7NW9TAvU1jKeb1DRKNJIFsp2dGJHyXFDzt+TSziBWtgJqtVegs5gqh+aNFWj
+         X2ler91mpOnhpScIhyAJQaexF7guRGJfSNQzi6/Y/nLnkzszG9fYjflkO9LR+/CkCf2z
+         EuSdnddvn8Im3WroPFfEEJg33HNnCUoH2lL7mG9cvX0hPZXJud7mTJ2N2ub5mhMWh7SZ
+         JDJgh2M5q/0Kd/VJWwCK6o76+ipVulpUb4boynLig73OnXf4JxZ2YIa1nSqQlbfTWYy0
+         pvrmReHhTuwGnJP7X9aHlyMLex2LrOVTyuhuMwpJeaEWwXrLL1on06NE1vGAeAjufyqL
+         yAqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:message-id:mime-version:subject:date
          :in-reply-to:cc:to:references;
-        bh=kRVQi7wSeU3kDhDvg7bs4h+7GF7Uuyi2TK915YxVu0M=;
-        b=SSE9GKJ1BM24QlhC0nXDQYe4+877LdMFcDcaMTZF/sHfkwZ83/KEEURmFB+jnMudni
-         9HnREz96yaRb1u0n5nlN2qR48uNYs0jLl9xljcW0wWvWbxkMJMlb/fixHID9/s+3yo7C
-         +a6xU3DA8KYVWtZaNchFNWqM+qbfzEWC9Z6mvB6RIKmeiC2UpSxFJc+gdcV9EUyHVIz7
-         PvffhPQklVhJJTf53rNZ2pZ9c8jbLTXo1m0y4gco1Hcdk7Ba19EXhY/6/lb+ZEgHlWqK
-         nznPQ07f7JBZZWPQ2bRbersWd1Ms/cM18s6UEHP54OhSZxk4lPXfR83EVTkNmUXiHMSf
-         ImDg==
-X-Gm-Message-State: APjAAAXivQsp2mzneCUmPr2SwBGR0byx/FjztovQxpe2nmExx/OsBG4b
-        /0qehKLJBjM/CBYIPiR2q/4MfQ==
-X-Google-Smtp-Source: APXvYqwkl6LdaqFuFuEjd6cR3SZTDixsQ8DnwWLgzjkNnL2Cq1NTAH0txMJXkKCbKIPocgBhD+u8dw==
-X-Received: by 2002:a50:a2a6:: with SMTP id 35mr13771100edm.227.1551685100312;
-        Sun, 03 Mar 2019 23:38:20 -0800 (PST)
+        bh=pjSD2FZPGkufifazvlxHHQPmVAP8CEDnvdkWfP/tPUw=;
+        b=oGESxzlDNcAe7BMa3AJ2/QK56mdaW8A/m0JX2iBTGmUvPxUP5IgWsnHP++NZxytGZZ
+         MN33D29kzgHMsDjqUUzmBEt38VHw1jWns808ZfxxliV1O00ab0Tsm4pBMGcpJz6lOeRo
+         kSDhEYfz3Xu6tbTHWHlLlPyE62HAS2XFzWcj9gNqbu0zOMXLYcWoeUXJEf2E9VaLkuQO
+         wa9YLdNKUXT59dGW5G07N4I4cTTZtd4sdm+mR1OE80bjB/ENHlZMnZNmOv8Chpfh6Uon
+         JhZDozGl164k47g52a9OpKiGGJS3I8iJITwxjCuLcRjjESdyBDLIgkXTgiBE2iTkpM8A
+         Z2jg==
+X-Gm-Message-State: APjAAAWmVYrdY5Sit/R24oABT5Knxc3WixOsksun3JoAF597HyQj9c6P
+        HG5/hIj/+f7ddHvlAz5yDeSRug==
+X-Google-Smtp-Source: APXvYqxMluPQMUQ2Mfv+i2XsNP3yZ2QM6dRTCFiROwV42QHRJJoyXKMKJHthxmN3YyNi66bPA4GMcg==
+X-Received: by 2002:a17:906:90c6:: with SMTP id v6mr11771571ejw.241.1551685362088;
+        Sun, 03 Mar 2019 23:42:42 -0800 (PST)
 Received: from [192.168.1.119] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id b5sm1034027eju.74.2019.03.03.23.38.19
+        by smtp.gmail.com with ESMTPSA id g48sm1854798edg.41.2019.03.03.23.42.41
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 03 Mar 2019 23:38:19 -0800 (PST)
+        Sun, 03 Mar 2019 23:42:41 -0800 (PST)
 From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <2DABC388-6D60-4253-9DD0-5FD2FDEED619@javigon.com>
+Message-Id: <BAC8CFE4-5D1E-4FA0-80DF-9BA655D458D1@javigon.com>
 Content-Type: multipart/signed;
-        boundary="Apple-Mail=_9914778C-342F-46FB-97D1-DD3E44D17150";
+        boundary="Apple-Mail=_EEE28D51-7D8F-4299-99C3-08E3E69F7156";
         protocol="application/pgp-signature";
         micalg=pgp-sha256
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 04/13] lightnvm: pblk: Rollback in gc read
-Date:   Mon, 4 Mar 2019 08:38:18 +0100
-In-Reply-To: <20190227171442.11853-5-igor.j.konopko@intel.com>
+Subject: Re: [PATCH 05/13] lightnvm: pblk: Count all read errors in stats
+Date:   Mon, 4 Mar 2019 08:42:40 +0100
+In-Reply-To: <20190227171442.11853-6-igor.j.konopko@intel.com>
 Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
         linux-block@vger.kernel.org
 To:     "Konopko, Igor J" <igor.j.konopko@intel.com>
 References: <20190227171442.11853-1-igor.j.konopko@intel.com>
- <20190227171442.11853-5-igor.j.konopko@intel.com>
+ <20190227171442.11853-6-igor.j.konopko@intel.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -77,7 +77,7 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---Apple-Mail=_9914778C-342F-46FB-97D1-DD3E44D17150
+--Apple-Mail=_EEE28D51-7D8F-4299-99C3-08E3E69F7156
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;
 	charset=utf-8
@@ -85,42 +85,43 @@ Content-Type: text/plain;
 > On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.com> =
 wrote:
 >=20
-> Currently in case of error returned by pblk_gc_line
-> to pblk_gc_read we leave current line unassigned
-> from all the lists. This patch fixes that issue.
+> Currently when unknown error occurs on read path
+> there is only dmesg information about it, but it
+> is not counted in sysfs statistics. Since this is
+> still an error we should also count it there.
 >=20
 > Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
 > ---
-> drivers/lightnvm/pblk-gc.c | 7 ++++++-
-> 1 file changed, 6 insertions(+), 1 deletion(-)
+> drivers/lightnvm/pblk-core.c | 1 +
+> 1 file changed, 1 insertion(+)
 >=20
-> diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-> index 511ed0d5333c..533da6ea3e15 100644
-> --- a/drivers/lightnvm/pblk-gc.c
-> +++ b/drivers/lightnvm/pblk-gc.c
-> @@ -361,8 +361,13 @@ static int pblk_gc_read(struct pblk *pblk)
->=20
-> 	pblk_gc_kick(pblk);
->=20
-> -	if (pblk_gc_line(pblk, line))
-> +	if (pblk_gc_line(pblk, line)) {
-> 		pblk_err(pblk, "failed to GC line %d\n", line->id);
-> +		/* rollback */
-> +		spin_lock(&gc->r_lock);
-> +		list_add_tail(&line->list, &gc->r_list);
-> +		spin_unlock(&gc->r_lock);
-> +	}
->=20
-> 	return 0;
-> }
+> diff --git a/drivers/lightnvm/pblk-core.c =
+b/drivers/lightnvm/pblk-core.c
+> index eabcbc119681..a98b2255f963 100644
+> --- a/drivers/lightnvm/pblk-core.c
+> +++ b/drivers/lightnvm/pblk-core.c
+> @@ -493,6 +493,7 @@ void pblk_log_read_err(struct pblk *pblk, struct =
+nvm_rq *rqd)
+> 		atomic_long_inc(&pblk->read_failed);
+> 		break;
+> 	default:
+> +		atomic_long_inc(&pblk->read_failed);
+> 		pblk_err(pblk, "unknown read error:%d\n", rqd->error);
+> 	}
+> #ifdef CONFIG_NVM_PBLK_DEBUG
 > --
 > 2.17.1
 
-Looks good to me.
+I left this out intentionally  so that we could correlate the logs from
+the controller and the errors in the read path. Since we do not have an
+standard way to correlate this on SMART yet, let=E2=80=99s add this now =
+(I
+assume that you are using it for something?) and we can separate the
+error stats in the future.
 
 Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
 
---Apple-Mail=_9914778C-342F-46FB-97D1-DD3E44D17150
+--Apple-Mail=_EEE28D51-7D8F-4299-99C3-08E3E69F7156
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
 	filename=signature.asc
@@ -130,19 +131,19 @@ Content-Description: Message signed with OpenPGP
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlx81eoACgkQPEYBfS0l
-eODmJg//ctBoYha3zYnq+neRlvMfpyDGMyNhqLAk2QpzDjqQbq2KuQi7l/gSzZ5d
-ic0eE8OnjA3bBKGlNNOMnTKl7mfv5VaMbB6FJXkMGR84ZBhUUfa0JVPYv6FJmfvi
-B6CodM3O0oleJJBA72kAJnLESoiFnUBNfc6KQM8JAhZrzwUZN67w1hjQPMHvIvGv
-rxNLaJd/hQcpR50/hE/G+V4KdyJlektQ9dKKjLOJOpXGrtvCiNdDK0X56ijpGXJY
-c1V6a4WP8WmGsZCvNPeo5sxay0fYfpessxRB3I2pCaCLZ2qL/Bd+1GegVkDAaAqB
-5cg9paQBlO05Au+Hy8kg81g1HdTOkWiTnaE16Xq5hRZZ0Xy4KPP2V5j3L1fR4q45
-3/A3Ih8TD1JtCNxTMIe39t227737UPnZgbAdWuZweigSZI26Ychfaq/Na5fPl1c9
-7H6RSZSVOHVIBqtlWyu88D3qyI4bzmHKsV/ITx57QxPedjbxDTp5jPrtV8IbhzdZ
-HMrxuKGVwsmzB673sNW1kZN+U9usVFMv0VUHWuC0nIAHYxf1/vRqe+G044cpts5d
-DQfYXshVikZjfXfVrayr003e1o7AeNfFV1TkijBKx4GCcm6DkFJ48G41dhL/lyeW
-aZhftv5A04z0mCgtxlCRabw0yBS6mO8g55MOQKkGf1hH9cXillo=
-=LW6A
+iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlx81vAACgkQPEYBfS0l
+eOBdcw//SrRRy2vpZLhK+40kzV0rT3lfLNCW5ljvBK/oMPAjrl00N5dTSquGEjB4
+/MMSkEnGnddFZpHCBzSKqEMhJkVmDJGognea/dM+ZvRJotT2QdK4Zmv0jWhd1e2Z
+dzgRf0xMwmIRpbfZmSl9eGaCoYbTUZeqTCFcQRFeNngO585dt3APPAodorKZzl1P
+6rzzmtzM8TpyTGU+m0haB5JaiylFq3y8LEn3guko9JbIt65jCXS373Pa7sEVslFJ
+9aq/itxDZrYwhVJkEJPmIaD/rtyZRSuHIdYSkDteDTeXkO9n/ISHCT1E7aT09Z9V
+/JYRTe8mcjBUdxM7VrvAHpqdSjxLK9aJ5div8a7/qHqX5KzheaR743w8jKE6Z+Fy
+jdwPDe2vsh3M8ePYWuFmjIyQsQigsHzEwIS2bqZiNt4NiIEDKBY1z9YRZi5Kq2Xt
+RpQWauZvzuZvtCjWpr9nRbnGLKAo9d+K58CqjHe1DtoCfMGKWykr5977IbZ2MOu0
+uy6Uey4uXlhkZFJ4TS2w6AwEYGSS3gCSl2vd6lXUoqOp/nn/IOdl1946gjcBLoRH
+0h1pNIaI0YkquuNvS/qs9bpFnm6grv02kMQgn2Bmgiep00bLHS8IM1SOgWlilJkv
+Mujm7XbCQ0ewTAC/zEkW6aLsEB6lbIPBWllW5RRooPTjYxd/OAw=
+=n7cP
 -----END PGP SIGNATURE-----
 
---Apple-Mail=_9914778C-342F-46FB-97D1-DD3E44D17150--
+--Apple-Mail=_EEE28D51-7D8F-4299-99C3-08E3E69F7156--
