@@ -2,155 +2,117 @@ Return-Path: <SRS0=rLai=RI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB52C43381
-	for <linux-block@archiver.kernel.org>; Tue,  5 Mar 2019 14:35:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1242FC43381
+	for <linux-block@archiver.kernel.org>; Tue,  5 Mar 2019 15:56:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E5DE82087C
-	for <linux-block@archiver.kernel.org>; Tue,  5 Mar 2019 14:35:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="Nz3CPcq1"
+	by mail.kernel.org (Postfix) with ESMTP id D725320657
+	for <linux-block@archiver.kernel.org>; Tue,  5 Mar 2019 15:56:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1551801401;
+	bh=iHVExEbsdI0GDCHdo1Pm4tsZAQgiTHubqlSUbu1Bl4w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=sSln5BQAsdR9CMZsIdPhobQEpFHATCFQidDIBrG7t+jV1OHjwhYNRwF+l6Lmg1C1F
+	 /qalb1W6pbkNPquuPEYb+uVS85nfH53L4A/qmuCMb1hgWJNQ4xSzPE6Q2tcQlpBXCr
+	 GOf1+uj22ZqELQ+oeQPYw8P+yL0qBi57iN2+2+a4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727443AbfCEOfA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Mar 2019 09:35:00 -0500
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:38793 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727433AbfCEOfA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Mar 2019 09:35:00 -0500
-Received: by mail-ed1-f66.google.com with SMTP id h58so7406113edb.5
-        for <linux-block@vger.kernel.org>; Tue, 05 Mar 2019 06:34:59 -0800 (PST)
+        id S1727827AbfCEP4f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Mar 2019 10:56:35 -0500
+Received: from mail-yw1-f67.google.com ([209.85.161.67]:43286 "EHLO
+        mail-yw1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727754AbfCEP4f (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Mar 2019 10:56:35 -0500
+Received: by mail-yw1-f67.google.com with SMTP id u200so7315865ywu.10;
+        Tue, 05 Mar 2019 07:56:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Q1SYQBF6GNDZHBAAuF2BtTKgJrFxoQowHPULG9yqbtY=;
-        b=Nz3CPcq15V53KfccoTsw8WrS3yr7eP0tcY7gYpS2+0L6gnYxzn+2F5COOcAF/oOxBu
-         Aqc/FCk5lLhbMbNHPhmOG0NM8xwz3BkPBGyZ9rSYSXTymrS4dxqVmUjSpSicx9kPMyrd
-         lBZoh/kZJZA2SlTzfY6C2J/d5xhJSwVCOQw5tmpD6DjMcKrapIfZ9+Guuv2sWAjNIzoY
-         C6NnQY4+eWMESaxhSyubeKpXBvc91JpU+PcYNy8FNcurvLIRmUSS3NuiLO2bAJV96v6x
-         VtwD7XwiX8/GKZwCQ80lhE7Ob57ndiYR2J13D6NQO1x1azcDabi6fliDZT2EbCnzTfW4
-         cVlw==
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=WTMGFXEwvv834bUyTqH/FDpKhZyzE74Gv015Xci/W80=;
+        b=gCM3lObLREqor6Te5QIeF/noQouXPJTTJIhg3fABbhNjvK8U4od1/wtuVUjK2ouuB0
+         cIKrr3yzdiuMxfDvFAXplqwoUVJZHron5JR9U4NHXgJYOR+eZ38X4BiY9GKL50rYgDaI
+         SGR9OwbLxUEDjidc9ra8qyYdHOykYF8H31DQMeJMhDyFMnMT/eFxYZYeW4/ScfWkLhRy
+         jDnScWmM9jJ1H/5foAhWFWpkzc8NtGJgk4G98tXfiVFSeaS3fsJJPdNwc0zYTen10JFX
+         oW3uCgzeZSSJpagaMW/7lG/g1loAormNguDSkYBY+b7MnT3wRSRNkutdqn4dtViQGfoC
+         9Hvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Q1SYQBF6GNDZHBAAuF2BtTKgJrFxoQowHPULG9yqbtY=;
-        b=HrwN6gr/MchvpbKG6x6CYH5TvaNlORxtpk44j6c0YHRPSwpeGnAluJmq0Hm3+bVUeK
-         SkPzg7vC0LhxQ8ZRHvFEHYy0iFP6WmmRmTSm61md/1MQjtRJbNe1h9CJ8h8hFq/PjfMj
-         m7Cft8VfI60MYdctjb4c3SI/exW/qXhC5UETAcjCoYo/S4lASBNFkYB+Lbx7Y/xA2/Cn
-         A1/H1DZyQPgrEH0AdsgYEHaTrW0ciBvSTxFDvkisV8uUxeUhZBcdWk1U08EdLj1OBkr/
-         pVlyCet3nZV6fkpUUgn8czc8h0IBhDNRMso5hnZc5LBxoiy4ojd66t995b3wKsM5/4CG
-         YEVQ==
-X-Gm-Message-State: APjAAAW6e4IBk6w76y5QVk5/13BsneQ2rQYedcDl/K7KJ0oEQbzHQas6
-        idaIsCDoSYbo6Ig92IHjtAFJMcCNTg4=
-X-Google-Smtp-Source: APXvYqw0dl8HSJzIUcq3opokYGmp1ThtmSd5/XrSbfKVisibEg/5/NWVzHM24GNBbmZyOSWy9OslLQ==
-X-Received: by 2002:a17:906:5583:: with SMTP id y3mr499586ejp.42.1551796498229;
-        Tue, 05 Mar 2019 06:34:58 -0800 (PST)
-Received: from [192.168.0.36] (2-111-91-225-cable.dk.customer.tdc.net. [2.111.91.225])
-        by smtp.googlemail.com with ESMTPSA id e14sm3172684edd.9.2019.03.05.06.34.56
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=WTMGFXEwvv834bUyTqH/FDpKhZyzE74Gv015Xci/W80=;
+        b=KSRPqZ9OKD0C+SYjJZCHB+MA4hKCnzzpizOTrUOGeUYL+HK5yajB5agHYJtazkmP9E
+         SNIunRZWOCt1G4NZX9HFNQzRKt/p38as4jk1H+YY/Fl95CDrgx+DeLECo2ScDB6QjFgx
+         HgBXuxs6vCmpZqd4x7HxICDCD9oxPIW4SB3v6JVDCqwL3ZUvTjCewhRI/R4oEUsFJbhQ
+         1hVL+OSEOcwC6AKSQ39BRGkDqfomRZ56oc9jDuDMn9kfG+q6R8+y/IWIzYDtwK2JtTrk
+         o+XAHf0O6fQW2vcJ/Qb2b20oQkFg3mWQsOJmYOAL1yEFdSdARwcboriTRgpNpGGuutFR
+         +hVw==
+X-Gm-Message-State: APjAAAXZ99iwIoynbKvOsTNuDHIjRXqVaJr7JLA9APA8stVFFzx5ntPQ
+        BgjK4NhInptkLUSnKXfNX/ZLNe/e
+X-Google-Smtp-Source: APXvYqy1YtNR0Rg17eysMQjQusFj2gyFemvar1vhni7du34/bwUqUz+Kqb61kXxZaxHL3YVBDgtAzg==
+X-Received: by 2002:a25:e86:: with SMTP id 128mr2755319ybo.10.1551801393613;
+        Tue, 05 Mar 2019 07:56:33 -0800 (PST)
+Received: from localhost ([2620:10d:c091:200::1676])
+        by smtp.gmail.com with ESMTPSA id h8sm3598373ywa.42.2019.03.05.07.56.32
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 05 Mar 2019 06:34:57 -0800 (PST)
-Subject: Re: [PATCH v2 8/8] lightnvm: Inherit mdts from the parent nvme device
-To:     Igor Konopko <igor.j.konopko@intel.com>, javier@javigon.com,
-        hans.holmberg@cnexlabs.com
-Cc:     linux-block@vger.kernel.org
-References: <20190305135120.29284-1-igor.j.konopko@intel.com>
- <20190305135120.29284-9-igor.j.konopko@intel.com>
-From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <fbe81dc8-fcf4-57ce-5443-11b44f3478bf@lightnvm.io>
-Date:   Tue, 5 Mar 2019 15:34:56 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Tue, 05 Mar 2019 07:56:32 -0800 (PST)
+Date:   Tue, 5 Mar 2019 07:56:31 -0800
+From:   Tejun Heo <tj@kernel.org>
+To:     Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, Li Zefan <lizefan@huawei.com>,
+        Johannes Weiner <hannes@cmpxchg.org>, cgroups@vger.kernel.org
+Subject: Re: [PATCH] blk-throttle: verify format of bandwidth limit and
+ detect overflows
+Message-ID: <20190305155631.GC50184@devbig004.ftw2.facebook.com>
+References: <155125474480.292717.11530762471075713387.stgit@buzz>
 MIME-Version: 1.0
-In-Reply-To: <20190305135120.29284-9-igor.j.konopko@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <155125474480.292717.11530762471075713387.stgit@buzz>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/5/19 2:51 PM, Igor Konopko wrote:
-> Current lightnvm and pblk implementation does not care about NVMe max
-> data transfer size, which can be smaller than 64*K=256K. There are
-> existing NVMe controllers which NVMe max data transfer size is lower
-> that 256K (for example 128K, which happens for existing NVMe
-> controllers which are NVMe spec compliant). Such a controllers are not
-> able to handle command which contains 64 PPAs, since the the size of
-> DMAed buffer will be above the capabilities of such a controller.
+Hello, Konstantin.
+
+On Wed, Feb 27, 2019 at 11:05:44AM +0300, Konstantin Khlebnikov wrote:
+> Unlike to memory cgroup blkio throttler does not support value suffixes.
 > 
-> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-> Reviewed-by: Javier González <javier@javigon.com>
-> ---
->   drivers/lightnvm/core.c      | 9 +++++++--
->   drivers/nvme/host/lightnvm.c | 1 +
->   include/linux/lightnvm.h     | 1 +
->   3 files changed, 9 insertions(+), 2 deletions(-)
+> It silently ignores everything after last digit. For example this command
+> will set rate limit 1 byte per second rather than 1 megabyte per second:
 > 
-> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-> index 5f82036..c01f83b 100644
-> --- a/drivers/lightnvm/core.c
-> +++ b/drivers/lightnvm/core.c
-> @@ -325,6 +325,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
->   	struct nvm_target *t;
->   	struct nvm_tgt_dev *tgt_dev;
->   	void *targetdata;
-> +	unsigned int mdts;
->   	int ret;
->   
->   	switch (create->conf.type) {
-> @@ -412,8 +413,12 @@ static int nvm_create_tgt(struct nvm_dev *dev, struct nvm_ioctl_create *create)
->   	tdisk->private_data = targetdata;
->   	tqueue->queuedata = targetdata;
->   
-> -	blk_queue_max_hw_sectors(tqueue,
-> -			(dev->geo.csecs >> 9) * NVM_MAX_VLBA);
-> +	mdts = (dev->geo.csecs >> 9) * NVM_MAX_VLBA;
-> +	if (dev->geo.mdts) {
-> +		mdts = min_t(u32, dev->geo.mdts,
-> +				(dev->geo.csecs >> 9) * NVM_MAX_VLBA);
-> +	}
-> +	blk_queue_max_hw_sectors(tqueue, mdts);
->   
->   	set_capacity(tdisk, tt->capacity(targetdata));
->   	add_disk(tdisk);
-> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
-> index 949e29e..4f20a10 100644
-> --- a/drivers/nvme/host/lightnvm.c
-> +++ b/drivers/nvme/host/lightnvm.c
-> @@ -977,6 +977,7 @@ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
->   	geo->csecs = 1 << ns->lba_shift;
->   	geo->sos = ns->ms;
->   	geo->ext = ns->ext;
-> +	geo->mdts = ns->ctrl->max_hw_sectors;
->   
->   	dev->q = q;
->   	memcpy(dev->name, disk_name, DISK_NAME_LEN);
-> diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-> index 5d865a5..d3b0270 100644
-> --- a/include/linux/lightnvm.h
-> +++ b/include/linux/lightnvm.h
-> @@ -358,6 +358,7 @@ struct nvm_geo {
->   	u16	csecs;		/* sector size */
->   	u16	sos;		/* out-of-band area size */
->   	bool	ext;		/* metadata in extended data buffer */
-> +	u32	mdts;		/* Max data transfer size*/
->   
->   	/* device write constrains */
->   	u32	ws_min;		/* minimum write size */
+> # echo "7:0 1M" > blkio.throttle.read_bps_device
+> # cat blkio.throttle.read_bps_device
+> 7:0 1
 > 
+> Cgroup2 interface has the same flaw:
+> 
+> # echo "7:0 rbps=1M" > io.max
+> # cat io.max
+> 7:0 rbps=1 wbps=max riops=max wiops=max
+> 
+> Also sscanf does not care much about overflows.
+> 
+> This patch uses modern function kstrtou64 for parsing.
+> It rejects trailing garbage and detects integer overflows.
+> 
+> Also this patch handles iops limit overflows for cgroup-v1 in the same as
+> cgroup-v2: limits >= UINT_MAX becomes unlimited.
+> 
+> Fixes: 2ee867dcfa2e ("blkcg: implement interface for the unified hierarchy")
+> Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
 
-I think I can pick this up. I'll let Javier/Hans rereview.
+So, I'd much rather keep the parsing implementations simple.  Unless
+there's a correctness problem (you mentioned overflowing, how would
+that happen?), the simpler the better.  I don't think the kernel needs
+to be in the business of strict input verification here.
 
-Given Javier's feedback on broken existing mdts implementations. When 
-they are brought to light, we may want to add in a quirk list to update 
-MDTS accordingly. Javier, will this address the issue you have regarding 
-using mdts?
+Thanks.
 
--Matias
-
+-- 
+tejun
