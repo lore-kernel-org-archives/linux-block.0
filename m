@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44F34C43381
-	for <linux-block@archiver.kernel.org>; Tue,  5 Mar 2019 05:25:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD51C43381
+	for <linux-block@archiver.kernel.org>; Tue,  5 Mar 2019 05:25:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1544820684
-	for <linux-block@archiver.kernel.org>; Tue,  5 Mar 2019 05:25:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4EFB720842
+	for <linux-block@archiver.kernel.org>; Tue,  5 Mar 2019 05:25:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="SVYfuIfl"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="RIq+drCx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726045AbfCEFZI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Mar 2019 00:25:08 -0500
+        id S1725835AbfCEFZJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Mar 2019 00:25:09 -0500
 Received: from esa5.hgst.iphmx.com ([216.71.153.144]:29725 "EHLO
         esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725835AbfCEFZI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Mar 2019 00:25:08 -0500
+        with ESMTP id S1727043AbfCEFZJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Mar 2019 00:25:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1551763508; x=1583299508;
+  t=1551763509; x=1583299509;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=MiZZeTqu+1kJzRl7EGsiCbJmhOI0dS6PQbZ9+5e6sPs=;
-  b=SVYfuIflS8fTRbBL57+2TNquD5ozgYowMmkpKCyFs5qzjY1wiIAmFQkI
-   qQYYSOfKn/kG5he6W9qmhGPNKgeSKfzd2RqkFLqYXc4oFgr3UxnxkkHth
-   IAqY04N2mualWvQvLuvQG6Wg0R18+1I3eXtNsZyqIPoYLUzbaogymxnd2
-   lrnPI7qNHFF8/fK089Wibjz6dlNG+VzhRH8sT0CCooFEvF2t/rBOjbD+q
-   Bs7uqXiVeX3kHHCI2mHXM0qABGD+5CMZvUd7SJdfxGieG0p5fpB6mvNYT
-   p0VzdnuCk97ROPr8j8ewToPHPePUWwgmBMLV0pSA1JzbSkEOPsMi49w6s
+  bh=NLJDoKqNeFjkCpr7fNdtTafJP8i4aDf71RpsRFmb0uI=;
+  b=RIq+drCxCzUBbYP+nV/T3PBfhn4Hvdw03xZaOMsnOMfhYeRioKpSs7rm
+   I4yPErRnquLocKgPRi1s+ntJ6EAetttBNKBLcPWdkJKweZCW49uAOrDMZ
+   IH1gCB4DcqJJP0AaBbNIfAoyLIhyd3h5eN51jv/pfN8R20GfT1VZDxM43
+   BaC0vz4rJ4J5sjJX3tZ3lhmMFspE3lCEf60d1ve12Io/98IWtuuKfLeks
+   nEJnSOCYBfCezTvJ6VNkz54+1Crgz9akgVj+vAHxlmBNjqP95JmzGQUlo
+   fF8Ghx1HmVZA4GigMEY7LHF+57cu53npKZpGu7tVOl7po9GSaaX+YHm3Y
    w==;
 X-IronPort-AV: E=Sophos;i="5.58,442,1544457600"; 
-   d="scan'208";a="104040565"
+   d="scan'208";a="104040566"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 05 Mar 2019 13:25:08 +0800
-IronPort-SDR: PyEfEix1mlHtV5Wmi8CjKUTn2xekBr2d8NcaN7NOu66Hf2H9JdRya7SOavhY/il79vvUcXe9u/
- whH4lpY4lGqBOL9uMg9HpDZbSZYIxVArVpgpWMNqAi6Rwrjm2PQ9fOAWetK+KO/ZJC2TDUbrGE
- VhMTDw7VyaQddWTkgXBzLdsiNKKT+xniXdn8PgplPYouvjsVfja2vM6p2dOe3N3pugVakMKdmc
- UVdXMeWM/JitF3W3ZALzh8y/AuMkXh80NpP2kthgZhbJmorC6ozENGQdZY0AWDGp1Bk5UDJqV7
- DCLkloPA06jgX2nnBF6879li
+  by ob1.hgst.iphmx.com with ESMTP; 05 Mar 2019 13:25:09 +0800
+IronPort-SDR: qBqdgGiiAvlQQJOppG8xEP4+nDG9orG9QqdHjpMPY5CZm7+4VSbbxzNNiUAsAXUukobL4JIwvi
+ U3i8YfJMRNYJBPVGSMDRhNrO0H525gxs40LW7cBrVEE6zLOVXRRHjObqcYZRnZjUGCz++yScRG
+ Hckpjaug2SVSttNE4jYptqjbOUyNCqJCA+3XZjLr7FCAQs6OOQXDHZ/dRTlda4qpJOHUPzBJ9H
+ VbFaW/VcJ+Oe8QKf6EX1EGnKaqeFOPSQWC8SHy9Db7qSnTlHPI2L773mcgIC6ihsPPXDvLJRVW
+ w3CFIri/LZhbd6jVc0caChRM
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP; 04 Mar 2019 21:05:11 -0800
-IronPort-SDR: Zom28rTANRXTDxVaTFHhMzyCHsWiv6/JqNVBGCoMhUlJZUsAmqc01FLh1eVTEjXVyqRH7KgBLQ
- XphV9JpgZKduVPxNiryzqLPKIGiL+9MlxrXM0wDb4izz5Qs55GHB8Cj4kmwEm9hB/J3RQENuAM
- MvlDSZV6HxVcox0zBZ1aPZnyvH7alry23SLmxVXDXwk/P5zL3xpXczzpubjoQbnc0Eoadpou2X
- TZGBZNt2ZO+nX/vQ6BLIuLLLO2kLx6JfE9071CyyQ5dd4jkmAngnh3y7Z6H3Yyzey+m563dFLh
- Orw=
+  by uls-op-cesaep02.wdc.com with ESMTP; 04 Mar 2019 21:05:12 -0800
+IronPort-SDR: ER19VKxzZB7My61R0qozBwU3+3t2mxXo7xyXAKeYUtpsdtmQeE+wQWnppT+66KLbH8HC86Dmfo
+ kcVW/RopYNsQavHJZ+ORFP7MO1mmfRH/aFLZW2lgZ5/quEqwmn1ghgBvGJTSRR+AJURkY4HMah
+ 6ftFuvGfN9roKeimCRyyDG5ROXUbvSAArJZb6VMiAb+i8NWwX3TsWO6ht4i1Sa/5kjxXimJ2hh
+ dYjODJn8NdiW2uzdcb9im+9jQupwAL83g4s2CxDLbDfBgPw+DCCmfLdF+NjJF8Kma+bHUCa9tv
+ RdU=
 Received: from shin_dev.dhcp.fujisawa.hgst.com (HELO shin_dev.fujisawa.hgst.com) ([10.149.52.166])
-  by uls-op-cesaip01.wdc.com with ESMTP; 04 Mar 2019 21:25:07 -0800
+  by uls-op-cesaip01.wdc.com with ESMTP; 04 Mar 2019 21:25:08 -0800
 From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
         Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Cc:     Masato Suzuki <masato.suzuki@wdc.com>,
         Omar Sandoval <osandov@osandov.com>,
         Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
-Subject: [PATCH blktests 2/3] common: Add _test_dev_is_partition() helper function
-Date:   Tue,  5 Mar 2019 14:24:46 +0900
-Message-Id: <20190305052447.24291-3-shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests 3/3] zbd: Change sysfs path for partition devices
+Date:   Tue,  5 Mar 2019 14:24:47 +0900
+Message-Id: <20190305052447.24291-4-shinichiro.kawasaki@wdc.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190305052447.24291-1-shinichiro.kawasaki@wdc.com>
 References: <20190305052447.24291-1-shinichiro.kawasaki@wdc.com>
@@ -71,35 +71,49 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-To control test conditions unique for partition devices, introduce the
-_test_dev_is_partition() helper function. Refer TEST_DEV_PART_SYSFS
-variable to tell if the TEST_DEV is a partition device or not.
+zbd/001 and zbd/002 test cases fail for partition devices because of
+sysfs path difference between partition devices and their holder
+devices. The size parameter in sysfs path is different between the
+partition devices and their holder devices. The holder devices have
+nr_zones parameter in sysfs but the partition devices do not.
+
+Utilize _test_dev_is_partition() helper function and TEST_DEV_PART_SYSFS
+variable to refer correct sysfs size parameter for the partition devices.
+Do not refer sysfs nr_zones parameter for the partition devices. Instead,
+calculate the expected nr_zones from device capacity and zone size.
 
 Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Reviewed-by: Omar Sandoval <osandov@fb.com>
 ---
- common/rc | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ tests/zbd/rc | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/common/rc b/common/rc
-index 153a323..0c354a2 100644
---- a/common/rc
-+++ b/common/rc
-@@ -208,6 +208,14 @@ _test_dev_in_hotplug_slot() {
- 	return 0
- }
- 
-+_test_dev_is_partition() {
-+	if [[ -z ${TEST_DEV_PART_SYSFS} ]]; then
-+		SKIP_REASON="${TEST_DEV} is not a partition device"
-+		return 1
+diff --git a/tests/zbd/rc b/tests/zbd/rc
+index c32bf31..88538d0 100644
+--- a/tests/zbd/rc
++++ b/tests/zbd/rc
+@@ -75,7 +75,11 @@ export SV_NR_ZONES=4
+ _get_sysfs_variable() {
+ 	unset SYSFS_VARS
+ 	local _dir=${TEST_DEV_SYSFS}
+-	SYSFS_VARS[$SV_CAPACITY]=$(<"${_dir}"/size)
++	if _test_dev_is_partition; then
++		SYSFS_VARS[$SV_CAPACITY]=$(<"${TEST_DEV_PART_SYSFS}"/size)
++	else
++		SYSFS_VARS[$SV_CAPACITY]=$(<"${_dir}"/size)
 +	fi
-+	return 0
-+}
-+
- # Older versions of xfs_io use pwrite64 and such, so the error messages won't
- # match current versions of xfs_io. See c52086226bc6 ("filter: xfs_io output
- # has dropped "64" from error messages") in xfstests.
+ 	SYSFS_VARS[$SV_CHUNK_SECTORS]=$(<"${_dir}"/queue/chunk_sectors)
+ 	SYSFS_VARS[$SV_PHYS_BLK_SIZE]=$(<"${_dir}"/queue/physical_block_size)
+ 	SYSFS_VARS[$SV_PHYS_BLK_SECTORS]=$((SYSFS_VARS[SV_PHYS_BLK_SIZE] / 512))
+@@ -83,7 +87,7 @@ _get_sysfs_variable() {
+ 	# If the nr_zones sysfs attribute exists, get its value. Otherwise,
+ 	# calculate its value based on the total capacity and zone size, taking
+ 	# into account that the last zone can be smaller than other zones.
+-	if [[ -e ${TEST_DEV_SYSFS}/queue/nr_zones ]]; then
++	if [[ -e "${_dir}"/queue/nr_zones ]] && ! _test_dev_is_partition; then
+ 		SYSFS_VARS[$SV_NR_ZONES]=$(<"${_dir}"/queue/nr_zones)
+ 	else
+ 		SYSFS_VARS[$SV_NR_ZONES]=$(( (SYSFS_VARS[SV_CAPACITY] - 1) \
 -- 
 2.20.1
 
