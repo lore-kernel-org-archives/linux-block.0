@@ -2,73 +2,58 @@ Return-Path: <SRS0=rLai=RI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D482C43381
-	for <linux-block@archiver.kernel.org>; Tue,  5 Mar 2019 08:55:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0440EC43381
+	for <linux-block@archiver.kernel.org>; Tue,  5 Mar 2019 11:36:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4232B20675
-	for <linux-block@archiver.kernel.org>; Tue,  5 Mar 2019 08:55:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C80FA20842
+	for <linux-block@archiver.kernel.org>; Tue,  5 Mar 2019 11:36:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="hwpwF6m2"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="fWFVIvgE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727249AbfCEIzV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Mar 2019 03:55:21 -0500
-Received: from mail-ua1-f68.google.com ([209.85.222.68]:37454 "EHLO
-        mail-ua1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725818AbfCEIzV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Mar 2019 03:55:21 -0500
-Received: by mail-ua1-f68.google.com with SMTP id x1so7056249uaj.4
-        for <linux-block@vger.kernel.org>; Tue, 05 Mar 2019 00:55:20 -0800 (PST)
+        id S1727100AbfCELgh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Mar 2019 06:36:37 -0500
+Received: from mail-oi1-f173.google.com ([209.85.167.173]:46251 "EHLO
+        mail-oi1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727611AbfCELgg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Mar 2019 06:36:36 -0500
+Received: by mail-oi1-f173.google.com with SMTP id j10so6546106oij.13
+        for <linux-block@vger.kernel.org>; Tue, 05 Mar 2019 03:36:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=qwsGrZ198nJcjXxVqn8ULzJwg+x7G3u7CziyVd+phw8=;
-        b=hwpwF6m27ZnhTh9EZgQLWEkD3Ie2SShIVS6JDVosv8kw1xfVlYTite1VRSQwvws6Qg
-         UCKVGdX0hbJt5tD92OALxizmR9zdSM8fIKz3aPH8S+1xxZP9wowvxQ3bi6qkp3qOB2Yc
-         vtI1j9I/q3HJyzHYxVJVIysXysRAHano7qNI18tPFpL+n61YYmNDzknhXOP0uV9En7TD
-         +MZ6zaRZFtKiWgamTMTX5DUrtEv5aDUycQ5qOpi/EYj02Fh5DMnTq5oggBup5UBGvlGI
-         UsXW1zgrw9sdPZQ1DX9RgBy1tTQPXzefBCafeFg615+IHcgXdUnsTKo5lAlycnQmhfpk
-         LLTg==
+        d=broadcom.com; s=google;
+        h=from:mime-version:thread-index:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=8QK8NVufTNeGGGTLfV2UoyYgP9Mhsrk10ad1VxIZOJA=;
+        b=fWFVIvgEcsGAPCDSdeIOU9vG3JuJbyf9PZGO944wdr5OFbUT98D0rZGTcjrF8JsODG
+         XbexFe40FovUrb1/rgpLrA6O1tTjwqP3i0mcPgjtHDACZ1xsEWsTcfgepMbhageEpg4n
+         DDmg2ttScNy6+FHB6rcZgpzpBa2CJNEkj8asw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=qwsGrZ198nJcjXxVqn8ULzJwg+x7G3u7CziyVd+phw8=;
-        b=tHXwBnhAa0z9AjdnCvYP5oTEvB9IGJQW0enZnmXo1KLHFi0aoavrY2S2SC3c5xvYbM
-         UpVSWclDFgHI7oEnk/TMr8OsnEzO9CTL0ObYPgriX+YTgK5oxFWweAB4U83VkYlpWYOj
-         GDI8I7DYfWnwbT3W8inSsKxBKxhL/HtHynQlYdo7lTg/Pn/sa0SZg1WyXBKzhDbZ/YK9
-         rdSQipUldIkG3WCAFgMV9zmRpAuy61SeO2C2RLG8e802UOXkgyw9L6PxiA/Cs90bq9qI
-         VaR5JqXnUIOZYVKWXoXaT2QLsjwBT8Hqrx5J9uH5PdLUaXIUw3VDdkfZ5S+eIjJPQU5K
-         M0mA==
-X-Gm-Message-State: APjAAAXj0wlAa3tLaP7sXrWQJeqeJ37w5Rgy/IW2q4CcDiRVspp2p45R
-        qA+ruWAVBqmewz1jnnpQyqzwVNl/nRBSR3DkOxJg0A==
-X-Google-Smtp-Source: APXvYqw7RxFgtGgm1h+Bm2YGIHQ/IisrI3bJZBAG3Ld/H1WJVVVTfWM1kJWpaKpqUFd+1SuE3bvSh1JXivi3ALbirCU=
-X-Received: by 2002:ab0:a98:: with SMTP id d24mr634567uak.124.1551776119654;
- Tue, 05 Mar 2019 00:55:19 -0800 (PST)
+        h=x-gm-message-state:from:mime-version:thread-index:date:message-id
+         :subject:to:content-transfer-encoding;
+        bh=8QK8NVufTNeGGGTLfV2UoyYgP9Mhsrk10ad1VxIZOJA=;
+        b=nskR0Dow+9rjogy77Ey2x9Uqt6+1JrMzwmF10uH5yAUJujResi4u2hCK2CpnkLBZTj
+         bgvxOX6n3QkVIbmVtR89eUyrsE6W81QZpZNZWAw3gGxcuWPDt3zM4l67yJC1+oWiuDM/
+         VKXuosPyukcQS+77Ms4uwF7C6Kr3TvzyrecNF09sZpcR0p6wyd2EyodjE2JrOld2Pwb1
+         gwtObN372BWf7aoeVQCdBvyyldFazF+aaFJBv2f6IEKVaMKdK0ip6m7taGkU3o9FoyEy
+         P4j3Y62BLkgMYVWjiLHv7tGGKdsbJ6h4a0zl8iXTX1O2J9ycMEufhCqcNj+xM/NdGMVt
+         r31Q==
+X-Gm-Message-State: APjAAAXgtwTLN8ZV4AnD0JGCppW2ZEW5yyYyFRv/57wXdiI8vc1pcKXu
+        Byskp6D9FxMV/XayzBJxkH1as0qYpLK7No2sLNec4Tsf
+X-Google-Smtp-Source: APXvYqyONviaaLtObp63GsmHs+xF8wZfUNaC3MtOssseul32G947rucWWhDMAnSg03S6nJW1cAt8ocZDQDjZy3q2R4Y=
+X-Received: by 2002:aca:3786:: with SMTP id e128mr1731645oia.120.1551785795266;
+ Tue, 05 Mar 2019 03:36:35 -0800 (PST)
+From:   Muneendra Kumar M <muneendra.kumar@broadcom.com>
 MIME-Version: 1.0
-References: <20190227171442.11853-1-igor.j.konopko@intel.com>
- <20190227171442.11853-7-igor.j.konopko@intel.com> <FA2EA171-4AB9-4D9C-A782-4BD416EC7045@javigon.com>
- <CANr-nt1877shJYYkMMwaC2StbrXaOjP7D0OOW5M1rW7LOXu=QQ@mail.gmail.com>
- <EE08736A-168C-4BED-8445-C0CFEDBB61D4@javigon.com> <CANr-nt30zr_5sMEAK4Uk7VCRJPWr30zjPUVrQPA_H5kBU-nfrQ@mail.gmail.com>
- <0a0fd388-98c0-f640-e031-1cc7d14372bb@intel.com> <387c3a1d-efe7-36c5-6233-f262f27a64a7@lightnvm.io>
- <CANr-nt0HuEnEPhAQC10xEFud4SHqcC662==1njSP8Ag2ue4UKA@mail.gmail.com>
- <0cd6b922-c622-6946-b182-77176967e63b@intel.com> <CANr-nt0xLtFG3+D-qU9kWq3t5RwfYkzw=K4pa+UDqw-ZiaROGw@mail.gmail.com>
- <61b7e62a-d229-95b1-2572-336ab1bd67cb@intel.com>
-In-Reply-To: <61b7e62a-d229-95b1-2572-336ab1bd67cb@intel.com>
-From:   Hans Holmberg <hans@owltronix.com>
-Date:   Tue, 5 Mar 2019 09:55:08 +0100
-Message-ID: <CANr-nt1cWKere6WfDNS-5X6jy81Z36iWZkjtwFNRC01TGxXjPA@mail.gmail.com>
-Subject: Re: [PATCH 06/13] lightnvm: pblk: Ensure that erase is chunk aligned
-To:     Igor Konopko <igor.j.konopko@intel.com>
-Cc:     =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        linux-block@vger.kernel.org
+X-Mailer: Microsoft Outlook 15.0
+Thread-Index: AdTTRts7AwDmUBW9T5qtbC0vW+jJqA==
+Date:   Tue, 5 Mar 2019 17:06:32 +0530
+Message-ID: <27226a7453efa3b147da2ea9f361437b@mail.gmail.com>
+Subject: number of write I/Os processed keeps changing for a same test case
+To:     linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
@@ -76,167 +61,82 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 5, 2019 at 9:51 AM Igor Konopko <igor.j.konopko@intel.com> wrot=
-e:
->
->
->
-> On 05.03.2019 09:40, Hans Holmberg wrote:
-> > On Tue, Mar 5, 2019 at 9:26 AM Igor Konopko <igor.j.konopko@intel.com> =
-wrote:
-> >>
-> >>
-> >>
-> >> On 05.03.2019 09:20, Hans Holmberg wrote:
-> >>> On Mon, Mar 4, 2019 at 2:00 PM Matias Bj=C3=B8rling <mb@lightnvm.io> =
-wrote:
-> >>>>
-> >>>> On 3/4/19 1:44 PM, Igor Konopko wrote:
-> >>>>>
-> >>>>>
-> >>>>> On 04.03.2019 12:43, Hans Holmberg wrote:
-> >>>>>> On Mon, Mar 4, 2019 at 10:11 AM Javier Gonz=C3=A1lez <javier@javig=
-on.com>
-> >>>>>> wrote:
-> >>>>>>>
-> >>>>>>>> On 4 Mar 2019, at 10.05, Hans Holmberg
-> >>>>>>>> <hans.ml.holmberg@owltronix.com> wrote:
-> >>>>>>>>
-> >>>>>>>> I strongly disagree with adding code that would mask implantatio=
-n
-> >>>>>>>> errors.
-> >>>>>>>>
-> >>>>>>>> If we want more internal checks, we could add an if statement th=
-at
-> >>>>>>>> would only be compiled in if CONFIG_NVM_PBLK_DEBUG is enabled.
-> >>>>>>>>
-> >>>>>>>
-> >>>>>>> Not sure who this is for - better not to top post.
-> >>>>>>>
-> >>>>>>> In any case, this is a spec grey zone. I=E2=80=99m ok with cleani=
-ng the bits as
-> >>>>>>> they mean nothing for the reset command. If you feel that strongl=
-y about
-> >>>>>>> this, you can take if with Igor.
-> >>>>>>
-> >>>>>> Pardon the top-post. It was meant for both you and Igor.
-> >>>>>>
-> >>>>>
-> >>>>> OCSSD 2.0 spec for vector chunk reset (chapter 2.2.2) explicitly sa=
-ys
-> >>>>> "The addresses in the LBA list shall be the first logical block add=
-ress
-> >>>>> of each chunk to be reset.". So in my understanding we suppose to c=
-lear
-> >>>>> the sectors bits of the PPA address in order to be spec compliant.
-> >>>>>
-> >>>>
-> >>>> Agree. And since ppa_addr is allocated on the stack, it should be ei=
-ther
-> >>>> memset or the remaining fields should be set to 0. Maybe better to z=
-ero
-> >>>> initialize in declaration?
-> >>>
-> >>> Ah, I thought this was not needed, as ppa is initialized as:
-> >>>
-> >>> ppa =3D pblk->luns[bit].bppa; /* set ch and lun */
-> >>>
-> >>> and luns[bit].bppa is initialized to on a value that originally comes
-> >>> from drivers/lightnvm/core.c:196
-> >>> (and that's explicitly zeroing all 64 bits before setting ch and lun)
-> >>>
-> >>> Let me know if i don't make sense here.
-> >>>
-> >>
-> >> I just noticed the same.
-> >>
-> >> In two places (pblk-core:1095 and pblk-map:205) we are using values
-> >> initialized previously in core.c - so my changes are not needed here.
-> >>
-> >> But still there is one place (pblk-map:163) where we initializing
-> >> erase_ppa based on ppa_list[i], which has PPA sector set in most of th=
-e
-> >> cases, so this zeroing is still needed here.
-> >
-> > Yes, you are right, thanks for pointing it out. Are you ok with just
-> > changing this?
->
-> Yes, that's my plan for v2.
+Hi ,
 
-Great, thanks.
+Iam running the below fio test case and collecting the cat
+/sys/class/block/sda/stat before after the test.
 
-> >
-> >>>>
-> >>>>>>>
-> >>>>>>>>
-> >>>>>>>> On Mon, Mar 4, 2019 at 8:48 AM Javier Gonz=C3=A1lez <javier@javi=
-gon.com>
-> >>>>>>>> wrote:
-> >>>>>>>>>> On 27 Feb 2019, at 18.14, Igor Konopko <igor.j.konopko@intel.c=
-om>
-> >>>>>>>>>> wrote:
-> >>>>>>>>>>
-> >>>>>>>>>> In current pblk implementation of erase command
-> >>>>>>>>>> there is a chance tha sector bits are set to some
-> >>>>>>>>>> random values for erase PPA. This is unexpected
-> >>>>>>>>>> situation, since erase shall be always chunk
-> >>>>>>>>>> aligned. This patch fixes that issue
-> >>>>>>>>>>
-> >>>>>>>>>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-> >>>>>>>>>> ---
-> >>>>>>>>>> drivers/lightnvm/pblk-core.c | 1 +
-> >>>>>>>>>> drivers/lightnvm/pblk-map.c  | 2 ++
-> >>>>>>>>>> 2 files changed, 3 insertions(+)
-> >>>>>>>>>>
-> >>>>>>>>>> diff --git a/drivers/lightnvm/pblk-core.c
-> >>>>>>>>>> b/drivers/lightnvm/pblk-core.c
-> >>>>>>>>>> index a98b2255f963..78b1eea4ab67 100644
-> >>>>>>>>>> --- a/drivers/lightnvm/pblk-core.c
-> >>>>>>>>>> +++ b/drivers/lightnvm/pblk-core.c
-> >>>>>>>>>> @@ -978,6 +978,7 @@ int pblk_line_erase(struct pblk *pblk, str=
-uct
-> >>>>>>>>>> pblk_line *line)
-> >>>>>>>>>>
-> >>>>>>>>>>                 ppa =3D pblk->luns[bit].bppa; /* set ch and lu=
-n */
-> >>>>>>>>>>                 ppa.a.blk =3D line->id;
-> >>>>>>>>>> +             ppa.a.reserved =3D 0;
-> >>>>>>>>>>
-> >>>>>>>>>>                 atomic_dec(&line->left_eblks);
-> >>>>>>>>>>                 WARN_ON(test_and_set_bit(bit, line->erase_bitm=
-ap));
-> >>>>>>>>>> diff --git a/drivers/lightnvm/pblk-map.c
-> >>>>>>>>>> b/drivers/lightnvm/pblk-map.c
-> >>>>>>>>>> index 79df583ea709..aea46b4ec40f 100644
-> >>>>>>>>>> --- a/drivers/lightnvm/pblk-map.c
-> >>>>>>>>>> +++ b/drivers/lightnvm/pblk-map.c
-> >>>>>>>>>> @@ -161,6 +161,7 @@ int pblk_map_erase_rq(struct pblk *pblk,
-> >>>>>>>>>> struct nvm_rq *rqd,
-> >>>>>>>>>>
-> >>>>>>>>>>                         *erase_ppa =3D ppa_list[i];
-> >>>>>>>>>>                         erase_ppa->a.blk =3D e_line->id;
-> >>>>>>>>>> +                     erase_ppa->a.reserved =3D 0;
-> >>>>>>>>>>
-> >>>>>>>>>>                         spin_unlock(&e_line->lock);
-> >>>>>>>>>>
-> >>>>>>>>>> @@ -202,6 +203,7 @@ int pblk_map_erase_rq(struct pblk *pblk,
-> >>>>>>>>>> struct nvm_rq *rqd,
-> >>>>>>>>>>                 atomic_dec(&e_line->left_eblks);
-> >>>>>>>>>>                 *erase_ppa =3D pblk->luns[bit].bppa; /* set ch=
- and lun */
-> >>>>>>>>>>                 erase_ppa->a.blk =3D e_line->id;
-> >>>>>>>>>> +             erase_ppa->a.reserved =3D 0;
-> >>>>>>>>>>         }
-> >>>>>>>>>>
-> >>>>>>>>>>         return 0;
-> >>>>>>>>>> --
-> >>>>>>>>>> 2.17.1
-> >>>>>>>>>
-> >>>>>>>>> I=E2=80=99m fine with adding this, but note that there is actua=
-lly no
-> >>>>>>>>> requirement for the erase to be chunk aligned - the only bits t=
-hat
-> >>>>>>>>> should be looked at are group, PU and chunk.
-> >>>>>>>>>
-> >>>>>>>>> Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
-> >>>>
+And below are the max_sectors_kb  and max_hw_sectors_kb settings for the
+device.
+
+ cat /sys/class/block/sdb/queue/max_hw_sectors_kb
+
+32767
+
+[root@localhost ~]# cat /sys/class/block/sdb/queue/max_sectors_kb
+
+1280
+
+Test Case:
+[root@localhost ~]#
+io --filename=3D/dev/sdb --direct=3D1 --rw=3Dwrite  --norandommap
+--randrepeat=3D0 --ioengine=3Dsync
+ --bs=3D1m  --iodepth=3D1 --numjobs=3D1 --group_reporting --name=3D4ktest -=
+-size=3D50m
+
+ And below is the o/p of the test .
+
+[root@localhost ~]#cat /sys/class/block/sdb/stat
+
+    6439        0  1513128     1618     4645        0  3332736     2697
+0     3356      633        0        0        0        0
+
+[root@localhost ~]#
+io --filename=3D/dev/sdb --direct=3D1 --rw=3Dwrite  --norandommap
+--randrepeat=3D0 --ioengine=3Dsync
+ --bs=3D1m  --iodepth=3D1 --numjobs=3D1 --group_reporting --name=3D4ktest -=
+-size=3D50m
+
+4ktest: (g=3D0): rw=3Dwrite, bs=3D(R) 1024KiB-1024KiB, (W) 1024KiB-1024KiB,=
+ (T)
+1024KiB-1024KiB, ioengine=3Dsync, iodepth=3D1
+
+fio-3.1
+
+=E2=80=A6..
+
+Run status group 0 (all jobs):
+
+  WRITE: bw=3D943MiB/s (989MB/s), 943MiB/s-943MiB/s (989MB/s-989MB/s),
+io=3D50.0MiB (52.4MB), run=3D53-53msec
+
+
+
+Disk stats (read/write):
+
+  sdb: ios=3D0/0, merge=3D0/0, ticks=3D0/0, in_queue=3D0, util=3D0.00%
+
+[root@localhost ~]# cat /sys/class/block/sdb/stat
+
+    6519        0  1517272     1628     4795        0  3435136     2785
+0     3420      633        0        0        0        0
+
+
+
+And when I compare the difference between the number of write I/Os processe=
+d
+between the two stats(4795-4645) it gave me 50 as it has submitted the 50
+requests of 1MB each(since max_sectors_kb is set to 1280).
+
+But when I ran the same test multiple the  number of write I/Os processed
+(collected as above) keeps changing which is more than 50.
+
+Not sure on what basis the requests are getting splitted when I run same
+test case on the same setup.
+
+Any input here will help me to understand more.
+
+Iam running kernel  of 5.0.0-rc+ version.
+
+Regards,
+Muneendra
