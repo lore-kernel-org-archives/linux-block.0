@@ -2,157 +2,171 @@ Return-Path: <SRS0=tltz=RJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 467D8C43381
-	for <linux-block@archiver.kernel.org>; Wed,  6 Mar 2019 14:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F849C43381
+	for <linux-block@archiver.kernel.org>; Wed,  6 Mar 2019 14:31:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0F49120684
-	for <linux-block@archiver.kernel.org>; Wed,  6 Mar 2019 14:29:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="PmxStlFO"
+	by mail.kernel.org (Postfix) with ESMTP id 0843220684
+	for <linux-block@archiver.kernel.org>; Wed,  6 Mar 2019 14:31:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725788AbfCFO3s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Mar 2019 09:29:48 -0500
-Received: from mail-vs1-f67.google.com ([209.85.217.67]:38775 "EHLO
-        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727143AbfCFO3s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Mar 2019 09:29:48 -0500
-Received: by mail-vs1-f67.google.com with SMTP id h132so2312256vsd.5
-        for <linux-block@vger.kernel.org>; Wed, 06 Mar 2019 06:29:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=OVDusR3yfYljr7SU5AGkRm6D+/ALnG2xoyh2wz8IgJY=;
-        b=PmxStlFOA/7Ud4WbfqxDHredOARIBZdS9c3+hr28INZcKCvl5+s/326pUG66igrl5Z
-         Os8zmtPA09wzC9TeCeeMyHtflqakrSTyXP5WDf/qkz4+QkOqdnoRBuYM0OxmWEntEzaQ
-         lZnNKaLmI7tXeqQke95rTpez2Y4zPHh/j+cFtdAf/2DbrKR+Ugx9FcP+1JvcDR4QC4jm
-         yLTqLP6QCHdU6HfKzZGgnUA5xVozK/qq9WLPl2062d7iK3kYtUxcVMz7hxvauygz1xV8
-         xEINtNfzC8ITd1faF0OcrE1owA50ZdBNuOotzqtYQwZkWOI6YX4kdcMMyQ6T5HbRnBd9
-         NsIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=OVDusR3yfYljr7SU5AGkRm6D+/ALnG2xoyh2wz8IgJY=;
-        b=b3VGifQ8pORXOH4hTHGRL5ueh0FF1wJV/u6HlgLVFVEm+zRRuZaDD7Qc5pt9LfUMET
-         bMt8mvMrpgF0PjdYjC30uK+oaSfO6yf0VrhnrJszQ/Sv4l6MG0zNuPAkG5cAZ/vuqnFx
-         gx0GPWrxY3P3qD8C/6fG7AVoXvun2cH4/to6PiOHTINJQBj82xDAdPSdGqckSDQrffgm
-         RyS5BjPrVgmo/JT1CaDMgXdKR8koxEMsKRhkx6fYii0QSOoX8N0VG0J/eABDbanTnCiZ
-         M8RINvltuT3GfdRjZSuTdBb98H6o90uildgUPFY723aNKqVGtDZoesTufPgA5fHvXKNB
-         AbxQ==
-X-Gm-Message-State: APjAAAVLfQ0wDP6rgYXvcXTCy3FBa517z3gIVLXu9hT4vB7ZWhz1mM+a
-        uQVMsk4xNpDXoSGSFcC5yr19w5GVrnKNB7pEYbPc/A==
-X-Google-Smtp-Source: APXvYqxdvxID13NrH/XA5YQW6RtFZ6PJglgEJinNl6INiicO5Lazo7gjxnE29W68vCzRNOwzf8syfVRDq0JxpZJnpW8=
-X-Received: by 2002:a67:f744:: with SMTP id w4mr4133127vso.16.1551882587000;
- Wed, 06 Mar 2019 06:29:47 -0800 (PST)
-MIME-Version: 1.0
-References: <20190305135120.29284-1-igor.j.konopko@intel.com>
- <20190305135120.29284-9-igor.j.konopko@intel.com> <fbe81dc8-fcf4-57ce-5443-11b44f3478bf@lightnvm.io>
- <9EAC5F97-CFEF-4598-A251-8C5C06F0DC96@javigon.com>
-In-Reply-To: <9EAC5F97-CFEF-4598-A251-8C5C06F0DC96@javigon.com>
-From:   Hans Holmberg <hans@owltronix.com>
-Date:   Wed, 6 Mar 2019 15:29:36 +0100
-Message-ID: <CANr-nt0t43K6y44G5VAg+KN2+BQahYoA-yiDT6-Hvgx00QcsFA@mail.gmail.com>
-Subject: Re: [PATCH v2 8/8] lightnvm: Inherit mdts from the parent nvme device
-To:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
-        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        "Konopko, Igor J" <igor.j.konopko@intel.com>
-Cc:     Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        id S1727257AbfCFObI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Mar 2019 09:31:08 -0500
+Received: from mga11.intel.com ([192.55.52.93]:56817 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727215AbfCFObI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 6 Mar 2019 09:31:08 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Mar 2019 06:31:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,448,1544515200"; 
+   d="scan'208";a="324749309"
+Received: from ikonopko-mobl1.ger.corp.intel.com (HELO [10.237.142.133]) ([10.237.142.133])
+  by fmsmga006.fm.intel.com with ESMTP; 06 Mar 2019 06:31:06 -0800
+Subject: Re: [PATCH v2 7/8] lightnvm: pblk: warn about opened chunk on factory
+ init
+To:     Hans Holmberg <hans@owltronix.com>
+Cc:     Matias Bjorling <mb@lightnvm.io>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
         linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <20190305135120.29284-1-igor.j.konopko@intel.com>
+ <20190305135120.29284-8-igor.j.konopko@intel.com>
+ <CANr-nt2M_miemdqpEyGJFNhbRDwVhYJgiToJ_kb4DvEvLqpg2Q@mail.gmail.com>
+From:   Igor Konopko <igor.j.konopko@intel.com>
+Message-ID: <3511f916-364d-4944-3e63-9c2e644ece27@intel.com>
+Date:   Wed, 6 Mar 2019 15:31:05 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.9.1
+MIME-Version: 1.0
+In-Reply-To: <CANr-nt2M_miemdqpEyGJFNhbRDwVhYJgiToJ_kb4DvEvLqpg2Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good to me too,
 
-Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 
-On Wed, Mar 6, 2019 at 8:44 AM Javier Gonz=C3=A1lez <javier@javigon.com> wr=
-ote:
->
-> > On 5 Mar 2019, at 15.34, Matias Bj=C3=B8rling <mb@lightnvm.io> wrote:
-> >
-> > On 3/5/19 2:51 PM, Igor Konopko wrote:
-> >> Current lightnvm and pblk implementation does not care about NVMe max
-> >> data transfer size, which can be smaller than 64*K=3D256K. There are
-> >> existing NVMe controllers which NVMe max data transfer size is lower
-> >> that 256K (for example 128K, which happens for existing NVMe
-> >> controllers which are NVMe spec compliant). Such a controllers are not
-> >> able to handle command which contains 64 PPAs, since the the size of
-> >> DMAed buffer will be above the capabilities of such a controller.
-> >> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-> >> Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
-> >> ---
-> >>  drivers/lightnvm/core.c      | 9 +++++++--
-> >>  drivers/nvme/host/lightnvm.c | 1 +
-> >>  include/linux/lightnvm.h     | 1 +
-> >>  3 files changed, 9 insertions(+), 2 deletions(-)
-> >> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-> >> index 5f82036..c01f83b 100644
-> >> --- a/drivers/lightnvm/core.c
-> >> +++ b/drivers/lightnvm/core.c
-> >> @@ -325,6 +325,7 @@ static int nvm_create_tgt(struct nvm_dev *dev, str=
-uct nvm_ioctl_create *create)
-> >>      struct nvm_target *t;
-> >>      struct nvm_tgt_dev *tgt_dev;
-> >>      void *targetdata;
-> >> +    unsigned int mdts;
-> >>      int ret;
-> >>      switch (create->conf.type) {
-> >> @@ -412,8 +413,12 @@ static int nvm_create_tgt(struct nvm_dev *dev, st=
-ruct nvm_ioctl_create *create)
-> >>      tdisk->private_data =3D targetdata;
-> >>      tqueue->queuedata =3D targetdata;
-> >>  -   blk_queue_max_hw_sectors(tqueue,
-> >> -                    (dev->geo.csecs >> 9) * NVM_MAX_VLBA);
-> >> +    mdts =3D (dev->geo.csecs >> 9) * NVM_MAX_VLBA;
-> >> +    if (dev->geo.mdts) {
-> >> +            mdts =3D min_t(u32, dev->geo.mdts,
-> >> +                            (dev->geo.csecs >> 9) * NVM_MAX_VLBA);
-> >> +    }
-> >> +    blk_queue_max_hw_sectors(tqueue, mdts);
-> >>      set_capacity(tdisk, tt->capacity(targetdata));
-> >>      add_disk(tdisk);
-> >> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm=
-.c
-> >> index 949e29e..4f20a10 100644
-> >> --- a/drivers/nvme/host/lightnvm.c
-> >> +++ b/drivers/nvme/host/lightnvm.c
-> >> @@ -977,6 +977,7 @@ int nvme_nvm_register(struct nvme_ns *ns, char *di=
-sk_name, int node)
-> >>      geo->csecs =3D 1 << ns->lba_shift;
-> >>      geo->sos =3D ns->ms;
-> >>      geo->ext =3D ns->ext;
-> >> +    geo->mdts =3D ns->ctrl->max_hw_sectors;
-> >>      dev->q =3D q;
-> >>      memcpy(dev->name, disk_name, DISK_NAME_LEN);
-> >> diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-> >> index 5d865a5..d3b0270 100644
-> >> --- a/include/linux/lightnvm.h
-> >> +++ b/include/linux/lightnvm.h
-> >> @@ -358,6 +358,7 @@ struct nvm_geo {
-> >>      u16     csecs;          /* sector size */
-> >>      u16     sos;            /* out-of-band area size */
-> >>      bool    ext;            /* metadata in extended data buffer */
-> >> +    u32     mdts;           /* Max data transfer size*/
-> >>      /* device write constrains */
-> >>      u32     ws_min;         /* minimum write size */
-> >
-> > I think I can pick this up. I'll let Javier/Hans rereview.
-> >
-> > Given Javier's feedback on broken existing mdts implementations. When
-> > they are brought to light, we may want to add in a quirk list to
-> > update MDTS accordingly. Javier, will this address the issue you have
-> > regarding using mdts?
->
-> Sounds good. Thanks for considering this.
->
-> Javier
+On 06.03.2019 15:27, Hans Holmberg wrote:
+> On Tue, Mar 5, 2019 at 2:54 PM Igor Konopko <igor.j.konopko@intel.com> wrote:
+>>
+>> When we creating pblk instance with factory flag, there is a
+>> possibility that some chunks are in open state, which does not allow
+>> to issue erase request to them directly, based on OCSSD 2.0 spec.
+>> Still most of the controllers allows for such a transition, but it is
+>> not guaranteed that the particular drive will do so. This patch adds
+>> the proper warning during pblk factory creation to let user know about
+>> number of chunks in such a state, which can potentially be a reason
+>> of erase failures.
+>>
+>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+>> ---
+>>   drivers/lightnvm/pblk-core.c | 14 ++++++++++++++
+>>   drivers/lightnvm/pblk-init.c | 14 +++++++++++---
+>>   drivers/lightnvm/pblk.h      |  1 +
+>>   3 files changed, 26 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+>> index 64280e6..4f16596 100644
+>> --- a/drivers/lightnvm/pblk-core.c
+>> +++ b/drivers/lightnvm/pblk-core.c
+>> @@ -161,6 +161,20 @@ struct nvm_chk_meta *pblk_chunk_get_off(struct pblk *pblk,
+>>          return meta + ch_off + lun_off + chk_off;
+>>   }
+>>
+>> +int pblk_count_opened_chunks(struct pblk *pblk, struct nvm_chk_meta *meta)
+>> +{
+>> +       struct nvm_tgt_dev *dev = pblk->dev;
+>> +       struct nvm_geo *geo = &dev->geo;
+>> +       int i, cnt = 0;
+>> +
+>> +       for (i = 0; i < geo->all_luns; i++) {
+> 
+> Shouldn't this be i < geo->all_chunks ?
+> 
+
+Yes, it should be.
+
+Anyway, Javier proposed to use existing pblk_setup_line_meta_chk() 
+function for counting that, so I'm gonna to rewrite this patch.
+
+> Otherwise the patch looks good.
+> 
+> Thanks,
+> Hans
+> 
+>> +               if (meta[i].state == NVM_CHK_ST_OPEN)
+>> +                       cnt++;
+>> +       }
+>> +
+>> +       return cnt;
+>> +}
+>> +
+>>   void __pblk_map_invalidate(struct pblk *pblk, struct pblk_line *line,
+>>                             u64 paddr)
+>>   {
+>> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+>> index 97b4c6e..f590f62 100644
+>> --- a/drivers/lightnvm/pblk-init.c
+>> +++ b/drivers/lightnvm/pblk-init.c
+>> @@ -1028,12 +1028,12 @@ static int pblk_line_meta_init(struct pblk *pblk)
+>>          return 0;
+>>   }
+>>
+>> -static int pblk_lines_init(struct pblk *pblk)
+>> +static int pblk_lines_init(struct pblk *pblk, bool factory_init)
+>>   {
+>>          struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+>>          struct pblk_line *line;
+>>          void *chunk_meta;
+>> -       int nr_free_chks = 0;
+>> +       int nr_free_chks = 0, nr_opened_chks;
+>>          int i, ret;
+>>
+>>          ret = pblk_line_meta_init(pblk);
+>> @@ -1054,6 +1054,14 @@ static int pblk_lines_init(struct pblk *pblk)
+>>                  goto fail_free_luns;
+>>          }
+>>
+>> +       if (factory_init) {
+>> +               nr_opened_chks = pblk_count_opened_chunks(pblk, chunk_meta);
+>> +               if (nr_opened_chks) {
+>> +                       pblk_warn(pblk, "There are %d opened chunks\n",
+>> +                                 nr_opened_chks);
+>> +               }
+>> +       }
+>> +
+>>          pblk->lines = kcalloc(l_mg->nr_lines, sizeof(struct pblk_line),
+>>                                                                  GFP_KERNEL);
+>>          if (!pblk->lines) {
+>> @@ -1245,7 +1253,7 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+>>                  goto fail;
+>>          }
+>>
+>> -       ret = pblk_lines_init(pblk);
+>> +       ret = pblk_lines_init(pblk, flags & NVM_TARGET_FACTORY);
+>>          if (ret) {
+>>                  pblk_err(pblk, "could not initialize lines\n");
+>>                  goto fail_free_core;
+>> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+>> index 6c82776..c2f07ec 100644
+>> --- a/drivers/lightnvm/pblk.h
+>> +++ b/drivers/lightnvm/pblk.h
+>> @@ -795,6 +795,7 @@ struct nvm_chk_meta *pblk_get_chunk_meta(struct pblk *pblk);
+>>   struct nvm_chk_meta *pblk_chunk_get_off(struct pblk *pblk,
+>>                                                struct nvm_chk_meta *lp,
+>>                                                struct ppa_addr ppa);
+>> +int pblk_count_opened_chunks(struct pblk *pblk, struct nvm_chk_meta *_meta);
+>>   void pblk_log_write_err(struct pblk *pblk, struct nvm_rq *rqd);
+>>   void pblk_log_read_err(struct pblk *pblk, struct nvm_rq *rqd);
+>>   int pblk_submit_io(struct pblk *pblk, struct nvm_rq *rqd);
+>> --
+>> 2.9.5
+>>
