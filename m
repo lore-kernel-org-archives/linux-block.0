@@ -2,80 +2,95 @@ Return-Path: <SRS0=tltz=RJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F20D5C43381
-	for <linux-block@archiver.kernel.org>; Wed,  6 Mar 2019 16:15:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84D6BC43381
+	for <linux-block@archiver.kernel.org>; Wed,  6 Mar 2019 16:43:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CC8F220684
-	for <linux-block@archiver.kernel.org>; Wed,  6 Mar 2019 16:15:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51B7620657
+	for <linux-block@archiver.kernel.org>; Wed,  6 Mar 2019 16:43:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="uNTNdfvM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729546AbfCFQPZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Mar 2019 11:15:25 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:33917 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729401AbfCFQPY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Mar 2019 11:15:24 -0500
-Received: by mail-pg1-f193.google.com with SMTP id i130so8785966pgd.1;
-        Wed, 06 Mar 2019 08:15:24 -0800 (PST)
+        id S1729931AbfCFQnZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Mar 2019 11:43:25 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:36812 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728729AbfCFQnZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Mar 2019 11:43:25 -0500
+Received: by mail-it1-f194.google.com with SMTP id v83so11188580itf.1
+        for <linux-block@vger.kernel.org>; Wed, 06 Mar 2019 08:43:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=MkIzNjBFSlc8acVN7wz53mnZUSmH7dGKq73pNb3vuNU=;
+        b=uNTNdfvM7AXqrwv8ldv00DFqTwcmdXbZUYw1HwDMFR/tJY9ixT5YlJoBKwqd4bDMX4
+         OkegsEQTCnPnNwD/FOLHKjljw9q1bpM+qyzBPpdfAY9AgoOxyoLn25tVKk3Bqo+8fhjy
+         pFFwzGOJzhvq2bxRGR03P5oW65zr6dYr45dxwGf52F/zOPscE1hLxffyocU2w00DVDEz
+         xNr8FhnCI5WV5O72U5m1y2XRhwB7uqEs2Z8VGZFMlXrhF8RqTPocZDeMgRYJIuZeB1zm
+         nTqgV9GomaGgTA7baxn+giD0bdl2WE7MntSmKA7mEjiuWDScrs/7Fk73Jv2Nu61aa/Mq
+         Fbuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=7CpHa6t6to0r574VyJ/7qSNmNIGZZsE1qy5W5MHvdrI=;
-        b=kw3zFhph6UsAmf1DPisr+L1Pe3HLHkeJMb03XRhIz49riBzxKA1rEgo0cVrusIgR20
-         JFuqVI+gngMjZhYt8jdCjlvjRIRj9x2paR9r2G1d/SC3e2LUJAGzyswsHHqVTk4sPgC9
-         AbiU6jBApmTMD8ODnakOUCRog1nuPs7amGMmMQhc/Zt3XqetWjwX0l7CFLblSJQqvKGQ
-         wo+MAdRZ+wAQt41MAFJdsNYvMm1QQG9ehVGtSyaZzHM51ZwrWKiGoK4ALACS0l7J4zTq
-         yHWcL/Vs2awqQENZyU0c0o2o9ibhHuHWprIBxJ3uXT64toV4OsRqFi70WeSpAFHlLIlQ
-         OAow==
-X-Gm-Message-State: APjAAAU36qYVGA/iHHiMGBB82G1wF4hxCcOeUfVWeGUvBfFPE0LxnOxt
-        /9ABkTFV51RUH09N4y48BKI=
-X-Google-Smtp-Source: APXvYqyIu9LlyyQ4FFxnglpH6DDXtIflHLDtG33Q2S1EFzl0fqUtOAB4nAaZ7seyD12LLTCT3sInxw==
-X-Received: by 2002:a65:510c:: with SMTP id f12mr7094491pgq.40.1551888923495;
-        Wed, 06 Mar 2019 08:15:23 -0800 (PST)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id s4sm3408248pfe.16.2019.03.06.08.15.22
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 06 Mar 2019 08:15:22 -0800 (PST)
-Message-ID: <1551888921.9796.2.camel@acm.org>
-Subject: Re: [RFC/PATCH net-next 0/9] net/dim: Support for multiple
- implementations
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Tal Gilboa <talgi@mellanox.com>, linux-rdma@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Cc:     Yamin Friedman <yaminf@mellanox.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Doug Ledford <dledford@redhat.com>,
-        Max Gurtovoy <maxg@mellanox.com>,
-        Idan Burstein <idanb@mellanox.com>,
-        Tariq Toukan <tariqt@mellanox.com>
-Date:   Wed, 06 Mar 2019 08:15:21 -0800
-In-Reply-To: <20190306084832.57753-1-talgi@mellanox.com>
-References: <20190306084832.57753-1-talgi@mellanox.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=MkIzNjBFSlc8acVN7wz53mnZUSmH7dGKq73pNb3vuNU=;
+        b=OdAEuoPkRrJibwn33rutfYvPFprfuC+bhZWcfIQYyaZiJifmS/6TCJtpTSPri0UOAP
+         QmCyRtmkhUrNvEVjeQ3UiDwKESYa3XeZHssmAzJ8NzVgz8RfpgruX3d56wx1m4yRBYCy
+         uiNGVfPGBq/vW0MkXcs77oyU4u/rMD4B8m3dKk9UTZNnpoI35dAWIxgpHIZzDnD2iGxG
+         YUSeiShss7XBE1uYpi3yvUZDh7/2totT15+KnYc48wFR1wt0XOqivJZwrK16pFlZH2sQ
+         7Gr1ZVjLzXenMilDyLtE9OcrwAeGgnfs8Y0USXMiygxRlRWOpUbF63yLKsQH8mKwXF1g
+         7AeA==
+X-Gm-Message-State: APjAAAUU3AXLRzGJVMVSyOFhCF838Zo59850OWHM1phWd3vUxGZBvtj3
+        Ao8Jk8vyYO1yA7VISkbNY+kTokJqpb7mAQ==
+X-Google-Smtp-Source: APXvYqymaXFWMcFSikw2nNkxc3bJDwc6Ox1cau9FKk+ItbADr2nQ1e6T77/42e3yUMPZ5LTGEI8lAg==
+X-Received: by 2002:a24:4198:: with SMTP id b24mr2889040itd.25.1551890604720;
+        Wed, 06 Mar 2019 08:43:24 -0800 (PST)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id u196sm1112361itu.34.2019.03.06.08.43.23
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 06 Mar 2019 08:43:23 -0800 (PST)
+Subject: Re: [PATCH] block: fix segment calculation for passthrough IO
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Omar Sandoval <osandov@fb.com>
+References: <20190303131748.24646-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <e4e52de2-1d32-0b55-eaf0-24c86d9158a4@kernel.dk>
+Date:   Wed, 6 Mar 2019 09:43:22 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
+MIME-Version: 1.0
+In-Reply-To: <20190303131748.24646-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2019-03-06 at 10:48 +-0200, Tal Gilboa wrote:
-+AD4 net+AF8-dim.h lib exposes an implementation of the DIM algorithm for dynamically-tuned interrupt
-+AD4 moderation for networking interfaces.
-+AD4 
-+AD4 We need the same behavior for any block CQ. The main motivation is two benefit from maximized
-+AD4 completion rate and reduced interrupt overhead that DIM may provide.
+On 3/3/19 6:17 AM, Ming Lei wrote:
+> blk_recount_segments() can be called in bio_add_pc_page() for
+> calculating how many segments this bio will has after one page is added
+> to this bio. If the resulted segment number is beyond the queue limit,
+> the added page will be removed.
+> 
+> The try-and-fix policy requires blk_recount_segments(__blk_recalc_rq_segments)
+> to not consider the segment number limit. Unfortunately bvec_split_segs()
+> does check this limit, and causes small segment number returned to
+> bio_add_pc_page(), then page still may be added to the bio even though
+> segment number limit becomes broken.
+> 
+> Fixes this issue by not considering segment number limit when calcualting
+> bio's segment number.
 
-What is a +ACI-block CQ+ACI? How does net+AF8-dim compare to lib/irq+AF8-poll? Which approach
-results in the best performance and lowest latency?
+Applied, thanks Ming.
 
-Thanks,
+-- 
+Jens Axboe
 
-Bart.
