@@ -1,113 +1,157 @@
-Return-Path: <SRS0=rLai=RI=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=tltz=RJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3708C43381
-	for <linux-block@archiver.kernel.org>; Tue,  5 Mar 2019 17:27:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F61C43381
+	for <linux-block@archiver.kernel.org>; Wed,  6 Mar 2019 02:25:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B3B6320848
-	for <linux-block@archiver.kernel.org>; Tue,  5 Mar 2019 17:27:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CB6920675
+	for <linux-block@archiver.kernel.org>; Wed,  6 Mar 2019 02:25:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="tDJLPYS1"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="BEMJh310";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="iw9bf3sK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728183AbfCER1m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Mar 2019 12:27:42 -0500
-Received: from forwardcorp1o.cmail.yandex.net ([37.9.109.47]:43405 "EHLO
-        forwardcorp1o.cmail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728172AbfCER1m (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 5 Mar 2019 12:27:42 -0500
-Received: from mxbackcorp1o.mail.yandex.net (mxbackcorp1o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::301])
-        by forwardcorp1o.cmail.yandex.net (Yandex) with ESMTP id E744721672;
-        Tue,  5 Mar 2019 20:27:38 +0300 (MSK)
-Received: from smtpcorp1o.mail.yandex.net (smtpcorp1o.mail.yandex.net [2a02:6b8:0:1a2d::30])
-        by mxbackcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTP id OU0qeWHHGu-RchOasM2;
-        Tue, 05 Mar 2019 20:27:38 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1551806858; bh=SHMSe0BDUm7rTH2OZfSxE/ZaTpJiliYBzSWNaqaUXTY=;
-        h=In-Reply-To:Message-ID:From:Date:References:To:Subject:Cc;
-        b=tDJLPYS1loEp0aC1r9BJoM6xeYPqeLJOrgmqsG8vRcRtgBk1E0k/nDjfoMJUlgLOq
-         +0LV8oZVsopSRE51WPExwANwgaLbQKLsWD3ThUy8Z8xC/a6kXL3+QQztJXshP7T0L5
-         gVKtaISq7uPC0Dk05k3RUthG1UckTGlmEaPA6ccw=
-Authentication-Results: mxbackcorp1o.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net [2a02:6b8:0:40c:f9d0:8381:2ca:ee7b])
-        by smtpcorp1o.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id gGUl5T8ZmN-Rc2WQFak;
-        Tue, 05 Mar 2019 20:27:38 +0300
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (Client certificate not present)
-Subject: Re: [PATCH] blk-throttle: verify format of bandwidth limit and detect
- overflows
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, Li Zefan <lizefan@huawei.com>,
-        Johannes Weiner <hannes@cmpxchg.org>, cgroups@vger.kernel.org
-References: <155125474480.292717.11530762471075713387.stgit@buzz>
- <20190305155631.GC50184@devbig004.ftw2.facebook.com>
-From:   Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-Message-ID: <8854733a-8724-d4d1-da37-48717b05a42a@yandex-team.ru>
-Date:   Tue, 5 Mar 2019 20:27:38 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        id S1728024AbfCFCZV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Mar 2019 21:25:21 -0500
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:52719 "EHLO
+        esa5.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726347AbfCFCZV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Mar 2019 21:25:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1551839122; x=1583375122;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=Qk7ZrHakRrGvUEZmGOIVAkp1f7v8VFHzv8Nzlk2nMIs=;
+  b=BEMJh310IkUnuTajFZNOFJ5XSBLb0jeA+jFS3MhJ0wK4PCcF1SGzo6Qn
+   ffLA2X33W/gwYLZH2w7s48734QM7dhO0W49blnfpRFSzduDTNrllR5cu7
+   6sf2mCJAjXD7pQzxHkzPCka7QAo2ULLpULoRvxr65Nh7lQYC17kna3IUu
+   1bGEiFcMbqn1IJTk6uTWs5h1C4LSw9rjcbsl2Cl7BJ6DdxbuQ9ID6SdZY
+   hWq5I5Uvb5eG5zzFZbM3jzBtGlyt2XyNWGgasy1ZLU8K6pbghaZeLJqR2
+   9Wp/E8kv1rQka72Qdmk3GkUFIa5R2dia/PWxAfRU2QEAjL0nCrLKUH1qS
+   g==;
+X-IronPort-AV: E=Sophos;i="5.58,446,1544457600"; 
+   d="scan'208";a="104128759"
+Received: from mail-bl2nam02lp2054.outbound.protection.outlook.com (HELO NAM02-BL2-obe.outbound.protection.outlook.com) ([104.47.38.54])
+  by ob1.hgst.iphmx.com with ESMTP; 06 Mar 2019 10:25:21 +0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eM7+2q1Z4jMNjRVDH1kfpmE56hQiuQ6q+yv5DrD5zDY=;
+ b=iw9bf3sKPnSQYdgfTFkekWYYhtllUYKW8X4ogkrSxk5kDDlqtOrbApuE8IFCIynFzO0iw8k8PDcc6uvYXICQTnOibwEwuoGXpg1R+SraePGuGXDEIJNlGgiCNw7yjNNkfA5Iw0aCAjnNOOz3zxXa72T3QutHEgaD9g0vUhQ5qTc=
+Received: from CY1PR04MB2268.namprd04.prod.outlook.com (10.167.9.7) by
+ CY1PR04MB2122.namprd04.prod.outlook.com (10.166.191.156) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1665.16; Wed, 6 Mar 2019 02:25:19 +0000
+Received: from CY1PR04MB2268.namprd04.prod.outlook.com
+ ([fe80::8589:671:2c8:5f7a]) by CY1PR04MB2268.namprd04.prod.outlook.com
+ ([fe80::8589:671:2c8:5f7a%11]) with mapi id 15.20.1665.021; Wed, 6 Mar 2019
+ 02:25:19 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Yi Zhang <yi.zhang@redhat.com>, "osandov@fb.com" <osandov@fb.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH blktests] Fix the failure case which will exit with 0
+Thread-Topic: [PATCH blktests] Fix the failure case which will exit with 0
+Thread-Index: AQHU0wQ4LlPqSjaLL0eRw/TFm5kt8Q==
+Date:   Wed, 6 Mar 2019 02:25:18 +0000
+Message-ID: <CY1PR04MB226890ADCF8445974A514A7AED730@CY1PR04MB2268.namprd04.prod.outlook.com>
+References: <20190305033319.6825-1-yi.zhang@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=shinichiro.kawasaki@wdc.com; 
+x-originating-ip: [199.255.47.11]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 78db3b3a-ae49-463e-43b2-08d6a1dafa2a
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4618075)(2017052603328)(7153060)(7193020);SRVR:CY1PR04MB2122;
+x-ms-traffictypediagnostic: CY1PR04MB2122:
+wdcipoutbound: EOP-TRUE
+x-microsoft-exchange-diagnostics: =?us-ascii?Q?1;CY1PR04MB2122;23:uKtzsIjRpHNfSzuQBRDsGE0C2n3p2F0oC6DN1b15l?=
+ =?us-ascii?Q?3FmiEspQmOKlrI/Wq5ngb442PLGPgKgyipJwB7kobO7XVCIc8bnc2YSbV48n?=
+ =?us-ascii?Q?JqyCG2kF9v4T6983oEp25kv7fCAnXzymc0yKD3hfuKUmkqnRp5hv6QrQvNaD?=
+ =?us-ascii?Q?hMbK1aIqj8lvhap5ldzsm8n0BEYgHWj5xXal2ZntzZOFD74LBfGZ6rd+/gqL?=
+ =?us-ascii?Q?EvuXQlM3r+xR36G7htqOCkNo1JAmD4hykcN0IH+fLllUntteTe6777PcrTRq?=
+ =?us-ascii?Q?OgPFPr6ucutscL0R20r6jkGDNCFatAFHO/eMmX2bKIjSgoUFSywsaiWJIFYF?=
+ =?us-ascii?Q?WhjBlJRPT9nxU+wG/SYBTzcuq2ou/ZRpPkI4bsfjlNdLb1iTBSMu4wQjNO8m?=
+ =?us-ascii?Q?e4hWF3g1kRIvX4p/R5bPqEGFSHc0bG78fsz2aq7m8PpjB4S29GmGuDysOZ4r?=
+ =?us-ascii?Q?7b3S5E07F+ALSEnpxT5D9hxJni9YN5ndbsrHxmcikVMbsyye93Tr5FlLW6+s?=
+ =?us-ascii?Q?NwrqqoItgtg/Nr59d12ppAde8dHZiEgxGhlilhpyaZ03f2ECrHpYO51cFObl?=
+ =?us-ascii?Q?WgdoHZhSQjjrr4b6lhgwoW5wyhcRZHxrQBLMpir72OjAJtzuydq47pNIKjKt?=
+ =?us-ascii?Q?QyhUVp/yu8ZB7YDMRPM4ykG6VlNsOUoCqhaRVM6VoWxsdOzJoVtQst4NBy/G?=
+ =?us-ascii?Q?D1gQOpNWWSAD7vY2gxtNQMN2AZ0vgUc3BqsWs5/V4HRM9ngIA0o7KcCy4/OU?=
+ =?us-ascii?Q?Up7nkgJbJALzCruDnvpi4YF9xOto4q2QsiwoetPVxfjaAw+YjdzzthQ5elv/?=
+ =?us-ascii?Q?TZ20mEaleUOI9TkxdX9DCalyWVU6yRng1ZpmYGtKsadLlbGsDrWXjrt8uuIF?=
+ =?us-ascii?Q?0DmDKk8/oE9OqJgrGmVnzDfdm9KwTuQPBm3gFMiUYywVM/GJ2Dridq6HcZj5?=
+ =?us-ascii?Q?n0QhfhsGLEvJB8p2lKBM1Q6klYqI5knbGPRh9EttweHYNgJFleDRQ6LNURMn?=
+ =?us-ascii?Q?CNZ7OTD2Ce0e3sF1x6itXIN2wftXHJxBYyNYelKedPPyw0lV9zLznFbX/bnv?=
+ =?us-ascii?Q?k066KIiFmyPeNChmU4/Kd5izRf4zy3FJoG/NA3vBSILVccZRsrHfZPDcnqpx?=
+ =?us-ascii?Q?ucT0z+FKtZTalXiEUpb7rFT+PLqxHwKNjiXW1fMxeUpgsVKIhfk00OaiATQN?=
+ =?us-ascii?Q?VlF9PhYiGC1ezZY/kz1ryOkDGE6SUJFE2JwLYwi2HdXuJAJqf0PCYbgxpt+c?=
+ =?us-ascii?Q?OMvCf5x8cJLtaZJ4bE=3D?=
+x-microsoft-antispam-prvs: <CY1PR04MB212216FDD3B2B28445B1E6FFED730@CY1PR04MB2122.namprd04.prod.outlook.com>
+x-forefront-prvs: 0968D37274
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(346002)(366004)(376002)(396003)(39860400002)(199004)(189003)(76176011)(5660300002)(53936002)(4744005)(478600001)(8676002)(86362001)(6116002)(9686003)(3846002)(97736004)(6436002)(25786009)(229853002)(110136005)(55016002)(2906002)(81156014)(2501003)(106356001)(26005)(52536013)(68736007)(14454004)(186003)(446003)(81166006)(6246003)(102836004)(7736002)(6506007)(476003)(44832011)(316002)(305945005)(8936002)(99286004)(486006)(74316002)(53546011)(105586002)(4326008)(7696005)(71200400001)(71190400001)(66066001)(256004)(33656002);DIR:OUT;SFP:1102;SCL:1;SRVR:CY1PR04MB2122;H:CY1PR04MB2268.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: N2m/QtAx33FuunjVjmc7v4j6XgxTjacYSyi4aw39ud+V+wScoHTqzm15WQtwfVtq+r1ZF3GZhJaCl0T59NPqwHYQk9qYa4L7QHT3KKuo0PAoWCq/AveaDQmIBvynE48+9duG4mDCawGERRuXCnORQ/qr6Gq3vKCqrxxlyJhg8lpWqnpXw76McYQRCCBETP9So0hzW4ZnqT2POc7+BtpzBrnoizFWp9xRwEaJOPSqty854DnfnOHIV6Nobtzqcbte6T+WTjDF8d/t1a3zV3goYMO1USZS8Z4LFGHzWj7t/jjLtCsGxbr5+8BDEvyazpbkQEbJV2kws9SaRqZBx2EnXA+pM8tSJauTI6b1YbxaZR8ysyF3c8qkAxUtw9D3zuaJ27K8G4b65rniSGZDbXW7nLFirlnYS35naHsUM6XSbsk=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20190305155631.GC50184@devbig004.ftw2.facebook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-CA
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 78db3b3a-ae49-463e-43b2-08d6a1dafa2a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Mar 2019 02:25:19.0128
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR04MB2122
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 05.03.2019 18:56, Tejun Heo wrote:
-> Hello, Konstantin.
-> 
-> On Wed, Feb 27, 2019 at 11:05:44AM +0300, Konstantin Khlebnikov wrote:
->> Unlike to memory cgroup blkio throttler does not support value suffixes.
->>
->> It silently ignores everything after last digit. For example this command
->> will set rate limit 1 byte per second rather than 1 megabyte per second:
->>
->> # echo "7:0 1M" > blkio.throttle.read_bps_device
->> # cat blkio.throttle.read_bps_device
->> 7:0 1
->>
->> Cgroup2 interface has the same flaw:
->>
->> # echo "7:0 rbps=1M" > io.max
->> # cat io.max
->> 7:0 rbps=1 wbps=max riops=max wiops=max
->>
->> Also sscanf does not care much about overflows.
->>
->> This patch uses modern function kstrtou64 for parsing.
->> It rejects trailing garbage and detects integer overflows.
->>
->> Also this patch handles iops limit overflows for cgroup-v1 in the same as
->> cgroup-v2: limits >= UINT_MAX becomes unlimited.
->>
->> Fixes: 2ee867dcfa2e ("blkcg: implement interface for the unified hierarchy")
->> Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-> 
-> So, I'd much rather keep the parsing implementations simple.  Unless
-> there's a correctness problem (you mentioned overflowing, how would
-> that happen?), the simpler the better.  I don't think the kernel needs
-> to be in the business of strict input verification here.
-
-This is inconsistency between controllers. IO controller should either
-accept size suffixes or reject them. Ignoring garbage is not an option.
-To be honest, I've successfully shot in the foot by bps limit "1M".
-
-Integer overflows are happens when userspace software uses floats for data
-representation and calculations. This way values bigger than 2^32-1 or
-2^64-1 could appear easily in text representation.
-
-Almost all integer knobs in sysctl and sysfs use modern kstrtoXX functions
-with strict validation of format and overflows.
-
-> 
-> Thanks.
-> 
+On 3/5/19 12:33 PM, Yi Zhang wrote:=0A=
+> The return value of a failing test was masked by the zoned test check.=0A=
+> Make sure to return either the original or zoned run failed value.=0A=
+> =0A=
+> Fixes: e840e15 ("config: Introduce RUN_ZONED_TESTS variable and=0A=
+> CAN_BE_ZONED flag")=0A=
+> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>=0A=
+> ---=0A=
+>   check | 3 +++=0A=
+>   1 file changed, 3 insertions(+)=0A=
+> =0A=
+> diff --git a/check b/check=0A=
+> index 819d8f3..c65270e 100755=0A=
+> --- a/check=0A=
+> +++ b/check=0A=
+> @@ -431,11 +431,14 @@ _run_test() {=0A=
+>   =0A=
+>   		RESULTS_DIR=3D"$OUTPUT/nodev"=0A=
+>   		_call_test test=0A=
+> +		local ret=3D$?=0A=
+>   		if (( RUN_ZONED_TESTS && CAN_BE_ZONED )); then=0A=
+>   			RESULTS_DIR=3D"$OUTPUT/nodev_zoned"=0A=
+>   			RUN_FOR_ZONED=3D1=0A=
+>   			_call_test test=0A=
+> +			ret=3D$(( ret || $? ))=0A=
+>   		fi=0A=
+> +		return $ret=0A=
+>   	else=0A=
+>   		if [[ ${#TEST_DEVS[@]} -eq 0 ]] && \=0A=
+>   			declare -fF fallback_device >/dev/null; then=0A=
+=0A=
+Hi Yi Zhang, thank you for the fix for commit e840e15.=0A=
+The change is required, and looks good to me.=0A=
+=0A=
+Reviewed-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>=0A=
+=0A=
+-- =0A=
+Best Regards,=0A=
+Shin'ichiro Kawasaki=0A=
