@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9408DC43381
-	for <linux-block@archiver.kernel.org>; Wed,  6 Mar 2019 08:48:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52993C43381
+	for <linux-block@archiver.kernel.org>; Wed,  6 Mar 2019 08:48:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6E00A206DD
-	for <linux-block@archiver.kernel.org>; Wed,  6 Mar 2019 08:48:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31BB020643
+	for <linux-block@archiver.kernel.org>; Wed,  6 Mar 2019 08:48:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729632AbfCFIsu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Mar 2019 03:48:50 -0500
-Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:47866 "EHLO
+        id S1729626AbfCFIsx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Mar 2019 03:48:53 -0500
+Received: from mail-il-dmz.mellanox.com ([193.47.165.129]:47900 "EHLO
         mellanox.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1729627AbfCFIst (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Mar 2019 03:48:49 -0500
+        with ESMTP id S1729631AbfCFIsx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Mar 2019 03:48:53 -0500
 Received: from Internal Mail-Server by MTLPINE1 (envelope-from talgi@mellanox.com)
-        with ESMTPS (AES256-SHA encrypted); 6 Mar 2019 10:48:42 +0200
+        with ESMTPS (AES256-SHA encrypted); 6 Mar 2019 10:48:46 +0200
 Received: from gen-l-vrt-691.mtl.labs.mlnx (gen-l-vrt-691.mtl.labs.mlnx [10.141.69.1])
-        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x268mg9g017559;
+        by labmailer.mlnx (8.13.8/8.13.8) with ESMTP id x268mgk4017599;
         Wed, 6 Mar 2019 10:48:42 +0200
 Received: from gen-l-vrt-691.mtl.labs.mlnx (localhost [127.0.0.1])
-        by gen-l-vrt-691.mtl.labs.mlnx (8.15.2/8.15.2/Debian-11ubuntu1) with ESMTP id x268mgFX057827;
+        by gen-l-vrt-691.mtl.labs.mlnx (8.15.2/8.15.2/Debian-11ubuntu1) with ESMTP id x268mgBG057829;
         Wed, 6 Mar 2019 10:48:42 +0200
 Received: (from talgi@localhost)
-        by gen-l-vrt-691.mtl.labs.mlnx (8.15.2/8.15.2/Submit) id x268mgd0057826;
+        by gen-l-vrt-691.mtl.labs.mlnx (8.15.2/8.15.2/Submit) id x268mgSf057828;
         Wed, 6 Mar 2019 10:48:42 +0200
 From:   Tal Gilboa <talgi@mellanox.com>
 To:     linux-rdma@vger.kernel.org, linux-nvme@lists.infradead.org,
@@ -42,9 +42,9 @@ Cc:     Yishai Hadas <yishaih@mellanox.com>,
         Idan Burstein <idanb@mellanox.com>,
         Yamin Friedman <yaminf@mellanox.com>,
         Max Gurtovoy <maxg@mellanox.com>
-Subject: [RFC/PATCH net-next 7/9] linux/dim: Add completions count to dim_sample
-Date:   Wed,  6 Mar 2019 10:48:30 +0200
-Message-Id: <20190306084832.57753-8-talgi@mellanox.com>
+Subject: [RFC/PATCH net-next 8/9] linux/dim: Implement blk_dim.h
+Date:   Wed,  6 Mar 2019 10:48:31 +0200
+Message-Id: <20190306084832.57753-9-talgi@mellanox.com>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190306084832.57753-1-talgi@mellanox.com>
 References: <20190306084832.57753-1-talgi@mellanox.com>
@@ -57,178 +57,240 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Yamin Friedman <yaminf@mellanox.com>
 
-Added a measurement of completions per/msec to allow for completion based dim
-algorithms.
+blk_dim implements a different algorithm than net_dim that is optimized for nvmf
+storage applications.
+The algorithm optimizes for number of completions and ratio between completions
+and events.
+It also has a feature for fast reduction of moderation level when the traffic
+changes in such a way as to no longer require high moderation in order to avoid
+long latencies.
+
+blk_dim.h will be called from the ib_core module.
 
 Signed-off-by: Yamin Friedman <yaminf@mellanox.com>
 Signed-off-by: Tal Gilboa <talgi@mellanox.com>
 ---
- drivers/net/ethernet/broadcom/bcmsysport.c        |  2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c         |  1 +
- drivers/net/ethernet/broadcom/genet/bcmgenet.c    |  2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c |  4 ++--
- include/linux/dim.h                               |  7 ++++++-
- lib/dim/dim.c                                     | 11 ++++++++++-
- lib/dim/net_dim.c                                 |  2 +-
- 7 files changed, 22 insertions(+), 7 deletions(-)
+ MAINTAINERS             |   1 +
+ include/linux/blk_dim.h |  56 ++++++++++++++++++++
+ lib/dim/Makefile        |   7 ++-
+ lib/dim/blk_dim.c       | 114 ++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 177 insertions(+), 1 deletion(-)
+ create mode 100644 include/linux/blk_dim.h
+ create mode 100644 lib/dim/blk_dim.c
 
-diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c b/drivers/net/ethernet/broadcom/bcmsysport.c
-index 840b3bf1ae3e..df38c8fd373f 100644
---- a/drivers/net/ethernet/broadcom/bcmsysport.c
-+++ b/drivers/net/ethernet/broadcom/bcmsysport.c
-@@ -1035,7 +1035,7 @@ static int bcm_sysport_poll(struct napi_struct *napi, int budget)
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6ae949be8b83..2860a3316be5 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -5337,6 +5337,7 @@ DYNAMIC INTERRUPT MODERATION
+ M:	Tal Gilboa <talgi@mellanox.com>
+ S:	Maintained
+ F:	include/linux/net_dim.h
++F:	include/linux/blk_dim.h
+ F:	include/linux/dim.h
+ F:	lib/dim/
  
- 	if (priv->dim.use_dim) {
- 		dim_create_sample(priv->dim.event_ctr, priv->dim.packets,
--				  priv->dim.bytes, &dim_sample);
-+				  priv->dim.bytes, 0, &dim_sample);
- 		net_dim(&priv->dim.dim, dim_sample);
- 	}
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 131ab07aad83..516703ac0009 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -2110,6 +2110,7 @@ static int bnxt_poll(struct napi_struct *napi, int budget)
- 		dim_create_sample(cpr->event_ctr,
- 				  cpr->rx_packets,
- 				  cpr->rx_bytes,
-+				  0,
- 				  &dim_sample);
- 		net_dim(&cpr->dim, dim_sample);
- 	}
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index 68d96e333c6d..aca82ef12d28 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -1910,7 +1910,7 @@ static int bcmgenet_rx_poll(struct napi_struct *napi, int budget)
- 
- 	if (ring->dim.use_dim) {
- 		dim_create_sample(ring->dim.event_ctr, ring->dim.packets,
--				  ring->dim.bytes, &dim_sample);
-+				  ring->dim.bytes, 0, &dim_sample);
- 		net_dim(&ring->dim.dim, dim_sample);
- 	}
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-index 432474754d77..76fc57762083 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-@@ -53,7 +53,7 @@ static void mlx5e_handle_tx_dim(struct mlx5e_txqsq *sq)
- 	if (unlikely(!test_bit(MLX5E_SQ_STATE_AM, &sq->state)))
- 		return;
- 
--	dim_create_sample(sq->cq.event_ctr, stats->packets, stats->bytes, &dim_sample);
-+	dim_create_sample(sq->cq.event_ctr, stats->packets, stats->bytes, 0, &dim_sample);
- 	net_dim(&sq->dim, dim_sample);
- }
- 
-@@ -65,7 +65,7 @@ static void mlx5e_handle_rx_dim(struct mlx5e_rq *rq)
- 	if (unlikely(!test_bit(MLX5E_RQ_STATE_AM, &rq->state)))
- 		return;
- 
--	dim_create_sample(rq->cq.event_ctr, stats->packets, stats->bytes, &dim_sample);
-+	dim_create_sample(rq->cq.event_ctr, stats->packets, stats->bytes, 0, &dim_sample);
- 	net_dim(&rq->dim, dim_sample);
- }
- 
-diff --git a/include/linux/dim.h b/include/linux/dim.h
-index 88a74cd83d95..39b621dc8e3e 100644
---- a/include/linux/dim.h
-+++ b/include/linux/dim.h
-@@ -45,6 +45,7 @@
- struct dim_cq_moder {
- 	u16 usec;
- 	u16 pkts;
-+	u16 comps;
- 	u8 cq_period_mode;
- };
- 
-@@ -53,18 +54,22 @@ struct dim_sample {
- 	u32     pkt_ctr;
- 	u32     byte_ctr;
- 	u16     event_ctr;
-+	u32     comp_ctr;
- };
- 
- struct dim_stats {
- 	int ppms; /* packets per msec */
- 	int bpms; /* bytes per msec */
- 	int epms; /* events per msec */
-+	int cpms; /* completions per msec */
-+	int cpe_ratio; /* ratio of completions to events */
- };
- 
- struct dim { /* Dynamic Interrupt Moderation */
- 	u8                                      state;
- 	struct dim_stats                        prev_stats;
- 	struct dim_sample                       start_sample;
-+	struct dim_sample                       measuring_sample;
- 	struct work_struct                      work;
- 	u8                                      profile_ix;
- 	u8                                      mode;
-@@ -113,7 +118,7 @@ void dim_park_on_top(struct dim *dim);
- 
- void dim_park_tired(struct dim *dim);
- 
--void dim_create_sample(u16 event_ctr, u64 packets, u64 bytes, struct dim_sample *s);
-+void dim_create_sample(u16 event_ctr, u64 packets, u64 bytes, u64 comps, struct dim_sample *s);
- 
- void dim_calc_stats(struct dim_sample *start, struct dim_sample *end,
- 		    struct dim_stats *curr_stats);
-diff --git a/lib/dim/dim.c b/lib/dim/dim.c
-index 93e1ddd701b0..b7283f1cb000 100644
---- a/lib/dim/dim.c
-+++ b/lib/dim/dim.c
-@@ -54,12 +54,13 @@ void dim_park_tired(struct dim *dim)
- }
- EXPORT_SYMBOL(dim_park_tired);
- 
--void dim_create_sample(u16 event_ctr, u64 packets, u64 bytes, struct dim_sample *s)
-+void dim_create_sample(u16 event_ctr, u64 packets, u64 bytes, u64 comps, struct dim_sample *s)
- {
- 	s->time	     = ktime_get();
- 	s->pkt_ctr   = packets;
- 	s->byte_ctr  = bytes;
- 	s->event_ctr = event_ctr;
-+	s->comp_ctr  = comps;
- }
- EXPORT_SYMBOL(dim_create_sample);
- 
-@@ -71,6 +72,8 @@ void dim_calc_stats(struct dim_sample *start, struct dim_sample *end,
- 	u32 npkts = BIT_GAP(BITS_PER_TYPE(u32), end->pkt_ctr, start->pkt_ctr);
- 	u32 nbytes = BIT_GAP(BITS_PER_TYPE(u32), end->byte_ctr,
- 			     start->byte_ctr);
-+	u32 ncomps = BIT_GAP(BITS_PER_TYPE(u32), end->comp_ctr,
-+			     start->comp_ctr);
- 
- 	if (!delta_us)
- 		return;
-@@ -79,5 +82,11 @@ void dim_calc_stats(struct dim_sample *start, struct dim_sample *end,
- 	curr_stats->bpms = DIV_ROUND_UP(nbytes * USEC_PER_MSEC, delta_us);
- 	curr_stats->epms = DIV_ROUND_UP(DIM_NEVENTS * USEC_PER_MSEC,
- 					delta_us);
-+	curr_stats->cpms = DIV_ROUND_UP(ncomps * USEC_PER_MSEC, delta_us);
-+	if (curr_stats->epms != 0)
-+		curr_stats->cpe_ratio = (curr_stats->cpms * 100) / curr_stats->epms;
-+	else
-+		curr_stats->cpe_ratio = 0;
+diff --git a/include/linux/blk_dim.h b/include/linux/blk_dim.h
+new file mode 100644
+index 000000000000..a044f62ec8fe
+--- /dev/null
++++ b/include/linux/blk_dim.h
+@@ -0,0 +1,56 @@
++/*
++ * Copyright (c) 2016, Mellanox Technologies. All rights reserved.
++ *
++ * This software is available to you under a choice of one of two
++ * licenses.  You may choose to be licensed under the terms of the GNU
++ * General Public License (GPL) Version 2, available from the file
++ * COPYING in the main directory of this source tree, or the
++ * OpenIB.org BSD license below:
++ *
++ *     Redistribution and use in source and binary forms, with or
++ *     without modification, are permitted provided that the following
++ *     conditions are met:
++ *
++ *      - Redistributions of source code must retain the above
++ *        copyright notice, this list of conditions and the following
++ *        disclaimer.
++ *
++ *      - Redistributions in binary form must reproduce the above
++ *        copyright notice, this list of conditions and the following
++ *        disclaimer in the documentation and/or other materials
++ *        provided with the distribution.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
++ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
++ * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
++ * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
++ * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
++ * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
++ * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++ * SOFTWARE.
++ */
 +
- }
- EXPORT_SYMBOL(dim_calc_stats);
-diff --git a/lib/dim/net_dim.c b/lib/dim/net_dim.c
-index cf95cd20cf02..10605b77bbc5 100644
---- a/lib/dim/net_dim.c
-+++ b/lib/dim/net_dim.c
-@@ -183,7 +183,7 @@ void net_dim(struct dim *dim, struct dim_sample end_sample)
- 		/* fall through */
- 	case DIM_START_MEASURE:
- 		dim_create_sample(end_sample.event_ctr, end_sample.pkt_ctr,
--				  end_sample.byte_ctr, &dim->start_sample);
-+				  end_sample.byte_ctr, 0, &dim->start_sample);
- 		dim->state = DIM_MEASURE_IN_PROGRESS;
- 		break;
- 	case DIM_APPLY_NEW_PROFILE:
++#ifndef BLK_DIM_H
++#define BLK_DIM_H
++
++#include <linux/module.h>
++#include <linux/dim.h>
++
++#define BLK_DIM_PARAMS_NUM_PROFILES 8
++#define BLK_DIM_START_PROFILE 0
++
++static const struct dim_cq_moder
++blk_dim_prof[BLK_DIM_PARAMS_NUM_PROFILES] = {
++	{1,   0, 1,  0},
++	{2,   0, 2,  0},
++	{4,   0, 4,  0},
++	{16,  0, 4,  0},
++	{32,  0, 4,  0},
++	{32,  0, 16, 0},
++	{256, 0, 16, 0},
++	{256, 0, 32, 0},
++};
++
++void blk_dim(struct dim *dim, struct dim_sample end_sample);
++
++#endif /* BLK_DIM_H */
+diff --git a/lib/dim/Makefile b/lib/dim/Makefile
+index 160afe288df0..2b3c57318dbb 100644
+--- a/lib/dim/Makefile
++++ b/lib/dim/Makefile
+@@ -2,8 +2,13 @@
+ # DIM Dynamic Interrupt Moderation library
+ #
+ 
+-obj-$(CONFIG_DIMLIB) = net_dim.o
++obj-$(CONFIG_DIMLIB) += net_dim.o
++obj-$(CONFIG_DIMLIB) += blk_dim.o
+ 
+ net_dim-y = \
+ 	dim.o		\
+ 	net_dim.o
++
++blk_dim-y = \
++	dim.o		\
++	blk_dim.o
+diff --git a/lib/dim/blk_dim.c b/lib/dim/blk_dim.c
+new file mode 100644
+index 000000000000..49107c169b56
+--- /dev/null
++++ b/lib/dim/blk_dim.c
+@@ -0,0 +1,114 @@
++#include <linux/blk_dim.h>
++
++static inline int blk_dim_step(struct dim *dim)
++{
++	switch (dim->tune_state) {
++	case DIM_PARKING_ON_TOP:
++	case DIM_PARKING_TIRED:
++		break;
++	case DIM_GOING_RIGHT:
++		if (dim->profile_ix == (BLK_DIM_PARAMS_NUM_PROFILES - 1))
++			return DIM_ON_EDGE;
++		dim->profile_ix++;
++		dim->steps_right++;
++		break;
++	case DIM_GOING_LEFT:
++		if (dim->profile_ix == 0)
++			return DIM_ON_EDGE;
++		dim->profile_ix--;
++		dim->steps_left++;
++		break;
++	}
++
++	return DIM_STEPPED;
++}
++
++static inline int blk_dim_stats_compare(struct dim_stats *curr, struct dim_stats *prev)
++{
++	/* first stat */
++	if (!prev->cpms)
++		return DIM_STATS_SAME;
++
++	if (IS_SIGNIFICANT_DIFF(curr->cpms, prev->cpms))
++		return (curr->cpms > prev->cpms) ? DIM_STATS_BETTER :
++						DIM_STATS_WORSE;
++
++	if (IS_SIGNIFICANT_DIFF(curr->cpe_ratio, prev->cpe_ratio))
++		return (curr->cpe_ratio > prev->cpe_ratio) ? DIM_STATS_BETTER :
++						DIM_STATS_WORSE;
++
++	return DIM_STATS_SAME;
++}
++
++static inline bool blk_dim_decision(struct dim_stats *curr_stats, struct dim *dim)
++{
++	int prev_ix = dim->profile_ix;
++	int stats_res;
++	int step_res;
++
++	switch (dim->tune_state) {
++	case DIM_PARKING_ON_TOP:
++		break;
++	case DIM_PARKING_TIRED:
++		break;
++
++	case DIM_GOING_RIGHT:
++	case DIM_GOING_LEFT:
++		stats_res = blk_dim_stats_compare(curr_stats, &dim->prev_stats);
++
++		switch (stats_res) {
++		case DIM_STATS_SAME:
++			if (curr_stats->cpe_ratio <= 50*prev_ix)
++				dim->profile_ix = 0;
++			break;
++		case DIM_STATS_WORSE:
++			dim_turn(dim);
++		default:
++		case DIM_STATS_BETTER:
++			/* fall through */
++			step_res = blk_dim_step(dim);
++			if (step_res == DIM_ON_EDGE)
++				dim_turn(dim);
++			break;
++		}
++		break;
++	}
++
++	dim->prev_stats = *curr_stats;
++
++	return dim->profile_ix != prev_ix;
++}
++
++void blk_dim(struct dim *dim, struct dim_sample end_sample)
++{
++	struct dim_stats curr_stats;
++	u16 nevents;
++
++	switch (dim->state) {
++	case DIM_MEASURE_IN_PROGRESS:
++		nevents = end_sample.event_ctr - dim->start_sample.event_ctr;
++		if (nevents < DIM_NEVENTS) {
++			dim_create_sample(end_sample.event_ctr, end_sample.pkt_ctr,
++				end_sample.byte_ctr, end_sample.comp_ctr, &dim->measuring_sample);
++			break;
++		}
++		dim_calc_stats(&dim->start_sample, &end_sample,
++				   &curr_stats);
++		if (blk_dim_decision(&curr_stats, dim)) {
++			dim->state = DIM_APPLY_NEW_PROFILE;
++			schedule_work(&dim->work);
++			break;
++		}
++		/* fall through */
++	case DIM_START_MEASURE:
++		dim->state = DIM_MEASURE_IN_PROGRESS;
++		dim_create_sample(end_sample.event_ctr, end_sample.pkt_ctr, end_sample.byte_ctr,
++				end_sample.comp_ctr, &dim->start_sample);
++		dim_create_sample(end_sample.event_ctr, end_sample.pkt_ctr, end_sample.byte_ctr,
++				end_sample.comp_ctr, &dim->measuring_sample);
++		break;
++	case DIM_APPLY_NEW_PROFILE:
++		break;
++	}
++}
++EXPORT_SYMBOL(blk_dim);
 -- 
 2.19.1
 
