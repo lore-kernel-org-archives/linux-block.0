@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B43DFC10F03
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 16:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 403DEC4360F
+	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 16:26:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 565432081B
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 16:26:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1117B20854
+	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 16:26:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j1z8IoVL"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WQ4/460q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726446AbfCGQ0U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Mar 2019 11:26:20 -0500
-Received: from mail-wr1-f46.google.com ([209.85.221.46]:33914 "EHLO
-        mail-wr1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726375AbfCGQ0T (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Mar 2019 11:26:19 -0500
-Received: by mail-wr1-f46.google.com with SMTP id f14so18149349wrg.1
-        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2019 08:26:16 -0800 (PST)
+        id S1726518AbfCGQ0Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Mar 2019 11:26:24 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:36043 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726463AbfCGQ0X (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Mar 2019 11:26:23 -0500
+Received: by mail-wm1-f68.google.com with SMTP id j125so9905170wmj.1
+        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2019 08:26:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=eowyCyg6fE0mBjV4jlMIOF/lyn5g/MwdTODgsX3vJKg=;
-        b=j1z8IoVLBlHnjS6c5OYsK0/iuUGE0NDDs/a9qeTCNomH1XJLqdrvT8LIZusLsXXTYg
-         9KNHJVjoHvJORgpT91vl6X22eWkGMbBmOp4nC+m8tVvBsmftlQSy0vQC/6q2uzjo7SPe
-         XQtodrdvVfkNySDeJ04xsc6fjXJR0QVDNBYRMhO8HOADciYb+EFiUwmZaq0wLkSufy8z
-         hmZ/eqLYM6u8s7+eqmCiD7hBX5m3QsONa3nGwx2FsYTWCLX5mAkAgxoKgqg7QKXbH0m3
-         1bUU8ygiL4whVNvQKC1B4EMozQ97smQjgvpC3uOk7nuPp0PyoV2nYqqRjMnwSq4ZslXq
-         KoIA==
+        bh=rb+YsYLv5aeFW93p5pLsMf9umO1yuPDktu059+duwqc=;
+        b=WQ4/460qM6FlUjNVkIEygVfdwtdGU0MVo3dAb9opKQ4YIY+njZ/t3bSyeLXDABk5Bm
+         nabD9ZMJiJFyhcTjSRHDdvjJpzNmWPy1WmpctU3uppNVE3JMHQqfNuShfsyur5AqYxe0
+         HtKf0IZCMtqqJqF7sNB0rZ9yiO8n7Gy1fEK7JKQteAE97aNYyBwK62roCArXJ118L609
+         I3YJTpKmTs1imbEnclKCPdcIgMAD830znJpyFATC2ijZGG64rE3RcWWEI3w9VIwa4YdC
+         GdGi4tUt4Voqynhw+88B2wyjZwVYXm3vTDix5O9xgG31dP+kOuX5mSykwsdzKW6ZcWrp
+         bcCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=eowyCyg6fE0mBjV4jlMIOF/lyn5g/MwdTODgsX3vJKg=;
-        b=jmcxOnN+f4a6i3YcE54RQPX0Y8bWxa+kGv80i4H1Yuek8RdSqjKcPQ2jtEUfQdzhiD
-         s1Mj+VirbVJ1jU9PJT6sYFaBeE+QQYUUtWa13wiKNST5tT/RGjSVGtzdpM0son9SBLsC
-         KmL1PHwKsPk8JC9Xf1xaJ5KbGmUXLNP3qLz10z+pOdGErhFN+TgvD6iWeHEgGy+8Ud8O
-         w91LUZEeH97x7G7Khid8En9JX+Dl1x4DHPL+Lt8o7UmXPspU8PbU+kmED+ibmqgN9lgd
-         7FxJ9GWQPNeUNmbtzNneDXKbqXps3JuBIuoXfCGi7OKE89GsSCPj7gVDogbM6rjw2inx
-         VZJA==
-X-Gm-Message-State: APjAAAUlwpfq0N7ZPAlYpe8zJXpvfQWtVjaR2+T435Lip1fPM4lCfJ4Z
-        xkYKTk6BhSX96r3Bo8munE9l3Q==
-X-Google-Smtp-Source: APXvYqzoLfUVRAA7sUQ8SU1euX9dd3/9t45B07V/w5uq++PNmwYq1bAbhXVsVBu4NU1B4GIMEFNttA==
-X-Received: by 2002:a5d:464b:: with SMTP id j11mr958768wrs.307.1551975975117;
-        Thu, 07 Mar 2019 08:26:15 -0800 (PST)
+        bh=rb+YsYLv5aeFW93p5pLsMf9umO1yuPDktu059+duwqc=;
+        b=ZgGbzVT6cDhEpDD9KnRbSJOwu7tcNt2Fj968sEn5mWNC3YUo7H6mOt5x5riTTjU3wD
+         DM7fMpIwI8sjYvVyPuUIc/JR8DkLYvUzB5whjeSEDFIDDpKwpeIx2hON/OCAp2UiiwR8
+         js8PzzowN5AkN2hx0voh6fuCespLOdFB0gKYncPwMvgZFBlAgf9Hgr0YBtBkNW3HLPJE
+         HcmqRwwtTUEK+2OFMt6Tb9gnmAGXQzDH1rkhjwUDj+UvbAF62xjR3562rzyO8ITQ7fxW
+         fQHC36OHUrZsJvqifqfQIV7nX/EEy//GUwLg/FJIX1U7gwD+xD2RF1JWCH+bRbxLZHRg
+         DjUw==
+X-Gm-Message-State: APjAAAWLW1tyVodpbeBFXuhZiN/owkOlo6R4w5lt3+qEB1oFc8yZdkmZ
+        76Ug0fHWKpjkj42DMYTBeLKeVjhfsa8=
+X-Google-Smtp-Source: APXvYqyLJ6BG63rxLyS0DfhUNnHhXMvveuGbX/88kf5WLxSFBtSPMtxpBGxpiH7g7qeoI9M8eWpebQ==
+X-Received: by 2002:a1c:c644:: with SMTP id w65mr6170078wmf.19.1551975981462;
+        Thu, 07 Mar 2019 08:26:21 -0800 (PST)
 Received: from localhost.localdomain (146-241-117-61.dyn.eolo.it. [146.241.117.61])
-        by smtp.gmail.com with ESMTPSA id o127sm5801797wmo.20.2019.03.07.08.26.13
+        by smtp.gmail.com with ESMTPSA id o127sm5801797wmo.20.2019.03.07.08.26.20
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 Mar 2019 08:26:14 -0800 (PST)
+        Thu, 07 Mar 2019 08:26:20 -0800 (PST)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -61,9 +61,9 @@ Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         broonie@kernel.org, bfq-iosched@googlegroups.com,
         oleksandr@natalenko.name, fra.fra.800@gmail.com,
         Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX IMPROVEMENT 3/8] block, bfq: tune service injection basing on request service times
-Date:   Thu,  7 Mar 2019 17:25:49 +0100
-Message-Id: <20190307162554.77205-4-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX IMPROVEMENT 8/8] block, bfq: save & resume weight on a queue merge/split
+Date:   Thu,  7 Mar 2019 17:25:54 +0100
+Message-Id: <20190307162554.77205-9-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190307162554.77205-1-paolo.valente@linaro.org>
 References: <20190307162554.77205-1-paolo.valente@linaro.org>
@@ -74,650 +74,66 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The processes associated with a bfq_queue, say Q, may happen to
-generate their cumulative I/O at a lower rate than the rate at which
-the device could serve the same I/O. This is rather probable, e.g., if
-only one process is associated with Q and the device is an SSD. It
-results in Q becoming often empty while in service. If BFQ is not
-allowed to switch to another queue when Q becomes empty, then, during
-the service of Q, there will be frequent "service holes", i.e., time
-intervals during which Q gets empty and the device can only consume
-the I/O already queued in its hardware queues. This easily causes
-considerable losses of throughput.
+From: Francesco Pollicino <fra.fra.800@gmail.com>
 
-To counter this problem, BFQ implements a request injection mechanism,
-which tries to fill the above service holes with I/O requests taken
-from other bfq_queues. The hard part in this mechanism is finding the
-right amount of I/O to inject, so as to both boost throughput and not
-break Q's bandwidth and latency guarantees. To this goal, the current
-version of this mechanism measures the bandwidth enjoyed by Q while it
-is being served, and tries to inject the maximum possible amount of
-extra service that does not cause Q's bandwidth to decrease too
-much.
+bfq saves the state of a queue each time a merge occurs, to be
+able to resume such a state when the queue is associated again
+with its original process, on a split.
 
-This solution has an important shortcoming. For bandwidth measurements
-to be stable and reliable, Q must remain in service for a much longer
-time than that needed to serve a single I/O request. Unfortunately,
-this does not hold with many workloads. This commit addresses this
-issue by changing the way the amount of injection allowed is
-dynamically computed. It tunes injection as a function of the service
-times of single I/O requests of Q, instead of Q's
-bandwidth. Single-request service times are evidently meaningful even
-if Q gets very few I/O requests completed while it is in service.
+Unfortunately bfq does not save & restore also the weight of the
+queue. If the weight is not correctly resumed when the queue is
+recycled, then the weight of the recycled queue could differ
+from the weight of the original queue.
 
-As a testbed for this new solution, we measured the throughput reached
-by BFQ for one of the nastiest workloads and configurations for this
-scheduler: the workload generated by the dbench test (in the Phoronix
-suite), with 6 clients, on a filesystem with journaling, and with the
-journaling daemon enjoying a higher weight than normal processes.
-With this commit, the throughput grows from ~100 MB/s to ~150 MB/s on
-a PLEXTOR PX-256M5.
+This commit adds the missing save & resume of the weight.
 
-Tested-by: Francesco Pollicino <fra.fra.800@gmail.com>
+Signed-off-by: Francesco Pollicino <fra.fra.800@gmail.com>
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/bfq-iosched.c | 417 ++++++++++++++++++++++++++++++++++++++++----
- block/bfq-iosched.h |  51 +++---
- 2 files changed, 409 insertions(+), 59 deletions(-)
+ block/bfq-iosched.c | 2 ++
+ block/bfq-iosched.h | 9 +++++++++
+ 2 files changed, 11 insertions(+)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 2be504f25b09..41364c0cca8c 100644
+index 7d95d9c01036..1712d12340c0 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -1721,6 +1721,123 @@ static void bfq_add_request(struct request *rq)
- 	bfqq->queued[rq_is_sync(rq)]++;
- 	bfqd->queued++;
+@@ -1028,6 +1028,7 @@ bfq_bfqq_resume_state(struct bfq_queue *bfqq, struct bfq_data *bfqd,
+ 	else
+ 		bfq_clear_bfqq_IO_bound(bfqq);
  
-+	if (RB_EMPTY_ROOT(&bfqq->sort_list) && bfq_bfqq_sync(bfqq)) {
-+		/*
-+		 * Periodically reset inject limit, to make sure that
-+		 * the latter eventually drops in case workload
-+		 * changes, see step (3) in the comments on
-+		 * bfq_update_inject_limit().
-+		 */
-+		if (time_is_before_eq_jiffies(bfqq->decrease_time_jif +
-+					     msecs_to_jiffies(1000))) {
-+			/* invalidate baseline total service time */
-+			bfqq->last_serv_time_ns = 0;
-+
-+			/*
-+			 * Reset pointer in case we are waiting for
-+			 * some request completion.
-+			 */
-+			bfqd->waited_rq = NULL;
-+
-+			/*
-+			 * If bfqq has a short think time, then start
-+			 * by setting the inject limit to 0
-+			 * prudentially, because the service time of
-+			 * an injected I/O request may be higher than
-+			 * the think time of bfqq, and therefore, if
-+			 * one request was injected when bfqq remains
-+			 * empty, this injected request might delay
-+			 * the service of the next I/O request for
-+			 * bfqq significantly. In case bfqq can
-+			 * actually tolerate some injection, then the
-+			 * adaptive update will however raise the
-+			 * limit soon. This lucky circumstance holds
-+			 * exactly because bfqq has a short think
-+			 * time, and thus, after remaining empty, is
-+			 * likely to get new I/O enqueued---and then
-+			 * completed---before being expired. This is
-+			 * the very pattern that gives the
-+			 * limit-update algorithm the chance to
-+			 * measure the effect of injection on request
-+			 * service times, and then to update the limit
-+			 * accordingly.
-+			 *
-+			 * On the opposite end, if bfqq has a long
-+			 * think time, then start directly by 1,
-+			 * because:
-+			 * a) on the bright side, keeping at most one
-+			 * request in service in the drive is unlikely
-+			 * to cause any harm to the latency of bfqq's
-+			 * requests, as the service time of a single
-+			 * request is likely to be lower than the
-+			 * think time of bfqq;
-+			 * b) on the downside, after becoming empty,
-+			 * bfqq is likely to expire before getting its
-+			 * next request. With this request arrival
-+			 * pattern, it is very hard to sample total
-+			 * service times and update the inject limit
-+			 * accordingly (see comments on
-+			 * bfq_update_inject_limit()). So the limit is
-+			 * likely to be never, or at least seldom,
-+			 * updated.  As a consequence, by setting the
-+			 * limit to 1, we avoid that no injection ever
-+			 * occurs with bfqq. On the downside, this
-+			 * proactive step further reduces chances to
-+			 * actually compute the baseline total service
-+			 * time. Thus it reduces chances to execute the
-+			 * limit-update algorithm and possibly raise the
-+			 * limit to more than 1.
-+			 */
-+			if (bfq_bfqq_has_short_ttime(bfqq))
-+				bfqq->inject_limit = 0;
-+			else
-+				bfqq->inject_limit = 1;
-+			bfqq->decrease_time_jif = jiffies;
-+		}
-+
-+		/*
-+		 * The following conditions must hold to setup a new
-+		 * sampling of total service time, and then a new
-+		 * update of the inject limit:
-+		 * - bfqq is in service, because the total service
-+		 *   time is evaluated only for the I/O requests of
-+		 *   the queues in service;
-+		 * - this is the right occasion to compute or to
-+		 *   lower the baseline total service time, because
-+		 *   there are actually no requests in the drive,
-+		 *   or
-+		 *   the baseline total service time is available, and
-+		 *   this is the right occasion to compute the other
-+		 *   quantity needed to update the inject limit, i.e.,
-+		 *   the total service time caused by the amount of
-+		 *   injection allowed by the current value of the
-+		 *   limit. It is the right occasion because injection
-+		 *   has actually been performed during the service
-+		 *   hole, and there are still in-flight requests,
-+		 *   which are very likely to be exactly the injected
-+		 *   requests, or part of them;
-+		 * - the minimum interval for sampling the total
-+		 *   service time and updating the inject limit has
-+		 *   elapsed.
-+		 */
-+		if (bfqq == bfqd->in_service_queue &&
-+		    (bfqd->rq_in_driver == 0 ||
-+		     (bfqq->last_serv_time_ns > 0 &&
-+		      bfqd->rqs_injected && bfqd->rq_in_driver > 0)) &&
-+		    time_is_before_eq_jiffies(bfqq->decrease_time_jif +
-+					      msecs_to_jiffies(100))) {
-+			bfqd->last_empty_occupied_ns = ktime_get_ns();
-+			/*
-+			 * Start the state machine for measuring the
-+			 * total service time of rq: setting
-+			 * wait_dispatch will cause bfqd->waited_rq to
-+			 * be set when rq will be dispatched.
-+			 */
-+			bfqd->wait_dispatch = true;
-+			bfqd->rqs_injected = false;
-+		}
-+	}
-+
- 	elv_rb_add(&bfqq->sort_list, rq);
- 
- 	/*
-@@ -2566,6 +2683,8 @@ static void bfq_arm_slice_timer(struct bfq_data *bfqd)
- 		sl = max_t(u32, sl, 20ULL * NSEC_PER_MSEC);
- 
- 	bfqd->last_idling_start = ktime_get();
-+	bfqd->last_idling_start_jiffies = jiffies;
-+
- 	hrtimer_start(&bfqd->idle_slice_timer, ns_to_ktime(sl),
- 		      HRTIMER_MODE_REL);
- 	bfqg_stats_set_start_idle_time(bfqq_group(bfqq));
-@@ -3240,13 +3359,6 @@ static unsigned long bfq_bfqq_softrt_next_start(struct bfq_data *bfqd,
- 		    jiffies + nsecs_to_jiffies(bfqq->bfqd->bfq_slice_idle) + 4);
- }
- 
--static bool bfq_bfqq_injectable(struct bfq_queue *bfqq)
--{
--	return BFQQ_SEEKY(bfqq) && bfqq->wr_coeff == 1 &&
--		blk_queue_nonrot(bfqq->bfqd->queue) &&
--		bfqq->bfqd->hw_tag;
--}
--
- /**
-  * bfq_bfqq_expire - expire a queue.
-  * @bfqd: device owning the queue.
-@@ -3361,6 +3473,14 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
- 		"expire (%d, slow %d, num_disp %d, short_ttime %d)", reason,
- 		slow, bfqq->dispatched, bfq_bfqq_has_short_ttime(bfqq));
- 
-+	/*
-+	 * bfqq expired, so no total service time needs to be computed
-+	 * any longer: reset state machine for measuring total service
-+	 * times.
-+	 */
-+	bfqd->rqs_injected = bfqd->wait_dispatch = false;
-+	bfqd->waited_rq = NULL;
-+
- 	/*
- 	 * Increase, decrease or leave budget unchanged according to
- 	 * reason.
-@@ -3372,8 +3492,6 @@ void bfq_bfqq_expire(struct bfq_data *bfqd,
- 	if (ref == 1) /* bfqq is gone, no more actions on it */
++	bfqq->entity.new_weight = bic->saved_weight;
+ 	bfqq->ttime = bic->saved_ttime;
+ 	bfqq->wr_coeff = bic->saved_wr_coeff;
+ 	bfqq->wr_start_at_switch_to_srt = bic->saved_wr_start_at_switch_to_srt;
+@@ -2502,6 +2503,7 @@ static void bfq_bfqq_save_state(struct bfq_queue *bfqq)
+ 	if (!bic)
  		return;
  
--	bfqq->injected_service = 0;
--
- 	/* mark bfqq as waiting a request only if a bic still points to it */
- 	if (!bfq_bfqq_busy(bfqq) &&
- 	    reason != BFQQE_BUDGET_TIMEOUT &&
-@@ -3767,26 +3885,98 @@ static bool bfq_bfqq_must_idle(struct bfq_queue *bfqq)
- 	return RB_EMPTY_ROOT(&bfqq->sort_list) && bfq_better_to_idle(bfqq);
- }
- 
--static struct bfq_queue *bfq_choose_bfqq_for_injection(struct bfq_data *bfqd)
-+/*
-+ * This function chooses the queue from which to pick the next extra
-+ * I/O request to inject, if it finds a compatible queue. See the
-+ * comments on bfq_update_inject_limit() for details on the injection
-+ * mechanism, and for the definitions of the quantities mentioned
-+ * below.
-+ */
-+static struct bfq_queue *
-+bfq_choose_bfqq_for_injection(struct bfq_data *bfqd)
- {
--	struct bfq_queue *bfqq;
-+	struct bfq_queue *bfqq, *in_serv_bfqq = bfqd->in_service_queue;
-+	unsigned int limit = in_serv_bfqq->inject_limit;
-+	/*
-+	 * If
-+	 * - bfqq is not weight-raised and therefore does not carry
-+	 *   time-critical I/O,
-+	 * or
-+	 * - regardless of whether bfqq is weight-raised, bfqq has
-+	 *   however a long think time, during which it can absorb the
-+	 *   effect of an appropriate number of extra I/O requests
-+	 *   from other queues (see bfq_update_inject_limit for
-+	 *   details on the computation of this number);
-+	 * then injection can be performed without restrictions.
-+	 */
-+	bool in_serv_always_inject = in_serv_bfqq->wr_coeff == 1 ||
-+		!bfq_bfqq_has_short_ttime(in_serv_bfqq);
- 
- 	/*
--	 * A linear search; but, with a high probability, very few
--	 * steps are needed to find a candidate queue, i.e., a queue
--	 * with enough budget left for its next request. In fact:
-+	 * If
-+	 * - the baseline total service time could not be sampled yet,
-+	 *   so the inject limit happens to be still 0, and
-+	 * - a lot of time has elapsed since the plugging of I/O
-+	 *   dispatching started, so drive speed is being wasted
-+	 *   significantly;
-+	 * then temporarily raise inject limit to one request.
-+	 */
-+	if (limit == 0 && in_serv_bfqq->last_serv_time_ns == 0 &&
-+	    bfq_bfqq_wait_request(in_serv_bfqq) &&
-+	    time_is_before_eq_jiffies(bfqd->last_idling_start_jiffies +
-+				      bfqd->bfq_slice_idle)
-+		)
-+		limit = 1;
-+
-+	if (bfqd->rq_in_driver >= limit)
-+		return NULL;
-+
-+	/*
-+	 * Linear search of the source queue for injection; but, with
-+	 * a high probability, very few steps are needed to find a
-+	 * candidate queue, i.e., a queue with enough budget left for
-+	 * its next request. In fact:
- 	 * - BFQ dynamically updates the budget of every queue so as
- 	 *   to accommodate the expected backlog of the queue;
- 	 * - if a queue gets all its requests dispatched as injected
- 	 *   service, then the queue is removed from the active list
--	 *   (and re-added only if it gets new requests, but with
--	 *   enough budget for its new backlog).
-+	 *   (and re-added only if it gets new requests, but then it
-+	 *   is assigned again enough budget for its new backlog).
- 	 */
- 	list_for_each_entry(bfqq, &bfqd->active_list, bfqq_list)
- 		if (!RB_EMPTY_ROOT(&bfqq->sort_list) &&
-+		    (in_serv_always_inject || bfqq->wr_coeff > 1) &&
- 		    bfq_serv_to_charge(bfqq->next_rq, bfqq) <=
--		    bfq_bfqq_budget_left(bfqq))
--			return bfqq;
-+		    bfq_bfqq_budget_left(bfqq)) {
-+			/*
-+			 * Allow for only one large in-flight request
-+			 * on non-rotational devices, for the
-+			 * following reason. On non-rotationl drives,
-+			 * large requests take much longer than
-+			 * smaller requests to be served. In addition,
-+			 * the drive prefers to serve large requests
-+			 * w.r.t. to small ones, if it can choose. So,
-+			 * having more than one large requests queued
-+			 * in the drive may easily make the next first
-+			 * request of the in-service queue wait for so
-+			 * long to break bfqq's service guarantees. On
-+			 * the bright side, large requests let the
-+			 * drive reach a very high throughput, even if
-+			 * there is only one in-flight large request
-+			 * at a time.
-+			 */
-+			if (blk_queue_nonrot(bfqd->queue) &&
-+			    blk_rq_sectors(bfqq->next_rq) >=
-+			    BFQQ_SECT_THR_NONROT)
-+				limit = min_t(unsigned int, 1, limit);
-+			else
-+				limit = in_serv_bfqq->inject_limit;
-+
-+			if (bfqd->rq_in_driver < limit) {
-+				bfqd->rqs_injected = true;
-+				return bfqq;
-+			}
-+		}
- 
- 	return NULL;
- }
-@@ -3873,14 +4063,32 @@ static struct bfq_queue *bfq_select_queue(struct bfq_data *bfqd)
- 	 * for a new request, or has requests waiting for a completion and
- 	 * may idle after their completion, then keep it anyway.
- 	 *
--	 * Yet, to boost throughput, inject service from other queues if
--	 * possible.
-+	 * Yet, inject service from other queues if it boosts
-+	 * throughput and is possible.
- 	 */
- 	if (bfq_bfqq_wait_request(bfqq) ||
- 	    (bfqq->dispatched != 0 && bfq_better_to_idle(bfqq))) {
--		if (bfq_bfqq_injectable(bfqq) &&
--		    bfqq->injected_service * bfqq->inject_coeff <
--		    bfqq->entity.service * 10)
-+		struct bfq_queue *async_bfqq =
-+			bfqq->bic && bfqq->bic->bfqq[0] &&
-+			bfq_bfqq_busy(bfqq->bic->bfqq[0]) ?
-+			bfqq->bic->bfqq[0] : NULL;
-+
-+		/*
-+		 * If the process associated with bfqq has also async
-+		 * I/O pending, then inject it
-+		 * unconditionally. Injecting I/O from the same
-+		 * process can cause no harm to the process. On the
-+		 * contrary, it can only increase bandwidth and reduce
-+		 * latency for the process.
-+		 */
-+		if (async_bfqq &&
-+		    icq_to_bic(async_bfqq->next_rq->elv.icq) == bfqq->bic &&
-+		    bfq_serv_to_charge(async_bfqq->next_rq, async_bfqq) <=
-+		    bfq_bfqq_budget_left(async_bfqq))
-+			bfqq = bfqq->bic->bfqq[0];
-+		else if (!idling_boosts_thr_without_issues(bfqd, bfqq) &&
-+			 (bfqq->wr_coeff == 1 || bfqd->wr_busy_queues > 1 ||
-+			  !bfq_bfqq_has_short_ttime(bfqq)))
- 			bfqq = bfq_choose_bfqq_for_injection(bfqd);
- 		else
- 			bfqq = NULL;
-@@ -3972,15 +4180,15 @@ static struct request *bfq_dispatch_rq_from_bfqq(struct bfq_data *bfqd,
- 
- 	bfq_bfqq_served(bfqq, service_to_charge);
- 
--	bfq_dispatch_remove(bfqd->queue, rq);
-+	if (bfqq == bfqd->in_service_queue && bfqd->wait_dispatch) {
-+		bfqd->wait_dispatch = false;
-+		bfqd->waited_rq = rq;
-+	}
- 
--	if (bfqq != bfqd->in_service_queue) {
--		if (likely(bfqd->in_service_queue))
--			bfqd->in_service_queue->injected_service +=
--				bfq_serv_to_charge(rq, bfqq);
-+	bfq_dispatch_remove(bfqd->queue, rq);
- 
-+	if (bfqq != bfqd->in_service_queue)
- 		goto return_rq;
--	}
- 
- 	/*
- 	 * If weight raising has to terminate for bfqq, then next
-@@ -4411,13 +4619,6 @@ static void bfq_init_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 			bfq_mark_bfqq_has_short_ttime(bfqq);
- 		bfq_mark_bfqq_sync(bfqq);
- 		bfq_mark_bfqq_just_created(bfqq);
--		/*
--		 * Aggressively inject a lot of service: up to 90%.
--		 * This coefficient remains constant during bfqq life,
--		 * but this behavior might be changed, after enough
--		 * testing and tuning.
--		 */
--		bfqq->inject_coeff = 1;
- 	} else
- 		bfq_clear_bfqq_sync(bfqq);
- 
-@@ -4976,6 +5177,147 @@ static void bfq_finish_requeue_request_body(struct bfq_queue *bfqq)
- 	bfq_put_queue(bfqq);
- }
- 
-+/*
-+ * The processes associated with bfqq may happen to generate their
-+ * cumulative I/O at a lower rate than the rate at which the device
-+ * could serve the same I/O. This is rather probable, e.g., if only
-+ * one process is associated with bfqq and the device is an SSD. It
-+ * results in bfqq becoming often empty while in service. In this
-+ * respect, if BFQ is allowed to switch to another queue when bfqq
-+ * remains empty, then the device goes on being fed with I/O requests,
-+ * and the throughput is not affected. In contrast, if BFQ is not
-+ * allowed to switch to another queue---because bfqq is sync and
-+ * I/O-dispatch needs to be plugged while bfqq is temporarily
-+ * empty---then, during the service of bfqq, there will be frequent
-+ * "service holes", i.e., time intervals during which bfqq gets empty
-+ * and the device can only consume the I/O already queued in its
-+ * hardware queues. During service holes, the device may even get to
-+ * remaining idle. In the end, during the service of bfqq, the device
-+ * is driven at a lower speed than the one it can reach with the kind
-+ * of I/O flowing through bfqq.
-+ *
-+ * To counter this loss of throughput, BFQ implements a "request
-+ * injection mechanism", which tries to fill the above service holes
-+ * with I/O requests taken from other queues. The hard part in this
-+ * mechanism is finding the right amount of I/O to inject, so as to
-+ * both boost throughput and not break bfqq's bandwidth and latency
-+ * guarantees. In this respect, the mechanism maintains a per-queue
-+ * inject limit, computed as below. While bfqq is empty, the injection
-+ * mechanism dispatches extra I/O requests only until the total number
-+ * of I/O requests in flight---i.e., already dispatched but not yet
-+ * completed---remains lower than this limit.
-+ *
-+ * A first definition comes in handy to introduce the algorithm by
-+ * which the inject limit is computed.  We define as first request for
-+ * bfqq, an I/O request for bfqq that arrives while bfqq is in
-+ * service, and causes bfqq to switch from empty to non-empty. The
-+ * algorithm updates the limit as a function of the effect of
-+ * injection on the service times of only the first requests of
-+ * bfqq. The reason for this restriction is that these are the
-+ * requests whose service time is affected most, because they are the
-+ * first to arrive after injection possibly occurred.
-+ *
-+ * To evaluate the effect of injection, the algorithm measures the
-+ * "total service time" of first requests. We define as total service
-+ * time of an I/O request, the time that elapses since when the
-+ * request is enqueued into bfqq, to when it is completed. This
-+ * quantity allows the whole effect of injection to be measured. It is
-+ * easy to see why. Suppose that some requests of other queues are
-+ * actually injected while bfqq is empty, and that a new request R
-+ * then arrives for bfqq. If the device does start to serve all or
-+ * part of the injected requests during the service hole, then,
-+ * because of this extra service, it may delay the next invocation of
-+ * the dispatch hook of BFQ. Then, even after R gets eventually
-+ * dispatched, the device may delay the actual service of R if it is
-+ * still busy serving the extra requests, or if it decides to serve,
-+ * before R, some extra request still present in its queues. As a
-+ * conclusion, the cumulative extra delay caused by injection can be
-+ * easily evaluated by just comparing the total service time of first
-+ * requests with and without injection.
-+ *
-+ * The limit-update algorithm works as follows. On the arrival of a
-+ * first request of bfqq, the algorithm measures the total time of the
-+ * request only if one of the three cases below holds, and, for each
-+ * case, it updates the limit as described below:
-+ *
-+ * (1) If there is no in-flight request. This gives a baseline for the
-+ *     total service time of the requests of bfqq. If the baseline has
-+ *     not been computed yet, then, after computing it, the limit is
-+ *     set to 1, to start boosting throughput, and to prepare the
-+ *     ground for the next case. If the baseline has already been
-+ *     computed, then it is updated, in case it results to be lower
-+ *     than the previous value.
-+ *
-+ * (2) If the limit is higher than 0 and there are in-flight
-+ *     requests. By comparing the total service time in this case with
-+ *     the above baseline, it is possible to know at which extent the
-+ *     current value of the limit is inflating the total service
-+ *     time. If the inflation is below a certain threshold, then bfqq
-+ *     is assumed to be suffering from no perceivable loss of its
-+ *     service guarantees, and the limit is even tentatively
-+ *     increased. If the inflation is above the threshold, then the
-+ *     limit is decreased. Due to the lack of any hysteresis, this
-+ *     logic makes the limit oscillate even in steady workload
-+ *     conditions. Yet we opted for it, because it is fast in reaching
-+ *     the best value for the limit, as a function of the current I/O
-+ *     workload. To reduce oscillations, this step is disabled for a
-+ *     short time interval after the limit happens to be decreased.
-+ *
-+ * (3) Periodically, after resetting the limit, to make sure that the
-+ *     limit eventually drops in case the workload changes. This is
-+ *     needed because, after the limit has gone safely up for a
-+ *     certain workload, it is impossible to guess whether the
-+ *     baseline total service time may have changed, without measuring
-+ *     it again without injection. A more effective version of this
-+ *     step might be to just sample the baseline, by interrupting
-+ *     injection only once, and then to reset/lower the limit only if
-+ *     the total service time with the current limit does happen to be
-+ *     too large.
-+ *
-+ * More details on each step are provided in the comments on the
-+ * pieces of code that implement these steps: the branch handling the
-+ * transition from empty to non empty in bfq_add_request(), the branch
-+ * handling injection in bfq_select_queue(), and the function
-+ * bfq_choose_bfqq_for_injection(). These comments also explain some
-+ * exceptions, made by the injection mechanism in some special cases.
-+ */
-+static void bfq_update_inject_limit(struct bfq_data *bfqd,
-+				    struct bfq_queue *bfqq)
-+{
-+	u64 tot_time_ns = ktime_get_ns() - bfqd->last_empty_occupied_ns;
-+	unsigned int old_limit = bfqq->inject_limit;
-+
-+	if (bfqq->last_serv_time_ns > 0) {
-+		u64 threshold = (bfqq->last_serv_time_ns * 3)>>1;
-+
-+		if (tot_time_ns >= threshold && old_limit > 0) {
-+			bfqq->inject_limit--;
-+			bfqq->decrease_time_jif = jiffies;
-+		} else if (tot_time_ns < threshold &&
-+			   old_limit < bfqd->max_rq_in_driver<<1)
-+			bfqq->inject_limit++;
-+	}
-+
-+	/*
-+	 * Either we still have to compute the base value for the
-+	 * total service time, and there seem to be the right
-+	 * conditions to do it, or we can lower the last base value
-+	 * computed.
-+	 */
-+	if ((bfqq->last_serv_time_ns == 0 && bfqd->rq_in_driver == 0) ||
-+	    tot_time_ns < bfqq->last_serv_time_ns) {
-+		bfqq->last_serv_time_ns = tot_time_ns;
-+		/*
-+		 * Now we certainly have a base value: make sure we
-+		 * start trying injection.
-+		 */
-+		bfqq->inject_limit = max_t(unsigned int, 1, old_limit);
-+	}
-+
-+	/* update complete, not waiting for any request completion any longer */
-+	bfqd->waited_rq = NULL;
-+}
-+
- /*
-  * Handle either a requeue or a finish for rq. The things to do are
-  * the same in both cases: all references to rq are to be dropped. In
-@@ -5020,6 +5362,9 @@ static void bfq_finish_requeue_request(struct request *rq)
- 
- 		spin_lock_irqsave(&bfqd->lock, flags);
- 
-+		if (rq == bfqd->waited_rq)
-+			bfq_update_inject_limit(bfqd, bfqq);
-+
- 		bfq_completed_request(bfqq, bfqd);
- 		bfq_finish_requeue_request_body(bfqq);
- 
++	bic->saved_weight = bfqq->entity.orig_weight;
+ 	bic->saved_ttime = bfqq->ttime;
+ 	bic->saved_has_short_ttime = bfq_bfqq_has_short_ttime(bfqq);
+ 	bic->saved_IO_bound = bfq_bfqq_IO_bound(bfqq);
 diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 81cabf51a87e..26869cfbbfa9 100644
+index 21ddb19cc322..18cc0e996abf 100644
 --- a/block/bfq-iosched.h
 +++ b/block/bfq-iosched.h
-@@ -240,6 +240,13 @@ struct bfq_queue {
- 	/* next ioprio and ioprio class if a change is in progress */
- 	unsigned short new_ioprio, new_ioprio_class;
+@@ -404,6 +404,15 @@ struct bfq_io_cq {
+ 	 */
+ 	bool was_in_burst_list;
  
-+	/* last total-service-time sample, see bfq_update_inject_limit() */
-+	u64 last_serv_time_ns;
-+	/* limit for request injection */
-+	unsigned int inject_limit;
-+	/* last time the inject limit has been decreased, in jiffies */
-+	unsigned long decrease_time_jif;
++	/*
++	 * Save the weight when a merge occurs, to be able
++	 * to restore it in case of split. If the weight is not
++	 * correctly resumed when the queue is recycled,
++	 * then the weight of the recycled queue could differ
++	 * from the weight of the original queue.
++	 */
++	unsigned int saved_weight;
 +
  	/*
- 	 * Shared bfq_queue if queue is cooperating with one or more
- 	 * other queues.
-@@ -357,29 +364,6 @@ struct bfq_queue {
- 
- 	/* max service rate measured so far */
- 	u32 max_service_rate;
--	/*
--	 * Ratio between the service received by bfqq while it is in
--	 * service, and the cumulative service (of requests of other
--	 * queues) that may be injected while bfqq is empty but still
--	 * in service. To increase precision, the coefficient is
--	 * measured in tenths of unit. Here are some example of (1)
--	 * ratios, (2) resulting percentages of service injected
--	 * w.r.t. to the total service dispatched while bfqq is in
--	 * service, and (3) corresponding values of the coefficient:
--	 * 1 (50%) -> 10
--	 * 2 (33%) -> 20
--	 * 10 (9%) -> 100
--	 * 9.9 (9%) -> 99
--	 * 1.5 (40%) -> 15
--	 * 0.5 (66%) -> 5
--	 * 0.1 (90%) -> 1
--	 *
--	 * So, if the coefficient is lower than 10, then
--	 * injected service is more than bfqq service.
--	 */
--	unsigned int inject_coeff;
--	/* amount of service injected in current service slot */
--	unsigned int injected_service;
- };
- 
- /**
-@@ -544,6 +528,26 @@ struct bfq_data {
- 	/* time of last request completion (ns) */
- 	u64 last_completion;
- 
-+	/* time of last transition from empty to non-empty (ns) */
-+	u64 last_empty_occupied_ns;
-+
-+	/*
-+	 * Flag set to activate the sampling of the total service time
-+	 * of a just-arrived first I/O request (see
-+	 * bfq_update_inject_limit()). This will cause the setting of
-+	 * waited_rq when the request is finally dispatched.
-+	 */
-+	bool wait_dispatch;
-+	/*
-+	 *  If set, then bfq_update_inject_limit() is invoked when
-+	 *  waited_rq is eventually completed.
-+	 */
-+	struct request *waited_rq;
-+	/*
-+	 * True if some request has been injected during the last service hole.
-+	 */
-+	bool rqs_injected;
-+
- 	/* time of first rq dispatch in current observation interval (ns) */
- 	u64 first_dispatch;
- 	/* time of last rq dispatch in current observation interval (ns) */
-@@ -553,6 +557,7 @@ struct bfq_data {
- 	ktime_t last_budget_start;
- 	/* beginning of the last idle slice */
- 	ktime_t last_idling_start;
-+	unsigned long last_idling_start_jiffies;
- 
- 	/* number of samples in current observation interval */
- 	int peak_rate_samples;
+ 	 * Similar to previous fields: save wr information.
+ 	 */
 -- 
 2.20.1
 
