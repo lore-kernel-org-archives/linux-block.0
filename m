@@ -2,188 +2,80 @@ Return-Path: <SRS0=/o95=RK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88341C43381
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 18:09:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1EFBC43381
+	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 18:38:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 64AE820854
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 18:09:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A306820851
+	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 18:38:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726364AbfCGSJa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Mar 2019 13:09:30 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:51165 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726227AbfCGSJa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Mar 2019 13:09:30 -0500
-Received: from mail-wr1-f70.google.com ([209.85.221.70])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <andrea.righi@canonical.com>)
-        id 1h1xSR-0001jg-Fv
-        for linux-block@vger.kernel.org; Thu, 07 Mar 2019 18:09:27 +0000
-Received: by mail-wr1-f70.google.com with SMTP id 92so8919700wrb.6
-        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2019 10:09:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=orfBePFDVPvptP/SIEB4LRUszsdy1P7zJ6ur8xGTkSA=;
-        b=TvU93nL/cToBl12d8RY+JWb65up61i5a63xm8KYVcqLFoLVZNX7gzxFRWZ49OjN1Yx
-         X0CAev5N4NcXhVrdlHnfGMIabnbBp5o6fGIEln/6+muCiF7MoL+uH13JL2Xb+/fMN6v5
-         gjNZwttoWh78EHqLxNC8yh8NQ63MOkqj9h1bW4xKby4YaBDLUxIOdneAY8krutW9TpOd
-         7HNSf29g5WSTUUHNysU+shYey0R8jqqbQaev04LPCTlTw5+9FONsWtG6aMH7mSvCFHxB
-         o04ZDTzDGmIzVqzT3VmtU6E8ErBIiflS/OpIXxJe17Mac4EVKdHW+crLiRkpuxkm0sDZ
-         Jv4Q==
-X-Gm-Message-State: APjAAAUh8i/Hc/q85yko9OK6uvv+TxjZwuoxekghrqmlnmaociPRSgJF
-        pc7ngeAt2aNpjHsqA8DrfWgWEBgBGnQFgTwOb1aV0OCsR8Zfr2yt/ky9R8wSzGHTbpnpcXCs1KM
-        seXT5RRjjAt0FrxNTayNEWMG2Gtd5yaUvok2iHtyq
-X-Received: by 2002:adf:e8c7:: with SMTP id k7mr8149007wrn.298.1551982167160;
-        Thu, 07 Mar 2019 10:09:27 -0800 (PST)
-X-Google-Smtp-Source: APXvYqyJecW6nEEj/fdA3lXOu/pN3qPg21VLRkzya2SGrHut1zqO7OZjax3AHpwD6k0DdHMUDBVsrA==
-X-Received: by 2002:adf:e8c7:: with SMTP id k7mr8148976wrn.298.1551982166849;
-        Thu, 07 Mar 2019 10:09:26 -0800 (PST)
-Received: from localhost.localdomain (host22-124-dynamic.46-79-r.retail.telecomitalia.it. [79.46.124.22])
-        by smtp.gmail.com with ESMTPSA id a74sm7872747wma.22.2019.03.07.10.09.25
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 Mar 2019 10:09:26 -0800 (PST)
-From:   Andrea Righi <andrea.righi@canonical.com>
-To:     Josef Bacik <josef@toxicpanda.com>, Tejun Heo <tj@kernel.org>
-Cc:     Li Zefan <lizefan@huawei.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jens Axboe <axboe@kernel.dk>, Vivek Goyal <vgoyal@redhat.com>,
-        Dennis Zhou <dennis@kernel.org>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/3] blkcg: sync() isolation
-Date:   Thu,  7 Mar 2019 19:08:31 +0100
-Message-Id: <20190307180834.22008-1-andrea.righi@canonical.com>
-X-Mailer: git-send-email 2.19.1
+        id S1726259AbfCGSiD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Mar 2019 13:38:03 -0500
+Received: from mail02.iobjects.de ([188.40.134.68]:53672 "EHLO
+        mail02.iobjects.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726161AbfCGSiD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Mar 2019 13:38:03 -0500
+X-Greylist: delayed 524 seconds by postgrey-1.27 at vger.kernel.org; Thu, 07 Mar 2019 13:38:02 EST
+Received: from tux.wizards.de (pD9EBF050.dip0.t-ipconnect.de [217.235.240.80])
+        by mail02.iobjects.de (Postfix) with ESMTPSA id 2B4074160E37;
+        Thu,  7 Mar 2019 19:29:17 +0100 (CET)
+Received: from [192.168.100.223] (ragnarok.applied-asynchrony.com [192.168.100.223])
+        by tux.wizards.de (Postfix) with ESMTP id 934BAF01611;
+        Thu,  7 Mar 2019 19:29:16 +0100 (CET)
+Subject: Re: [PATCH BUGFIX IMPROVEMENT 0/8] block, bfq: fix bugs, reduce exec
+ time and boost performance
+To:     Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ulf.hansson@linaro.org, linus.walleij@linaro.org,
+        broonie@kernel.org, bfq-iosched@googlegroups.com,
+        oleksandr@natalenko.name, fra.fra.800@gmail.com
+References: <20190307162554.77205-1-paolo.valente@linaro.org>
+From:   =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
+Organization: Applied Asynchrony, Inc.
+Message-ID: <469708ba-e483-b98c-118d-abc26ab8871a@applied-asynchrony.com>
+Date:   Thu, 7 Mar 2019 19:29:16 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.3
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190307162554.77205-1-paolo.valente@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-= Problem =
+On 3/7/19 5:25 PM, Paolo Valente wrote:
+> Hi,
+> since I didn't make it to submit these ones for 5.1, let me be
+> early for 5.2 :)
+> 
+> These patches fix some bug affecting performance, reduce execution
+> time a little bit, and boost throughput and responsiveness.
+> 
+> They are meant to be applied on top of the last series I submitted:
+> https://lkml.org/lkml/2019/1/29/368
 
-When sync() is executed from a high-priority cgroup, the process is forced to
-wait the completion of the entire outstanding writeback I/O, even the I/O that
-was originally generated by low-priority cgroups potentially.
+I have the earlier series applied & working well. This one applies cleanly
+on top, but something's wrong with the bfq_log_bfqq() macro:
 
-This may cause massive latencies to random processes (even those running in the
-root cgroup) that shouldn't be I/O-throttled at all, similarly to a classic
-priority inversion problem.
+   CC [M]  block/bfq-iosched.o
+In file included from block/bfq-iosched.c:140:
+block/bfq-iosched.c: In function 'bfq_check_fifo':
+block/bfq-iosched.h:1058:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
+   char pid_str[MAX_PID_STR_LENGTH]; \
+   ^~~~
+block/bfq-iosched.c:890:2: note: in expansion of macro 'bfq_log_bfqq'
+   bfq_log_bfqq(bfqq->bfqd, bfqq, "check_fifo: returned %p", rq);
+   ^~~~~~~~~~~~
+block/bfq-iosched.c: In function 'bfq_updated_next_req':
+block/bfq-iosched.h:1058:2: warning: ISO C90 forbids mixed declarations and code [-Wdeclaration-after-statement]
 
-This topic has been previously discussed here:
-https://patchwork.kernel.org/patch/10804489/
+This is with gcc 8.3.0 on top of 5.0++.
 
-[ Thanks to Josef for the suggestions ]
-
-= Solution =
-
-Here's a slightly more detailed description of the solution, as suggested by
-Josef and Tejun (let me know if I misunderstood or missed anything):
-
- - track the submitter of wb work (when issuing sync()) and the cgroup that
-   originally dirtied any inode, then use this information to determine the
-   proper "sync() domain" and decide if the I/O speed needs to be boosted or
-   not in order to prevent priority-inversion problems
-
- - by default when sync() is issued, all the outstanding writeback I/O is
-   boosted to maximum speed to prevent priority inversion problems
-
- - if sync() is issued by the same throttled cgroup that generated the dirty
-   pages, the corresponding writeback I/O is still throttled normally
-
- - add a new flag to cgroups (io.sync_isolation) that would make sync()'ers in
-   that cgroup only be allowed to write out dirty pages that belong to its
-   cgroup
-
-= Test =
-
-Here's a trivial example to trigger the problem:
-
- - create 2 cgroups: cg1 and cg2
-
- # mkdir /sys/fs/cgroup/unified/cg1
- # mkdir /sys/fs/cgroup/unified/cg2
-
- - set an I/O limit of 1MB/s on cg1/io.ma:
-
- # echo "8:0 rbps=1048576 wbps=1048576" > /sys/fs/cgroup/unified/cg1/io.max
-
- - run a write-intensive workload in cg1
-
- # cat /proc/self/cgroup
- 0::/cg1
- # fio --rw=write --bs=1M --size=32M --numjobs=16 --name=writer --time_based --runtime=30
-
- - run sync in cg2 and measure time
-
-== Vanilla kernel ==
-
- # cat /proc/self/cgroup
- 0::/cg2
-
- # time sync
- real	9m32,618s
- user	0m0,000s
- sys	0m0,018s
-
-Ideally "sync" should complete almost immediately, because cg2 is unlimited and
-it's not doing any I/O at all. Instead, the entire system is totally sluggish,
-waiting for the throttled writeback I/O to complete, and it also triggers many
-hung task timeout warnings.
-
-== With this patch set applied and io.sync_isolation=0 (default) ==
-
- # cat /proc/self/cgroup
- 0::/cg2
-
- # time sync
- real	0m2,044s
- user	0m0,009s
- sys	0m0,000s
-
-[ Time range goes from 2s to 4s ]
-
-== With this patch set applied and io.sync_isolation=1 ==
-
- # cat /proc/self/cgroup
- 0::/cg2
-
- # time sync
-
- real	0m0,768s
- user	0m0,001s
- sys	0m0,008s
-
-[ Time range goes from 0.7s to 1.6s ]
-
-Changes in v2:
- - fix: properly keep track of sync waiters when a blkcg is writing to
-   many block devices at the same time
-
-Andrea Righi (3):
-  blkcg: prevent priority inversion problem during sync()
-  blkcg: introduce io.sync_isolation
-  blkcg: implement sync() isolation
-
- Documentation/admin-guide/cgroup-v2.rst |   9 +++
- block/blk-cgroup.c                      | 178 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- block/blk-throttle.c                    |  48 ++++++++++++++-
- fs/fs-writeback.c                       |  57 +++++++++++++++++-
- fs/inode.c                              |   1 +
- fs/sync.c                               |   8 ++-
- include/linux/backing-dev-defs.h        |   2 +
- include/linux/blk-cgroup.h              |  52 +++++++++++++++++
- include/linux/fs.h                      |   4 ++
- mm/backing-dev.c                        |   2 +
- mm/page-writeback.c                     |   1 +
- 11 files changed, 355 insertions(+), 7 deletions(-)
-
+thanks,
+Holger
