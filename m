@@ -2,97 +2,162 @@ Return-Path: <SRS0=/o95=RK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3957C43381
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 21:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9343C43381
+	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 22:07:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6EDE320684
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 21:54:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3C142087C
+	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 22:07:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="bIg7J8+l"
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="hg7NUf0V"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726217AbfCGVyI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Mar 2019 16:54:08 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:35350 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726216AbfCGVyI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Mar 2019 16:54:08 -0500
-Received: by mail-pg1-f196.google.com with SMTP id e17so12339709pgd.2
-        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2019 13:54:08 -0800 (PST)
+        id S1726328AbfCGWHE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Mar 2019 17:07:04 -0500
+Received: from mail-yw1-f66.google.com ([209.85.161.66]:39213 "EHLO
+        mail-yw1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726324AbfCGWHE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Mar 2019 17:07:04 -0500
+Received: by mail-yw1-f66.google.com with SMTP id z191so14692309ywa.6
+        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2019 14:07:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=yGAJqssnTNBVYlMGoebUqqZzxEjMZ4NzDRgagEy+k6k=;
-        b=bIg7J8+lmEbG9XajS2NEpoCBAMnU1ZpJsiCzgoOSnRM5K9E3cRiHE+am2GBMicsakv
-         pikTqStSYoHDeiXfYgy7ia+ietoE0Y2k7aQ9eHPUK4auY78/G+qkqWPJWG/8l7Z79ebw
-         mIc/tKr7pl/naqyDtebhhm8QjTcJwxdYGi4zU0C5M9HpteYP91nqDbNpcQ/61PEZQaLD
-         LnvwgMI03zmeUuRsMICOSINMKqboHQPz8M3KR9ULXSc6opym1NzO35rAL5YH07Xr0Mr4
-         a+uZeFlO5T3/HctQK44hR+M9lHoFm+zFVMuF80KJDm4ZS3PlnFoWtbWVHAKR+If+POKA
-         mtcg==
+        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=5XqGPOhHxWelDgT11+htERfFUnfLr39ckjM2oBzWcuM=;
+        b=hg7NUf0VaR7rWE9ExshFRFdJUBKdlHgyhBWn7fpjNak6rkxf3itb5EAT/yLjZIgs5I
+         PqLKwWBjIsOsCasCwpoEFwHh16ddfXVwzx9FvJOt76zVAt4KwA9lhQLTSvqp5aVi9nfp
+         OLc7ZTSc9ofuBPPFhBVgn/JjmxwiAw9grGfKYve8t2h6dJP3YdzsJykQ137aLgGZcVQQ
+         VrQpJ1IQzv2koxKRIhT5auG+a8z/d8jXn2c446S8wZ18mlVD4GQIa840ydnLLmZDEn/g
+         lEWpO6x46h8n6/oPsjC6Pv+gSDsVjdOI2iSkuv6c3RhQmZsXH5qCpEjvo+HCT7qI+dgu
+         iS0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=yGAJqssnTNBVYlMGoebUqqZzxEjMZ4NzDRgagEy+k6k=;
-        b=XSgqOB6lKRG7t2ZangzyIHrHXJXKS3aZ4dcYaFqcwaaGbO6cQtJvRfUhdmob+pSosT
-         iPr+Z4A2CH1y1QYhA9/brj8U+lEWz0QVNITo1NsyZ42q9YWrfAsKzHsy7hzmjEd5WoM5
-         1y+sCEv+R30P2E3Z6XvpE3FdkjUQSwUd/t07Mft+PSLen2/SbjCHMRhqhnSbOZhXOmOm
-         HDspIl1yjuDIkRfJMJ30FasQa/2viSBTzL0o7b2ZnZ0aDvPrrHRxNXLjeZtLPeoHyeeS
-         XKxm1NycKKIJVLTZNePR7rdfUhwzaEsBN/IGBbZ057nHaEeF704G9wwhKk/JD8nLA7Zm
-         RTFg==
-X-Gm-Message-State: APjAAAVoVkjK6MhGZEgcwLcIkIkAMDTILXtW16UHdGgDnS/54aKHIvGT
-        DEtZ2oTgLWVXKi93ik+BTkJl1nXWRAsGMg==
-X-Google-Smtp-Source: APXvYqxZl3yAptI8+GBSspr2mZr3mtgwZS+IFw/LEd+B2cVesz5rydlWIz7yMjEwyURg6cuD4nnBMg==
-X-Received: by 2002:a17:902:6a83:: with SMTP id n3mr15175266plk.313.1551995647378;
-        Thu, 07 Mar 2019 13:54:07 -0800 (PST)
-Received: from [172.20.10.3] ([107.72.97.82])
-        by smtp.gmail.com with ESMTPSA id k12sm585533pga.21.2019.03.07.13.54.05
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=5XqGPOhHxWelDgT11+htERfFUnfLr39ckjM2oBzWcuM=;
+        b=T5IEBH4B3ggsHloqD5wmmagGnToo139vmUBkbjTQP7Sj1qiLv7P9kFC0xU5tu/Z7c+
+         qIZ1uv2WGM8jh7/JHhZ7PfMyo8CsiLmg57iQ10DLxpMnoDQJL7EpfUDXotYjosBxH3YF
+         KpzRN+eH9cUGH9R63Y6nPfRFZW2Ztei+eYQMuDKlCGxl9vW4Ea/C9bM+BwJDtKg0uLvM
+         SaQNQ6U5GpgUzLRatUs6gRkJZiz8FCHX2LCyAVuSGSi5j3kp9JlqTmDIJ8os5xpD6h+5
+         60r4WIFiI71xddwy+Wfcmy0FIcWE/g7esUgZAEM09aN0TnhL7p9xn6quj2H5UVs2mfce
+         fTiA==
+X-Gm-Message-State: APjAAAWqRK/982no4J4+lWvgCEIfePcK4bDn99YHdORghwzK5n8UWFdB
+        n+Qa1EiqYhT3BbxU/PJ+LVq1vg==
+X-Google-Smtp-Source: APXvYqxHCw18zCev+Plm9gMVQweneGhgqaylB5ml13zkDQOASfRadHyY4JnucJb5+loFSggeJzfBaQ==
+X-Received: by 2002:a81:b8d:: with SMTP id 135mr12004691ywl.152.1551996422797;
+        Thu, 07 Mar 2019 14:07:02 -0800 (PST)
+Received: from localhost ([2620:10d:c091:180::be7f])
+        by smtp.gmail.com with ESMTPSA id k187sm1953929ywc.47.2019.03.07.14.07.01
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 Mar 2019 13:54:06 -0800 (PST)
-Subject: Re: [PATCH] block: init flush rq ref count to 1
-To:     Josef Bacik <josef@toxicpanda.com>, kernel-team@fb.com,
-        linux-block@vger.kernel.org
-References: <20190307213718.28017-1-josef@toxicpanda.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e9542ba4-a468-5f23-1f1a-c1172769d7d9@kernel.dk>
-Date:   Thu, 7 Mar 2019 14:54:04 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        Thu, 07 Mar 2019 14:07:02 -0800 (PST)
+Date:   Thu, 7 Mar 2019 17:07:01 -0500
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Andrea Righi <andrea.righi@canonical.com>
+Cc:     Josef Bacik <josef@toxicpanda.com>, Tejun Heo <tj@kernel.org>,
+        Li Zefan <lizefan@huawei.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jens Axboe <axboe@kernel.dk>, Vivek Goyal <vgoyal@redhat.com>,
+        Dennis Zhou <dennis@kernel.org>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 3/3] blkcg: implement sync() isolation
+Message-ID: <20190307220659.5qmye2pxmto7nlei@macbook-pro-91.dhcp.thefacebook.com>
+References: <20190307180834.22008-1-andrea.righi@canonical.com>
+ <20190307180834.22008-4-andrea.righi@canonical.com>
 MIME-Version: 1.0
-In-Reply-To: <20190307213718.28017-1-josef@toxicpanda.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190307180834.22008-4-andrea.righi@canonical.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/7/19 2:37 PM, Josef Bacik wrote:
-> We discovered a problem in newer kernels where a disconnect of a NBD
-> device while the flush request was pending would result in a hang.  This
-> is because the blk mq timeout handler does
+On Thu, Mar 07, 2019 at 07:08:34PM +0100, Andrea Righi wrote:
+> Keep track of the inodes that have been dirtied by each blkcg cgroup and
+> make sure that a blkcg issuing a sync() can trigger the writeback + wait
+> of only those pages that belong to the cgroup itself.
 > 
->         if (!refcount_inc_not_zero(&rq->ref))
->                 return true;
+> This behavior is applied only when io.sync_isolation is enabled in the
+> cgroup, otherwise the old behavior is applied: sync() triggers the
+> writeback of any dirty page.
 > 
-> to determine if it's ok to run the timeout handler for the request.
-> Flush_rq's don't have a ref count set, so we'd skip running the timeout
-> handler for this request and it would just sit there in limbo forever.
+> Signed-off-by: Andrea Righi <andrea.righi@canonical.com>
+> ---
+>  block/blk-cgroup.c         | 47 ++++++++++++++++++++++++++++++++++
+>  fs/fs-writeback.c          | 52 +++++++++++++++++++++++++++++++++++---
+>  fs/inode.c                 |  1 +
+>  include/linux/blk-cgroup.h | 22 ++++++++++++++++
+>  include/linux/fs.h         |  4 +++
+>  mm/page-writeback.c        |  1 +
+>  6 files changed, 124 insertions(+), 3 deletions(-)
 > 
-> Fix this by always setting the refcount of any request going through
-> blk_init_rq() to 1.  I tested this with a nbd-server that dropped flush
-> requests to verify that it hung, and then tested with this patch to
-> verify I got the timeout as expected and the error handling kicked in.
-> Thanks,
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 4305e78d1bb2..7d3b26ba4575 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -1480,6 +1480,53 @@ void blkcg_stop_wb_wait_on_bdi(struct backing_dev_info *bdi)
+>  	spin_unlock(&blkcg_wb_sleeper_lock);
+>  	rcu_read_unlock();
+>  }
+> +
+> +/**
+> + * blkcg_set_mapping_dirty - set owner of a dirty mapping
+> + * @mapping: target address space
+> + *
+> + * Set the current blkcg as the owner of the address space @mapping (the first
+> + * blkcg that dirties @mapping becomes the owner).
+> + */
+> +void blkcg_set_mapping_dirty(struct address_space *mapping)
+> +{
+> +	struct blkcg *curr_blkcg, *blkcg;
+> +
+> +	if (mapping_tagged(mapping, PAGECACHE_TAG_WRITEBACK) ||
+> +	    mapping_tagged(mapping, PAGECACHE_TAG_DIRTY))
+> +		return;
+> +
+> +	rcu_read_lock();
+> +	curr_blkcg = blkcg_from_current();
+> +	blkcg = blkcg_from_mapping(mapping);
+> +	if (curr_blkcg != blkcg) {
+> +		if (blkcg)
+> +			css_put(&blkcg->css);
+> +		css_get(&curr_blkcg->css);
+> +		rcu_assign_pointer(mapping->i_blkcg, curr_blkcg);
+> +	}
+> +	rcu_read_unlock();
+> +}
+> +
+> +/**
+> + * blkcg_set_mapping_clean - clear the owner of a dirty mapping
+> + * @mapping: target address space
+> + *
+> + * Unset the owner of @mapping when it becomes clean.
+> + */
+> +
+> +void blkcg_set_mapping_clean(struct address_space *mapping)
+> +{
+> +	struct blkcg *blkcg;
+> +
+> +	rcu_read_lock();
+> +	blkcg = rcu_dereference(mapping->i_blkcg);
+> +	if (blkcg) {
+> +		css_put(&blkcg->css);
+> +		RCU_INIT_POINTER(mapping->i_blkcg, NULL);
+> +	}
+> +	rcu_read_unlock();
+> +}
+>  #endif
+>  
 
-Looks good to me, thanks Josef.
+Why do we need this?  We already have the inode_attach_wb(), which has the
+blkcg_css embedded in it for whoever dirtied the inode first.  Can we not just
+use that?  Thanks,
 
--- 
-Jens Axboe
-
+Josef
