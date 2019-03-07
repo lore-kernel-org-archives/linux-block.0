@@ -2,53 +2,53 @@ Return-Path: <SRS0=/o95=RK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B523C43381
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 18:09:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88341C43381
+	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 18:09:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B37220854
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 18:09:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64AE820854
+	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 18:09:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726446AbfCGSJc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Mar 2019 13:09:32 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:51195 "EHLO
+        id S1726364AbfCGSJa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Mar 2019 13:09:30 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:51165 "EHLO
         youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726439AbfCGSJb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Mar 2019 13:09:31 -0500
+        with ESMTP id S1726227AbfCGSJa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Mar 2019 13:09:30 -0500
 Received: from mail-wr1-f70.google.com ([209.85.221.70])
         by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
         (Exim 4.76)
         (envelope-from <andrea.righi@canonical.com>)
-        id 1h1xST-0001ks-Rp
-        for linux-block@vger.kernel.org; Thu, 07 Mar 2019 18:09:29 +0000
-Received: by mail-wr1-f70.google.com with SMTP id e14so8895935wrt.12
-        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2019 10:09:29 -0800 (PST)
+        id 1h1xSR-0001jg-Fv
+        for linux-block@vger.kernel.org; Thu, 07 Mar 2019 18:09:27 +0000
+Received: by mail-wr1-f70.google.com with SMTP id 92so8919700wrb.6
+        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2019 10:09:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=msHBAipTtijk0UwIEQstQw/a0b7WTAeEuEqzcOHunh8=;
-        b=AZnCp75qzmKBdh2r4s4/rLB73177IDIJVfQ/CVVj0R3FKnrEKBmbqRJDfHT29updzl
-         c+8Y7W69spMGaZ8qAS51QC7Qd/y+Bq+BUBAG/pzRq3HUu0wbZmyw6bhSu3494O+rSQtL
-         ipGq9QqzamBaR07WbLAmiT0PKmvT2RxRteebctQUrRlwKIZBHUWPWWf/2bhKtoYmxzAT
-         F5Fr9F09OPcCc+kz2XcnbzlgQD71vizTQGIoA/P/hWknSmxDbdJd4x6dQ2pJqMJnDFVE
-         ZFa8xCcvmUpfzoOmbc9HAtUYlugHrBT/0knldi+6QjqB797v+HUk5VLWzgF4Umahz5yV
-         z1BA==
-X-Gm-Message-State: APjAAAW34caIQKKLDq1EUqrMQxCZCLQs8xk2AIGkYIpW8RGbeoAlUzO0
-        X8/1uM7VLFjjG+RP/mqD1CfIT9uoIHKy5n53gGxaGUbnf11LfEWz3Tn9x+sM39GCzIAa8sCxlA7
-        rYtwte16Ag8lJP9Roz0JnoeY/m0DDj/608YdTDLKP
-X-Received: by 2002:a1c:48f:: with SMTP id 137mr6282805wme.21.1551982169517;
-        Thu, 07 Mar 2019 10:09:29 -0800 (PST)
-X-Google-Smtp-Source: APXvYqzrOrWH+mBOv+qbesPm46h8q7JZyeLqXfQE/4PXwLO2W361kOxwFytPiLP3snhrplrwntmGBQ==
-X-Received: by 2002:a1c:48f:: with SMTP id 137mr6282785wme.21.1551982169309;
-        Thu, 07 Mar 2019 10:09:29 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=orfBePFDVPvptP/SIEB4LRUszsdy1P7zJ6ur8xGTkSA=;
+        b=TvU93nL/cToBl12d8RY+JWb65up61i5a63xm8KYVcqLFoLVZNX7gzxFRWZ49OjN1Yx
+         X0CAev5N4NcXhVrdlHnfGMIabnbBp5o6fGIEln/6+muCiF7MoL+uH13JL2Xb+/fMN6v5
+         gjNZwttoWh78EHqLxNC8yh8NQ63MOkqj9h1bW4xKby4YaBDLUxIOdneAY8krutW9TpOd
+         7HNSf29g5WSTUUHNysU+shYey0R8jqqbQaev04LPCTlTw5+9FONsWtG6aMH7mSvCFHxB
+         o04ZDTzDGmIzVqzT3VmtU6E8ErBIiflS/OpIXxJe17Mac4EVKdHW+crLiRkpuxkm0sDZ
+         Jv4Q==
+X-Gm-Message-State: APjAAAUh8i/Hc/q85yko9OK6uvv+TxjZwuoxekghrqmlnmaociPRSgJF
+        pc7ngeAt2aNpjHsqA8DrfWgWEBgBGnQFgTwOb1aV0OCsR8Zfr2yt/ky9R8wSzGHTbpnpcXCs1KM
+        seXT5RRjjAt0FrxNTayNEWMG2Gtd5yaUvok2iHtyq
+X-Received: by 2002:adf:e8c7:: with SMTP id k7mr8149007wrn.298.1551982167160;
+        Thu, 07 Mar 2019 10:09:27 -0800 (PST)
+X-Google-Smtp-Source: APXvYqyJecW6nEEj/fdA3lXOu/pN3qPg21VLRkzya2SGrHut1zqO7OZjax3AHpwD6k0DdHMUDBVsrA==
+X-Received: by 2002:adf:e8c7:: with SMTP id k7mr8148976wrn.298.1551982166849;
+        Thu, 07 Mar 2019 10:09:26 -0800 (PST)
 Received: from localhost.localdomain (host22-124-dynamic.46-79-r.retail.telecomitalia.it. [79.46.124.22])
-        by smtp.gmail.com with ESMTPSA id a74sm7872747wma.22.2019.03.07.10.09.28
+        by smtp.gmail.com with ESMTPSA id a74sm7872747wma.22.2019.03.07.10.09.25
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 Mar 2019 10:09:28 -0800 (PST)
+        Thu, 07 Mar 2019 10:09:26 -0800 (PST)
 From:   Andrea Righi <andrea.righi@canonical.com>
 To:     Josef Bacik <josef@toxicpanda.com>, Tejun Heo <tj@kernel.org>
 Cc:     Li Zefan <lizefan@huawei.com>,
@@ -58,12 +58,10 @@ Cc:     Li Zefan <lizefan@huawei.com>,
         Dennis Zhou <dennis@kernel.org>, cgroups@vger.kernel.org,
         linux-block@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/3] blkcg: introduce io.sync_isolation
-Date:   Thu,  7 Mar 2019 19:08:33 +0100
-Message-Id: <20190307180834.22008-3-andrea.righi@canonical.com>
+Subject: [PATCH v2 0/3] blkcg: sync() isolation
+Date:   Thu,  7 Mar 2019 19:08:31 +0100
+Message-Id: <20190307180834.22008-1-andrea.righi@canonical.com>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190307180834.22008-1-andrea.righi@canonical.com>
-References: <20190307180834.22008-1-andrea.righi@canonical.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -71,123 +69,121 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a flag to the blkcg cgroups to make sync()'ers in a cgroup only be
-allowed to write out pages that have been dirtied by the cgroup itself.
+= Problem =
 
-This flag is disabled by default (meaning that we are not changing the
-previous behavior by default).
+When sync() is executed from a high-priority cgroup, the process is forced to
+wait the completion of the entire outstanding writeback I/O, even the I/O that
+was originally generated by low-priority cgroups potentially.
 
-When this flag is enabled any cgroup can write out only dirty pages that
-belong to the cgroup itself (except for the root cgroup that would still
-be able to write out all pages globally).
+This may cause massive latencies to random processes (even those running in the
+root cgroup) that shouldn't be I/O-throttled at all, similarly to a classic
+priority inversion problem.
 
-Signed-off-by: Andrea Righi <andrea.righi@canonical.com>
----
- Documentation/admin-guide/cgroup-v2.rst |  9 ++++++
- block/blk-throttle.c                    | 37 +++++++++++++++++++++++++
- include/linux/blk-cgroup.h              |  7 +++++
- 3 files changed, 53 insertions(+)
+This topic has been previously discussed here:
+https://patchwork.kernel.org/patch/10804489/
 
-diff --git a/Documentation/admin-guide/cgroup-v2.rst b/Documentation/admin-guide/cgroup-v2.rst
-index 53d3288c328b..17fff0ee97b8 100644
---- a/Documentation/admin-guide/cgroup-v2.rst
-+++ b/Documentation/admin-guide/cgroup-v2.rst
-@@ -1448,6 +1448,15 @@ IO Interface Files
- 	Shows pressure stall information for IO. See
- 	Documentation/accounting/psi.txt for details.
- 
-+  io.sync_isolation
-+        A flag (0|1) that determines whether a cgroup is allowed to write out
-+        only pages that have been dirtied by the cgroup itself. This option is
-+        set to false (0) by default, meaning that any cgroup would try to write
-+        out dirty pages globally, even those that have been dirtied by other
-+        cgroups.
-+
-+        Setting this option to true (1) provides a better isolation across
-+        cgroups that are doing an intense write I/O activity.
- 
- Writeback
- ~~~~~~~~~
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index da817896cded..4bc3b40a4d93 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -1704,6 +1704,35 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
- 	return ret ?: nbytes;
- }
- 
-+#ifdef CONFIG_CGROUP_WRITEBACK
-+static int sync_isolation_show(struct seq_file *sf, void *v)
-+{
-+	struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
-+
-+	seq_printf(sf, "%d\n", test_bit(BLKCG_SYNC_ISOLATION, &blkcg->flags));
-+	return 0;
-+}
-+
-+static ssize_t sync_isolation_write(struct kernfs_open_file *of,
-+				    char *buf, size_t nbytes, loff_t off)
-+{
-+	struct blkcg *blkcg = css_to_blkcg(of_css(of));
-+	unsigned long val;
-+	int err;
-+
-+	buf = strstrip(buf);
-+	err = kstrtoul(buf, 0, &val);
-+	if (err)
-+		return err;
-+	if (val)
-+		set_bit(BLKCG_SYNC_ISOLATION, &blkcg->flags);
-+	else
-+		clear_bit(BLKCG_SYNC_ISOLATION, &blkcg->flags);
-+
-+	return nbytes;
-+}
-+#endif
-+
- static struct cftype throtl_files[] = {
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- 	{
-@@ -1721,6 +1750,14 @@ static struct cftype throtl_files[] = {
- 		.write = tg_set_limit,
- 		.private = LIMIT_MAX,
- 	},
-+#ifdef CONFIG_CGROUP_WRITEBACK
-+	{
-+		.name = "sync_isolation",
-+		.flags = CFTYPE_NOT_ON_ROOT,
-+		.seq_show = sync_isolation_show,
-+		.write = sync_isolation_write,
-+	},
-+#endif
- 	{ }	/* terminate */
- };
- 
-diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
-index 0f7dcb70e922..6ac5aa049334 100644
---- a/include/linux/blk-cgroup.h
-+++ b/include/linux/blk-cgroup.h
-@@ -44,6 +44,12 @@ enum blkg_rwstat_type {
- 
- struct blkcg_gq;
- 
-+/* blkcg->flags */
-+enum {
-+	/* sync()'ers allowed to write out pages dirtied by the blkcg */
-+	BLKCG_SYNC_ISOLATION,
-+};
-+
- struct blkcg {
- 	struct cgroup_subsys_state	css;
- 	spinlock_t			lock;
-@@ -55,6 +61,7 @@ struct blkcg {
- 	struct blkcg_policy_data	*cpd[BLKCG_MAX_POLS];
- 
- 	struct list_head		all_blkcgs_node;
-+	unsigned long			flags;
- #ifdef CONFIG_CGROUP_WRITEBACK
- 	struct list_head		cgwb_wait_node;
- 	struct list_head		cgwb_list;
--- 
-2.19.1
+[ Thanks to Josef for the suggestions ]
+
+= Solution =
+
+Here's a slightly more detailed description of the solution, as suggested by
+Josef and Tejun (let me know if I misunderstood or missed anything):
+
+ - track the submitter of wb work (when issuing sync()) and the cgroup that
+   originally dirtied any inode, then use this information to determine the
+   proper "sync() domain" and decide if the I/O speed needs to be boosted or
+   not in order to prevent priority-inversion problems
+
+ - by default when sync() is issued, all the outstanding writeback I/O is
+   boosted to maximum speed to prevent priority inversion problems
+
+ - if sync() is issued by the same throttled cgroup that generated the dirty
+   pages, the corresponding writeback I/O is still throttled normally
+
+ - add a new flag to cgroups (io.sync_isolation) that would make sync()'ers in
+   that cgroup only be allowed to write out dirty pages that belong to its
+   cgroup
+
+= Test =
+
+Here's a trivial example to trigger the problem:
+
+ - create 2 cgroups: cg1 and cg2
+
+ # mkdir /sys/fs/cgroup/unified/cg1
+ # mkdir /sys/fs/cgroup/unified/cg2
+
+ - set an I/O limit of 1MB/s on cg1/io.ma:
+
+ # echo "8:0 rbps=1048576 wbps=1048576" > /sys/fs/cgroup/unified/cg1/io.max
+
+ - run a write-intensive workload in cg1
+
+ # cat /proc/self/cgroup
+ 0::/cg1
+ # fio --rw=write --bs=1M --size=32M --numjobs=16 --name=writer --time_based --runtime=30
+
+ - run sync in cg2 and measure time
+
+== Vanilla kernel ==
+
+ # cat /proc/self/cgroup
+ 0::/cg2
+
+ # time sync
+ real	9m32,618s
+ user	0m0,000s
+ sys	0m0,018s
+
+Ideally "sync" should complete almost immediately, because cg2 is unlimited and
+it's not doing any I/O at all. Instead, the entire system is totally sluggish,
+waiting for the throttled writeback I/O to complete, and it also triggers many
+hung task timeout warnings.
+
+== With this patch set applied and io.sync_isolation=0 (default) ==
+
+ # cat /proc/self/cgroup
+ 0::/cg2
+
+ # time sync
+ real	0m2,044s
+ user	0m0,009s
+ sys	0m0,000s
+
+[ Time range goes from 2s to 4s ]
+
+== With this patch set applied and io.sync_isolation=1 ==
+
+ # cat /proc/self/cgroup
+ 0::/cg2
+
+ # time sync
+
+ real	0m0,768s
+ user	0m0,001s
+ sys	0m0,008s
+
+[ Time range goes from 0.7s to 1.6s ]
+
+Changes in v2:
+ - fix: properly keep track of sync waiters when a blkcg is writing to
+   many block devices at the same time
+
+Andrea Righi (3):
+  blkcg: prevent priority inversion problem during sync()
+  blkcg: introduce io.sync_isolation
+  blkcg: implement sync() isolation
+
+ Documentation/admin-guide/cgroup-v2.rst |   9 +++
+ block/blk-cgroup.c                      | 178 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ block/blk-throttle.c                    |  48 ++++++++++++++-
+ fs/fs-writeback.c                       |  57 +++++++++++++++++-
+ fs/inode.c                              |   1 +
+ fs/sync.c                               |   8 ++-
+ include/linux/backing-dev-defs.h        |   2 +
+ include/linux/blk-cgroup.h              |  52 +++++++++++++++++
+ include/linux/fs.h                      |   4 ++
+ mm/backing-dev.c                        |   2 +
+ mm/page-writeback.c                     |   1 +
+ 11 files changed, 355 insertions(+), 7 deletions(-)
 
