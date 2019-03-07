@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08E85C43381
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 16:26:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB236C43381
+	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 16:26:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D0E7420840
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 16:26:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A3DB20854
+	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 16:26:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q1E4T6UH"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BiU1VLV7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726443AbfCGQ0t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1726395AbfCGQ0t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 7 Mar 2019 11:26:49 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:42463 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726395AbfCGQ0W (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Mar 2019 11:26:22 -0500
-Received: by mail-wr1-f65.google.com with SMTP id r5so18146199wrg.9
-        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2019 08:26:21 -0800 (PST)
+Received: from mail-wr1-f45.google.com ([209.85.221.45]:36356 "EHLO
+        mail-wr1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726442AbfCGQ0U (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Mar 2019 11:26:20 -0500
+Received: by mail-wr1-f45.google.com with SMTP id o17so18166608wrw.3
+        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2019 08:26:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=xlQD5/IUhsVAwG7WZ+Uc2ij3RLscMuoaMIxAkg1O+iU=;
-        b=Q1E4T6UHR4NyVlm1gbaXS3LV4WXKIF/F0NLzALIOjQ/JI8bU/ftJotOWy8XUY8UJ0j
-         d1e7gj4cZHb4l21rHhfjQFcTvhG+OuqT9BIhi6ORBNZ/PP3NLmZYw1FXyv5HJk4Sbyrl
-         Hjsa4b56ODAD1QEAuleKB/+IOgGMLiEFEhVhLeRy68WCrq5MsTbojThwSnDC++kO7HI6
-         YBQ6TAyLL+O4BHgIDct2NxkS96no/ITQ31rBbcoPwKjomcMgLlWY4mDnENBoBcRiFPca
-         8a3tTQ4omdGB+GToHNIlWVfuyaMS9bmCYT/V+tS6eKNPwYlvXR5+PY3ypSoEyCzul+ui
-         WQWQ==
+        bh=QUHw4uD/6PdjAyafvFS/vFaSGIdhMTKmdDdLyjrgLw8=;
+        b=BiU1VLV7jOAsQD02bezreQzwIST1pRkoNjFNXNMIbkymkn6y1h3pGaiPA1uO5bH2tc
+         cONVastuhjLUsr9yYGpMMEWqjG04/YeI0pJx2g9w5UdpvPEV9TEIFRNCqFwCRkGoU7SM
+         5EIN1eo1fuCtsw1vF1jDOJvTvgzWRq3xSJqvy3zwSarw+l3WmHSpxHKJlCsUqpIdDweM
+         NUAETypSqhLe60fcKAgBcNIM+d3Yc0HGgMh8spHwJovuYjTV8wS7ygNDRX7m1D25lBDw
+         HOQnCf2m2NqIidufGcDSNtuGKRqDTLQ7alooDns/2LyDYQvekS8HhSPCkWDybqkIzDQh
+         DzBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=xlQD5/IUhsVAwG7WZ+Uc2ij3RLscMuoaMIxAkg1O+iU=;
-        b=l64ROLtS0hqA0G4ek1RJ5LHmlKrcyokY7oH/qQAWPmkMqQHb4Ze3SkV+15yFm5Qp3k
-         7MXj5kPhAPAyUC0/ZJWu0Lqh8wfa1mUSHXnzIQAeqBBdfPAwLSqxlbU6aDxotR4klBhd
-         /kFKNq6UNasiV7eDR7sgECmJLzz5SfXZpvfMRCUEl7SO43I3bqq1aCXMokL0cpwAdi95
-         4pRc66/kSIGiZF5BZJ5OYAzTd2mPVc9Bed887Xlr2byOMFgdnzI6aLmjdrki3iEFH0rX
-         ymnZx2xM9q3fN+O+vczEGNCH9hFlBvdL+y/e9lSu1uU/SY4Hm8J/VJSTgRWTWZ66b133
-         K7bA==
-X-Gm-Message-State: APjAAAUTqPGUj75zu060woTsntXrgiUZV0nK2B6pMLF02782YqONTUFz
-        HP4Y+x9Ro1abxbHeDpjyseepXg==
-X-Google-Smtp-Source: APXvYqzSct+LDFTHq5O4JBJRM6R7GprYMkIgXLU6AWuLJihhVpa5nIAnVoOnDALeDoYGeR9ZDKQ48w==
-X-Received: by 2002:a5d:4e50:: with SMTP id r16mr7028459wrt.8.1551975980402;
-        Thu, 07 Mar 2019 08:26:20 -0800 (PST)
+        bh=QUHw4uD/6PdjAyafvFS/vFaSGIdhMTKmdDdLyjrgLw8=;
+        b=Yv8Qqcz/+UWJPDW9bZ8M3WtH8T+wZIwYzJE9F2lMPtC6MUzjELT+W+zlkAiPmFGQit
+         5fMbq7TdyvXEDdJviQfX1qcebSmPihL94pV3hisDTLR6r4O2XtT3V+T6OLen/9r5rd/5
+         OUyWtlKl54w9/7byWsSnCQLh9w8uYSv90xYA++eiMNmHdAbWjLyL9aBjUX1wXwF8qpxM
+         DUrbi8vpFDcGSerhTXY5b0Jl1FZp5Eo5ECqgUsNk8BS6Sx+4K/NVzbQitDZ9/doSezzU
+         weuYDVfGR8cdeBJr4hJE8IiUzvjEAEmMQdGkOpm5MlNK8fwGXSON3JqV/5JMJpOsiAAC
+         vlYg==
+X-Gm-Message-State: APjAAAVhHzVN/p7RBYpIrRsia5k7olJ7yOnuyPPpYP3RjyJ4jcTqVCMp
+        paR3XETgaPkBw+YGRa3injfiFQ==
+X-Google-Smtp-Source: APXvYqxH/k9Ocfv1Rbijdvaa9erPU0H6oubxWJA9pAEYHe/zCBKpzWf2Tu/dyMBY1YGxg4nOwKlAjw==
+X-Received: by 2002:adf:a4c9:: with SMTP id h9mr7363248wrb.254.1551975978016;
+        Thu, 07 Mar 2019 08:26:18 -0800 (PST)
 Received: from localhost.localdomain (146-241-117-61.dyn.eolo.it. [146.241.117.61])
-        by smtp.gmail.com with ESMTPSA id o127sm5801797wmo.20.2019.03.07.08.26.19
+        by smtp.gmail.com with ESMTPSA id o127sm5801797wmo.20.2019.03.07.08.26.16
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 Mar 2019 08:26:19 -0800 (PST)
+        Thu, 07 Mar 2019 08:26:17 -0800 (PST)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -61,9 +61,9 @@ Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         broonie@kernel.org, bfq-iosched@googlegroups.com,
         oleksandr@natalenko.name, fra.fra.800@gmail.com,
         Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX IMPROVEMENT 7/8] block, bfq: print SHARED instead of pid for shared queues in logs
-Date:   Thu,  7 Mar 2019 17:25:53 +0100
-Message-Id: <20190307162554.77205-8-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX IMPROVEMENT 5/8] block, bfq: do not tag totally seeky queues as soft rt
+Date:   Thu,  7 Mar 2019 17:25:51 +0100
+Message-Id: <20190307162554.77205-6-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190307162554.77205-1-paolo.valente@linaro.org>
 References: <20190307162554.77205-1-paolo.valente@linaro.org>
@@ -74,99 +74,56 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Francesco Pollicino <fra.fra.800@gmail.com>
+Sync random I/O is likely to be confused with soft real-time I/O,
+because it is characterized by limited throughput and apparently
+isochronous arrival pattern. To avoid false positives, this commits
+prevents bfq_queues containing only random (seeky) I/O from being
+tagged as soft real-time.
 
-The function "bfq_log_bfqq" prints the pid of the process
-associated with the queue passed as input.
-
-Unfortunately, if the queue is shared, then more than one process
-is associated with the queue. The pid that gets printed in this
-case is the pid of one of the associated processes.
-Which process gets printed depends on the exact sequence of merge
-events the queue underwent. So printing such a pid is rather
-useless and above all is often rather confusing because it
-reports a random pid between those of the associated processes.
-
-This commit addresses this issue by printing SHARED instead of a pid
-if the queue is shared.
-
-Signed-off-by: Francesco Pollicino <fra.fra.800@gmail.com>
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/bfq-iosched.c | 10 ++++++++++
- block/bfq-iosched.h | 18 ++++++++++++++++--
- 2 files changed, 26 insertions(+), 2 deletions(-)
+ block/bfq-iosched.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 500b04df9efa..7d95d9c01036 100644
+index b96be3764b8a..d34b80e5c47d 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -2590,6 +2590,16 @@ bfq_merge_bfqqs(struct bfq_data *bfqd, struct bfq_io_cq *bic,
- 	 *   assignment causes no harm).
+@@ -242,6 +242,14 @@ static struct kmem_cache *bfq_pool;
+ 	  blk_rq_sectors(rq) < BFQQ_SECT_THR_NONROT))
+ #define BFQQ_CLOSE_THR		(sector_t)(8 * 1024)
+ #define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 19)
++/*
++ * Sync random I/O is likely to be confused with soft real-time I/O,
++ * because it is characterized by limited throughput and apparently
++ * isochronous arrival pattern. To avoid false positives, queues
++ * containing only random (seeky) I/O are prevented from being tagged
++ * as soft real-time.
++ */
++#define BFQQ_TOTALLY_SEEKY(bfqq)	(bfqq->seek_history & -1)
+ 
+ /* Min number of samples required to perform peak-rate update */
+ #define BFQ_RATE_MIN_SAMPLES	32
+@@ -1622,6 +1630,7 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
  	 */
- 	new_bfqq->bic = NULL;
-+	/*
-+	 * If the queue is shared, the pid is the pid of one of the associated
-+	 * processes. Which pid depends on the exact sequence of merge events
-+	 * the queue underwent. So printing such a pid is useless and confusing
-+	 * because it reports a random pid between those of the associated
-+	 * processes.
-+	 * We mark such a queue with a pid -1, and then print SHARED instead of
-+	 * a pid in logging messages.
-+	 */
-+	new_bfqq->pid = -1;
- 	bfqq->bic = NULL;
- 	/* release process reference to bfqq */
- 	bfq_put_queue(bfqq);
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 829730b96fb2..21ddb19cc322 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -32,6 +32,8 @@
- #define BFQ_DEFAULT_GRP_IOPRIO	0
- #define BFQ_DEFAULT_GRP_CLASS	IOPRIO_CLASS_BE
- 
-+#define MAX_PID_STR_LENGTH 12
+ 	in_burst = bfq_bfqq_in_large_burst(bfqq);
+ 	soft_rt = bfqd->bfq_wr_max_softrt_rate > 0 &&
++		!BFQQ_TOTALLY_SEEKY(bfqq) &&
+ 		!in_burst &&
+ 		time_is_before_jiffies(bfqq->soft_rt_next_start) &&
+ 		bfqq->dispatched == 0;
+@@ -4816,6 +4825,11 @@ bfq_update_io_seektime(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ {
+ 	bfqq->seek_history <<= 1;
+ 	bfqq->seek_history |= BFQ_RQ_SEEKY(bfqd, bfqq->last_request_pos, rq);
 +
- /*
-  * Soft real-time applications are extremely more latency sensitive
-  * than interactive ones. Over-raise the weight of the former to
-@@ -1016,13 +1018,23 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq);
- /* --------------- end of interface of B-WF2Q+ ---------------- */
++	if (bfqq->wr_coeff > 1 &&
++	    bfqq->wr_cur_max_time == bfqd->bfq_wr_rt_max_time &&
++	    BFQQ_TOTALLY_SEEKY(bfqq))
++		bfq_bfqq_end_wr(bfqq);
+ }
  
- /* Logging facilities. */
-+void bfq_pid_to_str(int pid, char *str, int len)
-+{
-+	if (pid != -1)
-+		snprintf(str, len, "%d", pid);
-+	else
-+		snprintf(str, len, "SHARED-");
-+}
-+
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
- struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
- 
- #define bfq_log_bfqq(bfqd, bfqq, fmt, args...)	do {			\
-+	char pid_str[MAX_PID_STR_LENGTH];	\
-+	bfq_pid_to_str((bfqq)->pid, pid_str, MAX_PID_STR_LENGTH);	\
- 	blk_add_cgroup_trace_msg((bfqd)->queue,				\
- 			bfqg_to_blkg(bfqq_group(bfqq))->blkcg,		\
--			"bfq%d%c " fmt, (bfqq)->pid,			\
-+			"bfq%s%c " fmt, pid_str,			\
- 			bfq_bfqq_sync((bfqq)) ? 'S' : 'A', ##args);	\
- } while (0)
- 
-@@ -1034,7 +1046,9 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
- #else /* CONFIG_BFQ_GROUP_IOSCHED */
- 
- #define bfq_log_bfqq(bfqd, bfqq, fmt, args...)	\
--	blk_add_trace_msg((bfqd)->queue, "bfq%d%c " fmt, (bfqq)->pid,	\
-+	char pid_str[MAX_PID_STR_LENGTH];	\
-+	bfq_pid_to_str((bfqq)->pid, pid_str, MAX_PID_STR_LENGTH);	\
-+	blk_add_trace_msg((bfqd)->queue, "bfq%s%c " fmt, pid_str,	\
- 			bfq_bfqq_sync((bfqq)) ? 'S' : 'A',		\
- 				##args)
- #define bfq_log_bfqg(bfqd, bfqg, fmt, args...)		do {} while (0)
+ static void bfq_update_has_short_ttime(struct bfq_data *bfqd,
 -- 
 2.20.1
 
