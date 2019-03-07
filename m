@@ -2,132 +2,167 @@ Return-Path: <SRS0=/o95=RK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0474C10F03
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 15:59:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47189C43381
+	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 16:24:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B23C20652
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 15:59:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="P5/EiTyU"
+	by mail.kernel.org (Postfix) with ESMTP id 205A12081B
+	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 16:24:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726512AbfCGP7t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Mar 2019 10:59:49 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:40903 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726285AbfCGP7s (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Mar 2019 10:59:48 -0500
-Received: by mail-it1-f195.google.com with SMTP id l139so16501026ita.5
-        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2019 07:59:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=YR2PiZD6BHr8hgVqVgUGtVxLkfx0p0sFvLP49y5X5EI=;
-        b=P5/EiTyU4KfgnW2+IBT7ZH5KGDuij6zl65bbE5KcMtmJWTWMR2Ui7E7uFQ2ss9mDTw
-         ryFFeSc5FcaIb59hlJgyi1cXKO/QH8ZQLbfUOH2FX9xPrZr3q0fmgPfxPenrJUL5UXg4
-         uqZdAML7UD/m2bahGJDnkKQfA73U94svTUhYwHSgiy9VQwxLRbs3rq7Zfk9GYelDsR3I
-         QtZq3G9g9qD1UNBpzhgn76A6P5bdZMPkPc4kyGRhA5aaGgzUk/vr+1gzuvsKUn/WHbla
-         mpHeKlBTEQSmOyQ5TM0Nuq2//uCb/i3MuqkYztI3K6cXTH2P3ZXa6A5YaacLVYNikIu0
-         2ShQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=YR2PiZD6BHr8hgVqVgUGtVxLkfx0p0sFvLP49y5X5EI=;
-        b=SGv4kjjQF822z4wXw/juXybSjQXjk8/mZ2O8rOnoBdkftodyAny/OEoVseeFr2FJGc
-         rnVhwll6fdObfBHa/tSA8/6ue+BcuY01hPg3j9X1NqTiG4DZQPgB3uWleMjISzMLKoas
-         SNZUvTUf4aSFzZxcPnAhZgnVL6pPsJextwcF92Og5abkDa9ZB5suOX1I9NFeznVUJ41F
-         8F2LpFpUunfq3Fo54uORRKZgPj4oX52EnnRp8hvrAxnX2qqUY4S4pK+ad4zKyTbTHj9F
-         nBiCRDWgXP3fnsGoa/v3B5oDUuFkUq+EGKODpukYUCCH5mc2EAfdMx8aumHlCvJsUkbN
-         qXcg==
-X-Gm-Message-State: APjAAAU1px3IftqS/7S6Hvfx9hs/JBOWPl3frBER8zOjUodtbTGL38sj
-        PawWfvSSJTVi5xa68sPH08VFmUfUagrIeA==
-X-Google-Smtp-Source: APXvYqxmvbSmWH8FSqy1YOBptTvP1Jy52VMXPnwHGvYyYDU/NCxcwDU+qN3Zu9EUcEonMK20GUp5zw==
-X-Received: by 2002:a24:1c4d:: with SMTP id c74mr5540098itc.36.1551974387250;
-        Thu, 07 Mar 2019 07:59:47 -0800 (PST)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id x25sm259164ion.78.2019.03.07.07.59.45
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 Mar 2019 07:59:46 -0800 (PST)
-Subject: Re: [PATCH] pblk: fix max_io calculation
-To:     =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190307121853.14503-1-javier@javigon.com>
- <8b13dcf3-4486-0e14-b718-417c7fc42a7b@lightnvm.io>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a2f98eea-2407-49ad-4ff6-c1e92762d2f8@kernel.dk>
-Date:   Thu, 7 Mar 2019 08:59:45 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        id S1726200AbfCGQY6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Mar 2019 11:24:58 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:50661 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726127AbfCGQY6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 7 Mar 2019 11:24:58 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A47FB30832CF;
+        Thu,  7 Mar 2019 16:24:57 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 271DE60856;
+        Thu,  7 Mar 2019 16:24:52 +0000 (UTC)
+Date:   Thu, 7 Mar 2019 11:24:51 -0500
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Chengguang Xu <cgxu519@gmx.com>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Helen Koike <helen.koike@collabora.com>,
+        Huaisheng Ye <yehs1@lenovo.com>,
+        Jason Cai <jason.cai.kern@gmail.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        NeilBrown <neil@brown.name>
+Subject: [git pull] device mapper changes for 5.1
+Message-ID: <20190307162450.GA8985@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <8b13dcf3-4486-0e14-b718-417c7fc42a7b@lightnvm.io>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Thu, 07 Mar 2019 16:24:57 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/7/19 8:57 AM, Matias Bjørling wrote:
-> On 3/7/19 1:18 PM, Javier González wrote:
->> When calculating the maximun I/O size allowed into the buffer, consider
->> the write size (ws_opt) used by the write thread in order to cover the
->> case in which, due to flushes, the mem and subm pointers are disaligned
->> by (ws_opt - 1). This case currently translates into a stall when
->> an I/O of the largest possible size is submitted.
->>
->> Fixes: f9f9d1ae2c66 ("lightnvm: pblk: prevent stall due to wb threshold")
->>
->> Signed-off-by: Javier González <javier@javigon.com>
->> ---
->>
->> Matias: Can you apply this as a fix to 5.1. This is a case I missed when fixing
->> the wb threshold, which is also scheduled for 5.1
->>
->> Thanks,
->> Javier
->>
->>   drivers/lightnvm/pblk-rl.c | 7 ++++++-
->>   1 file changed, 6 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/lightnvm/pblk-rl.c b/drivers/lightnvm/pblk-rl.c
->> index b014957dde0b..a5f8bc2defbc 100644
->> --- a/drivers/lightnvm/pblk-rl.c
->> +++ b/drivers/lightnvm/pblk-rl.c
->> @@ -233,10 +233,15 @@ void pblk_rl_init(struct pblk_rl *rl, int budget, int threshold)
->>   	/* To start with, all buffer is available to user I/O writers */
->>   	rl->rb_budget = budget;
->>   	rl->rb_user_max = budget;
->> -	rl->rb_max_io = threshold ? (budget - threshold) : (budget - 1);
->>   	rl->rb_gc_max = 0;
->>   	rl->rb_state = PBLK_RL_HIGH;
->>   
->> +	/* Maximize I/O size and ansure that back threshold is respected */
->> +	if (threshold)
->> +		rl->rb_max_io = budget - pblk->min_write_pgs_data - threshold;
->> +	else
->> +		rl->rb_max_io = budget - pblk->min_write_pgs_data - 1;
->> +
->>   	atomic_set(&rl->rb_user_cnt, 0);
->>   	atomic_set(&rl->rb_gc_cnt, 0);
->>   	atomic_set(&rl->rb_space, -1);
->>
-> 
-> Hi Jens,
-> 
-> If possible, could you please pick this one up for 5.1? It fixes a 
-> previous patch that was introduced in 5.1 that should fix a stall, but 
-> didn't quite catch it.
+Hi Linus,
 
-Applied
+I had to rebase a couple days ago because I decided to drop the
+bio-based DM "noclone" feature that was developed this past development
+cycle.  The "noclone" support allowed certain DM targets to work without
+requiring bio cloning.  A performance win of ~10% was realized with 512b
+bio payloads, on _really_ fast storage, but if the bio payload just
+increased to as small as 4K then the improvement was only 1%.  The risk
+vs reward trade-off skewed toward too risky at this time given late
+breaking reports of Fedora boot hangs on s390 and x86_64 kvm guests for
+particular kernel configs.  Persistent memory may warrant revisiting
+this line of work in the future but for now it has been tabled.
 
--- 
-Jens Axboe
+The following changes since commit 4ae280b4ee3463fa57bbe6eede26b97daff8a0f1:
 
+  dm thin: fix bug where bio that overwrites thin block ignores FUA (2019-02-14 19:02:29 -0500)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.1/dm-changes
+
+for you to fetch changes up to 225557446856448039a9e495da37b72c20071ef2:
+
+  dm integrity: limit the rate of error messages (2019-03-06 09:03:00 -0500)
+
+Please pull, thanks.
+Mike
+
+----------------------------------------------------------------
+- Update bio-based DM core to always call blk_queue_split() and update
+  DM targets to properly advertise discard limits that blk_queue_split()
+  looks at when dtermining to split discard.  Whereby allowing DM core's
+  own 'split_discard_bios' to be removed.
+
+- Improve DM cache target to provide support for discard passdown to the
+  origin device.
+
+- Introduce support to directly boot to a DM mapped device from init by
+  using dm-mod.create= module param.  This eliminates the need for an
+  elaborate initramfs that is otherwise needed to create DM devices.
+  This feature's implementation has been worked on for quite some time
+  (got up to v12) and is of particular interest to Android and other
+  more embedded platforms (e.g. ARM).
+
+- Rate limit errors from the DM integrity target that were identified as
+  the cause for recent NMI hangs due to console limitations.
+
+- Add sanity checks for user input to thin-pool and external snapshot
+  creation.
+
+- Remove some unused leftover kmem caches from when old .request_fn
+  request-based support was removed.
+
+- Various small cleanups and fixes to targets (e.g. typos, needless
+  unlikely() annotations, use struct_size(), remove needless
+  .direct_access method from dm-snapshot)
+
+----------------------------------------------------------------
+Chengguang Xu (3):
+      dm integrity: remove redundant unlikely annotation
+      dm verity fec: remove redundant unlikely annotation
+      dm block manager: remove redundant unlikely annotation
+
+Gustavo A. R. Silva (1):
+      dm switch: use struct_size() in kzalloc()
+
+Helen Koike (1):
+      dm: add support to directly boot to a mapped device
+
+Huaisheng Ye (1):
+      dm writecache: fix typo in name for writeback_wq
+
+Jason Cai (Xiang Feng) (1):
+      dm thin: add sanity checks to thin-pool and external snapshot creation
+
+Mike Snitzer (5):
+      dm: update dm_process_bio() to split bio if in ->make_request_fn()
+      dm: eliminate 'split_discard_bios' flag from DM target interface
+      dm: remove unused _rq_tio_cache and _rq_cache
+      dm: always call blk_queue_split() in dm_process_bio()
+      dm cache: add support for discard passdown to the origin device
+
+Mikulas Patocka (2):
+      dm snapshot: don't define direct_access if we don't support it
+      dm integrity: limit the rate of error messages
+
+NeilBrown (1):
+      dm: fix to_sector() for 32bit
+
+ Documentation/device-mapper/cache.txt         |   3 +
+ Documentation/device-mapper/dm-init.txt       | 114 ++++++++++
+ drivers/md/Kconfig                            |  12 +
+ drivers/md/Makefile                           |   4 +
+ drivers/md/dm-cache-target.c                  | 127 ++++++++---
+ drivers/md/dm-init.c                          | 303 ++++++++++++++++++++++++++
+ drivers/md/dm-integrity.c                     |  10 +-
+ drivers/md/dm-ioctl.c                         | 103 +++++++++
+ drivers/md/dm-raid.c                          |  14 +-
+ drivers/md/dm-rq.c                            |  16 ++
+ drivers/md/dm-rq.h                            |  16 --
+ drivers/md/dm-snap.c                          |   8 -
+ drivers/md/dm-switch.c                        |   3 +-
+ drivers/md/dm-thin.c                          |  14 +-
+ drivers/md/dm-verity-fec.c                    |   6 +-
+ drivers/md/dm-writecache.c                    |   2 +-
+ drivers/md/dm-zoned-target.c                  |   1 -
+ drivers/md/dm.c                               | 139 ++++++------
+ drivers/md/persistent-data/dm-block-manager.c |   8 +-
+ include/linux/device-mapper.h                 |  17 +-
+ include/uapi/linux/dm-ioctl.h                 |   4 +-
+ 21 files changed, 776 insertions(+), 148 deletions(-)
+ create mode 100644 Documentation/device-mapper/dm-init.txt
+ create mode 100644 drivers/md/dm-init.c
