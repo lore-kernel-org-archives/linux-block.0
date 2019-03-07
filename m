@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB236C43381
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 16:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DBEEC43381
+	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 16:26:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7A3DB20854
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 16:26:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAE0020854
+	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 16:26:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BiU1VLV7"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m9my2F8P"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726395AbfCGQ0t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Mar 2019 11:26:49 -0500
-Received: from mail-wr1-f45.google.com ([209.85.221.45]:36356 "EHLO
-        mail-wr1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726442AbfCGQ0U (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Mar 2019 11:26:20 -0500
-Received: by mail-wr1-f45.google.com with SMTP id o17so18166608wrw.3
-        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2019 08:26:18 -0800 (PST)
+        id S1726423AbfCGQ0S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Mar 2019 11:26:18 -0500
+Received: from mail-wr1-f50.google.com ([209.85.221.50]:35090 "EHLO
+        mail-wr1-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726334AbfCGQ0R (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Mar 2019 11:26:17 -0500
+Received: by mail-wr1-f50.google.com with SMTP id t18so18169230wrx.2
+        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2019 08:26:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=QUHw4uD/6PdjAyafvFS/vFaSGIdhMTKmdDdLyjrgLw8=;
-        b=BiU1VLV7jOAsQD02bezreQzwIST1pRkoNjFNXNMIbkymkn6y1h3pGaiPA1uO5bH2tc
-         cONVastuhjLUsr9yYGpMMEWqjG04/YeI0pJx2g9w5UdpvPEV9TEIFRNCqFwCRkGoU7SM
-         5EIN1eo1fuCtsw1vF1jDOJvTvgzWRq3xSJqvy3zwSarw+l3WmHSpxHKJlCsUqpIdDweM
-         NUAETypSqhLe60fcKAgBcNIM+d3Yc0HGgMh8spHwJovuYjTV8wS7ygNDRX7m1D25lBDw
-         HOQnCf2m2NqIidufGcDSNtuGKRqDTLQ7alooDns/2LyDYQvekS8HhSPCkWDybqkIzDQh
-         DzBQ==
+        bh=0NAvrfo3Asn/Q7s9KDBK/T3qV+c+kR0mqhtwlAgJI8Y=;
+        b=m9my2F8PxT+VEZ6ZTPRJZ/yysIczbN1tS3x9zZ+21ou3rloElcIVaihb5lSi8/D2Kl
+         gxAU9WdyhHy/rKGJDdhiG0l68VhkPTM3Q4eaJm3IYLIVNdPpPUlI4FKf6EIaeVjGtE7M
+         2lLxaOTQEbgaciU8+GLqgzTGPLiPAWPmZIqZ7qb0GL43yf5gScO0mLO/+wTTIz1V6TWH
+         Oy57ZnVxmcWxDMdN2pFjLgAzyiPGpByhAdrxL8VTH4D2NxwfpSjUhr2L3CaSnV/GAtcJ
+         lALerYJ/sceAqSxllZNOQqK3PW15I+nv49D/tjYOLRozWJJ6eAKzEeS15SKVR5pO0r5l
+         rlBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=QUHw4uD/6PdjAyafvFS/vFaSGIdhMTKmdDdLyjrgLw8=;
-        b=Yv8Qqcz/+UWJPDW9bZ8M3WtH8T+wZIwYzJE9F2lMPtC6MUzjELT+W+zlkAiPmFGQit
-         5fMbq7TdyvXEDdJviQfX1qcebSmPihL94pV3hisDTLR6r4O2XtT3V+T6OLen/9r5rd/5
-         OUyWtlKl54w9/7byWsSnCQLh9w8uYSv90xYA++eiMNmHdAbWjLyL9aBjUX1wXwF8qpxM
-         DUrbi8vpFDcGSerhTXY5b0Jl1FZp5Eo5ECqgUsNk8BS6Sx+4K/NVzbQitDZ9/doSezzU
-         weuYDVfGR8cdeBJr4hJE8IiUzvjEAEmMQdGkOpm5MlNK8fwGXSON3JqV/5JMJpOsiAAC
-         vlYg==
-X-Gm-Message-State: APjAAAVhHzVN/p7RBYpIrRsia5k7olJ7yOnuyPPpYP3RjyJ4jcTqVCMp
-        paR3XETgaPkBw+YGRa3injfiFQ==
-X-Google-Smtp-Source: APXvYqxH/k9Ocfv1Rbijdvaa9erPU0H6oubxWJA9pAEYHe/zCBKpzWf2Tu/dyMBY1YGxg4nOwKlAjw==
-X-Received: by 2002:adf:a4c9:: with SMTP id h9mr7363248wrb.254.1551975978016;
-        Thu, 07 Mar 2019 08:26:18 -0800 (PST)
+        bh=0NAvrfo3Asn/Q7s9KDBK/T3qV+c+kR0mqhtwlAgJI8Y=;
+        b=sQzZitsS4eGfDUamqrlTA/r+m7HrlUArGxCzzKkuzFOnmlr77WdufpjSWCPGJu9XCv
+         GTqd0qzqnVogHJvKSnZz9WOuXFf2YJ93P9nDvYWY17rEIkYGAfmStZ3bFp/y0nl1EPWI
+         H4rZCxcwtr4BIIIYzE6U47WDgQyklGPaA4e3bjMepgeDTg7GqKD56Wbv38++l6IMLgBl
+         1s3K0FA3hGRX0TFkyM4q20HuSXnlRMDS7jhBTfWPhE400j+yDCE+FwwGJhi+UNpTyDJS
+         08gi/hg7QagvTv5kK645IG/UKhVSX24KGG2ZxOT20cetgYFlGNQiB6kJwMue4rt/Hfex
+         w4sA==
+X-Gm-Message-State: APjAAAWEbVBDrdr0yrR8IgPf64KMX66McFDuWTneLCnoGofwE0y2wbVG
+        2Hkiw+OPsuGn0q1ifDRgTWH5sg==
+X-Google-Smtp-Source: APXvYqxo7RL6PHYoNvVskc0ETjyLMGwZK1Dw26HNLhjwju7+RkIKVBJnzPqs3DcIXqXFo+OMDxisCg==
+X-Received: by 2002:adf:dfc4:: with SMTP id q4mr7703465wrn.276.1551975973567;
+        Thu, 07 Mar 2019 08:26:13 -0800 (PST)
 Received: from localhost.localdomain (146-241-117-61.dyn.eolo.it. [146.241.117.61])
-        by smtp.gmail.com with ESMTPSA id o127sm5801797wmo.20.2019.03.07.08.26.16
+        by smtp.gmail.com with ESMTPSA id o127sm5801797wmo.20.2019.03.07.08.26.12
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 07 Mar 2019 08:26:17 -0800 (PST)
+        Thu, 07 Mar 2019 08:26:13 -0800 (PST)
 From:   Paolo Valente <paolo.valente@linaro.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -61,9 +61,9 @@ Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         broonie@kernel.org, bfq-iosched@googlegroups.com,
         oleksandr@natalenko.name, fra.fra.800@gmail.com,
         Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX IMPROVEMENT 5/8] block, bfq: do not tag totally seeky queues as soft rt
-Date:   Thu,  7 Mar 2019 17:25:51 +0100
-Message-Id: <20190307162554.77205-6-paolo.valente@linaro.org>
+Subject: [PATCH BUGFIX IMPROVEMENT 2/8] block, bfq: do not idle for lowest-weight queues
+Date:   Thu,  7 Mar 2019 17:25:48 +0100
+Message-Id: <20190307162554.77205-3-paolo.valente@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190307162554.77205-1-paolo.valente@linaro.org>
 References: <20190307162554.77205-1-paolo.valente@linaro.org>
@@ -74,56 +74,421 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Sync random I/O is likely to be confused with soft real-time I/O,
-because it is characterized by limited throughput and apparently
-isochronous arrival pattern. To avoid false positives, this commits
-prevents bfq_queues containing only random (seeky) I/O from being
-tagged as soft real-time.
+In most cases, it is detrimental for throughput to plug I/O dispatch
+when the in-service bfq_queue becomes temporarily empty (plugging is
+performed to wait for the possible arrival, soon, of new I/O from the
+in-service queue). There is however a case where plugging is needed
+for service guarantees. If a bfq_queue, say Q, has a higher weight
+than some other active bfq_queue, and is sync, i.e., contains sync
+I/O, then, to guarantee that Q does receive a higher share of the
+throughput than other lower-weight queues, it is necessary to plug I/O
+dispatch when Q remains temporarily empty while being served.
+
+For this reason, BFQ performs I/O plugging when some active bfq_queue
+has a higher weight than some other active bfq_queue. But this is
+unnecessarily overkill. In fact, if the in-service bfq_queue actually
+has a weight lower than or equal to the other queues, then the queue
+*must not* be guaranteed a higher share of the throughput than the
+other queues. So, not plugging I/O cannot cause any harm to the
+queue. And can boost throughput.
+
+Taking advantage of this fact, this commit does not plug I/O for sync
+bfq_queues with a weight lower than or equal to the weights of the
+other queues. Here is an example of the resulting throughput boost
+with the dbench workload, which is particularly nasty for BFQ. With
+the dbench test in the Phoronix suite, BFQ reaches its lowest total
+throughput with 6 clients on a filesystem with journaling, in case the
+journaling daemon has a higher weight than normal processes. Before
+this commit, the total throughput was ~80 MB/sec on a PLEXTOR PX-256M5,
+after this commit it is ~100 MB/sec.
 
 Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 ---
- block/bfq-iosched.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ block/bfq-iosched.c | 204 +++++++++++++++++++++++++-------------------
+ block/bfq-iosched.h |   6 +-
+ block/bfq-wf2q.c    |   2 +-
+ 3 files changed, 118 insertions(+), 94 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index b96be3764b8a..d34b80e5c47d 100644
+index eb658de3cc40..2be504f25b09 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -242,6 +242,14 @@ static struct kmem_cache *bfq_pool;
- 	  blk_rq_sectors(rq) < BFQQ_SECT_THR_NONROT))
- #define BFQQ_CLOSE_THR		(sector_t)(8 * 1024)
- #define BFQQ_SEEKY(bfqq)	(hweight32(bfqq->seek_history) > 19)
-+/*
-+ * Sync random I/O is likely to be confused with soft real-time I/O,
-+ * because it is characterized by limited throughput and apparently
-+ * isochronous arrival pattern. To avoid false positives, queues
-+ * containing only random (seeky) I/O are prevented from being tagged
-+ * as soft real-time.
-+ */
-+#define BFQQ_TOTALLY_SEEKY(bfqq)	(bfqq->seek_history & -1)
- 
- /* Min number of samples required to perform peak-rate update */
- #define BFQ_RATE_MIN_SAMPLES	32
-@@ -1622,6 +1630,7 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
- 	 */
- 	in_burst = bfq_bfqq_in_large_burst(bfqq);
- 	soft_rt = bfqd->bfq_wr_max_softrt_rate > 0 &&
-+		!BFQQ_TOTALLY_SEEKY(bfqq) &&
- 		!in_burst &&
- 		time_is_before_jiffies(bfqq->soft_rt_next_start) &&
- 		bfqq->dispatched == 0;
-@@ -4816,6 +4825,11 @@ bfq_update_io_seektime(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- {
- 	bfqq->seek_history <<= 1;
- 	bfqq->seek_history |= BFQ_RQ_SEEKY(bfqd, bfqq->last_request_pos, rq);
-+
-+	if (bfqq->wr_coeff > 1 &&
-+	    bfqq->wr_cur_max_time == bfqd->bfq_wr_rt_max_time &&
-+	    BFQQ_TOTALLY_SEEKY(bfqq))
-+		bfq_bfqq_end_wr(bfqq);
+@@ -629,12 +629,19 @@ void bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq)
  }
  
- static void bfq_update_has_short_ttime(struct bfq_data *bfqd,
+ /*
+- * The following function returns true if every queue must receive the
+- * same share of the throughput (this condition is used when deciding
+- * whether idling may be disabled, see the comments in the function
+- * bfq_better_to_idle()).
++ * The following function returns false either if every active queue
++ * must receive the same share of the throughput (symmetric scenario),
++ * or, as a special case, if bfqq must receive a share of the
++ * throughput lower than or equal to the share that every other active
++ * queue must receive.  If bfqq does sync I/O, then these are the only
++ * two cases where bfqq happens to be guaranteed its share of the
++ * throughput even if I/O dispatching is not plugged when bfqq remains
++ * temporarily empty (for more details, see the comments in the
++ * function bfq_better_to_idle()). For this reason, the return value
++ * of this function is used to check whether I/O-dispatch plugging can
++ * be avoided.
+  *
+- * Such a scenario occurs when:
++ * The above first case (symmetric scenario) occurs when:
+  * 1) all active queues have the same weight,
+  * 2) all active queues belong to the same I/O-priority class,
+  * 3) all active groups at the same level in the groups tree have the same
+@@ -654,30 +661,36 @@ void bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+  * support or the cgroups interface are not enabled, thus no state
+  * needs to be maintained in this case.
+  */
+-static bool bfq_symmetric_scenario(struct bfq_data *bfqd)
++static bool bfq_asymmetric_scenario(struct bfq_data *bfqd,
++				   struct bfq_queue *bfqq)
+ {
++	bool smallest_weight = bfqq &&
++		bfqq->weight_counter &&
++		bfqq->weight_counter ==
++		container_of(
++			rb_first_cached(&bfqd->queue_weights_tree),
++			struct bfq_weight_counter,
++			weights_node);
++
+ 	/*
+ 	 * For queue weights to differ, queue_weights_tree must contain
+ 	 * at least two nodes.
+ 	 */
+-	bool varied_queue_weights = !RB_EMPTY_ROOT(&bfqd->queue_weights_tree) &&
+-		(bfqd->queue_weights_tree.rb_node->rb_left ||
+-		 bfqd->queue_weights_tree.rb_node->rb_right);
++	bool varied_queue_weights = !smallest_weight &&
++		!RB_EMPTY_ROOT(&bfqd->queue_weights_tree.rb_root) &&
++		(bfqd->queue_weights_tree.rb_root.rb_node->rb_left ||
++		 bfqd->queue_weights_tree.rb_root.rb_node->rb_right);
+ 
+ 	bool multiple_classes_busy =
+ 		(bfqd->busy_queues[0] && bfqd->busy_queues[1]) ||
+ 		(bfqd->busy_queues[0] && bfqd->busy_queues[2]) ||
+ 		(bfqd->busy_queues[1] && bfqd->busy_queues[2]);
+ 
+-	/*
+-	 * For queue weights to differ, queue_weights_tree must contain
+-	 * at least two nodes.
+-	 */
+-	return !(varied_queue_weights || multiple_classes_busy
++	return varied_queue_weights || multiple_classes_busy
+ #ifdef BFQ_GROUP_IOSCHED_ENABLED
+ 	       || bfqd->num_groups_with_pending_reqs > 0
+ #endif
+-		);
++		;
+ }
+ 
+ /*
+@@ -694,10 +707,11 @@ static bool bfq_symmetric_scenario(struct bfq_data *bfqd)
+  * should be low too.
+  */
+ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+-			  struct rb_root *root)
++			  struct rb_root_cached *root)
+ {
+ 	struct bfq_entity *entity = &bfqq->entity;
+-	struct rb_node **new = &(root->rb_node), *parent = NULL;
++	struct rb_node **new = &(root->rb_root.rb_node), *parent = NULL;
++	bool leftmost = true;
+ 
+ 	/*
+ 	 * Do not insert if the queue is already associated with a
+@@ -726,8 +740,10 @@ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 		}
+ 		if (entity->weight < __counter->weight)
+ 			new = &((*new)->rb_left);
+-		else
++		else {
+ 			new = &((*new)->rb_right);
++			leftmost = false;
++		}
+ 	}
+ 
+ 	bfqq->weight_counter = kzalloc(sizeof(struct bfq_weight_counter),
+@@ -736,7 +752,7 @@ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	/*
+ 	 * In the unlucky event of an allocation failure, we just
+ 	 * exit. This will cause the weight of queue to not be
+-	 * considered in bfq_symmetric_scenario, which, in its turn,
++	 * considered in bfq_asymmetric_scenario, which, in its turn,
+ 	 * causes the scenario to be deemed wrongly symmetric in case
+ 	 * bfqq's weight would have been the only weight making the
+ 	 * scenario asymmetric.  On the bright side, no unbalance will
+@@ -750,7 +766,8 @@ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 
+ 	bfqq->weight_counter->weight = entity->weight;
+ 	rb_link_node(&bfqq->weight_counter->weights_node, parent, new);
+-	rb_insert_color(&bfqq->weight_counter->weights_node, root);
++	rb_insert_color_cached(&bfqq->weight_counter->weights_node, root,
++				leftmost);
+ 
+ inc_counter:
+ 	bfqq->weight_counter->num_active++;
+@@ -765,7 +782,7 @@ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+  */
+ void __bfq_weights_tree_remove(struct bfq_data *bfqd,
+ 			       struct bfq_queue *bfqq,
+-			       struct rb_root *root)
++			       struct rb_root_cached *root)
+ {
+ 	if (!bfqq->weight_counter)
+ 		return;
+@@ -774,7 +791,7 @@ void __bfq_weights_tree_remove(struct bfq_data *bfqd,
+ 	if (bfqq->weight_counter->num_active > 0)
+ 		goto reset_entity_pointer;
+ 
+-	rb_erase(&bfqq->weight_counter->weights_node, root);
++	rb_erase_cached(&bfqq->weight_counter->weights_node, root);
+ 	kfree(bfqq->weight_counter);
+ 
+ reset_entity_pointer:
+@@ -889,7 +906,7 @@ static unsigned long bfq_serv_to_charge(struct request *rq,
+ 					struct bfq_queue *bfqq)
+ {
+ 	if (bfq_bfqq_sync(bfqq) || bfqq->wr_coeff > 1 ||
+-	    !bfq_symmetric_scenario(bfqq->bfqd))
++	    bfq_asymmetric_scenario(bfqq->bfqd, bfqq))
+ 		return blk_rq_sectors(rq);
+ 
+ 	return blk_rq_sectors(rq) * bfq_async_charge_factor;
+@@ -2543,7 +2560,7 @@ static void bfq_arm_slice_timer(struct bfq_data *bfqd)
+ 	 * queue).
+ 	 */
+ 	if (BFQQ_SEEKY(bfqq) && bfqq->wr_coeff == 1 &&
+-	    bfq_symmetric_scenario(bfqd))
++	    !bfq_asymmetric_scenario(bfqd, bfqq))
+ 		sl = min_t(u64, sl, BFQ_MIN_TT);
+ 	else if (bfqq->wr_coeff > 1)
+ 		sl = max_t(u32, sl, 20ULL * NSEC_PER_MSEC);
+@@ -3500,8 +3517,9 @@ static bool idling_boosts_thr_without_issues(struct bfq_data *bfqd,
+ }
+ 
+ /*
+- * There is a case where idling must be performed not for
+- * throughput concerns, but to preserve service guarantees.
++ * There is a case where idling does not have to be performed for
++ * throughput concerns, but to preserve the throughput share of
++ * the process associated with bfqq.
+  *
+  * To introduce this case, we can note that allowing the drive
+  * to enqueue more than one request at a time, and hence
+@@ -3517,77 +3535,83 @@ static bool idling_boosts_thr_without_issues(struct bfq_data *bfqd,
+  * concern about per-process throughput distribution, and
+  * makes its decisions only on a per-request basis. Therefore,
+  * the service distribution enforced by the drive's internal
+- * scheduler is likely to coincide with the desired
+- * device-throughput distribution only in a completely
+- * symmetric scenario where:
+- * (i)  each of these processes must get the same throughput as
+- *      the others;
+- * (ii) the I/O of each process has the same properties, in
+- *      terms of locality (sequential or random), direction
+- *      (reads or writes), request sizes, greediness
+- *      (from I/O-bound to sporadic), and so on.
+- * In fact, in such a scenario, the drive tends to treat
+- * the requests of each of these processes in about the same
+- * way as the requests of the others, and thus to provide
+- * each of these processes with about the same throughput
+- * (which is exactly the desired throughput distribution). In
+- * contrast, in any asymmetric scenario, device idling is
+- * certainly needed to guarantee that bfqq receives its
+- * assigned fraction of the device throughput (see [1] for
+- * details).
+- * The problem is that idling may significantly reduce
+- * throughput with certain combinations of types of I/O and
+- * devices. An important example is sync random I/O, on flash
+- * storage with command queueing. So, unless bfqq falls in the
+- * above cases where idling also boosts throughput, it would
+- * be important to check conditions (i) and (ii) accurately,
+- * so as to avoid idling when not strictly needed for service
+- * guarantees.
++ * scheduler is likely to coincide with the desired throughput
++ * distribution only in a completely symmetric, or favorably
++ * skewed scenario where:
++ * (i-a) each of these processes must get the same throughput as
++ *	 the others,
++ * (i-b) in case (i-a) does not hold, it holds that the process
++ *       associated with bfqq must receive a lower or equal
++ *	 throughput than any of the other processes;
++ * (ii)  the I/O of each process has the same properties, in
++ *       terms of locality (sequential or random), direction
++ *       (reads or writes), request sizes, greediness
++ *       (from I/O-bound to sporadic), and so on;
++
++ * In fact, in such a scenario, the drive tends to treat the requests
++ * of each process in about the same way as the requests of the
++ * others, and thus to provide each of these processes with about the
++ * same throughput.  This is exactly the desired throughput
++ * distribution if (i-a) holds, or, if (i-b) holds instead, this is an
++ * even more convenient distribution for (the process associated with)
++ * bfqq.
++ *
++ * In contrast, in any asymmetric or unfavorable scenario, device
++ * idling (I/O-dispatch plugging) is certainly needed to guarantee
++ * that bfqq receives its assigned fraction of the device throughput
++ * (see [1] for details).
++ *
++ * The problem is that idling may significantly reduce throughput with
++ * certain combinations of types of I/O and devices. An important
++ * example is sync random I/O on flash storage with command
++ * queueing. So, unless bfqq falls in cases where idling also boosts
++ * throughput, it is important to check conditions (i-a), i(-b) and
++ * (ii) accurately, so as to avoid idling when not strictly needed for
++ * service guarantees.
+  *
+- * Unfortunately, it is extremely difficult to thoroughly
+- * check condition (ii). And, in case there are active groups,
+- * it becomes very difficult to check condition (i) too. In
+- * fact, if there are active groups, then, for condition (i)
+- * to become false, it is enough that an active group contains
+- * more active processes or sub-groups than some other active
+- * group. More precisely, for condition (i) to hold because of
+- * such a group, it is not even necessary that the group is
+- * (still) active: it is sufficient that, even if the group
+- * has become inactive, some of its descendant processes still
+- * have some request already dispatched but still waiting for
+- * completion. In fact, requests have still to be guaranteed
+- * their share of the throughput even after being
+- * dispatched. In this respect, it is easy to show that, if a
+- * group frequently becomes inactive while still having
+- * in-flight requests, and if, when this happens, the group is
+- * not considered in the calculation of whether the scenario
+- * is asymmetric, then the group may fail to be guaranteed its
+- * fair share of the throughput (basically because idling may
+- * not be performed for the descendant processes of the group,
+- * but it had to be).  We address this issue with the
+- * following bi-modal behavior, implemented in the function
+- * bfq_symmetric_scenario().
++ * Unfortunately, it is extremely difficult to thoroughly check
++ * condition (ii). And, in case there are active groups, it becomes
++ * very difficult to check conditions (i-a) and (i-b) too.  In fact,
++ * if there are active groups, then, for conditions (i-a) or (i-b) to
++ * become false 'indirectly', it is enough that an active group
++ * contains more active processes or sub-groups than some other active
++ * group. More precisely, for conditions (i-a) or (i-b) to become
++ * false because of such a group, it is not even necessary that the
++ * group is (still) active: it is sufficient that, even if the group
++ * has become inactive, some of its descendant processes still have
++ * some request already dispatched but still waiting for
++ * completion. In fact, requests have still to be guaranteed their
++ * share of the throughput even after being dispatched. In this
++ * respect, it is easy to show that, if a group frequently becomes
++ * inactive while still having in-flight requests, and if, when this
++ * happens, the group is not considered in the calculation of whether
++ * the scenario is asymmetric, then the group may fail to be
++ * guaranteed its fair share of the throughput (basically because
++ * idling may not be performed for the descendant processes of the
++ * group, but it had to be).  We address this issue with the following
++ * bi-modal behavior, implemented in the function
++ * bfq_asymmetric_scenario().
+  *
+  * If there are groups with requests waiting for completion
+  * (as commented above, some of these groups may even be
+  * already inactive), then the scenario is tagged as
+  * asymmetric, conservatively, without checking any of the
+- * conditions (i) and (ii). So the device is idled for bfqq.
++ * conditions (i-a), (i-b) or (ii). So the device is idled for bfqq.
+  * This behavior matches also the fact that groups are created
+  * exactly if controlling I/O is a primary concern (to
+  * preserve bandwidth and latency guarantees).
+  *
+- * On the opposite end, if there are no groups with requests
+- * waiting for completion, then only condition (i) is actually
+- * controlled, i.e., provided that condition (i) holds, idling
+- * is not performed, regardless of whether condition (ii)
+- * holds. In other words, only if condition (i) does not hold,
+- * then idling is allowed, and the device tends to be
+- * prevented from queueing many requests, possibly of several
+- * processes. Since there are no groups with requests waiting
+- * for completion, then, to control condition (i) it is enough
+- * to check just whether all the queues with requests waiting
+- * for completion also have the same weight.
++ * On the opposite end, if there are no groups with requests waiting
++ * for completion, then only conditions (i-a) and (i-b) are actually
++ * controlled, i.e., provided that conditions (i-a) or (i-b) holds,
++ * idling is not performed, regardless of whether condition (ii)
++ * holds.  In other words, only if conditions (i-a) and (i-b) do not
++ * hold, then idling is allowed, and the device tends to be prevented
++ * from queueing many requests, possibly of several processes. Since
++ * there are no groups with requests waiting for completion, then, to
++ * control conditions (i-a) and (i-b) it is enough to check just
++ * whether all the queues with requests waiting for completion also
++ * have the same weight.
+  *
+  * Not checking condition (ii) evidently exposes bfqq to the
+  * risk of getting less throughput than its fair share.
+@@ -3639,7 +3663,7 @@ static bool idling_boosts_thr_without_issues(struct bfq_data *bfqd,
+  * compound condition that is checked below for deciding
+  * whether the scenario is asymmetric. To explain this
+  * compound condition, we need to add that the function
+- * bfq_symmetric_scenario checks the weights of only
++ * bfq_asymmetric_scenario checks the weights of only
+  * non-weight-raised queues, for efficiency reasons (see
+  * comments on bfq_weights_tree_add()). Then the fact that
+  * bfqq is weight-raised is checked explicitly here. More
+@@ -3667,7 +3691,7 @@ static bool idling_needed_for_service_guarantees(struct bfq_data *bfqd,
+ 	return (bfqq->wr_coeff > 1 &&
+ 		bfqd->wr_busy_queues <
+ 		bfq_tot_busy_queues(bfqd)) ||
+-		!bfq_symmetric_scenario(bfqd);
++		bfq_asymmetric_scenario(bfqd, bfqq);
+ }
+ 
+ /*
+@@ -5505,7 +5529,7 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+ 		     HRTIMER_MODE_REL);
+ 	bfqd->idle_slice_timer.function = bfq_idle_slice_timer;
+ 
+-	bfqd->queue_weights_tree = RB_ROOT;
++	bfqd->queue_weights_tree = RB_ROOT_CACHED;
+ 	bfqd->num_groups_with_pending_reqs = 0;
+ 
+ 	INIT_LIST_HEAD(&bfqd->active_list);
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 062e1c4787f4..81cabf51a87e 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -450,7 +450,7 @@ struct bfq_data {
+ 	 * weight-raised @bfq_queue (see the comments to the functions
+ 	 * bfq_weights_tree_[add|remove] for further details).
+ 	 */
+-	struct rb_root queue_weights_tree;
++	struct rb_root_cached queue_weights_tree;
+ 
+ 	/*
+ 	 * Number of groups with at least one descendant process that
+@@ -898,10 +898,10 @@ void bic_set_bfqq(struct bfq_io_cq *bic, struct bfq_queue *bfqq, bool is_sync);
+ struct bfq_data *bic_to_bfqd(struct bfq_io_cq *bic);
+ void bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq);
+ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+-			  struct rb_root *root);
++			  struct rb_root_cached *root);
+ void __bfq_weights_tree_remove(struct bfq_data *bfqd,
+ 			       struct bfq_queue *bfqq,
+-			       struct rb_root *root);
++			       struct rb_root_cached *root);
+ void bfq_weights_tree_remove(struct bfq_data *bfqd,
+ 			     struct bfq_queue *bfqq);
+ void bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index 63311d1ff1ed..0e3f344cc4d3 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -737,7 +737,7 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
+ 		struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
+ 		unsigned int prev_weight, new_weight;
+ 		struct bfq_data *bfqd = NULL;
+-		struct rb_root *root;
++		struct rb_root_cached *root;
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+ 		struct bfq_sched_data *sd;
+ 		struct bfq_group *bfqg;
 -- 
 2.20.1
 
