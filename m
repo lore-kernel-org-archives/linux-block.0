@@ -2,110 +2,235 @@ Return-Path: <SRS0=/NKK=RL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA4EFC43381
-	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 21:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D48FC43381
+	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 21:59:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C3F0620851
-	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 21:54:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5092E20855
+	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 21:59:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726268AbfCHVyJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Mar 2019 16:54:09 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:46428 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726267AbfCHVyJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Mar 2019 16:54:09 -0500
-Received: by mail-pf1-f195.google.com with SMTP id g6so15072222pfh.13
-        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2019 13:54:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=uI8JgGDFZEfWJe4SicWq4bH5tGm8Yu2S9wB4edZEdy8=;
-        b=heuScPH3XsnwMue4VUNgnI2ArdhFZSTS2MH30WmgcJ1ZOzaKFWD8aRhMRp2+VGKk7E
-         nieDzDNgWK8OrxtOMeg3oZR9TkgYkr4pZ6zbvMCdwPId9kk1zB607jYrbj0tA/Er7aEd
-         PLarQAaiqeTQHaH8xJX7YEh2yNfuj89PmUtltQLn9JUnd6HoD3VUr7Khe7YelDJSO75A
-         1gqnGAf0qGm4Zae0Yeq+hNVY8V6CYJFpYlqXcmBg4l1IJGb3/ao39vqPcidSJKgB74TE
-         wZ4S8Bl+QLuxCpHSznbUskZWPmuP1x4ZFcOzsw29OJUiPJs0cDvLNMQtbMTR5CxRvgqI
-         Z4kQ==
-X-Gm-Message-State: APjAAAU/1necoEQQQOsnNJCUn23rbXAEHkMogLuxtMtXB9A8gX2oNTAd
-        pRvvF3E3+UNFJuwyJ08pX28=
-X-Google-Smtp-Source: APXvYqwj6u1XsWnvGbFFl9c0tbfpoh6D35epVVcGLOSfw2PpYmm5xzZaRDYU3qmXoVjdgpbQqulamQ==
-X-Received: by 2002:a63:481d:: with SMTP id v29mr1018888pga.261.1552082047795;
-        Fri, 08 Mar 2019 13:54:07 -0800 (PST)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id v186sm21737567pfv.184.2019.03.08.13.54.06
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 08 Mar 2019 13:54:07 -0800 (PST)
-Message-ID: <1552082046.45180.91.camel@acm.org>
-Subject: Re: [PATCH 4/5] nvme: Fail dead namespace's entered requests
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Keith Busch <keith.busch@intel.com>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>
-Date:   Fri, 08 Mar 2019 13:54:06 -0800
-In-Reply-To: <20190308181905.GA5232@localhost.localdomain>
-References: <20190308174006.5032-1-keith.busch@intel.com>
-         <20190308174006.5032-4-keith.busch@intel.com>
-         <1552068927.45180.30.camel@acm.org>
-         <20190308181905.GA5232@localhost.localdomain>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S1726267AbfCHV7e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Mar 2019 16:59:34 -0500
+Received: from mga07.intel.com ([134.134.136.100]:37684 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726258AbfCHV7e (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Mar 2019 16:59:34 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Mar 2019 13:59:33 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,456,1544515200"; 
+   d="scan'208";a="132763291"
+Received: from unknown (HELO localhost.lm.intel.com) ([10.232.112.69])
+  by fmsmga007.fm.intel.com with ESMTP; 08 Mar 2019 13:59:33 -0800
+From:   Keith Busch <keith.busch@intel.com>
+To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <keith.busch@intel.com>
+Subject: [PATCH fio] t/io_uring: add depth options
+Date:   Fri,  8 Mar 2019 14:59:59 -0700
+Message-Id: <20190308215959.5575-1-keith.busch@intel.com>
+X-Mailer: git-send-email 2.13.6
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 2019-03-08 at 11:19 -0700, Keith Busch wrote:
-+AD4 On Fri, Mar 08, 2019 at 10:15:27AM -0800, Bart Van Assche wrote:
-+AD4 +AD4 On Fri, 2019-03-08 at 10:40 -0700, Keith Busch wrote:
-+AD4 +AD4 +AD4 End the entered requests on a quieced queue directly rather than flush
-+AD4 +AD4 +AD4 them through the low level driver's queue+AF8-rq().
-+AD4 +AD4 +AD4 
-+AD4 +AD4 +AD4 Signed-off-by: Keith Busch +ADw-keith.busch+AEA-intel.com+AD4
-+AD4 +AD4 +AD4 ---
-+AD4 +AD4 +AD4  drivers/nvme/host/core.c +AHw 10 +-+-+-+-+-+-+-+---
-+AD4 +AD4 +AD4  1 file changed, 8 insertions(+-), 2 deletions(-)
-+AD4 +AD4 +AD4 
-+AD4 +AD4 +AD4 diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-+AD4 +AD4 +AD4 index cc5d9a83d5af..7095406bb293 100644
-+AD4 +AD4 +AD4 --- a/drivers/nvme/host/core.c
-+AD4 +AD4 +AD4 +-+-+- b/drivers/nvme/host/core.c
-+AD4 +AD4 +AD4 +AEAAQA -94,6 +-94,13 +AEAAQA static void nvme+AF8-put+AF8-subsystem(struct nvme+AF8-subsystem +ACo-subsys)+ADs
-+AD4 +AD4 +AD4  static void nvme+AF8-remove+AF8-invalid+AF8-namespaces(struct nvme+AF8-ctrl +ACo-ctrl,
-+AD4 +AD4 +AD4  					   unsigned nsid)+ADs
-+AD4 +AD4 +AD4  
-+AD4 +AD4 +AD4 +-static bool nvme+AF8-fail+AF8-request(struct blk+AF8-mq+AF8-hw+AF8-ctx +ACo-hctx, struct request +ACo-req,
-+AD4 +AD4 +AD4 +-			      void +ACo-data, bool reserved)
-+AD4 +AD4 +AD4 +-+AHs
-+AD4 +AD4 +AD4 +-	blk+AF8-mq+AF8-end+AF8-request(req, BLK+AF8-STS+AF8-IOERR)+ADs
-+AD4 +AD4 +AD4 +-	return true+ADs
-+AD4 +AD4 +AD4 +-+AH0
-+AD4 +AD4 
-+AD4 +AD4 Calling blk+AF8-mq+AF8-end+AF8-request() from outside the .queue+AF8-rq() or .complete()
-+AD4 +AD4 callback functions is wrong. Did you perhaps want to call
-+AD4 +AD4 blk+AF8-mq+AF8-complete+AF8-request()?
-+AD4 
-+AD4 This callback can only see requests in MQ+AF8-RQ+AF8-IDLE state, and
-+AD4 bkl+AF8-mq+AF8-end+AF8-request() is the correct way to end those that never entered
-+AD4 a driver's queue+AF8-rq().
+Make depth options command line parameters so a recompile isn't
+required to see how it affects performance.
 
-Hi Keith,
+Signed-off-by: Keith Busch <keith.busch@intel.com>
+---
+ t/io_uring.c | 70 ++++++++++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 52 insertions(+), 18 deletions(-)
 
-What guarantees that nvme+AF8-fail+AF8-request() only sees requests in the idle state?
-From block/blk-mq-tag.c:
+diff --git a/t/io_uring.c b/t/io_uring.c
+index c7139f87..36aede9b 100644
+--- a/t/io_uring.c
++++ b/t/io_uring.c
+@@ -44,7 +44,6 @@ struct io_cq_ring {
+ };
+ 
+ #define DEPTH			128
+-
+ #define BATCH_SUBMIT		32
+ #define BATCH_COMPLETE		32
+ 
+@@ -67,7 +66,6 @@ struct submitter {
+ 	struct drand48_data rand;
+ 	struct io_sq_ring sq_ring;
+ 	struct io_uring_sqe *sqes;
+-	struct iovec iovecs[DEPTH];
+ 	struct io_cq_ring cq_ring;
+ 	int inflight;
+ 	unsigned long reaps;
+@@ -81,11 +79,15 @@ struct submitter {
+ 	struct file files[MAX_FDS];
+ 	unsigned nr_files;
+ 	unsigned cur_file;
++	struct iovec iovecs[];
+ };
+ 
+-static struct submitter submitters[1];
++static struct submitter *submitter;
+ static volatile int finish;
+ 
++static int depth = DEPTH;
++static int batch_submit = BATCH_SUBMIT;
++static int batch_complete = BATCH_COMPLETE;
+ static int polled = 1;		/* use IO polling */
+ static int fixedbufs = 1;	/* use fixed user buffers */
+ static int register_files = 1;	/* use fixed files */
+@@ -100,7 +102,7 @@ static int io_uring_register_buffers(struct submitter *s)
+ 		return 0;
+ 
+ 	return syscall(__NR_sys_io_uring_register, s->ring_fd,
+-			IORING_REGISTER_BUFFERS, s->iovecs, DEPTH);
++			IORING_REGISTER_BUFFERS, s->iovecs, depth);
+ }
+ 
+ static int io_uring_register_files(struct submitter *s)
+@@ -139,7 +141,7 @@ static int gettid(void)
+ 
+ static unsigned file_depth(struct submitter *s)
+ {
+-	return (DEPTH + s->nr_files - 1) / s->nr_files;
++	return (depth + s->nr_files - 1) / s->nr_files;
+ }
+ 
+ static void init_io(struct submitter *s, unsigned index)
+@@ -295,18 +297,18 @@ static void *submitter_fn(void *data)
+ 	do {
+ 		int to_wait, to_submit, this_reap, to_prep;
+ 
+-		if (!prepped && s->inflight < DEPTH) {
+-			to_prep = min(DEPTH - s->inflight, BATCH_SUBMIT);
++		if (!prepped && s->inflight < depth) {
++			to_prep = min(depth - s->inflight, batch_submit);
+ 			prepped = prep_more_ios(s, to_prep);
+ 		}
+ 		s->inflight += prepped;
+ submit_more:
+ 		to_submit = prepped;
+ submit:
+-		if (to_submit && (s->inflight + to_submit <= DEPTH))
++		if (to_submit && (s->inflight + to_submit <= depth))
+ 			to_wait = 0;
+ 		else
+-			to_wait = min(s->inflight + to_submit, BATCH_COMPLETE);
++			to_wait = min(s->inflight + to_submit, batch_complete);
+ 
+ 		/*
+ 		 * Only need to call io_uring_enter if we're not using SQ thread
+@@ -377,7 +379,7 @@ submit:
+ static void sig_int(int sig)
+ {
+ 	printf("Exiting on signal %d\n", sig);
+-	submitters[0].finish = 1;
++	submitter->finish = 1;
+ 	finish = 1;
+ }
+ 
+@@ -411,7 +413,7 @@ static int setup_ring(struct submitter *s)
+ 		}
+ 	}
+ 
+-	fd = io_uring_setup(DEPTH, &p);
++	fd = io_uring_setup(depth, &p);
+ 	if (fd < 0) {
+ 		perror("io_uring_setup");
+ 		return 1;
+@@ -466,7 +468,7 @@ static int setup_ring(struct submitter *s)
+ 
+ static void file_depths(char *buf)
+ {
+-	struct submitter *s = &submitters[0];
++	struct submitter *s = submitter;
+ 	char *p;
+ 	int i;
+ 
+@@ -482,24 +484,56 @@ static void file_depths(char *buf)
+ 	}
+ }
+ 
++static void usage(char *argv)
++{
++	printf("%s [options] -- [filenames]\n"
++		" -d <int> : IO Depth, default %d\n"
++		" -s <int> : Batch submit, default %d\n"
++		" -c <int> : Batch complete, default %d\n",
++		argv, DEPTH, BATCH_SUBMIT, BATCH_COMPLETE);
++	exit(0);
++}
++
+ int main(int argc, char *argv[])
+ {
+-	struct submitter *s = &submitters[0];
++	struct submitter *s;
+ 	unsigned long done, calls, reap, cache_hit, cache_miss;
+-	int err, i, flags, fd;
++	int err, i, flags, fd, opt;
+ 	char *fdepths;
+ 	void *ret;
+ 
+ 	if (!do_nop && argc < 2) {
+-		printf("%s: filename\n", argv[0]);
++		printf("%s: filename [options]\n", argv[0]);
+ 		return 1;
+ 	}
+ 
++	while ((opt = getopt(argc, argv, "d:s:c:h?")) != -1) {
++		switch (opt) {
++		case 'd':
++			depth = atoi(optarg);
++			break;
++		case 's':
++			batch_submit = atoi(optarg);
++			break;
++		case 'c':
++			batch_complete = atoi(optarg);
++			break;
++		case 'h':
++		case '?':
++		default:
++			usage(argv[0]);
++			break;
++		}
++	}
++
++	submitter = malloc(sizeof(*submitter) * depth * sizeof(struct iovec));
++	s = submitter;
++
+ 	flags = O_RDONLY | O_NOATIME;
+ 	if (!buffered)
+ 		flags |= O_DIRECT;
+ 
+-	i = 1;
++	i = optind;
+ 	while (!do_nop && i < argc) {
+ 		struct file *f;
+ 
+@@ -543,7 +577,7 @@ int main(int argc, char *argv[])
+ 
+ 	arm_sig_int();
+ 
+-	for (i = 0; i < DEPTH; i++) {
++	for (i = 0; i < depth; i++) {
+ 		void *buf;
+ 
+ 		if (posix_memalign(&buf, BS, BS)) {
+@@ -560,7 +594,7 @@ int main(int argc, char *argv[])
+ 		return 1;
+ 	}
+ 	printf("polled=%d, fixedbufs=%d, buffered=%d", polled, fixedbufs, buffered);
+-	printf(" QD=%d, sq_ring=%d, cq_ring=%d\n", DEPTH, *s->sq_ring.ring_entries, *s->cq_ring.ring_entries);
++	printf(" QD=%d, sq_ring=%d, cq_ring=%d\n", depth, *s->sq_ring.ring_entries, *s->cq_ring.ring_entries);
+ 
+ 	pthread_create(&s->thread, NULL, submitter_fn, s);
+ 
+-- 
+2.14.4
 
-/+ACoAKg
- +ACo blk+AF8-mq+AF8-queue+AF8-tag+AF8-busy+AF8-iter - iterate over all requests with a driver tag
- +ACo +AFs ... +AF0
- +ACo-/
-
-Thanks,
-
-Bart.
