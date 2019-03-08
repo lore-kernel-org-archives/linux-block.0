@@ -2,124 +2,93 @@ Return-Path: <SRS0=/NKK=RL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85015C43381
-	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 17:32:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB20C43381
+	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 17:39:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 62F2F20868
-	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 17:32:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A8DEF20868
+	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 17:39:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726395AbfCHRcU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Mar 2019 12:32:20 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:48188 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726713AbfCHRcU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Mar 2019 12:32:20 -0500
-Received: from mail-wm1-f70.google.com ([209.85.128.70])
-        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
-        (Exim 4.76)
-        (envelope-from <andrea.righi@canonical.com>)
-        id 1h2JM2-000591-6K
-        for linux-block@vger.kernel.org; Fri, 08 Mar 2019 17:32:18 +0000
-Received: by mail-wm1-f70.google.com with SMTP id i64so3917036wmg.3
-        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2019 09:32:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=y41igMRdVdi6O2TKhS1LdJCmwZwAdJ7DsR9RZUvhSc0=;
-        b=fjP8DXtDsS05173kgVXaYjHz/VC85260TyeWXLRvWVKbtuxUTSaRK/m69vGsjnLGos
-         3VWnPt+l3pn7LGhCJkJ01gSkKlhcJE+ni2a6i51bVG/TiY0faoFA5mbGV1ckNj5E08W9
-         0yweB9bENQuA0ljJncRWxMIQ6EC/SKvDXI5SbpxYQ+iPdXxQCx8rZJEM/eoIznkY2MZ4
-         b4eJmUABuP5IMD1lcJbszoao/socU+VcMWimD3MJANWoSX9rTR12XYQJjKQFkVuNDgla
-         pa8+mT0a2RdMBS86TqXqeSd3jF2JfaxR7ngZHYdqo2AWhW6FWUO5+tKdlWk5BdK5xANx
-         5e+Q==
-X-Gm-Message-State: APjAAAWyRCzMIwhX2XChF/H0ZUcdBLwe88EJwGTwUUGDEvGtdvVEPuN9
-        oTG8a7SRdTgjPsDm+W1WsIeub1EAtM41l2nxEmtOexQH4ZPt21y0h56ZLJagbXxkl78hj172GHs
-        FDYHMpFa7/P9T1E36M1vslIiQX/bbWqLEnfJNxF1X
-X-Received: by 2002:a5d:6288:: with SMTP id k8mr12639923wru.173.1552066337671;
-        Fri, 08 Mar 2019 09:32:17 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwhf68/DQLMK0imMdo9x9Dw8lpezAeVlvI54UAZdInwb89EfAYoRT+MB/jsPlNwEzuHeTEnqg==
-X-Received: by 2002:a5d:6288:: with SMTP id k8mr12639905wru.173.1552066337361;
-        Fri, 08 Mar 2019 09:32:17 -0800 (PST)
-Received: from localhost (host22-124-dynamic.46-79-r.retail.telecomitalia.it. [79.46.124.22])
-        by smtp.gmail.com with ESMTPSA id l18sm8233877wrv.20.2019.03.08.09.32.16
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Fri, 08 Mar 2019 09:32:16 -0800 (PST)
-Date:   Fri, 8 Mar 2019 18:32:15 +0100
-From:   Andrea Righi <andrea.righi@canonical.com>
-To:     Josef Bacik <josef@toxicpanda.com>
-Cc:     Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Johannes Weiner <hannes@cmpxchg.org>,
-        Jens Axboe <axboe@kernel.dk>, Vivek Goyal <vgoyal@redhat.com>,
-        Dennis Zhou <dennis@kernel.org>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] blkcg: sync() isolation
-Message-ID: <20190308173215.GA10148@xps-13>
-References: <20190307180834.22008-1-andrea.righi@canonical.com>
- <20190308172219.clcu6ehjav6y2hxi@MacBook-Pro-91.local>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190308172219.clcu6ehjav6y2hxi@MacBook-Pro-91.local>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S1726617AbfCHRjf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Mar 2019 12:39:35 -0500
+Received: from mga01.intel.com ([192.55.52.88]:33276 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726544AbfCHRjf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Mar 2019 12:39:35 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Mar 2019 09:39:35 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,456,1544515200"; 
+   d="scan'208";a="132430639"
+Received: from unknown (HELO localhost.lm.intel.com) ([10.232.112.69])
+  by orsmga003.jf.intel.com with ESMTP; 08 Mar 2019 09:39:35 -0800
+From:   Keith Busch <keith.busch@intel.com>
+To:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <keith.busch@intel.com>
+Subject: [PATCH 1/5] blk-mq: Export reading mq request state
+Date:   Fri,  8 Mar 2019 10:40:02 -0700
+Message-Id: <20190308174006.5032-1-keith.busch@intel.com>
+X-Mailer: git-send-email 2.13.6
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 08, 2019 at 12:22:20PM -0500, Josef Bacik wrote:
-> On Thu, Mar 07, 2019 at 07:08:31PM +0100, Andrea Righi wrote:
-> > = Problem =
-> > 
-> > When sync() is executed from a high-priority cgroup, the process is forced to
-> > wait the completion of the entire outstanding writeback I/O, even the I/O that
-> > was originally generated by low-priority cgroups potentially.
-> > 
-> > This may cause massive latencies to random processes (even those running in the
-> > root cgroup) that shouldn't be I/O-throttled at all, similarly to a classic
-> > priority inversion problem.
-> > 
-> > This topic has been previously discussed here:
-> > https://patchwork.kernel.org/patch/10804489/
-> > 
-> 
-> Sorry to move the goal posts on you again Andrea, but Tejun and I talked about
-> this some more offline.
-> 
-> We don't want cgroup to become the arbiter of correctness/behavior here.  We
-> just want it to be isolating things.
-> 
-> For you that means you can drop the per-cgroup flag stuff, and only do the
-> priority boosting for multiple sync(2) waiters.  That is a real priority
-> inversion that needs to be fixed.  io.latency and io.max are capable of noticing
-> that a low priority group is going above their configured limits and putting
-> pressure elsewhere accordingly.
+Drivers may need to know the state of their requets.
 
-Alright, so IIUC that means we just need patch 1/3 for now (with the
-per-bdi lock instead of the global lock). If that's the case I'll focus
-at that patch then.
+Signed-off-by: Keith Busch <keith.busch@intel.com>
+---
+ block/blk-mq.h         | 9 ---------
+ include/linux/blkdev.h | 9 +++++++++
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-> 
-> Tejun said he'd rather see the sync(2) isolation be done at the namespace level.
-> That way if you have fs namespacing you are already isolated to your namespace.
-> If you feel like tackling that then hooray, but that's a separate dragon to slay
-> so don't feel like you have to right now.
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index c11353a3749d..99ab7e472e62 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -128,15 +128,6 @@ extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
+ 
+ void blk_mq_release(struct request_queue *q);
+ 
+-/**
+- * blk_mq_rq_state() - read the current MQ_RQ_* state of a request
+- * @rq: target request.
+- */
+-static inline enum mq_rq_state blk_mq_rq_state(struct request *rq)
+-{
+-	return READ_ONCE(rq->state);
+-}
+-
+ static inline struct blk_mq_ctx *__blk_mq_get_ctx(struct request_queue *q,
+ 					   unsigned int cpu)
+ {
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index faed9d9eb84c..db113aee48bb 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -241,6 +241,15 @@ struct request {
+ 	struct request *next_rq;
+ };
+ 
++/**
++ * blk_mq_rq_state() - read the current MQ_RQ_* state of a request
++ * @rq: target request.
++ */
++static inline enum mq_rq_state blk_mq_rq_state(struct request *rq)
++{
++	return READ_ONCE(rq->state);
++}
++
+ static inline bool blk_op_is_scsi(unsigned int op)
+ {
+ 	return op == REQ_OP_SCSI_IN || op == REQ_OP_SCSI_OUT;
+-- 
+2.14.4
 
-Makes sense. I can take a look and see what I can do after posting the
-new patch with the priority inversion fix only.
-
-> 
-> This way we keep cgroup doing its job, controlling resources.  Then we allow
-> namespacing to do its thing, isolating resources.  Thanks,
-> 
-> Josef
-
-Looks like a good plan to me. Thanks for the update.
-
--Andrea
