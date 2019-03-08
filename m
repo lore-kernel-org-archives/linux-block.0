@@ -2,102 +2,92 @@ Return-Path: <SRS0=/NKK=RL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB609C43381
-	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 22:06:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F14B3C43381
+	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 22:55:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 809F82081B
-	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 22:06:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8CFA20857
+	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 22:55:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1552085753;
+	bh=5LVU4CwJIR0ViXcHaM9ZWACdCHo/5XTGwKRhfPnFIh8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=QOjStbDmqV5kS7mNX1frDScH3PalkKoXeHwu8hd89wx5coZTonI2qIELDrUUWhgQR
+	 NDpZQuVzVZcK3T6npX886oR9xrTkinkWNj6J2lredNgd2X95ZUxFAZ6TSIZKZkN9bE
+	 yppIJaB4zExmxv6hMtyRpQ+dli4AwOA+SrhqId7k=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726308AbfCHWGJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Mar 2019 17:06:09 -0500
-Received: from mga12.intel.com ([192.55.52.136]:34604 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726307AbfCHWGI (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Mar 2019 17:06:08 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Mar 2019 14:06:08 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.58,456,1544515200"; 
-   d="scan'208";a="153365155"
-Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
-  by fmsmga001.fm.intel.com with ESMTP; 08 Mar 2019 14:06:08 -0800
-Date:   Fri, 8 Mar 2019 15:06:41 -0700
-From:   Keith Busch <keith.busch@intel.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>
-Subject: Re: [PATCH 4/5] nvme: Fail dead namespace's entered requests
-Message-ID: <20190308220640.GA5629@localhost.localdomain>
-References: <20190308174006.5032-1-keith.busch@intel.com>
- <20190308174006.5032-4-keith.busch@intel.com>
- <1552068927.45180.30.camel@acm.org>
- <20190308181905.GA5232@localhost.localdomain>
- <1552082046.45180.91.camel@acm.org>
+        id S1726340AbfCHWzx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Mar 2019 17:55:53 -0500
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:33467 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726334AbfCHWzw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Mar 2019 17:55:52 -0500
+Received: by mail-lf1-f65.google.com with SMTP id z23so15385840lfe.0
+        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2019 14:55:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=MNKR2ldy22W3Wy4LlweEp4+EE9Adg5YCnspdgt5KT+4=;
+        b=YfdwYKx3mgfrC13R3hJUC++CK2e9F7QNpPmUFhVVhxXkdvh0pK8nRGAVvT1Qq6wrp4
+         PSOZbOwN99EG8zkGLL3PS0j0C6PrBgjele0eBSYGgOG+bH1uFAt/jsDSSyZpo4BFbqAd
+         LJ5+bSlFYzlF85XihHAPA7v1+aFLNREJz/pTQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=MNKR2ldy22W3Wy4LlweEp4+EE9Adg5YCnspdgt5KT+4=;
+        b=M+Uuou6/ub+dEA+DKzccaZ7f0QK7JsRe6GF9GSg6cVsDhIyM3YSoJ+M0fKGBl3Fi+m
+         QPSmsR8/SRyZhfNyJw/0MrH3nVTe+XhH4KXlDnzUD4R6FDB7OtBRyFTb1MTENJMkuUcx
+         U8NIboCEfiuSJGMzW+141Dyx6NL/7u8ZpfnWKcPIR9dH9w6vFJ2qJgf1968ieCVFu2RQ
+         +0LGYcRcBz2VHsX7LiXOI8r6q8+V8wX/m0CHbynf7QnfmovaoAlfin5nsruSQ0xjbWwM
+         vqBVwqiFTv35zKOrgIVJEuDFm7gFxXsh+cWJpQCcqi4qbz9Sxgyx5FBbTze2quskC5LR
+         TPQw==
+X-Gm-Message-State: APjAAAVtZquky73G/YDwo+F7oQtJtloOFIHjDToOfGDsmVfPkPwetL3M
+        XPpAe62iHMtJQ6SRpHc+auoeXunhRHY=
+X-Google-Smtp-Source: APXvYqyviZtoY42TMQa35RGiUOVCTvM/nnInCtc257lOhvCRIogeJnQFrWhV+npKmuuzL6mU0rGVVw==
+X-Received: by 2002:a19:7516:: with SMTP id y22mr10409712lfe.106.1552085750407;
+        Fri, 08 Mar 2019 14:55:50 -0800 (PST)
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com. [209.85.208.177])
+        by smtp.gmail.com with ESMTPSA id n25sm1706522lfe.70.2019.03.08.14.55.48
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 08 Mar 2019 14:55:49 -0800 (PST)
+Received: by mail-lj1-f177.google.com with SMTP id z25so18780697ljk.8
+        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2019 14:55:48 -0800 (PST)
+X-Received: by 2002:a2e:208a:: with SMTP id g10mr10463984lji.135.1552085748284;
+ Fri, 08 Mar 2019 14:55:48 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1552082046.45180.91.camel@acm.org>
-User-Agent: Mutt/1.9.1 (2017-09-22)
+References: <db961c75-8468-b5ec-1201-1ba0b37fa30a@kernel.dk> <5c128dfd-9e6c-21fe-7b2b-397d495e112a@kernel.dk>
+In-Reply-To: <5c128dfd-9e6c-21fe-7b2b-397d495e112a@kernel.dk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 8 Mar 2019 14:55:32 -0800
+X-Gmail-Original-Message-ID: <CAHk-=whtxVReSOZ2NpP7O-N+fwNw0hctBr1LdbTZ6Fu32=xcWg@mail.gmail.com>
+Message-ID: <CAHk-=whtxVReSOZ2NpP7O-N+fwNw0hctBr1LdbTZ6Fu32=xcWg@mail.gmail.com>
+Subject: Re: [GIT PULL] Support for the io_uring IO interface
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 08, 2019 at 01:54:06PM -0800, Bart Van Assche wrote:
-> On Fri, 2019-03-08 at 11:19 -0700, Keith Busch wrote:
-> > On Fri, Mar 08, 2019 at 10:15:27AM -0800, Bart Van Assche wrote:
-> > > On Fri, 2019-03-08 at 10:40 -0700, Keith Busch wrote:
-> > > > End the entered requests on a quieced queue directly rather than flush
-> > > > them through the low level driver's queue_rq().
-> > > > 
-> > > > Signed-off-by: Keith Busch <keith.busch@intel.com>
-> > > > ---
-> > > >  drivers/nvme/host/core.c | 10 ++++++++--
-> > > >  1 file changed, 8 insertions(+), 2 deletions(-)
-> > > > 
-> > > > diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-> > > > index cc5d9a83d5af..7095406bb293 100644
-> > > > --- a/drivers/nvme/host/core.c
-> > > > +++ b/drivers/nvme/host/core.c
-> > > > @@ -94,6 +94,13 @@ static void nvme_put_subsystem(struct nvme_subsystem *subsys);
-> > > >  static void nvme_remove_invalid_namespaces(struct nvme_ctrl *ctrl,
-> > > >  					   unsigned nsid);
-> > > >  
-> > > > +static bool nvme_fail_request(struct blk_mq_hw_ctx *hctx, struct request *req,
-> > > > +			      void *data, bool reserved)
-> > > > +{
-> > > > +	blk_mq_end_request(req, BLK_STS_IOERR);
-> > > > +	return true;
-> > > > +}
-> > > 
-> > > Calling blk_mq_end_request() from outside the .queue_rq() or .complete()
-> > > callback functions is wrong. Did you perhaps want to call
-> > > blk_mq_complete_request()?
-> > 
-> > This callback can only see requests in MQ_RQ_IDLE state, and
-> > bkl_mq_end_request() is the correct way to end those that never entered
-> > a driver's queue_rq().
-> 
-> Hi Keith,
-> 
-> What guarantees that nvme_fail_request() only sees requests in the idle state?
-> From block/blk-mq-tag.c:
-> 
-> /**
->  * blk_mq_queue_tag_busy_iter - iterate over all requests with a driver tag
->  * [ ... ]
->  */
+On Wed, Mar 6, 2019 at 12:05 PM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> Slight mess up in the stats, here's the correct one... Note that this
+> also throws a few more merge conflicts now, due to the syscall merges.
+> All trivial, though, and the branch was prepared for it in terms of
+> numbering.
 
-It's the driver's responsibility to ensure the queue is quiesced before
-requesting the iteration. When we call it through nvme_kill_queues(),
-the queues were already quiesced before calling that. The only other
-place it's called is on a frozen queue, so it's actually a no-op there
-since there no requests once frozen.
+Ok, merged in my tree, but not pushed out yet.
+
+I'm going to run the usual build tests, but also look at the basic
+sanity tests and boot and run them just to be careful before actually
+doing that final "ok pushed out".
+
+                  Linus
