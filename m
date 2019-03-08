@@ -4,70 +4,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34E1AC43381
-	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 23:37:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 132CEC43381
+	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 23:53:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E8DC32081B
-	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 23:37:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFB2F20851
+	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 23:53:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1552088228;
-	bh=Nj2eEDHTfjrs1w44KqU6FyCgUPvCisSl3IxacxtVqTw=;
+	s=default; t=1552089182;
+	bh=mUZrM84LacOemIlQ5Y/Yx1pItLMMgWtGdGw7ryyn7d0=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=UxDdtMsfty7QkZMowCm7GdQ3QcFkYNdDUiB3Y3VQJMG15y+PgZJWfhGgNEsUEt5Ql
-	 Ed+VMkeTQCizemP0bvO88/iwDhzUhh7P0y5zTfsFpGjcClxO5BCqpb74BDGfYyPGUe
-	 mA+XJRqsAHK81SEEAxonHxQ57tJycjEvY5SUTmI8=
+	b=PLyphebJOufkzJF+vZFa90ntd2970O7p5X79m91BawKd7LQ+hRRfqx9JOT918rvll
+	 U3Wge0LX/cIN5aemB7OYoQM/eaICXksLxW11kv+gJTdTJSKE5ZeQ48mQaoOq95W48Q
+	 9i3AXa3DIDS+w9fvG1jNOwOD4G/qHoiZc9OlxkZ0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726286AbfCHXhH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Mar 2019 18:37:07 -0500
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:46502 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726111AbfCHXhG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Mar 2019 18:37:06 -0500
-Received: by mail-lf1-f67.google.com with SMTP id g12so15400850lfb.13
-        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2019 15:37:05 -0800 (PST)
+        id S1726233AbfCHXxC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Mar 2019 18:53:02 -0500
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:44850 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726094AbfCHXxC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Mar 2019 18:53:02 -0500
+Received: by mail-lf1-f65.google.com with SMTP id u9so11321109lfe.11
+        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2019 15:53:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linux-foundation.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=AUQVTZ0r3/OTP5tgK8N2Pvo9zf9k7vbT+rbn/pVcFRQ=;
-        b=g7BoElOdod3kUi3B/fuYnJVHNiiR5REdmHBTavpGk9+tK2tbnsMxYdaYGw8hecNzoR
-         Si00xQnMHS0JSc10I/wavrSCQ6O3f04GIWM3Nv/pZwfmbEkJ4WWlImO17powAE3owHE3
-         QckXY7m7C95nEGR7zFDet/QsbGve17xzny2a4=
+        bh=crqhrFgBXY1iyb8K0DRyCsEYC2GEecViGMGVIHIE0gM=;
+        b=YucdF6n1Jrt6tgd2+OGGjP948SHjfrQTMG19gh/5qzzjCOVjVjvHPfJaXsAHnqQDk6
+         FliMbQEt+axOy8z7Y1GMV3zpHYpZelRdeb9vNQw+dkzQb/HQJ2rbkXAFb/BBD7v4CQG/
+         8Ki50dc1EOUfP07EbuBJLwsnLgaxXSYlaSrEg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=AUQVTZ0r3/OTP5tgK8N2Pvo9zf9k7vbT+rbn/pVcFRQ=;
-        b=Jg7T0XjAKdHDDNkwDhDjDqnRIu+MXkSaQx772YhFRrnm0ajAjXK65SnXG8W9f/9TOZ
-         aBrw1yQuBl1nTAL2UaFg0LaiZbZ39t2NNzwpYgnN45jkiPg6TVjVuyh+McDrZBQ1QjZJ
-         JqORvRzNn0wfn8H+UyEzwUobeyDzdVdcdE17t9Mm5N7eSQksiYZ54Weomt7cSdP4oUGe
-         bDiuHgYl6oX7St47RdaKLvWKIjbzFInqIdszwPd9AebLAOFduAr61MneRXdpB5jQ2ugA
-         HZwa53WYkk9l2hRyxK4/R7Qpz/s/yW2jqMUNoJfzGhk+XogGSfQqIorPt3p/8jEPFrRa
-         XH/A==
-X-Gm-Message-State: APjAAAWfTdVTMSU9dDjx/VZU98fw7kZcAvPhV59Hdng6pjQj57LEDQpI
-        XSpoMc6NgkWDuubn0TIzGf2lAZV86oE=
-X-Google-Smtp-Source: APXvYqzDbgqKoqzkb8+RIsErJzBkvHBNIO+KMkBEZ0sVTC8KVdSLx4/otHycoxQ239ZEBykM6TcPuA==
-X-Received: by 2002:a19:a1cc:: with SMTP id k195mr2949547lfe.65.1552088223994;
-        Fri, 08 Mar 2019 15:37:03 -0800 (PST)
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com. [209.85.208.169])
-        by smtp.gmail.com with ESMTPSA id 8sm1652892ljs.42.2019.03.08.15.37.02
+        bh=crqhrFgBXY1iyb8K0DRyCsEYC2GEecViGMGVIHIE0gM=;
+        b=F9G1zDv2I7vYRs6uRiij+fvNfWbsqMdEIvr+FEmrNDnPWIavjBcsn76P4P0hOb1sb+
+         5FDiALiHuAKyBY5O9zKyGs2peFNfKrL5ltLJ2G+Lt+STn/APelg5lrcA2wEMZof7ZwzZ
+         ILf7RbX1oGkI+wXEyrx5hCIz0Alp45hwoQlVaCV679O0iwmDJj1FriPcJEdcHIop5wJi
+         g4yKnbyQsyx2YdHVyQvmgUCoicJWbUrK13Sbbrdmnc8/raIdljeWW8Lsv+CqbRKXRkJd
+         VodztQZi05EhSlq48MRssYaJLq0lm/KFFW6YmkS6xBDwVP5e1pM5K/6WRlETew1OtF5U
+         Gmew==
+X-Gm-Message-State: APjAAAXV6GxvxLEKkJ13GPzcaj34vPF5aMXG4iputrNvsJ+LUGiHYX4p
+        Z+7h9qfeXObQGxolgLNu+5ctTBOMun4=
+X-Google-Smtp-Source: APXvYqyrTCgAaenzOu0NHP8K/E9/H/FIlQi3xJln+FKE9iBNoFlShW3yPBi8Eoq/mt25559NnT6TAQ==
+X-Received: by 2002:a19:ee18:: with SMTP id g24mr11399001lfb.63.1552089179077;
+        Fri, 08 Mar 2019 15:52:59 -0800 (PST)
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com. [209.85.167.42])
+        by smtp.gmail.com with ESMTPSA id i15sm1643997ljb.48.2019.03.08.15.52.58
         for <linux-block@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 08 Mar 2019 15:37:03 -0800 (PST)
-Received: by mail-lj1-f169.google.com with SMTP id z7so18831849lji.0
-        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2019 15:37:02 -0800 (PST)
-X-Received: by 2002:a2e:9117:: with SMTP id m23mr10198076ljg.94.1552088222447;
- Fri, 08 Mar 2019 15:37:02 -0800 (PST)
+        Fri, 08 Mar 2019 15:52:58 -0800 (PST)
+Received: by mail-lf1-f42.google.com with SMTP id 197so5528526lfz.3
+        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2019 15:52:58 -0800 (PST)
+X-Received: by 2002:ac2:5542:: with SMTP id l2mr9408968lfk.136.1552089177618;
+ Fri, 08 Mar 2019 15:52:57 -0800 (PST)
 MIME-Version: 1.0
 References: <db961c75-8468-b5ec-1201-1ba0b37fa30a@kernel.dk>
  <5c128dfd-9e6c-21fe-7b2b-397d495e112a@kernel.dk> <CAHk-=whtxVReSOZ2NpP7O-N+fwNw0hctBr1LdbTZ6Fu32=xcWg@mail.gmail.com>
-In-Reply-To: <CAHk-=whtxVReSOZ2NpP7O-N+fwNw0hctBr1LdbTZ6Fu32=xcWg@mail.gmail.com>
+ <CAHk-=whCvMXSbuDmPAZ1sHzuQFxzuVsrh4Q8rQmB9nooP8QOKA@mail.gmail.com>
+In-Reply-To: <CAHk-=whCvMXSbuDmPAZ1sHzuQFxzuVsrh4Q8rQmB9nooP8QOKA@mail.gmail.com>
 From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 8 Mar 2019 15:36:46 -0800
-X-Gmail-Original-Message-ID: <CAHk-=whCvMXSbuDmPAZ1sHzuQFxzuVsrh4Q8rQmB9nooP8QOKA@mail.gmail.com>
-Message-ID: <CAHk-=whCvMXSbuDmPAZ1sHzuQFxzuVsrh4Q8rQmB9nooP8QOKA@mail.gmail.com>
+Date:   Fri, 8 Mar 2019 15:52:41 -0800
+X-Gmail-Original-Message-ID: <CAHk-=whu3uojbKwdtaq8vwGfsvSpVUPfhvJPv+LMR=6kNT0XgA@mail.gmail.com>
+Message-ID: <CAHk-=whu3uojbKwdtaq8vwGfsvSpVUPfhvJPv+LMR=6kNT0XgA@mail.gmail.com>
 Subject: Re: [GIT PULL] Support for the io_uring IO interface
 To:     Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>
 Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
@@ -78,76 +79,44 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 8, 2019 at 2:55 PM Linus Torvalds
+On Fri, Mar 8, 2019 at 3:36 PM Linus Torvalds
 <torvalds@linux-foundation.org> wrote:
 >
-> I'm going to run the usual build tests, but also look at the basic
-> sanity tests and boot and run them just to be careful before actually
-> doing that final "ok pushed out".
+> It was bogus garbage in fs/aio.c, and honestly, looking at how much of
+> the logic looks suspiciously very similar here, I suspect it's bogus
+> garbage here too.
 
-While waiting for that, I'm looking at the file pointer refs, because
-that was completely buggered in fs/aio.c.
+Apart from that "this really looks suspicious" I actually like what
+the refcounting code does. The code looks like it took refcounting
+seriously, and the context refcounting and setup synchronization looks
+like it should work with that whole registration logic etc.
 
-What protects somebody from:
+But if the low-level request refcount is off, all bets are off. And I
+do think it looks like the basic io_kiocb refcounting is wrong, and
+that
 
- - io_uring_register(IORING_REGISTER_FILES);
+        refcount_set(&req->refs, 0);
 
- - start async IO
+in io_get_req() really is a big big red flag for "Oh, I'm not doing my
+refcount properly". It seems to be an optimization for "I only have a
+single refcount, and I don't want to have that expensive atomic
+decrement".
 
- - io_uring_register(IORING_UNREGISTER_FILES);
+But that automatically means that the whole "req" pointer is now
+really really dangerous, because if IO finishes early, it will be
+free'd immediately, possibly even before the synchronous part of
+submission is all done.
 
-and now it had better synchronize everything.
+And, as mentioned, it can free the file (and thus the inode) before
+the synchronous part is even done, which can cause really subtle
+problems.
 
-It looks like it migth work due to
+I think the fix is the same that fs/aio.c is getting: just always
+initialize the request refcount to 2: one for the submission side, and
+one for the completion side.
 
- (a) the mutex_lock(&ctx->uring_lock) around registration
+Initializing a refcount to 0 is basically always a bug. You can't
+return a structure that has a zero refcount - by definition you'd
+better have your own reference on it.
 
- (b) the wait_for_completion(&ctx->ctx_done) in __io_uring_register
-presumably waits for each outstanding request.
-
-HOWEVER.
-
-The io_kiocb reference counting seems to be the *exact* same bogus
-reference counting that fs/aio.c had, with the magical "zero means it
-was never initialized and counts as one" handling, which was buggy in
-fs/aio.c too, and caused serious problems with races between request
-creation (the "synchronous" part) and requests actually being finished
-asynchronously (the "completion" part).
-
-IOW, I can already tell that the reference counting looks suspicious with
-
-  static void io_free_req(struct io_kiocb *req)
-  {
-        if (!refcount_read(&req->refs) || refcount_dec_and_test(&req->refs)) {
-
-where that whole first "oh, a zero refcount is magic" handling looks
-*very* suspicious. It basically says "some ops don't do references
-properly at all".
-
-This is *exactly* the same bogosity that fds/aio.c had, and it has
-*exactly* the same pattern, with the "poll" code doing
-
-        /* one for removal from waitqueue, one for this function */
-        refcount_set(&req->refs, 2);
-
-and then everybody else seems to initialize req->refs to zero at
-allocation time, because they magically have no lifetime rules for the
-req.
-
-It was bogus garbage in fs/aio.c, and honestly, looking at how much of
-the logic looks suspiciously very similar jhere, I suspect it's bogus
-garbage here too.
-
-In fact, all the setup code looks suspiciously similar in general. It
-has the same broken "prep_rw" and "complete_rw" thing which was racy
-with files opened with O_DIRECT "competing" their IO while still
-holding i_rwsem on the inode, and then possibly things getting
-dropped.
-
-I'm getting the very strong signal that this code had all the logic
-taken from fs/aio.c, bugs and all.
-
-Al has patches to fix the aio.c cases. I very much suspect some very
-similar patches are needed in fs/io_ring.c.
-
-                        Linus
+                   Linus
