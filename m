@@ -1,134 +1,186 @@
-Return-Path: <SRS0=/o95=RK=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=/NKK=RL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.3 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35D82C43381
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 22:14:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 042C9C43381
+	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 07:38:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0405620657
-	for <linux-block@archiver.kernel.org>; Thu,  7 Mar 2019 22:14:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b="ojceyxaP"
+	by mail.kernel.org (Postfix) with ESMTP id CEEF82081B
+	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 07:38:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726227AbfCGWOR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Mar 2019 17:14:17 -0500
-Received: from vulcan.natalenko.name ([104.207.131.136]:17934 "EHLO
-        vulcan.natalenko.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726166AbfCGWOR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Mar 2019 17:14:17 -0500
-X-Greylist: delayed 568 seconds by postgrey-1.27 at vger.kernel.org; Thu, 07 Mar 2019 17:14:15 EST
-Received: from mail.natalenko.name (vulcan.natalenko.name [IPv6:fe80::5400:ff:fe0c:dfa0])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by vulcan.natalenko.name (Postfix) with ESMTPSA id DECA84F4FAE;
-        Thu,  7 Mar 2019 23:04:45 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
-        s=dkim-20170712; t=1551996285;
-        h=from:from:sender:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6Dh1v6nRRoPDMR08JHSiAFiJ7kRk4SEnXotOw9B/r+Y=;
-        b=ojceyxaPPC8ineATAXPfrZ9B1kXAFrn8yFnASj89Io/HBa9KViEy4IVnrVOrCqDxgfICRP
-        i2Rh4LSoG9DUGGeDpnnV4DMN/0QfwgkB4MAfGBH19VqiVIWWCq9nxJlEYMFlzvkX/8v9xp
-        +elDdB295jZT5G6i00G4uNYD9Jsj3fY=
+        id S1726270AbfCHHis (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Mar 2019 02:38:48 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:37224 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726039AbfCHHir (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Mar 2019 02:38:47 -0500
+Received: from mail-wr1-f71.google.com ([209.85.221.71])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <andrea.righi@canonical.com>)
+        id 1h2A5d-0002zu-VM
+        for linux-block@vger.kernel.org; Fri, 08 Mar 2019 07:38:45 +0000
+Received: by mail-wr1-f71.google.com with SMTP id t7so9739873wrw.8
+        for <linux-block@vger.kernel.org>; Thu, 07 Mar 2019 23:38:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=1XOvH1ZwcKfdCsQmFCknNIDKEgX2lwdmfDpwL/zvWFU=;
+        b=VoA/6SfnFKzd0nnE8/QnT/OewplIvvCvPkwDUAoi5c9y/SBxJg+ar/7bk6v/2ydaIT
+         A0nu7MMIV6Z27h2WqiYoCiaCyBg4jcA3xxfJlMR7bZ7gMmcPzY59Lkn7y4pWjNTnkZCE
+         /Pl0RXnJngRhv80aAy4elws35JEx5icpPaCLyxD/4cqnkfZ4ASMgXH5x8OhPgWmkzsGK
+         6BPWaXSnfaEVUh4Y3A9KdLZgLIulH/d7JZ4fCDwYx9Pi/e2dGfTiYGdINhm6Rj+OnmMu
+         7EaCdBPZ6I6G5rOOqr/L2oVLtwM/RDTgb5oCnRELmOQJifvG0tiX3Hk/21naxqTMb272
+         ra4g==
+X-Gm-Message-State: APjAAAXeeer7NsUs0xV5dwsCV3p+WKahVVDcYqz50wI0bLwET2eTt011
+        SpHScNEwgxssy6UafpiOgnydLKY4s4JB50tC94mrHeCkvQscr4b2daCh45XccnmOusCAJmbx4e2
+        +4IAt7M4Oi2kGB3ZwYcpPtJe8y5hzrg30l1cZvftH
+X-Received: by 2002:a1c:80d6:: with SMTP id b205mr8479023wmd.109.1552030725617;
+        Thu, 07 Mar 2019 23:38:45 -0800 (PST)
+X-Google-Smtp-Source: APXvYqxLTQafKmrDY6+zRDM4pgQpKkJYgiuooMQ+PLyafA8UY7bWKHY0hutucfT3+yB/9aVoNTFxnQ==
+X-Received: by 2002:a1c:80d6:: with SMTP id b205mr8478997wmd.109.1552030725252;
+        Thu, 07 Mar 2019 23:38:45 -0800 (PST)
+Received: from localhost (host22-124-dynamic.46-79-r.retail.telecomitalia.it. [79.46.124.22])
+        by smtp.gmail.com with ESMTPSA id y1sm8080826wrh.65.2019.03.07.23.38.44
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 07 Mar 2019 23:38:44 -0800 (PST)
+Date:   Fri, 8 Mar 2019 08:38:43 +0100
+From:   Andrea Righi <andrea.righi@canonical.com>
+To:     Josef Bacik <josef@toxicpanda.com>
+Cc:     Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Jens Axboe <axboe@kernel.dk>, Vivek Goyal <vgoyal@redhat.com>,
+        Dennis Zhou <dennis@kernel.org>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/3] blkcg: prevent priority inversion problem during
+ sync()
+Message-ID: <20190308073843.GA9732@xps-13>
+References: <20190307180834.22008-1-andrea.righi@canonical.com>
+ <20190307180834.22008-2-andrea.righi@canonical.com>
+ <20190307221051.ruhpp73q6ek2at3d@macbook-pro-91.dhcp.thefacebook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 07 Mar 2019 23:04:45 +0100
-From:   Oleksandr Natalenko <oleksandr@natalenko.name>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
-        linus.walleij@linaro.org, broonie@kernel.org,
-        bfq-iosched@googlegroups.com, fra.fra.800@gmail.com
-Subject: Re: [PATCH BUGFIX IMPROVEMENT 0/8] block, bfq: fix bugs, reduce exec
- time and boost performance
-In-Reply-To: <20190307162554.77205-1-paolo.valente@linaro.org>
-References: <20190307162554.77205-1-paolo.valente@linaro.org>
-Message-ID: <44c14c771a77db13289bd99d2fc0d029@natalenko.name>
-X-Sender: oleksandr@natalenko.name
-User-Agent: Roundcube Webmail/1.3.8
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
-        s=arc-20170712; t=1551996285;
-        h=from:from:sender:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6Dh1v6nRRoPDMR08JHSiAFiJ7kRk4SEnXotOw9B/r+Y=;
-        b=P2BGJxoJ8bURWBijItkeqU9zLkJV4VYfI4goLHneNBgRaZ//23iIkt+Q/3C0uCSz69AjUQ
-        LXerPGWYtBp93ycaHOgSugelIFwxZRy474quP8jpu8cWbFjEGcfQz2GTucBAmuh4N2aodP
-        XwYcmiGwqhDGQupyZTH+n0AeBAC8ccQ=
-ARC-Seal: i=1; s=arc-20170712; d=natalenko.name; t=1551996286; a=rsa-sha256;
-        cv=none;
-        b=PdQEbygoHNRe0+vd6A0oM6azJ93L4vJu/9b4CpAZIFX+ZWCv2iorLPyS7vcAdeWLcnRo1g
-        70OQRZ1CUhThlkXaqT+VB6uXT6TXWzluGRNdD0vBskAEWklYg4QbnMX5MpVspy6JUT/N9U
-        dvfeU3fpTo1cJo68PpvXBkaDwx8uRbU=
-ARC-Authentication-Results: i=1;
-        vulcan.natalenko.name;
-        auth=pass smtp.auth=oleksandr@natalenko.name smtp.mailfrom=oleksandr@natalenko.name
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190307221051.ruhpp73q6ek2at3d@macbook-pro-91.dhcp.thefacebook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi.
+On Thu, Mar 07, 2019 at 05:10:53PM -0500, Josef Bacik wrote:
+> On Thu, Mar 07, 2019 at 07:08:32PM +0100, Andrea Righi wrote:
+> > Prevent priority inversion problem when a high-priority blkcg issues a
+> > sync() and it is forced to wait the completion of all the writeback I/O
+> > generated by any other low-priority blkcg, causing massive latencies to
+> > processes that shouldn't be I/O-throttled at all.
+> > 
+> > The idea is to save a list of blkcg's that are waiting for writeback:
+> > every time a sync() is executed the current blkcg is added to the list.
+> > 
+> > Then, when I/O is throttled, if there's a blkcg waiting for writeback
+> > different than the current blkcg, no throttling is applied (we can
+> > probably refine this logic later, i.e., a better policy could be to
+> > adjust the throttling I/O rate using the blkcg with the highest speed
+> > from the list of waiters - priority inheritance, kinda).
+> > 
+> > Signed-off-by: Andrea Righi <andrea.righi@canonical.com>
+> > ---
+> >  block/blk-cgroup.c               | 131 +++++++++++++++++++++++++++++++
+> >  block/blk-throttle.c             |  11 ++-
+> >  fs/fs-writeback.c                |   5 ++
+> >  fs/sync.c                        |   8 +-
+> >  include/linux/backing-dev-defs.h |   2 +
+> >  include/linux/blk-cgroup.h       |  23 ++++++
+> >  mm/backing-dev.c                 |   2 +
+> >  7 files changed, 178 insertions(+), 4 deletions(-)
+> > 
+> > diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> > index 2bed5725aa03..4305e78d1bb2 100644
+> > --- a/block/blk-cgroup.c
+> > +++ b/block/blk-cgroup.c
+> > @@ -1351,6 +1351,137 @@ struct cgroup_subsys io_cgrp_subsys = {
+> >  };
+> >  EXPORT_SYMBOL_GPL(io_cgrp_subsys);
+> >  
+> > +#ifdef CONFIG_CGROUP_WRITEBACK
+> > +struct blkcg_wb_sleeper {
+> > +	struct backing_dev_info *bdi;
+> > +	struct blkcg *blkcg;
+> > +	refcount_t refcnt;
+> > +	struct list_head node;
+> > +};
+> > +
+> > +static DEFINE_SPINLOCK(blkcg_wb_sleeper_lock);
+> > +static LIST_HEAD(blkcg_wb_sleeper_list);
+> > +
+> > +static struct blkcg_wb_sleeper *
+> > +blkcg_wb_sleeper_find(struct blkcg *blkcg, struct backing_dev_info *bdi)
+> > +{
+> > +	struct blkcg_wb_sleeper *bws;
+> > +
+> > +	list_for_each_entry(bws, &blkcg_wb_sleeper_list, node)
+> > +		if (bws->blkcg == blkcg && bws->bdi == bdi)
+> > +			return bws;
+> > +	return NULL;
+> > +}
+> > +
+> > +static void blkcg_wb_sleeper_add(struct blkcg_wb_sleeper *bws)
+> > +{
+> > +	list_add(&bws->node, &blkcg_wb_sleeper_list);
+> > +}
+> > +
+> > +static void blkcg_wb_sleeper_del(struct blkcg_wb_sleeper *bws)
+> > +{
+> > +	list_del_init(&bws->node);
+> > +}
+> > +
+> > +/**
+> > + * blkcg_wb_waiters_on_bdi - check for writeback waiters on a block device
+> > + * @blkcg: current blkcg cgroup
+> > + * @bdi: block device to check
+> > + *
+> > + * Return true if any other blkcg different than the current one is waiting for
+> > + * writeback on the target block device, false otherwise.
+> > + */
+> > +bool blkcg_wb_waiters_on_bdi(struct blkcg *blkcg, struct backing_dev_info *bdi)
+> > +{
+> > +	struct blkcg_wb_sleeper *bws;
+> > +	bool ret = false;
+> > +
+> > +	spin_lock(&blkcg_wb_sleeper_lock);
+> > +	list_for_each_entry(bws, &blkcg_wb_sleeper_list, node)
+> > +		if (bws->bdi == bdi && bws->blkcg != blkcg) {
+> > +			ret = true;
+> > +			break;
+> > +		}
+> > +	spin_unlock(&blkcg_wb_sleeper_lock);
+> > +
+> > +	return ret;
+> > +}
+> 
+> No global lock please, add something to the bdi I think?  Also have a fast path
+> of
 
-On 07.03.2019 17:25, Paolo Valente wrote:
-> since I didn't make it to submit these ones for 5.1, let me be
-> early for 5.2 :)
-> 
-> These patches fix some bug affecting performance, reduce execution
-> time a little bit, and boost throughput and responsiveness.
-> 
-> They are meant to be applied on top of the last series I submitted:
-> https://lkml.org/lkml/2019/1/29/368
-> 
-> Thanks,
-> Paolo
-> 
-> Francesco Pollicino (2):
->   block, bfq: print SHARED instead of pid for shared queues in logs
->   block, bfq: save & resume weight on a queue merge/split
-> 
-> Paolo Valente (6):
->   block, bfq: increase idling for weight-raised queues
->   block, bfq: do not idle for lowest-weight queues
->   block, bfq: tune service injection basing on request service times
->   block, bfq: do not merge queues on flash storage with queueing
->   block, bfq: do not tag totally seeky queues as soft rt
->   block, bfq: always protect newly-created queues from existing active
->     queues
-> 
->  block/bfq-cgroup.c  |   3 +-
->  block/bfq-iosched.c | 786 ++++++++++++++++++++++++++++++++++++--------
->  block/bfq-iosched.h |  87 +++--
->  block/bfq-wf2q.c    |   2 +-
->  4 files changed, 704 insertions(+), 174 deletions(-)
-> 
-> --
-> 2.20.1
+OK, I'll add a list per-bdi and a lock as well.
 
-Fails for me with:
+> 
+> if (list_empty(blkcg_wb_sleeper_list))
+>    return false;
 
-===
-[11966s] ld: block/bfq-wf2q.o: in function `bfq_pid_to_str':
-[11966s] bfq-wf2q.c:(.text+0x3b0): multiple definition of 
-`bfq_pid_to_str'; block/bfq-iosched.o:bfq-iosched.c:(.text+0x1ab0): 
-first defined here
-[11966s] ld: block/bfq-cgroup.o: in function `bfq_pid_to_str':
-[11966s] bfq-cgroup.c:(.text+0x3a0): multiple definition of 
-`bfq_pid_to_str'; block/bfq-iosched.o:bfq-iosched.c:(.text+0x1ab0): 
-first defined here
-[11966s] make: *** [Makefile:1021: vmlinux] Error 1
-===
+OK.
 
--- 
-   Oleksandr Natalenko (post-factum)
+> 
+> we don't need to be super accurate here.  Thanks,
+> 
+> Josef
+
+Thanks,
+-Andrea
