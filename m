@@ -2,62 +2,57 @@ Return-Path: <SRS0=/NKK=RL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_NEOMUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99969C4360F
-	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 17:22:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85015C43381
+	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 17:32:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6D4D5208E4
-	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 17:22:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="BupmmeZk"
+	by mail.kernel.org (Postfix) with ESMTP id 62F2F20868
+	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 17:32:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726906AbfCHRWX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Mar 2019 12:22:23 -0500
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:34646 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726607AbfCHRWX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Mar 2019 12:22:23 -0500
-Received: by mail-qt1-f195.google.com with SMTP id x20so4412661qto.1
-        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2019 09:22:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=JbH57hj38dbuvh9sgqbNRJMeCQlSikG1kcp1+esyKsE=;
-        b=BupmmeZkBGvKHTBw9Ba0knKotbsh2ucjHI0nGoWNbNfY/Vz5l98p4lh36/ATOGGIy/
-         9kATlqWal45/OVi5k69K+pOW61YgOyiLvZ6r0VrpTgcM+sOfWv88hoQebSU3FIik95m/
-         nqd7OdcTF0ygteH8C37NMIK2loiV2y+1untflcF5ccuY+lM7Ifx55dznXKhzRlE6DpzN
-         0oexkJ8SnQGCq+yKpGzbO4uUslVcAW+V7oupFlO+Lnf8/ZjjXcXnppBSPK4iRRUext12
-         wqA3iL83EOzC7Qf31kwEaU5WWO5d7OKXziWjufIToX8G26BQJNNAxiq2D1WEyceZLyho
-         bvsg==
+        id S1726395AbfCHRcU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Mar 2019 12:32:20 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:48188 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726713AbfCHRcU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Mar 2019 12:32:20 -0500
+Received: from mail-wm1-f70.google.com ([209.85.128.70])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <andrea.righi@canonical.com>)
+        id 1h2JM2-000591-6K
+        for linux-block@vger.kernel.org; Fri, 08 Mar 2019 17:32:18 +0000
+Received: by mail-wm1-f70.google.com with SMTP id i64so3917036wmg.3
+        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2019 09:32:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=JbH57hj38dbuvh9sgqbNRJMeCQlSikG1kcp1+esyKsE=;
-        b=RCuggiYe3rVUFwQdGlnL0DoQn+IEbPNDjR5L30v8bxaghtoX8IT41FX5dAioyzG2H/
-         xDO+257Fxw+G2TuoM1zpBoPMLwr2cMa180HGN7mXmOYoltTb5BRfTMFgaLWPtotPcMW+
-         ip2e/4ZhIzac7dIAG0slLLiDGLuO+vgDFuvAq4BcW0Vn0lVAdxvRpcbXArM0Pcss5NXV
-         Ql5YtrJ0qwL1nRDNSs604NXjsWLpznbaKsOc0RnLR6GKQ55CmhUD2AK07SKfmjodBgg0
-         4Yr8lIBLQxe96gc6+86vHFGBis1DRN5b+b1EwKofAHw3LkVrqGKhF95WpK4TkEvo7+ko
-         GVyQ==
-X-Gm-Message-State: APjAAAWs9ql6Y81miQg/7q96FGbGB9sULYDtf/vcMu6xgZsNjy3R/nct
-        SRDcQgW93zSCHgXzERanyiOVIQ==
-X-Google-Smtp-Source: APXvYqxFeMvdRVtcxpV/iBEVratRFw6cxDJJ6VFy3yGqZG2kucewCRZA1txSERTsvGbbrU+ybjftdQ==
-X-Received: by 2002:a0c:b785:: with SMTP id l5mr15957092qve.225.1552065742151;
-        Fri, 08 Mar 2019 09:22:22 -0800 (PST)
-Received: from localhost ([107.15.81.208])
-        by smtp.gmail.com with ESMTPSA id n27sm2064404qtf.11.2019.03.08.09.22.20
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 08 Mar 2019 09:22:21 -0800 (PST)
-Date:   Fri, 8 Mar 2019 12:22:20 -0500
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     Andrea Righi <andrea.righi@canonical.com>
-Cc:     Josef Bacik <josef@toxicpanda.com>, Tejun Heo <tj@kernel.org>,
-        Li Zefan <lizefan@huawei.com>,
+        bh=y41igMRdVdi6O2TKhS1LdJCmwZwAdJ7DsR9RZUvhSc0=;
+        b=fjP8DXtDsS05173kgVXaYjHz/VC85260TyeWXLRvWVKbtuxUTSaRK/m69vGsjnLGos
+         3VWnPt+l3pn7LGhCJkJ01gSkKlhcJE+ni2a6i51bVG/TiY0faoFA5mbGV1ckNj5E08W9
+         0yweB9bENQuA0ljJncRWxMIQ6EC/SKvDXI5SbpxYQ+iPdXxQCx8rZJEM/eoIznkY2MZ4
+         b4eJmUABuP5IMD1lcJbszoao/socU+VcMWimD3MJANWoSX9rTR12XYQJjKQFkVuNDgla
+         pa8+mT0a2RdMBS86TqXqeSd3jF2JfaxR7ngZHYdqo2AWhW6FWUO5+tKdlWk5BdK5xANx
+         5e+Q==
+X-Gm-Message-State: APjAAAWyRCzMIwhX2XChF/H0ZUcdBLwe88EJwGTwUUGDEvGtdvVEPuN9
+        oTG8a7SRdTgjPsDm+W1WsIeub1EAtM41l2nxEmtOexQH4ZPt21y0h56ZLJagbXxkl78hj172GHs
+        FDYHMpFa7/P9T1E36M1vslIiQX/bbWqLEnfJNxF1X
+X-Received: by 2002:a5d:6288:: with SMTP id k8mr12639923wru.173.1552066337671;
+        Fri, 08 Mar 2019 09:32:17 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwhf68/DQLMK0imMdo9x9Dw8lpezAeVlvI54UAZdInwb89EfAYoRT+MB/jsPlNwEzuHeTEnqg==
+X-Received: by 2002:a5d:6288:: with SMTP id k8mr12639905wru.173.1552066337361;
+        Fri, 08 Mar 2019 09:32:17 -0800 (PST)
+Received: from localhost (host22-124-dynamic.46-79-r.retail.telecomitalia.it. [79.46.124.22])
+        by smtp.gmail.com with ESMTPSA id l18sm8233877wrv.20.2019.03.08.09.32.16
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 08 Mar 2019 09:32:16 -0800 (PST)
+Date:   Fri, 8 Mar 2019 18:32:15 +0100
+From:   Andrea Righi <andrea.righi@canonical.com>
+To:     Josef Bacik <josef@toxicpanda.com>
+Cc:     Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
         Paolo Valente <paolo.valente@linaro.org>,
         Johannes Weiner <hannes@cmpxchg.org>,
         Jens Axboe <axboe@kernel.dk>, Vivek Goyal <vgoyal@redhat.com>,
@@ -65,51 +60,66 @@ Cc:     Josef Bacik <josef@toxicpanda.com>, Tejun Heo <tj@kernel.org>,
         linux-block@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org
 Subject: Re: [PATCH v2 0/3] blkcg: sync() isolation
-Message-ID: <20190308172219.clcu6ehjav6y2hxi@MacBook-Pro-91.local>
+Message-ID: <20190308173215.GA10148@xps-13>
 References: <20190307180834.22008-1-andrea.righi@canonical.com>
+ <20190308172219.clcu6ehjav6y2hxi@MacBook-Pro-91.local>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190307180834.22008-1-andrea.righi@canonical.com>
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20190308172219.clcu6ehjav6y2hxi@MacBook-Pro-91.local>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 07, 2019 at 07:08:31PM +0100, Andrea Righi wrote:
-> = Problem =
+On Fri, Mar 08, 2019 at 12:22:20PM -0500, Josef Bacik wrote:
+> On Thu, Mar 07, 2019 at 07:08:31PM +0100, Andrea Righi wrote:
+> > = Problem =
+> > 
+> > When sync() is executed from a high-priority cgroup, the process is forced to
+> > wait the completion of the entire outstanding writeback I/O, even the I/O that
+> > was originally generated by low-priority cgroups potentially.
+> > 
+> > This may cause massive latencies to random processes (even those running in the
+> > root cgroup) that shouldn't be I/O-throttled at all, similarly to a classic
+> > priority inversion problem.
+> > 
+> > This topic has been previously discussed here:
+> > https://patchwork.kernel.org/patch/10804489/
+> > 
 > 
-> When sync() is executed from a high-priority cgroup, the process is forced to
-> wait the completion of the entire outstanding writeback I/O, even the I/O that
-> was originally generated by low-priority cgroups potentially.
+> Sorry to move the goal posts on you again Andrea, but Tejun and I talked about
+> this some more offline.
 > 
-> This may cause massive latencies to random processes (even those running in the
-> root cgroup) that shouldn't be I/O-throttled at all, similarly to a classic
-> priority inversion problem.
+> We don't want cgroup to become the arbiter of correctness/behavior here.  We
+> just want it to be isolating things.
 > 
-> This topic has been previously discussed here:
-> https://patchwork.kernel.org/patch/10804489/
+> For you that means you can drop the per-cgroup flag stuff, and only do the
+> priority boosting for multiple sync(2) waiters.  That is a real priority
+> inversion that needs to be fixed.  io.latency and io.max are capable of noticing
+> that a low priority group is going above their configured limits and putting
+> pressure elsewhere accordingly.
+
+Alright, so IIUC that means we just need patch 1/3 for now (with the
+per-bdi lock instead of the global lock). If that's the case I'll focus
+at that patch then.
+
 > 
+> Tejun said he'd rather see the sync(2) isolation be done at the namespace level.
+> That way if you have fs namespacing you are already isolated to your namespace.
+> If you feel like tackling that then hooray, but that's a separate dragon to slay
+> so don't feel like you have to right now.
 
-Sorry to move the goal posts on you again Andrea, but Tejun and I talked about
-this some more offline.
+Makes sense. I can take a look and see what I can do after posting the
+new patch with the priority inversion fix only.
 
-We don't want cgroup to become the arbiter of correctness/behavior here.  We
-just want it to be isolating things.
+> 
+> This way we keep cgroup doing its job, controlling resources.  Then we allow
+> namespacing to do its thing, isolating resources.  Thanks,
+> 
+> Josef
 
-For you that means you can drop the per-cgroup flag stuff, and only do the
-priority boosting for multiple sync(2) waiters.  That is a real priority
-inversion that needs to be fixed.  io.latency and io.max are capable of noticing
-that a low priority group is going above their configured limits and putting
-pressure elsewhere accordingly.
+Looks like a good plan to me. Thanks for the update.
 
-Tejun said he'd rather see the sync(2) isolation be done at the namespace level.
-That way if you have fs namespacing you are already isolated to your namespace.
-If you feel like tackling that then hooray, but that's a separate dragon to slay
-so don't feel like you have to right now.
-
-This way we keep cgroup doing its job, controlling resources.  Then we allow
-namespacing to do its thing, isolating resources.  Thanks,
-
-Josef
+-Andrea
