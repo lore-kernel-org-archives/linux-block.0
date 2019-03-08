@@ -6,64 +6,69 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5161DC43381
-	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 08:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 169BFC43381
+	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 08:18:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1FA8F2085A
-	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 08:18:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E54432087C
+	for <linux-block@archiver.kernel.org>; Fri,  8 Mar 2019 08:18:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725789AbfCHISO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Mar 2019 03:18:14 -0500
-Received: from verein.lst.de ([213.95.11.211]:52351 "EHLO newverein.lst.de"
+        id S1726261AbfCHISY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Mar 2019 03:18:24 -0500
+Received: from verein.lst.de ([213.95.11.211]:52357 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725776AbfCHISO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Mar 2019 03:18:14 -0500
+        id S1725776AbfCHISY (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Mar 2019 03:18:24 -0500
 Received: by newverein.lst.de (Postfix, from userid 2407)
-        id 0585868C4E; Fri,  8 Mar 2019 09:18:08 +0100 (CET)
-Date:   Fri, 8 Mar 2019 09:18:07 +0100
+        id B556668D0D; Fri,  8 Mar 2019 09:18:19 +0100 (CET)
+Date:   Fri, 8 Mar 2019 09:18:19 +0100
 From:   Christoph Hellwig <hch@lst.de>
-To:     Vlastimil Babka <vbabka@suse.cz>
-Cc:     Matthew Wilcox <willy@infradead.org>,
-        "Darrick J. Wong" <darrick.wong@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Ming Lei <tom.leiming@gmail.com>,
-        Dave Chinner <david@fromorbit.com>,
-        "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Dave Chinner <dchinner@redhat.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Aaron Lu <aaron.lu@intel.com>,
-        Christopher Lameter <cl@linux.com>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        linux-mm <linux-mm@kvack.org>,
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Ming Lei <ming.lei@redhat.com>, Ming Lei <tom.leiming@gmail.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "open list:AIO" <linux-aio@kvack.org>,
         linux-block <linux-block@vger.kernel.org>,
-        Pekka Enberg <penberg@kernel.org>,
-        David Rientjes <rientjes@google.com>,
-        Joonsoo Kim <iamjoonsoo.kim@lge.com>
-Subject: Re: [PATCH] xfs: allocate sector sized IO buffer via
- page_frag_alloc
-Message-ID: <20190308081807.GB12909@lst.de>
-References: <a641feb8-ceb2-2dac-27aa-7b1df10f5ae5@suse.cz> <CACVXFVMX=WpTRBbDTSibfXkTZxckk3ootetbE+rkJtHhsZkRAw@mail.gmail.com> <20190226121209.GC11592@bombadil.infradead.org> <20190226123545.GA6163@ming.t460p> <20190226130230.GD11592@bombadil.infradead.org> <20190226134247.GA30942@ming.t460p> <20190226140440.GF11592@bombadil.infradead.org> <20190226161433.GH21626@magnolia> <20190226161912.GG11592@bombadil.infradead.org> <095ae112-f98e-9516-910a-43b49ea5bf0d@suse.cz>
+        linux-api@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jeff Moyer <jmoyer@redhat.com>, Avi Kivity <avi@scylladb.com>,
+        jannh@google.com, Al Viro <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH 11/19] block: implement bio helper to add iter bvec
+ pages to bio
+Message-ID: <20190308081819.GA12948@lst.de>
+References: <20190211190049.7888-13-axboe@kernel.dk> <20190220225856.GB28313@ming.t460p> <b143e8c3-33d5-5f09-c441-98b3bf326d81@kernel.dk> <20190226034613.GA676@sol.localdomain> <aa1184bb-b482-0637-21e4-1ddb0e7aea90@kernel.dk> <1652577e-787b-638e-625d-c200fb144a9d@kernel.dk> <CACVXFVNOFA8_p+hVvaCffWAQ7+dgn++0b4Wn3naJzyNZN=CoFg@mail.gmail.com> <09820845-07cb-5153-e1c5-59ed185db26f@kernel.dk> <20190227015336.GD16802@ming.t460p> <e4dace7b-6a6f-2606-9a7e-8ae3c97c26b0@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <095ae112-f98e-9516-910a-43b49ea5bf0d@suse.cz>
+In-Reply-To: <e4dace7b-6a6f-2606-9a7e-8ae3c97c26b0@kernel.dk>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Feb 27, 2019 at 08:07:31AM +0100, Vlastimil Babka wrote:
-> > I don't know _what_ Ming Lei is saying.  I thought the problem was
-> > with slab redzones, which need to be before and after each object,
-> > but apparently the problem is with KASAN as well.
-> 
-> That's what I thought as well. But if we can solve it for caches created
-> by kmem_cache_create(..., align, ...) then IMHO we could guarantee
-> natural alignment for power-of-two kmalloc caches as well.
+On Tue, Feb 26, 2019 at 06:57:16PM -0700, Jens Axboe wrote:
+> Speaking of this, I took a quick look at why we've now regressed a lot
+> on IOPS perf with the multipage work. It looks like it's all related to
+> the (much) fatter setup around iteration, which is related to this very
+> topic too.
 
-Yes, having a version of kmalloc that guarantees power of two alignment
-would be extremely helpful and avoid a lot of pointless boilerplate code.
+> Basically setup of things like bio_for_each_bvec() and indexing through
+> nth_page() is MUCH slower than before.
+
+I haven't quite figure out what the point of nth_page is.  If we
+physically merge the page structures should also be consecuite
+in memory in general.  The only case where this could theoretically
+not be the case is with CONFIG_DISCONTIGMEM, but in that case we should
+check this once in biovec_phys_mergeable, and only for that case.
+
+Does this patch make a difference for you on x86?
+
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -53,7 +53,7 @@ struct bvec_iter_all {
+ 
+ static inline struct page *bvec_nth_page(struct page *page, int idx)
+ {
+-	return idx == 0 ? page : nth_page(page, idx);
++	return page + idx;
+ }
+ 
+ /*
