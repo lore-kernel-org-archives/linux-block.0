@@ -2,85 +2,98 @@ Return-Path: <SRS0=TT20=RM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35261C43381
-	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 04:31:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B7D9C43381
+	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 04:34:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DDD33207E0
-	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 04:31:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="pa7p0B2w"
+	by mail.kernel.org (Postfix) with ESMTP id 1CBF8207E0
+	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 04:34:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1552106044;
+	bh=L+sdmcfGyFcDfTr8kEKTDaAfwkgcohfqDnBhXNKlEPc=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=agFSXU7x5ikWN3VtFUmya5dG8EtMi4gWhdIsoGBPUrkScFekg79NiZTyoGyctH5wU
+	 JHWudGBDwVqa+TGn5Lk837A73NgRUgZNf2v+HYQ8e8G3cgzhwRg1rDi/o3Mv+o0rf7
+	 u7QlpLf5zY+UOwRcinBWI10K6iHb7/ECe7nF+/L4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726512AbfCIEbG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Mar 2019 23:31:06 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:45035 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726452AbfCIEbG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Mar 2019 23:31:06 -0500
-Received: by mail-pg1-f196.google.com with SMTP id j3so15699567pgm.11
-        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2019 20:31:05 -0800 (PST)
+        id S1726535AbfCIEeD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Mar 2019 23:34:03 -0500
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:41506 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726452AbfCIEeD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Mar 2019 23:34:03 -0500
+Received: by mail-lf1-f68.google.com with SMTP id y7so15682121lfg.8
+        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2019 20:34:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=+Qm6xs8b1ynsT5l9Yv9RTVR/8PtYE0YOkCPZ5e79wkc=;
-        b=pa7p0B2wSfK+Ve9KXHvi7eE0GmWFtZYKnZ4E4kyVss+nIVl8ozzNKAQUBSUIeDSFhh
-         XOZO6zJHOFj4D5HYZRnjYwDJfU6uF33NLr0P6Nl4jKQB21zWFT4NB2tFF3mWhzvkZ29u
-         Jg4GdXBx2joG70MgWqtngsny/GCx35yV3e7EL6bridvgMvi8AXli9Pl75j0ToRkxqdwh
-         7iOLraO2gpUgxny8qzwz0VNFxQ9Obfa3B98bxHlj/2NuCgvAhr1wdZ8p7k9l8kgOhFKi
-         OnYxMqOt/HLTwXCMFDKslkRYhrca8LfEa4f2O5fEzNME9T0uTkdveUFznc4wET1mKoy4
-         HgDA==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=L/tHncBJ0rEn1VsXokWCKc1iYTqPyf+ci++Vqf0JFs4=;
+        b=gwlVtSKpQypAnhE8kcbAZ2CVl9bXX2+2NrUbJ4pIrTKO5wFkFufCT0BUF3Yzfh0U44
+         sudB2+HcCuCKA4q/vhtgujRqXw5HdsA+/UlnPruFXQj6Gg6Z7HMhw5grXeBrVpNIhpRA
+         D4WGXGXWFQI1o1r201wYGDg8nF/dJzrn+CuJg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+Qm6xs8b1ynsT5l9Yv9RTVR/8PtYE0YOkCPZ5e79wkc=;
-        b=W83veoqhnEf8eykMrH1A13JQyNdA9PtavcQbs2Etcumx5vwRXuFXmVjLfIPNc37xwI
-         hpU9nb+3CkalMNfdrND0xJiX83IE18nEtS4wavjvKtXyta5lQIIBAiIOR3F8UtChyvxQ
-         7n3URuL5Au8GrGb9hCr/f4pSeuqq88DRDPfWUaSvrIn9eRPb/D0MdAD/21sRwDV6OD0f
-         00YmYDL3iVs6xf18p13Eg71mwRnq8QiAYcAe2PHN4kRow00FcJa17X8izxa+bPvaaqCq
-         5nTiTdkFNCUFTMLmxm15nxNwenYy3EssjT1ARFAUPwsrH5oaDzLCYbP8dedfHBqYd89N
-         FIyQ==
-X-Gm-Message-State: APjAAAVHou8ufis2VfnsSrbblb+IZkhWZTs2e9IDqh1znsw6tmuUV+06
-        Lu8gOJXkEOdir6zPKkAYrXgcrj0lfcbwEw==
-X-Google-Smtp-Source: APXvYqxKm+SmLrdcPIFISowSOx0m52mNF821ykF+G0ivR3XkZV7rV0UMEtXYStt199Bbq/KxsqnEjw==
-X-Received: by 2002:a17:902:f302:: with SMTP id gb2mr22844632plb.51.1552105864990;
-        Fri, 08 Mar 2019 20:31:04 -0800 (PST)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id v186sm22495470pfv.184.2019.03.08.20.31.03
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=L/tHncBJ0rEn1VsXokWCKc1iYTqPyf+ci++Vqf0JFs4=;
+        b=a0r+39XX/IFysoxLbnzGxk798WzpvtLwWsQTG9gqZIAbzSlqauFR6F2KznddXo0k1S
+         NwURsrYhP0k0BSzYRxjJ+trkchw1KaXl8KbNQ3G0ThaUVh0rF+PhA7LA6Feejs30yY2l
+         dvXGlMTb3/+IyWTgoMc2W1/LuaMeIBY3L5AyggKXYSTvKPJBYbsknguynFjVT2xFdYS8
+         O+hElCW8ZIKJL9fMVY954mYmiw/q5Q3f5I9bt5yx8aAmq+0VVj2BE6U3trD7+QbcQsHI
+         vLfhzcNtEX/ZorEDBIHz03/h/yeAAsjHeFFECbbaboO1EnZCqhhgm+Jmx3Cny13Ah5l7
+         blsw==
+X-Gm-Message-State: APjAAAWgHIKjF9nPkYiUPxJ9eIq99cEexnkRoQPCkxXAlbX2WE7Y6wJd
+        WR8a3TrOl/jFLAnHb6mUQSHN0GS5/l4=
+X-Google-Smtp-Source: APXvYqysgR5dr4Rs4WRyty7FmKcr56TbxuPRrk+x3UqFc19/XYfeTVBGZnJgn3L+sy5fR72MGktDeQ==
+X-Received: by 2002:ac2:52a1:: with SMTP id r1mr6976795lfm.155.1552106040434;
+        Fri, 08 Mar 2019 20:34:00 -0800 (PST)
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com. [209.85.208.179])
+        by smtp.gmail.com with ESMTPSA id t14sm1838875lfe.51.2019.03.08.20.33.59
+        for <linux-block@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 08 Mar 2019 20:31:04 -0800 (PST)
-Subject: Re: [PATCH fio] t/io_uring: add depth options
-To:     Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org
-References: <20190308215959.5575-1-keith.busch@intel.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <05f6756f-2298-5f88-1f44-6c6d11a82e29@kernel.dk>
-Date:   Fri, 8 Mar 2019 21:31:02 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        Fri, 08 Mar 2019 20:33:59 -0800 (PST)
+Received: by mail-lj1-f179.google.com with SMTP id z25so19145336ljk.8
+        for <linux-block@vger.kernel.org>; Fri, 08 Mar 2019 20:33:59 -0800 (PST)
+X-Received: by 2002:a2e:8585:: with SMTP id b5mr10811680lji.125.1552106039085;
+ Fri, 08 Mar 2019 20:33:59 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20190308215959.5575-1-keith.busch@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <db961c75-8468-b5ec-1201-1ba0b37fa30a@kernel.dk>
+ <5c128dfd-9e6c-21fe-7b2b-397d495e112a@kernel.dk> <CAHk-=whtxVReSOZ2NpP7O-N+fwNw0hctBr1LdbTZ6Fu32=xcWg@mail.gmail.com>
+ <CAHk-=whCvMXSbuDmPAZ1sHzuQFxzuVsrh4Q8rQmB9nooP8QOKA@mail.gmail.com>
+ <CAHk-=whu3uojbKwdtaq8vwGfsvSpVUPfhvJPv+LMR=6kNT0XgA@mail.gmail.com>
+ <CAHk-=wh36F+2iXMz1dxGxVebfFYtqypGXRchqttJuJ_=A9ctZw@mail.gmail.com> <6cc0763f-8a48-c61a-b831-4326345aa68c@kernel.dk>
+In-Reply-To: <6cc0763f-8a48-c61a-b831-4326345aa68c@kernel.dk>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 8 Mar 2019 20:33:43 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wjF5Pbuo-cOUzCESA4mrrQXA26OsYDvnXr3+W8ve9a=MA@mail.gmail.com>
+Message-ID: <CAHk-=wjF5Pbuo-cOUzCESA4mrrQXA26OsYDvnXr3+W8ve9a=MA@mail.gmail.com>
+Subject: Re: [GIT PULL] Support for the io_uring IO interface
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/8/19 2:59 PM, Keith Busch wrote:
-> Make depth options command line parameters so a recompile isn't
-> required to see how it affects performance.
+On Fri, Mar 8, 2019 at 8:25 PM Jens Axboe <axboe@kernel.dk> wrote:
+>
+>              I'll take a look
+> at the patches that went into aio and apply the same fix(es) to
+> io_uring.
 
-Thanks, everything really should be command line options. But I never
-bothered, it wasn't mean to live this long :-)
+Note that they are not upstream yet, there's a work-in-progress branch
+in Al's tree at
 
-Applied
+   git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git work.aio
 
--- 
-Jens Axboe
+so you can see what the fixes are, but they are not in their final form yet.
 
+              Linus
