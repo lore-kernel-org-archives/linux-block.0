@@ -2,201 +2,452 @@ Return-Path: <SRS0=TT20=RM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A05D3C43381
-	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 18:54:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 263BDC4360F
+	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 21:42:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B4F52081B
-	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 18:54:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF5FC207E0
+	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 21:42:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726360AbfCISyK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Mar 2019 13:54:10 -0500
-Received: from mga11.intel.com ([192.55.52.93]:22003 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726358AbfCISyK (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 9 Mar 2019 13:54:10 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Mar 2019 10:54:09 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.58,460,1544515200"; 
-   d="gz'50?scan'50,208,50";a="281239318"
-Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
-  by orsmga004.jf.intel.com with ESMTP; 09 Mar 2019 10:54:07 -0800
-Received: from kbuild by lkp-server01 with local (Exim 4.89)
-        (envelope-from <lkp@intel.com>)
-        id 1h2h6k-0002ni-3J; Sun, 10 Mar 2019 02:54:06 +0800
-Date:   Sun, 10 Mar 2019 02:53:57 +0800
-From:   kbuild test robot <lkp@intel.com>
-To:     Andrea Righi <andrea.righi@canonical.com>
-Cc:     kbuild-all@01.org, Josef Bacik <josef@toxicpanda.com>,
-        Tejun Heo <tj@kernel.org>, Li Zefan <lizefan@huawei.com>,
+        id S1726442AbfCIVmi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Mar 2019 16:42:38 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:38742 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726439AbfCIVmh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Mar 2019 16:42:37 -0500
+Received: from mail-wr1-f70.google.com ([209.85.221.70])
+        by youngberry.canonical.com with esmtps (TLS1.0:RSA_AES_128_CBC_SHA1:16)
+        (Exim 4.76)
+        (envelope-from <andrea.righi@canonical.com>)
+        id 1h2jjl-0000sW-OK
+        for linux-block@vger.kernel.org; Sat, 09 Mar 2019 21:42:33 +0000
+Received: by mail-wr1-f70.google.com with SMTP id n15so647673wrr.2
+        for <linux-block@vger.kernel.org>; Sat, 09 Mar 2019 13:42:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=A0PGKAOGAWEyIU2MwZgcDLodb1JVvAVCaAK3XCNp/gs=;
+        b=RS5sfnmnC2i70OLxCbTfTDHYcBy5WXBTe8lUSpCzG0a9OuuwIZiQ9a3dhXMh2eYCQh
+         5sSB6OLo/lrIdDlA5fXFyifpi6lqA5WZ642ptACCc4jNH8CXQM8jGAOZFzKaGSE2Y23m
+         9VcOkqOSN9c/ZCnsOqo019u14AE6srinEIm8mdoHUqZxhisY5fmbT0d4oILorRdV8sTb
+         sZ51wwNLX4yeo6WqTRXtkTW1hM+HDTzHRJUOB3nPz2zaDqLdcoa1w7NWvQEsj/pxMzMc
+         5I2sDrY6LQ5+nTWGFfHNJjmgk38SBJ0jm/FOzMFTi3HvLi2U7Ej1AhyfROyVmf/tpgjc
+         ACCQ==
+X-Gm-Message-State: APjAAAVodBZ4iu6AoN9hiNu3a6yuIvRYCJhKItIb1sBRsoBWXLZSXbFn
+        YZZEvWLFBzU8t0XBpo9P/0LUFoSeAZySX69z1eX14Sp86rjkExNXX9nzJ9nNmdKvbDoOoSsu3y/
+        BfvW5M9lNawLjKXutuKLrJhZbeXibu3hbfPR0Te9V
+X-Received: by 2002:a1c:4d17:: with SMTP id o23mr13190534wmh.53.1552167753156;
+        Sat, 09 Mar 2019 13:42:33 -0800 (PST)
+X-Google-Smtp-Source: APXvYqzWZG16wT4WBrDdXdzYR7pc5MjlXlVRzJba1BMT1iL9L5n0SiAcEmzSCBnCrIn0mommVxC5pA==
+X-Received: by 2002:a1c:4d17:: with SMTP id o23mr13190510wmh.53.1552167752687;
+        Sat, 09 Mar 2019 13:42:32 -0800 (PST)
+Received: from localhost (host157-124-dynamic.27-79-r.retail.telecomitalia.it. [79.27.124.157])
+        by smtp.gmail.com with ESMTPSA id 26sm16155708wmg.42.2019.03.09.13.42.31
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Sat, 09 Mar 2019 13:42:32 -0800 (PST)
+Date:   Sat, 9 Mar 2019 22:42:31 +0100
+From:   Andrea Righi <andrea.righi@canonical.com>
+To:     Josef Bacik <josef@toxicpanda.com>, Tejun Heo <tj@kernel.org>
+Cc:     Li Zefan <lizefan@huawei.com>,
         Paolo Valente <paolo.valente@linaro.org>,
         Johannes Weiner <hannes@cmpxchg.org>,
         Jens Axboe <axboe@kernel.dk>, Vivek Goyal <vgoyal@redhat.com>,
         Dennis Zhou <dennis@kernel.org>, cgroups@vger.kernel.org,
         linux-block@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] blkcg: prevent priority inversion problem during
- sync()
-Message-ID: <201903100216.OQdFKZhP%lkp@intel.com>
+Subject: [PATCH v4] blkcg: prevent priority inversion problem during sync()
+Message-ID: <20190309214230.GA1730@xps-13>
 References: <20190308212806.GA1172@xps-13>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="envbJBWh7q8WU6mo"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190308212806.GA1172@xps-13>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+When sync(2) is executed from a high-priority cgroup, the process is
+forced to wait the completion of the entire outstanding writeback I/O,
+even the I/O that was originally generated by low-priority cgroups
+potentially.
 
---envbJBWh7q8WU6mo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+This may cause massive latencies to random processes (even those running
+in the root cgroup) that shouldn't be I/O-throttled at all, similarly to
+a classic priority inversion problem.
 
-Hi Andrea,
+Prevent this problem by saving a list of blkcg's that are waiting for
+writeback: every time a sync(2) is executed the current blkcg is added
+to the list.
 
-Thank you for the patch! Yet something to improve:
+Then, when I/O is throttled, if there's a blkcg waiting for writeback
+different than the current blkcg, no throttling is applied (we can
+probably refine this logic later, i.e., a better policy could be to
+adjust the I/O rate using the blkcg with the highest speed from the list
+of waiters).
 
-[auto build test ERROR on linus/master]
-[also build test ERROR on v5.0 next-20190306]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+See also:
+  https://lkml.org/lkml/2019/3/7/640
 
-url:    https://github.com/0day-ci/linux/commits/Andrea-Righi/blkcg-prevent-priority-inversion-problem-during-sync/20190310-020543
-config: riscv-tinyconfig (attached as .config)
-compiler: riscv64-linux-gcc (GCC) 8.2.0
-reproduce:
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # save the attached .config to linux build tree
-        GCC_VERSION=8.2.0 make.cross ARCH=riscv 
-
-All errors (new ones prefixed by >>):
-
-   fs/sync.c: In function 'sync_fs_one_sb':
->> fs/sync.c:83:3: error: implicit declaration of function 'blkcg_start_wb_wait_on_bdi' [-Werror=implicit-function-declaration]
-      blkcg_start_wb_wait_on_bdi(bdi);
-      ^~~~~~~~~~~~~~~~~~~~~~~~~~
->> fs/sync.c:85:3: error: implicit declaration of function 'blkcg_stop_wb_wait_on_bdi' [-Werror=implicit-function-declaration]
-      blkcg_stop_wb_wait_on_bdi(bdi);
-      ^~~~~~~~~~~~~~~~~~~~~~~~~
-   cc1: some warnings being treated as errors
-
-vim +/blkcg_start_wb_wait_on_bdi +83 fs/sync.c
-
-    77	
-    78	static void sync_fs_one_sb(struct super_block *sb, void *arg)
-    79	{
-    80		struct backing_dev_info *bdi = sb->s_bdi;
-    81	
-    82		if (!sb_rdonly(sb) && sb->s_op->sync_fs) {
-  > 83			blkcg_start_wb_wait_on_bdi(bdi);
-    84			sb->s_op->sync_fs(sb, *(int *)arg);
-  > 85			blkcg_stop_wb_wait_on_bdi(bdi);
-    86		}
-    87	}
-    88	
-
+Signed-off-by: Andrea Righi <andrea.righi@canonical.com>
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+Changes in v4:
+  - fix a build bug when CONFIG_BLOCK is unset
 
---envbJBWh7q8WU6mo
-Content-Type: application/gzip
-Content-Disposition: attachment; filename=".config.gz"
-Content-Transfer-Encoding: base64
+ block/blk-cgroup.c               | 130 +++++++++++++++++++++++++++++++
+ block/blk-throttle.c             |  11 ++-
+ fs/fs-writeback.c                |   5 ++
+ fs/sync.c                        |   8 +-
+ include/linux/backing-dev-defs.h |   2 +
+ include/linux/blk-cgroup.h       |  35 ++++++++-
+ mm/backing-dev.c                 |   2 +
+ 7 files changed, 188 insertions(+), 5 deletions(-)
 
-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
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 77f37ef8ef06..5334cb3acd22 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1351,6 +1351,136 @@ struct cgroup_subsys io_cgrp_subsys = {
+ };
+ EXPORT_SYMBOL_GPL(io_cgrp_subsys);
+ 
++#ifdef CONFIG_CGROUP_WRITEBACK
++struct blkcg_wb_sleeper {
++	struct blkcg *blkcg;
++	refcount_t refcnt;
++	struct list_head node;
++};
++
++static struct blkcg_wb_sleeper *
++blkcg_wb_sleeper_find(struct blkcg *blkcg, struct backing_dev_info *bdi)
++{
++	struct blkcg_wb_sleeper *bws;
++
++	list_for_each_entry(bws, &bdi->cgwb_waiters, node)
++		if (bws->blkcg == blkcg)
++			return bws;
++	return NULL;
++}
++
++static void
++blkcg_wb_sleeper_add(struct backing_dev_info *bdi, struct blkcg_wb_sleeper *bws)
++{
++	list_add(&bws->node, &bdi->cgwb_waiters);
++}
++
++static void
++blkcg_wb_sleeper_del(struct backing_dev_info *bdi, struct blkcg_wb_sleeper *bws)
++{
++	list_del_init(&bws->node);
++}
++
++/**
++ * blkcg_wb_waiters_on_bdi - check for writeback waiters on a block device
++ * @blkcg: current blkcg cgroup
++ * @bdi: block device to check
++ *
++ * Return true if any other blkcg different than the current one is waiting for
++ * writeback on the target block device, false otherwise.
++ */
++bool blkcg_wb_waiters_on_bdi(struct blkcg *blkcg, struct backing_dev_info *bdi)
++{
++	struct blkcg_wb_sleeper *bws;
++	bool ret = false;
++
++	if (likely(list_empty(&bdi->cgwb_waiters)))
++		return false;
++	spin_lock(&bdi->cgwb_waiters_lock);
++	list_for_each_entry(bws, &bdi->cgwb_waiters, node)
++		if (bws->blkcg != blkcg) {
++			ret = true;
++			break;
++		}
++	spin_unlock(&bdi->cgwb_waiters_lock);
++
++	return ret;
++}
++
++/**
++ * blkcg_start_wb_wait_on_bdi - add current blkcg to writeback waiters list
++ * @bdi: target block device
++ *
++ * Add current blkcg to the list of writeback waiters on target block device.
++ */
++void blkcg_start_wb_wait_on_bdi(struct backing_dev_info *bdi)
++{
++	struct blkcg_wb_sleeper *new_bws, *bws;
++	struct blkcg *blkcg;
++
++	new_bws = kzalloc(sizeof(*new_bws), GFP_KERNEL);
++	if (unlikely(!new_bws))
++		return;
++
++	rcu_read_lock();
++	blkcg = blkcg_from_current();
++	if (likely(blkcg)) {
++		/* Check if blkcg is already sleeping on bdi */
++		spin_lock_bh(&bdi->cgwb_waiters_lock);
++		bws = blkcg_wb_sleeper_find(blkcg, bdi);
++		if (bws) {
++			refcount_inc(&bws->refcnt);
++		} else {
++			/* Add current blkcg as a new wb sleeper on bdi */
++			css_get(&blkcg->css);
++			new_bws->blkcg = blkcg;
++			refcount_set(&new_bws->refcnt, 1);
++			blkcg_wb_sleeper_add(bdi, new_bws);
++			new_bws = NULL;
++		}
++		spin_unlock_bh(&bdi->cgwb_waiters_lock);
++	}
++	rcu_read_unlock();
++
++	kfree(new_bws);
++}
++
++/**
++ * blkcg_stop_wb_wait_on_bdi - remove current blkcg from writeback waiters list
++ * @bdi: target block device
++ *
++ * Remove current blkcg from the list of writeback waiters on target block
++ * device.
++ */
++void blkcg_stop_wb_wait_on_bdi(struct backing_dev_info *bdi)
++{
++	struct blkcg_wb_sleeper *bws = NULL;
++	struct blkcg *blkcg;
++
++	rcu_read_lock();
++	blkcg = blkcg_from_current();
++	if (!blkcg) {
++		rcu_read_unlock();
++		return;
++	}
++	spin_lock_bh(&bdi->cgwb_waiters_lock);
++	bws = blkcg_wb_sleeper_find(blkcg, bdi);
++	if (unlikely(!bws)) {
++		/* blkcg_start/stop_wb_wait_on_bdi() mismatch */
++		WARN_ON(1);
++		goto out_unlock;
++	}
++	if (refcount_dec_and_test(&bws->refcnt)) {
++		blkcg_wb_sleeper_del(bdi, bws);
++		css_put(&blkcg->css);
++		kfree(bws);
++	}
++out_unlock:
++	spin_unlock_bh(&bdi->cgwb_waiters_lock);
++	rcu_read_unlock();
++}
++#endif
++
+ /**
+  * blkcg_activate_policy - activate a blkcg policy on a request_queue
+  * @q: request_queue of interest
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 1b97a73d2fb1..da817896cded 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -970,9 +970,13 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
+ {
+ 	bool rw = bio_data_dir(bio);
+ 	unsigned long bps_wait = 0, iops_wait = 0, max_wait = 0;
++	struct throtl_data *td = tg->td;
++	struct request_queue *q = td->queue;
++	struct backing_dev_info *bdi = q->backing_dev_info;
++	struct blkcg_gq *blkg = tg_to_blkg(tg);
+ 
+ 	/*
+- 	 * Currently whole state machine of group depends on first bio
++	 * Currently whole state machine of group depends on first bio
+ 	 * queued in the group bio list. So one should not be calling
+ 	 * this function with a different bio if there are other bios
+ 	 * queued.
+@@ -981,8 +985,9 @@ static bool tg_may_dispatch(struct throtl_grp *tg, struct bio *bio,
+ 	       bio != throtl_peek_queued(&tg->service_queue.queued[rw]));
+ 
+ 	/* If tg->bps = -1, then BW is unlimited */
+-	if (tg_bps_limit(tg, rw) == U64_MAX &&
+-	    tg_iops_limit(tg, rw) == UINT_MAX) {
++	if (blkcg_wb_waiters_on_bdi(blkg->blkcg, bdi) ||
++	    (tg_bps_limit(tg, rw) == U64_MAX &&
++	    tg_iops_limit(tg, rw) == UINT_MAX)) {
+ 		if (wait)
+ 			*wait = 0;
+ 		return true;
+diff --git a/fs/fs-writeback.c b/fs/fs-writeback.c
+index 36855c1f8daf..77c039a0ec25 100644
+--- a/fs/fs-writeback.c
++++ b/fs/fs-writeback.c
+@@ -28,6 +28,7 @@
+ #include <linux/tracepoint.h>
+ #include <linux/device.h>
+ #include <linux/memcontrol.h>
++#include <linux/blk-cgroup.h>
+ #include "internal.h"
+ 
+ /*
+@@ -2446,6 +2447,8 @@ void sync_inodes_sb(struct super_block *sb)
+ 		return;
+ 	WARN_ON(!rwsem_is_locked(&sb->s_umount));
+ 
++	blkcg_start_wb_wait_on_bdi(bdi);
++
+ 	/* protect against inode wb switch, see inode_switch_wbs_work_fn() */
+ 	bdi_down_write_wb_switch_rwsem(bdi);
+ 	bdi_split_work_to_wbs(bdi, &work, false);
+@@ -2453,6 +2456,8 @@ void sync_inodes_sb(struct super_block *sb)
+ 	bdi_up_write_wb_switch_rwsem(bdi);
+ 
+ 	wait_sb_inodes(sb);
++
++	blkcg_stop_wb_wait_on_bdi(bdi);
+ }
+ EXPORT_SYMBOL(sync_inodes_sb);
+ 
+diff --git a/fs/sync.c b/fs/sync.c
+index b54e0541ad89..3958b8f98b85 100644
+--- a/fs/sync.c
++++ b/fs/sync.c
+@@ -16,6 +16,7 @@
+ #include <linux/pagemap.h>
+ #include <linux/quotaops.h>
+ #include <linux/backing-dev.h>
++#include <linux/blk-cgroup.h>
+ #include "internal.h"
+ 
+ #define VALID_FLAGS (SYNC_FILE_RANGE_WAIT_BEFORE|SYNC_FILE_RANGE_WRITE| \
+@@ -76,8 +77,13 @@ static void sync_inodes_one_sb(struct super_block *sb, void *arg)
+ 
+ static void sync_fs_one_sb(struct super_block *sb, void *arg)
+ {
+-	if (!sb_rdonly(sb) && sb->s_op->sync_fs)
++	struct backing_dev_info *bdi = sb->s_bdi;
++
++	if (!sb_rdonly(sb) && sb->s_op->sync_fs) {
++		blkcg_start_wb_wait_on_bdi(bdi);
+ 		sb->s_op->sync_fs(sb, *(int *)arg);
++		blkcg_stop_wb_wait_on_bdi(bdi);
++	}
+ }
+ 
+ static void fdatawrite_one_bdev(struct block_device *bdev, void *arg)
+diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
+index 07e02d6df5ad..095e4dd0427b 100644
+--- a/include/linux/backing-dev-defs.h
++++ b/include/linux/backing-dev-defs.h
+@@ -191,6 +191,8 @@ struct backing_dev_info {
+ 	struct rb_root cgwb_congested_tree; /* their congested states */
+ 	struct mutex cgwb_release_mutex;  /* protect shutdown of wb structs */
+ 	struct rw_semaphore wb_switch_rwsem; /* no cgwb switch while syncing */
++	struct list_head cgwb_waiters; /* list of all waiters for writeback */
++	spinlock_t cgwb_waiters_lock; /* protect cgwb_waiters list */
+ #else
+ 	struct bdi_writeback_congested *wb_congested;
+ #endif
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 76c61318fda5..05e774d55624 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -29,6 +29,27 @@
+ /* Max limits for throttle policy */
+ #define THROTL_IOPS_MAX		UINT_MAX
+ 
++struct blkcg;
++
++#ifdef CONFIG_CGROUP_WRITEBACK
++
++bool blkcg_wb_waiters_on_bdi(struct blkcg *blkcg, struct backing_dev_info *bdi);
++void blkcg_start_wb_wait_on_bdi(struct backing_dev_info *bdi);
++void blkcg_stop_wb_wait_on_bdi(struct backing_dev_info *bdi);
++
++#else /* CONFIG_CGROUP_WRITEBACK */
++
++static inline bool
++blkcg_wb_waiters_on_bdi(struct blkcg *blkcg, struct backing_dev_info *bdi)
++{
++	return false;
++}
++
++static inline void blkcg_start_wb_wait_on_bdi(struct backing_dev_info *bdi) { }
++static inline void blkcg_stop_wb_wait_on_bdi(struct backing_dev_info *bdi) { }
++#endif /* CONFIG_CGROUP_WRITEBACK */
++
++
+ #ifdef CONFIG_BLK_CGROUP
+ 
+ enum blkg_rwstat_type {
+@@ -56,6 +77,7 @@ struct blkcg {
+ 
+ 	struct list_head		all_blkcgs_node;
+ #ifdef CONFIG_CGROUP_WRITEBACK
++	struct list_head		cgwb_wait_node;
+ 	struct list_head		cgwb_list;
+ 	refcount_t			cgwb_refcnt;
+ #endif
+@@ -252,6 +274,12 @@ static inline struct blkcg *css_to_blkcg(struct cgroup_subsys_state *css)
+ 	return css ? container_of(css, struct blkcg, css) : NULL;
+ }
+ 
++static inline struct blkcg *blkcg_from_current(void)
++{
++	WARN_ON_ONCE(!rcu_read_lock_held());
++	return css_to_blkcg(blkcg_css());
++}
++
+ /**
+  * __bio_blkcg - internal, inconsistent version to get blkcg
+  *
+@@ -463,7 +491,6 @@ static inline void blkcg_cgwb_put(struct blkcg *blkcg)
+ 	/* wb isn't being accounted, so trigger destruction right away */
+ 	blkcg_destroy_blkgs(blkcg);
+ }
+-
+ #endif
+ 
+ /**
+@@ -772,6 +799,7 @@ static inline void blkcg_bio_issue_init(struct bio *bio)
+ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+ 					 struct bio *bio)
+ {
++	struct backing_dev_info *bdi = q->backing_dev_info;
+ 	struct blkcg_gq *blkg;
+ 	bool throtl = false;
+ 
+@@ -788,6 +816,11 @@ static inline bool blkcg_bio_issue_check(struct request_queue *q,
+ 
+ 	blkg = bio->bi_blkg;
+ 
++	local_bh_disable();
++	if (blkcg_wb_waiters_on_bdi(blkg->blkcg, bdi))
++		bio_set_flag(bio, BIO_THROTTLED);
++	local_bh_enable();
++
+ 	throtl = blk_throtl_bio(q, blkg, bio);
+ 
+ 	if (!throtl) {
+diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+index 72e6d0c55cfa..8848d26e8bf6 100644
+--- a/mm/backing-dev.c
++++ b/mm/backing-dev.c
+@@ -686,10 +686,12 @@ static int cgwb_bdi_init(struct backing_dev_info *bdi)
+ {
+ 	int ret;
+ 
++	INIT_LIST_HEAD(&bdi->cgwb_waiters);
+ 	INIT_RADIX_TREE(&bdi->cgwb_tree, GFP_ATOMIC);
+ 	bdi->cgwb_congested_tree = RB_ROOT;
+ 	mutex_init(&bdi->cgwb_release_mutex);
+ 	init_rwsem(&bdi->wb_switch_rwsem);
++	spin_lock_init(&bdi->cgwb_waiters_lock);
+ 
+ 	ret = wb_init(&bdi->wb, bdi, 1, GFP_KERNEL);
+ 	if (!ret) {
+-- 
+2.19.1
 
---envbJBWh7q8WU6mo--
