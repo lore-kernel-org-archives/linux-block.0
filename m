@@ -2,67 +2,112 @@ Return-Path: <SRS0=TT20=RM=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19CD5C10F0C
-	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 00:10:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B3A8C43381
+	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 01:37:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DC64020857
-	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 00:10:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1552090220;
-	bh=5Ts5Y4vIfJybDC+aJk+17zlo+mKmlfRyNr71wmZU0m0=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=ImcOwBe8UPfmzyJz6KsCAaxpXMgsCTmfnsmKX0c/ceDUz3izl6iVm/V0zTdRjey0R
-	 0z7frLv6b5nYEfXbdJeTTyirRDatMZr2cgqd3P5JFnc+LDKV/EuHOWi31Bil6QnGVy
-	 Ngr7HF6oI4C9jc9qaB438iCZkIkGQnfli8hFuC04=
+	by mail.kernel.org (Postfix) with ESMTP id C8CFC20857
+	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 01:37:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726913AbfCIAKU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Mar 2019 19:10:20 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33448 "EHLO mail.kernel.org"
+        id S1726351AbfCIBhw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Mar 2019 20:37:52 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:56958 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726903AbfCIAKU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Mar 2019 19:10:20 -0500
-Subject: Re: [GIT PULL] Block changes for 5.1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1552090219;
-        bh=5Ts5Y4vIfJybDC+aJk+17zlo+mKmlfRyNr71wmZU0m0=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=kBtF+XaiwJw6qgmgy2xqEQYSjeQKToABQbWBwZrDl2BSA/+0gYaS0miVPSKYjI9VH
-         Gr1UyWTxQTFqEu2GAMDJCn4V5Zu6LVxXpk+4G7LqZvXO4C3QcKNbJWHNQykQXB3Zj0
-         YXxP3nvz4jptxOa61eJp2GEgf7InZZzTLtZPIY74=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <60f2e4cc-b0cb-1d17-bbb1-445e6a28b248@kernel.dk>
-References: <60f2e4cc-b0cb-1d17-bbb1-445e6a28b248@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <60f2e4cc-b0cb-1d17-bbb1-445e6a28b248@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git
- tags/for-5.1/block-20190302
-X-PR-Tracked-Commit-Id: aaeee62c841cc1e48231e1d60c304d2da9c4e41c
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 80201fe175cbf7f3e372f53eba0a881a702ad926
-Message-Id: <155209021955.17751.12406179379345112463.pr-tracker-bot@kernel.org>
-Date:   Sat, 09 Mar 2019 00:10:19 +0000
+        id S1726338AbfCIBhw (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Mar 2019 20:37:52 -0500
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id A07E283F44;
+        Sat,  9 Mar 2019 01:37:52 +0000 (UTC)
+Received: from localhost (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 084625FCB5;
+        Sat,  9 Mar 2019 01:37:49 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        ris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        xen-devel@lists.xenproject.org, Omar Sandoval <osandov@fb.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 1/6] block: pass page to xen_biovec_phys_mergeable
+Date:   Sat,  9 Mar 2019 09:37:32 +0800
+Message-Id: <20190309013737.27741-2-ming.lei@redhat.com>
+In-Reply-To: <20190309013737.27741-1-ming.lei@redhat.com>
+References: <20190309013737.27741-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Sat, 09 Mar 2019 01:37:52 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Sun, 3 Mar 2019 18:53:30 -0700:
+xen_biovec_phys_mergeable() only needs .bv_page of the 2nd bio bvec
+for checking if the two bvecs can be merged, so pass page to
+xen_biovec_phys_mergeable() directly.
 
-> git://git.kernel.dk/linux-block.git tags/for-5.1/block-20190302
+No function change.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/80201fe175cbf7f3e372f53eba0a881a702ad926
+Cc: ris Ostrovsky <boris.ostrovsky@oracle.com>
+Cc: Juergen Gross <jgross@suse.com>
+Cc: xen-devel@lists.xenproject.org
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk.h            | 2 +-
+ drivers/xen/biomerge.c | 5 +++--
+ include/xen/xen.h      | 2 +-
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
-Thank you!
-
+diff --git a/block/blk.h b/block/blk.h
+index 5d636ee41663..e27fd1512e4b 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -75,7 +75,7 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
+ 
+ 	if (addr1 + vec1->bv_len != addr2)
+ 		return false;
+-	if (xen_domain() && !xen_biovec_phys_mergeable(vec1, vec2))
++	if (xen_domain() && !xen_biovec_phys_mergeable(vec1, vec2->bv_page))
+ 		return false;
+ 	if ((addr1 | mask) != ((addr2 + vec2->bv_len - 1) | mask))
+ 		return false;
+diff --git a/drivers/xen/biomerge.c b/drivers/xen/biomerge.c
+index f3fbb700f569..05a286d24f14 100644
+--- a/drivers/xen/biomerge.c
++++ b/drivers/xen/biomerge.c
+@@ -4,12 +4,13 @@
+ #include <xen/xen.h>
+ #include <xen/page.h>
+ 
++/* check if @page can be merged with 'vec1' */
+ bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
+-			       const struct bio_vec *vec2)
++			       const struct page *page)
+ {
+ #if XEN_PAGE_SIZE == PAGE_SIZE
+ 	unsigned long bfn1 = pfn_to_bfn(page_to_pfn(vec1->bv_page));
+-	unsigned long bfn2 = pfn_to_bfn(page_to_pfn(vec2->bv_page));
++	unsigned long bfn2 = pfn_to_bfn(page_to_pfn(page));
+ 
+ 	return bfn1 + PFN_DOWN(vec1->bv_offset + vec1->bv_len) == bfn2;
+ #else
+diff --git a/include/xen/xen.h b/include/xen/xen.h
+index 0e2156786ad2..39a97f2eff75 100644
+--- a/include/xen/xen.h
++++ b/include/xen/xen.h
+@@ -44,6 +44,6 @@ extern struct hvm_start_info pvh_start_info;
+ 
+ struct bio_vec;
+ bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
+-		const struct bio_vec *vec2);
++		const struct page *page);
+ 
+ #endif	/* _XEN_XEN_H */
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+2.9.5
+
