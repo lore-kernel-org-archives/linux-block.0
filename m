@@ -6,197 +6,182 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D74BC43381
-	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 01:47:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F07EC43381
+	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 01:47:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 763BF20851
-	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 01:47:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53B4620851
+	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 01:47:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726381AbfCIBrn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Mar 2019 20:47:43 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:43794 "EHLO mx1.redhat.com"
+        id S1726429AbfCIBru (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Mar 2019 20:47:50 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:58322 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726338AbfCIBrn (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Mar 2019 20:47:43 -0500
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        id S1726338AbfCIBru (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Mar 2019 20:47:50 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 84E7B5AFE9;
-        Sat,  9 Mar 2019 01:47:43 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 44DB67FD59;
+        Sat,  9 Mar 2019 01:47:50 +0000 (UTC)
 Received: from localhost (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F2B2061529;
-        Sat,  9 Mar 2019 01:38:12 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E9DB9608D1;
+        Sat,  9 Mar 2019 01:38:09 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Omar Sandoval <osandov@fb.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 6/6] block: don't check if adjacent bvecs in one bio can be mergeable
-Date:   Sat,  9 Mar 2019 09:37:37 +0800
-Message-Id: <20190309013737.27741-7-ming.lei@redhat.com>
+Subject: [PATCH 5/6] block: enable multi-page bvec for passthrough IO
+Date:   Sat,  9 Mar 2019 09:37:36 +0800
+Message-Id: <20190309013737.27741-6-ming.lei@redhat.com>
 In-Reply-To: <20190309013737.27741-1-ming.lei@redhat.com>
 References: <20190309013737.27741-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Sat, 09 Mar 2019 01:47:43 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Sat, 09 Mar 2019 01:47:50 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now both passthrough and FS IO have supported multi-page bvec, and
-bvec merging has been handled actually when adding page to bio, then
-adjacent bvecs won't be mergeable any more if they belong to same bio.
+Now block IO stack is basically ready for supporting multi-page bvec,
+however it isn't enabled on passthrough IO.
 
-So only try to merge bvecs if they are from different bios.
+One reason is that passthrough IO is dispatched to LLD directly and bio
+split is bypassed, so the bio has to be built correctly for dispatch to
+LLD from the beginning.
+
+Implement multi-page support for passthrough IO by limitting each bvec
+as block device's segment and applying all kinds of queue limit in
+blk_add_pc_page(). Then we don't need to calculate segments any more for
+passthrough IO any more, turns out code is simplified much.
 
 Cc: Omar Sandoval <osandov@fb.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-merge.c | 81 ++++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 51 insertions(+), 30 deletions(-)
+ block/bio.c | 64 +++++++++++++++++++++++++++++++++----------------------------
+ 1 file changed, 35 insertions(+), 29 deletions(-)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index aa9164eb7187..5c52141eee7d 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -354,11 +354,11 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 					     struct bio *bio)
- {
- 	struct bio_vec bv, bvprv = { NULL };
--	int prev = 0;
- 	unsigned int seg_size, nr_phys_segs;
- 	unsigned front_seg_size;
- 	struct bio *fbio, *bbio;
- 	struct bvec_iter iter;
-+	bool new_bio;
- 
- 	if (!bio)
- 		return 0;
-@@ -377,9 +377,10 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 	fbio = bio;
- 	seg_size = 0;
- 	nr_phys_segs = 0;
-+	new_bio = false;
- 	for_each_bio(bio) {
- 		bio_for_each_bvec(bv, bio, iter) {
--			if (prev) {
-+			if (new_bio) {
- 				if (seg_size + bv.bv_len
- 				    > queue_max_segment_size(q))
- 					goto new_segment;
-@@ -387,7 +388,6 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 					goto new_segment;
- 
- 				seg_size += bv.bv_len;
--				bvprv = bv;
- 
- 				if (nr_phys_segs == 1 && seg_size >
- 						front_seg_size)
-@@ -396,12 +396,13 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 				continue;
- 			}
- new_segment:
--			bvprv = bv;
--			prev = 1;
- 			bvec_split_segs(q, &bv, &nr_phys_segs, &seg_size,
- 					&front_seg_size, NULL, UINT_MAX);
-+			new_bio = false;
- 		}
- 		bbio = bio;
-+		bvprv = bv;
-+		new_bio = true;
- 	}
- 
- 	fbio->bi_seg_front_size = front_seg_size;
-@@ -493,31 +494,38 @@ static unsigned blk_bvec_map_sg(struct request_queue *q,
- 	return nsegs;
+diff --git a/block/bio.c b/block/bio.c
+index 95ec5e893265..ce15246f9a1f 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -665,6 +665,27 @@ page_is_mergeable(const struct bio_vec *bv, struct page *page,
+ 	return true;
  }
  
--static inline void
--__blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
--		     struct scatterlist *sglist, struct bio_vec *bvprv,
--		     struct scatterlist **sg, int *nsegs)
-+/* only try to merge bvecs into one sg if they are from two bios */
-+static inline bool
-+__blk_segment_map_sg_merge(struct request_queue *q, struct bio_vec *bvec,
-+			   struct bio_vec *bvprv, struct scatterlist **sg)
- {
--
- 	int nbytes = bvec->bv_len;
- 
--	if (*sg) {
--		if ((*sg)->length + nbytes > queue_max_segment_size(q))
--			goto new_segment;
--		if (!biovec_phys_mergeable(q, bvprv, bvec))
--			goto new_segment;
-+	if (!*sg)
-+		return false;
- 
--		(*sg)->length += nbytes;
--	} else {
--new_segment:
--		if (bvec->bv_offset + bvec->bv_len <= PAGE_SIZE) {
--			*sg = blk_next_sg(sg, sglist);
--			sg_set_page(*sg, bvec->bv_page, nbytes, bvec->bv_offset);
--			(*nsegs) += 1;
--		} else
--			(*nsegs) += blk_bvec_map_sg(q, bvec, sglist, sg);
--	}
--	*bvprv = *bvec;
-+	if ((*sg)->length + nbytes > queue_max_segment_size(q))
++/*
++ * Check if the @page can be added to the current segment(@bv), and make
++ * sure to call it only if page_is_mergeable(@bv, @page) is true
++ */
++static bool can_add_page_to_seg(struct request_queue *q,
++		const struct bio_vec *bv, const struct page *page,
++		unsigned len, unsigned offset)
++{
++	unsigned long mask = queue_segment_boundary(q);
++	phys_addr_t addr1 = page_to_phys(bv->bv_page) + bv->bv_offset;
++	phys_addr_t addr2 = page_to_phys(page) + offset + len - 1;
++
++	if ((addr1 | mask) != (addr2 | mask))
 +		return false;
 +
-+	if (!biovec_phys_mergeable(q, bvprv, bvec))
++	if (bv->bv_len + len > queue_max_segment_size(q))
 +		return false;
-+
-+	(*sg)->length += nbytes;
 +
 +	return true;
 +}
 +
-+static inline void
-+__blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
-+		     struct scatterlist *sglist, struct scatterlist **sg,
-+		     int *nsegs)
-+{
-+	if (bvec->bv_offset + bvec->bv_len <= PAGE_SIZE) {
-+		*sg = blk_next_sg(sg, sglist);
-+		sg_set_page(*sg, bvec->bv_page, bvec->bv_len, bvec->bv_offset);
-+		(*nsegs) += 1;
-+	} else
-+		(*nsegs) += blk_bvec_map_sg(q, bvec, sglist, sg);
+ /**
+  *	__bio_add_pc_page	-	attempt to add page to bio
+  *	@q: the target queue
+@@ -680,12 +701,13 @@ page_is_mergeable(const struct bio_vec *bv, struct page *page,
+  *	so it is always possible to add a single page to an empty bio.
+  *
+  *	This should only be used by REQ_PC bios.
++ *
++ *	For REQ_PC bios, bvec is exactly same with segment of block device.
+  */
+ int __bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
+ 		      *page, unsigned int len, unsigned int offset,
+ 		      bool put_same_page)
+ {
+-	int retried_segments = 0;
+ 	struct bio_vec *bvec;
+ 
+ 	/*
+@@ -705,10 +727,12 @@ int __bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
+ 	if (bio->bi_vcnt > 0) {
+ 		struct bio_vec *prev = &bio->bi_io_vec[bio->bi_vcnt - 1];
+ 
++		/* segment size is always >= PAGE_SIZE */
+ 		if (page == prev->bv_page &&
+ 		    offset == prev->bv_offset + prev->bv_len) {
+ 			if (put_same_page)
+ 				put_page(page);
++ bvec_merge:
+ 			prev->bv_len += len;
+ 			bio->bi_iter.bi_size += len;
+ 			goto done;
+@@ -720,11 +744,18 @@ int __bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
+ 		 */
+ 		if (bvec_gap_to_prev(q, prev, offset))
+ 			return 0;
++
++		if (page_is_mergeable(prev, page, len, offset, false) &&
++				can_add_page_to_seg(q, prev, page, len, offset))
++			goto bvec_merge;
+ 	}
+ 
+ 	if (bio_full(bio))
+ 		return 0;
+ 
++	if (bio->bi_phys_segments >= queue_max_segments(q))
++		return 0;
++
+ 	/*
+ 	 * setup the new entry, we might clear it again later if we
+ 	 * cannot add the page
+@@ -734,38 +765,13 @@ int __bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
+ 	bvec->bv_len = len;
+ 	bvec->bv_offset = offset;
+ 	bio->bi_vcnt++;
+-	bio->bi_phys_segments++;
+ 	bio->bi_iter.bi_size += len;
+ 
+-	/*
+-	 * Perform a recount if the number of segments is greater
+-	 * than queue_max_segments(q).
+-	 */
+-
+-	while (bio->bi_phys_segments > queue_max_segments(q)) {
+-
+-		if (retried_segments)
+-			goto failed;
+-
+-		retried_segments = 1;
+-		blk_recount_segments(q, bio);
+-	}
+-
+-	/* If we may be able to merge these biovecs, force a recount */
+-	if (bio->bi_vcnt > 1 && biovec_phys_mergeable(q, bvec - 1, bvec))
+-		bio_clear_flag(bio, BIO_SEG_VALID);
+-
+  done:
++	bio->bi_phys_segments = bio->bi_vcnt;
++	if (!bio_flagged(bio, BIO_SEG_VALID))
++		bio_set_flag(bio, BIO_SEG_VALID);
+ 	return len;
+-
+- failed:
+-	bvec->bv_page = NULL;
+-	bvec->bv_len = 0;
+-	bvec->bv_offset = 0;
+-	bio->bi_vcnt--;
+-	bio->bi_iter.bi_size -= len;
+-	blk_recount_segments(q, bio);
+-	return 0;
  }
+ EXPORT_SYMBOL(__bio_add_pc_page);
  
- static inline int __blk_bvec_map_sg(struct request_queue *q, struct bio_vec bv,
-@@ -535,11 +543,24 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
- 	struct bio_vec bvec, bvprv = { NULL };
- 	struct bvec_iter iter;
- 	int nsegs = 0;
-+	bool new_bio = false;
- 
--	for_each_bio(bio)
--		bio_for_each_bvec(bvec, bio, iter)
--			__blk_segment_map_sg(q, &bvec, sglist, &bvprv, sg,
--					     &nsegs);
-+	for_each_bio(bio) {
-+		bio_for_each_bvec(bvec, bio, iter) {
-+			/*
-+			 * Only try to merge bvecs from two bios given we
-+			 * have done bio internal merge when adding pages
-+			 * to bio
-+			 */
-+			if (!new_bio || !__blk_segment_map_sg_merge(q,
-+						&bvec, &bvprv, sg))
-+				__blk_segment_map_sg(q, &bvec, sglist, sg,
-+						     &nsegs);
-+			new_bio = false;
-+		}
-+		bvprv = bvec;
-+		new_bio = true;
-+	}
- 
- 	return nsegs;
- }
 -- 
 2.9.5
 
