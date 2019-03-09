@@ -6,105 +6,113 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8298CC43381
-	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 01:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62783C43381
+	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 01:38:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5139D20857
-	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 01:38:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 301C420857
+	for <linux-block@archiver.kernel.org>; Sat,  9 Mar 2019 01:38:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726355AbfCIBh7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Mar 2019 20:37:59 -0500
-Received: from mx1.redhat.com ([209.132.183.28]:56026 "EHLO mx1.redhat.com"
+        id S1726363AbfCIBiE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Mar 2019 20:38:04 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:46488 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726338AbfCIBh7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 8 Mar 2019 20:37:59 -0500
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        id S1726338AbfCIBiE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 8 Mar 2019 20:38:04 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A4B8136893;
-        Sat,  9 Mar 2019 01:37:59 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 8DA173087BAF;
+        Sat,  9 Mar 2019 01:38:04 +0000 (UTC)
 Received: from localhost (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E7B051018A0A;
-        Sat,  9 Mar 2019 01:37:54 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CCA77608CC;
+        Sat,  9 Mar 2019 01:38:01 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        ris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        xen-devel@lists.xenproject.org, Omar Sandoval <osandov@fb.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 2/6] block: don't merge adjacent bvecs to one segment in bio blk_queue_split
-Date:   Sat,  9 Mar 2019 09:37:33 +0800
-Message-Id: <20190309013737.27741-3-ming.lei@redhat.com>
+        Omar Sandoval <osandov@fb.com>, Christoph Hellwig <hch@lst.de>
+Subject: [PATCH 3/6] block: check if page is mergeable in one helper
+Date:   Sat,  9 Mar 2019 09:37:34 +0800
+Message-Id: <20190309013737.27741-4-ming.lei@redhat.com>
 In-Reply-To: <20190309013737.27741-1-ming.lei@redhat.com>
 References: <20190309013737.27741-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Sat, 09 Mar 2019 01:37:59 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Sat, 09 Mar 2019 01:38:04 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For normal filesystem IO, each page is added via blk_add_page(),
-in which bvec(page) merge has been handled already, and basically
-not possible to merge two adjacent bvecs in one bio.
+Now the check for deciding if one page is mergeable to current bvec
+becomes a bit complicated, and we need to reuse the code before
+adding pc page.
 
-So not try to merge two adjacent bvecs in blk_queue_split(), also add
-check if one page is mergeable to current bvec in bio_add_page() for
-avoiding to break XEN.
+So move the check in one dedicated helper.
 
-Cc: ris Ostrovsky <boris.ostrovsky@oracle.com>
-Cc: Juergen Gross <jgross@suse.com>
-Cc: xen-devel@lists.xenproject.org
+No function change.
+
 Cc: Omar Sandoval <osandov@fb.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bio.c       |  2 ++
- block/blk-merge.c | 17 -----------------
- 2 files changed, 2 insertions(+), 17 deletions(-)
+ block/bio.c | 38 ++++++++++++++++++++++++--------------
+ 1 file changed, 24 insertions(+), 14 deletions(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index 71a78d9fb8b7..d8f48188937c 100644
+index d8f48188937c..62411877224c 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -776,6 +776,8 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
+@@ -647,6 +647,24 @@ struct bio *bio_clone_fast(struct bio *bio, gfp_t gfp_mask, struct bio_set *bs)
+ }
+ EXPORT_SYMBOL(bio_clone_fast);
  
- 		if (vec_end_addr + 1 != page_addr + off)
- 			return false;
-+		if (xen_domain() && !xen_biovec_phys_mergeable(bv, page))
-+			return false;
- 		if (same_page && (vec_end_addr & PAGE_MASK) != page_addr)
- 			return false;
++static inline bool
++page_is_mergeable(const struct bio_vec *bv, struct page *page,
++		unsigned int len, unsigned int off, bool same_page)
++{
++	phys_addr_t vec_end_addr = page_to_phys(bv->bv_page) +
++		bv->bv_offset + bv->bv_len - 1;
++	phys_addr_t page_addr = page_to_phys(page);
++
++	if (vec_end_addr + 1 != page_addr + off)
++		return false;
++	if (xen_domain() && !xen_biovec_phys_mergeable(bv, page))
++		return false;
++	if (same_page && (vec_end_addr & PAGE_MASK) != page_addr)
++		return false;
++
++	return true;
++}
++
+ /**
+  *	bio_add_pc_page	-	attempt to add page to bio
+  *	@q: the target queue
+@@ -770,20 +788,12 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
  
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 1c9d4f0f96ea..aa9164eb7187 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -267,23 +267,6 @@ static struct bio *blk_bio_segment_split(struct request_queue *q,
- 			goto split;
- 		}
- 
--		if (bvprvp) {
--			if (seg_size + bv.bv_len > queue_max_segment_size(q))
--				goto new_segment;
--			if (!biovec_phys_mergeable(q, bvprvp, &bv))
--				goto new_segment;
+ 	if (bio->bi_vcnt > 0) {
+ 		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
+-		phys_addr_t vec_end_addr = page_to_phys(bv->bv_page) +
+-			bv->bv_offset + bv->bv_len - 1;
+-		phys_addr_t page_addr = page_to_phys(page);
 -
--			seg_size += bv.bv_len;
--			bvprv = bv;
--			bvprvp = &bvprv;
--			sectors += bv.bv_len >> 9;
+-		if (vec_end_addr + 1 != page_addr + off)
+-			return false;
+-		if (xen_domain() && !xen_biovec_phys_mergeable(bv, page))
+-			return false;
+-		if (same_page && (vec_end_addr & PAGE_MASK) != page_addr)
+-			return false;
 -
--			if (nsegs == 1 && seg_size > front_seg_size)
--				front_seg_size = seg_size;
--
--			continue;
--		}
--new_segment:
- 		if (nsegs == max_segs)
- 			goto split;
- 
+-		bv->bv_len += len;
+-		bio->bi_iter.bi_size += len;
+-		return true;
++
++		if (page_is_mergeable(bv, page, len, off, same_page)) {
++			bv->bv_len += len;
++			bio->bi_iter.bi_size += len;
++			return true;
++		}
+ 	}
+ 	return false;
+ }
 -- 
 2.9.5
 
