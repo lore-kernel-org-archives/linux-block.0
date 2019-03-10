@@ -2,128 +2,138 @@ Return-Path: <SRS0=4SCO=RN=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.7 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 579CBC43381
-	for <linux-block@archiver.kernel.org>; Sun, 10 Mar 2019 18:13:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5659C10F0D
+	for <linux-block@archiver.kernel.org>; Sun, 10 Mar 2019 21:21:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 28953206DF
-	for <linux-block@archiver.kernel.org>; Sun, 10 Mar 2019 18:13:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A32AC20657
+	for <linux-block@archiver.kernel.org>; Sun, 10 Mar 2019 21:21:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L/K3M0uY"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=natalenko.name header.i=@natalenko.name header.b="YiF51NDg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726651AbfCJSNA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 10 Mar 2019 14:13:00 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:33238 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726863AbfCJSMJ (ORCPT
+        id S1726843AbfCJVVs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Mar 2019 17:21:48 -0400
+Received: from vulcan.natalenko.name ([104.207.131.136]:40404 "EHLO
+        vulcan.natalenko.name" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725770AbfCJVVr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 10 Mar 2019 14:12:09 -0400
-Received: by mail-wm1-f65.google.com with SMTP id c13so12356691wmb.0
-        for <linux-block@vger.kernel.org>; Sun, 10 Mar 2019 11:12:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=SY00KoFWeTwZXwxCAxRn3goBCIvGzbExPxId3YVmDAI=;
-        b=L/K3M0uYUBbqVjojJG+/UOlGrYywm685K9LWp12a8TuqJIqoSV9LLER2Wga7GgCP7I
-         iLpBKDlCtw3K61Com+z0O7IohUEHMADZL7UXzXZBeB1TeJrdg+Tka1GCJtth0+Jfyrkd
-         Xx2hwFjuBCEcpmNp25XaJYpqayHDsPz0uFYJjnYXz+edXJ6OPiRS4jMUxzjnLyzCJf38
-         qPygtOV/g1r6s4Zb74dgntggVsXMO56V4XgIM9C9UNW3AtvMiA3Sx+yFh4aZ3mXL84a3
-         +KKFqe8g/6za9sI5EJdlC9fp5WCjhN+1GM9ZU4lA1dXghb5JW4Prwru/RAswNQZMISDB
-         7Mpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=SY00KoFWeTwZXwxCAxRn3goBCIvGzbExPxId3YVmDAI=;
-        b=TWeVJy/rt0QEJRQt7Sr0swkj6hw18cQIxF81WwJODgFx8I8bky/GomcH/xA3/KftHI
-         /n5r9Mj1cFg0lQW0WQmmh00XSMCs2Q0pXx/vv8sOk4HiDM3txwvVbW1n6/K92+eLD8u8
-         eRnPXtzopGOd3unhI1tVhv9Fl2o9M0UWKsN5InkjCLb4hjT+Q39bIgFCj0vIUCSTyQ/A
-         nMQjb2W7UdGN5RUhscYcI61skGrDy+XWRlFqwKBNvBLPL3iCmvUNSta1uU+sWGVTl9jR
-         yaq5FhCVLwRB6zWHgbVluA2Z+AjjwFKF9VMSK5z70yAXEvPtU7Z9LE0Wrdvx9XiBLK0I
-         l33A==
-X-Gm-Message-State: APjAAAWClQYq1yDTg/dxCwu3Uu66v95K7WaLqWpm7SjXPZCL7OGWJCyU
-        xJFzjiREdPVF9EhXNl05Z1zM3A==
-X-Google-Smtp-Source: APXvYqyegrGTC3Qv7pIi+9NXnVoA9xCsLONvHfMKrXPEzvPOJ/shMfZR3xCW2+Z/8yST3dNomBL3og==
-X-Received: by 2002:a7b:c1c1:: with SMTP id a1mr8875305wmj.77.1552241527459;
-        Sun, 10 Mar 2019 11:12:07 -0700 (PDT)
-Received: from localhost.localdomain (146-241-67-113.dyn.eolo.it. [146.241.67.113])
-        by smtp.gmail.com with ESMTPSA id d206sm24906368wmc.11.2019.03.10.11.12.06
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 10 Mar 2019 11:12:06 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ulf.hansson@linaro.org, linus.walleij@linaro.org,
-        broonie@kernel.org, bfq-iosched@googlegroups.com,
-        oleksandr@natalenko.name, fra.fra.800@gmail.com,
-        alessio.masola@gmail.com, Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX IMPROVEMENT V2 1/9] block, bfq: increase idling for weight-raised queues
-Date:   Sun, 10 Mar 2019 19:11:29 +0100
-Message-Id: <20190310181137.2604-2-paolo.valente@linaro.org>
-X-Mailer: git-send-email 2.20.1
+        Sun, 10 Mar 2019 17:21:47 -0400
+Received: from mail.natalenko.name (vulcan.natalenko.name [IPv6:fe80::5400:ff:fe0c:dfa0])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by vulcan.natalenko.name (Postfix) with ESMTPSA id 980C34F961F;
+        Sun, 10 Mar 2019 22:21:43 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
+        s=dkim-20170712; t=1552252903;
+        h=from:from:sender:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZDXGufe+RVvE9rLnjl0k6TurgSY39BAFEAfs/tNsDR4=;
+        b=YiF51NDgew/mr73S+1gLlsm2+EA6heU/pKeK1wwBmR6UEROqosLvKPyZwYei8duAezVuiw
+        Uh3/0yEmAfwCpL/ceo0VlLBam0Sm+Vh/mbyUCjkkU27Sk2UqkqtYn6mXZ9eGTO+Sz4phuG
+        YMyon6Pwh+6KdAcuUJPGMHREslCq4ow=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Sun, 10 Mar 2019 22:21:43 +0100
+From:   Oleksandr Natalenko <oleksandr@natalenko.name>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ulf.hansson@linaro.org,
+        linus.walleij@linaro.org, broonie@kernel.org,
+        bfq-iosched@googlegroups.com, fra.fra.800@gmail.com,
+        alessio.masola@gmail.com
+Subject: Re: [PATCH BUGFIX IMPROVEMENT V2 0/9] block, bfq: fix bugs, reduce
+ exec time and boost performance
 In-Reply-To: <20190310181137.2604-1-paolo.valente@linaro.org>
 References: <20190310181137.2604-1-paolo.valente@linaro.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Message-ID: <8325fa983ce0e4aec257704861cfe87b@natalenko.name>
+X-Sender: oleksandr@natalenko.name
+User-Agent: Roundcube Webmail/1.3.8
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=natalenko.name;
+        s=arc-20170712; t=1552252903;
+        h=from:from:sender:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZDXGufe+RVvE9rLnjl0k6TurgSY39BAFEAfs/tNsDR4=;
+        b=w+tILmqk+ayGZc25yKL03Tj2SaWacu9v+MzylUjqeVKrjJ80eIZ6a4ExsmCRqwsmscbld6
+        6GcK2blWjQnk/vmbCFKqbDT6c4zxaunYo2K3icheJ5W3I6lZosB8Z4mI+AbSnJbOYYpC0J
+        Jxb1HDi0GcsTnmIf4lDU5e5om6R2upM=
+ARC-Seal: i=1; s=arc-20170712; d=natalenko.name; t=1552252903; a=rsa-sha256;
+        cv=none;
+        b=yVLjaJTzVgzYsssEIHLpzxDcY7iAv8XJOPlyZCOL9hCrNGASX/4PgJuSu4r/IoHCfTh88J
+        Ijyjuu7JGmgnCroiOKP4o6H1xP64pIH3Iju0FvDsquF3aXg5b3582BEnDJA34nqwiB7QBW
+        EZYDhQUUq2xi5JTNONNgUAkkzNKJYhk=
+ARC-Authentication-Results: i=1;
+        vulcan.natalenko.name;
+        auth=pass smtp.auth=oleksandr@natalenko.name smtp.mailfrom=oleksandr@natalenko.name
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If a sync bfq_queue has a higher weight than some other queue, and
-remains temporarily empty while in service, then, to preserve the
-bandwidth share of the queue, it is necessary to plug I/O dispatching
-until a new request arrives for the queue. In addition, a timeout
-needs to be set, to avoid waiting for ever if the process associated
-with the queue has actually finished its I/O.
+Hi.
 
-Even with the above timeout, the device is however not fed with new
-I/O for a while, if the process has finished its I/O. If this happens
-often, then throughput drops and latencies grow. For this reason, the
-timeout is kept rather low: 8 ms is the current default.
+On 10.03.2019 19:11, Paolo Valente wrote:
+> this is the v2 of the series
+> https://lkml.org/lkml/2019/3/7/461
+> that fixes some bug affecting performance, reduces execution time a
+> little bit, and boosts throughput and responsiveness.
+> 
+> The difference w.r.t. v1 is that Francesco has fixed compilation
+> issues of patch "block, bfq: print SHARED instead of pid for shared
+> queues in logs".
+> 
+> I took the opportunity of this v2 to also add BFQ's execution time to
+> the documentation.
+> 
+> Let me remind again that these patches are meant to be applied on top
+> of the last series I submitted:
+> https://lkml.org/lkml/2019/1/29/368
+> 
+> Thanks,
+> Paolo
+> 
+> Francesco Pollicino (2):
+>   block, bfq: print SHARED instead of pid for shared queues in logs
+>   block, bfq: save & resume weight on a queue merge/split
+> 
+> Paolo Valente (7):
+>   block, bfq: increase idling for weight-raised queues
+>   block, bfq: do not idle for lowest-weight queues
+>   block, bfq: tune service injection basing on request service times
+>   block, bfq: do not merge queues on flash storage with queueing
+>   block, bfq: do not tag totally seeky queues as soft rt
+>   block, bfq: always protect newly-created queues from existing active
+>     queues
+>   doc, block, bfq: add information on bfq execution time
+> 
+>  Documentation/block/bfq-iosched.txt |  29 +-
+>  block/bfq-cgroup.c                  |   3 +-
+>  block/bfq-iosched.c                 | 786 +++++++++++++++++++++++-----
+>  block/bfq-iosched.h                 |  92 ++--
+>  block/bfq-wf2q.c                    |   2 +-
+>  5 files changed, 729 insertions(+), 183 deletions(-)
+> 
+> --
+> 2.20.1
 
-Unfortunately, such a low value may cause, on the opposite end, a
-violation of bandwidth guarantees for a process that happens to issue
-new I/O too late. The higher the system load, the higher the
-probability that this happens to some process. This is a problem in
-scenarios where service guarantees matter more than throughput. One
-important case are weight-raised queues, which need to be granted a
-very high fraction of the bandwidth.
+Builds fine this time, thanks :).
 
-To address this issue, this commit lower-bounds the plugging timeout
-for weight-raised queues to 20 ms. This simple change provides
-relevant benefits. For example, on a PLEXTOR PX-256M5S, with which
-gnome-terminal starts in 0.6 seconds if there is no other I/O in
-progress, the same applications starts in
-- 0.8 seconds, instead of 1.2 seconds, if ten files are being read
-  sequentially in parallel
-- 1 second, instead of 2 seconds, if, in parallel, five files are
-  being read sequentially, and five more files are being written
-  sequentially
+I'm running v1 series since the submission just fine (with a fix from 
+zen-kernel guys [1]), and since v2 is functionally equivalent, feel free 
+to add Tested-by once it is accepted.
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 2 ++
- 1 file changed, 2 insertions(+)
+[1] 
+https://github.com/zen-kernel/zen-kernel/commit/0665ba81203c196b649d325e4ec2491d7ff1be01
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 4c592496a16a..eb658de3cc40 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -2545,6 +2545,8 @@ static void bfq_arm_slice_timer(struct bfq_data *bfqd)
- 	if (BFQQ_SEEKY(bfqq) && bfqq->wr_coeff == 1 &&
- 	    bfq_symmetric_scenario(bfqd))
- 		sl = min_t(u64, sl, BFQ_MIN_TT);
-+	else if (bfqq->wr_coeff > 1)
-+		sl = max_t(u32, sl, 20ULL * NSEC_PER_MSEC);
- 
- 	bfqd->last_idling_start = ktime_get();
- 	hrtimer_start(&bfqd->idle_slice_timer, ns_to_ktime(sl),
 -- 
-2.20.1
-
+   Oleksandr Natalenko (post-factum)
