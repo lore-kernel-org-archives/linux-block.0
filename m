@@ -6,66 +6,113 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D1CC43381
-	for <linux-block@archiver.kernel.org>; Mon, 11 Mar 2019 14:36:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 156D7C43381
+	for <linux-block@archiver.kernel.org>; Mon, 11 Mar 2019 14:40:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8192E206BA
-	for <linux-block@archiver.kernel.org>; Mon, 11 Mar 2019 14:36:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D739A20657
+	for <linux-block@archiver.kernel.org>; Mon, 11 Mar 2019 14:40:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727388AbfCKOgB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Mar 2019 10:36:01 -0400
-Received: from verein.lst.de ([213.95.11.211]:41848 "EHLO newverein.lst.de"
+        id S1727408AbfCKOka (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Mar 2019 10:40:30 -0400
+Received: from verein.lst.de ([213.95.11.211]:41869 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725943AbfCKOgB (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Mar 2019 10:36:01 -0400
+        id S1726605AbfCKOka (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Mar 2019 10:40:30 -0400
 Received: by newverein.lst.de (Postfix, from userid 2407)
-        id 92E9968CEC; Mon, 11 Mar 2019 15:35:54 +0100 (CET)
-Date:   Mon, 11 Mar 2019 15:35:54 +0100
+        id 3120468C7B; Mon, 11 Mar 2019 15:40:24 +0100 (CET)
+Date:   Mon, 11 Mar 2019 15:40:24 +0100
 From:   Christoph Hellwig <hch@lst.de>
 To:     Ming Lei <ming.lei@redhat.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Omar Sandoval <osandov@fb.com>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 5/6] block: enable multi-page bvec for passthrough IO
-Message-ID: <20190311143554.GE7850@lst.de>
-References: <20190309013737.27741-1-ming.lei@redhat.com> <20190309013737.27741-6-ming.lei@redhat.com>
+Subject: Re: [PATCH 6/6] block: don't check if adjacent bvecs in one bio
+ can be mergeable
+Message-ID: <20190311144024.GF7850@lst.de>
+References: <20190309013737.27741-1-ming.lei@redhat.com> <20190309013737.27741-7-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190309013737.27741-6-ming.lei@redhat.com>
+In-Reply-To: <20190309013737.27741-7-ming.lei@redhat.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
->  		struct bio_vec *prev = &bio->bi_io_vec[bio->bi_vcnt - 1];
+> +	bool new_bio;
 >  
-> +		/* segment size is always >= PAGE_SIZE */
+>  	if (!bio)
+>  		return 0;
+> @@ -377,9 +377,10 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
+>  	fbio = bio;
+>  	seg_size = 0;
+>  	nr_phys_segs = 0;
+> +	new_bio = false;
 
-I don't think that actually is true.  We have various drivers with 4k
-segment size, for which this would not be true with a 64k page size
-system.
+I'd just initialize it to false in the declaration line.
 
->  		if (page == prev->bv_page &&
->  		    offset == prev->bv_offset + prev->bv_len) {
->  			if (put_same_page)
->  				put_page(page);
-> + bvec_merge:
->  			prev->bv_len += len;
->  			bio->bi_iter.bi_size += len;
+> +/* only try to merge bvecs into one sg if they are from two bios */
+> +static inline bool
+> +__blk_segment_map_sg_merge(struct request_queue *q, struct bio_vec *bvec,
+> +			   struct bio_vec *bvprv, struct scatterlist **sg)
+>  {
+>  	int nbytes = bvec->bv_len;
+>  
+> +	if (!*sg)
+> +		return false;
+>  
+> +	if ((*sg)->length + nbytes > queue_max_segment_size(q))
+> +		return false;
+> +
+> +	if (!biovec_phys_mergeable(q, bvprv, bvec))
+> +		return false;
+> +
+> +	(*sg)->length += nbytes;
+> +
+> +	return true;
+> +}
+> +
+> +static inline void
+> +__blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
+> +		     struct scatterlist *sglist, struct scatterlist **sg,
+> +		     int *nsegs)
+> +{
+> +	if (bvec->bv_offset + bvec->bv_len <= PAGE_SIZE) {
+> +		*sg = blk_next_sg(sg, sglist);
+> +		sg_set_page(*sg, bvec->bv_page, bvec->bv_len, bvec->bv_offset);
+> +		(*nsegs) += 1;
 
-Please throw in a cleanup patch that removes prev and and always uses
-bvec, then we can just move the done label up by two lines and handle
-the increment of bv_len and bi_size in a common branch.
+This branch is basically the same as __blk_bvec_map_sg, I wonder if
+we can reuse it.
 
->   done:
-> +	bio->bi_phys_segments = bio->bi_vcnt;
-> +	if (!bio_flagged(bio, BIO_SEG_VALID))
-> +		bio_set_flag(bio, BIO_SEG_VALID);
+> +	} else
+> +		(*nsegs) += blk_bvec_map_sg(q, bvec, sglist, sg);
+>  }
 
-How would BIO_SEG_VALID get set previously?  And even if it did
-we wouldn't optimize much here, I'd just do it unconditionally.
+And then maybe just kill off __blk_segment_map_sg entirely by moving
+the if else into the caller.
 
-Btw, there are various comments in this function that either already
-were or have become out of data, like talking about REQ_PC or
-file system I/O - I think they could use some love.
+> @@ -535,11 +543,24 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
+>  	struct bio_vec bvec, bvprv = { NULL };
+>  	struct bvec_iter iter;
+>  	int nsegs = 0;
+> +	bool new_bio = false;
+>  
+> +	for_each_bio(bio) {
+> +		bio_for_each_bvec(bvec, bio, iter) {
+> +			/*
+> +			 * Only try to merge bvecs from two bios given we
+> +			 * have done bio internal merge when adding pages
+> +			 * to bio
+> +			 */
+> +			if (!new_bio || !__blk_segment_map_sg_merge(q,
+> +						&bvec, &bvprv, sg))
+
+Somewhat hard to read.  Why not:
+
+			if (new_bio ||
+			    !__blk_segment_map_sg_merge(q, &bvec, &bvprv, sg))
+
+That being said I'd really like to see some stats on workloads that
+actually trigger cross-bio segment merges.  If we get a lot of those
+we are doing something wrong.
