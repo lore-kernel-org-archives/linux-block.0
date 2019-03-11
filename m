@@ -2,121 +2,97 @@ Return-Path: <SRS0=4UPx=RO=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33D75C43381
-	for <linux-block@archiver.kernel.org>; Mon, 11 Mar 2019 20:11:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E358C43381
+	for <linux-block@archiver.kernel.org>; Mon, 11 Mar 2019 20:20:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 02ACC2064A
-	for <linux-block@archiver.kernel.org>; Mon, 11 Mar 2019 20:11:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1552335117;
-	bh=cih7bZYxj2MvS146g8G3SAQ1D4WjBs/JDLP3WKUqXSs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=XZk4hG81cUhxgOTHA/t4Af3eXpxoffKFS/G0pfMcedrgDXnpDM6gCxlmNEMKm4DEG
-	 g3h/zhwBiYSzS0kzcP5KmEIoyy2LfcnNAAOmlRQZaf/EKPPhypTozQsIi4d7RSOCac
-	 SzXP9gJ3lAwX+zghGfasYA8bLxAU5IJ3kRCpeRIo=
+	by mail.kernel.org (Postfix) with ESMTP id 4BAB72147C
+	for <linux-block@archiver.kernel.org>; Mon, 11 Mar 2019 20:20:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="I2e/OXSD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728780AbfCKULv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Mar 2019 16:11:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33474 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728582AbfCKT4Q (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Mar 2019 15:56:16 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B793B214D8;
-        Mon, 11 Mar 2019 19:56:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1552334175;
-        bh=cih7bZYxj2MvS146g8G3SAQ1D4WjBs/JDLP3WKUqXSs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Xi9sInDl8/Nz42EAaYSrIUh0AeYeyJveo7GaZJyDAtS9gRLXaOvE9FarO3/yaOTzO
-         5mj6GhtEzRkAkzQTycNrKotGocGoeISnFBzlF8T3sEypoAFvDF/TQ9Gj2+BYVKYk0T
-         EZAL0hR/G4V+gCCPjv5cETjgnZudFmUXNAjrMmi0=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.20 32/52] blk-mq: insert rq with DONTPREP to hctx dispatch list when requeue
-Date:   Mon, 11 Mar 2019 15:54:56 -0400
-Message-Id: <20190311195516.137772-32-sashal@kernel.org>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190311195516.137772-1-sashal@kernel.org>
-References: <20190311195516.137772-1-sashal@kernel.org>
+        id S1727501AbfCKUUu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Mar 2019 16:20:50 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:45040 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727424AbfCKUUu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Mar 2019 16:20:50 -0400
+Received: by mail-pg1-f194.google.com with SMTP id h34so1338528pgh.11
+        for <linux-block@vger.kernel.org>; Mon, 11 Mar 2019 13:20:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=2hFEz1NPo6Ta+HWyO4vmouu7fZiLzI5uBFZPhPoMO6g=;
+        b=I2e/OXSDPUrnH5aM5HfRdUHe90Qx/8bxvPPFZLVjp8f4oMdrVv/f5cxl7pGmi1pHFl
+         JEaYKYe0vEJUbC9jmts1FyOTSd2lD9fClvIgrtjz5gnDlRhL+32DkABLSFXDIFySaiT1
+         ONUcbQJzQzNQuSolfct+krmqzbUwyyvjkyGxvnZVNgHjH0tFpaNkobeOZDgMS7kwrlnl
+         69M3xTlGamAdlU41H3K+zxR70EwtfVmvr48kTmKOXrN1jVKPV/eHFLqay6xZNXQqTOx6
+         Wm9a3hKGWEgjeHXnTJUdFQM94gFLLjJ5tfe3mWtEj/OtfxHTLfLI6ppI+g3PjA+r+btb
+         RkNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=2hFEz1NPo6Ta+HWyO4vmouu7fZiLzI5uBFZPhPoMO6g=;
+        b=WTRqwLcqO6WpVIuhJ4QvcuKtiVlUCT6p9gwjECkV1n0AYL1fxA58eSV33YmCFfnMKs
+         g5l46B5y3/F3wlZD+cWwU9MIDODBo3u5UZA9xx/LsbAoqitlexyN5Emx6cUsJH52j5vO
+         /pK5oI5LmOLK9BL14CmME6/1SIehGIkKWPVaiadefB4SsGbdDBW/OX0b6EfGpkRr6JTc
+         1PHEtbnNYhNPUnX8AA1rF4KajyD3CzZNS5axcuxTooqfYuv/e7wOZOG4uvC9Ks6D04LA
+         RUBUjHUp3s4MuSSmDoc3y0vx4bcWvl5MOjt4n0IEKg/LjzJnnvniHeXIomcEcTvYNeSu
+         VorQ==
+X-Gm-Message-State: APjAAAVk7L0uwANB+o2ZKFdFr+EYjzbBhTAGsi5EtfMICk3suRLPGc53
+        DVBrt4Xlb9gy9gFddL+20XSzVg==
+X-Google-Smtp-Source: APXvYqzZQF/qApi/tPOI9EIhMXtk2eR7bEc0mmJ5u+aWL0ka5c/itR6zeUr0ztPxGlv0SZz1b+hQog==
+X-Received: by 2002:aa7:8157:: with SMTP id d23mr34863583pfn.67.1552335649180;
+        Mon, 11 Mar 2019 13:20:49 -0700 (PDT)
+Received: from vader ([2620:10d:c090:200::1:4c93])
+        by smtp.gmail.com with ESMTPSA id l63sm10077333pfc.89.2019.03.11.13.20.48
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 11 Mar 2019 13:20:48 -0700 (PDT)
+Date:   Mon, 11 Mar 2019 13:20:47 -0700
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Masato Suzuki <masato.suzuki@wdc.com>,
+        Chaitanya Kulkarni <Chaitanya.Kulkarni@wdc.com>
+Subject: Re: [PATCH blktests 0/3] Fix partition device sysfs access
+Message-ID: <20190311202047.GA30813@vader>
+References: <20190305052447.24291-1-shinichiro.kawasaki@wdc.com>
 MIME-Version: 1.0
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190305052447.24291-1-shinichiro.kawasaki@wdc.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
+On Tue, Mar 05, 2019 at 02:24:44PM +0900, Shin'ichiro Kawasaki wrote:
+> This patch series fixes test failures found in the zbd test group when run on
+> partition devices. The failure cause is a block device sysfs attributes access
+> problem if the target device is a partition.
+> 
+> This series resends patches 3, 4 and 5 posted as a part of another series.
+> 
+>   https://www.spinics.net/lists/linux-block/msg37431.html
+> 
+> The patches reflect the review comments by Omar made on the list.
+> 
+> Shin'ichiro Kawasaki (3):
+>   check: Add TEST_DEV_PART_SYSFS variable
+>   common: Add _test_dev_is_partition() helper function
+>   zbd: Change sysfs path for partition devices
+> 
+>  check        | 46 +++++++++++++++++++++++++---------------------
+>  common/rc    |  8 ++++++++
+>  new          | 16 ++++++++++++++--
+>  tests/zbd/rc |  8 ++++++--
+>  4 files changed, 53 insertions(+), 25 deletions(-)
 
-[ Upstream commit aef1897cd36dcf5e296f1d2bae7e0d268561b685 ]
-
-When requeue, if RQF_DONTPREP, rq has contained some driver
-specific data, so insert it to hctx dispatch list to avoid any
-merge. Take scsi as example, here is the trace event log (no
-io scheduler, because RQF_STARTED would prevent merging),
-
-   kworker/0:1H-339   [000] ...1  2037.209289: block_rq_insert: 8,0 R 4096 () 32768 + 8 [kworker/0:1H]
-scsi_inert_test-1987  [000] ....  2037.220465: block_bio_queue: 8,0 R 32776 + 8 [scsi_inert_test]
-scsi_inert_test-1987  [000] ...2  2037.220466: block_bio_backmerge: 8,0 R 32776 + 8 [scsi_inert_test]
-   kworker/0:1H-339   [000] ....  2047.220913: block_rq_issue: 8,0 R 8192 () 32768 + 16 [kworker/0:1H]
-scsi_inert_test-1996  [000] ..s1  2047.221007: block_rq_complete: 8,0 R () 32768 + 8 [0]
-scsi_inert_test-1996  [000] .Ns1  2047.221045: block_rq_requeue: 8,0 R () 32776 + 8 [0]
-   kworker/0:1H-339   [000] ...1  2047.221054: block_rq_insert: 8,0 R 4096 () 32776 + 8 [kworker/0:1H]
-   kworker/0:1H-339   [000] ...1  2047.221056: block_rq_issue: 8,0 R 4096 () 32776 + 8 [kworker/0:1H]
-scsi_inert_test-1986  [000] ..s1  2047.221119: block_rq_complete: 8,0 R () 32776 + 8 [0]
-
-(32768 + 8) was requeued by scsi_queue_insert and had RQF_DONTPREP.
-Then it was merged with (32776 + 8) and issued. Due to RQF_DONTPREP,
-the sdb only contained the part of (32768 + 8), then only that part
-was completed. The lucky thing was that scsi_io_completion detected
-it and requeued the remaining part. So we didn't get corrupted data.
-However, the requeue of (32776 + 8) is not expected.
-
-Suggested-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- block/blk-mq.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 6a7566244de3..2b04adaeefc2 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -718,12 +718,20 @@ static void blk_mq_requeue_work(struct work_struct *work)
- 	spin_unlock_irq(&q->requeue_lock);
- 
- 	list_for_each_entry_safe(rq, next, &rq_list, queuelist) {
--		if (!(rq->rq_flags & RQF_SOFTBARRIER))
-+		if (!(rq->rq_flags & (RQF_SOFTBARRIER | RQF_DONTPREP)))
- 			continue;
- 
- 		rq->rq_flags &= ~RQF_SOFTBARRIER;
- 		list_del_init(&rq->queuelist);
--		blk_mq_sched_insert_request(rq, true, false, false);
-+		/*
-+		 * If RQF_DONTPREP, rq has contained some driver specific
-+		 * data, so insert it to hctx dispatch list to avoid any
-+		 * merge.
-+		 */
-+		if (rq->rq_flags & RQF_DONTPREP)
-+			blk_mq_request_bypass_insert(rq, false);
-+		else
-+			blk_mq_sched_insert_request(rq, true, false, false);
- 	}
- 
- 	while (!list_empty(&rq_list)) {
--- 
-2.19.1
-
+Applied, thanks.
