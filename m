@@ -6,48 +6,47 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE224C43381
-	for <linux-block@archiver.kernel.org>; Mon, 11 Mar 2019 20:06:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED8C4C43381
+	for <linux-block@archiver.kernel.org>; Mon, 11 Mar 2019 20:11:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BBB582064A
-	for <linux-block@archiver.kernel.org>; Mon, 11 Mar 2019 20:06:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BAAA2214AF
+	for <linux-block@archiver.kernel.org>; Mon, 11 Mar 2019 20:11:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1552334765;
-	bh=3m8bFCYDlXEGZyQhUNm1WjQz5c6P5Vdtsxvq+UlIGI4=;
+	s=default; t=1552335096;
+	bh=otW8F45s7IE1iN3/Uar5IhKqKxXYhscDYQKY8ikA9gE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=1h+73UTeOkMuM5B5aUUMXXvZ6cZfxMR5UmRwxHA72B1ns4jy3EbhthuvbT6aBblbS
-	 Zp0WO1bjNFMYjXQ08OXk7Z/sXyupUyhkZZHVVt+Hg3Wrc0lE4E3TfMpI06gbOxLftt
-	 lMXEgdWfN5hud/PYW4zKgZMjrwllyfQxDYen8290=
+	b=QloLz6OuBl8s6cUM6Xzm+FGF3GJsM3pPyluAFx2YXJWHlFfSp797ND+/TZgQiFTqb
+	 0NB0nyCr38TCYbcGvY4UxWIm/aqlHpbdZbX3nMWatmTNLtstJH4BzEOFN8/tToiJzV
+	 n5HdylYyYngH/6L+FYFugCpaC/8qlO+kUg7UQOSA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729231AbfCKT5z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Mar 2019 15:57:55 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35304 "EHLO mail.kernel.org"
+        id S1728377AbfCKULb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Mar 2019 16:11:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33502 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729223AbfCKT5y (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Mar 2019 15:57:54 -0400
+        id S1728610AbfCKT4S (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Mar 2019 15:56:18 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B3D392084F;
-        Mon, 11 Mar 2019 19:57:52 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 383A62087C;
+        Mon, 11 Mar 2019 19:56:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1552334273;
-        bh=3m8bFCYDlXEGZyQhUNm1WjQz5c6P5Vdtsxvq+UlIGI4=;
+        s=default; t=1552334177;
+        bh=otW8F45s7IE1iN3/Uar5IhKqKxXYhscDYQKY8ikA9gE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jfI11nftL/HqiyhOBKZTMmsfiEJpYDqpcpZz/FXErXdLBN04bcOEfZnK59rYAxPeS
-         R2mIGcYCKc6JCvVWYh4A1RA6wgdascJC8+IEju+Zyrb9eP74B76c79oiWJG6UZqUD4
-         1B397ZTQaDyodDMD0SxOAIwkwX+1h/3N4wGADWsI=
+        b=k/SWUNLlaczs2n4NxyV2kTG2WcWSDPqlDNG/e7l6CgPifN/tCna0v9m/P3GtOrYmp
+         +TON5gkqkX6nWKKUWumWylA+JmSIbVMqcUsjvsrIo0Ol/delQtpUYsMFA1AlYp41hT
+         Uih5mvoMswIpPfqSiyxSHp0ln3jYtzDSpijn/78s=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 29/44] blk-mq: insert rq with DONTPREP to hctx dispatch list when requeue
-Date:   Mon, 11 Mar 2019 15:56:45 -0400
-Message-Id: <20190311195700.138462-29-sashal@kernel.org>
+Cc:     Yufen Yu <yuyufen@huawei.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.20 34/52] floppy: check_events callback should not return a negative number
+Date:   Mon, 11 Mar 2019 15:54:58 -0400
+Message-Id: <20190311195516.137772-34-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190311195700.138462-1-sashal@kernel.org>
-References: <20190311195700.138462-1-sashal@kernel.org>
+In-Reply-To: <20190311195516.137772-1-sashal@kernel.org>
+References: <20190311195516.137772-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -56,67 +55,41 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Jianchao Wang <jianchao.w.wang@oracle.com>
+From: Yufen Yu <yuyufen@huawei.com>
 
-[ Upstream commit aef1897cd36dcf5e296f1d2bae7e0d268561b685 ]
+[ Upstream commit 96d7cb932e826219ec41ac02e5af037ffae6098c ]
 
-When requeue, if RQF_DONTPREP, rq has contained some driver
-specific data, so insert it to hctx dispatch list to avoid any
-merge. Take scsi as example, here is the trace event log (no
-io scheduler, because RQF_STARTED would prevent merging),
+floppy_check_events() is supposed to return bit flags to say which
+events occured. We should return zero to say that no event flags are
+set.  Only BIT(0) and BIT(1) are used in the caller. And .check_events
+interface also expect to return an unsigned int value.
 
-   kworker/0:1H-339   [000] ...1  2037.209289: block_rq_insert: 8,0 R 4096 () 32768 + 8 [kworker/0:1H]
-scsi_inert_test-1987  [000] ....  2037.220465: block_bio_queue: 8,0 R 32776 + 8 [scsi_inert_test]
-scsi_inert_test-1987  [000] ...2  2037.220466: block_bio_backmerge: 8,0 R 32776 + 8 [scsi_inert_test]
-   kworker/0:1H-339   [000] ....  2047.220913: block_rq_issue: 8,0 R 8192 () 32768 + 16 [kworker/0:1H]
-scsi_inert_test-1996  [000] ..s1  2047.221007: block_rq_complete: 8,0 R () 32768 + 8 [0]
-scsi_inert_test-1996  [000] .Ns1  2047.221045: block_rq_requeue: 8,0 R () 32776 + 8 [0]
-   kworker/0:1H-339   [000] ...1  2047.221054: block_rq_insert: 8,0 R 4096 () 32776 + 8 [kworker/0:1H]
-   kworker/0:1H-339   [000] ...1  2047.221056: block_rq_issue: 8,0 R 4096 () 32776 + 8 [kworker/0:1H]
-scsi_inert_test-1986  [000] ..s1  2047.221119: block_rq_complete: 8,0 R () 32776 + 8 [0]
+However, after commit a0c80efe5956, it may return -EINTR (-4u).
+Here, both BIT(0) and BIT(1) are cleared. So this patch shouldn't
+affect runtime, but it obviously is still worth fixing.
 
-(32768 + 8) was requeued by scsi_queue_insert and had RQF_DONTPREP.
-Then it was merged with (32776 + 8) and issued. Due to RQF_DONTPREP,
-the sdb only contained the part of (32768 + 8), then only that part
-was completed. The lucky thing was that scsi_io_completion detected
-it and requeued the remaining part. So we didn't get corrupted data.
-However, the requeue of (32776 + 8) is not expected.
-
-Suggested-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+Reviewed-by: Dan Carpenter <dan.carpenter@oracle.com>
+Fixes: a0c80efe5956 ("floppy: fix lock_fdc() signal handling")
+Signed-off-by: Yufen Yu <yuyufen@huawei.com>
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/blk-mq.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ drivers/block/floppy.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 23a53b67cf0d..7d53f2314d7c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -701,12 +701,20 @@ static void blk_mq_requeue_work(struct work_struct *work)
- 	spin_unlock_irq(&q->requeue_lock);
+diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
+index fb23578e9a41..0cd5874ebb22 100644
+--- a/drivers/block/floppy.c
++++ b/drivers/block/floppy.c
+@@ -4081,7 +4081,7 @@ static unsigned int floppy_check_events(struct gendisk *disk,
  
- 	list_for_each_entry_safe(rq, next, &rq_list, queuelist) {
--		if (!(rq->rq_flags & RQF_SOFTBARRIER))
-+		if (!(rq->rq_flags & (RQF_SOFTBARRIER | RQF_DONTPREP)))
- 			continue;
- 
- 		rq->rq_flags &= ~RQF_SOFTBARRIER;
- 		list_del_init(&rq->queuelist);
--		blk_mq_sched_insert_request(rq, true, false, false);
-+		/*
-+		 * If RQF_DONTPREP, rq has contained some driver specific
-+		 * data, so insert it to hctx dispatch list to avoid any
-+		 * merge.
-+		 */
-+		if (rq->rq_flags & RQF_DONTPREP)
-+			blk_mq_request_bypass_insert(rq, false);
-+		else
-+			blk_mq_sched_insert_request(rq, true, false, false);
+ 	if (time_after(jiffies, UDRS->last_checked + UDP->checkfreq)) {
+ 		if (lock_fdc(drive))
+-			return -EINTR;
++			return 0;
+ 		poll_drive(false, 0);
+ 		process_fd_request();
  	}
- 
- 	while (!list_empty(&rq_list)) {
 -- 
 2.19.1
 
