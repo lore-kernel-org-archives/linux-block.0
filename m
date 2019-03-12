@@ -2,132 +2,100 @@ Return-Path: <SRS0=IPXt=RP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B54D8C43381
-	for <linux-block@archiver.kernel.org>; Tue, 12 Mar 2019 09:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACF87C43381
+	for <linux-block@archiver.kernel.org>; Tue, 12 Mar 2019 12:02:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7807D2147C
-	for <linux-block@archiver.kernel.org>; Tue, 12 Mar 2019 09:00:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7F15206BA
+	for <linux-block@archiver.kernel.org>; Tue, 12 Mar 2019 12:02:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nxSGFbhg"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="oUZXCL95"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727666AbfCLJAG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Mar 2019 05:00:06 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:40522 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727611AbfCLJAF (ORCPT
+        id S1726431AbfCLMC2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Mar 2019 08:02:28 -0400
+Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.53]:25789 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725844AbfCLMC2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Mar 2019 05:00:05 -0400
-Received: by mail-wr1-f68.google.com with SMTP id t5so564426wri.7
-        for <linux-block@vger.kernel.org>; Tue, 12 Mar 2019 02:00:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=zPxdu4FfztX2fjTuYHQF2xv6a9EM4Wt9HqApVzFZrNQ=;
-        b=nxSGFbhgUV0GSjJ9o0aDkRUnhb7rF4cJZtG3yJI9SPaZe2touaWmq6dTzIQY4cRU5+
-         M7c7dYRu+uAfqfNYcdYt9snPLYlW8d7Y9FDxZNoAUq193PlzQyJBqYdKkoGkR5xLeWpd
-         wwyU9CrT9T4ZqluwiVHQGN0Susi9hncsYO3TS9lR+fv5qvLyDtapVYBQ7ItRP1j86pWY
-         /5gbuYUSKD+RkoG1EduH4lBiCwb6lpIsAHe7mPJvj4d/j+EwwlMuhlqIAVILdaq2TN/I
-         j/1IhcQT57Tj4Zu5ODQPBcj2ndBq6dU7vAsvwfG1LpPKyhnqsdJV0MlQSVzMs2GWttMC
-         SxCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=zPxdu4FfztX2fjTuYHQF2xv6a9EM4Wt9HqApVzFZrNQ=;
-        b=B+XbPLcponSHnogVUe5tXly+NTWMfxsOvbdLqf2y3uJB3kWJfoGE+jmfNiHRU6Nocx
-         zL1x6NGUCKxHowZjnvrt5Xehn+AoceRL1tb+Coq13+kSpdSmZ1iD4Wpk1T5YtNSHqSaQ
-         vTchNNcYP9iekSG3mqrasHR27DnUHkYAios0tsGXyncACJptNxux1JyCKDx8GfXe9i5C
-         oltrqegtSRNQnMQti+Xr7NzwGQyNPZEFlWZTMTr3eFqingYuu8Nfv1Cow4LEujFvkQXx
-         AqNIp8ZeTM8npF44a1ec+Y6qOYAE8xqfjf+fhNZJtFBxQbxkjNsEI0y2n8fRUaONYE+g
-         oiJw==
-X-Gm-Message-State: APjAAAVOsINSuaELyOTvJQXMrH1mfB8F5TApVs7gdULwuEzA4k6wZEtQ
-        GHP3YjhuaiSDJstOGorLJRz+AA==
-X-Google-Smtp-Source: APXvYqyKWP8lF9pFQ0dLb8HO7lbor9P7IFQ0hqr4pM3qiOTw9FiJNUIz/DbqEYEjIIernPF2ufnULw==
-X-Received: by 2002:adf:fe05:: with SMTP id n5mr10000720wrr.160.1552381203408;
-        Tue, 12 Mar 2019 02:00:03 -0700 (PDT)
-Received: from localhost.localdomain ([84.33.65.66])
-        by smtp.gmail.com with ESMTPSA id y20sm3953043wmi.34.2019.03.12.02.00.01
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 12 Mar 2019 02:00:02 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ulf.hansson@linaro.org, linus.walleij@linaro.org,
-        broonie@kernel.org, bfq-iosched@googlegroups.com,
-        oleksandr@natalenko.name, fra.fra.800@gmail.com,
-        alessio.masola@gmail.com, holger@applied-asynchrony.com,
-        Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH BUGFIX IMPROVEMENT V3 1/9] block, bfq: increase idling for weight-raised queues
-Date:   Tue, 12 Mar 2019 09:59:27 +0100
-Message-Id: <20190312085935.11340-2-paolo.valente@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190312085935.11340-1-paolo.valente@linaro.org>
-References: <20190312085935.11340-1-paolo.valente@linaro.org>
+        Tue, 12 Mar 2019 08:02:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1552392143;
+        s=strato-dkim-0002; d=hartkopp.net;
+        h=In-Reply-To:Date:Message-ID:From:References:To:Subject:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=P5/PVrxkOtneOBmRAzRCH23Ow+mn9LtOrfvfD94JTQI=;
+        b=oUZXCL958GhknvxpCYsX0KtwOAWpMzTar8o1xA/gTZAXGNeggsapWuiSDf0f5Oz41x
+        yuo8i4fYBuBuKTW1shvUGna+mrwfnPh4LrbNRDf84Sz/0Z1+90wq2PXmfTbJqjjqATh4
+        ICnWaxmiRORJ/Nwnu2jf+c2WjAKjZd8Yfu688F0k8s8v3XVjuN0RNMDbW/6sd/UmSfGa
+        jMHc6fyP1wJJtKn/W01k5TK6jxo+NijYUjzqlFB8NsqBzSby518OvgNL2xMDU1z8P4cL
+        s7VurMDXbHoqCy+UsJEqqxeY5Qo9nhnJT6+isp09lsn0s8ifCRZwv+kApr/aSDWUS940
+        ouOg==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1onXMaVuOBdyp/nutbxfg"
+X-RZG-CLASS-ID: mo00
+Received: from [192.168.1.119]
+        by smtp.strato.de (RZmta 44.13 AUTH)
+        with ESMTPSA id e06351v2CC1xuWH
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Tue, 12 Mar 2019 13:01:59 +0100 (CET)
+Subject: Re: WARNING in hsr_forward_skb
+To:     syzbot <syzbot+fdce8f2a8903f3ba0e6b@syzkaller.appspotmail.com>,
+        arvid.brodin@alten.se, axboe@fb.com, axboe@kernel.dk,
+        davem@davemloft.net, hch@lst.de, linux-block@vger.kernel.org,
+        linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+        ming.lei@redhat.com, mkl@pengutronix.de, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+References: <0000000000004cfa120583e1dfc3@google.com>
+From:   Oliver Hartkopp <socketcan@hartkopp.net>
+Message-ID: <7dd5ffca-803d-9d5e-7fa4-f9eed2249d26@hartkopp.net>
+Date:   Tue, 12 Mar 2019 13:01:54 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <0000000000004cfa120583e1dfc3@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If a sync bfq_queue has a higher weight than some other queue, and
-remains temporarily empty while in service, then, to preserve the
-bandwidth share of the queue, it is necessary to plug I/O dispatching
-until a new request arrives for the queue. In addition, a timeout
-needs to be set, to avoid waiting for ever if the process associated
-with the queue has actually finished its I/O.
+Hi all,
 
-Even with the above timeout, the device is however not fed with new
-I/O for a while, if the process has finished its I/O. If this happens
-often, then throughput drops and latencies grow. For this reason, the
-timeout is kept rather low: 8 ms is the current default.
+I'm not sure why a Kernel 4.12.0-rc2+ is used here, but I do not get any 
+problems on the my latest 5.0.0-06622-g1fc1cd8399ab tree and I strongly 
+assume this patch showing up in 4.12-rc6
 
-Unfortunately, such a low value may cause, on the opposite end, a
-violation of bandwidth guarantees for a process that happens to issue
-new I/O too late. The higher the system load, the higher the
-probability that this happens to some process. This is a problem in
-scenarios where service guarantees matter more than throughput. One
-important case are weight-raised queues, which need to be granted a
-very high fraction of the bandwidth.
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit?id=74b7b490886852582d986a33443c2ffa50970169
 
-To address this issue, this commit lower-bounds the plugging timeout
-for weight-raised queues to 20 ms. This simple change provides
-relevant benefits. For example, on a PLEXTOR PX-256M5S, with which
-gnome-terminal starts in 0.6 seconds if there is no other I/O in
-progress, the same applications starts in
-- 0.8 seconds, instead of 1.2 seconds, if ten files are being read
-  sequentially in parallel
-- 1 second, instead of 2 seconds, if, in parallel, five files are
-  being read sequentially, and five more files are being written
-  sequentially
+fixes the problem.
 
-Tested-by: Holger Hoffstätte <holger@applied-asynchrony.com>
-Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
----
- block/bfq-iosched.c | 2 ++
- 1 file changed, 2 insertions(+)
+Best regards,
+Oliver
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 4c592496a16a..eb658de3cc40 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -2545,6 +2545,8 @@ static void bfq_arm_slice_timer(struct bfq_data *bfqd)
- 	if (BFQQ_SEEKY(bfqq) && bfqq->wr_coeff == 1 &&
- 	    bfq_symmetric_scenario(bfqd))
- 		sl = min_t(u64, sl, BFQ_MIN_TT);
-+	else if (bfqq->wr_coeff > 1)
-+		sl = max_t(u32, sl, 20ULL * NSEC_PER_MSEC);
- 
- 	bfqd->last_idling_start = ktime_get();
- 	hrtimer_start(&bfqd->idle_slice_timer, ns_to_ktime(sl),
--- 
-2.20.1
-
+On 3/12/19 9:57 AM, syzbot wrote:
+> syzbot has bisected this bug to:
+> 
+> commit ab42f35d9cb5ac49b5a2a11f940e74f58f207280
+> Author: Ming Lei <ming.lei@redhat.com>
+> Date:   Fri May 26 11:53:19 2017 +0000
+> 
+>      blk-mq: merge bio into sw queue before plugging
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16e68713200000
+> start commit:   ab42f35d blk-mq: merge bio into sw queue before plugging
+> git tree:       upstream
+> final crash:    https://syzkaller.appspot.com/x/report.txt?x=15e68713200000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=11e68713200000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=5e7dc790609552d7
+> dashboard link: 
+> https://syzkaller.appspot.com/bug?extid=fdce8f2a8903f3ba0e6b
+> userspace arch: amd64
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15f6d1fd400000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17290fdd400000
+> 
+> Reported-by: syzbot+fdce8f2a8903f3ba0e6b@syzkaller.appspotmail.com
+> Fixes: ab42f35d ("blk-mq: merge bio into sw queue before plugging")
