@@ -2,96 +2,86 @@ Return-Path: <SRS0=IPXt=RP=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFC9C43381
-	for <linux-block@archiver.kernel.org>; Tue, 12 Mar 2019 01:28:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1889CC43381
+	for <linux-block@archiver.kernel.org>; Tue, 12 Mar 2019 01:32:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 89030214D8
-	for <linux-block@archiver.kernel.org>; Tue, 12 Mar 2019 01:28:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="bhYCaF6y"
+	by mail.kernel.org (Postfix) with ESMTP id D83632084F
+	for <linux-block@archiver.kernel.org>; Tue, 12 Mar 2019 01:32:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726193AbfCLB20 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Mar 2019 21:28:26 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:45526 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725932AbfCLB20 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Mar 2019 21:28:26 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2C1Il7b112673;
-        Tue, 12 Mar 2019 01:28:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id; s=corp-2018-07-02;
- bh=yIB9yhUCdYLlG2cu/5oLydhDJhQQiZBh7E+wH+Xz4s4=;
- b=bhYCaF6y7zsFjQfrRAKUUSSF3oCAI8vOmvjIWLX1ltBPUX2PqOnXD9xVs/4txoA9zahH
- zgxD6ioDr03o9Eu41kSkvJlu0iyMGL2E1fhKX28vJeNWAJWsUbn9AUrIkHPnAHZqyve5
- rYp6eYFbWkMnXnWucpQY02MYTyzzHCAWYXtYMdbNYTBLHKg9TolokJawGQ+ikZWf3wG5
- GWJg0MOuijfUfxJESQ0FxSxMPa1AGuStA3bJEGz149zHeZZR0Li49h3PVJ/jJe20oemv
- 7+LDy55IgXtFZ84ZRghRMk5dyRgnSUdySl3Ywp0+03VuJkRZZO5wN/3EpbTDXEXn5G// AA== 
-Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by userp2130.oracle.com with ESMTP id 2r44wu1qu7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 12 Mar 2019 01:28:22 +0000
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2C1SKlc005723
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 12 Mar 2019 01:28:21 GMT
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x2C1SKGe022767;
-        Tue, 12 Mar 2019 01:28:20 GMT
-Received: from linux.cn.oracle.com (/10.182.69.106)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 11 Mar 2019 18:28:19 -0700
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-To:     virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     mst@redhat.com, jasowang@redhat.com, axboe@kernel.dk
-Subject: [PATCH 1/1] virtio_blk: replace 0 by HCTX_TYPE_DEFAULT to index blk_mq_tag_set->map
-Date:   Tue, 12 Mar 2019 09:31:56 +0800
-Message-Id: <1552354316-20204-1-git-send-email-dongli.zhang@oracle.com>
-X-Mailer: git-send-email 2.7.4
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9192 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=761 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1903120007
+        id S1726421AbfCLBc5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Mar 2019 21:32:57 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:39322 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726406AbfCLBc5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 11 Mar 2019 21:32:57 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 24D9181F25;
+        Tue, 12 Mar 2019 01:32:57 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-22.pek2.redhat.com [10.72.8.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A492C19C71;
+        Tue, 12 Mar 2019 01:32:51 +0000 (UTC)
+Date:   Tue, 12 Mar 2019 09:32:46 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: Re: NVMe: Regression: write zeros corrupts ext4 file system
+Message-ID: <20190312013245.GD28841@ming.t460p>
+References: <20190311022441.GA16849@ming.t460p>
+ <20190311145457.GA10411@localhost.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190311145457.GA10411@localhost.localdomain>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Tue, 12 Mar 2019 01:32:57 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use HCTX_TYPE_DEFAULT instead of 0 to avoid hardcoding.
+On Mon, Mar 11, 2019 at 08:54:59AM -0600, Keith Busch wrote:
+> On Mon, Mar 11, 2019 at 10:24:42AM +0800, Ming Lei wrote:
+> > Hi,
+> > 
+> > It is observed that ext4 is corrupted easily by running some workloads
+> > on QEMU NVMe, such as:
+> > 
+> > 1) mkfs.ext4 /dev/nvme0n1
+> > 
+> > 2) mount /dev/nvme0n1 /mnt
+> > 
+> > 3) cd /mnt; git clone git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+> > 
+> > 4) then the following error message may show up:
+> > 
+> > [ 1642.271816] EXT4-fs error (device nvme0n1): ext4_mb_generate_buddy:747: group 0, block bitmap and bg descriptor inconsistent: 32768 vs 23513 free clusters
+> > 
+> > Or fsck.ext4 will complain after running 'umount /mnt'
+> > 
+> > The issue disappears by reverting 6e02318eaea53eaafe6 ("nvme: add support for the
+> > Write Zeroes command").
+> > 
+> > QEMU version:
+> > 
+> > QEMU emulator version 2.10.2(qemu-2.10.2-1.fc27)
+> > Copyright (c) 2003-2017 Fabrice Bellard and the QEMU Project developers
+> 
+> In QEMU, blk_aio_pwrite_zeroes() takes bytes, but the nvme controller
+> thought it was blocks. Oops, that went by unnoticed till now!
+> 
+> We should fix QEMU (patch below). Question is, should we quirk driver 
+> for older versions too?
 
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
----
-This is the only place to cleanup under drivers/block/*. Another patch set
-is sent to scsi and then all of below are cleaned up:
-- block/*
-- drivers/*
+I think so, users may never upgrade their QEMU.
 
- drivers/block/virtio_blk.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 4bc083b..bed6035 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -691,7 +691,8 @@ static int virtblk_map_queues(struct blk_mq_tag_set *set)
- {
- 	struct virtio_blk *vblk = set->driver_data;
- 
--	return blk_mq_virtio_map_queues(&set->map[0], vblk->vdev, 0);
-+	return blk_mq_virtio_map_queues(&set->map[HCTX_TYPE_DEFAULT],
-+					vblk->vdev, 0);
- }
- 
- #ifdef CONFIG_VIRTIO_BLK_SCSI
--- 
-2.7.4
-
+Thanks,
+Ming
