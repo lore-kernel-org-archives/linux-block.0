@@ -7,19 +7,19 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49C24C43381
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1BE9C10F03
 	for <linux-block@archiver.kernel.org>; Wed, 13 Mar 2019 17:55:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 130F62077B
+	by mail.kernel.org (Postfix) with ESMTP id 755012077B
 	for <linux-block@archiver.kernel.org>; Wed, 13 Mar 2019 17:55:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="k6O4gghA"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="H89rzwWT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726585AbfCMRzu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Mar 2019 13:55:50 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:47772 "EHLO
+        id S1726431AbfCMRzv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Mar 2019 13:55:51 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:47768 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726431AbfCMRzu (ORCPT
+        with ESMTP id S1726549AbfCMRzu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 13 Mar 2019 13:55:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -28,26 +28,25 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=O82uO42zPFjhcbrzGyRDpxvzxNnyq3ZqK1xm+aaQuR4=; b=k6O4gghAs+5oCmTnjW7k4JQECm
-        mUC/CqgTF3a6QeBRLgaqg5tmOBih2JfQ/SuIBKM26X+zQyfIvtpcJsEV4z3gJzg/07lC8xHYI8NoL
-        bUZjp1BMZtfn1HvY2I2NyipT9EM9At2GKoLAHrrMQizZHqBBm4YEAr5ZChLuK7Tk+X6v96XK8KkWP
-        1OrvXUsiIBQhtZ/k97EF68ypwJpmu3/KykDmdfztq8b0FEKo0LWoPTVitep075zIFqq4FDW5C/eJx
-        aanjIk4yPlFMl7ab0G4p8f4Y4d32Sjy5AKyi+uEHn/lbKCBjNWBNUEY6CM4dUH7P2p5nJwseYB8/K
-        30zaDXng==;
+        bh=cZNH1UDgjHssIcr4zuVmj3khs8swLSWTUTaIVeGW7V4=; b=H89rzwWTZqMNmmAGcfk8I21Nd6
+        jwKe6cAnYKEmNXZXnramQu1vy14cgu0qCh9KHSbZ0NDoXoYQN3moHLmqGxJJHn47FfOib/YGUMM6M
+        1SQ2DUKD6fs3KjrYjvfHtkkWUVk/MdKn27SJHEq3gF0VA51/aMVpr9Ac0lkIy1jrZLvKkJwlMG9n3
+        Mx4ndgUUF+TrRlYuozWOh6QV/eKgZ/rEDQhQJpwIQ0WpYCvm5BWTpsiJYij9hQt1JPYh+nS1quLMB
+        kJVUrW6nRiimHQrx9hpOCIZm0it8p5BZREFG1cajsfAZYR8YRrZZpw34oDPAoKc1m2FnNQk+gYRLb
+        HNmawbdg==;
 Received: from 089144197017.atnat0006.highway.a1.net ([89.144.197.17] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1h486U-0001do-N4; Wed, 13 Mar 2019 17:55:47 +0000
+        id 1h486S-0001Zm-51; Wed, 13 Mar 2019 17:55:44 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Keith Busch <keith.busch@intel.com>,
         Sagi Grimberg <sagi@grimberg.me>,
         linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
         James Smart <jsmart2021@gmail.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Hannes Reinecke <hare@suse.com>
-Subject: [PATCH 08/17] nvme-fc: fix numa_node when dev is null
-Date:   Wed, 13 Mar 2019 18:55:01 +0100
-Message-Id: <20190313175510.20725-9-hch@lst.de>
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH 07/17] nvme-fc: use nr_phys_segments to determine existence of sgl
+Date:   Wed, 13 Mar 2019 18:55:00 +0100
+Message-Id: <20190313175510.20725-8-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190313175510.20725-1-hch@lst.de>
 References: <20190313175510.20725-1-hch@lst.de>
@@ -61,41 +60,63 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: James Smart <jsmart2021@gmail.com>
 
-A recent change added a numa_node field to the nvme controller
-and has the transport assign the node using dev_to_node().
-However, fcloop registers with a NULL device struct, so the
-dev_to_node() call oops.
+For some nvme command, when issued by the nvme core layer, there
+is an internal buffer which can cause blk_rq_payload_bytes() to
+return a non-zero value yet there is no actual/real command payload
+and sg list.  An example is the WRITE ZEROES command.
 
-Revise the assignment to assign no node when device struct is null.
+To address this, when making choices on whether to dma map an sgl,
+use blk_rq_nr_phys_segments() instead of blk_rq_payload_bytes().
+When there is a sgl, blk_rq_payload_bytes() will return the amount
+of data to be transferred by the sgl.
 
-Fixes: 103e515efa89b ("nvme: add a numa_node field to struct nvme_ctrl")
-Reported-by: Mike Snitzer <snitzer@redhat.com>
+Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
 Signed-off-by: James Smart <jsmart2021@gmail.com>
-Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-Reviewed-by: Hannes Reinecke <hare@suse.com>
-Reviewed-by: Mike Snitzer <snitzer@redhat.com>
-[hch: small coding style fixup]
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/fc.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/nvme/host/fc.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index ba8f2a9cbdaf..23f6bad19274 100644
+index b29b12498a1a..ba8f2a9cbdaf 100644
 --- a/drivers/nvme/host/fc.c
 +++ b/drivers/nvme/host/fc.c
-@@ -3017,7 +3017,10 @@ nvme_fc_init_ctrl(struct device *dev, struct nvmf_ctrl_options *opts,
+@@ -2107,7 +2107,7 @@ nvme_fc_map_data(struct nvme_fc_ctrl *ctrl, struct request *rq,
  
- 	ctrl->ctrl.opts = opts;
- 	ctrl->ctrl.nr_reconnects = 0;
--	ctrl->ctrl.numa_node = dev_to_node(lport->dev);
-+	if (lport->dev)
-+		ctrl->ctrl.numa_node = dev_to_node(lport->dev);
-+	else
-+		ctrl->ctrl.numa_node = NUMA_NO_NODE;
- 	INIT_LIST_HEAD(&ctrl->ctrl_list);
- 	ctrl->lport = lport;
- 	ctrl->rport = rport;
+ 	freq->sg_cnt = 0;
+ 
+-	if (!blk_rq_payload_bytes(rq))
++	if (!blk_rq_nr_phys_segments(rq))
+ 		return 0;
+ 
+ 	freq->sg_table.sgl = freq->first_sgl;
+@@ -2304,12 +2304,23 @@ nvme_fc_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	if (ret)
+ 		return ret;
+ 
+-	data_len = blk_rq_payload_bytes(rq);
+-	if (data_len)
++	/*
++	 * nvme core doesn't quite treat the rq opaquely. Commands such
++	 * as WRITE ZEROES will return a non-zero rq payload_bytes yet
++	 * there is no actual payload to be transferred.
++	 * To get it right, key data transmission on there being 1 or
++	 * more physical segments in the sg list. If there is no
++	 * physical segments, there is no payload.
++	 */
++	if (blk_rq_nr_phys_segments(rq)) {
++		data_len = blk_rq_payload_bytes(rq);
+ 		io_dir = ((rq_data_dir(rq) == WRITE) ?
+ 					NVMEFC_FCP_WRITE : NVMEFC_FCP_READ);
+-	else
++	} else {
++		data_len = 0;
+ 		io_dir = NVMEFC_FCP_NODATA;
++	}
++
+ 
+ 	return nvme_fc_start_fcp_op(ctrl, queue, op, data_len, io_dir);
+ }
 -- 
 2.20.1
 
