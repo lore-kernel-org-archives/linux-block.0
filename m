@@ -7,46 +7,45 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1BE9C10F03
-	for <linux-block@archiver.kernel.org>; Wed, 13 Mar 2019 17:55:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A1CDC43381
+	for <linux-block@archiver.kernel.org>; Wed, 13 Mar 2019 17:55:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 755012077B
-	for <linux-block@archiver.kernel.org>; Wed, 13 Mar 2019 17:55:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E65E20854
+	for <linux-block@archiver.kernel.org>; Wed, 13 Mar 2019 17:55:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="H89rzwWT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WubfDmxS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726431AbfCMRzv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Mar 2019 13:55:51 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:47768 "EHLO
+        id S1726337AbfCMRzz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Mar 2019 13:55:55 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:48288 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726549AbfCMRzu (ORCPT
+        with ESMTP id S1726534AbfCMRzy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Mar 2019 13:55:50 -0400
+        Wed, 13 Mar 2019 13:55:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=cZNH1UDgjHssIcr4zuVmj3khs8swLSWTUTaIVeGW7V4=; b=H89rzwWTZqMNmmAGcfk8I21Nd6
-        jwKe6cAnYKEmNXZXnramQu1vy14cgu0qCh9KHSbZ0NDoXoYQN3moHLmqGxJJHn47FfOib/YGUMM6M
-        1SQ2DUKD6fs3KjrYjvfHtkkWUVk/MdKn27SJHEq3gF0VA51/aMVpr9Ac0lkIy1jrZLvKkJwlMG9n3
-        Mx4ndgUUF+TrRlYuozWOh6QV/eKgZ/rEDQhQJpwIQ0WpYCvm5BWTpsiJYij9hQt1JPYh+nS1quLMB
-        kJVUrW6nRiimHQrx9hpOCIZm0it8p5BZREFG1cajsfAZYR8YRrZZpw34oDPAoKc1m2FnNQk+gYRLb
-        HNmawbdg==;
+        bh=8JaeW1Nvy3CfjJcjr3ig0hsO0HIi7Ps4n1x0iCXrTXM=; b=WubfDmxSPrvyEkKuJdLTKIsXOS
+        l6njR/krETx79rYmxT/YlD9Nh+CTwJmDyshfQ0UYufCLC4eIrjrOmxEKY3DITLZmtucccaRouHnRw
+        KIdaPbW7NOFvHkV3ey0HJlYHrZIzmAys4YpHMEQOi9wsz856KP8YCVu81+IYKyY0/FJvs2lHOEONJ
+        ymm0/tWDLWcXSZuMomOaZAwWVZPWamEESfXlDHpaN03A1nmSgyrt02EZ3QKuGqba1NW8/ICR46AGc
+        H86vcdGPyoHgJ8O0ygGgAYVx9SaRoyvKO/KttQaZfbjb92BzSN4Njk4WruC5owlDCAxIjDgnI2GDL
+        u/iRxyUQ==;
 Received: from 089144197017.atnat0006.highway.a1.net ([89.144.197.17] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1h486S-0001Zm-51; Wed, 13 Mar 2019 17:55:44 +0000
+        id 1h486X-0001hN-Cn; Wed, 13 Mar 2019 17:55:49 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Keith Busch <keith.busch@intel.com>,
         Sagi Grimberg <sagi@grimberg.me>,
         linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        James Smart <jsmart2021@gmail.com>,
-        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Subject: [PATCH 07/17] nvme-fc: use nr_phys_segments to determine existence of sgl
-Date:   Wed, 13 Mar 2019 18:55:00 +0100
-Message-Id: <20190313175510.20725-8-hch@lst.de>
+        James Smart <jsmart2021@gmail.com>
+Subject: [PATCH 09/17] nvme-fc: reject reconnect if io queue count is reduced to zero
+Date:   Wed, 13 Mar 2019 18:55:02 +0100
+Message-Id: <20190313175510.20725-10-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190313175510.20725-1-hch@lst.de>
 References: <20190313175510.20725-1-hch@lst.de>
@@ -60,63 +59,77 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: James Smart <jsmart2021@gmail.com>
 
-For some nvme command, when issued by the nvme core layer, there
-is an internal buffer which can cause blk_rq_payload_bytes() to
-return a non-zero value yet there is no actual/real command payload
-and sg list.  An example is the WRITE ZEROES command.
+If:
 
-To address this, when making choices on whether to dma map an sgl,
-use blk_rq_nr_phys_segments() instead of blk_rq_payload_bytes().
-When there is a sgl, blk_rq_payload_bytes() will return the amount
-of data to be transferred by the sgl.
+ - A successful connect has occurred with an io queue count greater than
+   zero and namespaces detected and running.
+ - An error or something occurs which causes a termination of the prior
+   association and then starts a reconnect,
+ - The reconnect then creates a new controller, but for whatever reason,
+   nvme_set_queue_count() results in io queue count set to zero.  This
+   will skip io queue and tag set changes.
+ - But... the controller will transition to live, calling
+   nvme_start_ctrl, which calls nvme_start_queues(), which then releases
+   I/Os into the transport which then sends them to the driver.
 
-Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+As there are no queues, things eventually hit the driver looking for a
+handle, which was cleared when the original controller was reset, and it
+can't proceed. Worst case, things progress, but everything fails.
+
+In the failing scenario, the nvme_set_features(NVME_FEAT_NUM_QUEUES)
+command actually failed with a NVME_SC_INTERNAL error.  For some reason,
+although nvme_set_queue_count() saw the error and set io queue count to
+zero, it doesn't return a failure status to the transport, which allows
+the transport to continue using the controller.
+
+Fix the problem by simply rejecting the new association if at least 1
+I/O queue can't be created. The association reject will fail the
+reconnect attempt and fall into the reconnect retry policy.
+
 Signed-off-by: James Smart <jsmart2021@gmail.com>
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/nvme/host/fc.c | 19 +++++++++++++++----
- 1 file changed, 15 insertions(+), 4 deletions(-)
+ drivers/nvme/host/fc.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-index b29b12498a1a..ba8f2a9cbdaf 100644
+index 23f6bad19274..f3b9d91ba0df 100644
 --- a/drivers/nvme/host/fc.c
 +++ b/drivers/nvme/host/fc.c
-@@ -2107,7 +2107,7 @@ nvme_fc_map_data(struct nvme_fc_ctrl *ctrl, struct request *rq,
+@@ -2475,6 +2475,7 @@ static int
+ nvme_fc_recreate_io_queues(struct nvme_fc_ctrl *ctrl)
+ {
+ 	struct nvmf_ctrl_options *opts = ctrl->ctrl.opts;
++	u32 prior_ioq_cnt = ctrl->ctrl.queue_count - 1;
+ 	unsigned int nr_io_queues;
+ 	int ret;
  
- 	freq->sg_cnt = 0;
- 
--	if (!blk_rq_payload_bytes(rq))
-+	if (!blk_rq_nr_phys_segments(rq))
- 		return 0;
- 
- 	freq->sg_table.sgl = freq->first_sgl;
-@@ -2304,12 +2304,23 @@ nvme_fc_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (ret)
+@@ -2487,6 +2488,13 @@ nvme_fc_recreate_io_queues(struct nvme_fc_ctrl *ctrl)
  		return ret;
+ 	}
  
--	data_len = blk_rq_payload_bytes(rq);
--	if (data_len)
-+	/*
-+	 * nvme core doesn't quite treat the rq opaquely. Commands such
-+	 * as WRITE ZEROES will return a non-zero rq payload_bytes yet
-+	 * there is no actual payload to be transferred.
-+	 * To get it right, key data transmission on there being 1 or
-+	 * more physical segments in the sg list. If there is no
-+	 * physical segments, there is no payload.
-+	 */
-+	if (blk_rq_nr_phys_segments(rq)) {
-+		data_len = blk_rq_payload_bytes(rq);
- 		io_dir = ((rq_data_dir(rq) == WRITE) ?
- 					NVMEFC_FCP_WRITE : NVMEFC_FCP_READ);
--	else
-+	} else {
-+		data_len = 0;
- 		io_dir = NVMEFC_FCP_NODATA;
++	if (!nr_io_queues && prior_ioq_cnt) {
++		dev_info(ctrl->ctrl.device,
++			"Fail Reconnect: At least 1 io queue "
++			"required (was %d)\n", prior_ioq_cnt);
++		return -ENOSPC;
 +	}
 +
+ 	ctrl->ctrl.queue_count = nr_io_queues + 1;
+ 	/* check for io queues existing */
+ 	if (ctrl->ctrl.queue_count == 1)
+@@ -2500,6 +2508,10 @@ nvme_fc_recreate_io_queues(struct nvme_fc_ctrl *ctrl)
+ 	if (ret)
+ 		goto out_delete_hw_queues;
  
- 	return nvme_fc_start_fcp_op(ctrl, queue, op, data_len, io_dir);
- }
++	if (prior_ioq_cnt != nr_io_queues)
++		dev_info(ctrl->ctrl.device,
++			"reconnect: revising io queue count from %d to %d\n",
++			prior_ioq_cnt, nr_io_queues);
+ 	blk_mq_update_nr_hw_queues(&ctrl->tag_set, nr_io_queues);
+ 
+ 	return 0;
 -- 
 2.20.1
 
