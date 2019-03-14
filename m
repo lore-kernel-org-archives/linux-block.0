@@ -2,110 +2,129 @@ Return-Path: <SRS0=8xnz=RR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E675C43381
-	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 08:28:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A3F0C43381
+	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 09:59:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 00FB021872
-	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 08:28:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BC6620693
+	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 09:59:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DaxSro7G"
+	dkim=pass (1024-bit key) header.d=Mellanox.com header.i=@Mellanox.com header.b="l7lBH2Oi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726796AbfCNI2v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Mar 2019 04:28:51 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:36479 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726292AbfCNI2v (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Mar 2019 04:28:51 -0400
-Received: by mail-pf1-f195.google.com with SMTP id n22so3346501pfa.3;
-        Thu, 14 Mar 2019 01:28:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=t+FO0Ge5x2R+otL95bBriY+e3z2BrwSY1bxTvsVVnwo=;
-        b=DaxSro7G2utPJRtoA014+s6MMe1CIM2L7Tv+hSbLnfPryawAol6n2QuguzhVCUzbVO
-         Q7kPtgtNId0BMdjbdGtgOkyX63RY8O5ZRWZJObBEsoU3J9N6hRJg5NmE4IgkSu/4Mw5w
-         tXIl+tyQzxgLNYd9cEBp6lDGrHlqexiCVT+zUkSxBeqM7zlZijOz45x4PGBxozXjarcb
-         z6xevAmLIBpmRp14y7Fc6dpq+g5VnINLtwBckL5p+w4fNwq/tS3F2dj17EptHiL4ZhjG
-         nof4auJN7x8b1uJwQXYtJ+s7G0LHp8Goj8/Fb1Qx7UsQFGnVbWukbtBcPnnJbcKr4O17
-         zYbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=t+FO0Ge5x2R+otL95bBriY+e3z2BrwSY1bxTvsVVnwo=;
-        b=kbdBQ8gGLewlajTsGDkGAMXmRY51DByOFKmrFVIpNOEgdlPGMQtEpMQ/x2dcLjYDw3
-         O6KAGZmONwHn73lmcK8F7ntqHmVgo1CivyPiNo9k2/FvgXYCjFy3xQZ06E4tPovZMtwv
-         15uVY5vaw1ryI/7B3DZMpJESzqbVN42OvbnGjmkRGcrJPfc6d8Cl7V+q5wAKIW29QOS8
-         dKQaj+4tNDfqyMjhR/XMBXlg02eEI2mRVQCST8z+2ztNBVeSP7YsgAM2lk0uux0mq8dg
-         LwwyJayXBxYygV9gyyFXbHGF8RviLFEzDLhv53T1AAam+a+1aXUvdhdwEUh4KqD5s2xK
-         dg+w==
-X-Gm-Message-State: APjAAAVGWSxD1MY4LS9xs+CQV1eSI/bjudvj5U1rclV6fnftvjeuHltm
-        htD0x85Lonh9E1rk74lM3VY=
-X-Google-Smtp-Source: APXvYqxYd/TA16EBmfT9nnV8MByf55XUP4NQ11MKp3Rfjo697utVklLvIsJaGOf4D7fJln6SPc9OkA==
-X-Received: by 2002:a63:cc43:: with SMTP id q3mr44497290pgi.387.1552552130354;
-        Thu, 14 Mar 2019 01:28:50 -0700 (PDT)
-Received: from localhost.localdomain ([175.223.23.218])
-        by smtp.gmail.com with ESMTPSA id a2sm18655957pgq.89.2019.03.14.01.28.46
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 14 Mar 2019 01:28:49 -0700 (PDT)
-From:   Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-X-Google-Original-From: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
-To:     Ed Cashin <ed.cashin@acm.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
-Subject: [PATCH] aoe: do not use __constant_cpu_to_be16
-Date:   Thu, 14 Mar 2019 17:28:42 +0900
-Message-Id: <20190314082842.21965-1-sergey.senozhatsky@gmail.com>
-X-Mailer: git-send-email 2.21.0
+        id S1726689AbfCNJ7D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Mar 2019 05:59:03 -0400
+Received: from mail-eopbgr30057.outbound.protection.outlook.com ([40.107.3.57]:18697
+        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726643AbfCNJ7D (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Mar 2019 05:59:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ah5q6aOSD9cef5feim6jRzNwhJFcK3/aGJUoCyJozu4=;
+ b=l7lBH2OitDSsnWr3tznosDbF6nUVDjwkG2UP+hXxTwskBpst1X4AHkPz/lSbuvjCSm1+o8oqu5MaZ/h72L9E9dRWkCHV+789gw+BOt56Y32gZzYHt3fEpU6VEZvUc+GIQ2u9Ve5lQ3uRNwDe8+g8zvCnX/80B/XquxhwyxEgboo=
+Received: from HE1PR05CA0191.eurprd05.prod.outlook.com (2603:10a6:3:f9::15) by
+ AM0PR05MB4562.eurprd05.prod.outlook.com (2603:10a6:208:b0::29) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1709.14; Thu, 14 Mar 2019 09:58:59 +0000
+Received: from DB5EUR03FT025.eop-EUR03.prod.protection.outlook.com
+ (2a01:111:f400:7e0a::200) by HE1PR05CA0191.outlook.office365.com
+ (2603:10a6:3:f9::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1709.13 via Frontend
+ Transport; Thu, 14 Mar 2019 09:58:58 +0000
+Authentication-Results: spf=pass (sender IP is 193.47.165.134)
+ smtp.mailfrom=mellanox.com; wdc.com; dkim=none (message not signed)
+ header.d=none;wdc.com; dmarc=pass action=none header.from=mellanox.com;
+Received-SPF: Pass (protection.outlook.com: domain of mellanox.com designates
+ 193.47.165.134 as permitted sender) receiver=protection.outlook.com;
+ client-ip=193.47.165.134; helo=mtlcas13.mtl.com;
+Received: from mtlcas13.mtl.com (193.47.165.134) by
+ DB5EUR03FT025.mail.protection.outlook.com (10.152.20.104) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.1709.13 via Frontend Transport; Thu, 14 Mar 2019 09:58:58 +0000
+Received: from MTLCAS13.mtl.com (10.0.8.78) by mtlcas13.mtl.com (10.0.8.78)
+ with Microsoft SMTP Server (TLS) id 15.0.1178.4; Thu, 14 Mar 2019 11:58:57
+ +0200
+Received: from MTLCAS01.mtl.com (10.0.8.71) by MTLCAS13.mtl.com (10.0.8.78)
+ with Microsoft SMTP Server (TLS) id 15.0.1178.4 via Frontend Transport; Thu,
+ 14 Mar 2019 11:58:57 +0200
+Received: from [10.223.3.162] (10.223.3.162) by MTLCAS01.mtl.com (10.0.8.71)
+ with Microsoft SMTP Server (TLS) id 14.3.301.0; Thu, 14 Mar 2019 11:57:56
+ +0200
+Subject: Re: [PATCH 07/17] nvme-fc: use nr_phys_segments to determine
+ existence of sgl
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+CC:     Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        <linux-nvme@lists.infradead.org>, <linux-block@vger.kernel.org>,
+        James Smart <jsmart2021@gmail.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+References: <20190313175510.20725-1-hch@lst.de>
+ <20190313175510.20725-8-hch@lst.de>
+From:   Max Gurtovoy <maxg@mellanox.com>
+Message-ID: <a488077e-d68e-a388-4d45-5b966f01f96e@mellanox.com>
+Date:   Thu, 14 Mar 2019 11:57:55 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.3
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190313175510.20725-8-hch@lst.de>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.223.3.162]
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-Forefront-Antispam-Report: CIP:193.47.165.134;IPV:NLI;CTRY:IL;EFV:NLI;SFV:NSPM;SFS:(10009020)(396003)(39860400002)(346002)(136003)(376002)(2980300002)(199004)(189003)(5660300002)(356004)(106466001)(50466002)(36756003)(2486003)(23676004)(229853002)(4326008)(47776003)(65956001)(65806001)(6246003)(64126003)(76176011)(8676002)(446003)(86362001)(336012)(316002)(478600001)(16576012)(58126008)(110136005)(81156014)(81166006)(65826007)(476003)(2906002)(11346002)(2616005)(486006)(126002)(305945005)(7736002)(26005)(77096007)(53546011)(230700001)(3846002)(6116002)(31696002)(54906003)(8936002)(31686004)(67846002)(106002)(186003)(16526019)(3940600001);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR05MB4562;H:mtlcas13.mtl.com;FPR:;SPF:Pass;LANG:en;PTR:mail13.mellanox.com;A:1;MX:1;
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 60da4ead-f7b3-4854-8dc5-08d6a863ad8a
+X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4608103)(4709054)(2017052603328)(7153060)(7193020);SRVR:AM0PR05MB4562;
+X-MS-TrafficTypeDiagnostic: AM0PR05MB4562:
+X-Microsoft-Antispam-PRVS: <AM0PR05MB4562629050AB5E360B86759EB64B0@AM0PR05MB4562.eurprd05.prod.outlook.com>
+X-Forefront-PRVS: 09760A0505
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam-Message-Info: 2vekz4vz0NUyG2yOk9YPJA1Ig7IVK7yMPKxb/nMP3sglR2xeJs7rrEGxxS5Gw68JRZocv/wjlNu/4oyZUxmZSAQsoWPq5oUG9KDPd5BV6luNHTlpFOITRgxDHDYO1FECNiPYTSZZ3fsfCH6UNT4sHZFBth4dYsbrvDkQ4oHGB31J8LHOfkFf6uDlF9Al5moflqFoxykb5dQYuvnvSO0lUTY9R/IKZPeDm0yf8eXCU6JnYmOgminquubm9+DZESppfGlfmFg64GLinEwIa3S8Zs5ljH3x5EwTzcFOALnWcFbqxTt5rmK8RGioBSkz18Ur0+FAm8QxqIaOhsw6jTGLWGU49B4OFE0qAALCfnBVU26Nuxe+YhbPaFio8zKMRP4nQcZwYmW/b0fgqPKI/KsYKpccLnPEdU9hWDaSiR8/BZA=
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2019 09:58:58.4162
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 60da4ead-f7b3-4854-8dc5-08d6a863ad8a
+X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=a652971c-7d2e-4d9b-a6a4-d149256f461b;Ip=[193.47.165.134];Helo=[mtlcas13.mtl.com]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR05MB4562
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-A trivial patch.
 
-cpu_to_be16() is capable enough to detect __builtin_constant_p()
-and to use an appropriate compile time ___constant_swahbXX()
-function.
+On 3/13/2019 7:55 PM, Christoph Hellwig wrote:
+> From: James Smart <jsmart2021@gmail.com>
+>
+> For some nvme command, when issued by the nvme core layer, there
+> is an internal buffer which can cause blk_rq_payload_bytes() to
+> return a non-zero value yet there is no actual/real command payload
+> and sg list.  An example is the WRITE ZEROES command.
+>
+> To address this, when making choices on whether to dma map an sgl,
+> use blk_rq_nr_phys_segments() instead of blk_rq_payload_bytes().
+> When there is a sgl, blk_rq_payload_bytes() will return the amount
+> of data to be transferred by the sgl.
+>
+> Signed-off-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> Signed-off-by: James Smart <jsmart2021@gmail.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-So we can use cpu_to_be16() instead of __constant_cpu_to_be16().
 
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
----
- drivers/block/aoe/aoecmd.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+I guess we'll need it for all transport.
 
-diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
-index 3cf9bc5d8d95..bc5bdef65868 100644
---- a/drivers/block/aoe/aoecmd.c
-+++ b/drivers/block/aoe/aoecmd.c
-@@ -132,7 +132,7 @@ aoehdr_atainit(struct aoedev *d, struct aoetgt *t, struct aoe_hdr *h)
- 
- 	memcpy(h->src, t->ifp->nd->dev_addr, sizeof h->src);
- 	memcpy(h->dst, t->addr, sizeof h->dst);
--	h->type = __constant_cpu_to_be16(ETH_P_AOE);
-+	h->type = cpu_to_be16(ETH_P_AOE);
- 	h->verfl = AOE_HVER;
- 	h->major = cpu_to_be16(d->aoemajor);
- 	h->minor = d->aoeminor;
-@@ -436,7 +436,7 @@ aoecmd_cfg_pkts(ushort aoemajor, unsigned char aoeminor, struct sk_buff_head *qu
- 
- 		memset(h->dst, 0xff, sizeof h->dst);
- 		memcpy(h->src, ifp->dev_addr, sizeof h->src);
--		h->type = __constant_cpu_to_be16(ETH_P_AOE);
-+		h->type = cpu_to_be16(ETH_P_AOE);
- 		h->verfl = AOE_HVER;
- 		h->major = cpu_to_be16(aoemajor);
- 		h->minor = aoeminor;
--- 
-2.21.0
+I saw that pci is covered, RDMA isn't.
+
+Also IMO tcp should be fixed (didn't dive into it yet, just high level 
+check for blk_rq_payload_bytes).
+
+may we should have a core function for it to reduce code duplication.
+
 
