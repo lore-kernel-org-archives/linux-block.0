@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4AFEC43381
-	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 20:44:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D1ADC43381
+	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 20:44:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 928F021872
-	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 20:44:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A02721872
+	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 20:44:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="NoBNxZ84"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="zr1JOoLA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727910AbfCNUop (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Mar 2019 16:44:45 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:34533 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727837AbfCNUoo (ORCPT
+        id S1727914AbfCNUoq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Mar 2019 16:44:46 -0400
+Received: from mail-it1-f193.google.com ([209.85.166.193]:52154 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727854AbfCNUoq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Mar 2019 16:44:44 -0400
-Received: by mail-io1-f65.google.com with SMTP id n11so6519960ioh.1
-        for <linux-block@vger.kernel.org>; Thu, 14 Mar 2019 13:44:44 -0700 (PDT)
+        Thu, 14 Mar 2019 16:44:46 -0400
+Received: by mail-it1-f193.google.com with SMTP id e24so6945894itl.1
+        for <linux-block@vger.kernel.org>; Thu, 14 Mar 2019 13:44:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=GkQgnR8Dxlw6eMCFxktvvmbSrLQd+vccM/+thHvNV8Q=;
-        b=NoBNxZ84SlJzEyoWKoldOCW2KzUpVWnPoqMUxJ6JseiYkAmYhVl8JW8sMEB1Wner0i
-         ZIBCvli9UGcTFzeFq3apVGHaJjnB3yzfPsqexr6Fx5L5kXbCLA/6t+PiUUjgVYAXuut9
-         TJXnDYjDJdApU2pKonijFJRFKff4CRz2hVNZ5lf2oS8cTT1SorZJL/ERkPdNzCjiy+9a
-         CabYAq26cHo/OjShnoa3YOI9fWzmb7l0AQXCt5nyRh3/n7nJSpzzaWTwWU5Zg0CeH2yT
-         LaSndNFnpm/KIG7fegjMs0K3lMlaZQE8/yF+OTD21ps5m2WSNetKwOzBWm2wSX8NDJyA
-         odMw==
+        bh=6aGgfBQgJx68zZgA7Gpk3ttCJRvX4djiuuqiwUtjZX4=;
+        b=zr1JOoLAv36LoNKK4bcvAZSxtrMxrxa5ySaeDX03leFwFX0nWvtUMVlZ92m+weAX4x
+         5NJXOVlq9SwCe+7XNYs6L0bZcwoejjnCm4EKdFTA37FrUcGr/bQzDOhhOpnmTlNlxr6K
+         LLQQOP+qKKpU94SCjgwTpHAnvF1Su78eGno7K1xJsQzEfEwXLXq7TBBBAaKxf25dYws2
+         S8PyLWcX+tGZ9Dr8VNm1nSAGdmzaJkjbk4iEq3N2E7eA3veFatbXS8r2dWppOUJla7Sb
+         B5Cih+36uyKPp00vZQVSZvBxs61xaxyrcedg5QEuHyEGNoblVxa8fmcHxQBdjlZka7TJ
+         gMww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=GkQgnR8Dxlw6eMCFxktvvmbSrLQd+vccM/+thHvNV8Q=;
-        b=ABkF6QLa1Wk1ydKHpBRM5kN7ITwHoiiJZoR6K8LnT7VTO/R1JWPyvD1x8wUvZ3DIy1
-         tgQNv+LymOYRh22lkU5PNEh8sRt8arkBRCYTDeT1Uv+Jc3lpIbY6L9MFw8MH3bb42nho
-         gTnyWRXm8b/VtXVTaVZZttcG+64r9Q3kSuox77kJ6f0yy3PnsjKwoD0aOCxq+eDcdNQg
-         Z6Atz7BYLQlP8pOnjBXIbthnPNcre60JNCmlbS84mjgFRDuC2ek17rb98JLXV0SvBnfs
-         iAOOB5f1ABo2FNDhUS8BKf38eA5LLDHKkr7EVPqEHtGwxv0RBNAB8sURSTytVEiONGbE
-         BPXw==
-X-Gm-Message-State: APjAAAWjVwQDsWbhdP/YH4CIcdnKPuN0/Rpom10OzsGelLd66LzZ6Y6I
-        IgHfKm51iGl6DdafD15fST/QvaYlrdW7lQ==
-X-Google-Smtp-Source: APXvYqyWtlUZXThcHFyDK1NqpEfJMam9MaweeDgGJ6IgJ6dFXNoIHA5XgNbnkNwb9b0T93I/uq0UBQ==
-X-Received: by 2002:a5e:8212:: with SMTP id l18mr14345iom.67.1552596283757;
-        Thu, 14 Mar 2019 13:44:43 -0700 (PDT)
+        bh=6aGgfBQgJx68zZgA7Gpk3ttCJRvX4djiuuqiwUtjZX4=;
+        b=DH1pSTKQSsf2T/T2cSWZM1gat4Qsyc/3UnwDQi4W73N/m6+F/Y1/vdBVlq7sWDlQPj
+         DveFvaQjDkV2LbSB5MsVTG5m3vvaMN6CtWbf2xB0VGqnYhB5EDiJwZfJb1BdqCFjG7uP
+         bqGcfDw6w8AMZK+mSSmZUM8ZbuoU8Hqc4MzcN/POm77A1bmNrVPsn2EctipeiQK9REi6
+         f4U1AO/ZnZp9raoeX0jyJRFIQS1PdEmdBEyIgQ8KsMmia8HtYczZY6Njv8ylCsYY7gUr
+         1irE9RE0RZedyBJwqoQTXz0Y1rFYQh56/36mP1OtXb/ZoKPkIIcEMjvkrkBTh8L9kr+g
+         1eAQ==
+X-Gm-Message-State: APjAAAVPJvuBVuTc7yP3tOAI4leAkZ/EdfgkQe3k3/Ubqui+lOMW0dAn
+        jg11dgIc52F5/OzYv/zv/4yCjQ==
+X-Google-Smtp-Source: APXvYqz76O6bFRt6AM0woI74PnUReqyn62Wd3fhf2tom6b253YrUnABg1uFkMAq50ASWnf4EcCRbOg==
+X-Received: by 2002:a02:3c07:: with SMTP id m7mr187046jaa.26.1552596285456;
+        Thu, 14 Mar 2019 13:44:45 -0700 (PDT)
 Received: from x1.thefacebook.com ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id w19sm1820538ita.33.2019.03.14.13.44.41
+        by smtp.gmail.com with ESMTPSA id w19sm1820538ita.33.2019.03.14.13.44.43
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 14 Mar 2019 13:44:41 -0700 (PDT)
+        Thu, 14 Mar 2019 13:44:44 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
 Cc:     viro@ZenIV.linux.org.uk, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 2/8] io_uring: make io_read/write return an integer
-Date:   Thu, 14 Mar 2019 14:44:29 -0600
-Message-Id: <20190314204435.7692-3-axboe@kernel.dk>
+Subject: [PATCH 3/8] io_uring: add prepped flag
+Date:   Thu, 14 Mar 2019 14:44:30 -0600
+Message-Id: <20190314204435.7692-4-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190314204435.7692-1-axboe@kernel.dk>
 References: <20190314204435.7692-1-axboe@kernel.dk>
@@ -68,84 +68,73 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The callers all convert to an integer, and we only return 0/-ERROR
-anyway.
+We currently use the fact that if ->ki_filp is already set, then we've
+done the prep. In preparation for moving the file assignment earlier,
+use a separate flag to tell whether the request has been prepped for
+IO or not.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/io_uring.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+ fs/io_uring.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/fs/io_uring.c b/fs/io_uring.c
-index c54af70c72fd..ecb93bb9d84e 100644
+index ecb93bb9d84e..d8468594a483 100644
 --- a/fs/io_uring.c
 +++ b/fs/io_uring.c
-@@ -893,7 +893,7 @@ static int io_import_iovec(struct io_ring_ctx *ctx, int rw,
- 	opcode = READ_ONCE(sqe->opcode);
- 	if (opcode == IORING_OP_READ_FIXED ||
- 	    opcode == IORING_OP_WRITE_FIXED) {
--		ssize_t ret = io_import_fixed(ctx, rw, sqe, iter);
-+		int ret = io_import_fixed(ctx, rw, sqe, iter);
- 		*iovec = NULL;
- 		return ret;
+@@ -214,6 +214,7 @@ struct io_kiocb {
+ #define REQ_F_IOPOLL_COMPLETED	2	/* polled IO has completed */
+ #define REQ_F_FIXED_FILE	4	/* ctx owns file */
+ #define REQ_F_SEQ_PREV		8	/* sequential with previous */
++#define REQ_F_PREPPED		16	/* prep already done */
+ 	u64			user_data;
+ 	u64			error;
+ 
+@@ -741,7 +742,7 @@ static int io_prep_rw(struct io_kiocb *req, const struct sqe_submit *s,
+ 	int fd, ret;
+ 
+ 	/* For -EAGAIN retry, everything is already prepped */
+-	if (kiocb->ki_filp)
++	if (req->flags & REQ_F_PREPPED)
+ 		return 0;
+ 
+ 	flags = READ_ONCE(sqe->flags);
+@@ -799,6 +800,7 @@ static int io_prep_rw(struct io_kiocb *req, const struct sqe_submit *s,
+ 		}
+ 		kiocb->ki_complete = io_complete_rw;
  	}
-@@ -951,15 +951,15 @@ static void io_async_list_note(int rw, struct io_kiocb *req, size_t len)
- 	async_list->io_end = io_end;
++	req->flags |= REQ_F_PREPPED;
+ 	return 0;
+ out_fput:
+ 	if (!(flags & IOSQE_FIXED_FILE)) {
+@@ -1099,8 +1101,8 @@ static int io_prep_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 	unsigned flags;
+ 	int fd;
+ 
+-	/* Prep already done */
+-	if (req->rw.ki_filp)
++	/* Prep already done (EAGAIN retry) */
++	if (req->flags & REQ_F_PREPPED)
+ 		return 0;
+ 
+ 	if (unlikely(ctx->flags & IORING_SETUP_IOPOLL))
+@@ -1122,6 +1124,7 @@ static int io_prep_fsync(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+ 			return -EBADF;
+ 	}
+ 
++	req->flags |= REQ_F_PREPPED;
+ 	return 0;
  }
  
--static ssize_t io_read(struct io_kiocb *req, const struct sqe_submit *s,
--		       bool force_nonblock, struct io_submit_state *state)
-+static int io_read(struct io_kiocb *req, const struct sqe_submit *s,
-+		   bool force_nonblock, struct io_submit_state *state)
- {
- 	struct iovec inline_vecs[UIO_FASTIOV], *iovec = inline_vecs;
- 	struct kiocb *kiocb = &req->rw;
- 	struct iov_iter iter;
- 	struct file *file;
- 	size_t iov_count;
--	ssize_t ret;
-+	int ret;
+@@ -1633,8 +1636,6 @@ static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
+ 	if (unlikely(!req))
+ 		return -EAGAIN;
  
- 	ret = io_prep_rw(req, s, force_nonblock, state);
- 	if (ret)
-@@ -1004,15 +1004,15 @@ static ssize_t io_read(struct io_kiocb *req, const struct sqe_submit *s,
- 	return ret;
- }
- 
--static ssize_t io_write(struct io_kiocb *req, const struct sqe_submit *s,
--			bool force_nonblock, struct io_submit_state *state)
-+static int io_write(struct io_kiocb *req, const struct sqe_submit *s,
-+		    bool force_nonblock, struct io_submit_state *state)
- {
- 	struct iovec inline_vecs[UIO_FASTIOV], *iovec = inline_vecs;
- 	struct kiocb *kiocb = &req->rw;
- 	struct iov_iter iter;
- 	struct file *file;
- 	size_t iov_count;
--	ssize_t ret;
-+	int ret;
- 
- 	ret = io_prep_rw(req, s, force_nonblock, state);
- 	if (ret)
-@@ -1396,8 +1396,7 @@ static int __io_submit_sqe(struct io_ring_ctx *ctx, struct io_kiocb *req,
- 			   const struct sqe_submit *s, bool force_nonblock,
- 			   struct io_submit_state *state)
- {
--	ssize_t ret;
--	int opcode;
-+	int ret, opcode;
- 
- 	if (unlikely(s->index >= ctx->sq_entries))
- 		return -EINVAL;
-@@ -1624,7 +1623,7 @@ static int io_submit_sqe(struct io_ring_ctx *ctx, struct sqe_submit *s,
- {
- 	bool did_submit = true;
- 	struct io_kiocb *req;
--	ssize_t ret;
-+	int ret;
- 
- 	/* enforce forwards compatibility on users */
- 	if (unlikely(s->sqe->flags & ~IOSQE_FIXED_FILE))
+-	req->rw.ki_filp = NULL;
+-
+ 	ret = __io_submit_sqe(ctx, req, s, true, state);
+ 	if (ret == -EAGAIN) {
+ 		struct io_uring_sqe *sqe_copy;
 -- 
 2.17.1
 
