@@ -2,127 +2,116 @@ Return-Path: <SRS0=8xnz=RR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E16A9C43381
-	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 16:09:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF0AFC43381
+	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 16:15:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B3EF02186A
-	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 16:09:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 860D62184C
+	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 16:15:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=ucsc.edu header.i=@ucsc.edu header.b="gEZWdUla"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727587AbfCNQJi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Mar 2019 12:09:38 -0400
-Received: from mga05.intel.com ([192.55.52.43]:58120 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727287AbfCNQJh (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Mar 2019 12:09:37 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Mar 2019 09:09:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.58,478,1544515200"; 
-   d="scan'208";a="134073433"
-Received: from gklab-107-059.igk.intel.com ([10.102.107.59])
-  by orsmga003.jf.intel.com with ESMTP; 14 Mar 2019 09:09:35 -0700
-From:   Igor Konopko <igor.j.konopko@intel.com>
-To:     mb@lightnvm.io, javier@javigon.com, hans.holmberg@cnexlabs.com
-Cc:     linux-block@vger.kernel.org, igor.j.konopko@intel.com
-Subject: [PATCH 18/18] lightnvm: track inflight target creations
-Date:   Thu, 14 Mar 2019 17:04:28 +0100
-Message-Id: <20190314160428.3559-19-igor.j.konopko@intel.com>
-X-Mailer: git-send-email 2.9.5
-In-Reply-To: <20190314160428.3559-1-igor.j.konopko@intel.com>
-References: <20190314160428.3559-1-igor.j.konopko@intel.com>
+        id S1726612AbfCNQP2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Mar 2019 12:15:28 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:56104 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726735AbfCNQP2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Mar 2019 12:15:28 -0400
+Received: by mail-wm1-f66.google.com with SMTP id 4so3612258wmf.5
+        for <linux-block@vger.kernel.org>; Thu, 14 Mar 2019 09:15:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ucsc.edu; s=ucsc-google-2018;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=1ISUeNh72ONMqMRqy4Bb2sjGisIJL4lyuhKFUZ5ugZI=;
+        b=gEZWdUlaRhIQHvvre3jWTj7jLamG1e2WK+qDYKpeB80Nw782C9NFv140uxGytbtH1g
+         rljzSNPycaZbcc3NoQ58YrJzehccrSzBXhl9msC/VDItxI/bpRO06F3jnP9r1Gb+6uCJ
+         BuVnXqks5ld9PGvPVBA3+XpXt1WQ9aCWJE06V54ShSu2VWvPZPKmZ2VkBmF5IvhZ/Omf
+         coUdx09AMJDVNNoSnsVYaabY76Ut94Vsk2N/JBC/TP90iKuP4aqyJGE2r3Ptc1Z3qAxv
+         +RMBBkVZ9LD9Y99jR6y1vdXnvuOuN/UQbmi2Y9ihKPDgLoJ9T0ngh7jKqq8Tf2TQSQwf
+         rt0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=1ISUeNh72ONMqMRqy4Bb2sjGisIJL4lyuhKFUZ5ugZI=;
+        b=fqhnKD3hc+djh/QGm/0Q+tE/guDm0sHPEtXKhGpOqf15cpVysTljkL9SJCam0kb8dS
+         LWKul4Ynyq4vrX3sHztS+vYOaiwYph9DvWeHJaRZaxy34FiY9hgeXxEllx9oKJB9fU9C
+         lWs2UZdNPjPjjNE4xZhVWY/poejR3limDyUHmBIW7Gcpewk7iyrhoNR+o6lh/ia1XcAC
+         RiN8kOTC7nvlXT6OgZS+Hbl1ufwSOLcQkbGDBN1PvrJLUtWok5Qyqu/VldzT2BA9sEDw
+         lckJsFd+3XiElu/fxJTV12DKg5KO/SYzxoXmZ/FZXJwbiBx9FIKNQpHHyzSBZlNwr89l
+         tdPw==
+X-Gm-Message-State: APjAAAWg61NXZLp0XjTh22U0bsqDS9lVkTu6TvKrWbhGI0wvoaq3xnUx
+        W86HkDqZLs4Vgfe5xyAiU7mzG73fyzK/C6Byt9D++Q==
+X-Google-Smtp-Source: APXvYqzaOl2K6oXkx6toYWYMf0lCcoqlLG7BFaiWf/v0QTPXPGnDoa/ClydXU4TrADlJxVOcWFt4WK88x8LXxAwNFz4=
+X-Received: by 2002:a1c:cc0c:: with SMTP id h12mr3387280wmb.140.1552580126550;
+ Thu, 14 Mar 2019 09:15:26 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190314111637.20236-1-hans@owltronix.com> <103c19f4-02a2-f54c-13f8-30bc5447426e@intel.com>
+ <FE25456B-A63E-4601-960D-96F519250B8C@javigon.com>
+In-Reply-To: <FE25456B-A63E-4601-960D-96F519250B8C@javigon.com>
+From:   Heiner Litz <hlitz@ucsc.edu>
+Date:   Thu, 14 Mar 2019 09:14:58 -0700
+Message-ID: <CAJbgVnU2RXK4ci79n0szwTpZ+UB2zx977PHo1ie7h5y5kJrbhQ@mail.gmail.com>
+Subject: Re: [PATCH RFC] lightnvm: pblk: fix crash in pblk_end_partial_read
+ due to multipage bvecs
+To:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
+Cc:     "Konopko, Igor J" <igor.j.konopko@intel.com>,
+        Hans Holmberg <hans@owltronix.com>,
+        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
+        Klaus Birkelund Jensen <klaus.jensen@cnexlabs.com>,
+        linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds a counter, which is responsible for tracking inflight
-target creations.
+On Thu, Mar 14, 2019 at 7:16 AM Javier Gonz=C3=A1lez <javier@javigon.com> w=
+rote:
+>
+> > On 14 Mar 2019, at 06.49, Igor Konopko <igor.j.konopko@intel.com> wrote=
+:
+> >
+> > While reading this patch, idea came to my mind - maybe it would be simp=
+ly better to get rid of partial read handling from pblk in current form at =
+all and use bio_split() & bio_chain() combination instead?
+> >
+> > This would definitely reduce a number of this 'kind of complicated' cod=
+e inside pblk and let block layer help us with that. Even that the performa=
+nce of such a requests could be a little worse (few smaller IOs instead of =
+single vector IO), I believe that partial read is more a corner case, then =
+a typical use case, so maybe this would be a path to go.
+> >
+> > Let me know what you think about such an approach - I can make a patch =
+with that if you want.
 
-When creation process is still in progress, target is not yet on
-targets list. This causes a chance for removing whole lightnvm
-subsystem by calling nvm_unregister() in the meantime and finally by
-causing kernel panic inside target init function.
+I like this idea as it will clean up a lot of code and get rid of the
+read_bitmap.
+Note that a single request can be turned into up to 32 requests if
+cached and non-cached sectors alternate, each one probably requiring
+an l2p lookup. I still think it's worth doing though.
+When you split, note that you have to release all line_refs which were
+acquired during l2p lookup.
 
-With this patch we are able to track such a scenarios and wait with
-completing nvm_unregister() and freeing memory until target creation
-will be completed.
-
-Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
----
- drivers/lightnvm/core.c  | 19 ++++++++++++++++++-
- include/linux/lightnvm.h |  2 ++
- 2 files changed, 20 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 838c3d8..490ec6e 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -1083,6 +1083,7 @@ static int nvm_core_init(struct nvm_dev *dev)
- 	INIT_LIST_HEAD(&dev->targets);
- 	mutex_init(&dev->mlock);
- 	spin_lock_init(&dev->lock);
-+	dev->create_inflight = 0;
- 
- 	ret = nvm_register_map(dev);
- 	if (ret)
-@@ -1180,6 +1181,11 @@ void nvm_unregister(struct nvm_dev *dev)
- 	struct nvm_target *t, *tmp;
- 
- 	mutex_lock(&dev->mlock);
-+	while (dev->create_inflight > 0) {
-+		mutex_unlock(&dev->mlock);
-+		io_schedule();
-+		mutex_lock(&dev->mlock);
-+	}
- 	list_for_each_entry_safe(t, tmp, &dev->targets, list) {
- 		if (t->dev->parent != dev)
- 			continue;
-@@ -1213,6 +1219,7 @@ static void nvm_normalize_path(char *path)
- static int __nvm_configure_create(struct nvm_ioctl_create *create)
- {
- 	struct nvm_dev *dev;
-+	int ret;
- 
- 	down_write(&nvm_lock);
- 	dev = nvm_find_nvm_dev(create->dev);
-@@ -1223,7 +1230,17 @@ static int __nvm_configure_create(struct nvm_ioctl_create *create)
- 		return -EINVAL;
- 	}
- 
--	return nvm_create_tgt(dev, create);
-+	mutex_lock(&dev->mlock);
-+	dev->create_inflight++;
-+	mutex_unlock(&dev->mlock);
-+
-+	ret = nvm_create_tgt(dev, create);
-+
-+	mutex_lock(&dev->mlock);
-+	dev->create_inflight--;
-+	mutex_unlock(&dev->mlock);
-+
-+	return ret;
- }
- 
- static long nvm_ioctl_info(struct file *file, void __user *arg)
-diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-index d3b0270..e462d1d 100644
---- a/include/linux/lightnvm.h
-+++ b/include/linux/lightnvm.h
-@@ -428,6 +428,8 @@ struct nvm_dev {
- 	char name[DISK_NAME_LEN];
- 	void *private_data;
- 
-+	int create_inflight;
-+
- 	void *rmap;
- 
- 	struct mutex mlock;
--- 
-2.9.5
-
+>
+> I agree with Igor.
+>
+> As I mentioned offline, we should fix this in a way that survives
+> further changes in struct bio; either making pblk handling visible to
+> the outside or rethinking the whole thing.
+>
+> Igor: If you can send a patch you mention, it would be great. I have
+> been trying the helper approach for some time, but it is too specific,
+> as fixing holes in the bvec breaks the bio advance-only semantics. Your
+> approach seems much better.
+>
+> Thanks,
+> Javier
