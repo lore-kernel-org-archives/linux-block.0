@@ -1,201 +1,222 @@
-Return-Path: <SRS0=zSf2=RQ=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=8xnz=RR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F977C43381
-	for <linux-block@archiver.kernel.org>; Wed, 13 Mar 2019 23:09:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C5D0C43381
+	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 02:21:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3682621019
-	for <linux-block@archiver.kernel.org>; Wed, 13 Mar 2019 23:09:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D41722087C
+	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 02:21:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="KSIOjLHj"
+	dkim=pass (1024-bit key) header.d=Synaptics.onmicrosoft.com header.i=@Synaptics.onmicrosoft.com header.b="OxfwdXWV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726263AbfCMXJh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Mar 2019 19:09:37 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:55716 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725876AbfCMXJh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Mar 2019 19:09:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:References:Cc:To:From:Subject:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=cRnRCzbuawIgAh21G+evH1q2P2gaMH7A3zUXEBHFv08=; b=KSIOjLHjJy82JByVXGHLLFEHvB
-        dTMhur+5lEPpZcc3V/ZGZg+5LHCog1fSPv3OdK9T/GIG3oC3VqP4AB88TtzQscpXgcvh1CEUs73of
-        dypo46x1pQ3MspA1i8GR5fcR0x2LTCUejDURd1k0resn/ArP8gQAn9p48lYe2yYyiVrwKfSfM4EWa
-        xU9DN4/kMXGchVQ1t0UGvo1K77KfKT6kLixHXll6vnTwNaq+6hIKTCDdGqNqeJWxY6Zwz7A0qYHvs
-        noABiXsQyZBAQuMytc4c4f75NOIF3OBiaXkhxRy0/KlHRAQpzg47otQ5KpRhgOvDRydt5tlsku9nV
-        /yWfXtdQ==;
-Received: from static-50-53-52-16.bvtn.or.frontiernet.net ([50.53.52.16] helo=dragon.dunlab)
-        by merlin.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1h4D07-0000t9-DS; Wed, 13 Mar 2019 23:09:32 +0000
-Subject: Re: paride/pf.c: blk-mq use-after-free (kernel v5.0)
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-block <linux-block@vger.kernel.org>, axboe <axboe@kernel.dk>
-Cc:     LKML <linux-kernel@vger.kernel.org>, Tim Waugh <tim@cyberelk.net>,
-        linux-parport@lists.infradead.org
-References: <30c63b2d-92d2-51be-40f0-62cada110388@infradead.org>
- <7d24a06f-f219-e50a-e8f8-915a6cc1b796@infradead.org>
-Message-ID: <e2a66da2-5433-5b42-1ebe-9f1c135b5471@infradead.org>
-Date:   Wed, 13 Mar 2019 16:09:24 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
-MIME-Version: 1.0
-In-Reply-To: <7d24a06f-f219-e50a-e8f8-915a6cc1b796@infradead.org>
-Content-Type: text/plain; charset=utf-8
+        id S1726564AbfCNCVb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Mar 2019 22:21:31 -0400
+Received: from mail-eopbgr740079.outbound.protection.outlook.com ([40.107.74.79]:26656
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726141AbfCNCVa (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 13 Mar 2019 22:21:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=Synaptics.onmicrosoft.com; s=selector1-synaptics-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KGrg7NhEC6JLOO93kjPxZxEULa7OFn3VUAmQ/F0U3Yk=;
+ b=OxfwdXWVqu/bmYDvVywcpx30mW0fDcKKMMrzNdM3tvtseqKLSXJHx5PekzYsZuhgUdgDHUIA6IhL8P7MktQjZ3Nt/QDvqEroPW5+uGeTctkvdbd/OmN15DbZcxrnJsds+vOJdQUyn04swFEL5LAULl9m5T+6J2DGsZvK30yBPKg=
+Received: from BYAPR03MB4773.namprd03.prod.outlook.com (20.179.92.152) by
+ BYAPR03MB3719.namprd03.prod.outlook.com (52.135.214.17) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1686.21; Thu, 14 Mar 2019 02:21:25 +0000
+Received: from BYAPR03MB4773.namprd03.prod.outlook.com
+ ([fe80::1a8:1bc4:174b:472b]) by BYAPR03MB4773.namprd03.prod.outlook.com
+ ([fe80::1a8:1bc4:174b:472b%2]) with mapi id 15.20.1709.011; Thu, 14 Mar 2019
+ 02:21:25 +0000
+From:   Jisheng Zhang <Jisheng.Zhang@synaptics.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+CC:     "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: kernel 5.0 blk_clear_pm_only triggers a warning during resume
+Thread-Topic: kernel 5.0 blk_clear_pm_only triggers a warning during resume
+Thread-Index: AQHU2JVqw++m7acTO0eeaCYwVxL0GaYIFuSAgAFEM4CAAQrkgA==
+Date:   Thu, 14 Mar 2019 02:21:25 +0000
+Message-ID: <20190314101355.1df7c014@xhacker.debian>
+References: <20190312132826.12c5f166@xhacker.debian>
+        <1552402699.45180.106.camel@acm.org>    <20190313101841.6d9e952b@xhacker.debian>
+In-Reply-To: <20190313101841.6d9e952b@xhacker.debian>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [199.33.119.15]
+x-clientproxiedby: TYCPR01CA0071.jpnprd01.prod.outlook.com
+ (2603:1096:405:2::35) To BYAPR03MB4773.namprd03.prod.outlook.com
+ (2603:10b6:a03:134::24)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Jisheng.Zhang@synaptics.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: b0d8a835-f027-4280-e288-08d6a823c1ae
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(2017052603328)(7153060)(7193020);SRVR:BYAPR03MB3719;
+x-ms-traffictypediagnostic: BYAPR03MB3719:
+x-microsoft-exchange-diagnostics: =?us-ascii?Q?1;BYAPR03MB3719;23:B80uAHXkAE2lzIB9hRyw/XGr90SORxXXkXR/JyxTH?=
+ =?us-ascii?Q?QgoRwEZumecnHx4Ub7f6Mi0yeU0+0/JGEKEwofN4/h/p74yNzjm5FxE8IxjZ?=
+ =?us-ascii?Q?VsYTiAdgwP644IuqgsUvuXTXAzhgJjJctlvoAYgPwdW4OF/glzz9iEYoNhjC?=
+ =?us-ascii?Q?UWG6v+yuOmUbRORrbC87xFjpdW4u1MxvbIv1pLtGl/o/UNqUN0m7IeIGMijS?=
+ =?us-ascii?Q?y8Qq1wU10s2GbLamAz+T43CwgZtxs+hRDsrKFjmPeQ1QrJ6uomkqrHTmZK6q?=
+ =?us-ascii?Q?u5Y1NCVn7alcrsXVtbu+OmIVmUNRHdzFKVIrMOUhRLmZKqc2lp3gLhlk25aA?=
+ =?us-ascii?Q?EcxHXkWeLDGqe34FDZzcagTKc02FqsjtqLHCVflCJRytbuMGR4hrUXptzbNF?=
+ =?us-ascii?Q?CwlJUTu2AOIDmboKsK5ETTQYbgsis2Up0GuB1UoWT5bCTJYIWecOgr/Cx6lC?=
+ =?us-ascii?Q?IcUTQAvZi5/jrV7nOdX/rSXEguf8JacgsSFoCsxOCUXLpiVsBPKDqr+6+oYt?=
+ =?us-ascii?Q?gomkZ+TFflulG5tT4Vw04ExbVvu8ETZeUKoShPHHDsFNedQc+uvEQ7Kbk3Sr?=
+ =?us-ascii?Q?YzrsAXIesZFrP2Ml3OhVa4BxKEa41e+Q6q02OgocuT8UByhkt0XojS1KDyTd?=
+ =?us-ascii?Q?/CFL0D9ftBW5pUb3LfP7PAWKCluaMHJZ1dnr1sLGEgaZQmcNsAlfPLwsqdX2?=
+ =?us-ascii?Q?FEJ7ro3C3n1WywuO+RAwlWiviefB1HQIyEyeZ+yzScHGGGbevcKgScYO4ocW?=
+ =?us-ascii?Q?YgFjXnDhEgwEZRIZnPKZ3wD5kko0/cF2HMbQS2Rmkg5UGzz1KFt15TLnuC+G?=
+ =?us-ascii?Q?C6eF9C5TVvBdiiMdr9dsTEegIJua4ZxBMhTawuA2eujwpkTHWhXocF5yQkZ0?=
+ =?us-ascii?Q?Bn4fMMMlM1+JkN26Sn1cK9t16sU288FZCX4i7DZSQySc5yS3YmJZlJXzG8WJ?=
+ =?us-ascii?Q?wnHukartDC4C1KC9rDQ+qFdwU2Ek6oQdGbnePf+XaIg1yI/1JTQOtF10Ibbd?=
+ =?us-ascii?Q?KJhA/eiSXs6fh1+Nw9ZPxLT3RcSaqyzEiKopJ/721304OgxNqMEHxw7BbWwF?=
+ =?us-ascii?Q?9FwNYRVzS/VOzhI80KaFsivcVTKtnYRQv/11RinUgS3qvJTTU30kE+KcYk/z?=
+ =?us-ascii?Q?sKwDShkZ5qMhFXXRD1UY66GCb2sGlgfG+jVUSh5+8i0ti1nT9o094nRR9Kue?=
+ =?us-ascii?Q?UPADGGRuV72X1L1N/7/wA8Tr7tavwVyREcYNvWnscH+TthMHFpXtlzoPynA6?=
+ =?us-ascii?Q?yXHHk0Y+TDQ3ilEQiSL7x/mjcIOzcfcQqys1+w3PQrfsigcWsIWD0gscdE7e?=
+ =?us-ascii?Q?xWtmUOpD1P2k7PbdKfS96AZxi0mV+pb+NRGQpNp2KpqbnlA0aFmkADU9Wfu1?=
+ =?us-ascii?Q?6DAzw=3D=3D?=
+x-microsoft-antispam-prvs: <BYAPR03MB3719FBE771B104228F9BAF5CED4B0@BYAPR03MB3719.namprd03.prod.outlook.com>
+x-forefront-prvs: 09760A0505
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(376002)(136003)(346002)(366004)(39860400002)(396003)(189003)(199004)(51234002)(51914003)(6506007)(386003)(86362001)(97736004)(7736002)(72206003)(102836004)(478600001)(26005)(446003)(11346002)(81166006)(81156014)(5660300002)(5024004)(14444005)(256004)(1076003)(8676002)(71190400001)(71200400001)(476003)(6246003)(6436002)(229853002)(3846002)(8936002)(6116002)(6486002)(68736007)(6512007)(66066001)(53936002)(316002)(305945005)(54906003)(186003)(9686003)(2906002)(486006)(76176011)(4326008)(14454004)(25786009)(6916009)(50226002)(99286004)(106356001)(105586002)(52116002)(39210200001);DIR:OUT;SFP:1101;SCL:1;SRVR:BYAPR03MB3719;H:BYAPR03MB4773.namprd03.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:0;
+received-spf: None (protection.outlook.com: synaptics.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: bBU9r93BTwMWi0GTAoszgrftRykITZHPP2Jl3qxFpJMgehM1u/1cJXP7emfSsp8c0CgC9fPrZ684BbINhN6xGW0CxvJ/JD8OfMZWShjScVHEj9kw5PZkNbnDuPjJD299hhhSAOCH37fbB99GV45YJxHI/iVhdJd1tRriaSAikjC7uG0HFoaOmt27KBky+bToQ+NeJcWS7l55bzmBm/ZlhEuZoJkiD2zxNXGFjpPrsGkJ00Ux+NVN3FV7keTP3ou7HnrfR0S3MixsYuwkUvyvI6r9OQh7KS2FlDj4Udeuxb7g93+5DYr0qgoDEIOoRDqhDC+wrv/3I1BmlMGQ45NEVnCxXTdK7jR2k/rUIIMt0W7qpYuwJNFgbyTO8oCWX1eRB8ffCKS/XdqNMJ8Cd76ybGtpT066pZSEi+7rVf0YI1s=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <EB4972A7A56C5645BE7A4A1CE432D2A4@namprd03.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: synaptics.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b0d8a835-f027-4280-e288-08d6a823c1ae
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Mar 2019 02:21:25.1273
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 335d1fbc-2124-4173-9863-17e7051a2a0e
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR03MB3719
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/11/19 6:34 PM, Randy Dunlap wrote:
-> On 3/11/19 6:25 PM, Randy Dunlap wrote:
->> [Has this already been addressed/fixed?]>>
-> 
-> Same bug occurs with paride/pcd.c driver.
+On Wed, 13 Mar 2019 10:18:41 +0800 Jisheng Zhang wrote:
 
-This still happens (in blk-mq) in v5.0-11053-gebc551f2b8f9 of Mar. 12, 2019,
-around 4pm PT.  [caused by paride: pf.c and pcd.c)
+> On Tue, 12 Mar 2019 07:58:19 -0700 Bart Van Assche wrote:
+>=20
+> > CAUTION: Email originated externally, do not click links or open attach=
+ments unless you recognize the sender and know the content is safe.
+> >=20
+> >=20
+> > On Tue, 2019-03-12 at 05:35 +0000, Jisheng Zhang wrote: =20
+> > > I got below warning during resume:
+> > >
+> > > [  673.658888] sd 0:0:0:0: [sda] Starting disk
+> > > [  673.658899] WARNING: CPU: 3 PID: 1039 at blk_clear_pm_only+0x2a/0x=
+30
+> > > [  673.658902] CPU: 3 PID: 1039 Comm: kworker/u8:49 Not tainted 5.0.0=
++ #1
+> > > [  673.658902] sd 2:0:0:0: [sdb] Starting disk
+> > > [  673.658903] Hardware name: LENOVO 4180F42/4180F42, BIOS 83ET75WW (=
+1.45 ) 05/10/2013
+> > > [  673.658906] Workqueue: events_unbound async_run_entry_fn
+> > > [  673.658909] RIP: 0010:blk_clear_pm_only+0x2a/0x30
+> > > [  673.658911] Code: b8 ff ff ff ff f0 0f c1 87 80 00 00 00 83 e8 01 =
+78 18 74 01 c3 48 81 c7 58 05 00 00 31 c9 31 d2 be 03 00 00 00 e9 36 97 e2 =
+ff <0f> 0b c3 0f 1f 00 48 81 c7 90 00 00 00 e9 04 01
+> > > 3a 00 0f 1f 40 00
+> > > [  673.658911] RSP: 0000:ffff8881115a7e48 EFLAGS: 00010297
+> > > [  673.658913] RAX: 00000000ffffffff RBX: ffff888118d42800 RCX: ffff8=
+881194c9a00
+> > > [  673.658914] RDX: ffff888118ab1a00 RSI: 0000000000000000 RDI: ffff8=
+88117e70000
+> > > [  673.658915] RBP: ffff888118d42f90 R08: 0000000000000004 R09: 00000=
+0000001f900
+> > > [  673.658915] R10: 0000000045698a8e R11: 0000000000000010 R12: ffff8=
+88119421000
+> > > [  673.658916] R13: 0000000000000000 R14: ffff88800030ea80 R15: 0ffff=
+88811942100
+> > > [  673.658918] FS:  0000000000000000(0000) GS:ffff88811a180000(0000) =
+knlGS:0000000000000000
+> > > [  673.658918] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > [  673.658919] CR2: 0000000000000000 CR3: 000000000200c001 CR4: 00000=
+000000606e0
+> > > [  673.658920] Call Trace:
+> > > [  673.658924]  ? scsi_device_resume+0x28/0x50
+> > > [  673.658926]  ? scsi_dev_type_resume+0x2b/0x80
+> > > [  673.658927]  ? async_run_entry_fn+0x2c/0xd0
+> > > [  673.658930]  ? process_one_work+0x1f0/0x3f0
+> > > [  673.658932]  ? worker_thread+0x28/0x3c0
+> > > [  673.658933]  ? process_one_work+0x3f0/0x3f0
+> > > [  673.658935]  ? kthread+0x10c/0x130
+> > > [  673.658936]  ? __kthread_create_on_node+0x150/0x150
+> > > [  673.658938]  ? ret_from_fork+0x1f/0x30
+> > > [  673.658940] ---[ end trace ce18772de33e283e ]---   =20
+> >=20
+> > Hi Jisheng, =20
+>=20
+> Hi Bart,
+>=20
+> >=20
+> > Is this something that occurred once or is this something that you can =
+reproduce =20
+>=20
+> It's 100% reproduced on my home's laptop PC.
+>=20
+> > easily? In the latter case, can you verify whether the patch below is s=
+ufficient
+> > to make this warning disappear? =20
+>=20
+> Thanks for the patch. I will test it this night.
 
+Good news. The patch fix the warning. So=20
 
-> 
->>
->> [ 1688.055696] calling  pf_init+0x0/0x1000 [pf] @ 8572
->> [ 1688.058871] pf: pf version 1.04, major 47, cluster 64, nice 0
->> [ 1688.064381] pf: No ATAPI disk detected
->> [ 1688.064783] initcall pf_init+0x0/0x1000 [pf] returned -19 after 8827 usecs
->> [ 1688.322562] calling  pf_init+0x0/0x1000 [pf] @ 8582
->> [ 1688.323566] ==================================================================
->> [ 1688.323621] BUG: KASAN: use-after-free in __cpuhp_state_add_instance_cpuslocked+0x33f/0x430
->> [ 1688.323669] Write of size 8 at addr ffff888117051810 by task modprobe/8582
->>
->> [ 1688.323729] CPU: 3 PID: 8582 Comm: modprobe Not tainted 5.0.0mod #2
->> [ 1688.323767] Hardware name: TOSHIBA PORTEGE R835/Portable PC, BIOS Version 4.10   01/08/2013
->> [ 1688.323812] Call Trace:
->> [ 1688.323840]  dump_stack+0x7b/0xb5
->> [ 1688.323874]  print_address_description+0x6e/0x360
->> [ 1688.323916]  kasan_report+0x11a/0x198
->> [ 1688.323948]  ? __cpuhp_state_add_instance_cpuslocked+0x33f/0x430
->> [ 1688.323993]  ? __cpuhp_state_add_instance_cpuslocked+0x33f/0x430
->> [ 1688.324035]  __asan_report_store8_noabort+0x17/0x20
->> [ 1688.324070]  __cpuhp_state_add_instance_cpuslocked+0x33f/0x430
->> [ 1688.324108]  ? blk_mq_realloc_hw_ctxs+0x409/0xfb0
->> [ 1688.324142]  ? __might_sleep+0xa1/0x1b0
->> [ 1688.324178]  ? lockdep_init_map+0x115/0x5e0
->> [ 1688.324215]  __cpuhp_state_add_instance+0x78/0xf0
->> [ 1688.324249]  blk_mq_realloc_hw_ctxs+0x409/0xfb0
->> [ 1688.324279]  ? kasan_unpoison_shadow+0x35/0x50
->> [ 1688.324311]  ? __kasan_kmalloc.constprop.8+0xa7/0xd0
->> [ 1688.324362]  blk_mq_init_allocated_queue+0x404/0x1a00
->> [ 1688.324395]  ? blk_throtl_init+0x431/0x620
->> [ 1688.324430]  ? blkcg_init_queue+0x102/0x190
->> [ 1688.324475]  blk_mq_init_queue+0x56/0x80
->> [ 1688.324507]  blk_mq_init_sq_queue+0x144/0x1a0
->> [ 1688.324547]  pf_init+0x9f/0x1000 [pf]
->> [ 1688.324575]  ? 0xffffffffc0a48000
->> [ 1688.324605]  ? ktime_get+0xba/0x160
->> [ 1688.324634]  ? 0xffffffffc0a48000
->> [ 1688.324662]  do_one_initcall+0xab/0x2ad
->> [ 1688.324692]  ? initcall_blacklisted+0x190/0x190
->> [ 1688.324723]  ? kasan_unpoison_shadow+0x35/0x50
->> [ 1688.324759]  ? kasan_unpoison_shadow+0x35/0x50
->> [ 1688.324788]  ? kasan_unpoison_shadow+0x35/0x50
->> [ 1688.324819]  ? kasan_poison_shadow+0x2f/0x40
->> [ 1688.324849]  ? __asan_register_globals+0x5a/0x70
->> [ 1688.324888]  do_init_module+0x1c7/0x548
->> [ 1688.324926]  load_module+0x445d/0x5de0
->> [ 1688.324999]  ? layout_and_allocate+0x2d00/0x2d00
->> [ 1688.325035]  ? kernel_read+0x90/0x130
->> [ 1688.325074]  ? kasan_check_write+0x14/0x20
->> [ 1688.325105]  ? kernel_read_file+0x24a/0x640
->> [ 1688.325179]  __do_sys_finit_module+0x193/0x1b0
->> [ 1688.325209]  ? __do_sys_finit_module+0x193/0x1b0
->> [ 1688.325242]  ? __ia32_sys_init_module+0xa0/0xa0
->> [ 1688.325275]  ? vfs_statx_fd+0x45/0x80
->> [ 1688.325306]  ? kasan_check_write+0x14/0x20
->> [ 1688.325335]  ? fput+0x18/0x130
->> [ 1688.325363]  ? ksys_mmap_pgoff+0x3d9/0xb50
->> [ 1688.325416]  __x64_sys_finit_module+0x6e/0xb0
->> [ 1688.325442]  ? __x64_sys_newfstat+0x4f/0x70
->> [ 1688.325469]  do_syscall_64+0xaa/0x310
->> [ 1688.325501]  ? prepare_exit_to_usermode+0x8b/0x150
->> [ 1688.325536]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
->> [ 1688.325567] RIP: 0033:0x7f17f52bd129
->> [ 1688.325595] Code: 00 f3 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 3f 0d 2c 00 f7 d8 64 89 01 48
->> [ 1688.325679] RSP: 002b:00007fff2e723e38 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
->> [ 1688.325718] RAX: ffffffffffffffda RBX: 00005565f67c0b10 RCX: 00007f17f52bd129
->> [ 1688.325740] RDX: 0000000000000000 RSI: 00005565f65ae548 RDI: 0000000000000003
->> [ 1688.325762] RBP: 00005565f65ae548 R08: 0000000000000000 R09: 00005565f67c0400
->> [ 1688.325783] R10: 0000000000000003 R11: 0000000000000246 R12: 0000000000040000
->> [ 1688.325805] R13: 00005565f67c0c40 R14: 0000000000000000 R15: 00005565f67c0b10
->>
->> [ 1688.325848] Allocated by task 8572:
->> [ 1688.325864]  save_stack+0x43/0xd0
->> [ 1688.325879]  __kasan_kmalloc.constprop.8+0xa7/0xd0
->> [ 1688.325896]  kasan_kmalloc+0x9/0x10
->> [ 1688.325912]  blk_mq_realloc_hw_ctxs+0x18b/0xfb0
->> [ 1688.325929]  blk_mq_init_allocated_queue+0x404/0x1a00
->> [ 1688.325948]  blk_mq_init_queue+0x56/0x80
->> [ 1688.325964]  blk_mq_init_sq_queue+0x144/0x1a0
->> [ 1688.325983]  pf_init+0x9f/0x1000 [pf]
->> [ 1688.325998]  do_one_initcall+0xab/0x2ad
->> [ 1688.326013]  do_init_module+0x1c7/0x548
->> [ 1688.326028]  load_module+0x445d/0x5de0
->> [ 1688.326043]  __do_sys_finit_module+0x193/0x1b0
->> [ 1688.326059]  __x64_sys_finit_module+0x6e/0xb0
->> [ 1688.326075]  do_syscall_64+0xaa/0x310
->> [ 1688.326097]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
->>
->> [ 1688.326142] Freed by task 2217:
->> [ 1688.326160]  save_stack+0x43/0xd0
->> [ 1688.326174]  __kasan_slab_free+0x137/0x190
->> [ 1688.326191]  kasan_slab_free+0xe/0x10
->> [ 1688.326206]  kfree+0xb0/0x1b0
->> [ 1688.326220]  blk_mq_hw_sysfs_release+0x6f/0x90
->> [ 1688.326237]  kobject_put+0x153/0x420
->> [ 1688.326252]  blk_mq_release+0xbc/0x160
->> [ 1688.326267]  __blk_release_queue+0x178/0x320
->> [ 1688.326284]  process_one_work+0x9fb/0x1710
->> [ 1688.326299]  worker_thread+0x85/0xee0
->> [ 1688.326315]  kthread+0x349/0x410
->> [ 1688.326329]  ret_from_fork+0x35/0x40
->>
->> [ 1688.326353] The buggy address belongs to the object at ffff888117051588
->>                 which belongs to the cache kmalloc-1k of size 1024
->> [ 1688.326388] The buggy address is located 648 bytes inside of
->>                 1024-byte region [ffff888117051588, ffff888117051988)
->> [ 1688.326421] The buggy address belongs to the page:
->> [ 1688.326439] page:ffffea00045c1400 count:1 mapcount:0 mapping:ffff888107c16940 index:0x0 compound_mapcount: 0
->> [ 1688.326469] flags: 0x17ffffc0010200(slab|head)
->> [ 1688.326488] raw: 0017ffffc0010200 ffffea0004502408 ffffea00042c6408 ffff888107c16940
->> [ 1688.326512] raw: 0000000000000000 0000000000170017 00000001ffffffff 0000000000000000
->> [ 1688.326535] page dumped because: kasan: bad access detected
->>
->> [ 1688.326562] Memory state around the buggy address:
->> [ 1688.326579]  ffff888117051700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->> [ 1688.326602]  ffff888117051780: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->> [ 1688.326624] >ffff888117051800: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->> [ 1688.326646]                          ^
->> [ 1688.326660]  ffff888117051880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->> [ 1688.326684]  ffff888117051900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->> [ 1688.326705] ==================================================================
->> [ 1688.326726] Disabling lock debugging due to kernel taint
->> [ 1688.328731] pf: pf version 1.04, major 47, cluster 64, nice 0
->> [ 1688.336493] pf: No ATAPI disk detected
->> [ 1688.336730] initcall pf_init+0x0/0x1000 [pf] returned -19 after 13791 usecs
->>
-> 
-> 
+Tested-by: Jisheng Zhang <Jisheng.Zhang@synaptics.com>
 
+Thanks
 
--- 
-~Randy
+>=20
+> >=20
+> > Thanks,
+> >=20
+> > Bart.
+> >=20
+> > ---
+> >  drivers/scsi/scsi_lib.c | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> > index f3f24dfd8fd5..33e1a72d47fa 100644
+> > --- a/drivers/scsi/scsi_lib.c
+> > +++ b/drivers/scsi/scsi_lib.c
+> > @@ -2540,8 +2540,10 @@ void scsi_device_resume(struct scsi_device *sdev=
+)
+> >          * device deleted during suspend)
+> >          */
+> >         mutex_lock(&sdev->state_mutex);
+> > -       sdev->quiesced_by =3D NULL;
+> > -       blk_clear_pm_only(sdev->request_queue);
+> > +       if (sdev->quiesced_by) {
+> > +               sdev->quiesced_by =3D NULL;
+> > +               blk_clear_pm_only(sdev->request_queue);
+> > +       }
+> >         if (sdev->sdev_state =3D=3D SDEV_QUIESCE)
+> >                 scsi_device_set_state(sdev, SDEV_RUNNING);
+> >         mutex_unlock(&sdev->state_mutex);
+> >  =20
+>=20
+
