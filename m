@@ -2,116 +2,81 @@ Return-Path: <SRS0=8xnz=RR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2F72C43381
-	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 21:53:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 783A4C43381
+	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 23:09:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C98AB2087C
-	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 21:53:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 457AE218A1
+	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 23:09:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727953AbfCNVxM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Mar 2019 17:53:12 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:33264 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727366AbfCNVxL (ORCPT
+        id S1728046AbfCNXJT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Mar 2019 19:09:19 -0400
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:45113 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1727489AbfCNXJT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Mar 2019 17:53:11 -0400
-Received: by mail-pf1-f193.google.com with SMTP id i19so4775425pfd.0;
-        Thu, 14 Mar 2019 14:53:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GdRQCn2XUyGAWChQh7sSps/lIJmu7pR7G4MRDmxsX10=;
-        b=cuveYsKtqZMJuSCgJxT66vRei1bYlr9UAMWFaIH1F1QT4W+HJfb9k0K3bV6S6usk12
-         Gdz+wdQ5PGRS8VFSHQRWS0orNttlH9/1b9FeFbWbXtTA6a5StQOdtNQrFUUIHLdBVLOJ
-         0SbJPn51lBGj5SfW7wN9FXYyG1Mg1OwcllC6NTxF48IjnAVDgR5StPOWiv11fCcxwE5/
-         mj10scq3NKoeMiqNvTdkXPkusynXGeVD3Q+a1KMkEo4V4uB+1wvoUDmrAFXhIqGgrMhD
-         w5n0+iWAsCEsvCDDQzqwQGECTVrvCP4bZSJcwront2fULqfQmrT1EpYtK8JyyBET30PZ
-         enaQ==
-X-Gm-Message-State: APjAAAVdiRKudywJ9nY/HKsJ+4px2q5adaahXfM6bJRoJYWOr2zSsplz
-        mBIz71WQRHNHjPsKCOIow7w=
-X-Google-Smtp-Source: APXvYqzxUcSMnseOwzuci/pN9HGIBTJB77HkTWKR7VU7usncWoyvgeH/uB1HVF5q1Mg023CcUueKlQ==
-X-Received: by 2002:a65:41ca:: with SMTP id b10mr134880pgq.146.1552600390713;
-        Thu, 14 Mar 2019 14:53:10 -0700 (PDT)
-Received: from [10.80.2.71] ([209.37.102.131])
-        by smtp.gmail.com with ESMTPSA id o1sm203141pgp.76.2019.03.14.14.53.09
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 14 Mar 2019 14:53:09 -0700 (PDT)
-Subject: Re: [RFC/PATCH net-next 0/9] net/dim: Support for multiple
- implementations
-To:     Max Gurtovoy <maxg@mellanox.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Tal Gilboa <talgi@mellanox.com>, linux-rdma@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Cc:     Yamin Friedman <yaminf@mellanox.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Yishai Hadas <yishaih@mellanox.com>,
-        Saeed Mahameed <saeedm@mellanox.com>,
-        Doug Ledford <dledford@redhat.com>,
-        Idan Burstein <idanb@mellanox.com>,
-        Tariq Toukan <tariqt@mellanox.com>
-References: <20190306084832.57753-1-talgi@mellanox.com>
- <1551888921.9796.2.camel@acm.org>
- <392082ba-9aeb-6c5e-53a0-7bb53ce101fa@grimberg.me>
- <010bc92c-55c1-c5bd-82a5-975aa7f7c735@mellanox.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <1271ff04-c1c2-fe9d-c7e8-4898c690d242@grimberg.me>
-Date:   Thu, 14 Mar 2019 14:53:08 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        Thu, 14 Mar 2019 19:09:19 -0400
+X-Greylist: delayed 369 seconds by postgrey-1.27 at vger.kernel.org; Thu, 14 Mar 2019 19:09:19 EDT
+Received: from callcc.thunk.org (guestnat-104-133-0-99.corp.google.com [104.133.0.99] (may be forged))
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x2EN2vMl021220
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 14 Mar 2019 19:02:58 -0400
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id BE32F420AA8; Thu, 14 Mar 2019 19:02:56 -0400 (EDT)
+Date:   Thu, 14 Mar 2019 19:02:56 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Ross Zwisler <zwisler@google.com>
+Cc:     Dave Chinner <david@fromorbit.com>, linux-ext4@vger.kernel.org,
+        Jan Kara <jack@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Ross Zwisler <zwisler@kernel.org>
+Subject: Re: question about writeback
+Message-ID: <20190314230256.GD6482@mit.edu>
+References: <CAGRrVHxhK9Bsk42m5D2LEiVzoWxbK7Z5=FGynLcbqsX-5iWT0g@mail.gmail.com>
+ <20190314201851.GH23020@dastard>
+ <CAGRrVHxhBbMX9W9OmftUPDq5R4koJNjJDDy2xPDF073GTVo6jw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <010bc92c-55c1-c5bd-82a5-975aa7f7c735@mellanox.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGRrVHxhBbMX9W9OmftUPDq5R4koJNjJDDy2xPDF073GTVo6jw@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, Mar 14, 2019 at 02:37:55PM -0600, Ross Zwisler wrote:
+> > So perhaps the caller should be waiting on a specific range to bound
+> > the wait (e.g.  isize as the end of the wait) rather than using the
+> > default "keep going until the end of file is reached" semantics?
+> 
+> The call to __filemap_fdatawait_range() is happening via the jdb2 code:
+> 
+> jbd2_journal_commit_transaction()
+>   journal_finish_inode_data_buffers()
+>     filemap_fdatawait_keep_errors()
+>       __filemap_fdatawait_range(end = LLONG_MAX)
 
->>> What is a "block CQ"?
->>
->> There is no such thing... Also, this has no difference
->> if a block/file/whatever is using the rdma cq.
->>
->> The naming should really be something like rdma_dim as it accounts
->> for completions and not bytes/packets.
-> 
-> Sagi,
-> 
-> I think that in the future we could use it in nvme since there is an 
-> option to set the interrupt coalescing in NVMe spec.
-> 
-> This might improve performance for NVMe driver.
+I think jbd2 needs to call a new filemap_fdatawait_range_keep_errors()
+(to be defined in mm/filemap.c).
 
-That would require changing the spec to make moderation config per-queue
-and not controller-wide. This does not apply specifically to block so
-naming it with blk does not make sense.
+> Would it have to be an extending write?  Or could it work the same if
+> you have one thread just moving forward through a very large file,
+> dirtying pages, and the __filemap_fdatawait_range() call will just
+> keep finding new pages as it moves forward through the big file?
 
->> Overall, I think its a great idea to add that to the rdma subsystem
->> but we cannot make it the default and especially without being able
->> to turn it off. So this needs to be opt in with a sysctl option.
-> 
-> We can add flag in create_cq command that will 
-> try_coalescing_is_possible instead of module parameter of course.
-> 
-> Storage ULPs can set it to True.
+No, that case is fine because we'll eventually make our way to the end
+of the file and stop.
 
-The point is that it can't be universally on.
+In the long term I want to get rid of data=ordered mode (while still
+avoids the stale data problem) without going through all of this hair
+so we don't have to call filemap_fdatawait from the commit thread.
+The real problem is that ext2/3 allocates blocks, updates the inode
+metadata, and then writes the data blocks out.  What we need to do is
+to swap the 2nd and 3rd steps....
 
-> Also in the internal review Yamin added a table that summarize all the 
-> testing that were done using NVMeoF (I guess it somehow didn't get to 
-> this RFC).
-> 
-> I guess we can do the same for iSER to get more confidence and then set 
-> both to create modifiable cq (if HCA supports, of course).
-> 
-> Agreed ?
-
-Sure.
+					- Ted
