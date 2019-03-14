@@ -3,36 +3,36 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 295AAC43381
-	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 16:09:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E16A9C43381
+	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 16:09:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 036632184E
-	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 16:09:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3EF02186A
+	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 16:09:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727547AbfCNQJc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Mar 2019 12:09:32 -0400
-Received: from mga04.intel.com ([192.55.52.120]:23645 "EHLO mga04.intel.com"
+        id S1727587AbfCNQJi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Mar 2019 12:09:38 -0400
+Received: from mga05.intel.com ([192.55.52.43]:58120 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726157AbfCNQJb (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Mar 2019 12:09:31 -0400
+        id S1727287AbfCNQJh (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 14 Mar 2019 12:09:37 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Mar 2019 09:09:31 -0700
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Mar 2019 09:09:37 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.58,478,1544515200"; 
-   d="scan'208";a="134073392"
+   d="scan'208";a="134073433"
 Received: from gklab-107-059.igk.intel.com ([10.102.107.59])
-  by orsmga003.jf.intel.com with ESMTP; 14 Mar 2019 09:09:29 -0700
+  by orsmga003.jf.intel.com with ESMTP; 14 Mar 2019 09:09:35 -0700
 From:   Igor Konopko <igor.j.konopko@intel.com>
 To:     mb@lightnvm.io, javier@javigon.com, hans.holmberg@cnexlabs.com
 Cc:     linux-block@vger.kernel.org, igor.j.konopko@intel.com
-Subject: [PATCH 17/18] lightnvm: allow to use full device path
-Date:   Thu, 14 Mar 2019 17:04:27 +0100
-Message-Id: <20190314160428.3559-18-igor.j.konopko@intel.com>
+Subject: [PATCH 18/18] lightnvm: track inflight target creations
+Date:   Thu, 14 Mar 2019 17:04:28 +0100
+Message-Id: <20190314160428.3559-19-igor.j.konopko@intel.com>
 X-Mailer: git-send-email 2.9.5
 In-Reply-To: <20190314160428.3559-1-igor.j.konopko@intel.com>
 References: <20190314160428.3559-1-igor.j.konopko@intel.com>
@@ -41,77 +41,88 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch adds the possibility to provide full device path (like
-/dev/nvme0n1) when specifying device on top of which pblk instance
-should be created/removed.
+This patch adds a counter, which is responsible for tracking inflight
+target creations.
 
-This makes creation of targets from nvme-cli (or other ioctl based
-tools) more unified with other commands in comparison with current
-situation where almost all commands uses full device path with except
-of lightnvm creation/removal parameter which uses just 'nvme0n1'
-naming convention. After this changes both approach will be valid.
+When creation process is still in progress, target is not yet on
+targets list. This causes a chance for removing whole lightnvm
+subsystem by calling nvm_unregister() in the meantime and finally by
+causing kernel panic inside target init function.
+
+With this patch we are able to track such a scenarios and wait with
+completing nvm_unregister() and freeing memory until target creation
+will be completed.
 
 Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
 ---
- drivers/lightnvm/core.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ drivers/lightnvm/core.c  | 19 ++++++++++++++++++-
+ include/linux/lightnvm.h |  2 ++
+ 2 files changed, 20 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index c01f83b..838c3d8 100644
+index 838c3d8..490ec6e 100644
 --- a/drivers/lightnvm/core.c
 +++ b/drivers/lightnvm/core.c
-@@ -1195,6 +1195,21 @@ void nvm_unregister(struct nvm_dev *dev)
- }
- EXPORT_SYMBOL(nvm_unregister);
+@@ -1083,6 +1083,7 @@ static int nvm_core_init(struct nvm_dev *dev)
+ 	INIT_LIST_HEAD(&dev->targets);
+ 	mutex_init(&dev->mlock);
+ 	spin_lock_init(&dev->lock);
++	dev->create_inflight = 0;
  
-+#define PREFIX_STR "/dev/"
-+static void nvm_normalize_path(char *path)
-+{
-+	path[DISK_NAME_LEN - 1] = '\0';
-+	if (!memcmp(PREFIX_STR, path,
-+				sizeof(char) * strlen(PREFIX_STR))) {
-+		/*
-+		 * User provide name in '/dev/nvme0n1' format,
-+		 * so we need to skip '/dev/' for comparison
-+		 */
-+		memmove(path, path + sizeof(char) * strlen(PREFIX_STR),
-+			(DISK_NAME_LEN - strlen(PREFIX_STR)) * sizeof(char));
+ 	ret = nvm_register_map(dev);
+ 	if (ret)
+@@ -1180,6 +1181,11 @@ void nvm_unregister(struct nvm_dev *dev)
+ 	struct nvm_target *t, *tmp;
+ 
+ 	mutex_lock(&dev->mlock);
++	while (dev->create_inflight > 0) {
++		mutex_unlock(&dev->mlock);
++		io_schedule();
++		mutex_lock(&dev->mlock);
 +	}
-+}
-+
+ 	list_for_each_entry_safe(t, tmp, &dev->targets, list) {
+ 		if (t->dev->parent != dev)
+ 			continue;
+@@ -1213,6 +1219,7 @@ static void nvm_normalize_path(char *path)
  static int __nvm_configure_create(struct nvm_ioctl_create *create)
  {
  	struct nvm_dev *dev;
-@@ -1304,9 +1319,9 @@ static long nvm_ioctl_dev_create(struct file *file, void __user *arg)
++	int ret;
+ 
+ 	down_write(&nvm_lock);
+ 	dev = nvm_find_nvm_dev(create->dev);
+@@ -1223,7 +1230,17 @@ static int __nvm_configure_create(struct nvm_ioctl_create *create)
  		return -EINVAL;
  	}
  
--	create.dev[DISK_NAME_LEN - 1] = '\0';
-+	nvm_normalize_path(create.dev);
-+	nvm_normalize_path(create.tgtname);
- 	create.tgttype[NVM_TTYPE_NAME_MAX - 1] = '\0';
--	create.tgtname[DISK_NAME_LEN - 1] = '\0';
+-	return nvm_create_tgt(dev, create);
++	mutex_lock(&dev->mlock);
++	dev->create_inflight++;
++	mutex_unlock(&dev->mlock);
++
++	ret = nvm_create_tgt(dev, create);
++
++	mutex_lock(&dev->mlock);
++	dev->create_inflight--;
++	mutex_unlock(&dev->mlock);
++
++	return ret;
+ }
  
- 	if (create.flags != 0) {
- 		__u32 flags = create.flags;
-@@ -1333,7 +1348,7 @@ static long nvm_ioctl_dev_remove(struct file *file, void __user *arg)
- 	if (copy_from_user(&remove, arg, sizeof(struct nvm_ioctl_remove)))
- 		return -EFAULT;
+ static long nvm_ioctl_info(struct file *file, void __user *arg)
+diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
+index d3b0270..e462d1d 100644
+--- a/include/linux/lightnvm.h
++++ b/include/linux/lightnvm.h
+@@ -428,6 +428,8 @@ struct nvm_dev {
+ 	char name[DISK_NAME_LEN];
+ 	void *private_data;
  
--	remove.tgtname[DISK_NAME_LEN - 1] = '\0';
-+	nvm_normalize_path(remove.tgtname);
++	int create_inflight;
++
+ 	void *rmap;
  
- 	if (remove.flags != 0) {
- 		pr_err("nvm: no flags supported\n");
-@@ -1373,8 +1388,6 @@ static long nvm_ioctl_dev_factory(struct file *file, void __user *arg)
- 	if (copy_from_user(&fact, arg, sizeof(struct nvm_ioctl_dev_factory)))
- 		return -EFAULT;
- 
--	fact.dev[DISK_NAME_LEN - 1] = '\0';
--
- 	if (fact.flags & ~(NVM_FACTORY_NR_BITS - 1))
- 		return -EINVAL;
- 
+ 	struct mutex mlock;
 -- 
 2.9.5
 
