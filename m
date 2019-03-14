@@ -2,134 +2,87 @@ Return-Path: <SRS0=8xnz=RR=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B2B5C43381
-	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 20:38:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D22C43381
+	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 20:44:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ECF8F21872
-	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 20:38:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DDC620854
+	for <linux-block@archiver.kernel.org>; Thu, 14 Mar 2019 20:44:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HmstC0ij"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="aMyahQx4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727875AbfCNUiJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Mar 2019 16:38:09 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:41764 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727873AbfCNUiJ (ORCPT
+        id S1727779AbfCNUok (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Mar 2019 16:44:40 -0400
+Received: from mail-it1-f177.google.com ([209.85.166.177]:40664 "EHLO
+        mail-it1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726444AbfCNUok (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Mar 2019 16:38:09 -0400
-Received: by mail-ed1-f66.google.com with SMTP id n14so5787109edv.8
-        for <linux-block@vger.kernel.org>; Thu, 14 Mar 2019 13:38:07 -0700 (PDT)
+        Thu, 14 Mar 2019 16:44:40 -0400
+Received: by mail-it1-f177.google.com with SMTP id l139so7322742ita.5
+        for <linux-block@vger.kernel.org>; Thu, 14 Mar 2019 13:44:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=p2Al2soIhgZIYM0c+nsA3HRmEqADz3AbtxgDnr+ydzs=;
-        b=HmstC0ijX8TZZQHSZ3M13+DhfP8K/O+4cmR22PkMy1LalXGtpcRmdy6lkTGlZ4cwlV
-         7bSEjHJTfWNHMS5bTVvlmTpPdgsSr0FuutUYTEiaWKlczfO8tDR8SW8VuzxbISQG8SGN
-         7gdkmFn+LsxHS+lAPxPsRgZDxSkeAlM3rW8OoZRePD8ddGoTXDWx1Tk5fD/n/4izN/rv
-         0ADGCXXlMWCSEOxppJ7sUtGL0cOjA5xC+JzzshE7zC65jjZ5uV6YeFYSP+sPXMZd0HXN
-         YPC8Ko6Zr85iIpVzJedCzalYS4gcZZp1qczjK5VXn9/2NKjubcfbWWjwhVyki9+BG/Vk
-         Y6xg==
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=do0PAfp8FItvZFX0sahV1VSfZjDfkuSope8xU3dAOoA=;
+        b=aMyahQx4t5tQsq6wBSJfVUqsrgLICUJVBbfWCfRdirOz52Eb6X4rKIsqLDkiO+G1+G
+         ev6UqibBWclbwdKNgviNob3nPVImzblExCOKaRMAB93OKaEpTDHejxekQXd0D4ToWix7
+         1H2qGWhfo3CQnOZpTHOAcpN4xnP6DPh+3z6f/33wpk0mispxcnCa/BgoF9Hgl9AogsFd
+         RMB4Z5Ye3R86SLH8G1gz34AjIj3p+B93oXbkAFsfu3whjbPcK52smVv2yslpZHtJffCK
+         YgNYrDhpjJT74enEwWl6ZBl1fWunwcTeINlVPPkWKmAvPy+47ITj/9rzjvT09dZZapyK
+         uBXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=p2Al2soIhgZIYM0c+nsA3HRmEqADz3AbtxgDnr+ydzs=;
-        b=XRgeby81BweAOC6HeyD+tRSub+KKL2J7o1uIKNRQP5PCMwW+kUQyqSgBFkgAfLBAWN
-         cle0ljZalR3/WvX45xYRwbWlLJiwyrylhWbpola0u1+41FOd5GgZaxTKJ0UXSQhGDN1+
-         Y9HXOqifAHboZLeAzFT+zJoV9EVgxo2VkYoItUIpC4aSCFzcuPDsoXXLb8+iXGKjoZM2
-         Dejp2Wa8V8ktmXRzdmJ4W4bU5aOC/37HjBaCYbR12DHGg7dMyg/XVUpV6Qthxa9ykMK+
-         m0skcg4GLH1IZNAf6tiSpl5YJWgSIfTcgEP8+OuK7bTYUlk2+h65Bax6TjU/WYFPeWV4
-         XBDA==
-X-Gm-Message-State: APjAAAXHy0mM7zYGDde8BNIBH2GM5QY5iGwdH+B1SCuPbEY7eLx9zRDd
-        HlaW3doryMAcTWCbfDfqTYjJau2bEjpHKlRj1jnOzQ==
-X-Google-Smtp-Source: APXvYqxuSV5kEOWVG8KMd19JLV5wpgTHRvcJ6sEubnpauvX5YIax4VaTk/TBboDPeNR4v8ITzlCOTckx8YCzldxcdCM=
-X-Received: by 2002:a50:c9c7:: with SMTP id c7mr236986edi.72.1552595886727;
- Thu, 14 Mar 2019 13:38:06 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAGRrVHxhK9Bsk42m5D2LEiVzoWxbK7Z5=FGynLcbqsX-5iWT0g@mail.gmail.com>
- <20190314201851.GH23020@dastard>
-In-Reply-To: <20190314201851.GH23020@dastard>
-From:   Ross Zwisler <zwisler@google.com>
-Date:   Thu, 14 Mar 2019 14:37:55 -0600
-Message-ID: <CAGRrVHxhBbMX9W9OmftUPDq5R4koJNjJDDy2xPDF073GTVo6jw@mail.gmail.com>
-Subject: Re: question about writeback
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     linux-ext4@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>,
-        Jan Kara <jack@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Ross Zwisler <zwisler@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=do0PAfp8FItvZFX0sahV1VSfZjDfkuSope8xU3dAOoA=;
+        b=TTBOlNax+WNcAOAI9sEG7jsBOpnd3HJ6MRlmUq1p/h/AaQWXWz9Q/H2mmO714cU6ZH
+         M3+hSOF9a2egAoK/bqP5NfIPkDItrmFKR/UUtPxoHnKbxaZQafbtQcPKvj/lp7tIr/G9
+         1cyvcLHW/KYNHPm5OLcVQVmJe+azXu2EvFDYv0rlcNpFanv+PK9cJFyhC/28agEYghc8
+         nBh/AMaJWFaZg6J3PFIBlG8QJEFQ70huOrKCm1LOLrAXvRy+XQA2MiagUx6acqBk2sJ9
+         u+PRcSrfHqFhSHnqrzgVgmPakA95jSjQIkrlScdDwvCrpBRQvf4OZddWXfz2dmRFP8oT
+         vIPg==
+X-Gm-Message-State: APjAAAX9/6erH+uOjrBBUocoSPs5dByXx1vGlCb3S/2dU9vmMkf57YHU
+        GF2/BI6rS0pHtwqEXEQpSgrgOp7QexxISQ==
+X-Google-Smtp-Source: APXvYqyoBeDUwuDIgUWpKhEvStBPU/R5cz9W9cAbHdUrKYf7x9a8H4aXLWj9ITNqWEFAYA0MqgXFhg==
+X-Received: by 2002:a05:660c:12c2:: with SMTP id k2mr282243itd.17.1552596279669;
+        Thu, 14 Mar 2019 13:44:39 -0700 (PDT)
+Received: from x1.thefacebook.com ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id w19sm1820538ita.33.2019.03.14.13.44.37
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 14 Mar 2019 13:44:38 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     viro@ZenIV.linux.org.uk
+Subject: [PATCHSET 0/8] io_uring fixes
+Date:   Thu, 14 Mar 2019 14:44:27 -0600
+Message-Id: <20190314204435.7692-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 14, 2019 at 2:18 PM Dave Chinner <david@fromorbit.com> wrote:
-> On Thu, Mar 14, 2019 at 02:03:08PM -0600, Ross Zwisler wrote:
-> > Hi,
-> >
-> > I'm trying to understand a failure I'm seeing with both v4.14 and
-> > v4.19 based kernels, and I was hoping you could point me in the right
-> > direction.
-> >
-> > What seems to be happening is that under heavy I/O we get into a
-> > situation where for a given inode/mapping we eventually reach a steady
-> > state where one task is continuously dirtying pages and marking them
-> > for writeback via ext4_writepages(), and another task is continuously
-> > completing I/Os via ext4_end_bio() and clearing the
-> > PAGECACHE_TAG_WRITEBACK flags.  So, we are making forward progress as
-> > far as I/O is concerned.
-> >
-> > The problem is that another task calls filemap_fdatwait_range(), and
-> > that call never returns because it always finds pages that are tagged
-> > for writeback.  I've added some prints to __filemap_fdatawait_range(),
-> > and the total number of pages tagged for writeback seems pretty
-> > constant.  It goes up and down a bit, but does not seem to move
-> > towards 0.  If we halt I/O the system eventually recovers, but if we
-> > keep I/O going we can block the task waiting in
-> > __filemap_fdatawait_range() long enough for the system to reboot due
-> > to what it perceives as hung task.
-> >
-> > My question is: Is there some mechanism that is supposed to prevent
-> > this sort of situation?  Or is it expected that with slow enough
-> > storage and a high enough I/O load, we could block inside of
-> > filemap_fdatawait_range() indefinitely since we never run out of dirty
-> > pages that are marked for writeback?
->
-> SO your problem is that you are doing an extending write, and then
-> doing __filemap_fdatawait_range(end = LLONG_MAX), and while it
-> blocks on the pages under IO, the file is further extended and so
-> the next radix tree lookup finds more pages past that page under
-> writeback?
->
-> i.e. because it is waiting for pages to complete, it never gets
-> ahead of the extending write or writeback and always ends up with
-> more pages to wait on and so never reached the end of the file as
-> directed?
->
-> So perhaps the caller should be waiting on a specific range to bound
-> the wait (e.g.  isize as the end of the wait) rather than using the
-> default "keep going until the end of file is reached" semantics?
+Here's a collection of fixes/changes that should go into this revision
+(at least the first 5). The first 5 are based on Al's fixes for aio, the
+next two are optimizations that allow us to bring back no-page-refs for
+BVEC iterators, and the last is the cache hint.
 
-The call to __filemap_fdatawait_range() is happening via the jdb2 code:
+Also find the patches here:
 
-jbd2_journal_commit_transaction()
-  journal_finish_inode_data_buffers()
-    filemap_fdatawait_keep_errors()
-      __filemap_fdatawait_range(end = LLONG_MAX)
+http://git.kernel.dk/cgit/linux-block/log/?h=io_uring-next
 
-Would it have to be an extending write?  Or could it work the same if
-you have one thread just moving forward through a very large file,
-dirtying pages, and the __filemap_fdatawait_range() call will just
-keep finding new pages as it moves forward through the big file?
+ block/bio.c                   |  43 ++---
+ fs/block_dev.c                |  12 +-
+ fs/io_uring.c                 | 388 ++++++++++++++++++------------------------
+ fs/iomap.c                    |  12 +-
+ include/linux/blk_types.h     |   1 +
+ include/linux/uio.h           |  24 ++-
+ include/uapi/linux/io_uring.h |   5 +
+ 7 files changed, 232 insertions(+), 253 deletions(-)
 
-In either case, I think your description of the problem is correct.
-Is this just a "well, don't do that" type situation, or is this
-supposed to have a different result?
+-- 
+Jens Axboe
 
-- Ross
+
