@@ -2,157 +2,112 @@ Return-Path: <SRS0=+tqK=RS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7856C43381
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 16:15:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10230C43381
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 16:19:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A68B221871
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 16:15:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1552666523;
-	bh=RpaS2pcVdJu5kJQz+kSIhUPYav7ZYzDmpAIosxThCJY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=saXvIFwk3d22eOH+3wAOJnDBAWsunQgjyFWe47CE1Pk6QR8fJlAG7U59ffZW2zfHX
-	 Lu2e7OTbB7hG+aoL39W/K6z/nUFVhkzzUOR+7z+NwTC/XFAOk1Hr74bs0DJ/591yn5
-	 Ej1PzQG7ZIyz9+xVK3tdOtIuJW44O0ShASdv2ffw=
+	by mail.kernel.org (Postfix) with ESMTP id D8CC3218A1
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 16:19:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729498AbfCOQPX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Mar 2019 12:15:23 -0400
-Received: from mga14.intel.com ([192.55.52.115]:51229 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729465AbfCOQPW (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Mar 2019 12:15:22 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Mar 2019 09:15:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.58,482,1544515200"; 
-   d="scan'208";a="327645325"
-Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
-  by fmsmga006.fm.intel.com with ESMTP; 15 Mar 2019 09:15:21 -0700
-Date:   Fri, 15 Mar 2019 10:16:08 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Jianchao Wang <jianchao.w.wang@oracle.com>
-Cc:     "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-        "jthumshirn@suse.de" <jthumshirn@suse.de>,
-        "hare@suse.de" <hare@suse.de>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "Busch, Keith" <keith.busch@intel.com>,
-        "jsmart2021@gmail.com" <jsmart2021@gmail.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/8] blk-mq: change the method of iterating busy tags of
- a request_queue
-Message-ID: <20190315161608.GB15153@localhost.localdomain>
+        id S1729397AbfCOQTI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Mar 2019 12:19:08 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:41330 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726632AbfCOQTH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Mar 2019 12:19:07 -0400
+Received: by mail-pf1-f195.google.com with SMTP id d25so6672525pfn.8;
+        Fri, 15 Mar 2019 09:19:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=dRvu+G8ug8+5vTKCte4q4HWLddoOJc2SzP36FOtasqk=;
+        b=srwqnUOs00pYmaQ9S29sYCcgpPbiqnQe9JmprGDCrJKT8kxmDxO0saFHrCwCqeBnOr
+         ZbsRZw4DfLBnxegtFejN2EgpK/H7C/fPtf6w6eT2+b1kLodZxc6OLMnAfc5Rgejg+YrN
+         c073VEeI2uzIAVsWJ/L2Zjtnly/z8tuz6ywAyWQctWk4QQaxrg8h7xyEfmtzoKX5rPqF
+         2bkMC9+Ho13tTcQuonz1aSFMqo14pY0DbIWd8kwJNBjmMX1/bQawtq79M/fqQ/rTHO32
+         fE8kva5uNJEi2RBsZ7eg6QsSYOkTi4BTB/nrRUu+qXCv1hW7V3F6LqEIFxgL+GpngsOY
+         RlOA==
+X-Gm-Message-State: APjAAAVPdub7C+wUcD5vAMb/lSCSo8RZTIgnMpM2HyOGhwb7j9vI0gbU
+        uBuXn5HCv18MiD+Q+a0COGs=
+X-Google-Smtp-Source: APXvYqyXvkV5j22cA33UXZzOjZ4yukDdes4z00vBK/fYv0zVskzgARlZwJpUVx908kErWQu1ET4z0g==
+X-Received: by 2002:a63:6ecb:: with SMTP id j194mr4354525pgc.250.1552666746704;
+        Fri, 15 Mar 2019 09:19:06 -0700 (PDT)
+Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id h63sm8448897pfd.148.2019.03.15.09.19.05
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 15 Mar 2019 09:19:05 -0700 (PDT)
+Message-ID: <1552666744.45180.135.camel@acm.org>
+Subject: Re: [PATCH 0/8]: blk-mq: use static_rqs to iterate busy tags
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     "jianchao.wang" <jianchao.w.wang@oracle.com>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, jsmart2021@gmail.com,
+        josef@toxicpanda.com, linux-nvme@lists.infradead.org,
+        linux-kernel@vger.kernel.org, keith.busch@intel.com, hare@suse.de,
+        jthumshirn@suse.de, sagi@grimberg.me
+Date:   Fri, 15 Mar 2019 09:19:04 -0700
+In-Reply-To: <a36be8bd-bb9c-745e-cfdb-018cf0a96d42@oracle.com>
 References: <1552640264-26101-1-git-send-email-jianchao.w.wang@oracle.com>
- <1552640264-26101-3-git-send-email-jianchao.w.wang@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1552640264-26101-3-git-send-email-jianchao.w.wang@oracle.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
+         <20190315092020.GA2405@lst.de>
+         <a36be8bd-bb9c-745e-cfdb-018cf0a96d42@oracle.com>
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 15, 2019 at 01:57:38AM -0700, Jianchao Wang wrote:
-> tags->rqs[] will not been cleaned when free driver tag and there
-> is a window between get driver tag and write tags->rqs[], so we
-> may see stale rq in tags->rqs[] which may have been freed, as
-> following case,
-> blk_mq_get_request         blk_mq_queue_tag_busy_iter
->   -> blk_mq_get_tag
->                              -> bt_for_each
->                                -> bt_iter
->                                  -> rq = taags->rqs[]
->                                  -> rq->q
->   -> blk_mq_rq_ctx_init
->     -> data->hctx->tags->rqs[rq->tag] = rq;
-> 
-> To fix this, the blk_mq_queue_tag_busy_iter is changed in this
-> patch to use tags->static_rqs[] instead of tags->rqs[]. We have
-> to identify whether there is a io scheduler attached to decide
-> to use hctx->tags or hctx->sched_tags. And we will try to get a
-> non-zero q_usage_counter before that, so it is safe to access
-> them. Add 'inflight' parameter to determine to iterate in-flight
-> requests or just busy tags. A correction here is that
-> part_in_flight should count the busy tags instead of rqs that
-> have got driver tags.
-> 
-> Moreover, get rid of the 'hctx' parameter in iter function as
-> we could get it from rq->mq_hctx and export this interface for
-> drivers.
-> 
-> Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
-> ---
->  block/blk-mq-tag.c     | 76 +++++++++++++++++++++++++++++++++-----------------
->  block/blk-mq-tag.h     |  2 --
->  block/blk-mq.c         | 31 ++++++++------------
->  include/linux/blk-mq.h |  5 ++--
->  4 files changed, 64 insertions(+), 50 deletions(-)
-> 
-> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-> index b792537..cdec2cd 100644
-> --- a/block/blk-mq-tag.c
-> +++ b/block/blk-mq-tag.c
-> @@ -216,26 +216,38 @@ struct bt_iter_data {
->  	busy_iter_fn *fn;
->  	void *data;
->  	bool reserved;
-> +	bool inflight;
->  };
->  
->  static bool bt_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
->  {
->  	struct bt_iter_data *iter_data = data;
->  	struct blk_mq_hw_ctx *hctx = iter_data->hctx;
-> -	struct blk_mq_tags *tags = hctx->tags;
->  	bool reserved = iter_data->reserved;
-> +	struct blk_mq_tags *tags;
->  	struct request *rq;
->  
-> +	tags =  hctx->sched_tags ? hctx->sched_tags : hctx->tags;
-> +
->  	if (!reserved)
->  		bitnr += tags->nr_reserved_tags;
-> -	rq = tags->rqs[bitnr];
-> +	/*
-> +	 * Because tags->rqs[] will not been cleaned when free driver tag
-> +	 * and there is a window between get driver tag and write tags->rqs[],
-> +	 * so we may see stale rq in tags->rqs[] which may have been freed.
-> +	 * Using static_rqs[] is safer.
-> +	 */
-> +	rq = tags->static_rqs[bitnr];
->  
->  	/*
-> -	 * We can hit rq == NULL here, because the tagging functions
-> -	 * test and set the bit before assigning ->rqs[].
-> +	 * There is a small window between get tag and blk_mq_rq_ctx_init,
-> +	 * so rq->q and rq->mq_hctx maybe different.
->  	 */
-> -	if (rq && rq->q == hctx->queue)
-> -		return iter_data->fn(hctx, rq, iter_data->data, reserved);
-> +	if (rq && rq->q == hctx->queue &&
-> +	    rq->mq_hctx == hctx &&
-> +	    (!iter_data->inflight ||
-> +	     blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT))
-> +		return iter_data->fn(rq, iter_data->data, reserved);
+On Fri, 2019-03-15 at 17:44 +-0800, jianchao.wang wrote:
++AD4 On 3/15/19 5:20 PM, Christoph Hellwig wrote:
++AD4 +AD4 On Fri, Mar 15, 2019 at 04:57:36PM +-0800, Jianchao Wang wrote:
++AD4 +AD4 +AD4 Hi Jens
++AD4 +AD4 +AD4 
++AD4 +AD4 +AD4 As we know, there is a risk of accesing stale requests when iterate
++AD4 +AD4 +AD4 in-flight requests with tags-+AD4-rqs+AFsAXQ and this has been talked in following
++AD4 +AD4 +AD4 thread,
++AD4 +AD4 +AD4 +AFs-1+AF0 https://urldefense.proofpoint.com/v2/url?u+AD0-https-3A+AF8AXw-marc.info+AF8--3Fl-3Dlinux-2Dscsi-26m-3D154511693912752-26w-3D2+ACY-d+AD0-DwICAg+ACY-c+AD0-RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI+AF8-JnE+ACY-r+AD0-7WdAxUBeiTUTCy8v-7zX
++AD4 +AD4 +AD4 yr4qk7sx26ATvfo6QSTvZyQ+ACY-m+AD0-CydqJPTf4FUrfs7ipUc2chm2jGuNuDVn+AF8-onIetKEehM+ACY-s+AD0-ZQ7RfO6-737-t5kQv7SFlXMhIdpwn+AF8-AxJI93d6c-nj0+ACY-e+AD0
++AD4 +AD4 +AD4 +AFs-2+AF0 https://urldefense.proofpoint.com/v2/url?u+AD0-https-3A+AF8AXw-marc.info+AF8--3Fl-3Dlinux-2Dblock-26m-3D154526189023236-26w-3D2+ACY-d+AD0-DwICAg+ACY-c+AD0-RoP1YumCXCgaWHvlZYR8PZh8Bv7qIrMUB65eapI+AF8-JnE+ACY-r+AD0-7WdAxUBeiTUTCy8v-7z
++AD4 +AD4 +AD4 Xyr4qk7sx26ATvfo6QSTvZyQ+ACY-m+AD0-CydqJPTf4FUrfs7ipUc2chm2jGuNuDVn+AF8-onIetKEehM+ACY-s+AD0-EBV1M5p4mE8jZ5ZD1ecU5kMbJ9EtbpVJoc7Tqolrsc8+ACY-e+AD0
++AD4 +AD4 
++AD4 +AD4 I'd rather take one step back and figure out why we are iterating
++AD4 +AD4 the busy requests.  There really shouldn't be any reason why a driver
++AD4 +AD4 is even doings that (vs some error handling helpers in the core
++AD4 +AD4 block code that can properly synchronize).
++AD4 +AD4 
++AD4 
++AD4 A typical scene is blk+AF8-mq+AF8-in+AF8-flight,
++AD4                           
++AD4 blk+AF8-mq+AF8-get+AF8-request         blk+AF8-mq+AF8-in+AF8-flight
++AD4   -+AD4 blk+AF8-mq+AF8-get+AF8-tag        -+AD4 blk+AF8-mq+AF8-queue+AF8-tag+AF8-busy+AF8-iter
++AD4                              -+AD4 bt+AF8-for+AF8-each
++AD4                                -+AD4 bt+AF8-iter
++AD4                                  -+AD4 rq +AD0 taags-+AD4-rqs+AFsAXQ
++AD4                                  -+AD4 rq-+AD4-q       //---+AD4 get a stale request
++AD4   -+AD4 blk+AF8-mq+AF8-rq+AF8-ctx+AF8-init
++AD4     -+AD4 data-+AD4-hctx-+AD4-tags-+AD4-rqs+AFs-rq-+AD4-tag+AF0 +AD0 rq
++AD4 
++AD4 This stale request maybe something that has been freed due to io scheduler
++AD4 is detached or a q using a shared tagset is gone.
++AD4 
++AD4 And also the blk+AF8-mq+AF8-timeout+AF8-work could use it to pick up the expired request.
++AD4 The driver would also use it to requeue the in-flight requests when the device is dead.
++AD4 
++AD4 Compared with adding more synchronization, using static+AF8-rqs+AFsAXQ directly maybe simpler :)
 
-There is still a window where the check may succeed, but the request is
-being assigned to a completely different request_queue. The callback
-then operates on a request it doesn't own.
+Hi Jianchao,
 
-Tag iteration from a driver can be safe only if the driver initiates a
-freeze and quiesced all queues sharing the same tagset first. The nvme
-driver does that, but I think there may need to be an additional grace
-period to wait for the allocation's queue_enter to call queue_exit to
-ensure the request is initialized through blk_mq_rq_ctx_init().
+Although I appreciate your work: I agree with Christoph that we should avoid races
+like this rather than modifying the block layer to make sure that such races are
+handled safely.
+
+Thanks,
+
+Bart.
