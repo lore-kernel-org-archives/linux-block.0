@@ -2,100 +2,91 @@ Return-Path: <SRS0=+tqK=RS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B58AC43381
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 14:55:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF805C43381
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 14:59:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 69B73218AC
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 14:55:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 761EB218AC
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 14:59:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Ql5zrRR2"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ih6BAd/5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729298AbfCOOzA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Mar 2019 10:55:00 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:40162 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729221AbfCOOzA (ORCPT
+        id S1727518AbfCOO7n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Mar 2019 10:59:43 -0400
+Received: from mail-pf1-f169.google.com ([209.85.210.169]:42527 "EHLO
+        mail-pf1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727013AbfCOO7n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Mar 2019 10:55:00 -0400
-Received: by mail-pg1-f193.google.com with SMTP id u9so6636746pgo.7
-        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2019 07:55:00 -0700 (PDT)
+        Fri, 15 Mar 2019 10:59:43 -0400
+Received: by mail-pf1-f169.google.com with SMTP id r15so3772104pfn.9
+        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2019 07:59:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=PsoNd4sOAZ3OGvoiEniWe7TzVWmF8MVo9Y93Xa4kZvU=;
-        b=Ql5zrRR2FgjjDkjfMLlEH1Z7V3LsZ+jB6ocFhoLlZWhv4w40FQUd0hBURJSCWPsS1C
-         Xyb1qUdaiSt5LKrFtTcUN6vCOeJOP9tgKihDGV7sLpkEOxNMUhbGq0im5GCA1hiWL3nT
-         OSVK6x2piqSboEBOG6HbRVaqWdYM7Hyq42PuaIIDcWUtFfWcdAHTySkkqTs/SueQVKGe
-         eM0ld7JBceO/Dy3U/CVVbUdsc+s8kSbtTqNKiTNrqmdO1KujN5E8cPg6Ebj+z3kq1j3V
-         /CAkcIyuDJgM/pCv84CgEnfHb4HbdhWOTpSYUaGoWjhydxf1iMIx7QLmVk4r3Pp8+eZp
-         AEvg==
+        h=from:to:cc:subject:date:message-id;
+        bh=Jz8JXKvrR91levwR+AKGQT+kkplKyy8RqUuN+K+6buE=;
+        b=ih6BAd/5HS/Lv53w4/SUY6Mis0BV94tqSfnEwcCsOFs/r0qTCskYnGQFr5OJ6C09em
+         ZqkZoE2aTG+eC2P5Zx4QNMdqtYz7Vc4ni+HTNqDIEfO8HHWhywCk2FNCFUmi/kvaIPKi
+         NrJj0PXSaBmBP093n4Asxx2fiueY2ez6l2/Qg5fziJlRRluvTaBiugOg0K2LzS86UXU0
+         9VoEixXGK959jm/bLaJXe3gHMxWDbvokdMFcjy/O+5GrhjOUfZVbMeaD6/F51F1yuxFe
+         jBfx4k3XTkZw49WzuT2KO1LcrQC84UlmIEeBlWdjeCK6IZDrJnckzH2lp64mt8HSiuy+
+         0Zog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=PsoNd4sOAZ3OGvoiEniWe7TzVWmF8MVo9Y93Xa4kZvU=;
-        b=BEptkS1CCXK7A1Ob/upQcHm5ly50C9f297UKffefx8kdyzLVjZ6fIBbkwXp/WYyWPy
-         4g5d95MUNWQTsyoVRkvClmDn/gAxMg3CuqzG7hUgr9aLSgY9qakuvJvMYOaelU9swcah
-         RVpWmryzO8L5otYu7Y/W/nhKaYsUVtGuT5IVHqrqRG4hxVRzn6IWZceUjX8ApjbBPISX
-         O7lovCO76c8WGzxGTZaTRDRk8Bo3RNm5ioAYuIlo2N5sYolOiTeK1qo9Yts9ZqiE2VUj
-         yQ9ZHcEvbc9mGTdedCyN2Ur5HitFvku14VGm2zXeOWDWqgd/VLWonHfA5fzdXeRdETft
-         CF3g==
-X-Gm-Message-State: APjAAAXFGJbyCiITamSNqBg8rSGTFcX74vyQYkQrYEVu3rnU/Vitymay
-        arUiL3BdrUGTmmXMbQDj2BfdOw==
-X-Google-Smtp-Source: APXvYqzIRSCyAzhwwzW8n5vrnZpJ8MgzO9AEiwQNaubTrxdyzC2D5/KKS1Xt6aoj/gaQCQM92jMdsg==
-X-Received: by 2002:a17:902:aa0c:: with SMTP id be12mr4650665plb.63.1552661700028;
-        Fri, 15 Mar 2019 07:55:00 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=Jz8JXKvrR91levwR+AKGQT+kkplKyy8RqUuN+K+6buE=;
+        b=TzbA/tb4I+uquMM/m581unVTU0C6nzdzjgKQKhpPumWckAhoPcSeDFqpFWQBn5sZgN
+         jaJQ3aw8KwH1wOxQCAYhsM0y+IWvl3nBt62nSYkv+o/UjKO8SAJt48KJ6oMH3QjePLjm
+         lHQJZVd9lp/bzKdaGqvYlDd2eDKf5KATSe0pVkJB128F3NlUx8UKpMPXRhuDmec8zmB8
+         AMmMcfV3F0lTJuR1xAr6MyhGEJUrwymCVQ3GkVS++dN4LP1VUY/I+UOZaXiJySkkiNUt
+         SqbKyS9xxlx8CjS9eg2pKrHUQ8AJGTZtOS5UwCkATtaNNXpD/DtK0XX9g2WbG3jl0gLS
+         Gi9w==
+X-Gm-Message-State: APjAAAU/61q3f4OBUp3g9047PfBW+Zgbsj7bexp0/+/Jb0iidMSccjuA
+        bxWDhXfSU51CFvA/Sbv81SJZgQ==
+X-Google-Smtp-Source: APXvYqzxzSg0PM7fwgGnYcvC6PUjceYx6lJfWxaAHg+mekLyIhWGmoGPYvBOJeskRSMHOdb5Nwn7jg==
+X-Received: by 2002:a65:60c7:: with SMTP id r7mr3954476pgv.37.1552661982324;
+        Fri, 15 Mar 2019 07:59:42 -0700 (PDT)
 Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id t10sm3192272pgo.27.2019.03.15.07.54.58
+        by smtp.gmail.com with ESMTPSA id f28sm4287179pfh.178.2019.03.15.07.59.40
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 15 Mar 2019 07:54:59 -0700 (PDT)
+        Fri, 15 Mar 2019 07:59:41 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     viro@ZenIV.linux.org.uk, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 7/7] io_uring: mark me as the maintainer
-Date:   Fri, 15 Mar 2019 08:54:42 -0600
-Message-Id: <20190315145442.21127-8-axboe@kernel.dk>
+Cc:     viro@ZenIV.linux.org.uk
+Subject: [PATCHSET 0/3] io_uring improvements
+Date:   Fri, 15 Mar 2019 08:59:35 -0600
+Message-Id: <20190315145938.21516-1-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190315145442.21127-1-axboe@kernel.dk>
-References: <20190315145442.21127-1-axboe@kernel.dk>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-And io_uring as maintained in general.
+This is on top of the just posted "PATCHSET v2 0/7] io_uring fixes"
+series.
 
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- MAINTAINERS | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+This re-introduces the ability to NOT have to touch page reference
+counts for our fixed buffers. Instead of assuming that's always
+safe to do with a BVEC iter, we add an explicit flag for that. This
+shifts the iter types a bit, but otherwise shouldn't cause any
+changes.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 17b59b66474b..a90137af48c2 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -8091,6 +8091,16 @@ F:	include/linux/iommu.h
- F:	include/linux/of_iommu.h
- F:	include/linux/iova.h
- 
-+IO_URING
-+M:	Jens Axboe <axboe@kernel.dk>
-+L:	linux-block@vger.kernel.org
-+L:	linux-fsdevel@vger.kernel.org
-+T:	git git://git.kernel.dk/linux-block
-+T:	git git://git.kernel.dk/liburing
-+S:	Maintained
-+F:	fs/io_uring.c
-+F:	include/uapi/linux/io_uring.h
-+
- IP MASQUERADING
- M:	Juanjo Ciarlante <jjciarla@raiz.uncu.edu.ar>
- S:	Maintained
+The final patch re-adds the "we hit cache" flag. I left this out of
+the initial series due to concerns over informing userspace about
+this, with all the mincore etc discussions.
+
+ block/bio.c                   | 43 +++++++++++++++++++----------------
+ fs/block_dev.c                | 12 ++++++----
+ fs/io_uring.c                 |  9 +++++++-
+ fs/iomap.c                    | 12 ++++++----
+ include/linux/blk_types.h     |  1 +
+ include/linux/uio.h           | 24 +++++++++++++++----
+ include/uapi/linux/io_uring.h |  5 ++++
+ 7 files changed, 71 insertions(+), 35 deletions(-)
+
 -- 
-2.17.1
+Jens Axboe
+
 
