@@ -2,108 +2,84 @@ Return-Path: <SRS0=+tqK=RS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CF5CC43381
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 14:29:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B87D1C43381
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 14:54:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 491A8218A1
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 14:29:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88FB7218AC
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 14:54:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="l3voeamv"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="nyQ2yoQZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729256AbfCOO3f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Mar 2019 10:29:35 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:43262 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729171AbfCOO3f (ORCPT
+        id S1727178AbfCOOys (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Mar 2019 10:54:48 -0400
+Received: from mail-pg1-f169.google.com ([209.85.215.169]:44599 "EHLO
+        mail-pg1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726655AbfCOOys (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Mar 2019 10:29:35 -0400
-Received: by mail-pf1-f194.google.com with SMTP id q17so6465836pfh.10
-        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2019 07:29:34 -0700 (PDT)
+        Fri, 15 Mar 2019 10:54:48 -0400
+Received: by mail-pg1-f169.google.com with SMTP id h34so6622035pgh.11
+        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2019 07:54:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=GhZ6JEqM6OGPlOqUafs+5RJ8MCNfu/6ROv/YnY68g88=;
-        b=l3voeamv6jZGeOAGko8E4Eje0cjk9b7t/1+dPYeHM/aHRf3+aAu8dujyEp4/C08XTW
-         D9ykaaQzm84JoVzJvzn416WhF9zux+sxDyWyxRNHMX7K1dZj3uV7JOjmSLqS8d9DDVaF
-         gkLRUjB41GkDdsomUWXZVHoZ5KbFS9n6SZye6IIfqAUydQYR+ZI9f0t6t43NiKwwep8i
-         KUWZ6qBBtMLGFACzx8LP2qUGkg7grxwl+fbqzDpHRcpmpPqJLuQCQb3FcjtyxHIxg61h
-         Zb1CSDeRdFg3kKX6ZG8ZeUR87nu1Qu0PrmQqpT8siYDJrz+pohTI9CpiEfRwDWXgTDN1
-         tJhQ==
+        h=from:to:cc:subject:date:message-id;
+        bh=/yvxxA+FLLhscO8u6OKwrwRMS+O7hwJIZ7ddpfpqfKo=;
+        b=nyQ2yoQZg3HCY1lJusi/pmP1mqWnWJwqmy4AZkqmTgpksWcmre9RdlVR/LWD6NA/NB
+         v8o0CL78hwPDx0fcKTmfNxt95OR2Vz5axdPx430l/aJ4AJQsET5ShGAQGu+vXSBp/PLc
+         Moy+1BzegY0wGqckQzE0NvEAHR6oGscp463afNyKdHgRF9Tq2aDv+cIq2wdddvDdGbNE
+         7p99Kaaq+gFdfvoZfYDOQSMrPtSx9dUf2YyAKSoyp8JRV2TJTCXoKOHXtneDfF0/R5Tn
+         SHn3rShhvHjSWZDcFtUDGHYcmwXQkKWsl6wHkxQlMZRx8F1pxR7XtOIH+QXtu/VOfYg1
+         eIOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=GhZ6JEqM6OGPlOqUafs+5RJ8MCNfu/6ROv/YnY68g88=;
-        b=jmbOtSAEIKLEun8nWsf/oSvmtcSdlvdHrI75Ajgx7DtwAaZmK5i0YXRnvyEQEm7OxU
-         XyOS/EABdU5K5ZgJzG4xpv03FVY2y1076KFWJ7FQVLhXPOddVZ4zwOGYHzsDSOdVxkcB
-         cHMx8gao2CKYhahkpYI5BsbhV1PUjaw5j8D/Tc9n5+3tguGBRgiaIbVxy9NpE09xNhRp
-         UWAiS3E7v9RzfFhZMle7NVtsRkVA0FMaQjDLMyFmI6GhTLukdrqXVgowtWswh+W6tgyO
-         YXsYmY3qE7vyASQdHUAfs/mP+xwGeaL+j5D2LX/dR4xu1APIQF2l8DJqYrnDkGxCZLxb
-         sMnQ==
-X-Gm-Message-State: APjAAAXq38ZREpHr4uAMBPY6ZCo0JGnuQeT7/jKCl/jXB2DL8PZndQtF
-        4pBg9dCSqmkx7Bt4TQxienCG1Q==
-X-Google-Smtp-Source: APXvYqyU4jUhYK9pYl664Tk5wLKreFCTSie4+jQ6+syEDDg8614DQxZ9qdrPxY1C0lxzoD7IVXAzMQ==
-X-Received: by 2002:aa7:818e:: with SMTP id g14mr4305675pfi.245.1552660174267;
-        Fri, 15 Mar 2019 07:29:34 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id v1sm4036969pff.9.2019.03.15.07.29.32
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=/yvxxA+FLLhscO8u6OKwrwRMS+O7hwJIZ7ddpfpqfKo=;
+        b=Uq/fMRVl4sVmgIZbMJ7E4Pdp6mzhpdl10QNXAVX4DeZ6khz3WUAqwthEwZwiFsVIoE
+         YYxciUQITpwcmi9Z1IQ165Lg9OKC5nJbY0XnzsAYHw+3+WxsoWJ1GO+X/lsXpyK37VZK
+         TaBmW1y1xW73tRVHlb1MOzYandS9yPmC+pe2NigO237upOppLZwHsnN9vpwPTOWV2PIM
+         Dx1M+I7av7oZN/1WWBDv85w9LrZVcsV6re3Q5jImJdHsoGYtlfG4riU2007xamBOV353
+         WqkZbbNZcuxcRTYxcX2qI/0vU9d/OXR0vcN2btv4hJcduecKLExtk7z5wwCLjJ8kBgmE
+         t2Jw==
+X-Gm-Message-State: APjAAAUM2I3VyZZV4O3/85lcKR6q+e4ng9qX0AcurDuD1rotTyW9tcUp
+        rViE8Bf/et0+bqjvoLzVsqzy7g==
+X-Google-Smtp-Source: APXvYqwzPB8A80Af8yl5NGGl62w/ecyRGE5XXD5ySe7iWnotX2oh2QsvMm9DHzuYqsxDtiSahH/obg==
+X-Received: by 2002:a65:5cc4:: with SMTP id b4mr3865242pgt.334.1552661687654;
+        Fri, 15 Mar 2019 07:54:47 -0700 (PDT)
+Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id t10sm3192272pgo.27.2019.03.15.07.54.44
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 15 Mar 2019 07:29:33 -0700 (PDT)
-Subject: Re: [PATCH 15/18] blktrace: change strncpy+truncation to strlcpy
-To:     Dominique Martinet <asmadeus@codewreck.org>
-Cc:     Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <1531444483-17338-1-git-send-email-asmadeus@codewreck.org>
- <1531445162-19771-1-git-send-email-asmadeus@codewreck.org>
- <20190314213721.339979f0@oasis.local.home>
- <80ab6751-cd34-1da6-91c7-7558d3a17943@kernel.dk>
- <20190315063022.GA12910@nautica>
+        Fri, 15 Mar 2019 07:54:45 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <85f295e5-d338-100b-16a6-45e28d292388@kernel.dk>
-Date:   Fri, 15 Mar 2019 08:29:31 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
-MIME-Version: 1.0
-In-Reply-To: <20190315063022.GA12910@nautica>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+To:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     viro@ZenIV.linux.org.uk
+Subject: [PATCHSET v2 0/7] io_uring fixes
+Date:   Fri, 15 Mar 2019 08:54:35 -0600
+Message-Id: <20190315145442.21127-1-axboe@kernel.dk>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/15/19 12:30 AM, Dominique Martinet wrote:
-> Jens, Steven,
-> 
-> Jens Axboe wrote on Thu, Mar 14, 2019:
->> On 3/14/19 7:37 PM, Steven Rostedt wrote:
->>> I noticed this old patch in my inbox. It looks like a legit cleanup.
->>> Want to take it?
->>
->> Indeed, I've applied it. Thanks!
-> 
-> Thanks. I am terribly sorry about this patch series to be honest, I did
-> not prepare it properly and sent too many generic patches at once but
-> more importantly some were unsafe (strlcpy expects the input string to
-> be validly formatted, because it basically does strlen() on it to check
-> how much hasn't been copied for its return value)
-> I was pointed out strscpy instead as a safer alternative.
-> 
-> In this case `name` comes from bdevname() which is disk_name() in
-> block/partition-generic.c which is a snprintf, so we are guaranted
-> null truncation from there and it should be OK, but I wanted to check
-> and point it out.
+I separated this into a strict fixes series, then we can focus
+on the last few optimizations for this series once that is in.
+Hence this is a v2 of the series from yesterday.
 
-Dropped.
+Through testing of the various modes of operation and opcodes,
+I found a few issues in the previous series. This further cleans
+up the file and reference handling, and passes all the tests I
+can throw at it.
+
+Please review, thanks.
+
+ MAINTAINERS   |  10 ++
+ fs/io_uring.c | 444 +++++++++++++++++++++++++-------------------------
+ 2 files changed, 229 insertions(+), 225 deletions(-)
 
 -- 
 Jens Axboe
+
 
