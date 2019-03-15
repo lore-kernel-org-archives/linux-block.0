@@ -2,128 +2,137 @@ Return-Path: <SRS0=+tqK=RS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2071C43381
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 08:34:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A8AEC43381
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 09:06:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8AC83218AC
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 08:34:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 497EB2184C
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 09:06:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="oELe57sN"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="afodna/o"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727238AbfCOIe0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Mar 2019 04:34:26 -0400
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:44559 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726856AbfCOIe0 (ORCPT
+        id S1728006AbfCOJGh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Mar 2019 05:06:37 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:40494 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727501AbfCOJGh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Mar 2019 04:34:26 -0400
-Received: by mail-vs1-f66.google.com with SMTP id b8so4894386vsq.11
-        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2019 01:34:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=s5upj3v+TSeq1leK9fAsZyA35bnuuGD34MaHoF8Wovc=;
-        b=oELe57sNsZVSlcdttIyaeC7KAlvCBASH9QF93WSwUDxIg+1CrtRF1RpKzM9b+HjwGT
-         BIHOmR8TfKZopjrL+FtSWIGBQb3XouaNWBT2N3EGmPeaxj/zfOJVfYx9fk/8DfrxTVyp
-         ZlAGpvkBWHympzmyvQlgaiilHO8DkCii1ks7f02JVe6ZM1DlbReaIxOqLiSSpA2mubG2
-         GyoPtbv/zexGKFstBr83F7stkYri7dSs4veM4B0p+uyauq9kRtCWoBHTDwFi5AfnD2fa
-         b6qRVAVvKStlE+21JuETHds0/zbf3bN7m9hGE3nL2ROEVATxSZDUEKCwzOpGJsfNnCrD
-         hNPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=s5upj3v+TSeq1leK9fAsZyA35bnuuGD34MaHoF8Wovc=;
-        b=sc+NQyrtm2cNUOMJVhXKMHcy4AK4NWBqLSMPM4l/VYP67emZ1P8wQnLGHoXuoQKdm1
-         TDEmhNfsYGineCFBQsti66DJg7z3fMnbLyHWpXS2Ruxek95/G44ZD7zAQgiv3aOO4YyQ
-         HZY6DLEYbl+APRaTJUzgdBC0I2nQOXNsAMiOjwqTAowYo8J1/djY8JYmfMh7YeZmVF53
-         hb5yW23ZZ+O2+Uh3DWktw7z+TagICIM+Z/LKLYoE+9NFsg9v2dNFY/OCsmGY1TNEvOx8
-         TMQJJirZhArzEnw14Mkh0noJaZld7CnxkfU4kSQ+m/0fN9vEXfyzZjttjUI8WQYQUILW
-         mCWQ==
-X-Gm-Message-State: APjAAAWjaO/8oDupDwR9rt/ETEKOeaoojobnnlNvxtYGyN2ONdj4CBz9
-        ckMopnaosejN5BevVsrCR0PpsBk9V62VAPcUEnA22Q==
-X-Google-Smtp-Source: APXvYqxKIuoqcCTvQhbTpjvwM8OShctA1QmP+rbImuBsoMDLFsaDkMlX9FrNwfAeLPU9OfcAv1dpbuWgLkcoGwb8k1c=
-X-Received: by 2002:a67:ba05:: with SMTP id l5mr1305615vsn.153.1552638865111;
- Fri, 15 Mar 2019 01:34:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190314111637.20236-1-hans@owltronix.com> <103c19f4-02a2-f54c-13f8-30bc5447426e@intel.com>
- <FE25456B-A63E-4601-960D-96F519250B8C@javigon.com> <CAJbgVnU2RXK4ci79n0szwTpZ+UB2zx977PHo1ie7h5y5kJrbhQ@mail.gmail.com>
-In-Reply-To: <CAJbgVnU2RXK4ci79n0szwTpZ+UB2zx977PHo1ie7h5y5kJrbhQ@mail.gmail.com>
-From:   Hans Holmberg <hans@owltronix.com>
-Date:   Fri, 15 Mar 2019 09:34:14 +0100
-Message-ID: <CANr-nt0DHudD9TFBqLzhgBuYz8GqVbwgiU7W2b5OVsLtpMuu_w@mail.gmail.com>
-Subject: Re: [PATCH RFC] lightnvm: pblk: fix crash in pblk_end_partial_read
- due to multipage bvecs
-To:     Heiner Litz <hlitz@ucsc.edu>
-Cc:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
-        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        Klaus Birkelund Jensen <klaus.jensen@cnexlabs.com>,
-        "Konopko, Igor J" <igor.j.konopko@intel.com>,
-        linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 15 Mar 2019 05:06:37 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2F8xHq8027924;
+        Fri, 15 Mar 2019 09:06:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2018-07-02;
+ bh=ooKzMHXjxB1hW4mS22uZ/3/Gq8wyTQbRb/0fnDdxmdE=;
+ b=afodna/opPv022Ix7KYXTzEzAm00+2z1BrogluY1JNaUEaEt0/RWrcDCD8omkfmLna1X
+ P2VC9FKonyna4rKupgiy4aLSlA/UP5UQcJjyy13AEnDj2PrEkQsbOrazBS4JykfymguQ
+ JY5B9ptt9z1z2mNSgsp6kBhetadJheDvfFtFylfFlAaqox4aM9AL3lpbhcKUQz8fxskd
+ 4HXmIMc7t1JjMW9BIhG7b07hpZ8IqZQafBzEBn/cXQs3S+uPO2H2OdOmqCO13/+fbBDh
+ ufPIOfOz8ZdyqjcciwdCBzcsqWjxRdYgkKcGEdYH769Wuz4+cXGTfZgVyY8IXBDoX7DH gg== 
+Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
+        by userp2120.oracle.com with ESMTP id 2r464rwhsu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 15 Mar 2019 09:06:19 +0000
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x2F96DmS007350
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 15 Mar 2019 09:06:13 GMT
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x2F968CE005175;
+        Fri, 15 Mar 2019 09:06:09 GMT
+Received: from will-ThinkCentre-M93p.cn.oracle.com (/10.182.71.12)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 15 Mar 2019 09:06:08 +0000
+From:   Jianchao Wang <jianchao.w.wang@oracle.com>
+To:     axboe@kernel.dk
+Cc:     hch@lst.de, jthumshirn@suse.de, hare@suse.de, josef@toxicpanda.com,
+        bvanassche@acm.org, sagi@grimberg.me, keith.busch@intel.com,
+        jsmart2021@gmail.com, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/8]: blk-mq: use static_rqs to iterate busy tags
+Date:   Fri, 15 Mar 2019 16:57:36 +0800
+Message-Id: <1552640264-26101-1-git-send-email-jianchao.w.wang@oracle.com>
+X-Mailer: git-send-email 2.7.4
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9195 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=868 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1903150067
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 14, 2019 at 5:15 PM Heiner Litz <hlitz@ucsc.edu> wrote:
->
-> On Thu, Mar 14, 2019 at 7:16 AM Javier Gonz=C3=A1lez <javier@javigon.com>=
- wrote:
-> >
-> > > On 14 Mar 2019, at 06.49, Igor Konopko <igor.j.konopko@intel.com> wro=
-te:
-> > >
-> > > While reading this patch, idea came to my mind - maybe it would be si=
-mply better to get rid of partial read handling from pblk in current form a=
-t all and use bio_split() & bio_chain() combination instead?
-> > >
-> > > This would definitely reduce a number of this 'kind of complicated' c=
-ode inside pblk and let block layer help us with that. Even that the perfor=
-mance of such a requests could be a little worse (few smaller IOs instead o=
-f single vector IO), I believe that partial read is more a corner case, the=
-n a typical use case, so maybe this would be a path to go.
-> > >
-> > > Let me know what you think about such an approach - I can make a patc=
-h with that if you want.
->
-> I like this idea as it will clean up a lot of code and get rid of the
-> read_bitmap.
-> Note that a single request can be turned into up to 32 requests if
-> cached and non-cached sectors alternate, each one probably requiring
-> an l2p lookup. I still think it's worth doing though.
-> When you split, note that you have to release all line_refs which were
-> acquired during l2p lookup.
->
-> >
-> > I agree with Igor.
-> >
+Hi Jens
 
-I agree as well, this path deserves some loving care and cleanup.
-Let's just try to avoid read tail latency degradation.
+As we know, there is a risk of accesing stale requests when iterate
+in-flight requests with tags->rqs[] and this has been talked in following
+thread,
+[1] https://marc.info/?l=linux-scsi&m=154511693912752&w=2
+[2] https://marc.info/?l=linux-block&m=154526189023236&w=2
 
-Simplifying the code is a great first step, then we can optimize if needed =
-be.
+A typical sence could be
+blk_mq_get_request         blk_mq_queue_tag_busy_iter
+  -> blk_mq_get_tag
+                             -> bt_for_each
+                               -> bt_iter
+                                 -> rq = taags->rqs[]
+                                 -> rq->q
+  -> blk_mq_rq_ctx_init
+    -> data->hctx->tags->rqs[rq->tag] = rq;
 
-Thanks for the feedback y'all!
+The root cause is that there is a window between set bit on tag sbitmap
+and set tags->rqs[].
 
+This patch would fix this issue by iterating requests with tags->static_rqs[]
+instead of tags->rqs[] which would be changed dynamically. Moreover,
+we will try to get a non-zero q_usage_counter before access hctxs and tags and
+thus could avoid the race with updating nr_hw_queues, switching io scheduler
+and even queue clean up which are all under a frozen and drained queue.
 
-> > As I mentioned offline, we should fix this in a way that survives
-> > further changes in struct bio; either making pblk handling visible to
-> > the outside or rethinking the whole thing.
-> >
-> > Igor: If you can send a patch you mention, it would be great. I have
-> > been trying the helper approach for some time, but it is too specific,
-> > as fixing holes in the bvec breaks the bio advance-only semantics. Your
-> > approach seems much better.
-> >
-> > Thanks,
-> > Javier
+The 1st patch get rid of the useless of synchronize_rcu in __blk_mq_update_nr_hw_queues
+
+The 2nd patch modify the blk_mq_queue_tag_busy_iter to use tags->static_rqs[]
+instead of tags->rqs[] to iterate the busy tags.
+
+The 3rd ~ 7th patch change the blk_mq_tagset_busy_iter to blk_mq_queue_tag_busy_iter
+which is safer
+
+The 8th patch get rid of the blk_mq_tagset_busy_iter.
+
+Jianchao Wang(8)
+	blk-mq: get rid of the synchronize_rcu in
+	blk-mq: change the method of iterating busy tags of a
+	blk-mq: use blk_mq_queue_tag_busy_iter in debugfs
+	mtip32xx: use blk_mq_queue_tag_busy_iter
+	nbd: use blk_mq_queue_tag_busy_iter
+	skd: use blk_mq_queue_tag_busy_iter
+	nvme: use blk_mq_queue_tag_busy_iter
+	blk-mq: remove blk_mq_tagset_busy_iter
+
+diff stat
+ block/blk-mq-debugfs.c            |   4 +-
+ block/blk-mq-tag.c                | 173 +++++++++++++++++++++++++-------------------------------------------------------------
+ block/blk-mq-tag.h                |   2 -
+ block/blk-mq.c                    |  35 ++++++------------
+ drivers/block/mtip32xx/mtip32xx.c |   8 ++--
+ drivers/block/nbd.c               |   2 +-
+ drivers/block/skd_main.c          |   4 +-
+ drivers/nvme/host/core.c          |  12 ++++++
+ drivers/nvme/host/fc.c            |  12 +++---
+ drivers/nvme/host/nvme.h          |   2 +
+ drivers/nvme/host/pci.c           |   5 ++-
+ drivers/nvme/host/rdma.c          |   6 +--
+ drivers/nvme/host/tcp.c           |   5 ++-
+ drivers/nvme/target/loop.c        |   6 +--
+ include/linux/blk-mq.h            |   7 ++--
+ 15 files changed, 105 insertions(+), 178 deletions(-
+
+Thanks
+Jianchao
+
