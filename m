@@ -4,62 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42FA8C10F00
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 14:59:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E86FC4360F
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 14:59:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 78825218AC
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 14:59:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6EB5A218AC
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 14:59:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WvisMBKb"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Q5B2XIA3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729319AbfCOO7p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Mar 2019 10:59:45 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:40141 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727668AbfCOO7p (ORCPT
+        id S1729324AbfCOO7s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Mar 2019 10:59:48 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:46914 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727691AbfCOO7s (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Mar 2019 10:59:45 -0400
-Received: by mail-pf1-f196.google.com with SMTP id y124so6525003pfy.7
-        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2019 07:59:44 -0700 (PDT)
+        Fri, 15 Mar 2019 10:59:48 -0400
+Received: by mail-pg1-f194.google.com with SMTP id a22so6621759pgg.13
+        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2019 07:59:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=BPF7HYIndwYCravUgyQt5YZcBBFvcmqnVAdETebox5w=;
-        b=WvisMBKbDsB+smLauX/MDEbJ1706Y11py46IH0eerWwAvAJ9bTtJ1oEdgPbWtGq7nu
-         k/g8LcJ/CTUL7e1Rj3cfytt4llW3XQ1SME8m5rQD4ZR15RHrQ1pUlloJoO2NqBWp+2KE
-         bYID6HOR1QW7sfq2WdPtDyWu8DxziePduW4buoGqSg4ep/uOXEREDkwsVgT3kgwVwkHF
-         /p4oJoo2PjHsMqqQag3AvV7Bg/MFq4ztQ22xhMGs5zzLus1/hR9RwSQ7sQy1po4PeIFo
-         JAkLH3/q9iAe95/Ma1cehtfMlDYysX4hZgQXLChGkfPvB3zBmyNXNnL/tzirIbQBATk6
-         U6hQ==
+        bh=iP0RIMIP0Dhv0Z3VwimEl1gZSo5mPCskMpjat/g+ZWI=;
+        b=Q5B2XIA3o13t9GSzsQbK8sE651mnRmz0FDF04NOuh0sqpEH7gMaXegRLvfuDuulYDe
+         mRKiRP+DEBaYzjjo3wArP3GZQ0bGCEuFChN4YEKgJQaU1WtFM2SQkJynmQWYD3Fzj8I8
+         gwR6ExlEVWAjvCmWBt6xDVHQtSA4SPYp6cunpok9yTdip8WhdAeB2W8PtyQc4BdZp3vC
+         Inyun33YXY3iAbaem/JIHpqcLxekLGghmMYaADq2JV7EvZHhFXkUTOctlbbZ2tEwk6x3
+         GEj/h/Riz26DKvA30dmbr5VecNcorRCqqfYT69XsKkbPLidrw1uGLoHXdqRy71um9+BX
+         ES3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=BPF7HYIndwYCravUgyQt5YZcBBFvcmqnVAdETebox5w=;
-        b=Nd64n7Q3QtX68ADgr78AXCZwA/KVZwPBSGYUALaXvO9AMq5lhLdOBohnp3H5cd9sDs
-         mgS/GEC6f5t/3vCSsIeveLV9m99XvmSs0k+bvQQzJx+7VGJhFjSZcEUA50IhRKXA3PGr
-         +E/Cbia5Tql4m/NwzjUpkbEne/P6aSaoKz6yUS/3gG6E/oIKFEvu6bTlJJI4Z3heV5/Y
-         BDJPc9Dsqf5J4cK+beu8tahUH+S/t6K520sOL0fAh9bf87NbtR187jXTa6P7o08SMRt+
-         apO2UV6X1xe8yoiXlIpYKlgrHUwDW/BWVUNvF0Q4Jk2L0ZlR3JpulCKRG/nh3DUEnnH2
-         7QDw==
-X-Gm-Message-State: APjAAAU/R+xvSO8WT0zmhqhbeN1UGzyUj7h+il9d7bwv4K2zAPGMwWgR
-        YuDA5d6IrxZzBlyoSZ/y4K+rnZ73zY2KhA==
-X-Google-Smtp-Source: APXvYqxXg87XrVTeTdWlDT7n6CgdvY8C2ocObXBjDXmAHzsUahS75D6fLAfOEDtnRjyxH7JcKzK6sA==
-X-Received: by 2002:a62:3890:: with SMTP id f138mr4568373pfa.148.1552661984006;
-        Fri, 15 Mar 2019 07:59:44 -0700 (PDT)
+        bh=iP0RIMIP0Dhv0Z3VwimEl1gZSo5mPCskMpjat/g+ZWI=;
+        b=j4qnioMDfiUkha51fpbOfGTtrdWkdasDOWXmg+tlyBW6vJ/uF55rXmk7bcqsCbaJ/G
+         wWbL1ZJ3BKtOFncRnpa1Z1qzPk0StJxVwcP1jYr2YtTiVlMVlLp06i1hSwMUZKe5aiT1
+         kplJDyn9iSzdAQUy3ydaJTWsw8A40rEnR016KU2GnL2mHBHLVT0NPVjXkBCt6yZLcgHz
+         CcEBLRvY3iMizFarI6B2juNNKJ9pBDSdwCSR9sUIZBxe59P157AR07rwd33Vp1pZ7x7h
+         2CIxhE6266TXG8yRstAIrFPPjNsGREp/RhEkzQ82Svx8FHyFHnCebt2LKKGzVXFk+meD
+         cNRA==
+X-Gm-Message-State: APjAAAU7oHc04ob12ah5vuwEizOkICHA0IeydrODwRVTgXfi0P5az4J/
+        eadCW5pyENC5WtQlL4foBaJVxg==
+X-Google-Smtp-Source: APXvYqys/fbXqgURwR1PbWrDiThPOX1HA8pdaQ59Q3iqAm147y+KQTuhOCcF7kRmF6ppefgBEartMw==
+X-Received: by 2002:a62:1d8c:: with SMTP id d134mr4453958pfd.185.1552661987812;
+        Fri, 15 Mar 2019 07:59:47 -0700 (PDT)
 Received: from x1.localdomain (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id f28sm4287179pfh.178.2019.03.15.07.59.42
+        by smtp.gmail.com with ESMTPSA id f28sm4287179pfh.178.2019.03.15.07.59.45
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 15 Mar 2019 07:59:43 -0700 (PDT)
+        Fri, 15 Mar 2019 07:59:46 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
 Cc:     viro@ZenIV.linux.org.uk, Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 1/3] iov_iter: add ITER_BVEC_FLAG_NO_REF flag
-Date:   Fri, 15 Mar 2019 08:59:36 -0600
-Message-Id: <20190315145938.21516-2-axboe@kernel.dk>
+Subject: [PATCH 3/3] io_uring: add io_uring_event cache hit information
+Date:   Fri, 15 Mar 2019 08:59:38 -0600
+Message-Id: <20190315145938.21516-4-axboe@kernel.dk>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190315145938.21516-1-axboe@kernel.dk>
 References: <20190315145938.21516-1-axboe@kernel.dk>
@@ -68,83 +68,55 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For ITER_BVEC, if we're holding on to kernel pages, the caller
-doesn't need to grab a reference to the bvec pages, and drop that
-same reference on IO completion. This is essentially safe for any
-ITER_BVEC, but some use cases end up reusing pages and uncondtionally
-dropping a page reference on completion. And example of that is
-sendfile(2), that ends up being a splice_in + splice_out on the
-pipe pages.
+Add hint on whether a read was served out of the page cache, or if it
+hit media. This is useful for buffered async IO, O_DIRECT reads would
+never have this set (for obvious reasons).
 
-Add a flag that tells us it's fine to not grab a page reference
-to the bvec pages, since that caller knows not to drop a reference
-when it's done with the pages.
+If the read hit page cache, cqe->flags will have IOCQE_FLAG_CACHEHIT
+set.
 
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- fs/io_uring.c       |  3 +++
- include/linux/uio.h | 24 +++++++++++++++++++-----
- 2 files changed, 22 insertions(+), 5 deletions(-)
+ fs/io_uring.c                 | 6 +++++-
+ include/uapi/linux/io_uring.h | 5 +++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/fs/io_uring.c b/fs/io_uring.c
-index 5be6e4f99a9e..f66a4a5daf35 100644
+index f66a4a5daf35..513df722702e 100644
 --- a/fs/io_uring.c
 +++ b/fs/io_uring.c
-@@ -862,6 +862,9 @@ static int io_import_fixed(struct io_ring_ctx *ctx, int rw,
- 	iov_iter_bvec(iter, rw, imu->bvec, imu->nr_bvecs, offset + len);
- 	if (offset)
- 		iov_iter_advance(iter, offset);
+@@ -635,10 +635,14 @@ static void kiocb_end_write(struct kiocb *kiocb)
+ static void io_complete_rw(struct kiocb *kiocb, long res, long res2)
+ {
+ 	struct io_kiocb *req = container_of(kiocb, struct io_kiocb, rw);
++	unsigned ev_flags = 0;
+ 
+ 	kiocb_end_write(kiocb);
+ 
+-	io_cqring_add_event(req->ctx, req->user_data, res, 0);
++	if (res > 0 && (req->flags & REQ_F_FORCE_NONBLOCK))
++		ev_flags = IOCQE_FLAG_CACHEHIT;
 +
-+	/* don't drop a reference to these pages */
-+	iter->type |= ITER_BVEC_FLAG_NO_REF;
- 	return 0;
++	io_cqring_add_event(req->ctx, req->user_data, res, ev_flags);
+ 	io_put_req(req);
  }
  
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index ecf584f6b82d..4e926641fa80 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -23,14 +23,23 @@ struct kvec {
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index e23408692118..24906e99fdc7 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -69,6 +69,11 @@ struct io_uring_cqe {
+ 	__u32	flags;
  };
  
- enum iter_type {
--	ITER_IOVEC = 0,
--	ITER_KVEC = 2,
--	ITER_BVEC = 4,
--	ITER_PIPE = 8,
--	ITER_DISCARD = 16,
-+	/* set if ITER_BVEC doesn't hold a bv_page ref */
-+	ITER_BVEC_FLAG_NO_REF = 2,
-+
-+	/* iter types */
-+	ITER_IOVEC = 4,
-+	ITER_KVEC = 8,
-+	ITER_BVEC = 16,
-+	ITER_PIPE = 32,
-+	ITER_DISCARD = 64,
- };
- 
- struct iov_iter {
-+	/*
-+	 * Bit 0 is the read/write bit, set if we're writing.
-+	 * Bit 1 is the BVEC_FLAG_NO_REF bit, set if type is a bvec and
-+	 * the caller isn't expecting to drop a page reference when done.
-+	 */
- 	unsigned int type;
- 	size_t iov_offset;
- 	size_t count;
-@@ -84,6 +93,11 @@ static inline unsigned char iov_iter_rw(const struct iov_iter *i)
- 	return i->type & (READ | WRITE);
- }
- 
-+static inline bool iov_iter_bvec_no_ref(const struct iov_iter *i)
-+{
-+	return (i->type & ITER_BVEC_FLAG_NO_REF) != 0;
-+}
++/*
++ * io_uring_event->flags
++ */
++#define IOCQE_FLAG_CACHEHIT	(1U << 0)	/* IO did not hit media */
 +
  /*
-  * Total number of bytes covered by an iovec.
-  *
+  * Magic offsets for the application to mmap the data it needs
+  */
 -- 
 2.17.1
 
