@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E7E5C43381
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 09:07:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B2CC43381
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 09:07:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B488218C3
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 09:07:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16DC4218B0
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 09:07:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="xqP793vY"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Kzesn5fH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728045AbfCOJHa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Mar 2019 05:07:30 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:50544 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728644AbfCOJGt (ORCPT
+        id S1728621AbfCOJGo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Mar 2019 05:06:44 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:40616 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727470AbfCOJGn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Mar 2019 05:06:49 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2F8xImn020939;
-        Fri, 15 Mar 2019 09:06:28 GMT
+        Fri, 15 Mar 2019 05:06:43 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2F8xI5J027981;
+        Fri, 15 Mar 2019 09:06:30 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=hodO79sVdUVbs8R2wgveaoHWI6y3it+JXm1fmyjQDVk=;
- b=xqP793vYQW7JOCT2ovXf0NeKSjjV6Sk1vbWBMc5KCIqFzaaWcWjxPhN64zTOSSVBd2V+
- KypriZ9GXCMVv1PmuqpDuA+wBvsUbajU/FDam8RBe8pUXDW6jCQL7MayLe/La3L4T219
- /48pkhDmxnU7ch2QlJDXhd4H73t1SpTVWwehhNTuLzeraQPltvG+eBfPnb6hYfunlmkI
- tvQKJXre8anR0Bn8g35omJdWXe7PNLs8nqU7LvtVn4DLJ8tOeuvDtHDrRGQ8xrwT8EBD
- EMvifZ/1sIAz2RvmC1E+KgJHqCwLaNzG7QPEP+7ylKKjx85axOlrFvNjoM1m4RlQXrZU dA== 
+ bh=3fE6qdcH4Ccpw7H6cCg51Qtvf/v1uSWjMXLedQ7vr3Q=;
+ b=Kzesn5fHkKDXfgXY2nsAsO/mT2PR7yZ3KBhaIASyr3oDt81pjiCLWn767XJPY2641ecm
+ XGv2Hrh6rmodqfBqDU6AOU8WJMLhDPz2c8FmLLg92CRt6uR6g+oX4808KzXvA/9JWGg7
+ Cq+FKKiZfH40pjKEDk3zOdjh0hRaCYL7f8W8ZsesIJkxV2s1AaF2I5T2BYQhIln9KncU
+ MgRZ9jYBgxu0/9XGlw8LQ9lZ+CBnGowApHCCqwWGrB0pyTcpefgamU5LrAXmvJv63J9S
+ AMCThMbivyreEy8NHrIn+zuwsM2/ky6m4EAnB6xFzb5ptKpYWYhdA0NRRDNCsLzSujdu ng== 
 Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by userp2130.oracle.com with ESMTP id 2r44wunjte-1
+        by userp2120.oracle.com with ESMTP id 2r464rwhtr-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 Mar 2019 09:06:28 +0000
+        Fri, 15 Mar 2019 09:06:30 +0000
 Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2F96RjV006011
+        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2F96OEc005837
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 15 Mar 2019 09:06:27 GMT
+        Fri, 15 Mar 2019 09:06:24 GMT
 Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x2F96Rit017635;
-        Fri, 15 Mar 2019 09:06:27 GMT
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x2F96OHK017621;
+        Fri, 15 Mar 2019 09:06:24 GMT
 Received: from will-ThinkCentre-M93p.cn.oracle.com (/10.182.71.12)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 15 Mar 2019 09:06:27 +0000
+        with ESMTP ; Fri, 15 Mar 2019 09:06:24 +0000
 From:   Jianchao Wang <jianchao.w.wang@oracle.com>
 To:     axboe@kernel.dk
 Cc:     hch@lst.de, jthumshirn@suse.de, hare@suse.de, josef@toxicpanda.com,
         bvanassche@acm.org, sagi@grimberg.me, keith.busch@intel.com,
         jsmart2021@gmail.com, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 6/8] skd: use blk_mq_queue_tag_busy_iter
-Date:   Fri, 15 Mar 2019 16:57:42 +0800
-Message-Id: <1552640264-26101-7-git-send-email-jianchao.w.wang@oracle.com>
+Subject: [PATCH 5/8] nbd: use blk_mq_queue_tag_busy_iter
+Date:   Fri, 15 Mar 2019 16:57:41 +0800
+Message-Id: <1552640264-26101-6-git-send-email-jianchao.w.wang@oracle.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1552640264-26101-1-git-send-email-jianchao.w.wang@oracle.com>
 References: <1552640264-26101-1-git-send-email-jianchao.w.wang@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9195 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
  suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=857 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1903150067
 Sender: linux-block-owner@vger.kernel.org
@@ -75,31 +75,22 @@ in tags->rqs[]. Use blk_mq_queue_tag_busy_iter here.
 
 Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
 ---
- drivers/block/skd_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/block/nbd.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index ab893a7..60c34ff 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -395,7 +395,7 @@ static int skd_in_flight(struct skd_device *skdev)
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 7c9a949..9e7e828 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -747,7 +747,7 @@ static bool nbd_clear_req(struct request *req, void *data, bool reserved)
+ static void nbd_clear_que(struct nbd_device *nbd)
  {
- 	int count = 0;
- 
--	blk_mq_tagset_busy_iter(&skdev->tag_set, skd_inc_in_flight, &count);
-+	blk_mq_queue_tag_busy_iter(skdev->queue, skd_inc_in_flight, &count, true);
- 
- 	return count;
+ 	blk_mq_quiesce_queue(nbd->disk->queue);
+-	blk_mq_tagset_busy_iter(&nbd->tag_set, nbd_clear_req, NULL);
++	blk_mq_queue_tag_busy_iter(nbd->disk->queue, nbd_clear_req, NULL, true);
+ 	blk_mq_unquiesce_queue(nbd->disk->queue);
+ 	dev_dbg(disk_to_dev(nbd->disk), "queue cleared\n");
  }
-@@ -1916,7 +1916,7 @@ static bool skd_recover_request(struct request *req, void *data, bool reserved)
- 
- static void skd_recover_requests(struct skd_device *skdev)
- {
--	blk_mq_tagset_busy_iter(&skdev->tag_set, skd_recover_request, skdev);
-+	blk_mq_queue_tag_busy_iter(skdev->queue, skd_recover_request, skdev, true);
- }
- 
- static void skd_isr_msg_from_dev(struct skd_device *skdev)
 -- 
 2.7.4
 
