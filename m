@@ -4,83 +4,96 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_NEOMUTT autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8619C43381
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 13:27:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53B68C43381
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 13:30:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B041920854
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 13:27:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FD5F21019
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 13:30:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="DOm3k7xY"
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20150623.gappssmtp.com header.i=@toxicpanda-com.20150623.gappssmtp.com header.b="hDqAlN2F"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726468AbfCON1r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Mar 2019 09:27:47 -0400
-Received: from mail-qt1-f179.google.com ([209.85.160.179]:36699 "EHLO
-        mail-qt1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726875AbfCON1o (ORCPT
+        id S1728132AbfCONaV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Mar 2019 09:30:21 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:34487 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726875AbfCONaV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Mar 2019 09:27:44 -0400
-Received: by mail-qt1-f179.google.com with SMTP id y36so223692qtb.3
-        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2019 06:27:43 -0700 (PDT)
+        Fri, 15 Mar 2019 09:30:21 -0400
+Received: by mail-qt1-f196.google.com with SMTP id k2so10067723qtm.1
+        for <linux-block@vger.kernel.org>; Fri, 15 Mar 2019 06:30:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=toxicpanda-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=No1HWm0EsCJCKhgJLbb3/U/NHO8sMm1k/TSYX8LGc6Q=;
-        b=DOm3k7xYFoHXos1RvdmIdXhpBQAYPDHy9rp4+wXKTEfosJSu0x0usHOezzegKlg5lh
-         Ske6dLEJgMQKVQFaW8LHTxi3i5eVwP++jO/HwV/CrcQ33PGMm/GQq7rAsQaSc5o+fO8j
-         2G4U77ocq1EW+UXUBlVKzqC++Mo/UEIai9wlgPwumMOAnnYuKt+KYDdvJ4srvty/z94H
-         AjBwnrDbO/NhfPKs+Rtpwv9fKSYRadkgrLLyZakDUssdgdUV76+HvwXQTldCAjVTrYR0
-         Vjk3qQIq2ezdv7ZO+QwAJhwLJIjLE2SvFyTyTz4iqjzmAzvW+oeRBs/4BF9BsJ0klKTO
-         TgUA==
+        bh=wN20U8IEsLh5RNTubrw2jQVkk1uGCIfHs0EfnmILUwo=;
+        b=hDqAlN2FFNw9E/cm85y3zwTUHBE+3/qKltYvD7P1DItMctcU264QY2NrOWTUhfEUL0
+         sxDxY5mXqC++3qobHhXG3vbtLla4ZU5fnny9kTF05Wsi9HBw3FV0ftQfIFH/0Y8+48XE
+         QstsgiTaVZlElstNtwvFyopEAoDyT/6GLOYQSaRSSYHARXUv0IECrlVROudmTjllefDv
+         5EHFMqm29s6KN9UTfcGxcQptZyNDEm/L8AhtnDSWcfqHsJdg9kdVoa0F+n9zHaSkb6Lc
+         6hboOr6eftZoQazM2uCyTV3VOveJATUk5WoEuJior/Ej618+RZLeQO9ECtQrfm1AsIZm
+         VS1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=No1HWm0EsCJCKhgJLbb3/U/NHO8sMm1k/TSYX8LGc6Q=;
-        b=jeFMRaoyfoGKp/6wJGfW9lk80oN9UVY1PfWF6mc56S5Haa4AmvSoGEsfe8TTpX0U2B
-         XQyNnBf+HxuF5uG+w8LcoAfcnh8X99OP77qM6jBAZ7reVtujrAzYqCwG0ktGU5tn93kW
-         q+xxAsFUIu27Lg2CbfIbLqdoyN2vljtUx8tRd764v4g2JxAelUMlYSlYCXLnZ8kenU0E
-         CRpvDa1khkOJHLDJLkPwB055uIYwZRUriYS/Uz9coEDcYinCn4CcG9xJJg25KAk5tgec
-         0suFujxci9Lu59EOBra6sAhKqmpWlxTz6FAQXnr/4p1Y8UCtVccBp4GR31byB26v32Hm
-         +UnA==
-X-Gm-Message-State: APjAAAWCV/zcT4CnC0nUV5N0xFnvzGXlrdgJNWbTJQFuGRTWzm9INPWm
-        0dNQI73lqncqgyO8XrRcojdWNA==
-X-Google-Smtp-Source: APXvYqz7HLKof8j3jGEoMoEfytO3lSQQVR/S/SdZ6syIQqabjFNdZDG/SL5NGoFYK8OFMQW7jmvsLQ==
-X-Received: by 2002:a0c:b89e:: with SMTP id y30mr2557406qvf.52.1552656463123;
-        Fri, 15 Mar 2019 06:27:43 -0700 (PDT)
+        bh=wN20U8IEsLh5RNTubrw2jQVkk1uGCIfHs0EfnmILUwo=;
+        b=onCsDieIZujuU9c/gnbjJryoyGtniAdoo8To7idBxd6APOeyrIUUE5DoIYcoopos/e
+         qOydXHSL4XPEw0GjQgKHLa27id/vONkTnx9VZ5lA74Wt1uiMr3yOa6dKsbrZlt83HHc4
+         g+NTJaQ7Gp1mhd9m4elboUNy/PfJuiPTlCg2sJSCF3978cSQYX/SIjg9Lo+ZCIxCYnX9
+         XnLpXYkCB4aubLguAccpjGMD+Ev1MPlawOf508+T2lImmfjYGZ9RQerZa4ve2ZrMGdGB
+         7b1QI8zS/tkwawKVN+kKgIXKHTrZ9H5R8W3TTW0aX4By07LfJM9pyaf0Lreaj2nKD/WY
+         upsQ==
+X-Gm-Message-State: APjAAAUM975ONfBF1L9B++l7TSMyEgpRIcHUeIoSwME45iMYKOkgCA/K
+        ptgpocrZ+J9jMswc2/bAxAd3Rg==
+X-Google-Smtp-Source: APXvYqxkABG5ytAGHiYJZdbE/6xgxKLdj0lquVjJ0GTNgf5CqZnChnTRdQH+xMT0fzAKltDVEahxrg==
+X-Received: by 2002:ac8:2427:: with SMTP id c36mr2857627qtc.124.1552656620302;
+        Fri, 15 Mar 2019 06:30:20 -0700 (PDT)
 Received: from localhost ([107.15.81.208])
-        by smtp.gmail.com with ESMTPSA id w33sm1438382qth.34.2019.03.15.06.27.42
+        by smtp.gmail.com with ESMTPSA id y2sm1435840qty.63.2019.03.15.06.30.19
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 15 Mar 2019 06:27:42 -0700 (PDT)
-Date:   Fri, 15 Mar 2019 09:27:40 -0400
+        Fri, 15 Mar 2019 06:30:19 -0700 (PDT)
+Date:   Fri, 15 Mar 2019 09:30:18 -0400
 From:   Josef Bacik <josef@toxicpanda.com>
-To:     Kangjie Lu <kjlu@umn.edu>
-Cc:     pakki001@umn.edu, Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: nbd: fix a missing check for nla_nest_start
-Message-ID: <20190315132739.mfnbkp5vdjx2uhko@MacBook-Pro-91.local>
-References: <20190315063138.17666-1-kjlu@umn.edu>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jianchao Wang <jianchao.w.wang@oracle.com>, axboe@kernel.dk,
+        jthumshirn@suse.de, hare@suse.de, josef@toxicpanda.com,
+        bvanassche@acm.org, sagi@grimberg.me, keith.busch@intel.com,
+        jsmart2021@gmail.com, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/8]: blk-mq: use static_rqs to iterate busy tags
+Message-ID: <20190315133017.lnr5cvtapo5nxilu@MacBook-Pro-91.local>
+References: <1552640264-26101-1-git-send-email-jianchao.w.wang@oracle.com>
+ <20190315092020.GA2405@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190315063138.17666-1-kjlu@umn.edu>
+In-Reply-To: <20190315092020.GA2405@lst.de>
 User-Agent: NeoMutt/20180716
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 15, 2019 at 01:31:38AM -0500, Kangjie Lu wrote:
-> nla_nest_start may fail and thus deserves a check.
+On Fri, Mar 15, 2019 at 10:20:20AM +0100, Christoph Hellwig wrote:
+> On Fri, Mar 15, 2019 at 04:57:36PM +0800, Jianchao Wang wrote:
+> > Hi Jens
+> > 
+> > As we know, there is a risk of accesing stale requests when iterate
+> > in-flight requests with tags->rqs[] and this has been talked in following
+> > thread,
+> > [1] https://marc.info/?l=linux-scsi&m=154511693912752&w=2
+> > [2] https://marc.info/?l=linux-block&m=154526189023236&w=2
 > 
-> The fix inserts such a check and exits gracefully in case it
-> fails.
-> 
+> I'd rather take one step back and figure out why we are iterating
+> the busy requests.  There really shouldn't be any reason why a driver
+> is even doings that (vs some error handling helpers in the core
+> block code that can properly synchronize).
 
-Except it won't because we pre-reserve enough space for that attr.  Subsequent
-calls could fail, and those are checked properly, but this one won't.  Thanks,
+I use it in NBD to error out any pending requests for forced disconnects.  I'd
+be happy to use some other blessed interface, I'm not married to this one.
+Thanks,
 
 Josef
