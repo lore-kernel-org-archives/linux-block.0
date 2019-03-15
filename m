@@ -2,149 +2,118 @@ Return-Path: <SRS0=+tqK=RS=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDEEBC43381
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 03:20:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2590C43381
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 04:19:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 92C4221873
-	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 03:20:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90DA2218A1
+	for <linux-block@archiver.kernel.org>; Fri, 15 Mar 2019 04:19:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726771AbfCODUs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Mar 2019 23:20:48 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4684 "EHLO huawei.com"
+        id S1726048AbfCOETs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Mar 2019 00:19:48 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:43608 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726571AbfCODUr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Mar 2019 23:20:47 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 3E26D629930835F28BED;
-        Fri, 15 Mar 2019 11:20:45 +0800 (CST)
-Received: from [127.0.0.1] (10.177.219.49) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.408.0; Fri, 15 Mar 2019
- 11:20:40 +0800
-Subject: Re: [PATCH v2] block: add a new flag BLK_MQ_POLL_CLASSIC for hybrid
- poll
-To:     Damien Le Moal <Damien.LeMoal@wdc.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "marcos.souza.org@gmail.com" <marcos.souza.org@gmail.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20190301012855.137660-1-yuyufen@huawei.com>
- <68a8b534-9eb8-7309-4df8-a90ea5705e49@huawei.com>
- <BYAPR04MB58160E554934D081C582C64EE7480@BYAPR04MB5816.namprd04.prod.outlook.com>
-From:   yuyufen <yuyufen@huawei.com>
-Message-ID: <311f900e-6ede-1127-e671-5a2603491c5d@huawei.com>
-Date:   Fri, 15 Mar 2019 11:20:39 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.1
+        id S1725857AbfCOETr (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 15 Mar 2019 00:19:47 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 8304CA7CDA77505F8A5D;
+        Fri, 15 Mar 2019 12:19:45 +0800 (CST)
+Received: from huawei.com (10.90.53.225) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.408.0; Fri, 15 Mar 2019
+ 12:19:43 +0800
+From:   Yufen Yu <yuyufen@huawei.com>
+To:     <axboe@kernel.dk>, <Damien.LeMoal@wdc.com>,
+        <marcos.souza.org@gmail.com>
+CC:     <linux-block@vger.kernel.org>
+Subject: [PATCH v3] block: add a new flag BLK_MQ_POLL_CLASSIC for hybrid poll
+Date:   Fri, 15 Mar 2019 12:24:00 +0800
+Message-ID: <20190315042400.107549-1-yuyufen@huawei.com>
+X-Mailer: git-send-email 2.16.2.dirty
 MIME-Version: 1.0
-In-Reply-To: <BYAPR04MB58160E554934D081C582C64EE7480@BYAPR04MB5816.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.177.219.49]
+Content-Type: text/plain
+X-Originating-IP: [10.90.53.225]
 X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+For q->poll_nsec == -1, means doing classic poll, not hybrid poll.
+We introduce a new flag BLK_MQ_POLL_CLASSIC to replace -1, which
+may make code much easier to read.
 
+Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+---
+ block/blk-mq.c         | 4 ++--
+ block/blk-sysfs.c      | 8 ++++----
+ include/linux/blkdev.h | 3 +++
+ 3 files changed, 9 insertions(+), 6 deletions(-)
 
-On 2019/3/11 21:51, Damien Le Moal wrote:
-> On 2019/03/11 6:31, yuyufen wrote:
->> ping?
->>
->>
->> On 2019/3/1 9:28, Yufen Yu wrote:
->>> For q->poll_nsec == -1, means doing classic poll, not hybrid poll.
->>> We introduce a new flag BLK_MQ_POLL_CLASSIC to replace -1, which
->>> may make code much easier to read.
->>>
->>> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
->>> ---
->>>    block/blk-mq.c         | 4 ++--
->>>    block/blk-sysfs.c      | 4 ++--
->>>    include/linux/blkdev.h | 3 +++
->>>    3 files changed, 7 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/block/blk-mq.c b/block/blk-mq.c
->>> index 9437a5eb07cf..e70202e3b378 100644
->>> --- a/block/blk-mq.c
->>> +++ b/block/blk-mq.c
->>> @@ -2857,7 +2857,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
->>>    	/*
->>>    	 * Default to classic polling
->>>    	 */
->>> -	q->poll_nsec = -1;
->>> +	q->poll_nsec = BLK_MQ_POLL_CLASSIC;
->>>    
->>>    	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
->>>    	blk_mq_add_queue_tag_set(set, q);
->>> @@ -3389,7 +3389,7 @@ static bool blk_mq_poll_hybrid(struct request_queue *q,
->>>    {
->>>    	struct request *rq;
->>>    
->>> -	if (q->poll_nsec == -1)
->>> +	if (q->poll_nsec == BLK_MQ_POLL_CLASSIC)
->>>    		return false;
->>>    
->>>    	if (!blk_qc_t_is_internal(cookie))
->>> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
->>> index 590d1ef2f961..8639e135687e 100644
->>> --- a/block/blk-sysfs.c
->>> +++ b/block/blk-sysfs.c
->>> @@ -360,7 +360,7 @@ static ssize_t queue_poll_delay_show(struct request_queue *q, char *page)
->>>    {
->>>    	int val;
->>>    
->>> -	if (q->poll_nsec == -1)
->>> +	if (q->poll_nsec == BLK_MQ_POLL_CLASSIC)
->>>    		val = -1;
->>>    	else
->>>    		val = q->poll_nsec / 1000;
->>> @@ -381,7 +381,7 @@ static ssize_t queue_poll_delay_store(struct request_queue *q, const char *page,
->>>    		return err;
->>>    
->>>    	if (val == -1)
-> Since val is an int obtained with kstrtoint(), val can be a negative value other
-> than -1. So what about something like:
->
-> 	if (val == BLK_MQ_POLL_CLASSIC)
-> 		q->poll_nsec = BLK_MQ_POLL_CLASSIC;
-> 	else if (val >= 0)
-> 		q->poll_nsec = val * 1000;
-> 	else
-> 		return -EINVAL;
->
-> That would avoid problems with negative values other than -1.
-
-I agree with you. This may be more reasonable.
-Thanks a lot for your suggestion.
-
-Yufen.
-Thanks
-
->>> -		q->poll_nsec = -1;
->>> +		q->poll_nsec = BLK_MQ_POLL_CLASSIC;
->>>    	else
->>>    		q->poll_nsec = val * 1000;
->>>    
->>> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
->>> index 338604dff7d0..f9c2ebf5e621 100644
->>> --- a/include/linux/blkdev.h
->>> +++ b/include/linux/blkdev.h
->>> @@ -50,6 +50,9 @@ struct blk_stat_callback;
->>>    /* Must be consistent with blk_mq_poll_stats_bkt() */
->>>    #define BLK_MQ_POLL_STATS_BKTS 16
->>>    
->>> +/* Doing classic polling */
->>> +#define BLK_MQ_POLL_CLASSIC -1
->>> +
->>>    /*
->>>     * Maximum number of blkcg policies allowed to be registered concurrently.
->>>     * Defined here to simplify include dependency.
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a9c181603cbd..1c588e5c4a02 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2857,7 +2857,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	/*
+ 	 * Default to classic polling
+ 	 */
+-	q->poll_nsec = -1;
++	q->poll_nsec = BLK_MQ_POLL_CLASSIC;
+ 
+ 	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
+ 	blk_mq_add_queue_tag_set(set, q);
+@@ -3392,7 +3392,7 @@ static bool blk_mq_poll_hybrid(struct request_queue *q,
+ {
+ 	struct request *rq;
+ 
+-	if (q->poll_nsec == -1)
++	if (q->poll_nsec == BLK_MQ_POLL_CLASSIC)
+ 		return false;
+ 
+ 	if (!blk_qc_t_is_internal(cookie))
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 59685918167e..cd127067998a 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -360,8 +360,8 @@ static ssize_t queue_poll_delay_show(struct request_queue *q, char *page)
+ {
+ 	int val;
+ 
+-	if (q->poll_nsec == -1)
+-		val = -1;
++	if (q->poll_nsec == BLK_MQ_POLL_CLASSIC)
++		val = BLK_MQ_POLL_CLASSIC;
+ 	else
+ 		val = q->poll_nsec / 1000;
+ 
+@@ -380,8 +380,8 @@ static ssize_t queue_poll_delay_store(struct request_queue *q, const char *page,
+ 	if (err < 0)
+ 		return err;
+ 
+-	if (val == -1)
+-		q->poll_nsec = -1;
++	if (val == BLK_MQ_POLL_CLASSIC)
++		q->poll_nsec = BLK_MQ_POLL_CLASSIC;
+ 	else
+ 		q->poll_nsec = val * 1000;
+ 
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 0de92b29f589..5c58a3b2bf00 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -50,6 +50,9 @@ struct blk_stat_callback;
+ /* Must be consistent with blk_mq_poll_stats_bkt() */
+ #define BLK_MQ_POLL_STATS_BKTS 16
+ 
++/* Doing classic polling */
++#define BLK_MQ_POLL_CLASSIC -1
++
+ /*
+  * Maximum number of blkcg policies allowed to be registered concurrently.
+  * Defined here to simplify include dependency.
+-- 
+2.16.2.dirty
 
