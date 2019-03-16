@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC0DC43381
-	for <linux-block@archiver.kernel.org>; Sat, 16 Mar 2019 22:29:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 319BFC43381
+	for <linux-block@archiver.kernel.org>; Sat, 16 Mar 2019 22:36:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5727218D4
-	for <linux-block@archiver.kernel.org>; Sat, 16 Mar 2019 22:29:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D656F2086A
+	for <linux-block@archiver.kernel.org>; Sat, 16 Mar 2019 22:36:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="cK5+EqKc"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="IsZ9lBmu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726780AbfCPW3X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Mar 2019 18:29:23 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:34201 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726741AbfCPW3W (ORCPT
+        id S1726741AbfCPWgn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Mar 2019 18:36:43 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:41818 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726728AbfCPWgn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Mar 2019 18:29:22 -0400
-Received: by mail-pg1-f195.google.com with SMTP id v12so8848411pgq.1
-        for <linux-block@vger.kernel.org>; Sat, 16 Mar 2019 15:29:22 -0700 (PDT)
+        Sat, 16 Mar 2019 18:36:43 -0400
+Received: by mail-pg1-f194.google.com with SMTP id k11so8811448pgb.8
+        for <linux-block@vger.kernel.org>; Sat, 16 Mar 2019 15:36:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=javigon-com.20150623.gappssmtp.com; s=20150623;
         h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
          :references;
-        bh=7f6WVTHQJ3cnFXyidhLlF0eZwg9RKiaRuZT4v2ju23A=;
-        b=cK5+EqKcVP8uw//uhg7icaJL9xhreNiOat65orIOrPkfHMTWY5NvEijdUk0cvCVpyA
-         9sYRs11wEHK4DHAJPdTmqvhIvfz5Rp+tqlE73pg+BbYgJ8aY5flJBWE46cqii5FxgzNo
-         bqDYZKO/8YYVxAcfLi0bbukGMvmxNASHVGxsSDf3SjxTcT5AU1u69+odAizc0vUgHH4G
-         unZufRFCOnDYja8zbIhdQs2I2Hm980/gs2faKv0V78oM4acf4yIQ+044YulVNA8JOtCQ
-         WHhsUZlPDjkA6a8olwarvC3LOqKUtfB9SCkQomw+qHImLc4S4PaNMtwlAUIAWIZaEysg
-         4pBw==
+        bh=V7/6hG+0UxpsrxFtwAUssIIX03Wm+9y5eDhuim3MhaQ=;
+        b=IsZ9lBmu4hEDqYa6OA3XDrRCLZbFv9Dy6957MhCi4MsVjMfyoaj1PU+CitY1oPirCd
+         t+GxTNuugVVxvCD408Xha9eLbdqaJlyFtvS6eIv9zjCNZnsOh3dpg4scmVhvFEWFQV+/
+         gQ3QZJ+ns41hu3ko/if7S38mgPzzof3oXUBo5dzcquliSRk09zY/nLIcP/uny6GlZdvU
+         wB78rzSIYyqlojpwB5rTp91jHcOOsGFJOYLgmfcJWTsYjE1S6xX/x9NEbbHan8FPzNwI
+         rAFY/IkCbAXr6RcZm1wDzNnAGeDo+elYVMk5Misni/Ipc3Y2HOskilcn3LmKvZv6f2jr
+         21vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:message-id:mime-version:subject:date
          :in-reply-to:cc:to:references;
-        bh=7f6WVTHQJ3cnFXyidhLlF0eZwg9RKiaRuZT4v2ju23A=;
-        b=tOTaMp3RpW17lBGqO0RMepsz4SHYCysUpFfTZmzYhFXbEK/mRyY2EqrvMWXHg8DZh8
-         Gc//6ndDCP9HYbFnYecbfrMvPIddZ10peUA+iW5nUT1yGYUMhmdHKait2tPB5mHbBH36
-         kMK5UgIWQZ0x25kP+OheDVilq5s+Trc4ztF3zxfge/t4zjRFGSJ7zqZ4mUVd8/hRvW6z
-         5msO53n64vPn8iRe4wSwhj9XMpNTTVO7cKpi1cRTsUUyjP7uCFaxLDoHPZM4pLHZHAKQ
-         /6nXcCFbB/5fz799d1R61KjQaB9JjlN/ohHmqCJ5bh2rj4NKDVS1Z9UpRRgMQeEFRVd4
-         btZA==
-X-Gm-Message-State: APjAAAWCCaSDW2P6MN9m8phxgfIwvggia3t5c8Ww8tYHuWQITvC7Nckq
-        vWILcorn0tvVBlTeMGd2fplpTg==
-X-Google-Smtp-Source: APXvYqyFWmFoTU0CldiaN893BbqGsXJ5BOou8+cBnV08RxwwZG7Vl2t2IF7aeNdbhCrCEykzP9SO8Q==
-X-Received: by 2002:a17:902:8c8b:: with SMTP id t11mr11637959plo.148.1552775362398;
-        Sat, 16 Mar 2019 15:29:22 -0700 (PDT)
+        bh=V7/6hG+0UxpsrxFtwAUssIIX03Wm+9y5eDhuim3MhaQ=;
+        b=UuQDW26lDWj8tzyMhJFoNaHYy8JOCxW152DxZZPtB6qAoCu7/mP59HPIHcTe9eIkq6
+         41e2iPKgB+UbNLXpnR+QBU0ectSnGfqlEGlZLP+AlyZc6FRJRJjnTk2aWS6imSEDnhD2
+         Ukkt36H3YSk71sdDiqsJOm26eo9MH3+Af7WKgFZpcDSzRs8OJPVWRsp4H1DoIkPUQQrb
+         +kAgHdI85H3eAa2DlqankmblZidgnUqk7lffP6i1wkj+mV9E1arM32nIE0v3u2/PelSo
+         hjBg5zAniQFFKchWf2jTeBIo4dKi7EHi6XbeJOdzvlcnQFyyGkZdTr91tLTOQ+I+n8KK
+         8LLA==
+X-Gm-Message-State: APjAAAVYpImFoJK6F700ilN5hnHa/0ThBxYWIsVKE78YGM4e91T/dGQ5
+        UDu7bCg9e3lWiJs4rAxazLpdZQ==
+X-Google-Smtp-Source: APXvYqyzVyescMQlw8mrkgtEcbVs+FakYatz+vkjwtzTyASvB20takiozVX9n2I5D9kq+usMi9Ovow==
+X-Received: by 2002:a63:fd10:: with SMTP id d16mr10343261pgh.306.1552775802057;
+        Sat, 16 Mar 2019 15:36:42 -0700 (PDT)
 Received: from [172.26.35.188] ([76.14.1.154])
-        by smtp.gmail.com with ESMTPSA id x19sm7694829pfm.108.2019.03.16.15.29.21
+        by smtp.gmail.com with ESMTPSA id l63sm8063052pfc.89.2019.03.16.15.36.40
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 16 Mar 2019 15:29:21 -0700 (PDT)
+        Sat, 16 Mar 2019 15:36:41 -0700 (PDT)
 From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <47F1D515-DE64-443A-9569-DBA611D21066@javigon.com>
+Message-Id: <AE7FD34D-0131-4A5D-A18F-0FD75A2C954C@javigon.com>
 Content-Type: multipart/signed;
-        boundary="Apple-Mail=_94AC2AF9-6F5A-415F-B80B-0FF153B6FA0B";
+        boundary="Apple-Mail=_217A2C5A-538A-40AA-9840-2D862FE1B7D4";
         protocol="application/pgp-signature";
         micalg=pgp-sha256
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 01/18] lightnvm: pblk: fix warning in pblk_l2p_init()
-Date:   Sat, 16 Mar 2019 15:29:21 -0700
-In-Reply-To: <20190314160428.3559-2-igor.j.konopko@intel.com>
+Subject: Re: [PATCH 02/18] lightnvm: pblk: warn when there are opened chunks
+Date:   Sat, 16 Mar 2019 15:36:40 -0700
+In-Reply-To: <20190314160428.3559-3-igor.j.konopko@intel.com>
 Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
         linux-block@vger.kernel.org
 To:     "Konopko, Igor J" <igor.j.konopko@intel.com>
 References: <20190314160428.3559-1-igor.j.konopko@intel.com>
- <20190314160428.3559-2-igor.j.konopko@intel.com>
+ <20190314160428.3559-3-igor.j.konopko@intel.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -78,7 +78,7 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---Apple-Mail=_94AC2AF9-6F5A-415F-B80B-0FF153B6FA0B
+--Apple-Mail=_217A2C5A-538A-40AA-9840-2D862FE1B7D4
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;
 	charset=utf-8
@@ -86,43 +86,121 @@ Content-Type: text/plain;
 > On 14 Mar 2019, at 09.04, Igor Konopko <igor.j.konopko@intel.com> =
 wrote:
 >=20
-> This patch fixes a compilation warning caused by improper format
-> specifier provided in pblk_l2p_init().
+> In case of factory pblk init, we might have a situation when there are
+> some opened chunks. Based on OCSSD spec we are not allowed to =
+transform
+> chunks from the open state directly to the free state, so such a reset
+> can lead to IO error (even that most of the controller will allow for
+> for such a operation anyway), so we would like to warn users about =
+such
+> a situation at least.
 >=20
-> Fixes: fe0c220 ("lightnvm: pblk: cleanly fail when there is not enough =
-memory")
 > Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
 > ---
-> drivers/lightnvm/pblk-init.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> drivers/lightnvm/pblk-init.c | 23 ++++++++++++++++-------
+> 1 file changed, 16 insertions(+), 7 deletions(-)
 >=20
 > diff --git a/drivers/lightnvm/pblk-init.c =
 b/drivers/lightnvm/pblk-init.c
-> index 1940f89..1e227a0 100644
+> index 1e227a0..b7845f6 100644
 > --- a/drivers/lightnvm/pblk-init.c
 > +++ b/drivers/lightnvm/pblk-init.c
-> @@ -159,7 +159,7 @@ static int pblk_l2p_init(struct pblk *pblk, bool =
-factory_init)
-> 					| __GFP_RETRY_MAYFAIL | =
-__GFP_HIGHMEM,
-> 					PAGE_KERNEL);
-> 	if (!pblk->trans_map) {
-> -		pblk_err(pblk, "failed to allocate L2P (need %ld of =
-memory)\n",
-> +		pblk_err(pblk, "failed to allocate L2P (need %zu of =
-memory)\n",
-> 				map_size);
-> 		return -ENOMEM;
+> @@ -712,7 +712,7 @@ static int pblk_set_provision(struct pblk *pblk, =
+int nr_free_chks)
+> }
+>=20
+> static int pblk_setup_line_meta_chk(struct pblk *pblk, struct =
+pblk_line *line,
+> -				   struct nvm_chk_meta *meta)
+> +				   struct nvm_chk_meta *meta, int =
+*opened)
+> {
+> 	struct nvm_tgt_dev *dev =3D pblk->dev;
+> 	struct nvm_geo *geo =3D &dev->geo;
+> @@ -748,6 +748,9 @@ static int pblk_setup_line_meta_chk(struct pblk =
+*pblk, struct pblk_line *line,
+> 			continue;
+> 		}
+>=20
+> +		if (chunk->state & NVM_CHK_ST_OPEN)
+> +			(*opened)++;
+> +
+> 		if (!(chunk->state & NVM_CHK_ST_OFFLINE))
+> 			continue;
+>=20
+> @@ -759,7 +762,7 @@ static int pblk_setup_line_meta_chk(struct pblk =
+*pblk, struct pblk_line *line,
+> }
+>=20
+> static long pblk_setup_line_meta(struct pblk *pblk, struct pblk_line =
+*line,
+> -				 void *chunk_meta, int line_id)
+> +				 void *chunk_meta, int line_id, int =
+*opened)
+> {
+> 	struct pblk_line_mgmt *l_mg =3D &pblk->l_mg;
+> 	struct pblk_line_meta *lm =3D &pblk->lm;
+> @@ -773,7 +776,7 @@ static long pblk_setup_line_meta(struct pblk =
+*pblk, struct pblk_line *line,
+> 	line->vsc =3D &l_mg->vsc_list[line_id];
+> 	spin_lock_init(&line->lock);
+>=20
+> -	nr_bad_chks =3D pblk_setup_line_meta_chk(pblk, line, =
+chunk_meta);
+> +	nr_bad_chks =3D pblk_setup_line_meta_chk(pblk, line, chunk_meta, =
+opened);
+>=20
+> 	chk_in_line =3D lm->blk_per_line - nr_bad_chks;
+> 	if (nr_bad_chks < 0 || nr_bad_chks > lm->blk_per_line ||
+> @@ -1019,12 +1022,12 @@ static int pblk_line_meta_init(struct pblk =
+*pblk)
+> 	return 0;
+> }
+>=20
+> -static int pblk_lines_init(struct pblk *pblk)
+> +static int pblk_lines_init(struct pblk *pblk, bool factory)
+> {
+> 	struct pblk_line_mgmt *l_mg =3D &pblk->l_mg;
+> 	struct pblk_line *line;
+> 	void *chunk_meta;
+> -	int nr_free_chks =3D 0;
+> +	int nr_free_chks =3D 0, nr_opened_chks =3D 0;
+> 	int i, ret;
+>=20
+> 	ret =3D pblk_line_meta_init(pblk);
+> @@ -1059,7 +1062,8 @@ static int pblk_lines_init(struct pblk *pblk)
+> 		if (ret)
+> 			goto fail_free_lines;
+>=20
+> -		nr_free_chks +=3D pblk_setup_line_meta(pblk, line, =
+chunk_meta, i);
+> +		nr_free_chks +=3D pblk_setup_line_meta(pblk, line, =
+chunk_meta, i,
+> +							=
+&nr_opened_chks);
+>=20
+> 		trace_pblk_line_state(pblk_disk_name(pblk), line->id,
+> 								=
+line->state);
+> @@ -1071,6 +1075,11 @@ static int pblk_lines_init(struct pblk *pblk)
+> 		goto fail_free_lines;
 > 	}
-> --
-> 2.9.5
+>=20
+> +	if (factory && nr_opened_chks) {
+> +		pblk_warn(pblk, "%d opened chunks during factory =
+creation\n",
+> +				nr_opened_chks);
+> +	}
+> +
 
-Looks food to me.
+nip: no need for braces here.
+
+Otherwise it looks good.
 
 Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
 
 
---Apple-Mail=_94AC2AF9-6F5A-415F-B80B-0FF153B6FA0B
+--Apple-Mail=_217A2C5A-538A-40AA-9840-2D862FE1B7D4
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
 	filename=signature.asc
@@ -132,19 +210,19 @@ Content-Description: Message signed with OpenPGP
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlyNeMEACgkQPEYBfS0l
-eOAHDw/9Hi4WhdO0ri1+7a9nK9HE4RAWg4aqvQLsBjTW5OdE2kUcAOIE5EH0Q0Al
-MLuPZbwb55Uj6X0U1bbsnwfM73QAFU1Yg+541R6OPAcMLkQm3zTCVWAKRviL2ORz
-yXmA5sDc29OcQDe7aGQQNPR7jl9rfwwTbPa0FlCBQzgVAHsIXEpQsn+4iLs/9GOB
-ARDmcVdBXi4jTc6yzqgmM9eRtzMGpShjQj41ReBbSml8xB3ql5WVRvf84C3y88uI
-omapWAFQVr8lGWkAvqweTifSNx4ua9epiCC8akRiRHkxwH/sQFAsVbseGKui31t1
-6PCjbf3rByn8oU718u2yJU/3MjZKLI197x1UDnXAiOYrOCF14bHxYRuSTPpYqiWw
-VTz8myJGpEMZFOkwnNZFXe7FzdijYAudTbYso9Niw5o7+yp2zbEQYSwKtU/gQktj
-jvvW3/DJE5g1Ni+vA3ROKWt1Kpnt1jX3AdF4wWF2ee1F9P0J95vNp5UN81xhSHBL
-ZW6phSTJD4beGkiQnn0CTARuZJir9R/WoV4m0+tXyT+dbIxx4Ol6TrnSyonxZ12y
-1s81SAzA5DPt2vNIfaJxzftc9w5HN2kdWB9k8FMO1beMQGPx1ria/LZ69ANqbK1k
-hZIHQ4UNhImKo2IAZ6Xg83WBk/VUY9rvqT7Gm5FoUJH5Z6T9Y8s=
-=O2xd
+iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlyNengACgkQPEYBfS0l
+eOAUUhAAzWk+h5/lQqMO+s56OaBrw9/S0nd05weKcuXiaY051OB7TdoEWOlgenHS
+AFrBZgWTirtKXbxlx0XnpFHBlSozhp+BENvYRxXfLrKpJiBnkzUAZ2vpdLXoTajN
+7PrfSXAHz6zIBCPJ7Bvb0xir+WMaIyfMznFWrguJXtg/VxX0+dd3IlwZPK8emBU5
+jxke/9zCz7tuIgM+YWjH+3JLqHRWC5sSLWnSGQ2l8U3XjBcNz5sud4/irIvlraaZ
+XGVzfk1U86OAdX1+aoh7aaE9XiOjSwQM/sHZ741xt9DhKXWLmMRYqjd8kdtyZctB
+Xt9VEMgkUwa7IPItrxrqo8vA8WndIEb6BPYJOe3DMBwK74tDw6o5gxQYY37b7A2L
+7mj0JhfeFrq6pOJfYk1tqXXY/RAESsLqEaWRJj+gwSiqGZ+KARadZd1LWoTdTZ5z
+r28L7P5LS3JQfpwC1puyT0mqWdKfTKDrqL8/oEUjAmRvrd7ybSQ2N9QgURkvKlZm
+Nbwj2grCA6M4L3jErefcTAtyx7TnDQXqMyqSADUdAnnU1dpou8paGYGgacU0DVgu
+fdNmCl8v6V0PtD7mwU9zNCFx+M2OXfRpVVm4YfCykXEnX1p5kdXt4mVCSIl4kH1K
+4ahnGSbMxhRSBES8uUg5IwqhWb9E1suOIG+DWKfu7ptW4vKqTMk=
+=FBXh
 -----END PGP SIGNATURE-----
 
---Apple-Mail=_94AC2AF9-6F5A-415F-B80B-0FF153B6FA0B--
+--Apple-Mail=_217A2C5A-538A-40AA-9840-2D862FE1B7D4--
