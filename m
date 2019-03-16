@@ -2,202 +2,168 @@ Return-Path: <SRS0=01oL=RT=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55572C43381
-	for <linux-block@archiver.kernel.org>; Sat, 16 Mar 2019 23:46:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C41BC43381
+	for <linux-block@archiver.kernel.org>; Sat, 16 Mar 2019 23:49:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A7F82186A
-	for <linux-block@archiver.kernel.org>; Sat, 16 Mar 2019 23:46:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 287F22186A
+	for <linux-block@archiver.kernel.org>; Sat, 16 Mar 2019 23:49:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="d461wXv8"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="xTFYEdLZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726695AbfCPXqg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Mar 2019 19:46:36 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:34846 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726493AbfCPXqg (ORCPT
+        id S1726876AbfCPXtA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Mar 2019 19:49:00 -0400
+Received: from merlin.infradead.org ([205.233.59.134]:48226 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726828AbfCPXtA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Mar 2019 19:46:36 -0400
-Received: by mail-pf1-f194.google.com with SMTP id j5so8799963pfa.2
-        for <linux-block@vger.kernel.org>; Sat, 16 Mar 2019 16:46:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=R/9tVsj+/zBIaMt9CujtlQHgRBCqoLbyWaxS3h+PSkQ=;
-        b=d461wXv82A9hib0LgGT7fFkzTL1GCaHvCXUiXdg+j0hzS3yOtb2MaUzlCGuNo8WpqO
-         1BdvDyq5bafXRa8ftJraqePBUBsKn4v1iydz7XcjKVsIeA1pmm4e1+RnjWT4qYb/d5Pb
-         5Ud++Y51v1ykNN2gcOvgTvtB/QnoCTT+bnkyB1BJZeBF4Wbc+K93+y+naseDs+Dm5X5O
-         eKo4f9n9Ub9fk4wXj6rkB0R6NC64obPRypSGYOj7/n5gm+JBB2a1el3NYavL2jqhDpEL
-         SnOwtU7PjzJBdK4deby2sl43ygmkxTq9Q4sn29NeBOZVO4a64z4OPSC8q8X9cKhBL7lR
-         cIcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=R/9tVsj+/zBIaMt9CujtlQHgRBCqoLbyWaxS3h+PSkQ=;
-        b=DeWe2J0RGepCBeMgQESuVtD7P8+akrEXfDB0zCpp4pyP/FGwakt9hjK+bDypo4JzEw
-         cmpqk2sTaHRk7MHjvJ7LjwJZJponTrqZUAp/XaS7kirhcBU/C8TaIZ6pm+RiABlRjyGr
-         vM3BljshoAsRiZHxXdWF++kEZ2sz+bZaFCKNY+CV9/QH8k1sWXxIasakcugM4Co5+Q5Q
-         I50vZ4vDSFWB+S1acTOAF5ombKFAcLlmcJVT0mpua+xPr8fwGoPFzDIAjFXp+uY99yv0
-         m3JXInPrijpsxODRKduwUaFOiDoaXmMn7QLSHJvLmFaOVV1C+h/oPfqOH1raz1dnCvBo
-         jQPw==
-X-Gm-Message-State: APjAAAX3t3rpaomSPkfwv9Yq7bwV7837oehKF8BK7jDamS9hkVQLYEz6
-        px/2/Khpe9YbNANf7BJlCcCxlg==
-X-Google-Smtp-Source: APXvYqx4GWL8c97QKB5BomL1AfCoWSzpUoRV4ibRDA7sIbkyUFI99aMbuDMVQsaNq5MIwSZhYA7Phw==
-X-Received: by 2002:a62:b608:: with SMTP id j8mr11907444pff.183.1552779994859;
-        Sat, 16 Mar 2019 16:46:34 -0700 (PDT)
-Received: from [172.26.35.188] ([76.14.1.154])
-        by smtp.gmail.com with ESMTPSA id h23sm7742760pfn.68.2019.03.16.16.46.33
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 16 Mar 2019 16:46:34 -0700 (PDT)
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <4017AC03-A854-4158-ADC9-E1BBAE65003D@javigon.com>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_4F77CA3A-4148-40E8-8CA3-763A6F2EACEE";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 06/18] lightnvm: pblk: recover only written metadata
-Date:   Sat, 16 Mar 2019 16:46:32 -0700
-In-Reply-To: <20190314160428.3559-7-igor.j.konopko@intel.com>
-Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        linux-block@vger.kernel.org
-To:     "Konopko, Igor J" <igor.j.konopko@intel.com>
-References: <20190314160428.3559-1-igor.j.konopko@intel.com>
- <20190314160428.3559-7-igor.j.konopko@intel.com>
-X-Mailer: Apple Mail (2.3445.102.3)
+        Sat, 16 Mar 2019 19:49:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=merlin.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=y+DXStj5c2Xqr9WzdcP1wEOJyGpE6jq16MXzR2t7nyI=; b=xTFYEdLZu+raIcDfqv3/w2TgQi
+        91zi/6li1kaAIFv2FUkSWCU/NsLPKetfUMZb2Hoy1UzXgyxzz9IoxtGewQtxJAnPu97Pt2Xu9ioYu
+        xuDxt85CnYzow6DO6ZXPoMSKh/dihFMRlOaatwHeXfHaFoONTGpHlMnsIsETREBuY0B6ahoKLy5PR
+        Q+G150Sj/e5Pm0WfTSG/P/rcMvEEliYcjuUk9TIzyRl0hB37wcJVKOLWvDyaxI4JiWEGxHVOXTg5C
+        Gm8EXv3HNVjvKcj3xQNF2jMxgArl8j/LJBkbs+cvM/yBsTfx5xC8YxwrmLTEbdysjTB8/K2MvTBIO
+        pRbW1oSw==;
+Received: from static-50-53-52-16.bvtn.or.frontiernet.net ([50.53.52.16] helo=dragon.dunlab)
+        by merlin.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1h5J2s-0000Tk-WE; Sat, 16 Mar 2019 23:48:55 +0000
+Subject: Re: paride/pf.c: blk-mq use-after-free (kernel v5.0)
+To:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>, Tim Waugh <tim@cyberelk.net>,
+        linux-parport@lists.infradead.org
+References: <30c63b2d-92d2-51be-40f0-62cada110388@infradead.org>
+ <7d24a06f-f219-e50a-e8f8-915a6cc1b796@infradead.org>
+ <e2a66da2-5433-5b42-1ebe-9f1c135b5471@infradead.org>
+ <59cb035e-6880-de5a-33c5-d4db6ed910f4@kernel.dk>
+ <4a2adc33-ef38-6a5f-65ee-8fcfaa0948a9@infradead.org>
+ <d22bf156-06df-ec67-121d-7dce65088b1a@kernel.dk>
+ <55743981-da8f-3211-0650-b143c8fec084@infradead.org>
+ <23f48266-0d12-1891-1373-711b63f4f589@kernel.dk>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <21e5a575-8f28-5a14-3916-ab41b4d37734@infradead.org>
+Date:   Sat, 16 Mar 2019 16:48:37 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
+MIME-Version: 1.0
+In-Reply-To: <23f48266-0d12-1891-1373-711b63f4f589@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 3/16/19 12:31 PM, Jens Axboe wrote:
+> On 3/15/19 6:32 PM, Randy Dunlap wrote:
+>> On 3/15/19 9:33 AM, Jens Axboe wrote:
+>>> On 3/14/19 5:49 PM, Randy Dunlap wrote:
+>>>> On 3/14/19 4:43 PM, Jens Axboe wrote:
+>>>>> On 3/13/19 5:09 PM, Randy Dunlap wrote:
+>>>>>> On 3/11/19 6:34 PM, Randy Dunlap wrote:
+>>>>>>> On 3/11/19 6:25 PM, Randy Dunlap wrote:
+>>>>>>>> [Has this already been addressed/fixed?]>>
+>>>>>>>
+>>>>>>> Same bug occurs with paride/pcd.c driver.
+>>>>>>
+>>>>>> This still happens (in blk-mq) in v5.0-11053-gebc551f2b8f9 of Mar. 12, 2019,
+>>>>>> around 4pm PT.  [caused by paride: pf.c and pcd.c)
+>>>>>
+>>>>> I'll take a look at this, been busy with other stuff. How are you
+>>>>> reproducing this? I'm assuming you don't actually have any hardware :-)
+>>>>
+>>>> Right.  I just load the module (pf or pcd), unload it, and
+>>>> then load it again.
+>>>
+>>> Does this work?
+>>>
+>>
+>> No.  Just loading the pf module gives this:
+> 
+> Missing clear of the queue. This one should be more complete.
+> 
+> To be fair, this was utterly broken since forever. It's just now apparent
+> since we complain about it. But pf/pcd was one big leak fest.
+> 
 
---Apple-Mail=_4F77CA3A-4148-40E8-8CA3-763A6F2EACEE
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+OK, this one works for both pf and pcd.
+By "works" I mean that the driver init function runs and exits without
+causing a BUG or GP fault etc.
+Not that I have any such hardware.
 
-> On 14 Mar 2019, at 09.04, Igor Konopko <igor.j.konopko@intel.com> =
-wrote:
->=20
-> This patch ensures that smeta/emeta was written properly before even
-> trying to read it based on chunk table state and write pointer.
->=20
-> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-> ---
-> drivers/lightnvm/pblk-recovery.c | 43 =
-++++++++++++++++++++++++++++++++++++++--
-> 1 file changed, 41 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/lightnvm/pblk-recovery.c =
-b/drivers/lightnvm/pblk-recovery.c
-> index 688fdeb..ba1691d 100644
-> --- a/drivers/lightnvm/pblk-recovery.c
-> +++ b/drivers/lightnvm/pblk-recovery.c
-> @@ -653,8 +653,42 @@ static int pblk_line_was_written(struct pblk_line =
-*line,
-> 	bppa =3D pblk->luns[smeta_blk].bppa;
-> 	chunk =3D &line->chks[pblk_ppa_to_pos(geo, bppa)];
->=20
-> -	if (chunk->state & NVM_CHK_ST_FREE)
-> -		return 0;
-> +	if (chunk->state & NVM_CHK_ST_CLOSED ||
-> +	    (chunk->state & NVM_CHK_ST_OPEN
-> +	     && chunk->wp >=3D lm->smeta_sec))
-> +		return 1;
-> +
-> +	return 0;
-> +}
-> +
-> +static int pblk_line_was_emeta_written(struct pblk_line *line,
-> +				       struct pblk *pblk)
-> +{
-> +
-> +	struct pblk_line_meta *lm =3D &pblk->lm;
-> +	struct nvm_tgt_dev *dev =3D pblk->dev;
-> +	struct nvm_geo *geo =3D &dev->geo;
-> +	struct nvm_chk_meta *chunk;
-> +	struct ppa_addr ppa;
-> +	int i, pos;
-> +	int min =3D pblk->min_write_pgs;
-> +	u64 paddr =3D line->emeta_ssec;
-> +
-> +	for (i =3D 0; i < lm->emeta_sec[0]; i++, paddr++) {
-> +		ppa =3D addr_to_gen_ppa(pblk, paddr, line->id);
-> +		pos =3D pblk_ppa_to_pos(geo, ppa);
-> +		while (test_bit(pos, line->blk_bitmap)) {
-> +			paddr +=3D min;
-> +			ppa =3D addr_to_gen_ppa(pblk, paddr, line->id);
-> +			pos =3D pblk_ppa_to_pos(geo, ppa);
-> +		}
-> +		chunk =3D &line->chks[pos];
-> +
-> +		if (!(chunk->state & NVM_CHK_ST_CLOSED ||
-> +		    (chunk->state & NVM_CHK_ST_OPEN
-> +		     && chunk->wp > ppa.m.sec)))
-> +			return 0;
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
+
+Thanks.
+
+> 
+> diff --git a/drivers/block/paride/pcd.c b/drivers/block/paride/pcd.c
+> index 96670eefaeb2..377a694dc228 100644
+> --- a/drivers/block/paride/pcd.c
+> +++ b/drivers/block/paride/pcd.c
+> @@ -749,8 +749,12 @@ static int pcd_detect(void)
+>  		return 0;
+>  
+>  	printk("%s: No CD-ROM drive found\n", name);
+> -	for (unit = 0, cd = pcd; unit < PCD_UNITS; unit++, cd++)
+> +	for (unit = 0, cd = pcd; unit < PCD_UNITS; unit++, cd++) {
+> +		blk_cleanup_queue(cd->disk->queue);
+> +		cd->disk->queue = NULL;
+> +		blk_mq_free_tag_set(&cd->tag_set);
+>  		put_disk(cd->disk);
 > +	}
->=20
-> 	return 1;
-> }
-> @@ -788,6 +822,11 @@ struct pblk_line *pblk_recov_l2p(struct pblk =
-*pblk)
-> 			goto next;
-> 		}
->=20
-> +		if (!pblk_line_was_emeta_written(line, pblk)) {
-> +			pblk_recov_l2p_from_oob(pblk, line);
-> +			goto next;
-> +		}
+>  	pi_unregister_driver(par_drv);
+>  	return -1;
+>  }
+> diff --git a/drivers/block/paride/pf.c b/drivers/block/paride/pf.c
+> index e92e7a8eeeb2..103b617cdc31 100644
+> --- a/drivers/block/paride/pf.c
+> +++ b/drivers/block/paride/pf.c
+> @@ -761,8 +761,12 @@ static int pf_detect(void)
+>  		return 0;
+>  
+>  	printk("%s: No ATAPI disk detected\n", name);
+> -	for (pf = units, unit = 0; unit < PF_UNITS; pf++, unit++)
+> +	for (pf = units, unit = 0; unit < PF_UNITS; pf++, unit++) {
+> +		blk_cleanup_queue(pf->disk->queue);
+> +		pf->disk->queue = NULL;
+> +		blk_mq_free_tag_set(&pf->tag_set);
+>  		put_disk(pf->disk);
+> +	}
+>  	pi_unregister_driver(par_drv);
+>  	return -1;
+>  }
+> @@ -1047,13 +1051,15 @@ static void __exit pf_exit(void)
+>  	int unit;
+>  	unregister_blkdev(major, name);
+>  	for (pf = units, unit = 0; unit < PF_UNITS; pf++, unit++) {
+> -		if (!pf->present)
+> -			continue;
+> -		del_gendisk(pf->disk);
+> +		if (pf->present)
+> +			del_gendisk(pf->disk);
 > +
-> 		if (pblk_line_emeta_read(pblk, line, line->emeta->buf)) =
-{
-> 			pblk_recov_l2p_from_oob(pblk, line);
-> 			goto next;
-> --
-> 2.9.5
-
- I would like to avoid iterating on all chunks again an again to check
- for different things at boot time. What do you think having this as
- something like PBLK_LINESTATE_OPEN_INVALID or
- PBLK_LINESTATE_OPEN_NONRECOV, which you populate when collecting the
- chunk information? Then this becomes a simple check as opposed to the
- extra chunk iteration?
-
-On the check itself: Is this done for completeness or have you hit a
-case that is not covered by the smeta/emeta CRC protection?
+>  		blk_cleanup_queue(pf->disk->queue);
+>  		blk_mq_free_tag_set(&pf->tag_set);
+>  		put_disk(pf->disk);
+> -		pi_release(pf->pi);
+> +
+> +		if (pf->present)
+> +			pi_release(pf->pi);
+>  	}
+>  }
+>  
+> 
 
 
-
---Apple-Mail=_4F77CA3A-4148-40E8-8CA3-763A6F2EACEE
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlyNitgACgkQPEYBfS0l
-eOBc1g/+Jz5JE3TctNEJk/VQQ55xFMn93GpsI33UEnzVK4m4NIcs6hnnxijGEHvF
-qHW6QU6/ccBdNwQFghTl6aeAoaTcVfpp/R8Dv5AkhHfztr4yI2xxbMup1AQ9+6H0
-zfujLjFCHlO/T29il6TDH5hapCPMJg3xiNgsj/wd7/mNVaTgSOzhSP2Oj7bYxTDm
-DP8K56bWYJvzH/xVbA/GI18ieTCAViYQNS90OlU/rLv4A5YsAvYgCZHS9HYLUzRz
-pXzTIa4SxEmGo1ss2ZrqHvieq8LtBaMiKVT+5legm4w7J0f6be0Fm0qqKBfRPKbA
-cWiLbY9pzBT4ThQXUCk1DzdIeEb7MYgqL+9Prm+xWNiLbfEk7KIVlsx0Bz3Ab0vH
-aSN5LjuP2Zv1qyA0QekaJV0FzFyUQAxzNgSRbcU4NjbrlqGYk7JZzrYTEjWyLsQ6
-3T0M6353hXqEnzp+8uGRvw82wkqJFdxhY7iWIahH6hBDuZ7+KKzVHApqUeAzDy53
-8Kd9I4ZSeb9QyN4lUHknzMW27t6NlHCnbIBJhJUwTD9HBiyfxjevZzBcZNogDWdh
-lY2KcqEiG7v+rhGbzsH8jHpx01cu1tMkIlW0Ncj+144IquybXOn930Kkgq1sJQdj
-zR0o6tRxXS7kU81HB47DH5aIVagXh4dYB+PbNymJcASvK3i8xIM=
-=Q0gf
------END PGP SIGNATURE-----
-
---Apple-Mail=_4F77CA3A-4148-40E8-8CA3-763A6F2EACEE--
+-- 
+~Randy
