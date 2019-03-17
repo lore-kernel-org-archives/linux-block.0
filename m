@@ -1,144 +1,129 @@
-Return-Path: <SRS0=01oL=RT=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=Zyuh=RU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABEBCC43381
-	for <linux-block@archiver.kernel.org>; Sat, 16 Mar 2019 23:54:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B37C43381
+	for <linux-block@archiver.kernel.org>; Sun, 17 Mar 2019 06:17:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 708942186A
-	for <linux-block@archiver.kernel.org>; Sat, 16 Mar 2019 23:54:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 576C121738
+	for <linux-block@archiver.kernel.org>; Sun, 17 Mar 2019 06:17:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="Ltqtvp6X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j772X62a"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726712AbfCPXyE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Mar 2019 19:54:04 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:46129 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726493AbfCPXyE (ORCPT
+        id S1725914AbfCQGOV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Mar 2019 02:14:21 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:55386 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725903AbfCQGOV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Mar 2019 19:54:04 -0400
-Received: by mail-pf1-f193.google.com with SMTP id s23so8766489pfe.13
-        for <linux-block@vger.kernel.org>; Sat, 16 Mar 2019 16:54:04 -0700 (PDT)
+        Sun, 17 Mar 2019 02:14:21 -0400
+Received: by mail-wm1-f67.google.com with SMTP id 4so9934818wmf.5;
+        Sat, 16 Mar 2019 23:14:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=8jlikmUWGOyHK2D1++3qxInTVeLN+YIOHB0eC8qR/f0=;
-        b=Ltqtvp6XBRzBb/s9nilz1y5LuEwIEWhvf43iprDUheX7WilC03YuzZmIuuxHNWUsJN
-         9pP/FgmMNzzwn9W2H+170uxNpjSurxvhL3f7gV5qF+WHFQVSk+wRXVr6ZvQS1kRNxydr
-         xcWNnNgKEocaBvsz1y7L7IdaURgmdHj9cbWHBzDYMfUUffb3P157t8zpdXhG74Y07udG
-         UYeLQo7NA2obVvESUeTGBLPwn6POrNt0tv8qqSAEEWjnfrsmqQaE3twg36G0xtUG2BYB
-         F3BcKP7o/Bx1NvWCud164LHe6kjcBVB+usdVvWvoP/cwX2DVnydRYIzLKDnvnYd+14b3
-         O7mw==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OsmxGvxHwRSGZ+/emJfD/r6bzJZ56d0CKBLKDddlMoo=;
+        b=j772X62alTSLQMGqgME+WRNrSnmScpMqcpuj3MsYKw9/b0KyLtcMGR7RJFjebJvQZM
+         ZypMsTI9omWNFIq+IzVjR7XYhElKE5pkav9XCXnZ84/nXCxHmsLLqBRG2FkpPAsF4GGK
+         O5j0eo4EZ1CQ4OyhZ81ce4yy+/vmT3v2Se9HuIXHw1pE1tmZQPM69UOFcgkoR2wEGgCs
+         0/7xaBTiFyELxhNeqQxz5NWcx5ZfHYrtn35P7vWO8kKUZX+gwPtycYR1zfr7/GSrjKy8
+         XY7lAMSUq8IG2nmpAtsgah2xuYKiEpwooQ69SXJkdQLyFiKoxS4aEq75Ob/xRcQYQ0Mk
+         hKjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=8jlikmUWGOyHK2D1++3qxInTVeLN+YIOHB0eC8qR/f0=;
-        b=HTwL0TFD2ixQKL0eJZWEHdPIRWEpF6RoMBr60zSHPMJJp7PNgk35J6Ad1rS8+a3FbV
-         dInMAGFAKJmJ+UlebOdSczJA2zX6+03+Ge1LNiY60rJsldrY5Hl5q7dfV1YewH5dfy61
-         WlfJRSwoqI9pPYN44sCm2LwUIjYTqOMzNoJa4vUhMGWFbzTvtrwHrVMBJ2BPJ/+DJPD7
-         f24D6s37gS2AsqRk9N6zOTq6ZMiZxa5zR6yWF0iY5DUEsZiHoLzdJqniXnri90eCcFDm
-         vCN28ZNZ0NKEizY2mJmKEvHKSbw9TrIHK5mh0nyHg1uWmxJxENnpEbYY1iGzMYl0RGUV
-         1CNQ==
-X-Gm-Message-State: APjAAAX2IEUY/n6X7bHyFztGK2GiPfPmro+1QbmThvx11rbxDlL49MKm
-        2CY7zOde6HmiZSnhet9kwupsug==
-X-Google-Smtp-Source: APXvYqzi3/46V1B5Ich3Zf/UErZabxIHOEmydpf2uvKmWp1BxZ33UmKhV3wM4yTU/bb3cjK3X4x1LA==
-X-Received: by 2002:a63:42c4:: with SMTP id p187mr10043274pga.219.1552780443957;
-        Sat, 16 Mar 2019 16:54:03 -0700 (PDT)
-Received: from [172.26.35.188] ([76.14.1.154])
-        by smtp.gmail.com with ESMTPSA id i23sm2671839pgh.13.2019.03.16.16.54.02
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 16 Mar 2019 16:54:03 -0700 (PDT)
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <1DCC42C1-E6F8-49D7-80A6-C91377C8BC4D@javigon.com>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_821DA3BE-45C3-4BF6-ADD2-7AE91794552C";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 09/18] lightnvm: pblk: kick writer on write recovery path
-Date:   Sat, 16 Mar 2019 16:54:02 -0700
-In-Reply-To: <20190314160428.3559-10-igor.j.konopko@intel.com>
-Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        linux-block@vger.kernel.org
-To:     "Konopko, Igor J" <igor.j.konopko@intel.com>
-References: <20190314160428.3559-1-igor.j.konopko@intel.com>
- <20190314160428.3559-10-igor.j.konopko@intel.com>
-X-Mailer: Apple Mail (2.3445.102.3)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OsmxGvxHwRSGZ+/emJfD/r6bzJZ56d0CKBLKDddlMoo=;
+        b=fNRZWbv1fxq/QigeamQGWa5HgrOz6XABzAB6YbS8G6WJ8slltGwyLaE+lUjJGOqf7h
+         WmtCRbY8Zi/zgaHo6Qyc7d/mnWWkmdfkVNilkCwFXgWNm4QeV5OeZg88DSR8z4bg45/N
+         GZwhMDlpHeSgfpWGraF1HNLbLKMU5sixEPFDMD88m4qaHAZTY98NrtT7eV8ljMrr3TO6
+         LkGBhKImg+SXCL2o1+4r6nFT2dIcGBJoh6o4TH/8KWEyloEqlFSstHX9B5yY0eoaYrST
+         WpUNUidIApKpl+Z6BetWXqqMz59+WyvtZwx+zy61vXZgpMLWl4vN0fIkVLXPQuW9Wog9
+         /KhQ==
+X-Gm-Message-State: APjAAAV0d55XL+sY6ISna7ZtIBP92gam0Y5s67jf7HgIsRdtHcB1xVbZ
+        5KtUToowBsT/rqvcJp/bE/H3uzoKfaU/GOiWde8=
+X-Google-Smtp-Source: APXvYqyZ7HNiymKXZ7P8zYBk1bMR2cD5oswloxcGcnsM9PZDxNCZEJVY4Au9nFcWhIN8SQPyL2JMYT2PBCTnjUUfmbc=
+X-Received: by 2002:a1c:ef1a:: with SMTP id n26mr7354603wmh.67.1552803259678;
+ Sat, 16 Mar 2019 23:14:19 -0700 (PDT)
+MIME-Version: 1.0
+References: <1552640264-26101-1-git-send-email-jianchao.w.wang@oracle.com> <1552640264-26101-2-git-send-email-jianchao.w.wang@oracle.com>
+In-Reply-To: <1552640264-26101-2-git-send-email-jianchao.w.wang@oracle.com>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Sun, 17 Mar 2019 14:14:06 +0800
+Message-ID: <CACVXFVOa25+NWdb1RG0sWuLYyoZeYTcUupNryABfQfEvO7FiUA@mail.gmail.com>
+Subject: Re: [PATCH 1/8] blk-mq: get rid of the synchronize_rcu in __blk_mq_update_nr_hw_queues
+To:     Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        Johannes Thumshirn <jthumshirn@suse.de>,
+        Hannes Reinecke <hare@suse.de>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Keith Busch <keith.busch@intel.com>, jsmart2021@gmail.com,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-nvme <linux-nvme@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
---Apple-Mail=_821DA3BE-45C3-4BF6-ADD2-7AE91794552C
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
-
-> On 14 Mar 2019, at 09.04, Igor Konopko <igor.j.konopko@intel.com> =
-wrote:
->=20
-> In case of write recovery path, there is a chance that writer thread
-> is not active, so for sanity it would be good to always kick it.
->=20
-> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+On Fri, Mar 15, 2019 at 5:07 PM Jianchao Wang
+<jianchao.w.wang@oracle.com> wrote:
+>
+> In commit 530ca2c (blk-mq: Allow blocking queue tag iter callbacks),
+> we try to get a non-zero q_usage_counter to avoid access hctxs that
+> being modified. So the synchronize_rcu is useless and should be
+> removed.
+>
+> Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
 > ---
-> drivers/lightnvm/pblk-write.c | 1 +
-> 1 file changed, 1 insertion(+)
->=20
-> diff --git a/drivers/lightnvm/pblk-write.c =
-b/drivers/lightnvm/pblk-write.c
-> index 6593dea..4e63f9b 100644
-> --- a/drivers/lightnvm/pblk-write.c
-> +++ b/drivers/lightnvm/pblk-write.c
-> @@ -228,6 +228,7 @@ static void pblk_submit_rec(struct work_struct =
-*work)
-> 	mempool_free(recovery, &pblk->rec_pool);
->=20
-> 	atomic_dec(&pblk->inflight_io);
-> +	pblk_write_kick(pblk);
-> }
->=20
->=20
+>  block/blk-mq-tag.c | 4 +---
+>  block/blk-mq.c     | 4 ----
+>  2 files changed, 1 insertion(+), 7 deletions(-)
+>
+> diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+> index 2089c6c..b792537 100644
+> --- a/block/blk-mq-tag.c
+> +++ b/block/blk-mq-tag.c
+> @@ -384,9 +384,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+>         /*
+>          * __blk_mq_update_nr_hw_queues() updates nr_hw_queues and queue_hw_ctx
+>          * while the queue is frozen. So we can use q_usage_counter to avoid
+> -        * racing with it. __blk_mq_update_nr_hw_queues() uses
+> -        * synchronize_rcu() to ensure this function left the critical section
+> -        * below.
+> +        * racing with it.
+>          */
+>         if (!percpu_ref_tryget(&q->q_usage_counter))
+>                 return;
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 9437a5e..07584a9 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3208,10 +3208,6 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+>         list_for_each_entry(q, &set->tag_list, tag_set_list)
+>                 blk_mq_freeze_queue(q);
+>         /*
+> -        * Sync with blk_mq_queue_tag_busy_iter.
+> -        */
+> -       synchronize_rcu();
+> -       /*
+>          * Switch IO scheduler to 'none', cleaning up the data associated
+>          * with the previous scheduler. We will switch back once we are done
+>          * updating the new sw to hw queue mappings.
 > --
-> 2.9.5
+> 2.7.4
+>
 
-Looks good to me.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
-
-
---Apple-Mail=_821DA3BE-45C3-4BF6-ADD2-7AE91794552C
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlyNjJoACgkQPEYBfS0l
-eOAvsQ/+P3nx745SOSxlhlHoW49tWvszQHVrpBdXhGcIdPgYuX0Wtd0UP/aN09yA
-1b1ACk6c3o7fVja1vOj9xy1JDBanT+LXrnLWWwI+Vw3Q8XxR2XPRGk8grtQUgzTn
-DTl2yOY1BNbOF7qyIv7ou6CZLwXfvVeGQfeIpU2YmrGogfyZc69khnCd6QKbIx9M
-VXKnhYUMzmziu2ZDroMChlid9qjLa0HjfIGXL2q4T+TtTQWj7azSYpxWbd7Sm4Tu
-gly/u9OJLoBvRxo+LYZjQXJKjJAZwz6kxvrEdKh/VWK1893JMoy0BdNrx9ow8Gze
-dLuIaOTKwWL5BfYuVqEDLPokRQwdchLd2oF5DzCJ3JlyNExoFxpTPLlNOI7F8lck
-LmFIWVDW4cG18aAqQkVdHsm0wZW29w+2RE/Z9Q/7DJQnf5YJxjeR+rvmBFSiwf4L
-F10Upxa7s7JXZ4m7N+GlHlZhLfI9X91P8EkwX+v9bCVTdg/09WvPyhDj2dptg/2p
-Tb6zRJ6d2ZLRXQJ0LVkjBg0xajdw0S9OZNelG0LBgTbFnaLDUO8IrpaGEOn5iVhp
-TTDmIlMMtQ2AVhnQXCxm1MkRgVSmj/76CJQAcwxHVDEMokSlK98Lp/qEuJS98Bf4
-pTgcpSAYDlq0wibS61SuXkPZTEEfdgh5WAAcURDTKMDAbbXiBaM=
-=3uU2
------END PGP SIGNATURE-----
-
---Apple-Mail=_821DA3BE-45C3-4BF6-ADD2-7AE91794552C--
+Thanks,
+Ming Lei
