@@ -2,30 +2,30 @@ Return-Path: <SRS0=Zyuh=RU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B3ACC4360F
-	for <linux-block@archiver.kernel.org>; Sun, 17 Mar 2019 10:01:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80360C43381
+	for <linux-block@archiver.kernel.org>; Sun, 17 Mar 2019 10:01:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0D6092085A
-	for <linux-block@archiver.kernel.org>; Sun, 17 Mar 2019 10:01:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59C8121738
+	for <linux-block@archiver.kernel.org>; Sun, 17 Mar 2019 10:01:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726803AbfCQKBU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Mar 2019 06:01:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:50626 "EHLO mx1.redhat.com"
+        id S1726824AbfCQKBZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Mar 2019 06:01:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54588 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725903AbfCQKBU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Mar 2019 06:01:20 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        id S1725903AbfCQKBZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 17 Mar 2019 06:01:25 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D470B302454F;
-        Sun, 17 Mar 2019 10:01:19 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 930C5301D682;
+        Sun, 17 Mar 2019 10:01:25 +0000 (UTC)
 Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D34711A922;
-        Sun, 17 Mar 2019 10:01:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A55816025C;
+        Sun, 17 Mar 2019 10:01:22 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
@@ -33,71 +33,84 @@ Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Juergen Gross <jgross@suse.com>,
         xen-devel@lists.xenproject.org, Omar Sandoval <osandov@fb.com>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V2 00/10] block: enable multi-page bvec for passthrough IO
-Date:   Sun, 17 Mar 2019 18:01:02 +0800
-Message-Id: <20190317100112.8106-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Sun, 17 Mar 2019 10:01:20 +0000 (UTC)
+Subject: [PATCH V2 01/10] block: pass page to xen_biovec_phys_mergeable
+Date:   Sun, 17 Mar 2019 18:01:03 +0800
+Message-Id: <20190317100112.8106-2-ming.lei@redhat.com>
+In-Reply-To: <20190317100112.8106-1-ming.lei@redhat.com>
+References: <20190317100112.8106-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Sun, 17 Mar 2019 10:01:25 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+xen_biovec_phys_mergeable() only needs .bv_page of the 2nd bio bvec
+for checking if the two bvecs can be merged, so pass page to
+xen_biovec_phys_mergeable() directly.
 
-Now the whole IO stack is capable of handling multi-page bvec, and it has
-been enabled in the normal FS IO path. However, it isn't done for
-passthrough IO.
-
-Without enabling multi-bvec for passthough IO, we won't go ahead for
-optimizing related IO paths, such as bvec merging, bio_add_pc_page
-simplification.
-
-This patch enables multi-page bvec for passthrough IO. Turns out
-bio_add_pc_page() is simpliefied a lot, especially the physical segment
-number of passthrough bio is always same with bio.bi_vcnt. Also the
-bvec merging inside bio is killed.
-
-blktests(block/029) is added for covering passthough IO path, and this
-patchset does pass the new block/029 test.
-
-	https://marc.info/?l=linux-block&m=155175063417139&w=2
-
-V2:
-	- add new patch of 'block: avoid to break XEN by multi-page bvec'
-	- add one new patch to cleanup bio_add_pc_page()
-	- add another two new patches for cleanup of mapping bvec to sg
-	- most of others are patch style changes
-
-Ming Lei (10):
-  block: pass page to xen_biovec_phys_mergeable
-  block: avoid to break XEN by multi-page bvec
-  block: don't merge adjacent bvecs to one segment in bio
-    blk_queue_split
-  block: cleanup bio_add_pc_page
-  block: check if page is mergeable in one helper
-  block: put the same page when adding it to bio
-  block: enable multi-page bvec for passthrough IO
-  block: remove argument of 'request_queue' from __blk_bvec_map_sg
-  block: reuse __blk_bvec_map_sg() for mapping page sized bvec
-  block: don't check if adjacent bvecs in one bio can be mergeable
-
- block/bio.c            | 134 ++++++++++++++++++++++++++++---------------------
- block/blk-merge.c      | 106 +++++++++++++++++++-------------------
- block/blk.h            |   2 +-
- drivers/xen/biomerge.c |   5 +-
- include/linux/bio.h    |   3 ++
- include/xen/xen.h      |   2 +-
- 6 files changed, 135 insertions(+), 117 deletions(-)
+No function change.
 
 Cc: ris Ostrovsky <boris.ostrovsky@oracle.com>
 Cc: Juergen Gross <jgross@suse.com>
 Cc: xen-devel@lists.xenproject.org
 Cc: Omar Sandoval <osandov@fb.com>
 Cc: Christoph Hellwig <hch@lst.de>
-Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk.h            | 2 +-
+ drivers/xen/biomerge.c | 5 +++--
+ include/xen/xen.h      | 2 +-
+ 3 files changed, 5 insertions(+), 4 deletions(-)
 
-
+diff --git a/block/blk.h b/block/blk.h
+index 5d636ee41663..e27fd1512e4b 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -75,7 +75,7 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
+ 
+ 	if (addr1 + vec1->bv_len != addr2)
+ 		return false;
+-	if (xen_domain() && !xen_biovec_phys_mergeable(vec1, vec2))
++	if (xen_domain() && !xen_biovec_phys_mergeable(vec1, vec2->bv_page))
+ 		return false;
+ 	if ((addr1 | mask) != ((addr2 + vec2->bv_len - 1) | mask))
+ 		return false;
+diff --git a/drivers/xen/biomerge.c b/drivers/xen/biomerge.c
+index f3fbb700f569..05a286d24f14 100644
+--- a/drivers/xen/biomerge.c
++++ b/drivers/xen/biomerge.c
+@@ -4,12 +4,13 @@
+ #include <xen/xen.h>
+ #include <xen/page.h>
+ 
++/* check if @page can be merged with 'vec1' */
+ bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
+-			       const struct bio_vec *vec2)
++			       const struct page *page)
+ {
+ #if XEN_PAGE_SIZE == PAGE_SIZE
+ 	unsigned long bfn1 = pfn_to_bfn(page_to_pfn(vec1->bv_page));
+-	unsigned long bfn2 = pfn_to_bfn(page_to_pfn(vec2->bv_page));
++	unsigned long bfn2 = pfn_to_bfn(page_to_pfn(page));
+ 
+ 	return bfn1 + PFN_DOWN(vec1->bv_offset + vec1->bv_len) == bfn2;
+ #else
+diff --git a/include/xen/xen.h b/include/xen/xen.h
+index 19d032373de5..0e2324085b32 100644
+--- a/include/xen/xen.h
++++ b/include/xen/xen.h
+@@ -44,7 +44,7 @@ extern struct hvm_start_info pvh_start_info;
+ 
+ struct bio_vec;
+ bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
+-		const struct bio_vec *vec2);
++		const struct page *page);
+ 
+ #if defined(CONFIG_MEMORY_HOTPLUG) && defined(CONFIG_XEN_BALLOON)
+ extern u64 xen_saved_max_mem_size;
 -- 
 2.9.5
 
