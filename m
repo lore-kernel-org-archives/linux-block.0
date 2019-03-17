@@ -2,188 +2,131 @@ Return-Path: <SRS0=Zyuh=RU=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E479C43381
-	for <linux-block@archiver.kernel.org>; Sun, 17 Mar 2019 10:02:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4ED7C43381
+	for <linux-block@archiver.kernel.org>; Sun, 17 Mar 2019 19:24:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 55C8F2085A
-	for <linux-block@archiver.kernel.org>; Sun, 17 Mar 2019 10:02:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4231A20896
+	for <linux-block@archiver.kernel.org>; Sun, 17 Mar 2019 19:24:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="xR7qI2DX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726702AbfCQKCU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Mar 2019 06:02:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53838 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725903AbfCQKCU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Mar 2019 06:02:20 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id E3C523084031;
-        Sun, 17 Mar 2019 10:02:19 +0000 (UTC)
-Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A6752437F;
-        Sun, 17 Mar 2019 10:02:18 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Omar Sandoval <osandov@fb.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V2 10/10] block: don't check if adjacent bvecs in one bio can be mergeable
-Date:   Sun, 17 Mar 2019 18:01:12 +0800
-Message-Id: <20190317100112.8106-11-ming.lei@redhat.com>
-In-Reply-To: <20190317100112.8106-1-ming.lei@redhat.com>
-References: <20190317100112.8106-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.40]); Sun, 17 Mar 2019 10:02:19 +0000 (UTC)
+        id S1726349AbfCQTYW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Mar 2019 15:24:22 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:40474 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725946AbfCQTYW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 17 Mar 2019 15:24:22 -0400
+Received: by mail-pf1-f196.google.com with SMTP id c207so745906pfc.7
+        for <linux-block@vger.kernel.org>; Sun, 17 Mar 2019 12:24:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=3bb2Lay00cEWy1liYyfPOeyo88g7dBpxSAROapCvu3A=;
+        b=xR7qI2DXbZg8lIiE5hCIgayFDPSPxD89Dc2vhuLxMN++BxQg1Jah6Y3r52xRTckvgK
+         wlFPr4H/0D1sTUdknPgSmV90s+kDVE18E0yf2RNS1mDjiUyg/zL0X/H0wD8XIWLIP7+d
+         tqqe1lFkw4Oir6yVfp8WN3cikIKdJohiJkjJkdWwKMvJcyKKS6KjVYLzQF3/fktvIZDI
+         KlptDXBxUI8Gsuohi5RDuqZ/TVxnM+MoLO2qB2CXO/bN95SV+Z1BVKvR9jzf8mEa4Ibc
+         6IzQmeNvVyTKOF9PRaDVdDIKDwDIVv0hwYzCaI1DaW04Ssj4HLBe+7Colc9WSXZq8oMe
+         nhvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=3bb2Lay00cEWy1liYyfPOeyo88g7dBpxSAROapCvu3A=;
+        b=cp7+r5in0k0eFbXHS90Hlhsv1j4psASzkv6Biz9QMZcv8Vo6AZ+sKhmtb0NTF3fJ72
+         2cD7xcVnUqySocv+qr9jWzkIDangUis3nGWY235+/Ep2vw/cMhXv+Ts0EU8+IoB4Lpqi
+         LrBr4/6TqdrxyUjOuozFpgnHus2/c2ebXfYv4fqyey+yCc+VKEW19DozREK3fS+LT9Jw
+         ylinlFel7NHqJ4N7yl4YxQ9If/IVl67qblQZ8eEoxE9YwhKa2xuYwQ5XE6xawq3IZ1OY
+         SFKsoyqgWMRyQwg16RE/M2uNZSvruaFaLO37r84Vs2wR/WYiEaIITJrQPCDxN1lXBBqT
+         Fhrw==
+X-Gm-Message-State: APjAAAW1lwKf2YOAdDE+o49UVnSk/zERiZMTDVsiUqK/xq6w0GFZwxNr
+        2M7E4svvojMKouXpvfisCroQ/mSlhREzkQ==
+X-Google-Smtp-Source: APXvYqyNQFpNCan+I5ZmFRMpQQ98bATwPCoi1kLAKKUk3qcWJI6v3wLWUw2VIVYd1Slktu0kpCvImw==
+X-Received: by 2002:a17:902:14b:: with SMTP id 69mr15761479plb.216.1552850660696;
+        Sun, 17 Mar 2019 12:24:20 -0700 (PDT)
+Received: from [10.111.76.104] (rap-us.hgst.com. [199.255.44.250])
+        by smtp.gmail.com with ESMTPSA id e63sm11653608pfa.116.2019.03.17.12.24.19
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 17 Mar 2019 12:24:19 -0700 (PDT)
+Subject: Re: [PATCH 04/18] lightnvm: pblk: OOB recovery for closed chunks fix
+To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
+        "Konopko, Igor J" <igor.j.konopko@intel.com>
+Cc:     Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        linux-block@vger.kernel.org
+References: <20190314160428.3559-1-igor.j.konopko@intel.com>
+ <20190314160428.3559-5-igor.j.konopko@intel.com>
+ <F7A12A66-ADBD-4B24-9FD0-B02031E2FACB@javigon.com>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <5d997ae1-ec1f-6a78-6a93-f15fab542859@lightnvm.io>
+Date:   Sun, 17 Mar 2019 12:24:17 -0700
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
+ Gecko/20100101 Thunderbird/60.5.3
+MIME-Version: 1.0
+In-Reply-To: <F7A12A66-ADBD-4B24-9FD0-B02031E2FACB@javigon.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now both passthrough and FS IO have supported multi-page bvec, and
-bvec merging has been handled actually when adding page to bio, then
-adjacent bvecs won't be mergeable any more if they belong to same bio.
+On 3/16/19 3:43 PM, Javier González wrote:
+>> On 14 Mar 2019, at 09.04, Igor Konopko <igor.j.konopko@intel.com> wrote:
+>>
+>> In case of OOB recovery, when some of the chunks are in closed state,
+>> we are calculating number of written sectors in line incorrectly,
+>> because we are always counting chunk WP, which for closed chunks
+>> does not longer reflects written sectors in particular chunks. This
+>> patch for such a chunks takes clba field instead.
+>>
+>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+>> ---
+>> drivers/lightnvm/pblk-recovery.c | 8 +++++++-
+>> 1 file changed, 7 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+>> index 83b467b..bcd3633 100644
+>> --- a/drivers/lightnvm/pblk-recovery.c
+>> +++ b/drivers/lightnvm/pblk-recovery.c
+>> @@ -101,6 +101,8 @@ static void pblk_update_line_wp(struct pblk *pblk, struct pblk_line *line,
+>>
+>> static u64 pblk_sec_in_open_line(struct pblk *pblk, struct pblk_line *line)
+>> {
+>> +	struct nvm_tgt_dev *dev = pblk->dev;
+>> +	struct nvm_geo *geo = &dev->geo;
+>> 	struct pblk_line_meta *lm = &pblk->lm;
+>> 	int nr_bb = bitmap_weight(line->blk_bitmap, lm->blk_per_line);
+>> 	u64 written_secs = 0;
+>> @@ -113,7 +115,11 @@ static u64 pblk_sec_in_open_line(struct pblk *pblk, struct pblk_line *line)
+>> 		if (chunk->state & NVM_CHK_ST_OFFLINE)
+>> 			continue;
+>>
+>> -		written_secs += chunk->wp;
+>> +		if (chunk->state & NVM_CHK_ST_OPEN)
+>> +			written_secs += chunk->wp;
+>> +		else if (chunk->state & NVM_CHK_ST_CLOSED)
+>> +			written_secs += geo->clba;
+>> +
+>> 		valid_chunks++;
+>> 	}
+>>
+>> --
+>> 2.9.5
+> 
+> Mmmm. The change is correct, but can you develop on why the WP does not
+> reflect the written sectors in a closed chunk? As I understand it, the
+> WP reflects the last written sector; if it happens to be WP == clba, then
+> the chunk state machine transitions to closed, but the WP remains
+> untouched. It is only when we reset the chunk that the WP comes back to
+> 0. Am I missing something?
+> 
 
-So only try to merge bvecs if they are from different bios.
-
-Cc: Omar Sandoval <osandov@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-merge.c | 69 +++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 42 insertions(+), 27 deletions(-)
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 3e934ee9a907..8f96d683b577 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -354,11 +354,11 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 					     struct bio *bio)
- {
- 	struct bio_vec bv, bvprv = { NULL };
--	int prev = 0;
- 	unsigned int seg_size, nr_phys_segs;
- 	unsigned front_seg_size;
- 	struct bio *fbio, *bbio;
- 	struct bvec_iter iter;
-+	bool new_bio = false;
- 
- 	if (!bio)
- 		return 0;
-@@ -379,7 +379,7 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 	nr_phys_segs = 0;
- 	for_each_bio(bio) {
- 		bio_for_each_bvec(bv, bio, iter) {
--			if (prev) {
-+			if (new_bio) {
- 				if (seg_size + bv.bv_len
- 				    > queue_max_segment_size(q))
- 					goto new_segment;
-@@ -387,7 +387,6 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 					goto new_segment;
- 
- 				seg_size += bv.bv_len;
--				bvprv = bv;
- 
- 				if (nr_phys_segs == 1 && seg_size >
- 						front_seg_size)
-@@ -396,12 +395,13 @@ static unsigned int __blk_recalc_rq_segments(struct request_queue *q,
- 				continue;
- 			}
- new_segment:
--			bvprv = bv;
--			prev = 1;
- 			bvec_split_segs(q, &bv, &nr_phys_segs, &seg_size,
- 					&front_seg_size, NULL, UINT_MAX);
-+			new_bio = false;
- 		}
- 		bbio = bio;
-+		bvprv = bv;
-+		new_bio = true;
- 	}
- 
- 	fbio->bi_seg_front_size = front_seg_size;
-@@ -501,29 +501,26 @@ static inline int __blk_bvec_map_sg(struct bio_vec bv,
- 	return 1;
- }
- 
--static inline void
--__blk_segment_map_sg(struct request_queue *q, struct bio_vec *bvec,
--		     struct scatterlist *sglist, struct bio_vec *bvprv,
--		     struct scatterlist **sg, int *nsegs)
-+/* only try to merge bvecs into one sg if they are from two bios */
-+static inline bool
-+__blk_segment_map_sg_merge(struct request_queue *q, struct bio_vec *bvec,
-+			   struct bio_vec *bvprv, struct scatterlist **sg)
- {
- 
- 	int nbytes = bvec->bv_len;
- 
--	if (*sg) {
--		if ((*sg)->length + nbytes > queue_max_segment_size(q))
--			goto new_segment;
--		if (!biovec_phys_mergeable(q, bvprv, bvec))
--			goto new_segment;
-+	if (!*sg)
-+		return false;
- 
--		(*sg)->length += nbytes;
--	} else {
--new_segment:
--		if (bvec->bv_offset + bvec->bv_len <= PAGE_SIZE) {
--			(*nsegs) += __blk_bvec_map_sg(*bvec, sglist, sg);
--		} else
--			(*nsegs) += blk_bvec_map_sg(q, bvec, sglist, sg);
--	}
--	*bvprv = *bvec;
-+	if ((*sg)->length + nbytes > queue_max_segment_size(q))
-+		return false;
-+
-+	if (!biovec_phys_mergeable(q, bvprv, bvec))
-+		return false;
-+
-+	(*sg)->length += nbytes;
-+
-+	return true;
- }
- 
- static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
-@@ -533,11 +530,29 @@ static int __blk_bios_map_sg(struct request_queue *q, struct bio *bio,
- 	struct bio_vec bvec, bvprv = { NULL };
- 	struct bvec_iter iter;
- 	int nsegs = 0;
-+	bool new_bio = false;
- 
--	for_each_bio(bio)
--		bio_for_each_bvec(bvec, bio, iter)
--			__blk_segment_map_sg(q, &bvec, sglist, &bvprv, sg,
--					     &nsegs);
-+	for_each_bio(bio) {
-+		bio_for_each_bvec(bvec, bio, iter) {
-+			/*
-+			 * Only try to merge bvecs from two bios given we
-+			 * have done bio internal merge when adding pages
-+			 * to bio
-+			 */
-+			if (new_bio &&
-+			    __blk_segment_map_sg_merge(q, &bvec, &bvprv, sg))
-+				goto next_bvec;
-+
-+			if (bvec.bv_offset + bvec.bv_len <= PAGE_SIZE)
-+				nsegs += __blk_bvec_map_sg(bvec, sglist, sg);
-+			else
-+				nsegs += blk_bvec_map_sg(q, &bvec, sglist, sg);
-+ next_bvec:
-+			new_bio = false;
-+		}
-+		bvprv = bvec;
-+		new_bio = true;
-+	}
- 
- 	return nsegs;
- }
--- 
-2.9.5
-
+I agree with Javier. In OCSSD, the write pointer shall always be valid.
