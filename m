@@ -2,78 +2,84 @@ Return-Path: <SRS0=WbMh=RV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFB41C43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:38:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84763C43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:39:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A1C620872
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:38:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 540A920835
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:39:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1552919991;
+	bh=Ew/TQOH/rmdXnJQksHSHOBdA0kAWKJn9+PjlLWA1ORk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=ZqxCzi1vJQxwfg5eI40WGRF1vc61eMgTZqxke9w8n6b+6CElhWvAW+UUilyFimV9F
+	 AB6iurUbNW5GSEg6A9mLCfYy0945dFfJiqYTvbmkKR41o8WmEvuy0SDNTumKRLwgw/
+	 xmnQm3RLUr/rezZrc/AD4qAg+cO0AjeKVWMFz0rA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726926AbfCROiq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 10:38:46 -0400
-Received: from mga03.intel.com ([134.134.136.65]:22183 "EHLO mga03.intel.com"
+        id S1727372AbfCROju (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 10:39:50 -0400
+Received: from mga14.intel.com ([192.55.52.115]:24028 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726692AbfCROip (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 10:38:45 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
+        id S1726846AbfCROju (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Mar 2019 10:39:50 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga103.jf.intel.com with ESMTP; 18 Mar 2019 07:38:45 -0700
+  by fmsmga103.fm.intel.com with ESMTP; 18 Mar 2019 07:39:49 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.58,494,1544515200"; 
-   d="scan'208";a="135022075"
-Received: from mdziegie-mobl.ger.corp.intel.com (HELO localhost.igk.intel.com) ([10.237.142.141])
-  by orsmga003.jf.intel.com with ESMTP; 18 Mar 2019 07:38:43 -0700
-From:   Marcin Dziegielewski <marcin.dziegielewski@intel.com>
-To:     mb@lightnvm.io, javier@javigon.com, hans.holmberg@cnexlabs.com
-Cc:     linux-block@vger.kernel.org, marcin.dziegielewski@intel.com,
-        igor.j.konopko@intel.com
-Subject: [PATCH] lightnvm: pblk: do not pad line when there are no left_msecs
-Date:   Mon, 18 Mar 2019 15:38:37 +0100
-Message-Id: <1552919917-12846-1-git-send-email-marcin.dziegielewski@intel.com>
-X-Mailer: git-send-email 1.8.3.1
+   d="scan'208";a="135023381"
+Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
+  by orsmga003.jf.intel.com with ESMTP; 18 Mar 2019 07:39:49 -0700
+Date:   Mon, 18 Mar 2019 08:40:42 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 1/2] blk-mq: introduce blk_mq_complete_request_sync()
+Message-ID: <20190318144042.GA23473@localhost.localdomain>
+References: <20190318032950.17770-1-ming.lei@redhat.com>
+ <20190318032950.17770-2-ming.lei@redhat.com>
+ <f708ee0c-dfa4-0bca-f996-8d834471f1fd@acm.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f708ee0c-dfa4-0bca-f996-8d834471f1fd@acm.org>
+User-Agent: Mutt/1.9.1 (2017-09-22)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When there are no left msecs in line, despite it, we are
-trying to pad line. In such case, pblk_recov_pad_line function
-returns error, we don't write end meta to this line and
-in consequence we need to scan whole line on next pblk load.
+On Sun, Mar 17, 2019 at 09:09:09PM -0700, Bart Van Assche wrote:
+> On 3/17/19 8:29 PM, Ming Lei wrote:
+> > In NVMe's error handler, follows the typical steps for tearing down
+> > hardware:
+> > 
+> > 1) stop blk_mq hw queues
+> > 2) stop the real hw queues
+> > 3) cancel in-flight requests via
+> > 	blk_mq_tagset_busy_iter(tags, cancel_request, ...)
+> > cancel_request():
+> > 	mark the request as abort
+> > 	blk_mq_complete_request(req);
+> > 4) destroy real hw queues
+> > 
+> > However, there may be race between #3 and #4, because blk_mq_complete_request()
+> > actually completes the request asynchronously.
+> > 
+> > This patch introduces blk_mq_complete_request_sync() for fixing the
+> > above race.
+> 
+> Other block drivers wait until outstanding requests have completed by
+> calling blk_cleanup_queue() before hardware queues are destroyed. Why can't
+> the NVMe driver follow that approach?
 
-This patch fixes this issue, now when there is no left_msecs
-we skip padding, write end meta and return success.
-
-Signed-off-by: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
----
- drivers/lightnvm/pblk-recovery.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 83b467b..b9d7d7f 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -880,10 +880,12 @@ int pblk_recov_pad(struct pblk *pblk)
- 	left_msecs = line->left_msecs;
- 	spin_unlock(&l_mg->free_lock);
- 
--	ret = pblk_recov_pad_line(pblk, line, left_msecs);
--	if (ret) {
--		pblk_err(pblk, "tear down padding failed (%d)\n", ret);
--		return ret;
-+	if (left_msecs) {
-+		ret = pblk_recov_pad_line(pblk, line, left_msecs);
-+		if (ret) {
-+			pblk_err(pblk, "tear down padding failed (%d)\n", ret);
-+			return ret;
-+		}
- 	}
- 
- 	pblk_line_close_meta(pblk, line);
--- 
-1.8.3.1
-
+You can't just wait for an outstanding request indefinitely. We have to
+safely make forward progress when we've determined it's not going to be
+completed.
