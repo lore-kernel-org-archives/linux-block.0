@@ -2,119 +2,60 @@ Return-Path: <SRS0=WbMh=RV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E961C43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 21:42:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DBACC43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 22:14:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 165E32133D
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 21:42:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D899F2171F
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 22:14:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="awPrbu7d"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726926AbfCRVmr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 17:42:47 -0400
-Received: from gateway34.websitewelcome.com ([192.185.148.200]:45809 "EHLO
-        gateway34.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726832AbfCRVmr (ORCPT
+        id S1727238AbfCRWOP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 18:14:15 -0400
+Received: from mail-wr1-f43.google.com ([209.85.221.43]:42370 "EHLO
+        mail-wr1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726911AbfCRWOP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 17:42:47 -0400
-X-Greylist: delayed 1500 seconds by postgrey-1.27 at vger.kernel.org; Mon, 18 Mar 2019 17:42:46 EDT
-Received: from cm12.websitewelcome.com (cm12.websitewelcome.com [100.42.49.8])
-        by gateway34.websitewelcome.com (Postfix) with ESMTP id 85B099FB8A5
-        for <linux-block@vger.kernel.org>; Mon, 18 Mar 2019 15:54:00 -0500 (CDT)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id 5zGihv35giQer5zGihjCY3; Mon, 18 Mar 2019 15:54:00 -0500
-X-Authority-Reason: nr=8
-Received: from [189.250.104.39] (port=46800 helo=[192.168.1.76])
-        by gator4166.hostgator.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-        (Exim 4.91)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1h5zGi-0031kp-0n; Mon, 18 Mar 2019 15:54:00 -0500
-Subject: Re: [Drbd-dev] [PATCH] block: Mark expected switch fall-throughs
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To:     Roland Kammerer <roland.kammerer@linbit.com>
-Cc:     Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Joshua Morris <josh.h.morris@us.ibm.com>,
-        Philip Kelleher <pjk1939@linux.ibm.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        drbd-dev@lists.linbit.com, Kees Cook <keescook@chromium.org>
-References: <20190123064501.GA26147@embeddedor>
- <20190129094230.ezjzpfwf5xx47luu@rck.sh>
- <577904a8-2882-1895-007b-55e92cfdf918@embeddedor.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=gustavo@embeddedor.com; keydata=
- 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
- VtSixD1uOgytAP7RWS474w==
-Message-ID: <4e659bb0-e706-ce39-711c-da57a98e03d8@embeddedor.com>
-Date:   Mon, 18 Mar 2019 15:53:58 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        Mon, 18 Mar 2019 18:14:15 -0400
+Received: by mail-wr1-f43.google.com with SMTP id n9so14757308wrr.9
+        for <linux-block@vger.kernel.org>; Mon, 18 Mar 2019 15:14:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=+A0pC70TpjGGI1Z0C+jlw/ivVgQIP8bQvCh5OhOe8Ik=;
+        b=awPrbu7drkmA9i8eyHnzamXuldNlsOiLZdAE7bgWwYDUvH1gzik/2qyXP9KzLxlq0k
+         StWVHIUajI3Dqi4zTjYvwr+CN+UYCUXAHstK2LyMJLmUP7tHcApKVciaN3fHU3ZhszaB
+         ADa9FIQfBZSm/1qbBUduD/it/JSmnet2GQhfF72n0iCabt2vpqgAF9nfWVbq/MdE5+sk
+         zyUgdqxIDQddPNDphGeaf19HHFIJZdanIu8cNWGQmso5Nhw0tAp/lkR+rczIHIXgi3L0
+         Q3doYiYF7z3z7Hr1c9hVeajE7SmRxuUYY6jFVjkGKDBc3l3H4oRfSPTboalU4Ooo7TEG
+         sFow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=+A0pC70TpjGGI1Z0C+jlw/ivVgQIP8bQvCh5OhOe8Ik=;
+        b=nI1JWvpje6Bo1AlWSbYDEkHUtkod7iATlExtxEmDMydZ+7BY5ufQwo7KmzGKG7JK7z
+         eWJS3FIAyFbCIx3+fK3yC7XHy8WptF7eJ2rwMzoA/BsBE4PJz/4cVyA4UDnl1gb8YrDG
+         4eLbFvxVIxL51Gb92f4EeDsbNRgg1H2Y8kM9XWMJgYgc7jJeINajxSfixBdnGnJLGixo
+         GJJrZwQw9MmPV/ZftXE8kqMqF7WjFSk0nJHlCYuhRXiXuXNkdyOm8nIK6F6oHBIi3jck
+         f7OD7qBuPe6aF3fZUV07wQwgcg6TpYru49l3kOD1Nc5Bm9PXlpoh9+MO5NmqpcRY0F6B
+         MpIw==
+X-Gm-Message-State: APjAAAWEYdxTTS3kc43OZvpxAwppUgY++xhEsrQOBBlETjj/U7RE1654
+        KqzASYH+SWaMeARzbeURYgWom0S6K48XlLp+PrjORvuW
+X-Google-Smtp-Source: APXvYqytbP6uLi0mA76QLnkpwyjMz5ndrTjjeF2Jbl8xV4gfxVy4BhcJrMGah1aqreCO/vS1ck59DOinuXfBP+DqWdE=
+X-Received: by 2002:adf:eecb:: with SMTP id a11mr6911053wrp.23.1552947253146;
+ Mon, 18 Mar 2019 15:14:13 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <577904a8-2882-1895-007b-55e92cfdf918@embeddedor.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 189.250.104.39
-X-Source-L: No
-X-Exim-ID: 1h5zGi-0031kp-0n
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.1.76]) [189.250.104.39]:46800
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 7
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+From:   Nikhil Sambhus <nikhilsambhus@gmail.com>
+Date:   Mon, 18 Mar 2019 18:14:01 -0400
+Message-ID: <CAFQ9A4Zc8Fc4bDyAsiduTw4kTpxR=dVZr7LUdqUkvQSu1CaGpg@mail.gmail.com>
+Subject: Error while enabling io_poll for NVMe SSD
+To:     linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -122,48 +63,19 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hi,
 
-If no one cares, I'll add this to my tree for 5.2
+On a Linux Kernel 5.0.0+ machine (Ubuntu 16.04)  I am using the
+following command as a root user to enable polling for a NVMe SSD
+device.
 
-Thanks
---
-Gustavo
+# echo 1 > /sys/block/nvme2n1/queue/io_poll
 
-On 2/26/19 1:31 PM, Gustavo A. R. Silva wrote:
-> 
-> 
-> On 1/29/19 3:42 AM, Roland Kammerer wrote:
->> On Wed, Jan 23, 2019 at 12:45:01AM -0600, Gustavo A. R. Silva wrote:
->>> In preparation to enabling -Wimplicit-fallthrough, mark switch cases
->>> where we are expecting to fall through.
->>>
->>> Warning level 3 was used: -Wimplicit-fallthrough=3
->>>
->>> This patch is part of the ongoing efforts to enabling
->>> -Wimplicit-fallthrough
->>>
->>> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
->>> ---
->>>  drivers/block/drbd/drbd_int.h      | 2 +-
->>>  drivers/block/drbd/drbd_receiver.c | 4 ++--
->>>  drivers/block/drbd/drbd_req.c      | 2 +-
->>>  drivers/block/rsxx/core.c          | 1 +
->>>  4 files changed, 5 insertions(+), 4 deletions(-)
->>>
->>
->> Hi Gustavo,
->>
->> as also discussed with Lars in person, obviously OK for the DRBD part.
->>
->> Acked-by: Roland Kammerer <roland.kammerer@linbit.com>
->>
-> 
-> Thank you, Roland.
-> 
-> Friendly ping:
-> 
-> Who can take this, please?
-> 
-> Thanks
-> --
-> Gustavo
-> 
+I get the following error:
+
+bash: echo: write error: Invalid argument
+
+The current value of io_poll is 0.
+-- 
+Regards,
+Nikhil P Sambhus
+
+"To bug is human, to debug is divine"
