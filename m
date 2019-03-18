@@ -2,84 +2,127 @@ Return-Path: <SRS0=WbMh=RV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84763C43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:39:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0310C43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:40:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 540A920835
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:39:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1552919991;
-	bh=Ew/TQOH/rmdXnJQksHSHOBdA0kAWKJn9+PjlLWA1ORk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ZqxCzi1vJQxwfg5eI40WGRF1vc61eMgTZqxke9w8n6b+6CElhWvAW+UUilyFimV9F
-	 AB6iurUbNW5GSEg6A9mLCfYy0945dFfJiqYTvbmkKR41o8WmEvuy0SDNTumKRLwgw/
-	 xmnQm3RLUr/rezZrc/AD4qAg+cO0AjeKVWMFz0rA=
+	by mail.kernel.org (Postfix) with ESMTP id 8A22320835
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:40:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727372AbfCROju (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 10:39:50 -0400
-Received: from mga14.intel.com ([192.55.52.115]:24028 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726846AbfCROju (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 10:39:50 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP; 18 Mar 2019 07:39:49 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.58,494,1544515200"; 
-   d="scan'208";a="135023381"
-Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
-  by orsmga003.jf.intel.com with ESMTP; 18 Mar 2019 07:39:49 -0700
-Date:   Mon, 18 Mar 2019 08:40:42 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 1/2] blk-mq: introduce blk_mq_complete_request_sync()
-Message-ID: <20190318144042.GA23473@localhost.localdomain>
-References: <20190318032950.17770-1-ming.lei@redhat.com>
- <20190318032950.17770-2-ming.lei@redhat.com>
- <f708ee0c-dfa4-0bca-f996-8d834471f1fd@acm.org>
+        id S1727376AbfCROkt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 10:40:49 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4703 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727134AbfCROkt (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Mar 2019 10:40:49 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id B7CDDB1966F951D122C3;
+        Mon, 18 Mar 2019 22:40:43 +0800 (CST)
+Received: from huawei.com (10.90.53.225) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.408.0; Mon, 18 Mar 2019
+ 22:40:41 +0800
+From:   Yufen Yu <yuyufen@huawei.com>
+To:     <axboe@kernel.dk>, <Damien.LeMoal@wdc.com>
+CC:     <linux-block@vger.kernel.org>
+Subject: [PATCH v4] block: add BLK_MQ_POLL_CLASSIC for hybrid poll and return EINVAL for unexpected value
+Date:   Mon, 18 Mar 2019 22:44:41 +0800
+Message-ID: <20190318144441.133569-1-yuyufen@huawei.com>
+X-Mailer: git-send-email 2.16.2.dirty
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f708ee0c-dfa4-0bca-f996-8d834471f1fd@acm.org>
-User-Agent: Mutt/1.9.1 (2017-09-22)
+Content-Type: text/plain
+X-Originating-IP: [10.90.53.225]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 17, 2019 at 09:09:09PM -0700, Bart Van Assche wrote:
-> On 3/17/19 8:29 PM, Ming Lei wrote:
-> > In NVMe's error handler, follows the typical steps for tearing down
-> > hardware:
-> > 
-> > 1) stop blk_mq hw queues
-> > 2) stop the real hw queues
-> > 3) cancel in-flight requests via
-> > 	blk_mq_tagset_busy_iter(tags, cancel_request, ...)
-> > cancel_request():
-> > 	mark the request as abort
-> > 	blk_mq_complete_request(req);
-> > 4) destroy real hw queues
-> > 
-> > However, there may be race between #3 and #4, because blk_mq_complete_request()
-> > actually completes the request asynchronously.
-> > 
-> > This patch introduces blk_mq_complete_request_sync() for fixing the
-> > above race.
-> 
-> Other block drivers wait until outstanding requests have completed by
-> calling blk_cleanup_queue() before hardware queues are destroyed. Why can't
-> the NVMe driver follow that approach?
+For q->poll_nsec == -1, means doing classic poll, not hybrid poll.
+We introduce a new flag BLK_MQ_POLL_CLASSIC to replace -1, which
+may make code much easier to read.
 
-You can't just wait for an outstanding request indefinitely. We have to
-safely make forward progress when we've determined it's not going to be
-completed.
+Additionally, since val is an int obtained with kstrtoint(), val can be
+a negative value other than -1, so return -EINVAL for that case.
+
+Thanks to Damien Le Moal for some good suggestion.
+
+Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+---
+ block/blk-mq.c         |  4 ++--
+ block/blk-sysfs.c      | 12 +++++++-----
+ include/linux/blkdev.h |  3 +++
+ 3 files changed, 12 insertions(+), 7 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a9c181603cbd..1c588e5c4a02 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2857,7 +2857,7 @@ struct request_queue *blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	/*
+ 	 * Default to classic polling
+ 	 */
+-	q->poll_nsec = -1;
++	q->poll_nsec = BLK_MQ_POLL_CLASSIC;
+ 
+ 	blk_mq_init_cpu_queues(q, set->nr_hw_queues);
+ 	blk_mq_add_queue_tag_set(set, q);
+@@ -3392,7 +3392,7 @@ static bool blk_mq_poll_hybrid(struct request_queue *q,
+ {
+ 	struct request *rq;
+ 
+-	if (q->poll_nsec == -1)
++	if (q->poll_nsec == BLK_MQ_POLL_CLASSIC)
+ 		return false;
+ 
+ 	if (!blk_qc_t_is_internal(cookie))
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 59685918167e..422327089e0f 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -360,8 +360,8 @@ static ssize_t queue_poll_delay_show(struct request_queue *q, char *page)
+ {
+ 	int val;
+ 
+-	if (q->poll_nsec == -1)
+-		val = -1;
++	if (q->poll_nsec == BLK_MQ_POLL_CLASSIC)
++		val = BLK_MQ_POLL_CLASSIC;
+ 	else
+ 		val = q->poll_nsec / 1000;
+ 
+@@ -380,10 +380,12 @@ static ssize_t queue_poll_delay_store(struct request_queue *q, const char *page,
+ 	if (err < 0)
+ 		return err;
+ 
+-	if (val == -1)
+-		q->poll_nsec = -1;
+-	else
++	if (val == BLK_MQ_POLL_CLASSIC)
++		q->poll_nsec = BLK_MQ_POLL_CLASSIC;
++	else if (val >= 0)
+ 		q->poll_nsec = val * 1000;
++	else
++		return -EINVAL;
+ 
+ 	return count;
+ }
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 0de92b29f589..5c58a3b2bf00 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -50,6 +50,9 @@ struct blk_stat_callback;
+ /* Must be consistent with blk_mq_poll_stats_bkt() */
+ #define BLK_MQ_POLL_STATS_BKTS 16
+ 
++/* Doing classic polling */
++#define BLK_MQ_POLL_CLASSIC -1
++
+ /*
+  * Maximum number of blkcg policies allowed to be registered concurrently.
+  * Defined here to simplify include dependency.
+-- 
+2.16.2.dirty
+
