@@ -2,91 +2,88 @@ Return-Path: <SRS0=WbMh=RV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF6BC43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 15:49:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72CC8C43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 15:52:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C6AFB20872
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 15:49:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3896A2085A
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 15:52:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1552924355;
+	bh=adkHIhy0hpLzBOMxL2+tiQhQ+2V6H1aflwiY1TLMXTw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=TGReQVw74CHgL8l3Kl2evFF+HAXi+yOX4Ro4CcpGKx6D/cRMGHtRKxEhb84aAgyZf
+	 dW0MtKKR5FsCwLQMNx/qq4pwU39piX9dVxRV0SYtLTx27ne52OSQCr2j+EUg18U0ZM
+	 M58aBuuAvPXpzxQ5Zz0BTU2MdvaAw9DD1BJ5rTAg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727499AbfCRPt1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 11:49:27 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:39052 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727239AbfCRPt0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 11:49:26 -0400
-Received: by mail-pg1-f194.google.com with SMTP id h8so11666484pgp.6
-        for <linux-block@vger.kernel.org>; Mon, 18 Mar 2019 08:49:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=YXuzdlCHhgWVAxBqw3+RNjlhyFNzOx4bP1/RMhizIyI=;
-        b=HSzgK03s/bUzfWUD4He1l249CJz1Je0V/+vcFyoAuQjdSwYGmowFX+8TuQEimQ3CnU
-         Q7Z7/1ZDOEqz/Do5norYNorb4MyF/hm9gYgi4hvVx7bpVLTmGQ1W8NYHH4y3baeNzq8r
-         c7klAX7SlU50F3kfltBHhyZ9VJCtYPwReIQd41MFS/fcyJkfroYfsc3oFRWBcNPGy67h
-         E2uk82XjQzzR2eDPrB01B4zTYrNqbpSqzS0BUSATNxhdvJRnzhXS6CM/SRgNiz8q4Vzs
-         O+bJB7eVXKADg+AEb6i8d9OZn/s8HZwr1N0P3TKprnrzq5D4bxRiih/d/biPOOCQKdiA
-         wm8A==
-X-Gm-Message-State: APjAAAWxkMyJsNAtVQmqZ15M4X/BN9la6lZE7hKCkR1MwglggMEl9mZc
-        z92qGO0y10mh4zuPxUKco7w=
-X-Google-Smtp-Source: APXvYqxYv19NsL0kQAQCv2yPa+igYRNRcKzrHToZvARKxnqWy32bqamfmIRHaJsXTk5f9y1KmIIHzA==
-X-Received: by 2002:aa7:8710:: with SMTP id b16mr19933847pfo.15.1552924166056;
-        Mon, 18 Mar 2019 08:49:26 -0700 (PDT)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id h184sm24474746pfc.78.2019.03.18.08.49.25
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 18 Mar 2019 08:49:25 -0700 (PDT)
-Message-ID: <1552924164.152266.21.camel@acm.org>
-Subject: Re: [PATCH 1/2] blk-mq: introduce blk_mq_complete_request_sync()
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org
-Date:   Mon, 18 Mar 2019 08:49:24 -0700
-In-Reply-To: <20190318151618.GA20371@ming.t460p>
-References: <20190318032950.17770-1-ming.lei@redhat.com>
-         <20190318032950.17770-2-ming.lei@redhat.com>
-         <f708ee0c-dfa4-0bca-f996-8d834471f1fd@acm.org>
-         <20190318073826.GA29746@ming.t460p> <1552921495.152266.8.camel@acm.org>
-         <20190318151618.GA20371@ming.t460p>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S1727406AbfCRPwe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 11:52:34 -0400
+Received: from mga12.intel.com ([192.55.52.136]:18026 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726714AbfCRPwe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Mar 2019 11:52:34 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Mar 2019 08:52:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,494,1544515200"; 
+   d="scan'208";a="141703258"
+Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
+  by FMSMGA003.fm.intel.com with ESMTP; 18 Mar 2019 08:52:33 -0700
+Date:   Mon, 18 Mar 2019 09:53:26 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Ming Lei <tom.leiming@gmail.com>
+Cc:     Jianchao Wang <jianchao.w.wang@oracle.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "jsmart2021@gmail.com" <jsmart2021@gmail.com>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Busch, Keith" <keith.busch@intel.com>,
+        "hare@suse.de" <hare@suse.de>,
+        "jthumshirn@suse.de" <jthumshirn@suse.de>,
+        "hch@lst.de" <hch@lst.de>, "sagi@grimberg.me" <sagi@grimberg.me>
+Subject: Re: [PATCH 2/8] blk-mq: change the method of iterating busy tags of
+ a request_queue
+Message-ID: <20190318155326.GB23533@localhost.localdomain>
+References: <1552640264-26101-1-git-send-email-jianchao.w.wang@oracle.com>
+ <1552640264-26101-3-git-send-email-jianchao.w.wang@oracle.com>
+ <20190315161608.GB15153@localhost.localdomain>
+ <CACVXFVM=r-jS_GnkAuARiiXLr3bQeWV5Gix3+F03B5oYbmdULw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACVXFVM=r-jS_GnkAuARiiXLr3bQeWV5Gix3+F03B5oYbmdULw@mail.gmail.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2019-03-18 at 23:16 +-0800, Ming Lei wrote:
-+AD4 I am not familiar with SRP, could you explain what SRP initiator driver
-+AD4 will do when the controller is in bad state? Especially about dealing with
-+AD4 in-flight IO requests under this situation.
+On Sat, Mar 16, 2019 at 11:50:27PM -0700, Ming Lei wrote:
+> On Sat, Mar 16, 2019 at 12:15 AM Keith Busch <kbusch@kernel.org> wrote:
+> > On Fri, Mar 15, 2019 at 01:57:38AM -0700, Jianchao Wang wrote:
+> > > +     if (rq && rq->q == hctx->queue &&
+> > > +         rq->mq_hctx == hctx &&
+> > > +         (!iter_data->inflight ||
+> > > +          blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT))
+> > > +             return iter_data->fn(rq, iter_data->data, reserved);
+> >
+> > There is still a window where the check may succeed, but the request is
+> > being assigned to a completely different request_queue. The callback
+> > then operates on a request it doesn't own.
+> 
+> The situation above is only related with 'none' io scheduler.
+> 
+> However, this patch doesn't change behavior for none given .rq[tag] is same with
+> .static_rq[tag], so I guess your concern may not be related with this patch.
 
-Hi Ming,
-
-Just like the NVMeOF initiator driver, the SRP initiator driver uses an
-RDMA RC connection for all of its communication over the network. If
-communication between initiator and target fails the target driver will
-close the connection or one of the work requests that was posted by the
-initiator driver will complete with an error status (wc-+AD4-status +ACEAPQ
-IB+AF8-WC+AF8-SUCCESS). In the latter case the function srp+AF8-handle+AF8-qp+AF8-err() will
-try to reestablish the connection between initiator and target after a
-certain delay:
-
-	if (delay +AD4 0)
-		queue+AF8-delayed+AF8-work(system+AF8-long+AF8-wq, +ACY-rport-+AD4-reconnect+AF8-work,
-				   1UL +ACo delay +ACo HZ)+ADs
-
-SCSI timeouts may kick the SCSI error handler. That results in calls of
-the srp+AF8-reset+AF8-device() and/or srp+AF8-reset+AF8-host() functions. srp+AF8-reset+AF8-host()
-terminates all outstanding requests after having disconnected the RDMA RC
-connection. Disconnecting the RC connection first guarantees that there
-are no concurrent request completion calls from the regular completion
-path and from the error handler.
-
-Bart.
+Right, it's not new, but queue iteration wasn't exported for drivers
+before this.
