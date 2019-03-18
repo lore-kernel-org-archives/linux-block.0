@@ -4,43 +4,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4B54C43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 19:48:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B8DFC10F0D
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 19:48:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA6AC20857
+	by mail.kernel.org (Postfix) with ESMTP id E066F20989
 	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 19:48:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="b38JTHGH"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="QQza5uEg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727564AbfCRTsi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727567AbfCRTsi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 18 Mar 2019 15:48:38 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:35368 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:35354 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727567AbfCRTs3 (ORCPT
+        with ESMTP id S1727218AbfCRTs2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 15:48:29 -0400
+        Mon, 18 Mar 2019 15:48:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=References:In-Reply-To:Message-Id:
         Date:Subject:Cc:To:From:Sender:Reply-To:MIME-Version:Content-Type:
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=syzjGXm7nZCMWATApfkoGI2YZgFq4WD7FAbxvnSIUZs=; b=b38JTHGHP/Txgst2+ZYrbbPDu
-        Mwk46zT8F//mpcMJvRB7QXdm2kMYhEn5SoSVlc8l4O8cqUcKcZADski72/RgKnAYwuWqM66Hmn+wW
-        5HLMnj7onyrA1ZZI2Oy1c6I7fMRvaBjRzQCUy68P3e7MwEegkt9TVUxLmWKmZpXVDaDm0KMyjtQ+X
-        Rp2UhLQZl6WOaRXIWr+j08FQ3kA6vBIRWasTHlUklLiXgEq0q90CvXIABLEyJIJx+h8YCHVqrP5b2
-        rNT1clMQveYBGWNRUI9kGSxhxJFBpiTr7fiDcdYPBN7SiTyx2UNpEfMiWA3XajUDuGHv/fEdCHPvE
-        Qx0sS9xBg==;
+         bh=RPkeFIWpFer9xbM+mmvwrTZv7i0Ua6lxJAjpp1KHriA=; b=QQza5uEgj43uWAmVOe5qrnATq
+        m85X7+XOQpX3NP2XMscCn4Pv4oENCzRn+9VE8djVr2m5RpnxxKHMIgHKyy7sxupZVF8O/1eSJYSS/
+        wdv4NAqToCeHfjEAqU0rpdrWbXj41cmyRsuoR83A9ZxWSOcduaKcyAzdh63CFzPeR4fR1kKm19JDx
+        HR9f4LYXUX0SgB/r+vWML/koyvsmIRWpWf7O4lYGENwmWv9TWh7xVvJUkAQJWKV5BUjMokiMawF/J
+        GCvE+8O2FjvHeNKZoRaQXHvnzKYlB75JvxTy/FysxxyvVnDXjtv6AQxy5IDJLb6HLpYeSZTok06Gz
+        GbiMThO4A==;
 Received: from willy by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1h5yFJ-0000vw-2T; Mon, 18 Mar 2019 19:48:29 +0000
+        id 1h5yFH-0000vC-Va; Mon, 18 Mar 2019 19:48:27 +0000
 From:   Matthew Wilcox <willy@infradead.org>
 To:     linux-block@vger.kernel.org
 Cc:     Matthew Wilcox <willy@infradead.org>
-Subject: [PATCH 09/14] null_blk: Convert to XArray
-Date:   Mon, 18 Mar 2019 12:48:16 -0700
-Message-Id: <20190318194821.3470-10-willy@infradead.org>
+Subject: [PATCH 02/14] blk-cgroup: Remove blkg_list hlist
+Date:   Mon, 18 Mar 2019 12:48:09 -0700
+Message-Id: <20190318194821.3470-3-willy@infradead.org>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20190318194821.3470-1-willy@infradead.org>
 References: <20190318194821.3470-1-willy@infradead.org>
@@ -49,228 +50,176 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-By changing the locking we could remove the slightly awkward dance in
-null_insert_page(), but I'll leave that for someone who's more familiar
-with the driver.
+We can iterate over all blkcgs using the XArray iterator instead of
+maintaining a separate hlist.  This removes a nasty locking inversion
+in blkcg_destroy_blkgs().
 
 Signed-off-by: Matthew Wilcox <willy@infradead.org>
 ---
- drivers/block/null_blk.h      |  4 +-
- drivers/block/null_blk_main.c | 97 ++++++++++++++---------------------
- 2 files changed, 40 insertions(+), 61 deletions(-)
+ block/bfq-cgroup.c         |  3 ++-
+ block/blk-cgroup.c         | 38 ++++++++++++++------------------------
+ include/linux/blk-cgroup.h |  2 --
+ 3 files changed, 16 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/block/null_blk.h b/drivers/block/null_blk.h
-index 34b22d6523ba..8460eb0b2fe2 100644
---- a/drivers/block/null_blk.h
-+++ b/drivers/block/null_blk.h
-@@ -35,8 +35,8 @@ struct nullb_queue {
- struct nullb_device {
- 	struct nullb *nullb;
- 	struct config_item item;
--	struct radix_tree_root data; /* data stored in the disk */
--	struct radix_tree_root cache; /* disk cache data */
-+	struct xarray data; /* data stored in the disk */
-+	struct xarray cache; /* disk cache data */
- 	unsigned long flags; /* device flags */
- 	unsigned int curr_cache;
- 	struct badblocks badblocks;
-diff --git a/drivers/block/null_blk_main.c b/drivers/block/null_blk_main.c
-index 417a9f15c116..2a9832eb9ad4 100644
---- a/drivers/block/null_blk_main.c
-+++ b/drivers/block/null_blk_main.c
-@@ -8,6 +8,7 @@
- #include <linux/sched.h>
- #include <linux/fs.h>
- #include <linux/init.h>
-+#include <linux/xarray.h>
- #include "null_blk.h"
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 9d25e490f9fa..13e5c7edde7a 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -857,6 +857,7 @@ static int bfq_io_set_weight_legacy(struct cgroup_subsys_state *css,
+ 	struct blkcg *blkcg = css_to_blkcg(css);
+ 	struct bfq_group_data *bfqgd = blkcg_to_bfqgd(blkcg);
+ 	struct blkcg_gq *blkg;
++	unsigned long index;
+ 	int ret = -ERANGE;
  
- #define PAGE_SECTORS_SHIFT	(PAGE_SHIFT - SECTOR_SHIFT)
-@@ -507,8 +508,8 @@ static struct nullb_device *null_alloc_dev(void)
- 	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
- 	if (!dev)
- 		return NULL;
--	INIT_RADIX_TREE(&dev->data, GFP_ATOMIC);
--	INIT_RADIX_TREE(&dev->cache, GFP_ATOMIC);
-+	xa_init_flags(&dev->data, XA_FLAGS_LOCK_IRQ);
-+	xa_init_flags(&dev->cache, XA_FLAGS_LOCK_IRQ);
- 	if (badblocks_init(&dev->badblocks, 0)) {
- 		kfree(dev);
- 		return NULL;
-@@ -689,18 +690,18 @@ static void null_free_sector(struct nullb *nullb, sector_t sector,
- 	unsigned int sector_bit;
- 	u64 idx;
- 	struct nullb_page *t_page, *ret;
--	struct radix_tree_root *root;
-+	struct xarray *xa;
+ 	if (val < BFQ_MIN_WEIGHT || val > BFQ_MAX_WEIGHT)
+@@ -865,7 +866,7 @@ static int bfq_io_set_weight_legacy(struct cgroup_subsys_state *css,
+ 	ret = 0;
+ 	xa_lock_irq(&blkcg->blkg_array);
+ 	bfqgd->weight = (unsigned short)val;
+-	hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
++	xa_for_each(&blkcg->blkg_array, index, blkg) {
+ 		struct bfq_group *bfqg = blkg_to_bfqg(blkg);
  
--	root = is_cache ? &nullb->dev->cache : &nullb->dev->data;
-+	xa = is_cache ? &nullb->dev->cache : &nullb->dev->data;
- 	idx = sector >> PAGE_SECTORS_SHIFT;
- 	sector_bit = (sector & SECTOR_MASK);
+ 		if (!bfqg)
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 90deb5445332..bd6eea0587fb 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -258,7 +258,6 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
  
--	t_page = radix_tree_lookup(root, idx);
-+	t_page = xa_load(xa, idx);
- 	if (t_page) {
- 		__clear_bit(sector_bit, t_page->bitmap);
+ 	xa_lock(&blkcg->blkg_array);
+ 	__xa_store(&blkcg->blkg_array, q->id, blkg, 0);
+-	hlist_add_head_rcu(&blkg->blkcg_node, &blkcg->blkg_list);
+ 	list_add(&blkg->q_node, &q->blkg_list);
  
- 		if (null_page_empty(t_page)) {
--			ret = radix_tree_delete_item(root, idx, t_page);
-+			ret = xa_cmpxchg(xa, idx, t_page, NULL, 0);
- 			WARN_ON(ret != t_page);
- 			null_free_page(ret);
- 			if (is_cache)
-@@ -709,47 +710,17 @@ static void null_free_sector(struct nullb *nullb, sector_t sector,
- 	}
- }
+ 	for (i = 0; i < BLKCG_MAX_POLS; i++) {
+@@ -372,7 +371,6 @@ static void blkg_destroy(struct blkcg_gq *blkg)
  
--static struct nullb_page *null_radix_tree_insert(struct nullb *nullb, u64 idx,
--	struct nullb_page *t_page, bool is_cache)
--{
--	struct radix_tree_root *root;
--
--	root = is_cache ? &nullb->dev->cache : &nullb->dev->data;
--
--	if (radix_tree_insert(root, idx, t_page)) {
--		null_free_page(t_page);
--		t_page = radix_tree_lookup(root, idx);
--		WARN_ON(!t_page || t_page->page->index != idx);
--	} else if (is_cache)
--		nullb->dev->curr_cache += PAGE_SIZE;
--
--	return t_page;
--}
--
- static void null_free_device_storage(struct nullb_device *dev, bool is_cache)
- {
--	unsigned long pos = 0;
--	int nr_pages;
--	struct nullb_page *ret, *t_pages[FREE_BATCH];
--	struct radix_tree_root *root;
--
--	root = is_cache ? &dev->cache : &dev->data;
--
--	do {
--		int i;
--
--		nr_pages = radix_tree_gang_lookup(root,
--				(void **)t_pages, pos, FREE_BATCH);
--
--		for (i = 0; i < nr_pages; i++) {
--			pos = t_pages[i]->page->index;
--			ret = radix_tree_delete_item(root, pos, t_pages[i]);
--			WARN_ON(ret != t_pages[i]);
--			null_free_page(ret);
--		}
-+	struct nullb_page *t_page;
-+	XA_STATE(xas, is_cache ? &dev->cache : &dev->data, 0);
+ 	/* Something wrong if we are trying to remove same group twice */
+ 	WARN_ON_ONCE(list_empty(&blkg->q_node));
+-	WARN_ON_ONCE(hlist_unhashed(&blkg->blkcg_node));
  
--		pos++;
--	} while (nr_pages == FREE_BATCH);
-+	xas_lock(&xas);
-+	xas_for_each(&xas, t_page, ULONG_MAX) {
-+		xas_store(&xas, NULL);
-+		null_free_page(t_page);
-+	}
-+	xas_unlock(&xas);
+ 	for (i = 0; i < BLKCG_MAX_POLS; i++) {
+ 		struct blkcg_policy *pol = blkcg_policy[i];
+@@ -390,7 +388,6 @@ static void blkg_destroy(struct blkcg_gq *blkg)
  
- 	if (is_cache)
- 		dev->curr_cache = 0;
-@@ -761,13 +732,13 @@ static struct nullb_page *__null_lookup_page(struct nullb *nullb,
- 	unsigned int sector_bit;
- 	u64 idx;
- 	struct nullb_page *t_page;
--	struct radix_tree_root *root;
-+	struct xarray *xa;
+ 	__xa_erase(&blkcg->blkg_array, blkg->q->id);
+ 	list_del_init(&blkg->q_node);
+-	hlist_del_init_rcu(&blkg->blkcg_node);
  
- 	idx = sector >> PAGE_SECTORS_SHIFT;
- 	sector_bit = (sector & SECTOR_MASK);
- 
--	root = is_cache ? &nullb->dev->cache : &nullb->dev->data;
--	t_page = radix_tree_lookup(root, idx);
-+	xa = is_cache ? &nullb->dev->cache : &nullb->dev->data;
-+	t_page = xa_load(xa, idx);
- 	WARN_ON(t_page && t_page->page->index != idx);
- 
- 	if (t_page && (for_write || test_bit(sector_bit, t_page->bitmap)))
-@@ -793,8 +764,9 @@ static struct nullb_page *null_insert_page(struct nullb *nullb,
- 	__releases(&nullb->lock)
- 	__acquires(&nullb->lock)
- {
--	u64 idx;
--	struct nullb_page *t_page;
-+	struct xarray *xa;
-+	unsigned long idx;
-+	struct nullb_page *exist, *t_page;
- 
- 	t_page = null_lookup_page(nullb, sector, true, ignore_cache);
- 	if (t_page)
-@@ -806,14 +778,21 @@ static struct nullb_page *null_insert_page(struct nullb *nullb,
- 	if (!t_page)
- 		goto out_lock;
- 
--	if (radix_tree_preload(GFP_NOIO))
-+	idx = sector >> PAGE_SECTORS_SHIFT;
-+	xa = ignore_cache ? &nullb->dev->data : &nullb->dev->cache;
-+	if (xa_insert_irq(xa, idx, NULL, GFP_NOIO) == -ENOMEM)
- 		goto out_freepage;
- 
- 	spin_lock_irq(&nullb->lock);
--	idx = sector >> PAGE_SECTORS_SHIFT;
- 	t_page->page->index = idx;
--	t_page = null_radix_tree_insert(nullb, idx, t_page, !ignore_cache);
--	radix_tree_preload_end();
-+	exist = xa_cmpxchg(xa, idx, XA_ZERO_ENTRY, t_page, GFP_ATOMIC);
-+	if (exist) {
-+		null_free_page(t_page);
-+		t_page = exist;
-+	} else if (!ignore_cache)
-+		nullb->dev->curr_cache += PAGE_SIZE;
-+
-+	WARN_ON(t_page->page->index != idx);
- 
- 	return t_page;
- out_freepage:
-@@ -839,8 +818,7 @@ static int null_flush_cache_page(struct nullb *nullb, struct nullb_page *c_page)
- 	if (test_bit(NULLB_PAGE_FREE, c_page->bitmap)) {
- 		null_free_page(c_page);
- 		if (t_page && null_page_empty(t_page)) {
--			ret = radix_tree_delete_item(&nullb->dev->data,
--				idx, t_page);
-+			xa_cmpxchg(&nullb->dev->data, idx, t_page, NULL, 0);
- 			null_free_page(t_page);
- 		}
- 		return 0;
-@@ -865,7 +843,7 @@ static int null_flush_cache_page(struct nullb *nullb, struct nullb_page *c_page)
- 	kunmap_atomic(dst);
- 	kunmap_atomic(src);
- 
--	ret = radix_tree_delete_item(&nullb->dev->cache, idx, c_page);
-+	ret = xa_cmpxchg(&nullb->dev->cache, idx, c_page, NULL, 0);
- 	null_free_page(ret);
- 	nullb->dev->curr_cache -= PAGE_SIZE;
- 
-@@ -883,8 +861,9 @@ static int null_make_cache_space(struct nullb *nullb, unsigned long n)
- 	     nullb->dev->curr_cache + n || nullb->dev->curr_cache == 0)
- 		return 0;
- 
--	nr_pages = radix_tree_gang_lookup(&nullb->dev->cache,
--			(void **)c_pages, nullb->cache_flush_pos, FREE_BATCH);
-+	nr_pages = xa_extract(&nullb->dev->cache, (void **)c_pages,
-+				nullb->cache_flush_pos, ULONG_MAX,
-+				FREE_BATCH, XA_PRESENT);
  	/*
- 	 * nullb_flush_cache_page could unlock before using the c_pages. To
- 	 * avoid race, we don't allow page free
-@@ -1025,7 +1004,7 @@ static int null_handle_flush(struct nullb *nullb)
- 			break;
+ 	 * Both setting lookup hint to and clearing it from @blkg are done
+@@ -435,6 +432,7 @@ static int blkcg_reset_stats(struct cgroup_subsys_state *css,
+ {
+ 	struct blkcg *blkcg = css_to_blkcg(css);
+ 	struct blkcg_gq *blkg;
++	unsigned long index;
+ 	int i;
+ 
+ 	mutex_lock(&blkcg_pol_mutex);
+@@ -445,7 +443,7 @@ static int blkcg_reset_stats(struct cgroup_subsys_state *css,
+ 	 * stat updates.  This is a debug feature which shouldn't exist
+ 	 * anyway.  If you get hit by a race, retry.
+ 	 */
+-	hlist_for_each_entry(blkg, &blkcg->blkg_list, blkcg_node) {
++	xa_for_each(&blkcg->blkg_array, index, blkg) {
+ 		blkg_rwstat_reset(&blkg->stat_bytes);
+ 		blkg_rwstat_reset(&blkg->stat_ios);
+ 
+@@ -495,16 +493,15 @@ void blkcg_print_blkgs(struct seq_file *sf, struct blkcg *blkcg,
+ 		       bool show_total)
+ {
+ 	struct blkcg_gq *blkg;
++	unsigned long index;
+ 	u64 total = 0;
+ 
+-	rcu_read_lock();
+-	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
++	xa_for_each(&blkcg->blkg_array, index, blkg) {
+ 		spin_lock_irq(&blkg->q->queue_lock);
+ 		if (blkcg_policy_enabled(blkg->q, pol))
+ 			total += prfill(sf, blkg->pd[pol->plid], data);
+ 		spin_unlock_irq(&blkg->q->queue_lock);
+ 	}
+-	rcu_read_unlock();
+ 
+ 	if (show_total)
+ 		seq_printf(sf, "Total %llu\n", (unsigned long long)total);
+@@ -924,10 +921,10 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
+ {
+ 	struct blkcg *blkcg = css_to_blkcg(seq_css(sf));
+ 	struct blkcg_gq *blkg;
++	unsigned long index;
+ 
+ 	rcu_read_lock();
+-
+-	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
++	xa_for_each(&blkcg->blkg_array, index, blkg) {
+ 		const char *dname;
+ 		char *buf;
+ 		struct blkg_rwstat rwstat;
+@@ -1076,24 +1073,18 @@ static void blkcg_css_offline(struct cgroup_subsys_state *css)
+  */
+ void blkcg_destroy_blkgs(struct blkcg *blkcg)
+ {
+-	xa_lock_irq(&blkcg->blkg_array);
++	struct blkcg_gq *blkg;
++	unsigned long index;
+ 
+-	while (!hlist_empty(&blkcg->blkg_list)) {
+-		struct blkcg_gq *blkg = hlist_entry(blkcg->blkg_list.first,
+-						struct blkcg_gq, blkcg_node);
++	xa_for_each(&blkcg->blkg_array, index, blkg) {
+ 		struct request_queue *q = blkg->q;
+ 
+-		if (spin_trylock(&q->queue_lock)) {
+-			blkg_destroy(blkg);
+-			spin_unlock(&q->queue_lock);
+-		} else {
+-			xa_unlock_irq(&blkcg->blkg_array);
+-			cpu_relax();
+-			xa_lock_irq(&blkcg->blkg_array);
+-		}
++		spin_lock_irq(&q->queue_lock);
++		xa_lock(&blkcg->blkg_array);
++		blkg_destroy(blkg);
++		xa_unlock(&blkcg->blkg_array);
++		spin_unlock_irq(&q->queue_lock);
+ 	}
+-
+-	xa_unlock_irq(&blkcg->blkg_array);
+ }
+ 
+ static void blkcg_css_free(struct cgroup_subsys_state *css)
+@@ -1159,7 +1150,6 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
  	}
  
--	WARN_ON(!radix_tree_empty(&nullb->dev->cache));
-+	WARN_ON(!xa_empty(&nullb->dev->cache));
- 	spin_unlock_irq(&nullb->lock);
- 	return err;
- }
+ 	xa_init_flags(&blkcg->blkg_array, XA_FLAGS_LOCK_IRQ);
+-	INIT_HLIST_HEAD(&blkcg->blkg_list);
+ #ifdef CONFIG_CGROUP_WRITEBACK
+ 	INIT_LIST_HEAD(&blkcg->cgwb_list);
+ 	refcount_set(&blkcg->cgwb_refcnt, 1);
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 51530ac5451f..0b2929195a0f 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -49,7 +49,6 @@ struct blkcg {
+ 
+ 	struct xarray			blkg_array;
+ 	struct blkcg_gq	__rcu		*blkg_hint;
+-	struct hlist_head		blkg_list;
+ 
+ 	struct blkcg_policy_data	*cpd[BLKCG_MAX_POLS];
+ 
+@@ -110,7 +109,6 @@ struct blkcg_gq {
+ 	/* Pointer to the associated request_queue */
+ 	struct request_queue		*q;
+ 	struct list_head		q_node;
+-	struct hlist_node		blkcg_node;
+ 	struct blkcg			*blkcg;
+ 
+ 	/*
 -- 
 2.20.1
 
