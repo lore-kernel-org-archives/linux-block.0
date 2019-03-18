@@ -6,110 +6,129 @@ X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10FA0C43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 01:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99C95C43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 02:45:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D0ED82075C
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 01:47:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 67ED920857
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 02:45:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="GsqNnHre"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="d0pRE4eL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727132AbfCRBrL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Mar 2019 21:47:11 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:49070 "EHLO
+        id S1726932AbfCRCpX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Mar 2019 22:45:23 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:39974 "EHLO
         userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726878AbfCRBrK (ORCPT
+        with ESMTP id S1726828AbfCRCpX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Mar 2019 21:47:10 -0400
+        Sun, 17 Mar 2019 22:45:23 -0400
 Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2I1ieuS033126;
-        Mon, 18 Mar 2019 01:46:32 GMT
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2I2iAM4070187;
+        Mon, 18 Mar 2019 02:45:01 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=W13ViHroDyNOovUGQfhK8z1oAhd0ebEkpUkZ7DZ2D70=;
- b=GsqNnHrel18unqwfC9y2Bet3+EX8lP5NMzHe2jXLDUqFwez9Ffy5VGx+xD9RI9be2EK6
- Nzn8ZKBYdsBHeT0SatwIbqfTJG9qw4UVp9iMDRjxQ0cBggXi6YrpYuNUrExRo9BHhwZu
- Pnt5C3SKieQHUCx4qlzQ2l+GBhZv4jTWVOrh1C729bHGNaLBUMNXUAyqWXYQFO0LclYu
- kLibDjxhqHJDRMDCvbbwx/BsuJmpsWNZeJ7JY9MbDWM314cKhU0jO46C3dXl524r5yQM
- 7yUedWR6qnKwJvCf6kG0lzIUGaBocmSbOk7D17gr7ZAYKxHn+0tA1bqw0dSKUh+47PQq Zw== 
+ bh=+H8sO4+ai3RUeaP13YotfoTwvVomwWWJy0pTcu/ByDw=;
+ b=d0pRE4eLYhZH2blv1a2LtoyvQ+bHTjlzropLO8miLwbAJ6Ah9r4vnAXp2VJhYObnQ8pw
+ 6sCNdVFNelO9W4y7TDL8b6xjYn1RmBGCNOpLP7qJ0Un3tigLymjzPGiWHePHllt5ovHZ
+ 3bg15Dfj+DP0R3so/V0vT6XSwCzEpri/JowTkhvT5pD2287oep2UC9KkheICkVTRENlT
+ Dxk1iWlVswvYUHLkM458VEbOfeJLEJW1bXHVPhZdR7o1J11WEae/ZcWdXikoGkav5x71
+ 8j9k9gCTmTIEAUoQeDoFw+6pfJCHshSdFxEqK5M/kziuNxoUogam0CzlnMpk/b7sAYgS 8Q== 
 Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by userp2120.oracle.com with ESMTP id 2r8ssr3mn1-1
+        by userp2120.oracle.com with ESMTP id 2r8ssr3qrb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 18 Mar 2019 01:46:32 +0000
+        Mon, 18 Mar 2019 02:45:00 +0000
 Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2I1kUNG026009
+        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2I2ir5I008309
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 18 Mar 2019 01:46:31 GMT
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x2I1kRjV015488;
-        Mon, 18 Mar 2019 01:46:27 GMT
+        Mon, 18 Mar 2019 02:44:53 GMT
+Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x2I2ioML005642;
+        Mon, 18 Mar 2019 02:44:50 GMT
 Received: from [10.182.69.118] (/10.182.69.118)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 17 Mar 2019 18:46:27 -0700
-Subject: Re: [PATCH 2/8] blk-mq: change the method of iterating busy tags of a
- request_queue
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "jsmart2021@gmail.com" <jsmart2021@gmail.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Busch, Keith" <keith.busch@intel.com>,
-        "hare@suse.de" <hare@suse.de>,
-        "jthumshirn@suse.de" <jthumshirn@suse.de>,
-        "hch@lst.de" <hch@lst.de>, "sagi@grimberg.me" <sagi@grimberg.me>
+        with ESMTP ; Sun, 17 Mar 2019 19:44:49 -0700
+Subject: Re: [PATCH 0/8]: blk-mq: use static_rqs to iterate busy tags
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, jsmart2021@gmail.com,
+        josef@toxicpanda.com, linux-nvme@lists.infradead.org,
+        linux-kernel@vger.kernel.org, keith.busch@intel.com, hare@suse.de,
+        jthumshirn@suse.de, sagi@grimberg.me
 References: <1552640264-26101-1-git-send-email-jianchao.w.wang@oracle.com>
- <1552640264-26101-3-git-send-email-jianchao.w.wang@oracle.com>
- <20190315161608.GB15153@localhost.localdomain>
+ <20190315092020.GA2405@lst.de>
+ <a36be8bd-bb9c-745e-cfdb-018cf0a96d42@oracle.com>
+ <1552666744.45180.135.camel@acm.org>
 From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <e17f86f0-98ca-5c79-0d9b-43c628b72413@oracle.com>
-Date:   Mon, 18 Mar 2019 09:49:33 +0800
+Message-ID: <8cff92a3-2f25-18a7-265f-9bff7d8cc3fc@oracle.com>
+Date:   Mon, 18 Mar 2019 10:47:57 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <20190315161608.GB15153@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1552666744.45180.135.camel@acm.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9198 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1903180012
+ definitions=main-1903180020
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Keith
+Hi Bart
 
-On 3/16/19 12:16 AM, Keith Busch wrote:
-> There is still a window where the check may succeed, but the request is
-> being assigned to a completely different request_queue. The callback
-> then operates on a request it doesn't own.
+On 3/16/19 12:19 AM, Bart Van Assche wrote:
+>> This stale request maybe something that has been freed due to io scheduler
+>> is detached or a q using a shared tagset is gone.
+>>
+>> And also the blk_mq_timeout_work could use it to pick up the expired request.
+>> The driver would also use it to requeue the in-flight requests when the device is dead.
+>>
+>> Compared with adding more synchronization, using static_rqs[] directly maybe simpler :)
+> Hi Jianchao,
 > 
-> Tag iteration from a driver can be safe only if the driver initiates a
-> freeze and quiesced all queues sharing the same tagset first. The nvme
-> driver does that, but I think there may need to be an additional grace
-> period to wait for the allocation's queue_enter to call queue_exit to
-> ensure the request is initialized through blk_mq_rq_ctx_init().
+> Although I appreciate your work: I agree with Christoph that we should avoid races
+> like this rather than modifying the block layer to make sure that such races are
+> handled safely.
 
-This patch is to avoid the use-after-free case in the comment.
-The helper interface is used in following cases,
-1. in flight request account
-   this case should not require so much accuracy
+The root cause here is that there is window between set tag sbitmap and set tags->rqs[]
+, and we don't clear the tags->rqs[] in free tags path. So when we iterate the busy
+tags, we could see stale requests in tags->rqs[] and this stale requests maybe freed.
 
-2. timeout check
-   a extra reference will be held there to avoid the request recycle
+Looks like it is difficult to close the window above, so we used to try to clear the
+tags->rqs[] in two ways,
 
-3. if it is used by driver, it should be enough that quiesce the request_queue
-   the driver usually wants to handle the in-flight ones, quiesce request_queue
-   could ensure all of tasks quit the hctx_lock and no one issue request any
-   more.
+1. clear the tags->rqs[] in the request free path
+Jens doesn't like it
+https://marc.info/?l=linux-block&m=154515671524877&w=2
+"
+It's an extra store, and it's a store to an area that's then now shared
+between issue and completion. Those are never a good idea. Besides, it's
+the kind of issue you solve in the SLOW path, not in the fast path. Since
+that's doable, it would be silly to do it for every IO.
+"
+
+2. clear the associated slots in tags->tags[] when blk_mq_free_rqs
+https://marc.info/?l=linux-block&m=154534605914798&w=2
+
++	rcu_read_lock();
+ 	sbitmap_for_each_set(&bt->sb, bt_iter, &iter_data);
++	rcu_read_unlock();
+
+The busy_iter_fn could sleep
+blk_mq_check_expired
+  -> blk_mq_rq_timed_out
+    -> q->mq_ops->timeout
+       nvme_timeout
+         -> nvme_dev_disable
+            -> mutex_lock dev->shutdown_lock
+
+Since it is not so flexible to fix on tags->rqs[], why not try to use tags->static_rqs[] ?
+Then we wound never care about the stable requests any more.
 
 Thanks
 Jianchao
