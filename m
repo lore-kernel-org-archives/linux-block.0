@@ -2,252 +2,205 @@ Return-Path: <SRS0=WbMh=RV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C39C43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 12:22:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB613C43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 12:27:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 186852085A
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 12:22:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9EBE20854
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 12:27:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="pPoYN4p+"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="2mFSye5s"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726908AbfCRMWX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 08:22:23 -0400
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:40045 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726808AbfCRMWX (ORCPT
+        id S1726435AbfCRM1f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 08:27:35 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:44472 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725973AbfCRM1f (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 08:22:23 -0400
-Received: by mail-vs1-f66.google.com with SMTP id z18so9298070vso.7
-        for <linux-block@vger.kernel.org>; Mon, 18 Mar 2019 05:22:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=wp8IcHrc3LupWAQNcX22XPAct576zyu3f4urp9cAls4=;
-        b=pPoYN4p+LzgoPrRRQcVlGJMxkMU5Dvw81/jby9isaV46UWs6VmHHaCjdAvbtlWnOcw
-         cQj/SnoCsiNCvUULh6y8Qi1iRt0z71jK9RWqDyFrsSn/FaSk6qrftSzgM+OJWaGFkSNG
-         1/fR3ai00f9rHlHbqNBXJ5MY2ywEqP99e2YMyfZyfW/C80YXM+47YZ1/xxwUfIAk5QTs
-         3XRuICj/QO7A9PE21tw5KRTsuUFN14aGRD/08c9ANan8XNT2DyaWwbLeI8OzUCXL+XDd
-         RdMMOQJKnD2D9SsSAVdCG5ATgHVAfRHHEhOS9Q1CnVK978m/JBpCzbKMgMdKft3t35AX
-         zMJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=wp8IcHrc3LupWAQNcX22XPAct576zyu3f4urp9cAls4=;
-        b=mXpngakrHD8uIg5jtfftN+/20da5uoFGLhTJIUt2y/0svkVy0Qmo1evw2eIWgJTOra
-         Wy8pMr38zT2oaVGGY4iMg22+I7txjAmhkrt2mkGFQX0c2Lg1nis2ESbeWuJGKuQXFP+5
-         CtQyNUUVROCoWtEJ46OndKVLCFL0DHyn4ih+H+jbtGX1Gnj13zuzpxuLCsCK38hI4fih
-         Xr65wp6jIDx7tdJqUfkYW+OdPvpsElUblFs691F2ctNQC+CzW11dKCFrIlesavj10HLb
-         8hbwCfDmwdcmQ5CflmHGIfg42WokFklI0Z6K1OcMJhUXjl/OC11q7SvLBCPX4yenMUpL
-         yjsw==
-X-Gm-Message-State: APjAAAV8PcqnaLgEMv88ITDLSPxs5aCTq3EhAJKFpCJ7pE9hjzyKwN1m
-        eJaUeerPzrSTrrncF/0897tbzk09s44jcSTZZ1dejQ==
-X-Google-Smtp-Source: APXvYqwd6G1TY+qchmkvK8/iGu8bVtCZL3nxK7rBLTo5neQu59OnehTkXPOFEBYayO5UjYD0oLZ+ms/HC1NWULbLDHI=
-X-Received: by 2002:a67:fe85:: with SMTP id b5mr8707898vsr.42.1552911741789;
- Mon, 18 Mar 2019 05:22:21 -0700 (PDT)
+        Mon, 18 Mar 2019 08:27:35 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2ICOEo5132699;
+        Mon, 18 Mar 2019 12:27:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : references
+ : cc : to : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=rV4e1ER0keWutNGoARjp7yyaYTfL4C9PQH3nR/duadY=;
+ b=2mFSye5sgQGmJu5a7y+DfZcr9XAjit1GntsUgtBNJWhWhbyb4qpsmnSHi0q3TNYVR0fR
+ 67qSvqeStftIyNaoapKY6GiC3uPS5mryM8B9EXtij3PKn3KilegpY3sQ1vMLTi6QMCx/
+ IMm9PkBXeWbKCtaMw/Pp9Jv/GcqChK3UIZTHvCdiL8FlsuGrELWgEH60ZlYlrxfZdSAi
+ lIBsHTr6kuPMB/RM3/It5LRX3+Ep6EWkrdfLoVrglZ/OeMRO8PCYfygT+QYInKhxrvrv
+ i7D/cnNrFWoLy91ZUM5C+qApn5QIoK1lRMeFs43QYqD5NQOtthSlcVW4rak3TMGay9qg 4A== 
+Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
+        by userp2120.oracle.com with ESMTP id 2r8ssr611h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 18 Mar 2019 12:27:26 +0000
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2ICRPGJ032198
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 18 Mar 2019 12:27:25 GMT
+Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x2ICRNFo004430;
+        Mon, 18 Mar 2019 12:27:24 GMT
+Received: from [10.191.7.230] (/10.191.7.230)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 18 Mar 2019 05:27:23 -0700
+Subject: Re: general protection fault in loop_validate_file (2)
+References: <00000000000098bf7d05845616d7@google.com>
+Cc:     syzbot <syzbot+9bdc1adc1c55e7fe765b@syzkaller.appspotmail.com>,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        penguin-kernel@i-love.sakura.ne.jp
+To:     Jan Kara <jack@suse.cz>
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+Message-ID: <cb7aa6d1-6d1e-a9ac-239a-1b5d8160f8cd@oracle.com>
+Date:   Mon, 18 Mar 2019 20:27:02 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101
+ Thunderbird/45.3.0
 MIME-Version: 1.0
-References: <1552573079-12712-1-git-send-email-marcin.dziegielewski@intel.com>
- <874EAB88-573F-485A-A008-FE1CC803E8D3@javigon.com> <D45E9938-F025-446D-8E48-CAE954B791A6@javigon.com>
- <a63ef9e7-214a-a701-5c40-d1d1107de4a4@intel.com>
-In-Reply-To: <a63ef9e7-214a-a701-5c40-d1d1107de4a4@intel.com>
-From:   Hans Holmberg <hans@owltronix.com>
-Date:   Mon, 18 Mar 2019 13:22:10 +0100
-Message-ID: <CANr-nt3B8UknSTdKOj2PbfDRTfPJZ+g1s83XY2egtBdZqsU6tQ@mail.gmail.com>
-Subject: Re: [PATCH] lightnvm: pblk: set write thread affinity to particular cpu
-To:     Marcin Dziegielewski <marcin.dziegielewski@intel.com>
-Cc:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
-        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        linux-block@vger.kernel.org,
-        "Konopko, Igor J" <igor.j.konopko@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <00000000000098bf7d05845616d7@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9198 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1903180094
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 18, 2019 at 10:44 AM Marcin Dziegielewski
-<marcin.dziegielewski@intel.com> wrote:
->
-> On 3/14/19 3:22 PM, Javier Gonz=C3=A1lez wrote:
-> >
-> >> On 14 Mar 2019, at 07.22, Javier Gonz=C3=A1lez <javier@javigon.com> wr=
-ote:
-> >>
-> >>> On 14 Mar 2019, at 07.17, Marcin Dziegielewski <marcin.dziegielewski@=
-intel.com> wrote:
-> >>>
-> >>> In some cases write thread migration between cpus can cause
-> >>> sending writes in improper order and in consequence a lot of
-> >>> errors from device.
-> >>>
-> >>> Write thread affinity to particular cpu prevent before it.
-> >>>
-> >>> Signed-off-by: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
-> >>> ---
-> >>> drivers/lightnvm/pblk-init.c | 30 +++++++++++++++++++++++++++++-
-> >>> drivers/lightnvm/pblk.h      |  1 +
-> >>> drivers/nvme/host/lightnvm.c |  1 +
-> >>> include/linux/lightnvm.h     |  2 ++
-> >>> 4 files changed, 33 insertions(+), 1 deletion(-)
-> >>>
-> >>> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-ini=
-t.c
-> >>> index 81e8ed4..bd25004 100644
-> >>> --- a/drivers/lightnvm/pblk-init.c
-> >>> +++ b/drivers/lightnvm/pblk-init.c
-> >>> @@ -21,6 +21,8 @@
-> >>>
-> >>> #include "pblk.h"
-> >>> #include "pblk-trace.h"
-> >>> +#include <linux/cpumask.h>
-> >>> +#include <linux/numa.h>
-> >>>
-> >>> static unsigned int write_buffer_size;
-> >>>
-> >>> @@ -47,6 +49,8 @@ struct pblk_global_caches {
-> >>>
-> >>> struct bio_set pblk_bio_set;
-> >>>
-> >>> +cpumask_t free_cpumask;
-> >>> +
-> >>> static int pblk_rw_io(struct request_queue *q, struct pblk *pblk,
-> >>>                       struct bio *bio)
-> >>> {
-> >>> @@ -1098,6 +1102,9 @@ static int pblk_lines_init(struct pblk *pblk)
-> >>>
-> >>> static int pblk_writer_init(struct pblk *pblk)
-> >>> {
-> >>> +   cpumask_t tmp_cpumask, cpumask;
-> >>> +   int cpu;
-> >>> +
-> >>>     pblk->writer_ts =3D kthread_create(pblk_write_ts, pblk, "pblk-wri=
-ter-t");
-> >>>     if (IS_ERR(pblk->writer_ts)) {
-> >>>             int err =3D PTR_ERR(pblk->writer_ts);
-> >>> @@ -1108,6 +1115,22 @@ static int pblk_writer_init(struct pblk *pblk)
-> >>>             return err;
-> >>>     }
-> >>>
-> >>> +   cpumask_and(&tmp_cpumask, cpumask_of_node(pblk->dev->parent->node=
-),
-> >>> +                   cpu_online_mask);
-> >>> +   cpumask_and(&cpumask, &tmp_cpumask, &free_cpumask);
-> >>> +
-> >>> +   if (!cpumask_weight(&free_cpumask)) {
-> >>> +           free_cpumask =3D CPU_MASK_ALL;
-> >>> +           cpumask_and(&cpumask, &tmp_cpumask, &free_cpumask);
-> >>> +   }
-> >>> +
-> >>> +   cpu =3D cpumask_last(&cpumask);
-> >>> +
-> >>> +   kthread_bind(pblk->writer_ts, cpu);
-> >>> +
-> >>> +   cpumask_clear_cpu(cpu, &free_cpumask);
-> >>> +   pblk->writer_cpu =3D cpu;
-> >>> +
-> >>>     timer_setup(&pblk->wtimer, pblk_write_timer_fn, 0);
-> >>>     mod_timer(&pblk->wtimer, jiffies + msecs_to_jiffies(100));
-> >>>
-> >>> @@ -1126,8 +1149,11 @@ static void pblk_writer_stop(struct pblk *pblk=
-)
-> >>>                     "Stopping not fully synced write buffer\n");
-> >>>
-> >>>     del_timer_sync(&pblk->wtimer);
-> >>> -   if (pblk->writer_ts)
-> >>> +   if (pblk->writer_ts) {
-> >>> +           set_cpus_allowed_ptr(pblk->writer_ts, cpu_online_mask);
-> >>>             kthread_stop(pblk->writer_ts);
-> >>> +           cpumask_set_cpu(pblk->writer_cpu, &free_cpumask);
-> >>> +   }
-> >>> }
-> >>>
-> >>> static void pblk_free(struct pblk *pblk)
-> >>> @@ -1328,6 +1354,8 @@ static int __init pblk_module_init(void)
-> >>> {
-> >>>     int ret;
-> >>>
-> >>> +   free_cpumask =3D CPU_MASK_ALL;
-> >>> +
-> >>>     ret =3D bioset_init(&pblk_bio_set, BIO_POOL_SIZE, 0, 0);
-> >>>     if (ret)
-> >>>             return ret;
-> >>> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-> >>> index 381f074..650f983 100644
-> >>> --- a/drivers/lightnvm/pblk.h
-> >>> +++ b/drivers/lightnvm/pblk.h
-> >>> @@ -690,6 +690,7 @@ struct pblk {
-> >>>     atomic_t inflight_io;           /* General inflight I/O counter *=
-/
-> >>>
-> >>>     struct task_struct *writer_ts;
-> >>> +   int writer_cpu;
-> >>>
-> >>>     /* Simple translation map of logical addresses to physical addres=
-ses.
-> >>>      * The logical addresses is known by the host system, while the p=
-hysical
-> >>> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnv=
-m.c
-> >>> index 949e29e..971a19f 100644
-> >>> --- a/drivers/nvme/host/lightnvm.c
-> >>> +++ b/drivers/nvme/host/lightnvm.c
-> >>> @@ -982,6 +982,7 @@ int nvme_nvm_register(struct nvme_ns *ns, char *d=
-isk_name, int node)
-> >>>     memcpy(dev->name, disk_name, DISK_NAME_LEN);
-> >>>     dev->ops =3D &nvme_nvm_dev_ops;
-> >>>     dev->private_data =3D ns;
-> >>> +   dev->node =3D node;
-> >>>     ns->ndev =3D dev;
-> >>>
-> >>>     return nvm_register(dev);
-> >>> diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
-> >>> index 5d865a5..312029e 100644
-> >>> --- a/include/linux/lightnvm.h
-> >>> +++ b/include/linux/lightnvm.h
-> >>> @@ -427,6 +427,8 @@ struct nvm_dev {
-> >>>     char name[DISK_NAME_LEN];
-> >>>     void *private_data;
-> >>>
-> >>> +   int node;
-> >>> +
-> >>>     void *rmap;
-> >>>
-> >>>     struct mutex mlock;
-> >>> --
-> >>> 1.8.3.1
-> >>
-> >> We have a per-CPU semaphore that only allows to send a single I/O in
-> >> order to prevent write pointer violations. Are you seeing this error, =
-or
-> >> is it theoretical?
-> >>
-> >> Javier
-> >
-> > I meant per PU (parallel unit)=E2=80=A6
-> >
->
-> You are right, for current upstream implementation it's theoretical. I
-> saw it after some experimental changes in lightnvm layer.
->
-> But I see one more potential benefit from this patch (correct me if I'm
-> wrong), after this patch we will be sure that write thread is working on
-> cpu from right numa node for device. Now I think, we can also take under
-> consideration binding to whole set of cpus from right numa node instead
-> of particular one.
+Hi Jan,
 
-If this is just a potential benefit, I'd rather not do this, at least
-not until we have numbers on any performance benefits and an analysis
-of any trade offs.
+Indeed there is another issue implicitly reported by below console output from
+syzkaller:
 
-Thanks,
-Hans
->
-> Marcin
+[  245.524424][ T9455] loop_reread_partitions: partition scan of loop0 () failed
+(rc=-13)
+[  245.563340][ T9499] kasan: CONFIG_KASAN_INLINE enabled
+[  245.576412][ T9489] __loop_clr_fd: partition scan of loop0 failed (rc=-13)
+[  245.581275][ T9499] kasan: GPF could be caused by NULL-ptr deref or user
+memory access
+[  245.602596][ T9499] general protection fault: 0000 [#1] PREEMPT SMP KASAN
+
+I think rc=-13 is because of below code at line 168:
+
+162 int __blkdev_reread_part(struct block_device *bdev)
+163 {
+164         struct gendisk *disk = bdev->bd_disk;
+165
+166         if (!disk_part_scan_enabled(disk) || bdev != bdev->bd_contains)
+167                 return -EINVAL;
+168         if (!capable(CAP_SYS_ADMIN))
+169                 return -EACCES;
+170
+171         lockdep_assert_held(&bdev->bd_mutex);
+172
+173         return rescan_partitions(disk, bdev);
+174 }
+175 EXPORT_SYMBOL(__blkdev_reread_part);
+
+I can reproduce this by 'chown username /dev/loop0' on my test machine.
+
+Taking 'losetup -d /dev/loop0' as sample, as /dev/loop0 belongs to my username,
+I am able to detach the loop without 'su'.
+
+However, because of above line 168, the partition scan would fail.
+
+Should we always assume the user should have admin privilege to detach the loop
+and this is not a bug?
+
+Thank you very much!
+
+Dongli Zhang
+
+On 03/18/2019 11:36 AM, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following crash on:
+> 
+> HEAD commit:    9c7dc824 Merge tag '5.1-rc-smb3' of git://git.samba.org/sf..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=148a35fb200000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=7e1aaa1cfbfe1abf
+> dashboard link: https://syzkaller.appspot.com/bug?extid=9bdc1adc1c55e7fe765b
+> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+> 
+> Unfortunately, I don't have any reproducer for this crash yet.
+> 
+> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> Reported-by: syzbot+9bdc1adc1c55e7fe765b@syzkaller.appspotmail.com
+> 
+> kasan: CONFIG_KASAN_INLINE enabled
+> kasan: GPF could be caused by NULL-ptr deref or user memory access
+> general protection fault: 0000 [#1] PREEMPT SMP KASAN
+> CPU: 1 PID: 9499 Comm: syz-executor.4 Not tainted 5.0.0+ #25
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google
+> 01/01/2011
+> RIP: 0010:loop_validate_file+0x23e/0x310 drivers/block/loop.c:652
+> Code: 00 48 89 f8 48 c1 e8 03 42 80 3c 38 00 0f 85 d4 00 00 00 4d 8b a4 24 f0 00
+> 00 00 49 8d bc 24 b8 01 00 00 48 89 f8 48 c1 e8 03 <42> 80 3c 38 00 0f 85 a8 00
+> 00 00 4d 8b a4 24 b8 01 00 00 4c 89 e0
+> RSP: 0018:ffff88804d2bfb18 EFLAGS: 00010202
+> RAX: 0000000000000037 RBX: ffff888095ffa3d8 RCX: ffffc9000e657000
+> RDX: 0000000000000077 RSI: ffffffff83e754ed RDI: 00000000000001b8
+> RBP: ffff88804d2bfb40 R08: ffff88808eab41c0 R09: fffffbfff11d981d
+> R10: ffff88804d2bfb40 R11: ffffffff88ecc0e7 R12: 0000000000000000
+> R13: 0000000000000002 R14: ffff888095ffa800 R15: dffffc0000000000
+> FS:  00007f04b0c91700(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000000625208 CR3: 00000000a7af8000 CR4: 00000000001406e0
+> Call Trace:
+>  loop_set_fd drivers/block/loop.c:930 [inline]
+>  lo_ioctl+0x99d/0x2150 drivers/block/loop.c:1542
+>  __blkdev_driver_ioctl block/ioctl.c:303 [inline]
+>  blkdev_ioctl+0xee8/0x1c40 block/ioctl.c:605
+>  block_ioctl+0xee/0x130 fs/block_dev.c:1931
+>  vfs_ioctl fs/ioctl.c:46 [inline]
+>  file_ioctl fs/ioctl.c:509 [inline]
+>  do_vfs_ioctl+0xd6e/0x1390 fs/ioctl.c:696
+>  ksys_ioctl+0xab/0xd0 fs/ioctl.c:713
+>  __do_sys_ioctl fs/ioctl.c:720 [inline]
+>  __se_sys_ioctl fs/ioctl.c:718 [inline]
+>  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:718
+>  do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
+>  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+> RIP: 0033:0x458079
+> Code: ad b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89
+> d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 7b
+> b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+> RSP: 002b:00007f04b0c90c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000458079
+> RDX: 0000000000000004 RSI: 0000000000004c00 RDI: 0000000000000003
+> RBP: 000000000073bf00 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 00007f04b0c916d4
+> R13: 00000000004c1252 R14: 00000000004d3160 R15: 00000000ffffffff
+> Modules linked in:
+> ---[ end trace 81b29486bae7280a ]---
+> RIP: 0010:loop_validate_file+0x23e/0x310 drivers/block/loop.c:652
+> Code: 00 48 89 f8 48 c1 e8 03 42 80 3c 38 00 0f 85 d4 00 00 00 4d 8b a4 24 f0 00
+> 00 00 49 8d bc 24 b8 01 00 00 48 89 f8 48 c1 e8 03 <42> 80 3c 38 00 0f 85 a8 00
+> 00 00 4d 8b a4 24 b8 01 00 00 4c 89 e0
+> RSP: 0018:ffff88804d2bfb18 EFLAGS: 00010202
+> RAX: 0000000000000037 RBX: ffff888095ffa3d8 RCX: ffffc9000e657000
+> RDX: 0000000000000077 RSI: ffffffff83e754ed RDI: 00000000000001b8
+> RBP: ffff88804d2bfb40 R08: ffff88808eab41c0 R09: fffffbfff11d981d
+> R10: ffff88804d2bfb40 R11: ffffffff88ecc0e7 R12: 0000000000000000
+> R13: 0000000000000002 R14: ffff888095ffa800 R15: dffffc0000000000
+> FS:  00007f04b0c91700(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000000625208 CR3: 00000000a7af8000 CR4: 00000000001406e0
+> 
+> 
+> ---
+> This bug is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this bug report. See:
+> https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with syzbot.
