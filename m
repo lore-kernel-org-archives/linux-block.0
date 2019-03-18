@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A53DC43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 13:18:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E25D1C43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 13:22:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0268B20857
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 13:18:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C018220811
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 13:22:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726271AbfCRNSr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 09:18:47 -0400
-Received: from mga09.intel.com ([134.134.136.24]:44609 "EHLO mga09.intel.com"
+        id S1727359AbfCRNWf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 09:22:35 -0400
+Received: from mga06.intel.com ([134.134.136.31]:15589 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726202AbfCRNSr (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 09:18:47 -0400
+        id S1726202AbfCRNWf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Mar 2019 09:22:35 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Mar 2019 06:18:46 -0700
+  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Mar 2019 06:22:34 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.58,494,1544515200"; 
-   d="scan'208";a="126385677"
+   d="scan'208";a="126386780"
 Received: from ikonopko-mobl1.ger.corp.intel.com (HELO [10.237.142.164]) ([10.237.142.164])
-  by orsmga008.jf.intel.com with ESMTP; 18 Mar 2019 06:18:45 -0700
-Subject: Re: [PATCH 17/18] lightnvm: allow to use full device path
+  by orsmga008.jf.intel.com with ESMTP; 18 Mar 2019 06:22:32 -0700
+Subject: Re: [PATCH 14/18] lightnvm: pblk: GC error handling
 To:     Hans Holmberg <hans@owltronix.com>
 Cc:     Matias Bjorling <mb@lightnvm.io>,
         =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
         linux-block@vger.kernel.org
 References: <20190314160428.3559-1-igor.j.konopko@intel.com>
- <20190314160428.3559-18-igor.j.konopko@intel.com>
- <CANr-nt3poAp1NQmK35=X=mrKgvEJnUHVN_ROxMWB1hrGoZpHdQ@mail.gmail.com>
+ <20190314160428.3559-15-igor.j.konopko@intel.com>
+ <CANr-nt2XeD=xrvRt5xoiJpzN1SB54KCp5gbOJ-dm9_LRx4Dh3w@mail.gmail.com>
 From:   Igor Konopko <igor.j.konopko@intel.com>
-Message-ID: <2683438c-2d8d-c450-8b6f-639d0d757185@intel.com>
-Date:   Mon, 18 Mar 2019 14:18:44 +0100
+Message-ID: <c97739cf-df61-f6d4-7735-78e5743d0c1f@intel.com>
+Date:   Mon, 18 Mar 2019 14:22:31 +0100
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.3
 MIME-Version: 1.0
-In-Reply-To: <CANr-nt3poAp1NQmK35=X=mrKgvEJnUHVN_ROxMWB1hrGoZpHdQ@mail.gmail.com>
+In-Reply-To: <CANr-nt2XeD=xrvRt5xoiJpzN1SB54KCp5gbOJ-dm9_LRx4Dh3w@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -53,89 +53,113 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 18.03.2019 11:28, Hans Holmberg wrote:
-> On Thu, Mar 14, 2019 at 5:11 PM Igor Konopko <igor.j.konopko@intel.com> wrote:
+On 18.03.2019 13:14, Hans Holmberg wrote:
+> On Thu, Mar 14, 2019 at 5:09 PM Igor Konopko <igor.j.konopko@intel.com> wrote:
 >>
->> This patch adds the possibility to provide full device path (like
->> /dev/nvme0n1) when specifying device on top of which pblk instance
->> should be created/removed.
+>> Currently when there is an IO error (or similar) on GC read path, pblk
+>> still moves this line to free state, what leads to data mismatch issue.
 >>
->> This makes creation of targets from nvme-cli (or other ioctl based
->> tools) more unified with other commands in comparison with current
->> situation where almost all commands uses full device path with except
->> of lightnvm creation/removal parameter which uses just 'nvme0n1'
->> naming convention. After this changes both approach will be valid.
+>> This patch adds a handling for such an error - after that changes this
+>> line will be returned to closed state so it can be still in use
+>> for reading - at least we will be able to return error status to user
+>> when user tries to read such a data.
 >>
 >> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
 >> ---
->>   drivers/lightnvm/core.c | 23 ++++++++++++++++++-----
->>   1 file changed, 18 insertions(+), 5 deletions(-)
+>>   drivers/lightnvm/pblk-core.c | 8 ++++++++
+>>   drivers/lightnvm/pblk-gc.c   | 5 ++---
+>>   drivers/lightnvm/pblk-read.c | 1 -
+>>   drivers/lightnvm/pblk.h      | 2 ++
+>>   4 files changed, 12 insertions(+), 4 deletions(-)
 >>
->> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
->> index c01f83b..838c3d8 100644
->> --- a/drivers/lightnvm/core.c
->> +++ b/drivers/lightnvm/core.c
->> @@ -1195,6 +1195,21 @@ void nvm_unregister(struct nvm_dev *dev)
->>   }
->>   EXPORT_SYMBOL(nvm_unregister);
+>> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+>> index 4d5cd99..6817f8f 100644
+>> --- a/drivers/lightnvm/pblk-core.c
+>> +++ b/drivers/lightnvm/pblk-core.c
+>> @@ -1786,6 +1786,14 @@ static void __pblk_line_put(struct pblk *pblk, struct pblk_line *line)
 >>
->> +#define PREFIX_STR "/dev/"
->> +static void nvm_normalize_path(char *path)
->> +{
->> +       path[DISK_NAME_LEN - 1] = '\0';
->> +       if (!memcmp(PREFIX_STR, path,
->> +                               sizeof(char) * strlen(PREFIX_STR))) {
->> +               /*
->> +                * User provide name in '/dev/nvme0n1' format,
->> +                * so we need to skip '/dev/' for comparison
->> +                */
->> +               memmove(path, path + sizeof(char) * strlen(PREFIX_STR),
->> +                       (DISK_NAME_LEN - strlen(PREFIX_STR)) * sizeof(char));
+>>          spin_lock(&line->lock);
+>>          WARN_ON(line->state != PBLK_LINESTATE_GC);
+>> +       if (line->w_err_gc->has_gc_err) {
+>> +               spin_unlock(&line->lock);
+>> +               pblk_err(pblk, "line %d had errors during GC\n", line->id);
+>> +               pblk_put_line_back(pblk, line);
+>> +               line->w_err_gc->has_gc_err = 0;
+> 
+> In a real bummer corner case, the line might have had a write error as well
+> (line->w_err_gc->has_write_err == true)
+> 
+> In that case we need to inform the rate limiter:
+> pblk_rl_werr_line_out(&pblk->rl);
+
+Is that needed or rather preferred?
+
+I'm not clearing w_err_gc->has_write_err value in that case (and thus 
+not informing the rate limiter), so the line will go back to exactly the 
+same state as before GC (still with write error marked).
+
+> 
+>> +               return;
 >> +       }
->> +}
 >> +
-> 
-> I don't like this. Why add string parsing to the kernel? Can't this
-> feature be added to the nvme tool?
-
-Since during target creation/removal in kernel, we already operate on 
-strings multiple times (strcmp calls for target types, nvme device, 
-target names) my idea was to keep this in the same layer too.
-
-> 
->>   static int __nvm_configure_create(struct nvm_ioctl_create *create)
+>>          line->state = PBLK_LINESTATE_FREE;
+>>          trace_pblk_line_state(pblk_disk_name(pblk), line->id,
+>>                                          line->state);
+>> diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
+>> index e23b192..63ee205 100644
+>> --- a/drivers/lightnvm/pblk-gc.c
+>> +++ b/drivers/lightnvm/pblk-gc.c
+>> @@ -59,7 +59,7 @@ static void pblk_gc_writer_kick(struct pblk_gc *gc)
+>>          wake_up_process(gc->gc_writer_ts);
+>>   }
+>>
+>> -static void pblk_put_line_back(struct pblk *pblk, struct pblk_line *line)
+>> +void pblk_put_line_back(struct pblk *pblk, struct pblk_line *line)
 >>   {
->>          struct nvm_dev *dev;
->> @@ -1304,9 +1319,9 @@ static long nvm_ioctl_dev_create(struct file *file, void __user *arg)
->>                  return -EINVAL;
+>>          struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+>>          struct list_head *move_list;
+>> @@ -98,8 +98,7 @@ static void pblk_gc_line_ws(struct work_struct *work)
+>>          /* Read from GC victim block */
+>>          ret = pblk_submit_read_gc(pblk, gc_rq);
+>>          if (ret) {
+>> -               pblk_err(pblk, "failed GC read in line:%d (err:%d)\n",
+>> -                                                               line->id, ret);
+>> +               line->w_err_gc->has_gc_err = 1;
+>>                  goto out;
 >>          }
 >>
->> -       create.dev[DISK_NAME_LEN - 1] = '\0';
->> +       nvm_normalize_path(create.dev);
->> +       nvm_normalize_path(create.tgtname);
->>          create.tgttype[NVM_TTYPE_NAME_MAX - 1] = '\0';
->> -       create.tgtname[DISK_NAME_LEN - 1] = '\0';
+>> diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+>> index 54422a2..6a77c24 100644
+>> --- a/drivers/lightnvm/pblk-read.c
+>> +++ b/drivers/lightnvm/pblk-read.c
+>> @@ -475,7 +475,6 @@ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
 >>
->>          if (create.flags != 0) {
->>                  __u32 flags = create.flags;
->> @@ -1333,7 +1348,7 @@ static long nvm_ioctl_dev_remove(struct file *file, void __user *arg)
->>          if (copy_from_user(&remove, arg, sizeof(struct nvm_ioctl_remove)))
->>                  return -EFAULT;
+>>          if (pblk_submit_io_sync(pblk, &rqd)) {
+>>                  ret = -EIO;
+>> -               pblk_err(pblk, "GC read request failed\n");
+>>                  goto err_free_bio;
+>>          }
 >>
->> -       remove.tgtname[DISK_NAME_LEN - 1] = '\0';
->> +       nvm_normalize_path(remove.tgtname);
+>> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+>> index 5d1040a..52002f5 100644
+>> --- a/drivers/lightnvm/pblk.h
+>> +++ b/drivers/lightnvm/pblk.h
+>> @@ -427,6 +427,7 @@ struct pblk_smeta {
 >>
->>          if (remove.flags != 0) {
->>                  pr_err("nvm: no flags supported\n");
->> @@ -1373,8 +1388,6 @@ static long nvm_ioctl_dev_factory(struct file *file, void __user *arg)
->>          if (copy_from_user(&fact, arg, sizeof(struct nvm_ioctl_dev_factory)))
->>                  return -EFAULT;
+>>   struct pblk_w_err_gc {
+>>          int has_write_err;
+>> +       int has_gc_err;
+>>          __le64 *lba_list;
+>>   };
 >>
->> -       fact.dev[DISK_NAME_LEN - 1] = '\0';
->> -
->>          if (fact.flags & ~(NVM_FACTORY_NR_BITS - 1))
->>                  return -EINVAL;
+>> @@ -909,6 +910,7 @@ void pblk_gc_free_full_lines(struct pblk *pblk);
+>>   void pblk_gc_sysfs_state_show(struct pblk *pblk, int *gc_enabled,
+>>                                int *gc_active);
+>>   int pblk_gc_sysfs_force(struct pblk *pblk, int force);
+>> +void pblk_put_line_back(struct pblk *pblk, struct pblk_line *line);
 >>
+>>   /*
+>>    * pblk rate limiter
 >> --
 >> 2.9.5
 >>
