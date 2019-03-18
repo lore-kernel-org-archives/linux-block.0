@@ -2,206 +2,276 @@ Return-Path: <SRS0=WbMh=RV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DCFBC43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 10:44:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0430CC43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 11:08:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6BEFA20850
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 10:44:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B229F2084F
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 11:08:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=Mellanox.com header.i=@Mellanox.com header.b="mRK/eRQH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727177AbfCRKoL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 06:44:11 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41744 "EHLO mx1.suse.de"
+        id S1726629AbfCRLIk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 07:08:40 -0400
+Received: from mail-eopbgr50064.outbound.protection.outlook.com ([40.107.5.64]:27456
+        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726771AbfCRKoL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 06:44:11 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 701C1ADE4;
-        Mon, 18 Mar 2019 10:44:09 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id A7E651E425D; Mon, 18 Mar 2019 11:44:08 +0100 (CET)
-Date:   Mon, 18 Mar 2019 11:44:08 +0100
-From:   Jan Kara <jack@suse.cz>
-To:     Dongli Zhang <dongli.zhang@oracle.com>
-Cc:     linux-block@vger.kernel.org, jack@suse.cz,
-        syzbot <syzbot+9bdc1adc1c55e7fe765b@syzkaller.appspotmail.com>,
-        axboe@kernel.dk, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Subject: Re: general protection fault in loop_validate_file (2)
-Message-ID: <20190318104408.GC9415@quack2.suse.cz>
-References: <00000000000098bf7d05845616d7@google.com>
- <60b13932-0526-09bc-0a32-48371e941544@oracle.com>
+        id S1726356AbfCRLIj (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Mar 2019 07:08:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Mellanox.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=m79MolMY9q4CeGJuP9uNMfdWXBMrNaanIkdAOAIti4k=;
+ b=mRK/eRQHtdepjzWoT4jy1fF5hp0IaC6/HMdagCVgELdpAC12ROni5X31NGAKvDaIs/HaCbthOO6FJcIVcrJ7D7CtSkjH/k6GGOSyoWqx15Tj6Wr9aRTpVlvmSnXewvCvcUFg3KLryrqndrT5xPX03xseiOaZHZZNDNjQDJ8csPI=
+Received: from HE1PR05CA0175.eurprd05.prod.outlook.com (2603:10a6:3:f8::23) by
+ DBBPR05MB6588.eurprd05.prod.outlook.com (2603:10a6:10:d1::23) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1709.14; Mon, 18 Mar 2019 11:08:34 +0000
+Received: from VE1EUR03FT039.eop-EUR03.prod.protection.outlook.com
+ (2a01:111:f400:7e09::208) by HE1PR05CA0175.outlook.office365.com
+ (2603:10a6:3:f8::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1709.13 via Frontend
+ Transport; Mon, 18 Mar 2019 11:08:34 +0000
+Authentication-Results: spf=pass (sender IP is 193.47.165.134)
+ smtp.mailfrom=mellanox.com; lst.de; dkim=none (message not signed)
+ header.d=none;lst.de; dmarc=pass action=none header.from=mellanox.com;
+Received-SPF: Pass (protection.outlook.com: domain of mellanox.com designates
+ 193.47.165.134 as permitted sender) receiver=protection.outlook.com;
+ client-ip=193.47.165.134; helo=mtlcas13.mtl.com;
+Received: from mtlcas13.mtl.com (193.47.165.134) by
+ VE1EUR03FT039.mail.protection.outlook.com (10.152.19.196) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.20.1730.9 via Frontend Transport; Mon, 18 Mar 2019 11:08:33 +0000
+Received: from MTLCAS13.mtl.com (10.0.8.78) by mtlcas13.mtl.com (10.0.8.78)
+ with Microsoft SMTP Server (TLS) id 15.0.1178.4; Mon, 18 Mar 2019 13:08:31
+ +0200
+Received: from MTLCAS01.mtl.com (10.0.8.71) by MTLCAS13.mtl.com (10.0.8.78)
+ with Microsoft SMTP Server (TLS) id 15.0.1178.4 via Frontend Transport; Mon,
+ 18 Mar 2019 13:08:31 +0200
+Received: from [10.223.3.162] (10.223.3.162) by MTLCAS01.mtl.com (10.0.8.71)
+ with Microsoft SMTP Server (TLS) id 14.3.301.0; Mon, 18 Mar 2019 13:08:28
+ +0200
+Subject: Re: [RFC/PATCH net-next 0/9] net/dim: Support for multiple
+ implementations
+To:     Yamin Friedman <yaminf@mellanox.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Tal Gilboa <talgi@mellanox.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC:     Leon Romanovsky <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+        "Yishai Hadas" <yishaih@mellanox.com>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        "Doug Ledford" <dledford@redhat.com>,
+        Idan Burstein <idanb@mellanox.com>,
+        "Tariq Toukan" <tariqt@mellanox.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20190306084832.57753-1-talgi@mellanox.com>
+ <1551888921.9796.2.camel@acm.org>
+ <392082ba-9aeb-6c5e-53a0-7bb53ce101fa@grimberg.me>
+ <010bc92c-55c1-c5bd-82a5-975aa7f7c735@mellanox.com>
+ <50b3659d-fd88-85b0-755e-49565fbe98c2@mellanox.com>
+From:   Max Gurtovoy <maxg@mellanox.com>
+Message-ID: <89a41878-c88b-c0a2-64ef-4409b907ece6@mellanox.com>
+Date:   Mon, 18 Mar 2019 13:08:28 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <50b3659d-fd88-85b0-755e-49565fbe98c2@mellanox.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <60b13932-0526-09bc-0a32-48371e941544@oracle.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Language: en-US
+X-Originating-IP: [10.223.3.162]
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-Forefront-Antispam-Report: CIP:193.47.165.134;IPV:NLI;CTRY:IL;EFV:NLI;SFV:NSPM;SFS:(10009020)(376002)(39860400002)(346002)(136003)(396003)(2980300002)(189003)(51444003)(199004)(36756003)(93886005)(65956001)(65806001)(316002)(16576012)(58126008)(229853002)(47776003)(126002)(476003)(110136005)(6246003)(356004)(2616005)(2201001)(2501003)(8936002)(86362001)(106002)(67846002)(11346002)(31696002)(23676004)(2486003)(76176011)(77096007)(53546011)(26005)(446003)(81156014)(8676002)(81166006)(6116002)(3846002)(14444005)(2906002)(2870700001)(65826007)(16526019)(106466001)(7736002)(478600001)(336012)(305945005)(5660300002)(561944003)(54906003)(64126003)(186003)(486006)(31686004)(50466002)(4326008)(3940600001);DIR:OUT;SFP:1101;SCL:1;SRVR:DBBPR05MB6588;H:mtlcas13.mtl.com;FPR:;SPF:Pass;LANG:en;PTR:mail13.mellanox.com;MX:1;A:1;
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f73e51a9-4bc3-4e66-d4b8-08d6ab920fce
+X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4608103)(4709054)(2017052603328)(7153060)(7193020);SRVR:DBBPR05MB6588;
+X-MS-TrafficTypeDiagnostic: DBBPR05MB6588:
+X-Microsoft-Antispam-PRVS: <DBBPR05MB658820B4E54C2AE4F67E2690B6470@DBBPR05MB6588.eurprd05.prod.outlook.com>
+X-Forefront-PRVS: 098076C36C
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam-Message-Info: B7WAoXTWP8dACKn7PF/MQBU//J8W1KqWsdMDn+xcWhL1THy21VgrRO4PjYnY6Ck2J+6doL/jhi4RlD90nqzKsEz5UCvybB4UcLxcehxAMSg3sh++UNBQWLMs84gxKYY5ThglpspqP6XeJchCC04pqLr1LeX++DDDc+bRboNTQgv2KQMoPfXNGJdsbFKzxlNhz5uHPpzKRzIiChw8w6mmdu7NFAjx/fA3Qcv7sr1wCiP66yZDb1Rdwhob+BeryHnO94P1ezTNd4Rxj78YNIqUs6HhSA5Ppe9mYKKCbqLuO4UD7PNB9RccPtcEzgzuTe+e5mIVglJR2ZvDV3qeRXZH8fhaKo7hks9c5Xh8mDPG+yuUSU1meIzNElA5lw/x2REyZ7UwpnH5g9JNNhnLdMaB4Bi7pXcvUgRs+WyfMwGLCnk=
+X-OriginatorOrg: Mellanox.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Mar 2019 11:08:33.4999
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f73e51a9-4bc3-4e66-d4b8-08d6ab920fce
+X-MS-Exchange-CrossTenant-Id: a652971c-7d2e-4d9b-a6a4-d149256f461b
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=a652971c-7d2e-4d9b-a6a4-d149256f461b;Ip=[193.47.165.134];Helo=[mtlcas13.mtl.com]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR05MB6588
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 18-03-19 14:51:59, Dongli Zhang wrote:
-> 
-> 
-> On 3/18/19 11:36 AM, syzbot wrote:
-> > Hello,
-> > 
-> > syzbot found the following crash on:
-> > 
-> > HEAD commit:��� 9c7dc824 Merge tag '5.1-rc-smb3' of git://git.samba.org/sf..
-> > git tree:������ upstream
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=148a35fb200000
-> > kernel config:� https://syzkaller.appspot.com/x/.config?x=7e1aaa1cfbfe1abf
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=9bdc1adc1c55e7fe765b
-> > compiler:������ gcc (GCC) 9.0.0 20181231 (experimental)
-> > 
-> > Unfortunately, I don't have any reproducer for this crash yet.
-> > 
-> > IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> > Reported-by: syzbot+9bdc1adc1c55e7fe765b@syzkaller.appspotmail.com
-> > 
-> > kasan: CONFIG_KASAN_INLINE enabled
-> > kasan: GPF could be caused by NULL-ptr deref or user memory access
-> > general protection fault: 0000 [#1] PREEMPT SMP KASAN
-> > CPU: 1 PID: 9499 Comm: syz-executor.4 Not tainted 5.0.0+ #25
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google
-> > 01/01/2011
-> > RIP: 0010:loop_validate_file+0x23e/0x310 drivers/block/loop.c:652
-> > Code: 00 48 89 f8 48 c1 e8 03 42 80 3c 38 00 0f 85 d4 00 00 00 4d 8b a4 24 f0 00
-> > 00 00 49 8d bc 24 b8 01 00 00 48 89 f8 48 c1 e8 03 <42> 80 3c 38 00 0f 85 a8 00
-> > 00 00 4d 8b a4 24 b8 01 00 00 4c 89 e0
-> > RSP: 0018:ffff88804d2bfb18 EFLAGS: 00010202
-> > RAX: 0000000000000037 RBX: ffff888095ffa3d8 RCX: ffffc9000e657000
-> > RDX: 0000000000000077 RSI: ffffffff83e754ed RDI: 00000000000001b8
-> > RBP: ffff88804d2bfb40 R08: ffff88808eab41c0 R09: fffffbfff11d981d
-> > R10: ffff88804d2bfb40 R11: ffffffff88ecc0e7 R12: 0000000000000000
-> > R13: 0000000000000002 R14: ffff888095ffa800 R15: dffffc0000000000
-> > FS:� 00007f04b0c91700(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
-> > CS:� 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 0000000000625208 CR3: 00000000a7af8000 CR4: 00000000001406e0
-> > Call Trace:
-> > �loop_set_fd drivers/block/loop.c:930 [inline]
-> > �lo_ioctl+0x99d/0x2150 drivers/block/loop.c:1542
-> > �__blkdev_driver_ioctl block/ioctl.c:303 [inline]
-> > �blkdev_ioctl+0xee8/0x1c40 block/ioctl.c:605
-> > �block_ioctl+0xee/0x130 fs/block_dev.c:1931
-> > �vfs_ioctl fs/ioctl.c:46 [inline]
-> > �file_ioctl fs/ioctl.c:509 [inline]
-> > �do_vfs_ioctl+0xd6e/0x1390 fs/ioctl.c:696
-> > �ksys_ioctl+0xab/0xd0 fs/ioctl.c:713
-> > �__do_sys_ioctl fs/ioctl.c:720 [inline]
-> > �__se_sys_ioctl fs/ioctl.c:718 [inline]
-> > �__x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:718
-> > �do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
-> > �entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> > RIP: 0033:0x458079
-> > Code: ad b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89
-> > d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 7b
-> > b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-> > RSP: 002b:00007f04b0c90c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> > RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000458079
-> > RDX: 0000000000000004 RSI: 0000000000004c00 RDI: 0000000000000003
-> > RBP: 000000000073bf00 R08: 0000000000000000 R09: 0000000000000000
-> > R10: 0000000000000000 R11: 0000000000000246 R12: 00007f04b0c916d4
-> > R13: 00000000004c1252 R14: 00000000004d3160 R15: 00000000ffffffff
-> > Modules linked in:
-> > ---[ end trace 81b29486bae7280a ]---
-> > RIP: 0010:loop_validate_file+0x23e/0x310 drivers/block/loop.c:652
-> > Code: 00 48 89 f8 48 c1 e8 03 42 80 3c 38 00 0f 85 d4 00 00 00 4d 8b a4 24 f0 00
-> > 00 00 49 8d bc 24 b8 01 00 00 48 89 f8 48 c1 e8 03 <42> 80 3c 38 00 0f 85 a8 00
-> > 00 00 4d 8b a4 24 b8 01 00 00 4c 89 e0
-> > RSP: 0018:ffff88804d2bfb18 EFLAGS: 00010202
-> > RAX: 0000000000000037 RBX: ffff888095ffa3d8 RCX: ffffc9000e657000
-> > RDX: 0000000000000077 RSI: ffffffff83e754ed RDI: 00000000000001b8
-> > RBP: ffff88804d2bfb40 R08: ffff88808eab41c0 R09: fffffbfff11d981d
-> > R10: ffff88804d2bfb40 R11: ffffffff88ecc0e7 R12: 0000000000000000
-> > R13: 0000000000000002 R14: ffff888095ffa800 R15: dffffc0000000000
-> > FS:� 00007f04b0c91700(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
-> > CS:� 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 0000000000625208 CR3: 00000000a7af8000 CR4: 00000000001406e0
-> > 
-> > 
-> > ---
-> > This bug is generated by a bot. It may contain errors.
-> > See https://goo.gl/tpsmEJ for more information about syzbot.
-> > syzbot engineers can be reached at syzkaller@googlegroups.com.
-> > 
-> > syzbot will keep track of this bug report. See:
-> > https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with syzbot.
-> 
-> As discussed with Tetsuo in other email thread, the issue can hit when the
-> backend of the loop is another loop device, e.g., loop0's backend is a file,
-> while loop1's backend is loop0.
-> 
-> 
-> loop0's backend is file            loop1's backend is loop0
-> 
-> __loop_clr_fd
->   mutex_lock(&loop_ctl_mutex);
->   lo->lo_backing_file = NULL;
->   mutex_unlock(&loop_ctl_mutex);
->                                    loop_set_fd()
->                                      mutex_lock_killable(&loop_ctl_mutex);
->                                      loop_validate_file
->                                        f = l->lo_backing_file; --> access if
->                                               loop0 is not Lo_unbound
->   mutex_lock(&loop_ctl_mutex);
->   lo->lo_flags = 0;
->   mutex_unlock(&loop_ctl_mutex);
-> 
-> 
-> 
-> Here I post below for more feedback. We should use a loop device as backend only
-> when it is still bound.
 
-Yes, this is the right fix. Thanks for writing it! In fact, the problem has
-been introduced already in commit 7ccd0791d985 "loop: Push loop_ctl_mutex
-down into loop_clr_fd()" after which loop_validate_file() could see devices
-in Lo_rundown state with which it didn't count. It was harmless at that
-point but still. So when submitting the fix, please include there:
+On 3/18/2019 11:24 AM, Yamin Friedman wrote:
+> On 3/14/2019 1:45 PM, Max Gurtovoy wrote:
+>> On 3/7/2019 3:56 AM, Sagi Grimberg wrote:
+>>>>> net_dim.h lib exposes an implementation of the DIM algorithm for
+>>>>> dynamically-tuned interrupt
+>>>>> moderation for networking interfaces.
+>>>>>
+>>>>> We need the same behavior for any block CQ. The main motivation is
+>>>>> two benefit from maximized
+>>>>> completion rate and reduced interrupt overhead that DIM may provide.
+>>>> What is a "block CQ"?
+>>> There is no such thing... Also, this has no difference
+>>> if a block/file/whatever is using the rdma cq.
+>>>
+>>> The naming should really be something like rdma_dim as it accounts
+>>> for completions and not bytes/packets.
+>> Sagi,
+>>
+>> I think that in the future we could use it in nvme since there is an
+>> option to set the interrupt coalescing in NVMe spec.
+>>
+>> This might improve performance for NVMe driver.
+>>
+>> We already see some bottlenecks in performance (maybe driver ones)
+>> while developing the NVMe SNAP feature in Bluefield (NVMe emulation
+>> using Smart NIC).
+>>
+>> We're trying to get 2.5-2.7 MIOPs OOB from 1 controller and it's not
+>> trivial for today's driver.
+>>
+>> So let's take this into consideration when we set the naming.
+>>
+>>
+> I agree that blk is not the most successful name, we were trying to find
+> something that would work for general storage applications. I think
+> rdma_dim would work as it is completion based but then when we want to
+> use it for nvme it will probably require code duplication.
 
-Fixes: 7ccd0791d985 "loop: Push loop_ctl_mutex down into loop_clr_fd()"
+agreed for rdma_dim.
 
-And also appropriate Reported-by for syzbot. Something like:
+Yamin/Idan,
 
-Reported-by: syzbot+9bdc1adc1c55e7fe765b@syzkaller.appspotmail.com
+let's discuss internally regarding Sagi's proposal for 
+moderation/coalescing per NVMe queue (and not per controller).
 
-You can also add my:
+maybe need to update specification.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
 
-							Thanks!
+>
+>>>
+>>>> How does net_dim compare to lib/irq_poll?
+>>> Its orthogonal, its basically adaptive interrupt moderation for
+>>> RDMA devices. Its sort of below the irq_poll code. It basically
+>>> configures interrupt moderation based on stats collected by
+>>> the rdma driver.
+>>>
+>>>> Which approach results in the best performance and lowest latency?
+>>> I guess it depends on what is the test case. This approach tries to
+>>> apply some time or completion count limit to when the HW should fire
+>>> an interrupt based on the load in an adaptive fashion.
+>>>
+>>> The scheme is to try and detect what are the load characteristics and
+>>> come up with a moderation parameters that fit. For high interrupt rate
+>>> (usually seen with small size high queue-depth workloads) it configures
+>>> the device to aggregate some more before firing an interrupt - so less
+>>> interrupts, better efficiency per interrupt (finds more completions).
+>>> For low interrupt rate (low queue depth) the load is probably low to
+>>> moderate and aggregating before firing an interrupt is just added
+>>> latency for no benefit. So the algorithm tries to transition between a
+>>> number of pre-defined levels according to the load it samples.
+>>>
+>>> This has been widely used by the network drivers for the past decade.
+>>>
+>>> Now, this algorithm while trying to adjust itself by learning the load,
+>>> also adds entropy to the overall system performance and latency.
+>>> So this is not a trivial trade-off for any workload.
+>>>
+>>> I took a stab at this once (came up with something very similar),
+>>> and while for large queue-depth workloads I got up to 2x IOPs as the
+>>> algorithm chose aggressive moderation parameters which improved the
+>>> efficiency a lot, but when the workload varied the algorithm wasn't very
+>>> successful detecting the load and the step direction (I used a variation
+>>> of the same basic algorithm from mlx5 driver that net_dim is based on).
+>>>
+>>> Also, QD=1 resulted in higher latency as the algorithm was dangling
+>>> between the two lowest levels. So I guess this needs to undergo a
+>>> thorough performance evaluation for steady and varying workloads before
+>>> we can consider this.
+>>>
+>>> Overall, I think its a great idea to add that to the rdma subsystem
+>>> but we cannot make it the default and especially without being able
+>>> to turn it off. So this needs to be opt in with a sysctl option.
+>> We can add flag in create_cq command that will
+>> try_coalescing_is_possible instead of module parameter of course.
+>>
+>> Storage ULPs can set it to True.
+>>
+>> Also in the internal review Yamin added a table that summarize all the
+>> testing that were done using NVMeoF (I guess it somehow didn't get to
+>> this RFC).
+>>
+>> I guess we can do the same for iSER to get more confidence and then
+>> set both to create modifiable cq (if HCA supports, of course).
+>>
+>> Agreed ?
+>>
+> I think that adding a flag in create_cq will be less clean as it will
+> require more work for anyone writing applications that should not have
+> to consider this feature.
 
-								Honza
 
-> 
-> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-> index 1e6edd5..bf1c61c 100644
-> --- a/drivers/block/loop.c
-> +++ b/drivers/block/loop.c
-> @@ -656,7 +656,7 @@ static int loop_validate_file(struct file *file, struct
-> block_device *bdev)
->                         return -EBADF;
-> 
->                 l = f->f_mapping->host->i_bdev->bd_disk->private_data;
-> -               if (l->lo_state == Lo_unbound) {
-> +               if (l->lo_state != Lo_bound) {
->                         return -EINVAL;
->                 }
->                 f = l->lo_backing_file;
-> 
-> 
-> Thanks Tetsuo for the discussion and feedback!
-> 
-> Dongli Zhang
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+As we discussed, let's check with RDMA maintainers if it's better to 
+extend alloc_cq API or create alloc_cq_dim API function.
+
+Sagi/Christoph,
+
+how about adding a module param per ULP ? as we use register_always 
+today, create a use_dimm module param for iSER/NVMe-RDMA ?
+
+>
+> Based on the results I saw during testing I would set it to work by
+> default as I could not find a use case where it significantly reduces
+> performance and in many cases it is a large improvement. It should be
+> more of an opt out situation.
+>
+> Performance improvement (ConnectX-5 100GbE, x86) running FIO benchmark over
+>       NVMf between two equal end-hosts with 56 cores across a Mellanox switch
+>       using null_blk device:
+>
+>       IO READS before:
+>       blk size | BW      | IOPS | 99th percentile latency
+>       512B     | 3.2GiB  | 6.6M | 1549  usec
+>       4k       | 7.2GiB  | 1.8M | 7177  usec
+>       64k      | 10.7GiB | 176k | 82314 usec
+>
+>       IO READS after:
+>       blk size | BW      | IOPS | 99th percentile latency
+>       512B     | 4.2GiB  | 8.6M | 1729   usec
+>       4k       | 10.5GiB | 2.7M | 5669   usec
+>       64k      | 10.7GiB | 176k | 102000 usec
+>
+>       IO WRITES before:
+>       blk size | BW      | IOPS | 99th percentile latency
+>       512B     | 3GiB    | 6.2M | 2573  usec
+>       4k       | 7.2GiB  | 1.8M | 5342  usec
+>       64k      | 10.7GiB | 176k | 62129 usec
+>
+>       IO WRITES after:
+>       blk size | BW      | IOPS  | 99th percentile latency
+>       512B     | 4.2GiB  | 8.6M  | 938   usec
+>       4k       | 10.2GiB | 2.68M | 2769  usec
+>       64k      | 10.6GiB | 173k  | 87557 usec
+>
+> It doesn't really make a difference to me how the option is implemented
+> but I think it makes more sense to have it dealt with by us such as in a
+> module parameter and not something like a flag that has a larger radius
+> of effect.
+>
+>>>
+>>> Moreover, not every device support cq moderation so you need to check
+>>> the device capabilities before you apply any of this.
+>> for sure.
+>>
+>>
