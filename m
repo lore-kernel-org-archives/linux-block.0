@@ -2,159 +2,108 @@ Return-Path: <SRS0=WbMh=RV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88057C43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 15:04:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E50C43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 15:05:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 63F2620854
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 15:04:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E722920863
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 15:04:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726776AbfCRPEp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 11:04:45 -0400
-Received: from mga18.intel.com ([134.134.136.126]:19770 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726435AbfCRPEp (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 11:04:45 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Mar 2019 08:04:45 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.58,494,1544515200"; 
-   d="scan'208";a="127969862"
-Received: from ikonopko-mobl1.ger.corp.intel.com (HELO [10.237.142.164]) ([10.237.142.164])
-  by orsmga006.jf.intel.com with ESMTP; 18 Mar 2019 08:04:43 -0700
-Subject: Re: [PATCH 06/18] lightnvm: pblk: recover only written metadata
-From:   Igor Konopko <igor.j.konopko@intel.com>
-To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>
-Cc:     =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        linux-block@vger.kernel.org
-References: <20190314160428.3559-1-igor.j.konopko@intel.com>
- <20190314160428.3559-7-igor.j.konopko@intel.com>
- <4017AC03-A854-4158-ADC9-E1BBAE65003D@javigon.com>
- <b0210004-8b9e-14d7-a7fe-60bb20d6300e@intel.com>
-Message-ID: <94581714-a75a-e4fc-2c3c-74d1cf4dafc1@intel.com>
-Date:   Mon, 18 Mar 2019 16:04:43 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.3
-MIME-Version: 1.0
-In-Reply-To: <b0210004-8b9e-14d7-a7fe-60bb20d6300e@intel.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        id S1726093AbfCRPE7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 11:04:59 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:36730 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726435AbfCRPE7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Mar 2019 11:04:59 -0400
+Received: by mail-pg1-f193.google.com with SMTP id r124so11598018pgr.3
+        for <linux-block@vger.kernel.org>; Mon, 18 Mar 2019 08:04:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=wTGVzdB/0aE1dt1UucJUscaeEjwEIR5e5bpu3ZKlhx0=;
+        b=apm4EIKatq+5j+g63obUFZwwO2Pu2Ac5oQh0YfRxYJ3cDU6hepYFT2wGqRroMgZF0H
+         tykaHO6yUGPSwpceNmI//dPO3N23ZIbspkgguCA2QP6eMBEPp6QyqXAbdQd0OlRGpzZH
+         h66F82ZJ8krw3OpEU0n8uz45SuxwPpd5NqlpgkHBhL07TuYLEdWhpOb6QEhyN+/djCZr
+         NHnIQjgJaC5Wa5mE0CGc2mH0aoNHpDV5fE1JoEqMpYmvF6BIToj2JtHR2cpLQ4NQPEpG
+         eLZe3SNWPAyJR07sTSqZJRp91wg60ytXvAsGtjlef08OhQvx1mxSmAHTM5sZDXwziRSQ
+         R82A==
+X-Gm-Message-State: APjAAAXnVIQ4Fd71eFhxDxTe4iyF09iRDg4q3lGy3dsj8d4oX1ngZCpH
+        JS+Q8B3VkiT+3S8uKANZ+Gc=
+X-Google-Smtp-Source: APXvYqzJVDJWRnHixeXC3Kc+0kIcB8yrR70+jwQNumcwzZ9NYA7R04ceXp8fneVwtmpxL2boXnWWbQ==
+X-Received: by 2002:aa7:8157:: with SMTP id d23mr19556745pfn.67.1552921498271;
+        Mon, 18 Mar 2019 08:04:58 -0700 (PDT)
+Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id e8sm14180798pfn.103.2019.03.18.08.04.57
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 18 Mar 2019 08:04:57 -0700 (PDT)
+Message-ID: <1552921495.152266.8.camel@acm.org>
+Subject: Re: [PATCH 1/2] blk-mq: introduce blk_mq_complete_request_sync()
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org
+Date:   Mon, 18 Mar 2019 08:04:55 -0700
+In-Reply-To: <20190318073826.GA29746@ming.t460p>
+References: <20190318032950.17770-1-ming.lei@redhat.com>
+         <20190318032950.17770-2-ming.lei@redhat.com>
+         <f708ee0c-dfa4-0bca-f996-8d834471f1fd@acm.org>
+         <20190318073826.GA29746@ming.t460p>
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, 2019-03-18 at 15:38 +-0800, Ming Lei wrote:
++AD4 On Sun, Mar 17, 2019 at 09:09:09PM -0700, Bart Van Assche wrote:
++AD4 +AD4 On 3/17/19 8:29 PM, Ming Lei wrote:
++AD4 +AD4 +AD4 In NVMe's error handler, follows the typical steps for tearing down
++AD4 +AD4 +AD4 hardware:
++AD4 +AD4 +AD4 
++AD4 +AD4 +AD4 1) stop blk+AF8-mq hw queues
++AD4 +AD4 +AD4 2) stop the real hw queues
++AD4 +AD4 +AD4 3) cancel in-flight requests via
++AD4 +AD4 +AD4 	blk+AF8-mq+AF8-tagset+AF8-busy+AF8-iter(tags, cancel+AF8-request, ...)
++AD4 +AD4 +AD4 cancel+AF8-request():
++AD4 +AD4 +AD4 	mark the request as abort
++AD4 +AD4 +AD4 	blk+AF8-mq+AF8-complete+AF8-request(req)+ADs
++AD4 +AD4 +AD4 4) destroy real hw queues
++AD4 +AD4 +AD4 
++AD4 +AD4 +AD4 However, there may be race between +ACM-3 and +ACM-4, because blk+AF8-mq+AF8-complete+AF8-request()
++AD4 +AD4 +AD4 actually completes the request asynchronously.
++AD4 +AD4 +AD4 
++AD4 +AD4 +AD4 This patch introduces blk+AF8-mq+AF8-complete+AF8-request+AF8-sync() for fixing the
++AD4 +AD4 +AD4 above race.
++AD4 +AD4 
++AD4 +AD4 Other block drivers wait until outstanding requests have completed by
++AD4 +AD4 calling blk+AF8-cleanup+AF8-queue() before hardware queues are destroyed. Why can't
++AD4 +AD4 the NVMe driver follow that approach?
++AD4 
++AD4 The tearing down of controller can be done in error handler, in which
++AD4 the request queues may not be cleaned up, almost all kinds of NVMe
++AD4 controller's error handling follows the above steps, such as:
++AD4 
++AD4 nvme+AF8-rdma+AF8-error+AF8-recovery+AF8-work()
++AD4 	-+AD4-nvme+AF8-rdma+AF8-teardown+AF8-io+AF8-queues()
++AD4 
++AD4 nvme+AF8-timeout()
++AD4 	-+AD4-nvme+AF8-dev+AF8-disable
 
+Hi Ming,
 
-On 18.03.2019 13:54, Igor Konopko wrote:
-> 
-> 
-> On 17.03.2019 00:46, Javier González wrote:
->>> On 14 Mar 2019, at 09.04, Igor Konopko <igor.j.konopko@intel.com> wrote:
->>>
->>> This patch ensures that smeta/emeta was written properly before even
->>> trying to read it based on chunk table state and write pointer.
->>>
->>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
->>> ---
->>> drivers/lightnvm/pblk-recovery.c | 43 
->>> ++++++++++++++++++++++++++++++++++++++--
->>> 1 file changed, 41 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/drivers/lightnvm/pblk-recovery.c 
->>> b/drivers/lightnvm/pblk-recovery.c
->>> index 688fdeb..ba1691d 100644
->>> --- a/drivers/lightnvm/pblk-recovery.c
->>> +++ b/drivers/lightnvm/pblk-recovery.c
->>> @@ -653,8 +653,42 @@ static int pblk_line_was_written(struct 
->>> pblk_line *line,
->>>     bppa = pblk->luns[smeta_blk].bppa;
->>>     chunk = &line->chks[pblk_ppa_to_pos(geo, bppa)];
->>>
->>> -    if (chunk->state & NVM_CHK_ST_FREE)
->>> -        return 0;
->>> +    if (chunk->state & NVM_CHK_ST_CLOSED ||
->>> +        (chunk->state & NVM_CHK_ST_OPEN
->>> +         && chunk->wp >= lm->smeta_sec))
->>> +        return 1;
->>> +
->>> +    return 0;
->>> +}
->>> +
->>> +static int pblk_line_was_emeta_written(struct pblk_line *line,
->>> +                       struct pblk *pblk)
->>> +{
->>> +
->>> +    struct pblk_line_meta *lm = &pblk->lm;
->>> +    struct nvm_tgt_dev *dev = pblk->dev;
->>> +    struct nvm_geo *geo = &dev->geo;
->>> +    struct nvm_chk_meta *chunk;
->>> +    struct ppa_addr ppa;
->>> +    int i, pos;
->>> +    int min = pblk->min_write_pgs;
->>> +    u64 paddr = line->emeta_ssec;
->>> +
->>> +    for (i = 0; i < lm->emeta_sec[0]; i++, paddr++) {
->>> +        ppa = addr_to_gen_ppa(pblk, paddr, line->id);
->>> +        pos = pblk_ppa_to_pos(geo, ppa);
->>> +        while (test_bit(pos, line->blk_bitmap)) {
->>> +            paddr += min;
->>> +            ppa = addr_to_gen_ppa(pblk, paddr, line->id);
->>> +            pos = pblk_ppa_to_pos(geo, ppa);
->>> +        }
->>> +        chunk = &line->chks[pos];
->>> +
->>> +        if (!(chunk->state & NVM_CHK_ST_CLOSED ||
->>> +            (chunk->state & NVM_CHK_ST_OPEN
->>> +             && chunk->wp > ppa.m.sec)))
->>> +            return 0;
->>> +    }
->>>
->>>     return 1;
->>> }
->>> @@ -788,6 +822,11 @@ struct pblk_line *pblk_recov_l2p(struct pblk *pblk)
->>>             goto next;
->>>         }
->>>
->>> +        if (!pblk_line_was_emeta_written(line, pblk)) {
->>> +            pblk_recov_l2p_from_oob(pblk, line);
->>> +            goto next;
->>> +        }
->>> +
->>>         if (pblk_line_emeta_read(pblk, line, line->emeta->buf)) {
->>>             pblk_recov_l2p_from_oob(pblk, line);
->>>             goto next;
->>> -- 
->>> 2.9.5
->>
->>   I would like to avoid iterating on all chunks again an again to check
->>   for different things at boot time. What do you think having this as
->>   something like PBLK_LINESTATE_OPEN_INVALID or
->>   PBLK_LINESTATE_OPEN_NONRECOV, which you populate when collecting the
->>   chunk information? Then this becomes a simple check as opposed to the
->>   extra chunk iteration?
->>
-> 
-> Ok, will work on sth different.
+This makes me wonder whether the current design of the NVMe core is the best
+design we can come up with? The structure of e.g. the SRP initiator and target
+drivers is similar to the NVMeOF drivers. However, there is no need in the SRP
+initiator driver to terminate requests synchronously. Is this due to
+differences in the error handling approaches in the SCSI and NVMe core drivers?
 
-I rethink my changes again and I messed up. Emeta check is redundant, 
-since pblk_line_is_open() will handle the scenario when emeta was not 
-fully written (since some chunk will be in open state).
-So I'll drop the emeta part of that patch from v2 and will keep only 
-smeta fix part.
+Thanks,
 
-> 
->> On the check itself: Is this done for completeness or have you hit a
->> case that is not covered by the smeta/emeta CRC protection?
->>
-> 
-> So generally my goal here was to avoid reading blank sectors if not needed.
-> 
->>
+Bart.
