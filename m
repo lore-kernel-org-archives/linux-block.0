@@ -2,205 +2,357 @@ Return-Path: <SRS0=WbMh=RV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB613C43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 12:27:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D451EC43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 12:44:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A9EBE20854
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 12:27:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="2mFSye5s"
+	by mail.kernel.org (Postfix) with ESMTP id 9F0ED20850
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 12:44:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726435AbfCRM1f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 08:27:35 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:44472 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725973AbfCRM1f (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 08:27:35 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2ICOEo5132699;
-        Mon, 18 Mar 2019 12:27:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : references
- : cc : to : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=rV4e1ER0keWutNGoARjp7yyaYTfL4C9PQH3nR/duadY=;
- b=2mFSye5sgQGmJu5a7y+DfZcr9XAjit1GntsUgtBNJWhWhbyb4qpsmnSHi0q3TNYVR0fR
- 67qSvqeStftIyNaoapKY6GiC3uPS5mryM8B9EXtij3PKn3KilegpY3sQ1vMLTi6QMCx/
- IMm9PkBXeWbKCtaMw/Pp9Jv/GcqChK3UIZTHvCdiL8FlsuGrELWgEH60ZlYlrxfZdSAi
- lIBsHTr6kuPMB/RM3/It5LRX3+Ep6EWkrdfLoVrglZ/OeMRO8PCYfygT+QYInKhxrvrv
- i7D/cnNrFWoLy91ZUM5C+qApn5QIoK1lRMeFs43QYqD5NQOtthSlcVW4rak3TMGay9qg 4A== 
-Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by userp2120.oracle.com with ESMTP id 2r8ssr611h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 18 Mar 2019 12:27:26 +0000
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2ICRPGJ032198
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 18 Mar 2019 12:27:25 GMT
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x2ICRNFo004430;
-        Mon, 18 Mar 2019 12:27:24 GMT
-Received: from [10.191.7.230] (/10.191.7.230)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 18 Mar 2019 05:27:23 -0700
-Subject: Re: general protection fault in loop_validate_file (2)
-References: <00000000000098bf7d05845616d7@google.com>
-Cc:     syzbot <syzbot+9bdc1adc1c55e7fe765b@syzkaller.appspotmail.com>,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        penguin-kernel@i-love.sakura.ne.jp
-To:     Jan Kara <jack@suse.cz>
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <cb7aa6d1-6d1e-a9ac-239a-1b5d8160f8cd@oracle.com>
-Date:   Mon, 18 Mar 2019 20:27:02 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        id S1726851AbfCRMoH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 08:44:07 -0400
+Received: from mga05.intel.com ([192.55.52.43]:26911 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726678AbfCRMoG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Mar 2019 08:44:06 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Mar 2019 05:44:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.58,493,1544515200"; 
+   d="scan'208";a="126376753"
+Received: from ikonopko-mobl1.ger.corp.intel.com (HELO [10.237.142.164]) ([10.237.142.164])
+  by orsmga008.jf.intel.com with ESMTP; 18 Mar 2019 05:44:04 -0700
+Subject: Re: [PATCH 03/18] lightnvm: pblk: simplify partial read path
+To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>
+Cc:     Heiner Litz <hlitz@ucsc.edu>,
+        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        linux-block@vger.kernel.org
+References: <20190314160428.3559-1-igor.j.konopko@intel.com>
+ <20190314160428.3559-4-igor.j.konopko@intel.com>
+ <CAJbgVnWkM1V9VaoQGR4NwUBEbQZxt7e6L0CoBnLXoGvtY2qZfA@mail.gmail.com>
+ <6ce1fb9a-a076-10c2-98e9-64505ae7d61f@intel.com>
+ <FBF04275-1824-4661-A823-8551E5262ED7@javigon.com>
+From:   Igor Konopko <igor.j.konopko@intel.com>
+Message-ID: <ff0fc727-3836-dc3a-6076-76c4bd568aca@intel.com>
+Date:   Mon, 18 Mar 2019 13:44:03 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.3
 MIME-Version: 1.0
-In-Reply-To: <00000000000098bf7d05845616d7@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9198 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1903180094
+In-Reply-To: <FBF04275-1824-4661-A823-8551E5262ED7@javigon.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jan,
 
-Indeed there is another issue implicitly reported by below console output from
-syzkaller:
 
-[  245.524424][ T9455] loop_reread_partitions: partition scan of loop0 () failed
-(rc=-13)
-[  245.563340][ T9499] kasan: CONFIG_KASAN_INLINE enabled
-[  245.576412][ T9489] __loop_clr_fd: partition scan of loop0 failed (rc=-13)
-[  245.581275][ T9499] kasan: GPF could be caused by NULL-ptr deref or user
-memory access
-[  245.602596][ T9499] general protection fault: 0000 [#1] PREEMPT SMP KASAN
-
-I think rc=-13 is because of below code at line 168:
-
-162 int __blkdev_reread_part(struct block_device *bdev)
-163 {
-164         struct gendisk *disk = bdev->bd_disk;
-165
-166         if (!disk_part_scan_enabled(disk) || bdev != bdev->bd_contains)
-167                 return -EINVAL;
-168         if (!capable(CAP_SYS_ADMIN))
-169                 return -EACCES;
-170
-171         lockdep_assert_held(&bdev->bd_mutex);
-172
-173         return rescan_partitions(disk, bdev);
-174 }
-175 EXPORT_SYMBOL(__blkdev_reread_part);
-
-I can reproduce this by 'chown username /dev/loop0' on my test machine.
-
-Taking 'losetup -d /dev/loop0' as sample, as /dev/loop0 belongs to my username,
-I am able to detach the loop without 'su'.
-
-However, because of above line 168, the partition scan would fail.
-
-Should we always assume the user should have admin privilege to detach the loop
-and this is not a bug?
-
-Thank you very much!
-
-Dongli Zhang
-
-On 03/18/2019 11:36 AM, syzbot wrote:
-> Hello,
+On 16.03.2019 23:28, Javier González wrote:
+>> On 15 Mar 2019, at 02.52, Igor Konopko <igor.j.konopko@intel.com> wrote:
+>>
+>>
+>>
+>> On 14.03.2019 22:35, Heiner Litz wrote:
+>>> On Thu, Mar 14, 2019 at 9:07 AM Igor Konopko <igor.j.konopko@intel.com> wrote:
+>>>> This patch changes the approach to handling partial read path.
+>>>>
+>>>> In old approach merging of data from round buffer and drive was fully
+>>>> made by drive. This had some disadvantages - code was complex and
+>>>> relies on bio internals, so it was hard to maintain and was strongly
+>>>> dependent on bio changes.
+>>>>
+>>>> In new approach most of the handling is done mostly by block layer
+>>>> functions such as bio_split(), bio_chain() and generic_make request()
+>>>> and generally is less complex and easier to maintain. Below some more
+>>>> details of the new approach.
+>>>>
+>>>> When read bio arrives, it is cloned for pblk internal purposes. All
+>>>> the L2P mapping, which includes copying data from round buffer to bio
+>>>> and thus bio_advance() calls is done on the cloned bio, so the original
+>>>> bio is untouched. Later if we found that we have partial read case, we
+>>>> still have original bio untouched, so we can split it and continue to
+>>>> process only first 4K of it in current context, when the rest will be
+>>>> called as separate bio request which is passed to generic_make_request()
+>>>> for further processing.
+>>>>
+>>>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+>>>> ---
+>>>>   drivers/lightnvm/pblk-read.c | 242 ++++++++-----------------------------------
+>>>>   drivers/lightnvm/pblk.h      |  12 ---
+>>>>   2 files changed, 41 insertions(+), 213 deletions(-)
+>>>>
+>>>> diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+>>>> index 6569746..54422a2 100644
+>>>> --- a/drivers/lightnvm/pblk-read.c
+>>>> +++ b/drivers/lightnvm/pblk-read.c
+>>>> @@ -222,171 +222,6 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+>>>>          __pblk_end_io_read(pblk, rqd, true);
+>>>>   }
+>>>>
+>>>> -static void pblk_end_partial_read(struct nvm_rq *rqd)
+>>>> -{
+>>>> -       struct pblk *pblk = rqd->private;
+>>>> -       struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+>>>> -       struct pblk_pr_ctx *pr_ctx = r_ctx->private;
+>>>> -       struct pblk_sec_meta *meta;
+>>>> -       struct bio *new_bio = rqd->bio;
+>>>> -       struct bio *bio = pr_ctx->orig_bio;
+>>>> -       struct bio_vec src_bv, dst_bv;
+>>>> -       void *meta_list = rqd->meta_list;
+>>>> -       int bio_init_idx = pr_ctx->bio_init_idx;
+>>>> -       unsigned long *read_bitmap = pr_ctx->bitmap;
+>>>> -       int nr_secs = pr_ctx->orig_nr_secs;
+>>>> -       int nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
+>>>> -       void *src_p, *dst_p;
+>>>> -       int hole, i;
+>>>> -
+>>>> -       if (unlikely(nr_holes == 1)) {
+>>>> -               struct ppa_addr ppa;
+>>>> -
+>>>> -               ppa = rqd->ppa_addr;
+>>>> -               rqd->ppa_list = pr_ctx->ppa_ptr;
+>>>> -               rqd->dma_ppa_list = pr_ctx->dma_ppa_list;
+>>>> -               rqd->ppa_list[0] = ppa;
+>>>> -       }
+>>>> -
+>>>> -       for (i = 0; i < nr_secs; i++) {
+>>>> -               meta = pblk_get_meta(pblk, meta_list, i);
+>>>> -               pr_ctx->lba_list_media[i] = le64_to_cpu(meta->lba);
+>>>> -               meta->lba = cpu_to_le64(pr_ctx->lba_list_mem[i]);
+>>>> -       }
+>>>> -
+>>>> -       /* Fill the holes in the original bio */
+>>>> -       i = 0;
+>>>> -       hole = find_first_zero_bit(read_bitmap, nr_secs);
+>>>> -       do {
+>>>> -               struct pblk_line *line;
+>>>> -
+>>>> -               line = pblk_ppa_to_line(pblk, rqd->ppa_list[i]);
+>>>> -               kref_put(&line->ref, pblk_line_put);
+>>>> -
+>>>> -               meta = pblk_get_meta(pblk, meta_list, hole);
+>>>> -               meta->lba = cpu_to_le64(pr_ctx->lba_list_media[i]);
+>>>> -
+>>>> -               src_bv = new_bio->bi_io_vec[i++];
+>>>> -               dst_bv = bio->bi_io_vec[bio_init_idx + hole];
+>>>> -
+>>>> -               src_p = kmap_atomic(src_bv.bv_page);
+>>>> -               dst_p = kmap_atomic(dst_bv.bv_page);
+>>>> -
+>>>> -               memcpy(dst_p + dst_bv.bv_offset,
+>>>> -                       src_p + src_bv.bv_offset,
+>>>> -                       PBLK_EXPOSED_PAGE_SIZE);
+>>>> -
+>>>> -               kunmap_atomic(src_p);
+>>>> -               kunmap_atomic(dst_p);
+>>>> -
+>>>> -               mempool_free(src_bv.bv_page, &pblk->page_bio_pool);
+>>>> -
+>>>> -               hole = find_next_zero_bit(read_bitmap, nr_secs, hole + 1);
+>>>> -       } while (hole < nr_secs);
+>>>> -
+>>>> -       bio_put(new_bio);
+>>>> -       kfree(pr_ctx);
+>>>> -
+>>>> -       /* restore original request */
+>>>> -       rqd->bio = NULL;
+>>>> -       rqd->nr_ppas = nr_secs;
+>>>> -
+>>>> -       pblk_end_user_read(bio, rqd->error);
+>>>> -       __pblk_end_io_read(pblk, rqd, false);
+>>>> -}
+>>>> -
+>>>> -static int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
+>>>> -                           unsigned int bio_init_idx,
+>>>> -                           unsigned long *read_bitmap,
+>>>> -                           int nr_holes)
+>>>> -{
+>>>> -       void *meta_list = rqd->meta_list;
+>>>> -       struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+>>>> -       struct pblk_pr_ctx *pr_ctx;
+>>>> -       struct bio *new_bio, *bio = r_ctx->private;
+>>>> -       int nr_secs = rqd->nr_ppas;
+>>>> -       int i;
+>>>> -
+>>>> -       new_bio = bio_alloc(GFP_KERNEL, nr_holes);
+>>>> -
+>>>> -       if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
+>>>> -               goto fail_bio_put;
+>>>> -
+>>>> -       if (nr_holes != new_bio->bi_vcnt) {
+>>>> -               WARN_ONCE(1, "pblk: malformed bio\n");
+>>>> -               goto fail_free_pages;
+>>>> -       }
+>>>> -
+>>>> -       pr_ctx = kzalloc(sizeof(struct pblk_pr_ctx), GFP_KERNEL);
+>>>> -       if (!pr_ctx)
+>>>> -               goto fail_free_pages;
+>>>> -
+>>>> -       for (i = 0; i < nr_secs; i++) {
+>>>> -               struct pblk_sec_meta *meta = pblk_get_meta(pblk, meta_list, i);
+>>>> -
+>>>> -               pr_ctx->lba_list_mem[i] = le64_to_cpu(meta->lba);
+>>>> -       }
+>>>> -
+>>>> -       new_bio->bi_iter.bi_sector = 0; /* internal bio */
+>>>> -       bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
+>>>> -
+>>>> -       rqd->bio = new_bio;
+>>>> -       rqd->nr_ppas = nr_holes;
+>>>> -
+>>>> -       pr_ctx->orig_bio = bio;
+>>>> -       bitmap_copy(pr_ctx->bitmap, read_bitmap, NVM_MAX_VLBA);
+>>>> -       pr_ctx->bio_init_idx = bio_init_idx;
+>>>> -       pr_ctx->orig_nr_secs = nr_secs;
+>>>> -       r_ctx->private = pr_ctx;
+>>>> -
+>>>> -       if (unlikely(nr_holes == 1)) {
+>>>> -               pr_ctx->ppa_ptr = rqd->ppa_list;
+>>>> -               pr_ctx->dma_ppa_list = rqd->dma_ppa_list;
+>>>> -               rqd->ppa_addr = rqd->ppa_list[0];
+>>>> -       }
+>>>> -       return 0;
+>>>> -
+>>>> -fail_free_pages:
+>>>> -       pblk_bio_free_pages(pblk, new_bio, 0, new_bio->bi_vcnt);
+>>>> -fail_bio_put:
+>>>> -       bio_put(new_bio);
+>>>> -
+>>>> -       return -ENOMEM;
+>>>> -}
+>>>> -
+>>>> -static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+>>>> -                                unsigned int bio_init_idx,
+>>>> -                                unsigned long *read_bitmap, int nr_secs)
+>>>> -{
+>>>> -       int nr_holes;
+>>>> -       int ret;
+>>>> -
+>>>> -       nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
+>>>> -
+>>>> -       if (pblk_setup_partial_read(pblk, rqd, bio_init_idx, read_bitmap,
+>>>> -                                   nr_holes))
+>>>> -               return NVM_IO_ERR;
+>>>> -
+>>>> -       rqd->end_io = pblk_end_partial_read;
+>>>> -
+>>>> -       ret = pblk_submit_io(pblk, rqd);
+>>>> -       if (ret) {
+>>>> -               bio_put(rqd->bio);
+>>>> -               pblk_err(pblk, "partial read IO submission failed\n");
+>>>> -               goto err;
+>>>> -       }
+>>>> -
+>>>> -       return NVM_IO_OK;
+>>>> -
+>>>> -err:
+>>>> -       pblk_err(pblk, "failed to perform partial read\n");
+>>>> -
+>>>> -       /* Free allocated pages in new bio */
+>>>> -       pblk_bio_free_pages(pblk, rqd->bio, 0, rqd->bio->bi_vcnt);
+>>>> -       __pblk_end_io_read(pblk, rqd, false);
+>>>> -       return NVM_IO_ERR;
+>>>> -}
+>>>> -
+>>>>   static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd, struct bio *bio,
+>>>>                           sector_t lba, unsigned long *read_bitmap)
+>>>>   {
+>>>> @@ -432,11 +267,11 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+>>>>   {
+>>>>          struct nvm_tgt_dev *dev = pblk->dev;
+>>>>          struct request_queue *q = dev->q;
+>>>> +       struct bio *split_bio, *int_bio;
+>>>>          sector_t blba = pblk_get_lba(bio);
+>>>>          unsigned int nr_secs = pblk_get_secs(bio);
+>>>>          struct pblk_g_ctx *r_ctx;
+>>>>          struct nvm_rq *rqd;
+>>>> -       unsigned int bio_init_idx;
+>>>>          DECLARE_BITMAP(read_bitmap, NVM_MAX_VLBA);
+>>>>          int ret = NVM_IO_ERR;
+>>>>
+>>>> @@ -456,61 +291,66 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+>>>>          r_ctx = nvm_rq_to_pdu(rqd);
+>>>>          r_ctx->start_time = jiffies;
+>>>>          r_ctx->lba = blba;
+>>>> -       r_ctx->private = bio; /* original bio */
+>>>>
+>>>> -       /* Save the index for this bio's start. This is needed in case
+>>>> -        * we need to fill a partial read.
+>>>> +       /* Clone read bio to deal with:
+>>>> +        * -usage of bio_advance() when memcpy data from round buffer
+>>>> +        * -read errors in case of reading from device
+>>>>           */
+>>>> -       bio_init_idx = pblk_get_bi_idx(bio);
+>>>> +       int_bio = bio_clone_fast(bio, GFP_KERNEL, &pblk_bio_set);
+>>>> +       if (!int_bio)
+>>>> +               return NVM_IO_ERR;
+>>>>
+>>>>          if (pblk_alloc_rqd_meta(pblk, rqd))
+>>>>                  goto fail_rqd_free;
+>>>>
+>>>>          if (nr_secs > 1)
+>>>> -               pblk_read_ppalist_rq(pblk, rqd, bio, blba, read_bitmap);
+>>>> +               pblk_read_ppalist_rq(pblk, rqd, int_bio, blba, read_bitmap);
+>>>>          else
+>>>> -               pblk_read_rq(pblk, rqd, bio, blba, read_bitmap);
+>>>> +               pblk_read_rq(pblk, rqd, int_bio, blba, read_bitmap);
+>>>> +
+>>>> +split_retry:
+>>>> +       r_ctx->private = bio; /* original bio */
+>>>>
+>>>> -       if (bitmap_full(read_bitmap, nr_secs)) {
+>>>> +       if (bitmap_full(read_bitmap, rqd->nr_ppas)) {
+>>>> +               bio_put(int_bio);
+>>>>                  atomic_inc(&pblk->inflight_io);
+>>>>                  __pblk_end_io_read(pblk, rqd, false);
+>>>>                  return NVM_IO_DONE;
+>>>>          }
+>>>>
+>>>> -       /* All sectors are to be read from the device */
+>>>> -       if (bitmap_empty(read_bitmap, rqd->nr_ppas)) {
+>>>> -               struct bio *int_bio = NULL;
+>>>> +       if (!bitmap_empty(read_bitmap, rqd->nr_ppas)) {
+>>>> +               /* The read bio request could be partially filled by the write
+>>>> +                * buffer, but there are some holes that need to be read from
+>>>> +                * the drive. In order to handle this, we will use block layer
+>>>> +                * mechanism to split this request in to smaller ones.
+>>>> +                */
+>>>> +               split_bio = bio_split(bio, NR_PHY_IN_LOG, GFP_KERNEL,
+>>>> +                                       &pblk_bio_set);
+>>> This is quite inefficient. If you have an rqd with 63 sectors on the device and
+>>> the 64th is cached, you are splitting 63 times whereas a single split
+>>> would be sufficient.
+>>
+>> Yeah, definitely, it would be better to find how many contiguous sectors in cache/on drive are and splitting based on it. Will improve that in v2.
+>>
+>>>> +               bio_chain(split_bio, bio);
+>>> I am not sure if it's needed but in blk_queue_split() these flags are set
+>>> before making the request:
+>>>          split->bi_opf |= REQ_NOMERGE;
+>>>          bio_set_flag(*bio, BIO_QUEUE_ENTERED);
+>>>> +               generic_make_request(bio);
+>>> pblk_lookup_l2p_seq() increments line->ref. You have to release the krefs before
+>>> requeing the request.
+>> I completely forgot about it, will fix that of course, thanks!
+>>
+>>> You might consider introducing a pblk_lookup_l2p_uncached() which returns when
+>>> it finds a cached sector and returns its index. Doing so you can avoid obtaining
+>>> superfluous line->refs and we could also get rid of the read_bitmap
+>>> entirely. This
+>>> index could also be used to split the bio at the right position.
 > 
-> syzbot found the following crash on:
 > 
-> HEAD commit:    9c7dc824 Merge tag '5.1-rc-smb3' of git://git.samba.org/sf..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=148a35fb200000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=7e1aaa1cfbfe1abf
-> dashboard link: https://syzkaller.appspot.com/bug?extid=9bdc1adc1c55e7fe765b
-> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+> I think you can also get rid of the read_bitmap. This would help
+> removing one of the 64 lba dependencies in pblk, which I think is useful
+> as we move forward.
+
+Sure, makes sense - I'll post this as a part of v2.
 > 
-> Unfortunately, I don't have any reproducer for this crash yet.
-> 
-> IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> Reported-by: syzbot+9bdc1adc1c55e7fe765b@syzkaller.appspotmail.com
-> 
-> kasan: CONFIG_KASAN_INLINE enabled
-> kasan: GPF could be caused by NULL-ptr deref or user memory access
-> general protection fault: 0000 [#1] PREEMPT SMP KASAN
-> CPU: 1 PID: 9499 Comm: syz-executor.4 Not tainted 5.0.0+ #25
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google
-> 01/01/2011
-> RIP: 0010:loop_validate_file+0x23e/0x310 drivers/block/loop.c:652
-> Code: 00 48 89 f8 48 c1 e8 03 42 80 3c 38 00 0f 85 d4 00 00 00 4d 8b a4 24 f0 00
-> 00 00 49 8d bc 24 b8 01 00 00 48 89 f8 48 c1 e8 03 <42> 80 3c 38 00 0f 85 a8 00
-> 00 00 4d 8b a4 24 b8 01 00 00 4c 89 e0
-> RSP: 0018:ffff88804d2bfb18 EFLAGS: 00010202
-> RAX: 0000000000000037 RBX: ffff888095ffa3d8 RCX: ffffc9000e657000
-> RDX: 0000000000000077 RSI: ffffffff83e754ed RDI: 00000000000001b8
-> RBP: ffff88804d2bfb40 R08: ffff88808eab41c0 R09: fffffbfff11d981d
-> R10: ffff88804d2bfb40 R11: ffffffff88ecc0e7 R12: 0000000000000000
-> R13: 0000000000000002 R14: ffff888095ffa800 R15: dffffc0000000000
-> FS:  00007f04b0c91700(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000625208 CR3: 00000000a7af8000 CR4: 00000000001406e0
-> Call Trace:
->  loop_set_fd drivers/block/loop.c:930 [inline]
->  lo_ioctl+0x99d/0x2150 drivers/block/loop.c:1542
->  __blkdev_driver_ioctl block/ioctl.c:303 [inline]
->  blkdev_ioctl+0xee8/0x1c40 block/ioctl.c:605
->  block_ioctl+0xee/0x130 fs/block_dev.c:1931
->  vfs_ioctl fs/ioctl.c:46 [inline]
->  file_ioctl fs/ioctl.c:509 [inline]
->  do_vfs_ioctl+0xd6e/0x1390 fs/ioctl.c:696
->  ksys_ioctl+0xab/0xd0 fs/ioctl.c:713
->  __do_sys_ioctl fs/ioctl.c:720 [inline]
->  __se_sys_ioctl fs/ioctl.c:718 [inline]
->  __x64_sys_ioctl+0x73/0xb0 fs/ioctl.c:718
->  do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
->  entry_SYSCALL_64_after_hwframe+0x49/0xbe
-> RIP: 0033:0x458079
-> Code: ad b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89
-> d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 7b
-> b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00
-> RSP: 002b:00007f04b0c90c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000458079
-> RDX: 0000000000000004 RSI: 0000000000004c00 RDI: 0000000000000003
-> RBP: 000000000073bf00 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 00007f04b0c916d4
-> R13: 00000000004c1252 R14: 00000000004d3160 R15: 00000000ffffffff
-> Modules linked in:
-> ---[ end trace 81b29486bae7280a ]---
-> RIP: 0010:loop_validate_file+0x23e/0x310 drivers/block/loop.c:652
-> Code: 00 48 89 f8 48 c1 e8 03 42 80 3c 38 00 0f 85 d4 00 00 00 4d 8b a4 24 f0 00
-> 00 00 49 8d bc 24 b8 01 00 00 48 89 f8 48 c1 e8 03 <42> 80 3c 38 00 0f 85 a8 00
-> 00 00 4d 8b a4 24 b8 01 00 00 4c 89 e0
-> RSP: 0018:ffff88804d2bfb18 EFLAGS: 00010202
-> RAX: 0000000000000037 RBX: ffff888095ffa3d8 RCX: ffffc9000e657000
-> RDX: 0000000000000077 RSI: ffffffff83e754ed RDI: 00000000000001b8
-> RBP: ffff88804d2bfb40 R08: ffff88808eab41c0 R09: fffffbfff11d981d
-> R10: ffff88804d2bfb40 R11: ffffffff88ecc0e7 R12: 0000000000000000
-> R13: 0000000000000002 R14: ffff888095ffa800 R15: dffffc0000000000
-> FS:  00007f04b0c91700(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000625208 CR3: 00000000a7af8000 CR4: 00000000001406e0
-> 
-> 
-> ---
-> This bug is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this bug report. See:
-> https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with syzbot.
