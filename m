@@ -6,66 +6,68 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A27C43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:15:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1157AC43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:21:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CAAAE20863
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:15:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C961F2085A
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:21:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="PCNxY+Gj"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="tSAIpPkB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726753AbfCROPL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 10:15:11 -0400
-Received: from mail-it1-f194.google.com ([209.85.166.194]:50649 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726356AbfCROPL (ORCPT
+        id S1727012AbfCROVm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 10:21:42 -0400
+Received: from mail-it1-f195.google.com ([209.85.166.195]:52350 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726466AbfCROVl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 10:15:11 -0400
-Received: by mail-it1-f194.google.com with SMTP id m137so5089016ita.0
-        for <linux-block@vger.kernel.org>; Mon, 18 Mar 2019 07:15:10 -0700 (PDT)
+        Mon, 18 Mar 2019 10:21:41 -0400
+Received: by mail-it1-f195.google.com with SMTP id g17so20689799ita.2
+        for <linux-block@vger.kernel.org>; Mon, 18 Mar 2019 07:21:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=UEvuBP4aWr3OZ9AbbtlftQYNPHMcYiA4Lc7tJGEj2d8=;
-        b=PCNxY+GjJLNG3IzzkvalG7bq0ayQXLFHhvR42imaxaxJV53WouFQgAUiTP6csgOLE6
-         lXzbD55wujjKY4aQ+fDuNDQRYqxLxHpFn3diV5UljP2Kg+0AXCniQ+PKPyXMpowZ5Ykj
-         DylaGsYPu2aXi9Y/BtWe/I495Od/ngTjS8nCUZg3kL2f+56pVAAo2bVkGnPc8HtCT9tF
-         ku4fosPO/U16WCHNmfUZ/0bZQkFhMa845TEKNskdfDBw/4vOD7TkajcH93dJxpqJTq+F
-         rjZMMH2or8ic2JmrU3iGxU7mHwrGuKcs2whuiWpvlRTFKjTd+1/CdH2Bc32+16GJdV0s
-         menA==
+        bh=3+eAWS/Rmc6f7GwRJVmc9nC5CxO0UcnP7Zod6D16lqU=;
+        b=tSAIpPkB05uDR+b9SKj/vLk1S5eLFEW6C3+lscD2/hWQRnnyGnJKV8tOgvBccDQs04
+         LuMo6kTjA06s17gxwj8At93ZTi3DZUFUAfE+ax9aOCjLgy6VFiS1KUdD+Ssnu4FcEH2D
+         wRo2gaNG6GXj5q4IJTsoc9/JwJ4WsqAoEmKKqeyLZmDosq8Rq5AcqdCDST94l11KHRJU
+         RjDXY5me8VOVc0uT79cpV8pW4inrGeO7WxgSL+MhbkxEcJpY/GYgffGWq/Zfb70zvm/s
+         Jk0LaCH05tP+vlJs2b/WcPS6YZSaE4ZdvtRG9ET9WmyLJA5i0+Yt8NDDksQTT+k2aCwx
+         PakA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=UEvuBP4aWr3OZ9AbbtlftQYNPHMcYiA4Lc7tJGEj2d8=;
-        b=B9OQaKFN4/tly47ZaaXRSScJWQ8EDPjGvOt7adViTUCRztMv5WjPasu54izQQwy2+d
-         0RE8zdfsY6ys2X9CxG1GkQBJYkaJDBz72um6yWKtpZj5V0gW1Li6JVZUx7QuSLL4Utaa
-         Rm/Qh6AtLdcBD/UZFHJC/hkfgfK+hmYRxwCMBxDLZTMv4t+4gYCjU9W9Qv0LvQAR47LB
-         caqKIpWJhxWCJUOpxJ2f5wFGf571Tu7F3LHkX9mCz6htq+N6JTYKcInGpqkWfYsSjx6u
-         f3rM2X6RiCs+I6hJbDdQuxWlI8stEqo0/9S0kNLV6A7iFkaDIHBfrSV3CMs2x4sg3g+y
-         NDlA==
-X-Gm-Message-State: APjAAAX+YkUyWTaSvk8IkZEfwRfWwgdcxxA0q3wTJ2sygXfYMEELdEOh
-        ZT8aKVirQFUBXMeemjS11zztgqxady1qEg==
-X-Google-Smtp-Source: APXvYqwV6URnb30AZ6YG/UCfvssSS/2/lYECQee/weuRiLlVjI9AmQABmW0R9RdTsui4WioFRz9rIA==
-X-Received: by 2002:a24:3c53:: with SMTP id m80mr6273097ita.102.1552918509612;
-        Mon, 18 Mar 2019 07:15:09 -0700 (PDT)
+        bh=3+eAWS/Rmc6f7GwRJVmc9nC5CxO0UcnP7Zod6D16lqU=;
+        b=Xkqlg32u5BenVI5kIMeZ8faPQZD0SRx0F850qVB/QBI70GTy6mPZSmuu1oeQZElAKy
+         tspOp2h3OcNWMkBmU+GF0iYvBAcQ9K+5+UYe+mqs7XYE709D6Dh7ELB5yT1C38RbZh2/
+         EHe4RyY/FUXJ4GjbN3urFLg33x7rOWEEC29W4rWPFyfOMYO7DupmFGiCk4300NIVm+m0
+         3uJcZdw0xR8OSPbFpHeEAcg3KCVYv6a7Hp9W07XBAEVAZZU8kSUKssXW6c4EL0kZUlXn
+         U0Tk4ofKCk8qyIaB2C4k/Nn72BS8IBpbIkVYhxvrqYC46zsc/DCQAYYmEH84PCiBrqis
+         Vk3A==
+X-Gm-Message-State: APjAAAWQsus5e9qgfqdeAm9tKdIsGPneLSl1ZqIBxsM5I8HwnOKhwudn
+        nXKaM94qegRBUdoiSK46nRsQ7xbW6wXS2g==
+X-Google-Smtp-Source: APXvYqyYuaYDqCSh8xnnjVgv6aCwNdZGp+Qz387KHmKQwg1GeVczfDKJkSVkUVLhkpe50aByitngrg==
+X-Received: by 2002:a24:1747:: with SMTP id 68mr8917990ith.62.1552918900809;
+        Mon, 18 Mar 2019 07:21:40 -0700 (PDT)
 Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id o129sm240313ito.0.2019.03.18.07.15.08
+        by smtp.gmail.com with ESMTPSA id t74sm186626itb.11.2019.03.18.07.21.39
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 18 Mar 2019 07:15:08 -0700 (PDT)
-Subject: Re: [PATCH] blk-mq: use blk_mq_sched_mark_restart_hctx to set RESTART
-To:     Yufen Yu <yuyufen@huawei.com>
-Cc:     linux-block@vger.kernel.org
-References: <20190315030510.36531-1-yuyufen@huawei.com>
+        Mon, 18 Mar 2019 07:21:39 -0700 (PDT)
+Subject: Re: [PATCH 1/1] loop: access lo_backing_file only when the loop
+ device is Lo_bound
+To:     Dongli Zhang <dongli.zhang@oracle.com>, linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, jack@suse.cz,
+        penguin-kernel@i-love.sakura.ne.jp
+References: <1552911797-20455-1-git-send-email-dongli.zhang@oracle.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <3c176be6-afeb-6770-c112-ff1026e40c45@kernel.dk>
-Date:   Mon, 18 Mar 2019 08:15:08 -0600
+Message-ID: <2debdd71-c444-a04b-c308-097d8e51ee4c@kernel.dk>
+Date:   Mon, 18 Mar 2019 08:21:39 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <20190315030510.36531-1-yuyufen@huawei.com>
+In-Reply-To: <1552911797-20455-1-git-send-email-dongli.zhang@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -74,11 +76,40 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/14/19 9:05 PM, Yufen Yu wrote:
-> Let blk_mq_mark_tag_wait() use the blk_mq_sched_mark_restart_hctx()
-> to set BLK_MQ_S_SCHED_RESTART.
+On 3/18/19 6:23 AM, Dongli Zhang wrote:
+> Commit 758a58d0bc67 ("loop: set GENHD_FL_NO_PART_SCAN after
+> blkdev_reread_part()") separates "lo->lo_backing_file = NULL" and
+> "lo->lo_state = Lo_unbound" into different critical regions protected by
+> loop_ctl_mutex.
+> 
+> However, there is below race that the NULL lo->lo_backing_file would be
+> accessed when the backend of a loop is another loop device, e.g., loop0's
+> backend is a file, while loop1's backend is loop0.
+> 
+> loop0's backend is file            loop1's backend is loop0
+> 
+> __loop_clr_fd()
+>   mutex_lock(&loop_ctl_mutex);
+>   lo->lo_backing_file = NULL; --> set to NULL
+>   mutex_unlock(&loop_ctl_mutex);
+>                                    loop_set_fd()
+>                                      mutex_lock_killable(&loop_ctl_mutex);
+>                                      loop_validate_file()
+>                                        f = l->lo_backing_file; --> NULL
+>                                          access if loop0 is not Lo_unbound
+>   mutex_lock(&loop_ctl_mutex);
+>   lo->lo_state = Lo_unbound;
+>   mutex_unlock(&loop_ctl_mutex);
+> 
+> lo->lo_backing_file should be accessed only when the loop device is
+> Lo_bound.
+> 
+> In fact, the problem has been introduced already in commit 7ccd0791d985
+> ("loop: Push loop_ctl_mutex down into loop_clr_fd()") after which
+> loop_validate_file() could see devices in Lo_rundown state with which it
+> did not count. It was harmless at that point but still.
 
-Applied, thanks.
+Thanks, applied.
 
 -- 
 Jens Axboe
