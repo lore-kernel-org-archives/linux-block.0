@@ -2,103 +2,95 @@ Return-Path: <SRS0=WbMh=RV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BEB8C43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 16:26:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 023B7C43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 17:16:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DCAE62087E
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 16:26:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="znq+fTgc"
+	by mail.kernel.org (Postfix) with ESMTP id CCACC20863
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 17:16:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726958AbfCRQ0D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 12:26:03 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:32851 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726922AbfCRQ0D (ORCPT
+        id S1727188AbfCRRQ1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 13:16:27 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:46648 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726765AbfCRRQ1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 12:26:03 -0400
-Received: by mail-pf1-f196.google.com with SMTP id i19so11626652pfd.0
-        for <linux-block@vger.kernel.org>; Mon, 18 Mar 2019 09:26:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=cUscf38WuHw/6CRtCjGBOmERQXd4dmutO0qrnxAL9nE=;
-        b=znq+fTgc76k/hT+k+LOXD9SwWU9zrMKqCnutwAdfDZDDXlhsmAJMqsDEnTm/+05x63
-         7A5QOSHzt/2Xm2HsqvNGjqikBpQAeUceDckAVisE65AVD6iAXT8KLXdQbqigm3dIaee5
-         GJqrPZgJuDZoWOMiGJqx1z2bNzyZPZvsrw0qjGlCSHM+HVGhY9GRWGncObNBIVVaNlnW
-         GSynupzHP/R3Q+6lUrzx5tU3AR8/apsNBi5L7M+CErHUuVaFlTs1yHnv6dlqxn7tkZHH
-         ZA9ToqWnw+XekLdMUvgtzFFl883KUQoZ9iaNAfhvQ7PKAVv+zPyWbE8pEM9nUuIzKB84
-         W3Qg==
+        Mon, 18 Mar 2019 13:16:27 -0400
+Received: by mail-pg1-f194.google.com with SMTP id a22so11805562pgg.13;
+        Mon, 18 Mar 2019 10:16:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=cUscf38WuHw/6CRtCjGBOmERQXd4dmutO0qrnxAL9nE=;
-        b=XoadfznSkFHQFxjOvVZ19LcHpg0aT8QrBx6+u/JYji7HVvv0DGOKbCmDKdtTTBPlzZ
-         10WBjWjjlfqohEoVZRY7mwz92KpXFDIyjQ1kuyo9gk4BRr9Djjpf4m1lk+TQvEn+0/iZ
-         z81Ws2f+U1uBuGeXq8YCLjsQKZD9uk1MNQLpoKlfGalPp3oN4HfOGNTtZS/9fbUd3VZE
-         7p1IO6IWpzLmt6iE4LpPTT6F5tEsesiKrszQ+kq0/CV4MyCjL6JmW+cF53R1bIOpe8sh
-         Wbml0gVoqesSP95jac7lddcoP7LJCzJfk+tCOwqVh8jqMb554/8lq9hetDHczzNpPR8q
-         XHYg==
-X-Gm-Message-State: APjAAAWFyc58bY+gihXQ/qc6RPNYdrL+LoLl3ro8jDUkzif65rPk2FP0
-        9C32rx2VWzJoISToU2aVctc1EI/AxPuuUQ==
-X-Google-Smtp-Source: APXvYqzqWP0FG871fQ9cNYp0JQCeilTr7PbmpgSV8wDsBn8NXEDbTxD1Tx1+aNOF4dKxfn6eZmTFcw==
-X-Received: by 2002:a63:540c:: with SMTP id i12mr18355811pgb.69.1552926361713;
-        Mon, 18 Mar 2019 09:26:01 -0700 (PDT)
-Received: from [10.111.76.104] (rap-us.hgst.com. [199.255.44.250])
-        by smtp.gmail.com with ESMTPSA id h3sm6589977pfb.31.2019.03.18.09.26.00
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 18 Mar 2019 09:26:00 -0700 (PDT)
-Subject: Re: [PATCH 01/18] lightnvm: pblk: fix warning in pblk_l2p_init()
-To:     Igor Konopko <igor.j.konopko@intel.com>, javier@javigon.com,
-        hans.holmberg@cnexlabs.com
-Cc:     linux-block@vger.kernel.org
-References: <20190314160428.3559-1-igor.j.konopko@intel.com>
- <20190314160428.3559-2-igor.j.konopko@intel.com>
-From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <5527ef9e-0e09-7bd8-9d2d-b9638425c86e@lightnvm.io>
-Date:   Mon, 18 Mar 2019 09:25:59 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.5.3
-MIME-Version: 1.0
-In-Reply-To: <20190314160428.3559-2-igor.j.konopko@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=V4E1evcqLqxZDwrDpf1S27x2FhHzdkvtC33qAjLzojw=;
+        b=k70YN2MjuvxTsPlE+Ntb4dm/K0jBmhHpFBds3jpqqLYMrCFz3yk/1FLMyHcSZiV+fa
+         gX1ukPmpLrEfSHv+CjjahlsgpICTBVcgNvnekY1TRsi33srN4NPOR1sDbgeCE01Fka99
+         BGD8pI8oYJP++elbbuNdnfAc099sVtbWMxGT+NYO9Vbutf0d83r1W5RSQqtZrr8b4Nmz
+         FtLwsHuyf6Z7cCugWsglxSFQWFgfsGAEA9LhxMuUCPB0yGu10glfCwYe3oFEc5KchJbh
+         kbYNzFr+ELqjdls2GPwJT6onJOWMoUxtcbiOa6vDqjwws/9Ejv0NRRcJsOxmXPTm0K8Z
+         9OtA==
+X-Gm-Message-State: APjAAAWkfOaEd2opYf1CddOaKJqN/MYcZL1xxuSp24iHRo1c6Ydzc1f1
+        PpXSmDVT9yLvyOP4EXwy4es1QadJo1w=
+X-Google-Smtp-Source: APXvYqxUm3w2rctlqHvfzCxw5PpFZYfXdmB7cCThe5p5W3sSylHV9U4SRMmLhsnxCXJG82eEKv71YQ==
+X-Received: by 2002:a65:6210:: with SMTP id d16mr18684648pgv.189.1552929386882;
+        Mon, 18 Mar 2019 10:16:26 -0700 (PDT)
+Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id z6sm47644372pgo.31.2019.03.18.10.16.25
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 18 Mar 2019 10:16:25 -0700 (PDT)
+Message-ID: <1552929384.152266.27.camel@acm.org>
+Subject: Re: [PATCH 5/8] nbd: use blk_mq_queue_tag_busy_iter
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jianchao Wang <jianchao.w.wang@oracle.com>, axboe@kernel.dk
+Cc:     hch@lst.de, jthumshirn@suse.de, hare@suse.de, josef@toxicpanda.com,
+        sagi@grimberg.me, keith.busch@intel.com, jsmart2021@gmail.com,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Date:   Mon, 18 Mar 2019 10:16:24 -0700
+In-Reply-To: <1552640264-26101-6-git-send-email-jianchao.w.wang@oracle.com>
+References: <1552640264-26101-1-git-send-email-jianchao.w.wang@oracle.com>
+         <1552640264-26101-6-git-send-email-jianchao.w.wang@oracle.com>
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/14/19 9:04 AM, Igor Konopko wrote:
-> This patch fixes a compilation warning caused by improper format
-> specifier provided in pblk_l2p_init().
-> 
-> Fixes: fe0c220 ("lightnvm: pblk: cleanly fail when there is not enough memory")
-> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-> ---
->   drivers/lightnvm/pblk-init.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-> index 1940f89..1e227a0 100644
-> --- a/drivers/lightnvm/pblk-init.c
-> +++ b/drivers/lightnvm/pblk-init.c
-> @@ -159,7 +159,7 @@ static int pblk_l2p_init(struct pblk *pblk, bool factory_init)
->   					| __GFP_RETRY_MAYFAIL | __GFP_HIGHMEM,
->   					PAGE_KERNEL);
->   	if (!pblk->trans_map) {
-> -		pblk_err(pblk, "failed to allocate L2P (need %ld of memory)\n",
-> +		pblk_err(pblk, "failed to allocate L2P (need %zu of memory)\n",
->   				map_size);
->   		return -ENOMEM;
->   	}
-> 
+On Fri, 2019-03-15 at 16:57 +-0800, Jianchao Wang wrote:
++AD4 blk+AF8-mq+AF8-tagset+AF8-busy+AF8-iter is not safe that it could get stale request
++AD4 in tags-+AD4-rqs+AFsAXQ. Use blk+AF8-mq+AF8-queue+AF8-tag+AF8-busy+AF8-iter here.
++AD4 
++AD4 Signed-off-by: Jianchao Wang +ADw-jianchao.w.wang+AEA-oracle.com+AD4
++AD4 ---
++AD4  drivers/block/nbd.c +AHw 2 +-
++AD4  1 file changed, 1 insertion(), 1 deletion(-)
++AD4 
++AD4 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
++AD4 index 7c9a949..9e7e828 100644
++AD4 --- a/drivers/block/nbd.c
++AD4 +-+-+- b/drivers/block/nbd.c
++AD4 +AEAAQA -747,7 +-747,7 +AEAAQA static bool nbd+AF8-clear+AF8-req(struct request +ACo-req, void +ACo-data, bool reserved)
++AD4  static void nbd+AF8-clear+AF8-que(struct nbd+AF8-device +ACo-nbd)
++AD4  +AHs
++AD4         blk+AF8-mq+AF8-quiesce+AF8-queue(nbd-+AD4-disk-+AD4-queue)+ADs
++AD4 -       blk+AF8-mq+AF8-tagset+AF8-busy+AF8-iter(+ACY-nbd-+AD4-tag+AF8-set, nbd+AF8-clear+AF8-req, NULL)+ADs
++AD4 +-       blk+AF8-mq+AF8-queue+AF8-tag+AF8-busy+AF8-iter(nbd-+AD4-disk-+AD4-queue, nbd+AF8-clear+AF8-req, NULL, true)+ADs
++AD4         blk+AF8-mq+AF8-unquiesce+AF8-queue(nbd-+AD4-disk-+AD4-queue)+ADs
++AD4         dev+AF8-dbg(disk+AF8-to+AF8-dev(nbd-+AD4-disk), +ACI-queue cleared+AFw-n+ACI)+ADs
++AD4  +AH0
 
-Thanks Igor. I pulled it into the original patch.
+Hi Jianchao,
+
+The nbd driver calls nbd+AF8-clear+AF8-que() after having called sock+AF8-shutdown(). So
+what makes you think that it's not safe to call blk+AF8-mq+AF8-tagset+AF8-busy+AF8-iter()
+from nbd+AF8-clear+AF8-que()?
+
+Thanks,
+
+Bart.
