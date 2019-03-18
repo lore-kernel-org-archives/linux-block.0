@@ -6,30 +6,30 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 263CDC10F00
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:02:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3F5BC43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:02:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EA45C20863
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:02:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8CDEC206C0
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 14:02:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727605AbfCROCu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 10:02:50 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:37152 "EHLO huawei.com"
+        id S1726782AbfCROCw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 10:02:52 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:36380 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726093AbfCROCt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 10:02:49 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id CB0D035276FDAB61C688;
+        id S1727602AbfCROCv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Mar 2019 10:02:51 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id A8BEA6084FFF19F973FC;
         Mon, 18 Mar 2019 22:02:47 +0800 (CST)
 Received: from huawei.com (10.90.53.225) by DGGEMS401-HUB.china.huawei.com
  (10.3.19.201) with Microsoft SMTP Server id 14.3.408.0; Mon, 18 Mar 2019
- 22:02:45 +0800
+ 22:02:46 +0800
 From:   Yufen Yu <yuyufen@huawei.com>
 To:     <axboe@kernel.dk>
 CC:     <linux-block@vger.kernel.org>, <tj@kernel.org>, <hch@lst.de>
-Subject: [PATCH 1/2] block: remove devt from ext_devt_idr when delete partition
-Date:   Mon, 18 Mar 2019 22:07:02 +0800
-Message-ID: <20190318140703.28963-2-yuyufen@huawei.com>
+Subject: [PATCH 2/2] block: remove unnecessary statement in blk_free_devt
+Date:   Mon, 18 Mar 2019 22:07:03 +0800
+Message-ID: <20190318140703.28963-3-yuyufen@huawei.com>
 X-Mailer: git-send-email 2.16.2.dirty
 In-Reply-To: <20190318140703.28963-1-yuyufen@huawei.com>
 References: <20190318140703.28963-1-yuyufen@huawei.com>
@@ -42,56 +42,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In part_release(), it will remove devt from ext_devt_idr and
-get_gendisk cannot find it. But, if disk_release() works before
-part_release, open device partition may cause use-after-free of
-disk in get_gendisk(). We use md device as example, the race sence:
-
-Process1	Worker			Process2
-md_free
-					blkdev_open
-del_gendisk
-  add delete_partition_work_fn() to wq
-  					__blkdev_get
-					get_gendisk
-put_disk
-  disk_release
-    kfree(disk)
-    					find part from ext_devt_idr
-					get_disk_and_module(disk)
-    					  cause use after free
-
-    		delete_partition_work_fn
-		put_device(part)
-    		  part_release
-		    remove part from ext_devt_idr
-
-Before Woker thread removes part from ext_devt_idr, Process2 can find
-the part and access the disk, resulting use-after-free.
-
-We fix this by removing the devt from ext_devt_idr when delete partition.
+If devt is MKDEV(0, 0), its MAJOR cannot be BLOCK_EXT_MAJOR,
+so, I think we can remove the statement.
 
 Signed-off-by: Yufen Yu <yuyufen@huawei.com>
 ---
- block/partition-generic.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ block/genhd.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/block/partition-generic.c b/block/partition-generic.c
-index 1ee3e1d1bc2a..30d1039d5e8d 100644
---- a/block/partition-generic.c
-+++ b/block/partition-generic.c
-@@ -288,6 +288,11 @@ void delete_partition(struct gendisk *disk, int partno)
- 	kobject_put(part->holder_dir);
- 	device_del(part_to_dev(part));
- 
-+	/*
-+	 * We should ensuere to delete part from idr before kfree(disk),
-+	 * avoiding use-after-free of disk.
-+	 */
-+	blk_free_devt(part_devt(part));
- 	hd_struct_kill(part);
- }
- 
+diff --git a/block/genhd.c b/block/genhd.c
+index f00198e6758a..961b2bc4634f 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -522,9 +522,6 @@ int blk_alloc_devt(struct hd_struct *part, dev_t *devt)
+  */
+ void blk_free_devt(dev_t devt)
+ {
+-	if (devt == MKDEV(0, 0))
+-		return;
+-
+ 	if (MAJOR(devt) == BLOCK_EXT_MAJOR) {
+ 		spin_lock_bh(&ext_devt_lock);
+ 		idr_remove(&ext_devt_idr, blk_mangle_minor(MINOR(devt)));
 -- 
 2.16.2.dirty
 
