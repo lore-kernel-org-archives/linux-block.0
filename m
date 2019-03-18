@@ -2,77 +2,116 @@ Return-Path: <SRS0=WbMh=RV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25796C43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 17:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF448C43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 17:31:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F015F20854
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 17:28:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8EBFF20989
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 17:31:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="XnDqyQIg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726767AbfCRR2J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 13:28:09 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:38316 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726765AbfCRR2J (ORCPT
+        id S1726773AbfCRRbA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 13:31:00 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:37819 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726765AbfCRRbA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 13:28:09 -0400
-Received: by mail-pf1-f196.google.com with SMTP id n125so11722628pfn.5;
-        Mon, 18 Mar 2019 10:28:08 -0700 (PDT)
+        Mon, 18 Mar 2019 13:31:00 -0400
+Received: by mail-pg1-f196.google.com with SMTP id q206so11869198pgq.4
+        for <linux-block@vger.kernel.org>; Mon, 18 Mar 2019 10:30:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=+VrQH3cs+pQ9NWRQ08YnxQceXRyyvIn4lVuNrLgWMk8=;
+        b=XnDqyQIgzkeI5Gy7jUo8E98YyRGDt6GBH951NGzLa/IBY3SLBaA8tJQqKa+MCeG4IS
+         Z61jQBoBuYOPh+Az4BGjGNLYGQx8/IkR4i7q4WTpTlCY/IR3qUDNhGzLqdL+qpjYHW+s
+         cXu4u4Ib8HeqU1BJkO1xkctCaKmtasmksA47U=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=5KE4wyfuPK8v8HlyIMBIYRZHkOOdHrncsG0EpVpGZwU=;
-        b=C7EXqa+Mw2udDaXmJMom8Bu3DzTWeTpo2I6vv3aYnm8+wlMi1g8gZyZbMAVT7MfPKK
-         QpWZ+mAr1U70q40ropFirP1/CxJnaS8+KPmRBRLYKjZMnGiejuy8Z6ZVS6zGux9Oj5GA
-         3Gva1m1UCiA5kFIXdMT0wXjuLk/wvwHK1r90uKpj34vF2saUwRLaNSJ3H70fLcJF1/Vn
-         gm10jnwaghpq+2OWmBxJlIuyRYrM9plRK9OBr8aKeX+wpWx/KcpempZq9Vt3N5wKRf/S
-         94OmZZVqTL4dqfdbLjVtob3V6+8UFyDffEE5agas44Md6vuuaAqQNNXqIoNOPdeqJjf1
-         ZBlw==
-X-Gm-Message-State: APjAAAWvZgrmk8TyvTdAsNrtLyMSu3qkC9p1JX5oF+ASg1BRmd87abhJ
-        AmjPbQLV0SlmTVDWj6RaOtE=
-X-Google-Smtp-Source: APXvYqxgsrVM9i5/x26a7Ori9du9Nh5vFam+SaNl68I4xRJ3CN5fa89ZLkFSxN2qHUjoGCIC6ZaE4Q==
-X-Received: by 2002:a63:ef57:: with SMTP id c23mr8565915pgk.176.1552930088073;
-        Mon, 18 Mar 2019 10:28:08 -0700 (PDT)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id m32sm1137034pgb.13.2019.03.18.10.28.06
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 18 Mar 2019 10:28:06 -0700 (PDT)
-Message-ID: <1552930085.152266.36.camel@acm.org>
-Subject: Re: [PATCH 0/8]: blk-mq: use static_rqs to iterate busy tags
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jianchao Wang <jianchao.w.wang@oracle.com>, axboe@kernel.dk
-Cc:     hch@lst.de, jthumshirn@suse.de, hare@suse.de, josef@toxicpanda.com,
-        sagi@grimberg.me, keith.busch@intel.com, jsmart2021@gmail.com,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Date:   Mon, 18 Mar 2019 10:28:05 -0700
-In-Reply-To: <1552640264-26101-1-git-send-email-jianchao.w.wang@oracle.com>
-References: <1552640264-26101-1-git-send-email-jianchao.w.wang@oracle.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=+VrQH3cs+pQ9NWRQ08YnxQceXRyyvIn4lVuNrLgWMk8=;
+        b=SZAZuwLrbSVGuA/R1S1bOt0GNOcsDQt2gQfhawbQyC+j6SQGtMCRDrADLanuuEh4Wn
+         HaLAO1lbwszmO+lr+BbXYIjDmwEAEVgLO7n67gik9Ms3S8x+5W5+uyOhDA0sX5FUBYBg
+         AOo9AAPrBnbFZEohTqVbDZEvmi4Y8m9ToXxfpwlNimxtRac1u6+7HJrowxcxwH2msLW8
+         Q0Ixssfx/3ucXtzl5dwZ+Vu0QgCNjwklsCJk/a6trRXjhak0p1/I2CTOFahISvOgVJr9
+         Pn0P3YWy/BltVW/TCJmv1H0GHfO8EMq4usYcBOODZh/MaikhlBsCsWooKRGxyMC3h4Hz
+         cO8w==
+X-Gm-Message-State: APjAAAVI3/hHOgp4mpJPe+Lfw3MQSR9oobpTukDmkMNj5YCdFreEBP8x
+        d8kVy+2wZlXnuztx9z7ZhBVnE8QL6Nw=
+X-Google-Smtp-Source: APXvYqysGQplly8c/Nv9usH9GYG/5edDjGMas2z5AOOnPMGYtntF2/xgtGSlcOWjg4/Kky4mFMB/GA==
+X-Received: by 2002:a17:902:20e3:: with SMTP id v32mr20941193plg.213.1552930259531;
+        Mon, 18 Mar 2019 10:30:59 -0700 (PDT)
+Received: from [10.69.37.149] ([192.19.223.250])
+        by smtp.gmail.com with ESMTPSA id u14sm16455374pfm.66.2019.03.18.10.30.58
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 18 Mar 2019 10:30:58 -0700 (PDT)
+Subject: Re: [PATCH 1/2] blk-mq: introduce blk_mq_complete_request_sync()
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        linux-nvme@lists.infradead.org
+References: <20190318032950.17770-1-ming.lei@redhat.com>
+ <20190318032950.17770-2-ming.lei@redhat.com>
+ <f708ee0c-dfa4-0bca-f996-8d834471f1fd@acm.org>
+From:   James Smart <james.smart@broadcom.com>
+Message-ID: <c6a28972-d33f-6d65-2123-19875db0c07f@broadcom.com>
+Date:   Mon, 18 Mar 2019 10:30:57 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.3
+MIME-Version: 1.0
+In-Reply-To: <f708ee0c-dfa4-0bca-f996-8d834471f1fd@acm.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 2019-03-15 at 16:57 +-0800, Jianchao Wang wrote:
-+AD4 +AFs-2+AF0 https://marc.info/?l+AD0-linux-block+ACY-m+AD0-154526189023236+ACY-w+AD0-2
 
-Hi Jianchao,
+On 3/17/2019 9:09 PM, Bart Van Assche wrote:
+> On 3/17/19 8:29 PM, Ming Lei wrote:
+>> In NVMe's error handler, follows the typical steps for tearing down
+>> hardware:
+>>
+>> 1) stop blk_mq hw queues
+>> 2) stop the real hw queues
+>> 3) cancel in-flight requests via
+>>     blk_mq_tagset_busy_iter(tags, cancel_request, ...)
+>> cancel_request():
+>>     mark the request as abort
+>>     blk_mq_complete_request(req);
+>> 4) destroy real hw queues
+>>
+>> However, there may be race between #3 and #4, because 
+>> blk_mq_complete_request()
+>> actually completes the request asynchronously.
+>>
+>> This patch introduces blk_mq_complete_request_sync() for fixing the
+>> above race.
+>
+> Other block drivers wait until outstanding requests have completed by 
+> calling blk_cleanup_queue() before hardware queues are destroyed. Why 
+> can't the NVMe driver follow that approach?
+>
 
-That is a reference to the +ACI-BUG: KASAN: use-after-free in bt+AF8-iter+ACI issue.
-I think that issue can be fixed in another way than modifying all code that
-iterates over tags, namely by adding an rcu+AF8-read+AF8-lock() / rcu+AF8-read+AF8-unlock()
-pair in bt+AF8-for+AF8-each() and bt+AF8-tags+AF8-for+AF8-each() and by changing the calls in
-blk+AF8-mq+AF8-free+AF8-rqs() and blk+AF8-free+AF8-flush+AF8-queue() that free the data structures
-used by the tag iteration functions into kfree+AF8-rcu() or call+AF8-rcu() calls.
+speaking for the fabrics, not necessarily pci:
 
-Thanks,
+The intent of this looping, which happens immediately following an error 
+being detected, is to cause the termination of the outstanding requests. 
+Otherwise, the only recourse is to wait for the ios to finish, which 
+they may never do, or have their upper-level timeout expire to cause 
+their termination - thus a very long delay.   And one of the commands, 
+on the admin queue - a different tag set but handled the same, doesn't 
+have a timeout (the Async Event Reporting command) so it wouldn't 
+necessarily clear without this looping.
 
-Bart.
+-- james
+
