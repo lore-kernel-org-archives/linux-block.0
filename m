@@ -2,209 +2,149 @@ Return-Path: <SRS0=WbMh=RV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 049F6C43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 09:44:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F47C43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 10:29:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C5568206B7
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 09:44:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5BADF2070D
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 10:29:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="lshe6y+8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728141AbfCRJoQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 05:44:16 -0400
-Received: from mga06.intel.com ([134.134.136.31]:4614 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727375AbfCRJoP (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 05:44:15 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 18 Mar 2019 02:44:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.58,493,1544515200"; 
-   d="scan'208";a="329584206"
-Received: from mdziegie-mobl.ger.corp.intel.com (HELO localhost.localdomain) ([10.237.142.141])
-  by fmsmga005.fm.intel.com with ESMTP; 18 Mar 2019 02:44:13 -0700
-Subject: Re: [PATCH] lightnvm: pblk: set write thread affinity to particular
- cpu
-To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>
-Cc:     =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        linux-block@vger.kernel.org,
-        "Konopko, Igor J" <igor.j.konopko@intel.com>
-References: <1552573079-12712-1-git-send-email-marcin.dziegielewski@intel.com>
- <874EAB88-573F-485A-A008-FE1CC803E8D3@javigon.com>
- <D45E9938-F025-446D-8E48-CAE954B791A6@javigon.com>
-From:   Marcin Dziegielewski <marcin.dziegielewski@intel.com>
-Message-ID: <a63ef9e7-214a-a701-5c40-d1d1107de4a4@intel.com>
-Date:   Mon, 18 Mar 2019 10:44:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+        id S1726946AbfCRK3D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 06:29:03 -0400
+Received: from mail-vk1-f193.google.com ([209.85.221.193]:44612 "EHLO
+        mail-vk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726813AbfCRK3D (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 18 Mar 2019 06:29:03 -0400
+Received: by mail-vk1-f193.google.com with SMTP id q189so3638620vkq.11
+        for <linux-block@vger.kernel.org>; Mon, 18 Mar 2019 03:29:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=jqzN75yxkXN+vD/S75J6kX2i0s5KP4wFxhIBL//QHDY=;
+        b=lshe6y+8P7xkAXXiSEEh/bZEF/qEPfWisu1ysOWO5IgGsCa3qOJv7TaHAwEflmGvKB
+         UGt3beouJZAZpG93799QLjVsqT7CXYbQe4DILj2irstJSSHoA1/i87+Qvq/4hGJgiZ37
+         mRy5NF1hsQ+Q9oA01vmp+u8iSwOZqyMTjn66WZzP6ht/eZ6jGZB6gZjn+4x9tXNmk8/r
+         cMc4vZ7iytckWqPGFPC27lfvAwqv6iDrYc0OnL0UjfX3RR3ahDGxsJT89GRei9QOZSUe
+         eLoLPlQwbpA7upU3Eu2vItdZL39YiWGhSG9KdaicPLwpXWe8eM8PoWt467F53IlzfDVZ
+         Mv9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jqzN75yxkXN+vD/S75J6kX2i0s5KP4wFxhIBL//QHDY=;
+        b=scROnS35hoACRo7dEgEnPkgNXUBlr5Ctlx4Q1q1Cf6QHz1CjLieyH4ouAo9lB3g5qI
+         RmPU2Dbcj4ptlb0X6JSekahAB41Zt+Rdyn69m5e5Hxe0xH83nkneTPMUOYkmzEDc0EvJ
+         oS7hCP3l94qPskvtZGqkmxQm0/XLbRRfck1k6Il2kNpg7lwPbVVOOJ3ooCFTPF/tmWeN
+         E9fkvMX8+twC0EVzEYWKXmL6k15GteLvcGutq1Pg+T5KsHgfXygcDMLvTOCxXK7f98G/
+         yKKWw0Mm52k0TIy5LUvqRnfUMOvYnMhXbCk3MxDqY8dNi0BMLvurfB1tbErUV2stvphO
+         FFRw==
+X-Gm-Message-State: APjAAAWrdQsY6MUnX2JYmGCOLonrVVk4SMJU/i5+2nN+8UbAbtNLJ3Xp
+        ZaMnQ1wXFTCp/0LBgfY5P/10rz1pvNEU8c0Xnug3t7htJWN1DA==
+X-Google-Smtp-Source: APXvYqyG5rc40ObL6caAoTjU63u/FFmu2QSiy/Nn+10+b4VfARhKLxJOxPaudN4KL0hTIroPvEGj6dx1UeSP3SZNGHQ=
+X-Received: by 2002:a1f:b483:: with SMTP id d125mr8601756vkf.51.1552904942575;
+ Mon, 18 Mar 2019 03:29:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <D45E9938-F025-446D-8E48-CAE954B791A6@javigon.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20190314160428.3559-1-igor.j.konopko@intel.com> <20190314160428.3559-18-igor.j.konopko@intel.com>
+In-Reply-To: <20190314160428.3559-18-igor.j.konopko@intel.com>
+From:   Hans Holmberg <hans@owltronix.com>
+Date:   Mon, 18 Mar 2019 11:28:51 +0100
+Message-ID: <CANr-nt3poAp1NQmK35=X=mrKgvEJnUHVN_ROxMWB1hrGoZpHdQ@mail.gmail.com>
+Subject: Re: [PATCH 17/18] lightnvm: allow to use full device path
+To:     Igor Konopko <igor.j.konopko@intel.com>
+Cc:     Matias Bjorling <mb@lightnvm.io>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/14/19 3:22 PM, Javier González wrote:
-> 
->> On 14 Mar 2019, at 07.22, Javier González <javier@javigon.com> wrote:
->>
->>> On 14 Mar 2019, at 07.17, Marcin Dziegielewski <marcin.dziegielewski@intel.com> wrote:
->>>
->>> In some cases write thread migration between cpus can cause
->>> sending writes in improper order and in consequence a lot of
->>> errors from device.
->>>
->>> Write thread affinity to particular cpu prevent before it.
->>>
->>> Signed-off-by: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
->>> ---
->>> drivers/lightnvm/pblk-init.c | 30 +++++++++++++++++++++++++++++-
->>> drivers/lightnvm/pblk.h      |  1 +
->>> drivers/nvme/host/lightnvm.c |  1 +
->>> include/linux/lightnvm.h     |  2 ++
->>> 4 files changed, 33 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
->>> index 81e8ed4..bd25004 100644
->>> --- a/drivers/lightnvm/pblk-init.c
->>> +++ b/drivers/lightnvm/pblk-init.c
->>> @@ -21,6 +21,8 @@
->>>
->>> #include "pblk.h"
->>> #include "pblk-trace.h"
->>> +#include <linux/cpumask.h>
->>> +#include <linux/numa.h>
->>>
->>> static unsigned int write_buffer_size;
->>>
->>> @@ -47,6 +49,8 @@ struct pblk_global_caches {
->>>
->>> struct bio_set pblk_bio_set;
->>>
->>> +cpumask_t free_cpumask;
->>> +
->>> static int pblk_rw_io(struct request_queue *q, struct pblk *pblk,
->>> 			  struct bio *bio)
->>> {
->>> @@ -1098,6 +1102,9 @@ static int pblk_lines_init(struct pblk *pblk)
->>>
->>> static int pblk_writer_init(struct pblk *pblk)
->>> {
->>> +	cpumask_t tmp_cpumask, cpumask;
->>> +	int cpu;
->>> +
->>> 	pblk->writer_ts = kthread_create(pblk_write_ts, pblk, "pblk-writer-t");
->>> 	if (IS_ERR(pblk->writer_ts)) {
->>> 		int err = PTR_ERR(pblk->writer_ts);
->>> @@ -1108,6 +1115,22 @@ static int pblk_writer_init(struct pblk *pblk)
->>> 		return err;
->>> 	}
->>>
->>> +	cpumask_and(&tmp_cpumask, cpumask_of_node(pblk->dev->parent->node),
->>> +			cpu_online_mask);
->>> +	cpumask_and(&cpumask, &tmp_cpumask, &free_cpumask);
->>> +
->>> +	if (!cpumask_weight(&free_cpumask)) {
->>> +		free_cpumask = CPU_MASK_ALL;
->>> +		cpumask_and(&cpumask, &tmp_cpumask, &free_cpumask);
->>> +	}
->>> +
->>> +	cpu = cpumask_last(&cpumask);
->>> +
->>> +	kthread_bind(pblk->writer_ts, cpu);
->>> +
->>> +	cpumask_clear_cpu(cpu, &free_cpumask);
->>> +	pblk->writer_cpu = cpu;
->>> +
->>> 	timer_setup(&pblk->wtimer, pblk_write_timer_fn, 0);
->>> 	mod_timer(&pblk->wtimer, jiffies + msecs_to_jiffies(100));
->>>
->>> @@ -1126,8 +1149,11 @@ static void pblk_writer_stop(struct pblk *pblk)
->>> 			"Stopping not fully synced write buffer\n");
->>>
->>> 	del_timer_sync(&pblk->wtimer);
->>> -	if (pblk->writer_ts)
->>> +	if (pblk->writer_ts) {
->>> +		set_cpus_allowed_ptr(pblk->writer_ts, cpu_online_mask);
->>> 		kthread_stop(pblk->writer_ts);
->>> +		cpumask_set_cpu(pblk->writer_cpu, &free_cpumask);
->>> +	}
->>> }
->>>
->>> static void pblk_free(struct pblk *pblk)
->>> @@ -1328,6 +1354,8 @@ static int __init pblk_module_init(void)
->>> {
->>> 	int ret;
->>>
->>> +	free_cpumask = CPU_MASK_ALL;
->>> +
->>> 	ret = bioset_init(&pblk_bio_set, BIO_POOL_SIZE, 0, 0);
->>> 	if (ret)
->>> 		return ret;
->>> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
->>> index 381f074..650f983 100644
->>> --- a/drivers/lightnvm/pblk.h
->>> +++ b/drivers/lightnvm/pblk.h
->>> @@ -690,6 +690,7 @@ struct pblk {
->>> 	atomic_t inflight_io;		/* General inflight I/O counter */
->>>
->>> 	struct task_struct *writer_ts;
->>> +	int writer_cpu;
->>>
->>> 	/* Simple translation map of logical addresses to physical addresses.
->>> 	 * The logical addresses is known by the host system, while the physical
->>> diff --git a/drivers/nvme/host/lightnvm.c b/drivers/nvme/host/lightnvm.c
->>> index 949e29e..971a19f 100644
->>> --- a/drivers/nvme/host/lightnvm.c
->>> +++ b/drivers/nvme/host/lightnvm.c
->>> @@ -982,6 +982,7 @@ int nvme_nvm_register(struct nvme_ns *ns, char *disk_name, int node)
->>> 	memcpy(dev->name, disk_name, DISK_NAME_LEN);
->>> 	dev->ops = &nvme_nvm_dev_ops;
->>> 	dev->private_data = ns;
->>> +	dev->node = node;
->>> 	ns->ndev = dev;
->>>
->>> 	return nvm_register(dev);
->>> diff --git a/include/linux/lightnvm.h b/include/linux/lightnvm.h
->>> index 5d865a5..312029e 100644
->>> --- a/include/linux/lightnvm.h
->>> +++ b/include/linux/lightnvm.h
->>> @@ -427,6 +427,8 @@ struct nvm_dev {
->>> 	char name[DISK_NAME_LEN];
->>> 	void *private_data;
->>>
->>> +	int node;
->>> +
->>> 	void *rmap;
->>>
->>> 	struct mutex mlock;
->>> --
->>> 1.8.3.1
->>
->> We have a per-CPU semaphore that only allows to send a single I/O in
->> order to prevent write pointer violations. Are you seeing this error, or
->> is it theoretical?
->>
->> Javier
-> 
-> I meant per PU (parallel unit)…
-> 
+On Thu, Mar 14, 2019 at 5:11 PM Igor Konopko <igor.j.konopko@intel.com> wrote:
+>
+> This patch adds the possibility to provide full device path (like
+> /dev/nvme0n1) when specifying device on top of which pblk instance
+> should be created/removed.
+>
+> This makes creation of targets from nvme-cli (or other ioctl based
+> tools) more unified with other commands in comparison with current
+> situation where almost all commands uses full device path with except
+> of lightnvm creation/removal parameter which uses just 'nvme0n1'
+> naming convention. After this changes both approach will be valid.
+>
+> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+> ---
+>  drivers/lightnvm/core.c | 23 ++++++++++++++++++-----
+>  1 file changed, 18 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+> index c01f83b..838c3d8 100644
+> --- a/drivers/lightnvm/core.c
+> +++ b/drivers/lightnvm/core.c
+> @@ -1195,6 +1195,21 @@ void nvm_unregister(struct nvm_dev *dev)
+>  }
+>  EXPORT_SYMBOL(nvm_unregister);
+>
+> +#define PREFIX_STR "/dev/"
+> +static void nvm_normalize_path(char *path)
+> +{
+> +       path[DISK_NAME_LEN - 1] = '\0';
+> +       if (!memcmp(PREFIX_STR, path,
+> +                               sizeof(char) * strlen(PREFIX_STR))) {
+> +               /*
+> +                * User provide name in '/dev/nvme0n1' format,
+> +                * so we need to skip '/dev/' for comparison
+> +                */
+> +               memmove(path, path + sizeof(char) * strlen(PREFIX_STR),
+> +                       (DISK_NAME_LEN - strlen(PREFIX_STR)) * sizeof(char));
+> +       }
+> +}
+> +
 
-You are right, for current upstream implementation it's theoretical. I 
-saw it after some experimental changes in lightnvm layer.
+I don't like this. Why add string parsing to the kernel? Can't this
+feature be added to the nvme tool?
 
-But I see one more potential benefit from this patch (correct me if I'm 
-wrong), after this patch we will be sure that write thread is working on 
-cpu from right numa node for device. Now I think, we can also take under 
-consideration binding to whole set of cpus from right numa node instead 
-of particular one.
-
-Marcin
+>  static int __nvm_configure_create(struct nvm_ioctl_create *create)
+>  {
+>         struct nvm_dev *dev;
+> @@ -1304,9 +1319,9 @@ static long nvm_ioctl_dev_create(struct file *file, void __user *arg)
+>                 return -EINVAL;
+>         }
+>
+> -       create.dev[DISK_NAME_LEN - 1] = '\0';
+> +       nvm_normalize_path(create.dev);
+> +       nvm_normalize_path(create.tgtname);
+>         create.tgttype[NVM_TTYPE_NAME_MAX - 1] = '\0';
+> -       create.tgtname[DISK_NAME_LEN - 1] = '\0';
+>
+>         if (create.flags != 0) {
+>                 __u32 flags = create.flags;
+> @@ -1333,7 +1348,7 @@ static long nvm_ioctl_dev_remove(struct file *file, void __user *arg)
+>         if (copy_from_user(&remove, arg, sizeof(struct nvm_ioctl_remove)))
+>                 return -EFAULT;
+>
+> -       remove.tgtname[DISK_NAME_LEN - 1] = '\0';
+> +       nvm_normalize_path(remove.tgtname);
+>
+>         if (remove.flags != 0) {
+>                 pr_err("nvm: no flags supported\n");
+> @@ -1373,8 +1388,6 @@ static long nvm_ioctl_dev_factory(struct file *file, void __user *arg)
+>         if (copy_from_user(&fact, arg, sizeof(struct nvm_ioctl_dev_factory)))
+>                 return -EFAULT;
+>
+> -       fact.dev[DISK_NAME_LEN - 1] = '\0';
+> -
+>         if (fact.flags & ~(NVM_FACTORY_NR_BITS - 1))
+>                 return -EINVAL;
+>
+> --
+> 2.9.5
+>
