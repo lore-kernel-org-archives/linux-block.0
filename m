@@ -4,22 +4,21 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEFA5C10F10
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5880DC10F0D
 	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 19:48:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A20662133F
+	by mail.kernel.org (Postfix) with ESMTP id 1506220989
 	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 19:48:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="AxMidq+p"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Kz/4MMdQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727570AbfCRTsa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1727597AbfCRTsa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 18 Mar 2019 15:48:30 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:35376 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.133]:35382 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727609AbfCRTsa (ORCPT
+        with ESMTP id S1727618AbfCRTsa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 18 Mar 2019 15:48:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -28,20 +27,20 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
         Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
         List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=Fbn0hOZXTaH//51hQ9uMk96e0SP6ig2f7P3BksZdLtU=; b=AxMidq+p2ljaornnhjbhjRlnF
-        i4XLRflV1/ICRFlBQVd12FwRIN99M111rpCtmCfJPSEhOYmorG8oWWNFi/HGkzs3rfdQ0ytQR6c6H
-        eoKMjnAc5VzvylJOGFHq/cJSk+eOXNLPy1EQHdUVcFfBU0l4fR985noJVVB79/eJvyb885B0ZIgPH
-        3/AaL3lcY43w0cgTxG0MkJsJB3PE7qqjta1Ln11uzCytGHqmVuUZ9QnzBH7A4h8toJhzUtBnYwZzf
-        AadsmDhwT9AWxKlQkwhI/inErB0xwCPT7eaoASpptUAfR5vqYo159fORVv/3gw4mivbVyC+0EQT1W
-        /1xisUrTQ==;
+         bh=syPNaKyPeHJalobdeO/7vC2pGxao4lfo8CHz8FE1ntg=; b=Kz/4MMdQi2cV16gyCmldt7Kdb
+        enkKBVqb0EupDQQ9M57xlLpf/3NhkZSPiOpeyRft3BqFb1kRmV11D6kBmetN+W3RKiw1zkl0Ubg0M
+        Fn+7vXEJUD0f0fMBHiyd5w+gzhuI3rtNGTQMRnm+hJMsZ5HUKN4JrgAUnoc2arKfdFguCHsw/ktqc
+        tadp0Ztd0ETVVUbgzGOUnj/VJuaOdfhP1dNp/g2iMS9m+VzFvea6lURdVguBVHkXQ/cYPxfQfdWJz
+        +BedaMQrvf8kVKaesXYrvMvYgI/SxOamn+bGk+DDhByCKkbF3BuV9ji8DX7WA7f2KpTZH8N66SYqx
+        GHaFmxOaA==;
 Received: from willy by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1h5yFJ-0000wL-Mw; Mon, 18 Mar 2019 19:48:29 +0000
+        id 1h5yFJ-0000wQ-S3; Mon, 18 Mar 2019 19:48:29 +0000
 From:   Matthew Wilcox <willy@infradead.org>
 To:     linux-block@vger.kernel.org
 Cc:     Matthew Wilcox <willy@infradead.org>
-Subject: [PATCH 13/14] drbd: Convert drbd devices to XArray
-Date:   Mon, 18 Mar 2019 12:48:20 -0700
-Message-Id: <20190318194821.3470-14-willy@infradead.org>
+Subject: [PATCH 14/14] drbd: Convert peer devices to XArray
+Date:   Mon, 18 Mar 2019 12:48:21 -0700
+Message-Id: <20190318194821.3470-15-willy@infradead.org>
 X-Mailer: git-send-email 2.14.5
 In-Reply-To: <20190318194821.3470-1-willy@infradead.org>
 References: <20190318194821.3470-1-willy@infradead.org>
@@ -52,532 +51,635 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Signed-off-by: Matthew Wilcox <willy@infradead.org>
 ---
- drivers/block/drbd/drbd_debugfs.c  | 16 ++++-----
- drivers/block/drbd/drbd_int.h      |  6 ++--
- drivers/block/drbd/drbd_main.c     | 56 ++++++++++++++----------------
- drivers/block/drbd/drbd_nl.c       | 42 +++++++++++-----------
- drivers/block/drbd/drbd_proc.c     |  8 ++---
- drivers/block/drbd/drbd_receiver.c |  4 +--
- drivers/block/drbd/drbd_state.c    |  8 ++---
- drivers/block/drbd/drbd_worker.c   |  8 ++---
- 8 files changed, 72 insertions(+), 76 deletions(-)
+ drivers/block/drbd/drbd_int.h      |  4 +-
+ drivers/block/drbd/drbd_main.c     | 25 +++++++------
+ drivers/block/drbd/drbd_nl.c       | 35 +++++++++---------
+ drivers/block/drbd/drbd_receiver.c | 29 ++++++++-------
+ drivers/block/drbd/drbd_state.c    | 59 +++++++++++++++---------------
+ drivers/block/drbd/drbd_worker.c   | 12 +++---
+ 6 files changed, 84 insertions(+), 80 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_debugfs.c b/drivers/block/drbd/drbd_debugfs.c
-index f13b48ff5f43..a1336bbf5083 100644
---- a/drivers/block/drbd/drbd_debugfs.c
-+++ b/drivers/block/drbd/drbd_debugfs.c
-@@ -128,11 +128,11 @@ static void seq_print_minor_vnr_req(struct seq_file *m, struct drbd_request *req
- static void seq_print_resource_pending_meta_io(struct seq_file *m, struct drbd_resource *resource, unsigned long now)
- {
- 	struct drbd_device *device;
--	unsigned int i;
-+	unsigned long i;
- 
- 	seq_puts(m, "minor\tvnr\tstart\tsubmit\tintent\n");
- 	rcu_read_lock();
--	idr_for_each_entry(&resource->devices, device, i) {
-+	xa_for_each(&resource->devices, i, device) {
- 		struct drbd_md_io tmp;
- 		/* In theory this is racy,
- 		 * in the sense that there could have been a
-@@ -156,11 +156,11 @@ static void seq_print_resource_pending_meta_io(struct seq_file *m, struct drbd_r
- static void seq_print_waiting_for_AL(struct seq_file *m, struct drbd_resource *resource, unsigned long now)
- {
- 	struct drbd_device *device;
--	unsigned int i;
-+	unsigned long i;
- 
- 	seq_puts(m, "minor\tvnr\tage\t#waiting\n");
- 	rcu_read_lock();
--	idr_for_each_entry(&resource->devices, device, i) {
-+	xa_for_each(&resource->devices, i, device) {
- 		unsigned long jif;
- 		struct drbd_request *req;
- 		int n = atomic_read(&device->ap_actlog_cnt);
-@@ -216,11 +216,11 @@ static void seq_print_device_bitmap_io(struct seq_file *m, struct drbd_device *d
- static void seq_print_resource_pending_bitmap_io(struct seq_file *m, struct drbd_resource *resource, unsigned long now)
- {
- 	struct drbd_device *device;
--	unsigned int i;
-+	unsigned long i;
- 
- 	seq_puts(m, "minor\tvnr\trw\tage\t#in-flight\n");
- 	rcu_read_lock();
--	idr_for_each_entry(&resource->devices, device, i) {
-+	xa_for_each(&resource->devices, i, device) {
- 		seq_print_device_bitmap_io(m, device, now);
- 	}
- 	rcu_read_unlock();
-@@ -288,10 +288,10 @@ static void seq_print_resource_pending_peer_requests(struct seq_file *m,
- 	struct drbd_resource *resource, unsigned long now)
- {
- 	struct drbd_device *device;
--	unsigned int i;
-+	unsigned long i;
- 
- 	rcu_read_lock();
--	idr_for_each_entry(&resource->devices, device, i) {
-+	xa_for_each(&resource->devices, i, device) {
- 		seq_print_device_peer_requests(m, device, now);
- 	}
- 	rcu_read_unlock();
 diff --git a/drivers/block/drbd/drbd_int.h b/drivers/block/drbd/drbd_int.h
-index 000a2f4c0e92..4e68b5f8265b 100644
+index 4e68b5f8265b..375418164a2c 100644
 --- a/drivers/block/drbd/drbd_int.h
 +++ b/drivers/block/drbd/drbd_int.h
-@@ -189,7 +189,7 @@ drbd_insert_fault(struct drbd_device *device, unsigned int type) {
- #define div_floor(A, B) ((A)/(B))
- 
- extern struct ratelimit_state drbd_ratelimit_state;
--extern struct idr drbd_devices; /* RCU, updates: genl_lock() */
-+extern struct xarray drbd_devices; /* RCU, updates: genl_lock() */
- extern struct list_head drbd_resources; /* RCU, updates: genl_lock() */
- 
- extern const char *cmdname(enum drbd_packet cmd);
-@@ -670,7 +670,7 @@ struct drbd_resource {
- 	struct dentry *debugfs_res_in_flight_summary;
+@@ -705,7 +705,7 @@ struct drbd_connection {
+ 	struct dentry *debugfs_conn_oldest_requests;
  #endif
  	struct kref kref;
--	struct idr devices;		/* volume number to device mapping */
-+	struct xarray devices;		/* volume number to device mapping */
- 	struct list_head connections;
- 	struct list_head resources;
- 	struct res_opts res_opts;
-@@ -1022,7 +1022,7 @@ struct drbd_config_context {
- 
- static inline struct drbd_device *minor_to_device(unsigned int minor)
+-	struct idr peer_devices;	/* volume number to peer device mapping */
++	struct xarray peer_devices;	/* volume number to peer device mapping */
+ 	enum drbd_conns cstate;		/* Only C_STANDALONE to C_WF_REPORT_PARAMS */
+ 	struct mutex cstate_mutex;	/* Protects graceful disconnects */
+ 	unsigned int connect_cnt;	/* Inc each time a connection is established */
+@@ -1033,7 +1033,7 @@ static inline struct drbd_peer_device *first_peer_device(struct drbd_device *dev
+ static inline struct drbd_peer_device *
+ conn_peer_device(struct drbd_connection *connection, int volume_number)
  {
--	return (struct drbd_device *)idr_find(&drbd_devices, minor);
-+	return xa_load(&drbd_devices, minor);
+-	return idr_find(&connection->peer_devices, volume_number);
++	return xa_load(&connection->peer_devices, volume_number);
  }
  
- static inline struct drbd_peer_device *first_peer_device(struct drbd_device *device)
+ #define for_each_resource(resource, _resources) \
 diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index 714eb64fabfd..2f3b18e0223b 100644
+index 2f3b18e0223b..c292fbdddfec 100644
 --- a/drivers/block/drbd/drbd_main.c
 +++ b/drivers/block/drbd/drbd_main.c
-@@ -116,7 +116,7 @@ module_param_string(usermode_helper, drbd_usermode_helper, sizeof(drbd_usermode_
- /* in 2.6.x, our device mapping and config info contains our virtual gendisks
-  * as member "struct gendisk *vdisk;"
-  */
--struct idr drbd_devices;
-+DEFINE_XARRAY(drbd_devices);
- struct list_head drbd_resources;
- struct mutex resources_mutex;
- 
-@@ -2364,7 +2364,7 @@ void drbd_destroy_resource(struct kref *kref)
- 	struct drbd_resource *resource =
- 		container_of(kref, struct drbd_resource, kref);
- 
--	idr_destroy(&resource->devices);
-+	xa_destroy(&resource->devices);
- 	free_cpumask_var(resource->cpu_mask);
- 	kfree(resource->name);
- 	memset(resource, 0xf2, sizeof(*resource));
-@@ -2386,7 +2386,7 @@ void drbd_free_resource(struct drbd_resource *resource)
- 
- static void drbd_cleanup(void)
+@@ -489,10 +489,12 @@ void _drbd_thread_stop(struct drbd_thread *thi, int restart, int wait)
+ int conn_lowest_minor(struct drbd_connection *connection)
  {
--	unsigned int i;
-+	unsigned long i;
- 	struct drbd_device *device;
- 	struct drbd_resource *resource, *tmp;
+ 	struct drbd_peer_device *peer_device;
+-	int vnr = 0, minor = -1;
++	unsigned long vnr = 0;
++	int minor = -1;
  
-@@ -2406,8 +2406,9 @@ static void drbd_cleanup(void)
+ 	rcu_read_lock();
+-	peer_device = idr_get_next(&connection->peer_devices, &vnr);
++	peer_device = xa_find(&connection->peer_devices, &vnr,
++			ULONG_MAX, XA_PRESENT);
+ 	if (peer_device)
+ 		minor = device_to_minor(peer_device->device);
+ 	rcu_read_unlock();
+@@ -2712,7 +2714,7 @@ struct drbd_connection *conn_create(const char *name, struct res_opts *res_opts)
+ 	connection->cstate = C_STANDALONE;
+ 	mutex_init(&connection->cstate_mutex);
+ 	init_waitqueue_head(&connection->ping_wait);
+-	idr_init(&connection->peer_devices);
++	xa_init(&connection->peer_devices);
  
- 	drbd_genl_unregister();
+ 	drbd_init_workqueue(&connection->sender_work);
+ 	mutex_init(&connection->data.mutex);
+@@ -2757,7 +2759,7 @@ void drbd_destroy_connection(struct kref *kref)
+ 		drbd_err(connection, "epoch_size:%d\n", atomic_read(&connection->current_epoch->epoch_size));
+ 	kfree(connection->current_epoch);
  
--	idr_for_each_entry(&drbd_devices, device, i)
-+	xa_for_each(&drbd_devices, i, device)
- 		drbd_delete_device(device);
-+	xa_destroy(&drbd_devices);
+-	idr_destroy(&connection->peer_devices);
++	xa_destroy(&connection->peer_devices);
  
- 	/* not _rcu since, no other updater anymore. Genl already unregistered */
- 	for_each_resource_safe(resource, tmp, &drbd_resources) {
-@@ -2420,8 +2421,6 @@ static void drbd_cleanup(void)
- 	drbd_destroy_mempools();
- 	unregister_blkdev(DRBD_MAJOR, "drbd");
- 
--	idr_destroy(&drbd_devices);
--
- 	pr_info("module cleanup done.\n");
- }
- 
-@@ -2659,7 +2658,7 @@ struct drbd_resource *drbd_create_resource(const char *name)
- 	if (!zalloc_cpumask_var(&resource->cpu_mask, GFP_KERNEL))
- 		goto fail_free_name;
- 	kref_init(&resource->kref);
--	idr_init(&resource->devices);
-+	xa_init(&resource->devices);
- 	INIT_LIST_HEAD(&resource->connections);
- 	resource->write_ordering = WO_BDEV_FLUSH;
- 	list_add_tail_rcu(&resource->resources, &drbd_resources);
-@@ -2791,7 +2790,7 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
- 	struct drbd_peer_device *peer_device, *tmp_peer_device;
- 	struct gendisk *disk;
- 	struct request_queue *q;
--	int id;
-+	int ret;
- 	int vnr = adm_ctx->volume;
- 	enum drbd_ret_code err = ERR_NOMEM;
- 
-@@ -2854,19 +2853,19 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
- 	device->read_requests = RB_ROOT;
- 	device->write_requests = RB_ROOT;
- 
--	id = idr_alloc(&drbd_devices, device, minor, minor + 1, GFP_KERNEL);
--	if (id < 0) {
--		if (id == -ENOSPC)
-+	ret = xa_insert(&drbd_devices, minor, device, GFP_KERNEL);
-+	if (ret < 0) {
-+		if (ret == -EBUSY)
- 			err = ERR_MINOR_OR_VOLUME_EXISTS;
--		goto out_no_minor_idr;
-+		goto out_no_minor;
- 	}
- 	kref_get(&device->kref);
- 
--	id = idr_alloc(&resource->devices, device, vnr, vnr + 1, GFP_KERNEL);
--	if (id < 0) {
--		if (id == -ENOSPC)
-+	ret = xa_insert(&resource->devices, vnr, device, GFP_KERNEL);
-+	if (ret < 0) {
-+		if (ret == -EBUSY)
- 			err = ERR_MINOR_OR_VOLUME_EXISTS;
--		goto out_idr_remove_minor;
-+		goto out_remove_minor;
- 	}
- 	kref_get(&device->kref);
- 
-@@ -2875,18 +2874,18 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
- 	for_each_connection(connection, resource) {
- 		peer_device = kzalloc(sizeof(struct drbd_peer_device), GFP_KERNEL);
- 		if (!peer_device)
--			goto out_idr_remove_from_resource;
-+			goto out_remove_from_resource;
- 		peer_device->connection = connection;
- 		peer_device->device = device;
- 
+ 	drbd_free_socket(&connection->meta);
+ 	drbd_free_socket(&connection->data);
+@@ -2881,9 +2883,10 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
  		list_add(&peer_device->peer_devices, &device->peer_devices);
  		kref_get(&device->kref);
  
--		id = idr_alloc(&connection->peer_devices, peer_device, vnr, vnr + 1, GFP_KERNEL);
--		if (id < 0) {
--			if (id == -ENOSPC)
-+		ret = idr_alloc(&connection->peer_devices, peer_device, vnr, vnr + 1, GFP_KERNEL);
-+		if (ret < 0) {
-+			if (ret == -ENOSPC)
+-		ret = idr_alloc(&connection->peer_devices, peer_device, vnr, vnr + 1, GFP_KERNEL);
++		ret = xa_insert(&connection->peer_devices, vnr, peer_device,
++				GFP_KERNEL);
+ 		if (ret < 0) {
+-			if (ret == -ENOSPC)
++			if (ret == -EBUSY)
  				err = ERR_INVALID_REQUEST;
--			goto out_idr_remove_from_resource;
-+			goto out_remove_from_resource;
+ 			goto out_remove_from_resource;
  		}
- 		kref_get(&connection->kref);
- 		INIT_WORK(&peer_device->send_acks_work, drbd_send_acks_wf);
-@@ -2913,7 +2912,7 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
+@@ -2911,10 +2914,10 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
+ 	return NO_ERROR;
  
  out_idr_remove_vol:
- 	idr_remove(&connection->peer_devices, vnr);
--out_idr_remove_from_resource:
-+out_remove_from_resource:
+-	idr_remove(&connection->peer_devices, vnr);
++	xa_erase(&connection->peer_devices, vnr);
+ out_remove_from_resource:
  	for_each_connection(connection, resource) {
- 		peer_device = idr_remove(&connection->peer_devices, vnr);
+-		peer_device = idr_remove(&connection->peer_devices, vnr);
++		peer_device = xa_erase(&connection->peer_devices, vnr);
  		if (peer_device)
-@@ -2923,11 +2922,11 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
- 		list_del(&peer_device->peer_devices);
- 		kfree(peer_device);
+ 			kref_put(&connection->kref, drbd_destroy_connection);
  	}
--	idr_remove(&resource->devices, vnr);
--out_idr_remove_minor:
--	idr_remove(&drbd_devices, minor);
-+	xa_erase(&resource->devices, vnr);
-+out_remove_minor:
-+	xa_erase(&drbd_devices, minor);
- 	synchronize_rcu();
--out_no_minor_idr:
-+out_no_minor:
- 	drbd_bm_cleanup(device);
- out_no_bitmap:
- 	__free_page(device->md_io.page);
-@@ -2955,9 +2954,9 @@ void drbd_delete_device(struct drbd_device *device)
- 		idr_remove(&connection->peer_devices, device->vnr);
+@@ -2951,7 +2954,7 @@ void drbd_delete_device(struct drbd_device *device)
+ 		drbd_debugfs_peer_device_cleanup(peer_device);
+ 	drbd_debugfs_device_cleanup(device);
+ 	for_each_connection(connection, resource) {
+-		idr_remove(&connection->peer_devices, device->vnr);
++		xa_erase(&connection->peer_devices, device->vnr);
  		kref_put(&device->kref, drbd_destroy_device);
  	}
--	idr_remove(&resource->devices, device->vnr);
-+	xa_erase(&resource->devices, device->vnr);
- 	kref_put(&device->kref, drbd_destroy_device);
--	idr_remove(&drbd_devices, device_to_minor(device));
-+	xa_erase(&drbd_devices, device_to_minor(device));
- 	kref_put(&device->kref, drbd_destroy_device);
- 	del_gendisk(device->vdisk);
- 	synchronize_rcu();
-@@ -2990,7 +2989,6 @@ static int __init drbd_init(void)
- 	init_waitqueue_head(&drbd_pp_wait);
+ 	xa_erase(&resource->devices, device->vnr);
+@@ -3066,10 +3069,10 @@ void drbd_free_sock(struct drbd_connection *connection)
+ void conn_md_sync(struct drbd_connection *connection)
+ {
+ 	struct drbd_peer_device *peer_device;
+-	int vnr;
++	unsigned long vnr;
  
- 	drbd_proc = NULL; /* play safe for drbd_cleanup */
--	idr_init(&drbd_devices);
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
  
- 	mutex_init(&resources_mutex);
- 	INIT_LIST_HEAD(&drbd_resources);
+ 		kref_get(&device->kref);
 diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index f2471172a961..67c1a343a595 100644
+index 67c1a343a595..9f599c85b3d2 100644
 --- a/drivers/block/drbd/drbd_nl.c
 +++ b/drivers/block/drbd/drbd_nl.c
-@@ -3436,11 +3436,12 @@ int drbd_adm_dump_devices(struct sk_buff *skb, struct netlink_callback *cb)
- 	struct nlattr *resource_filter;
- 	struct drbd_resource *resource;
- 	struct drbd_device *uninitialized_var(device);
--	int minor, err, retcode;
-+	int err, retcode;
-+	unsigned long minor;
- 	struct drbd_genlmsghdr *dh;
- 	struct device_info device_info;
- 	struct device_statistics device_statistics;
--	struct idr *idr_to_search;
-+	struct xarray *devices;
- 
- 	resource = (struct drbd_resource *)cb->args[0];
- 	if (!cb->args[0] && !cb->args[1]) {
-@@ -3456,18 +3457,13 @@ int drbd_adm_dump_devices(struct sk_buff *skb, struct netlink_callback *cb)
+@@ -457,10 +457,10 @@ static enum drbd_fencing_p highest_fencing_policy(struct drbd_connection *connec
+ {
+ 	enum drbd_fencing_p fp = FP_NOT_AVAIL;
+ 	struct drbd_peer_device *peer_device;
+-	int vnr;
++	unsigned long vnr;
  
  	rcu_read_lock();
- 	minor = cb->args[1];
--	idr_to_search = resource ? &resource->devices : &drbd_devices;
--	device = idr_get_next(idr_to_search, &minor);
-+	devices = resource ? &resource->devices : &drbd_devices;
-+	device = xa_find_after(devices, &minor, ULONG_MAX, XA_PRESENT);
- 	if (!device) {
- 		err = 0;
- 		goto out;
- 	}
--	idr_for_each_entry_continue(idr_to_search, device, minor) {
--		retcode = NO_ERROR;
--		goto put_result;  /* only one iteration */
--	}
--	err = 0;
--	goto out;  /* no more devices */
-+	retcode = NO_ERROR;
- 
- put_result:
- 	dh = genlmsg_put(skb, NETLINK_CB(cb->skb).portid,
-@@ -3688,9 +3684,10 @@ int drbd_adm_dump_peer_devices(struct sk_buff *skb, struct netlink_callback *cb)
- 	struct drbd_resource *resource;
- 	struct drbd_device *uninitialized_var(device);
- 	struct drbd_peer_device *peer_device = NULL;
--	int minor, err, retcode;
-+	int err, retcode;
-+	unsigned long minor;
- 	struct drbd_genlmsghdr *dh;
--	struct idr *idr_to_search;
-+	struct xarray *devices;
- 
- 	resource = (struct drbd_resource *)cb->args[0];
- 	if (!cb->args[0] && !cb->args[1]) {
-@@ -3706,13 +3703,12 @@ int drbd_adm_dump_peer_devices(struct sk_buff *skb, struct netlink_callback *cb)
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		if (get_ldev_if_state(device, D_CONSISTENT)) {
+ 			struct disk_conf *disk_conf =
+@@ -2271,10 +2271,10 @@ static bool conn_resync_running(struct drbd_connection *connection)
+ {
+ 	struct drbd_peer_device *peer_device;
+ 	bool rv = false;
+-	int vnr;
++	unsigned long vnr;
  
  	rcu_read_lock();
- 	minor = cb->args[1];
--	idr_to_search = resource ? &resource->devices : &drbd_devices;
--	device = idr_find(idr_to_search, minor);
-+	devices = resource ? &resource->devices : &drbd_devices;
-+	device = xa_load(devices, minor);
- 	if (!device) {
- next_device:
--		minor++;
- 		cb->args[2] = 0;
--		device = idr_get_next(idr_to_search, &minor);
-+		device = xa_find_after(devices, &minor, ULONG_MAX, XA_PRESENT);
- 		if (!device) {
- 			err = 0;
- 			goto out;
-@@ -3941,12 +3937,12 @@ static int get_one_status(struct sk_buff *skb, struct netlink_callback *cb)
- 	struct drbd_resource *pos = (struct drbd_resource *)cb->args[0];
- 	struct drbd_resource *resource = NULL;
- 	struct drbd_resource *tmp;
--	unsigned volume = cb->args[1];
-+	unsigned long volume = cb->args[1];
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		if (device->state.conn == C_SYNC_SOURCE ||
+ 		    device->state.conn == C_SYNC_TARGET ||
+@@ -2293,10 +2293,10 @@ static bool conn_ov_running(struct drbd_connection *connection)
+ {
+ 	struct drbd_peer_device *peer_device;
+ 	bool rv = false;
+-	int vnr;
++	unsigned long vnr;
  
- 	/* Open coded, deferred, iteration:
- 	 * for_each_resource_safe(resource, tmp, &drbd_resources) {
- 	 *      connection = "first connection of resource or undefined";
--	 *	idr_for_each_entry(&resource->devices, device, i) {
-+	 *	xa_for_each(&resource->devices, i, device) {
- 	 *	  ...
- 	 *	}
- 	 * }
-@@ -3981,7 +3977,8 @@ static int get_one_status(struct sk_buff *skb, struct netlink_callback *cb)
- 	}
- 	if (resource) {
- next_resource:
--		device = idr_get_next(&resource->devices, &volume);
-+		device = xa_find(&resource->devices, &volume,
-+				ULONG_MAX, XA_PRESENT);
- 		if (!device) {
- 			/* No more volumes to dump on this resource.
- 			 * Advance resource iterator. */
-@@ -4489,7 +4486,7 @@ static int adm_del_resource(struct drbd_resource *resource)
- 		if (connection->cstate > C_STANDALONE)
- 			return ERR_NET_CONFIGURED;
- 	}
--	if (!idr_is_empty(&resource->devices))
-+	if (!xa_empty(&resource->devices))
- 		return ERR_RES_IN_USE;
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		if (device->state.conn == C_VERIFY_S ||
+ 		    device->state.conn == C_VERIFY_T) {
+@@ -2313,7 +2313,7 @@ static enum drbd_ret_code
+ _check_net_options(struct drbd_connection *connection, struct net_conf *old_net_conf, struct net_conf *new_net_conf)
+ {
+ 	struct drbd_peer_device *peer_device;
+-	int i;
++	unsigned long i;
  
- 	/* The state engine has stopped the sender thread, so we don't
-@@ -4519,6 +4516,7 @@ int drbd_adm_down(struct sk_buff *skb, struct genl_info *info)
- 	struct drbd_device *device;
- 	int retcode; /* enum drbd_ret_code rsp. enum drbd_state_rv */
- 	unsigned i;
-+	unsigned long index;
+ 	if (old_net_conf && connection->cstate == C_WF_REPORT_PARAMS && connection->agreed_pro_version < 100) {
+ 		if (new_net_conf->wire_protocol != old_net_conf->wire_protocol)
+@@ -2335,7 +2335,7 @@ _check_net_options(struct drbd_connection *connection, struct net_conf *old_net_
+ 	    (new_net_conf->wire_protocol != DRBD_PROT_C))
+ 		return ERR_NOT_PROTO_C;
+ 
+-	idr_for_each_entry(&connection->peer_devices, peer_device, i) {
++	xa_for_each(&connection->peer_devices, i, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		if (get_ldev(device)) {
+ 			enum drbd_fencing_p fp = rcu_dereference(device->ldev->disk_conf)->fencing;
+@@ -2358,14 +2358,14 @@ check_net_options(struct drbd_connection *connection, struct net_conf *new_net_c
+ {
+ 	enum drbd_ret_code rv;
+ 	struct drbd_peer_device *peer_device;
+-	int i;
++	unsigned long i;
+ 
+ 	rcu_read_lock();
+ 	rv = _check_net_options(connection, rcu_dereference(connection->net_conf), new_net_conf);
+ 	rcu_read_unlock();
+ 
+ 	/* connection->peer_devices protected by genl_lock() here */
+-	idr_for_each_entry(&connection->peer_devices, peer_device, i) {
++	xa_for_each(&connection->peer_devices, i, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		if (!device->bitmap) {
+ 			if (drbd_bm_init(device))
+@@ -2535,9 +2535,9 @@ int drbd_adm_net_opts(struct sk_buff *skb, struct genl_info *info)
+ 
+ 	if (connection->cstate >= C_WF_REPORT_PARAMS) {
+ 		struct drbd_peer_device *peer_device;
+-		int vnr;
++		unsigned long vnr;
+ 
+-		idr_for_each_entry(&connection->peer_devices, peer_device, vnr)
++		xa_for_each(&connection->peer_devices, vnr, peer_device)
+ 			drbd_send_sync_param(peer_device);
+ 	}
+ 
+@@ -2589,7 +2589,7 @@ int drbd_adm_connect(struct sk_buff *skb, struct genl_info *info)
+ 	struct drbd_resource *resource;
+ 	struct drbd_connection *connection;
+ 	enum drbd_ret_code retcode;
+-	int i;
++	unsigned long i;
+ 	int err;
  
  	retcode = drbd_adm_prepare(&adm_ctx, skb, info, DRBD_ADM_NEED_RESOURCE);
- 	if (!adm_ctx.reply_skb)
-@@ -4548,7 +4546,7 @@ int drbd_adm_down(struct sk_buff *skb, struct genl_info *info)
+@@ -2682,7 +2682,7 @@ int drbd_adm_connect(struct sk_buff *skb, struct genl_info *info)
+ 	connection->peer_addr_len = nla_len(adm_ctx.peer_addr);
+ 	memcpy(&connection->peer_addr, nla_data(adm_ctx.peer_addr), connection->peer_addr_len);
+ 
+-	idr_for_each_entry(&connection->peer_devices, peer_device, i) {
++	xa_for_each(&connection->peer_devices, i, peer_device) {
+ 		peer_devices++;
  	}
  
- 	/* detach */
--	idr_for_each_entry(&resource->devices, device, i) {
-+	xa_for_each(&resource->devices, index, device) {
- 		retcode = adm_detach(device, 0);
- 		if (retcode < SS_SUCCESS || retcode > NO_ERROR) {
- 			drbd_msg_put_info(adm_ctx.reply_skb, "failed to detach");
-@@ -4557,7 +4555,7 @@ int drbd_adm_down(struct sk_buff *skb, struct genl_info *info)
- 	}
+@@ -2690,7 +2690,7 @@ int drbd_adm_connect(struct sk_buff *skb, struct genl_info *info)
+ 	flags = (peer_devices--) ? NOTIFY_CONTINUES : 0;
+ 	mutex_lock(&notification_mutex);
+ 	notify_connection_state(NULL, 0, connection, &connection_info, NOTIFY_CREATE | flags);
+-	idr_for_each_entry(&connection->peer_devices, peer_device, i) {
++	xa_for_each(&connection->peer_devices, i, peer_device) {
+ 		struct peer_device_info peer_device_info;
  
- 	/* delete volumes */
--	idr_for_each_entry(&resource->devices, device, i) {
-+	xa_for_each(&resource->devices, index, device) {
- 		retcode = adm_del_minor(device);
- 		if (retcode != NO_ERROR) {
- 			/* "can not happen" */
-diff --git a/drivers/block/drbd/drbd_proc.c b/drivers/block/drbd/drbd_proc.c
-index 74ef29247bb5..77a0ad118e51 100644
---- a/drivers/block/drbd/drbd_proc.c
-+++ b/drivers/block/drbd/drbd_proc.c
-@@ -226,7 +226,7 @@ static void drbd_syncer_progress(struct drbd_device *device, struct seq_file *se
- 
- int drbd_seq_show(struct seq_file *seq, void *v)
- {
--	int i, prev_i = -1;
-+	unsigned long i, prev_i = -1;
- 	const char *sn;
- 	struct drbd_device *device;
- 	struct net_conf *nc;
-@@ -263,7 +263,7 @@ int drbd_seq_show(struct seq_file *seq, void *v)
- 	*/
+ 		peer_device_to_info(&peer_device_info, peer_device);
+@@ -2701,7 +2701,7 @@ int drbd_adm_connect(struct sk_buff *skb, struct genl_info *info)
+ 	mutex_unlock(&adm_ctx.resource->conf_update);
  
  	rcu_read_lock();
--	idr_for_each_entry(&drbd_devices, device, i) {
-+	xa_for_each(&drbd_devices, i, device) {
- 		if (prev_i != i - 1)
- 			seq_putc(seq, '\n');
- 		prev_i = i;
-@@ -274,7 +274,7 @@ int drbd_seq_show(struct seq_file *seq, void *v)
- 		if (state.conn == C_STANDALONE &&
- 		    state.disk == D_DISKLESS &&
- 		    state.role == R_SECONDARY) {
--			seq_printf(seq, "%2d: cs:Unconfigured\n", i);
-+			seq_printf(seq, "%2ld: cs:Unconfigured\n", i);
- 		} else {
- 			/* reset device->congestion_reason */
- 			bdi_rw_congested(device->rq_queue->backing_dev_info);
-@@ -282,7 +282,7 @@ int drbd_seq_show(struct seq_file *seq, void *v)
- 			nc = rcu_dereference(first_peer_device(device)->connection->net_conf);
- 			wp = nc ? nc->wire_protocol - DRBD_PROT_A + 'A' : ' ';
- 			seq_printf(seq,
--			   "%2d: cs:%s ro:%s/%s ds:%s/%s %c %c%c%c%c%c%c\n"
-+			   "%2ld: cs:%s ro:%s/%s ds:%s/%s %c %c%c%c%c%c%c\n"
- 			   "    ns:%u nr:%u dw:%u dr:%u al:%u bm:%u "
- 			   "lo:%d pe:%d ua:%d ap:%d ep:%d wo:%c",
- 			   i, sn,
+-	idr_for_each_entry(&connection->peer_devices, peer_device, i) {
++	xa_for_each(&connection->peer_devices, i, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		device->send_cnt = 0;
+ 		device->recv_cnt = 0;
+@@ -4515,7 +4515,6 @@ int drbd_adm_down(struct sk_buff *skb, struct genl_info *info)
+ 	struct drbd_connection *connection;
+ 	struct drbd_device *device;
+ 	int retcode; /* enum drbd_ret_code rsp. enum drbd_state_rv */
+-	unsigned i;
+ 	unsigned long index;
+ 
+ 	retcode = drbd_adm_prepare(&adm_ctx, skb, info, DRBD_ADM_NEED_RESOURCE);
+@@ -4530,7 +4529,7 @@ int drbd_adm_down(struct sk_buff *skb, struct genl_info *info)
+ 	for_each_connection(connection, resource) {
+ 		struct drbd_peer_device *peer_device;
+ 
+-		idr_for_each_entry(&connection->peer_devices, peer_device, i) {
++		xa_for_each(&connection->peer_devices, index, peer_device) {
+ 			retcode = drbd_set_role(peer_device->device, R_SECONDARY, 0);
+ 			if (retcode < SS_SUCCESS) {
+ 				drbd_msg_put_info(adm_ctx.reply_skb, "failed to demote");
 diff --git a/drivers/block/drbd/drbd_receiver.c b/drivers/block/drbd/drbd_receiver.c
-index c7ad88d91a09..f87bd8a034b2 100644
+index f87bd8a034b2..88b9de71833e 100644
 --- a/drivers/block/drbd/drbd_receiver.c
 +++ b/drivers/block/drbd/drbd_receiver.c
-@@ -1460,7 +1460,7 @@ void drbd_bump_write_ordering(struct drbd_resource *resource, struct drbd_backin
+@@ -232,10 +232,10 @@ static void drbd_reclaim_net_peer_reqs(struct drbd_device *device)
+ static void conn_reclaim_net_peer_reqs(struct drbd_connection *connection)
  {
- 	struct drbd_device *device;
- 	enum write_ordering_e pwo;
+ 	struct drbd_peer_device *peer_device;
 -	int vnr;
 +	unsigned long vnr;
- 	static char *write_ordering_str[] = {
- 		[WO_NONE] = "none",
- 		[WO_DRAIN_IO] = "drain",
-@@ -1471,7 +1471,7 @@ void drbd_bump_write_ordering(struct drbd_resource *resource, struct drbd_backin
- 	if (wo != WO_BDEV_FLUSH)
- 		wo = min(pwo, wo);
+ 
  	rcu_read_lock();
--	idr_for_each_entry(&resource->devices, device, vnr) {
-+	xa_for_each(&resource->devices, vnr, device) {
- 		if (get_ldev(device)) {
- 			wo = max_allowed_wo(device->ldev, wo);
- 			if (device->ldev == bdev)
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		if (!atomic_read(&device->pp_in_use_by_net))
+ 			continue;
+@@ -935,7 +935,8 @@ static int conn_connect(struct drbd_connection *connection)
+ 	struct drbd_socket sock, msock;
+ 	struct drbd_peer_device *peer_device;
+ 	struct net_conf *nc;
+-	int vnr, timeout, h;
++	int timeout, h;
++	unsigned long vnr;
+ 	bool discard_my_data, ok;
+ 	enum drbd_state_rv rv;
+ 	struct accept_wait_data ad = {
+@@ -1098,7 +1099,7 @@ static int conn_connect(struct drbd_connection *connection)
+ 	 * drbd_set_role() is finished, and any incoming drbd_set_role
+ 	 * will see the STATE_SENT flag, and wait for it to be cleared.
+ 	 */
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr)
++	xa_for_each(&connection->peer_devices, vnr, peer_device)
+ 		mutex_lock(peer_device->device->state_mutex);
+ 
+ 	/* avoid a race with conn_request_state( C_DISCONNECTING ) */
+@@ -1106,11 +1107,11 @@ static int conn_connect(struct drbd_connection *connection)
+ 	set_bit(STATE_SENT, &connection->flags);
+ 	spin_unlock_irq(&connection->resource->req_lock);
+ 
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr)
++	xa_for_each(&connection->peer_devices, vnr, peer_device)
+ 		mutex_unlock(peer_device->device->state_mutex);
+ 
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		kref_get(&device->kref);
+ 		rcu_read_unlock();
+@@ -1323,14 +1324,14 @@ static void drbd_flush(struct drbd_connection *connection)
+ 	if (connection->resource->write_ordering >= WO_BDEV_FLUSH) {
+ 		struct drbd_peer_device *peer_device;
+ 		struct issue_flush_context ctx;
+-		int vnr;
++		unsigned long vnr;
+ 
+ 		atomic_set(&ctx.pending, 1);
+ 		ctx.error = 0;
+ 		init_completion(&ctx.done);
+ 
+ 		rcu_read_lock();
+-		idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++		xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 			struct drbd_device *device = peer_device->device;
+ 
+ 			if (!get_ldev(device))
+@@ -1763,10 +1764,10 @@ static void drbd_remove_epoch_entry_interval(struct drbd_device *device,
+ static void conn_wait_active_ee_empty(struct drbd_connection *connection)
+ {
+ 	struct drbd_peer_device *peer_device;
+-	int vnr;
++	unsigned long vnr;
+ 
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 
+ 		kref_get(&device->kref);
+@@ -5166,7 +5167,7 @@ static void conn_disconnect(struct drbd_connection *connection)
+ {
+ 	struct drbd_peer_device *peer_device;
+ 	enum drbd_conns oc;
+-	int vnr;
++	unsigned long vnr;
+ 
+ 	if (connection->cstate == C_STANDALONE)
+ 		return;
+@@ -5187,7 +5188,7 @@ static void conn_disconnect(struct drbd_connection *connection)
+ 	drbd_free_sock(connection);
+ 
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		kref_get(&device->kref);
+ 		rcu_read_unlock();
+@@ -5881,12 +5882,12 @@ static int got_BarrierAck(struct drbd_connection *connection, struct packet_info
+ {
+ 	struct p_barrier_ack *p = pi->data;
+ 	struct drbd_peer_device *peer_device;
+-	int vnr;
++	unsigned long vnr;
+ 
+ 	tl_release(connection, p->barrier, be32_to_cpu(p->set_size));
+ 
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 
+ 		if (device->state.conn == C_AHEAD &&
 diff --git a/drivers/block/drbd/drbd_state.c b/drivers/block/drbd/drbd_state.c
-index 2b4c0db5d867..c3587054fa1e 100644
+index c3587054fa1e..f6a93cda2028 100644
 --- a/drivers/block/drbd/drbd_state.c
 +++ b/drivers/block/drbd/drbd_state.c
-@@ -56,12 +56,12 @@ static void count_objects(struct drbd_resource *resource,
+@@ -307,10 +307,10 @@ bool conn_all_vols_unconf(struct drbd_connection *connection)
  {
- 	struct drbd_device *device;
- 	struct drbd_connection *connection;
+ 	struct drbd_peer_device *peer_device;
+ 	bool rv = true;
 -	int vnr;
 +	unsigned long vnr;
  
- 	*n_devices = 0;
- 	*n_connections = 0;
- 
--	idr_for_each_entry(&resource->devices, device, vnr)
-+	xa_for_each(&resource->devices, vnr, device)
- 		(*n_devices)++;
- 	for_each_connection(connection, resource)
- 		(*n_connections)++;
-@@ -99,7 +99,7 @@ struct drbd_state_change *remember_old_state(struct drbd_resource *resource, gfp
- 	unsigned int n_devices;
- 	struct drbd_connection *connection;
- 	unsigned int n_connections;
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		if (device->state.disk != D_DISKLESS ||
+ 		    device->state.conn != C_STANDALONE ||
+@@ -348,10 +348,10 @@ enum drbd_role conn_highest_role(struct drbd_connection *connection)
+ {
+ 	enum drbd_role role = R_SECONDARY;
+ 	struct drbd_peer_device *peer_device;
 -	int vnr;
 +	unsigned long vnr;
  
- 	struct drbd_device_state_change *device_state_change;
- 	struct drbd_peer_device_state_change *peer_device_state_change;
-@@ -133,7 +133,7 @@ struct drbd_state_change *remember_old_state(struct drbd_resource *resource, gfp
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		role = max_role(role, device->state.role);
+ 	}
+@@ -364,10 +364,10 @@ enum drbd_role conn_highest_peer(struct drbd_connection *connection)
+ {
+ 	enum drbd_role peer = R_UNKNOWN;
+ 	struct drbd_peer_device *peer_device;
+-	int vnr;
++	unsigned long vnr;
  
- 	device_state_change = state_change->devices;
- 	peer_device_state_change = state_change->peer_devices;
--	idr_for_each_entry(&resource->devices, device, vnr) {
-+	xa_for_each(&resource->devices, vnr, device) {
- 		kref_get(&device->kref);
- 		device_state_change->device = device;
- 		device_state_change->disk_state[OLD] = device->state.disk;
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		peer = max_role(peer, device->state.peer);
+ 	}
+@@ -380,10 +380,10 @@ enum drbd_disk_state conn_highest_disk(struct drbd_connection *connection)
+ {
+ 	enum drbd_disk_state disk_state = D_DISKLESS;
+ 	struct drbd_peer_device *peer_device;
+-	int vnr;
++	unsigned long vnr;
+ 
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		disk_state = max_t(enum drbd_disk_state, disk_state, device->state.disk);
+ 	}
+@@ -396,10 +396,10 @@ enum drbd_disk_state conn_lowest_disk(struct drbd_connection *connection)
+ {
+ 	enum drbd_disk_state disk_state = D_MASK;
+ 	struct drbd_peer_device *peer_device;
+-	int vnr;
++	unsigned long vnr;
+ 
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		disk_state = min_t(enum drbd_disk_state, disk_state, device->state.disk);
+ 	}
+@@ -412,10 +412,10 @@ enum drbd_disk_state conn_highest_pdsk(struct drbd_connection *connection)
+ {
+ 	enum drbd_disk_state disk_state = D_DISKLESS;
+ 	struct drbd_peer_device *peer_device;
+-	int vnr;
++	unsigned long vnr;
+ 
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		disk_state = max_t(enum drbd_disk_state, disk_state, device->state.pdsk);
+ 	}
+@@ -428,10 +428,10 @@ enum drbd_conns conn_lowest_conn(struct drbd_connection *connection)
+ {
+ 	enum drbd_conns conn = C_MASK;
+ 	struct drbd_peer_device *peer_device;
+-	int vnr;
++	unsigned long vnr;
+ 
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		conn = min_t(enum drbd_conns, conn, device->state.conn);
+ 	}
+@@ -443,11 +443,11 @@ enum drbd_conns conn_lowest_conn(struct drbd_connection *connection)
+ static bool no_peer_wf_report_params(struct drbd_connection *connection)
+ {
+ 	struct drbd_peer_device *peer_device;
+-	int vnr;
++	unsigned long vnr;
+ 	bool rv = true;
+ 
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr)
++	xa_for_each(&connection->peer_devices, vnr, peer_device)
+ 		if (peer_device->device->state.conn == C_WF_REPORT_PARAMS) {
+ 			rv = false;
+ 			break;
+@@ -460,10 +460,10 @@ static bool no_peer_wf_report_params(struct drbd_connection *connection)
+ static void wake_up_all_devices(struct drbd_connection *connection)
+ {
+ 	struct drbd_peer_device *peer_device;
+-	int vnr;
++	unsigned long vnr;
+ 
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr)
++	xa_for_each(&connection->peer_devices, vnr, peer_device)
+ 		wake_up(&peer_device->device->state_wait);
+ 	rcu_read_unlock();
+ 
+@@ -1767,10 +1767,10 @@ static void after_state_ch(struct drbd_device *device, union drbd_state os,
+ 		if (resource->susp_fen && conn_lowest_conn(connection) >= C_CONNECTED) {
+ 			/* case2: The connection was established again: */
+ 			struct drbd_peer_device *peer_device;
+-			int vnr;
++			unsigned long vnr;
+ 
+ 			rcu_read_lock();
+-			idr_for_each_entry(&connection->peer_devices, peer_device, vnr)
++			xa_for_each(&connection->peer_devices, vnr, peer_device)
+ 				clear_bit(NEW_CUR_UUID, &peer_device->device->flags);
+ 			rcu_read_unlock();
+ 
+@@ -2054,7 +2054,7 @@ static int w_after_conn_state_ch(struct drbd_work *w, int unused)
+ 	enum drbd_conns oc = acscw->oc;
+ 	union drbd_state ns_max = acscw->ns_max;
+ 	struct drbd_peer_device *peer_device;
+-	int vnr;
++	unsigned long vnr;
+ 
+ 	broadcast_state_change(acscw->state_change);
+ 	forget_state_change(acscw->state_change);
+@@ -2068,7 +2068,7 @@ static int w_after_conn_state_ch(struct drbd_work *w, int unused)
+ 		struct net_conf *old_conf;
+ 
+ 		mutex_lock(&notification_mutex);
+-		idr_for_each_entry(&connection->peer_devices, peer_device, vnr)
++		xa_for_each(&connection->peer_devices, vnr, peer_device)
+ 			notify_peer_device_state(NULL, 0, peer_device, NULL,
+ 						 NOTIFY_DESTROY | NOTIFY_CONTINUES);
+ 		notify_connection_state(NULL, 0, connection, NULL, NOTIFY_DESTROY);
+@@ -2090,7 +2090,7 @@ static int w_after_conn_state_ch(struct drbd_work *w, int unused)
+ 		/* case1: The outdate peer handler is successful: */
+ 		if (ns_max.pdsk <= D_OUTDATED) {
+ 			rcu_read_lock();
+-			idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++			xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 				struct drbd_device *device = peer_device->device;
+ 				if (test_bit(NEW_CUR_UUID, &device->flags)) {
+ 					drbd_uuid_new_current(device);
+@@ -2117,7 +2117,8 @@ static void conn_old_common_state(struct drbd_connection *connection, union drbd
+ {
+ 	enum chg_state_flags flags = ~0;
+ 	struct drbd_peer_device *peer_device;
+-	int vnr, first_vol = 1;
++	unsigned long vnr;
++	bool first_vol = true;
+ 	union drbd_dev_state os, cs = {
+ 		{ .role = R_SECONDARY,
+ 		  .peer = R_UNKNOWN,
+@@ -2127,7 +2128,7 @@ static void conn_old_common_state(struct drbd_connection *connection, union drbd
+ 		} };
+ 
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		os = device->state;
+ 
+@@ -2166,10 +2167,10 @@ conn_is_valid_transition(struct drbd_connection *connection, union drbd_state ma
+ 	enum drbd_state_rv rv = SS_SUCCESS;
+ 	union drbd_state ns, os;
+ 	struct drbd_peer_device *peer_device;
+-	int vnr;
++	unsigned long vnr;
+ 
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		os = drbd_read_state(device);
+ 		ns = sanitize_state(device, os, apply_mask_val(os, mask, val), NULL);
+@@ -2216,7 +2217,7 @@ conn_set_state(struct drbd_connection *connection, union drbd_state mask, union
+ 		} };
+ 	struct drbd_peer_device *peer_device;
+ 	enum drbd_state_rv rv;
+-	int vnr, number_of_volumes = 0;
++	unsigned long vnr, number_of_volumes = 0;
+ 
+ 	if (mask.conn == C_MASK) {
+ 		/* remember last connect time so request_timer_fn() won't
+@@ -2229,7 +2230,7 @@ conn_set_state(struct drbd_connection *connection, union drbd_state mask, union
+ 	}
+ 
+ 	rcu_read_lock();
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		number_of_volumes++;
+ 		os = drbd_read_state(device);
 diff --git a/drivers/block/drbd/drbd_worker.c b/drivers/block/drbd/drbd_worker.c
-index 268ef0c5d4ab..614aa963700c 100644
+index 614aa963700c..ece947ba341d 100644
 --- a/drivers/block/drbd/drbd_worker.c
 +++ b/drivers/block/drbd/drbd_worker.c
-@@ -1577,10 +1577,10 @@ static bool drbd_pause_after(struct drbd_device *device)
+@@ -1013,8 +1013,8 @@ int drbd_resync_finished(struct drbd_device *device)
+ 		fp = rcu_dereference(device->ldev->disk_conf)->fencing;
+ 		if (fp != FP_DONT_CARE) {
+ 			struct drbd_peer_device *peer_device;
+-			int vnr;
+-			idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++			unsigned long vnr;
++			xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 				struct drbd_device *device = peer_device->device;
+ 				disk_state = min_t(enum drbd_disk_state, disk_state, device->state.disk);
+ 				pdsk_state = min_t(enum drbd_disk_state, pdsk_state, device->state.pdsk);
+@@ -2062,10 +2062,10 @@ static unsigned long get_work_bits(unsigned long *flags)
+ static void do_unqueued_work(struct drbd_connection *connection)
  {
- 	bool changed = false;
- 	struct drbd_device *odev;
--	int i;
-+	unsigned long i;
+ 	struct drbd_peer_device *peer_device;
+-	int vnr;
++	unsigned long vnr;
  
  	rcu_read_lock();
--	idr_for_each_entry(&drbd_devices, odev, i) {
-+	xa_for_each(&drbd_devices, i, odev) {
- 		if (odev->state.conn == C_STANDALONE && odev->state.disk == D_DISKLESS)
- 			continue;
- 		if (!_drbd_may_sync_now(odev) &&
-@@ -1603,10 +1603,10 @@ static bool drbd_resume_next(struct drbd_device *device)
- {
- 	bool changed = false;
- 	struct drbd_device *odev;
--	int i;
-+	unsigned long i;
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		unsigned long todo = get_work_bits(&device->flags);
+ 		if (!todo)
+@@ -2179,7 +2179,7 @@ int drbd_worker(struct drbd_thread *thi)
+ 	struct drbd_work *w = NULL;
+ 	struct drbd_peer_device *peer_device;
+ 	LIST_HEAD(work_list);
+-	int vnr;
++	unsigned long vnr;
+ 
+ 	while (get_t_state(thi) == RUNNING) {
+ 		drbd_thread_current_set_cpu(thi);
+@@ -2232,7 +2232,7 @@ int drbd_worker(struct drbd_thread *thi)
+ 	} while (!list_empty(&work_list) || test_bit(DEVICE_WORK_PENDING, &connection->flags));
  
  	rcu_read_lock();
--	idr_for_each_entry(&drbd_devices, odev, i) {
-+	xa_for_each(&drbd_devices, i, odev) {
- 		if (odev->state.conn == C_STANDALONE && odev->state.disk == D_DISKLESS)
- 			continue;
- 		if (odev->state.aftr_isp) {
+-	idr_for_each_entry(&connection->peer_devices, peer_device, vnr) {
++	xa_for_each(&connection->peer_devices, vnr, peer_device) {
+ 		struct drbd_device *device = peer_device->device;
+ 		D_ASSERT(device, device->state.disk == D_DISKLESS && device->state.conn == C_STANDALONE);
+ 		kref_get(&device->kref);
 -- 
 2.20.1
 
