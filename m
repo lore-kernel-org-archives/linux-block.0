@@ -2,174 +2,127 @@ Return-Path: <SRS0=WbMh=RV=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04A34C43381
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 06:56:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D31AC43381
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 06:58:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C76832083D
-	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 06:56:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF2192077B
+	for <linux-block@archiver.kernel.org>; Mon, 18 Mar 2019 06:58:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="r3octX7b"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="VN0couvw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727839AbfCRG4R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 02:56:17 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:45276 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727718AbfCRG4Q (ORCPT
+        id S1727813AbfCRG6D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 02:58:03 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:59268 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727769AbfCRG6D (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 02:56:16 -0400
-Received: by mail-ed1-f66.google.com with SMTP id m16so5948637edd.12
-        for <linux-block@vger.kernel.org>; Sun, 17 Mar 2019 23:56:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20150623.gappssmtp.com; s=20150623;
-        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
-         :references;
-        bh=Y+fCUWypa9Wa48AOjJ7DsieQeHoG5KFp1jhdxCULZuI=;
-        b=r3octX7b6BNdvt7yVmH9Q4f1qoX+c7M6ODBEUJzJoh3zgE8bQrxlTYpH/GzSjnjDCu
-         xe4wj8PtqUpRq7hyGvi5Dk35U4D9vUPLqdyLQfHD4qYfjrLuZOGnXQhyKRZKONto34zl
-         /Pe54YeKVCZv6z0UuMLsGdnMqHQ6/hmRQeyH/SQZTTRu+XabeLhLv1sLcvNu3z/Lenus
-         ALWF14dg+9o/ra5J4sdDkhcPf1JRN2MXK9lthSvzkmPpF0Le+7U7ThYCJ2Anc5wLm0x2
-         Zld4hCwZ9bAGSKu3fykYFWuhV6d91L0G7S7reShtvhEuShncMM78CR+01EeQTf6qihss
-         YfxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:message-id:mime-version:subject:date
-         :in-reply-to:cc:to:references;
-        bh=Y+fCUWypa9Wa48AOjJ7DsieQeHoG5KFp1jhdxCULZuI=;
-        b=q4CXxqFSv7E/YiKF9bhGgBWXGb2acgJFngfH3MsEo9nYHJqIovhcBro/hvY1MADRaT
-         T4O6J5OD65hPWlcmh4HqQBQyLQzZb3omDhEBkg6IHgYsmD94hsE0+USoW6mr8eJfzTCN
-         sfUY2nFQugI6AxCLejGa+Cp1Iq1HEJYdLHlojuyKEhMLMcHMkQETZAvpHs79HZLiF2B7
-         QDnTf8x/EMfUiE7hZWjHAk5/GIiIU5hVd6tKxuFl+b6BBnuPcWTFHNGcs7YKe+cggQSj
-         twWlyQEhJIIp98E67TuHd0YP+4APYeHoEBpkgl50g4PixpYoq0CF4iVDCWUVjAzMkTe2
-         lOwg==
-X-Gm-Message-State: APjAAAVFCHQCBYCARHlEQVqLMVM3bEiL9vHBhs0ZSmHzCzArvlKIkRn3
-        TghU5P8g0wj36CfES3KeFYzNRxuV7WlGnw==
-X-Google-Smtp-Source: APXvYqx4FNfpwBB6c9uTZKyp1GoSVcDCbE+M8weF+I097x7KhGHHMqlAmXLmfJSZxkyiHTCc4FqRHQ==
-X-Received: by 2002:a17:906:289b:: with SMTP id o27mr9947989ejd.161.1552892174771;
-        Sun, 17 Mar 2019 23:56:14 -0700 (PDT)
-Received: from [192.168.1.119] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
-        by smtp.gmail.com with ESMTPSA id r48sm3148232edd.87.2019.03.17.23.56.13
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 17 Mar 2019 23:56:13 -0700 (PDT)
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <13318131-0146-420D-94B9-5E771F344E2A@javigon.com>
-Content-Type: multipart/signed;
-        boundary="Apple-Mail=_4B1EF17F-6261-4535-98E7-4538FF788884";
-        protocol="application/pgp-signature";
-        micalg=pgp-sha256
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 11/18] lightnvm: pblk: fix update line wp in OOB recovery
-Date:   Mon, 18 Mar 2019 07:56:12 +0100
-In-Reply-To: <20190314160428.3559-12-igor.j.konopko@intel.com>
-Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        linux-block@vger.kernel.org
-To:     "Konopko, Igor J" <igor.j.konopko@intel.com>
-References: <20190314160428.3559-1-igor.j.konopko@intel.com>
- <20190314160428.3559-12-igor.j.konopko@intel.com>
-X-Mailer: Apple Mail (2.3445.102.3)
+        Mon, 18 Mar 2019 02:58:03 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2I6sZX4080941;
+        Mon, 18 Mar 2019 06:57:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=3gX8cKTbyoZG3L+QNNnAaLKgQc7So5R3/tqK9Oa6rDQ=;
+ b=VN0couvw8PSJFliV65Q6a6hkKT3q2lCQS+gGYyRtKwkJDP1DmYMByNzIrkDCZ9yG3auZ
+ Bw8YmlAmea0g91sQnZxOnLi8LExXvgtfyvQ6Wr2DiZ70kYLMaG8WnFQ0j1qaV/WMoNLK
+ 1p7V+y4EoAC6sWh8/Ob2OwLsCe6qTycmS37s4XfVOyBNrGAdT6q/3eEOpt4gYxaOiuLp
+ luB8VWTE9DtjZNajfKK2eMxbuUd8LHy77aQJRAiKDYoiXpgeWnWOXP2Tr9kla9bMmNcu
+ tCXbpjqhR4guSOqdxOPFC3ZYTP7oxa+/+sKRUamKNIF4FMXmGyL9B96rz1gQT04zeho2 Ng== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by aserp2130.oracle.com with ESMTP id 2r8pnecsk6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 18 Mar 2019 06:57:39 +0000
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x2I6vbMP031557
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 18 Mar 2019 06:57:37 GMT
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x2I6vWjF024292;
+        Mon, 18 Mar 2019 06:57:32 GMT
+Received: from [10.182.69.118] (/10.182.69.118)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sun, 17 Mar 2019 23:57:32 -0700
+Subject: Re: [PATCH 7/8] nvme: use blk_mq_queue_tag_busy_iter
+To:     James Smart <jsmart2021@gmail.com>, axboe@kernel.dk
+Cc:     hch@lst.de, jthumshirn@suse.de, hare@suse.de, josef@toxicpanda.com,
+        bvanassche@acm.org, sagi@grimberg.me, keith.busch@intel.com,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+References: <1552640264-26101-1-git-send-email-jianchao.w.wang@oracle.com>
+ <1552640264-26101-8-git-send-email-jianchao.w.wang@oracle.com>
+ <62de99e8-0d8d-910a-bfdc-649f734b152c@gmail.com>
+From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <3ce02cf8-f310-4a79-18d4-1ac2e1ef823a@oracle.com>
+Date:   Mon, 18 Mar 2019 15:00:39 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
+MIME-Version: 1.0
+In-Reply-To: <62de99e8-0d8d-910a-bfdc-649f734b152c@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9198 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1903180053
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi James
 
---Apple-Mail=_4B1EF17F-6261-4535-98E7-4538FF788884
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=utf-8
+On 3/16/19 12:33 AM, James Smart wrote:
+> On 3/15/2019 1:57 AM, Jianchao Wang wrote:
+>> blk_mq_tagset_busy_iter is not safe that it could get stale request
+>> in tags->rqs[]. Use blk_mq_queue_tag_busy_iter here. A new helper
+>> interface nvme_iterate_inflight_rqs is introduced to iterate
+>> all of the ns under a ctrl.
+>>
+>> Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+>> ---
+>>   drivers/nvme/host/core.c   | 12 ++++++++++++
+>>   drivers/nvme/host/fc.c     | 12 ++++++------
+>>   drivers/nvme/host/nvme.h   |  2 ++
+>>   drivers/nvme/host/pci.c    |  5 +++--
+>>   drivers/nvme/host/rdma.c   |  6 +++---
+>>   drivers/nvme/host/tcp.c    |  5 +++--
+>>   drivers/nvme/target/loop.c |  6 +++---
+>>   7 files changed, 32 insertions(+), 16 deletions(-)
+>>
+>> diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+>> index 6a9dd68..5760fad 100644
+>> --- a/drivers/nvme/host/core.c
+>> +++ b/drivers/nvme/host/core.c
+>> @@ -3816,6 +3816,18 @@ void nvme_start_queues(struct nvme_ctrl *ctrl)
+>>   }
+>>   EXPORT_SYMBOL_GPL(nvme_start_queues);
+>>   +void nvme_iterate_inflight_rqs(struct nvme_ctrl *ctrl,
+>> +        busy_iter_fn *fn, void *data)
+>> +{
+>> +    struct nvme_ns *ns;
+>> +
+>> +    down_read(&ctrl->namespaces_rwsem);
+>> +    list_for_each_entry(ns, &ctrl->namespaces, list)
+>> +        blk_mq_queue_tag_busy_iter(ns->queue, fn, data, true);
+>> +    up_read(&ctrl->namespaces_rwsem);
+>> +}
+>> +EXPORT_SYMBOL_GPL(nvme_iterate_inflight_rqs);
+> 
+> Hmm... so this aborts ios for namespaces. How about ios that aren't for a namespace but rather for the controller itself.  For example, anything on the admin queue ?   Rather critical for those ios be terminated as well.
+> 
 
-> On 14 Mar 2019, at 17.04, Igor Konopko <igor.j.konopko@intel.com> =
-wrote:
->=20
-> In case of OOB recovery, we can hit the scenario when all the data in
-> line were written and some part of emeta was written too. In such
-> a case pblk_update_line_wp() function will call pblk_alloc_page()
-> function which will case to set left_msecs to value below zero
-> (since this field does not track emeta region) and thus will lead to
-> multiple kernel warnings. This patch fixes that issue.
->=20
-> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-> ---
-> drivers/lightnvm/pblk-recovery.c | 20 +++++++++++++++++---
-> 1 file changed, 17 insertions(+), 3 deletions(-)
->=20
-> diff --git a/drivers/lightnvm/pblk-recovery.c =
-b/drivers/lightnvm/pblk-recovery.c
-> index 73d5ead..4764596 100644
-> --- a/drivers/lightnvm/pblk-recovery.c
-> +++ b/drivers/lightnvm/pblk-recovery.c
-> @@ -93,10 +93,24 @@ static int pblk_recov_l2p_from_emeta(struct pblk =
-*pblk, struct pblk_line *line)
-> static void pblk_update_line_wp(struct pblk *pblk, struct pblk_line =
-*line,
-> 				u64 written_secs)
-> {
-> -	int i;
-> +	struct pblk_line_mgmt *l_mg =3D &pblk->l_mg;
-> +	int i =3D 0;
->=20
-> -	for (i =3D 0; i < written_secs; i +=3D pblk->min_write_pgs)
-> -		pblk_alloc_page(pblk, line, pblk->min_write_pgs);
-> +	for (; i < written_secs; i +=3D pblk->min_write_pgs)
+The blk_mq_tagset_busy_iter which is currently used by nvme is iterating the in-flight ios for the controller.
+But due to blk_mq_tagset_busy_iter is not safe which is talked in the patch 0/8,
+so change it to blk_mq_queue_busy_tag_iter which is for a namespace/request_queue.
 
-Why no i =3D 0 here?
-
-> +		__pblk_alloc_page(pblk, line, pblk->min_write_pgs);
-> +
-> +	spin_lock(&l_mg->free_lock);
-> +	if (written_secs > line->left_msecs) {
-> +		/*
-> +		 * We have all data sectors written
-> +		 * and some emeta sectors written too.
-> +		 */
-> +		line->left_msecs =3D 0;
-> +	} else {
-> +		/* We have only some data sectors written. */
-> +		line->left_msecs -=3D written_secs;
-> +	}
-> +	spin_unlock(&l_mg->free_lock);
-> }
->=20
-> static u64 pblk_sec_in_open_line(struct pblk *pblk, struct pblk_line =
-*line)
-> --
-> 2.9.5
-
-Otherwise, it looks good.
-
-Reviewed-by: Javier Gonz=C3=A1lez <javier@javigon.com>
-
-
-
-
---Apple-Mail=_4B1EF17F-6261-4535-98E7-4538FF788884
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlyPQQwACgkQPEYBfS0l
-eOBrVw/6A9bxVvjvJQAyn8lWlEqtPLxrCMB6qSNH1nBT99LKfVm800TmlRNmC8NX
-OTD1iLn54HV3Ma2Cjxlr5UZ4X9XNrcF3x+LInZZBj68dmHr017fnI91phTOO9hjh
-j9LUGmD1isPu16Ny7DTPdLDS9u5SrHfg3Mdu9vredQ7LrYik3vJt3bG7ZqX1X1Wm
-3NvnrH9BOuLVJzgqPHaX/GsQk/cKfSQee9PyoK6tRAHQ6aYUMuegOwNtYnSnBa2T
-xUWiP55IVwIKWc5QIYCHhsGxZLd4o/DI1xRjVUrnRK/MQLWljlgBnDMJdkC7pppC
-W8B+vqpYc9VCwH1l5lzTrbbRFNsUV55/4ggfX9x1qYbsV5dN1FX1VLrnnCz9nC+Q
-c2uTo3JKBm6HTKiEGgYNYuhsimWGoTXjXgzN2pUQMSZE+ZIo45HKICmzRjubYCHE
-5EO6Yn7K6nM0eBJRmbbfORh6eIYY6G3Due/+0Foycxzq0dicl8ECo7Mxd/DDBnHe
-B9H0F1jkZifpQsClZ2DF7HWjdmxWJKR3wELvUnsDKOv3Cqpkx7yief0jW+lRBZ66
-MCYyNBgRxHnf9ssrftA/yRKwYNXl+D7/88hUgkOjCQ+jr2EHIwRZ9mpCzf/6E8Cx
-7ZWs0CEqiebOZzkLYzDjOTFvlTx7QYtInED8pWjgmCLpVVGzx4Y=
-=06Hm
------END PGP SIGNATURE-----
-
---Apple-Mail=_4B1EF17F-6261-4535-98E7-4538FF788884--
+Thanks
+Jianchao
