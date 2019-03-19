@@ -2,122 +2,147 @@ Return-Path: <SRS0=YHP0=RW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16892C43381
-	for <linux-block@archiver.kernel.org>; Tue, 19 Mar 2019 04:04:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF4C3C43381
+	for <linux-block@archiver.kernel.org>; Tue, 19 Mar 2019 04:25:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA08A20854
-	for <linux-block@archiver.kernel.org>; Tue, 19 Mar 2019 04:04:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DZjf0Z1s"
+	by mail.kernel.org (Postfix) with ESMTP id 8DD7020872
+	for <linux-block@archiver.kernel.org>; Tue, 19 Mar 2019 04:25:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725958AbfCSEEl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Mar 2019 00:04:41 -0400
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:42809 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725913AbfCSEEk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Mar 2019 00:04:40 -0400
-Received: by mail-oi1-f194.google.com with SMTP id w139so6142410oie.9
-        for <linux-block@vger.kernel.org>; Mon, 18 Mar 2019 21:04:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=+jBfmrowfcH2J/qQqo9idvj9cqHVWDySDwGkrCAoSVs=;
-        b=DZjf0Z1sfjXCx8dXXy0hZRc/m7mhxvWXkwAIjRN+oujKJIF2igYLyUHHKczVH8n97c
-         ehqFFz+qyQR9BvLS191lrPoAVUbG3pr5Ru+0UbZx1n8aEkRc6P1g13b9GLJXfMlS4fIN
-         foNU4yseau9mPTrXbmzQcmO0UeJMyIqq+1lrU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=+jBfmrowfcH2J/qQqo9idvj9cqHVWDySDwGkrCAoSVs=;
-        b=C2cbmMB+kmtWY3w/J4JQhsWuZ0evORWSTgTFvNv1zsCqubXmGydJOKJH4zlsHVOjMD
-         RHH7MXBgoyFn1Vlr6TAF3eNOI9sF6kPkOXYmbvqv345H8WIynw3oM7/0qhNy3XRAfw1V
-         OfmBOixPytG7qqEKVl78hiKNxWTs/wXkcBv6Me3lhmlioaxmCqolionLq/wKeVkVb4pg
-         iufEZewUHs2q5aYXBK7DdvZxNHO7TW9kg52gJ/j6JQ7j3JCnonhGCXY2gi56IkmhsWqy
-         YT/tVWlGpUOk/qcYF85istYmrf0cdu+FC9iN4afDPBjtGyqLTyOt3Hl1/yUAFFgP0heD
-         ZBMg==
-X-Gm-Message-State: APjAAAXZQM8FCMIyDwNZNhyNqFj3a/wNERNDKVExJlFvKyYzCn347Czp
-        n0uUY6P/z2M88TcwS09qNcf9nb2t1L4=
-X-Google-Smtp-Source: APXvYqwSTg24I6O1NC1fBPbdpaF9OCOumEzVH4BiA41swoug6IRtVJLknATrkNKnhs7QyQouT3qkww==
-X-Received: by 2002:aca:1e09:: with SMTP id m9mr206622oic.142.1552968279835;
-        Mon, 18 Mar 2019 21:04:39 -0700 (PDT)
-Received: from [192.168.1.237] (ip68-5-145-143.oc.oc.cox.net. [68.5.145.143])
-        by smtp.gmail.com with ESMTPSA id e12sm4030028otl.61.2019.03.18.21.04.37
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 18 Mar 2019 21:04:38 -0700 (PDT)
-Subject: Re: [PATCH 1/2] blk-mq: introduce blk_mq_complete_request_sync()
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org
-References: <20190318032950.17770-1-ming.lei@redhat.com>
- <20190318032950.17770-2-ming.lei@redhat.com>
- <4563485a-02c6-0bfe-d9ec-49adbd44671c@broadcom.com>
- <20190319013142.GB22459@ming.t460p>
-From:   James Smart <james.smart@broadcom.com>
-Message-ID: <cb036f6f-3dd5-cf7b-4811-6c7d97a2279e@broadcom.com>
-Date:   Mon, 18 Mar 2019 21:04:37 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.3
-MIME-Version: 1.0
-In-Reply-To: <20190319013142.GB22459@ming.t460p>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+        id S1725905AbfCSEZC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Mar 2019 00:25:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:33710 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725287AbfCSEZB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Mar 2019 00:25:01 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id F059D3082200;
+        Tue, 19 Mar 2019 04:25:00 +0000 (UTC)
+Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F29BF5DD97;
+        Tue, 19 Mar 2019 04:24:54 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Omar Sandoval <osandov@fb.com>, Yi Zhang <yi.zhang@redhat.com>
+Subject: [PATCH] sbitmap: order RW on old associated instance and setting clear bit
+Date:   Tue, 19 Mar 2019 12:24:47 +0800
+Message-Id: <20190319042447.27580-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Tue, 19 Mar 2019 04:25:01 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Inside sbitmap_queue_clear(), once the clear bit is set, it will be
+visiable to allocation path immediately. Meantime any RW on old
+associated instance(such as request in case of blk-mq) may be
+out-of-order with the setting clear bit, so use-after-free can
+be triggered if this tag is re-allocated.
 
+Adds one memory barrier for ordering RW on the freed associated
+instannce with setting clear bit for avoiding the potential
+use-after-free.
 
-On 3/18/2019 6:31 PM, Ming Lei wrote:
-> On Mon, Mar 18, 2019 at 10:37:08AM -0700, James Smart wrote:
->>
->> On 3/17/2019 8:29 PM, Ming Lei wrote:
->>> In NVMe's error handler, follows the typical steps for tearing down
->>> hardware:
->>>
->>> 1) stop blk_mq hw queues
->>> 2) stop the real hw queues
->>> 3) cancel in-flight requests via
->>> 	blk_mq_tagset_busy_iter(tags, cancel_request, ...)
->>> cancel_request():
->>> 	mark the request as abort
->>> 	blk_mq_complete_request(req);
->>> 4) destroy real hw queues
->>>
->>> However, there may be race between #3 and #4, because blk_mq_complete_request()
->>> actually completes the request asynchronously.
->>>
->>> This patch introduces blk_mq_complete_request_sync() for fixing the
->>> above race.
->>>
->> This won't help FC at all. Inherently, the "completion" has to be
->> asynchronous as line traffic may be required.
->>
->> e.g. FC doesn't use nvme_complete_request() in the iterator routine.
->>
-> Looks FC has done the sync already, see nvme_fc_delete_association():
->
-> 		...
->          /* wait for all io that had to be aborted */
->          spin_lock_irq(&ctrl->lock);
->          wait_event_lock_irq(ctrl->ioabort_wait, ctrl->iocnt == 0, ctrl->lock);
->          ctrl->flags &= ~FCCTRL_TERMIO;
->          spin_unlock_irq(&ctrl->lock);
+This patch fixes the following kernel oops triggerd by block/006 on
+aarch64:
 
-yes - but the iterator started a lot of the back end io terminating in 
-parallel. So waiting on many happening in parallel is better than 
-waiting 1 at a time.   Even so, I've always disliked this wait and would 
-have preferred to exit the thread with something monitoring the 
-completions re-queuing a work thread to finish.
+[  142.330954] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000330
+[  142.338794] Mem abort info:
+[  142.341554]   ESR = 0x96000005
+[  142.344632]   Exception class = DABT (current EL), IL = 32 bits
+[  142.350500]   SET = 0, FnV = 0
+[  142.353544]   EA = 0, S1PTW = 0
+[  142.356678] Data abort info:
+[  142.359528]   ISV = 0, ISS = 0x00000005
+[  142.363343]   CM = 0, WnR = 0
+[  142.366305] user pgtable: 64k pages, 48-bit VAs, pgdp = 000000002a3c51c0
+[  142.372983] [0000000000000330] pgd=0000000000000000, pud=0000000000000000
+[  142.379777] Internal error: Oops: 96000005 [#1] SMP
+[  142.384613] Modules linked in: null_blk ib_isert iscsi_target_mod ib_srpt target_core_mod ib_srp scsi_transport_srp vfat fat rpcrdma sunrpc rdma_ucm ib_iser rdma_cm iw_cm libiscsi ib_umad scsi_transport_iscsi ib_ipoib ib_cm mlx5_ib ib_uverbs ib_core sbsa_gwdt crct10dif_ce ghash_ce ipmi_ssif sha2_ce ipmi_devintf sha256_arm64 sg sha1_ce ipmi_msghandler ip_tables xfs libcrc32c mlx5_core sdhci_acpi mlxfw ahci_platform at803x sdhci libahci_platform qcom_emac mmc_core hdma hdma_mgmt i2c_dev [last unloaded: null_blk]
+[  142.429753] CPU: 7 PID: 1983 Comm: fio Not tainted 5.0.0.cki #2
+[  142.449458] pstate: 00400005 (nzcv daif +PAN -UAO)
+[  142.454239] pc : __blk_mq_free_request+0x4c/0xa8
+[  142.458830] lr : blk_mq_free_request+0xec/0x118
+[  142.463344] sp : ffff00003360f6a0
+[  142.466646] x29: ffff00003360f6a0 x28: ffff000010e70000
+[  142.471941] x27: ffff801729a50048 x26: 0000000000010000
+[  142.477232] x25: ffff00003360f954 x24: ffff7bdfff021440
+[  142.482529] x23: 0000000000000000 x22: 00000000ffffffff
+[  142.487830] x21: ffff801729810000 x20: 0000000000000000
+[  142.493123] x19: ffff801729a50000 x18: 0000000000000000
+[  142.498413] x17: 0000000000000000 x16: 0000000000000001
+[  142.503709] x15: 00000000000000ff x14: ffff7fe000000000
+[  142.509003] x13: ffff8017dcde09a0 x12: 0000000000000000
+[  142.514308] x11: 0000000000000001 x10: 0000000000000008
+[  142.519597] x9 : ffff8017dcde09a0 x8 : 0000000000002000
+[  142.524889] x7 : ffff8017dcde0a00 x6 : 000000015388f9be
+[  142.530187] x5 : 0000000000000001 x4 : 0000000000000000
+[  142.535478] x3 : 0000000000000000 x2 : 0000000000000000
+[  142.540777] x1 : 0000000000000001 x0 : ffff00001041b194
+[  142.546071] Process fio (pid: 1983, stack limit = 0x000000006460a0ea)
+[  142.552500] Call trace:
+[  142.554926]  __blk_mq_free_request+0x4c/0xa8
+[  142.559181]  blk_mq_free_request+0xec/0x118
+[  142.563352]  blk_mq_end_request+0xfc/0x120
+[  142.567444]  end_cmd+0x3c/0xa8 [null_blk]
+[  142.571434]  null_complete_rq+0x20/0x30 [null_blk]
+[  142.576194]  blk_mq_complete_request+0x108/0x148
+[  142.580797]  null_handle_cmd+0x1d4/0x718 [null_blk]
+[  142.585662]  null_queue_rq+0x60/0xa8 [null_blk]
+[  142.590171]  blk_mq_try_issue_directly+0x148/0x280
+[  142.594949]  blk_mq_try_issue_list_directly+0x9c/0x108
+[  142.600064]  blk_mq_sched_insert_requests+0xb0/0xd0
+[  142.604926]  blk_mq_flush_plug_list+0x16c/0x2a0
+[  142.609441]  blk_flush_plug_list+0xec/0x118
+[  142.613608]  blk_finish_plug+0x3c/0x4c
+[  142.617348]  blkdev_direct_IO+0x3b4/0x428
+[  142.621336]  generic_file_read_iter+0x84/0x180
+[  142.625761]  blkdev_read_iter+0x50/0x78
+[  142.629579]  aio_read.isra.6+0xf8/0x190
+[  142.633409]  __io_submit_one.isra.8+0x148/0x738
+[  142.637912]  io_submit_one.isra.9+0x88/0xb8
+[  142.642078]  __arm64_sys_io_submit+0xe0/0x238
+[  142.646428]  el0_svc_handler+0xa0/0x128
+[  142.650238]  el0_svc+0x8/0xc
+[  142.653104] Code: b9402a63 f9000a7f 3100047f 540000a0 (f9419a81)
+[  142.659202] ---[ end trace 467586bc175eb09d ]---
 
--- james
+Fixes: ea86ea2cdced20057da ("sbitmap: ammortize cost of clearing bits")
+Reported-and-bisected-and-tested-by: Yi Zhang <yi.zhang@redhat.com>
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Yi Zhang <yi.zhang@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ lib/sbitmap.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index 5b382c1244ed..48e62322b9c6 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -591,6 +591,15 @@ EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
+ void sbitmap_queue_clear(struct sbitmap_queue *sbq, unsigned int nr,
+ 			 unsigned int cpu)
+ {
++	/*
++	 * Once the clear bit is set, it will be visible to allocation
++	 * side.
++	 *
++	 * This memory barrier orders any READ/WRITE on the to-be-freed
++	 * asssociated instance for avoiding potential use-after-free, and
++	 * its pair is the memory barrier implied in sbitmap_get().
++	 */
++	smp_mb();
+ 	sbitmap_deferred_clear_bit(&sbq->sb, nr);
+ 
+ 	/*
+-- 
+2.9.5
 
