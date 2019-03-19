@@ -4,152 +4,118 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DCDFC43381
-	for <linux-block@archiver.kernel.org>; Tue, 19 Mar 2019 02:18:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D081C43381
+	for <linux-block@archiver.kernel.org>; Tue, 19 Mar 2019 03:37:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 22F6D2146E
-	for <linux-block@archiver.kernel.org>; Tue, 19 Mar 2019 02:18:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 249F020989
+	for <linux-block@archiver.kernel.org>; Tue, 19 Mar 2019 03:37:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="xU5toR2l"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="HyduMx4N"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727408AbfCSCSi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Mar 2019 22:18:38 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:57636 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726832AbfCSCSh (ORCPT
+        id S1726788AbfCSDhi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Mar 2019 23:37:38 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:33516 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726743AbfCSDhi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Mar 2019 22:18:37 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2J2FIvG034487;
-        Tue, 19 Mar 2019 02:18:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=8WOjIZ8HA0PmsIsu84PFWpwUD/WhnweLtaNZQdrhu2w=;
- b=xU5toR2ln97pPrhT5DPhATOICwbv9havXoGA7cg/P2rjjeEaVp+Ji+AHyopxYu5iDArs
- Ske3JzYLVKG7+aujcUqW4SvCwMAv6OdS+lYyN0bktSNyLincA6wjaO6zGGKcdERflWrO
- mcO7KV4DiLvqyFP5YK1XKHqNk4SBUVLE8od8rwzge7CbVfBl5iU3n8yNZE29maKbnXYy
- 6c3c/5aJVg8K/7oQo6rhzFUwKcBNIBhygZcdnpaE+CZCJnfk0enD/7hZnKhR8yhfA+UY
- H1krMMmEfpK/3mYxoFyMLETbU8YKg2Ez5fgusC759jDbuaEw6k1KZNRCivby9mzCIJpH KA== 
-Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
-        by userp2120.oracle.com with ESMTP id 2r8ssr9sqk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Mar 2019 02:18:31 +0000
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x2J2IPQh003715
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Mar 2019 02:18:25 GMT
-Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x2J2IOjM016507;
-        Tue, 19 Mar 2019 02:18:24 GMT
-Received: from [10.182.69.106] (/10.182.69.106)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 18 Mar 2019 19:18:24 -0700
-Subject: Re: virtio-blk: should num_vqs be limited by num_possible_cpus()?
-To:     Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc:     mst@redhat.com, virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        linux-kernel@vger.kernel.org
-References: <e4afe4c5-0262-4500-aeec-60f30734b4fc@default>
- <20190312183351.74764f4f.cohuck@redhat.com>
- <173d19c9-24db-35f2-269f-0b9b83bd0ad6@oracle.com>
- <20190313103900.1ea7f996.cohuck@redhat.com>
- <a3f24cfa-5160-0ccc-decc-a48362c8de19@oracle.com>
- <537e6420-8994-43d6-1d4d-ccb6e0fafa0b@redhat.com>
- <20190315134112.7d63348c.cohuck@redhat.com>
- <1df52766-88fb-6b23-d160-b891c3017133@redhat.com>
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <0fbdcfa6-cbd7-4f09-93b1-40898d5f77d1@oracle.com>
-Date:   Tue, 19 Mar 2019 10:22:21 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        Mon, 18 Mar 2019 23:37:38 -0400
+Received: by mail-ot1-f66.google.com with SMTP id q24so16447571otk.0
+        for <linux-block@vger.kernel.org>; Mon, 18 Mar 2019 20:37:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=Hqp0jHS2sCkG7UFO+bJYm762lcPTSyNN5UvsAKRxIRc=;
+        b=HyduMx4Nd+g0ECNFs6PwjpgwVXZH4fNygCsrIJ6l3j96IKvyPe//ectkM+PVsohffl
+         FAZDbAk2TJXj/AXQCbBQZc6oRxPCYl70RaDA+ypvWIVYvr9xbp3uM1dAOcJhq3M+npAB
+         JYnGpRs03xK5yASQynygptPIPAuGDUmO+Qswg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=Hqp0jHS2sCkG7UFO+bJYm762lcPTSyNN5UvsAKRxIRc=;
+        b=VoiNVFqzspf2ptYnYxHOSi8jnACvRYNSZy2yjSuLGS1rT4DSSvjx1xO+lwIS1R4wb2
+         d0CdlfkPNdE3Z6gSrlHiAES48AfNi8p9aPLEMwX20OrU+eayyGWBPIa3b3CV7CKN67SJ
+         6Fd9ieN/EfRZR2I/DUWIR9KhbBf6EgCkmr8HqD1FD0JWg5mDa3Tzr2GeF8A/CtdzVzEx
+         7rm+iC0f9pzdIgowyLFpjCZzu3ivHkBoN/0M9m8Itli9R98+0kD6Qbd5fZ+jgb5n8+a9
+         2+3ZRYjPp7q0+OoqMZRPWGWtPg07ExLRjCl/eesPMJ4kOvV/r3a5BHl0bvUBeonUnuMO
+         +Png==
+X-Gm-Message-State: APjAAAVN+F3gd3CFuI8gcGM/X5Vh9yO0Kich7sKDH0UgeXJ2gu90dkcf
+        N/AOAvEb/HWk0lV6POTpj1X3rg==
+X-Google-Smtp-Source: APXvYqwd4nBKALFUHpa5esaxhq4DGHCfCGvp9keLcexl1VZj96JIvdGCJOAEyuFiBu1FYCjugt7k7w==
+X-Received: by 2002:a05:6830:1018:: with SMTP id a24mr176643otp.111.1552966657145;
+        Mon, 18 Mar 2019 20:37:37 -0700 (PDT)
+Received: from [192.168.1.237] (ip68-5-145-143.oc.oc.cox.net. [68.5.145.143])
+        by smtp.gmail.com with ESMTPSA id h138sm5594128oic.8.2019.03.18.20.37.35
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 18 Mar 2019 20:37:36 -0700 (PDT)
+Subject: Re: [PATCH 1/2] blk-mq: introduce blk_mq_complete_request_sync()
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org
+References: <20190318032950.17770-1-ming.lei@redhat.com>
+ <20190318032950.17770-2-ming.lei@redhat.com>
+ <4563485a-02c6-0bfe-d9ec-49adbd44671c@broadcom.com>
+ <20190319010601.GA22459@ming.t460p>
+From:   James Smart <james.smart@broadcom.com>
+Message-ID: <606d3477-e7ed-d876-f132-11627a77a760@broadcom.com>
+Date:   Mon, 18 Mar 2019 20:37:35 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.3
 MIME-Version: 1.0
-In-Reply-To: <1df52766-88fb-6b23-d160-b891c3017133@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <20190319010601.GA22459@ming.t460p>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9199 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1903190015
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jason,
 
-On 3/18/19 3:47 PM, Jason Wang wrote:
-> 
-> On 2019/3/15 下午8:41, Cornelia Huck wrote:
->> On Fri, 15 Mar 2019 12:50:11 +0800
->> Jason Wang <jasowang@redhat.com> wrote:
+
+On 3/18/2019 6:06 PM, Ming Lei wrote:
+> On Mon, Mar 18, 2019 at 10:37:08AM -0700, James Smart wrote:
 >>
->>> Or something like I proposed several years ago?
->>> https://do-db2.lkml.org/lkml/2014/12/25/169
+>> On 3/17/2019 8:29 PM, Ming Lei wrote:
+>>> In NVMe's error handler, follows the typical steps for tearing down
+>>> hardware:
 >>>
->>> Btw, for virtio-net, I think we actually want to go for having a maximum
->>> number of supported queues like what hardware did. This would be useful
->>> for e.g cpu hotplug or XDP (requires per cpu TX queue). But the current
->>> vector allocation doesn't support this which will results all virtqueues
->>> to share a single vector. We may indeed need more flexible policy here.
->> I think it should be possible for the driver to give the transport
->> hints how to set up their queues/interrupt structures. (The driver
->> probably knows best about its requirements.) Perhaps whether a queue is
->> high or low frequency, or whether it should be low latency, or even
->> whether two queues could share a notification mechanism without
->> drawbacks. It's up to the transport to make use of that information, if
->> possible.
-> 
-> 
-> Exactly and it was what the above series tried to do by providing hints of e.g
-> which queues want to share a notification.
-> 
+>>> 1) stop blk_mq hw queues
+>>> 2) stop the real hw queues
+>>> 3) cancel in-flight requests via
+>>> 	blk_mq_tagset_busy_iter(tags, cancel_request, ...)
+>>> cancel_request():
+>>> 	mark the request as abort
+>>> 	blk_mq_complete_request(req);
+>>> 4) destroy real hw queues
+>>>
+>>> However, there may be race between #3 and #4, because blk_mq_complete_request()
+>>> actually completes the request asynchronously.
+>>>
+>>> This patch introduces blk_mq_complete_request_sync() for fixing the
+>>> above race.
+>>>
+>> This won't help FC at all. Inherently, the "completion" has to be
+>> asynchronous as line traffic may be required.
+>>
+>> e.g. FC doesn't use nvme_complete_request() in the iterator routine.
+> Yeah, I saw the FC code, it is supposed to address the asynchronous
+> completion of blk_mq_complete_request() in error handler.
+>
+> Also I think it is always the correct thing to abort requests
+> synchronously in error handler, isn't it?
+>
 
-I read about your patch set on providing more flexibility of queue-to-vector
-mapping.
+not sure I fully follow you, but if you're asking shouldn't it always be 
+synchronous - why would that be the case ?  I really don't want a 
+blocking thread that could block for several seconds on a single io to 
+complete.  The controller has changed state and the queues frozen which 
+should have been sufficient - but bottom-end io can still complete at 
+any time.
 
-One use case of the patch set is we would be able to enable more queues when
-there is limited number of vectors.
+-- james
 
-Another use case we may classify queues as hight priority or low priority as
-mentioned by Cornelia.
-
-For virtio-blk, we may extend virtio-blk based on this patch set to enable
-something similar to write_queues/poll_queues in nvme, when (set->nr_maps != 1).
-
-
-Yet, the question I am asking in this email thread is for a difference scenario.
-
-The issue is not we are not having enough vectors (although this is why only 1
-vector is allocated for all virtio-blk queues). As so far virtio-blk has
-(set->nr_maps == 1), block layer would limit the number of hw queues by
-nr_cpu_ids, we indeed do not need more than nr_cpu_ids hw queues in virtio-blk.
-
-That's why I ask why not change the flow as below options when the number of
-supported hw queues is more than nr_cpu_ids (and set->nr_maps == 1. virtio-blk
-does not set nr_maps and block layer would set it to 1 when the driver does not
-specify with a value):
-
-option 1:
-As what nvme and xen-netfront do, limit the hw queue number by nr_cpu_ids.
-
-option 2:
-If the vectors is not enough, use the max number vector (indeed nr_cpu_ids) as
-number of hw queues.
-
-option 3:
-We should allow more vectors even the block layer would support at most
-nr_cpu_ids queues.
-
-
-I understand a new policy for queue-vector mapping is very helpful. I am just
-asking the question from block layer's point of view.
-
-Thank you very much!
-
-Dongli Zhang
