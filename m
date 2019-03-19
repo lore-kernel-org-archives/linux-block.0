@@ -2,125 +2,100 @@ Return-Path: <SRS0=YHP0=RW=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C37DC43381
-	for <linux-block@archiver.kernel.org>; Tue, 19 Mar 2019 04:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 040F4C43381
+	for <linux-block@archiver.kernel.org>; Tue, 19 Mar 2019 05:14:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CCB4D2085A
-	for <linux-block@archiver.kernel.org>; Tue, 19 Mar 2019 04:28:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C10CE20989
+	for <linux-block@archiver.kernel.org>; Tue, 19 Mar 2019 05:14:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="D1kLBlyR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725290AbfCSE2P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Mar 2019 00:28:15 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60132 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725287AbfCSE2P (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Mar 2019 00:28:15 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id DEB593082B07;
-        Tue, 19 Mar 2019 04:28:14 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 748F219C67;
-        Tue, 19 Mar 2019 04:28:09 +0000 (UTC)
-Date:   Tue, 19 Mar 2019 12:28:04 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     James Smart <james.smart@broadcom.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 1/2] blk-mq: introduce blk_mq_complete_request_sync()
-Message-ID: <20190319042803.GD22459@ming.t460p>
-References: <20190318032950.17770-1-ming.lei@redhat.com>
- <20190318032950.17770-2-ming.lei@redhat.com>
- <4563485a-02c6-0bfe-d9ec-49adbd44671c@broadcom.com>
- <20190319013142.GB22459@ming.t460p>
- <cb036f6f-3dd5-cf7b-4811-6c7d97a2279e@broadcom.com>
+        id S1725978AbfCSFOd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Mar 2019 01:14:33 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:38842 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725287AbfCSFOd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Mar 2019 01:14:33 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2J5ELmT155178;
+        Tue, 19 Mar 2019 05:14:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=DwSnNDqnPUTXk4dmngFX+rC699NjHiw/SGofjgeXANc=;
+ b=D1kLBlyR1Oc4OaVTPN4eVDW2vXsk7WJKLuZLckfza9YnbOO1GaVpYPMHsvh/rJxj25Hd
+ BrIvW2EMaxg5kEFbeRqlI33AhOw/aq4sWC412eXgdDaZq5SBkYtkr/J3fXmb6tbSdEt8
+ MHyQn7EHlEzo/AD+HA66xFlvA/itf9WUWTpMoUaqu8pAbx49kfaqVQZlSVIf3cmojx9K
+ 1c+UG00GHglu16R6OgIZa3vhKSfDIv440Nb4zUaM/pOqdFILktEeOghw6FKEM/fG0aKX
+ ULBEqx4kMz7g6zK82Pz3W0auOwEgPwHAQuaMrzrlkYH1oyBSPE2y342Ny+wvFkvLsTsS HQ== 
+Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
+        by userp2120.oracle.com with ESMTP id 2r8ssra7bn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Mar 2019 05:14:28 +0000
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2J5EMAP010354
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 Mar 2019 05:14:22 GMT
+Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x2J5EMBp017489;
+        Tue, 19 Mar 2019 05:14:22 GMT
+Received: from [10.182.69.118] (/10.182.69.118)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 18 Mar 2019 22:14:22 -0700
+Subject: Re: [PATCH] sbitmap: order RW on old associated instance and setting
+ clear bit
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        Yi Zhang <yi.zhang@redhat.com>
+References: <20190319042447.27580-1-ming.lei@redhat.com>
+From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <9e784c48-2865-a14a-d8f4-e6c74f258f48@oracle.com>
+Date:   Tue, 19 Mar 2019 13:17:31 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cb036f6f-3dd5-cf7b-4811-6c7d97a2279e@broadcom.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.45]); Tue, 19 Mar 2019 04:28:14 +0000 (UTC)
+In-Reply-To: <20190319042447.27580-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9199 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=904 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1903190039
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 18, 2019 at 09:04:37PM -0700, James Smart wrote:
-> 
-> 
-> On 3/18/2019 6:31 PM, Ming Lei wrote:
-> > On Mon, Mar 18, 2019 at 10:37:08AM -0700, James Smart wrote:
-> > > 
-> > > On 3/17/2019 8:29 PM, Ming Lei wrote:
-> > > > In NVMe's error handler, follows the typical steps for tearing down
-> > > > hardware:
-> > > > 
-> > > > 1) stop blk_mq hw queues
-> > > > 2) stop the real hw queues
-> > > > 3) cancel in-flight requests via
-> > > > 	blk_mq_tagset_busy_iter(tags, cancel_request, ...)
-> > > > cancel_request():
-> > > > 	mark the request as abort
-> > > > 	blk_mq_complete_request(req);
-> > > > 4) destroy real hw queues
-> > > > 
-> > > > However, there may be race between #3 and #4, because blk_mq_complete_request()
-> > > > actually completes the request asynchronously.
-> > > > 
-> > > > This patch introduces blk_mq_complete_request_sync() for fixing the
-> > > > above race.
-> > > > 
-> > > This won't help FC at all. Inherently, the "completion" has to be
-> > > asynchronous as line traffic may be required.
-> > > 
-> > > e.g. FC doesn't use nvme_complete_request() in the iterator routine.
-> > > 
-> > Looks FC has done the sync already, see nvme_fc_delete_association():
-> > 
-> > 		...
-> >          /* wait for all io that had to be aborted */
-> >          spin_lock_irq(&ctrl->lock);
-> >          wait_event_lock_irq(ctrl->ioabort_wait, ctrl->iocnt == 0, ctrl->lock);
-> >          ctrl->flags &= ~FCCTRL_TERMIO;
-> >          spin_unlock_irq(&ctrl->lock);
-> 
-> yes - but the iterator started a lot of the back end io terminating in
-> parallel. So waiting on many happening in parallel is better than waiting 1
-> at a time.
+Hi Ming
 
-OK, that is FC's sync, not related with this patch.
+On 3/19/19 12:24 PM, Ming Lei wrote:
+> @@ -591,6 +591,15 @@ EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
+>  void sbitmap_queue_clear(struct sbitmap_queue *sbq, unsigned int nr,
+>  			 unsigned int cpu)
+>  {
+> +	/*
+> +	 * Once the clear bit is set, it will be visible to allocation
+> +	 * side.
+> +	 *
+> +	 * This memory barrier orders any READ/WRITE on the to-be-freed
+> +	 * asssociated instance for avoiding potential use-after-free, and
+> +	 * its pair is the memory barrier implied in sbitmap_get().
+which one ?
 
-> Even so, I've always disliked this wait and would have
-> preferred to exit the thread with something monitoring the completions
-> re-queuing a work thread to finish.
+> +	 */
+> +	smp_mb();
 
-Then I guess you may like this patch given it actually avoids the
-potential wait, :-)
+smp_mb_before_atomic should be enough.
 
-What the patch does is to convert the remote completion(#1) into local
-completion(#2):
+>  	sbitmap_deferred_clear_bit(&sbq->sb, nr);
 
-1) previously one request may be completed remotely by blk_mq_complete_request():
-
-         rq->csd.func = __blk_mq_complete_request_remote;
-         rq->csd.info = rq;
-         rq->csd.flags = 0;
-         smp_call_function_single_async(ctx->cpu, &rq->csd);
-
-2) this patch changes the remote completion into local completion via
-blk_mq_complete_request_sync(), so all in-flight requests can be aborted
-before destroying queue.
-
-		q->mq_ops->complete(rq);
-
-As I mentioned in another email, there isn't any waiting for aborting
-request, nvme_cancel_request() simply requeues the request to blk-mq
-under this situation.
-
-Thanks,
-Ming
+Thanks
+Jianchao
