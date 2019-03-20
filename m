@@ -2,131 +2,170 @@ Return-Path: <SRS0=ireV=RX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83DC2C10F05
-	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 13:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CD8DC43381
+	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 13:44:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 59E2D2184D
-	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 13:20:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 126792184D
+	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 13:44:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727028AbfCTNU1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Mar 2019 09:20:27 -0400
-Received: from mx2.suse.de ([195.135.220.15]:50480 "EHLO mx1.suse.de"
+        id S1726366AbfCTNoC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Mar 2019 09:44:02 -0400
+Received: from mx2.suse.de ([195.135.220.15]:54916 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728277AbfCTNT1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Mar 2019 09:19:27 -0400
+        id S1725905AbfCTNoC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Mar 2019 09:44:02 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 40BFEAEEA;
-        Wed, 20 Mar 2019 13:19:25 +0000 (UTC)
-Subject: Re: [PATCH] block_dev: fix crash on chained bios with O_DIRECT
-To:     Jan Kara <jack@suse.cz>
-Cc:     Hannes Reinecke <hare@suse.com>, Hannes Reinecke <hare@suse.de>,
-        Jan Kara <jack@suse.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20190320081253.129688-1-hare@suse.de>
- <9cec723b-d0d0-859f-37c2-bfdccb898071@suse.de>
- <e9953e6c-fd4c-cde5-976e-a5831d7c79a3@suse.com>
- <abd08aa4-f5fd-8ed1-1ae2-9987f6a43dc7@suse.de>
- <20190320114734.GB9485@quack2.suse.cz>
-From:   Johannes Thumshirn <jthumshirn@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <94293d71-fab4-43cd-3d83-243995218907@suse.de>
-Date:   Wed, 20 Mar 2019 14:19:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.0
+        by mx1.suse.de (Postfix) with ESMTP id DB714AFE9;
+        Wed, 20 Mar 2019 13:43:43 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 368F81E4255; Wed, 20 Mar 2019 14:43:43 +0100 (CET)
+Date:   Wed, 20 Mar 2019 14:43:43 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Dongli Zhang <dongli.zhang@oracle.com>
+Cc:     Jan Kara <jack@suse.cz>,
+        syzbot <syzbot+9bdc1adc1c55e7fe765b@syzkaller.appspotmail.com>,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        penguin-kernel@i-love.sakura.ne.jp
+Subject: Re: general protection fault in loop_validate_file (2)
+Message-ID: <20190320134343.GF9485@quack2.suse.cz>
+References: <00000000000098bf7d05845616d7@google.com>
+ <cb7aa6d1-6d1e-a9ac-239a-1b5d8160f8cd@oracle.com>
+ <20190319094136.GE17334@quack2.suse.cz>
+ <a6a6fda6-4911-69a1-9db1-97e3ec7cce99@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20190320114734.GB9485@quack2.suse.cz>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a6a6fda6-4911-69a1-9db1-97e3ec7cce99@oracle.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 20/03/2019 12:47, Jan Kara wrote:
-> On Wed 20-03-19 09:53:10, Johannes Thumshirn wrote:
->> On 20/03/2019 09:51, Hannes Reinecke wrote:
->>> Yeah, should work, too.
->>> But we should be calling bio_uninit() for all bios.
->>
->> Yup, probably.
->>
->>> Will you be sending an updated patch?
->>
->> Let's wait what other's thing first.
+On Wed 20-03-19 12:21:29, Dongli Zhang wrote:
+> On 3/19/19 5:41 PM, Jan Kara wrote:
+> > On Mon 18-03-19 20:27:02, Dongli Zhang wrote:
+> >> Hi Jan,
+> >>
+> >> Indeed there is another issue implicitly reported by below console output from
+> >> syzkaller:
+> >>
+> >> [  245.524424][ T9455] loop_reread_partitions: partition scan of loop0 () failed
+> >> (rc=-13)
+> >> [  245.563340][ T9499] kasan: CONFIG_KASAN_INLINE enabled
+> >> [  245.576412][ T9489] __loop_clr_fd: partition scan of loop0 failed (rc=-13)
+> >> [  245.581275][ T9499] kasan: GPF could be caused by NULL-ptr deref or user
+> >> memory access
+> >> [  245.602596][ T9499] general protection fault: 0000 [#1] PREEMPT SMP KASAN
+> >>
+> >> I think rc=-13 is because of below code at line 168:
+> >>
+> >> 162 int __blkdev_reread_part(struct block_device *bdev)
+> >> 163 {
+> >> 164         struct gendisk *disk = bdev->bd_disk;
+> >> 165
+> >> 166         if (!disk_part_scan_enabled(disk) || bdev != bdev->bd_contains)
+> >> 167                 return -EINVAL;
+> >> 168         if (!capable(CAP_SYS_ADMIN))
+> >> 169                 return -EACCES;
+> >> 170
+> >> 171         lockdep_assert_held(&bdev->bd_mutex);
+> >> 172
+> >> 173         return rescan_partitions(disk, bdev);
+> >> 174 }
+> >> 175 EXPORT_SYMBOL(__blkdev_reread_part);
+> >>
+> >> I can reproduce this by 'chown username /dev/loop0' on my test machine.
+> >>
+> >> Taking 'losetup -d /dev/loop0' as sample, as /dev/loop0 belongs to my username,
+> >> I am able to detach the loop without 'su'.
+> >>
+> >> However, because of above line 168, the partition scan would fail.
+> >>
+> >> Should we always assume the user should have admin privilege to detach
+> >> the loop and this is not a bug?
+> > 
+> > Firstly, __blkdev_reread_part() is used for all devices so we have to be
+> > *very* careful when we relax the permission checks there.
+> > 
+> > Secondly, I'm not convinced it is always safe to allow non-priviledged user
+> > to force repartitioning of a device. That exposes the whole partition table
+> > parsing code to non-priviledged user and thus increases possible attack
+> > surface.
+> > 
+> > But in this specific case we call __blkdev_reread_part() only to tear down
+> > partitions. So in this specific case calling it by unpriviledged user is
+> > fine plus leaving stale partitions behind is certainly not nice. What we
+> > could do is:
+> > 
+> > Export drop_partitions() functionality as a function like
+> > __blkdev_drop_part() that would call drop_partitions(bdev->bd_disk, bdev).
+> > It would expect (and assert) that &bdev->bd_mutex is already locked. It
+> > should probably also replicate the check:
+> > 
+> >         if (!disk_part_scan_enabled(disk) || bdev != bdev->bd_contains)
+> >                 return -EINVAL;
+> > 
+> > from __blkdev_reread_part(). And we can call this from __loop_clr_fd().
+> > 
+> > Then we can just unexport __blkdev_reread_part() (since only loop.c is
+> > using it) and fold it inside blkdev_reread_part().
+> > 
+> > What do you think?
+> > 
+> > 								Honza
+> > 
 > 
-> FWIW I'm OK with either solution. Yours seems a bit more future-proof so I
-> like it a bit more.
+> The idea is to duplicate a new caller of drop_partitions() which is
+> specifically used by loop. I think it works. It is safe as well as the
+> functionality is limited within loop.
+> 
+> However, perhaps we should not regard this as a bug? Below is the sample
+> to reproduce this issue:
+> 
+> $ dd if=/dev/zero of=tmp.raw bs=1M count=100 oflag=direct
+> 
+> $ parted tmp.raw --script mklabel msdos mkpart primary 0% 50% mkpart primary 50%
+> 100%
+> 
+> $ sudo chown zhang /dev/loop0
+> 
+> $ losetup -P /dev/loop0 tmp.raw
+> 
+> $ ls -l /dev | grep loop0
+> brw-rw---- 1 zhang disk      7,   0 Mar  20 11:42 loop0   --> user (zhang)
+> brw-rw---- 1 root  disk    259,   0 Mar  20 11:42 loop0p1 --> root
+> brw-rw---- 1 root  disk    259,   1 Mar  20 11:42 loop0p2 --> root
+> 
+> $ losetup -d /dev/loop
+> 
+> From above case, /dev/loop0 is owned by user (zhang), while the partitions are
+> owned by root.
+> 
+> Should the detach of loop owned by user also unmaps all related partitions owned
+> by root?
+> 
+> Perhaps we should assume the '-P' option is always used by root?
 
-FWIW Bit 13 for the Flag doesn't work, need to find a free one before
-doing a proper submission.
+Yes, that's another option. And since I'm not aware of any user reports of
+the problem you've found I'd just say that non-root users don't use loop
+devices with partitions.
 
+> This is similar to the fact that the administrator should always use '-P'
+> in order to enforce partscan when the loop is detached. Otherwise, the
+> partitions belong to the loop would remain after 'losetup -d'.
 
+Yeah. That seems like another slight catch for the users. Honestly, I don't
+feel either of these issues is serious enough that I'd go and fix them. But
+if someone wanted to spend the time with them, I won't object :).
 
+								Honza
 -- 
-Johannes Thumshirn                            SUSE Labs Filesystems
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Jane Smithard, Graham Norton
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
