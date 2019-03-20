@@ -2,111 +2,101 @@ Return-Path: <SRS0=ireV=RX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF934C43381
-	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 02:56:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D587C43381
+	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 03:31:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 68310217F4
-	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 02:56:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="BqQ9CbWv"
+	by mail.kernel.org (Postfix) with ESMTP id 56C04217F4
+	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 03:31:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727106AbfCTC44 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Mar 2019 22:56:56 -0400
-Received: from mout.gmx.net ([212.227.17.22]:54345 "EHLO mout.gmx.net"
+        id S1726823AbfCTDa7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Mar 2019 23:30:59 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:35742 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726937AbfCTC44 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Mar 2019 22:56:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1553050614;
-        bh=446xnWccmwxmzq6ZScgPsRNAjdCDISotdcTHzMLPmFI=;
-        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=BqQ9CbWvwIMzL6FifHBNk3wK1Zt7iVOQBiPYhj5bmh3N8hZL7Y9EkwHeIgCcLx098
-         Rfw9WYXUwOx1w9hWdHD8zIC93u2nOAvIpWSFCiIchEZYhNVwCfs7BZP/dZCPrdNI5a
-         Flm5ArClXWS88pH7/GFrk5dYSQeVYAABHzL64zPY=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.183.223] ([218.18.229.179]) by mail.gmx.com (mrgmx102
- [212.227.17.174]) with ESMTPSA (Nemesis) id 0MZOan-1hR7zU3Zin-00LAta; Wed, 20
- Mar 2019 03:56:54 +0100
-Subject: Re: [PATCH 1/2] block: increase bio_slab_nr only for necessary case
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
-References: <20190308101540.24337-1-cgxu519@gmx.com>
-From:   cgxu519 <cgxu519@gmx.com>
-Message-ID: <672a4135-9d68-e6c9-f9b6-c759018c3d65@gmx.com>
-Date:   Wed, 20 Mar 2019 10:56:50 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.0
+        id S1726573AbfCTDa7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 19 Mar 2019 23:30:59 -0400
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 965A158E35;
+        Wed, 20 Mar 2019 03:30:58 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8BD0C62489;
+        Wed, 20 Mar 2019 03:30:50 +0000 (UTC)
+Date:   Wed, 20 Mar 2019 11:30:45 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>, Yi Zhang <yi.zhang@redhat.com>,
+        "jianchao.wang" <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH V2] sbitmap: order READ/WRITE freed instance and setting
+ clear bit
+Message-ID: <20190320033044.GA5745@ming.t460p>
+References: <20190319083842.30059-1-ming.lei@redhat.com>
+ <1553008008.152266.42.camel@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20190308101540.24337-1-cgxu519@gmx.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-Provags-ID: V03:K1:w+GUcBWeiDFy+BoM5+Q9RmJfIJZsHbgqQtur1c68KTMVLQlDnlD
- jwgoyMntJS+LalkB2ZGhoCeKQWHQEWfN58gyqehiOyhPAK8B65tCZsgp0IqyMOQrJS7eXwG
- jSUEbW+qa/Kuv6NL1vMCOcrhxibva4rF72o0VIGvOzqOtxzsR8J7kvMBQvz6u5gCBLzs//Y
- c+9pMsBho4k1a3i5Mx+pg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:SSCdehzoSBE=:VGKqvLFDN7aUrsMOTqS15t
- xSTh2wlWb0kWD93I2293X3YZ6+SgcJUyZtaB5cy+aqzDewtCBy8W1MiFNHyINdx/7YJ0UNxv5
- 34kwKIUu1EWUuwmgKwwUQ9wIYBYf8N6IYkTsC6jDoIY8HhGyjGCjFd5vlg+wyTyODTI453C0N
- UJczCn+5HLVj4aqmYLIXGJlJiyFVczfZhPKx4P4T3oPHyXgbNJBdu3oPKMrAv2ZuiBPuSkVqE
- KCDlAFwBC5HtxHntYHLEUcS7Jq2fQd8uZcHtKu4l0zLwAtB2vTYwU3h9upjyQxVdPHnxpDwu9
- WcvSZfCTAwlc5mvHciv3nVb9S/V0jDVewbIGpy/ucMyxlzgSscGmkG1ppVEOIMP54si0uqCqQ
- LK/EsQ3OFJh2fa6dMlMuoW8DwPIovmsd03h6aSdhCtjx5+uW2zhXV8baU0E+zjAneuex0s8cT
- Ej1Yn47FBdD5cCvmfVZhEIGwTdA57230kvUTGwxzvztUAMpiJOeAjSah4K0EhERGNcnt1jXwk
- MDXlmAyAcIfuPIzlD8c5r4h0IyHUBPMdOYdrdt0Eiq3N7FHh3lCZGSSJioOE5RpBFnz+34W2Q
- 9vIKrmlrEMN9T9fYMv/dINSbkAWJVDFlsIRy9naUWahFJfEDzynrjSAe93hy7L1bOZnqFE56m
- bjP50OM5birnutP+NhRKEFmQ6PtU/PAyvcb05ue7+6zomHKDboIeKW0anX4+cknaX9CYJzDUj
- L3gM/aaZHZ7cvHHgWGA4NcdvlcAB+HGu2tIKNAQLi+SDT/0Kk8gOqpvGcaGMWhzWpt9ya7CAw
- 0y60TOKtQ2hxvgCLAsjrRBdlEkjYYa9720v9FeFcGX27xWdbjRVzQh2HyCb3Iq7UpW4qbLBUY
- ky2cHJ8ZPPrMlTVQpYmq39Xng1OTTQDy9QBi17SgwH/jyj9Cd3X9OxA/Gy+g5VKJ9kNe2ondI
- OHDMnv0Wutw==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1553008008.152266.42.camel@acm.org>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Wed, 20 Mar 2019 03:30:58 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/8/19 6:15 PM, Chengguang Xu wrote:
-> When fail to create new cache in bio_find_or_create_slab(),
-> we should not increase bio_slab_nr because it will cause
-> referring uninitilized data in subsequent search.
->
-> Signed-off-by: Chengguang Xu <cgxu519@gmx.com>
-> ---
->   block/bio.c | 6 +++++-
->   1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/block/bio.c b/block/bio.c
-> index 4db1008309ed..8081906f5d01 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -109,7 +109,7 @@ static struct kmem_cache *bio_find_or_create_slab(un=
-signed int extra_size)
->   		bio_slabs =3D new_bio_slabs;
->   	}
->   	if (entry =3D=3D -1)
-> -		entry =3D bio_slab_nr++;
-> +		entry =3D bio_slab_nr;
->
->   	bslab =3D &bio_slabs[entry];
->
-> @@ -122,6 +122,10 @@ static struct kmem_cache *bio_find_or_create_slab(u=
-nsigned int extra_size)
->   	bslab->slab =3D slab;
->   	bslab->slab_ref =3D 1;
->   	bslab->slab_size =3D sz;
-> +
-> +	if (entry =3D=3D bio_slab_nr)
-> +		bio_slab_nr++;
-> +
->   out_unlock:
->   	mutex_unlock(&bio_slab_lock);
->   	return slab;
+On Tue, Mar 19, 2019 at 08:06:48AM -0700, Bart Van Assche wrote:
+> On Tue, 2019-03-19 at 16:38 +0800, Ming Lei wrote:
+> > Inside sbitmap_queue_clear(), once the clear bit is set, it will be
+> > visiable to allocation path immediately. Meantime READ/WRITE on old
+> > associated instance(such as request in case of blk-mq) may be
+> > out-of-order with the setting clear bit, so race with re-allocation
+> > may be triggered.
+> > 
+> > Adds one memory barrier for ordering READ/WRITE of the freed associated
+> > instance with setting clear bit for avoiding race with re-allocation.
+> > 
+> > The following kernel oops triggerd by block/006 on aarch64 may be fixed:
+>                                                              ^^^
+> 
+> Does that mean that it has not been verified whether this patch fixes the
+> NULL pointer issue mentioned in the patch description?
 
-Any suggestion?
+V1 has been verified by Zhang Yi, but V2 isn't done yet.
 
-Thanks.
+> 
+> > diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> > index 5b382c1244ed..941a46495e12 100644
+> > --- a/lib/sbitmap.c
+> > +++ b/lib/sbitmap.c
+> > @@ -591,6 +591,17 @@ EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
+> >  void sbitmap_queue_clear(struct sbitmap_queue *sbq, unsigned int nr,
+> >                          unsigned int cpu)
+> >  {
+> > +       /*
+> > +        * Once the clear bit is set, the bit may be allocated out.
+>              ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 
+> This comment is confusing. Did you perhaps mean "Once the bit is cleared"?
+
+No, please take at look at sbitmap_deferred_clear_bit().
+
+> 
+> > +        *
+> > +        * Orders READ/WRITE on the asssociated instance(such as request
+> > +        * of blk_mq) by this bit for avoiding race with re-allocation,
+> > +        * and its pair is the memory barrier implied in __sbitmap_get_word.
+> > +        *
+> > +        * One invarient is that the clear bit has to be zero when the bit
+>                  ^^^^^^^^^             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>                  invariant?            I cant' make sense of this.
+
+It is really 'clear bit', again please look at
+sbitmap_deferred_clear_bit().
+
+Thanks,
+Ming
