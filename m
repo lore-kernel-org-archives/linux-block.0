@@ -2,61 +2,65 @@ Return-Path: <SRS0=ireV=RX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F13DAC43381
-	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 11:42:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5486EC43381
+	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 11:47:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C9EC72146E
-	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 11:42:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2BE162184D
+	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 11:47:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726603AbfCTLma (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Mar 2019 07:42:30 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:24513 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726006AbfCTLm3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Mar 2019 07:42:29 -0400
-Received: from fsav403.sakura.ne.jp (fsav403.sakura.ne.jp [133.242.250.102])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id x2KBgBxK064631;
-        Wed, 20 Mar 2019 20:42:11 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav403.sakura.ne.jp (F-Secure/fsigk_smtp/530/fsav403.sakura.ne.jp);
- Wed, 20 Mar 2019 20:42:11 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/530/fsav403.sakura.ne.jp)
-Received: from [192.168.1.8] (softbank126094122116.bbtec.net [126.94.122.116])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id x2KBgAst064627
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NO);
-        Wed, 20 Mar 2019 20:42:11 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-To:     Jan Kara <jack@suse.cz>, Dongli Zhang <dongli.zhang@oracle.com>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        syzkaller <syzkaller@googlegroups.com>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Subject: loop: Too many partitions and OOM killer?
-Message-ID: <f817788e-d228-67bd-1bd2-14a12bd76d0b@i-love.sakura.ne.jp>
-Date:   Wed, 20 Mar 2019 20:42:09 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.3
+        id S1728035AbfCTLrg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Mar 2019 07:47:36 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59748 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727673AbfCTLrg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Mar 2019 07:47:36 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 84ED2AC6C;
+        Wed, 20 Mar 2019 11:47:34 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 408661E4255; Wed, 20 Mar 2019 12:47:34 +0100 (CET)
+Date:   Wed, 20 Mar 2019 12:47:34 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Johannes Thumshirn <jthumshirn@suse.de>
+Cc:     Hannes Reinecke <hare@suse.com>, Hannes Reinecke <hare@suse.de>,
+        Jan Kara <jack@suse.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH] block_dev: fix crash on chained bios with O_DIRECT
+Message-ID: <20190320114734.GB9485@quack2.suse.cz>
+References: <20190320081253.129688-1-hare@suse.de>
+ <9cec723b-d0d0-859f-37c2-bfdccb898071@suse.de>
+ <e9953e6c-fd4c-cde5-976e-a5831d7c79a3@suse.com>
+ <abd08aa4-f5fd-8ed1-1ae2-9987f6a43dc7@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <abd08aa4-f5fd-8ed1-1ae2-9987f6a43dc7@suse.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello.
+On Wed 20-03-19 09:53:10, Johannes Thumshirn wrote:
+> On 20/03/2019 09:51, Hannes Reinecke wrote:
+> > Yeah, should work, too.
+> > But we should be calling bio_uninit() for all bios.
+> 
+> Yup, probably.
+> 
+> > Will you be sending an updated patch?
+> 
+> Let's wait what other's thing first.
 
-syzbot is sometimes generating corrupted reports like
-https://syzkaller.appspot.com/text?tag=CrashLog&x=14f62a8b200000 .
+FWIW I'm OK with either solution. Yours seems a bit more future-proof so I
+like it a bit more.
 
-The report includes flood of global OOM killer invocations, and I suspect
-that the reason of global OOM killer invocations is a lot of "blkid" processes
-(invoked by uevent?) after manipulating loop devices with a lot of partitions.
-
-Can "blkid" be invoked asynchronously upon manipulating loop devices?
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
