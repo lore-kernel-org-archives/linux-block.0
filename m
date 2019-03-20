@@ -2,146 +2,92 @@ Return-Path: <SRS0=ireV=RX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6BA2C43381
-	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 14:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF9BC10F05
+	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 15:12:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85D302186A
-	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 14:39:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="GATWuRly"
+	by mail.kernel.org (Postfix) with ESMTP id E37C121873
+	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 15:12:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1553094756;
+	bh=cgey03YGMsaWzYa5SArv5hvqi4kZuGNAoXv+ly7VTmE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=XUf58BQ2sc5Je4qGHUl82QaYCRwlqlp7zkb8HMWrtHGG3pWNGCLOB9i8yi/7e4/zQ
+	 DgdgTXe7tYfdeYqycwC89n/Utv/Q79V7rUGtLvPqJhVwZdGuKo1S1AsiS/Vsn3mQC/
+	 vkSqJ6onU2oxFBXIis9VQpLvSlTN0VTknMcaS9p0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726824AbfCTOjC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Mar 2019 10:39:02 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:36452 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726782AbfCTOjC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Mar 2019 10:39:02 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2KEXpjR041917;
-        Wed, 20 Mar 2019 14:38:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : cc : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=72Ikz92xE6o7/OKv9tzQr01ODA/hMEyQjZOhqgNMQAo=;
- b=GATWuRlyAXIaOSDfgESwbeDMdvBt9mfEQJ3TBJGEjuh9MxaNKxwM9ChfIXI6FzT9lM+7
- mXDh+hSVuMF7MQnTBuC38qsSuOg3hzEsFMs6Jgy1gJLSOurkasi8R0W45YShJihotCN8
- 1M2Noilwf+wv53q7WhjIhMV4GY8CsjzNxFLXIwvtrCScTDbfCJxtf0E9tk0tfzJyL5fW
- HshjbrTi+Sn+sKC8OUtl3HXowRD3gkYJQXBJKokLU60eJjZ/4Ncqe0AuVSGUM9oHXbaK
- mpl9VmoIVFnthCWPjbLizwsOJCrWkpgzy8Vwulnk5h+kT68zE9m4ignhM39hbK+SUpeX ng== 
-Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by userp2130.oracle.com with ESMTP id 2r8rjuu7m9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Mar 2019 14:38:56 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2KEcoLp031565
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Mar 2019 14:38:50 GMT
-Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x2KEcnLp018299;
-        Wed, 20 Mar 2019 14:38:49 GMT
-Received: from [192.168.2.8] (/106.39.150.192)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 20 Mar 2019 07:38:49 -0700
-Subject: Re: loop: Too many partitions and OOM killer?
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Jan Kara <jack@suse.cz>
-References: <f817788e-d228-67bd-1bd2-14a12bd76d0b@i-love.sakura.ne.jp>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        syzkaller <syzkaller@googlegroups.com>
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <6afcdd5a-4d42-558d-dece-ac332886eb7d@oracle.com>
-Date:   Wed, 20 Mar 2019 22:38:41 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        id S1727379AbfCTPMf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Mar 2019 11:12:35 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37312 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726169AbfCTPMe (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Mar 2019 11:12:34 -0400
+Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D12AC2184D;
+        Wed, 20 Mar 2019 15:12:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1553094754;
+        bh=cgey03YGMsaWzYa5SArv5hvqi4kZuGNAoXv+ly7VTmE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=f3IPKlYueZ3ybYTH2vqMBuXDNfzG6zUlG70z3mLEZGAWs0QThz2omqqFsUwk3SUwO
+         wM1RFoiXQU4vYmF7ts1KzBZAvPXqYkclQCkFG5ytbspifRrv2/6MjSxzIAI68nlxJr
+         5HsRuIvw1710NN1z5K+o678b10EImgBdslbufVFM=
+Date:   Wed, 20 Mar 2019 16:12:31 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Jan Kara <jack@suse.cz>
+Cc:     stable@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Subject: Re: Revert commit 310ca162d77
+Message-ID: <20190320151231.GA31247@kroah.com>
+References: <20190320125806.GD9485@quack2.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <f817788e-d228-67bd-1bd2-14a12bd76d0b@i-love.sakura.ne.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9200 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1903200112
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190320125806.GD9485@quack2.suse.cz>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Tetsuo,
-
-On 03/20/2019 07:42 PM, Tetsuo Handa wrote:
-> Hello.
+On Wed, Mar 20, 2019 at 01:58:06PM +0100, Jan Kara wrote:
+> Hello,
 > 
-> syzbot is sometimes generating corrupted reports like
-> https://syzkaller.appspot.com/text?tag=CrashLog&x=14f62a8b200000 .
-> 
-> The report includes flood of global OOM killer invocations, and I suspect
-> that the reason of global OOM killer invocations is a lot of "blkid" processes
-> (invoked by uevent?) after manipulating loop devices with a lot of partitions.
-> 
-> Can "blkid" be invoked asynchronously upon manipulating loop devices?
+> commit 310ca162d77 "block/loop: Use global lock for ioctl() operation." has
+> been pushed to multiple stable trees. This patch is a part of larger series
+> that overhauls the locking inside loopback device upstream and for 4.4,
+> 4.9, and 4.14 stable trees only this patch from the series is applied. Our
+> testing now has shown [1] that the patch alone makes present deadlocks
+> inside loopback driver more likely (the openqa test in our infrastructure
+> didn't hit the deadlock before whereas with the new kernel it hits it
+> reliably every time). So I would suggest we revert 310ca162d77 from 4.4,
+> 4.9, and 4.14 kernels.
 
-I am not sure.
+Ugh, ok.
 
-Therefore I have tested on Ubuntu 16.04.5 VM running default 4.15.0-46-generic.
+> Another option would be to backport other locking fixes for the loop
+> device but honestly I don't think that's a stable material - never heard
+> of real users hitting problems, only syzkaller could, and we are still
+> fixing up some small glitches resulting from that rework...
 
+I tried to backport a number of the loop fixes, and odds are I am the
+one that grabbed this.  There are other loop locking fixes in the stable
+releases, I don't know if I can just revert this one, let me check...
 
-1. I hooked blkid by a proxy bash script. If blkid is involved, the related
-syslog will be printed to /var/log/syslog by 'logger':
+And yes, I did get some loop bugreports from the Android kernel team as
+they are using loop devices in large numbers on the new Android release
+for something.  So I think they have already backported a number of
+these fixes to their trees, which made me want to push these out to more
+people.
 
-$ cat /sbin/blkid
+Also, given that syzbot has a reproducer for 310ca162d77, are we worst
+off if we revert it?
 
-#!/bin/sh
+thanks,
 
-/sbin/blkid-bin $*
-logger "blkid $*"
-
-
-2. Then I started to monitor udev messages via 'udevadm monitor'.
-
-3. Finally, I did the test with below command set and there would be two
-partitions involved:
-
-# dd if=/dev/zero of=tmp.raw bs=1M count=100 oflag=direct
-# parted tmp.raw --script mklabel msdos mkpart primary 0% 50% mkpart primary 50%
-100%
-# losetup -P /dev/loop0 tmp.raw
-# losetup -d /dev/loop0
-
-
-Below are the udev messages captured during the test.
-
-For 'losetup -P /dev/loop0 tmp.raw':
-
-KERNEL[140.622809] change   /devices/virtual/block/loop0 (block)
-KERNEL[140.640550] change   /devices/virtual/block/loop0 (block)
-KERNEL[140.640601] add      /devices/virtual/block/loop0/loop0p1 (block)
-KERNEL[140.640625] add      /devices/virtual/block/loop0/loop0p2 (block)
-UDEV  [140.676169] change   /devices/virtual/block/loop0 (block)
-UDEV  [140.692198] change   /devices/virtual/block/loop0 (block)
-UDEV  [140.701744] add      /devices/virtual/block/loop0/loop0p1 (block)
-UDEV  [140.724253] add      /devices/virtual/block/loop0/loop0p2 (block)
-
-
-For 'losetup -d /dev/loop0':
-
-KERNEL[159.504382] change   /devices/virtual/block/loop0 (block)
-KERNEL[159.504718] remove   /devices/virtual/block/loop0/loop0p1 (block)
-KERNEL[159.504758] remove   /devices/virtual/block/loop0/loop0p2 (block)
-UDEV  [159.505807] change   /devices/virtual/block/loop0 (block)
-UDEV  [159.506201] remove   /devices/virtual/block/loop0/loop0p1 (block)
-UDEV  [159.507036] remove   /devices/virtual/block/loop0/loop0p2 (block)
-
-
-There is NO blkid log printed to /var/log/syslog and I would assume blkid is not
-involved.
-
-This is just a test on ubuntu 16.04.5. I am not sure about the env of syzbot.
-
-Dongli Zhang
+greg k-h
