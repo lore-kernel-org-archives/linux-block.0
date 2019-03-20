@@ -2,100 +2,84 @@ Return-Path: <SRS0=ireV=RX=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD70C43381
-	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 20:18:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C7EC43381
+	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 20:20:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AD6DF21873
-	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 20:18:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63C172184D
+	for <linux-block@archiver.kernel.org>; Wed, 20 Mar 2019 20:20:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="agp9X8GO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726067AbfCTUSx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Mar 2019 16:18:53 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:45382 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726006AbfCTUSx (ORCPT
+        id S1726686AbfCTUUB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Mar 2019 16:20:01 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:46446 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726492AbfCTUUB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Mar 2019 16:18:53 -0400
-Received: by mail-pg1-f193.google.com with SMTP id y3so2576621pgk.12
-        for <linux-block@vger.kernel.org>; Wed, 20 Mar 2019 13:18:53 -0700 (PDT)
+        Wed, 20 Mar 2019 16:20:01 -0400
+Received: by mail-pf1-f196.google.com with SMTP id 9so2470585pfj.13
+        for <linux-block@vger.kernel.org>; Wed, 20 Mar 2019 13:20:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=MJlS70bfAWl/TOjxSvrrx+kgfuN9Gjbfih+DInapuUs=;
+        b=agp9X8GOK5psCjnvgMx/aFNKd9xtNrwUJwBQ04GC3TKP2GMJeyud6WQtMStl1gaoED
+         SSTWsYYG45v+uXV2mw0hf/jzzoaYMkZkx3IZe843m7jsDLeBmXVD6KKZAmZVcIbf4wRK
+         1g/tjKhNrYb6IPamaHZl2H6fseqUKxvCvjWohka4Y39IozNyMSsf3zG0udbqXe14ILnS
+         Po5OZyUB84SXxhDWPrIyFzYN3q/KBhw9xFRyFzEi6a88aAxqCe9NqK6BWbZxJ5RorD6Q
+         10IrmxRKl0Jaf0SnjMpe6cu9+st6o2WHW6MZ0KOKT1j3eHHY67pQhGJPEfNwIQ4/hXY0
+         mL3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=umM+vb0S9fzaz8XDr8knGw9xI1I151VcD0bnvbVERSI=;
-        b=S4zc+Orl8SUi4T5lMvr1nYXCGToHFR0HTTbf9Txamm5J1PRhRo0u4uAgUdB5CcswcL
-         YThQeQKODN1+JVzaJy2OTAFlQGAaa9ZDRhAb3dnelQMyX7oz195jSp/frVD5ROaHW7uH
-         NIS7WMaVw9Ujfjzq9vI9t0+g//8C4q14gzp7IFS/QTz9TwXaqGjeHRr+5qPSMPkrbIWz
-         CQqx2X1YNR87kbKDgJ/e6KmjE7yuOboDHnBX/4J2uhSJSsbfcRE4JXrKMZv58D59d7jO
-         lStiorfYqbrBAkUIXwZ5x2bIiFs7PePdtr2PKQj6Q4ToUIG4OaSGReCBuxm4ZAXmoEEI
-         EATw==
-X-Gm-Message-State: APjAAAX7DJ3pblK/+m2cKXz75dljQLEHMNH3OrEOHcT1mFynppPicit9
-        c6E8Gu/DtjgLELFNfWJ+7Hw=
-X-Google-Smtp-Source: APXvYqyfOB0BPbLxYpEO1ZJqYud4YMDs/9E2ZImKcHNSCK3WNB38426AMqJlk5E47xMacj3cXyhuNA==
-X-Received: by 2002:a63:5c66:: with SMTP id n38mr9072334pgm.15.1553113132646;
-        Wed, 20 Mar 2019 13:18:52 -0700 (PDT)
-Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id 184sm3877027pff.149.2019.03.20.13.18.51
+        bh=MJlS70bfAWl/TOjxSvrrx+kgfuN9Gjbfih+DInapuUs=;
+        b=Q5vLSpQ+98OHvXw6ujHY1WIuBKlNgqG44e/cdHiYPDUg/bKPm6GPR05+9A6nfVdVjL
+         MoeSnM6ASNqgjAc0iTlSGAlqAOOMwxMXi20NfH5gHNiyuQ5YkskBii/koRQy2GfdFSFh
+         E2LKgg7AG70zXD84tKV7o3OUSRKwBfygZnqEPy+WBcD6Y59f0QLUvLW+z1T3urEU4dg1
+         6dUK2WARn7CfcRmjZz5A1PUGN5STDn7cSfllWmvqQAgY697cSetTxScf0qHGyW0Phsq/
+         X6fYA1q+IozTk2ssNUIjHUjgeowkC+RpGMoAXgcfn9WT82peWywYSuyZ0HuBR5mjXIgK
+         hAEg==
+X-Gm-Message-State: APjAAAW/meps8DKUWXe/MHxgfJzCoPLZRRv4nAY+v6ngm+jbH2BcOcn9
+        VuPw/UeqoWxKQ2uYbOeZtzruew==
+X-Google-Smtp-Source: APXvYqzW9lDNq5dcMB1kDlClGqRPK0BNzHLw9/N/ZDbtFbbIwEw+R8AA7Nbi/KcuIt7/bqqm31Eb3Q==
+X-Received: by 2002:a62:b415:: with SMTP id h21mr9497606pfn.26.1553113200892;
+        Wed, 20 Mar 2019 13:20:00 -0700 (PDT)
+Received: from [10.155.59.239] (96-86-215-89-static.hfc.comcastbusiness.net. [96.86.215.89])
+        by smtp.gmail.com with ESMTPSA id m69sm6320479pfi.151.2019.03.20.13.19.59
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 20 Mar 2019 13:18:52 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
+        Wed, 20 Mar 2019 13:20:00 -0700 (PDT)
+Subject: Re: [PATCH] block: Unexport blk_mq_add_to_requeue_list()
+To:     Bart Van Assche <bvanassche@acm.org>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH] blkcg: Fix kernel-doc warnings
-Date:   Wed, 20 Mar 2019 13:18:45 -0700
-Message-Id: <20190320201845.39595-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.20.GIT
+        Ming Lei <ming.lei@redhat.com>
+References: <20190320201437.36672-1-bvanassche@acm.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <212768a0-0f62-c01b-0ec1-e7d238cc6db1@kernel.dk>
+Date:   Wed, 20 Mar 2019 14:19:58 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190320201437.36672-1-bvanassche@acm.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Avoid that the following warnings are reported when building with W=1:
+On 3/20/19 2:14 PM, Bart Van Assche wrote:
+> This function is not used outside the block layer core. Hence unexport it.
 
-block/blk-cgroup.c:1755: warning: Function parameter or member 'q' not described in 'blkcg_schedule_throttle'
-block/blk-cgroup.c:1755: warning: Function parameter or member 'use_memdelay' not described in 'blkcg_schedule_throttle'
-block/blk-cgroup.c:1779: warning: Function parameter or member 'blkg' not described in 'blkcg_add_delay'
-block/blk-cgroup.c:1779: warning: Function parameter or member 'now' not described in 'blkcg_add_delay'
-block/blk-cgroup.c:1779: warning: Function parameter or member 'delta' not described in 'blkcg_add_delay'
+Applied, thanks.
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-cgroup.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 77f37ef8ef06..617a2b3f7582 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1736,8 +1736,8 @@ void blkcg_maybe_throttle_current(void)
- 
- /**
-  * blkcg_schedule_throttle - this task needs to check for throttling
-- * @q - the request queue IO was submitted on
-- * @use_memdelay - do we charge this to memory delay for PSI
-+ * @q: the request queue IO was submitted on
-+ * @use_memdelay: do we charge this to memory delay for PSI
-  *
-  * This is called by the IO controller when we know there's delay accumulated
-  * for the blkg for this task.  We do not pass the blkg because there are places
-@@ -1769,8 +1769,9 @@ void blkcg_schedule_throttle(struct request_queue *q, bool use_memdelay)
- 
- /**
-  * blkcg_add_delay - add delay to this blkg
-- * @now - the current time in nanoseconds
-- * @delta - how many nanoseconds of delay to add
-+ * @blkg: blkg of interest
-+ * @now: the current time in nanoseconds
-+ * @delta: how many nanoseconds of delay to add
-  *
-  * Charge @delta to the blkg's current delay accumulation.  This is used to
-  * throttle tasks if an IO controller thinks we need more throttling.
 -- 
-2.21.0.155.ge902e9bcae20
+Jens Axboe
 
