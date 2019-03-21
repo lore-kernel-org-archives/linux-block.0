@@ -2,156 +2,216 @@ Return-Path: <SRS0=o3qj=RY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 533D8C43381
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 14:15:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73618C43381
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 14:21:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1728F218D3
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 14:15:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B44A218FF
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 14:21:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="UA0kA9RH";
-	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="bIlfz4Ad"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="hxyyP+pS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728016AbfCUOPZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Mar 2019 10:15:25 -0400
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:37218 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726551AbfCUOPY (ORCPT
+        id S1728057AbfCUOV6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Mar 2019 10:21:58 -0400
+Received: from mail-it1-f193.google.com ([209.85.166.193]:32880 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727857AbfCUOV6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Mar 2019 10:15:24 -0400
-Received: from pps.filterd (m0001255.ppops.net [127.0.0.1])
-        by mx0b-00082601.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x2LECmss028841;
-        Thu, 21 Mar 2019 07:15:17 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type : content-id
- : content-transfer-encoding : mime-version; s=facebook;
- bh=y7xIGjAo71ZEiPY66qDuUIppJzk+tzlGIyeGN2MQLGU=;
- b=UA0kA9RHBHYpuRvS0F7Spp4lCiCBqZhjISRp9nBUIHynazBsbL9Smta2bUmAz7ESkLty
- SrUbetz591xRItQLpk/lDvbsduft9B8BwlFq7awK8KJKBF1jpwS7Z3/AP/upMmW0vs6a
- BC0C58yWnhQcVIf5+ADNY1lspBNNq3PKA58= 
-Received: from maileast.thefacebook.com ([199.201.65.23])
-        by mx0b-00082601.pphosted.com with ESMTP id 2rbss2kkfx-2
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Thu, 21 Mar 2019 07:15:17 -0700
-Received: from frc-mbx02.TheFacebook.com (2620:10d:c0a1:f82::26) by
- frc-hub06.TheFacebook.com (2620:10d:c021:18::176) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.1.1713.5; Thu, 21 Mar 2019 07:15:16 -0700
-Received: from frc-hub06.TheFacebook.com (2620:10d:c021:18::176) by
- frc-mbx02.TheFacebook.com (2620:10d:c0a1:f82::26) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.1.1713.5; Thu, 21 Mar 2019 07:15:16 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (192.168.183.28)
- by o365-in.thefacebook.com (192.168.177.76) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.1.1713.5
- via Frontend Transport; Thu, 21 Mar 2019 07:15:16 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
- s=selector1-fb-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y7xIGjAo71ZEiPY66qDuUIppJzk+tzlGIyeGN2MQLGU=;
- b=bIlfz4AdeTYBJYvKQh40wnGY928C9FG0woTHvURvuzCQKHN4QJARz9nABYi6WcTDLfYKzOU30oLhGyldYoMkpiWbcy/f9NKYFFdCWWlLGh9OWJ5q/9Hxkrx+w7AMSXZk7vmCpH96HuxsQAYSJ0N54rkofzkSqo//BP3tXcqrbYw=
-Received: from CY4PR15MB1463.namprd15.prod.outlook.com (10.172.159.10) by
- CY4PR15MB1510.namprd15.prod.outlook.com (10.172.162.15) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1709.13; Thu, 21 Mar 2019 14:15:14 +0000
-Received: from CY4PR15MB1463.namprd15.prod.outlook.com
- ([fe80::4119:34fe:7e7c:1919]) by CY4PR15MB1463.namprd15.prod.outlook.com
- ([fe80::4119:34fe:7e7c:1919%11]) with mapi id 15.20.1709.017; Thu, 21 Mar
- 2019 14:15:14 +0000
-From:   Jens Axboe <axboe@fb.com>
-To:     Johannes Thumshirn <jthumshirn@suse.de>
-CC:     Hannes Reinecke <hare@suse.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-        "Linux Block Layer Mailinglist" <linux-block@vger.kernel.org>,
-        Linux FSDEVEL Mailinglist <linux-fsdevel@vger.kernel.org>
+        Thu, 21 Mar 2019 10:21:58 -0400
+Received: by mail-it1-f193.google.com with SMTP id v8so2598908itf.0
+        for <linux-block@vger.kernel.org>; Thu, 21 Mar 2019 07:21:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:from:to:cc:references:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=XgDhbctfX3Arv5rZxySt6y8AH4YckqBWEj3wTbF9LLI=;
+        b=hxyyP+pSce1pi6B/SWx1E/81Qs359gimqlFRDaEwzdgQ7oXeKWeBavUJ9WB6ZN411S
+         WGAA7IBOs9/3fKyS9EVd+AG5zgI/oPl3J6M6b7twKBQn29jZSkpe9cVRsQgOq//nENbk
+         CYyqorm8TKFNJ6tpWHezsiwXs1Tz4i4rkuh1XiWJJCkpsopKn6x3xPuy4aiQHfvBbb0g
+         /xI/n0qhZlTpQUQ41pl8mB0LqnoL3tTZ8fa19UgNaACtlqdFQ7DYECLBoxYsTLgJOst4
+         I9Tygoq54ANSV6bwL54G1NQ7o/FgUgDjWOvOey8gXaMQ6C7y/G4cMi3Pd2+TYvj3tMIX
+         igLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=XgDhbctfX3Arv5rZxySt6y8AH4YckqBWEj3wTbF9LLI=;
+        b=WiJutsjXewjuibvS8JQ5dcKRoJ0Z+cdelRTQwtEWQ5yazcbEU+lidlVkPZKE7nXM0k
+         2gFv3/yVy79D5om2hffqQBigyJ+z/ctzqitnMvZ8MZWXnw0CNW10sMr+EOR5W1qexIle
+         TVzQMF2jTUPwkKcCLikFQfvRjpULWBF14UdhQoxsNkLvUMKlFl1xPQ2VoO7zVQS00GC2
+         ZgzBkfG5Xp1Q8rhoAIcRZzvuljzM9oS99bPbzcrYnFIoUnpFG/C0uaHPJdPicnJzy0Kr
+         ItTQSddie9y+tp/bgcXn1pMWox7QmervyjUxWzTQGaGVY1DMgHYmbyfr78yYdmbRgsj2
+         PHtA==
+X-Gm-Message-State: APjAAAXVT1Y4z1Q5mhnlRF9zKI+ZJw2r70+6Jjsk/pVFViI5YyV5Qcr9
+        meUJ/ajowGuutYdNvRxvcN0vhg==
+X-Google-Smtp-Source: APXvYqwnYLYSPIIkfnqlzWgi79+mGsKpLokjfu0tFyX837vTrSmx4RZNsFgYnk22snHG6i7s85N+WA==
+X-Received: by 2002:a05:660c:a18:: with SMTP id e24mr2783545itk.129.1553178117386;
+        Thu, 21 Mar 2019 07:21:57 -0700 (PDT)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id n4sm347424ioh.52.2019.03.21.07.21.55
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 21 Mar 2019 07:21:56 -0700 (PDT)
 Subject: Re: [PATCH 1/2] block: bio: ensure newly added bio flags don't
  override BVEC_POOL_IDX
-Thread-Topic: [PATCH 1/2] block: bio: ensure newly added bio flags don't
- override BVEC_POOL_IDX
-Thread-Index: AQHU3+Hy9VBNEVaPrECP2cUtM1mUXaYWITmA
-Date:   Thu, 21 Mar 2019 14:15:14 +0000
-Message-ID: <78cf685f-2bb4-c494-4677-afa513b47339@fb.com>
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Johannes Thumshirn <jthumshirn@suse.de>
+Cc:     Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
+        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        Linux FSDEVEL Mailinglist <linux-fsdevel@vger.kernel.org>
 References: <20190321123045.32396-1-jthumshirn@suse.de>
  <20190321123045.32396-2-jthumshirn@suse.de>
-In-Reply-To: <20190321123045.32396-2-jthumshirn@suse.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: DM5PR17CA0059.namprd17.prod.outlook.com
- (2603:10b6:3:13f::21) To CY4PR15MB1463.namprd15.prod.outlook.com
- (2603:10b6:903:fa::10)
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [216.160.245.98]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 51399c27-2078-49f2-c524-08d6ae07a2ec
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(2017052603328)(7153060)(7193020);SRVR:CY4PR15MB1510;
-x-ms-traffictypediagnostic: CY4PR15MB1510:
-x-microsoft-antispam-prvs: <CY4PR15MB1510DFD47A1A638C26A0C439C0420@CY4PR15MB1510.namprd15.prod.outlook.com>
-x-forefront-prvs: 0983EAD6B2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(39860400002)(136003)(366004)(346002)(396003)(199004)(189003)(6486002)(5660300002)(6436002)(14454004)(305945005)(7736002)(36756003)(316002)(54906003)(106356001)(3846002)(478600001)(99286004)(6116002)(6916009)(2906002)(97736004)(105586002)(229853002)(8676002)(68736007)(8936002)(256004)(14444005)(11346002)(446003)(4326008)(31686004)(66066001)(386003)(81156014)(102836004)(53546011)(6506007)(186003)(71190400001)(81166006)(71200400001)(6246003)(6512007)(86362001)(76176011)(31696002)(52116002)(486006)(53936002)(25786009)(26005)(2616005)(476003);DIR:OUT;SFP:1102;SCL:1;SRVR:CY4PR15MB1510;H:CY4PR15MB1463.namprd15.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: fb.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: KVD6KLCg2fErzfZtpRhmJFKneW5GC4z/18um5Qz+RxfdIZEsZL2eNIEP1iwKFv0ilHvDUGTJcNaG9jwFTkX68odl+D4k7/EibXzXCPh66w7+vGGu1yeLKYYuU5caBB/2RWS2BPbY5MpGG6L//z4lrc9Nf5MSbh4/K2IA8eF8zM/+qpd+eszsSQV/qK221qg3Dx6p0vGTiYv4JddxdH95CYMHlio+ocyrUtqNs84z1NXpiRHL2d03v0VWCCZAc4Rh6dVBM8b/pnZWWf4AFGV6JNl7MU1tU704eJOsPktf3eoZvPNK/kx6Kh4k85vyZzJjcyLXoZCZHiHMtWAvWBm4s5IWhZJChCirWGKXYsmoSmOOe0JNz1DTDrlzlYSLrCKFRTukw6gPHf0jOjRJM6X35p9Jq/cnlHzRQgCOqAFaAGQ=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9540E9D449F91948BC65F7C91BD5286B@namprd15.prod.outlook.com>
-Content-Transfer-Encoding: base64
+ <78cf685f-2bb4-c494-4677-afa513b47339@fb.com>
+Message-ID: <17f1ef65-5fcf-0cba-4d37-a43d5e5038b0@kernel.dk>
+Date:   Thu, 21 Mar 2019 08:21:55 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 51399c27-2078-49f2-c524-08d6ae07a2ec
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Mar 2019 14:15:14.7659
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR15MB1510
-X-OriginatorOrg: fb.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-03-21_06:,,
- signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-FB-Internal: Safe
+In-Reply-To: <78cf685f-2bb4-c494-4677-afa513b47339@fb.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gMy8yMS8xOSA2OjMwIEFNLCBKb2hhbm5lcyBUaHVtc2hpcm4gd3JvdGU6DQo+IFdpdGggdGhl
-IGludHJvZHVjdGlvbiBvZiBCSU9fQUxMT0NFRCB3ZSd2ZSB1c2VkIHVwIGFsbCBhdmFpbGFibGUg
-Yml0cyBpbg0KPiBiaW86OmJpX2ZsYWdzLg0KPiANCj4gTWFrZSBzdXJlIG5vLW9uZSBhZGRzIGEg
-bmV3IG9uZSBhbmQgdGh1cyBvdmVycmlkZXMgdGhlIEJWRUNfUE9PTF9JRFgNCg0KVHdvIG1pbm9y
-IHRoaW5nczoNCg0KPiBkaWZmIC0tZ2l0IGEvYmxvY2svYmlvLmMgYi9ibG9jay9iaW8uYw0KPiBp
-bmRleCA0ZGIxMDA4MzA5ZWQuLjhjNjg5YWVkNDZhMCAxMDA2NDQNCj4gLS0tIGEvYmxvY2svYmlv
-LmMNCj4gKysrIGIvYmxvY2svYmlvLmMNCj4gQEAgLTIxMjYsMTIgKzIxMjYsMjAgQEAgc3RhdGlj
-IHZvaWQgX19pbml0IGJpb3ZlY19pbml0X3NsYWJzKHZvaWQpDQo+ICAJfQ0KPiAgfQ0KPiAgDQo+
-ICtzdGF0aWMgaW5saW5lIHZvaWQgYmlvX2ZsYWdfYnVpbGR0aW1lX2NoZWNrKHZvaWQpDQo+ICt7
-DQo+ICsJQlVJTERfQlVHX09OKEJJT19GTEFHX0xBU1QgPiBCVkVDX1BPT0xfT0ZGU0VUKTsNCj4g
-K30NCj4gKw0KPiAgc3RhdGljIGludCBfX2luaXQgaW5pdF9iaW8odm9pZCkNCj4gIHsNCj4gIAli
-aW9fc2xhYl9tYXggPSAyOw0KPiAgCWJpb19zbGFiX25yID0gMDsNCj4gIAliaW9fc2xhYnMgPSBr
-Y2FsbG9jKGJpb19zbGFiX21heCwgc2l6ZW9mKHN0cnVjdCBiaW9fc2xhYiksDQo+ICAJCQkgICAg
-R0ZQX0tFUk5FTCk7DQo+ICsNCj4gKwliaW9fZmxhZ19idWlsZHRpbWVfY2hlY2soKTsNCj4gKw0K
-DQpKdXN0IGFkZCB0aGUgQlVJTERfQlVHX09OKCkgaGVyZSwgZG9uJ3QgcHV0IGl0IGluIGEgZnVu
-Y3Rpb24uDQoNCj4gK2VudW0gew0KPiArCUJJT19TRUdfVkFMSUQgPQkxLAkJLyogYmlfcGh5c19z
-ZWdtZW50cyB2YWxpZCAqLw0KPiArCUJJT19DTE9ORUQgPSAyLAkJCS8qIGRvZXNuJ3Qgb3duIGRh
-dGEgKi8NCj4gKwlCSU9fQk9VTkNFRCA9IDMsCQkvKiBiaW8gaXMgYSBib3VuY2UgYmlvICovDQo+
-ICsJQklPX1VTRVJfTUFQUEVEID0gNCwJCS8qIGNvbnRhaW5zIHVzZXIgcGFnZXMgKi8NCj4gKwlC
-SU9fTlVMTF9NQVBQRUQgPSA1LAkJLyogY29udGFpbnMgaW52YWxpZCB1c2VyIHBhZ2VzICovDQo+
-ICsJQklPX1FVSUVUID0gNiwJCQkvKiBNYWtlIEJJTyBRdWlldCAqLw0KPiArCUJJT19DSEFJTiA9
-IDcsCQkJLyogY2hhaW5lZCBiaW8sIC0+YmlfcmVtYWluaW5nIGluIGVmZmVjdCAqLw0KPiArCUJJ
-T19SRUZGRUQgPSA4LAkJCS8qIGJpbyBoYXMgZWxldmF0ZWQgLT5iaV9jbnQgKi8NCj4gKwlCSU9f
-VEhST1RUTEVEID0JOSwJCS8qIFRoaXMgYmlvIGhhcyBhbHJlYWR5IGJlZW4gc3ViamVjdGVkIHRv
-DQo+ICsJCQkJCSAqIHRocm90dGxpbmcgcnVsZXMuIERvbid0IGRvIGl0IGFnYWluLiAqLw0KPiAr
-CUJJT19UUkFDRV9DT01QTEVUSU9OID0gMTAsCS8qIGJpb19lbmRpbygpIHNob3VsZCB0cmFjZSB0
-aGUgZmluYWwgY29tcGxldGlvbg0KPiArCQkJCQkgKiBvZiB0aGlzIGJpby4gKi8NCj4gKwlCSU9f
-UVVFVUVfRU5URVJFRCA9IDExLAkJLyogY2FuIHVzZSBibGtfcXVldWVfZW50ZXJfbGl2ZSgpICov
-DQo+ICsJQklPX1RSQUNLRUQgPSAxMiwJCS8qIHNldCBpZiBiaW8gZ29lcyB0aHJvdWdoIHRoZSBy
-cV9xb3MgcGF0aCAqLw0KPiArCUJJT19GTEFHX0xBU1QNCj4gK307DQoNCkxldCdzIG9yZGVyIHRo
-aXMgYWZ0ZXIgdGhlIEJJT19OT19QQUdFX1JFRiBwYXRjaCwgc28gd2UgY2FuIGF2b2lkDQpoYXZp
-bmcgdG8gZXhwbGljaXRseSBpbml0aWFsaXplIHRoZSB2YWx1ZXMuDQoNCllvdSBhbHNvIGhhdmVu
-J3Qgc29sdmVkIHRoZSBpc3N1ZSBvZiBub3cgaGF2aW5nIGFuIGV4dHJhIGJpdCwgMi8yIHVzZXMN
-CnRoZSBsYXN0IGJpdCB3aGljaCB0aGUgb3RoZXIgcGF0Y2ggYWxyZWFkeSB0b29rLi4uDQoNCi0t
-IA0KSmVucyBBeGJvZQ0KDQo=
+On 3/21/19 8:15 AM, Jens Axboe wrote:
+> You also haven't solved the issue of now having an extra bit, 2/2 uses
+> the last bit which the other patch already took...
+
+Here's one way - kill BIO_SEG_VALID. We should just use
+->bi_phys_segments to tell if it's valid or not. This patch uses -1 to
+signify it's not.
+
+Totally untested...
+
+diff --git a/block/bio.c b/block/bio.c
+index 71a78d9fb8b7..4bc165e7ca43 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -280,6 +280,7 @@ void bio_init(struct bio *bio, struct bio_vec *table,
+ 	      unsigned short max_vecs)
+ {
+ 	memset(bio, 0, sizeof(*bio));
++	bio->bi_phys_segments = -1;
+ 	atomic_set(&bio->__bi_remaining, 1);
+ 	atomic_set(&bio->__bi_cnt, 1);
+ 
+@@ -305,6 +306,7 @@ void bio_reset(struct bio *bio)
+ 	bio_uninit(bio);
+ 
+ 	memset(bio, 0, BIO_RESET_BYTES);
++	bio->bi_phys_segments = -1;
+ 	bio->bi_flags = flags;
+ 	atomic_set(&bio->__bi_remaining, 1);
+ }
+@@ -573,7 +575,7 @@ EXPORT_SYMBOL(bio_put);
+ 
+ int bio_phys_segments(struct request_queue *q, struct bio *bio)
+ {
+-	if (unlikely(!bio_flagged(bio, BIO_SEG_VALID)))
++	if (unlikely(bio->bi_phys_segments == -1))
+ 		blk_recount_segments(q, bio);
+ 
+ 	return bio->bi_phys_segments;
+@@ -731,7 +733,7 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
+ 
+ 	/* If we may be able to merge these biovecs, force a recount */
+ 	if (bio->bi_vcnt > 1 && biovec_phys_mergeable(q, bvec - 1, bvec))
+-		bio_clear_flag(bio, BIO_SEG_VALID);
++		bio->bi_phys_segments = -1;
+ 
+  done:
+ 	return len;
+@@ -1913,10 +1915,8 @@ void bio_trim(struct bio *bio, int offset, int size)
+ 	if (offset == 0 && size == bio->bi_iter.bi_size)
+ 		return;
+ 
+-	bio_clear_flag(bio, BIO_SEG_VALID);
+-
++	bio->bi_phys_segments = -1;
+ 	bio_advance(bio, offset << 9);
+-
+ 	bio->bi_iter.bi_size = size;
+ 
+ 	if (bio_integrity(bio))
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 1c9d4f0f96ea..57cea2782a76 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -343,7 +343,6 @@ void blk_queue_split(struct request_queue *q, struct bio **bio)
+ 	/* physical segments can be figured out during splitting */
+ 	res = split ? split : *bio;
+ 	res->bi_phys_segments = nsegs;
+-	bio_set_flag(res, BIO_SEG_VALID);
+ 
+ 	if (split) {
+ 		/* there isn't chance to merge the splitted bio */
+@@ -440,8 +439,6 @@ void blk_recount_segments(struct request_queue *q, struct bio *bio)
+ 	bio->bi_next = NULL;
+ 	bio->bi_phys_segments = __blk_recalc_rq_segments(q, bio);
+ 	bio->bi_next = nxt;
+-
+-	bio_set_flag(bio, BIO_SEG_VALID);
+ }
+ 
+ static int blk_phys_contig_segment(struct request_queue *q, struct bio *bio,
+@@ -651,9 +648,9 @@ int ll_back_merge_fn(struct request_queue *q, struct request *req,
+ 		req_set_nomerge(q, req);
+ 		return 0;
+ 	}
+-	if (!bio_flagged(req->biotail, BIO_SEG_VALID))
++	if (req->biotail->bi_phys_segments == -1)
+ 		blk_recount_segments(q, req->biotail);
+-	if (!bio_flagged(bio, BIO_SEG_VALID))
++	if (bio->bi_phys_segments == -1)
+ 		blk_recount_segments(q, bio);
+ 
+ 	return ll_new_hw_segment(q, req, bio);
+@@ -673,9 +670,9 @@ int ll_front_merge_fn(struct request_queue *q, struct request *req,
+ 		req_set_nomerge(q, req);
+ 		return 0;
+ 	}
+-	if (!bio_flagged(bio, BIO_SEG_VALID))
++	if (bio->bi_phys_segments == -1)
+ 		blk_recount_segments(q, bio);
+-	if (!bio_flagged(req->bio, BIO_SEG_VALID))
++	if (req->bio->bi_phys_segments == -1)
+ 		blk_recount_segments(q, req->bio);
+ 
+ 	return ll_new_hw_segment(q, req, bio);
+diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
+index c033bfcb209e..79eb54dcf0f9 100644
+--- a/drivers/md/raid5.c
++++ b/drivers/md/raid5.c
+@@ -5247,7 +5247,7 @@ static int raid5_read_one_chunk(struct mddev *mddev, struct bio *raid_bio)
+ 		rcu_read_unlock();
+ 		raid_bio->bi_next = (void*)rdev;
+ 		bio_set_dev(align_bi, rdev->bdev);
+-		bio_clear_flag(align_bi, BIO_SEG_VALID);
++		align_bi->bi_phys_segments = -1;
+ 
+ 		if (is_badblock(rdev, align_bi->bi_iter.bi_sector,
+ 				bio_sectors(align_bi),
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index d66bf5f32610..472059e92071 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -215,7 +215,6 @@ struct bio {
+ /*
+  * bio flags
+  */
+-#define BIO_SEG_VALID	1	/* bi_phys_segments valid */
+ #define BIO_CLONED	2	/* doesn't own data */
+ #define BIO_BOUNCED	3	/* bio is a bounce bio */
+ #define BIO_USER_MAPPED 4	/* contains user pages */
+
+-- 
+Jens Axboe
+
