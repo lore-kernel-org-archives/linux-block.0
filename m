@@ -3,82 +3,91 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F1FC43381
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 17:06:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F15C43381
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 21:41:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D9893218B0
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 17:06:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8896C218A5
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 21:41:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728138AbfCURGa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Mar 2019 13:06:30 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51142 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726787AbfCURGa (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Mar 2019 13:06:30 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C66A83086258;
-        Thu, 21 Mar 2019 17:06:29 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-121-98.rdu2.redhat.com [10.10.121.98])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D63A85D71C;
-        Thu, 21 Mar 2019 17:06:25 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <11178040.rrurhZOAV8@blindfold>
-References: <11178040.rrurhZOAV8@blindfold> <20992998.5BCRIlqCZf@blindfold> <6007.1553181386@warthog.procyon.org.uk> <19628.1553183102@warthog.procyon.org.uk>
-To:     Richard Weinberger <richard@nod.at>
-Cc:     dhowells@redhat.com, viro@zeniv.linux.org.uk,
-        linux-block@vger.kernel.org, squashfs-devel@lists.sourceforge.net,
-        Marek Vasut <marek.vasut@gmail.com>,
-        Brian Norris <computersforpeace@gmail.com>,
-        Nicolas Pitre <nico@linaro.org>,
-        Boris Brezillon <bbrezillon@kernel.org>,
-        linux-mtd@lists.infradead.org,
-        David Woodhouse <dwmw2@infradead.org>,
-        Phillip Lougher <phillip@squashfs.org.uk>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/6] Convert mount_single-using filesystems to fs_context
+        id S1726533AbfCUVlH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Mar 2019 17:41:07 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39531 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726529AbfCUVlH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Mar 2019 17:41:07 -0400
+Received: by mail-wr1-f67.google.com with SMTP id j9so185925wrn.6
+        for <linux-block@vger.kernel.org>; Thu, 21 Mar 2019 14:41:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jplgh4vEgfc/R/UaPu12ZHrOgb8efl0u9uCDO0C0Buk=;
+        b=AeihcSsgQJAaYrZXhAZVNJhtY1R80BZNKo2zyHS/ncwoiawFEnhWUKofBIeJ+WLePi
+         qj6FdxY77QEWW0JsT76VohAUlCNuj5vqZ+HetByQYqPSUWVOj6vitjT0RjJXRkdWsjmr
+         x8jVk4Re0590EQ4cHigAqviGoa4TvUMlXOgdIC/xegZXj+vqM+NWD9fSZngFKEfLEuNi
+         lvg+n7KGuhKg1WDLLXUGKYfA9j8CAlsElfC7h0CrAybLUOnH3iEvbyV/jtErd7gRG8ZK
+         vlubR18cxApoT2tT7uuH959bH+IefqA2W1BiKDLY0O+W3C3Z/8GSYBGlTaQ8NCpiuRRa
+         7fzw==
+X-Gm-Message-State: APjAAAUts7buPNGJa67JEYWnZYYMSuvy9ssm8riuvQWS5dif98EVPAp5
+        c6sYJcjD5X9nVOJri4q40TY=
+X-Google-Smtp-Source: APXvYqwBqiXlluevloMuDwuVx+rGRdUhY1Y542L95pxyGvKolARNRomUtDSYf0BxigIWrzGxWM0tTg==
+X-Received: by 2002:adf:f64d:: with SMTP id x13mr4256276wrp.298.1553204465940;
+        Thu, 21 Mar 2019 14:41:05 -0700 (PDT)
+Received: from [192.168.1.114] (162-195-240-247.lightspeed.sntcca.sbcglobal.net. [162.195.240.247])
+        by smtp.gmail.com with ESMTPSA id c17sm4144284wrs.17.2019.03.21.14.41.03
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 21 Mar 2019 14:41:05 -0700 (PDT)
+Subject: Re: [PATCH 1/2] blk-mq: introduce blk_mq_complete_request_sync()
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-nvme@lists.infradead.org, Christoph Hellwig <hch@lst.de>
+References: <20190318032950.17770-1-ming.lei@redhat.com>
+ <20190318032950.17770-2-ming.lei@redhat.com>
+ <f708ee0c-dfa4-0bca-f996-8d834471f1fd@acm.org>
+ <20190318073826.GA29746@ming.t460p> <1552921495.152266.8.camel@acm.org>
+ <20190318151618.GA20371@ming.t460p> <1552924164.152266.21.camel@acm.org>
+ <448615db-64e2-cbe7-c09e-19b2d86a720a@grimberg.me>
+ <20190321013908.GA15115@ming.t460p>
+ <95da080a-7fb4-33a9-1dc3-4452c565c83a@grimberg.me>
+ <20190321023235.GB15115@ming.t460p>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <1bc084aa-e9bb-fc69-2983-5e825065046a@grimberg.me>
+Date:   Thu, 21 Mar 2019 14:40:51 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <26883.1553187985.1@warthog.procyon.org.uk>
-Date:   Thu, 21 Mar 2019 17:06:25 +0000
-Message-ID: <26884.1553187985@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Thu, 21 Mar 2019 17:06:29 +0000 (UTC)
+In-Reply-To: <20190321023235.GB15115@ming.t460p>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Richard Weinberger <richard@nod.at> wrote:
 
-> Just gave it a try, jffs2 does not mount anymore. The problem is that you
-> define an Opt_source in super.c, but never evaluate it ->
-> jffs2_parse_param() returns -EINVAL.
-
-Will fix.
-
-> What I really don't get is the new logging stuff in
-> include/linux/fs_context.h.  printk() is already an overloaded beat, why
-> another layer?
-
-Because there are some patches that aren't upstream yet that allow you to read
-these out through the file descriptor you control the mount process through
-rather than them going into dmesg.
-
-> The log output seems very odd to me:
-> [   13.117593] e MTD: Couldn't look up '/dev/mtd0': -15
+> For example,
 > 
-> Please notice the "e" before MTD, first I though this is a memory
-> corruption, but is your log level?!
+> nvme_rdma_complete_rq
+> 	->nvme_rdma_unmap_data
+> 		->ib_mr_pool_put
+> 
+> But the ib queue pair may has been destroyed by nvme_rdma_destroy_io_queues()
+> before request's remote completion.
+> 
+> nvme_rdma_teardown_io_queues:
+>          nvme_stop_queues(&ctrl->ctrl);
+>          nvme_rdma_stop_io_queues(ctrl);
+>          blk_mq_tagset_busy_iter(&ctrl->tag_set, nvme_cancel_request,
+>                          &ctrl->ctrl);
+>          if (remove)
+>                  nvme_start_queues(&ctrl->ctrl);
+>          nvme_rdma_destroy_io_queues(ctrl, remove);
+> 
 
-Thanks - I'll fix that.
-
-David
+Yea, you're right. I'm fine with this patchset.
