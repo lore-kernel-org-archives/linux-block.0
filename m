@@ -2,100 +2,49 @@ Return-Path: <SRS0=o3qj=RY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BA95C4360F
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 13:22:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 961C3C43381
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 13:34:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5590C21901
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 13:22:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 648D820693
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 13:34:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728091AbfCUNW2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Mar 2019 09:22:28 -0400
-Received: from mx2.suse.de ([195.135.220.15]:59056 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728049AbfCUNW1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Mar 2019 09:22:27 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id ACFF7AF2F;
-        Thu, 21 Mar 2019 13:22:25 +0000 (UTC)
-Subject: Re: [PATCH 1/2] block: bio: ensure newly added bio flags don't
- override BVEC_POOL_IDX
-To:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@fb.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Linux FSDEVEL Mailinglist <linux-fsdevel@vger.kernel.org>
-References: <20190321123045.32396-1-jthumshirn@suse.de>
- <20190321123045.32396-2-jthumshirn@suse.de>
- <886489c7-133d-b0bb-6ae9-f054727985e4@suse.de>
-From:   Johannes Thumshirn <jthumshirn@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <4771867f-1cfe-67f6-10de-27c278fe9c3c@suse.de>
-Date:   Thu, 21 Mar 2019 14:22:25 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.0
+        id S1727857AbfCUNep (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Mar 2019 09:34:45 -0400
+Received: from mga18.intel.com ([134.134.136.126]:7975 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727829AbfCUNep (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Mar 2019 09:34:45 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Mar 2019 06:34:44 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,252,1549958400"; 
+   d="scan'208";a="216208215"
+Received: from ikonopko-mobl1.ger.corp.intel.com (HELO [10.237.142.155]) ([10.237.142.155])
+  by orsmga001.jf.intel.com with ESMTP; 21 Mar 2019 06:34:42 -0700
+Subject: Re: [PATCH 10/18] lightnvm: pblk: ensure that emeta is written
+To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>
+Cc:     =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        linux-block@vger.kernel.org
+References: <20190314160428.3559-1-igor.j.konopko@intel.com>
+ <20190314160428.3559-11-igor.j.konopko@intel.com>
+ <6766e0ae-ec44-3ebd-0015-aeb7cb9029e5@lightnvm.io>
+ <5d8dc4e4-c1a4-88ea-9006-47c3c492ea2c@intel.com>
+ <23A8B9B8-21F8-4A8D-BBEE-EC4286AB4B13@javigon.com>
+From:   Igor Konopko <igor.j.konopko@intel.com>
+Message-ID: <c9c5bcf0-314a-9d00-6aa7-14df39ea86e6@intel.com>
+Date:   Thu, 21 Mar 2019 14:34:42 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.3
 MIME-Version: 1.0
-In-Reply-To: <886489c7-133d-b0bb-6ae9-f054727985e4@suse.de>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <23A8B9B8-21F8-4A8D-BBEE-EC4286AB4B13@javigon.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -103,23 +52,110 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 21/03/2019 14:18, Hannes Reinecke wrote:
-> Where's the point of the enum if all values are initialized?
 
-Enums start at 0 if not otherwise initialized and I wanted to keep the
-unused 0th bit as unused in this patch, for either the patch from Jens
-or 2/2 in this series.
 
-It's the only reason and it is not wrong to do and not the only place
-where we have it:
+On 18.03.2019 19:26, Javier González wrote:
+>> On 18 Mar 2019, at 14.02, Igor Konopko <igor.j.konopko@intel.com> wrote:
+>>
+>>
+>>
+>> On 17.03.2019 20:44, Matias Bjørling wrote:
+>>> On 3/14/19 9:04 AM, Igor Konopko wrote:
+>>>> When we are trying to switch to the new line, we need to ensure that
+>>>> emeta for n-2 line is already written. In other case we can end with
+>>>> deadlock scenario, when the writer has no more requests to write and
+>>>> thus there is no way to trigger emeta writes from writer thread. This
+>>>> is a corner case scenario which occurs in a case of multiple writes
+>>>> error and thus kind of early line close due to lack of line space.
+>>>>
+>>>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+>>>> ---
+>>>>    drivers/lightnvm/pblk-core.c  |  2 ++
+>>>>    drivers/lightnvm/pblk-write.c | 24 ++++++++++++++++++++++++
+>>>>    drivers/lightnvm/pblk.h       |  1 +
+>>>>    3 files changed, 27 insertions(+)
+>>>>
+>>>> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+>>>> index 38e26fe..a683d1f 100644
+>>>> --- a/drivers/lightnvm/pblk-core.c
+>>>> +++ b/drivers/lightnvm/pblk-core.c
+>>>> @@ -1001,6 +1001,7 @@ static void pblk_line_setup_metadata(struct pblk_line *line,
+>>>>                         struct pblk_line_mgmt *l_mg,
+>>>>                         struct pblk_line_meta *lm)
+>>>>    {
+>>>> +    struct pblk *pblk = container_of(l_mg, struct pblk, l_mg);
+>>>>        int meta_line;
+>>>>        lockdep_assert_held(&l_mg->free_lock);
+>>>> @@ -1009,6 +1010,7 @@ static void pblk_line_setup_metadata(struct pblk_line *line,
+>>>>        meta_line = find_first_zero_bit(&l_mg->meta_bitmap, PBLK_DATA_LINES);
+>>>>        if (meta_line == PBLK_DATA_LINES) {
+>>>>            spin_unlock(&l_mg->free_lock);
+>>>> +        pblk_write_emeta_force(pblk);
+>>>>            io_schedule();
+>>>>            spin_lock(&l_mg->free_lock);
+>>>>            goto retry_meta;
+>>>> diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+>>>> index 4e63f9b..4fbb9b2 100644
+>>>> --- a/drivers/lightnvm/pblk-write.c
+>>>> +++ b/drivers/lightnvm/pblk-write.c
+>>>> @@ -505,6 +505,30 @@ static struct pblk_line *pblk_should_submit_meta_io(struct pblk *pblk,
+>>>>        return meta_line;
+>>>>    }
+>>>> +void pblk_write_emeta_force(struct pblk *pblk)
+>>>> +{
+>>>> +    struct pblk_line_meta *lm = &pblk->lm;
+>>>> +    struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+>>>> +    struct pblk_line *meta_line;
+>>>> +
+>>>> +    while (true) {
+>>>> +        spin_lock(&l_mg->close_lock);
+>>>> +        if (list_empty(&l_mg->emeta_list)) {
+>>>> +            spin_unlock(&l_mg->close_lock);
+>>>> +            break;
+>>>> +        }
+>>>> +        meta_line = list_first_entry(&l_mg->emeta_list,
+>>>> +                        struct pblk_line, list);
+>>>> +        if (meta_line->emeta->mem >= lm->emeta_len[0]) {
+>>>> +            spin_unlock(&l_mg->close_lock);
+>>>> +            io_schedule();
+>>>> +            continue;
+>>>> +        }
+>>>> +        spin_unlock(&l_mg->close_lock);
+>>>> +        pblk_submit_meta_io(pblk, meta_line);
+>>>> +    }
+>>>> +}
+>>>> +
+>>>>    static int pblk_submit_io_set(struct pblk *pblk, struct nvm_rq *rqd)
+>>>>    {
+>>>>        struct ppa_addr erase_ppa;
+>>>> diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+>>>> index 0a85990..a42bbfb 100644
+>>>> --- a/drivers/lightnvm/pblk.h
+>>>> +++ b/drivers/lightnvm/pblk.h
+>>>> @@ -877,6 +877,7 @@ int pblk_write_ts(void *data);
+>>>>    void pblk_write_timer_fn(struct timer_list *t);
+>>>>    void pblk_write_should_kick(struct pblk *pblk);
+>>>>    void pblk_write_kick(struct pblk *pblk);
+>>>> +void pblk_write_emeta_force(struct pblk *pblk);
+>>>>    /*
+>>>>     * pblk read path
+>>> Hi Igor,
+>>> Is this an error that qemu can force pblk to expose? Can you provide a specific example on what is needed to force the error?
+>>
+>> So I hit this error on PBLKs with low number of LUNs and multiple
+>> write IO errors (should be reproducible with error injection). Then
+>> pblk_map_remaining() quickly mapped all the sectors in line and thus
+>> writer thread was not able to issue all the necessary emeta IO writes,
+>> so it stucks when trying to replace line to new one. So this is
+>> definitely an error/corner case scenario.
+> 
+> If the cause if emeta writes, then there is a bug in
+> pblk_line_close_meta(), as the logic to prevent this case is in place.
+> 
 
-jthumshirn@glass:linux (master)$ git grep -A 1 "enum {" | grep "= 0" | wc -l
-2206
-
--- 
-Johannes Thumshirn                            SUSE Labs Filesystems
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+So I definitely saw this functions to be called few times in corner 
+series scenarios, but I will drop this patch for now and I'll try to 
+find out what is the reason of such a behavior, since this patch more 
+looks like a workaround that a real fix for me now after the discussion.
+Thanks
+Igor
