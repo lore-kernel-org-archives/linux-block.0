@@ -2,130 +2,169 @@ Return-Path: <SRS0=o3qj=RY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 394E8C43381
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 01:31:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4021CC43381
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 01:33:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 01D75218D3
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 01:31:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sDTBq/Sx"
+	by mail.kernel.org (Postfix) with ESMTP id 18B44218D3
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 01:33:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726853AbfCUBbL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Mar 2019 21:31:11 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:60842 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726753AbfCUBbL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Mar 2019 21:31:11 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2L1NbbX014048;
-        Thu, 21 Mar 2019 01:30:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=tHqaXZAUo6StWTKwDVBLWpvAhmFJGq957ch/0cuFhIc=;
- b=sDTBq/SxzOO3LKORzHmbieurenqD7aky+gYKqalj7CRJ9YmHYWF9h30PPSjavJcTfoBS
- aD9eN7Nm0RHiCBAQgNtEmU28/otcLl9LvKcglMdA8oghnni4G50Mj97IkxVpRCWe24lE
- ChD3G4Vxf5rZ9d1croNQ4dLLzUE78i1u2NxZwPdtuS4XSoPcDJ908188wJ41C9yVdTJw
- rM8/JBL62SscIebLrx+HUZt50S/R1eanEEHre78///T/PJEA+Yn6gCnbcNXFTfaGiaAN
- SWcZoAqGwErwI48yhpASZmjnXi0xoFVnNtKqGUIRY/lJDYWQ5vJwKOqufTDQwfq+jE6/ xg== 
-Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
-        by aserp2130.oracle.com with ESMTP id 2r8pnex5vy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Mar 2019 01:30:49 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x2L1Umb5013151
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Mar 2019 01:30:48 GMT
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x2L1UlDH020203;
-        Thu, 21 Mar 2019 01:30:47 GMT
-Received: from [10.182.71.8] (/10.182.71.8)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 20 Mar 2019 18:30:47 -0700
-Subject: Re: [PATCH 2/8] blk-mq: change the method of iterating busy tags of a
- request_queue
-To:     Sagi Grimberg <sagi@grimberg.me>, axboe@kernel.dk
-Cc:     hch@lst.de, jthumshirn@suse.de, hare@suse.de, josef@toxicpanda.com,
-        bvanassche@acm.org, keith.busch@intel.com, jsmart2021@gmail.com,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-References: <1552640264-26101-1-git-send-email-jianchao.w.wang@oracle.com>
- <1552640264-26101-3-git-send-email-jianchao.w.wang@oracle.com>
- <bf563d09-c243-5bf5-ab3e-0fa2bd583edd@grimberg.me>
-From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <a3ee391b-1815-9c15-a8d8-d0d16f930460@oracle.com>
-Date:   Thu, 21 Mar 2019 09:33:58 +0800
+        id S1727731AbfCUBd1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Mar 2019 21:33:27 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37268 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726753AbfCUBd1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 20 Mar 2019 21:33:27 -0400
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1871DC04D944;
+        Thu, 21 Mar 2019 01:33:27 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-12-77.pek2.redhat.com [10.72.12.77])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 710165D9C4;
+        Thu, 21 Mar 2019 01:33:21 +0000 (UTC)
+Subject: Re: [PATCH V2] sbitmap: order READ/WRITE freed instance and setting
+ clear bit
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Omar Sandoval <osandov@fb.com>,
+        "jianchao.wang" <jianchao.w.wang@oracle.com>
+References: <20190319083842.30059-1-ming.lei@redhat.com>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Message-ID: <3ff171a8-855e-c8f4-4b93-912da9e0a034@redhat.com>
+Date:   Thu, 21 Mar 2019 09:33:18 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+ Thunderbird/60.5.3
 MIME-Version: 1.0
-In-Reply-To: <bf563d09-c243-5bf5-ab3e-0fa2bd583edd@grimberg.me>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20190319083842.30059-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9201 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1903210008
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Thu, 21 Mar 2019 01:33:27 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Sagi
+Thanks Ming, feel free to add
 
-Thanks for your kindly response.
+Tested-by: Yi Zhang <yi.zhang@redhat.com>
 
-On 3/21/19 2:52 AM, Sagi Grimberg wrote:
-> 
-> 
-> On 3/15/19 1:57 AM, Jianchao Wang wrote:
->> tags->rqs[] will not been cleaned when free driver tag and there
->> is a window between get driver tag and write tags->rqs[], so we
->> may see stale rq in tags->rqs[] which may have been freed, as
->> following case,
->> blk_mq_get_request         blk_mq_queue_tag_busy_iter
->>    -> blk_mq_get_tag
->>                               -> bt_for_each
->>                                 -> bt_iter
->>                                   -> rq = taags->rqs[]
->>                                   -> rq->q
->>    -> blk_mq_rq_ctx_init
->>      -> data->hctx->tags->rqs[rq->tag] = rq;
->>
->> To fix this, the blk_mq_queue_tag_busy_iter is changed in this
->> patch to use tags->static_rqs[] instead of tags->rqs[]. We have
->> to identify whether there is a io scheduler attached to decide
->> to use hctx->tags or hctx->sched_tags. And we will try to get a
->> non-zero q_usage_counter before that, so it is safe to access
->> them. Add 'inflight' parameter to determine to iterate in-flight
->> requests or just busy tags. A correction here is that
->> part_in_flight should count the busy tags instead of rqs that
->> have got driver tags.
-> 
-> IMO, instead of this parameter, add a wrapper like
-> blk_mq_queue_tag_inflight_iter() or keep the parameter out until
-> we actually have a user that calls it for busy and not inflight.
 
-Using a wrapper instead of exporting the parameter to user is indeed better.
-I will change it in next version.
+Thanks
 
-When the 'inflight' parameter is true, we iterate the inflight requests,
-otherwise, we iterate the all the busy requests no matter they are in-flight
-or not. The latter would be useful for part_in_flight. Currently, we only
-account the requests with driver tags, it is inconsistent for the io-scheduler
-and non-io-scheduler case.
+Yi
 
-> 
-> Other than that, I think that iterating over static_rqs is a good
-> solution to the problem described.
-> 
-
-Sincerely
-Jianchao
+On 3/19/19 4:38 PM, Ming Lei wrote:
+> Inside sbitmap_queue_clear(), once the clear bit is set, it will be
+> visiable to allocation path immediately. Meantime READ/WRITE on old
+> associated instance(such as request in case of blk-mq) may be
+> out-of-order with the setting clear bit, so race with re-allocation
+> may be triggered.
+>
+> Adds one memory barrier for ordering READ/WRITE of the freed associated
+> instance with setting clear bit for avoiding race with re-allocation.
+>
+> The following kernel oops triggerd by block/006 on aarch64 may be fixed:
+>
+> [  142.330954] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000330
+> [  142.338794] Mem abort info:
+> [  142.341554]   ESR = 0x96000005
+> [  142.344632]   Exception class = DABT (current EL), IL = 32 bits
+> [  142.350500]   SET = 0, FnV = 0
+> [  142.353544]   EA = 0, S1PTW = 0
+> [  142.356678] Data abort info:
+> [  142.359528]   ISV = 0, ISS = 0x00000005
+> [  142.363343]   CM = 0, WnR = 0
+> [  142.366305] user pgtable: 64k pages, 48-bit VAs, pgdp = 000000002a3c51c0
+> [  142.372983] [0000000000000330] pgd=0000000000000000, pud=0000000000000000
+> [  142.379777] Internal error: Oops: 96000005 [#1] SMP
+> [  142.384613] Modules linked in: null_blk ib_isert iscsi_target_mod ib_srpt target_core_mod ib_srp scsi_transport_srp vfat fat rpcrdma sunrpc rdma_ucm ib_iser rdma_cm iw_cm libiscsi ib_umad scsi_transport_iscsi ib_ipoib ib_cm mlx5_ib ib_uverbs ib_core sbsa_gwdt crct10dif_ce ghash_ce ipmi_ssif sha2_ce ipmi_devintf sha256_arm64 sg sha1_ce ipmi_msghandler ip_tables xfs libcrc32c mlx5_core sdhci_acpi mlxfw ahci_platform at803x sdhci libahci_platform qcom_emac mmc_core hdma hdma_mgmt i2c_dev [last unloaded: null_blk]
+> [  142.429753] CPU: 7 PID: 1983 Comm: fio Not tainted 5.0.0.cki #2
+> [  142.449458] pstate: 00400005 (nzcv daif +PAN -UAO)
+> [  142.454239] pc : __blk_mq_free_request+0x4c/0xa8
+> [  142.458830] lr : blk_mq_free_request+0xec/0x118
+> [  142.463344] sp : ffff00003360f6a0
+> [  142.466646] x29: ffff00003360f6a0 x28: ffff000010e70000
+> [  142.471941] x27: ffff801729a50048 x26: 0000000000010000
+> [  142.477232] x25: ffff00003360f954 x24: ffff7bdfff021440
+> [  142.482529] x23: 0000000000000000 x22: 00000000ffffffff
+> [  142.487830] x21: ffff801729810000 x20: 0000000000000000
+> [  142.493123] x19: ffff801729a50000 x18: 0000000000000000
+> [  142.498413] x17: 0000000000000000 x16: 0000000000000001
+> [  142.503709] x15: 00000000000000ff x14: ffff7fe000000000
+> [  142.509003] x13: ffff8017dcde09a0 x12: 0000000000000000
+> [  142.514308] x11: 0000000000000001 x10: 0000000000000008
+> [  142.519597] x9 : ffff8017dcde09a0 x8 : 0000000000002000
+> [  142.524889] x7 : ffff8017dcde0a00 x6 : 000000015388f9be
+> [  142.530187] x5 : 0000000000000001 x4 : 0000000000000000
+> [  142.535478] x3 : 0000000000000000 x2 : 0000000000000000
+> [  142.540777] x1 : 0000000000000001 x0 : ffff00001041b194
+> [  142.546071] Process fio (pid: 1983, stack limit = 0x000000006460a0ea)
+> [  142.552500] Call trace:
+> [  142.554926]  __blk_mq_free_request+0x4c/0xa8
+> [  142.559181]  blk_mq_free_request+0xec/0x118
+> [  142.563352]  blk_mq_end_request+0xfc/0x120
+> [  142.567444]  end_cmd+0x3c/0xa8 [null_blk]
+> [  142.571434]  null_complete_rq+0x20/0x30 [null_blk]
+> [  142.576194]  blk_mq_complete_request+0x108/0x148
+> [  142.580797]  null_handle_cmd+0x1d4/0x718 [null_blk]
+> [  142.585662]  null_queue_rq+0x60/0xa8 [null_blk]
+> [  142.590171]  blk_mq_try_issue_directly+0x148/0x280
+> [  142.594949]  blk_mq_try_issue_list_directly+0x9c/0x108
+> [  142.600064]  blk_mq_sched_insert_requests+0xb0/0xd0
+> [  142.604926]  blk_mq_flush_plug_list+0x16c/0x2a0
+> [  142.609441]  blk_flush_plug_list+0xec/0x118
+> [  142.613608]  blk_finish_plug+0x3c/0x4c
+> [  142.617348]  blkdev_direct_IO+0x3b4/0x428
+> [  142.621336]  generic_file_read_iter+0x84/0x180
+> [  142.625761]  blkdev_read_iter+0x50/0x78
+> [  142.629579]  aio_read.isra.6+0xf8/0x190
+> [  142.633409]  __io_submit_one.isra.8+0x148/0x738
+> [  142.637912]  io_submit_one.isra.9+0x88/0xb8
+> [  142.642078]  __arm64_sys_io_submit+0xe0/0x238
+> [  142.646428]  el0_svc_handler+0xa0/0x128
+> [  142.650238]  el0_svc+0x8/0xc
+> [  142.653104] Code: b9402a63 f9000a7f 3100047f 540000a0 (f9419a81)
+> [  142.659202] ---[ end trace 467586bc175eb09d ]---
+>
+> Fixes: ea86ea2cdced20057da ("sbitmap: ammortize cost of clearing bits")
+> Reported-and-bisected-by: Yi Zhang <yi.zhang@redhat.com>
+> Cc: Omar Sandoval <osandov@fb.com>
+> Cc: Yi Zhang <yi.zhang@redhat.com>
+> Cc: "jianchao.wang" <jianchao.w.wang@oracle.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> 	V2:
+> 		- use smp_mb__before_atomic() as suggested by jianchao
+>
+> 	Zhang Yi, could you re-test V2?
+>
+>   lib/sbitmap.c | 11 +++++++++++
+>   1 file changed, 11 insertions(+)
+>
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index 5b382c1244ed..941a46495e12 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -591,6 +591,17 @@ EXPORT_SYMBOL_GPL(sbitmap_queue_wake_up);
+>   void sbitmap_queue_clear(struct sbitmap_queue *sbq, unsigned int nr,
+>   			 unsigned int cpu)
+>   {
+> +	/*
+> +	 * Once the clear bit is set, the bit may be allocated out.
+> +	 *
+> +	 * Orders READ/WRITE on the asssociated instance(such as request
+> +	 * of blk_mq) by this bit for avoiding race with re-allocation,
+> +	 * and its pair is the memory barrier implied in __sbitmap_get_word.
+> +	 *
+> +	 * One invarient is that the clear bit has to be zero when the bit
+> +	 * is in use.
+> +	 */
+> +	smp_mb__before_atomic();
+>   	sbitmap_deferred_clear_bit(&sbq->sb, nr);
+>   
+>   	/*
