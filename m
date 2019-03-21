@@ -4,45 +4,46 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25C49C43381
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 23:11:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B482EC43381
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 23:11:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DD58221925
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 23:11:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76974218D3
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 23:11:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fJHTyuIj"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="tWwdNpbG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727418AbfCUXLL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Mar 2019 19:11:11 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:43904 "EHLO
+        id S1727413AbfCUXLR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Mar 2019 19:11:17 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:44718 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727413AbfCUXLL (ORCPT
+        with ESMTP id S1727047AbfCUXLQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Mar 2019 19:11:11 -0400
+        Thu, 21 Mar 2019 19:11:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=F42AEQ++7toBGuHEZexmW5wjlGfvvflPDBOFKtwFxKY=; b=fJHTyuIjqmFWDJxpG01brLOLHz
-        xuZ+utKKpBpt41OUN3ZJ76yM+bOPQuCvED4i2L3ycmSuZGL1rt8Vd+EJOJf9sVs3hSEjKtMdcMClJ
-        CKeZPVCu+McaJ12lnptDQ7sWkLpbGtx/caeXz6g5KHh9tOLVJgtzpyx8J4cCCyYrnZkDC0cUwF+Fm
-        OwEmuetnosujzmX8qidiSNPzt4XqxVVZQvx6lwTAGxrLEbgXtCDOQNChFrNOJ3q+5CkUVDSM1WsgN
-        /UXvqzKMI/PkvdY/VUr7FiFOv18d0q0pxPUt1KiDqPtJuY3Z0Ar3lM75z9FyixPx1UE6ldslD3XjV
-        qVBNIflg==;
+        bh=Z19RMoNUXyWeIaEYJbiwfHsCVF8cJAHWnhfueECV51Y=; b=tWwdNpbGB37Hma+L4IRHOqZtn6
+        6Zreve40SbFdtOIP5/2p7VBwDo9UWO/5mxwWNv5mTlBljYRUx9j9DZHVNZ9jJW5+GrMUT2WHPH97r
+        /jF7Tuy0rTB2vpTZGNbRq5KZOjGSLDNYUzWMECanrijqBnmIMay/LqJia4wD2ZX6C6sXDZ8415+q0
+        LQJLqFFPJeaIG1ZjI6HVYpQN2bPenv03G7BhX/bkLSt0OYetohZvY+6u1pscHY8i0qYRqCZQ5pRIt
+        bdYUP5usCB0C67PAJVwV0+Nc86i9mJelKJLmp0RKgvDqexioEmx9NePeYfrjETakNsUuqlBpVvuv1
+        31VklxxA==;
 Received: from [199.255.44.128] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1h76q1-0002U5-UT; Thu, 21 Mar 2019 23:11:05 +0000
+        id 1h76q7-0002dE-Cb; Thu, 21 Mar 2019 23:11:11 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@fb.com>, Keith Busch <keith.busch@intel.com>,
         Sagi Grimberg <sagi@grimberg.me>
 Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Subject: [PATCH 02/15] block: add a rq_integrity_vec helper
-Date:   Thu, 21 Mar 2019 16:10:24 -0700
-Message-Id: <20190321231037.25104-3-hch@lst.de>
+Subject: [PATCH 03/15] block: add a rq_dma_dir helper
+Date:   Thu, 21 Mar 2019 16:10:25 -0700
+Message-Id: <20190321231037.25104-4-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190321231037.25104-1-hch@lst.de>
 References: <20190321231037.25104-1-hch@lst.de>
@@ -54,47 +55,28 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This provides a nice little shortcut to get the integrity data for
-drivers like NVMe that only support a single integrity segment.
+In a lot of places we want to know the DMA direction for a given
+struct request.  Add a little helper to make it a littler easier.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/blkdev.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ include/linux/blkdev.h | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 255e20313cde..f9a072610d28 100644
+index f9a072610d28..5279104527ad 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -1552,6 +1552,16 @@ static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
- 	return bio_integrity_intervals(bi, sectors) * bi->tuple_size;
- }
+@@ -638,6 +638,9 @@ static inline bool blk_account_rq(struct request *rq)
  
-+/*
-+ * Return the first bvec that contains integrity data.  In general only
-+ * drivers that are limited to a single integrity segment should use this
-+ * helper.
-+ */
-+static inline struct bio_vec *rq_integrity_vec(struct request *rq)
-+{
-+	return rq->bio->bi_integrity->bip_vec;
-+}
+ #define rq_data_dir(rq)		(op_is_write(req_op(rq)) ? WRITE : READ)
+ 
++#define rq_dma_dir(rq) \
++	(op_is_write(req_op(rq)) ? DMA_TO_DEVICE : DMA_FROM_DEVICE)
 +
- #else /* CONFIG_BLK_DEV_INTEGRITY */
- 
- struct bio;
-@@ -1626,6 +1636,11 @@ static inline unsigned int bio_integrity_bytes(struct blk_integrity *bi,
- 	return 0;
- }
- 
-+static inline struct bio_vec *rq_integrity_vec(struct request *rq)
-+{
-+	return NULL;
-+}
-+
- #endif /* CONFIG_BLK_DEV_INTEGRITY */
- 
- struct block_device_operations {
+ static inline bool queue_is_mq(struct request_queue *q)
+ {
+ 	return q->mq_ops;
 -- 
 2.20.1
 
