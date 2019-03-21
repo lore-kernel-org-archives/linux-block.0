@@ -4,136 +4,159 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76BA9C10F0D
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 13:18:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C15C43381
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 13:18:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 509CB218FF
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 13:18:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42BCF218FF
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 13:18:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728429AbfCUNSn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Mar 2019 09:18:43 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58350 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728416AbfCUNSm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Mar 2019 09:18:42 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 8EBEFAF2F;
-        Thu, 21 Mar 2019 13:18:40 +0000 (UTC)
-Subject: Re: [PATCH 1/2] block: bio: ensure newly added bio flags don't
- override BVEC_POOL_IDX
-To:     Johannes Thumshirn <jthumshirn@suse.de>, Jens Axboe <axboe@fb.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Linux FSDEVEL Mailinglist <linux-fsdevel@vger.kernel.org>
-References: <20190321123045.32396-1-jthumshirn@suse.de>
- <20190321123045.32396-2-jthumshirn@suse.de>
-From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <886489c7-133d-b0bb-6ae9-f054727985e4@suse.de>
-Date:   Thu, 21 Mar 2019 14:18:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        id S1728231AbfCUNSw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Mar 2019 09:18:52 -0400
+Received: from mga18.intel.com ([134.134.136.126]:7139 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728426AbfCUNSv (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 21 Mar 2019 09:18:51 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Mar 2019 06:18:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,252,1549958400"; 
+   d="scan'208";a="216204553"
+Received: from ikonopko-mobl1.ger.corp.intel.com (HELO [10.237.142.155]) ([10.237.142.155])
+  by orsmga001.jf.intel.com with ESMTP; 21 Mar 2019 06:18:48 -0700
+Subject: Re: [PATCH 17/18] lightnvm: allow to use full device path
+To:     Matias Bjorling <mb@lightnvm.io>
+Cc:     Hans Holmberg <hans@owltronix.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        linux-block@vger.kernel.org
+References: <20190314160428.3559-1-igor.j.konopko@intel.com>
+ <20190314160428.3559-18-igor.j.konopko@intel.com>
+ <CANr-nt3poAp1NQmK35=X=mrKgvEJnUHVN_ROxMWB1hrGoZpHdQ@mail.gmail.com>
+ <2683438c-2d8d-c450-8b6f-639d0d757185@intel.com>
+ <CANr-nt1HbjfxQLvmUrsA9shLmn4_VNOF42JoMV7afvjAtwftFg@mail.gmail.com>
+From:   Igor Konopko <igor.j.konopko@intel.com>
+Message-ID: <001207b7-5b26-2079-b5bf-c8b7de9312e5@intel.com>
+Date:   Thu, 21 Mar 2019 14:18:47 +0100
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.3
 MIME-Version: 1.0
-In-Reply-To: <20190321123045.32396-2-jthumshirn@suse.de>
+In-Reply-To: <CANr-nt1HbjfxQLvmUrsA9shLmn4_VNOF42JoMV7afvjAtwftFg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/21/19 1:30 PM, Johannes Thumshirn wrote:
-> With the introduction of BIO_ALLOCED we've used up all available bits in
-> bio::bi_flags.
-> 
-> Make sure no-one adds a new one and thus overrides the BVEC_POOL_IDX
-> 
-> Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
-> ---
->   block/bio.c               |  8 ++++++++
->   include/linux/blk_types.h | 31 +++++++++++++++++--------------
->   2 files changed, 25 insertions(+), 14 deletions(-)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index 4db1008309ed..8c689aed46a0 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -2126,12 +2126,20 @@ static void __init biovec_init_slabs(void)
->   	}
->   }
->   
-> +static inline void bio_flag_buildtime_check(void)
-> +{
-> +	BUILD_BUG_ON(BIO_FLAG_LAST > BVEC_POOL_OFFSET);
-> +}
-> +
->   static int __init init_bio(void)
->   {
->   	bio_slab_max = 2;
->   	bio_slab_nr = 0;
->   	bio_slabs = kcalloc(bio_slab_max, sizeof(struct bio_slab),
->   			    GFP_KERNEL);
-> +
-> +	bio_flag_buildtime_check();
-> +
->   	if (!bio_slabs)
->   		panic("bio: can't allocate bios\n");
->   
-> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-> index d66bf5f32610..0273bad71a96 100644
-> --- a/include/linux/blk_types.h
-> +++ b/include/linux/blk_types.h
-> @@ -215,20 +215,23 @@ struct bio {
->   /*
->    * bio flags
->    */
-> -#define BIO_SEG_VALID	1	/* bi_phys_segments valid */
-> -#define BIO_CLONED	2	/* doesn't own data */
-> -#define BIO_BOUNCED	3	/* bio is a bounce bio */
-> -#define BIO_USER_MAPPED 4	/* contains user pages */
-> -#define BIO_NULL_MAPPED 5	/* contains invalid user pages */
-> -#define BIO_QUIET	6	/* Make BIO Quiet */
-> -#define BIO_CHAIN	7	/* chained bio, ->bi_remaining in effect */
-> -#define BIO_REFFED	8	/* bio has elevated ->bi_cnt */
-> -#define BIO_THROTTLED	9	/* This bio has already been subjected to
-> -				 * throttling rules. Don't do it again. */
-> -#define BIO_TRACE_COMPLETION 10	/* bio_endio() should trace the final completion
-> -				 * of this bio. */
-> -#define BIO_QUEUE_ENTERED 11	/* can use blk_queue_enter_live() */
-> -#define BIO_TRACKED 12		/* set if bio goes through the rq_qos path */
-> +enum {
-> +	BIO_SEG_VALID =	1,		/* bi_phys_segments valid */
-> +	BIO_CLONED = 2,			/* doesn't own data */
-> +	BIO_BOUNCED = 3,		/* bio is a bounce bio */
-> +	BIO_USER_MAPPED = 4,		/* contains user pages */
-> +	BIO_NULL_MAPPED = 5,		/* contains invalid user pages */
-> +	BIO_QUIET = 6,			/* Make BIO Quiet */
-> +	BIO_CHAIN = 7,			/* chained bio, ->bi_remaining in effect */
-> +	BIO_REFFED = 8,			/* bio has elevated ->bi_cnt */
-> +	BIO_THROTTLED =	9,		/* This bio has already been subjected to
-> +					 * throttling rules. Don't do it again. */
-> +	BIO_TRACE_COMPLETION = 10,	/* bio_endio() should trace the final completion
-> +					 * of this bio. */
-> +	BIO_QUEUE_ENTERED = 11,		/* can use blk_queue_enter_live() */
-> +	BIO_TRACKED = 12,		/* set if bio goes through the rq_qos path */
-> +	BIO_FLAG_LAST
-> +};
->   
->   /* See BVEC_POOL_OFFSET below before adding new flags */
->   
-> 
-Where's the point of the enum if all values are initialized?
+Matias,
+any opinion from your side, whether you would like to do such a changes 
+in userspace tool or in lightnvm core? I can go both ways.
+Thanks
+Igor
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		   Teamlead Storage & Networking
-hare@suse.de			               +49 911 74053 688
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: F. Imendörffer, J. Smithard, J. Guild, D. Upmanyu, G. Norton
-HRB 21284 (AG Nürnberg)
+On 18.03.2019 15:41, Hans Holmberg wrote:
+> On Mon, Mar 18, 2019 at 2:18 PM Igor Konopko <igor.j.konopko@intel.com> wrote:
+>>
+>>
+>>
+>> On 18.03.2019 11:28, Hans Holmberg wrote:
+>>> On Thu, Mar 14, 2019 at 5:11 PM Igor Konopko <igor.j.konopko@intel.com> wrote:
+>>>>
+>>>> This patch adds the possibility to provide full device path (like
+>>>> /dev/nvme0n1) when specifying device on top of which pblk instance
+>>>> should be created/removed.
+>>>>
+>>>> This makes creation of targets from nvme-cli (or other ioctl based
+>>>> tools) more unified with other commands in comparison with current
+>>>> situation where almost all commands uses full device path with except
+>>>> of lightnvm creation/removal parameter which uses just 'nvme0n1'
+>>>> naming convention. After this changes both approach will be valid.
+>>>>
+>>>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+>>>> ---
+>>>>    drivers/lightnvm/core.c | 23 ++++++++++++++++++-----
+>>>>    1 file changed, 18 insertions(+), 5 deletions(-)
+>>>>
+>>>> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+>>>> index c01f83b..838c3d8 100644
+>>>> --- a/drivers/lightnvm/core.c
+>>>> +++ b/drivers/lightnvm/core.c
+>>>> @@ -1195,6 +1195,21 @@ void nvm_unregister(struct nvm_dev *dev)
+>>>>    }
+>>>>    EXPORT_SYMBOL(nvm_unregister);
+>>>>
+>>>> +#define PREFIX_STR "/dev/"
+>>>> +static void nvm_normalize_path(char *path)
+>>>> +{
+>>>> +       path[DISK_NAME_LEN - 1] = '\0';
+>>>> +       if (!memcmp(PREFIX_STR, path,
+>>>> +                               sizeof(char) * strlen(PREFIX_STR))) {
+>>>> +               /*
+>>>> +                * User provide name in '/dev/nvme0n1' format,
+>>>> +                * so we need to skip '/dev/' for comparison
+>>>> +                */
+>>>> +               memmove(path, path + sizeof(char) * strlen(PREFIX_STR),
+>>>> +                       (DISK_NAME_LEN - strlen(PREFIX_STR)) * sizeof(char));
+>>>> +       }
+>>>> +}
+>>>> +
+>>>
+>>> I don't like this. Why add string parsing to the kernel? Can't this
+>>> feature be added to the nvme tool?
+>>
+>> Since during target creation/removal in kernel, we already operate on
+>> strings multiple times (strcmp calls for target types, nvme device,
+>> target names) my idea was to keep this in the same layer too.
+> 
+> Oh, pardon the terse and rather grumpy review. Let me elaborate:
+> 
+> String parsing is best avoided when possible, and i don't think it's
+> worth increasing the kernel code size and changing the behavior of the
+> IOCTL when its fully doable to do this in userspace.
+> 
+> Thanks,
+> Hans
+> 
+>>
+>>>
+>>>>    static int __nvm_configure_create(struct nvm_ioctl_create *create)
+>>>>    {
+>>>>           struct nvm_dev *dev;
+>>>> @@ -1304,9 +1319,9 @@ static long nvm_ioctl_dev_create(struct file *file, void __user *arg)
+>>>>                   return -EINVAL;
+>>>>           }
+>>>>
+>>>> -       create.dev[DISK_NAME_LEN - 1] = '\0';
+>>>> +       nvm_normalize_path(create.dev);
+>>>> +       nvm_normalize_path(create.tgtname);
+>>>>           create.tgttype[NVM_TTYPE_NAME_MAX - 1] = '\0';
+>>>> -       create.tgtname[DISK_NAME_LEN - 1] = '\0';
+>>>>
+>>>>           if (create.flags != 0) {
+>>>>                   __u32 flags = create.flags;
+>>>> @@ -1333,7 +1348,7 @@ static long nvm_ioctl_dev_remove(struct file *file, void __user *arg)
+>>>>           if (copy_from_user(&remove, arg, sizeof(struct nvm_ioctl_remove)))
+>>>>                   return -EFAULT;
+>>>>
+>>>> -       remove.tgtname[DISK_NAME_LEN - 1] = '\0';
+>>>> +       nvm_normalize_path(remove.tgtname);
+>>>>
+>>>>           if (remove.flags != 0) {
+>>>>                   pr_err("nvm: no flags supported\n");
+>>>> @@ -1373,8 +1388,6 @@ static long nvm_ioctl_dev_factory(struct file *file, void __user *arg)
+>>>>           if (copy_from_user(&fact, arg, sizeof(struct nvm_ioctl_dev_factory)))
+>>>>                   return -EFAULT;
+>>>>
+>>>> -       fact.dev[DISK_NAME_LEN - 1] = '\0';
+>>>> -
+>>>>           if (fact.flags & ~(NVM_FACTORY_NR_BITS - 1))
+>>>>                   return -EINVAL;
+>>>>
+>>>> --
+>>>> 2.9.5
+>>>>
