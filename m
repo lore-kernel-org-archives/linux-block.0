@@ -2,113 +2,130 @@ Return-Path: <SRS0=o3qj=RY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D345CC43381
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 00:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 394E8C43381
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 01:31:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A40F6218C3
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 00:47:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01D75218D3
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 01:31:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sDTBq/Sx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727081AbfCUArL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Mar 2019 20:47:11 -0400
-Received: from mail-oi1-f196.google.com ([209.85.167.196]:43274 "EHLO
-        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726169AbfCUArL (ORCPT
+        id S1726853AbfCUBbL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Mar 2019 21:31:11 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:60842 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726753AbfCUBbL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Mar 2019 20:47:11 -0400
-Received: by mail-oi1-f196.google.com with SMTP id 67so3372658oif.10
-        for <linux-block@vger.kernel.org>; Wed, 20 Mar 2019 17:47:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/mSokY1Je2WYD5CWQpJeZsSLYFE3PxgSkGyLzhE0/1k=;
-        b=LVCKxjQYyMguiGoTjMDafqlWIUCL7PRk+w/fb55UQAnZmFFAV01G1e3IO0QVjrcxnF
-         CCv1R8Y19OTMQCGjljwGkgptP9r8a2yCJq7vTcagN1hrPcHOuTgcbv7Rn5Ipk4LR4TbN
-         46Awm5NsMik40xmsb4WEfIMugEuL5pocNLYuyHL6ItP4E0kLncwbfoSzZNNywgdk6AA3
-         VJ1zmGUSnq9NGPaKbSVjbl8APmpiFq8kLKW7Bl7Dwxes2gkgSLLGd5aBkFw6Ttt28y/q
-         uwAbd+8Izj5Eq4/OBjwoJKzXoriwK47PAKogqZtpvMIzNKFsUY5NljbL1eK9HV+nfaWb
-         zoHw==
-X-Gm-Message-State: APjAAAViE2HjAsbEnDjvaAS8TLItJkRN+YuizkrnyPMfgBBr9iXW0tGA
-        erbav6gPLorqda8fIyI6OOfjfxbt
-X-Google-Smtp-Source: APXvYqyEmBH1gytDa8J5X+jzeXyQhQGMP4uRCkPqyzO6+cAZ3UuxZ6JlzY92UymVTT7Ru4u0/VaGkg==
-X-Received: by 2002:aca:5387:: with SMTP id h129mr545694oib.52.1553129230474;
-        Wed, 20 Mar 2019 17:47:10 -0700 (PDT)
-Received: from [192.168.1.114] (162-195-240-247.lightspeed.sntcca.sbcglobal.net. [162.195.240.247])
-        by smtp.gmail.com with ESMTPSA id n9sm1433238otk.72.2019.03.20.17.47.08
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 20 Mar 2019 17:47:09 -0700 (PDT)
-Subject: Re: [PATCH 1/2] blk-mq: introduce blk_mq_complete_request_sync()
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, linux-nvme@lists.infradead.org
-References: <20190318032950.17770-1-ming.lei@redhat.com>
- <20190318032950.17770-2-ming.lei@redhat.com>
- <f708ee0c-dfa4-0bca-f996-8d834471f1fd@acm.org>
- <20190318073826.GA29746@ming.t460p> <1552921495.152266.8.camel@acm.org>
- <20190318151618.GA20371@ming.t460p> <1552924164.152266.21.camel@acm.org>
-From:   Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <448615db-64e2-cbe7-c09e-19b2d86a720a@grimberg.me>
-Date:   Wed, 20 Mar 2019 17:47:01 -0700
+        Wed, 20 Mar 2019 21:31:11 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2L1NbbX014048;
+        Thu, 21 Mar 2019 01:30:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=tHqaXZAUo6StWTKwDVBLWpvAhmFJGq957ch/0cuFhIc=;
+ b=sDTBq/SxzOO3LKORzHmbieurenqD7aky+gYKqalj7CRJ9YmHYWF9h30PPSjavJcTfoBS
+ aD9eN7Nm0RHiCBAQgNtEmU28/otcLl9LvKcglMdA8oghnni4G50Mj97IkxVpRCWe24lE
+ ChD3G4Vxf5rZ9d1croNQ4dLLzUE78i1u2NxZwPdtuS4XSoPcDJ908188wJ41C9yVdTJw
+ rM8/JBL62SscIebLrx+HUZt50S/R1eanEEHre78///T/PJEA+Yn6gCnbcNXFTfaGiaAN
+ SWcZoAqGwErwI48yhpASZmjnXi0xoFVnNtKqGUIRY/lJDYWQ5vJwKOqufTDQwfq+jE6/ xg== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by aserp2130.oracle.com with ESMTP id 2r8pnex5vy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 21 Mar 2019 01:30:49 +0000
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x2L1Umb5013151
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 21 Mar 2019 01:30:48 GMT
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x2L1UlDH020203;
+        Thu, 21 Mar 2019 01:30:47 GMT
+Received: from [10.182.71.8] (/10.182.71.8)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 20 Mar 2019 18:30:47 -0700
+Subject: Re: [PATCH 2/8] blk-mq: change the method of iterating busy tags of a
+ request_queue
+To:     Sagi Grimberg <sagi@grimberg.me>, axboe@kernel.dk
+Cc:     hch@lst.de, jthumshirn@suse.de, hare@suse.de, josef@toxicpanda.com,
+        bvanassche@acm.org, keith.busch@intel.com, jsmart2021@gmail.com,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+References: <1552640264-26101-1-git-send-email-jianchao.w.wang@oracle.com>
+ <1552640264-26101-3-git-send-email-jianchao.w.wang@oracle.com>
+ <bf563d09-c243-5bf5-ab3e-0fa2bd583edd@grimberg.me>
+From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <a3ee391b-1815-9c15-a8d8-d0d16f930460@oracle.com>
+Date:   Thu, 21 Mar 2019 09:33:58 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <1552924164.152266.21.camel@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <bf563d09-c243-5bf5-ab3e-0fa2bd583edd@grimberg.me>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9201 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1903210008
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Sagi
 
-> Hi Ming,
+Thanks for your kindly response.
+
+On 3/21/19 2:52 AM, Sagi Grimberg wrote:
 > 
-> Just like the NVMeOF initiator driver, the SRP initiator driver uses an
-> RDMA RC connection for all of its communication over the network. If
-> communication between initiator and target fails the target driver will
-> close the connection or one of the work requests that was posted by the
-> initiator driver will complete with an error status (wc->status !=
-> IB_WC_SUCCESS). In the latter case the function srp_handle_qp_err() will
-> try to reestablish the connection between initiator and target after a
-> certain delay:
 > 
-> 	if (delay > 0)
-> 		queue_delayed_work(system_long_wq, &rport->reconnect_work,
-> 				   1UL * delay * HZ);
+> On 3/15/19 1:57 AM, Jianchao Wang wrote:
+>> tags->rqs[] will not been cleaned when free driver tag and there
+>> is a window between get driver tag and write tags->rqs[], so we
+>> may see stale rq in tags->rqs[] which may have been freed, as
+>> following case,
+>> blk_mq_get_request         blk_mq_queue_tag_busy_iter
+>>    -> blk_mq_get_tag
+>>                               -> bt_for_each
+>>                                 -> bt_iter
+>>                                   -> rq = taags->rqs[]
+>>                                   -> rq->q
+>>    -> blk_mq_rq_ctx_init
+>>      -> data->hctx->tags->rqs[rq->tag] = rq;
+>>
+>> To fix this, the blk_mq_queue_tag_busy_iter is changed in this
+>> patch to use tags->static_rqs[] instead of tags->rqs[]. We have
+>> to identify whether there is a io scheduler attached to decide
+>> to use hctx->tags or hctx->sched_tags. And we will try to get a
+>> non-zero q_usage_counter before that, so it is safe to access
+>> them. Add 'inflight' parameter to determine to iterate in-flight
+>> requests or just busy tags. A correction here is that
+>> part_in_flight should count the busy tags instead of rqs that
+>> have got driver tags.
 > 
-> SCSI timeouts may kick the SCSI error handler. That results in calls of
-> the srp_reset_device() and/or srp_reset_host() functions. srp_reset_host()
-> terminates all outstanding requests after having disconnected the RDMA RC
-> connection. Disconnecting the RC connection first guarantees that there
-> are no concurrent request completion calls from the regular completion
-> path and from the error handler.
+> IMO, instead of this parameter, add a wrapper like
+> blk_mq_queue_tag_inflight_iter() or keep the parameter out until
+> we actually have a user that calls it for busy and not inflight.
 
-Hi Bart,
+Using a wrapper instead of exporting the parameter to user is indeed better.
+I will change it in next version.
 
-If I understand the race correctly, its not between the requests
-completion and the queue pairs removal nor the timeout handler
-necessarily, but rather it is between the async requests completion and
-the tagset deallocation.
+When the 'inflight' parameter is true, we iterate the inflight requests,
+otherwise, we iterate the all the busy requests no matter they are in-flight
+or not. The latter would be useful for part_in_flight. Currently, we only
+account the requests with driver tags, it is inconsistent for the io-scheduler
+and non-io-scheduler case.
 
-Think of surprise removal (or disconnect) during I/O, drivers
-usually stop/quiesce/freeze the queues, terminate/abort inflight
-I/Os and then teardown the hw queues and the tagset.
+> 
+> Other than that, I think that iterating over static_rqs is a good
+> solution to the problem described.
+> 
 
-IIRC, the same race holds for srp if this happens during I/O:
-1. srp_rport_delete() -> srp_remove_target() -> srp_stop_rport_timers() 
--> __rport_fail_io_fast()
-
-2. complete all I/Os (async remotely via smp)
-
-Then continue..
-
-3. scsi_host_put() -> scsi_host_dev_release() -> scsi_mq_destroy_tags()
-
-What is preventing (3) from happening before (2) if its async? I would
-think that scsi drivers need the exact same thing...
+Sincerely
+Jianchao
