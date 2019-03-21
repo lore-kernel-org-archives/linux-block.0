@@ -2,113 +2,189 @@ Return-Path: <SRS0=o3qj=RY=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C4DFC43381
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 23:12:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4394C43381
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 23:26:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 69EE9218D3
-	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 23:12:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 554C321902
+	for <linux-block@archiver.kernel.org>; Thu, 21 Mar 2019 23:26:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NaFt4t84"
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="wRmcP0mu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726980AbfCUXMT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Mar 2019 19:12:19 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:52144 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726611AbfCUXMS (ORCPT
+        id S1727257AbfCUX0d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Mar 2019 19:26:33 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:32999 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726529AbfCUX0d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Mar 2019 19:12:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
-        :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=LfjNXsN3o2AHquL1g8L5xDbXrIN82br20YgpHMBO7uU=; b=NaFt4t84SDtD7KlyQw0Vdgxj6g
-        88jc3IsRxTaxMl8gjjBdrZ4EkurDb3IhwT+FoFnS7zpdmNWykuYtY3+uUSIbCUCc0zOJfoKaOygZF
-        lbCzuZGOkoTMyaV3ppuwE49dEcqZIGnWyog7iQtSV06bxXeG1s6xkGNKp6SJxyGn6PWlvx2GhgAOt
-        e4wU/nLpTz7DMi6Ym2klVql96N35G39xdR2kTaHRdFuEqA/nDIr6De3Nif4JgOECjZA/J7hcrEnDE
-        sXcIj2kyZ9a9ipfUGYx8nFX28R7H10vesytNRY18LFDOQNkIWqc77aZqWOVYRMBsHEU6r93iWh4PX
-        y1/r5VEQ==;
-Received: from [199.255.44.128] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1h76rB-0003zM-2x; Thu, 21 Mar 2019 23:12:17 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@fb.com>, Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>
-Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Subject: [PATCH 15/15] nvme-pci: tidy up nvme_map_data
-Date:   Thu, 21 Mar 2019 16:10:37 -0700
-Message-Id: <20190321231037.25104-16-hch@lst.de>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190321231037.25104-1-hch@lst.de>
-References: <20190321231037.25104-1-hch@lst.de>
+        Thu, 21 Mar 2019 19:26:33 -0400
+Received: by mail-pg1-f193.google.com with SMTP id b12so141396pgk.0
+        for <linux-block@vger.kernel.org>; Thu, 21 Mar 2019 16:26:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=osandov-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=3w3S8k7k2fiZhhHnx96Ws5U31CKWrr6kN7uBb0rDT6I=;
+        b=wRmcP0muItih9xRcRxvb9LF1UoZf4NUWV1aSJksqKHvqAWLRFhZfahOGI6rbL6tzoj
+         tJ/IsfkxP2xhI1SRyczMTy981/w6pPHfobB0du94ksyzAo6YCRbi4ruEZ7qcsdgIjZHi
+         +Edeb61D335T5QvSzOrfuNGeemN7qenvdXDSMqpdpSxWj07lt0/0ny7Vu6PuRpegMCOd
+         gQPSXk3nCjTBbFA8M4MQrEfJKqv5qvtnxfX1ifQ70zd7z2nZdnZVTZmTYDHBLWMzbZxJ
+         OAZEktPHsA6Y7/mfD2JdEjk2jlmI8fVxoyRUCOdjsSM+LWUUmDWlizFKtA/6oDFhl3XB
+         xUAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=3w3S8k7k2fiZhhHnx96Ws5U31CKWrr6kN7uBb0rDT6I=;
+        b=KmCGMgvPlM1rUTSOWrN+qDKhT5V/9GkEBE/gKvxSTE0y4EoeVqAYwQIr6fBQxTCA+6
+         /cTVWWfOz09ISC2BUzyVB85QOowdnZbmOFW+AN8lUCZyRtmNrKSgscrXFYCtLFb8QcTX
+         XYsPxNMWCc5sk3RacfdIaSy9eN79RKHZDe2LsXG+GlxCz8rilSNj95M+12euQuxwLPaQ
+         WdcrtETfNMr2romY5A/fX5xYJ+JvuxmDfCOmgrRajnQMBzilSUUMWnwRI9qhdiMVVDO6
+         ZkE9caghAmQpwPuX5GimTZI7JxuYNoVeA+vqFLsEEGrhgQPjhUsT7bMW+0yK9ORo57om
+         lnnw==
+X-Gm-Message-State: APjAAAWvAnUmhByI+b/gNClPi6mpMUPypTA9V7+bhMiz8lGCwKWdqubd
+        ENJBPjJMg9Zoa/pt8v1hUHreFA==
+X-Google-Smtp-Source: APXvYqwYhS5SKYLc42cAUvvkzGNKsFg7aEU5AQ8izjIrLx3LZgyRJzG/sr3P4pID6U7NyHTzkmYYhQ==
+X-Received: by 2002:a65:49c4:: with SMTP id t4mr5857274pgs.421.1553210792137;
+        Thu, 21 Mar 2019 16:26:32 -0700 (PDT)
+Received: from vader ([2620:10d:c090:200::2:1643])
+        by smtp.gmail.com with ESMTPSA id 14sm8731196pft.137.2019.03.21.16.26.30
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 21 Mar 2019 16:26:31 -0700 (PDT)
+Date:   Thu, 21 Mar 2019 16:26:28 -0700
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Dongli Zhang <dongli.zhang@oracle.com>
+Cc:     linux-block@vger.kernel.org, osandov@fb.com, jack@suse.cz
+Subject: Re: [PATCH blktests 2/2] loop/001: verify all partitions are removed
+Message-ID: <20190321232628.GE20838@vader>
+References: <1552563917-8388-1-git-send-email-dongli.zhang@oracle.com>
+ <1552563917-8388-2-git-send-email-dongli.zhang@oracle.com>
+ <20190314175533.GC11825@vader>
+ <c55aa1f3-6b5f-3dab-6c74-247ba65b5bd0@oracle.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c55aa1f3-6b5f-3dab-6c74-247ba65b5bd0@oracle.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove two pointless local variables, remove ret assignment that is
-never used, move the use_sgl initialization closer to where it is used.
+On Fri, Mar 15, 2019 at 10:00:27AM +0800, Dongli Zhang wrote:
+> 
+> 
+> On 3/15/19 1:55 AM, Omar Sandoval wrote:
+> > On Thu, Mar 14, 2019 at 07:45:17PM +0800, Dongli Zhang wrote:
+> >> loop/001 does not test whether all partitions are removed successfully
+> >> during loop device partition scanning. As a result, the regression
+> >> introduced by 0da03cab87e6 ("loop: Fix deadlock when calling
+> >> blkdev_reread_part()") can not be detected.
+> >>
+> >> The regression will generate below message in dmesg:
+> >>
+> >> [  464.414043] __loop_clr_fd: partition scan of loop0 failed (rc=-22)
+> >>
+> >> and leave orphan partitions like below:
+> >>
+> >> - /dev/loop0p1
+> >> - /sys/block/loop0/loop0p1
+> >>
+> >> This patch verifies all partitions are removed by checking if there is
+> >> /sys/block/loopX/loopXpY left. The expected number of partitions left is 0.
+> > 
+> > Thanks for the test! A couple of comments below.
+> > 
+> >> Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+> >> ---
+> >>  tests/loop/001     | 5 +++++
+> >>  tests/loop/001.out | 1 +
+> >>  2 files changed, 6 insertions(+)
+> >>
+> >> diff --git a/tests/loop/001 b/tests/loop/001
+> >> index 47f760a..a0326b7 100755
+> >> --- a/tests/loop/001
+> >> +++ b/tests/loop/001
+> >> @@ -4,6 +4,9 @@
+> >>  #
+> >>  # Test loop device partition scanning. Regression test for commit e02898b42380
+> >>  # ("loop: fix LO_FLAGS_PARTSCAN hang").
+> >> +#
+> >> +# Test loop device paritition scanning. Regression test for commit 758a58d0bc67
+> >> +# ("loop: set GENHD_FL_NO_PART_SCAN after blkdev_reread_part()").
+> > 
+> > These can just be combined to
+> > 
+> > # Test loop device partition scanning. Regression test for commits e02898b42380
+> > # ("loop: fix LO_FLAGS_PARTSCAN hang") and 758a58d0bc67 ("loop: set
+> > # GENHD_FL_NO_PART_SCAN after blkdev_reread_part()").
+> > 
+> >>  . tests/loop/rc
+> >>  
+> >> @@ -24,9 +27,11 @@ test() {
+> >>  		mkpart primary 50% 100%
+> >>  
+> >>  	loop_device="$(losetup -P -f --show "$TMPDIR/img")"
+> >> +	loop_name=${loop_device:5}
+> >>  	lsblk -ln "$loop_device" | wc -l
+> >>  
+> >>  	losetup -d "$loop_device"
+> >> +	ls /sys/block/$loop_name | grep loop | wc -l
+> > 
+> > We can just repeat the same `lsblk -ln "$loop_device" | wc -l` from
+> > earlier, right? That's a bit cleaner than the hardcoded string slicing
+> > and ls.
+> 
+> Seems 'lsblk' does not work here.
+> 
+> step1: truncate -s 100M /tmp/tmp.raw
+> step2: parted /tmp/tmp.raw --script mklabel msdos \
+>        mkpart primary 0% 50% mkpart primary 50% 100%
+> step3: losetup -P -f --show /tmp/tmp.raw
+> 
+> Now we are able to see two loop partitions from 'lsblk'
+> 
+> # lsblk -ln /dev/loop0
+> loop0     7:0    0  100M  0 loop
+> loop0p1 259:0    0   50M  0 loop
+> loop0p2 259:1    0   50M  0 loop
+> 
+> 
+> step4: # losetup -d /dev/loop0
+> 
+> There is below syslog as  partscan is failed.
+> 
+> [  261.181049] __loop_clr_fd: partition scan of loop0 failed (rc=-22)
+> 
+> 
+> There are 2 partitions left:
+> 
+> # ls /dev | grep loop0
+> loop0
+> loop0p1
+> loop0p2
+> 
+> # ls /sys/block/loop0 | grep loop
+> loop0p1
+> loop0p2
+> 
+> 
+> However, 'lsblk -ln' does not report the orphan paritions:
+> 
+> # lsblk -ln
+> sr0   11:0    1 1024M  0 rom
+> sda    8:0    0   20G  0 disk
+> sda2   8:2    0    1K  0 part
+> sda5   8:5    0  4.1G  0 part [SWAP]
+> sda1   8:1    0 15.9G  0 part /
+> 
+> 
+> Therefore, we would not be able to use 'lsblk' here.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/nvme/host/pci.c | 17 +++++------------
- 1 file changed, 5 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 38869f59c296..9ec0704d5f78 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -840,10 +840,7 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
- 		struct nvme_command *cmnd)
- {
- 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
--	struct request_queue *q = req->q;
--	enum dma_data_direction dma_dir = rq_data_dir(req) ?
--			DMA_TO_DEVICE : DMA_FROM_DEVICE;
--	blk_status_t ret = BLK_STS_IOERR;
-+	blk_status_t ret = BLK_STS_RESOURCE;
- 	int nr_mapped;
- 
- 	if (blk_rq_nr_phys_segments(req) == 1) {
-@@ -865,25 +862,21 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
- 	iod->sg = mempool_alloc(dev->iod_mempool, GFP_ATOMIC);
- 	if (!iod->sg)
- 		return BLK_STS_RESOURCE;
--
--	iod->use_sgl = nvme_pci_use_sgls(dev, req);
--
- 	sg_init_table(iod->sg, blk_rq_nr_phys_segments(req));
--	iod->nents = blk_rq_map_sg(q, req, iod->sg);
-+	iod->nents = blk_rq_map_sg(req->q, req, iod->sg);
- 	if (!iod->nents)
- 		goto out;
- 
--	ret = BLK_STS_RESOURCE;
--
- 	if (is_pci_p2pdma_page(sg_page(iod->sg)))
- 		nr_mapped = pci_p2pdma_map_sg(dev->dev, iod->sg, iod->nents,
--					  dma_dir);
-+					      rq_dma_dir(req));
- 	else
- 		nr_mapped = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents,
--					     dma_dir,  DMA_ATTR_NO_WARN);
-+					     rq_dma_dir(req), DMA_ATTR_NO_WARN);
- 	if (!nr_mapped)
- 		goto out;
- 
-+	iod->use_sgl = nvme_pci_use_sgls(dev, req);
- 	if (iod->use_sgl)
- 		ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw, nr_mapped);
- 	else
--- 
-2.20.1
-
+I see. I think we should check both lsblk and sysfs here. How about
+something like
+https://github.com/osandov/blktests/commit/6c1237cd358008024ece90bd915a67c23add8a2a?
