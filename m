@@ -6,143 +6,305 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0865C43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B21AAC43381
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:51:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7928D20883
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:51:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82875218FE
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:51:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728336AbfCVOvb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Mar 2019 10:51:31 -0400
-Received: from mga07.intel.com ([134.134.136.100]:13975 "EHLO mga07.intel.com"
+        id S1728353AbfCVOvj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Mar 2019 10:51:39 -0400
+Received: from mga04.intel.com ([192.55.52.120]:10599 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728072AbfCVOva (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Mar 2019 10:51:30 -0400
+        id S1728072AbfCVOvi (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Mar 2019 10:51:38 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Mar 2019 07:51:30 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Mar 2019 07:51:38 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.60,256,1549958400"; 
-   d="scan'208";a="216593160"
+   d="scan'208";a="216593185"
 Received: from gklab-107-059.igk.intel.com ([10.102.107.59])
-  by orsmga001.jf.intel.com with ESMTP; 22 Mar 2019 07:51:28 -0700
+  by orsmga001.jf.intel.com with ESMTP; 22 Mar 2019 07:51:36 -0700
 From:   Igor Konopko <igor.j.konopko@intel.com>
 To:     mb@lightnvm.io, javier@javigon.com, hans.holmberg@cnexlabs.com
 Cc:     linux-block@vger.kernel.org, igor.j.konopko@intel.com
-Subject: [PATCH v2 01/16] lightnvm: pblk: warn when there are opened chunks
-Date:   Fri, 22 Mar 2019 15:48:28 +0100
-Message-Id: <20190322144843.9602-2-igor.j.konopko@intel.com>
+Subject: [PATCH v2 02/16] lightnvm: pblk: IO path reorganization
+Date:   Fri, 22 Mar 2019 15:48:29 +0100
+Message-Id: <20190322144843.9602-3-igor.j.konopko@intel.com>
 X-Mailer: git-send-email 2.9.5
 In-Reply-To: <20190322144843.9602-1-igor.j.konopko@intel.com>
 References: <20190322144843.9602-1-igor.j.konopko@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In case of factory pblk init, we might have a situation when there are
-some opened chunks. Based on OCSSD spec we are not allowed to transform
-chunks from the open state directly to the free state, so such a reset
-can lead to IO error (even that most of the controller will allow for
-for such a operation anyway), so we would like to warn users about such
-a situation at least.
+This patch is made in order to prepare read path for new approach to
+partial read handling (which is needed for multi-page bvec handling)
+The most important change is to move the handling of completed and
+failed bio from the pblk_make_rq() to particular read and write
+functions. This is needed, since after partial read path changes,
+sometimes completed/failed bio will be different from original one, so
+we cannot do this any longer in pblk_make_rq(). Other changes are
+small read path refactor in order to reduce the size of another patch
+with partial read changes. Generally the goal of this patch is not to
+change the functionality, but just to prepare the code for the
+following changes.
 
 Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-Reviewed-by: Javier González <javier@javigon.com>
 ---
- drivers/lightnvm/pblk-init.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ drivers/lightnvm/pblk-cache.c |  7 ++--
+ drivers/lightnvm/pblk-init.c  | 14 ++------
+ drivers/lightnvm/pblk-read.c  | 83 ++++++++++++++++++++-----------------------
+ drivers/lightnvm/pblk.h       |  4 +--
+ 4 files changed, 47 insertions(+), 61 deletions(-)
 
+diff --git a/drivers/lightnvm/pblk-cache.c b/drivers/lightnvm/pblk-cache.c
+index c9fa26f..d2a3683 100644
+--- a/drivers/lightnvm/pblk-cache.c
++++ b/drivers/lightnvm/pblk-cache.c
+@@ -18,7 +18,7 @@
+ 
+ #include "pblk.h"
+ 
+-int pblk_write_to_cache(struct pblk *pblk, struct bio *bio, unsigned long flags)
++void pblk_write_to_cache(struct pblk *pblk, struct bio *bio, unsigned long flags)
+ {
+ 	struct request_queue *q = pblk->dev->q;
+ 	struct pblk_w_ctx w_ctx;
+@@ -43,6 +43,7 @@ int pblk_write_to_cache(struct pblk *pblk, struct bio *bio, unsigned long flags)
+ 		goto retry;
+ 	case NVM_IO_ERR:
+ 		pblk_pipeline_stop(pblk);
++		bio_io_error(bio);
+ 		goto out;
+ 	}
+ 
+@@ -79,7 +80,9 @@ int pblk_write_to_cache(struct pblk *pblk, struct bio *bio, unsigned long flags)
+ out:
+ 	generic_end_io_acct(q, REQ_OP_WRITE, &pblk->disk->part0, start_time);
+ 	pblk_write_should_kick(pblk);
+-	return ret;
++
++	if (ret == NVM_IO_DONE)
++		bio_endio(bio);
+ }
+ 
+ /*
 diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
-index 1e227a0..e2e1193 100644
+index e2e1193..4211cd1 100644
 --- a/drivers/lightnvm/pblk-init.c
 +++ b/drivers/lightnvm/pblk-init.c
-@@ -712,7 +712,7 @@ static int pblk_set_provision(struct pblk *pblk, int nr_free_chks)
+@@ -50,7 +50,6 @@ struct bio_set pblk_bio_set;
+ static blk_qc_t pblk_make_rq(struct request_queue *q, struct bio *bio)
+ {
+ 	struct pblk *pblk = q->queuedata;
+-	int ret;
+ 
+ 	if (bio_op(bio) == REQ_OP_DISCARD) {
+ 		pblk_discard(pblk, bio);
+@@ -65,7 +64,7 @@ static blk_qc_t pblk_make_rq(struct request_queue *q, struct bio *bio)
+ 	 */
+ 	if (bio_data_dir(bio) == READ) {
+ 		blk_queue_split(q, &bio);
+-		ret = pblk_submit_read(pblk, bio);
++		pblk_submit_read(pblk, bio);
+ 	} else {
+ 		/* Prevent deadlock in the case of a modest LUN configuration
+ 		 * and large user I/Os. Unless stalled, the rate limiter
+@@ -74,16 +73,7 @@ static blk_qc_t pblk_make_rq(struct request_queue *q, struct bio *bio)
+ 		if (pblk_get_secs(bio) > pblk_rl_max_io(&pblk->rl))
+ 			blk_queue_split(q, &bio);
+ 
+-		ret = pblk_write_to_cache(pblk, bio, PBLK_IOTYPE_USER);
+-	}
+-
+-	switch (ret) {
+-	case NVM_IO_ERR:
+-		bio_io_error(bio);
+-		break;
+-	case NVM_IO_DONE:
+-		bio_endio(bio);
+-		break;
++		pblk_write_to_cache(pblk, bio, PBLK_IOTYPE_USER);
+ 	}
+ 
+ 	return BLK_QC_T_NONE;
+diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+index 6569746..597fe6d 100644
+--- a/drivers/lightnvm/pblk-read.c
++++ b/drivers/lightnvm/pblk-read.c
+@@ -179,7 +179,8 @@ static void pblk_end_user_read(struct bio *bio, int error)
+ {
+ 	if (error && error != NVM_RSP_WARN_HIGHECC)
+ 		bio_io_error(bio);
+-	bio_endio(bio);
++	else
++		bio_endio(bio);
  }
  
- static int pblk_setup_line_meta_chk(struct pblk *pblk, struct pblk_line *line,
--				   struct nvm_chk_meta *meta)
-+				   struct nvm_chk_meta *meta, int *opened)
+ static void __pblk_end_io_read(struct pblk *pblk, struct nvm_rq *rqd,
+@@ -383,7 +384,6 @@ static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+ 
+ 	/* Free allocated pages in new bio */
+ 	pblk_bio_free_pages(pblk, rqd->bio, 0, rqd->bio->bi_vcnt);
+-	__pblk_end_io_read(pblk, rqd, false);
+ 	return NVM_IO_ERR;
+ }
+ 
+@@ -428,7 +428,7 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd, struct bio *bio,
+ 	}
+ }
+ 
+-int pblk_submit_read(struct pblk *pblk, struct bio *bio)
++void pblk_submit_read(struct pblk *pblk, struct bio *bio)
  {
  	struct nvm_tgt_dev *dev = pblk->dev;
- 	struct nvm_geo *geo = &dev->geo;
-@@ -748,6 +748,9 @@ static int pblk_setup_line_meta_chk(struct pblk *pblk, struct pblk_line *line,
- 			continue;
+ 	struct request_queue *q = dev->q;
+@@ -436,9 +436,9 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 	unsigned int nr_secs = pblk_get_secs(bio);
+ 	struct pblk_g_ctx *r_ctx;
+ 	struct nvm_rq *rqd;
++	struct bio *int_bio;
+ 	unsigned int bio_init_idx;
+ 	DECLARE_BITMAP(read_bitmap, NVM_MAX_VLBA);
+-	int ret = NVM_IO_ERR;
+ 
+ 	generic_start_io_acct(q, REQ_OP_READ, bio_sectors(bio),
+ 			      &pblk->disk->part0);
+@@ -449,74 +449,67 @@ int pblk_submit_read(struct pblk *pblk, struct bio *bio)
+ 
+ 	rqd->opcode = NVM_OP_PREAD;
+ 	rqd->nr_ppas = nr_secs;
+-	rqd->bio = NULL; /* cloned bio if needed */
+ 	rqd->private = pblk;
+ 	rqd->end_io = pblk_end_io_read;
+ 
+ 	r_ctx = nvm_rq_to_pdu(rqd);
+ 	r_ctx->start_time = jiffies;
+ 	r_ctx->lba = blba;
+-	r_ctx->private = bio; /* original bio */
+ 
+ 	/* Save the index for this bio's start. This is needed in case
+ 	 * we need to fill a partial read.
+ 	 */
+ 	bio_init_idx = pblk_get_bi_idx(bio);
+ 
+-	if (pblk_alloc_rqd_meta(pblk, rqd))
+-		goto fail_rqd_free;
++	if (pblk_alloc_rqd_meta(pblk, rqd)) {
++		bio_io_error(bio);
++		pblk_free_rqd(pblk, rqd, PBLK_READ);
++		return;
++	}
++
++	/* Clone read bio to deal internally with:
++	 * -read errors when reading from drive
++	 * -bio_advance() calls during l2p lookup and cache reads
++	 */
++	int_bio = bio_clone_fast(bio, GFP_KERNEL, &pblk_bio_set);
+ 
+ 	if (nr_secs > 1)
+ 		pblk_read_ppalist_rq(pblk, rqd, bio, blba, read_bitmap);
+ 	else
+ 		pblk_read_rq(pblk, rqd, bio, blba, read_bitmap);
+ 
++	r_ctx->private = bio; /* original bio */
++	rqd->bio = int_bio; /* internal bio */
++
+ 	if (bitmap_full(read_bitmap, nr_secs)) {
++		pblk_end_user_read(bio, 0);
+ 		atomic_inc(&pblk->inflight_io);
+ 		__pblk_end_io_read(pblk, rqd, false);
+-		return NVM_IO_DONE;
++		return;
+ 	}
+ 
+-	/* All sectors are to be read from the device */
+-	if (bitmap_empty(read_bitmap, rqd->nr_ppas)) {
+-		struct bio *int_bio = NULL;
+-
+-		/* Clone read bio to deal with read errors internally */
+-		int_bio = bio_clone_fast(bio, GFP_KERNEL, &pblk_bio_set);
+-		if (!int_bio) {
+-			pblk_err(pblk, "could not clone read bio\n");
+-			goto fail_end_io;
+-		}
+-
+-		rqd->bio = int_bio;
+-
+-		if (pblk_submit_io(pblk, rqd)) {
++	if (!bitmap_empty(read_bitmap, rqd->nr_ppas)) {
++		/* The read bio request could be partially filled by the write
++		 * buffer, but there are some holes that need to be read from
++		 * the drive.
++		 */
++		bio_put(int_bio);
++		rqd->bio = NULL;
++		if (pblk_partial_read_bio(pblk, rqd, bio_init_idx, read_bitmap,
++					    nr_secs)) {
+ 			pblk_err(pblk, "read IO submission failed\n");
+-			ret = NVM_IO_ERR;
+-			goto fail_end_io;
++			bio_io_error(bio);
++			__pblk_end_io_read(pblk, rqd, false);
  		}
- 
-+		if (chunk->state & NVM_CHK_ST_OPEN)
-+			(*opened)++;
-+
- 		if (!(chunk->state & NVM_CHK_ST_OFFLINE))
- 			continue;
- 
-@@ -759,7 +762,7 @@ static int pblk_setup_line_meta_chk(struct pblk *pblk, struct pblk_line *line,
- }
- 
- static long pblk_setup_line_meta(struct pblk *pblk, struct pblk_line *line,
--				 void *chunk_meta, int line_id)
-+				 void *chunk_meta, int line_id, int *opened)
- {
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
- 	struct pblk_line_meta *lm = &pblk->lm;
-@@ -773,7 +776,7 @@ static long pblk_setup_line_meta(struct pblk *pblk, struct pblk_line *line,
- 	line->vsc = &l_mg->vsc_list[line_id];
- 	spin_lock_init(&line->lock);
- 
--	nr_bad_chks = pblk_setup_line_meta_chk(pblk, line, chunk_meta);
-+	nr_bad_chks = pblk_setup_line_meta_chk(pblk, line, chunk_meta, opened);
- 
- 	chk_in_line = lm->blk_per_line - nr_bad_chks;
- 	if (nr_bad_chks < 0 || nr_bad_chks > lm->blk_per_line ||
-@@ -1019,12 +1022,12 @@ static int pblk_line_meta_init(struct pblk *pblk)
- 	return 0;
- }
- 
--static int pblk_lines_init(struct pblk *pblk)
-+static int pblk_lines_init(struct pblk *pblk, bool factory)
- {
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
- 	struct pblk_line *line;
- 	void *chunk_meta;
--	int nr_free_chks = 0;
-+	int nr_free_chks = 0, nr_opened_chks = 0;
- 	int i, ret;
- 
- 	ret = pblk_line_meta_init(pblk);
-@@ -1059,7 +1062,8 @@ static int pblk_lines_init(struct pblk *pblk)
- 		if (ret)
- 			goto fail_free_lines;
- 
--		nr_free_chks += pblk_setup_line_meta(pblk, line, chunk_meta, i);
-+		nr_free_chks += pblk_setup_line_meta(pblk, line, chunk_meta, i,
-+							&nr_opened_chks);
- 
- 		trace_pblk_line_state(pblk_disk_name(pblk), line->id,
- 								line->state);
-@@ -1071,6 +1075,10 @@ static int pblk_lines_init(struct pblk *pblk)
- 		goto fail_free_lines;
+-
+-		return NVM_IO_OK;
++		return;
  	}
  
-+	if (factory && nr_opened_chks)
-+		pblk_warn(pblk, "%d opened chunks during factory creation\n",
-+				nr_opened_chks);
-+
- 	ret = pblk_set_provision(pblk, nr_free_chks);
- 	if (ret)
- 		goto fail_free_lines;
-@@ -1235,7 +1243,7 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
- 		goto fail;
- 	}
+-	/* The read bio request could be partially filled by the write buffer,
+-	 * but there are some holes that need to be read from the drive.
+-	 */
+-	ret = pblk_partial_read_bio(pblk, rqd, bio_init_idx, read_bitmap,
+-				    nr_secs);
+-	if (ret)
+-		goto fail_meta_free;
+-
+-	return NVM_IO_OK;
+-
+-fail_meta_free:
+-	nvm_dev_dma_free(dev->parent, rqd->meta_list, rqd->dma_meta_list);
+-fail_rqd_free:
+-	pblk_free_rqd(pblk, rqd, PBLK_READ);
+-	return ret;
+-fail_end_io:
+-	__pblk_end_io_read(pblk, rqd, false);
+-	return ret;
++	/* All sectors are to be read from the device */
++	if (pblk_submit_io(pblk, rqd)) {
++		pblk_err(pblk, "read IO submission failed\n");
++		bio_io_error(bio);
++		__pblk_end_io_read(pblk, rqd, false);
++	}
+ }
  
--	ret = pblk_lines_init(pblk);
-+	ret = pblk_lines_init(pblk, flags & NVM_TARGET_FACTORY);
- 	if (ret) {
- 		pblk_err(pblk, "could not initialize lines\n");
- 		goto fail_free_core;
+ static int read_ppalist_rq_gc(struct pblk *pblk, struct nvm_rq *rqd,
+diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+index 381f074..a3c925d 100644
+--- a/drivers/lightnvm/pblk.h
++++ b/drivers/lightnvm/pblk.h
+@@ -868,7 +868,7 @@ void pblk_get_packed_meta(struct pblk *pblk, struct nvm_rq *rqd);
+ /*
+  * pblk user I/O write path
+  */
+-int pblk_write_to_cache(struct pblk *pblk, struct bio *bio,
++void pblk_write_to_cache(struct pblk *pblk, struct bio *bio,
+ 			unsigned long flags);
+ int pblk_write_gc_to_cache(struct pblk *pblk, struct pblk_gc_rq *gc_rq);
+ 
+@@ -894,7 +894,7 @@ void pblk_write_kick(struct pblk *pblk);
+  * pblk read path
+  */
+ extern struct bio_set pblk_bio_set;
+-int pblk_submit_read(struct pblk *pblk, struct bio *bio);
++void pblk_submit_read(struct pblk *pblk, struct bio *bio);
+ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq);
+ /*
+  * pblk recovery
 -- 
 2.9.5
 
