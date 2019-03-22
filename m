@@ -7,159 +7,258 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF1EC43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 12:17:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1687C43381
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 12:35:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B87BE2083D
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 12:17:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B6CBD218A1
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 12:35:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="m/etkseJ"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="tGol1RNi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390334AbfCVMRN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Mar 2019 08:17:13 -0400
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:44586 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390068AbfCVMRM (ORCPT
+        id S2388564AbfCVMfn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Mar 2019 08:35:43 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:33476 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390003AbfCVMeq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Mar 2019 08:17:12 -0400
-Received: by mail-vs1-f65.google.com with SMTP id j184so1213102vsd.11
-        for <linux-block@vger.kernel.org>; Fri, 22 Mar 2019 05:17:11 -0700 (PDT)
+        Fri, 22 Mar 2019 08:34:46 -0400
+Received: by mail-ed1-f68.google.com with SMTP id q3so1561851edg.0
+        for <linux-block@vger.kernel.org>; Fri, 22 Mar 2019 05:34:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=CmjyJjQtUXKSmnwe6amdk5vUmqjcMxErli1tHzGcQfU=;
-        b=m/etkseJLknXc/ZwBvVNalOR9smiHmuVZXJjP28h6O34x89cg2WhbCnxNiz74Z8Y6l
-         95hpXaL4WugSE4iGZKaPuxpnTNe7fkSkxEV75OQ+Mx+Ph8vfP8QZiflbiZAnnDdFd2cZ
-         E9+7qX5m4WlDdyyU1PteZ/Xg722pU1Ij3xNQOyfZMdI8wKWePcq9AgC4rtEVFEo9kJUM
-         kk2mUErikkzljBgJOMSdAMd2DTEYjdEe7EbN8m1s+0bi9cDeTEa31FYBdsReuauBmv2D
-         NMTKyBisydfakBC37iFVMFQxcFZ1DlJdqySaCB+p90Uz0Vr18JPDQMKmSfjcZvNORfrP
-         +uUQ==
+        d=javigon-com.20150623.gappssmtp.com; s=20150623;
+        h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
+         :references;
+        bh=V53kJ96aKw32vrLZTIDJkSvYG2OnDUTGNsJdZYXUxxc=;
+        b=tGol1RNi/InzwcGPdhmY2nITX7SUpE/OEHoHAcjhfBQZiIKm9DobgpDULofXNgoW3t
+         dATX2JxWdOJFZVm61/2sgjwqPqO7JxlHF/1WlFD2xRP021Yw7aCqc2jhjcf5S88NQesb
+         cpLwtwxRZxej8XG7F+CXj6gUVFxCSEhe962w3d7PgJNHr436Dvy4BMZ+QgjN+tccc42v
+         EXMdEcJZx3di9RfKZPgrO0ATWIZLrqsuhqct/ULJFPxGAdVsMX3L9Ausw8P1d4ksVAkO
+         zpVb9yk8u/QJodKmtIadgK/Dbo2vcHtAjrcYWXCPcr+lQXJPyFo7AD/aAoY2hCxotkEi
+         yawA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=CmjyJjQtUXKSmnwe6amdk5vUmqjcMxErli1tHzGcQfU=;
-        b=FBA6Gr/inYDNXan2HGVaX8q37Fx7bnp9IJ0gwa2NT/bbZrPhR65px96bxRoWjssp0t
-         xdC4WGK+WsYtIr4gY8SuWaVlP97fnXmb81XFcRsXBQgH+qGqpt3SijqdXgFlZbC1ZQaU
-         XYPEDqQ/zhLq12n4Zkq53K2/OfZOWEvr+ayUM4Yyp8+lsLTBX0tWpkRC6OGAlBsSTmi5
-         U+cyS3ZmjaCRmgY0yoB5URGc5iBljInFXyLuhZHfNHIjxEg8MR/g45313QI+ti0JDwQ+
-         0xt4hUQJ0a1YY72ODUgM6WzSpSijyP5tL/+apXKCmMjTT79gi6YRH8YXKnv1fTGvEf1U
-         O71Q==
-X-Gm-Message-State: APjAAAWxNrg4sHOw1igrVxbZGUyaCY56/cEWiYcqLwYJKVGUlRoBMxKD
-        4Vpl9KCJD9/9j9A2WtsfyifxfbCBQNDSQbvinbl9BnF0E1VfLw==
-X-Google-Smtp-Source: APXvYqyPG7GMD1PlZiHG1UMLR/iJ/5t+RnxWb9x8UBx9epRaKHMuX/YTdXExPO0BxYXyL0fhKFVyzLnR6MTd759ptDs=
-X-Received: by 2002:a67:ea4b:: with SMTP id r11mr5640152vso.184.1553257031413;
- Fri, 22 Mar 2019 05:17:11 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190314160428.3559-1-igor.j.konopko@intel.com>
- <20190314160428.3559-16-igor.j.konopko@intel.com> <FFE27E31-83ED-41CB-9D6C-327C3E3BA7D9@javigon.com>
- <b6536c70-2593-7751-de3d-beba51dad092@intel.com> <0983C3F3-0141-43B4-A97D-A4ACB797E4D0@javigon.com>
- <c6e06dee-42b1-6fdc-2993-280acb121d54@intel.com>
-In-Reply-To: <c6e06dee-42b1-6fdc-2993-280acb121d54@intel.com>
-From:   Hans Holmberg <hans@owltronix.com>
-Date:   Fri, 22 Mar 2019 13:17:00 +0100
-Message-ID: <CANr-nt037_iSvyjsf=e0f20v7zK=Y-ZoCTZUL+hy3bQai2Xr3g@mail.gmail.com>
-Subject: Re: [PATCH 15/18] lightnvm: pblk: fix in case of lack of lines
-To:     Igor Konopko <igor.j.konopko@intel.com>
-Cc:     =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        h=x-gm-message-state:from:message-id:mime-version:subject:date
+         :in-reply-to:cc:to:references;
+        bh=V53kJ96aKw32vrLZTIDJkSvYG2OnDUTGNsJdZYXUxxc=;
+        b=DmwuNT82G2dhcyws6t0Mh0ciduXshTEWe7eVOnq7SU3qEeeMWl3bN8ex6TZ0dr0zmy
+         bcDCJHCtYcPnY4whm8orjHm29ukciF1/g+rCRHcWnHmisDS/Hje7UC34m5HX4v9dRa8d
+         PP9fKcDABn+S1C0PsVd+lP4vjn45pSqf9VdPQECJtSNK8t98KT+1UQsQTBgIft7spKm6
+         zSSDt14FkIp8KDXjcOgmrifQ3rqKzY0GNKIry9Cw9E5Ib0Kvm5Nu39MeUal4QZJqgIU8
+         Myy+za3wHV0SCjetfIKIR1Xtwx69y8iyrAuucU52YCGoII07unJ971GIgFYFlkZnBPzX
+         XQ8Q==
+X-Gm-Message-State: APjAAAWnq9zdUsDexeWsdTMWJZBeN6fEv2pJLI/EXVCrLWgjtszKWNLs
+        2ojAuv4fGoM7LnARuwSl0hascA==
+X-Google-Smtp-Source: APXvYqyw408KSf+qmdWFIUL7ZJcGpo079++xIys+8Q0BqrsEyyocsAsW/WBUT9GIGoV0hyV88iZEhA==
+X-Received: by 2002:a50:ca41:: with SMTP id e1mr6302066edi.73.1553258083926;
+        Fri, 22 Mar 2019 05:34:43 -0700 (PDT)
+Received: from [192.168.1.119] (ip-5-186-122-168.cgn.fibianet.dk. [5.186.122.168])
+        by smtp.gmail.com with ESMTPSA id h34sm2633071edb.13.2019.03.22.05.34.43
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 22 Mar 2019 05:34:43 -0700 (PDT)
+From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
+Message-Id: <B62BC149-32E4-4033-81BD-8AC1F2B5E5EE@javigon.com>
+Content-Type: multipart/signed;
+        boundary="Apple-Mail=_35FD5C8D-D2E2-4C9D-BAE4-23493D047A3F";
+        protocol="application/pgp-signature";
+        micalg=pgp-sha256
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: [RFC PATCH] lightnvm: add mechanism to trigger pblk close on
+ reboot
+Date:   Fri, 22 Mar 2019 13:34:42 +0100
+In-Reply-To: <45ed5eee-ec10-5fa3-fda2-33f413d68ced@intel.com>
+Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        =?UTF-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        linux-block@vger.kernel.org,
+        "Konopko, Igor J" <igor.j.konopko@intel.com>
+To:     Marcin Dziegielewski <marcin.dziegielewski@intel.com>
+References: <1553096315-11128-1-git-send-email-marcin.dziegielewski@intel.com>
+ <3925EE02-8AE8-4F99-BF85-A73B195C601C@javigon.com>
+ <45ed5eee-ec10-5fa3-fda2-33f413d68ced@intel.com>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 21, 2019 at 2:21 PM Igor Konopko <igor.j.konopko@intel.com> wro=
-te:
->
->
->
-> On 18.03.2019 20:21, Javier Gonz=C3=A1lez wrote:
-> >
-> >> On 18 Mar 2019, at 14.28, Igor Konopko <igor.j.konopko@intel.com> wrot=
-e:
-> >>
-> >>
-> >>
-> >> On 18.03.2019 08:42, Javier Gonz=C3=A1lez wrote:
-> >>>> On 14 Mar 2019, at 17.04, Igor Konopko <igor.j.konopko@intel.com> wr=
-ote:
-> >>>>
-> >>>> In case when mapping fails (called from writer thread) due to lack o=
-f
-> >>>> lines, currently we are calling pblk_pipeline_stop(), which waits
-> >>>> for pending write IOs, so it will lead to the deadlock. Switching
-> >>>> to __pblk_pipeline_stop() in that case instead will fix that.
-> >>>>
-> >>>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-> >>>> ---
-> >>>> drivers/lightnvm/pblk-map.c | 2 +-
-> >>>> 1 file changed, 1 insertion(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/drivers/lightnvm/pblk-map.c b/drivers/lightnvm/pblk-map=
-.c
-> >>>> index 5408e32..afc10306 100644
-> >>>> --- a/drivers/lightnvm/pblk-map.c
-> >>>> +++ b/drivers/lightnvm/pblk-map.c
-> >>>> @@ -46,7 +46,7 @@ static int pblk_map_page_data(struct pblk *pblk, u=
-nsigned int sentry,
-> >>>>            pblk_line_close_meta(pblk, prev_line);
-> >>>>
-> >>>>            if (!line) {
-> >>>> -                  pblk_pipeline_stop(pblk);
-> >>>> +                  __pblk_pipeline_stop(pblk);
-> >>>>                    return -ENOSPC;
-> >>>>            }
-> >>>>
-> >>>> --
-> >>>> 2.9.5
-> >>> Have you seeing this problem?
-> >>> Before checking if there is a line, we are closing metadata for the
-> >>> previous line, so all inflight I/Os should be clear. Can you develop =
-on
-> >>> the case in which this would happen?
-> >>
-> >> So we have following sequence: pblk_pipeline_stop() -> __pblk_pipeline=
-_flush() -> pblk_flush_writer() -> wait for emptying round buffer.
-> >> This will never complete, since we still have some RB entries, which c=
-annot be written since writer thread is blocked with waiting inside pblk_fl=
-ush_writer().
-> >>
-> >> Am I missing sth?
-> >
-> > So this will be the case in which we are in the last line and
-> > pblk_flush_writer() needs to allocate an extra line persist the write
-> > buffer? Shouldn=E2=80=99t the rate-limiter take care of this? As I reca=
-ll, Hans
-> > implemented some logic to guarantee that at least one line is always
-> > available for GC, which in turn will free a line for user data. When we
-> > hit this limit, performance will drop dramatically, but it should not
-> > stall.
-> >
-> > The reason I want to understand the real case behind this fix is that b=
-y
-> > calling __pblk_pipeline_stop() we are basically stopping all other
-> > inflight I/Os; we should be able to serve all inflight I/Os before a
-> > mapping error triggers the pipeline to get into read-only mode.
-> >
->
-> Javier,
-> my understanding was that if we hit that particular case, we are simply
-> "done" with pblk and there is no way to recover it, so I made this
-> changes based on code analysis, if it is not true, than this patch does
-> not make sense anymore.
->
-> Hans,
-> could you help me to understand how rate limiter ensure that what Javier
-> mentioned about? Thanks
 
-I think Javier refers to: '3bcebc5bac09 ("lightnvm: pblk: set
-conservative threshold for user writes")'
+--Apple-Mail=_35FD5C8D-D2E2-4C9D-BAE4-23493D047A3F
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=utf-8
 
-See the commit message. Let me know if something is unclear :)
 
-Hans
+> On 22 Mar 2019, at 13.01, Marcin Dziegielewski =
+<marcin.dziegielewski@intel.com> wrote:
+>=20
+>=20
+>=20
+> On 3/21/19 10:32 AM, Javier Gonz=C3=A1lez wrote:
+>>> On 20 Mar 2019, at 16.38, Marcin Dziegielewski =
+<marcin.dziegielewski@intel.com> wrote:
+>>>=20
+>>> Currently if we issue reboot to the system pblk will close
+>>> ungracefully and in consequence it will need recovery on load.
+>>>=20
+>>> This patch propose utilize of reboot notifier feature to trigger
+>>> gracefull pblk shutdown on reboot.
+>>>=20
+>>> Signed-off-by: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
+>>> ---
+>>> drivers/lightnvm/core.c | 64 =
++++++++++++++++++++++++++++++++++++++++----------
+>>> 1 file changed, 51 insertions(+), 13 deletions(-)
+>>>=20
+>>> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
+>>> index 5f82036..5488051 100644
+>>> --- a/drivers/lightnvm/core.c
+>>> +++ b/drivers/lightnvm/core.c
+>>> @@ -27,6 +27,7 @@
+>>> #include <linux/miscdevice.h>
+>>> #include <linux/lightnvm.h>
+>>> #include <linux/sched/sysctl.h>
+>>> +#include <linux/reboot.h>
+>>>=20
+>>> static LIST_HEAD(nvm_tgt_types);
+>>> static DECLARE_RWSEM(nvm_tgtt_lock);
+>>> @@ -1138,6 +1139,48 @@ struct nvm_dev *nvm_alloc_dev(int node)
+>>> }
+>>> EXPORT_SYMBOL(nvm_alloc_dev);
+>>>=20
+>>> +static void _nvm_unregister(struct nvm_dev *dev, bool graceful)
+>>> +{
+>>> +	struct nvm_target *t, *tmp;
+>>> +
+>>> +	mutex_lock(&dev->mlock);
+>>> +	list_for_each_entry_safe(t, tmp, &dev->targets, list) {
+>>> +		if (t->dev->parent !=3D dev)
+>>> +			continue;
+>>> +		__nvm_remove_target(t, graceful);
+>>> +	}
+>>> +	mutex_unlock(&dev->mlock);
+>>> +
+>>> +	list_del(&dev->devices);
+>>> +
+>>> +	nvm_free(dev);
+>>> +}
+>>> +
+>>> +static int nvm_notify_reboot(struct notifier_block *this,
+>>> +			    unsigned long code, void *x)
+>>> +{
+>>> +	struct nvm_dev *dev, *t;
+>>> +
+>>> +	down_write(&nvm_lock);
+>>> +	if (list_empty(&nvm_devices)) {
+>>> +		up_write(&nvm_lock);
+>>> +		return NOTIFY_DONE;
+>>> +	}
+>>> +
+>>> +	list_for_each_entry_safe(dev, t, &nvm_devices, devices)
+>>> +		_nvm_unregister(dev, true);
+>>> +
+>>> +	up_write(&nvm_lock);
+>>> +
+>>> +	return NOTIFY_DONE;
+>>> +}
+>>> +
+>>> +static struct notifier_block nvm_notifier =3D {
+>>> +	.notifier_call	=3D nvm_notify_reboot,
+>>> +	.next		=3D NULL,
+>>> +	.priority	=3D INT_MAX, /* before any real devices */
+>> Why this priority?
+>=20
+> I believe that is the safest priority for our case, I based on bcache
+> approach. Should I use other priority?
+>=20
+
+I=E2=80=99m not very familiar with the notifier_block. I quick look =
+showed that
+most modules do not use it, that=E2=80=99s what I asked. Not real =
+feedback here.
+
+>>> +};
+>>> +
+>>> int nvm_register(struct nvm_dev *dev)
+>>> {
+>>> 	int ret, exp_pool_size;
+>>> @@ -1161,8 +1204,11 @@ int nvm_register(struct nvm_dev *dev)
+>>> 		return -ENOMEM;
+>>> 	}
+>>>=20
+>>> -	/* register device with a supported media manager */
+>>> 	down_write(&nvm_lock);
+>>> +	if (list_empty(&nvm_devices))
+>>> +		register_reboot_notifier(&nvm_notifier);
+>>> +
+>>> +	/* register device with a supported media manager */
+>>> 	list_add(&dev->devices, &nvm_devices);
+>>> 	up_write(&nvm_lock);
+>>>=20
+>>> @@ -1172,21 +1218,13 @@ int nvm_register(struct nvm_dev *dev)
+>>>=20
+>>> void nvm_unregister(struct nvm_dev *dev)
+>>> {
+>>> -	struct nvm_target *t, *tmp;
+>>> +	down_write(&nvm_lock);
+>>>=20
+>>> -	mutex_lock(&dev->mlock);
+>>> -	list_for_each_entry_safe(t, tmp, &dev->targets, list) {
+>>> -		if (t->dev->parent !=3D dev)
+>>> -			continue;
+>>> -		__nvm_remove_target(t, false);
+>>> -	}
+>>> -	mutex_unlock(&dev->mlock);
+>>> +	_nvm_unregister(dev, false);
+>> You are adding an extra lock dependency here. I cannot see any =
+obvious
+>> problem with it, but you probably want to test this with lock =
+debugging
+>> enabled.
+>=20
+> It was good suggestion, thanks. With enabled lock debugging I have =
+found
+> one potential deadlock, I will send second version of this patch.
+>=20
+
+Cool.
+
+
+>>> -	down_write(&nvm_lock);
+>>> -	list_del(&dev->devices);
+>>> +	if (list_empty(&nvm_devices))
+>>> +		unregister_reboot_notifier(&nvm_notifier);
+>>> 	up_write(&nvm_lock);
+>>> -
+>>> -	nvm_free(dev);
+>>> }
+>>> EXPORT_SYMBOL(nvm_unregister);
+>>>=20
+>>> --
+>>> 1.8.3.1
+>> Otherwise, I think adding this functionality is beneficial.
+
+--Apple-Mail=_35FD5C8D-D2E2-4C9D-BAE4-23493D047A3F
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlyU1mIACgkQPEYBfS0l
+eOB/ghAAgtxh4hI8PjMp8vbS8Es7U2njZINlPnW+m9afZZQUM8zPmYJ30L3kaY46
+XlTiRnZdyHKW6S02idZ9ks9Cfv6+mHX1lCEzigMNWiJir7nBhIolDsNuVTFQm1ZQ
+dDN0PRlW4v3zTw4Mg+DvTGyhj49GCAegXGc81Dj8TVbdfScKERVlKlefWRCTEgBN
+/ujMObV6Nt6ScnhzLw2KoJUJDj01EXHKmikQdLLGdPKYzIPctWGaEkUnnHpkzwdp
+usK1s4JG6fKHdYDO/GhY/+hbOzpM3jarqY+ou2ObSSxVlD1tE/ILeaXUyyIRaOr6
+XnHdEojL2YGjxsWpDcr4AMp1U0zI660GOmksv+zbjjjdF+953V+GN/IYRsQ0T5a2
+rh/IWkJIRAmKc7Q0XcOp/83625t4OYaREoGcc5lHXcgSiQbZJBIui3V5CWqteVVX
+X3fXhxmccMMNW3mOJBH5yX1p/bx4lY51fc0Z1Mv63KsUJuZTURrmA+pzTwV1ueI5
+5NBAWdAT6yeJey79g8m2aXR67bgXyXK4jvni9ddRd/Zv7i7rQqH+wWmy+dBYv/DZ
+M8OSdEc24egGwUV1PltJRSfddpuWc/8vZOmRrcdy7KMOjHxuE5rs1nUmBVoRPba2
+vyoUIrNnyFsdgemzPKdNRcBefAGM5LKrJg82CvUj0l0B4cdTTKU=
+=phPu
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_35FD5C8D-D2E2-4C9D-BAE4-23493D047A3F--
