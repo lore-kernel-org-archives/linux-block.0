@@ -2,26 +2,26 @@ Return-Path: <SRS0=iCYb=RZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A51C43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 13:14:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D72C10F03
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 13:14:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 91A55204FD
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 13:14:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33629218E2
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 13:14:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728265AbfCVNN6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Mar 2019 09:13:58 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55124 "EHLO mx1.suse.de"
+        id S1729696AbfCVNOA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Mar 2019 09:14:00 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55160 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728552AbfCVNN6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Mar 2019 09:13:58 -0400
+        id S1729682AbfCVNOA (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Mar 2019 09:14:00 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id BDCE2ABD5;
-        Fri, 22 Mar 2019 13:13:56 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id B3893AC94;
+        Fri, 22 Mar 2019 13:13:58 +0000 (UTC)
 From:   Johannes Thumshirn <jthumshirn@suse.de>
 To:     Jens Axboe <axboe@fb.com>
 Cc:     Hannes Reinecke <hare@suse.de>,
@@ -30,47 +30,66 @@ Cc:     Hannes Reinecke <hare@suse.de>,
         Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
         Linux FSDEVEL Mailinglist <linux-fsdevel@vger.kernel.org>,
         Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v2 0/3] add flag for tracking bio allocation
-Date:   Fri, 22 Mar 2019 14:13:43 +0100
-Message-Id: <20190322131346.20169-1-jthumshirn@suse.de>
+Subject: [PATCH v2 3/3] block: bio: introduce BIO_ALLOCED flag and check it in bio_free
+Date:   Fri, 22 Mar 2019 14:13:46 +0100
+Message-Id: <20190322131346.20169-4-jthumshirn@suse.de>
 X-Mailer: git-send-email 2.16.4
+In-Reply-To: <20190322131346.20169-1-jthumshirn@suse.de>
+References: <20190322131346.20169-1-jthumshirn@suse.de>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hannes recently sent a patch in [1] to fix an Oops caused by
-__blkdev_direct_IO_simple() doing bio submissions from the stack and which
-ended up being freed bio bio_free(). As bio_free() expected a bio which was
-allocated by bio_alloc_bioset() it crashed.
+When we're submitting a bio from stack and this ends up being split, we
+call bio_put(). bio_put() will eventually call bio_free() if the reference
+count drops to 0. But freeing the bio is wrong, as it was never allocated
+out of the bio's mempool.
 
-I've sent out a different aproach to tackling this problem and both Jens and
-Jan leaned to my solution, namely adding another bio flag tracking the
-allocation.
+Flag each normally allocated bio as 'BIO_ALLOCATED' and skip freeing if the
+flag isn't set.
 
-As we start to run out of flags, Jens has killed the BIO_SEG_VALID flag in a
-preparation patch and I added a compile time check as a safety net, so we're
-not accidentially overriding the high 3 bits of bi_flags, which are used for
-the BVEC_POOL_IDX().
+Fixes: 189ce2b9dcc3 ("block: fast-path for small and simple direct I/O requests")
+Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+---
+ block/bio.c               | 4 ++++
+ include/linux/blk_types.h | 1 +
+ 2 files changed, 5 insertions(+)
 
-This set has passed a full xfstests run on both BTRFS and XFS (against zram
-disks) and a full blktests run without introducing any regressions.
-
-[1] https://lore.kernel.org/linux-block/20190320081253.129688-1-hare@suse.de/
-
-Jens Axboe (1):
-  block: bio: kill BIO_SEG_VALID flag
-
-Johannes Thumshirn (2):
-  block: bio: ensure newly added bio flags don't override BVEC_POOL_IDX
-  block: bio: introduce BIO_ALLOCED flag and check it in bio_free
-
- block/bio.c               | 17 ++++++++++++-----
- block/blk-merge.c         | 11 ++++-------
- drivers/md/raid5.c        |  2 +-
- include/linux/blk_types.h | 27 +++++++++++++++------------
- 4 files changed, 32 insertions(+), 25 deletions(-)
-
+diff --git a/block/bio.c b/block/bio.c
+index 87a515e93bee..ba6949f111b7 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -255,6 +255,9 @@ static void bio_free(struct bio *bio)
+ 
+ 	bio_uninit(bio);
+ 
++	if (!bio_flagged(bio, BIO_ALLOCED))
++		return;
++
+ 	if (bs) {
+ 		bvec_free(&bs->bvec_pool, bio->bi_io_vec, BVEC_POOL_IDX(bio));
+ 
+@@ -523,6 +526,7 @@ struct bio *bio_alloc_bioset(gfp_t gfp_mask, unsigned int nr_iovecs,
+ 		bvl = bio->bi_inline_vecs;
+ 	}
+ 
++	bio_set_flag(bio, BIO_ALLOCED);
+ 	bio->bi_pool = bs;
+ 	bio->bi_max_vecs = nr_iovecs;
+ 	bio->bi_io_vec = bvl;
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 1d28992a20f0..19d7402a9af3 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -229,6 +229,7 @@ enum {
+ 				 * of this bio. */
+ 	BIO_QUEUE_ENTERED,	/* can use blk_queue_enter_live() */
+ 	BIO_TRACKED,		/* set if bio goes through the rq_qos path */
++	BIO_ALLOCED,		/* bio allocated by bio_alloc_bioset */
+ 	BIO_FLAG_LAST
+ };
+ 
 -- 
 2.16.4
 
