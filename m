@@ -3,102 +3,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14CD5C43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 13:37:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECB52C43381
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 13:42:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E14AD20693
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 13:37:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C515721916
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 13:42:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728491AbfCVNhd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Mar 2019 09:37:33 -0400
-Received: from mail-ua1-f65.google.com ([209.85.222.65]:37544 "EHLO
-        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728140AbfCVNhc (ORCPT
+        id S1728374AbfCVNmf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Mar 2019 09:42:35 -0400
+Received: from mail-pg1-f179.google.com ([209.85.215.179]:37533 "EHLO
+        mail-pg1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728010AbfCVNmf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Mar 2019 09:37:32 -0400
-Received: by mail-ua1-f65.google.com with SMTP id x1so744187uaj.4;
-        Fri, 22 Mar 2019 06:37:31 -0700 (PDT)
+        Fri, 22 Mar 2019 09:42:35 -0400
+Received: by mail-pg1-f179.google.com with SMTP id q206so1568155pgq.4
+        for <linux-block@vger.kernel.org>; Fri, 22 Mar 2019 06:42:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XzQ9NHyI634XKb+UUobZCMcWq8m8E9RK1f4ELxnBy2E=;
-        b=V1v/AnSzmYyzfgtTGbdWoSkqLVLaYuJoNGCkUfnE6xPn6rGBm6rwYo4QDADjnaY0wQ
-         BXqC7l+6BAE4eOrjar1GbFHv99ONn1xR7HIIMPq/QETAWXHN3w8MpCzQ+YXBFBrn/0qC
-         YqwIleqEs/o+6Pq+43Ir43txZgWSA+hkXMzoD/PZe/NAfih+blQRtEU/Q4gZTS/yvM+6
-         cl+4x6aLPjvKnVrygfhOmnvIVSRbheBHCCA6UHhVFLTYLe81saehixXRov1vaX1iYhz/
-         FH2J7suVfmwqRnHb1xJEoWOzK0zMFKnDurbsmn9GQTIx2BPiTzi3wtsgrHoSTlg5DccL
-         tY9A==
-X-Gm-Message-State: APjAAAWiIQu/M1n/5ZHrazupQk8BYqApPh9h1Y+Sv1a3dKS81hknWLOt
-        jLiXOv/5Gd2C05GMTW2sxVsR0stTpF7O2IqI+OrgIw==
-X-Google-Smtp-Source: APXvYqy4ogpwjpSonoiPfh2lc9ghBw42usNLeIrbxmtszFsz2NZOsJfJk0zpTsb127+lhrr709ywFNgm7FrLQ8o0S0U=
-X-Received: by 2002:ab0:6419:: with SMTP id x25mr938049uao.86.1553261850477;
- Fri, 22 Mar 2019 06:37:30 -0700 (PDT)
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ocJOCosZ9OF3/mdM0y5kx5mfNJHzJpnW3S2kjcwd4ug=;
+        b=t/ewmotl8q6EutbhJrHxxeL1txeKwRoHV311zdq9BA6DtV5WamSfCz/cRA708miF6q
+         MrPVbX6sbn8sTUBsMlelmrJlEpJgpRWI7lsYEQ3fwz13bi8E7LGnTH8/uh7FW2T8iBfT
+         h19Ag3hZZLmOgM8mOznZSMP6ktObRTWqzZITqNH7fXUShDvbOkMnZOXiQTW1/3JyT71a
+         YC3YsGssXhrOKr4oyhVFPyuDz8HOLFzOAin9gbOd/QPSZK2kapge1YH5//B5BpCfLrw5
+         YaDJOf6TlOoInoD8oeBUgeHN2cTl2fENDJwv4YLSw8kDqGpiKsB4oDcS6rJ9mvaSloI2
+         MZAw==
+X-Gm-Message-State: APjAAAU4zX4dKhFSAXIstF3zhXQGXONEDGI7xzLsogOBZ4s3RDDqSCe3
+        xYDdJXQNIyYDJdnjAF56bjyZyGlGe9Y=
+X-Google-Smtp-Source: APXvYqyXKJ1h1JUkA+y8DailIu0pUqdeFj5LtDfuuYcY7Vir/LpNwQ9Nvj0xmRKAvs8ULR1j1VO/tw==
+X-Received: by 2002:a17:902:9683:: with SMTP id n3mr9737176plp.333.1553262154112;
+        Fri, 22 Mar 2019 06:42:34 -0700 (PDT)
+Received: from asus.site ([2601:647:4000:5dd1:a41e:80b4:deb3:fb66])
+        by smtp.gmail.com with ESMTPSA id r66sm9277375pfr.131.2019.03.22.06.42.33
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 22 Mar 2019 06:42:33 -0700 (PDT)
+Subject: Re: Read data to kernel buffer by blkdev_read_iter
+To:     Ivan Safonov <insafonov@gmail.com>, linux-block@vger.kernel.org
+References: <b6d54ac9-ee29-edcf-907d-1e12fce321ac@gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <98dec559-60bf-2463-7b0b-0cc2dd57db7d@acm.org>
+Date:   Fri, 22 Mar 2019 06:42:32 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.2
 MIME-Version: 1.0
-References: <20190322132108.25501-1-sakari.ailus@linux.intel.com>
-In-Reply-To: <20190322132108.25501-1-sakari.ailus@linux.intel.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Fri, 22 Mar 2019 14:37:18 +0100
-Message-ID: <CAMuHMdVmqqjVx7As9AAywYxYXG=grijF5rF77OBn6TUjM9+xKw@mail.gmail.com>
-Subject: Re: [PATCH 0/2] Remove support for deprecated %pf and %pF in vsprintf
-To:     Sakari Ailus <sakari.ailus@linux.intel.com>
-Cc:     Petr Mladek <pmladek@suse.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        scsi <linux-scsi@vger.kernel.org>,
-        Linux PM list <linux-pm@vger.kernel.org>,
-        Linux MMC List <linux-mmc@vger.kernel.org>,
-        "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
-        linux-um@lists.infradead.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-block@vger.kernel.org,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        linux-btrfs <linux-btrfs@vger.kernel.org>,
-        linux-pci <linux-pci@vger.kernel.org>,
-        sparclinux <sparclinux@vger.kernel.org>,
-        xen-devel@lists.xenproject.org,
-        ceph-devel <ceph-devel@vger.kernel.org>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Lars Ellenberg <drbd-dev@lists.linbit.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <b6d54ac9-ee29-edcf-907d-1e12fce321ac@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Sakari,
+On 3/22/19 6:06 AM, Ivan Safonov wrote:
+> Kernel version is 4.19.16.
+> 
+> Is this behavior valid for iov_iter with type ITER_KVEC?
 
-On Fri, Mar 22, 2019 at 2:25 PM Sakari Ailus
-<sakari.ailus@linux.intel.com> wrote:
-> The printk family of functions supports %ps and %pS conversion specifiers
-> to print function names. Yet the deprecated %pf and %pF conversion
-> specifiers with equivalent functionality remain supported. A number of
-> users of %pf and %pF remain.
->
-> This patchsets converts the existing users of %pf and %pF to %ps and %pS,
-> respectively, and removes support for the deprecated %pf and %pF.
->
-> The patches apply cleanly both on 5.1-rc1 as well as on Linux-next. No new
-> %pf or %pF users have been added in the meantime so the patch is
-> sufficient as itself on linux-next, too.
+Are you familiar with the ITER_KVEC flag?
 
-Do you know in which commit they became deprecated, so the backporters
-know how far this can be backported safely?
+Bart.
 
-Thanks!
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
