@@ -2,109 +2,117 @@ Return-Path: <SRS0=iCYb=RZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC619C43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 21:31:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F3BC10F03
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 22:00:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B5ABC21900
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 21:31:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D262B21925
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 22:00:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cRbEMKDH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727648AbfCVVat (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Mar 2019 17:30:49 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56440 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726014AbfCVVas (ORCPT
+        id S1727578AbfCVWA2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Mar 2019 18:00:28 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:42170 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727440AbfCVWA2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Mar 2019 17:30:48 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x2MLT3BO133214
-        for <linux-block@vger.kernel.org>; Fri, 22 Mar 2019 17:30:46 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2rd788ru50-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 22 Mar 2019 17:30:46 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-block@vger.kernel.org> from <rppt@linux.ibm.com>;
-        Fri, 22 Mar 2019 21:30:35 -0000
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Fri, 22 Mar 2019 21:30:29 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x2MLUcr541615510
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Mar 2019 21:30:38 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5C5FDA405B;
-        Fri, 22 Mar 2019 21:30:38 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 675B8A405C;
-        Fri, 22 Mar 2019 21:30:36 +0000 (GMT)
-Received: from rapoport-lnx (unknown [9.148.206.23])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Fri, 22 Mar 2019 21:30:36 +0000 (GMT)
-Date:   Fri, 22 Mar 2019 23:30:34 +0200
-From:   Mike Rapoport <rppt@linux.ibm.com>
-To:     Sakari Ailus <sakari.ailus@linux.intel.com>
-Cc:     Petr Mladek <pmladek@suse.com>, linux-kernel@vger.kernel.org,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        linux-arm-kernel@lists.infradead.org, sparclinux@vger.kernel.org,
-        linux-um@lists.infradead.org, xen-devel@lists.xenproject.org,
-        linux-acpi@vger.kernel.org, linux-pm@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-nvdimm@lists.01.org,
-        linux-pci@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-btrfs@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
-        ceph-devel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] treewide: Switch printk users from %pf and %pF to
- %ps and %pS, respectively
-References: <20190322132108.25501-1-sakari.ailus@linux.intel.com>
- <20190322132108.25501-2-sakari.ailus@linux.intel.com>
+        Fri, 22 Mar 2019 18:00:28 -0400
+Received: by mail-pf1-f194.google.com with SMTP id r15so2393526pfn.9
+        for <linux-block@vger.kernel.org>; Fri, 22 Mar 2019 15:00:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=WQp0WNe+X6GkcnKSgJpReVIeC/xEsLmkihelFScJ3bo=;
+        b=cRbEMKDHDicl9aX7YOQfMoJnuLo934wf3lg/0BamyVK5mwwoCKjj9XJIxLsWr4taLL
+         1cGcuHEqw9/QP+klPJqhgZR0yVcZzd+0TY1BokY4sYcHdxfppeNa0Dzo6qtOmUcSOe/8
+         MA120IjeUNM6JpmDj6a3Y+mqaa6nhik6y5A5HAop5EX1oehjHQ3WzLK8rvpMBkyy2c/+
+         wDJVrchddpzM97CxojNZAFXaaUHJvcs18dL9u1ePP3B9XXX7znLj9jHtcZDKycpfxc6r
+         GvP8YJ/23xznjMm1pErF2cEEEoVCnyRCMs4pGhjinKW3RnIL8wK4OS+m/VFH9zWQ8OWg
+         WBGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=WQp0WNe+X6GkcnKSgJpReVIeC/xEsLmkihelFScJ3bo=;
+        b=bbsFzID3jEIy2mYWDnIR0W2DOb9qzxUQgUo7LFdfggeB5//I55+XzDZu5buZVS3aob
+         RFVqZeuFIdv0yWcD8Dt3n5/ZmX1LXOMyv0ujTG90CRmpIKLBsayCMrX71QOhb/uBgRGU
+         w3DXX8YqjFIzz9yFWxZBrh5Xb/JO+pz380puoa5sgOCUp2vHfyYp5rn3CoG+ANkU9/up
+         pPy3j+iRlOdSwD1GdT1Mrnw2p9q4pIFU0W8J9iBUxEkvOEyI5dEbJIPG5n070brGt6Eg
+         F+7gE9+0r34tsb5Wtbj9Jy5eUIqnmKuRxVCDZsfpnwmlOV02e2dpz0h1e7tBCc/twm7t
+         TyIA==
+X-Gm-Message-State: APjAAAXjSYvLEUa2z+VCpYClLTvtaXFAVb4C+faB2f3uSO92gauXY8bg
+        5EyQ3zK6LFIvVzKkRKSI7cL0qQ==
+X-Google-Smtp-Source: APXvYqx/HM9iLwVpBsFaPt+difdECtJgd+tOtQ+8YICne46WK8BnRxYXCkB17ZQ7nNjZaI/qpxdRZQ==
+X-Received: by 2002:a62:480d:: with SMTP id v13mr11692049pfa.125.1553292027508;
+        Fri, 22 Mar 2019 15:00:27 -0700 (PDT)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id k75sm19948572pfj.46.2019.03.22.15.00.25
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 22 Mar 2019 15:00:26 -0700 (PDT)
+Subject: Re: [PATCH v2 1/3] block: bio: kill BIO_SEG_VALID flag
+To:     Johannes Thumshirn <jthumshirn@suse.de>
+Cc:     Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
+        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        Linux FSDEVEL Mailinglist <linux-fsdevel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+References: <20190322131346.20169-1-jthumshirn@suse.de>
+ <20190322131346.20169-2-jthumshirn@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <8273b995-01c2-fbf4-b8be-484508c65938@kernel.dk>
+Date:   Fri, 22 Mar 2019 16:00:24 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190322132108.25501-2-sakari.ailus@linux.intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-X-TM-AS-GCONF: 00
-x-cbid: 19032221-0016-0000-0000-0000026616B6
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19032221-0017-0000-0000-000032C13E1F
-Message-Id: <20190322213034.GA9303@rapoport-lnx>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-03-22_12:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1903220152
+In-Reply-To: <20190322131346.20169-2-jthumshirn@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 22, 2019 at 03:21:07PM +0200, Sakari Ailus wrote:
-> %pF and %pf are functionally equivalent to %pS and %ps conversion
-> specifiers. The former are deprecated, therefore switch the current users
-> to use the preferred variant.
-> 
-> The changes have been produced by the following command:
-> 
-> 	git grep -l '%p[fF]' | grep -v '^\(tools\|Documentation\)/' | \
-> 	while read i; do perl -i -pe 's/%pf/%ps/g; s/%pF/%pS/g;' $i; done
-> 
-> And verifying the result.
-> 
-> Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
-> ---
+On 3/22/19 7:13 AM, Johannes Thumshirn wrote:
+> @@ -712,7 +714,10 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
+>  	bvec->bv_len = len;
+>  	bvec->bv_offset = offset;
+>  	bio->bi_vcnt++;
+> -	bio->bi_phys_segments++;
+> +	if (bio->bi_phys_segments == -1)
+> +		bio->bi_phys_segments = 1;
+> +	else
+> +		bio->bi_phys_segments++;
+>  	bio->bi_iter.bi_size += len;
 
-For
+Echo Christophs suggestion here.
 
->  mm/memblock.c                           | 12 ++++++------
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 4673ebe42255..53372a16dd7c 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1514,6 +1514,7 @@ void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
+>  	else if (bio_op(bio) == REQ_OP_DISCARD)
+>  		rq->nr_phys_segments = 1;
+>  
+> +	WARN_ON(rq->nr_phys_segments == -1);
+>  	rq->__data_len = bio->bi_iter.bi_size;
+>  	rq->bio = rq->biotail = bio;
 
-Acked-by: Mike Rapoport <rppt@linux.ibm.com>
+Just make that:
+
+	else
+		rq->nr_phys_segments = 0;
+
+for the third case?
+
+-- 
+Jens Axboe
 
