@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF3ACC43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 12:47:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9E22C10F03
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 12:52:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 79FBE218E2
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 12:47:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 793392082C
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 12:52:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TwYPEBnF"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="dJ4w6UQI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387826AbfCVL61 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Mar 2019 07:58:27 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:33548 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387823AbfCVL61 (ORCPT
+        id S1729563AbfCVLx0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Mar 2019 07:53:26 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:58370 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732685AbfCVLxZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Mar 2019 07:58:27 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2MBnJno030483;
-        Fri, 22 Mar 2019 11:58:15 GMT
+        Fri, 22 Mar 2019 07:53:25 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2MBmqed000797;
+        Fri, 22 Mar 2019 11:53:12 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
  references : cc : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=nBL4+RHOYzG4OWB9aNyOjbCEf0XNxXIGQYLtHZrRaEU=;
- b=TwYPEBnFFZYF2kSvZvWHnl3P8vv6DFCp5rnrETRkyMomrVy8YjYXxDOfoi0NYYvx8bAd
- sxkBobpDVQ+hKhFqASDYEB8fBg9P062T6GdJSOItGFwn8PiUctH57cuJGRUcsUVQl3Tq
- EiJ0ahrcfBkNbOeedff8dixTdTOFtZhbDDPkoyUlPflCNu821G8ft2TE3rtvfxAvhuI6
- pPRHzs+7B9kqkEqSSZGkQ8HW68flbXGEzPcF1HsDWXG4MZyvC5CsDVmatEnqyTWqs2rc
- CRthmYuz42d3uMr1lbn7vtYFOAL/Y5o0LZa3D5/zTROKp9fZgvFLp3jD4SrXzc3X+alZ TQ== 
-Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by aserp2130.oracle.com with ESMTP id 2r8pnf5tnf-1
+ bh=5kIC1lIBPr6kULrAGUH8q+RWbSEpFtG1sSRhYzaZhYs=;
+ b=dJ4w6UQIrnRYAYrcR76eJ0QEemtElXs93Djzx1N0YDxwLPmLqWrC7GXH2FL4Pg51rXco
+ 0RCZ9tloVNZHSuA8XHkSdyNGenwbLAgZb5FiRiLtaC6sfzGzsiT4evYz5/xQ3gCG74wn
+ X1ghOhPTa6Oy1ydm8C/+7lRAVFpPQRVcqtClI15yAZjMxpciaIzkyDNi+Aa2oDApjOiO
+ moD2qNK9BcIrwCwttPbuw2jk3bNZl37EL33XyMg08l1Z+Uc0CU0uyRsmBxwxXc9u3vfv
+ 6MTdlS/5lEB6pgZLyN2RyCEyJcyLsHK+DDMccbkSvqZr591f4iH6gbJiVRiA9cEoYXfY 0w== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by userp2120.oracle.com with ESMTP id 2r8ssrwf66-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Mar 2019 11:58:15 +0000
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2MBwEds030966
+        Fri, 22 Mar 2019 11:53:12 +0000
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x2MBr64q002866
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 22 Mar 2019 11:58:14 GMT
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x2MBwEtr022364;
-        Fri, 22 Mar 2019 11:58:14 GMT
-Received: from [10.191.13.95] (/10.191.13.95)
+        Fri, 22 Mar 2019 11:53:07 GMT
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x2MBr6qY017040;
+        Fri, 22 Mar 2019 11:53:06 GMT
+Received: from [192.168.2.8] (/106.39.150.192)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 22 Mar 2019 04:58:14 -0700
+        with ESMTP ; Fri, 22 Mar 2019 04:53:06 -0700
 Subject: Re: [PATCH] block/mq: blk map queues by core id
 To:     luferry <luferry@163.com>
 References: <20190322100949.5555-1-luferry@163.com>
@@ -55,17 +55,17 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
         Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 From:   Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <9fa3eda2-536c-86a1-a7a3-c157fd0cdfdc@oracle.com>
-Date:   Fri, 22 Mar 2019 19:58:08 +0800
+Message-ID: <6d6ca45d-fa9e-6a1c-e6e6-b07ba195a8f2@oracle.com>
+Date:   Fri, 22 Mar 2019 19:53:01 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101
  Thunderbird/45.3.0
 MIME-Version: 1.0
 In-Reply-To: <20190322100949.5555-1-luferry@163.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9202 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
  definitions=main-1903220089
@@ -78,7 +78,6 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 On 03/22/2019 06:09 PM, luferry wrote:
 > under virtual machine environment, cpu topology may differ from normal
-> physical server.
 
 Would mind share the name of virtual machine monitor, the command line if
 available, and which device to reproduce.
@@ -97,11 +96,7 @@ cpu0  cpu1  cpu2  cpu3  cpu_list  nr_reserved_tags  nr_tags
 /sys/block/nvme0n1/mq/1:
 cpu4  cpu5  cpu6  cpu7  cpu_list  nr_reserved_tags  nr_tags
 
-
-Thank you very much!
-
-Dongli Zhang
-
+> physical server.
 > for example (machine with 4 cores, 2 threads per core):
 > 
 > normal physical server:
