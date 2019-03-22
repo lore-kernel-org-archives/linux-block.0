@@ -2,78 +2,109 @@ Return-Path: <SRS0=iCYb=RZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E322C10F03
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 21:29:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC619C43381
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 21:31:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1190521900
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 21:29:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1553290173;
-	bh=JYXpnfLScPq1fKIDnHyeO1pbFRN4/z/QJAHolJ7HGPU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=0/CoCGdstRQVxr/VYhRDPazJ8A5ekOdvJ3XAN8OeU7omvhr6ivvVRC5QDhTI+0cDp
-	 hFvCaodpqw6paLoSHdZsZrZP7WegM8JjNH3J3moRTP+aHaiVikHdlHFrdDUfdfnTnE
-	 CyC9/fLQzPKBZX8UQMVM/t8oA+SjZImW3UrvjCSQ=
+	by mail.kernel.org (Postfix) with ESMTP id B5ABC21900
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 21:31:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727109AbfCVV3b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Mar 2019 17:29:31 -0400
-Received: from mga17.intel.com ([192.55.52.151]:29414 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726557AbfCVV3b (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Mar 2019 17:29:31 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Mar 2019 14:29:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,256,1549958400"; 
-   d="scan'208";a="216699338"
-Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
-  by orsmga001.jf.intel.com with ESMTP; 22 Mar 2019 14:29:30 -0700
-Date:   Fri, 22 Mar 2019 15:30:32 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        Jens Axboe <axboe@fb.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Jan Kara <jack@suse.cz>,
-        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Linux FSDEVEL Mailinglist <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH v2 3/3] block: bio: introduce BIO_ALLOCED flag and check
- it in bio_free
-Message-ID: <20190322213031.GD31194@localhost.localdomain>
-References: <20190322131346.20169-1-jthumshirn@suse.de>
- <20190322131346.20169-4-jthumshirn@suse.de>
- <20190322140233.GC17767@lst.de>
- <3ab3d268-68a7-0c23-601b-d86d26aa3936@suse.de>
+        id S1727648AbfCVVat (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Mar 2019 17:30:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56440 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726014AbfCVVas (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Mar 2019 17:30:48 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x2MLT3BO133214
+        for <linux-block@vger.kernel.org>; Fri, 22 Mar 2019 17:30:46 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2rd788ru50-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Fri, 22 Mar 2019 17:30:46 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-block@vger.kernel.org> from <rppt@linux.ibm.com>;
+        Fri, 22 Mar 2019 21:30:35 -0000
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 22 Mar 2019 21:30:29 -0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x2MLUcr541615510
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 22 Mar 2019 21:30:38 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5C5FDA405B;
+        Fri, 22 Mar 2019 21:30:38 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 675B8A405C;
+        Fri, 22 Mar 2019 21:30:36 +0000 (GMT)
+Received: from rapoport-lnx (unknown [9.148.206.23])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Fri, 22 Mar 2019 21:30:36 +0000 (GMT)
+Date:   Fri, 22 Mar 2019 23:30:34 +0200
+From:   Mike Rapoport <rppt@linux.ibm.com>
+To:     Sakari Ailus <sakari.ailus@linux.intel.com>
+Cc:     Petr Mladek <pmladek@suse.com>, linux-kernel@vger.kernel.org,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        linux-arm-kernel@lists.infradead.org, sparclinux@vger.kernel.org,
+        linux-um@lists.infradead.org, xen-devel@lists.xenproject.org,
+        linux-acpi@vger.kernel.org, linux-pm@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-nvdimm@lists.01.org,
+        linux-pci@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-btrfs@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-mm@kvack.org,
+        ceph-devel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] treewide: Switch printk users from %pf and %pF to
+ %ps and %pS, respectively
+References: <20190322132108.25501-1-sakari.ailus@linux.intel.com>
+ <20190322132108.25501-2-sakari.ailus@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3ab3d268-68a7-0c23-601b-d86d26aa3936@suse.de>
-User-Agent: Mutt/1.9.1 (2017-09-22)
+In-Reply-To: <20190322132108.25501-2-sakari.ailus@linux.intel.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+X-TM-AS-GCONF: 00
+x-cbid: 19032221-0016-0000-0000-0000026616B6
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19032221-0017-0000-0000-000032C13E1F
+Message-Id: <20190322213034.GA9303@rapoport-lnx>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-03-22_12:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1903220152
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 22, 2019 at 03:05:46PM +0100, Hannes Reinecke wrote:
-> On 3/22/19 3:02 PM, Christoph Hellwig wrote:
-> > But how do you manage to get the tiny on-stack bios split?  What kind
-> > of setup is this?
-> > 
-> It's not tiny if you send a 2M file via direct-io, _and_ have a non-zero
-> MDTS setting...
+On Fri, Mar 22, 2019 at 03:21:07PM +0200, Sakari Ailus wrote:
+> %pF and %pf are functionally equivalent to %pS and %ps conversion
+> specifiers. The former are deprecated, therefore switch the current users
+> to use the preferred variant.
+> 
+> The changes have been produced by the following command:
+> 
+> 	git grep -l '%p[fF]' | grep -v '^\(tools\|Documentation\)/' | \
+> 	while read i; do perl -i -pe 's/%pf/%ps/g; s/%pF/%pS/g;' $i; done
+> 
+> And verifying the result.
+> 
+> Signed-off-by: Sakari Ailus <sakari.ailus@linux.intel.com>
+> ---
 
-I see a larger request can create a bio chain (though I think 1M
-is the max that goes through _simple), but how does the stack bio
-get used in a bio_put()? The chained bios are allocated through a
-bio_set, and their bio_end_io() calls bio_put() on themselves through
-bio_chain_endio(), but that's it. The original's endio is never modified
-from blkdev_bio_end_io_simple(), so who's calling bio_put() on the
-on-stack bio?
+For
+
+>  mm/memblock.c                           | 12 ++++++------
+
+Acked-by: Mike Rapoport <rppt@linux.ibm.com>
+
