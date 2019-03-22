@@ -2,160 +2,74 @@ Return-Path: <SRS0=iCYb=RZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A8ADC43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 18:07:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93229C43381
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 18:55:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D4CD2213F2
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 18:07:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60EBF218FE
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 18:55:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727988AbfCVSHu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Mar 2019 14:07:50 -0400
-Received: from mga17.intel.com ([192.55.52.151]:19643 "EHLO mga17.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727693AbfCVSHt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Mar 2019 14:07:49 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Mar 2019 11:07:49 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,256,1549958400"; 
-   d="scan'208";a="142997375"
-Received: from mdziegie-mobl.ger.corp.intel.com (HELO localhost.igk.intel.com) ([10.237.143.1])
-  by FMSMGA003.fm.intel.com with ESMTP; 22 Mar 2019 11:07:47 -0700
-From:   Marcin Dziegielewski <marcin.dziegielewski@intel.com>
-To:     mb@lightnvm.io, javier@javigon.com, hans.holmberg@cnexlabs.com
-Cc:     linux-block@vger.kernel.org, marcin.dziegielewski@intel.com,
-        igor.j.konopko@intel.com
-Subject: [RFC PATCH v2] lightnvm: add mechanism to trigger pblk close on reboot
-Date:   Fri, 22 Mar 2019 19:07:27 +0100
-Message-Id: <1553278047-13115-1-git-send-email-marcin.dziegielewski@intel.com>
-X-Mailer: git-send-email 1.8.3.1
+        id S1726017AbfCVSz1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Mar 2019 14:55:27 -0400
+Received: from mail-ot1-f47.google.com ([209.85.210.47]:41708 "EHLO
+        mail-ot1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725998AbfCVSz1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Mar 2019 14:55:27 -0400
+Received: by mail-ot1-f47.google.com with SMTP id 64so2829203otb.8
+        for <linux-block@vger.kernel.org>; Fri, 22 Mar 2019 11:55:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ffBzdEOG4/+ZtSGoHrElRQVZMnIZOKstBsuKDHHkpjg=;
+        b=YoRYdmN6SYagBT+XDPnrWmWLsaty5rcEYnflNDpqghLCXfI/WnPKMEdINEe0cq5WNe
+         VDz6GYSX9LMODty/d/hf1H9akSfvh5J31ccxeKLeeeGbMeXliaYGc9UN2wyLxTa1CQgS
+         VSw3WGZ+k1ZRFo/4N6HtwbNCj/INTZ6f7aqfOKfLg5d9u4603Qq9/cM1xmbamtyyKuq3
+         YmXa5yp8WkRs1OVor1QDnDa2rFqiSTuI4AIrgmHHDPBO651d2zVQHKp+xNSbdVyKfesi
+         U/j7hZxSYXBYH3Hz+kZ/W/67uLsmX5l3qRWE83kFzTxRLzRSpyVJq8euvE00FSkawhCN
+         BM3A==
+X-Gm-Message-State: APjAAAU3mHYziRrgFotOQ25oXe3HF1MxJQArCvg6YqQN0iUCzle2IYpg
+        63nUy9ta+dD4JvbBvAxslYM=
+X-Google-Smtp-Source: APXvYqyT4QeVXTgmyiAdhayrPyOG/6wSzt3cv+E1x2TpP6BKK9LV6c0VH6f+zVdqaiiFDnFft1aw3A==
+X-Received: by 2002:a05:6830:1248:: with SMTP id s8mr7772302otp.234.1553280926612;
+        Fri, 22 Mar 2019 11:55:26 -0700 (PDT)
+Received: from [192.168.1.114] (162-195-240-247.lightspeed.sntcca.sbcglobal.net. [162.195.240.247])
+        by smtp.gmail.com with ESMTPSA id m11sm3308033oif.50.2019.03.22.11.55.24
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 22 Mar 2019 11:55:25 -0700 (PDT)
+Subject: Re: [RFC] optimize nvme single segment I/O
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@fb.com>,
+        Keith Busch <keith.busch@intel.com>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+References: <20190321231037.25104-1-hch@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+Message-ID: <c7c95931-2e6c-60c6-b9ab-606a7a166410@grimberg.me>
+Date:   Fri, 22 Mar 2019 11:55:13 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
+MIME-Version: 1.0
+In-Reply-To: <20190321231037.25104-1-hch@lst.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently if we issue reboot to the system pblk will close
-ungracefully and in consequence it will need recovery on load.
 
-This patch propose utilize of reboot notifier feature to trigger
-gracefull pblk shutdown on reboot.
+> Hi all,
+> 
+> with all the discussion on small I/O performance lately I thought
+> it was time off to dust my old idea to optimize this path a bit
+> by avoiding to build a scatterlist.  I've only done very basic
+> testing because I've been a bit busy, but I thought it might be
+> worthwhile to get it out for feedback.
 
-Signed-off-by: Marcin Dziegielewski <marcin.dziegielewski@intel.com>
----
- drivers/lightnvm/core.c | 65 ++++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 51 insertions(+), 14 deletions(-)
+This looks good Christoph! for the series,
 
-diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
-index 5f82036..4a421f5 100644
---- a/drivers/lightnvm/core.c
-+++ b/drivers/lightnvm/core.c
-@@ -27,6 +27,7 @@
- #include <linux/miscdevice.h>
- #include <linux/lightnvm.h>
- #include <linux/sched/sysctl.h>
-+#include <linux/reboot.h>
- 
- static LIST_HEAD(nvm_tgt_types);
- static DECLARE_RWSEM(nvm_tgtt_lock);
-@@ -1138,9 +1139,52 @@ struct nvm_dev *nvm_alloc_dev(int node)
- }
- EXPORT_SYMBOL(nvm_alloc_dev);
- 
-+static void _nvm_unregister(struct nvm_dev *dev, bool graceful)
-+{
-+	struct nvm_target *t, *tmp;
-+
-+	mutex_lock(&dev->mlock);
-+	list_for_each_entry_safe(t, tmp, &dev->targets, list) {
-+		if (t->dev->parent != dev)
-+			continue;
-+		__nvm_remove_target(t, graceful);
-+	}
-+	mutex_unlock(&dev->mlock);
-+
-+	list_del(&dev->devices);
-+
-+	nvm_free(dev);
-+}
-+
-+static int nvm_notify_reboot(struct notifier_block *this,
-+			    unsigned long code, void *x)
-+{
-+	struct nvm_dev *dev, *t;
-+
-+	down_write(&nvm_lock);
-+	if (list_empty(&nvm_devices)) {
-+		up_write(&nvm_lock);
-+		return NOTIFY_DONE;
-+	}
-+
-+	list_for_each_entry_safe(dev, t, &nvm_devices, devices)
-+		_nvm_unregister(dev, true);
-+
-+	up_write(&nvm_lock);
-+
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block nvm_notifier = {
-+	.notifier_call	= nvm_notify_reboot,
-+	.next		= NULL,
-+	.priority	= INT_MAX, /* before any real devices */
-+};
-+
- int nvm_register(struct nvm_dev *dev)
- {
- 	int ret, exp_pool_size;
-+	bool is_first;
- 
- 	if (!dev->q || !dev->ops)
- 		return -EINVAL;
-@@ -1161,32 +1205,25 @@ int nvm_register(struct nvm_dev *dev)
- 		return -ENOMEM;
- 	}
- 
--	/* register device with a supported media manager */
- 	down_write(&nvm_lock);
-+	is_first = list_empty(&nvm_devices);
-+
-+	/* register device with a supported media manager */
- 	list_add(&dev->devices, &nvm_devices);
- 	up_write(&nvm_lock);
- 
-+	if (is_first)
-+		register_reboot_notifier(&nvm_notifier);
-+
- 	return 0;
- }
- EXPORT_SYMBOL(nvm_register);
- 
- void nvm_unregister(struct nvm_dev *dev)
- {
--	struct nvm_target *t, *tmp;
--
--	mutex_lock(&dev->mlock);
--	list_for_each_entry_safe(t, tmp, &dev->targets, list) {
--		if (t->dev->parent != dev)
--			continue;
--		__nvm_remove_target(t, false);
--	}
--	mutex_unlock(&dev->mlock);
--
- 	down_write(&nvm_lock);
--	list_del(&dev->devices);
-+	_nvm_unregister(dev, false);
- 	up_write(&nvm_lock);
--
--	nvm_free(dev);
- }
- EXPORT_SYMBOL(nvm_unregister);
- 
--- 
-1.8.3.1
-
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
