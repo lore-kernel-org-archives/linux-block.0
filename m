@@ -6,109 +6,110 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A09C43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:36:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9359EC43381
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:44:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D2B5921917
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:36:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C42120883
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:44:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728889AbfCVOgy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Mar 2019 10:36:54 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:42633 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728733AbfCVOgy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Mar 2019 10:36:54 -0400
-Received: from wuerfel.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue107 [212.227.15.145]) with ESMTPA (Nemesis) id
- 1MLyvH-1hP9Fl3xpJ-00Ht2v; Fri, 22 Mar 2019 15:36:45 +0100
-From:   Arnd Bergmann <arnd@arndb.de>
-To:     Ilya Dryomov <idryomov@gmail.com>, Sage Weil <sage@redhat.com>,
-        Alex Elder <elder@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     clang-built-linux@googlegroups.com,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Jason Dillaman <dillaman@redhat.com>,
-        ceph-devel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] rbd: avoid clang -Wuninitialized warning
-Date:   Fri, 22 Mar 2019 15:36:37 +0100
-Message-Id: <20190322143643.1317312-1-arnd@arndb.de>
-X-Mailer: git-send-email 2.20.0
+        id S1728945AbfCVOoO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Mar 2019 10:44:14 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5736 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729424AbfCVOoJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Mar 2019 10:44:09 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 58815870277896B0D6FA;
+        Fri, 22 Mar 2019 22:44:06 +0800 (CST)
+Received: from huawei.com (10.90.53.225) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.408.0; Fri, 22 Mar 2019
+ 22:44:02 +0800
+From:   Yufen Yu <yuyufen@huawei.com>
+To:     <axboe@kernel.dk>, <dwindsor@gmail.com>, <peterz@infradead.org>
+CC:     <linux-block@vger.kernel.org>
+Subject: [PATCH 2/2] blk-mq: covert blk_mq_tag.active_queues to refcount_t
+Date:   Fri, 22 Mar 2019 22:48:18 +0800
+Message-ID: <20190322144818.987-3-yuyufen@huawei.com>
+X-Mailer: git-send-email 2.16.2.dirty
+In-Reply-To: <20190322144818.987-1-yuyufen@huawei.com>
+References: <20190322144818.987-1-yuyufen@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ArQEfk+AU79dMEw+t+/M/Vy4omm9JFXr12vfJvDOE8w0LvZdo1t
- DiayFQqJhMH6lbFTQ6qj3HUL0ViAwLKpYjSOZ1oRxcKkN2VaYuTzPwLKTyR3def4VVNAEqu
- 3/nPfrm63xzhvFWN1Md44ffnDt1W5Yokm7PTdaZPdaN8mi2H7uPI3JNCbcDBpYI+btRwFax
- P9nJikkgSy/GZq6ExMi6A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:N1+yyUeQGSk=:SJCif1SFlh0KUIRvSOKUG4
- P5gV4xbx/jE770iWRHakj2NmYBfZWM3fGpmh2nKMwVHZkTbfp8qEFQlKtw5CSLxMO+p+C0bnO
- EJohRr4ts39JWR/pfQFGKKxBT35MrsNYjIOzZT0ma29ACWD8Q8wfb9sporv8NgxCkeB6gnYV/
- tswxyhSMK8uIV4Lm5V1TIMXbY53bRmQ4/DGIyuU9MxXcdrodoMrGbLxIU6ap9l5CLkoGLJxBE
- At+T6i5aFRDx2km2ssRhqqh1V+usJ6r+ILdwqgTDqwHO6Di7iKnhOaRUwq89aTsbOGj+4JKaq
- g3YIQYtHrKuRN3HbsmRLZ+yd0x9OL/YCj9/R5iUuf3SfIAlMsmoPiofmGMCtDmqMVrHqBvZH9
- N00HJOJDrceZpbreVkpt749IaOi/LJoV30ICgSszH+7S2ychmUKRPHPGTpm6zB9NggGI1Oys6
- 6T9Fdja2dQbjQ/1kYDFsl29JJLMMc6IkhLa21yZmRIve0QVLfS1ZpMVxBAUkAjN+QrPvyZxLu
- S0dDVDLXCeJk7kgbU4bTxjYoO7rold1OiNus3Nna+ofSfB7nOaiGTW9QqFM09v9BEX1/4q5Oj
- 77FgVbCFssn9w9dauR3HnZUSRxHXEFm+hbeN5etuOmne3rhYC4Y5hmRgENxH9qolh4oDEps/K
- SQV3fu5nuPD14d0i21K+4tK0BpKm5C/pJmSJUn7MhJiTsAokJ1tbvOqG3UJG18QRNNVdankSU
- 5/5J6m+hN0eXjYiKxjiLbOE+E2yhOXLyA/OPGw==
+Content-Type: text/plain
+X-Originating-IP: [10.90.53.225]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-clang fails to see that rbd_assert(0) ends in an unreachable code
-path and warns about a subsequent use of an uninitialized variable
-when CONFIG_PROFILE_ANNOTATED_BRANCHES is set:
+We convert 'active_queues' from atomic_t to newly provied
+refcount_t type and API, which can prevent accidental counter
+overflows and underflows.
 
-drivers/block/rbd.c:2402:4: error: variable 'ret' is used uninitialized whenever 'if' condition is false
-      [-Werror,-Wsometimes-uninitialized]
-                        rbd_assert(0);
-                        ^~~~~~~~~~~~~
-drivers/block/rbd.c:563:7: note: expanded from macro 'rbd_assert'
-                if (unlikely(!(expr))) {                                \
-                    ^~~~~~~~~~~~~~~~~
-include/linux/compiler.h:48:23: note: expanded from macro 'unlikely'
- #  define unlikely(x)   (__branch_check__(x, 0, __builtin_constant_p(x)))
-                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-drivers/block/rbd.c:2410:6: note: uninitialized use occurs here
-        if (ret) {
-            ^~~
-drivers/block/rbd.c:2402:4: note: remove the 'if' if its condition is always true
-                        rbd_assert(0);
-                        ^
-drivers/block/rbd.c:563:3: note: expanded from macro 'rbd_assert'
-                if (unlikely(!(expr))) {                                \
-                ^
-drivers/block/rbd.c:2376:9: note: initialize the variable 'ret' to silence this warning
-        int ret;
-               ^
-                = 0
-1 error generated.
-
-This seems to be a bug in clang, but is easy to work around by using
-an unconditional BUG().
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Yufen Yu <yuyufen@huawei.com>
 ---
- drivers/block/rbd.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/blk-mq-debugfs.c | 2 +-
+ block/blk-mq-tag.c     | 6 +++---
+ block/blk-mq-tag.h     | 2 +-
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index 4ba967d65cf9..cbcc3baf3807 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -2399,7 +2399,7 @@ static int rbd_obj_read_from_parent(struct rbd_obj_request *obj_req)
- 						      &obj_req->bvec_pos);
- 			break;
- 		default:
--			rbd_assert(0);
-+			BUG();
- 		}
- 	} else {
- 		ret = rbd_img_fill_from_bvecs(child_img_req,
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 81536b7201be..48f0cc2c90ba 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -473,7 +473,7 @@ static void blk_mq_debugfs_tags_show(struct seq_file *m,
+ 	seq_printf(m, "nr_tags=%u\n", tags->nr_tags);
+ 	seq_printf(m, "nr_reserved_tags=%u\n", tags->nr_reserved_tags);
+ 	seq_printf(m, "active_queues=%d\n",
+-		   atomic_read(&tags->active_queues));
++		   refcount_read(&tags->active_queues));
+ 
+ 	seq_puts(m, "\nbitmap_tags:\n");
+ 	sbitmap_queue_show(&tags->bitmap_tags, m);
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 3fcb15fa6398..1d713f221bf7 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -31,7 +31,7 @@ bool __blk_mq_tag_busy(struct blk_mq_hw_ctx *hctx)
+ {
+ 	if (!test_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state) &&
+ 	    !test_and_set_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+-		atomic_inc(&hctx->tags->active_queues);
++		refcount_inc(&hctx->tags->active_queues);
+ 
+ 	return true;
+ }
+@@ -57,7 +57,7 @@ void __blk_mq_tag_idle(struct blk_mq_hw_ctx *hctx)
+ 	if (!test_and_clear_bit(BLK_MQ_S_TAG_ACTIVE, &hctx->state))
+ 		return;
+ 
+-	atomic_dec(&tags->active_queues);
++	refcount_dec(&tags->active_queues);
+ 
+ 	blk_mq_tag_wakeup_all(tags, false);
+ }
+@@ -82,7 +82,7 @@ static inline bool hctx_may_queue(struct blk_mq_hw_ctx *hctx,
+ 	if (bt->sb.depth == 1)
+ 		return true;
+ 
+-	users = atomic_read(&hctx->tags->active_queues);
++	users = refcount_read(&hctx->tags->active_queues);
+ 	if (!users)
+ 		return true;
+ 
+diff --git a/block/blk-mq-tag.h b/block/blk-mq-tag.h
+index 61deab0b5a5a..e948b4833a2a 100644
+--- a/block/blk-mq-tag.h
++++ b/block/blk-mq-tag.h
+@@ -11,7 +11,7 @@ struct blk_mq_tags {
+ 	unsigned int nr_tags;
+ 	unsigned int nr_reserved_tags;
+ 
+-	atomic_t active_queues;
++	refcount_t active_queues;
+ 
+ 	struct sbitmap_queue bitmap_tags;
+ 	struct sbitmap_queue breserved_tags;
 -- 
-2.20.0
+2.16.2.dirty
 
