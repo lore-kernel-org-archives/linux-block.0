@@ -2,90 +2,69 @@ Return-Path: <SRS0=iCYb=RZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0389C43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:55:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D288DC43381
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 15:01:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 702F52147A
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:55:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C78F218FE
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 15:01:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JMvKegxJ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="pKpQb44T"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729202AbfCVOzB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Mar 2019 10:55:01 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:44416 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727719AbfCVOzB (ORCPT
+        id S1729241AbfCVPBW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Mar 2019 11:01:22 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:42220 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727843AbfCVPBV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Mar 2019 10:55:01 -0400
-Received: by mail-lj1-f196.google.com with SMTP id n18so2262310ljg.11
-        for <linux-block@vger.kernel.org>; Fri, 22 Mar 2019 07:55:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=dHLeSHDrYgbSB2JusfLYx17Mi6oXvKxS/T8ghheSOXQ=;
-        b=JMvKegxJGvEe6wqsUlCO4mAWuqO76Nzx6erJb91wOYR+dzbVj8AHXKD+9Bau9Z3Gis
-         JGfxWgbDCLy4WdzPVSy3H6bzTca6V/7a9DaY4zhoLqQvTMXZ+mM1jL+HgSD7pnpku9dw
-         TwBY4Gt2eTCHQbxO5weVz4EXvwtovGjO0ylACmpOvI7YTJUXgMiqgZtLY7rvGbQTzRrO
-         FzNsbipr8bYV8TJhnebHM+Z+Sl9SZgMWpvFIazbXnBIkMdZQg3hGFi7OpQQ/Zoxmru3g
-         l+0zSutbB+Q+btdWvS+jJNYKImmAdOQUI36kUshQUJ3seFRUJCzMw5lRQyMY73KjBpYp
-         QC5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dHLeSHDrYgbSB2JusfLYx17Mi6oXvKxS/T8ghheSOXQ=;
-        b=rhOZDF4o67txrgM3h7QIMdx2gkNIkk0rVrv33PnUo1ZPcpY/dV4nO/x88cOkjrBfOi
-         8yMhEMe5QRsP4d0UcaxDgmV/rvesFv7+d68JIL4Tcxbb+FBW+rG5843+/C3Jmu08MKbs
-         dGBLqda5zamG6p2zY2ds7RvLZ0D16tju/ZifyWO2b0R2OtzSHkoucSUXIX15y7eyrNiu
-         He343J/cgsSIwjamwM49okAXXZ4hXUsO6GEGVmUXd9FCNAZLotNxBALGclsnXz+gaTtA
-         OJwxtEz2r9l7MkeOBb1j5mefB27jgV1gidbkO0uIEvn0ph8Eesz/LHR3OSYHhwQ0aq1C
-         ASnA==
-X-Gm-Message-State: APjAAAXJK1Nv4iAVJW3Mjpn9eRkd5A0LaP5eNobmTCXiyzA6NfO/MtSS
-        AS8NfnYxP8+B64gbpl1iUnGnvcib
-X-Google-Smtp-Source: APXvYqx1B575UgvJSxNWAoxm8PJ85awshX13dV9UFbTI3/5uK0ybvc+WVibbykKjDdGzmfZFqSZ5hw==
-X-Received: by 2002:a2e:9ec9:: with SMTP id h9mr5505125ljk.176.1553266498963;
-        Fri, 22 Mar 2019 07:54:58 -0700 (PDT)
-Received: from [192.168.0.160] (ppp89-110-13-118.pppoe.avangarddsl.ru. [89.110.13.118])
-        by smtp.gmail.com with ESMTPSA id w3sm454354lji.59.2019.03.22.07.54.58
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Fri, 22 Mar 2019 07:54:58 -0700 (PDT)
-Subject: Re: Read data to kernel buffer by blkdev_read_iter
-To:     Bart Van Assche <bvanassche@acm.org>, linux-block@vger.kernel.org
-References: <b6d54ac9-ee29-edcf-907d-1e12fce321ac@gmail.com>
- <98dec559-60bf-2463-7b0b-0cc2dd57db7d@acm.org>
-From:   Ivan Safonov <insafonov@gmail.com>
-Message-ID: <1a5a1b81-49c0-2817-73d9-d58716c44b0a@gmail.com>
-Date:   Fri, 22 Mar 2019 17:57:33 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.3
+        Fri, 22 Mar 2019 11:01:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=EgTMKWHz0uBwQukACuWjiRNym5eVpJIbo0etG/vWlfE=; b=pKpQb44TZiwFukfwRCaLbc9xp
+        gYw1hNJIWl53OMAvsbds928sGHPDfyICVuWZ26ehZi4CGQRC+NqFLV+w+rHg3Y2ebYWU7v6B9Z1Ly
+        f5UuVWTNzAHrA7glMee+yX/YXoDXZqmQjt9EKqy6rw9MVF7s8XNXEd3Jx0LKop4WkSLPnzDVX6AoY
+        GEtvnSo++aJuX3z1jn1pZh2XgTcipj5EvPHgIuLvJ380qMOFq17KxnxVjxCKsjUzNpbR9Ygw0y8P1
+        Q1LfGcf8k6YCHuM1aiox8kuKgKviy5i2DMsoIsJ0uM1AS4gLx0wpsHAVwvkDVvT4xq47PVX+R8keS
+        LnWOF30Iw==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1h7Lfb-0007x3-8d; Fri, 22 Mar 2019 15:01:19 +0000
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id BC568287233CE; Fri, 22 Mar 2019 16:01:16 +0100 (CET)
+Date:   Fri, 22 Mar 2019 16:01:16 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Yufen Yu <yuyufen@huawei.com>
+Cc:     axboe@kernel.dk, dwindsor@gmail.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/2] blk-mq: convert hctx.nr_active to refcount_t
+Message-ID: <20190322150116.GZ6058@hirez.programming.kicks-ass.net>
+References: <20190322144818.987-1-yuyufen@huawei.com>
+ <20190322144818.987-2-yuyufen@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <98dec559-60bf-2463-7b0b-0cc2dd57db7d@acm.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190322144818.987-2-yuyufen@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/22/19 4:42 PM, Bart Van Assche wrote:
-> On 3/22/19 6:06 AM, Ivan Safonov wrote:
->> Kernel version is 4.19.16.
->>
->> Is this behavior valid for iov_iter with type ITER_KVEC?
-> 
-> Are you familiar with the ITER_KVEC flag?
+On Fri, Mar 22, 2019 at 10:48:17PM +0800, Yufen Yu wrote:
+> @@ -2710,7 +2710,7 @@ static struct blk_mq_hw_ctx *blk_mq_alloc_and_init_hctx(
+>  		return NULL;
+>  	}
+>  
+> -	atomic_set(&hctx->nr_active, 0);
+> +	refcount_set(&hctx->nr_active, 0);
+>  	hctx->numa_node = node;
+>  	hctx->queue_num = hctx_idx;
+>  
 
-No, I did not find a clear description of this flag.
-
-In the previous message I misled you: iov_iter has ITER_KVEC type only 
-if set_fs(get_ds()) present before iov_iter_init(). In this case 
-_without_ IOCB_DIRECT blkdev_read_iter() work fine. With IOCB_DIRECT 
-blkdev_read_iter() return -EFAULT.
+That looks bogus, refcount_t cannot inc-from-zero.
