@@ -6,33 +6,33 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5B63C43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:52:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66749C43381
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:53:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BEE8320883
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:52:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38AC820883
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:53:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728882AbfCVOw4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Mar 2019 10:52:56 -0400
+        id S1729121AbfCVOw7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Mar 2019 10:52:59 -0400
 Received: from mga09.intel.com ([134.134.136.24]:5341 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728827AbfCVOw4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Mar 2019 10:52:56 -0400
+        id S1728827AbfCVOw7 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Mar 2019 10:52:59 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Mar 2019 07:52:55 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Mar 2019 07:52:58 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.60,256,1549958400"; 
-   d="scan'208";a="216593475"
+   d="scan'208";a="216593488"
 Received: from gklab-107-059.igk.intel.com ([10.102.107.59])
-  by orsmga001.jf.intel.com with ESMTP; 22 Mar 2019 07:52:54 -0700
+  by orsmga001.jf.intel.com with ESMTP; 22 Mar 2019 07:52:57 -0700
 From:   Igor Konopko <igor.j.konopko@intel.com>
 To:     mb@lightnvm.io, javier@javigon.com, hans.holmberg@cnexlabs.com
 Cc:     linux-block@vger.kernel.org, igor.j.konopko@intel.com
-Subject: [PATCH v2 14/16] lightnvm: pblk: GC error handling
-Date:   Fri, 22 Mar 2019 15:48:41 +0100
-Message-Id: <20190322144843.9602-15-igor.j.konopko@intel.com>
+Subject: [PATCH v2 15/16] lightnvm: pblk: use nvm_rq_to_ppa_list()
+Date:   Fri, 22 Mar 2019 15:48:42 +0100
+Message-Id: <20190322144843.9602-16-igor.j.konopko@intel.com>
 X-Mailer: git-send-email 2.9.5
 In-Reply-To: <20190322144843.9602-1-igor.j.konopko@intel.com>
 References: <20190322144843.9602-1-igor.j.konopko@intel.com>
@@ -44,98 +44,207 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently when there is an IO error (or similar) on GC read path, pblk
-still moves this line to free state, what leads to data mismatch issue.
-
-This patch adds a handling for such an error - after that changes this
-line will be returned to closed state so it can be still in use
-for reading - at least we will be able to return error status to user
-when user tries to read such a data.
+This patch replaces few remaining usages of rqd->ppa_list[] with
+existing nvm_rq_to_ppa_list() helpers. This is needed for theoretical
+devices with ws_min/ws_opt equal to 1.
 
 Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
 Reviewed-by: Javier González <javier@javigon.com>
-Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
 ---
- drivers/lightnvm/pblk-core.c | 8 ++++++++
- drivers/lightnvm/pblk-gc.c   | 5 ++---
- drivers/lightnvm/pblk-read.c | 1 -
- drivers/lightnvm/pblk.h      | 2 ++
- 4 files changed, 12 insertions(+), 4 deletions(-)
+ drivers/lightnvm/pblk-core.c     | 26 ++++++++++++++------------
+ drivers/lightnvm/pblk-recovery.c | 13 ++++++++-----
+ 2 files changed, 22 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 9d9a9e2..1b88e5e 100644
+index 1b88e5e..cd99c8c 100644
 --- a/drivers/lightnvm/pblk-core.c
 +++ b/drivers/lightnvm/pblk-core.c
-@@ -1799,6 +1799,14 @@ static void __pblk_line_put(struct pblk *pblk, struct pblk_line *line)
+@@ -562,11 +562,9 @@ int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd)
  
- 	spin_lock(&line->lock);
- 	WARN_ON(line->state != PBLK_LINESTATE_GC);
-+	if (line->w_err_gc->has_gc_err) {
-+		spin_unlock(&line->lock);
-+		pblk_err(pblk, "line %d had errors during GC\n", line->id);
-+		pblk_put_line_back(pblk, line);
-+		line->w_err_gc->has_gc_err = 0;
-+		return;
-+	}
-+
- 	line->state = PBLK_LINESTATE_FREE;
- 	trace_pblk_line_state(pblk_disk_name(pblk), line->id,
- 					line->state);
-diff --git a/drivers/lightnvm/pblk-gc.c b/drivers/lightnvm/pblk-gc.c
-index e23b192..63ee205 100644
---- a/drivers/lightnvm/pblk-gc.c
-+++ b/drivers/lightnvm/pblk-gc.c
-@@ -59,7 +59,7 @@ static void pblk_gc_writer_kick(struct pblk_gc *gc)
- 	wake_up_process(gc->gc_writer_ts);
- }
- 
--static void pblk_put_line_back(struct pblk *pblk, struct pblk_line *line)
-+void pblk_put_line_back(struct pblk *pblk, struct pblk_line *line)
+ int pblk_submit_io_sync_sem(struct pblk *pblk, struct nvm_rq *rqd)
  {
+-	struct ppa_addr *ppa_list;
++	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
+ 	int ret;
+ 
+-	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
+-
+ 	pblk_down_chunk(pblk, ppa_list[0]);
+ 	ret = pblk_submit_io_sync(pblk, rqd);
+ 	pblk_up_chunk(pblk, ppa_list[0]);
+@@ -727,6 +725,7 @@ static int pblk_line_smeta_read_copy(struct pblk *pblk,
+ 	struct nvm_geo *geo = &dev->geo;
+ 	struct pblk_line_meta *lm = &pblk->lm;
+ 	struct bio *bio;
++	struct ppa_addr *ppa_list;
+ 	struct nvm_rq rqd;
+ 	int i, ret;
+ 
+@@ -749,6 +748,7 @@ static int pblk_line_smeta_read_copy(struct pblk *pblk,
+ 	rqd.opcode = NVM_OP_PREAD;
+ 	rqd.nr_ppas = lm->smeta_sec;
+ 	rqd.is_seq = 1;
++	ppa_list = nvm_rq_to_ppa_list(&rqd);
+ 
+ 	for (i = 0; i < rqd.nr_ppas; i++, paddr++) {
+ 		struct ppa_addr ppa = addr_to_gen_ppa(pblk, paddr, line->id);
+@@ -760,7 +760,7 @@ static int pblk_line_smeta_read_copy(struct pblk *pblk,
+ 			pos = pblk_ppa_to_pos(geo, ppa);
+ 		}
+ 
+-		rqd.ppa_list[i] = ppa;
++		ppa_list[i] = ppa;
+ 		pblk_get_meta(pblk, rqd.meta_list, i)->lba =
+ 				  cpu_to_le64(ADDR_EMPTY);
+ 	}
+@@ -811,6 +811,7 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line)
+ 	struct nvm_geo *geo = &dev->geo;
+ 	struct pblk_line_meta *lm = &pblk->lm;
+ 	struct bio *bio;
++	struct ppa_addr *ppa_list;
+ 	struct nvm_rq rqd;
+ 	__le64 *lba_list = emeta_to_lbas(pblk, line->emeta->buf);
+ 	__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
+@@ -862,6 +863,7 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line)
+ 	rqd.opcode = NVM_OP_PWRITE;
+ 	rqd.nr_ppas = smeta_wr_sec;
+ 	rqd.is_seq = 1;
++	ppa_list = nvm_rq_to_ppa_list(&rqd);
+ 
+ 	for (i = 0; i < rqd.nr_ppas; i++, paddr++) {
+ 		void *meta_list = rqd.meta_list;
+@@ -874,7 +876,7 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line)
+ 			pos = pblk_ppa_to_pos(geo, ppa);
+ 		}
+ 
+-		rqd.ppa_list[i] = ppa;
++		ppa_list[i] = ppa;
+ 		pblk_get_meta(pblk, meta_list, i)->lba = addr_empty;
+ 		lba_list[paddr] = addr_empty;
+ 	}
+@@ -910,8 +912,9 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
+ 	struct nvm_geo *geo = &dev->geo;
  	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
- 	struct list_head *move_list;
-@@ -98,8 +98,7 @@ static void pblk_gc_line_ws(struct work_struct *work)
- 	/* Read from GC victim block */
- 	ret = pblk_submit_read_gc(pblk, gc_rq);
+ 	struct pblk_line_meta *lm = &pblk->lm;
+-	void *ppa_list, *meta_list;
++	void *ppa_list_buf, *meta_list;
+ 	struct bio *bio;
++	struct ppa_addr *ppa_list;
+ 	struct nvm_rq rqd;
+ 	u64 paddr = line->emeta_ssec;
+ 	dma_addr_t dma_ppa_list, dma_meta_list;
+@@ -927,7 +930,7 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
+ 	if (!meta_list)
+ 		return -ENOMEM;
+ 
+-	ppa_list = meta_list + pblk_dma_meta_size(pblk);
++	ppa_list_buf = meta_list + pblk_dma_meta_size(pblk);
+ 	dma_ppa_list = dma_meta_list + pblk_dma_meta_size(pblk);
+ 
+ next_rq:
+@@ -948,11 +951,12 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
+ 
+ 	rqd.bio = bio;
+ 	rqd.meta_list = meta_list;
+-	rqd.ppa_list = ppa_list;
++	rqd.ppa_list = ppa_list_buf;
+ 	rqd.dma_meta_list = dma_meta_list;
+ 	rqd.dma_ppa_list = dma_ppa_list;
+ 	rqd.opcode = NVM_OP_PREAD;
+ 	rqd.nr_ppas = rq_ppas;
++	ppa_list = nvm_rq_to_ppa_list(&rqd);
+ 
+ 	for (i = 0; i < rqd.nr_ppas; ) {
+ 		struct ppa_addr ppa = addr_to_gen_ppa(pblk, paddr, line_id);
+@@ -980,7 +984,7 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
+ 		}
+ 
+ 		for (j = 0; j < min; j++, i++, paddr++)
+-			rqd.ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line_id);
++			ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line_id);
+ 	}
+ 
+ 	ret = pblk_submit_io_sync(pblk, &rqd);
+@@ -1605,11 +1609,9 @@ void pblk_ppa_to_line_put(struct pblk *pblk, struct ppa_addr ppa)
+ 
+ void pblk_rq_to_line_put(struct pblk *pblk, struct nvm_rq *rqd)
+ {
+-	struct ppa_addr *ppa_list;
++	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
+ 	int i;
+ 
+-	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
+-
+ 	for (i = 0; i < rqd->nr_ppas; i++)
+ 		pblk_ppa_to_line_put(pblk, ppa_list[i]);
+ }
+diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+index 038931d..b80341f 100644
+--- a/drivers/lightnvm/pblk-recovery.c
++++ b/drivers/lightnvm/pblk-recovery.c
+@@ -187,6 +187,7 @@ static int pblk_recov_pad_line(struct pblk *pblk, struct pblk_line *line,
+ 	struct pblk_pad_rq *pad_rq;
+ 	struct nvm_rq *rqd;
+ 	struct bio *bio;
++	struct ppa_addr *ppa_list;
+ 	void *data;
+ 	__le64 *lba_list = emeta_to_lbas(pblk, line->emeta->buf);
+ 	u64 w_ptr = line->cur_sec;
+@@ -247,6 +248,7 @@ static int pblk_recov_pad_line(struct pblk *pblk, struct pblk_line *line,
+ 	rqd->end_io = pblk_end_io_recov;
+ 	rqd->private = pad_rq;
+ 
++	ppa_list = nvm_rq_to_ppa_list(rqd);
+ 	meta_list = rqd->meta_list;
+ 
+ 	for (i = 0; i < rqd->nr_ppas; ) {
+@@ -274,17 +276,17 @@ static int pblk_recov_pad_line(struct pblk *pblk, struct pblk_line *line,
+ 			lba_list[w_ptr] = addr_empty;
+ 			meta = pblk_get_meta(pblk, meta_list, i);
+ 			meta->lba = addr_empty;
+-			rqd->ppa_list[i] = dev_ppa;
++			ppa_list[i] = dev_ppa;
+ 		}
+ 	}
+ 
+ 	kref_get(&pad_rq->ref);
+-	pblk_down_chunk(pblk, rqd->ppa_list[0]);
++	pblk_down_chunk(pblk, ppa_list[0]);
+ 
+ 	ret = pblk_submit_io(pblk, rqd);
  	if (ret) {
--		pblk_err(pblk, "failed GC read in line:%d (err:%d)\n",
--								line->id, ret);
-+		line->w_err_gc->has_gc_err = 1;
- 		goto out;
+ 		pblk_err(pblk, "I/O submission failed: %d\n", ret);
+-		pblk_up_chunk(pblk, rqd->ppa_list[0]);
++		pblk_up_chunk(pblk, ppa_list[0]);
+ 		kref_put(&pad_rq->ref, pblk_recov_complete);
+ 		pblk_free_rqd(pblk, rqd, PBLK_WRITE_INT);
+ 		bio_put(bio);
+@@ -430,6 +432,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+ 	rqd->ppa_list = ppa_list;
+ 	rqd->dma_ppa_list = dma_ppa_list;
+ 	rqd->dma_meta_list = dma_meta_list;
++	ppa_list = nvm_rq_to_ppa_list(rqd);
+ 
+ 	if (pblk_io_aligned(pblk, rq_ppas))
+ 		rqd->is_seq = 1;
+@@ -448,7 +451,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+ 		}
+ 
+ 		for (j = 0; j < pblk->min_write_pgs; j++, i++)
+-			rqd->ppa_list[i] =
++			ppa_list[i] =
+ 				addr_to_gen_ppa(pblk, paddr + j, line->id);
  	}
  
-diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
-index 264d1d7..5481dfa 100644
---- a/drivers/lightnvm/pblk-read.c
-+++ b/drivers/lightnvm/pblk-read.c
-@@ -494,7 +494,6 @@ int pblk_submit_read_gc(struct pblk *pblk, struct pblk_gc_rq *gc_rq)
+@@ -505,7 +508,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+ 			continue;
  
- 	if (pblk_submit_io_sync(pblk, &rqd)) {
- 		ret = -EIO;
--		pblk_err(pblk, "GC read request failed\n");
- 		goto err_free_bio;
+ 		line->nr_valid_lbas++;
+-		pblk_update_map(pblk, lba, rqd->ppa_list[i]);
++		pblk_update_map(pblk, lba, ppa_list[i]);
  	}
  
-diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
-index 0999245..0bc4255 100644
---- a/drivers/lightnvm/pblk.h
-+++ b/drivers/lightnvm/pblk.h
-@@ -425,6 +425,7 @@ struct pblk_smeta {
- 
- struct pblk_w_err_gc {
- 	int has_write_err;
-+	int has_gc_err;
- 	__le64 *lba_list;
- };
- 
-@@ -916,6 +917,7 @@ void pblk_gc_free_full_lines(struct pblk *pblk);
- void pblk_gc_sysfs_state_show(struct pblk *pblk, int *gc_enabled,
- 			      int *gc_active);
- int pblk_gc_sysfs_force(struct pblk *pblk, int force);
-+void pblk_put_line_back(struct pblk *pblk, struct pblk_line *line);
- 
- /*
-  * pblk rate limiter
+ 	left_ppas -= rq_ppas;
 -- 
 2.9.5
 
