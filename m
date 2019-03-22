@@ -2,90 +2,68 @@ Return-Path: <SRS0=iCYb=RZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC8FC4360F
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 17:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E68DC43381
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 17:36:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7FF262192D
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 17:06:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5C71218A1
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 17:36:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1553276197;
+	bh=GWmzpEXHZLcTlnW83g5ygRKMuvBGrH3uZgBq4va+EMA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=lzjlD/CwRigiGXN6olvM8xAuky6STzKrDD3MpReJq9DNKGOeYTHMPak6YHZ/iai8q
+	 2JfK8b/1xpR+HaerDjNUwzx7yUYB8HFl5giO1ZwbfAKhPCdktWfajQfzQgAbevl7cP
+	 L1WOFz124eLJ5I07Dayme28IO+/e+RFfa5cqzcG8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727805AbfCVRF6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Mar 2019 13:05:58 -0400
-Received: from mga05.intel.com ([192.55.52.43]:20937 "EHLO mga05.intel.com"
+        id S1727203AbfCVRgg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Mar 2019 13:36:36 -0400
+Received: from mga07.intel.com ([134.134.136.100]:23456 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727706AbfCVRF6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Mar 2019 13:05:58 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
+        id S1725981AbfCVRgg (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Mar 2019 13:36:36 -0400
+X-Amp-Result: UNSCANNABLE
 X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Mar 2019 10:05:57 -0700
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Mar 2019 10:36:35 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.60,256,1549958400"; 
-   d="scan'208";a="329774387"
-Received: from smile.fi.intel.com (HELO smile) ([10.237.72.86])
-  by fmsmga006.fm.intel.com with ESMTP; 22 Mar 2019 10:05:52 -0700
-Received: from andy by smile with local (Exim 4.92)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1h7Nc7-0004wO-0W; Fri, 22 Mar 2019 19:05:51 +0200
-Date:   Fri, 22 Mar 2019 19:05:50 +0200
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Sakari Ailus <sakari.ailus@linux.intel.com>
-Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
-        Petr Mladek <pmladek@suse.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        scsi <linux-scsi@vger.kernel.org>,
-        Linux PM list <linux-pm@vger.kernel.org>,
-        Linux MMC List <linux-mmc@vger.kernel.org>,
-        "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
-        linux-um@lists.infradead.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-block@vger.kernel.org,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        linux-btrfs <linux-btrfs@vger.kernel.org>,
-        linux-pci <linux-pci@vger.kernel.org>,
-        sparclinux <sparclinux@vger.kernel.org>,
-        xen-devel@lists.xenproject.org,
-        ceph-devel <ceph-devel@vger.kernel.org>,
-        Linux MM <linux-mm@kvack.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Lars Ellenberg <drbd-dev@lists.linbit.com>
-Subject: Re: [PATCH 0/2] Remove support for deprecated %pf and %pF in vsprintf
-Message-ID: <20190322170550.GX9224@smile.fi.intel.com>
-References: <20190322132108.25501-1-sakari.ailus@linux.intel.com>
- <CAMuHMdVmqqjVx7As9AAywYxYXG=grijF5rF77OBn6TUjM9+xKw@mail.gmail.com>
- <20190322135350.2btpno7vspvewxvk@paasikivi.fi.intel.com>
+   d="scan'208";a="285028592"
+Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
+  by orsmga004.jf.intel.com with ESMTP; 22 Mar 2019 10:36:35 -0700
+Date:   Fri, 22 Mar 2019 11:37:36 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@fb.com>, Keith Busch <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
+Subject: Re: [RFC] optimize nvme single segment I/O
+Message-ID: <20190322173736.GC31194@localhost.localdomain>
+References: <20190321231037.25104-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190322135350.2btpno7vspvewxvk@paasikivi.fi.intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190321231037.25104-1-hch@lst.de>
+User-Agent: Mutt/1.9.1 (2017-09-22)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 22, 2019 at 03:53:50PM +0200, Sakari Ailus wrote:
+On Thu, Mar 21, 2019 at 04:10:22PM -0700, Christoph Hellwig wrote:
+> Hi all,
+> 
+> with all the discussion on small I/O performance lately I thought
+> it was time off to dust my old idea to optimize this path a bit
+> by avoiding to build a scatterlist.  I've only done very basic
+> testing because I've been a bit busy, but I thought it might be
+> worthwhile to get it out for feedback.
 
-> Porting a patch
-> forward should have no issues either as checkpatch.pl has been complaining
-> of the use of %pf and %pF for a while now.
+Tests well here with a measurable IOPs improvement at lower queue depths.
 
-And that's exactly the reason why I think instead of removing warning on
-checkpatch, it makes sense to convert to an error for a while. People are
-tending read documentation on internet and thus might have outdated one. And
-yes, the compiler doesn't tell a thing about it.
+Series looks good to me, especially patch 5! :p
 
-P.S. Though, if majority of people will tell that I'm wrong, then it's okay to
-remove.
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+Reviewed-by: Keith Busch <keith.busch@intel.com>
