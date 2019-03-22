@@ -2,89 +2,69 @@ Return-Path: <SRS0=iCYb=RZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87AF0C43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 15:23:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF24C43381
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 15:36:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 475022083D
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 15:23:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="cOYwYSa3"
+	by mail.kernel.org (Postfix) with ESMTP id 46FE1213F2
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 15:36:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726703AbfCVPXV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Mar 2019 11:23:21 -0400
-Received: from mail-it1-f195.google.com ([209.85.166.195]:51518 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726440AbfCVPXV (ORCPT
+        id S1727163AbfCVPg4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Mar 2019 11:36:56 -0400
+Received: from mail-pf1-f178.google.com ([209.85.210.178]:39135 "EHLO
+        mail-pf1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725981AbfCVPg4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Mar 2019 11:23:21 -0400
-Received: by mail-it1-f195.google.com with SMTP id e24so4252803itl.1
-        for <linux-block@vger.kernel.org>; Fri, 22 Mar 2019 08:23:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=idTbDdgSVc7JtWlfRBQrCe7voUYIIuq1qsXWuWOqido=;
-        b=cOYwYSa3eBCfnTy0utQlOxD/GS9ptMrq6BQq8w4ulKcIQbUi8ix6yVDfnLwTUUrtUs
-         eL1kBcW16Fxfoc8AXOh9rsh+9UY5I6uLckS371dXfEorYSvvCWWd7n88Sg4JLqEkyBRD
-         6eyqhN2uDNen9bHhRaFzjM31EKBiLDfmgfHM/C9IdIBDLhhqktR1/OqQShtjC0HQo2zt
-         IKBquE4V0BXRCWGZRyjln4ZaGm7QjrYnFLBqTKPqvCArKAtVc1ZGwOVmu/vIYLvxNLV6
-         zQTDJg8qpR+TQ6wEoOijdDK85fRRsNQt/RlYYQe+JsEYnO7O7vscIy07jOl59OSkwWbT
-         aFGw==
+        Fri, 22 Mar 2019 11:36:56 -0400
+Received: by mail-pf1-f178.google.com with SMTP id i17so1788032pfo.6
+        for <linux-block@vger.kernel.org>; Fri, 22 Mar 2019 08:36:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=idTbDdgSVc7JtWlfRBQrCe7voUYIIuq1qsXWuWOqido=;
-        b=rPM2V7L9MHXAF7/vZqAsV2EOlWZjPa84DMcoDDHoJlXtCo4T1t4kt3XHZT7ehp0Xyd
-         zkE+fNnkhi7HPLV3zpxCJXV3FZIzHy2yggLrbqv0tl0h2js/K60PlciZEtVs1jITSekP
-         hAl+8CLSGJoXsDAmSyPKd0RYSO/hfLDRxojJC8sD4emprJkIAFYpry3i2qfaYfwfT+AF
-         fqL0OxkkMG28dpq7NtTLEQwAsSgIVDaFJb99DGfOUaskb6qhcCWfDlBX/PN3vOk+kNlh
-         i/cryQXwpk+BHK6Izv8bOlYtZ/IDTwRkVBrhc0y68z4yjOxPg0UerCfr4U3VuQc5OZoA
-         M7Lw==
-X-Gm-Message-State: APjAAAUrysRM6P2cpFQsroeQUFZiH9sI4GCP2E+dwlBrnfi+KYU/JfRJ
-        DnT5NezKDww9pV7hJku4GHciKireTny6qWLb
-X-Google-Smtp-Source: APXvYqzviBZgtlY6dc8FCWz3DHq37+p6gHftqyAun3QgPg0pUFEP+E9hfg9uj9iNggUP6TMRqxpVhA==
-X-Received: by 2002:a02:1c49:: with SMTP id c70mr1527693jac.92.1553268200368;
-        Fri, 22 Mar 2019 08:23:20 -0700 (PDT)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id m25sm1527428iti.16.2019.03.22.08.23.18
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 22 Mar 2019 08:23:19 -0700 (PDT)
-Subject: Re: [PATCH 0/2] blk-mq: convert atomic_t to refcount_t
-To:     Yufen Yu <yuyufen@huawei.com>, dwindsor@gmail.com,
-        peterz@infradead.org
-Cc:     linux-block@vger.kernel.org
-References: <20190322144818.987-1-yuyufen@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <24f14149-a309-5876-563c-e11124d0c6ac@kernel.dk>
-Date:   Fri, 22 Mar 2019 09:23:17 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
-MIME-Version: 1.0
-In-Reply-To: <20190322144818.987-1-yuyufen@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=UKSZ4+pqnZJ/O8a2pIjuLuFqQN2xjxc92GTtiGPMxBU=;
+        b=U67b6reaWdeGu+ppTgCcmMfqI9IXYr4dFMh+ILSXpB+3JPEkAvvXpmHA7ZEVUaQOup
+         RZDewMKtclSYZFbRR4nuxBeI/PEcvCaOzTiosii8svOoUloCZ2/i+7zqVu/i4BDNSBd0
+         WFnRNeKAYqQv9EaG481f7PtVIYApPw3BgKRIpuxXv33XoViKaenENBRiJU4eYAPWKz12
+         gJbdag6p78dkzFOR1/IdXx6wSeFx79hy7rv+cKiUkP/9RKgt0cKGqooV5wh1n8Xpj5fX
+         hYahFVDwsb+DVJyeOpdEGXDzpOL1yU1O71h7koT3pM4uYZs7hMTFPubZZbmSUfwHNr7W
+         zxew==
+X-Gm-Message-State: APjAAAUyhg5EphJIk4j527ZoOW2b/r84F+CfJHRXKndNOIkF1NEDZ+dq
+        P6dKNgAnp7C4IhnYvufoKVY=
+X-Google-Smtp-Source: APXvYqxsuAxhbNIBpa047RB2mbInKSU6WLDiqsw1779OdEWiPu5//HpMXSO0cmbTyaZuXlcfPnFb+g==
+X-Received: by 2002:a63:510a:: with SMTP id f10mr9539239pgb.327.1553269015053;
+        Fri, 22 Mar 2019 08:36:55 -0700 (PDT)
+Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id u4sm16081290pgn.12.2019.03.22.08.36.53
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 22 Mar 2019 08:36:54 -0700 (PDT)
+Message-ID: <1553269013.65329.147.camel@acm.org>
+Subject: Re: Read data to kernel buffer by blkdev_read_iter
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Ivan Safonov <insafonov@gmail.com>, linux-block@vger.kernel.org
+Date:   Fri, 22 Mar 2019 08:36:53 -0700
+In-Reply-To: <1a5a1b81-49c0-2817-73d9-d58716c44b0a@gmail.com>
+References: <b6d54ac9-ee29-edcf-907d-1e12fce321ac@gmail.com>
+         <98dec559-60bf-2463-7b0b-0cc2dd57db7d@acm.org>
+         <1a5a1b81-49c0-2817-73d9-d58716c44b0a@gmail.com>
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/22/19 8:48 AM, Yufen Yu wrote:
-> Hi,
-> 
-> This patchset covert atomic variables (hctx.nr_active and blk_mq_tag.active_queues)
-> to newly provided refcount_t type and API, which can prevent accidental counter overflows
-> and underflows.
+On Fri, 2019-03-22 at 17:57 +-0300, Ivan Safonov wrote:
++AD4 In the previous message I misled you: iov+AF8-iter has ITER+AF8-KVEC type only 
++AD4 if set+AF8-fs(get+AF8-ds()) present before iov+AF8-iter+AF8-init(). In this case 
++AD4 +AF8-without+AF8 IOCB+AF8-DIRECT blkdev+AF8-read+AF8-iter() work fine. With IOCB+AF8-DIRECT 
++AD4 blkdev+AF8-read+AF8-iter() return -EFAULT.
 
-Neither of these are reference counts in the sense that things go away when they
-hit zero.
+Have you tried to store a physical address in iov+AF8-base instead of a virtual
+address?
 
--- 
-Jens Axboe
-
+Bart.
