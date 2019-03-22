@@ -2,38 +2,40 @@ Return-Path: <SRS0=iCYb=RZ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C24C43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0865C43381
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:51:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D388D20883
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:51:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7928D20883
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 14:51:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728320AbfCVOvY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Mar 2019 10:51:24 -0400
-Received: from mga06.intel.com ([134.134.136.31]:54147 "EHLO mga06.intel.com"
+        id S1728336AbfCVOvb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Mar 2019 10:51:31 -0400
+Received: from mga07.intel.com ([134.134.136.100]:13975 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728072AbfCVOvY (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Mar 2019 10:51:24 -0400
+        id S1728072AbfCVOva (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 22 Mar 2019 10:51:30 -0400
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Mar 2019 07:51:23 -0700
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 22 Mar 2019 07:51:30 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.60,256,1549958400"; 
-   d="scan'208";a="216593122"
+   d="scan'208";a="216593160"
 Received: from gklab-107-059.igk.intel.com ([10.102.107.59])
-  by orsmga001.jf.intel.com with ESMTP; 22 Mar 2019 07:51:21 -0700
+  by orsmga001.jf.intel.com with ESMTP; 22 Mar 2019 07:51:28 -0700
 From:   Igor Konopko <igor.j.konopko@intel.com>
 To:     mb@lightnvm.io, javier@javigon.com, hans.holmberg@cnexlabs.com
 Cc:     linux-block@vger.kernel.org, igor.j.konopko@intel.com
-Subject: [PATCH v2 00/16] lightnvm: next set of improvements for 5.2
-Date:   Fri, 22 Mar 2019 15:48:27 +0100
-Message-Id: <20190322144843.9602-1-igor.j.konopko@intel.com>
+Subject: [PATCH v2 01/16] lightnvm: pblk: warn when there are opened chunks
+Date:   Fri, 22 Mar 2019 15:48:28 +0100
+Message-Id: <20190322144843.9602-2-igor.j.konopko@intel.com>
 X-Mailer: git-send-email 2.9.5
+In-Reply-To: <20190322144843.9602-1-igor.j.konopko@intel.com>
+References: <20190322144843.9602-1-igor.j.konopko@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -42,54 +44,105 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is another set of fixes and improvements to both pblk and lightnvm
-core. 
+In case of factory pblk init, we might have a situation when there are
+some opened chunks. Based on OCSSD spec we are not allowed to transform
+chunks from the open state directly to the free state, so such a reset
+can lead to IO error (even that most of the controller will allow for
+for such a operation anyway), so we would like to warn users about such
+a situation at least.
 
-First patch is the leftover from previous patchset, since we decided to
-reorganize it a little. Second & third patches are the most crutial, since they
-changes the approach to partial read path, so detailed review is needed
-especially here.
+Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+Reviewed-by: Javier González <javier@javigon.com>
+---
+ drivers/lightnvm/pblk-init.c | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
-Other patches are my other findings related to some bugs or potential
-improvements, mostly related to some corner cases.
-
-Changes v1 -> v2:
--dropped some not needed patches
--review feedback incorporated for some of the patches
--partial read path changes patch splitted into two patches
-
-Igor Konopko (16):
-  lightnvm: pblk: warn when there are opened chunks
-  lightnvm: pblk: IO path reorganization
-  lightnvm: pblk: simplify partial read path
-  lightnvm: pblk: OOB recovery for closed chunks fix
-  lightnvm: pblk: propagate errors when reading meta
-  lightnvm: pblk: recover only written metadata
-  lightnvm: pblk: wait for inflight IOs in recovery
-  lightnvm: pblk: remove internal IO timeout
-  lightnvm: pblk: fix spin_unlock order
-  lightnvm: pblk: kick writer on write recovery path
-  lightnvm: pblk: fix update line wp in OOB recovery
-  lightnvm: pblk: do not read OOB from emeta region
-  lightnvm: pblk: store multiple copies of smeta
-  lightnvm: pblk: GC error handling
-  lightnvm: pblk: use nvm_rq_to_ppa_list()
-  lightnvm: track inflight target creations
-
- drivers/lightnvm/core.c          |  19 ++-
- drivers/lightnvm/pblk-cache.c    |   7 +-
- drivers/lightnvm/pblk-core.c     | 179 +++++++++++++++++----
- drivers/lightnvm/pblk-gc.c       |   5 +-
- drivers/lightnvm/pblk-init.c     |  59 ++++---
- drivers/lightnvm/pblk-rb.c       |   2 +-
- drivers/lightnvm/pblk-read.c     | 336 +++++++++++----------------------------
- drivers/lightnvm/pblk-recovery.c | 103 ++++++++----
- drivers/lightnvm/pblk-rl.c       |   3 +-
- drivers/lightnvm/pblk-write.c    |   1 +
- drivers/lightnvm/pblk.h          |  31 ++--
- include/linux/lightnvm.h         |   2 +
- 12 files changed, 391 insertions(+), 356 deletions(-)
-
+diff --git a/drivers/lightnvm/pblk-init.c b/drivers/lightnvm/pblk-init.c
+index 1e227a0..e2e1193 100644
+--- a/drivers/lightnvm/pblk-init.c
++++ b/drivers/lightnvm/pblk-init.c
+@@ -712,7 +712,7 @@ static int pblk_set_provision(struct pblk *pblk, int nr_free_chks)
+ }
+ 
+ static int pblk_setup_line_meta_chk(struct pblk *pblk, struct pblk_line *line,
+-				   struct nvm_chk_meta *meta)
++				   struct nvm_chk_meta *meta, int *opened)
+ {
+ 	struct nvm_tgt_dev *dev = pblk->dev;
+ 	struct nvm_geo *geo = &dev->geo;
+@@ -748,6 +748,9 @@ static int pblk_setup_line_meta_chk(struct pblk *pblk, struct pblk_line *line,
+ 			continue;
+ 		}
+ 
++		if (chunk->state & NVM_CHK_ST_OPEN)
++			(*opened)++;
++
+ 		if (!(chunk->state & NVM_CHK_ST_OFFLINE))
+ 			continue;
+ 
+@@ -759,7 +762,7 @@ static int pblk_setup_line_meta_chk(struct pblk *pblk, struct pblk_line *line,
+ }
+ 
+ static long pblk_setup_line_meta(struct pblk *pblk, struct pblk_line *line,
+-				 void *chunk_meta, int line_id)
++				 void *chunk_meta, int line_id, int *opened)
+ {
+ 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+ 	struct pblk_line_meta *lm = &pblk->lm;
+@@ -773,7 +776,7 @@ static long pblk_setup_line_meta(struct pblk *pblk, struct pblk_line *line,
+ 	line->vsc = &l_mg->vsc_list[line_id];
+ 	spin_lock_init(&line->lock);
+ 
+-	nr_bad_chks = pblk_setup_line_meta_chk(pblk, line, chunk_meta);
++	nr_bad_chks = pblk_setup_line_meta_chk(pblk, line, chunk_meta, opened);
+ 
+ 	chk_in_line = lm->blk_per_line - nr_bad_chks;
+ 	if (nr_bad_chks < 0 || nr_bad_chks > lm->blk_per_line ||
+@@ -1019,12 +1022,12 @@ static int pblk_line_meta_init(struct pblk *pblk)
+ 	return 0;
+ }
+ 
+-static int pblk_lines_init(struct pblk *pblk)
++static int pblk_lines_init(struct pblk *pblk, bool factory)
+ {
+ 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
+ 	struct pblk_line *line;
+ 	void *chunk_meta;
+-	int nr_free_chks = 0;
++	int nr_free_chks = 0, nr_opened_chks = 0;
+ 	int i, ret;
+ 
+ 	ret = pblk_line_meta_init(pblk);
+@@ -1059,7 +1062,8 @@ static int pblk_lines_init(struct pblk *pblk)
+ 		if (ret)
+ 			goto fail_free_lines;
+ 
+-		nr_free_chks += pblk_setup_line_meta(pblk, line, chunk_meta, i);
++		nr_free_chks += pblk_setup_line_meta(pblk, line, chunk_meta, i,
++							&nr_opened_chks);
+ 
+ 		trace_pblk_line_state(pblk_disk_name(pblk), line->id,
+ 								line->state);
+@@ -1071,6 +1075,10 @@ static int pblk_lines_init(struct pblk *pblk)
+ 		goto fail_free_lines;
+ 	}
+ 
++	if (factory && nr_opened_chks)
++		pblk_warn(pblk, "%d opened chunks during factory creation\n",
++				nr_opened_chks);
++
+ 	ret = pblk_set_provision(pblk, nr_free_chks);
+ 	if (ret)
+ 		goto fail_free_lines;
+@@ -1235,7 +1243,7 @@ static void *pblk_init(struct nvm_tgt_dev *dev, struct gendisk *tdisk,
+ 		goto fail;
+ 	}
+ 
+-	ret = pblk_lines_init(pblk);
++	ret = pblk_lines_init(pblk, flags & NVM_TARGET_FACTORY);
+ 	if (ret) {
+ 		pblk_err(pblk, "could not initialize lines\n");
+ 		goto fail_free_core;
 -- 
 2.9.5
 
