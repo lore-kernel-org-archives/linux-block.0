@@ -3,24 +3,24 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94957C43381
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 22:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D95B4C43381
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 22:45:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A6122075E
-	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 22:44:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B123F21925
+	for <linux-block@archiver.kernel.org>; Fri, 22 Mar 2019 22:45:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728151AbfCVWo6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Mar 2019 18:44:58 -0400
-Received: from smtp2.provo.novell.com ([137.65.250.81]:37053 "EHLO
+        id S1728199AbfCVWpA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Mar 2019 18:45:00 -0400
+Received: from smtp2.provo.novell.com ([137.65.250.81]:47633 "EHLO
         smtp2.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728132AbfCVWo6 (ORCPT
+        with ESMTP id S1728132AbfCVWo7 (ORCPT
         <rfc822;groupwise-linux-block@vger.kernel.org:0:0>);
-        Fri, 22 Mar 2019 18:44:58 -0400
+        Fri, 22 Mar 2019 18:44:59 -0400
 Received: from apollon.suse.de.de (prva10-snat226-1.provo.novell.com [137.65.226.35])
-        by smtp2.provo.novell.com with ESMTP (TLS encrypted); Fri, 22 Mar 2019 16:44:47 -0600
+        by smtp2.provo.novell.com with ESMTP (TLS encrypted); Fri, 22 Mar 2019 16:44:49 -0600
 From:   Martin Wilck <mwilck@suse.com>
 To:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
         Hannes Reinecke <hare@suse.de>,
@@ -30,9 +30,9 @@ Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
         Bart Van Assche <Bart.VanAssche@sandisk.com>,
         Martin Wilck <mwilck@suse.com>, linux-block@vger.kernel.org,
         linux-scsi@vger.kernel.org, linux-ide@vger.kernel.org
-Subject: [PATCH RESEND v2 1/5] block: genhd: remove async_events field
-Date:   Fri, 22 Mar 2019 23:43:49 +0100
-Message-Id: <20190322224353.11088-2-mwilck@suse.com>
+Subject: [PATCH RESEND v2 2/5] block: disk_events: introduce event flags
+Date:   Fri, 22 Mar 2019 23:43:50 +0100
+Message-Id: <20190322224353.11088-3-mwilck@suse.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190322224353.11088-1-mwilck@suse.com>
 References: <20190322224353.11088-1-mwilck@suse.com>
@@ -43,81 +43,125 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The async_events field, intended to be used for drivers that
-support asynchronous notifications about disk events (aka
-media change events), isn't currently used by any driver,
-and apparently that has been that way for a long time
-(if not forever). Remove it.
+Currently, an empty disk->events field tells the block layer not to forward
+media change events to user space. This was done in
+commit 7c88a168da80 ("block: don't propagate unlisted DISK_EVENTs to userland")
+in order to avoid events from "fringe" drivers to be forwarded to user
+space. By doing so, the block layer lost the information which events were
+supported by a particular block device, and most importantly, whether or
+not a given device supports media change events at all.
+
+Prepare for not interpreting the "events" field this way in the future any
+more. This is done by adding two flag bits that can be set to have the
+device treated like one that has the "events" field set to a non-zero value
+before. This applies only to the sd and sr drivers, which are changed to
+set the new flags.
+
+The new flags are DISK_EVENT_FLAG_POLL to enforce polling of the device for
+synchronous events, and DISK_EVENT_FLAG_UEVENT to tell the blocklayer to
+generate udev events from kernel events. They can easily be fit in the int
+reserved for event bits.
+
+This patch doesn't change behavior.
 
 Signed-off-by: Martin Wilck <mwilck@suse.com>
 ---
- block/genhd.c           | 10 ++++------
- drivers/block/pktcdvd.c |  1 -
- include/linux/genhd.h   |  1 -
- 3 files changed, 4 insertions(+), 8 deletions(-)
+ block/genhd.c         | 15 ++++++++++-----
+ drivers/scsi/sd.c     |  3 ++-
+ drivers/scsi/sr.c     |  3 ++-
+ include/linux/genhd.h |  7 +++++++
+ 4 files changed, 21 insertions(+), 7 deletions(-)
 
 diff --git a/block/genhd.c b/block/genhd.c
-index 7032678..ee76de0 100644
+index ee76de0..cc6c52d1 100644
 --- a/block/genhd.c
 +++ b/block/genhd.c
-@@ -1628,12 +1628,11 @@ static unsigned long disk_events_poll_jiffies(struct gendisk *disk)
- 
- 	/*
- 	 * If device-specific poll interval is set, always use it.  If
--	 * the default is being used, poll iff there are events which
--	 * can't be monitored asynchronously.
-+	 * the default is being used, poll if the POLL flag is set.
+@@ -1632,7 +1632,7 @@ static unsigned long disk_events_poll_jiffies(struct gendisk *disk)
  	 */
  	if (ev->poll_msecs >= 0)
  		intv_msecs = ev->poll_msecs;
--	else if (disk->events & ~disk->async_events)
-+	else if (disk->events)
+-	else if (disk->events)
++	else if (disk->events & DISK_EVENT_FLAG_POLL)
  		intv_msecs = disk_events_dfl_poll_msecs;
  
  	return msecs_to_jiffies(intv_msecs);
-@@ -1860,6 +1859,7 @@ static void disk_check_events(struct disk_events *ev,
-  *
-  * events		: list of all supported events
-  * events_async		: list of events which can be detected w/o polling
-+ *			  (always empty, only for backwards compatibility)
-  * events_poll_msecs	: polling interval, 0: disable, -1: system default
-  */
- static ssize_t __disk_events_show(unsigned int events, char *buf)
-@@ -1890,9 +1890,7 @@ static ssize_t disk_events_show(struct device *dev,
- static ssize_t disk_events_async_show(struct device *dev,
- 				      struct device_attribute *attr, char *buf)
+@@ -1842,11 +1842,13 @@ static void disk_check_events(struct disk_events *ev,
+ 
+ 	/*
+ 	 * Tell userland about new events.  Only the events listed in
+-	 * @disk->events are reported.  Unlisted events are processed the
+-	 * same internally but never get reported to userland.
++	 * @disk->events are reported, and only if DISK_EVENT_FLAG_UEVENT
++	 * is set. Otherwise, events are processed internally but never
++	 * get reported to userland.
+ 	 */
+ 	for (i = 0; i < ARRAY_SIZE(disk_uevents); i++)
+-		if (events & disk->events & (1 << i))
++		if (events & disk->events & (1 << i) &&
++		    disk->events & DISK_EVENT_FLAG_UEVENT)
+ 			envp[nr_events++] = disk_uevents[i];
+ 
+ 	if (nr_events)
+@@ -1884,7 +1886,10 @@ static ssize_t disk_events_show(struct device *dev,
  {
--	struct gendisk *disk = dev_to_disk(dev);
--
--	return __disk_events_show(disk->async_events, buf);
-+	return 0;
+ 	struct gendisk *disk = dev_to_disk(dev);
+ 
+-	return __disk_events_show(disk->events, buf);
++	if (!(disk->events & DISK_EVENT_FLAG_UEVENT))
++		return 0;
++
++	return __disk_events_show(disk->events & DISK_EVENT_TYPES_MASK, buf);
  }
  
- static ssize_t disk_events_poll_msecs_show(struct device *dev,
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index f5a7102..0240601 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -2761,7 +2761,6 @@ static int pkt_setup_dev(dev_t dev, dev_t* pkt_dev)
+ static ssize_t disk_events_async_show(struct device *dev,
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index 251db30..71a8a1b 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -3326,7 +3326,8 @@ static void sd_probe_async(void *data, async_cookie_t cookie)
+ 	gd->flags = GENHD_FL_EXT_DEVT;
+ 	if (sdp->removable) {
+ 		gd->flags |= GENHD_FL_REMOVABLE;
+-		gd->events |= DISK_EVENT_MEDIA_CHANGE;
++		gd->events |= DISK_EVENT_MEDIA_CHANGE |
++			DISK_EVENT_FLAG_POLL | DISK_EVENT_FLAG_UEVENT;
+ 	}
  
- 	/* inherit events of the host device */
- 	disk->events = pd->bdev->bd_disk->events;
--	disk->async_events = pd->bdev->bd_disk->async_events;
+ 	blk_pm_runtime_init(sdp->request_queue, dev);
+diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
+index 039c27c2..f7a9d34 100644
+--- a/drivers/scsi/sr.c
++++ b/drivers/scsi/sr.c
+@@ -715,7 +715,8 @@ static int sr_probe(struct device *dev)
+ 	sprintf(disk->disk_name, "sr%d", minor);
+ 	disk->fops = &sr_bdops;
+ 	disk->flags = GENHD_FL_CD | GENHD_FL_BLOCK_EVENTS_ON_EXCL_WRITE;
+-	disk->events = DISK_EVENT_MEDIA_CHANGE | DISK_EVENT_EJECT_REQUEST;
++	disk->events = DISK_EVENT_MEDIA_CHANGE | DISK_EVENT_EJECT_REQUEST
++		| DISK_EVENT_FLAG_POLL | DISK_EVENT_FLAG_UEVENT;
  
- 	add_disk(disk);
+ 	blk_queue_rq_timeout(sdev->request_queue, SR_TIMEOUT);
  
 diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-index 06c0fd59..5f78edb 100644
+index 5f78edb..a3d5b1c 100644
 --- a/include/linux/genhd.h
 +++ b/include/linux/genhd.h
-@@ -185,7 +185,6 @@ struct gendisk {
- 	char *(*devnode)(struct gendisk *gd, umode_t *mode);
+@@ -148,8 +148,15 @@ struct hd_struct {
+ enum {
+ 	DISK_EVENT_MEDIA_CHANGE			= 1 << 0, /* media changed */
+ 	DISK_EVENT_EJECT_REQUEST		= 1 << 1, /* eject requested */
++	/* Poll even if events_poll_msecs is unset */
++	DISK_EVENT_FLAG_POLL			= 1 << 16,
++	/* Forward events to udev */
++	DISK_EVENT_FLAG_UEVENT			= 1 << 17,
+ };
  
- 	unsigned int events;		/* supported events */
--	unsigned int async_events;	/* async events, subset of all */
- 
- 	/* Array of pointers to partitions indexed by partno.
- 	 * Protected with matching bdev lock but stat and other
++#define DISK_EVENT_TYPES_MASK \
++	(DISK_EVENT_MEDIA_CHANGE | DISK_EVENT_EJECT_REQUEST)
++
+ struct disk_part_tbl {
+ 	struct rcu_head rcu_head;
+ 	int len;
 -- 
 2.21.0
 
