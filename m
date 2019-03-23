@@ -2,157 +2,327 @@ Return-Path: <SRS0=7zlQ=R2=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA5EBC43381
-	for <linux-block@archiver.kernel.org>; Sat, 23 Mar 2019 06:34:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76642C43381
+	for <linux-block@archiver.kernel.org>; Sat, 23 Mar 2019 11:14:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5FBCC21874
-	for <linux-block@archiver.kernel.org>; Sat, 23 Mar 2019 06:34:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 34D8721902
+	for <linux-block@archiver.kernel.org>; Sat, 23 Mar 2019 11:14:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=163.com header.i=@163.com header.b="EpghnCiP"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="aIYfQ5JT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726037AbfCWGe6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 23 Mar 2019 02:34:58 -0400
-Received: from m13-37.163.com ([220.181.13.37]:46963 "EHLO m13-37.163.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726211AbfCWGe6 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sat, 23 Mar 2019 02:34:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=Date:From:Subject:MIME-Version:Message-ID; bh=miYSJ
-        G8KpKAlih9b8ElAxT99SSIoN+EhSb1raJGbYO0=; b=EpghnCiPA+qFR//hrLywX
-        GhhDOrUk5H6Niqu6hhGH7AjPHkZGr+g1lQoQq7RzvXjoD04CGL8zRHr9EhdLgKEl
-        KH4pjDvEciwhu7hPra+I20eKBoXUkElp3nEKE62y0gBsu7efwiEOArR0zIMUozsX
-        XnE0eXX/xlkf4hLGF5jM2s=
-Received: from luferry$163.com ( [47.251.3.230, 54.215.2.217] ) by
- ajax-webmail-wmsvr37 (Coremail) ; Sat, 23 Mar 2019 14:34:25 +0800 (CST)
-X-Originating-IP: [47.251.3.230, 54.215.2.217]
-Date:   Sat, 23 Mar 2019 14:34:25 +0800 (CST)
-From:   luferry <luferry@163.com>
-To:     "Dongli Zhang" <dongli.zhang@oracle.com>
-Cc:     "Jens Axboe" <axboe@kernel.dk>, "Ming Lei" <ming.lei@redhat.com>,
-        "Christoph Hellwig" <hch@lst.de>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re:Re: [PATCH] block/mq: blk map queues by core id
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version SP_ntes V3.5 build
- 20180927(cd7136b6) Copyright (c) 2002-2019 www.mailtech.cn 163com
-In-Reply-To: <9fa3eda2-536c-86a1-a7a3-c157fd0cdfdc@oracle.com>
+        id S1727252AbfCWLO5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 Mar 2019 07:14:57 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:40646 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726801AbfCWLO5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sat, 23 Mar 2019 07:14:57 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2NB9d0j034464;
+        Sat, 23 Mar 2019 11:14:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
+ references : cc : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=q6Vljd9Y9wIfU42BUTFJBOiApHALT3R85W511PZscA0=;
+ b=aIYfQ5JT0OHkQCRSn8/D/DE39YOi2ZU+aLgZAaYEYXNsJhMAVnirUzU+p8U9nAQVHlBY
+ 5RkJY4dAnsxxzpYVkzW1IFC4E7OPwR4J9gB1LoXFzExM1NPgmSpFVdUN0Pp7/suRzOpf
+ aYPDlWHy7o7xmJitYPCn5/yBpIwYvB/7HODIbAEsj6TzW8Hh/K6r08EuDTOtgiT/CCU0
+ S4UpOmRQU0PK7UgxaiWHFpb97JEagpNR0V6CrlVct9xraHSvnnLtkXZiP1eHxscgbZxq
+ YI9K7v12KCfiO+8OicbWfw1GTATB7/k1bbf2aOpogpopDtQLWCzwUG1A6bYGfk6uxm+6 mg== 
+Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
+        by aserp2130.oracle.com with ESMTP id 2rdaae0u8j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 23 Mar 2019 11:14:44 +0000
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x2NBEhSe012439
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 23 Mar 2019 11:14:44 GMT
+Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x2NBEfmo006587;
+        Sat, 23 Mar 2019 11:14:41 GMT
+Received: from [10.191.2.156] (/10.191.2.156)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Sat, 23 Mar 2019 04:14:40 -0700
+Subject: Re: [PATCH] block/mq: blk map queues by core id
+To:     luferry <luferry@163.com>
 References: <20190322100949.5555-1-luferry@163.com>
  <9fa3eda2-536c-86a1-a7a3-c157fd0cdfdc@oracle.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
+ <4cddfb88.8534.169a941f24a.Coremail.luferry@163.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+Message-ID: <9b568440-cd06-d74c-5708-333b847e49c1@oracle.com>
+Date:   Sat, 23 Mar 2019 19:14:34 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101
+ Thunderbird/45.3.0
 MIME-Version: 1.0
-Message-ID: <4cddfb88.8534.169a941f24a.Coremail.luferry@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID: JcGowABHZgRx05VcfTcaAA--.55002W
-X-CM-SenderInfo: poxiv2lu16il2tof0z/xtbBax6AWletueSFXAACsT
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
+In-Reply-To: <4cddfb88.8534.169a941f24a.Coremail.luferry@163.com>
+Content-Type: text/plain; charset=gbk
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9203 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1903230087
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-CkkganVzdCBib3VnaHQgb25lIHZtICwgc28gaSBjYW5ub3QgYWNjZXNzIHRvIGh5cGVydmlzb3Iu
-IEkgd2lsbCB0cnkgdG8gYnVpbGQgdGhlIGVudmlyb25tZW50IG9uIG15IGRlc2t0b3AuCkknbSBz
-dXJlIGFib3V0IHNvbWV0aGluZy4KVGhlIGh5cGVydmlzb3IgaXMgS1ZNIGFuZCBkaXNrIGRyaXZl
-ciBpcyB2aXJ0aW8tYmxrLgpbcm9vdEBibGstbXEgfl0jIGRtZXNnIHxncmVwIEtWTQpbICAgIDAu
-MDAwMDAwXSBIeXBlcnZpc29yIGRldGVjdGVkOiBLVk0KWyAgICAwLjE4NjMzMF0gQm9vdGluZyBw
-YXJhdmlydHVhbGl6ZWQga2VybmVsIG9uIEtWTQpbICAgIDAuMjc5MTA2XSBLVk0gc2V0dXAgYXN5
-bmMgUEYgZm9yIGNwdSAwClsgICAgMC40MjA4MTldIEtWTSBzZXR1cCBhc3luYyBQRiBmb3IgY3B1
-IDEKWyAgICAwLjQyMTY4Ml0gS1ZNIHNldHVwIGFzeW5jIFBGIGZvciBjcHUgMgpbICAgIDAuNDIy
-MTEzXSBLVk0gc2V0dXAgYXN5bmMgUEYgZm9yIGNwdSAzClsgICAgMC40MjI0MzRdIEtWTSBzZXR1
-cCBhc3luYyBQRiBmb3IgY3B1IDQKWyAgICAwLjQyMjQzNF0gS1ZNIHNldHVwIGFzeW5jIFBGIGZv
-ciBjcHUgNQpbICAgIDAuNDIzMzEyXSBLVk0gc2V0dXAgYXN5bmMgUEYgZm9yIGNwdSA2ClsgICAg
-MC40MjMzOTRdIEtWTSBzZXR1cCBhc3luYyBQRiBmb3IgY3B1IDcKWyAgICAwLjQyNDEyNV0gS1ZN
-IHNldHVwIGFzeW5jIFBGIGZvciBjcHUgOApbICAgIDAuNDI0NDE0XSBLVk0gc2V0dXAgYXN5bmMg
-UEYgZm9yIGNwdSA5ClsgICAgMC40MjQ0MTVdIEtWTSBzZXR1cCBhc3luYyBQRiBmb3IgY3B1IDEw
-ClsgICAgMC40MjUzMjldIEtWTSBzZXR1cCBhc3luYyBQRiBmb3IgY3B1IDExClsgICAgMC40MjU0
-MjBdIEtWTSBzZXR1cCBhc3luYyBQRiBmb3IgY3B1IDEyClsgICAgMC40MjYxNTZdIEtWTSBzZXR1
-cCBhc3luYyBQRiBmb3IgY3B1IDEzClsgICAgMC40MjY0MzFdIEtWTSBzZXR1cCBhc3luYyBQRiBm
-b3IgY3B1IDE0ClsgICAgMC40MjY0MzFdIEtWTSBzZXR1cCBhc3luYyBQRiBmb3IgY3B1IDE1Clty
-b290QGJsay1tcSB+XSMgbHNwY2kgfGdyZXAgYmxvY2sKMDA6MDUuMCBTQ1NJIHN0b3JhZ2UgY29u
-dHJvbGxlcjogUmVkIEhhdCwgSW5jLiBWaXJ0aW8gYmxvY2sgZGV2aWNlCjAwOjA2LjAgU0NTSSBz
-dG9yYWdlIGNvbnRyb2xsZXI6IFJlZCBIYXQsIEluYy4gVmlydGlvIGJsb2NrIGRldmljZQoKW3Jv
-b3RAYmxrLW1xIH5dIyBsc2NwdQpBcmNoaXRlY3R1cmU6ICAgICAgICAgIHg4Nl82NApDUFUgb3At
-bW9kZShzKTogICAgICAgIDMyLWJpdCwgNjQtYml0CkJ5dGUgT3JkZXI6ICAgICAgICAgICAgTGl0
-dGxlIEVuZGlhbgpDUFUocyk6ICAgICAgICAgICAgICAgIDE2Ck9uLWxpbmUgQ1BVKHMpIGxpc3Q6
-ICAgMC0xNQpUaHJlYWQocykgcGVyIGNvcmU6ICAgIDIKQ29yZShzKSBwZXIgc29ja2V0OiAgICA4
-Cgpbcm9vdEBibGstbXEgfl0jIGxzIC9zeXMvYmxvY2svdmRiL21xLwowICAxICAyICAzCgpbcm9v
-dEBibGstbXEgfl0jIGNhdCAvcHJvYy9jcHVpbmZvIHxlZ3JlcCAncHJvY2Vzc29yfGNvcmUgaWQn
-CnByb2Nlc3Nvcgk6IDAKY29yZSBpZAkJOiAwCnByb2Nlc3Nvcgk6IDEKY29yZSBpZAkJOiAwCnBy
-b2Nlc3Nvcgk6IDIKY29yZSBpZAkJOiAxCnByb2Nlc3Nvcgk6IDMKY29yZSBpZAkJOiAxCnByb2Nl
-c3Nvcgk6IDQKY29yZSBpZAkJOiAyCnByb2Nlc3Nvcgk6IDUKY29yZSBpZAkJOiAyCnByb2Nlc3Nv
-cgk6IDYKY29yZSBpZAkJOiAzCnByb2Nlc3Nvcgk6IDcKY29yZSBpZAkJOiAzCnByb2Nlc3Nvcgk6
-IDgKY29yZSBpZAkJOiA0CnByb2Nlc3Nvcgk6IDkKY29yZSBpZAkJOiA0CnByb2Nlc3Nvcgk6IDEw
-CmNvcmUgaWQJCTogNQpwcm9jZXNzb3IJOiAxMQpjb3JlIGlkCQk6IDUKcHJvY2Vzc29yCTogMTIK
-Y29yZSBpZAkJOiA2CnByb2Nlc3Nvcgk6IDEzCmNvcmUgaWQJCTogNgpwcm9jZXNzb3IJOiAxNApj
-b3JlIGlkCQk6IDcKcHJvY2Vzc29yCTogMTUKY29yZSBpZAkJOiA3CgotLWJlZm9yZSB0aGlzIHBh
-dGNoLS0KW3Jvb3RAYmxrLW1xIH5dIyBjYXQgL3N5cy9ibG9jay92ZGIvbXEvKi9jcHVfbGlzdAow
-LCA0LCA1LCA4LCA5LCAxMiwgMTMKMQoyLCA2LCA3LCAxMCwgMTEsIDE0LCAxNQozCgotLWFmdGVy
-IHRoaXMgcGF0Y2gtLQpbcm9vdEBibGstbXEgfl0jIGNhdCAvc3lzL2Jsb2NrL3ZkYi9tcS8qL2Nw
-dV9saXN0CjAsIDQsIDUsIDEyLCAxMwoxLCA2LCA3LCAxNCwgMTUKMiwgOCwgOQozLCAxMCwgMTEK
-CgpJIGFkZCBkdW1wX3N0YWNrIGluc2VydCBibGtfbXFfbWFwX3F1ZXVlcy4KClsgICAgMS4zNzg2
-ODBdIENhbGwgVHJhY2U6ClsgICAgMS4zNzg2OTBdICBkdW1wX3N0YWNrKzB4NWEvMHg3MwpbICAg
-IDEuMzc4Njk1XSAgYmxrX21xX21hcF9xdWV1ZXMrMHgyOS8weGIwClsgICAgMS4zNzg3MDBdICBi
-bGtfbXFfYWxsb2NfdGFnX3NldCsweDFiZC8weDJkMApbICAgIDEuMzc4NzA1XSAgdmlydGJsa19w
-cm9iZSsweDFhZS8weDhlNCBbdmlydGlvX2Jsa10KWyAgICAxLjM3ODcwOV0gIHZpcnRpb19kZXZf
-cHJvYmUrMHgxOGEvMHgyMzAgW3ZpcnRpb10KWyAgICAxLjM3ODcxM10gIHJlYWxseV9wcm9iZSsw
-eDIxNS8weDNmMApbICAgIDEuMzc4NzE2XSAgZHJpdmVyX3Byb2JlX2RldmljZSsweDExNS8weDEz
-MApbICAgIDEuMzc4NzE4XSAgZGV2aWNlX2RyaXZlcl9hdHRhY2grMHg1MC8weDYwClsgICAgMS4z
-Nzg3MjBdICBfX2RyaXZlcl9hdHRhY2grMHhiZC8weDE0MApbICAgIDEuMzc4NzIyXSAgPyBkZXZp
-Y2VfZHJpdmVyX2F0dGFjaCsweDYwLzB4NjAKWyAgICAxLjM3ODcyNF0gIGJ1c19mb3JfZWFjaF9k
-ZXYrMHg2Ny8weGMwClsgICAgMS4zNzg3MjddICA/IGtsaXN0X2FkZF90YWlsKzB4NTcvMHg3MAoK
-CkF0IDIwMTktMDMtMjIgMTk6NTg6MDgsICJEb25nbGkgWmhhbmciIDxkb25nbGkuemhhbmdAb3Jh
-Y2xlLmNvbT4gd3JvdGU6Cj4KPgo+T24gMDMvMjIvMjAxOSAwNjowOSBQTSwgbHVmZXJyeSB3cm90
-ZToKPj4gdW5kZXIgdmlydHVhbCBtYWNoaW5lIGVudmlyb25tZW50LCBjcHUgdG9wb2xvZ3kgbWF5
-IGRpZmZlciBmcm9tIG5vcm1hbAo+PiBwaHlzaWNhbCBzZXJ2ZXIuCj4KPldvdWxkIG1pbmQgc2hh
-cmUgdGhlIG5hbWUgb2YgdmlydHVhbCBtYWNoaW5lIG1vbml0b3IsIHRoZSBjb21tYW5kIGxpbmUg
-aWYKPmF2YWlsYWJsZSwgYW5kIHdoaWNoIGRldmljZSB0byByZXByb2R1Y2UuCj4KPkZvciBpbnN0
-YW5jZSwgSSBhbSBub3QgYWJsZSB0byByZXByb2R1Y2Ugd2l0aCBxZW11IG52bWUgb3IgdmlydGlv
-LWJsayBhcyBJCj5hc3N1bWUgdGhleSB1c2UgcGNpIG9yIHZpcnRpbyBzcGVjaWZpYyBtYXBwZXIg
-dG8gZXN0YWJsaXNoIHRoZSBtYXBwaW5nLgo+Cj5FLmcuLCB3aXRoIHFlbXUgYW5kIG52bWU6IC1z
-bXAgOCxzb2NrZXRzPTEsY29yZXM9NCx0aHJlYWRzPTIKPgo+SW5kZWVkIEkgdXNlIHRocmVlIHF1
-ZXVlcyBpbnN0ZWFkIG9mIHR3cCBhcyBvbmUgaXMgcmVzZXJ2ZWQgZm9yIGFkbWluLgo+Cj4jIGxz
-IC9zeXMvYmxvY2svbnZtZTBuMS9tcS8qCj4vc3lzL2Jsb2NrL252bWUwbjEvbXEvMDoKPmNwdTAg
-IGNwdTEgIGNwdTIgIGNwdTMgIGNwdV9saXN0ICBucl9yZXNlcnZlZF90YWdzICBucl90YWdzCj4K
-Pi9zeXMvYmxvY2svbnZtZTBuMS9tcS8xOgo+Y3B1NCAgY3B1NSAgY3B1NiAgY3B1NyAgY3B1X2xp
-c3QgIG5yX3Jlc2VydmVkX3RhZ3MgIG5yX3RhZ3MKPgo+Cj5UaGFuayB5b3UgdmVyeSBtdWNoIQo+
-Cj5Eb25nbGkgWmhhbmcKPgo+PiBmb3IgZXhhbXBsZSAobWFjaGluZSB3aXRoIDQgY29yZXMsIDIg
-dGhyZWFkcyBwZXIgY29yZSk6Cj4+IAo+PiBub3JtYWwgcGh5c2ljYWwgc2VydmVyOgo+PiBjb3Jl
-LWlkICAgdGhyZWFkLTAtaWQgIHRocmVhZC0xLWlkCj4+IDAgICAgICAgICAwICAgICAgICAgICAg
-NAo+PiAxICAgICAgICAgMSAgICAgICAgICAgIDUKPj4gMiAgICAgICAgIDIgICAgICAgICAgICA2
-Cj4+IDMgICAgICAgICAzICAgICAgICAgICAgNwo+PiAKPj4gdmlydHVhbCBtYWNoaW5lOgo+PiBj
-b3JlLWlkICAgdGhyZWFkLTAtaWQgIHRocmVhZC0xLWlkCj4+IDAgICAgICAgICAwICAgICAgICAg
-ICAgMQo+PiAxICAgICAgICAgMiAgICAgICAgICAgIDMKPj4gMiAgICAgICAgIDQgICAgICAgICAg
-ICA1Cj4+IDMgICAgICAgICA2ICAgICAgICAgICAgNwo+PiAKPj4gV2hlbiBhdHRhY2ggZGlzayB3
-aXRoIHR3byBxdWV1ZXMsIGFsbCB0aGUgZXZlbiBudW1iZXJlZCBjcHVzIHdpbGwgYmUKPj4gbWFw
-cGVkIHRvIHF1ZXVlIDAuIFVuZGVyIHZpcnR1YWwgbWFjaGluZSwgYWxsIHRoZSBjcHVzIGlzIGZv
-bGxvd2VkIGJ5Cj4+IGl0cyBzaWJsaW5nIGNwdS5CZWZvcmUgdGhpcyBwYXRjaCwgYWxsIHRoZSBv
-ZGQgbnVtYmVyZWQgY3B1cyB3aWxsIGFsc28KPj4gYmUgbWFwcGVkIHRvIHF1ZXVlIDAsIGNhbiBj
-YXVzZSBzZXJpb3VzIGltYmFsYW5jZS50aGlzIHdpbGwgbGVhZCB0bwo+PiBwZXJmb3JtYW5jZSBp
-bXBhY3Qgb24gc3lzdGVtIElPCj4+IAo+PiBTbyBzdWdnZXN0IHRvIGFsbG9jYXRlIGNwdSBtYXAg
-YnkgY29yZSBpZCwgdGhpcyBjYW4gYmUgbW9yZSBjdXJyZW5jeQo+PiAKPj4gU2lnbmVkLW9mZi1i
-eTogbHVmZXJyeSA8bHVmZXJyeUAxNjMuY29tPgo+PiAtLS0KPj4gIGJsb2NrL2Jsay1tcS1jcHVt
-YXAuYyB8IDkgKysrKystLS0tCj4+ICAxIGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCA0
-IGRlbGV0aW9ucygtKQo+PiAKPj4gZGlmZiAtLWdpdCBhL2Jsb2NrL2Jsay1tcS1jcHVtYXAuYyBi
-L2Jsb2NrL2Jsay1tcS1jcHVtYXAuYwo+PiBpbmRleCAwM2E1MzQ4MjAyNzEuLjQxMjVlOGU3NzY3
-OSAxMDA2NDQKPj4gLS0tIGEvYmxvY2svYmxrLW1xLWNwdW1hcC5jCj4+ICsrKyBiL2Jsb2NrL2Js
-ay1tcS1jcHVtYXAuYwo+PiBAQCAtMzUsNyArMzUsNyBAQCBpbnQgYmxrX21xX21hcF9xdWV1ZXMo
-c3RydWN0IGJsa19tcV9xdWV1ZV9tYXAgKnFtYXApCj4+ICB7Cj4+ICAJdW5zaWduZWQgaW50ICpt
-YXAgPSBxbWFwLT5tcV9tYXA7Cj4+ICAJdW5zaWduZWQgaW50IG5yX3F1ZXVlcyA9IHFtYXAtPm5y
-X3F1ZXVlczsKPj4gLQl1bnNpZ25lZCBpbnQgY3B1LCBmaXJzdF9zaWJsaW5nOwo+PiArCXVuc2ln
-bmVkIGludCBjcHUsIGZpcnN0X3NpYmxpbmcsIGNvcmUgPSAwOwo+PiAgCj4+ICAJZm9yX2VhY2hf
-cG9zc2libGVfY3B1KGNwdSkgewo+PiAgCQkvKgo+PiBAQCAtNDgsOSArNDgsMTAgQEAgaW50IGJs
-a19tcV9tYXBfcXVldWVzKHN0cnVjdCBibGtfbXFfcXVldWVfbWFwICpxbWFwKQo+PiAgCQkJbWFw
-W2NwdV0gPSBjcHVfdG9fcXVldWVfaW5kZXgocW1hcCwgbnJfcXVldWVzLCBjcHUpOwo+PiAgCQl9
-IGVsc2Ugewo+PiAgCQkJZmlyc3Rfc2libGluZyA9IGdldF9maXJzdF9zaWJsaW5nKGNwdSk7Cj4+
-IC0JCQlpZiAoZmlyc3Rfc2libGluZyA9PSBjcHUpCj4+IC0JCQkJbWFwW2NwdV0gPSBjcHVfdG9f
-cXVldWVfaW5kZXgocW1hcCwgbnJfcXVldWVzLCBjcHUpOwo+PiAtCQkJZWxzZQo+PiArCQkJaWYg
-KGZpcnN0X3NpYmxpbmcgPT0gY3B1KSB7Cj4+ICsJCQkJbWFwW2NwdV0gPSBjcHVfdG9fcXVldWVf
-aW5kZXgocW1hcCwgbnJfcXVldWVzLCBjb3JlKTsKPj4gKwkJCQljb3JlKys7Cj4+ICsJCQl9IGVs
-c2UKPj4gIAkJCQltYXBbY3B1XSA9IG1hcFtmaXJzdF9zaWJsaW5nXTsKPj4gIAkJfQo+PiAgCX0K
-Pj4gCg==
+
+
+On 03/23/2019 02:34 PM, luferry wrote:
+> 
+> I just bought one vm , so i cannot access to hypervisor. I will try to build the environment on my desktop.
+> I'm sure about something.
+> The hypervisor is KVM and disk driver is virtio-blk.
+> [root@blk-mq ~]# dmesg |grep KVM
+> [    0.000000] Hypervisor detected: KVM
+> [    0.186330] Booting paravirtualized kernel on KVM
+> [    0.279106] KVM setup async PF for cpu 0
+> [    0.420819] KVM setup async PF for cpu 1
+> [    0.421682] KVM setup async PF for cpu 2
+> [    0.422113] KVM setup async PF for cpu 3
+> [    0.422434] KVM setup async PF for cpu 4
+> [    0.422434] KVM setup async PF for cpu 5
+> [    0.423312] KVM setup async PF for cpu 6
+> [    0.423394] KVM setup async PF for cpu 7
+> [    0.424125] KVM setup async PF for cpu 8
+> [    0.424414] KVM setup async PF for cpu 9
+> [    0.424415] KVM setup async PF for cpu 10
+> [    0.425329] KVM setup async PF for cpu 11
+> [    0.425420] KVM setup async PF for cpu 12
+> [    0.426156] KVM setup async PF for cpu 13
+> [    0.426431] KVM setup async PF for cpu 14
+> [    0.426431] KVM setup async PF for cpu 15
+> [root@blk-mq ~]# lspci |grep block
+> 00:05.0 SCSI storage controller: Red Hat, Inc. Virtio block device
+> 00:06.0 SCSI storage controller: Red Hat, Inc. Virtio block device
+> 
+> [root@blk-mq ~]# lscpu
+> Architecture:          x86_64
+> CPU op-mode(s):        32-bit, 64-bit
+> Byte Order:            Little Endian
+> CPU(s):                16
+> On-line CPU(s) list:   0-15
+> Thread(s) per core:    2
+> Core(s) per socket:    8
+> 
+> [root@blk-mq ~]# ls /sys/block/vdb/mq/
+> 0  1  2  3
+> 
+> [root@blk-mq ~]# cat /proc/cpuinfo |egrep 'processor|core id'
+> processor	: 0
+> core id		: 0
+> processor	: 1
+> core id		: 0
+> processor	: 2
+> core id		: 1
+> processor	: 3
+> core id		: 1
+> processor	: 4
+> core id		: 2
+> processor	: 5
+> core id		: 2
+> processor	: 6
+> core id		: 3
+> processor	: 7
+> core id		: 3
+> processor	: 8
+> core id		: 4
+> processor	: 9
+> core id		: 4
+> processor	: 10
+> core id		: 5
+> processor	: 11
+> core id		: 5
+> processor	: 12
+> core id		: 6
+> processor	: 13
+> core id		: 6
+> processor	: 14
+> core id		: 7
+> processor	: 15
+> core id		: 7
+> 
+> --before this patch--
+> [root@blk-mq ~]# cat /sys/block/vdb/mq/*/cpu_list
+> 0, 4, 5, 8, 9, 12, 13
+> 1
+> 2, 6, 7, 10, 11, 14, 15
+> 3
+> 
+> --after this patch--
+> [root@blk-mq ~]# cat /sys/block/vdb/mq/*/cpu_list
+> 0, 4, 5, 12, 13
+> 1, 6, 7, 14, 15
+> 2, 8, 9
+> 3, 10, 11
+> 
+> 
+> I add dump_stack insert blk_mq_map_queues.
+> 
+> [    1.378680] Call Trace:
+> [    1.378690]  dump_stack+0x5a/0x73
+> [    1.378695]  blk_mq_map_queues+0x29/0xb0
+> [    1.378700]  blk_mq_alloc_tag_set+0x1bd/0x2d0
+> [    1.378705]  virtblk_probe+0x1ae/0x8e4 [virtio_blk]
+> [    1.378709]  virtio_dev_probe+0x18a/0x230 [virtio]
+> [    1.378713]  really_probe+0x215/0x3f0
+> [    1.378716]  driver_probe_device+0x115/0x130
+> [    1.378718]  device_driver_attach+0x50/0x60
+> [    1.378720]  __driver_attach+0xbd/0x140
+> [    1.378722]  ? device_driver_attach+0x60/0x60
+> [    1.378724]  bus_for_each_dev+0x67/0xc0
+> [    1.378727]  ? klist_add_tail+0x57/0x70
+
+I am not able to reproduce above call stack when virtio-blk is assigned 4 queues
+while my qemu cmdline is "-smp 16,sockets=1,cores=8,threads=2".
+
+# cat /sys/block/vda/mq/0/cpu_list
+0, 1, 2, 3
+# cat /sys/block/vda/mq/1/cpu_list
+4, 5, 6, 7
+# cat /sys/block/vda/mq/2/cpu_list
+8, 9, 10, 11
+# cat /sys/block/vda/mq/3/cpu_list
+12, 13, 14, 15
+
+
+I do agree in above case we would have issue if the mapping is established by
+blk_mq_map_queues().
+
+
+However, I am just curious how we finally reach at blk_mq_map_queues() from
+blk_mq_alloc_tag_set()?
+
+It should be something like:
+
+blk_mq_alloc_tag_set()
+ -> blk_mq_update_queue_map()
+      -> if (set->ops->map_queues && !is_kdump_kernel())
+             return set->ops->map_queues(set);
+      -> else
+             return blk_mq_map_queues(&set->map[HCTX_TYPE_DEFAULT]);
+
+Wouldn't we always have set->ops->map_queues = virtblk_map_queues()?
+
+Or the execution reach at:
+
+virtblk_map_queues()
+ -> blk_mq_virtio_map_queues()
+     -> if (!vdev->config->get_vq_affinity)
+            return blk_mq_map_queues(qmap);
+     -> else
+            establish the mapping via get_vq_affinity
+
+but vdev->config->get_vq_affinity == NULL?
+
+For virtio pci, get_vq_affinity is always set. Seems virtio mmio would not set
+get_vq_affinity.
+
+
+I used to play with firecracker (by amazon) and it is interesting firecracker
+uses mmio to setup virtio-blk.
+
+
+Sorry for disturbing the review of this patch. I just would like to clarify in
+which scenario we would hit this issue, e.g., when virtio-blk is based on mmio?
+
+Dongli Zhang
+
+> 
+> 
+> At 2019-03-22 19:58:08, "Dongli Zhang" <dongli.zhang@oracle.com> wrote:
+>>
+>>
+>> On 03/22/2019 06:09 PM, luferry wrote:
+>>> under virtual machine environment, cpu topology may differ from normal
+>>> physical server.
+>>
+>> Would mind share the name of virtual machine monitor, the command line if
+>> available, and which device to reproduce.
+>>
+>> For instance, I am not able to reproduce with qemu nvme or virtio-blk as I
+>> assume they use pci or virtio specific mapper to establish the mapping.
+>>
+>> E.g., with qemu and nvme: -smp 8,sockets=1,cores=4,threads=2
+>>
+>> Indeed I use three queues instead of twp as one is reserved for admin.
+>>
+>> # ls /sys/block/nvme0n1/mq/*
+>> /sys/block/nvme0n1/mq/0:
+>> cpu0  cpu1  cpu2  cpu3  cpu_list  nr_reserved_tags  nr_tags
+>>
+>> /sys/block/nvme0n1/mq/1:
+>> cpu4  cpu5  cpu6  cpu7  cpu_list  nr_reserved_tags  nr_tags
+>>
+>>
+>> Thank you very much!
+>>
+>> Dongli Zhang
+>>
+>>> for example (machine with 4 cores, 2 threads per core):
+>>>
+>>> normal physical server:
+>>> core-id   thread-0-id  thread-1-id
+>>> 0         0            4
+>>> 1         1            5
+>>> 2         2            6
+>>> 3         3            7
+>>>
+>>> virtual machine:
+>>> core-id   thread-0-id  thread-1-id
+>>> 0         0            1
+>>> 1         2            3
+>>> 2         4            5
+>>> 3         6            7
+>>>
+>>> When attach disk with two queues, all the even numbered cpus will be
+>>> mapped to queue 0. Under virtual machine, all the cpus is followed by
+>>> its sibling cpu.Before this patch, all the odd numbered cpus will also
+>>> be mapped to queue 0, can cause serious imbalance.this will lead to
+>>> performance impact on system IO
+>>>
+>>> So suggest to allocate cpu map by core id, this can be more currency
+>>>
+>>> Signed-off-by: luferry <luferry@163.com>
+>>> ---
+>>>  block/blk-mq-cpumap.c | 9 +++++----
+>>>  1 file changed, 5 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/block/blk-mq-cpumap.c b/block/blk-mq-cpumap.c
+>>> index 03a534820271..4125e8e77679 100644
+>>> --- a/block/blk-mq-cpumap.c
+>>> +++ b/block/blk-mq-cpumap.c
+>>> @@ -35,7 +35,7 @@ int blk_mq_map_queues(struct blk_mq_queue_map *qmap)
+>>>  {
+>>>  	unsigned int *map = qmap->mq_map;
+>>>  	unsigned int nr_queues = qmap->nr_queues;
+>>> -	unsigned int cpu, first_sibling;
+>>> +	unsigned int cpu, first_sibling, core = 0;
+>>>  
+>>>  	for_each_possible_cpu(cpu) {
+>>>  		/*
+>>> @@ -48,9 +48,10 @@ int blk_mq_map_queues(struct blk_mq_queue_map *qmap)
+>>>  			map[cpu] = cpu_to_queue_index(qmap, nr_queues, cpu);
+>>>  		} else {
+>>>  			first_sibling = get_first_sibling(cpu);
+>>> -			if (first_sibling == cpu)
+>>> -				map[cpu] = cpu_to_queue_index(qmap, nr_queues, cpu);
+>>> -			else
+>>> +			if (first_sibling == cpu) {
+>>> +				map[cpu] = cpu_to_queue_index(qmap, nr_queues, core);
+>>> +				core++;
+>>> +			} else
+>>>  				map[cpu] = map[first_sibling];
+>>>  		}
+>>>  	}
+>>>
