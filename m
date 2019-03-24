@@ -1,122 +1,131 @@
-Return-Path: <SRS0=7zlQ=R2=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=54qS=R3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5410DC43381
-	for <linux-block@archiver.kernel.org>; Sat, 23 Mar 2019 19:31:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 005A8C43381
+	for <linux-block@archiver.kernel.org>; Sun, 24 Mar 2019 09:11:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 04E22218D4
-	for <linux-block@archiver.kernel.org>; Sat, 23 Mar 2019 19:31:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Fq/LJxRO"
+	by mail.kernel.org (Postfix) with ESMTP id BFF2F21741
+	for <linux-block@archiver.kernel.org>; Sun, 24 Mar 2019 09:11:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1553418711;
+	bh=iAzV3yUmG70CBC/tUbEk+4CM5j8K4sFFs2wduRWC3qk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=r0z1gbA6MQy75YL/oOvydqgyg4E2ccCIVjGKAzMJ5sr0o2ajzImktV2HnHjO7mrdK
+	 F9uS2y7J07eKLubSYJ1TVwVc8232sbozmZtbm4r6ef9zaCDb97zs3R0X+DsdTWw9bz
+	 aAKgS4tHxZg2UqTtz7IYTYNOpAjDnMETEfxEQqlY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727679AbfCWTbs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 23 Mar 2019 15:31:48 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:44891 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727544AbfCWTbr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 23 Mar 2019 15:31:47 -0400
-Received: by mail-pf1-f195.google.com with SMTP id a3so3682928pff.11
-        for <linux-block@vger.kernel.org>; Sat, 23 Mar 2019 12:31:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=TtXvO2t5VbuatZT1Y8UWmD4czXR168NpO+FrozFDT6A=;
-        b=Fq/LJxROnAb3qQ5FaH9JZGvmLMAJJ1hR+vKAFhtdJw+v8g/V3Vt+KRyUyCRa8xxkjd
-         sVbKNOj+Ya/s0HXaBVXfjGQDccY++xAZaocOPhNCM/dV/Zt/GtFR1uAFBuLqhsYY5PZS
-         fihFF+kq04syS7amxo1mWLjpKzfzBCR/RdInRCaiIXjMp09RL8V1UcYhE7UPK3Tyk9iY
-         JcftogVOuAk9CIgBU5W9BAcO68X/4+PD5PqBzxlmd1Vcmgk/NxE572qQpRVV9Xm6qi5W
-         MbVLoP/RuLesceFtIoG1+Aig91YrVMUIXGF/hViBao3f3Y3ZgpFNScldtB44CaRb5LLu
-         dXyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=TtXvO2t5VbuatZT1Y8UWmD4czXR168NpO+FrozFDT6A=;
-        b=Tcq4NkeP8pI8fWhjMs9NrbY7NCV4nozEzc/FBWubdHsl1zdjy12QhtyTKPftGFOIEW
-         BSq0hOf33Dk467eD98nk5W2Qkrcf4eNxT7NxwZp3tmqNrYpfGQA7wehQwzWZlibu1DMe
-         VHdcpbk6rFgnveIklUztKkE8UfLxXK/j/kZcNt2mkb7EyxuwlOEvxIAJLgiQQj1fFI0r
-         O1WDCfTbaM94n56r2iRxcMKESXukmJVc5lfCSu1pFAGAFHtwalKORRrCNEQomg1aesM3
-         uesuPIvCZTLBxvVqGa/GvNMoPi6OHUSEuOG+JvtF+vktrdIRLl0cEGQQT1G12tP6u0J2
-         YtQg==
-X-Gm-Message-State: APjAAAVceFIh+jrz6Dvo5nQgYotEUu7sSGBxyIeaxVl/qyJ2dDEL158k
-        NhUH8PM1F9+v8OsUdkEGkWwh/Q==
-X-Google-Smtp-Source: APXvYqwohWHiUcvhcXfYACNjPo2fOtpk97PFsKMvUWgGK98vWPMFzsmBJPxi7LKXVdrdfMBqlJ/RfA==
-X-Received: by 2002:a63:e80d:: with SMTP id s13mr15283505pgh.379.1553369506911;
-        Sat, 23 Mar 2019 12:31:46 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id v18sm13962124pfm.165.2019.03.23.12.31.44
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 23 Mar 2019 12:31:45 -0700 (PDT)
-Subject: Re: [PATCH v2 1/3] block: bio: kill BIO_SEG_VALID flag
-To:     Johannes Thumshirn <jthumshirn@suse.de>
-Cc:     Hannes Reinecke <hare@suse.de>,
+        id S1726347AbfCXJLu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 24 Mar 2019 05:11:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53346 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726139AbfCXJLu (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 24 Mar 2019 05:11:50 -0400
+Received: from localhost (unknown [193.47.165.251])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1F5BD2171F;
+        Sun, 24 Mar 2019 09:11:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1553418709;
+        bh=iAzV3yUmG70CBC/tUbEk+4CM5j8K4sFFs2wduRWC3qk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=C7tTZosOV3ZpF2kLFD5L4Y9p5WJAkLcfLUq5uD2pIoO8bnTz6MUnoOhPum7rSxZox
+         qnt1jQgCrY+1Nb843+1Sgstj4ARh+OP27iAunn5VA7CGdxmqFGXAykp0d24LyQb6Jt
+         xPqEldCm8JlDHqxe48d8VpAIwikDYdqUpVYK6By0=
+Date:   Sun, 24 Mar 2019 11:11:46 +0200
+From:   Leon Romanovsky <leon@kernel.org>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Max Gurtovoy <maxg@mellanox.com>,
+        Yamin Friedman <yaminf@mellanox.com>,
         Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
-        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
-        Linux FSDEVEL Mailinglist <linux-fsdevel@vger.kernel.org>
-References: <20190322131346.20169-1-jthumshirn@suse.de>
- <20190322131346.20169-2-jthumshirn@suse.de>
- <8273b995-01c2-fbf4-b8be-484508c65938@kernel.dk>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <1b279b39-310c-b180-a880-79a3f65df48e@kernel.dk>
-Date:   Sat, 23 Mar 2019 13:31:43 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        Tal Gilboa <talgi@mellanox.com>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Yishai Hadas <yishaih@mellanox.com>,
+        Saeed Mahameed <saeedm@mellanox.com>,
+        Doug Ledford <dledford@redhat.com>,
+        Idan Burstein <idanb@mellanox.com>,
+        Tariq Toukan <tariqt@mellanox.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [RFC/PATCH net-next 0/9] net/dim: Support for multiple
+ implementations
+Message-ID: <20190324091146.GZ4823@mtr-leonro.mtl.com>
+References: <20190306084832.57753-1-talgi@mellanox.com>
+ <1551888921.9796.2.camel@acm.org>
+ <392082ba-9aeb-6c5e-53a0-7bb53ce101fa@grimberg.me>
+ <010bc92c-55c1-c5bd-82a5-975aa7f7c735@mellanox.com>
+ <50b3659d-fd88-85b0-755e-49565fbe98c2@mellanox.com>
+ <89a41878-c88b-c0a2-64ef-4409b907ece6@mellanox.com>
+ <4c7b78ff-e906-8e67-c3ad-495b858ce82c@grimberg.me>
+ <226b674a-8ccb-864a-6153-be38ebcc3133@mellanox.com>
+ <20190320111058.GU4823@mtr-leonro.mtl.com>
+ <6599b66b-04d8-13e0-905a-9ab3862b30f5@grimberg.me>
 MIME-Version: 1.0
-In-Reply-To: <8273b995-01c2-fbf4-b8be-484508c65938@kernel.dk>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="vDEbda84Uy/oId5W"
+Content-Disposition: inline
+In-Reply-To: <6599b66b-04d8-13e0-905a-9ab3862b30f5@grimberg.me>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/22/19 4:00 PM, Jens Axboe wrote:
-> On 3/22/19 7:13 AM, Johannes Thumshirn wrote:
->> @@ -712,7 +714,10 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
->>  	bvec->bv_len = len;
->>  	bvec->bv_offset = offset;
->>  	bio->bi_vcnt++;
->> -	bio->bi_phys_segments++;
->> +	if (bio->bi_phys_segments == -1)
->> +		bio->bi_phys_segments = 1;
->> +	else
->> +		bio->bi_phys_segments++;
->>  	bio->bi_iter.bi_size += len;
-> 
-> Echo Christophs suggestion here.
-> 
->> diff --git a/block/blk-core.c b/block/blk-core.c
->> index 4673ebe42255..53372a16dd7c 100644
->> --- a/block/blk-core.c
->> +++ b/block/blk-core.c
->> @@ -1514,6 +1514,7 @@ void blk_rq_bio_prep(struct request_queue *q, struct request *rq,
->>  	else if (bio_op(bio) == REQ_OP_DISCARD)
->>  		rq->nr_phys_segments = 1;
->>  
->> +	WARN_ON(rq->nr_phys_segments == -1);
->>  	rq->__data_len = bio->bi_iter.bi_size;
->>  	rq->bio = rq->biotail = bio;
-> 
-> Just make that:
-> 
-> 	else
-> 		rq->nr_phys_segments = 0;
-> 
-> for the third case?
 
-Would be great if you could spin a v3 with the mentioned changes, against
-master since the BIO_NO_PAGE_REF change is now merged there.
+--vDEbda84Uy/oId5W
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
--- 
-Jens Axboe
+On Wed, Mar 20, 2019 at 11:34:27AM -0700, Sagi Grimberg wrote:
+>
+> > It doesn't sound reasonable that we have per-ULP feature (DIM is
+> > per-ULP) to be configured globally. Especially given the fact that
+> > users can find themselves running different workloads with different
+> > requirements on the same system.
+> >
+> > Currently each ULP has some sort of tool to configure itself and I think
+> > that once ULP is converted to use DIM, it should have on/off knob in the
+> > tool used by their users.
+>
+> Its not any different than socket options that can have a global sysctl
+> knob that can be overridden by individual socket consumers.
 
+Right, but there is a major difference between socket example and
+your proposal.
+
+Combination of socket option with general knob gives you maximum
+versatility in order to disable/enable/configure through program
+or through some sensible default. In your proposal, you will limit
+yourself to some system wide default, without any ability to override
+it specifically for your load.
+
+Thanks
+
+--vDEbda84Uy/oId5W
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBAgAGBQJcl0nSAAoJEORje4g2clinFTcQAMUh0hYQcyUcKj1te6V95YL8
+qIGHGvOmYNitbN2sKijNUWfgebW4ehmQTtl62dq/zoN1Y0BYtsXnDoDHuao1rdg+
+BaEz6yM6v8ut1ukZ6xnayexrYp1hHGHmXl85qHL/PGcR0yHWd2/XvZDXC2oTs8aS
+SkkPay/LBYcMxZJF38c2AkFDrZhux4hukE8E2l5Xiclyj3QKccb/TRR3E/vpzTcB
+GkMfg0iTV7XYLXB0REMsfT2fbsH1O3AneE9CDP6HZMwDN49/Ev6jNaXx9w8K3WLd
+uV5olgk67XMpyJzbNROmJrbvWp1GaMxagVHuRuMxxb4CdMSgZWej/49qvzrtEitk
+KRPC2ZEsTUrMEVFIlu/prALqud6UdNVL9T065Np86j+t+tz+AJeIVVWhqStV7WPR
+qwLVfd8UjXvVJ2OgUNyw0FANLW7l9sjOK2XajVEAX4kXbATtkWB6lwssX6vDVsOV
+YhwDezrYJZcZDgH1HzuwCjkuf2aTR4trmqtxFnLqpbYZeo3UlWPYJnxk5UH5u9Lb
+RU5G8/ld+o52QbsdDZSQ6q+RjeFbZvrBBpVHE0sP7JPWRoX6gp8jM4KPV7GVLFER
+h6MiFqSAitmwTN9nmeYzzRYPhQq9x0/zmkfAwd/0lPWBGPBBKKgLMZsbgbCZIbLQ
+VA+itmD38e7U6PqLdbVe
+=LeWq
+-----END PGP SIGNATURE-----
+
+--vDEbda84Uy/oId5W--
