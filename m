@@ -2,85 +2,107 @@ Return-Path: <SRS0=54qS=R3=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0E1BC43381
-	for <linux-block@archiver.kernel.org>; Sun, 24 Mar 2019 16:25:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E90C43381
+	for <linux-block@archiver.kernel.org>; Sun, 24 Mar 2019 21:10:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 991F420883
-	for <linux-block@archiver.kernel.org>; Sun, 24 Mar 2019 16:25:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="h4IZR0Gq"
+	by mail.kernel.org (Postfix) with ESMTP id 294E02147A
+	for <linux-block@archiver.kernel.org>; Sun, 24 Mar 2019 21:10:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726889AbfCXQZq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 24 Mar 2019 12:25:46 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:46677 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726811AbfCXQZq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 24 Mar 2019 12:25:46 -0400
-Received: by mail-pg1-f194.google.com with SMTP id a22so4719998pgg.13
-        for <linux-block@vger.kernel.org>; Sun, 24 Mar 2019 09:25:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=a413qc4UWdxcy1b4xS2ceHgjk5uQtS1GJU8cEu0SkNI=;
-        b=h4IZR0GqIJ3Gun0vgSJjVqrWsfbBmx7U4Ufl1RBhWptz80zo1cUK9qGC/34bOWRO6h
-         kY/tXufk86JTKSXHMO7o/D97XHJL3iT3UkAmWUL+5H2Rhm/UQh5CUOJeROJ+Xn1+hoNB
-         exTfHsDwETTcZaJ8ByFtwYZkB2e5yzTEb/a9kI3ZeoQ+R0jOClGmA/QBECl94sFjm1YC
-         A6dDDg7ssIu8LwLaahXCWPh92A+yi8ZfldqYDXaX4sHXRzVHtUP612jL+rb+hc9XUXbq
-         tChMudvTvbCZC8QP+rPp552GhvdxhmX4zZNL91sl+RGXrWb3mrXKe00rjdSSx53tC5ok
-         Pttg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=a413qc4UWdxcy1b4xS2ceHgjk5uQtS1GJU8cEu0SkNI=;
-        b=auhsRclEBubWdmmiCnQ1u393c0MGxZPadq05HW+vFiLMUx69Pjk3LKwHgnClCuns9H
-         m0LBuP+QY/WQ9zcXfXn5Bh7gKeFKa/7MFmkyTIz6CxnPL3lBMca5Y/WwQxuuvbfYjZs0
-         LTv3N9Ev6HuKzLmWrorjHlc66IPoqrlbDsKohwzu8qc4IQ4m9Nh+5ZxmljRMICv5+asW
-         YkpYzER17sqJKk7gpDj/lnf0iI1dAPuHUmYteEvjG87lTFrc6BcIdjsQbRWqq2IYpzit
-         wu8Y74jHYphGMPWXlxhlLrRRwQzSssyBD4WCf7891549ZYbSsJH+U9jPzi2LH+3dOXGC
-         v8cA==
-X-Gm-Message-State: APjAAAUmJrVoGDhSyl9Sch1sAXxqJmYsEB5xbuoYMjbrvfQvzUKdqtxa
-        XtDBz55B2jRRGGcjxhXZN4Jmk39VmAuybS0f
-X-Google-Smtp-Source: APXvYqzAskbk3HgEzTPlN3Q4HUQbOMwzSd8RMkSlZFVCeKbLURzDaqySMX+ciaD6bMn9oPsrY+V3qA==
-X-Received: by 2002:a62:29c6:: with SMTP id p189mr20247474pfp.194.1553444745431;
-        Sun, 24 Mar 2019 09:25:45 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id x11sm18075071pfa.154.2019.03.24.09.25.44
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 24 Mar 2019 09:25:44 -0700 (PDT)
-Subject: Re: [PATCH 0/2] blk-mq: cleaup code and update comment
-To:     Yufen Yu <yuyufen@huawei.com>, linux-block@vger.kernel.org
-References: <20190324095708.77658-1-yuyufen@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <fee7f93a-0c28-36ad-89d5-c89051295319@kernel.dk>
-Date:   Sun, 24 Mar 2019 10:25:43 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        id S1728857AbfCXVKT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 24 Mar 2019 17:10:19 -0400
+Received: from mga02.intel.com ([134.134.136.20]:10185 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726317AbfCXVKT (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 24 Mar 2019 17:10:19 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Mar 2019 14:10:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,256,1549958400"; 
+   d="scan'208";a="331600917"
+Received: from pnass-mobl.ger.corp.intel.com (HELO mara.localdomain) ([10.249.136.221])
+  by fmsmga005.fm.intel.com with ESMTP; 24 Mar 2019 14:10:11 -0700
+Received: from sailus by mara.localdomain with local (Exim 4.89)
+        (envelope-from <sakari.ailus@linux.intel.com>)
+        id 1h8ANd-0000IX-8x; Sun, 24 Mar 2019 23:10:09 +0200
+Date:   Sun, 24 Mar 2019 23:10:08 +0200
+From:   Sakari Ailus <sakari.ailus@linux.intel.com>
+To:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
+        Petr Mladek <pmladek@suse.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        scsi <linux-scsi@vger.kernel.org>,
+        Linux PM list <linux-pm@vger.kernel.org>,
+        Linux MMC List <linux-mmc@vger.kernel.org>,
+        "linux-nvdimm@lists.01.org" <linux-nvdimm@lists.01.org>,
+        linux-um@lists.infradead.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-block@vger.kernel.org,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        linux-btrfs <linux-btrfs@vger.kernel.org>,
+        linux-pci <linux-pci@vger.kernel.org>,
+        sparclinux <sparclinux@vger.kernel.org>,
+        xen-devel@lists.xenproject.org,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        Linux MM <linux-mm@kvack.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Lars Ellenberg <drbd-dev@lists.linbit.com>
+Subject: Re: [PATCH 0/2] Remove support for deprecated %pf and %pF in vsprintf
+Message-ID: <20190324211008.lypghym3gqcp62th@mara.localdomain>
+References: <20190322132108.25501-1-sakari.ailus@linux.intel.com>
+ <CAMuHMdVmqqjVx7As9AAywYxYXG=grijF5rF77OBn6TUjM9+xKw@mail.gmail.com>
+ <20190322135350.2btpno7vspvewxvk@paasikivi.fi.intel.com>
+ <20190322170550.GX9224@smile.fi.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20190324095708.77658-1-yuyufen@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190322170550.GX9224@smile.fi.intel.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/24/19 3:57 AM, Yufen Yu wrote:
-> Hi,
-> 
-> This patchset replace blk_mq_put_driver_tag_hctx() by blk_mq_put_driver_tag(),
-> and update comment for blk_mq_hctx_has_pending().
+Hi Andy,
 
-Both look good to me, and it's nice to get rid of the _hctx() tag put variant.
+On Fri, Mar 22, 2019 at 07:05:50PM +0200, Andy Shevchenko wrote:
+> On Fri, Mar 22, 2019 at 03:53:50PM +0200, Sakari Ailus wrote:
+> 
+> > Porting a patch
+> > forward should have no issues either as checkpatch.pl has been complaining
+> > of the use of %pf and %pF for a while now.
+> 
+> And that's exactly the reason why I think instead of removing warning on
+> checkpatch, it makes sense to convert to an error for a while. People are
+> tending read documentation on internet and thus might have outdated one. And
+> yes, the compiler doesn't tell a thing about it.
+> 
+> P.S. Though, if majority of people will tell that I'm wrong, then it's okay to
+> remove.
+
+I wonder if you wrote this before seeing my other patchset.
+
+For others as the background, it adds %pfw to print fwnode node names.
+Assuming this would be merged, %pfw could be in use relatively soon. With
+the current patchset, %pf prints nothing just as %pO ("F" missing).
+
+What I think could be done is to warn of plain %pf (without following "w")
+in checkpatch.pl, and %pf that is not followed by "w" in the kernel.
+Although we didn't have such checks to begin with. The case is still a
+little bit different as %pf used to be a valid conversion specifier whereas
+%pO likely has never existed.
+
+So, how about adding such checks in the other set? I can retain %p[fF] check
+here, too, if you like.
 
 -- 
-Jens Axboe
+Kind regards,
 
+Sakari Ailus
+sakari.ailus@linux.intel.com
