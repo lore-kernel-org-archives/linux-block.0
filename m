@@ -2,134 +2,125 @@ Return-Path: <SRS0=AbZH=R4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76297C43381
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 12:26:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68FBDC43381
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 13:32:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2CE802085A
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 12:26:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Drz3epJW";
-	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="DzWJk9lD"
+	by mail.kernel.org (Postfix) with ESMTP id 40F0320863
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 13:32:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730899AbfCYM0n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Mar 2019 08:26:43 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:61066 "EHLO
-        esa6.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730889AbfCYM0n (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Mar 2019 08:26:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1553516802; x=1585052802;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=QV/oHXdX+wyxPQAvmd7H9VYOo7mavSmvgfBMM8p7d88=;
-  b=Drz3epJWmjENbDFpIhZRP1rY3hspgcPdVcBLbLxiZIo9ndL71BaLdR0B
-   uNbtSMxFBCXpBmydd8+BuVDL6WHhEfYJQAKVuDik8YDyOQ5pYGSYt5OxZ
-   x+6+VLQrminJuCNZESA+PNe5bLMBtF40On4gVFrFEiUA4QSaku/7iLxWS
-   FQppfgy8J7sZNS4X+/q6XnpGs8hxrVXQypu91A28u4GitJrGoINe7gfav
-   KfsyYTHNGppziQvfwFFD3HGnrD5qPvTvM/r4WnCRKaeJ24TGHZZUNvQBd
-   Az9lW+ZkQ8b7QTM396xleNf+3vEVmzKOTUG5KzwP5Ta8I8l79Tv7r1Awp
-   A==;
-X-IronPort-AV: E=Sophos;i="5.60,256,1549900800"; 
-   d="scan'208";a="105894841"
-Received: from mail-by2nam05lp2054.outbound.protection.outlook.com (HELO NAM05-BY2-obe.outbound.protection.outlook.com) ([104.47.50.54])
-  by ob1.hgst.iphmx.com with ESMTP; 25 Mar 2019 20:26:42 +0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector1-wdc-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5ZFX3LuGU/GT3udWTqeoBqXcg5G7vpQkOeXPvZ8c+a0=;
- b=DzWJk9lDDcSNdxmsqnPrExecYC/EutOEICqh1RphUgC1PMO9ecHR2RUT8UY0eLU/Fz3/DLgt0AfmKu8i2ukbtHFJz1qfJjyV9AAZOQxL6D2I1PPMHly06J1Is9Nq3Aio9mkz1u9/4v5F2v9JfyIf2cHEeGbmvSjmAMd2hOZm/io=
-Received: from CY1PR04MB2268.namprd04.prod.outlook.com (10.167.9.7) by
- CY1PR04MB2009.namprd04.prod.outlook.com (10.166.191.22) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1730.16; Mon, 25 Mar 2019 12:26:39 +0000
-Received: from CY1PR04MB2268.namprd04.prod.outlook.com
- ([fe80::68b3:fe7a:76bd:6c33]) by CY1PR04MB2268.namprd04.prod.outlook.com
- ([fe80::68b3:fe7a:76bd:6c33%6]) with mapi id 15.20.1730.019; Mon, 25 Mar 2019
- 12:26:39 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Yi Zhang <yi.zhang@redhat.com>, "osandov@fb.com" <osandov@fb.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests] check: add zoned sysfs node checking in
- _test_dev_is_zoned
-Thread-Topic: [PATCH blktests] check: add zoned sysfs node checking in
- _test_dev_is_zoned
-Thread-Index: AQHU4IcKjy157LlJ/Um710EEqlYAaw==
-Date:   Mon, 25 Mar 2019 12:26:39 +0000
-Message-ID: <CY1PR04MB2268E117640C7A672F0F1F95ED5E0@CY1PR04MB2268.namprd04.prod.outlook.com>
-References: <20190322081228.21898-1-yi.zhang@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=shinichiro.kawasaki@wdc.com; 
-x-originating-ip: [199.255.47.11]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c2085082-115b-4746-2569-08d6b11d2196
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4618075)(2017052603328)(7153060)(7193020);SRVR:CY1PR04MB2009;
-x-ms-traffictypediagnostic: CY1PR04MB2009:
-wdcipoutbound: EOP-TRUE
-x-microsoft-antispam-prvs: <CY1PR04MB200934183907E565DF6BB719ED5E0@CY1PR04MB2009.namprd04.prod.outlook.com>
-x-forefront-prvs: 0987ACA2E2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(346002)(39860400002)(366004)(376002)(396003)(136003)(199004)(189003)(102836004)(3846002)(476003)(6116002)(316002)(106356001)(105586002)(229853002)(53936002)(6436002)(110136005)(25786009)(44832011)(486006)(5660300002)(52536014)(33656002)(446003)(9686003)(6246003)(478600001)(55016002)(4326008)(26005)(81166006)(99286004)(8936002)(305945005)(4744005)(2501003)(7696005)(76176011)(81156014)(186003)(74316002)(8676002)(86362001)(68736007)(6506007)(53546011)(14444005)(71200400001)(2906002)(71190400001)(97736004)(7736002)(14454004)(256004)(66066001);DIR:OUT;SFP:1102;SCL:1;SRVR:CY1PR04MB2009;H:CY1PR04MB2268.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: YuHRLLEUDMMppUxgnDJmnrZp2Wpvb/MVWwDy61jZiwNEAb5jI5W1rwq09hqsNIfH1zuRWFRWNytCAQGdcAYHEdiz5xruL+RmBmuOLlv7+ns96I1oumN7ILoHyzl9ginK4Vr1Zj0eltI3G+gaSmQLR2wlS8SSA5C7BuiqW0rDgKiq7vrPHpvJmDoCbE2ATzlCdNftEttkuTUw7M+OXZFUvY+vcJr419B660tbaB4bHWN8NPg3hRndTdHX4y71wm70HEk+Rr5y3y1PMZCBum3K3yZNueLQu3Pq/7fBfyNDsTcl++roMOy2Q6OzEUa6Vg4rfJGZ1+ylKW6PVkco8F3A2L0TLGU9Dcd9Qi01ntRviN1YVGzjPnFBkVG8TLjvJV9FtYtxe+XN0c/uYbJL0pIl+dVO7cyqL54n8sHYnGbhfgI=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1726207AbfCYNcM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Mar 2019 09:32:12 -0400
+Received: from mx2.suse.de ([195.135.220.15]:37244 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728645AbfCYNcM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Mar 2019 09:32:12 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id DCC49AC8B;
+        Mon, 25 Mar 2019 13:32:09 +0000 (UTC)
+Subject: Re: [PATCH v2 1/3] block: bio: kill BIO_SEG_VALID flag
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
+        Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        Linux FSDEVEL Mailinglist <linux-fsdevel@vger.kernel.org>
+References: <20190322131346.20169-1-jthumshirn@suse.de>
+ <20190322131346.20169-2-jthumshirn@suse.de>
+ <8273b995-01c2-fbf4-b8be-484508c65938@kernel.dk>
+ <1b279b39-310c-b180-a880-79a3f65df48e@kernel.dk>
+From:   Johannes Thumshirn <jthumshirn@suse.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <383491c4-d23a-2f5c-7d5f-400371cb79f9@suse.de>
+Date:   Mon, 25 Mar 2019 14:32:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.0
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c2085082-115b-4746-2569-08d6b11d2196
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2019 12:26:39.4689
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR04MB2009
+In-Reply-To: <1b279b39-310c-b180-a880-79a3f65df48e@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/22/19 5:12 PM, Yi Zhang wrote:=0A=
-> Some kernel may not have zoned sysfs node, e.g. RHEL7, checking if=0A=
-> it exists first in _test_dev_is_zoned.=0A=
-> =0A=
-> Signed-off-by: Yi Zhang <yi.zhang@redhat.com>=0A=
-> ---=0A=
->   check | 2 +-=0A=
->   1 file changed, 1 insertion(+), 1 deletion(-)=0A=
-> =0A=
-> diff --git a/check b/check=0A=
-> index f0ca382..459104d 100755=0A=
-> --- a/check=0A=
-> +++ b/check=0A=
-> @@ -405,7 +405,7 @@ _call_test() {=0A=
->   }=0A=
->   =0A=
->   _test_dev_is_zoned() {=0A=
-> -	if grep -qe "none" "${TEST_DEV_SYSFS}/queue/zoned" ; then=0A=
-> +	if [[ ! -f "${TEST_DEV_SYSFS}/queue/zoned" ]] || grep -qe "none" "${TES=
-T_DEV_SYSFS}/queue/zoned" ; then=0A=
->   		SKIP_REASON=3D"${TEST_DEV} is not a zoned block device"=0A=
->   		return 1=0A=
->   	fi=0A=
-=0A=
-Hi Yi Zhang. This patch looks good for me.=0A=
-=0A=
-I have prepared Debian oldstable environment with kernel 3.16, which does n=
-ot =0A=
-support "zoned" sysfs attribute. With this kernel, test cases that has =0A=
-test_devices() function and does not have CAN_BE_ZONED=3D1 flag are skipped=
-. This =0A=
-skip is not expected, and the patch avoids it.=0A=
-=0A=
--- =0A=
-Best Regards,=0A=
-Shin'ichiro Kawasaki=0A=
+On 23/03/2019 20:31, Jens Axboe wrote:
+[...]
+> Would be great if you could spin a v3 with the mentioned changes, against
+> master since the BIO_NO_PAGE_REF change is now merged there.
+
+Done.
+
+I just need to figure out the blktests failure form the kbuild robot first.
+
+It takes some time to trigger > 100 runs of nvme/005 and I still don't
+understand what's happening and why.
+
+Byte,
+	Johannes
+-- 
+Johannes Thumshirn                            SUSE Labs Filesystems
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
