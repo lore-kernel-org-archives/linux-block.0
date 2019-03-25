@@ -6,71 +6,71 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB6BC43381
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 06:02:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF2A5C43381
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 06:18:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E5D32087E
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 06:02:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B2F0E2075E
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 06:18:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="GBwSY3Jp"
+	dkim=pass (2048-bit key) header.d=javigon-com.20150623.gappssmtp.com header.i=@javigon-com.20150623.gappssmtp.com header.b="R+vygkp0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729634AbfCYGCS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Mar 2019 02:02:18 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:34648 "EHLO
+        id S1729614AbfCYGSz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Mar 2019 02:18:55 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:40530 "EHLO
         mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729342AbfCYGCS (ORCPT
+        with ESMTP id S1729568AbfCYGSy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Mar 2019 02:02:18 -0400
-Received: by mail-ed1-f68.google.com with SMTP id x14so3760974eds.1
-        for <linux-block@vger.kernel.org>; Sun, 24 Mar 2019 23:02:17 -0700 (PDT)
+        Mon, 25 Mar 2019 02:18:54 -0400
+Received: by mail-ed1-f68.google.com with SMTP id h22so6434332edw.7
+        for <linux-block@vger.kernel.org>; Sun, 24 Mar 2019 23:18:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=javigon-com.20150623.gappssmtp.com; s=20150623;
         h=from:message-id:mime-version:subject:date:in-reply-to:cc:to
          :references;
-        bh=E1lyr5CXTIG+jq8Ouwdce60Eeznfpr/w/V/CNo3Inog=;
-        b=GBwSY3JpidEH9/T1qbruZe2dHYhIGIpsMlhtlcQVunq3BqH5Vj8WYLtJzwVLd7NDRt
-         MQ/KEUeL9mp+j4zkeNAx7xL4R0xX0ZuShcwkcV+UXDBB8oTfbIREMm06BV36PeQAwmkU
-         IxXtngSeZGFlHkMZHtyK3f/oFUEeAXl/XUKkUlpkSASlM3FVygdVNOGmF5ILnG573dOx
-         AFywVXJydytVg84RkcOchA0F+CB7I3k0HPaKuZaLZ9qwaGDaDDLYsirox2auQV41d72E
-         bH58a+LpI07aBk9kHxOFSnrTYzZ1hailcdPnGNPgLy7+JmDOCjwH0LOWSnm9N1wJCiLK
-         kQGg==
+        bh=J8vWZV1sj0udrWFN/jdloh2DqlmF0WWcAxo/duIwbAc=;
+        b=R+vygkp0tJbMq2t6o/X95u2yMA0S8aSIMf9CA7Qtj0L1ttMtFWvufrxJHvsADCqub3
+         0TM41299W6hOpWj7uOQv+GSB9Fjf5WpbvzGVqryBKGYiorajvCdXEYow4U88L26cjZQ+
+         ZKAIbiQQEDbeQD2l0yn+vMiclZa+3Sv5dno0suc4QsHUYoDfsKeZ4buVPolRKtfZdcQt
+         /dbBTOqKYKW7v9iOxrkWHExgXTtYt6FmdXC1dBrIw4ZOZsnS9K+lQqPSYNQuVeyICrnT
+         VVEAaK1lnldlUcfWqXkktrsS/dfTcH4edeio7HHU2BV3OqgBBQcq5T6iWojHaUQXF0CI
+         uSYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:message-id:mime-version:subject:date
          :in-reply-to:cc:to:references;
-        bh=E1lyr5CXTIG+jq8Ouwdce60Eeznfpr/w/V/CNo3Inog=;
-        b=HynlzTq9I4Z1IJsw3v+/grNza9vrtw/7EqD66xUlOQcCtiwiQsAn6mmAkPMqH4wa4N
-         LLFe0sSF3zthp+N6WelO9IVRcojSzmA9L0mJbgjSIzVt+rW+1sxDR70BVQ6QIBXRI9cb
-         NCoeX1RG//awDo+GTGlUpFwo4fJGtr1rRDNmSzAxwa/9ZgqsbldBchzFm56o3YwCpMo4
-         tEFMKoXCdombhswtyOWEAhqZ0zWpyab8YqaB6OW7wHlRIibGtQzbzH4f4q6IVnXClE9h
-         ltPLPmgpsd+2ZKxxIwHiTGNBDVaS9YaUkG67lhcBTzh1FWQIyDoa4j56mvJb7aITzllF
-         oYGQ==
-X-Gm-Message-State: APjAAAW8M2vXqiORdIzs4oLP44KiFt7rfwSB44NQ9+7yPHS+Ey2zFCP7
-        sTUXCaoPOgDjcFzKJ5iZNKIdbQ==
-X-Google-Smtp-Source: APXvYqy6H0wN4d1Kl/JX/AP5xvKsDCj9fK9KjmVeSPgZw0zuOKC20sE1IPvQCUqIhtgQvLOfW/S4uA==
-X-Received: by 2002:a50:b3cd:: with SMTP id t13mr14990681edd.150.1553493736645;
-        Sun, 24 Mar 2019 23:02:16 -0700 (PDT)
+        bh=J8vWZV1sj0udrWFN/jdloh2DqlmF0WWcAxo/duIwbAc=;
+        b=Ip6diTYWZwTWZ+riKg3cJ3mojFvQuYsquNjQ3xAljAgSFobpwrtZVn+gFCFe16d+9G
+         p8c+9hnIMclo3lyJiCf7FJVAVclHHh5ibz62bAnlB4ZjcQFGfQfPL52YHjjTyxKZjQcm
+         s1h24wtJTfivGH8oj2Zoz412Lr8vudDExsAebAoK16gkI3N8YsE0FBWhnU/ioEkSJmna
+         dEmtG8+wyv6VILSmwwc3SX+exDnVgsJtDTMWfvnoTDN+oqnZV7BdeW4iOoozrmNIY5EU
+         6uOaVc1OezeoerJwyldAZh31q0PqRcoqB+8fgTdnWmITmeiyJJtn6G+XriQnTHJsZAcX
+         3t3g==
+X-Gm-Message-State: APjAAAXMtp3b1hhky93j6Wjn9AxTK0Trj8gVyNoNA9Xxmt1qZsmv+DU4
+        ZZdsTOOIo8iI/EG1c4TZ8zVa/w==
+X-Google-Smtp-Source: APXvYqwfWUObGACEOG6MdhYTWLBdo6PF4Aeb+dHtuV82tBSfwERVlKpiSHvBmo6QOIj21e+TQbrkTQ==
+X-Received: by 2002:a17:906:d20e:: with SMTP id w14mr12764636ejz.160.1553494732442;
+        Sun, 24 Mar 2019 23:18:52 -0700 (PDT)
 Received: from [172.30.99.70] ([37.120.153.227])
-        by smtp.gmail.com with ESMTPSA id w6sm3236329eja.50.2019.03.24.23.02.14
+        by smtp.gmail.com with ESMTPSA id g4sm3236851ejd.74.2019.03.24.23.18.49
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 24 Mar 2019 23:02:15 -0700 (PDT)
+        Sun, 24 Mar 2019 23:18:51 -0700 (PDT)
 From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Message-Id: <652D902B-21C8-4599-8298-F73E0620CC95@javigon.com>
+Message-Id: <759E29D3-9FEA-4A9B-875A-360DB96335C9@javigon.com>
 Content-Type: multipart/signed;
-        boundary="Apple-Mail=_DA2510D8-52E8-467C-89DF-99F7AE4DBE3D";
+        boundary="Apple-Mail=_4BB74FA8-E999-4D9E-8A84-C35F7393A80F";
         protocol="application/pgp-signature";
         micalg=pgp-sha256
 Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH v2 04/16] lightnvm: pblk: OOB recovery for closed chunks
- fix
-Date:   Mon, 25 Mar 2019 14:02:12 +0800
-In-Reply-To: <20190322144843.9602-5-igor.j.konopko@intel.com>
+Subject: Re: [PATCH v2 07/16] lightnvm: pblk: wait for inflight IOs in
+ recovery
+Date:   Mon, 25 Mar 2019 14:18:46 +0800
+In-Reply-To: <20190322144843.9602-8-igor.j.konopko@intel.com>
 Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <mb@lightnvm.io>,
         Hans Holmberg <hans.holmberg@cnexlabs.com>,
         linux-block@vger.kernel.org
 To:     "Konopko, Igor J" <igor.j.konopko@intel.com>
 References: <20190322144843.9602-1-igor.j.konopko@intel.com>
- <20190322144843.9602-5-igor.j.konopko@intel.com>
+ <20190322144843.9602-8-igor.j.konopko@intel.com>
 X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
@@ -78,66 +78,122 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
---Apple-Mail=_DA2510D8-52E8-467C-89DF-99F7AE4DBE3D
+--Apple-Mail=_4BB74FA8-E999-4D9E-8A84-C35F7393A80F
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain;
-	charset=utf-8
+	charset=us-ascii
+
 
 > On 22 Mar 2019, at 22.48, Igor Konopko <igor.j.konopko@intel.com> =
 wrote:
 >=20
-> In case of OOB recovery, when some of the chunks are in closed state,
-> we are calculating number of written sectors in line incorrectly,
-> because we are always counting chunk WP, which for closed chunks
-> does not longer reflects written sectors in particular chunk. Based on
-> OCSSD 2.0 spec WP for closed chunks is equal to SLBA + NLB and here we
-> need only NLB (clba in code) value for calculation. This patch for =
-such
-> a chunks takes clba field instead.
+> This patch changes the behaviour of recovery padding in order to
+> support a case, when some IOs were already submitted to the drive and
+> some next one are not submitted due to error returned.
+>=20
+> Currently in case of errors we simply exit the pad function without
+> waiting for inflight IOs, which leads to panic on inflight IOs
+> completion.
+>=20
+> After the changes we always wait for all the inflight IOs before
+> exiting the function.
 >=20
 > Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
 > ---
-> drivers/lightnvm/pblk-recovery.c | 8 +++++++-
-> 1 file changed, 7 insertions(+), 1 deletion(-)
+> drivers/lightnvm/pblk-recovery.c | 25 ++++++++++++-------------
+> 1 file changed, 12 insertions(+), 13 deletions(-)
 >=20
 > diff --git a/drivers/lightnvm/pblk-recovery.c =
 b/drivers/lightnvm/pblk-recovery.c
-> index 83b467b..bcd3633 100644
+> index b2267bd..f7e383e 100644
 > --- a/drivers/lightnvm/pblk-recovery.c
 > +++ b/drivers/lightnvm/pblk-recovery.c
-> @@ -101,6 +101,8 @@ static void pblk_update_line_wp(struct pblk *pblk, =
+> @@ -200,7 +200,7 @@ static int pblk_recov_pad_line(struct pblk *pblk, =
 struct pblk_line *line,
->=20
-> static u64 pblk_sec_in_open_line(struct pblk *pblk, struct pblk_line =
-*line)
-> {
-> +	struct nvm_tgt_dev *dev =3D pblk->dev;
-> +	struct nvm_geo *geo =3D &dev->geo;
-> 	struct pblk_line_meta *lm =3D &pblk->lm;
-> 	int nr_bb =3D bitmap_weight(line->blk_bitmap, lm->blk_per_line);
-> 	u64 written_secs =3D 0;
-> @@ -113,7 +115,11 @@ static u64 pblk_sec_in_open_line(struct pblk =
-*pblk, struct pblk_line *line)
-> 		if (chunk->state & NVM_CHK_ST_OFFLINE)
-> 			continue;
->=20
-> -		written_secs +=3D chunk->wp;
-> +		if (chunk->state & NVM_CHK_ST_OPEN)
-> +			written_secs +=3D chunk->wp;
-> +		else if (chunk->state & NVM_CHK_ST_CLOSED)
-> +			written_secs +=3D geo->clba;
-> +
-> 		valid_chunks++;
+> 	rq_ppas =3D pblk_calc_secs(pblk, left_ppas, 0, false);
+> 	if (rq_ppas < pblk->min_write_pgs) {
+> 		pblk_err(pblk, "corrupted pad line %d\n", line->id);
+> -		goto fail_free_pad;
+> +		goto fail_complete;
 > 	}
 >=20
+> 	rq_len =3D rq_ppas * geo->csecs;
+> @@ -209,7 +209,7 @@ static int pblk_recov_pad_line(struct pblk *pblk, =
+struct pblk_line *line,
+> 						PBLK_VMALLOC_META, =
+GFP_KERNEL);
+> 	if (IS_ERR(bio)) {
+> 		ret =3D PTR_ERR(bio);
+> -		goto fail_free_pad;
+> +		goto fail_complete;
+> 	}
+>=20
+> 	bio->bi_iter.bi_sector =3D 0; /* internal bio */
+> @@ -218,8 +218,11 @@ static int pblk_recov_pad_line(struct pblk *pblk, =
+struct pblk_line *line,
+> 	rqd =3D pblk_alloc_rqd(pblk, PBLK_WRITE_INT);
+>=20
+> 	ret =3D pblk_alloc_rqd_meta(pblk, rqd);
+> -	if (ret)
+> -		goto fail_free_rqd;
+> +	if (ret) {
+> +		pblk_free_rqd(pblk, rqd, PBLK_WRITE_INT);
+> +		bio_put(bio);
+> +		goto fail_complete;
+> +	}
+>=20
+> 	rqd->bio =3D bio;
+> 	rqd->opcode =3D NVM_OP_PWRITE;
+> @@ -266,7 +269,10 @@ static int pblk_recov_pad_line(struct pblk *pblk, =
+struct pblk_line *line,
+> 	if (ret) {
+> 		pblk_err(pblk, "I/O submission failed: %d\n", ret);
+> 		pblk_up_chunk(pblk, rqd->ppa_list[0]);
+> -		goto fail_free_rqd;
+> +		kref_put(&pad_rq->ref, pblk_recov_complete);
+
+Are you sure you need this? You are putting the reference on
+fail_complete: already.
+
+> +		pblk_free_rqd(pblk, rqd, PBLK_WRITE_INT);
+> +		bio_put(bio);
+> +		goto fail_complete;
+> 	}
+>=20
+> 	left_line_ppas -=3D rq_ppas;
+> @@ -274,6 +280,7 @@ static int pblk_recov_pad_line(struct pblk *pblk, =
+struct pblk_line *line,
+> 	if (left_ppas && left_line_ppas)
+> 		goto next_pad_rq;
+>=20
+> +fail_complete:
+> 	kref_put(&pad_rq->ref, pblk_recov_complete);
+>=20
+> 	if (!wait_for_completion_io_timeout(&pad_rq->wait,
+> @@ -289,14 +296,6 @@ static int pblk_recov_pad_line(struct pblk *pblk, =
+struct pblk_line *line,
+> free_rq:
+> 	kfree(pad_rq);
+> 	return ret;
+> -
+> -fail_free_rqd:
+> -	pblk_free_rqd(pblk, rqd, PBLK_WRITE_INT);
+> -	bio_put(bio);
+> -fail_free_pad:
+> -	kfree(pad_rq);
+> -	vfree(data);
+> -	return ret;
+> }
+>=20
+> static int pblk_pad_distance(struct pblk *pblk, struct pblk_line =
+*line)
 > --
 > 2.9.5
 
-Didn=E2=80=99t we agree that the patch was not needed?
+Rest looks good
 
 
-
---Apple-Mail=_DA2510D8-52E8-467C-89DF-99F7AE4DBE3D
+--Apple-Mail=_4BB74FA8-E999-4D9E-8A84-C35F7393A80F
 Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment;
 	filename=signature.asc
@@ -147,19 +203,19 @@ Content-Description: Message signed with OpenPGP
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlyYbuQACgkQPEYBfS0l
-eOCnOw//dIYj1IVg0tGcpD0/rCjMc5Y0Uwum5un9MO2Y/cvwzJ49UeLO32GNJZh3
-8VoErSh4vOQAd+Ju2F5Pp+neqDOOZQdES52Zcpr8TBBo/kBMMuVEi2ntVr9Q7lHS
-6Y6vHv5GXQx5b3o4erFA9mJlX/NVzvYRag6zV4Qw8kgrIa8vEhP86/05YTTaVvp6
-sEIlGfz3ypogu3ey13KJlnORwtyX8VNHF87NJLmyVN/3X9jSy8ryMmHyD8J0+mMW
-sINRwvqWEgO65mSt7gSA3kRkMUv5dVQ+74pdbMhm1k+pY7wjRSkNNGSa2ymLxZbf
-Ja6vYuJjSJFJ+VWg9a9U54kWcGv9Nu0uZX+l9EgnFYVNvHOIbrHeARWRTgjiPUsq
-DrZvtYfz/x4+BOqTrRZ1mfEtLMCR996+5sx4mDw0ujTfcNP2ddgJcwDQ2CDWPsYv
-jnmcaJrTgB/OlvZO6E0Y4uMFX0xYTKWF4vF2BUjFVqPI4/EZ3pav+5UXDPDE/0Cu
-/ehTqYPIDXxHMpxITOucqo1qJxeHmkidK+bkJ5Rzb7CnW1Lcg35zg86C2MriFZwK
-t0DewM7WrlIVTeZ2hp1rXZVbLhrpJBvf4NRcgTFJgHoN1KNyuUFDJ7/Qav8NRG07
-Fp9dK0YE7gBRYDgXPJmr3ZI2Mr64gCE7V5Z1vAY/uGnThaImQaI=
-=JdxL
+iQIzBAEBCAAdFiEEU1dMZpvMIkj0jATvPEYBfS0leOAFAlyYcsYACgkQPEYBfS0l
+eODh9A/+LNJQI6hTq20JL0i+xf+t4LGYZ8ok/fnMNztNulv4B2aRAeH6JhJhDRSf
+O/NPG0kalMbxnuGgZiv/JNpRuXDlLNNpzn4EElVTQOeTK8jJJ5qeEobB0YpkLL9a
+Pgreys5xbDtJqPAfOFwUW9IqYaa5WHMff+C6GgB+ISPO/xN1BZ8rjomZcKW1A+uZ
+7wZy+Pt489TeBK0Sv/vlbyBRJjQUyc1/TKN25FOw/vkCkRJgkBrEY4l/QmTX8H2S
+TP6bdqKuHb3gk9p2mMGk2g2VhYZdG9+jZb+hP+wRCy2jZw7JjxGYuVOM4/nwpb2R
+sIoyMT8EsQp35vJpUeNZYnPTBdB6zX3XFiGmeqYFDLbbTbxZT3/Gj/HD2iTZHI9A
+RQjH0xH/UT9NfYBPzyySqUcEg/cINS4qQ4ee+wJmrqNs1NJxSYUKhLVKcx5K0IiF
+jhJgJSD0/WWh3YHjhUQ5mailnUw9mms2Qt79fttGzCrbjhaL/4g4GXHZD1IPj4YU
+6U0rq6HuSHSRdPsGu6SejHnJjH11SQ0hHArTHL5YDoLTkDEkOaexOZXPEQt2bGbt
+rUSRVRWC39Eh1Ie+xxnX/8sSTyBeo24SHeJsJ+ezrdgyCUKKBNuPlG1n3d2EEX1H
+p3Y2jTrMsUkobogNVN/wshlxPjDooW7DzFvTp3G55OjKhWt7Qzs=
+=RHLm
 -----END PGP SIGNATURE-----
 
---Apple-Mail=_DA2510D8-52E8-467C-89DF-99F7AE4DBE3D--
+--Apple-Mail=_4BB74FA8-E999-4D9E-8A84-C35F7393A80F--
