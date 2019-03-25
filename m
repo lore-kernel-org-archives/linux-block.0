@@ -6,23 +6,24 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0936DC43381
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 07:34:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B08C43381
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 07:37:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D485C206BA
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 07:34:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FFB12087E
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 07:37:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729792AbfCYHeT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Mar 2019 03:34:19 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58468 "EHLO mx1.suse.de"
+        id S1729831AbfCYHhP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Mar 2019 03:37:15 -0400
+Received: from mx2.suse.de ([195.135.220.15]:59834 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729720AbfCYHeT (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Mar 2019 03:34:19 -0400
+        id S1729720AbfCYHhP (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Mar 2019 03:37:15 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id A5F75AD76;
-        Mon, 25 Mar 2019 07:34:17 +0000 (UTC)
-Subject: Re: [PATCH RESEND v2 2/5] block: disk_events: introduce event flags
+        by mx1.suse.de (Postfix) with ESMTP id 463AAAE15;
+        Mon, 25 Mar 2019 07:37:14 +0000 (UTC)
+Subject: Re: [PATCH RESEND v2 3/5] Revert "ide: unexport
+ DISK_EVENT_MEDIA_CHANGE for ide-gd and ide-cd"
 To:     Martin Wilck <mwilck@suse.com>, Jens Axboe <axboe@kernel.dk>,
         Tejun Heo <tj@kernel.org>,
         "Martin K. Petersen" <martin.petersen@oracle.com>
@@ -30,16 +31,16 @@ Cc:     James Bottomley <jejb@linux.vnet.ibm.com>,
         Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <Bart.VanAssche@sandisk.com>,
         linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-ide@vger.kernel.org
+        linux-ide@vger.kernel.org, Borislav Petkov <bp@alien8.de>
 References: <20190322224353.11088-1-mwilck@suse.com>
- <20190322224353.11088-3-mwilck@suse.com>
+ <20190322224353.11088-4-mwilck@suse.com>
 From:   Hannes Reinecke <hare@suse.de>
-Message-ID: <f9f3499e-0c74-8861-bcd4-5db3dafff04a@suse.de>
-Date:   Mon, 25 Mar 2019 08:34:17 +0100
+Message-ID: <795d5684-5d83-99be-594e-a80e23fd8b31@suse.de>
+Date:   Mon, 25 Mar 2019 08:37:14 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <20190322224353.11088-3-mwilck@suse.com>
+In-Reply-To: <20190322224353.11088-4-mwilck@suse.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -49,34 +50,22 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 3/22/19 11:43 PM, Martin Wilck wrote:
-> Currently, an empty disk->events field tells the block layer not to forward
-> media change events to user space. This was done in
-> commit 7c88a168da80 ("block: don't propagate unlisted DISK_EVENTs to userland")
-> in order to avoid events from "fringe" drivers to be forwarded to user
-> space. By doing so, the block layer lost the information which events were
-> supported by a particular block device, and most importantly, whether or
-> not a given device supports media change events at all.
+> This reverts commit 7eec77a1816a7042591a6cbdb4820e9e7ebffe0e.
 > 
-> Prepare for not interpreting the "events" field this way in the future any
-> more. This is done by adding two flag bits that can be set to have the
-> device treated like one that has the "events" field set to a non-zero value
-> before. This applies only to the sd and sr drivers, which are changed to
-> set the new flags.
+> Instead of leaving disk->events completely empty, we now export the
+> supported events again, and tell the block layer not to forward events to
+> user space by not setting DISK_EVENT_FLAG_UEVENT. This allows the block
+> layer to distinguish between devices that for which events should be
+> handled in kernel only, and devices which don't support any meda change
+> events at all.
 > 
-> The new flags are DISK_EVENT_FLAG_POLL to enforce polling of the device for
-> synchronous events, and DISK_EVENT_FLAG_UEVENT to tell the blocklayer to
-> generate udev events from kernel events. They can easily be fit in the int
-> reserved for event bits.
-> 
-> This patch doesn't change behavior.
-> 
+> Cc: Borislav Petkov <bp@alien8.de>
 > Signed-off-by: Martin Wilck <mwilck@suse.com>
 > ---
->   block/genhd.c         | 15 ++++++++++-----
->   drivers/scsi/sd.c     |  3 ++-
->   drivers/scsi/sr.c     |  3 ++-
->   include/linux/genhd.h |  7 +++++++
->   4 files changed, 21 insertions(+), 7 deletions(-)
+>   drivers/ide/ide-cd.c       | 1 +
+>   drivers/ide/ide-cd_ioctl.c | 5 +++--
+>   drivers/ide/ide-gd.c       | 6 ++++--
+>   3 files changed, 8 insertions(+), 4 deletions(-)
 > 
 Reviewed-by: Hannes Reinecke <hare@suse.com>
 
