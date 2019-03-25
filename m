@@ -2,96 +2,82 @@ Return-Path: <SRS0=AbZH=R4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7B11C10F03
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 16:25:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F58C43381
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 16:39:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A21832083D
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 16:25:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A0F02087C
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 16:39:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726243AbfCYQZR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Mar 2019 12:25:17 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:35039 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725747AbfCYQZR (ORCPT
+        id S1726743AbfCYQjt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Mar 2019 12:39:49 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:40497 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725788AbfCYQjt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Mar 2019 12:25:17 -0400
-Received: by mail-qt1-f193.google.com with SMTP id h39so11019773qte.2;
-        Mon, 25 Mar 2019 09:25:16 -0700 (PDT)
+        Mon, 25 Mar 2019 12:39:49 -0400
+Received: by mail-pg1-f195.google.com with SMTP id u9so6841951pgo.7
+        for <linux-block@vger.kernel.org>; Mon, 25 Mar 2019 09:39:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/3qcFiab5roarwBrwE0AfKKMTRw6Enlx5L9BcfDXngY=;
-        b=MlpeDtg6ag/3OIs9s00epuGusc5tzfKYxXDlFczJiCyu/A0korFcWQqxAj2uq9s7Vj
-         DdU243z7aql4457kaZi9cd2c6+HFF9ZTE5Pipx7+MQgD2C2FTc8evPk6WxiT3MXyL0tw
-         PwOiLeQo9xf41UZC7fCVmqyTlaCiaCvIE/uTpcOYI0RKG3YLyVNk5ukw0lyu8C9itOsY
-         Y+7U006xi5kPkTbkVgziOseIflmY3y5YL8ao9PN8t3Z4YBpj8dKUbqMMyVHelKqCnRJA
-         gLTd9hPCTzqh8e/164R7ktSU5VaSdifcNL2NAMKU+2sN/TKYcQL5OVzGxbvqyxjNtcsP
-         Mifw==
-X-Gm-Message-State: APjAAAVjFIf9iQ9/KlBfUyFw6XK6K7m7Zr8nMNwu2co1YtDFto1O6RZ4
-        1OQBlPWNb6aN68tCEnZAs+38a6RqVvj80CPM0oo=
-X-Google-Smtp-Source: APXvYqy5O+Aq0j29hG+cWekpuSGn3MTLpaGPbrsWzdFEUenqiGUsGURqRRLSpfilya4J1c+1u8pu6oPwOIqpp5XslVg=
-X-Received: by 2002:aed:3b09:: with SMTP id p9mr21351337qte.152.1553531116015;
- Mon, 25 Mar 2019 09:25:16 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190325143521.34928-1-arnd@arndb.de> <1553530766.2955.51.camel@HansenPartnership.com>
-In-Reply-To: <1553530766.2955.51.camel@HansenPartnership.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Mon, 25 Mar 2019 17:24:58 +0100
-Message-ID: <CAK8P3a0u3SAehvBiRuE-a4=qiAsyDgv0yuuCWc-nQhiTENRCAg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] io_uring: fix big-endian compat signal mask handling
-To:     James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hannes Reinecke <hare@suse.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        David Hildenbrand <david@redhat.com>,
-        Nikolay Borisov <nborisov@suse.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=+rwDTY8XsBstYWr62SK57whkQYa0L062kPJaUGHRe4w=;
+        b=XzCYiq1nVqVnAuMWGCIvsQLAAGW/s8zo/ofYA2dsIyToN1QmoGVKoFPrK3SryJOyHO
+         oZeTIIircztCO0YcaDBWO+tDzMbkzozr85JeXmivC3wEbhe3I3kve9WqYO6hZcCBaxjy
+         J1Vwkm6Bs0m+gmKj67//EnanJ+5sgoIYdPvJOE7B5bym+2czTtJk48xZdJ/8+quxL+CY
+         HWHW7KsuBT9+GHCoMQy0hw/DsD9XLSn/K3dPYFrWtc/57dSaDqE278qLzSxkEoT17oCR
+         4tF3Wy/fcjMLSCeuzJvgm35g5qQ7wo9TJ6cRqn9qCg4Qqv1B9pCBv7WEOpL/aclNXgw0
+         ATcQ==
+X-Gm-Message-State: APjAAAWFAOw1Ii16JwYJ/IytuIQwmQS8aVGcka7aqwLi6jZucOj0rIRE
+        yaretjPsdgNwz84BW9N9Zu8=
+X-Google-Smtp-Source: APXvYqzqdX4VKFk4ehpTvZ2oqFp3X/54Bo/OWKc+s0EHmEzmkpzVaF0oN42+FXU+IE8YXxhZcqtLLQ==
+X-Received: by 2002:a63:5953:: with SMTP id j19mr9588363pgm.260.1553531988988;
+        Mon, 25 Mar 2019 09:39:48 -0700 (PDT)
+Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id e21sm10791238pfd.177.2019.03.25.09.39.47
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 25 Mar 2019 09:39:48 -0700 (PDT)
+Message-ID: <1553531987.118779.9.camel@acm.org>
+Subject: Re: [PATCH] blk-mq: fix sbitmap ws_active for shared tags
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     Omar Sandoval <osandov@fb.com>
+Date:   Mon, 25 Mar 2019 09:39:47 -0700
+In-Reply-To: <c0d3f0c8-a5d7-19dd-7b7f-1d4f860c425b@kernel.dk>
+References: <c0d3f0c8-a5d7-19dd-7b7f-1d4f860c425b@kernel.dk>
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 25, 2019 at 5:19 PM James Bottomley
-<James.Bottomley@hansenpartnership.com> wrote:
+On Mon, 2019-03-25 at 10:22 -0600, Jens Axboe wrote:
++AD4 We now wrap sbitmap waitqueues in an active counter, so we can avoid
++AD4 iterating wakeups unless we have waiters there. This works as long as
++AD4 everyone that's manipulating the waitqueues use the proper helpers. For
++AD4 the tag wait case for shared tags, however, we add ourselves to the
++AD4 waitqueue without incrementing/decrementing the -+AD4-ws+AF8-active count. This
++AD4 means that wakeups can take a long time to happen.
++AD4 
++AD4 Fix this by manually doing the inc/dec as needed for the wait queue
++AD4 handling.
++AD4 
++AD4 Fixes: 5d2ee7122c73 (+ACI-sbitmap: optimize wakeup check+ACI)
++AD4 Signed-off-by: Jens Axboe +ADw-axboe+AEA-kernel.dk+AD4
 
-> > --- a/fs/io_uring.c
-> > +++ b/fs/io_uring.c
-> > @@ -1968,7 +1968,15 @@ static int io_cqring_wait(struct io_ring_ctx
-> > *ctx, int min_events,
-> >               return 0;
-> >
-> >       if (sig) {
-> > -             ret = set_user_sigmask(sig, &ksigmask, &sigsaved,
-> > sigsz);
-> > +#ifdef CONFIG_COMPAT
-> > +             if (in_compat_syscall())
-> > +                     ret = set_compat_user_sigmask((const
-> > compat_sigset_t __user *)sig,
-> > +                                                   &ksigmask,
-> > &sigsaved, sigsz);
-> > +             else
-> > +#endif
->
-> This looks a bit suboptimal: shouldn't in_compat_syscall() be hard
-> coded to return 0 if CONFIG_COMPAT isn't defined?  That way the
-> compiler can do the correct optimization and we don't have to litter
-> #ifdefs and worry about undefined variables and other things.
+Hi Jens,
 
-The check can be outside of the #ifdef, but set_compat_user_sigmask
-is not declared then.
+Since commit 5d2ee7122c73 went upstream in kernel v5.0, does this patch need
+a +ACI-Cc: stable+ACI tag?
 
-I think for the future we can consider just moving the compat logic
-into set_user_sigmask(), which would simplify most of the callers,
-but that seemed to invasive as a bugfix for 5.1.
+Thanks,
 
-      Arnd
+Bart.
