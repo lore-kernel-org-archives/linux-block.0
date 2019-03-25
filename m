@@ -2,111 +2,106 @@ Return-Path: <SRS0=AbZH=R4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0904AC43381
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 16:15:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E045C43381
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 16:19:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C9EDB2083D
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 16:15:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F8002083D
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 16:19:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="1BHMTqWg"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="nDm/dgy8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726195AbfCYQPM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Mar 2019 12:15:12 -0400
-Received: from mail-it1-f194.google.com ([209.85.166.194]:50689 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725747AbfCYQPL (ORCPT
+        id S1729315AbfCYQT3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Mar 2019 12:19:29 -0400
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:36248 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729182AbfCYQT3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Mar 2019 12:15:11 -0400
-Received: by mail-it1-f194.google.com with SMTP id m137so14840749ita.0
-        for <linux-block@vger.kernel.org>; Mon, 25 Mar 2019 09:15:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=pqYUKVKMwv5YvhQa8I/3FZP8NUyCezJ/K6L0O0AKUWg=;
-        b=1BHMTqWgTQOGU1QcRFSfGlW0TLvJb8ToAg5PewmnCRznMEZLYJ0nJGeTrwQjfo1RZh
-         Qj/op9hkykWQJL4K1RYhgmWKr63lJeAT7vatheTSCR44PMsuIbTjjHjev0iSB6kYgkqa
-         EKY2ovK74Jpsy7LAnsIVJqtyEs8K8zqKYvaNTwpprHasIFtL8qz9BLuMcua0Hl+Qkhn/
-         nzSeadq1/Y6jio5y1LSFyhdhBVsDioDvkHD9Ph6feGBOWn+IiB6YUCCRIaWGns2WkD92
-         qgLTXOZG1irDj/TOuuLk/siDBdhRg474JSQspPnL2+QCtWB7uGjE3GILplHA2HAmkyEy
-         JzLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=pqYUKVKMwv5YvhQa8I/3FZP8NUyCezJ/K6L0O0AKUWg=;
-        b=YikWpjal6QSsH9T9YSwO+5J7uF2dsRrBY/AfXlDzUxgWB3ytFLQI8EZ/vmSabuNmRv
-         BD3BDceioijxGX9dAjSowEAtPhRl5prHVsxPQjvrtxcuacfbNNvjrkzoi3YTNbYA/42B
-         VX/Czeajjv703LjZ63u7uEdtOUolG7uzePS8sbyYEjWtKjSvMzWJA4jYvVjtSxs8/Utm
-         62pHHFwZ6sEE9NlzCnYM23aPX/G2y//OKHfSuZ+T7kVA5gO8Vn2L0+nN2CYn/2bwdY7E
-         K4ZHvy7nd2Vq+9pm58qegCOsWsjb1LtwSdiFbAyPjhIuUOHg7f0sIJjDmnxZRBpFC55H
-         mZ4g==
-X-Gm-Message-State: APjAAAWLo0dnRKoyJIKSj3wadh/rpU6jCTOIgI+iBzGahf/zw5Sl6Lzg
-        bVg/7jUEPFO1cUwKwdAUNxZovQ==
-X-Google-Smtp-Source: APXvYqzhokJ/W9aLEg/odcdA2NQFO9N2nplNZZZZbt4De391Ejqe3S2SAaKA0D4tfu3m+PR/1pjmtw==
-X-Received: by 2002:a02:1ac3:: with SMTP id 186mr18374282jai.96.1553530510808;
-        Mon, 25 Mar 2019 09:15:10 -0700 (PDT)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id i23sm6758795ion.40.2019.03.25.09.15.08
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 25 Mar 2019 09:15:09 -0700 (PDT)
+        Mon, 25 Mar 2019 12:19:29 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 2B2338EE0E0;
+        Mon, 25 Mar 2019 09:19:28 -0700 (PDT)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id YaSfB_YKKZQI; Mon, 25 Mar 2019 09:19:27 -0700 (PDT)
+Received: from [153.66.254.194] (unknown [50.35.68.20])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 496488EE0DF;
+        Mon, 25 Mar 2019 09:19:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1553530767;
+        bh=+3uWbRb3VNNt1gddenhaoH9K4l+ztpTwtY1m4yMYWjA=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=nDm/dgy8L5tykk8qxInC6Zx9Z56uXaCSkypB44YG8n9FRgXEi/91oKe9zo0VByP1L
+         Jm6fLzWFykZqsAxsIty2vpk9tPDi2GbFD3AEnQRwMMjV98WIhJARtmeuN+vGgHa9XX
+         Etz+mJ/1dt1OpIWCFEGBwS0QAnLYNxDuW9MMye/I=
+Message-ID: <1553530766.2955.51.camel@HansenPartnership.com>
 Subject: Re: [PATCH 1/2] io_uring: fix big-endian compat signal mask handling
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Arnd Bergmann <arnd@arndb.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
         Hannes Reinecke <hare@suse.com>,
         Matthew Wilcox <willy@infradead.org>,
         David Hildenbrand <david@redhat.com>,
         Nikolay Borisov <nborisov@suse.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Mon, 25 Mar 2019 09:19:26 -0700
+In-Reply-To: <20190325143521.34928-1-arnd@arndb.de>
 References: <20190325143521.34928-1-arnd@arndb.de>
- <a29338b9-60ad-a4da-da9d-a0c522a5b9df@kernel.dk>
- <CAK8P3a2SpydaLZijzUXxCzMKSEv3ymfpOCO4xSZOVfz2cwFxAQ@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <52bbd23b-3bda-31fc-3f38-16749b90be4c@kernel.dk>
-Date:   Mon, 25 Mar 2019 10:15:08 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
-MIME-Version: 1.0
-In-Reply-To: <CAK8P3a2SpydaLZijzUXxCzMKSEv3ymfpOCO4xSZOVfz2cwFxAQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.26.6 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/25/19 10:11 AM, Arnd Bergmann wrote:
-> On Mon, Mar 25, 2019 at 5:05 PM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 3/25/19 8:34 AM, Arnd Bergmann wrote:
->>> On big-endian architectures, the signal masks are differnet
->>> between 32-bit and 64-bit tasks, so we have to use a different
->>> function for reading them from user space.
->>>
->>> io_cqring_wait() initially got this wrong, and always interprets
->>> this as a native structure. This is ok on x86 and most arm64,
->>> but not on s390, ppc64be, mips64be, sparc64 and parisc.
->>
->> Thanks Arnd, applied.
->>
->> Was there a 2/2 patch? I only received this one, 1/2.
+On Mon, 2019-03-25 at 15:34 +0100, Arnd Bergmann wrote:
+> On big-endian architectures, the signal masks are differnet
+> between 32-bit and 64-bit tasks, so we have to use a different
+> function for reading them from user space.
 > 
-> Sorry I missed you on Cc:
-> https://lore.kernel.org/lkml/20190325144737.703921-1-arnd@arndb.de/T/#u
+> io_cqring_wait() initially got this wrong, and always interprets
+> this as a native structure. This is ok on x86 and most arm64,
+> but not on s390, ppc64be, mips64be, sparc64 and parisc.
 > 
-> This one went out to all the affected arch maintainers.
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  fs/io_uring.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/io_uring.c b/fs/io_uring.c
+> index 6aaa30580a2b..8f48d29abf76 100644
+> --- a/fs/io_uring.c
+> +++ b/fs/io_uring.c
+> @@ -1968,7 +1968,15 @@ static int io_cqring_wait(struct io_ring_ctx
+> *ctx, int min_events,
+>  		return 0;
+>  
+>  	if (sig) {
+> -		ret = set_user_sigmask(sig, &ksigmask, &sigsaved,
+> sigsz);
+> +#ifdef CONFIG_COMPAT
+> +		if (in_compat_syscall())
+> +			ret = set_compat_user_sigmask((const
+> compat_sigset_t __user *)sig,
+> +						      &ksigmask,
+> &sigsaved, sigsz);
+> +		else
+> +#endif
 
-Ah gotcha, just wanted to make sure I didn't miss a patch.
+This looks a bit suboptimal: shouldn't in_compat_syscall() be hard
+coded to return 0 if CONFIG_COMPAT isn't defined?  That way the
+compiler can do the correct optimization and we don't have to litter
+#ifdefs and worry about undefined variables and other things.
 
--- 
-Jens Axboe
+James
 
