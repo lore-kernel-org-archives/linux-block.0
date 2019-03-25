@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73122C43381
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 05:47:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39687C43381
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 05:47:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 40CBC20879
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 05:47:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 05AF420870
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 05:47:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DA2ifDZN"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="etRewFq+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729471AbfCYFrq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Mar 2019 01:47:46 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:57802 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726166AbfCYFrp (ORCPT
+        id S1726166AbfCYFrx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Mar 2019 01:47:53 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:56686 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729638AbfCYFri (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Mar 2019 01:47:45 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2P5iMEW004246;
-        Mon, 25 Mar 2019 05:47:20 GMT
+        Mon, 25 Mar 2019 01:47:38 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2P5i941004675;
+        Mon, 25 Mar 2019 05:47:15 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=ss1t3DJAWRqtk33Piyd+aeKtdRJeAop5F6RCCUL08C8=;
- b=DA2ifDZNV8rFkr9Zy5rlLdWnEfOUnqCRCXzXy0bz7tmZChch6/Dvgi0Z4hcB2LCV/+y5
- sXT7eZWe+JTd7J75sCy+q5xPpyNlLylzPszfJjpNGOzQYDWjEWbdGIWf7SDQAydBK0MG
- s3Xmbm6geuNRm0zIHY1sGPksKdKy1rTLwqOfMBYrzmUPE0+ZKP5ed9tq40u1TtDiJpzc
- qQTtiW1HiBwuWawpf4LhChaMUzyu24tIX1x5DCYgVWxa6Tc+w027ZpAHH02I8y0VmvZo
- ucVKSlWbFFqo4gxsBptYOR3tkVx3Xwyf8luwCPC9sdk3yK//z5BpT/T7VYqb4rFQwG8G PQ== 
-Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by aserp2130.oracle.com with ESMTP id 2re6g0ht0h-1
+ bh=7aA4xWq/tfGdYTPt4hOCXVnTHtj21qv2ydS8SKqRloY=;
+ b=etRewFq+x35pGm5Lu6ZsLtmyb6FeFPNzlcRNwX3AIk3jseEGQbrfBrM2fETMwvzDyUez
+ Bhdmd0/G3xhzMPQI/o9R6hjAorpdE4eOusyFUEgz3St9QsGUSIie/+cxaCeoceWZfh+7
+ v89lFb8G6lrhfXIscQx6bzK+jjuIEVaQ39e4YJGGntIqmtXapYS3OlZDrrBBS7oe6VNh
+ UKHCcG3I5Yq00rwydeuXTS0NIIvOc3O2/nOn4/tvCjZ57uGKJWseh993Q9QN9Ahh1rCI
+ 39ZuposM8Bl5mMSfLUZG5n4DG47oXuzHfLY99CAyTEtH8Pg/d5nihuJ4NEVx4s4v1P8a qw== 
+Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
+        by userp2130.oracle.com with ESMTP id 2re6g0st4e-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 25 Mar 2019 05:47:20 +0000
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2P5lJ45012747
+        Mon, 25 Mar 2019 05:47:15 +0000
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x2P5l9kO004834
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 25 Mar 2019 05:47:20 GMT
+        Mon, 25 Mar 2019 05:47:09 GMT
 Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x2P5lJ2u031755;
-        Mon, 25 Mar 2019 05:47:19 GMT
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x2P5l9j6026031;
+        Mon, 25 Mar 2019 05:47:09 GMT
 Received: from will-ThinkCentre-M93p.cn.oracle.com (/10.182.71.12)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 24 Mar 2019 22:47:18 -0700
+        with ESMTP ; Sun, 24 Mar 2019 22:47:09 -0700
 From:   Jianchao Wang <jianchao.w.wang@oracle.com>
 To:     axboe@kernel.dk
 Cc:     hch@lst.de, jthumshirn@suse.de, hare@suse.de, josef@toxicpanda.com,
         bvanassche@acm.org, sagi@grimberg.me, keith.busch@intel.com,
         jsmart2021@gmail.com, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH V2 6/8] skd: use blk_mq_queue_tag_inflight_iter
-Date:   Mon, 25 Mar 2019 13:38:36 +0800
-Message-Id: <1553492318-1810-7-git-send-email-jianchao.w.wang@oracle.com>
+Subject: [PATCH V2 3/8] blk-mq: use blk_mq_queue_tag_inflight_iter in debugfs
+Date:   Mon, 25 Mar 2019 13:38:33 +0800
+Message-Id: <1553492318-1810-4-git-send-email-jianchao.w.wang@oracle.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1553492318-1810-1-git-send-email-jianchao.w.wang@oracle.com>
 References: <1553492318-1810-1-git-send-email-jianchao.w.wang@oracle.com>
@@ -75,31 +75,22 @@ in tags->rqs[]. Use blk_mq_queue_tag_inflight_iter here.
 
 Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
 ---
- drivers/block/skd_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block/blk-mq-debugfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/skd_main.c b/drivers/block/skd_main.c
-index 7d3ad6c..0213b19 100644
---- a/drivers/block/skd_main.c
-+++ b/drivers/block/skd_main.c
-@@ -395,7 +395,7 @@ static int skd_in_flight(struct skd_device *skdev)
- {
- 	int count = 0;
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index ec1d18c..b7f2538 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -438,7 +438,7 @@ static int hctx_busy_show(void *data, struct seq_file *m)
+ 	struct blk_mq_hw_ctx *hctx = data;
+ 	struct show_busy_params params = { .m = m, .hctx = hctx };
  
--	blk_mq_tagset_busy_iter(&skdev->tag_set, skd_inc_in_flight, &count);
-+	blk_mq_queue_tag_inflight_iter(skdev->queue, skd_inc_in_flight, &count);
+-	blk_mq_tagset_busy_iter(hctx->queue->tag_set, hctx_show_busy_rq,
++	blk_mq_queue_tag_inflight_iter(hctx->queue, hctx_show_busy_rq,
+ 				&params);
  
- 	return count;
- }
-@@ -1916,7 +1916,7 @@ static bool skd_recover_request(struct request *req, void *data, bool reserved)
- 
- static void skd_recover_requests(struct skd_device *skdev)
- {
--	blk_mq_tagset_busy_iter(&skdev->tag_set, skd_recover_request, skdev);
-+	blk_mq_queue_tag_inflight_iter(skdev->queue, skd_recover_request, skdev);
- }
- 
- static void skd_isr_msg_from_dev(struct skd_device *skdev)
+ 	return 0;
 -- 
 2.7.4
 
