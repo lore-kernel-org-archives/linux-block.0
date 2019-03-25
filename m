@@ -4,65 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD3FC43381
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 16:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CF96C43381
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 16:23:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BDF082083D
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 16:22:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3BE3D20828
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 16:23:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="lDl+tZIs"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="a4p6XGps"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729278AbfCYQWy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Mar 2019 12:22:54 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:36153 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726024AbfCYQWx (ORCPT
+        id S1729010AbfCYQXg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Mar 2019 12:23:36 -0400
+Received: from mail-it1-f194.google.com ([209.85.166.194]:53906 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726024AbfCYQXg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Mar 2019 12:22:53 -0400
-Received: by mail-io1-f68.google.com with SMTP id f6so8152925iop.3
-        for <linux-block@vger.kernel.org>; Mon, 25 Mar 2019 09:22:53 -0700 (PDT)
+        Mon, 25 Mar 2019 12:23:36 -0400
+Received: by mail-it1-f194.google.com with SMTP id y204so599084itf.3
+        for <linux-block@vger.kernel.org>; Mon, 25 Mar 2019 09:23:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=PQiIDfSeExLN0W62UkHWbJVMzuNGqhCTfDjoX3zemfs=;
-        b=lDl+tZIsCw0q+Ahs4bz6BDO72ysg+yY7D8elJu92RvYzclYhWffw1AwIdd1qzvxFUT
-         Gu/1oEgB8D1SgHhPQI5WvhzoqHiMyRGv6bq9FHB0cFAtG4lcb9tVM/TjBdEsU6wV7gIr
-         3K3WyM6NT0aD2kdLZtSRRNIdtu/hbx72vNCG5p6RrFzXnb37+/siwi6uq+8ew2ScE8ls
-         QZ3RgAsi1Mdl/INcfUAefiNopeZf2O1w/1dqflrHU22/c5CM+8K6ANestcZhnU36/RAI
-         h4OaNTP9iIIpWrb4ejkrBgXzmBPwjNvBPlUx7Q/+LEGnjc0kaHh8Bn3GTcwg3xsx9CWE
-         ZrFg==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=5RYC5QkNPmWnV7M+cp152sH2vhCRnoMiK4CZtvvJh04=;
+        b=a4p6XGpsh4XKbVLZAa544N9Eyip02ETThXf36Kzdq2N67nSugtAGMj8ZW02ZXjqcBo
+         dGqv7gA4t4WGd4x9Zbe1UF99alCbkWJM56ao7ntWpb5lvOLioWPPDXd4q8TAN10gAsi7
+         AakLjcW6gu94dkOkHpnZ4QUGGZPcF7ihTOTOtMQo1nP7Mw6r9DScn8NuMglhLQZtsV/v
+         Ck5jE1PkfUR8r0LOZyyd3I6PzzP+TuAEpr6tCQ3BzlK6CvBCTWJVQcImhu6Rz0S64t9O
+         XxRvJs+xo95Fz0UI0U6bgSmCt0ckkICGnrEtwE16vSxtoMypxGAKYQyA6nH5l5+sw2x8
+         E/JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=PQiIDfSeExLN0W62UkHWbJVMzuNGqhCTfDjoX3zemfs=;
-        b=uEkQ9wUgqGcF1DIzQX6t8ViKHwsI6NP8XK4R68C5w918+nUkN4zXZ8arAm1triop8y
-         0OaqihLfiODwsvKjxu4hnTkz1McTPLIzzYPmi7u336UWuNr9Sul1CjSwxb462AScokwT
-         jIwKd84GYQAf5I5bZtk1oGR2aSbiXmlUx2HTBWjn3Z71NWaNZMh4uzOOHNqaaPrOY6vu
-         z43qpXxHS96xWa8WOn5Eff+BoHvhKP7XD+t3Wdy2ShBH/BgttrLCXgwFSqi5bhLYxUvg
-         IeIGQ4Pls20umr+AJsnwPKrmJoZJ+8OqP0ZeNYAdOdShZggb21dBaQlEQM9sEVepM2at
-         W3pA==
-X-Gm-Message-State: APjAAAXrtT1S3xcyqMTxHidQWE35xuYgGTYygp01Vonm1nW9RnNRQ8FA
-        VfjwE50tPcZRrcQVMAgVPqTFHw==
-X-Google-Smtp-Source: APXvYqz703h1m86oAOIDejjSlSD2Q4XkIpQKVwAI3vlPlhVYLQhmC0e52HEu1iSa/Uu1aE6a+dINDw==
-X-Received: by 2002:a5e:8c07:: with SMTP id n7mr17774123ioj.301.1553530973033;
-        Mon, 25 Mar 2019 09:22:53 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5RYC5QkNPmWnV7M+cp152sH2vhCRnoMiK4CZtvvJh04=;
+        b=R4FVcniQm7NGtsU3CBIq4sF0GhdfSDya6dKBw7NklRwZ76uEN2sW811W1vfQGcU1dN
+         eItn3tuq8cIAvtfvWCcRVrz3MTetlu+z/BJLOblxX6bQ1UIRNOZGMTw5hwcC8qzY8Q4s
+         k95RwkOgRDtG/GITSaAVeMfbdZpTQC36UEprsV9/NSLRYLqPS9geEjLNHUOIFYLgt1mZ
+         a604TSEWn2ubXXhvSbFZOiscvI74+8+fCpybNPL8Nrxg5VvIAZFeEvCZWM0xu/J1SGZI
+         oTWpx4Bh/3pRwidXomDhJQc6l3Za6B9zx/5R1L5AFw4rvaNoJ1mDCF4iUwPegeRakMSP
+         C8Fw==
+X-Gm-Message-State: APjAAAUrKiCASCjQM56pMQiPP2eM/DWfwOzOgcsry8WB/ZUvDPgRM8tJ
+        YatY3gzi15sS4Nxgcm79bjZKa34e+5qzEg==
+X-Google-Smtp-Source: APXvYqzTFUytd6hF1JTNnC7hNWzLdzWp0tAu433Pimy4C35zggJYDouZ4iACNnRfPcoKlOa0F90WEg==
+X-Received: by 2002:a24:6794:: with SMTP id u142mr9064550itc.84.1553531015661;
+        Mon, 25 Mar 2019 09:23:35 -0700 (PDT)
 Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id a8sm6700557iol.35.2019.03.25.09.22.51
+        by smtp.gmail.com with ESMTPSA id o11sm5992146itb.33.2019.03.25.09.23.33
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 25 Mar 2019 09:22:51 -0700 (PDT)
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Cc:     Omar Sandoval <osandov@fb.com>
+        Mon, 25 Mar 2019 09:23:34 -0700 (PDT)
+Subject: Re: [PATCH 1/2] io_uring: fix big-endian compat signal mask handling
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        Hannes Reinecke <hare@suse.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Hildenbrand <david@redhat.com>,
+        Nikolay Borisov <nborisov@suse.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20190325143521.34928-1-arnd@arndb.de>
+ <1553530766.2955.51.camel@HansenPartnership.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH] blk-mq: fix sbitmap ws_active for shared tags
-Message-ID: <c0d3f0c8-a5d7-19dd-7b7f-1d4f860c425b@kernel.dk>
-Date:   Mon, 25 Mar 2019 10:22:50 -0600
+Message-ID: <4c77d293-8eb9-01aa-27f8-7f320082e182@kernel.dk>
+Date:   Mon, 25 Mar 2019 10:23:33 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.1
 MIME-Version: 1.0
+In-Reply-To: <1553530766.2955.51.camel@HansenPartnership.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -71,77 +83,48 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We now wrap sbitmap waitqueues in an active counter, so we can avoid
-iterating wakeups unless we have waiters there. This works as long as
-everyone that's manipulating the waitqueues use the proper helpers. For
-the tag wait case for shared tags, however, we add ourselves to the
-waitqueue without incrementing/decrementing the ->ws_active count. This
-means that wakeups can take a long time to happen.
+On 3/25/19 10:19 AM, James Bottomley wrote:
+> On Mon, 2019-03-25 at 15:34 +0100, Arnd Bergmann wrote:
+>> On big-endian architectures, the signal masks are differnet
+>> between 32-bit and 64-bit tasks, so we have to use a different
+>> function for reading them from user space.
+>>
+>> io_cqring_wait() initially got this wrong, and always interprets
+>> this as a native structure. This is ok on x86 and most arm64,
+>> but not on s390, ppc64be, mips64be, sparc64 and parisc.
+>>
+>> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>> ---
+>>  fs/io_uring.c | 10 +++++++++-
+>>  1 file changed, 9 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/fs/io_uring.c b/fs/io_uring.c
+>> index 6aaa30580a2b..8f48d29abf76 100644
+>> --- a/fs/io_uring.c
+>> +++ b/fs/io_uring.c
+>> @@ -1968,7 +1968,15 @@ static int io_cqring_wait(struct io_ring_ctx
+>> *ctx, int min_events,
+>>  		return 0;
+>>  
+>>  	if (sig) {
+>> -		ret = set_user_sigmask(sig, &ksigmask, &sigsaved,
+>> sigsz);
+>> +#ifdef CONFIG_COMPAT
+>> +		if (in_compat_syscall())
+>> +			ret = set_compat_user_sigmask((const
+>> compat_sigset_t __user *)sig,
+>> +						      &ksigmask,
+>> &sigsaved, sigsz);
+>> +		else
+>> +#endif
+> 
+> This looks a bit suboptimal: shouldn't in_compat_syscall() be hard
+> coded to return 0 if CONFIG_COMPAT isn't defined?  That way the
+> compiler can do the correct optimization and we don't have to litter
+> #ifdefs and worry about undefined variables and other things.
 
-Fix this by manually doing the inc/dec as needed for the wait queue
-handling.
-
-Fixes: 5d2ee7122c73 ("sbitmap: optimize wakeup check")
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-
----
-
-Got a bug report on raid5 on 4 USB-3 attached drives which is slow with
-5.0, but works fine with the ->ws_active check bypassed. Waiting for
-confirmation that this patch fixes it, but I think it will.
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 28080b0235f0..3ff3d7b49969 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1072,7 +1072,13 @@ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
- 	hctx = container_of(wait, struct blk_mq_hw_ctx, dispatch_wait);
- 
- 	spin_lock(&hctx->dispatch_wait_lock);
--	list_del_init(&wait->entry);
-+	if (!list_empty(&wait->entry)) {
-+		struct sbitmap_queue *sbq;
-+
-+		list_del_init(&wait->entry);
-+		sbq = &hctx->tags->bitmap_tags;
-+		atomic_dec(&sbq->ws_active);
-+	}
- 	spin_unlock(&hctx->dispatch_wait_lock);
- 
- 	blk_mq_run_hw_queue(hctx, true);
-@@ -1088,6 +1094,7 @@ static int blk_mq_dispatch_wake(wait_queue_entry_t *wait, unsigned mode,
- static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
- 				 struct request *rq)
- {
-+	struct sbitmap_queue *sbq = &hctx->tags->bitmap_tags;
- 	struct wait_queue_head *wq;
- 	wait_queue_entry_t *wait;
- 	bool ret;
-@@ -1110,7 +1117,7 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
- 	if (!list_empty_careful(&wait->entry))
- 		return false;
- 
--	wq = &bt_wait_ptr(&hctx->tags->bitmap_tags, hctx)->wait;
-+	wq = &bt_wait_ptr(sbq, hctx)->wait;
- 
- 	spin_lock_irq(&wq->lock);
- 	spin_lock(&hctx->dispatch_wait_lock);
-@@ -1120,6 +1127,7 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
- 		return false;
- 	}
- 
-+	atomic_inc(&sbq->ws_active);
- 	wait->flags &= ~WQ_FLAG_EXCLUSIVE;
- 	__add_wait_queue(wq, wait);
- 
-@@ -1140,6 +1148,7 @@ static bool blk_mq_mark_tag_wait(struct blk_mq_hw_ctx *hctx,
- 	 * someone else gets the wakeup.
- 	 */
- 	list_del_init(&wait->entry);
-+	atomic_dec(&sbq->ws_active);
- 	spin_unlock(&hctx->dispatch_wait_lock);
- 	spin_unlock_irq(&wq->lock);
- 
+That requires the types to be valid for !CONFIG_COMPAT, as well as the
+sigmask helper.
 
 -- 
 Jens Axboe
