@@ -2,204 +2,316 @@ Return-Path: <SRS0=AbZH=R4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49C1CC43381
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 11:40:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8E96C43381
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 12:17:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0D2872085A
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 11:40:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="u36FxgH8"
+	by mail.kernel.org (Postfix) with ESMTP id 8276C2075E
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 12:17:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730679AbfCYLkM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Mar 2019 07:40:12 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:34928 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726327AbfCYLkM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Mar 2019 07:40:12 -0400
-Received: by mail-ed1-f66.google.com with SMTP id s39so1706110edb.2
-        for <linux-block@vger.kernel.org>; Mon, 25 Mar 2019 04:40:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=ZXU58uMloxYeTuHYTfwtPTLwXccbqcdXijVAoNFFORQ=;
-        b=u36FxgH8OjXcql6ZgmXMmPoAoHdeE4Nd8qaywo7hFTAD9l7QFu0l3vACaC41sr+C73
-         fWnAhd6yt7ysYwMse/AfWCvda+oHqHQV7dNQqT0sRNyoU6MkMsAuAnOz9KG1hqjNB60W
-         OmF/0B2oTAuqwS1eko95uUMSKfWA6Ww7eF3te97J1UtDuiC5Sbh2T9Ewx3HoHQzNn9+J
-         joSE89AWyZNX2FRufPDVPORlIaheOn0wWxXhQJHj2Rqw0wkB+QpOjStOfqGOn2L5WZkR
-         O5QL9rR65aibsgY3M0ZsjcLA4a5dpnigkAxcfgIa4+93xF53rj1je0qyKvU+QITAN0iV
-         yZdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=ZXU58uMloxYeTuHYTfwtPTLwXccbqcdXijVAoNFFORQ=;
-        b=c8CTt8wXvHJxHtJ+U9kNbkiDH8tIaiml6dyx9KWyzCuHBz7pRscpBH66eIFllkIfEw
-         qxUptDmjA/ibLZrJpZiqsCX8willNXjntTevjk2pSdZzPeFw72uWbTkhgxt58iO6D8n1
-         hMLiox7/TfMgK9KRzvadoxCt2QP/OWC+M3ThHL0kNa2hyHFeQkWwWOWj9n3jQTKTkVce
-         gHcqSa0IgUo4+AfSew7GBH11LTouHPOJUJkg9HcVSERLh9h2tNSTGgd0T9bg7VZ6TA8/
-         /o9Iec1V+2/t88llB0+BbLCRDdpA4se+K2mIN0tjB4TLR0LsInzVt2+HU/s1tpnOg9Mc
-         A5DQ==
-X-Gm-Message-State: APjAAAW31M/a1mcmjFYMoiqLpV4LwQZmTOqCxnYAOkmp1GtpPR84kB+x
-        frl6SI9bcvHGhGRsuc8sKU5ov1XI/+M=
-X-Google-Smtp-Source: APXvYqwswFOy9rGrZtgPFaDahJp+l1GQs4++rINtU/7kvCOBCKIsHSOsZVfg9IBfgOAtVjBX2awn5Q==
-X-Received: by 2002:a50:a704:: with SMTP id h4mr6279192edc.7.1553514009716;
-        Mon, 25 Mar 2019 04:40:09 -0700 (PDT)
-Received: from [192.168.0.36] (2-111-91-225-cable.dk.customer.tdc.net. [2.111.91.225])
-        by smtp.googlemail.com with ESMTPSA id p1sm4793343eda.29.2019.03.25.04.40.08
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 25 Mar 2019 04:40:09 -0700 (PDT)
-Subject: Re: [PATCH 17/18] lightnvm: allow to use full device path
-To:     Igor Konopko <igor.j.konopko@intel.com>
-Cc:     Hans Holmberg <hans@owltronix.com>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
-        Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        linux-block@vger.kernel.org
-References: <20190314160428.3559-1-igor.j.konopko@intel.com>
- <20190314160428.3559-18-igor.j.konopko@intel.com>
- <CANr-nt3poAp1NQmK35=X=mrKgvEJnUHVN_ROxMWB1hrGoZpHdQ@mail.gmail.com>
- <2683438c-2d8d-c450-8b6f-639d0d757185@intel.com>
- <CANr-nt1HbjfxQLvmUrsA9shLmn4_VNOF42JoMV7afvjAtwftFg@mail.gmail.com>
- <001207b7-5b26-2079-b5bf-c8b7de9312e5@intel.com>
-From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Message-ID: <97a5a15d-8d87-620b-9c7e-14b1f524cb79@lightnvm.io>
-Date:   Mon, 25 Mar 2019 12:40:07 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1730932AbfCYMRD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Mar 2019 08:17:03 -0400
+Received: from mga02.intel.com ([134.134.136.20]:25159 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729280AbfCYMRD (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Mar 2019 08:17:03 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Mar 2019 05:17:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,256,1549958400"; 
+   d="scan'208";a="137074353"
+Received: from zliu7-mobl2.ccr.corp.intel.com (HELO wfg-t570.sh.intel.com) ([10.254.212.116])
+  by orsmga003.jf.intel.com with ESMTP; 25 Mar 2019 05:16:57 -0700
+Received: from wfg by wfg-t570.sh.intel.com with local (Exim 4.89)
+        (envelope-from <fengguang.wu@intel.com>)
+        id 1h8OWi-0006jG-QW; Mon, 25 Mar 2019 20:16:28 +0800
+Date:   Mon, 25 Mar 2019 20:16:28 +0800
+From:   Fengguang Wu <fengguang.wu@intel.com>
+To:     Martin Liu <liumartin@google.com>
+Cc:     akpm@linux-foundation.org, axboe@kernel.dk, dchinner@redhat.com,
+        jenhaochen@google.com, salyzyn@google.com, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [RFC PATCH] mm: readahead: add readahead_shift into backing
+ device
+Message-ID: <20190325121628.zxlogz52go6k36on@wfg-t540p.sh.intel.com>
+References: <20190322154610.164564-1-liumartin@google.com>
 MIME-Version: 1.0
-In-Reply-To: <001207b7-5b26-2079-b5bf-c8b7de9312e5@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20190322154610.164564-1-liumartin@google.com>
+User-Agent: NeoMutt/20170609 (1.8.3)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/21/19 2:18 PM, Igor Konopko wrote:
-> Matias,
-> any opinion from your side, whether you would like to do such a changes 
-> in userspace tool or in lightnvm core? I can go both ways.
-> Thanks
-> Igor
+Martin,
 
-I'm a user-space freak. Let's fix it up in nvme-cli.
+On Fri, Mar 22, 2019 at 11:46:11PM +0800, Martin Liu wrote:
+>As the discussion https://lore.kernel.org/patchwork/patch/334982/
+>We know an open file's ra_pages might run out of sync from
+>bdi.ra_pages since sequential, random or error read. Current design
+>is we have to ask users to reopen the file or use fdavise system
+>call to get it sync. However, we might have some cases to change
+>system wide file ra_pages to enhance system performance such as
+>enhance the boot time by increasing the ra_pages or decrease it to
 
-> 
-> On 18.03.2019 15:41, Hans Holmberg wrote:
->> On Mon, Mar 18, 2019 at 2:18 PM Igor Konopko 
->> <igor.j.konopko@intel.com> wrote:
->>>
->>>
->>>
->>> On 18.03.2019 11:28, Hans Holmberg wrote:
->>>> On Thu, Mar 14, 2019 at 5:11 PM Igor Konopko 
->>>> <igor.j.konopko@intel.com> wrote:
->>>>>
->>>>> This patch adds the possibility to provide full device path (like
->>>>> /dev/nvme0n1) when specifying device on top of which pblk instance
->>>>> should be created/removed.
->>>>>
->>>>> This makes creation of targets from nvme-cli (or other ioctl based
->>>>> tools) more unified with other commands in comparison with current
->>>>> situation where almost all commands uses full device path with except
->>>>> of lightnvm creation/removal parameter which uses just 'nvme0n1'
->>>>> naming convention. After this changes both approach will be valid.
->>>>>
->>>>> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
->>>>> ---
->>>>>    drivers/lightnvm/core.c | 23 ++++++++++++++++++-----
->>>>>    1 file changed, 18 insertions(+), 5 deletions(-)
->>>>>
->>>>> diff --git a/drivers/lightnvm/core.c b/drivers/lightnvm/core.c
->>>>> index c01f83b..838c3d8 100644
->>>>> --- a/drivers/lightnvm/core.c
->>>>> +++ b/drivers/lightnvm/core.c
->>>>> @@ -1195,6 +1195,21 @@ void nvm_unregister(struct nvm_dev *dev)
->>>>>    }
->>>>>    EXPORT_SYMBOL(nvm_unregister);
->>>>>
->>>>> +#define PREFIX_STR "/dev/"
->>>>> +static void nvm_normalize_path(char *path)
->>>>> +{
->>>>> +       path[DISK_NAME_LEN - 1] = '\0';
->>>>> +       if (!memcmp(PREFIX_STR, path,
->>>>> +                               sizeof(char) * strlen(PREFIX_STR))) {
->>>>> +               /*
->>>>> +                * User provide name in '/dev/nvme0n1' format,
->>>>> +                * so we need to skip '/dev/' for comparison
->>>>> +                */
->>>>> +               memmove(path, path + sizeof(char) * 
->>>>> strlen(PREFIX_STR),
->>>>> +                       (DISK_NAME_LEN - strlen(PREFIX_STR)) * 
->>>>> sizeof(char));
->>>>> +       }
->>>>> +}
->>>>> +
->>>>
->>>> I don't like this. Why add string parsing to the kernel? Can't this
->>>> feature be added to the nvme tool?
->>>
->>> Since during target creation/removal in kernel, we already operate on
->>> strings multiple times (strcmp calls for target types, nvme device,
->>> target names) my idea was to keep this in the same layer too.
->>
->> Oh, pardon the terse and rather grumpy review. Let me elaborate:
->>
->> String parsing is best avoided when possible, and i don't think it's
->> worth increasing the kernel code size and changing the behavior of the
->> IOCTL when its fully doable to do this in userspace.
->>
->> Thanks,
->> Hans
->>
->>>
->>>>
->>>>>    static int __nvm_configure_create(struct nvm_ioctl_create *create)
->>>>>    {
->>>>>           struct nvm_dev *dev;
->>>>> @@ -1304,9 +1319,9 @@ static long nvm_ioctl_dev_create(struct file 
->>>>> *file, void __user *arg)
->>>>>                   return -EINVAL;
->>>>>           }
->>>>>
->>>>> -       create.dev[DISK_NAME_LEN - 1] = '\0';
->>>>> +       nvm_normalize_path(create.dev);
->>>>> +       nvm_normalize_path(create.tgtname);
->>>>>           create.tgttype[NVM_TTYPE_NAME_MAX - 1] = '\0';
->>>>> -       create.tgtname[DISK_NAME_LEN - 1] = '\0';
->>>>>
->>>>>           if (create.flags != 0) {
->>>>>                   __u32 flags = create.flags;
->>>>> @@ -1333,7 +1348,7 @@ static long nvm_ioctl_dev_remove(struct file 
->>>>> *file, void __user *arg)
->>>>>           if (copy_from_user(&remove, arg, sizeof(struct 
->>>>> nvm_ioctl_remove)))
->>>>>                   return -EFAULT;
->>>>>
->>>>> -       remove.tgtname[DISK_NAME_LEN - 1] = '\0';
->>>>> +       nvm_normalize_path(remove.tgtname);
->>>>>
->>>>>           if (remove.flags != 0) {
->>>>>                   pr_err("nvm: no flags supported\n");
->>>>> @@ -1373,8 +1388,6 @@ static long nvm_ioctl_dev_factory(struct file 
->>>>> *file, void __user *arg)
->>>>>           if (copy_from_user(&fact, arg, sizeof(struct 
->>>>> nvm_ioctl_dev_factory)))
->>>>>                   return -EFAULT;
->>>>>
->>>>> -       fact.dev[DISK_NAME_LEN - 1] = '\0';
->>>>> -
->>>>>           if (fact.flags & ~(NVM_FACTORY_NR_BITS - 1))
->>>>>                   return -EINVAL;
->>>>>
->>>>> -- 
->>>>> 2.9.5
->>>>>
+Do you have examples that some distro making use of larger ra_pages
+for boot time optimization?
 
+There are fadvise() based readahead/preload tools that can be more
+efficient for such purpose.
+
+>mitigate the trashing under memory pressure. Those are the cases
+
+Suppose N read streams with equal read speed. The thrash-free memory
+requirement would be (N * 2 * ra_pages).
+
+If N=1000 and ra_pages=1MB, it'd require 2GB memory. Which looks
+affordable in mainstream servers.
+
+Also we have try_context_readahead() that's good at estimating the
+thrashing free readahead size -- as long as the system load and
+read speed remains stable, and node/zone reclaims are balanced.
+
+For normal systems w/o huge number slow read streams, e.g. desktop,
+reducing ra_pages may save a little memory by reducing readahead
+misses, especially on mmap() read-around. Though at the risk of more
+number of IOs. So I'd imagine desktops with 1GB or fewer memory
+to really need worry about conservative readahead size.
+
+>we need to globally and immediately change this value. However,
+
+Such requirement should be rare enough?
+
+OTOH, the current Linux behavior of "changing ra_pages only changes
+future file opens" does seem not a typical end user would expect and
+understand.
+
+>from the discussion, we know bdi readahead tend to be an optimal
+>value to be a physical property of the storage and doesn't tend to
+>change dynamically. Thus we'd like to purpose readahead_shift into
+>backing device. This value is used as a shift bit number with bdi
+>readahead value to come out the readahead value and the negative
+>value means the division effect in the fixup function. The fixup
+>would only take effect when shift value is not zero;otherwise,
+>it returns file's ra_pages directly. Thus, an administrator could
+>use this value to control the amount readahead referred to
+>its backing device to achieve its goal.
+
+Sorry but it sounds like introducing an unnecessarily twisted new
+interface. I'm afraid it fixes the pain for 0.001% users while
+bringing more puzzle to the majority others.
+
+If we make up mind to fix the problem, it'd be more acceptable to
+limit to an internal per-file data structure change, like this:
+
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -884,7 +884,7 @@ struct file_ra_state {
+        unsigned int async_size;        /* do asynchronous readahead when
+                                           there are only # of pages ahead */
+
+-       unsigned int ra_pages;          /* Maximum readahead window */
++       unsigned int ra_pages_shift;
+        unsigned int mmap_miss;         /* Cache miss stat for mmap accesses */
+        loff_t prev_pos;                /* Cache last read() position */
+ };
+
+Then let fadvise() and shrink_readahead_size_eio() adjust that
+per-file ra_pages_shift.
+
+Cheers,
+Fengguang
+
+>Signed-off-by: Martin Liu <liumartin@google.com>
+>---
+>I'd like to get some feedback about the patch. If you have any
+>concern, please let me know. Thanks.
+>---
+> block/blk-sysfs.c                | 28 ++++++++++++++++++++++++++++
+> include/linux/backing-dev-defs.h |  1 +
+> include/linux/backing-dev.h      | 10 ++++++++++
+> mm/backing-dev.c                 | 27 +++++++++++++++++++++++++++
+> mm/filemap.c                     |  8 +++++---
+> mm/readahead.c                   |  2 +-
+> 6 files changed, 72 insertions(+), 4 deletions(-)
+>
+>diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+>index 59685918167e..f48b68e05d0e 100644
+>--- a/block/blk-sysfs.c
+>+++ b/block/blk-sysfs.c
+>@@ -107,6 +107,27 @@ queue_ra_store(struct request_queue *q, const char *page, size_t count)
+> 	return ret;
+> }
+>
+>+static ssize_t queue_ra_shift_show(struct request_queue *q, char *page)
+>+{
+>+	int ra_shift = q->backing_dev_info->read_ahead_shift;
+>+
+>+	return scnprintf(page, PAGE_SIZE - 1, "%d\n", ra_shift);
+>+}
+>+
+>+static ssize_t queue_ra_shift_store(struct request_queue *q, const char *page,
+>+				    size_t count)
+>+{
+>+	s8 ra_shift;
+>+	ssize_t ret = kstrtos8(page, 10, &ra_shift);
+>+
+>+	if (ret)
+>+		return ret;
+>+
+>+	q->backing_dev_info->read_ahead_shift = ra_shift;
+>+
+>+	return count;
+>+}
+>+
+> static ssize_t queue_max_sectors_show(struct request_queue *q, char *page)
+> {
+> 	int max_sectors_kb = queue_max_sectors(q) >> 1;
+>@@ -540,6 +561,12 @@ static struct queue_sysfs_entry queue_ra_entry = {
+> 	.store = queue_ra_store,
+> };
+>
+>+static struct queue_sysfs_entry queue_ra_shift_entry = {
+>+	.attr = {.name = "read_ahead_shift", .mode = 0644 },
+>+	.show = queue_ra_shift_show,
+>+	.store = queue_ra_shift_store,
+>+};
+>+
+> static struct queue_sysfs_entry queue_max_sectors_entry = {
+> 	.attr = {.name = "max_sectors_kb", .mode = 0644 },
+> 	.show = queue_max_sectors_show,
+>@@ -729,6 +756,7 @@ static struct queue_sysfs_entry throtl_sample_time_entry = {
+> static struct attribute *default_attrs[] = {
+> 	&queue_requests_entry.attr,
+> 	&queue_ra_entry.attr,
+>+	&queue_ra_shift_entry.attr,
+> 	&queue_max_hw_sectors_entry.attr,
+> 	&queue_max_sectors_entry.attr,
+> 	&queue_max_segments_entry.attr,
+>diff --git a/include/linux/backing-dev-defs.h b/include/linux/backing-dev-defs.h
+>index 07e02d6df5ad..452002df5232 100644
+>--- a/include/linux/backing-dev-defs.h
+>+++ b/include/linux/backing-dev-defs.h
+>@@ -167,6 +167,7 @@ struct bdi_writeback {
+> struct backing_dev_info {
+> 	struct list_head bdi_list;
+> 	unsigned long ra_pages;	/* max readahead in PAGE_SIZE units */
+>+	s8 read_ahead_shift; /* shift to ra_pages */
+> 	unsigned long io_pages;	/* max allowed IO size */
+> 	congested_fn *congested_fn; /* Function pointer if device is md/dm */
+> 	void *congested_data;	/* Pointer to aux data for congested func */
+>diff --git a/include/linux/backing-dev.h b/include/linux/backing-dev.h
+>index f9b029180241..23f755fe386e 100644
+>--- a/include/linux/backing-dev.h
+>+++ b/include/linux/backing-dev.h
+>@@ -221,6 +221,16 @@ static inline int bdi_sched_wait(void *word)
+> 	return 0;
+> }
+>
+>+static inline unsigned long read_ahead_fixup(struct file *file)
+>+{
+>+	unsigned long ra = file->f_ra.ra_pages;
+>+	s8 shift = (inode_to_bdi(file->f_mapping->host))->read_ahead_shift;
+>+
+>+	ra = (shift >= 0) ? ra << shift : ra >> abs(shift);
+>+
+>+	return ra;
+>+}
+>+
+> #ifdef CONFIG_CGROUP_WRITEBACK
+>
+> struct bdi_writeback_congested *
+>diff --git a/mm/backing-dev.c b/mm/backing-dev.c
+>index 72e6d0c55cfa..1b5163a5ead5 100644
+>--- a/mm/backing-dev.c
+>+++ b/mm/backing-dev.c
+>@@ -172,6 +172,32 @@ static DEVICE_ATTR_RW(name);
+>
+> BDI_SHOW(read_ahead_kb, K(bdi->ra_pages))
+>
+>+static ssize_t read_ahead_shift_store(struct device *dev,
+>+				      struct device_attribute *attr,
+>+				      const char *buf, size_t count)
+>+{
+>+	struct backing_dev_info *bdi = dev_get_drvdata(dev);
+>+	s8 read_ahead_shift;
+>+	ssize_t ret = kstrtos8(buf, 10, &read_ahead_shift);
+>+
+>+	if (ret)
+>+		return ret;
+>+
+>+	bdi->read_ahead_shift = read_ahead_shift;
+>+
+>+	return count;
+>+}
+>+
+>+static ssize_t read_ahead_shift_show(struct device *dev,
+>+				     struct device_attribute *attr, char *page)
+>+{
+>+	struct backing_dev_info *bdi = dev_get_drvdata(dev);
+>+
+>+	return scnprintf(page, PAGE_SIZE - 1, "%d\n", bdi->read_ahead_shift);
+>+}
+>+
+>+static DEVICE_ATTR_RW(read_ahead_shift);
+>+
+> static ssize_t min_ratio_store(struct device *dev,
+> 		struct device_attribute *attr, const char *buf, size_t count)
+> {
+>@@ -223,6 +249,7 @@ static DEVICE_ATTR_RO(stable_pages_required);
+>
+> static struct attribute *bdi_dev_attrs[] = {
+> 	&dev_attr_read_ahead_kb.attr,
+>+	&dev_attr_read_ahead_shift.attr,
+> 	&dev_attr_min_ratio.attr,
+> 	&dev_attr_max_ratio.attr,
+> 	&dev_attr_stable_pages_required.attr,
+>diff --git a/mm/filemap.c b/mm/filemap.c
+>index d78f577baef2..cd8d0e00ff93 100644
+>--- a/mm/filemap.c
+>+++ b/mm/filemap.c
+>@@ -2469,6 +2469,7 @@ static struct file *do_sync_mmap_readahead(struct vm_fault *vmf)
+> 	struct address_space *mapping = file->f_mapping;
+> 	struct file *fpin = NULL;
+> 	pgoff_t offset = vmf->pgoff;
+>+	unsigned long max;
+>
+> 	/* If we don't want any read-ahead, don't bother */
+> 	if (vmf->vma->vm_flags & VM_RAND_READ)
+>@@ -2498,9 +2499,10 @@ static struct file *do_sync_mmap_readahead(struct vm_fault *vmf)
+> 	 * mmap read-around
+> 	 */
+> 	fpin = maybe_unlock_mmap_for_io(vmf, fpin);
+>-	ra->start = max_t(long, 0, offset - ra->ra_pages / 2);
+>-	ra->size = ra->ra_pages;
+>-	ra->async_size = ra->ra_pages / 4;
+>+	max = read_ahead_fixup(file);
+>+	ra->start = max_t(long, 0, offset - max / 2);
+>+	ra->size = max;
+>+	ra->async_size = max / 4;
+> 	ra_submit(ra, mapping, file);
+> 	return fpin;
+> }
+>diff --git a/mm/readahead.c b/mm/readahead.c
+>index a4593654a26c..546bf344fc4d 100644
+>--- a/mm/readahead.c
+>+++ b/mm/readahead.c
+>@@ -384,7 +384,7 @@ ondemand_readahead(struct address_space *mapping,
+> 		   unsigned long req_size)
+> {
+> 	struct backing_dev_info *bdi = inode_to_bdi(mapping->host);
+>-	unsigned long max_pages = ra->ra_pages;
+>+	unsigned long max_pages = read_ahead_fixup(filp);
+> 	unsigned long add_pages;
+> 	pgoff_t prev_offset;
+>
+>-- 
+>2.21.0.392.gf8f6787159e-goog
+>
