@@ -2,107 +2,107 @@ Return-Path: <SRS0=AbZH=R4=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4E80C10F03
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 11:12:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18362C43381
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 11:13:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8996520872
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 11:12:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D734C207DD
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 11:13:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="VNzJ0KIB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730859AbfCYLM2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Mar 2019 07:12:28 -0400
-Received: from mga04.intel.com ([192.55.52.120]:63136 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730785AbfCYLM1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Mar 2019 07:12:27 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Mar 2019 04:12:27 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,256,1549958400"; 
-   d="scan'208";a="154936391"
-Received: from ikonopko-mobl1.ger.corp.intel.com (HELO [10.237.142.109]) ([10.237.142.109])
-  by fmsmga002.fm.intel.com with ESMTP; 25 Mar 2019 04:12:26 -0700
-Subject: Re: [PATCH v2 04/16] lightnvm: pblk: OOB recovery for closed chunks
- fix
-To:     =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
-        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
-Cc:     Hans Holmberg <hans.holmberg@cnexlabs.com>,
-        linux-block@vger.kernel.org
+        id S1730555AbfCYLNY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Mar 2019 07:13:24 -0400
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:36961 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730511AbfCYLNY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Mar 2019 07:13:24 -0400
+Received: by mail-ed1-f67.google.com with SMTP id v21so7149190edq.4
+        for <linux-block@vger.kernel.org>; Mon, 25 Mar 2019 04:13:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=jUvUvZ9MohxaphU9AAI2vJjXo6Sp+2imnIn4wA3zSnw=;
+        b=VNzJ0KIBva7F86IXJ6nBCXESy2O84ZSEitF0MUd/ayLBlGZ8TDXvVXRqFlOruSaXcx
+         ctn/XpZxxtbKe3qsm0UOQhavSQti8LEaQUd2kXO24MtqD5reK9j29+9FO5FPm+pl4y8E
+         QQM7gpwDbuLjDvjvUtzMzOv3+vXL++9EkjpC7tewQO6/K/Wb6agRLdIpS69cQjo0mMgO
+         EaQT/UXJpOi6RvQkC5OJetcoMLAA0zrVHeqKXNBvrMFp10MU5tx3UK53Bk9MeruXHX+P
+         lbxP2dN6Il1xgbRqRI8bm4D0oAeOZkmn2dfnXf1gtdOMBN6FzQ8IUc9fH2xG/UBGuWCo
+         349Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jUvUvZ9MohxaphU9AAI2vJjXo6Sp+2imnIn4wA3zSnw=;
+        b=ko0WIUdRdBVJaOClMOdvkJEUQvT8kcoXlcPoqMKPgGxA/sGqJj+07c8Dhc6K6V6ovS
+         Q5cYMWZNJQavQft/35QNyNc+QcpAVFEjeihLRpBO49RONWwqCmGDEPfK9/MLYK9uAMUG
+         RvbOLQHKwOWMPc7EX8+P04t3/7jTmCzPTgD29fiIHvUo2XPPwh82XIvvr/ZTqh1hUV7j
+         jXuE2zloFpKpIHoqWRVFWNfBM56PMD06i8bCLe5hfqasucMmdgNDpd6LRMipBuIH+IsY
+         nI0kVdPm2rX0A7Kuf4PbaBykCLf3BJmbLp5shBx5Pa9eqUm2r9KYViJbIvaLgBEbzti4
+         0QJA==
+X-Gm-Message-State: APjAAAVVzpeTY6AE/QOupntC+R9DimpSXokUQCegauNhSsLkMzCbTi7V
+        lYqexbHrqCcL9unpEvHjHGC+EJ+n4RE=
+X-Google-Smtp-Source: APXvYqzFXFHitHSpvmHNXQZe6hJrdaG+ZAIXhoF6J+aVyXQ47bkTsnw9qFOMszgGgJ+ljNj0YwdvRg==
+X-Received: by 2002:a17:906:5946:: with SMTP id g6mr13981910ejr.58.1553512401631;
+        Mon, 25 Mar 2019 04:13:21 -0700 (PDT)
+Received: from [192.168.0.36] (2-111-91-225-cable.dk.customer.tdc.net. [2.111.91.225])
+        by smtp.googlemail.com with ESMTPSA id p12sm3448574ejr.58.2019.03.25.04.13.20
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 25 Mar 2019 04:13:21 -0700 (PDT)
+Subject: Re: [PATCH v2 10/16] lightnvm: pblk: kick writer on write recovery
+ path
+To:     Igor Konopko <igor.j.konopko@intel.com>, javier@javigon.com,
+        hans.holmberg@cnexlabs.com
+Cc:     linux-block@vger.kernel.org
 References: <20190322144843.9602-1-igor.j.konopko@intel.com>
- <20190322144843.9602-5-igor.j.konopko@intel.com>
- <652D902B-21C8-4599-8298-F73E0620CC95@javigon.com>
-From:   Igor Konopko <igor.j.konopko@intel.com>
-Message-ID: <64d5fe55-b8ce-da89-8459-5ef3cafc2226@intel.com>
-Date:   Mon, 25 Mar 2019 12:12:25 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.3
+ <20190322144843.9602-11-igor.j.konopko@intel.com>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <21671414-5c88-4cdc-ee28-c5d46acb5b28@lightnvm.io>
+Date:   Mon, 25 Mar 2019 12:13:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-In-Reply-To: <652D902B-21C8-4599-8298-F73E0620CC95@javigon.com>
+In-Reply-To: <20190322144843.9602-11-igor.j.konopko@intel.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 25.03.2019 07:02, Javier González wrote:
->> On 22 Mar 2019, at 22.48, Igor Konopko <igor.j.konopko@intel.com> wrote:
->>
->> In case of OOB recovery, when some of the chunks are in closed state,
->> we are calculating number of written sectors in line incorrectly,
->> because we are always counting chunk WP, which for closed chunks
->> does not longer reflects written sectors in particular chunk. Based on
->> OCSSD 2.0 spec WP for closed chunks is equal to SLBA + NLB and here we
->> need only NLB (clba in code) value for calculation. This patch for such
->> a chunks takes clba field instead.
->>
->> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
->> ---
->> drivers/lightnvm/pblk-recovery.c | 8 +++++++-
->> 1 file changed, 7 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
->> index 83b467b..bcd3633 100644
->> --- a/drivers/lightnvm/pblk-recovery.c
->> +++ b/drivers/lightnvm/pblk-recovery.c
->> @@ -101,6 +101,8 @@ static void pblk_update_line_wp(struct pblk *pblk, struct pblk_line *line,
->>
->> static u64 pblk_sec_in_open_line(struct pblk *pblk, struct pblk_line *line)
->> {
->> +	struct nvm_tgt_dev *dev = pblk->dev;
->> +	struct nvm_geo *geo = &dev->geo;
->> 	struct pblk_line_meta *lm = &pblk->lm;
->> 	int nr_bb = bitmap_weight(line->blk_bitmap, lm->blk_per_line);
->> 	u64 written_secs = 0;
->> @@ -113,7 +115,11 @@ static u64 pblk_sec_in_open_line(struct pblk *pblk, struct pblk_line *line)
->> 		if (chunk->state & NVM_CHK_ST_OFFLINE)
->> 			continue;
->>
->> -		written_secs += chunk->wp;
->> +		if (chunk->state & NVM_CHK_ST_OPEN)
->> +			written_secs += chunk->wp;
->> +		else if (chunk->state & NVM_CHK_ST_CLOSED)
->> +			written_secs += geo->clba;
->> +
->> 		valid_chunks++;
->> 	}
->>
->> --
->> 2.9.5
+On 3/22/19 3:48 PM, Igor Konopko wrote:
+> In case of write recovery path, there is a chance that writer thread
+> is not active, so for sanity it would be good to always kick it.
 > 
-> Didn’t we agree that the patch was not needed?
+> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+> Reviewed-by: Javier González <javier@javigon.com>
+> Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+> ---
+>   drivers/lightnvm/pblk-write.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/lightnvm/pblk-write.c b/drivers/lightnvm/pblk-write.c
+> index 6593dea..4e63f9b 100644
+> --- a/drivers/lightnvm/pblk-write.c
+> +++ b/drivers/lightnvm/pblk-write.c
+> @@ -228,6 +228,7 @@ static void pblk_submit_rec(struct work_struct *work)
+>   	mempool_free(recovery, &pblk->rec_pool);
+>   
+>   	atomic_dec(&pblk->inflight_io);
+> +	pblk_write_kick(pblk);
+>   }
+>   
+>   
 > 
 
-I hope I explained what was my motivation for doing this changes. And 
-don't know honestly if we should fix this here or in the spec, so that's 
-why I send it with v2 too. Matias should decide.
+Thanks Igor. I've updated the description a bit.
 
-> 
+"In case of write recovery path, there is a chance that writer thread
+is not active, kick immediately instead of waiting for timer."
