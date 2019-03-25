@@ -4,58 +4,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham
+	SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEC03C43381
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 05:48:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCFEFC43381
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 05:48:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E37E20870
-	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 05:48:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 832A520870
+	for <linux-block@archiver.kernel.org>; Mon, 25 Mar 2019 05:48:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Lr/kMNM/"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="MMtdqAKW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729625AbfCYFsK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Mar 2019 01:48:10 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:58170 "EHLO
+        id S1729618AbfCYFsM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Mar 2019 01:48:12 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:58214 "EHLO
         aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729590AbfCYFsJ (ORCPT
+        with ESMTP id S1729590AbfCYFsL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Mar 2019 01:48:09 -0400
+        Mon, 25 Mar 2019 01:48:11 -0400
 Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2P5icfU004287;
-        Mon, 25 Mar 2019 05:47:31 GMT
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2P5iASS003895;
+        Mon, 25 Mar 2019 05:47:28 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2018-07-02;
- bh=ZKSQGcpUijxA9bKMQXk3raXk4fV1gU8mOw9/NX/tnCA=;
- b=Lr/kMNM/qPudRyPMH+jPFDoyB2GY1qs5fdcgoqXME1QSn+J3uyslXv1ONHH9LPuQVxnw
- zSzpEMKihZvPib8iLCWHKbECZm0sV1QBb6MwwsweNng+uGnuIYbvWZpvwIy5s+DZXCde
- L9L8QsEMzC0rIKgJkN2po0REERVYvUOR+NOZbW0aVMnY0zJKzfcluiFTrVNMluZINawF
- x91gMDbJCvkVrDrrN4KQhKfrdJ/6ycWu1NEjFRXaqMgI/YVtNh5LvtVL1BsW92lvMn/2
- xqxsEE+jsk06LSJVUOxQ85NCGmrMSgkFEu9eeTGUIo4HXpNLcDOs5sGd1HZ6cBdbRUOv SA== 
+ bh=g8MNxG5h6K02d1j2gbKNvS/YX3Qz/wQcjAOs3taPJWs=;
+ b=MMtdqAKWCbA1DAc2NALO4dAUngrWz2oUzJrJJobsDRRqXuZ0P+3nHYQVWn8wgUojCGN7
+ Z0DlS/cf8J+mO7QcdSb75Ok++9O+WWJkCzuOT/vTBe1/mxU5+yeIbfxKioeg7uESSuqI
+ j4vQiL7vq70luO+S79FdUidm/h16M+uKq8waGpWwVY9k3iTWyKFy2GMVEhtwsbH1pClk
+ IFrMUjFM9A2frx+2avuIdDbSd9dsEolkE9EDjKshF6QITniVFAJ7p6K+Q4rGeqWdNVN2
+ Ghx6Niyei9yf6uqCfHokZ23OMqFiYEoW4MOtFLL8rmQ9MgFGfb7i5nxZaYYtQu6TXWNt Cg== 
 Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
-        by aserp2130.oracle.com with ESMTP id 2re6g0ht0x-1
+        by aserp2130.oracle.com with ESMTP id 2re6g0ht0s-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 25 Mar 2019 05:47:31 +0000
+        Mon, 25 Mar 2019 05:47:28 +0000
 Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2P5lPDY013981
+        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2P5lMpj013909
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 25 Mar 2019 05:47:25 GMT
+        Mon, 25 Mar 2019 05:47:22 GMT
 Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x2P5lPQS030215;
-        Mon, 25 Mar 2019 05:47:25 GMT
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x2P5lMo3030211;
+        Mon, 25 Mar 2019 05:47:22 GMT
 Received: from will-ThinkCentre-M93p.cn.oracle.com (/10.182.71.12)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 24 Mar 2019 22:47:25 -0700
+        with ESMTP ; Sun, 24 Mar 2019 22:47:21 -0700
 From:   Jianchao Wang <jianchao.w.wang@oracle.com>
 To:     axboe@kernel.dk
 Cc:     hch@lst.de, jthumshirn@suse.de, hare@suse.de, josef@toxicpanda.com,
         bvanassche@acm.org, sagi@grimberg.me, keith.busch@intel.com,
         jsmart2021@gmail.com, linux-block@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH V2 8/8] blk-mq: remove blk_mq_tagset_busy_iter
-Date:   Mon, 25 Mar 2019 13:38:38 +0800
-Message-Id: <1553492318-1810-9-git-send-email-jianchao.w.wang@oracle.com>
+Subject: [PATCH V2 7/8] nvme: use blk_mq_queue_tag_inflight_iter
+Date:   Mon, 25 Mar 2019 13:38:37 +0800
+Message-Id: <1553492318-1810-8-git-send-email-jianchao.w.wang@oracle.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1553492318-1810-1-git-send-email-jianchao.w.wang@oracle.com>
 References: <1553492318-1810-1-git-send-email-jianchao.w.wang@oracle.com>
@@ -70,133 +70,186 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-As nobody uses blk_mq_tagset_busy_iter, remove it.
+blk_mq_tagset_inflight_iter is not safe that it could get stale request
+in tags->rqs[]. Use blk_mq_queue_tag_inflight_iter here. A new helper
+interface nvme_iterate_inflight_rqs is introduced to iterate
+all of the ns under a ctrl.
 
 Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
 ---
- block/blk-mq-tag.c     | 95 --------------------------------------------------
- include/linux/blk-mq.h |  2 --
- 2 files changed, 97 deletions(-)
+ drivers/nvme/host/core.c   | 12 ++++++++++++
+ drivers/nvme/host/fc.c     | 10 +++++-----
+ drivers/nvme/host/nvme.h   |  2 ++
+ drivers/nvme/host/pci.c    |  5 +++--
+ drivers/nvme/host/rdma.c   |  4 ++--
+ drivers/nvme/host/tcp.c    |  5 +++--
+ drivers/nvme/target/loop.c |  4 ++--
+ 7 files changed, 29 insertions(+), 13 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index bf7b235..a6a28dd 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -279,101 +279,6 @@ static void bt_for_each(struct blk_mq_hw_ctx *hctx, struct sbitmap_queue *bt,
- 	sbitmap_for_each_set(&bt->sb, bt_iter, &iter_data);
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index 4706019..d6c53fe 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -3874,6 +3874,18 @@ void nvme_start_queues(struct nvme_ctrl *ctrl)
  }
+ EXPORT_SYMBOL_GPL(nvme_start_queues);
  
--struct bt_tags_iter_data {
--	struct blk_mq_tags *tags;
--	busy_tag_iter_fn *fn;
--	void *data;
--	bool reserved;
--};
--
--static bool bt_tags_iter(struct sbitmap *bitmap, unsigned int bitnr, void *data)
--{
--	struct bt_tags_iter_data *iter_data = data;
--	struct blk_mq_tags *tags = iter_data->tags;
--	bool reserved = iter_data->reserved;
--	struct request *rq;
--
--	if (!reserved)
--		bitnr += tags->nr_reserved_tags;
--
--	/*
--	 * We can hit rq == NULL here, because the tagging functions
--	 * test and set the bit before assining ->rqs[].
--	 */
--	rq = tags->rqs[bitnr];
--	if (rq && blk_mq_request_started(rq))
--		return iter_data->fn(rq, iter_data->data, reserved);
--
--	return true;
--}
--
--/**
-- * bt_tags_for_each - iterate over the requests in a tag map
-- * @tags:	Tag map to iterate over.
-- * @bt:		sbitmap to examine. This is either the breserved_tags member
-- *		or the bitmap_tags member of struct blk_mq_tags.
-- * @fn:		Pointer to the function that will be called for each started
-- *		request. @fn will be called as follows: @fn(rq, @data,
-- *		@reserved) where rq is a pointer to a request. Return true
-- *		to continue iterating tags, false to stop.
-- * @data:	Will be passed as second argument to @fn.
-- * @reserved:	Indicates whether @bt is the breserved_tags member or the
-- *		bitmap_tags member of struct blk_mq_tags.
-- */
--static void bt_tags_for_each(struct blk_mq_tags *tags, struct sbitmap_queue *bt,
--			     busy_tag_iter_fn *fn, void *data, bool reserved)
--{
--	struct bt_tags_iter_data iter_data = {
--		.tags = tags,
--		.fn = fn,
--		.data = data,
--		.reserved = reserved,
--	};
--
--	if (tags->rqs)
--		sbitmap_for_each_set(&bt->sb, bt_tags_iter, &iter_data);
--}
--
--/**
-- * blk_mq_all_tag_busy_iter - iterate over all started requests in a tag map
-- * @tags:	Tag map to iterate over.
-- * @fn:		Pointer to the function that will be called for each started
-- *		request. @fn will be called as follows: @fn(rq, @priv,
-- *		reserved) where rq is a pointer to a request. 'reserved'
-- *		indicates whether or not @rq is a reserved request. Return
-- *		true to continue iterating tags, false to stop.
-- * @priv:	Will be passed as second argument to @fn.
-- */
--static void blk_mq_all_tag_busy_iter(struct blk_mq_tags *tags,
--		busy_tag_iter_fn *fn, void *priv)
--{
--	if (tags->nr_reserved_tags)
--		bt_tags_for_each(tags, &tags->breserved_tags, fn, priv, true);
--	bt_tags_for_each(tags, &tags->bitmap_tags, fn, priv, false);
--}
--
--/**
-- * blk_mq_tagset_busy_iter - iterate over all started requests in a tag set
-- * @tagset:	Tag set to iterate over.
-- * @fn:		Pointer to the function that will be called for each started
-- *		request. @fn will be called as follows: @fn(rq, @priv,
-- *		reserved) where rq is a pointer to a request. 'reserved'
-- *		indicates whether or not @rq is a reserved request. Return
-- *		true to continue iterating tags, false to stop.
-- * @priv:	Will be passed as second argument to @fn.
-- */
--void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
--		busy_tag_iter_fn *fn, void *priv)
--{
--	int i;
--
--	for (i = 0; i < tagset->nr_hw_queues; i++) {
--		if (tagset->tags && tagset->tags[i])
--			blk_mq_all_tag_busy_iter(tagset->tags[i], fn, priv);
--	}
--}
--EXPORT_SYMBOL(blk_mq_tagset_busy_iter);
--
- /**
-  * __blk_mq_queue_tag_busy_iter - iterate over all busy or inflight tags
-  * @q:		Request queue to examine.
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index dff9bb6..3ba8001 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -318,8 +318,6 @@ void blk_mq_unquiesce_queue(struct request_queue *q);
- void blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, unsigned long msecs);
- bool blk_mq_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async);
- void blk_mq_run_hw_queues(struct request_queue *q, bool async);
--void blk_mq_tagset_busy_iter(struct blk_mq_tag_set *tagset,
--		busy_tag_iter_fn *fn, void *priv);
- void blk_mq_queue_tag_inflight_iter(struct request_queue *q,
- 		busy_iter_fn *fn, void *priv);
- void blk_mq_freeze_queue(struct request_queue *q);
++void nvme_iterate_inflight_rqs(struct nvme_ctrl *ctrl,
++		busy_iter_fn *fn, void *data)
++{
++	struct nvme_ns *ns;
++
++	down_read(&ctrl->namespaces_rwsem);
++	list_for_each_entry(ns, &ctrl->namespaces, list)
++		blk_mq_queue_tag_inflight_iter(ns->queue, fn, data);
++	up_read(&ctrl->namespaces_rwsem);
++}
++EXPORT_SYMBOL_GPL(nvme_iterate_inflight_rqs);
++
+ int __init nvme_core_init(void)
+ {
+ 	int result = -ENOMEM;
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index f3b9d91..667da72 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -2367,7 +2367,7 @@ nvme_fc_complete_rq(struct request *rq)
+ /*
+  * This routine is used by the transport when it needs to find active
+  * io on a queue that is to be terminated. The transport uses
+- * blk_mq_tagset_busy_itr() to find the busy requests, which then invoke
++ * blk_mq_queue_tag_inflight_iter() to find the busy requests, which then invoke
+  * this routine to kill them on a 1 by 1 basis.
+  *
+  * As FC allocates FC exchange for each io, the transport must contact
+@@ -2740,7 +2740,7 @@ nvme_fc_delete_association(struct nvme_fc_ctrl *ctrl)
+ 	 * If io queues are present, stop them and terminate all outstanding
+ 	 * ios on them. As FC allocates FC exchange for each io, the
+ 	 * transport must contact the LLDD to terminate the exchange,
+-	 * thus releasing the FC exchange. We use blk_mq_tagset_busy_itr()
++	 * thus releasing the FC exchange. We use blk_mq_queue_tag_inflight_iter
+ 	 * to tell us what io's are busy and invoke a transport routine
+ 	 * to kill them with the LLDD.  After terminating the exchange
+ 	 * the LLDD will call the transport's normal io done path, but it
+@@ -2750,7 +2750,7 @@ nvme_fc_delete_association(struct nvme_fc_ctrl *ctrl)
+ 	 */
+ 	if (ctrl->ctrl.queue_count > 1) {
+ 		nvme_stop_queues(&ctrl->ctrl);
+-		blk_mq_tagset_busy_iter(&ctrl->tag_set,
++		nvme_iterate_inflight_rqs(&ctrl->ctrl,
+ 				nvme_fc_terminate_exchange, &ctrl->ctrl);
+ 	}
+ 
+@@ -2768,11 +2768,11 @@ nvme_fc_delete_association(struct nvme_fc_ctrl *ctrl)
+ 
+ 	/*
+ 	 * clean up the admin queue. Same thing as above.
+-	 * use blk_mq_tagset_busy_itr() and the transport routine to
++	 * use blk_mq_queue_tag_inflight_iter() and the transport routine to
+ 	 * terminate the exchanges.
+ 	 */
+ 	blk_mq_quiesce_queue(ctrl->ctrl.admin_q);
+-	blk_mq_tagset_busy_iter(&ctrl->admin_tag_set,
++	blk_mq_queue_tag_inflight_iter(ctrl->ctrl.admin_q,
+ 				nvme_fc_terminate_exchange, &ctrl->ctrl);
+ 
+ 	/* kill the aens as they are a separate path */
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 527d645..4c6bc803 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -445,6 +445,8 @@ void nvme_unfreeze(struct nvme_ctrl *ctrl);
+ void nvme_wait_freeze(struct nvme_ctrl *ctrl);
+ void nvme_wait_freeze_timeout(struct nvme_ctrl *ctrl, long timeout);
+ void nvme_start_freeze(struct nvme_ctrl *ctrl);
++void nvme_iterate_inflight_rqs(struct nvme_ctrl *ctrl,
++		busy_iter_fn *fn, void *data);
+ 
+ #define NVME_QID_ANY -1
+ struct request *nvme_alloc_request(struct request_queue *q,
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index a90cf5d..96faa36 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -2430,8 +2430,9 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
+ 	nvme_suspend_queue(&dev->queues[0]);
+ 	nvme_pci_disable(dev);
+ 
+-	blk_mq_tagset_busy_iter(&dev->tagset, nvme_cancel_request, &dev->ctrl);
+-	blk_mq_tagset_busy_iter(&dev->admin_tagset, nvme_cancel_request, &dev->ctrl);
++	nvme_iterate_inflight_rqs(&dev->ctrl, nvme_cancel_request, &dev->ctrl);
++	blk_mq_queue_tag_inflight_iter(dev->ctrl.admin_q,
++			nvme_cancel_request, &dev->ctrl);
+ 
+ 	/*
+ 	 * The driver will not be starting up queues again if shutting down so
+diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
+index 11a5eca..5660200 100644
+--- a/drivers/nvme/host/rdma.c
++++ b/drivers/nvme/host/rdma.c
+@@ -914,7 +914,7 @@ static void nvme_rdma_teardown_admin_queue(struct nvme_rdma_ctrl *ctrl,
+ {
+ 	blk_mq_quiesce_queue(ctrl->ctrl.admin_q);
+ 	nvme_rdma_stop_queue(&ctrl->queues[0]);
+-	blk_mq_tagset_busy_iter(&ctrl->admin_tag_set, nvme_cancel_request,
++	blk_mq_queue_tag_inflight_iter(ctrl->ctrl.admin_q, nvme_cancel_request,
+ 			&ctrl->ctrl);
+ 	blk_mq_unquiesce_queue(ctrl->ctrl.admin_q);
+ 	nvme_rdma_destroy_admin_queue(ctrl, remove);
+@@ -926,7 +926,7 @@ static void nvme_rdma_teardown_io_queues(struct nvme_rdma_ctrl *ctrl,
+ 	if (ctrl->ctrl.queue_count > 1) {
+ 		nvme_stop_queues(&ctrl->ctrl);
+ 		nvme_rdma_stop_io_queues(ctrl);
+-		blk_mq_tagset_busy_iter(&ctrl->tag_set, nvme_cancel_request,
++		nvme_iterate_inflight_rqs(&ctrl->ctrl, nvme_cancel_request,
+ 				&ctrl->ctrl);
+ 		if (remove)
+ 			nvme_start_queues(&ctrl->ctrl);
+diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+index e7e0888..4c825dc 100644
+--- a/drivers/nvme/host/tcp.c
++++ b/drivers/nvme/host/tcp.c
+@@ -1710,7 +1710,8 @@ static void nvme_tcp_teardown_admin_queue(struct nvme_ctrl *ctrl,
+ {
+ 	blk_mq_quiesce_queue(ctrl->admin_q);
+ 	nvme_tcp_stop_queue(ctrl, 0);
+-	blk_mq_tagset_busy_iter(ctrl->admin_tagset, nvme_cancel_request, ctrl);
++	blk_mq_queue_tag_inflight_iter(ctrl->admin_q,
++			nvme_cancel_request, ctrl);
+ 	blk_mq_unquiesce_queue(ctrl->admin_q);
+ 	nvme_tcp_destroy_admin_queue(ctrl, remove);
+ }
+@@ -1722,7 +1723,7 @@ static void nvme_tcp_teardown_io_queues(struct nvme_ctrl *ctrl,
+ 		return;
+ 	nvme_stop_queues(ctrl);
+ 	nvme_tcp_stop_io_queues(ctrl);
+-	blk_mq_tagset_busy_iter(ctrl->tagset, nvme_cancel_request, ctrl);
++	nvme_iterate_inflight_rqs(ctrl, nvme_cancel_request, ctrl);
+ 	if (remove)
+ 		nvme_start_queues(ctrl);
+ 	nvme_tcp_destroy_io_queues(ctrl, remove);
+diff --git a/drivers/nvme/target/loop.c b/drivers/nvme/target/loop.c
+index b9f623a..50d7288 100644
+--- a/drivers/nvme/target/loop.c
++++ b/drivers/nvme/target/loop.c
+@@ -421,7 +421,7 @@ static void nvme_loop_shutdown_ctrl(struct nvme_loop_ctrl *ctrl)
+ {
+ 	if (ctrl->ctrl.queue_count > 1) {
+ 		nvme_stop_queues(&ctrl->ctrl);
+-		blk_mq_tagset_busy_iter(&ctrl->tag_set,
++		nvme_iterate_inflight_rqs(&ctrl->ctrl,
+ 					nvme_cancel_request, &ctrl->ctrl);
+ 		nvme_loop_destroy_io_queues(ctrl);
+ 	}
+@@ -430,7 +430,7 @@ static void nvme_loop_shutdown_ctrl(struct nvme_loop_ctrl *ctrl)
+ 		nvme_shutdown_ctrl(&ctrl->ctrl);
+ 
+ 	blk_mq_quiesce_queue(ctrl->ctrl.admin_q);
+-	blk_mq_tagset_busy_iter(&ctrl->admin_tag_set,
++	blk_mq_queue_tag_inflight_iter(ctrl->ctrl.admin_q,
+ 				nvme_cancel_request, &ctrl->ctrl);
+ 	blk_mq_unquiesce_queue(ctrl->ctrl.admin_q);
+ 	nvme_loop_destroy_admin_queue(ctrl);
 -- 
 2.7.4
 
