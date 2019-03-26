@@ -2,105 +2,123 @@ Return-Path: <SRS0=zyEp=R5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_NEOMUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04166C10F03
-	for <linux-block@archiver.kernel.org>; Tue, 26 Mar 2019 01:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 478FCC43381
+	for <linux-block@archiver.kernel.org>; Tue, 26 Mar 2019 01:31:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C757E206DF
-	for <linux-block@archiver.kernel.org>; Tue, 26 Mar 2019 01:18:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="A2+sc/nz"
+	by mail.kernel.org (Postfix) with ESMTP id 216ED20848
+	for <linux-block@archiver.kernel.org>; Tue, 26 Mar 2019 01:31:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730180AbfCZBSG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Mar 2019 21:18:06 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:50632 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726553AbfCZBSF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Mar 2019 21:18:05 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2Q1FvgT022959;
-        Tue, 26 Mar 2019 01:17:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=/Kl0K4H2oLqA9ZCxH7NCR8HsssQuahLQEpvi0trC9h8=;
- b=A2+sc/nzx/vW4i55Lyyr6ggK/XnrmAe+8sjda7zqYwQ5sr5MXYdqLX0EN1bPoacnn/mq
- f7+0mE9BTh3TdW5TOdXBYTalXlRapkUm9roIf/LGkI/TKLkQb79ySlwmDrKJ4tO2IT1K
- Hqd1cPk3mHkqYmp9jJ5MxJct8RmMDEwjo6esTLMJsS6d+2WxuqpoGEROqrwuBDVE3bSb
- roQLVlvgdSJu+iHF16m6xhOD5YGxpgFtL8P9r7ThYneZRzzhk20/KGTxiW0q/KMUdNFS
- SspYMvT1hfXeaxAcJ9alFCNeaKO/W4sRKwD/S5sp7P3eJZleiT/WwJCVG6mphhyMydN7 ag== 
-Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
-        by aserp2130.oracle.com with ESMTP id 2re6g0qeas-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Mar 2019 01:17:31 +0000
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2Q1HTh8000458
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Mar 2019 01:17:30 GMT
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x2Q1HOFl021687;
-        Tue, 26 Mar 2019 01:17:25 GMT
-Received: from [10.182.69.118] (/10.182.69.118)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 25 Mar 2019 18:17:24 -0700
-Subject: Re: [PATCH V2 7/8] nvme: use blk_mq_queue_tag_inflight_iter
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, jsmart2021@gmail.com,
-        bvanassche@acm.org, josef@toxicpanda.com,
-        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        keith.busch@intel.com, hare@suse.de, jthumshirn@suse.de,
-        hch@lst.de, sagi@grimberg.me
-References: <1553492318-1810-1-git-send-email-jianchao.w.wang@oracle.com>
- <1553492318-1810-8-git-send-email-jianchao.w.wang@oracle.com>
- <20190325134917.GA4328@localhost.localdomain>
-From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
-Message-ID: <70e14e12-2ffc-37db-dd8f-229bc580546e@oracle.com>
-Date:   Tue, 26 Mar 2019 09:17:24 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.5.1
+        id S1730375AbfCZBbD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Mar 2019 21:31:03 -0400
+Received: from mga07.intel.com ([134.134.136.100]:27619 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727427AbfCZBbC (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 25 Mar 2019 21:31:02 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Mar 2019 18:31:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,270,1549958400"; 
+   d="scan'208";a="137252173"
+Received: from zliu7-mobl2.ccr.corp.intel.com (HELO wfg-t570.sh.intel.com) ([10.254.212.116])
+  by orsmga003.jf.intel.com with ESMTP; 25 Mar 2019 18:30:59 -0700
+Received: from wfg by wfg-t570.sh.intel.com with local (Exim 4.89)
+        (envelope-from <fengguang.wu@intel.com>)
+        id 1h8ava-0007nx-GU; Tue, 26 Mar 2019 09:30:58 +0800
+Date:   Tue, 26 Mar 2019 09:30:58 +0800
+From:   Fengguang Wu <fengguang.wu@intel.com>
+To:     Mark Salyzyn <salyzyn@android.com>
+Cc:     Martin Liu <liumartin@google.com>, akpm@linux-foundation.org,
+        axboe@kernel.dk, dchinner@redhat.com, jenhaochen@google.com,
+        salyzyn@google.com, linux-mm@kvack.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [RFC PATCH] mm: readahead: add readahead_shift into backing
+ device
+Message-ID: <20190326013058.ykdwxbfkk3x3pvtu@wfg-t540p.sh.intel.com>
+References: <20190322154610.164564-1-liumartin@google.com>
+ <20190325121628.zxlogz52go6k36on@wfg-t540p.sh.intel.com>
+ <9b194e61-f2d0-82cb-30ac-95afb493b894@android.com>
 MIME-Version: 1.0
-In-Reply-To: <20190325134917.GA4328@localhost.localdomain>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9206 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1903260007
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <9b194e61-f2d0-82cb-30ac-95afb493b894@android.com>
+User-Agent: NeoMutt/20170609 (1.8.3)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Keith
+On Mon, Mar 25, 2019 at 09:59:31AM -0700, Mark Salyzyn wrote:
+>On 03/25/2019 05:16 AM, Fengguang Wu wrote:
+>> Martin,
+>>
+>> On Fri, Mar 22, 2019 at 11:46:11PM +0800, Martin Liu wrote:
+>>> As the discussion https://lore.kernel.org/patchwork/patch/334982/
+>>> We know an open file's ra_pages might run out of sync from
+>>> bdi.ra_pages since sequential, random or error read. Current design
+>>> is we have to ask users to reopen the file or use fdavise system
+>>> call to get it sync. However, we might have some cases to change
+>>> system wide file ra_pages to enhance system performance such as
+>>> enhance the boot time by increasing the ra_pages or decrease it to
+>>
+>> Do you have examples that some distro making use of larger ra_pages
+>> for boot time optimization?
+>
+>Android (if you are willing to squint and look at android-common AOSP
+>kernels as a Distro).
 
-On 3/25/19 9:49 PM, Keith Busch wrote:
-> On Mon, Mar 25, 2019 at 01:38:37PM +0800, Jianchao Wang wrote:
->> blk_mq_tagset_inflight_iter is not safe that it could get stale request
->> in tags->rqs[]. Use blk_mq_queue_tag_inflight_iter here. A new helper
->> interface nvme_iterate_inflight_rqs is introduced to iterate
->> all of the ns under a ctrl.
-> 
-> Nak, NVMe only iterates tags when new requests can't enter, allocated
-> requests can't dispatch, and dispatched commands can't complete. So
-> it is perfectly safe to iterate if the driver takes reasonable steps
-> beforehand.
+OK. I wonder how exactly Android makes use of it. Since phones are not
+using hard disks, so should benefit less from large ra_pages.  Would
+you kindly point me to the code?
 
-nvme_dev_disable just quiesce and freeze the request_queue, but not drain the enters.
-So there still could be someone escapes the queue freeze checking and tries to allocate
-request.
+>> Suppose N read streams with equal read speed. The thrash-free memory
+>> requirement would be (N * 2 * ra_pages).
+>>
+>> If N=1000 and ra_pages=1MB, it'd require 2GB memory. Which looks
+>> affordable in mainstream servers.
+>That is 50% of the memory on a high end Android device ...
 
-> Further, for M tags and N namespaces, we complete teardown
-> in O(M) time, but this makes in O(M*N) without gaining anything.
-> 
+Yeah but I'm obviously not talking Android device here. Will a phone
+serve 1000 concurrent read streams?
 
-Yes, it is indeed inefficient.
+>> Sorry but it sounds like introducing an unnecessarily twisted new
+>> interface. I'm afraid it fixes the pain for 0.001% users while
+>> bringing more puzzle to the majority others.
+> >2B Android devices on the planet is 0.001%?
 
-Thanks
-Jianchao
+Nope. Sorry I didn't know about the Android usage.
+Actually nobody mentioned it in the past discussions.
+
+>I am not defending the proposed interface though, if there is something
+>better that can be used, then looking into:
+>>
+>> Then let fadvise() and shrink_readahead_size_eio() adjust that
+>> per-file ra_pages_shift.
+>Sounds like this would require a lot from init to globally audit and
+>reduce the read-ahead for all open files?
+
+It depends. In theory it should be possible to create a standalone
+kernel module to dump the page cache and get the current snapshot of
+all cached file pages. It'd be a one-shot action and don't require
+continuous auditing.
+
+[RFC] kernel facilities for cache prefetching
+https://lwn.net/Articles/182128
+
+This tool may also work. It's quick to get the list of opened files by
+walking /proc/*/fd/, however not as easy to get the list of cached
+file names.
+
+https://github.com/tobert/pcstat
+
+Perhaps we can do a simplified /proc/filecache that only dumps the
+list of cached file names. Then let mincore() based tools take care
+of the rest work.
+
+Regards,
+Fengguang
