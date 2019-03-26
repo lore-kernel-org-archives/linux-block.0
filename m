@@ -2,113 +2,105 @@ Return-Path: <SRS0=zyEp=R5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E88FC43381
-	for <linux-block@archiver.kernel.org>; Tue, 26 Mar 2019 00:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04166C10F03
+	for <linux-block@archiver.kernel.org>; Tue, 26 Mar 2019 01:18:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 098F120848
-	for <linux-block@archiver.kernel.org>; Tue, 26 Mar 2019 00:13:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C757E206DF
+	for <linux-block@archiver.kernel.org>; Tue, 26 Mar 2019 01:18:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="ikbnUsZ1"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="A2+sc/nz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727066AbfCZANI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Mar 2019 20:13:08 -0400
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:43530 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726553AbfCZANI (ORCPT
+        id S1730180AbfCZBSG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Mar 2019 21:18:06 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:50632 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726553AbfCZBSF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Mar 2019 20:13:08 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 6217E8EE0E0;
-        Mon, 25 Mar 2019 17:13:07 -0700 (PDT)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id RDz2U9LDNnC6; Mon, 25 Mar 2019 17:13:06 -0700 (PDT)
-Received: from [153.66.254.194] (unknown [50.35.68.20])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 648DE8EE0DF;
-        Mon, 25 Mar 2019 17:13:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1553559186;
-        bh=Lfp/oz/KzPDjG1nta07E58bI9NcSy7H9Dyu6V8CSx70=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=ikbnUsZ1B1lkL+vzVvcVEImnvHc4J1lTEqettn2xHOd09KqS8acJuLXXLAEWUXKy4
-         BxZx1B2lPD7RAvLfwJQNuLoDevkx30J8qfjhBZQSjRzGEn0pZMju2VjQ1+IXaK5aw4
-         FlJGggUYGcewatXnsrOMViWRCdkb2vQPfI38191o=
-Message-ID: <1553559185.2929.20.camel@HansenPartnership.com>
-Subject: Re: [PATCH 1/2] io_uring: fix big-endian compat signal mask handling
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Hannes Reinecke <hare@suse.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        David Hildenbrand <david@redhat.com>,
-        Nikolay Borisov <nborisov@suse.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Date:   Mon, 25 Mar 2019 17:13:05 -0700
-In-Reply-To: <CAK8P3a0u3SAehvBiRuE-a4=qiAsyDgv0yuuCWc-nQhiTENRCAg@mail.gmail.com>
-References: <20190325143521.34928-1-arnd@arndb.de>
-         <1553530766.2955.51.camel@HansenPartnership.com>
-         <CAK8P3a0u3SAehvBiRuE-a4=qiAsyDgv0yuuCWc-nQhiTENRCAg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
+        Mon, 25 Mar 2019 21:18:05 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2Q1FvgT022959;
+        Tue, 26 Mar 2019 01:17:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=/Kl0K4H2oLqA9ZCxH7NCR8HsssQuahLQEpvi0trC9h8=;
+ b=A2+sc/nzx/vW4i55Lyyr6ggK/XnrmAe+8sjda7zqYwQ5sr5MXYdqLX0EN1bPoacnn/mq
+ f7+0mE9BTh3TdW5TOdXBYTalXlRapkUm9roIf/LGkI/TKLkQb79ySlwmDrKJ4tO2IT1K
+ Hqd1cPk3mHkqYmp9jJ5MxJct8RmMDEwjo6esTLMJsS6d+2WxuqpoGEROqrwuBDVE3bSb
+ roQLVlvgdSJu+iHF16m6xhOD5YGxpgFtL8P9r7ThYneZRzzhk20/KGTxiW0q/KMUdNFS
+ SspYMvT1hfXeaxAcJ9alFCNeaKO/W4sRKwD/S5sp7P3eJZleiT/WwJCVG6mphhyMydN7 ag== 
+Received: from aserv0022.oracle.com (aserv0022.oracle.com [141.146.126.234])
+        by aserp2130.oracle.com with ESMTP id 2re6g0qeas-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 26 Mar 2019 01:17:31 +0000
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2Q1HTh8000458
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 26 Mar 2019 01:17:30 GMT
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x2Q1HOFl021687;
+        Tue, 26 Mar 2019 01:17:25 GMT
+Received: from [10.182.69.118] (/10.182.69.118)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 25 Mar 2019 18:17:24 -0700
+Subject: Re: [PATCH V2 7/8] nvme: use blk_mq_queue_tag_inflight_iter
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, jsmart2021@gmail.com,
+        bvanassche@acm.org, josef@toxicpanda.com,
+        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        keith.busch@intel.com, hare@suse.de, jthumshirn@suse.de,
+        hch@lst.de, sagi@grimberg.me
+References: <1553492318-1810-1-git-send-email-jianchao.w.wang@oracle.com>
+ <1553492318-1810-8-git-send-email-jianchao.w.wang@oracle.com>
+ <20190325134917.GA4328@localhost.localdomain>
+From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <70e14e12-2ffc-37db-dd8f-229bc580546e@oracle.com>
+Date:   Tue, 26 Mar 2019 09:17:24 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
+MIME-Version: 1.0
+In-Reply-To: <20190325134917.GA4328@localhost.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9206 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1903260007
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2019-03-25 at 17:24 +0100, Arnd Bergmann wrote:
-> On Mon, Mar 25, 2019 at 5:19 PM James Bottomley
-> <James.Bottomley@hansenpartnership.com> wrote:
+Hi Keith
+
+On 3/25/19 9:49 PM, Keith Busch wrote:
+> On Mon, Mar 25, 2019 at 01:38:37PM +0800, Jianchao Wang wrote:
+>> blk_mq_tagset_inflight_iter is not safe that it could get stale request
+>> in tags->rqs[]. Use blk_mq_queue_tag_inflight_iter here. A new helper
+>> interface nvme_iterate_inflight_rqs is introduced to iterate
+>> all of the ns under a ctrl.
 > 
-> > > --- a/fs/io_uring.c
-> > > +++ b/fs/io_uring.c
-> > > @@ -1968,7 +1968,15 @@ static int io_cqring_wait(struct
-> > > io_ring_ctx
-> > > *ctx, int min_events,
-> > >               return 0;
-> > > 
-> > >       if (sig) {
-> > > -             ret = set_user_sigmask(sig, &ksigmask, &sigsaved,
-> > > sigsz);
-> > > +#ifdef CONFIG_COMPAT
-> > > +             if (in_compat_syscall())
-> > > +                     ret = set_compat_user_sigmask((const
-> > > compat_sigset_t __user *)sig,
-> > > +                                                   &ksigmask,
-> > > &sigsaved, sigsz);
-> > > +             else
-> > > +#endif
-> > 
-> > This looks a bit suboptimal: shouldn't in_compat_syscall() be hard
-> > coded to return 0 if CONFIG_COMPAT isn't defined?  That way the
-> > compiler can do the correct optimization and we don't have to
-> > litter #ifdefs and worry about undefined variables and other
-> > things.
+> Nak, NVMe only iterates tags when new requests can't enter, allocated
+> requests can't dispatch, and dispatched commands can't complete. So
+> it is perfectly safe to iterate if the driver takes reasonable steps
+> beforehand.
+
+nvme_dev_disable just quiesce and freeze the request_queue, but not drain the enters.
+So there still could be someone escapes the queue freeze checking and tries to allocate
+request.
+
+> Further, for M tags and N namespaces, we complete teardown
+> in O(M) time, but this makes in O(M*N) without gaining anything.
 > 
-> The check can be outside of the #ifdef, but set_compat_user_sigmask
-> is not declared then.
 
-Right, but shouldn't it be declared?  I thought BUILD_BUG_ON had nice
-magic that allowed it to work here (meaning if the compiler doesn't
-eliminate the branch we get a build bug).
+Yes, it is indeed inefficient.
 
-> I think for the future we can consider just moving the compat logic
-> into set_user_sigmask(), which would simplify most of the callers,
-> but that seemed to invasive as a bugfix for 5.1.
-
-Well, that too.  I've just been on a recent bender to stop #ifdefs
-after I saw what some people were doing with them.
-
-James
-
+Thanks
+Jianchao
