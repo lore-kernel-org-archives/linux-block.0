@@ -2,77 +2,47 @@ Return-Path: <SRS0=zyEp=R5=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE575C43381
-	for <linux-block@archiver.kernel.org>; Tue, 26 Mar 2019 17:57:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C3DC43381
+	for <linux-block@archiver.kernel.org>; Tue, 26 Mar 2019 17:59:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A36572082F
-	for <linux-block@archiver.kernel.org>; Tue, 26 Mar 2019 17:57:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="FSXHnqCV"
+	by mail.kernel.org (Postfix) with ESMTP id E6D4E2082F
+	for <linux-block@archiver.kernel.org>; Tue, 26 Mar 2019 17:59:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731920AbfCZR5l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Mar 2019 13:57:41 -0400
-Received: from mail-it1-f194.google.com ([209.85.166.194]:53316 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731761AbfCZR5l (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Mar 2019 13:57:41 -0400
-Received: by mail-it1-f194.google.com with SMTP id y204so6820541itf.3
-        for <linux-block@vger.kernel.org>; Tue, 26 Mar 2019 10:57:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=6dwy383dQ6LRVboW0PJg4TARc+HUbTaqlDNY4e3xk5A=;
-        b=FSXHnqCVDKAM1kHANbDfWVoaWybd6WwFOizYiNOt0SUzOk17SUKKoIow9v8MfsX3ol
-         IxHrlyr6gGkcxZc+Q1QXEghTua+Yb4Ui9XV6feJgOSl6m/Ik5aMfrIoOY6J1s6pT/H5y
-         mYcVgveblit1YqhohZ2zFJv3yQOEQ1C41R8w+L6qr3I3CFfMHjObFstvn6j94dZelYK8
-         uXIU0cEOtZ/gyjgNpOJU3Upj7Dx7nFnaT0Vwp1f1a1RypkL6tF5jvocnNupNsQJkl5Tb
-         MOoNpMmXggmQJax3fKski1GcTMH41Sll3plhtzZjML9DY3TFuJdB5mcxMmsbo/esgCNM
-         u1iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=6dwy383dQ6LRVboW0PJg4TARc+HUbTaqlDNY4e3xk5A=;
-        b=Y7VMsbWoXFNe/iYPaKnFsIBx0yob6r/R04itqTD3riIkQDYxVrdBS+U0hd6K4EQtKY
-         ZzEuL2jlPwX4uoTBb5E5VPPAia5f4RYQQDc4HI4nG3Vdi7fF1QtsX2IvVFPyRKo+hK/y
-         LmwjBCKVtwj4hdMI4uvTh4bNHD1SHyGT51YJo9yWATWkNfFKg49/YGoEC8VIOgKUSX1K
-         30TYYSeUN1z/J6h3HpQUNpiTQVyXDqU60wLcVyXpbhTnrEdCTYFS7FIuNCYjzL3ML1vo
-         rtCGHvUVZwlafp77C74dmxo42kVu0i+KrfUmIYMm3YFSpdySSOzawDDYkCiix7uSFlOu
-         g6RQ==
-X-Gm-Message-State: APjAAAV7+jXv14gsvyHS4zhpYBh27l5AM4tF8gNnCm4VgDP5v6qI9dU+
-        fIMgJtML2eDQ/FeHeQYHaFwGQQ==
-X-Google-Smtp-Source: APXvYqxxvv6MgQwEFKiPW11F4UgW39kHU4+vtSKEZwzdoPGE7A0tcn/bGW1bvAqKxvXleIvitu6yHg==
-X-Received: by 2002:a24:360d:: with SMTP id l13mr116423itl.83.1553623060238;
-        Tue, 26 Mar 2019 10:57:40 -0700 (PDT)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id 14sm8029382ity.24.2019.03.26.10.57.38
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Mar 2019 10:57:39 -0700 (PDT)
-Subject: Re: [PATCH] loop: properly observe rotational flag of underlying
- device
-To:     Benjamin Gordon <bmgordon@chromium.org>,
-        =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, linux-block@vger.kernel.org,
-        Gwendal Grignou <gwendal@chromium.org>,
-        Guenter Roeck <groeck@chromium.org>
-References: <20190212225424.139232-1-bmgordon@chromium.org>
- <52a9cb46-5863-834c-3378-5b0ec87814e6@applied-asynchrony.com>
- <CADaYBq32aM4QpHmOmevFWSkjYqWmBWdhgd7CDWh+Se6q_2byHg@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <e9d510d5-c301-f936-b5ab-812e64261ae7@kernel.dk>
-Date:   Tue, 26 Mar 2019 11:57:37 -0600
+        id S1732253AbfCZR7m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Mar 2019 13:59:42 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55664 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1731828AbfCZR7m (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Mar 2019 13:59:42 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 02574AF45;
+        Tue, 26 Mar 2019 17:59:40 +0000 (UTC)
+Subject: Re: [PATCH] block: don't call blk_mq_run_hw_queues() for dead or
+ dying queues
+To:     James Smart <james.smart@broadcom.com>,
+        Hannes Reinecke <hare@suse.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, Ming Lei <tom.leiming@gmail.com>,
+        linux-block@vger.kernel.org
+References: <20190326120712.41657-1-hare@suse.de>
+ <82fca840-bce0-938e-abc5-1faff5c255d0@acm.org>
+ <a95b94e1-ee6f-a534-a1f0-d55d6b8bffe0@suse.de>
+ <1553613164.118779.50.camel@acm.org>
+ <761a7684-862d-d3bf-a75d-aab06fd43e29@suse.com>
+ <f6096aa5-0311-6d7f-697a-bb5771ca5fc7@broadcom.com>
+From:   Hannes Reinecke <hare@suse.de>
+Message-ID: <e16814f3-1fc0-ef46-760e-cc23d951030f@suse.de>
+Date:   Tue, 26 Mar 2019 18:59:28 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <CADaYBq32aM4QpHmOmevFWSkjYqWmBWdhgd7CDWh+Se6q_2byHg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <f6096aa5-0311-6d7f-697a-bb5771ca5fc7@broadcom.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
@@ -80,17 +50,56 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/26/19 11:04 AM, Benjamin Gordon wrote:
-> On Tue, Mar 26, 2019 at 10:55 AM Holger Hoffstätte <holger@applied-asynchrony.com <mailto:holger@applied-asynchrony.com>> wrote:
+On 3/26/19 6:49 PM, James Smart wrote:
 > 
+> Cancelling/flushing scan_work before starting reset won't work. Hannes 
+> is, correct, reset must take precedent.
 > 
->     Ping! Jens, can we please let this finally land in 5.2?
+> The scenario is a controller that was recently connected, thus scan work 
+> started, and while the scan thread is running, there's an error or 
+> connectivity is lost.  The errors force the reset - which must run to 
+> terminate any outstanding requests, including those issued by the scan 
+> thread.  This has to happen or we're going to hang the scan thread as 
+> it's synchronous io.  The 
+> nvme_fc_delete_association->nvme_start_queues() sequence says the reset 
+> path froze the queues, cancelled all outstanding io and is unfreezing 
+> the queues to allow io to pass again, so that any new io on the request 
+> queue can be rejected while the controller is not connected (ioctls or 
+> subsequent io from the scan thread while the controller is unconnected 
+> as well as anything that was pending on the io queues from the fs that 
+> should be bounced back for multipath).  Meanwhile, the scan thread got 
+> the error on the io request, and since it's the identify command that 
+> failed, it's deleting the namespace at the same time the transport is 
+> unfreezing the queues.
 > 
+> Given the transport nvme_start_queues() routine has no idea what 
+> ns-queues exist, or what state the ns queues are in, it seems like a 
+> synchronization issue on the ns queue itself, that can't be solved by 
+> scheduling transport work elements.
 > 
-> Yes, please!  I've just double-checked and this patch still applies cleanly.
+> I wonder if it should be something like this:
+> --- a    2019-03-26 10:46:08.576056741 -0700
+> +++ b    2019-03-26 10:47:55.081252967 -0700
+> @@ -3870,8 +3870,10 @@ void nvme_start_queues(struct nvme_ctrl
+>       struct nvme_ns *ns;
+> 
+>       down_read(&ctrl->namespaces_rwsem);
+> -    list_for_each_entry(ns, &ctrl->namespaces, list)
+> -        blk_mq_unquiesce_queue(ns->queue);
+> +    list_for_each_entry(ns, &ctrl->namespaces, list) {
+> +        if (!test_bit(NVME_NS_REMOVING, &ns->flags))
+> +            blk_mq_unquiesce_queue(ns->queue);
+> +    }
+>       up_read(&ctrl->namespaces_rwsem);
+>   }
+>   EXPORT_SYMBOL_GPL(nvme_start_queues);
+> 
+> which if valid, would also mean the same check should be in 
+> nvme_stop_queues() and perhaps elsewhere.
+> 
+Well, if the namespace wouldn't be part of the list in the first place 
+once it's been set to 'REMOVING'... lemme check.
 
-I've added it for 5.2, thanks everyone.
+Cheers,
 
--- 
-Jens Axboe
-
+Hannes
