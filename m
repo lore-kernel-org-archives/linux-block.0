@@ -2,103 +2,159 @@ Return-Path: <SRS0=uWmC=R6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8630C43381
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 12:56:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5946C10F00
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 13:20:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9FAC02146F
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 12:56:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 840162184C
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 13:20:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1553692815;
+	bh=wB5yMbd+xds0A6HLBwF/hSyrSp8RgZ6jaWVwZVO0FRs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=sV+t4FofD8q6ihcWdyTWYBu8jXQgLiNppEO4Nl/x/mYEoxQyuhutIK9ecalUk/xJi
+	 q5p9GecUczpNqZ9P0reDYHP6RFZTVDAaud7fhUVmNRhFdQlw5v9QP/gxW4GyFHfQcs
+	 faluxS14cprydKSN92KzNAl4rSZ1c4pwIdA4aqtg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728194AbfC0M40 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Mar 2019 08:56:26 -0400
-Received: from mail-qt1-f177.google.com ([209.85.160.177]:32929 "EHLO
-        mail-qt1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728101AbfC0M40 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Mar 2019 08:56:26 -0400
-Received: by mail-qt1-f177.google.com with SMTP id k14so18652385qtb.0
-        for <linux-block@vger.kernel.org>; Wed, 27 Mar 2019 05:56:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=O9eF93opPmbohUrFZL0eNGcl7o7eyP205dVnTVEj2OY=;
-        b=epDre0V0BnK1fWR/V6f/SP7KmtOQd7dCef3RZqAtiEbEa1MlyT35B4JhvxbLGfHVrD
-         vUo+qBNToanszWBAI23VOiDIdf4t6LtHlZ4hqZ6t4IkOPEO6Ut0T1iR4g8CYs485HyOf
-         ErU1Z2anwIxRXz6AHGdnrjBDdobgyJHyVkWdbfigqjR1vGwt1WdvkYaAY8IPYaxWLuOn
-         KwAUx4SA9AruyWIhHdAfp+dP9TcJwUhzMI6Ihdl5L1rdlketyJ/RtXvtAieta5Xhtz8O
-         zRzIa11pmYEhu/WagyH8unT9oV7KcU38GTgnpQKHcNdUcPbhxBwNjSZ18cC27F24NuIn
-         YxVQ==
-X-Gm-Message-State: APjAAAUw3HHxlLF6MZ8nPgIK8k2Bk8Wr8+RxBS7m7EENdi8wY230FjT/
-        78kqMym8LeeLhE3lCMEbMdfhGg==
-X-Google-Smtp-Source: APXvYqxEDOPx2aSaCIWX4LffGCQeb+JlvHRtyFpRLUlK8HHR2f0+gRUGV/Zodpn7NJI8uilaq+gVHQ==
-X-Received: by 2002:ac8:32fb:: with SMTP id a56mr31315265qtb.338.1553691384892;
-        Wed, 27 Mar 2019 05:56:24 -0700 (PDT)
-Received: from 2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net (2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net. [2600:6c64:4e80:f1:422c:9885:a6c:81b2])
-        by smtp.gmail.com with ESMTPSA id q6sm781182qkj.87.2019.03.27.05.56.23
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 27 Mar 2019 05:56:24 -0700 (PDT)
-Message-ID: <5d79ef69efecba45718c87110e8a37a37f973bea.camel@redhat.com>
-Subject: Re: Panic when rebooting target server testing srp on 5.0.0-rc2
-From:   Laurence Oberman <loberman@redhat.com>
-To:     Ming Lei <tom.leiming@gmail.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
+        id S1728950AbfC0NUM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Mar 2019 09:20:12 -0400
+Received: from mga03.intel.com ([134.134.136.65]:56121 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725829AbfC0NUM (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Mar 2019 09:20:12 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Mar 2019 06:20:10 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,276,1549958400"; 
+   d="scan'208";a="156248817"
+Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
+  by fmsmga004.fm.intel.com with ESMTP; 27 Mar 2019 06:20:09 -0700
+Date:   Wed, 27 Mar 2019 07:21:21 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@fb.com>,
-        linux-scsi <linux-scsi@vger.kernel.org>
-Date:   Wed, 27 Mar 2019 08:56:23 -0400
-In-Reply-To: <38a35a9c6a74371ebaea6cdf210184b8dee4dbeb.camel@redhat.com>
-References: <6e19971d315f4a3ce2cc20a1c6693f4a263a280c.camel@redhat.com>
-         <7858e19ce3fc3ebf7845494a2209c58cd9e3086d.camel@redhat.com>
-         <1553113730.65329.60.camel@acm.org>
-         <3645c45e88523d4b242333d96adbb492ab100f97.camel@redhat.com>
-         <d9febee1de759206bbf4d66f6570415ae64e4f33.camel@redhat.com>
-         <8a6807100283a0c1256410f4f0381979b18398fe.camel@redhat.com>
-         <CACVXFVOfZvnDo_ccVm1+cFRo_oSoiexgLfe_pyXp84v=0eQ7rQ@mail.gmail.com>
-         <38a35a9c6a74371ebaea6cdf210184b8dee4dbeb.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-2.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Sagi Grimberg <sagi@grimberg.me>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "Busch, Keith" <keith.busch@intel.com>
+Subject: Re: [PATCH 5/5] nvme/pci: Remove queue IO flushing hack
+Message-ID: <20190327132116.GA8419@localhost.localdomain>
+References: <20190308174006.5032-1-keith.busch@intel.com>
+ <20190308174006.5032-5-keith.busch@intel.com>
+ <20190311184031.GA11707@lst.de>
+ <20190311193753.GE10411@localhost.localdomain>
+ <20190327083142.GQ20525@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190327083142.GQ20525@lst.de>
+User-Agent: Mutt/1.9.1 (2017-09-22)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Truncating email content, starting bisect again as suggested.
-Email was getting too long with repetition.
+On Wed, Mar 27, 2019 at 01:31:42AM -0700, Christoph Hellwig wrote:
+> > Okay, I may even be able to drop the new block exports if we do request
+> > termination in generic block layer. That's probably the right thing
+> > anyway since that layer is in a better position to check the necessary
+> > conditions that make tag iteration safe. Bart did point out that is
+> > generally not safe for drives to do, so it'd be good to safegaurd against
+> > incorrect usage.
+> 
+> Did you get a chance to look into this?
 
-Crux of the issue repeated here so easy to understand topic
+I haven't had a chance to put it through the proper tests (I no longer
+have a hotplug machine), but this is what I'd written if you can give it
+a quick look:
 
-We got to dispatch passing rq_list and the list is corrupted/freed so
-we panic. Clearly a race and is in v5.x+ kernels.
-This new bisect will find it.
+From 5afd8e3765eabf859100fda84e646a96683d7751 Mon Sep 17 00:00:00 2001
+From: Keith Busch <keith.busch@intel.com>
+Date: Tue, 12 Mar 2019 13:58:12 -0600
+Subject: [PATCH] blk-mq: Provide request termination API
 
-crash> bt
-PID: 9191   TASK: ffff9dea0a8395c0  CPU: 1   COMMAND: "kworker/1:1H"
- #0 [ffffa9fe0759fab0] machine_kexec at ffffffff938606cf
- #1 [ffffa9fe0759fb08] __crash_kexec at ffffffff9393a48d
- #2 [ffffa9fe0759fbd0] crash_kexec at ffffffff9393b659
- #3 [ffffa9fe0759fbe8] oops_end at ffffffff93831c41
- #4 [ffffa9fe0759fc08] no_context at ffffffff9386ecb9
- #5 [ffffa9fe0759fcb0] do_page_fault at ffffffff93870012
- #6 [ffffa9fe0759fce0] page_fault at ffffffff942010ee
-    [exception RIP: blk_mq_dispatch_rq_list+114]
-    RIP: ffffffff93b9f202  RSP: ffffa9fe0759fd90  RFLAGS: 00010246
-    RAX: ffff9de9c4d3bbc8  RBX: ffff9de9c4d3bbc8  RCX: 0000000000000004
-    RDX: 0000000000000000  RSI: ffffa9fe0759fe20  RDI: ffff9dea0dad87f0
-    RBP: 0000000000000000   R8: 0000000000000000   R9: 8080808080808080
-    R10: ffff9dea33827660  R11: ffffee9d9e097a00  R12: ffffa9fe0759fe20
-    R13: ffff9de9c4d3bb80  R14: 0000000000000000  R15: ffff9dea0dad87f0
-    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
- #7 [ffffa9fe0759fe18] blk_mq_sched_dispatch_requests at
-ffffffff93ba455c
- #8 [ffffa9fe0759fe60] __blk_mq_run_hw_queue at ffffffff93b9e3cf
- #9 [ffffa9fe0759fe78] process_one_work at ffffffff938b0c21
-#10 [ffffa9fe0759feb8] worker_thread at ffffffff938b18d9
-#11 [ffffa9fe0759ff10] kthread at ffffffff938b6ee8
-#12 [ffffa9fe0759ff50] ret_from_fork at ffffffff94200215
+A driver that determined hardware contexts backing its request queue
+is unable to service new commands, it would have to end those commands
+in its IO path. This requires unlikely checks per-IO.
+
+Create a new API that terminates all requests directly rather than
+requiring those requests get flushed through the low level driver. This
+is safe only if the current request allocation state is unchanging, so
+driver must have quiesced and initiated a freeze on its queue, and after
+it has reclaimed any in flight requests so that the tag iterator is not
+racing with in flux requests. The new API enforces these conditions in
+order to successfully terminate requests.
+
+Signed-off-by: Keith Busch <keith.busch@intel.com>
+---
+ block/blk-mq.c         | 36 ++++++++++++++++++++++++++++++++++++
+ include/linux/blk-mq.h |  1 +
+ 2 files changed, 37 insertions(+)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a9c181603cbd..ad98c27e2b34 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -952,6 +952,42 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 	blk_queue_exit(q);
+ }
+ 
++static bool blk_mq_terminate_request(struct blk_mq_hw_ctx *hctx,
++		struct request *rq, void *priv, bool reserved)
++{
++	int *hctx_idx = priv;
++
++	if (WARN_ON_ONCE(blk_mq_rq_state(rq) != MQ_RQ_IDLE))
++		return false;
++	if (hctx->queue_num >= *hctx_idx)
++		blk_mq_end_request(rq, BLK_STS_IOERR);
++	return true;
++}
++
++/**
++ * blk_mq_terminate_queued_requests() - end requests with an error queued on
++ *					hardware contexts at and above the
++ *					provided index.
++ * @q: request queue
++ * @hctx_idx: starting hardware context, 0 for all hctx's
++ *
++ * A low level driver should invoke this routine when its hardware contexts are
++ * not capable of handling future requests. The caller must ensure their
++ * request_queue is quiesced, freeze initiated, and all dispatched requests
++ * have been reclaimed so the tag iteration has a static request allocation to
++ * consider.
++ */
++void blk_mq_terminate_queued_requests(struct request_queue *q, int hctx_idx)
++{
++	if (WARN_ON_ONCE(!atomic_read(&q->mq_freeze_depth)))
++		return;
++	if (WARN_ON_ONCE(!blk_queue_quiesced(q)))
++		return;
++	blk_sync_queue(q);
++	blk_mq_queue_tag_busy_iter(q, blk_mq_terminate_request, &hctx_idx);
++}
++EXPORT_SYMBOL(blk_mq_terminate_queued_requests);
++
+ struct flush_busy_ctx_data {
+ 	struct blk_mq_hw_ctx *hctx;
+ 	struct list_head *list;
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index a64b3fdce0b0..d47cd4575abb 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -334,6 +334,7 @@ int blk_mq_map_queues(struct blk_mq_queue_map *qmap);
+ void blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set, int nr_hw_queues);
+ 
+ void blk_mq_quiesce_queue_nowait(struct request_queue *q);
++void blk_mq_terminate_queued_requests(struct request_queue *q, int hctx_idx);
+ 
+ unsigned int blk_mq_rq_cpu(struct request *rq);
+ 
+-- 
+2.14.4
 
