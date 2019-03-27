@@ -6,51 +6,53 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 131E4C43381
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 08:16:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BD4EC43381
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 08:18:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D659A2075D
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 08:16:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 54E492075D
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 08:18:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725787AbfC0IQ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Mar 2019 04:16:29 -0400
-Received: from verein.lst.de ([213.95.11.211]:40421 "EHLO newverein.lst.de"
+        id S1725841AbfC0ISL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Mar 2019 04:18:11 -0400
+Received: from verein.lst.de ([213.95.11.211]:40436 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725763AbfC0IQ3 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Mar 2019 04:16:29 -0400
+        id S1725763AbfC0ISL (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Mar 2019 04:18:11 -0400
 Received: by newverein.lst.de (Postfix, from userid 2407)
-        id 48B1568B05; Wed, 27 Mar 2019 09:16:19 +0100 (CET)
-Date:   Wed, 27 Mar 2019 09:16:19 +0100
+        id 239D668B05; Wed, 27 Mar 2019 09:18:02 +0100 (CET)
+Date:   Wed, 27 Mar 2019 09:18:01 +0100
 From:   Christoph Hellwig <hch@lst.de>
-To:     luferry <luferry@163.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] make blk_mq_map_queues more friendly for cpu topology
-Message-ID: <20190327081619.GG20525@lst.de>
-References: <20190325152640.48120-1-luferry@163.com> <20190326073954.GD21617@lst.de> <48ca2186.fc76.169b8fef63a.Coremail.luferry@163.com>
+To:     Martin Wilck <mwilck@suse.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
+        Hannes Reinecke <hare@suse.de>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <jejb@linux.vnet.ibm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <Bart.VanAssche@sandisk.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-ide@vger.kernel.org
+Subject: Re: [PATCH RESEND v2 1/5] block: genhd: remove async_events field
+Message-ID: <20190327081801.GH20525@lst.de>
+References: <20190322224353.11088-1-mwilck@suse.com> <20190322224353.11088-2-mwilck@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <48ca2186.fc76.169b8fef63a.Coremail.luferry@163.com>
+In-Reply-To: <20190322224353.11088-2-mwilck@suse.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 26, 2019 at 03:55:10PM +0800, luferry wrote:
-> 
-> 
-> 
-> At 2019-03-26 15:39:54, "Christoph Hellwig" <hch@lst.de> wrote:
-> >Why isn't this using the automatic PCI-level affinity assignment to
-> >start with?
-> 
-> When enable virtio-blk with multi queues but with only 2 msix-vector.
-> vp_dev->per_vq_vectors will be false, vp_get_vq_affintity will return NULL directly
-> so blk_mq_virtio_map_queues will fallback to blk_mq_map_queues.
+On Fri, Mar 22, 2019 at 11:43:49PM +0100, Martin Wilck wrote:
+> The async_events field, intended to be used for drivers that
+> support asynchronous notifications about disk events (aka
+> media change events), isn't currently used by any driver,
+> and apparently that has been that way for a long time
+> (if not forever). Remove it.
 
-What is the point of the multiqueue mode if you don't have enough
-(virtual) MSI-X vectors?
+Please use up all the available 72 lines for the changelog.
+
+Otherwise looks fine:
+
+Reviewed-by: Christoph Hellwig <hch@lst.de>
