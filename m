@@ -2,117 +2,168 @@ Return-Path: <SRS0=uWmC=R6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ED24C43381
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 22:29:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21CDCC43381
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 23:34:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4EB322082F
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 22:29:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="E40OAaz3"
+	by mail.kernel.org (Postfix) with ESMTP id E4E8C2082F
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 23:34:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728005AbfC0W2u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Mar 2019 18:28:50 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:38734 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725601AbfC0W2u (ORCPT
+        id S1727698AbfC0Xek (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Mar 2019 19:34:40 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:39498 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727373AbfC0Xek (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Mar 2019 18:28:50 -0400
-Received: by mail-pg1-f196.google.com with SMTP id j26so8605838pgl.5
-        for <linux-block@vger.kernel.org>; Wed, 27 Mar 2019 15:28:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=v2fLDJLohMFc1kLJ2cYvqf1Mls9WFPVr5nSai/fXAlY=;
-        b=E40OAaz39oi24C4XipMLcKBjEeNKFf/L1kN+YE5bI5PN65aB/H6N7XmfYL7ho04V9Q
-         IaCx6pMrH5aiiIoHfS41QfxN0Ubi2tejW5CW0kvlJYhK6mY/weVkdgxqFhbym35PSoIG
-         W15PTUPy2w9DbF5e3SxwQy/kc/ucjY/goaVq8=
+        Wed, 27 Mar 2019 19:34:40 -0400
+Received: by mail-qt1-f196.google.com with SMTP id t28so21044300qte.6
+        for <linux-block@vger.kernel.org>; Wed, 27 Mar 2019 16:34:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=v2fLDJLohMFc1kLJ2cYvqf1Mls9WFPVr5nSai/fXAlY=;
-        b=Z/ql6kzZMYlXfoKH1Tgs0sX65GPw1hoPsx+2h7bJmMP0BPNwuw0BO2WiYoZ8f8SAsj
-         +UjNKSP7Z8IH1zHyd5qgk857Os4cz89QMDOSJu9Lqu4niATdmWP7GooSY5YIKHUQdFWM
-         EaOqY2gkX5Bf+T7P1BTbf6n92PBQXLx19KyFugqavFiVoW1bcwvgiumqEGqQ5UPSoWqW
-         L+r5Xfzd4k0ixfxjQryHF//T76M4zrDa+wVwMwzJ7dL5ponxfOnoCIApRuWmyKf0GQo8
-         7Pxjsg1xHXBNuHIfGiEM/soKv8NyQmwqJNbQ8XwXhUXaajwAoErXN+/vHIRPe7IMUZ43
-         TBbA==
-X-Gm-Message-State: APjAAAWqpliIBlK1PaH2Ocbhn/a9FWA5/SHEHA2juKj6dpij4YdQyUqO
-        VA46FX/R1S9zXglKCob/BCI03g==
-X-Google-Smtp-Source: APXvYqzOYGYcyq7u9JsK1QFKXSpeOZMUFw7T+Ftd9LLv12sNrFE8EoPQZmg0PsTgkzu89Y0iNxkvvA==
-X-Received: by 2002:a63:1247:: with SMTP id 7mr32325872pgs.352.1553725728973;
-        Wed, 27 Mar 2019 15:28:48 -0700 (PDT)
-Received: from evgreen2.mtv.corp.google.com ([2620:15c:202:201:ffda:7716:9afc:1301])
-        by smtp.gmail.com with ESMTPSA id p88sm36928347pfa.80.2019.03.27.15.28.47
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Wed, 27 Mar 2019 15:28:48 -0700 (PDT)
-From:   Evan Green <evgreen@chromium.org>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Martin K Petersen <martin.petersen@oracle.com>
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=JxoKOzV6gsT6S6lChwl95dDVDiMsttT8P0x02HRj6qY=;
+        b=RehNWO1qm0dyOhV5D3V4s6arDdNkfVpVEyoAErRu72PgzO8U980c1Lj1iHUNUFtyrH
+         wb7j5M2t/6k+iVmwy2LEA9QwNSMzKyfB2L49gfAdOyzo2MomUaHch65fSlq0v3pioI5F
+         rF/Ni/+xTfjlz51uTKyPYnDHL/FDFbcY7untAxiuWoXTBzYv6l3GxnXj3BUqGVF1Hns3
+         RbrJhYZIiC8P2jXNtUk0ax1H9EpSY61wAarIMuDdcFLi75WT7tkuqqdS4bvb5/Wce9cY
+         xHL3PiqLEo5vqm8ciNEAvx9n9qerDHsR4RYVOT2jcUuL/2tfOUq8eWT8Q184s4Wh8S2a
+         Krfw==
+X-Gm-Message-State: APjAAAUNWlWBuQv8EMetXLIRq4s7C7vRuY+hFtIz3pel01McHwvBwC1U
+        f4onrNcB/YxWJqxo5T/qlcGKNptMLng=
+X-Google-Smtp-Source: APXvYqyUEl6ja3mWyNCGvsZSR8+FNdoDi5X+o2kD4hIzE6BcHT+eVLeJSGb8XKVI/dPGq8SLQ42Eyg==
+X-Received: by 2002:a0c:96fd:: with SMTP id b58mr18881673qvd.134.1553729679251;
+        Wed, 27 Mar 2019 16:34:39 -0700 (PDT)
+Received: from 2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net (2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net. [2600:6c64:4e80:f1:422c:9885:a6c:81b2])
+        by smtp.gmail.com with ESMTPSA id t49sm14894285qte.86.2019.03.27.16.34.37
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 27 Mar 2019 16:34:38 -0700 (PDT)
+Message-ID: <d8c921e8df338e789b0a5bbe5e5e6944556ff2b8.camel@redhat.com>
+Subject: Re: Panic when rebooting target server testing srp on 5.0.0-rc2
+From:   Laurence Oberman <loberman@redhat.com>
+To:     Ming Lei <tom.leiming@gmail.com>, jianchao.w.wang@oracle.com
 Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Gwendal Grignou <gwendal@chromium.org>,
-        Alexis Savery <asavery@chromium.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Evan Green <evgreen@chromium.org>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 0/2] loop: Better discard for block devices
-Date:   Wed, 27 Mar 2019 15:28:39 -0700
-Message-Id: <20190327222841.38650-1-evgreen@chromium.org>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@fb.com>,
+        linux-scsi <linux-scsi@vger.kernel.org>
+Date:   Wed, 27 Mar 2019 19:34:37 -0400
+In-Reply-To: <74e767afc0e10054f87fc821fa15966449d3dd2a.camel@redhat.com>
+References: <6e19971d315f4a3ce2cc20a1c6693f4a263a280c.camel@redhat.com>
+         <7858e19ce3fc3ebf7845494a2209c58cd9e3086d.camel@redhat.com>
+         <1553113730.65329.60.camel@acm.org>
+         <3645c45e88523d4b242333d96adbb492ab100f97.camel@redhat.com>
+         <d9febee1de759206bbf4d66f6570415ae64e4f33.camel@redhat.com>
+         <8a6807100283a0c1256410f4f0381979b18398fe.camel@redhat.com>
+         <CACVXFVOfZvnDo_ccVm1+cFRo_oSoiexgLfe_pyXp84v=0eQ7rQ@mail.gmail.com>
+         <38a35a9c6a74371ebaea6cdf210184b8dee4dbeb.camel@redhat.com>
+         <5d79ef69efecba45718c87110e8a37a37f973bea.camel@redhat.com>
+         <74e767afc0e10054f87fc821fa15966449d3dd2a.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-2.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This series addresses some errors seen when using the loop
-device directly backed by a block device. The first change plumbs
-out the correct error message, and the second change prevents the
-error from occurring in many cases.
+On Wed, 2019-03-27 at 18:00 -0400, Laurence Oberman wrote:
+> On Wed, 2019-03-27 at 08:56 -0400, Laurence Oberman wrote:
+> > Truncating email content, starting bisect again as suggested.
+> > Email was getting too long with repetition.
+> > 
+> > Crux of the issue repeated here so easy to understand topic
+> > 
+> > We got to dispatch passing rq_list and the list is corrupted/freed
+> > so
+> > we panic. Clearly a race and is in v5.x+ kernels.
+> > This new bisect will find it.
+> > 
+> > crash> bt
+> > PID: 9191   TASK: ffff9dea0a8395c0  CPU: 1   COMMAND:
+> > "kworker/1:1H"
+> >  #0 [ffffa9fe0759fab0] machine_kexec at ffffffff938606cf
+> >  #1 [ffffa9fe0759fb08] __crash_kexec at ffffffff9393a48d
+> >  #2 [ffffa9fe0759fbd0] crash_kexec at ffffffff9393b659
+> >  #3 [ffffa9fe0759fbe8] oops_end at ffffffff93831c41
+> >  #4 [ffffa9fe0759fc08] no_context at ffffffff9386ecb9
+> >  #5 [ffffa9fe0759fcb0] do_page_fault at ffffffff93870012
+> >  #6 [ffffa9fe0759fce0] page_fault at ffffffff942010ee
+> >     [exception RIP: blk_mq_dispatch_rq_list+114]
+> >     RIP: ffffffff93b9f202  RSP: ffffa9fe0759fd90  RFLAGS: 00010246
+> >     RAX: ffff9de9c4d3bbc8  RBX: ffff9de9c4d3bbc8  RCX:
+> > 0000000000000004
+> >     RDX: 0000000000000000  RSI: ffffa9fe0759fe20  RDI:
+> > ffff9dea0dad87f0
+> >     RBP: 0000000000000000   R8: 0000000000000000   R9:
+> > 8080808080808080
+> >     R10: ffff9dea33827660  R11: ffffee9d9e097a00  R12:
+> > ffffa9fe0759fe20
+> >     R13: ffff9de9c4d3bb80  R14: 0000000000000000  R15:
+> > ffff9dea0dad87f0
+> >     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+> >  #7 [ffffa9fe0759fe18] blk_mq_sched_dispatch_requests at
+> > ffffffff93ba455c
+> >  #8 [ffffa9fe0759fe60] __blk_mq_run_hw_queue at ffffffff93b9e3cf
+> >  #9 [ffffa9fe0759fe78] process_one_work at ffffffff938b0c21
+> > #10 [ffffa9fe0759feb8] worker_thread at ffffffff938b18d9
+> > #11 [ffffa9fe0759ff10] kthread at ffffffff938b6ee8
+> > #12 [ffffa9fe0759ff50] ret_from_fork at ffffffff94200215
+> > 
+> 
+> Hello Jens, Jianchao
+> Finally made it to this one.
+> I will see if I can revert and test
+> 
+> 7f556a44e61d0b62d78db9a2662a5f0daef010f2 is the first bad commit
+> commit 7f556a44e61d0b62d78db9a2662a5f0daef010f2
+> Author: Jianchao Wang <jianchao.w.wang@oracle.com>
+> Date:   Fri Dec 14 09:28:18 2018 +0800
+> 
+>     blk-mq: refactor the code of issue request directly
+>     
+>     Merge blk_mq_try_issue_directly and __blk_mq_try_issue_directly
+>     into one interface to unify the interfaces to issue requests
+>     directly. The merged interface takes over the requests totally,
+>     it could insert, end or do nothing based on the return value of
+>     .queue_rq and 'bypass' parameter. Then caller needn't any other
+>     handling any more and then code could be cleaned up.
+>     
+>     And also the commit c616cbee ( blk-mq: punt failed direct issue
+>     to dispatch list ) always inserts requests to hctx dispatch list
+>     whenever get a BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE, this is
+>     overkill and will harm the merging. We just need to do that for
+>     the requests that has been through .queue_rq. This patch also
+>     could fix this.
+>     
+>     Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
+>     Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+> 
+> 
 
-The errors look like this:
-[   90.880875] print_req_error: I/O error, dev loop5, sector 0
+Cannot clean revert 
 
-The errors occur when trying to do a discard or write zeroes operation
-on a loop device backed by a block device that does not support discard.
-Firstly, the error itself is incorrectly reported as I/O error, but is
-actually EOPNOTSUPP. The first patch plumbs out EOPNOTSUPP to properly
-report the error.
+loberman@ibclient linux]$ git revert
+7f556a44e61d0b62d78db9a2662a5f0daef010f2 
+error: could not revert 7f556a4... blk-mq: refactor the code of issue
+request directly
+hint: after resolving the conflicts, mark the corrected paths
+hint: with 'git add <paths>' or 'git rm <paths>'
+hint: and commit the result with 'git commit'
 
-The second patch prevents these errors from occurring by mirroring the
-discard capabilities of the underlying block device into the loop device.
-Before this change, discard was always reported as being supported, and
-the loop device simply turns around and does a discard operation on the
-backing device. After this change, backing block devices that do support
-discard will continue to work as before, and continue to get all the
-benefits of doing that. Backing devices that do not support discard will
-fail earlier, avoiding hitting the loop device at all and ultimately
-avoiding this error in the logs.
+Revert "blk-mq: refactor the code of issue request directly"
 
-I can also confirm that this fixes test block/003 in the blktests, when
-running blktests on a loop device backed by a block device.
+This reverts commit 7f556a44e61d0b62d78db9a2662a5f0daef010f2.
+
+Conflicts:
+        block/blk-mq.c
+
+No clear what in this commit is breaking things and causing the race
 
 
-Changes in v3:
-- Updated tags
-- Updated commit description
-
-Changes in v2:
-- Unnested error if statement (Bart)
-
-Evan Green (2):
-  loop: Report EOPNOTSUPP properly
-  loop: Better discard support for block devices
-
- drivers/block/loop.c | 70 ++++++++++++++++++++++++++++++--------------
- 1 file changed, 48 insertions(+), 22 deletions(-)
-
--- 
-2.20.1
 
