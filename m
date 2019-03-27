@@ -2,168 +2,253 @@ Return-Path: <SRS0=uWmC=R6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21CDCC43381
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 23:34:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61166C10F00
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 23:45:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E4E8C2082F
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 23:34:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D00721773
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 23:45:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727698AbfC0Xek (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Mar 2019 19:34:40 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:39498 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727373AbfC0Xek (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Mar 2019 19:34:40 -0400
-Received: by mail-qt1-f196.google.com with SMTP id t28so21044300qte.6
-        for <linux-block@vger.kernel.org>; Wed, 27 Mar 2019 16:34:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=JxoKOzV6gsT6S6lChwl95dDVDiMsttT8P0x02HRj6qY=;
-        b=RehNWO1qm0dyOhV5D3V4s6arDdNkfVpVEyoAErRu72PgzO8U980c1Lj1iHUNUFtyrH
-         wb7j5M2t/6k+iVmwy2LEA9QwNSMzKyfB2L49gfAdOyzo2MomUaHch65fSlq0v3pioI5F
-         rF/Ni/+xTfjlz51uTKyPYnDHL/FDFbcY7untAxiuWoXTBzYv6l3GxnXj3BUqGVF1Hns3
-         RbrJhYZIiC8P2jXNtUk0ax1H9EpSY61wAarIMuDdcFLi75WT7tkuqqdS4bvb5/Wce9cY
-         xHL3PiqLEo5vqm8ciNEAvx9n9qerDHsR4RYVOT2jcUuL/2tfOUq8eWT8Q184s4Wh8S2a
-         Krfw==
-X-Gm-Message-State: APjAAAUNWlWBuQv8EMetXLIRq4s7C7vRuY+hFtIz3pel01McHwvBwC1U
-        f4onrNcB/YxWJqxo5T/qlcGKNptMLng=
-X-Google-Smtp-Source: APXvYqyUEl6ja3mWyNCGvsZSR8+FNdoDi5X+o2kD4hIzE6BcHT+eVLeJSGb8XKVI/dPGq8SLQ42Eyg==
-X-Received: by 2002:a0c:96fd:: with SMTP id b58mr18881673qvd.134.1553729679251;
-        Wed, 27 Mar 2019 16:34:39 -0700 (PDT)
-Received: from 2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net (2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net. [2600:6c64:4e80:f1:422c:9885:a6c:81b2])
-        by smtp.gmail.com with ESMTPSA id t49sm14894285qte.86.2019.03.27.16.34.37
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 27 Mar 2019 16:34:38 -0700 (PDT)
-Message-ID: <d8c921e8df338e789b0a5bbe5e5e6944556ff2b8.camel@redhat.com>
-Subject: Re: Panic when rebooting target server testing srp on 5.0.0-rc2
-From:   Laurence Oberman <loberman@redhat.com>
-To:     Ming Lei <tom.leiming@gmail.com>, jianchao.w.wang@oracle.com
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@fb.com>,
-        linux-scsi <linux-scsi@vger.kernel.org>
-Date:   Wed, 27 Mar 2019 19:34:37 -0400
-In-Reply-To: <74e767afc0e10054f87fc821fa15966449d3dd2a.camel@redhat.com>
-References: <6e19971d315f4a3ce2cc20a1c6693f4a263a280c.camel@redhat.com>
-         <7858e19ce3fc3ebf7845494a2209c58cd9e3086d.camel@redhat.com>
-         <1553113730.65329.60.camel@acm.org>
-         <3645c45e88523d4b242333d96adbb492ab100f97.camel@redhat.com>
-         <d9febee1de759206bbf4d66f6570415ae64e4f33.camel@redhat.com>
-         <8a6807100283a0c1256410f4f0381979b18398fe.camel@redhat.com>
-         <CACVXFVOfZvnDo_ccVm1+cFRo_oSoiexgLfe_pyXp84v=0eQ7rQ@mail.gmail.com>
-         <38a35a9c6a74371ebaea6cdf210184b8dee4dbeb.camel@redhat.com>
-         <5d79ef69efecba45718c87110e8a37a37f973bea.camel@redhat.com>
-         <74e767afc0e10054f87fc821fa15966449d3dd2a.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-2.el7) 
-Mime-Version: 1.0
+        id S1731977AbfC0Xpx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Mar 2019 19:45:53 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:47698 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727210AbfC0Xpx (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Mar 2019 19:45:53 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 280EE30BC66C;
+        Wed, 27 Mar 2019 23:45:52 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-121-98.rdu2.redhat.com [10.10.121.98])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C8D4260589;
+        Wed, 27 Mar 2019 23:45:50 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+ Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+ Kingdom.
+ Registered in England and Wales under Company Registration No. 3798903
+Subject: [RFC PATCH 42/68] vfs: Create fs_context-aware mount_bdev()
+ replacement
+From:   David Howells <dhowells@redhat.com>
+To:     viro@zeniv.linux.org.uk
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dhowells@redhat.com
+Date:   Wed, 27 Mar 2019 23:45:50 +0000
+Message-ID: <155373035000.7602.11167468155734013967.stgit@warthog.procyon.org.uk>
+In-Reply-To: <155372999953.7602.13784796495137723805.stgit@warthog.procyon.org.uk>
+References: <155372999953.7602.13784796495137723805.stgit@warthog.procyon.org.uk>
+User-Agent: StGit/unknown-version
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.46]); Wed, 27 Mar 2019 23:45:52 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2019-03-27 at 18:00 -0400, Laurence Oberman wrote:
-> On Wed, 2019-03-27 at 08:56 -0400, Laurence Oberman wrote:
-> > Truncating email content, starting bisect again as suggested.
-> > Email was getting too long with repetition.
-> > 
-> > Crux of the issue repeated here so easy to understand topic
-> > 
-> > We got to dispatch passing rq_list and the list is corrupted/freed
-> > so
-> > we panic. Clearly a race and is in v5.x+ kernels.
-> > This new bisect will find it.
-> > 
-> > crash> bt
-> > PID: 9191   TASK: ffff9dea0a8395c0  CPU: 1   COMMAND:
-> > "kworker/1:1H"
-> >  #0 [ffffa9fe0759fab0] machine_kexec at ffffffff938606cf
-> >  #1 [ffffa9fe0759fb08] __crash_kexec at ffffffff9393a48d
-> >  #2 [ffffa9fe0759fbd0] crash_kexec at ffffffff9393b659
-> >  #3 [ffffa9fe0759fbe8] oops_end at ffffffff93831c41
-> >  #4 [ffffa9fe0759fc08] no_context at ffffffff9386ecb9
-> >  #5 [ffffa9fe0759fcb0] do_page_fault at ffffffff93870012
-> >  #6 [ffffa9fe0759fce0] page_fault at ffffffff942010ee
-> >     [exception RIP: blk_mq_dispatch_rq_list+114]
-> >     RIP: ffffffff93b9f202  RSP: ffffa9fe0759fd90  RFLAGS: 00010246
-> >     RAX: ffff9de9c4d3bbc8  RBX: ffff9de9c4d3bbc8  RCX:
-> > 0000000000000004
-> >     RDX: 0000000000000000  RSI: ffffa9fe0759fe20  RDI:
-> > ffff9dea0dad87f0
-> >     RBP: 0000000000000000   R8: 0000000000000000   R9:
-> > 8080808080808080
-> >     R10: ffff9dea33827660  R11: ffffee9d9e097a00  R12:
-> > ffffa9fe0759fe20
-> >     R13: ffff9de9c4d3bb80  R14: 0000000000000000  R15:
-> > ffff9dea0dad87f0
-> >     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
-> >  #7 [ffffa9fe0759fe18] blk_mq_sched_dispatch_requests at
-> > ffffffff93ba455c
-> >  #8 [ffffa9fe0759fe60] __blk_mq_run_hw_queue at ffffffff93b9e3cf
-> >  #9 [ffffa9fe0759fe78] process_one_work at ffffffff938b0c21
-> > #10 [ffffa9fe0759feb8] worker_thread at ffffffff938b18d9
-> > #11 [ffffa9fe0759ff10] kthread at ffffffff938b6ee8
-> > #12 [ffffa9fe0759ff50] ret_from_fork at ffffffff94200215
-> > 
-> 
-> Hello Jens, Jianchao
-> Finally made it to this one.
-> I will see if I can revert and test
-> 
-> 7f556a44e61d0b62d78db9a2662a5f0daef010f2 is the first bad commit
-> commit 7f556a44e61d0b62d78db9a2662a5f0daef010f2
-> Author: Jianchao Wang <jianchao.w.wang@oracle.com>
-> Date:   Fri Dec 14 09:28:18 2018 +0800
-> 
->     blk-mq: refactor the code of issue request directly
->     
->     Merge blk_mq_try_issue_directly and __blk_mq_try_issue_directly
->     into one interface to unify the interfaces to issue requests
->     directly. The merged interface takes over the requests totally,
->     it could insert, end or do nothing based on the return value of
->     .queue_rq and 'bypass' parameter. Then caller needn't any other
->     handling any more and then code could be cleaned up.
->     
->     And also the commit c616cbee ( blk-mq: punt failed direct issue
->     to dispatch list ) always inserts requests to hctx dispatch list
->     whenever get a BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE, this is
->     overkill and will harm the merging. We just need to do that for
->     the requests that has been through .queue_rq. This patch also
->     could fix this.
->     
->     Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
->     Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> 
-> 
+Create a function, vfs_get_block_super(), that is fs_context-aware and a
+replacement for mount_bdev().  It caches the block device pointer and file
+open mode in the fs_context struct so that this information can be passed
+into sget_fc()'s test and set functions.
 
-Cannot clean revert 
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Jens Axboe <axboe@kernel.dk>
+cc: linux-block@vger.kernel.org
+---
 
-loberman@ibclient linux]$ git revert
-7f556a44e61d0b62d78db9a2662a5f0daef010f2 
-error: could not revert 7f556a4... blk-mq: refactor the code of issue
-request directly
-hint: after resolving the conflicts, mark the corrected paths
-hint: with 'git add <paths>' or 'git rm <paths>'
-hint: and commit the result with 'git commit'
+ fs/fs_context.c            |    2 +
+ fs/super.c                 |  111 ++++++++++++++++++++++++++++++++++++++++++++
+ include/linux/fs_context.h |    9 ++++
+ 3 files changed, 121 insertions(+), 1 deletion(-)
 
-Revert "blk-mq: refactor the code of issue request directly"
-
-This reverts commit 7f556a44e61d0b62d78db9a2662a5f0daef010f2.
-
-Conflicts:
-        block/blk-mq.c
-
-No clear what in this commit is breaking things and causing the race
-
-
+diff --git a/fs/fs_context.c b/fs/fs_context.c
+index 87e3546b9a52..fc8fda4b9fe9 100644
+--- a/fs/fs_context.c
++++ b/fs/fs_context.c
+@@ -425,6 +425,8 @@ void put_fs_context(struct fs_context *fc)
+ 
+ 	if (fc->need_free && fc->ops && fc->ops->free)
+ 		fc->ops->free(fc);
++	if (fc->dev_destructor)
++		fc->dev_destructor(fc);
+ 
+ 	security_free_mnt_opts(&fc->security);
+ 	put_net(fc->net_ns);
+diff --git a/fs/super.c b/fs/super.c
+index f27ee08fb26f..e9e678d2c37c 100644
+--- a/fs/super.c
++++ b/fs/super.c
+@@ -1211,6 +1211,110 @@ int vfs_get_super(struct fs_context *fc,
+ EXPORT_SYMBOL(vfs_get_super);
+ 
+ #ifdef CONFIG_BLOCK
++static void fc_bdev_destructor(struct fs_context *fc)
++{
++	if (fc->bdev) {
++		blkdev_put(fc->bdev, fc->bdev_mode);
++		fc->bdev = NULL;
++	}
++}
++
++static int set_bdev_super_fc(struct super_block *s, struct fs_context *fc)
++{
++	s->s_mode = fc->bdev_mode;
++	s->s_bdev = fc->bdev;
++	s->s_dev = s->s_bdev->bd_dev;
++	s->s_bdi = bdi_get(s->s_bdev->bd_bdi);
++	fc->bdev = NULL;
++	return 0;
++}
++
++static int test_bdev_super_fc(struct super_block *s, struct fs_context *fc)
++{
++	return s->s_bdev == fc->bdev;
++}
++
++/**
++ * vfs_get_block_super - Get a superblock based on a single block device
++ * @fc: The filesystem context holding the parameters
++ * @keying: How to distinguish superblocks
++ * @fill_super: Helper to initialise a new superblock
++ */
++int vfs_get_block_super(struct fs_context *fc,
++			int (*fill_super)(struct super_block *,
++					  struct fs_context *))
++{
++	struct block_device *bdev;
++	struct super_block *s;
++	int error = 0;
++
++	fc->bdev_mode = FMODE_READ | FMODE_EXCL;
++	if (!(fc->sb_flags & SB_RDONLY))
++		fc->bdev_mode |= FMODE_WRITE;
++
++	if (!fc->source)
++		return invalf(fc, "No source specified");
++
++	bdev = blkdev_get_by_path(fc->source, fc->bdev_mode, fc->fs_type);
++	if (IS_ERR(bdev)) {
++		errorf(fc, "%s: Can't open blockdev", fc->source);
++		return PTR_ERR(bdev);
++	}
++
++	fc->dev_destructor = fc_bdev_destructor;
++	fc->bdev = bdev;
++
++	/* Once the superblock is inserted into the list by sget_fc(), s_umount
++	 * will protect the lockfs code from trying to start a snapshot while
++	 * we are mounting
++	 */
++	mutex_lock(&bdev->bd_fsfreeze_mutex);
++	if (bdev->bd_fsfreeze_count > 0) {
++		mutex_unlock(&bdev->bd_fsfreeze_mutex);
++		warnf(fc, "%pg: Can't mount, blockdev is frozen", bdev);
++		return -EBUSY;
++	}
++
++	fc->sb_flags |= SB_NOSEC;
++	s = sget_fc(fc, test_bdev_super_fc, set_bdev_super_fc);
++	mutex_unlock(&bdev->bd_fsfreeze_mutex);
++	if (IS_ERR(s))
++		return PTR_ERR(s);
++
++	if (s->s_root) {
++		/* Don't summarily change the RO/RW state. */
++		if ((fc->sb_flags ^ s->s_flags) & SB_RDONLY) {
++			warnf(fc, "%pg: Can't mount, would change RO state", bdev);
++			error = -EBUSY;
++			goto error_sb;
++		}
++
++		/* Leave fc->bdev to fc_bdev_destructor() to clean up to avoid
++		 * locking conflicts.
++		 */
++	} else {
++		snprintf(s->s_id, sizeof(s->s_id), "%pg", bdev);
++		sb_set_blocksize(s, block_size(bdev));
++		error = fill_super(s, fc);
++		if (error)
++			goto error_sb;
++
++		s->s_flags |= SB_ACTIVE;
++		bdev->bd_super = s;
++	}
++
++	BUG_ON(fc->root);
++	fc->root = dget(s->s_root);
++	return 0;
++
++error_sb:
++	deactivate_locked_super(s);
++	/* Leave fc->bdev to fc_bdev_destructor() to clean up */
++	return error;
++}
++EXPORT_SYMBOL(vfs_get_block_super);
++
++
+ static int set_bdev_super(struct super_block *s, void *data)
+ {
+ 	s->s_bdev = data;
+@@ -1415,8 +1519,13 @@ int vfs_get_tree(struct fs_context *fc)
+ 	 * on the superblock.
+ 	 */
+ 	error = fc->ops->get_tree(fc);
+-	if (error < 0)
++	if (error < 0) {
++		if (fc->dev_destructor) {
++			fc->dev_destructor(fc);
++			fc->dev_destructor = NULL;
++		}
+ 		return error;
++	}
+ 
+ 	if (!fc->root) {
+ 		pr_err("Filesystem %s get_tree() didn't set fc->root\n",
+diff --git a/include/linux/fs_context.h b/include/linux/fs_context.h
+index a779022d06f5..9af788a3ef8e 100644
+--- a/include/linux/fs_context.h
++++ b/include/linux/fs_context.h
+@@ -76,6 +76,9 @@ struct fs_context {
+ 	const struct fs_context_operations *ops;
+ 	struct file_system_type	*fs_type;
+ 	void			*fs_private;	/* The filesystem's context */
++	union {
++		struct block_device *bdev;	/* The backing blockdev (if applicable) */
++	};
+ 	struct dentry		*root;		/* The root and superblock */
+ 	struct user_namespace	*user_ns;	/* The user namespace for this mount */
+ 	struct net		*net_ns;	/* The network namespace for this mount */
+@@ -84,6 +87,7 @@ struct fs_context {
+ 	const char		*subtype;	/* The subtype to set on the superblock */
+ 	void			*security;	/* Linux S&M options */
+ 	void			*s_fs_info;	/* Proposed s_fs_info */
++	fmode_t			bdev_mode;	/* File open mode for bdev */
+ 	unsigned int		sb_flags;	/* Proposed superblock flags (SB_*) */
+ 	unsigned int		sb_flags_mask;	/* Superblock flags that were changed */
+ 	unsigned int		s_iflags;	/* OR'd with sb->s_iflags */
+@@ -91,6 +95,7 @@ struct fs_context {
+ 	enum fs_context_purpose	purpose:8;
+ 	bool			need_free:1;	/* Need to call ops->free() */
+ 	bool			global:1;	/* Goes into &init_user_ns */
++	void (*dev_destructor)(struct fs_context *fc); /* For block or mtd */
+ };
+ 
+ struct fs_context_operations {
+@@ -141,6 +146,10 @@ extern int vfs_get_super(struct fs_context *fc,
+ 			 int (*fill_super)(struct super_block *sb,
+ 					   struct fs_context *fc));
+ 
++extern int vfs_get_block_super(struct fs_context *fc,
++			       int (*fill_super)(struct super_block *sb,
++						 struct fs_context *fc));
++
+ extern const struct file_operations fscontext_fops;
+ 
+ #ifdef CONFIG_PRINTK
 
