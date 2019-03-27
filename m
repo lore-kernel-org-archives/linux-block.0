@@ -2,141 +2,136 @@ Return-Path: <SRS0=uWmC=R6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D650C4360F
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 19:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24504C43381
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 20:25:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 61337206C0
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 19:26:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1553714779;
-	bh=3us/v9f8j5BYRgqxZZlbrsxO9WOuZuT2mCaJ0oYJW1E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Jwm1u7CFejECWDAJUIz+HS7yngaBJ4bpmv1/8tdBkmTzC5nzxPVooNqMggVtg/hJ2
-	 93ESa2UfnRXoRACngReYGwB8Gn1vO5R1Wa1MDmY3ibJXAwCsYCt67mVKtn5kXLvEKz
-	 KdYrQ0LUpgrBwjc5xRltb3zpZzTE5zHFePbZ3MA8=
+	by mail.kernel.org (Postfix) with ESMTP id D56E420700
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 20:25:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=lightnvm-io.20150623.gappssmtp.com header.i=@lightnvm-io.20150623.gappssmtp.com header.b="IM03fd9T"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387574AbfC0T0G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Mar 2019 15:26:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46034 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387569AbfC0SFF (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Mar 2019 14:05:05 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 09BEA2075C;
-        Wed, 27 Mar 2019 18:05:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1553709903;
-        bh=3us/v9f8j5BYRgqxZZlbrsxO9WOuZuT2mCaJ0oYJW1E=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WAHcTycuuDmfjghDP7bWRJKsTGKnQCk6jamcI63P42wSaAztCMiJj+fpJRMrfcTpk
-         T2n8efCNyGmXmVBWZ6P3JYnOT0QSwYyxLQrqTAq60oZTR2zD3lMR8j7JYFi5XvoTwr
-         DurAGrSN3E1Rhqyhqj0+ZaH6SFuDTRwip6oxX3Dc=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Dongli Zhang <dongli.zhang@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.0 101/262] loop: set GENHD_FL_NO_PART_SCAN after blkdev_reread_part()
-Date:   Wed, 27 Mar 2019 13:59:16 -0400
-Message-Id: <20190327180158.10245-101-sashal@kernel.org>
-X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190327180158.10245-1-sashal@kernel.org>
-References: <20190327180158.10245-1-sashal@kernel.org>
+        id S1725841AbfC0UZy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Mar 2019 16:25:54 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:33569 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725787AbfC0UZy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Mar 2019 16:25:54 -0400
+Received: by mail-ed1-f68.google.com with SMTP id q3so15255590edg.0
+        for <linux-block@vger.kernel.org>; Wed, 27 Mar 2019 13:25:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=lightnvm-io.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=kSMzQACcQXCF59sFa/85M2ZknQeJriEPP4jWD62ljjg=;
+        b=IM03fd9T50MDRVfSFF8GCgN8op64s1qaXzeV5X/Zew/EElTf1OOyOPwcFKq10BCZ02
+         VnHBH6oyaotouq0bpnAEm4+J9RPGp5VJ4jEv0lgl4ViWfeiCK+yuGNlfpgSJuHbZc536
+         Zesl7mVy6upFGJj5s4fDgpqWmsl+4RG3ZpkWle8IRGop4OfIThKHGN4G1FDs/oLR9Re4
+         Iw+abq35f+j0fQbTD1CvLxMQyrM6cKGmiW2iTWrViMkpZ3Vj9KWi9/GH3b+2vvpIzf5j
+         mUKEppoY0hsAQu25nyDCIGwZH0qDPWdwFFiYkpZAlI1pWB5ry4Duusadf1o2HM0dFJ1z
+         PRiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=kSMzQACcQXCF59sFa/85M2ZknQeJriEPP4jWD62ljjg=;
+        b=I8O9ahwr0x7P7yWOgJske4BpgrIVm5eKok+xKSUIaj4AGXycmsemJQjrGtNjJ27HkC
+         VtvLKbH+DsFf4ImfEUSBjaEq9QjiacMY0kAHbTKv5KFT+Fb1SWJHkS5dQ1+Autfuq0ds
+         fTQ0QQxK1W/1qjuMTgIW1CnaZbN5mWj800zKssxK1z1KkDtIkAMApvctchkDhFs+jwpu
+         bHpwLz8g2Cf0QogvYhKxvpPyfcm/EViJ/xzwkkbVK1tzC9rFXEWii21IWlOj9WIQteJt
+         6b9QER/5V6oV0wHui4ZoCZ+4F4rgxRixLMpGTr+YnMCdepsjcqt54lzIvN0sorqnc2QB
+         Ncbg==
+X-Gm-Message-State: APjAAAUXeZ7ukRgDT4XGI43tK+YkbYdb3PVoZLksSFV//Q4Kt7LIcAaf
+        BMql/iAsRMs8hFuRchaBpQA7Pz7D2ls=
+X-Google-Smtp-Source: APXvYqw+HzNaY2OAproGUJNtVpeVQ0ut2OjteI9Hge139+7WPpyB+Yknjh3QtNBL8SvnqPWd06Gb0Q==
+X-Received: by 2002:a05:6402:28f:: with SMTP id l15mr25721040edv.10.1553718352432;
+        Wed, 27 Mar 2019 13:25:52 -0700 (PDT)
+Received: from [192.168.0.36] (2-111-91-225-cable.dk.customer.tdc.net. [2.111.91.225])
+        by smtp.googlemail.com with ESMTPSA id t9sm2908163ejg.54.2019.03.27.13.25.50
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 27 Mar 2019 13:25:51 -0700 (PDT)
+Subject: Re: [PATCH v3 03/10] lightnvm: pblk: propagate errors when reading
+ meta
+To:     Igor Konopko <igor.j.konopko@intel.com>, javier@javigon.com,
+        hans.holmberg@cnexlabs.com
+Cc:     linux-block@vger.kernel.org
+References: <20190327123901.12323-1-igor.j.konopko@intel.com>
+ <20190327123901.12323-4-igor.j.konopko@intel.com>
+From:   =?UTF-8?Q?Matias_Bj=c3=b8rling?= <mb@lightnvm.io>
+Message-ID: <276a0fd6-69f7-87ee-6e25-fe79b35ce503@lightnvm.io>
+Date:   Wed, 27 Mar 2019 21:25:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.2.1
 MIME-Version: 1.0
-X-Patchwork-Hint: Ignore
+In-Reply-To: <20190327123901.12323-4-igor.j.konopko@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
 Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Dongli Zhang <dongli.zhang@oracle.com>
+On 3/27/19 1:38 PM, Igor Konopko wrote:
+> Currently when smeta/emeta/oob is read errors are not always propagated
+> correctly. This patch changes that behaviour and propagates all the
+> error codes except of high ecc read warning status.
+> 
+> Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+> Reviewed-by: Javier González <javier@javigon.com>
+> Reviewed-by: Hans Holmberg <hans.holmberg@cnexlabs.com>
+> ---
+>   drivers/lightnvm/pblk-core.c     | 9 +++++++--
+>   drivers/lightnvm/pblk-recovery.c | 2 +-
+>   2 files changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+> index f2edec6..06ac3f0 100644
+> --- a/drivers/lightnvm/pblk-core.c
+> +++ b/drivers/lightnvm/pblk-core.c
+> @@ -761,8 +761,10 @@ int pblk_line_smeta_read(struct pblk *pblk, struct pblk_line *line)
+>   
+>   	atomic_dec(&pblk->inflight_io);
+>   
+> -	if (rqd.error)
+> +	if (rqd.error && rqd.error != NVM_RSP_WARN_HIGHECC) {
+>   		pblk_log_read_err(pblk, &rqd);
+> +		ret = -EIO;
+> +	}
+>   
+>   clear_rqd:
+>   	pblk_free_rqd_meta(pblk, &rqd);
+> @@ -916,8 +918,11 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
+>   
+>   	atomic_dec(&pblk->inflight_io);
+>   
+> -	if (rqd.error)
+> +	if (rqd.error && rqd.error != NVM_RSP_WARN_HIGHECC) {
+>   		pblk_log_read_err(pblk, &rqd);
+> +		ret = -EIO;
+> +		goto free_rqd_dma;
+> +	}
+>   
+>   	emeta_buf += rq_len;
+>   	left_ppas -= rq_ppas;
+> diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
+> index 357e529..124d817 100644
+> --- a/drivers/lightnvm/pblk-recovery.c
+> +++ b/drivers/lightnvm/pblk-recovery.c
+> @@ -458,7 +458,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
+>   	atomic_dec(&pblk->inflight_io);
+>   
+>   	/* If a read fails, do a best effort by padding the line and retrying */
+> -	if (rqd->error) {
+> +	if (rqd->error && rqd->error != NVM_RSP_WARN_HIGHECC) {
+>   		int pad_distance, ret;
+>   
+>   		if (padded) {
+> 
 
-[ Upstream commit 758a58d0bc67457f1215321a536226654a830eeb ]
-
-Commit 0da03cab87e6
-("loop: Fix deadlock when calling blkdev_reread_part()") moves
-blkdev_reread_part() out of the loop_ctl_mutex. However,
-GENHD_FL_NO_PART_SCAN is set before __blkdev_reread_part(). As a result,
-__blkdev_reread_part() will fail the check of GENHD_FL_NO_PART_SCAN and
-will not rescan the loop device to delete all partitions.
-
-Below are steps to reproduce the issue:
-
-step1 # dd if=/dev/zero of=tmp.raw bs=1M count=100
-step2 # losetup -P /dev/loop0 tmp.raw
-step3 # parted /dev/loop0 mklabel gpt
-step4 # parted -a none -s /dev/loop0 mkpart primary 64s 1
-step5 # losetup -d /dev/loop0
-
-Step5 will not be able to delete /dev/loop0p1 (introduced by step4) and
-there is below kernel warning message:
-
-[  464.414043] __loop_clr_fd: partition scan of loop0 failed (rc=-22)
-
-This patch sets GENHD_FL_NO_PART_SCAN after blkdev_reread_part().
-
-Fixes: 0da03cab87e6 ("loop: Fix deadlock when calling blkdev_reread_part()")
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/block/loop.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index cf5538942834..23aa2e9b3be0 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1089,16 +1089,12 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 		kobject_uevent(&disk_to_dev(bdev->bd_disk)->kobj, KOBJ_CHANGE);
- 	}
- 	mapping_set_gfp_mask(filp->f_mapping, gfp);
--	lo->lo_state = Lo_unbound;
- 	/* This is safe: open() is still holding a reference. */
- 	module_put(THIS_MODULE);
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 
- 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN && bdev;
- 	lo_number = lo->lo_number;
--	lo->lo_flags = 0;
--	if (!part_shift)
--		lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
- 	loop_unprepare_queue(lo);
- out_unlock:
- 	mutex_unlock(&loop_ctl_mutex);
-@@ -1120,6 +1116,23 @@ static int __loop_clr_fd(struct loop_device *lo, bool release)
- 		/* Device is gone, no point in returning error */
- 		err = 0;
- 	}
-+
-+	/*
-+	 * lo->lo_state is set to Lo_unbound here after above partscan has
-+	 * finished.
-+	 *
-+	 * There cannot be anybody else entering __loop_clr_fd() as
-+	 * lo->lo_backing_file is already cleared and Lo_rundown state
-+	 * protects us from all the other places trying to change the 'lo'
-+	 * device.
-+	 */
-+	mutex_lock(&loop_ctl_mutex);
-+	lo->lo_flags = 0;
-+	if (!part_shift)
-+		lo->lo_disk->flags |= GENHD_FL_NO_PART_SCAN;
-+	lo->lo_state = Lo_unbound;
-+	mutex_unlock(&loop_ctl_mutex);
-+
- 	/*
- 	 * Need not hold loop_ctl_mutex to fput backing file.
- 	 * Calling fput holding loop_ctl_mutex triggers a circular
--- 
-2.19.1
-
+Thanks, applied. I've updated the wording a bit.
