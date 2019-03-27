@@ -2,249 +2,103 @@ Return-Path: <SRS0=uWmC=R6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF715C43381
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 12:42:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8630C43381
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 12:56:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BE8C52087C
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 12:42:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FAC02146F
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 12:56:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728130AbfC0Mm2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Mar 2019 08:42:28 -0400
-Received: from mga12.intel.com ([192.55.52.136]:33640 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726185AbfC0Mm2 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Mar 2019 08:42:28 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Mar 2019 05:42:12 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,276,1549958400"; 
-   d="scan'208";a="137680466"
-Received: from gklab-107-059.igk.intel.com ([10.102.107.59])
-  by orsmga003.jf.intel.com with ESMTP; 27 Mar 2019 05:42:10 -0700
-From:   Igor Konopko <igor.j.konopko@intel.com>
-To:     mb@lightnvm.io, javier@javigon.com, hans.holmberg@cnexlabs.com
-Cc:     linux-block@vger.kernel.org, igor.j.konopko@intel.com
-Subject: [PATCH v3 09/10] lightnvm: pblk: use nvm_rq_to_ppa_list()
-Date:   Wed, 27 Mar 2019 13:39:00 +0100
-Message-Id: <20190327123901.12323-10-igor.j.konopko@intel.com>
-X-Mailer: git-send-email 2.9.5
-In-Reply-To: <20190327123901.12323-1-igor.j.konopko@intel.com>
-References: <20190327123901.12323-1-igor.j.konopko@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        id S1728194AbfC0M40 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Mar 2019 08:56:26 -0400
+Received: from mail-qt1-f177.google.com ([209.85.160.177]:32929 "EHLO
+        mail-qt1-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728101AbfC0M40 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Mar 2019 08:56:26 -0400
+Received: by mail-qt1-f177.google.com with SMTP id k14so18652385qtb.0
+        for <linux-block@vger.kernel.org>; Wed, 27 Mar 2019 05:56:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=O9eF93opPmbohUrFZL0eNGcl7o7eyP205dVnTVEj2OY=;
+        b=epDre0V0BnK1fWR/V6f/SP7KmtOQd7dCef3RZqAtiEbEa1MlyT35B4JhvxbLGfHVrD
+         vUo+qBNToanszWBAI23VOiDIdf4t6LtHlZ4hqZ6t4IkOPEO6Ut0T1iR4g8CYs485HyOf
+         ErU1Z2anwIxRXz6AHGdnrjBDdobgyJHyVkWdbfigqjR1vGwt1WdvkYaAY8IPYaxWLuOn
+         KwAUx4SA9AruyWIhHdAfp+dP9TcJwUhzMI6Ihdl5L1rdlketyJ/RtXvtAieta5Xhtz8O
+         zRzIa11pmYEhu/WagyH8unT9oV7KcU38GTgnpQKHcNdUcPbhxBwNjSZ18cC27F24NuIn
+         YxVQ==
+X-Gm-Message-State: APjAAAUw3HHxlLF6MZ8nPgIK8k2Bk8Wr8+RxBS7m7EENdi8wY230FjT/
+        78kqMym8LeeLhE3lCMEbMdfhGg==
+X-Google-Smtp-Source: APXvYqxEDOPx2aSaCIWX4LffGCQeb+JlvHRtyFpRLUlK8HHR2f0+gRUGV/Zodpn7NJI8uilaq+gVHQ==
+X-Received: by 2002:ac8:32fb:: with SMTP id a56mr31315265qtb.338.1553691384892;
+        Wed, 27 Mar 2019 05:56:24 -0700 (PDT)
+Received: from 2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net (2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net. [2600:6c64:4e80:f1:422c:9885:a6c:81b2])
+        by smtp.gmail.com with ESMTPSA id q6sm781182qkj.87.2019.03.27.05.56.23
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 27 Mar 2019 05:56:24 -0700 (PDT)
+Message-ID: <5d79ef69efecba45718c87110e8a37a37f973bea.camel@redhat.com>
+Subject: Re: Panic when rebooting target server testing srp on 5.0.0-rc2
+From:   Laurence Oberman <loberman@redhat.com>
+To:     Ming Lei <tom.leiming@gmail.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@fb.com>,
+        linux-scsi <linux-scsi@vger.kernel.org>
+Date:   Wed, 27 Mar 2019 08:56:23 -0400
+In-Reply-To: <38a35a9c6a74371ebaea6cdf210184b8dee4dbeb.camel@redhat.com>
+References: <6e19971d315f4a3ce2cc20a1c6693f4a263a280c.camel@redhat.com>
+         <7858e19ce3fc3ebf7845494a2209c58cd9e3086d.camel@redhat.com>
+         <1553113730.65329.60.camel@acm.org>
+         <3645c45e88523d4b242333d96adbb492ab100f97.camel@redhat.com>
+         <d9febee1de759206bbf4d66f6570415ae64e4f33.camel@redhat.com>
+         <8a6807100283a0c1256410f4f0381979b18398fe.camel@redhat.com>
+         <CACVXFVOfZvnDo_ccVm1+cFRo_oSoiexgLfe_pyXp84v=0eQ7rQ@mail.gmail.com>
+         <38a35a9c6a74371ebaea6cdf210184b8dee4dbeb.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-2.el7) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch replaces few remaining usages of rqd->ppa_list[] with
-existing nvm_rq_to_ppa_list() helpers. This is needed for theoretical
-devices with ws_min/ws_opt equal to 1.
+Truncating email content, starting bisect again as suggested.
+Email was getting too long with repetition.
 
-Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
-Reviewed-by: Javier González <javier@javigon.com>
----
- drivers/lightnvm/pblk-core.c     | 26 ++++++++++++++------------
- drivers/lightnvm/pblk-recovery.c | 13 ++++++++-----
- 2 files changed, 22 insertions(+), 17 deletions(-)
+Crux of the issue repeated here so easy to understand topic
 
-diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
-index 1b88e5e..cd99c8c 100644
---- a/drivers/lightnvm/pblk-core.c
-+++ b/drivers/lightnvm/pblk-core.c
-@@ -562,11 +562,9 @@ int pblk_submit_io_sync(struct pblk *pblk, struct nvm_rq *rqd)
- 
- int pblk_submit_io_sync_sem(struct pblk *pblk, struct nvm_rq *rqd)
- {
--	struct ppa_addr *ppa_list;
-+	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 	int ret;
- 
--	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
--
- 	pblk_down_chunk(pblk, ppa_list[0]);
- 	ret = pblk_submit_io_sync(pblk, rqd);
- 	pblk_up_chunk(pblk, ppa_list[0]);
-@@ -727,6 +725,7 @@ static int pblk_line_smeta_read_copy(struct pblk *pblk,
- 	struct nvm_geo *geo = &dev->geo;
- 	struct pblk_line_meta *lm = &pblk->lm;
- 	struct bio *bio;
-+	struct ppa_addr *ppa_list;
- 	struct nvm_rq rqd;
- 	int i, ret;
- 
-@@ -749,6 +748,7 @@ static int pblk_line_smeta_read_copy(struct pblk *pblk,
- 	rqd.opcode = NVM_OP_PREAD;
- 	rqd.nr_ppas = lm->smeta_sec;
- 	rqd.is_seq = 1;
-+	ppa_list = nvm_rq_to_ppa_list(&rqd);
- 
- 	for (i = 0; i < rqd.nr_ppas; i++, paddr++) {
- 		struct ppa_addr ppa = addr_to_gen_ppa(pblk, paddr, line->id);
-@@ -760,7 +760,7 @@ static int pblk_line_smeta_read_copy(struct pblk *pblk,
- 			pos = pblk_ppa_to_pos(geo, ppa);
- 		}
- 
--		rqd.ppa_list[i] = ppa;
-+		ppa_list[i] = ppa;
- 		pblk_get_meta(pblk, rqd.meta_list, i)->lba =
- 				  cpu_to_le64(ADDR_EMPTY);
- 	}
-@@ -811,6 +811,7 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line)
- 	struct nvm_geo *geo = &dev->geo;
- 	struct pblk_line_meta *lm = &pblk->lm;
- 	struct bio *bio;
-+	struct ppa_addr *ppa_list;
- 	struct nvm_rq rqd;
- 	__le64 *lba_list = emeta_to_lbas(pblk, line->emeta->buf);
- 	__le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
-@@ -862,6 +863,7 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line)
- 	rqd.opcode = NVM_OP_PWRITE;
- 	rqd.nr_ppas = smeta_wr_sec;
- 	rqd.is_seq = 1;
-+	ppa_list = nvm_rq_to_ppa_list(&rqd);
- 
- 	for (i = 0; i < rqd.nr_ppas; i++, paddr++) {
- 		void *meta_list = rqd.meta_list;
-@@ -874,7 +876,7 @@ static int pblk_line_smeta_write(struct pblk *pblk, struct pblk_line *line)
- 			pos = pblk_ppa_to_pos(geo, ppa);
- 		}
- 
--		rqd.ppa_list[i] = ppa;
-+		ppa_list[i] = ppa;
- 		pblk_get_meta(pblk, meta_list, i)->lba = addr_empty;
- 		lba_list[paddr] = addr_empty;
- 	}
-@@ -910,8 +912,9 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
- 	struct nvm_geo *geo = &dev->geo;
- 	struct pblk_line_mgmt *l_mg = &pblk->l_mg;
- 	struct pblk_line_meta *lm = &pblk->lm;
--	void *ppa_list, *meta_list;
-+	void *ppa_list_buf, *meta_list;
- 	struct bio *bio;
-+	struct ppa_addr *ppa_list;
- 	struct nvm_rq rqd;
- 	u64 paddr = line->emeta_ssec;
- 	dma_addr_t dma_ppa_list, dma_meta_list;
-@@ -927,7 +930,7 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
- 	if (!meta_list)
- 		return -ENOMEM;
- 
--	ppa_list = meta_list + pblk_dma_meta_size(pblk);
-+	ppa_list_buf = meta_list + pblk_dma_meta_size(pblk);
- 	dma_ppa_list = dma_meta_list + pblk_dma_meta_size(pblk);
- 
- next_rq:
-@@ -948,11 +951,12 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
- 
- 	rqd.bio = bio;
- 	rqd.meta_list = meta_list;
--	rqd.ppa_list = ppa_list;
-+	rqd.ppa_list = ppa_list_buf;
- 	rqd.dma_meta_list = dma_meta_list;
- 	rqd.dma_ppa_list = dma_ppa_list;
- 	rqd.opcode = NVM_OP_PREAD;
- 	rqd.nr_ppas = rq_ppas;
-+	ppa_list = nvm_rq_to_ppa_list(&rqd);
- 
- 	for (i = 0; i < rqd.nr_ppas; ) {
- 		struct ppa_addr ppa = addr_to_gen_ppa(pblk, paddr, line_id);
-@@ -980,7 +984,7 @@ int pblk_line_emeta_read(struct pblk *pblk, struct pblk_line *line,
- 		}
- 
- 		for (j = 0; j < min; j++, i++, paddr++)
--			rqd.ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line_id);
-+			ppa_list[i] = addr_to_gen_ppa(pblk, paddr, line_id);
- 	}
- 
- 	ret = pblk_submit_io_sync(pblk, &rqd);
-@@ -1605,11 +1609,9 @@ void pblk_ppa_to_line_put(struct pblk *pblk, struct ppa_addr ppa)
- 
- void pblk_rq_to_line_put(struct pblk *pblk, struct nvm_rq *rqd)
- {
--	struct ppa_addr *ppa_list;
-+	struct ppa_addr *ppa_list = nvm_rq_to_ppa_list(rqd);
- 	int i;
- 
--	ppa_list = (rqd->nr_ppas > 1) ? rqd->ppa_list : &rqd->ppa_addr;
--
- 	for (i = 0; i < rqd->nr_ppas; i++)
- 		pblk_ppa_to_line_put(pblk, ppa_list[i]);
- }
-diff --git a/drivers/lightnvm/pblk-recovery.c b/drivers/lightnvm/pblk-recovery.c
-index 9a992af..2fca21e 100644
---- a/drivers/lightnvm/pblk-recovery.c
-+++ b/drivers/lightnvm/pblk-recovery.c
-@@ -181,6 +181,7 @@ static int pblk_recov_pad_line(struct pblk *pblk, struct pblk_line *line,
- 	struct pblk_pad_rq *pad_rq;
- 	struct nvm_rq *rqd;
- 	struct bio *bio;
-+	struct ppa_addr *ppa_list;
- 	void *data;
- 	__le64 *lba_list = emeta_to_lbas(pblk, line->emeta->buf);
- 	u64 w_ptr = line->cur_sec;
-@@ -241,6 +242,7 @@ static int pblk_recov_pad_line(struct pblk *pblk, struct pblk_line *line,
- 	rqd->end_io = pblk_end_io_recov;
- 	rqd->private = pad_rq;
- 
-+	ppa_list = nvm_rq_to_ppa_list(rqd);
- 	meta_list = rqd->meta_list;
- 
- 	for (i = 0; i < rqd->nr_ppas; ) {
-@@ -268,17 +270,17 @@ static int pblk_recov_pad_line(struct pblk *pblk, struct pblk_line *line,
- 			lba_list[w_ptr] = addr_empty;
- 			meta = pblk_get_meta(pblk, meta_list, i);
- 			meta->lba = addr_empty;
--			rqd->ppa_list[i] = dev_ppa;
-+			ppa_list[i] = dev_ppa;
- 		}
- 	}
- 
- 	kref_get(&pad_rq->ref);
--	pblk_down_chunk(pblk, rqd->ppa_list[0]);
-+	pblk_down_chunk(pblk, ppa_list[0]);
- 
- 	ret = pblk_submit_io(pblk, rqd);
- 	if (ret) {
- 		pblk_err(pblk, "I/O submission failed: %d\n", ret);
--		pblk_up_chunk(pblk, rqd->ppa_list[0]);
-+		pblk_up_chunk(pblk, ppa_list[0]);
- 		kref_put(&pad_rq->ref, pblk_recov_complete);
- 		pblk_free_rqd(pblk, rqd, PBLK_WRITE_INT);
- 		bio_put(bio);
-@@ -424,6 +426,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
- 	rqd->ppa_list = ppa_list;
- 	rqd->dma_ppa_list = dma_ppa_list;
- 	rqd->dma_meta_list = dma_meta_list;
-+	ppa_list = nvm_rq_to_ppa_list(rqd);
- 
- 	if (pblk_io_aligned(pblk, rq_ppas))
- 		rqd->is_seq = 1;
-@@ -442,7 +445,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
- 		}
- 
- 		for (j = 0; j < pblk->min_write_pgs; j++, i++)
--			rqd->ppa_list[i] =
-+			ppa_list[i] =
- 				addr_to_gen_ppa(pblk, paddr + j, line->id);
- 	}
- 
-@@ -490,7 +493,7 @@ static int pblk_recov_scan_oob(struct pblk *pblk, struct pblk_line *line,
- 			continue;
- 
- 		line->nr_valid_lbas++;
--		pblk_update_map(pblk, lba, rqd->ppa_list[i]);
-+		pblk_update_map(pblk, lba, ppa_list[i]);
- 	}
- 
- 	left_ppas -= rq_ppas;
--- 
-2.9.5
+We got to dispatch passing rq_list and the list is corrupted/freed so
+we panic. Clearly a race and is in v5.x+ kernels.
+This new bisect will find it.
+
+crash> bt
+PID: 9191   TASK: ffff9dea0a8395c0  CPU: 1   COMMAND: "kworker/1:1H"
+ #0 [ffffa9fe0759fab0] machine_kexec at ffffffff938606cf
+ #1 [ffffa9fe0759fb08] __crash_kexec at ffffffff9393a48d
+ #2 [ffffa9fe0759fbd0] crash_kexec at ffffffff9393b659
+ #3 [ffffa9fe0759fbe8] oops_end at ffffffff93831c41
+ #4 [ffffa9fe0759fc08] no_context at ffffffff9386ecb9
+ #5 [ffffa9fe0759fcb0] do_page_fault at ffffffff93870012
+ #6 [ffffa9fe0759fce0] page_fault at ffffffff942010ee
+    [exception RIP: blk_mq_dispatch_rq_list+114]
+    RIP: ffffffff93b9f202  RSP: ffffa9fe0759fd90  RFLAGS: 00010246
+    RAX: ffff9de9c4d3bbc8  RBX: ffff9de9c4d3bbc8  RCX: 0000000000000004
+    RDX: 0000000000000000  RSI: ffffa9fe0759fe20  RDI: ffff9dea0dad87f0
+    RBP: 0000000000000000   R8: 0000000000000000   R9: 8080808080808080
+    R10: ffff9dea33827660  R11: ffffee9d9e097a00  R12: ffffa9fe0759fe20
+    R13: ffff9de9c4d3bb80  R14: 0000000000000000  R15: ffff9dea0dad87f0
+    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+ #7 [ffffa9fe0759fe18] blk_mq_sched_dispatch_requests at
+ffffffff93ba455c
+ #8 [ffffa9fe0759fe60] __blk_mq_run_hw_queue at ffffffff93b9e3cf
+ #9 [ffffa9fe0759fe78] process_one_work at ffffffff938b0c21
+#10 [ffffa9fe0759feb8] worker_thread at ffffffff938b18d9
+#11 [ffffa9fe0759ff10] kthread at ffffffff938b6ee8
+#12 [ffffa9fe0759ff50] ret_from_fork at ffffffff94200215
 
