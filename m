@@ -2,54 +2,47 @@ Return-Path: <SRS0=uWmC=R6=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A36BFC43381
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 00:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 076E0C43381
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 01:25:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 67BF92087E
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 00:03:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1553645031;
-	bh=nCnqtOpGfDBmPCIcZQZJQCDa7AXUZ58008r2BPqSplw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=WfEIIXdKnoogpu2nREH5+BF4T7kTHn5DWHwquyqsgGMDhoyclnWqYkFnjcfS+caWI
-	 4xstxXXwFyPxo5uLCDHpmqtcobcnnXrS84KZsuHja9dotHMtVtYxnXvHe+Xk8hAi8W
-	 2dzT7Lz7uThK+0xOnnwtO5xm04z7xsD3irH/h5yE=
+	by mail.kernel.org (Postfix) with ESMTP id CFCC22075E
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 01:25:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731516AbfC0ADu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Mar 2019 20:03:50 -0400
-Received: from mga05.intel.com ([192.55.52.43]:13970 "EHLO mga05.intel.com"
+        id S1727483AbfC0BZt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Mar 2019 21:25:49 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59088 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726782AbfC0ADu (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Mar 2019 20:03:50 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Mar 2019 17:03:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,274,1549958400"; 
-   d="scan'208";a="155493076"
-Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
-  by fmsmga002.fm.intel.com with ESMTP; 26 Mar 2019 17:03:49 -0700
-Date:   Tue, 26 Mar 2019 18:05:00 -0600
-From:   Keith Busch <kbusch@kernel.org>
+        id S1726377AbfC0BZs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 26 Mar 2019 21:25:48 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id D16E7307D844;
+        Wed, 27 Mar 2019 01:25:48 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 913FA60BE5;
+        Wed, 27 Mar 2019 01:25:43 +0000 (UTC)
+Date:   Wed, 27 Mar 2019 09:25:39 +0800
+From:   Ming Lei <ming.lei@redhat.com>
 To:     Hannes Reinecke <hare@suse.de>
 Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Ming Lei <tom.leiming@gmail.com>, linux-block@vger.kernel.org,
         Hannes Reinecke <hare@suse.com>
 Subject: Re: [PATCH] block: don't call blk_mq_run_hw_queues() for dead or
  dying queues
-Message-ID: <20190327000500.GD4328@localhost.localdomain>
+Message-ID: <20190327012538.GA4882@ming.t460p>
 References: <20190326120712.41657-1-hare@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20190326120712.41657-1-hare@suse.de>
 User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Wed, 27 Mar 2019 01:25:48 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -80,5 +73,11 @@ On Tue, Mar 26, 2019 at 01:07:12PM +0100, Hannes Reinecke wrote:
 >  }
 >  EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
 
-We actually still have to unquieces the queue to flush entered requests to
-a failed completion after killing that queue, like in nvme_set_queue_dying().
+Per previous protocol in legacy io path, the LLD should handle requests
+when queue is dying.
+
+Also now, the request queue has become frozen before setting DEAD, so
+not necessary to add the DEAD check before run queue.
+
+Thanks,
+Ming
