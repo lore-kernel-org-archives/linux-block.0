@@ -6,21 +6,21 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64C27C4360F
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 08:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19B6BC43381
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 08:21:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E4232075D
-	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 08:20:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E50222075D
+	for <linux-block@archiver.kernel.org>; Wed, 27 Mar 2019 08:21:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732468AbfC0IU5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Mar 2019 04:20:57 -0400
-Received: from verein.lst.de ([213.95.11.211]:40472 "EHLO newverein.lst.de"
+        id S1725972AbfC0IVf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Mar 2019 04:21:35 -0400
+Received: from verein.lst.de ([213.95.11.211]:40485 "EHLO newverein.lst.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725827AbfC0IU5 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Mar 2019 04:20:57 -0400
+        id S1726241AbfC0IVf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Mar 2019 04:21:35 -0400
 Received: by newverein.lst.de (Postfix, from userid 2407)
-        id 3C48268B05; Wed, 27 Mar 2019 09:20:47 +0100 (CET)
-Date:   Wed, 27 Mar 2019 09:20:47 +0100
+        id 0B39268B05; Wed, 27 Mar 2019 09:21:26 +0100 (CET)
+Date:   Wed, 27 Mar 2019 09:21:25 +0100
 From:   Christoph Hellwig <hch@lst.de>
 To:     Martin Wilck <mwilck@suse.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
@@ -30,26 +30,21 @@ Cc:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
         Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <Bart.VanAssche@sandisk.com>,
         linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-ide@vger.kernel.org
-Subject: Re: [PATCH RESEND v2 2/5] block: disk_events: introduce event flags
-Message-ID: <20190327082047.GI20525@lst.de>
-References: <20190322224353.11088-1-mwilck@suse.com> <20190322224353.11088-3-mwilck@suse.com>
+        linux-ide@vger.kernel.org, Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH RESEND v2 3/5] Revert "ide: unexport
+ DISK_EVENT_MEDIA_CHANGE for ide-gd and ide-cd"
+Message-ID: <20190327082125.GJ20525@lst.de>
+References: <20190322224353.11088-1-mwilck@suse.com> <20190322224353.11088-4-mwilck@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190322224353.11088-3-mwilck@suse.com>
+In-Reply-To: <20190322224353.11088-4-mwilck@suse.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Abusing the same field for the events and flags seems to be asking
-for trouble, an you please split it into separate fields?
+Looks fine:
 
->  	for (i = 0; i < ARRAY_SIZE(disk_uevents); i++)
-> -		if (events & disk->events & (1 << i))
-> +		if (events & disk->events & (1 << i) &&
-> +		    disk->events & DISK_EVENT_FLAG_UEVENT)
-
-I think this wants some braces around the flag check as well.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
