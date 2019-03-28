@@ -2,112 +2,85 @@ Return-Path: <SRS0=7L3l=R7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 103E9C43381
-	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 03:05:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B95EC43381
+	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 03:32:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D5214206C0
-	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 03:05:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49FA32075E
+	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 03:32:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1553743927;
+	bh=NACTPYz6sQRsa3cR4+CBhxoUmDh3jdfIQ6Z45wKamUg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=vHN54FOWK1p+kTnmf0+R2ryTg2CZiIIC6jcAkt25EZcXr6hHFE2pm3OqRd9G2FPC6
+	 IfwTKkzuniYkTHXm6mPJ9gDYLz/NbkIRl0NnoT8k1MpFGE9VVeQSKSsROocUC3ZQoM
+	 gWcHF7cgFOpCv9NRL47V476s/v3VKQ73xnrcoe1A=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726275AbfC1DFl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Mar 2019 23:05:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54122 "EHLO mx1.redhat.com"
+        id S1726275AbfC1DcG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Mar 2019 23:32:06 -0400
+Received: from mga18.intel.com ([134.134.136.126]:53673 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726108AbfC1DFl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Mar 2019 23:05:41 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 16C5AC024936;
-        Thu, 28 Mar 2019 03:05:41 +0000 (UTC)
-Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2CE321001DC0;
-        Thu, 28 Mar 2019 03:05:37 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH] block: loop: mark bvec as ITER_BVEC_FLAG_NO_REF
-Date:   Thu, 28 Mar 2019 11:05:31 +0800
-Message-Id: <20190328030531.28279-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.32]); Thu, 28 Mar 2019 03:05:41 +0000 (UTC)
+        id S1726176AbfC1DcG (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 27 Mar 2019 23:32:06 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 27 Mar 2019 20:32:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,278,1549958400"; 
+   d="scan'208";a="137893966"
+Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
+  by orsmga003.jf.intel.com with ESMTP; 27 Mar 2019 20:32:05 -0700
+Date:   Wed, 27 Mar 2019 21:33:18 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     "jianchao.wang" <jianchao.w.wang@oracle.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "Busch, Keith" <keith.busch@intel.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [PATCH 5/5] nvme/pci: Remove queue IO flushing hack
+Message-ID: <20190328033317.GC8448@localhost.localdomain>
+References: <20190308174006.5032-1-keith.busch@intel.com>
+ <20190308174006.5032-5-keith.busch@intel.com>
+ <20190311184031.GA11707@lst.de>
+ <20190311193753.GE10411@localhost.localdomain>
+ <20190327083142.GQ20525@lst.de>
+ <20190327132116.GA8419@localhost.localdomain>
+ <3d72ec9f-0aa5-d455-b453-40c319871287@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3d72ec9f-0aa5-d455-b453-40c319871287@oracle.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-loop is one block device, for any bio submitted to this device,
-the upper layer does guarantee that pages added to loop's bio won't
-go away when the bio is in-flight.
+On Thu, Mar 28, 2019 at 09:42:51AM +0800, jianchao.wang wrote:
+> On 3/27/19 9:21 PM, Keith Busch wrote:
+> > +void blk_mq_terminate_queued_requests(struct request_queue *q, int hctx_idx)
+> > +{
+> > +	if (WARN_ON_ONCE(!atomic_read(&q->mq_freeze_depth)))
+> > +		return;
+> > +	if (WARN_ON_ONCE(!blk_queue_quiesced(q)))
+> > +		return;
+> > +	blk_sync_queue(q);
+> > +	blk_mq_queue_tag_busy_iter(q, blk_mq_terminate_request, &hctx_idx);
+> > +}
+> 
+> 
+> Is it really OK to end these requests directly w/o dequeue ?
+> All of them are on ctx->rq_list, or hctx->dispatch list or internal queue of io scheduler.
+> 
+> Terrible things may happen after we unquiesce the queue.
 
-So mark loop's bvec as ITER_BVEC_FLAG_NO_REF then get_page/put_page
-can be saved for serving loop's IO.
-
-Cc: linux-fsdevel@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- drivers/block/loop.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index bf1c61cab8eb..3d25611eebdc 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -264,12 +264,20 @@ lo_do_transfer(struct loop_device *lo, int cmd,
- 	return ret;
- }
- 
-+static inline void loop_iov_iter_bvec(struct iov_iter *i,
-+		unsigned int direction, const struct bio_vec *bvec,
-+		unsigned long nr_segs, size_t count)
-+{
-+	iov_iter_bvec(i, direction, bvec, nr_segs, count);
-+	i->type |= ITER_BVEC_FLAG_NO_REF;
-+}
-+
- static int lo_write_bvec(struct file *file, struct bio_vec *bvec, loff_t *ppos)
- {
- 	struct iov_iter i;
- 	ssize_t bw;
- 
--	iov_iter_bvec(&i, WRITE, bvec, 1, bvec->bv_len);
-+	loop_iov_iter_bvec(&i, WRITE, bvec, 1, bvec->bv_len);
- 
- 	file_start_write(file);
- 	bw = vfs_iter_write(file, &i, ppos, 0);
-@@ -347,7 +355,7 @@ static int lo_read_simple(struct loop_device *lo, struct request *rq,
- 	ssize_t len;
- 
- 	rq_for_each_segment(bvec, rq, iter) {
--		iov_iter_bvec(&i, READ, &bvec, 1, bvec.bv_len);
-+		loop_iov_iter_bvec(&i, READ, &bvec, 1, bvec.bv_len);
- 		len = vfs_iter_read(lo->lo_backing_file, &i, &pos, 0);
- 		if (len < 0)
- 			return len;
-@@ -388,7 +396,7 @@ static int lo_read_transfer(struct loop_device *lo, struct request *rq,
- 		b.bv_offset = 0;
- 		b.bv_len = bvec.bv_len;
- 
--		iov_iter_bvec(&i, READ, &b, 1, b.bv_len);
-+		loop_iov_iter_bvec(&i, READ, &b, 1, b.bv_len);
- 		len = vfs_iter_read(lo->lo_backing_file, &i, &pos, 0);
- 		if (len < 0) {
- 			ret = len;
-@@ -555,7 +563,7 @@ static int lo_rw_aio(struct loop_device *lo, struct loop_cmd *cmd,
- 	}
- 	atomic_set(&cmd->ref, 2);
- 
--	iov_iter_bvec(&iter, rw, bvec, nr_bvec, blk_rq_bytes(rq));
-+	loop_iov_iter_bvec(&iter, rw, bvec, nr_bvec, blk_rq_bytes(rq));
- 	iter.iov_offset = offset;
- 
- 	cmd->iocb.ki_pos = pos;
--- 
-2.9.5
-
+Good point. This was intended as a last action before killing an hctx or
+the entire request queue, so I didn't expect they'd be turned back on, but
+it's easy enough to splice lists and handle those requests directly. We
+wouldn'even need to iterate tags that way, and may be better way to
+handle this.
