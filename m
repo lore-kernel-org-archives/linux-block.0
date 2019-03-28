@@ -2,472 +2,86 @@ Return-Path: <SRS0=7L3l=R7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C565C43381
-	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 15:10:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E037EC43381
+	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 15:32:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0209220823
-	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 15:10:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE5A22184D
+	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 15:32:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fa+rL/KM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726150AbfC1PKB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Mar 2019 11:10:01 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:44384 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726082AbfC1PKB (ORCPT
+        id S1726227AbfC1PcF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Mar 2019 11:32:05 -0400
+Received: from mail-wm1-f48.google.com ([209.85.128.48]:53897 "EHLO
+        mail-wm1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726210AbfC1PcF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Mar 2019 11:10:01 -0400
-Received: by mail-qt1-f195.google.com with SMTP id w5so23415021qtb.11
-        for <linux-block@vger.kernel.org>; Thu, 28 Mar 2019 08:10:00 -0700 (PDT)
+        Thu, 28 Mar 2019 11:32:05 -0400
+Received: by mail-wm1-f48.google.com with SMTP id q16so4042769wmj.3;
+        Thu, 28 Mar 2019 08:32:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2IS/RSOm3zlVImWcezcR+ocyFLYvoZdo9zgmFGvoorg=;
+        b=fa+rL/KM7nVByaCTlGgeZK+CN2Ivr2e/LLoCrXGyLVS5F1SC8hQu8tww0dpK6mbRXW
+         3/Ydh1ubn38tW3YplHfuSFa65XuEQDXd+m3iRx1T2qjlRUegSrvuNk3n6SmOdlu9JsoP
+         0AvaaTlxtNhSHc+jWCzjxTiN8+pQ2CmoibXKv2XvnKbDnqVJZzqdh08qlmrHwBcq3Yzl
+         G5KgXfV/Zzb50eybGx3Uz/YtRbVZH1RgOV8gM/sBRraChDxir22HmLyJRkeYwNbLkupA
+         w77gIMUgFQrS91DrUSS+gPe7Qw3zC39y8xLdNmIxQXbzQyesXgxAy/W3d1V5m7jzUk9s
+         aSQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=KzBJJvl1y+B2R8Qr94FoqZhRmXO1/EXylouZLUp9LzY=;
-        b=SQ7oE5WpGBmND62C62eQzTs3Hkjkv9idQUaf18GGo/4lyu/lyy95gujqgE9E62Hd+5
-         2Ek86EiaXokRqwj3vjjExOt7V4lMeS/HTJeN7vdC8pHH9bpJZ0TjfhOcWqPdpDWdEbGs
-         tBh/3gges4PUgbaGOEsZxq1i/TT/gRzcPQsJ+f597W3G3PKoF3cMv8h1Gj31KldmbHgX
-         F8B9tZSOeLOscSNLtGxrIWFB097oaHl9BtIkUzyTjS5kcfKP0rsVb1hvf23l0Sq9Chdm
-         4irkliYCdGFC4ykZ01XZxyhX7xGLswazPe58qkk43eCfw1fTfES5nt0zoXVNlv2zAZUR
-         dGqw==
-X-Gm-Message-State: APjAAAUe2uh18b7GCQBamg1Xe6HT+5y330WhKwXuhGWgem0GhYhPP+Hi
-        MHj2q2zxB9Ftvvh/ZqoZiUIcgA==
-X-Google-Smtp-Source: APXvYqxRsyPGHYw6CHVJ2KAWa1wHyEtVA2zGM6RWLqkF5fMtMtT5H7r+9l17jAkvdtULNgmBQcjDgQ==
-X-Received: by 2002:a0c:acbd:: with SMTP id m58mr1591916qvc.228.1553785799643;
-        Thu, 28 Mar 2019 08:09:59 -0700 (PDT)
-Received: from 2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net (2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net. [2600:6c64:4e80:f1:422c:9885:a6c:81b2])
-        by smtp.gmail.com with ESMTPSA id s50sm992765qts.39.2019.03.28.08.09.58
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 28 Mar 2019 08:09:58 -0700 (PDT)
-Message-ID: <ea38f0a025d9686ad56bfb0c15dc824a1473915d.camel@redhat.com>
-Subject: Re: Panic when rebooting target server testing srp on 5.0.0-rc2
-From:   Laurence Oberman <loberman@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Ming Lei <tom.leiming@gmail.com>, jianchao.w.wang@oracle.com,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@fb.com>,
-        linux-scsi <linux-scsi@vger.kernel.org>
-Date:   Thu, 28 Mar 2019 11:09:58 -0400
-In-Reply-To: <f1414550876007cee564551561e3b21065b5d7a8.camel@redhat.com>
-References: <7858e19ce3fc3ebf7845494a2209c58cd9e3086d.camel@redhat.com>
-         <1553113730.65329.60.camel@acm.org>
-         <3645c45e88523d4b242333d96adbb492ab100f97.camel@redhat.com>
-         <d9febee1de759206bbf4d66f6570415ae64e4f33.camel@redhat.com>
-         <8a6807100283a0c1256410f4f0381979b18398fe.camel@redhat.com>
-         <CACVXFVOfZvnDo_ccVm1+cFRo_oSoiexgLfe_pyXp84v=0eQ7rQ@mail.gmail.com>
-         <38a35a9c6a74371ebaea6cdf210184b8dee4dbeb.camel@redhat.com>
-         <5d79ef69efecba45718c87110e8a37a37f973bea.camel@redhat.com>
-         <74e767afc0e10054f87fc821fa15966449d3dd2a.camel@redhat.com>
-         <d8c921e8df338e789b0a5bbe5e5e6944556ff2b8.camel@redhat.com>
-         <20190328013116.GC19708@ming.t460p>
-         <f1414550876007cee564551561e3b21065b5d7a8.camel@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2IS/RSOm3zlVImWcezcR+ocyFLYvoZdo9zgmFGvoorg=;
+        b=kffIJpwUb0vx8B4iAdSueIZGDgO/iPWwN/JfjPaA8Joumx9UrT3NeR4q8GecjVKUBg
+         MQuXaLk12B815iLS6owKw2y/B5eXTKaILRd4y7/fXwx0QgeHaSBZF5YkHQn8wWaxpGiy
+         5hMovqQ2Q/6+5IjyYIJ9hQXQMMxzYU+w1wdkwKvxSmW6HqT7PHznVPdM7A3F4AWc/OkO
+         rDAHIAVgsjRxioFkm/yE/RB4iBvi6Fc9y2lao9vsVvl4jXGaV4X0KvPKqN60Bf7TxISQ
+         Nxf2pHVwB3SEwp5v7b1r9zLPttmBo3VdfF9ZSF/UzZupybGSM5GtjehwEH1WU5LqFPx4
+         BUAw==
+X-Gm-Message-State: APjAAAVyfwGm8D78OvB6UueViWgybJnY2nkpNTsnZGqzieXQPKv6kCnk
+        PEelGFLVJtUXKdix+3LzjSeGNKkXkrwhqTHZ7vU=
+X-Google-Smtp-Source: APXvYqy2lY3hBQJ0TjxxRM7edmep6uxTgIY1PCh6AMUBewrypFD63hWkVKuDq92h6joGFIwAdpqhDwcd3LsRSAxXc6M=
+X-Received: by 2002:a05:600c:2293:: with SMTP id 19mr368411wmf.77.1553787123695;
+ Thu, 28 Mar 2019 08:32:03 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190328035001.26276-1-ming.lei@redhat.com> <5258cad3-b324-660f-589f-73eb7fb8fa04@kernel.dk>
+ <20190328150320.GB9265@infradead.org>
+In-Reply-To: <20190328150320.GB9265@infradead.org>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Thu, 28 Mar 2019 23:31:52 +0800
+Message-ID: <CACVXFVOOBerm38vmZjhvDi8OKdyX_sW0jU1tTr5Fp=qahY+Vhw@mail.gmail.com>
+Subject: Re: [PATCH] block: clarify that bio_add_page() and related helpers
+ can add multi pages
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        "open list:XFS FILESYSTEM" <linux-xfs@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-2.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2019-03-28 at 10:58 -0400, Laurence Oberman wrote:
-> On Thu, 2019-03-28 at 09:31 +0800, Ming Lei wrote:
-> > On Wed, Mar 27, 2019 at 07:34:37PM -0400, Laurence Oberman wrote:
-> > > On Wed, 2019-03-27 at 18:00 -0400, Laurence Oberman wrote:
-> > > > On Wed, 2019-03-27 at 08:56 -0400, Laurence Oberman wrote:
-> > > > > Truncating email content, starting bisect again as suggested.
-> > > > > Email was getting too long with repetition.
-> > > > > 
-> > > > > Crux of the issue repeated here so easy to understand topic
-> > > > > 
-> > > > > We got to dispatch passing rq_list and the list is
-> > > > > corrupted/freed
-> > > > > so
-> > > > > we panic. Clearly a race and is in v5.x+ kernels.
-> > > > > This new bisect will find it.
-> > > > > 
-> > > > > crash> bt
-> > > > > PID: 9191   TASK: ffff9dea0a8395c0  CPU: 1   COMMAND:
-> > > > > "kworker/1:1H"
-> > > > >  #0 [ffffa9fe0759fab0] machine_kexec at ffffffff938606cf
-> > > > >  #1 [ffffa9fe0759fb08] __crash_kexec at ffffffff9393a48d
-> > > > >  #2 [ffffa9fe0759fbd0] crash_kexec at ffffffff9393b659
-> > > > >  #3 [ffffa9fe0759fbe8] oops_end at ffffffff93831c41
-> > > > >  #4 [ffffa9fe0759fc08] no_context at ffffffff9386ecb9
-> > > > >  #5 [ffffa9fe0759fcb0] do_page_fault at ffffffff93870012
-> > > > >  #6 [ffffa9fe0759fce0] page_fault at ffffffff942010ee
-> > > > >     [exception RIP: blk_mq_dispatch_rq_list+114]
-> > > > >     RIP: ffffffff93b9f202  RSP: ffffa9fe0759fd90  RFLAGS:
-> > > > > 00010246
-> > > > >     RAX: ffff9de9c4d3bbc8  RBX: ffff9de9c4d3bbc8  RCX:
-> > > > > 0000000000000004
-> > > > >     RDX: 0000000000000000  RSI: ffffa9fe0759fe20  RDI:
-> > > > > ffff9dea0dad87f0
-> > > > >     RBP: 0000000000000000   R8: 0000000000000000   R9:
-> > > > > 8080808080808080
-> > > > >     R10: ffff9dea33827660  R11: ffffee9d9e097a00  R12:
-> > > > > ffffa9fe0759fe20
-> > > > >     R13: ffff9de9c4d3bb80  R14: 0000000000000000  R15:
-> > > > > ffff9dea0dad87f0
-> > > > >     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
-> > > > >  #7 [ffffa9fe0759fe18] blk_mq_sched_dispatch_requests at
-> > > > > ffffffff93ba455c
-> > > > >  #8 [ffffa9fe0759fe60] __blk_mq_run_hw_queue at
-> > > > > ffffffff93b9e3cf
-> > > > >  #9 [ffffa9fe0759fe78] process_one_work at ffffffff938b0c21
-> > > > > #10 [ffffa9fe0759feb8] worker_thread at ffffffff938b18d9
-> > > > > #11 [ffffa9fe0759ff10] kthread at ffffffff938b6ee8
-> > > > > #12 [ffffa9fe0759ff50] ret_from_fork at ffffffff94200215
-> > > > > 
-> > > > 
-> > > > Hello Jens, Jianchao
-> > > > Finally made it to this one.
-> > > > I will see if I can revert and test
-> > > > 
-> > > > 7f556a44e61d0b62d78db9a2662a5f0daef010f2 is the first bad
-> > > > commit
-> > > > commit 7f556a44e61d0b62d78db9a2662a5f0daef010f2
-> > > > Author: Jianchao Wang <jianchao.w.wang@oracle.com>
-> > > > Date:   Fri Dec 14 09:28:18 2018 +0800
-> > > > 
-> > > >     blk-mq: refactor the code of issue request directly
-> > > >     
-> > > >     Merge blk_mq_try_issue_directly and
-> > > > __blk_mq_try_issue_directly
-> > > >     into one interface to unify the interfaces to issue
-> > > > requests
-> > > >     directly. The merged interface takes over the requests
-> > > > totally,
-> > > >     it could insert, end or do nothing based on the return
-> > > > value
-> > > > of
-> > > >     .queue_rq and 'bypass' parameter. Then caller needn't any
-> > > > other
-> > > >     handling any more and then code could be cleaned up.
-> > > >     
-> > > >     And also the commit c616cbee ( blk-mq: punt failed direct
-> > > > issue
-> > > >     to dispatch list ) always inserts requests to hctx dispatch
-> > > > list
-> > > >     whenever get a BLK_STS_RESOURCE or BLK_STS_DEV_RESOURCE,
-> > > > this
-> > > > is
-> > > >     overkill and will harm the merging. We just need to do that
-> > > > for
-> > > >     the requests that has been through .queue_rq. This patch
-> > > > also
-> > > >     could fix this.
-> > > >     
-> > > >     Signed-off-by: Jianchao Wang <jianchao.w.wang@oracle.com>
-> > > >     Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> > > > 
-> > > > 
-> > > > 
-> > > 
-> > > Cannot clean revert 
-> > > 
-> > > loberman@ibclient linux]$ git revert
-> > > 7f556a44e61d0b62d78db9a2662a5f0daef010f2 
-> > > error: could not revert 7f556a4... blk-mq: refactor the code of
-> > > issue
-> > > request directly
-> > > hint: after resolving the conflicts, mark the corrected paths
-> > > hint: with 'git add <paths>' or 'git rm <paths>'
-> > > hint: and commit the result with 'git commit'
-> > > 
-> > > Revert "blk-mq: refactor the code of issue request directly"
-> > > 
-> > > This reverts commit 7f556a44e61d0b62d78db9a2662a5f0daef010f2.
-> > > 
-> > > Conflicts:
-> > >         block/blk-mq.c
-> > > 
-> > > No clear what in this commit is breaking things and causing the
-> > > race
-> > 
-> > Hi Laurence,
-> > 
-> > Could you test the following patch?
-> > 
-> > 'bypass' means the caller handle the dispatch result.
-> > 
-> > Also, we might remove the handling for 'force', so we can align to
-> > blk_mq_dispatch_rq_list(), but that shouldn't be related with this
-> > issue.
-> > 
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index bc3524428b96..ee4bfd9cbde5 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -1848,12 +1848,14 @@ blk_status_t
-> > blk_mq_try_issue_directly(struct
-> > blk_mq_hw_ctx *hctx,
-> >  	ret = __blk_mq_issue_directly(hctx, rq, cookie, last);
-> >  out_unlock:
-> >  	hctx_unlock(hctx, srcu_idx);
-> > +	if (bypass)
-> > +		return ret;
-> >  	switch (ret) {
-> >  	case BLK_STS_OK:
-> >  		break;
-> >  	case BLK_STS_DEV_RESOURCE:
-> >  	case BLK_STS_RESOURCE:
-> > -		if (force) {
-> > +		if (force)
-> >  			blk_mq_request_bypass_insert(rq, run_queue);
-> >  			/*
-> >  			 * We have to return BLK_STS_OK for the DM
-> > @@ -1861,18 +1863,14 @@ blk_status_t
-> > blk_mq_try_issue_directly(struct
-> > blk_mq_hw_ctx *hctx,
-> >  			 * the real result to indicate whether the
-> >  			 * request is direct-issued successfully.
-> >  			 */
-> > -			ret = bypass ? BLK_STS_OK : ret;
-> > -		} else if (!bypass) {
-> > +		else
-> >  			blk_mq_sched_insert_request(rq, false,
-> >  						    run_queue, false);
-> > -		}
-> >  		break;
-> >  	default:
-> > -		if (!bypass)
-> > -			blk_mq_end_request(rq, ret);
-> > +		blk_mq_end_request(rq, ret);
-> >  		break;
-> >  	}
-> > -
-> >  	return ret;
-> >  }
-> >  
-> > Thanks,
-> > Ming
-> 
-> Hello Ming
-> 
-> Thanks for the patch, unfortunately it did not help.
-> I stared at the changes for a while and could not see how it would
-> make
-> a difference to the race.
-> However, thats is mostly because I still need to get my head around
-> all
-> the block-mq code.
-> 
-> The test was with this commit I added
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 70b210a..8952116 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1834,12 +1834,15 @@ blk_status_t blk_mq_try_issue_directly(struct
-> blk_mq_hw_ctx *hctx,
->         ret = __blk_mq_issue_directly(hctx, rq, cookie, last);
->  out_unlock:
->         hctx_unlock(hctx, srcu_idx);
-> +        if (bypass)
-> +                return ret;
-> +
->         switch (ret) {
->         case BLK_STS_OK:
->                 break;
->         case BLK_STS_DEV_RESOURCE:
->         case BLK_STS_RESOURCE:
-> -               if (force) {
-> +                if (force)
->                         blk_mq_request_bypass_insert(rq, run_queue);
->                         /*
->                          * We have to return BLK_STS_OK for the DM
-> @@ -1847,18 +1850,14 @@ blk_status_t blk_mq_try_issue_directly(struct
-> blk_mq_hw_ctx *hctx,
->                          * the real result to indicate whether the
->                          * request is direct-issued successfully.
->                          */
-> -                       ret = bypass ? BLK_STS_OK : ret;
-> -               } else if (!bypass) {
-> +       else
->                         blk_mq_sched_insert_request(rq, false,
->                                                     run_queue,
-> false);
-> -               }
->                 break;
->         default:
-> -               if (!bypass)
-> -                       blk_mq_end_request(rq, ret);
-> +                blk_mq_end_request(rq, ret);
->                 break;
->         }
-> -
->         return ret;
->  }
-> 
-> 
-> 
-> [  193.068245] device-mapper: multipath: Failing path 66:96.
-> [  193.092929] device-mapper: multipath: Failing path 8:96.
-> [  193.137068] #PF error: [normal kernel read fault]
-> [  195.217691] PGD 0 P4D 0 
-> [  195.231958] Oops: 0000 [#1] SMP PTI
-> [  195.250796] CPU: 4 PID: 8525 Comm: kworker/4:1H Tainted:
-> G        W
-> I       5.1.0-rc2+ #2
-> [  195.295820] Hardware name: HP ProLiant DL380 G7, BIOS P67
-> 08/16/2015
-> [  195.330339] Workqueue: kblockd blk_mq_run_work_fn
-> [  195.355613] RIP: 0010:blk_mq_dispatch_rq_list+0x72/0x570
-> [  195.385494] Code: 08 84 d2 0f 85 cf 03 00 00 45 31 f6 c7 44 24 38
-> 00
-> 00 00 00 c7 44 24 3c 00 00 00 00 80 3c 24 00 4c 8d 6b b8 48 8b 6b c8
-> 75
-> 24 <48> 8b 85 b8 00 00 00 48 8b 40 40 48 8b 40 10 48 85 c0 74 10 48
-> 89
-> [  195.489501] RSP: 0018:ffffbb074781bd90 EFLAGS: 00010246
-> [  195.519090] RAX: ffff9f7e6e1de148 RBX: ffff9f7e6e1de148 RCX:
-> 0000000000000004
-> [  195.560254] RDX: 0000000000000000 RSI: ffffbb074781be20 RDI:
-> ffff9f8aa95297d0
-> [  195.601196] RBP: 0000000000000000 R08: 0000000000000000 R09:
-> 8080808080808080
-> [  195.642186] R10: 0000000000000001 R11: 0000000000000000 R12:
-> ffffbb074781be20
-> [  195.683094] R13: ffff9f7e6e1de100 R14: 0000000000000000 R15:
-> ffff9f8aa95297d0
-> [  195.724153] FS:  0000000000000000(0000) GS:ffff9f7eb7880000(0000)
-> knlGS:0000000000000000
-> [  195.769427] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  195.801687] CR2: 00000000000000b8 CR3: 000000020d20e004 CR4:
-> 00000000000206e0
-> [  195.841126] Call Trace:
-> [  195.854014]  ? blk_mq_flush_busy_ctxs+0xca/0x120
-> [  195.879448]  blk_mq_sched_dispatch_requests+0x15c/0x180
-> [  195.908389]  __blk_mq_run_hw_queue+0x5f/0x100
-> [  195.932961]  process_one_work+0x171/0x380
-> [  195.956414]  worker_thread+0x49/0x3f0
-> [  195.976984]  kthread+0xf8/0x130
-> [  195.995078]  ? max_active_store+0x80/0x80
-> [  196.018080]  ? kthread_bind+0x10/0x10
-> [  196.038383]  ret_from_fork+0x35/0x40
-> [  196.058435] Modules linked in: ib_isert iscsi_target_mod
-> target_core_mod ib_srp scsi_transport_srp rpcrdma ib_iser rdma_ucm
-> ib_umad rdma_cm ib_ipoib sunrpc libiscsi iw_cm scsi_transport_iscsi
-> ib_cm mlx5_ib ib_uverbs ib_core intel_powerclamp coretemp kvm_intel
-> kvm
-> irqbypass crct10dif_pclmul crc32_pclmul ghash_clmulni_intel
-> aesni_intel
-> crypto_simd iTCO_wdt cryptd ipmi_ssif glue_helper gpio_ich
-> iTCO_vendor_support dm_service_time pcspkr joydev hpwdt hpilo ipmi_si
-> acpi_power_meter pcc_cpufreq sg ipmi_devintf i7core_edac lpc_ich
-> ipmi_msghandler dm_multipath ip_tables xfs libcrc32c radeon sd_mod
-> i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt
-> fb_sys_fops mlx5_core ttm mlxfw drm crc32c_intel serio_raw hpsa ptp
-> bnx2 scsi_transport_sas pps_core dm_mirror dm_region_hash dm_log
-> dm_mod
-> [  196.451938] CR2: 00000000000000b8
-> [  196.469994] ---[ end trace b2b431da81df2e95 ]---
-> [  196.469996] BUG: unable to handle kernel NULL pointer dereference
-> at
-> 00000000000000b8
-> [  196.495380] RIP: 0010:blk_mq_dispatch_rq_list+0x72/0x570
-> [  196.540456] #PF error: [normal kernel read fault]
-> [  196.570957] Code: 08 84 d2 0f 85 cf 03 00 00 45 31 f6 c7 44 24 38
-> 00
-> 00 00 00 c7 44 24 3c 00 00 00 00 80 3c 24 00 4c 8d 6b b8 48 8b 6b c8
-> 75
-> 24 <48> 8b 85 b8 00 00 00 48 8b 40 40 48 8b 40 10 48 85 c0 74 10 48
-> 89
-> [  196.597976] PGD 0 P4D 0 
-> [  196.705627] RSP: 0018:ffffbb074781bd90 EFLAGS: 00010246
-> [  196.720114] Oops: 0000 [#2] SMP PTI
-> [  196.749959] RAX: ffff9f7e6e1de148 RBX: ffff9f7e6e1de148 RCX:
-> 0000000000000004
-> [  196.769936] CPU: 6 PID: 4034 Comm: kworker/6:1H Tainted: G      D
-> W
-> I       5.1.0-rc2+ #2
-> [  196.809000] RDX: 0000000000000000 RSI: ffffbb074781be20 RDI:
-> ffff9f8aa95297d0
-> [  196.854098] Hardware name: HP ProLiant DL380 G7, BIOS P67
-> 08/16/2015
-> [  196.893109] RBP: 0000000000000000 R08: 0000000000000000 R09:
-> 8080808080808080
-> [  196.928283] Workqueue: kblockd blk_mq_run_work_fn
-> [  196.968750] R10: 0000000000000001 R11: 0000000000000000 R12:
-> ffffbb074781be20
-> [  196.995203] RIP: 0010:blk_mq_dispatch_rq_list+0x72/0x570
-> [  197.035808] R13: ffff9f7e6e1de100 R14: 0000000000000000 R15:
-> ffff9f8aa95297d0
-> [  197.065780] Code: 08 84 d2 0f 85 cf 03 00 00 45 31 f6 c7 44 24 38
-> 00
-> 00 00 00 c7 44 24 3c 00 00 00 00 80 3c 24 00 4c 8d 6b b8 48 8b 6b c8
-> 75
-> 24 <48> 8b 85 b8 00 00 00 48 8b 40 40 48 8b 40 10 48 85 c0 74 10 48
-> 89
-> [  197.105262] FS:  0000000000000000(0000) GS:ffff9f7eb7880000(0000)
-> knlGS:0000000000000000
-> [  197.213467] RSP: 0018:ffffbb074722bd90 EFLAGS: 00010246
-> [  197.259374] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  197.289579] RAX: ffff9f7e6e25a908 RBX: ffff9f7e6e25a908 RCX:
-> 0000000000000004
-> [  197.322352] CR2: 00000000000000b8 CR3: 000000020d20e004 CR4:
-> 00000000000206e0
-> [  197.361122] RDX: 0000000000000000 RSI: ffffbb074722be20 RDI:
-> ffff9f8a19f60000
-> [  197.400084] Kernel panic - not syncing: Fatal exception
-> [  197.440204] RBP: 0000000000000000 R08: 0000000000000000 R09:
-> 8080808080808080
-> [  197.509179] R10: 0000000000000001 R11: 0000000000000000 R12:
-> ffffbb074722be20
-> [  197.549143] R13: ffff9f7e6e25a8c0 R14: 0000000000000000 R15:
-> ffff9f8a19f60000
-> [  197.590162] FS:  0000000000000000(0000) GS:ffff9f7eb78c0000(0000)
-> knlGS:0000000000000000
-> [  197.636223] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  197.668680] CR2: 00000000000000b8 CR3: 000000020d20e004 CR4:
-> 00000000000206e0
-> [  197.708291] Call Trace:
-> [  197.722282]  ? blk_mq_flush_busy_ctxs+0xca/0x120
-> [  197.748285]  blk_mq_sched_dispatch_requests+0x15c/0x180
-> [  197.777145]  __blk_mq_run_hw_queue+0x5f/0x100
-> [  197.801406]  process_one_work+0x171/0x380
-> [  197.824021]  worker_thread+0x49/0x3f0
-> [  197.844756]  kthread+0xf8/0x130
-> [  197.862142]  ? max_active_store+0x80/0x80
-> [  197.883917]  ? kthread_bind+0x10/0x10
-> [  197.904609]  ret_from_fork+0x35/0x40
-> [  197.924992] Modules linked in: ib_isert iscsi_target_mod
-> target_core_mod ib_srp scsi_transport_srp rpcrdma ib_iser rdma_ucm
-> ib_umad rdma_cm ib_ipoib sunrpc libiscsi iw_cm scsi_transport_iscsi
-> ib_cm mlx5_ib ib_uverbs ib_core intel_powerclamp coretemp kvm_intel
-> kvm
-> irqbypass crct10dif_pclmul crc32_pclmul ghash_clmulni_intel
-> aesni_intel
-> crypto_simd iTCO_wdt cryptd ipmi_ssif glue_helper gpio_ich
-> iTCO_vendor_support dm_service_time pcspkr joydev hpwdt hpilo ipmi_si
-> acpi_power_meter pcc_cpufreq sg ipmi_devintf i7core_edac lpc_ich
-> ipmi_msghandler dm_multipath ip_tables xfs libcrc32c radeon sd_mod
-> i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt
-> fb_sys_fops mlx5_core ttm mlxfw drm crc32c_intel serio_raw hpsa ptp
-> bnx2 scsi_transport_sas pps_core dm_mirror dm_region_hash dm_log
-> dm_mod
-> [  198.317894] CR2: 00000000000000b8
-> [  198.336570] ---[ end trace b2b431da81df2e96 ]---
-> [  198.336571] BUG: unable to handle kernel NULL pointer dereference
-> at
-> 00000000000000b8
-> [  198.336572] #PF error: [normal kernel read fault]
-> [  198.362241] RIP: 0010:blk_mq_dispatch_rq_list+0x72/0x570
-> [  198.405359] PGD 0 P4D 0 
-> [  198.432068] Code: 08 84 d2 0f 85 cf 03 00 00 45 31 f6 c7 44 24 38
-> 00[  198.461906] Oops: 0000 [#3] SMP PTI
-> 
+On Thu, Mar 28, 2019 at 11:04 PM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Thu, Mar 28, 2019 at 08:21:55AM -0600, Jens Axboe wrote:
+> > This is going to create a needless conflict between 5.1 and the 5.2
+> > block tree. I haven't pushed the 5.2 tree out yet, plan to do so
+> > this week after I've pushed the current 5.1 patches. Can you respin
+> > this one on top of for-5.2/block when it comes out?
+>
+> Can we also drop the parameter name rename and just add the comments?
 
-I am going to run the same test not using srp but for example qla2xxx.
-This issue is clearly in the block layer, but I wonder why I am the
-first to report it.
-The exposure, if it happens also on F/C luns means we should have seen
-panics when arrays were rebooted with any kernel >= v5.0-rc1
+OK, I will drop the name rename change and send it out after for-5.2 comes out.
 
-
-
+Thanks,
+Ming Lei
