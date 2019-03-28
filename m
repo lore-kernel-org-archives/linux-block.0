@@ -6,70 +6,68 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C679DC43381
-	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 15:07:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA6BC43381
+	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 15:07:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 989BD20823
-	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 15:07:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2EE420823
+	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 15:07:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="tvSn1oFH"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="WoMWwYYh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726648AbfC1PHG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Mar 2019 11:07:06 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:43336 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725816AbfC1PHG (ORCPT
+        id S1726904AbfC1PHV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Mar 2019 11:07:21 -0400
+Received: from mail-io1-f47.google.com ([209.85.166.47]:39524 "EHLO
+        mail-io1-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726059AbfC1PHV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Mar 2019 11:07:06 -0400
-Received: by mail-io1-f67.google.com with SMTP id x3so17511422iol.10
-        for <linux-block@vger.kernel.org>; Thu, 28 Mar 2019 08:07:05 -0700 (PDT)
+        Thu, 28 Mar 2019 11:07:21 -0400
+Received: by mail-io1-f47.google.com with SMTP id e13so17501505ioq.6
+        for <linux-block@vger.kernel.org>; Thu, 28 Mar 2019 08:07:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=b78i6ZArWnjtH9Ww9AlxlSEgwBRJ8cwhcMbYlVPRXK8=;
-        b=tvSn1oFHYIgooZzJFoCEetkeNGmeRR54WinovmLFCKgo2vLBuWx2Gx/P0GGACykR80
-         GXhC5g/ROFXUjUQNblY6FeRS3qYt9tZxsEXkP/9mNSrLOWVLD+Yf9OnjlCkgR3B2HVaG
-         H1F0pNY39yP2T1kIuWlRt8ZpjEweOb6a95bVbAoATs5gz/guJHsFyzXWC2bnp+/zBE4A
-         qcAIfmjV5VE982zvfk7gC+O79VH2uGdfDecVMJV8ojfTQGgNboZXG8Fu4AZSm1331QEC
-         aa02WafzObt8FHfEGIX4eu0T50rxr5bjtzXwJpeRSqd1nWORB4ARUTjhi/F+6KZ3QEd7
-         Wyrw==
+        bh=laNgreeFIbw83SNwdt/N1Nr9Ge8tGRgnWVJtil+GanA=;
+        b=WoMWwYYhcVkl/oe/xFeZjCuk8dRrhN4eAHPYP57ay8ZpPRZM8pgea9KJ9zk0+WSIiN
+         0IIwYN3mCpfChZoG/QjsNhCuO4klusbhoQe3f7LPsjmAXm2Lm8fENb81QcWCD6bRPCAJ
+         C3f5HfLDz2Z66P9xMCNfs42caPQS14ljBrIIP6/yMZUHEszalJjtFvoBrKw3IpMpt1cD
+         fGT4Q4KS3KJR3haVQrlEvYTgY2DkrzdBndbEAK4loh6uKfpiQjek+JGB/wo6g1yq3IaT
+         vxNxvkz9bXxuqQcPHHscOVN6a93YcZ/qku3zrR8uVW7nDrMf6yzVu883YQ3S3gBlq+l+
+         I6xQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=b78i6ZArWnjtH9Ww9AlxlSEgwBRJ8cwhcMbYlVPRXK8=;
-        b=eOiqXaExOatTXcom1wln/dvvUqQWakhBuopwArbIWs1AmEs8gpcFxP1OSv2Rnxhua1
-         b1zqCRClAHTz7KmmAIZoH52QMrnZU2aiZI5Yj5PUKQUHlIXxCR7D30YaQmugSL/JJqfL
-         2YbW/UdoB7jkvWkvnamJeINduqtEvrhUjwwllw3Z3GxiBZYLonWAPbyf4UbzaYSYAZ71
-         0Q9hVj5qJnblXZRJDxNfcXbXEzeS81tCVvHolycXivRp3/n9/+n8Yb0gyrMsWVc7BXHX
-         yOvmO7tUn8u/HkBThcrbihKTAjWY/ZzOCTz2KlOmjSLNMvfdZgkWk6ThZDlGXNsIUWhV
-         c2rg==
-X-Gm-Message-State: APjAAAVRpyZVZNiNBg0iqt0+VS/I90vvBe8UdnpogtbV0LuUJS77lvD9
-        imSEltrtoZB/MTUXMLUs3/aejg==
-X-Google-Smtp-Source: APXvYqx/ITvDxgvPLWcvPr3EWc/OkPqFfX8U/pbV01O7pZ7gCwd3BQo590F8o9bas/fmDNRXrCxAew==
-X-Received: by 2002:a5e:d514:: with SMTP id e20mr28664900iom.8.1553785625431;
-        Thu, 28 Mar 2019 08:07:05 -0700 (PDT)
+        bh=laNgreeFIbw83SNwdt/N1Nr9Ge8tGRgnWVJtil+GanA=;
+        b=sWr4DGwJ+0UuK0gPrZyKDCHr1IEIbp7sS1gRayDBgPN2Tfzdd5vQYzQNfjgzYIPe61
+         LiNUFgGYkTN/2yJnkAejNXHhiiUj8sM4osnqUPunHKJhSFhpir8TdGNODVZROCAwwNkZ
+         T/hVFDpDQUyUQLDwvY2BibRMNVDRpH6Mru2+swJ9WteMRYKmHRwxdNKIhVHKMGk+5oXw
+         BwHfCzxwmsr5UfILgBBvL07iApUvWg9YQ4vtjy8ooLyyOOnJ8zoNh8Rg5xDbiMnXLk+x
+         ZrhPVfPfegQH85T1NfSwn9aKU+rhXC8y5omdUhkr0BUMLfM9PT7A2OQNvyEIzedrLDtL
+         uTlg==
+X-Gm-Message-State: APjAAAVr4EHLN3vYD87RRT6A4/y7YBezAgwWut0egeM7rLZxXnmcX40Y
+        cxmOeOj12MZw0GG9PSyNNHVIKg==
+X-Google-Smtp-Source: APXvYqyRIyve+Hb2GTkzntkft3F9PDROKMrVaSLE3AkPNFZp7UMHu5uxOlunQFIF0+loxl8bqEk4ZQ==
+X-Received: by 2002:a6b:b757:: with SMTP id h84mr30822442iof.193.1553785640228;
+        Thu, 28 Mar 2019 08:07:20 -0700 (PDT)
 Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id b199sm2038449itb.29.2019.03.28.08.07.03
+        by smtp.gmail.com with ESMTPSA id b17sm11519296ion.0.2019.03.28.08.07.18
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 28 Mar 2019 08:07:04 -0700 (PDT)
-Subject: Re: [PATCH] block: clarify that bio_add_page() and related helpers
- can add multi pages
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org
-References: <20190328035001.26276-1-ming.lei@redhat.com>
- <5258cad3-b324-660f-589f-73eb7fb8fa04@kernel.dk>
- <20190328150320.GB9265@infradead.org>
+        Thu, 28 Mar 2019 08:07:19 -0700 (PDT)
+Subject: Re: [PATCH] block: loop: mark bvec as ITER_BVEC_FLAG_NO_REF
+To:     Christoph Hellwig <hch@infradead.org>,
+        Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+References: <20190328030531.28279-1-ming.lei@redhat.com>
+ <20190328150224.GA9265@infradead.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <8e53a36f-2b73-55bf-e404-52cfa0192981@kernel.dk>
-Date:   Thu, 28 Mar 2019 09:07:03 -0600
+Message-ID: <f14d6b1e-2853-cc79-363a-34b5a0596930@kernel.dk>
+Date:   Thu, 28 Mar 2019 09:07:18 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <20190328150320.GB9265@infradead.org>
+In-Reply-To: <20190328150224.GA9265@infradead.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,16 +76,17 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/28/19 9:03 AM, Christoph Hellwig wrote:
-> On Thu, Mar 28, 2019 at 08:21:55AM -0600, Jens Axboe wrote:
->> This is going to create a needless conflict between 5.1 and the 5.2
->> block tree. I haven't pushed the 5.2 tree out yet, plan to do so
->> this week after I've pushed the current 5.1 patches. Can you respin
->> this one on top of for-5.2/block when it comes out?
+On 3/28/19 9:02 AM, Christoph Hellwig wrote:
+>> +	iov_iter_bvec(i, direction, bvec, nr_segs, count);
+>> +	i->type |= ITER_BVEC_FLAG_NO_REF;
+>> +}
 > 
-> Can we also drop the parameter name rename and just add the comments?
+> What about simply providing a iov_iter_bvec_noref in core code and
+> also using that in io_uring?
+> 
+> Otherwise this looks fine to me.
 
-Yeah, that might be better to avoid needless churn.
+I'd be fine with that helper.
 
 -- 
 Jens Axboe
