@@ -3,33 +3,36 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB5D9C43381
-	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 15:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A891C43381
+	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 15:43:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 81DEC21773
-	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 15:43:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26DEC21773
+	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 15:43:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726286AbfC1PnL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Mar 2019 11:43:11 -0400
-Received: from mga09.intel.com ([134.134.136.24]:55504 "EHLO mga09.intel.com"
+        id S1726150AbfC1Pn4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Mar 2019 11:43:56 -0400
+Received: from mga09.intel.com ([134.134.136.24]:55579 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726046AbfC1PnL (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Mar 2019 11:43:11 -0400
+        id S1726108AbfC1Pn4 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Mar 2019 11:43:56 -0400
 X-Amp-Result: UNSCANNABLE
 X-Amp-File-Uploaded: False
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Mar 2019 08:43:10 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Mar 2019 08:43:55 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.60,280,1549958400"; 
-   d="p7s'?scan'208";a="126671779"
+   d="p7s'?scan'208";a="126671894"
 Received: from orsmsx108.amr.corp.intel.com ([10.22.240.6])
-  by orsmga007.jf.intel.com with ESMTP; 28 Mar 2019 08:43:10 -0700
+  by orsmga007.jf.intel.com with ESMTP; 28 Mar 2019 08:43:55 -0700
+Received: from orsmsx116.amr.corp.intel.com (10.22.240.14) by
+ ORSMSX108.amr.corp.intel.com (10.22.240.6) with Microsoft SMTP Server (TLS)
+ id 14.3.408.0; Thu, 28 Mar 2019 08:43:55 -0700
 Received: from orsmsx101.amr.corp.intel.com ([169.254.8.133]) by
- ORSMSX108.amr.corp.intel.com ([169.254.2.134]) with mapi id 14.03.0415.000;
- Thu, 28 Mar 2019 08:43:10 -0700
+ ORSMSX116.amr.corp.intel.com ([169.254.7.78]) with mapi id 14.03.0415.000;
+ Thu, 28 Mar 2019 08:43:54 -0700
 From:   "Derrick, Jonathan" <jonathan.derrick@intel.com>
 To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "zub@linux.fjfi.cvut.cz" <zub@linux.fjfi.cvut.cz>,
@@ -38,114 +41,78 @@ To:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "axboe@kernel.dk" <axboe@kernel.dk>
 CC:     "jonas.rabenstein@studium.uni-erlangen.de" 
         <jonas.rabenstein@studium.uni-erlangen.de>
-Subject: Re: [PATCH 04/16] block: sed-opal: unify space check in add_token_*
-Thread-Topic: [PATCH 04/16] block: sed-opal: unify space check in add_token_*
-Thread-Index: AQHUw/qb5kq+x19s2UaFiwg5ylQWJKYh5y8A
-Date:   Thu, 28 Mar 2019 15:43:08 +0000
-Message-ID: <be50dc915987e880eaefbd52d7b324464c4dea07.camel@intel.com>
+Subject: Re: [PATCH 11/16] block: sed-opal: add token for OPAL_LIFECYCLE
+Thread-Topic: [PATCH 11/16] block: sed-opal: add token for OPAL_LIFECYCLE
+Thread-Index: AQHUw/qjP4MyehHmF0i/uAkQfRhxlaYh51mA
+Date:   Thu, 28 Mar 2019 15:43:53 +0000
+Message-ID: <57637592e1afc4cdb2b6d7fb370eb47cb469a0c5.camel@intel.com>
 References: <1550103368-4605-1-git-send-email-zub@linux.fjfi.cvut.cz>
-         <1550103368-4605-5-git-send-email-zub@linux.fjfi.cvut.cz>
-In-Reply-To: <1550103368-4605-5-git-send-email-zub@linux.fjfi.cvut.cz>
+         <1550103368-4605-12-git-send-email-zub@linux.fjfi.cvut.cz>
+In-Reply-To: <1550103368-4605-12-git-send-email-zub@linux.fjfi.cvut.cz>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: yes
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.232.112.25]
 Content-Type: multipart/signed; micalg=sha-1;
-        protocol="application/x-pkcs7-signature"; boundary="=-cQj3br6aN+FDWlTdeT09"
+        protocol="application/x-pkcs7-signature"; boundary="=-Oq96GhW3NPcli0YjCd71"
 MIME-Version: 1.0
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---=-cQj3br6aN+FDWlTdeT09
+--=-Oq96GhW3NPcli0YjCd71
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Looks good
-
 Acked-by: Jon Derrick <jonathan.derrick@intel.com>
 
-On Thu, 2019-02-14 at 01:15 +0100, David Kozub wrote:
-> From: Jonas Rabenstein <jonas.rabenstein@studium.uni-erlangen.de>
+On Thu, 2019-02-14 at 01:16 +0100, David Kozub wrote:
+> Define OPAL_LIFECYCLE token and use it instead of literals in
+> get_lsp_lifecycle.
 >=20
-> All add_token_* functions have a common set of conditions that have
-> to
-> be checked. Use a common function for those checks in order to avoid
-> different behaviour as well as code duplication.
->=20
-> Co-authored-by: David Kozub <zub@linux.fjfi.cvut.cz>
-> Signed-off-by: Jonas Rabenstein <
-> jonas.rabenstein@studium.uni-erlangen.de>
 > Signed-off-by: David Kozub <zub@linux.fjfi.cvut.cz>
 > ---
->  block/sed-opal.c | 25 ++++++++++++++++---------
->  1 file changed, 16 insertions(+), 9 deletions(-)
+>  block/opal_proto.h | 2 ++
+>  block/sed-opal.c   | 4 ++--
+>  2 files changed, 4 insertions(+), 2 deletions(-)
 >=20
+> diff --git a/block/opal_proto.h b/block/opal_proto.h
+> index e20be8258854..b6e352cfe982 100644
+> --- a/block/opal_proto.h
+> +++ b/block/opal_proto.h
+> @@ -170,6 +170,8 @@ enum opal_token {
+>  	OPAL_READLOCKED =3D 0x07,
+>  	OPAL_WRITELOCKED =3D 0x08,
+>  	OPAL_ACTIVEKEY =3D 0x0A,
+> +	/* lockingsp table */
+> +	OPAL_LIFECYCLE =3D 0x06,
+>  	/* locking info table */
+>  	OPAL_MAXRANGES =3D 0x04,
+>  	 /* mbr control */
 > diff --git a/block/sed-opal.c b/block/sed-opal.c
-> index e59ae364f1ef..d285bd4b2b9b 100644
+> index ad66d1dc725a..7f02e50e2bce 100644
 > --- a/block/sed-opal.c
 > +++ b/block/sed-opal.c
-> @@ -510,15 +510,24 @@ static int opal_discovery0(struct opal_dev
+> @@ -1786,12 +1786,12 @@ static int get_lsp_lifecycle(struct opal_dev
 > *dev, void *data)
->  	return opal_discovery0_end(dev);
->  }
 > =20
-> -static void add_token_u8(int *err, struct opal_dev *cmd, u8 tok)
-> +static bool can_add(int *err, struct opal_dev *cmd, size_t len)
->  {
->  	if (*err)
-> -		return;
-> -	if (cmd->pos >=3D IO_BUFFER_LENGTH - 1) {
-> -		pr_debug("Error adding u8: end of buffer.\n");
-> +		return false;
-> +
-> +	if (len > IO_BUFFER_LENGTH || cmd->pos > IO_BUFFER_LENGTH -
-> len) {
-> +		pr_debug("Error adding %zu bytes: end of buffer.\n",
-> len);
->  		*err =3D -ERANGE;
-> -		return;
-> +		return false;
->  	}
-> +
-> +	return true;
-> +}
-> +
-> +static void add_token_u8(int *err, struct opal_dev *cmd, u8 tok)
-> +{
-> +	if (!can_add(err, cmd, 1))
-> +		return;
->  	cmd->cmd[cmd->pos++] =3D tok;
->  }
+>  	add_token_u8(&err, dev, OPAL_STARTNAME);
+>  	add_token_u8(&err, dev, 3); /* Start Column */
+> -	add_token_u8(&err, dev, 6); /* Lifecycle Column */
+> +	add_token_u8(&err, dev, OPAL_LIFECYCLE);
+>  	add_token_u8(&err, dev, OPAL_ENDNAME);
 > =20
-> @@ -562,9 +571,8 @@ static void add_token_u64(int *err, struct
-> opal_dev *cmd, u64 number)
->  	msb =3D fls64(number);
->  	len =3D DIV_ROUND_UP(msb, 8);
+>  	add_token_u8(&err, dev, OPAL_STARTNAME);
+>  	add_token_u8(&err, dev, 4); /* End Column */
+> -	add_token_u8(&err, dev, 6); /* Lifecycle Column */
+> +	add_token_u8(&err, dev, OPAL_LIFECYCLE);
+>  	add_token_u8(&err, dev, OPAL_ENDNAME);
 > =20
-> -	if (cmd->pos >=3D IO_BUFFER_LENGTH - len - 1) {
-> +	if (!can_add(err, cmd, len + 1)) {
->  		pr_debug("Error adding u64: end of buffer.\n");
-> -		*err =3D -ERANGE;
->  		return;
->  	}
->  	add_short_atom_header(cmd, false, false, len);
-> @@ -586,9 +594,8 @@ static void add_token_bytestring(int *err, struct
-> opal_dev *cmd,
->  		is_short_atom =3D false;
->  	}
-> =20
-> -	if (len >=3D IO_BUFFER_LENGTH - cmd->pos - header_len) {
-> +	if (!can_add(err, cmd, header_len + len)) {
->  		pr_debug("Error adding bytestring: end of buffer.\n");
-> -		*err =3D -ERANGE;
->  		return;
->  	}
-> =20
+>  	add_token_u8(&err, dev, OPAL_ENDLIST);
 
---=-cQj3br6aN+FDWlTdeT09
+--=-Oq96GhW3NPcli0YjCd71
 Content-Type: application/x-pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -201,13 +168,13 @@ CPVfCgq9qnmVCn5DyHWE3V/BRjJCoILLBLxAxnmSdH4pF6wJ6pYRLEw9qoyNhpzGUIJU/Lk1MYIC
 FzCCAhMCAQEwgZAweTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBD
 bGFyYTEaMBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFs
 IEJhc2ljIElzc3VpbmcgQ0EgNEECEzMAAMamAkocC+WQNPgAAAAAxqYwCQYFKw4DAhoFAKBdMBgG
-CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDMyODE1NDI1MFowIwYJ
-KoZIhvcNAQkEMRYEFFR021jJeug6gawg/B0CMY6qCfZxMA0GCSqGSIb3DQEBAQUABIIBAA1XDiNj
-vWA007L6C6k99MsC3zwBXCYhjHpZO23rTHyCBvXOhENK8oVPm7dVHzBXGaZ2WsV2GSUq50gQHfO9
-G56eOMEB25L0yDLSpAHKHSet8eYzzTG2S4XZJDH3JP7nso3CDBdJYXaDGDkxWw9b6WK8f+MmursF
-59t4KHYNMyv5PxVIs9PXXoxZBDHjWrbHACV9VZLADDaXFqfGCL+ubqKkb67YuFYSj4dGhvM1+l2h
-wlk0ZvxrK35N4p2+JC5V0ALVs+gf9mtdAvqY5t8K1zZJdiUruFtdlgke+v5kFCtTJ89AGSYaWXs7
-BBb0VxQf2jdOHb2cY6fSpwObArs9GvMAAAAAAAA=
+CSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTE5MDMyODE1NDMyNVowIwYJ
+KoZIhvcNAQkEMRYEFNiH982GyJj/GnomeGwN6CAmhy7jMA0GCSqGSIb3DQEBAQUABIIBAFro18wQ
+QWXJwf3cucnhYL1xD42qlBTwIGxxExe9sQ/RspojO4tvcP66NEr5UjcPO0K1l0st3VbI0gbCZoaT
+G0LVytc7vBvpZ6ZnfPy3fjOO9ML8gd3MIbv3xoUpHEatJgLB5wMyY/pgLaOJJJPAdHhcI5s3LzPP
+hCBAms2/6epxwM/LCwtOCs9co7qo9C0nhE5VeIL3KnH5JgEehe3++xdCohQPaYCVq6lyCcz03J2b
+yA9mwCZaSYarFKiBfYO2NO1G6YBN0aV+n1pS5mXSNbLMkOOD8WD+1q0AMbO/UJV+1cuJEWBV8p4W
+Z0r4TDdUFNO6//dAXvQbjRA+yhOtb5YAAAAAAAA=
 
 
---=-cQj3br6aN+FDWlTdeT09--
+--=-Oq96GhW3NPcli0YjCd71--
