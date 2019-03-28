@@ -2,123 +2,90 @@ Return-Path: <SRS0=7L3l=R7=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F34CC43381
-	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 10:26:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB11C43381
+	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 14:18:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DCE40206C0
-	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 10:26:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E6C6217F9
+	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 14:18:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="XUgxn0yo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726238AbfC1K0q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Mar 2019 06:26:46 -0400
-Received: from mx2.suse.de ([195.135.220.15]:44170 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726108AbfC1K0p (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Mar 2019 06:26:45 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id D07A9B842;
-        Thu, 28 Mar 2019 10:26:43 +0000 (UTC)
-Subject: Re: [PATCH 03/15] block: add a rq_dma_dir helper
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Keith Busch <keith.busch@intel.com>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org, Jens Axboe <axboe@fb.com>,
-        linux-block@vger.kernel.org
-References: <20190321231037.25104-1-hch@lst.de>
- <20190321231037.25104-4-hch@lst.de>
- <80ffa084-e1fb-4c5c-da92-7d9486084cb6@suse.de>
- <20190327142049.GC26200@lst.de>
-From:   Johannes Thumshirn <jthumshirn@suse.de>
-Openpgp: preference=signencrypt
-Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <b694b0e4-4c93-16d8-01c3-c6a75a0998f0@suse.de>
-Date:   Thu, 28 Mar 2019 11:26:43 +0100
+        id S1726227AbfC1OSF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Mar 2019 10:18:05 -0400
+Received: from mail-io1-f67.google.com ([209.85.166.67]:43354 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726046AbfC1OSE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 28 Mar 2019 10:18:04 -0400
+Received: by mail-io1-f67.google.com with SMTP id x3so17355788iol.10
+        for <linux-block@vger.kernel.org>; Thu, 28 Mar 2019 07:18:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=b+Bw10x7fkQ4mUPP787LxbVWlDvqnskQwOPw1GIlIOY=;
+        b=XUgxn0yoqB4lSEJVcLxtrdLHJMMSn91CHcofLIc0cU3xgwqvytZjnsRddmnPi3B8p2
+         Ht8cTGcDTCYnIKbnuTNBtmFFxzvYb9dbxvtLiNIFrhcpLzXsRAbS2KZv80UrYd6m697J
+         KIFBavfr49I6SvE43E41KwbalUa9MCJvXWAFfeYbA3rGymEOCDzdbnW8bAAhWdxqn1UU
+         9ZlQazl1AEVLM69hImN+25wv8KP2rFF7+xx9xM6/ZzSG9G0Lv+W6jkbtGxVDGaAmmXZE
+         J+7I6SXWoFjwNvCrtanr/19r4QnkCYiwNREQUwTKZjTt7a7rmPBc8A1+DwzLsDBQ3/h6
+         NmPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=b+Bw10x7fkQ4mUPP787LxbVWlDvqnskQwOPw1GIlIOY=;
+        b=IdJUSptJK8kCn2oQ0RWRoUT6irR+ikk88q3H0q7xtos5qYSk2IoKPDnQ13quGGRoA7
+         VFvifNWR6R4w+OXMLQBPuIwFtvI+dsBWgGQgPzednI1U4TWK/kVuQNiB8tk7Jv9wU41w
+         L8w+Cmtr3CPcQ/KjGEYwog+y9FD/YOicmm8VVfSPfOVnTjp6hzC1WFtVNWQewvQoc0Is
+         MVwpEhd1A5Mbx6PuMo1R6LgILfWqgY6/XpLC+5qZrYN+5TAEx61RHaZqoZzFU6zonyiv
+         vSnEXx8zAQWyc+3n6nBcF796dfDHvnoynibVXt4JuXqggw1IlVlFtHmhRDDfesMyzxet
+         fCCA==
+X-Gm-Message-State: APjAAAUkplC+rkKh0MhdG8mE0AV28N9o/luKiE47LojEbjoZrlvjwZhW
+        ashz9YtdRbSJQug435OwO3G27Q==
+X-Google-Smtp-Source: APXvYqy01IJR6FFlfoSXsHG0PybJ8ISGQIwfKb4MLXegGHZRm/SNxb2mUmSYWBgqR/gC2yf91GQbcA==
+X-Received: by 2002:a6b:c84e:: with SMTP id y75mr31872300iof.107.1553782684118;
+        Thu, 28 Mar 2019 07:18:04 -0700 (PDT)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id b102sm1963348itd.13.2019.03.28.07.18.02
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 28 Mar 2019 07:18:03 -0700 (PDT)
+Subject: Re: [PATCH] block: loop: mark bvec as ITER_BVEC_FLAG_NO_REF
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+References: <20190328030531.28279-1-ming.lei@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <2ac9386c-4a4f-3d39-e0be-b597fa63d0f0@kernel.dk>
+Date:   Thu, 28 Mar 2019 08:18:02 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.3.0
+ Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <20190327142049.GC26200@lst.de>
+In-Reply-To: <20190328030531.28279-1-ming.lei@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 27/03/2019 15:20, Christoph Hellwig wrote:
-[...]
+On 3/27/19 9:05 PM, Ming Lei wrote:
+> loop is one block device, for any bio submitted to this device,
+> the upper layer does guarantee that pages added to loop's bio won't
+> go away when the bio is in-flight.
 > 
-> I'd rather not throw that into a nvme series.  Those are easily cleanups
-> for later.  Maybe we can even encourage people that would otherwise
-> do whitespace cleanups or incorrect refcount_t conversions to take care
-> of it :)
+> So mark loop's bvec as ITER_BVEC_FLAG_NO_REF then get_page/put_page
+> can be saved for serving loop's IO.
 
-Fair enough.
+Curious if this is a noticable win on loop? In any case, looks
+fine to me, I'll queue it up for 5.2.
 
-Byte,
-	Johannes
 -- 
-Johannes Thumshirn                            SUSE Labs Filesystems
-jthumshirn@suse.de                                +49 911 74053 689
-SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
-GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
-HRB 21284 (AG Nürnberg)
-Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
+Jens Axboe
+
