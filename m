@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6DD0C43381
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 07:08:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46405C43381
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 07:08:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9077E2183E
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 07:08:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14B062173C
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 07:08:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728793AbfC2HIU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Mar 2019 03:08:20 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:60950 "EHLO mx1.redhat.com"
+        id S1728800AbfC2HIZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Mar 2019 03:08:25 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54096 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728781AbfC2HIU (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Mar 2019 03:08:20 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        id S1728796AbfC2HIZ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 29 Mar 2019 03:08:25 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A484583F51;
-        Fri, 29 Mar 2019 07:08:19 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 5E8D0308CF80;
+        Fri, 29 Mar 2019 07:08:25 +0000 (UTC)
 Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6729A60BF1;
-        Fri, 29 Mar 2019 07:08:16 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 12E1661B6A;
+        Fri, 29 Mar 2019 07:08:21 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
@@ -33,87 +33,47 @@ Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Juergen Gross <jgross@suse.com>,
         xen-devel@lists.xenproject.org, Omar Sandoval <osandov@fb.com>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V3 01/10] block: pass page to xen_biovec_phys_mergeable
-Date:   Fri, 29 Mar 2019 15:07:54 +0800
-Message-Id: <20190329070803.10958-2-ming.lei@redhat.com>
+Subject: [PATCH V3 02/10] block: avoid to break XEN by multi-page bvec
+Date:   Fri, 29 Mar 2019 15:07:55 +0800
+Message-Id: <20190329070803.10958-3-ming.lei@redhat.com>
 In-Reply-To: <20190329070803.10958-1-ming.lei@redhat.com>
 References: <20190329070803.10958-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Fri, 29 Mar 2019 07:08:19 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Fri, 29 Mar 2019 07:08:25 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-xen_biovec_phys_mergeable() only needs .bv_page of the 2nd bio bvec
-for checking if the two bvecs can be merged, so pass page to
-xen_biovec_phys_mergeable() directly.
+XEN has special page merge requirement, see xen_biovec_phys_mergeable().
+We can't merge pages into one bvec simply for XEN.
 
-No function change.
+So move XEN's specific check on page merge into __bio_try_merge_page(),
+then abvoid to break XEN by multi-page bvec.
 
 Cc: ris Ostrovsky <boris.ostrovsky@oracle.com>
 Cc: Juergen Gross <jgross@suse.com>
 Cc: xen-devel@lists.xenproject.org
 Cc: Omar Sandoval <osandov@fb.com>
 Cc: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk.h            | 2 +-
- drivers/xen/biomerge.c | 5 +++--
- include/xen/xen.h      | 4 +++-
- 3 files changed, 7 insertions(+), 4 deletions(-)
+ block/bio.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/block/blk.h b/block/blk.h
-index 5d636ee41663..e27fd1512e4b 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -75,7 +75,7 @@ static inline bool biovec_phys_mergeable(struct request_queue *q,
+diff --git a/block/bio.c b/block/bio.c
+index b64cedc7f87c..b2423e7aae08 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -776,6 +776,8 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
  
- 	if (addr1 + vec1->bv_len != addr2)
- 		return false;
--	if (xen_domain() && !xen_biovec_phys_mergeable(vec1, vec2))
-+	if (xen_domain() && !xen_biovec_phys_mergeable(vec1, vec2->bv_page))
- 		return false;
- 	if ((addr1 | mask) != ((addr2 + vec2->bv_len - 1) | mask))
- 		return false;
-diff --git a/drivers/xen/biomerge.c b/drivers/xen/biomerge.c
-index f3fbb700f569..05a286d24f14 100644
---- a/drivers/xen/biomerge.c
-+++ b/drivers/xen/biomerge.c
-@@ -4,12 +4,13 @@
- #include <xen/xen.h>
- #include <xen/page.h>
+ 		if (vec_end_addr + 1 != page_addr + off)
+ 			return false;
++		if (xen_domain() && !xen_biovec_phys_mergeable(bv, page))
++			return false;
+ 		if (same_page && (vec_end_addr & PAGE_MASK) != page_addr)
+ 			return false;
  
-+/* check if @page can be merged with 'vec1' */
- bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
--			       const struct bio_vec *vec2)
-+			       const struct page *page)
- {
- #if XEN_PAGE_SIZE == PAGE_SIZE
- 	unsigned long bfn1 = pfn_to_bfn(page_to_pfn(vec1->bv_page));
--	unsigned long bfn2 = pfn_to_bfn(page_to_pfn(vec2->bv_page));
-+	unsigned long bfn2 = pfn_to_bfn(page_to_pfn(page));
- 
- 	return bfn1 + PFN_DOWN(vec1->bv_offset + vec1->bv_len) == bfn2;
- #else
-diff --git a/include/xen/xen.h b/include/xen/xen.h
-index 19d032373de5..19a72f591e2b 100644
---- a/include/xen/xen.h
-+++ b/include/xen/xen.h
-@@ -43,8 +43,10 @@ extern struct hvm_start_info pvh_start_info;
- #endif	/* CONFIG_XEN_DOM0 */
- 
- struct bio_vec;
-+struct page;
-+
- bool xen_biovec_phys_mergeable(const struct bio_vec *vec1,
--		const struct bio_vec *vec2);
-+		const struct page *page);
- 
- #if defined(CONFIG_MEMORY_HOTPLUG) && defined(CONFIG_XEN_BALLOON)
- extern u64 xen_saved_max_mem_size;
 -- 
 2.9.5
 
