@@ -2,151 +2,135 @@ Return-Path: <SRS0=pPwc=SA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70A2FC43381
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 07:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7527C4360F
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 08:06:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E7E82183E
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 07:58:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="rzIViYxQ"
+	by mail.kernel.org (Postfix) with ESMTP id AF9F721773
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 08:06:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728943AbfC2H5m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Mar 2019 03:57:42 -0400
-Received: from mailout4.samsung.com ([203.254.224.34]:54610 "EHLO
-        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728937AbfC2H5m (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Mar 2019 03:57:42 -0400
-Received: from epcas1p3.samsung.com (unknown [182.195.41.47])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20190329075738epoutp04cd1edf13242593745dd3221f7892eeb2~QXvCN6j7i1708117081epoutp04e;
-        Fri, 29 Mar 2019 07:57:38 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20190329075738epoutp04cd1edf13242593745dd3221f7892eeb2~QXvCN6j7i1708117081epoutp04e
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1553846258;
-        bh=v0Q6ayUZE5qT6eA3Vyc1UBCx/oaxtVit/tVtoFnGuq4=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=rzIViYxQoTFxJMaO/fRY6Pc9zKub3KDdidC8XsovRVIXcb/lBFACaFFeUgbyuTzAr
-         iNug1Gt4tGjpOCLPiCaAQQK0MPNKrHknQsjTYZkRPJS3F++6CbpnZKjHxzdKHOGsi6
-         Wwz86Rjj0f9Pz2myWCsunbjzh5y9SxcoHcXjF2gU=
-Received: from epsmges1p1.samsung.com (unknown [182.195.42.53]) by
-        epcas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20190329075738epcas1p18686183ad2d4150dc37d0094f1317cd7~QXvB-sl4n2148321483epcas1p1E;
-        Fri, 29 Mar 2019 07:57:38 +0000 (GMT)
-Received: from epcas1p1.samsung.com ( [182.195.41.45]) by
-        epsmges1p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A7.45.04139.2FFCD9C5; Fri, 29 Mar 2019 16:57:38 +0900 (KST)
-Received: from epsmgms2p1new.samsung.com (unknown [182.195.42.142]) by
-        epcas1p4.samsung.com (KnoxPortal) with ESMTP id
-        20190329075737epcas1p4f32cad26279c1146982a6c91b3378eab~QXvBf-vTM2558625586epcas1p4o;
-        Fri, 29 Mar 2019 07:57:37 +0000 (GMT)
-X-AuditID: b6c32a35-deaec9c00000102b-16-5c9dcff2e99e
-Received: from epmmp1.local.host ( [203.254.227.16]) by
-        epsmgms2p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        D3.7F.03598.1FFCD9C5; Fri, 29 Mar 2019 16:57:37 +0900 (KST)
-Received: from test-PowerEdge-R720.sa.corp.samsungelectronics.net
-        ([107.108.221.212]) by mmp1.samsung.com (Oracle Communications Messaging
-        Server 7.0.5.31.0 64bit (built May  5 2014)) with ESMTPA id
-        <0PP40008VBFTTN20@mmp1.samsung.com>; Fri, 29 Mar 2019 16:57:37 +0900 (KST)
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org
-Cc:     axboe@fb.com, prakash.v@samsung.com, anshul@samsung.com,
-        joshiiitr@gmail.com, Kanchan Joshi <joshi.k@samsung.com>
-Subject: [PATCH v3 0/7] Extend write-hint for in-kernel use
-Date:   Fri, 29 Mar 2019 13:23:45 +0530
-Message-id: <1553846032-4451-1-git-send-email-joshi.k@samsung.com>
-X-Mailer: git-send-email 2.7.4
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprDIsWRmVeSWpSXmKPExsWy7bCmru6n83NjDJ7flrL4PX0Kq8X/PcfY
-        LI7+f8tmcf7tYSaLvbe0LWbOu8NmsWfvSRaLy7vmsFnMX/aU3eLKlEXMDlweE5vfsXvsnHWX
-        3WPzknqPvi2rGD0+b5ILYI3isklJzcksSy3St0vgyjjw8TJbQaNIxbq5xxgbGLfzdTFyckgI
-        mEicff+CqYuRi0NIYAejxL6Z35ghnO+MEmdO9jLDVM29fw2qajejxJzDU1ghnOlMEq8nz2Xs
-        YuTgYBPQlLgwuRQkLiIwh1Fi2b5pYN3MAuUSf6dcZQSxhQWsJV7u3MIKYrMIqEp83tkCFucV
-        cJK43NfBBLFNTuLmuU6wMyQEetgktk54wwiRcJG4d24bE8gyCQFpiUtHbSHCxRK/7hyFqu9g
-        lLjeMJMFImEvcXHPXyaII/gk3n3tYYXo5ZXoaBOCKPGQ+LpxEzuILSQQK3F34n7mCYziCxgZ
-        VjGKpRYU56anFhsWGOoVJ+YWl+al6yXn525iBMeZlukOxinnfA4xCnAwKvHwztg5J0aINbGs
-        uDL3EKMEB7OSCG/gubkxQrwpiZVVqUX58UWlOanFhxilOViUxHnXOzjHCAmkJ5akZqemFqQW
-        wWSZODilGhin9hX3rU6zkPO/UVMVyve93WPWX2ZJ5omqFT828e7c5Zlf/eRe/3XOJRO7ZXc6
-        n53w0/zznS+K2t0iNWf18m8tCFb/p9x4J0rjw4pby4+4GKrnbKlfXba3UOcdb+Bz3bmPvm+w
-        4V9jdXrW3I8q083NG1/8YVm1YrZvc3ZBnMAxmw3NGarB51uUWIozEg21mIuKEwFSBUOMrwIA
-        AA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrPJMWRmVeSWpSXmKPExsVy+t9jAd2P5+fGGFxYYW7xe/oUVov/e46x
-        WRz9/5bN4vzbw0wWe29pW8ycd4fNYs/ekywWl3fNYbOYv+wpu8WVKYuYHbg8Jja/Y/fYOesu
-        u8fmJfUefVtWMXp83iQXwBrFZZOSmpNZllqkb5fAlXHg42W2gkaRinVzjzE2MG7n62Lk5JAQ
-        MJGYe/8aE4gtJLCTUeJnf0QXIxeQPZNJYvHqH8xdjBwcbAKaEhcml4LERQTmMEr07F7PChJn
-        FiiXmLKJE6RXWMBa4uXOLawgNouAqsTnnS2MIDavgJPE5b4OJohdchI3z3UyT2DkWsDIsIpR
-        MrWgODc9t9iowDAvtVyvODG3uDQvXS85P3cTIzBYth3W6tvBeH9J/CFGAQ5GJR7eGTvnxAix
-        JpYVV+YeYpTgYFYS4Q08NzdGiDclsbIqtSg/vqg0J7X4EKM0B4uSOO/tvGORQgLpiSWp2amp
-        BalFMFkmDk6pBsbZ1975MvD4pdV/MPpT1vmt56iuVJxly6fjFvuC96wNvs6YzGv6a/JBPgeb
-        g+eP7t9x1CrW0zPoz4fif61ShxSUwv+LP9hsvCXtwJcn3/umam3+z6SyZIWiRfdUgZYJi4XX
-        mvZf1rjMd6CN1W7z8wTN837fVjWlCa78xhDbIhR3vNLgvt6lmVeVWIozEg21mIuKEwHFoTbP
-        EgIAAA==
-X-CMS-MailID: 20190329075737epcas1p4f32cad26279c1146982a6c91b3378eab
-CMS-TYPE: 101P
-X-CMS-RootMailID: 20190329075737epcas1p4f32cad26279c1146982a6c91b3378eab
-References: <CGME20190329075737epcas1p4f32cad26279c1146982a6c91b3378eab@epcas1p4.samsung.com>
+        id S1728955AbfC2IGJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Mar 2019 04:06:09 -0400
+Received: from mx2.suse.de ([195.135.220.15]:56214 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728943AbfC2IGJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 29 Mar 2019 04:06:09 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id D1208AF79;
+        Fri, 29 Mar 2019 08:06:06 +0000 (UTC)
+Subject: Re: [block] 4e366a7962: blktests.nvme.005.fail
+To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+Cc:     Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
+        Hannes Reinecke <hare@suse.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Jan Kara <jack@suse.cz>,
+        Linux FSDEVEL Mailinglist <linux-fsdevel@vger.kernel.org>,
+        lkp@01.org, Ming Lei <ming.lei@redhat.com>
+References: <20190325010409.GB6379@shao2-debian>
+ <bb98759a-2b51-9785-d903-282ca1ed91cb@suse.de>
+ <20190328174846.GA22610@lst.de>
+ <6cf48b68-a81b-d28e-96dc-0f8185eddec7@kernel.dk>
+From:   Johannes Thumshirn <jthumshirn@suse.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <7779ab0a-391f-269e-9172-c03151211f85@suse.de>
+Date:   Fri, 29 Mar 2019 09:06:05 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.3.0
+MIME-Version: 1.0
+In-Reply-To: <6cf48b68-a81b-d28e-96dc-0f8185eddec7@kernel.dk>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Towards extending write-hints/streams infrastucture so that file-systems
-and other kernel-mode components can use exclusive hints. This patchset also
-modifies Ext4/JBD2 to use new in-kernel, write-hint with journal. 
+On 28/03/2019 18:52, Jens Axboe wrote:
+> On 3/28/19 11:48 AM, Christoph Hellwig wrote:
+>> On Thu, Mar 28, 2019 at 05:31:29PM +0100, Johannes Thumshirn wrote:
+>>> In all cases I could reproduce it I had nsegs == 2 and
+>>> rq->nr_phys_segments == 1 (rq->bio->bi_phys_segments == 1).
+>>
+>> And all cases are pass through as well?
+>>
+>> Can you check if this still shows up with the series from Ming which
+>> switches the passthrough requests to use multi-page biovecs aswell
+>> and gets rid of the hairy code you quote below.
 
-Here is the history and changelog -
+Good idea, thanks.
 
-Changes since v2:                                                               
-- Introduce API in block layer so that drivers can register stream info. Added 
-new limit in request queue for this purpose.
-- Block layer does the conversion from write-hint to stream-id. 
-- Any write-hint beyond registered limit turn to 0.
-- New macro "WRITE_LIFE_KERN_MIN" can be used as base by kernel mode components.
+> Since I already merged that in my 5.2 but didn't push it out yet, I've
+> made a temporary branch available if you want to test through that:
+> 
+> git://git.kernel.dk/linux-block 5.2-tmp
 
-Changes since v1:                                                               
-- introduce four more hints for in-kernel use, as recommended by Dave chinner   
-  & Jens axboe. This isolates kernel-mode hints from user-mode ones.            
-- remove mount-option to specify write-hint, as recommended by Jan kara &       
-  Dave chinner. Rather, FS always sets write-hint for journal. This gets ignored
-  if device does not support stream.                                            
-- Removed code-redundancy for write_dirty_buffer (Jan kara's review comment) 
+Awesome thanks.
 
-V2 patch:
-https://patchwork.kernel.org/cover/10754405/
-V1 patch:
-https://marc.info/?l=linux-fsdevel&m=154444637519020&w=2  
-
-Note: I am sorry about the fact this patchset is against 5.0.0-rc4, rather than 
-against linux-next.
-
-Kanchan Joshi (7):
-  block: extend stream count for in-kernel use
-  block: introduce API to register stream information with block layer
-  block: add write-hint to stream-id conversion
-  nvme: register stream info with block layer
-  fs: introduce APIs to enable sending write-hint with buffer-head
-  fs: introduce write-hint start point for in-kernel hints
-  fs/ext4,jbd2: add support for passing write-hint with journal
-
- block/blk-core.c            | 20 ++++++++++++++++++++
- block/blk-settings.c        | 12 ++++++++++++
- drivers/nvme/host/core.c    | 19 ++++++-------------
- fs/buffer.c                 | 18 ++++++++++++++++--
- fs/ext4/ext4_jbd2.h         |  1 +
- fs/ext4/super.c             |  2 ++
- fs/jbd2/commit.c            | 11 +++++++----
- fs/jbd2/journal.c           |  3 ++-
- fs/jbd2/revoke.c            |  3 ++-
- include/linux/blkdev.h      |  9 +++++++--
- include/linux/buffer_head.h |  3 +++
- include/linux/fs.h          |  2 ++
- include/linux/jbd2.h        |  8 ++++++++
- 13 files changed, 88 insertions(+), 23 deletions(-)
 
 -- 
-2.7.4
-
+Johannes Thumshirn                            SUSE Labs Filesystems
+jthumshirn@suse.de                                +49 911 74053 689
+SUSE LINUX GmbH, Maxfeldstr. 5, 90409 Nürnberg
+GF: Felix Imendörffer, Mary Higgins, Sri Rasiah
+HRB 21284 (AG Nürnberg)
+Key fingerprint = EC38 9CAB C2C4 F25D 8600 D0D0 0393 969D 2D76 0850
