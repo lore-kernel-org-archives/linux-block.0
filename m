@@ -3,37 +3,37 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7527C4360F
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 08:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB789C10F05
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 08:19:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AF9F721773
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 08:06:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C12132082F
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 08:19:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728955AbfC2IGJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Mar 2019 04:06:09 -0400
-Received: from mx2.suse.de ([195.135.220.15]:56214 "EHLO mx1.suse.de"
+        id S1726320AbfC2ITD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Mar 2019 04:19:03 -0400
+Received: from mx2.suse.de ([195.135.220.15]:57460 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728943AbfC2IGJ (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Mar 2019 04:06:09 -0400
+        id S1728944AbfC2ITB (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 29 Mar 2019 04:19:01 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id D1208AF79;
-        Fri, 29 Mar 2019 08:06:06 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id A9924AE27;
+        Fri, 29 Mar 2019 08:18:59 +0000 (UTC)
 Subject: Re: [block] 4e366a7962: blktests.nvme.005.fail
-To:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <tom.leiming@gmail.com>
 Cc:     Linux Block Layer Mailinglist <linux-block@vger.kernel.org>,
         Hannes Reinecke <hare@suse.de>,
         Bart Van Assche <bvanassche@acm.org>,
-        Jan Kara <jack@suse.cz>,
+        Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>,
         Linux FSDEVEL Mailinglist <linux-fsdevel@vger.kernel.org>,
-        lkp@01.org, Ming Lei <ming.lei@redhat.com>
+        Jens Axboe <axboe@kernel.dk>, LKP ML <lkp@01.org>,
+        Ming Lei <ming.lei@redhat.com>
 References: <20190325010409.GB6379@shao2-debian>
  <bb98759a-2b51-9785-d903-282ca1ed91cb@suse.de>
- <20190328174846.GA22610@lst.de>
- <6cf48b68-a81b-d28e-96dc-0f8185eddec7@kernel.dk>
+ <CACVXFVPi4WHcthPey4xKT8Jxwkq40J3iLu5v_sprD=eFjs4Qrg@mail.gmail.com>
 From:   Johannes Thumshirn <jthumshirn@suse.de>
 Openpgp: preference=signencrypt
 Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
@@ -91,12 +91,12 @@ Autocrypt: addr=jthumshirn@suse.de; prefer-encrypt=mutual; keydata=
  l2t2TyTuHm7wVUY2J3gJYgG723/PUGW4LaoqNrYQUr/rqo6NXw6c+EglRpm1BdpkwPwAng63
  W5VOQMdnozD2RsDM5GfA4aEFi5m00tE+8XPICCtkduyWw+Z+zIqYk2v+zraPLs9Gs0X2C7X0
  yvqY9voUoJjG6skkOToGZbqtMX9K4GOv9JAxVs075QRXL3brHtHONDt6udYobzz+
-Message-ID: <7779ab0a-391f-269e-9172-c03151211f85@suse.de>
-Date:   Fri, 29 Mar 2019 09:06:05 +0100
+Message-ID: <a776e212-f1c2-0b34-11ff-8600c058c01c@suse.de>
+Date:   Fri, 29 Mar 2019 09:18:59 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.3.0
 MIME-Version: 1.0
-In-Reply-To: <6cf48b68-a81b-d28e-96dc-0f8185eddec7@kernel.dk>
+In-Reply-To: <CACVXFVPi4WHcthPey4xKT8Jxwkq40J3iLu5v_sprD=eFjs4Qrg@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -105,28 +105,57 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 28/03/2019 18:52, Jens Axboe wrote:
-> On 3/28/19 11:48 AM, Christoph Hellwig wrote:
->> On Thu, Mar 28, 2019 at 05:31:29PM +0100, Johannes Thumshirn wrote:
->>> In all cases I could reproduce it I had nsegs == 2 and
->>> rq->nr_phys_segments == 1 (rq->bio->bi_phys_segments == 1).
->>
->> And all cases are pass through as well?
->>
->> Can you check if this still shows up with the series from Ming which
->> switches the passthrough requests to use multi-page biovecs aswell
->> and gets rid of the hairy code you quote below.
+On 29/03/2019 01:33, Ming Lei wrote:
+[...]
 
-Good idea, thanks.
-
-> Since I already merged that in my 5.2 but didn't push it out yet, I've
-> made a temporary branch available if you want to test through that:
+>> +       blk_queue_segment_boundary(ctrl->ctrl.admin_q, PAGE_SIZE - 1);
 > 
-> git://git.kernel.dk/linux-block 5.2-tmp
+> The above isn't needed for linus tree, however it is required for 5.0 and older
+> releases.
 
-Awesome thanks.
+Yes but it was worth a try after days of failing to find the issue.
 
+> But nvme-loop target have other problems, and I'd suggest you to apply
+> the following patch:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=for-linus&id=02db99548d3608a625cf481cff2bb7b626829b3f
 
+This only applies to the file backed target, doesn't it? My testcase
+uses bdev backed namespaces.
+
+[...]
+
+>>  731
+>>  732   /* If we may be able to merge these biovecs, force a recount */
+>>  733   if (bio->bi_vcnt > 1 && biovec_phys_mergeable(q, bvec - 1, bvec))
+>>  734           bio->bi_phys_segments = -1;
+> 
+> The above change from you might cause issue given some queue's .bi_phys_segments
+> is 255.
+
+65535 but yes there are drivers setting it to USHRT_MAX. I'll have to
+see if I can get hold of one for testing.
+ [...]
+
+> I'd suggest you to address the following comments first before working on
+> your patch:
+> 
+> https://lore.kernel.org/linux-block/CACVXFVNPW1TOsCaAibc-YJHDEdK95Y8-v1rHNaab7oV=eb+8TA@mail.gmail.com/
+> 
+> https://lore.kernel.org/linux-block/CACVXFVOq1ngjpD62SreSZda5k_WJjxOZRHwpqt6si7bRv=O46Q@mail.gmail.com/
+
+I'll have a look, thanks.
+
+[...]
+
+> Can you trigger this issue on linus tree or 5.2-tmp of block tree?
+
+I haven't been able to trigger it on vanilla so far, so it's most likely
+related to the patch. Will rebase the patchset to 5.2-tmp and retest
+from there.
+
+Thanks,
+	Johannes
 -- 
 Johannes Thumshirn                            SUSE Labs Filesystems
 jthumshirn@suse.de                                +49 911 74053 689
