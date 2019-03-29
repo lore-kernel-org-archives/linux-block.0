@@ -2,94 +2,100 @@ Return-Path: <SRS0=pPwc=SA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99BA5C43381
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:01:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75D0EC43381
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:10:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 68ACB2184D
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:01:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A91B2183F
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:10:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="BpD7+A8P"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Hzrd13p4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728961AbfC2OBW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Mar 2019 10:01:22 -0400
-Received: from forwardcorp1o.cmail.yandex.net ([37.9.109.47]:52360 "EHLO
-        forwardcorp1o.cmail.yandex.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728720AbfC2OBW (ORCPT
+        id S1729197AbfC2OKl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Mar 2019 10:10:41 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:38193 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728774AbfC2OKl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Mar 2019 10:01:22 -0400
-Received: from mxbackcorp1j.mail.yandex.net (mxbackcorp1j.mail.yandex.net [IPv6:2a02:6b8:0:1619::162])
-        by forwardcorp1o.cmail.yandex.net (Yandex) with ESMTP id 407A020EF0;
-        Fri, 29 Mar 2019 17:01:19 +0300 (MSK)
-Received: from smtpcorp1p.mail.yandex.net (smtpcorp1p.mail.yandex.net [2a02:6b8:0:1472:2741:0:8b6:10])
-        by mxbackcorp1j.mail.yandex.net (nwsmtp/Yandex) with ESMTP id rgKlzJY0yI-1I34egO4;
-        Fri, 29 Mar 2019 17:01:19 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1553868079; bh=W7/RS3vHJEbXBp2niGN4WUhiiMnPTF+LmOZwA1GB9ps=;
-        h=Message-ID:Date:To:From:Subject;
-        b=BpD7+A8Pudi56qbvTXEpBI2C8bQ5UyGyEieWMZ5HiKFd3laF5DdeqPS6z/Od+zPVt
-         TVxtYZUdTN74vqrBpxRz5ouCEq0jVS+JDuI8smKTTE++H4W7SLUhkmjMhJOMBXtgAM
-         tgfUPuOoqKkF42lciXz8TYeJChOsvEOJnJZXPY+8=
-Authentication-Results: mxbackcorp1j.mail.yandex.net; dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-red.dhcp.yndx.net (dynamic-red.dhcp.yndx.net [2a02:6b8:0:40c:cccc:f1a4:6b5a:61d8])
-        by smtpcorp1p.mail.yandex.net (nwsmtp/Yandex) with ESMTPSA id Bnb6ODpKCW-1IsiVsO7;
-        Fri, 29 Mar 2019 17:01:18 +0300
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (Client certificate not present)
-Subject: [PATCH] block/bfq: fix ifdef for CONFIG_BFQ_GROUP_IOSCHED=y
-From:   Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
-To:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        linux-kernel@vger.kernel.org
-Date:   Fri, 29 Mar 2019 17:01:18 +0300
-Message-ID: <155386807826.3190.16175453392005064129.stgit@buzz>
-User-Agent: StGit/0.17.1-dirty
+        Fri, 29 Mar 2019 10:10:41 -0400
+Received: by mail-io1-f68.google.com with SMTP id v4so1844477ioj.5
+        for <linux-block@vger.kernel.org>; Fri, 29 Mar 2019 07:10:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=InFNj43Ew+zCZHSNgM4rGAqFiRaGJhlAqF5jIgxZqrQ=;
+        b=Hzrd13p4BfDoZijAoBqMNkX/RL1AjjiYrqxr6RxGIuH2eYPg1YHh5EgmMNsXp2KSvt
+         QX7zak8YntPOEH/F3XtCxTts+ZoarAGlTh/V8scjWKGr93u81ztKWMO+6zGL//dznWOe
+         jxic1068pnpG52O4giIvypSvVpPashLRsYLvCE9whD2/VXzuOvT08wPwc1E304pV3SG2
+         K4ZIoFNX13aQWZXu8hzB275LWNSzBsp4DTmp8KjzvIMgCTkwfIH/kM1PSLf+5/hQHAbU
+         G8wOUYuwyDRAmLtx1rrVh9IS+ldca4RIdZhpYDMIXvfPoonmfMtnvgePvoZ1bR8E2hhM
+         /fWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=InFNj43Ew+zCZHSNgM4rGAqFiRaGJhlAqF5jIgxZqrQ=;
+        b=rNwJj90uePHX3y1FI58HvJ/T2JCWqV1DxgEt3dGfLrkUcCk1rn6Q4PHt9GUN/8l4h8
+         SPEFHGYBYlQ0B5nuCchM9brZ7LTT66H8XDXmQKKhJjUc5tPNxEDT6plS/xgRgL4L/gga
+         AXE53PWwPeph8JXaD7IxHLrh1BjTUloYjSn/RVgYlo9GCD+TZkFK0uBz/cp4e+xsLYar
+         WUQ05Hq6bkcpvRfRQS5RYWaaMvAo+ZyrQMsR3RB/2uatcDg4dnETfmSGQh3mUdktJxoj
+         vp4DaopQ/SXChXc3x0Ke9HixlPBccvQNbrMFDcGnsZ3tj9cz/oPrP9S/K7A7yWRmgPqJ
+         SZ8g==
+X-Gm-Message-State: APjAAAXhMSU72fovKF7vjr2Dd1Pr6cCqlQi6AbxQQxVrIFU28myt0jvw
+        dmmA4MkSxCr3gswafh06UKUegBXEJ8LY7A==
+X-Google-Smtp-Source: APXvYqx0F5SUC3ltQ3YKga9JM9tVZEzbQrIBCj0jmkkJ2owsxSdbL6R6hx2SVMn8jioOgkN1yEH6yQ==
+X-Received: by 2002:a5e:8a07:: with SMTP id d7mr35777563iok.194.1553868640406;
+        Fri, 29 Mar 2019 07:10:40 -0700 (PDT)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id m6sm812672ioj.36.2019.03.29.07.10.39
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 29 Mar 2019 07:10:39 -0700 (PDT)
+Subject: Re: Bisected GFP in bfq_bfqq_expire on v5.1-rc1
+To:     Dmitrii Tcvetkov <demfloro@demfloro.ru>,
+        linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>
+References: <20190329160227.7d55c8dd@fire.localdomain>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <0e203a26-b941-cef4-dff1-013999d4b041@kernel.dk>
+Date:   Fri, 29 Mar 2019 08:10:38 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20190329160227.7d55c8dd@fire.localdomain>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Replace BFQ_GROUP_IOSCHED_ENABLED with CONFIG_BFQ_GROUP_IOSCHED.
-Code under these ifdefs never worked, something might be broken.
+On 3/29/19 7:02 AM, Dmitrii Tcvetkov wrote:
+> Hi,
+> 
+> I got kernel panic since v5.1-rc1 when working with files on block
+> device with BFQ scheduler assigned. I didn't find trivial way to
+> reproduce the panic but "git checkout origin/linux-5.0.y"
+> on linux-stable-rc[1] git repo on btrfs filesystem reproduces the
+> problem 100% of the time on my bare-metal machine and in a VM.
+> 
+> Bisect led me to commit 9dee8b3b057e1 (block, bfq: fix queue removal
+> from weights tree). After reverting this commit on top of current
+> mainline master(9936328b41ce) I can't reproduce the problem.
+> 
+> dmesg with the panic and bisect log attached.
+> 
+> [1] https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stable-rc.git
 
-Fixes: 0471559c2fbd ("block, bfq: add/remove entity weights correctly")
-Fixes: 73d58118498b ("block, bfq: consider also ioprio classes in symmetry detection")
-Signed-off-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
----
- block/bfq-iosched.c |    2 +-
- block/bfq-wf2q.c    |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Paolo, can you please take a look at this?
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 4c592496a16a..fac188dd78fa 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -674,7 +674,7 @@ static bool bfq_symmetric_scenario(struct bfq_data *bfqd)
- 	 * at least two nodes.
- 	 */
- 	return !(varied_queue_weights || multiple_classes_busy
--#ifdef BFQ_GROUP_IOSCHED_ENABLED
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
- 	       || bfqd->num_groups_with_pending_reqs > 0
- #endif
- 		);
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 63311d1ff1ed..a11bef75483d 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -1012,7 +1012,7 @@ static void __bfq_activate_entity(struct bfq_entity *entity,
- 		entity->on_st = true;
- 	}
- 
--#ifdef BFQ_GROUP_IOSCHED_ENABLED
-+#ifdef CONFIG_BFQ_GROUP_IOSCHED
- 	if (!bfq_entity_to_bfqq(entity)) { /* bfq_group */
- 		struct bfq_group *bfqg =
- 			container_of(entity, struct bfq_group, entity);
+
+-- 
+Jens Axboe
 
