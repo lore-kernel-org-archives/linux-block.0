@@ -2,115 +2,82 @@ Return-Path: <SRS0=pPwc=SA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EDE8C4360F
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 18:12:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92CF1C43381
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 20:21:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 644F0218A6
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 18:12:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3BB3520657
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 20:21:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="O82K2QI4";
-	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="AwR/1g8F"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="iHZ1Do1l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729911AbfC2SMP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Mar 2019 14:12:15 -0400
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:40292 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729809AbfC2SMP (ORCPT
+        id S1730060AbfC2UVU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Mar 2019 16:21:20 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:33383 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730014AbfC2UVU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Mar 2019 14:12:15 -0400
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x2TI07J7022534;
-        Fri, 29 Mar 2019 11:12:02 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : references : in-reply-to : content-type : content-id
- : content-transfer-encoding : mime-version; s=facebook;
- bh=LhR82jiilKwTNcM0XTXnJCDcSDWLVRdcJLiz5nwPA2w=;
- b=O82K2QI4Bwo4+E79pKPB3GwCveK+XBQyRP5rL8x1J07Yna/qVYUiiA9V5E4IyzGdc77E
- W4U0zvcZ806rL5d3Asp6RPs19U9KD5bU98j9D6Scm8kRgkRdFXwfIUam7GCcUO5U1KHv
- 4gS0QeajqU+QKki2ReyVXisTIiqAmwV+mKM= 
-Received: from maileast.thefacebook.com ([199.201.65.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 2rhr14g3mn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Fri, 29 Mar 2019 11:12:02 -0700
-Received: from frc-hub01.TheFacebook.com (2620:10d:c021:18::171) by
- frc-hub05.TheFacebook.com (2620:10d:c021:18::175) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.1.1713.5; Fri, 29 Mar 2019 11:12:01 -0700
-Received: from NAM04-BN3-obe.outbound.protection.outlook.com (192.168.183.28)
- by o365-in.thefacebook.com (192.168.177.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.1.1713.5
- via Frontend Transport; Fri, 29 Mar 2019 11:12:01 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
- s=selector1-fb-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LhR82jiilKwTNcM0XTXnJCDcSDWLVRdcJLiz5nwPA2w=;
- b=AwR/1g8FdnIGZAZ9Cqc5dLKnXfj7a9Am9uW3Ld7Yzb0cwD7fi6h5Jm2UPEB/+7yT1hthuPWK72V/fHU7JuGewiMcH4O0o4fkJAWVglIudYCbE47l4nJj4tH8zttGdFsuFzVaoinHTZ5faP2jU6odXBVpwhxr9dh12HqEzkPutgU=
-Received: from MWHPR15MB1165.namprd15.prod.outlook.com (10.175.2.19) by
- MWHPR15MB1389.namprd15.prod.outlook.com (10.173.234.16) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1750.17; Fri, 29 Mar 2019 18:12:00 +0000
-Received: from MWHPR15MB1165.namprd15.prod.outlook.com
- ([fe80::f190:6de5:7e3:e065]) by MWHPR15MB1165.namprd15.prod.outlook.com
- ([fe80::f190:6de5:7e3:e065%6]) with mapi id 15.20.1730.019; Fri, 29 Mar 2019
- 18:11:59 +0000
-From:   Song Liu <songliubraving@fb.com>
-To:     Jens Axboe <axboe@kernel.dk>
-CC:     linux-raid <linux-raid@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Kernel Team <Kernel-team@fb.com>,
-        "neilb@suse.com" <neilb@suse.com>,
-        "xni@redhat.com" <xni@redhat.com>,
-        "ncroxon@redhat.com" <ncroxon@redhat.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        David Jeffy <djeffery@redhat.com>
-Subject: Re: [PATCH 1/3] Don't jump to compute_result state from check_result
- state
-Thread-Topic: [PATCH 1/3] Don't jump to compute_result state from check_result
- state
-Thread-Index: AQHU5ldflUHySDdYDkmg0QLY2VtZRKYi406AgAAFzwA=
-Date:   Fri, 29 Mar 2019 18:11:59 +0000
-Message-ID: <4E82467A-B5D3-45B7-A394-C23F9E35C3E1@fb.com>
-References: <20190329174617.3670341-1-songliubraving@fb.com>
- <20190329174617.3670341-2-songliubraving@fb.com>
- <97dc86ee-b9d6-152e-ba5a-b485ac6a3fde@kernel.dk>
-In-Reply-To: <97dc86ee-b9d6-152e-ba5a-b485ac6a3fde@kernel.dk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-mailer: Apple Mail (2.3445.102.3)
-x-originating-ip: [2620:10d:c090:200::2:f139]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 971ceef2-a3b5-47d1-e3ce-08d6b472099b
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(2017052603328)(7153060)(7193020);SRVR:MWHPR15MB1389;
-x-ms-traffictypediagnostic: MWHPR15MB1389:
-x-microsoft-antispam-prvs: <MWHPR15MB13897EAF05BB0B70CF09CCFCB35A0@MWHPR15MB1389.namprd15.prod.outlook.com>
-x-forefront-prvs: 0991CAB7B3
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(396003)(136003)(376002)(346002)(39860400002)(189003)(199004)(46003)(54906003)(2906002)(6246003)(4744005)(57306001)(316002)(256004)(446003)(478600001)(99286004)(53936002)(86362001)(7736002)(11346002)(14454004)(25786009)(6512007)(2616005)(186003)(82746002)(97736004)(102836004)(305945005)(476003)(6506007)(53546011)(4326008)(76176011)(81156014)(83716004)(5660300002)(105586002)(486006)(81166006)(106356001)(6486002)(6116002)(6916009)(71200400001)(71190400001)(36756003)(50226002)(229853002)(6436002)(68736007)(33656002)(8676002)(8936002);DIR:OUT;SFP:1102;SCL:1;SRVR:MWHPR15MB1389;H:MWHPR15MB1165.namprd15.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: fb.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Esp0i1BLVSjAP4TOIC68wxVpjUEyeTsJxom1hz1zrpjG3GCEAT+JrVeallwmEhV9w6UIWYe1NI7orfwgdpLsnZDz9nS05GvaaG4/br2q0i4vMmCkp/278BKeRk41YqrDP+WEKaMqZ7R4gigdb3NEUhsCPb58cedoYVvqyTavK5njKSnBVCR6RKd6gbAlZWuKGFIMA+zQHQ2Wl9msmevxIYUiHWS7ZexnBz3jOsLdgIv+g+AfyMusLrf3qGrgcaPB5ONQTe1JY6LFv+rTnFxDTuPObfd/nz9q9QSMpDaWw658Hr+4jjdvtOYeII9MAjr/mZrnICc9w6a8TKe23ILEw4xWd3pjnR0nt6tz51qz843LIEvbQIWRLSk9Mg8HnBhIFchGckoUaTA/4Usg2o/XVvQW6Vb1Ax+iLEsBMRbkYHk=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <FB21C3E4747C56449E03380328D2BAAC@namprd15.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        Fri, 29 Mar 2019 16:21:20 -0400
+Received: by mail-pl1-f193.google.com with SMTP id bg8so1541397plb.0
+        for <linux-block@vger.kernel.org>; Fri, 29 Mar 2019 13:21:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=k1RqSW5DlEQNcchLuS+Iqj9UbsEc7ygEDJ5KAYCvQ48=;
+        b=iHZ1Do1liWZNBLRVNNxNunES9Qv9+SqhLtB3GWMbfqYpd8VeP10155EBs33WJKN7Rb
+         dCkaVR82qgoRYXsH80SLDzRspRdiBI8iPkdcQOah0hKJWvc6HQuBkQUf8g9fwTn38qPR
+         /L3Cqh/2CWNdFr010FJyJqkWIzgrLpu3k3VFQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=k1RqSW5DlEQNcchLuS+Iqj9UbsEc7ygEDJ5KAYCvQ48=;
+        b=rWDMAODNy3PRz0jLduRldjTl7jADw+vxgrBf1BhYVmfx2dXvbnKsrbhf9VGurhwX85
+         LqMtAllHlbwxo9GMI+mqLg/J/e1LA0rDhtUEQPNUReWR8sgRYjUfKUVqYikb87DHWQ8+
+         Z1QmwT4pq64KyVWoSWOGA9ArkggE4gtz1tOgkoiFnDf/3PS2QyL36trwfFDklNtKKmM3
+         551tSOq6OTRkKt+0RmUEiNp1Su7uYSW+I6Ad/fpsVDTU+olq4V1OwkVOwUTiGdcyU5yu
+         n9RXSrzqipPei9QuJydKKmjENFpiR4gXTV3hJG9FqhHDnsP4mVPKRBuEbz217CAxDTu5
+         gpEA==
+X-Gm-Message-State: APjAAAVnk/sgkk5f3Xif8cz+X+33jFmXZGYUhq7+1scBUZq6VJHxdQFC
+        AiwXto/74BHhuy+8EGTZ/3IrPg==
+X-Google-Smtp-Source: APXvYqx8cZ4KPUvT5PanPpVhLcW54x6hY3lWHAqDEvXGOnGkniYdtvA38m0ZqQ3fA+nMOI2ijiAq4w==
+X-Received: by 2002:a17:902:968b:: with SMTP id n11mr43737516plp.118.1553890879407;
+        Fri, 29 Mar 2019 13:21:19 -0700 (PDT)
+Received: from [10.69.37.149] ([192.19.223.250])
+        by smtp.gmail.com with ESMTPSA id e2sm4799220pfa.64.2019.03.29.13.21.14
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 29 Mar 2019 13:21:18 -0700 (PDT)
+Subject: Re: [PATCH V2] SCSI: fix queue cleanup race before queue
+ initialization is done
+To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Andrew Jones <drjones@redhat.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        stable <stable@vger.kernel.org>,
+        "jianchao . wang" <jianchao.w.wang@oracle.com>
+References: <20181114082551.12141-1-ming.lei@redhat.com>
+ <63c063ad-7d74-4268-bfd4-2de89908949e@kernel.dk>
+ <4e24ace9-c83f-5311-5419-18f4a0fb5148@kernel.dk>
+ <20181122010034.GA20814@ming.t460p>
+ <dc374ec8-2ea2-0792-4677-0ae81fa7826e@kernel.dk>
+From:   James Smart <james.smart@broadcom.com>
+Message-ID: <baba41b1-8495-8bd1-0bea-341d207852a7@broadcom.com>
+Date:   Fri, 29 Mar 2019 13:21:12 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 971ceef2-a3b5-47d1-e3ce-08d6b472099b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Mar 2019 18:11:59.7624
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR15MB1389
-X-OriginatorOrg: fb.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-03-29_10:,,
- signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-FB-Internal: Safe
+In-Reply-To: <dc374ec8-2ea2-0792-4677-0ae81fa7826e@kernel.dk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -118,29 +85,76 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-> On Mar 29, 2019, at 10:51 AM, Jens Axboe <axboe@kernel.dk> wrote:
->=20
-> On 3/29/19 11:46 AM, Song Liu wrote:
->> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
->> index c033bfcb209e..4204a972ecf2 100644
->> --- a/drivers/md/raid5.c
->> +++ b/drivers/md/raid5.c
->> @@ -4223,26 +4223,15 @@ static void handle_parity_checks6(struct r5conf =
-*conf, struct stripe_head *sh,
->> 	case check_state_check_result:
->> 		sh->check_state =3D check_state_idle;
->>=20
->> +		if (s->failed > 1)           =20
->> +		    break;
->=20
-> Not sure what happened here, but there's a lot of whitespace after that
-> if statement, and the break is using 4 spaces instead of a tab. I fixed
-> both of these up, but please review the style of patches going forward.
->=20
-> --=20
-> Jens Axboe
->=20
+On 11/21/2018 5:42 PM, Jens Axboe wrote:
+> On 11/21/18 6:00 PM, Ming Lei wrote:
+>> On Wed, Nov 21, 2018 at 02:47:35PM -0700, Jens Axboe wrote:
+>>> On 11/14/18 8:20 AM, Jens Axboe wrote:
+>>>> On 11/14/18 1:25 AM, Ming Lei wrote:
+>>>>> c2856ae2f315d ("blk-mq: quiesce queue before freeing queue") has
+>>>>> already fixed this race, however the implied synchronize_rcu()
+>>>>> in blk_mq_quiesce_queue() can slow down LUN probe a lot, so caused
+>>>>> performance regression.
+>>>>>
+>>>>> Then 1311326cf4755c7 ("blk-mq: avoid to synchronize rcu inside blk_cleanup_queue()")
+>>>>> tried to quiesce queue for avoiding unnecessary synchronize_rcu()
+>>>>> only when queue initialization is done, because it is usual to see
+>>>>> lots of inexistent LUNs which need to be probed.
+>>>>>
+>>>>> However, turns out it isn't safe to quiesce queue only when queue
+>>>>> initialization is done. Because when one SCSI command is completed,
+>>>>> the user of sending command can be waken up immediately, then the
+>>>>> scsi device may be removed, meantime the run queue in scsi_end_request()
+>>>>> is still in-progress, so kernel panic can be caused.
+>>>>>
+>>>>> In Red Hat QE lab, there are several reports about this kind of kernel
+>>>>> panic triggered during kernel booting.
+>>>>>
+>>>>> This patch tries to address the issue by grabing one queue usage
+>>>>> counter during freeing one request and the following run queue.
+>>>> Thanks applied, this bug was elusive but ever present in recent
+>>>> testing that we did internally, it's been a huge pain in the butt.
+>>>> The symptoms were usually a crash in blk_mq_get_driver_tag() with
+>>>> hctx->tags == NULL, or a crash inside deadline request insert off
+>>>> requeue.
 
-Thanks Jens! I will be more careful in the future.=20
+All,
 
-Song=
+We are seeing errors with the following error:
+
+[44492.814347] BUG: unable to handle kernel NULL pointer dereference at 
+(null)
+[44492.814383] IP: [<ffffffff8135a10b>] sbitmap_any_bit_set+0xb/0x30
+...
+[44492.815634] Call Trace:
+[44492.815652]  [<ffffffff81303a88>] blk_mq_run_hw_queues+0x48/0x90
+[44492.819755]  [<ffffffff813053cc>] blk_mq_requeue_work+0x10c/0x120
+[44492.819777]  [<ffffffff81098cb4>] process_one_work+0x154/0x410
+[44492.819781]  [<ffffffff81099896>] worker_thread+0x116/0x4a0
+[44492.819784]  [<ffffffff8109edb9>] kthread+0xc9/0xe0
+[44492.819790]  [<ffffffff81619b05>] ret_from_fork+0x55/0x80
+[44492.822798] DWARF2 unwinder stuck at ret_from_fork+0x55/0x80
+[44492.822798]
+[44492.822799] Leftover inexact backtrace:
+
+[44492.822802]  [<ffffffff8109ecf0>] ? kthread_park+0x50/0x50
+[44492.822818] Code: c6 44 0f 46 ce 83 c2 01 45 89 ca 4c 89 54 01 08 48 
+8b 4f
+10 2b 74 01 08 39 57 08 77 d8 f3 c3 90 8b 4f 08 85 c9 74 1f 48 8b 57 10 
+<48> 83
+3a 00 75 18 31 c0 eb 0a 48 83 c2 40 48 83 3a 00 75 0a 83
+[44492.822820] RIP  [<ffffffff8135a10b>] sbitmap_any_bit_set+0xb/0x30
+[44492.822821]  RSP <ffff8807219ffdd8>
+[44492.822821] CR2: 0000000000000000
+
+It appears the queue has been freed thus the bitmap is bad.
+
+Looking at the commit relative to this email thread:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/scsi/scsi_lib.c?id=8dc765d438f1e42b3e8227b3b09fad7d73f4ec9a
+
+It's interesting that the queue reference taken was released after the 
+kblockd_schedule_work() call was made, and it's this work element that 
+is hitting the issue. So perhaps the patch missed keeping the reference 
+until the requeue_work item finished ?
+
+-- james
+
