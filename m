@@ -4,71 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75D0EC43381
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6106C4360F
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:20:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3A91B2183F
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:10:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73DCF2183F
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:20:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Hzrd13p4"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="eZuUgWqk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729197AbfC2OKl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Mar 2019 10:10:41 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:38193 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728774AbfC2OKl (ORCPT
+        id S1729406AbfC2OUk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Mar 2019 10:20:40 -0400
+Received: from mail-it1-f195.google.com ([209.85.166.195]:39843 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728652AbfC2OUj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Mar 2019 10:10:41 -0400
-Received: by mail-io1-f68.google.com with SMTP id v4so1844477ioj.5
-        for <linux-block@vger.kernel.org>; Fri, 29 Mar 2019 07:10:40 -0700 (PDT)
+        Fri, 29 Mar 2019 10:20:39 -0400
+Received: by mail-it1-f195.google.com with SMTP id 139so4092358ita.4
+        for <linux-block@vger.kernel.org>; Fri, 29 Mar 2019 07:20:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=InFNj43Ew+zCZHSNgM4rGAqFiRaGJhlAqF5jIgxZqrQ=;
-        b=Hzrd13p4BfDoZijAoBqMNkX/RL1AjjiYrqxr6RxGIuH2eYPg1YHh5EgmMNsXp2KSvt
-         QX7zak8YntPOEH/F3XtCxTts+ZoarAGlTh/V8scjWKGr93u81ztKWMO+6zGL//dznWOe
-         jxic1068pnpG52O4giIvypSvVpPashLRsYLvCE9whD2/VXzuOvT08wPwc1E304pV3SG2
-         K4ZIoFNX13aQWZXu8hzB275LWNSzBsp4DTmp8KjzvIMgCTkwfIH/kM1PSLf+5/hQHAbU
-         G8wOUYuwyDRAmLtx1rrVh9IS+ldca4RIdZhpYDMIXvfPoonmfMtnvgePvoZ1bR8E2hhM
-         /fWg==
+        bh=IJApajzilyrOBUOhH9z22ai+kPPbWGy6cgC7ap9X+vI=;
+        b=eZuUgWqkZQSL2Vo0debRtiWr8TFBPe2vNFowm2pgGqry9GH+NDo3ZHyieHMIWlUr3T
+         Mxvbya0d2qEedGmDcXubb/w9bE4e+yG225rJ591bk2jbJR241dZaYh6HFmuVSg/E1tgk
+         IYPopXvtzjmVG1xVqgBw4eIo71W+WMQCOpTgctaG4T1DkYggrU4giAsHJI5tWB+17kSy
+         QurNOZcC6upStfgYvw5bp7aCzN43zvry7YyY+vnrbzWdpHXZn63pJj1v2mnzouosZ8cN
+         ECEHlOSuCiHAyNUJbVPDo2Ow+2gq5sDd+JCyF9eucqB5zC/elH3eGUvgnGqBeSH2rIfj
+         FoRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=InFNj43Ew+zCZHSNgM4rGAqFiRaGJhlAqF5jIgxZqrQ=;
-        b=rNwJj90uePHX3y1FI58HvJ/T2JCWqV1DxgEt3dGfLrkUcCk1rn6Q4PHt9GUN/8l4h8
-         SPEFHGYBYlQ0B5nuCchM9brZ7LTT66H8XDXmQKKhJjUc5tPNxEDT6plS/xgRgL4L/gga
-         AXE53PWwPeph8JXaD7IxHLrh1BjTUloYjSn/RVgYlo9GCD+TZkFK0uBz/cp4e+xsLYar
-         WUQ05Hq6bkcpvRfRQS5RYWaaMvAo+ZyrQMsR3RB/2uatcDg4dnETfmSGQh3mUdktJxoj
-         vp4DaopQ/SXChXc3x0Ke9HixlPBccvQNbrMFDcGnsZ3tj9cz/oPrP9S/K7A7yWRmgPqJ
-         SZ8g==
-X-Gm-Message-State: APjAAAXhMSU72fovKF7vjr2Dd1Pr6cCqlQi6AbxQQxVrIFU28myt0jvw
-        dmmA4MkSxCr3gswafh06UKUegBXEJ8LY7A==
-X-Google-Smtp-Source: APXvYqx0F5SUC3ltQ3YKga9JM9tVZEzbQrIBCj0jmkkJ2owsxSdbL6R6hx2SVMn8jioOgkN1yEH6yQ==
-X-Received: by 2002:a5e:8a07:: with SMTP id d7mr35777563iok.194.1553868640406;
-        Fri, 29 Mar 2019 07:10:40 -0700 (PDT)
+        bh=IJApajzilyrOBUOhH9z22ai+kPPbWGy6cgC7ap9X+vI=;
+        b=RKrrXlHjRL5nWs9Q+doJ+RIYmMw5HHCyMdPdRGbeWzXZLlM4cHDcVL1mDHzOUhS6gN
+         ASnLgcEOWRchcqnv28TUkgtDpcc2ogO0KGOguak0lG0HrrbiuwQlLUmiy/19ANC+BLOK
+         ESOT8N5uU+ybsHt3ZPhsjEaeO/3Pi4Qz/CP6NkFvWYrYBrM6F9hwEdOv9gLxx2NQcfo3
+         9jFbEIprui6xt5hy/gDh8V2TLcf0YmwcnXUgtNN9/rgdpATuq1BJ4m1SLf/r3gAEQE9E
+         d0EcIG8p4DdlT5bltFmVv6t/kZrlG2DfZUskEGmbiPkkUeQSW/VtkBkla+rl/r676kdM
+         lKLg==
+X-Gm-Message-State: APjAAAVvtLF7+QU7p6lEjnX26iU8XLiwoia/eyZb66qXz17DL+k7tTIt
+        ihLDI38u0CG9hPGOvWty5aoUGzahxKoFSA==
+X-Google-Smtp-Source: APXvYqxd4KyYltn6l1074MaxGI2M8IDimuUc7rbSckWWV+tZDuozdSB3xKNSFi+FrVkoLX28KI4m2Q==
+X-Received: by 2002:a05:6638:258:: with SMTP id w24mr36990348jaq.85.1553869237750;
+        Fri, 29 Mar 2019 07:20:37 -0700 (PDT)
 Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id m6sm812672ioj.36.2019.03.29.07.10.39
+        by smtp.gmail.com with ESMTPSA id a8sm852809iol.35.2019.03.29.07.20.35
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 29 Mar 2019 07:10:39 -0700 (PDT)
-Subject: Re: Bisected GFP in bfq_bfqq_expire on v5.1-rc1
-To:     Dmitrii Tcvetkov <demfloro@demfloro.ru>,
-        linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Paolo Valente <paolo.valente@linaro.org>
-References: <20190329160227.7d55c8dd@fire.localdomain>
+        Fri, 29 Mar 2019 07:20:36 -0700 (PDT)
+Subject: Re: [PATCH V3 00/10] block: enable multi-page bvec for passthrough IO
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org
+References: <20190329070803.10958-1-ming.lei@redhat.com>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <0e203a26-b941-cef4-dff1-013999d4b041@kernel.dk>
-Date:   Fri, 29 Mar 2019 08:10:38 -0600
+Message-ID: <ca3a4d22-ec5a-4300-3ff2-08e0c02ed3dd@kernel.dk>
+Date:   Fri, 29 Mar 2019 08:20:35 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190329160227.7d55c8dd@fire.localdomain>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20190329070803.10958-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -76,25 +74,33 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/29/19 7:02 AM, Dmitrii Tcvetkov wrote:
+On 3/29/19 1:07 AM, Ming Lei wrote:
 > Hi,
 > 
-> I got kernel panic since v5.1-rc1 when working with files on block
-> device with BFQ scheduler assigned. I didn't find trivial way to
-> reproduce the panic but "git checkout origin/linux-5.0.y"
-> on linux-stable-rc[1] git repo on btrfs filesystem reproduces the
-> problem 100% of the time on my bare-metal machine and in a VM.
+> Now the whole IO stack is capable of handling multi-page bvec, and it has
+> been enabled in the normal FS IO path. However, it isn't done for
+> passthrough IO.
 > 
-> Bisect led me to commit 9dee8b3b057e1 (block, bfq: fix queue removal
-> from weights tree). After reverting this commit on top of current
-> mainline master(9936328b41ce) I can't reproduce the problem.
+> Without enabling multi-bvec for passthough IO, we won't go ahead for
+> optimizing related IO paths, such as bvec merging, bio_add_pc_page
+> simplification.
 > 
-> dmesg with the panic and bisect log attached.
+> This patch enables multi-page bvec for passthrough IO. Turns out
+> bio_add_pc_page() is simpliefied a lot, especially the physical segment
+> number of passthrough bio is always same with bio.bi_vcnt. Also the
+> bvec merging inside bio is killed.
 > 
-> [1] https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stable-rc.git
+> blktests(block/029) is added for covering passthough IO path, and this
+> patchset does pass the new block/029 test.
+> 
+> V3:
+> 	- fix build warning on patch 1 and 7, only the two patches are
+> 	  changed
 
-Paolo, can you please take a look at this?
-
+Please just send me an incremental fix for those two patches, v2 has
+been in my tree for a while now. I can rebase it since I haven't pushed
+out, but doing so incrementally is a lot more convenient than replacing
+the entire series.
 
 -- 
 Jens Axboe
