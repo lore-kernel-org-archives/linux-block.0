@@ -2,68 +2,69 @@ Return-Path: <SRS0=pPwc=SA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2926C43381
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:41:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D655CC10F05
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:42:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 811022184C
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:41:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A51A32183F
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:42:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="o5vomxwD"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="CyQGbY4J"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729364AbfC2OlM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Mar 2019 10:41:12 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:50444 "EHLO
+        id S1728869AbfC2OmK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Mar 2019 10:42:10 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:51616 "EHLO
         aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729021AbfC2OlM (ORCPT
+        with ESMTP id S1728815AbfC2OmK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Mar 2019 10:41:12 -0400
+        Fri, 29 Mar 2019 10:42:10 -0400
 Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2TEYAM8024330;
-        Fri, 29 Mar 2019 14:40:59 GMT
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2TEYKXp024448;
+        Fri, 29 Mar 2019 14:42:01 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=BA1AYr2ucxnuv3ubR2s3P90REEFgNoCOQ/E7/18xvrM=;
- b=o5vomxwDO0UCZXST52/SM7nKWzDoTnRZdogv3hmtMfxr2eXoBEMZM+x9mfIdqLCrMgFr
- 9/GZij5HZFieR2xsuFgxeIPYFRmw0yQZt+GmlHc77WI6xgvHWOj6kPMZZjjp1KzAYbs4
- B80twgouddlnpm05sVzRUMZvbg08/FW7QgmNRw3cI5EbGcttFODSm7iarU3jDOpzRBou
- D5musFetXit1SrzG6KAXDhy1i8m0AdXlGylgnOjQvHsOvw3bl9MUxJt1aNF6LFVfqPzB
- QW9xvxGt6apYFePXs4vfCLMGPa1rs4PvKuoTxjo616FlsQFGEuC3tfblyN5K6ZUdrd+e fA== 
-Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
-        by aserp2130.oracle.com with ESMTP id 2re6g1cuts-1
+ bh=g4x5JEl3MDDss/pGR5g5kuLrCuM4XZMFh325aQf57C4=;
+ b=CyQGbY4J9CtNKRxcg6LM9DfVKWR7YfIAyqqvZqJvYGENsKBlUAtYHTqN0qD8T261lj45
+ qyzObRMpl9Lxr31fyt3GaT3jZ5xRSnEPTxKnKi5WIybR7MjHLmbBQ4gaGcEFL2xKFoiH
+ f4G93efm8FIDql6+BnArVi1RUhgi8w0RBQ9om73Bo9PKvb20lIcf68n2qRY9fvkm5FS9
+ APYtylIjZ7H7uAvYKgsZLRZ582ONz4zuZhvCsrCG7qfO+j3F5KPVgHnt6Y1A5Hd3XtUC
+ W7rq9JHZFU00f5hAx5GYopWNteBXVhaZ6JzGqKZFL/5tPRozbSTANyUReQRkBjEZ9aBQ 3A== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by aserp2130.oracle.com with ESMTP id 2re6g1cv19-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 29 Mar 2019 14:40:59 +0000
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x2TEewYZ013929
+        Fri, 29 Mar 2019 14:42:01 +0000
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x2TEfnXt026765
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 29 Mar 2019 14:40:58 GMT
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x2TEev8F030271;
-        Fri, 29 Mar 2019 14:40:57 GMT
+        Fri, 29 Mar 2019 14:41:50 GMT
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x2TEfnCX030013;
+        Fri, 29 Mar 2019 14:41:49 GMT
 Received: from [192.168.1.12] (/180.165.90.201)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 29 Mar 2019 07:40:57 -0700
+        with ESMTP ; Fri, 29 Mar 2019 07:41:49 -0700
 Subject: Re: [PATCH v3 2/3] block: verify data when endio
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc:     linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        martin.petersen@oracle.com, shirley.ma@oracle.com,
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, shirley.ma@oracle.com,
         allison.henderson@oracle.com, david@fromorbit.com,
         darrick.wong@oracle.com, hch@infradead.org, adilger@dilger.ca,
         tytso@mit.edu
 References: <20190329142346.1677-1-bob.liu@oracle.com>
  <20190329142346.1677-3-bob.liu@oracle.com>
- <41c8688a-65bd-96ac-9b23-4facd0ade4a7@kernel.dk>
+ <41c8688a-65bd-96ac-9b23-4facd0ade4a7@kernel.dk> <yq1ftr5rbq1.fsf@oracle.com>
 From:   Bob Liu <bob.liu@oracle.com>
-Message-ID: <73ecbb57-fd99-5df3-8859-e218b830363b@oracle.com>
-Date:   Fri, 29 Mar 2019 22:40:26 +0800
+Message-ID: <c3c942f4-8006-37fe-5996-458526c51254@oracle.com>
+Date:   Fri, 29 Mar 2019 22:41:37 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.5.1
 MIME-Version: 1.0
-In-Reply-To: <41c8688a-65bd-96ac-9b23-4facd0ade4a7@kernel.dk>
+In-Reply-To: <yq1ftr5rbq1.fsf@oracle.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,39 +79,19 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/29/19 10:28 PM, Jens Axboe wrote:
-> On 3/29/19 8:23 AM, Bob Liu wrote:
->> diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
->> index d66bf5f32610..e9f25f162138 100644
->> --- a/include/linux/blk_types.h
->> +++ b/include/linux/blk_types.h
->> @@ -18,6 +18,7 @@ struct block_device;
->>  struct io_context;
->>  struct cgroup_subsys_state;
->>  typedef void (bio_end_io_t) (struct bio *);
->> +typedef int (bio_verifier_t) (struct bio *);
->>  
->>  /*
->>   * Block error status values.  See block/blk-core:blk_errors for the details.
->> @@ -187,6 +188,8 @@ struct bio {
->>  		struct bio_integrity_payload *bi_integrity; /* data integrity */
->>  #endif
->>  	};
->> +	bio_verifier_t		*bi_verifier;	/* verify callback when endio */
->> +	struct work_struct      bi_work;	/* I/O completion */
->>  
->>  	unsigned short		bi_vcnt;	/* how many bio_vec's */
+On 3/29/19 10:34 PM, Martin K. Petersen wrote:
 > 
-> I told you this for the initial posting, and the objection still stands.
-> Adding 40 bytes to struct bio is a no-go.
+> Jens,
+> 
+>> I told you this for the initial posting, and the objection still
+>> stands.  Adding 40 bytes to struct bio is a no-go.
+>>
+>> So that's a big NAK on that series.
+> 
+> I think you missed Bob's comment that this will go in the existing
+> bio_integrity field. I believe the main purpose of the series is to
+> solicit feedback on the callback approach.
 > 
 
-Yes, I know that.
-Already list in Todo:
-- union with "struct bio_integrity_payload *bi_integrity" to save bio space.
+Yes, indeed!
 
-This is only a rfc patch, because not sure any other objection of this passdown-verify solution..
-Will consider more about the bio space if there is agreement of the passdown-verify way.
-
-Thanks,
-Bob
