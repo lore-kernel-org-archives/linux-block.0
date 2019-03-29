@@ -3,116 +3,155 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52BA0C43381
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 07:08:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04D6BC43381
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 07:08:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 23A102173C
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 07:08:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D38A32173C
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 07:08:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728781AbfC2HIl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Mar 2019 03:08:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:36516 "EHLO mx1.redhat.com"
+        id S1728864AbfC2HIs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Mar 2019 03:08:48 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44792 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728651AbfC2HIl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Mar 2019 03:08:41 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        id S1728651AbfC2HIs (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 29 Mar 2019 03:08:48 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 7EDE981F01;
-        Fri, 29 Mar 2019 07:08:41 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id F31EA3086207;
+        Fri, 29 Mar 2019 07:08:47 +0000 (UTC)
 Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E64D84140;
-        Fri, 29 Mar 2019 07:08:37 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D4B7C1001E93;
+        Fri, 29 Mar 2019 07:08:44 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
         Omar Sandoval <osandov@fb.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V3 05/10] block: check if page is mergeable in one helper
-Date:   Fri, 29 Mar 2019 15:07:58 +0800
-Message-Id: <20190329070803.10958-6-ming.lei@redhat.com>
+Subject: [PATCH V3 06/10] block: put the same page when adding it to bio
+Date:   Fri, 29 Mar 2019 15:07:59 +0800
+Message-Id: <20190329070803.10958-7-ming.lei@redhat.com>
 In-Reply-To: <20190329070803.10958-1-ming.lei@redhat.com>
 References: <20190329070803.10958-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Fri, 29 Mar 2019 07:08:41 +0000 (UTC)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Fri, 29 Mar 2019 07:08:48 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now the check for deciding if one page is mergeable to current bvec
-becomes a bit complicated, and we need to reuse the code before
-adding pc page.
+When the added page is merged to last same page in bio_add_pc_page(),
+the user may need to put this page for avoiding page leak.
 
-So move the check in one dedicated helper.
+bio_map_user_iov() needs this kind of handling, and now it deals with
+it by itself in hack style.
 
-No function change.
+Moves the handling of put page into __bio_add_pc_page(), so
+bio_map_user_iov() may be simplified a bit, and maybe more users
+can benefit from this change.
 
 Cc: Omar Sandoval <osandov@fb.com>
 Cc: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/bio.c | 38 ++++++++++++++++++++++++--------------
- 1 file changed, 24 insertions(+), 14 deletions(-)
+ block/bio.c         | 28 ++++++++++++++++------------
+ include/linux/bio.h |  3 +++
+ 2 files changed, 19 insertions(+), 12 deletions(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index cbd202250a32..7ab7060a0e6c 100644
+index 7ab7060a0e6c..26853e072cd7 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -647,6 +647,24 @@ struct bio *bio_clone_fast(struct bio *bio, gfp_t gfp_mask, struct bio_set *bs)
+@@ -666,12 +666,13 @@ static inline bool page_is_mergeable(const struct bio_vec *bv,
  }
- EXPORT_SYMBOL(bio_clone_fast);
  
-+static inline bool page_is_mergeable(const struct bio_vec *bv,
-+		struct page *page, unsigned int len, unsigned int off,
-+		bool same_page)
-+{
-+	phys_addr_t vec_end_addr = page_to_phys(bv->bv_page) +
-+		bv->bv_offset + bv->bv_len - 1;
-+	phys_addr_t page_addr = page_to_phys(page);
-+
-+	if (vec_end_addr + 1 != page_addr + off)
-+		return false;
-+	if (xen_domain() && !xen_biovec_phys_mergeable(bv, page))
-+		return false;
-+	if (same_page && (vec_end_addr & PAGE_MASK) != page_addr)
-+		return false;
-+
-+	return true;
-+}
-+
  /**
-  *	bio_add_pc_page	-	attempt to add page to passthrough bio
+- *	bio_add_pc_page	-	attempt to add page to passthrough bio
++ *	__bio_add_pc_page	- attempt to add page to passthrough bio
   *	@q: the target queue
-@@ -770,20 +788,12 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
+  *	@bio: destination bio
+  *	@page: page to add
+  *	@len: vec entry length
+  *	@offset: vec entry offset
++ *	@put_same_page: put the page if it is same with last added page
+  *
+  *	Attempt to add a page to the bio_vec maplist. This can fail for a
+  *	number of reasons, such as the bio being full or target block device
+@@ -680,8 +681,9 @@ static inline bool page_is_mergeable(const struct bio_vec *bv,
+  *
+  *	This should only be used by passthrough bios.
+  */
+-int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
+-		    *page, unsigned int len, unsigned int offset)
++int __bio_add_pc_page(struct request_queue *q, struct bio *bio,
++		struct page *page, unsigned int len, unsigned int offset,
++		bool put_same_page)
+ {
+ 	int retried_segments = 0;
+ 	struct bio_vec *bvec;
+@@ -705,6 +707,8 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
  
- 	if (bio->bi_vcnt > 0) {
- 		struct bio_vec *bv = &bio->bi_io_vec[bio->bi_vcnt - 1];
--		phys_addr_t vec_end_addr = page_to_phys(bv->bv_page) +
--			bv->bv_offset + bv->bv_len - 1;
--		phys_addr_t page_addr = page_to_phys(page);
--
--		if (vec_end_addr + 1 != page_addr + off)
--			return false;
--		if (xen_domain() && !xen_biovec_phys_mergeable(bv, page))
--			return false;
--		if (same_page && (vec_end_addr & PAGE_MASK) != page_addr)
--			return false;
--
--		bv->bv_len += len;
--		bio->bi_iter.bi_size += len;
--		return true;
-+
-+		if (page_is_mergeable(bv, page, len, off, same_page)) {
-+			bv->bv_len += len;
-+			bio->bi_iter.bi_size += len;
-+			return true;
-+		}
- 	}
- 	return false;
+ 		if (page == bvec->bv_page &&
+ 		    offset == bvec->bv_offset + bvec->bv_len) {
++			if (put_same_page)
++				put_page(page);
+ 			bvec->bv_len += len;
+ 			bio->bi_iter.bi_size += len;
+ 			goto done;
+@@ -763,6 +767,13 @@ int bio_add_pc_page(struct request_queue *q, struct bio *bio, struct page
+ 	blk_recount_segments(q, bio);
+ 	return 0;
  }
++EXPORT_SYMBOL(__bio_add_pc_page);
++
++int bio_add_pc_page(struct request_queue *q, struct bio *bio,
++		struct page *page, unsigned int len, unsigned int offset)
++{
++	return __bio_add_pc_page(q, bio, page, len, offset, false);
++}
+ EXPORT_SYMBOL(bio_add_pc_page);
+ 
+ /**
+@@ -1397,21 +1408,14 @@ struct bio *bio_map_user_iov(struct request_queue *q,
+ 			for (j = 0; j < npages; j++) {
+ 				struct page *page = pages[j];
+ 				unsigned int n = PAGE_SIZE - offs;
+-				unsigned short prev_bi_vcnt = bio->bi_vcnt;
+ 
+ 				if (n > bytes)
+ 					n = bytes;
+ 
+-				if (!bio_add_pc_page(q, bio, page, n, offs))
++				if (!__bio_add_pc_page(q, bio, page, n, offs,
++							true))
+ 					break;
+ 
+-				/*
+-				 * check if vector was merged with previous
+-				 * drop page reference if needed
+-				 */
+-				if (bio->bi_vcnt == prev_bi_vcnt)
+-					put_page(page);
+-
+ 				added += n;
+ 				bytes -= n;
+ 				offs = 0;
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index bb6090aa165d..bb915591557b 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -432,6 +432,9 @@ void bio_chain(struct bio *, struct bio *);
+ extern int bio_add_page(struct bio *, struct page *, unsigned int,unsigned int);
+ extern int bio_add_pc_page(struct request_queue *, struct bio *, struct page *,
+ 			   unsigned int, unsigned int);
++extern int __bio_add_pc_page(struct request_queue *, struct bio *,
++			     struct page *, unsigned int, unsigned int,
++			     bool);
+ bool __bio_try_merge_page(struct bio *bio, struct page *page,
+ 		unsigned int len, unsigned int off, bool same_page);
+ void __bio_add_page(struct bio *bio, struct page *page,
 -- 
 2.9.5
 
