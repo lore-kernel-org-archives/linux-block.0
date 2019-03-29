@@ -4,55 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 705F4C4360F
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 17:46:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8196C43381
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 17:46:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 35B2C218A6
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 17:46:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 744072184D
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 17:46:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="FhIHo14L"
+	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="kdsudl5e"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729652AbfC2Rqf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Mar 2019 13:46:35 -0400
-Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:58246 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729658AbfC2Rqd (ORCPT
+        id S1729920AbfC2Rqh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Mar 2019 13:46:37 -0400
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:49996 "EHLO
+        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729463AbfC2Rqg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Mar 2019 13:46:33 -0400
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-        by m0089730.ppops.net (8.16.0.27/8.16.0.27) with SMTP id x2THho3q014324
-        for <linux-block@vger.kernel.org>; Fri, 29 Mar 2019 10:46:32 -0700
+        Fri, 29 Mar 2019 13:46:36 -0400
+Received: from pps.filterd (m0148460.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x2THiFV3011574
+        for <linux-block@vger.kernel.org>; Fri, 29 Mar 2019 10:46:35 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
- content-type; s=facebook; bh=RbTeFel0E88w0B4T/74Hp1JsrJFcU4lFW56ilObLSKc=;
- b=FhIHo14LndU9u1go7qHX0sqLa26SZDaM9n3apxQuoD8UX8ioY0484zxuMY8P6ablRTit
- fYyW1m6zlneWWrsFIciYmS5CI+bsT4AW9AfRD68awTJCMci0GWcrnNaAWIVzrgDU/aCX
- KcPOX635eAWUNACpgbAc1byKScgvpLVRfGA= 
+ content-type; s=facebook; bh=jN8k8+6e/0W/WHkHWb+SZMwdlbMnh2t9nGQvuMfxq28=;
+ b=kdsudl5e/Hr1mcQHTd1nqjTWXJsTCVaFmG4TcQ5i7oZjWIGhAG+EPb9z9XRi9jmgfNrI
+ +sgwtN0a5so43v2hrxVJoky0I6x+yweOzhUJT39WRCAD+yS5sDBROk8URn2+FUl4yFYt
+ EDnyk5TSPW0lc2xTDxsHXeMISzZ47SPK0oY= 
 Received: from mail.thefacebook.com ([199.201.64.23])
-        by m0089730.ppops.net with ESMTP id 2rhb9n2x0d-6
+        by mx0a-00082601.pphosted.com with ESMTP id 2rhq1j08w6-11
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 29 Mar 2019 10:46:32 -0700
+        for <linux-block@vger.kernel.org>; Fri, 29 Mar 2019 10:46:35 -0700
 Received: from mx-out.facebook.com (2620:10d:c081:10::13) by
- mail.thefacebook.com (2620:10d:c081:35::127) with Microsoft SMTP Server
+ mail.thefacebook.com (2620:10d:c081:35::129) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA) id 15.1.1713.5;
- Fri, 29 Mar 2019 10:46:30 -0700
+ Fri, 29 Mar 2019 10:46:32 -0700
 Received: by devbig006.ftw2.facebook.com (Postfix, from userid 4523)
-        id EB2F062E1BDA; Fri, 29 Mar 2019 10:46:28 -0700 (PDT)
+        id 6161862E1BDA; Fri, 29 Mar 2019 10:46:31 -0700 (PDT)
 Smtp-Origin-Hostprefix: devbig
 From:   Song Liu <songliubraving@fb.com>
 Smtp-Origin-Hostname: devbig006.ftw2.facebook.com
 To:     <linux-raid@vger.kernel.org>, <linux-block@vger.kernel.org>
 CC:     <kernel-team@fb.com>, <neilb@suse.com>, <xni@redhat.com>,
         <ncroxon@redhat.com>, <axboe@kernel.dk>, <stable@vger.kernel.org>,
-        David Jeffy <djeffery@redhat.com>,
         Song Liu <songliubraving@fb.com>
 Smtp-Origin-Cluster: ftw2c04
-Subject: [PATCH 1/3] Don't jump to compute_result state from check_result state
-Date:   Fri, 29 Mar 2019 10:46:15 -0700
-Message-ID: <20190329174617.3670341-2-songliubraving@fb.com>
+Subject: [PATCH 3/3] md: batch flush requests.
+Date:   Fri, 29 Mar 2019 10:46:17 -0700
+Message-ID: <20190329174617.3670341-4-songliubraving@fb.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190329174617.3670341-1-songliubraving@fb.com>
 References: <20190329174617.3670341-1-songliubraving@fb.com>
@@ -68,113 +67,170 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Nigel Croxon <ncroxon@redhat.com>
+From: NeilBrown <neilb@suse.com>
 
-Changing state from check_state_check_result to
-check_state_compute_result not only is unsafe but also doesn't
-appear to serve a valid purpose.  A raid6 check should only be
-pushing out extra writes if doing repair and a mis-match occurs.
-The stripe dev management will already try and do repair writes
-for failing sectors.
+Currently if many flush requests are submitted to an md device is quick
+succession, they are serialized and can take a long to process them all.
+We don't really need to call flush all those times - a single flush call
+can satisfy all requests submitted before it started.
+So keep track of when the current flush started and when it finished,
+allow any pending flush that was requested before the flush started
+to complete without waiting any more.
 
-This patch makes the raid6 check_state_check_result handling
-work more like raid5's.  If somehow too many failures for a
-check, just quit the check operation for the stripe.  When any
-checks pass, don't try and use check_state_compute_result for
-a purpose it isn't needed for and is unsafe for.  Just mark the
-stripe as in sync for passing its parity checks and let the
-stripe dev read/write code and the bad blocks list do their
-job handling I/O errors.
+Test results from Xiao:
 
-Repro steps from Xiao:
+Test is done on a raid10 device which is created by 4 SSDs. The tool is
+dbench.
 
-These are the steps to reproduce this problem:
-1. redefined OPT_MEDIUM_ERR_ADDR to 12000 in scsi_debug.c
-2. insmod scsi_debug.ko dev_size_mb=11000  max_luns=1 num_tgts=1
-3. mdadm --create /dev/md127 --level=6 --raid-devices=5 /dev/sde1 /dev/sde2 /dev/sde3 /dev/sde5 /dev/sde6
-sde is the disk created by scsi_debug
-4. echo "2" >/sys/module/scsi_debug/parameters/opts
-5. raid-check
+1. The latest linux stable kernel
+  Operation                Count    AvgLat    MaxLat
+  --------------------------------------------------
+  Deltree                    768    10.509    78.305
+  Flush                  2078376     0.013    10.094
+  Close                  21787697     0.019    18.821
+  LockX                    96580     0.007     3.184
+  Mkdir                      384     0.008     0.062
+  Rename                 1255883     0.191    23.534
+  ReadX                  46495589     0.020    14.230
+  WriteX                 14790591     7.123    60.706
+  Unlink                 5989118     0.440    54.551
+  UnlockX                  96580     0.005     2.736
+  FIND_FIRST             10393845     0.042    12.079
+  SET_FILE_INFORMATION   2415558     0.129    10.088
+  QUERY_FILE_INFORMATION 4711725     0.005     8.462
+  QUERY_PATH_INFORMATION 26883327     0.032    21.715
+  QUERY_FS_INFORMATION   4929409     0.010     8.238
+  NTCreateX              29660080     0.100    53.268
 
-It panic:
-[ 4854.730899] md: data-check of RAID array md127
-[ 4854.857455] sd 5:0:0:0: [sdr] tag#80 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE
-[ 4854.859246] sd 5:0:0:0: [sdr] tag#80 Sense Key : Medium Error [current]
-[ 4854.860694] sd 5:0:0:0: [sdr] tag#80 Add. Sense: Unrecovered read error
-[ 4854.862207] sd 5:0:0:0: [sdr] tag#80 CDB: Read(10) 28 00 00 00 2d 88 00 04 00 00
-[ 4854.864196] print_req_error: critical medium error, dev sdr, sector 11656 flags 0
-[ 4854.867409] sd 5:0:0:0: [sdr] tag#100 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE
-[ 4854.869469] sd 5:0:0:0: [sdr] tag#100 Sense Key : Medium Error [current]
-[ 4854.871206] sd 5:0:0:0: [sdr] tag#100 Add. Sense: Unrecovered read error
-[ 4854.872858] sd 5:0:0:0: [sdr] tag#100 CDB: Read(10) 28 00 00 00 2e e0 00 00 08 00
-[ 4854.874587] print_req_error: critical medium error, dev sdr, sector 12000 flags 4000
-[ 4854.876456] sd 5:0:0:0: [sdr] tag#101 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE
-[ 4854.878552] sd 5:0:0:0: [sdr] tag#101 Sense Key : Medium Error [current]
-[ 4854.880278] sd 5:0:0:0: [sdr] tag#101 Add. Sense: Unrecovered read error
-[ 4854.881846] sd 5:0:0:0: [sdr] tag#101 CDB: Read(10) 28 00 00 00 2e e8 00 00 08 00
-[ 4854.883691] print_req_error: critical medium error, dev sdr, sector 12008 flags 4000
-[ 4854.893927] sd 5:0:0:0: [sdr] tag#166 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE
-[ 4854.896002] sd 5:0:0:0: [sdr] tag#166 Sense Key : Medium Error [current]
-[ 4854.897561] sd 5:0:0:0: [sdr] tag#166 Add. Sense: Unrecovered read error
-[ 4854.899110] sd 5:0:0:0: [sdr] tag#166 CDB: Read(10) 28 00 00 00 2e e0 00 00 10 00
-[ 4854.900989] print_req_error: critical medium error, dev sdr, sector 12000 flags 0
-[ 4854.902757] md/raid:md127: read error NOT corrected!! (sector 9952 on sdr1).
-[ 4854.904375] md/raid:md127: read error NOT corrected!! (sector 9960 on sdr1).
-[ 4854.906201] ------------[ cut here ]------------
-[ 4854.907341] kernel BUG at drivers/md/raid5.c:4190!
+Throughput 1034.88 MB/sec (sync open)  128 clients  128 procs
+max_latency=60.712 ms
 
-raid5.c:4190 above is this BUG_ON:
+2. With patch1 "Revert "MD: fix lock contention for flush bios""
+  Operation                Count    AvgLat    MaxLat
+  --------------------------------------------------
+  Deltree                    256     8.326    36.761
+  Flush                   693291     3.974   180.269
+  Close                  7266404     0.009    36.929
+  LockX                    32160     0.006     0.840
+  Mkdir                      128     0.008     0.021
+  Rename                  418755     0.063    29.945
+  ReadX                  15498708     0.007     7.216
+  WriteX                 4932310    22.482   267.928
+  Unlink                 1997557     0.109    47.553
+  UnlockX                  32160     0.004     1.110
+  FIND_FIRST             3465791     0.036     7.320
+  SET_FILE_INFORMATION    805825     0.015     1.561
+  QUERY_FILE_INFORMATION 1570950     0.005     2.403
+  QUERY_PATH_INFORMATION 8965483     0.013    14.277
+  QUERY_FS_INFORMATION   1643626     0.009     3.314
+  NTCreateX              9892174     0.061    41.278
 
-    handle_parity_checks6()
-        ...
-        BUG_ON(s->uptodate < disks - 1); /* We don't need Q to recover */
+Throughput 345.009 MB/sec (sync open)  128 clients  128 procs
+max_latency=267.939 m
 
-Cc: <stable@vger.kernel.org> # v3.16+
-OriginalAuthor: David Jeffery <djeffery@redhat.com>
-Cc: Xiao Ni <xni@redhat.com>
-Tested-by: David Jeffery <djeffery@redhat.com>
-Signed-off-by: David Jeffy <djeffery@redhat.com>
-Signed-off-by: Nigel Croxon <ncroxon@redhat.com>
+3. With patch1 and patch2
+  Operation                Count    AvgLat    MaxLat
+  --------------------------------------------------
+  Deltree                    768     9.570    54.588
+  Flush                  2061354     0.666    15.102
+  Close                  21604811     0.012    25.697
+  LockX                    95770     0.007     1.424
+  Mkdir                      384     0.008     0.053
+  Rename                 1245411     0.096    12.263
+  ReadX                  46103198     0.011    12.116
+  WriteX                 14667988     7.375    60.069
+  Unlink                 5938936     0.173    30.905
+  UnlockX                  95770     0.005     4.147
+  FIND_FIRST             10306407     0.041    11.715
+  SET_FILE_INFORMATION   2395987     0.048     7.640
+  QUERY_FILE_INFORMATION 4672371     0.005     9.291
+  QUERY_PATH_INFORMATION 26656735     0.018    19.719
+  QUERY_FS_INFORMATION   4887940     0.010     7.654
+  NTCreateX              29410811     0.059    28.551
+
+Throughput 1026.21 MB/sec (sync open)  128 clients  128 procs
+max_latency=60.075 ms
+
+Cc: <stable@vger.kernel.org> # v4.19+
+Tested-by: Xiao Ni <xni@redhat.com>
+Signed-off-by: NeilBrown <neilb@suse.com>
 Signed-off-by: Song Liu <songliubraving@fb.com>
 ---
- drivers/md/raid5.c | 19 ++++---------------
- 1 file changed, 4 insertions(+), 15 deletions(-)
+ drivers/md/md.c | 27 +++++++++++++++++++++++----
+ drivers/md/md.h |  3 +++
+ 2 files changed, 26 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-index c033bfcb209e..4204a972ecf2 100644
---- a/drivers/md/raid5.c
-+++ b/drivers/md/raid5.c
-@@ -4223,26 +4223,15 @@ static void handle_parity_checks6(struct r5conf *conf, struct stripe_head *sh,
- 	case check_state_check_result:
- 		sh->check_state = check_state_idle;
+diff --git a/drivers/md/md.c b/drivers/md/md.c
+index 021e522001c1..d0f688399a56 100644
+--- a/drivers/md/md.c
++++ b/drivers/md/md.c
+@@ -427,6 +427,7 @@ static void submit_flushes(struct work_struct *ws)
+ 	struct mddev *mddev = container_of(ws, struct mddev, flush_work);
+ 	struct md_rdev *rdev;
  
-+		if (s->failed > 1)            
-+		    break;
- 		/* handle a successful check operation, if parity is correct
- 		 * we are done.  Otherwise update the mismatch count and repair
- 		 * parity if !MD_RECOVERY_CHECK
- 		 */
- 		if (sh->ops.zero_sum_result == 0) {
--			/* both parities are correct */
--			if (!s->failed)
--				set_bit(STRIPE_INSYNC, &sh->state);
--			else {
--				/* in contrast to the raid5 case we can validate
--				 * parity, but still have a failure to write
--				 * back
--				 */
--				sh->check_state = check_state_compute_result;
--				/* Returning at this point means that we may go
--				 * off and bring p and/or q uptodate again so
--				 * we make sure to check zero_sum_result again
--				 * to verify if p or q need writeback
--				 */
--			}
-+			/* Any parity checked was correct */
-+			set_bit(STRIPE_INSYNC, &sh->state);
- 		} else {
- 			atomic64_add(STRIPE_SECTORS, &conf->mddev->resync_mismatches);
- 			if (test_bit(MD_RECOVERY_CHECK, &conf->mddev->recovery)) {
++	mddev->start_flush = ktime_get_boottime();
+ 	INIT_WORK(&mddev->flush_work, md_submit_flush_data);
+ 	atomic_set(&mddev->flush_pending, 1);
+ 	rcu_read_lock();
+@@ -467,6 +468,7 @@ static void md_submit_flush_data(struct work_struct *ws)
+ 	 * could wait for this and below md_handle_request could wait for those
+ 	 * bios because of suspend check
+ 	 */
++	mddev->last_flush = mddev->start_flush;
+ 	mddev->flush_bio = NULL;
+ 	wake_up(&mddev->sb_wait);
+ 
+@@ -481,15 +483,32 @@ static void md_submit_flush_data(struct work_struct *ws)
+ 
+ void md_flush_request(struct mddev *mddev, struct bio *bio)
+ {
++	ktime_t start = ktime_get_boottime();
+ 	spin_lock_irq(&mddev->lock);
+ 	wait_event_lock_irq(mddev->sb_wait,
+-			    !mddev->flush_bio,
++			    !mddev->flush_bio ||
++			    ktime_after(mddev->last_flush, start),
+ 			    mddev->lock);
+-	mddev->flush_bio = bio;
++	if (!ktime_after(mddev->last_flush, start)) {
++		WARN_ON(mddev->flush_bio);
++		mddev->flush_bio = bio;
++		bio = NULL;
++	}
+ 	spin_unlock_irq(&mddev->lock);
+ 
+-	INIT_WORK(&mddev->flush_work, submit_flushes);
+-	queue_work(md_wq, &mddev->flush_work);
++	if (!bio) {
++		INIT_WORK(&mddev->flush_work, submit_flushes);
++		queue_work(md_wq, &mddev->flush_work);
++	} else {
++		/* flush was performed for some other bio while we waited. */
++		if (bio->bi_iter.bi_size == 0)
++			/* an empty barrier - all done */
++			bio_endio(bio);
++		else {
++			bio->bi_opf &= ~REQ_PREFLUSH;
++			mddev->pers->make_request(mddev, bio);
++		}
++	}
+ }
+ EXPORT_SYMBOL(md_flush_request);
+ 
+diff --git a/drivers/md/md.h b/drivers/md/md.h
+index 2deb84fa93f9..257cb4c9e22b 100644
+--- a/drivers/md/md.h
++++ b/drivers/md/md.h
+@@ -463,6 +463,9 @@ struct mddev {
+ 	 */
+ 	struct bio *flush_bio;
+ 	atomic_t flush_pending;
++	ktime_t start_flush, last_flush; /* last_flush is when the last completed
++					  * flush was started.
++					  */
+ 	struct work_struct flush_work;
+ 	struct work_struct event_work;	/* used by dm to report failure event */
+ 	void (*sync_super)(struct mddev *mddev, struct md_rdev *rdev);
 -- 
 2.17.1
 
