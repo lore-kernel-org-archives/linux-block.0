@@ -2,93 +2,107 @@ Return-Path: <SRS0=pPwc=SA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 270E0C43381
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:34:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3DD5C10F05
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:38:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E56262173C
-	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:34:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9950B2183F
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 14:38:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KylpRb8F"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="jdY5yGzw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728776AbfC2Oek (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Mar 2019 10:34:40 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:40446 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728833AbfC2Oek (ORCPT
+        id S1729078AbfC2OiI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Mar 2019 10:38:08 -0400
+Received: from mail-it1-f196.google.com ([209.85.166.196]:51378 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728804AbfC2OiI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Mar 2019 10:34:40 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2TEY6ZD027901;
-        Fri, 29 Mar 2019 14:34:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=EbupV4QSUXAVQsyhVndp2Sv5sCXiR2sgYQhgjoSdwb0=;
- b=KylpRb8Fr8RyGs3grkHyHwdmjBYUv8l+1ZRvxiZpgN5mK9yHTIVD5jSV4llmUTzbHXnJ
- epor6B+yRyfBjIIr2IjlZydwW73JI8RSPcAVn2uxzFznXx4sE2v/SKBXkNNfPTNnQez2
- ZRCQyCLs/gbBSOVDM/7/wVa5I508FNRzYfETQ9WDSm7tKbPxPo4iJ7U3bxdAN8CqyhPL
- vUCJrQbZLfPsaUdumCkzjpPs5QWXDUDmCxUHyk9U40QggQJc2xeee6VidcOomSmQmbP7
- pAZEaF2qnSMzoCEraEl7vUkbA7VyGa6qrIDHOBwNV/G4Ew9AnvHrzD7L8+l4I0EAgOpy qQ== 
-Received: from aserv0021.oracle.com (aserv0021.oracle.com [141.146.126.233])
-        by userp2120.oracle.com with ESMTP id 2re6djvub2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 29 Mar 2019 14:34:26 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x2TEYKJG027942
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 29 Mar 2019 14:34:20 GMT
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x2TEYJqB024577;
-        Fri, 29 Mar 2019 14:34:19 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 29 Mar 2019 07:34:19 -0700
-To:     Jens Axboe <axboe@kernel.dk>
+        Fri, 29 Mar 2019 10:38:08 -0400
+Received: by mail-it1-f196.google.com with SMTP id e24so4053892itl.1
+        for <linux-block@vger.kernel.org>; Fri, 29 Mar 2019 07:38:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=eQpIfLC+fwJsGVmnvxqsf2yilFvyJXO22CqcFpk5C2Q=;
+        b=jdY5yGzwcPXdlQ6i38rqoB3F+Jwwm4cXR0VBag/rlf4Qr7G1tK+E44I4QKQIup+Tsc
+         wV5JuUYQAt8E4F2ejUv7bcr5Tz/1kfkbq9sInTIz29z161GV4iEdbuSdUOvfIzy+YSUg
+         YIxQJppMoUoLkSM1P6Y4eOnvCwp8HFSzaPxbwwvz/GLHlUFC7RaNFmrR2iUGDJQS60RS
+         CCEjAeXJ9vSh5bUhVaZxudGZrjKOrKy/2Ufp1p+XF9unwLm3xfy//b8zA4VN6AmdcPmx
+         DjllZctSSUi4P8XZoK3y3oc0msBEg3oxwM9VSyOtyfrWPxDrgyDVeuL3yC6WMnS7df/s
+         xT9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=eQpIfLC+fwJsGVmnvxqsf2yilFvyJXO22CqcFpk5C2Q=;
+        b=k7zv0cBYh9pkr1jin+aPeSDdHRcTOAwQB8a+jtMI8I9sCOYKLgFGIcYCuZFy3gm//D
+         ug6G1pnSuXZWQGBiO/paautPtCDlZf7yAMU6TG9yPsOCHLqJaXId2Gn5BHpEmomTyalE
+         3KiovRrvmrWbqYPLQt5+6yZt0q6h4HguXYIiSZVYM+bu+gh75Yy6wKA/PuktupU/la/z
+         02mft5d03fuOs3geU4G6ToLZg9oVHx8Z+ab71EzVXC8fwWhnzKAiHqFIq5dj65JF8T1P
+         6UmHmbUbtzxtcv1Tumr1ai/lQykPAkkOxUstaFDhD+0ecoVr5GMgyNootiUbNVWXiNzP
+         DN4Q==
+X-Gm-Message-State: APjAAAX6vPwYUDAmjOUoLm7bi2HRp/9GoHf8v8Nq4E0LgJQrmj5yPZPb
+        sKRmKs+50bEsey0g06AfGms2Tw==
+X-Google-Smtp-Source: APXvYqymxhrY7ZRiInV8U9y/4jALhw8KuSa7dnsjxt1QTcn+q2mkrIOCwgyIJMYReHoz2DpHsBQ0cg==
+X-Received: by 2002:a05:6638:1a:: with SMTP id z26mr34038518jao.99.1553870287551;
+        Fri, 29 Mar 2019 07:38:07 -0700 (PDT)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id j66sm1060135itb.38.2019.03.29.07.38.05
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 29 Mar 2019 07:38:05 -0700 (PDT)
+Subject: Re: [PATCH v3 2/3] block: verify data when endio
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
 Cc:     Bob Liu <bob.liu@oracle.com>, linux-block@vger.kernel.org,
         linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        martin.petersen@oracle.com, shirley.ma@oracle.com,
-        allison.henderson@oracle.com, david@fromorbit.com,
-        darrick.wong@oracle.com, hch@infradead.org, adilger@dilger.ca,
-        tytso@mit.edu
-Subject: Re: [PATCH v3 2/3] block: verify data when endio
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
+        shirley.ma@oracle.com, allison.henderson@oracle.com,
+        david@fromorbit.com, darrick.wong@oracle.com, hch@infradead.org,
+        adilger@dilger.ca, tytso@mit.edu
 References: <20190329142346.1677-1-bob.liu@oracle.com>
-        <20190329142346.1677-3-bob.liu@oracle.com>
-        <41c8688a-65bd-96ac-9b23-4facd0ade4a7@kernel.dk>
-Date:   Fri, 29 Mar 2019 10:34:14 -0400
-In-Reply-To: <41c8688a-65bd-96ac-9b23-4facd0ade4a7@kernel.dk> (Jens Axboe's
-        message of "Fri, 29 Mar 2019 08:28:23 -0600")
-Message-ID: <yq1ftr5rbq1.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+ <20190329142346.1677-3-bob.liu@oracle.com>
+ <41c8688a-65bd-96ac-9b23-4facd0ade4a7@kernel.dk> <yq1ftr5rbq1.fsf@oracle.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <f65d6a7b-9e69-ae1e-b8b8-8769dc650311@kernel.dk>
+Date:   Fri, 29 Mar 2019 08:38:04 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9210 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=881 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1903290104
+In-Reply-To: <yq1ftr5rbq1.fsf@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 3/29/19 8:34 AM, Martin K. Petersen wrote:
+> 
+> Jens,
+> 
+>> I told you this for the initial posting, and the objection still
+>> stands.  Adding 40 bytes to struct bio is a no-go.
+>>
+>> So that's a big NAK on that series.
+> 
+> I think you missed Bob's comment that this will go in the existing
+> bio_integrity field. I believe the main purpose of the series is to
+> solicit feedback on the callback approach.
 
-Jens,
+I didn't miss that, but it fixes nothing. That will unify the 40 bytes
+with 8 bytes, we're still growing the bio by a LOT. And we can't even
+nicely hide this behind some ifdef, sine distros enable everything and
+hence we're solving nothing by doing that.
 
-> I told you this for the initial posting, and the objection still
-> stands.  Adding 40 bytes to struct bio is a no-go.
->
-> So that's a big NAK on that series.
-
-I think you missed Bob's comment that this will go in the existing
-bio_integrity field. I believe the main purpose of the series is to
-solicit feedback on the callback approach.
+One potential solution could be to setup a specific bio_set for this,
+and allocate your read bios out of that. Growing struct bio by an
+enormous amount for this is just a non-starter to begin with, end of
+story.
 
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+Jens Axboe
+
