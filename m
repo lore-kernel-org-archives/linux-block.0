@@ -1,187 +1,244 @@
-Return-Path: <SRS0=7L3l=R7=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=pPwc=SA=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78F8DC4360F
-	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 19:53:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6E62C43381
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 00:11:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3ECB22173C
-	for <linux-block@archiver.kernel.org>; Thu, 28 Mar 2019 19:53:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AAF782184E
+	for <linux-block@archiver.kernel.org>; Fri, 29 Mar 2019 00:11:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="VjW+JUp5"
+	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="YvhWEUf0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726076AbfC1Txs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Mar 2019 15:53:48 -0400
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:38079 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726059AbfC1Txr (ORCPT
+        id S1728648AbfC2ALV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Mar 2019 20:11:21 -0400
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:35980 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728500AbfC2ALV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Mar 2019 15:53:47 -0400
-Received: by mail-lf1-f67.google.com with SMTP id a6so14908863lfl.5
-        for <linux-block@vger.kernel.org>; Thu, 28 Mar 2019 12:53:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gYGWnhIks4l2MvbVr4OOzOvA1DR9kZHEkMjqKsutwJM=;
-        b=VjW+JUp5Ow5m9ugk5lKNG7c/n8KEWjzx0UMl+kEyhgEl7A3xmAvyRKOSGjILTj4+87
-         UE7mUw3gu9Z2gKO7K/ltJa/GA1xsUJSXm4ZD6DdtxBrtls9bKKCfKFOEyT1llNgDNgVQ
-         0SRSECwP4XyBRt0ngrU3t/ySAuGyHYVxiN6gQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gYGWnhIks4l2MvbVr4OOzOvA1DR9kZHEkMjqKsutwJM=;
-        b=gSAn/pSywvmWenQNKj3IfVTcq15sMd/n5ZYWnwSOIjj2c26Xdkj9P1rcvTRbFU/05L
-         nItRMSp4NVBuiaUQ2cSw1fwF0SCsw+ONCr2hkd6aZHgBlS7VjbcBbkRqt+slpBGvWUvo
-         j/qla2O7FhqMpKT+tJ1dgpneRaXRccfyFEVfd8gN/S0ob6ExQ9aYq/nE+2Df29icrT+0
-         naaAZuLVbz4eTo8j8QwDMqqpqYgxbIVRt0mGNTLOM8GDF7ux14atei4+9e3X4F7mRc2q
-         pn26UKnAbQ1rcPznPrSFzMb+Dbr3Y0U7+oB9reYVY7IfLqY72JrJwGm2nLWU6RdxRS7w
-         trSw==
-X-Gm-Message-State: APjAAAWzuDVs/MNGxInShFjrtCEN+EHqmlaGEqYw02g0QSExtGSGMbTU
-        AtaIA5/auoLbIkhMOBP7B1JpxG/CzSU=
-X-Google-Smtp-Source: APXvYqzvddxB7UGwDBTukZ78NTBGGJqFy9r1h166uo0Ay8qb5/4bJP5U5uB0dByRawoEKrkWsEkI5g==
-X-Received: by 2002:ac2:489b:: with SMTP id x27mr24085840lfc.107.1553802824507;
-        Thu, 28 Mar 2019 12:53:44 -0700 (PDT)
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com. [209.85.208.169])
-        by smtp.gmail.com with ESMTPSA id j27sm5162250lfk.97.2019.03.28.12.53.43
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 28 Mar 2019 12:53:43 -0700 (PDT)
-Received: by mail-lj1-f169.google.com with SMTP id f18so18757207lja.10
-        for <linux-block@vger.kernel.org>; Thu, 28 Mar 2019 12:53:43 -0700 (PDT)
-X-Received: by 2002:a2e:6507:: with SMTP id z7mr10807300ljb.147.1553802823297;
- Thu, 28 Mar 2019 12:53:43 -0700 (PDT)
+        Thu, 28 Mar 2019 20:11:21 -0400
+Received: from pps.filterd (m0044008.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x2T09FI7011342
+        for <linux-block@vger.kernel.org>; Thu, 28 Mar 2019 17:11:20 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-type; s=facebook; bh=hrmkK86CLcUqI7FOsA7WTDumNlH5nTqSdid1LV/cbvQ=;
+ b=YvhWEUf0/GA5wb6JjOr5B5m4wJHYk/4ed4HLXXebfGqJEeHMz/KVzVkg1/UVptAKhRdV
+ /m2jb2Rmpw5NUkXX1W0PwTOQYOspnhd2KiB2SOgHO5FyPgCdPGiB8AFuUvdBCOXg45d8
+ 3NRMCqVnYRpObKAyAp222Du6t/kQkNtUswA= 
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0a-00082601.pphosted.com with ESMTP id 2rh2432a47-4
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT)
+        for <linux-block@vger.kernel.org>; Thu, 28 Mar 2019 17:11:20 -0700
+Received: from mx-out.facebook.com (2620:10d:c081:10::13) by
+ mail.thefacebook.com (2620:10d:c081:35::128) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA) id 15.1.1713.5;
+ Thu, 28 Mar 2019 17:11:18 -0700
+Received: by dev003.prn2.facebook.com (Postfix, from userid 572441)
+        id 43B133645773; Thu, 28 Mar 2019 17:08:58 -0700 (PDT)
+Smtp-Origin-Hostprefix: dev
+From:   Matt Mullins <mmullins@fb.com>
+Smtp-Origin-Hostname: dev003.prn2.facebook.com
+To:     <hall@fb.com>, <mmullins@fb.com>, <ast@kernel.org>,
+        <bpf@vger.kernel.org>, <netdev@vger.kernel.org>
+CC:     <linux-kernel@vger.kernel.org>, Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        <linux-block@vger.kernel.org>, <nbd@other.debian.org>
+Smtp-Origin-Cluster: prn2c23
+Subject: [PATCH bpf-next 3/3] nbd: add tracepoints for send/receive timing
+Date:   Thu, 28 Mar 2019 17:07:58 -0700
+Message-ID: <20190329000758.494762-4-mmullins@fb.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190329000758.494762-1-mmullins@fb.com>
+References: <20190329000758.494762-1-mmullins@fb.com>
+X-FB-Internal: Safe
 MIME-Version: 1.0
-References: <20190327222841.38650-1-evgreen@chromium.org> <20190327222841.38650-3-evgreen@chromium.org>
- <20190328023650.GD19708@ming.t460p>
-In-Reply-To: <20190328023650.GD19708@ming.t460p>
-From:   Evan Green <evgreen@chromium.org>
-Date:   Thu, 28 Mar 2019 12:53:06 -0700
-X-Gmail-Original-Message-ID: <CAE=gft7AXQ1t_oeJRpytD26A=hAPp3G-g5SY0MvxzZAGYJGaSA@mail.gmail.com>
-Message-ID: <CAE=gft7AXQ1t_oeJRpytD26A=hAPp3G-g5SY0MvxzZAGYJGaSA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] loop: Better discard support for block devices
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Martin K Petersen <martin.petersen@oracle.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Gwendal Grignou <gwendal@chromium.org>,
-        Alexis Savery <asavery@chromium.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-03-28_15:,,
+ signatures=0
+X-Proofpoint-Spam-Reason: safe
+X-FB-Internal: Safe
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 27, 2019 at 7:37 PM Ming Lei <ming.lei@redhat.com> wrote:
->
-> On Wed, Mar 27, 2019 at 03:28:41PM -0700, Evan Green wrote:
-...
-> > @@ -854,6 +854,25 @@ static void loop_config_discard(struct loop_device *lo)
-> >       struct file *file = lo->lo_backing_file;
-> >       struct inode *inode = file->f_mapping->host;
-> >       struct request_queue *q = lo->lo_queue;
-> > +     struct request_queue *backingq;
-> > +
-> > +     /*
-> > +      * If the backing device is a block device, mirror its discard
-> > +      * capabilities.
-> > +      */
-> > +     if (S_ISBLK(inode->i_mode)) {
-> > +             backingq = bdev_get_queue(inode->i_bdev);
-> > +             blk_queue_max_discard_sectors(q,
-> > +                     backingq->limits.max_discard_sectors);
-> > +
-> > +             blk_queue_max_write_zeroes_sectors(q,
-> > +                     backingq->limits.max_write_zeroes_sectors);
-> > +
-> > +             q->limits.discard_granularity =
-> > +                     backingq->limits.discard_granularity;
-> > +
-> > +             q->limits.discard_alignment =
-> > +                     backingq->limits.discard_alignment;
->
-> Loop usually doesn't mirror backing queue's limits, and I believe
-> it isn't necessary for this case too, just wondering why the
-> following simple setting can't work?
->
->         if (S_ISBLK(inode->i_mode)) {
->                 backingq = bdev_get_queue(inode->i_bdev);
->
->                 q->limits.discard_alignment = 0;
->                 if (!blk_queue_discard(backingq)) {
->                         q->limits.discard_granularity = 0;
->                         blk_queue_max_discard_sectors(q, 0);
->                         blk_queue_max_write_zeroes_sectors(q, 0);
->                         blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
->                 } else {
->                         q->limits.discard_granularity = inode->i_sb->s_blocksize;
->                         blk_queue_max_discard_sectors(q, UINT_MAX >> 9);
->                         blk_queue_max_write_zeroes_sectors(q, UINT_MAX >> 9);
->                         blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
->                 }
->         } else if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) {
->                 ...
->         }
->
-> I remembered you mentioned the above code doesn't work in some of your
-> tests, but never explain the reason. However, it is supposed to work
-> given bio splitting does handle/respect the discard limits. Or is there
-> bug in bio splitting on discard IO?
+From: Andrew Hall <hall@fb.com>
 
-I've done some more digging, and I think I have an answer for you,
-with some proposed changes to the patch.
+This adds four tracepoints to nbd, enabling separate tracing of payload
+and header sending/receipt.
 
-My original answer was going to be that REQ_OP_DISCARD and
-REQ_OP_WRITE_ZEROES are different. So I have an NVMe device that does
-support discard, but does not support write_zeroes, and should mirror
-those capabilities individually to most accurately reflect the
-underlying block device. But then I noticed that this device still
-prints the error log I was trying to get rid of when doing mkfs.ext4,
-so my fix is incomplete.
+In the send path for headers that have already been sent, we also
+explicitly initialize the handle so it can be referenced by the later
+tracepoint.
 
-The reason is that I have the following translation between REQ_OP_*
-and FALLOC_FL_*:
-REQ_OP_DISCARD ==> FALLOC_FL_PUNCH_HOLE | FALLOC_FL_KEEP_SIZE
-REQ_OP_WRITE_ZEROES ==> FALLOC_FL_ZERO_RANGE | FALLOC_FL_KEEP_SIZE
+Signed-off-by: Andrew Hall <hall@fb.com>
+Signed-off-by: Matt Mullins <mmullins@fb.com>
+---
+ drivers/block/nbd.c        |  8 ++++
+ include/trace/events/nbd.h | 92 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 100 insertions(+)
 
-This makes sense for loop devices backed by regular files, and I think
-is the right mapping. But for loop devices backed by block devices,
-blkdev_fallocate() translates both of these sets of flags into
-blkdev_issue_zeroout(), rather than blkdev_issue_discard() for
-REQ_OP_DISCARD (since I wasn't setting FALLOC_FL_NO_HIDE_STALE).
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 7393d04d255c..d3d914620f66 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -513,6 +513,10 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 	if (sent) {
+ 		if (sent >= sizeof(request)) {
+ 			skip = sent - sizeof(request);
++
++			// initialize handle for tracing purposes
++			handle = nbd_cmd_handle(cmd);
++
+ 			goto send_pages;
+ 		}
+ 		iov_iter_advance(&from, sent);
+@@ -536,6 +540,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 		(unsigned long long)blk_rq_pos(req) << 9, blk_rq_bytes(req));
+ 	result = sock_xmit(nbd, index, 1, &from,
+ 			(type == NBD_CMD_WRITE) ? MSG_MORE : 0, &sent);
++	trace_nbd_header_sent(req, handle);
+ 	if (result <= 0) {
+ 		if (was_interrupted(result)) {
+ 			/* If we havne't sent anything we can just return BUSY,
+@@ -608,6 +613,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
+ 		bio = next;
+ 	}
+ out:
++	trace_nbd_payload_sent(req, handle);
+ 	nsock->pending = NULL;
+ 	nsock->sent = 0;
+ 	return 0;
+@@ -655,6 +661,7 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+ 			tag, req);
+ 		return ERR_PTR(-ENOENT);
+ 	}
++	trace_nbd_header_received(req, handle);
+ 	cmd = blk_mq_rq_to_pdu(req);
+ 
+ 	mutex_lock(&cmd->lock);
+@@ -708,6 +715,7 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
+ 		}
+ 	}
+ out:
++	trace_nbd_payload_received(req, handle);
+ 	mutex_unlock(&cmd->lock);
+ 	return ret ? ERR_PTR(ret) : cmd;
+ }
+diff --git a/include/trace/events/nbd.h b/include/trace/events/nbd.h
+index 5928255ed02e..eef476fef95a 100644
+--- a/include/trace/events/nbd.h
++++ b/include/trace/events/nbd.h
+@@ -7,6 +7,98 @@
+ 
+ #include <linux/tracepoint.h>
+ 
++TRACE_EVENT(nbd_header_sent,
++
++	TP_PROTO(struct request *req, u64 handle),
++
++	TP_ARGS(req, handle),
++
++	TP_STRUCT__entry(
++		__field(struct request *, req)
++		__field(u64, handle)
++	),
++
++	TP_fast_assign(
++		__entry->req = req;
++		__entry->handle = handle;
++	),
++
++	TP_printk(
++		"nbd header sent: request %p, handle 0x%016llx",
++		__entry->req,
++		__entry->handle
++	)
++);
++
++TRACE_EVENT(nbd_payload_sent,
++
++	TP_PROTO(struct request *req, u64 handle),
++
++	TP_ARGS(req, handle),
++
++	TP_STRUCT__entry(
++		__field(struct request *, req)
++		__field(u64, handle)
++	),
++
++	TP_fast_assign(
++		__entry->req = req;
++		__entry->handle = handle;
++	),
++
++	TP_printk(
++		"nbd payload sent: request %p, handle 0x%016llx",
++		__entry->req,
++		__entry->handle
++	)
++);
++
++TRACE_EVENT(nbd_header_received,
++
++	TP_PROTO(struct request *req, u64 handle),
++
++	TP_ARGS(req, handle),
++
++	TP_STRUCT__entry(
++		__field(struct request *, req)
++		__field(u64, handle)
++	),
++
++	TP_fast_assign(
++		__entry->req = req;
++		__entry->handle = handle;
++	),
++
++	TP_printk(
++		"nbd header received: request %p, handle 0x%016llx",
++		__entry->req,
++		__entry->handle
++	)
++);
++
++TRACE_EVENT(nbd_payload_received,
++
++	TP_PROTO(struct request *req, u64 handle),
++
++	TP_ARGS(req, handle),
++
++	TP_STRUCT__entry(
++		__field(struct request *, req)
++		__field(u64, handle)
++	),
++
++	TP_fast_assign(
++		__entry->req = req;
++		__entry->handle = handle;
++	),
++
++	TP_printk(
++		"nbd payload received: request %p, handle 0x%016llx",
++		__entry->req,
++		__entry->handle
++	)
++);
++
+ DECLARE_EVENT_CLASS(nbd_send_request,
+ 
+ 	TP_PROTO(struct nbd_request *nbd_request, int index,
+-- 
+2.17.1
 
-I think this set of flags still makes sense for block devices, since
-it keeps a consistent behavior for loop devices backed by files and
-block devices (namely, that the discarded space is always zeroed).
-However it means that for my NVMe that supports discard (never used)
-but not write_zeroes (always tried), loop devices backed directly by
-this NVMe should not set the discard flag.
-
-So I think what I should actually have is this:
-
-if (S_ISBLK(inode->i_mode)) {
-        backingq = bdev_get_queue(inode->i_bdev);
-        blk_queue_max_discard_sectors(q,
-                backingq->limits.max_write_zeroes_sectors);  /// Note
-the difference here.
-
-        blk_queue_max_write_zeroes_sectors(q,
-                backingq->limits.max_write_zeroes_sectors);
-} else if ((!file->f_op->fallocate) || lo->lo_encrypt_key_size) { ... }
-...
-if (q->limits.max_write_zeroes_sectors)
-        blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
-else
-        blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
-
-I can confirm that this fixes the errors for my NVMe as well.
-
-What do you think?
--Evan
