@@ -2,119 +2,630 @@ Return-Path: <SRS0=7fUu=SB=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E79DC4360F
-	for <linux-block@archiver.kernel.org>; Sat, 30 Mar 2019 02:17:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED5F3C43381
+	for <linux-block@archiver.kernel.org>; Sat, 30 Mar 2019 05:02:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E3656218D9
-	for <linux-block@archiver.kernel.org>; Sat, 30 Mar 2019 02:17:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87972218A3
+	for <linux-block@archiver.kernel.org>; Sat, 30 Mar 2019 05:02:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="aGExxa4N"
+	dkim=pass (2048-bit key) header.d=ucsc.edu header.i=@ucsc.edu header.b="jpK8zYNG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730319AbfC3CRp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Mar 2019 22:17:45 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:49842 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730001AbfC3CRp (ORCPT
+        id S1726132AbfC3FC5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 30 Mar 2019 01:02:57 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:51591 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725957AbfC3FC5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Mar 2019 22:17:45 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x2U2F9aF169089;
-        Sat, 30 Mar 2019 02:17:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=YLx/EyDULt8jFC0kooQ/Icu4Sr96cI4UQiIE+WeD9rc=;
- b=aGExxa4NcRvLFAHBi+ijxYK7Ia95PDh7Z4sO8nuwPjnIPsgKB8X+kb5v8DxzhA+GHgHs
- 2+AeT4u2ZBZ3mWcNVmJDYNFEA29/Q5nxwXdIeB99HueqWRqGwLVe/ToQsqc7dg7kAgjV
- xX1u/5anQiPySM6YNS0NQUlgQe+ICCpIEJjs+Ma61JyTDBbokTSDSj4iq+0xS9VpG3nX
- dpgx6D6QZ7wy09ujbb6mFQWELnX9P/kFV7eeD1hQR2DkwkNGrUBl+eildBsuXtvopVZy
- +7i3dsXy3fqGmjRuXRdJziLrgab8AJ8nBGgfaA3gLOQskHb7JFCa8TjoSxsFEskatulS /w== 
-Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
-        by aserp2130.oracle.com with ESMTP id 2rhwycr46t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 30 Mar 2019 02:17:31 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x2U2HT1q007769
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 30 Mar 2019 02:17:30 GMT
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x2U2HQBs027812;
-        Sat, 30 Mar 2019 02:17:26 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 29 Mar 2019 19:17:25 -0700
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Bob Liu <bob.liu@oracle.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, shirley.ma@oracle.com,
-        allison.henderson@oracle.com, david@fromorbit.com,
-        darrick.wong@oracle.com, hch@infradead.org, adilger@dilger.ca,
-        tytso@mit.edu
-Subject: Re: [PATCH v3 2/3] block: verify data when endio
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <20190329142346.1677-1-bob.liu@oracle.com>
-        <20190329142346.1677-3-bob.liu@oracle.com>
-        <41c8688a-65bd-96ac-9b23-4facd0ade4a7@kernel.dk>
-        <yq1ftr5rbq1.fsf@oracle.com>
-        <f65d6a7b-9e69-ae1e-b8b8-8769dc650311@kernel.dk>
-        <yq1bm1trb4y.fsf@oracle.com>
-        <feefa611-b744-326c-29d5-c64bcda45d9f@kernel.dk>
-        <yq17echrax1.fsf@oracle.com>
-        <1b638dc2-56fd-6ab4-dcca-ad2adb9931bb@kernel.dk>
-        <c9adb48c-7b6e-2017-9480-aa2342b3523b@oracle.com>
-        <7599b239-46f4-9799-a87a-3ca3891d4a08@kernel.dk>
-Date:   Fri, 29 Mar 2019 22:17:22 -0400
-In-Reply-To: <7599b239-46f4-9799-a87a-3ca3891d4a08@kernel.dk> (Jens Axboe's
-        message of "Fri, 29 Mar 2019 09:03:47 -0600")
-Message-ID: <yq1imw1p0lp.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        Sat, 30 Mar 2019 01:02:57 -0400
+Received: by mail-wm1-f66.google.com with SMTP id 4so4534699wmf.1
+        for <linux-block@vger.kernel.org>; Fri, 29 Mar 2019 22:02:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ucsc.edu; s=ucsc-google-2018;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=UvSp4XWVzdYzXXfwdQFH9ZaI2yq0hE2OaKrRhHtte3w=;
+        b=jpK8zYNGlgsxVwvKznQmr95BIpZpbqPuA2zJHfllPzzNYoXgm9oa6bPrUgIGN0cRF8
+         CZDjxKQIuQBqWs8Gcjl1ktrkrc9bWKdjtDGLJdGWYEYnJ4V/tH6Xb6wTNZvQSu2Y7LTI
+         vChb9euYdXhU57p0qH3PZro40T+Z+dxSCrqGkjeTx6nCLxi3By5mzHcGvhEPFCMRD3Wm
+         tcLSpLvSQs6uLKWq45ywnIFKDyLFwWpdrEQVtqV3ku2+yla8c67RVwI9DJ0sHf378xkv
+         n2S0j6m/UjDHg27bIV59M5P5lRqOnDqa6GPxNn67jvRGsBLXH+sbgU3qT4EvEo1t/EXi
+         ZseQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=UvSp4XWVzdYzXXfwdQFH9ZaI2yq0hE2OaKrRhHtte3w=;
+        b=tS/I3g4Kc/f+KkvtISWhppubtj6R96Yk6zEC2xanFzRtrp41wjL8yM/iFSsuWN5nUm
+         NfpI7IMACd/7pCYCT9hTKmzbC3Jfcf/qXXKZoIO429KKeA1hf5eDg8ydj+cATnQyXuX/
+         ig9/FrbDQ2+CitWz6trh/hTu2K5AkxZs6qcr2ltOS/xL0JaWm/4lEmfjCoIg0flVBnGy
+         zVEgkaeUhVY1iOiRWcK7BAnjS1f1AgUf0X+UIdy27muvZbItYpQvjJz40GAyBL/w3y2M
+         HUIHkERwLhS/nXlopkSP1J6VTpIh+Wr9S+4vF1qjfI+LS3qJBXwnNkgCNWBg/uqjB7n7
+         baDA==
+X-Gm-Message-State: APjAAAUK6YWG3nEuH3qezdffjh5SYphjMi10p2f3w1KvRhHCk4/rctAL
+        lnaXBiV/JJ58ta3RvcW1TF4dNbWqidG8YFKVq8ni1g==
+X-Google-Smtp-Source: APXvYqzBqrILveLcXRfM1L1LZ5puoXc0RWbgauI8NQ5jGhoDiwOI7tsTKMX1IR86mc3DwTo+Ote/xuxIeVfGy0drNZs=
+X-Received: by 2002:a1c:c013:: with SMTP id q19mr5608527wmf.148.1553922174114;
+ Fri, 29 Mar 2019 22:02:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9211 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1903300014
+References: <20190327123901.12323-1-igor.j.konopko@intel.com>
+ <20190327123901.12323-3-igor.j.konopko@intel.com> <CANr-nt0ScaSzze9v=o6j=S2Jn+HC7fSbC+2keRB=+E0dNuwxqw@mail.gmail.com>
+In-Reply-To: <CANr-nt0ScaSzze9v=o6j=S2Jn+HC7fSbC+2keRB=+E0dNuwxqw@mail.gmail.com>
+From:   Heiner Litz <hlitz@ucsc.edu>
+Date:   Fri, 29 Mar 2019 22:02:42 -0700
+Message-ID: <CAJbgVnXvqwGnUATB_xECZqD5aNPUcWg2j56ccbmZu_C9wv3C3A@mail.gmail.com>
+Subject: Re: [PATCH v3 02/10] lightnvm: pblk: simplify partial read path
+To:     Hans Holmberg <hans@owltronix.com>
+Cc:     Igor Konopko <igor.j.konopko@intel.com>,
+        Matias Bjorling <mb@lightnvm.io>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Igor,
+thanks for sending the patch. There are a couple things I don't like too much:
+- the fact that we have to carry around state in form of
+pblk_read_info which somewhat replaces the read_bitmap
+- the fact that sectors are looked up multiple times and hence krefs
+are incremented and decremented unnecessarily
+- the fact that we still bio_advance all over the place
 
-Jens,
+I think we can avoid all above with a new lookup_l2p function which
+does the following (pseudo code):
 
-> You will not need a callback in the bio, you will just have a private
-> end_io function for that particular bio that does the verification.
+bool did_read_from_device = false;
+bool did_read_from_cache = false;
+lookup_l2p_segment() {
+  for (i = 0; i < nr_secs; i++) {
+    ppa = trans_map_get();
+    if (!did_read_from_device && ppa_is_cached(ppa)) {
+      read_from_cache(ppa);
+      did_read_from_cache = true;
+    }
+    if (!did_read_from_cache && !ppa_is_cached(ppa)) {
+      ppa_list[p++] = ppa;
+      kref_get(line);
+      did_read_from_device = true;
+    }
+    else
+      return i;
+  }
+  return i;
+}
 
-The saving grace for the integrity stuff is that once all the child bios
-complete, we no longer care about their completion context and we have
-the parent bio submitted by the filesystem we can use to verify the PI
-against.
+This function achieves the following.
+1) It returns the length (i) of a segment of consecutive cached or
+device sectors. We can use i to split the bio
+2) Whenever the function above returns we know that the split bio
+either only contains device or cached sectors. This means we can
+finish the split bio without needing read_info
+3) The function returns after a split, so sectors are never looked up
+twice (no multi-kref inc/dec)
+4) don't need to bio_advance all over the place, as in a cached bio we
+know that all sectors are cached and we can complete it at once
+5) because we read from cache within lookup_l2p, we don't have to
+retry externally if secs don't exist in the cache anymore
 
-For the redundant copy use case, however, I am guessing that the
-filesystem folks would want the same thing. I.e. verify the structure of
-the data received once the parent bio completes. However, at that point
-all the slicing and dicing completion state is lost. And thus there is
-no way to know that the failure was due to mirror B two layers down the
-stack. Nor is there any way to retry the I/O without having recorded a
-completion breadcrumb trail for every child bio.
+Note: If we don't want to read_from_cache while holding the trans_lock
+we can release and re-acquire within lookup_l2p.
 
-The other approach is the callback where each stacking layer--which
-knows about redundancy--can do verification of a bio upon completion.
-However, that suffers from another headache in that the I/O can get
-arbitrarily sliced and diced in units of 512 bytes. And thus the
-filesystem verification function would have to be able to verify an
-arbitrary multiple of 512 bytes at any 512-byte offset inside a
-submitted bio. That would work, but I don't think that's the pony the
-filesystem were wishing for?
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+On Fri, Mar 29, 2019 at 2:12 AM Hans Holmberg <hans@owltronix.com> wrote:
+>
+> On Wed, Mar 27, 2019 at 1:41 PM Igor Konopko <igor.j.konopko@intel.com> wrote:
+> >
+> > This patch changes the approach to handling partial read path, what is
+> > needed for supporting multi-page bvec, which is currently broken.
+> >
+> > In old approach merging of data from round buffer and drive was fully
+> > made by drive. This had some disadvantages - code was complex and
+> > relies on bio internals, so it was hard to maintain and was strongly
+> > dependent on bio changes.
+> >
+> > In new approach most of the handling is done mostly by block layer
+> > functions such as bio_split(), bio_chain() and generic_make request()
+> > and generally is less complex and easier to maintain. Below some more
+> > details of the new approach.
+> >
+> > When read bio arrives, it is cloned for pblk internal purposes. All
+> > the L2P mapping, which includes copying data from round buffer to bio
+> > and thus bio_advance() calls is done on the cloned bio, so the original
+> > bio is untouched. Later if we found that we have partial read case, we
+> > still have original bio untouched, so we can split it and continue to
+> > process only first 4K of it in current context, when the rest will be
+> > called as separate bio request which is passed to generic_make_request()
+> > for further processing.
+> >
+> > Signed-off-by: Igor Konopko <igor.j.konopko@intel.com>
+>
+> I've played around with fio to figure out if there is a read latency
+> performance hit, and I have not found any diff that can't be written
+> off as noise.
+> (i did seq write + random 4k reads with different sizes and checked
+> the latency stats)
+>
+> > ---
+> >  drivers/lightnvm/pblk-core.c |  16 +++
+> >  drivers/lightnvm/pblk-read.c | 276 +++++++++++--------------------------------
+> >  drivers/lightnvm/pblk.h      |  22 ++--
+> >  3 files changed, 97 insertions(+), 217 deletions(-)
+>
+> Nice cleanup :)
+> I hope to find time early next week to go through the patch in depth.
+>
+> Thanks,
+> Hans
+>
+> >
+> > diff --git a/drivers/lightnvm/pblk-core.c b/drivers/lightnvm/pblk-core.c
+> > index 39280c1..f2edec6 100644
+> > --- a/drivers/lightnvm/pblk-core.c
+> > +++ b/drivers/lightnvm/pblk-core.c
+> > @@ -1529,6 +1529,22 @@ void pblk_rq_to_line_put(struct pblk *pblk, struct nvm_rq *rqd)
+> >                 pblk_ppa_to_line_put(pblk, ppa_list[i]);
+> >  }
+> >
+> > +void pblk_rq_to_line_partial_put(struct pblk *pblk, struct nvm_rq *rqd,
+> > +                                       int offset)
+> > +{
+> > +       struct ppa_addr ppa;
+> > +       struct pblk_line *line;
+> > +       int i = offset;
+> > +
+> > +       for (; i < rqd->nr_ppas; i++) {
+> > +               ppa = rqd->ppa_list[i];
+> > +               if (!pblk_ppa_empty(ppa) && !pblk_addr_in_cache(ppa)) {
+> > +                       line = pblk_ppa_to_line(pblk, ppa);
+> > +                       kref_put(&line->ref, pblk_line_put);
+> > +               }
+> > +       }
+> > +}
+> > +
+> >  static void pblk_stop_writes(struct pblk *pblk, struct pblk_line *line)
+> >  {
+> >         lockdep_assert_held(&pblk->l_mg.free_lock);
+> > diff --git a/drivers/lightnvm/pblk-read.c b/drivers/lightnvm/pblk-read.c
+> > index 597fe6d..264d1d7 100644
+> > --- a/drivers/lightnvm/pblk-read.c
+> > +++ b/drivers/lightnvm/pblk-read.c
+> > @@ -41,28 +41,30 @@ static int pblk_read_from_cache(struct pblk *pblk, struct bio *bio,
+> >
+> >  static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+> >                                  struct bio *bio, sector_t blba,
+> > -                                unsigned long *read_bitmap)
+> > +                                struct pblk_read_info *info)
+> >  {
+> >         void *meta_list = rqd->meta_list;
+> > -       struct ppa_addr ppas[NVM_MAX_VLBA];
+> >         int nr_secs = rqd->nr_ppas;
+> >         bool advanced_bio = false;
+> > -       int i, j = 0;
+> > +       int i;
+> >
+> > -       pblk_lookup_l2p_seq(pblk, ppas, blba, nr_secs);
+> > +       pblk_lookup_l2p_seq(pblk, rqd->ppa_list, blba, nr_secs);
+> > +       info->first_sec_from_cache = nr_secs;
+> > +       info->first_sec_from_drive = nr_secs;
+> >
+> >         for (i = 0; i < nr_secs; i++) {
+> > -               struct ppa_addr p = ppas[i];
+> >                 struct pblk_sec_meta *meta = pblk_get_meta(pblk, meta_list, i);
+> >                 sector_t lba = blba + i;
+> >
+> >  retry:
+> > -               if (pblk_ppa_empty(p)) {
+> > +               if (pblk_ppa_empty(rqd->ppa_list[i])) {
+> >                         __le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
+> >
+> > -                       WARN_ON(test_and_set_bit(i, read_bitmap));
+> > -                       meta->lba = addr_empty;
+> > +                       info->secs_from_cache = true;
+> > +                       info->first_sec_from_cache = min_t(int, i,
+> > +                                               info->first_sec_from_cache);
+> >
+> > +                       meta->lba = addr_empty;
+> >                         if (unlikely(!advanced_bio)) {
+> >                                 bio_advance(bio, (i) * PBLK_EXPOSED_PAGE_SIZE);
+> >                                 advanced_bio = true;
+> > @@ -74,13 +76,18 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+> >                 /* Try to read from write buffer. The address is later checked
+> >                  * on the write buffer to prevent retrieving overwritten data.
+> >                  */
+> > -               if (pblk_addr_in_cache(p)) {
+> > -                       if (!pblk_read_from_cache(pblk, bio, lba, p, i,
+> > -                                                               advanced_bio)) {
+> > -                               pblk_lookup_l2p_seq(pblk, &p, lba, 1);
+> > +               if (pblk_addr_in_cache(rqd->ppa_list[i])) {
+> > +                       if (!pblk_read_from_cache(pblk, bio, lba,
+> > +                                       rqd->ppa_list[i], i, advanced_bio)) {
+> > +                               pblk_lookup_l2p_seq(pblk, &rqd->ppa_list[i],
+> > +                                                       lba, 1);
+> >                                 goto retry;
+> >                         }
+> > -                       WARN_ON(test_and_set_bit(i, read_bitmap));
+> > +
+> > +                       info->secs_from_cache = true;
+> > +                       info->first_sec_from_cache = min_t(int, i,
+> > +                                               info->first_sec_from_cache);
+> > +
+> >                         meta->lba = cpu_to_le64(lba);
+> >                         advanced_bio = true;
+> >  #ifdef CONFIG_NVM_PBLK_DEBUG
+> > @@ -88,7 +95,9 @@ static void pblk_read_ppalist_rq(struct pblk *pblk, struct nvm_rq *rqd,
+> >  #endif
+> >                 } else {
+> >                         /* Read from media non-cached sectors */
+> > -                       rqd->ppa_list[j++] = p;
+> > +                       info->secs_from_drive = true;
+> > +                       info->first_sec_from_drive = min_t(int, i,
+> > +                                               info->first_sec_from_drive);
+> >                 }
+> >
+> >  next:
+> > @@ -223,172 +232,8 @@ static void pblk_end_io_read(struct nvm_rq *rqd)
+> >         __pblk_end_io_read(pblk, rqd, true);
+> >  }
+> >
+> > -static void pblk_end_partial_read(struct nvm_rq *rqd)
+> > -{
+> > -       struct pblk *pblk = rqd->private;
+> > -       struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+> > -       struct pblk_pr_ctx *pr_ctx = r_ctx->private;
+> > -       struct pblk_sec_meta *meta;
+> > -       struct bio *new_bio = rqd->bio;
+> > -       struct bio *bio = pr_ctx->orig_bio;
+> > -       struct bio_vec src_bv, dst_bv;
+> > -       void *meta_list = rqd->meta_list;
+> > -       int bio_init_idx = pr_ctx->bio_init_idx;
+> > -       unsigned long *read_bitmap = pr_ctx->bitmap;
+> > -       int nr_secs = pr_ctx->orig_nr_secs;
+> > -       int nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
+> > -       void *src_p, *dst_p;
+> > -       int hole, i;
+> > -
+> > -       if (unlikely(nr_holes == 1)) {
+> > -               struct ppa_addr ppa;
+> > -
+> > -               ppa = rqd->ppa_addr;
+> > -               rqd->ppa_list = pr_ctx->ppa_ptr;
+> > -               rqd->dma_ppa_list = pr_ctx->dma_ppa_list;
+> > -               rqd->ppa_list[0] = ppa;
+> > -       }
+> > -
+> > -       for (i = 0; i < nr_secs; i++) {
+> > -               meta = pblk_get_meta(pblk, meta_list, i);
+> > -               pr_ctx->lba_list_media[i] = le64_to_cpu(meta->lba);
+> > -               meta->lba = cpu_to_le64(pr_ctx->lba_list_mem[i]);
+> > -       }
+> > -
+> > -       /* Fill the holes in the original bio */
+> > -       i = 0;
+> > -       hole = find_first_zero_bit(read_bitmap, nr_secs);
+> > -       do {
+> > -               struct pblk_line *line;
+> > -
+> > -               line = pblk_ppa_to_line(pblk, rqd->ppa_list[i]);
+> > -               kref_put(&line->ref, pblk_line_put);
+> > -
+> > -               meta = pblk_get_meta(pblk, meta_list, hole);
+> > -               meta->lba = cpu_to_le64(pr_ctx->lba_list_media[i]);
+> > -
+> > -               src_bv = new_bio->bi_io_vec[i++];
+> > -               dst_bv = bio->bi_io_vec[bio_init_idx + hole];
+> > -
+> > -               src_p = kmap_atomic(src_bv.bv_page);
+> > -               dst_p = kmap_atomic(dst_bv.bv_page);
+> > -
+> > -               memcpy(dst_p + dst_bv.bv_offset,
+> > -                       src_p + src_bv.bv_offset,
+> > -                       PBLK_EXPOSED_PAGE_SIZE);
+> > -
+> > -               kunmap_atomic(src_p);
+> > -               kunmap_atomic(dst_p);
+> > -
+> > -               mempool_free(src_bv.bv_page, &pblk->page_bio_pool);
+> > -
+> > -               hole = find_next_zero_bit(read_bitmap, nr_secs, hole + 1);
+> > -       } while (hole < nr_secs);
+> > -
+> > -       bio_put(new_bio);
+> > -       kfree(pr_ctx);
+> > -
+> > -       /* restore original request */
+> > -       rqd->bio = NULL;
+> > -       rqd->nr_ppas = nr_secs;
+> > -
+> > -       pblk_end_user_read(bio, rqd->error);
+> > -       __pblk_end_io_read(pblk, rqd, false);
+> > -}
+> > -
+> > -static int pblk_setup_partial_read(struct pblk *pblk, struct nvm_rq *rqd,
+> > -                           unsigned int bio_init_idx,
+> > -                           unsigned long *read_bitmap,
+> > -                           int nr_holes)
+> > -{
+> > -       void *meta_list = rqd->meta_list;
+> > -       struct pblk_g_ctx *r_ctx = nvm_rq_to_pdu(rqd);
+> > -       struct pblk_pr_ctx *pr_ctx;
+> > -       struct bio *new_bio, *bio = r_ctx->private;
+> > -       int nr_secs = rqd->nr_ppas;
+> > -       int i;
+> > -
+> > -       new_bio = bio_alloc(GFP_KERNEL, nr_holes);
+> > -
+> > -       if (pblk_bio_add_pages(pblk, new_bio, GFP_KERNEL, nr_holes))
+> > -               goto fail_bio_put;
+> > -
+> > -       if (nr_holes != new_bio->bi_vcnt) {
+> > -               WARN_ONCE(1, "pblk: malformed bio\n");
+> > -               goto fail_free_pages;
+> > -       }
+> > -
+> > -       pr_ctx = kzalloc(sizeof(struct pblk_pr_ctx), GFP_KERNEL);
+> > -       if (!pr_ctx)
+> > -               goto fail_free_pages;
+> > -
+> > -       for (i = 0; i < nr_secs; i++) {
+> > -               struct pblk_sec_meta *meta = pblk_get_meta(pblk, meta_list, i);
+> > -
+> > -               pr_ctx->lba_list_mem[i] = le64_to_cpu(meta->lba);
+> > -       }
+> > -
+> > -       new_bio->bi_iter.bi_sector = 0; /* internal bio */
+> > -       bio_set_op_attrs(new_bio, REQ_OP_READ, 0);
+> > -
+> > -       rqd->bio = new_bio;
+> > -       rqd->nr_ppas = nr_holes;
+> > -
+> > -       pr_ctx->orig_bio = bio;
+> > -       bitmap_copy(pr_ctx->bitmap, read_bitmap, NVM_MAX_VLBA);
+> > -       pr_ctx->bio_init_idx = bio_init_idx;
+> > -       pr_ctx->orig_nr_secs = nr_secs;
+> > -       r_ctx->private = pr_ctx;
+> > -
+> > -       if (unlikely(nr_holes == 1)) {
+> > -               pr_ctx->ppa_ptr = rqd->ppa_list;
+> > -               pr_ctx->dma_ppa_list = rqd->dma_ppa_list;
+> > -               rqd->ppa_addr = rqd->ppa_list[0];
+> > -       }
+> > -       return 0;
+> > -
+> > -fail_free_pages:
+> > -       pblk_bio_free_pages(pblk, new_bio, 0, new_bio->bi_vcnt);
+> > -fail_bio_put:
+> > -       bio_put(new_bio);
+> > -
+> > -       return -ENOMEM;
+> > -}
+> > -
+> > -static int pblk_partial_read_bio(struct pblk *pblk, struct nvm_rq *rqd,
+> > -                                unsigned int bio_init_idx,
+> > -                                unsigned long *read_bitmap, int nr_secs)
+> > -{
+> > -       int nr_holes;
+> > -       int ret;
+> > -
+> > -       nr_holes = nr_secs - bitmap_weight(read_bitmap, nr_secs);
+> > -
+> > -       if (pblk_setup_partial_read(pblk, rqd, bio_init_idx, read_bitmap,
+> > -                                   nr_holes))
+> > -               return NVM_IO_ERR;
+> > -
+> > -       rqd->end_io = pblk_end_partial_read;
+> > -
+> > -       ret = pblk_submit_io(pblk, rqd);
+> > -       if (ret) {
+> > -               bio_put(rqd->bio);
+> > -               pblk_err(pblk, "partial read IO submission failed\n");
+> > -               goto err;
+> > -       }
+> > -
+> > -       return NVM_IO_OK;
+> > -
+> > -err:
+> > -       pblk_err(pblk, "failed to perform partial read\n");
+> > -
+> > -       /* Free allocated pages in new bio */
+> > -       pblk_bio_free_pages(pblk, rqd->bio, 0, rqd->bio->bi_vcnt);
+> > -       return NVM_IO_ERR;
+> > -}
+> > -
+> >  static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd, struct bio *bio,
+> > -                        sector_t lba, unsigned long *read_bitmap)
+> > +                        sector_t lba, struct pblk_read_info *info)
+> >  {
+> >         struct pblk_sec_meta *meta = pblk_get_meta(pblk, rqd->meta_list, 0);
+> >         struct ppa_addr ppa;
+> > @@ -403,8 +248,8 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd, struct bio *bio,
+> >         if (pblk_ppa_empty(ppa)) {
+> >                 __le64 addr_empty = cpu_to_le64(ADDR_EMPTY);
+> >
+> > -               WARN_ON(test_and_set_bit(0, read_bitmap));
+> >                 meta->lba = addr_empty;
+> > +               info->secs_from_cache = true;
+> >                 return;
+> >         }
+> >
+> > @@ -417,14 +262,14 @@ static void pblk_read_rq(struct pblk *pblk, struct nvm_rq *rqd, struct bio *bio,
+> >                         goto retry;
+> >                 }
+> >
+> > -               WARN_ON(test_and_set_bit(0, read_bitmap));
+> >                 meta->lba = cpu_to_le64(lba);
+> > -
+> > +               info->secs_from_cache = true;
+> >  #ifdef CONFIG_NVM_PBLK_DEBUG
+> >                 atomic_long_inc(&pblk->cache_reads);
+> >  #endif
+> >         } else {
+> >                 rqd->ppa_addr = ppa;
+> > +               info->secs_from_drive = true;
+> >         }
+> >  }
+> >
+> > @@ -436,15 +281,12 @@ void pblk_submit_read(struct pblk *pblk, struct bio *bio)
+> >         unsigned int nr_secs = pblk_get_secs(bio);
+> >         struct pblk_g_ctx *r_ctx;
+> >         struct nvm_rq *rqd;
+> > -       struct bio *int_bio;
+> > -       unsigned int bio_init_idx;
+> > -       DECLARE_BITMAP(read_bitmap, NVM_MAX_VLBA);
+> > +       struct bio *int_bio, *split_bio;
+> > +       struct pblk_read_info info = {0};
+> >
+> >         generic_start_io_acct(q, REQ_OP_READ, bio_sectors(bio),
+> >                               &pblk->disk->part0);
+> >
+> > -       bitmap_zero(read_bitmap, nr_secs);
+> > -
+> >         rqd = pblk_alloc_rqd(pblk, PBLK_READ);
+> >
+> >         rqd->opcode = NVM_OP_PREAD;
+> > @@ -456,11 +298,6 @@ void pblk_submit_read(struct pblk *pblk, struct bio *bio)
+> >         r_ctx->start_time = jiffies;
+> >         r_ctx->lba = blba;
+> >
+> > -       /* Save the index for this bio's start. This is needed in case
+> > -        * we need to fill a partial read.
+> > -        */
+> > -       bio_init_idx = pblk_get_bi_idx(bio);
+> > -
+> >         if (pblk_alloc_rqd_meta(pblk, rqd)) {
+> >                 bio_io_error(bio);
+> >                 pblk_free_rqd(pblk, rqd, PBLK_READ);
+> > @@ -474,34 +311,63 @@ void pblk_submit_read(struct pblk *pblk, struct bio *bio)
+> >         int_bio = bio_clone_fast(bio, GFP_KERNEL, &pblk_bio_set);
+> >
+> >         if (nr_secs > 1)
+> > -               pblk_read_ppalist_rq(pblk, rqd, bio, blba, read_bitmap);
+> > +               pblk_read_ppalist_rq(pblk, rqd, int_bio, blba, &info);
+> >         else
+> > -               pblk_read_rq(pblk, rqd, bio, blba, read_bitmap);
+> > +               pblk_read_rq(pblk, rqd, int_bio, blba, &info);
+> >
+> > +split_retry:
+> >         r_ctx->private = bio; /* original bio */
+> >         rqd->bio = int_bio; /* internal bio */
+> >
+> > -       if (bitmap_full(read_bitmap, nr_secs)) {
+> > +       if (info.secs_from_cache && !info.secs_from_drive) {
+> >                 pblk_end_user_read(bio, 0);
+> >                 atomic_inc(&pblk->inflight_io);
+> >                 __pblk_end_io_read(pblk, rqd, false);
+> >                 return;
+> >         }
+> >
+> > -       if (!bitmap_empty(read_bitmap, rqd->nr_ppas)) {
+> > +       if (info.secs_from_cache && info.secs_from_drive) {
+> >                 /* The read bio request could be partially filled by the write
+> >                  * buffer, but there are some holes that need to be read from
+> > -                * the drive.
+> > +                * the drive. In order to handle this, we will use block layer
+> > +                * mechanism to split this request in to smaller ones and make
+> > +                * a chain of it.
+> > +                */
+> > +               int split = max_t(int, info.first_sec_from_cache,
+> > +                                       info.first_sec_from_drive);
+> > +
+> > +               split_bio = bio_split(bio, split * NR_PHY_IN_LOG, GFP_KERNEL,
+> > +                                       &pblk_bio_set);
+> > +               bio_chain(split_bio, bio);
+> > +               generic_make_request(bio);
+> > +
+> > +               /* New bio contains first N sectors of the previous one, so
+> > +                * we can continue to use existing rqd, but we need to shrink
+> > +                * the number of PPAs in it. We also need to release line
+> > +                * references on the rest of the PPAs. Finally we also need
+> > +                * to update pblk_read_info struct properly in order to avoid
+> > +                * another interation of l2p lookup.
+> > +                */
+> > +               bio = split_bio;
+> > +               pblk_rq_to_line_partial_put(pblk, rqd, split);
+> > +#ifdef CONFIG_NVM_PBLK_DEBUG
+> > +               atomic_long_sub((rqd->nr_ppas - split), &pblk->inflight_reads);
+> > +#endif
+> > +               rqd->nr_ppas = split;
+> > +               if (rqd->nr_ppas == 1)
+> > +                       rqd->ppa_addr = rqd->ppa_list[0];
+> > +
+> > +               if (info.first_sec_from_cache > info.first_sec_from_drive)
+> > +                       info.secs_from_cache = false;
+> > +               else
+> > +                       info.secs_from_drive = false;
+> > +
+> > +               /* Recreate int_bio - existing might have some needed internal
+> > +                * fields modified already.
+> >                  */
+> >                 bio_put(int_bio);
+> > -               rqd->bio = NULL;
+> > -               if (pblk_partial_read_bio(pblk, rqd, bio_init_idx, read_bitmap,
+> > -                                           nr_secs)) {
+> > -                       pblk_err(pblk, "read IO submission failed\n");
+> > -                       bio_io_error(bio);
+> > -                       __pblk_end_io_read(pblk, rqd, false);
+> > -               }
+> > -               return;
+> > +               int_bio = bio_clone_fast(bio, GFP_KERNEL, &pblk_bio_set);
+> > +               goto split_retry;
+> >         }
+> >
+> >         /* All sectors are to be read from the device */
+> > diff --git a/drivers/lightnvm/pblk.h b/drivers/lightnvm/pblk.h
+> > index a3c925d..e284a93 100644
+> > --- a/drivers/lightnvm/pblk.h
+> > +++ b/drivers/lightnvm/pblk.h
+> > @@ -123,18 +123,6 @@ struct pblk_g_ctx {
+> >         u64 lba;
+> >  };
+> >
+> > -/* partial read context */
+> > -struct pblk_pr_ctx {
+> > -       struct bio *orig_bio;
+> > -       DECLARE_BITMAP(bitmap, NVM_MAX_VLBA);
+> > -       unsigned int orig_nr_secs;
+> > -       unsigned int bio_init_idx;
+> > -       void *ppa_ptr;
+> > -       dma_addr_t dma_ppa_list;
+> > -       u64 lba_list_mem[NVM_MAX_VLBA];
+> > -       u64 lba_list_media[NVM_MAX_VLBA];
+> > -};
+> > -
+> >  /* Pad context */
+> >  struct pblk_pad_rq {
+> >         struct pblk *pblk;
+> > @@ -726,6 +714,14 @@ struct pblk_line_ws {
+> >         struct work_struct ws;
+> >  };
+> >
+> > +/* L2P lookup on read path info */
+> > +struct pblk_read_info {
+> > +       int first_sec_from_cache;
+> > +       int first_sec_from_drive;
+> > +       bool secs_from_cache;
+> > +       bool secs_from_drive;
+> > +};
+> > +
+> >  #define pblk_g_rq_size (sizeof(struct nvm_rq) + sizeof(struct pblk_g_ctx))
+> >  #define pblk_w_rq_size (sizeof(struct nvm_rq) + sizeof(struct pblk_c_ctx))
+> >
+> > @@ -809,6 +805,8 @@ struct pblk_line *pblk_line_get_first_data(struct pblk *pblk);
+> >  struct pblk_line *pblk_line_replace_data(struct pblk *pblk);
+> >  void pblk_ppa_to_line_put(struct pblk *pblk, struct ppa_addr ppa);
+> >  void pblk_rq_to_line_put(struct pblk *pblk, struct nvm_rq *rqd);
+> > +void pblk_rq_to_line_partial_put(struct pblk *pblk, struct nvm_rq *rqd,
+> > +                                       int offset);
+> >  int pblk_line_recov_alloc(struct pblk *pblk, struct pblk_line *line);
+> >  void pblk_line_recov_close(struct pblk *pblk, struct pblk_line *line);
+> >  struct pblk_line *pblk_line_get_data(struct pblk *pblk);
+> > --
+> > 2.9.5
+> >
