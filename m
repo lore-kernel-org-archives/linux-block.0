@@ -6,142 +6,133 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BC6CC43381
-	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 15:40:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B95C43381
+	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 22:00:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3A49D20882
-	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 15:40:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46B7D20872
+	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 22:00:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731216AbfCaPk2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 31 Mar 2019 11:40:28 -0400
-Received: from mx1.didichuxing.com ([111.202.154.82]:22057 "HELO
-        bsf02.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with SMTP id S1731162AbfCaPk2 (ORCPT
+        id S1731369AbfCaWAG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 31 Mar 2019 18:00:06 -0400
+Received: from ipmail06.adl2.internode.on.net ([150.101.137.129]:38463 "EHLO
+        ipmail06.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731172AbfCaWAG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 31 Mar 2019 11:40:28 -0400
-X-Greylist: delayed 687 seconds by postgrey-1.27 at vger.kernel.org; Sun, 31 Mar 2019 11:40:17 EDT
-X-ASG-Debug-ID: 1554046126-0e41083ba3135a60001-Cu09wu
-Received: from BJEXMBX012.didichuxing.com (bjexmbx012.didichuxing.com [172.20.2.191]) by bsf02.didichuxing.com with ESMTP id ciWaJdIvxiB4XEXX; Sun, 31 Mar 2019 23:28:46 +0800 (CST)
-X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
-Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
- (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1263.5; Sun, 31 Mar
- 2019 23:28:46 +0800
-Date:   Sun, 31 Mar 2019 23:28:40 +0800
-From:   weiping zhang <zhangweiping@didichuxing.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-CC:     Weiping Zhang <zhangweiping@didiglobal.com>, <axboe@kernel.dk>,
-        <hch@infradead.org>, <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] block: don't show io_timeout if driver has no timeout
- handler
-Message-ID: <20190331152824.GA29577@192.168.3.9>
-X-ASG-Orig-Subj: Re: [PATCH] block: don't show io_timeout if driver has no timeout
- handler
-Mail-Followup-To: Bart Van Assche <bvanassche@acm.org>,
-        Weiping Zhang <zhangweiping@didiglobal.com>, axboe@kernel.dk,
-        hch@infradead.org, linux-block@vger.kernel.org
-References: <20190107125215.GA5039@192.168.3.9>
- <1546995460.83374.37.camel@acm.org>
+        Sun, 31 Mar 2019 18:00:06 -0400
+Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
+  by ipmail06.adl2.internode.on.net with ESMTP; 01 Apr 2019 08:30:03 +1030
+Received: from dave by dastard with local (Exim 4.80)
+        (envelope-from <david@fromorbit.com>)
+        id 1hAiUj-0003xk-FQ; Mon, 01 Apr 2019 09:00:01 +1100
+Date:   Mon, 1 Apr 2019 09:00:01 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Bob Liu <bob.liu@oracle.com>,
+        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, shirley.ma@oracle.com,
+        allison.henderson@oracle.com, darrick.wong@oracle.com,
+        hch@infradead.org, adilger@dilger.ca, tytso@mit.edu
+Subject: Re: [PATCH v3 2/3] block: verify data when endio
+Message-ID: <20190331220001.GM23020@dastard>
+References: <41c8688a-65bd-96ac-9b23-4facd0ade4a7@kernel.dk>
+ <yq1ftr5rbq1.fsf@oracle.com>
+ <f65d6a7b-9e69-ae1e-b8b8-8769dc650311@kernel.dk>
+ <yq1bm1trb4y.fsf@oracle.com>
+ <feefa611-b744-326c-29d5-c64bcda45d9f@kernel.dk>
+ <yq17echrax1.fsf@oracle.com>
+ <1b638dc2-56fd-6ab4-dcca-ad2adb9931bb@kernel.dk>
+ <c9adb48c-7b6e-2017-9480-aa2342b3523b@oracle.com>
+ <7599b239-46f4-9799-a87a-3ca3891d4a08@kernel.dk>
+ <yq1imw1p0lp.fsf@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1546995460.83374.37.camel@acm.org>
+In-Reply-To: <yq1imw1p0lp.fsf@oracle.com>
 User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Originating-IP: [172.22.50.20]
-X-ClientProxiedBy: BJEXCAS004.didichuxing.com (172.20.1.44) To
- BJSGEXMBX03.didichuxing.com (172.20.15.133)
-X-Barracuda-Connect: bjexmbx012.didichuxing.com[172.20.2.191]
-X-Barracuda-Start-Time: 1554046126
-X-Barracuda-URL: https://bsf02.didichuxing.com:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at didichuxing.com
-X-Barracuda-Scan-Msg-Size: 2708
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.69237
-        Rule breakdown below
-         pts rule name              description
-        ---- ---------------------- --------------------------------------------------
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jan 08, 2019 at 04:57:40PM -0800, Bart Van Assche wrote:
-Hi Bart,
-Sorry to reply so late.
-> On Mon, 2019-01-07 at 20:52 +0800, Weiping Zhang wrote:
-> > If the low level driver has no timerout handler, the
->                                  ^^^^^^^^
->                                  timeout?
+On Fri, Mar 29, 2019 at 10:17:22PM -0400, Martin K. Petersen wrote:
 > 
-OK, I'll fix this spelling mistake.
-> > +static umode_t queue_attr_visible(struct kobject *kobj, struct attribute *attr,
-> > +				int n)
-> > +{
-> > +	struct request_queue *q =
-> > +		container_of(kobj, struct request_queue, kobj);
-> > +
-> > +	if (attr == &queue_io_timeout_entry.attr) {
-> > +		if (!q->mq_ops || !q->mq_ops->timeout)
-> > +			return 0;
-> > +	}
+> Jens,
 > 
-> Are there any legacy block drivers left? Do we really need the mq_ops test?
-As request_fn removed, now we can use mq_ops->timeout directly.
+> > You will not need a callback in the bio, you will just have a private
+> > end_io function for that particular bio that does the verification.
 > 
-> Additionally, please combine the two nested if-statements into a single
-> if-statement.
-OK, it's more clear.
+> The saving grace for the integrity stuff is that once all the child bios
+> complete, we no longer care about their completion context and we have
+> the parent bio submitted by the filesystem we can use to verify the PI
+> against.
 > 
-> > @@ -942,6 +961,14 @@ int blk_register_queue(struct gendisk *disk)
-> >  		goto unlock;
-> >  	}
-> >  
-> > +	ret = sysfs_create_group(&q->kobj, &queue_attr_group);
-> > +	if (ret) {
-> > +		kobject_del(&q->kobj);
-> > +		blk_trace_remove_sysfs(dev);
-> > +		kobject_put(&dev->kobj);
-> > +		goto unlock;
-> > +	}
-> 
-> Are you sure the "goto unlock" is OK here? Shouldn't kobject_del() be called
-> to undo the kobject_add() call if sysfs_create_group() fails?
-Sorry, can you tell me why it's may be not safe, if goto unlock here,
-if failed to call sysfs_create_group, I think we should call
-kobject_del.
-> 
-> >  	if (queue_is_mq(q)) {
-> >  		__blk_mq_register_dev(dev, q);
-> >  		blk_mq_debugfs_register(q);
-> > @@ -958,6 +985,7 @@ int blk_register_queue(struct gendisk *disk)
-> >  		if (ret) {
-> >  			mutex_unlock(&q->sysfs_lock);
-> >  			kobject_uevent(&q->kobj, KOBJ_REMOVE);
-> > +			sysfs_remove_group(&q->kobj, &queue_attr_group);
-> >  			kobject_del(&q->kobj);
-> >  			blk_trace_remove_sysfs(dev);
-> >  			kobject_put(&dev->kobj);
-> > @@ -1006,6 +1034,7 @@ void blk_unregister_queue(struct gendisk *disk)
-> >  		blk_mq_unregister_dev(disk_to_dev(disk), q);
-> >  	mutex_unlock(&q->sysfs_lock);
-> >  
-> > +	sysfs_remove_group(&q->kobj, &queue_attr_group);
-> >  	kobject_uevent(&q->kobj, KOBJ_REMOVE);
-> >  	kobject_del(&q->kobj);
-> >  	blk_trace_remove_sysfs(disk_to_dev(disk));
-> 
-> Is it necessary to call sysfs_remove_group() explicitly? Isn't this something
-> kobject_del() does automatically?
-I check kobject_del, it's same as you said,
-kobject_del->sysfs_remove_dir->kernfs_remove, it will remove all files
-and subdirectories belong this kobject directory.
-> 
-> Thanks,
-> 
-Thanks
+> For the redundant copy use case, however, I am guessing that the
+> filesystem folks would want the same thing. I.e. verify the structure of
+> the data received once the parent bio completes. However, at that point
+> all the slicing and dicing completion state is lost.
 
-Weiping
-> Bart.
-> 
+Right, that's the problem. We already run the verifier on completion
+of the bio that the filesytsem sends down the stack, but that then
+means....
+
+> And thus there is
+> no way to know that the failure was due to mirror B two layers down the
+> stack. Nor is there any way to retry the I/O without having recorded a
+> completion breadcrumb trail for every child bio.
+
+.... we have this problem when the verifier fails. i.e. the bio
+needs to contain sufficient information for the filesystem to
+implement some robust retry mechanism without having any clue what
+lies below it or what failed.
+
+> The other approach is the callback where each stacking layer--which
+> knows about redundancy--can do verification of a bio upon completion.
+
+*nod*
+
+> However, that suffers from another headache in that the I/O can get
+> arbitrarily sliced and diced in units of 512 bytes.
+
+Right, but we don't need support that insane case. Indeed, if
+it wasn't already obvious, we _can't support it_ because the
+filesystem verifiers can't do partial verification. i.e.  part of
+the verification is CRC validation of the whole bio, not to mention
+that filesystem structure fragments cannot be safely parsed,
+interpretted and/or verified without the whole structure first being
+read in.
+
+This means the verifier is only useful if the entire IO can be
+passed down to the next layer. IOWs, if the bio has to be sliced and
+diced to be issued to the next layer down, then we have a hard stop
+on verifier propagation. Put simply, the verifier can only be run at
+the lowest layer that sees the whole parent bio context. Hence
+sliced and diced child bios won't have the parent verifier attached
+to them, and so we can ignore the whole "slice and dice" problem
+altogether.
+
+Further, arguing about slicing and dicing misses the key observation
+that the filesystem can largely avoid slicing and dicing for most
+common cases. i.e. the IO sizes (XFS metadata!) we are talking about
+here and their alignment to the underlying block devices are very
+small and so are extremely unlikely to cross multi-device
+boundaries.  And, of course, if the underlying device can't verify
+the biofor whatever reason, we'll still do it at the filesystem IO
+completion and so detect corruption like we do now.
+
+IOWs, we need to look at this problem from a "whole stack" point of
+view, not just cry about how "bios are too flexible and so make this
+too hard!". The filesystem greatly constrains the alignment and
+slicing/dicing problem to the point where it should be non-existent,
+we have a clearly defined hard stop where verifier propagation
+terminates, and if all else fails we can still detect corruption at
+the filesystem level just like we do now. The worst thing that
+happens here is we give up the capability for automatic block device
+recovery and repair of damaged copies, which we can't do right now,
+so it's essentially status quo...
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
