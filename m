@@ -3,136 +3,91 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77B95C43381
-	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 22:00:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76B53C43381
+	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 22:45:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 46B7D20872
-	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 22:00:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 440912086C
+	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 22:45:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731369AbfCaWAG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 31 Mar 2019 18:00:06 -0400
-Received: from ipmail06.adl2.internode.on.net ([150.101.137.129]:38463 "EHLO
-        ipmail06.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731172AbfCaWAG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sun, 31 Mar 2019 18:00:06 -0400
-Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
-  by ipmail06.adl2.internode.on.net with ESMTP; 01 Apr 2019 08:30:03 +1030
-Received: from dave by dastard with local (Exim 4.80)
-        (envelope-from <david@fromorbit.com>)
-        id 1hAiUj-0003xk-FQ; Mon, 01 Apr 2019 09:00:01 +1100
-Date:   Mon, 1 Apr 2019 09:00:01 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Bob Liu <bob.liu@oracle.com>,
-        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, shirley.ma@oracle.com,
-        allison.henderson@oracle.com, darrick.wong@oracle.com,
-        hch@infradead.org, adilger@dilger.ca, tytso@mit.edu
-Subject: Re: [PATCH v3 2/3] block: verify data when endio
-Message-ID: <20190331220001.GM23020@dastard>
-References: <41c8688a-65bd-96ac-9b23-4facd0ade4a7@kernel.dk>
- <yq1ftr5rbq1.fsf@oracle.com>
- <f65d6a7b-9e69-ae1e-b8b8-8769dc650311@kernel.dk>
- <yq1bm1trb4y.fsf@oracle.com>
- <feefa611-b744-326c-29d5-c64bcda45d9f@kernel.dk>
- <yq17echrax1.fsf@oracle.com>
- <1b638dc2-56fd-6ab4-dcca-ad2adb9931bb@kernel.dk>
- <c9adb48c-7b6e-2017-9480-aa2342b3523b@oracle.com>
- <7599b239-46f4-9799-a87a-3ca3891d4a08@kernel.dk>
- <yq1imw1p0lp.fsf@oracle.com>
+        id S1731335AbfCaWpy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 31 Mar 2019 18:45:54 -0400
+Received: from fieldses.org ([173.255.197.46]:34514 "EHLO fieldses.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731172AbfCaWpy (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 31 Mar 2019 18:45:54 -0400
+Received: by fieldses.org (Postfix, from userid 2815)
+        id D30141EF6; Sun, 31 Mar 2019 18:45:53 -0400 (EDT)
+Date:   Sun, 31 Mar 2019 18:45:53 -0400
+To:     Qu Wenruo <quwenruo.btrfs@gmx.com>
+Cc:     Supercilious Dude <supercilious.dude@gmail.com>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        linux-block@vger.kernel.org
+Subject: Re: Is it possible that certain physical disk doesn't implement
+ flush correctly?
+Message-ID: <20190331224553.GA17421@fieldses.org>
+References: <dc1735e6-e410-e593-7059-3728eb427886@gmx.com>
+ <CAGmvKk7bYkaNXGe4agwLWmM_YM7Sjfn1NjBheQ=FzcJmUkZcGg@mail.gmail.com>
+ <16edb2d0-ee41-908f-e0bf-5c27160ccff7@gmx.com>
+ <CAGmvKk5wk9RFhBr20X850MjFDkudzrZvjWVJxGg4GkhtrDfKUw@mail.gmail.com>
+ <948a62d3-aa3e-418e-00df-d73d4dbfb5a6@gmx.com>
+ <CAGmvKk5wFJNLbiJdYGA5PVFUnAURfN4Uk=JiGUaCndcepa51NA@mail.gmail.com>
+ <4f5586f7-aef1-4e2a-2aee-5d040c023c68@gmx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <yq1imw1p0lp.fsf@oracle.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4f5586f7-aef1-4e2a-2aee-5d040c023c68@gmx.com>
 User-Agent: Mutt/1.5.21 (2010-09-15)
+From:   bfields@fieldses.org (J. Bruce Fields)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 29, 2019 at 10:17:22PM -0400, Martin K. Petersen wrote:
+On Sat, Mar 30, 2019 at 09:24:37PM +0800, Qu Wenruo wrote:
 > 
-> Jens,
 > 
-> > You will not need a callback in the bio, you will just have a private
-> > end_io function for that particular bio that does the verification.
+> On 2019/3/30 下午9:14, Supercilious Dude wrote:
+> > On Sat, 30 Mar 2019 at 13:09, Qu Wenruo <quwenruo.btrfs@gmx.com> wrote:
+> >>
+> >> If controller is doing so, it must have its own power or at least finish
+> >> flush when controller writes to its fast cache.
+> >>
+> > 
+> > The controller has its own battery backup to power the DRAM cache, as
+> > well as flash storage to dump it onto in the exceedingly unlikely
+> > event that the battery gets depleted.
+> > 
+> >> For cache case, if we have enough data, we could still find some clue on
+> >> the flush execution time.
+> >>
+> >> Despite that, for that enterprise level usage, it's OK.
+> >>
+> >> But for consumer level storage, I'm not sure, especially for HDDs, and
+> >> maybe NVMe devices.
+> >>
+> > 
+> > How do you distinguish who is a who? Am I an enterprise or a consumer?
 > 
-> The saving grace for the integrity stuff is that once all the child bios
-> complete, we no longer care about their completion context and we have
-> the parent bio submitted by the filesystem we can use to verify the PI
-> against.
+> Easy, price. :P
 > 
-> For the redundant copy use case, however, I am guessing that the
-> filesystem folks would want the same thing. I.e. verify the structure of
-> the data received once the parent bio completes. However, at that point
-> all the slicing and dicing completion state is lost.
+> To be honest, I don't really care about that fancy use case.
+> It's the vendor doing its work, and if something wrong happened,
+> customer will yell at them.
+> 
+> I'm more interesting in the consumer level situation.
 
-Right, that's the problem. We already run the verifier on completion
-of the bio that the filesytsem sends down the stack, but that then
-means....
+The feature seems to be advertised as "power loss protection" or
+"enhanced power loss data protection".  Which makes it sound like a data
+safety feature when really it's a performance feature.  E.g. these are
+the Intel drives with "EPLDP":
 
-> And thus there is
-> no way to know that the failure was due to mirror B two layers down the
-> stack. Nor is there any way to retry the I/O without having recorded a
-> completion breadcrumb trail for every child bio.
+	https://ark.intel.com/content/www/us/en/ark/search/featurefilter.html?productType=35125&0_EPLDP=True
 
-.... we have this problem when the verifier fails. i.e. the bio
-needs to contain sufficient information for the filesystem to
-implement some robust retry mechanism without having any clue what
-lies below it or what failed.
+Last I checked there were some that weren't too expensive.
 
-> The other approach is the callback where each stacking layer--which
-> knows about redundancy--can do verification of a bio upon completion.
-
-*nod*
-
-> However, that suffers from another headache in that the I/O can get
-> arbitrarily sliced and diced in units of 512 bytes.
-
-Right, but we don't need support that insane case. Indeed, if
-it wasn't already obvious, we _can't support it_ because the
-filesystem verifiers can't do partial verification. i.e.  part of
-the verification is CRC validation of the whole bio, not to mention
-that filesystem structure fragments cannot be safely parsed,
-interpretted and/or verified without the whole structure first being
-read in.
-
-This means the verifier is only useful if the entire IO can be
-passed down to the next layer. IOWs, if the bio has to be sliced and
-diced to be issued to the next layer down, then we have a hard stop
-on verifier propagation. Put simply, the verifier can only be run at
-the lowest layer that sees the whole parent bio context. Hence
-sliced and diced child bios won't have the parent verifier attached
-to them, and so we can ignore the whole "slice and dice" problem
-altogether.
-
-Further, arguing about slicing and dicing misses the key observation
-that the filesystem can largely avoid slicing and dicing for most
-common cases. i.e. the IO sizes (XFS metadata!) we are talking about
-here and their alignment to the underlying block devices are very
-small and so are extremely unlikely to cross multi-device
-boundaries.  And, of course, if the underlying device can't verify
-the biofor whatever reason, we'll still do it at the filesystem IO
-completion and so detect corruption like we do now.
-
-IOWs, we need to look at this problem from a "whole stack" point of
-view, not just cry about how "bios are too flexible and so make this
-too hard!". The filesystem greatly constrains the alignment and
-slicing/dicing problem to the point where it should be non-existent,
-we have a clearly defined hard stop where verifier propagation
-terminates, and if all else fails we can still detect corruption at
-the filesystem level just like we do now. The worst thing that
-happens here is we give up the capability for automatic block device
-recovery and repair of damaged copies, which we can't do right now,
-so it's essentially status quo...
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+--b.
