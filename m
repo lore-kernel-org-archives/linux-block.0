@@ -2,163 +2,98 @@ Return-Path: <SRS0=bw4W=SC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15622C10F00
-	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 03:11:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4D87C43381
+	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 11:27:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CE6F820881
-	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 03:11:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hgs8789z"
+	by mail.kernel.org (Postfix) with ESMTP id B1AD5206B7
+	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 11:27:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731114AbfCaDLs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 30 Mar 2019 23:11:48 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:41288 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731113AbfCaDLs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Sat, 30 Mar 2019 23:11:48 -0400
-Received: by mail-wr1-f68.google.com with SMTP id r4so7366657wrq.8;
-        Sat, 30 Mar 2019 20:11:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5BXAx0oPinNF+csSL1VCs9lI63B1cXxXTyYtnihNhOk=;
-        b=hgs8789zDdI281nC66/ObhkUviSxQnWoZm8NQts2t3Egq4LGTmFv58E1lrZ8NYDJQ2
-         +Yktj7DcZHzEOFbts290NJdtNICCb0Z97C/cKgNk+TIo0bKCSIVbVWn9Iuk8LzZzNiaX
-         8tA/b3Di8SrcLxn0Ts0F8gvff6b9U9cJA33oDCnNqaXyvss+YZE/vvLLQsOdCokHnMAC
-         /Tej9op5DeDwLQ0AhrIgP4o3dmlLYcbas9tujEAZ9URyYFOBn9jmUBSwc+ofwu/ZuIAp
-         tbiFciX+zYcab4CcNmdwrYALVdOu0EcspOw8m+3ER+1RdCM8npxPBNi3DXQ9bs0Tq9r0
-         Q/Hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5BXAx0oPinNF+csSL1VCs9lI63B1cXxXTyYtnihNhOk=;
-        b=arG72ej0QmcU8gFBC4/44peIXnlMvNAJaZTcEkwfqF6QDYoexLGH3CtnLYHvzcOjrT
-         4YEe/vzM7d0V9JYZzYfzp5tc7DTmr6Tq7JJ8eFybPdKvizbYR0Ref5jERl1PbWhRLAn3
-         iIY85jY4Ry604sBj1NMn0LEIsQB7xFfEEMVtbAyejGubIW/4ajsJZWjY0gJruqo8Tj3h
-         5eT8M4g6B2PKYqtjaEjNOhQODuBIXSy6M9+HebD7dUagjw2Cu5gucJZsa0WbyINlqvSQ
-         4SVLWmfDD3fHVTLsBbnv2Ii5zUMkorMHcdTT0D3nlJsCZqAgEpgwJlUoNLXwrG/xhVTo
-         cegQ==
-X-Gm-Message-State: APjAAAUCXLerQA86tU+MZop/rxhCDiw/NhWaVzW3AH2PakWRy6lzzf/w
-        /xI3I9HDvOThOZ33lHcH9MsEN8Oqs+rqiScnaxY=
-X-Google-Smtp-Source: APXvYqyrTZCEKOran2JekYmCJtF2HORbcTUQIQXsh67ycNOGFuQFmbCuZCd3nVpxBXz1BqpaiA7EA+9rI/l73htHZMs=
-X-Received: by 2002:adf:b60a:: with SMTP id f10mr34924757wre.116.1554001905970;
- Sat, 30 Mar 2019 20:11:45 -0700 (PDT)
+        id S1726941AbfCaL1Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 31 Mar 2019 07:27:24 -0400
+Received: from mail-oln040092065108.outbound.protection.outlook.com ([40.92.65.108]:31876
+        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726873AbfCaL1X (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 31 Mar 2019 07:27:23 -0400
+Received: from VE1EUR01FT059.eop-EUR01.prod.protection.outlook.com
+ (10.152.2.52) by VE1EUR01HT050.eop-EUR01.prod.protection.outlook.com
+ (10.152.3.140) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1750.16; Sun, 31 Mar
+ 2019 11:27:19 +0000
+Received: from AM0PR03MB5745.eurprd03.prod.outlook.com (10.152.2.53) by
+ VE1EUR01FT059.mail.protection.outlook.com (10.152.3.127) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1750.16 via Frontend Transport; Sun, 31 Mar 2019 11:27:19 +0000
+Received: from AM0PR03MB5745.eurprd03.prod.outlook.com
+ ([fe80::1c73:bc14:e50d:35d1]) by AM0PR03MB5745.eurprd03.prod.outlook.com
+ ([fe80::1c73:bc14:e50d:35d1%4]) with mapi id 15.20.1750.014; Sun, 31 Mar 2019
+ 11:27:19 +0000
+From:   Alberto Bursi <alberto.bursi@outlook.it>
+To:     Qu Wenruo <quwenruo.btrfs@gmx.com>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: Is it possible that certain physical disk doesn't implement flush
+ correctly?
+Thread-Topic: Is it possible that certain physical disk doesn't implement
+ flush correctly?
+Thread-Index: AQHU5vSOIf8Y3Zji40ahBYvjFy94yKYlm3uA
+Date:   Sun, 31 Mar 2019 11:27:19 +0000
+Message-ID: <AM0PR03MB5745ACEC53F69BC28AC480F592540@AM0PR03MB5745.eurprd03.prod.outlook.com>
+References: <dc1735e6-e410-e593-7059-3728eb427886@gmx.com>
+In-Reply-To: <dc1735e6-e410-e593-7059-3728eb427886@gmx.com>
+Accept-Language: it-IT, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: PR0P264CA0006.FRAP264.PROD.OUTLOOK.COM (2603:10a6:100::18)
+ To AM0PR03MB5745.eurprd03.prod.outlook.com (2603:10a6:208:176::10)
+x-incomingtopheadermarker: OriginalChecksum:9016FA4FF31A8488B0DD308BDC7DF16FF9706F1D51ECEA855C32BF25D10FDD25;UpperCasedChecksum:980921BD897A50AFB192B81F5CDEE7F9C9C893FCCCB37E4F70ACD1216DB54B04;SizeAsReceived:7620;Count:49
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tmn:  [xjxld9DUFhSAGZnyb47Y0ITT5hZZdGml]
+x-microsoft-original-message-id: <8d3c3a30-0854-ca94-8fc4-0e835cfdd1c7@outlook.it>
+x-ms-publictraffictype: Email
+x-incomingheadercount: 49
+x-eopattributedmessage: 0
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(20181119110)(201702061078)(5061506573)(5061507331)(1603103135)(2017031320274)(2017031322404)(2017031324274)(2017031323274)(1601125500)(1603101475)(1701031045);SRVR:VE1EUR01HT050;
+x-ms-traffictypediagnostic: VE1EUR01HT050:
+x-microsoft-antispam-message-info: j2aq/0rYxDfqvlCeEXrli12oxK82quBo7AFWszfv82r3qKxB1tKTzGY0zOOhqL6N
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D22C06D166AC944C83AC21480DEAED11@eurprd03.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20181114082551.12141-1-ming.lei@redhat.com> <63c063ad-7d74-4268-bfd4-2de89908949e@kernel.dk>
- <4e24ace9-c83f-5311-5419-18f4a0fb5148@kernel.dk> <20181122010034.GA20814@ming.t460p>
- <dc374ec8-2ea2-0792-4677-0ae81fa7826e@kernel.dk> <baba41b1-8495-8bd1-0bea-341d207852a7@broadcom.com>
-In-Reply-To: <baba41b1-8495-8bd1-0bea-341d207852a7@broadcom.com>
-From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Sun, 31 Mar 2019 11:11:33 +0800
-Message-ID: <CACVXFVNRd7+C9ASNex8DY5eK+Cq4Y4d+hd-rhvLcLcWn9whh4Q@mail.gmail.com>
-Subject: Re: [PATCH V2] SCSI: fix queue cleanup race before queue
- initialization is done
-To:     James Smart <james.smart@broadcom.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Linux SCSI List <linux-scsi@vger.kernel.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        stable <stable@vger.kernel.org>,
-        "jianchao . wang" <jianchao.w.wang@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: a7122734-3e44-41ed-e4fc-08d6b5cbd5c5
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Mar 2019 11:27:19.6263
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Internet
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1EUR01HT050
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Mar 30, 2019 at 4:21 AM James Smart <james.smart@broadcom.com> wrote:
->
->
->
-> On 11/21/2018 5:42 PM, Jens Axboe wrote:
-> > On 11/21/18 6:00 PM, Ming Lei wrote:
-> >> On Wed, Nov 21, 2018 at 02:47:35PM -0700, Jens Axboe wrote:
-> >>> On 11/14/18 8:20 AM, Jens Axboe wrote:
-> >>>> On 11/14/18 1:25 AM, Ming Lei wrote:
-> >>>>> c2856ae2f315d ("blk-mq: quiesce queue before freeing queue") has
-> >>>>> already fixed this race, however the implied synchronize_rcu()
-> >>>>> in blk_mq_quiesce_queue() can slow down LUN probe a lot, so caused
-> >>>>> performance regression.
-> >>>>>
-> >>>>> Then 1311326cf4755c7 ("blk-mq: avoid to synchronize rcu inside blk_cleanup_queue()")
-> >>>>> tried to quiesce queue for avoiding unnecessary synchronize_rcu()
-> >>>>> only when queue initialization is done, because it is usual to see
-> >>>>> lots of inexistent LUNs which need to be probed.
-> >>>>>
-> >>>>> However, turns out it isn't safe to quiesce queue only when queue
-> >>>>> initialization is done. Because when one SCSI command is completed,
-> >>>>> the user of sending command can be waken up immediately, then the
-> >>>>> scsi device may be removed, meantime the run queue in scsi_end_request()
-> >>>>> is still in-progress, so kernel panic can be caused.
-> >>>>>
-> >>>>> In Red Hat QE lab, there are several reports about this kind of kernel
-> >>>>> panic triggered during kernel booting.
-> >>>>>
-> >>>>> This patch tries to address the issue by grabing one queue usage
-> >>>>> counter during freeing one request and the following run queue.
-> >>>> Thanks applied, this bug was elusive but ever present in recent
-> >>>> testing that we did internally, it's been a huge pain in the butt.
-> >>>> The symptoms were usually a crash in blk_mq_get_driver_tag() with
-> >>>> hctx->tags == NULL, or a crash inside deadline request insert off
-> >>>> requeue.
->
-> All,
->
-> We are seeing errors with the following error:
->
-> [44492.814347] BUG: unable to handle kernel NULL pointer dereference at
-> (null)
-> [44492.814383] IP: [<ffffffff8135a10b>] sbitmap_any_bit_set+0xb/0x30
-> ...
-> [44492.815634] Call Trace:
-> [44492.815652]  [<ffffffff81303a88>] blk_mq_run_hw_queues+0x48/0x90
-> [44492.819755]  [<ffffffff813053cc>] blk_mq_requeue_work+0x10c/0x120
-> [44492.819777]  [<ffffffff81098cb4>] process_one_work+0x154/0x410
-> [44492.819781]  [<ffffffff81099896>] worker_thread+0x116/0x4a0
-> [44492.819784]  [<ffffffff8109edb9>] kthread+0xc9/0xe0
-> [44492.819790]  [<ffffffff81619b05>] ret_from_fork+0x55/0x80
-> [44492.822798] DWARF2 unwinder stuck at ret_from_fork+0x55/0x80
-> [44492.822798]
-> [44492.822799] Leftover inexact backtrace:
->
-> [44492.822802]  [<ffffffff8109ecf0>] ? kthread_park+0x50/0x50
-> [44492.822818] Code: c6 44 0f 46 ce 83 c2 01 45 89 ca 4c 89 54 01 08 48
-> 8b 4f
-> 10 2b 74 01 08 39 57 08 77 d8 f3 c3 90 8b 4f 08 85 c9 74 1f 48 8b 57 10
-> <48> 83
-> 3a 00 75 18 31 c0 eb 0a 48 83 c2 40 48 83 3a 00 75 0a 83
-> [44492.822820] RIP  [<ffffffff8135a10b>] sbitmap_any_bit_set+0xb/0x30
-> [44492.822821]  RSP <ffff8807219ffdd8>
-> [44492.822821] CR2: 0000000000000000
->
-> It appears the queue has been freed thus the bitmap is bad.
->
-> Looking at the commit relative to this email thread:
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/scsi/scsi_lib.c?id=8dc765d438f1e42b3e8227b3b09fad7d73f4ec9a
->
-> It's interesting that the queue reference taken was released after the
-> kblockd_schedule_work() call was made, and it's this work element that
-> is hitting the issue. So perhaps the patch missed keeping the reference
-> until the requeue_work item finished ?
-
-Hi James,
-
-Please test the following patchset:
-
-https://lore.kernel.org/linux-block/20190331030954.22320-1-ming.lei@redhat.com/T/#u
-
-
-Thanks.
-Ming Lei
+DQpPbiAzMC8wMy8xOSAxMzozMSwgUXUgV2VucnVvIHdyb3RlOg0KPiBIaSwNCj4NCj4gSSdtIHdv
+bmRlcmluZyBpZiBpdCdzIHBvc3NpYmxlIHRoYXQgY2VydGFpbiBwaHlzaWNhbCBkZXZpY2UgZG9l
+c24ndA0KPiBoYW5kbGUgZmx1c2ggY29ycmVjdGx5Lg0KPg0KPiBFLmcuIHNvbWUgdmVuZG9yIGRv
+ZXMgc29tZSBjb21wbGV4IGxvZ2ljYWwgaW4gdGhlaXIgaGRkIGNvbnRyb2xsZXIgdG8NCj4gc2tp
+cCBjZXJ0YWluIGZsdXNoIHJlcXVlc3QgKGJ1dCBub3QgYWxsLCBvYnZpb3VzbHkpIHRvIGltcHJv
+dmUgcGVyZm9ybWFuY2U/DQo+DQo+IERvIGFueW9uZSBzZWUgc3VjaCByZXBvcnRzPw0KPg0KPiBB
+bmQgaWYgcHJvdmVzIHRvIGhhcHBlbmVkIGJlZm9yZSwgaG93IGRvIHdlIHVzZXJzIGRldGVjdCBz
+dWNoIHByb2JsZW0/DQo+DQo+IENhbiB3ZSBqdXN0IGNoZWNrIHRoZSBmbHVzaCB0aW1lIGFnYWlu
+c3QgdGhlIHdyaXRlIGJlZm9yZSBmbHVzaCBjYWxsPw0KPiBFLmcuIHdyaXRlIFggcmFuZG9tIGJs
+b2NrcyBpbnRvIHRoYXQgZGV2aWNlLCBjYWxsIGZzeW5jKCkgb24gaXQsIGNoZWNrDQo+IHRoZSBl
+eGVjdXRpb24gdGltZS4gUmVwZWF0IFkgdGltZXMsIGFuZCBjb21wYXJlIHRoZSBhdmcvc3RkLg0K
+PiBBbmQgY2hhbmdlIFggdG8gMlgvNFgvLi4uLCByZXBlYXQgYWJvdmUgY2hlY2suDQo+DQo+IFRo
+YW5rcywNCj4gUXUNCj4NCj4NCg0KQWZhaWsgSEREcyBhbmQgU1NEcyBkbyBsaWUgdG8gZnN5bmMo
+KQ0KDQp1bmxlc3MgdGhlIHdyaXRlIGNhY2hlIGlzIHR1cm5lZCBvZmYgd2l0aCBoZHBhcm0sDQoN
+CmhkcGFybSAtVzAgL2Rldi9zZGENCg0Kc2ltaWxhcmx5IHRvIFJBSUQgY29udHJvbGxlcnMuDQoN
+CnNlZSBiZWxvdw0KDQpodHRwczovL2JyYWQubGl2ZWpvdXJuYWwuY29tLzIxMTY3MTUuaHRtbA0K
+DQpodHRwczovL3F1ZXVlLmFjbS5vcmcvZGV0YWlsLmNmbT9pZD0yMzY3Mzc4DQoNCg0KLQ0KDQo=
