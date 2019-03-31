@@ -2,102 +2,146 @@ Return-Path: <SRS0=bw4W=SC=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 679C2C43381
-	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 15:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BC6CC43381
+	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 15:40:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F51220872
-	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 15:29:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A49D20882
+	for <linux-block@archiver.kernel.org>; Sun, 31 Mar 2019 15:40:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731233AbfCaP3s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 31 Mar 2019 11:29:48 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:36817 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731200AbfCaP3s (ORCPT
+        id S1731216AbfCaPk2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 31 Mar 2019 11:40:28 -0400
+Received: from mx1.didichuxing.com ([111.202.154.82]:22057 "HELO
+        bsf02.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with SMTP id S1731162AbfCaPk2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 31 Mar 2019 11:29:48 -0400
-Received: by mail-pg1-f195.google.com with SMTP id 85so3471769pgc.3;
-        Sun, 31 Mar 2019 08:29:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=6H6ZUj+H0tveWUWI3TM+oGlKBv/MK/R+ASBGLg0OQi0=;
-        b=M96oDXBefk8xLKixownSJPuVeYhOCPON/oe6EyAq/u/81D2tf6K+l2jzSsPvZcytc4
-         bYm4jaPxIrRtIm5LNIxzA0D6m4Q1vUfTLFiTW1pHYRN9Jf6d/arE1CVaDaXAzGWmdZTi
-         GH8fDHCG4NCLdEALagz+O6yVbwlLfK/6EN8u438Z5tbcX5z3f5W8PZfrfvz8XTBgEoID
-         WPSR1LZisZkHAxd5SMlxbif6n+Ph1S2uLtVYHB2wRd7ec4aLXiTqKyywecpuHyXc3FrM
-         20/DZh3j8AA7wKlOGttuLRKT6ZLTddEGDVgFXrsXV80TnrlwFJxKv/lfSsnv5fBwM7Wq
-         Gahg==
-X-Gm-Message-State: APjAAAU5Y38HNy4V7UzECMMPmn8R9Ak70sRfaqVaoQBlijepPJ2pwvYz
-        s5KFwGKijnK1kpEvDZfl2fo=
-X-Google-Smtp-Source: APXvYqyYT9AUmJC6GPEhknwazlOFQ2+njLako3ZDDw5LLPPh1dMRF+VnIsKfDso7d3M3ls6KVpZcoA==
-X-Received: by 2002:a63:fd07:: with SMTP id d7mr55722851pgh.199.1554046187377;
-        Sun, 31 Mar 2019 08:29:47 -0700 (PDT)
-Received: from asus.site (c-67-188-93-131.hsd1.ca.comcast.net. [67.188.93.131])
-        by smtp.gmail.com with ESMTPSA id f6sm2352659pgq.11.2019.03.31.08.29.46
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 31 Mar 2019 08:29:46 -0700 (PDT)
-Subject: Re: [PATCH 0/5] blk-mq: allow to run queue if queue refcount is held
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        James Smart <james.smart@broadcom.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        jianchao wang <jianchao.w.wang@oracle.com>
-References: <20190331030954.22320-1-ming.lei@redhat.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <10c8ed10-3c96-b73c-18d8-114773b1d675@acm.org>
-Date:   Sun, 31 Mar 2019 08:27:35 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.0
+        Sun, 31 Mar 2019 11:40:28 -0400
+X-Greylist: delayed 687 seconds by postgrey-1.27 at vger.kernel.org; Sun, 31 Mar 2019 11:40:17 EDT
+X-ASG-Debug-ID: 1554046126-0e41083ba3135a60001-Cu09wu
+Received: from BJEXMBX012.didichuxing.com (bjexmbx012.didichuxing.com [172.20.2.191]) by bsf02.didichuxing.com with ESMTP id ciWaJdIvxiB4XEXX; Sun, 31 Mar 2019 23:28:46 +0800 (CST)
+X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
+Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
+ (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1263.5; Sun, 31 Mar
+ 2019 23:28:46 +0800
+Date:   Sun, 31 Mar 2019 23:28:40 +0800
+From:   weiping zhang <zhangweiping@didichuxing.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+CC:     Weiping Zhang <zhangweiping@didiglobal.com>, <axboe@kernel.dk>,
+        <hch@infradead.org>, <linux-block@vger.kernel.org>
+Subject: Re: [PATCH] block: don't show io_timeout if driver has no timeout
+ handler
+Message-ID: <20190331152824.GA29577@192.168.3.9>
+X-ASG-Orig-Subj: Re: [PATCH] block: don't show io_timeout if driver has no timeout
+ handler
+Mail-Followup-To: Bart Van Assche <bvanassche@acm.org>,
+        Weiping Zhang <zhangweiping@didiglobal.com>, axboe@kernel.dk,
+        hch@infradead.org, linux-block@vger.kernel.org
+References: <20190107125215.GA5039@192.168.3.9>
+ <1546995460.83374.37.camel@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20190331030954.22320-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1546995460.83374.37.camel@acm.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Originating-IP: [172.22.50.20]
+X-ClientProxiedBy: BJEXCAS004.didichuxing.com (172.20.1.44) To
+ BJSGEXMBX03.didichuxing.com (172.20.15.133)
+X-Barracuda-Connect: bjexmbx012.didichuxing.com[172.20.2.191]
+X-Barracuda-Start-Time: 1554046126
+X-Barracuda-URL: https://bsf02.didichuxing.com:443/cgi-mod/mark.cgi
+X-Virus-Scanned: by bsmtpd at didichuxing.com
+X-Barracuda-Scan-Msg-Size: 2708
+X-Barracuda-BRTS-Status: 1
+X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
+X-Barracuda-Spam-Score: -2.02
+X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
+X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.69237
+        Rule breakdown below
+         pts rule name              description
+        ---- ---------------------- --------------------------------------------------
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/30/19 8:09 PM, Ming Lei wrote:
-> Since 45a9c9d909b2 ("blk-mq: Fix a use-after-free"), run queue isn't
-> allowed during cleanup queue even though queue refcount is held.
+On Tue, Jan 08, 2019 at 04:57:40PM -0800, Bart Van Assche wrote:
+Hi Bart,
+Sorry to reply so late.
+> On Mon, 2019-01-07 at 20:52 +0800, Weiping Zhang wrote:
+> > If the low level driver has no timerout handler, the
+>                                  ^^^^^^^^
+>                                  timeout?
 > 
-> This change has caused lots of kernel oops triggered in run queue path,
-> turns out it isn't easy to fix them all.
+OK, I'll fix this spelling mistake.
+> > +static umode_t queue_attr_visible(struct kobject *kobj, struct attribute *attr,
+> > +				int n)
+> > +{
+> > +	struct request_queue *q =
+> > +		container_of(kobj, struct request_queue, kobj);
+> > +
+> > +	if (attr == &queue_io_timeout_entry.attr) {
+> > +		if (!q->mq_ops || !q->mq_ops->timeout)
+> > +			return 0;
+> > +	}
 > 
-> So move freeing of hw queue resources into queue's release handler, then
-> the above issue is fixed. Meantime, this way is safe given freeing hw
-> queue resource doesn't require to use tags.
+> Are there any legacy block drivers left? Do we really need the mq_ops test?
+As request_fn removed, now we can use mq_ops->timeout directly.
+> 
+> Additionally, please combine the two nested if-statements into a single
+> if-statement.
+OK, it's more clear.
+> 
+> > @@ -942,6 +961,14 @@ int blk_register_queue(struct gendisk *disk)
+> >  		goto unlock;
+> >  	}
+> >  
+> > +	ret = sysfs_create_group(&q->kobj, &queue_attr_group);
+> > +	if (ret) {
+> > +		kobject_del(&q->kobj);
+> > +		blk_trace_remove_sysfs(dev);
+> > +		kobject_put(&dev->kobj);
+> > +		goto unlock;
+> > +	}
+> 
+> Are you sure the "goto unlock" is OK here? Shouldn't kobject_del() be called
+> to undo the kobject_add() call if sysfs_create_group() fails?
+Sorry, can you tell me why it's may be not safe, if goto unlock here,
+if failed to call sysfs_create_group, I think we should call
+kobject_del.
+> 
+> >  	if (queue_is_mq(q)) {
+> >  		__blk_mq_register_dev(dev, q);
+> >  		blk_mq_debugfs_register(q);
+> > @@ -958,6 +985,7 @@ int blk_register_queue(struct gendisk *disk)
+> >  		if (ret) {
+> >  			mutex_unlock(&q->sysfs_lock);
+> >  			kobject_uevent(&q->kobj, KOBJ_REMOVE);
+> > +			sysfs_remove_group(&q->kobj, &queue_attr_group);
+> >  			kobject_del(&q->kobj);
+> >  			blk_trace_remove_sysfs(dev);
+> >  			kobject_put(&dev->kobj);
+> > @@ -1006,6 +1034,7 @@ void blk_unregister_queue(struct gendisk *disk)
+> >  		blk_mq_unregister_dev(disk_to_dev(disk), q);
+> >  	mutex_unlock(&q->sysfs_lock);
+> >  
+> > +	sysfs_remove_group(&q->kobj, &queue_attr_group);
+> >  	kobject_uevent(&q->kobj, KOBJ_REMOVE);
+> >  	kobject_del(&q->kobj);
+> >  	blk_trace_remove_sysfs(disk_to_dev(disk));
+> 
+> Is it necessary to call sysfs_remove_group() explicitly? Isn't this something
+> kobject_del() does automatically?
+I check kobject_del, it's same as you said,
+kobject_del->sysfs_remove_dir->kernfs_remove, it will remove all files
+and subdirectories belong this kobject directory.
+> 
+> Thanks,
+> 
+Thanks
 
-I'm not sure the approach of this patch series is really the direction 
-we should pursue. There are many block driver that free resources 
-immediately after blk_cleanup_queue() returns. An example from the brd 
-driver:
-
-static void brd_free(struct brd_device *brd)
-{
-	put_disk(brd->brd_disk);
-	blk_cleanup_queue(brd->brd_queue);
-	brd_free_pages(brd);
-	kfree(brd);
-}
-
-I'd like to avoid having to modify all block drivers that free resources 
-immediately after blk_cleanup_queue() has returned. Have you considered 
-to modify blk_mq_run_hw_queues() such that it becomes safe to call that 
-function while blk_cleanup_queue() is in progress, e.g. by inserting a 
-percpu_ref_tryget_live(&q->q_usage_counter) / 
-percpu_ref_put(&q->q_usage_counter) pair?
-
-Thanks,
-
-Bart.
+Weiping
+> Bart.
+> 
