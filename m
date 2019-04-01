@@ -2,33 +2,33 @@ Return-Path: <SRS0=QnQz=SD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69A6CC43381
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 02:00:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF6EFC43381
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 02:06:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 38FE820870
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 02:00:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94C3420879
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 02:06:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726893AbfDACAw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 31 Mar 2019 22:00:52 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:49150 "EHLO mx1.redhat.com"
+        id S1731406AbfDACGf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 31 Mar 2019 22:06:35 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:48298 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726196AbfDACAw (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Sun, 31 Mar 2019 22:00:52 -0400
+        id S1726196AbfDACGf (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 31 Mar 2019 22:06:35 -0400
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 746AD308FF2D;
-        Mon,  1 Apr 2019 02:00:51 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 451AE3086214;
+        Mon,  1 Apr 2019 02:06:35 +0000 (UTC)
 Received: from ming.t460p (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C62860185;
-        Mon,  1 Apr 2019 02:00:42 +0000 (UTC)
-Date:   Mon, 1 Apr 2019 10:00:37 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id BD22A60185;
+        Mon,  1 Apr 2019 02:06:27 +0000 (UTC)
+Date:   Mon, 1 Apr 2019 10:06:23 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
+To:     Dongli Zhang <dongli.zhang@oracle.com>
 Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         James Smart <james.smart@broadcom.com>,
         Bart Van Assche <bart.vanassche@wdc.com>,
@@ -37,82 +37,95 @@ Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
         "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
         jianchao wang <jianchao.w.wang@oracle.com>
-Subject: Re: [PATCH 0/5] blk-mq: allow to run queue if queue refcount is held
-Message-ID: <20190401020036.GB30776@ming.t460p>
+Subject: Re: [PATCH 1/5] blk-mq: re-organize blk_mq_exit_hctx() into two parts
+Message-ID: <20190401020622.GC30776@ming.t460p>
 References: <20190331030954.22320-1-ming.lei@redhat.com>
- <10c8ed10-3c96-b73c-18d8-114773b1d675@acm.org>
+ <20190331030954.22320-2-ming.lei@redhat.com>
+ <f36610c3-efb1-f364-48af-3d365bbb0144@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <10c8ed10-3c96-b73c-18d8-114773b1d675@acm.org>
+In-Reply-To: <f36610c3-efb1-f364-48af-3d365bbb0144@oracle.com>
 User-Agent: Mutt/1.9.1 (2017-09-22)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.49]); Mon, 01 Apr 2019 02:00:51 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.42]); Mon, 01 Apr 2019 02:06:35 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 31, 2019 at 08:27:35AM -0700, Bart Van Assche wrote:
-> On 3/30/19 8:09 PM, Ming Lei wrote:
-> > Since 45a9c9d909b2 ("blk-mq: Fix a use-after-free"), run queue isn't
-> > allowed during cleanup queue even though queue refcount is held.
+On Mon, Apr 01, 2019 at 09:40:32AM +0800, Dongli Zhang wrote:
+> 
+> 
+> On 3/31/19 11:09 AM, Ming Lei wrote:
+> > This patch re-organizes blk_mq_exit_hctx() into two parts, and
+> > one part is for exit hctx, and another part is for free hw queue.
 > > 
-> > This change has caused lots of kernel oops triggered in run queue path,
-> > turns out it isn't easy to fix them all.
+> > No function change, just prepare for fixing hctx lifetime issue.
 > > 
-> > So move freeing of hw queue resources into queue's release handler, then
-> > the above issue is fixed. Meantime, this way is safe given freeing hw
-> > queue resource doesn't require to use tags.
+> > Cc: James Smart <james.smart@broadcom.com>
+> > Cc: Bart Van Assche <bart.vanassche@wdc.com>
+> > Cc: linux-scsi@vger.kernel.org,
+> > Cc: Martin K . Petersen <martin.petersen@oracle.com>,
+> > Cc: Christoph Hellwig <hch@lst.de>,
+> > Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
+> > Cc: jianchao wang <jianchao.w.wang@oracle.com>
+> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> > ---
+> >  block/blk-mq.c | 16 +++++++++++-----
+> >  1 file changed, 11 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index 70b210a308c4..53265ce45238 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -2229,6 +2229,16 @@ static void blk_mq_remove_cpuhp(struct blk_mq_hw_ctx *hctx)
+> >  					    &hctx->cpuhp_dead);
+> >  }
+> >  
+> > +static void blk_mq_free_hctx(struct request_queue *q,
+> > +		struct blk_mq_hw_ctx *hctx)
+> > +{
+> > +	if (hctx->flags & BLK_MQ_F_BLOCKING)
+> > +		cleanup_srcu_struct(hctx->srcu);
+> > +
+> > +	blk_free_flush_queue(hctx->fq);
+> > +	sbitmap_free(&hctx->ctx_map);
+> > +}
+> > +
+> >  /* hctx->ctxs will be freed in queue's release handler */
+> >  static void blk_mq_exit_hctx(struct request_queue *q,
+> >  		struct blk_mq_tag_set *set,
+> > @@ -2243,12 +2253,7 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+> >  	if (set->ops->exit_hctx)
+> >  		set->ops->exit_hctx(hctx, hctx_idx);
+> >  
+> > -	if (hctx->flags & BLK_MQ_F_BLOCKING)
+> > -		cleanup_srcu_struct(hctx->srcu);
+> > -
+> >  	blk_mq_remove_cpuhp(hctx);
+> > -	blk_free_flush_queue(hctx->fq);
+> > -	sbitmap_free(&hctx->ctx_map);
+> >  }
+> >  
+> >  static void blk_mq_exit_hw_queues(struct request_queue *q,
+> > @@ -2262,6 +2267,7 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
+> >  			break;
+> >  		blk_mq_debugfs_unregister_hctx(hctx);
+> >  		blk_mq_exit_hctx(q, set, hctx, i);
+> > +		blk_mq_free_hctx(q, hctx);
 > 
-> I'm not sure the approach of this patch series is really the direction we
-> should pursue. There are many block driver that free resources immediately
-
-Please see scsi_run_queue(), and the queue refcount is always held
-before run queue. That said this way has been working well for long time.
-However, 45a9c9d909b2 ("blk-mq: Fix a use-after-free") breaks this behaviour,
-and causes kernel oops.
-
-> after blk_cleanup_queue() returns. An example from the brd driver:
+> Assuming if this direction is still followed, how about blk_mq_realloc_hw_ctxs()
+> which is another caller of blk_mq_exit_hctx(), while part of blk_mq_exit_hctx()
+> is extracted and encapsulated into blk_mq_free_hctx()?
 > 
-> static void brd_free(struct brd_device *brd)
-> {
-> 	put_disk(brd->brd_disk);
-> 	blk_cleanup_queue(brd->brd_queue);
-> 	brd_free_pages(brd);
-> 	kfree(brd);
-> }
+> Additional blk_mq_free_hctx() is missing?
 
-Once blk_cleanup_queue() is returned, especially queue is frozen, there
-isn't any request to be queued to driver, so it isn't a problem wrt.
-freeing driver resource because we won't call into driver any more
-under this situation.
+Good catch!
 
-This patch fixes the race between cleanup queue and run queue:
-
-1) run queue may happen before the queue is frozen, however blk_mq_run_hw_queues()
-may not be done when blk_freeze_queue() returns.
-
-2) run queue may happen after blk_freeze_queue() returns
-
-> 
-> I'd like to avoid having to modify all block drivers that free resources
-> immediately after blk_cleanup_queue() has returned. Have you considered to
-> modify blk_mq_run_hw_queues() such that it becomes safe to call that
-> function while blk_cleanup_queue() is in progress, e.g. by inserting a
-> percpu_ref_tryget_live(&q->q_usage_counter) /
-> percpu_ref_put(&q->q_usage_counter) pair?
-
-It can't work because blk_mq_run_hw_queues may happen after
-percpu_ref_exit() is done.
-
-However, if we move percpu_ref_exit() into queue's release handler, we
-don't need to grab q->q_usage_counter any more in blk_mq_run_hw_queues(),
-and we still have to free hw queue resources in queue's release handler,
-that is exactly what this patchset is doing.
-
-In short, getting q->q_usage_counter doesn't make a difference on this
-issue.
+Another two blk_mq_exit_hctx() is called just before kobject_put(&hctx->kobj), then
+we can simply move blk_mq_free_hctx() into hctx's release handler(blk_mq_hw_sysfs_release),
+then thing is simplified too.
 
 Thanks,
 Ming
