@@ -2,111 +2,133 @@ Return-Path: <SRS0=QnQz=SD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E593C10F05
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 05:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56BE5C43381
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 05:16:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4BB9420856
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 05:12:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2EED120856
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 05:16:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726635AbfDAFMo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Apr 2019 01:12:44 -0400
-Received: from ipmail03.adl6.internode.on.net ([150.101.137.143]:47594 "EHLO
-        ipmail03.adl6.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725992AbfDAFMo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 1 Apr 2019 01:12:44 -0400
-Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
-  by ipmail03.adl6.internode.on.net with ESMTP; 01 Apr 2019 15:42:41 +1030
-Received: from dave by dastard with local (Exim 4.80)
-        (envelope-from <david@fromorbit.com>)
-        id 1hApFP-0004NU-HU; Mon, 01 Apr 2019 16:12:39 +1100
-Date:   Mon, 1 Apr 2019 16:12:39 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, axboe@fb.com, prakash.v@samsung.com,
-        anshul@samsung.com, joshiiitr@gmail.com
-Subject: Re: [PATCH v3 6/7] fs: introduce write-hint start point for
- in-kernel hints
-Message-ID: <20190401051239.GP26298@dastard>
-References: <1553846032-4451-1-git-send-email-joshi.k@samsung.com>
- <CGME20190329075758epcas1p335511dcb10bb5592ea72409a1d01e752@epcas1p3.samsung.com>
- <1553846032-4451-7-git-send-email-joshi.k@samsung.com>
+        id S1726168AbfDAFQc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Apr 2019 01:16:32 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:46422 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725784AbfDAFQc (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 1 Apr 2019 01:16:32 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id C228786673;
+        Mon,  1 Apr 2019 05:16:31 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F46D5C206;
+        Mon,  1 Apr 2019 05:16:22 +0000 (UTC)
+Date:   Mon, 1 Apr 2019 13:16:18 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Dongli Zhang <dongli.zhang@oracle.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org,
+        James Smart <james.smart@broadcom.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        jianchao wang <jianchao.w.wang@oracle.com>
+Subject: Re: [PATCH 0/5] blk-mq: allow to run queue if queue refcount is held
+Message-ID: <20190401051617.GH30776@ming.t460p>
+References: <20190331030954.22320-1-ming.lei@redhat.com>
+ <10c8ed10-3c96-b73c-18d8-114773b1d675@acm.org>
+ <20190401020036.GB30776@ming.t460p>
+ <a64684d1-c3dc-b10a-1a03-0a8b2d01b331@acm.org>
+ <20190401025237.GE30776@ming.t460p>
+ <a6dc5d0e-8e51-0714-ac25-6cb6ab78fa18@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1553846032-4451-7-git-send-email-joshi.k@samsung.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <a6dc5d0e-8e51-0714-ac25-6cb6ab78fa18@oracle.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Mon, 01 Apr 2019 05:16:31 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 29, 2019 at 01:23:51PM +0530, Kanchan Joshi wrote:
-> kernel-mode components can define own write-hints using
-> "WRITE_LIFE_KERN_MIN" as base.
+Hi Dongli,
+
+On Mon, Apr 01, 2019 at 01:05:46PM +0800, Dongli Zhang wrote:
 > 
-> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> ---
->  include/linux/fs.h | 2 ++
->  1 file changed, 2 insertions(+)
 > 
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 29d8e2c..6a2673e 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -291,6 +291,8 @@ enum rw_hint {
->  	WRITE_LIFE_MEDIUM	= RWH_WRITE_LIFE_MEDIUM,
->  	WRITE_LIFE_LONG		= RWH_WRITE_LIFE_LONG,
->  	WRITE_LIFE_EXTREME	= RWH_WRITE_LIFE_EXTREME,
-> +/* Kernel should use write-hint starting from this */
-> +	WRITE_LIFE_KERN_MIN,
+> On 4/1/19 10:52 AM, Ming Lei wrote:
+> > On Sun, Mar 31, 2019 at 07:39:17PM -0700, Bart Van Assche wrote:
+> >> On 3/31/19 7:00 PM, Ming Lei wrote:
+> >>> On Sun, Mar 31, 2019 at 08:27:35AM -0700, Bart Van Assche wrote:
+> >>>> I'm not sure the approach of this patch series is really the direction we
+> >>>> should pursue. There are many block driver that free resources immediately
+> >>>
+> >>> Please see scsi_run_queue(), and the queue refcount is always held
+> >>> before run queue.
+> >>
+> >> That's not correct. There is no guarantee that q->q_usage_counter > 0 when
+> >> scsi_run_queue() is called from inside scsi_requeue_run_queue().
+> > 
+> > We don't need the guarantee of 'q->q_usage_counter > 0', I mean the
+> > queue's kobj reference counter.
+> > 
+> > What we need is to allow run queue to work correctly after queue is frozen
+> > or cleaned up.
+> > 
+> >>
+> >>>> I'd like to avoid having to modify all block drivers that free resources
+> >>>> immediately after blk_cleanup_queue() has returned. Have you considered to
+> >>>> modify blk_mq_run_hw_queues() such that it becomes safe to call that
+> >>>> function while blk_cleanup_queue() is in progress, e.g. by inserting a
+> >>>> percpu_ref_tryget_live(&q->q_usage_counter) /
+> >>>> percpu_ref_put(&q->q_usage_counter) pair?
+> >>>
+> >>> It can't work because blk_mq_run_hw_queues may happen after
+> >>> percpu_ref_exit() is done.
+> >>>
+> >>> However, if we move percpu_ref_exit() into queue's release handler, we
+> >>> don't need to grab q->q_usage_counter any more in blk_mq_run_hw_queues(),
+> >>> and we still have to free hw queue resources in queue's release handler,
+> >>> that is exactly what this patchset is doing.
+> >>>
+> >>> In short, getting q->q_usage_counter doesn't make a difference on this
+> >>> issue.
+> >>
+> >> percpu_ref_tryget_live() fails if a per-cpu counter is in the "dead" state.
+> >> percpu_ref_kill() changes the state of a per-cpu counter to the "dead"
+> >> state. blk_freeze_queue_start() calls percpu_ref_kill(). blk_cleanup_queue()
+> >> already calls blk_set_queue_dying() and that last function calls
+> >> blk_freeze_queue_start(). So I think that what you wrote is not correct and
+> >> that inserting a percpu_ref_tryget_live()/percpu_ref_put() pair in
+> >> blk_mq_run_hw_queues() or blk_mq_run_hw_queue() would make a difference and
+> >> also that moving the percpu_ref_exit() call into blk_release_queue() makes
+> >> sense.
+> > 
+> > If percpu_ref_exit() is moved to blk_release_queue(), we still need to
+> > move freeing of hw queue's resource into blk_release_queue() like what
+> > the patchset is doing.
+> 
+> Hi Ming,
+> 
+> Would you mind help explain why we still need to move freeing of hw queue's
+> resource into blk_release_queue() like what the patchset is doing?
+> 
+> Let's assume there is no deadlock when percpu_ref_tryget_live() is used,
 
-Which means that when a new userspace hint is defined, all the
-kernel hints change numbers and, AIUI, that changes how the kernel
-hints are mapped to the underlying device.
+Could you explain why the assumption is true?
 
-The kernel hints need to be mapped to the highest supported number a
-work down, while userspace starts at the lowest and works up. The
-"kernel to device stream id" needs to translate the kernel hints
-down to the upper range of the device hints.
+We have to run queue after starting to freeze queue for draining
+allocated requests and making forward progress. Inside blk_freeze_queue_start(),
+percpu_ref_kill() marks this ref as DEAD, then percpu_ref_tryget_live() returns
+false, then queue won't be run.
 
-I think the mapping range the code uses should be:
 
-    HINT		Type			device
-     0			USER 0			  0
-     1			USER 1			  1
-     ......
-     n			USER MAX		  n
-
-     {n,65535-m}	UNUSED			{n,dev_max-m}
-
-     65535 - m		KERN_MIN,		dev_max - m
-     ......
-     65532		KERN 3			dev_max - 3
-     65533		KERN 2			dev_max - 2
-     65534		KERN 1			dev_max - 1
-     65535		KERN 0			dev_max
-
-i.e. if you look at the mapping as a signed short, >= 0 are user
-hints, < 0 are kernel hints. This provides an obvious, simple way
-to map the kernel hints to the upper range of the device hint
-range. It also provides a simple way to compress both user and
-kernel hints into a limited device hint range - kernel always uses
-the top device hint, user is limited to the rest of the range....
-
-This means the ranges don't overlap or change at either the
-code or the device level as we add more user and kernel hint
-channels in the future.
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+Thanks, 
+Ming
