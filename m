@@ -2,120 +2,268 @@ Return-Path: <SRS0=QnQz=SD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ED6CC43381
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 15:15:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 384BBC10F05
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 15:25:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 22F25208E4
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 15:15:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F07112133D
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 15:25:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=pobox.com header.i=@pobox.com header.b="YLNhaTYf";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=fluxnic.net header.i=@fluxnic.net header.b="1fXeqViD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726854AbfDAPPD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Apr 2019 11:15:03 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:46738 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726617AbfDAPPD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Apr 2019 11:15:03 -0400
-Received: by mail-pl1-f196.google.com with SMTP id y6so4636601pll.13;
-        Mon, 01 Apr 2019 08:15:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=AIRhixesr2nYIBWP0RtlIR90tBEm7g07dp6hjtKGYv0=;
-        b=mcxB1RpQfqucwi+xX5tRqyz0QjrtdORVqY/RYPjEviqruYIC06Lay3E0HnZyC+CU20
-         yPg2QV4ZdC4ls060HqxDCpHn01n3iasEuUx3YuoUCp54FUbScEXz5dx4ZLDda6ygjeb/
-         +2/bQl16kup2hPvcvx5CQYhox5TgUnKVM2jNcXXMnQxstsQTkcjJBlftMVpHsW2Zo/TX
-         +XNb+Yp7ELobHH6S2Lksl4QvElKwDmMqZbTowq06Q/nO99ImeOFaCjw8tHMjNP7/kUO3
-         ei1u22tXtVvzsurLgDpxR8oG5kBfhzAUf0m+hNJ1yRvHhWyJxxzaYHlt20T2f2v8LJtl
-         kn0w==
-X-Gm-Message-State: APjAAAUQD1rXYmiut/wWp2okpwd0KDtyUeTHIR7beaFBwAwApFXnblFx
-        z3SwRnc13wt0X8ivd4+0pX7Y3zq6
-X-Google-Smtp-Source: APXvYqxY3FZCzoBInlJD+DZuw7uVo4aEOXM3pzHAB4ND4e2121JxgGvCxE7SR/jnhN8ObKBbPi3vvw==
-X-Received: by 2002:a17:902:694c:: with SMTP id k12mr2225994plt.149.1554131702468;
-        Mon, 01 Apr 2019 08:15:02 -0700 (PDT)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id p6sm1436626pfd.122.2019.04.01.08.15.00
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 01 Apr 2019 08:15:01 -0700 (PDT)
-Message-ID: <1554131699.118779.119.camel@acm.org>
-Subject: Re: [PATCH V2 2/3] block: don't drain in-progress dispatch in
- blk_cleanup_queue()
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        James Smart <james.smart@broadcom.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        jianchao wang <jianchao.w.wang@oracle.com>
-Date:   Mon, 01 Apr 2019 08:14:59 -0700
-In-Reply-To: <20190401044247.29881-3-ming.lei@redhat.com>
-References: <20190401044247.29881-1-ming.lei@redhat.com>
-         <20190401044247.29881-3-ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S1726754AbfDAPZZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Apr 2019 11:25:25 -0400
+Received: from pb-smtp2.pobox.com ([64.147.108.71]:54036 "EHLO
+        pb-smtp2.pobox.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726617AbfDAPZY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Apr 2019 11:25:24 -0400
+Received: from pb-smtp2.pobox.com (unknown [127.0.0.1])
+        by pb-smtp2.pobox.com (Postfix) with ESMTP id CB6C5134A61;
+        Mon,  1 Apr 2019 11:25:17 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=pobox.com; h=date:from:to
+        :cc:subject:in-reply-to:message-id:references:mime-version
+        :content-type; s=sasl; bh=ndejXqIJxqzUiIyAycGiXOLl8Ag=; b=YLNhaT
+        YfkwoPLHnkOUK3jepEQtyVPxcxDCaKKlJHVBjHjo+HxiWEJnjCKyTYI/B9EnoEaG
+        DNnauRE/iGjnjCkP82LGL5o3Jcn/UM6uFH7d6aik6p/GhFGYBVC1RFrRcOr/Sccc
+        9xa5VBOizpXOO+0eSo/FT1sxkbPHr2hlrdimA=
+Received: from pb-smtp2.nyi.icgroup.com (unknown [127.0.0.1])
+        by pb-smtp2.pobox.com (Postfix) with ESMTP id C1508134A60;
+        Mon,  1 Apr 2019 11:25:17 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed; d=fluxnic.net;
+ h=date:from:to:cc:subject:in-reply-to:message-id:references:mime-version:content-type; s=2016-12.pbsmtp; bh=Sga27Msg4oo6+VzgjwJKl6FpIJ7nJxQUh/RmP2YrqDo=; b=1fXeqViDMMyFYU/qirHu6UJ4ss2rJILOHapZ2tM7J73AmLHdhaM56MslbBqcN7iS4mC56k10WRHSjH9l12ra3GlQlE55HQeeXNIVLqDBUVb9VuptWEkB18Zsse8kUmpOf6Q5rQi2Dh4ihJyG09Ky75T54dMk2BCnWiruyCYW1Qc=
+Received: from yoda.home (unknown [70.82.104.228])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by pb-smtp2.pobox.com (Postfix) with ESMTPSA id 3F284134A5F;
+        Mon,  1 Apr 2019 11:25:17 -0400 (EDT)
+Received: from xanadu.home (xanadu.home [192.168.2.2])
+        by yoda.home (Postfix) with ESMTPSA id 55C122DA00D8;
+        Mon,  1 Apr 2019 11:25:16 -0400 (EDT)
+Date:   Mon, 1 Apr 2019 11:25:16 -0400 (EDT)
+From:   Nicolas Pitre <nico@fluxnic.net>
+To:     David Howells <dhowells@redhat.com>
+cc:     viro@zeniv.linux.org.uk, linux-mtd@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 48/68] vfs: Convert cramfs to use the new mount API
+In-Reply-To: <155373039704.7602.6796835761744428479.stgit@warthog.procyon.org.uk>
+Message-ID: <nycvar.YSQ.7.76.1904011120210.20244@knanqh.ubzr>
+References: <155372999953.7602.13784796495137723805.stgit@warthog.procyon.org.uk> <155373039704.7602.6796835761744428479.stgit@warthog.procyon.org.uk>
+User-Agent: Alpine 2.21 (LFD 202 2017-01-01)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+X-Pobox-Relay-ID: 5A8E4D16-5492-11E9-BFB9-DF19F34BB12D-78420484!pb-smtp2.pobox.com
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2019-04-01 at 12:42 +-0800, Ming Lei wrote:
-+AD4 Now freeing hw queue resource is moved to hctx's release handler,
-+AD4 we don't need to worry about the race between blk+AF8-cleanup+AF8-queue and
-+AD4 run queue any more.
-+AD4 
-+AD4 So don't drain in-progress dispatch in blk+AF8-cleanup+AF8-queue().
-+AD4 
-+AD4 This is basically revert of c2856ae2f315 (+ACI-blk-mq: quiesce queue before
-+AD4 freeing queue+ACI).
-+AD4 
-+AD4 Cc: Dongli Zhang +ADw-dongli.zhang+AEA-oracle.com+AD4
-+AD4 Cc: James Smart +ADw-james.smart+AEA-broadcom.com+AD4
-+AD4 Cc: Bart Van Assche +ADw-bart.vanassche+AEA-wdc.com+AD4
-+AD4 Cc: linux-scsi+AEA-vger.kernel.org,
-+AD4 Cc: Martin K . Petersen +ADw-martin.petersen+AEA-oracle.com+AD4,
-+AD4 Cc: Christoph Hellwig +ADw-hch+AEA-lst.de+AD4,
-+AD4 Cc: James E . J . Bottomley +ADw-jejb+AEA-linux.vnet.ibm.com+AD4,
-+AD4 Cc: jianchao wang +ADw-jianchao.w.wang+AEA-oracle.com+AD4
-+AD4 Signed-off-by: Ming Lei +ADw-ming.lei+AEA-redhat.com+AD4
-+AD4 ---
-+AD4  block/blk-core.c +AHw 12 ------------
-+AD4  1 file changed, 12 deletions(-)
-+AD4
-+AD4 diff --git a/block/blk-core.c b/block/blk-core.c
-+AD4 index b3bbf8a5110d..491dc0295778 100644
-+AD4 --- a/block/blk-core.c
-+AD4 +-+-+- b/block/blk-core.c
-+AD4 +AEAAQA -347,18 +-347,6 +AEAAQA void blk+AF8-cleanup+AF8-queue(struct request+AF8-queue +ACo-q)
-+AD4  
-+AD4         blk+AF8-queue+AF8-flag+AF8-set(QUEUE+AF8-FLAG+AF8-DEAD, q)+ADs
-+AD4  
-+AD4 -       /+ACo
-+AD4 -        +ACo make sure all in-progress dispatch are completed because
-+AD4 -        +ACo blk+AF8-freeze+AF8-queue() can only complete all requests, and
-+AD4 -        +ACo dispatch may still be in-progress since we dispatch requests
-+AD4 -        +ACo from more than one contexts.
-+AD4 -        +ACo
-+AD4 -        +ACo We rely on driver to deal with the race in case that queue
-+AD4 -        +ACo initialization isn't done.
-+AD4 -        +ACo-/
-+AD4 -       if (queue+AF8-is+AF8-mq(q) +ACYAJg blk+AF8-queue+AF8-init+AF8-done(q))
-+AD4 -               blk+AF8-mq+AF8-quiesce+AF8-queue(q)+ADs
-+AD4 -
-+AD4         /+ACo for synchronous bio-based driver finish in-flight integrity i/o +ACo-/
-+AD4         blk+AF8-flush+AF8-integrity()+ADs
+On Wed, 27 Mar 2019, David Howells wrote:
 
-Many block drivers clean up resources immediately after blk+AF8-cleanup+AF8-queue()
-returns. Not waiting for ongoing .queue+AF8-rq() calls to finish is wrong because
-it can cause block drivers to destroy resources that are in use by a concurrent
-.queue+AF8-rq() call.
+> Convert the cramfs filesystem to the new internal mount API as the old
+> one will be obsoleted and removed.  This allows greater flexibility in
+> communication of mount parameters between userspace, the VFS and the
+> filesystem.
+> 
+> See Documentation/filesystems/mount_api.txt for more information.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Nicolas Pitre <nico@linaro.org>
+> cc: linux-mtd@lists.infradead.org
+> cc: linux-block@vger.kernel.org
 
-Bart.
+Tested-by: Nicolas Pitre <nico@fluxnic.net>
+Acked-by: Nicolas Pitre <nico@fluxnic.net>
+
+
+
+
+> ---
+> 
+>  fs/cramfs/inode.c |   69 ++++++++++++++++++++++++++++++-----------------------
+>  1 file changed, 39 insertions(+), 30 deletions(-)
+> 
+> diff --git a/fs/cramfs/inode.c b/fs/cramfs/inode.c
+> index 9352487bd0fc..2ee89a353d64 100644
+> --- a/fs/cramfs/inode.c
+> +++ b/fs/cramfs/inode.c
+> @@ -24,6 +24,7 @@
+>  #include <linux/blkdev.h>
+>  #include <linux/mtd/mtd.h>
+>  #include <linux/mtd/super.h>
+> +#include <linux/fs_context.h>
+>  #include <linux/slab.h>
+>  #include <linux/vfs.h>
+>  #include <linux/mutex.h>
+> @@ -506,18 +507,19 @@ static void cramfs_kill_sb(struct super_block *sb)
+>  	kfree(sbi);
+>  }
+>  
+> -static int cramfs_remount(struct super_block *sb, int *flags, char *data)
+> +static int cramfs_reconfigure(struct fs_context *fc)
+>  {
+> -	sync_filesystem(sb);
+> -	*flags |= SB_RDONLY;
+> +	sync_filesystem(fc->root->d_sb);
+> +	fc->sb_flags |= SB_RDONLY;
+>  	return 0;
+>  }
+>  
+> -static int cramfs_read_super(struct super_block *sb,
+> -			     struct cramfs_super *super, int silent)
+> +static int cramfs_read_super(struct super_block *sb, struct fs_context *fc,
+> +			     struct cramfs_super *super)
+>  {
+>  	struct cramfs_sb_info *sbi = CRAMFS_SB(sb);
+>  	unsigned long root_offset;
+> +	bool silent = fc->sb_flags & SB_SILENT;
+>  
+>  	/* We don't know the real size yet */
+>  	sbi->size = PAGE_SIZE;
+> @@ -532,7 +534,7 @@ static int cramfs_read_super(struct super_block *sb,
+>  		/* check for wrong endianness */
+>  		if (super->magic == CRAMFS_MAGIC_WEND) {
+>  			if (!silent)
+> -				pr_err("wrong endianness\n");
+> +				errorf(fc, "cramfs: wrong endianness");
+>  			return -EINVAL;
+>  		}
+>  
+> @@ -544,22 +546,22 @@ static int cramfs_read_super(struct super_block *sb,
+>  		mutex_unlock(&read_mutex);
+>  		if (super->magic != CRAMFS_MAGIC) {
+>  			if (super->magic == CRAMFS_MAGIC_WEND && !silent)
+> -				pr_err("wrong endianness\n");
+> +				errorf(fc, "cramfs: wrong endianness");
+>  			else if (!silent)
+> -				pr_err("wrong magic\n");
+> +				errorf(fc, "cramfs: wrong magic");
+>  			return -EINVAL;
+>  		}
+>  	}
+>  
+>  	/* get feature flags first */
+>  	if (super->flags & ~CRAMFS_SUPPORTED_FLAGS) {
+> -		pr_err("unsupported filesystem features\n");
+> +		errorf(fc, "cramfs: unsupported filesystem features");
+>  		return -EINVAL;
+>  	}
+>  
+>  	/* Check that the root inode is in a sane state */
+>  	if (!S_ISDIR(super->root.mode)) {
+> -		pr_err("root is not a directory\n");
+> +		errorf(fc, "cramfs: root is not a directory");
+>  		return -EINVAL;
+>  	}
+>  	/* correct strange, hard-coded permissions of mkcramfs */
+> @@ -578,12 +580,12 @@ static int cramfs_read_super(struct super_block *sb,
+>  	sbi->magic = super->magic;
+>  	sbi->flags = super->flags;
+>  	if (root_offset == 0)
+> -		pr_info("empty filesystem");
+> +		infof(fc, "cramfs: empty filesystem");
+>  	else if (!(super->flags & CRAMFS_FLAG_SHIFTED_ROOT_OFFSET) &&
+>  		 ((root_offset != sizeof(struct cramfs_super)) &&
+>  		  (root_offset != 512 + sizeof(struct cramfs_super))))
+>  	{
+> -		pr_err("bad root offset %lu\n", root_offset);
+> +		errorf(fc, "cramfs: bad root offset %lu", root_offset);
+>  		return -EINVAL;
+>  	}
+>  
+> @@ -607,8 +609,7 @@ static int cramfs_finalize_super(struct super_block *sb,
+>  	return 0;
+>  }
+>  
+> -static int cramfs_blkdev_fill_super(struct super_block *sb, void *data,
+> -				    int silent)
+> +static int cramfs_blkdev_fill_super(struct super_block *sb, struct fs_context *fc)
+>  {
+>  	struct cramfs_sb_info *sbi;
+>  	struct cramfs_super super;
+> @@ -623,14 +624,13 @@ static int cramfs_blkdev_fill_super(struct super_block *sb, void *data,
+>  	for (i = 0; i < READ_BUFFERS; i++)
+>  		buffer_blocknr[i] = -1;
+>  
+> -	err = cramfs_read_super(sb, &super, silent);
+> +	err = cramfs_read_super(sb, fc, &super);
+>  	if (err)
+>  		return err;
+>  	return cramfs_finalize_super(sb, &super.root);
+>  }
+>  
+> -static int cramfs_mtd_fill_super(struct super_block *sb, void *data,
+> -				 int silent)
+> +static int cramfs_mtd_fill_super(struct super_block *sb, struct fs_context *fc)
+>  {
+>  	struct cramfs_sb_info *sbi;
+>  	struct cramfs_super super;
+> @@ -652,7 +652,7 @@ static int cramfs_mtd_fill_super(struct super_block *sb, void *data,
+>  
+>  	pr_info("checking physical address %pap for linear cramfs image\n",
+>  		&sbi->linear_phys_addr);
+> -	err = cramfs_read_super(sb, &super, silent);
+> +	err = cramfs_read_super(sb, fc, &super);
+>  	if (err)
+>  		return err;
+>  
+> @@ -947,32 +947,41 @@ static const struct inode_operations cramfs_dir_inode_operations = {
+>  };
+>  
+>  static const struct super_operations cramfs_ops = {
+> -	.remount_fs	= cramfs_remount,
+>  	.statfs		= cramfs_statfs,
+>  };
+>  
+> -static struct dentry *cramfs_mount(struct file_system_type *fs_type, int flags,
+> -				   const char *dev_name, void *data)
+> +static int cramfs_get_tree(struct fs_context *fc)
+>  {
+> -	struct dentry *ret = ERR_PTR(-ENOPROTOOPT);
+> +	int ret = -ENOPROTOOPT;
+>  
+>  	if (IS_ENABLED(CONFIG_CRAMFS_MTD)) {
+> -		ret = mount_mtd(fs_type, flags, dev_name, data,
+> -				cramfs_mtd_fill_super);
+> -		if (!IS_ERR(ret))
+> +		ret = vfs_get_mtd_super(fc, cramfs_mtd_fill_super);
+> +		if (ret < 0)
+>  			return ret;
+>  	}
+> -	if (IS_ENABLED(CONFIG_CRAMFS_BLOCKDEV)) {
+> -		ret = mount_bdev(fs_type, flags, dev_name, data,
+> -				 cramfs_blkdev_fill_super);
+> -	}
+> +	if (IS_ENABLED(CONFIG_CRAMFS_BLOCKDEV))
+> +		ret = vfs_get_block_super(fc, cramfs_blkdev_fill_super);
+>  	return ret;
+>  }
+>  
+> +static const struct fs_context_operations cramfs_context_ops = {
+> +	.get_tree	= cramfs_get_tree,
+> +	.reconfigure	= cramfs_reconfigure,
+> +};
+> +
+> +/*
+> + * Set up the filesystem mount context.
+> + */
+> +static int cramfs_init_fs_context(struct fs_context *fc)
+> +{
+> +	fc->ops = &cramfs_context_ops;
+> +	return 0;
+> +}
+> +
+>  static struct file_system_type cramfs_fs_type = {
+>  	.owner		= THIS_MODULE,
+>  	.name		= "cramfs",
+> -	.mount		= cramfs_mount,
+> +	.init_fs_context = cramfs_init_fs_context,
+>  	.kill_sb	= cramfs_kill_sb,
+>  	.fs_flags	= FS_REQUIRES_DEV,
+>  };
+> 
+> 
