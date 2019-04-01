@@ -2,147 +2,132 @@ Return-Path: <SRS0=QnQz=SD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75F7DC10F05
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 09:01:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2834C43381
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 09:19:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 412E82084B
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 09:01:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADC26213A2
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 09:19:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mBlHcfam"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="KNs5YV0F"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728679AbfDAJBd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Apr 2019 05:01:33 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:34109 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727259AbfDAJBc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Apr 2019 05:01:32 -0400
-Received: by mail-wr1-f68.google.com with SMTP id p10so10917755wrq.1
-        for <linux-block@vger.kernel.org>; Mon, 01 Apr 2019 02:01:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=sXk/RNe/QfIZJt2m4bkPTnI917e020gPuS2AXpdWHYA=;
-        b=mBlHcfambs1nqnYLFIU3kZmBlRvkbALXztXs2utLtWZKPiczYNbpPuBFwomLpiqbAD
-         aURjdY0B+L7a1AdoJgUQqT1pBO0pUq1S91W6YucYE8638ULy5QzRGTNdl/kKDgHXWULc
-         1uiOREBZdqST7T61yBtCR8bZHdQqLwpZfkuyCWrwAcgdm8m+9JyLk1BNrsKLNXSLg+YO
-         UN/nPldmK0bSEpddErfFUS9dJcfO5UeC7Zt8EhPD6WtoSsLvajthDr52O/XZwkE3T04T
-         re1fBmUxIqR4hRzrmayY/ISn9zN7EJ0hCthmrMLOe2x/phUK3yCr47KVooFjmEL7DcEF
-         tLbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=sXk/RNe/QfIZJt2m4bkPTnI917e020gPuS2AXpdWHYA=;
-        b=hcaJvCgPQ3SyEuJ2wtK2x9j5U7yOKoTVc3tUxYSAACajlo+MvmYBzbADLPHpMWcWRx
-         BEd59R0EroxiQ+T2OEQjmq45TXzKLZZLRPoFS5wCGnGRN9OIE/GM0PVWRyOKnc+3lNt+
-         3Au5wbOMcvn25QkrsZFYmsgT4E7PVjGlA0ocqGxWkFvGbqgoXlM9LLkRt95Q2uli0fwx
-         ofYO9PSE2upD81vcLfgOATMNETMYzzGD5w4C9VItNTo5mS+DC249maQOVNiXsMYCcfRh
-         en3ns7EFVtf43bYdTJOajw4R9ZK3N90SQSbfkNCNNkSk3GnvFeTD4dZ9QyaSyfOEcs+r
-         ISxg==
-X-Gm-Message-State: APjAAAXlHNICX1YlHjt5FeUVodiw4PKHXBlIB0tjPNjNKlHVRdi3LS3Z
-        lC/4JVWKMTe+SnB8FcmFrBT1ng==
-X-Google-Smtp-Source: APXvYqxeAyEFBlAuZQoHb8VHHtsmRwWrxfY7XYvNTiAEh9EidxkoUXqDezY7o8LJF9ENN2G6K5Ilvg==
-X-Received: by 2002:adf:fd04:: with SMTP id e4mr41844552wrr.190.1554109290099;
-        Mon, 01 Apr 2019 02:01:30 -0700 (PDT)
-Received: from [192.168.0.101] ([88.147.53.253])
-        by smtp.gmail.com with ESMTPSA id 13sm10146380wmf.23.2019.04.01.02.01.29
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 01 Apr 2019 02:01:29 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: Bisected GFP in bfq_bfqq_expire on v5.1-rc1
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20190401115509.76310e03@fire.localdomain>
-Date:   Mon, 1 Apr 2019 11:01:27 +0200
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <84B0CA50-0ED8-4171-8007-19EA43951735@linaro.org>
-References: <20190329160227.7d55c8dd@fire.localdomain>
- <0e203a26-b941-cef4-dff1-013999d4b041@kernel.dk>
- <626EAE58-63C1-4ABA-9040-9D9A61F74A0D@linaro.org>
- <20190401115509.76310e03@fire.localdomain>
-To:     Dmitrii Tcvetkov <demfloro@demfloro.ru>
-X-Mailer: Apple Mail (2.3445.102.3)
+        id S1726604AbfDAJTU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Apr 2019 05:19:20 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:33518 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725821AbfDAJTT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Apr 2019 05:19:19 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3194Cik091650;
+        Mon, 1 Apr 2019 09:19:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2018-07-02;
+ bh=XRl1QmEdNWQV5dsmWsJ5qr3weJMDJFoO6g5XRJBflmI=;
+ b=KNs5YV0FyJ6Sc1X6tu23eW2RvQ31/to/+IZRHtAKt+x9FW3JDNHunZ0mlXkdcKMHM5jx
+ 5sJ2QthaWg9Tt4wrjE+G0pBhuOvsweP8VolYlWVkYzpn3Dn4A+iFU/tX35IxlbvzNwn6
+ wZq0TkNUlE9i+yMXSfAgRSRMf0vjzLOC2d1jKRqJGIeJisKeKJJOYKCaOnottrIylQm4
+ B//ZcdAJq+XYD7GphySIK5KgF/146/or+2qLLRItq8qDryJnqjDxkWB96rHfLhKtkiyG
+ 29UG3DO51ggH5yVjRlAtaD0euWXp4Sq/kCE5dp6r6su2MSdewW/4OPidTYJXcXMvzZtD Ew== 
+Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
+        by aserp2130.oracle.com with ESMTP id 2rhwycwwp5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 01 Apr 2019 09:19:05 +0000
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x319IsXP023178
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 1 Apr 2019 09:18:54 GMT
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x319Iqjh002759;
+        Mon, 1 Apr 2019 09:18:52 GMT
+Received: from [10.182.71.8] (/10.182.71.8)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 01 Apr 2019 02:18:52 -0700
+Subject: Re: [PATCH 0/5] blk-mq: allow to run queue if queue refcount is held
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org,
+        James Smart <james.smart@broadcom.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+References: <20190331030954.22320-1-ming.lei@redhat.com>
+ <10c8ed10-3c96-b73c-18d8-114773b1d675@acm.org>
+ <20190401020036.GB30776@ming.t460p>
+ <a64684d1-c3dc-b10a-1a03-0a8b2d01b331@acm.org>
+ <20190401025237.GE30776@ming.t460p>
+ <21b2000b-16b6-f5a6-692b-73143a49a4ec@oracle.com>
+ <20190401032852.GG30776@ming.t460p>
+From:   "jianchao.wang" <jianchao.w.wang@oracle.com>
+Message-ID: <ef192658-74cd-e193-cb40-aed546c2b309@oracle.com>
+Date:   Mon, 1 Apr 2019 17:19:01 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.5.1
+MIME-Version: 1.0
+In-Reply-To: <20190401032852.GG30776@ming.t460p>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9213 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1904010065
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Ming
 
+On 4/1/19 11:28 AM, Ming Lei wrote:
+> On Mon, Apr 01, 2019 at 11:25:50AM +0800, jianchao.wang wrote:
+>> Hi Ming
+>>
+>> On 4/1/19 10:52 AM, Ming Lei wrote:
+>>>> percpu_ref_tryget_live() fails if a per-cpu counter is in the "dead" state.
+>>>> percpu_ref_kill() changes the state of a per-cpu counter to the "dead"
+>>>> state. blk_freeze_queue_start() calls percpu_ref_kill(). blk_cleanup_queue()
+>>>> already calls blk_set_queue_dying() and that last function calls
+>>>> blk_freeze_queue_start(). So I think that what you wrote is not correct and
+>>>> that inserting a percpu_ref_tryget_live()/percpu_ref_put() pair in
+>>>> blk_mq_run_hw_queues() or blk_mq_run_hw_queue() would make a difference and
+>>>> also that moving the percpu_ref_exit() call into blk_release_queue() makes
+>>>> sense.
+>>> If percpu_ref_exit() is moved to blk_release_queue(), we still need to
+>>> move freeing of hw queue's resource into blk_release_queue() like what
+>>> the patchset is doing.
+>>>
+>>> Then we don't need to get/put q_usage_counter in blk_mq_run_hw_queues() any more,
+>>> do we?
+>>
+>> IMO, if we could get a way to prevent any attempt to run queue, it would be
+>> better and clearer.
+> 
+> It is hard to do that way, and not necessary.
+> 
+> I will post V2 soon for review.
+> 
 
-> Il giorno 1 apr 2019, alle ore 10:55, Dmitrii Tcvetkov =
-<demfloro@demfloro.ru> ha scritto:
->=20
-> On Mon, 1 Apr 2019 09:29:16 +0200
-> Paolo Valente <paolo.valente@linaro.org> wrote:
->>=20
->>=20
->>> Il giorno 29 mar 2019, alle ore 15:10, Jens Axboe <axboe@kernel.dk>
->>> ha scritto:
->>>=20
->>> On 3/29/19 7:02 AM, Dmitrii Tcvetkov wrote:
->>>> Hi,
->>>>=20
->>>> I got kernel panic since v5.1-rc1 when working with files on block
->>>> device with BFQ scheduler assigned. I didn't find trivial way to
->>>> reproduce the panic but "git checkout origin/linux-5.0.y"
->>>> on linux-stable-rc[1] git repo on btrfs filesystem reproduces the
->>>> problem 100% of the time on my bare-metal machine and in a VM.
->>>>=20
->>>> Bisect led me to commit 9dee8b3b057e1 (block, bfq: fix queue
->>>> removal from weights tree). After reverting this commit on top of
->>>> current mainline master(9936328b41ce) I can't reproduce the
->>>> problem.
->>>>=20
->>>> dmesg with the panic and bisect log attached.
->>>>=20
->>>> [1]
->>>> =
-https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stab=
-le-rc.git
->>>=20
->>> Paolo, can you please take a look at this?
->>>=20
->>>=20
->>=20
->> Yep.
->>=20
->> That you very much Dmitrii for also bisecting.  I feel like this
->> failure may be caused by the typo fixed by this patch:
->> https://patchwork.kernel.org/patch/10877113/
->>=20
->> Could you please give this fix a try?
->=20
-> Still reproduces with the patch on top of current mainline
-> master(v5.1-rc3).
->=20
-> Crashes with and without CONFIG_BFQ_GROUP_IOSCHED look same to me.
-> Original dmesg was also from kernel with CONFIG_BFQ_GROUP_IOSCHED=3Dn.
->=20
-> gpf.txt contains crash with the patch and CONFIG_BFQ_GROUP_IOSCHED=3Dn
-> gpf-w-bfq-group-iosched.txt - with the patch and =
-CONFIG_BFQ_GROUP_IOSCHED=3Dy
-> config.txt - kernel config for the VM with CONFIG_BFQ_GROUP_IOSCHED=3Dn
->=20
->=20
+Put percpu_ref_tryget/put pair into blk_mq_run_hw_queues could stop run queue after
+requet_queue is frozen and drained (run queue is also unnecessary because there is no
+entered requests). And also percpu_ref_tryget could avoid the io hung issue you mentioned.
+We have similar one in blk_mq_timeout_work.
 
-Ok, thank you. Could you please do a
+freeze and drain queue to stop new attempt to run queue, blk_sync_queue syncs and stops
+the started ones, then hctx->run_queue is cleaned totally.
 
-list *(bfq_bfqq_expire+0x1f3)
+IMO, it would be better to have a checkpoint after which there will be no any in-flight
+asynchronous activities of the request_queue (hctx->run_work, q->requeue_work, q-> timeout_work)
+and any attempt to start them will fail.
 
-for me?
+Perhaps, this will be a good change to do this ；）
 
-Thanks,
-Paolo
-
->=20
-> <gpf.txt><gpf-w-bfq-group-iosched.txt><config.txt>
-
+Thanks
+Jianchao
