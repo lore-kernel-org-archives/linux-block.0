@@ -2,160 +2,111 @@ Return-Path: <SRS0=QnQz=SD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46F8FC43381
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 05:02:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3796DC3E8A3
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 05:03:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 03B1E20870
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 05:02:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TA251E6V"
+	by mail.kernel.org (Postfix) with ESMTP id 0877A20828
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 05:03:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725867AbfDAFCH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Apr 2019 01:02:07 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:59720 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725817AbfDAFCH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Apr 2019 01:02:07 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x314wUVj084392;
-        Mon, 1 Apr 2019 05:01:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=CiqXy3lCRlQrTKlZNflhYuELS5Rdpvnb9SMrpEr3VW4=;
- b=TA251E6VQei5TH43rrYARY/6E5jE6MMz8TbFzaAjIhEVqNYaGNsagHPu0jY/xjmbqKay
- fLqMiZDRzX+jwz7EKHiKuGL+iz4uAptAAeCjJi3BqARos1PPnjl1bhddvL6roYd6gpJG
- uPf3ByGFm7NZRHLr61mCwdfEbyh9H4iTpc0K6j0lvMZzdEtvZ3ZCRs55Yuy0NFGrV8ch
- RM5OkbpEAPd89p+JMwDF7rMOXfClUqmRyu4vJHJeORakFTCk1fUpXk1MZ104WZZKjV9t
- xJ8/2L0PT2TyW0C+tOgP/7iKvdo78fRitJO9AGKIIDfdSGoVsrWnqgUL5zyu9HB0espG yA== 
-Received: from userv0021.oracle.com (userv0021.oracle.com [156.151.31.71])
-        by userp2130.oracle.com with ESMTP id 2rhyvsvmbs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 01 Apr 2019 05:01:45 +0000
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userv0021.oracle.com (8.14.4/8.14.4) with ESMTP id x3151juP004102
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 1 Apr 2019 05:01:45 GMT
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x3151hbf021672;
-        Mon, 1 Apr 2019 05:01:43 GMT
-Received: from [10.182.69.106] (/10.182.69.106)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 31 Mar 2019 22:01:43 -0700
-Subject: Re: [PATCH 0/5] blk-mq: allow to run queue if queue refcount is held
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        James Smart <james.smart@broadcom.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        jianchao wang <jianchao.w.wang@oracle.com>
-References: <20190331030954.22320-1-ming.lei@redhat.com>
- <10c8ed10-3c96-b73c-18d8-114773b1d675@acm.org>
- <20190401020036.GB30776@ming.t460p>
- <a64684d1-c3dc-b10a-1a03-0a8b2d01b331@acm.org>
- <20190401025237.GE30776@ming.t460p>
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <a6dc5d0e-8e51-0714-ac25-6cb6ab78fa18@oracle.com>
-Date:   Mon, 1 Apr 2019 13:05:46 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        id S1726605AbfDAFDE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Apr 2019 01:03:04 -0400
+Received: from ipmail03.adl6.internode.on.net ([150.101.137.143]:30778 "EHLO
+        ipmail03.adl6.internode.on.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725817AbfDAFDD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Mon, 1 Apr 2019 01:03:03 -0400
+Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
+  by ipmail03.adl6.internode.on.net with ESMTP; 01 Apr 2019 15:32:57 +1030
+Received: from dave by dastard with local (Exim 4.80)
+        (envelope-from <david@fromorbit.com>)
+        id 1hAp5z-0004MY-CL; Mon, 01 Apr 2019 16:02:55 +1100
+Date:   Mon, 1 Apr 2019 16:02:55 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Kanchan Joshi <joshi.k@samsung.com>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, axboe@fb.com, prakash.v@samsung.com,
+        anshul@samsung.com, joshiiitr@gmail.com
+Subject: Re: [PATCH v3 1/7] block: extend stream count for in-kernel use
+Message-ID: <20190401050255.GP23020@dastard>
+References: <1553846032-4451-1-git-send-email-joshi.k@samsung.com>
+ <CGME20190329075743epcas1p12f1d290e65ddf84eb74ed94a5ae6eb74@epcas1p1.samsung.com>
+ <1553846032-4451-2-git-send-email-joshi.k@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <20190401025237.GE30776@ming.t460p>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9213 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1904010037
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1553846032-4451-2-git-send-email-joshi.k@samsung.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 4/1/19 10:52 AM, Ming Lei wrote:
-> On Sun, Mar 31, 2019 at 07:39:17PM -0700, Bart Van Assche wrote:
->> On 3/31/19 7:00 PM, Ming Lei wrote:
->>> On Sun, Mar 31, 2019 at 08:27:35AM -0700, Bart Van Assche wrote:
->>>> I'm not sure the approach of this patch series is really the direction we
->>>> should pursue. There are many block driver that free resources immediately
->>>
->>> Please see scsi_run_queue(), and the queue refcount is always held
->>> before run queue.
->>
->> That's not correct. There is no guarantee that q->q_usage_counter > 0 when
->> scsi_run_queue() is called from inside scsi_requeue_run_queue().
+On Fri, Mar 29, 2019 at 01:23:46PM +0530, Kanchan Joshi wrote:
+> This patch bumps up stream count to suppor in-kernel hints. It also
+> adds 'streamid' member in 'request' and declares new API for driver
+> to register stream-info with block layer.
 > 
-> We don't need the guarantee of 'q->q_usage_counter > 0', I mean the
-> queue's kobj reference counter.
+> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+> ---
+>  include/linux/blkdev.h | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 > 
-> What we need is to allow run queue to work correctly after queue is frozen
-> or cleaned up.
-> 
->>
->>>> I'd like to avoid having to modify all block drivers that free resources
->>>> immediately after blk_cleanup_queue() has returned. Have you considered to
->>>> modify blk_mq_run_hw_queues() such that it becomes safe to call that
->>>> function while blk_cleanup_queue() is in progress, e.g. by inserting a
->>>> percpu_ref_tryget_live(&q->q_usage_counter) /
->>>> percpu_ref_put(&q->q_usage_counter) pair?
->>>
->>> It can't work because blk_mq_run_hw_queues may happen after
->>> percpu_ref_exit() is done.
->>>
->>> However, if we move percpu_ref_exit() into queue's release handler, we
->>> don't need to grab q->q_usage_counter any more in blk_mq_run_hw_queues(),
->>> and we still have to free hw queue resources in queue's release handler,
->>> that is exactly what this patchset is doing.
->>>
->>> In short, getting q->q_usage_counter doesn't make a difference on this
->>> issue.
->>
->> percpu_ref_tryget_live() fails if a per-cpu counter is in the "dead" state.
->> percpu_ref_kill() changes the state of a per-cpu counter to the "dead"
->> state. blk_freeze_queue_start() calls percpu_ref_kill(). blk_cleanup_queue()
->> already calls blk_set_queue_dying() and that last function calls
->> blk_freeze_queue_start(). So I think that what you wrote is not correct and
->> that inserting a percpu_ref_tryget_live()/percpu_ref_put() pair in
->> blk_mq_run_hw_queues() or blk_mq_run_hw_queue() would make a difference and
->> also that moving the percpu_ref_exit() call into blk_release_queue() makes
->> sense.
-> 
-> If percpu_ref_exit() is moved to blk_release_queue(), we still need to
-> move freeing of hw queue's resource into blk_release_queue() like what
-> the patchset is doing.
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 338604d..4088e21 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -214,6 +214,7 @@ struct request {
+>  #endif
+>  
+>  	unsigned short write_hint;
+> +	unsigned short streamid;
+>  	unsigned short ioprio;
+>  
+>  	void *special;		/* opaque pointer available for LLD use */
+> @@ -341,6 +342,8 @@ struct queue_limits {
+>  	unsigned char		misaligned;
+>  	unsigned char		discard_misaligned;
+>  	unsigned char		raid_partial_stripes_expensive;
+> +
+> +	unsigned short		nr_streams;
+>  	enum blk_zoned_model	zoned;
+>  };
+>  
+> @@ -567,8 +570,9 @@ struct request_queue {
+>  	size_t			cmd_size;
+>  
+>  	struct work_struct	release_work;
+> -
+> -#define BLK_MAX_WRITE_HINTS	5
+> +#define BLK_MAX_USER_HINTS	(WRITE_LIFE_KERN_MIN - 2)
 
-Hi Ming,
+WRITE_LIFE_KERN_MIN is undefined.
 
-Would you mind help explain why we still need to move freeing of hw queue's
-resource into blk_release_queue() like what the patchset is doing?
+-Dave.
 
-Let's assume there is no deadlock when percpu_ref_tryget_live() is used,
-blk_mq_run_hw_queues() would not be able to move forward as __PERCPU_REF_DEAD is
-already set. Why we still need to move freeing of hw queue's resource into
-blk_release_queue()?
-
-Thank you very much!
-
-Dongli Zhang
-
-> 
-> Then we don't need to get/put q_usage_counter in blk_mq_run_hw_queues() any more,
-> do we?
+> +#define BLK_MAX_KERN_HINTS	4
+> +#define BLK_MAX_WRITE_HINTS	(1 + BLK_MAX_USER_HINTS + BLK_MAX_KERN_HINTS)
+>  	u64			write_hints[BLK_MAX_WRITE_HINTS];
+>  };
+>  
+> @@ -1071,6 +1075,7 @@ extern void blk_queue_update_dma_alignment(struct request_queue *, int);
+>  extern void blk_queue_rq_timeout(struct request_queue *, unsigned int);
+>  extern void blk_queue_flush_queueable(struct request_queue *q, bool queueable);
+>  extern void blk_queue_write_cache(struct request_queue *q, bool enabled, bool fua);
+> +extern void blk_queue_stream_limits(struct request_queue *, unsigned short);
+>  
+>  /*
+>   * Number of physical segments as sent to the device.
+> -- 
+> 2.7.4
 > 
 > 
-> Thanks,
-> Ming
-> 
+
+-- 
+Dave Chinner
+david@fromorbit.com
