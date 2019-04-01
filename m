@@ -2,149 +2,147 @@ Return-Path: <SRS0=QnQz=SD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A8E2C43381
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 08:59:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75F7DC10F05
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 09:01:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 75546214C6
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 08:59:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 412E82084B
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 09:01:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mBlHcfam"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728543AbfDAI7s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Apr 2019 04:59:48 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:6205 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725843AbfDAI7s (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 1 Apr 2019 04:59:48 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 71F2EC2916541F21CD32;
-        Mon,  1 Apr 2019 16:59:45 +0800 (CST)
-Received: from [127.0.0.1] (10.177.219.49) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.408.0; Mon, 1 Apr 2019
- 16:59:42 +0800
-Subject: Re: [PATCH 1/2] block: remove devt from ext_devt_idr when delete
- partition
-To:     Jan Kara <jack@suse.cz>
-CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>, <tj@kernel.org>,
-        <hch@lst.de>, <viro@zeniv.linux.org.uk>, <bart.vanassche@wdc.com>,
-        "Keith Busch" <keith.busch@intel.com>
-References: <20190318140703.28963-1-yuyufen@huawei.com>
- <20190318140703.28963-2-yuyufen@huawei.com>
- <bb6f69c4-b8d6-32cb-3a90-40c2ad2bf0a7@huawei.com>
- <20190329224244.GE8757@quack2.suse.cz>
-From:   yuyufen <yuyufen@huawei.com>
-Message-ID: <39e2ec62-9dac-accb-728c-69cac9d24ace@huawei.com>
-Date:   Mon, 1 Apr 2019 16:59:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.1
-MIME-Version: 1.0
-In-Reply-To: <20190329224244.GE8757@quack2.suse.cz>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.177.219.49]
-X-CFilter-Loop: Reflected
+        id S1728679AbfDAJBd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Apr 2019 05:01:33 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34109 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727259AbfDAJBc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Apr 2019 05:01:32 -0400
+Received: by mail-wr1-f68.google.com with SMTP id p10so10917755wrq.1
+        for <linux-block@vger.kernel.org>; Mon, 01 Apr 2019 02:01:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=sXk/RNe/QfIZJt2m4bkPTnI917e020gPuS2AXpdWHYA=;
+        b=mBlHcfambs1nqnYLFIU3kZmBlRvkbALXztXs2utLtWZKPiczYNbpPuBFwomLpiqbAD
+         aURjdY0B+L7a1AdoJgUQqT1pBO0pUq1S91W6YucYE8638ULy5QzRGTNdl/kKDgHXWULc
+         1uiOREBZdqST7T61yBtCR8bZHdQqLwpZfkuyCWrwAcgdm8m+9JyLk1BNrsKLNXSLg+YO
+         UN/nPldmK0bSEpddErfFUS9dJcfO5UeC7Zt8EhPD6WtoSsLvajthDr52O/XZwkE3T04T
+         re1fBmUxIqR4hRzrmayY/ISn9zN7EJ0hCthmrMLOe2x/phUK3yCr47KVooFjmEL7DcEF
+         tLbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=sXk/RNe/QfIZJt2m4bkPTnI917e020gPuS2AXpdWHYA=;
+        b=hcaJvCgPQ3SyEuJ2wtK2x9j5U7yOKoTVc3tUxYSAACajlo+MvmYBzbADLPHpMWcWRx
+         BEd59R0EroxiQ+T2OEQjmq45TXzKLZZLRPoFS5wCGnGRN9OIE/GM0PVWRyOKnc+3lNt+
+         3Au5wbOMcvn25QkrsZFYmsgT4E7PVjGlA0ocqGxWkFvGbqgoXlM9LLkRt95Q2uli0fwx
+         ofYO9PSE2upD81vcLfgOATMNETMYzzGD5w4C9VItNTo5mS+DC249maQOVNiXsMYCcfRh
+         en3ns7EFVtf43bYdTJOajw4R9ZK3N90SQSbfkNCNNkSk3GnvFeTD4dZ9QyaSyfOEcs+r
+         ISxg==
+X-Gm-Message-State: APjAAAXlHNICX1YlHjt5FeUVodiw4PKHXBlIB0tjPNjNKlHVRdi3LS3Z
+        lC/4JVWKMTe+SnB8FcmFrBT1ng==
+X-Google-Smtp-Source: APXvYqxeAyEFBlAuZQoHb8VHHtsmRwWrxfY7XYvNTiAEh9EidxkoUXqDezY7o8LJF9ENN2G6K5Ilvg==
+X-Received: by 2002:adf:fd04:: with SMTP id e4mr41844552wrr.190.1554109290099;
+        Mon, 01 Apr 2019 02:01:30 -0700 (PDT)
+Received: from [192.168.0.101] ([88.147.53.253])
+        by smtp.gmail.com with ESMTPSA id 13sm10146380wmf.23.2019.04.01.02.01.29
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 01 Apr 2019 02:01:29 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: Bisected GFP in bfq_bfqq_expire on v5.1-rc1
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20190401115509.76310e03@fire.localdomain>
+Date:   Mon, 1 Apr 2019 11:01:27 +0200
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <84B0CA50-0ED8-4171-8007-19EA43951735@linaro.org>
+References: <20190329160227.7d55c8dd@fire.localdomain>
+ <0e203a26-b941-cef4-dff1-013999d4b041@kernel.dk>
+ <626EAE58-63C1-4ABA-9040-9D9A61F74A0D@linaro.org>
+ <20190401115509.76310e03@fire.localdomain>
+To:     Dmitrii Tcvetkov <demfloro@demfloro.ru>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi
 
 
-On 2019/3/30 6:42, Jan Kara wrote:
-> On Sat 23-03-19 20:51:45, yuyufen wrote:
->> This patch fix use-after-free on gendisk when open the disk partition.
->>
->> Ping and Cc
->>
->> Cc: Al Viro <viro@zeniv.linux.org.uk>
->> Cc: Bart Van Assche <bart.vanassche@wdc.com>
->> Cc: Jan Kara <jack@suse.cz>
->>
->> Yufen
->> Thanks
->>
->> On 2019/3/18 22:07, Yufen Yu wrote:
->>> In part_release(), it will remove devt from ext_devt_idr and
->>> get_gendisk cannot find it. But, if disk_release() works before
->>> part_release, open device partition may cause use-after-free of
->>> disk in get_gendisk(). We use md device as example, the race sence:
->>>
->>> Process1	Worker			Process2
->>> md_free
->>> 					blkdev_open
->>> del_gendisk
->>>     add delete_partition_work_fn() to wq
->>>     					__blkdev_get
->>> 					get_gendisk
->>> put_disk
->>>     disk_release
->>>       kfree(disk)
->>>       					find part from ext_devt_idr
->>> 					get_disk_and_module(disk)
->>>       					  cause use after free
->>>
->>>       		delete_partition_work_fn
->>> 		put_device(part)
->>>       		  part_release
->>> 		    remove part from ext_devt_idr
->>>
->>> Before Woker thread removes part from ext_devt_idr, Process2 can find
->>> the part and access the disk, resulting use-after-free.
->>>
->>> We fix this by removing the devt from ext_devt_idr when delete partition.
->>>
->>> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
-> Thanks for your analysis and the patch! I agree with our analysis of the
-> problem but I'm afraid the fix won't be so straightforward. The problem is
-> that once you remove device number from idr, it can get reallocated for
-> another device. So if nothing else, the idr_remove() call you've left in
-> part_release() could delete *newly created device* from idr which is not
-> what you want. And even if this is fixed, there are other possible issues
-> with reallocating device number before the device is fully shutdown -
-> commit 2da78092dda "block: Fix dev_t minor allocation lifetime"
-> specifically moved blk_free_devt(dev->devt) call to part_release() to avoid
-> such issues (sadly without explaining more details). Adding Keith to CC
-> just in case he remembers.
->
-> Anyway, you are right that it is fundamentally wrong to expose a structure
-> (hd_struct in our case) for lookup in idr when it is essentially scheduled
-> for RCU-delayed freeing. So what we can do is to replace hd_struct pointer
-> in idr with some placeholder value - NULL seems to be OK with idr - and
-> delete the entry from idr in part_release() as we do now. We can call this
-> new helper blk_invalidate_devt() or something like that.
->
-> 								Honza
->
+> Il giorno 1 apr 2019, alle ore 10:55, Dmitrii Tcvetkov =
+<demfloro@demfloro.ru> ha scritto:
+>=20
+> On Mon, 1 Apr 2019 09:29:16 +0200
+> Paolo Valente <paolo.valente@linaro.org> wrote:
+>>=20
+>>=20
+>>> Il giorno 29 mar 2019, alle ore 15:10, Jens Axboe <axboe@kernel.dk>
+>>> ha scritto:
+>>>=20
+>>> On 3/29/19 7:02 AM, Dmitrii Tcvetkov wrote:
+>>>> Hi,
+>>>>=20
+>>>> I got kernel panic since v5.1-rc1 when working with files on block
+>>>> device with BFQ scheduler assigned. I didn't find trivial way to
+>>>> reproduce the panic but "git checkout origin/linux-5.0.y"
+>>>> on linux-stable-rc[1] git repo on btrfs filesystem reproduces the
+>>>> problem 100% of the time on my bare-metal machine and in a VM.
+>>>>=20
+>>>> Bisect led me to commit 9dee8b3b057e1 (block, bfq: fix queue
+>>>> removal from weights tree). After reverting this commit on top of
+>>>> current mainline master(9936328b41ce) I can't reproduce the
+>>>> problem.
+>>>>=20
+>>>> dmesg with the panic and bisect log attached.
+>>>>=20
+>>>> [1]
+>>>> =
+https://kernel.googlesource.com/pub/scm/linux/kernel/git/stable/linux-stab=
+le-rc.git
+>>>=20
+>>> Paolo, can you please take a look at this?
+>>>=20
+>>>=20
+>>=20
+>> Yep.
+>>=20
+>> That you very much Dmitrii for also bisecting.  I feel like this
+>> failure may be caused by the typo fixed by this patch:
+>> https://patchwork.kernel.org/patch/10877113/
+>>=20
+>> Could you please give this fix a try?
+>=20
+> Still reproduces with the patch on top of current mainline
+> master(v5.1-rc3).
+>=20
+> Crashes with and without CONFIG_BFQ_GROUP_IOSCHED look same to me.
+> Original dmesg was also from kernel with CONFIG_BFQ_GROUP_IOSCHED=3Dn.
+>=20
+> gpf.txt contains crash with the patch and CONFIG_BFQ_GROUP_IOSCHED=3Dn
+> gpf-w-bfq-group-iosched.txt - with the patch and =
+CONFIG_BFQ_GROUP_IOSCHED=3Dy
+> config.txt - kernel config for the VM with CONFIG_BFQ_GROUP_IOSCHED=3Dn
+>=20
+>=20
 
-Thanks a lot for your detailed explanation:-). And replacing hd_struct 
-pointer by
-NULL in idr is a good idea. I will send v2 for this problem.
+Ok, thank you. Could you please do a
 
-Yufen
-Thanks
+list *(bfq_bfqq_expire+0x1f3)
 
->>> ---
->>>    block/partition-generic.c | 5 +++++
->>>    1 file changed, 5 insertions(+)
->>>
->>> diff --git a/block/partition-generic.c b/block/partition-generic.c
->>> index 1ee3e1d1bc2a..30d1039d5e8d 100644
->>> --- a/block/partition-generic.c
->>> +++ b/block/partition-generic.c
->>> @@ -288,6 +288,11 @@ void delete_partition(struct gendisk *disk, int partno)
->>>    	kobject_put(part->holder_dir);
->>>    	device_del(part_to_dev(part));
->>> +	/*
->>> +	 * We should ensuere to delete part from idr before kfree(disk),
->>> +	 * avoiding use-after-free of disk.
->>> +	 */
->>> +	blk_free_devt(part_devt(part));
->>>    	hd_struct_kill(part);
->>>    }
->>
+for me?
 
+Thanks,
+Paolo
+
+>=20
+> <gpf.txt><gpf-w-bfq-group-iosched.txt><config.txt>
 
