@@ -2,127 +2,165 @@ Return-Path: <SRS0=QnQz=SD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3EE3C43381
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 10:03:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33D0BC43381
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 10:12:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AD96B2086C
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 10:03:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0908E20830
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 10:12:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726192AbfDAKDt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Apr 2019 06:03:49 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:33882 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725867AbfDAKDt (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 1 Apr 2019 06:03:49 -0400
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D4D4E8B947;
-        Mon,  1 Apr 2019 10:03:48 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AC7A05D9C8;
-        Mon,  1 Apr 2019 10:03:40 +0000 (UTC)
-Date:   Mon, 1 Apr 2019 18:03:36 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "jianchao.wang" <jianchao.w.wang@oracle.com>
-Cc:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        James Smart <james.smart@broadcom.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
-Subject: Re: [PATCH 0/5] blk-mq: allow to run queue if queue refcount is held
-Message-ID: <20190401100334.GA5493@ming.t460p>
-References: <20190331030954.22320-1-ming.lei@redhat.com>
- <10c8ed10-3c96-b73c-18d8-114773b1d675@acm.org>
- <20190401020036.GB30776@ming.t460p>
- <a64684d1-c3dc-b10a-1a03-0a8b2d01b331@acm.org>
- <20190401025237.GE30776@ming.t460p>
- <21b2000b-16b6-f5a6-692b-73143a49a4ec@oracle.com>
- <20190401032852.GG30776@ming.t460p>
- <ef192658-74cd-e193-cb40-aed546c2b309@oracle.com>
+        id S1726008AbfDAKM0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Apr 2019 06:12:26 -0400
+Received: from mx2.suse.de ([195.135.220.15]:44460 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725867AbfDAKM0 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 1 Apr 2019 06:12:26 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 1FED7ACAD;
+        Mon,  1 Apr 2019 10:12:24 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 3D0021E42C7; Mon,  1 Apr 2019 12:12:23 +0200 (CEST)
+Date:   Mon, 1 Apr 2019 12:12:23 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     yuyufen <yuyufen@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        bart.vanassche@wdc.com, Jan Kara <jack@suse.cz>,
+        Keith Busch <keith.busch@intel.com>
+Subject: Re: [PATCH v2] block: fix use-after-free on gendisk
+Message-ID: <20190401101223.GF4826@quack2.suse.cz>
+References: <20190401093413.20502-1-yuyufen@huawei.com>
+ <59c72f9c-389e-1c66-045e-93beb4ef071f@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ef192658-74cd-e193-cb40-aed546c2b309@oracle.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.27]); Mon, 01 Apr 2019 10:03:48 +0000 (UTC)
+In-Reply-To: <59c72f9c-389e-1c66-045e-93beb4ef071f@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 01, 2019 at 05:19:01PM +0800, jianchao.wang wrote:
-> Hi Ming
+On Mon 01-04-19 17:32:32, yuyufen wrote:
+> add Cc
 > 
-> On 4/1/19 11:28 AM, Ming Lei wrote:
-> > On Mon, Apr 01, 2019 at 11:25:50AM +0800, jianchao.wang wrote:
-> >> Hi Ming
-> >>
-> >> On 4/1/19 10:52 AM, Ming Lei wrote:
-> >>>> percpu_ref_tryget_live() fails if a per-cpu counter is in the "dead" state.
-> >>>> percpu_ref_kill() changes the state of a per-cpu counter to the "dead"
-> >>>> state. blk_freeze_queue_start() calls percpu_ref_kill(). blk_cleanup_queue()
-> >>>> already calls blk_set_queue_dying() and that last function calls
-> >>>> blk_freeze_queue_start(). So I think that what you wrote is not correct and
-> >>>> that inserting a percpu_ref_tryget_live()/percpu_ref_put() pair in
-> >>>> blk_mq_run_hw_queues() or blk_mq_run_hw_queue() would make a difference and
-> >>>> also that moving the percpu_ref_exit() call into blk_release_queue() makes
-> >>>> sense.
-> >>> If percpu_ref_exit() is moved to blk_release_queue(), we still need to
-> >>> move freeing of hw queue's resource into blk_release_queue() like what
-> >>> the patchset is doing.
-> >>>
-> >>> Then we don't need to get/put q_usage_counter in blk_mq_run_hw_queues() any more,
-> >>> do we?
-> >>
-> >> IMO, if we could get a way to prevent any attempt to run queue, it would be
-> >> better and clearer.
+> On 2019/4/1 17:34, Yufen Yu wrote:
+> > commit 2da78092dda "block: Fix dev_t minor allocation lifetime"
+> > specifically moved blk_free_devt(dev->devt) call to part_release()
+> > to avoid reallocating device number before the device is fully
+> > shutdown.
 > > 
-> > It is hard to do that way, and not necessary.
+> > However, it can cause use-after-free on gendisk in get_gendisk().
+> > We use md device as example to show the race scenes:
 > > 
-> > I will post V2 soon for review.
+> > Process1		Worker			Process2
+> > md_free
+> > 						blkdev_open
+> > del_gendisk
+> >    add delete_partition_work_fn() to wq
+> >    						__blkdev_get
+> > 						get_gendisk
+> > put_disk
+> >    disk_release
+> >      kfree(disk)
+> >      						find part from ext_devt_idr
+> > 						get_disk_and_module(disk)
+> >      					  	cause use after free
 > > 
-> 
-> Put percpu_ref_tryget/put pair into blk_mq_run_hw_queues could stop run queue after
-> requet_queue is frozen and drained (run queue is also unnecessary because there is no
-> entered requests). And also percpu_ref_tryget could avoid the io hung issue you mentioned.
-> We have similar one in blk_mq_timeout_work.
+> >      			delete_partition_work_fn
+> > 			put_device(part)
+> >      		  	part_release
+> > 		    	remove part from ext_devt_idr
+> > 
+> > Before <devt, hd_struct pointer> is removed from ext_devt_idr by
+> > delete_partition_work_fn(), we can find the devt and then access
+> > gendisk by hd_struct pointer. But, if we access the gendisk after
+> > it have been freed, it can cause in use-after-freeon gendisk in
+> > get_gendisk().
+> > 
+> > We fix this by adding a new helper blk_invalidate_devt() in
+> > delete_partition() and del_gendisk(). It replaces hd_struct
+> > pointer in idr with value 'NULL', and deletes the entry from
+> > idr in part_release() as we do now.
+> > 
+> > Fixes: 2da78092dda1 ("block: Fix dev_t minor allocation lifetime")
+> > Cc: Al Viro <viro@zeniv.linux.org.uk>
+> > Cc: Bart Van Assche <bart.vanassche@wdc.com>
+> > Cc: Jan Kara <jack@suse.cz>
+> > Cc: Keith Busch <keith.busch@intel.com>
+> > Signed-off-by: Yufen Yu <yuyufen@huawei.com>
 
-If percpu_ref_tryget() is used, percpu_ref_exit() has to be moved into
-queue's release handler.
+Thanks for the patch! Just two nits below:
 
-Then we still have to move freeing hctx's resource into hctx or queue's
-release handler, that is exactly what this patch is doing. Then
-percpu_ref_tryget() becomes unnecessary again, right?
+> > diff --git a/block/genhd.c b/block/genhd.c
+> > index 961b2bc4634f..7144153c6bf1 100644
+> > --- a/block/genhd.c
+> > +++ b/block/genhd.c
+> > @@ -529,6 +529,18 @@ void blk_free_devt(dev_t devt)
+> >   	}
+> >   }
+> > +/**
+> > + *	We invalidate devt by assigning NULL pointer for devt in idr.
+> > + */
+> > +void blk_invalidate_devt(dev_t devt)
+> > +{
+> > +	if (MAJOR(devt) == BLOCK_EXT_MAJOR) {
+> > +		spin_lock_bh(&ext_devt_lock);
+> > +		idr_replace(&ext_devt_idr, NULL, blk_mangle_minor(MINOR(devt)));
+> > +		spin_unlock_bh(&ext_devt_lock);
+> > +	}
+> > +}
+> > +
+> >   static char *bdevt_str(dev_t devt, char *buf)
+> >   {
+> >   	if (MAJOR(devt) <= 0xff && MINOR(devt) <= 0xff) {
+> > @@ -801,6 +813,11 @@ void del_gendisk(struct gendisk *disk)
+> >   		sysfs_remove_link(block_depr, dev_name(disk_to_dev(disk)));
+> >   	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
+> >   	device_del(disk_to_dev(disk));
+> > +
+> > +	/*
+> > +	 * we need to invalidate devt before remove it from idr.
+> > +	 */
+> > +	blk_invalidate_devt(disk_devt(disk));
 
-> 
-> freeze and drain queue to stop new attempt to run queue, blk_sync_queue syncs and stops
-> the started ones, then hctx->run_queue is cleaned totally.
-> 
-> IMO, it would be better to have a checkpoint after which there will be no any in-flight
-> asynchronous activities of the request_queue (hctx->run_work, q->requeue_work, q-> timeout_work)
-> and any attempt to start them will fail.
+I would move this slightly up to where blk_unregister_region() is called
+because these two are just different means to lookup the gendisk (idr or
+bdev_map depending of major number used). Also I'd update the comment to
+something like:
 
-All are canceled in blk_cleanup_queue(), but not enough, given queue can
-be run in sync mode(such as via plug, direct issue, ...), or driver's
-requeue, such as SCSI's requeue. SCSI's requeue may run other LUN's queue
-just by holding queue's kobject refcount.
+	/*
+	 * Remove gendisk pointer from idr so that it cannot be looked up
+	 * while RCU period before freeing gendisk is running to prevent
+	 * use-after-free issues. Note that the device number stays
+	 * "in-use" until we really free the gendisk.
+	 */
 
-> 
-> Perhaps, this will be a good change to do this ；）
+> >   }
+> >   EXPORT_SYMBOL(del_gendisk);
+> > diff --git a/block/partition-generic.c b/block/partition-generic.c
+> > index 1ee3e1d1bc2a..922230b5a907 100644
+> > --- a/block/partition-generic.c
+> > +++ b/block/partition-generic.c
+> > @@ -288,6 +288,12 @@ void delete_partition(struct gendisk *disk, int partno)
+> >   	kobject_put(part->holder_dir);
+> >   	device_del(part_to_dev(part));
+> > +	/*
+> > +	 *	We need to invalidate devt by assigning NULL pointer for devt
+> > +	 *	before remove it from ext_devt_idr, which can avoid use-after-free
+> > +	 *	on gendisk.
+> > +	 */
+> > +	blk_invalidate_devt(part_devt(part));
+> >   	hd_struct_kill(part);
+> >   }
 
-However, I don't see it is necessary if we simply move freeing hctx's
-resource into its release handler, just like V2.
+And here I'd just use the same comment as above.
 
-
-Thanks,
-Ming
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
