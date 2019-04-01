@@ -7,70 +7,68 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAC01C43381
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 11:55:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94289C43381
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 12:04:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9826D206DD
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 11:55:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63BE420883
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 12:04:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aOEAGSKJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y4GNetfn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725895AbfDALzs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Apr 2019 07:55:48 -0400
-Received: from mail-it1-f196.google.com ([209.85.166.196]:40361 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725882AbfDALzs (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Apr 2019 07:55:48 -0400
-Received: by mail-it1-f196.google.com with SMTP id y63so14699064itb.5;
-        Mon, 01 Apr 2019 04:55:47 -0700 (PDT)
+        id S1726723AbfDAME4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Apr 2019 08:04:56 -0400
+Received: from mail-it1-f194.google.com ([209.85.166.194]:51193 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726637AbfDAME4 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Apr 2019 08:04:56 -0400
+Received: by mail-it1-f194.google.com with SMTP id q14so1876007itk.0;
+        Mon, 01 Apr 2019 05:04:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:to:references:from:message-id:date:user-agent:mime-version
          :in-reply-to:content-language:content-transfer-encoding;
-        bh=GAtnZVsq43buRcawG33U5wTp9JD/QYMtT4DBSiQC68E=;
-        b=aOEAGSKJkbtgSpEnHJtmQCp0S4SVECQ/lc7GQZSk9uQWL0UFOLD4/jyHG7NIfk39Ku
-         RZsrioWnK5sv6mkGGbgz5LDGLdF7weziQPsucQgTBiTqfxCUt8bx1unpmxks1Y6FCYLD
-         Bkd+/ZlSVAFC58mQwSM/MORT12WhSlNubn7nwwCfF/79jQmF1hjLPACrC26MrChLcPfz
-         migKlvDkcoLqVqYked5AANW7uG8seZpMV+CkCDV0x+G1iMdDrFwuQ4cDyf6JXLUx3d+S
-         JfIonoEVPCTlbFOMrcpMwGFJMwgvfbXhkC8V9zxHrnV6Yt1eyBEYOJwYYJdTulTHBSN6
-         jb/w==
+        bh=FWmZ6v+E+z/q2UJ7igejy84L4+s8W8RrVDxcjfEt8Ro=;
+        b=Y4GNetfnT5A4+itBpz6MO+5Zc1PVEosltmydrRiJp4C4ZGniRSRPf8RiG68wjaK1TU
+         H4NGvlJKHEf7iAZJeKjf2+0JK+7jXHsuS4FDnuc1YIBg29VlT+30xmoT8j1Ll0lGFieZ
+         ZZxKi2PgLfKew/dQ1zdeUJdLda1fBO744odPa4s3kL16Yb/KhdQPrKCKbqVrtOLawSp2
+         SrGLAdbFggJwAhKCN3FC/8xnlcEzSlDzW4B+1uRFwNw/+dQsgvZ3lfsOVSVk3iiU2zvU
+         oYLJuun227bIf0pjTOd74hScGlKgNGp0+rTPrhTv8TmZr0pbQoK0C5bTXifnS77ohet4
+         dPIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=GAtnZVsq43buRcawG33U5wTp9JD/QYMtT4DBSiQC68E=;
-        b=bl3ypj0Qc+a4KfTmPJb3v7oR/cmasi1kBNiUyozt28NwFC3e8c7dB6KQyFdeKJNix0
-         Tcr7v8XDjcAjuWWo5w8mXseKcwCCaSUNKyn9Yf5O81ud9nw5t4/cDL5bCtOwklkAODH7
-         N0otzGaMb/D9j27RTqZSQzRujM/BHp8jix+seVClQ1ztn6G1ARLO8zJKlV83M3fp1lLF
-         wKbmeLDZX+2Pj47SK3hUdY//CDaLxjKmC0Q4XoBIPKJXKZS0h56z1zzIrur0CJefZ8be
-         4KUUnpqImW+vUmv9nBnBeyd02ggc//3cveU8+BWvBmSSUHTCUlI4mF2u+LntXISFzjMV
-         ymXQ==
-X-Gm-Message-State: APjAAAX7YZnwmmHefuLPbZVn/u5OOVa1FUYDNgsvx4ibsOr1Bk2D+CLO
-        6fJmvP0Wl7Wz6EGt8MQ1cmrkPH9YXZM=
-X-Google-Smtp-Source: APXvYqwxv+P3h7Y8MrvaFyoRezq2n43YtPX4pZ77qPnb/Q+K1C6Iyf24DOTkD2co+2UnMOi0jHzpCg==
-X-Received: by 2002:a02:3506:: with SMTP id k6mr18954109jaa.41.1554119747211;
-        Mon, 01 Apr 2019 04:55:47 -0700 (PDT)
+        bh=FWmZ6v+E+z/q2UJ7igejy84L4+s8W8RrVDxcjfEt8Ro=;
+        b=fA9lEX0ji8CbYvnDPIUSOJ9mO+6utYGWD+wTBtRl1dHvsKV+uGHZf7hnbJHVtojWoY
+         iGbq3I9KAbzn/11I0NT+cVcEmhJb+31yVqbdRijHjuOrhq0dSAThNvzxsPe7Un+6Ja0Y
+         x0D9LzgVbeONdeUBWrtOay1OQ4SyCoISJ4u0adXJT+SjtZhZjn9MOQHg3I+12u0czMzH
+         Fhdcu9ZdkRkULtYKLV0rhW0d5c27EbVzkeOKa1GTlJc9oQCCqguG3TMSsXWeuHEUlc3q
+         iAoF0be+XueX3fifwiOInfTzWhjGWbsi6BqkCbP5HzS2YmdoiyBCvFFX/C6xom0EwBM1
+         m88g==
+X-Gm-Message-State: APjAAAUKDlTPyccZuXXWpy8asK/qyrBWU03Zh5avON3oTOG/QYoqVh5B
+        NItcBPGKIBIjkSev4XcZC3Pltl74WrZqlg==
+X-Google-Smtp-Source: APXvYqzbbwn1jjBVyblnA2jvWnghLkgC+6MnWzi6BJC4FzV4VnZ4474bkip4RANtyckG5bGuQsuVJA==
+X-Received: by 2002:a02:ab90:: with SMTP id t16mr43897334jan.135.1554120295027;
+        Mon, 01 Apr 2019 05:04:55 -0700 (PDT)
 Received: from [191.9.209.46] (rrcs-70-62-41-24.central.biz.rr.com. [70.62.41.24])
-        by smtp.gmail.com with ESMTPSA id f204sm5596421itc.26.2019.04.01.04.55.46
+        by smtp.gmail.com with ESMTPSA id n4sm4260109ioh.52.2019.04.01.05.04.53
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 01 Apr 2019 04:55:46 -0700 (PDT)
+        Mon, 01 Apr 2019 05:04:54 -0700 (PDT)
 Subject: Re: Is it possible that certain physical disk doesn't implement flush
  correctly?
-To:     Alberto Bursi <alberto.bursi@outlook.it>,
-        Qu Wenruo <quwenruo.btrfs@gmx.com>,
+To:     Qu Wenruo <quwenruo.btrfs@gmx.com>,
         "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
         Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        linux-block@vger.kernel.org
 References: <dc1735e6-e410-e593-7059-3728eb427886@gmx.com>
- <AM0PR03MB5745ACEC53F69BC28AC480F592540@AM0PR03MB5745.eurprd03.prod.outlook.com>
 From:   "Austin S. Hemmelgarn" <ahferroin7@gmail.com>
-Message-ID: <5f58328a-8b9a-3a78-0e2f-45e1e1e62685@gmail.com>
-Date:   Mon, 1 Apr 2019 07:55:42 -0400
+Message-ID: <e6f92cc0-de85-32b1-3cbb-5f380bce6c41@gmail.com>
+Date:   Mon, 1 Apr 2019 08:04:51 -0400
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <AM0PR03MB5745ACEC53F69BC28AC480F592540@AM0PR03MB5745.eurprd03.prod.outlook.com>
+In-Reply-To: <dc1735e6-e410-e593-7059-3728eb427886@gmx.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -79,52 +77,46 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2019-03-31 07:27, Alberto Bursi wrote:
+On 2019-03-30 08:31, Qu Wenruo wrote:
+> Hi,
 > 
-> On 30/03/19 13:31, Qu Wenruo wrote:
->> Hi,
->>
->> I'm wondering if it's possible that certain physical device doesn't
->> handle flush correctly.
->>
->> E.g. some vendor does some complex logical in their hdd controller to
->> skip certain flush request (but not all, obviously) to improve performance?
->>
->> Do anyone see such reports?
->>
->> And if proves to happened before, how do we users detect such problem?
->>
->> Can we just check the flush time against the write before flush call?
->> E.g. write X random blocks into that device, call fsync() on it, check
->> the execution time. Repeat Y times, and compare the avg/std.
->> And change X to 2X/4X/..., repeat above check.
->>
->> Thanks,
->> Qu
->>
->>
+> I'm wondering if it's possible that certain physical device doesn't
+> handle flush correctly.
 > 
-> Afaik HDDs and SSDs do lie to fsync()
+> E.g. some vendor does some complex logical in their hdd controller to
+> skip certain flush request (but not all, obviously) to improve performance?
 > 
-> unless the write cache is turned off with hdparm,
-Nope, not the case on modern Linux.  The issue here was that Linux did 
-not issue a FLUSH bio as part of the completion of an fsync() system 
-call, and problem has long-since been fixed (and wasn't actually the 
-disk lying, but the kernel).
+> Do anyone see such reports?
+Some OCZ SSD's had issues that could be explained by this type of 
+behavior (and the associated data-loss problems are part of why they 
+don't make SSD's any more).
+
+Other than that, I know of no modern _physical_ hardware that does this 
+(I've got  5.25 inch full-height SCSI-2 disks that have this issue at 
+work, and am really glad we have no systems that use them anymore).  It 
+is, however, pretty easy to configure _virtual_ disk drives to behave 
+like this.
 > 
-> hdparm -W0 /dev/sda
+> And if proves to happened before, how do we users detect such problem?
+There's unfortunately no good way to do so unless you can get the disk 
+to drop it's write cache without writing out it's contents.  Assuming 
+you can do that, the trivial test is to write a block, issue a FLUSH, 
+force drop the cache, and then read-back the block that was written. 
+There were some old SCSI disks that actually let you do this by issuing 
+some extended SCSI commands, but I don't know of any ATA disks where 
+this was ever possible, and most modern SCSI disks won't let you do it 
+unless you flash custom firmware to allow for it.
+
+Of course, you can always test with throw-away data by manually inducing 
+power failures, but that's tedious and hard on the hardware.
 > 
-> similarly to RAID controllers.
-And most RAID controllers don't actually lie either.  The SCSI and ATA 
-standards both count a write that is stored in a _non-volatile_ cache as 
-completed, and any halfway-decent RAID controller will be using some 
-form of non-volatile storage for it's cache (classically battery-backed 
-SRAM, but there's been some shift to NOR or NAND flash storage recently, 
-and I've seen a couple of really expensive ones using more-exotic 
-non-volatile storage technologies).
+> Can we just check the flush time against the write before flush call?
+> E.g. write X random blocks into that device, call fsync() on it, check
+> the execution time. Repeat Y times, and compare the avg/std.
+> And change X to 2X/4X/..., repeat above check.
 > 
-> see below
+> Thanks,
+> Qu
 > 
-> https://brad.livejournal.com/2116715.html
 > 
-> https://queue.acm.org/detail.cfm?id=2367378
+
