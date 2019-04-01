@@ -2,152 +2,112 @@ Return-Path: <SRS0=QnQz=SD=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91CA0C43381
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 14:05:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE92C43381
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 14:25:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 55E62214AF
-	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 14:05:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C11220857
+	for <linux-block@archiver.kernel.org>; Mon,  1 Apr 2019 14:25:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JlrScw85"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="h1lYlVOA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727035AbfDAOFK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Apr 2019 10:05:10 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:45782 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726657AbfDAOFJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Apr 2019 10:05:09 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x31DwqYK151890;
-        Mon, 1 Apr 2019 14:04:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=ZIuTcT3YxAn2V8WHN2im9MO7KNlk3OqiwzWFHQZa2FQ=;
- b=JlrScw85yPFz7rjxJPrMGv+hy+fodIcBHJVfqehgwAqfxNpz9j0VVLeOMnwa7C4zTmuM
- ZbLJ678ENVTDv7SWA6JkgwG9CWGY/gPtVK3macfMZzHbJVI9Fa6ju9yUhPuwz7zpRcgg
- AFTl93qjsxp/ayJrKhQ8pEoBX24RoN8pcqdd7th9QoGtR+7oy5mj7WzQI5B507iXPJ9L
- 3Gwy8M9tmtRHLh/kL+6f3y8FJH9lTTuo1fmMgJ67Bh/y5KWjSHimxW/kaeJN+qfKAwHm
- HyhEUyswqSnHdVJtcS8cZzJtRXDcpyI2n9Xw/2f1tjewoKh1zxE/WKYWeT/m9FxY0RB/ bg== 
-Received: from userv0022.oracle.com (userv0022.oracle.com [156.151.31.74])
-        by aserp2130.oracle.com with ESMTP id 2rhwycyc3g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 01 Apr 2019 14:04:49 +0000
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userv0022.oracle.com (8.14.4/8.14.4) with ESMTP id x31E4mdC030193
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 1 Apr 2019 14:04:48 GMT
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x31E4lh8029430;
-        Mon, 1 Apr 2019 14:04:47 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 01 Apr 2019 07:04:46 -0700
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Jens Axboe <axboe@kernel.dk>, Bob Liu <bob.liu@oracle.com>,
-        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, shirley.ma@oracle.com,
-        allison.henderson@oracle.com, darrick.wong@oracle.com,
-        hch@infradead.org, adilger@dilger.ca, tytso@mit.edu
-Subject: Re: [PATCH v3 2/3] block: verify data when endio
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <41c8688a-65bd-96ac-9b23-4facd0ade4a7@kernel.dk>
-        <yq1ftr5rbq1.fsf@oracle.com>
-        <f65d6a7b-9e69-ae1e-b8b8-8769dc650311@kernel.dk>
-        <yq1bm1trb4y.fsf@oracle.com>
-        <feefa611-b744-326c-29d5-c64bcda45d9f@kernel.dk>
-        <yq17echrax1.fsf@oracle.com>
-        <1b638dc2-56fd-6ab4-dcca-ad2adb9931bb@kernel.dk>
-        <c9adb48c-7b6e-2017-9480-aa2342b3523b@oracle.com>
-        <7599b239-46f4-9799-a87a-3ca3891d4a08@kernel.dk>
-        <yq1imw1p0lp.fsf@oracle.com> <20190331220001.GM23020@dastard>
-Date:   Mon, 01 Apr 2019 10:04:43 -0400
-In-Reply-To: <20190331220001.GM23020@dastard> (Dave Chinner's message of "Mon,
-        1 Apr 2019 09:00:01 +1100")
-Message-ID: <yq1ef6lq0sk.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        id S1727583AbfDAOZE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Apr 2019 10:25:04 -0400
+Received: from mail-it1-f171.google.com ([209.85.166.171]:40366 "EHLO
+        mail-it1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727153AbfDAOZD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Apr 2019 10:25:03 -0400
+Received: by mail-it1-f171.google.com with SMTP id k64so16669itb.5
+        for <linux-block@vger.kernel.org>; Mon, 01 Apr 2019 07:25:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=to:from:subject:message-id:date:user-agent:mime-version
+         :content-language:content-transfer-encoding;
+        bh=hB0Mn2Lixajuir7J7FmHfAw00LgecZYvZBAy6Pj7V2I=;
+        b=h1lYlVOATLXMGAkhzzF0J6n0yu3ekIuNjcTqFHMRMPbpxgh24kT8OAKLdFCyqrywxN
+         nS4d9BpyrJuXMfKTG0TVD8OMaVSFg7o86Z00GjDEqPhsuDE0Qb5a6OrvemGtB9ZtYb3+
+         HqO+KGjLpY4tu05cLYRfPZDACgVALAPXenCiYA4wxO6Lui7rOmN4QiVgpvHI2qCK9wbc
+         KvpMwhR4l5ZPZ2HIXEbFHAUtxzACKI8XIGtrDJAk37oJ1ykA1ehAD+Oj1nkPesGwbJeM
+         NuoKQ6mAEViY8RqOPFshC/cvN5A11K+/veOzEk1M40/QtEdrWxXVaHk0V/gIs0wbom4L
+         emvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:from:subject:message-id:date:user-agent
+         :mime-version:content-language:content-transfer-encoding;
+        bh=hB0Mn2Lixajuir7J7FmHfAw00LgecZYvZBAy6Pj7V2I=;
+        b=QKsyGkKxQTB1ZzM0bKYSuthfRTdneNHMwOYX+1XxUQHD1k0+/ADaOw/08e8NdI41jA
+         FvLy/8J4ToXN18baaOGP3tY8QcimHaQAJ4UEHdvwsQtpRivftZZ2KR1VW4DDnxVuLIow
+         RiDarZBdE7ieC1nrqo6sz1vuWbTzYv+D0iIR1upyUcNrwSgHFXpwuF5CVzZCCdQ44TEy
+         muwjGq3BvjF1cf6O+oEdOF8WGNGzkld8X0tDb+4Xqizj18rzFZOkmciYMwkhbTFxJJGa
+         fefHaPfsibpa/Y+NC+Bc0XhhZ7f/ryvHd++OmujCe0scuy/W8yLyTif1ZOpCZ+y1+gaE
+         12IQ==
+X-Gm-Message-State: APjAAAVTvD/Ucm9A8h0UVGsesPzSjaeZW3tNanID8FYcHG/lRSZuN/EB
+        4hcMN45RpPDDZrbz19y9XNpPhhDv3129Cw==
+X-Google-Smtp-Source: APXvYqwV1SVmPL28czQp2NUDx0r7T/b4wK6Avq1cq8iz34UMzbmPhaF/5LaW0UJlKlS2ZVMK+X8qIQ==
+X-Received: by 2002:a24:4198:: with SMTP id b24mr15356857itd.25.1554128702637;
+        Mon, 01 Apr 2019 07:25:02 -0700 (PDT)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id v187sm7403392ita.0.2019.04.01.07.25.01
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 01 Apr 2019 07:25:01 -0700 (PDT)
+To:     Ming Lei <ming.lei@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: blk-merge warning in for-5.2/block
+Message-ID: <100ac534-cce5-47d2-d703-e81fcbaca34f@kernel.dk>
+Date:   Mon, 1 Apr 2019 08:25:00 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9213 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1904010096
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Ming,
 
-Hi Dave!
+I'm getting this one when building the new set with gcc 8.3.0:
 
->> However, that suffers from another headache in that the I/O can get
->> arbitrarily sliced and diced in units of 512 bytes.
->
-> Right, but we don't need support that insane case. Indeed, if
-> it wasn't already obvious, we _can't support it_ because the
-> filesystem verifiers can't do partial verification. i.e.  part of
-> the verification is CRC validation of the whole bio, not to mention
-> that filesystem structure fragments cannot be safely parsed,
-> interpretted and/or verified without the whole structure first being
-> read in.
 
-What I thought. There are some things I can verify by masking but it's
-limited.
+-- In file included from block/blk-merge.c:13:
+block/blk-merge.c: In function ‘blk_rq_map_sg’:
+block/blk.h:73:56: warning: ‘bvec.bv_offset’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+  phys_addr_t addr1 = page_to_phys(vec1->bv_page) + vec1->bv_offset;
+                                                    ~~~~^~~~~~~~~~~
+block/blk-merge.c:530:17: note: ‘bvec.bv_offset’ was declared here
+  struct bio_vec bvec, bvprv = { NULL };
+                 ^~~~
+In file included from block/blk-merge.c:13:
+block/blk.h:76:18: warning: ‘bvec.bv_len’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+  if (addr1 + vec1->bv_len != addr2)
+              ~~~~^~~~~~~~
+block/blk-merge.c:530:17: note: ‘bvec.bv_len’ was declared here
+  struct bio_vec bvec, bvprv = { NULL };
+                 ^~~~
+In file included from ./arch/x86/include/asm/page.h:76,
+                 from ./arch/x86/include/asm/thread_info.h:12,
+                 from ./include/linux/thread_info.h:38,
+                 from ./arch/x86/include/asm/preempt.h:7,
+                 from ./include/linux/preempt.h:78,
+                 from ./include/linux/spinlock.h:51,
+                 from ./include/linux/seqlock.h:36,
+                 from ./include/linux/time.h:6,
+                 from ./include/linux/stat.h:19,
+                 from ./include/linux/module.h:10,
+                 from block/blk-merge.c:6:
+./include/asm-generic/memory_model.h:55:52: warning: ‘bvec.bv_page’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+ #define __page_to_pfn(page) (unsigned long)((page) - vmemmap)
+                                                    ^
+block/blk-merge.c:530:17: note: ‘bvec.bv_page’ was declared here
+  struct bio_vec bvec, bvprv = { NULL };
+                 ^~~~
 
-What about journal entries? Would they be validated with 512-byte
-granularity or in bundles thereof? Only a problem during recovery, but
-potentially a case where we care deeply about trying another copy if it
-exists.
 
-What I'm asking is if we should have a block size argument for the
-verification? Or would you want to submit bios capped to the size you
-care about and let the block layer take care of coalescing?
+Jens Axboe
 
-Validation of units bigger than the logical block size is an area which
-our older Oracle HARD technology handles gracefully but which T10 PI has
-been unable to address. So this is an area of particular interest to me,
-although it's somewhat orthogonal to Bob's retry plumbing.
-
-Another question for you wrt. retries: Once a copy has been identified
-as bad and a good copy read from media, who does the rewrite? Does the
-filesystem send a new I/O (which would overwrite all copies) or does the
-retry plumbing own the responsibility of writing the good bio to the bad
-location?
-
-> IOWs, we need to look at this problem from a "whole stack" point of
-> view, not just cry about how "bios are too flexible and so make this
-> too hard!". The filesystem greatly constrains the alignment and
-> slicing/dicing problem to the point where it should be non-existent,
-> we have a clearly defined hard stop where verifier propagation
-> terminates, and if all else fails we can still detect corruption at
-> the filesystem level just like we do now. The worst thing that
-> happens here is we give up the capability for automatic block device
-> recovery and repair of damaged copies, which we can't do right now,
-> so it's essentially status quo...
-
-Having gone down the path of the one-to-many relationship when I did the
-original heterogeneous I/O topology attempt, it's pure hell. Also dealt
-with similar conundrums for the integrity stuff. So I don't like the
-breadcrumb approach. Perfect is the enemy of good and all that.
-
-And I am 100% in agreement on the careful alignment and not making
-things complex for crazy use cases (although occasional straddling I/Os
-are not as uncommon as we'd like to think). However, I do have concerns
-about this particular feature when it comes to your status quo comment.
-
-In order for us to build highly reliable systems, we have to have a
-better building block than "this redundancy retry feature works most of
-the time". So to me it is imperative that we provide hard guarantees
-once a particular configuration has been set up and stacked. And if the
-retry guarantee is somehow invalidated, then we really need to let the
-user know about it.
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
