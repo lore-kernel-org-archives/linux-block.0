@@ -2,102 +2,94 @@ Return-Path: <SRS0=N1jC=SE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF74C43381
-	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 06:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73EF0C43381
+	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 07:59:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A0E00206B7
-	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 06:30:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1554186605;
-	bh=3cdCwFG0qB3EXDXlA1qQ+fiqjqIrsqWKYpZKPFmq3NY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=aqWE6Mt1IZBPBwkHEKiDpp7IRecL9z2vwNwL2ETxAPzkwVcf8GIvUY+xksyvVCWEm
-	 q9ZYxbv1QWOBS/6SicGy/9TqdKoVzhH33uwwLKYPH+WGu1RaZn2UaP+I1mTHuk0Qd5
-	 sXysPupb+Ma86815DfaQbZAQjio2gW5h1LPrtFaE=
+	by mail.kernel.org (Postfix) with ESMTP id 453FD20857
+	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 07:59:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XiFYIF90"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726628AbfDBG36 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Apr 2019 02:29:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58018 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725778AbfDBG36 (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Apr 2019 02:29:58 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 97FA1206B7;
-        Tue,  2 Apr 2019 06:29:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1554186597;
-        bh=3cdCwFG0qB3EXDXlA1qQ+fiqjqIrsqWKYpZKPFmq3NY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VRsMnf/qtqWRAr5kYLGAXOVw4JvfRl80f2zA0bV529qaUA9njPwps85sDunN+Qf+k
-         wBk6V45E/Ry70g8L1H05dZ0Rzo0AZsdp/NGn33VghiFPJWA/5+nbxmtawL8J+mzwj7
-         g8OUlsSxJQ9HufqSnPLcuuDJVwjrAHVu88Lw137A=
-Date:   Tue, 2 Apr 2019 08:29:50 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Kimberly Brown <kimbrownkd@gmail.com>
-Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Petr Mladek <pmladek@suse.com>,
-        Joe Lawrence <joe.lawrence@redhat.com>,
-        live-patching@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/8] kobject: Add default group support to kobj_type
- and replace subsystem uses
-Message-ID: <20190402062950.GA7218@kroah.com>
-References: <20190322201440.GA30814@ubu-Virtual-Machine>
- <cover.1554151487.git.kimbrownkd@gmail.com>
+        id S1728159AbfDBH7u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Apr 2019 03:59:50 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:38866 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725884AbfDBH7u (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Apr 2019 03:59:50 -0400
+Received: by mail-wr1-f68.google.com with SMTP id k11so15332749wro.5
+        for <linux-block@vger.kernel.org>; Tue, 02 Apr 2019 00:59:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=m2ru/BFVHEWSadfx1cM6+uKtJ+kqJjiJuEIrRwhtwAI=;
+        b=XiFYIF90eYovH6lL+5WfQpAlG7W2DKylG2dC5Z0GxJkeRl2ma0na7dALXekW0p4Jb4
+         ru3D4rgy60UrNT4kxsjxPkyQ9WGJ9/dqKjPB0r68BtjiBtP13XKHcXrRje2UyZ8Akqyv
+         qAeviQDGLKFFpCDZm2A1B4m9bMGMIwFaZWkQMLRGB1siDA/k5eBTVCa6IQSIhgD4NVNN
+         1uzw8xDJNckRb6VQOV7AxUFWgPHDn08t6PU7nHqxpSqlwh5ngUgUXyzJnnPE2V6wiNXc
+         yhHRoPTjmMdVIH3AzihZjjzfHaUIWjeBjeyGZfRkPNWfcWuLqZqko/SYT5+petxb2H7M
+         pTig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=m2ru/BFVHEWSadfx1cM6+uKtJ+kqJjiJuEIrRwhtwAI=;
+        b=MjdCKcj0HAHKF/W6SdS1EACgVDEs91A9b+jdytqLO605MwMuIzB/4Mo0XNr6VHeUwH
+         2yPqc08VPsyuVM1cEytu70dpQgA0h+179A7sKOtVf/Me8IX1tXA3lco17RJ/qMmhLTq1
+         pqdmS6Bnu2365MwJL3sJ2GbqUXzQRye02D1RLY1ny1RgJMOF0lVZztXVMLM11Nyn4i5I
+         rKm+W77qI2jrd97C3NtzVN2aIDakgfLJOrLqmD1avwx2+as0sB1SVjwjKcdVAqIctqO8
+         FLCPynbjSpV99bZXGjY2OHfaZ4ukmcCZL4/gAh6A3qe8XzFngqDgsq0jAPr99z4hojlj
+         U9TA==
+X-Gm-Message-State: APjAAAUo1CdfXS45Y1EsXHWgYaBZeEI/WiiIAeKA0rys4H01HXXV2Z/V
+        pZeHL4LLM/jEff1aWOQg7P3KEw7b+A1w72NZ1a0=
+X-Google-Smtp-Source: APXvYqyJwW4atSQzvdRbmVnh2Mo8Z3U0VrUOb05vjy+JKISPFK9+gQHBD3aiuKxWxIlV0eXoxefsgL/wD7Ysgk2aK7I=
+X-Received: by 2002:adf:ed90:: with SMTP id c16mr42467336wro.74.1554191988262;
+ Tue, 02 Apr 2019 00:59:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1554151487.git.kimbrownkd@gmail.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+References: <20190401134036.8377-1-shhuiw@foxmail.com>
+In-Reply-To: <20190401134036.8377-1-shhuiw@foxmail.com>
+From:   Ming Lei <tom.leiming@gmail.com>
+Date:   Tue, 2 Apr 2019 15:59:36 +0800
+Message-ID: <CACVXFVNsgA1Xu24smAJ1i7OnSUY1d1wa8aAYgHxqpZ2iQgXhkQ@mail.gmail.com>
+Subject: Re: [PATCH] block: use blk_free_flush_queue() to free hctx->fq in blk_mq_init_hctx
+To:     Shenghui Wang <shhuiw@foxmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 01, 2019 at 10:51:10PM -0400, Kimberly Brown wrote:
-> This patchset adds support for default attribute groups to kobj_type.
-> Also, the uses of kobj_type's default_attrs field are replaced with
-> default_groups in the following subsystems:
->  - samples
->  - block
->  - net
->  - irq
->  - padata
->  - cpufreq
->  - livepatch
-> 
-> The subsystem maintainers and lists will be copied on the subsystem
-> patches.
-> 
-> The uses of kobj_type's default_attrs field in the other subsystems will
-> be replaced in future patchsets.
-> 
-> Changes in v2:
->  - Patch 1 is not changed.
->  - Patches 2-8 are new.
+On Mon, Apr 1, 2019 at 9:41 PM Shenghui Wang <shhuiw@foxmail.com> wrote:
+>
+> kfree() can leak the hctx->fq->flush_rq field.
+>
+> Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
+> ---
+>  block/blk-mq.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 3ff3d7b49969..f3b0d33bdf88 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2332,7 +2332,7 @@ static int blk_mq_init_hctx(struct request_queue *q,
+>         return 0;
+>
+>   free_fq:
+> -       kfree(hctx->fq);
+> +       blk_free_flush_queue(hctx->fq);
+>   exit_hctx:
+>         if (set->ops->exit_hctx)
+>                 set->ops->exit_hctx(hctx, hctx_idx);
 
-Thanks so much for doing this.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-As all of the different subsystems depend on the first patch, I'll be
-glad to merge them all through my driver-core tree, or apply the first
-one and wait a release cycle so that the others can go through the
-individual subsystem's tree, depending on what the subsystem maintainer
-is comfortable with.
-
-thanks,
-
-greg k-h
+Thanks,
+Ming Lei
