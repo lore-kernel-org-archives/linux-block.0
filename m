@@ -2,136 +2,133 @@ Return-Path: <SRS0=N1jC=SE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 912F0C43381
-	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 02:36:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42714C43381
+	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 02:51:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5DA5E2084B
-	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 02:36:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 06C3F2070D
+	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 02:51:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bTqR6OtN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728483AbfDBCgl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 1 Apr 2019 22:36:41 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:47940 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726168AbfDBCgl (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Mon, 1 Apr 2019 22:36:41 -0400
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id D4AE0F74AC;
-        Tue,  2 Apr 2019 02:36:40 +0000 (UTC)
-Received: from localhost (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D06A35C22C;
-        Tue,  2 Apr 2019 02:36:37 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>
-Subject: [PATCH] block: clarify that bio_add_page() and related helpers can add multi pages
-Date:   Tue,  2 Apr 2019 10:36:32 +0800
-Message-Id: <20190402023632.8485-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Tue, 02 Apr 2019 02:36:40 +0000 (UTC)
+        id S1728681AbfDBCvP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 1 Apr 2019 22:51:15 -0400
+Received: from mail-it1-f193.google.com ([209.85.166.193]:56295 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726269AbfDBCvP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 1 Apr 2019 22:51:15 -0400
+Received: by mail-it1-f193.google.com with SMTP id z126so2637979itd.5;
+        Mon, 01 Apr 2019 19:51:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=Qzcc4/2F2anEBs0yxcfDa0SSDpIJUqbgduaUlMcApaA=;
+        b=bTqR6OtN2mOSNfb5+HBdYwCKeL0xq0V6F3o9nchI9U7ZxmMyh1pGmdGG7BkYPZCywH
+         j5MWGwrSZ5RmieURRbKklpZAd42B7F8w8/nRoJxUIGsaNn5xEI84TBJgoPAfX4R1iYVx
+         gCZFgqcPmdF4Ay05FmekZ5fyf08VBOSYIO90L3RgAw7+emCLLMDzXvUZWEAiUAbAuoFQ
+         c16O5THjgmbBbx9drTgXsHABVEIPGkrPOroWCJ4Qq4sMhFE6rnm3wvFX0rBT7UVKzrRd
+         LvNnV69rGFvRZvPnyfbbP9K+JS1kcvFsJi1pEwrj44f2TSbk9ALfFSa1LCy2X/hBGeZX
+         B3rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=Qzcc4/2F2anEBs0yxcfDa0SSDpIJUqbgduaUlMcApaA=;
+        b=ZtVrtX1GrvCX+l634SjZgyg5oiBsFL/BoC/0fUUJxwHHL7gAIB91UB6XLB9XcTqDbu
+         OqbXg0pgkVl7U4z/bw+ygKbTYFnCGlfxjVUBoFlUkgZuXAOpT9E1vp2yqM5m71sNzbbj
+         GH+3BnqgY5N7BIaE5x/0Zt/ixewgKcadjtptzEHNbbCWjTdDqG1sHsIw76kY6riKj4Ux
+         csNEljdp0Se1dSDdWP2/vtKTBT82utEYISjNqrUeafuFE8jTQtpMCAGUSDda5FfrI+LR
+         wWQRdv9m1SgaEdI6bDGfs5l7wpVl25qEKqx4NkP8Hax4qmcV8KE+KcfA+9fXpBsC0cQJ
+         m2Pg==
+X-Gm-Message-State: APjAAAUkB1Mm+OTqPWfjv13mHuqCuFKKRDKtbJPXNeMjdRX73g+8OQxL
+        m+jXd1JWdf1usl/up8C88Qel/JQka88=
+X-Google-Smtp-Source: APXvYqyy4JxLbEVaNCVlbec2CoT/m2KHC4KW/XadAZ3gTDH2paZ8NcB4b9jmYwFVFGUm8Hi7bHXBjA==
+X-Received: by 2002:a24:3ac8:: with SMTP id m191mr2218104itm.74.1554173473916;
+        Mon, 01 Apr 2019 19:51:13 -0700 (PDT)
+Received: from ubu (2600-6c48-437f-c81d-984d-b4e8-0abe-7e26.dhcp6.chtrptr.net. [2600:6c48:437f:c81d:984d:b4e8:abe:7e26])
+        by smtp.gmail.com with ESMTPSA id o11sm6435986itb.33.2019.04.01.19.51.12
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 01 Apr 2019 19:51:13 -0700 (PDT)
+Date:   Mon, 1 Apr 2019 22:51:10 -0400
+From:   Kimberly Brown <kimbrownkd@gmail.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Petr Mladek <pmladek@suse.com>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        live-patching@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/8] kobject: Add default group support to kobj_type and
+ replace subsystem uses
+Message-ID: <cover.1554151487.git.kimbrownkd@gmail.com>
+References: <20190322201440.GA30814@ubu-Virtual-Machine>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190322201440.GA30814@ubu-Virtual-Machine>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-bio_add_page() and __bio_add_page() are capable of adding pages into
-bio, and now we have at least two such usages alreay:
+This patchset adds support for default attribute groups to kobj_type.
+Also, the uses of kobj_type's default_attrs field are replaced with
+default_groups in the following subsystems:
+ - samples
+ - block
+ - net
+ - irq
+ - padata
+ - cpufreq
+ - livepatch
 
-	- __bio_iov_bvec_add_pages()
-	- nvmet_bdev_execute_rw().
+The subsystem maintainers and lists will be copied on the subsystem
+patches.
 
-So update comments on these two helpers.
+The uses of kobj_type's default_attrs field in the other subsystems will
+be replaced in future patchsets.
 
-The thing is a bit special for __bio_try_merge_page(), given the caller
-needs to know if the new added page is same with the last added page,
-then it isn't safe to pass multi-page in case that 'same_page' is true,
-so adds warning on potential misuse, and updates comment on
-__bio_try_merge_page().
+Changes in v2:
+ - Patch 1 is not changed.
+ - Patches 2-8 are new.
 
-Cc: linux-xfs@vger.kernel.org
-Cc: linux-fsdevel@vger.kernel.org
-Cc: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/bio.c | 26 +++++++++++++++-----------
- 1 file changed, 15 insertions(+), 11 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index 8d516d508ae3..07315056c2f6 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -662,6 +662,8 @@ static inline bool page_is_mergeable(const struct bio_vec *bv,
- 	if (same_page && (vec_end_addr & PAGE_MASK) != page_addr)
- 		return false;
- 
-+	WARN_ON_ONCE(same_page && (len + off) > PAGE_SIZE);
-+
- 	return true;
- }
- 
-@@ -781,9 +783,9 @@ EXPORT_SYMBOL(bio_add_pc_page);
- /**
-  * __bio_try_merge_page - try appending data to an existing bvec.
-  * @bio: destination bio
-- * @page: page to add
-+ * @page: start page to add
-  * @len: length of the data to add
-- * @off: offset of the data in @page
-+ * @off: offset of the data relative to @page
-  * @same_page: if %true only merge if the new data is in the same physical
-  *		page as the last segment of the bio.
-  *
-@@ -791,6 +793,8 @@ EXPORT_SYMBOL(bio_add_pc_page);
-  * a useful optimisation for file systems with a block size smaller than the
-  * page size.
-  *
-+ * Warn if (@len, @off) crosses pages in case that @same_page is true.
-+ *
-  * Return %true on success or %false on failure.
-  */
- bool __bio_try_merge_page(struct bio *bio, struct page *page,
-@@ -813,11 +817,11 @@ bool __bio_try_merge_page(struct bio *bio, struct page *page,
- EXPORT_SYMBOL_GPL(__bio_try_merge_page);
- 
- /**
-- * __bio_add_page - add page to a bio in a new segment
-+ * __bio_add_page - add page(s) to a bio in a new segment
-  * @bio: destination bio
-- * @page: page to add
-- * @len: length of the data to add
-- * @off: offset of the data in @page
-+ * @page: start page to add
-+ * @len: length of the data to add, may cross pages
-+ * @off: offset of the data relative to @page, may cross pages
-  *
-  * Add the data at @page + @off to @bio as a new bvec.  The caller must ensure
-  * that @bio has space for another bvec.
-@@ -840,13 +844,13 @@ void __bio_add_page(struct bio *bio, struct page *page,
- EXPORT_SYMBOL_GPL(__bio_add_page);
- 
- /**
-- *	bio_add_page	-	attempt to add page to bio
-+ *	bio_add_page	-	attempt to add page(s) to bio
-  *	@bio: destination bio
-- *	@page: page to add
-- *	@len: vec entry length
-- *	@offset: vec entry offset
-+ *	@page: start page to add
-+ *	@len: vec entry length, may cross pages
-+ *	@offset: vec entry offset relative to @page, may cross pages
-  *
-- *	Attempt to add a page to the bio_vec maplist. This will only fail
-+ *	Attempt to add page(s) to the bio_vec maplist. This will only fail
-  *	if either bio->bi_vcnt == bio->bi_max_vecs or it's a cloned bio.
-  */
- int bio_add_page(struct bio *bio, struct page *page,
+Kimberly Brown (8):
+  kobject: Add support for default attribute groups to kobj_type
+  samples/kobject: Replace foo_ktype's default_attrs field with groups
+  block: Replace all ktype default_attrs with groups
+  net-sysfs: Replace ktype default_attrs field with groups
+  irqdesc: Replace irq_kobj_type's default_attrs field with groups
+  padata: Replace padata_attr_type default_attrs field with groups
+  cpufreq: schedutil: Replace default_attrs field with groups
+  livepatch: Replace klp_ktype_patch's default_attrs with groups
+
+ block/blk-integrity.c            |  3 ++-
+ block/blk-mq-sysfs.c             |  8 ++------
+ block/blk-sysfs.c                |  3 ++-
+ include/linux/kobject.h          |  3 ++-
+ kernel/irq/irqdesc.c             |  3 ++-
+ kernel/livepatch/core.c          |  3 ++-
+ kernel/padata.c                  |  3 ++-
+ kernel/sched/cpufreq_schedutil.c |  5 +++--
+ lib/kobject.c                    | 14 ++++++++++++++
+ net/core/net-sysfs.c             |  6 ++++--
+ samples/kobject/kset-example.c   |  3 ++-
+ 11 files changed, 37 insertions(+), 17 deletions(-)
+
 -- 
-2.9.5
+2.17.1
 
