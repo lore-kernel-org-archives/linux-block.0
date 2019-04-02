@@ -3,175 +3,133 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B93FC4360F
-	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 11:07:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5385C10F00
+	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 11:48:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 309CF208E4
-	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 11:07:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 917CE20857
+	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 11:48:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730368AbfDBLHO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Apr 2019 07:07:14 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:57764 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728748AbfDBLHO (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Apr 2019 07:07:14 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [10.3.19.205])
-        by Forcepoint Email with ESMTP id AFE6DE8FB282651C1D42;
-        Tue,  2 Apr 2019 19:07:11 +0800 (CST)
-Received: from [127.0.0.1] (10.177.219.49) by DGGEMS405-HUB.china.huawei.com
- (10.3.19.205) with Microsoft SMTP Server id 14.3.408.0; Tue, 2 Apr 2019
- 19:07:07 +0800
-Subject: Re: [PATCH v2] block: fix use-after-free on gendisk
-To:     Jan Kara <jack@suse.cz>
-CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-        <bart.vanassche@wdc.com>, Keith Busch <keith.busch@intel.com>
-References: <20190401093413.20502-1-yuyufen@huawei.com>
- <59c72f9c-389e-1c66-045e-93beb4ef071f@huawei.com>
- <20190401101223.GF4826@quack2.suse.cz>
-From:   yuyufen <yuyufen@huawei.com>
-Message-ID: <ce47476b-8097-1c55-c70d-b1c13dcd94e3@huawei.com>
-Date:   Tue, 2 Apr 2019 19:07:06 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.1
-MIME-Version: 1.0
-In-Reply-To: <20190401101223.GF4826@quack2.suse.cz>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [10.177.219.49]
+        id S1730775AbfDBLsO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Apr 2019 07:48:14 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:44624 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729568AbfDBLsO (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 2 Apr 2019 07:48:14 -0400
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 9B2BEF74D0;
+        Tue,  2 Apr 2019 11:48:13 +0000 (UTC)
+Received: from localhost (ovpn-8-32.pek2.redhat.com [10.72.8.32])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3C069848E4;
+        Tue,  2 Apr 2019 11:48:09 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        James Smart <james.smart@broadcom.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Christoph Hellwig <hch@lst.de>,
+        jianchao wang <jianchao.w.wang@oracle.com>
+Subject: [PATCH] SCSI: don't hold device refcount in IO path
+Date:   Tue,  2 Apr 2019 19:48:00 +0800
+Message-Id: <20190402114800.2281-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Tue, 02 Apr 2019 11:48:13 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+scsi_device's refcount is always grabed in IO path.
 
+Turns out it isn't necessary, becasue blk_queue_cleanup() will
+drain any in-flight IOs, then cancel timeout/requeue work, and
+SCSI's requeue_work is canceled too in __scsi_remove_device().
 
-On 2019/4/1 18:12, Jan Kara wrote:
-> On Mon 01-04-19 17:32:32, yuyufen wrote:
->> add Cc
->>
->> On 2019/4/1 17:34, Yufen Yu wrote:
->>> commit 2da78092dda "block: Fix dev_t minor allocation lifetime"
->>> specifically moved blk_free_devt(dev->devt) call to part_release()
->>> to avoid reallocating device number before the device is fully
->>> shutdown.
->>>
->>> However, it can cause use-after-free on gendisk in get_gendisk().
->>> We use md device as example to show the race scenes:
->>>
->>> Process1		Worker			Process2
->>> md_free
->>> 						blkdev_open
->>> del_gendisk
->>>     add delete_partition_work_fn() to wq
->>>     						__blkdev_get
->>> 						get_gendisk
->>> put_disk
->>>     disk_release
->>>       kfree(disk)
->>>       						find part from ext_devt_idr
->>> 						get_disk_and_module(disk)
->>>       					  	cause use after free
->>>
->>>       			delete_partition_work_fn
->>> 			put_device(part)
->>>       		  	part_release
->>> 		    	remove part from ext_devt_idr
->>>
->>> Before <devt, hd_struct pointer> is removed from ext_devt_idr by
->>> delete_partition_work_fn(), we can find the devt and then access
->>> gendisk by hd_struct pointer. But, if we access the gendisk after
->>> it have been freed, it can cause in use-after-freeon gendisk in
->>> get_gendisk().
->>>
->>> We fix this by adding a new helper blk_invalidate_devt() in
->>> delete_partition() and del_gendisk(). It replaces hd_struct
->>> pointer in idr with value 'NULL', and deletes the entry from
->>> idr in part_release() as we do now.
->>>
->>> Fixes: 2da78092dda1 ("block: Fix dev_t minor allocation lifetime")
->>> Cc: Al Viro <viro@zeniv.linux.org.uk>
->>> Cc: Bart Van Assche <bart.vanassche@wdc.com>
->>> Cc: Jan Kara <jack@suse.cz>
->>> Cc: Keith Busch <keith.busch@intel.com>
->>> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
-> Thanks for the patch! Just two nits below:
->
->>> diff --git a/block/genhd.c b/block/genhd.c
->>> index 961b2bc4634f..7144153c6bf1 100644
->>> --- a/block/genhd.c
->>> +++ b/block/genhd.c
->>> @@ -529,6 +529,18 @@ void blk_free_devt(dev_t devt)
->>>    	}
->>>    }
->>> +/**
->>> + *	We invalidate devt by assigning NULL pointer for devt in idr.
->>> + */
->>> +void blk_invalidate_devt(dev_t devt)
->>> +{
->>> +	if (MAJOR(devt) == BLOCK_EXT_MAJOR) {
->>> +		spin_lock_bh(&ext_devt_lock);
->>> +		idr_replace(&ext_devt_idr, NULL, blk_mangle_minor(MINOR(devt)));
->>> +		spin_unlock_bh(&ext_devt_lock);
->>> +	}
->>> +}
->>> +
->>>    static char *bdevt_str(dev_t devt, char *buf)
->>>    {
->>>    	if (MAJOR(devt) <= 0xff && MINOR(devt) <= 0xff) {
->>> @@ -801,6 +813,11 @@ void del_gendisk(struct gendisk *disk)
->>>    		sysfs_remove_link(block_depr, dev_name(disk_to_dev(disk)));
->>>    	pm_runtime_set_memalloc_noio(disk_to_dev(disk), false);
->>>    	device_del(disk_to_dev(disk));
->>> +
->>> +	/*
->>> +	 * we need to invalidate devt before remove it from idr.
->>> +	 */
->>> +	blk_invalidate_devt(disk_devt(disk));
-> I would move this slightly up to where blk_unregister_region() is called
-> because these two are just different means to lookup the gendisk (idr or
-> bdev_map depending of major number used). Also I'd update the comment to
-> something like:
->
-> 	/*
-> 	 * Remove gendisk pointer from idr so that it cannot be looked up
-> 	 * while RCU period before freeing gendisk is running to prevent
-> 	 * use-after-free issues. Note that the device number stays
-> 	 * "in-use" until we really free the gendisk.
-> 	 */
+Also scsi_device won't go away until blk_cleanup_queue() is done.
 
-Thanks a lot for your nice suggestion. As you say, they are just two 
-different means to lookup
-the gendisk. So, moving blk_invalidate_devt() up to 
-blk_unregister_region() is more reasonable
-and also improve the code readability.
+So don't hold the refcount in IO path.
 
-Yufen
-Thanks
+Cc: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+Cc: jianchao wang <jianchao.w.wang@oracle.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/scsi/scsi_lib.c | 17 ++---------------
+ 1 file changed, 2 insertions(+), 15 deletions(-)
 
->>>    }
->>>    EXPORT_SYMBOL(del_gendisk);
->>> diff --git a/block/partition-generic.c b/block/partition-generic.c
->>> index 1ee3e1d1bc2a..922230b5a907 100644
->>> --- a/block/partition-generic.c
->>> +++ b/block/partition-generic.c
->>> @@ -288,6 +288,12 @@ void delete_partition(struct gendisk *disk, int partno)
->>>    	kobject_put(part->holder_dir);
->>>    	device_del(part_to_dev(part));
->>> +	/*
->>> +	 *	We need to invalidate devt by assigning NULL pointer for devt
->>> +	 *	before remove it from ext_devt_idr, which can avoid use-after-free
->>> +	 *	on gendisk.
->>> +	 */
->>> +	blk_invalidate_devt(part_devt(part));
->>>    	hd_struct_kill(part);
->>>    }
-> And here I'd just use the same comment as above.
->
-> 								Honza
-
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 601b9f1de267..a095426b1c7a 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -141,8 +141,6 @@ scsi_set_blocked(struct scsi_cmnd *cmd, int reason)
+ 
+ static void scsi_mq_requeue_cmd(struct scsi_cmnd *cmd)
+ {
+-	struct scsi_device *sdev = cmd->device;
+-
+ 	if (cmd->request->rq_flags & RQF_DONTPREP) {
+ 		cmd->request->rq_flags &= ~RQF_DONTPREP;
+ 		scsi_mq_uninit_cmd(cmd);
+@@ -150,7 +148,6 @@ static void scsi_mq_requeue_cmd(struct scsi_cmnd *cmd)
+ 		WARN_ON_ONCE(true);
+ 	}
+ 	blk_mq_requeue_request(cmd->request, true);
+-	put_device(&sdev->sdev_gendev);
+ }
+ 
+ /**
+@@ -201,7 +198,6 @@ static void __scsi_queue_insert(struct scsi_cmnd *cmd, int reason, bool unbusy)
+ 	 * happened.
+ 	 */
+ 	blk_mq_requeue_request(cmd->request, true);
+-	put_device(&device->sdev_gendev);
+ }
+ 
+ /*
+@@ -619,7 +615,6 @@ static bool scsi_end_request(struct request *req, blk_status_t error,
+ 		blk_mq_run_hw_queues(q, true);
+ 
+ 	percpu_ref_put(&q->q_usage_counter);
+-	put_device(&sdev->sdev_gendev);
+ 	return false;
+ }
+ 
+@@ -1613,7 +1608,6 @@ static void scsi_mq_put_budget(struct blk_mq_hw_ctx *hctx)
+ 	struct scsi_device *sdev = q->queuedata;
+ 
+ 	atomic_dec(&sdev->device_busy);
+-	put_device(&sdev->sdev_gendev);
+ }
+ 
+ static bool scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
+@@ -1621,16 +1615,9 @@ static bool scsi_mq_get_budget(struct blk_mq_hw_ctx *hctx)
+ 	struct request_queue *q = hctx->queue;
+ 	struct scsi_device *sdev = q->queuedata;
+ 
+-	if (!get_device(&sdev->sdev_gendev))
+-		goto out;
+-	if (!scsi_dev_queue_ready(q, sdev))
+-		goto out_put_device;
+-
+-	return true;
++	if (scsi_dev_queue_ready(q, sdev))
++		return true;
+ 
+-out_put_device:
+-	put_device(&sdev->sdev_gendev);
+-out:
+ 	if (atomic_read(&sdev->device_busy) == 0 && !scsi_device_blocked(sdev))
+ 		blk_mq_delay_run_hw_queue(hctx, SCSI_QUEUE_DELAY);
+ 	return false;
+-- 
+2.9.5
 
