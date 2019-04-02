@@ -2,143 +2,82 @@ Return-Path: <SRS0=N1jC=SE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	URIBL_SBL,URIBL_SBL_A,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDD51C4360F
-	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 13:14:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63AEBC4360F
+	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 14:20:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C1A2321473
-	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 13:14:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2748F2084B
+	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 14:20:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="RCXefB5v"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730854AbfDBNOo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Apr 2019 09:14:44 -0400
-Received: from mx1.didichuxing.com ([111.202.154.82]:7600 "HELO
-        bsf01.didichuxing.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with SMTP id S1729732AbfDBNOn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Apr 2019 09:14:43 -0400
-X-ASG-Debug-ID: 1554210876-0e40881d96e0580001-Cu09wu
-Received: from BJEXMBX011.didichuxing.com (bjexmbx011.didichuxing.com [172.20.2.190]) by bsf01.didichuxing.com with ESMTP id QAie32dpQaxXBkuX; Tue, 02 Apr 2019 21:14:36 +0800 (CST)
-X-Barracuda-Envelope-From: zhangweiping@didiglobal.com
-Received: from 192.168.3.9 (172.22.50.20) by BJSGEXMBX03.didichuxing.com
- (172.20.15.133) with Microsoft SMTP Server (TLS) id 15.0.1263.5; Tue, 2 Apr
- 2019 21:14:36 +0800
-Date:   Tue, 2 Apr 2019 21:14:30 +0800
-From:   Weiping Zhang <zhangweiping@didiglobal.com>
-To:     <axboe@kernel.dk>, <bvanassche@acm.org>, <hch@infradead.org>
-CC:     <linux-block@vger.kernel.org>
-Subject: [PATCH v2] block: don't show io_timeout if driver has no timeout
- handler
-Message-ID: <20190402131424.GA12935@192.168.3.9>
-X-ASG-Orig-Subj: [PATCH v2] block: don't show io_timeout if driver has no timeout
- handler
-Mail-Followup-To: axboe@kernel.dk, bvanassche@acm.org, hch@infradead.org,
-        linux-block@vger.kernel.org
+        id S1727280AbfDBOUW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Apr 2019 10:20:22 -0400
+Received: from mail-it1-f194.google.com ([209.85.166.194]:35790 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726903AbfDBOUW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Apr 2019 10:20:22 -0400
+Received: by mail-it1-f194.google.com with SMTP id w15so5535815itc.0
+        for <linux-block@vger.kernel.org>; Tue, 02 Apr 2019 07:20:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=Tp8KZUxNEJXRRBYQYe769aEySsaQ/J5CCb9l6tyWbhI=;
+        b=RCXefB5vA0MUOuanzOLksCWmfQqTokeqQXwjUgx2zVkMYQd2Srv2aVhqGs3ogeJl5D
+         S14iRtlM6Xja/ogd0OSmbqqiPiJETNSSDA9KCcyV6/6ZCD6rJRtNE5QO8x+3JROd5PS7
+         3+nsdW3V2dQEBgLgwed9pW/o8O7cbcYsM++d3Ia5OO4rw07ORFiQ7E46gYpqLBs69HXI
+         nJ2bSVdbOHlO5T6fq3E1jrVAteCZpjKKXjK3tTnARDSyOlfaINbzsWLb/q1tJVB9JkUn
+         8zLNDNwH/IU651Hf7YYdMlOql03mvLFPh1Ayh/HATQDmv7i3i+X1ylQBj95tnHOr0+iI
+         tL4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Tp8KZUxNEJXRRBYQYe769aEySsaQ/J5CCb9l6tyWbhI=;
+        b=atFcgGxClXstiR9+waDWI1xSM8my8frDPUQL28E/i80eNq+SpKNzuVE8dYhKPjUuaI
+         1FzqFMimsd0rNpf3f5hDo7IHsrBQQc2Aip8NNMMl6Mxg/dhUAep6HVOSPoyqU9Hx3Csv
+         o3zsYUN8XGgq98w+SoJ9E1DnrcpLDSlZ3ic1CO0RM0RGVYpLjZH3L4QXLJFiEw5pAJSv
+         4cTx9hN9bWfgMEZgCt8fD/Q14X7scHwlqPhCM5WhI+AVRgC1Su8yr5Mq6ijPpYwpGHpi
+         RtjNciMHox0dxjdWcR5w4UFBB02blkPfavmwGAPdZxgBDTZea/xCMcDk/eggkGlKcrS/
+         +apQ==
+X-Gm-Message-State: APjAAAXfuaRJmCtznUZ1xCBm+3cuqEW5UBA21e7EjYMHs3/UtT7nMwhw
+        eOcKHnOjqTiMSiHASY0PcJZr3s5W7K3xIQ==
+X-Google-Smtp-Source: APXvYqxFQBlNtDpujFvaHTnru7S4gR8SZBrJ/yx3gSSDdbSKQbekUZaNy6fCGaKD6i+ihoGaB4NFqw==
+X-Received: by 2002:a24:7350:: with SMTP id y77mr4275471itb.52.1554214821007;
+        Tue, 02 Apr 2019 07:20:21 -0700 (PDT)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id f14sm5523920ion.46.2019.04.02.07.20.19
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 02 Apr 2019 07:20:19 -0700 (PDT)
+Subject: Re: [PATCH] block: use blk_free_flush_queue() to free hctx->fq in
+ blk_mq_init_hctx
+To:     Shenghui Wang <shhuiw@foxmail.com>, linux-block@vger.kernel.org
+References: <20190401134036.8377-1-shhuiw@foxmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <b13e24d4-cc99-c973-9401-9944ba04b596@kernel.dk>
+Date:   Tue, 2 Apr 2019 08:20:19 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Originating-IP: [172.22.50.20]
-X-ClientProxiedBy: BJEXCAS004.didichuxing.com (172.20.1.44) To
- BJSGEXMBX03.didichuxing.com (172.20.15.133)
-X-Barracuda-Connect: bjexmbx011.didichuxing.com[172.20.2.190]
-X-Barracuda-Start-Time: 1554210876
-X-Barracuda-URL: https://bsf01.didichuxing.com:443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at didichuxing.com
-X-Barracuda-Scan-Msg-Size: 2247
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0001 1.0000 -2.0204
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=1000.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.69320
-        Rule breakdown below
-         pts rule name              description
-        ---- ---------------------- --------------------------------------------------
+In-Reply-To: <20190401134036.8377-1-shhuiw@foxmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If the low level driver has no timeout handler, the
-/sys/block/<disk>/queue/io_timeout will not be displayed.
+On 4/1/19 7:40 AM, Shenghui Wang wrote:
+> kfree() can leak the hctx->fq->flush_rq field.
 
-Signed-off-by: Weiping Zhang <zhangweiping@didiglobal.com>
----
-Changes since v1:
- * don't call sysfs_remove_group explicitly
- * also check q->mq_ops otherwise bug at md driver
-[    2.094516]  internal_create_group+0xd8/0x3a0
-[    2.095238]  blk_register_queue+0xb8/0x1e0
-[    2.095912]  __device_add_disk+0x2b5/0x4a0
-[    2.096573]  md_alloc+0x1ab/0x330
+Applied, thanks.
 
- block/blk-sysfs.c | 30 ++++++++++++++++++++++++++++--
- 1 file changed, 28 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 422327089e0f..a16a02c52a85 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -728,7 +728,7 @@ static struct queue_sysfs_entry throtl_sample_time_entry = {
- };
- #endif
- 
--static struct attribute *default_attrs[] = {
-+static struct attribute *queue_attrs[] = {
- 	&queue_requests_entry.attr,
- 	&queue_ra_entry.attr,
- 	&queue_max_hw_sectors_entry.attr,
-@@ -770,6 +770,25 @@ static struct attribute *default_attrs[] = {
- 	NULL,
- };
- 
-+static umode_t queue_attr_visible(struct kobject *kobj, struct attribute *attr,
-+				int n)
-+{
-+	struct request_queue *q =
-+		container_of(kobj, struct request_queue, kobj);
-+
-+	if (attr == &queue_io_timeout_entry.attr &&
-+		(!q->mq_ops || !q->mq_ops->timeout))
-+			return 0;
-+
-+	return attr->mode;
-+}
-+
-+static struct attribute_group queue_attr_group = {
-+	.attrs = queue_attrs,
-+	.is_visible = queue_attr_visible,
-+};
-+
-+
- #define to_queue(atr) container_of((atr), struct queue_sysfs_entry, attr)
- 
- static ssize_t
-@@ -890,7 +909,6 @@ static const struct sysfs_ops queue_sysfs_ops = {
- 
- struct kobj_type blk_queue_ktype = {
- 	.sysfs_ops	= &queue_sysfs_ops,
--	.default_attrs	= default_attrs,
- 	.release	= blk_release_queue,
- };
- 
-@@ -939,6 +957,14 @@ int blk_register_queue(struct gendisk *disk)
- 		goto unlock;
- 	}
- 
-+	ret = sysfs_create_group(&q->kobj, &queue_attr_group);
-+	if (ret) {
-+		blk_trace_remove_sysfs(dev);
-+		kobject_del(&q->kobj);
-+		kobject_put(&dev->kobj);
-+		goto unlock;
-+	}
-+
- 	if (queue_is_mq(q)) {
- 		__blk_mq_register_dev(dev, q);
- 		blk_mq_debugfs_register(q);
 -- 
-2.14.1
+Jens Axboe
 
