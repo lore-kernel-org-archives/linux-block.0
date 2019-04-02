@@ -2,177 +2,113 @@ Return-Path: <SRS0=N1jC=SE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A2C8C4360F
-	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 15:16:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7936C10F0B
+	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 15:44:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1E75320830
-	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 15:16:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD02120674
+	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 15:44:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730918AbfDBPQm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Apr 2019 11:16:42 -0400
-Received: from mx2.suse.de ([195.135.220.15]:42396 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729678AbfDBPQm (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Apr 2019 11:16:42 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 235CDAE64;
-        Tue,  2 Apr 2019 15:16:40 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id AE18C1E3FD4; Tue,  2 Apr 2019 17:16:39 +0200 (CEST)
-Date:   Tue, 2 Apr 2019 17:16:39 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Yufen Yu <yuyufen@huawei.com>
-Cc:     axboe@kernel.dk, jack@suse.cz, viro@zeniv.linux.org.uk,
-        bart.vanassche@wdc.com, linux-block@vger.kernel.org
-Subject: Re: [PATCH v3] block: fix use-after-free on gendisk
-Message-ID: <20190402151639.GB25668@quack2.suse.cz>
-References: <20190402120634.51040-1-yuyufen@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190402120634.51040-1-yuyufen@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S1729109AbfDBPoN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Apr 2019 11:44:13 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:36831 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726167AbfDBPoN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Apr 2019 11:44:13 -0400
+Received: by mail-pl1-f194.google.com with SMTP id ck15so5275949plb.3;
+        Tue, 02 Apr 2019 08:44:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=2J3JNlHEnfYSgUSsh4Gi92+U0Z8xFY101mPnbVB1XAk=;
+        b=EkgYOSc3ZC+oNEgu6MkBIhiHqpt8VLjdIDCPWJkHjwicCjnJ1Tg7cS0nAofVa2Im9C
+         R/UzCnTiFQHbLeKmfySwfWczjJz+438qga6MNDKag0hyFwURSBlktcig0kNVSCcn+zdw
+         bQr89suhBGmmTXkvGIVVEsJQaiX2ZaDHIHM5kkwJukbP9aO0Ja1QenqAZAbgTaGZYkVt
+         TmtS7ZqUgJhBihG8R1KZ/2hOiw4kqgOeYtcpqR7ZKLVY7DVnckUe7i1eCMMlT27hnwIQ
+         bIwk7g7D9qnghX8OfjIH2QG3LIhwHtt0hKXjJrkjfRFov3QopY5DNsQJOEjKLMTHpDvu
+         szoA==
+X-Gm-Message-State: APjAAAWaDqr6b6XKmyp6pLLBNGm4N2WY37zfP07+d7GLbOhmyJkynkuc
+        JYtyNol+uT5/12lgXU0dtnQ=
+X-Google-Smtp-Source: APXvYqybGfV8ExXBOe9ipe+tbKKQUecA0O/A7dAMNIatBAkqQ627vPLFfWuhJx9VOY1vLRCKZ/cT1w==
+X-Received: by 2002:a17:902:31c3:: with SMTP id x61mr69975476plb.143.1554219852863;
+        Tue, 02 Apr 2019 08:44:12 -0700 (PDT)
+Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id o68sm38666591pfi.140.2019.04.02.08.44.11
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 02 Apr 2019 08:44:12 -0700 (PDT)
+Message-ID: <1554219850.118779.137.camel@acm.org>
+Subject: Re: [PATCH 2/4] block: Fix a race between request queue freezing
+ and running queues
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.com>,
+        James Smart <james.smart@broadcom.com>,
+        Jianchao Wang <jianchao.w.wang@oracle.com>,
+        Dongli Zhang <dongli.zhang@oracle.com>, stable@vger.kernel.org
+Date:   Tue, 02 Apr 2019 08:44:10 -0700
+In-Reply-To: <20190402005318.GC21944@ming.t460p>
+References: <20190401212014.192753-1-bvanassche@acm.org>
+         <20190401212014.192753-3-bvanassche@acm.org>
+         <20190402005318.GC21944@ming.t460p>
+Content-Type: text/plain; charset="UTF-7"
+X-Mailer: Evolution 3.26.2-1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 02-04-19 20:06:34, Yufen Yu wrote:
-> commit 2da78092dda "block: Fix dev_t minor allocation lifetime"
-> specifically moved blk_free_devt(dev->devt) call to part_release()
-> to avoid reallocating device number before the device is fully
-> shutdown.
-> 
-> However, it can cause use-after-free on gendisk in get_gendisk().
-> We use md device as example to show the race scenes:
-> 
-> Process1		Worker			Process2
-> md_free
-> 						blkdev_open
-> del_gendisk
->   add delete_partition_work_fn() to wq
->   						__blkdev_get
-> 						get_gendisk
-> put_disk
->   disk_release
->     kfree(disk)
->     						find part from ext_devt_idr
-> 						get_disk_and_module(disk)
->     					  	cause use after free
-> 
->     			delete_partition_work_fn
-> 			put_device(part)
->     		  	part_release
-> 		    	remove part from ext_devt_idr
-> 
-> Before <devt, hd_struct pointer> is removed from ext_devt_idr by
-> delete_partition_work_fn(), we can find the devt and then access
-> gendisk by hd_struct pointer. But, if we access the gendisk after
-> it have been freed, it can cause in use-after-freeon gendisk in
-> get_gendisk().
-> 
-> We fix this by adding a new helper blk_invalidate_devt() in
-> delete_partition() and del_gendisk(). It replaces hd_struct
-> pointer in idr with value 'NULL', and deletes the entry from
-> idr in part_release() as we do now.
-> 
-> Thanks to Jan Kara for providing the solution and more clear comments
-> for the code.
-> 
-> Fixes: 2da78092dda1 ("block: Fix dev_t minor allocation lifetime")
-> Cc: Al Viro <viro@zeniv.linux.org.uk>
-> Cc: Bart Van Assche <bart.vanassche@wdc.com>
-> Cc: Keith Busch <keith.busch@intel.com>
-> Suggested-by: Jan Kara <jack@suse.cz>
-> Signed-off-by: Yufen Yu <yuyufen@huawei.com>
+On Tue, 2019-04-02 at 08:53 +-0800, Ming Lei wrote:
++AD4 On Mon, Apr 01, 2019 at 02:20:12PM -0700, Bart Van Assche wrote:
++AD4 +AD4 diff --git a/block/blk-mq.c b/block/blk-mq.c
++AD4 +AD4 index 3ff3d7b49969..652d0c6d5945 100644
++AD4 +AD4 --- a/block/blk-mq.c
++AD4 +AD4 +-+-+- b/block/blk-mq.c
++AD4 +AD4 +AEAAQA -1499,12 +-1499,20 +AEAAQA void blk+AF8-mq+AF8-run+AF8-hw+AF8-queues(struct request+AF8-queue +ACo-q, bool async)
++AD4 +AD4  	struct blk+AF8-mq+AF8-hw+AF8-ctx +ACo-hctx+ADs
++AD4 +AD4  	int i+ADs
++AD4 +AD4  
++AD4 +AD4 +-	/+ACo
++AD4 +AD4 +-	 +ACo Do not run any hardware queues if the queue is frozen or if a
++AD4 +AD4 +-	 +ACo concurrent blk+AF8-cleanup+AF8-queue() call is removing any data
++AD4 +AD4 +-	 +ACo structures used by this function.
++AD4 +AD4 +-	 +ACo-/
++AD4 +AD4 +-	if (+ACE-percpu+AF8-ref+AF8-tryget(+ACY-q-+AD4-q+AF8-usage+AF8-counter))
++AD4 +AD4 +-		return+ADs
++AD4 +AD4  	queue+AF8-for+AF8-each+AF8-hw+AF8-ctx(q, hctx, i) +AHs
++AD4 +AD4  		if (blk+AF8-mq+AF8-hctx+AF8-stopped(hctx))
++AD4 +AD4  			continue+ADs
++AD4 +AD4  
++AD4 +AD4  		blk+AF8-mq+AF8-run+AF8-hw+AF8-queue(hctx, async)+ADs
++AD4 +AD4  	+AH0
++AD4 +AD4 +-	percpu+AF8-ref+AF8-put(+ACY-q-+AD4-q+AF8-usage+AF8-counter)+ADs
++AD4 +AD4  +AH0
++AD4 +AD4  EXPORT+AF8-SYMBOL(blk+AF8-mq+AF8-run+AF8-hw+AF8-queues)+ADs
++AD4 
++AD4 I don't see it is necessary to add percpu+AF8-ref+AF8-tryget()/percpu+AF8-ref+AF8-put()
++AD4 in the fast path if we simply release all hctx resource in hctx's
++AD4 release handler by the following patch:
++AD4 
++AD4 https://lore.kernel.org/linux-block/20190401044247.29881-2-ming.lei+AEA-redhat.com/T/+ACM-u
++AD4 
++AD4 Even we can kill the percpu+AF8-ref+AF8-tryget+AF8-live()/percpu+AF8-ref+AF8-put() in
++AD4 scsi+AF8-end+AF8-request().
 
-Thanks. The patch looks good to me. You can add:
+The above approach has the advantages of being easy to review and to maintain.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Patch +ACIAWw-PATCH V2 1/3+AF0 blk-mq: free hw queue's resource in hctx's release handler+ACI
+makes the block layer more complicated because it introduces a new state for
+hardware queues: block driver cleanup has happened (set-+AD4-ops-+AD4-exit+AF8-hctx(...)) but
+the hardware queues are still in use by the block layer core.
 
-								Honza
+Let's see what other reviewers think.
 
-> ---
->  block/genhd.c             | 19 +++++++++++++++++++
->  block/partition-generic.c |  7 +++++++
->  include/linux/genhd.h     |  1 +
->  3 files changed, 27 insertions(+)
-> 
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 961b2bc4634f..a4ef0068dbb2 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -529,6 +529,18 @@ void blk_free_devt(dev_t devt)
->  	}
->  }
->  
-> +/**
-> + *	We invalidate devt by assigning NULL pointer for devt in idr.
-> + */
-> +void blk_invalidate_devt(dev_t devt)
-> +{
-> +	if (MAJOR(devt) == BLOCK_EXT_MAJOR) {
-> +		spin_lock_bh(&ext_devt_lock);
-> +		idr_replace(&ext_devt_idr, NULL, blk_mangle_minor(MINOR(devt)));
-> +		spin_unlock_bh(&ext_devt_lock);
-> +	}
-> +}
-> +
->  static char *bdevt_str(dev_t devt, char *buf)
->  {
->  	if (MAJOR(devt) <= 0xff && MINOR(devt) <= 0xff) {
-> @@ -791,6 +803,13 @@ void del_gendisk(struct gendisk *disk)
->  
->  	if (!(disk->flags & GENHD_FL_HIDDEN))
->  		blk_unregister_region(disk_devt(disk), disk->minors);
-> +	/*
-> +	 * Remove gendisk pointer from idr so that it cannot be looked up
-> +	 * while RCU period before freeing gendisk is running to prevent
-> +	 * use-after-free issues. Note that the device number stays
-> +	 * "in-use" until we really free the gendisk.
-> +	 */
-> +	blk_invalidate_devt(disk_devt(disk));
->  
->  	kobject_put(disk->part0.holder_dir);
->  	kobject_put(disk->slave_dir);
-> diff --git a/block/partition-generic.c b/block/partition-generic.c
-> index 1ee3e1d1bc2a..7cf769103a25 100644
-> --- a/block/partition-generic.c
-> +++ b/block/partition-generic.c
-> @@ -288,6 +288,13 @@ void delete_partition(struct gendisk *disk, int partno)
->  	kobject_put(part->holder_dir);
->  	device_del(part_to_dev(part));
->  
-> +	/*
-> +	 * Remove gendisk pointer from idr so that it cannot be looked up
-> +	 * while RCU period before freeing gendisk is running to prevent
-> +	 * use-after-free issues. Note that the device number stays
-> +	 * "in-use" until we really free the gendisk.
-> +	 */
-> +	blk_invalidate_devt(part_devt(part));
->  	hd_struct_kill(part);
->  }
->  
-> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-> index 06c0fd594097..69db1affedb0 100644
-> --- a/include/linux/genhd.h
-> +++ b/include/linux/genhd.h
-> @@ -610,6 +610,7 @@ struct unixware_disklabel {
->  
->  extern int blk_alloc_devt(struct hd_struct *part, dev_t *devt);
->  extern void blk_free_devt(dev_t devt);
-> +extern void blk_invalidate_devt(dev_t devt);
->  extern dev_t blk_lookup_devt(const char *name, int partno);
->  extern char *disk_name (struct gendisk *hd, int partno, char *buf);
->  
-> -- 
-> 2.16.2.dirty
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Bart.
