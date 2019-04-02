@@ -2,134 +2,135 @@ Return-Path: <SRS0=N1jC=SE=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91942C4360F
-	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 21:31:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E572C10F0B
+	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 22:32:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5FB9920830
-	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 21:31:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB2DE20857
+	for <linux-block@archiver.kernel.org>; Tue,  2 Apr 2019 22:32:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725963AbfDBVbB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Apr 2019 17:31:01 -0400
-Received: from mail-qt1-f194.google.com ([209.85.160.194]:36946 "EHLO
-        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725912AbfDBVbB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Apr 2019 17:31:01 -0400
-Received: by mail-qt1-f194.google.com with SMTP id z16so17144644qtn.4
-        for <linux-block@vger.kernel.org>; Tue, 02 Apr 2019 14:31:00 -0700 (PDT)
+        id S1726078AbfDBWcN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Apr 2019 18:32:13 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:44235 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726071AbfDBWcM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Apr 2019 18:32:12 -0400
+Received: by mail-pg1-f194.google.com with SMTP id i2so7238500pgj.11;
+        Tue, 02 Apr 2019 15:32:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=lduQgi2GSaCg10iJ1dVs+N671zGBvmblx+xwcmWclGI=;
-        b=YKDGhY3LUj78B65OPpCWm3aA8K4qWyU4CyuBh9XWfbXUPSRfYRDphIUEZP/todHCeV
-         onRr08rMc05ylFaY5ryDwI5j+rspe05gNUOcazplq3sev09s0bR0P64G5tahyGn2MMi1
-         91q+OoD54vDmv7ACgAei4A776af+qMfocv2/ce4dhxpnc4yG3zzimar6AnMOJVlqFQ2W
-         OPlTn4jixc4gGpT67TzsoKotJZ8+rCY+EAfurM7/u4Ve0dcNhO/+Zlidr7K+fbYj4uxr
-         B2sROEqmo8M6+vXZQVRVAaFW4BvWcnG4MW1U4sV7mg1Zz31rZew+oZRDM7u028usPm1H
-         frEA==
-X-Gm-Message-State: APjAAAVoaw40G97FcGUTWwu0gbeRGVBgrcMYK6xMw/qFAUvchiEFmTeW
-        f2tQb+Aj5U6lKM4SKp6Y2tdJeA==
-X-Google-Smtp-Source: APXvYqxXlZqNYYDK4WtfXZNUvru3kk6K9mTbLNyiy0OEv41PpQ4etS7HHgmSLa9QZJP6Mq+nilL/rQ==
-X-Received: by 2002:a0c:d21a:: with SMTP id m26mr60616999qvh.100.1554240660365;
-        Tue, 02 Apr 2019 14:31:00 -0700 (PDT)
-Received: from 2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net (2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net. [2600:6c64:4e80:f1:422c:9885:a6c:81b2])
-        by smtp.gmail.com with ESMTPSA id q50sm9488970qtq.34.2019.04.02.14.30.59
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rQcabysotoQSPcMHyH9q0nwOwWOcOSfXS/4rap+nXrs=;
+        b=M8gUe2ac8PFkB3V/3JRu7d8nYGFVJ0YqCR9Ev6DKahyRMXAz04jab5Hxjrgj7WW2wv
+         ahf+Kq1KYqthjMSNpz6B/x9U+Udt3Ce50BA/XElsfniP7ork9M7OyacaRvt5p1R3DNca
+         qTwvPVImrLsVNPQeH+y0hPz5EQeb/n6sIeunDvA1ddVUQUgt05q7URbMb38CkpT8M4Yy
+         aCCbLsZ9YI0tvt/bYzvVzZ8lPZVWUdAz7WXViIMV5d+oHZeCJhSSYd+B1PfbaxSRdtkQ
+         +gXyHgjrztVtPxPUe57Bh8WCx2nJAqHC4VN6TP52V9sRYUI9bBhrYsICaFxFHOt1CkMx
+         DqjQ==
+X-Gm-Message-State: APjAAAV80fyGA3oO09TdsAkFWLDtWIGzCjKVbev/vkwWKASS8TLXU5dU
+        JKNx8lIupdQc2QM3M53MWn8hl2DCNpA=
+X-Google-Smtp-Source: APXvYqyyPfJ2z/EoG6k6R0qGcexTkZiG3zZABGFs9TTidFMh3dBo5YeBS3FzAg+iD95Gy0TXTIG/Cg==
+X-Received: by 2002:a63:7885:: with SMTP id t127mr18736075pgc.338.1554244331994;
+        Tue, 02 Apr 2019 15:32:11 -0700 (PDT)
+Received: from desktop-bart.svl.corp.google.com ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
+        by smtp.gmail.com with ESMTPSA id d8sm9455366pgv.34.2019.04.02.15.32.10
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 02 Apr 2019 14:30:59 -0700 (PDT)
-Message-ID: <d72a2bf241d53d47117fbec07aa122c4a1bc3067.camel@redhat.com>
-Subject: Re: Lock recursion seen on qla2xxx client when rebooting the target
- server
-From:   Laurence Oberman <loberman@redhat.com>
-To:     linux-scsi <linux-scsi@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Himanshu Madhani <hmadhani@redhat.com>,
-        "Madhani, Himanshu" <himanshu.madhani@cavium.com>,
-        Hannes Reinecke <hare@suse.de>, Ewan Milne <emilne@redhat.com>
-Cc:     Marco Patalano <mpatalan@redhat.com>,
-        "Dutile, Don" <ddutile@redhat.com>,
-        "Van Assche, Bart" <bvanassche@acm.org>
-Date:   Tue, 02 Apr 2019 17:30:58 -0400
-In-Reply-To: <514bc70458ce6360189f03fec96b565e5a29c461.camel@redhat.com>
-References: <514bc70458ce6360189f03fec96b565e5a29c461.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-2.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Tue, 02 Apr 2019 15:32:11 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.com>,
+        James Smart <james.smart@broadcom.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Jianchao Wang <jianchao.w.wang@oracle.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Dongli Zhang <dongli.zhang@oracle.com>, stable@vger.kernel.org
+Subject: [PATCH] block: Fix a race between tag iteration and hardware queue changes
+Date:   Tue,  2 Apr 2019 15:32:02 -0700
+Message-Id: <20190402223202.30752-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.20.GIT
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, 2019-03-31 at 20:44 -0400, Laurence Oberman wrote:
-> This who have been following my trials and tribulations with SRP and
-> block-mq panics (See Re: Panic when rebooting target server testing
-> srp
-> on 5.0.0-rc2) know I was going to run the same test with qla2xxx and
-> F/C
-> 
-> Anyway, rebooting the targetserver (LIO) that was causing the block-
-> mq
-> race that is still out there and not yet diagnosed when SRP is the
-> client causes issues with 5.1-rc2 as well.
-> 
-> The issue is different. I was seeing a total lockup and no console
-> messages. To get the lockup message I had to enable lock debugging.
-> 
-> Anyway, Hannes, how have you folks not seen these issues at Suse with
-> 5.1+ testing. Here I caught two different problems that are now
-> latent
-> in 5.1-x (maybe earlier too). This is a generic array reboot test
-> that
-> sadly is a common issue with our customewrs when they have fabric or
-> array issues.
-> 
-> Kernel 5.1.0-rc2+ on an x86_64
-> 
-> localhost login: [  301.752492] BUG: spinlock cpu recursion on
-> CPU#38,
-> kworker/38:0/204
-> [  301.782364]  lock: 0xffff90ddb2e43430, .magic: dead4ead, .owner:
-> kworker/38:1/271, .owner_cpu: 38
-> [  301.825496] CPU: 38 PID: 204 Comm: kworker/38:0 Kdump: loaded Not
-> tainted 5.1.0-rc2+ #1
-> [  301.863052] Hardware name: HP ProLiant ML150 Gen9/ProLiant ML150
-> Gen9, BIOS P95 05/21/2018
-> [  301.903614] Workqueue: qla2xxx_wq qla24xx_delete_sess_fn [qla2xxx]
-> [  301.933561] Call Trace:
-> [  301.945950]  dump_stack+0x5a/0x73
-> [  301.962080]  do_raw_spin_lock+0x83/0xa0
-> [  301.980287]  _raw_spin_lock_irqsave+0x66/0x80
-> [  302.001726]  ? qla24xx_delete_sess_fn+0x34/0x90 [qla2xxx]
-> [  302.028111]  qla24xx_delete_sess_fn+0x34/0x90 [qla2xxx]
-> [  302.052864]  process_one_work+0x215/0x4c0
-> [  302.071940]  ? process_one_work+0x18c/0x4c0
-> [  302.092228]  worker_thread+0x46/0x3e0
-> [  302.110313]  kthread+0xfb/0x130
-> [  302.125274]  ? process_one_work+0x4c0/0x4c0
-> [  302.146054]  ? kthread_bind+0x10/0x10
-> [  302.163789]  ret_from_fork+0x35/0x40
-> 
-> Just an FYI, with only 100 LUNS 4 paths i cannot boot the host
-> without
-> adding my watchdog_thresh=60 to the kernel line.
-> I hard lockup during LUN discovery so that issue is also out there.
-> 
-> So far 5.x+ has been problemetic with regression testing.
-> 
-> Regards
-> Laurence
+Since the callback function called by blk_mq_queue_tag_busy_iter()
+may sleep calling synchronize_rcu() from __blk_mq_update_nr_hw_queues()
+is not sufficient to wait until blk_mq_queue_tag_busy_iter() has
+finished. Instead of making __blk_mq_update_nr_hw_queues() wait until
+q->q_usage_counter == 0 is globally visible, do not iterate over tags
+if the request queue is frozen.
 
-I chatted with Himanshu about this and he will be sending me a test
-patch. He thinks he knows what is going on here.
-I will report back when tested.
+Cc: Christoph Hellwig <hch@infradead.org>
+Cc: Hannes Reinecke <hare@suse.com>
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+Cc: Keith Busch <keith.busch@intel.com>
+Cc: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: <stable@vger.kernel.org>
+Fixes: 530ca2c9bd69 ("blk-mq: Allow blocking queue tag iter callbacks") # v4.19.
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/blk-mq-tag.c | 10 +++++-----
+ block/blk-mq.c     |  5 +----
+ 2 files changed, 6 insertions(+), 9 deletions(-)
 
-Note!! to reitterate, this is not the block-mq issue I uncovered with
-SRP testing. The investigation for that is still ongoing.
-
-Thanks
-Laurence
-
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index a4931fc7be8a..89f479634b4d 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -383,14 +383,13 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+ 
+ 	/*
+ 	 * __blk_mq_update_nr_hw_queues() updates nr_hw_queues and queue_hw_ctx
+-	 * while the queue is frozen. So we can use q_usage_counter to avoid
+-	 * racing with it. __blk_mq_update_nr_hw_queues() uses
+-	 * synchronize_rcu() to ensure this function left the critical section
+-	 * below.
++	 * while the queue is frozen. Hold q_usage_counter to serialize
++	 * __blk_mq_update_nr_hw_queues() against this function.
+ 	 */
+ 	if (!percpu_ref_tryget(&q->q_usage_counter))
+ 		return;
+-
++	if (atomic_read(&q->mq_freeze_depth))
++		goto out;
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		struct blk_mq_tags *tags = hctx->tags;
+ 
+@@ -405,6 +404,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_iter_fn *fn,
+ 			bt_for_each(hctx, &tags->breserved_tags, fn, priv, true);
+ 		bt_for_each(hctx, &tags->bitmap_tags, fn, priv, false);
+ 	}
++out:
+ 	blk_queue_exit(q);
+ }
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 652d0c6d5945..f9fc1536408d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -3226,10 +3226,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list)
+ 		blk_mq_freeze_queue(q);
+-	/*
+-	 * Sync with blk_mq_queue_tag_busy_iter.
+-	 */
+-	synchronize_rcu();
++
+ 	/*
+ 	 * Switch IO scheduler to 'none', cleaning up the data associated
+ 	 * with the previous scheduler. We will switch back once we are done
+-- 
+2.21.0.196.g041f5ea1cf98
 
