@@ -2,82 +2,114 @@ Return-Path: <SRS0=zJbT=SF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58069C4360F
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 10:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C320C4360F
+	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 10:26:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 17D2620882
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 10:26:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14A6E2147C
+	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 10:26:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726328AbfDCK0R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Apr 2019 06:26:17 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:34762 "EHLO mx1.redhat.com"
+        id S1726316AbfDCK0V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Apr 2019 06:26:21 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:52964 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726199AbfDCK0R (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Apr 2019 06:26:17 -0400
+        id S1726199AbfDCK0V (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Wed, 3 Apr 2019 06:26:21 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 77B3730832C2;
-        Wed,  3 Apr 2019 10:26:17 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id 098C93091747;
+        Wed,  3 Apr 2019 10:26:21 +0000 (UTC)
 Received: from localhost (ovpn-8-25.pek2.redhat.com [10.72.8.25])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B6989608BD;
-        Wed,  3 Apr 2019 10:26:14 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 11C21608AA;
+        Wed,  3 Apr 2019 10:26:19 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 0/6] blk-mq: fix races related with freeing queue
-Date:   Wed,  3 Apr 2019 18:26:03 +0800
-Message-Id: <20190403102609.18707-1-ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        James Smart <james.smart@broadcom.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
+        jianchao wang <jianchao.w.wang@oracle.com>
+Subject: [PATCH V3 1/6] blk-mq: grab .q_usage_counter when queuing request from plug code path
+Date:   Wed,  3 Apr 2019 18:26:04 +0800
+Message-Id: <20190403102609.18707-2-ming.lei@redhat.com>
+In-Reply-To: <20190403102609.18707-1-ming.lei@redhat.com>
+References: <20190403102609.18707-1-ming.lei@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.44]); Wed, 03 Apr 2019 10:26:17 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Wed, 03 Apr 2019 10:26:21 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Just like aio/io_uring, we need to grab 2 refcount for queuing one
+request, one is for submission, another is for completion.
 
-Since 45a9c9d909b2 ("blk-mq: Fix a use-after-free"), run queue isn't
-allowed during cleanup queue even though queue refcount is held.
+If the request isn't queued from plug code path, the refcount grabbed
+in generic_make_request() serves for submission. In theroy, this
+refcount should have been released after the sumission(async run queue)
+is done. But blk_freeze_queue() is working with blk_sync_queue() together
+for canceling async run queue work activities if hctx->run_work is scheduled
+with holding the refcount.
 
-This change has caused lots of kernel oops triggered in run queue path,
-turns out it isn't easy to fix them all.
+However, if request is staggered into plug list, and finally queued
+from plug code path, the refcount in submission side is actually missed.
+And we may start to run queue after queue is removed, then kernel oops
+is triggered.
 
-So move freeing of hw queue resources into hctx's release handler, then
-the above issue is fixed. Meantime, this way is safe given freeing hw
-queue resource doesn't require tags.
+Fixes the issue by grab .q_usage_counter before calling
+blk_mq_sched_insert_requests() in blk_mq_flush_plug_list(). This way is
+safe because the queue is absolutely alive before inserting request.
 
-V3 covers more races.
+Cc: Dongli Zhang <dongli.zhang@oracle.com>
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Bart Van Assche <bart.vanassche@wdc.com>
+Cc: linux-scsi@vger.kernel.org,
+Cc: Martin K . Petersen <martin.petersen@oracle.com>,
+Cc: Christoph Hellwig <hch@lst.de>,
+Cc: James E . J . Bottomley <jejb@linux.vnet.ibm.com>,
+Cc: jianchao wang <jianchao.w.wang@oracle.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-mq.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-V3:
-	- cancel q->requeue_work in queue's release handler
-	- cancel hctx->run_work in hctx's release handler
-	- add patch 1 for fixing race in plug code path
-	- the last patch is added for avoiding to grab SCSI's refcont
-	in IO path
-
-V2:
-	- moving freeing hw queue resources into hctx's release handler
-
-
-Ming Lei (6):
-  blk-mq: grab .q_usage_counter when queuing request from plug code path
-  blk-mq: move cancel of requeue_work into blk_mq_release
-  blk-mq: free hw queue's resource in hctx's release handler
-  blk-mq: move cancel of hctx->run_work into blk_mq_hw_sysfs_release
-  block: don't drain in-progress dispatch in blk_cleanup_queue()
-  SCSI: don't hold device refcount in IO path
-
- block/blk-core.c        | 23 +----------------------
- block/blk-mq-sysfs.c    |  8 ++++++++
- block/blk-mq.c          | 16 ++++++++++------
- block/blk-mq.h          |  2 +-
- drivers/scsi/scsi_lib.c | 30 ++++++------------------------
- 5 files changed, 26 insertions(+), 53 deletions(-)
-
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3ff3d7b49969..5b586affee09 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1728,9 +1728,12 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+ 		if (rq->mq_hctx != this_hctx || rq->mq_ctx != this_ctx) {
+ 			if (this_hctx) {
+ 				trace_block_unplug(this_q, depth, !from_schedule);
++
++				percpu_ref_get(&this_q->q_usage_counter);
+ 				blk_mq_sched_insert_requests(this_hctx, this_ctx,
+ 								&rq_list,
+ 								from_schedule);
++				percpu_ref_put(&this_q->q_usage_counter);
+ 			}
+ 
+ 			this_q = rq->q;
+@@ -1749,8 +1752,11 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+ 	 */
+ 	if (this_hctx) {
+ 		trace_block_unplug(this_q, depth, !from_schedule);
++
++		percpu_ref_get(&this_q->q_usage_counter);
+ 		blk_mq_sched_insert_requests(this_hctx, this_ctx, &rq_list,
+ 						from_schedule);
++		percpu_ref_put(&this_q->q_usage_counter);
+ 	}
+ }
+ 
 -- 
 2.9.5
 
