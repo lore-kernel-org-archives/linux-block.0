@@ -3,60 +3,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C9E6C4360F
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 15:26:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FBA5C10F06
+	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 15:30:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EFF0B206B7
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 15:25:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DBF1206DD
+	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 15:30:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726264AbfDCPZ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Apr 2019 11:25:59 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:38907 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726084AbfDCPZ7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Apr 2019 11:25:59 -0400
-Received: by mail-pg1-f196.google.com with SMTP id j26so8501826pgl.5;
-        Wed, 03 Apr 2019 08:25:58 -0700 (PDT)
+        id S1726074AbfDCPaY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Apr 2019 11:30:24 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:33827 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725990AbfDCPaY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Apr 2019 11:30:24 -0400
+Received: by mail-pf1-f193.google.com with SMTP id b3so8335539pfd.1;
+        Wed, 03 Apr 2019 08:30:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=hwG/2rIwOprS7Qml3CdqWTLYp2FHA3Z2R1freTcl9XA=;
-        b=WpihWzHyFRnnOUU/1RdQP1Dpo6r3/ledbj4J4PwoHn19+pItnwuJ45tr0g18hh+MZv
-         2anB5bjAghbOBtdWfy17PDgnXoh+bwi0ACWI5eWaEq1Tpp3rY6KKT31/NJvCjIPCo3CK
-         eUrPgIIGMFIXlB9qiKa553uYC3e9tXJDkcBgn0HlcfKO+HbkUfrstot3bmA+qc18IThi
-         kLcxiBgcWp3H7kFEcDHPhfoSmcmmXrH2mgWhEUSt7aDO+HUwlrmLkMORFYLhbOsDcyX+
-         hsZOW4fOKvmbTV28oPhSGhUV50vVjvxwJy1t0MTEjvp0v5NsV6kEbHRwevHr2evgDEhQ
-         rTFw==
-X-Gm-Message-State: APjAAAX+qV69YeADUtl7Nt28ukeW+9zKxogUlBT/tD86CUOaGbcubwCO
-        15zL4afddY90Pa8T8Xzz5IQ=
-X-Google-Smtp-Source: APXvYqzGwb7yWPL22+oVpsQKnGnvJ7lBk1VAx7DGXMRJq5YRB9DqSFMkHlcV5v89kmRyAmR9Z7jplA==
-X-Received: by 2002:a63:3fc3:: with SMTP id m186mr228502pga.151.1554305158248;
-        Wed, 03 Apr 2019 08:25:58 -0700 (PDT)
+        bh=e80FEICx9abJBygCcRq3LP2wwezRKJU09Q1ghjdKEmc=;
+        b=Pf5BnAvdHt2g7yrgsbtvl+MCGfvdING3z3AtXls/SR9Fk5I+7+jucgjHhyWj+R8g2l
+         DC44+R3uB+saS7VqrnrRkggGLtK2JN6F/aunchVOuaZvpZYuiNM+dX8RNam0xfQpSZX3
+         EGLkY82l19UzxWd63LF0P/UaAYI84Xh5bzhrccYlD8+PjMBeV+G2o9b7fi4Ey5DAWEgp
+         ouU9aKP0J9pwsD2O0vE7SAArcLwggloocrufO9rnWvKFbxxIwP+R7VTeD3P+HITlAIIR
+         MDVxCLgMx3OTZE3Wrwg4jDD8r3mfuvMTF47/F/b34W7p/0wzf5Ea2/hrbbSF2KJQJ4jc
+         ePXA==
+X-Gm-Message-State: APjAAAVTfpCfnd//KGxt22EHKXDuHuFvXcswMpkziuZbpkTlXkIJObYu
+        Fpv8qrn+YeyJCRDkJWq45WKV47kDhfk=
+X-Google-Smtp-Source: APXvYqxw9Kr1Z+3m/QcdtazqEZ7tpflZyMGrQrvBj9HA8O/V6UZznQqdncZ7X4iIctffFreM/NF5Mw==
+X-Received: by 2002:a63:465b:: with SMTP id v27mr249259pgk.165.1554305423720;
+        Wed, 03 Apr 2019 08:30:23 -0700 (PDT)
 Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id 10sm24090611pft.83.2019.04.03.08.25.57
+        by smtp.gmail.com with ESMTPSA id 18sm19056701pfp.18.2019.04.03.08.30.22
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Wed, 03 Apr 2019 08:25:57 -0700 (PDT)
-Message-ID: <1554305156.118779.186.camel@acm.org>
-Subject: Re: [PATCH V3 5/6] block: don't drain in-progress dispatch in
- blk_cleanup_queue()
+        Wed, 03 Apr 2019 08:30:22 -0700 (PDT)
+Message-ID: <1554305421.118779.187.camel@acm.org>
+Subject: Re: [PATCH] block: Fix a race between tag iteration and hardware
+ queue changes
 From:   Bart Van Assche <bvanassche@acm.org>
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Dongli Zhang <dongli.zhang@oracle.com>,
+To:     "jianchao.wang" <jianchao.w.wang@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.com>,
         James Smart <james.smart@broadcom.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        jianchao wang <jianchao.w.wang@oracle.com>
-Date:   Wed, 03 Apr 2019 08:25:56 -0700
-In-Reply-To: <20190403102609.18707-6-ming.lei@redhat.com>
-References: <20190403102609.18707-1-ming.lei@redhat.com>
-         <20190403102609.18707-6-ming.lei@redhat.com>
+        Ming Lei <ming.lei@redhat.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Dongli Zhang <dongli.zhang@oracle.com>, stable@vger.kernel.org
+Date:   Wed, 03 Apr 2019 08:30:21 -0700
+In-Reply-To: <9d74985d-969c-b68d-fa05-2707ed27e013@oracle.com>
+References: <20190402223202.30752-1-bvanassche@acm.org>
+         <9d74985d-969c-b68d-fa05-2707ed27e013@oracle.com>
 Content-Type: text/plain; charset="UTF-7"
 X-Mailer: Evolution 3.26.2-1 
 Mime-Version: 1.0
@@ -66,16 +66,12 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2019-04-03 at 18:26 +-0800, Ming Lei wrote:
-+AD4 Now freeing hw queue resource is moved to hctx's release handler,
-+AD4 we don't need to worry about the race between blk+AF8-cleanup+AF8-queue and
-+AD4 run queue any more.
-+AD4 
-+AD4 So don't drain in-progress dispatch in blk+AF8-cleanup+AF8-queue().
-+AD4 
-+AD4 This is basically revert of c2856ae2f315 (+ACI-blk-mq: quiesce queue before
-+AD4 freeing queue+ACI).
+On Wed, 2019-04-03 at 11:26 +-0800, jianchao.wang wrote:
++AD4 percpu+AF8-ref+AF8-tryget should be enough here.
 
-Reviewed-by: Bart Van Assche +ADw-bvanassche+AEA-acm.org+AD4
+Having thought further about this, I think you are right. I will drop this
+patch.
 
+Thanks,
 
+Bart.
