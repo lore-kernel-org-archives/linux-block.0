@@ -2,110 +2,147 @@ Return-Path: <SRS0=zJbT=SF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C578C10F0B
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 03:31:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37789C4360F
+	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 03:37:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58FC920882
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 03:31:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C7A920830
+	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 03:37:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726865AbfDCDby (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Apr 2019 23:31:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54971 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726924AbfDCDbv (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Tue, 2 Apr 2019 23:31:51 -0400
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 18E6185363;
-        Wed,  3 Apr 2019 03:31:51 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 800AD1001E76;
-        Wed,  3 Apr 2019 03:31:43 +0000 (UTC)
-Date:   Wed, 3 Apr 2019 11:31:38 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Christoph Hellwig <hch@infradead.org>,
-        Hannes Reinecke <hare@suse.com>,
-        James Smart <james.smart@broadcom.com>,
-        Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Dongli Zhang <dongli.zhang@oracle.com>, stable@vger.kernel.org
-Subject: Re: [PATCH 2/4] block: Fix a race between request queue freezing and
- running queues
-Message-ID: <20190403033137.GC9968@ming.t460p>
-References: <20190401212014.192753-1-bvanassche@acm.org>
- <20190401212014.192753-3-bvanassche@acm.org>
- <20190402005318.GC21944@ming.t460p>
- <1554219850.118779.137.camel@acm.org>
+        id S1726183AbfDCDh1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Apr 2019 23:37:27 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:44746 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726130AbfDCDh1 (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 2 Apr 2019 23:37:27 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [10.3.19.212])
+        by Forcepoint Email with ESMTP id 9E91A2A3071AFDF7CE0D;
+        Wed,  3 Apr 2019 11:37:24 +0800 (CST)
+Received: from localhost (10.177.31.96) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.408.0; Wed, 3 Apr 2019
+ 11:37:16 +0800
+From:   Yue Haibing <yuehaibing@huawei.com>
+To:     <tim@cyberelk.net>, <axboe@kernel.dk>, <rdunlap@infradead.org>
+CC:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH] paride/pf: Fix potential NULL pointer dereference
+Date:   Wed, 3 Apr 2019 11:37:07 +0800
+Message-ID: <20190403033707.8840-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1554219850.118779.137.camel@acm.org>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Wed, 03 Apr 2019 03:31:51 +0000 (UTC)
+Content-Type: text/plain
+X-Originating-IP: [10.177.31.96]
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 02, 2019 at 08:44:10AM -0700, Bart Van Assche wrote:
-> On Tue, 2019-04-02 at 08:53 +0800, Ming Lei wrote:
-> > On Mon, Apr 01, 2019 at 02:20:12PM -0700, Bart Van Assche wrote:
-> > > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > > index 3ff3d7b49969..652d0c6d5945 100644
-> > > --- a/block/blk-mq.c
-> > > +++ b/block/blk-mq.c
-> > > @@ -1499,12 +1499,20 @@ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
-> > >  	struct blk_mq_hw_ctx *hctx;
-> > >  	int i;
-> > >  
-> > > +	/*
-> > > +	 * Do not run any hardware queues if the queue is frozen or if a
-> > > +	 * concurrent blk_cleanup_queue() call is removing any data
-> > > +	 * structures used by this function.
-> > > +	 */
-> > > +	if (!percpu_ref_tryget(&q->q_usage_counter))
-> > > +		return;
-> > >  	queue_for_each_hw_ctx(q, hctx, i) {
-> > >  		if (blk_mq_hctx_stopped(hctx))
-> > >  			continue;
-> > >  
-> > >  		blk_mq_run_hw_queue(hctx, async);
-> > >  	}
-> > > +	percpu_ref_put(&q->q_usage_counter);
-> > >  }
-> > >  EXPORT_SYMBOL(blk_mq_run_hw_queues);
-> > 
-> > I don't see it is necessary to add percpu_ref_tryget()/percpu_ref_put()
-> > in the fast path if we simply release all hctx resource in hctx's
-> > release handler by the following patch:
-> > 
-> > https://lore.kernel.org/linux-block/20190401044247.29881-2-ming.lei@redhat.com/T/#u
-> > 
-> > Even we can kill the percpu_ref_tryget_live()/percpu_ref_put() in
-> > scsi_end_request().
-> 
-> The above approach has the advantages of being easy to review and to maintain.
-> 
-> Patch "[PATCH V2 1/3] blk-mq: free hw queue's resource in hctx's release handler"
-> makes the block layer more complicated because it introduces a new state for
-> hardware queues: block driver cleanup has happened (set->ops->exit_hctx(...)) but
+From: YueHaibing <yuehaibing@huawei.com>
 
-We are done with driver after blk_freeze_queue() and blk_sync_queue(),
-then call .exit_hctx() to say good bye with driver, I don't see it
-causes any issue.
+Syzkaller report this:
 
-> the hardware queues are still in use by the block layer core.
+pf: pf version 1.04, major 47, cluster 64, nice 0
+pf: No ATAPI disk detected
+kasan: CONFIG_KASAN_INLINE enabled
+kasan: GPF could be caused by NULL-ptr deref or user memory access
+general protection fault: 0000 [#1] SMP KASAN PTI
+CPU: 0 PID: 9887 Comm: syz-executor.0 Tainted: G         C        5.1.0-rc3+ #8
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
+RIP: 0010:pf_init+0x7af/0x1000 [pf]
+Code: 46 77 d2 48 89 d8 48 c1 e8 03 80 3c 28 00 74 08 48 89 df e8 03 25 a6 d2 4c 8b 23 49 8d bc 24 80 05 00 00 48 89 f8 48 c1 e8 03 <80> 3c 28 00 74 05 e8 e6 24 a6 d2 49 8b bc 24 80 05 00 00 e8 79 34
+RSP: 0018:ffff8881abcbf998 EFLAGS: 00010202
+RAX: 00000000000000b0 RBX: ffffffffc1e4a8a8 RCX: ffffffffaec50788
+RDX: 0000000000039b10 RSI: ffffc9000153c000 RDI: 0000000000000580
+RBP: dffffc0000000000 R08: ffffed103ee44e59 R09: ffffed103ee44e59
+R10: 0000000000000001 R11: ffffed103ee44e58 R12: 0000000000000000
+R13: ffffffffc1e4b028 R14: 0000000000000000 R15: 0000000000000020
+FS:  00007f1b78a91700(0000) GS:ffff8881f7200000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f6d72b207f8 CR3: 00000001d5790004 CR4: 00000000007606f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ ? 0xffffffffc1e50000
+ do_one_initcall+0xbc/0x47d init/main.c:901
+ do_init_module+0x1b5/0x547 kernel/module.c:3456
+ load_module+0x6405/0x8c10 kernel/module.c:3804
+ __do_sys_finit_module+0x162/0x190 kernel/module.c:3898
+ do_syscall_64+0x9f/0x450 arch/x86/entry/common.c:290
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x462e99
+Code: f7 d8 64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f1b78a90c58 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
+RAX: ffffffffffffffda RBX: 000000000073bf00 RCX: 0000000000462e99
+RDX: 0000000000000000 RSI: 0000000020000180 RDI: 0000000000000003
+RBP: 00007f1b78a90c70 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f1b78a916bc
+R13: 00000000004bcefa R14: 00000000006f6fb0 R15: 0000000000000004
+Modules linked in: pf(+) paride gpio_tps65218 tps65218 i2c_cht_wc ati_remote dc395x act_meta_skbtcindex act_ife ife ecdh_generic rc_xbox_dvd sky81452_regulator v4l2_fwnode leds_blinkm snd_usb_hiface comedi(C) aes_ti slhc cfi_cmdset_0020 mtd cfi_util sx8654 mdio_gpio of_mdio fixed_phy mdio_bitbang libphy alcor_pci matrix_keymap hid_uclogic usbhid scsi_transport_fc videobuf2_v4l2 videobuf2_dma_sg snd_soc_pcm179x_spi snd_soc_pcm179x_codec i2c_demux_pinctrl mdev snd_indigodj isl6405 mii enc28j60 cmac adt7316_i2c(C) adt7316(C) fmc_trivial fmc nf_reject_ipv4 authenc rc_dtt200u rtc_ds1672 dvb_usb_dibusb_mc dvb_usb_dibusb_mc_common dib3000mc dibx000_common dvb_usb_dibusb_common dvb_usb dvb_core videobuf2_common videobuf2_vmalloc videobuf2_memops regulator_haptic adf7242 mac802154 ieee802154 s5h1409 da9034_ts snd_intel8x0m wmi cx24120 usbcore sdhci_cadence sdhci_pltfm sdhci mmc_core joydev i2c_algo_bit scsi_transport_iscsi iscsi_boot_sysfs ves1820 lockd grace nfs_acl auth_rpcgss sunrp
+ c
+ ip_vs snd_soc_adau7002 snd_cs4281 snd_rawmidi gameport snd_opl3_lib snd_seq_device snd_hwdep snd_ac97_codec ad7418 hid_primax hid snd_soc_cs4265 snd_soc_core snd_pcm_dmaengine snd_pcm snd_timer ac97_bus snd_compress snd soundcore ti_adc108s102 eeprom_93cx6 i2c_algo_pca mlxreg_hotplug st_pressure st_sensors industrialio_triggered_buffer kfifo_buf industrialio v4l2_common videodev media snd_soc_adau_utils rc_pinnacle_grey rc_core pps_gpio leds_lm3692x nandcore ledtrig_pattern iptable_security iptable_raw iptable_mangle iptable_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 iptable_filter bpfilter ip6_vti ip_vti ip_gre ipip sit tunnel4 ip_tunnel hsr veth netdevsim vxcan batman_adv cfg80211 rfkill chnl_net caif nlmon dummy team bonding vcan bridge stp llc ip6_gre gre ip6_tunnel tunnel6 tun mousedev ppdev tpm kvm_intel kvm irqbypass crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel aesni_intel ide_pci_generic aes_x86_64 piix crypto_simd input_leds psmouse cryp
+ td
+ glue_helper ide_core intel_agp serio_raw intel_gtt agpgart ata_generic i2c_piix4 pata_acpi parport_pc parport rtc_cmos floppy sch_fq_codel ip_tables x_tables sha1_ssse3 sha1_generic ipv6 [last unloaded: paride]
+Dumping ftrace buffer:
+  (ftrace buffer empty)
+---[ end trace 7a818cf5f210d79e ]---
 
-Block layer has the correct in-memory state to work well, and no
-driver activity is involved too.
+If alloc_disk fails in pf_init_units, pf->disk will be
+NULL, however in pf_detect and pf_exit, it's not check
+this before free.It may result a NULL pointer dereference.
 
-Thanks,
-Ming
+Also when register_blkdev failed, blk_cleanup_queue() and
+blk_mq_free_tag_set() should be called to free resources.
+
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Fixes: 6ce59025f118 ("paride/pf: cleanup queues when detection fails")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ drivers/block/paride/pf.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/paride/pf.c b/drivers/block/paride/pf.c
+index 103b617c..f027247 100644
+--- a/drivers/block/paride/pf.c
++++ b/drivers/block/paride/pf.c
+@@ -762,6 +762,8 @@ static int pf_detect(void)
+ 
+ 	printk("%s: No ATAPI disk detected\n", name);
+ 	for (pf = units, unit = 0; unit < PF_UNITS; pf++, unit++) {
++		if (!pf->disk)
++			continue;
+ 		blk_cleanup_queue(pf->disk->queue);
+ 		pf->disk->queue = NULL;
+ 		blk_mq_free_tag_set(&pf->tag_set);
+@@ -1029,8 +1031,13 @@ static int __init pf_init(void)
+ 	pf_busy = 0;
+ 
+ 	if (register_blkdev(major, name)) {
+-		for (pf = units, unit = 0; unit < PF_UNITS; pf++, unit++)
++		for (pf = units, unit = 0; unit < PF_UNITS; pf++, unit++) {
++			if (!pf->disk)
++				continue;
++			blk_cleanup_queue(pf->disk->queue);
++			blk_mq_free_tag_set(&pf->tag_set);
+ 			put_disk(pf->disk);
++		}
+ 		return -EBUSY;
+ 	}
+ 
+@@ -1051,6 +1058,9 @@ static void __exit pf_exit(void)
+ 	int unit;
+ 	unregister_blkdev(major, name);
+ 	for (pf = units, unit = 0; unit < PF_UNITS; pf++, unit++) {
++		if (!pf->disk)
++			continue;
++
+ 		if (pf->present)
+ 			del_gendisk(pf->disk);
+ 
+-- 
+2.7.0
+
+
