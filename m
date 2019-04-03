@@ -2,102 +2,107 @@ Return-Path: <SRS0=zJbT=SF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.1 required=3.0 tests=BIGNUM_EMAILS,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_MUTT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE294C4360F
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 04:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4055EC4360F
+	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 06:15:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7831A2084C
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 04:21:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE54620882
+	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 06:15:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="EfWe761W"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lkcQCvw8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725879AbfDCEV1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Apr 2019 00:21:27 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:44380 "EHLO
+        id S1725908AbfDCGPY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Apr 2019 02:15:24 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:43478 "EHLO
         aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725936AbfDCEV1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Apr 2019 00:21:27 -0400
+        with ESMTP id S1725879AbfDCGPY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Apr 2019 02:15:24 -0400
 Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x334Jl5o139343;
-        Wed, 3 Apr 2019 04:21:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=C7/C8uTEo4ZaBw6Hn6VFIbpNsmVwCI6sGV/YXbFIpRI=;
- b=EfWe761W9cBTS1tUhlODlmo4Dyr+MoJ2KF5U96OtJdoF2vuos+PWDnTaQ8daKoIKghGJ
- wg7A2Lk8/nkTRSSFvsSAXPelSiieiVn12ul62Irc6GAOJzbQEhaHQ3x8VOsLhIdtmgfG
- fhDSXD2UZHUd9O4Ieyi++4O/oMgIanhAle0Qxp/JlNOFQTE1JbzApoT3tWCSDVwf0pP+
- RVLPeVYPKsP89OWG435u2PmIJ8GS4fXg+u+4mmGKaW/uuLoKSZKCtfXlv+zhrt4BdqH8
- FQGtiPTW9NhEHyyr7nS2SrMS8/E429OX7MdsdZdLftfZorq3mtRXumq2YdqczXcX+RNL Zw== 
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3363dfh020161;
+        Wed, 3 Apr 2019 06:15:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2018-07-02;
+ bh=FXWGszBwk+zJdu+WCpXoCjQuCfGIl2iMj82QTScq6wU=;
+ b=lkcQCvw8m1/taxzOyf5eJpYnX6odJswgMNuGMeXdu0HZyJbMF/ywRTtQRcRSZM91Tcin
+ 8U228GwJOPNUlwin9QP9EW+my3+6HwWYBubIMTJzTs5WAHCHy5ql/ytKr0NtaFHtM4O3
+ 6eeoU7GcdB/UBso0wQP3B904XW87Cd2Dl5Urh26M0D6lWlSWVhyq0u3np1Hkv9S5JjZ3
+ uHK78oMlet+nVidPi0Ju+yuXpk+AQcxi76C6Q2jJRUL7MI0WQLRBWHh57Y3HFRfPVSvc
+ pvzeYoHLFsn0rUIKk81FHPqzpO2gsL4rBo3JeRfgyUPyXGNoFLZeu31l5P8QyR1t0+HD rg== 
 Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 2rj0dnnpkd-1
+        by aserp2120.oracle.com with ESMTP id 2rj0dnp2nr-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 03 Apr 2019 04:21:18 +0000
+        Wed, 03 Apr 2019 06:15:21 +0000
 Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x334JpES115767;
-        Wed, 3 Apr 2019 04:21:17 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2rm8f4vere-1
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x336Dt8Z152433;
+        Wed, 3 Apr 2019 06:15:20 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3030.oracle.com with ESMTP id 2rm8f4wra7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 03 Apr 2019 04:21:17 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x334LEQn027050;
-        Wed, 3 Apr 2019 04:21:15 GMT
-Received: from [10.182.69.106] (/10.182.69.106)
+        Wed, 03 Apr 2019 06:15:20 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x336FJTv029986;
+        Wed, 3 Apr 2019 06:15:20 GMT
+Received: from kadam (/41.202.241.37)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 02 Apr 2019 21:21:14 -0700
-Subject: Re: [PATCH] SCSI: don't hold device refcount in IO path
-To:     Ming Lei <ming.lei@redhat.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Cc:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        James Smart <james.smart@broadcom.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        Christoph Hellwig <hch@lst.de>,
-        jianchao wang <jianchao.w.wang@oracle.com>
-References: <20190402114800.2281-1-ming.lei@redhat.com>
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <79c85f5b-863c-539c-b702-009ad3fac3cc@oracle.com>
-Date:   Wed, 3 Apr 2019 12:25:16 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.2.1
+        with ESMTP ; Tue, 02 Apr 2019 23:15:19 -0700
+Date:   Wed, 3 Apr 2019 09:15:12 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     paolo.valente@linaro.org
+Cc:     linux-block@vger.kernel.org
+Subject: [bug report] block, bfq: update blkio stats outside the scheduler
+ lock
+Message-ID: <20190403061512.GA1618@kadam>
 MIME-Version: 1.0
-In-Reply-To: <20190402114800.2281-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
 X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9215 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=781
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=703
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1904030026
+ engine=8.0.1-1810050000 definitions=main-1904030041
 X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9215 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=832 adultscore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=754 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1904030027
+ definitions=main-1904030041
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello Paolo Valente,
 
+This is a semi-automatic email about new static checker warnings.
 
-On 4/2/19 7:48 PM, Ming Lei wrote:
-> scsi_device's refcount is always grabed in IO path.
+The patch 24bfd19bb789: "block, bfq: update blkio stats outside the 
+scheduler lock" from Nov 13, 2017, leads to the following Smatch 
+complaint:
 
-'grabbed'
+    block/bfq-iosched.c:5013 __bfq_insert_request()
+    error: we previously assumed 'bfqq' could be null (see line 5008)
 
-> 
-> Turns out it isn't necessary, becasue blk_queue_cleanup() will
+block/bfq-iosched.c
+  5007	
+  5008		waiting = bfqq && bfq_bfqq_wait_request(bfqq);
+                          ^^^^
+The patch adds a NULL check here.  Hopefully it's not required because
 
-'because blk_cleanup_queue()'
+  5009		bfq_add_request(rq);
+  5010		idle_timer_disabled = waiting && !bfq_bfqq_wait_request(bfqq);
+  5011	
+  5012		rq->fifo_time = ktime_get_ns() + bfqd->bfq_fifo_expire[rq_is_sync(rq)];
+  5013		list_add_tail(&rq->queuelist, &bfqq->fifo);
+                                              ^^^^^^^^^^^
+the existing code assumes "bfqq" is valid.
 
-> drain any in-flight IOs, then cancel timeout/requeue work, and
-> SCSI's requeue_work is canceled too in __scsi_remove_device().
+  5014	
+  5015		bfq_rq_enqueued(bfqd, bfqq, rq);
 
-Dongli Zhang
+regards,
+dan carpenter
