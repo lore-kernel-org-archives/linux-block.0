@@ -2,104 +2,124 @@ Return-Path: <SRS0=zJbT=SF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD50FC10F0C
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 02:57:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0C11C4360F
+	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 03:21:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 78E812146E
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 02:57:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sZBLv6WX"
+	by mail.kernel.org (Postfix) with ESMTP id 79B0F2146E
+	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 03:21:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726565AbfDCC5v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 2 Apr 2019 22:57:51 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:35348 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726130AbfDCC5v (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 2 Apr 2019 22:57:51 -0400
-X-Greylist: delayed 742 seconds by postgrey-1.27 at vger.kernel.org; Tue, 02 Apr 2019 22:57:50 EDT
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x332sdmD077761;
-        Wed, 3 Apr 2019 02:57:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : references : date : in-reply-to : message-id : mime-version :
- content-type; s=corp-2018-07-02;
- bh=3QNUYX/6CiPJimN19TLvqEDYljNHcDYiKAec+w9jsk0=;
- b=sZBLv6WXTh457gmNEHTd1YdlrdH/4ikmI6AJk9owGon5CXXKpb4vCGwYSeYk1nfWtvSV
- F1MI7WOgl1beWefYY3+lRZnObzeCkocDH513AdPyuWEVeuB35ic9xTGdsnXkqvorJcLP
- 1wwdm0XLoNCzMq+bVsO05qQrGBdGKSTZa8aE2wm69CK1rIIT9zGSbmCQ52atxCWABUsK
- HoZPLetndXT3EtcErW9znz5QOIpZLfxWOxaw4WDqrDCdxRUKhyWJ6UbjDeDfrv873XRY
- sU1/ej4OwkHJImQVneXrS+/qdG6PXCVB0vGlFfacMv9XaF/TfR4H9WsrbSw5EZM6BT5Z fQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2rj0dnnf22-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 03 Apr 2019 02:57:36 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x332vYVc035843;
-        Wed, 3 Apr 2019 02:57:36 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2rm9mht0mv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 03 Apr 2019 02:57:35 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x332vYwF011060;
-        Wed, 3 Apr 2019 02:57:34 GMT
-Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 02 Apr 2019 19:57:33 -0700
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, axboe@fb.com, prakash.v@samsung.com,
-        anshul@samsung.com, joshiiitr@gmail.com
-Subject: Re: [PATCH v3 7/7] fs/ext4,jbd2: add support for passing write-hint with journal
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-Organization: Oracle Corporation
-References: <1553846032-4451-1-git-send-email-joshi.k@samsung.com>
-        <CGME20190329075800epcas2p4731f10eabf7d70dc7096117d161b05a3@epcas2p4.samsung.com>
-        <1553846032-4451-8-git-send-email-joshi.k@samsung.com>
-Date:   Tue, 02 Apr 2019 22:57:31 -0400
-In-Reply-To: <1553846032-4451-8-git-send-email-joshi.k@samsung.com> (Kanchan
-        Joshi's message of "Fri, 29 Mar 2019 13:23:52 +0530")
-Message-ID: <yq14l7fokx0.fsf@oracle.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        id S1726680AbfDCDVI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 2 Apr 2019 23:21:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:59950 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726157AbfDCDVI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Tue, 2 Apr 2019 23:21:08 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 25D588552A;
+        Wed,  3 Apr 2019 03:21:08 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 95A925C57E;
+        Wed,  3 Apr 2019 03:20:59 +0000 (UTC)
+Date:   Wed, 3 Apr 2019 11:20:54 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     "jianchao.wang" <jianchao.w.wang@oracle.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        James Smart <james.smart@broadcom.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        linux-scsi@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
+Subject: Re: [PATCH 0/5] blk-mq: allow to run queue if queue refcount is held
+Message-ID: <20190403032053.GA9968@ming.t460p>
+References: <20190401025237.GE30776@ming.t460p>
+ <21b2000b-16b6-f5a6-692b-73143a49a4ec@oracle.com>
+ <20190401032852.GG30776@ming.t460p>
+ <ef192658-74cd-e193-cb40-aed546c2b309@oracle.com>
+ <20190401100334.GA5493@ming.t460p>
+ <ad0f8f4c-5efe-e50f-a3a7-4f7e3d368d28@oracle.com>
+ <20190402025505.GB26316@ming.t460p>
+ <ac11c70b-0914-cce7-7ed4-22acb292a965@oracle.com>
+ <20190402110558.GA12221@ming.t460p>
+ <1554227580.118779.158.camel@acm.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9215 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=597
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1904030016
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9215 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=642 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1904030016
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1554227580.118779.158.camel@acm.org>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.28]); Wed, 03 Apr 2019 03:21:08 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, Apr 02, 2019 at 10:53:00AM -0700, Bart Van Assche wrote:
+> On Tue, 2019-04-02 at 19:05 +0800, Ming Lei wrote:
+> > On Tue, Apr 02, 2019 at 04:07:04PM +0800, jianchao.wang wrote:
+> > > percpu_ref is born for fast path.
+> > > There are some drivers use it in completion path, such as scsi, does it really
+> > > matter for this kind of device ? If yes, I guess we should remove blk_mq_run_hw_queues
+> > > which is the really bulk and depend on hctx restart mechanism.
+> > 
+> > Yes, it is designed for fast path, but it doesn't mean percpu_ref
+> > hasn't any cost. blk_mq_run_hw_queues() is called for all blk-mq devices,
+> > includes the fast NVMe.
+> 
+> I think the overhead of adding a percpu_ref_get/put pair is acceptable for
+> SCSI drivers. The NVMe driver doesn't call blk_mq_run_hw_queues() directly.
+> Additionally, I don't think that any of the blk_mq_run_hw_queues() calls from
+> the block layer matter for the fast path code in the NVMe driver. In other
+> words, adding a percpu_ref_get/put pair in blk_mq_run_hw_queues() shouldn't
+> affect the performance of the NVMe driver.
 
-Kanchan,
+But it can be avoided easily and cleanly, why abuse it for protecting hctx?
 
-> For NAND based SSDs, mixing of data with different life-time reduces
-> efficiency of internal garbage-collection. During FS operations,
-> series of journal updates will follow/precede series of data/meta
-> updates, causing intermixing inside SSD. By passing a write-hint with
-> journal, its write can be isolated from other data/meta writes,
-> leading to endurance/performance benefit on SSD.
+> 
+> > Also:
+> > 
+> > It may not be enough to just grab the percpu_ref for blk_mq_run_hw_queues
+> > only, given the idea is to use the percpu_ref to protect hctx's resources.
+> > 
+> > There are lots of uses on 'hctx', such as other exported blk-mq APIs.
+> > If this approach were chosen, we may have to audit other blk-mq APIs,
+> > cause they might be called after queue is frozen too.
+> 
+> The only blk_mq_hw_ctx user I have found so far that needs additional
+> protection is the q->mq_ops->poll() call in blk_poll(). However, that is not
+> a new issue. Functions like nvme_poll() access data structures (NVMe
+> completion queue) that shouldn't be accessed while blk_cleanup_queue() is in
+> progress. If blk_poll() is modified such that it becomes safe to call that
+> function while blk_cleanup_queue() is in progress then blk_poll() won't
+> access any hardware queue that it shouldn't access.
 
-Why not just introduce REQ_JOURNAL and let the device driver decide how
-to turn that into something appropriate for the device?
+There can be lots of such case:
 
-That's what I'll need for SCSI. Existing SCSI streams are not a good
-fit.
+1) blk_mq_run_hw_queue() from blk_mq_flush_plug_list()
+- requests can be completed just after added to ctx queue or scheduler queue
+becasue there can be concurrent run queue, then queue freezing may be done
 
--- 
-Martin K. Petersen	Oracle Linux Engineering
+- then the following blk_mq_run_hw_queue() in blk_mq_sched_insert_requests()
+may see freed hctx fields
+
+2) blk_mq_delay_run_hw_queue
+- what if it is called after blk_sync_queue() is done in
+  blk_cleanup_queue()
+- but the caller follows the old rule by holding request queue's
+  refcount
+
+3) blk_mq_quiesce_queue
+- called after blk_mq_free_queue() is done, then use-after-free on hctx->srcu
+- but the caller follows the old rule by holding request queue's
+
+...
+
+Thanks,
+Ming
