@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED0D3C4360F
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 17:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A877C4360F
+	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 18:43:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BB2D820657
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 17:59:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 193982084B
+	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 18:43:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726167AbfDCR74 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Apr 2019 13:59:56 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:34471 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726157AbfDCR74 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Apr 2019 13:59:56 -0400
-Received: by mail-qk1-f193.google.com with SMTP id n68so10743193qka.1
-        for <linux-block@vger.kernel.org>; Wed, 03 Apr 2019 10:59:55 -0700 (PDT)
+        id S1726706AbfDCSnj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Apr 2019 14:43:39 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:41629 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726654AbfDCSni (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Apr 2019 14:43:38 -0400
+Received: by mail-qk1-f196.google.com with SMTP id o129so29796qke.8
+        for <linux-block@vger.kernel.org>; Wed, 03 Apr 2019 11:43:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=idNNn2auLOCsa+03fh9anl9RFgYqN/V9B05DyYw+qhk=;
-        b=uXJ//5w+fubdL3Tvzb///+YtEuJ69NdlTh2sHDQxfDp14Q67SGc9IkerjJwJieoaf5
-         7ELzyHHzfAalBBP79aWi90jJfEbgeKEX783BnzCdCHtTl9yOUSmXHki5WaUk7A3o2pok
-         1YHxMBvEQTz3RLev0OP9vT4TkUDpBOaRPtgWZeivzThO+OcmdW3/z0NasiXU/ouEqvYD
-         uqNsoGttXzQ+xVb5xmRX3ScFRPU6nH2iAr/kM/IpNBLyhJqMDeIoc3/IuF8t0Gh355ro
-         /LWkXWx6p1ZWtwsmn0Hv1pK/9fMBsK3kT8GFZ3bInmELW27MvQHmRPlmbeoEEnZ3qM/6
-         AaOg==
-X-Gm-Message-State: APjAAAVpIQze9R6gV4zy/vTa8fXlNiE0wrPtFKtZGLJ+R2ULsFg9kUgP
-        ouWvOTf9fxRhGgm5OHuCV7qJog==
-X-Google-Smtp-Source: APXvYqz5hKauQKtZL/rvRNE3bghavFm5pCfnh0v2ngqfrsw+4588sfE451CYxICGeq6o18Tr/nZ9eQ==
-X-Received: by 2002:a37:ef19:: with SMTP id j25mr1298662qkk.176.1554314394989;
-        Wed, 03 Apr 2019 10:59:54 -0700 (PDT)
+        bh=ek2PhIDisG6J66uV7qhhtwD5wdO30T5kxZXke94Glko=;
+        b=msKVwW/ugUt3okwklSLvagpXriMjG/b5T1ZfKgfwqxGVhD404ZkqZtN9k44OawcxTb
+         TzQ3zYN/CIvgO5UqeuDXuSwMkRm/CQ/LcKa8dRFSXn4adsh4+GaUG4ePJxhSxN6p5/yr
+         ZNLrahSeeOzcWNkdHArMKSuOujdjZde/Khyaid6GTzfzPTzpehmIpRuLfB9hMJzqb7gX
+         uz1wpgnQWj4TRjQgl7B3UfntpmtSUS+dZ68KYawOJB8bllsejuPCFLA/bINn3fHhqazy
+         epyqfoPehaM0nMVMUMuphnVVqb/SLxXCjclnJTnwwvjlz0Qyq/qyLUi6gEk8N9K7SP/r
+         2Q8w==
+X-Gm-Message-State: APjAAAWQB75YLTJycG5/qR05/U8322ME6wnWlcRuYrXOL7iXSW5h30Hi
+        L1VrO2r5SOThg4EkarYez3/MOA==
+X-Google-Smtp-Source: APXvYqwYXayp02c+98QDMfBv5zCOno3flsgkkhICUAWnMJhZUue5xE+BP050mKTSkna6WuPjERlqTg==
+X-Received: by 2002:a05:620a:1253:: with SMTP id a19mr1467369qkl.148.1554317017166;
+        Wed, 03 Apr 2019 11:43:37 -0700 (PDT)
 Received: from dhcp-49-37.bos.redhat.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
-        by smtp.gmail.com with ESMTPSA id p62sm2618292qkd.27.2019.04.03.10.59.54
+        by smtp.gmail.com with ESMTPSA id x2sm8323041qkj.59.2019.04.03.11.43.36
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 03 Apr 2019 10:59:54 -0700 (PDT)
-Message-ID: <fc0899f9c46af3d5f22c93ea4fb93acce4fcefe3.camel@redhat.com>
+        Wed, 03 Apr 2019 11:43:36 -0700 (PDT)
+Message-ID: <799b8ceb473c6c221eb7468e5897a61576bc003a.camel@redhat.com>
 Subject: Re: Panic when rebooting target server testing srp on 5.0.0-rc2
 From:   Laurence Oberman <loberman@redhat.com>
 To:     Bart Van Assche <bvanassche@acm.org>,
@@ -49,7 +49,7 @@ Cc:     linux-rdma <linux-rdma@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Jens Axboe <axboe@fb.com>,
         linux-scsi <linux-scsi@vger.kernel.org>
-Date:   Wed, 03 Apr 2019 13:59:53 -0400
+Date:   Wed, 03 Apr 2019 14:43:35 -0400
 In-Reply-To: <1554313972.118779.233.camel@acm.org>
 References: <6e19971d315f4a3ce2cc20a1c6693f4a263a280c.camel@redhat.com>
          <7858e19ce3fc3ebf7845494a2209c58cd9e3086d.camel@redhat.com>
@@ -160,6 +160,43 @@ On Wed, 2019-04-03 at 10:52 -0700, Bart Van Assche wrote:
 > 
 > Bart.
 
-Thanks Bart
-About to build and test
+Hello Bart
+
+For the above:
+
+Reviewed-by: Laurence Oberman <loberman@redhat.com>
+Tested-by: Laurence Oberman <loberman@redhat.com>
+
+
+Thank you. Given I know this issue very well, I can confirm your patch
+fixes it.
+Against 5.1-rc3 the initiator no longer panics when I reboot the
+ib_srpt target server. It continues to try reconnect as it should.
+I would never have found this. Patch makes sense now of course so I can
+review it.
+
+[  221.285919] device-mapper: multipath: Failing path 8:176.
+[  221.286182] device-mapper: multipath: Failing path 65:144.
+[  221.286266] device-mapper: multipath: Failing path 65:0.
+[  221.286625] device-mapper: multipath: Failing path 65:32.
+[  221.286708] device-mapper: multipath: Failing path 65:96.
+[  221.286965] device-mapper: multipath: Failing path 65:224.
+[  221.287115] device-mapper: multipath: Failing path 66:48.
+[  221.309589] sd 1:0:0:14: rejecting I/O to offline device
+[  221.309595] sd 1:0:0:6: rejecting I/O to offline device
+[  231.692106] scsi host2: ib_srp: Got failed path rec status -110
+[  231.722521] scsi host2: ib_srp: Path record query failed: sgid
+fe80:0000:0000:0000:7cfe:9003:0072:6ed3, dgid
+fe80:0000:0000:0000:7cfe:9003:0072:6e4f, pkey 0xffff, service_id
+0x7cfe900300726e4e
+[  231.816709] scsi host2: reconnect attempt 2 failed (-110)
+[  236.684030] scsi host1: ib_srp: Got failed path rec status -110
+[  236.716132] scsi host1: ib_srp: Path record query failed: sgid
+fe80:0000:0000:0000:7cfe:9003:0072:6ed2, dgid
+fe80:0000:0000:0000:7cfe:9003:0072:6e4e, pkey 0xffff, service_id
+0x7cfe900300726e4e
+[  236.814095] scsi host1: reconnect attempt 2 failed (-110)
+
+
+
 
