@@ -2,107 +2,140 @@ Return-Path: <SRS0=zJbT=SF=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.1 required=3.0 tests=BIGNUM_EMAILS,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_MUTT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4055EC4360F
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 06:15:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0169DC4360F
+	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 07:20:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE54620882
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 06:15:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE51A20830
+	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 07:20:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lkcQCvw8"
+	dkim=pass (2048-bit key) header.d=owltronix-com.20150623.gappssmtp.com header.i=@owltronix-com.20150623.gappssmtp.com header.b="IDaNDVk8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725908AbfDCGPY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Apr 2019 02:15:24 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:43478 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725879AbfDCGPY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Apr 2019 02:15:24 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3363dfh020161;
-        Wed, 3 Apr 2019 06:15:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2018-07-02;
- bh=FXWGszBwk+zJdu+WCpXoCjQuCfGIl2iMj82QTScq6wU=;
- b=lkcQCvw8m1/taxzOyf5eJpYnX6odJswgMNuGMeXdu0HZyJbMF/ywRTtQRcRSZM91Tcin
- 8U228GwJOPNUlwin9QP9EW+my3+6HwWYBubIMTJzTs5WAHCHy5ql/ytKr0NtaFHtM4O3
- 6eeoU7GcdB/UBso0wQP3B904XW87Cd2Dl5Urh26M0D6lWlSWVhyq0u3np1Hkv9S5JjZ3
- uHK78oMlet+nVidPi0Ju+yuXpk+AQcxi76C6Q2jJRUL7MI0WQLRBWHh57Y3HFRfPVSvc
- pvzeYoHLFsn0rUIKk81FHPqzpO2gsL4rBo3JeRfgyUPyXGNoFLZeu31l5P8QyR1t0+HD rg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 2rj0dnp2nr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 03 Apr 2019 06:15:21 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x336Dt8Z152433;
-        Wed, 3 Apr 2019 06:15:20 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3030.oracle.com with ESMTP id 2rm8f4wra7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 03 Apr 2019 06:15:20 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x336FJTv029986;
-        Wed, 3 Apr 2019 06:15:20 GMT
-Received: from kadam (/41.202.241.37)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 02 Apr 2019 23:15:19 -0700
-Date:   Wed, 3 Apr 2019 09:15:12 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     paolo.valente@linaro.org
-Cc:     linux-block@vger.kernel.org
-Subject: [bug report] block, bfq: update blkio stats outside the scheduler
- lock
-Message-ID: <20190403061512.GA1618@kadam>
+        id S1725936AbfDCHUz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Apr 2019 03:20:55 -0400
+Received: from mail-vs1-f66.google.com ([209.85.217.66]:38392 "EHLO
+        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725879AbfDCHUy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Apr 2019 03:20:54 -0400
+Received: by mail-vs1-f66.google.com with SMTP id s2so8302360vsi.5
+        for <linux-block@vger.kernel.org>; Wed, 03 Apr 2019 00:20:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=owltronix-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=hM07C2u6Y9yDMn6jglerSnoVl4T7upPpq2Q9E2Fo8hE=;
+        b=IDaNDVk8hY3SzZfCF/NaELTFZ1LJsyHXHaYCZUGmdYttjS3u8svzF1JQ+oTi3jy2mA
+         +Jc9oX2TnYuaWt1eNU010WPfP7ILAmd7nrWr7XJxzN4K2nz0rtnCpCnNkHYPscreNG/O
+         ZGuLXyt/BfHfdpvSsOk5DnS9QSQSnbzrP9izKdTlUT3tpuN5GV+h0MYmfezi81lPfuke
+         OszJ+dotScPF5nkX8cfQjZhdzlieReFdmJTu0eLVFqx309xI/IZRHg3NNKKaGjRqKxAR
+         OPwXFNAnxnT7j9oq/DHGDzN/9qk4GaVqCfF/ucz2V8wTx7ZyFsqa5Tp8++IzSL+hNChg
+         hWSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hM07C2u6Y9yDMn6jglerSnoVl4T7upPpq2Q9E2Fo8hE=;
+        b=EZEjqyM1eBu946J975HdtBd+nNiqEHxZ2cpXRyomHKYO05KGGEP89miKEhIAMM5YZy
+         slVBUBXUrEuGFcp/cqxorxijG4WR/5IjIxR8VJ2e8rduXKQ5dnuRZ2uhX6hG7wPkSPw1
+         zKxoH3bM83mbrBARq25IX0F6pRa/d+mVveMQddpuWwZEt0Ax5vS7AzrDHwc3N5TClv3P
+         8CrDVJeULneILUVmX3gliZ2BFPeZk9jPaZFTxetrbLjbVsjPMrX/Hbqv9g/bt9K8cuBH
+         c380talUp2tJ3oMMCAJ4jNbME1+YtzLTXpr96cAuV9S0qbvw9rrAb59TyoHnxqP4IsD+
+         5IDQ==
+X-Gm-Message-State: APjAAAUhfdKwTzgwX3bxgC/scnWzUDwn44Ojh3o7AOt/Q/3NHCfC0JmS
+        0xIp3UmYaYsRl58xLtyd+NSEdv+q7nNmEf+D0p/Rzg==
+X-Google-Smtp-Source: APXvYqxHVCpNPOJ1YYivWgS5BDjN32NFCs7bHZE/3Rmq8wDYZVRHnPcH7A6JgsPhqLw9tyquUhc0ae4ZFZ4rqVOiQws=
+X-Received: by 2002:a67:f105:: with SMTP id n5mr44672441vsk.181.1554275581737;
+ Wed, 03 Apr 2019 00:13:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9215 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=703
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1904030041
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9215 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=754 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1904030041
+References: <20190327123901.12323-1-igor.j.konopko@intel.com>
+In-Reply-To: <20190327123901.12323-1-igor.j.konopko@intel.com>
+From:   Hans Holmberg <hans@owltronix.com>
+Date:   Wed, 3 Apr 2019 09:12:51 +0200
+Message-ID: <CANr-nt0d7DJ_-gYPKiJXBAUopSTATXVM7X5_=BeqDH-dZq-A8Q@mail.gmail.com>
+Subject: Re: [PATCH v3 00/10] lightnvm: next set of improvements for 5.2
+To:     Igor Konopko <igor.j.konopko@intel.com>
+Cc:     Matias Bjorling <mb@lightnvm.io>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello Paolo Valente,
+On Wed, Mar 27, 2019 at 1:41 PM Igor Konopko <igor.j.konopko@intel.com> wrote:
+>
+> This is another set of fixes and improvements to both pblk and lightnvm
+> core.
+>
+> First & second patches are the most crutial, since they changes the approach
+> to the partial read path, so detailed review is needed especially here.
+>
+> Other patches are my other findings related to some bugs or potential
+> improvements, mostly related to some corner cases.
+>
+> Changes v2 -> v3;
+> -dropped some not needed patches
+> -dropped patches which were already pulled into for-5.2/core branch
+> -commit messages cleanup
+>
+> Changes v1 -> v2:
+> -dropped some not needed patches
+> -review feedback incorporated for some of the patches
+> -partial read path changes patch splitted into two patches
+>
 
-This is a semi-automatic email about new static checker warnings.
+Hi Igor,
 
-The patch 24bfd19bb789: "block, bfq: update blkio stats outside the 
-scheduler lock" from Nov 13, 2017, leads to the following Smatch 
-complaint:
+I ran the quick xfstests and generic/247 hangs with this patchset on qemu:
 
-    block/bfq-iosched.c:5013 __bfq_insert_request()
-    error: we previously assumed 'bfqq' could be null (see line 5008)
+FSTYP         -- xfs (non-debug)
+PLATFORM      -- Linux/x86_64 u1804-qatd 5.0.0-rc6_for-5.2/core_igor_v3
 
-block/bfq-iosched.c
-  5007	
-  5008		waiting = bfqq && bfq_bfqq_wait_request(bfqq);
-                          ^^^^
-The patch adds a NULL check here.  Hopefully it's not required because
+generic/247 95s ...
+<hang>
 
-  5009		bfq_add_request(rq);
-  5010		idle_timer_disabled = waiting && !bfq_bfqq_wait_request(bfqq);
-  5011	
-  5012		rq->fifo_time = ktime_get_ns() + bfqd->bfq_fifo_expire[rq_is_sync(rq)];
-  5013		list_add_tail(&rq->queuelist, &bfqq->fifo);
-                                              ^^^^^^^^^^^
-the existing code assumes "bfqq" is valid.
+Note: If i run it with Matias 5.2 core branch with my biovec fix, it
+completes successfully, but with this in dmesg:
 
-  5014	
-  5015		bfq_rq_enqueued(bfqd, bfqq, rq);
+[  358.028158] Page cache invalidation failure on direct I/O.
+Possible data corruption due to collision with buffered I/O!
+[  358.030768] File: /mnt/247 PID: 4431 Comm: dd
 
-regards,
-dan carpenter
+(I have not looked into that any further)
+
+Best regards,
+Hans
+
+
+> Igor Konopko (10):
+>   lightnvm: pblk: IO path reorganization
+>   lightnvm: pblk: simplify partial read path
+>   lightnvm: pblk: propagate errors when reading meta
+>   lightnvm: pblk: recover only written metadata
+>   lightnvm: pblk: wait for inflight IOs in recovery
+>   lightnvm: pblk: remove internal IO timeout
+>   lightnvm: pblk: store multiple copies of smeta
+>   lightnvm: pblk: GC error handling
+>   lightnvm: pblk: use nvm_rq_to_ppa_list()
+>   lightnvm: track inflight target creations
+>
+>  drivers/lightnvm/core.c          |  19 ++-
+>  drivers/lightnvm/pblk-cache.c    |   8 +-
+>  drivers/lightnvm/pblk-core.c     | 179 +++++++++++++++++----
+>  drivers/lightnvm/pblk-gc.c       |   5 +-
+>  drivers/lightnvm/pblk-init.c     |  37 +++--
+>  drivers/lightnvm/pblk-read.c     | 336 +++++++++++----------------------------
+>  drivers/lightnvm/pblk-recovery.c |  69 ++++----
+>  drivers/lightnvm/pblk-rl.c       |   3 +-
+>  drivers/lightnvm/pblk.h          |  31 ++--
+>  include/linux/lightnvm.h         |   2 +
+>  10 files changed, 343 insertions(+), 346 deletions(-)
+>
+> --
+> 2.9.5
+>
