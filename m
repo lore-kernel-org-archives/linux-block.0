@@ -2,146 +2,108 @@ Return-Path: <SRS0=51nD=SG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2E1CC4360F
-	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 18:02:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58792C4360F
+	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 18:10:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5DC020820
-	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 18:02:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C917206C0
+	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 18:10:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="bkwZgaxn"
+	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="zk5u5rw0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728683AbfDDSC1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Apr 2019 14:02:27 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:36458 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726418AbfDDSC1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Apr 2019 14:02:27 -0400
-Received: by mail-pf1-f196.google.com with SMTP id z5so1746403pfn.3
-        for <linux-block@vger.kernel.org>; Thu, 04 Apr 2019 11:02:26 -0700 (PDT)
+        id S1728862AbfDDSK6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Apr 2019 14:10:58 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:39589 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728699AbfDDSK6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Apr 2019 14:10:58 -0400
+Received: by mail-pl1-f194.google.com with SMTP id b65so1548616plb.6
+        for <linux-block@vger.kernel.org>; Thu, 04 Apr 2019 11:10:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=osandov-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to:user-agent;
-        bh=Di6CAON9Z7uSEbcJxQWi71TfI9P+rvaygzn75B4Mh4M=;
-        b=bkwZgaxnpZ8f0XoFX3ZXSTuvQ9mhgjxaFdtQ5S4dDBTF35MOCXl7n4NW3A+OJwHMgJ
-         jx0UDu8Gg2RVHWhxhaGrTZodQdGwkqEXoOTOCNOVhPvBZmt8EjslsfsKegfVy3fu5aHd
-         CN1tMnv7MzzUG4d4qmr9sfUDUmZk0ptkJHleYolap41Fy9e2tJDKTXx3ip4D9Bqq7eaX
-         iIakn40cs3KyZlWrZQi8PrciaW/54EukOmn7TxMtky4ItWn3hva4yxvwC0bAkmfIiC6f
-         iGYxXId3ixK2OEvStyqfhoFVrwBOVcwETrK6r2qkdU8/Lms3bEUdr1JNkD+ArXz5hsKS
-         +Eog==
+        bh=DUzfBQhyk+Fkl+/tWLRUMMxy9LuyArSyJfsu+VSZcpM=;
+        b=zk5u5rw098Mj2lf1n8vI5dDl3GnvPUyYbH/s0XRHypR+8zk26rPQcr1sPoj8xiQpPs
+         Cr9nC3VewdstPvKTDjgHCjRRTSp8WIJyEN8SgUHY7oruASl8PAt3eaApSMgsQj5UeK0W
+         Iqn5CMmHIr7i0qTsfdv2xQGlsEOMPkhiVSXWITGsnnRXDDgj5vBFjCBgnKtGxEUHhOES
+         3pXgX627XNFgaZv1cwc2O2HSOMkV6G8YDxHK+yAa84Tld5f++5j4A37rovy4rZDOuAlr
+         4VU+fJ0G8kUDrMn+LtgjdyPCpuaXW2F01lR+dHU+vayttfOEh6gmYc0q0oplbEBR7vVq
+         GRzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Di6CAON9Z7uSEbcJxQWi71TfI9P+rvaygzn75B4Mh4M=;
-        b=SApSEbU4OxpGRRrDBn+HTywgJCBfSF3j3xte+WLFcO/wvfqvC02+kwUrQtfpLdsv4B
-         Euk/Wi/eqOWEP3QnWaqYRGfT734PLeL38dL4QGN7dYkelqyrG9jz0AjxnuJjZ99sFwye
-         8brdIyE7nGUCwND+rncYLjKtDAUEFdx9uhC3dYpP78FuaKo3YJ7IFnji311+E0vPsnFt
-         OTrnI0JkPRhm/SSpvjh40QV2TzvxScFo4RjjJLc77DcAyqVNe8FTsIKqkor7fdcJTgjh
-         BJQio6+C/SUv/vGabz17jOQE/HMuIfOtn8rv9BegpIN2Dv1AHQk/dBP8E6z879GyojNb
-         TuAQ==
-X-Gm-Message-State: APjAAAV6w3Lh65RFYcsUC6VewbSQQRX7yyZH05jZsmTKDT8DbNRtXW4S
-        UfaKHLi52WgZFLI21FdgX+JhgYVdVDI=
-X-Google-Smtp-Source: APXvYqwCvmFB+xfR3Gg1ulkYt9tFXr9qntkSa8uYPmTcGkhDMhUHLb8EtE8UKx3bOHVS9kxr/6F6nw==
-X-Received: by 2002:a63:5b24:: with SMTP id p36mr7489258pgb.84.1554400945926;
-        Thu, 04 Apr 2019 11:02:25 -0700 (PDT)
+        bh=DUzfBQhyk+Fkl+/tWLRUMMxy9LuyArSyJfsu+VSZcpM=;
+        b=XHCQvnPYDmGg6TGTxvodFwKZ9vcrn/GvITYlFaQV2WOPueYi/lFZsT9b1Y4I9sQX+w
+         bhVeW5sxcZKY051pok6cFvfbH28gnoiZFR64RX6aUilubvgoL1nycwZjq8Hn9Os4C//D
+         3rpWF6ZI+MAeytINXkKqQwWX9Y6KqX3ZFEjR7lf5uWtdtkE55hWO3vmFYqpZDSSz0iY1
+         +Xa4ttrFtVx/wpVPWo74oXNbA+siSJKY24Po7A7PRchp7KivgeXB6CH9LqyRmylLCkhM
+         0MX1di1Vxnb6Aj6iLCgqvtoSFJg+hFep/h7Nb4oCGvti7aDJRTWkenUttdtcY+k7svRq
+         rtgA==
+X-Gm-Message-State: APjAAAUYGZ0rX2cQS2RD75ND27FBNCb0KNlcGFjEKwc/C3dUwtHNRvY6
+        cjYvOiRIFaQL/nch8DdDjiwmuw==
+X-Google-Smtp-Source: APXvYqwckbTKDP9A+daX47m9f1ZwXKoq0YXjC4bxijs+ywoIHNSNVyCyk6CC5RZ7EpddILKGHg4JFA==
+X-Received: by 2002:a17:902:bd92:: with SMTP id q18mr7937864pls.136.1554401457171;
+        Thu, 04 Apr 2019 11:10:57 -0700 (PDT)
 Received: from vader ([2620:10d:c090:180::3f62])
-        by smtp.gmail.com with ESMTPSA id p2sm10566887pfb.80.2019.04.04.11.02.25
+        by smtp.gmail.com with ESMTPSA id v6sm24382919pgv.92.2019.04.04.11.10.56
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 04 Apr 2019 11:02:25 -0700 (PDT)
-Date:   Thu, 4 Apr 2019 11:02:24 -0700
+        Thu, 04 Apr 2019 11:10:56 -0700 (PDT)
+Date:   Thu, 4 Apr 2019 11:10:55 -0700
 From:   Omar Sandoval <osandov@osandov.com>
-To:     Dennis Zhou <dennis@kernel.org>
-Cc:     kernel-team@fb.com, linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: fix fio jobs for 027 and add cgroup support
-Message-ID: <20190404180224.GA25741@vader>
-References: <20190329221432.38726-1-dennis@kernel.org>
+To:     Xiao Liang <xiliang@redhat.com>
+Cc:     linux-block@vger.kernel.org, osandov@fb.com
+Subject: Re: [PATCH blktests] block/020: dynamically change iodepth if test
+ aio-nr lager than aio-max-nr
+Message-ID: <20190404181055.GB25741@vader>
+References: <20190401033800.6032-1-xiliang@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190329221432.38726-1-dennis@kernel.org>
+In-Reply-To: <20190401033800.6032-1-xiliang@redhat.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 29, 2019 at 03:14:32PM -0700, Dennis Zhou wrote:
-> Previously, the test was broken as "$fio_jobs" was considered as a
-> string instead of additional parameters. This is fixed here.
+On Mon, Apr 01, 2019 at 11:38:00AM +0800, Xiao Liang wrote:
+> When system has large count of cpus(eg. 96), the test failed as aio-nr over
+> aio-max-nr limitation.
 > 
-> Second, there was an issue with earlier kernels when request lists
-> existed such that request_queues were never being cleaned up because
-> non-root blkgs took a reference on the queue. However, blkgs were being
-> cleaned up after the last reference to the request_queue was put back.
-> This creates a blktest cgroup for the fio jobs to utilize and should be
-> useful for catching this scenario in the future.
+> This patch continues to use 1024 as default iodepth, but change it if
+> iodepth*$(nproc) > aio-max-nr.
 > 
-> Signed-off-by: Dennis Zhou <dennis@kernel.org>
-
-Would it be valuable to test this both in a cgroup and not in a cgroup?
-
->  tests/block/027 | 17 ++++++++++++++---
->  1 file changed, 14 insertions(+), 3 deletions(-)
+> Signed-off-by: Xiao Liang <xiliang@redhat.com>
+> ---
+>  tests/block/020 | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 > 
-> diff --git a/tests/block/027 b/tests/block/027
-> index b480016..36e88b4 100755
-> --- a/tests/block/027
-> +++ b/tests/block/027
-> @@ -26,6 +26,13 @@ scsi_debug_stress_remove() {
->  		return
->  	fi
+> diff --git a/tests/block/020 b/tests/block/020
+> index 39dde66..f03c131 100755
+> --- a/tests/block/020
+> +++ b/tests/block/020
+> @@ -29,10 +29,16 @@ test() {
+>  	# shellcheck disable=SC2207
+>  	scheds=($(sed 's/[][]//g' /sys/block/nullb0/queue/scheduler))
 >  
-> +	_init_cgroup2
-> +
-> +	# setup cgroups
-> +	echo "+io" > "/sys/fs/cgroup/cgroup.subtree_control"
-> +	echo "+io" > "$CGROUP2_DIR/cgroup.subtree_control"
-> +	mkdir "$CGROUP2_DIR/fast"
-> +
+> +	aio_max_nr=$(cat /proc/sys/fs/aio-max-nr)
+> +	max_iodepth=$(($aio_max_nr/$(nproc)))
+> +	iodepth=1024
+> +	if (( $iodepth > $max_iodepth )); then
+> +		iodepth=$max_iodepth
+> +	fi
 
-Why is this called "fast"?
+This has a few shellcheck errors:
 
->  	# set higher aio limit
->  	echo 524288 > /proc/sys/fs/aio-max-nr
->  
-> @@ -45,13 +52,13 @@ scsi_debug_stress_remove() {
->  		((cnt++))
->  	done
->  
-> -	local num_jobs=4 runtime=21
-> +	local num_jobs=4 runtime=12
->  	fio --rw=randread --size=128G --direct=1 --ioengine=libaio \
->  		--iodepth=2048 --numjobs=$num_jobs --bs=4k \
->  		--group_reporting=1 --group_reporting=1 --runtime=$runtime \
-> -		--loops=10000 "$fio_jobs" > "$FULL" 2>&1 &
-> +		--loops=10000 --cgroup=blktests/fast $fio_jobs > "$FULL" 2>&1 &
->  
-> -	sleep 7
-> +	sleep 6
+tests/block/020:33:17: note: $/${} is unnecessary on arithmetic variables. [SC2004]
+tests/block/020:35:8: note: $/${} is unnecessary on arithmetic variables. [SC2004]
+tests/block/020:35:19: note: $/${} is unnecessary on arithmetic variables. [SC2004]
 
-Is there any particular reason you changed the run time and sleep time
-and added the sleep at the end?
+Can you please address those and resend?
 
->  	local device_path
->  	for dev in "${SCSI_DEBUG_DEVICES[@]}"; do
->  		# shutdown devices in progress
-> @@ -61,6 +68,10 @@ scsi_debug_stress_remove() {
->  
->  	wait
->  
-> +	sleep 10
-> +
-> +	_exit_cgroup2
-> +
->  	_exit_scsi_debug
->  }
->  
-> -- 
-> 2.17.1
-> 
+Thanks!
