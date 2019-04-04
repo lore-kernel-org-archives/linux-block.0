@@ -3,63 +3,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68FA6C4360F
-	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 15:58:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C90EC10F0E
+	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 16:47:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2C40B2082E
-	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 15:58:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47EEE20693
+	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 16:47:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727339AbfDDP6a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Apr 2019 11:58:30 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:44590 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726888AbfDDP6a (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Apr 2019 11:58:30 -0400
-Received: by mail-pf1-f194.google.com with SMTP id y13so1569326pfm.11;
-        Thu, 04 Apr 2019 08:58:29 -0700 (PDT)
+        id S1729423AbfDDQr5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Apr 2019 12:47:57 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:45822 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727415AbfDDQr5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Apr 2019 12:47:57 -0400
+Received: by mail-qk1-f196.google.com with SMTP id z76so2032616qkb.12
+        for <linux-block@vger.kernel.org>; Thu, 04 Apr 2019 09:47:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=pZyUnG07XXhOlm5o9LjAqKZNza7NwzeK75RB07k04cs=;
-        b=eOijdr/wqT/J80BIcpNOhOKZrt5XaJ487Ddr0x5/hMgpTYGH5xjR8g36q2UobJTYH0
-         G+93vXXIX0yRGPXJjLXfQuvoixV/G+R3x39vi36SaHpPjqkKJf1L0al9u3Yr7SHUM8zI
-         E0KBGS8TifcMYf7gcKdtHd3LVWk+aEm4Cp1OCFmxYVcYKzO7UI+jWnq5JPt0SEnYkWwu
-         LACBmPamkytbPr/m2gPeWZXFXCCXUZBzJQRxqsPcRDbrIrOXdJqDonzPIFTNHAgI06ul
-         FTMImI8nyCy8K0Y1PuVP3bfUsGLhtu5pB9J2bWJLvDG476gcKZIjAS6DH9jWT1y5pL8f
-         qS1w==
-X-Gm-Message-State: APjAAAWd4gKS4AA7mCPIFuS4icZ3Wcey8gYcEu+3z5YjSOsAi4IIAaAf
-        Er9Fu6AeqpptRr7tEDTZo7c=
-X-Google-Smtp-Source: APXvYqykjgaRreIF+kWGVYSJndwUX4siz/634CkJ4D+0c0VsXp0CMZW8OI3d0x7hYup1r6cyuqQMUQ==
-X-Received: by 2002:a63:29c8:: with SMTP id p191mr6645476pgp.197.1554393509156;
-        Thu, 04 Apr 2019 08:58:29 -0700 (PDT)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id h11sm22150529pgq.57.2019.04.04.08.58.27
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 04 Apr 2019 08:58:28 -0700 (PDT)
-Message-ID: <1554393507.118779.251.camel@acm.org>
-Subject: Re: [PATCH V4 1/7] blk-mq: grab .q_usage_counter when queuing
- request from plug code path
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        James Smart <james.smart@broadcom.com>,
-        Bart Van Assche <bart.vanassche@wdc.com>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        bh=kHQCK17KRg6QvRGXIBYT01OLOLKD6hZcVaPXQ8YjMjc=;
+        b=BWqeLBIBi+9q1PQzyzb3N8TbaTlQsGZtFPWY994ZE7EwCBOsJ6uilx1TKkOVhw04Y3
+         YlAldJpu7++pODzYcP8RI5xbQDEQ2aJ6TuuMbboBqkoXpTcIFQOzujBHuayBX8X0Dy4O
+         55yVp9SBUw4gZMCsmFix+YjxQdwHoDnEC7hWz4Wwf/uw217iBtdIbnTxw1R5nCSZ995p
+         nwxIYpXWIUslWQRc35aDzC++R+jaUds5raa5Psmy2SnJelwBLITlzrSvm4AF7jC31HvU
+         lRnWGztRf6nyPPUD49moBzNXZt10n33pTGGiqoFACSfIMc4Xe8An7sT6CGSbE2uj1sTJ
+         7U6A==
+X-Gm-Message-State: APjAAAWE7drx0L8uxHcd2vbP5JPLIty5dohelw9d3319x/U09d5lhOaR
+        LnRiTgxQzw3OGvYewPI6vp4SoQ==
+X-Google-Smtp-Source: APXvYqwSgnPNQ99wqFHaNxgghlYcDSPSD64Tq3PReaM8K2Fli9iVfb7QkqJC6IRkltiwGswlEFAe+g==
+X-Received: by 2002:a05:620a:148d:: with SMTP id w13mr6273927qkj.6.1554396475775;
+        Thu, 04 Apr 2019 09:47:55 -0700 (PDT)
+Received: from 2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net (2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net. [2600:6c64:4e80:f1:422c:9885:a6c:81b2])
+        by smtp.gmail.com with ESMTPSA id j93sm6587734qte.42.2019.04.04.09.47.54
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 04 Apr 2019 09:47:55 -0700 (PDT)
+Message-ID: <4b19805967da8d6a11346a7820af06eb91c5bc6c.camel@redhat.com>
+Subject: Re: [PATCH] block: Fix blk_mq_try_issue_directly()
+From:   Laurence Oberman <loberman@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
         Christoph Hellwig <hch@lst.de>,
-        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>,
-        jianchao wang <jianchao.w.wang@oracle.com>
-Date:   Thu, 04 Apr 2019 08:58:27 -0700
-In-Reply-To: <20190404084320.24681-2-ming.lei@redhat.com>
-References: <20190404084320.24681-1-ming.lei@redhat.com>
-         <20190404084320.24681-2-ming.lei@redhat.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
+        Christoph Hellwig <hch@infradead.org>,
+        Hannes Reinecke <hare@suse.com>,
+        James Smart <james.smart@broadcom.com>,
+        Jianchao Wang <jianchao.w.wang@oracle.com>,
+        Keith Busch <keith.busch@intel.com>,
+        Dongli Zhang <dongli.zhang@oracle.com>, stable@vger.kernel.org
+Date:   Thu, 04 Apr 2019 12:47:53 -0400
+In-Reply-To: <1554391728.118779.241.camel@acm.org>
+References: <20190403201126.22819-1-bvanassche@acm.org>
+         <20190404070849.GD5004@ming.t460p> <1554389983.118779.237.camel@acm.org>
+         <2b049ffa57ccac27b876c674bc1fa06faca5d3b6.camel@redhat.com>
+         <1554391728.118779.241.camel@acm.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-2.el7) 
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -67,84 +68,372 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2019-04-04 at 16:43 +-0800, Ming Lei wrote:
-+AD4 Just like aio/io+AF8-uring, we need to grab 2 refcount for queuing one
-+AD4 request, one is for submission, another is for completion.
-+AD4 
-+AD4 If the request isn't queued from plug code path, the refcount grabbed
-+AD4 in generic+AF8-make+AF8-request() serves for submission. In theroy, this
-+AD4 refcount should have been released after the sumission(async run queue)
-+AD4 is done. blk+AF8-freeze+AF8-queue() works with blk+AF8-sync+AF8-queue() together
-+AD4 for avoiding race between cleanup queue and IO submission, given async
-+AD4 run queue activities are canceled because hctx-+AD4-run+AF8-work is scheduled with
-+AD4 the refcount held, so it is fine to not hold the refcount when
-+AD4 running the run queue work function for dispatch IO.
-+AD4 
-+AD4 However, if request is staggered into plug list, and finally queued
-+AD4 from plug code path, the refcount in submission side is actually missed.
-+AD4 And we may start to run queue after queue is removed because the queue's
-+AD4 kobject refcount isn't guaranteed to be grabbed in flushing plug list
-+AD4 context, then kernel oops is triggered, see the following race:
-+AD4 
-+AD4 blk+AF8-mq+AF8-flush+AF8-plug+AF8-list():
-+AD4         blk+AF8-mq+AF8-sched+AF8-insert+AF8-requests()
-+AD4                 insert requests to sw queue or scheduler queue
-+AD4                 blk+AF8-mq+AF8-run+AF8-hw+AF8-queue
-+AD4 
-+AD4 Because of concurrent run queue, all requests inserted above may be
-+AD4 completed before calling the above blk+AF8-mq+AF8-run+AF8-hw+AF8-queue. Then queue can
-+AD4 be freed during the above blk+AF8-mq+AF8-run+AF8-hw+AF8-queue().
-+AD4 
-+AD4 Fixes the issue by grab .q+AF8-usage+AF8-counter before calling
-+AD4 blk+AF8-mq+AF8-sched+AF8-insert+AF8-requests() in blk+AF8-mq+AF8-flush+AF8-plug+AF8-list(). This way is
-+AD4 safe because the queue is absolutely alive before inserting request.
-+AD4 
-+AD4 Cc: Dongli Zhang +ADw-dongli.zhang+AEA-oracle.com+AD4
-+AD4 Cc: James Smart +ADw-james.smart+AEA-broadcom.com+AD4
-+AD4 Cc: Bart Van Assche +ADw-bart.vanassche+AEA-wdc.com+AD4
-+AD4 Cc: linux-scsi+AEA-vger.kernel.org,
-+AD4 Cc: Martin K . Petersen +ADw-martin.petersen+AEA-oracle.com+AD4,
-+AD4 Cc: Christoph Hellwig +ADw-hch+AEA-lst.de+AD4,
-+AD4 Cc: James E . J . Bottomley +ADw-jejb+AEA-linux.vnet.ibm.com+AD4,
-+AD4 Cc: jianchao wang +ADw-jianchao.w.wang+AEA-oracle.com+AD4
-+AD4 Signed-off-by: Ming Lei +ADw-ming.lei+AEA-redhat.com+AD4
-+AD4 ---
-+AD4  block/blk-mq.c +AHw 6 +-+-+-+-+-+-
-+AD4  1 file changed, 6 insertions(+-)
-+AD4 
-+AD4 diff --git a/block/blk-mq.c b/block/blk-mq.c
-+AD4 index 3ff3d7b49969..5b586affee09 100644
-+AD4 --- a/block/blk-mq.c
-+AD4 +-+-+- b/block/blk-mq.c
-+AD4 +AEAAQA -1728,9 +-1728,12 +AEAAQA void blk+AF8-mq+AF8-flush+AF8-plug+AF8-list(struct blk+AF8-plug +ACo-plug, bool from+AF8-schedule)
-+AD4                 if (rq-+AD4-mq+AF8-hctx +ACEAPQ this+AF8-hctx +AHwAfA rq-+AD4-mq+AF8-ctx +ACEAPQ this+AF8-ctx) +AHs
-+AD4                         if (this+AF8-hctx) +AHs
-+AD4                                 trace+AF8-block+AF8-unplug(this+AF8-q, depth, +ACE-from+AF8-schedule)+ADs
-+AD4 +-
-+AD4 +-                               percpu+AF8-ref+AF8-get(+ACY-this+AF8-q-+AD4-q+AF8-usage+AF8-counter)+ADs
-+AD4                                 blk+AF8-mq+AF8-sched+AF8-insert+AF8-requests(this+AF8-hctx, this+AF8-ctx,
-+AD4                                                                 +ACY-rq+AF8-list,
-+AD4                                                                 from+AF8-schedule)+ADs
-+AD4 +-                               percpu+AF8-ref+AF8-put(+ACY-this+AF8-q-+AD4-q+AF8-usage+AF8-counter)+ADs
-+AD4                         +AH0
-+AD4  
-+AD4                         this+AF8-q +AD0 rq-+AD4-q+ADs
-+AD4 +AEAAQA -1749,8 +-1752,11 +AEAAQA void blk+AF8-mq+AF8-flush+AF8-plug+AF8-list(struct blk+AF8-plug +ACo-plug, bool from+AF8-schedule)
-+AD4          +ACo-/
-+AD4         if (this+AF8-hctx) +AHs
-+AD4                 trace+AF8-block+AF8-unplug(this+AF8-q, depth, +ACE-from+AF8-schedule)+ADs
-+AD4 +-
-+AD4 +-               percpu+AF8-ref+AF8-get(+ACY-this+AF8-q-+AD4-q+AF8-usage+AF8-counter)+ADs
-+AD4                 blk+AF8-mq+AF8-sched+AF8-insert+AF8-requests(this+AF8-hctx, this+AF8-ctx, +ACY-rq+AF8-list,
-+AD4                                                 from+AF8-schedule)+ADs
-+AD4 +-               percpu+AF8-ref+AF8-put(+ACY-this+AF8-q-+AD4-q+AF8-usage+AF8-counter)+ADs
-+AD4         +AH0
-+AD4  +AH0
+On Thu, 2019-04-04 at 08:28 -0700, Bart Van Assche wrote:
+> On Thu, 2019-04-04 at 11:09 -0400, Laurence Oberman wrote:
+> > When I bisected and got to that commit I was unable to revert it to
+> > test without it.
+> > I showed that in an earlier update, had merge issues.
+> > 
+> > loberman@lobewsrhel linux_torvalds]$ git revert 7f556a44e61d
+> > error: could not revert 7f556a4... blk-mq: refactor the code of
+> > issue
+> > request directly
+> > hint: after resolving the conflicts, mark the corrected paths
+> > hint: with 'git add <paths>' or 'git rm <paths>'
+> > hint: and commit the result with 'git commit'
+> 
+> Hi Laurence,
+> 
+> On my setup the following commits revert cleanly if I revert them in
+> the
+> following order:
+>  * d6a51a97c0b2 ("blk-mq: replace and kill
+> blk_mq_request_issue_directly") # v5.0.
+>  * 5b7a6f128aad ("blk-mq: issue directly with bypass 'false' in
+> blk_mq_sched_insert_requests") # v5.0.
+>  * 7f556a44e61d ("blk-mq: refactor the code of issue request
+> directly") # v5.0.
+> 
+> The result of these three reverts is the patch below. Test feedback
+> for
+> this patch would be appreciated.
+> 
+> Thanks,
+> 
+> Bart.
+> 
+> 
+> Subject: [PATCH] block: Revert recent blk_mq_request_issue_directly()
+> changes
+> 
+> blk_mq_try_issue_directly() can return BLK_STS*_RESOURCE for requests
+> that
+> have been queued. If that happens when blk_mq_try_issue_directly() is
+> called
+> by the dm-mpath driver then the dm-mpath will try to resubmit a
+> request that
+> is already queued and a kernel crash follows. Since it is nontrivial
+> to fix
+> blk_mq_request_issue_directly(), revert the most recent
+> blk_mq_request_issue_directly() changes.
+> 
+> This patch reverts the following commits:
+> * d6a51a97c0b2 ("blk-mq: replace and kill
+> blk_mq_request_issue_directly") # v5.0.
+> * 5b7a6f128aad ("blk-mq: issue directly with bypass 'false' in
+> blk_mq_sched_insert_requests") # v5.0.
+> * 7f556a44e61d ("blk-mq: refactor the code of issue request
+> directly") # v5.0.
+> 
+> Cc: Christoph Hellwig <hch@infradead.org>
+> Cc: Hannes Reinecke <hare@suse.com>
+> Cc: James Smart <james.smart@broadcom.com>
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Jianchao Wang <jianchao.w.wang@oracle.com>
+> Cc: Keith Busch <keith.busch@intel.com>
+> Cc: Dongli Zhang <dongli.zhang@oracle.com>
+> Cc: Laurence Oberman <loberman@redhat.com>
+> Cc: <stable@vger.kernel.org>
+> Reported-by: Laurence Oberman <loberman@redhat.com>
+> Fixes: 7f556a44e61d ("blk-mq: refactor the code of issue request
+> directly") # v5.0.
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  block/blk-core.c     |   4 +-
+>  block/blk-mq-sched.c |   8 +--
+>  block/blk-mq.c       | 122 ++++++++++++++++++++++-------------------
+> --
+>  block/blk-mq.h       |   6 +--
+>  4 files changed, 71 insertions(+), 69 deletions(-)
+> 
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 2921af6f8d33..5bca56016575 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -1232,8 +1232,6 @@ static int blk_cloned_rq_check_limits(struct
+> request_queue *q,
+>   */
+>  blk_status_t blk_insert_cloned_request(struct request_queue *q,
+> struct request *rq)
+>  {
+> -	blk_qc_t unused;
+> -
+>  	if (blk_cloned_rq_check_limits(q, rq))
+>  		return BLK_STS_IOERR;
+>  
+> @@ -1249,7 +1247,7 @@ blk_status_t blk_insert_cloned_request(struct
+> request_queue *q, struct request *
+>  	 * bypass a potential scheduler on the bottom device for
+>  	 * insert.
+>  	 */
+> -	return blk_mq_try_issue_directly(rq->mq_hctx, rq, &unused,
+> true, true);
+> +	return blk_mq_request_issue_directly(rq, true);
+>  }
+>  EXPORT_SYMBOL_GPL(blk_insert_cloned_request);
+>  
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 40905539afed..aa6bc5c02643 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -423,10 +423,12 @@ void blk_mq_sched_insert_requests(struct
+> blk_mq_hw_ctx *hctx,
+>  		 * busy in case of 'none' scheduler, and this way may
+> save
+>  		 * us one extra enqueue & dequeue to sw queue.
+>  		 */
+> -		if (!hctx->dispatch_busy && !e && !run_queue_async)
+> +		if (!hctx->dispatch_busy && !e && !run_queue_async) {
+>  			blk_mq_try_issue_list_directly(hctx, list);
+> -		else
+> -			blk_mq_insert_requests(hctx, ctx, list);
+> +			if (list_empty(list))
+> +				return;
+> +		}
+> +		blk_mq_insert_requests(hctx, ctx, list);
+>  	}
+>  
+>  	blk_mq_run_hw_queue(hctx, run_queue_async);
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 652d0c6d5945..403984a557bb 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -1808,74 +1808,76 @@ static blk_status_t
+> __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+>  	return ret;
+>  }
+>  
+> -blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+> +static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx
+> *hctx,
+>  						struct request *rq,
+>  						blk_qc_t *cookie,
+> -						bool bypass, bool last)
+> +						bool bypass_insert,
+> bool last)
+>  {
+>  	struct request_queue *q = rq->q;
+>  	bool run_queue = true;
+> -	blk_status_t ret = BLK_STS_RESOURCE;
+> -	int srcu_idx;
+> -	bool force = false;
+>  
+> -	hctx_lock(hctx, &srcu_idx);
+>  	/*
+> -	 * hctx_lock is needed before checking quiesced flag.
+> +	 * RCU or SRCU read lock is needed before checking quiesced
+> flag.
+>  	 *
+> -	 * When queue is stopped or quiesced, ignore 'bypass', insert
+> -	 * and return BLK_STS_OK to caller, and avoid driver to try to
+> -	 * dispatch again.
+> +	 * When queue is stopped or quiesced, ignore 'bypass_insert'
+> from
+> +	 * blk_mq_request_issue_directly(), and return BLK_STS_OK to
+> caller,
+> +	 * and avoid driver to try to dispatch again.
+>  	 */
+> -	if (unlikely(blk_mq_hctx_stopped(hctx) ||
+> blk_queue_quiesced(q))) {
+> +	if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)) {
+>  		run_queue = false;
+> -		bypass = false;
+> -		goto out_unlock;
+> +		bypass_insert = false;
+> +		goto insert;
+>  	}
+>  
+> -	if (unlikely(q->elevator && !bypass))
+> -		goto out_unlock;
+> +	if (q->elevator && !bypass_insert)
+> +		goto insert;
+>  
+>  	if (!blk_mq_get_dispatch_budget(hctx))
+> -		goto out_unlock;
+> +		goto insert;
+>  
+>  	if (!blk_mq_get_driver_tag(rq)) {
+>  		blk_mq_put_dispatch_budget(hctx);
+> -		goto out_unlock;
+> +		goto insert;
+>  	}
+>  
+> -	/*
+> -	 * Always add a request that has been through
+> -	 *.queue_rq() to the hardware dispatch list.
+> -	 */
+> -	force = true;
+> -	ret = __blk_mq_issue_directly(hctx, rq, cookie, last);
+> -out_unlock:
+> +	return __blk_mq_issue_directly(hctx, rq, cookie, last);
+> +insert:
+> +	if (bypass_insert)
+> +		return BLK_STS_RESOURCE;
+> +
+> +	blk_mq_request_bypass_insert(rq, run_queue);
+> +	return BLK_STS_OK;
+> +}
+> +
+> +static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+> +		struct request *rq, blk_qc_t *cookie)
+> +{
+> +	blk_status_t ret;
+> +	int srcu_idx;
+> +
+> +	might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
+> +
+> +	hctx_lock(hctx, &srcu_idx);
+> +
+> +	ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false,
+> true);
+> +	if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
+> +		blk_mq_request_bypass_insert(rq, true);
+> +	else if (ret != BLK_STS_OK)
+> +		blk_mq_end_request(rq, ret);
+> +
+> +	hctx_unlock(hctx, srcu_idx);
+> +}
+> +
+> +blk_status_t blk_mq_request_issue_directly(struct request *rq, bool
+> last)
+> +{
+> +	blk_status_t ret;
+> +	int srcu_idx;
+> +	blk_qc_t unused_cookie;
+> +	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
+> +
+> +	hctx_lock(hctx, &srcu_idx);
+> +	ret = __blk_mq_try_issue_directly(hctx, rq, &unused_cookie,
+> true, last);
+>  	hctx_unlock(hctx, srcu_idx);
+> -	switch (ret) {
+> -	case BLK_STS_OK:
+> -		break;
+> -	case BLK_STS_DEV_RESOURCE:
+> -	case BLK_STS_RESOURCE:
+> -		if (force) {
+> -			blk_mq_request_bypass_insert(rq, run_queue);
+> -			/*
+> -			 * We have to return BLK_STS_OK for the DM
+> -			 * to avoid livelock. Otherwise, we return
+> -			 * the real result to indicate whether the
+> -			 * request is direct-issued successfully.
+> -			 */
+> -			ret = bypass ? BLK_STS_OK : ret;
+> -		} else if (!bypass) {
+> -			blk_mq_sched_insert_request(rq, false,
+> -						    run_queue, false);
+> -		}
+> -		break;
+> -	default:
+> -		if (!bypass)
+> -			blk_mq_end_request(rq, ret);
+> -		break;
+> -	}
+>  
+>  	return ret;
+>  }
+> @@ -1883,20 +1885,22 @@ blk_status_t blk_mq_try_issue_directly(struct
+> blk_mq_hw_ctx *hctx,
+>  void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+>  		struct list_head *list)
+>  {
+> -	blk_qc_t unused;
+> -	blk_status_t ret = BLK_STS_OK;
+> -
+>  	while (!list_empty(list)) {
+> +		blk_status_t ret;
+>  		struct request *rq = list_first_entry(list, struct
+> request,
+>  				queuelist);
+>  
+>  		list_del_init(&rq->queuelist);
+> -		if (ret == BLK_STS_OK)
+> -			ret = blk_mq_try_issue_directly(hctx, rq,
+> &unused,
+> -							false,
+> +		ret = blk_mq_request_issue_directly(rq,
+> list_empty(list));
+> +		if (ret != BLK_STS_OK) {
+> +			if (ret == BLK_STS_RESOURCE ||
+> +					ret == BLK_STS_DEV_RESOURCE) {
+> +				blk_mq_request_bypass_insert(rq,
+>  							list_empty(list
+> ));
+> -		else
+> -			blk_mq_sched_insert_request(rq, false, true,
+> false);
+> +				break;
+> +			}
+> +			blk_mq_end_request(rq, ret);
+> +		}
+>  	}
+>  
+>  	/*
+> @@ -1904,7 +1908,7 @@ void blk_mq_try_issue_list_directly(struct
+> blk_mq_hw_ctx *hctx,
+>  	 * the driver there was more coming, but that turned out to
+>  	 * be a lie.
+>  	 */
+> -	if (ret != BLK_STS_OK && hctx->queue->mq_ops->commit_rqs)
+> +	if (!list_empty(list) && hctx->queue->mq_ops->commit_rqs)
+>  		hctx->queue->mq_ops->commit_rqs(hctx);
+>  }
+>  
+> @@ -2017,13 +2021,13 @@ static blk_qc_t blk_mq_make_request(struct
+> request_queue *q, struct bio *bio)
+>  		if (same_queue_rq) {
+>  			data.hctx = same_queue_rq->mq_hctx;
+>  			blk_mq_try_issue_directly(data.hctx,
+> same_queue_rq,
+> -					&cookie, false, true);
+> +					&cookie);
+>  		}
+>  	} else if ((q->nr_hw_queues > 1 && is_sync) || (!q->elevator &&
+>  			!data.hctx->dispatch_busy)) {
+>  		blk_mq_put_ctx(data.ctx);
+>  		blk_mq_bio_to_request(rq, bio);
+> -		blk_mq_try_issue_directly(data.hctx, rq, &cookie,
+> false, true);
+> +		blk_mq_try_issue_directly(data.hctx, rq, &cookie);
+>  	} else {
+>  		blk_mq_put_ctx(data.ctx);
+>  		blk_mq_bio_to_request(rq, bio);
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index d704fc7766f4..423ea88ab6fb 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -70,10 +70,8 @@ void blk_mq_request_bypass_insert(struct request
+> *rq, bool run_queue);
+>  void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct
+> blk_mq_ctx *ctx,
+>  				struct list_head *list);
+>  
+> -blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
+> -						struct request *rq,
+> -						blk_qc_t *cookie,
+> -						bool bypass, bool
+> last);
+> +/* Used by blk_insert_cloned_request() to issue request directly */
+> +blk_status_t blk_mq_request_issue_directly(struct request *rq, bool
+> last);
+>  void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
+>  				    struct list_head *list);
+>  
+> 
 
-Although this patch looks fine to me: have you considered to insert one
-percpu+AF8-ref+AF8-get() call at the start of blk+AF8-mq+AF8-flush+AF8-plug+AF8-list() and one
-percpu+AF8-ref+AF8-put() call at the end of the same function?
+Hello Bart
 
-Thanks,
+I can conform, reverting those 3 in order also resolves the panic I was
+seeing. I have 3 reboot tests of the srpt server allowing the client ot
+remain stable and try reconnect.
 
-Bart.
+For the above patch:
+Tested-by: Laurence Oberman <loberman@redhat.com>
+
+Too many changes in code I am not familiar enough to review and
+comnment why reverting helps.
+
+Thanks
+Laurence
+
