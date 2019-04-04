@@ -2,108 +2,217 @@ Return-Path: <SRS0=51nD=SG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58792C4360F
-	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 18:10:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A988C4360F
+	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 19:23:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2C917206C0
-	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 18:10:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B2D92075E
+	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 19:23:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=osandov-com.20150623.gappssmtp.com header.i=@osandov-com.20150623.gappssmtp.com header.b="zk5u5rw0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=demfloro.ru header.i=@demfloro.ru header.b="VyYTT/VV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728862AbfDDSK6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Apr 2019 14:10:58 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:39589 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728699AbfDDSK6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Apr 2019 14:10:58 -0400
-Received: by mail-pl1-f194.google.com with SMTP id b65so1548616plb.6
-        for <linux-block@vger.kernel.org>; Thu, 04 Apr 2019 11:10:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=DUzfBQhyk+Fkl+/tWLRUMMxy9LuyArSyJfsu+VSZcpM=;
-        b=zk5u5rw098Mj2lf1n8vI5dDl3GnvPUyYbH/s0XRHypR+8zk26rPQcr1sPoj8xiQpPs
-         Cr9nC3VewdstPvKTDjgHCjRRTSp8WIJyEN8SgUHY7oruASl8PAt3eaApSMgsQj5UeK0W
-         Iqn5CMmHIr7i0qTsfdv2xQGlsEOMPkhiVSXWITGsnnRXDDgj5vBFjCBgnKtGxEUHhOES
-         3pXgX627XNFgaZv1cwc2O2HSOMkV6G8YDxHK+yAa84Tld5f++5j4A37rovy4rZDOuAlr
-         4VU+fJ0G8kUDrMn+LtgjdyPCpuaXW2F01lR+dHU+vayttfOEh6gmYc0q0oplbEBR7vVq
-         GRzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=DUzfBQhyk+Fkl+/tWLRUMMxy9LuyArSyJfsu+VSZcpM=;
-        b=XHCQvnPYDmGg6TGTxvodFwKZ9vcrn/GvITYlFaQV2WOPueYi/lFZsT9b1Y4I9sQX+w
-         bhVeW5sxcZKY051pok6cFvfbH28gnoiZFR64RX6aUilubvgoL1nycwZjq8Hn9Os4C//D
-         3rpWF6ZI+MAeytINXkKqQwWX9Y6KqX3ZFEjR7lf5uWtdtkE55hWO3vmFYqpZDSSz0iY1
-         +Xa4ttrFtVx/wpVPWo74oXNbA+siSJKY24Po7A7PRchp7KivgeXB6CH9LqyRmylLCkhM
-         0MX1di1Vxnb6Aj6iLCgqvtoSFJg+hFep/h7Nb4oCGvti7aDJRTWkenUttdtcY+k7svRq
-         rtgA==
-X-Gm-Message-State: APjAAAUYGZ0rX2cQS2RD75ND27FBNCb0KNlcGFjEKwc/C3dUwtHNRvY6
-        cjYvOiRIFaQL/nch8DdDjiwmuw==
-X-Google-Smtp-Source: APXvYqwckbTKDP9A+daX47m9f1ZwXKoq0YXjC4bxijs+ywoIHNSNVyCyk6CC5RZ7EpddILKGHg4JFA==
-X-Received: by 2002:a17:902:bd92:: with SMTP id q18mr7937864pls.136.1554401457171;
-        Thu, 04 Apr 2019 11:10:57 -0700 (PDT)
-Received: from vader ([2620:10d:c090:180::3f62])
-        by smtp.gmail.com with ESMTPSA id v6sm24382919pgv.92.2019.04.04.11.10.56
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 04 Apr 2019 11:10:56 -0700 (PDT)
-Date:   Thu, 4 Apr 2019 11:10:55 -0700
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Xiao Liang <xiliang@redhat.com>
-Cc:     linux-block@vger.kernel.org, osandov@fb.com
-Subject: Re: [PATCH blktests] block/020: dynamically change iodepth if test
- aio-nr lager than aio-max-nr
-Message-ID: <20190404181055.GB25741@vader>
-References: <20190401033800.6032-1-xiliang@redhat.com>
+        id S1729969AbfDDTXF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Apr 2019 15:23:05 -0400
+Received: from mx.demfloro.ru ([185.52.0.75]:52842 "EHLO mx.demfloro.ru"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729287AbfDDTXF (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 4 Apr 2019 15:23:05 -0400
+Received: from fire.localdomain (unknown [IPv6:2001:470:28:88::100])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: demfloro)
+        by mx.demfloro.ru (Postfix) with ESMTPSA id 44ZtBt1TlvzB57c;
+        Thu,  4 Apr 2019 19:23:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=demfloro.ru; s=032019;
+        t=1554405782; h=from:from:sender:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=63g/cWAoNflwlZQm2tGWAfkT/DR+u+GHtae92sla5g4=;
+        b=VyYTT/VV88usSWiDDtDFyzv75g/AFYiqJWdVQLXhFVEA19NDOYdLdX5Aqc7f2cqqWLeWeM
+        7CGciGzgyk4Oa/epEz48zR8t/zbF840LR9QjRS8fqmTvT3DGP9kSQN+SRKb8VIahdlk6iY
+        W5ZhDhZ9ZKk80yn2kmB1bXREwa5kUVjoSZAcpHf6xPKuyYGNH8a+C88BMaYLZz9toddU1F
+        QvXRuT/PRWipOK1/H1N6omTv7Cw2QFBLzaxWw2ldLzpHbi873HJ7b1hBFCzRzgb3EowHjp
+        CuoQi6EstDYYswYvmAaaP2r/hTPF9z3CXf5INcSnKXZk8MTwEVGhymCXQRG0Wg==
+Date:   Thu, 4 Apr 2019 22:22:57 +0300
+From:   Dmitrii Tcvetkov <demfloro@demfloro.ru>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: Bisected GFP in bfq_bfqq_expire on v5.1-rc1
+Message-ID: <20190404222257.0cfb1130@fire.localdomain>
+In-Reply-To: <EBC090F1-72C0-4794-91CC-37F9A2A1DEFB@linaro.org>
+References: <20190329160227.7d55c8dd@fire.localdomain>
+        <0e203a26-b941-cef4-dff1-013999d4b041@kernel.dk>
+        <626EAE58-63C1-4ABA-9040-9D9A61F74A0D@linaro.org>
+        <20190401115509.76310e03@fire.localdomain>
+        <84B0CA50-0ED8-4171-8007-19EA43951735@linaro.org>
+        <20190401122233.3e861312@fire.localdomain>
+        <EBC090F1-72C0-4794-91CC-37F9A2A1DEFB@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190401033800.6032-1-xiliang@redhat.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Type: multipart/mixed; boundary="MP_/IJ.6CVMsu2MF7LCxrnNrmoU"
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=demfloro.ru;
+        s=arc032019; t=1554405782;
+        h=from:from:sender:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=63g/cWAoNflwlZQm2tGWAfkT/DR+u+GHtae92sla5g4=;
+        b=WQWph2OhK9Hxh1EXVBvmrTLevQWbTBMoXzt/5P42up1gurx8EJGAAD7p1jYaGwUzP+lRGQ
+        iDkXAedxW0/p8cQ1AHD3rB7DPnTlmiffOQNPtd1tu9UhAfqtUDhMf1/K/SfcGcKe0/cM/C
+        tnEKf7OqekE9ZnuWgq4WiJ56V2EqC0clUJ0l9mmNQuKq3GKYVTzhs4JspHOvUJVYmTNT6E
+        VezvK5IurW6EKBMeD+oLCGD3wSnRzAOSe7GYURTmEKqkbqIPXkx/4vwznA5er+W1kf+hC7
+        r/ysvsU8kKIp77HKXMJMdhQowQHHhIMequ+4whN7MVGo5WdKvLknku70fW5iKA==
+ARC-Seal: i=1; s=arc032019; d=demfloro.ru; t=1554405782; a=rsa-sha256;
+        cv=none;
+        b=tqWtjR1uBfdBhYCB/emqDMK2o61mL/kbfioLlMZMWHmJ1VAb+Yq5zWio7WGI8R+ydZREe1
+        Q7TTJDkX72jf0zQ+hovycALoffXoGRGLUbBCu1qZNkPVdJyo9P+G8yJ1YINNOwXBK5xe2V
+        7YS+ZuSeGhuF5L/XXZ1ZNCqeDnk/xSkByWJ8vDzdrmF7hnBxL7tQ3xvkL9oSyogiwxp85L
+        7PfeHBGqDsF5IFnz6zbuXXvq363bul0FXqwSRbsoGQcFaE6x8Kxwj1CpJbYDTD3kvH5rs/
+        u2VKu0ZnkFKT7Kib34XekbZVCyLU0QqF/Cr5abGCJ1zPR+R9unrApzVuEv0qLw==
+ARC-Authentication-Results: i=1;
+        mx.demfloro.ru;
+        auth=pass smtp.auth=demfloro smtp.mailfrom=demfloro@demfloro.ru
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 01, 2019 at 11:38:00AM +0800, Xiao Liang wrote:
-> When system has large count of cpus(eg. 96), the test failed as aio-nr over
-> aio-max-nr limitation.
+--MP_/IJ.6CVMsu2MF7LCxrnNrmoU
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+
+On Mon, 1 Apr 2019 12:35:11 +0200
+Paolo Valente <paolo.valente@linaro.org> wrote:
+
 > 
-> This patch continues to use 1024 as default iodepth, but change it if
-> iodepth*$(nproc) > aio-max-nr.
 > 
-> Signed-off-by: Xiao Liang <xiliang@redhat.com>
-> ---
->  tests/block/020 | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
+> > Il giorno 1 apr 2019, alle ore 11:22, Dmitrii Tcvetkov
+> > <demfloro@demfloro.ru> ha scritto:
+> > 
+> > On Mon, 1 Apr 2019 11:01:27 +0200
+> > Paolo Valente <paolo.valente@linaro.org> wrote:
+> >> Ok, thank you. Could you please do a
+> >> 
+> >> list *(bfq_bfqq_expire+0x1f3)
+> >> 
+> >> for me?
+> >> 
+> >> Thanks,
+> >> Paolo
+> >> 
+> >>> 
+> >>> <gpf.txt><gpf-w-bfq-group-iosched.txt><config.txt>
+> > 
+> > Reading symbols from vmlinux...done.
+> > (gdb) list *(bfq_bfqq_expire+0x1f3)
+> > 0xffffffff813d02c3 is in bfq_bfqq_expire (block/bfq-iosched.c:3390).
+> > 3385             * even in case bfqq and thus parent entities go on
+> > receiving 3386             * service with the same budget.
+> > 3387             */
+> > 3388            entity = entity->parent;
+> > 3389            for_each_entity(entity)
+> > 3390                    entity->service = 0;
+> > 3391    }
+> > 3392
+> > 3393    /*
+> > 3394     * Budget timeout is not implemented through a dedicated
+> > timer, but
 > 
-> diff --git a/tests/block/020 b/tests/block/020
-> index 39dde66..f03c131 100755
-> --- a/tests/block/020
-> +++ b/tests/block/020
-> @@ -29,10 +29,16 @@ test() {
->  	# shellcheck disable=SC2207
->  	scheds=($(sed 's/[][]//g' /sys/block/nullb0/queue/scheduler))
->  
-> +	aio_max_nr=$(cat /proc/sys/fs/aio-max-nr)
-> +	max_iodepth=$(($aio_max_nr/$(nproc)))
-> +	iodepth=1024
-> +	if (( $iodepth > $max_iodepth )); then
-> +		iodepth=$max_iodepth
-> +	fi
+> Thank you very much.  Unfortunately this doesn't ring any bell.  I'm
+> trying to reproduce the failure.  It will probably take a little
+> time.  If I don't make it, I'll ask you to kindly retry after applying
+> some instrumentation patch.
+> 
 
-This has a few shellcheck errors:
+I looked at what git is doing just before panic and it's doing a lot of
+lstat() syscalls on working tree.
 
-tests/block/020:33:17: note: $/${} is unnecessary on arithmetic variables. [SC2004]
-tests/block/020:35:8: note: $/${} is unnecessary on arithmetic variables. [SC2004]
-tests/block/020:35:19: note: $/${} is unnecessary on arithmetic variables. [SC2004]
+I've attached a python script which reproduces the crash in about
+10 seconds after it prepares testdir, git checkout origin/linux-5.0.y
+reproduces it in about 2 seconds. I have to use multiprocessing Pool as
+I couldn't reproduce the crash using ThreadPool, probably due to Python
+GIL.
 
-Can you please address those and resend?
 
-Thanks!
+--MP_/IJ.6CVMsu2MF7LCxrnNrmoU
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename=crash.py
+
+#!/usr/bin/env python3
+
+from glob import glob
+from os import lstat,mkdir
+from random import randint
+from os.path import isdir,exists
+from pathlib import Path
+from time import sleep
+from subprocess import run
+from multiprocessing import Pool
+
+def drop_caches():
+    with open('/proc/sys/vm/drop_caches','w') as f:
+        f.write('3')
+
+def enable_bfq():
+    with open('/sys/block/sda/queue/scheduler','w') as f:
+        f.write('bfq')
+
+def sync():
+    run(('sync'))
+
+def prepare_tree(name):
+    def populate(dir, depth=6):
+        if not depth:
+            return
+        for fname in range(1,20):
+            if randint(0,100) > 80:
+                dirname = "{}{}/".format(dir,fname)
+                mkdir(dirname)
+                populate(dirname, depth - 1)
+                continue
+            fname = "{}{}".format(dir, fname)
+            Path(fname).touch(exist_ok=True)
+            
+    if not isdir(name):
+        mkdir(name)
+    if not name.endswith('/'):
+        name = '{}/'.format(name)
+    populate(name)
+    
+        
+
+def traverse(dir):
+    drop_caches()
+    for inode in glob("{}/*".format(dir)):
+        if isdir(inode):
+            traverse(inode)
+        else:
+            lstat(inode)
+            if randint(0,10) > 6:
+                sleep(0)
+
+def main():
+    nproc = 16
+    dirname = 'testdir'
+    if not exists(dirname):
+        prepare_tree(dirname)
+    sync()
+    drop_caches()
+    enable_bfq()
+    drop_caches()
+
+    with Pool(nproc) as pool:
+        dirs = (dirname,) * nproc
+        pool.map(traverse,dirs)
+            
+main()
+
+--MP_/IJ.6CVMsu2MF7LCxrnNrmoU--
