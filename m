@@ -1,157 +1,104 @@
-Return-Path: <SRS0=zJbT=SF=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=51nD=SG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD9F9C10F06
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 22:21:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10AB8C4360F
+	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 02:53:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 856B520882
-	for <linux-block@archiver.kernel.org>; Wed,  3 Apr 2019 22:21:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D00092133D
+	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 02:53:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kMvIKkfw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726387AbfDCWV1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 3 Apr 2019 18:21:27 -0400
-Received: from ipmail06.adl6.internode.on.net ([150.101.137.145]:3835 "EHLO
-        ipmail06.adl6.internode.on.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726199AbfDCWV1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Wed, 3 Apr 2019 18:21:27 -0400
-Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
-  by ipmail06.adl6.internode.on.net with ESMTP; 04 Apr 2019 08:51:23 +1030
-Received: from dave by dastard with local (Exim 4.80)
-        (envelope-from <david@fromorbit.com>)
-        id 1hBoFy-0008Nx-KN; Thu, 04 Apr 2019 09:21:18 +1100
-Date:   Thu, 4 Apr 2019 09:21:18 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Bob Liu <bob.liu@oracle.com>,
-        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, shirley.ma@oracle.com,
-        allison.henderson@oracle.com, darrick.wong@oracle.com,
-        hch@infradead.org, adilger@dilger.ca, tytso@mit.edu
-Subject: Re: [PATCH v3 2/3] block: verify data when endio
-Message-ID: <20190403222118.GC26298@dastard>
-References: <feefa611-b744-326c-29d5-c64bcda45d9f@kernel.dk>
- <yq17echrax1.fsf@oracle.com>
- <1b638dc2-56fd-6ab4-dcca-ad2adb9931bb@kernel.dk>
- <c9adb48c-7b6e-2017-9480-aa2342b3523b@oracle.com>
- <7599b239-46f4-9799-a87a-3ca3891d4a08@kernel.dk>
- <yq1imw1p0lp.fsf@oracle.com>
- <20190331220001.GM23020@dastard>
- <yq1ef6lq0sk.fsf@oracle.com>
- <20190401212115.GQ26298@dastard>
- <yq1d0m3olhs.fsf@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <yq1d0m3olhs.fsf@oracle.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+        id S1726530AbfDDCxw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 3 Apr 2019 22:53:52 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:36490 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726515AbfDDCxv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 3 Apr 2019 22:53:51 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x342rcui023872;
+        Thu, 4 Apr 2019 02:53:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2018-07-02;
+ bh=OppRsf5R8GtQ7DOAGXoRu99YOawhCPz1bLgCqWEt4Mk=;
+ b=kMvIKkfw7wwOS6MuFuOy8412knXq5IM8f9b0TibHNu0SRqxyGOuClLZ2iKzp1nnVBPWR
+ neeKr05ZS7bq6MCWurD2zE5TYa2onvB1qqZF7kV+gG4UU99me0kBUwGbQrYEGWgzbhgb
+ vWXruMIj3HhtsraAcGUdstSVaCZLvnKsf7PzDb9Aclrv39LhRAKslv8dTa9AOOXRJJ9u
+ dasGCZ2Ius0Pt7uwtxFYVPM2HR70/9HF/Uk+vQetkG7ti/QXHh/kB8OkZnADKrOMbsAS
+ 6Zx3ngA7+vPjDN7gBfebqgatAfpuIkfm5XHv+OCYkb4bFfrT1mnmNUzw9d1j61hwGePK tA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 2rj13qcchr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 04 Apr 2019 02:53:48 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x342rM5n095701;
+        Thu, 4 Apr 2019 02:53:47 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3020.oracle.com with ESMTP id 2rm9mjctmd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 04 Apr 2019 02:53:47 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x342rkto022043;
+        Thu, 4 Apr 2019 02:53:47 GMT
+Received: from linux.cn.oracle.com (/10.182.69.106)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 03 Apr 2019 19:53:46 -0700
+From:   Dongli Zhang <dongli.zhang@oracle.com>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/1] blk-mq: do not reset plug->rq_count before the list is sorted
+Date:   Thu,  4 Apr 2019 10:57:44 +0800
+Message-Id: <1554346664-24038-1-git-send-email-dongli.zhang@oracle.com>
+X-Mailer: git-send-email 2.7.4
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9216 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1904040019
+X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9216 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1904040019
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 02, 2019 at 10:45:03PM -0400, Martin K. Petersen wrote:
-> 
-> Dave,
-> 
-> > Not sure what you mean by "capped to the size you care about". The
-> > verifier attached to a bio will exactly match the size of the bio
-> > being issued. AFAICT, coalescing with other bios in the request
-> > queues should not affect how the completion of that bio is
-> > handled by things like the RAID layers...
-> 
-> Just wanted to make sure that you wanted an interface that worked on a
-> bio containing a single logical entity. As opposed to an interface that
-> permitted you to submit 10 logical entities in one bio and have the
-> verify function iterate over them at completion time.
-> 
-> > As far as I'm concerned, correcting bad copies is the responisbility
-> > of the layer that manages the copies. It has nothing to do with the
-> > filesystem.
-> 
-> Good.
-> 
-> > There is so many varied storage algorithms and recovery options
-> > (rewrite, partial rewrite, recalc parity/erasure codes and rewrite,
-> > full stripe rewrite, rebuild onto hot spare due to too many errors,
-> > etc) it doesn't make sense to only allow repair to be done by
-> > completely error context-free rewriting from a higher layer. The
-> > layer that owns the redundancy can make much better decisions aout
-> > repair
-> 
-> I agree.
-> 
-> > If the storage fails (and it will) and the filesystem cannot recover
-> > the lost metadata, then it will let the user know and potentially
-> > shut down the filesystem to protect the rest of the filesystem from
-> > further damage. That is the current status quo, and the presence or
-> > absence of automatic block layer retry and repair does not change
-> > this at all.
-> 
-> No. But hopefully the retry logic will significantly reduce the cases
-> where shutdown and recovery is required. Availability is super
-> important.
+We would never be able to sort the list if we first reset plug->rq_count
+which is used in conditional check later.
 
-*nod*
+Fixes: ce5b009cff19 ("block: improve logic around when to sort a plug list")
+Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+---
+ block/blk-mq.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-We're on the same page, I think :)
-
-> Also, at least some storage technologies are trending towards becoming
-> less reliable, not more. So the reality is that recovering from block
-> errors could become, if not hot path, then at least relatively common
-> path.
-
-Yup, all the more reason for having some form of generic
-verification infrastructure plumbed into the stack.
-
-> > IOWs, the filesystem doesn't expect hard "always correct" guarantees
-> > from the storage layers - we always have to assume IO failures will
-> > occur because they do, even with T10 PI. Hence it makes no sense to
-> > for an automatic retry-and-recovery infrastructure for filesystems to
-> > require hard guarantees that the block device will always return good
-> > data.
-> 
-> I am not expecting hard guarantees wrt. always delivering good data. But
-> I want predictable behavior of the retry infrastructure.
-> 
-> That's no different from RAID drive failures. Things keep running, I/Os
-> don't fail until we run out of good copies. But we notify the user that
-> redundancy is lost so they can decide how to deal with the situation.
-> Setting the expectation that an I/O failure on the remaining drive would
-> potentially lead to a filesystem or database shutdown. RAID1 isn't
-> branded as "we sometimes mirror your data". Substantial effort has gone
-> into making sure that the mirrors are in sync.
-
-Oh, I've been assuming that the layers that can do verification
-would immediately take steps to correct whatever was detected, and
-if the error couldn't be corrected they take whatever action they
-normally take when an uncorrectable error is encountered.  i.e.
-they'd never silently violate the redundancy guarantees they are
-supposed to provide. MD and DM already do this, right? (e.g.
-marking arrays degraded and notifying the admin they need to replace
-a drive and rebuild.)
-
-> For the retry stuff we should have a similar expectation. It doesn't
-> have to be fancy. I'm perfectly happy with a check at mkfs/growfs time
-> that complains if the resulting configuration violates whichever
-> alignment and other assumptions we end up baking into this.
-
-Makes sense to me. If we can ensure that the alignment requirements
-for the stack are communicated in the existing geometry infoi
-correctly (i.e. io_min, io_opt) then we've pretty much already got
-everything we need in place. We might need a few mkfs tweaks to
-ensure the log is placed correctly, log write padding is set
-appropriately, and check that inode clusters are appropriately
-aligned (I think they are already) but otherwise I think we will be
-good here...
-
-Cheers,
-
-Dave.
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 3ff3d7b..c162718 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1711,11 +1711,12 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+ 	unsigned int depth;
+ 
+ 	list_splice_init(&plug->mq_list, &list);
+-	plug->rq_count = 0;
+ 
+ 	if (plug->rq_count > 2 && plug->multiple_queues)
+ 		list_sort(NULL, &list, plug_rq_cmp);
+ 
++	plug->rq_count = 0;
++
+ 	this_q = NULL;
+ 	this_hctx = NULL;
+ 	this_ctx = NULL;
 -- 
-Dave Chinner
-david@fromorbit.com
+2.7.4
+
