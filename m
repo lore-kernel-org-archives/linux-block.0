@@ -2,83 +2,84 @@ Return-Path: <SRS0=51nD=SG=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DE9BC4360F
-	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 11:28:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF525C4360F
+	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 14:37:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 677B0206C0
-	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 11:28:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E6812147C
+	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 14:37:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WiwMZqrw"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="ytkjuPb2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728888AbfDDL2U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Apr 2019 07:28:20 -0400
-Received: from merlin.infradead.org ([205.233.59.134]:54618 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728775AbfDDL2U (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Apr 2019 07:28:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=merlin.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=ZjwA9bBAqDZG+ml5BFZSkpHCRFNpvjIjCm42eG0iWhk=; b=WiwMZqrwYn/59tRw9u8l9eG2Y
-        9fjZjP7NmBA3EJ9tRt9pWfHJNrrr2pKXExAGvsIPELJOcNdz50XBEvXvUQ08nFSvqpVzi2xOv37dI
-        jouIfPS6QVC+IbhHHVinPRfQriXCoEgDdL5mghWYu9dLC0zNP9qOfrqdpfCKXmZpOhnKkcmPDpS0n
-        cgiz/43tw6DvvWEFvk9jK+v7ehN1LR0S/HcnjCppZcaHFazeTFRg0gbjrO3mi53v+i4t7a4r7OmQo
-        zp8yTb0mYlPb5LJQc2tNJzYbmaQ7miLJLysivGvuI24gVevk1ZKvQq59nOmfwykz1+fCd1cXTV4G5
-        lgPKJedPw==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=hirez.programming.kicks-ass.net)
-        by merlin.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hC0XQ-00038L-Ft; Thu, 04 Apr 2019 11:28:08 +0000
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id AD34629AA465D; Thu,  4 Apr 2019 13:28:05 +0200 (CEST)
-Date:   Thu, 4 Apr 2019 13:28:05 +0200
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Michal Hocko <mhocko@kernel.org>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Jens Axboe <axboe@kernel.dk>,
-        Amritha Nambiar <amritha.nambiar@intel.com>,
-        Willem de Bruijn <willemb@google.com>,
-        kernel-janitors@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] cpumask: Introduce possible_cpu_safe()
-Message-ID: <20190404112805.GZ4038@hirez.programming.kicks-ass.net>
-References: <20190404100218.GA26946@kadam>
- <20190404103528.GG12864@dhcp22.suse.cz>
+        id S1727441AbfDDOh5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Apr 2019 10:37:57 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:44330 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727489AbfDDOh5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Apr 2019 10:37:57 -0400
+Received: by mail-pg1-f195.google.com with SMTP id i2so1334422pgj.11
+        for <linux-block@vger.kernel.org>; Thu, 04 Apr 2019 07:37:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=2nsBitIrQDU00C7pV7eoPW99k5WkEBUd+i7nBmDCTKU=;
+        b=ytkjuPb2YgAN983gXFG8uvfmjXWj2iI9akDbFpg2hMOO80E8vd/vfDWUsJeCcU9gmY
+         BhjF1RivYDQRxV2wjBuSM0ZZm4G3CM5p+2mqfIDHrWO2tVX221hg6WLXfqQJ1Rujt0bn
+         0LFx1ggs7uL9aJw54MYM195RLrlHrWWSOD+LMvACZCnM+r4+88bkiEgBQT7E2T9txgEs
+         3Yn7L5kEdzN5ZdyjFMy/0CtJh4yxPH+TIHyOhGA9Nw8Al1ER57pMHJWw7yJc4luPtj4E
+         3kI6fWyE63/cnmY7oYwoqgcL/WtRD/8l4wu+SNkVUdENRpBz8h+ARiZAAPuM9cVTtef0
+         G1rQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2nsBitIrQDU00C7pV7eoPW99k5WkEBUd+i7nBmDCTKU=;
+        b=GzjLUawkYS2J7ipf5qtHNwI2GKEGSc1/UiyybMTxM7+sUf54DwsOOGOfPq02dt8jPh
+         jqsg9YQpDQ6kAM3pDo98t0XzDH1zmbKwR9H28EZeWxi+gEjJL62YA48jez9REQBHkDJy
+         9QKqwzIn+wMIuzMqi6Wd8MdnAGQSOiQsxBlelh9v2oY5ZoqL1dp7B3MAoF9NxRnCIo+f
+         e9c387Je5cHkJxfyqz9NGkPkijQQCrSpfqHa8eTv1AoA/EriKHjut6/vSaWuPKgqpVRg
+         pR8WO8fvMux65kJERoKGWWTa2GjfB4pueb/1NXk1DDQzh+ROc1Sm3od6wqA80cR61Ysx
+         4C3Q==
+X-Gm-Message-State: APjAAAXwP1gzm895/HaJLkCIqwW+KDzfBVIdOAVgzT/6ZJ0j95AsgNFW
+        dpIUxwTgueQUi/Wckrb+vCuoAIQSeXU=
+X-Google-Smtp-Source: APXvYqyvIO1lIEAGSdrkoa/xRd13DwIICrCmZzv2bbqLIu3kW96kRtpq8sXNOVPeFhKe1827sznBUw==
+X-Received: by 2002:a63:28c:: with SMTP id 134mr6359794pgc.278.1554388675463;
+        Thu, 04 Apr 2019 07:37:55 -0700 (PDT)
+Received: from [172.20.10.3] ([107.72.96.208])
+        by smtp.gmail.com with ESMTPSA id i15sm25043254pfd.162.2019.04.04.07.37.53
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 04 Apr 2019 07:37:54 -0700 (PDT)
+Subject: Re: [PATCH 1/1] blk-mq: do not reset plug->rq_count before the list
+ is sorted
+To:     Dongli Zhang <dongli.zhang@oracle.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1554346664-24038-1-git-send-email-dongli.zhang@oracle.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <e5c00bf3-79d5-b0eb-f38a-a912c5f85c33@kernel.dk>
+Date:   Thu, 4 Apr 2019 08:37:52 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190404103528.GG12864@dhcp22.suse.cz>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <1554346664-24038-1-git-send-email-dongli.zhang@oracle.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 04, 2019 at 12:35:28PM +0200, Michal Hocko wrote:
-> On Thu 04-04-19 13:02:19, Dan Carpenter wrote:
-> > There have been two cases recently where we pass user a controlled "cpu"
-> > to possible_cpus().  That's not allowed.  If it's invalid, it will
-> > trigger a WARN_ONCE() and an out of bounds read which could result in an
-> > Oops.
-> > 
-> > This patch introduces possible_cpu_safe() which first checks to see if
-> > the cpu is valid, turns off speculation and then checks if the cpu is
-> > possible.
-> 
-> Why cannot we do the check in possible_cpu directly? Is it used from any
-> hot path? I am quite skeptical people will use the new helper
-> consistently.
+On 4/3/19 8:57 PM, Dongli Zhang wrote:
+> We would never be able to sort the list if we first reset plug->rq_count
+> which is used in conditional check later.
 
-Why only possible? What is to say stop anyone from using garbage (aka.
-user input) in any other of the cpumask APIs.
+Well, that was pretty stupid. Thanks for the patch, applied.
 
-I'd much rather have the explicit validate call and keep assuming @cpu
-as used in the rest of the API is sane.
+-- 
+Jens Axboe
+
