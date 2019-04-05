@@ -2,128 +2,131 @@ Return-Path: <SRS0=t+Ub=SH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 003BDC4360F
-	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 06:21:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B89C4360F
+	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 06:31:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C463A217D7
-	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 06:21:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Lkh01HBF"
+	by mail.kernel.org (Postfix) with ESMTP id A3138217D4
+	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 06:31:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726389AbfDEGVF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Apr 2019 02:21:05 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:58264 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726356AbfDEGVF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Apr 2019 02:21:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=OM6tvRtlJr2pr50Z7kKONhtzW/9AH70SGK08t67fAGg=; b=Lkh01HBFCPTnLPwE+ae964l1tR
-        HO0Ut7wBeGeYXElywwlvMt/hxOwWSADnEy6T11MbH3Dj+BIGXKBdaV2+4CTj79VYTumv8LT4ExYAf
-        zRllXSr1uAlbmuk/6JV+/WaLUxyNnRsKxbfHDL94Z7+FqFPKev9bYbo8OMieZnr/DnhQ52qAIDlao
-        Vg3Vu7lJG9ocn4Z1wJvROGytwe8kTJLV9kuqKtr2mg0XKwKPqD5Z5O1vMVAVBw4W+Vf8oy+ZAN9tQ
-        JZOVhiHLqhCtVl6MmRLReNqph0NZ/qxv6Gm3tDZzR8kQuaLiB08iKvpploTSrYTKZNc3uXW4FsD9T
-        rCM7OaXg==;
-Received: from 089144198096.atnat0007.highway.a1.net ([89.144.198.96] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hCIDm-0003JV-Uq; Fri, 05 Apr 2019 06:21:03 +0000
-Date:   Fri, 5 Apr 2019 08:20:43 +0200
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-Subject: [GIT PULL] early nvme updates for 5.2
-Message-ID: <20190405062043.GA26688@infradead.org>
+        id S1726643AbfDEGbX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Apr 2019 02:31:23 -0400
+Received: from mga14.intel.com ([192.55.52.115]:63146 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726626AbfDEGbX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Apr 2019 02:31:23 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Apr 2019 23:31:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,310,1549958400"; 
+   d="scan'208";a="140183673"
+Received: from ssayana-mobl.ger.corp.intel.com (HELO [10.249.46.55]) ([10.249.46.55])
+  by orsmga003.jf.intel.com with ESMTP; 04 Apr 2019 23:31:20 -0700
+Subject: Re: [PATCH v3 00/10] lightnvm: next set of improvements for 5.2
+To:     Hans Holmberg <hans@owltronix.com>
+Cc:     Matias Bjorling <mb@lightnvm.io>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
+        Hans Holmberg <hans.holmberg@cnexlabs.com>,
+        linux-block@vger.kernel.org
+References: <20190327123901.12323-1-igor.j.konopko@intel.com>
+ <CANr-nt0d7DJ_-gYPKiJXBAUopSTATXVM7X5_=BeqDH-dZq-A8Q@mail.gmail.com>
+From:   Igor Konopko <igor.j.konopko@intel.com>
+Message-ID: <302dd514-2b52-6669-0764-5b91c22704df@intel.com>
+Date:   Fri, 5 Apr 2019 08:31:18 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <CANr-nt0d7DJ_-gYPKiJXBAUopSTATXVM7X5_=BeqDH-dZq-A8Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
-
-below is the first batch of nvme updates for 5.2.  This includes the
-performance improvements for single segment I/O on PCIe, which introduce
-new block helpers, so it might be a good idea to get them in early.
-
- - various performance optimizations in the PCIe code (Keith and me)
- - new block helpers to support the above (me)
- - nvmet error conversion cleanup (me)
- - nvmet-fc variable sized array cleanup (Gustavo)
- - passthrough ioctl error printk cleanup (Kenneth)
- - small nvmet fixes (Max)
- - endianess conversion cleanup (Max)
- - nvmet-tcp faspath completion optimization (Sagi)
 
 
-The following changes since commit 2b24e6f63ac9e817630424c6d8f008256348dfc4:
+On 03.04.2019 09:12, Hans Holmberg wrote:
+> On Wed, Mar 27, 2019 at 1:41 PM Igor Konopko <igor.j.konopko@intel.com> wrote:
+>>
+>> This is another set of fixes and improvements to both pblk and lightnvm
+>> core.
+>>
+>> First & second patches are the most crutial, since they changes the approach
+>> to the partial read path, so detailed review is needed especially here.
+>>
+>> Other patches are my other findings related to some bugs or potential
+>> improvements, mostly related to some corner cases.
+>>
+>> Changes v2 -> v3;
+>> -dropped some not needed patches
+>> -dropped patches which were already pulled into for-5.2/core branch
+>> -commit messages cleanup
+>>
+>> Changes v1 -> v2:
+>> -dropped some not needed patches
+>> -review feedback incorporated for some of the patches
+>> -partial read path changes patch splitted into two patches
+>>
+> 
+> Hi Igor,
+> 
+> I ran the quick xfstests and generic/247 hangs with this patchset on qemu:
+> 
+> FSTYP         -- xfs (non-debug)
+> PLATFORM      -- Linux/x86_64 u1804-qatd 5.0.0-rc6_for-5.2/core_igor_v3
+> 
+> generic/247 95s ...
+> <hang>
+> 
+> Note: If i run it with Matias 5.2 core branch with my biovec fix, it
+> completes successfully, but with this in dmesg:
+> 
+> [  358.028158] Page cache invalidation failure on direct I/O.
+> Possible data corruption due to collision with buffered I/O!
+> [  358.030768] File: /mnt/247 PID: 4431 Comm: dd
+> 
+> (I have not looked into that any further)
+> 
 
-  block: bio: ensure newly added bio flags don't override BVEC_POOL_IDX (2019-04-04 09:30:37 -0600)
+Thanks Hans for testing that and reporting back. Will definitely look 
+into that and resubmit when fixed.
+Igor
 
-are available in the Git repository at:
-
-  git://git.infradead.org/nvme.git nvme-5.2
-
-for you to fetch changes up to d0de579c043c3a2ab60ce75eb6cf4d414becc676:
-
-  nvme: log the error status on Identify Namespace failure (2019-04-05 08:07:58 +0200)
-
-----------------------------------------------------------------
-Christoph Hellwig (15):
-      nvmet: avoid double errno conversions
-      block: add a req_bvec helper
-      block: add a rq_integrity_vec helper
-      block: add a rq_dma_dir helper
-      block: add dma_map_bvec helper
-      nvme-pci: remove nvme_init_iod
-      nvme-pci: move the call to nvme_cleanup_cmd out of nvme_unmap_data
-      nvme-pci: merge nvme_free_iod into nvme_unmap_data
-      nvme-pci: only call nvme_unmap_data for requests transferring data
-      nvme-pci: do not build a scatterlist to map metadata
-      nvme-pci: split metadata handling from nvme_map_data / nvme_unmap_data
-      nvme-pci: remove the inline scatterlist optimization
-      nvme-pci: optimize mapping of small single segment requests
-      nvme-pci: optimize mapping single segment requests using SGLs
-      nvme-pci: tidy up nvme_map_data
-
-Gustavo A. R. Silva (1):
-      nvmet-fc: use zero-sized array and struct_size() in kzalloc()
-
-Keith Busch (3):
-      nvme-pci: use a flag for polled queues
-      nvme-pci: remove q_dmadev from nvme_queue
-      nvme-pci: remove unused nvme_iod member
-
-Kenneth Heitke (1):
-      nvme: log the error status on Identify Namespace failure
-
-Max Gurtovoy (3):
-      nvme: avoid double dereference to convert le to cpu
-      nvmet: never fail double namespace enablement
-      nvmet: add safety check for subsystem lock during nvmet_ns_changed
-
-Sagi Grimberg (1):
-      nvmet-tcp: implement C2HData SUCCESS optimization
-
- drivers/nvme/host/core.c          |   6 +-
- drivers/nvme/host/pci.c           | 263 +++++++++++++++++++-------------------
- drivers/nvme/target/core.c        |   9 +-
- drivers/nvme/target/fc.c          |   7 +-
- drivers/nvme/target/io-cmd-bdev.c |   6 +-
- drivers/nvme/target/tcp.c         |  24 +++-
- include/linux/blkdev.h            |  34 +++++
- 7 files changed, 197 insertions(+), 152 deletions(-)
+> Best regards,
+> Hans
+> 
+> 
+>> Igor Konopko (10):
+>>    lightnvm: pblk: IO path reorganization
+>>    lightnvm: pblk: simplify partial read path
+>>    lightnvm: pblk: propagate errors when reading meta
+>>    lightnvm: pblk: recover only written metadata
+>>    lightnvm: pblk: wait for inflight IOs in recovery
+>>    lightnvm: pblk: remove internal IO timeout
+>>    lightnvm: pblk: store multiple copies of smeta
+>>    lightnvm: pblk: GC error handling
+>>    lightnvm: pblk: use nvm_rq_to_ppa_list()
+>>    lightnvm: track inflight target creations
+>>
+>>   drivers/lightnvm/core.c          |  19 ++-
+>>   drivers/lightnvm/pblk-cache.c    |   8 +-
+>>   drivers/lightnvm/pblk-core.c     | 179 +++++++++++++++++----
+>>   drivers/lightnvm/pblk-gc.c       |   5 +-
+>>   drivers/lightnvm/pblk-init.c     |  37 +++--
+>>   drivers/lightnvm/pblk-read.c     | 336 +++++++++++----------------------------
+>>   drivers/lightnvm/pblk-recovery.c |  69 ++++----
+>>   drivers/lightnvm/pblk-rl.c       |   3 +-
+>>   drivers/lightnvm/pblk.h          |  31 ++--
+>>   include/linux/lightnvm.h         |   2 +
+>>   10 files changed, 343 insertions(+), 346 deletions(-)
+>>
+>> --
+>> 2.9.5
+>>
