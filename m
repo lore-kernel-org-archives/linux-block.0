@@ -2,156 +2,115 @@ Return-Path: <SRS0=t+Ub=SH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E132CC4360F
-	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 15:25:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 176F6C4360F
+	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 16:04:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A37EE2186A
-	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 15:25:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="B9F7w/ct"
+	by mail.kernel.org (Postfix) with ESMTP id E5ADE2175B
+	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 16:04:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731416AbfDEPZD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Apr 2019 11:25:03 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:44129 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730554AbfDEPZD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Apr 2019 11:25:03 -0400
-Received: by mail-io1-f66.google.com with SMTP id u12so5274203iop.11
-        for <linux-block@vger.kernel.org>; Fri, 05 Apr 2019 08:25:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=d+z5Ury4MY0ac4auTRYPYh1QWeB/5PQnmPHd/oEN7ms=;
-        b=B9F7w/ctSBqay+MUx71pBnnkxSDQgKs0BuiV88hB4eR/WYA/WFKmwHiBt2UOZP4sEa
-         uqlTx9sS8c1gMoSqnme9ayfnTZ6evCeDal2ZLBC7gNf/qmbctAA4MXsYldOhnMZxCzbq
-         0b6xVsjuPmt9J0E5iHJwgy9BVdQeUYRqTyTXNGL6CNW9/Y+BfzRwwPd6SrGEs5ARe+1F
-         JLM8XZT0OfLU9u18GDIEBrJdaR5b248kXESuJUBGLou9Y1DY+grflTucxoOvT9lNHL5m
-         dF2atgM6TmDBt6zWxXsHzwM8wiSR/pmm8MPNgoZGyXAZOIFi8HFcoeMSm1h0BwnVPOp7
-         3G2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=d+z5Ury4MY0ac4auTRYPYh1QWeB/5PQnmPHd/oEN7ms=;
-        b=lYeTouxKI3f1eHjE+i7atNxVnHi2Nyz3UEJyMAQubEcM6GN3VtEFws3iuZS5zmAHsd
-         5w3llfGdxKIQzriud5VYlfISSTc6hGgt4fGvszhEnCgfd2q4lV1/soBDFQxG1JqgtOCf
-         Ijy4AbtG69OgG/BUdu2gav0VTpXOIJW52Vh9jwuqXtU1OfEQuZ2zbKLTHNUusGacatcZ
-         JmjvvKaa6fdAMfTp8QX8Gm1ene/mvBlW45tu232kSBr2yICQjK1FzkNknRo5ezKD3iQZ
-         P74+ZY83O7im1KS+ZmQuYgIp2A1JnhTs9YcnhOXp1OAxFUyUi0afUZf+VW3J61KwPjLm
-         8Hzg==
-X-Gm-Message-State: APjAAAWMoZOX+jFyqIEEQKlUSHkcEnQ37+7Gzfbk8vs6BcYeCR2OdMGx
-        ib8Nx1OXxHC5OeAyOvTZdN6OYrfEe+44Mw==
-X-Google-Smtp-Source: APXvYqxwhcwsbdAL/0fvDYrp9DqR+I3/M0tUpbmmekRWSzwpouoqPgf1wVwczoyeQYCwAwkMTPnbTw==
-X-Received: by 2002:a5d:8248:: with SMTP id n8mr4043295ioo.125.1554477901927;
-        Fri, 05 Apr 2019 08:25:01 -0700 (PDT)
-Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id s5sm8732259iog.34.2019.04.05.08.25.00
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Apr 2019 08:25:00 -0700 (PDT)
-Subject: Re: [PATCH] paride/pcd: Fix potential NULL pointer dereference and
- mem leak
-To:     Yue Haibing <yuehaibing@huawei.com>, tim@cyberelk.net,
-        rdunlap@infradead.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-References: <20190405021458.29872-1-yuehaibing@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <4084a000-3557-ff84-ef37-ed68ff6822e2@kernel.dk>
-Date:   Fri, 5 Apr 2019 09:24:59 -0600
+        id S1726730AbfDEQEX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Apr 2019 12:04:23 -0400
+Received: from mx2.suse.de ([195.135.220.15]:44290 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726135AbfDEQEW (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Apr 2019 12:04:22 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 5BBC2AF47;
+        Fri,  5 Apr 2019 16:04:20 +0000 (UTC)
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@osandov.com>,
+        linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-btrfs <linux-btrfs@vger.kernel.org>
+From:   Nikolay Borisov <nborisov@suse.com>
+Subject: Possible bio merging breakage in mp bio rework
+Openpgp: preference=signencrypt
+Autocrypt: addr=nborisov@suse.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <59c19acf-999f-1911-b0b8-1a5cec8116c5@suse.com>
+Date:   Fri, 5 Apr 2019 19:04:18 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190405021458.29872-1-yuehaibing@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gNC80LzE5IDg6MTQgUE0sIFl1ZSBIYWliaW5nIHdyb3RlOg0KPiBGcm9tOiBZdWVIYWli
-aW5nIDx5dWVoYWliaW5nQGh1YXdlaS5jb20+DQo+IA0KPiBTeXprYWxsZXIgcmVwb3J0IHRo
-aXM6DQo+IA0KPiBwY2Q6IHBjZCB2ZXJzaW9uIDEuMDcsIG1ham9yIDQ2LCBuaWNlIDANCj4g
-cGNkMDogQXV0b3Byb2JlIGZhaWxlZA0KPiBwY2Q6IE5vIENELVJPTSBkcml2ZSBmb3VuZA0K
-PiBrYXNhbjogQ09ORklHX0tBU0FOX0lOTElORSBlbmFibGVkDQo+IGthc2FuOiBHUEYgY291
-bGQgYmUgY2F1c2VkIGJ5IE5VTEwtcHRyIGRlcmVmIG9yIHVzZXIgbWVtb3J5IGFjY2Vzcw0K
-PiBnZW5lcmFsIHByb3RlY3Rpb24gZmF1bHQ6IDAwMDAgWyMxXSBTTVAgS0FTQU4gUFRJDQo+
-IENQVTogMSBQSUQ6IDQ1MjUgQ29tbTogc3l6LWV4ZWN1dG9yLjAgTm90IHRhaW50ZWQgNS4x
-LjAtcmMzKyAjOA0KPiBIYXJkd2FyZSBuYW1lOiBRRU1VIFN0YW5kYXJkIFBDIChpNDQwRlgg
-KyBQSUlYLCAxOTk2KSwgQklPUyAxLjEwLjItMXVidW50dTEgMDQvMDEvMjAxNA0KPiBSSVA6
-IDAwMTA6cGNkX2luaXQrMHg5NWMvMHgxMDAwIFtwY2RdDQo+IENvZGU6IGM0IGFiIGY3IDQ4
-IDg5IGQ4IDQ4IGMxIGU4IDAzIDgwIDNjIDI4IDAwIDc0IDA4IDQ4IDg5IGRmIGU4IDU2IGEz
-IGRhIGY3IDRjIDhiIDIzIDQ5IDhkIGJjIDI0IDgwIDA1IDAwIDAwIDQ4IDg5IGY4IDQ4IGMx
-IGU4IDAzIDw4MD4gM2MgMjggMDAgNzQgMDUgZTggMzkgYTMgZGEgZjcgNDkgOGIgYmMgMjQg
-ODAgMDUgMDAgMDAgZTggY2MgYjINCj4gUlNQOiAwMDE4OmZmZmY4ODgxZTg0ZGY4ODAgRUZM
-QUdTOiAwMDAxMDIwMg0KPiBSQVg6IDAwMDAwMDAwMDAwMDAwYjAgUkJYOiBmZmZmZmZmZmMx
-NTVhMDg4IFJDWDogZmZmZmZmZmZjMTUwODkzNQ0KPiBSRFg6IDAwMDAwMDAwMDAwNDAwMDAg
-UlNJOiBmZmZmYzkwMDAxNGYwMDAwIFJESTogMDAwMDAwMDAwMDAwMDU4MA0KPiBSQlA6IGRm
-ZmZmYzAwMDAwMDAwMDAgUjA4OiBmZmZmZWQxMDNlZTY1OGI4IFIwOTogZmZmZmVkMTAzZWU2
-NThiOA0KPiBSMTA6IDAwMDAwMDAwMDAwMDAwMDEgUjExOiBmZmZmZWQxMDNlZTY1OGI3IFIx
-MjogMDAwMDAwMDAwMDAwMDAwMA0KPiBSMTM6IGZmZmZmZmZmYzE1NWE3NzggUjE0OiBmZmZm
-ZmZmZmMxNTVhNGE4IFIxNTogMDAwMDAwMDAwMDAwMDAwMw0KPiBGUzogIDAwMDA3ZmU3MWJl
-ZTM3MDAoMDAwMCkgR1M6ZmZmZjg4ODFmNzMwMDAwMCgwMDAwKSBrbmxHUzowMDAwMDAwMDAw
-MDAwMDAwDQo+IENTOiAgMDAxMCBEUzogMDAwMCBFUzogMDAwMCBDUjA6IDAwMDAwMDAwODAw
-NTAwMzMNCj4gQ1IyOiAwMDAwNTVhNzMzNDQ0MWE4IENSMzogMDAwMDAwMDFlOTY3NDAwMyBD
-UjQ6IDAwMDAwMDAwMDA3NjA2ZTANCj4gRFIwOiAwMDAwMDAwMDAwMDAwMDAwIERSMTogMDAw
-MDAwMDAwMDAwMDAwMCBEUjI6IDAwMDAwMDAwMDAwMDAwMDANCj4gRFIzOiAwMDAwMDAwMDAw
-MDAwMDAwIERSNjogMDAwMDAwMDBmZmZlMGZmMCBEUjc6IDAwMDAwMDAwMDAwMDA0MDANCj4g
-UEtSVTogNTU1NTU1NTQNCj4gQ2FsbCBUcmFjZToNCj4gID8gMHhmZmZmZmZmZmMxNTA4MDAw
-DQo+ICA/IDB4ZmZmZmZmZmZjMTUwODAwMA0KPiAgZG9fb25lX2luaXRjYWxsKzB4YmMvMHg0
-N2QgaW5pdC9tYWluLmM6OTAxDQo+ICBkb19pbml0X21vZHVsZSsweDFiNS8weDU0NyBrZXJu
-ZWwvbW9kdWxlLmM6MzQ1Ng0KPiAgbG9hZF9tb2R1bGUrMHg2NDA1LzB4OGMxMCBrZXJuZWwv
-bW9kdWxlLmM6MzgwNA0KPiAgX19kb19zeXNfZmluaXRfbW9kdWxlKzB4MTYyLzB4MTkwIGtl
-cm5lbC9tb2R1bGUuYzozODk4DQo+ICBkb19zeXNjYWxsXzY0KzB4OWYvMHg0NTAgYXJjaC94
-ODYvZW50cnkvY29tbW9uLmM6MjkwDQo+ICBlbnRyeV9TWVNDQUxMXzY0X2FmdGVyX2h3ZnJh
-bWUrMHg0OS8weGJlDQo+IFJJUDogMDAzMzoweDQ2MmU5OQ0KPiBDb2RlOiBmNyBkOCA2NCA4
-OSAwMiBiOCBmZiBmZiBmZiBmZiBjMyA2NiAwZiAxZiA0NCAwMCAwMCA0OCA4OSBmOCA0OCA4
-OSBmNyA0OCA4OSBkNiA0OCA4OSBjYSA0ZCA4OSBjMiA0ZCA4OSBjOCA0YyA4YiA0YyAyNCAw
-OCAwZiAwNSA8NDg+IDNkIDAxIGYwIGZmIGZmIDczIDAxIGMzIDQ4IGM3IGMxIGJjIGZmIGZm
-IGZmIGY3IGQ4IDY0IDg5IDAxIDQ4DQo+IFJTUDogMDAyYjowMDAwN2ZlNzFiZWUyYzU4IEVG
-TEFHUzogMDAwMDAyNDYgT1JJR19SQVg6IDAwMDAwMDAwMDAwMDAxMzkNCj4gUkFYOiBmZmZm
-ZmZmZmZmZmZmZmRhIFJCWDogMDAwMDAwMDAwMDczYmYwMCBSQ1g6IDAwMDAwMDAwMDA0NjJl
-OTkNCj4gUkRYOiAwMDAwMDAwMDAwMDAwMDAwIFJTSTogMDAwMDAwMDAyMDAwMDE4MCBSREk6
-IDAwMDAwMDAwMDAwMDAwMDMNCj4gUkJQOiAwMDAwN2ZlNzFiZWUyYzcwIFIwODogMDAwMDAw
-MDAwMDAwMDAwMCBSMDk6IDAwMDAwMDAwMDAwMDAwMDANCj4gUjEwOiAwMDAwMDAwMDAwMDAw
-MDAwIFIxMTogMDAwMDAwMDAwMDAwMDI0NiBSMTI6IDAwMDA3ZmU3MWJlZTM2YmMNCj4gUjEz
-OiAwMDAwMDAwMDAwNGJjZWZhIFIxNDogMDAwMDAwMDAwMDZmNmZiMCBSMTU6IDAwMDAwMDAw
-MDAwMDAwMDQNCj4gTW9kdWxlcyBsaW5rZWQgaW46IHBjZCgrKSBwYXJpZGUgc29sb3NfcGNp
-IGF0bSB0c19mc20gcnRjX210NjM5NyBtYWM4MDIxMSBuaGNfbW9iaWxpdHkgbmhjX3VkcCBu
-aGNfaXB2NiBuaGNfaG9wIG5oY19kZXN0IG5oY19mcmFnbWVudCBuaGNfcm91dGluZyA2bG93
-cGFuIHJ0Y19jcm9zX2VjIG1lbWNvbnNvbGUgaW50ZWxfeGhjaV91c2Jfcm9sZV9zd2l0Y2gg
-cm9sZXMgcnRjX3dtODM1MCB1c2Jjb3JlIGluZHVzdHJpYWxpb190cmlnZ2VyZWRfYnVmZmVy
-IGtmaWZvX2J1ZiBpbmR1c3RyaWFsaW8gYXNjNzYyMSBkbV9lcmEgZG1fcGVyc2lzdGVudF9k
-YXRhIGRtX2J1ZmlvIGRtX21vZCB0cG0gZ25zc191YnggZ25zc19zZXJpYWwgc2VyZGV2IGdu
-c3MgbWF4MjE2NSBjcHVmcmVxX2R0IGhpZF9wZW5tb3VudCBoaWQgbWVuZjIxYm1jX3dkdCBy
-Y19jb3JlIG5fdHJhY2VzaW5rIGlkZV9nZF9tb2QgY2Ruc19jc2kydHggdjRsMl9md25vZGUg
-dmlkZW9kZXYgbWVkaWEgcGluY3RybF9sZXdpc2J1cmcgcGluY3RybF9pbnRlbCBpcHRhYmxl
-X3NlY3VyaXR5IGlwdGFibGVfcmF3IGlwdGFibGVfbWFuZ2xlIGlwdGFibGVfbmF0IG5mX25h
-dCBuZl9jb25udHJhY2sgbmZfZGVmcmFnX2lwdjYgbmZfZGVmcmFnX2lwdjQgaXB0YWJsZV9m
-aWx0ZXIgYnBmaWx0ZXIgaXA2X3Z0aSBpcF92dGkgaXBfZ3JlIGlwaXAgc2l0IHR1bm5lbDQg
-aXBfdHVubmVsIGhzciB2ZXRoIG5ldGRldnNpbSB2eGNhbiBiYXRtYW5fYWR2IGNmZzgwMjEx
-IHJma2lsbCBjaG5sX25ldCBjYWlmIG5sbW9uIGR1bW15IHRlYW0gYm9uZGluZyB2Y2FuIGJy
-aWRnZSBzdHAgbGxjIGlwNl9ncmUgZ3JlIGlwNl90dW5uZWwgdHVubmVsNiB0dW4gam95ZGV2
-IG1vdXNlZGV2IHBwZGV2IGt2bV9pbnRlbCBrdm0gaXJxYnlwYXNzIGNyY3QxMGRpZl9wY2xt
-dWwgY3JjMzJfcGNsbXVsIGNyYzMyY19pbnRlbCBnaGFzaF9jbG11bG5pX2ludGVsIGFlc25p
-X2ludGVsIGFlc194ODZfNjQgY3J5cHRvX3NpbWQNCj4gIGlkZV9wY2lfZ2VuZXJpYyBwaWl4
-IGlucHV0X2xlZHMgY3J5cHRkIGdsdWVfaGVscGVyIHBzbW91c2UgaWRlX2NvcmUgaW50ZWxf
-YWdwIHNlcmlvX3JhdyBpbnRlbF9ndHQgYXRhX2dlbmVyaWMgaTJjX3BpaXg0IGFncGdhcnQg
-cGF0YV9hY3BpIHBhcnBvcnRfcGMgcGFycG9ydCBmbG9wcHkgcnRjX2Ntb3Mgc2NoX2ZxX2Nv
-ZGVsIGlwX3RhYmxlcyB4X3RhYmxlcyBzaGExX3Nzc2UzIHNoYTFfZ2VuZXJpYyBpcHY2IFts
-YXN0IHVubG9hZGVkOiBibWMxNTBfbWFnbl0NCj4gRHVtcGluZyBmdHJhY2UgYnVmZmVyOg0K
-PiAgICAoZnRyYWNlIGJ1ZmZlciBlbXB0eSkNCj4gLS0tWyBlbmQgdHJhY2UgZDg3MzY5MWMz
-Y2Q2OWY1NiBdLS0tDQo+IA0KPiBJZiBhbGxvY19kaXNrIGZhaWxzIGluIHBjZF9pbml0X3Vu
-aXRzLCBjZC0+ZGlzayB3aWxsIGJlDQo+IE5VTEwsIGhvd2V2ZXIgaW4gcGNkX2RldGVjdCBh
-bmQgcGNkX2V4aXQsIGl0J3Mgbm90IGNoZWNrDQo+IHRoaXMgYmVmb3JlIGZyZWUuSXQgbWF5
-IHJlc3VsdCBhIE5VTEwgcG9pbnRlciBkZXJlZmVyZW5jZS4NCj4gDQo+IEFsc28gd2hlbiBy
-ZWdpc3Rlcl9ibGtkZXYgZmFpbGVkLCBibGtfY2xlYW51cF9xdWV1ZSgpIGFuZA0KPiBibGtf
-bXFfZnJlZV90YWdfc2V0KCkgc2hvdWxkIGJlIGNhbGxlZCB0byBmcmVlIHJlc291cmNlcy4N
-Cg0KQXBwbGllZCwgdGhhbmtzLiBOb3Qgc3VycHJpc2luZyBzaW5jZSBwZiB3YXMgYnJva2Vu
-IGFzIHdlbGwuDQoNCi0tIA0KSmVucyBBeGJvZQ0KDQo=
+Hello Ming, 
+
+Following the mp biovec rework what is the maximum 
+data that a bio could contain? Should it be PAGE_SIZE * bio_vec 
+or something else? Currently I can see bios as large as 127 megs 
+on sequential workloads, I got prompted to this since btrfs has a 
+memory allocation that is dependent on the data in the bio and this 
+particular memory allocation started failing with order 6 allocs. 
+Further debugging showed that with the following xfs_io command line: 
+
+
+xfs_io -f -c "pwrite -S 0x61 -b 4m 0 10g" /media/scratch/file1
+
+I can easily see very large bios: 
+
+[  188.366540] kworker/-7       3.... 34847519us : btrfs_submit_bio_hook: bio: ffff8dffe9940bb0 bi_iter.bi_size = 134184960 bi_vcn: 28 bi_vcnt_max: 256
+[  188.367129] kworker/-658     2.... 34946536us : btrfs_submit_bio_hook: bio: ffff8dffe9940370 bi_iter.bi_size = 134246400 bi_vcn: 28 bi_vcnt_max: 256
+[  188.367714] kworker/-7       3.... 35107967us : btrfs_submit_bio_hook: bio: ffff8dffe9940bb0 bi_iter.bi_size = 134184960 bi_vcn: 30 bi_vcnt_max: 256
+[  188.368319] kworker/-658     2.... 35229894us : btrfs_submit_bio_hook: bio: ffff8dffe9940370 bi_iter.bi_size = 134246400 bi_vcn: 32 bi_vcnt_max: 256
+[  188.368909] kworker/-7       3.... 35374809us : btrfs_submit_bio_hook: bio: ffff8dffe9940bb0 bi_iter.bi_size = 134184960 bi_vcn: 25 bi_vcnt_max: 256
+[  188.369498] kworker/-658     2.... 35516194us : btrfs_submit_bio_hook: bio: ffff8dffe9940370 bi_iter.bi_size = 134246400 bi_vcn: 31 bi_vcnt_max: 256
+[  188.370086] kworker/-7       3.... 35663669us : btrfs_submit_bio_hook: bio: ffff8dffe9940bb0 bi_iter.bi_size = 134184960 bi_vcn: 32 bi_vcnt_max: 256
+[  188.370696] kworker/-658     2.... 35791006us : btrfs_submit_bio_hook: bio: ffff8dffe9940370 bi_iter.bi_size = 100655104 bi_vcn: 24 bi_vcnt_max: 256
+[  188.371335] kworker/-658     2.... 35816114us : btrfs_submit_bio_hook: bio: ffff8dffe99434f0 bi_iter.bi_size = 33591296 bi_vcn: 5 bi_vcnt_max: 256
+
+
+So that's 127 megs in a single bio? This stems from the new merging logic. 
+07173c3ec276 ("block: enable multipage bvecs") made it so that physically 
+contiguous pages added to the bio would just modify bi_iter.bi_size and the 
+initial page's bio_vec's bv_len. There's no longer the 
+page == bv->bv_page portion of the check. 
