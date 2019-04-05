@@ -2,155 +2,105 @@ Return-Path: <SRS0=t+Ub=SH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E5D0C282CE
-	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 22:45:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AC71C282CE
+	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 22:59:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 559AA2171F
-	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 22:45:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uV5MvX+o"
+	by mail.kernel.org (Postfix) with ESMTP id ED7172175B
+	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 22:59:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726124AbfDEWpC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Apr 2019 18:45:02 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:34704 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725973AbfDEWpC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Apr 2019 18:45:02 -0400
-Received: by mail-pl1-f193.google.com with SMTP id y6so3780033plt.1;
-        Fri, 05 Apr 2019 15:45:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=aWEecOU3ZLSpruRw1eiZyJO4itUOhyN98xsznH722UA=;
-        b=uV5MvX+ounc9QDg4AN2thG1LOUs6R9PPGD7NB2eY446G3H+GRwcx4eaJw9YUUyW2JB
-         35yifCkMqN77NqWiW4aujPKxplibGVFnk65ubaRgjGK37aoKJLdhtTpkGF+sAGGhn7Zj
-         wYRe7OSF7OpQFSdbgnYDJzaSEkFcLS94V0dRw2zUw+bv8bFlaEkdorHXA6FwdFMXfgFs
-         2uJNgoiDytA+c5e6a29NLo6KUccar12jFd+RZ1vtDVD7U164W9NS4rkIHBvoZWXqSglV
-         ikWZ11GmaRaWaDh9A+sPdcAzsATEm3l3oWYbnixjeoX/3Hr0N91xczf2ddFg3rErSOCx
-         RwtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=aWEecOU3ZLSpruRw1eiZyJO4itUOhyN98xsznH722UA=;
-        b=o4AdLloaft7PKRRHAqRNPZWAYTjKyRdLhzha6xe6Ysl1rO43W8RK+/3FaM9TZ4/BDW
-         eiJimiwI+0Rgikc3ozRGEJ2oHZ3cmNc5qi0WD6PxZ9kFFgMjnqy4RRDsLhA3sa4wxCRG
-         n30xQiA8OFSHss+9uJg9lA0dQdbvWjPXi6+rbZmz9TRMg39BLhN+o6zJYWJGeSgy7PrK
-         Gol2/2km/A4SfE1gGEY+XdqkvmsdJ0D9nHnwdndZyvO82FG1FgYi3LM9xdvXIOr+KFHz
-         DhztH8nlyXxBOye1+GO1XVk2Mt4D/gsSl1XwSs7fdhCIJ1+tbpV7Jkkh6iYo9texrbMG
-         62kA==
-X-Gm-Message-State: APjAAAUlauN/D7neZoKoAdPlk+VLmDv0KE3CYPM2iVx/XDGGsTSP4fyv
-        LT6UqAn492uiqOn2Meg5CnjF1tdj
-X-Google-Smtp-Source: APXvYqy6EF7mgWkAk54FFi86v2T2k5ihXgjErgXquERF/kqyDItWyXbdLzLXG/U+3J0C+U+WlV8QPQ==
-X-Received: by 2002:a17:902:9a83:: with SMTP id w3mr15873502plp.241.1554504301077;
-        Fri, 05 Apr 2019 15:45:01 -0700 (PDT)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id 20sm30910819pfn.131.2019.04.05.15.44.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Apr 2019 15:44:59 -0700 (PDT)
-Date:   Fri, 5 Apr 2019 15:44:58 -0700
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     Michal Simek <michal.simek@xilinx.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] xsysace: Fix error handling in ace_setup
-Message-ID: <20190405224458.GA19556@roeck-us.net>
-References: <1550594996-11453-1-git-send-email-linux@roeck-us.net>
+        id S1726218AbfDEW7d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Apr 2019 18:59:33 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54908 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725973AbfDEW7d (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Apr 2019 18:59:33 -0400
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id E11A159444;
+        Fri,  5 Apr 2019 22:59:32 +0000 (UTC)
+Received: from localhost (unknown [10.18.25.174])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5EF9C648BE;
+        Fri,  5 Apr 2019 22:59:30 +0000 (UTC)
+Date:   Fri, 5 Apr 2019 18:59:29 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        YueHaibing <yuehaibing@huawei.com>
+Subject: [git pull] device mapper fixes for 5.1-rc4
+Message-ID: <20190405225928.GB26473@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1550594996-11453-1-git-send-email-linux@roeck-us.net>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.39]); Fri, 05 Apr 2019 22:59:33 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+Hi Linus,
 
-On Tue, Feb 19, 2019 at 08:49:56AM -0800, Guenter Roeck wrote:
-> If xace hardware reports a bad version number, the error handling code
-> in ace_setup() calls put_disk(), followed by queue cleanup. However, since
-> the disk data structure has the queue pointer set, put_disk() also
-> cleans and releases the queue. This results in blk_cleanup_queue()
-> accessing an already released data structure, which in turn may result
-> in a crash such as the following.
-> 
+The following changes since commit 79a3aaa7b82e3106be97842dedfd8429248896e6:
 
-This crash is now quite persistent in mainline. The fix didn't make it.
-Should I stop testing virtex-ml507 with qemu ?
+  Linux 5.1-rc3 (2019-03-31 14:39:29 -0700)
 
-Guenter
+are available in the Git repository at:
 
-> [   10.681671] BUG: Kernel NULL pointer dereference at 0x00000040
-> [   10.681826] Faulting instruction address: 0xc0431480
-> [   10.682072] Oops: Kernel access of bad area, sig: 11 [#1]
-> [   10.682251] BE PAGE_SIZE=4K PREEMPT Xilinx Virtex440
-> [   10.682387] Modules linked in:
-> [   10.682528] CPU: 0 PID: 1 Comm: swapper Tainted: G        W         5.0.0-rc6-next-20190218+ #2
-> [   10.682733] NIP:  c0431480 LR: c043147c CTR: c0422ad8
-> [   10.682863] REGS: cf82fbe0 TRAP: 0300   Tainted: G        W          (5.0.0-rc6-next-20190218+)
-> [   10.683065] MSR:  00029000 <CE,EE,ME>  CR: 22000222  XER: 00000000
-> [   10.683236] DEAR: 00000040 ESR: 00000000
-> [   10.683236] GPR00: c043147c cf82fc90 cf82ccc0 00000000 00000000 00000000 00000002 00000000
-> [   10.683236] GPR08: 00000000 00000000 c04310bc 00000000 22000222 00000000 c0002c54 00000000
-> [   10.683236] GPR16: 00000000 00000001 c09aa39c c09021b0 c09021dc 00000007 c0a68c08 00000000
-> [   10.683236] GPR24: 00000001 ced6d400 ced6dcf0 c0815d9c 00000000 00000000 00000000 cedf0800
-> [   10.684331] NIP [c0431480] blk_mq_run_hw_queue+0x28/0x114
-> [   10.684473] LR [c043147c] blk_mq_run_hw_queue+0x24/0x114
-> [   10.684602] Call Trace:
-> [   10.684671] [cf82fc90] [c043147c] blk_mq_run_hw_queue+0x24/0x114 (unreliable)
-> [   10.684854] [cf82fcc0] [c04315bc] blk_mq_run_hw_queues+0x50/0x7c
-> [   10.685002] [cf82fce0] [c0422b24] blk_set_queue_dying+0x30/0x68
-> [   10.685154] [cf82fcf0] [c0423ec0] blk_cleanup_queue+0x34/0x14c
-> [   10.685306] [cf82fd10] [c054d73c] ace_probe+0x3dc/0x508
-> [   10.685445] [cf82fd50] [c052d740] platform_drv_probe+0x4c/0xb8
-> [   10.685592] [cf82fd70] [c052abb0] really_probe+0x20c/0x32c
-> [   10.685728] [cf82fda0] [c052ae58] driver_probe_device+0x68/0x464
-> [   10.685877] [cf82fdc0] [c052b500] device_driver_attach+0xb4/0xe4
-> [   10.686024] [cf82fde0] [c052b5dc] __driver_attach+0xac/0xfc
-> [   10.686161] [cf82fe00] [c0528428] bus_for_each_dev+0x80/0xc0
-> [   10.686314] [cf82fe30] [c0529b3c] bus_add_driver+0x144/0x234
-> [   10.686457] [cf82fe50] [c052c46c] driver_register+0x88/0x15c
-> [   10.686610] [cf82fe60] [c09de288] ace_init+0x4c/0xac
-> [   10.686742] [cf82fe80] [c0002730] do_one_initcall+0xac/0x330
-> [   10.686888] [cf82fee0] [c09aafd0] kernel_init_freeable+0x34c/0x478
-> [   10.687043] [cf82ff30] [c0002c6c] kernel_init+0x18/0x114
-> [   10.687188] [cf82ff40] [c000f2f0] ret_from_kernel_thread+0x14/0x1c
-> [   10.687349] Instruction dump:
-> [   10.687435] 3863ffd4 4bfffd70 9421ffd0 7c0802a6 93c10028 7c9e2378 93e1002c 38810008
-> [   10.687637] 7c7f1b78 90010034 4bfffc25 813f008c <81290040> 75290100 4182002c 80810008
-> [   10.688056] ---[ end trace 13c9ff51d41b9d40 ]---
-> 
-> Fix the problem by setting the disk queue pointer to NULL before calling
-> put_disk(). A more comprehensive fix might be to rearrange the code
-> to check the hardware version before initializing data structures,
-> but I don't know if this would have undesirable side effects, and
-> it would increase the complexity of backporting the fix to older kernels.
-> 
-> Fixes: 74489a91dd43a ("Add support for Xilinx SystemACE CompactFlash interface")
-> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-> Acked-by: Michal Simek <michal.simek@xilinx.com>
-> ---
->  drivers/block/xsysace.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/block/xsysace.c b/drivers/block/xsysace.c
-> index 87ccef4bd69e..32a21b8d1d85 100644
-> --- a/drivers/block/xsysace.c
-> +++ b/drivers/block/xsysace.c
-> @@ -1090,6 +1090,8 @@ static int ace_setup(struct ace_device *ace)
->  	return 0;
->  
->  err_read:
-> +	/* prevent double queue cleanup */
-> +	ace->gd->queue = NULL;
->  	put_disk(ace->gd);
->  err_alloc_disk:
->  	blk_cleanup_queue(ace->queue);
+  git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.1/dm-fixes
+
+for you to fetch changes up to 4ed319c6ac08e9a28fca7ac188181ac122f4de84:
+
+  dm integrity: fix deadlock with overlapping I/O (2019-04-05 18:49:08 -0400)
+
+Please pull, thanks.
+Mike
+
+----------------------------------------------------------------
+- Two queue_limits stacking fixes: disable discards if underlying driver
+  does.  And propagate BDI_CAP_STABLE_WRITES to fix sporadic checksum
+  errors.
+
+- Fix that reverts a DM core limit that wasn't needed given that
+  dm-crypt was already updated to impose an equivalent limit.
+
+- Fix dm-init to properly establish 'const' for __initconst array.
+
+- Fix deadlock in DM integrity target that occurs when overlapping IO is
+  being issued to it.  And two smaller fixes to the DM integrity target.
+
+----------------------------------------------------------------
+Andi Kleen (1):
+      dm init: fix const confusion for dm_allowed_targets array
+
+Ilya Dryomov (1):
+      dm table: propagate BDI_CAP_STABLE_WRITES to fix sporadic checksum errors
+
+Mike Snitzer (1):
+      dm: disable DISCARD if the underlying storage no longer supports it
+
+Mikulas Patocka (3):
+      dm integrity: change memcmp to strncmp in dm_integrity_ctr
+      dm: revert 8f50e358153d ("dm: limit the max bio size as BIO_MAX_PAGES * PAGE_SIZE")
+      dm integrity: fix deadlock with overlapping I/O
+
+YueHaibing (1):
+      dm integrity: make dm_integrity_init and dm_integrity_exit static
+
+ drivers/md/dm-core.h      |  1 +
+ drivers/md/dm-init.c      |  2 +-
+ drivers/md/dm-integrity.c | 16 +++++++---------
+ drivers/md/dm-rq.c        | 11 +++++++----
+ drivers/md/dm-table.c     | 39 +++++++++++++++++++++++++++++++++++++++
+ drivers/md/dm.c           | 30 +++++++++++++++++-------------
+ 6 files changed, 72 insertions(+), 27 deletions(-)
