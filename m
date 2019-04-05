@@ -6,76 +6,66 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FF75C282CE
-	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 17:59:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 429D7C282CE
+	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 18:01:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 18E8D2146F
-	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 17:59:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0EB4F2146F
+	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 18:01:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="HPQAw1kn"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="J4QopgTz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731183AbfDER7m (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Apr 2019 13:59:42 -0400
-Received: from mail-it1-f194.google.com ([209.85.166.194]:54051 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728683AbfDER7m (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Apr 2019 13:59:42 -0400
-Received: by mail-it1-f194.google.com with SMTP id y204so10835380itf.3
-        for <linux-block@vger.kernel.org>; Fri, 05 Apr 2019 10:59:41 -0700 (PDT)
+        id S1731648AbfDESBB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Apr 2019 14:01:01 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:37319 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731183AbfDESBB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Apr 2019 14:01:01 -0400
+Received: by mail-io1-f66.google.com with SMTP id x7so5741054ioh.4
+        for <linux-block@vger.kernel.org>; Fri, 05 Apr 2019 11:01:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20150623.gappssmtp.com; s=20150623;
         h=subject:to:cc:references:from:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=XDfJotbVMoiW5ope76ksKwkqSMr67TpKxT+aX1WjESw=;
-        b=HPQAw1knA7FTaW7tFZNg7Visr0mVxGy+a/YM2Lta9ut9xYSAdAEk4y1QBYe1ywlB6c
-         3nMGhSHjGLRyUR9rTiGG69/n6QkC5bIM6FNgifvmgvNeeR8SmHpe98lDKwGRRgbyR3Ah
-         jV/SeAvwA05jdeKdHFIoSgM+sqwju1mQ4/X6JXfOqFxPiEUKhvh8l3Ld40yWozkPofM7
-         MN9jVWzjM6brHHlzeGeJY3pl4cpXrAAdw1PVQY/dfWrMv/ia1RNKosATEYQs9WXOH7ef
-         9otVLizOZ9glWtfLIrrrO85+Pex/oC5aVO+MkA40d+cOBlURFvWapbdL1WcUbQAdTrJL
-         lePw==
+        bh=+NDSRx5h5x+TfG4bSns5PJZMQKSAxX5BnzBxZnj70YA=;
+        b=J4QopgTzxefhwc27/eqj1K3dY6iHaaoQO/ASitMuMh6EVkD0sXyXRB5nNmDKCBQYFr
+         Nn2vKbZRvJsVxYhhUfFb5AOSz7GKP8cTQLEy/83+95WMU2kUa93OF85HnYkIANozOfAH
+         ZernX9Exkqe39E2Mdn/8MFIk75JDuUU4D+aZFSzM7EGm/1grxd8dq5p6TafcvKc6xRsM
+         M3eDLrQIftbnM4r0bRsJSZ8uzMN+LRIjvmkjOheq0LKGE8Ezf9vsurWLs0izWWS9p8yP
+         uUbvVimaL/oYoKgWfm6MNz9k2p3jSy/2xPv0SteGRkrx+9GDxkMo10BubuYypLPrezB9
+         pNXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=XDfJotbVMoiW5ope76ksKwkqSMr67TpKxT+aX1WjESw=;
-        b=R4nsd+cMwe0bm+A+VF+779cj3isPeTIuSoo+FgMDos1hnbrNBIGEex1tW+goorDisr
-         xNiQUf0GTpWx6zj8utOCdkAmmIJyXfPu4yke3YvBHy98towl468kt14AN+OazGmoni7x
-         hb6L17zrn4K0Oo6pAAJcWsBFlj2NzmJxUYR3RZzDIV1mEGgFyvIout0dyx92FcFAbq08
-         bkHMPeqoeUW75I61oUURJzMuMq735NTTaZiWCvqLvkCUaoUu6xsUBw2laSbMErrjwKim
-         lT+YsLtbilIMjd5/gxHZERGjEURKqbgPdRR56h/Kp61KfSYxOKkIFSu8PrrFCG4lit1T
-         BWNQ==
-X-Gm-Message-State: APjAAAVQ7zSNZLxiSAfYoVUL4QkPHx2MZG2aMwaJAE++g6FvjW5LGGa7
-        yZYLGWZQNt4c2nCcF42GBQcEXQ==
-X-Google-Smtp-Source: APXvYqw+icLdC7W6Gv/TCUBYCFaxSHMoBehkuM5omDrEad3PxF/yMUjvQ1/fqudmipRgY3seEAOhPA==
-X-Received: by 2002:a02:8c59:: with SMTP id j25mr10666919jal.4.1554487181571;
-        Fri, 05 Apr 2019 10:59:41 -0700 (PDT)
+        bh=+NDSRx5h5x+TfG4bSns5PJZMQKSAxX5BnzBxZnj70YA=;
+        b=Uc2S6fsj1/HDs+i4ENJPF7/nbaaSR3wq52QmAvqHP+W0088Iyk9KN7QF0JVgz6QPDS
+         lDlqMlsHDHlfjg7kw43lhmJmsPYprDrLXak3efOMXiDCDPhABr3kz3wlMdwANl9HS9LG
+         NVntS3VLvqqOUG4gu4M4kI4iSNjXk/adVU1qavzdCzoZ7Q3kodmGWLzSPE0mh0aFeLoW
+         H0MNxZr20a0n6LKf3xKUf8L1rnc03zXWUU8djeoJfPH4T/CJF1LGMjsPJJwrprZjcuB+
+         SKM3I4i+ciMHdkk+3nuDOq7QLcRQQ9XpYeLhePSwH4IdoqYppDAQjgYQ/ISYYnRC0laB
+         MmWQ==
+X-Gm-Message-State: APjAAAWpogjXS09iewCrg6HGsKuR/YtcgQB0ZLQebuByhVqZ35agBqTw
+        3o5uhIprOLmPvqFE2QVVny2xpfows1+F+Q==
+X-Google-Smtp-Source: APXvYqzmtNedjjz8k8qBQ077Zig66RaX0gxWoW/oIoUNzCDkFe2YrA9adnsi82XWiCBNhqMO2HvCMQ==
+X-Received: by 2002:a6b:f419:: with SMTP id i25mr9107514iog.216.1554487260312;
+        Fri, 05 Apr 2019 11:01:00 -0700 (PDT)
 Received: from [192.168.1.158] ([216.160.245.98])
-        by smtp.gmail.com with ESMTPSA id l8sm1455959itl.26.2019.04.05.10.59.39
+        by smtp.gmail.com with ESMTPSA id q8sm8641376ioi.33.2019.04.05.11.00.58
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Apr 2019 10:59:39 -0700 (PDT)
-Subject: Re: [PATCH] block: Revert v5.0 blk_mq_request_issue_directly()
- changes
-To:     Bart Van Assche <bvanassche@acm.org>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        James Smart <james.smart@broadcom.com>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        Laurence Oberman <loberman@redhat.com>, stable@vger.kernel.org
-References: <20190404170843.83517-1-bvanassche@acm.org>
- <20190405060612.GA32144@lst.de>
- <fd4c63a9-6eaa-f104-6f33-0dfcd2dc6eba@acm.org>
+        Fri, 05 Apr 2019 11:00:58 -0700 (PDT)
+Subject: Re: [PATCH] block: remove CONFIG_LBDAF
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     torvalds@linuxfoundation.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20190405160859.5288-1-hch@lst.de>
 From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <58149bc4-1ece-dd50-4bfb-4e55306bf870@kernel.dk>
-Date:   Fri, 5 Apr 2019 11:59:38 -0600
+Message-ID: <802e6ae2-40b2-8f46-fe9f-1277bf55d50f@kernel.dk>
+Date:   Fri, 5 Apr 2019 12:00:57 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <fd4c63a9-6eaa-f104-6f33-0dfcd2dc6eba@acm.org>
+In-Reply-To: <20190405160859.5288-1-hch@lst.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -84,25 +74,21 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/5/19 8:00 AM, Bart Van Assche wrote:
-> On 4/4/19 11:06 PM, Christoph Hellwig wrote:
->> On Thu, Apr 04, 2019 at 10:08:43AM -0700, Bart Van Assche wrote:
->>> blk_mq_try_issue_directly() can return BLK_STS*_RESOURCE for requests that
->>> have been queued. If that happens when blk_mq_try_issue_directly() is called
->>> by the dm-mpath driver then dm-mpath will try to resubmit a request that is
->>> already queued and a kernel crash follows. Since it is nontrivial to fix
->>> blk_mq_request_issue_directly(), revert the blk_mq_request_issue_directly()
->>> changes that went into kernel v5.0.
->>
->> And what are we going to do about 5.1+?
+On 4/5/19 10:08 AM, Christoph Hellwig wrote:
+> Currently support for 64-bit sector_t and blkcnt_t is optional on 32-bit
+> architectures.  These types are required to support block device and/or
+> file sizes larger than 2 TiB, and have generally defaulted to on for
+> a long time.  Enabling the option only increases the i386 tinyconfig
+> size by 145 bytes, and many data structures already always use
+> 64-bit values for their in-core and on-disk data structures anyway,
+> so there should not be a large change in dynamic memory usage either.
 > 
-> Hi Christoph,
-> 
-> This patch was developed and tested on my setup against Jens' for-next 
-> branch. So this patch should apply fine on kernel v5.1-rc3.
+> Dropping this option removes a somewhat weird non-default config that
+> has cause various bugs or compiler warnings when actually used.
 
-I'm inclined to apply the bundled up version. It applies with a bit of
-help and merges cleanly between the 5.1 and 5.2 branches.
+I'm greatly in favor of this - but can we drop the defconfig changes?
+Not strictly needed, it's not like they will cause issues with the
+symbol still being there.
 
 -- 
 Jens Axboe
