@@ -2,66 +2,72 @@ Return-Path: <SRS0=t+Ub=SH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF8FCC10F00
-	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 14:00:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FB99C10F0F
+	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 15:10:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C65B821852
-	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 14:00:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2028821872
+	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 15:10:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="Z2ePWAeT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731425AbfDEOA2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Apr 2019 10:00:28 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:39688 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731424AbfDEOA0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Apr 2019 10:00:26 -0400
-Received: by mail-pg1-f196.google.com with SMTP id k3so3132292pga.6;
-        Fri, 05 Apr 2019 07:00:26 -0700 (PDT)
+        id S1729704AbfDEPKE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Apr 2019 11:10:04 -0400
+Received: from mail-it1-f193.google.com ([209.85.166.193]:56018 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726643AbfDEPKE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Apr 2019 11:10:04 -0400
+Received: by mail-it1-f193.google.com with SMTP id y134so3384092itc.5
+        for <linux-block@vger.kernel.org>; Fri, 05 Apr 2019 08:10:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Fiq/Ne+GSNud8oxLcwF/SogPF5XpwyQ406WIPTvS4Ig=;
+        b=Z2ePWAeT9Vt2KzOVcefw2HLztAy3f8C9dBYX3mcQBlQnTIZTCGmL3QDEF/QlkUgaqA
+         G7ZaTeZuuAMbGvkoREzldYxyZXX5RThQ0+fP+DjpNbiOt7lnOW1uXNmE6mccE6QKqugF
+         6mL0hEPEIeP1iL1DTgeRiJlylpX727i4MQcdeM+wI58DvCxEXrcUecYTSIDI8OSy6xoU
+         j+72+l10KUEGxeBX2pkXvnQp43qZ3petKSnv62l3ERzSBmu5Afkh+wOBXI+U80p9W4zM
+         U4a1BNcVnbNcElyL68VO+X1lNU4hfQ71W0tJQYZxLF62XFvLqEiVwAwdeTy7UhIFIiDa
+         eJ5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=GOYK0huQCxaBCXxS9kfbcTcQRYlnlZt8LC94WIpkZY8=;
-        b=J9vXKPm2lQYaznVYUEJYNMYE8BmcvcCmRWFc4/FxXT2odv079TjFvKuHwsAirGwa07
-         lFEiCZK1Zmx6XKXYW/OUzB1z82XSP7c6d+D4lmbnS0AV9ESIBhRDUsF8jw0Om/BOsWiB
-         3HJ45NFMY89ygU3JVh7ye1CydkshJfTU6MOforzKeUmMpjqQVEyRhmx2s6mVTU4qQXy9
-         AJT0owxyuJieUsPE69czOEtGppqAXBXEFToHpSXzxdZO7nF124Q4UB+hO4k3+LtM7Pvm
-         T+5aKjS7z9banY7sNwMst2VrWErtbkylDeSGqgezmTccLJ2cCfOltkim3fG6ncitMbKj
-         5wQQ==
-X-Gm-Message-State: APjAAAXzIEtDlLeeAPc7N8b2+pAC7D66OvA1N+503wuOs8wrvYpMxWti
-        CP2ZFTJb0OdwQPe0yT9uh8VY0ONmJq0=
-X-Google-Smtp-Source: APXvYqwZXfgV3JbaRPvsFqocR2ExEzhaH3XJYFc2HY9GsIrQtRTQ9qSRchuvGndy3jb1Du+dt/yquA==
-X-Received: by 2002:a63:6786:: with SMTP id b128mr12354481pgc.318.1554472825286;
-        Fri, 05 Apr 2019 07:00:25 -0700 (PDT)
-Received: from asus.site ([2601:647:4000:5dd1:a41e:80b4:deb3:fb66])
-        by smtp.gmail.com with ESMTPSA id y19sm30957206pfn.164.2019.04.05.07.00.23
+        bh=Fiq/Ne+GSNud8oxLcwF/SogPF5XpwyQ406WIPTvS4Ig=;
+        b=hSeloUSocjhlD+f8riyWR+PJbuyuzAJ0+Jxf8qJPk/rQzG4bpTi9MMMfLtjNXW2Pxd
+         oLCmUWIuGNG9amQvlq1ykS3T7VlIGw1WKTdunweWzS8UJf4tJGSCzMzUCxvCcRPWHbCn
+         z1Uk03IKpbMT8VXkilw2vtvNj/mn8oGqFTV1xe0+S3BNfIVVNNYcPG3vevl0YevYGoxr
+         A07ozJAonkpd/Ux2kmTODp5XYcKMDX0CQ7fvKecF4J5qUFSpgkDXA3D32ikJTHu2gtEq
+         fQvnYEEtLtrL8CwjbLb3H83+5OfkRIKooSk/crSTK7bjZId67g22tX7GEI7VcyW1ddh9
+         mIqg==
+X-Gm-Message-State: APjAAAWvBJhwqeeug69YBmO2gGORAYLk6jlrvXNMk5t2Thki8Xc8bs6x
+        /HXnp9SUu+UjiMF2jI0eqKSb/veHIa/sHw==
+X-Google-Smtp-Source: APXvYqyYri6D++rJSzOi+GgXkhsxvokTz1jlvH/2UDQG2BQBk/BH7MGvWcsoIUE9nC4TVVcvStuJuA==
+X-Received: by 2002:a24:ac43:: with SMTP id m3mr9305836iti.14.1554477003239;
+        Fri, 05 Apr 2019 08:10:03 -0700 (PDT)
+Received: from [192.168.1.158] ([216.160.245.98])
+        by smtp.gmail.com with ESMTPSA id c13sm9174452ioi.12.2019.04.05.08.10.01
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Apr 2019 07:00:24 -0700 (PDT)
-Subject: Re: [PATCH] block: Revert v5.0 blk_mq_request_issue_directly()
- changes
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        James Smart <james.smart@broadcom.com>,
-        Dongli Zhang <dongli.zhang@oracle.com>,
-        Laurence Oberman <loberman@redhat.com>, stable@vger.kernel.org
-References: <20190404170843.83517-1-bvanassche@acm.org>
- <20190405060612.GA32144@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-Message-ID: <fd4c63a9-6eaa-f104-6f33-0dfcd2dc6eba@acm.org>
-Date:   Fri, 5 Apr 2019 07:00:22 -0700
+        Fri, 05 Apr 2019 08:10:01 -0700 (PDT)
+Subject: Re: [GIT PULL] early nvme updates for 5.2
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Keith Busch <keith.busch@intel.com>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+References: <20190405062043.GA26688@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <96592ce3-88d6-ac9a-1f10-6175ccae89b7@kernel.dk>
+Date:   Fri, 5 Apr 2019 09:10:00 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.0
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190405060612.GA32144@lst.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <20190405062043.GA26688@infradead.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
@@ -69,21 +75,24 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/4/19 11:06 PM, Christoph Hellwig wrote:
-> On Thu, Apr 04, 2019 at 10:08:43AM -0700, Bart Van Assche wrote:
->> blk_mq_try_issue_directly() can return BLK_STS*_RESOURCE for requests that
->> have been queued. If that happens when blk_mq_try_issue_directly() is called
->> by the dm-mpath driver then dm-mpath will try to resubmit a request that is
->> already queued and a kernel crash follows. Since it is nontrivial to fix
->> blk_mq_request_issue_directly(), revert the blk_mq_request_issue_directly()
->> changes that went into kernel v5.0.
+On 4/5/19 12:20 AM, Christoph Hellwig wrote:
+> Hi Jens,
 > 
-> And what are we going to do about 5.1+?
+> below is the first batch of nvme updates for 5.2.  This includes the
+> performance improvements for single segment I/O on PCIe, which introduce
+> new block helpers, so it might be a good idea to get them in early.
+> 
+>  - various performance optimizations in the PCIe code (Keith and me)
+>  - new block helpers to support the above (me)
+>  - nvmet error conversion cleanup (me)
+>  - nvmet-fc variable sized array cleanup (Gustavo)
+>  - passthrough ioctl error printk cleanup (Kenneth)
+>  - small nvmet fixes (Max)
+>  - endianess conversion cleanup (Max)
+>  - nvmet-tcp faspath completion optimization (Sagi)
 
-Hi Christoph,
+Pulled, thanks.
 
-This patch was developed and tested on my setup against Jens' for-next 
-branch. So this patch should apply fine on kernel v5.1-rc3.
-
-Bart.
+-- 
+Jens Axboe
 
