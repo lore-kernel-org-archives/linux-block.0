@@ -1,450 +1,157 @@
-Return-Path: <SRS0=51nD=SG=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=t+Ub=SH=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DEE6C10F0F
-	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 23:49:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1D88C4360F
+	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 02:15:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 14326217D7
-	for <linux-block@archiver.kernel.org>; Thu,  4 Apr 2019 23:49:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 715D9217D4
+	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 02:15:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729728AbfDDXtY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 4 Apr 2019 19:49:24 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:40771 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729635AbfDDXtY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 4 Apr 2019 19:49:24 -0400
-Received: by mail-qt1-f193.google.com with SMTP id x12so5428844qts.7
-        for <linux-block@vger.kernel.org>; Thu, 04 Apr 2019 16:49:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Z/NUbhdIMdPdC28SvvPXBU/DR7iBFS8yJCKKpQVE68o=;
-        b=Va2qw18WmlRyfOdcfrnAvxojzmWz4jOnu9X9vgv4g9MC/icTpDyAL8c3VxaGkPIKHv
-         DCueYNyOPWj7wSNW+nXZQn7T0JCRtiOZMhkENyJNLGD8LEr5Rh/8LM6lnkPZGSNOXEyq
-         iW8UACaH2uuaqBjKdfK5bODa3AMzT4GZAQv0BBtvXGBUHkNJ+u4htJEQ/QD4WWHxhkRq
-         AX/zTg5oIPuGmFlCHa3znS7Fs0TOm72VSs+Fr18asgqT+XlkPo7qg8y0xhSPD+dvg2ry
-         I+qzeWFp+UeREqCwEVPjl/LKUbVP05GFHeY4YoE2aXa8DF8C8krp51Ccfc6L1RyfgEmA
-         f/yw==
-X-Gm-Message-State: APjAAAWahRYGinSnml+/JbQkbRjEE0vzfzzb8Cx/k/LSSfiFVH4DU3cs
-        ZCZlaovINIXAR6OpU8v6zSgWkA==
-X-Google-Smtp-Source: APXvYqzQYaWalERl1ungDxSpFVCTf0lOBJ+N2mDmas9MYP06rSntObFcMV+akfDk0JPebGGjoB4jXQ==
-X-Received: by 2002:a0c:9e56:: with SMTP id z22mr7256822qve.173.1554421762630;
-        Thu, 04 Apr 2019 16:49:22 -0700 (PDT)
-Received: from 2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net (2600-6c64-4e80-00f1-422c-9885-0a6c-81b2.dhcp6.chtrptr.net. [2600:6c64:4e80:f1:422c:9885:a6c:81b2])
-        by smtp.gmail.com with ESMTPSA id t69sm10632828qke.38.2019.04.04.16.49.20
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 04 Apr 2019 16:49:21 -0700 (PDT)
-Message-ID: <3e18326f005b201b889e2bd8365d289d1918bfe9.camel@redhat.com>
-Subject: Re: [PATCH] block: Revert v5.0 blk_mq_request_issue_directly()
- changes
-From:   Laurence Oberman <loberman@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Christoph Hellwig <hch@infradead.org>,
-        Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Hannes Reinecke <hare@suse.com>,
-        Johannes Thumshirn <jthumshirn@suse.de>,
-        James Smart <james.smart@broadcom.com>,
-        Dongli Zhang <dongli.zhang@oracle.com>, stable@vger.kernel.org
-Date:   Thu, 04 Apr 2019 19:49:19 -0400
-In-Reply-To: <20190404214344.GA30656@ming.t460p>
-References: <20190404170843.83517-1-bvanassche@acm.org>
-         <20190404214344.GA30656@ming.t460p>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-2.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        id S1728721AbfDECPS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 4 Apr 2019 22:15:18 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:37500 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727212AbfDECPS (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Thu, 4 Apr 2019 22:15:18 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id C8DF4BC2572B1E34737A;
+        Fri,  5 Apr 2019 10:15:14 +0800 (CST)
+Received: from localhost (10.177.31.96) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.408.0; Fri, 5 Apr 2019
+ 10:15:08 +0800
+From:   Yue Haibing <yuehaibing@huawei.com>
+To:     <tim@cyberelk.net>, <axboe@kernel.dk>, <rdunlap@infradead.org>
+CC:     <linux-kernel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH] paride/pcd: Fix potential NULL pointer dereference and mem leak
+Date:   Fri, 5 Apr 2019 10:14:58 +0800
+Message-ID: <20190405021458.29872-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.177.31.96]
+X-CFilter-Loop: Reflected
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 2019-04-05 at 05:43 +0800, Ming Lei wrote:
-> On Thu, Apr 04, 2019 at 10:08:43AM -0700, Bart Van Assche wrote:
-> > blk_mq_try_issue_directly() can return BLK_STS*_RESOURCE for
-> > requests that
-> > have been queued. If that happens when blk_mq_try_issue_directly()
-> > is called
-> > by the dm-mpath driver then dm-mpath will try to resubmit a request
-> > that is
-> > already queued and a kernel crash follows. Since it is nontrivial
-> > to fix
-> > blk_mq_request_issue_directly(), revert the
-> > blk_mq_request_issue_directly()
-> > changes that went into kernel v5.0.
-> > 
-> > This patch reverts the following commits:
-> > * d6a51a97c0b2 ("blk-mq: replace and kill
-> > blk_mq_request_issue_directly") # v5.0.
-> > * 5b7a6f128aad ("blk-mq: issue directly with bypass 'false' in
-> > blk_mq_sched_insert_requests") # v5.0.
-> > * 7f556a44e61d ("blk-mq: refactor the code of issue request
-> > directly") # v5.0.
-> 
-> I am fine to revert them now.
-> 
-> However, could you revert them one by one so that they can be
-> reviewed
-> easily?
-> 
-> Thanks,
-> Ming
+From: YueHaibing <yuehaibing@huawei.com>
 
-Hello Ming
-I did them 1 by 1 here for you
+Syzkaller report this:
 
+pcd: pcd version 1.07, major 46, nice 0
+pcd0: Autoprobe failed
+pcd: No CD-ROM drive found
+kasan: CONFIG_KASAN_INLINE enabled
+kasan: GPF could be caused by NULL-ptr deref or user memory access
+general protection fault: 0000 [#1] SMP KASAN PTI
+CPU: 1 PID: 4525 Comm: syz-executor.0 Not tainted 5.1.0-rc3+ #8
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubuntu1 04/01/2014
+RIP: 0010:pcd_init+0x95c/0x1000 [pcd]
+Code: c4 ab f7 48 89 d8 48 c1 e8 03 80 3c 28 00 74 08 48 89 df e8 56 a3 da f7 4c 8b 23 49 8d bc 24 80 05 00 00 48 89 f8 48 c1 e8 03 <80> 3c 28 00 74 05 e8 39 a3 da f7 49 8b bc 24 80 05 00 00 e8 cc b2
+RSP: 0018:ffff8881e84df880 EFLAGS: 00010202
+RAX: 00000000000000b0 RBX: ffffffffc155a088 RCX: ffffffffc1508935
+RDX: 0000000000040000 RSI: ffffc900014f0000 RDI: 0000000000000580
+RBP: dffffc0000000000 R08: ffffed103ee658b8 R09: ffffed103ee658b8
+R10: 0000000000000001 R11: ffffed103ee658b7 R12: 0000000000000000
+R13: ffffffffc155a778 R14: ffffffffc155a4a8 R15: 0000000000000003
+FS:  00007fe71bee3700(0000) GS:ffff8881f7300000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055a7334441a8 CR3: 00000001e9674003 CR4: 00000000007606e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ ? 0xffffffffc1508000
+ ? 0xffffffffc1508000
+ do_one_initcall+0xbc/0x47d init/main.c:901
+ do_init_module+0x1b5/0x547 kernel/module.c:3456
+ load_module+0x6405/0x8c10 kernel/module.c:3804
+ __do_sys_finit_module+0x162/0x190 kernel/module.c:3898
+ do_syscall_64+0x9f/0x450 arch/x86/entry/common.c:290
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x462e99
+Code: f7 d8 64 89 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fe71bee2c58 EFLAGS: 00000246 ORIG_RAX: 0000000000000139
+RAX: ffffffffffffffda RBX: 000000000073bf00 RCX: 0000000000462e99
+RDX: 0000000000000000 RSI: 0000000020000180 RDI: 0000000000000003
+RBP: 00007fe71bee2c70 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007fe71bee36bc
+R13: 00000000004bcefa R14: 00000000006f6fb0 R15: 0000000000000004
+Modules linked in: pcd(+) paride solos_pci atm ts_fsm rtc_mt6397 mac80211 nhc_mobility nhc_udp nhc_ipv6 nhc_hop nhc_dest nhc_fragment nhc_routing 6lowpan rtc_cros_ec memconsole intel_xhci_usb_role_switch roles rtc_wm8350 usbcore industrialio_triggered_buffer kfifo_buf industrialio asc7621 dm_era dm_persistent_data dm_bufio dm_mod tpm gnss_ubx gnss_serial serdev gnss max2165 cpufreq_dt hid_penmount hid menf21bmc_wdt rc_core n_tracesink ide_gd_mod cdns_csi2tx v4l2_fwnode videodev media pinctrl_lewisburg pinctrl_intel iptable_security iptable_raw iptable_mangle iptable_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 iptable_filter bpfilter ip6_vti ip_vti ip_gre ipip sit tunnel4 ip_tunnel hsr veth netdevsim vxcan batman_adv cfg80211 rfkill chnl_net caif nlmon dummy team bonding vcan bridge stp llc ip6_gre gre ip6_tunnel tunnel6 tun joydev mousedev ppdev kvm_intel kvm irqbypass crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel aesni_intel aes_x86_64 crypto_simd
+ ide_pci_generic piix input_leds cryptd glue_helper psmouse ide_core intel_agp serio_raw intel_gtt ata_generic i2c_piix4 agpgart pata_acpi parport_pc parport floppy rtc_cmos sch_fq_codel ip_tables x_tables sha1_ssse3 sha1_generic ipv6 [last unloaded: bmc150_magn]
+Dumping ftrace buffer:
+   (ftrace buffer empty)
+---[ end trace d873691c3cd69f56 ]---
 
-commit cff8d4710f8cc0817950942252bcf0809a95aa4a
-Author: Laurence Oberman <loberman@ibclient.lab.eng.bos.redhat.com>
-Date:   Thu Apr 4 19:51:33 2019 -0400
+If alloc_disk fails in pcd_init_units, cd->disk will be
+NULL, however in pcd_detect and pcd_exit, it's not check
+this before free.It may result a NULL pointer dereference.
 
-    Revert "blk-mq: replace and kill blk_mq_request_issue_directly"
-    
-    This reverts commit d6a51a97c0b2e21fec224746c2683ff739bcf4ae.
+Also when register_blkdev failed, blk_cleanup_queue() and
+blk_mq_free_tag_set() should be called to free resources.
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index 4673ebe..a55389b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -1245,8 +1245,6 @@ static int blk_cloned_rq_check_limits(struct
-request_queue *q,
-  */
- blk_status_t blk_insert_cloned_request(struct request_queue *q, struct
-request *rq)
- {
--       blk_qc_t unused;
--
-        if (blk_cloned_rq_check_limits(q, rq))
-                return BLK_STS_IOERR;
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Fixes: 81b74ac68c28 ("paride/pcd: cleanup queues when detection fails")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ drivers/block/paride/pcd.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/paride/pcd.c b/drivers/block/paride/pcd.c
+index 377a694..6d415b2 100644
+--- a/drivers/block/paride/pcd.c
++++ b/drivers/block/paride/pcd.c
+@@ -314,6 +314,7 @@ static void pcd_init_units(void)
+ 		disk->queue = blk_mq_init_sq_queue(&cd->tag_set, &pcd_mq_ops,
+ 						   1, BLK_MQ_F_SHOULD_MERGE);
+ 		if (IS_ERR(disk->queue)) {
++			put_disk(disk);
+ 			disk->queue = NULL;
+ 			continue;
+ 		}
+@@ -750,6 +751,8 @@ static int pcd_detect(void)
  
-@@ -1262,7 +1260,7 @@ blk_status_t blk_insert_cloned_request(struct
-request_queue *q, struct request *
-         * bypass a potential scheduler on the bottom device for
-         * insert.
-         */
--       return blk_mq_try_issue_directly(rq->mq_hctx, rq, &unused,
-true, true);
-+       return blk_mq_request_issue_directly(rq, true);
- }
- EXPORT_SYMBOL_GPL(blk_insert_cloned_request);
+ 	printk("%s: No CD-ROM drive found\n", name);
+ 	for (unit = 0, cd = pcd; unit < PCD_UNITS; unit++, cd++) {
++		if (!cd->disk)
++			continue;
+ 		blk_cleanup_queue(cd->disk->queue);
+ 		cd->disk->queue = NULL;
+ 		blk_mq_free_tag_set(&cd->tag_set);
+@@ -1010,8 +1013,14 @@ static int __init pcd_init(void)
+ 	pcd_probe_capabilities();
  
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3ff3d7b..536b176 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1800,7 +1800,7 @@ static blk_status_t
-__blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
-        return ret;
- }
- 
--blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx
-*hctx,
-                                                struct request *rq,
-                                                blk_qc_t *cookie,
-                                                bool bypass, bool last)
-@@ -1872,6 +1872,13 @@ blk_status_t blk_mq_try_issue_directly(struct
-blk_mq_hw_ctx *hctx,
-        return ret;
- }
- 
-+blk_status_t blk_mq_request_issue_directly(struct request *rq, bool
-last)
-+{
-+       blk_qc_t unused;
+ 	if (register_blkdev(major, name)) {
+-		for (unit = 0, cd = pcd; unit < PCD_UNITS; unit++, cd++)
++		for (unit = 0, cd = pcd; unit < PCD_UNITS; unit++, cd++) {
++			if (!cd->disk)
++				continue;
 +
-+       return blk_mq_try_issue_directly(rq->mq_hctx, rq, &unused,
-true, last);
-+}
++			blk_cleanup_queue(cd->disk->queue);
++			blk_mq_free_tag_set(&cd->tag_set);
+ 			put_disk(cd->disk);
++		}
+ 		return -EBUSY;
+ 	}
+ 
+@@ -1032,6 +1041,9 @@ static void __exit pcd_exit(void)
+ 	int unit;
+ 
+ 	for (unit = 0, cd = pcd; unit < PCD_UNITS; unit++, cd++) {
++		if (!cd->disk)
++			continue;
 +
- void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
-                struct list_head *list)
- {
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index d704fc7..423ea88 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -70,10 +70,8 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx
-*hctx, struct request *rq,
- void blk_mq_insert_requests(struct blk_mq_hw_ctx *hctx, struct
-blk_mq_ctx *ctx,
-                                struct list_head *list);
- 
--blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
--                                               struct request *rq,
--                                               blk_qc_t *cookie,
--                                               bool bypass, bool
-last);
-+/* Used by blk_insert_cloned_request() to issue request directly */
-+blk_status_t blk_mq_request_issue_directly(struct request *rq, bool
-last);
- void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
-                                    struct list_head *list);
+ 		if (cd->present) {
+ 			del_gendisk(cd->disk);
+ 			pi_release(cd->pi);
+-- 
+2.7.4
 
-
-commit 9b7f3de27504aefae8304dfd9640a1477599de8b
-Author: Laurence Oberman <loberman@ibclient.lab.eng.bos.redhat.com>
-Date:   Thu Apr 4 19:53:23 2019 -0400
-
-    Revert "blk-mq: issue directly with bypass 'false' in
-blk_mq_sched_insert_requests"
-    
-    This reverts commit 5b7a6f128aad761b471ca0ff620b4841b38e596f.
-
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index 4090553..aa6bc5c 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -423,10 +423,12 @@ void blk_mq_sched_insert_requests(struct
-blk_mq_hw_ctx *hctx,
-                 * busy in case of 'none' scheduler, and this way may
-save
-                 * us one extra enqueue & dequeue to sw queue.
-                 */
--               if (!hctx->dispatch_busy && !e && !run_queue_async)
-+               if (!hctx->dispatch_busy && !e && !run_queue_async) {
-                        blk_mq_try_issue_list_directly(hctx, list);
--               else
--                       blk_mq_insert_requests(hctx, ctx, list);
-+                       if (list_empty(list))
-+                               return;
-+               }
-+               blk_mq_insert_requests(hctx, ctx, list);
-        }
- 
-        blk_mq_run_hw_queue(hctx, run_queue_async);
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 536b176..df2150e 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1882,20 +1882,22 @@ blk_status_t
-blk_mq_request_issue_directly(struct request *rq, bool last)
- void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
-                struct list_head *list)
- {
--       blk_qc_t unused;
--       blk_status_t ret = BLK_STS_OK;
--
-        while (!list_empty(list)) {
-+               blk_status_t ret;
-                struct request *rq = list_first_entry(list, struct
-request,
-                                queuelist);
- 
-                list_del_init(&rq->queuelist);
--               if (ret == BLK_STS_OK)
--                       ret = blk_mq_try_issue_directly(hctx, rq,
-&unused,
--                                                       false,
-+               ret = blk_mq_request_issue_directly(rq,
-list_empty(list));
-+               if (ret != BLK_STS_OK) {
-+                       if (ret == BLK_STS_RESOURCE ||
-+                                       ret == BLK_STS_DEV_RESOURCE) {
-+                               blk_mq_request_bypass_insert(rq,
-                                                        list_empty(list
-));
--               else
--                       blk_mq_sched_insert_request(rq, false, true,
-false);
-+                               break;
-+                       }
-+                       blk_mq_end_request(rq, ret);
-+               }
-        }
- 
-        /*
-@@ -1903,7 +1905,7 @@ void blk_mq_try_issue_list_directly(struct
-blk_mq_hw_ctx *hctx,
-         * the driver there was more coming, but that turned out to
-         * be a lie.
-         */
--       if (ret != BLK_STS_OK && hctx->queue->mq_ops->commit_rqs)
-+       if (!list_empty(list) && hctx->queue->mq_ops->commit_rqs)
-                hctx->queue->mq_ops->commit_rqs(hctx);
- }
-
-
-commit 6db32dc1b5cb3d236f26f77947094f1d895ba557
-Author: Laurence Oberman <loberman@ibclient.lab.eng.bos.redhat.com>
-Date:   Thu Apr 4 19:54:28 2019 -0400
-
-    Revert "blk-mq: refactor the code of issue request directly"
-    
-    This reverts commit 7f556a44e61d0b62d78db9a2662a5f0daef010f2.
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index df2150e..afac6c2 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1800,83 +1800,78 @@ static blk_status_t
-__blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
-        return ret;
- }
- 
--static blk_status_t blk_mq_try_issue_directly(struct blk_mq_hw_ctx
-*hctx,
-+static blk_status_t __blk_mq_try_issue_directly(struct blk_mq_hw_ctx
-*hctx,
-                                                struct request *rq,
-                                                blk_qc_t *cookie,
--                                               bool bypass, bool last)
-+                                               bool bypass_insert,
-bool last)
- {
-        struct request_queue *q = rq->q;
-        bool run_queue = true;
--       blk_status_t ret = BLK_STS_RESOURCE;
--       int srcu_idx;
--       bool force = false;
- 
--       hctx_lock(hctx, &srcu_idx);
-        /*
--        * hctx_lock is needed before checking quiesced flag.
-+        * RCU or SRCU read lock is needed before checking quiesced
-flag.
-         *
--        * When queue is stopped or quiesced, ignore 'bypass', insert
--        * and return BLK_STS_OK to caller, and avoid driver to try to
--        * dispatch again.
-+        * When queue is stopped or quiesced, ignore 'bypass_insert'
-from
-+        * blk_mq_request_issue_directly(), and return BLK_STS_OK to
-caller,
-+        * and avoid driver to try to dispatch again.
-         */
--       if (unlikely(blk_mq_hctx_stopped(hctx) ||
-blk_queue_quiesced(q))) {
-+       if (blk_mq_hctx_stopped(hctx) || blk_queue_quiesced(q)) {
-                run_queue = false;
--               bypass = false;
--               goto out_unlock;
-+               bypass_insert = false;
-+               goto insert;
-        }
- 
--       if (unlikely(q->elevator && !bypass))
--               goto out_unlock;
-+       if (q->elevator && !bypass_insert)
-+               goto insert;
- 
-        if (!blk_mq_get_dispatch_budget(hctx))
--               goto out_unlock;
-+               goto insert;
- 
-        if (!blk_mq_get_driver_tag(rq)) {
-                blk_mq_put_dispatch_budget(hctx);
--               goto out_unlock;
-+               goto insert;
-        }
- 
--       /*
--        * Always add a request that has been through
--        *.queue_rq() to the hardware dispatch list.
--        */
--       force = true;
--       ret = __blk_mq_issue_directly(hctx, rq, cookie, last);
--out_unlock:
--       hctx_unlock(hctx, srcu_idx);
--       switch (ret) {
--       case BLK_STS_OK:
--               break;
--       case BLK_STS_DEV_RESOURCE:
--       case BLK_STS_RESOURCE:
--               if (force) {
--                       blk_mq_request_bypass_insert(rq, run_queue);
--                       /*
--                        * We have to return BLK_STS_OK for the DM
--                        * to avoid livelock. Otherwise, we return
--                        * the real result to indicate whether the
--                        * request is direct-issued successfully.
--                        */
--                       ret = bypass ? BLK_STS_OK : ret;
--               } else if (!bypass) {
--                       blk_mq_sched_insert_request(rq, false,
--                                                   run_queue, false);
--               }
--               break;
--       default:
--               if (!bypass)
--                       blk_mq_end_request(rq, ret);
--               break;
--       }
-+       return __blk_mq_issue_directly(hctx, rq, cookie, last);
-+insert:
-+       if (bypass_insert)
-+               return BLK_STS_RESOURCE;
- 
--       return ret;
-+       blk_mq_request_bypass_insert(rq, run_queue);
-+       return BLK_STS_OK;
-+}
-+
-+static void blk_mq_try_issue_directly(struct blk_mq_hw_ctx *hctx,
-+               struct request *rq, blk_qc_t *cookie)
-+{
-+       blk_status_t ret;
-+       int srcu_idx;
-+
-+       might_sleep_if(hctx->flags & BLK_MQ_F_BLOCKING);
-+
-+       hctx_lock(hctx, &srcu_idx);
-+
-+       ret = __blk_mq_try_issue_directly(hctx, rq, cookie, false,
-true);
-+       if (ret == BLK_STS_RESOURCE || ret == BLK_STS_DEV_RESOURCE)
-+               blk_mq_request_bypass_insert(rq, true);
-+       else if (ret != BLK_STS_OK)
-+               blk_mq_end_request(rq, ret);
-+
-+       hctx_unlock(hctx, srcu_idx);
- }
- 
- blk_status_t blk_mq_request_issue_directly(struct request *rq, bool
-last)
- {
--       blk_qc_t unused;
-+       blk_status_t ret;
-+       int srcu_idx;
-+       blk_qc_t unused_cookie;
-+       struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
- 
--       return blk_mq_try_issue_directly(rq->mq_hctx, rq, &unused,
-true, last);
-+       hctx_lock(hctx, &srcu_idx);
-+       ret = __blk_mq_try_issue_directly(hctx, rq, &unused_cookie,
-true, last);
-+       hctx_unlock(hctx, srcu_idx);
-+
-+       return ret;
- }
- 
- void blk_mq_try_issue_list_directly(struct blk_mq_hw_ctx *hctx,
-@@ -2018,13 +2013,13 @@ static blk_qc_t blk_mq_make_request(struct
-request_queue *q, struct bio *bio)
-                if (same_queue_rq) {
-                        data.hctx = same_queue_rq->mq_hctx;
-                        blk_mq_try_issue_directly(data.hctx,
-same_queue_rq,
--                                       &cookie, false, true);
-+                                       &cookie);
-                }
-        } else if ((q->nr_hw_queues > 1 && is_sync) || (!q->elevator &&
-                        !data.hctx->dispatch_busy)) {
-                blk_mq_put_ctx(data.ctx);
-                blk_mq_bio_to_request(rq, bio);
--               blk_mq_try_issue_directly(data.hctx, rq, &cookie,
-false, true);
-+               blk_mq_try_issue_directly(data.hctx, rq, &cookie);
-        } else {
-                blk_mq_put_ctx(data.ctx);
-                blk_mq_bio_to_request(rq, bio);
 
