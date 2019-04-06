@@ -2,86 +2,84 @@ Return-Path: <SRS0=s1xr=SI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2405C282CE
-	for <linux-block@archiver.kernel.org>; Sat,  6 Apr 2019 02:01:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29898C282CE
+	for <linux-block@archiver.kernel.org>; Sat,  6 Apr 2019 02:03:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6EAC92186A
-	for <linux-block@archiver.kernel.org>; Sat,  6 Apr 2019 02:01:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B344721871
+	for <linux-block@archiver.kernel.org>; Sat,  6 Apr 2019 02:03:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="PkBr/FfC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726326AbfDFCBU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Apr 2019 22:01:20 -0400
-Received: from zeniv.linux.org.uk ([195.92.253.2]:49060 "EHLO
-        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726316AbfDFCBU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 5 Apr 2019 22:01:20 -0400
-Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92 #3 (Red Hat Linux))
-        id 1hCady-0007mH-Mt; Sat, 06 Apr 2019 02:01:18 +0000
-Date:   Sat, 6 Apr 2019 03:01:18 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Qu Wenruo <quwenruo.btrfs@gmx.com>
-Cc:     "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        ming.lei@redhat.com
-Subject: Re: No way to break bio_for_each_segment_all() macro?
-Message-ID: <20190406020118.GL2217@ZenIV.linux.org.uk>
-References: <ac2ba6e0-5312-1ec5-471e-edd16d6cde3a@gmx.com>
+        id S1726326AbfDFCDH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Apr 2019 22:03:07 -0400
+Received: from [103.7.29.155] ([103.7.29.155]:56391 "EHLO smtpbg64.qq.com"
+        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726316AbfDFCDH (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Apr 2019 22:03:07 -0400
+X-Greylist: delayed 466 seconds by postgrey-1.27 at vger.kernel.org; Fri, 05 Apr 2019 22:03:06 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+        s=s201512; t=1554516161;
+        bh=j92zCe2a4Akoo/3jGg5ofdVBAz44WXJqbnAohA5iNEo=;
+        h=From:To:Subject:Date:Message-Id:MIME-Version:Content-Transfer-Encoding;
+        b=PkBr/FfCg2Nnyx79m60kNEBZbpQgCZtA0d1Cg9SfgcDh2eClm04wjgZPMkFOfWStj
+         /fnrkmruprkmXlFRRRC/fOsaafznSXVLFBZXJdkGjJnrsY99JeO7uXpviMhGr+0TDn
+         tic26wx8OFu5c96jg09cTzWb9DUaEUdxHsXd8rwQ=
+X-QQ-mid: esmtp7t1554515689t2khz8qxm
+Received: from localhost.localdomain (unknown [114.243.219.120])
+        by esmtp4.qq.com (ESMTP) with 
+        id ; Sat, 06 Apr 2019 09:54:40 +0800 (CST)
+X-QQ-SSF: 01000000000000F0FH3000000000000
+X-QQ-FEAT: 9NFkmNiL4hcagxEGXxMG/VrKGbwWMfnp6v0Hz8sO8j7vS0MHKd+pLHpwH2UmJ
+        b5XWKBsRDp0io2xTQ47NQ9QlHZ7wp719h7ib4smrlD39+marQOenXx0/CDabObDFM7hesXm
+        /iZ2xHqholXajEbw2Z+Fv1AG8ayoAGwkb2jVvQIbdPoAgJm5ioJ2yfC9bwa0UNb8VA4zAKC
+        F7PT5tY+5+dZrFWQlNp2kpYFvzSt8lAR1/rLtwdNTxgmvqfn7Odj1Uw6tIambyhmp+PN+Es
+        VnNN1PQ8QV1yr8KUrFM4WpU30Nf++6ipOwfA==
+X-QQ-GoodBg: 0
+From:   Shenghui Wang <shhuiw@foxmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: [PATCH] blk-mq: set plug->rq_count 0 after sort in blk_mq_flush_plug_list
+Date:   Sat,  6 Apr 2019 09:54:40 +0800
+Message-Id: <20190406015440.30233-1-shhuiw@foxmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ac2ba6e0-5312-1ec5-471e-edd16d6cde3a@gmx.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtp:foxmail.com:bgweb:bgweb115
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Apr 06, 2019 at 09:53:07AM +0800, Qu Wenruo wrote:
-> Hi,
-> 
-> I'm looking into a strange behavior that we can't break
-> bio_for_each_segment_all() after commit 6dc4f100c175 ("block: allow
-> bio_for_each_segment_all() to iterate over multi-page bvec").
-> 
-> It's screwing up all bio_for_each_segment_all() call with error out branch.
+Set plug->rq_count 0 earlier can skip possible sort.
+Move the 0-value set after sort.
 
->         bio_for_each_segment_all(bvec, bio, i, iter_all) {
->                 root = BTRFS_I(bvec->bv_page->mapping->host)->root;
->                 ret = csum_dirty_buffer(root->fs_info, bvec->bv_page);
-> -               if (ret)
-> +               if (ret) {
-> +                       err = ret;
-> +                       pr_info("breaking out with ret=%d\n", ret);
->                         break;
-> +               }
->         }
-> 
-> +       if (err)
-> +               pr_info("err=%d out, but ret=%d\n",err, ret);
->         return errno_to_blk_status(ret);
->  }
-> 
-> Straightforward, if we break, we should have err == ret.
-> 
-> Then run fstests btrfs/151, which will trigger a false alert in
-> tree-checker:
-> 
->   BTRFS critical (device dm-1): corrupt leaf: root=3 block=570572800
-> slot=1 devid=1 invalid total bytes: have 0
->   BTRFS error (device dm-1): block=570572800 write time tree block
-> corruption detected
->   breaking out with ret=-117
->   err=-117 out, but ret=0
-> 
-> So it looks like the break line doens't really break, but continue
-> executing.
+Signed-off-by: Shenghui Wang <shhuiw@foxmail.com>
+---
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-It expands to for-inside-for since that commit, so break only takes you
-out of the inner loop...
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f3b0d33bdf88..e5d32f186e81 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1711,10 +1711,10 @@ void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule)
+ 	unsigned int depth;
+ 
+ 	list_splice_init(&plug->mq_list, &list);
+-	plug->rq_count = 0;
+ 
+ 	if (plug->rq_count > 2 && plug->multiple_queues)
+ 		list_sort(NULL, &list, plug_rq_cmp);
++	plug->rq_count = 0;
+ 
+ 	this_q = NULL;
+ 	this_hctx = NULL;
+-- 
+2.20.1
 
-No comments on desirability of such macros - personally, I prefer to
-avoid those, but I'm not stepping into that holy war...
