@@ -1,238 +1,100 @@
-Return-Path: <SRS0=t+Ub=SH=vger.kernel.org=linux-block-owner@kernel.org>
+Return-Path: <SRS0=s1xr=SI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF64C282DA
-	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 23:57:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC3AC282CE
+	for <linux-block@archiver.kernel.org>; Sat,  6 Apr 2019 00:17:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5522621726
-	for <linux-block@archiver.kernel.org>; Fri,  5 Apr 2019 23:57:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="QGACJq8i"
+	by mail.kernel.org (Postfix) with ESMTP id D05DF21871
+	for <linux-block@archiver.kernel.org>; Sat,  6 Apr 2019 00:17:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726676AbfDEX5Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Apr 2019 19:57:16 -0400
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:47686 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726223AbfDEX5K (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 5 Apr 2019 19:57:10 -0400
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x35Nt3hh022716;
-        Fri, 5 Apr 2019 16:56:12 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-type; s=facebook; bh=hrmkK86CLcUqI7FOsA7WTDumNlH5nTqSdid1LV/cbvQ=;
- b=QGACJq8ioJNkbFtLtLdJrY9O7P3qC/uK9tl+NQtdJ3pVbvHgcI+VFB0LPXub6vbhE0aD
- ZG/Fw/1205ed0EG9H5ZLWfdrR+NDA/3BLBt+nFcom+EHmMOxj+qgqPFBo5RrxccbIkKb
- 7haZjB7QPi7+lv3n+NC6+8jruFMcyfBF8vA= 
-Received: from maileast.thefacebook.com ([199.201.65.23])
-        by mx0a-00082601.pphosted.com with ESMTP id 2rp9r5hnp8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Fri, 05 Apr 2019 16:56:12 -0700
-Received: from mmullins-1.thefacebook.com (2620:10d:c0a1:3::13) by
- mail.thefacebook.com (2620:10d:c021:18::176) with Microsoft SMTP Server id
- 15.1.1713.5; Fri, 5 Apr 2019 16:56:09 -0700
-From:   Matt Mullins <mmullins@fb.com>
-To:     <hall@fb.com>, <mmullins@fb.com>, <ast@kernel.org>,
-        <bpf@vger.kernel.org>, <netdev@vger.kernel.org>
-CC:     <linux-kernel@vger.kernel.org>, Josef Bacik <josef@toxicpanda.com>,
-        "Jens Axboe" <axboe@kernel.dk>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Martin KaFai Lau <kafai@fb.com>,
-        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
-        <linux-block@vger.kernel.org>, <nbd@other.debian.org>
-Subject: [PATCH bpf-next v2 3/5] nbd: add tracepoints for send/receive timing
-Date:   Fri, 5 Apr 2019 16:55:04 -0700
-Message-ID: <20190405235506.29236-4-mmullins@fb.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190405235506.29236-1-mmullins@fb.com>
-References: <20190405235506.29236-1-mmullins@fb.com>
+        id S1726167AbfDFARF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Apr 2019 20:17:05 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:42958 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725973AbfDFARE (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Apr 2019 20:17:04 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 1479E3082231;
+        Sat,  6 Apr 2019 00:17:04 +0000 (UTC)
+Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 74FA919C56;
+        Sat,  6 Apr 2019 00:16:58 +0000 (UTC)
+Date:   Sat, 6 Apr 2019 08:16:54 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Nikolay Borisov <nborisov@suse.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@osandov.com>,
+        linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-btrfs <linux-btrfs@vger.kernel.org>
+Subject: Re: Possible bio merging breakage in mp bio rework
+Message-ID: <20190406001653.GA4805@ming.t460p>
+References: <59c19acf-999f-1911-b0b8-1a5cec8116c5@suse.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [2620:10d:c0a1:3::13]
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-05_17:,,
- signatures=0
-X-Proofpoint-Spam-Reason: safe
-X-FB-Internal: Safe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <59c19acf-999f-1911-b0b8-1a5cec8116c5@suse.com>
+User-Agent: Mutt/1.9.1 (2017-09-22)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Sat, 06 Apr 2019 00:17:04 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Andrew Hall <hall@fb.com>
+Hi Nikolay,
 
-This adds four tracepoints to nbd, enabling separate tracing of payload
-and header sending/receipt.
+On Fri, Apr 05, 2019 at 07:04:18PM +0300, Nikolay Borisov wrote:
+> Hello Ming, 
+> 
+> Following the mp biovec rework what is the maximum 
+> data that a bio could contain? Should it be PAGE_SIZE * bio_vec 
 
-In the send path for headers that have already been sent, we also
-explicitly initialize the handle so it can be referenced by the later
-tracepoint.
+There isn't any maximum data limit on the bio submitted from fs,
+and block layer will make the final bio sent to driver correct
+by applying all kinds of queue limit, such as max segment size,
+max segment number, max sectors, ...
 
-Signed-off-by: Andrew Hall <hall@fb.com>
-Signed-off-by: Matt Mullins <mmullins@fb.com>
----
- drivers/block/nbd.c        |  8 ++++
- include/trace/events/nbd.h | 92 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 100 insertions(+)
+> or something else? Currently I can see bios as large as 127 megs 
+> on sequential workloads, I got prompted to this since btrfs has a 
+> memory allocation that is dependent on the data in the bio and this 
+> particular memory allocation started failing with order 6 allocs. 
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 7393d04d255c..d3d914620f66 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -513,6 +513,10 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 	if (sent) {
- 		if (sent >= sizeof(request)) {
- 			skip = sent - sizeof(request);
-+
-+			// initialize handle for tracing purposes
-+			handle = nbd_cmd_handle(cmd);
-+
- 			goto send_pages;
- 		}
- 		iov_iter_advance(&from, sent);
-@@ -536,6 +540,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 		(unsigned long long)blk_rq_pos(req) << 9, blk_rq_bytes(req));
- 	result = sock_xmit(nbd, index, 1, &from,
- 			(type == NBD_CMD_WRITE) ? MSG_MORE : 0, &sent);
-+	trace_nbd_header_sent(req, handle);
- 	if (result <= 0) {
- 		if (was_interrupted(result)) {
- 			/* If we havne't sent anything we can just return BUSY,
-@@ -608,6 +613,7 @@ static int nbd_send_cmd(struct nbd_device *nbd, struct nbd_cmd *cmd, int index)
- 		bio = next;
- 	}
- out:
-+	trace_nbd_payload_sent(req, handle);
- 	nsock->pending = NULL;
- 	nsock->sent = 0;
- 	return 0;
-@@ -655,6 +661,7 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 			tag, req);
- 		return ERR_PTR(-ENOENT);
- 	}
-+	trace_nbd_header_received(req, handle);
- 	cmd = blk_mq_rq_to_pdu(req);
- 
- 	mutex_lock(&cmd->lock);
-@@ -708,6 +715,7 @@ static struct nbd_cmd *nbd_read_stat(struct nbd_device *nbd, int index)
- 		}
- 	}
- out:
-+	trace_nbd_payload_received(req, handle);
- 	mutex_unlock(&cmd->lock);
- 	return ret ? ERR_PTR(ret) : cmd;
- }
-diff --git a/include/trace/events/nbd.h b/include/trace/events/nbd.h
-index 5928255ed02e..eef476fef95a 100644
---- a/include/trace/events/nbd.h
-+++ b/include/trace/events/nbd.h
-@@ -7,6 +7,98 @@
- 
- #include <linux/tracepoint.h>
- 
-+TRACE_EVENT(nbd_header_sent,
-+
-+	TP_PROTO(struct request *req, u64 handle),
-+
-+	TP_ARGS(req, handle),
-+
-+	TP_STRUCT__entry(
-+		__field(struct request *, req)
-+		__field(u64, handle)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->req = req;
-+		__entry->handle = handle;
-+	),
-+
-+	TP_printk(
-+		"nbd header sent: request %p, handle 0x%016llx",
-+		__entry->req,
-+		__entry->handle
-+	)
-+);
-+
-+TRACE_EVENT(nbd_payload_sent,
-+
-+	TP_PROTO(struct request *req, u64 handle),
-+
-+	TP_ARGS(req, handle),
-+
-+	TP_STRUCT__entry(
-+		__field(struct request *, req)
-+		__field(u64, handle)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->req = req;
-+		__entry->handle = handle;
-+	),
-+
-+	TP_printk(
-+		"nbd payload sent: request %p, handle 0x%016llx",
-+		__entry->req,
-+		__entry->handle
-+	)
-+);
-+
-+TRACE_EVENT(nbd_header_received,
-+
-+	TP_PROTO(struct request *req, u64 handle),
-+
-+	TP_ARGS(req, handle),
-+
-+	TP_STRUCT__entry(
-+		__field(struct request *, req)
-+		__field(u64, handle)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->req = req;
-+		__entry->handle = handle;
-+	),
-+
-+	TP_printk(
-+		"nbd header received: request %p, handle 0x%016llx",
-+		__entry->req,
-+		__entry->handle
-+	)
-+);
-+
-+TRACE_EVENT(nbd_payload_received,
-+
-+	TP_PROTO(struct request *req, u64 handle),
-+
-+	TP_ARGS(req, handle),
-+
-+	TP_STRUCT__entry(
-+		__field(struct request *, req)
-+		__field(u64, handle)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->req = req;
-+		__entry->handle = handle;
-+	),
-+
-+	TP_printk(
-+		"nbd payload received: request %p, handle 0x%016llx",
-+		__entry->req,
-+		__entry->handle
-+	)
-+);
-+
- DECLARE_EVENT_CLASS(nbd_send_request,
- 
- 	TP_PROTO(struct nbd_request *nbd_request, int index,
--- 
-2.17.1
+Could you share us the code? I don't see why order 6 allocs is a must.
 
+> Further debugging showed that with the following xfs_io command line: 
+> 
+> 
+> xfs_io -f -c "pwrite -S 0x61 -b 4m 0 10g" /media/scratch/file1
+> 
+> I can easily see very large bios: 
+> 
+> [  188.366540] kworker/-7       3.... 34847519us : btrfs_submit_bio_hook: bio: ffff8dffe9940bb0 bi_iter.bi_size = 134184960 bi_vcn: 28 bi_vcnt_max: 256
+> [  188.367129] kworker/-658     2.... 34946536us : btrfs_submit_bio_hook: bio: ffff8dffe9940370 bi_iter.bi_size = 134246400 bi_vcn: 28 bi_vcnt_max: 256
+> [  188.367714] kworker/-7       3.... 35107967us : btrfs_submit_bio_hook: bio: ffff8dffe9940bb0 bi_iter.bi_size = 134184960 bi_vcn: 30 bi_vcnt_max: 256
+> [  188.368319] kworker/-658     2.... 35229894us : btrfs_submit_bio_hook: bio: ffff8dffe9940370 bi_iter.bi_size = 134246400 bi_vcn: 32 bi_vcnt_max: 256
+> [  188.368909] kworker/-7       3.... 35374809us : btrfs_submit_bio_hook: bio: ffff8dffe9940bb0 bi_iter.bi_size = 134184960 bi_vcn: 25 bi_vcnt_max: 256
+> [  188.369498] kworker/-658     2.... 35516194us : btrfs_submit_bio_hook: bio: ffff8dffe9940370 bi_iter.bi_size = 134246400 bi_vcn: 31 bi_vcnt_max: 256
+> [  188.370086] kworker/-7       3.... 35663669us : btrfs_submit_bio_hook: bio: ffff8dffe9940bb0 bi_iter.bi_size = 134184960 bi_vcn: 32 bi_vcnt_max: 256
+> [  188.370696] kworker/-658     2.... 35791006us : btrfs_submit_bio_hook: bio: ffff8dffe9940370 bi_iter.bi_size = 100655104 bi_vcn: 24 bi_vcnt_max: 256
+> [  188.371335] kworker/-658     2.... 35816114us : btrfs_submit_bio_hook: bio: ffff8dffe99434f0 bi_iter.bi_size = 33591296 bi_vcn: 5 bi_vcnt_max: 256
+> 
+> 
+> So that's 127 megs in a single bio? This stems from the new merging logic. 
+> 07173c3ec276 ("block: enable multipage bvecs") made it so that physically 
+> contiguous pages added to the bio would just modify bi_iter.bi_size and the 
+> initial page's bio_vec's bv_len. There's no longer the 
+> page == bv->bv_page portion of the check. 
+
+bio_add_page() tries best to put physically contiguous pages into one bvec, and
+I don't see anything is wrong in the log.
+
+Could you show us what the real problem is?
+
+Thanks,
+Ming
