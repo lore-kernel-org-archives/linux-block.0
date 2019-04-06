@@ -2,99 +2,72 @@ Return-Path: <SRS0=s1xr=SI=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC3AC282CE
-	for <linux-block@archiver.kernel.org>; Sat,  6 Apr 2019 00:17:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA4DC282DC
+	for <linux-block@archiver.kernel.org>; Sat,  6 Apr 2019 01:40:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D05DF21871
-	for <linux-block@archiver.kernel.org>; Sat,  6 Apr 2019 00:17:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDAA4218AC
+	for <linux-block@archiver.kernel.org>; Sat,  6 Apr 2019 01:40:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1554514811;
+	bh=pDVlXSToFgSK2myrT72rlLGN7uu/g6xD4cyoatKIv5E=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=PWNsNpdN7jNVwsu5fAnUY8sxr0Fay7J+0fhFmflE11I7SO5quqUIasjj+2ZXaFjO4
+	 iMYcykm9TdvFLIJWjZqYAXd99EHZHx90hQ1858MUv1lf0rMHmVSAvbAlzm2et5dIk+
+	 nGDnhG8JPROcyjxNKUkUWIlCDZ4l3lQmy9y84NK0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726167AbfDFARF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 5 Apr 2019 20:17:05 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:42958 "EHLO mx1.redhat.com"
+        id S1726605AbfDFBkI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 5 Apr 2019 21:40:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38108 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725973AbfDFARE (ORCPT <rfc822;linux-block@vger.kernel.org>);
-        Fri, 5 Apr 2019 20:17:04 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 1479E3082231;
-        Sat,  6 Apr 2019 00:17:04 +0000 (UTC)
-Received: from ming.t460p (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 74FA919C56;
-        Sat,  6 Apr 2019 00:16:58 +0000 (UTC)
-Date:   Sat, 6 Apr 2019 08:16:54 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Nikolay Borisov <nborisov@suse.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@osandov.com>,
-        linux-block@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-btrfs <linux-btrfs@vger.kernel.org>
-Subject: Re: Possible bio merging breakage in mp bio rework
-Message-ID: <20190406001653.GA4805@ming.t460p>
-References: <59c19acf-999f-1911-b0b8-1a5cec8116c5@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <59c19acf-999f-1911-b0b8-1a5cec8116c5@suse.com>
-User-Agent: Mutt/1.9.1 (2017-09-22)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Sat, 06 Apr 2019 00:17:04 +0000 (UTC)
+        id S1726575AbfDFBkI (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Fri, 5 Apr 2019 21:40:08 -0400
+Subject: Re: [git pull] device mapper fixes for 5.1-rc4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1554514807;
+        bh=pDVlXSToFgSK2myrT72rlLGN7uu/g6xD4cyoatKIv5E=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=tsZVhTHCH7RONffVg9I026/wFBb5Jn5hWTiDY3uyCOZ5aIZ8wRgdn3pjB4AFUqS6Z
+         Shkcy5LqnJ2TtFFe3B3CjOEygaMsPMZ4jbZvUVhBcfZpZVzIHvfSaeEfj1VrMS3s4f
+         n5s6dFoWQKBLgKoIMHzLrU7Ut99qCF6AQmqKRUSI=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20190405225928.GB26473@redhat.com>
+References: <20190405225928.GB26473@redhat.com>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20190405225928.GB26473@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git
+ tags/for-5.1/dm-fixes
+X-PR-Tracked-Commit-Id: 4ed319c6ac08e9a28fca7ac188181ac122f4de84
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 4f1cbe078546914538d8aabba04db984da68dcbf
+Message-Id: <155451480788.21678.8266707604256803825.pr-tracker-bot@kernel.org>
+Date:   Sat, 06 Apr 2019 01:40:07 +0000
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        Alasdair G Kergon <agk@redhat.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Mikulas Patocka <mpatocka@redhat.com>,
+        YueHaibing <yuehaibing@huawei.com>
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Nikolay,
+The pull request you sent on Fri, 5 Apr 2019 18:59:29 -0400:
 
-On Fri, Apr 05, 2019 at 07:04:18PM +0300, Nikolay Borisov wrote:
-> Hello Ming, 
-> 
-> Following the mp biovec rework what is the maximum 
-> data that a bio could contain? Should it be PAGE_SIZE * bio_vec 
+> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.1/dm-fixes
 
-There isn't any maximum data limit on the bio submitted from fs,
-and block layer will make the final bio sent to driver correct
-by applying all kinds of queue limit, such as max segment size,
-max segment number, max sectors, ...
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/4f1cbe078546914538d8aabba04db984da68dcbf
 
-> or something else? Currently I can see bios as large as 127 megs 
-> on sequential workloads, I got prompted to this since btrfs has a 
-> memory allocation that is dependent on the data in the bio and this 
-> particular memory allocation started failing with order 6 allocs. 
+Thank you!
 
-Could you share us the code? I don't see why order 6 allocs is a must.
-
-> Further debugging showed that with the following xfs_io command line: 
-> 
-> 
-> xfs_io -f -c "pwrite -S 0x61 -b 4m 0 10g" /media/scratch/file1
-> 
-> I can easily see very large bios: 
-> 
-> [  188.366540] kworker/-7       3.... 34847519us : btrfs_submit_bio_hook: bio: ffff8dffe9940bb0 bi_iter.bi_size = 134184960 bi_vcn: 28 bi_vcnt_max: 256
-> [  188.367129] kworker/-658     2.... 34946536us : btrfs_submit_bio_hook: bio: ffff8dffe9940370 bi_iter.bi_size = 134246400 bi_vcn: 28 bi_vcnt_max: 256
-> [  188.367714] kworker/-7       3.... 35107967us : btrfs_submit_bio_hook: bio: ffff8dffe9940bb0 bi_iter.bi_size = 134184960 bi_vcn: 30 bi_vcnt_max: 256
-> [  188.368319] kworker/-658     2.... 35229894us : btrfs_submit_bio_hook: bio: ffff8dffe9940370 bi_iter.bi_size = 134246400 bi_vcn: 32 bi_vcnt_max: 256
-> [  188.368909] kworker/-7       3.... 35374809us : btrfs_submit_bio_hook: bio: ffff8dffe9940bb0 bi_iter.bi_size = 134184960 bi_vcn: 25 bi_vcnt_max: 256
-> [  188.369498] kworker/-658     2.... 35516194us : btrfs_submit_bio_hook: bio: ffff8dffe9940370 bi_iter.bi_size = 134246400 bi_vcn: 31 bi_vcnt_max: 256
-> [  188.370086] kworker/-7       3.... 35663669us : btrfs_submit_bio_hook: bio: ffff8dffe9940bb0 bi_iter.bi_size = 134184960 bi_vcn: 32 bi_vcnt_max: 256
-> [  188.370696] kworker/-658     2.... 35791006us : btrfs_submit_bio_hook: bio: ffff8dffe9940370 bi_iter.bi_size = 100655104 bi_vcn: 24 bi_vcnt_max: 256
-> [  188.371335] kworker/-658     2.... 35816114us : btrfs_submit_bio_hook: bio: ffff8dffe99434f0 bi_iter.bi_size = 33591296 bi_vcn: 5 bi_vcnt_max: 256
-> 
-> 
-> So that's 127 megs in a single bio? This stems from the new merging logic. 
-> 07173c3ec276 ("block: enable multipage bvecs") made it so that physically 
-> contiguous pages added to the bio would just modify bi_iter.bi_size and the 
-> initial page's bio_vec's bv_len. There's no longer the 
-> page == bv->bv_page portion of the check. 
-
-bio_add_page() tries best to put physically contiguous pages into one bvec, and
-I don't see anything is wrong in the log.
-
-Could you show us what the real problem is?
-
-Thanks,
-Ming
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
