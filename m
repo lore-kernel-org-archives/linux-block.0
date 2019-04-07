@@ -2,251 +2,72 @@ Return-Path: <SRS0=ol8w=SJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 477C3C10F0E
-	for <linux-block@archiver.kernel.org>; Sun,  7 Apr 2019 13:56:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4671C10F0E
+	for <linux-block@archiver.kernel.org>; Sun,  7 Apr 2019 14:18:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0CC2720B1F
-	for <linux-block@archiver.kernel.org>; Sun,  7 Apr 2019 13:56:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="doN+cSr/"
+	by mail.kernel.org (Postfix) with ESMTP id 803A820896
+	for <linux-block@archiver.kernel.org>; Sun,  7 Apr 2019 14:18:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726360AbfDGN4I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 7 Apr 2019 09:56:08 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:49456 "EHLO
-        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726315AbfDGN4I (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Apr 2019 09:56:08 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
-        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x37DtYwi037478;
-        Sun, 7 Apr 2019 13:55:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to :
- references : cc : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2018-07-02;
- bh=V5eO5m3QZHgr95sfAEKEJhS39zTO3RtRxmIOBxL30rY=;
- b=doN+cSr/Z1Wg1GXiPo8WadlUEEBlHSWvhchu8YOg3ZR6iV0THI4GWeqcB2R8VYAU3C+r
- JdNjZ64iiTJhGovlh92GhJaSCf4SdbiJIBIFh4WL05zHYnzJc8S/Itz4RCqYt5GL82dz
- GkV1S74QR5WludRCu5nZx9aolPA6iiZHgnzLyBgTFx0X6qyN7X621srWFTgnPTVk0sem
- 3OLksHHY6dtQm7P8d75tGUzgkTVNkAw5wWN3spzDDhjWDEkebhJnpWxzz/8Z0iwNj22y
- 2vAmJF0Ls+urS4NQXrnPcikY7iH8TuLo3rV4VYWidQCBCVHdc6pt/Z0TIwYI4iPqcU63 vQ== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2130.oracle.com with ESMTP id 2rphme2wx2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 07 Apr 2019 13:55:34 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x37DtYd3137318;
-        Sun, 7 Apr 2019 13:55:34 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3030.oracle.com with ESMTP id 2rpj59mx04-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 07 Apr 2019 13:55:34 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x37DtSj7006273;
-        Sun, 7 Apr 2019 13:55:29 GMT
-Received: from [192.168.2.8] (/106.39.150.192)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Sun, 07 Apr 2019 13:55:28 +0000
-Subject: Re: [PATCH] blk-mq: Wait for for hctx requests on CPU unplug
-To:     Ming Lei <ming.lei@redhat.com>, Keith Busch <keith.busch@gmail.com>
-References: <20190405215920.27085-1-keith.busch@intel.com>
- <226503cd-53ac-902c-7944-b2748407b1d3@kernel.dk>
- <20190405223719.GC25081@localhost.localdomain>
- <d4a4b6c0-3ea8-f748-85b0-6b39c5023a6f@kernel.dk>
- <CAOSXXT7V3E2j_Ut=hJ2X3QcdLwuWGRFtgzTs4iTe+RDMeHg8nA@mail.gmail.com>
- <20190406212709.GA29871@ming.t460p>
-Cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <keith.busch@intel.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Jianchao Wang <jianchao.w.wang@oracle.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-From:   Dongli Zhang <dongli.zhang@oracle.com>
-Message-ID: <4a57f581-954d-b314-fd1d-6dd30640e0f5@oracle.com>
-Date:   Sun, 7 Apr 2019 21:55:20 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        id S1726246AbfDGOSS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 7 Apr 2019 10:18:18 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:39219 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726049AbfDGOSS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Apr 2019 10:18:18 -0400
+Received: by mail-pg1-f193.google.com with SMTP id k3so5765504pga.6
+        for <linux-block@vger.kernel.org>; Sun, 07 Apr 2019 07:18:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=2hE+Y4VLdlpNzQ9km+DbjGD+caRGA+nzXynZLj8D/zE=;
+        b=IMLD4lxoQ55T0+Fcs4Bt9fcljjPZemoAq59E6KpVxQLaufR7WAS/caXlTXUUctp5yS
+         ifAmlAnJ3VR/5F1/xc14rfap9qEQIYV4e4Ftit+c809elkmyNBTpT9Woh4ZOow+RVMEG
+         mMznFE93U3pNJ0nP8LbibFSYSE+tJtYItvo//kjiHAP+TooCUUcrMQ2nsuJH5jElBpTR
+         WdQdueq6xkcx1PNLS98c0NgByHaRyivsM96JgYN4ej9CVwy+cPN9IZhgnJeSyRb4hB+/
+         4AGAnT1joanFdqtQDfo9TnfggWbINoMbigm92qiSt8rUZV65VwU1GPCkN94x8rxo+f+P
+         KNHA==
+X-Gm-Message-State: APjAAAXHSqSL948ecqTVCzPVK5fCXjX0e7QDw6qGdT7X1vOL9W0GkrHV
+        lQ3N3V/UWkfGCsx8rN57yq7x994L
+X-Google-Smtp-Source: APXvYqzBUbGgJtgUDKX8nZGhI2fwhWkKlvWsIWBgwldrxbHS06qfOwhp3ElBlRWjohlilgVMb2K4qQ==
+X-Received: by 2002:a63:c45:: with SMTP id 5mr23352911pgm.385.1554646697289;
+        Sun, 07 Apr 2019 07:18:17 -0700 (PDT)
+Received: from asus.site ([2601:647:4000:5dd1:a41e:80b4:deb3:fb66])
+        by smtp.gmail.com with ESMTPSA id c5sm4451835pgh.5.2019.04.07.07.18.15
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 07 Apr 2019 07:18:16 -0700 (PDT)
+Subject: Re: [PATCH] block: cleanup for blk_cleanup_queue()
+To:     Shenghui Wang <shhuiw@foxmail.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org
+References: <20190407110314.7145-1-shhuiw@foxmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+Message-ID: <26a49dd7-4525-1632-5bc5-a41cf5327cec@acm.org>
+Date:   Sun, 7 Apr 2019 07:18:14 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-In-Reply-To: <20190406212709.GA29871@ming.t460p>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20190407110314.7145-1-shhuiw@foxmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9219 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1904070130
-X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9219 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1904070131
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Keith and Ming,
+On 4/7/19 4:03 AM, Shenghui Wang wrote:
+>   	/*
+> -	 * Drain all requests queued before DYING marking. Set DEAD flag to
+> +	 * Drain all requests queued before DEAD marking. Set DEAD flag to
+>   	 * prevent that q->request_fn() gets invoked after draining finished.
+>   	 */
 
-On 04/07/2019 05:27 AM, Ming Lei wrote:
-> On Fri, Apr 05, 2019 at 05:36:32PM -0600, Keith Busch wrote:
->> On Fri, Apr 5, 2019 at 5:04 PM Jens Axboe <axboe@kernel.dk> wrote:
->>> Looking at current peak testing, I've got around 1.2% in queue enter
->>> and exit. It's definitely not free, hence my question. Probably safe
->>> to assume that we'll double that cycle counter, per IO.
->>
->> Okay, that's not negligible at all. I don't know of a faster reference
->> than the percpu_ref, but that much overhead would have to rule out
->> having a per hctx counter.
-> 
-> Or not using any refcount in fast path, how about the following one?
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 3ff3d7b49969..6fe334e12236 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2199,6 +2199,23 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
->  	return -ENOMEM;
->  }
->  
-> +static void blk_mq_wait_hctx_become_idle(struct blk_mq_hw_ctx *hctx,
-> +		int dead_cpu)
-> +{
-> +	unsigned long msecs_left = 1000 * 10;
-> +
-> +	while (msecs_left > 0) {
-> +		if (blk_mq_hctx_idle(hctx))
-> +			break;
-> +		msleep(5);
-> +		msecs_left -= 5;
-> +	}
-> +
-> +	if (msecs_left > 0)
-> +		printk(KERN_WARNING "requests not completed from "
-> +			"CPU %d\n", dead_cpu);
-> +}
-> +
->  /*
->   * 'cpu' is going away. splice any existing rq_list entries from this
->   * software queue to the hw queue dispatch list, and ensure that it
-> @@ -2230,6 +2247,14 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
->  	spin_unlock(&hctx->lock);
->  
+No new requests can be queued between the "dying" and "dead" states. I 
+wrote "dying" in that comment because I meant "dying". See also commit 
+3f3299d5c026 ("block: Rename queue dead flag").
 
-While debugging the blk_mq_hctx_notify_dead(), I found that
-blk_mq_hctx_notify_dead() is called once for each hctx for the cpu to offline.
-
-As shown below between linux 2216 and line 2217, ctx might not be mapped to
-hctx. Why would we flush ctx->rq_lists[type] to hctx->dispatch?
-
-2207 static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
-2208 {
-2209         struct blk_mq_hw_ctx *hctx;
-2210         struct blk_mq_ctx *ctx;
-2211         LIST_HEAD(tmp);
-2212         enum hctx_type type;
-2213
-2214         hctx = hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
-2215         ctx = __blk_mq_get_ctx(hctx->queue, cpu);
-2216         type = hctx->type;
-
-===>>>>> ctx might not be mappped to hctx, that is,
-cpumask_test_cpu(cpu, hctx->cpumask) = false
-
-2217
-2218         spin_lock(&ctx->lock);
-2219         if (!list_empty(&ctx->rq_lists[type])) {
-2220                 list_splice_init(&ctx->rq_lists[type], &tmp);
-2221                 blk_mq_hctx_clear_pending(hctx, ctx);
-2222         }
-2223         spin_unlock(&ctx->lock);
-2224
-2225         if (list_empty(&tmp))
-2226                 return 0;
-2227
-2228         spin_lock(&hctx->lock);
-2229         list_splice_tail_init(&tmp, &hctx->dispatch);
-2230         spin_unlock(&hctx->lock);
-2231
-2232         blk_mq_run_hw_queue(hctx, true);
-2233         return 0;
-2234 }
-
-
-For example, on a VM (with nvme) of 4 cpu, to offline cpu 2 out of the
-4 cpu (0-3), blk_mq_hctx_notify_dead() is called once for each io queue
-hctx:
-
-1st: blk_mq_ctx->cpu = 2 for blk_mq_hw_ctx->queue_num = 3
-2nd: blk_mq_ctx->cpu = 2 for blk_mq_hw_ctx->queue_num = 2
-3rd: blk_mq_ctx->cpu = 2 for blk_mq_hw_ctx->queue_num = 1
-4th: blk_mq_ctx->cpu = 2 for blk_mq_hw_ctx->queue_num = 0
-
-Although blk_mq_ctx->cpu = 2 is only mapped to blk_mq_hw_ctx->queue_num = 2
-in this case, its ctx->rq_lists[type] will however be moved to
-blk_mq_hw_ctx->queue_num = 3 during the 1st call of
-blk_mq_hctx_notify_dead().
-
-
-Is this expected or a bug?
-
-If it is a bug, would the below help?
-
-[PATCH 1/1] blk-mq: do not splice ctx->rq_lists[type] to hctx->dispatch if ctx
-is not mapped to hctx
-
-When a cpu is offline, blk_mq_hctx_notify_dead() is called once for each
-hctx for the offline cpu.
-
-While blk_mq_hctx_notify_dead() is used to splice all ctx->rq_lists[type]
-to hctx->dispatch, it never checks whether the ctx is already mapped to the
-hctx.
-
-For example, on a VM (with nvme) of 4 cpu, to offline cpu 2 out of the
-4 cpu (0-3), blk_mq_hctx_notify_dead() is called once for each io queue
-hctx:
-
-1st: blk_mq_ctx->cpu = 2 for blk_mq_hw_ctx->queue_num = 3
-2nd: blk_mq_ctx->cpu = 2 for blk_mq_hw_ctx->queue_num = 2
-3rd: blk_mq_ctx->cpu = 2 for blk_mq_hw_ctx->queue_num = 1
-4th: blk_mq_ctx->cpu = 2 for blk_mq_hw_ctx->queue_num = 0
-
-Although blk_mq_ctx->cpu = 2 is only mapped to blk_mq_hw_ctx->queue_num = 2
-in this case, its ctx->rq_lists[type] will however be moved to
-blk_mq_hw_ctx->queue_num = 3 during the 1st call of
-blk_mq_hctx_notify_dead().
-
-This patch would return and go ahead to next call of
-blk_mq_hctx_notify_dead() if ctx is not mapped to hctx.
-
-Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
----
- block/blk-mq.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 3ff3d7b..b8ef489 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2212,6 +2212,10 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu,
-struct hlist_node *node)
- 	enum hctx_type type;
-
- 	hctx = hlist_entry_safe(node, struct blk_mq_hw_ctx, cpuhp_dead);
-+
-+	if (!cpumask_test_cpu(cpu, hctx->cpumask))
-+		return 0;
-+
- 	ctx = __blk_mq_get_ctx(hctx->queue, cpu);
- 	type = hctx->type;
-
--- 
-2.7.4
-
-
-Thank you very much!
-
-Dongli Zhang
+Bart.
