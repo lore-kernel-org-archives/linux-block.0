@@ -2,93 +2,162 @@ Return-Path: <SRS0=ol8w=SJ=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6346BC10F0E
-	for <linux-block@archiver.kernel.org>; Sun,  7 Apr 2019 08:19:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3CE4C10F0E
+	for <linux-block@archiver.kernel.org>; Sun,  7 Apr 2019 08:53:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 27AF0213F2
-	for <linux-block@archiver.kernel.org>; Sun,  7 Apr 2019 08:19:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bvG9td0q"
+	by mail.kernel.org (Postfix) with ESMTP id C18C120833
+	for <linux-block@archiver.kernel.org>; Sun,  7 Apr 2019 08:53:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726020AbfDGITy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 7 Apr 2019 04:19:54 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:35886 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725966AbfDGITy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 7 Apr 2019 04:19:54 -0400
-Received: by mail-pg1-f196.google.com with SMTP id 85so5516234pgc.3
-        for <linux-block@vger.kernel.org>; Sun, 07 Apr 2019 01:19:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=CyIs65fI7ie50Guxpn5FRBWMQhTfYw2JeejDUpG9jL0=;
-        b=bvG9td0qYcRGwTcscHPUvGnsjhgt0XFDoygtgIe8oexGO16LJAXZd1TW11ywWFUAZO
-         eczR+b4c2nEKzOe2iG+oBrGIu/0y090Dza2r7JW0mFvLoBS8gdF9kMf54iiGM+hXU5Wi
-         jSsjJYABTZ01TFQS9PZStXdyR0Xjq31lpcg+x1CAibXzGd1N40RBsIwEFEA9PcM+T7Hn
-         h7U+z+sTyYY5V13J7GNQNgpi+V/LtWwn1/OtaIpFeRlpWer7L+ihnfor2HRi8wleN194
-         PX5juacbF7rqTkOUFFhQawVJuzgnt2FdCNZQfNKLabfmZOS2myXbQSFSQ361dREwB3CG
-         NdCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=CyIs65fI7ie50Guxpn5FRBWMQhTfYw2JeejDUpG9jL0=;
-        b=DbTJ/0LxGJIpzfT936wXDve8L7PcuMo2YpVIZF9d+WvFHv24dr1cAXJMFxc0uHMBaX
-         I19ZYp0zV5VOHltExXV2NsUN38nFMIkRT0U+4ilxTViiyALy2yBn2eCHfKqfQZCbYEIL
-         z6nzHFwwLa2pRnu6AxsjaHgVRgLKGBDrnPYq6MvpHTQBJbp9vWR56Cygr9Oq6BofB+Yq
-         PqNyi7HKDoHkNd7bHRjH5Yt/fGBsib2f0VYhsiLNzHiK1C5bqHqAb+lMzE9Dbz7Ua4C+
-         aY7ke8lMvwY2wvEg+DEuDEpx/4hqamnXN4kaqOsBWBadMhal/sfS6/XzH3jKA/7vTmFo
-         vL7g==
-X-Gm-Message-State: APjAAAVVlIJkDhDQloQXdOrxPc9iztWlereb88dsjl+f/ndjJ9lyjhgR
-        FLrwIVwErlT5aC2l02GlQtq0iFeuSQE=
-X-Google-Smtp-Source: APXvYqyLFnxYgbEp6mlDsqYFUVyoYMf6JcDyMWvaRDvqLPfHht+CXXTFWh4gWowuzd0qcf/qE/FrpQ==
-X-Received: by 2002:a62:62c3:: with SMTP id w186mr22727624pfb.73.1554625193124;
-        Sun, 07 Apr 2019 01:19:53 -0700 (PDT)
-Received: from localhost.localdomain ([123.213.206.190])
-        by smtp.gmail.com with ESMTPSA id m69sm39923029pfi.151.2019.04.07.01.19.50
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 07 Apr 2019 01:19:52 -0700 (PDT)
-From:   Minwoo Im <minwoo.im.dev@gmail.com>
-To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Minwoo Im <minwoo.im.dev@gmail.com>
-Subject: [PATCH] block: null: Add documentation for "zone_nr_conv" param
-Date:   Sun,  7 Apr 2019 17:19:38 +0900
-Message-Id: <20190407081938.20318-1-minwoo.im.dev@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        id S1726053AbfDGIxe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 7 Apr 2019 04:53:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:58032 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725996AbfDGIxd (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Sun, 7 Apr 2019 04:53:33 -0400
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id EBD95F74A7;
+        Sun,  7 Apr 2019 08:53:32 +0000 (UTC)
+Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B43C719C56;
+        Sun,  7 Apr 2019 08:53:29 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Qu Wenruo <quwenruo.btrfs@gmx.com>,
+        linux-btrfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Omar Sandoval <osandov@fb.com>, Christoph Hellwig <hch@lst.de>
+Subject: [PATCH V2] block: don't use for-inside-for in bio_for_each_segment_all
+Date:   Sun,  7 Apr 2019 16:53:25 +0800
+Message-Id: <20190407085325.9380-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.38]); Sun, 07 Apr 2019 08:53:33 +0000 (UTC)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-zone_nr_conv module parameter was introduced by a commit
-ea2c18e1("null_blk: Add conventional zone configuration for zoned
-support").
+Commit 6dc4f100c175 ("block: allow bio_for_each_segment_all() to
+iterate over multi-page bvec") changes bio_for_each_segment_all()
+to use for-inside-for.
 
-This patch describes "zone_nr_conv" module parameter to the document.
+This way breaks all bio_for_each_segment_all() call with error out
+branch via 'break', since now 'break' can only break from the inner
+loop.
 
-Signed-off-by: Minwoo Im <minwoo.im.dev@gmail.com>
+Fixes this issue by implementing bio_for_each_segment_all() via
+single 'for' loop, and now the logic is very similar with normal
+bvec iterator.
+
+Cc: Qu Wenruo <quwenruo.btrfs@gmx.com>
+Cc: linux-btrfs@vger.kernel.org
+Cc: linux-fsdevel@vger.kernel.org
+Cc: Omar Sandoval <osandov@fb.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Reported-and-Tested-by: Qu Wenruo <quwenruo.btrfs@gmx.com>
+Fixes: 6dc4f100c175 ("block: allow bio_for_each_segment_all() to iterate over multi-page bvec")
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- Documentation/block/null_blk.txt | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/linux/bio.h  | 20 ++++++++++++--------
+ include/linux/bvec.h | 23 +++++++++++++++--------
+ 2 files changed, 27 insertions(+), 16 deletions(-)
 
-diff --git a/Documentation/block/null_blk.txt b/Documentation/block/null_blk.txt
-index 4cad1024fff7..41f0a3d33bbd 100644
---- a/Documentation/block/null_blk.txt
-+++ b/Documentation/block/null_blk.txt
-@@ -93,3 +93,7 @@ zoned=[0/1]: Default: 0
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index bb6090aa165d..9c583bf98ff9 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -120,19 +120,23 @@ static inline bool bio_full(struct bio *bio)
+ 	return bio->bi_vcnt >= bio->bi_max_vecs;
+ }
  
- zone_size=[MB]: Default: 256
-   Per zone size when exposed as a zoned block device. Must be a power of two.
+-#define mp_bvec_for_each_segment(bv, bvl, i, iter_all)			\
+-	for (bv = bvec_init_iter_all(&iter_all);			\
+-		(iter_all.done < (bvl)->bv_len) &&			\
+-		(mp_bvec_next_segment((bvl), &iter_all), 1);		\
+-		iter_all.done += bv->bv_len, i += 1)
++static inline bool bio_next_segment(const struct bio *bio,
++					 struct bvec_iter_all *iter)
++{
++	if (iter->idx >= bio->bi_vcnt)
++		return false;
 +
-+zone_nr_conv=[nr_conv]: Default: 0
-+  The number of conventional zones to create when block device is zoned.  If
-+  zone_nr_conv >= nr_zones, it will be reduced to nr_zones - 1.
++	bvec_advance(&bio->bi_io_vec[iter->idx], iter);
++	return true;
++}
+ 
+ /*
+  * drivers should _never_ use the all version - the bio may have been split
+  * before it got to the driver and the driver won't own all of it
+  */
+-#define bio_for_each_segment_all(bvl, bio, i, iter_all)		\
+-	for (i = 0, iter_all.idx = 0; iter_all.idx < (bio)->bi_vcnt; iter_all.idx++)	\
+-		mp_bvec_for_each_segment(bvl, &((bio)->bi_io_vec[iter_all.idx]), i, iter_all)
++#define bio_for_each_segment_all(bvl, bio, i, iter)			\
++	for (i = 0, bvl = bvec_init_iter_all(&iter);			\
++	     bio_next_segment((bio), &iter); i++)
+ 
+ static inline void bio_advance_iter(struct bio *bio, struct bvec_iter *iter,
+ 				    unsigned bytes)
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index f6275c4da13a..67eda310b643 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -47,8 +47,9 @@ struct bvec_iter {
+ 
+ struct bvec_iter_all {
+ 	struct bio_vec	bv;
+-	int		idx;
+-	unsigned	done;
++	int		idx;		/* current index into bvec table */
++	unsigned	bvec_done;	/* number of bytes completed in
++					   currnet bvec	*/
+ };
+ 
+ static inline struct page *bvec_nth_page(struct page *page, int idx)
+@@ -145,18 +146,18 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
+ 
+ static inline struct bio_vec *bvec_init_iter_all(struct bvec_iter_all *iter_all)
+ {
+-	iter_all->bv.bv_page = NULL;
+-	iter_all->done = 0;
++	iter_all->bvec_done = 0;
++	iter_all->idx = 0;
+ 
+ 	return &iter_all->bv;
+ }
+ 
+-static inline void mp_bvec_next_segment(const struct bio_vec *bvec,
+-					struct bvec_iter_all *iter_all)
++static inline void bvec_advance(const struct bio_vec *bvec,
++		struct bvec_iter_all *iter_all)
+ {
+ 	struct bio_vec *bv = &iter_all->bv;
+ 
+-	if (bv->bv_page) {
++	if (iter_all->bvec_done) {
+ 		bv->bv_page = nth_page(bv->bv_page, 1);
+ 		bv->bv_offset = 0;
+ 	} else {
+@@ -164,7 +165,13 @@ static inline void mp_bvec_next_segment(const struct bio_vec *bvec,
+ 		bv->bv_offset = bvec->bv_offset;
+ 	}
+ 	bv->bv_len = min_t(unsigned int, PAGE_SIZE - bv->bv_offset,
+-			   bvec->bv_len - iter_all->done);
++			   bvec->bv_len - iter_all->bvec_done);
++	iter_all->bvec_done += bv->bv_len;
++
++	if (iter_all->bvec_done == bvec->bv_len) {
++		iter_all->idx++;
++		iter_all->bvec_done = 0;
++	}
+ }
+ 
+ /*
 -- 
-2.17.1
+2.9.5
 
