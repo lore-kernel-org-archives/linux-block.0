@@ -4,44 +4,43 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40758C10F14
-	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 10:47:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE187C10F13
+	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 10:47:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 07633213F2
-	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 10:47:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7469020883
+	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 10:47:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="fRj+WHLS"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nT30lN5D"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726240AbfDHKrK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Apr 2019 06:47:10 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:43128 "EHLO
+        id S1726025AbfDHKrN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Apr 2019 06:47:13 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:43468 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726025AbfDHKrK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Apr 2019 06:47:10 -0400
+        with ESMTP id S1725933AbfDHKrM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Apr 2019 06:47:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=ujE7HFWYEnqRuLkTpNeVkbaF5H7bpbdcoBBNUgC69Zg=; b=fRj+WHLSIvPWSc1dcMLmssONy3
-        DvSOagbFjFzyzPM/D6OB0ixyxKArcUABEoO/3+1zeBbQVEal3+dKsxTrLZj3MloqlT2NuN56DzbBP
-        mnRJRsGZGZeXCK1+5JkptsG4hZHE44CZ6YCsxh9iEyZArKUldjWAK5IS5kVTjUwug0qSEmAoNSZa+
-        kN1xDAFTDTDczm3Bw6EIZMo3h4EZ2RAgv2CVWfH7exHGGrB+nseQ3v6CdrMfRmqO81q944x3jsJNP
-        6iohgXmLQ9KPEzmtexgZYPxxRKTiWsLvXEvHxEosw445WmfZY3W6Zy7N2gQHTPflKWVQNsIxltJSE
-        YNhcPj9Q==;
+        bh=S1pVJ2+xZSpEMyLPvjUzxxbCmkkVwdxyV3H/fb2TEcI=; b=nT30lN5Dq0VHdY485iSq28g6Vs
+        fsZ/gXBJYRmF6Bk7lrD7JyxN5Qvd5nJw+nyncGZZSJaNuctwYynums5EWyabX4e+wQPNlO3XBA0K4
+        cUYYOxcGgyomHWnQjFAB/MT/v9BIMOk6NYSq8cndUGz21B1vCp6C5ZSgEya3v5KP3bKEXZQ9PVccx
+        kMmAY/1wHwSOYVc32UOmex6hh+UZfeEe3SF6/P3lIAWd+T/m3D2AwxZU0AgNffSqSUh3OPyO3eQ/z
+        GX0nClqizsAJ5RSGKkoKhoM+/3qhIsMvCCsTJK/fhm8hoLe5+pHaWSsGxSS4uRl3rK2FORo1I0ZI1
+        p0L4Cp1A==;
 Received: from clnet-p19-102.ikbnet.co.at ([83.175.77.102] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hDRnw-0000ID-1w; Mon, 08 Apr 2019 10:47:08 +0000
+        id 1hDRny-0000Lq-I2; Mon, 08 Apr 2019 10:47:10 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Subject: [PATCH 2/5] block: refactor __bio_iov_bvec_add_pages
-Date:   Mon,  8 Apr 2019 12:46:38 +0200
-Message-Id: <20190408104641.4905-3-hch@lst.de>
+Subject: [PATCH 3/5] block: don't allow multiple bio_iov_iter_get_pages calls per bio
+Date:   Mon,  8 Apr 2019 12:46:39 +0200
+Message-Id: <20190408104641.4905-4-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190408104641.4905-1-hch@lst.de>
 References: <20190408104641.4905-1-hch@lst.de>
@@ -53,47 +52,54 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Return early on error, and add an unlikely annotation for that case.
+No caller uses bio_iov_iter_get_pages multiple times on a given bio,
+and that funtionality isn't all that useful.  Removing it will make
+some future changes a little easier and also simplifies the function
+a bit.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio.c | 19 +++++++++----------
- 1 file changed, 9 insertions(+), 10 deletions(-)
+ block/bio.c | 15 ++++++---------
+ 1 file changed, 6 insertions(+), 9 deletions(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index c2592c5d70b9..ad346082a971 100644
+index ad346082a971..2fa624db21c7 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -873,20 +873,19 @@ static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
- 	len = min_t(size_t, bv->bv_len - iter->iov_offset, iter->count);
- 	size = bio_add_page(bio, bv->bv_page, len,
- 				bv->bv_offset + iter->iov_offset);
--	if (size == len) {
--		if (!bio_flagged(bio, BIO_NO_PAGE_REF)) {
--			struct page *page;
--			int i;
-+	if (unlikely(size != len))
+@@ -958,7 +958,10 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ {
+ 	const bool is_bvec = iov_iter_is_bvec(iter);
+-	unsigned short orig_vcnt = bio->bi_vcnt;
++	int ret = -EFAULT;
++
++	if (WARN_ON_ONCE(bio->bi_vcnt))
 +		return -EINVAL;
  
--			mp_bvec_for_each_page(page, bv, i)
--				get_page(page);
--		}
-+	if (!bio_flagged(bio, BIO_NO_PAGE_REF)) {
-+		struct page *page;
-+		int i;
+ 	/*
+ 	 * If this is a BVEC iter, then the pages are kernel pages. Don't
+@@ -968,19 +971,13 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 		bio_set_flag(bio, BIO_NO_PAGE_REF);
  
--		iov_iter_advance(iter, size);
--		return 0;
-+		mp_bvec_for_each_page(page, bv, i)
-+			get_page(page);
- 	}
+ 	do {
+-		int ret;
+-
+ 		if (is_bvec)
+ 			ret = __bio_iov_bvec_add_pages(bio, iter);
+ 		else
+ 			ret = __bio_iov_iter_get_pages(bio, iter);
++	} while (!ret && iov_iter_count(iter) && !bio_full(bio));
  
--	return -EINVAL;
-+	iov_iter_advance(iter, size);
-+	return 0;
+-		if (unlikely(ret))
+-			return bio->bi_vcnt > orig_vcnt ? 0 : ret;
+-
+-	} while (iov_iter_count(iter) && !bio_full(bio));
+-
+-	return 0;
++	return bio->bi_vcnt ? 0 : ret;
  }
  
- #define PAGE_PTRS_PER_BVEC     (sizeof(struct bio_vec) / sizeof(struct page *))
+ static void submit_bio_wait_endio(struct bio *bio)
 -- 
 2.20.1
 
