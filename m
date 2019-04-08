@@ -2,126 +2,146 @@ Return-Path: <SRS0=Qcaa=SK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D85A7C10F13
-	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 15:19:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F113C10F13
+	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 15:20:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A35BA20879
-	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 15:19:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k6GTCo5u"
+	by mail.kernel.org (Postfix) with ESMTP id 5E4B520883
+	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 15:20:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1554736824;
+	bh=/phdwhnjT0kwwsjSnq2lGtRBBrDys1nMccYrqHSQ0P0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=fHzm3ooI/Z8DoZDsp2M0PegWIxR1N8/qVqjJ2SrfABWh/YkHR/ceHpp4M3aU/pUYH
+	 A921G1QDTlHEM2YsEKNk0qW9Rqrd11uvY860Tq2FPsicjkhb3Taexf9ZSrbw03yvTk
+	 9yWIygdaiPPqh8rZBz/047kxDeZ4YqNcidXyAAWc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728681AbfDHPTK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Apr 2019 11:19:10 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:37147 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728637AbfDHPTK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Apr 2019 11:19:10 -0400
-Received: by mail-wr1-f67.google.com with SMTP id w10so16911297wrm.4
-        for <linux-block@vger.kernel.org>; Mon, 08 Apr 2019 08:19:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=/leuO0ReNKxJFhgJ0Qj7KukamA50Bn4keQX7qI/nENE=;
-        b=k6GTCo5umK7gLWSz437KDn9LSP6GlCxNEy4GI7Rh0gEDZvFxEpAL4TbtSYFlVLJ4Ge
-         fGm70b/C4itq7DAv3r5wbbDoGubjcGfZRYW5W5qdmMHX+Pk82yCxd8bJxSF7sSn4L++/
-         SHJNvARO3Pn0vszp+AJNvT89eAG3kOQIYQu3ZgqLUSDsyOy4fHCPN1zEN7pJl40IIR0q
-         R7JKRK3+IxbcOpyTiDofd8AoewvBhF2GA1Jnpog/fF4tYgsiUE+hoXfu4ViwBjtTck9R
-         X2DhhVhmZOjtb2Ts9U/eFU9ApsHhSUkP/MtdBg7TWBWK+IFI/M1OswuUaH5f3tEimal/
-         qquw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=/leuO0ReNKxJFhgJ0Qj7KukamA50Bn4keQX7qI/nENE=;
-        b=qFbg+Y8UYmbCsKKi+Jw2ziH2ZVGiZpzxH9DWtC/EcUaQFIlGcMJgUIJr3ppSYYI2vf
-         Sa6svG8X7fD1np3bZzsgvpsrg77bzxrlwOC7obFgOGLCZnv44m6WMVFRbURdkELz2HmN
-         KMU+QWolljzgBJvaxgBz77cE+sK0Vpwf9VvO0mm9ubBpW2OPYXrdzvrt21VOQ2gb39Jl
-         85vAFJKE/y3KUSeNM228UhfZ1h/58yKNrImxkmuN6KJQ0Enz7JeYsDb9su4gYnNIeeoW
-         VPh9JdhakSwbqmpuINqCIIT/uOVDnnjtu7GWg8SRfm7916iNFMC91TnorzVbMM5h3g6b
-         HQNg==
-X-Gm-Message-State: APjAAAUatUs4RQTM2stu3VY3E/WpqZgdBqYtriYqYvg87Wu9ZeYfJStM
-        JvIZHCr+RlycUu7G1q/4a69qVw==
-X-Google-Smtp-Source: APXvYqwIL3aSbbSE3AHMHC3+MPX0zhIl82ebt9C8NHdoa3rLCksIfRwVXXfEDjnPoiIE342asVOFSQ==
-X-Received: by 2002:a5d:448b:: with SMTP id j11mr18416274wrq.218.1554736747973;
-        Mon, 08 Apr 2019 08:19:07 -0700 (PDT)
-Received: from [192.168.0.100] ([88.147.51.116])
-        by smtp.gmail.com with ESMTPSA id t15sm28228687wrx.22.2019.04.08.08.19.06
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 08 Apr 2019 08:19:07 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
-Subject: Re: [PATCH 1/1] block, bfq: delete "bfq" prefix from cgroup filenames
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <d5c1fb9c-16ec-420c-4067-53d6bccb4ebd@kernel.dk>
-Date:   Mon, 8 Apr 2019 17:19:06 +0200
-Cc:     Johannes Thumshirn <jthumshirn@suse.de>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Mark Brown <broonie@kernel.org>,
-        'Paolo Valente' via bfq-iosched 
-        <bfq-iosched@googlegroups.com>,
-        Oleksandr Natalenko <oleksandr@natalenko.name>,
-        Angelo Ruocco <angeloruocco90@gmail.com>,
-        lennart@poettering.net, mkoutny@suse.cz
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <0266AF07-C2CE-49DC-BC54-519F2C71E1EE@linaro.org>
-References: <20190408143935.9062-1-paolo.valente@linaro.org>
- <20190408143935.9062-2-paolo.valente@linaro.org>
- <20190408144925.GA23021@linux-x5ow.site>
- <7B68DAA9-61D9-4AE0-9FA9-05C07C7FE408@linaro.org>
- <20190408150430.GB23021@linux-x5ow.site>
- <df1dfe5d-c763-91c2-4aca-25d4622c4820@kernel.dk>
- <20190408150828.GC23021@linux-x5ow.site>
- <d5c1fb9c-16ec-420c-4067-53d6bccb4ebd@kernel.dk>
-To:     Jens Axboe <axboe@kernel.dk>
-X-Mailer: Apple Mail (2.3445.102.3)
+        id S1726876AbfDHPUX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Apr 2019 11:20:23 -0400
+Received: from mga02.intel.com ([134.134.136.20]:3205 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726742AbfDHPUX (ORCPT <rfc822;linux-block@vger.kernel.org>);
+        Mon, 8 Apr 2019 11:20:23 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Apr 2019 08:20:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,325,1549958400"; 
+   d="scan'208";a="221592237"
+Received: from unknown (HELO localhost.localdomain) ([10.232.112.69])
+  by orsmga001.jf.intel.com with ESMTP; 08 Apr 2019 08:20:21 -0700
+Date:   Mon, 8 Apr 2019 09:21:58 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Keith Busch <keith.busch@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "Busch, Keith" <keith.busch@intel.com>,
+        Jianchao Wang <jianchao.w.wang@oracle.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH] blk-mq: Wait for for hctx requests on CPU unplug
+Message-ID: <20190408152158.GD32498@localhost.localdomain>
+References: <20190405215920.27085-1-keith.busch@intel.com>
+ <226503cd-53ac-902c-7944-b2748407b1d3@kernel.dk>
+ <20190405223719.GC25081@localhost.localdomain>
+ <d4a4b6c0-3ea8-f748-85b0-6b39c5023a6f@kernel.dk>
+ <CAOSXXT7V3E2j_Ut=hJ2X3QcdLwuWGRFtgzTs4iTe+RDMeHg8nA@mail.gmail.com>
+ <20190406212709.GA29871@ming.t460p>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190406212709.GA29871@ming.t460p>
+User-Agent: Mutt/1.9.1 (2017-09-22)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Sat, Apr 06, 2019 at 02:27:10PM -0700, Ming Lei wrote:
+> On Fri, Apr 05, 2019 at 05:36:32PM -0600, Keith Busch wrote:
+> > On Fri, Apr 5, 2019 at 5:04 PM Jens Axboe <axboe@kernel.dk> wrote:
+> > > Looking at current peak testing, I've got around 1.2% in queue enter
+> > > and exit. It's definitely not free, hence my question. Probably safe
+> > > to assume that we'll double that cycle counter, per IO.
+> > 
+> > Okay, that's not negligible at all. I don't know of a faster reference
+> > than the percpu_ref, but that much overhead would have to rule out
+> > having a per hctx counter.
+> 
+> Or not using any refcount in fast path, how about the following one?
 
+Sure, I don't think we need a high precision completion wait in this path,
+so a delay-spin seems okay to me.
 
-> Il giorno 8 apr 2019, alle ore 17:13, Jens Axboe <axboe@kernel.dk> ha =
-scritto:
->=20
-> On 4/8/19 9:08 AM, Johannes Thumshirn wrote:
->> On Mon, Apr 08, 2019 at 09:05:19AM -0600, Jens Axboe wrote:
->>> I did consider that, and that would be doable. But honestly, I'm =
-having a
->>> hard time seeing what issue we are attempting to fix by doing this.
->>=20
->> Yeah, I guess the real fix would be to update the documentation and =
-the
->> expectations user-space has. Including eventual re-write of some udev =
-rules or
->> whatever is facing these files. But to me that sounds more like a =
-systemd or
->> even distro thing than a kernel thing.
->=20
-> I agree. Trying to force someones hand by renaming isn't going to fix
-> anything, but it will potentially cause issues.
->=20
-
-Potential issues against concrete, big issues already with us.  The
-proportional share interface doesn't match the idea people have of it.
-
-I don't want to push for this solution, but we cannot pretend we don't
-have a big problem already.  Any solution that could really work is ok
-for me, including symlinks.
-
-Thanks,
-Paolo
-
-> --=20
-> Jens Axboe
->=20
-
+ 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index 3ff3d7b49969..6fe334e12236 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2199,6 +2199,23 @@ int blk_mq_alloc_rqs(struct blk_mq_tag_set *set, struct blk_mq_tags *tags,
+>  	return -ENOMEM;
+>  }
+>  
+> +static void blk_mq_wait_hctx_become_idle(struct blk_mq_hw_ctx *hctx,
+> +		int dead_cpu)
+> +{
+> +	unsigned long msecs_left = 1000 * 10;
+> +
+> +	while (msecs_left > 0) {
+> +		if (blk_mq_hctx_idle(hctx))
+> +			break;
+> +		msleep(5);
+> +		msecs_left -= 5;
+> +	}
+> +
+> +	if (msecs_left > 0)
+> +		printk(KERN_WARNING "requests not completed from "
+> +			"CPU %d\n", dead_cpu);
+> +}
+> +
+>  /*
+>   * 'cpu' is going away. splice any existing rq_list entries from this
+>   * software queue to the hw queue dispatch list, and ensure that it
+> @@ -2230,6 +2247,14 @@ static int blk_mq_hctx_notify_dead(unsigned int cpu, struct hlist_node *node)
+>  	spin_unlock(&hctx->lock);
+>  
+>  	blk_mq_run_hw_queue(hctx, true);
+> +
+> +	/*
+> +	 * Interrupt for this queue will be shutdown, so wait until all
+> +	 * requests from this hctx is done or timeout.
+> +	 */
+> +	if (cpumask_first_and(hctx->cpumask, cpu_online_mask) >= nr_cpu_ids)
+> +		blk_mq_wait_hctx_become_idle(hctx, cpu);
+> +
+>  	return 0;
+>  }
+>  
+> diff --git a/block/blk-mq.h b/block/blk-mq.h
+> index d704fc7766f4..935cf8519bf2 100644
+> --- a/block/blk-mq.h
+> +++ b/block/blk-mq.h
+> @@ -240,4 +240,15 @@ static inline void blk_mq_clear_mq_map(struct blk_mq_queue_map *qmap)
+>  		qmap->mq_map[cpu] = 0;
+>  }
+>  
+> +static inline bool blk_mq_hctx_idle(struct blk_mq_hw_ctx *hctx)
+> +{
+> +	struct blk_mq_tags *tags = hctx->sched_tags ?: hctx->tags;
+> +
+> +	if (!tags)
+> +		return true;
+> +
+> +	return !sbitmap_any_bit_set(&tags->bitmap_tags.sb) &&
+> +                       !sbitmap_any_bit_set(&tags->bitmap_tags.sb);
+> +}
+> +
+>  #endif
+> 
+> Thanks,
+> Ming
