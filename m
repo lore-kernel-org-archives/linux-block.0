@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_MUTT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C059C282DD
-	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 08:12:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 950A5C282DE
+	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 08:15:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2673920870
-	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 08:12:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62DCC20B1F
+	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 08:15:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="hP7L9iKH"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="sdrIBkcp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725881AbfDHIMa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Apr 2019 04:12:30 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:52852 "EHLO
+        id S1726401AbfDHIPg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Apr 2019 04:15:36 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:56444 "EHLO
         userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725877AbfDHIMa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Apr 2019 04:12:30 -0400
+        with ESMTP id S1726343AbfDHIPg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Apr 2019 04:15:36 -0400
 Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x3888NqJ139100;
-        Mon, 8 Apr 2019 08:12:05 GMT
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x388Drhh143445;
+        Mon, 8 Apr 2019 08:15:25 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
  : subject : message-id : mime-version : content-type : in-reply-to;
- s=corp-2018-07-02; bh=HiUbrj12MPa2Z7DU5uSYa65BaW2pN4N2CCdbBgsulKI=;
- b=hP7L9iKH7tbatxNfhhBso3njNJkMEorOKASDKceJzbhbq4ZxTh2ZIyeRmWeN8vl2PQtr
- OfYpSf0AvnuGuDOA+Wap1iv8UW0JVUtKdG8YzoQKu8p5o7MslrUKNtq59vb9PS0mMLRC
- 0oJsr4AbWEqdQuNX1jQ0epA8BGhSVRrLlKy5tXVGkujBIGtEX/4ukltDOsD22tLi2iOZ
- y1ANXFPjIFG+0Q6j1lvgjFUO5Jf1HesOqJT68//+oEfibl+rTAn2u/Ig9DuV65yBrFKP
- kl1vOp9b2WOJDZ7F50GBNUlzSLdZMAcji2L1SkK3uCYbQvk5cgKYQ/eamJrt0JFudND1 /Q== 
+ s=corp-2018-07-02; bh=p8SPSjCn008e07/4+WJbLSruNtiI92Hx8qaumPKlQbY=;
+ b=sdrIBkcpORRohOOZBxziQBn3Gh6QXCPN5DcpKga7R9kTDg748mXZQ+JK6ajuKuOWeAVZ
+ NRfHTD1tSOK6rQPedUNxqxu9IIWv/h5IMBNTP6vSYDBMMLqiwiJzC6DNxvk6JYhvwIux
+ SpXK2e5QYSmIV3WR6N6GdGyvbqPCUJSv4m6OsG1NXJPWH3kNNP8uCT//JxUD1/Gp5FiG
+ 0VBDaSjg4U8b4D0t/uLvv2Z9PjWLu2i9VQzMXUbOxAVA93gKdtE/AMrYjeqeH41JfHKN
+ 2+DL1HmhmjlJjxfRGXHSA7Ot4edPwkPWxr+K1+fRcjEa/KtlXhVZoSKR3KGJIdHwGb5W KA== 
 Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 2rpkhsmp5d-1
+        by userp2130.oracle.com with ESMTP id 2rpkhsmpph-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 08 Apr 2019 08:12:05 +0000
+        Mon, 08 Apr 2019 08:15:25 +0000
 Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x388A1c6096044;
-        Mon, 8 Apr 2019 08:10:05 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2rpkehjvra-1
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x388DmtZ104387;
+        Mon, 8 Apr 2019 08:15:25 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2rpkehjxxw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 08 Apr 2019 08:10:05 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x388A1MB026277;
-        Mon, 8 Apr 2019 08:10:03 GMT
+        Mon, 08 Apr 2019 08:15:25 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x388FN8B024630;
+        Mon, 8 Apr 2019 08:15:24 GMT
 Received: from kadam (/41.202.241.3)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 08 Apr 2019 01:10:01 -0700
-Date:   Mon, 8 Apr 2019 11:09:50 +0300
+        with ESMTP ; Mon, 08 Apr 2019 01:15:22 -0700
+Date:   Mon, 8 Apr 2019 11:15:13 +0300
 From:   Dan Carpenter <dan.carpenter@oracle.com>
 To:     "David S. Miller" <davem@davemloft.net>,
         Alexander Viro <viro@zeniv.linux.org.uk>,
@@ -59,8 +59,8 @@ Cc:     Amritha Nambiar <amritha.nambiar@intel.com>,
         kernel-janitors@vger.kernel.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Peter Zijlstra <peterz@infradead.org>
-Subject: [PATCH v2 1/2] cpumask: Introduce possible_cpu_safe()
-Message-ID: <20190408080950.GA15239@kadam>
+Subject: [PATCH v2 2/2] io_uring: Potential Oops in io_sq_offload_start()
+Message-ID: <20190408081513.GB15239@kadam>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -71,96 +71,57 @@ X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9220 signatures=6
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1904080076
+ engine=8.0.1-1810050000 definitions=main-1904080077
 X-Proofpoint-Virus-Version: vendor=nai engine=5900 definitions=9220 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
  suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1904080076
+ definitions=main-1904080077
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There have been two cases recently where we pass user a controlled "cpu"
-to possible_cpus().  That's not allowed.  If it's invalid, it will
-trigger a WARN_ONCE() and an out of bounds read which could result in an
-Oops.
+The "p->sq_thread_cpu" variable is an integer which comes from the user.
+We can't pass values greater than NR_CPUS to cpu_possible() or it could
+lead to an out of bound read and possibly an Oops.
 
-This patch introduces possible_cpu_safe() which first checks to see if
-the cpu is valid, turns off speculation and then checks if the cpu is
-possible.
+The recently added cpu_possible_safe() function can handle unfiltered
+input so lets use that instead.  This patch also removes the call to
+array_index_nospec() since that is handled in cpu_possible_safe().
 
+Fixes: 6c271ce2f1d5 ("io_uring: add submission polling")
 Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 ---
-v2: Use nr_cpumask_bits instead of NR_CPUS.
-    Split cpumask_validate_cpu() into a separate function.
+No change.
 
-I still left cpumask_test_cpu_safe() return 0 for invalid cpus, instead
-of returning -ERANGE I feel it's simpler to stay consistent with the
-normal possible_cpu() function.
+ fs/io_uring.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
- include/linux/cpumask.h | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
-
-diff --git a/include/linux/cpumask.h b/include/linux/cpumask.h
-index 147bdec42215..f371e44cb5ff 100644
---- a/include/linux/cpumask.h
-+++ b/include/linux/cpumask.h
-@@ -11,6 +11,7 @@
- #include <linux/threads.h>
- #include <linux/bitmap.h>
- #include <linux/bug.h>
-+#include <linux/nospec.h>
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index c0fecb9d889f..9789887b0d36 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -2240,16 +2240,13 @@ static int io_sq_offload_start(struct io_ring_ctx *ctx,
+ 		ctx->sq_thread_idle = HZ;
  
- /* Don't assign or return these: may not be this big! */
- typedef struct cpumask { DECLARE_BITMAP(bits, NR_CPUS); } cpumask_t;
-@@ -102,6 +103,7 @@ extern struct cpumask __cpu_active_mask;
- #define num_active_cpus()	cpumask_weight(cpu_active_mask)
- #define cpu_online(cpu)		cpumask_test_cpu((cpu), cpu_online_mask)
- #define cpu_possible(cpu)	cpumask_test_cpu((cpu), cpu_possible_mask)
-+#define cpu_possible_safe(cpu)	cpumask_test_cpu_safe((cpu), cpu_possible_mask)
- #define cpu_present(cpu)	cpumask_test_cpu((cpu), cpu_present_mask)
- #define cpu_active(cpu)		cpumask_test_cpu((cpu), cpu_active_mask)
- #else
-@@ -111,6 +113,7 @@ extern struct cpumask __cpu_active_mask;
- #define num_active_cpus()	1U
- #define cpu_online(cpu)		((cpu) == 0)
- #define cpu_possible(cpu)	((cpu) == 0)
-+#define cpu_possible_safe(cpu)  ((cpu) == 0)
- #define cpu_present(cpu)	((cpu) == 0)
- #define cpu_active(cpu)		((cpu) == 0)
- #endif
-@@ -344,6 +347,28 @@ static inline int cpumask_test_cpu(int cpu, const struct cpumask *cpumask)
- 	return test_bit(cpumask_check(cpu), cpumask_bits((cpumask)));
- }
+ 	ret = -EINVAL;
+-	if (!cpu_possible(p->sq_thread_cpu))
++	if (!cpu_possible_safe(p->sq_thread_cpu))
+ 		goto err;
  
-+static inline unsigned int cpumask_validate_cpu(unsigned int cpu)
-+{
-+	if (cpu >= nr_cpumask_bits)
-+		return nr_cpumask_bits;
-+	return array_index_nospec(cpu, nr_cpumask_bits);
-+}
-+
-+/**
-+ * cpumask_test_cpu_safe - test for a cpu in a cpumask
-+ * @cpu: cpu number
-+ * @cpumask: the cpumask pointer
-+ *
-+ * Returns 1 if @cpu is valid and set in @cpumask, else returns 0
-+ */
-+static inline int cpumask_test_cpu_safe(int cpu, const struct cpumask *cpumask)
-+{
-+	cpu = cpumask_validate_cpu(cpu);
-+	if (cpu >= nr_cpu_ids)
-+		return 0;
-+	return test_bit(cpu, cpumask_bits(cpumask));
-+}
-+
- /**
-  * cpumask_test_and_set_cpu - atomically test and set a cpu in a cpumask
-  * @cpu: cpu number (< nr_cpu_ids)
+ 	if (ctx->flags & IORING_SETUP_SQPOLL) {
+ 		if (p->flags & IORING_SETUP_SQ_AFF) {
+-			int cpu;
+-
+-			cpu = array_index_nospec(p->sq_thread_cpu, NR_CPUS);
+ 			ctx->sqo_thread = kthread_create_on_cpu(io_sq_thread,
+-							ctx, cpu,
++							ctx, p->sq_thread_cpu,
+ 							"io_uring-sq");
+ 		} else {
+ 			ctx->sqo_thread = kthread_create(io_sq_thread, ctx,
 -- 
 2.17.1
 
