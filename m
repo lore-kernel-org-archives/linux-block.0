@@ -2,92 +2,152 @@ Return-Path: <SRS0=Qcaa=SK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ADDCC282DE
-	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 16:58:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9441C10F13
+	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 17:01:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4FF8720880
-	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 16:58:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 95DED20880
+	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 17:01:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="k0Yr6hUn"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HjyIXlM9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729012AbfDHQ5t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Apr 2019 12:57:49 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:37075 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728664AbfDHQ5t (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Apr 2019 12:57:49 -0400
-Received: by mail-pl1-f194.google.com with SMTP id w23so7676300ply.4
-        for <linux-block@vger.kernel.org>; Mon, 08 Apr 2019 09:57:48 -0700 (PDT)
+        id S1729097AbfDHRBb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Apr 2019 13:01:31 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:41031 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729059AbfDHRBb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Apr 2019 13:01:31 -0400
+Received: by mail-wr1-f68.google.com with SMTP id r4so17273222wrq.8
+        for <linux-block@vger.kernel.org>; Mon, 08 Apr 2019 10:01:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=X9DEftMRHX1cTeld1z4NOF2ma7HZecszHQHSDO73rq4=;
-        b=k0Yr6hUn0V3/gqaLh4Lh2ysHPlexMzD11JWufDkgD3gyXyYZDDN+jBi26ah1cvKCYf
-         oC/KzRgJze5xSApX+Lne79nSq097xi1etnkisQhGp0EMySJz/MBND62hCS2s8BI0LHij
-         s5itrq18Zq6Mrtl0fCUnSonwSBshKp0i6h4AkulcSHnzbHO4cWdt3FKcxQgTdzX/qLzl
-         TTX9BiWo5xjZZXfuZz728L7VOjRsnIcFLW8CgMnUmcP66wKORbuHLdzvbZFANH9HA+b2
-         XFWGTlSlvullS/PIOF29r8qlNWsyZzCsM7GADWs4/SZT4RLY5gMejtYMCRuGAY6+AiJK
-         Obcg==
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=iqf43cq8RemTopCE0ufXfp+TKKTu8jJvXQ5PxPdROIg=;
+        b=HjyIXlM9NVEpWRMBzLiUCUaHmiTdQNUC1LlZDaO1rJUZ/tc/4vFmRZuF5iD4KRzbw3
+         NqLt/XWzwexoTi/mRyEaJlSjMz7tfZSZSiQW6gwZuDcKsMocDhaPg49g3qyYGtV5L+vr
+         30cUUKqYXqOqb7V0imdhatthehWPWwxrD1/G1mYL3uKkQ2Iqd8YglOzcorT5FEEbRwAM
+         3cGwADzx1jMH3V9Jn8ZQ8KWi2Oy/yrjZM28UjMvlWOpxCr5D9N2woP1IDACfw18yF+hc
+         AQWBEFoK0BBAuDK8XfM4xYNLCXfCOlrMRA1Ex50JJQmSH/tno6gWlTUE0oJ/ew0wfqoi
+         uXBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=X9DEftMRHX1cTeld1z4NOF2ma7HZecszHQHSDO73rq4=;
-        b=pJS8pnkiW6+IEMK0w5RePHw6Vczxlni94eI+2JPEVA2ezZ0J1u8q1EPxRtTkLASVPm
-         gAa7MFA4aULnJxutq6HCtJnYlaHZ49bfpSru2UyJC7HNDojm/WLxnHbcZDlC3qo0shPG
-         8djs7VmrkY1dRbO7cNqLYkD6JH8UbK96J6pIjH32oUkiNnyhHDDHz7d7Rt6QHROeU3fY
-         Gv+fT5KSLF3tPIo3Gd/ECqdFg0fxMLgTq//Ub5Udjk+KONVaNJRi+V3PEwlMbS0Frmdu
-         Lcfgt2TqOyrkNVo1NCvrPWC9gM5RS+803Zg80nq00h3nmai6SwUAmi2P1jco2x4zutZx
-         2egw==
-X-Gm-Message-State: APjAAAVYaJLq2lVu1j92rinILYap/9xWiMy4uduxAIOjrjjFlxHvnlBE
-        /aj+aw5oJ69pxY1Qn7hzofs8cOFMif+5+g==
-X-Google-Smtp-Source: APXvYqxnUjmWt1ezECpcZEM8bz3R2frtm5orZF09mplHLe8wtYkWJoosDIE9+NQ3wjMO501P3UuZMg==
-X-Received: by 2002:a17:902:7885:: with SMTP id q5mr31848557pll.12.1554742667931;
-        Mon, 08 Apr 2019 09:57:47 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id p189sm33040429pfg.184.2019.04.08.09.57.46
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=iqf43cq8RemTopCE0ufXfp+TKKTu8jJvXQ5PxPdROIg=;
+        b=WSl4oPYnKhGclU+1hf+Xc0P0mbuXy5wSFF0BwcdiI7dS9szDR2l74DBwoXrLEMelj3
+         SHMWkS3bHhwoOxq1FBHqWvGV/Qjb0pcvDIN/PEsq4x1i0Svp3fMNjschOdqoeJiseya+
+         LiIWRyEY1ioQIBjlMLGvZ93ws7zylPCdP3Tmf3+LtiA6qryHS7qwbGTmkJ+Txh8S3QO7
+         drwI61zbkt02TI/4yNZTAQtovlPUbLvG7/BRjgR8C4+VS+t24IPZr0Gtu79babxXxrg6
+         wwPmHQxEz8sgigcnpIHS1MBiBVFmvczsNbO7OqMujkRBCpWXgBiNxFcyzVqWNoz68SnN
+         3gkg==
+X-Gm-Message-State: APjAAAXmtprMboqEF23GZDqFGyp15lKIA1UddNQ9v1q4sTZAajEns/Uw
+        Sh338jq2FELt67faOW6BpzryXA==
+X-Google-Smtp-Source: APXvYqwWdxX2q/Ds/K8IgAvLrxajOXIANeP6HE60KBuItPfhifSpFiyOpGhcA+XdxVSEuVYAh4fvbw==
+X-Received: by 2002:adf:ee91:: with SMTP id b17mr18169609wro.234.1554742883959;
+        Mon, 08 Apr 2019 10:01:23 -0700 (PDT)
+Received: from [192.168.43.112] ([37.161.65.57])
+        by smtp.gmail.com with ESMTPSA id u8sm30288100wrt.69.2019.04.08.10.01.21
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 08 Apr 2019 09:57:47 -0700 (PDT)
-Subject: Re: [PATCH V2] block: fix build warning in merging bvecs
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org
-References: <20190402022644.7812-1-ming.lei@redhat.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <3984b306-9a7c-3cf0-19df-ab7eda7ff13b@kernel.dk>
-Date:   Mon, 8 Apr 2019 10:57:45 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190402022644.7812-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        Mon, 08 Apr 2019 10:01:23 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.2 \(3445.102.3\))
+Subject: Re: [PATCH 1/1] block, bfq: delete "bfq" prefix from cgroup filenames
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <ef1481e8-c664-5f17-4a19-bb90daabc0b7@kernel.dk>
+Date:   Mon, 8 Apr 2019 19:01:18 +0200
+Cc:     Johannes Thumshirn <jthumshirn@suse.de>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Mark Brown <broonie@kernel.org>,
+        'Paolo Valente' via bfq-iosched 
+        <bfq-iosched@googlegroups.com>,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        Angelo Ruocco <angeloruocco90@gmail.com>,
+        lennart@poettering.net, mkoutny@suse.cz
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <377E06A7-14D7-4AC6-AD07-AEB691E00DEA@linaro.org>
+References: <20190408143935.9062-1-paolo.valente@linaro.org>
+ <20190408143935.9062-2-paolo.valente@linaro.org>
+ <20190408144925.GA23021@linux-x5ow.site>
+ <7B68DAA9-61D9-4AE0-9FA9-05C07C7FE408@linaro.org>
+ <20190408150430.GB23021@linux-x5ow.site>
+ <df1dfe5d-c763-91c2-4aca-25d4622c4820@kernel.dk>
+ <20190408150828.GC23021@linux-x5ow.site>
+ <5283A08F-FD6F-4A9C-841D-B49CE9B4CF1F@linaro.org>
+ <ef1481e8-c664-5f17-4a19-bb90daabc0b7@kernel.dk>
+To:     Jens Axboe <axboe@kernel.dk>
+X-Mailer: Apple Mail (2.3445.102.3)
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/1/19 8:26 PM, Ming Lei wrote:
-> Commit f6970f83ef79 ("block: don't check if adjacent bvecs in one bio can
-> be mergeable") changes bvec merge by only considering two bvecs from
-> different bios. However, if the former bio doesn't inlcude any io bvec,
-> then the following warning may be triggered:
-> 
->  warning: ‘bvec.bv_offset’ may be used uninitialized in this function [-Wmaybe-uninitialized]
-> 
-> In practice, it shouldn't be triggered.
-> 
-> Fixes it by adding check on former bio, the check shouldn't add any cost
-> given 'bio->bi_iter' can be hit in cache.
 
-Applied, thanks.
 
--- 
-Jens Axboe
+> Il giorno 8 apr 2019, alle ore 17:17, Jens Axboe <axboe@kernel.dk> ha =
+scritto:
+>=20
+> On 4/8/19 9:14 AM, Paolo Valente wrote:
+>>=20
+>>=20
+>>> Il giorno 8 apr 2019, alle ore 17:08, Johannes Thumshirn =
+<jthumshirn@suse.de> ha scritto:
+>>>=20
+>>> On Mon, Apr 08, 2019 at 09:05:19AM -0600, Jens Axboe wrote:
+>>>> I did consider that, and that would be doable. But honestly, I'm =
+having a
+>>>> hard time seeing what issue we are attempting to fix by doing this.
+>>>=20
+>>> Yeah, I guess the real fix would be to update the documentation and =
+the
+>>> expectations user-space has. Including eventual re-write of some =
+udev rules or
+>>> whatever is facing these files. But to me that sounds more like a =
+systemd or
+>>> even distro thing than a kernel thing.
+>>>=20
+>>=20
+>> Unfortunately the user-space people I have interacted with find crazy
+>> to have to change their software to call bfq.weight the weight of a
+>> group.  And are not willing to do it [1].
+>=20
+> Then you need to educate them.
+
+I'm not sure that educate is the right verb (I don't like the current
+messy solution either).  But I'll do my best to inform people when
+I'll have the opportunity to do it.
+
+> Some of the issues were called out years
+> ago, at the time when we could have potentially renamed.
+
+Yeah, a good window was 5.0, and at that time we tried with a more
+general solution.  But we failed.
+
+
+> A rename now
+> will solve nothing.
+>=20
+
+I see your point, but I don't agree this rename would solve nothing.
+The real bad thing is not having done this before.  Changing names
+that nobody uses, to names that everybody already uses, but wrongly,
+would instantaneously improve the situation a lot.  And it is what
+userspace already asked explicitly for [1].  Without this simple
+change, it will take a lot for all the inconsistent documentation
+spread around the world to be synced.  And for all legacy software to
+be changed, assuming it will all be changed.
+
+Paolo
+
+[1] https://github.com/systemd/systemd/issues/7057
+
+> --=20
+> Jens Axboe
 
