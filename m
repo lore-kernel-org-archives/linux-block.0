@@ -2,93 +2,84 @@ Return-Path: <SRS0=Qcaa=SK=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2A01C10F14
-	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 16:02:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1019AC10F13
+	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 16:06:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C4E3020857
-	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 16:02:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0D3220857
+	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 16:06:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="pURn1er1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727878AbfDHQCP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Apr 2019 12:02:15 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:38041 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727331AbfDHQCP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Apr 2019 12:02:15 -0400
-Received: by mail-pl1-f196.google.com with SMTP id f36so3106627plb.5;
-        Mon, 08 Apr 2019 09:02:14 -0700 (PDT)
+        id S1726741AbfDHQGT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Apr 2019 12:06:19 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:42463 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726723AbfDHQGT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Apr 2019 12:06:19 -0400
+Received: by mail-pf1-f195.google.com with SMTP id w25so6436334pfi.9
+        for <linux-block@vger.kernel.org>; Mon, 08 Apr 2019 09:06:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=UE9ujoGUXVccfCMNHPjF9tRbGyt6CXPSmg5+WMYpY/8=;
+        b=pURn1er1A1ytab8pKzfnomujh7tKxcthslwOo+mxMKJ9WqmTtBGOT1bP4v6YO6lcGx
+         keo8qVsztm8V1HcjIX11NHQk1H5+afH8WWsTAPS2gAsEjAAFJNzOx6WIyb9jTZPzrWN2
+         /IT5JS3LemkeLSNuHMjbdbmIuXuYgLSxOrAJAu7m9o+JbkiJ/SeECSCL4oQBnJsAmqMn
+         AgRThliPMy/LSwZu9VfJ1Ho2EEAbeC0bXay9S3Dcg5Sha91bTeEVJCUlpv6m1yFQXUnW
+         HoAFQ5asarlJfmd5+396QfqQxjCPxJym7Gq1gQvl7FiPWjL+p06yREShJTJZ1JZjsAwY
+         LltQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=GE0TAFxw9kW2YRs7vIrsQIndfvAZMCvui/zXzKoD9l0=;
-        b=qTMygxLpUlBC3q9JjpP4tBBELRB99dpR+8BrSCqvTJOV07+JQuG4teUGwh8MMYxLGm
-         CMwSbz0ZozXAJ4bIAiS2YebR7JooBQ7xxAWuo2Gccvt7cwwHpfOAzMQ48tBn5vCz/OBX
-         8pvVj+aYTyDxIecBpBTzfirbRdGdWCelkRZIbrZFUdMGCB+qgbU9XBSDS41sIkIj6HiE
-         gcoIilv58+McQSDvsW4tGCpxXOu+qL9aDl8/EHPi5oMWpt3/Uct01PmtqMSocE6Mya1N
-         cd2B3HQ1Ix468UGPYrhGe6Acc3PR0oB9nCmIyODhS08TOhKdswcO/PARQyeLuUA4JnOI
-         V+iw==
-X-Gm-Message-State: APjAAAXDwIFVmsjvvwNMXaIpDNhumKz5FY+p3GoR1Yt3/iCivUDEaMxg
-        Tgj8rZh1FxIFGus2cdYDJzfKqpGb
-X-Google-Smtp-Source: APXvYqx11fGkTEdCVM3C+S/wRWC4trFdCUCrSs2iiU1sGwRqV7sIeccP+PEtS4vGpMFYHg1sz6SoTw==
-X-Received: by 2002:a17:902:6949:: with SMTP id k9mr31034567plt.59.1554739334272;
-        Mon, 08 Apr 2019 09:02:14 -0700 (PDT)
-Received: from ?IPv6:2620:15c:2cd:203:5cdc:422c:7b28:ebb5? ([2620:15c:2cd:203:5cdc:422c:7b28:ebb5])
-        by smtp.gmail.com with ESMTPSA id c3sm56658009pfg.88.2019.04.08.09.02.11
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 08 Apr 2019 09:02:12 -0700 (PDT)
-Message-ID: <1554739330.118779.275.camel@acm.org>
-Subject: Re: [PATCH] fs/block_dev.c: remove unused header file badblocks.h
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Chengguang Xu <cgxu519@gmx.com>, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org
-Cc:     viro@zeniv.linux.org.uk, axboe@kernel.dk
-Date:   Mon, 08 Apr 2019 09:02:10 -0700
-In-Reply-To: <20190408103354.18638-1-cgxu519@gmx.com>
-References: <20190408103354.18638-1-cgxu519@gmx.com>
-Content-Type: text/plain; charset="UTF-7"
-X-Mailer: Evolution 3.26.2-1 
-Mime-Version: 1.0
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=UE9ujoGUXVccfCMNHPjF9tRbGyt6CXPSmg5+WMYpY/8=;
+        b=gx0/mtbpSrmEq5qTIkoO0TTLj3O/V6Z8ewvwOAyluGSwn3wObP3F0umExmR+h6wvPg
+         DnB2PjKeh2Y4Gyu8j+Jca0Uz1yqMNpcWJhiISwBKKvE/TtQb0IDN6E9SpLTPHC6YObQl
+         uwjFPlNSU4ZxKhIAmaJJ4zOB8uiTFSNBLQ1o2FCswVhW0Lt06pNq4oB/eX/6H/LAJFbQ
+         VAELyjbdXOvMKgmmkOxX3n0r/b36iGha+/Sw0JPomtqeYIA86ODeowgbLfLF6ohSWByW
+         YAPRKUoVHL3NlpwoYMI+GNX4zwIvDPmkhcD9/K7C1KIpvABgMfDFZfsTFCDvG6Nqj2es
+         ac4w==
+X-Gm-Message-State: APjAAAWXOfChs1OvIIAigjib+WGnWHz0y/iKAQ7EVT+eIozogwEHz5oM
+        ye3oCMvUzL6tx5+DiTUChkzE7A==
+X-Google-Smtp-Source: APXvYqyXzF6yAdAmV/g+4XodIzAQunxyVQKnj6JFIq84NA0oLnqaO5XUwknSP/ltjar+g3cIDUy/Yw==
+X-Received: by 2002:a63:5b4d:: with SMTP id l13mr27912821pgm.160.1554739578313;
+        Mon, 08 Apr 2019 09:06:18 -0700 (PDT)
+Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
+        by smtp.gmail.com with ESMTPSA id l184sm73646861pfc.98.2019.04.08.09.06.16
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 08 Apr 2019 09:06:17 -0700 (PDT)
+Subject: Re: [PATCH] block, bfq: fix some typos in comments
+To:     Angelo Ruocco <angelo.ruocco.90@gmail.com>,
+        linux-block@vger.kernel.org
+Cc:     paolo.valente@linaro.org, linux-kernel@vger.kernel.org,
+        trivial@kernel.org
+References: <20190408153534.6312-1-angeloruocco90@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+Message-ID: <0d1ee9c5-e585-a1b9-d14a-7af1498fd14f@kernel.dk>
+Date:   Mon, 8 Apr 2019 10:06:15 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <20190408153534.6312-1-angeloruocco90@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 2019-04-08 at 18:33 +-0800, Chengguang Xu wrote:
-+AD4 This patch just removes unused header file badblocks.h
-+AD4 from fs/block+AF8-dev.c
-+AD4 
-+AD4 Signed-off-by: Chengguang Xu +ADw-cgxu519+AEA-gmx.com+AD4
-+AD4 ---
-+AD4  fs/block+AF8-dev.c +AHw 1 -
-+AD4  1 file changed, 1 deletion(-)
-+AD4 
-+AD4 diff --git a/fs/block+AF8-dev.c b/fs/block+AF8-dev.c
-+AD4 index 78d3257435c0..6b584817d461 100644
-+AD4 --- a/fs/block+AF8-dev.c
-+AD4  fs/block+AF8-dev.c +AHw 1 -
-+AD4  1 file changed, 1 deletion(-)
-+AD4 
-+AD4 diff --git a/fs/block+AF8-dev.c b/fs/block+AF8-dev.c
-+AD4 index 78d3257435c0..6b584817d461 100644
-+AD4 --- a/fs/block+AF8-dev.c
-+AD4 +-+-+- b/fs/block+AF8-dev.c
-+AD4 +AEAAQA -30,7 +-30,6 +AEAAQA
-+AD4  +ACM-include +ADw-linux/log2.h+AD4
-+AD4  +ACM-include +ADw-linux/cleancache.h+AD4
-+AD4  +ACM-include +ADw-linux/dax.h+AD4
-+AD4 -+ACM-include +ADw-linux/badblocks.h+AD4
-+AD4  +ACM-include +ADw-linux/task+AF8-io+AF8-accounting+AF8-ops.h+AD4
-+AD4  +ACM-include +ADw-linux/falloc.h+AD4
-+AD4  +ACM-include +ADw-linux/uaccess.h+AD4
+On 4/8/19 9:35 AM, Angelo Ruocco wrote:
+> Some of the comments in the bfq files had typos. This patch fixes them.
 
-This patch does not remove a header file but removes an include directive.
-Please make sure that the patch title is not misleading.
+Applied for 5.2, thanks.
 
-Thanks,
+-- 
+Jens Axboe
 
-Bart.
