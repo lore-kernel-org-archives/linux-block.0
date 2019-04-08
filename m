@@ -4,88 +4,103 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F490C282CE
-	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 08:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1B53C282CE
+	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 09:02:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E7BFE20883
-	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 08:46:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B8D720870
+	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 09:02:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OmnhsIOn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W9QOcqQz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726515AbfDHIqr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Apr 2019 04:46:47 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:39189 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726465AbfDHIqr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Apr 2019 04:46:47 -0400
-Received: by mail-wm1-f65.google.com with SMTP id n25so13736161wmk.4;
-        Mon, 08 Apr 2019 01:46:45 -0700 (PDT)
+        id S1726686AbfDHJCE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Apr 2019 05:02:04 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:38901 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726189AbfDHJCD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Apr 2019 05:02:03 -0400
+Received: by mail-wr1-f68.google.com with SMTP id k11so15379129wro.5;
+        Mon, 08 Apr 2019 02:02:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=FScztbLxfgAYyDBX6ETQBY9oih7OO35wMO4LBh2mf7g=;
-        b=OmnhsIOnjMYeZQSLR7w2oFts6UUI93U1e9Fm//kenmLHQzSBBB6JpuPfiJJfQS8R3g
-         bVQA278WhgkUpfv9EKVsOGQguO13qCnnNKeTVCYPfCAPY13SX2tWnIjx/kbJhjGPXV4X
-         GtMbM43bkPKDtLJSfSVV4PLRrpzQ2FYXcgqVArDNScg+U8f2BcrHA6H08+SB/mxBChwC
-         /0HRSzpT7RfKFhYgomD2eX1eU50TcZNxTeLaAuFajQDUuUZjEZxq7wA9An9UkO35mLbV
-         mabYF//FDn2BVN8qJNXAXnpYL7utbua0GPEhcyuFx5ViYq79+kgozPWuf7+aYioPkYwr
-         Vphg==
+        bh=CG7VK1KiQuqH1IebpQWWnQz2mb+OQNTKTBGWnJsK2TM=;
+        b=W9QOcqQzced6wFWygWMu8myrsV++jq7y+1oKsQLgxJ4a1vLnOE8MnHIQbByWvP5d+L
+         ATdHTHxa4wq0SA6i2s318W8OBqrmP2Z5wUSJc2wF9EFJEvRq5ZxOj1kU3flQv4NGjQbp
+         ZqoCuiUZ8rNbCb4kxbKLpcJmqacoPM6sq3kGrL/fFfbqRLeaVHVEWr18AdlHKK9Rt8er
+         /GFW6zEE+lwU/mviijwQPTirn5tHTtIIKqMRU+ViJM1Q5H7yaZ8E101CyGb6FBiDyzRl
+         3cUNIZrz5Y2z8ny0f6vfMmGrHKHHkQJ268Oq22EELTqyIU8URUrg7QFYocPh4e9EXuXb
+         S43g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=FScztbLxfgAYyDBX6ETQBY9oih7OO35wMO4LBh2mf7g=;
-        b=OYvveQ4bISAldyViobqNopPRQvX+H9h+7itD1VqIKgThPC7Wlqc8xfvs+kfAfC94hV
-         Qu0s4P87rYC5K7UV+Db3A9gZ581hbrBEMwmgB+J4FOjADddWqYB1Rkm6fGgb2gB6F61n
-         bgCo+orZYIAu+jOrSUm3qiNMDw6mPg2uKtGAcxVcWS/KCXxJHWv8/2r5LedrOg9ge33E
-         0XJt+YKGQxPIGa3hhfNz1sYBp1DFFRwCKAI65p0+soD1F5g4N4xpdK8co4axzpte7jUA
-         216aXTHO1JNSHvWiVgUP3nYDg2C+uFPY//MMJ7+g2x6IlfqHz9YTFQtLpm3reDwIFWrT
-         dChw==
-X-Gm-Message-State: APjAAAVLoeB+nqxF/azWqDFrsA2BWgtoeNcGRFU9VysaJnWWsIp6irBE
-        yrB5R0QbSgJfvvawbDR2RFxmlNs8goECMBqSNS0=
-X-Google-Smtp-Source: APXvYqzKPICU5V4Ww/fssKJsc2mrwTVsTy4wCUuI4OTUz2v5LQUA9pHVP3WAuabCmfjidQHMCOPZkCsUvqbGf/O7sDQ=
-X-Received: by 2002:a1c:658a:: with SMTP id z132mr16788927wmb.92.1554713205322;
- Mon, 08 Apr 2019 01:46:45 -0700 (PDT)
+        bh=CG7VK1KiQuqH1IebpQWWnQz2mb+OQNTKTBGWnJsK2TM=;
+        b=T+EfA2L8Y55HVhyusoyAr7al1Qa035WPivQ+CvUDtIgcjLwrL/yXvcLREBd/K5XBST
+         C+SSdcZGk4a2n4+yPhqxy/kNa4Dhcb2dUjZ6k5Q9vbiYH6isxRodVlK4CYbPHufRQqIk
+         knNqizLnsjV2wMg3WNpfHK4hqrxGCptDLsx6KIXSPnGxcylQJgsa/JlpLCBQ3Irhze9A
+         0cBn/BOHrfNw5QSsSSyYu3VdgPX8puhVvU1C7iNU74XtEE3kLMbBPrKgNUljW6fOpFSB
+         /+epMLYpIPJTR88VHmtpQsj0pbSlj4euLeZzt/rgkNN9letGaePMyygQ/1H+PbTA9gDL
+         74vg==
+X-Gm-Message-State: APjAAAW5rIU1flsZDfQ03fEzGkb16Lxlv/KWI5faDxL30Wq3jWKc3jrK
+        tqSA4Kqe7JlpK4xoxDcEim4ucnBVXhX4Hco8jaA=
+X-Google-Smtp-Source: APXvYqxJcGELgPBQYCypQAxGZ1PKE2uc5rQNI2vs6WoXxXYKde48hbYnGxiRlI+C1aUsTtKgOImZMQz4e6CcxGG3v2k=
+X-Received: by 2002:adf:f1c7:: with SMTP id z7mr18293185wro.274.1554714122228;
+ Mon, 08 Apr 2019 02:02:02 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190407085325.9380-1-ming.lei@redhat.com> <20190408061604.GA26364@lst.de>
- <20190408083333.GA28939@lst.de>
-In-Reply-To: <20190408083333.GA28939@lst.de>
+References: <20190404084320.24681-1-ming.lei@redhat.com> <20190404084320.24681-4-ming.lei@redhat.com>
+ <402dd676-ce8b-6691-03ff-cb80aab38ecf@oracle.com>
+In-Reply-To: <402dd676-ce8b-6691-03ff-cb80aab38ecf@oracle.com>
 From:   Ming Lei <tom.leiming@gmail.com>
-Date:   Mon, 8 Apr 2019 16:46:33 +0800
-Message-ID: <CACVXFVNkTPf1=6JfO4cYhXwZT9Gg2FVeNh4-VJ3bVUwRw21shA@mail.gmail.com>
-Subject: Re: [PATCH V2] block: don't use for-inside-for in bio_for_each_segment_all
-To:     Christoph Hellwig <hch@lst.de>
+Date:   Mon, 8 Apr 2019 17:01:50 +0800
+Message-ID: <CACVXFVOBPyT+NBO-NQsoUKzOmhY8EuMPP5B_ApCHNfc1+6mkcw@mail.gmail.com>
+Subject: Re: [PATCH V4 3/7] blk-mq: quiesce queue before updating nr_hw_queues
+To:     "jianchao.wang" <jianchao.w.wang@oracle.com>
 Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
         linux-block <linux-block@vger.kernel.org>,
-        Qu Wenruo <quwenruo.btrfs@gmx.com>,
-        Btrfs BTRFS <linux-btrfs@vger.kernel.org>,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        Omar Sandoval <osandov@fb.com>
+        Dongli Zhang <dongli.zhang@oracle.com>,
+        James Smart <james.smart@broadcom.com>,
+        Bart Van Assche <bart.vanassche@wdc.com>,
+        Linux SCSI List <linux-scsi@vger.kernel.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 8, 2019 at 4:34 PM Christoph Hellwig <hch@lst.de> wrote:
+On Mon, Apr 8, 2019 at 11:17 AM jianchao.wang
+<jianchao.w.wang@oracle.com> wrote:
 >
-> On Mon, Apr 08, 2019 at 08:16:04AM +0200, Christoph Hellwig wrote:
-> > Looks good:
-> >
-> > Reviewed-by: Christoph Hellwig <hch@lst.de>
+> Hi Ming
 >
-> Actually..  I just noticed the gratious done rename creates a (trivial)
-> conflict in a series I was about to submit for 5.2.  Can you respin
-> it without the rename to make everyones life a littler easier?
+> Why not add percpu_ref_tryget/put pair into run queue and requeue work,
+> or before queue the work ?
 
-Yeah, no problem.
+If following this direction, most of block layer API might need the pair.
 
-You mean the 'done->bvec_done' rename?
+Also Jens has complained in another thread, the pair may introduce
+1.2% performance
+loss, then we should avoid it in the fast path, such as blk_mq_run_hw_queue().
 
+Given it is required that request queue is alive from kobject view
+before calling almost
+every block layer API, this lifetime issue should be addressed easily
+by moving the hctx
+free into queue's release handler.
+
+>
+> Then freezing queue could really implement to freeze the queue and there will be
+> no any queue activity after freeze, including run queue and requeue work.
+
+The queue activity is just block layer internal thing, not related
+with driver, so not a big
+deal by dealing with freeing hctx resources in release handler.
 
 Thanks,
 Ming Lei
