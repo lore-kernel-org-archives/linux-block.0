@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A01AAC10F13
-	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 10:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7448FC10F14
+	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 10:47:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7081E208E3
-	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 10:47:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 435D2208E3
+	for <linux-block@archiver.kernel.org>; Mon,  8 Apr 2019 10:47:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="alnrW9ft"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LLoZqKCj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726415AbfDHKrP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 8 Apr 2019 06:47:15 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:43626 "EHLO
+        id S1726373AbfDHKrQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 8 Apr 2019 06:47:16 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:43824 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725933AbfDHKrO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Apr 2019 06:47:14 -0400
+        with ESMTP id S1725933AbfDHKrQ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 8 Apr 2019 06:47:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From
         :Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=kvkKV+VNLAkRJzDVbZr0dxBi0bzpHVJFo5LtX+KIzUI=; b=alnrW9ft+hQj890QXAwaxIqK58
-        +Lh7yrsHEY2m+hLvWdpMgM34uNQ4maiEv77VfKrDoqbIsPJ2jzGlHp/fzhrlEHNRtPGPvS0fJMh7o
-        DQzO0yxi2heH1OfT5t5+0rzNJgC05XZKlkK4q8Xl27RvCGn0QcePb1s/Exl/ovX8EY4UuIl6joPYC
-        SSfS+pRx73cAA3zd2am06Sckfrb6whiPaekO+6BKFPKelcoYyRO7mUxf8R6WtYKdbhAD2sqgFq8ae
-        N9/1g1ZzTN3pLvv+Fci1HzqUc/l4tyLW+Qllk5J8x/5RTJrqWgAUd3BPJi/73AaCDz754JDPOawSw
-        64s3kbow==;
+        bh=caKqIysjwPngf2dEiv7LYGwskh2cfe4iXlPMxcz+BDQ=; b=LLoZqKCjAR3qMmAhJzDsfO3HpU
+        j+D8MvbVSFobNucBHI7Vtqg2QRmnSLBOhMqjpatG3MUtN8YwWa0M1NM9xku2DLbfqF4jE/OU9O3MR
+        inkhv0D7oRMFaAvQPzxZTzW1NDqwdeAE0a/GrKrMzg05SRCocFh2ht+swcB9IkdLFblExTInHHwsQ
+        Xsryc/DgJALm9G8e5BJNvZVAu+vx2awjPt0rX2XDAP8+G67x9QYzof86U9tOaAZJCCG9fUdzboA4E
+        kN6Kkom4oZPAN9AFkFCnKxl2O2JilspZDzWSqHQhQdThDjkVzpHncTmg3dOODjUD4VRP4b+ZOdItR
+        czjPt99w==;
 Received: from clnet-p19-102.ikbnet.co.at ([83.175.77.102] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
-        id 1hDRo0-0000Ph-VR; Mon, 08 Apr 2019 10:47:13 +0000
+        id 1hDRo3-0000Sr-Dr; Mon, 08 Apr 2019 10:47:15 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-Subject: [PATCH 4/5] block: change how we get page references in bio_iov_iter_get_pages
-Date:   Mon,  8 Apr 2019 12:46:40 +0200
-Message-Id: <20190408104641.4905-5-hch@lst.de>
+Subject: [PATCH 5/5] block: only allow contiguous page structs in a bio_vec
+Date:   Mon,  8 Apr 2019 12:46:41 +0200
+Message-Id: <20190408104641.4905-6-hch@lst.de>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190408104641.4905-1-hch@lst.de>
 References: <20190408104641.4905-1-hch@lst.de>
@@ -52,121 +52,83 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of needing a special macro to iterate over all pages in
-a bvec just do a second passs over the whole bio.  This also matches
-what we do on the release side.  The release side helper is moved
-up to where we need the get helper to clearly express the symmetry.
+We currently have to call nth_page when iterating over pages inside a
+bio_vec.  Jens complained a while ago that this is fairly expensive.
+To mitigate this we can check that that the actual page structures
+are contiguous when adding them to the bio, and just do check pointer
+arithmetics later on.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/bio.c          | 51 ++++++++++++++++++++++----------------------
- include/linux/bvec.h |  5 -----
- 2 files changed, 25 insertions(+), 31 deletions(-)
+ block/bio.c          |  9 +++++++--
+ include/linux/bvec.h | 13 ++++---------
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index 2fa624db21c7..3f78c114b5e9 100644
+index 3f78c114b5e9..110292627575 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -861,6 +861,26 @@ int bio_add_page(struct bio *bio, struct page *page,
+@@ -659,8 +659,13 @@ static inline bool page_is_mergeable(const struct bio_vec *bv,
+ 		return false;
+ 	if (xen_domain() && !xen_biovec_phys_mergeable(bv, page))
+ 		return false;
+-	if (same_page && (vec_end_addr & PAGE_MASK) != page_addr)
+-		return false;
++
++	if ((vec_end_addr & PAGE_MASK) != page_addr) {
++		if (same_page)
++			return false;
++		if (pfn_to_page(PFN_DOWN(vec_end_addr)) + 1 != page)
++			return false;
++	}
+ 
+ 	return true;
  }
- EXPORT_SYMBOL(bio_add_page);
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 307bbda62b7b..44b0f4684190 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -51,11 +51,6 @@ struct bvec_iter_all {
+ 	unsigned	done;
+ };
  
-+static void bio_get_pages(struct bio *bio)
-+{
-+	struct bvec_iter_all iter_all;
-+	struct bio_vec *bvec;
-+	int i;
-+
-+	bio_for_each_segment_all(bvec, bio, i, iter_all)
-+		get_page(bvec->bv_page);
-+}
-+
-+static void bio_release_pages(struct bio *bio)
-+{
-+	struct bvec_iter_all iter_all;
-+	struct bio_vec *bvec;
-+	int i;
-+
-+	bio_for_each_segment_all(bvec, bio, i, iter_all)
-+		put_page(bvec->bv_page);
-+}
-+
- static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
- {
- 	const struct bio_vec *bv = iter->bvec;
-@@ -875,15 +895,6 @@ static int __bio_iov_bvec_add_pages(struct bio *bio, struct iov_iter *iter)
- 				bv->bv_offset + iter->iov_offset);
- 	if (unlikely(size != len))
- 		return -EINVAL;
--
--	if (!bio_flagged(bio, BIO_NO_PAGE_REF)) {
--		struct page *page;
--		int i;
--
--		mp_bvec_for_each_page(page, bv, i)
--			get_page(page);
--	}
--
- 	iov_iter_advance(iter, size);
- 	return 0;
- }
-@@ -963,13 +974,6 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	if (WARN_ON_ONCE(bio->bi_vcnt))
- 		return -EINVAL;
- 
--	/*
--	 * If this is a BVEC iter, then the pages are kernel pages. Don't
--	 * release them on IO completion, if the caller asked us to.
--	 */
--	if (is_bvec && iov_iter_bvec_no_ref(iter))
--		bio_set_flag(bio, BIO_NO_PAGE_REF);
--
- 	do {
- 		if (is_bvec)
- 			ret = __bio_iov_bvec_add_pages(bio, iter);
-@@ -977,6 +981,11 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 			ret = __bio_iov_iter_get_pages(bio, iter);
- 	} while (!ret && iov_iter_count(iter) && !bio_full(bio));
- 
-+	if (iov_iter_bvec_no_ref(iter))
-+		bio_set_flag(bio, BIO_NO_PAGE_REF);
-+	else
-+		bio_get_pages(bio);
-+
- 	return bio->bi_vcnt ? 0 : ret;
- }
- 
-@@ -1670,16 +1679,6 @@ void bio_set_pages_dirty(struct bio *bio)
- 	}
- }
- 
--static void bio_release_pages(struct bio *bio)
+-static inline struct page *bvec_nth_page(struct page *page, int idx)
 -{
--	struct bio_vec *bvec;
--	int i;
--	struct bvec_iter_all iter_all;
--
--	bio_for_each_segment_all(bvec, bio, i, iter_all)
--		put_page(bvec->bv_page);
+-	return idx == 0 ? page : nth_page(page, idx);
 -}
 -
  /*
-  * bio_check_pages_dirty() will check that all the BIO's pages are still dirty.
-  * If they are, then fine.  If, however, some pages are clean then they must
-diff --git a/include/linux/bvec.h b/include/linux/bvec.h
-index f6275c4da13a..307bbda62b7b 100644
---- a/include/linux/bvec.h
-+++ b/include/linux/bvec.h
-@@ -189,9 +189,4 @@ static inline void mp_bvec_last_segment(const struct bio_vec *bvec,
- 	}
- }
+  * various member access, note that bio_data should of course not be used
+  * on highmem page vectors
+@@ -92,8 +87,8 @@ static inline struct page *bvec_nth_page(struct page *page, int idx)
+ 	      PAGE_SIZE - bvec_iter_offset((bvec), (iter)))
  
--#define mp_bvec_for_each_page(pg, bv, i)				\
--	for (i = (bv)->bv_offset / PAGE_SIZE;				\
--		(i <= (((bv)->bv_offset + (bv)->bv_len - 1) / PAGE_SIZE)) && \
--		(pg = bvec_nth_page((bv)->bv_page, i)); i += 1)
--
- #endif /* __LINUX_BVEC_ITER_H */
+ #define bvec_iter_page(bvec, iter)				\
+-	bvec_nth_page(mp_bvec_iter_page((bvec), (iter)),		\
+-		      mp_bvec_iter_page_idx((bvec), (iter)))
++	(mp_bvec_iter_page((bvec), (iter)) +			\
++	 mp_bvec_iter_page_idx((bvec), (iter)))
+ 
+ #define bvec_iter_bvec(bvec, iter)				\
+ ((struct bio_vec) {						\
+@@ -157,7 +152,7 @@ static inline void mp_bvec_next_segment(const struct bio_vec *bvec,
+ 	struct bio_vec *bv = &iter_all->bv;
+ 
+ 	if (bv->bv_page) {
+-		bv->bv_page = nth_page(bv->bv_page, 1);
++		bv->bv_page++;
+ 		bv->bv_offset = 0;
+ 	} else {
+ 		bv->bv_page = bvec->bv_page;
+@@ -177,7 +172,7 @@ static inline void mp_bvec_last_segment(const struct bio_vec *bvec,
+ 	unsigned total = bvec->bv_offset + bvec->bv_len;
+ 	unsigned last_page = (total - 1) / PAGE_SIZE;
+ 
+-	seg->bv_page = bvec_nth_page(bvec->bv_page, last_page);
++	seg->bv_page = bvec->bv_page + last_page;
+ 
+ 	/* the whole segment is inside the last page */
+ 	if (bvec->bv_offset >= last_page * PAGE_SIZE) {
 -- 
 2.20.1
 
