@@ -2,146 +2,141 @@ Return-Path: <SRS0=B8lj=SL=vger.kernel.org=linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA6DDC10F0E
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 18:46:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4955C10F0E
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 18:57:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B46B0217F9
-	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 18:46:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71C402133D
+	for <linux-block@archiver.kernel.org>; Tue,  9 Apr 2019 18:57:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20150623.gappssmtp.com header.i=@kernel-dk.20150623.gappssmtp.com header.b="PoL/k0X6"
+	dkim=pass (1024-bit key) header.d=fb.com header.i=@fb.com header.b="E3TvCbzC";
+	dkim=pass (1024-bit key) header.d=fb.onmicrosoft.com header.i=@fb.onmicrosoft.com header.b="I1oqDOEx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726573AbfDISqS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 9 Apr 2019 14:46:18 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:37229 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726383AbfDISqS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 9 Apr 2019 14:46:18 -0400
-Received: by mail-pl1-f194.google.com with SMTP id w23so9946105ply.4
-        for <linux-block@vger.kernel.org>; Tue, 09 Apr 2019 11:46:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20150623.gappssmtp.com; s=20150623;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=0vApW/buY6OtCIWOQhnD5Xdm5WPEcH/+QK5/B7HgPtU=;
-        b=PoL/k0X6ejuMiI0c9MQKWm9xd2VHgVKAB9jdtVvO3kK/e3wM/mpcxFVRmHspMNOgC/
-         bB1b9loCQDjA1VnrgOvVXwfQ+gllNSnaecp+jqKsn9Ol/BtRXIIFVul4IVhADr9weE42
-         RmAetUkOE3iZ2F1dLzmooSr/dt7QAdit053yA0l7Ki1DaYGkdFO4G4au7kSPT/OGcAQh
-         Z0fQe4/q+c454Z4G2I+jsz9dXCNoeiS86mBjV0JUUkCKoFzQGQ27zq84otl/tuAokojP
-         sdcsLxvOVvYmCI8FetX8eTq51isRqSaQ3OyPWhKyRVHE9xa+Ru/n4KgX9T+OeZS2KB0P
-         SCLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=0vApW/buY6OtCIWOQhnD5Xdm5WPEcH/+QK5/B7HgPtU=;
-        b=ntnUT02VQu/znxQuCKK4+NNYsi2wvTlAwSOLCq+pnL6mZClyHjqvonZWCgyZGyqKcZ
-         5qTOSXTbnadQYGolX2l9AgF5Z1AK7W4irbykPD44cSXqYfLHP6g+fW1vLqrZtT4X77Lq
-         ZZbsjuKEKzgPwcv9Zg9UdJP7MDCBJr8dinB+5PEe1lDcVojXB/8vB9cEyf1FWgNOxLyV
-         bc1ImwnVeKhGmnF8tEYyVL12Sh26eMcp2CkVJJsU30OWFp4aiH0IxGJH6+T5zN0BLxKI
-         kGkRFJQyf9jRzfZcv3GMm9lXdGoGk7usa+ery3p3LN+WtYYeSnHziR/dMtsg0EATC9xK
-         s6Qg==
-X-Gm-Message-State: APjAAAWIUn3imy8CieZO1fNfqB61t30bgnjKB0omdKF+k8tJwadETmt6
-        Cg9/VktY5Cqz0/QfFOnGfrybqw==
-X-Google-Smtp-Source: APXvYqxCFYzGofLG3ra9STFDozNvsDGaIZYxmKv5Hy7Ee58vyLLkvQg2fJGIj6Q+oooq1xpqXuGskA==
-X-Received: by 2002:a17:902:ec0c:: with SMTP id cy12mr16772022plb.291.1554835577855;
-        Tue, 09 Apr 2019 11:46:17 -0700 (PDT)
-Received: from [192.168.1.121] (66.29.188.166.static.utbb.net. [66.29.188.166])
-        by smtp.gmail.com with ESMTPSA id h4sm42587504pgn.20.2019.04.09.11.46.15
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 09 Apr 2019 11:46:16 -0700 (PDT)
-Subject: Re: [PATCH] io_uring: add support for barrier fsync
-To:     Chris Mason <clm@fb.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
+        id S1726556AbfDIS5H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 9 Apr 2019 14:57:07 -0400
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:47910 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726529AbfDIS5H (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Tue, 9 Apr 2019 14:57:07 -0400
+Received: from pps.filterd (m0001255.ppops.net [127.0.0.1])
+        by mx0b-00082601.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x39Ikmsv025732;
+        Tue, 9 Apr 2019 11:56:59 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=facebook;
+ bh=Z9vFFyn/yZ2e15vn0E1YnuvsKhzJFakjY+2fDJzxYus=;
+ b=E3TvCbzC3TNy+YqKxWKCutWrEPAY2uBbBLPwkSUnCQsWRkKCbaZgMAnGsfkzRxFtQ79H
+ LOCjVBxpC3K+I8U+aAvcyeTC5INe/hHcW+4kOUx/LT//w/3X8gUBQ6tH14HGdJ581eza
+ su3+oHIQvBtvgkvmlZ4mzhyUDsmX/MIpahE= 
+Received: from mail.thefacebook.com ([199.201.64.23])
+        by mx0b-00082601.pphosted.com with ESMTP id 2rryj6rfvn-3
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Tue, 09 Apr 2019 11:56:59 -0700
+Received: from prn-mbx06.TheFacebook.com (2620:10d:c081:6::20) by
+ prn-hub01.TheFacebook.com (2620:10d:c081:35::125) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.1.1713.5; Tue, 9 Apr 2019 11:56:58 -0700
+Received: from prn-hub03.TheFacebook.com (2620:10d:c081:35::127) by
+ prn-mbx06.TheFacebook.com (2620:10d:c081:6::20) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.1.1713.5; Tue, 9 Apr 2019 11:56:58 -0700
+Received: from NAM01-BY2-obe.outbound.protection.outlook.com (192.168.54.28)
+ by o365-in.thefacebook.com (192.168.16.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.1.1713.5
+ via Frontend Transport; Tue, 9 Apr 2019 11:56:58 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.onmicrosoft.com;
+ s=selector1-fb-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Z9vFFyn/yZ2e15vn0E1YnuvsKhzJFakjY+2fDJzxYus=;
+ b=I1oqDOExxIlYNmAdvPXxEia+CSQxOU3oMr3mHGNvoHvi9prztmPTroczIonM3kuTdWlNdaGe7Nhn6Uyk9zkS6uppI/4qXUIi3J5rtTog16wP04NDN1YNcMuNIfGT0+uaCb/QcS6SlO3uO1usFv4mQPJs7Du7UulkN49fYaLcMEE=
+Received: from DM5PR15MB1290.namprd15.prod.outlook.com (10.173.209.148) by
+ DM5PR15MB1356.namprd15.prod.outlook.com (10.173.224.143) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1792.15; Tue, 9 Apr 2019 18:56:56 +0000
+Received: from DM5PR15MB1290.namprd15.prod.outlook.com
+ ([fe80::e828:23d4:87c9:b7f7]) by DM5PR15MB1290.namprd15.prod.outlook.com
+ ([fe80::e828:23d4:87c9:b7f7%5]) with mapi id 15.20.1792.009; Tue, 9 Apr 2019
+ 18:56:56 +0000
+From:   Chris Mason <clm@fb.com>
+To:     Jens Axboe <axboe@kernel.dk>
+CC:     Christoph Hellwig <hch@infradead.org>,
         linux-fsdevel <linux-fsdevel@vger.kernel.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] io_uring: add support for barrier fsync
+Thread-Topic: [PATCH] io_uring: add support for barrier fsync
+Thread-Index: AQHU7vEvvXtetWT7+EuXEpZlgauUcqY0IygAgAABpACAAAVjgIAAAPOAgAAC+YA=
+Date:   Tue, 9 Apr 2019 18:56:56 +0000
+Message-ID: <FBAE8433-865B-4D4D-B658-27E234FE829F@fb.com>
 References: <7c7276e4-8ffa-495a-6abf-926a58ee899e@kernel.dk>
  <20190409181742.GA24925@infradead.org>
  <5f8d9644-9e8f-c9d2-611e-4b144c62539c@kernel.dk>
  <5BF7FDDE-212E-4F9A-9B50-26BDA99E952A@fb.com>
-From:   Jens Axboe <axboe@kernel.dk>
-Message-ID: <a7f00629-f822-7271-7a4e-ad3b802752e4@kernel.dk>
-Date:   Tue, 9 Apr 2019 12:46:15 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <5BF7FDDE-212E-4F9A-9B50-26BDA99E952A@fb.com>
-Content-Type: text/plain; charset=utf-8
+ <a7f00629-f822-7271-7a4e-ad3b802752e4@kernel.dk>
+In-Reply-To: <a7f00629-f822-7271-7a4e-ad3b802752e4@kernel.dk>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: MailMate (1.12.4r5594)
+x-clientproxiedby: BN4PR10CA0001.namprd10.prod.outlook.com (2603:10b6:403::11)
+ To DM5PR15MB1290.namprd15.prod.outlook.com (2603:10b6:3:b3::20)
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [2620:10d:c091:180::2ad7]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 805657c3-46f9-40c9-fce2-08d6bd1d236c
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(2017052603328)(7193020);SRVR:DM5PR15MB1356;
+x-ms-traffictypediagnostic: DM5PR15MB1356:
+x-microsoft-antispam-prvs: <DM5PR15MB135666F46FA089E797C16766D32D0@DM5PR15MB1356.namprd15.prod.outlook.com>
+x-forefront-prvs: 000227DA0C
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(346002)(376002)(39860400002)(396003)(366004)(136003)(189003)(199004)(8936002)(6512007)(83716004)(305945005)(71200400001)(71190400001)(76176011)(68736007)(2616005)(7736002)(6246003)(4326008)(446003)(11346002)(486006)(476003)(53936002)(14454004)(52116002)(25786009)(478600001)(6116002)(14444005)(186003)(256004)(6506007)(386003)(53546011)(102836004)(46003)(316002)(99286004)(54906003)(2906002)(50226002)(93886005)(82746002)(86362001)(106356001)(105586002)(6436002)(6486002)(33656002)(5660300002)(81156014)(8676002)(81166006)(229853002)(97736004)(6916009)(36756003);DIR:OUT;SFP:1102;SCL:1;SRVR:DM5PR15MB1356;H:DM5PR15MB1290.namprd15.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: fb.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 5NYxtHbJAvovG5DALy1pSkek1CqS33ASnGTkzQj690Kp1SyAzzbcbGDJEr9za2yWHs04kZicnKcaLcniSe6Ied6XUKt17GBnNyl2145EIIeP8r1f0w1QIwArTTa2S3lqTc3mQBc39aIXAvspVXohrBSvE5DlozpNDaH8rLGhvYiPKjsh27sONb9LlZyWoKQNtoJX6g4tpJzUBc/C1cNHR0ma0bJp/F4QmzDKHkM+6t7GIP5WRbotwRASf/VlB1MKWSq9VK9U1t41hDyzZXiDhfmlPCkxyALkQUIO33WbIGJsqYJ8Vh8wqpQmEmydwqMh1LaCBc4Zgd8CcK8zPTGBoeLkU4eRORKQZj8ThHExeVZrSu12fm9SVXXkUmm8ZUZcFwU7JhUnKNFvqBd7Gg8uQ+Y6V8FI8kMfo1+Ci1GToDo=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 805657c3-46f9-40c9-fce2-08d6bd1d236c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2019 18:56:56.8122
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR15MB1356
+X-OriginatorOrg: fb.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-09_09:,,
+ signatures=0
+X-Proofpoint-Spam-Reason: safe
+X-FB-Internal: Safe
 Sender: linux-block-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/9/19 12:42 PM, Chris Mason wrote:
-> On 9 Apr 2019, at 14:23, Jens Axboe wrote:
-> 
->> On 4/9/19 12:17 PM, Christoph Hellwig wrote:
->>> On Tue, Apr 09, 2019 at 10:27:43AM -0600, Jens Axboe wrote:
->>>> It's a quite common use case to issue a bunch of writes, then an 
->>>> fsync
->>>> or fdatasync when they complete. Since io_uring doesn't guarantee 
->>>> any
->>>> type of ordering, the application must track issued writes and wait
->>>> with the fsync issue until they have completed.
->>>>
->>>> Add an IORING_FSYNC_BARRIER flag that helps with this so the 
->>>> application
->>>> doesn't have to do this manually. If this flag is set for the fsync
->>>> request, we won't issue it until pending IO has already completed.
->>>
->>> I think we need a much more detailed explanation of the semantics,
->>> preferably in man page format.
->>>
->>> Barrier at least in Linux traditionally means all previously 
->>> submitted
->>> requests have finished and no new ones are started until the
->>> barrier request finishes, which is very heavy handed.  Is that what
->>> this is supposed to do?  If not what are the exact guarantees vs
->>> ordering and or barrier semantics?
->>
->> The patch description isn't that great, and maybe the naming isn't 
->> that
->> intuitive either. The way it's implemented, the fsync will NOT be 
->> issued
->> until previously issued IOs have completed. That means both reads and
->> writes, since there's no way to wait for just one.  In terms of
->> semantics, any previously submitted writes will have completed before
->> this fsync is issued. The barrier fsync has no ordering wrt future
->> writes, no ordering is implied there. Hence:
->>
->> W1, W2, W3, FSYNC_W_BARRIER, W4, W5
->>
->> W1..3 will have been completed by the hardware side before we start
->> FSYNC_W_BARRIER. We don't wait with issuing W4..5 until after the 
->> fsync
->> completes, no ordering is provided there.
-> 
-> Looking at the patch, why is fsync special?  Seems like you could add 
-> this ordering bit to any write?
-
-It's really not, the exact same technique could be used on any type of
-command to imply ordering. My initial idea was to have an explicit
-barrier/ordering command, but I didn't think that separating it from an
-actual command would be needed/useful.
-
-> While you're here, do you want to add a way to FUA/cache flush?  
-> Basically the rest of what user land would need to make their own 
-> write-back-cache-safe implementation.
-
-FUA would be a WRITEV/WRITE_FIXED flag, that should be trivially doable.
-
-In terms of cache flush, that's very heavy handed (and storage
-oriented).  What applications would want/need to do an explicit whole
-device flush?
-
--- 
-Jens Axboe
-
+T24gOSBBcHIgMjAxOSwgYXQgMTQ6NDYsIEplbnMgQXhib2Ugd3JvdGU6DQoNCj4gT24gNC85LzE5
+IDEyOjQyIFBNLCBDaHJpcyBNYXNvbiB3cm90ZToNCg0KPj4gTG9va2luZyBhdCB0aGUgcGF0Y2gs
+IHdoeSBpcyBmc3luYyBzcGVjaWFsPyAgU2VlbXMgbGlrZSB5b3UgY291bGQgYWRkDQo+PiB0aGlz
+IG9yZGVyaW5nIGJpdCB0byBhbnkgd3JpdGU/DQo+DQo+IEl0J3MgcmVhbGx5IG5vdCwgdGhlIGV4
+YWN0IHNhbWUgdGVjaG5pcXVlIGNvdWxkIGJlIHVzZWQgb24gYW55IHR5cGUgb2YNCj4gY29tbWFu
+ZCB0byBpbXBseSBvcmRlcmluZy4gTXkgaW5pdGlhbCBpZGVhIHdhcyB0byBoYXZlIGFuIGV4cGxp
+Y2l0DQo+IGJhcnJpZXIvb3JkZXJpbmcgY29tbWFuZCwgYnV0IEkgZGlkbid0IHRoaW5rIHRoYXQg
+c2VwYXJhdGluZyBpdCBmcm9tIA0KPiBhbg0KPiBhY3R1YWwgY29tbWFuZCB3b3VsZCBiZSBuZWVk
+ZWQvdXNlZnVsLg0KDQpNaWdodCB3YW50IHRvIG9yZGVyIGRpc2NhcmRzPyAgQ29tbWl0IGEgdHJh
+bnNhY3Rpb24gdG8gZnJlZSBzb21lIGJsb2NrcywgDQpkaXNjYXJkIHRob3NlIGJsb2Nrcz8NCg0K
+Pg0KPj4gV2hpbGUgeW91J3JlIGhlcmUsIGRvIHlvdSB3YW50IHRvIGFkZCBhIHdheSB0byBGVUEv
+Y2FjaGUgZmx1c2g/DQo+PiBCYXNpY2FsbHkgdGhlIHJlc3Qgb2Ygd2hhdCB1c2VyIGxhbmQgd291
+bGQgbmVlZCB0byBtYWtlIHRoZWlyIG93bg0KPj4gd3JpdGUtYmFjay1jYWNoZS1zYWZlIGltcGxl
+bWVudGF0aW9uLg0KPg0KPiBGVUEgd291bGQgYmUgYSBXUklURVYvV1JJVEVfRklYRUQgZmxhZywg
+dGhhdCBzaG91bGQgYmUgdHJpdmlhbGx5IA0KPiBkb2FibGUuDQo+DQo+IEluIHRlcm1zIG9mIGNh
+Y2hlIGZsdXNoLCB0aGF0J3MgdmVyeSBoZWF2eSBoYW5kZWQgKGFuZCBzdG9yYWdlDQo+IG9yaWVu
+dGVkKS4gIFdoYXQgYXBwbGljYXRpb25zIHdvdWxkIHdhbnQvbmVlZCB0byBkbyBhbiBleHBsaWNp
+dCB3aG9sZQ0KPiBkZXZpY2UgZmx1c2g/DQoNCkJhc2ljYWxseSBpZiBzb21lb25lIGlzIHdyaXRp
+bmcgYSB1c2VybGFuZCBmaWxlc3lzdGVtIHRoZXknZCB3YW50IHRvIA0KY2FjaGUgZmx1c2ggZm9y
+IHRoZSBzYW1lIHJlYXNvbnMgdGhlIGtlcm5lbCBmaWxlc3lzdGVtcyBkby4NCg0KDQotY2hyaXMN
+Cg==
